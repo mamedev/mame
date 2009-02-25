@@ -120,7 +120,7 @@ void fatfury2_install_protection(running_machine *machine)
 static WRITE16_HANDLER ( kof98_prot_w )
 {
 	/* info from razoola */
-	UINT16* mem16 = (UINT16*)memory_region(space->machine, "main");
+	UINT16* mem16 = (UINT16*)memory_region(space->machine, "maincpu");
 
 	switch (data)
 	{
@@ -160,7 +160,7 @@ void install_kof98_protection(running_machine *machine)
 void mslugx_install_protection(running_machine *machine)
 {
 	int i;
-	UINT16 *mem16 = (UINT16 *)memory_region(machine, "main");
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
 
 	for (i = 0;i < (0x100000/2) - 4;i++)
 	{

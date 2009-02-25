@@ -299,8 +299,8 @@ static UINT8 nmi_enable = 0;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine,  STATIC_BANK1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
-//  memory_set_bankptr(machine,  1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
+	memory_set_bankptr(machine,  STATIC_BANK1, memory_region(machine, "audiocpu") + (banknum * 0x8000) + 0x10000 );
+//  memory_set_bankptr(machine,  1, memory_region(machine, "audiocpu") + (banknum * 0x8000) + 0x10000 );
 
 }
 
@@ -839,11 +839,11 @@ static const ym2203_interface ym2203_interface_2 =
 static MACHINE_DRIVER_START( darius )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius_readmem,darius_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius_sound_readmem,darius_sound_writemem)
 
 	MDRV_CPU_ADD("cpub", M68000,16000000/2)	/* 8 MHz ? */
@@ -964,7 +964,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( darius )
-	ROM_REGION( 0x60000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
 	ROM_FILL( 0x00000, 0x60000, 0xff )
 	ROM_LOAD16_BYTE( "da-59.bin",   0x00000, 0x10000, CRC(11aab4eb) SHA1(92f795e96a940e8d94abbf429ba4ac119992b991) )
 	ROM_LOAD16_BYTE( "da-58.bin",   0x00001, 0x10000, CRC(5f71e697) SHA1(bf959cf82e8e8ba950ab40d9c008ad5de01385aa) )
@@ -973,7 +973,7 @@ ROM_START( darius )
 	ROM_LOAD16_BYTE( "a96_31.187",  0x40000, 0x10000, CRC(e9bb5d89) SHA1(a5d08129c32b97e2cce84496945766fd32b6506e) )	/* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",  0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )
 
-   	ROM_REGION( 0x30000, "audio", 0 )	/* Z80 sound cpu */
+   	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )	/* 68000 code */
@@ -1023,7 +1023,7 @@ ROM_START( darius )
 ROM_END
 
 ROM_START( dariusj )
-	ROM_REGION( 0x60000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
 	ROM_FILL( 0x00000, 0x60000, 0xff )
 	ROM_LOAD16_BYTE( "a96_29-1.185", 0x00000, 0x10000, CRC(75486f62) SHA1(818b095f2c6cc5764161c3e14ba70fe1c4b2f724) )
 	ROM_LOAD16_BYTE( "a96_28-1.152", 0x00001, 0x10000, CRC(fb34d400) SHA1(b14517384f5eadca8b73833bcd81374614b928d4) )
@@ -1031,7 +1031,7 @@ ROM_START( dariusj )
 	ROM_LOAD16_BYTE( "a96_31.187",   0x40000, 0x10000, CRC(e9bb5d89) SHA1(a5d08129c32b97e2cce84496945766fd32b6506e) )	/* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",   0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )
 
-   	ROM_REGION( 0x30000, "audio", 0 )	/* Z80 sound cpu */
+   	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )	/* 68000 code */
@@ -1078,7 +1078,7 @@ ROM_START( dariusj )
 ROM_END
 
 ROM_START( dariuso )
-	ROM_REGION( 0x60000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
 	ROM_FILL( 0x00000, 0x60000, 0xff )
 	ROM_LOAD16_BYTE( "a96-29.185",   0x00000, 0x10000, CRC(f775162b) SHA1(a17e570c2ba4daf0a3526b45c324c822faac0c8d) )
 	ROM_LOAD16_BYTE( "a96-28.152",   0x00001, 0x10000, CRC(4721d667) SHA1(fa9a109054a818f836452215204ce91f2b166ddb) )
@@ -1086,7 +1086,7 @@ ROM_START( dariuso )
 	ROM_LOAD16_BYTE( "a96_31.187",   0x40000, 0x10000, CRC(e9bb5d89) SHA1(a5d08129c32b97e2cce84496945766fd32b6506e) )	/* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",   0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )
 
-   	ROM_REGION( 0x30000, "audio", 0 )	/* Z80 sound cpu */
+   	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )	/* 68000 code */
@@ -1133,7 +1133,7 @@ ROM_START( dariuso )
 ROM_END
 
 ROM_START( dariuse )
-	ROM_REGION( 0x60000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
 	ROM_FILL( 0x00000, 0x60000, 0xff )
 	ROM_LOAD16_BYTE( "dae-68.bin",   0x00000, 0x10000, CRC(ed721127) SHA1(8127f4a9b26b5fb83a381235eef0577d60d1cfd7) )
 	ROM_LOAD16_BYTE( "dae-67.bin",   0x00001, 0x10000, CRC(b99aea8c) SHA1(859ada7c472ab2ac308faa775066e79ed1f4ad71) )
@@ -1141,7 +1141,7 @@ ROM_START( dariuse )
 	ROM_LOAD16_BYTE( "dae-70.bin",   0x40000, 0x10000, CRC(54590b31) SHA1(2b89846f14a5cb19b58ab4999bc5ae11671bbb5a) )	/* 2 data roms */
 	ROM_LOAD16_BYTE( "a96_30.154",   0x40001, 0x10000, CRC(9eb5e127) SHA1(50e2fe5ec7f79ecf1fb5107298da13ef5ab37162) )	// dae-69.bin
 
-   	ROM_REGION( 0x30000, "audio", 0 )	/* Z80 sound cpu */
+   	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "a96_57.33",  0x00000, 0x10000, CRC(33ceb730) SHA1(05070ea503ac57ff8445145d6f97115f7aad90a5) )
 
 	ROM_REGION( 0x80000, "cpub", 0 )	/* 68000 code */
@@ -1223,7 +1223,7 @@ static MACHINE_RESET( darius )
 	int  i;
 
 	/**** setup sound bank image ****/
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(machine, "audiocpu");
 
 	for( i = 3; i >= 0; i-- ){
 		memcpy( RAM + 0x8000*i + 0x10000, RAM,            0x4000 );

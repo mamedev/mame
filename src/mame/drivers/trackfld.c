@@ -791,17 +791,17 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( trackfld )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 2048000)        /* 1.400 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,14318180/4)	/* Z80 Clock is derived from a 14.31818 MHz crystal */
+	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)	/* Z80 Clock is derived from a 14.31818 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_NVRAM_HANDLER(trackfld)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -833,17 +833,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hyprolyb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 2048000)        /* 1.400 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,14318180/4)	/* Z80 Clock is derived from a 14.31818 MHz crystal */
+	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)	/* Z80 Clock is derived from a 14.31818 MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_readmem,hyprolyb_sound_writemem)
 
 	MDRV_NVRAM_HANDLER(trackfld)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -876,7 +876,7 @@ static MACHINE_DRIVER_START( mastkin )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(trackfld)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mastkin_readmem,mastkin_writemem)
 
 	MDRV_NVRAM_HANDLER(mastkin)
@@ -887,9 +887,9 @@ static MACHINE_DRIVER_START( wizzquiz )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(trackfld)
 	// right cpu?
-	MDRV_CPU_REPLACE("main",M6800,2048000)		/* 1.400 MHz ??? */
+	MDRV_CPU_REPLACE("maincpu",M6800,2048000)		/* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wizzquiz_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
@@ -898,10 +898,10 @@ static MACHINE_DRIVER_START( reaktor )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(trackfld)
-	MDRV_CPU_REPLACE("main",Z80,18432000/6)
+	MDRV_CPU_REPLACE("maincpu",Z80,18432000/6)
 	MDRV_CPU_PROGRAM_MAP(reaktor_readmem,reaktor_writemem)
 	MDRV_CPU_IO_MAP(reaktor_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_DRIVER_END
 
 
@@ -912,14 +912,14 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( trackfld )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "a01_e01.bin",  0x6000, 0x2000, CRC(2882f6d4) SHA1(f7ddae2c5412a2849efd7f9629e92a5b0328e7cb) )
 	ROM_LOAD( "a02_e02.bin",  0x8000, 0x2000, CRC(1743b5ee) SHA1(31301031a525f893c31461f634350f01a9492ef4) )
 	ROM_LOAD( "a03_k03.bin",  0xa000, 0x2000, CRC(6c0d1ee9) SHA1(380ab2162153a61910a6fe5b6d091ca9451ad4fd) )
 	ROM_LOAD( "a04_e04.bin",  0xc000, 0x2000, CRC(21d6c448) SHA1(6c42cc76302485954a31520bdd08469fa948c72f) )
 	ROM_LOAD( "a05_e05.bin",  0xe000, 0x2000, CRC(f08c7b7e) SHA1(50e65d9b0ea37d2afb2dfdf1f3e1378e3290bc81) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c2_d13.bin",   0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )
@@ -943,14 +943,14 @@ ROM_START( trackfld )
 ROM_END
 
 ROM_START( trackflc )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "f01.1a",       0x6000, 0x2000, CRC(4e32b360) SHA1(cafd4b9ef5548d31d894610dfd2288425d29ed58) )
 	ROM_LOAD( "f02.2a",       0x8000, 0x2000, CRC(4e7ebf07) SHA1(266110e5195ab1e374724536b82ec4da35123dc7) )
 	ROM_LOAD( "l03.3a",       0xa000, 0x2000, CRC(fef4c0ea) SHA1(c34a0f001de8c06fdb617e20dc335ad99e15df05) )
 	ROM_LOAD( "f04.4a",       0xc000, 0x2000, CRC(73940f2d) SHA1(31e0db23ebcf634605f8c232606079ad75e27a66) )
 	ROM_LOAD( "f05.5a",       0xe000, 0x2000, CRC(363fd761) SHA1(2b4868813b62c2b7d122e2cb238803eb4687b002) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c2_d13.bin",   0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )
@@ -974,14 +974,14 @@ ROM_START( trackflc )
 ROM_END
 
 ROM_START( hyprolym ) /* GX361 */
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "361-d01.a01", 0x6000, 0x2000, CRC(82257fb7) SHA1(4a5038292e582d5c3b5f2d82b01c57ccb24f3095) )
 	ROM_LOAD( "361-d02.a02", 0x8000, 0x2000, CRC(15b83099) SHA1(79827590d74f20c9a95723e06b05af2b15c34f5f) )
 	ROM_LOAD( "361-d03.a03", 0xa000, 0x2000, CRC(e54cc960) SHA1(7c448c174675271d548ffcf0297ec7a2ae646985) )
 	ROM_LOAD( "361-d04.a04", 0xc000, 0x2000, CRC(d099b1e8) SHA1(0472991ad6caef41ec6b8ec8bf3d9d07584a57cc) )
 	ROM_LOAD( "361-d05.a05", 0xe000, 0x2000, CRC(974ff815) SHA1(11512df2008a79ba44bbb84bd70885f187113211) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c2_d13.bin",   0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) ) /* 361-d13.c03 */
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )
@@ -1006,7 +1006,7 @@ ROM_END
 
 ROM_START( hyprolyb )
     /* These ROM's are located on the CPU/Video Board */
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "1.a1",         0x6000, 0x2000, CRC(9aee2d5a) SHA1(81f151459f1113b5f2f76ddc140bf86676f778e4) )
 	ROM_LOAD( "2.a2",         0x8000, 0x2000, CRC(15b83099) SHA1(79827590d74f20c9a95723e06b05af2b15c34f5f) )
 	ROM_LOAD( "3.a4",         0xa000, 0x2000, CRC(2d6fc308) SHA1(1ff95384670e40d560703f2238998a8e154aa4cf) )
@@ -1014,7 +1014,7 @@ ROM_START( hyprolyb )
 	ROM_LOAD( "5.a7",         0xe000, 0x2000, CRC(974ff815) SHA1(11512df2008a79ba44bbb84bd70885f187113211) )
 
     /* These ROM's are located on the Sound Board */
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c2_d13.bin",   0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) )
 
     /* These ROM's are located on the Sound Board */
@@ -1052,11 +1052,11 @@ ROM_START( hyprolyb )
 ROM_END
 
 ROM_START( atlantol )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "atl37", 0x00000, 0x10000, CRC(aca8da51) SHA1(50e96fd8496ed32e11eb43bcbfd468ce566caa47) )
 	ROM_CONTINUE(      0x00000, 0x10000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "atl35", 0x00000, 0x10000, CRC(03331597) SHA1(74a6e20cb0cadc17500b9046d621be252839de98) )
 	ROM_CONTINUE(      0x00000, 0x10000 )
 
@@ -1080,12 +1080,12 @@ ROM_START( atlantol )
 ROM_END
 
 ROM_START( mastkin )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mk3",          0x8000, 0x2000, CRC(9f80d6ae) SHA1(724321d8c3e32d679f8170dfef6555d0179f9d20) )
 	ROM_LOAD( "mk4",          0xa000, 0x2000, CRC(99f361e7) SHA1(8706e5c393325c5a89d32388991bc48fa4102779) )
 	ROM_LOAD( "mk5",          0xe000, 0x2000, CRC(143d76ce) SHA1(5e5c450e891a11980fb514453f28ffc74a2730ae) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "mk1",          0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )
@@ -1109,7 +1109,7 @@ ROM_START( mastkin )
 ROM_END
 
 ROM_START( wizzquiz )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pros.rom",     0xe000, 0x2000, CRC(4c858841) SHA1(78858bd4021d19415cd5f0db21b508880b298c1d) )
 
 	ROM_REGION( 0x40000, "user1", 0 )    /* questions data */
@@ -1130,7 +1130,7 @@ ROM_START( wizzquiz )
 	ROM_LOAD( "pop2.rom",     0x3a000, 0x6000, CRC(5a5b41cd) SHA1(31b2cdc74925b4666820d1d6febcb1358312bbdf) )
 	ROM_CONTINUE(             0x38000, 0x2000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "zandz.2c",     0x0000, 0x2000, CRC(3daca93a) SHA1(743c2b787aeb2c893ea476efc95d92e33b9bd159) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1152,7 +1152,7 @@ ROM_START( wizzquiz )
 ROM_END
 
 ROM_START( wizzquza )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic9_a1.bin",   0xe000, 0x2000, CRC(608e1ff3) SHA1(f3350a3367df59ec1780bb22c7a6a227e7b10d5e) )
 
 	ROM_REGION( 0x40000, "user1", 0 )    /* questions data */
@@ -1173,7 +1173,7 @@ ROM_START( wizzquza )
 	ROM_LOAD( "ic8_q19.bin",  0x3a000, 0x6000, CRC(8d152da0) SHA1(8404256775b6236d80869f5023d912aa9ebb6582) )
 	ROM_CONTINUE(             0x38000, 0x2000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "02c.bin",      0x0000, 0x2000, CRC(3daca93a) SHA1(743c2b787aeb2c893ea476efc95d92e33b9bd159) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1195,14 +1195,14 @@ ROM_START( wizzquza )
 ROM_END
 
 ROM_START( reaktor )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "prog3.bin",  0x0000, 0x8000, CRC(8ba956fa) SHA1(8085b85da1b81f5d9e0da80fcfec44d70f59c208) )
 
 	/* most of these were 27128 roms, but they have identical halves, 2764 chips could have been used
        instead, and one was actually used for rom 12c.  I'm not cutting the others because this is the
        form in which they were found */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "2c.bin",   0x0000, 0x2000, CRC(105a8beb) SHA1(4bd9a0076fece8dc9a830e76a60fbcefe08940f7) )
 	ROM_CONTINUE(0x0000,0x2000)
 
@@ -1236,18 +1236,18 @@ ROM_END
 
 static DRIVER_INIT( trackfld )
 {
-	konami1_decode(machine, "main");
+	konami1_decode(machine, "maincpu");
 }
 
 static DRIVER_INIT( atlantol )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypt;
 	int A;
 
 	/* "konami1" encrypted opcodes */
-	decrypt = konami1_decode(machine, "main");
+	decrypt = konami1_decode(machine, "maincpu");
 
 	/* not encrypted opcodes */
 	for (A = 0;A < 0x6000;A++)
@@ -1281,7 +1281,7 @@ static DRIVER_INIT( mastkin )
 
 static DRIVER_INIT( wizzquiz )
 {
-	UINT8 *ROM = memory_region(machine, "main") + 0xe000;
+	UINT8 *ROM = memory_region(machine, "maincpu") + 0xe000;
 	int i;
 
 	/* decrypt program rom */

@@ -548,7 +548,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch2_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch2_r),
 	DEVCB_HANDLER(ay8910_port0a_w),
 	DEVCB_NULL
 };
@@ -563,11 +563,11 @@ static const tms5220_interface tms5220_config =
 static MACHINE_DRIVER_START( zaccaria )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", M6802,XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_1,0)
 	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)3580000/4096)
 
@@ -580,7 +580,7 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -626,7 +626,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( monymony )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpu1.1a",           0x0000, 0x1000, CRC(13c227ca) SHA1(be305d112917904dd130b08f6b5186e3fbcb858a) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
 	ROM_LOAD( "cpu2.1b",           0x1000, 0x1000, CRC(87372545) SHA1(04618d007a93b3f6706f56b10bdf39727d7d748d) )
@@ -640,7 +640,7 @@ ROM_START( monymony )
 	ROM_LOAD( "cpu6.2c",           0x5000, 0x1000, CRC(31da62b1) SHA1(486f07087244f8537510afacb64ddd59eb512a4d) )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for first 6802 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for first 6802 */
 	ROM_LOAD( "snd13.2g",           0xa000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
 	ROM_LOAD( "snd9.1i",           0xe000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
 
@@ -661,7 +661,7 @@ ROM_START( monymony )
 ROM_END
 
 ROM_START( jackrabt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpu-01.1a",    0x0000, 0x1000, CRC(499efe97) SHA1(f0efc910a5343001b27637779e1d4de218d44a4e) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
 	ROM_LOAD( "cpu-01.2l",    0x1000, 0x1000, CRC(4772e557) SHA1(71c1eb49c978799294e732e65a77eba330d8da9b) )
@@ -675,7 +675,7 @@ ROM_START( jackrabt )
 	ROM_LOAD( "cpu-01.5h",    0xc000, 0x1000, CRC(785e1a01) SHA1(a748d300be9455cad4f912e01c2279bb8465edfe) )
 	ROM_LOAD( "cpu-01.6h",    0xd000, 0x1000, CRC(dd5979cf) SHA1(e9afe7002b2258a1c3132bdd951c6e20d473fb6a) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for first 6802 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for first 6802 */
 	ROM_LOAD( "13snd.2g",     0xa000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
 	ROM_LOAD( "9snd.1i",      0xe000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
@@ -700,7 +700,7 @@ ROM_START( jackrabt )
 ROM_END
 
 ROM_START( jackrab2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1cpu2.1a",     0x0000, 0x1000, CRC(f9374113) SHA1(521f293f1894bcaf21e44bc7841a20ae29232da3) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
 	ROM_LOAD( "2cpu2.1b",     0x1000, 0x1000, CRC(0a0eea4a) SHA1(4dfd9b2511d480bb5cc918f7d91013205911d377) )
@@ -714,7 +714,7 @@ ROM_START( jackrab2 )
 	ROM_LOAD( "6cpu2.2c",     0x5000, 0x1000, CRC(404496eb) SHA1(44381e27e540fe9d8cacab4c3b1fe9a4f20d26a8) )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for first 6802 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for first 6802 */
 	ROM_LOAD( "13snd.2g",     0xa000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
 	ROM_LOAD( "9snd.1i",      0xe000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
@@ -735,7 +735,7 @@ ROM_START( jackrab2 )
 ROM_END
 
 ROM_START( jackrabs )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1cpu.1a",      0x0000, 0x1000, CRC(6698dc65) SHA1(33e3518846e88dc34f4b6c4e9ca9f8999c0460c8) )
 	ROM_CONTINUE(             0x8000, 0x1000 )
 	ROM_LOAD( "2cpu.1b",      0x1000, 0x1000, CRC(42b32929) SHA1(5b400d434ce903c74f58780a422a8c2594af90be) )
@@ -749,7 +749,7 @@ ROM_START( jackrabs )
 	ROM_LOAD( "6cpu.2c",      0x5000, 0x1000, CRC(f53d6356) SHA1(9b167edca59cf81a2468368a372bab132f15e2ea) )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for first 6802 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for first 6802 */
 	ROM_LOAD( "13snd.2g",     0xa000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
 	ROM_LOAD( "9snd.1i",      0xe000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 

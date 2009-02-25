@@ -287,7 +287,7 @@ static READ8_HANDLER ( suzume_dsw_r )
 
 static WRITE8_HANDLER ( suzume_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	int address;
 
 	suzume_bank = data;
@@ -303,7 +303,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 
 static WRITE8_HANDLER ( mjapinky_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	rombank = data;
 	memory_set_bankptr(space->machine, 1,ROM + 0x10000 + 0x8000 * data);
 }
@@ -319,12 +319,12 @@ static WRITE8_HANDLER( mjapinky_palbank_w )
 static READ8_HANDLER( mjapinky_dsw_r )
 {
 	if (rombank == 0x0e)	return input_port_read(space->machine, "DSW3");
-	else					return *(memory_region(space->machine, "main") + 0x10000 + 0x8000 * rombank);
+	else					return *(memory_region(space->machine, "maincpu") + 0x10000 + 0x8000 * rombank);
 }
 
 static WRITE8_HANDLER ( tontonb_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	int address;
 
 logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
@@ -342,7 +342,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 static WRITE8_HANDLER ( dynax_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	int address;
 
 //logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
@@ -532,7 +532,7 @@ static READ8_HANDLER( janptr96_dsw_r )
 
 static WRITE8_HANDLER( janptr96_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1,ROM + 0x10000 + 0x8000 * data);
 }
 
@@ -585,7 +585,7 @@ static WRITE8_HANDLER( mjifb_coin_counter_w )
 static READ8_HANDLER( mjifb_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(space->machine, "main") + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(memory_region(space->machine, "maincpu") + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -692,7 +692,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( mjdejavu_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(space->machine, "main") + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(memory_region(space->machine, "maincpu") + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
@@ -751,7 +751,7 @@ static READ8_HANDLER( mjtensin_p3_r )
 
 static void mjtensin_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr(machine,  1, memory_region(machine, "main") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr(machine,  1, memory_region(machine, "maincpu") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( mjtensin_p4_w )
 {
@@ -792,7 +792,7 @@ ADDRESS_MAP_END
 
 static void cafetime_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr(machine,  1, memory_region(machine, "main") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr(machine,  1, memory_region(machine, "maincpu") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( cafetime_p4_w )
 {
@@ -2229,10 +2229,10 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( royalmah )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3000000)        /* 3.00 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 3000000)        /* 3.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(royalmah_map,0)
 	MDRV_CPU_IO_MAP(royalmah_iomap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -2241,7 +2241,7 @@ static MACHINE_DRIVER_START( royalmah )
 	MDRV_PALETTE_LENGTH(16*2)
 	MDRV_PALETTE_INIT(royalmah)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 255)
@@ -2260,25 +2260,25 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( janoh )
 
 	MDRV_IMPORT_FROM(royalmah)
-	MDRV_CPU_REPLACE("main", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_REPLACE("maincpu", Z80, 8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(janho_map,0)
 
 	MDRV_CPU_ADD("sub", Z80, 4000000)        /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(janoh_sub_map,0)
 	MDRV_CPU_IO_MAP(janoh_sub_iomap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( dondenmj )
 	MDRV_IMPORT_FROM(royalmah)
-	MDRV_CPU_REPLACE("main", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_REPLACE("maincpu", Z80, 8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_IO_MAP(dondenmj_iomap,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ippatsu )
 	MDRV_IMPORT_FROM(dondenmj)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(ippatsu_iomap,0)
 MACHINE_DRIVER_END
 
@@ -2290,39 +2290,39 @@ static INTERRUPT_GEN( suzume_irq )
 
 static MACHINE_DRIVER_START( suzume )
 	MDRV_IMPORT_FROM(dondenmj)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(suzume_iomap,0)
-	MDRV_CPU_VBLANK_INT("main", suzume_irq)
+	MDRV_CPU_VBLANK_INT("screen", suzume_irq)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tontonb )
 	MDRV_IMPORT_FROM(dondenmj)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(tontonb_iomap,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjdiplob )
 	MDRV_IMPORT_FROM(dondenmj)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjdiplob_iomap,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( majs101b )
 	MDRV_IMPORT_FROM(dondenmj)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(majs101b_iomap,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjapinky )
 	MDRV_IMPORT_FROM(dondenmj)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mjapinky_map,0)
 	MDRV_CPU_IO_MAP(mjapinky_iomap,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjderngr )
 	MDRV_IMPORT_FROM(dondenmj)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjderngr_iomap,0)
 
 	/* video hardware */
@@ -2343,12 +2343,12 @@ static INTERRUPT_GEN( janptr96_interrupt )
 
 static MACHINE_DRIVER_START( janptr96 )
 	MDRV_IMPORT_FROM(mjderngr)
-	MDRV_CPU_REPLACE("main",Z80,24000000/4)	/* 6 MHz? */
+	MDRV_CPU_REPLACE("maincpu",Z80,24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(janptr96_map,0)
 	MDRV_CPU_IO_MAP(janptr96_iomap,0)
 	MDRV_CPU_VBLANK_INT_HACK(janptr96_interrupt,3)	/* IM 2 needs a vector on the data bus */
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
 
 	/* devices */
@@ -2358,24 +2358,24 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjifb )
 	MDRV_IMPORT_FROM(mjderngr)
-	MDRV_CPU_REPLACE("main",TMP90841, 8000000)	/* ? */
+	MDRV_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjifb_map,0)
 	MDRV_CPU_IO_MAP(mjifb_iomap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( mjdejavu )
 	MDRV_IMPORT_FROM(mjderngr)
-	MDRV_CPU_REPLACE("main",TMP90841, 8000000)	/* ? */
+	MDRV_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjdejavu_map,0)
 	MDRV_CPU_IO_MAP(mjifb_iomap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 MACHINE_DRIVER_END
 
@@ -2391,12 +2391,12 @@ static INTERRUPT_GEN( mjtensin_interrupt )
 
 static MACHINE_DRIVER_START( mjtensin )
 	MDRV_IMPORT_FROM(mjderngr)
-	MDRV_CPU_REPLACE("main",TMP90841, 12000000)	/* ? */
+	MDRV_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjtensin_map,0)
 	MDRV_CPU_IO_MAP(mjtensin_iomap,0)
 	MDRV_CPU_VBLANK_INT_HACK( mjtensin_interrupt,2 )
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
@@ -2405,12 +2405,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cafetime )
 	MDRV_IMPORT_FROM(mjderngr)
-	MDRV_CPU_REPLACE("main",TMP90841, 12000000)	/* ? */
+	MDRV_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(cafetime_map,0)
 	MDRV_CPU_IO_MAP(cafetime_iomap,0)
 	MDRV_CPU_VBLANK_INT_HACK(mjtensin_interrupt,2)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
 
 	/* devices */
@@ -2435,7 +2435,7 @@ OSC: 18.432MHz
 ***************************************************************************/
 
 ROM_START( royalmj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.p1", 0x0000, 0x1000, CRC(549544bb) SHA1(dfb221572c7bfd267a22c0a944830d5f127f9942) )
 	ROM_LOAD( "2.p2", 0x1000, 0x1000, CRC(afc8a61e) SHA1(4134f6404f955838fc48fd0f87b83ebc75c1a021) )
 	ROM_LOAD( "3.p3", 0x2000, 0x1000, CRC(5d33e54d) SHA1(bf5e0ad5177c086f1cea5c90d7273a841db941bc) )
@@ -2448,7 +2448,7 @@ ROM_START( royalmj )
 ROM_END
 
 ROM_START( royalmah )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom1",       0x0000, 0x1000, CRC(69b37a62) SHA1(7792528754b0df4e11f4ebe33380b713ac7351a3) )
 	ROM_LOAD( "rom2",       0x1000, 0x1000, CRC(0c8351b6) SHA1(9e6b48fd39dd98478d1e3557df839b09652c4349) )
 	ROM_LOAD( "rom3",       0x2000, 0x1000, CRC(b7736596) SHA1(4b8bc175d945e695b767b9fb2227ffc1cd4b0547) )
@@ -2461,7 +2461,7 @@ ROM_START( royalmah )
 ROM_END
 
 ROM_START( openmj )
-	ROM_REGION( 0x7000, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x7000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "10", 0x0000, 0x2000, CRC(4042920e) SHA1(19753bcb27ebf391ab824a45c6e41d956826a263) )
 	ROM_LOAD( "20", 0x2000, 0x2000, CRC(8fa0f735) SHA1(645154d51c0679b953b9ffc2f1d3b8f2752a0796) )
 	ROM_LOAD( "30", 0x4000, 0x2000, CRC(00045cd7) SHA1(0c32995753c1da14dacc8bc6c12dbcbdcae4e1b0) )
@@ -2494,7 +2494,7 @@ empty socket for MC68705
 ***************************************************************************/
 
 ROM_START( janyoup2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.c110",       0x0000, 0x2000, CRC(36ebb3d0) SHA1(39c0cdd1dc5878539768074dad3c39aac4ace8bf) )
 	ROM_LOAD( "2.c109",       0x2000, 0x2000, CRC(324426d4) SHA1(409244c8458d9bafa325746c37de9e7b955b3787) )
 	ROM_LOAD( "3.c108",       0x4000, 0x2000, CRC(e98b6d34) SHA1(e27ab9a03aff750df78c5db52a112247bdd31328) )
@@ -2524,7 +2524,7 @@ dumped by sayu
 ****************************************************************************/
 
 ROM_START( ippatsu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "11", 0x0000, 0x8000, CRC(5f563be7) SHA1(2ce486777bd61a2de789683cd0c8abeefe31775b) )
 	ROM_LOAD( "12", 0x8000, 0x4000, CRC(a09a43b0) SHA1(da12e669ccd036da817a69bd549e8668e6a45730) )
 	ROM_RELOAD(     0xc000, 0x4000 )
@@ -2534,7 +2534,7 @@ ROM_START( ippatsu )
 ROM_END
 
 ROM_START( suzume )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "p1.bin",     0x00000, 0x1000, CRC(e9706967) SHA1(2e3d78178623de6552c9036da90e02f240d94055) )
 	ROM_LOAD( "p2.bin",     0x01000, 0x1000, CRC(dd48cd62) SHA1(1ce7b515fabae5054f0ac284a9ed5760f59d18fa) )
 	ROM_LOAD( "p3.bin",     0x02000, 0x1000, CRC(10a05c23) SHA1(f13ba660bc5eff9057b1ab46f564f586c76e945d) )
@@ -2553,7 +2553,7 @@ ROM_START( suzume )
 ROM_END
 
 ROM_START( dondenmj )
-	ROM_REGION( 0x90000, "main", 0 )
+	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "dn5.1h",     0x00000, 0x08000, CRC(3080252e) SHA1(e039087afc36a0c594da093ea599b81a1d757139) )
 	/* bank switched ROMs follow */
 	ROM_LOAD( "dn1.1e",     0x18000, 0x08000, CRC(1cd9c48a) SHA1(12bc519889dacea59ae49672ad5313fff3a99f12) )	// 1
@@ -2566,7 +2566,7 @@ ROM_START( dondenmj )
 ROM_END
 
 ROM_START( mjdiplob )
-	ROM_REGION( 0x90000, "main", 0 )
+	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "071.4l",     0x00000, 0x10000, CRC(81a6d6b0) SHA1(c6169e6d5f35304a0c3efcc2175c3213650f179c) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x10000 )				// 0,1
@@ -2579,7 +2579,7 @@ ROM_START( mjdiplob )
 ROM_END
 
 ROM_START( tontonb )
-	ROM_REGION( 0x90000, "main", 0 )
+	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "091.5e",   	0x00000, 0x10000, CRC(d8d67b59) SHA1(7e7a85df738f80fc031cda8a104ac9c7b3e24785) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x10000 )				// 0,1
@@ -2593,7 +2593,7 @@ ROM_START( tontonb )
 ROM_END
 
 ROM_START( majs101b )
-	ROM_REGION( 0x90000, "main", 0 )
+	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "171.3e",     0x00000, 0x10000, CRC(fa3c553b) SHA1(fda212559c4d55610a12ad2927afe21f9069c7b6) )
 	/* bank switched ROMs follow */
 	/**/													// 0,1 unused
@@ -2607,7 +2607,7 @@ ROM_START( majs101b )
 ROM_END
 
 ROM_START( mjderngr )
-	ROM_REGION( 0xb0000, "main", 0 )
+	ROM_REGION( 0xb0000, "maincpu", 0 )
 	ROM_LOAD( "2201.1a",    0x00000, 0x08000, CRC(54ec531d) SHA1(c5d9c575f6bdc499bae35123d7ad5bd4869b6ed9) )
 	/* bank switched ROMs follow */
 	ROM_CONTINUE(           0x10000, 0x08000 )				// 0
@@ -2645,7 +2645,7 @@ D29-2.4D
 ***************************************************************************/
 
 ROM_START( mjifb )
-	ROM_REGION( 0xd0000, "main", 0 )
+	ROM_REGION( 0xd0000, "maincpu", 0 )
 	ROM_LOAD( "2911.1b",    0x00000, 0x10000, CRC(138a31a1) SHA1(7e77c63a968206b8e61aaa423e19a766e4142554) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x08000 )	// bank 0 = 8000-bfff
@@ -2663,7 +2663,7 @@ ROM_START( mjifb )
 ROM_END
 
 ROM_START( mjifb2 )
-	ROM_REGION( 0xd0000, "main", 0 )
+	ROM_REGION( 0xd0000, "maincpu", 0 )
 	ROM_LOAD( "2921.bin",    0x00000, 0x10000, CRC(9f2bfa4e) SHA1(7d6ca22bf0a91d65fde34ae321054638df705eef) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x08000 )	// bank 0 = 8000-bfff
@@ -2681,7 +2681,7 @@ ROM_START( mjifb2 )
 ROM_END
 
 ROM_START( mjifb3 )
-	ROM_REGION( 0xd0000, "main", 0 )
+	ROM_REGION( 0xd0000, "maincpu", 0 )
 	ROM_LOAD( "2931.bin",    0x00000, 0x10000, CRC(2a3133de) SHA1(9fdc8c145d3da17ec5f86810716f1b1a2abd8023) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x08000 )	// bank 0 = 8000-bfff
@@ -2705,7 +2705,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( janptr96 )
-	ROM_REGION( 0x210000, "main", 0 )
+	ROM_REGION( 0x210000, "maincpu", 0 )
 	ROM_LOAD( "503x-1.1h", 0x000000, 0x40000, CRC(39914ecd) SHA1(e5796a95a7e3e7b61da63d50fa089be2946ba611) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(            0x010000, 0x40000 )
@@ -2799,7 +2799,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjtensin )
-	ROM_REGION( 0x290000, "main", 0 )
+	ROM_REGION( 0x290000, "maincpu", 0 )
 	ROM_LOAD( "1001.5e", 0x000000, 0x80000, CRC(960e1fe9) SHA1(11f5164b2c75c0e684e910ee8e09de978bdaff2f) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(          0x010000, 0x80000 )
@@ -2891,7 +2891,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjapinky )
-	ROM_REGION( 0x90000, "main", 0 )
+	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "141.4d",     0x00000, 0x10000, CRC(0c4fb83a) SHA1(5d467e8fae715ca4acf88f8e9437c7cdf9f876bd) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(             0x10000, 0x10000 )
@@ -2928,7 +2928,7 @@ D63-2.8F     [af735b42] /
 ***************************************************************************/
 
 ROM_START( cafetime )
-	ROM_REGION( 0x210000, "main", 0 )
+	ROM_REGION( 0x210000, "maincpu", 0 )
 	ROM_LOAD( "6301.2e", 0x000000, 0x40000, CRC(1fc10e7c) SHA1(0ed6bfd4cc6fc64bbf55bd3c6bde2d8ba9da2afb) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(          0x010000, 0x40000 )
@@ -3011,7 +3011,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( cafedoll )
-	ROM_REGION( 0x190000, "main", 0 )
+	ROM_REGION( 0x190000, "maincpu", 0 )
 	ROM_LOAD( "76xx.tmp90841", 0x00000, 0x02000, NO_DUMP )
 	ROM_LOAD( "7601", 0x000000, 0x80000, CRC(20c80ad9) SHA1(e45edd101c6e26c0fa3c3f15f4a4152a853e41bd) )
 	/* bank switched ROMs follow */
@@ -3098,7 +3098,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjvegas )
-	ROM_REGION( 0xd0000, "main", 0 )
+	ROM_REGION( 0xd0000, "maincpu", 0 )
 	ROM_LOAD( "50xx.tmp90841", 0x00000, 0x02000, NO_DUMP )
 	ROM_LOAD( "5001a.1b", 0x00000, 0x20000, CRC(91859a47) SHA1(3c452405bf28f5e7302eaccdf472e91b64629a67) )
 	/* bank switched ROMs follow */
@@ -3178,7 +3178,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjdejavu )
-	ROM_REGION( 0xd0000, "main", 0 )
+	ROM_REGION( 0xd0000, "maincpu", 0 )
 	ROM_LOAD( "2101.1b", 0x00000, 0x10000, CRC(b0426ea7) SHA1(ac39cbf5d78acdaa4b01d948917965c3aa2761b8) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(          0x10000, 0x08000 )
@@ -3196,7 +3196,7 @@ ROM_START( mjdejavu )
 ROM_END
 
 ROM_START( mjdejav2 )
-	ROM_REGION( 0xd0000, "main", 0 )
+	ROM_REGION( 0xd0000, "maincpu", 0 )
 	ROM_LOAD( "210a.1b", 0x00000, 0x10000, CRC(caa5c267) SHA1(c779f9217f56d9d3b1ee9fadca07f7917d203e8e) )
 	/* bank switched ROMs follow */
 	ROM_RELOAD(          0x10000, 0x08000 )
@@ -3215,7 +3215,7 @@ ROM_END
 
 // Incomplete romset (missing rom7 at $6000): "Jan Oh" by Toaplan, on royalmah hardware (try pc=64f).
 ROM_START( janoh )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom1.p1",  0x0000, 0x1000, CRC(8fc19963) SHA1(309e941c059a97b117090fd9dd69a00031aa6109) )	// "1984 JAN OH"
 	ROM_LOAD( "rom2.p12", 0x1000, 0x1000, CRC(e1141ae1) SHA1(38f7a71b367a607bb20a5cbe62e7c87c96c6997c) )
 	ROM_LOAD( "rom3.p2",  0x2000, 0x1000, CRC(66e6d2f4) SHA1(d7e00e5bfee60daf844c46d36b1f4860fba70759) )	// "JANOH TOAPLAN 84"
@@ -3264,7 +3264,7 @@ Notes:
 
 ***************************************************************************/
 ROM_START( cafebrk )
-	ROM_REGION( 0x280000, "main", 0 )
+	ROM_REGION( 0x280000, "maincpu", 0 )
 	ROM_LOAD( "528.tmp91640", 0x000000, 0x004000, NO_DUMP )
 	ROM_LOAD( "528011.1f",    0x000000, 0x080000, CRC(440ae60b) SHA1(c24efd76ba73adcb614b1974e8f92592800ba53c) )
 	/* bank switched ROMs follow */
@@ -3313,7 +3313,7 @@ http://japump.i.am/
 */
 
 ROM_START( janoha )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jo1",       0x0000, 0x1000, CRC(1a7dd28d) SHA1(347085c2b305861e4a4a602c3b3b0c57889f7f45) )
 	ROM_LOAD( "jo2",       0x1000, 0x1000, CRC(e92ca79f) SHA1(9714ebee954dd98cf98b340e1dc424a4b2a78c36) )
 	ROM_LOAD( "jo3",       0x2000, 0x1000, CRC(8e349cac) SHA1(27442fc97750ceb6e928682ee545a9ebff4511ac) )
@@ -3354,7 +3354,7 @@ COLOR.BPR  color
 */
 
 ROM_START( mjsiyoub )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.3g", 0x00000, 0x8000, CRC(47d0f16e) SHA1(a125be052668ba93756bf940af31a10e91a3d307) )
 	ROM_LOAD( "4.3f", 0x08000, 0x8000, CRC(6cd6a200) SHA1(1c53e5caacdb9c660bd98f5331bf5354581f74c9) )
 
@@ -3398,7 +3398,7 @@ http://japump.i.am/
 */
 
 ROM_START( mjsenka )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3",       0x0000, 0x4000, CRC(b2d8be1f) SHA1(da75e1072d271de2dbd897a551f6c32593f6421b) )
 	ROM_LOAD( "4",       0x4000, 0x2000, CRC(e9e84999) SHA1(7b5f0edd92cf3a45e85055460e6cb00b154fd152) )
 	ROM_LOAD( "2",       0x6000, 0x2000, CRC(cdb02fc5) SHA1(5de6b15b79ea7c4246a294b17f166e53be6a4abc) )
@@ -3497,7 +3497,7 @@ http://japump.i.am/
 */
 
 ROM_START( mjyarou )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",       0x0000, 0x1000, CRC(312c3b29) SHA1(ec2e14b392cf761f0a7079376994418fd463a06c) )
 	ROM_LOAD( "2",       0x1000, 0x1000, CRC(98f14097) SHA1(cd1f72d6effa50f95386dfc5fa9b5056d83e554f) )
 	ROM_LOAD( "3",       0x2000, 0x1000, CRC(295dbf40) SHA1(d6ac7bd88da849e418e750e2c91a594f65bdff39) )
@@ -3565,14 +3565,14 @@ ROM_START( jansou )
 	ROM_LOAD( "5", 0x18000, 0x8000, CRC(57a4d300) SHA1(35d211d50052cd76721dbd6ad02ec7cb56c475d1) )
 
 	/*this is just a z80 Voice Player (and latches port I/O $00 with the main CPU)*/
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1", 0x0000, 0x8000, CRC(0321ac7e) SHA1(1a0372a25f979461db09cd153c15daaa556c3d1f) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "n82s123an", 0x0000, 0x0020, CRC(e9598146) SHA1(619e7eb76cc3e882b5b3e55cdd23fe00b0a1fe45) )
 ROM_END
 
-static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x8000 );	}
+static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
 {

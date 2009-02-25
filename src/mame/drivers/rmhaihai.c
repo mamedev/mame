@@ -157,7 +157,7 @@ static WRITE8_HANDLER( ctrl_w )
 
 static WRITE8_HANDLER( themj_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000;
 	int bank = data & 0x03;
 logerror("banksw %d\n",bank);
 	memory_set_bankptr(space->machine, 1, rom + bank*0x4000);
@@ -444,13 +444,13 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( rmhaihai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,20000000/4)	/* 5 MHz ??? */
+	MDRV_CPU_ADD("maincpu",Z80,20000000/4)	/* 5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -491,7 +491,7 @@ static MACHINE_DRIVER_START( themj )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(rmhaihai)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(themj_readmem,writemem)
 	MDRV_CPU_IO_MAP(themj_io_map,0)
 
@@ -511,7 +511,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( rmhaihai )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s3-6.11g",     0x00000, 0x2000, CRC(e7af7ba2) SHA1(1b0f87a16006a96e5b59e055966addac3e2ca926) )
 	ROM_CONTINUE(             0x06000, 0x2000 )
 	ROM_LOAD( "s3-4.8g",      0x04000, 0x2000, CRC(f849e75c) SHA1(4636bcaa7cddb9bc012212098a25f3c57cfc6b51) )
@@ -538,7 +538,7 @@ ROM_START( rmhaihai )
 ROM_END
 
 ROM_START( rmhaihib )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s-30-6.11g",   0x00000,  0x2000, CRC(f3e13cc8) SHA1(7eb9b17ea9efb5b2891ec40a9ff9744e84c0511c) )
 	ROM_CONTINUE(             0x06000,  0x2000 )
 	ROM_LOAD( "s-30-4.8g",    0x04000,  0x2000, CRC(f6642584) SHA1(5160baf267fd5dd8385ea5a9ff82e9c220fee342) )
@@ -565,7 +565,7 @@ ROM_START( rmhaihib )
 ROM_END
 
 ROM_START( rmhaijin )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s-4-6.11g",    0x00000, 0x2000, CRC(474c9ace) SHA1(9161a5c64054f079d57676f3d7f61ca149018f61) )
 	ROM_CONTINUE(             0x06000, 0x2000 )
 	ROM_LOAD( "s-4-4.8g",     0x04000, 0x2000, CRC(c76ab584) SHA1(7d76fa6166108d6a511d5311c0d34b55364afec1) )
@@ -592,7 +592,7 @@ ROM_START( rmhaijin )
 ROM_END
 
 ROM_START( rmhaisei )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sei-11.h11",   0x00000, 0x2000, CRC(7c35692b) SHA1(8890ca90ae84c63bfd2b4857bbdd02bd9a2f29a9) )
 	ROM_CONTINUE(             0x06000, 0x2000 )
 	ROM_LOAD( "sei-10.h8",    0x04000, 0x2000, CRC(cbd58124) SHA1(562eb13c2dc441294b1b7dafe37ac27a9b7bba2b) )
@@ -620,7 +620,7 @@ ROM_START( rmhaisei )
 ROM_END
 
 ROM_START( themj )
-	ROM_REGION( 0x20000, "main", 0 ) /* CPU */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* CPU */
 	ROM_LOAD( "t7.bin",       0x00000,  0x02000, CRC(a58563c3) SHA1(53faeb66606214eb97ef8ff9affe68705e18a0b3) )
 	ROM_CONTINUE(             0x06000,  0x02000 )
 	ROM_LOAD( "t8.bin",       0x04000,  0x02000, CRC(bdf29475) SHA1(6296561da9c3a299d69bba8a98362c40b677ea9a) )

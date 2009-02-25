@@ -531,10 +531,10 @@ static MACHINE_RESET( sms )
 }
 
 static MACHINE_DRIVER_START( sms )
-	MDRV_CPU_ADD("main", I8088, XTAL_24MHz/8)
+	MDRV_CPU_ADD("maincpu", I8088, XTAL_24MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sms_map,0)
 
-	MDRV_CPU_ADD("sound", Z80, XTAL_16MHz/8)
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_16MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sub_map, 0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -548,7 +548,7 @@ static MACHINE_DRIVER_START( sms )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -571,7 +571,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(sureshot)
 	MDRV_IMPORT_FROM(sms)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sureshot_map,0)
 
 	MDRV_MACHINE_START(sureshot)
@@ -671,12 +671,12 @@ ROM text showed...
 */
 
 ROM_START( trvhang )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "sms.17",       0xf8000, 0x04000, CRC(af6ef980) SHA1(f0f98d1f91de718a63b87c5f1c6ee3bd854d1c1b) )
 	ROM_LOAD( "sms.16",       0xfc000, 0x04000, CRC(b827d883) SHA1(68d6c2127ef9e537471c414ca7baa89c63997bbb) )
-	ROM_COPY( "main",    0xf8000, 0x08000, 0x8000 )
+	ROM_COPY( "maincpu",    0xf8000, 0x08000, 0x8000 )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sms.26",       0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
 	ROM_RELOAD(               0x1000, 0x1000 )
 
@@ -787,12 +787,12 @@ saved in JEDEC format
 */
 
 ROM_START( trvhanga )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "sms2.u17",   0xf8000, 0x04000, CRC(e5c880a1) SHA1(da777c4e126da2f03a663f8c8f565bda8520c883) )
 	ROM_LOAD( "sms2.16",    0xfc000, 0x04000, CRC(85484aee) SHA1(7c282bd208bd644d5d57ac399942c95211e87bf4) )
-	ROM_COPY( "main",    0xf8000, 0x08000, 0x8000 )
+	ROM_COPY( "maincpu",    0xf8000, 0x08000, 0x8000 )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sms2.26",       0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
 	ROM_RELOAD(               0x1000, 0x1000 )
 
@@ -844,14 +844,14 @@ ROM_START( trvhanga )
 ROM_END
 
 ROM_START( sureshot )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "u-19 hldly s.shot 020687.u19.a12.bin", 0xf8000, 0x02000, CRC(028bdb61) SHA1(e39c27cc6dec12de5a5e60d544f35448e49baee1) )
 	ROM_LOAD( "u-18 hldly s.shot 020687.u18.a11.bin", 0xfa000, 0x02000, CRC(5aa083f1) SHA1(3eed1a7421e7abcc41a1bddf655b1e777d843898) )
 	ROM_LOAD( "u-17 hldly s.shot 020687.u17.a10.bin", 0xfc000, 0x02000, CRC(a37432d6) SHA1(398462642ab0b34efdb6ff4756758057b9833e10) )
 	ROM_LOAD( "u-16 hldly s.shot 020687.u16.a9.bin",  0xfe000, 0x02000, CRC(d7f756d5) SHA1(5c7f62b02b4d4836881c3da0604448c34ede674b) )
-	ROM_COPY( "main",    0xf8000, 0x08000, 0x8000 )
+	ROM_COPY( "maincpu",    0xf8000, 0x08000, 0x8000 )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "26 404 073184.u26.b5.bin", 0x0000, 0x1000, CRC(e04bb922) SHA1(1df90720f11a5b736273f43272d7727b3020f848) )
 	ROM_RELOAD(               0x1000, 0x1000 )
 ROM_END

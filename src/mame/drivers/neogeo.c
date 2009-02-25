@@ -622,7 +622,7 @@ static void set_main_cpu_vector_table_source(running_machine *machine, UINT8 dat
 
 static void _set_main_cpu_bank_address(running_machine *machine)
 {
-	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &memory_region(machine, "main")[main_cpu_bank_address]);
+	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &memory_region(machine, "maincpu")[main_cpu_bank_address]);
 }
 
 
@@ -639,7 +639,7 @@ void neogeo_set_main_cpu_bank_address(const address_space *space, UINT32 bank_ad
 static WRITE16_HANDLER( main_cpu_bank_select_w )
 {
 	UINT32 bank_address;
-	UINT32 len = memory_region_length(space->machine, "main");
+	UINT32 len = memory_region_length(space->machine, "maincpu");
 
 	if ((len <= 0x100000) && (data & 0x07))
 		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", cpu_get_pc(space->cpu), data);
@@ -664,10 +664,10 @@ static void main_cpu_banking_init(running_machine *machine)
 
 	/* create vector banks */
 	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, "mainbios"), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, memory_region(machine, "main"), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, memory_region(machine, "maincpu"), 0);
 
 	/* set initial main CPU bank */
-	if (memory_region_length(machine, "main") > 0x100000)
+	if (memory_region_length(machine, "maincpu") > 0x100000)
 		neogeo_set_main_cpu_bank_address(mainspace, 0x100000);
 	else
 		neogeo_set_main_cpu_bank_address(mainspace, 0x000000);
@@ -769,12 +769,12 @@ static void audio_cpu_banking_init(running_machine *machine)
 	/* audio bios/cartridge selection */
  	if (memory_region(machine, "audiobios"))
 		memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(machine, "audiobios"), 0);
-	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(machine, "audio"), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(machine, "audiocpu"), 0);
 
 	/* audio banking */
-	address_mask = memory_region_length(machine, "audio") - 0x10000 - 1;
+	address_mask = memory_region_length(machine, "audiocpu") - 0x10000 - 1;
 
-	rgn = memory_region(machine, "audio");
+	rgn = memory_region(machine, "audiocpu");
 	for (region = 0; region < 4; region++)
 	{
 		for (bank = 0; bank < 0x100; bank++)
@@ -1227,10 +1227,10 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( neogeo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, NEOGEO_MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M68000, NEOGEO_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, NEOGEO_AUDIO_CPU_CLOCK)
+	MDRV_CPU_ADD("audiocpu", Z80, NEOGEO_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_IO_MAP(auido_io_map,0)
 
@@ -1247,7 +1247,7 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_VIDEO_UPDATE(neogeo)
 	MDRV_DEFAULT_LAYOUT(layout_neogeo)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 

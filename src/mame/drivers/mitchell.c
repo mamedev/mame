@@ -1116,13 +1116,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mgakuen )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 6000000)	/* ??? */
+	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mgakuen_readmem,mgakuen_writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1150,7 +1150,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80, 8000000)	/* (verified on pcb) */
+	MDRV_CPU_ADD("maincpu",Z80, 8000000)	/* (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
@@ -1158,7 +1158,7 @@ static MACHINE_DRIVER_START( pang )
 	MDRV_NVRAM_HANDLER(mitchell)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1221,16 +1221,16 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( spangbl )
 	MDRV_IMPORT_FROM(pang)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spangb_memmap,0)
 	MDRV_CPU_IO_MAP(spangb_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound",Z80, 8000000)
+	MDRV_CPU_ADD("soundcpu",Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(spangb_sound_memmap,0 )
 	MDRV_CPU_IO_MAP(spangb_sound_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_GFXDECODE(spangbl)
 
@@ -1248,17 +1248,17 @@ static MACHINE_DRIVER_START( mstworld )
 	/* it doesn't glitch with the clock speed set to 4x normal, however this is incorrect..
       the interrupt handling (and probably various irq flags / vbl flags handling etc.) is
       more likely wrong.. the game appears to run too fast anyway .. */
-	MDRV_CPU_ADD("main", Z80, 6000000*4)
+	MDRV_CPU_ADD("maincpu", Z80, 6000000*4)
 
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(mstworld_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,6000000)		 /* 6 MHz? */
+	MDRV_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mstworld_sound_readmem,mstworld_sound_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1283,7 +1283,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( marukin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
+	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
@@ -1291,7 +1291,7 @@ static MACHINE_DRIVER_START( marukin )
 	MDRV_NVRAM_HANDLER(mitchell)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1318,7 +1318,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( mgakuen )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "mg-1.1j",      0x00000, 0x08000, CRC(bf02ea6b) SHA1(bb1f5fbb211a5ed181f1afbba6b39737639d3ee7) )
 	ROM_LOAD( "mg-2.1l",      0x10000, 0x20000, CRC(64141b0c) SHA1(2de6bcd5cf2c042e5bf5c294dd7625393e99682b) )
 
@@ -1337,7 +1337,7 @@ ROM_START( mgakuen )
 ROM_END
 
 ROM_START( 7toitsu )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "mc01.1j",      0x00000, 0x08000, CRC(0bebe45f) SHA1(24fadffd0033565441a75f36e2cb085a37e0f0e5) )
 	ROM_LOAD( "mc02.1l",      0x10000, 0x20000, CRC(375378b0) SHA1(cbb5db5fda1d87902b22130243d579cb28803707) )
 
@@ -1356,7 +1356,7 @@ ROM_START( 7toitsu )
 ROM_END
 
 ROM_START( mgakuen2 )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "mg2-xf.1j",    0x00000, 0x08000, CRC(c8165d2d) SHA1(95146e293b2e005c4015590811119a4070dda65b) )
 	ROM_LOAD( "mg2-y.1l",     0x10000, 0x20000, CRC(75bbcc14) SHA1(52ec279fda131c8de06d8c940df12d61ec6881cc) )
 	ROM_LOAD( "mg2-z.3l",     0x30000, 0x20000, CRC(bfdba961) SHA1(75045562edbdef1eb599d6a6bfc4247c33c11258) )
@@ -1376,7 +1376,7 @@ ROM_START( mgakuen2 )
 ROM_END
 
 ROM_START( pkladies )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "pko-prg1.14f", 0x00000, 0x08000, CRC(86585a94) SHA1(067791da20556e6c47de26fbf85389d92f9709db) )
 	ROM_LOAD( "pko-prg2.15f", 0x10000, 0x10000, CRC(86cbe82d) SHA1(3997a642004d1226cfce0f590123d4e407edf094) )
 
@@ -1396,7 +1396,7 @@ ROM_START( pkladies )
 ROM_END
 
 ROM_START( pkladiel )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "pk05.14f",     0x00000, 0x08000, CRC(ea1740a6) SHA1(eafd3fb0056a648dfc67b5d0a1dc93c4262e2a8b) )
 	ROM_LOAD( "pk06.15f",     0x10000, 0x20000, CRC(3078ff5e) SHA1(5d91d68a07a968ee59f693841da165833a9fcf08) )	/* larger than pkladies - 2nd half unused? */
 
@@ -1416,7 +1416,7 @@ ROM_START( pkladiel )
 ROM_END
 
 ROM_START( pkladila )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "05.14f",       0x00000, 0x08000, CRC(fa18e16a) SHA1(05fff3335a55b9ebf13a0bc89216f00fba6b6b6d) )
 	ROM_LOAD( "06.15f",       0x10000, 0x10000, CRC(a2fb7646) SHA1(778d3c1348efe6e46aed4ce968826ce73e320187) )
 
@@ -1436,7 +1436,7 @@ ROM_START( pkladila )
 ROM_END
 
 ROM_START( dokaben )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "db06.11h",     0x00000, 0x08000, CRC(413e0886) SHA1(e9e6117fbbd980bc0f5448ada6c1856919bf92b5) )
 	ROM_LOAD( "db07.13h",     0x10000, 0x20000, CRC(8bdcf49e) SHA1(7d845ae2e640ec7d8d642e3aeef741d9f7b0a57c) )
 	ROM_LOAD( "db08.14h",     0x30000, 0x20000, CRC(1643bdd9) SHA1(5805e749713dbffacbb1238b1b4d42e8473d3656) )
@@ -1458,7 +1458,7 @@ ROM_START( dokaben )
 ROM_END
 
 ROM_START( pang )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "pang6.bin",    0x00000, 0x08000, CRC(68be52cd) SHA1(67b9ac15f4cbd3959c417f979beae36ae17334c1) )
 	ROM_LOAD( "pang7.bin",    0x10000, 0x20000, CRC(4a2e70f6) SHA1(039db1b51374e5637b5c2ba8e18ccd08816613a7) )
 
@@ -1481,7 +1481,7 @@ ROM_END
 
 
 ROM_START( pangb )
-	ROM_REGION( 2*0x50000, "main", 0 )
+	ROM_REGION( 2*0x50000, "maincpu", 0 )
 	ROM_LOAD( "pang_04.bin",  0x50000, 0x08000, CRC(f68f88a5) SHA1(6f57891d399a46d8d5a531771129552ed420d10a) )   /* Decrypted opcode + data */
 	ROM_CONTINUE(             0x00000, 0x08000 )
 	ROM_LOAD( "pang_02.bin",  0x60000, 0x20000, CRC(3f15bb61) SHA1(4f74ee25f32a201482840158b4d4c7aca1cda684) )   /* Decrypted op codes */
@@ -1507,7 +1507,7 @@ ROM_END
    the above bootleg, and it uses a different PCB layout.  Multiple PCBs with these ROMs have been found,
    so it's worth supporting anyway. */
 ROM_START( pangbold )
-	ROM_REGION( 2*0x50000, "main", 0 )
+	ROM_REGION( 2*0x50000, "maincpu", 0 )
 	ROM_LOAD( "4.6l",  0x50000, 0x08000, CRC(f68f88a5) SHA1(6f57891d399a46d8d5a531771129552ed420d10a) )   /* Decrypted opcode + data */
 	ROM_CONTINUE(      0x00000, 0x08000 )
 	ROM_LOAD( "2.3l",  0x60000, 0x20000, CRC(3f15bb61) SHA1(4f74ee25f32a201482840158b4d4c7aca1cda684) )   /* Decrypted op codes */
@@ -1534,7 +1534,7 @@ ROM_END
 /* this bootleg has different sound hardware, the sound program is the same as 'rebus' by microhard
    I suspect it was produced by the same company as 'spangbl' */
 ROM_START( pangba )
-	ROM_REGION( 2*0x50000, "main", 0 )
+	ROM_REGION( 2*0x50000, "maincpu", 0 )
 	ROM_LOAD( "pang.3",  0x50000, 0x08000, CRC(2548534f) SHA1(c67964e1d0b51ea7bb62685055dee1910e9f0fb9) )
 	ROM_CONTINUE(        0x00000, 0x08000 )
 	ROM_LOAD( "pang.2",  0x60000, 0x04000, CRC(8167b646) SHA1(db131cb53e81abd070db83721752a8f5473afbb9) )
@@ -1550,7 +1550,7 @@ ROM_START( pangba )
 	ROM_CONTINUE(        0x74000, 0x04000 )
 	ROM_CONTINUE(        0x24000, 0x04000 )
 
-	ROM_REGION( 0x20000, "sound", 0 ) /* Sound Z80 + M5205(?) samples */
+	ROM_REGION( 0x20000, "soundcpu", 0 ) /* Sound Z80 + M5205(?) samples */
 	ROM_LOAD( "pang.4",   0x00000, 0x10000, CRC(88a7b1f8) SHA1(b34fa26dbc613bf3b525d19df90fa3ba4efb6e5d) ) // this is the same as the microhard game 'rebus' ...
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_INVERT | ROMREGION_DISPOSE | ROMREGION_ERASEFF )
@@ -1573,7 +1573,7 @@ ROM_END
 
 
 ROM_START( bbros )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "bb6.bin",      0x00000, 0x08000, CRC(a3041ca4) SHA1(2accb2151f621e4802211efe986969ebd3acb6d4) )
 	ROM_LOAD( "bb7.bin",      0x10000, 0x20000, CRC(09231c68) SHA1(9e735487a99a5eb89a6abb81d5d9a20414ad75bf) )
 
@@ -1594,7 +1594,7 @@ ROM_START( bbros )
 ROM_END
 
 ROM_START( pompingw )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "pwj_06.11h",   0x00000, 0x08000, CRC(4a0a6426) SHA1(c61346c5f80507bdf543e9ea32ee3f814be8e27f) )
 	ROM_LOAD( "pwj_07.13h",   0x10000, 0x20000, CRC(a9402420) SHA1(2ca3aa59d561826477e3509fcaeeec753d64d419) )
 
@@ -1615,7 +1615,7 @@ ROM_START( pompingw )
 ROM_END
 
 ROM_START( cworld )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "cw05.bin",     0x00000, 0x08000, CRC(d3c1723d) SHA1(b67f63e39f4301909c967555222820b54e98a205) )
 	ROM_LOAD( "cw06.bin",     0x10000, 0x20000, CRC(d71ed4a3) SHA1(5b6d498810e6fc8041f4326087f3be56863e91d9) )
 	ROM_LOAD( "cw07.bin",     0x30000, 0x20000, CRC(d419ce08) SHA1(f0a8265e839f6bdab2926f48aba88b6f9aaa3b29) )
@@ -1639,7 +1639,7 @@ ROM_START( cworld )
 ROM_END
 
 ROM_START( hatena )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "q2-05.rom",    0x00000, 0x08000, CRC(66c9e1da) SHA1(7ddbc4acf9d9d5b69f0bb60af65a171f3ba185b1) )
 	ROM_LOAD( "q2-06.rom",    0x10000, 0x20000, CRC(5fc39916) SHA1(84ead43d8bad3f9c88fcb02171500298613646dc) )
 	ROM_LOAD( "q2-07.rom",    0x30000, 0x20000, CRC(ec6d5e5e) SHA1(6269f5a5a3af91193afe85d34a764499877c2a24) )
@@ -1666,10 +1666,10 @@ ROM_END
 
 /* seems to be the same basic hardware, but the memory map and io map are different at least.. */
 ROM_START( mstworld )
-	ROM_REGION( 0x50000*2, "main", 0 )	/* CPU1 code */
+	ROM_REGION( 0x50000*2, "maincpu", 0 )	/* CPU1 code */
 	ROM_LOAD( "mw-1.rom", 0x00000, 0x080000, CRC(c4e51fb4) SHA1(60ad4ff2cec3a4d13b4aa0319dfcdab941404b1a) ) /* fixed code */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* CPU2 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* CPU2 code */
 	ROM_LOAD( "mw-2.rom", 0x00000, 0x08000, CRC(12c4fea9) SHA1(4616f2d70022abcf89f244f3f365b39b96973368) )
 
 	ROM_REGION( 0x080000, "user2", 0 )	/* Samples */
@@ -1701,7 +1701,7 @@ ROM_END
 
 
 ROM_START( spang )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "spe_06.rom",   0x00000, 0x08000, CRC(1af106fb) SHA1(476ba5c95e090663a47d3f98451bf3b79bac7748) )
 	ROM_LOAD( "spe_07.rom",   0x10000, 0x20000, CRC(208b5f54) SHA1(9d44f7240b56756dcb69d110036b1cb13b1bbc02) )
 	ROM_LOAD( "spe_08.rom",   0x30000, 0x20000, CRC(2bc03ade) SHA1(3a8ee342b0556a8f6d5a417c98e5c3c43422713d) )
@@ -1739,7 +1739,7 @@ Note    1x JAMMA edge connector
 */
 
 ROM_START( spangbl )
-	ROM_REGION( 0x50000*2, "main", ROMREGION_ERASEFF )
+	ROM_REGION( 0x50000*2, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ic17.1",   0x00000, 0x08000, CRC(f0b2bf86) SHA1(b42a6c0b98c7ccd1e8acd41066a25c7ed4a3aabe) )
 	ROM_CONTINUE(0x50000,0x8000)
 	ROM_LOAD( "ic18.2",   0x60000, 0x04000, CRC(6f377832) SHA1(25755ed77a797f50fdfbb4c42a04f51d3d08f87c) )
@@ -1763,7 +1763,7 @@ ROM_START( spangbl )
 	ROM_CONTINUE(0x44000,0x4000)
 	ROM_CONTINUE(0x4c000,0x4000)
 
-	ROM_REGION( 0x20000, "sound", 0 ) /* Sound Z80 + M5205 samples */
+	ROM_REGION( 0x20000, "soundcpu", 0 ) /* Sound Z80 + M5205 samples */
 	ROM_LOAD( "ic28.4",   0x00000, 0x10000, CRC(02b07d0a) SHA1(77cb9bf1b0d93ebad1bd8cdbedb7fdbad23697be) )
 	ROM_LOAD( "ic45.5",   0x10000, 0x10000, CRC(95c32824) SHA1(02de90a7bfbe89feb7708fda8dfac4ed32bc0773) )
 
@@ -1786,7 +1786,7 @@ ROM_END
 
 
 ROM_START( spangj )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "spj_11h.bin",    0x00000, 0x08000, CRC(1a548b0b) SHA1(3aa65028876ab6e176f5b227366e65212c944888) )
 	ROM_LOAD( "spj7_13h.bin",   0x10000, 0x20000, CRC(14c2b765) SHA1(af0f965dd13d878bae7850cf8419b26511090579) )
 	ROM_LOAD( "spj8_14h.bin",   0x30000, 0x20000, CRC(4be4e5b7) SHA1(6273e8bf5d9f5b100ecda20001808dcf86411d83) )
@@ -1808,7 +1808,7 @@ ROM_START( spangj )
 ROM_END
 
 ROM_START( sbbros )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "06.j12",       0x00000, 0x08000, CRC(292eee6a) SHA1(d33368d2373a1ee9e24ada6aa045e0675c8e8160) )
 	ROM_LOAD( "07.j13",       0x10000, 0x20000, CRC(f46b698d) SHA1(6a1867f591aa0fb9e02dd472699df93f9d018793) )
 	ROM_LOAD( "08.j14",       0x30000, 0x20000, CRC(a75e7fbe) SHA1(0331d1a3e888678909f3e6d21f97896a5350e585) )
@@ -1830,7 +1830,7 @@ ROM_START( sbbros )
 ROM_END
 
 ROM_START( marukin )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "mg3-01.9d",    0x00000, 0x08000, CRC(04357973) SHA1(61b0b347479126213c90ef6833c09537fab03093) )
 	ROM_LOAD( "mg3-02.10d",   0x10000, 0x20000, CRC(50d08da0) SHA1(5d115eb646f34827d02219be3d5346f05c0c27b6) )
 
@@ -1849,7 +1849,7 @@ ROM_START( marukin )
 ROM_END
 
 ROM_START( qtono1 )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "q3-05.rom",    0x00000, 0x08000, CRC(1dd0a344) SHA1(814049bf957b78ff2d1c8da316dfe5303abee4df) )
 	ROM_LOAD( "q3-06.rom",    0x10000, 0x20000, CRC(bd6a2110) SHA1(8c4d7a10dfaee0fcd18be21c80fc3d2ff9615eae) )
 	ROM_LOAD( "q3-07.rom",    0x30000, 0x20000, CRC(61e53c4f) SHA1(bcde0029a217994561ae0a6fb0482bf1e3517913) )
@@ -1873,7 +1873,7 @@ ROM_START( qtono1 )
 ROM_END
 
 ROM_START( qsangoku )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "q4-05c.rom",   0x00000, 0x08000, CRC(e1d010b4) SHA1(7fca1ee45054331320abb6a99f10fa98dd4be994) )
 	ROM_LOAD( "q4-06.rom",    0x10000, 0x20000, CRC(a0301849) SHA1(60910d84f869fd5735cd5500a93b761d8b8dbacb) )
 	ROM_LOAD( "q4-07.rom",    0x30000, 0x20000, CRC(2941ef5b) SHA1(a86f5365edd315fcbb2a50489d63b4be9587ae29) )
@@ -1898,7 +1898,7 @@ ROM_END
 
 
 ROM_START( block )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "ble_05.rom",   0x00000, 0x08000, CRC(c12e7f4c) SHA1(335f4eab2323b942d5feeb3bab6f7286fabfffb4) )
 	ROM_LOAD( "ble_06.rom",   0x10000, 0x20000, CRC(cdb13d55) SHA1(2e4489d12a603b4c7dfb90d246ebff9176e88a0b) )
 	ROM_LOAD( "ble_07.rom",   0x30000, 0x20000, CRC(1d114f13) SHA1(ee3588e1752b3432fd611e2d7d4fb43f942de580) )
@@ -1920,7 +1920,7 @@ ROM_START( block )
 ROM_END
 
 ROM_START( blockj )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "blj_05.rom",   0x00000, 0x08000, CRC(3b55969a) SHA1(86de2f1f5878de380a8b1e3935cffa146863f07f) )
 	ROM_LOAD( "ble_06.rom",   0x10000, 0x20000, CRC(cdb13d55) SHA1(2e4489d12a603b4c7dfb90d246ebff9176e88a0b) )
 	ROM_LOAD( "blj_07.rom",   0x30000, 0x20000, CRC(1723883c) SHA1(e6b7575a55c045b90fb41290a60306713121acfb) )
@@ -1942,7 +1942,7 @@ ROM_START( blockj )
 ROM_END
 
 ROM_START( blockjoy )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "ble_05.bin",   0x00000, 0x08000, CRC(fa2a4536) SHA1(8f584745116bd0ced4d66719cd80c0372b797134) )
 	ROM_LOAD( "blf_06.bin",   0x10000, 0x20000, CRC(e114ebde) SHA1(12362e809443644b43fbc72e7eead5f376fe11d3) )
 // this seems to be a bad version of the above rom, although the rom code is different it is 99% the same, and level 6
@@ -1969,7 +1969,7 @@ ROM_START( blockjoy )
 ROM_END
 
 ROM_START( blockbl )
-	ROM_REGION( 0x50000*2, "main", 0 )
+	ROM_REGION( 0x50000*2, "maincpu", 0 )
 	ROM_LOAD( "m7.l6",        0x50000, 0x08000, CRC(3b576fd9) SHA1(99cf14eba089ed9c7d9f287277dab4a8a997a9a4) )   /* Decrypted opcode + data */
 	ROM_CONTINUE(             0x00000, 0x08000 )
 	ROM_LOAD( "m5.l3",        0x60000, 0x20000, CRC(7c988bb7) SHA1(138ffe62ef9186849c3db73b048132ad0349ccf7) )   /* Decrypted opcode + data */
@@ -1997,15 +1997,15 @@ ROM_END
 
 static void bootleg_decode(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x50000);
-	memory_configure_bank_decrypted(machine, 1, 0, 16, memory_region(machine, "main") + 0x60000, 0x4000);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x50000);
+	memory_configure_bank_decrypted(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x60000, 0x4000);
 }
 
 
 static void configure_banks(running_machine *machine)
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	pang_port5_kludge = 0;
 }
 
@@ -2049,7 +2049,7 @@ static DRIVER_INIT( spang )
 {
 	input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "main")[0xe000];	/* NVRAM */
+	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
 	spang_decode(machine);
 	configure_banks(machine);
 }
@@ -2058,7 +2058,7 @@ static DRIVER_INIT( spangbl )
 {
 	input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "main")[0xe000];	/* NVRAM */
+	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2067,13 +2067,13 @@ static DRIVER_INIT( spangj )
 {
 	input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "main")[0xe000];	/* NVRAM */
+	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
 	spangj_decode(machine);
 	configure_banks(machine);
 
 	/* fix data that will be written to nvram */
 	{
-		UINT8 *rom = memory_region(machine, "main") + 0x10000;
+		UINT8 *rom = memory_region(machine, "maincpu") + 0x10000;
 		rom[0x0183] = 0xcd;
 		rom[0x0184] = 0x81;
 		rom[0x0185] = 0x0e;
@@ -2083,7 +2083,7 @@ static DRIVER_INIT( sbbros )
 {
 	input_type = 3;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "main")[0xe000];	/* NVRAM */
+	nvram = &memory_region(machine, "maincpu")[0xe000];	/* NVRAM */
 	sbbros_decode(machine);
 	configure_banks(machine);
 }
@@ -2132,7 +2132,7 @@ static DRIVER_INIT( block )
 {
 	input_type = 2;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "main")[0xff80];	/* NVRAM */
+	nvram = &memory_region(machine, "maincpu")[0xff80];	/* NVRAM */
 	block_decode(machine);
 	configure_banks(machine);
 }
@@ -2140,7 +2140,7 @@ static DRIVER_INIT( blockbl )
 {
 	input_type = 2;
 	nvram_size = 0x80;
-	nvram = &memory_region(machine, "main")[0xff80];	/* NVRAM */
+	nvram = &memory_region(machine, "maincpu")[0xff80];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2148,9 +2148,9 @@ static DRIVER_INIT( blockbl )
 static DRIVER_INIT( mstworld )
 {
 	/* descramble the program rom .. */
-	int len = memory_region_length(machine, "main");
+	int len = memory_region_length(machine, "maincpu");
 	UINT8* source = malloc_or_die(len);
-	UINT8* dst    = memory_region(machine, "main") ;
+	UINT8* dst    = memory_region(machine, "maincpu") ;
 	int x;
 
 	static const int tablebank[]=

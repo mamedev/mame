@@ -319,12 +319,12 @@ static INTERRUPT_GEN( quasar_interrupt )
 
 static MACHINE_DRIVER_START( quasar )
 
-	MDRV_CPU_ADD("main", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */
+	MDRV_CPU_ADD("maincpu", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */
 	MDRV_CPU_PROGRAM_MAP(quasar,0)
 	MDRV_CPU_IO_MAP(quasar_io,0)
-	MDRV_CPU_VBLANK_INT("main", quasar_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", quasar_interrupt)
 
-	MDRV_CPU_ADD("sound",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
+	MDRV_CPU_ADD("soundcpu",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -333,7 +333,7 @@ static MACHINE_DRIVER_START( quasar )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)							/* From dot clock */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( quasar )
 MACHINE_DRIVER_END
 
 ROM_START( quasar )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "7b_01.bin",    0x0000, 0x0400, CRC(20a7feaf) SHA1(ab89087efca2fcb9568f49ba117755ae2c1bd3a3) )
 	ROM_CONTINUE(			  0x4000, 0x0400 )
 	ROM_LOAD( "6b_02.bin",    0x0400, 0x0400, CRC(c14af4a1) SHA1(ca2d3aff94db43aa7c25d33b345a53f484f679cd) )
@@ -372,7 +372,7 @@ ROM_START( quasar )
 	ROM_LOAD( "3c_09.bin",    0x2c00, 0x0400, CRC(ef87c2cb) SHA1(1ba10dd3996c047e595c54a37c1abb44df3b63c6) )
 	ROM_LOAD( "2c_10.bin",    0x3000, 0x0400, CRC(be6c4f84) SHA1(b3a779457bd0d33ccb23c21a7e7cd4a6fc78bb7f) )
 
-	ROM_REGION( 0x1000, "sound", 0 )
+	ROM_REGION( 0x1000, "soundcpu", 0 )
 	ROM_LOAD( "quasar.snd",   0x0000, 0x0800, CRC(9e489768) SHA1(a9f01ef0a6512543bbdfec56037f37a0440b2b94) )
 
 	ROM_REGION( 0x1800, "gfx1", ROMREGION_DISPOSE )
@@ -385,7 +385,7 @@ ROM_START( quasar )
 ROM_END
 
 ROM_START( quasara )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "7b_01.bin",    0x0000, 0x0400, CRC(20a7feaf) SHA1(ab89087efca2fcb9568f49ba117755ae2c1bd3a3) )
 	ROM_CONTINUE(			  0x4000, 0x0400 )
 	ROM_LOAD( "6b_02.bin",    0x0400, 0x0400, CRC(c14af4a1) SHA1(ca2d3aff94db43aa7c25d33b345a53f484f679cd) )
@@ -402,7 +402,7 @@ ROM_START( quasara )
 	ROM_LOAD( "3c_09.bin",    0x2c00, 0x0400, CRC(ef87c2cb) SHA1(1ba10dd3996c047e595c54a37c1abb44df3b63c6) )
 	ROM_LOAD( "2c_10a.bin",   0x3000, 0x0400, CRC(a31c0435) SHA1(48e1c5da455610145310dfe4c6b6e4302b531876) ) // different from quasar set
 
-	ROM_REGION( 0x1000, "sound", 0 )
+	ROM_REGION( 0x1000, "soundcpu", 0 )
 	ROM_LOAD( "quasar.snd",   0x0000, 0x0800, CRC(9e489768) SHA1(a9f01ef0a6512543bbdfec56037f37a0440b2b94) )
 
 	ROM_REGION( 0x1800, "gfx1", ROMREGION_DISPOSE )

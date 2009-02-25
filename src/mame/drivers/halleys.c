@@ -1945,11 +1945,11 @@ static const ay8910_interface ay8910_config =
 
 
 static MACHINE_DRIVER_START( halleys )
-	MDRV_CPU_ADD("main", M6809, XTAL_19_968MHz/12) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_6MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
@@ -1957,7 +1957,7 @@ static MACHINE_DRIVER_START( halleys )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1990,7 +1990,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( benberob )
 	MDRV_IMPORT_FROM(halleys)
-	MDRV_CPU_REPLACE("main", M6809, XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
+	MDRV_CPU_REPLACE("maincpu", M6809, XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
 	MDRV_CPU_VBLANK_INT_HACK(benberob_interrupt, 4)
 	MDRV_VIDEO_UPDATE(benberob)
 MACHINE_DRIVER_END
@@ -2000,12 +2000,12 @@ MACHINE_DRIVER_END
 // ROM Definitions
 
 ROM_START( benberob )
-	ROM_REGION( 0x10000, "main", 0 ) //MAIN PRG
+	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
 	ROM_LOAD( "a26_01.31",   0x4000, 0x4000, CRC(9ed566ba) SHA1(15c042e727b00b1dc6f24c72226d1a361fc0fa58) )
 	ROM_LOAD( "a26_02.52",   0x8000, 0x4000, CRC(a563a033) SHA1(c2c4a73f190303b7101e7849a638d35a80e4c36b) )
 	ROM_LOAD( "a26_03.50",   0xc000, 0x4000, CRC(975849ef) SHA1(2724c3b7cca724bee5ae8331037529bfd8285011) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) //SOUND
+	ROM_REGION( 0x10000, "audiocpu", 0 ) //SOUND
 	ROM_LOAD( "a26_12.5",    0x0000, 0x4000, CRC(7fd728f3) SHA1(772c14d9254e43a56f1e67ad4dd5d7840df50e34) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) //CHR
@@ -2026,13 +2026,13 @@ ROM_END
 
 
 ROM_START( halleys )
-	ROM_REGION( 0x10000, "main", 0 ) //MAIN PRG
+	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
 	ROM_LOAD( "a62_01.30",   0x0000, 0x4000, CRC(a5e82b3e) SHA1(c16c6a6c23a579454b8a2be4b951c35b04f2a856) )
 	ROM_LOAD( "a62_02.31",   0x4000, 0x4000, CRC(25f5bcd3) SHA1(9d72afe866df363d2ac33dab3ed6c3913f4de12d) )
 	ROM_LOAD( "a62-15.52",   0x8000, 0x4000, CRC(e65d8312) SHA1(29870fe0dbb30d23970a8a816849dc5807d70675) )
 	ROM_LOAD( "a62_04.50",   0xc000, 0x4000, CRC(fad74dfe) SHA1(92c0d42c5e186bc07c168ad581e52a5ae340c2b2) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) //SOUND
+	ROM_REGION( 0x10000, "audiocpu", 0 ) //SOUND
 	ROM_LOAD( "a62_13.5",    0x0000, 0x2000, CRC(7ce290db) SHA1(e3c72ba5d97cb07f0f72d2765a068af6fb5cca29) )
 	ROM_LOAD( "a62_14.4",    0x2000, 0x2000, CRC(ea74b1a2) SHA1(7be3b9e9d51cfa753ce97e92f7eebd9723fe5821) )
 
@@ -2054,13 +2054,13 @@ ROM_END
 
 
 ROM_START( halleycj )
-	ROM_REGION( 0x10000, "main", 0 ) //MAIN PRG
+	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
 	ROM_LOAD( "a62_01.30",   0x0000, 0x4000, CRC(a5e82b3e) SHA1(c16c6a6c23a579454b8a2be4b951c35b04f2a856) )
 	ROM_LOAD( "a62_02.31",   0x4000, 0x4000, CRC(25f5bcd3) SHA1(9d72afe866df363d2ac33dab3ed6c3913f4de12d) )
 	ROM_LOAD( "a62_03-1.52", 0x8000, 0x4000, CRC(e2fffbe4) SHA1(a10ced7103a26fd6753765bf11b00ca018f49a48) )
 	ROM_LOAD( "a62_04.50",   0xc000, 0x4000, CRC(fad74dfe) SHA1(92c0d42c5e186bc07c168ad581e52a5ae340c2b2) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) //SOUND
+	ROM_REGION( 0x10000, "audiocpu", 0 ) //SOUND
 	ROM_LOAD( "a62_13.5",    0x0000, 0x2000, CRC(7ce290db) SHA1(e3c72ba5d97cb07f0f72d2765a068af6fb5cca29) )
 	ROM_LOAD( "a62_14.4",    0x2000, 0x2000, CRC(ea74b1a2) SHA1(7be3b9e9d51cfa753ce97e92f7eebd9723fe5821) )
 
@@ -2082,13 +2082,13 @@ ROM_END
 
 
 ROM_START( halleysc )
-	ROM_REGION( 0x10000, "main", 0 ) //MAIN PRG
+	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
 	ROM_LOAD( "a62_01.30",   0x0000, 0x4000, CRC(a5e82b3e) SHA1(c16c6a6c23a579454b8a2be4b951c35b04f2a856) )
 	ROM_LOAD( "a62_02.31",   0x4000, 0x4000, CRC(25f5bcd3) SHA1(9d72afe866df363d2ac33dab3ed6c3913f4de12d) )
 	ROM_LOAD( "a62_03.52",   0x8000, 0x4000, CRC(8e90a97b) SHA1(9199628ad5353a88e4478a13c48df1ccb5d2b538) )
 	ROM_LOAD( "a62_04.50",   0xc000, 0x4000, CRC(fad74dfe) SHA1(92c0d42c5e186bc07c168ad581e52a5ae340c2b2) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) //SOUND
+	ROM_REGION( 0x10000, "audiocpu", 0 ) //SOUND
 	ROM_LOAD( "a62_13.5",    0x0000, 0x2000, CRC(7ce290db) SHA1(e3c72ba5d97cb07f0f72d2765a068af6fb5cca29) )
 	ROM_LOAD( "a62_14.4",    0x2000, 0x2000, CRC(ea74b1a2) SHA1(7be3b9e9d51cfa753ce97e92f7eebd9723fe5821) )
 
@@ -2110,13 +2110,13 @@ ROM_END
 
 
 ROM_START( halley87 )
-	ROM_REGION( 0x10000, "main", 0 ) //MAIN PRG
+	ROM_REGION( 0x10000, "maincpu", 0 ) //MAIN PRG
 	ROM_LOAD( "a62-17.30",   0x0000, 0x4000, CRC(fa2a58a6) SHA1(42cb587aad166ff74ece987f275aa7ad16d58300) )
 	ROM_LOAD( "a62-18.31",   0x4000, 0x4000, CRC(f3a078e6) SHA1(f8fa548b5814276d1ae2d575b9a5d3f0cc2f54fa) )
 	ROM_LOAD( "a62-19.52",   0x8000, 0x4000, CRC(e8bb695c) SHA1(066558ec48a38db03ae10ba873ff05ab5f911658) )
 	ROM_LOAD( "a62-20.50",   0xc000, 0x4000, CRC(59ed52cd) SHA1(059ee01610949a654741b853eed0235eabe0e313) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) //SOUND
+	ROM_REGION( 0x10000, "audiocpu", 0 ) //SOUND
 	ROM_LOAD( "a62_13.5",    0x0000, 0x2000, CRC(7ce290db) SHA1(e3c72ba5d97cb07f0f72d2765a068af6fb5cca29) )
 	ROM_LOAD( "a62_14.4",    0x2000, 0x2000, CRC(ea74b1a2) SHA1(7be3b9e9d51cfa753ce97e92f7eebd9723fe5821) )
 
@@ -2175,7 +2175,7 @@ static void init_common(running_machine *machine)
 
 
 	// decrypt main program ROM
-	rom = cpu1_base = memory_region(machine, "main");
+	rom = cpu1_base = memory_region(machine, "maincpu");
 	buf = gfx1_base;
 
 	for (i=0; i<0x10000; i++)

@@ -215,16 +215,16 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( prehisle )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_18MHz/2) 	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) 	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(prehisle_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_4MHz)	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(prehisle_sound_map,0)
 	MDRV_CPU_IO_MAP(prehisle_sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -251,11 +251,11 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( prehisle )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "gt-e2.2h", 0x00000, 0x20000, CRC(7083245a) SHA1(c4f72440e3fb130c8c44224c958bf70c61e8c34e) ) /* red "E" stamped on printed label */
 	ROM_LOAD16_BYTE( "gt-e3.3h", 0x00001, 0x20000, CRC(6d8cdf58) SHA1(0078e54db899132d2b1244aed0b974173717f82e) ) /* red "E" stamped on printed label */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
@@ -279,11 +279,11 @@ ROM_START( prehisle )
 ROM_END
 
 ROM_START( prehislu )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "gt-u2.2h", 0x00000, 0x20000, CRC(a14f49bb) SHA1(6b39a894c3d3862be349a58c748d2d763d5a269c) ) /* red "U" stamped on printed label */
 	ROM_LOAD16_BYTE( "gt-u3.3h", 0x00001, 0x20000, CRC(f165757e) SHA1(26cf369fed1713deec182852d76fe014ed46d6ac) ) /* red "U" stamped on printed label */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
@@ -307,11 +307,11 @@ ROM_START( prehislu )
 ROM_END
 
 ROM_START( gensitou )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "gt-j2.2h", 0x00000, 0x20000, CRC(a2da0b6b) SHA1(d102118f83b96094fd4ea4b3468713c4946c949d) ) /* red "J" stamped on printed label */
 	ROM_LOAD16_BYTE( "gt-j3.3h", 0x00001, 0x20000, CRC(c1a0ae8e) SHA1(2c9643abfd71edf8612e63d69cea4fbc19aad19d) ) /* red "J" stamped on printed label */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "gt1.1",  0x000000, 0x10000, CRC(80a4c093) SHA1(abe59e43259eb80b504bd5541f58cd0e5eb998ab) )
 
 	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )

@@ -220,14 +220,14 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( avalnche )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,MASTER_CLOCK/16)	   /* clock input is the "2H" signal divided by two */
+	MDRV_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)	   /* clock input is the "2H" signal divided by two */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(avalnche_interrupt,8)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(avalnche)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -251,7 +251,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( avalnche )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD_NIB_HIGH( "30612.d2",     	0x6800, 0x0800, CRC(3f975171) SHA1(afe680865da97824f1ebade4c7a2ba5d7ee2cbab) )
 	ROM_LOAD_NIB_LOW ( "30615.d3",     	0x6800, 0x0800, CRC(3e1a86b4) SHA1(3ff4cffea5b7a32231c0996473158f24c3bbe107) )
 	ROM_LOAD_NIB_HIGH( "30613.e2",     	0x7000, 0x0800, CRC(47a224d3) SHA1(9feb7444a2e5a3d90a4fe78ae5d23c3a5039bfaa) )
@@ -261,7 +261,7 @@ ROM_START( avalnche )
 ROM_END
 
 ROM_START( cascade )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "10005.1a",     	0x6800, 0x0400, CRC(54774594) SHA1(03e013b563675fb8a30bd69836466a353db9bfc7) )
 	ROM_LOAD( "10005.1b",     	0x6c00, 0x0400, CRC(fd9575ad) SHA1(ed0a1343d3c0456d458561256d5ee966b6c213f4) )
 	ROM_LOAD( "10005.2a",     	0x7000, 0x0400, CRC(12857c75) SHA1(e42fdee70bd19d6f60e88f106a49dbbd68c591cd) )

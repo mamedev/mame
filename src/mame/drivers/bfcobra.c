@@ -1674,7 +1674,7 @@ static DRIVER_INIT( bfcobra )
 	UINT8 *tmp;
 
 	tmp = malloc_or_die(0x8000);
-	rom = memory_region(machine, "audio") + 0x8000;
+	rom = memory_region(machine, "audiocpu") + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
 	for (i = 0; i < 0x8000; i++)
@@ -1738,12 +1738,12 @@ static INTERRUPT_GEN( vblank_gen )
 }
 
 static MACHINE_DRIVER_START( bfcobra )
-	MDRV_CPU_ADD("main", Z80, Z80_XTAL)
+	MDRV_CPU_ADD("maincpu", Z80, Z80_XTAL)
 	MDRV_CPU_PROGRAM_MAP(z80_prog_map, 0)
 	MDRV_CPU_IO_MAP(z80_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", vblank_gen)
+	MDRV_CPU_VBLANK_INT("screen", vblank_gen)
 
-	MDRV_CPU_ADD("audio", M6809, M6809_XTAL)
+	MDRV_CPU_ADD("audiocpu", M6809, M6809_XTAL)
 	MDRV_CPU_PROGRAM_MAP(m6809_prog_map, 0)
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)
 
@@ -1752,7 +1752,7 @@ static MACHINE_DRIVER_START( bfcobra )
 	MDRV_MACHINE_RESET(bfcobra)
 
 	/* TODO */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1787,7 +1787,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( inquiztr )
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "inq6809", 0x08000, 0x08000, CRC(ae996600) SHA1(f360399e77b81399d910770fa8106c196f04363c) )
 
 	ROM_REGION( 0x20000, "user1", 0 )
@@ -1799,7 +1799,7 @@ ROM_START( inquiztr )
 ROM_END
 
 ROM_START( escounts )
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 //  ROM_LOAD( "escint1b", 0x08000, 0x08000, CRC(96918aae) SHA1(849ce7b8eccc89c45aacc840a73935f95788a141) )
 	ROM_LOAD( "esc12int", 0x08000, 0x08000, CRC(741a1fe6) SHA1(e741d0ae0d2f11036a358120381e4b0df4a560a1) )
 
@@ -1812,7 +1812,7 @@ ROM_START( escounts )
 ROM_END
 
 ROM_START( trebltop )
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "95740078.bin", 0x08000, 0x08000, CRC(aca1980b) SHA1(3d4ed1dc545cc80f56d7daa13028fb10a12a718b) )
 
 	ROM_REGION( 0x20000, "user1", 0 )
@@ -1828,7 +1828,7 @@ ROM_START( trebltop )
 ROM_END
 
 ROM_START( beeline )
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bln12int.a", 0x08000, 0x08000, CRC(cb97905e) SHA1(9725156bf64e53a56bc0f90795d4b07db41d059e) )
 
 	ROM_REGION( 0x20000, "user1", 0 )
@@ -1840,7 +1840,7 @@ ROM_START( beeline )
 ROM_END
 
 ROM_START( quizvadr )
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "q6809.bin", 0x08000, 0x8000, CRC(a74dff10) SHA1(87578694a022dc3d7ade9cc76d387c1ae5fc74d9) )
 
 	ROM_REGION( 0x200000, "user1", 0 )
@@ -1855,7 +1855,7 @@ ROM_START( quizvadr )
 ROM_END
 
 ROM_START( qos )
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "39360107.bin", 0x08000, 0x8000, CRC(20844655) SHA1(b67c7f7bbabf6d5139b8ad8cbb5f8cc3f28e9cc7) )
 
 	ROM_REGION( 0x200000, "user1", 0 )
@@ -1870,7 +1870,7 @@ ROM_START( qos )
 ROM_END
 
 ROM_START( qosa )
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "qos_nondata_68f4.bin", 0x08000, 0x8000, CRC(5f40005a) SHA1(180017acf6b432bc135d1090099fdf99f1e3583a) )
 
 	ROM_REGION( 0x200000, "user1", 0 )
@@ -1885,7 +1885,7 @@ ROM_START( qosa )
 ROM_END
 
 ROM_START( qosb )
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "95740599.bin", 0x08000, 0x8000, CRC(bf1e321f) SHA1(51f18620f22ba2a1b110954284ddf00614d51a0e) )
 
 	ROM_REGION( 0x200000, "user1", 0 )

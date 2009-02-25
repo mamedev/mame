@@ -283,7 +283,7 @@ static WRITE8_HANDLER( esd16_sound_rombank_w )
 	int bank = data & 0xf;
 	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank >= 3)	bank += 1;
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audio") + 0x4000 * bank);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audiocpu") + 0x4000 * bank);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -566,17 +566,17 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( multchmp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000, 16000000)
+	MDRV_CPU_ADD("maincpu",M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(multchmp_readmem,multchmp_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(multchmp_sound_readmem,multchmp_sound_writemem)
 	MDRV_CPU_IO_MAP(multchmp_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)	/* IRQ By Main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -605,7 +605,7 @@ static MACHINE_DRIVER_START( hedpanic )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(multchmp)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hedpanic_readmem,hedpanic_writemem)
 
 	MDRV_NVRAM_HANDLER(93C46)
@@ -622,7 +622,7 @@ static MACHINE_DRIVER_START( mchampdx )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hedpanic)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mchampdx_readmem,mchampdx_writemem)
 MACHINE_DRIVER_END
 
@@ -631,7 +631,7 @@ static MACHINE_DRIVER_START( tangtang )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hedpanic)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tangtang_readmem,tangtang_writemem)
 
 	MDRV_GFXDECODE(tangtang)
@@ -711,11 +711,11 @@ MULTCHMP.U39 -/                    MX27C2000
 ***************************************************************************/
 
 ROM_START( multchmp )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000,  CRC(2d1b098a) SHA1(c2f3991f02c611c258219da2c61cad22c9a21f7d) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(10974063) SHA1(854b38b4d4cb529e9928aae4212c86a220615e04) )
 
-	ROM_REGION( 0x24000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x24000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
 	ROM_CONTINUE(          0x10000, 0x14000)
 
@@ -741,11 +741,11 @@ ROM_START( multchmp )
 ROM_END
 
 ROM_START( multchmk )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "multchmp.u02", 0x000000, 0x040000, CRC(7da8c0df) SHA1(763a3240554a02d8a9a0b13b6bfcd384825a6c57) )
 	ROM_LOAD16_BYTE( "multchmp.u03", 0x000001, 0x040000, CRC(5dc62799) SHA1(ff7882985efc20309c3f901a622f1beffa0c47be) )
 
-	ROM_REGION( 0x24000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x24000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
 	ROM_CONTINUE(          0x10000, 0x14000)
 
@@ -823,11 +823,11 @@ Note: Some versions of this PCB used larger EPROMs with the data repeated:
 
 
 ROM_START( mchampdx )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "ver0106_esd2.cu02", 0x000000, 0x040000, CRC(ea98b3fd) SHA1(107ee8adea246141fd6fa9209541ce0a7ed1e24c) )
 	ROM_LOAD16_BYTE( "ver0106_esd1.cu03", 0x000001, 0x040000, CRC(c6e4546b) SHA1(af9a8edffe94d035f92b36b1cd145c2a5ee66f48) )
 
-	ROM_REGION( 0x44000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(1b22568c) SHA1(5458e1a798357a6785f8ea1fe9da37768cd4761d) )
 	ROM_CONTINUE(          0x10000, 0x34000)
 
@@ -848,11 +848,11 @@ ROM_START( mchampdx )
 ROM_END
 
 ROM_START( mchampda )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000, CRC(4cca802c) SHA1(5e6e81febbb56b7c4630b530e546e7ab59c6c6c1) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000, CRC(0af1cd0a) SHA1(d2befcb596d83d523317d17b4c1c71f99de0d33e) )
 
-	ROM_REGION( 0x44000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(1b22568c) SHA1(5458e1a798357a6785f8ea1fe9da37768cd4761d) )
 	ROM_CONTINUE(          0x10000, 0x34000)
 
@@ -917,11 +917,11 @@ Note: Some versions of this PCB used larger EPROMs with the data repeated:
 
 
 ROM_START( hedpanic ) /* Story line & game instructions in English */
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.cu03", 0x000000, 0x040000, CRC(7c7be3bb) SHA1(d43ad7a967e1ef79ee0cf50d3842cc9174fbef3a) )
 	ROM_LOAD16_BYTE( "esd1.cu02", 0x000001, 0x040000, CRC(42405e9d) SHA1(0fa088b8bd921e42cedcc4083dfe41bc9888dfd1) )
 
-	ROM_REGION( 0x44000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
 	ROM_CONTINUE(          0x10000, 0x34000)
 
@@ -942,11 +942,11 @@ ROM_END
 
 
 ROM_START( hedpanif ) /* Story line in Japanese, game instructions in English */
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2", 0x000000, 0x040000, CRC(8cccc691) SHA1(d6a5dd6c21a67638b9023182f77780282b9b04e5) )
 	ROM_LOAD16_BYTE( "esd1", 0x000001, 0x040000, CRC(d8574925) SHA1(bd4990778b90a49aa6b10f8cf6709ce2424f546a) )
 
-	ROM_REGION( 0x44000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
 	ROM_CONTINUE(          0x10000, 0x34000)
 
@@ -967,11 +967,11 @@ ROM_END
 
 
 ROM_START( hedpanio ) /* Story line & game instructions in English, copyright year is 1999 */
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.rom", 0x000000, 0x040000, CRC(70b08424) SHA1(2ba4fb3b749e31db4239a9173b8509366400152f) )
 	ROM_LOAD16_BYTE( "esd1.rom", 0x000001, 0x040000, CRC(4e0682c5) SHA1(f4117f31b6426d7bf126a6c62c489b9347885b42) )
 
-	ROM_REGION( 0x24000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x24000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.rom", 0x00000, 0x0c000, BAD_DUMP CRC(b72b761b) SHA1(9735e05ddc1db38bf81eac89a5312200fc008248) ) /* Should be twice the size, IE: 27C020 */
 	ROM_CONTINUE(         0x10000, 0x14000)
 
@@ -1046,11 +1046,11 @@ Notes:
 */
 
 ROM_START( tangtang )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000,  CRC(b6dd6e3d) SHA1(44d2663827c45267eb154c873f3bd2e9e2bf3d3f) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(b6c0f2f4) SHA1(68ad76e7e380c728dda200a852729e034d9c9f4c) )
 
-	ROM_REGION( 0x44000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(d48ecc5c) SHA1(5015dd775980542eb29a08bffe1a09ea87d56272) )
 	ROM_CONTINUE(          0x10000, 0x34000)
 
@@ -1120,11 +1120,11 @@ Notes:
 */
 
 ROM_START( swatpolc ) /* SWAT Police */
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "esd.cu02", 0x000000, 0x040000,  CRC(29e0c126) SHA1(7c0356eed4ffdc056b7ec5c1ac07f1c9cc6aeffa) ) /* ESD labels but not numbered */
 	ROM_LOAD16_BYTE( "esd.cu03", 0x000001, 0x040000,  CRC(1070208b) SHA1(1e058774c5aee1de15ffcd26d530b23592286db1) ) /* ESD labels but not numbered */
 
-	ROM_REGION( 0x44000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(80e97dbe) SHA1(d6fae689cd3737777f36c980b9a7d9e42b06a467) ) /* 2 roms on PCB with an ESD3 label */
 	ROM_CONTINUE(          0x10000, 0x34000)
 

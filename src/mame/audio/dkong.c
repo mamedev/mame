@@ -977,7 +977,7 @@ static SOUND_START( dkong)
 {
 	dkong_state *state = machine->driver_data;
 
-	state->snd_rom = memory_region(machine, "sound");
+	state->snd_rom = memory_region(machine, "soundcpu");
 	state->dev_vp2 = devtag_get_device(machine, LATCH8, "virtual_p2");
 }
 
@@ -1242,7 +1242,7 @@ MACHINE_DRIVER_START( dkong2b_audio )
 	MDRV_LATCH8_DEVREAD(5, LATCH8, "ls259.6h", latch8_r, 3)
 	MDRV_LATCH8_DISCRETE_NODE("discrete", 7, DS_DISCHARGE_INV)
 
-	MDRV_CPU_ADD("sound", MB8884, I8035_CLOCK)
+	MDRV_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
 	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
 
@@ -1266,7 +1266,7 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( radarsc1_audio )
 
 	MDRV_IMPORT_FROM( radarscp_audio )
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
@@ -1305,7 +1305,7 @@ MACHINE_DRIVER_START( dkongjr_audio )
 	MDRV_LATCH8_DEVREAD(4, LATCH8, "ls259.6h", latch8_r, 6)
 	MDRV_LATCH8_DISCRETE_NODE("discrete", 7, DS_DISCHARGE_INV)
 
-	MDRV_CPU_ADD("sound", MB8884, I8035_CLOCK)
+	MDRV_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
 	MDRV_CPU_IO_MAP(dkongjr_sound_io_map, 0)
 
@@ -1321,11 +1321,11 @@ MACHINE_DRIVER_START( dkong3_audio )
 
 	MDRV_CPU_ADD("n2a03a", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong3_sound1_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("n2a03b", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong3_sound2_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* sound latches */
 	MDRV_LATCH8_ADD( "latch1")

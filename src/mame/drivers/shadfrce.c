@@ -512,14 +512,14 @@ static const ym2151_interface ym2151_config =
 };
 
 static MACHINE_DRIVER_START( shadfrce )
-	MDRV_CPU_ADD("main", M68000, CPU_CLOCK) 			/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK) 			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_map,0)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", shadfrce_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", shadfrce_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) 		/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) 		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_sound_map,0)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 432, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
 
@@ -547,13 +547,13 @@ MACHINE_DRIVER_END
 /* Rom Defs. */
 
 ROM_START( shadfrce )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "32a12-01.34", 0x00001, 0x40000, CRC(04501198) SHA1(50f981c13f9ed19d681d494376018ba86464ea13) )
 	ROM_LOAD16_BYTE( "32a13-01.26", 0x00000, 0x40000, CRC(b8f8a05c) SHA1(bd9d4218a7cf57b56aec1f7e710e02af8471f9d7) )
 	ROM_LOAD16_BYTE( "32a14-0.33",  0x80001, 0x40000, CRC(08279be9) SHA1(1833526b23feddb58b21874070ad2bf3b6be8dca) )
 	ROM_LOAD16_BYTE( "32a15-0.14",  0x80000, 0x40000, CRC(bfcadfea) SHA1(1caa9fc30d8622ce4c7221039c446e99cc8f5346) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "32j10-0.42",  0x00000, 0x10000, CRC(65daf475) SHA1(7144332b2d17af8645e22e1926b33113db0d20e2) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* Chars */
@@ -576,13 +576,13 @@ ROM_START( shadfrce )
 ROM_END
 
 ROM_START( shadfrcj )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "32j12-01.ic34", 0x00001, 0x40000, CRC(38fdbe1d) SHA1(476d8ef2c0d2a8c568ce44631f93f8c730f91b08) )
 	ROM_LOAD16_BYTE( "32j13-01.ic26", 0x00000, 0x40000, CRC(6e1df6f1) SHA1(c165553fe967b437413dd7ddc87a267548dd0ca9) )
 	ROM_LOAD16_BYTE( "32j14-01.ic33", 0x80001, 0x40000, CRC(89e3fb60) SHA1(90de38558d63215a0079079030e8b1097599c9e5) )
 	ROM_LOAD16_BYTE( "32j15-01.ic14", 0x80000, 0x40000, CRC(3dc3a84a) SHA1(166ad91b93192d94e3f6d2fe6dde02f59d334f75) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "32j10-0.42",  0x00000, 0x10000, CRC(65daf475) SHA1(7144332b2d17af8645e22e1926b33113db0d20e2) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* Chars */

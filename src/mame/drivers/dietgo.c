@@ -183,15 +183,15 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_DRIVER_START( dietgo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(dietgo_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", H6280, XTAL_32_22MHz/4/3)	/* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
+	MDRV_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)	/* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -219,11 +219,11 @@ MACHINE_DRIVER_END
 /* Diet Go Go */
 
 ROM_START( dietgou )
-	ROM_REGION( 0x80000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "jx.00",    0x000001, 0x040000, CRC(1a9de04f) SHA1(7ce1e7cf4cdce2b02da4df2a6ae9a9e665e24422) )
 	ROM_LOAD16_BYTE( "jx.01",    0x000000, 0x040000, CRC(79c097c8) SHA1(be49055ee324535e1118d243bd49e74ec1d2a2d7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "jx.02",    0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -253,11 +253,11 @@ Hold both START buttons on bootup to display version notice.
 */
 
 ROM_START( dietgoe )
-	ROM_REGION( 0x80000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "jy00-1.4h",    0x000001, 0x040000, CRC(8bce137d) SHA1(55f5b1c89330803c6147f9656f2cabe8d1de8478) )
 	ROM_LOAD16_BYTE( "jy01-1.5h",    0x000000, 0x040000, CRC(eca50450) SHA1(1a24117e3b1b66d7dbc5484c94cc2c627d34e6a3) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "jy02.m14",    0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -277,11 +277,11 @@ ROM_START( dietgoe )
 ROM_END
 
 ROM_START( dietgo )
-	ROM_REGION( 0x80000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "jy00-2.h4",    0x000001, 0x040000, CRC(014dcf62) SHA1(1a28ce4a643ec8b6f062b1200342ed4dc6db38a1) )
 	ROM_LOAD16_BYTE( "jy01-2.h5",    0x000000, 0x040000, CRC(793ebd83) SHA1(b9178f18ce6e9fca848cbbf9dce3f3856672bf94) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "jy02.m14",    0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -318,11 +318,11 @@ PAL16R6A 11H
 */
 
 ROM_START( dietgoj )
-	ROM_REGION( 0x80000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "jw-00-2.4h",    0x000001, 0x040000, CRC(e6ba6c49) SHA1(d5eaea81f1353c58c03faae67428f7ee98e766b1) )
 	ROM_LOAD16_BYTE( "jw-01-2.5h",    0x000000, 0x040000, CRC(684a3d57) SHA1(bd7a57ba837a1dc8f92b5ebcb46e50db1f98524f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "jx.02",    0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -340,7 +340,7 @@ ROM_END
 static DRIVER_INIT( dietgo )
 {
 	deco56_decrypt_gfx(machine, "gfx1");
-	deco102_decrypt_cpu(machine, "main", 0xe9ba, 0x01, 0x19);
+	deco102_decrypt_cpu(machine, "maincpu", 0xe9ba, 0x01, 0x19);
 }
 
 GAME( 1992, dietgo,   0,      dietgo, dietgo,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26)", 0 )

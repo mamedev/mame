@@ -641,7 +641,7 @@ static MACHINE_DRIVER_START( m63 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(m63_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("soundcpu",I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
@@ -650,7 +650,7 @@ static MACHINE_DRIVER_START( m63 )
 
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -683,17 +683,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fghtbskt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/4)     /* 3 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(fghtbskt_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", I8039,XTAL_12MHz/4)	/* ????? */
+	MDRV_CPU_ADD("audiocpu", I8039,XTAL_12MHz/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
 	MDRV_CPU_PERIODIC_INT(snd_irq, 60/2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -849,14 +849,14 @@ ROM_START( atomboya )
 ROM_END
 
 ROM_START( fghtbskt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fb14.0f",      0x0000, 0x2000, CRC(82032853) SHA1(e103ace4cac6df3a429b785f9789b302ae8cdade) )
 	ROM_LOAD( "fb13.2f",      0x2000, 0x2000, CRC(5306df0f) SHA1(11be226e7167703bb08e48510a113b2d43b211a4) )
 	ROM_LOAD( "fb12.3f",      0x4000, 0x2000, CRC(ee9210d4) SHA1(c63d036314d635f65a2b5bb192ceb312a587db6e) )
 	ROM_LOAD( "fb10.6f",      0x8000, 0x2000, CRC(6b47efba) SHA1(cb55c7a9d5afe748c1c88f87dd1909e106932798) )
 	ROM_LOAD( "fb09.7f",      0xa000, 0x2000, CRC(be69e087) SHA1(be95ecafa494cb0787ee18eb3ecea4ad545a6ae3) )
 
-	ROM_REGION( 0x1000, "audio", 0 )	/* 8039 */
+	ROM_REGION( 0x1000, "audiocpu", 0 )	/* 8039 */
 	ROM_LOAD( "fb07.0b",      0x0000, 0x1000, CRC(50432dbd) SHA1(35a2218ed243bde47dbe06b5a11a65502ba734ea) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

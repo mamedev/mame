@@ -832,7 +832,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( berzerk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(berzerk_map,0)
 	MDRV_CPU_IO_MAP(berzerk_io_map,0)
 
@@ -845,7 +845,7 @@ static MACHINE_DRIVER_START( berzerk )
 	MDRV_VIDEO_START(berzerk)
 	MDRV_VIDEO_UPDATE(berzerk)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -866,7 +866,7 @@ static MACHINE_DRIVER_START( frenzy )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(berzerk)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(frenzy_map,0)
 MACHINE_DRIVER_END
 
@@ -879,7 +879,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( berzerk )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1c-0",         0x0000, 0x0800, CRC(ca566dbc) SHA1(fae2647f12f1cd82826db61b53b116a5e0c9f995) )
 	ROM_LOAD( "1d-1",         0x1000, 0x0800, CRC(7ba69fde) SHA1(69af170c4a39a3494dcd180737e5c87b455f9203) )
 	ROM_LOAD( "3d-2",         0x1800, 0x0800, CRC(a1d5248b) SHA1(a0b7842f6a5f86c16d80d78e7012c78b3ea11d1d) )
@@ -894,7 +894,7 @@ ROM_START( berzerk )
 ROM_END
 
 ROM_START( berzerk1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom0.1c",      0x0000, 0x0800, CRC(5b7eb77d) SHA1(8de488e279036fe40d6fb4c0dde16075309342fd) )
 	ROM_LOAD( "rom1.1d",      0x1000, 0x0800, CRC(e58c8678) SHA1(a11f08448b457d690b270512c9f02fcf1e41d9e0) )
 	ROM_LOAD( "rom2.3d",      0x1800, 0x0800, CRC(705bb339) SHA1(845191df90cd7d80f8fed3d2b69305301d921549) )
@@ -910,7 +910,7 @@ ROM_END
 
 
 ROM_START( frenzy )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1c-0",         0x0000, 0x1000, CRC(abdd25b8) SHA1(e6a3ab826b51b2c6ddd63d55681848fccad800dd) )
 	ROM_LOAD( "1d-1",         0x1000, 0x1000, CRC(536e4ae8) SHA1(913385c43b8902d3d3ad2194a3137e19e61c6573) )
 	ROM_LOAD( "3d-2",         0x2000, 0x1000, CRC(3eb9bc9b) SHA1(1e43e76ae0606a6d41d9006005d6001bdee48694) )
@@ -934,7 +934,7 @@ ROM_END
    'Moon War 2' because it is the second version, and many of the PCBs are labeled as such
 */
 ROM_START( moonwarp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1c",         0x0000, 0x1000, NO_DUMP )
 	/*ROM_LOAD( "3c",         0x?000, 0x?000, NO_DUMP ) */ /* likely unused */
 	ROM_LOAD( "1d",         0x1000, 0x1000, NO_DUMP )

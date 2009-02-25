@@ -427,7 +427,7 @@ ADDRESS_MAP_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",					/* screen we are acting on */
+	"screen",				/* screen we are acting on */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
@@ -454,7 +454,7 @@ MACHINE_DRIVER_START( qix_video )
 
 	MDRV_MC6845_ADD(MC6845_TAG, MC6845, QIX_CHARACTER_CLOCK, mc6845_intf)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 MACHINE_DRIVER_END

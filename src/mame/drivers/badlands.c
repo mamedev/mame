@@ -431,11 +431,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( badlands )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_int)
+	MDRV_CPU_VBLANK_INT("screen", vblank_int)
 
-	MDRV_CPU_ADD("audio", M6502, ATARI_CLOCK_14MHz/8)
+	MDRV_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_MACHINE_RESET(badlands)
@@ -446,7 +446,7 @@ static MACHINE_DRIVER_START( badlands )
 	MDRV_GFXDECODE(badlands)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
@@ -472,13 +472,13 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( badlands )
-	ROM_REGION( 0x40000, "main", 0 )	/* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136074-1008.20f",  0x00000, 0x10000, CRC(a3da5774) SHA1(5ab1eb61d25594b2d7c40400cb57e7f47a717598) )
 	ROM_LOAD16_BYTE( "136074-1006.27f",  0x00001, 0x10000, CRC(aa03b4f3) SHA1(5eda60c715ffcefd4ad34bdb90579e8671dc384a) )
 	ROM_LOAD16_BYTE( "136074-1009.17f",  0x20000, 0x10000, CRC(0e2e807f) SHA1(5b61de066dca12c44335aa68a13c821845657866) )
 	ROM_LOAD16_BYTE( "136074-1007.24f",  0x20001, 0x10000, CRC(99a20c2c) SHA1(9b0a5a5dafb8816e72330d302c60339b600b49a8) )
 
-	ROM_REGION( 0x14000, "audio", 0 )	/* 64k for 6502 code */
+	ROM_REGION( 0x14000, "audiocpu", 0 )	/* 64k for 6502 code */
 	ROM_LOAD( "136074-1018.9c", 0x10000, 0x4000, CRC(a05fd146) SHA1(d97abbcf7897ca720cc18ff3a323f41cd3b23c34) )
 	ROM_CONTINUE(               0x04000, 0xc000 )
 
@@ -515,8 +515,8 @@ static DRIVER_INIT( badlands )
 	atarigen_eeprom_default = NULL;
 
 	/* initialize the audio system */
-	bank_base = &memory_region(machine, "audio")[0x03000];
-	bank_source_data = &memory_region(machine, "audio")[0x10000];
+	bank_base = &memory_region(machine, "audiocpu")[0x03000];
+	bank_source_data = &memory_region(machine, "audiocpu")[0x10000];
 }
 
 
@@ -637,11 +637,11 @@ static MACHINE_RESET( badlandb )
 static MACHINE_DRIVER_START( badlandb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 2800000/2)
+	MDRV_CPU_ADD("maincpu", M68000, 2800000/2)
 	MDRV_CPU_PROGRAM_MAP(bootleg_map,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_int)
+	MDRV_CPU_VBLANK_INT("screen", vblank_int)
 
-//  MDRV_CPU_ADD("audio", Z80, 2800000/8)
+//  MDRV_CPU_ADD("audiocpu", Z80, 2800000/8)
 //  MDRV_CPU_PROGRAM_MAP(bootleg_soundmap,0)
 
 	MDRV_MACHINE_RESET(badlandb)
@@ -652,7 +652,7 @@ static MACHINE_DRIVER_START( badlandb )
 	MDRV_GFXDECODE(badlandb)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
@@ -674,7 +674,7 @@ MACHINE_DRIVER_END
 /* bootleg by Playmark, uses Joystick controls */
 ROM_START( badlandb )
 	/* bootleg 68k Program */
-	ROM_REGION( 0x40000, "main", 0 )	/* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "blb28.ic21",  0x00000, 0x10000, CRC(dffb025d) SHA1(f2c17607acbbeee7d5d3f3dd2e8dc768b755e991) )
 	ROM_LOAD16_BYTE( "blb22.ic22",  0x00001, 0x10000, CRC(ca3015c4) SHA1(72e1451498143d920239487704f4b4a8a71410e0) )
 	ROM_LOAD16_BYTE( "blb27.ic19",  0x20000, 0x10000, CRC(0e2e807f) SHA1(5b61de066dca12c44335aa68a13c821845657866) )

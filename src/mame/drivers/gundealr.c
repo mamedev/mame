@@ -87,7 +87,7 @@ static INTERRUPT_GEN( yamyam_interrupt )
 static WRITE8_HANDLER( yamyam_bankswitch_w )
 {
  	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
@@ -462,13 +462,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( gundealr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 8000000)	/* 8 MHz ??? */
+	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(yamyam_interrupt,4)	/* ? */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -497,7 +497,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( gundealr )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
 	ROM_LOAD( "gundealr.1",   0x00000, 0x10000, CRC(5797e830) SHA1(54bd9fbcafdf3fff55d73ecfe26d8e8df0dd55d9) )
 	ROM_RELOAD(               0x10000, 0x10000 )	/* banked at 0x8000-0xbfff */
 
@@ -509,7 +509,7 @@ ROM_START( gundealr )
 ROM_END
 
 ROM_START( gundeala )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
 	ROM_LOAD( "gundeala.1",   0x00000, 0x10000, CRC(d87e24f1) SHA1(5ac3e20e5848b9cab2a23e083d2566bfd54502d4) )
 	ROM_RELOAD(               0x10000, 0x10000 )	/* banked at 0x8000-0xbfff */
 
@@ -521,7 +521,7 @@ ROM_START( gundeala )
 ROM_END
 
 ROM_START( gundealt )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
 	ROM_LOAD( "1.3j",         0x00000, 0x10000, CRC(1d951292) SHA1(a8bd34dfaf31c7dc4f9e0ec1fd7d4e10c5b29a85) )
 	ROM_RELOAD(               0x10000, 0x10000 )	/* banked at 0x8000-0xbfff */
 
@@ -533,7 +533,7 @@ ROM_START( gundealt )
 ROM_END
 
 ROM_START( yamyam )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
 	ROM_LOAD( "b3.f10",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
 	ROM_RELOAD(               0x10000, 0x20000 )	/* banked at 0x8000-0xbfff */
 
@@ -546,7 +546,7 @@ ROM_END
 
 /* only gfx are different, code is the same */
 ROM_START( wiseguy )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + 128k for banks */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
 	ROM_LOAD( "b3.f10",       0x00000, 0x20000, CRC(96ae9088) SHA1(a605882dcdcf1e8cf8b0112f614e696d59acfd97) )
 	ROM_RELOAD(               0x10000, 0x20000 )	/* banked at 0x8000-0xbfff */
 

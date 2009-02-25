@@ -56,7 +56,7 @@ static int rombank;
 
 static MACHINE_RESET( thedeep )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000 + 0 * 0x4000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x10000 + 0 * 0x4000);
 	thedeep_scroll[0] = 0;
 	thedeep_scroll[1] = 0;
 	thedeep_scroll[2] = 0;
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 			int new_rombank = protection_command & 3;
 			if (rombank == new_rombank)	break;
 			rombank = new_rombank;
-			rom = memory_region(space->machine, "main");
+			rom = memory_region(space->machine, "maincpu");
 			memory_set_bankptr(space->machine, 1, rom + 0x10000 + rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
@@ -352,11 +352,11 @@ static INTERRUPT_GEN( thedeep_interrupt )
 static MACHINE_DRIVER_START( thedeep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 6000000)		/* 6MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 6000000)		/* 6MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(thedeep_interrupt,2)	/* IRQ by MCU, NMI by vblank (maskable) */
 
- 	MDRV_CPU_ADD("audio", M65C02, 2000000)	/* 2MHz */
+ 	MDRV_CPU_ADD("audiocpu", M65C02, 2000000)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
@@ -365,7 +365,7 @@ static MACHINE_DRIVER_START( thedeep )
 	MDRV_MACHINE_RESET(thedeep)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -419,11 +419,11 @@ Visit The ROMLiST Homepage: Http://hem.passagen.se/ogg/
 ***************************************************************************/
 
 ROM_START( thedeep )
-	ROM_REGION( 0x20000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x20000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "dp-10.rom", 0x00000, 0x08000, CRC(7480b7a5) SHA1(ac6f121873a70c8077576322c201b7089c7b8a91) )
 	ROM_LOAD( "dp-09.rom", 0x10000, 0x10000, CRC(c630aece) SHA1(809916a1ba1c8e0af4c228b0f26ac638e2abf81e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 65C02 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
 	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */
@@ -451,11 +451,11 @@ ROM_START( thedeep )
 ROM_END
 
 ROM_START( rundeep )
-	ROM_REGION( 0x20000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x20000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "3", 0x00000, 0x08000, CRC(c9c9e194) SHA1(e9552c3321585f0902f29b55a7de8e2316885713) )
 	ROM_LOAD( "9", 0x10000, 0x10000, CRC(931f4e67) SHA1(f4942c5f0fdbcd6cdb96ddbbf2015f938b56b466) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 65C02 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
 	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */

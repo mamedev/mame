@@ -52,7 +52,7 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 static WRITE8_HANDLER( tbowlb_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -480,7 +480,7 @@ static MACHINE_RESET( tbowl )
 static MACHINE_DRIVER_START( tbowl )
 
 	/* CPU on Board '6206B' */
-	MDRV_CPU_ADD("main", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
+	MDRV_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
 	MDRV_CPU_PROGRAM_MAP(6206B_map,0)
 	MDRV_CPU_VBLANK_INT("left", irq0_line_hold)
 
@@ -490,7 +490,7 @@ static MACHINE_DRIVER_START( tbowl )
 	MDRV_CPU_VBLANK_INT("left", irq0_line_hold)
 
 	/* CPU on Board '6206A' */
-	MDRV_CPU_ADD("audio", Z80, 4000000) /* Actual Z80 */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* Actual Z80 */
 	MDRV_CPU_PROGRAM_MAP(6206A_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -613,7 +613,7 @@ this fails its rom check so I assume its corrupt
 
 
 ROM_START( tbowl )
-	ROM_REGION( 0x20000, "main", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
 	ROM_LOAD( "4.11b",	    0x00000, 0x08000, CRC(db8a4f5d) SHA1(730dee040c18ed8736c07a7de0b986f667b0f2f5) )
 	ROM_LOAD( "6206b.5",	0x10000, 0x10000, CRC(133c5c11) SHA1(7d4e76db3505ccf033d0d9b8d21feaf09b76dcc4) )
 
@@ -621,7 +621,7 @@ ROM_START( tbowl )
 	ROM_LOAD( "6206c.24",	0x00000, 0x10000, CRC(040c8138) SHA1(f6fea192bf2ef0a3f0876133c761488184f54f50) )
 	ROM_LOAD( "6206c.25",	0x10000, 0x10000, CRC(92c3cef5) SHA1(75883663b309bf46be544114c6e9086ab222300d) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 */
 	ROM_LOAD( "6206a.1",	0x00000, 0x08000, CRC(4370207b) SHA1(2c929b571c86d35e646870644751e86bd16b5e22) )
 
 	ROM_REGION( 0x10000, "characters", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */
@@ -654,7 +654,7 @@ ROM_START( tbowl )
 ROM_END
 
 ROM_START( tbowlj )
-	ROM_REGION( 0x20000, "main", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* NEC D70008AC-8 (Z80 Clone) */
 	ROM_LOAD( "6206b.4",	0x00000, 0x08000, CRC(7ed3eff7) SHA1(4a17f2838e9bbed8b1638783c62d07d1074e2b35) )
 	ROM_LOAD( "6206b.5",	0x10000, 0x10000, CRC(133c5c11) SHA1(7d4e76db3505ccf033d0d9b8d21feaf09b76dcc4) )
 
@@ -662,7 +662,7 @@ ROM_START( tbowlj )
 	ROM_LOAD( "6206c.24",	0x00000, 0x10000, CRC(040c8138) SHA1(f6fea192bf2ef0a3f0876133c761488184f54f50) )
 	ROM_LOAD( "6206c.25",	0x10000, 0x10000, CRC(92c3cef5) SHA1(75883663b309bf46be544114c6e9086ab222300d) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 */
 	ROM_LOAD( "6206a.1",	0x00000, 0x08000, CRC(4370207b) SHA1(2c929b571c86d35e646870644751e86bd16b5e22) )
 
 	ROM_REGION( 0x10000, "characters", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */

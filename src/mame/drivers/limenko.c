@@ -630,15 +630,15 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( limenko )
-	MDRV_CPU_ADD("main", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(limenko_map,0)
 	MDRV_CPU_IO_MAP(limenko_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -655,18 +655,18 @@ static MACHINE_DRIVER_START( limenko )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spotty )
-	MDRV_CPU_ADD("main", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
+	MDRV_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(spotty_map,0)
 	MDRV_CPU_IO_MAP(spotty_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", AT89C4051, 4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("audiocpu", AT89C4051, 4000000)	/* 4 MHz */
 	MDRV_CPU_IO_MAP(spotty_sound_io_map,0)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -938,7 +938,7 @@ ROM_START( spotty )
 	/* sys_rom1 empty */
 	ROM_LOAD16_WORD_SWAP( "sys_rom2",     0x080000, 0x80000, CRC(6ded8d9b) SHA1(547c532f4014d818c4412244b60dbc439496de20) )
 
-	ROM_REGION( 0x01000, "audio", 0 )
+	ROM_REGION( 0x01000, "audiocpu", 0 )
 	ROM_LOAD( "at89c4051.mcu", 0x000000, 0x01000, CRC(82ceab26) SHA1(9bbc454bdcbc70dc01f10a13c9fc01c884918fe8) )
 
 	/* Expand the gfx roms here */

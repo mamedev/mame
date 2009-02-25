@@ -237,16 +237,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( carpolo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,11289000/12)		/* 940.75 kHz */
+	MDRV_CPU_ADD("maincpu", M6502,11289000/12)		/* 940.75 kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", carpolo_timer_interrupt)	/* this not strictly VBLANK,
+	MDRV_CPU_VBLANK_INT("screen", carpolo_timer_interrupt)	/* this not strictly VBLANK,
                                                        but it's supposed to happen 60
                                                        times a sec, so it's a good place */
 	MDRV_MACHINE_START(carpolo)
 	MDRV_MACHINE_RESET(carpolo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -271,7 +271,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( carpolo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4000.6c",   0xf000, 0x0200, CRC(9d2e75a5) SHA1(c249d0b31de452738516f04a7bc3fb472d54f79d) )
 	ROM_LOAD( "4001.6d",   0xf200, 0x0200, CRC(69fb3768) SHA1(5fcc0807e560de0d73f8bab6943f3cad5ee324c9) )
 	ROM_LOAD( "4002.6h",   0xf400, 0x0200, CRC(5db179c7) SHA1(83615cdc1e3d8930cbdafbd0d327e1d6611faefd) )

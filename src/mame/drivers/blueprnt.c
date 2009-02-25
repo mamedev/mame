@@ -251,7 +251,7 @@ static const ay8910_interface ay8910_interface_1 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_HANDLER(dipsw_w),
 	DEVCB_NULL
 };
@@ -270,17 +270,17 @@ static const ay8910_interface ay8910_interface_2 =
 
 static MACHINE_DRIVER_START( blueprnt )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, 7000000/2)	// 3.5 MHz
+	MDRV_CPU_ADD("maincpu", Z80, 7000000/2)	// 3.5 MHz
 	MDRV_CPU_PROGRAM_MAP(blueprnt_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 10000000/2/2/2)	// 1.25 MHz (2H)
+	MDRV_CPU_ADD("audiocpu", Z80, 10000000/2/2/2)	// 1.25 MHz (2H)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)	// IRQs connected to 32V
 											// NMIs are caused by the main CPU
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -309,14 +309,14 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( blueprnt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bp-1.1m",   0x0000, 0x1000, CRC(b20069a6) SHA1(aa0a61c898ec58fc4872a24666f422e1abdc09f3) )
 	ROM_LOAD( "bp-2.1n",   0x1000, 0x1000, CRC(4a30302e) SHA1(a3a22b78585cc9677bf03bbfeb20afb05f026075) )
 	ROM_LOAD( "bp-3.1p",   0x2000, 0x1000, CRC(6866ca07) SHA1(a0df14eee9240fad42ceb6f926d34755e8442411) )
 	ROM_LOAD( "bp-4.1r",   0x3000, 0x1000, CRC(5d3cfac3) SHA1(7e6ab8398d799aaf0fcaa0769a827471d8c872e9) )
 	ROM_LOAD( "bp-5.1s",   0x4000, 0x1000, CRC(a556cac4) SHA1(0fe7070c70792d883c29f3d12a33238b5ed8af22) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "snd-1.3u",  0x0000, 0x1000, CRC(fd38777a) SHA1(0ed230e0fa047d3171e7141e5620b4c750b07629) )
 	ROM_LOAD( "snd-2.3v",  0x2000, 0x1000, CRC(33d5bf5b) SHA1(3ac684cd48559cd0eab32f9e7ce3ec6eca88dcd4) )
 
@@ -331,14 +331,14 @@ ROM_START( blueprnt )
 ROM_END
 
 ROM_START( blueprnj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bp-1j.1m",   0x0000, 0x1000, CRC(2e746693) SHA1(4a9bb023f753ba792d1db86a0fb128d5261db685) )
 	ROM_LOAD( "bp-2j.1n",   0x1000, 0x1000, CRC(a0eb0b8e) SHA1(b3c830b61172880fd2843a47350d8cb9461a25a4) )
 	ROM_LOAD( "bp-3j.1p",   0x2000, 0x1000, CRC(c34981bb) SHA1(1c7fa9d599b3458f665e95d92cafda8851098c8f) )
 	ROM_LOAD( "bp-4j.1r",   0x3000, 0x1000, CRC(525e77b5) SHA1(95c898be78881802b801f071d1d88062dcb1b798) )
 	ROM_LOAD( "bp-5j.1s",   0x4000, 0x1000, CRC(431a015f) SHA1(e00912ac501bdd6750f63b53204553a40ad6605a) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "snd-1.3u",  0x0000, 0x1000, CRC(fd38777a) SHA1(0ed230e0fa047d3171e7141e5620b4c750b07629) )
 	ROM_LOAD( "snd-2.3v",  0x2000, 0x1000, CRC(33d5bf5b) SHA1(3ac684cd48559cd0eab32f9e7ce3ec6eca88dcd4) )
 
@@ -353,7 +353,7 @@ ROM_START( blueprnj )
 ROM_END
 
 ROM_START( saturn )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "r1",           0x0000, 0x1000, CRC(18a6d68e) SHA1(816baca24dd75c6f9d4c91c86f90825dbb9a1347) )
 	ROM_LOAD( "r2",           0x1000, 0x1000, CRC(a7dd2665) SHA1(02d03fb436c704ccdbad751ccf034742fcd4ae43) )
 	ROM_LOAD( "r3",           0x2000, 0x1000, CRC(b9cfa791) SHA1(4f4c7b1dd347c6f402124ddf235a02e812dc536d) )
@@ -361,7 +361,7 @@ ROM_START( saturn )
 	ROM_LOAD( "r5",           0x4000, 0x1000, CRC(43444d00) SHA1(3b58c9387eac75e713943a5ea9c8922634772a67) )
 	ROM_LOAD( "r6",           0x5000, 0x1000, CRC(4d4821f6) SHA1(e414751d73c3f6e86d265540c1ebf69b95088b43) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "r7",           0x0000, 0x1000, CRC(dd43e02f) SHA1(1d95a307cb4ef523f024cb9c60382a2ac8c17b1c) )
 	ROM_LOAD( "r8",           0x2000, 0x1000, CRC(7f9d0877) SHA1(335b17d187089e91bd3002778821921e73ec59d2) )
 

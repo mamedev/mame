@@ -854,15 +854,15 @@ static const samples_interface rallyx_samples_interface =
 static MACHINE_DRIVER_START( rallyx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(rallyx_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -892,14 +892,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jungler )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(jungler_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -935,7 +935,7 @@ static MACHINE_DRIVER_START( locomotn )
 	MDRV_IMPORT_FROM(jungler)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_VIDEO_START(locomotn)
 	MDRV_VIDEO_UPDATE(locomotn)
@@ -948,7 +948,7 @@ static MACHINE_DRIVER_START( commsega )
 	MDRV_IMPORT_FROM(jungler)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_VIDEO_START(commsega)
 	MDRV_VIDEO_UPDATE(locomotn)
@@ -963,7 +963,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( rallyx )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1b",           0x0000, 0x1000, CRC(5882700d) SHA1(b6029e9730f1694894fe8b729ac0ba8d6712dea9) )
 	ROM_LOAD( "rallyxn.1e",   0x1000, 0x1000, CRC(ed1eba2b) SHA1(82d3a4b34b0ff5cfdb8ca7c18ad5c63d943b8484) )
 	ROM_LOAD( "rallyxn.1h",   0x2000, 0x1000, CRC(4f98dd1c) SHA1(8a20fadcea76802d1c412ba62086abb846ad54a8) )
@@ -987,7 +987,7 @@ ROM_START( rallyx )
 ROM_END
 
 ROM_START( rallyxm )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1b",           0x0000, 0x1000, CRC(5882700d) SHA1(b6029e9730f1694894fe8b729ac0ba8d6712dea9) )
 	ROM_LOAD( "1e",           0x1000, 0x1000, CRC(786585ec) SHA1(8aa75f10d695f4b3483c4bf7030b733318fd3bf3) )
 	ROM_LOAD( "1h",           0x2000, 0x1000, CRC(110d7dcd) SHA1(23e0855c2c9300f2068711d160fcdfaedd07832f) )
@@ -1011,7 +1011,7 @@ ROM_START( rallyxm )
 ROM_END
 
 ROM_START( nrallyx )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nrallyx.1b",   0x0000, 0x1000, CRC(9404c8d6) SHA1(ee7e45c22a2fbf72d3ac5ac26ab1111a22623fc5) )
 	ROM_LOAD( "nrallyx.1e",   0x1000, 0x1000, CRC(ac01bf3f) SHA1(8e1a7cce92ef709d18727db6ee7f89936f4b8df8) )
 	ROM_LOAD( "nrallyx.1h",   0x2000, 0x1000, CRC(aeba29b5) SHA1(2a6e4568729b83c430bf70e43c4146ad6a556b1b) )
@@ -1036,7 +1036,7 @@ ROM_END
 
 
 ROM_START( jungler )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jungr1",       0x0000, 0x1000, CRC(5bd6ad15) SHA1(608de86e19c6726bb7d21e7dc0e936f00121a3f4) )
 	ROM_LOAD( "jungr2",       0x1000, 0x1000, CRC(dc99f1e3) SHA1(942405f6c7d816139e36289126fe883a6a9a0a08) )
 	ROM_LOAD( "jungr3",       0x2000, 0x1000, CRC(3dcc03da) SHA1(2c328a46511c4c9eec6515b9316a586de6503152) )
@@ -1060,7 +1060,7 @@ ROM_START( jungler )
 ROM_END
 
 ROM_START( junglers )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5c",           0x0000, 0x1000, CRC(edd71b28) SHA1(6bdd85bc1c24ca57573252fd636e05759164de8a) )
 	ROM_LOAD( "5a",           0x1000, 0x1000, CRC(61ea4d46) SHA1(575ffe9fc7d5777c8f2d2b449623c353f42a4249) )
 	ROM_LOAD( "4d",           0x2000, 0x1000, CRC(557c7925) SHA1(84d8eb2fdb7ee9098805be9f457a37f51e4bc3b8) )
@@ -1084,7 +1084,7 @@ ROM_START( junglers )
 ROM_END
 
 ROM_START( tactcian )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tacticia.001", 0x0000, 0x1000, CRC(99163e39) SHA1(0a863f358a0bb065a9e2c41fcf4c20d370001dfe) )
 	ROM_LOAD( "tacticia.002", 0x1000, 0x1000, CRC(6d3e8a69) SHA1(2b4b3f2b7401064540f59070ef6742d1f44ca839) )
 	ROM_LOAD( "tacticia.003", 0x2000, 0x1000, CRC(0f71d0fa) SHA1(cb55243853b8b33034af7a6438f9a7c85a774d71) )
@@ -1111,7 +1111,7 @@ ROM_START( tactcian )
 ROM_END
 
 ROM_START( tactcan2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tan1",         0x0000, 0x1000, CRC(ddf38b75) SHA1(bad66fd6ae0ab3b91989fca14a8696ed855dc852) )
 	ROM_LOAD( "tan2",         0x1000, 0x1000, CRC(f065ee2e) SHA1(f2362c471981af3348465f3c8a5ffb38058432a5) )
 	ROM_LOAD( "tan3",         0x2000, 0x1000, CRC(2dba64fe) SHA1(8d312a6db99d2248fef2bbc590ceba333b0fde8b) )
@@ -1139,7 +1139,7 @@ ROM_START( tactcan2 )
 ROM_END
 
 ROM_START( locomotn )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1a.cpu",       0x0000, 0x1000, CRC(b43e689a) SHA1(7f1a0fa1ea9ff95a9d51b23ea00792ba22024282) )
 	ROM_LOAD( "2a.cpu",       0x1000, 0x1000, CRC(529c823d) SHA1(714ae0af254646eb6ebc5f47422246832e89ccfb) )
 	ROM_LOAD( "3.cpu",        0x2000, 0x1000, CRC(c9dbfbd1) SHA1(10ec7403053ef52d0ce4aa6eab3e82a3ea5e57ff) )
@@ -1164,7 +1164,7 @@ ROM_START( locomotn )
 ROM_END
 
 ROM_START( gutangtn )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3d_1.bin",     0x0000, 0x1000, CRC(e9757395) SHA1(78e2f8988ed39d2ecfe1f874be370f603d5eecc1) )
 	ROM_LOAD( "3e_2.bin",     0x1000, 0x1000, CRC(11d21d2e) SHA1(fd17dd481bb7bb39234fa7e9946b1cb4fa18109e) )
 	ROM_LOAD( "3f_3.bin",     0x2000, 0x1000, CRC(4d80f895) SHA1(7d83f4ee34226636012a84f46af01991a28b96f6) )
@@ -1189,7 +1189,7 @@ ROM_START( gutangtn )
 ROM_END
 
 ROM_START( cottong )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c1",           0x0000, 0x1000, CRC(2c256fe6) SHA1(115594c616497eec998e4e3255ec6ab6299346fa) )
 	ROM_LOAD( "c2",           0x1000, 0x1000, CRC(1de5e6a0) SHA1(8bb3408a510662ff3b9b7201d2d06fe70685bf7f) )
 	ROM_LOAD( "c3",           0x2000, 0x1000, CRC(01f909fe) SHA1(c80295e9f91ce25bfd28e72823b20ee6f6524a5c) )
@@ -1214,7 +1214,7 @@ ROM_START( cottong )
 ROM_END
 
 ROM_START( locoboot )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g.116",           0x0000, 0x1000, CRC(1248799c) SHA1(b0e513bb7ca6266f9182a91c2a30adc4b414a7ad) )
 	ROM_LOAD( "g.117",           0x1000, 0x1000, CRC(5b5b5753) SHA1(22f7fa0968843b52aa6eac743e5447502c86b10f) )
 	ROM_LOAD( "g.118",           0x2000, 0x1000, CRC(6bc269e1) SHA1(22d2c97e597fb7e6ae9074c8f921c902b879efe8) )
@@ -1244,7 +1244,7 @@ ROM_START( locoboot )
 ROM_END
 
 ROM_START( commsega )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "csega1",       0x0000, 0x1000, CRC(92de3405) SHA1(81ef4274b13f92d6274a0a037d7dc77ba0f67a1b) )
 	ROM_LOAD( "csega2",       0x1000, 0x1000, CRC(f14e2f9a) SHA1(c1a7ec1c306e07bac0bbf19b60f756650f63ae29) )
 	ROM_LOAD( "csega3",       0x2000, 0x1000, CRC(941dbf48) SHA1(01d2d64fb662af423aa04507ba97997772130c54) )

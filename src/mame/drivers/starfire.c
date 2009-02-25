@@ -264,12 +264,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( starfire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, STARFIRE_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART)
 
@@ -288,7 +288,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( starfire )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sfire.1a",     0x0000, 0x0800, CRC(9990af64) SHA1(05eccf1084ace55be9d6cf0fccddcaa18fa5487a) )
 	ROM_LOAD( "sfire.2a",     0x0800, 0x0800, CRC(6e17ba33) SHA1(59433696f56018a7b253491b1db3ff45546dcd46) )
 	ROM_LOAD( "sfire.1b",     0x1000, 0x0800, CRC(946175d0) SHA1(6a55d9f6031b96e9e05d61d59a23d4fc6df724bf) )
@@ -303,7 +303,7 @@ ROM_START( starfire )
 ROM_END
 
 ROM_START( starfira )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "starfire.1a",  0x0000, 0x0800, CRC(6adcd7e7) SHA1(a931fb80e48db3050ce3bc39f455961c0c7c56ce) )
 	ROM_LOAD( "starfire.2a",  0x0800, 0x0800, CRC(835c70ea) SHA1(36828735aa48de5e3e973ca1f42ef08537e1c6ce) )
 	ROM_LOAD( "starfire.1b",  0x1000, 0x0800, CRC(377afbef) SHA1(97cb5a20aeb8c70670d6db8f41b2abcb181755c6) )
@@ -317,7 +317,7 @@ ROM_START( starfira )
 ROM_END
 
 ROM_START( fireone )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fo-ic13.7b",     0x0000, 0x0800, CRC(f927f086) SHA1(509db84d781dd2d5aaefd561539738f0db7c4ca5) )
 	ROM_LOAD( "fo-ic24.7c",     0x0800, 0x0800, CRC(0d2d8723) SHA1(e9bb2092ce7786016f15e42916ad48ef12735e9c) )
 	ROM_LOAD( "fo-ic12.6b",     0x1000, 0x0800, CRC(ac7783d9) SHA1(8bcfcc5d3126382f4ec8904e0435de0931abc41e) )
@@ -335,7 +335,7 @@ ROM_START( fireone )
 ROM_END
 
 ROM_START( starfir2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sfire2.01",     0x0000, 0x0800, CRC(f75be2f4) SHA1(b15511c345363f45eee0c019aa336a9aa16e63ea) )
 	ROM_LOAD( "sfire2.02",     0x0800, 0x0800, CRC(ccf98c6a) SHA1(3e7792aa47750ee19baf1e74016038fe80c92381) )
 	ROM_LOAD( "sfire2.03",     0x1000, 0x0800, CRC(604b2d50) SHA1(39d402135aaaa44c1ad05e1665eb6668280fae28) )

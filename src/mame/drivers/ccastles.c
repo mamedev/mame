@@ -230,7 +230,7 @@ static MACHINE_START( ccastles )
 	video_screen_configure(machine->primary_screen, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0xa000, 0x6000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
 	irq_timer = timer_alloc(machine, clock_irq, NULL);
@@ -489,7 +489,7 @@ static const pokey_interface pokey_config =
 static MACHINE_DRIVER_START( ccastles )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK/8)
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_START(ccastles)
@@ -501,7 +501,7 @@ static MACHINE_DRIVER_START( ccastles )
 	MDRV_GFXDECODE(ccastles)
 	MDRV_PALETTE_LENGTH(32)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, 0, HTOTAL - 1, VTOTAL, 0, VTOTAL - 1)	/* will be adjusted later */
 
@@ -528,7 +528,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( ccastles )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-403.1k", 0x0a000, 0x2000, CRC(81471ae5) SHA1(8ec13b48119ecf8fe85207403c0a0de5240cded4) )
 	ROM_LOAD( "136022-404.1l", 0x0c000, 0x2000, CRC(820daf29) SHA1(a2cff00e9ddce201344692b75038431e4241fedd) )
 	ROM_LOAD( "136022-405.1n", 0x0e000, 0x2000, CRC(4befc296) SHA1(2e789a32903808014e9d5f3021d7eff57c3e2212) )
@@ -548,7 +548,7 @@ ROM_END
 
 
 ROM_START( ccastleg )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-303.1k", 0x0a000, 0x2000, CRC(10e39fce) SHA1(5247f52e14ccf39f0ec699a39c8ebe35e61e07d2) )
 	ROM_LOAD( "136022-304.1l", 0x0c000, 0x2000, CRC(74510f72) SHA1(d22550f308ff395d51869b52449bc0669a4e35e4) )
 	ROM_LOAD( "136022-112.1n", 0x0e000, 0x2000, CRC(69b8d906) SHA1(b71251a4402eedf97b6ed5798403823739991d3e) )
@@ -568,7 +568,7 @@ ROM_END
 
 
 ROM_START( ccastlep )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-303.1k", 0x0a000, 0x2000, CRC(10e39fce) SHA1(5247f52e14ccf39f0ec699a39c8ebe35e61e07d2) )
 	ROM_LOAD( "136022-304.1l", 0x0c000, 0x2000, CRC(74510f72) SHA1(d22550f308ff395d51869b52449bc0669a4e35e4) )
 	ROM_LOAD( "136022-113.1n", 0x0e000, 0x2000, CRC(b833936e) SHA1(c063989107acb82ac963342d6328c7e459160d2a) )
@@ -588,7 +588,7 @@ ROM_END
 
 
 ROM_START( ccastlef )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-303.1k", 0x0a000, 0x2000, CRC(10e39fce) SHA1(5247f52e14ccf39f0ec699a39c8ebe35e61e07d2) )
 	ROM_LOAD( "136022-304.1l", 0x0c000, 0x2000, CRC(74510f72) SHA1(d22550f308ff395d51869b52449bc0669a4e35e4) )
 	ROM_LOAD( "136022-114.1n", 0x0e000, 0x2000, CRC(8585b4d1) SHA1(e2054dba64cc210a0790fe32a98d8c35c1389bf5) )
@@ -608,7 +608,7 @@ ROM_END
 
 
 ROM_START( ccastle3 )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-303.1k", 0x0a000, 0x2000, CRC(10e39fce) SHA1(5247f52e14ccf39f0ec699a39c8ebe35e61e07d2) )
 	ROM_LOAD( "136022-304.1l", 0x0c000, 0x2000, CRC(74510f72) SHA1(d22550f308ff395d51869b52449bc0669a4e35e4) )
 	ROM_LOAD( "136022-305.1n", 0x0e000, 0x2000, CRC(9418cf8a) SHA1(1f835db94270e4a16e721b2ac355fb7e7c052285) )
@@ -628,7 +628,7 @@ ROM_END
 
 
 ROM_START( ccastle2 )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-203.1k", 0x0a000, 0x2000, CRC(348a96f0) SHA1(76de7bf6a01ccb15a4fe7333c1209f623a2e0d1b) )
 	ROM_LOAD( "136022-204.1l", 0x0c000, 0x2000, CRC(d48d8c1f) SHA1(8744182a3e2096419de63e341feb77dd8a8bcb34) )
 	ROM_LOAD( "136022-205.1n", 0x0e000, 0x2000, CRC(0e4883cc) SHA1(a96abbf654e087409a90c1686d9dd553bd08c14e) )
@@ -648,7 +648,7 @@ ROM_END
 
 
 ROM_START( ccastle1 )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "136022-103.1k", 0x0a000, 0x2000, CRC(9d10e314) SHA1(3474ae0f0617c1dc9aaa02ca2a912a72d57eba73) )
 	ROM_LOAD( "136022-104.1l", 0x0c000, 0x2000, CRC(fe2647a4) SHA1(532b236043449b35bd444fff63a7e083d0e2d8c8) )
 	ROM_LOAD( "136022-105.1n", 0x0e000, 0x2000, CRC(5a13af07) SHA1(d4314a4344aac4a794d9014943591fee2e9bf13b) )
@@ -668,7 +668,7 @@ ROM_END
 
 
 ROM_START( ccastlej )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "a000.12m",      0x0a000, 0x2000, CRC(0d911ef4) SHA1(fbd6a5a0e4e865421ed3720aa61221d03583f248) )
 	ROM_LOAD( "c000.13m",      0x0c000, 0x2000, CRC(246079de) SHA1(ade2c63656339c3e7e634470a17bc30da1006979) )
 	ROM_LOAD( "e000.14m",      0x0e000, 0x2000, CRC(3beec4f3) SHA1(076caffe67910bdcd1f51a41f2cc4ebdb930c7ca) )

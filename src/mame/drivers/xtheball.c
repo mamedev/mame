@@ -323,7 +323,7 @@ INPUT_PORTS_END
 static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	10000000,						/* pixel clock */
 	1,								/* pixels per clock */
 	xtheball_scanline_update,		/* scanline callback */
@@ -342,7 +342,7 @@ static const tms34010_config tms_config =
 
 static MACHINE_DRIVER_START( xtheball )
 
-	MDRV_CPU_ADD("main", TMS34010, 40000000)
+	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,15000)
@@ -353,7 +353,7 @@ static MACHINE_DRIVER_START( xtheball )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(tms340x0)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(10000000, 640, 114, 626, 257, 24, 248)
 

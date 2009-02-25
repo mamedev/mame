@@ -371,19 +371,19 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_DRIVER_START( lkage )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,6000000)
+	MDRV_CPU_ADD("maincpu", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(lkage,0)
 	MDRV_CPU_IO_MAP(readport,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 6000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 								/* IRQs are triggered by the YM2203 */
 	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -416,17 +416,17 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( lkageb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,6000000)
+	MDRV_CPU_ADD("maincpu", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(lkage,0)
 	MDRV_CPU_IO_MAP(readport,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 6000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 								/* IRQs are triggered by the YM2203 */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -458,11 +458,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( lkage )
-	ROM_REGION( 0x14000, "main", 0 ) /* Z80 code (main CPU) */
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 code (main CPU) */
 	ROM_LOAD( "a54-01-2.37", 0x0000, 0x8000, CRC(60fd9734) SHA1(33b444b887d80acb3a63ca4534db65c4d8147712) )
 	ROM_LOAD( "a54-02-2.38", 0x8000, 0x8000, CRC(878a25ce) SHA1(6228a12774e116e333c3563ee6e20c0c70db514b) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code (sound CPU) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705 MCU code */
@@ -488,11 +488,11 @@ ROM_START( lkage )
 ROM_END
 
 ROM_START( lkageo )
-	ROM_REGION( 0x14000, "main", 0 ) /* Z80 code (main CPU) */
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 code (main CPU) */
 	ROM_LOAD( "a54-01-1.37", 0x0000, 0x8000, CRC(973da9c5) SHA1(ad3b5d6a329b784e47be563c6f8dc628f32ba0a5) )
 	ROM_LOAD( "a54-02-1.38", 0x8000, 0x8000, CRC(27b509da) SHA1(c623950bd7dd2b5699ca948e3731455964106b89) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code (sound CPU) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705 MCU code */
@@ -518,11 +518,11 @@ ROM_START( lkageo )
 ROM_END
 
 ROM_START( lkageb )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code (main CPU) */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code (main CPU) */
 	ROM_LOAD( "ic37_1",      0x0000, 0x8000, CRC(05694f7b) SHA1(08a3796d6cf04d64db52ed8208a51084c420e10a) )
 	ROM_LOAD( "ic38_2",      0x8000, 0x8000, CRC(22efe29e) SHA1(f7a29d54081ca7509e822ad8823ec977bccc4a40) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code (sound CPU) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -539,11 +539,11 @@ ROM_START( lkageb )
 ROM_END
 
 ROM_START( lkageb2 )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code (main CPU) */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code (main CPU) */
 	ROM_LOAD( "lok.a",       0x0000, 0x8000, CRC(866df793) SHA1(44a9a773d7bbfc5f9d53f56682438ef8b23ecbd6) )
 	ROM_LOAD( "lok.b",       0x8000, 0x8000, CRC(fba9400f) SHA1(fedcb9b717feaeec31afda098f0ac2744df6c7be) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code (sound CPU) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
@@ -560,11 +560,11 @@ ROM_START( lkageb2 )
 ROM_END
 
 ROM_START( lkageb3 )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code (main CPU) */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code (main CPU) */
 	ROM_LOAD( "z1.bin",      0x0000, 0x8000, CRC(60cac488) SHA1(b61df14159f37143b1faed22d77fc7be31602022) )
 	ROM_LOAD( "z2.bin",      0x8000, 0x8000, CRC(22c95f17) SHA1(8ca438d508a36918778651adf599cf45a7c4a5d7) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code (sound CPU) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */

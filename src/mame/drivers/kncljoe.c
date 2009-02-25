@@ -241,7 +241,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("sound", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("soundcpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(unused_w)
@@ -256,11 +256,11 @@ static MACHINE_DRIVER_START( kncljoe )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("main", Z80, XTAL_6MHz)  /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_6MHz)  /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("soundcpu", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 	MDRV_CPU_PERIODIC_INT(sound_nmi, (double)3970) //measured 3.970 kHz
@@ -269,7 +269,7 @@ static MACHINE_DRIVER_START( kncljoe )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1500))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -300,12 +300,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( kncljoe )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kj-1.bin", 0x0000, 0x4000, CRC(4e4f5ff2) SHA1(7d889aa4f4138f01014c1dda391f82396074cfab) )
 	ROM_LOAD( "kj-2.bin", 0x4000, 0x4000, CRC(cb11514b) SHA1(c75d4019d1617493ff074ce8187a81ad70d9b60c) )
 	ROM_LOAD( "kj-3.bin", 0x8000, 0x4000, CRC(0f50697b) SHA1(412c6aba270824299ca2a74e9bea42b83e69797b) )
 
-	ROM_REGION( 0x8000, "sound", 0 )  /* 64k for audio code */
+	ROM_REGION( 0x8000, "soundcpu", 0 )  /* 64k for audio code */
 	ROM_LOAD( "kj-13.bin",0x6000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )	/* tiles */
@@ -332,12 +332,12 @@ ROM_START( kncljoe )
 ROM_END
 
 ROM_START( kncljoea )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kj01.bin", 0x0000, 0x4000, CRC(f251019e) SHA1(a7ca2fae57ce698ec19e118e967c74eb92341803) )
 	ROM_LOAD( "kj-2.bin", 0x4000, 0x4000, CRC(cb11514b) SHA1(c75d4019d1617493ff074ce8187a81ad70d9b60c) )
 	ROM_LOAD( "kj-3.bin", 0x8000, 0x4000, CRC(0f50697b) SHA1(412c6aba270824299ca2a74e9bea42b83e69797b) )
 
-	ROM_REGION( 0x8000, "sound", 0 )  /* 64k for audio code */
+	ROM_REGION( 0x8000, "soundcpu", 0 )  /* 64k for audio code */
 	ROM_LOAD( "kj-13.bin",0x6000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )	/* tiles */
@@ -364,12 +364,12 @@ ROM_START( kncljoea )
 ROM_END
 
 ROM_START( bcrusher )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bcrush1.bin", 0x0000, 0x4000, CRC(e8979196) SHA1(f1aff40e645760c786510c77a4841acb782ba157) )
 	ROM_LOAD( "bcrush2.bin", 0x4000, 0x4000, CRC(1be4c731) SHA1(11f3a33263d66172902dfb6f3fe2d0ab5cad38d7) )
 	ROM_LOAD( "bcrush3.bin", 0x8000, 0x4000, CRC(0772d993) SHA1(430f0319bd4765add2f1ee197e7217fdf9ae79c8) )
 
-	ROM_REGION( 0x8000, "sound", 0 )  /* 64k for audio code */
+	ROM_REGION( 0x8000, "soundcpu", 0 )  /* 64k for audio code */
 	ROM_LOAD( "kj-13.bin",0x6000, 0x2000, CRC(0a0be3f5) SHA1(00be47fc76500843b6f5de63622edb1748ef5f7d) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )	/* tiles */

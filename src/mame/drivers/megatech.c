@@ -278,13 +278,13 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, memory_region(space->machine, "main")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, memory_region(space->machine, "main")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, memory_region(space->machine, "main")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, memory_region(space->machine, "maincpu")+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -338,7 +338,7 @@ static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
 	memory_set_bankptr(machine,  5, sms_rom );
 
-	memcpy(sms_rom, memory_region(machine, "main"), 0x400000);
+	memcpy(sms_rom, memory_region(machine, "maincpu"), 0x400000);
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x2000); // 8kb of main ram
@@ -382,7 +382,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	if (game_region && bios_region)
 	{
 		memcpy(memory_region(machine, "mtbios")+0x8000, bios_region, 0x8000);
-		memcpy(memory_region(machine, "main"), game_region, 0x300000);
+		memcpy(memory_region(machine, "maincpu"), game_region, 0x300000);
 
 		// I store an extra byte at the end of the instruction rom region when loading
 		// to indicate if the current cart is an SMS cart.. the original hardware
@@ -419,7 +419,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 
 		/* no cart.. */
 		memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);
-		memset(memory_region(machine, "main"), 0x00, 0x300000);
+		memset(memory_region(machine, "maincpu"), 0x00, 0x300000);
 	}
 
 	return;
@@ -661,7 +661,7 @@ MACHINE_DRIVER_END
 	ROM_FILL(0x8000, 2, FLAG) \
 
 #define MEGATECH_BIOS \
-	ROM_REGION( 0x400000, "main", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x10000, "mtbios", 0 ) \
 	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) ) \
 

@@ -261,11 +261,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( copsnrob )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,14318180/16)		/* 894886.25 kHz */
+	MDRV_CPU_ADD("maincpu", M6502,14318180/16)		/* 894886.25 kHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -288,7 +288,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( copsnrob )
-	ROM_REGION( 0x2000, "main", 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "5777.l7",      0x1200, 0x0200, CRC(2b62d627) SHA1(ff4d3546ad931b8e8c5cffd65469814ba7200925) )
 	ROM_LOAD( "5776.k7",      0x1400, 0x0200, CRC(7fb12a49) SHA1(8cd2f4bd2405835d06eb4d76d028e1b14a97b500) )
 	ROM_LOAD( "5775.j7",      0x1600, 0x0200, CRC(627dee63) SHA1(6066ba9f5e12aa0c595eb60bcb468efa9f4495ef) )

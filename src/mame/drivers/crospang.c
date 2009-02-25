@@ -328,16 +328,16 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( crospang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14318180/2)
+	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)
 	MDRV_CPU_PROGRAM_MAP(crospang_readmem,crospang_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 14318180/4)
+	MDRV_CPU_ADD("audiocpu", Z80, 14318180/4)
 	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
 	MDRV_CPU_IO_MAP(crospang_sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -365,16 +365,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bestri )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14318180/2)
+	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)
 	MDRV_CPU_PROGRAM_MAP(bestri_readmem,bestri_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 14318180/4)
+	MDRV_CPU_ADD("audiocpu", Z80, 14318180/4)
 	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
 	MDRV_CPU_IO_MAP(crospang_sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -401,11 +401,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( crospang )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "p1.bin", 0x00001, 0x20000, CRC(0bcbbaad) SHA1(807f07be340d7af0aad8d49461b5a7f0221ea3b7) )
 	ROM_LOAD16_BYTE( "p2.bin", 0x00000, 0x20000, CRC(0947d204) SHA1(35e7e277c51888a66d305994bf05c3f6bfc3c29e) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* z80  */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* z80  */
 	ROM_LOAD( "s1.bin", 0x00000, 0x10000, CRC(d61a224c) SHA1(5cd1b2d136ad58ab550c7ba135558d6c8a4cd8f6) )
 
 	ROM_REGION( 0x20000, "oki", 0 ) /* samples */
@@ -450,11 +450,11 @@ OKI M6295
 */
 
 ROM_START( heuksun )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ua02.j3", 0x00001, 0x80000, CRC(db2b9c8e) SHA1(aa37e3a056957a12888e2e3112fe78a6bff7d76f) )
 	ROM_LOAD16_BYTE( "ua03.j5", 0x00000, 0x80000, CRC(de9f01e8) SHA1(3ee9206e7c3c7bebd7cde6f201c2fa7f9f6553b7) )
 
-	ROM_REGION( 0x040000, "audio", 0 ) /* Z80 */
+	ROM_REGION( 0x040000, "audiocpu", 0 ) /* Z80 */
 	ROM_LOAD( "us02.r4", 0x00000, 0x10000, CRC(c7cc05fa) SHA1(5fbf479be98f618c63e4c74a250d51279c2f5e3b) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -524,11 +524,11 @@ ud17.e12 D
 */
 
 ROM_START( bestri )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ua02.i3", 0x00001, 0x80000, CRC(9e94023d) SHA1(61a07eb835d324cb4fe7e3d366dd3907838b2554) )
 	ROM_LOAD16_BYTE( "ua03.i5", 0x00000, 0x80000, CRC(08cfa8d8) SHA1(684729887bf2dd2fe22e5bd2e32073169d426e02) )
 
-	ROM_REGION( 0x040000, "audio", 0 ) /* Z80 */
+	ROM_REGION( 0x040000, "audiocpu", 0 ) /* Z80 */
 	ROM_LOAD( "us02.p3", 0x00000, 0x10000, CRC(c7cc05fa) SHA1(5fbf479be98f618c63e4c74a250d51279c2f5e3b) ) // same as huek
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */

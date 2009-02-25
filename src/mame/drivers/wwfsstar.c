@@ -436,15 +436,15 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( wwfsstar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", wwfsstar_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", wwfsstar_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
 
@@ -473,11 +473,11 @@ MACHINE_DRIVER_END
 *******************************************************************************/
 
 ROM_START( wwfsstar )
-	ROM_REGION( 0x40000, "main", 0 ) /* Main CPU  (68000) */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-0_j-1.34", 0x00000, 0x20000, CRC(ec8fd2c9) SHA1(04ab93e2a1becdc480750c3b55839328b2af4639) )
 	ROM_LOAD16_BYTE( "24ad-0_j-1.35", 0x00001, 0x20000, CRC(54e614e4) SHA1(ee924dea977606fcb1222d1aa89211994126a182)  )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU (Z80)  */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "b.12",    0x00000, 0x08000, CRC(1e44f8aa) SHA1(e03857d6954e9b9b6073b211e2d6570032af8807) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -537,11 +537,11 @@ ROM_START( wwfsstar )
 ROM_END
 
 ROM_START( wwfsstau )
-	ROM_REGION( 0x40000, "main", 0 ) /* Main CPU  (68000) */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-04.34", 0x00000, 0x20000, CRC(ee9b850e) SHA1(6b634ad98b6104b9e860d05e73f3a139c2a19a78) )
 	ROM_LOAD16_BYTE( "24ad-04.35", 0x00001, 0x20000, CRC(057c2eef) SHA1(6eb5f60fa51b3e7f17fc6a81182a01ea406febea) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU (Z80)  */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "b.12",    0x00000, 0x08000, CRC(1e44f8aa) SHA1(e03857d6954e9b9b6073b211e2d6570032af8807) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -600,11 +600,11 @@ ROM_END
 
 /* this set is using the proper mask rom dumps */
 ROM_START( wwfsstaa )
-	ROM_REGION( 0x40000, "main", 0 ) /* Main CPU  (68000) */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-06.34", 0x00000, 0x20000, CRC(924a50e4) SHA1(e163ffc6bada5db0d979523dde77355acedcd456) )
 	ROM_LOAD16_BYTE( "24ad-07.35", 0x00001, 0x20000, CRC(9a76a50e) SHA1(adde96956a7602ae1ece797732e8295dc176b071) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU (Z80)  */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "24ab-0.12", 0x00000, 0x08000, CRC(1e44f8aa) SHA1(e03857d6954e9b9b6073b211e2d6570032af8807) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */
@@ -628,11 +628,11 @@ ROM_START( wwfsstaa )
 ROM_END
 
 ROM_START( wwfsstaj )
-	ROM_REGION( 0x40000, "main", 0 ) /* Main CPU  (68000) */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-0_j-1_japan.34", 0x00000, 0x20000, CRC(f872e968) SHA1(e52298817348601ed88c369018d3110e467cf602) )
 	ROM_LOAD16_BYTE( "24ad-0_j-1_japan.35", 0x00001, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU (Z80)  */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "b.12",    0x00000, 0x08000, CRC(1e44f8aa) SHA1(e03857d6954e9b9b6073b211e2d6570032af8807) )
 
 	ROM_REGION( 0x40000, "oki", 0 )	/* ADPCM samples */

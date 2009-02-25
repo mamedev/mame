@@ -932,9 +932,9 @@ static const tms32031_config tms_config =
 static MACHINE_DRIVER_START( gaelco3d )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 15000000)
+	MDRV_CPU_ADD("maincpu", M68000, 15000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_gen)
+	MDRV_CPU_VBLANK_INT("screen", vblank_gen)
 
 	MDRV_CPU_ADD("tms", TMS32031, 60000000)
 	MDRV_CPU_CONFIG(tms_config)
@@ -951,7 +951,7 @@ static MACHINE_DRIVER_START( gaelco3d )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -985,7 +985,7 @@ static MACHINE_DRIVER_START( gaelco3d2 )
 	MDRV_IMPORT_FROM(gaelco3d)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", M68EC020, 25000000)
+	MDRV_CPU_REPLACE("maincpu", M68EC020, 25000000)
 	MDRV_CPU_PROGRAM_MAP(main020_map,0)
 
 	MDRV_CPU_REPLACE("tms", TMS32031, 50000000)
@@ -1002,7 +1002,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( speedup )
-	ROM_REGION( 0x200000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "sup10.bin", 0x000000, 0x80000, CRC(07e70bae) SHA1(17013d859ec075e12518b094040a056d850b3271) )
 	ROM_LOAD16_BYTE( "sup15.bin", 0x000001, 0x80000, CRC(7947c28d) SHA1(46efb56d0f7fe2e92d0d04dcd2f130aef3be436d) )
 
@@ -1029,7 +1029,7 @@ ROM_END
 
 
 ROM_START( surfplnt )
-	ROM_REGION( 0x200000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "surfplnt.u5",  0x000000, 0x80000, CRC(c96e0a18) SHA1(b313d02d1d1bff8717b3d798e6ae681baefc1061) )
 	ROM_LOAD16_BYTE( "surfplnt.u11", 0x000001, 0x80000, CRC(99211d2d) SHA1(dee5b157489ce9c6988c8eec92fa91fff60d521c) )
 	ROM_LOAD16_BYTE( "surfplnt.u8",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
@@ -1062,7 +1062,7 @@ ROM_END
 
 
 ROM_START( surfpl40 )
-	ROM_REGION( 0x200000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "surfpl40.u5",  0x000000, 0x80000, CRC(572e0343) SHA1(badb08a5a495611b5fd2d821d4299348b2c9f308) )
 	ROM_LOAD16_BYTE( "surfpl40.u11", 0x000001, 0x80000, CRC(6056edaa) SHA1(9bc2df54d1367b9d58272a8f506e523e74110361) )
 	ROM_LOAD16_BYTE( "surfplnt.u8",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
@@ -1095,7 +1095,7 @@ ROM_END
 
 
 ROM_START( radikalb )
-	ROM_REGION( 0x200000, "main", 0 )	/* 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68020 code */
 	ROM_LOAD32_BYTE( "rab.6",  0x000000, 0x80000, CRC(ccac98c5) SHA1(43a30caf9880f48aba79676f9e746fdc6258139d) )
 	ROM_LOAD32_BYTE( "rab.12", 0x000001, 0x80000, CRC(26199506) SHA1(1b7b44895aa296eab8061ae85cbb5b0d30119dc7) )
 	ROM_LOAD32_BYTE( "rab.14", 0x000002, 0x80000, CRC(4a0ac8cb) SHA1(4883e5eddb833dcd39376be435aa8e8e2ec47ab5) )

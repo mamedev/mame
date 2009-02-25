@@ -283,12 +283,12 @@ static INTERRUPT_GEN( hexion_interrupt )
 static MACHINE_DRIVER_START( hexion )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,24000000/4)	/* Z80B 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,24000000/4)	/* Z80B 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(hexion_interrupt,3)	/* both IRQ and NMI are used */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -322,7 +322,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( hexion )
-	ROM_REGION( 0x34800, "main", 0 )	/* ROMs + space for additional RAM */
+	ROM_REGION( 0x34800, "maincpu", 0 )	/* ROMs + space for additional RAM */
 	ROM_LOAD( "122jab01.bin", 0x00000, 0x20000, CRC(eabc6dd1) SHA1(e74c1f1f2fcf8973f0741a2d544f25c8639448bf) )
 	ROM_RELOAD(               0x10000, 0x20000 )	/* banked at 8000-9fff */
 

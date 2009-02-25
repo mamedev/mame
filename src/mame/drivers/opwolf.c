@@ -578,11 +578,11 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( opwolf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, CPU_CLOCK )	/* 8 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(opwolf_readmem,opwolf_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, SOUND_CPU_CLOCK )	/* 4 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -591,7 +591,7 @@ static MACHINE_DRIVER_START( opwolf )
 	MDRV_MACHINE_RESET(opwolf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -627,23 +627,23 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( opwolfb ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, CPU_CLOCK )	/* 8 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(opwolfb_readmem,opwolfb_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 
 	MDRV_CPU_ADD("sub", Z80, SOUND_CPU_CLOCK )	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sub_z80_readmem,sub_z80_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	MDRV_MACHINE_START(opwolf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -681,13 +681,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( opwolf )
-	ROM_REGION( 0x40000, "main", 0 )     /* 256k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
 	ROM_LOAD16_BYTE( "b20-03-02.30",  0x00001, 0x10000, CRC(fdabd8a5) SHA1(866ec6168489024b8d157f2d5b1553d7f6e3d9b7) )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
 	ROM_LOAD16_BYTE( "b20-20.29",     0x20001, 0x10000, CRC(d244431a) SHA1(cb6c1d330a526f05c205f68247328161b8d4a1ba) )
 
-	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
+	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
@@ -707,13 +707,13 @@ ROM_END
    has exactly the same change and the label is different (b20-17 instead of b20-20) so this seems unlikely */
 
 ROM_START( opwolfa )
-	ROM_REGION( 0x40000, "main", 0 )     /* 256k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
 	ROM_LOAD16_BYTE( "b20-03-02.30",  0x00001, 0x10000, CRC(fdabd8a5) SHA1(866ec6168489024b8d157f2d5b1553d7f6e3d9b7) )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
 	ROM_LOAD16_BYTE( "b20-17.29",     0x20001, 0x10000, CRC(6043188e) SHA1(3a6f4836b1c19d37713f5714a947276baf1df50c) )
 
-	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
+	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
@@ -729,13 +729,13 @@ ROM_END
 
 
 ROM_START( opwolfu ) /* Taito TC0030 C-Chip labeled B20-18 (yes, it has a specific label on it) */
-	ROM_REGION( 0x40000, "main", 0 )     /* 256k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "b20-05-02.40",  0x00000, 0x10000, CRC(3ffbfe3a) SHA1(e41257e6af18bab4e36267a0c25a6aaa742972d2) )
 	ROM_LOAD16_BYTE( "b20-03-02.30",  0x00001, 0x10000, CRC(fdabd8a5) SHA1(866ec6168489024b8d157f2d5b1553d7f6e3d9b7) )
 	ROM_LOAD16_BYTE( "b20-04.39",     0x20000, 0x10000, CRC(216b4838) SHA1(2851cae00bb3e32e20f35fdab8ed6f149e658363) )
 	ROM_LOAD16_BYTE( "b20-19.29",     0x20001, 0x10000, CRC(b71bc44c) SHA1(5b404bd7630f01517ab98bda40ca43c11268035a) )
 
-	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
+	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "b20-07.10",  0x00000, 0x04000, CRC(45c7ace3) SHA1(06f7393f6b973b7735c27e8380cb4148650cfc16) )
 	ROM_CONTINUE(           0x10000, 0x0c000 ) /* banked stuff */
 
@@ -750,13 +750,13 @@ ROM_START( opwolfu ) /* Taito TC0030 C-Chip labeled B20-18 (yes, it has a specif
 ROM_END
 
 ROM_START( opwolfb )
-	ROM_REGION( 0x40000, "main", 0 )     /* 256k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 256k for 68000 code */
 	ROM_LOAD16_BYTE( "opwlfb.12",  0x00000, 0x10000, CRC(d87e4405) SHA1(de8a7763acd57293fbbff609e949ecd66c0f9234) )
 	ROM_LOAD16_BYTE( "opwlfb.10",  0x00001, 0x10000, CRC(9ab6f75c) SHA1(85310258ca005ffb031e8d6b3f43c3d1fc29ef14) )
 	ROM_LOAD16_BYTE( "opwlfb.13",  0x20000, 0x10000, CRC(61230c6e) SHA1(942764aec0c55ba00df8dbb54e127b73e24192ae) )
 	ROM_LOAD16_BYTE( "opwlfb.11",  0x20001, 0x10000, CRC(342e318d) SHA1(a52918d16884ca42b2a3b910bc71bfd81b45f1ab) )
 
-	ROM_REGION( 0x20000, "audio", 0 )      /* sound cpu */
+	ROM_REGION( 0x20000, "audiocpu", 0 )      /* sound cpu */
 	ROM_LOAD( "opwlfb.30",  0x00000, 0x04000, CRC(0669b94c) SHA1(f10894a6fad8ed144a528db696436b58f62ddee4) )
 	ROM_CONTINUE(           0x10000, 0x04000 ) /* banked stuff */
 
@@ -797,7 +797,7 @@ ROM_END
 
 static DRIVER_INIT( opwolf )
 {
-	UINT16* rom=(UINT16*)memory_region(machine, "main");
+	UINT16* rom=(UINT16*)memory_region(machine, "maincpu");
 
 	opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -807,13 +807,13 @@ static DRIVER_INIT( opwolf )
 	opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 
 static DRIVER_INIT( opwolfb )
 {
-	UINT16* rom=(UINT16*)memory_region(machine, "main");
+	UINT16* rom=(UINT16*)memory_region(machine, "maincpu");
 
 	opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -821,7 +821,7 @@ static DRIVER_INIT( opwolfb )
 	opwolf_gun_xoffs = -2;
 	opwolf_gun_yoffs = 17;
 
-	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 

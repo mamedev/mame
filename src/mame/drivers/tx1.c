@@ -698,14 +698,14 @@ static const ay8910_interface buggybjr_ym2149_interface_2 =
  *************************************/
 
 static MACHINE_DRIVER_START( tx1 )
-	MDRV_CPU_ADD("main", I8086, CPU_MASTER_CLOCK / 3)
+	MDRV_CPU_ADD("maincpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(tx1_main, 0)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD("math", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(tx1_math, 0)
 
-	MDRV_CPU_ADD("audio", Z80, TX1_PIXEL_CLOCK / 2)
+	MDRV_CPU_ADD("audiocpu", Z80, TX1_PIXEL_CLOCK / 2)
 	MDRV_CPU_PROGRAM_MAP(tx1_sound_prg, 0)
 	MDRV_CPU_IO_MAP(tx1_sound_io, 0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, TX1_PIXEL_CLOCK / 4 / 2048 / 2)
@@ -752,14 +752,14 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( buggyboy )
-	MDRV_CPU_ADD("main", I8086, CPU_MASTER_CLOCK / 3)
+	MDRV_CPU_ADD("maincpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_main, 0)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD("math", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_math, 0)
 
-	MDRV_CPU_ADD("audio", Z80, BUGGYBOY_ZCLK / 2)
+	MDRV_CPU_ADD("audiocpu", Z80, BUGGYBOY_ZCLK / 2)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_sound_prg, 0)
 	MDRV_CPU_PERIODIC_INT(z80_irq, BUGGYBOY_ZCLK / 2 / 4 / 2048)
 	MDRV_CPU_IO_MAP(buggyboy_sound_io, 0)
@@ -807,14 +807,14 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( buggybjr )
-	MDRV_CPU_ADD("main", I8086, CPU_MASTER_CLOCK / 3)
+	MDRV_CPU_ADD("maincpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggybjr_main, 0)
 //  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD("math", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_math, 0)
 
-	MDRV_CPU_ADD("audio", Z80, BUGGYBOY_ZCLK / 2)
+	MDRV_CPU_ADD("audiocpu", Z80, BUGGYBOY_ZCLK / 2)
 	MDRV_CPU_PROGRAM_MAP(buggybjr_sound_prg, 0)
 	MDRV_CPU_IO_MAP(buggyboy_sound_io, 0)
 	MDRV_CPU_PERIODIC_INT(z80_irq, BUGGYBOY_ZCLK / 2 / 4 / 2048)
@@ -823,7 +823,7 @@ static MACHINE_DRIVER_START( buggybjr )
 	MDRV_MACHINE_START(buggybjr)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 #if 0
 	MDRV_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
@@ -864,7 +864,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( tx1 )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tx1_1c.ic22", 0xf0000, 0x4000, CRC(eedcee83) SHA1(7fa0590b142fb13c6562126a9bdd5a1e032880c7) )
 	ROM_LOAD16_BYTE( "tx1_2c.ic29", 0xf0001, 0x4000, CRC(294bf5bf) SHA1(02b425caba8a187c58211bab27988205eb044558) )
 	ROM_LOAD16_BYTE( "tx1_4c.ic54", 0xf8001, 0x4000, CRC(15bb8ef2) SHA1(83968f010ec555fcd0548a80562fb23a892b5afb) )
@@ -881,7 +881,7 @@ ROM_START( tx1 )
 	ROM_RELOAD(                  0xc001, 0x2000 )
 
 	/* Sound */
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8411-136027-157.11", 0x00000, 0x2000, CRC(10ae3075) SHA1(69c5f62f2473aba848383eed3cecf15e273d86ca) )
 
 	/* 8x8 characters */
@@ -959,7 +959,7 @@ ROM_END
 
 /* Some PROMs haven't been confirmed to be the same as the Tatsumi set (but are very likely identical) */
 ROM_START( tx1a )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "8412-136027-244.22", 0xf0000, 0x4000, CRC(2e9cefa2) SHA1(4ca04eae446e8df08ab793488a79217ed1a27875) )
 	ROM_LOAD16_BYTE( "8412-136027-245.29", 0xf0001, 0x4000, CRC(ade7895c) SHA1(1c33a574cae46fddb4cadb85f5de17f02ae7a596) )
 	ROM_LOAD16_BYTE( "8412-136027-250.54", 0xf8001, 0x4000, CRC(c8c9368f) SHA1(0972d54d506216eb2b204cf22ccdff9210fb7b10) )
@@ -976,7 +976,7 @@ ROM_START( tx1a )
 	ROM_RELOAD(                  0xc001, 0x2000 )
 
 	/* Sound */
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8411-136027-157.11", 0x00000, 0x2000, CRC(10ae3075) SHA1(69c5f62f2473aba848383eed3cecf15e273d86ca) )
 
 	/* 8x8 characters */
@@ -1063,7 +1063,7 @@ ROM_END
 */
 
 ROM_START( buggybjr )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bug1a.214", 0x20000, 0x8000, CRC(92797c25) SHA1(8f7434abbd7f557d3202abb01b1e4899c82c67a5) )
 	ROM_LOAD16_BYTE( "bug4a.175", 0x20001, 0x8000, CRC(40ce3930) SHA1(4bf62ebeea1549a13a21a32cb860717f064b186a) )
 
@@ -1082,7 +1082,7 @@ ROM_START( buggybjr )
 	ROM_RELOAD(                  0xfc001, 0x2000 )
 
     /* ROM's Located on the sound board */
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bug35s.21", 0x00000, 0x4000, CRC(65d9af57) SHA1(17b09404942d17e7254550c43b56ae96a8c55680) )
 
 	/* 8x8 characters */
@@ -1169,7 +1169,7 @@ ROM_END
 
 
 ROM_START( buggyboy )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bug1a.230", 0x20000, 0x8000, CRC(92797c25) SHA1(8f7434abbd7f557d3202abb01b1e4899c82c67a5) )
 	ROM_LOAD16_BYTE( "bug4a.173", 0x20001, 0x8000, CRC(40ce3930) SHA1(4bf62ebeea1549a13a21a32cb860717f064b186a) )
 
@@ -1190,7 +1190,7 @@ ROM_START( buggyboy )
 	ROM_RELOAD(                  0xc001,  0x2000 )
 	ROM_RELOAD(                  0xfc001, 0x2000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bug35.11", 0x00000, 0x4000,  CRC(7aa16e9e) SHA1(ea54e56270f70351a62a78fa32027bb41ef9861e) )
 
 	/* 8x8 characters */

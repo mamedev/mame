@@ -672,14 +672,14 @@ static INTERRUPT_GEN( realbrk_interrupt )
 static MACHINE_DRIVER_START( realbrk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000, XTAL_32MHz / 2)			/* !! TMP68301 !! */
+	MDRV_CPU_ADD("maincpu",M68000, XTAL_32MHz / 2)			/* !! TMP68301 !! */
 	MDRV_CPU_PROGRAM_MAP(realbrk_mem,base_mem)
-	MDRV_CPU_VBLANK_INT("main", realbrk_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", realbrk_interrupt)
 
 	MDRV_MACHINE_RESET( tmp68301 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -706,19 +706,19 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pkgnsh )
 	MDRV_IMPORT_FROM( realbrk )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(base_mem,pkgnsh_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pkgnshdx )
 	MDRV_IMPORT_FROM( realbrk )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(base_mem,pkgnshdx_mem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dai2kaku )
 	MDRV_IMPORT_FROM( realbrk )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(base_mem,dai2kaku_mem)
 
 	MDRV_GFXDECODE(dai2kaku)
@@ -818,7 +818,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( pkgnsh )
-	ROM_REGION( 0x100000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "50506.1h", 0x000001, 0x080000, CRC(06949a7d) SHA1(1276c28bc5cebeae749e0cded2da631353efbbb4) )
 	ROM_LOAD16_BYTE( "50505.1k", 0x000000, 0x080000, CRC(26df869f) SHA1(d716e561441da6ae8ca61e17335aab44770157a6) )
 
@@ -899,7 +899,7 @@ OKI M6242 clock: 32.768kHz
 ***************************************************************************/
 
 ROM_START( pkgnshdx )
-	ROM_REGION( 0x100000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "52202b.1r", 0x000000, 0x080000, CRC(3c1a10de) SHA1(44a13adec64645aa01e216dfd527b59e7298c732) )
 	ROM_LOAD16_BYTE( "52201b.2r", 0x000001, 0x080000, CRC(d63797ce) SHA1(d1b0b57b5426135e36772be296e94e04822e54ac) )
 
@@ -971,7 +971,7 @@ Vertical Sync: 60Hz
 ***************************************************************************/
 
 ROM_START( realbrk )
-	ROM_REGION( 0x100000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "600k02b.1r", 0x000000, 0x080000, CRC(6954ff7f) SHA1(dc17be7dadb2d6acff039d4d6484ee71070e466d) )
 	ROM_LOAD16_BYTE( "600k01b.2r", 0x000001, 0x080000, CRC(6eb865bf) SHA1(07bcdbec8fd8d280b1cdb4b5545607d3a87e2395) )
 
@@ -997,7 +997,7 @@ ROM_START( realbrk )
 ROM_END
 
 ROM_START( realbrkj )
-	ROM_REGION( 0x100000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(ab0379b0) SHA1(67af6670f2b37a7d4d6e03508f291f8ffe64d4cb) )
 	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(9cc1596e) SHA1(a598f18eaac1ed6943069e9500b07b77e263f0d0) )
 
@@ -1023,7 +1023,7 @@ ROM_START( realbrkj )
 ROM_END
 
 ROM_START( realbrkk )
-	ROM_REGION( 0x100000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "600k_02b", 0x000000, 0x080000, CRC(fdca08b1) SHA1(69b35c85b1842d0a8c98fc519b46c72954322ceb) )
 	ROM_LOAD16_BYTE( "600k_01b", 0x000001, 0x080000, CRC(b6fe8998) SHA1(86f7d6067e007de50a02478a0e583ab64408bc4f) )
 
@@ -1051,7 +1051,7 @@ ROM_END
 // Team Japump board:
 
 ROM_START( dai2kaku )
-	ROM_REGION( 0x100000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "52201b.2r", 0x000000, 0x080000, CRC(5672cbe6) SHA1(4379edd0725e1b8cd5b3f9201e484487eccd1714) )
 	ROM_LOAD16_BYTE( "52202b.1r", 0x000001, 0x080000, CRC(e45d6368) SHA1(5fb39b7c2e0fd474e7c366279f616b9244e6cf2e) )
 
@@ -1139,7 +1139,7 @@ This dump matches the already supported set, except for rom sizes:
 */
 #if 0
 ROM_START( dai2kaku_alt_rom_size )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1r", 0x000000, 0x080000, CRC(5672cbe6) SHA1(4379edd0725e1b8cd5b3f9201e484487eccd1714) )
 	ROM_LOAD16_BYTE( "2r", 0x000001, 0x080000, CRC(e45d6368) SHA1(5fb39b7c2e0fd474e7c366279f616b9244e6cf2e) )
 

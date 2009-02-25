@@ -312,11 +312,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( espial )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(espial_readmem,espial_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 3072000)	/* 2 MHz?????? */
+	MDRV_CPU_ADD("audiocpu", Z80, 3072000)	/* 2 MHz?????? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,4)
@@ -324,7 +324,7 @@ static MACHINE_DRIVER_START( espial )
 	MDRV_MACHINE_RESET(espial)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -349,11 +349,11 @@ static MACHINE_DRIVER_START( netwars )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(espial)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(netwars_readmem,netwars_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(32*8, 64*8)
 
 	MDRV_VIDEO_START(netwars)
@@ -368,13 +368,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( espial )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "esp3.4f",      0x0000, 0x2000, CRC(0973c8a4) SHA1(d1fc6775870710b3dfea4e58a937ab996021adb1) )
 	ROM_LOAD( "esp4.4h",      0x2000, 0x2000, CRC(6034d7e5) SHA1(62c9699088f4ee1c69ec10a2f82feddd4083efef) )
 	ROM_LOAD( "esp6.bin",     0x4000, 0x1000, CRC(357025b4) SHA1(8bc62f564fcbe37bd490452b2d569d1981f76db1) )
 	ROM_LOAD( "esp5.bin",     0xc000, 0x1000, CRC(d03a2fc4) SHA1(791d70e4354350507f4c39d6115c046254168895) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "esp1.4n",      0x0000, 0x1000, CRC(fc7729e9) SHA1(96dfec574521fa4fe2588fbac2ef1caba6c1b884) )
 	ROM_LOAD( "esp2.4r",      0x1000, 0x1000, CRC(e4e256da) SHA1(8007471405bdcf90e29657a3ac2c2f84c9db7c9b) )
 
@@ -392,13 +392,13 @@ ROM_START( espial )
 ROM_END
 
 ROM_START( espialu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "espial3.4f",   0x0000, 0x2000, CRC(10f1da30) SHA1(8954ca3c7fccb8dd8433015ee303bb75a98f3474) )
 	ROM_LOAD( "espial4.4h",   0x2000, 0x2000, CRC(d2adbe39) SHA1(13c6041fd0e7c49988af89e3bab1b20999336928) )
 	ROM_LOAD( "espial.6",     0x4000, 0x1000, CRC(baa60bc1) SHA1(fc3d3f2e0316efb31161b28984fc8bd94473b783) )
 	ROM_LOAD( "espial.5",     0xc000, 0x1000, CRC(6d7bbfc1) SHA1(d886a76ce4a23c1310135bf1e4ffeda6d44625e7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "espial1.4n",   0x0000, 0x1000, CRC(1e5ec20b) SHA1(f3bee38737321edf2d1ea753124421416441666e) )
 	ROM_LOAD( "espial2.4r",   0x1000, 0x1000, CRC(3431bb97) SHA1(97343bfb5e49cd1d26799723d8c5a31eff7b1170) )
 
@@ -416,11 +416,11 @@ ROM_START( espialu )
 ROM_END
 
 ROM_START( netwars )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "netw3.4f",     0x0000, 0x2000, CRC(8e782991) SHA1(4fd533035b61b7006ef94300bb63474fb9e1c9f0) )
 	ROM_LOAD( "netw4.4h",     0x2000, 0x2000, CRC(6e219f61) SHA1(a27304017251777be501861e106a670fff078d54) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "netw1.4n",     0x0000, 0x1000, CRC(53939e16) SHA1(938f505db0cfcfafb751378ae0c139b7f32404cb) )
 	ROM_LOAD( "netw2.4r",     0x1000, 0x1000, CRC(c096317a) SHA1(e61a3e9107481fd80309172a1a9a431903e02489) )
 

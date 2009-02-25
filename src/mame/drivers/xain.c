@@ -469,7 +469,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( xsleena )
 {
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x4000, 0xc000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x4000, 0xc000);
 	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "sub")  + 0x4000, 0xc000);
 	memory_set_bank(machine, 1, 0);
 	memory_set_bank(machine, 2, 0);
@@ -478,14 +478,14 @@ static MACHINE_START( xsleena )
 static MACHINE_DRIVER_START( xsleena )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("maincpu", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", xain_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", xain_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
 	MDRV_CPU_PROGRAM_MAP(cpu_map_B,0)
 
-	MDRV_CPU_ADD("audio", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
+	MDRV_CPU_ADD("audiocpu", M6809, CPU_CLOCK)	/* Confirmed 1.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 //  MDRV_CPU_ADD("mcu", M68705, MCU_CLOCK)    /* Confirmed 3MHz */
@@ -493,10 +493,10 @@ static MACHINE_DRIVER_START( xsleena )
 
 	MDRV_MACHINE_START(xsleena)
 
-	MDRV_QUANTUM_PERFECT_CPU("main")
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 8, 248)	/* based on ddragon driver */
 
@@ -531,7 +531,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( xsleena )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "s-10.7d",      0x08000, 0x8000, CRC(370164be) SHA1(65c9951cac7dc3943fa4d5f9919ebb4c4f29b3ae) )
 	ROM_LOAD( "s-11.7c",      0x04000, 0x4000, CRC(d22bf859) SHA1(9edb159bef2eba2c5d93c03c15fbcb87eea52236) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
@@ -541,7 +541,7 @@ ROM_START( xsleena )
 	ROM_LOAD( "s-1.2b",       0x04000, 0x4000, CRC(948b9757) SHA1(3ea840cc47ae6a66f3e5f6a2f3e88475dcfe1840) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s-3.4s",       0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
 //  ROM_REGION( 0x800, "cpu3", 0 )
@@ -585,7 +585,7 @@ ROM_START( xsleena )
 ROM_END
 
 ROM_START( xsleenab )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "1.rom",        0x08000, 0x8000, CRC(79f515a7) SHA1(e61f18e3639dd9afe16c7bcb90fa7be31905e2c6) )
 	ROM_LOAD( "s-11.7c",      0x04000, 0x4000, CRC(d22bf859) SHA1(9edb159bef2eba2c5d93c03c15fbcb87eea52236) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
@@ -595,7 +595,7 @@ ROM_START( xsleenab )
 	ROM_LOAD( "s-1.2b",       0x04000, 0x4000, CRC(948b9757) SHA1(3ea840cc47ae6a66f3e5f6a2f3e88475dcfe1840) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s-3.4s",       0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -636,7 +636,7 @@ ROM_START( xsleenab )
 ROM_END
 
 ROM_START( solarwar )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "p9-0.bin",     0x08000, 0x8000, CRC(8ff372a8) SHA1(0fc396e662419fb9cb5bea11748aa8e0e8d072e6) )
 	ROM_LOAD( "pa-0.bin",     0x04000, 0x4000, CRC(154f946f) SHA1(25b776eb9c494e5302795ae79e494cbfc7c104b1) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
@@ -646,7 +646,7 @@ ROM_START( solarwar )
 	ROM_LOAD( "p0-0.bin",     0x04000, 0x4000, CRC(51ae95ae) SHA1(e03f7ccb0b33b05547577c60a7f92dc75e24b4d6) )
 	ROM_CONTINUE(             0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s-3.4s",       0x8000, 0x8000, CRC(a5318cb8) SHA1(35fb28c5598e39f22552bb036ae356b78422f080) )
 
 //  ROM_REGION( 0x800, "cpu3", 0 )
@@ -692,7 +692,7 @@ ROM_END
 
 static DRIVER_INIT( xsleena )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	/* do the same patch as the bootleg xsleena */
 	RAM[0xd488] = 0x12;
@@ -705,7 +705,7 @@ static DRIVER_INIT( xsleena )
 
 static DRIVER_INIT( solarwar )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	/* do the same patch as the bootleg xsleena */
 	RAM[0xd47e] = 0x12;

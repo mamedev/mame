@@ -49,8 +49,8 @@ static int stfight_coin_mech_query;
 
 DRIVER_INIT( empcity )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 
 	decrypt = auto_malloc(0x8000);
@@ -111,7 +111,7 @@ MACHINE_RESET( stfight )
 // - in fact I don't even know how/where it's switched in!
 static WRITE8_HANDLER( stfight_bank_w )
 {
-	UINT8   *ROM2 = memory_region(space->machine, "main") + 0x10000;
+	UINT8   *ROM2 = memory_region(space->machine, "maincpu") + 0x10000;
 
 	memory_set_bankptr(space->machine,  1, &ROM2[data<<14] );
 }

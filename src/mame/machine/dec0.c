@@ -559,9 +559,9 @@ DRIVER_INIT( hippodrm )
 
 DRIVER_INIT( slyspy )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(machine, "audiocpu");
 
-	h6280_decrypt(machine, "audio");
+	h6280_decrypt(machine, "audiocpu");
 
 	/* Slyspy sound cpu has some protection */
 	RAM[0xf2d]=0xea;
@@ -582,7 +582,7 @@ DRIVER_INIT( hbarrel )
 {
 	GAME=1;
 { /* Remove this patch once processing time of i8751 is simulated */
-UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 rom[0xb68/2] = 0x8008;
 }
 }
@@ -591,7 +591,7 @@ DRIVER_INIT( hbarrelw )
 {
 	GAME=1;
 { /* Remove this patch once processing time of i8751 is simulated */
-UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 rom[0xb3e/2] = 0x8008;
 }
 }

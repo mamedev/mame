@@ -549,7 +549,7 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START( spacefev_sound )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audio", I8035, 6000000)
+	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
 	MDRV_CPU_PROGRAM_MAP(n8080_sound_cpu_map, 0)
 	MDRV_CPU_IO_MAP(n8080_sound_io_map, 0)
 
@@ -570,7 +570,7 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( sheriff_sound )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audio", I8035, 6000000)
+	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
 	MDRV_CPU_PROGRAM_MAP(n8080_sound_cpu_map, 0)
 	MDRV_CPU_IO_MAP(n8080_sound_io_map, 0)
 
@@ -591,7 +591,7 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( helifire_sound )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audio", I8035, 6000000)
+	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
 	MDRV_CPU_PROGRAM_MAP(n8080_sound_cpu_map, 0)
 	MDRV_CPU_IO_MAP(helifire_sound_io_map, 0)
 

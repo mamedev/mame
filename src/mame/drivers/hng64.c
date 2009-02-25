@@ -1514,12 +1514,12 @@ static MACHINE_RESET(hyperneo)
 
 static MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", R4600BE, MASTER_CLOCK)  	// actually R4300
+	MDRV_CPU_ADD("maincpu", R4600BE, MASTER_CLOCK)  	// actually R4300
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(hng_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq_start,3)
 
-	MDRV_CPU_ADD("audio", V30,8000000)		 		// v53, 16? mhz!
+	MDRV_CPU_ADD("audiocpu", V30,8000000)		 		// v53, 16? mhz!
 	MDRV_CPU_PROGRAM_MAP(hng_sound_map,0)
 
 	MDRV_CPU_ADD("comm", Z80,MASTER_CLOCK/4)		/* KL5C80A12CFP - binary compatible with Z80. */
@@ -1529,7 +1529,7 @@ static MACHINE_DRIVER_START( hng64 )
 	MDRV_GFXDECODE(hng64)
 	MDRV_MACHINE_RESET(hyperneo)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

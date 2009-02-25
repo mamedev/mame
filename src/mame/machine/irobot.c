@@ -123,7 +123,7 @@ WRITE8_HANDLER( irobot_statwr_w )
 
 WRITE8_HANDLER( irobot_out0_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	irobot_out0 = data;
 	switch (data & 0x60)
@@ -145,7 +145,7 @@ WRITE8_HANDLER( irobot_out0_w )
 
 WRITE8_HANDLER( irobot_rom_banksel_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	switch ((data & 0x0E) >> 1)
 	{

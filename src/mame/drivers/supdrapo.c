@@ -245,12 +245,12 @@ static PALETTE_INIT( sdpoker )
 }
 
 static MACHINE_DRIVER_START( supdrapo )
-	MDRV_CPU_ADD("main", Z80,8000000/2) /* ??? */
+	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* ??? */
 	MDRV_CPU_PROGRAM_MAP(sdpoker_mem,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -271,7 +271,7 @@ static MACHINE_DRIVER_START( supdrapo )
 MACHINE_DRIVER_END
 
 ROM_START( supdrapo )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "a2-1c",        0x0000, 0x1000, CRC(b65af689) SHA1(b45cd15ca8f9c931d83a90f3cdbebf218070b195) )
 	ROM_LOAD( "a2-1d",        0x1000, 0x1000, CRC(9ccc4347) SHA1(ea8f4d17aaacc7091ca0a66247b55eb12155c9d7) )
 	ROM_LOAD( "a1-1e",        0x2000, 0x1000, CRC(44f2b75d) SHA1(615d0acd3f8a109334f415732b6b4fe7b810d91c) ) //a2-1e

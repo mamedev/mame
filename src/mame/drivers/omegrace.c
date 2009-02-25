@@ -332,7 +332,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4bff) AM_RAM
 	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* NVRAM */
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x8000) /* vector ram */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x8000) /* vector ram */
 	AM_RANGE(0x9000, 0x9fff) AM_ROM /* vector rom */
 ADDRESS_MAP_END
 
@@ -476,7 +476,7 @@ static MACHINE_DRIVER_START( omegrace )
 	/* main CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
-	MDRV_CPU_ADD("main", Z80,12000000/4)
+	MDRV_CPU_ADD("maincpu", Z80,12000000/4)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_IO_MAP(port_map, 0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,250)
@@ -485,7 +485,7 @@ static MACHINE_DRIVER_START( omegrace )
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 12 = divide by 8 */
 	/* Fed to CPU as 1.5mhz though line J4-D */
-	MDRV_CPU_ADD("audio", Z80,12000000/8)
+	MDRV_CPU_ADD("audiocpu", Z80,12000000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_IO_MAP(sound_port, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,250)
@@ -494,7 +494,7 @@ static MACHINE_DRIVER_START( omegrace )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(40)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
@@ -523,7 +523,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( omegrace )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "omega.m7",     0x0000, 0x1000, CRC(0424d46e) SHA1(cc1ac6c06ba6f6e8466fa08286a0c70b5335af33) )
 	ROM_LOAD( "omega.l7",     0x1000, 0x1000, CRC(edcd7a7d) SHA1(5d142de2f48b01d563578a54fd5540e5d0ac8f4c) )
 	ROM_LOAD( "omega.k7",     0x2000, 0x1000, CRC(6d10f197) SHA1(9609a0cbeeef2efa10d49cde9f0afdca96e9c2f8) )
@@ -531,7 +531,7 @@ ROM_START( omegrace )
 	ROM_LOAD( "omega.e1",     0x9000, 0x0800, CRC(1d0fdf3a) SHA1(3333397a9745874cea1dd6a1bda783cc59393b55) )
 	ROM_LOAD( "omega.f1",     0x9800, 0x0800, CRC(d44c0814) SHA1(2f216ee6de88bbe09775619003aee2d5aa8c554d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
 	/* DVG PROM */
@@ -540,7 +540,7 @@ ROM_START( omegrace )
 ROM_END
 
 ROM_START( deltrace )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "omega.m7",     0x0000, 0x1000, CRC(0424d46e) SHA1(cc1ac6c06ba6f6e8466fa08286a0c70b5335af33) )
 	ROM_LOAD( "omega.l7",     0x1000, 0x1000, CRC(edcd7a7d) SHA1(5d142de2f48b01d563578a54fd5540e5d0ac8f4c) )
 	ROM_LOAD( "omega.k7",     0x2000, 0x1000, CRC(6d10f197) SHA1(9609a0cbeeef2efa10d49cde9f0afdca96e9c2f8) )
@@ -548,7 +548,7 @@ ROM_START( deltrace )
 	ROM_LOAD( "omega.e1",     0x9000, 0x0800, CRC(1d0fdf3a) SHA1(3333397a9745874cea1dd6a1bda783cc59393b55) )
 	ROM_LOAD( "omega.f1",     0x9800, 0x0800, CRC(d44c0814) SHA1(2f216ee6de88bbe09775619003aee2d5aa8c554d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
 	/* DVG PROM */

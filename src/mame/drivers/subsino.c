@@ -262,12 +262,12 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( victor5 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z180, XTAL_12MHz / 3)	// 4 MHz?
+	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 3)	// 4 MHz?
 	MDRV_CPU_PROGRAM_MAP(victor5_map,0)
 	MDRV_CPU_IO_MAP(subsino_iomap,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -303,12 +303,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( srider )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z180, XTAL_12MHz / 3)	// 4 MHz?
+	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 3)	// 4 MHz?
 	MDRV_CPU_PROGRAM_MAP(srider_map,0)
 	MDRV_CPU_IO_MAP(subsino_iomap,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -337,12 +337,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( crsbingo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z180, XTAL_12MHz / 3)	// Unknown CPU and clock
+	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 3)	// Unknown CPU and clock
 	MDRV_CPU_PROGRAM_MAP(victor5_map,0)
 	MDRV_CPU_IO_MAP(subsino_iomap,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -406,7 +406,7 @@ Info by f205v (26/03/2008)
 ***************************************************************************/
 
 ROM_START( victor5 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(e3ada2fc) SHA1(eddb460dcb80a29fbbe3ed6c4733c75b892baf52) )
 
 	ROM_REGION( 0x18000, "tilemap", ROMREGION_DISPOSE )
@@ -455,7 +455,7 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 ***************************************************************************/
 
 ROM_START( victor21 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u1", 0x00000, 0x10000, CRC(43999b2d) SHA1(7ce26fd332ffe35fd826a1a6166b228d4bc370b8) )
 
 	ROM_REGION( 0x18000, "tilemap", ROMREGION_DISPOSE )
@@ -512,7 +512,7 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpy )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "shark_n.1.u18", 0x00000, 0x10000, CRC(25aeac2f) SHA1(d94e3e5cfffd150ac48e1463493a8323f42e7a89) )
 
 	ROM_REGION( 0x40000, "tilemap", ROMREGION_DISPOSE )
@@ -575,7 +575,7 @@ Info by f205v (25/03/2008)
 ***************************************************************************/
 
 ROM_START( sharkpya )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "shark1.6.u18", 0x00000, 0x10000, CRC(365312a0) SHA1(de8370b1f35e8d071185d2e5f2fbd2fdf74c55ac) )
 
 	ROM_REGION( 0x40000, "tilemap", ROMREGION_DISPOSE )
@@ -637,7 +637,7 @@ Info by f205v (29/12/2005)
 ***************************************************************************/
 
 ROM_START( smoto16 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rideritaly_1ver1.6.u18", 0x0000, 0x10000, CRC(c7c0c3e8) SHA1(5dc80bc775f370653135a7b3ea9c8d3c92263804) )
 
 	ROM_REGION( 0x40000, "tilemap", ROMREGION_DISPOSE )
@@ -661,7 +661,7 @@ ROM_END
 
 static DRIVER_INIT( smoto16 )
 {
-	UINT8 *rom = memory_region( machine, "main" );
+	UINT8 *rom = memory_region( machine, "maincpu" );
 	rom[0x12d0] = 0x20;	// "ERROR 951010"
 }
 
@@ -707,7 +707,7 @@ Info by f205v, Corrado Tomaselli (20/04/2008)
 ***************************************************************************/
 
 ROM_START( smoto20 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "italyv2.0-25.u18", 0x00000, 0x10000, CRC(91abc76e) SHA1(b0eb3afda1d94111056559017802b16b2e72a9a5) )
 
 	ROM_REGION( 0x40000, "tilemap", ROMREGION_DISPOSE )
@@ -731,7 +731,7 @@ ROM_END
 
 static DRIVER_INIT( smoto20 )
 {
-	UINT8 *rom = memory_region( machine, "main" );
+	UINT8 *rom = memory_region( machine, "maincpu" );
 	rom[0x12e1] = 0x20;	// "ERROR 951010"
 }
 
@@ -773,7 +773,7 @@ Info by f205v (14/12/2008)
 ***************************************************************************/
 
 ROM_START( crsbingo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u36", 0x00000, 0x10000, CRC(c5aff4eb) SHA1(74f06d7735975657fca9be5fff9e7d53f38fcd02) )
 
 	ROM_REGION( 0x20000, "tilemap", ROMREGION_DISPOSE )

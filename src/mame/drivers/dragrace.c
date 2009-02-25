@@ -331,7 +331,7 @@ static PALETTE_INIT( dragrace )
 static MACHINE_DRIVER_START( dragrace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6800, 12096000 / 12)
+	MDRV_CPU_ADD("maincpu", M6800, 12096000 / 12)
 	MDRV_CPU_PROGRAM_MAP(dragrace_readmem, dragrace_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
@@ -339,7 +339,7 @@ static MACHINE_DRIVER_START( dragrace )
 	MDRV_MACHINE_RESET(dragrace)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 262)
@@ -362,7 +362,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( dragrace )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8513.c1", 0x1000, 0x0800, CRC(543bbb30) SHA1(646a41d1124c8365f07a93de38af007895d7d263) )
 	ROM_LOAD( "8514.a1", 0x1800, 0x0800, CRC(ad218690) SHA1(08ba5f4fa4c75d8dad1a7162888d44b3349cbbe4) )
 	ROM_RELOAD(          0xF800, 0x0800 )

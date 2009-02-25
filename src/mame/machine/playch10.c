@@ -168,7 +168,7 @@ WRITE8_HANDLER( pc10_prot_w )
 		/* is the actual protection memory area                     */
 		/* setting the whole 0x2000 region every time is a waste    */
 		/* so we just set $ffff with the current value              */
-		memory_region( space->machine, "main" )[0xffff] = pc10_prot_r(space,0);
+		memory_region( space->machine, "maincpu" )[0xffff] = pc10_prot_r(space,0);
 	}
 }
 

@@ -198,11 +198,11 @@ static WRITE32_HANDLER( namcofl_sysreg_w )
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
 			memory_set_bankptr(space->machine,  1, namcofl_workram );
-			memory_set_bankptr(space->machine,  2, memory_region(space->machine, "main") );
+			memory_set_bankptr(space->machine,  2, memory_region(space->machine, "maincpu") );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			memory_set_bankptr(space->machine,  1, memory_region(space->machine, "main") );
+			memory_set_bankptr(space->machine,  1, memory_region(space->machine, "maincpu") );
 			memory_set_bankptr(space->machine,  2, namcofl_workram );
 		}
 	}
@@ -383,7 +383,7 @@ static MACHINE_RESET( namcofl )
 
 
 static MACHINE_DRIVER_START( namcofl )
-	MDRV_CPU_ADD("main", I960, 20000000)	// i80960KA-20 == 20 MHz part
+	MDRV_CPU_ADD("maincpu", I960, 20000000)	// i80960KA-20 == 20 MHz part
 	MDRV_CPU_PROGRAM_MAP(namcofl_mem, 0)
 
 	NAMCO_C7X_MCU_SHARED( 16384000 )
@@ -393,7 +393,7 @@ static MACHINE_DRIVER_START( namcofl )
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
@@ -410,7 +410,7 @@ static MACHINE_DRIVER_START( namcofl )
 MACHINE_DRIVER_END
 
 ROM_START( speedrcr )
-	ROM_REGION( 0x200000, "main", 0 ) // i960 program
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("se2mpea4.19a",   0x000000, 0x080000, CRC(95ab3fd7) SHA1(273a536f8512f3c55260ac1b78533bc35b8390ed) )
 	ROM_LOAD32_WORD("se2mpoa4.18a",   0x000002, 0x080000, CRC(5b5ef1eb) SHA1(3e9e4abb1a32269baef772079de825dfe1ea230c) )
 
@@ -458,7 +458,7 @@ ROM_START( speedrcr )
 ROM_END
 
 ROM_START( finalapb )
-	ROM_REGION( 0x200000, "main", 0 ) // i960 program
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2mpeb.19a",   0x000000, 0x080000, CRC(8bfe615f) SHA1(7b867eb261268a83177f1f873689f77d1b6c47ca) )
 	ROM_LOAD32_WORD("flr2mpob.18a",   0x000002, 0x080000, CRC(91c14e4f) SHA1(934a86daaef0e3e2c2b3066f4677ccb3aaab6eaf) )
 
@@ -495,7 +495,7 @@ ROM_START( finalapb )
 ROM_END
 
 ROM_START( finalapo )
-	ROM_REGION( 0x200000, "main", 0 ) // i960 program
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("flr2mpe.19a",   0x000000, 0x080000, CRC(cc8961ae) SHA1(08ce4d27a723101370d1c536b26256ce0d8a1b6c) )
 	ROM_LOAD32_WORD("flr2mpo.18a",   0x000002, 0x080000, CRC(8118f465) SHA1(c4b79878a82fd36b5707e92aa893f69c2b942d57) )
 
@@ -532,7 +532,7 @@ ROM_START( finalapo )
 ROM_END
 
 ROM_START( finalapr )
-	ROM_REGION( 0x200000, "main", 0 ) // i960 program
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
         ROM_LOAD32_WORD("flr1_mpec.19a", 0x000000, 0x080000, CRC(52735494) SHA1(db9873cb39bcfdd3dbe2e5079249fecac2c46df9) )
         ROM_LOAD32_WORD("flr1_mpoc.18a", 0x000002, 0x080000, CRC(b11fe577) SHA1(70b51a1e66a3bb92f027aad7ba0f358c0e139b3c) )
 
@@ -572,7 +572,7 @@ static void namcofl_common_init(running_machine *machine)
 {
 	namcofl_workram = auto_malloc(0x100000);
 
-	memory_set_bankptr(machine,  1, memory_region(machine, "main") );
+	memory_set_bankptr(machine,  1, memory_region(machine, "maincpu") );
 	memory_set_bankptr(machine,  2, namcofl_workram );
 
 	namcoc7x_on_driver_init(machine);

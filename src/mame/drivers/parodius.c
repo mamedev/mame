@@ -289,11 +289,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( parodius )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 3000000)		/* 053248 */
+	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* 053248 */
 	MDRV_CPU_PROGRAM_MAP(parodius_readmem,parodius_writemem)
-	MDRV_CPU_VBLANK_INT("main", parodius_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", parodius_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(parodius_readmem_sound,parodius_writemem_sound)
 								/* NMIs are triggered by the 053260 */
 
@@ -302,7 +302,7 @@ static MACHINE_DRIVER_START( parodius )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -333,12 +333,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( parodius )
-	ROM_REGION( 0x51000, "main", 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, "maincpu", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "955l01.bin", 0x10000, 0x20000, CRC(49a658eb) SHA1(dd53060c4da99b8e1f896ebfec572296ef2b5665) )
 	ROM_LOAD( "955l02.bin", 0x30000, 0x18000, CRC(161d7322) SHA1(a752f28c19c58263680221ad1119f2fd57df4723) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "955e03.bin", 0x0000, 0x10000, CRC(940aa356) SHA1(e7466f049be48861fd2d929eed786bd48782b5bb) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
@@ -354,12 +354,12 @@ ROM_START( parodius )
 ROM_END
 
 ROM_START( parodisj )
-	ROM_REGION( 0x51000, "main", 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, "maincpu", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "955e01.bin", 0x10000, 0x20000, CRC(49baa334) SHA1(8902fbb2228111b15de6537bd168241933df134d) )
 	ROM_LOAD( "955e02.bin", 0x30000, 0x18000, CRC(14010d6f) SHA1(69fe162ea08c3bd4b3e78e9d10d278bd15444af4) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "955e03.bin", 0x0000, 0x10000, CRC(940aa356) SHA1(e7466f049be48861fd2d929eed786bd48782b5bb) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
@@ -382,7 +382,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( parodius_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "maincpu");
 	int offs = 0;
 
 	if (lines & 0xf0) logerror("%04x: setlines %02x\n",cpu_get_pc(device),lines);
@@ -394,11 +394,11 @@ static KONAMI_SETLINES_CALLBACK( parodius_banking )
 
 static MACHINE_RESET( parodius )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	konami_configure_set_lines(machine->cpu[0], parodius_banking);
 
-	paletteram = &memory_region(machine, "main")[0x48000];
+	paletteram = &memory_region(machine, "maincpu")[0x48000];
 
 	videobank = 0;
 

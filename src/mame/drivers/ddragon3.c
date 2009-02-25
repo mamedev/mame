@@ -611,15 +611,15 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 
 static MACHINE_DRIVER_START( ddragon3 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_20MHz / 2)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon3_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon3_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound, writemem_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 448, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
 
@@ -646,17 +646,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ddrago3b )
 	MDRV_IMPORT_FROM(ddragon3)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dd3b_readmem, dd3b_writemem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ctribe )
 	MDRV_IMPORT_FROM(ddragon3)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ctribe_readmem,ctribe_writemem)
 
-	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(ctribe_readmem_sound,ctribe_writemem_sound)
 
 	MDRV_VIDEO_UPDATE(ctribe)
@@ -677,11 +677,11 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( ddragon3 )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "30a14-0.ic78", 0x00001, 0x40000, CRC(f42fe016) SHA1(11511aa43caa12b36a795bfaefee824821282523) )
 	ROM_LOAD16_BYTE( "30a15-0.ic79", 0x00000, 0x20000, CRC(ad50e92c) SHA1(facac5bbe11716d076a40eacbb67f7caab7a4a27) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "30a13-0.ic43", 0x00000, 0x10000, CRC(1e974d9b) SHA1(8e54ff747efe587a2e971c15e729445c4e232f0f) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
@@ -708,11 +708,11 @@ ROM_START( ddragon3 )
 ROM_END
 
 ROM_START( ddrago3j )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "30j15.ic78", 0x00001, 0x40000, CRC(40618cbc) SHA1(cb05498003a45d773983501d3a0f1584a25dcdd3) )
 	ROM_LOAD16_BYTE( "30j14.ic79", 0x00000, 0x20000, CRC(96827e80) SHA1(499c0c67d55ff4816ad8832d1d8836eb7432bd13) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "30j13.ic43",   0x00000, 0x10000, CRC(1e974d9b) SHA1(8e54ff747efe587a2e971c15e729445c4e232f0f) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
@@ -739,11 +739,11 @@ ROM_START( ddrago3j )
 ROM_END
 
 ROM_START( ddrago3p )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "30a14-0.ic80", 0x00001, 0x40000, CRC(f42fe016) SHA1(11511aa43caa12b36a795bfaefee824821282523) )
 	ROM_LOAD16_BYTE( "30a15-0.ic79", 0x00000, 0x20000, CRC(ad50e92c) SHA1(facac5bbe11716d076a40eacbb67f7caab7a4a27) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "30a13-0.ic43",   0x00000, 0x10000, CRC(1e974d9b) SHA1(8e54ff747efe587a2e971c15e729445c4e232f0f) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
@@ -790,13 +790,13 @@ ROM_START( ddrago3p )
 ROM_END
 
 ROM_START( ddrago3b )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "dd3.01",   0x00001, 0x20000, CRC(68321d8b) SHA1(bd34d361e8ef18ef2b7e8bfe438b1b098c3151b5) )
 	ROM_LOAD16_BYTE( "dd3.03",   0x00000, 0x20000, CRC(bc05763b) SHA1(49f661fdc98bd43a6622945e9aa8d8e7a7dc1ce6) )
 	ROM_LOAD16_BYTE( "dd3.02",   0x40001, 0x20000, CRC(38d9ae75) SHA1(d42e1d9c704c66bad94e14d14f5e0b7209cc938e) )
 	/* No EVEN rom! */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "dd3.06",    0x00000, 0x10000, CRC(1e974d9b) SHA1(8e54ff747efe587a2e971c15e729445c4e232f0f) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
@@ -839,13 +839,13 @@ ROM_START( ddrago3b )
 ROM_END
 
 ROM_START( ctribe )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-2.ic26", 0x00001, 0x20000, CRC(c46b2e63) SHA1(86ace715dca48c78a46da1d102de47e5f948a86c) )
 	ROM_LOAD16_BYTE( "28a15-2.ic25", 0x00000, 0x20000, CRC(3221c755) SHA1(0f6fe5cd6947f6547585eedb7fc5e6af8544b1f7) )
 	ROM_LOAD16_BYTE( "ct_ep2.ic104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "28a10-0.ic89", 0x00000, 0x8000, CRC(4346de13) SHA1(67c6de90ba31a325f03e64d28c9391a315ee359c) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
@@ -873,13 +873,13 @@ ROM_START( ctribe )
 ROM_END
 
 ROM_START( ctribe1 )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-2.ic26", 0x00001, 0x20000, CRC(f00f8443) SHA1(3c099b6bea9956cc60ce4a9a5d790ac2bf7d77bd) )
 	ROM_LOAD16_BYTE( "28a15-2.ic25", 0x00000, 0x20000, CRC(dd70079f) SHA1(321b523fefec2a962d0afa20b33428e7caea8958) )
 	ROM_LOAD16_BYTE( "ct_ep2.ic104", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "28a10-0.ic89", 0x00000, 0x8000, CRC(4346de13) SHA1(67c6de90ba31a325f03e64d28c9391a315ee359c) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
@@ -907,13 +907,13 @@ ROM_START( ctribe1 )
 ROM_END
 
 ROM_START( ctribeb )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "ct_ep1.rom", 0x00001, 0x20000, CRC(9cfa997f) SHA1(ee49b4b9e9cd29616f244fdf3912ef743e2404ce) )
 	ROM_LOAD16_BYTE( "ct_ep3.rom", 0x00000, 0x20000, CRC(2ece8681) SHA1(17ee2ceb893e2eb08fa4cabcdebcec02bee16cda) )
 	ROM_LOAD16_BYTE( "ct_ep2.rom", 0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "ct_ep4.rom",   0x00000, 0x8000, CRC(4346de13) SHA1(67c6de90ba31a325f03e64d28c9391a315ee359c) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */
@@ -938,13 +938,13 @@ ROM_START( ctribeb )
 ROM_END
 
 ROM_START( ctribb2 )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "1.bin",  0x00001, 0x20000, CRC(9cfa997f) SHA1(ee49b4b9e9cd29616f244fdf3912ef743e2404ce) )
 	ROM_LOAD16_BYTE( "3.bin",  0x00000, 0x20000, CRC(2ece8681) SHA1(17ee2ceb893e2eb08fa4cabcdebcec02bee16cda) )
 	ROM_LOAD16_BYTE( "2.bin",  0x40001, 0x10000, CRC(8c2c6dbd) SHA1(b99b9be6e0bdc8340fedd258819c4df587926a84) )
 	/* No EVEN rom! */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "6.bin",   0x00000, 0x10000, CRC(0101df2d) SHA1(35e1efa4a11c0f9d9db5ee057926e5de29c3a4c1) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Background */

@@ -667,7 +667,7 @@ VIDEO_UPDATE( choplifter )
 #ifdef MAME_DEBUG
 	if (input_code_pressed(KEYCODE_SPACE))		// goto next level
 	{
-		memory_region(screen->machine, "main")[0xC085]=33;
+		memory_region(screen->machine, "maincpu")[0xC085]=33;
 	}
 #endif
 	return 0;

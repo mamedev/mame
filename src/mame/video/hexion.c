@@ -50,7 +50,7 @@ VIDEO_START( hexion )
 	tilemap_set_scrollx(bg_tilemap[1],0,-4);
 	tilemap_set_scrolly(bg_tilemap[1],0,4);
 
-	vram[0] = memory_region(machine, "main") + 0x30000;
+	vram[0] = memory_region(machine, "maincpu") + 0x30000;
 	vram[1] = vram[0] + 0x2000;
 	unkram = vram[1] + 0x2000;
 }
@@ -65,7 +65,7 @@ VIDEO_START( hexion )
 
 WRITE8_HANDLER( hexion_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000;
 
 	/* bits 0-3 select ROM bank */
 	memory_set_bankptr(space->machine, 1,rom + 0x2000 * (data & 0x0f));

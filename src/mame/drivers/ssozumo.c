@@ -231,16 +231,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ssozumo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1200000)	/* 1.2 MHz ???? */
+	MDRV_CPU_ADD("maincpu", M6502, 1200000)	/* 1.2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", ssozumo_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ssozumo_interrupt)
 
-	MDRV_CPU_ADD("audio", M6502, 975000) 		/* 975 kHz ?? */
+	MDRV_CPU_ADD("audiocpu", M6502, 975000) 		/* 975 kHz ?? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -270,7 +270,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( ssozumo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Main Program ROMs */
 	ROM_LOAD( "ic61.g01",	0x06000, 0x2000, CRC(86968f46) SHA1(6acd111b71fbb4ef00ae03be4fb93d305a6564e7) )	// m1
 	ROM_LOAD( "ic60.g11",	0x08000, 0x2000, CRC(1a5143dd) SHA1(19e36afcd0827f14f4360b55d952cc1af38327fd) )	// m2
@@ -278,7 +278,7 @@ ROM_START( ssozumo )
 	ROM_LOAD( "ic58.g31",	0x0c000, 0x2000, CRC(0ee43a78) SHA1(383a29a2dfdbd600dacf3885039759efab718a45) )	// m4
 	ROM_LOAD( "ic57.g41",	0x0e000, 0x2000, CRC(ac77aa4c) SHA1(36ee826327e4433bcdcb8d770fc6176f53d3eed0) )	// m5
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	/* Sound Program & Voice Sample ROMs*/
 	ROM_LOAD( "ic47.g50",	0x04000, 0x2000, CRC(b64ec829) SHA1(684f1c37c05fc3812f11e040fb96789c8abb987f) )	// a1
 	ROM_LOAD( "ic46.g60",	0x06000, 0x2000, CRC(630d7380) SHA1(aab3f034417a9712c8fa922946eda02751c9e319) )	// a2

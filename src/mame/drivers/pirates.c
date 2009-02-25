@@ -285,16 +285,16 @@ GFXDECODE_END
 /* Machine Driver + Related bits */
 
 static MACHINE_DRIVER_START( pirates )
-	MDRV_CPU_ADD("main", M68000, 16000000) /* 16mhz */
+	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
 	MDRV_CPU_PROGRAM_MAP(pirates_readmem,pirates_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(pirates)
 
 	MDRV_GFXDECODE(pirates)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -319,7 +319,7 @@ MACHINE_DRIVER_END
 /* Rom Loading */
 
 ROM_START( pirates )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code (encrypted) */
 	ROM_LOAD16_BYTE( "r_449b.bin",  0x00000, 0x80000, CRC(224aeeda) SHA1(5b7e47a106af0debf8b07f120571f437ad6ab5c3) )
 	ROM_LOAD16_BYTE( "l_5c1e.bin",  0x00001, 0x80000, CRC(46740204) SHA1(6f1da3b2cbea25bbfdec74c625c5fb23459b83b6) )
 
@@ -340,7 +340,7 @@ ROM_START( pirates )
 ROM_END
 
 ROM_START( genix )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code (encrypted) */
 	ROM_LOAD16_BYTE( "1.15",  0x00000, 0x80000, CRC(d26abfb0) SHA1(4a89ba7504f86cb612796c376f359ab61ec3d902) )
 	ROM_LOAD16_BYTE( "2.16",  0x00001, 0x80000, CRC(a14a25b4) SHA1(9fa64c6514bdee56b5654b001f8367283b461e8a) )
 
@@ -368,11 +368,11 @@ static void pirates_decrypt_68k(running_machine *machine)
     UINT16 *buf, *rom;
     int i;
 
-    rom_size = memory_region_length(machine, "main");
+    rom_size = memory_region_length(machine, "maincpu");
 
     buf = malloc_or_die(rom_size);
 
-    rom = (UINT16 *)memory_region(machine, "main");
+    rom = (UINT16 *)memory_region(machine, "maincpu");
     memcpy (buf, rom, rom_size);
 
     for (i=0; i<rom_size/2; i++)
@@ -464,7 +464,7 @@ static void pirates_decrypt_oki(running_machine *machine)
 
 static DRIVER_INIT( pirates )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	pirates_decrypt_68k(machine);
 	pirates_decrypt_p(machine);

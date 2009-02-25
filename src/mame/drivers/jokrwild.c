@@ -338,7 +338,7 @@ static const pia6821_interface pia1_intf =
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",		/* screen we are acting on */
+	"screen",	/* screen we are acting on */
 	8,			/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
@@ -356,14 +356,14 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( jokrwild )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/8)	/* guess */
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(jokrwild_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 //  MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -392,7 +392,7 @@ MACHINE_DRIVER_END
 
 */
 ROM_START( jokrwild )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jwild.7b",	0x8000, 0x4000, CRC(744cd029) SHA1(766faea330836344ffc6a1b4e1a64a679b9bf579) )
 	ROM_LOAD( "jwild.7a",	0xc000, 0x4000, CRC(ca8e4f58) SHA1(a4f682980fe562dcd8743890ce94619719cd1153) )
 
@@ -430,7 +430,7 @@ static DRIVER_INIT( jokrwild )
 *****************************************************************************/
 {
 	int i, offs;
-	UINT8 *srcp = memory_region( machine, "main" );
+	UINT8 *srcp = memory_region( machine, "maincpu" );
 
 	for (i = 0x8000; i < 0x10000; i++)
 	{

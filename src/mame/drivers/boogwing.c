@@ -297,17 +297,17 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_DRIVER_START( boogwing )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000)	/* DE102 */
+	MDRV_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
 	MDRV_CPU_PROGRAM_MAP(boogwing_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", H6280,32220000/4)
+	MDRV_CPU_ADD("audiocpu", H6280,32220000/4)
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -342,13 +342,13 @@ MACHINE_DRIVER_END
 /**********************************************************************************/
 
 ROM_START( boogwing ) /* VER 1.5 EUR 92.12.07 */
-	ROM_REGION( 0x100000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "kn_00-2.2b",    0x000000, 0x040000, CRC(e38892b9) SHA1(49b5637965a43e0378e1258c5f0a780926f1f283) )
 	ROM_LOAD16_BYTE( "kn_02-2.2e",    0x000001, 0x040000, CRC(8426efef) SHA1(2ea33cbd58b638053d75668a484648dbf67dabb8) )
 	ROM_LOAD16_BYTE( "kn_01-2.4b",    0x080000, 0x040000, CRC(3ad4b54c) SHA1(5141001768266995078407851b445378b21453de) )
 	ROM_LOAD16_BYTE( "kn_03-2.4e",    0x080001, 0x040000, CRC(10b61f4a) SHA1(41d7f670defbd7dae89afafac9839a9e237814d5) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
 	ROM_REGION( 0x20000, "tiles1", ROMREGION_DISPOSE ) /* Tiles 1 */
@@ -386,13 +386,13 @@ ROM_START( boogwing ) /* VER 1.5 EUR 92.12.07 */
 ROM_END
 
 ROM_START( boogwina )
-	ROM_REGION( 0x100000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "km_00-2.2b",    0x000000, 0x040000, CRC(71ab71c6) SHA1(00bfd71dd9ae5f12c574ab0ecc07d85898930c4b) )
 	ROM_LOAD16_BYTE( "km_02-2.2e",    0x000001, 0x040000, CRC(e90f07f9) SHA1(1e8bd3983ed875f4752cbf2ab1c7e748d3df019c) )
 	ROM_LOAD16_BYTE( "km_01-2.4b",    0x080000, 0x040000, CRC(7fdce2d3) SHA1(5ce9b8ac26700f1c3bfb3ce4845f890b81241823) )
 	ROM_LOAD16_BYTE( "km_03-2.4e",    0x080001, 0x040000, CRC(0b582de3) SHA1(f5c58c7e0e8a227506a81e38c266356596dcda7b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
 	ROM_REGION( 0x20000, "tiles1", ROMREGION_DISPOSE ) /* Tiles 1 */
@@ -430,13 +430,13 @@ ROM_START( boogwina )
 ROM_END
 
 ROM_START( ragtime ) /* VER 1.5 JPN 92.12.07 */
-	ROM_REGION( 0x100000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "kh_00-2.2b",    0x000000, 0x040000, CRC(553e179f) SHA1(ab156d9eca4a74084da944989529fd8f5a147dfc) )
 	ROM_LOAD16_BYTE( "kh_02-2.2e",    0x000001, 0x040000, CRC(6c759ec0) SHA1(f503d225c31543a7cd975fc599811a31ff729251) )
 	ROM_LOAD16_BYTE( "kh_01-2.4b",    0x080000, 0x040000, CRC(12dfee70) SHA1(a7c8fd118f589ef13bcb43a6aa446ff81015f5b3) )
 	ROM_LOAD16_BYTE( "kh_03-2.4e",    0x080001, 0x040000, CRC(076fea18) SHA1(342ca71b6d8c8be92dbf221ada717bdbd0061226) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
 	ROM_REGION( 0x20000, "tiles1", ROMREGION_DISPOSE ) /* Tiles 1 */
@@ -474,13 +474,13 @@ ROM_START( ragtime ) /* VER 1.5 JPN 92.12.07 */
 ROM_END
 
 ROM_START( ragtimea ) /* VER 1.3 JPN 92.11.26 */
-	ROM_REGION( 0x100000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "kh_00-1.2b",    0x000000, 0x040000, CRC(88f0155a) SHA1(6f11cc91e36cd68b7143e3326d92b258f051012e) )
 	ROM_LOAD16_BYTE( "kh_02-1.2e",    0x000001, 0x040000, CRC(8811b41b) SHA1(d395338bcd812add0de3d1554d1dc3e048d0e4c9) )
 	ROM_LOAD16_BYTE( "kh_01-1.4b",    0x080000, 0x040000, CRC(4dab63ad) SHA1(8c6f6e8382bcbba6e1a7ced504397181e7d6e1d1) )
 	ROM_LOAD16_BYTE( "kh_03-1.4e",    0x080001, 0x040000, CRC(8a4cbb18) SHA1(272c8e2b20b0a38ce37552be00130c4117533ea9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
 	ROM_REGION( 0x20000, "tiles1", ROMREGION_DISPOSE ) /* Tiles 1 */
@@ -526,7 +526,7 @@ static DRIVER_INIT( boogwing )
 	deco56_decrypt_gfx(machine, "tiles2");
 	deco56_decrypt_gfx(machine, "tiles3");
 	deco56_remap_gfx(machine, "gfx6");
-	deco102_decrypt_cpu(machine, "main", 0x42ba, 0x00, 0x18);
+	deco102_decrypt_cpu(machine, "maincpu", 0x42ba, 0x00, 0x18);
 	memcpy(dst, src, 0x100000);
 }
 

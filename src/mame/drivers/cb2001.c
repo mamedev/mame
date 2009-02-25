@@ -181,15 +181,15 @@ GFXDECODE_END
 
 static const nec_config cb2001_config = { cb2001_decryption_table, };
 static MACHINE_DRIVER_START( cb2001 )
-	MDRV_CPU_ADD("main", V30, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
+	MDRV_CPU_ADD("maincpu", V30, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MDRV_CPU_CONFIG(cb2001_config)
 	MDRV_CPU_PROGRAM_MAP(cb2001_map,0)
 	MDRV_CPU_IO_MAP(cb2001_io,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_irq)
+	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MDRV_GFXDECODE(cb2001)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

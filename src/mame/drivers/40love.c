@@ -597,7 +597,7 @@ static READ8_HANDLER( undoukai_mcu_status_r )
 
 static DRIVER_INIT( undoukai )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x2000);
 
 	from_mcu = 0xff;
@@ -611,7 +611,7 @@ static DRIVER_INIT( undoukai )
 
 static DRIVER_INIT( 40love )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
@@ -1041,11 +1041,11 @@ static MACHINE_START( 40love )
 static MACHINE_DRIVER_START( 40love )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,8000000/2) /* OK */
+	MDRV_CPU_ADD("maincpu",Z80,8000000/2) /* OK */
 	MDRV_CPU_PROGRAM_MAP(40love_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio",Z80,8000000/2) /* OK */
+	MDRV_CPU_ADD("audiocpu",Z80,8000000/2) /* OK */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
@@ -1056,7 +1056,7 @@ static MACHINE_DRIVER_START( 40love )
 	MDRV_MACHINE_RESET(ta7630)	/* init machine */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1099,11 +1099,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( undoukai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,8000000/2)
+	MDRV_CPU_ADD("maincpu",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(undoukai_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio",Z80,8000000/2)
+	MDRV_CPU_ADD("audiocpu",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
 
@@ -1113,7 +1113,7 @@ static MACHINE_DRIVER_START( undoukai )
 	MDRV_MACHINE_RESET(ta7630)	/* init machine */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1156,7 +1156,7 @@ MACHINE_DRIVER_END
 /*******************************************************************************/
 
 ROM_START( 40love )
-	ROM_REGION( 0x14000, "main", 0 ) /* Z80 main CPU */
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 main CPU */
 	ROM_LOAD( "a30-19.ic1", 0x00000, 0x2000, CRC(7baca598) SHA1(b1767f5af9b3f484afb4423afe1f9c15db92c2ac) )
 	ROM_LOAD( "a30-20.ic2", 0x02000, 0x2000, CRC(a7b4f2cc) SHA1(67f570874fa0feb21f2a9a0712fadf78ebaad91c) )
 	ROM_LOAD( "a30-21.ic3", 0x04000, 0x2000, CRC(49a372e8) SHA1(7c15fac65369d2e90b432c0f5c8e1d7295c379d1) )
@@ -1164,7 +1164,7 @@ ROM_START( 40love )
 	ROM_LOAD( "a30-23.ic5", 0x10000, 0x2000, CRC(6dcd186e) SHA1(c8d88a2f35ba77ea822bdd8133033c8eb0bb5f72) )	/* banked at 0xa000 */
 	ROM_LOAD( "a30-24.ic6", 0x12000, 0x2000, CRC(590c20c8) SHA1(93689d6a299dfbe33ffec42d13378091d8589b34) )	/* banked at 0xa000 */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 sound CPU */
 	ROM_LOAD( "a30-08.u08", 0x0000, 0x2000, CRC(2fc42ee1) SHA1(b56e5f9acbcdc476252e188f41ad7249dba6f8e1) )
 	ROM_LOAD( "a30-09.u09", 0x2000, 0x2000, CRC(3a75abce) SHA1(ad2df26789d38196c0677c22ab8f176e99604b18) )
 	ROM_LOAD( "a30-10.u10", 0x4000, 0x2000, CRC(393c4b5b) SHA1(a8e1dd5c33e929bc832cccc13b85ecd13fff1eb2) )
@@ -1196,16 +1196,16 @@ ROM_START( 40love )
 ROM_END
 
 ROM_START( fieldday )
-	ROM_REGION( 0x14000, "main", 0 ) /* Z80 main CPU  */
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 main CPU  */
 	ROM_LOAD( "a17_44.bin", 0x00000, 0x2000, CRC(d59812e1) SHA1(f3e7e2f09fba5964c92813cd652aa093fe3e4415) )
 	ROM_LOAD( "a17_45.bin", 0x02000, 0x2000, CRC(828bfb9a) SHA1(0be24ec076b715d65e9c8e01e3be76628e4f60ed) )
 	ROM_LOAD( "a23_05.bin", 0x04000, 0x2000, CRC(2670cad3) SHA1(8ba3a6b788fa4e997f9153226f6f13b32fc33124) )
 	ROM_LOAD( "a23_06.bin", 0x06000, 0x2000, CRC(737ce7de) SHA1(52a46fe14978e217de81dcd529d16d62fb5a4e46) )
 	ROM_LOAD( "a23_07.bin", 0x10000, 0x2000, CRC(ee2fb306) SHA1(f2b0a6af279b459fe61d56ba4d36d519318376fb) )
 	ROM_LOAD( "a23_08.bin", 0x12000, 0x2000, CRC(1ed2f1ad) SHA1(e3cf954dd2c34759147d0c85da7a716a8eb0e820) )
-	ROM_COPY( "main" , 0x10000, 0x8000, 0x2000 ) /* to avoid 'bank bug' */
+	ROM_COPY( "maincpu" , 0x10000, 0x8000, 0x2000 ) /* to avoid 'bank bug' */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 sound CPU */
 	ROM_LOAD( "a17_24.bin", 0x0000, 0x2000, CRC(6bac6b7f) SHA1(eb95192204a868737d609b789312ac37c31d3071) )
 	ROM_LOAD( "a17_25.bin", 0x2000, 0x2000, CRC(570b90b1) SHA1(2a8c3bebd15655ffbfeaf40c2db90292afbb11ef) )
 	ROM_LOAD( "a17_26.bin", 0x4000, 0x2000, CRC(7a8ea7f4) SHA1(1d9d2b54645266f95aa89cdbec6f82d4ac20d6e4) )
@@ -1237,13 +1237,13 @@ ROM_START( fieldday )
 ROM_END
 
 ROM_START( undoukai )
-	ROM_REGION( 0x14000, "main", 0 ) /* Z80 main CPU  */
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 main CPU  */
 	ROM_LOAD( "a17-01.70c", 0x00000, 0x4000, CRC(6ce324d9) SHA1(9c5207ac897eaae5a6aa1a05a918c9cb58544664) )
 	ROM_LOAD( "a17-02.71c", 0x04000, 0x4000, CRC(055c7ef1) SHA1(f974bd441b8e3621ac5f8d36104791c97051a97a) )
 	ROM_LOAD( "a17-03.72c", 0x10000, 0x4000, CRC(9034a5c5) SHA1(bc3dae0dee08b6989275ac220fc76bfe61367154) ) /* banked at 0x8000 */
-	ROM_COPY( "main" , 0x10000, 0x8000, 0x2000 ) /* to avoid 'bank bug' */
+	ROM_COPY( "maincpu" , 0x10000, 0x8000, 0x2000 ) /* to avoid 'bank bug' */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 sound CPU */
 	ROM_LOAD( "a17-08.8s",  0x0000, 0x2000, CRC(2545aa0e) SHA1(190ef99890251e1e49b14ffd28f2badb4d0d8fbe) )
 	ROM_LOAD( "a17-09.9s",  0x2000, 0x2000, CRC(57e2cdbb) SHA1(ae6187d62fb36a37be06040e0fd85e0252cdf750) )
 	ROM_LOAD( "a17-10.10s", 0x4000, 0x2000, CRC(38a288fe) SHA1(af4979cae59ca2569a3663132451b9b554552a79) )

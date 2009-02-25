@@ -705,15 +705,15 @@ static INTERRUPT_GEN( statriv2_interrupt )
 static MACHINE_DRIVER_START( statriv2 )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-    MDRV_CPU_ADD("main", 8085A, 13684000) /* 12.44MHz * 1.1, ugh, glargh, hack, but it makes one in-game second roughly one real-life second */
+    MDRV_CPU_ADD("maincpu", 8085A, 13684000) /* 12.44MHz * 1.1, ugh, glargh, hack, but it makes one in-game second roughly one real-life second */
 	MDRV_CPU_PROGRAM_MAP(statriv2_readmem, statriv2_writemem)
 	MDRV_CPU_IO_MAP(statriv2_readport, statriv2_writeport)
-	MDRV_CPU_VBLANK_INT("main", statriv2_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", statriv2_interrupt)
 
 	MDRV_NVRAM_HANDLER(statriv2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -744,7 +744,7 @@ static MACHINE_DRIVER_START( statriv2v )
 
 	MDRV_GFXDECODE(statriv2v)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0, 30*8-1)
 MACHINE_DRIVER_END
 
@@ -755,10 +755,10 @@ static MACHINE_DRIVER_START( statriv4 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(statriv4_readport,statriv4_writeport)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -766,7 +766,7 @@ static MACHINE_DRIVER_START( trivquiz )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(trivquiz_readport,trivquiz_writeport)
 MACHINE_DRIVER_END
 
@@ -774,10 +774,10 @@ static MACHINE_DRIVER_START( sextriv )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(trivquiz_readport,trivquiz_writeport)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -785,13 +785,13 @@ static MACHINE_DRIVER_START( supertr2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(supertr2_readmem,supertr2_writemem)
 	MDRV_CPU_IO_MAP(supertr2_readport,supertr2_writeport)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -799,13 +799,13 @@ static MACHINE_DRIVER_START( supertr3 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(supertr2_readmem,supertr2_writemem)
 	MDRV_CPU_IO_MAP(supertr3_readport,supertr2_writeport)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -815,7 +815,7 @@ static MACHINE_DRIVER_START( quaquiz2 )
 
 	MDRV_NVRAM_HANDLER(quaquiz2)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 38*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -823,10 +823,10 @@ static MACHINE_DRIVER_START( hangman )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
 
-	MDRV_CPU_REPLACE("main",8085A,12400000/4)
+	MDRV_CPU_REPLACE("maincpu",8085A,12400000/4)
 	MDRV_CPU_IO_MAP(hangman_readport,supertr2_writeport)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 35*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -834,7 +834,7 @@ static MACHINE_DRIVER_START( statusbj )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
 
-	MDRV_CPU_REPLACE("main",8085A,12400000/4)
+	MDRV_CPU_REPLACE("maincpu",8085A,12400000/4)
 	MDRV_CPU_IO_MAP(statusbj_io,0)
 
 	/* 1x 8255 */
@@ -856,7 +856,7 @@ Black Jack (Status 1981)
 */
 
 ROM_START( statusbj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "statusbj.1",   0x0000, 0x0800, CRC(d3faf340) SHA1(e03f7e3375a02a3bec07d9c7f4f2b1a711d4d1cc) )
 	ROM_LOAD( "statusbj.2",   0x0800, 0x0800, CRC(3f1727af) SHA1(0df12626591fc70031a9d8615c37243813d67b70) )
 	ROM_RELOAD(               0x1000, 0x0800 )
@@ -868,7 +868,7 @@ ROM_START( statusbj )
 ROM_END
 
 ROM_START( statriv2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trivii1c.u7", 0x00000, 0x01000, CRC(89326d7b) SHA1(4878a3aabe51a4de5ff5927a0707b2d121ff87fa) )
 	ROM_LOAD( "trivii2c.u8", 0x01000, 0x01000, CRC(6fd255f6) SHA1(13c75effda1db8eb3635d955ae11f37388f159aa) )
 	ROM_LOAD( "trivii3c.u9", 0x02000, 0x01000, CRC(f666dc54) SHA1(757e0e621400d266771ea6db835305208457702f) )
@@ -893,7 +893,7 @@ ROM_START( statriv2 )
 ROM_END
 
 ROM_START( statrv2v )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "status.u7",    0x00000, 0x01000, CRC(4acc2060) SHA1(04f841fa7fba2231f312904dbd1d352fd2dbc287) )
 	ROM_LOAD( "status.u8",    0x01000, 0x01000, CRC(f2de3867) SHA1(ec891d4aa4e8dc0780cf187d8b1548d7e00d4321) )
 	ROM_LOAD( "status.u9",    0x02000, 0x01000, CRC(d70f5dbf) SHA1(1b21a6d9cc17c7cd03a43056070ab55f3c5d4c58))
@@ -922,7 +922,7 @@ ROM_START( statrv2v )
 ROM_END
 
 ROM_START( statriv4 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "triv4.u07",    0x00000, 0x01000, CRC(38800e01) SHA1(3d174c4194169eae7c033e8bb30bd02779170d42) )
 	ROM_LOAD( "triv4.u08",    0x01000, 0x01000, CRC(7557e97e) SHA1(9096e7055b7a7579cc9206ad678063f9c882785b) )
 	ROM_LOAD( "triv4.u09",    0x02000, 0x01000, CRC(7f1b2e1d) SHA1(12249335a1c7fed8912009051e400e216688bdbc) )
@@ -947,7 +947,7 @@ ROM_START( statriv4 )
 ROM_END
 
 ROM_START( trivquiz )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "triv1-1f.u8",  0x00000, 0x01000, CRC(da9a763a) SHA1(d7a60718a1aeadb247330c939e0ac487015b55b2) )
 	ROM_LOAD( "triv1-2f.u9",  0x01000, 0x01000, CRC(270459fe) SHA1(1507a477fe7170d24788c880d43b0a3b08f35748) )
 	ROM_LOAD( "triv1-3f.u10", 0x02000, 0x01000, CRC(103f4160) SHA1(487afaf243d144aaee8a2ea76105fba09181dfdb) )
@@ -972,7 +972,7 @@ ROM_START( trivquiz )
 ROM_END
 
 ROM_START( supertr2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ast2-1d.rom", 0x00000, 0x01000, CRC(e9f0e271) SHA1(c2bae7d5ef04aed3ce14c403c70d2acc1831b763) )
 	ROM_LOAD( "ast2-2d.rom", 0x01000, 0x01000, CRC(542ba813) SHA1(1ac063f3678d1295aa728ab7ac43165284b66836) )
 	ROM_LOAD( "ast2-3d.rom", 0x02000, 0x01000, CRC(46c467b7) SHA1(2556ce6436112646d8ec3bcff7c32212c5296463) )
@@ -999,7 +999,7 @@ ROM_END
 
 
 ROM_START( supertr3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "triv3.u07",    0x00000, 0x01000, CRC(f04a19d7) SHA1(f887ec976d9eb14329621ac75d6547fca6808bb3) )
 	ROM_LOAD( "triv3.u08",    0x01000, 0x01000, CRC(543d5664) SHA1(58ee8b94964b567fc052f7c4df4517ee029046bd) )
 	ROM_LOAD( "triv3.u09",    0x02000, 0x01000, CRC(047faed4) SHA1(e24c919434ad4e9a1059e34e6609a7271accd8f1) )
@@ -1025,7 +1025,7 @@ ROM_START( supertr3 )
 ROM_END
 
 ROM_START( quaquiz2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "qquiz.u7",  0x00000, 0x01000, CRC(8e525abc) SHA1(b03500a2ccb8f0b038093460e38460d29bdf8af3) )
 	ROM_LOAD( "qquiz.u8",  0x01000, 0x01000, CRC(2186ceb5) SHA1(c8f74026d18841ebcc4cfc85ba08e68e41e9d1d0) )
 	ROM_LOAD( "qquiz.u9",  0x02000, 0x01000, CRC(6d815876) SHA1(275a76e791abd38bc9baf6626edcb6d78259ebc9) )
@@ -1051,7 +1051,7 @@ ROM_START( quaquiz2 )
 ROM_END
 
 ROM_START( hangman )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "main_hang_1b_2732.u7", 0x0000, 0x1000, CRC(0d71b2ad) SHA1(636e5e0e356c9c7de174a0b6a5663fedcb1e697f) )
 	ROM_LOAD( "main_hang_2b_2732.u8", 0x1000, 0x1000, CRC(77533554) SHA1(fe97a412135b770ce7e85442507eac0c25b7256a) )
 	ROM_LOAD( "main_hang_3b_2732.u9", 0x2000, 0x1000, CRC(daab4853) SHA1(b3b8ef051f4b04195cf7b25232f1af561c3ff7ba) )
@@ -1076,7 +1076,7 @@ ROM_START( hangman )
 ROM_END
 
 ROM_START( sextriv )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sex.u7",       0x00000, 0x1000, CRC(f587bd69) SHA1(47ddc70c3cc75a22ba67833531aeeb409f8d8dc1) )
 	ROM_LOAD( "sex.u8",       0x01000, 0x1000, CRC(2718c26d) SHA1(b614b4a102ae664c4a3be1e30e515454442de052) )
 	ROM_LOAD( "sex.u9",       0x02000, 0x1000, CRC(f4f5a651) SHA1(a1e1fa96f7631b2274ef7fbe7e6e1aae1ee540c5) )

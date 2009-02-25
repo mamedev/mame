@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(battlera_adpcm_data_w)
-	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE(SOUND, "audio", c6280_w)
+	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE(SOUND, "audiocpu", c6280_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(7) /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_r) AM_DEVWRITE(SOUND, "msm", battlera_adpcm_reset_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
@@ -237,16 +237,16 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( battlera )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", H6280,21477200/3)
+	MDRV_CPU_ADD("maincpu", H6280,21477200/3)
 	MDRV_CPU_PROGRAM_MAP(battlera_map,0)
 	MDRV_CPU_IO_MAP(battlera_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
 
-	MDRV_CPU_ADD("audio", H6280,21477200/3)
+	MDRV_CPU_ADD("audiocpu", H6280,21477200/3)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.85)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.85)
 
-	MDRV_SOUND_ADD("audio", C6280, 21477270/6)
+	MDRV_SOUND_ADD("audiocpu", C6280, 21477270/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 MACHINE_DRIVER_END
@@ -278,7 +278,7 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( battlera )
-	ROM_REGION( 0x100000, "main", 0 ) /* Main cpu code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Main cpu code */
 	ROM_LOAD( "00_e1.bin", 0x00000, 0x10000, CRC(aa1cbe69) SHA1(982530f3202bc7b8d94d2b818873b71f02c0e8de) ) /* ET00 */
 	ROM_LOAD( "es01.rom",  0x10000, 0x10000, CRC(9fea3189) SHA1(0692df6df533dfe55f61df8aa0c5c11944ba3ae3) ) /* ET01 */
 	ROM_LOAD( "02_e4.bin", 0x20000, 0x10000, CRC(cd72f580) SHA1(43b476c8f554348b02aa9558c0773f47cdb47fe0) ) /* ET02, etc */
@@ -291,12 +291,12 @@ ROM_START( battlera )
 	ROM_LOAD( "es10-1.rom",0xd0000, 0x10000, CRC(d3cddc02) SHA1(d212127a9d7aff384171d79c563f1516c0bd46ae) )
 	/* Rom sockets 0xe0000 - 0x100000 are unused */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "es11.rom",  0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
 ROM_END
 
 ROM_START( bldwolf )
-	ROM_REGION( 0x100000, "main", 0 ) /* Main cpu code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Main cpu code */
 	ROM_LOAD( "es00-1.rom", 0x00000, 0x10000, CRC(ff4aa252) SHA1(3c190e49020bb6923abb3f3c2632d3c86443c292) )
 	ROM_LOAD( "es01.rom",   0x10000, 0x10000, CRC(9fea3189) SHA1(0692df6df533dfe55f61df8aa0c5c11944ba3ae3) )
 	ROM_LOAD( "es02-1.rom", 0x20000, 0x10000, CRC(49792753) SHA1(4f3fb6912607d373fc0c1096ac0a8cc939e33617) )
@@ -309,12 +309,12 @@ ROM_START( bldwolf )
 	ROM_LOAD( "es10-1.rom", 0xd0000, 0x10000, CRC(d3cddc02) SHA1(d212127a9d7aff384171d79c563f1516c0bd46ae) )
 	/* Rom sockets 0xe0000 - 0x100000 are unused */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "es11.rom",   0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
 ROM_END
 
 ROM_START( bldwolfj ) /* note, rom codes are ER not ES even if the content of some roms is identical */
-	ROM_REGION( 0x100000, "main", 0 ) /* Main cpu code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Main cpu code */
 	ROM_LOAD( "er00-.0-0", 0x00000, 0x10000, CRC(3819a14e) SHA1(0222051e0b5ec87a18f2e6e9155034f91898c14f) )
 	ROM_LOAD( "er01-.0-1", 0x10000, 0x10000, CRC(763cf206) SHA1(0f1c0f80a6aaad0c987c2ba3fdd01db1f5ceb7e6) )
 	ROM_LOAD( "er02-.0-2", 0x20000, 0x10000, CRC(bcad8a0f) SHA1(e7c69d2c894eaedd10ce02f6bceaa43bb060afb9) )
@@ -327,7 +327,7 @@ ROM_START( bldwolfj ) /* note, rom codes are ER not ES even if the content of so
 	ROM_LOAD( "er10-.1-5", 0xd0000, 0x10000, CRC(d3cddc02) SHA1(d212127a9d7aff384171d79c563f1516c0bd46ae) )
 	/* Rom sockets 0xe0000 - 0x100000 are unused */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "er11-.tpg",   0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
 ROM_END
 

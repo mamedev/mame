@@ -22,7 +22,7 @@ const via6522_interface b_via_0_interface =
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_DEVICE_HANDLER(VIA6522, "via6522_1", via_ca2_r), DEVCB_HANDLER(b_via_0_ca2_r), DEVCB_DEVICE_HANDLER(VIA6522, "via6522_1", via_ca1_r),
 	/*outputs: A/B         */ DEVCB_HANDLER(b_via_0_pa_w), DEVCB_HANDLER(b_via_0_pb_w),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(b_via_0_ca2_w), DEVCB_DEVICE_HANDLER(VIA6522, "via6522_1", via_ca1_w),
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("main", M6809_IRQ_LINE)
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
 const via6522_interface b_via_1_interface =
@@ -31,7 +31,7 @@ const via6522_interface b_via_1_interface =
 	/*inputs : CA/B1,CA/B2 */ DEVCB_DEVICE_HANDLER(VIA6522, "via6522_0", via_cb2_r), DEVCB_NULL, DEVCB_DEVICE_HANDLER(VIA6522, "via6522_0", via_cb1_r), DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_HANDLER(b_via_1_pa_w), DEVCB_HANDLER(b_via_1_pb_w),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER(VIA6522, "via6522_0", via_cb1_w), DEVCB_NULL,
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("audio", M6809_IRQ_LINE)
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("audiocpu", M6809_IRQ_LINE)
 };
 
 static READ8_DEVICE_HANDLER( b_via_0_ca2_r )
@@ -116,7 +116,7 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 	}
 	else
 	{
-		UINT8 *rom = memory_region(space->machine, "main") + 0x10000;
+		UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000;
 		memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_BANK1);
 		memory_set_bankptr(space->machine, 1, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}

@@ -857,27 +857,27 @@ static MACHINE_RESET( apache3 )
 static MACHINE_DRIVER_START( apache3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30, CLOCK_1 / 2)
+	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
 	MDRV_CPU_PROGRAM_MAP(apache3_v30_map,0)
-	MDRV_CPU_VBLANK_INT("main", roundup5_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", roundup5_interrupt)
 
 	MDRV_CPU_ADD("sub", M68000, CLOCK_2 / 4)
 	MDRV_CPU_PROGRAM_MAP(apache3_68000_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", V20, CLOCK_1 / 2)
+	MDRV_CPU_ADD("audiocpu", V20, CLOCK_1 / 2)
 	MDRV_CPU_PROGRAM_MAP(apache3_v20_map,0)
 
 	MDRV_CPU_ADD("sub2", Z80, CLOCK_2 / 8)
 	MDRV_CPU_PROGRAM_MAP(apache3_z80_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_RESET(apache3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(CLOCK_2 / 8, 400, 0, 320, 280, 0, 240) // TODO: Hook up CRTC
 
@@ -904,20 +904,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( roundup5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30, CLOCK_1 / 2)
+	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
 	MDRV_CPU_PROGRAM_MAP(roundup5_v30_map,0)
-	MDRV_CPU_VBLANK_INT("main", roundup5_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", roundup5_interrupt)
 
 	MDRV_CPU_ADD("sub", M68000, CLOCK_2 / 4)
 	MDRV_CPU_PROGRAM_MAP(roundup5_68000_map, 0)
 
-	MDRV_CPU_ADD("audio", Z80, CLOCK_1 / 4)
+	MDRV_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MDRV_CPU_PROGRAM_MAP(roundup5_z80_map, 0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -947,21 +947,21 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cyclwarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, CLOCK_2 / 4)
+	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000a_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, CLOCK_2 / 4)
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_68000b_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, CLOCK_1 / 4)
+	MDRV_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -991,21 +991,21 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bigfight )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, CLOCK_2 / 4)
+	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
 	MDRV_CPU_PROGRAM_MAP(bigfight_68000a_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, CLOCK_2 / 4)
 	MDRV_CPU_PROGRAM_MAP(bigfight_68000b_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, CLOCK_1 / 4)
+	MDRV_CPU_ADD("audiocpu", Z80, CLOCK_1 / 4)
 	MDRV_CPU_PROGRAM_MAP(cyclwarr_z80_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1035,7 +1035,7 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( apache3 )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ap-25f.125",   0x0a0001, 0x10000, CRC(3c7530f4) SHA1(9f7b58a3abddbdc3081ba9dfc1732406eb8c1752) )
 	ROM_LOAD16_BYTE( "ap-26f.133",   0x0a0000, 0x10000, CRC(2955997f) SHA1(86e37def923d9cf4eb33e7979118ec6f1ef62678) )
 	ROM_LOAD16_BYTE( "ap-23f.110",   0x0e0001, 0x10000, CRC(d7077149) SHA1(b08f5a9ee03641c20bdd5e5c9671a22c740150c6) )
@@ -1047,7 +1047,7 @@ ROM_START( apache3 )
 	ROM_LOAD16_BYTE( "ap-20a.89",   0x040001, 0x20000, CRC(92d24b5e) SHA1(1ea270d46a607e47b7e0961b532316aa05dc8f4e) )
 	ROM_LOAD16_BYTE( "ap-22a.105",  0x040000, 0x20000, CRC(a8458a92) SHA1(43674731c2e9962c2bfbb73a85484cf03d6be223) )
 
-	ROM_REGION( 0x100000, "audio", 0 ) /* 64k code for sound V20 */
+	ROM_REGION( 0x100000, "audiocpu", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x0f0000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1087,7 +1087,7 @@ ROM_START( apache3 )
 ROM_END
 
 ROM_START( apache3a )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ap-25c.125",   0x0a0001, 0x10000, CRC(7bc496a6) SHA1(5491d06181d729407e975b85a8715fdc3b489c67) )
 	ROM_LOAD16_BYTE( "ap-26c.133",   0x0a0000, 0x10000, CRC(9393a470) SHA1(00376f7a545629a83eb5a90b9d1685a68430e4ce) )
 	ROM_LOAD16_BYTE( "ap-23g.110",   0x0e0001, 0x10000, CRC(0ab485e4) SHA1(d8d0695312732c31cedcb1c298810a6793835e80) )
@@ -1099,7 +1099,7 @@ ROM_START( apache3a )
 	ROM_LOAD16_BYTE( "ap-20a.89",   0x040001, 0x20000, CRC(92d24b5e) SHA1(1ea270d46a607e47b7e0961b532316aa05dc8f4e) )
 	ROM_LOAD16_BYTE( "ap-22a.105",  0x040000, 0x20000, CRC(a8458a92) SHA1(43674731c2e9962c2bfbb73a85484cf03d6be223) )
 
-	ROM_REGION( 0x100000, "audio", 0 ) /* 64k code for sound V20 */
+	ROM_REGION( 0x100000, "audiocpu", 0 ) /* 64k code for sound V20 */
 	ROM_LOAD( "ap-27d.151",   0x0f0000, 0x10000, CRC(294b4d79) SHA1(2b03418a12a2aaf3919b98161d8d0ce6ae29a2bb) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1139,7 +1139,7 @@ ROM_START( apache3a )
 ROM_END
 
 ROM_START( roundup5 )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ru-23s",   0x080000, 0x20000, CRC(2dc8c521) SHA1(b78de101db3ef00fc4375ae32a7871e0da2dac6c) )
 	ROM_LOAD16_BYTE( "ru-26s",   0x080001, 0x20000, CRC(1e16b531) SHA1(d7badef29cf1c4a9bd262933ecd1ca3343ea94bd) )
 	ROM_LOAD16_BYTE( "ru-22t",   0x0c0000, 0x20000, CRC(9611382e) SHA1(c99258782dbad6d69ba7f54115ee3aa218f9b6ee) )
@@ -1151,7 +1151,7 @@ ROM_START( roundup5 )
 	ROM_LOAD16_BYTE( "ru-24s",   0x040000, 0x20000, CRC(b9f91b70) SHA1(43c5d9dafb60ed3e5c3eb0e612c2dbc5497f8a6c) )
 	ROM_LOAD16_BYTE( "ru-19s",   0x040001, 0x20000, CRC(e3953800) SHA1(28fbc6bf154b512fcefeb04fe12db598b1b20cfe) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "ru-28d",   0x000000, 0x10000, CRC(df36c6c5) SHA1(c046482043f6b54c55696ba3d339ffb11d78f674) )
 
 	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
@@ -1183,7 +1183,7 @@ ROM_START( roundup5 )
 ROM_END
 
 ROM_START( cyclwarr )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 main cpu */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 main cpu */
 	ROM_LOAD16_BYTE( "cw16b",   0x000000, 0x20000, CRC(cb1a737a) SHA1(a603ee1256be5641d00a72f64efaaacb65ed9d7d) )
 	ROM_LOAD16_BYTE( "cw18b",   0x000001, 0x20000, CRC(0633ddcb) SHA1(1196ab17065352ec5b37f2f6b383a43a2d0fa3a6) )
 	ROM_LOAD16_BYTE( "cw17a",   0x040000, 0x20000, CRC(2ad6f836) SHA1(5fa4275b433013943ba1d1b64a3c725097f946f9) )
@@ -1195,7 +1195,7 @@ ROM_START( cyclwarr )
 	ROM_LOAD16_BYTE( "cw21",    0x040000, 0x20000, CRC(ed90d956) SHA1(f533f93da31ac6eb631fb506357717e7cac8e186) )
 	ROM_LOAD16_BYTE( "cw23",    0x040001, 0x20000, CRC(009cdc78) SHA1(a77933a7736546397e8c69226703d6f9be7b55e5) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "cw26a",   0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1235,7 +1235,7 @@ ROM_START( cyclwarr )
 ROM_END
 
 ROM_START( bigfight )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 main cpu */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 main cpu */
 	ROM_LOAD16_BYTE( "rom16.ic77",   0x000000, 0x40000, CRC(e7304ec8) SHA1(31a37e96bf963b349d36534bc5ebbf45e19ad00e) )
 	ROM_LOAD16_BYTE( "rom17.ic98",   0x000001, 0x40000, CRC(4cf090f6) SHA1(9ae0274c890e829a90108ce316aff9665128c982) )
 
@@ -1243,7 +1243,7 @@ ROM_START( bigfight )
 	ROM_LOAD16_BYTE( "rom18.ic100",   0x000000, 0x40000, CRC(49df6207) SHA1(c4126f4542add11a3a3d236311c8787c24c98440) )
 	ROM_LOAD16_BYTE( "rom19.ic102",   0x000001, 0x40000, CRC(c12aa9e9) SHA1(19cc7feaa97c6f5148ae8c0077174f96be684f05) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom20.ic91",   0x000000, 0x10000, CRC(b3add091) SHA1(8a67bfff75c13fe4d9b89d30449199200d11cea7) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )
@@ -1344,7 +1344,7 @@ static DRIVER_INIT( cyclwarr )
 		src2+=32;
 	}
 
-	dst = memory_region(machine, "main");
+	dst = memory_region(machine, "maincpu");
 	memcpy(cyclwarr_cpua_ram,dst,8);
 	memory_set_bankptr(machine, 1, dst);
 

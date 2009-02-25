@@ -291,10 +291,10 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( suprgolf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,4000000)
+	MDRV_CPU_ADD("maincpu", Z80,4000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_VIDEO_START(suprgolf)
 	MDRV_VIDEO_UPDATE(suprgolf)
@@ -302,7 +302,7 @@ static MACHINE_DRIVER_START( suprgolf )
 	MDRV_MACHINE_RESET(suprgolf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -350,7 +350,7 @@ CG23     7F         "
 */
 
 ROM_START( suprgolf )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cg24.6k",0x000000, 0x08000, CRC(de548044) SHA1(f96b4cfcfca4dffabfaf205eb903cbc70972626b) )
 
 	ROM_REGION( 0x100000, "user1", ROMREGION_ERASEFF )

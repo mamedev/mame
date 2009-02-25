@@ -1535,22 +1535,22 @@ static const c140_interface C140_interface_typeB =
 };
 
 static MACHINE_DRIVER_START( s21base )
-	MDRV_CPU_ADD("main", M68000,12288000) /* Master */
+	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(namcos21_68k_master, namcos21_68k_common)
-	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
+	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
 	MDRV_CPU_ADD("slave", M68000,12288000) /* Slave */
 	MDRV_CPU_PROGRAM_MAP(namcos21_68k_slave, namcos21_68k_common)
-	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
+	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audio", M6809,3072000) /* Sound */
+	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MDRV_CPU_ADD("mcu", HD63705,2048000) /* IO */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
 	MDRV_CPU_PROGRAM_MAP(master_dsp_program,0)
@@ -1569,7 +1569,7 @@ static MACHINE_DRIVER_START( s21base )
 	MDRV_NVRAM_HANDLER(namcos2)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1614,22 +1614,22 @@ static MACHINE_DRIVER_START( poly_c140_typeB )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( driveyes )
-	MDRV_CPU_ADD("main", M68000,12288000) /* Master */
+	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(driveyes_68k_master, driveyes_68k_common)
-	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
+	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
 	MDRV_CPU_ADD("slave", M68000,12288000) /* Slave */
 	MDRV_CPU_PROGRAM_MAP(driveyes_68k_slave, driveyes_68k_common)
-	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
+	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audio", M6809,3072000) /* Sound */
+	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MDRV_CPU_ADD("mcu", HD63705,2048000) /* IO */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
 	MDRV_CPU_PROGRAM_MAP(winrun_dsp_program,0)
@@ -1643,7 +1643,7 @@ static MACHINE_DRIVER_START( driveyes )
 	MDRV_NVRAM_HANDLER(namcos2)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1669,22 +1669,22 @@ static MACHINE_DRIVER_START( driveyes )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( winrun_c140_typeB )
-	MDRV_CPU_ADD("main", M68000,12288000) /* Master */
+	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(am_master_winrun,0)
-	MDRV_CPU_VBLANK_INT("main", namcos2_68k_master_vblank)
+	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
 
 	MDRV_CPU_ADD("slave", M68000,12288000) /* Slave */
 	MDRV_CPU_PROGRAM_MAP(am_slave_winrun,0)
-	MDRV_CPU_VBLANK_INT("main", namcos2_68k_slave_vblank)
+	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_slave_vblank)
 
-	MDRV_CPU_ADD("audio", M6809,3072000) /* Sound */
+	MDRV_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,120)
 
 	MDRV_CPU_ADD("mcu", HD63705,2048000) /* IO */
 	MDRV_CPU_PROGRAM_MAP(readmem_mcu,writemem_mcu)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
 	MDRV_CPU_PROGRAM_MAP(winrun_dsp_program,0)
@@ -1693,7 +1693,7 @@ static MACHINE_DRIVER_START( winrun_c140_typeB )
 
 	MDRV_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
 	MDRV_CPU_PROGRAM_MAP(am_gpu_winrun,0)
-	MDRV_CPU_VBLANK_INT("main", namcos2_68k_gpu_vblank)
+	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_gpu_vblank)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
@@ -1702,7 +1702,7 @@ static MACHINE_DRIVER_START( winrun_c140_typeB )
 	MDRV_NVRAM_HANDLER(namcos2)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1727,7 +1727,7 @@ static MACHINE_DRIVER_START( winrun_c140_typeB )
 MACHINE_DRIVER_END
 
 ROM_START( aircombu )
-	ROM_REGION( 0x100000, "main", 0 ) /* Master */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
 	ROM_LOAD16_BYTE( "ac2-mpr-u.3j",  0x000000, 0x80000, CRC(a7133f85) SHA1(9f1c99dd503f1fc81096170fd272e33ae8a7de2f) )
 	ROM_LOAD16_BYTE( "ac2-mpr-l.1j",  0x000001, 0x80000, CRC(520a52e6) SHA1(74306e02abfe08aa1afbf325b74dbc0840c3ad3a) )
 
@@ -1735,7 +1735,7 @@ ROM_START( aircombu )
 	ROM_LOAD16_BYTE( "ac2-spr-u.6c",  0x000000, 0x20000, CRC(42aca956) SHA1(10ea2400bb4d5b2d805e2de43ca0e0f54597f660) )
 	ROM_LOAD16_BYTE( "ac2-spr-l.4c",  0x000001, 0x20000, CRC(3e15fa19) SHA1(65dbb33ab6b3c06c793613348ebb7b110b8bba0d) )
 
-	ROM_REGION( 0x030000, "audio", 0 ) /* Sound */
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "ac1-snd0.8j", 0x00c000, 0x004000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
@@ -1783,7 +1783,7 @@ ROM_START( aircombu )
 ROM_END
 
 ROM_START( aircombj )
-	ROM_REGION( 0x100000, "main", 0 ) /* Master */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
 	ROM_LOAD16_BYTE( "ac1-mpr-u.3j",  0x000000, 0x80000, CRC(a4dec813) SHA1(2ee8b3492d30db4c841f695151880925a5e205e0) )
 	ROM_LOAD16_BYTE( "ac1-mpr-l.1j",  0x000001, 0x80000, CRC(8577b6a2) SHA1(32194e392fbd051754be88eb8c90688c65c65d85) )
 
@@ -1791,7 +1791,7 @@ ROM_START( aircombj )
 	ROM_LOAD16_BYTE( "ac1-spr-u.6c",  0x000000, 0x20000, CRC(5810e219) SHA1(c312ffd8324670897871b12d521779570dc0f580) )
 	ROM_LOAD16_BYTE( "ac1-spr-l.4c",  0x000001, 0x20000, CRC(175a7d6c) SHA1(9e31dde6646cd9b6dcdbdb3f2326177508559e56) )
 
-	ROM_REGION( 0x030000, "audio", 0 ) /* Sound */
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "ac1-snd0.8j", 0x00c000, 0x004000, CRC(5c1fb84b) SHA1(20e4d81289dbe58ffcfc947251a6ff1cc1e36436) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
@@ -1839,7 +1839,7 @@ ROM_START( aircombj )
 ROM_END
 
 ROM_START( cybsled )
-	ROM_REGION( 0x100000, "main", 0 ) /* Master */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
 	ROM_LOAD16_BYTE( "cy2-mpr-u.3j",  0x000000, 0x80000, CRC(b35a72bc) SHA1(d9bc5b8f0bc30510fca8fc57eeb67e5ca0e4c67f) )
 	ROM_LOAD16_BYTE( "cy2-mpr-l.1j",  0x000001, 0x80000, CRC(c4a25919) SHA1(52f6947102001376e37730ace16283141b13fee7) )
 
@@ -1847,7 +1847,7 @@ ROM_START( cybsled )
 	ROM_LOAD16_BYTE( "cy2-spr-u.6c",  0x000000, 0x80000, CRC(575a422d) SHA1(cad97742da1e2baf47ac110fadef5544b3a30cc7) )
 	ROM_LOAD16_BYTE( "cy2-spr-l.4c",  0x000001, 0x80000, CRC(4066291a) SHA1(6ebbc11a68f66ec1e6d2e6ee857e8c599691e289) )
 
-	ROM_REGION( 0x030000, "audio", 0 ) /* Sound */
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "cy1-snd0.8j", 0x00c000, 0x004000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
@@ -1893,7 +1893,7 @@ ROM_START( cybsled )
 ROM_END
 
 ROM_START( cybsledj )
-	ROM_REGION( 0x100000, "main", 0 ) /* Master */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
 	ROM_LOAD16_BYTE( "cy1-mpr-u.3j",  0x000000, 0x80000, CRC(cc5a2e83) SHA1(b794051b2c351e9ca43351603845e4e563f6740f) )
 	ROM_LOAD16_BYTE( "cy1-mpr-l.1j",  0x000001, 0x80000, CRC(f7ee8b48) SHA1(6d36eb3dba9cf7f5f5e1a26c156e77a2dad3f257) )
 
@@ -1901,7 +1901,7 @@ ROM_START( cybsledj )
 	ROM_LOAD16_BYTE( "cy1-spr-u.6c",  0x000000, 0x80000, CRC(28dd707b) SHA1(11297ceae4fe78d170785a5cf9ad77833bbe7fff) )
 	ROM_LOAD16_BYTE( "cy1-spr-l.4c",  0x000001, 0x80000, CRC(437029de) SHA1(3d275a2b0ce6909e77e657c371bd22597ea9d398) )
 
-	ROM_REGION( 0x030000, "audio", 0 ) /* Sound */
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "cy1-snd0.8j", 0x00c000, 0x004000, CRC(3dddf83b) SHA1(e16119cbef176b6f8f8ace773fcbc201e987823f) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
@@ -1947,7 +1947,7 @@ ROM_START( cybsledj )
 ROM_END
 
 ROM_START( driveyes )
-	ROM_REGION( 0x40000, "main", 0 ) /* C68C - 68k code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* C68C - 68k code */
 	ROM_LOAD16_BYTE( "de2-mp-ub.3j",  0x000000, 0x20000, CRC(f9c86fb5) SHA1(b48d16e8f26e7a2cfecb30285b517c42e5585ac7) )
 	ROM_LOAD16_BYTE( "de2-mp-lb.1j",  0x000001, 0x20000, CRC(11d8587a) SHA1(ecb1e8fe2ba56b6f6a71a5552d5663b597165786) )
 
@@ -1955,7 +1955,7 @@ ROM_START( driveyes )
 	ROM_LOAD16_BYTE( "de1-sp-ub.6c",  0x000000, 0x20000, CRC(231b144f) SHA1(42518614cb083455dc5fec71e699403907ca784b) )
 	ROM_LOAD16_BYTE( "de1-sp-lb.4c",  0x000001, 0x20000, CRC(50cb9f59) SHA1(aec7fa080854f0297d9e90e3aaeb0f332fd579bd) )
 
-	ROM_REGION( 0x30000, "audio", 0 ) /* Sound */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
 /*
 There are 3 seperate complete boards used for this 3 screen version....
 "Set2" (center screen board?) has de1_snd0 while the other 2 sets have de1_snd0r (rear speakers??)
@@ -2005,7 +2005,7 @@ We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom
 ROM_END
 
 ROM_START( starblad )
-	ROM_REGION( 0x100000, "main", 0 ) /* Master */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
 	ROM_LOAD16_BYTE( "st1-mp-u.bin",  0x000000, 0x80000, CRC(483a311c) SHA1(dd9416b8d4b0f8b361630e312eac71c113064eae) )
 	ROM_LOAD16_BYTE( "st1-mp-l.bin",  0x000001, 0x80000, CRC(0a4dd661) SHA1(fc2b71a255a8613693c4d1c79ddd57a6d396165a) )
 
@@ -2013,7 +2013,7 @@ ROM_START( starblad )
 	ROM_LOAD16_BYTE( "st1-sp-u.bin",  0x000000, 0x40000, CRC(9f9a55db) SHA1(72bf5d6908cc57cc490fa2292b4993d796b2974d) )
 	ROM_LOAD16_BYTE( "st1-sp-l.bin",  0x000001, 0x40000, CRC(acbe39c7) SHA1(ca48b7ea619b1caaf590eed33001826ce7ef36d8) )
 
-	ROM_REGION( 0x030000, "audio", 0 ) /* Sound */
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "st1-snd0.bin", 0x00c000, 0x004000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
 	ROM_CONTINUE(             0x010000, 0x01c000 )
 	ROM_RELOAD(               0x010000, 0x020000 )
@@ -2053,7 +2053,7 @@ ROM_START( starblad )
 ROM_END
 
 ROM_START( solvalou )
-	ROM_REGION( 0x100000, "main", 0 ) /* Master */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
 	ROM_LOAD16_BYTE( "sv1-mp-u.bin",  0x000000, 0x20000, CRC(b6f92762) SHA1(d177328b3da2ab0580e101478142bc8c373d6140) )
 	ROM_LOAD16_BYTE( "sv1-mp-l.bin",  0x000001, 0x20000, CRC(28c54c42) SHA1(32fcca2eb4bb8ba8c2587b03d3cf59f072f7fac5) )
 
@@ -2061,7 +2061,7 @@ ROM_START( solvalou )
 	ROM_LOAD16_BYTE( "sv1-sp-u.bin",  0x000000, 0x20000, CRC(ebd4bf82) SHA1(67946360d680a675abcb3c131bac0502b2455573) )
 	ROM_LOAD16_BYTE( "sv1-sp-l.bin",  0x000001, 0x20000, CRC(7acab679) SHA1(764297c9601be99dbbffb75bbc6fe4a40ea38529) )
 
-	ROM_REGION( 0x030000, "audio", 0 ) /* Sound */
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "sv1-snd0.bin", 0x00c000, 0x004000, CRC(5e007864) SHA1(94da2d51544c6127056beaa251353038646da15f) )
 	ROM_CONTINUE(             0x010000, 0x01c000 )
 	ROM_RELOAD(               0x010000, 0x020000 )
@@ -2102,7 +2102,7 @@ ROM_START( solvalou )
 ROM_END
 
 ROM_START( winrun )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_BYTE( "sg1-mp-ub.3k",  0x000000, 0x20000, CRC(7f9b855a) SHA1(6d39a3a9959dbcd0047dbaab0fcd68adc81f5508) )
 	ROM_LOAD16_BYTE( "sg1-mp-lb.1k",  0x000001, 0x20000, CRC(a45e8543) SHA1(f9e583a988e4661026ee7873a48d078225778df3) )
 
@@ -2110,7 +2110,7 @@ ROM_START( winrun )
 	ROM_LOAD16_BYTE( "sg1-sp-u.6b",  0x000000, 0x20000, CRC(7c9c3a3f) SHA1(cacb45c9111ac66c6e60b7a0cacd8bf47fd00752) )
 	ROM_LOAD16_BYTE( "sg1-sp-l.4b",  0x000001, 0x20000, CRC(5068fc5d) SHA1(7f6e80f74985959509d824318a4a7ff2b11953da) )
 
-	ROM_REGION( 0x30000, "audio", 0 ) /* Sound */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "sg1-snd0.7c", 0x00c000, 0x004000, CRC(de04b794) SHA1(191f4d79ac2375d7060f3d83ec753185e92f28ea) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 	ROM_RELOAD(              0x010000, 0x020000 )
@@ -2151,7 +2151,7 @@ ROM_START( winrun )
 ROM_END
 
 ROM_START( winrun91 )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_BYTE( "mpu.3k",  0x000000, 0x20000, CRC(80a0e5be) SHA1(6613b95e164c2032ea9043e4161130c6b3262492) )
 	ROM_LOAD16_BYTE( "mpl.1k",  0x000001, 0x20000, CRC(942172d8) SHA1(21d8dfd2165b5ceb0399fdb53d9d0f51f1255803) )
 
@@ -2159,7 +2159,7 @@ ROM_START( winrun91 )
 	ROM_LOAD16_BYTE( "spu.6b",  0x000000, 0x20000, CRC(0221d4b2) SHA1(65fd38b1cfaa6693d71248561d764a9ea1098c56) )
 	ROM_LOAD16_BYTE( "spl.4b",  0x000001, 0x20000, CRC(288799e2) SHA1(2c4bf0cf9c71458fff4dd77e426a76685d9e1bab) )
 
-	ROM_REGION( 0x30000, "audio", 0 ) /* Sound */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound */
 	ROM_LOAD( "snd0.7c", 0x00c000, 0x004000, CRC(6a321e1e) SHA1(b2e77cac4ed7609593fa5a462c9d78526451e477) )
 	ROM_CONTINUE(        0x010000, 0x01c000 )
 	ROM_RELOAD(          0x010000, 0x020000 )
@@ -2246,7 +2246,7 @@ static DRIVER_INIT( cybsled )
 
 static DRIVER_INIT( solvalou )
 {
-	UINT16 *mem = (UINT16 *)memory_region(machine, "main");
+	UINT16 *mem = (UINT16 *)memory_region(machine, "maincpu");
 	mem[0x20ce4/2+1] = 0x0000; // $200128
 	mem[0x20cf4/2+0] = 0x4e71; // 2nd ptr_booting
 	mem[0x20cf4/2+1] = 0x4e71;

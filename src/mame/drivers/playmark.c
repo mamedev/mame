@@ -315,7 +315,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hrdtimes_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0fffff) AM_ROM AM_REGION("main", 0x0c0000)
+	AM_RANGE(0x0c0000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0x0c0000)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE(&wbeachvl_videoram3)
 	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE(&wbeachvl_videoram2)
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(hrdtimes_txvideoram_w) AM_BASE(&wbeachvl_videoram1)
@@ -919,16 +919,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bigtwin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(bigtwin_main_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_CPU_ADD("audio", PIC16C57, 12000000)	/* 3MHz */
+	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -953,18 +953,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wbeachvl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(wbeachvl_main_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-//  MDRV_CPU_ADD("audio", PIC16C57, 12000000)   /* 3MHz */
+//  MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000)   /* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
 	MDRV_NVRAM_HANDLER(wbeachvl)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -988,16 +988,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( excelsr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(excelsr_main_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_CPU_ADD("audio", PIC16C57, 12000000)	/* 3MHz */
+	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000)	/* 3MHz */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1021,18 +1021,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hotmind )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hotmind_main_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_CPU_ADD("audio", PIC16C57, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)	/* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
 	MDRV_NVRAM_HANDLER(wbeachvl)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1056,16 +1056,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hrdtimes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(hrdtimes_main_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-//  MDRV_CPU_ADD("audio", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
+//  MDRV_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1093,11 +1093,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( bigtwin )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "2.302",        0x000000, 0x80000, CRC(e6767f60) SHA1(ec0ba1c786e6fde04601c2f3f619e3c6545f9239) )
 	ROM_LOAD16_BYTE( "3.301",        0x000001, 0x80000, CRC(5aba6990) SHA1(4f664a91819fdd27821fa607425701d83fcbd8ce) )
 
-	ROM_REGION( 0x1000, "audio", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
 //  ROM_LOAD( "16c57hs.bin",  0x0000, 0x1000, CRC(b4c95cc3) SHA1(7fc9b141e7782aa5c17310ee06db99d884537c30) )
 	/* ROM will be copied here by the init code from "user1" */
 
@@ -1121,11 +1121,11 @@ ROM_START( bigtwin )
 ROM_END
 
 ROM_START( wbeachvl )
-	ROM_REGION( 0x80000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "wbv_02.bin",   0x000000, 0x40000, CRC(c7cca29e) SHA1(03af361081d688c4204a95f7f5babcc598b72c23) )
 	ROM_LOAD16_BYTE( "wbv_03.bin",   0x000001, 0x40000, CRC(db4e69d5) SHA1(119bf35a463d279ddde67ab08f6f1bab9f05cf0c) )
 
-	ROM_REGION( 0x1000, "audio", ROMREGION_ERASE00 )	/* sound (missing) */
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 )	/* sound (missing) */
 	ROM_LOAD( "pic16c57",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )
@@ -1166,11 +1166,11 @@ ROM_START( wbeachvl )
 ROM_END
 
 ROM_START( wbeachv2 )
-	ROM_REGION( 0x80000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "2.bin",   0x000000, 0x40000, CRC(8993487e) SHA1(c927ae655807f9046f66ff96a30bd2c6fa671566) )
 	ROM_LOAD16_BYTE( "3.bin",   0x000001, 0x40000, CRC(15904789) SHA1(640c80bbf7302529e1a39c2ae60e018ecb176478) )
 
-	ROM_REGION( 0x1000, "audio", ROMREGION_ERASE00 )	/* sound (missing) */
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 )	/* sound (missing) */
 	ROM_LOAD( "pic16c57",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )
@@ -1211,7 +1211,7 @@ ROM_START( wbeachv2 )
 ROM_END
 
 ROM_START( excelsr )
-	ROM_REGION( 0x300000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x300000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "22.u301", 0x000001, 0x80000, CRC(f0aa1c1b) SHA1(5ed68181defe6cde6f4979508f0cfce9e9743912) )
 	ROM_LOAD16_BYTE( "19.u302", 0x000000, 0x80000, CRC(9a8acddc) SHA1(c7868317998bb98c630685a0b242ffd1fbdc54ed) )
 	ROM_LOAD16_BYTE( "21.u303", 0x100001, 0x80000, CRC(fdf9bd64) SHA1(783e3b8b70f8751915715e2455990c1c8eec6a71) )
@@ -1219,7 +1219,7 @@ ROM_START( excelsr )
 	ROM_LOAD16_BYTE( "20.u305", 0x200001, 0x80000, CRC(8692afe9) SHA1(b4411bad64a9a6efd8eb13dcf7c5eebfb5681f3d) )
 	ROM_LOAD16_BYTE( "17.u306", 0x200000, 0x80000, CRC(978f9a6b) SHA1(9514b97f071fd20740218a58af877765beffedad) )
 
-	ROM_REGION( 0x1000, "audio", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
 	/* ROM will be copied here by the init code from "user1" */
 
 	ROM_REGION( 0x3000, "user1", ROMREGION_DISPOSE )
@@ -1293,11 +1293,11 @@ Notes:
 */
 
 ROM_START( hotmind )
-	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "21.u87",       0x00000, 0x20000, CRC(e9000f7f) SHA1(c19fee7b774d3f30f4d4025a63ec396ec119c855) )
 	ROM_LOAD16_BYTE( "22.u68",       0x00001, 0x20000, CRC(2c518ec5) SHA1(6d9e81ddb5793d64e22dc0254519b947f6ec6954) )
 
-	ROM_REGION( 0x1000, "audio", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
 	/* ROM will be copied here by the init code from "user1" */
 
 	/* original PIC (which is the one from Hard Times) was protected, but it works with the Excelsior one
@@ -1326,11 +1326,11 @@ ROM_START( hotmind )
 ROM_END
 
 ROM_START( hrdtimes )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "31.u67",       0x00000, 0x80000, CRC(53eb041b) SHA1(7437da1ceb26e9518a3085560b8a42f37e77ace9) )
 	ROM_LOAD16_BYTE( "32.u66",       0x00001, 0x80000, CRC(f2c6b382) SHA1(d73affed091a261c4bfe17f409657e0a46b6c163) )
 
-	ROM_REGION( 0x1000, "audio", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
 	ROM_LOAD( "pic16c57",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1362,11 +1362,11 @@ ROM_END
 /* Different revision of the PCB, uses larger gfx ROMs, however the content is the same */
 
 ROM_START( hrdtimea )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "u67.bin",       0x00000, 0x80000, CRC(3e1334cb) SHA1(9523c04f92371a35c297280b42b1604e23790a1e) )
 	ROM_LOAD16_BYTE( "u66.bin",       0x00001, 0x80000, CRC(041ec30a) SHA1(00476ebd0a64cbd027be159cae7666d2df6d11ba) )
 
-	ROM_REGION( 0x1000, "audio", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
+	ROM_REGION( 0x1000, "audiocpu", ROMREGION_ERASE00 )	/* sound (PIC16C57) */
 	ROM_LOAD( "pic16c57",     0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1407,7 +1407,7 @@ static UINT8 playmark_asciitohex(UINT8 data)
 static DRIVER_INIT( bigtwin )
 {
 	UINT8 *playmark_PICROM_HEX = memory_region(machine, "user1");
-	UINT16 *playmark_PICROM = (UINT16 *)memory_region(machine, "audio");
+	UINT16 *playmark_PICROM = (UINT16 *)memory_region(machine, "audiocpu");
 	INT32   offs, data;
 	UINT16  src_pos = 0;
 	UINT16  dst_pos = 0;
@@ -1460,7 +1460,7 @@ static DRIVER_INIT( bigtwin )
 			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			pic16c5x_set_config(cputag_get_cpu(machine, "audio"), data);
+			pic16c5x_set_config(cputag_get_cpu(machine, "audiocpu"), data);
 
 			src_pos = 0x7fff;		/* Force Exit */
 		}

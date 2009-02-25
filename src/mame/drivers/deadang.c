@@ -228,7 +228,7 @@ static INTERRUPT_GEN( deadang_interrupt )
 static MACHINE_DRIVER_START( deadang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MDRV_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
 
@@ -243,7 +243,7 @@ static MACHINE_DRIVER_START( deadang )
 	MDRV_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -264,7 +264,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( deadang )
-	ROM_REGION( 0x100000, "main", 0 ) /* v20 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v20 main cpu */
 	ROM_LOAD16_BYTE("2.18h",   0x0c0000, 0x10000, CRC(1bc05b7e) SHA1(21833150a1f5ab543999a67f5b3bfbaf703e5508) )
 	ROM_LOAD16_BYTE("4.22h",   0x0c0001, 0x10000, CRC(5751d4e7) SHA1(2e1a30c20199461fd876849f7563fef1d9a80c2d) )
 	ROM_LOAD16_BYTE("1.18f",   0x0e0000, 0x10000, CRC(8e7b15cc) SHA1(7e4766953c1adf04be18207a2aa6f5e861ea5f6c) )
@@ -274,7 +274,7 @@ ROM_START( deadang )
 	ROM_LOAD16_BYTE("5.6bh",   0x0e0000, 0x10000, CRC(9c69eb35) SHA1(d5a9714f279b71c419b4bae0f142c4cb1cc8d30e) )
 	ROM_LOAD16_BYTE("6.9b",    0x0e0001, 0x10000, CRC(34a44ce5) SHA1(621c69d8778d4c96ac3be06b033a5931a6a23da2) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "13.b1", 0x000000, 0x02000, CRC(13b956fb) SHA1(f7c21ad5e988ac59073659a427b1fa66ff49b0c1) ) /* Encrypted */
 	ROM_LOAD( "14.c1", 0x010000, 0x10000, CRC(98837d57) SHA1(291769a11478291a65c959d119d19960b100d135) ) /* Banked */
 
@@ -309,7 +309,7 @@ ROM_START( deadang )
 ROM_END
 
 ROM_START( leadang )
-	ROM_REGION( 0x100000, "main", 0 ) /* v20 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v20 main cpu */
 	ROM_LOAD16_BYTE("2.18h",   0x0c0000, 0x10000, CRC(611247e0) SHA1(1b9ad50f67ba3a3a9e5a0d6e33f4d4be2fc20446) )
 	ROM_LOAD16_BYTE("4.22h",   0x0c0001, 0x10000, CRC(348c1201) SHA1(277dd77dcbc950299de0fd56a4f66db8f90752ad) )
 	ROM_LOAD16_BYTE("1.18f",   0x0e0000, 0x10000, CRC(fb952d71) SHA1(c6578cddf019872e6005c3a9e8e3e024d17d8c6e) )
@@ -319,7 +319,7 @@ ROM_START( leadang )
 	ROM_LOAD16_BYTE("5.6b",    0x0e0000, 0x10000, CRC(9c69eb35) SHA1(d5a9714f279b71c419b4bae0f142c4cb1cc8d30e) )
 	ROM_LOAD16_BYTE("6.9b",    0x0e0001, 0x10000, CRC(34a44ce5) SHA1(621c69d8778d4c96ac3be06b033a5931a6a23da2) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "13.b1", 0x000000, 0x02000, CRC(13b956fb) SHA1(f7c21ad5e988ac59073659a427b1fa66ff49b0c1) ) /* Encrypted */
 	ROM_LOAD( "14.c1", 0x010000, 0x10000, CRC(98837d57) SHA1(291769a11478291a65c959d119d19960b100d135) ) /* Banked */
 
@@ -354,7 +354,7 @@ ROM_START( leadang )
 ROM_END
 
 ROM_START( ghunter )
-	ROM_REGION( 0x100000, "main", 0 ) /* v20 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v20 main cpu */
 	ROM_LOAD16_BYTE("ggh-2.h18",   0x0c0000, 0x10000, CRC(7ccc6fee) SHA1(bccc283d82f080157f0521457b04fdd1d63caafe) )
 	ROM_LOAD16_BYTE("ggh-4.h22",   0x0c0001, 0x10000, CRC(d1f23ad7) SHA1(2668729af797ccab52ac2bf519d43ab2fa9e54ce) )
 	ROM_LOAD16_BYTE("ggh-1.f18",   0x0e0000, 0x10000, CRC(0d6ff111) SHA1(209d26170446b43d1d463737b447e30aaca614a7) )
@@ -364,7 +364,7 @@ ROM_START( ghunter )
 	ROM_LOAD16_BYTE("ggh-5.b6",   0x0e0000, 0x10000, CRC(1f612f3b) SHA1(71840fa0e988828a819d371f082ce31d5a5e3a30) )
 	ROM_LOAD16_BYTE("ggh-6.b10",  0x0e0001, 0x10000, CRC(63e18e56) SHA1(5183d0909a7c795e76540723fb710a5a75730298) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "13.b1", 0x000000, 0x02000, CRC(13b956fb) SHA1(f7c21ad5e988ac59073659a427b1fa66ff49b0c1) ) /* Encrypted */
 	ROM_LOAD( "14.c1", 0x010000, 0x10000, CRC(98837d57) SHA1(291769a11478291a65c959d119d19960b100d135) ) /* Banked */
 
@@ -402,13 +402,13 @@ ROM_END
 
 static DRIVER_INIT( deadang )
 {
-	seibu_sound_decrypt(machine, "audio", 0x2000);
+	seibu_sound_decrypt(machine, "audiocpu", 0x2000);
 	seibu_adpcm_decrypt(machine, "adpcm");
 }
 
 static DRIVER_INIT( ghunter )
 {
-	seibu_sound_decrypt(machine, "audio", 0x2000);
+	seibu_sound_decrypt(machine, "audiocpu", 0x2000);
 	seibu_adpcm_decrypt(machine, "adpcm");
 
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80000, 0x80001, 0, 0, ghunter_trackball_low_r);

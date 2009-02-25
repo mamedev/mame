@@ -279,7 +279,7 @@ static const struct sp0250_interface sp0250_interface =
 MACHINE_DRIVER_START( sega_speech_board )
 
 	/* CPU for the speech board */
-	MDRV_CPU_ADD("audio", I8035, SPEECH_MASTER_CLOCK)		/* divide by 15 in CPU */
+	MDRV_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)		/* divide by 15 in CPU */
 	MDRV_CPU_PROGRAM_MAP(speech_map, 0)
 	MDRV_CPU_IO_MAP(speech_portmap, 0)
 

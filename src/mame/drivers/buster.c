@@ -71,12 +71,12 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( buster )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(mainmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -98,12 +98,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( buster )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vf-1.bin", 0x00000, 0x1000, CRC(571c32fe) SHA1(a61a052a4caf4430be5c5377934295bb90bb903a) )
 	ROM_LOAD( "vf-2.bin", 0x01000, 0x1000, CRC(fefe8783) SHA1(aed2bae4cf531dc994b50be9968fa5e10b61f2b8) )
 	ROM_LOAD( "vf-3.bin", 0x02000, 0x1000, CRC(9dd9be43) SHA1(5319ef3b43236abd38138adef87a7701f91afd1d))
 	ROM_LOAD( "vf-4.bin", 0x03000, 0x1000, CRC(90dd550b) SHA1(a0a26031aada35f6d6c4fa5af9b75e594d8039d0) )
-	ROM_COPY( "main",     0x00000, 0x7000, 0x4000 )
+	ROM_COPY( "maincpu",     0x00000, 0x7000, 0x4000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "b-red.bin", 0x00000, 0x2000, CRC(6e3ea232) SHA1(dcf76a1ee12517bd00c7b10aaeda0fa2fcec941e) )
@@ -113,7 +113,7 @@ ROM_END
 
 static DRIVER_INIT( buster )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 //  vram = auto_malloc(0x2000);
 	memcpy(buster_rom, ROM, 0x4000);
 }

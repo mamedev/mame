@@ -317,7 +317,7 @@ static READ8_DEVICE_HANDLER( nemesis_portA_r )
 */
 
 	const device_config *vlm = devtag_get_device(device->machine, SOUND, "vlm");
-	int res = (cputag_get_total_cycles(device->machine, "audio") / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
+	int res = (cputag_get_total_cycles(device->machine, "audiocpu") / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
 
 	res |= 0xd0;
 
@@ -2115,18 +2115,18 @@ static const k007232_interface k007232_config =
 static MACHINE_DRIVER_START( nemesis )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 //          14318180/2, /* From schematics, should be accurate */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", nemesis_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", nemesis_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,14318180/4) /* From schematics, should be accurate */
+	MDRV_CPU_ADD("audiocpu", Z80,14318180/4) /* From schematics, should be accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)	/* fixed */
 
 	MDRV_MACHINE_RESET(nemesis)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* ??? */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2161,17 +2161,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konamigt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(konamigt_readmem,konamigt_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(konamigt_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80,14318180/4)        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2203,11 +2203,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( salamand )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,18432000/2)       /* 9.216MHz */
+	MDRV_CPU_ADD("maincpu", M68000,18432000/2)       /* 9.216MHz */
 	MDRV_CPU_PROGRAM_MAP(salamand_readmem,salamand_writemem)
-	MDRV_CPU_VBLANK_INT("main", salamand_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", salamand_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)         /* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)         /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sal_sound_readmem,sal_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2215,7 +2215,7 @@ static MACHINE_DRIVER_START( salamand )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((264-256)*125/2))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2252,11 +2252,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blkpnthr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(blkpnthr_readmem,blkpnthr_writemem)
-	MDRV_CPU_VBLANK_INT("main", blkpnthr_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", blkpnthr_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sal_sound_readmem,blkpnthr_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2264,7 +2264,7 @@ static MACHINE_DRIVER_START( blkpnthr )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2297,11 +2297,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( citybomb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(citybomb_readmem,citybomb_writemem)
-	MDRV_CPU_VBLANK_INT("main", salamand_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", salamand_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(city_sound_readmem,city_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2309,7 +2309,7 @@ static MACHINE_DRIVER_START( citybomb )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2346,11 +2346,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nyanpani )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,18432000/2)         /* 9.216 MHz? */
+	MDRV_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
 	MDRV_CPU_PROGRAM_MAP(nyanpani_readmem,nyanpani_writemem)
-	MDRV_CPU_VBLANK_INT("main", salamand_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", salamand_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(city_sound_readmem,city_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
@@ -2358,7 +2358,7 @@ static MACHINE_DRIVER_START( nyanpani )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2395,18 +2395,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gx400 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,18432000/2)     /* 9.216MHz */
+	MDRV_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
 	MDRV_CPU_PROGRAM_MAP(gx400_readmem,gx400_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(gx400_interrupt,3)
 
-	MDRV_CPU_ADD("audio", Z80,14318180/4)        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(gx400_sound_readmem,gx400_sound_writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
 	MDRV_MACHINE_RESET(nemesis)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2441,18 +2441,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rf2_gx400 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,18432000/2)     /* 9.216MHz */
+	MDRV_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
 	MDRV_CPU_PROGRAM_MAP(rf2_gx400_readmem,rf2_gx400_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(gx400_interrupt,3)
 
-	MDRV_CPU_ADD("audio", Z80,14318180/4)        /* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)        /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(gx400_sound_readmem,gx400_sound_writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)	/* interrupts are triggered by the main CPU */
 
 	MDRV_MACHINE_RESET(nemesis)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2486,17 +2486,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hcrash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,18432000/3)         /* 6.144MHz */
+	MDRV_CPU_ADD("maincpu", M68000,18432000/3)         /* 6.144MHz */
 	MDRV_CPU_PROGRAM_MAP(hcrash_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(konamigt_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80,14318180/4)       /* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)       /* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sal_sound_readmem,sal_sound_writemem)
 
 	MDRV_MACHINE_RESET(nemesis)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((18432000.0/4)/(288*264))		/* 60.606060 Hz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2536,7 +2536,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( nemesis )
-	ROM_REGION( 0x40000, "main", 0 )    /* 4 * 64k for code and rom */
+	ROM_REGION( 0x40000, "maincpu", 0 )    /* 4 * 64k for code and rom */
 	ROM_LOAD16_BYTE( "456-d01.12a",   0x00000, 0x8000, CRC(35ff1aaa) SHA1(2879a5d2ff7dca217fe5cd40be871878294c491f) )
 	ROM_LOAD16_BYTE( "456-d05.12c",   0x00001, 0x8000, CRC(23155faa) SHA1(08c73c669b3a5275353cbfcbe58ced92d93244a7) )
 	ROM_LOAD16_BYTE( "456-d02.13a",   0x10000, 0x8000, CRC(ac0cf163) SHA1(8b1a46c3ad102fe78cf099425e108d09dafd0955) )
@@ -2546,7 +2546,7 @@ ROM_START( nemesis )
 	ROM_LOAD16_BYTE( "456-d04.15a",   0x30000, 0x8000, CRC(9ca75592) SHA1(04388f2874faa54dd2cabfec4d6ce3e8d164cbcc) )
 	ROM_LOAD16_BYTE( "456-d08.15c",   0x30001, 0x8000, CRC(03c0b7f5) SHA1(4eb31bcbd2ee66afe4158308351a57589c5a1e4e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "456-d09.9c",   0x00000, 0x4000, CRC(26bf9636) SHA1(009dcbf18ea6230fc75a72232bd4fc29ad28dbf0) )
 
 	ROM_REGION( 0x0200,  "konami", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2555,7 +2555,7 @@ ROM_START( nemesis )
 ROM_END
 
 ROM_START( nemesuk )
-	ROM_REGION( 0x40000, "main", 0 )    /* 4 * 64k for code and rom */
+	ROM_REGION( 0x40000, "maincpu", 0 )    /* 4 * 64k for code and rom */
 	ROM_LOAD16_BYTE( "456-e01.12a",   0x00000, 0x8000, CRC(e1993f91) SHA1(6759bb9ba0ce28ad4d7f61b824a7d0fe43215bdc) )
 	ROM_LOAD16_BYTE( "456-e05.12c",   0x00001, 0x8000, CRC(c9761c78) SHA1(bfd63517efa820a05a0d9a908dd0917cd0d01b77) )
 	ROM_LOAD16_BYTE( "456-e02.13a",   0x10000, 0x8000, CRC(f6169c4b) SHA1(047a204fbcf8c24eca2db7197d4297e5a28c2b42) )
@@ -2565,7 +2565,7 @@ ROM_START( nemesuk )
 	ROM_LOAD16_BYTE( "456-e04.15a",   0x30000, 0x8000, CRC(322423d0) SHA1(6106b607132a09193353f339d06032a13b1e3de8) )
 	ROM_LOAD16_BYTE( "456-e08.15c",   0x30001, 0x8000, CRC(eb656266) SHA1(2f4abea282d30775f7a25747eb41bfd8d5299967) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "456-d09.9c",   0x00000, 0x4000, CRC(26bf9636) SHA1(009dcbf18ea6230fc75a72232bd4fc29ad28dbf0) )
 
 	ROM_REGION( 0x0200,  "konami", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2574,7 +2574,7 @@ ROM_START( nemesuk )
 ROM_END
 
 ROM_START( konamigt )
-	ROM_REGION( 0x40000, "main", 0 )    /* 4 * 64k for code and rom */
+	ROM_REGION( 0x40000, "maincpu", 0 )    /* 4 * 64k for code and rom */
 	ROM_LOAD16_BYTE( "561-c01.12a",   0x00000, 0x8000, CRC(56245bfd) SHA1(12579ae0031c172d42b766f5a801ef479148105e) )
 	ROM_LOAD16_BYTE( "561-c05.12c",   0x00001, 0x8000, CRC(8d651f44) SHA1(0d057ce063dd19c0a708cffa413511b367206682) )
 	ROM_LOAD16_BYTE( "561-c02.13a",   0x10000, 0x8000, CRC(3407b7cb) SHA1(1df834a47e3b4cabc79ece4cd90e05e5df68df9a) )
@@ -2584,7 +2584,7 @@ ROM_START( konamigt )
 	ROM_LOAD16_BYTE( "561-b04.15a",   0x30000, 0x8000, CRC(94bd4bd7) SHA1(314b537ba97dec1a91dcfc5deeb1dd9f7bb4a930) )
 	ROM_LOAD16_BYTE( "561-b08.15c",   0x30001, 0x8000, CRC(b7236567) SHA1(7626d70262a0acff36357877a5e7c9ed3f45415e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(       "561-b09.9c",  0x00000, 0x4000, CRC(539d0c49) SHA1(4c16b07fbd876b6445fc0ec49c3ad5ab1a92cbf6) )
 
 	ROM_REGION( 0x0200,  "konami", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2593,13 +2593,13 @@ ROM_START( konamigt )
 ROM_END
 
 ROM_START( rf2 )
-	ROM_REGION( 0xc0000, "main", 0 )    /* 5 * 64k for code and rom */
+	ROM_REGION( 0xc0000, "maincpu", 0 )    /* 5 * 64k for code and rom */
 	ROM_LOAD16_BYTE( "400-a06.15l",  0x00000, 0x08000, CRC(b99d8cff) SHA1(18e277827a534bab2b3b8b81e51d886b8382d435) )
 	ROM_LOAD16_BYTE( "400-a04.10l",  0x00001, 0x08000, CRC(d02c9552) SHA1(ec0aaa093541dab98412c11f666161cd558c383a) )
 	ROM_LOAD16_BYTE( "561-a07.17l",  0x80000, 0x20000, CRC(ed6e7098) SHA1(a28f2846b091b5bc333088054451d7b6d7f6458e) )
 	ROM_LOAD16_BYTE( "561-a05.12l",  0x80001, 0x20000, CRC(dfe04425) SHA1(0817992aeeba140feba1417c265b794f096936d9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "400-e03.5l",   0x00000, 0x02000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
 	ROM_REGION( 0x0200,  "konami", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2608,13 +2608,13 @@ ROM_START( rf2 )
 ROM_END
 
 ROM_START( twinbee )
-	ROM_REGION( 0xc0000, "main", 0 )    /* 5 * 64k for code and rom */
+	ROM_REGION( 0xc0000, "maincpu", 0 )    /* 5 * 64k for code and rom */
 	ROM_LOAD16_BYTE( "400-a06.15l",  0x00000, 0x08000, CRC(b99d8cff) SHA1(18e277827a534bab2b3b8b81e51d886b8382d435) )
 	ROM_LOAD16_BYTE( "400-a04.10l",  0x00001, 0x08000, CRC(d02c9552) SHA1(ec0aaa093541dab98412c11f666161cd558c383a) )
 	ROM_LOAD16_BYTE( "412-a07.17l",  0x80000, 0x20000, CRC(d93c5499) SHA1(4555b9232ce86192360ea5b5092643ff51446aa0) )
 	ROM_LOAD16_BYTE( "412-a05.12l",  0x80001, 0x20000, CRC(2b357069) SHA1(409cf3aa174f5d7dc5efc8b8b1c925fcb677fc98) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "400-e03.5l",   0x00000, 0x02000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
 	ROM_REGION( 0x0200,  "konami", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2623,13 +2623,13 @@ ROM_START( twinbee )
 ROM_END
 
 ROM_START( gradius )
-	ROM_REGION( 0xc0000, "main", 0 )    /* 5 * 64k for code and rom */
+	ROM_REGION( 0xc0000, "maincpu", 0 )    /* 5 * 64k for code and rom */
 	ROM_LOAD16_BYTE( "400-a06.15l",  0x00000, 0x08000, CRC(b99d8cff) SHA1(18e277827a534bab2b3b8b81e51d886b8382d435) )
 	ROM_LOAD16_BYTE( "400-a04.10l",  0x00001, 0x08000, CRC(d02c9552) SHA1(ec0aaa093541dab98412c11f666161cd558c383a) )
 	ROM_LOAD16_BYTE( "456-a07.17l",  0x80000, 0x20000, CRC(92df792c) SHA1(aec916f70af92a2d6476d7a36ba9be265890f9aa) )
 	ROM_LOAD16_BYTE( "456-a05.12l",  0x80001, 0x20000, CRC(5cafb263) SHA1(7cd12c695ec6ef4d5785ce218911961fc3528e95) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "400-e03.5l",   0x00000, 0x2000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
 	ROM_REGION( 0x0200,  "konami", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2638,13 +2638,13 @@ ROM_START( gradius )
 ROM_END
 
 ROM_START( gwarrior )
-	ROM_REGION( 0xc0000, "main", 0 )    /* 5 * 64k for code and rom */
+	ROM_REGION( 0xc0000, "maincpu", 0 )    /* 5 * 64k for code and rom */
 	ROM_LOAD16_BYTE( "400-a06.15l",  0x00000, 0x08000, CRC(b99d8cff) SHA1(18e277827a534bab2b3b8b81e51d886b8382d435) )
 	ROM_LOAD16_BYTE( "400-a04.10l",  0x00001, 0x08000, CRC(d02c9552) SHA1(ec0aaa093541dab98412c11f666161cd558c383a) )
 	ROM_LOAD16_BYTE( "578-a07.17l",  0x80000, 0x20000, CRC(0aedacb5) SHA1(bf8e4b443df37e021a86e1fe76683113977a1a76) )
 	ROM_LOAD16_BYTE( "578-a05.12l",  0x80001, 0x20000, CRC(76240e2e) SHA1(3f4086972fa655704ec6480fa3012c3e8999d8ab) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "400-e03.5l",   0x00000, 0x02000, CRC(a5a8e57d) SHA1(f4236770093392dec3f76835a5766e9b3ed64e2e) )
 
 	ROM_REGION( 0x0200,  "konami", 0 )      /* 2x 256 byte for 0005289 wavetable data */
@@ -2653,13 +2653,13 @@ ROM_START( gwarrior )
 ROM_END
 
 ROM_START( salamand )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "587-d02.18b",  0x00000, 0x10000, CRC(a42297f9) SHA1(7c974779e438eae649b39b36f6f6d24847099a6e) )
 	ROM_LOAD16_BYTE( "587-d05.18c",  0x00001, 0x10000, CRC(f9130b0a) SHA1(925ea65c13fc87fc59f893cc0ead2c82fd0bed6f) )
 	ROM_LOAD16_BYTE( "587-c03.17b",  0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
 	ROM_LOAD16_BYTE( "587-c06.17c",  0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-d09.11j",      0x00000, 0x08000, CRC(5020972c) SHA1(04c752c3b7fd850a8a51ecd230b39e6edde9dd7e) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data? */
@@ -2670,13 +2670,13 @@ ROM_START( salamand )
 ROM_END
 
 ROM_START( salamanj )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "587-j02.18b",  0x00000, 0x10000, CRC(f68ee99a) SHA1(aec1f4720abe2529120ae711daa9e7e7d966b351) )
 	ROM_LOAD16_BYTE( "587-j05.18c",  0x00001, 0x10000, CRC(72c16128) SHA1(6921445caa0b1121e483c9c62c17aad8aa42cc18) )
 	ROM_LOAD16_BYTE( "587-c03.17b",  0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
 	ROM_LOAD16_BYTE( "587-c06.17c",  0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-d09.11j",      0x00000, 0x08000, CRC(5020972c) SHA1(04c752c3b7fd850a8a51ecd230b39e6edde9dd7e) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data? */
@@ -2687,13 +2687,13 @@ ROM_START( salamanj )
 ROM_END
 
 ROM_START( lifefrce )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "587-k02.18b",  0x00000, 0x10000, CRC(4a44da18) SHA1(8e76bc2b9c48bfc65664fb6ee4d1d33622ee1eb8) )
 	ROM_LOAD16_BYTE( "587-k05.18c",  0x00001, 0x10000, CRC(2f8c1cbd) SHA1(aa309d509be69f315e50047abff42d9b30334e1d) )
 	ROM_LOAD16_BYTE( "587-c03.17b",  0x40000, 0x20000, CRC(e5caf6e6) SHA1(f5df4fbc43cfa6e2866558c99dd95ba8dc89dc7a) ) /* Mask rom */
 	ROM_LOAD16_BYTE( "587-c06.17c",  0x40001, 0x20000, CRC(c2f567ea) SHA1(0c38fea53f3d4a9ae0deada5669deca4be8c9fd3) ) /* Mask rom */
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-k09.11j",  0x00000, 0x08000, CRC(2255fe8c) SHA1(6ee35575a15f593642b29020857ec466094ef495) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data? */
@@ -2704,13 +2704,13 @@ ROM_START( lifefrce )
 ROM_END
 
 ROM_START( lifefrcj )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "587-n02.18b",  0x00000, 0x10000, CRC(235dba71) SHA1(f3a0092a7d002436253054953e36d0865ce95b80) )
 	ROM_LOAD16_BYTE( "587-n05.18c",  0x00001, 0x10000, CRC(054e569f) SHA1(e810f7e3e762875e2e71e4356997257e1bbe0da1) )
 	ROM_LOAD16_BYTE( "587-n03.17b",  0x40000, 0x20000, CRC(9041f850) SHA1(d62b8c3132916a4053cb282448b2404ac0143e01) )
 	ROM_LOAD16_BYTE( "587-n06.17c",  0x40001, 0x20000, CRC(fba8b6aa) SHA1(5ef861b89b7a89c9d70355e09621b106baa5c1e7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "587-n09.11j",  0x00000, 0x08000, CRC(e8496150) SHA1(c7d40b6dc56849dfd8d080f1aaebad36c88d93df) )
 
 	ROM_REGION( 0x04000, "vlm", 0 )    /* VLM5030 data? */
@@ -2721,13 +2721,13 @@ ROM_START( lifefrcj )
 ROM_END
 
 ROM_START( blkpnthr )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "604-f02.18b",  0x00000, 0x10000, CRC(487bf8da) SHA1(43b01599a1e3f82972d597a7a92bdd4ce1343847) )
 	ROM_LOAD16_BYTE( "604-f05.18c",  0x00001, 0x10000, CRC(b08f8ca2) SHA1(ca3b17709a86abdcfa0034ccb4ff8d0afc84558f) )
 	ROM_LOAD16_BYTE( "604-c03.17b",  0x40000, 0x20000, CRC(815bc3b0) SHA1(ee643b9af5906d12b1d621996503c2e28d93a207) )
 	ROM_LOAD16_BYTE( "604-c06.17c",  0x40001, 0x20000, CRC(4af6bf7f) SHA1(bf6d128670dda1f30cbf72cb82b61bf6ddfcde60) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "604-a08.11j",  0x00000, 0x08000, CRC(aff88a2b) SHA1(7080add63deab5755606759a218dea9105df4819) )
 
 	ROM_REGION( 0x20000, "konami", 0 )    /* 007232 data */
@@ -2735,7 +2735,7 @@ ROM_START( blkpnthr )
 ROM_END
 
 ROM_START( citybomb )
-	ROM_REGION( 0x1c0000, "main", 0 )
+	ROM_REGION( 0x1c0000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "787-g10.15k",  0x000000, 0x10000, CRC(26207530) SHA1(ccb5e4ca472aad11cf308973d6a020d3af22a134) )
 	ROM_LOAD16_BYTE( "787-g09.15h",  0x000001, 0x10000, CRC(ce7de262) SHA1(73ab58c057113ffffb633c314fa383e65236d423) )
 	ROM_LOAD16_BYTE( "787-g08.15f",  0x100000, 0x20000, CRC(6242ef35) SHA1(16fd4478d54117bbf09792e22c786622ca5049bb) )
@@ -2745,7 +2745,7 @@ ROM_START( citybomb )
 	ROM_LOAD16_BYTE( "787-g04.13f",  0x180000, 0x20000, CRC(137cf39f) SHA1(39cfd25c45d824cabc3641fd39eb77c98d32ec9b) )
 	ROM_LOAD16_BYTE( "787-g03.13d",  0x180001, 0x20000, CRC(0cc704dc) SHA1(b0c3991393cdb6a75461597d51452bfa08955081) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "787-e02.4h",  0x00000, 0x08000, CRC(f4591e46) SHA1(c17c1a24bf1866fbba388521a4b7ea0975bda587) )
 
 	ROM_REGION( 0x80000, "konami", 0 )    /* 007232 data */
@@ -2753,7 +2753,7 @@ ROM_START( citybomb )
 ROM_END
 
 ROM_START( citybmrj )
-	ROM_REGION( 0x1c0000, "main", 0 )
+	ROM_REGION( 0x1c0000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "787-h10.15k",  0x000000, 0x10000, CRC(66fecf69) SHA1(5881ec019ef6228a693af5c9f6c26e05bdee3846) )
 	ROM_LOAD16_BYTE( "787-h09.15h",  0x000001, 0x10000, CRC(a0e29468) SHA1(78971da14a748ade6ea94770080a393c7617b97d) )
 	ROM_LOAD16_BYTE( "787-g08.15f",  0x100000, 0x20000, CRC(6242ef35) SHA1(16fd4478d54117bbf09792e22c786622ca5049bb) )
@@ -2763,7 +2763,7 @@ ROM_START( citybmrj )
 	ROM_LOAD16_BYTE( "787-g04.13f",  0x180000, 0x20000, CRC(137cf39f) SHA1(39cfd25c45d824cabc3641fd39eb77c98d32ec9b) )
 	ROM_LOAD16_BYTE( "787-g03.13d",  0x180001, 0x20000, CRC(0cc704dc) SHA1(b0c3991393cdb6a75461597d51452bfa08955081) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "787-e02.4h",  0x00000, 0x08000, CRC(f4591e46) SHA1(c17c1a24bf1866fbba388521a4b7ea0975bda587) )
 
 	ROM_REGION( 0x80000, "konami", 0 )    /* 007232 data */
@@ -2771,13 +2771,13 @@ ROM_START( citybmrj )
 ROM_END
 
 ROM_START( kittenk )
-	ROM_REGION( 0x140000, "main", 0 )
+	ROM_REGION( 0x140000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "kitten.15k",   0x000000, 0x10000, CRC(8267cb2b) SHA1(63c4ebef834850eff379141b8eb0fafbdcf26d0e) )
 	ROM_LOAD16_BYTE( "kitten.15h",   0x000001, 0x10000, CRC(eb41cfa5) SHA1(d481e63faea098625a42613c13f82fec310a7c62) )
 	ROM_LOAD16_BYTE( "712-b08.15f",  0x100000, 0x20000, CRC(e6d71611) SHA1(89fced4074c491c211fea908f08be94595c57f31) )
 	ROM_LOAD16_BYTE( "712-b07.15d",  0x100001, 0x20000, CRC(30f75c9f) SHA1(0cbc247ff37800dd3275d2ff23a63ed19ec4cef2) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "712-e02.4h",  0x00000, 0x08000, CRC(ba76f310) SHA1(cc2164a9617493d1b3b8ac67430f9eb26fd987d2) )
 
 	ROM_REGION( 0x80000, "konami", 0 )    /* 007232 data */
@@ -2785,13 +2785,13 @@ ROM_START( kittenk )
 ROM_END
 
 ROM_START( nyanpani )
-	ROM_REGION( 0x140000, "main", 0 )
+	ROM_REGION( 0x140000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "712-j10.15k",  0x000000, 0x10000, CRC(924b27ec) SHA1(019279349b1be45ba46e57ef8f21d79a1b115d7b) )
 	ROM_LOAD16_BYTE( "712-j09.15h",  0x000001, 0x10000, CRC(a9862ea1) SHA1(84e481eb6159889d54d0dfe4c31399ab06e13bb7) )
 	ROM_LOAD16_BYTE( "712-b08.15f",  0x100000, 0x20000, CRC(e6d71611) SHA1(89fced4074c491c211fea908f08be94595c57f31) )
 	ROM_LOAD16_BYTE( "712-b07.15d",  0x100001, 0x20000, CRC(30f75c9f) SHA1(0cbc247ff37800dd3275d2ff23a63ed19ec4cef2) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD(      "712-e02.4h",  0x00000, 0x08000, CRC(ba76f310) SHA1(cc2164a9617493d1b3b8ac67430f9eb26fd987d2) )
 
 	ROM_REGION( 0x80000, "konami", 0 )    /* 007232 data */
@@ -2905,13 +2905,13 @@ Notes:
 */
 
 ROM_START( hcrash )
-	ROM_REGION( 0x140000, "main", 0 )
+	ROM_REGION( 0x140000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "790-d03.t9",   0x00000, 0x08000, CRC(10177dce) SHA1(e46f75e3206eff5299e08e5258e67b68efc4c20c) )
 	ROM_LOAD16_BYTE( "790-d06.t7",   0x00001, 0x08000, CRC(fca5ab3e) SHA1(2ad335cf25a86fe38c190e2e0fe101ea161eb81d) )
 	ROM_LOAD16_BYTE( "790-c02.s9",   0x40000, 0x10000, CRC(8ae6318f) SHA1(b3205df1103a69eef34c5207e567a27a5fee5660) )
 	ROM_LOAD16_BYTE( "790-c05.s7",   0x40001, 0x10000, CRC(c214f77b) SHA1(c5754c3da2a3820d8d06f8ff171be6c2aea92ecc) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "790-c09.n2",   0x00000, 0x8000, CRC(a68a8cce) SHA1(a54966b9cbbe37b2be6a2276ee09c81452d9c0ca) )
 
 	ROM_REGION( 0x80000, "vlm", 0 )  /* VLM5030 data data */
@@ -2923,13 +2923,13 @@ ROM_START( hcrash )
 ROM_END
 
 ROM_START( hcrashc )
-	ROM_REGION( 0x140000, "main", 0 )
+	ROM_REGION( 0x140000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "790-c03.t9",   0x00000, 0x08000, CRC(d98ec625) SHA1(ddec88b0babd1c538fe5055adec73b537d637d3e) )
 	ROM_LOAD16_BYTE( "790-c06.t7",   0x00001, 0x08000, CRC(1d641a86) SHA1(d20ae01565d04db62d5687546c19d87c8e26248c) )
 	ROM_LOAD16_BYTE( "790-c02.s9",   0x40000, 0x10000, CRC(8ae6318f) SHA1(b3205df1103a69eef34c5207e567a27a5fee5660) )
 	ROM_LOAD16_BYTE( "790-c05.s7",   0x40001, 0x10000, CRC(c214f77b) SHA1(c5754c3da2a3820d8d06f8ff171be6c2aea92ecc) )
 
-	ROM_REGION( 0x10000, "audio", 0 )    /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for sound */
 	ROM_LOAD( "790-c09.n2",   0x00000, 0x8000, CRC(a68a8cce) SHA1(a54966b9cbbe37b2be6a2276ee09c81452d9c0ca) )
 
 	ROM_REGION( 0x80000, "vlm", 0 )  /* VLM5030 data data */

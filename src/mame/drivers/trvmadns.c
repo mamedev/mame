@@ -284,15 +284,15 @@ static MACHINE_RESET( trvmadns )
 }
 
 static MACHINE_DRIVER_START( trvmadns )
-	MDRV_CPU_ADD("main", Z80,10000000/2) // ?
+	MDRV_CPU_ADD("maincpu", Z80,10000000/2) // ?
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(trvmadns)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -314,7 +314,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( trvmadns )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5f lat la trivia.bin", 0x0000, 0x2000, CRC(a8fb07ea) SHA1(dcf2cccd8b98087d30b3347e69b1bf8565f95ad6) )
 	ROM_LOAD( "u6f lat green.bin",     0x2000, 0x2000, CRC(40f816f1) SHA1(a1a6a9af99edb1860bc4c8eb51859bbfbf91cae2) )
 	ROM_LOAD( "u7f lat green.bin",     0x4000, 0x2000, CRC(3e45feb0) SHA1(5ffc18ab3f6ace844242d4be52b3946c1469944a) )

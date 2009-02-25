@@ -358,7 +358,7 @@ static WRITE8_HANDLER( combascb_priority_w )
 
 WRITE8_HANDLER( combasc_bankselect_w )
 {
-	UINT8 *page = memory_region(space->machine, "main") + 0x10000;
+	UINT8 *page = memory_region(space->machine, "maincpu") + 0x10000;
 
 	if (data & 0x40)
 	{
@@ -401,7 +401,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 	data = data & 0x1f;
 	if( data != combasc_bank_select )
 	{
-		UINT8 *page = memory_region(space->machine, "main") + 0x10000;
+		UINT8 *page = memory_region(space->machine, "maincpu") + 0x10000;
 		combasc_bank_select = data;
 
 		if (data & 0x10)
@@ -430,7 +430,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 
 MACHINE_RESET( combasc )
 {
-	UINT8 *MEM = memory_region(machine, "main") + 0x38000;
+	UINT8 *MEM = memory_region(machine, "maincpu") + 0x38000;
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	combasc_io_ram  = MEM + 0x0000;

@@ -70,12 +70,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( minivadr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,24000000 / 6)		 /* 4 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80,24000000 / 6)		 /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(minivadr_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -95,7 +95,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( minivadr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d26-01.bin",	0x0000, 0x2000, CRC(a96c823d) SHA1(aa9969ff80e94b0fff0f3530863f6b300510162e) )
 ROM_END
 

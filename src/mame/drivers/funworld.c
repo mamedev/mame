@@ -1987,14 +1987,14 @@ static const ay8910_interface ay8910_intf =
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",	/* screen we are acting on */
-	4,		/* number of pixels per video memory address */
-	NULL,	/* before pixel update callback */
-	NULL,	/* row update callback */
-	NULL,	/* after pixel update callback */
-	NULL,	/* callback for display state changes */
-	NULL,	/* HSYNC callback */
-	NULL	/* VSYNC callback */
+	"screen",	/* screen we are acting on */
+	4,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	NULL,		/* callback for display state changes */
+	NULL,		/* HSYNC callback */
+	NULL		/* VSYNC callback */
 };
 
 
@@ -2004,15 +2004,15 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_DRIVER_START( funworld )
     /* basic machine hardware */
-	MDRV_CPU_ADD("main", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(funworld_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
     /* video hardware */
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2041,7 +2041,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( magicrd2 )
 	MDRV_IMPORT_FROM(funworld)
 
-	MDRV_CPU_REPLACE("main", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map, 0)
 
 	MDRV_GFXDECODE(funworld)
@@ -2055,28 +2055,28 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( royalcrd )
 	MDRV_IMPORT_FROM(funworld)
 
-	MDRV_CPU_REPLACE("main", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cuoreuno )
 	MDRV_IMPORT_FROM(funworld)
 
-	MDRV_CPU_REPLACE("main", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(cuoreuno_map, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( royalmcu )
 	MDRV_IMPORT_FROM(funworld)
 
-	MDRV_CPU_REPLACE("main", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_REPLACE("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(royalmcu_map, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( saloon )
 	MDRV_IMPORT_FROM(funworld)
 
-	MDRV_CPU_REPLACE("main", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(saloon_map, 0)
 MACHINE_DRIVER_END
 
@@ -2242,7 +2242,7 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( jollycrd )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jolycard.run", 0x8000, 0x8000, CRC(f531dd10) SHA1(969191fbfeff4349afef619d9241ef5186e6d57f) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2254,7 +2254,7 @@ ROM_START( jollycrd )
 ROM_END
 
 ROM_START( jolycdae )	/* encrypted roms...*/
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "pokeru0.bin", 0x8000, 0x10000, CRC(7732f177) SHA1(b75fca596a7315d1379fa5bcf07c449ec32c90f5) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -2267,7 +2267,7 @@ ROM_START( jolycdae )	/* encrypted roms...*/
 ROM_END
 
 ROM_START( jolyc3x3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jc3x3.bin", 0x8000, 0x8000, CRC(71e304ad) SHA1(238b792d841432582c94b21a674d46a95e8f3826) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2279,7 +2279,7 @@ ROM_START( jolyc3x3 )
 ROM_END
 
 ROM_START( jolyc980 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "j980.bin", 0x8000, 0x8000, CRC(48249fff) SHA1(390cd0eb3399446a66363dc6760458170e1970fd) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2291,7 +2291,7 @@ ROM_START( jolyc980 )
 ROM_END
 
 ROM_START( jolycdev )	/* Jolly Card (lipa) from Evona */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lipa.bin", 0x8000, 0x8000, CRC(62657c98) SHA1(237466dde26540c119c631c75f51c87ea59d1a91) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2306,7 +2306,7 @@ ROM_START( jolycdev )	/* Jolly Card (lipa) from Evona */
 ROM_END
 
 ROM_START( jolyccra )	/* Jolly Card (croatian, set 1) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jollyc.bin", 0x8000, 0x8000, CRC(8926d99d) SHA1(dd5d1ac03d30d823dfcfe1349328ecb7afbc37fa) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2318,7 +2318,7 @@ ROM_START( jolyccra )	/* Jolly Card (croatian, set 1) */
 ROM_END
 
 ROM_START( jolyccrb )	/* Jolly Card (croatian, set 2) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jollypkr.003", 0x8000, 0x8000, CRC(ea7340b4) SHA1(7dd468f28a488a4781521809d06db1d7917048ad) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2330,7 +2330,7 @@ ROM_START( jolyccrb )	/* Jolly Card (croatian, set 2) */
 ROM_END
 
 ROM_START( jolycdit )	/* blue TAB PCB, encrypted graphics */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jn.bin", 0x8000, 0x8000, CRC(6ae00ed0) SHA1(5921c2882aeb5eadd0e04a477fa505ad35e9d98c) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2354,7 +2354,7 @@ jolycdib program seems to be the original for blue TAB PCB.
 jolycdit has some code patches and redirected parts to suspicious offsets (as d500, d000, etc)
 */
 ROM_START( jolycdib )	/* bootleg PCB, encrypted graphics */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.bin", 0x8000, 0x8000, CRC(c76fdc79) SHA1(fc75c274d64fa9c99a546d424f38e79f1acf2576) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2369,7 +2369,7 @@ ROM_START( jolycdib )	/* bootleg PCB, encrypted graphics */
 ROM_END
 
 ROM_START( sjcd2kx3 )	/* Super Joly 2000 3x */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sj3.bin", 0x8000, 0x8000, CRC(c530b518) SHA1(36934d8e1e2cb2f71eb44a05b86ec970c9f398cd) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2384,7 +2384,7 @@ ROM_START( sjcd2kx3 )	/* Super Joly 2000 3x */
 ROM_END
 
 ROM_START( jolycdab )
-	ROM_REGION( 0x10000, "main", 0 )	/* program is testing/writting RAM in offset $8800-$BFFF (ROM)...?? */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* program is testing/writting RAM in offset $8800-$BFFF (ROM)...?? */
 	ROM_LOAD( "ig1poker.run", 0x8000, 0x8000, CRC(c96e6542) SHA1(ed6c0cf9fe8597dba9149b2225320d8d9c39219a) )
 //  ROM_RELOAD(               0x4000, 0x4000 )
 
@@ -2397,7 +2397,7 @@ ROM_START( jolycdab )
 ROM_END
 
 ROM_START( bigdeal )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poker4.001", 0x8000, 0x8000, CRC(bb0198c1) SHA1(6e7d42beb5723a4368ae3788f83b448f86e5653d) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2409,7 +2409,7 @@ ROM_START( bigdeal )
 ROM_END
 
 ROM_START( bigdealb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poker8.003", 0x8000, 0x8000, CRC(09c93745) SHA1(a64e96ef3489bc37c2c642f49e62cfef371de6f1) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2421,7 +2421,7 @@ ROM_START( bigdealb )
 ROM_END
 
 ROM_START( jolycdat )	/* there are unused pieces of code that compare or jumps within $4000-$5000 range */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bonucard.cpu", 0x8000, 0x4000, CRC(da342100) SHA1(451fa6074aad19e9efd148c3d18115a20a3d344a) )
 	ROM_CONTINUE(			  0xc000, 0x4000 )
 
@@ -2434,7 +2434,7 @@ ROM_START( jolycdat )	/* there are unused pieces of code that compare or jumps w
 ROM_END
 
 ROM_START( cuoreuno )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cuore1a.u2", 0x8000, 0x8000, CRC(6e112184) SHA1(283ac534fc1cb33d11bbdf3447630333f2fc957f) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2451,7 +2451,7 @@ ROM_START( cuoreuno )
 ROM_END
 
 ROM_START( elephfam )
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "eleph_a.u2", 0x8000, 0x10000, CRC(8392b842) SHA1(74c850c734ca8174167b2f826b9b1ac902669392) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -2469,7 +2469,7 @@ ROM_START( elephfam )
 ROM_END
 
 ROM_START( elephfmb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "now.u2", 0x8000, 0x8000, CRC(7b537ce6) SHA1(b221d08c53b9e14178335632420e78070b9cfb27) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2486,7 +2486,7 @@ ROM_START( elephfmb )
 ROM_END
 
 ROM_START( pool10 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pool10.u2", 0x8000, 0x8000, CRC(4e928756) SHA1(d9ac3d41ea32e060a7e269502b7f22333c5e6c61) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2503,7 +2503,7 @@ ROM_START( pool10 )
 ROM_END
 
 ROM_START( pool10b )	/* this set should be the parent */
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "u2.bin", 0x8000, 0x10000, CRC(64fee38e) SHA1(8a624a0b6eb4a3ba09e5b396dc5a01994dfdf294) )
 
 	/* GFX ROMs are the same of pool10, but double sized with identical halves. */
@@ -2522,7 +2522,7 @@ ROM_START( pool10b )	/* this set should be the parent */
 ROM_END
 
 ROM_START( pool10c )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a.u2", 0x8000, 0x8000, CRC(ac157b17) SHA1(f2b7eb940273bc404d3e0d8dd0f00ca757cebf69) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2539,7 +2539,7 @@ ROM_START( pool10c )
 ROM_END
 
 ROM_START( pool10d )
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "3.50.u2", 0x8000, 0x10000, CRC(4c68e1f4) SHA1(bbab63a18e0c041ce519daa32e12dd1b6a672dce) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2556,7 +2556,7 @@ ROM_START( pool10d )
 ROM_END
 
 ROM_START( tortufam )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tortu.a.u2", 0x8000, 0x8000, CRC(6e112184) SHA1(283ac534fc1cb33d11bbdf3447630333f2fc957f) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2573,7 +2573,7 @@ ROM_START( tortufam )
 ROM_END
 
 ROM_START( potgame )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "now.u2", 0x8000, 0x8000, CRC(7b537ce6) SHA1(b221d08c53b9e14178335632420e78070b9cfb27) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2590,7 +2590,7 @@ ROM_START( potgame )
 ROM_END
 
 ROM_START( bottle10 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "boat_3.bin", 0x8000, 0x8000, CRC(e2db8334) SHA1(22ac4ce361a93b7e6d491e260635755dd562b294) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2607,7 +2607,7 @@ ROM_START( bottle10 )
 ROM_END
 
 ROM_START( bottl10b )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.u2", 0x8000, 0x8000, CRC(e2db8334) SHA1(22ac4ce361a93b7e6d491e260635755dd562b294) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2624,7 +2624,7 @@ ROM_START( bottl10b )
 ROM_END
 
 ROM_START( royalcrd )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "r2.bin", 0x8000, 0x8000, CRC(25dfe0dc) SHA1(1a857a910d0c34b6b5bfc2b6ea2e08ed8ed0cae0) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2641,9 +2641,9 @@ ROM_START( royalcrd )
 ROM_END
 
 ROM_START( royalcdb ) /* both halves have different programs. we're using the 2nd one */
-	ROM_REGION( 0x20000, "main", 0 )	/* 1st half prg is testing RAM in offset $8600-$BF00...?? */
+	ROM_REGION( 0x20000, "maincpu", 0 )	/* 1st half prg is testing RAM in offset $8600-$BF00...?? */
 	ROM_LOAD( "rc.bin", 0x10000, 0x10000, CRC(8a9a6dd6) SHA1(04c3f9f17d5404ac1414c51ef8f930df54530e72) )
-	ROM_COPY( "main",	0x18000, 0x8000, 0x8000 )
+	ROM_COPY( "maincpu",	0x18000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "1a.bin", 0x0000, 0x10000, CRC(8a66f22c) SHA1(67d6e8f8f5a0fd979dc498ba2cc67cf707ccdf95) )
@@ -2658,7 +2658,7 @@ ROM_START( royalcdb ) /* both halves have different programs. we're using the 2n
 ROM_END
 
 ROM_START( royalcdc )	/* encrypted program rom */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rc_1.bin", 0x8000, 0x8000, CRC(8cdcc978) SHA1(489b58760a7c8646399c8cdfb86ec4341823e7dd) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2675,7 +2675,7 @@ ROM_START( royalcdc )	/* encrypted program rom */
 ROM_END
 
 ROM_START( lluck3x3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "l3x3.bin", 0x8000, 0x8000, CRC(dbdb07ff) SHA1(6be43aa0b2c10d83373f20f477606cb031bc6dd9) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2687,7 +2687,7 @@ ROM_START( lluck3x3 )
 ROM_END
 
 ROM_START( lluck4x1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rk4x1.bin", 0x8000, 0x8000, CRC(37f8a355) SHA1(a6eb4c53464e373bdecbbaaf146f5f7cf66b4bcd) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2699,7 +2699,7 @@ ROM_START( lluck4x1 )
 ROM_END
 
 ROM_START( magicrd2 )	/* Impera */
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
     ROM_LOAD( "magicard.004", 0x0000, 0x8000,  CRC(f6e948b8) SHA1(7d5983015a508ab135ccbf69b7f3c526c229e3ef) ) /* only last 16kbyte visible? */
 	ROM_LOAD( "magicard.01",  0x8000, 0x10000, CRC(c94767d4) SHA1(171ac946bdf2575f9e4a31e534a8e641597af519) ) /* 1st and 2nd half identical */
 
@@ -2715,7 +2715,7 @@ ROM_START( magicrd2 )	/* Impera */
 ROM_END
 
 ROM_START( magicd2a )	/* for green TAB or Impera boards */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
 //    ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
 
@@ -2731,7 +2731,7 @@ ROM_START( magicd2a )	/* for green TAB or Impera boards */
 ROM_END
 
 ROM_START( magicd2b )	/* for blue TAB board (encrypted)*/
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 //    ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
     ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
 
@@ -2747,7 +2747,7 @@ ROM_START( magicd2b )	/* for blue TAB board (encrypted)*/
 ROM_END
 
 ROM_START( vegasslw )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vslow.bin", 0x8000, 0x8000, CRC(9cb7861a) SHA1(f934eacd5b3573a6bbeaa827f521b4a498e5bcdf) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2759,7 +2759,7 @@ ROM_START( vegasslw )
 ROM_END
 
 ROM_START( vegasfst )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vfast.bin", 0x8000, 0x8000, CRC(87dfb28d) SHA1(9a06e695e59722b6c97e5a9fd2c8b238661e5a4a) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2771,7 +2771,7 @@ ROM_START( vegasfst )
 ROM_END
 
 ROM_START( vegasfte )	/* Royal Vegas Joker Card (fast deal, english gfx) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ch3.bin", 0x8000, 0x8000, CRC(87dfb28d) SHA1(9a06e695e59722b6c97e5a9fd2c8b238661e5a4a) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2783,7 +2783,7 @@ ROM_START( vegasfte )	/* Royal Vegas Joker Card (fast deal, english gfx) */
 ROM_END
 
 ROM_START( jolyjokr )	/* Jolly Joker (Impera, original) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "impera3orig.bin", 0x8000, 0x8000, CRC(ceb3a0d5) SHA1(25efae9f225abddfa663e6abcc91801996e5b0ea) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2795,7 +2795,7 @@ ROM_START( jolyjokr )	/* Jolly Joker (Impera, original) */
 ROM_END
 
 ROM_START( jolyjkra )	/* Jolly Joker (Impera, 50bet) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "impera50.bin", 0x8000, 0x8000, CRC(7effc044) SHA1(961438e7fb8222296fb959b510cdf646e4ac3226) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2811,10 +2811,10 @@ ROM_START( jokercrd )
     Program roms seems encrypted. Custom Funworld CPU based on 6502 family.
     Seems to be a Big Deal clone.
 */
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
     ROM_LOAD( "ic41.bin",   0x8000,  0x8000, CRC(d36188b3) SHA1(3fb848fabbbde9fbb70875b3dfef62bfb3a8cbcb) ) /* only last 16kbyte visible? */
 	ROM_LOAD( "ic37.bin",   0x10000, 0x8000, CRC(8e0d70c4) SHA1(018f92631acbe98e5826a41698f0e07b4b46cd71) ) /* 1st and 2nd half identical */
-	ROM_COPY( "main",	0x10000, 0xc000, 0x4000 ) /* rgn, srcoffset, offset, length */
+	ROM_COPY( "maincpu",	0x10000, 0xc000, 0x4000 ) /* rgn, srcoffset, offset, length */
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ic10.bin",	0x0000, 0x8000, CRC(2bbd27ad) SHA1(37d37899398d95beac5f3cbffc4277c97aca1a23) )
@@ -2825,9 +2825,9 @@ ROM_START( jokercrd )
 ROM_END
 
 ROM_START( mongolnw )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "prgteov.2.3m.u16", 0x10000, 0x10000, CRC(996b851a) SHA1(ef4e3d036ca10b33c83749024d04c4d4c09feeb7) )
-	ROM_COPY( "main",	0x18000, 0x8000, 0x8000 )
+	ROM_COPY( "maincpu",	0x18000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* TSC87C52-16CB MCU Code */
 	ROM_LOAD( "tsc87c52-mf.u40", 0x00000, 0x02000 , CRC(ae22e778) SHA1(0897e05967d68d7f23489e98717663e3a3176070) )
@@ -2845,9 +2845,9 @@ ROM_START( mongolnw )
 ROM_END
 
 ROM_START( soccernw )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "prgteo2gv2.3.u16", 0x10000, 0x10000, CRC(c61d1937) SHA1(c516f13a108da60b7ccee338b63a025009ef9099) )
-	ROM_COPY( "main",	0x18000, 0x8000, 0x8000 )
+	ROM_COPY( "maincpu",	0x18000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "cpu1", 0 ) /* TSC87C52-16CB MCU Code */
 	ROM_LOAD( "tsc87c52-sn.u40", 0x00000, 0x02000 , CRC(af0bd35b) SHA1(c6613a7bcdec2fd6060d6dcf639654568de87e75) )
@@ -2865,7 +2865,7 @@ ROM_START( soccernw )
 ROM_END
 
 ROM_START( saloon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1s.bin", 0x8000, 0x8000, CRC(66938330) SHA1(09118d607eff7121472db7d2cc24079e063dc7cf) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -2945,7 +2945,7 @@ static DRIVER_INIT( jolyc980 )
 
 *************************************************************************************************/
 
-//  UINT8 *ROM = memory_region(machine, "main");
+//  UINT8 *ROM = memory_region(machine, "maincpu");
 
 //  ROM[0xc1fc] = 0x4c;
 //  ROM[0xc1fd] = 0x1c;
@@ -2971,7 +2971,7 @@ static DRIVER_INIT( magicd2a )
 
 ******************************************************************/
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	ROM[0xc1c6] = 0x92;
 
@@ -2985,7 +2985,7 @@ static DRIVER_INIT( magicd2b )
 {
 	int x, na, nb, nad, nbd;
 	UINT8 *src = memory_region( machine, "gfx1" );
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
@@ -3008,7 +3008,7 @@ static DRIVER_INIT( magicd2b )
 static DRIVER_INIT( soccernw )
 {
 /* temporary patch to avoid hardware errors for debug purposes */
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	ROM[0x80b2] = 0xa9;
 	ROM[0x80b3] = 0x00;
@@ -3047,8 +3047,8 @@ static DRIVER_INIT( saloon )
 
 *************************************************/
 {
-	UINT8 *rom = memory_region(machine, "main");
-	int size = memory_region_length(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
+	int size = memory_region_length(machine, "maincpu");
 	int start = 0x8000;
 
 	UINT8 *gfxrom = memory_region(machine, "gfx1");

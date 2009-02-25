@@ -564,10 +564,10 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( enigma2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(engima2_main_cpu_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, 2500000)
+	MDRV_CPU_ADD("audiocpu", Z80, 2500000)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
 	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map,0)
 
@@ -577,7 +577,7 @@ static MACHINE_DRIVER_START( enigma2 )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(enigma2)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -593,11 +593,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( enigma2a )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", 8080, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(engima2a_main_cpu_map,0)
 	MDRV_CPU_IO_MAP(engima2a_main_cpu_io_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, 2500000)
+	MDRV_CPU_ADD("audiocpu", Z80, 2500000)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
 	MDRV_CPU_PROGRAM_MAP(engima2_audio_cpu_map,0)
 
@@ -607,7 +607,7 @@ static MACHINE_DRIVER_START( enigma2a )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(enigma2a)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -622,7 +622,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( enigma2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.5d",         0x0000, 0x0800, CRC(499749de) SHA1(401928ff41d3b4cbb68e6ad3bf3be4a10ae1781f) )
 	ROM_LOAD( "2.7d",         0x0800, 0x0800, CRC(173c1329) SHA1(3f1ad46d0e58ab236e4ff2b385d09fbf113627da) )
 	ROM_LOAD( "3.8d",         0x1000, 0x0800, CRC(c7d3e6b1) SHA1(43f7c3a02b46747998260d5469248f21714fe12b) )
@@ -630,7 +630,7 @@ ROM_START( enigma2 )
 	ROM_LOAD( "5.11d",   	  0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
 	ROM_LOAD( "6.13d",   	  0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "enigma2.s",    0x0000, 0x1000, CRC(68fd8c54) SHA1(69996d5dfd996f0aacb26e397bef314204a2a88a) )
 
 	ROM_REGION( 0x1000, "proms", 0 )	/* color map/star map */
@@ -640,7 +640,7 @@ ROM_END
 
 
 ROM_START( enigma2a )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "36_en1.bin",   0x0000, 0x0800, CRC(15f44806) SHA1(4a2f7bc91d4edf7a069e0865d964371c97af0a0a) )
 	ROM_LOAD( "35_en2.bin",   0x0800, 0x0800, CRC(e841072f) SHA1(6ab02fd9fdeac5ab887cd25eee3d6b70ab01f849) )
 	ROM_LOAD( "34_en3.bin",   0x1000, 0x0800, CRC(43d06cf4) SHA1(495af05d54c0325efb67347f691e64d194645d85) )
@@ -648,7 +648,7 @@ ROM_START( enigma2a )
 	ROM_LOAD( "5.11d",        0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
 	ROM_LOAD( "6.13d",   	  0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.bin",    0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
 ROM_END
 
@@ -657,7 +657,7 @@ ROM_END
 static DRIVER_INIT(enigma2)
 {
 	offs_t i;
-	UINT8 *rom = memory_region(machine, "audio");
+	UINT8 *rom = memory_region(machine, "audiocpu");
 
 	for(i = 0; i < 0x2000; i++)
 	{

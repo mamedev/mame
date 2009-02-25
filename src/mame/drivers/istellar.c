@@ -323,13 +323,13 @@ static INTERRUPT_GEN( vblank_callback_istellar )
 /* DRIVER */
 static MACHINE_DRIVER_START( istellar )
 	/* main cpu */
-	MDRV_CPU_ADD("main", Z80, GUESSED_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_0_mem,0)
 	MDRV_CPU_IO_MAP(z80_0_io,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_callback_istellar)
+	MDRV_CPU_VBLANK_INT("screen", vblank_callback_istellar)
 
 	/* sound cpu */
-	MDRV_CPU_ADD("audio", Z80, GUESSED_CLOCK)
+	MDRV_CPU_ADD("audiocpu", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_1_mem,0)
 	MDRV_CPU_IO_MAP(z80_1_io,0)
 
@@ -340,11 +340,11 @@ static MACHINE_DRIVER_START( istellar )
 
 	MDRV_MACHINE_START(istellar)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(istellar, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(istellar)
@@ -363,7 +363,7 @@ MACHINE_DRIVER_END
 /* There is a photo of the PCB with blurry IC locations and labels.  Comments reflect what I can (barely) see. */
 ROM_START( istellar )
 	/* Main program CPU */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "rom2.top", 0x0000, 0x2000, CRC(5d643381) SHA1(75ca52c28a52f534eda00c18b0db97e9923ff670) )	/* At IC location C63 (top board) - label ? */
 	ROM_LOAD( "rom3.top", 0x2000, 0x2000, CRC(ce5a2b09) SHA1(2de6a6e993c3411577ac0c834db8aaf16fb007ed) )	/* At IC location C64 (top board) - label ? */
 	ROM_LOAD( "rom4.top", 0x4000, 0x2000, CRC(7c2cb1f1) SHA1(ffd92510c03c2d35a59d233883c2b9f57394a51c) )	/* At IC location C65 (top board) - label ? */
@@ -371,7 +371,7 @@ ROM_START( istellar )
 	ROM_LOAD( "rom6.top", 0x8000, 0x2000, CRC(0319bf40) SHA1(f324626e457c3eb7d6b74bc6afbfcc3aab2b3c72) )	/* At IC location C67 (top board) - label ? */
 
 	/* Sound CPU */
-	ROM_REGION( 0x2000, "audio", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "rom1.top", 0x0000, 0x2000, CRC(4f34fb1d) SHA1(56ca19344c84c5989d0be797e2759f84760310be) )	/* At IC location C62 (top board) - label ? */
 
 	/* LDP Communications CPU */

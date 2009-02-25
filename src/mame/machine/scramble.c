@@ -38,7 +38,7 @@ MACHINE_RESET( monsterz )
 {
 /*
 // patch rom crc
-    UINT8 *ROM = memory_region(machine, "main");
+    UINT8 *ROM = memory_region(machine, "maincpu");
     ROM[0x363f] = 0;
     ROM[0x3640] = 0;
     ROM[0x3641] = 0;
@@ -54,7 +54,7 @@ MACHINE_RESET( monsterz )
 
 MACHINE_RESET( explorer )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	RAM[0x47ff] = 0; /* If not set, it doesn't reset after the 1st time */
 
 	MACHINE_RESET_CALL(galaxold);
@@ -189,7 +189,7 @@ const ppi8255_interface scramble_ppi_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_NULL,												/* Port C read */
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
 	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
 	DEVCB_NULL												/* Port C write */
 };
@@ -200,7 +200,7 @@ const ppi8255_interface stratgyx_ppi_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
 	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
 	DEVCB_NULL												/* Port C write */
 };
@@ -211,7 +211,7 @@ const ppi8255_interface scramble_protection_ppi_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_HANDLER(scramble_protection_r),					/* Port C read */
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
 	DEVCB_HANDLER(scramble_sh_irqtrigger_w),				/* Port B write */
 	DEVCB_HANDLER(scramble_protection_w)					/* Port C write */
 };
@@ -222,7 +222,7 @@ const ppi8255_interface mrkougar_ppi_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_NULL,												/* Port C read */
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
 	DEVCB_HANDLER(mrkougar_sh_irqtrigger_w),				/* Port B write */
 	DEVCB_NULL												/* Port C write */
 };
@@ -267,7 +267,7 @@ DRIVER_INIT( mariner )
 {
 	/* extra ROM */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, SMH_BANK1, SMH_UNMAP);
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x5800);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5800);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
@@ -282,7 +282,7 @@ DRIVER_INIT( frogger )
 	UINT8 *ROM;
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
-	ROM = memory_region(machine, "audio");
+	ROM = memory_region(machine, "audiocpu");
 	for (A = 0;A < 0x0800;A++)
 		ROM[A] = BITSWAP8(ROM[A],7,6,5,4,3,2,0,1);
 
@@ -298,7 +298,7 @@ DRIVER_INIT( froggers )
 	UINT8 *ROM;
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
-	ROM = memory_region(machine, "audio");
+	ROM = memory_region(machine, "audiocpu");
 	for (A = 0;A < 0x0800;A++)
 		ROM[A] = BITSWAP8(ROM[A],7,6,5,4,3,2,0,1);
 }
@@ -315,7 +315,7 @@ DRIVER_INIT( devilfsh )
 	/* A2 -> A3 */
 	/* A3 -> A1 */
 
-	RAM = memory_region(machine, "main");
+	RAM = memory_region(machine, "maincpu");
 	for (i = 0; i < 0x10000; i += 16)
 	{
 		offs_t j;
@@ -341,12 +341,12 @@ DRIVER_INIT( hotshock )
 {
 	/* protection??? The game jumps into never-neverland here. I think
        it just expects a RET there */
-	memory_region(machine, "main")[0x2ef9] = 0xc9;
+	memory_region(machine, "maincpu")[0x2ef9] = 0xc9;
 }
 
 DRIVER_INIT( cavelon )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* banked ROM */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
@@ -391,7 +391,7 @@ DRIVER_INIT( mimonkey )
 		{ 0x80,0x87,0x81,0x87,0x83,0x00,0x84,0x01,0x01,0x86,0x86,0x80,0x86,0x00,0x86,0x86 }
 	};
 
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	int A, ctr = 0, line, col;
 
 	for( A = 0; A < 0x4000; A++ )
@@ -574,7 +574,7 @@ DRIVER_INIT( losttomb )
 DRIVER_INIT( hustler )
 {
 	offs_t A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 
 	for (A = 0;A < 0x4000;A++)
@@ -602,7 +602,7 @@ DRIVER_INIT( hustler )
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	{
-		rom = memory_region(machine, "audio");
+		rom = memory_region(machine, "audiocpu");
 
 
 		for (A = 0;A < 0x0800;A++)
@@ -613,7 +613,7 @@ DRIVER_INIT( hustler )
 DRIVER_INIT( billiard )
 {
 	offs_t A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 
 	for (A = 0;A < 0x4000;A++)
@@ -643,7 +643,7 @@ DRIVER_INIT( billiard )
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	{
-		rom = memory_region(machine, "audio");
+		rom = memory_region(machine, "audiocpu");
 
 
 		for (A = 0;A < 0x0800;A++)
@@ -671,8 +671,8 @@ DRIVER_INIT( mrkougb )
 DRIVER_INIT( ad2083 )
 {
 	UINT8 c;
-	int i, len = memory_region_length(machine, "main");
-	UINT8 *ROM = memory_region(machine, "main");
+	int i, len = memory_region_length(machine, "maincpu");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	for (i=0; i<len; i++)
 	{

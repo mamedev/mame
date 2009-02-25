@@ -252,7 +252,7 @@ static INTERRUPT_GEN( jackpool_interrupt )
 
 
 static MACHINE_DRIVER_START( jackpool )
-	MDRV_CPU_ADD("main", M68000, 12000000) // ?
+	MDRV_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MDRV_CPU_PROGRAM_MAP(jackpool_mem,0)
 	MDRV_CPU_VBLANK_INT("left",jackpool_interrupt)  // ?
 
@@ -289,7 +289,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( jackpool )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "jpc2", 0x00001, 0x20000,CRC(5aad51ff) SHA1(af504d15c356c241efb6410a5dad09494d693eca) )
 	ROM_LOAD16_BYTE( "jpc3", 0x00000, 0x20000,CRC(249c7073) SHA1(e654232d5f454932a108591deacadc9da9fd8055) )
 

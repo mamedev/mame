@@ -309,7 +309,7 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	airbustr_bankswitch(space->machine, "audio", 3, data);
+	airbustr_bankswitch(space->machine, "audiocpu", 3, data);
 }
 
 static READ8_HANDLER( soundcommand_status_r )
@@ -621,10 +621,10 @@ static MACHINE_DRIVER_START( airbustr )
 	MDRV_CPU_IO_MAP(slave_io_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(slave_interrupt, 2)		// nmi caused by main cpu, ?
 
-	MDRV_CPU_ADD("audio", Z80, 6000000)	// ???
+	MDRV_CPU_ADD("audiocpu", Z80, 6000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_IO_MAP(sound_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
 
 	MDRV_QUANTUM_TIME(HZ(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
@@ -634,7 +634,7 @@ static MACHINE_DRIVER_START( airbustr )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -679,7 +679,7 @@ ROM_START( airbustr )
 	ROM_LOAD( "pr13.l15",   0x00000, 0x0c000, CRC(13b2257b) SHA1(325efa54e757a1f08caf81801930d61ea4e7b6d4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x24000, "audio", 0 )
+	ROM_REGION( 0x24000, "audiocpu", 0 )
 	ROM_LOAD( "pr-21.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
@@ -703,7 +703,7 @@ ROM_START( airbustj )
 	ROM_LOAD( "pr-11j.bin", 0x00000, 0x0c000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x24000, "audio", 0 )
+	ROM_REGION( 0x24000, "audiocpu", 0 )
 	ROM_LOAD( "pr-21.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
@@ -740,7 +740,7 @@ ROM_START( airbusb )
 	ROM_LOAD( "1.bin",   0x00000, 0x0c000, CRC(85464124) SHA1(8cce8dfdede48032c40d5f155fd58061866668de) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 
-	ROM_REGION( 0x24000, "audio", 0 )
+	ROM_REGION( 0x24000, "audiocpu", 0 )
 	ROM_LOAD( "2.bin",  0x00000, 0x0c000, CRC(6e0a5df0) SHA1(616b7c7aaf52a9a55b63c60717c1866940635cd4) )
 	ROM_CONTINUE(           0x10000, 0x14000 )
 

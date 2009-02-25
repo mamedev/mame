@@ -135,7 +135,7 @@ static WRITE8_HANDLER( cabaret_nmi_and_coins_w )
 
 static ADDRESS_MAP_START( cabaret_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0efff ) AM_ROM
-	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM AM_REGION("main", 0xf000)
+	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabaret_portmap, ADDRESS_SPACE_IO, 8 )
@@ -305,15 +305,15 @@ static INTERRUPT_GEN( cabaret_interrupt )
 
 static MACHINE_DRIVER_START( cabaret )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z180, XTAL_12MHz / 2)
+	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(cabaret_map,0)
 	MDRV_CPU_IO_MAP(cabaret_portmap,0)
-	MDRV_CPU_VBLANK_INT("main",cabaret_interrupt)
+	MDRV_CPU_VBLANK_INT("screen",cabaret_interrupt)
 
 	MDRV_MACHINE_RESET(cabaret)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -335,7 +335,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( cabaret )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	/* decrypt the program ROM */
@@ -357,7 +357,7 @@ static DRIVER_INIT( cabaret )
 }
 
 ROM_START( cabaret )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code */
 	ROM_LOAD( "cg-8v204.u97",  0x0000, 0x10000, CRC(44cebf77) SHA1(e3f4e4abf41388f0eed50cf9a0fd0b14aa2f8b93) )
 
 	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )

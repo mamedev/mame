@@ -231,7 +231,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( dogfgt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1500000)	/* 1.5 MHz ???? */
+	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)	/* ? controls music tempo */
 
@@ -241,7 +241,7 @@ static MACHINE_DRIVER_START( dogfgt )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -268,7 +268,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( dogfgt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bx00.52",        0x8000, 0x2000, CRC(e602a21c) SHA1(12c659608d04ffc35ea9c1c0e1e82a8aab9f24bb) )
 	ROM_LOAD( "bx01.37",        0xa000, 0x2000, CRC(4921c4fb) SHA1(995b9ac123110c5c6d34d90f706ed72afdeaa231) )
 	ROM_LOAD( "bx02-5.bin",     0xc000, 0x2000, CRC(d11b50c3) SHA1(99dbbc85e8ff66eadc48a9f65f800676b10e35e4) )
@@ -302,7 +302,7 @@ ROM_START( dogfgt )
 ROM_END
 
 ROM_START( dogfgtj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bx00.52",     0x8000, 0x2000, CRC(e602a21c) SHA1(12c659608d04ffc35ea9c1c0e1e82a8aab9f24bb) )
 	ROM_LOAD( "bx01.37",     0xa000, 0x2000, CRC(4921c4fb) SHA1(995b9ac123110c5c6d34d90f706ed72afdeaa231) )
 	ROM_LOAD( "bx02.36",     0xc000, 0x2000, CRC(91f1b9b3) SHA1(dd939538abf615d3a0271fd561038acc6a2a616d) )

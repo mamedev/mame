@@ -681,11 +681,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ladybug )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(ladybug_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -713,17 +713,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sraider )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sraider_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sraider_cpu2_map,0)
 	MDRV_CPU_IO_MAP(sraider_cpu2_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -765,7 +765,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ladybug )
-	ROM_REGION( 0x10000, "main", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
 	ROM_LOAD( "l1.c4", 0x0000, 0x1000, CRC(d09e0adb) SHA1(ddc1f849cbcefb64b70a26c2a4c993f0516af814) ) /* PCB silkscreened ROM1 */
 	ROM_LOAD( "l2.d4", 0x1000, 0x1000, CRC(88bc4a0a) SHA1(193c9f90b7550020c0923cb158dff7d5faa53bc6) ) /* PCB silkscreened ROM2 */
 	ROM_LOAD( "l3.e4", 0x2000, 0x1000, CRC(53e9efce) SHA1(1960e9cd896b6a65197aefc3f10348103552b598) ) /* PCB silkscreened ROM3 */
@@ -788,7 +788,7 @@ ROM_START( ladybug )
 ROM_END
 
 ROM_START( ladybugb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lb1a.cpu", 0x0000, 0x1000, CRC(ec135e54) SHA1(69fc6db04b28c25eda329fc88c235267ca93a09f) )
 	ROM_LOAD( "lb2a.cpu", 0x1000, 0x1000, CRC(3049c5c6) SHA1(51ceb70fa4789ff91c9bb1e157be5b6c09ff3c8e) )
 	ROM_LOAD( "lb3a.cpu", 0x2000, 0x1000, CRC(b0fef837) SHA1(37e9d8d157c3af12cd97534a42dd21f621ac501b) )
@@ -811,7 +811,7 @@ ROM_START( ladybugb )
 ROM_END
 
 ROM_START( ladybgb2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lb1b.cpu", 0x0000, 0x1000, CRC(35d61e65) SHA1(43b797f1882e0acbf6685deea82de77e78d2c917) )
 	ROM_LOAD( "lb2b.cpu", 0x1000, 0x1000, CRC(a13e0fe4) SHA1(9e2876d8390d2b072d064b197057089a25c13a4a) )
 	ROM_LOAD( "lb3b.cpu", 0x2000, 0x1000, CRC(ee8ac716) SHA1(ead222d2cd022ea3a4559e3cff08cabf2486eb68) )
@@ -834,7 +834,7 @@ ROM_START( ladybgb2 )
 ROM_END
 
 ROM_START( snapjack )
-	ROM_REGION( 0x10000, "main", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
 	ROM_LOAD( "sj1.c4", 0x0000, 0x1000, CRC(6b30fcda) SHA1(85e4ebbbe8e8d6c79a14387d7a6818abc9430037) ) /* PCB silkscreened ROM1 */
 	ROM_LOAD( "sj2.d4", 0x1000, 0x1000, CRC(1f1088d1) SHA1(0fd5204ea27e9bdd811e9ea21e9bbab84b916f4a) ) /* PCB silkscreened ROM2 */
 	ROM_LOAD( "sj3.e4", 0x2000, 0x1000, CRC(edd65f3a) SHA1(763d588f0755a22c0f24269e6f38979fd516693f) ) /* PCB silkscreened ROM3 */
@@ -857,7 +857,7 @@ ROM_START( snapjack )
 ROM_END
 
 ROM_START( cavenger )
-	ROM_REGION( 0x10000, "main", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
 	ROM_LOAD( "1.c4", 0x0000, 0x1000, CRC(9e0cc781) SHA1(f23bd6b9f427c26ac996a5c8ba29f356cf45c78a) ) /* PCB silkscreened ROM1 */
 	ROM_LOAD( "2.d4", 0x1000, 0x1000, CRC(5ce5b950) SHA1(170e3f8be592dcccb8868474f40f8f2223e8a8b5) ) /* PCB silkscreened ROM2 */
 	ROM_LOAD( "3.e4", 0x2000, 0x1000, CRC(bc28218d) SHA1(4b0f1b38a5837b7ffc9aec6c28c6eb72cfa46226) ) /* PCB silkscreened ROM3 */
@@ -880,7 +880,7 @@ ROM_START( cavenger )
 ROM_END
 
 ROM_START( dorodon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dorodon.0",   0x0000, 0x2000, CRC(460aaf26) SHA1(c4ea41cba4ac2d93fedec3c117a4470fee2a910f) )
 	ROM_LOAD( "dorodon.1",   0x2000, 0x2000, CRC(d2451eb6) SHA1(4154bfe50b7f75444d3f0c9be6bd2475fdba1938) )
 	ROM_LOAD( "dorodon.2",   0x4000, 0x2000, CRC(d3c6ee6c) SHA1(6971ecdc968810c19f8601efc3d389450156bb22) )
@@ -904,7 +904,7 @@ ROM_START( dorodon )
 ROM_END
 
 ROM_START( dorodon2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.3fg",        0x0000, 0x2000, CRC(4d05d6f8) SHA1(db12ad04295f0ce112b6e90fde94a53ed1d6c3b9) )
 	ROM_LOAD( "2.3h",         0x2000, 0x2000, CRC(27b43b09) SHA1(12a8a6b8665bb9d1967ec631a794aab564a50570) )
 	ROM_LOAD( "3.3k",         0x4000, 0x2000, CRC(38d2f295) SHA1(b4d2cfd6e9f03c3ef18dcf67326f4106749b62b1) )
@@ -929,7 +929,7 @@ ROM_START( dorodon2 )
 ROM_END
 
 ROM_START( sraider )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sraid3.r4",    0x0000, 0x2000, CRC(0f389774) SHA1(c67596e6bf00175ff0a241506cd2f88114d05933) )
 	ROM_LOAD( "sraid2.n4",    0x2000, 0x2000, CRC(38a48db0) SHA1(6f4f384d702fb8ee4bb2ef579638239d57e32ddd) )
 	ROM_LOAD( "sraid1.m4",    0x4000, 0x2000, CRC(2f302a4e) SHA1(3a902ce6858f38df88b60830bef4b1d45b09b2df) )
@@ -962,9 +962,9 @@ static DRIVER_INIT( dorodon )
 	/* decode the opcodes */
 
 	offs_t i;
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x6000);
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *table = memory_region(machine, "user1");
 
 	memory_set_decrypted_region(space, 0x0000, 0x5fff, decrypted);

@@ -708,11 +708,11 @@ static MACHINE_RESET( karnov )
 static MACHINE_DRIVER_START( karnov )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(karnov_readmem,karnov_writemem)
-	MDRV_CPU_VBLANK_INT("main", karnov_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", karnov_interrupt)
 
-	MDRV_CPU_ADD("audio", M6502, 1500000)	/* Accurate */
+	MDRV_CPU_ADD("audiocpu", M6502, 1500000)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(karnov_s_readmem,karnov_s_writemem)
 
 	MDRV_MACHINE_RESET(karnov)
@@ -720,7 +720,7 @@ static MACHINE_DRIVER_START( karnov )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -749,11 +749,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wndrplnt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(karnov_readmem,karnov_writemem)
-	MDRV_CPU_VBLANK_INT("main", karnov_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", karnov_interrupt)
 
-	MDRV_CPU_ADD("audio", M6502, 1500000)	/* Accurate */
+	MDRV_CPU_ADD("audiocpu", M6502, 1500000)	/* Accurate */
 	MDRV_CPU_PROGRAM_MAP(karnov_s_readmem,karnov_s_writemem)
 
 	MDRV_MACHINE_RESET(karnov)
@@ -761,7 +761,7 @@ static MACHINE_DRIVER_START( wndrplnt )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -789,7 +789,7 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( karnov )
-	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "dn08-5",       0x00000, 0x10000, CRC(db92c264) SHA1(bd4bcd984a3455eedd2b78dc2090c9d625025671) )
 	ROM_LOAD16_BYTE( "dn11-5",       0x00001, 0x10000, CRC(05669b4b) SHA1(c78d0da5afc66750dd9841a7d4f8f244d878c081) )
 	ROM_LOAD16_BYTE( "dn07-",        0x20000, 0x10000, CRC(fc14291b) SHA1(c92207cf70d4c887cd0f53208e8090c7f614c1d3) )
@@ -797,7 +797,7 @@ ROM_START( karnov )
 	ROM_LOAD16_BYTE( "dn06-5",       0x40000, 0x10000, CRC(29d64e42) SHA1(c07ff5f29b7ccd5fc97b5086bcae57ab6eb29330) )
 	ROM_LOAD16_BYTE( "dn09-5",       0x40001, 0x10000, CRC(072d7c49) SHA1(92195b89274d066a9c1f87dd810683ea66edaff4) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "dn05-5",       0x8000, 0x8000, CRC(fa1a31a8) SHA1(5007a625be03c546d2a78444d72c28761b10cdb0) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -825,7 +825,7 @@ ROM_START( karnov )
 ROM_END
 
 ROM_START( karnovj )
-	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "kar8",         0x00000, 0x10000, CRC(3e17e268) SHA1(3a63928bb0148175519540f9d891b03590094dfb) )
 	ROM_LOAD16_BYTE( "kar11",        0x00001, 0x10000, CRC(417c936d) SHA1(d31f9291f18c3d5e3c4430768396e1ac10fd9ea3) )
 	ROM_LOAD16_BYTE( "dn07-",        0x20000, 0x10000, CRC(fc14291b) SHA1(c92207cf70d4c887cd0f53208e8090c7f614c1d3) )
@@ -833,7 +833,7 @@ ROM_START( karnovj )
 	ROM_LOAD16_BYTE( "kar6",         0x40000, 0x10000, CRC(c641e195) SHA1(fa7a2eba70e730f72a8d868160af9c41f9b2e5b0) )
 	ROM_LOAD16_BYTE( "kar9",         0x40001, 0x10000, CRC(d420658d) SHA1(4c7e67a80e419b8b94eb015f7f0af0a01f00c28e) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "kar5",         0x8000, 0x8000, CRC(7c9158f1) SHA1(dfba7b3abd6b8d6991f0207cd252ee652a6050c2) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -861,7 +861,7 @@ ROM_START( karnovj )
 ROM_END
 
 ROM_START( wndrplnt )
-	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ea08.bin",   0x00000, 0x10000, CRC(b0578a14) SHA1(a420d1e8f80405161c86a123610ddf17c7ff07ff) )
 	ROM_LOAD16_BYTE( "ea11.bin",   0x00001, 0x10000, CRC(271edc6c) SHA1(6aa411fa4a3613018e7d971c5675f54d5765904d) )
 	ROM_LOAD16_BYTE( "ea07.bin",   0x20000, 0x10000, CRC(7095a7d5) SHA1(a7ee88cad03690a72a52b8ea2310416aa53febdd) )
@@ -869,7 +869,7 @@ ROM_START( wndrplnt )
 	ROM_LOAD16_BYTE( "ea06.bin",   0x40000, 0x10000, CRC(5951add3) SHA1(394552c29a6266becbdb36c3bd65fc1f56701d11) )
 	ROM_LOAD16_BYTE( "ea09.bin",   0x40001, 0x10000, CRC(c4b3cb1e) SHA1(006becbcdbbb3e666382e59e8fa5a5ebe06e5724) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound CPU */
 	ROM_LOAD( "ea05.bin",     0x8000, 0x8000, CRC(8dbb6231) SHA1(342faa020448ce916e820b3df18d44191983f7a6) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -897,7 +897,7 @@ ROM_START( wndrplnt )
 ROM_END
 
 ROM_START( chelnovu )
-	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ee08-a.j15",   0x00000, 0x10000, CRC(2f2fb37b) SHA1(f89b424099097a95cf184d20a15b876c5b639552) )
 	ROM_LOAD16_BYTE( "ee11-a.j20",   0x00001, 0x10000, CRC(f306d05f) SHA1(e523ffd17fb0104fe28eac288b6ebf7fc0ea2908) )
 	ROM_LOAD16_BYTE( "ee07-a.j14",   0x20000, 0x10000, CRC(9c69ed56) SHA1(23606d2fc7c550eaddf0fd4b0da1a4e2c9263e14) )
@@ -905,7 +905,7 @@ ROM_START( chelnovu )
 	ROM_LOAD16_BYTE( "ee06-e.j13",   0x40000, 0x10000, CRC(55acafdb) SHA1(9dc0528c888dd73617f8cab76690b9296715680a) )
 	ROM_LOAD16_BYTE( "ee09-e.j17",   0x40001, 0x10000, CRC(303e252c) SHA1(d5d2570e42aa1e1b3600d14cc694677248e12750) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -930,7 +930,7 @@ ROM_START( chelnovu )
 ROM_END
 
 ROM_START( chelnov )
-	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "ee08-e.j16",   0x00000, 0x10000, CRC(8275cc3a) SHA1(961166226b68744eef15fed6a306010757b83556) )
 	ROM_LOAD16_BYTE( "ee11-e.j19",   0x00001, 0x10000, CRC(889e40a0) SHA1(e927f32d9bc448a331fb7b3478b2d07154f5013b) )
 	ROM_LOAD16_BYTE( "a-j14.bin",    0x20000, 0x10000, CRC(51465486) SHA1(e165e754eb756db3abc1f8477171ab817d03a890) )
@@ -938,7 +938,7 @@ ROM_START( chelnov )
 	ROM_LOAD16_BYTE( "ee06-e.j13",   0x40000, 0x10000, CRC(55acafdb) SHA1(9dc0528c888dd73617f8cab76690b9296715680a) )
 	ROM_LOAD16_BYTE( "ee09-e.j17",   0x40001, 0x10000, CRC(303e252c) SHA1(d5d2570e42aa1e1b3600d14cc694677248e12750) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -963,7 +963,7 @@ ROM_START( chelnov )
 ROM_END
 
 ROM_START( chelnovj )
-	ROM_REGION( 0x60000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "a-j15.bin",    0x00000, 0x10000, CRC(1978cb52) SHA1(833b8e80445ec2384e0479afb7430b32d6a14441) )
 	ROM_LOAD16_BYTE( "a-j20.bin",    0x00001, 0x10000, CRC(e0ed3d99) SHA1(f47aaec5c72ecc308c32cdcf117ef4965ac5ea61) )
 	ROM_LOAD16_BYTE( "a-j14.bin",    0x20000, 0x10000, CRC(51465486) SHA1(e165e754eb756db3abc1f8477171ab817d03a890) )
@@ -971,7 +971,7 @@ ROM_START( chelnovj )
 	ROM_LOAD16_BYTE( "a-j13.bin",    0x40000, 0x10000, CRC(cd991507) SHA1(9da858ea41bfbce78496c086e3b462ea9f3722e8) )
 	ROM_LOAD16_BYTE( "a-j17.bin",    0x40001, 0x10000, CRC(977f601c) SHA1(b40a37160b493dcb614922c2a9b4b5f140b62aca) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 6502 Sound CPU */
 	ROM_LOAD( "ee05-.f3",     0x8000, 0x8000, CRC(6a8936b4) SHA1(2b72cb749e6bddb67c2bd3d27b3a92511f9ef016) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -1017,7 +1017,7 @@ static DRIVER_INIT( wndrplnt )
 
 static DRIVER_INIT( chelnov )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 
 	microcontroller_id=CHELNOV;
 	coin_mask=0xe0;
@@ -1027,7 +1027,7 @@ static DRIVER_INIT( chelnov )
 
 static DRIVER_INIT( chelnovw )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 
 	microcontroller_id=CHELNOVW;
 	coin_mask=0xe0;
@@ -1037,7 +1037,7 @@ static DRIVER_INIT( chelnovw )
 
 static DRIVER_INIT( chelnovj )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 
 	microcontroller_id=CHELNOVJ;
 	coin_mask=0xe0;

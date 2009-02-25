@@ -932,12 +932,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( galpanic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_12MHz) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(galpanic,0)
 	MDRV_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -974,7 +974,7 @@ static MACHINE_DRIVER_START( comad )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galpanic)
-	MDRV_CPU_REPLACE("main", M68000, 10000000)
+	MDRV_CPU_REPLACE("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(comad_readmem,comad_writemem)
 
 	/* video hardware */
@@ -986,7 +986,7 @@ static MACHINE_DRIVER_START( supmodel )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
-	MDRV_CPU_REPLACE("main", M68000, 12000000)	/* ? */
+	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(supmodel_readmem,supmodel_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
 
@@ -1005,7 +1005,7 @@ static MACHINE_DRIVER_START( fantsia2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
-	MDRV_CPU_REPLACE("main", M68000, 12000000)	/* ? */
+	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(fantsia2_readmem,fantsia2_writemem)
 
 	/* video hardware */
@@ -1017,7 +1017,7 @@ static MACHINE_DRIVER_START( galhustl )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
-	MDRV_CPU_REPLACE("main", M68000, 12000000)	/* ? */
+	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(galhustl_readmem,galhustl_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
@@ -1034,7 +1034,7 @@ static MACHINE_DRIVER_START( zipzap )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(comad)
-	MDRV_CPU_REPLACE("main", M68000, 12000000)	/* ? */
+	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(zipzap_readmem,zipzap_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(galhustl_interrupt,3)
 
@@ -1055,7 +1055,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( galpanic ) /* PAMERA-04 PCB with the PAMERA-SUB daughter card and unpopulated CALC1 MCU socket */
-	ROM_REGION( 0x400000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x400000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "pm110.4m2",    0x000000, 0x80000, CRC(ae6b17a8) SHA1(f3a625eef45cc85cdf9760f77ea7ce93387911f9) )
 	ROM_LOAD16_BYTE( "pm109.4m1",    0x000001, 0x80000, CRC(b85d792d) SHA1(0ed78e15f6e58285ce6944200b023ada1e673b0e) )
 	ROM_LOAD16_BYTE( "pm112.subic6", 0x000000, 0x20000, CRC(7b972b58) SHA1(a7f619fca665b15f4f004ae739f5776ee2d4d432) ) /* Located on the PAMERA-SUB daughter card */
@@ -1078,7 +1078,7 @@ ROM_START( galpanic ) /* PAMERA-04 PCB with the PAMERA-SUB daughter card and unp
 ROM_END
 
 ROM_START( galpania ) /* PAMERA-04 PCB with the CALC1 MCU used */
-	ROM_REGION( 0x400000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x400000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "pm110.4m2",    0x000000, 0x80000, CRC(ae6b17a8) SHA1(f3a625eef45cc85cdf9760f77ea7ce93387911f9) )
 	ROM_LOAD16_BYTE( "pm109.4m1",    0x000001, 0x80000, CRC(b85d792d) SHA1(0ed78e15f6e58285ce6944200b023ada1e673b0e) )
 	ROM_LOAD16_BYTE( "pm004e.8",     0x100001, 0x80000, CRC(d3af52bc) SHA1(46be057106388578defecab1cdd1793ec76ebe92) )
@@ -1128,7 +1128,7 @@ scr*   - gfx
 
 // fantasy 95 - derived from new fantasia?
 ROM_START( fantsy95 )
-	ROM_REGION( 0x500000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "prog2.12",  0x000000, 0x80000, CRC(1e684da7) SHA1(2104a6fb5f019011009f4faa769afcada90cff97) )
 	ROM_LOAD16_BYTE( "prog1.7",   0x000001, 0x80000, CRC(dc4e4f6b) SHA1(9934121692a6d32164bef03c72c25dc727438e54) )
 	ROM_LOAD16_BYTE( "i-scr2.10", 0x100000, 0x80000, CRC(ab8756ff) SHA1(0a7aa977151962e67b15a7e0f819b1412ff8dbdc) )
@@ -1151,7 +1151,7 @@ ROM_START( fantsy95 )
 ROM_END
 
 ROM_START( newfant )
-	ROM_REGION( 0x500000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "prog2_12.rom", 0x000000, 0x80000, CRC(de43a457) SHA1(91db13f63b46146131c58e775119ea3b073ca409) )
 	ROM_LOAD16_BYTE( "prog1_07.rom", 0x000001, 0x80000, CRC(370b45be) SHA1(775873df9d3af803dbd1a392a45cad5f37b1b1c7) )
 	ROM_LOAD16_BYTE( "iscr2_10.rom", 0x100000, 0x80000, CRC(4f2da2eb) SHA1(4f0b72327d1bdfad24d822953f45218bfae29cff) )
@@ -1174,7 +1174,7 @@ ROM_START( newfant )
 ROM_END
 
 ROM_START( missw96 )
-	ROM_REGION( 0x500000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "mw96_10.bin",  0x000000, 0x80000, CRC(b1309bb1) SHA1(3cc7a903cb007d8fc0f836a33780c1c9231d1629) )
 	ROM_LOAD16_BYTE( "mw96_06.bin",  0x000001, 0x80000, CRC(a5892bb3) SHA1(99130eb0af307fe66c9668414475e003f9c7d969) )
 	ROM_LOAD16_BYTE( "mw96_09.bin",  0x100000, 0x80000, CRC(7032dfdf) SHA1(53728b60d0c772f6d936be47e21b069d0a75a2b4) )
@@ -1195,7 +1195,7 @@ ROM_START( missw96 )
 ROM_END
 
 ROM_START( missmw96 )
-	ROM_REGION( 0x500000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "mmw96_10.bin",  0x000000, 0x80000, CRC(45ed1cd9) SHA1(a75b1b6cddde065e6d7f7355a746819c8268c24f) )
 	ROM_LOAD16_BYTE( "mmw96_06.bin",  0x000001, 0x80000, CRC(52ec9e5d) SHA1(20b7cc923e9d55e391b09d96248837bb8f28a176) )
 	ROM_LOAD16_BYTE( "mmw96_09.bin",  0x100000, 0x80000, CRC(6c458b05) SHA1(249490c45cdecd6496338286a9ab6a6137cefcd0) )
@@ -1216,7 +1216,7 @@ ROM_START( missmw96 )
 ROM_END
 
 ROM_START( fantsia2 )
-	ROM_REGION( 0x500000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "prog2.g17",    0x000000, 0x80000, CRC(57c59972) SHA1(4b1da928b537cf340a67026d07bc3dfc078b0d0f) )
 	ROM_LOAD16_BYTE( "prog1.f17",    0x000001, 0x80000, CRC(bf2d9a26) SHA1(92f0c1bd32f1e5e0ede3ba847242a212dfae4986) )
 	ROM_LOAD16_BYTE( "scr2.g16",     0x100000, 0x80000, CRC(887b1bc5) SHA1(b6fcdc8a56ea25758f363224d256e9b6c8e30244) )
@@ -1240,7 +1240,7 @@ ROM_START( fantsia2 )
 ROM_END
 
 ROM_START( fntsia2a )
-	ROM_REGION( 0x500000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "fnt2-22.bin",    0x000000, 0x80000, CRC(a3a92c4b) SHA1(6affdcb57e1e0a77c7cc33135dafe86843e9e3d8) )
 	ROM_LOAD16_BYTE( "fnt2-17.bin",    0x000001, 0x80000, CRC(d0ce4493) SHA1(9cec088e6630555b6d584df23236c279909820cf) )
 	ROM_LOAD16_BYTE( "fnt2-21.bin",    0x100000, 0x80000, CRC(e989c2e7) SHA1(c9eea2a89843cdd9db4a4a0539d0315c125e3e02) )
@@ -1264,7 +1264,7 @@ ROM_START( fntsia2a )
 ROM_END
 
 ROM_START( galhustl )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ue17.3", 0x00000, 0x80000, CRC(b2583dbb) SHA1(536f4aa2246ec816c4f270f9d42acc090718ee8b) )
 	ROM_LOAD16_BYTE( "ud17.4", 0x00001, 0x80000, CRC(470a3668) SHA1(ad86e96ab8f1f5da23fb1feaabfb9c757965418e) )
 
@@ -1294,7 +1294,7 @@ Zip Zap (pcb marked Barko Corp 950509)
 */
 
 ROM_START( zipzap )
-	ROM_REGION( 0x500000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x500000, "maincpu", 0 ) /* 68000 Code */
 	/* all the roms for this game could do with checking on another board, this one was in pretty bad condition
        and reads weren't always consistent */
 	ROM_LOAD16_BYTE( "ud17.bin", 0x000001, 0x40000, BAD_DUMP CRC(2901fae1) SHA1(0d6ca6d48c5586c05f3c02aee51a95da38b3751f) )
@@ -1322,7 +1322,7 @@ ROM_START( zipzap )
 ROM_END
 
 ROM_START( supmodel )
-	ROM_REGION( 0x500000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x500000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "prog2.12",  0x000000, 0x80000, CRC(714b7e74) SHA1(a4f7754a4b04729084ccb1359f9bdfbad6150222) )
 	ROM_LOAD16_BYTE( "prog1.7",   0x000001, 0x80000, CRC(0bb858de) SHA1(bd2039fa46fce89289e99a790400bd567f90105e) )
 	ROM_LOAD16_BYTE( "i-scr2.10", 0x100000, 0x80000, CRC(d07ec0ce) SHA1(88997254ea2bffa83ab4a77087905cf646ee3c12) )

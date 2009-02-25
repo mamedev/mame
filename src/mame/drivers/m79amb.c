@@ -167,7 +167,7 @@ static INTERRUPT_GEN( m79amb_interrupt )
 
 static DRIVER_INIT( m79amb )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	/* PROM data is active low */
@@ -178,12 +178,12 @@ static DRIVER_INIT( m79amb )
 static MACHINE_DRIVER_START( m79amb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 1996800)
+	MDRV_CPU_ADD("maincpu", 8080, 1996800)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", m79amb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", m79amb_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -198,7 +198,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( m79amb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "m79.10t",      0x0000, 0x0200, CRC(ccf30b1e) SHA1(c1a77f8dc81c491928f81121ca5c9b7f8753794f) )
 	ROM_LOAD( "m79.9t",       0x0200, 0x0200, CRC(daf807dd) SHA1(16cd9d553bfb111c8380966cbde39dbddd5fe58c) )
 	ROM_LOAD( "m79.8t",       0x0400, 0x0200, CRC(79fafa02) SHA1(440620f5be44febdd7c64014739dc71fb570cc92) )

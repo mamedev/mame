@@ -229,12 +229,12 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( shisen )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 6000000)	/* 6 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 3579645)
+	MDRV_CPU_ADD("soundcpu", Z80, 3579645)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -243,7 +243,7 @@ static MACHINE_DRIVER_START( shisen )
 	MDRV_MACHINE_RESET(m72_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -278,12 +278,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( sichuan2 )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k+128k for main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k+128k for main CPU */
 	ROM_LOAD( "ic06.06",      0x00000, 0x10000, CRC(98a2459b) SHA1(42102cf2921f80be7600b11aba63538e3b3858ec) )
 	ROM_RELOAD(               0x10000, 0x10000 )
 	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -312,12 +312,12 @@ ROM_START( sichuan2 )
 ROM_END
 
 ROM_START( sichuana )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k+128k for main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k+128k for main CPU */
 	ROM_LOAD( "sichuan.a6",   0x00000, 0x10000, CRC(f8ac05ef) SHA1(cd20e5239d73264f1323ba6b1e35934685852ba1) )
 	ROM_RELOAD(               0x10000, 0x10000 )
 	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -346,11 +346,11 @@ ROM_START( sichuana )
 ROM_END
 
 ROM_START( shisen )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k+128k for main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k+128k for main CPU */
 	ROM_LOAD( "a-27-a.rom",   0x00000, 0x20000, CRC(de2ecf05) SHA1(7256c5587f92db10a52c43001e3236f3be3df5df) )
 	ROM_RELOAD(               0x10000, 0x20000 )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -418,12 +418,12 @@ ROMs  : (All ROMs type 27C512)
 */
 
 ROM_START( matchit )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k+128k for main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k+128k for main CPU */
 	ROM_LOAD( "2.11d",      0x00000, 0x10000, CRC(299815f7) SHA1(dd25f69d3c825e12e5c2e24b5bbfda9c39400345) )
 	ROM_RELOAD(               0x10000, 0x10000 )
 	ROM_LOAD( "ic07.03",      0x20000, 0x10000, CRC(0350f6e2) SHA1(c683571969c0e4c66eb316a1bc580759db02bbfc) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic01.01",      0x00000, 0x10000, CRC(51b0a26c) SHA1(af2482cfe8d395848c8e1bf07bf1049ffc6ee69b) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )

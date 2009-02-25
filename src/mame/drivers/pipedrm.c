@@ -124,11 +124,11 @@ static UINT8 sound_command;
 static MACHINE_RESET( pipedrm )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 	memory_set_bank(machine, 1, 0);
 
 	/* initialize sound bank */
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audio") + 0x10000, 0x8000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x8000);
 	memory_set_bank(machine, 2, 0);
 	/* state save */
 	state_save_register_global(machine, pending_command);
@@ -549,19 +549,19 @@ static const ym2610_interface ym2610_config =
 static MACHINE_DRIVER_START( pipedrm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,14318000/4)
+	MDRV_CPU_ADD("audiocpu", Z80,14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_MACHINE_RESET(pipedrm)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -588,19 +588,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hatris )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,14318000/4)
+	MDRV_CPU_ADD("audiocpu", Z80,14318000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(hatris_sound_portmap,0)
 
 	MDRV_MACHINE_RESET(pipedrm)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -632,11 +632,11 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( pipedrm )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "01.u12",	0x00000, 0x08000, CRC(9fe261fb) SHA1(57beeeade8809be0a71086f55b14b1676c0b3759) )
 	ROM_LOAD( "02.u11",	0x10000, 0x10000, CRC(c8209b67) SHA1(cca7356d75e8091b07e3328aef523ff452abbcd8) )
 
-	ROM_REGION( 0x20000, "audio", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "4",	0x00000, 0x08000, CRC(497fad4c) SHA1(f151543a0c4a1d6d5d2de5e1dc12fd59dabcf1a8) )
 	ROM_LOAD( "3",	0x10000, 0x10000, CRC(4800322a) SHA1(a616c497ac18351b68b8307050a2a62c717a7873) )
 
@@ -667,11 +667,11 @@ ROM_END
 
 
 ROM_START( pipedrmj )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "1",	0x00000, 0x08000, CRC(dbfac46b) SHA1(98ddfaed61de28b238964445572eb398b9dd03c7) )
 	ROM_LOAD( "2",	0x10000, 0x10000, CRC(b7adb99a) SHA1(fdab2b99e86aa0b6b17ec95556222e5211ba55e9) )
 
-	ROM_REGION( 0x20000, "audio", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "4",	0x00000, 0x08000, CRC(497fad4c) SHA1(f151543a0c4a1d6d5d2de5e1dc12fd59dabcf1a8) )
 	ROM_LOAD( "3",	0x10000, 0x10000, CRC(4800322a) SHA1(a616c497ac18351b68b8307050a2a62c717a7873) )
 
@@ -702,10 +702,10 @@ ROM_END
 
 
 ROM_START( hatris )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2-ic79.bin",	0x00000, 0x08000, CRC(bbcaddbf) SHA1(7f01493dadfed87112644a8ef77ae58fa273980d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1-ic81.bin",	0x00000, 0x08000, CRC(db25e166) SHA1(3538963d092967311d0a216b1e33ea39389b0d87) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )

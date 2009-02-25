@@ -161,13 +161,13 @@ static MACHINE_RESET( tickee )
 
 static READ8_DEVICE_HANDLER( port1_r )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	return input_port_read(device->machine, "IN0") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
 }
 
 static READ8_DEVICE_HANDLER( port2_r )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	return input_port_read(device->machine, "IN2") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
 }
 
@@ -407,7 +407,7 @@ static const ay8910_interface ay8910_interface_2 =
 static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	VIDEO_CLOCK/2,					/* pixel clock */
 	1,								/* pixels per clock */
 	scanline_update,				/* scanline callback */
@@ -427,7 +427,7 @@ static const tms34010_config tms_config =
 static MACHINE_DRIVER_START( tickee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS34010, XTAL_40MHz)
+	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(tickee_map,0)
 
@@ -438,7 +438,7 @@ static MACHINE_DRIVER_START( tickee )
 	MDRV_VIDEO_START(tickee)
 	MDRV_VIDEO_UPDATE(tms340x0)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)
 
@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( ghoshunt )
 	MDRV_IMPORT_FROM(tickee)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ghoshunt_map,0)
 MACHINE_DRIVER_END
 

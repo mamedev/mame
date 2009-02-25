@@ -298,7 +298,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( beaminv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 2000000)	/* 2 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 2000000)	/* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
 
@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( beaminv )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(beaminv)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 247, 16, 231)
@@ -325,7 +325,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( beaminv )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0a", 0x0000, 0x0400, CRC(17503086) SHA1(18c789216e5c4330dba3eeb24919dae636bf803d) )
 	ROM_LOAD( "1a", 0x0400, 0x0400, CRC(aa9e1666) SHA1(050e2bd169f1502f49b7e6f5f2df9dac0d8107aa) )
 	ROM_LOAD( "2a", 0x0800, 0x0400, CRC(ebaa2fc8) SHA1(b4ff1e1bdfe9efdc08873bba2f0a30d24678f9d8) )
@@ -336,7 +336,7 @@ ROM_END
 
 
 ROM_START( beaminva )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom_0", 0x0000, 0x0400, CRC(67e100dd) SHA1(5f58e2ed3da14c48f7c382ee6091a59caf8e0609) )
 	ROM_LOAD( "rom_1", 0x0400, 0x0400, CRC(442bbe98) SHA1(0e0382d4f6491629449759747019bd453a458b66) )
 	ROM_LOAD( "rom_2", 0x0800, 0x0400, CRC(5d5d2f68) SHA1(e363f9445bbba1492188efe1830cae96f6078878) )

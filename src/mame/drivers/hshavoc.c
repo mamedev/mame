@@ -134,12 +134,12 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( genesis_base )
 	/*basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 7)
-	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 7)
+	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK / 15)
+	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK / 15)
 	MDRV_CPU_PROGRAM_MAP(genesis_z80_readmem, genesis_z80_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* from vdp at scanline 0xe0 */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -149,7 +149,7 @@ static MACHINE_DRIVER_START( genesis_base )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(342,262)
@@ -172,7 +172,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hshavoc )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( genesis_base )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(topshoot_readmem,topshoot_writemem)
 
 	/* sound hardware */
@@ -181,7 +181,7 @@ static MACHINE_DRIVER_START( hshavoc )
 MACHINE_DRIVER_END
 
 ROM_START( hshavoc )
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "d-25.11a", 0x000000, 0x080000, CRC(6a155060) SHA1(ecb47bd428786e50e300a062b5038f943419a389) )
 	ROM_LOAD16_BYTE( "d-26.9a",  0x000001, 0x080000, CRC(1afa84fe) SHA1(041296e0360b7747aedc2d948c39e06ba03a7d08) )
 
@@ -195,7 +195,7 @@ ROM_END
 
 #ifdef UNUSED_DEFINITION
 ROM_START( hshavoc2 ) /* Genesis Version, for reference */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "hsh.rom", 0x000000, 0x100000, CRC(17be551c) SHA1(0dc1969098716ba332978b89356f62961417682b) )
 ROM_END
 #endif
@@ -210,7 +210,7 @@ static DRIVER_INIT(genesis)
 	/* hack -- fix vdp emulation instead */
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xC00004, 0xC00005, 0, 0, vdp_fake_r);
 
-	memory_set_bankptr(machine, 3, memory_region(machine, "main") );
+	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") );
 	memory_set_bankptr(machine, 4, genesis_68k_ram );
 }
 
@@ -218,7 +218,7 @@ static DRIVER_INIT(hshavoc)
 {
 
 	int x;
-	UINT16 *src = (UINT16 *)memory_region(machine, "main");
+	UINT16 *src = (UINT16 *)memory_region(machine, "maincpu");
 
 	static const UINT16 typedat[16] = {
 		1,1,1,1, 1,1,1,1,

@@ -219,17 +219,17 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( vaportra )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,12000000) /* Custom chip 59 */
+	MDRV_CPU_ADD("maincpu", M68000,12000000) /* Custom chip 59 */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", H6280, 32220000/4) /* Custom chip 45; Audio section crystal is 32.220 MHz */
+	MDRV_CPU_ADD("audiocpu", H6280, 32220000/4) /* Custom chip 45; Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -264,13 +264,13 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( vaportra )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
   	ROM_LOAD16_BYTE( "fl_02-1.bin", 0x00000, 0x20000, CRC(9ae36095) SHA1(c8d11a6033a44277a267915b4ca471c43acd1143) )
   	ROM_LOAD16_BYTE( "fl_00-1.bin", 0x00001, 0x20000, CRC(c08cc048) SHA1(b28f95856817b8a8cb6cc588d48e95196cbf52fd) )
 	ROM_LOAD16_BYTE( "fl_03.bin",   0x40000, 0x20000, CRC(80bd2844) SHA1(3fcaa409c7134388fa9458df8e8aaecc93f085e6) )
  	ROM_LOAD16_BYTE( "fl_01.bin",   0x40001, 0x20000, CRC(9474b085) SHA1(5510309ddab5fbf1dbb0a7b1e424a5dff5ec263d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fj04",    0x00000, 0x10000, CRC(e9aedf9b) SHA1(f7bcf8f666015140aaad8ee5cf619636934b7066) )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
@@ -302,13 +302,13 @@ ROM_START( vaportra )
 ROM_END
 
 ROM_START( vaportru )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
   	ROM_LOAD16_BYTE( "fj02",   0x00000, 0x20000, CRC(a2affb73) SHA1(0d49397cc9891047a0b92e92e2e3d0e7fcaf8db9) )
   	ROM_LOAD16_BYTE( "fj00",   0x00001, 0x20000, CRC(ef05e07b) SHA1(0e505709fa251e6b30f019c0c28ee9ba2b29a50a) )
 	ROM_LOAD16_BYTE( "fj03",   0x40000, 0x20000, CRC(44893379) SHA1(da1340bc1821a552c317cb9a7c1ba69eb080b055) )
  	ROM_LOAD16_BYTE( "fj01",   0x40001, 0x20000, CRC(97fbc107) SHA1(b2899eb4347c0471397b83051e46c94dff3526f5) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fj04",    0x00000, 0x10000, CRC(e9aedf9b) SHA1(f7bcf8f666015140aaad8ee5cf619636934b7066) )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
@@ -340,13 +340,13 @@ ROM_START( vaportru )
 ROM_END
 
 ROM_START( kuhga )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
   	ROM_LOAD16_BYTE( "fp02-3.bin", 0x00000, 0x20000, CRC(d0705ef4) SHA1(781efbf36d9dda543895e0a59cd4d72667439a93) )
   	ROM_LOAD16_BYTE( "fp00-3.bin", 0x00001, 0x20000, CRC(1da92e48) SHA1(6507bd9bbc31ee03e38b82cc135aebf090902761) )
 	ROM_LOAD16_BYTE( "fp03.bin",   0x40000, 0x20000, CRC(ea0da0f1) SHA1(ca40e694cb0aa0c13672c14fd4a389bc6d26cbc6) )
  	ROM_LOAD16_BYTE( "fp01.bin",   0x40001, 0x20000, CRC(e3ecbe86) SHA1(382e959111ec37ad94da8fd6dcefe2d2aab346b6) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fj04",    0x00000, 0x10000, CRC(e9aedf9b) SHA1(f7bcf8f666015140aaad8ee5cf619636934b7066) )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
@@ -763,7 +763,7 @@ C3D54*
 
 static DRIVER_INIT( vaportra )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	int i;
 
 	for (i=0x00000; i<0x80000; i++)

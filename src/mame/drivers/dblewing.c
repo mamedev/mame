@@ -664,18 +664,18 @@ static const ym2151_interface ym2151_config =
 
 static MACHINE_DRIVER_START( dblewing )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000)	/* DE102 */
+	MDRV_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
 	MDRV_CPU_PROGRAM_MAP(dblewing_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -744,17 +744,17 @@ MBE-02.8H    [5a6d3ac5]
 */
 
 ROM_START( dblewing )
-	ROM_REGION( 0x80000, "main", 0 ) /* DE102 code (encrypted) */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
 	ROM_LOAD16_BYTE( "kp_00-.3d",    0x000001, 0x040000, CRC(547dc83e) SHA1(f6f96bd4338d366f06df718093f035afabc073d1) )
 	ROM_LOAD16_BYTE( "kp_01-.5d",    0x000000, 0x040000, CRC(7a210c33) SHA1(ced89140af6d6a1bc0ffb7728afca428ed007165) )
 
-	ROM_REGION( 0x18000, "audio", 0 ) // sound cpu
+	ROM_REGION( 0x18000, "audiocpu", 0 ) // sound cpu
 	ROM_LOAD( "kp_02-.10h",    0x00000, 0x08000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 
 	ROM_REGION( 0x10000, "audio_data", 0 ) // sound data
-	ROM_COPY( "audio" ,  0x00000, 0x00000, 0x8000 )
-	ROM_COPY( "audio" ,  0x10000, 0x08000, 0x8000 )
+	ROM_COPY( "audiocpu" ,  0x00000, 0x00000, 0x8000 )
+	ROM_COPY( "audiocpu" ,  0x10000, 0x08000, 0x8000 )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mbe-02.8h",    0x00000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
@@ -774,7 +774,7 @@ ROM_END
 static DRIVER_INIT( dblewing )
 {
 	deco56_decrypt_gfx(machine, "gfx1");
-	deco102_decrypt_cpu(machine, "main", 0x399d, 0x25, 0x3d);
+	deco102_decrypt_cpu(machine, "maincpu", 0x399d, 0x25, 0x3d);
 }
 
 

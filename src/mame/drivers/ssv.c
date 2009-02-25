@@ -2800,13 +2800,13 @@ static DRIVER_INIT( jsk )			{	init_ssv();
 static MACHINE_DRIVER_START( ssv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V60, 16000000) /* Based on STA-0001 & STA-0001B System boards */
+	MDRV_CPU_ADD("maincpu", V60, 16000000) /* Based on STA-0001 & STA-0001B System boards */
 	MDRV_CPU_VBLANK_INT_HACK(ssv_interrupt,2)	/* Vblank */
 
 	MDRV_MACHINE_RESET(ssv)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(0x180, 0x100)
@@ -2831,13 +2831,13 @@ static MACHINE_DRIVER_START( drifto94 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drifto94_readmem, drifto94_writemem)
 
 	MDRV_NVRAM_HANDLER(ssv)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 4, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -2846,14 +2846,14 @@ static MACHINE_DRIVER_START( gdfs )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gdfs_readmem, gdfs_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(gdfs_interrupt,1+4)
 
 	MDRV_NVRAM_HANDLER(gdfs)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 
 	MDRV_GFXDECODE(gdfs)
@@ -2866,11 +2866,11 @@ static MACHINE_DRIVER_START( hypreact )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hypreact_readmem, hypreact_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(8, 0x148-1, 16, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -2879,11 +2879,11 @@ static MACHINE_DRIVER_START( hypreac2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hypreac2_readmem, hypreac2_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 8, 0xf8-1)
 MACHINE_DRIVER_END
 
@@ -2892,11 +2892,11 @@ static MACHINE_DRIVER_START( janjans1 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(janjans1_readmem, janjans1_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -2905,11 +2905,11 @@ static MACHINE_DRIVER_START( keithlcy )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(keithlcy_readmem, keithlcy_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 4, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -2918,13 +2918,13 @@ static MACHINE_DRIVER_START( meosism )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(meosism_readmem, meosism_writemem)
 
 	MDRV_NVRAM_HANDLER(ssv)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -2933,11 +2933,11 @@ static MACHINE_DRIVER_START( mslider )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mslider_readmem, mslider_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -2946,11 +2946,11 @@ static MACHINE_DRIVER_START( ryorioh )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ryorioh_readmem, ryorioh_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -2959,11 +2959,11 @@ static MACHINE_DRIVER_START( srmp4 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(srmp4_readmem, srmp4_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 4, 0xf4-1)
 MACHINE_DRIVER_END
 
@@ -2972,11 +2972,11 @@ static MACHINE_DRIVER_START( srmp7 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(srmp7_readmem, srmp7_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -2985,12 +2985,12 @@ static MACHINE_DRIVER_START( stmblade )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drifto94_readmem, drifto94_writemem)
 
 	MDRV_NVRAM_HANDLER(ssv)
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x158-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -2999,11 +2999,11 @@ static MACHINE_DRIVER_START( survarts )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(survarts_readmem, survarts_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 4, 0xf4-1)
 MACHINE_DRIVER_END
 
@@ -3011,7 +3011,7 @@ static MACHINE_DRIVER_START( dynagear )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(survarts)
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(8, 0x158-16-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -3020,13 +3020,13 @@ static MACHINE_DRIVER_START( eaglshot )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(eaglshot_readmem, eaglshot_writemem)
 
 	MDRV_NVRAM_HANDLER(ssv)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 8, 0xe8-1)
 
 	MDRV_GFXDECODE(eaglshot)
@@ -3039,13 +3039,13 @@ static MACHINE_DRIVER_START( sxyreact )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sxyreact_readmem, sxyreact_writemem)
 
 	MDRV_NVRAM_HANDLER(ssv)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -3054,11 +3054,11 @@ static MACHINE_DRIVER_START( twineag2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(twineag2_readmem, twineag2_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -3067,11 +3067,11 @@ static MACHINE_DRIVER_START( ultrax )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ultrax_readmem, ultrax_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 
@@ -3079,14 +3079,14 @@ static MACHINE_DRIVER_START( jsk )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ssv)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(jsk_readmem, jsk_writemem)
 
 	MDRV_CPU_ADD("sub", V810,25000000)
 	MDRV_CPU_PROGRAM_MAP(jsk_v810_mem, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_DRIVER_END
 

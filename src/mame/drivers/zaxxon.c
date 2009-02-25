@@ -936,7 +936,7 @@ static const ppi8255_interface zaxxon_ppi_intf =
 
 static const ppi8255_interface congo_ppi_intf =
 {
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -985,9 +985,9 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( root )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/16)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
 	MDRV_CPU_PROGRAM_MAP(zaxxon_map, 0)
-	MDRV_CPU_VBLANK_INT("main", vblank_int)
+	MDRV_CPU_VBLANK_INT("screen", vblank_int)
 
 	MDRV_MACHINE_START(zaxxon)
 
@@ -997,7 +997,7 @@ static MACHINE_DRIVER_START( root )
 	MDRV_GFXDECODE(zaxxon)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -1046,12 +1046,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( congo )
 	MDRV_IMPORT_FROM(root)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(congo_map, 0)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255", congo_ppi_intf )
 
-	MDRV_CPU_ADD("audio", Z80, SOUND_CLOCK)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(congo_sound_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/16/16/16/4)
 
@@ -1081,7 +1081,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( zaxxon )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "zaxxon3.u27",  0x0000, 0x2000, CRC(6e2b4a30) SHA1(80ac53c554c84226b119cbe3cf3470bcdbcd5762) )
 	ROM_LOAD( "zaxxon2.u28",  0x2000, 0x2000, CRC(1c9ea398) SHA1(0cd259be3fa80f3d53dfa76d5ca06773cdfe5945) )
 	ROM_LOAD( "zaxxon1.u29",  0x4000, 0x1000, CRC(1c123ef9) SHA1(2588be06ea7baca6112d58c78a1eeb98aad8a02e) )
@@ -1112,7 +1112,7 @@ ROM_START( zaxxon )
 ROM_END
 
 ROM_START( zaxxon2 )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "zaxxon3a.u27", 0x0000, 0x2000, CRC(b18e428a) SHA1(d3ff077e37a3ed8a9cc32cba19e1694b79df6b30) )
 	ROM_LOAD( "zaxxon2.u28",  0x2000, 0x2000, CRC(1c9ea398) SHA1(0cd259be3fa80f3d53dfa76d5ca06773cdfe5945) )
 	ROM_LOAD( "zaxxon1a.u29", 0x4000, 0x1000, CRC(1977d933) SHA1(b0100a51a85928b8df3b07b27c9e7e4f929d7893) )
@@ -1143,7 +1143,7 @@ ROM_START( zaxxon2 )
 ROM_END
 
 ROM_START( zaxxonb )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "zaxxonb3.u27", 0x0000, 0x2000, CRC(125bca1c) SHA1(f4160966d42e5282736cde8a276204ba8910ca61) )
 	ROM_LOAD( "zaxxonb2.u28", 0x2000, 0x2000, CRC(c088df92) SHA1(c0c6cd8dcf6db65129980331fa9ecc3800b63436) )
 	ROM_LOAD( "zaxxonb1.u29", 0x4000, 0x1000, CRC(e7bdc417) SHA1(209f0d259f60b984c84229bb31af1ef939adc73e) )
@@ -1175,7 +1175,7 @@ ROM_END
 
 
 ROM_START( szaxxon )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "suzaxxon3.u27",  0x0000, 0x2000, CRC(af7221da) SHA1(b5d3beb296d52ed69b4ceacf329c20a72e3a1dce) )
 	ROM_LOAD( "suzaxxon2.u28",  0x2000, 0x2000, CRC(1b90fb2a) SHA1(afb2bd2ffee3f5e589064f59b6ac21ed915094df) )
 	ROM_LOAD( "suzaxxon1.u29",  0x4000, 0x1000, CRC(07258b4a) SHA1(91e3a0c0df6c9cf66980d1ffcc3830ffdbef8c2f) )
@@ -1207,7 +1207,7 @@ ROM_END
 
 
 ROM_START( futspy )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "fs_snd.u27",   0x0000, 0x2000, CRC(7578fe7f) SHA1(ab42bdf74b07c1ba5337c3d34647d3ee16f9db05) )
 	ROM_LOAD( "fs_snd.u28",   0x2000, 0x2000, CRC(8ade203c) SHA1(f095f4019befff7af4203c886ef42357f79592a1) )
 	ROM_LOAD( "fs_snd.u29",   0x4000, 0x1000, CRC(734299c3) SHA1(12acf71d9d00e0e0df29c4d8c397ad407266b364) )
@@ -1239,7 +1239,7 @@ ROM_END
 
 
 ROM_START( razmataz )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "u27",           0x0000, 0x2000, CRC(254f350f) SHA1(f8e84778b7ffc4da76e97992f01c742c212480cf) )
 	ROM_LOAD( "u28",           0x2000, 0x2000, CRC(3a1eaa99) SHA1(d1f2a61a8548135c9754097aa468672616244710) )
 	ROM_LOAD( "u29",           0x4000, 0x2000, CRC(0ee67e78) SHA1(c6c703000a4e0da8af65be53b2a6b2ef67860c30) )
@@ -1275,7 +1275,7 @@ ROM_END
 
 
 ROM_START( ixion )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "1937d.u27",      0x0000, 0x2000, CRC(f447aac5) SHA1(f6ec02f20482649ba1765254e0e67a8593075092) )
 	ROM_LOAD( "1938b.u28",      0x2000, 0x2000, CRC(17f48640) SHA1(d661e8ae0747c2c526360cb72e403deba7a98e71) )
 	ROM_LOAD( "1955b.u29",      0x4000, 0x1000, CRC(78636ec6) SHA1(afca6418221e700749031cb3fa738907d77c1566) )
@@ -1311,13 +1311,13 @@ ROM_END
 
 
 ROM_START( congo )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "congo1.u35",   0x0000, 0x2000, CRC(09355b5b) SHA1(0085ac7eb0035a88cb54cdd3dd6b2643141d39db) )
 	ROM_LOAD( "congo2.u34",   0x2000, 0x2000, CRC(1c5e30ae) SHA1(7cc5420e0e7a2793a671b938c121ae4079f5b1b8) )
 	ROM_LOAD( "congo3.u33",   0x4000, 0x2000, CRC(5ee1132c) SHA1(26294cd69ee43dfd29fc3642e8c04552dcdbaa49) )
 	ROM_LOAD( "congo4.u32",   0x6000, 0x2000, CRC(5332b9bf) SHA1(8440cc6f92918b3b467a5a0b86c9defeb0a7db0e) )
 
-	ROM_REGION( 0x2000, "audio", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "congo17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
@@ -1346,13 +1346,13 @@ ROM_START( congo )
 ROM_END
 
 ROM_START( tiptop )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "tiptop1.u35",  0x0000, 0x2000, CRC(e19dc77b) SHA1(d3782dd55701e0f5cd426ad2771c1bd0264c366a) )
 	ROM_LOAD( "tiptop2.u34",  0x2000, 0x2000, CRC(3fcd3b6e) SHA1(2898807ee36fca7fbc06616c9a070604beb782b9) )
 	ROM_LOAD( "tiptop3.u33",  0x4000, 0x2000, CRC(1c94250b) SHA1(cb70a91d07b0a9c61a093f1b5d37f2e69d1345c1) )
 	ROM_LOAD( "tiptop4.u32",  0x6000, 0x2000, CRC(577b501b) SHA1(5cad98a60a5241ba9467aa03fcd94c7490e6dbbb) )
 
-	ROM_REGION( 0x2000, "audio", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "congo17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
@@ -1475,25 +1475,25 @@ static void zaxxonb_decode(running_machine *machine, const char *cputag)
 
 static DRIVER_INIT( zaxxonb )
 {
-	zaxxonb_decode(machine, "main");
+	zaxxonb_decode(machine, "maincpu");
 }
 
 
 static DRIVER_INIT( szaxxon )
 {
-	szaxxon_decode(machine, "main");
+	szaxxon_decode(machine, "maincpu");
 }
 
 
 static DRIVER_INIT( futspy )
 {
-	futspy_decode(machine, "main");
+	futspy_decode(machine, "maincpu");
 }
 
 
 static DRIVER_INIT( razmataz )
 {
-	nprinces_decode(machine, "main");
+	nprinces_decode(machine, "maincpu");
 
 	/* additional input ports are wired */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc004, 0xc004, 0, 0x18f3, input_port_read_handler8(machine->portconfig, "SW04"));
@@ -1514,7 +1514,7 @@ static DRIVER_INIT( razmataz )
 
 static DRIVER_INIT( ixion )
 {
-	szaxxon_decode(machine, "main");
+	szaxxon_decode(machine, "maincpu");
 
 	/* connect the universal sound board */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);

@@ -410,9 +410,9 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( eprom )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
+	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(extra_map,0)
@@ -427,7 +427,7 @@ static MACHINE_DRIVER_START( eprom )
 	MDRV_GFXDECODE(eprom)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
@@ -444,9 +444,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( klaxp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
+	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -458,7 +458,7 @@ static MACHINE_DRIVER_START( klaxp )
 	MDRV_GFXDECODE(eprom)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
@@ -474,9 +474,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( guts )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(guts_map,0)
-	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
+	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -488,7 +488,7 @@ static MACHINE_DRIVER_START( guts )
 	MDRV_GFXDECODE(guts)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
@@ -510,7 +510,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( eprom )
-	ROM_REGION( 0xa0000, "main", 0 )	/* 10*64k for 68000 code */
+	ROM_REGION( 0xa0000, "maincpu", 0 )	/* 10*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136069.50a",   0x00000, 0x10000, CRC(08888dec) SHA1(a0a137828b9e1efbdbc0e5ddaf4d73d24b36948a) )
 	ROM_LOAD16_BYTE( "136069.40a",   0x00001, 0x10000, CRC(29cb1e97) SHA1(ccf7024dccbd61983d61450f15c805422e4eee09) )
 	ROM_LOAD16_BYTE( "136069.50b",   0x20000, 0x10000, CRC(702241c9) SHA1(cba27e92f64fd201c16aed6a8f2dc64c4f887e4f) )
@@ -523,7 +523,7 @@ ROM_START( eprom )
 	ROM_REGION( 0x80000, "extra", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136069.10s",   0x00000, 0x10000, CRC(deff6469) SHA1(2fe4d42d60965581579e8edad49b86fbd321d1db) )
 	ROM_LOAD16_BYTE( "136069.10u",   0x00001, 0x10000, CRC(5d7afca2) SHA1(a37ecd2909049dd0b3ddbe602f0173c44b065f6f) )
-	ROM_COPY( "main", 0x60000,  0x60000, 0x20000 )
+	ROM_COPY( "maincpu", 0x60000,  0x60000, 0x20000 )
 
 	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k + 16k for 6502 code */
 	ROM_LOAD( "136069.7b",    0x10000, 0x4000, CRC(86e93695) SHA1(63ddab02df139dd41a8260c303798b2a550b9fe6) )
@@ -561,7 +561,7 @@ ROM_END
 
 
 ROM_START( eprom2 )
-	ROM_REGION( 0xa0000, "main", 0 )	/* 10*64k for 68000 code */
+	ROM_REGION( 0xa0000, "maincpu", 0 )	/* 10*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136069-1025.50a",   0x00000, 0x10000, CRC(b0c9a476) SHA1(6d0edeeb9458e92191f6623307eddc9b2f830d4d) )
 	ROM_LOAD16_BYTE( "136069-1024.40a",   0x00001, 0x10000, CRC(4cc2c50c) SHA1(088908cc57b07d71a5d664674e38fa02c55bb4fc) )
 	ROM_LOAD16_BYTE( "136069-1027.50b",   0x20000, 0x10000, CRC(84f533ea) SHA1(c1da671be5149bff26acd19b14cd18db0df695b7) )
@@ -576,7 +576,7 @@ ROM_START( eprom2 )
 	ROM_REGION( 0x80000, "extra", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136069-1035.10s",    0x00000, 0x10000, CRC(ffeb5647) SHA1(fbd9217a96e51dd0c0cbc0ba9dfdaaa36fbc1ae9) )
 	ROM_LOAD16_BYTE( "136069-1034.10u",    0x00001, 0x10000, CRC(c68f58dd) SHA1(0ec300f32e67b710ac33efb60b8eccceb43faca6) )
-	ROM_COPY( "main", 0x60000, 0x60000, 0x20000 )
+	ROM_COPY( "maincpu", 0x60000, 0x60000, 0x20000 )
 
 	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k + 16k for 6502 code */
 	ROM_LOAD( "136069.7b",    0x10000, 0x4000, CRC(86e93695) SHA1(63ddab02df139dd41a8260c303798b2a550b9fe6) )
@@ -614,7 +614,7 @@ ROM_END
 
 
 ROM_START( klaxp1 )
-	ROM_REGION( 0xa0000, "main", 0 )	/* 10*64k for 68000 code */
+	ROM_REGION( 0xa0000, "maincpu", 0 )	/* 10*64k for 68000 code */
 	ROM_LOAD16_BYTE( "klax_ft1.50a",   0x00000, 0x10000, CRC(87ee72d1) SHA1(39ae6f8406f0768480bcc80d395a14d9c2c65dca) )
 	ROM_LOAD16_BYTE( "klax_ft1.40a",   0x00001, 0x10000, CRC(ba139fdb) SHA1(98a8ac5e0349b934f55d0d9de85abacd3fd0d77d) )
 
@@ -638,7 +638,7 @@ ROM_END
 
 
 ROM_START( klaxp2 )
-	ROM_REGION( 0xa0000, "main", 0 )	/* 10*64k for 68000 code */
+	ROM_REGION( 0xa0000, "maincpu", 0 )	/* 10*64k for 68000 code */
 	ROM_LOAD16_BYTE( "klax_ft2.50a",   0x00000, 0x10000, CRC(7d401937) SHA1(8db0560528a86b9cb01c4598a49694bd44b00dba) )
 	ROM_LOAD16_BYTE( "klax_ft2.40a",   0x00001, 0x10000, CRC(c5ca33a9) SHA1(c2e2948f987ba43f61c043baed06ffea8787be43) )
 
@@ -662,7 +662,7 @@ ROM_END
 
 
 ROM_START( guts )
-	ROM_REGION( 0xa0000, "main", 0 )	/* 10*64k for 68000 code */
+	ROM_REGION( 0xa0000, "maincpu", 0 )	/* 10*64k for 68000 code */
 	ROM_LOAD16_BYTE( "guts-hi0.50a", 0x00000, 0x10000, CRC(3afca24a) SHA1(4910c958ac2124de13d4069420fb2cfd18b12cec) )
 	ROM_LOAD16_BYTE( "guts-lo0.40a", 0x00001, 0x10000, CRC(ce86cf23) SHA1(28504e2e8dcf1eaa96364eed1faf00fec9e98788) )
 	ROM_LOAD16_BYTE( "guts-hi1.50b", 0x20000, 0x10000, CRC(a231f65d) SHA1(9c8ccd265ed0e9f6d7181d216ed41a0c5cc0cd5f) )

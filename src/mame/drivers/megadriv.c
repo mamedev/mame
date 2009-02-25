@@ -643,7 +643,7 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 {
 	if (( source >= 0x000000 ) && ( source <= 0x3fffff ))
 	{
-		UINT16 *rom = (UINT16*)memory_region(machine, "main");
+		UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
 		return rom[(source&0x3fffff)>>1];
 	}
 	else if (( source >= 0xe00000 ) && ( source <= 0xffffff ))
@@ -2391,7 +2391,7 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 		UINT32 fulladdress;
 		fulladdress = genz80.z80_bank_addr + offset;
 
-		return memory_region(space->machine, "main")[fulladdress^1]; // ^1? better..
+		return memory_region(space->machine, "maincpu")[fulladdress^1]; // ^1? better..
 
 
 	}
@@ -3643,7 +3643,7 @@ static UINT32 pm_io(const address_space *space, int reg, int write, UINT32 d)
 			int addr = svp.pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *) memory_region(space->machine, "main");
+				UINT16 *ROM = (UINT16 *) memory_region(space->machine, "maincpu");
 				svp.pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
@@ -3845,7 +3845,7 @@ static UINT16 vdp_get_word_from_68k_mem_svp(running_machine *machine, UINT32 sou
 {
 	if ((source & 0xe00000) == 0x000000)
 	{
-		UINT16 *rom = (UINT16*)memory_region(machine, "main");
+		UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
 		source -= 2; // DMA latency
 		return rom[source >> 1];
 	}
@@ -3905,7 +3905,7 @@ static void svp_init(running_machine *machine)
 	svp.iram = auto_malloc(0x800);
 	memory_set_bankptr(machine,  3, svp.iram );
 	/* SVP ROM just shares m68k region.. */
-	ROM = memory_region(machine, "main");
+	ROM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine,  4, ROM + 0x800 );
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_svp;
@@ -6223,7 +6223,7 @@ static NVRAM_HANDLER( megadriv )
 
 
 MACHINE_DRIVER_START( megadriv )
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
 	/* IRQs are handled via the timers */
 
@@ -6267,7 +6267,7 @@ MACHINE_DRIVER_END
 /************ PAL hardware has a different master clock *************/
 
 MACHINE_DRIVER_START( megadpal )
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
 	/* IRQs are handled via the timers */
 
@@ -6466,7 +6466,7 @@ static void megadriv_init_common(running_machine *machine)
           some games specify a single address, (start 200001, end 200001)
           this usually means there is serial eeprom instead */
 		int i;
-		UINT16 *rom = (UINT16*)memory_region(machine, "main");
+		UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
 
 		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
 		for (i=0;i<12;i++)
@@ -6729,7 +6729,7 @@ ROM_START( 32x_bios )
 //  ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
 
-	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	// temp, rom should only be visible here when one of the regs is set, tempo needs it
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
 	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100)
@@ -6742,13 +6742,13 @@ ROM_START( 32x_bios )
 ROM_END
 
 ROM_START( segacd )
-	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "segacd_model2_bios_2_11_u.bin", 0x000000,  0x020000, CRC(2e49d72c) SHA1(328a3228c29fba244b9db2055adc1ec4f7a87e6b) )
 ROM_END
 
 /* some games use the 32x and SegaCD together to give better quality FMV */
 ROM_START( 32x_scd )
-	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
+	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
 	ROM_LOAD( "segacd_model2_bios_2_11_u.bin", 0x000000,  0x020000, CRC(2e49d72c) SHA1(328a3228c29fba244b9db2055adc1ec4f7a87e6b) )
@@ -6764,19 +6764,19 @@ ROM_START( 32x_scd )
 ROM_END
 
 ROM_START( g_virr )
-	ROM_REGION( 0x400000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "g_virr.bin", 0x000000, 0x200000, CRC(7e1a324a) SHA1(ff969ae53120cc4e7cb1a8a7e47458f2eb8a2165) )
 ROM_END
 ROM_START( g_virrj )
-	ROM_REGION( 0x400000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "g_virrj.bin", 0x000000, 0x200000, CRC(53a293b5) SHA1(0ad38a3ab1cc99edac72184f8ae420e13df5cac6) )
 ROM_END
 ROM_START( g_virre )
-	ROM_REGION( 0x400000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "g_virre.bin", 0x000000, 0x200000, CRC(9624d4ef) SHA1(2c3812f8a010571e51269a33a989598787d27c2d) )
 ROM_END
 ROM_START( g_virrea )
-	ROM_REGION( 0x400000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "g_virrea.bin", 0x000000, 0x200000, CRC(5a943df9) SHA1(2c08ea556c79d48e88ff5202944c161ae1b41c63) )
 ROM_END
 

@@ -400,17 +400,17 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( pastelg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 19968000/8)	/* 2.496 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 19968000/8)	/* 2.496 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(pastelg_map,0)
 	MDRV_CPU_IO_MAP(pastelg_io_map,0)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt,96)  // nmiclock not written, chip is 1411M1 instead of 1413M3
-	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -460,16 +460,16 @@ Note
 static MACHINE_DRIVER_START( threeds )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 19968000/8)	/* 2.496 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 19968000/8)	/* 2.496 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(pastelg_map,0)
 	MDRV_CPU_IO_MAP(threeds_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -495,7 +495,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( pastelg )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "pgal_09.bin",  0x00000, 0x04000, CRC(1e494af3) SHA1(1597a7da22ecfbb1df83cf9d0acc7a8be461bc2c) )
 	ROM_LOAD( "pgal_10.bin",  0x04000, 0x04000, CRC(677cccea) SHA1(a294bf4e3c5e74291160a0858371961868afc1d1) )
 	ROM_LOAD( "pgal_11.bin",  0x08000, 0x04000, CRC(c2ccea38) SHA1(0374e8aa0e7961426e417ffe6e1a0d8dc7fd9ecf) )
@@ -518,7 +518,7 @@ ROM_START( pastelg )
 ROM_END
 
 ROM_START( 3ds )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "up9.9a",    0x00000, 0x04000, CRC(bc0e7cfd) SHA1(4e84f573fb2c1228757d34b8bc69649b145d9707) )
 	ROM_LOAD( "up10.10a",  0x04000, 0x04000, CRC(e185d9f5) SHA1(98d4a824ed6a89e42543fb87daed33ef606bcced) )
 	ROM_LOAD( "up11.11a",  0x08000, 0x04000, CRC(d1fb728b) SHA1(46e8e6ccdc1b78da29c969cd9290158c96bac4c4) )

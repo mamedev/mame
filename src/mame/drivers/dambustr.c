@@ -145,7 +145,7 @@ static DRIVER_INIT(dambustr)
 {
 	int i, j, tmp;
 	int tmpram[16];
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *usr = memory_region(machine, "user1");
 	UINT8 *gfx = memory_region(machine, "gfx1");
 
@@ -184,13 +184,13 @@ static DRIVER_INIT(dambustr)
 
 static MACHINE_DRIVER_START( dambustr )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(dambustr_readmem, dambustr_writemem)
 
 	MDRV_MACHINE_RESET(galaxold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -214,7 +214,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( dambustr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "db8a",   0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
 	ROM_LOAD( "db6a",   0x5000, 0x1000, CRC(448db54b) SHA1(c9afbf02bf4d4ac2972ab7ac6adfa4e951ae79c2) )
 	ROM_LOAD( "db7a",   0x6000, 0x1000, CRC(675b1f5e) SHA1(6a386212a640fb467b6956a4dc5a68476af1cf97) )
@@ -239,7 +239,7 @@ ROM_END
 
 
 ROM_START( dambust )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "db08.bin",   0x4000, 0x1000, CRC(fd041ff4) SHA1(8d27da7bf0c655633711b960cbc23950c8a371ae) )
 	ROM_LOAD( "db06p.bin",  0x5000, 0x1000, CRC(35dcee01) SHA1(2c23c727d9b38322a6d0548dfe6a2a254f3530af) )
 	ROM_LOAD( "db07.bin",   0x6000, 0x1000, CRC(675b1f5e) SHA1(6a386212a640fb467b6956a4dc5a68476af1cf97) )

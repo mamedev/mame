@@ -357,17 +357,17 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( suprridr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_49_152MHz/16)		/* 3 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_49_152MHz/16)		/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", main_nmi_gen)
+	MDRV_CPU_VBLANK_INT("screen", main_nmi_gen)
 
-	MDRV_CPU_ADD("audio", Z80, 10000000/4)		/* 2.5 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 10000000/4)		/* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -401,7 +401,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( suprridr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sr8",    0x0000, 0x1000, CRC(4a1f0a6c) SHA1(cabdeafa3b9828d7a6e056fb037abb90484bb33a) )
 	ROM_LOAD( "sr7",    0x1000, 0x1000, CRC(523ee717) SHA1(dd2a53a56b0f29b4d02c4207a7260b345cab0074) )
 	ROM_LOAD( "sr4",    0x2000, 0x1000, CRC(300370ae) SHA1(bf43d800e1b2a5353625c1012d22df6419292d7d) )
@@ -414,7 +414,7 @@ ROM_START( suprridr )
 	ROM_LOAD( "2",      0xd000, 0x1000, CRC(2b3c638e) SHA1(af397cc9137888ccc503aff1b3554744a2327a4c) )
 	ROM_LOAD( "3",      0xe000, 0x1000, CRC(2abdb5f4) SHA1(3003b3f5e70712339bf0d88e45ca0dd7ca8cf7d0) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sr9",    0x0000, 0x1000, CRC(1c5dba78) SHA1(c2232221ae9960295055fcf1bd75d798136e694c) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

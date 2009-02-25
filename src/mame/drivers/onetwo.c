@@ -65,7 +65,7 @@ static WRITE8_HANDLER( onetwo_fgram_w )
 
 static WRITE8_HANDLER( onetwo_cpubank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main") + 0x10000;
+	UINT8 *RAM = memory_region(space->machine, "maincpu") + 0x10000;
 
 	memory_set_bankptr(space->machine, 1,&RAM[data * 0x4000]);
 }
@@ -107,7 +107,7 @@ static WRITE8_HANDLER(palette2_w)
 /* Main CPU */
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("main", 0x10000)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE(palette1_w) AM_BASE(&paletteram)
 	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE(palette2_w) AM_BASE(&paletteram_2)
@@ -276,17 +276,17 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_DRIVER_START( onetwo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 	MDRV_CPU_IO_MAP(sound_cpu_io,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(16))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -312,10 +312,10 @@ static MACHINE_DRIVER_START( onetwo )
 MACHINE_DRIVER_END
 
 ROM_START( onetwo )
-	ROM_REGION( 0x30000, "main", 0 ) /* main z80 */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* main z80 */
 	ROM_LOAD( "main", 0x10000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* sound z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 */
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
 
 	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )
@@ -328,10 +328,10 @@ ROM_START( onetwo )
 ROM_END
 
 ROM_START( onetwoe )
-	ROM_REGION( 0x30000, "main", 0 ) /* main z80 */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* main z80 */
 	ROM_LOAD( "main_prog", 0x10000,  0x20000, CRC(6c1936e9) SHA1(d8fb3056299c9b45e0b537e77dc0d633882705dd) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* sound z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 */
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
 
 	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )

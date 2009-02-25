@@ -54,7 +54,7 @@ static INTERRUPT_GEN( ddrible_interrupt_1 )
 static WRITE8_HANDLER( ddrible_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	bankaddress = 0x10000 + (data & 0x0f)*0x2000;
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
@@ -333,13 +333,13 @@ static const vlm5030_interface vlm5030_config =
 static MACHINE_DRIVER_START( ddribble )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu0,writemem_cpu0)
-	MDRV_CPU_VBLANK_INT("main", ddrible_interrupt_0)
+	MDRV_CPU_VBLANK_INT("screen", ddrible_interrupt_0)
 
 	MDRV_CPU_ADD("cpu1", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
-	MDRV_CPU_VBLANK_INT("main", ddrible_interrupt_1)
+	MDRV_CPU_VBLANK_INT("screen", ddrible_interrupt_1)
 
 	MDRV_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START( ddribble )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -387,7 +387,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( ddribble )
-	ROM_REGION( 0x1a000, "main", 0 ) /* 64K CPU #0 + 40K for Banked ROMS */
+	ROM_REGION( 0x1a000, "maincpu", 0 ) /* 64K CPU #0 + 40K for Banked ROMS */
 	ROM_LOAD( "690c03.bin",	0x10000, 0x0a000, CRC(07975a58) SHA1(96fd1b2348bbdf560067d8ee3cd4c0514e263d7a) )
 	ROM_CONTINUE(			0x0a000, 0x06000 )
 

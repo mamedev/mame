@@ -615,11 +615,11 @@ static const ym2610_interface ym2610_config =
 static MACHINE_DRIVER_START( fromanc2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000/2)		/* 16.00 MHz */
+	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_main,fromanc2_writemem_main)
 	MDRV_CPU_VBLANK_INT("left", fromanc2_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/4)		/* 8.00 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
 	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
 
@@ -667,11 +667,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fromancr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000/2)		/* 16.00 MHz */
+	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromancr_readmem_main,fromancr_writemem_main)
 	MDRV_CPU_VBLANK_INT("left", fromanc2_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/4)		/* 8.00 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
 	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
 
@@ -718,11 +718,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fromanc4 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000/2)		/* 16.00 MHz */
+	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc4_readmem_main,fromanc4_writemem_main)
 	MDRV_CPU_VBLANK_INT("left", fromanc2_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/4)		/* 8.00 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
 	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
 
@@ -769,10 +769,10 @@ MACHINE_DRIVER_END
 // ----------------------------------------------------------------------------
 
 ROM_START( fromanc2 )
-	ROM_REGION( 0x0080000, "main", 0 )	// MAIN CPU
+	ROM_REGION( 0x0080000, "maincpu", 0 )	// MAIN CPU
 	ROM_LOAD16_WORD_SWAP( "4-ic23.bin", 0x000000, 0x080000, CRC(96c90f9e) SHA1(c233e91d6967ef05cf14923273be84b17fce200f) )
 
-	ROM_REGION( 0x0010000, "audio", 0 )	// SOUND CPU
+	ROM_REGION( 0x0010000, "audiocpu", 0 )	// SOUND CPU
 	ROM_LOAD( "5-ic85.bin",  0x00000, 0x10000, CRC(d8f19aa3) SHA1(f980c2a021fa1995bc18b6427b361506ca8d9bf2) )
 
 	ROM_REGION( 0x0020000, "sub", 0 )	// SUB CPU + BANK RAM
@@ -800,10 +800,10 @@ ROM_START( fromanc2 )
 ROM_END
 
 ROM_START( fromancr )
-	ROM_REGION( 0x0080000, "main", 0 )	// MAIN CPU
+	ROM_REGION( 0x0080000, "maincpu", 0 )	// MAIN CPU
 	ROM_LOAD16_WORD_SWAP( "2-ic20.bin", 0x000000, 0x080000, CRC(378eeb9c) SHA1(c1cfc7440590a229b3cdc1114428a473fea15b63) )
 
-	ROM_REGION( 0x0010000, "audio", 0 )	// SOUND CPU
+	ROM_REGION( 0x0010000, "audiocpu", 0 )	// SOUND CPU
 	ROM_LOAD( "5-ic73.bin",  0x0000000, 0x010000, CRC(3e4727fe) SHA1(816c0c2cd2e349900fb9cd63cbced4c621017f37) )
 
 	ROM_REGION( 0x0020000, "sub", 0 )	// SUB CPU + BANK RAM
@@ -833,11 +833,11 @@ ROM_START( fromancr )
 ROM_END
 
 ROM_START( fromanc4 )
-	ROM_REGION( 0x0800000, "main", 0 )	// MAIN CPU + DATA
+	ROM_REGION( 0x0800000, "maincpu", 0 )	// MAIN CPU + DATA
 	ROM_LOAD16_WORD_SWAP( "ic18.bin",    0x0000000, 0x080000, CRC(46a47839) SHA1(f1ba47b193e7e4b1c0fe8d67a76a9c452989885c) )
 	ROM_LOAD16_WORD_SWAP( "em33-m00.19", 0x0400000, 0x400000, CRC(6442534b) SHA1(a504d5cdd569ad4301f9917247531d4fdb807c76) )
 
-	ROM_REGION( 0x0020000, "audio", 0 )	// SOUND CPU
+	ROM_REGION( 0x0020000, "audiocpu", 0 )	// SOUND CPU
 	ROM_LOAD( "ic79.bin", 0x0000000, 0x020000, CRC(c9587c09) SHA1(e04ee8c3f8519c2b2d3c2bdade1e142974b7fcb1) )
 
 	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )	// BG DATA

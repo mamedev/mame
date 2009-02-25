@@ -268,7 +268,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( iqblock )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)	/* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
@@ -276,7 +276,7 @@ static MACHINE_DRIVER_START( iqblock )
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -347,7 +347,7 @@ Notes:
 */
 
 ROM_START( iqblock )
-	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 64K for extra RAM */
+	ROM_REGION( 0x20000, "maincpu", 0 )	/* 64k for code + 64K for extra RAM */
 	ROM_LOAD( "u7.v5",        0x0000, 0x10000, CRC(811f306e) SHA1(d0aef80f1624002d05721276358f26a3ef69a3f6) )
 
 	ROM_REGION( 0x8000, "user1", 0 )
@@ -407,7 +407,7 @@ Notes:
 */
 
 ROM_START( grndtour )
-	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 64K for extra RAM */
+	ROM_REGION( 0x20000, "maincpu", 0 )	/* 64k for code + 64K for extra RAM */
 	ROM_LOAD( "grand7.u7",        0x0000, 0x10000, CRC(95cac31e) SHA1(47bbcce6981ea3d38e0aa49ccd3762a4529f3c96) )
 
 	ROM_REGION( 0x8000, "user1", 0 )
@@ -425,7 +425,7 @@ ROM_END
 
 static DRIVER_INIT( iqblock )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	/* decrypt the program ROM */
@@ -447,7 +447,7 @@ static DRIVER_INIT( iqblock )
 
 static DRIVER_INIT( grndtour )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	/* decrypt the program ROM */

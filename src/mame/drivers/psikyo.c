@@ -399,7 +399,7 @@ static WRITE8_HANDLER( psikyo_clear_nmi_w )
 
 static WRITE8_HANDLER( sngkace_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 	int bank = data & 3;
 	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x8000 + 0x10000]);
 }
@@ -430,7 +430,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( gunbird_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 	int bank = (data >> 4) & 3;
 
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes
@@ -1206,18 +1206,18 @@ static const ym2610_interface sngkace_ym2610_interface =
 static MACHINE_DRIVER_START( sngkace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sngkace_sound_readmem,sngkace_sound_writemem)
 	MDRV_CPU_IO_MAP(sngkace_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.3)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1257,18 +1257,18 @@ static const ym2610_interface gunbird_ym2610_interface =
 static MACHINE_DRIVER_START( gunbird )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	MDRV_CPU_PROGRAM_MAP(gunbird_sound_readmem,gunbird_sound_writemem)
 	MDRV_CPU_IO_MAP(gunbird_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.3)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1317,11 +1317,11 @@ static const ymf278b_interface ymf278b_config =
 static MACHINE_DRIVER_START( s1945 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, 16000000)
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
 	MDRV_CPU_PROGRAM_MAP(psikyo_readmem,psikyo_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	MDRV_CPU_PROGRAM_MAP(gunbird_sound_readmem,gunbird_sound_writemem)
 	MDRV_CPU_IO_MAP(s1945_sound_io_map,0)
 
@@ -1330,7 +1330,7 @@ static MACHINE_DRIVER_START( s1945 )
 	MDRV_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.3)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1383,11 +1383,11 @@ OSC:    32.000, 14.31818 MHz
 
 ROM_START( samuraia )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "4-u127.bin", 0x000000, 0x040000, CRC(8c9911ca) SHA1(821ba648b9a1d495c600cbf4606f2dbddc6f9e6f) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u126.bin", 0x000002, 0x040000, CRC(d20c3ef0) SHA1(264e5a7e45e130a9e7152468733337668dc5b65f) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u58.bin", 0x00000, 0x20000, CRC(310f5c76) SHA1(dbfd1c5a7a514bccd89fc4f7191744cf76bb745d) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1408,11 +1408,11 @@ ROM_END
 
 ROM_START( sngkace )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u127.bin", 0x000000, 0x040000, CRC(6c45b2f8) SHA1(08473297e174f3a6d67043f3b16f4e6b9c68b826) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u126.bin", 0x000002, 0x040000, CRC(845a6760) SHA1(3b8fed294e28d9d8ef5cb5ec88b9ade396146a48) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u58.bin", 0x00000, 0x20000, CRC(310f5c76) SHA1(dbfd1c5a7a514bccd89fc4f7191744cf76bb745d) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1460,7 +1460,7 @@ static DRIVER_INIT( sngkace )
 #if 0
 	if (!strcmp(machine->gamedrv->name,"sngkace"))
 	{
-		UINT8 *ROM	=	memory_region(machine, "main");
+		UINT8 *ROM	=	memory_region(machine, "maincpu");
 		ROM[0x995] = 0x4e;
 		ROM[0x994] = 0x71;
 		ROM[0x997] = 0x4e;
@@ -1491,11 +1491,11 @@ Chips:  PS2001B
 
 ROM_START( gunbird )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "4-u46.bin", 0x000000, 0x040000, CRC(b78ec99d) SHA1(399b79931652d9df1632cd4d7ec3d214e473a5c3) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u39.bin", 0x000002, 0x040000, CRC(925f095d) SHA1(301a536119a0320a756e9c6e51fb10e36b90ef16) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1521,11 +1521,11 @@ ROM_END
 
 ROM_START( gunbirdk )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1k-u46.bin", 0x000000, 0x080000, CRC(745cee52) SHA1(6c5bb92c92c55f882484417bc1aa580684019610) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2k-u39.bin", 0x000002, 0x080000, CRC(669632fb) SHA1(885dea42e6da35e9166a208b18dbd930642c26cd) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "k3-u71.bin", 0x00000, 0x20000, CRC(11994055) SHA1(619776c178361f23de37ff14e87284ec0f1f4f10) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1551,11 +1551,11 @@ ROM_END
 
 ROM_START( gunbirdj )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x040000, CRC(474abd69) SHA1(27f37333075f9c92849101aad4875e69004d747b) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x040000, CRC(3e3e661f) SHA1(b5648546f390539b0f727a9a62d1b9516254ae21) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(2168e4ba) SHA1(ca7ad6acb5f806ce2528e7b52c19e8cceecb8543) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1582,11 +1582,11 @@ ROM_END
 
 ROM_START( btlkroad )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "4-u46.bin", 0x000000, 0x040000, CRC(8a7a28b4) SHA1(f7197be673dfd0ddf46998af81792b81d8fe9fbf) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u39.bin", 0x000002, 0x040000, CRC(933561fa) SHA1(f6f3b1e14b1cfeca26ef8260ac4771dc1531c357) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(22411fab) SHA1(1094cb51712e40ae65d0082b408572bdec06ae8b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1646,11 +1646,11 @@ Chips:  PS2001B
 
 ROM_START( s1945jn )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u46.bin", 0x000000, 0x080000, CRC(45fa8086) SHA1(f1753b9420596f4b828c77e877a044ba5fb01b28) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u39.bin", 0x000002, 0x080000, CRC(0152ab8c) SHA1(2aef4cb88341b35f20bb551716f1e5ac2731e9ba) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u71.bin", 0x00000, 0x20000, CRC(e3e366bd) SHA1(1f5b5909745802e263a896265ea365df76d3eaa5) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1763,11 +1763,11 @@ OSC:    16.000MHz
 
 ROM_START( s1945 )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "2s.u40", 0x000000, 0x040000, CRC(9b10062a) SHA1(cf963bba157422b659d8d64b4493eb7d69cd07b7) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "3s.u41", 0x000002, 0x040000, CRC(f87e871a) SHA1(567167c7fcfb622f78e211d74b04060c3d29d6b7) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1793,11 +1793,11 @@ ROM_END
 
 ROM_START( s1945a )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "4-u40.bin", 0x000000, 0x040000, CRC(29ffc217) SHA1(12dc3cb32253c3908f4c440c627a0e1b32ee7cac) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "5-u41.bin", 0x000002, 0x040000, CRC(c3d3fb64) SHA1(4388586bc0a6f3d62366b3c38b8b23f8a03dbf15) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1823,11 +1823,11 @@ ROM_END
 
 ROM_START( s1945j )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "1-u40.bin", 0x000000, 0x040000, CRC(c00eb012) SHA1(080dae010ca83548ebdb3324585d15e48baf0541) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "2-u41.bin", 0x000002, 0x040000, CRC(3f5a134b) SHA1(18bb3bb1e1adadcf522795f5cf7d4dc5a5dd1f30) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1853,11 +1853,11 @@ ROM_END
 
 ROM_START( s1945k ) /* Same MCU as the current parent set, region dip has no effect on this set */
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "10.u40", 0x000000, 0x040000, CRC(5a32af36) SHA1(2eada37fd043c097a11bcf4e3e0bebb473bbc0df) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "9.u41",  0x000002, 0x040000, CRC(29cc6d7d) SHA1(aeee9e88922c25c75885483d115e064c6b71540b) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "3-u63.bin", 0x00000, 0x20000, CRC(42d40ae1) SHA1(530a5a3f78ac489b84a631ea6ce21010a4f4d31b) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1950,11 +1950,11 @@ Chips:  PS2001B
 
 ROM_START( tengai )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "5-u40.bin", 0x000000, 0x080000, CRC(90088195) SHA1(8ec48d581ecd14b3dad36edc65d5a273324cf3c1) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "4-u41.bin", 0x000002, 0x080000, CRC(0d53196c) SHA1(454bb4695b13ce44ca5dac7c6d4142a8b9afa798) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 
@@ -1980,11 +1980,11 @@ ROM_END
 
 ROM_START( tengaij )
 
-	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "2-u40.bin", 0x000000, 0x080000, CRC(ab6fe58a) SHA1(6687a3af192b3eab60d75ca286ebb8e0636297b5) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "3-u41.bin", 0x000002, 0x080000, CRC(02e42e39) SHA1(6cdb7b1cebab50c0a44cd60cd437f0e878ccac5c) ) // 3&2
 
-	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 )		/* Sound CPU Code */
 	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
 	ROM_RELOAD(            0x10000, 0x20000             )
 

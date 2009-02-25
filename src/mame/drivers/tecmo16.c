@@ -439,17 +439,17 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( fstarfrc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12MHz */
+	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(fstarfrc_readmem,fstarfrc_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,8000000/2)			/* 4MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)			/* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -479,17 +479,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ginkun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12MHz */
+	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(ginkun_readmem,ginkun_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,8000000/2)			/* 4MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)			/* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main CPU */
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -525,11 +525,11 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( fstarfrc )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fstarf01.rom", 0x00000, 0x40000, CRC(94c71de6) SHA1(7637aee89034d60ef74d0015db6fcbcc8689b88b) )
 	ROM_LOAD16_BYTE( "fstarf02.rom", 0x00001, 0x40000, CRC(b1a07761) SHA1(efd580e06a134a8b6ed6e836eec3203c41ed03c5) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "fstarf07.rom", 0x00000, 0x10000, CRC(e0ad5de1) SHA1(677237341e837061b6cc02200c0752964caed907) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -548,11 +548,11 @@ ROM_START( fstarfrc )
 ROM_END
 
 ROM_START( ginkun )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ginkun01.i01", 0x00000, 0x40000, CRC(98946fd5) SHA1(e0b496d1fa5201d94a2a22243fe4b37d9ff7bc90) )
 	ROM_LOAD16_BYTE( "ginkun02.i02", 0x00001, 0x40000, CRC(e98757f6) SHA1(2310b5f00b9522d5a983c8686f7d5bcf2d885964) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ginkun07.i17", 0x00000, 0x10000, CRC(8836b1aa) SHA1(22bd5258e5971aa69eaa516d7358d87fbb65bee4) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -678,11 +678,11 @@ Notes:
 */
 
 ROM_START( riot )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1.ic1", 0x00000, 0x40000, CRC(9ef4232e) SHA1(b9dd3e0dc5785311ff2433b5eb94e327b51ef144) )
 	ROM_LOAD16_BYTE( "2.ic2", 0x00001, 0x40000, CRC(f2c6fbbf) SHA1(114cc9ede8b6b4e94dad59f82f0232e9b7fa5025) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "7.ic17", 0x00000, 0x10000, CRC(0a95b8f3) SHA1(cc6bdeeeb184eb4f3867eb9c961b0b82743fac9f) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )

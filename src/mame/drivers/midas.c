@@ -434,14 +434,14 @@ static const ymz280b_interface ymz280b_config =
 static MACHINE_DRIVER_START( livequiz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 24000000 / 2)
+	MDRV_CPU_ADD("maincpu", M68000, 24000000 / 2)
 	MDRV_CPU_PROGRAM_MAP(mem_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -552,7 +552,7 @@ Notes:
 ***************************************************************************************/
 
 ROM_START( livequiz )
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "flash.u1", 0x000000, 0x200000, CRC(8ec44493) SHA1(a987886cb87ac0a744f01f2e4a7cc6d12efeaa04) )
 
 	ROM_REGION( 0x200000, "user1", 0 )
@@ -574,7 +574,7 @@ ROM_END
 
 static DRIVER_INIT( livequiz )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	// PROTECTION CHECKS
 	rom[0x13345a/2]	=	0x4e75;

@@ -414,19 +414,19 @@ static const namco_interface namco_config =
 static MACHINE_DRIVER_START( pacland )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 49152000/32)	/* 1.536 MHz */
+	MDRV_CPU_ADD("maincpu", M6809, 49152000/32)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("mcu", HD63701, 49152000/8)	/* 1.536 MHz? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synching between the MCU and the CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -456,7 +456,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pacland )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pl5_01b.bin",  0x08000, 0x4000, CRC(b0ea7631) SHA1(424afa6f397310c7af39c9e8b580aa9ccd42c39c) )
 	ROM_LOAD( "pl5_02.bin",   0x0C000, 0x4000, CRC(d903e84e) SHA1(25338726227bfbec65847879aac5228a6a307db4) )
 	/* all the following are banked at 0x4000-0x5fff */
@@ -490,7 +490,7 @@ ROM_START( pacland )
 ROM_END
 
 ROM_START( pacland2 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pl6_01.bin",   0x08000, 0x4000, CRC(4c96e11c) SHA1(c136dc3877155b7a600173c876f6a53394d9260d) )
 	ROM_LOAD( "pl6_02.bin",   0x0C000, 0x4000, CRC(8cf5bd8d) SHA1(0771ca1ab5db58f5632583a5e6e84660e8ab727d) )
 	/* all the following are banked at 0x4000-0x5fff */
@@ -524,7 +524,7 @@ ROM_START( pacland2 )
 ROM_END
 
 ROM_START( pacland3 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pln1-1",       0x08000, 0x4000, CRC(f729fb94) SHA1(332ff2e4aae67eb8ed0f52048097f74323a176f8) )
 	ROM_LOAD( "pln1-2",       0x0C000, 0x4000, CRC(5c66eb6f) SHA1(376233f51e655df8922886c1e808a2f37ccae5d4) )
 	/* all the following are banked at 0x4000-0x5fff */
@@ -558,7 +558,7 @@ ROM_START( pacland3 )
 ROM_END
 
 ROM_START( paclandm )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "pl1-1",        0x08000, 0x4000, CRC(a938ae99) SHA1(bf12097d8c69685cb7af763f9b9617c767aaed2f) )
 	ROM_LOAD( "pl1-2",        0x0C000, 0x4000, CRC(3fe43bb5) SHA1(14e6144d06ff2fd786f383f36f1b8238ac364849) )
 	/* all the following are banked at 0x4000-0x5fff */

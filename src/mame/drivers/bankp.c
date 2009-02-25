@@ -258,13 +258,13 @@ static MACHINE_DRIVER_START( bankp )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("main", Z80, BANKP_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, BANKP_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(bankp_map, 0)
 	MDRV_CPU_IO_MAP(bankp_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -299,7 +299,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( bankp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6175.7e",  0x0000, 0x4000, CRC(044552b8) SHA1(8d50ba062483d4789cfd3ed86cea53dff0ff6968) )
 	ROM_LOAD( "epr-6174.7f",  0x4000, 0x4000, CRC(d29b1598) SHA1(8c1ee4d23d8d6f93af3e22f2cba189b0055994fb) )
 	ROM_LOAD( "epr-6173.7h",  0x8000, 0x4000, CRC(b8405d38) SHA1(0f62a972f38b4ddcea77eb0e1d76c70ddbcb7b11) )
@@ -329,7 +329,7 @@ ROM_END
 
 
 ROM_START( combh )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-10904.7e",  0x0000, 0x4000, CRC(4b106335) SHA1(1cdfac301b52ccd98d09b52089bb2a45fc9afdbb) )
 	ROM_LOAD( "epr-10905.7f",  0x4000, 0x4000, CRC(a76fc390) SHA1(9ffc453010ffb93db5f549e3cc1e0a4eb39ac61c) )
 	ROM_LOAD( "epr-10906.7h",  0x8000, 0x4000, CRC(16d54885) SHA1(e00fc618bb1a1f8c160fe2a0d4de6d9750313643) )

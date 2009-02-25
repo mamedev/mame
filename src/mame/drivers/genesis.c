@@ -568,7 +568,7 @@ WRITE8_HANDLER ( genesis_z80_w )
 READ8_HANDLER ( genesis_z80_bank_r )
 {
 	int address = (z80_68000_latch) + (offset & 0x7fff);
-	const UINT8 *base = memory_region(space->machine, "sound");
+	const UINT8 *base = memory_region(space->machine, "soundcpu");
 
 	if (!z80running) logerror("undead Z80->68000 read!\n");
 
@@ -602,13 +602,13 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( genesis_base )
 	/*basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 7)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 7)
 	MDRV_CPU_PROGRAM_MAP(genesis_readmem, genesis_writemem)
-	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK / 15)
+	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK / 15)
 	MDRV_CPU_PROGRAM_MAP(genesis_z80_readmem, genesis_z80_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* from vdp at scanline 0xe0 */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -618,7 +618,7 @@ static MACHINE_DRIVER_START( genesis_base )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(342,262)

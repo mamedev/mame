@@ -177,13 +177,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( kopunch )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
+	MDRV_CPU_ADD("maincpu", 8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
 	MDRV_CPU_PROGRAM_MAP(kopunch_map,0)
 	MDRV_CPU_IO_MAP(kopunch_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(kopunch_interrupt,4)	/* ??? */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -208,7 +208,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kopunch )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr1105.x",    0x0000, 0x1000, CRC(34ef5e79) SHA1(2827c68f4c902f447a304d3ab0258c7819a0e4ca) )
 	ROM_LOAD( "epr1106.x",    0x1000, 0x1000, CRC(25a5c68b) SHA1(9761418c6f3903f8aaceece658739fe5bf5c0803) )
 

@@ -194,12 +194,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( thoop2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(thoop2_readmem,thoop2_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -222,7 +222,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( thoop2 )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"th2c23.040",	0x000000, 0x080000, CRC(3e465753) SHA1(1ea1173b9fe5d652e7b5fafb822e2535cecbc198) )
 	ROM_LOAD16_BYTE(	"th2c22.040",	0x000001, 0x080000, CRC(837205b7) SHA1(f78b90c2be0b4dddaba26f074ea00eff863cfdb2) )
 

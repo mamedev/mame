@@ -243,11 +243,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( dday )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 2000000)     /* 2 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -281,7 +281,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( dday )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "e8_63co.bin",  0x0000, 0x1000, CRC(13d53793) SHA1(045f4b02803cb24305f90593777bb4a59f1bbb34) )
 	ROM_LOAD( "e7_64co.bin",  0x1000, 0x1000, CRC(e1ef2a70) SHA1(946ef20e2cd441ca858f969e7f25ab7c940671f8) )
 	ROM_LOAD( "e6_65co.bin",  0x2000, 0x1000, CRC(fe414a83) SHA1(1ca1d30b71b62af5230dfe862a67c4cff5a71f41) )
@@ -313,7 +313,7 @@ ROM_START( dday )
 ROM_END
 
 ROM_START( ddayc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "e8_63-c.bin",  0x0000, 0x1000, CRC(d4fa3ae3) SHA1(587cfcd0bb3103c9875b8a5fd185a321212a86ab) )
 	ROM_LOAD( "e7_64-c.bin",  0x1000, 0x1000, CRC(9fb8b1a7) SHA1(abd935274745db28039f2e341e9be0490e307772) )
 	ROM_LOAD( "e6_65-c.bin",  0x2000, 0x1000, CRC(4c210686) SHA1(9d3110c4d1347f8a067c49b363a32d0f6a2c34c7) )

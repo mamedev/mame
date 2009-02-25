@@ -400,14 +400,14 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_DRIVER_START( jantotsu )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,18432000/4)
+	MDRV_CPU_ADD("maincpu", Z80,18432000/4)
 	MDRV_CPU_PROGRAM_MAP(0,jantotsu_map)
 	MDRV_CPU_IO_MAP(0,jantotsu_io)
-	MDRV_CPU_VBLANK_INT("main", jantotsu_irq)
+	MDRV_CPU_VBLANK_INT("screen", jantotsu_irq)
 
 	MDRV_MACHINE_RESET(jantotsu)
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -437,7 +437,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( jantotsu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jat-00.2b", 0x00000, 0x02000, CRC(bed10f86) SHA1(c5ac845b32fa295b0ff205b1401bcc071d604d6e) )
 	ROM_LOAD( "jat-01.3b", 0x02000, 0x02000, CRC(cc9312e9) SHA1(b08d38cc58d92378305c015c5a001b4da072188b) )
 	ROM_LOAD( "jat-02.4b", 0x04000, 0x02000, CRC(292969f1) SHA1(e7cb93b67296e84ea012fcceb72df712c7e0f135) )

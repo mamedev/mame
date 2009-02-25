@@ -100,7 +100,7 @@ static DRIVER_INIT( kyuhito )
 {
 #if 1
 	/* uses the same protection data as ????, but a different check */
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	rom[0x0149] = 0x00;
 	rom[0x014a] = 0x00;
@@ -2937,8 +2937,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("main", IO, nb1413m3_dipsw1_r),		// DIPSW-A read
-	DEVCB_MEMORY_HANDLER("main", IO, nb1413m3_dipsw2_r),		// DIPSW-B read
+	DEVCB_MEMORY_HANDLER("maincpu", IO, nb1413m3_dipsw1_r),		// DIPSW-A read
+	DEVCB_MEMORY_HANDLER("maincpu", IO, nb1413m3_dipsw2_r),		// DIPSW-B read
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -2948,14 +2948,14 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( NBMJDRV_4096 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 5000000)	/* 5.00 MHz */
-	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
+	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.00 MHz */
+	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2999,7 +2999,7 @@ static MACHINE_DRIVER_START( NBMJDRV_65536 )
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_PALETTE_LENGTH(65536)
 
@@ -3014,7 +3014,7 @@ static MACHINE_DRIVER_START( crystalg )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_256)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_crystalg)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 96) // nmiclock = 2f
@@ -3025,7 +3025,7 @@ static MACHINE_DRIVER_START( apparel )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_256)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_secolove)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
@@ -3036,7 +3036,7 @@ static MACHINE_DRIVER_START( mbmj_h12bit )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_secolove)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
@@ -3050,7 +3050,7 @@ static MACHINE_DRIVER_START( barline )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mbmj_h12bit)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_barline, writeport_barline)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
 
@@ -3064,7 +3064,7 @@ static MACHINE_DRIVER_START( mbmj_p16bit )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_65536)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_secolove)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60/40
@@ -3077,8 +3077,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mbmj_p16bit_LCD )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 5000000)	/* 5.00 MHz */
-	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
+	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.00 MHz */
+	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_p16bit_LCD)
 
@@ -3090,7 +3090,7 @@ static MACHINE_DRIVER_START( mbmj_p16bit_LCD )
 	MDRV_PALETTE_INIT(mbmj8688_16bit)
 	MDRV_DEFAULT_LAYOUT(layout_nbmj8688)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -3130,7 +3130,7 @@ static MACHINE_DRIVER_START( seiha )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_65536)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_seiha)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
@@ -3140,7 +3140,7 @@ static MACHINE_DRIVER_START( mjgaiden )
     /* basic machine hardware */
     MDRV_IMPORT_FROM(NBMJDRV_4096)
 
-    MDRV_CPU_MODIFY("main")
+    MDRV_CPU_MODIFY("maincpu")
     MDRV_CPU_PROGRAM_MAP(readmem_ojousan, writemem_ojousan)
     MDRV_CPU_IO_MAP(readport_secolove, writeport_mjgaiden)
 MACHINE_DRIVER_END
@@ -3149,7 +3149,7 @@ static MACHINE_DRIVER_START( iemoto )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_65536)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_iemoto)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
@@ -3160,7 +3160,7 @@ static MACHINE_DRIVER_START( ojousan )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_65536)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_ojousan, writemem_ojousan)
 	MDRV_CPU_IO_MAP(readport_secolove, writeport_iemoto)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)    // nmiclock = 60
@@ -3170,7 +3170,7 @@ static MACHINE_DRIVER_START( mbmj_p12bit )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_mjsikaku, writemem_mjsikaku)
 	MDRV_CPU_IO_MAP(readport_kaguya, writeport_kaguya)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
@@ -3181,7 +3181,7 @@ static MACHINE_DRIVER_START( mjsikaku )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_mjsikaku, writemem_mjsikaku)
 	MDRV_CPU_IO_MAP(readport_mjsikaku, writeport_mjsikaku)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 144)    // nmiclock = 70
@@ -3196,7 +3196,7 @@ static MACHINE_DRIVER_START( mmsikaku )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(NBMJDRV_4096)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_secolove, writemem_secolove)
 	MDRV_CPU_IO_MAP(readport_mmsikaku, writeport_mmsikaku)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
@@ -3207,7 +3207,7 @@ static MACHINE_DRIVER_START( otonano )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mjsikaku)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_otonano, writeport_otonano)
 MACHINE_DRIVER_END
 
@@ -3215,7 +3215,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( crystalg )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "mbs1.3c",  0x00000, 0x04000, CRC(1cacdbbd) SHA1(672e67b761ef1723ec2445f13881a435dbbdf53f) )
 	ROM_LOAD( "mbs2.4c",  0x04000, 0x04000, CRC(bf833674) SHA1(45bc63313acc7b3c4bbbe3070dd25cac549e475c) )
 	ROM_LOAD( "mbs3.5c",  0x08000, 0x04000, CRC(faacafd0) SHA1(facab33c668a15dc85ada690dd02ffee2c332485) )
@@ -3238,7 +3238,7 @@ ROM_START( crystalg )
 ROM_END
 
 ROM_START( crystal2 )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "cgl2_01.bin",  0x00000, 0x04000, CRC(67673350) SHA1(c7b9e5f0a9e073793db74304272c94657328cd92) )
 	ROM_LOAD( "cgl2_02.bin",  0x04000, 0x04000, CRC(79c599d8) SHA1(e70cbb2b2b7867be81bc133bb4dbc19753578b7e) )
 	ROM_LOAD( "cgl2_03.bin",  0x08000, 0x04000, CRC(c11987ed) SHA1(69a7c252b28843437a06812213ad1d6de683aac3) )
@@ -3267,7 +3267,7 @@ ROM_START( crystal2 )
 ROM_END
 
 ROM_START( apparel )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "11.bin", 0x00000, 0x04000, CRC(31bd49d5) SHA1(104f468254e255a9a1537ec67a670f60a64e15c6) )
 	ROM_LOAD( "12.bin", 0x04000, 0x04000, CRC(56acd87d) SHA1(d228db94b66c1f7da80c799251c28a0bc3e48ea9) )
 	ROM_LOAD( "13.bin", 0x08000, 0x04000, CRC(3e2a9c66) SHA1(f6a4859463524f46002fc5684d573d1fae8a5e22) )
@@ -3289,7 +3289,7 @@ ROM_START( apparel )
 ROM_END
 
 ROM_START( nightlov )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "7.ic3",  0x00000, 0x08000, CRC(f9be0b15) SHA1(11b60bb48c78fefae3e8dc63f79a3bebbf701575) )
 	ROM_LOAD( "8.ic4",  0x08000, 0x08000, CRC(034c2b8c) SHA1(0aa10b28647b3511f17c62cd439f289c59ba4c01) )
 
@@ -3307,7 +3307,7 @@ ROM_START( nightlov )
 ROM_END
 
 ROM_START( citylove )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "14.12c", 0x00000, 0x08000, CRC(2db5186c) SHA1(4cd282aebaf5f9f31008c2f9ccb65d9c9b4f8f56) )
 	ROM_LOAD( "13.11c", 0x08000, 0x08000, CRC(52c7632b) SHA1(05b24612c52ed41195f2d98edbb5c12b0ef97b74) )
 
@@ -3329,7 +3329,7 @@ ROM_START( citylove )
 ROM_END
 
 ROM_START( mcitylov )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "m14.12c", 0x00000, 0x08000, CRC(b0815b50) SHA1(499239ee63801fc14267ad253f4da1d9a961c802) )
 	ROM_LOAD( "13.11c",  0x08000, 0x08000, CRC(52c7632b) SHA1(05b24612c52ed41195f2d98edbb5c12b0ef97b74) )
 
@@ -3351,7 +3351,7 @@ ROM_START( mcitylov )
 ROM_END
 
 ROM_START( secolove )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "slov_08.bin", 0x00000, 0x08000, CRC(5aad556e) SHA1(f02e3014dab69598fd3a30deb66fe24932fd9665) )
 	ROM_LOAD( "slov_07.bin", 0x08000, 0x08000, CRC(94175129) SHA1(1cb2dfdbfa42296a120e5160ee57da013a6f1b9c) )
 
@@ -3369,7 +3369,7 @@ ROM_START( secolove )
 ROM_END
 
 ROM_START( livegal )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4c",     0x00000, 0x08000, CRC(25f28dfb) SHA1(beb8c82e0d460f1d2a6583e4625628933bb46a01) )
 	ROM_LOAD( "2.3c",     0x08000, 0x08000, CRC(4177cccf) SHA1(eeb8ed9b75893fe02a5556e9fc59a4c3f7a4d841) )
 
@@ -3387,7 +3387,7 @@ ROM_START( livegal )
 ROM_END
 
 ROM_START( housemnq )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4c",   0x00000, 0x08000, CRC(465f61bb) SHA1(32e0931dd672ffaf5acf09d552f36e06162f8ef5) )
 	ROM_LOAD( "2.3c",   0x08000, 0x08000, CRC(e4499d02) SHA1(737c4d9f5b93d351d80bd7c2d5a337d7d5b8bec9) )
 
@@ -3403,7 +3403,7 @@ ROM_START( housemnq )
 ROM_END
 
 ROM_START( housemn2 )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "hmq2_01.bin", 0x00000, 0x08000, CRC(a5aaf6c8) SHA1(caf70d311cb5617eddcd6274cedefb05ae2a24a6) )
 	ROM_LOAD( "hmq2_02.bin", 0x08000, 0x08000, CRC(6bdcc867) SHA1(bd9fe709c3bc42cf9142ab171a62460dbc6f5de0) )
 
@@ -3419,7 +3419,7 @@ ROM_START( housemn2 )
 ROM_END
 
 ROM_START( seiha )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "seiha1.4g",  0x00000, 0x08000, CRC(ad5ba5b5) SHA1(976fa8651000b1103302d38d323a3ffbd81d89e5) )
 	ROM_LOAD( "seiha2.3g",  0x08000, 0x08000, CRC(0fe7a4b8) SHA1(5e702db804ba5a0bf38e6511f10a6704854d9aca) )
 
@@ -3440,7 +3440,7 @@ ROM_START( seiha )
 ROM_END
 
 ROM_START( seiham )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "seih_01m.bin", 0x00000, 0x08000, CRC(0c9a081b) SHA1(3cbc6aecca7e48099ea8e5a8092965150b8d3da0) )
 	ROM_LOAD( "seih_02m.bin", 0x08000, 0x08000, CRC(a32cdb9a) SHA1(249efb16bd40a63d201a210b449b3121310ca600) )
 
@@ -3501,7 +3501,7 @@ Is this a hack of Seiha or an officially licensed game? There are Seiha referenc
 it shares some gfx roms...
 */
 ROM_START( mjgaiden )
-    ROM_REGION( 0x30000, "main", 0 ) /* program */
+    ROM_REGION( 0x30000, "maincpu", 0 ) /* program */
     ROM_LOAD( "1.4g",      0x00000, 0x08000, CRC(6f54ab3d) SHA1(08fe565616de2e06141407c56b6de23014cfc56c) )
     ROM_LOAD( "2.3g",      0x08000, 0x08000, CRC(b4fed864) SHA1(a48300e586cb160fff903fb4203ee66418a81b3d) )
 
@@ -3525,7 +3525,7 @@ ROM_START( mjgaiden )
 ROM_END
 
 ROM_START( bijokkoy )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4c",   0x00000, 0x08000, CRC(7dec7ae1) SHA1(fd16a33342014b1c7400e278755ae68248134129) )
 	ROM_LOAD( "2.3c",   0x08000, 0x08000, CRC(3ae9650f) SHA1(c2a5b0114b7d147ecd8e3760ee45fdf25fc32c14) )
 
@@ -3544,7 +3544,7 @@ ROM_START( bijokkoy )
 ROM_END
 
 ROM_START( iemoto )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "iemoto1.4g",  0x00000, 0x08000, CRC(ab51f5c3) SHA1(5b2a6be6ac3d1409523ce495605f906b47128f65) )
 	ROM_LOAD( "iemoto2.3g",  0x08000, 0x08000, CRC(873cd265) SHA1(283fa86d916a7ad08dfdcd4b9592d36d48b62ede) )
 
@@ -3561,7 +3561,7 @@ ROM_START( iemoto )
 ROM_END
 
 ROM_START( iemotom )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4g",        0x00000, 0x08000, CRC(c4107170) SHA1(92ab01e91a7cbd4ac5d74352c9630aa918cbe6b2) )
 	ROM_LOAD( "2.3g",        0x08000, 0x08000, CRC(6778cf82) SHA1(f3eec7dcda00ebf5097df0111908029337a15032) )
 
@@ -3579,7 +3579,7 @@ ROM_START( iemotom )
 ROM_END
 
 ROM_START( ryuuha )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4ga",       0x00000, 0x08000, CRC(2f995640) SHA1(f95d7cd6b7598c263011a61c58451f6615c81966) )
 	ROM_LOAD( "2.3ga",        0x08000, 0x08000, CRC(0787d707) SHA1(4d0df545cc3892690593216afbee4a5529afddfe) )
 
@@ -3598,7 +3598,7 @@ ROM_START( ryuuha )
 ROM_END
 
 ROM_START( ojousan )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4g",    0x00000, 0x08000, CRC(c0166351) SHA1(656f5ac0846d9e7ee5059947597c5863bb213165) )
 	ROM_LOAD( "2.3g",    0x08000, 0x08000, CRC(2c264eb2) SHA1(eb94a1ef88c499d2f57881d886a206b599441698) )
 
@@ -3618,7 +3618,7 @@ ROM_START( ojousan )
 ROM_END
 
 ROM_START( ojousanm )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4ga", 0x00000, 0x08000, CRC(ba1d08dd) SHA1(a1c46a0027b4294e50afd48a2389222ef06cd903) )
 	ROM_LOAD( "2.3ga", 0x08000, 0x08000, CRC(26a093fa) SHA1(b5bdc9b5f21655e8fe47c09c0bb3bb211d555f52) )
 
@@ -3637,7 +3637,7 @@ ROM_START( ojousanm )
 ROM_END
 
 ROM_START( bijokkog )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4c",    0x00000, 0x08000, CRC(3c28b45c) SHA1(289582f607322b878b4737325498e749f5460586) )
 	ROM_LOAD( "2.3c",    0x08000, 0x08000, CRC(396f6a05) SHA1(f983b34b2b782631f9913a85f933ec0c504f4047) )
 
@@ -3663,7 +3663,7 @@ ROM_START( bijokkog )
 ROM_END
 
 ROM_START( orangec )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "ft2.3c",   0x00000, 0x08000, CRC(4ed413aa) SHA1(7cfa3a2efa41b60e261e5cc2e58736b97957e819) )
 	ROM_LOAD( "ft1.2c",   0x08000, 0x08000, CRC(f26bfd1b) SHA1(a34352d5dc3f41ee6c4ca480a0e501e8c0b82766) )
 
@@ -3686,7 +3686,7 @@ ROM_START( orangec )
 ROM_END
 
 ROM_START( orangeci )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "2.bin",    0x00000, 0x08000, CRC(8599bf78) SHA1(1c2c14205dcd2fc0160d31c0839404168b59ee3f) )
 	ROM_LOAD( "1.bin",	  0x08000, 0x08000, CRC(adc9b0ab) SHA1(0fbb7b419f645b4715407e45c8e564b7bf334a9d) )
 
@@ -3709,7 +3709,7 @@ ROM_START( orangeci )
 ROM_END
 
 ROM_START( vipclub )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "2.3c",     0x00000, 0x08000, CRC(49acc59a) SHA1(a1e65e2804fde817c4e6f1e9b0949a4cbe537a6d) )
 	ROM_LOAD( "1.2c",     0x08000, 0x08000, CRC(42101925) SHA1(b3e1b4a3c905e0c5ad85fd1276b221440937719e) )
 
@@ -3732,7 +3732,7 @@ ROM_START( vipclub )
 ROM_END
 
 ROM_START( korinai )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4g",       0x00000, 0x08000, CRC(ddcf787c) SHA1(d73d274a0ae87515e5943b112d85e8d02117c4ea) )
 	ROM_LOAD( "2.3g",       0x08000, 0x08000, CRC(9bb992f5) SHA1(912daad2ae19e639b5064544bc7b31f8d36862a3) )
 
@@ -3754,7 +3754,7 @@ ROM_START( korinai )
 ROM_END
 
 ROM_START( korinaim )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "11.4g",      0x00000, 0x08000, CRC(23664cdc) SHA1(66992910df215578bb48d4678595251db4db3191) )
 	ROM_LOAD( "12.3g",      0x08000, 0x08000, CRC(10cf7144) SHA1(467fb8f11266cc0add5beb6faf2f7b7bc8fadc17) )
 
@@ -3777,7 +3777,7 @@ ROM_START( korinaim )
 ROM_END
 
 ROM_START( kaguya )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "kaguya01.bin", 0x00000, 0x10000, CRC(6ac18c32) SHA1(3605d12c42850bb679c0375b1c03fde7a15d0782) )
 
 	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
@@ -3796,7 +3796,7 @@ ROM_START( kaguya )
 ROM_END
 
 ROM_START( kaguya2 )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.3f",    0x00000, 0x10000, CRC(1a6ad8fd) SHA1(ebb1e3f08643e0602a0ec2e7401c3ee2fccff9f5) )
 
 	ROM_REGION( 0x40000, "voice", 0 ) /* voice */
@@ -3821,7 +3821,7 @@ ROM_START( kaguya2 )
 ROM_END
 
 ROM_START( kaguya2f )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.3fa",   0x00000, 0x10000, CRC(8b5481a0) SHA1(268b0ec8a8871c7172533ff8fb9731f4603e57a9) )
 
 	ROM_REGION( 0x40000, "voice", 0 ) /* voice */
@@ -3846,7 +3846,7 @@ ROM_START( kaguya2f )
 ROM_END
 
 ROM_START( kanatuen )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "11.3f", 0x00000, 0x10000, CRC(3345d977) SHA1(9fd53d44b8f929a57b2900974f645898e3f92668) )
 
 	ROM_REGION( 0x40000, "voice", 0 ) /* voice */
@@ -3870,7 +3870,7 @@ ROM_START( kanatuen )
 ROM_END
 
 ROM_START( kyuhito )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "11.3fa", 0x00000, 0x10000, CRC(f3929245) SHA1(3654c6f167d643f0e24b44a1cfa44663b5b5ffbb) )
 
 	ROM_REGION( 0x40000, "voice", 0 ) /* voice */
@@ -3894,7 +3894,7 @@ ROM_START( kyuhito )
 ROM_END
 
 ROM_START( mjsikaku )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "mjsk_01.bin", 0x00000, 0x10000, CRC(6b64c96a) SHA1(2f267b66773dc8c0ad260f081738b30fd555c818) )
 
 	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
@@ -3915,7 +3915,7 @@ ROM_START( mjsikaku )
 ROM_END
 
 ROM_START( mjsikakb )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "sikaku.1",    0x00000, 0x10000, CRC(66349663) SHA1(48cdf25a30e11c06b79f218f4744719199961429) )
 
 	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
@@ -3934,7 +3934,7 @@ ROM_START( mjsikakb )
 ROM_END
 
 ROM_START( mjsikakc )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.bin",       0x00000, 0x10000, CRC(74e6e403) SHA1(975ea8792511d9962ccd41a2cc70bce9e97a187d) )
 
 	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
@@ -3953,7 +3953,7 @@ ROM_START( mjsikakc )
 ROM_END
 
 ROM_START( mjsikakd )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "11.bin",      0x00000, 0x10000, CRC(372474bd) SHA1(12ee6f3a49926d8120b46e36df4d7df628e86ac1) )
 
 	ROM_REGION( 0x20000, "voice", 0 ) /* voice */
@@ -3972,7 +3972,7 @@ ROM_START( mjsikakd )
 ROM_END
 
 ROM_START( mmsikaku )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.4g",        0x00000, 0x08000, CRC(6a8483af) SHA1(0ba9177991f14ea26cec1d1e01c3c38921d5b3cf) )
 	ROM_LOAD( "2.3g",        0x08000, 0x08000, CRC(eb352bea) SHA1(6e0233de09d74ff0bc92cbc9715b8c7c2fefdade) )
 
@@ -3992,7 +3992,7 @@ ROM_START( mmsikaku )
 ROM_END
 
 ROM_START( otonano )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "otona_01.bin", 0x00000, 0x10000, CRC(ee629b72) SHA1(f4661981e6e41cf17d2ca453a6c53f9b9bbd93f1) )
 
 	ROM_REGION( 0x40000, "voice", 0 ) /* voice */
@@ -4013,7 +4013,7 @@ ROM_START( otonano )
 ROM_END
 
 ROM_START( mjcamera )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "mcam_01.bin", 0x00000, 0x10000, CRC(73d4b9ff) SHA1(219bc9617c14490d70bb3e28ab497dfd2ef01cf8) )
 
 	ROM_REGION( 0x30000, "voice", 0 ) /* voice */
@@ -4043,7 +4043,7 @@ ROM_START( mjcamera )
 ROM_END
 
 ROM_START( idhimitu )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.3f",     0x00000, 0x10000, CRC(619f9465) SHA1(9e4d3cab6370bda06ddedea5ca4b6d4cbd158174) )
 
 	ROM_REGION( 0x30000, "voice", 0 ) /* voice */
@@ -4068,7 +4068,7 @@ ROM_START( idhimitu )
 ROM_END
 
 ROM_START( barline )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "16061_1h1r.c2", 0x00000, 0x10000, CRC(0a1d3e61) SHA1(652005181779e69c03f2b29e6aac2481321b8d06) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )

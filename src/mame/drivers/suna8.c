@@ -61,7 +61,7 @@ Notes:
 
 static DRIVER_INIT( hardhead )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
@@ -76,15 +76,15 @@ static DRIVER_INIT( hardhead )
 			rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
 	}
 
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 /* Non encrypted bootleg */
 static DRIVER_INIT( hardhedb )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x48000);
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x48000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -95,9 +95,9 @@ static DRIVER_INIT( hardhedb )
 
 static UINT8 *brickzn_decrypt(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8	*RAM	=	memory_region(machine, "main");
-	size_t	size	=	memory_region_length(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8	*RAM	=	memory_region(machine, "maincpu");
+	size_t	size	=	memory_region_length(machine, "maincpu");
 	UINT8   *decrypt = auto_malloc(size);
 	int i;
 
@@ -138,7 +138,7 @@ static UINT8 *brickzn_decrypt(running_machine *machine)
 
 static DRIVER_INIT( brickzn )
 {
-	UINT8	*RAM	=	memory_region(machine, "main");
+	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	UINT8   *decrypt = brickzn_decrypt(machine);
 	int i;
 
@@ -163,13 +163,13 @@ static DRIVER_INIT( brickzn )
 	decrypt[0x24b5] = 0x00;	// HALT -> NOP
 	decrypt[0x2583] = 0x00;	// HALT -> NOP
 
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, 1, 0, 16, decrypt + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( brickzn3 )
 {
-	UINT8	*RAM	=	memory_region(machine, "main");
+	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	UINT8   *decrypt = brickzn_decrypt(machine);
 	int i;
 
@@ -194,7 +194,7 @@ static DRIVER_INIT( brickzn3 )
 	decrypt[0x2487] = 0x00;	// HALT -> NOP
 	decrypt[0x256c] = 0x00;	// HALT -> NOP
 
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, 1, 0, 16, decrypt + 0x10000, 0x4000);
 }
 
@@ -205,9 +205,9 @@ static DRIVER_INIT( brickzn3 )
 
 static DRIVER_INIT( hardhea2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8	*RAM	=	memory_region(machine, "main");
-	size_t	size	=	memory_region_length(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8	*RAM	=	memory_region(machine, "maincpu");
+	size_t	size	=	memory_region_length(machine, "maincpu");
 	UINT8   *decrypt = 	auto_malloc(size);
 	UINT8 x;
 	int i;
@@ -281,7 +281,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
 	}
 
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	memory_configure_bank(machine, 2, 0, 2, auto_malloc(0x2000 * 2), 0x2000);
 }
 
@@ -292,9 +292,9 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 
 static DRIVER_INIT( starfigh )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8	*RAM	=	memory_region(machine, "main");
-	size_t	size	=	memory_region_length(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8	*RAM	=	memory_region(machine, "maincpu");
+	size_t	size	=	memory_region_length(machine, "maincpu");
 	UINT8   *decrypt = 	auto_malloc(size);
 	UINT8 x;
 	int i;
@@ -350,7 +350,7 @@ static DRIVER_INIT( starfigh )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x45;
 	}
 
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 
@@ -360,9 +360,9 @@ static DRIVER_INIT( starfigh )
 
 static DRIVER_INIT( sparkman )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8	*RAM	=	memory_region(machine, "main");
-	size_t	size	=	memory_region_length(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8	*RAM	=	memory_region(machine, "maincpu");
+	size_t	size	=	memory_region_length(machine, "maincpu");
 	UINT8   *decrypt = 	auto_malloc(size);
 	UINT8 x;
 	int i;
@@ -418,7 +418,7 @@ static DRIVER_INIT( sparkman )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x44;
 	}
 
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -1480,18 +1480,18 @@ static const samples_interface suna8_samples_interface =
 static MACHINE_DRIVER_START( hardhead )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)			/* ? */
+	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)			/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_readmem,hardhead_writemem)
 	MDRV_CPU_IO_MAP(hardhead_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* No NMI */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* No NMI */
 
-	MDRV_CPU_ADD("audio", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
 	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1534,17 +1534,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rranger )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(rranger_readmem,rranger_writemem)
 	MDRV_CPU_IO_MAP(rranger_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ & NMI ! */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ & NMI ! */
 
-	MDRV_CPU_ADD("audio", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(rranger_sound_readmem,rranger_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* NMI = retn */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1590,12 +1590,12 @@ static INTERRUPT_GEN( brickzn_interrupt )
 static MACHINE_DRIVER_START( brickzn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA PROTECTION BLOCK */
+	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA PROTECTION BLOCK */
 	MDRV_CPU_PROGRAM_MAP(brickzn_readmem,brickzn_writemem)
 //  MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt, 2)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// nmi breaks ramtest but is needed!
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// nmi breaks ramtest but is needed!
 
-	MDRV_CPU_ADD("sound", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
+	MDRV_CPU_ADD("soundcpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
 	MDRV_CPU_PROGRAM_MAP(brickzn_sound_readmem,brickzn_sound_writemem)
 
 	MDRV_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
@@ -1603,7 +1603,7 @@ static MACHINE_DRIVER_START( brickzn )
 	MDRV_CPU_IO_MAP(brickzn_pcm_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1666,7 +1666,7 @@ static MACHINE_RESET( hardhea2 )
 static MACHINE_DRIVER_START( hardhea2 )
 
 	MDRV_IMPORT_FROM( brickzn )
-	MDRV_CPU_MODIFY("main")			/* SUNA T568009 */
+	MDRV_CPU_MODIFY("maincpu")			/* SUNA T568009 */
 	MDRV_CPU_PROGRAM_MAP(hardhea2_readmem,hardhea2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(hardhea2_interrupt,2)	/* IRQ & NMI */
 
@@ -1692,18 +1692,18 @@ static const ay8910_interface starfigh_ay8910_interface =
 static MACHINE_DRIVER_START( starfigh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(starfigh_readmem,starfigh_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt,2)	/* IRQ & NMI */
 
 	/* The sound section is identical to that of hardhead */
-	MDRV_CPU_ADD("audio", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
 	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1751,17 +1751,17 @@ static INTERRUPT_GEN( sparkman_interrupt )
 static MACHINE_DRIVER_START( sparkman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(sparkman_readmem,sparkman_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(sparkman_interrupt,2)	/* IRQ & NMI */
 
-	MDRV_CPU_ADD("audio", Z80, SUNA8_MASTER_CLOCK / 4)				/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)				/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
 	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1836,7 +1836,7 @@ Sound processor -  Z80
 ***************************************************************************/
 
 ROM_START( hardhead )
-	ROM_REGION( 0x48000, "main", 0 ) /* Main Z80 Code */
+	ROM_REGION( 0x48000, "maincpu", 0 ) /* Main Z80 Code */
 	ROM_LOAD( "p1",  0x00000, 0x8000, CRC(c6147926) SHA1(8d1609aaeac344c6aec102e92d34caab22a8ec64) )	// 1988,9,14
 	ROM_LOAD( "p2",  0x10000, 0x8000, CRC(faa2cf9a) SHA1(5987f146b58fcbc3aaa9c010d86022b5172bcfb4) )
 	ROM_LOAD( "p3",  0x18000, 0x8000, CRC(3d24755e) SHA1(519a179594956f7c3ddfaca362c42b453c928e25) )
@@ -1846,7 +1846,7 @@ ROM_START( hardhead )
 	ROM_LOAD( "p9",  0x38000, 0x8000, CRC(2ad430c4) SHA1(286a5b1042e077c3ae741d01311d4c91f8f87054) )
 	ROM_LOAD( "p10", 0x40000, 0x8000, CRC(b6894517) SHA1(e114a5f92b83d98215aab6e2cd943a110d118f56) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "p13", 0x0000, 0x8000, CRC(493c0b41) SHA1(994a334253e905c39ec912765e8b0f4b1be900bc) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* Sprites */
@@ -1864,7 +1864,7 @@ ROM_START( hardhead )
 ROM_END
 
 ROM_START( hardhedb )
-	ROM_REGION( 0x48000+0x8000, "main", 0 ) /* Main Z80 Code */
+	ROM_REGION( 0x48000+0x8000, "maincpu", 0 ) /* Main Z80 Code */
 	ROM_LOAD( "1_27512.l6",  0x48000, 0x8000, CRC(bb4aa9ac) SHA1(da6310a1034cf610139d74fc30dd13e5fbd1d8dd) ) // 1988,9,14 (already decrypted)
 	ROM_CONTINUE(			 0x00000, 0x8000 )
 	ROM_LOAD( "p2",			 0x10000, 0x8000, CRC(faa2cf9a) SHA1(5987f146b58fcbc3aaa9c010d86022b5172bcfb4) )
@@ -1875,7 +1875,7 @@ ROM_START( hardhedb )
 	ROM_LOAD( "p9",			 0x38000, 0x8000, CRC(2ad430c4) SHA1(286a5b1042e077c3ae741d01311d4c91f8f87054) )
 	ROM_LOAD( "p10",		 0x40000, 0x8000, CRC(b6894517) SHA1(e114a5f92b83d98215aab6e2cd943a110d118f56) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "p13", 0x0000, 0x8000, CRC(493c0b41) SHA1(994a334253e905c39ec912765e8b0f4b1be900bc) )
 //  ROM_LOAD( "2_13_9h.rom", 0x00000, 0x8000, CRC(1b20e5ec) )
 
@@ -1894,7 +1894,7 @@ ROM_START( hardhedb )
 ROM_END
 
 ROM_START( pop_hh )
-	ROM_REGION( 0x48000+0x8000, "main", 0 ) /* Main Z80 Code */
+	ROM_REGION( 0x48000+0x8000, "maincpu", 0 ) /* Main Z80 Code */
 	ROM_LOAD( "1_27512.l6",  0x48000, 0x8000, CRC(bb4aa9ac) SHA1(da6310a1034cf610139d74fc30dd13e5fbd1d8dd) ) // 1988,9,14 (already decrypted)
 	ROM_CONTINUE(			 0x00000, 0x8000 )
 	ROM_LOAD( "2_27256.k6",  0x10000, 0x8000, CRC(8fcc1248) SHA1(5da0b7dc63f7bc00e81e9e5bac02ee6b0076ffaa) )
@@ -1905,7 +1905,7 @@ ROM_START( pop_hh )
 	ROM_LOAD( "p9",          0x38000, 0x8000, CRC(2ad430c4) SHA1(286a5b1042e077c3ae741d01311d4c91f8f87054) ) // 9_27256.j8
 	ROM_LOAD( "10_27256.i8", 0x40000, 0x8000, CRC(84fc6574) SHA1(ab33e6c656f25e65bb08d0a2689693df83cab43d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "p13", 0x0000, 0x8000, CRC(493c0b41) SHA1(994a334253e905c39ec912765e8b0f4b1be900bc) ) // 13_27256.i10
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* Sprites */
@@ -1981,7 +1981,7 @@ Sound processor - Z80
 ***************************************************************************/
 
 ROM_START( rranger )
-	ROM_REGION( 0x48000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x48000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "1",  0x00000, 0x8000, CRC(4fb4f096) SHA1(c5ac3e04080cdcf570769918587e8cf8d455fc30) )	// V 2.0 1988,4,15
 	ROM_LOAD( "2",  0x10000, 0x8000, CRC(ff65af29) SHA1(90f9a0c862e2a9da0343446a325961ab29d26b4b) )
 	ROM_LOAD( "3",  0x18000, 0x8000, CRC(64e09436) SHA1(077f0d38d489562532d5f7678434a85ca04d373c) )
@@ -1990,7 +1990,7 @@ ROM_START( rranger )
 	ROM_LOAD( "r5", 0x38000, 0x8000, CRC(6a7ca1c3) SHA1(0f0b508e9b20909e9efa07b42d67732082b6940b) )
 	ROM_CONTINUE(   0x28000, 0x8000             )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "14", 0x0000, 0x8000, CRC(11c83aa1) SHA1(d1f75096528b220a3f858eac62e3b4111fa013de) )
 
 	ROM_REGION( 0x8000, "samples", 0 )	/* Samples */
@@ -2008,7 +2008,7 @@ ROM_START( rranger )
 ROM_END
 
 ROM_START( sranger )
-	ROM_REGION( 0x48000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x48000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "r1", 0x00000, 0x8000, CRC(4eef1ede) SHA1(713074400e27f6983f97ce73e522a1d687961317) )	// V 2.0 1988,4,15
 	ROM_LOAD( "2",  0x10000, 0x8000, CRC(ff65af29) SHA1(90f9a0c862e2a9da0343446a325961ab29d26b4b) )
 	ROM_LOAD( "3",  0x18000, 0x8000, CRC(64e09436) SHA1(077f0d38d489562532d5f7678434a85ca04d373c) )
@@ -2017,7 +2017,7 @@ ROM_START( sranger )
 	ROM_LOAD( "r5", 0x38000, 0x8000, CRC(6a7ca1c3) SHA1(0f0b508e9b20909e9efa07b42d67732082b6940b) )
 	ROM_CONTINUE(   0x28000, 0x8000             )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "14", 0x0000, 0x8000, CRC(11c83aa1) SHA1(d1f75096528b220a3f858eac62e3b4111fa013de) )
 
 	ROM_REGION( 0x8000, "samples", 0 )	/* Samples */
@@ -2035,7 +2035,7 @@ ROM_START( sranger )
 ROM_END
 
 ROM_START( srangerb )
-	ROM_REGION( 0x48000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x48000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "r1bt", 0x00000, 0x8000, CRC(40635e7c) SHA1(741290ad640e941774d496a329cd29198ab83463) )	// NYWACORPORATION LTD 88-1-07
 	ROM_LOAD( "2",    0x10000, 0x8000, CRC(ff65af29) SHA1(90f9a0c862e2a9da0343446a325961ab29d26b4b) )
 	ROM_LOAD( "3",    0x18000, 0x8000, CRC(64e09436) SHA1(077f0d38d489562532d5f7678434a85ca04d373c) )
@@ -2045,7 +2045,7 @@ ROM_START( srangerb )
 	ROM_CONTINUE(     0x28000, 0x8000             )
 	ROM_LOAD( "r5bt", 0x28000, 0x8000, BAD_DUMP CRC(f7f391b5) SHA1(a0a8de1d9d7876f5c4b26e34d5e54ec79529c2da) )	// wrong length
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "14", 0x0000, 0x8000, CRC(11c83aa1) SHA1(d1f75096528b220a3f858eac62e3b4111fa013de) )
 
 	ROM_REGION( 0x8000, "samples", 0 )	/* Samples */
@@ -2063,7 +2063,7 @@ ROM_START( srangerb )
 ROM_END
 
 ROM_START( srangerw )
-	ROM_REGION( 0x48000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x48000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "w1", 0x00000, 0x8000, CRC(2287d3fc) SHA1(cc2dab587ca50fc4371d2861ac842cd81370f868) )	// 88,2,28
 	ROM_LOAD( "2",  0x10000, 0x8000, CRC(ff65af29) SHA1(90f9a0c862e2a9da0343446a325961ab29d26b4b) )
 	ROM_LOAD( "3",  0x18000, 0x8000, CRC(64e09436) SHA1(077f0d38d489562532d5f7678434a85ca04d373c) )
@@ -2072,7 +2072,7 @@ ROM_START( srangerw )
 	ROM_LOAD( "r5", 0x38000, 0x8000, CRC(6a7ca1c3) SHA1(0f0b508e9b20909e9efa07b42d67732082b6940b) )
 	ROM_CONTINUE(   0x28000, 0x8000             )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "14", 0x0000, 0x8000, CRC(11c83aa1) SHA1(d1f75096528b220a3f858eac62e3b4111fa013de) )
 
 	ROM_REGION( 0x8000, "samples", 0 )	/* Samples */
@@ -2120,12 +2120,12 @@ Large epoxy(?) module near the cpu's.
 ***************************************************************************/
 
 ROM_START( brickzn )
-	ROM_REGION( 0x50000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x50000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "brickzon.009", 0x00000, 0x08000, CRC(1ea68dea) SHA1(427152a26b062c5e77089de49c1da69369d4d557) )	// V5.0 1992,3,3
 	ROM_LOAD( "brickzon.008", 0x10000, 0x20000, CRC(c61540ba) SHA1(08c0ede591b229427b910ca6bb904a6146110be8) )
 	ROM_LOAD( "brickzon.007", 0x30000, 0x20000, CRC(ceed12f1) SHA1(9006726b75a65455afb1194298bade8fa2207b4a) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Music Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Music Z80 Code */
 	ROM_LOAD( "brickzon.010", 0x00000, 0x10000, CRC(4eba8178) SHA1(9a214a1acacdc124529bc9dde73a8e884fc70293) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )		/* PCM Z80 Code */
@@ -2141,12 +2141,12 @@ ROM_START( brickzn )
 ROM_END
 
 ROM_START( brickzn3 )
-	ROM_REGION( 0x50000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x50000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "39",           0x00000, 0x08000, CRC(043380bd) SHA1(7eea7cc7d754815df233879b4a9d3d88eac5b28d) )	// V3.0 1992,1,23
 	ROM_LOAD( "38",           0x10000, 0x20000, CRC(e16216e8) SHA1(e88ae97e8a632823d5f1fe500954b6f6542407d5) )
 	ROM_LOAD( "brickzon.007", 0x30000, 0x20000, CRC(ceed12f1) SHA1(9006726b75a65455afb1194298bade8fa2207b4a) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Music Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Music Z80 Code */
 	ROM_LOAD( "brickzon.010", 0x00000, 0x10000, CRC(4eba8178) SHA1(9a214a1acacdc124529bc9dde73a8e884fc70293) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )		/* PCM Z80 Code */
@@ -2200,14 +2200,14 @@ Sound is a Yamaha YM3812 and a  AY-3-8910A
 ***************************************************************************/
 
 ROM_START( hardhea2 )
-	ROM_REGION( 0x50000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x50000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "hrd-hd9",  0x00000, 0x08000, CRC(69c4c307) SHA1(0dfde1dcda51b5b1740aff9e96cb877a428a3e04) )	// V 2.0 1991,2,12
 	ROM_LOAD( "hrd-hd10", 0x10000, 0x10000, CRC(77ec5b0a) SHA1(2d3e24c208904a7884e585e08e5818fd9f8b5391) )
 	ROM_LOAD( "hrd-hd11", 0x20000, 0x10000, CRC(12af8f8e) SHA1(1b33a060b70900042fdae00f7dec325228d566f5) )
 	ROM_LOAD( "hrd-hd12", 0x30000, 0x10000, CRC(35d13212) SHA1(2fd03077b89ec9e55d2758b7f9cada970f0bdd91) )
 	ROM_LOAD( "hrd-hd13", 0x40000, 0x10000, CRC(3225e7d7) SHA1(2da9d1ce182dab8d9e09772e6899676b84c7458c) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Music Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Music Z80 Code */
 	ROM_LOAD( "hrd-hd14", 0x00000, 0x08000, CRC(79a3be51) SHA1(30bc67cd3a936615c6931f8e15953425dff59611) )
 
 	ROM_REGION( 0x10000, "pcm", 0 )		/* PCM Z80 Code */
@@ -2232,14 +2232,14 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( starfigh )
-	ROM_REGION( 0x50000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x50000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "starfgtr.l1", 0x00000, 0x08000, CRC(f93802c6) SHA1(4005b06b69dd440dfb6385766386a1168e73288f) )	// V.1
 	ROM_LOAD( "starfgtr.j1", 0x10000, 0x10000, CRC(fcfcf08a) SHA1(65fe1666aa5092f820b337bcbcbed7accdec440d) )
 	ROM_LOAD( "starfgtr.i1", 0x20000, 0x10000, CRC(6935fcdb) SHA1(f47812f6716ccf52dd7ab8522c29e059f1e38f31) )
 	ROM_LOAD( "starfgtr.l3", 0x30000, 0x10000, CRC(50c072a4) SHA1(e48ec5a786ef245e5b2b72390824b6b7c449a74b) )	// 0xxxxxxxxxxxxxxx = 0xFF (ROM Test: OK)
 	ROM_LOAD( "starfgtr.j3", 0x40000, 0x10000, CRC(3fe3c714) SHA1(ccc9a33cf29c0e43ae8ab91f08438a89c777c186) )	// clear text here
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Music Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Music Z80 Code */
 	ROM_LOAD( "starfgtr.m8", 0x0000, 0x8000, CRC(ae3b0691) SHA1(41e004d09522cf7ddce6e4adc68841ad5553264a) )
 
 	ROM_REGION( 0x8000, "samples", 0 )	/* Samples */
@@ -2280,14 +2280,14 @@ Sound is a Yamaha YM3812 and a  AY-3-8910A
 ***************************************************************************/
 
 ROM_START( sparkman )
-	ROM_REGION( 0x50000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x50000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "sparkman.e7", 0x00000, 0x08000, CRC(d89c5780) SHA1(177f0ae21c00575a7eb078e86f3a790fc95211e4) )	/* "SPARK MAN MAIN PROGRAM 1989,8,12 K.H.T (SUNA ELECTRPNICS) V 2.0 SOULE KOREA" */
 	ROM_LOAD( "sparkman.g7", 0x10000, 0x10000, CRC(48b4a31e) SHA1(771d1f1a2ce950ce2b661a4081471e98a7a7d53e) )
 	ROM_LOAD( "sparkman.g8", 0x20000, 0x10000, CRC(b8a4a557) SHA1(10251b49fb44fb1e7c71fde8fe9544df29d27346) )
 	ROM_LOAD( "sparkman.i7", 0x30000, 0x10000, CRC(f5f38e1f) SHA1(25f0abbac1298fad1f8e7202db05e48c3598bc88) )
 	ROM_LOAD( "sparkman.i8", 0x40000, 0x10000,  CRC(e54eea25) SHA1(b8ea884ee1a24953b6406f2d1edf103700f542d2) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Music Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Music Z80 Code */
 	ROM_LOAD( "sparkman.h11", 0x00000, 0x08000, CRC(06822f3d) SHA1(d30592cecbcd4dbf67e5a8d9c151d60b3232a54d) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* Sprites */
@@ -2319,7 +2319,7 @@ ROM_END
 
 static DRIVER_INIT( suna8 )
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 /* Working Games */

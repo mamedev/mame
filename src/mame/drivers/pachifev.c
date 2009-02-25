@@ -90,14 +90,14 @@ static MACHINE_RESET( pachifev )
 static MACHINE_DRIVER_START( pachifev )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,8000000/2)
+	MDRV_CPU_ADD("maincpu",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(pachifev_map,0)
 	MDRV_CPU_IO_MAP(pachifev_io,0)
 //  MDRV_CPU_FLAGS(CPU_DISABLE)
-//  MDRV_CPU_VBLANK_INT("main",irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -123,7 +123,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pachifev )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "ic42.00",   0x0000, 0x2000, CRC(9653546e) SHA1(0836d01118241d38bbf61732275afe3ae47d0622) )
 	ROM_LOAD( "ic43.01",   0x2000, 0x2000, CRC(5572dce5) SHA1(fad45b33e095ac6e3ed3d7cdc3d8678c153a1b38) )
 	ROM_LOAD( "ic44.02",   0x4000, 0x2000, CRC(98b3841f) SHA1(0563139877bf01e1673767ee1798bbcf68adadea) )

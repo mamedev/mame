@@ -268,17 +268,17 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( lemmings )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000)
+	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(lemmings_readmem,lemmings_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", M6809,32220000/8)
+	MDRV_CPU_ADD("audiocpu", M6809,32220000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -309,7 +309,7 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( lemmings )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "lemmings.5", 0x00000, 0x20000, CRC(e9a2b439) SHA1(873723a06d71bb41772951f451a75578b30267d5) )
 	ROM_LOAD16_BYTE( "lemmings.1", 0x00001, 0x20000, CRC(bf52293b) SHA1(47a1ed64bf02776db086fdce80997b8a0c068791) )
 	ROM_LOAD16_BYTE( "lemmings.6", 0x40000, 0x20000, CRC(0e3dc0ea) SHA1(533abf66ca4b578d03566d5de922dc5828c26eca) )
@@ -319,7 +319,7 @@ ROM_START( lemmings )
 	ROM_LOAD16_BYTE( "lemmings.8", 0xc0000, 0x20000, CRC(9166ce09) SHA1(7f0970cc07ebdbfc9a738342259d07d37b397161) )
 	ROM_LOAD16_BYTE( "lemmings.4", 0xc0001, 0x20000, CRC(aa845488) SHA1(d17ec80f43d2a0123e93fad83d4e1319eb18d7c7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "lemmings.15",    0x00000, 0x10000, CRC(f0b24a35) SHA1(1aaeb1e6faee04d2e433161fd7aa965b58e3b8a7) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )

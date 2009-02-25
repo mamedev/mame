@@ -385,12 +385,12 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( dreamwld )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, MASTER_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", M68EC020, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(dreamwld_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold) // 4, 5, or 6, all point to the same place
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold) // 4, 5, or 6, all point to the same place
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -419,7 +419,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( dreamwld )
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "1.bin", 0x000002, 0x040000, CRC(35c94ee5) SHA1(3440a65a807622b619c97bc2a88fd7d875c26f66) )
 	ROM_LOAD32_BYTE( "2.bin", 0x000003, 0x040000, CRC(5409e7fc) SHA1(2f94a6a8e4c94b36b43f0b94d58525f594339a9d) )
 	ROM_LOAD32_BYTE( "3.bin", 0x000000, 0x040000, CRC(e8f7ae78) SHA1(cfd393cec6dec967c82e1131547b7e7fdc5d814f) )

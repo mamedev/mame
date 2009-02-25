@@ -440,7 +440,7 @@ INPUT_PORTS_END
 static const tms34010_config master_config =
 {
 	FALSE,						/* halt on reset */
-	"main",						/* the screen operated on */
+	"screen",					/* the screen operated on */
 	40000000/8,					/* pixel clock */
 	1,							/* pixels per clock */
 	exterm_scanline_update,		/* scanline updater */
@@ -452,7 +452,7 @@ static const tms34010_config master_config =
 static const tms34010_config slave_config =
 {
 	TRUE,						/* halt on reset */
-	"main",						/* the screen operated on */
+	"screen",					/* the screen operated on */
 	40000000/8,					/* pixel clock */
 	1,							/* pixels per clock */
 	NULL,						/* scanline updater */
@@ -472,7 +472,7 @@ static const tms34010_config slave_config =
 static MACHINE_DRIVER_START( exterm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS34010, 40000000)
+	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(master_config)
 	MDRV_CPU_PROGRAM_MAP(master_map,0)
 
@@ -480,7 +480,7 @@ static MACHINE_DRIVER_START( exterm )
 	MDRV_CPU_CONFIG(slave_config)
 	MDRV_CPU_PROGRAM_MAP(slave_map,0)
 
-	MDRV_CPU_ADD("audio", M6502, 2000000)
+	MDRV_CPU_ADD("audiocpu", M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(sound_master_map,0)
 
 	MDRV_CPU_ADD("audioslave", M6502, 2000000)
@@ -494,7 +494,7 @@ static MACHINE_DRIVER_START( exterm )
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(2048+32768)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(40000000/8, 318, 0, 256, 264, 0, 240)
 
@@ -520,7 +520,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( exterm )
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for YM2151 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for YM2151 code */
 	ROM_LOAD( "v101y1", 0x8000, 0x8000, CRC(cbeaa837) SHA1(87d8a258f059512dbf9bc0e7cfff728ef9e616f1) )
 
 	ROM_REGION( 0x10000, "audioslave", 0 )		/* 64k for DAC code */

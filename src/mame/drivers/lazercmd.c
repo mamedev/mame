@@ -615,7 +615,7 @@ static PALETTE_INIT( lazercmd )
 static MACHINE_DRIVER_START( lazercmd )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650,MASTER_CLOCK/12)				/* 672 kHz? */
+	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 672 kHz? */
 /*          Main Clock is 8MHz divided by 12
             but memory and IO access is only possible
             within the line and frame blanking period
@@ -625,7 +625,7 @@ static MACHINE_DRIVER_START( lazercmd )
 	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -650,7 +650,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( medlanes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650,MASTER_CLOCK/12)				/* 666 kHz */
+	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
 /*          Main Clock is 8MHz divided by 12
             but memory and IO access is only possible
             within the line and frame blanking period
@@ -660,7 +660,7 @@ static MACHINE_DRIVER_START( medlanes )
 	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128) 	/* 7680 Hz */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -685,7 +685,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbonk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650,MASTER_CLOCK/12)				/* 666 kHz */
+	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
 /*          Main Clock is 8MHz divided by 12
             but memory and IO access is only possible
             within the line and frame blanking period
@@ -695,7 +695,7 @@ static MACHINE_DRIVER_START( bbonk )
 	MDRV_CPU_VBLANK_INT_HACK(bbonk_timer, 128) 	/* 7680 Hz */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -723,7 +723,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( lazercmd )
-	ROM_REGION( 0x0c00, "main", ROMREGION_INVERT )			   /* 32K cpu, 4K for ROM/RAM */
+	ROM_REGION( 0x0c00, "maincpu", ROMREGION_INVERT )			   /* 32K cpu, 4K for ROM/RAM */
 	ROM_LOAD_NIB_HIGH( "lc.e5",        0x0000, 0x0400, CRC(56dc7a40) SHA1(1324d5d6a44d7314723a0b5745d89f8e27f49d25) )
 	ROM_LOAD_NIB_LOW(  "lc.f5",        0x0000, 0x0400, CRC(fc5b38a4) SHA1(bff670d7b78c6b9324d2bf4b2d8a4f9dbfe82158) )
 	ROM_LOAD_NIB_HIGH( "lc.e6",        0x0400, 0x0400, CRC(b1ef0aa2) SHA1(3edeaa4d4f4e18536066898284d430a1ac00512e) )
@@ -736,7 +736,7 @@ ROM_START( lazercmd )
 ROM_END
 
 ROM_START( medlanes )
-	ROM_REGION( 0x1800, "main", ROMREGION_INVERT )	   /* 32K cpu, 4K for ROM/RAM */
+	ROM_REGION( 0x1800, "maincpu", ROMREGION_INVERT )	   /* 32K cpu, 4K for ROM/RAM */
 	ROM_LOAD_NIB_HIGH( "medlanes.2a", 0x0000, 0x0400, CRC(9c77566a) SHA1(60e1820012b47da8b86d54f00b6f60d2d0123745) )
 	ROM_LOAD_NIB_LOW(  "medlanes.3a", 0x0000, 0x0400, CRC(22bc56a6) SHA1(7444170c19274d9d889df61796e6f61af2361f3e) )
 	ROM_LOAD_NIB_HIGH( "medlanes.2b", 0x0400, 0x0400, CRC(7841b1a9) SHA1(80621d30995dad42ae44c62494922ca8b75415cf) )
@@ -754,7 +754,7 @@ ROM_END
 
 
 ROM_START( bbonk )
-	ROM_REGION( 0x0c00, "main", ROMREGION_INVERT )			   /* 32K cpu, 4K for ROM/RAM */
+	ROM_REGION( 0x0c00, "maincpu", ROMREGION_INVERT )			   /* 32K cpu, 4K for ROM/RAM */
 	ROM_LOAD_NIB_HIGH( "bbonk.e5",     0x0000, 0x0400, CRC(d032baa0) SHA1(09cba16f6a2b7d8a8c501db639bd5eeefb63dc0f) )
 	ROM_LOAD_NIB_LOW(  "bbonk.f5",     0x0000, 0x0400, CRC(748e8c7f) SHA1(99e4e182ee41c246e31f656411a9f09d7b617f92) )
 	ROM_LOAD_NIB_HIGH( "bbonk.e6",     0x0400, 0x0400, CRC(71df0e25) SHA1(c2f78490816add1296923861a89df15be9822fed) )

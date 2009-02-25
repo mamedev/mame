@@ -271,7 +271,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( thunderj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
@@ -281,14 +281,14 @@ static MACHINE_DRIVER_START( thunderj )
 	MDRV_NVRAM_HANDLER(atarigen)
 
 	/* perfect synchronization due to shared RAM */
-	MDRV_QUANTUM_PERFECT_CPU("main")
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_GFXDECODE(thunderj)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
@@ -310,7 +310,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( thunderj )
-	ROM_REGION( 0xa0000, "main", 0 )	/* 10*64k for 68000 code */
+	ROM_REGION( 0xa0000, "maincpu", 0 )	/* 10*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136076-2001.14e",   0x00000, 0x10000, CRC(f6a71532) SHA1(b1c55968d7da9b64bde737d66aa8f0ddcdcfee27) )
 	ROM_LOAD16_BYTE( "136076-2002.14c",   0x00001, 0x10000, CRC(173ec10d) SHA1(e32eca9194336f3d7e289b2a187ed125ed03688c) )
 	ROM_LOAD16_BYTE( "136076-2003.15e",   0x20000, 0x10000, CRC(6e155469) SHA1(ba87d0a510304fd8a0f91c81580c4f09fc4d1886) )
@@ -325,7 +325,7 @@ ROM_START( thunderj )
 	ROM_REGION( 0x80000, "extra", 0 )	/* 8*64k for 68000 code */
 	ROM_LOAD16_BYTE( "136076-1011.17l",    0x00000, 0x10000, CRC(bbbbca45) SHA1(977e785e0272a84c8d7e28e25f45064d1b37aad1) )
 	ROM_LOAD16_BYTE( "136076-1012.17n",    0x00001, 0x10000, CRC(53e5e638) SHA1(75593e5d328ede105b8db64005dd5d1c5cae11ed) )
-	ROM_COPY( "main", 0x60000, 0x60000, 0x20000 )
+	ROM_COPY( "maincpu", 0x60000, 0x60000, 0x20000 )
 
 	ROM_REGION( 0x14000, "jsa", 0 )	/* 64k + 16k for 6502 code */
 	ROM_LOAD( "136076-2015.1b", 0x10000, 0x4000, CRC(d8feb7fb) SHA1(684ebf2f0c0df742c98e7f45f74de86a11c8d6e8) )

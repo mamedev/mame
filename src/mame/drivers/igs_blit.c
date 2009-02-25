@@ -394,7 +394,7 @@ static WRITE16_HANDLER( igs_palette_w )
 static void grtwall_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 
@@ -418,7 +418,7 @@ static void grtwall_decrypt(running_machine *machine)
 static void lhb_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 
@@ -443,7 +443,7 @@ static void lhb_decrypt(running_machine *machine)
 static void chindrag_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 
@@ -472,7 +472,7 @@ static void chindrag_decrypt(running_machine *machine)
 static void drgnwrld_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 
@@ -502,7 +502,7 @@ static void chmplst2_decrypt(running_machine *machine)
 {
 	int i,j;
 	int rom_size = 0x80000;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 	UINT16 *result_data = malloc_or_die(rom_size);
 
  	for (i=0; i<rom_size/2; i++)
@@ -532,7 +532,7 @@ static void chmplst2_decrypt(running_machine *machine)
 static void vbowlj_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 
@@ -566,7 +566,7 @@ static void vbowlj_decrypt(running_machine *machine)
 static void dbc_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 
@@ -2389,14 +2389,14 @@ GFXDECODE_END
 */
 
 static MACHINE_DRIVER_START( igs_base )
-	MDRV_CPU_ADD("main",M68000, 22000000/3)
+	MDRV_CPU_ADD("maincpu",M68000, 22000000/3)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 //  MDRV_GFXDECODE(igs_blit)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2429,7 +2429,7 @@ static INTERRUPT_GEN( chmplst2_interrupt )
 
 static MACHINE_DRIVER_START( chmplst2 )
 	MDRV_IMPORT_FROM(igs_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(chmplst2,0)
 	MDRV_CPU_VBLANK_INT_HACK(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
@@ -2442,7 +2442,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( chindrag )
 	MDRV_IMPORT_FROM(igs_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(chindrag,0)
 	MDRV_CPU_VBLANK_INT_HACK(chmplst2_interrupt,1+4)	// lev5 frequency drives the music tempo
 
@@ -2462,7 +2462,7 @@ static INTERRUPT_GEN( grtwall_interrupt )
 
 static MACHINE_DRIVER_START( grtwall )
 	MDRV_IMPORT_FROM(igs_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(grtwall,0)
 	MDRV_CPU_VBLANK_INT_HACK(grtwall_interrupt,2)
 MACHINE_DRIVER_END
@@ -2486,7 +2486,7 @@ static INTERRUPT_GEN( lhb_interrupt )
 
 static MACHINE_DRIVER_START( lhb )
 	MDRV_IMPORT_FROM(igs_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lhb,0)
 	MDRV_CPU_VBLANK_INT_HACK(lhb_interrupt,3+1)
 MACHINE_DRIVER_END
@@ -2516,7 +2516,7 @@ static INTERRUPT_GEN( vbowl_interrupt )
 
 static MACHINE_DRIVER_START( vbowl )
 	MDRV_IMPORT_FROM(igs_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(vbowl,0)
 	MDRV_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
 
@@ -2533,7 +2533,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( xymg )
 	MDRV_IMPORT_FROM(igs_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(xymg,0)
 	MDRV_CPU_VBLANK_INT_HACK(grtwall_interrupt,2)
 MACHINE_DRIVER_END
@@ -2542,7 +2542,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( chmplst2 )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "screen");
 
 	chmplst2_decrypt(machine);
 	chmplst2_decrypt_gfx(machine);
@@ -2564,7 +2564,7 @@ static DRIVER_INIT( chmplst2 )
 
 static DRIVER_INIT( drgnwrld )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	drgnwrld_decrypt(machine);
 	chindrag_gfx_decrypt(machine);
@@ -2587,7 +2587,7 @@ static DRIVER_INIT( drgnwrld )
 
 static DRIVER_INIT( drgwrld3 )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	drgnwrld_decrypt(machine);
 	chindrag_gfx_decrypt(machine);
@@ -2611,7 +2611,7 @@ static DRIVER_INIT( drgwrld3 )
 
 static DRIVER_INIT( chindrac )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	drgnwrld_decrypt(machine);
 	chindrag_gfx_decrypt(machine);
@@ -2643,7 +2643,7 @@ static DRIVER_INIT( chindrah )
 
 static DRIVER_INIT( chindrag )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	chindrag_decrypt(machine);
 	chindrag_gfx_decrypt(machine);
@@ -2669,7 +2669,7 @@ static DRIVER_INIT( chindrag )
 
 static DRIVER_INIT( chugokur )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	chindrag_decrypt(machine);
 	chindrag_gfx_decrypt(machine);
@@ -2697,7 +2697,7 @@ static DRIVER_INIT( chugokur )
 
 static DRIVER_INIT( grtwall )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	grtwall_decrypt(machine);
 
@@ -2719,7 +2719,7 @@ static DRIVER_INIT( grtwall )
 
 static DRIVER_INIT( lhb )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	lhb_decrypt(machine);
 
@@ -2729,7 +2729,7 @@ static DRIVER_INIT( lhb )
 
 static DRIVER_INIT( lhba )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	lhb_decrypt(machine);
 
@@ -2739,7 +2739,7 @@ static DRIVER_INIT( lhba )
 
 static DRIVER_INIT( vbowl )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 	UINT8  *gfx = (UINT8 *)  memory_region(machine, "gfx1");
 	int i;
 
@@ -2760,7 +2760,7 @@ static DRIVER_INIT( vbowl )
 
 static DRIVER_INIT( vbowlj )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 	UINT8  *gfx = (UINT8 *)  memory_region(machine, "gfx1");
 	int i;
 
@@ -2780,7 +2780,7 @@ static DRIVER_INIT( vbowlj )
 
 static DRIVER_INIT( xymg )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	lhb_decrypt(machine);
 
@@ -2813,7 +2813,7 @@ static DRIVER_INIT( xymg )
 
 static DRIVER_INIT( dbc )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	dbc_decrypt(machine);
 
@@ -2882,7 +2882,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( chmplst2 )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "maj2v185h.u29", 0x00000, 0x80000, CRC(2572d59a) SHA1(1d5362e209dadf8b21c10d1351d4bb038bfcaaef) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -2925,7 +2925,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( drgnwrld )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "chinadr-v0400.u3", 0x00000, 0x80000, CRC(a6daa2b8) SHA1(0cbfd001c1fd82a6385453d1c2a808add67746af) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
@@ -2950,7 +2950,7 @@ ROMs:
 ***************************************************************************/
 
 ROM_START( drgwrld3 )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "chinadr-v0300.u3", 0x00000, 0x80000, CRC(5ac243e5) SHA1(50cccff0307239187ac2b65331ad2bcc666f8033) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
@@ -2997,7 +2997,7 @@ The PCB is perfectly working, empty spaces and empty sockets are clearly intende
 ***************************************************************************/
 
 ROM_START( chindrac )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "igs-d0303.u3", 0x00000, 0x80000, CRC(3b3c29bb) SHA1(77b7e58104314303985c283cce3aec40bd7b9334) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
@@ -3036,7 +3036,7 @@ SOUND DATA?: "CHINA DRAGON U44"
 ***************************************************************************/
 
 ROM_START( chugokur )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "china_jp.v20", 0x00000, 0x80000, CRC(9e018d1a) SHA1(fe14e6344434cabf43685e50fd49c90f05f565be) )
 
 	ROM_REGION( 0x420000, "gfx1", 0 )
@@ -3049,7 +3049,7 @@ ROM_START( chugokur )
 ROM_END
 
 ROM_START( chindrag )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "v-021j", 0x00000, 0x80000, CRC(2f87f6e4) SHA1(d43065b078fdd9605c121988ad3092dce6cf0bf1) )
 
 	ROM_REGION( 0x420000, "gfx1", 0 )
@@ -3067,7 +3067,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( chindrah )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "c_drgn_hk.u3", 0x00000, 0x80000, CRC(182037ce) SHA1(141b698777533e57493e588d2526523d4bd3e17d) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
@@ -3093,7 +3093,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( grtwall )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "wlcc4096.rom", 0x00000, 0x80000, CRC(3b16729f) SHA1(4ef4e5cbd6ccc65775e36c2c8b459bc1767d6574) )
 	ROM_CONTINUE        (                 0x00000, 0x80000 ) // 1ST+2ND IDENTICAL
 
@@ -3120,7 +3120,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( lhb )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	// identical to LHB-4096
 	ROM_LOAD16_WORD_SWAP( "v305j-409", 0x00000, 0x80000, CRC(701de8ef) SHA1(4a77160f642f4de02fa6fbacf595b75c0d4a505d) )
 
@@ -3183,7 +3183,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( lhba )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "maj_v-033c.u30", 0x00000, 0x80000, CRC(02a0b716) SHA1(cd0ee32ea69f66768196b0e9b4df0fae3af84ed3) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -3245,7 +3245,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( dbc )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "maj-h_v027h.u30", 0x00000, 0x80000, CRC(5d5ccd5b) SHA1(7a1223923f9a5825fd919ae9a36912284e705382) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 )
@@ -3281,7 +3281,7 @@ there are 4 banks of 8 dip switches
 ***************************************************************************/
 
 ROM_START( vbowl )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "bowlingv101xcm.u45", 0x00000, 0x80000, BAD_DUMP CRC(ab8e3f1f) SHA1(69159e22559d6a26fe2afafd770aa640c192ba4b) )
 
 	ROM_REGION( 0x400000 * 2, "gfx1", 0)
@@ -3300,7 +3300,7 @@ ROM_START( vbowl )
 ROM_END
 
 ROM_START( vbowlj )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "vrbowlng.u45", 0x00000, 0x80000, CRC(091c19c1) SHA1(5a7bfbee357122e9061b38dfe988c3853b0984b0) ) // second half all 00
 
 	ROM_REGION( 0x400000 * 2, "gfx1", 0)
@@ -3332,7 +3332,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( xymg )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "u30-ebac.rom", 0x00000, 0x80000, CRC(7d272b6f) SHA1(15fd1be23cabdc77b747541f5cd9fed6b08be4ad) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 )

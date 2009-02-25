@@ -46,7 +46,7 @@ static READ8_DEVICE_HANDLER( megazone_portA_r )
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
 
-	clock = cputag_get_total_cycles(device->machine, "audio") * 7159/12288;	/* = (14318/8)/(18432/6) */
+	clock = cputag_get_total_cycles(device->machine, "audiocpu") * 7159/12288;	/* = (14318/8)/(18432/6) */
 	timer = (clock / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
@@ -308,14 +308,14 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( megazone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 18432000/9)        /* 2 MHz */
+	MDRV_CPU_ADD("maincpu", M6809, 18432000/9)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,18432000/6)     /* Z80 Clock is derived from the H1 signal */
+	MDRV_CPU_ADD("audiocpu", Z80,18432000/6)     /* Z80 Clock is derived from the H1 signal */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("dac", I8039,14318000/2)	/* 1/2 14MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
@@ -324,7 +324,7 @@ static MACHINE_DRIVER_START( megazone )
 	MDRV_QUANTUM_TIME(HZ(900))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -367,14 +367,14 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( megazone )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "319i07.bin",    0x6000, 0x2000, CRC(94b22ea8) SHA1(dc3ed2a0d1a12df51e46561324d78b7d655be313) )
 	ROM_LOAD( "319i06.bin",    0x8000, 0x2000, CRC(0468b619) SHA1(a6755728fab37674749f9b77cb53f6f228102f2f) )
 	ROM_LOAD( "319i05.bin",    0xa000, 0x2000, CRC(ac59000c) SHA1(c7568589f6b0e1706e996fdfed9c16755541951e) )
 	ROM_LOAD( "319i04.bin",    0xc000, 0x2000, CRC(1e968603) SHA1(fd818f678a3dc8d48a30f9f7670bfcb42a3009a2) )
 	ROM_LOAD( "319i03.bin",    0xe000, 0x2000, CRC(0888b803) SHA1(37249bfb14c6c3ce40ad68be457ab1f66fd7ea70) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319e02.bin",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
 	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
@@ -399,14 +399,14 @@ ROM_START( megazone )
 ROM_END
 
 ROM_START( megaznik )
-	ROM_REGION( 2*0x10000, "main", 0 )
+	ROM_REGION( 2*0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic59_cpu.bin",  0x6000, 0x2000, CRC(f41922a0) SHA1(9f54509da18721a76593921c6e52085e62e6ea6b) )
 	ROM_LOAD( "ic58_cpu.bin",  0x8000, 0x2000, CRC(7fd7277b) SHA1(e773247e0c9419cae49e04962ea362a2976c2db2) )
 	ROM_LOAD( "ic57_cpu.bin",  0xa000, 0x2000, CRC(a4b33b51) SHA1(12bb4da0319a7fe355e5ea4945759c8709aed5fe) )
 	ROM_LOAD( "ic56_cpu.bin",  0xc000, 0x2000, CRC(2aabcfbf) SHA1(f0054af98bd68158eab3328f8cf2a04b35e812c7) )
 	ROM_LOAD( "ic55_cpu.bin",  0xe000, 0x2000, CRC(b33a3c37) SHA1(2f1fdf1b9f18fcc9bd97cc9adeecc4ce77dd30c9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319e02.bin",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
 	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
@@ -482,14 +482,14 @@ REAR BOARD      1C026           N/U       (CUSTOM ON ORIGINAL)
 */
 
 ROM_START( megazona )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.12g",  0x6000, 0x2000, CRC(d42d67bf) SHA1(adac80d183ad26a9b1ec25a2da7ebbb33b441b63) )
 	ROM_LOAD( "6.10g",  0x8000, 0x2000, CRC(692398eb) SHA1(518001d738c2fb9417e52edfe9a7b74a074af3b0) )
 	ROM_LOAD( "5.9g",   0xa000, 0x2000, CRC(620ffec3) SHA1(e047beb29e0cda72126e8dcdd0b7504a202efba2) )
 	ROM_LOAD( "4.8g",   0xc000, 0x2000, CRC(28650971) SHA1(25e405fb9f648b7118e3c7c7b3ba59a7b7c29c42) )
 	ROM_LOAD( "3.6g",   0xe000, 0x2000, CRC(f264018f) SHA1(6ca0f7e26311799b0650a6c58567405bc2a7f922) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319-h02",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
 	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
@@ -514,14 +514,14 @@ ROM_START( megazona )
 ROM_END
 
 ROM_START( megazonb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "319-j07",  0x6000, 0x2000,  CRC(5161a523) SHA1(90b456c30bccaaca96c75c2f421af3a2875b0b6b) )
 	ROM_LOAD( "319-j06",  0x8000, 0x2000,  CRC(7344c3de) SHA1(d3867738d4828afa50c8b43116d68cc6074d6cb5) )
 	ROM_LOAD( "319-j05",  0xa000, 0x2000,  CRC(affa492b) SHA1(ee6789f293902716d65d08a89ae12dd96c75c885) )
 	ROM_LOAD( "319-j04",  0xc000, 0x2000,  CRC(03544ab3) SHA1(efa034cc6976b47915601cf215758df23e308878) )
 	ROM_LOAD( "319-j03",  0xe000, 0x2000,  CRC(0d95cc0a) SHA1(9aadadf09a4826da451ee35c89ee0254ec552d80) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319-h02",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
 	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
@@ -546,14 +546,14 @@ ROM_START( megazonb )
 ROM_END
 
 ROM_START( megazonc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "319-h07",  0x6000, 0x2000,  CRC(8ca47f64) SHA1(1a20db5ac504b9b004116cfa6992d63a86a04cc5) )
 	ROM_LOAD( "319-h06",  0x8000, 0x2000,  CRC(ed35b12e) SHA1(69e88c4801c838a24aba0a867af205a7169ad089) )
 	ROM_LOAD( "319-h05",  0xa000, 0x2000,  CRC(c3655ccd) SHA1(b86b58a12c6ced9a7e0a6d0cdb3881a28220a650) )
 	ROM_LOAD( "319-h04",  0xc000, 0x2000,  CRC(9e221177) SHA1(0c6fffd657d66090362108578aa78eb36bdcce6b) )
 	ROM_LOAD( "319-h03",  0xe000, 0x2000,  CRC(9048955b) SHA1(d8a7b46d984832f566298d3b417b3a34c9fea6c7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319-h02",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
 	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
@@ -580,7 +580,7 @@ ROM_END
 
 static DRIVER_INIT( megazone )
 {
-	konami1_decode(machine, "main");
+	konami1_decode(machine, "maincpu");
 }
 
 /* these just display a Konami copyright, no logo */

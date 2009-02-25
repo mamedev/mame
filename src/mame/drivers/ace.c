@@ -313,12 +313,12 @@ static MACHINE_START( ace )
 static MACHINE_DRIVER_START( ace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/9)	/* 2 MHz ? */
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/9)	/* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
     MDRV_MACHINE_START(ace)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -343,7 +343,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ace )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ace.a1",		0x0000, 0x0200, CRC(16811834) SHA1(5502812dd161908eea3fa8851d7e5c1e22b0f8ff) )
 	ROM_LOAD( "ace.a2",		0x0200, 0x0200, CRC(f9eae80e) SHA1(8865b86c7b5d57c76312c16f8a614bf35ffaf532) )
 	ROM_LOAD( "ace.a3",		0x0400, 0x0200, CRC(c5c63b8c) SHA1(2079dd12ff0c4aafec19aeb9baa70fc9b6788356) )

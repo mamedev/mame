@@ -816,15 +816,15 @@ static MACHINE_DRIVER_START( m10 )
 	MDRV_DRIVER_DATA(m10_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,IREMM10_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(m10_main,0)
 
 	MDRV_MACHINE_RESET(irem)
 
-	//MDRV_CPU_VBLANK_INT("main", m10_interrupt)
+	//MDRV_CPU_VBLANK_INT("screen", m10_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART)
 
@@ -855,10 +855,10 @@ static MACHINE_DRIVER_START( m11 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(m10)
-	MDRV_CPU_REPLACE("main", M6502,IREMM10_CPU_CLOCK)
-	//MDRV_CPU_MODIFY("main")
+	MDRV_CPU_REPLACE("maincpu", M6502,IREMM10_CPU_CLOCK)
+	//MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(m11_main,0)
-	//MDRV_CPU_VBLANK_INT("main", m11_interrupt)
+	//MDRV_CPU_VBLANK_INT("screen", m11_interrupt)
 
 	/* sound hardware */
 MACHINE_DRIVER_END
@@ -868,15 +868,15 @@ static MACHINE_DRIVER_START( m15 )
 	MDRV_DRIVER_DATA(m10_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,IREMM15_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(m15_main,0)
 
 	MDRV_MACHINE_RESET(irem)
 
-	MDRV_CPU_VBLANK_INT("main", m15_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", m15_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART)
 
@@ -898,7 +898,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( headoni )
 	MDRV_IMPORT_FROM(m15)
-	MDRV_CPU_REPLACE("main", M6502,11730000/16)
+	MDRV_CPU_REPLACE("maincpu", M6502,11730000/16)
 MACHINE_DRIVER_END
 
 /*************************************
@@ -936,7 +936,7 @@ static DRIVER_INIT( ipminva1 )
 ***************************************************************************/
 
 ROM_START( andromed )//Jumps to an unmapped sub-routine at $2fc9
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "am1",  0x1000, 0x0400, CRC(53df0152) SHA1(d27113740094d219b0e05a930d8daa4c22129183) )
 	ROM_LOAD( "am2",  0x1400, 0x0400, CRC(dab64957) SHA1(77ced520f8e78bb08ddab4213646cf55d834e63e) )
 	ROM_LOAD( "am3",  0x1800, 0x0400, CRC(f983f35c) SHA1(1bfee6cf7d18b56594831f2efa7dcc53b47d7e30) )
@@ -953,7 +953,7 @@ ROM_START( andromed )//Jumps to an unmapped sub-routine at $2fc9
 ROM_END
 
 ROM_START( ipminvad )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1r",  0x1000, 0x0400, CRC(f9a7eb9b) SHA1(93ac65d3ac725d3e4c2fb769816ee808ab609911) )
 	ROM_LOAD( "b2r",  0x1400, 0x0400, CRC(af11c1aa) SHA1(6a74fcc7cb1627b1c427a77da89b69ccf3175800) )
 	ROM_LOAD( "b3r",  0x1800, 0x0400, CRC(ed49e481) SHA1(8771a34f432e6d88acc5f7529f16c980a77485db) )
@@ -969,7 +969,7 @@ ROM_START( ipminvad )
 ROM_END
 
 ROM_START( ipminva1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1g",  0x1000, 0x0400, CRC(069102e2) SHA1(90affe384a688b0d42154633e80b708371117fc2) )
 	ROM_LOAD( "b2f",  0x1400, 0x0400, CRC(a6aa5879) SHA1(959ab207110785c03e57ca69c0e62356dd974085) )
 	ROM_LOAD( "b3f",  0x1800, 0x0400, CRC(0c09feb9) SHA1(0db43f480162f8e3fb8b61fcceb2884d19ff115b) )
@@ -985,7 +985,7 @@ ROM_START( ipminva1 )
 ROM_END
 
 ROM_START( skychut )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sc1d",  0x1000, 0x0400, CRC(30b5ded1) SHA1(3a8b4fa344522404661b062808a2ea1d5858fdd0) )
 	ROM_LOAD( "sc2d",  0x1400, 0x0400, CRC(fd1f4b9e) SHA1(e5606979abe1fa4cc9eae0c4f61516769db35c39) )
 	ROM_LOAD( "sc3d",  0x1800, 0x0400, CRC(67ed201e) SHA1(589b1efdc1bbccff296f6420e2b320cd54b4ac8e) )
@@ -1002,7 +1002,7 @@ ROM_START( skychut )
 ROM_END
 
 ROM_START( spacbeam )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "m1b", 0x1000, 0x0400, CRC(5a1c3e0b) SHA1(1c9c58359d74b14ce96934fcc6acefbdfaf1e1be) )
 	ROM_LOAD( "m2b", 0x1400, 0x0400, CRC(a02bd9d7) SHA1(d25dfa66b422bdbb29b1922007c84f1947fe9be1) )
 	ROM_LOAD( "m3b", 0x1800, 0x0400, CRC(78040843) SHA1(0b8a3ab09dff951aa527649f82b8877cf01126c1) )
@@ -1013,7 +1013,7 @@ ROM_START( spacbeam )
 ROM_END
 
 ROM_START( headoni )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "e1.9a", 0x1000, 0x0400, CRC(05da5265) SHA1(17e0c9261978770325a0befdcdd8a1b07ed39df0) )
 	ROM_LOAD( "e2.9b", 0x1400, 0x0400, CRC(dada26a8) SHA1(1368ade1c0c57d33d15594370cf1edf95fc44fd1) )
 	ROM_LOAD( "e3.9c", 0x1800, 0x0400, CRC(61ff24f5) SHA1(0e68aedd01b765fb2af76f914b3d287ecf30f716) )
@@ -1024,7 +1024,7 @@ ROM_START( headoni )
 ROM_END
 
 ROM_START( greenber )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gb1", 0x1000, 0x0400, CRC(018ff672) SHA1(54d082a332831afc28b47704a5656da0a8a902fa) ) // ok
 	ROM_LOAD( "gb2", 0x1400, 0x0400, CRC(ea8f2267) SHA1(ad5bb38a80fbc7c70c8fa6f41086a7ade81655bc) ) // ok
 	ROM_LOAD( "gb3", 0x1800, 0x0400, CRC(8f337920) SHA1(ac3d76eb368645ba23f5823b39c04fae49d481e1) ) // ok

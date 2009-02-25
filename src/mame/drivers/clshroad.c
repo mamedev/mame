@@ -251,18 +251,18 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( firebatl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3000000)	/* ? */
+	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(clshroad_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
-	MDRV_CPU_ADD("audio", Z80, 3000000)	/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_MACHINE_RESET(clshroad)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -286,18 +286,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( clshroad )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18432000/4)	/* ? real speed unknown. 3MHz is too low and causes problems */
+	MDRV_CPU_ADD("maincpu", Z80, 18432000/4)	/* ? real speed unknown. 3MHz is too low and causes problems */
 	MDRV_CPU_PROGRAM_MAP(clshroad_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
-	MDRV_CPU_ADD("audio", Z80, 18432000/6)	/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 18432000/6)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_MACHINE_RESET(clshroad)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -321,12 +321,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( firebatl )
-	ROM_REGION( 0x10000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x10000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "rom01",       0x00000, 0x2000, CRC(10e24ef6) SHA1(b6dae9824eb3cecececbdfdb416a90b1b61ff18d) )
 	ROM_LOAD( "rom02",       0x02000, 0x2000, CRC(47f79bee) SHA1(23e64ff69ff5112b0413d12a283ca90cf3642389) )
 	ROM_LOAD( "rom03",       0x04000, 0x2000, CRC(693459b9) SHA1(8bba526960f49c9e6c7bca40eb8fbbfc81588660) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "rom04",       0x0000, 0x2000, CRC(5f232d9a) SHA1(d0b9926cb02203f1a1f7fd0d0d7b1fe8eddc6511) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* Sprites */
@@ -366,10 +366,10 @@ ROM_START( firebatl )
 ROM_END
 
 ROM_START( clshroad )
-	ROM_REGION( 0x10000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x10000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "clashr3.bin", 0x0000, 0x8000, CRC(865c32ae) SHA1(e5cdd2d624fe6dc8bd6bebf2bd1c79d287408c63) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "clashr2.bin", 0x0000, 0x2000, CRC(e6389ec1) SHA1(6ec94d5e389e9104f40fc48df6f15674415851c0) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* Sprites */
@@ -403,10 +403,10 @@ ROM_START( clshroad )
 ROM_END
 
 ROM_START( clshrdst )
-	ROM_REGION( 0x10000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x10000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "cr-3",  0x0000, 0x8000, CRC(23559df2) SHA1(41a08a4fbad3da1898226e2ca1956a9f7c8f94b0) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "clashr2.bin", 0x0000, 0x2000, CRC(e6389ec1) SHA1(6ec94d5e389e9104f40fc48df6f15674415851c0) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )	/* Sprites */
@@ -456,7 +456,7 @@ without this the death sequence never ends so the game is unplayable after you
 die once, it would be nice to avoid the hack however
 
 */
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	ROM[0x05C6] = 0xc3;
 	ROM[0x05C7] = 0x8d;

@@ -373,16 +373,16 @@ static INTERRUPT_GEN( deco32_vbl_interrupt )
 static MACHINE_DRIVER_START( hvysmsh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", ARM, 28000000) /* Unconfirmed */
+	MDRV_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(hvysmsh_map,0)
-	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -412,16 +412,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wcvol95 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", ARM, 28000000) /* Unconfirmed */
+	MDRV_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(wcvol95_map,0)
-	MDRV_CPU_VBLANK_INT("main", deco32_vbl_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -501,7 +501,7 @@ Notes:
 */
 
 ROM_START( hvysmsh ) /* Europe -2  1993/06/30 */
-	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "lt00-2.2j", 0x000002, 0x080000, CRC(f6e10fc0) SHA1(76189260ca0a79500d62c4aa8e3aed6cfca3e102) )
 	ROM_LOAD32_WORD( "lt01-2.3j", 0x000000, 0x080000, CRC(ce2a75e2) SHA1(4119a3175d7c394041197f01523a6eaa3d9ba398) )
 
@@ -526,7 +526,7 @@ ROM_START( hvysmsh ) /* Europe -2  1993/06/30 */
 ROM_END
 
 ROM_START( hvysmshj ) /* Japan -2  1993/06/30 */
-	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "lp00-2.2j", 0x000002, 0x080000, CRC(3f8fd724) SHA1(8efb27b96dbdc58715eb44c7846f30d485e1ded4) )
 	ROM_LOAD32_WORD( "lp01-2.3j", 0x000000, 0x080000, CRC(a6fe282a) SHA1(10295b740ced35b3bb1f48ca3af2e985912405ec) )
 
@@ -551,7 +551,7 @@ ROM_START( hvysmshj ) /* Japan -2  1993/06/30 */
 ROM_END
 
 ROM_START( hvysmsha ) /* Asia -4  1993/09/06 */
-	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "xx00-4.2j", 0x000002, 0x080000, CRC(333a92c1) SHA1(b7e174ea081febb765298aa1c6533b2f9f162bce) ) /* "xx" is NOT the correct region code, this needs */
 	ROM_LOAD32_WORD( "xx01-4.3j", 0x000000, 0x080000, CRC(8c24c5ed) SHA1(ab9689530f4f4a6015ce0a6f8e0d796b0618cd79) ) /* to be verified and corrected at some point */
 
@@ -616,7 +616,7 @@ Notes:
 */
 
 ROM_START( wcvol95 )
-	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "pn00-0.2f",    0x000002, 0x080000, CRC(c9ed2006) SHA1(cee93eafc42c4de7a1453c85e7d6bca8d62cdc7b) )
 	ROM_LOAD32_WORD( "pn01-0.4f",    0x000000, 0x080000, CRC(1c3641c3) SHA1(60dddc3585e4dedb485f7505fee03495f615c0c0) )
 

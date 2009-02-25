@@ -400,7 +400,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( toratora )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6800,500000)	/* ?????? game speed is entirely controlled by this */
+	MDRV_CPU_ADD("maincpu", M6800,500000)	/* ?????? game speed is entirely controlled by this */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_PERIODIC_INT(toratora_timer,16)	/* timer counting at 16 Hz */
 
@@ -410,7 +410,7 @@ static MACHINE_DRIVER_START( toratora )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(toratora)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0,256-1,8,248-1)
@@ -439,7 +439,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( toratora )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tora.u1",  0x1000, 0x0800, CRC(413c743a) SHA1(a887dfaaee557327a1699bb424488b934dab8612) )
 	ROM_LOAD( "tora.u10", 0x1800, 0x0800, CRC(dc771b1c) SHA1(1bd81decb4d0a854878227c52d45ac0eea0602ec) )
 	ROM_LOAD( "tora.u2",  0x2000, 0x0800, CRC(c574c664) SHA1(9f41a53ca51d04e5bec7525fe83c5f4bdfcf128d) )

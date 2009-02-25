@@ -386,15 +386,15 @@ static MACHINE_RESET( bwing )
 static MACHINE_DRIVER_START( bwing )
 
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M6809, 2000000)
+	MDRV_CPU_ADD("maincpu", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp1_readmem, bwp1_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bwp1_interrupt, 3)
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp2_readmem, bwp2_writemem)
-//  MDRV_CPU_VBLANK_INT("main", irq1_line_assert) // vblank triggers FIRQ on CPU2 by design (unused)
+//  MDRV_CPU_VBLANK_INT("screen", irq1_line_assert) // vblank triggers FIRQ on CPU2 by design (unused)
 
-	MDRV_CPU_ADD("audio", DECO16, 2000000)
+	MDRV_CPU_ADD("audiocpu", DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp3_readmem, bwp3_writemem)
 	MDRV_CPU_IO_MAP(bwp3_io_map,0)
 	MDRV_CPU_PERIODIC_INT(bwp3_interrupt, 1000)
@@ -406,7 +406,7 @@ static MACHINE_DRIVER_START( bwing )
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(600))	// must be long enough for polling
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -437,7 +437,7 @@ MACHINE_DRIVER_END
 
 ROM_START( bwings )
 	// Top Board(SCU-01)
-	ROM_REGION( 0x10000, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "maincpu", 0 ) // main CPU
 	ROM_LOAD( "bw_bv-02-.10a",0x04000, 0x04000, CRC(6074a86b) SHA1(0ce1bd74450144fd3c6556787d6c5c5d4531d830) )  // different
 	ROM_LOAD( "bw_bv-01.7a",  0x08000, 0x04000, CRC(b960c707) SHA1(086cb0f22fb59922bf0369bf6b382a241d979ec3) )
 	ROM_LOAD( "bw_bv-00-.4a", 0x0c000, 0x04000, CRC(1f83804c) SHA1(afd5eb0822db4fd982062945ca27e66ed9680645) )  // different
@@ -447,7 +447,7 @@ ROM_START( bwings )
 	ROM_LOAD( "bw_bv-05-.9d", 0x0c000, 0x02000, CRC(1e393300) SHA1(8d847256eb5dbccf5f524ec3aa836073d70b4edc) )  // different
 	ROM_LOAD( "bw_bv-04-.7d", 0x0e000, 0x02000, CRC(6548c5bb) SHA1(d12cc8d0d5692c3de766f5c42c818dd8f685760a) )  // different
 
-	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "bw_bv-03.13a", 0x0e000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
 
 	// Bottom Board(CCU-01)
@@ -468,7 +468,7 @@ ROM_END
 
 ROM_START( bwingso )
 	// Top Board(SCU-01)
-	ROM_REGION( 0x10000, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "maincpu", 0 ) // main CPU
 	ROM_LOAD( "bw_bv-02.10a", 0x04000, 0x04000, CRC(5ce74ab5) SHA1(b414f0bbe1c4c5b4c810bb4b9fba16aaf86520ff) )
 	ROM_LOAD( "bw_bv-01.7a",  0x08000, 0x04000, CRC(b960c707) SHA1(086cb0f22fb59922bf0369bf6b382a241d979ec3) )
 	ROM_LOAD( "bw_bv-00.4a",  0x0c000, 0x04000, CRC(926bef63) SHA1(d4bd2e91fa0abc5e9472d4b684c076bdc3c29f5b) )
@@ -478,7 +478,7 @@ ROM_START( bwingso )
 	ROM_LOAD( "bw_bv-05.9d",  0x0c000, 0x02000, CRC(f283f39a) SHA1(9f7f4c39d49f4dfff73fe74cd457480e8a43a3c5) )
 	ROM_LOAD( "bw_bv-04.7d",  0x0e000, 0x02000, CRC(29ae75b6) SHA1(48c94e996857f2ac995bcd25f0e67b9f7c17d807) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "bw_bv-03.13a", 0x0e000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
 
 	// Bottom Board(CCU-01)
@@ -499,7 +499,7 @@ ROM_END
 
 ROM_START( bwingsa )
 	// Top Board(SCU-01)
-	ROM_REGION( 0x10000, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "maincpu", 0 ) // main CPU
 	ROM_LOAD( "bw_bv-02.10a", 0x04000, 0x04000, CRC(5ce74ab5) SHA1(b414f0bbe1c4c5b4c810bb4b9fba16aaf86520ff) )
 	ROM_LOAD( "bv02.bin",     0x06000, 0x02000, CRC(2f84654e) SHA1(11b5343219b46d03f686ea348181c509121b9e3c) ) // only the lower 8k is different
 	ROM_LOAD( "bw_bv-01.7a",  0x08000, 0x04000, CRC(b960c707) SHA1(086cb0f22fb59922bf0369bf6b382a241d979ec3) )
@@ -510,7 +510,7 @@ ROM_START( bwingsa )
 	ROM_LOAD( "bw_bv-05.9d",  0x0c000, 0x02000, CRC(f283f39a) SHA1(9f7f4c39d49f4dfff73fe74cd457480e8a43a3c5) )
 	ROM_LOAD( "bw_bv-04.7d",  0x0e000, 0x02000, CRC(29ae75b6) SHA1(48c94e996857f2ac995bcd25f0e67b9f7c17d807) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "bw_bv-03.13a", 0x0e000, 0x02000, CRC(e8ac9379) SHA1(aaf5c20aa33ed05747a8a27739e9d09e094a518d) )
 
 	// Bottom Board(CCU-01)
@@ -530,7 +530,7 @@ ROM_END
 
 ROM_START( zaviga )
 	// Top Board(DE-0169-0)
-	ROM_REGION( 0x10000, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "maincpu", 0 ) // main CPU
 	ROM_LOAD( "as04", 0x04000, 0x04000, CRC(b79f5da2) SHA1(b39748666d3f7fb1ac46d282cce09fe9531df6b1) )
 	ROM_LOAD( "as02", 0x08000, 0x04000, CRC(6addd16a) SHA1(940637c49bf9f38c77176ed2ae212048e9e7fd8f) )
 	ROM_LOAD( "as00", 0x0c000, 0x04000, CRC(c6ae4af0) SHA1(6f6f14385b20f9c9c312f816036c608fe8514b00) )
@@ -540,7 +540,7 @@ ROM_START( zaviga )
 	ROM_LOAD( "as07", 0x0c000, 0x02000, CRC(dc1170e3) SHA1(c8e4d1564fd272d726d0e4ffd4f33f67f1b37cd7) )
 	ROM_LOAD( "as06", 0x0e000, 0x02000, CRC(ba888f84) SHA1(f94de8553cd4704d9b3349ded881a7cc62fa9b57) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "as05", 0x0e000, 0x02000, CRC(afe9b0ac) SHA1(3c653cd4fff7f4e00971249900b5a810b6e74dfe) )
 
 	// Bottom Board(DE-0170-0)
@@ -561,7 +561,7 @@ ROM_END
 
 ROM_START( zavigaj )
 	// Top Board(DE-0169-0)
-	ROM_REGION( 0x10000, "main", 0 ) // main CPU
+	ROM_REGION( 0x10000, "maincpu", 0 ) // main CPU
 	ROM_LOAD( "as04", 0x04000, 0x04000, CRC(b79f5da2) SHA1(b39748666d3f7fb1ac46d282cce09fe9531df6b1) )
 	ROM_LOAD( "as02", 0x08000, 0x04000, CRC(6addd16a) SHA1(940637c49bf9f38c77176ed2ae212048e9e7fd8f) )
 	ROM_LOAD( "as00", 0x0c000, 0x04000, CRC(c6ae4af0) SHA1(6f6f14385b20f9c9c312f816036c608fe8514b00) )
@@ -571,7 +571,7 @@ ROM_START( zavigaj )
 	ROM_LOAD( "as07",     0x0c000, 0x02000, CRC(dc1170e3) SHA1(c8e4d1564fd272d726d0e4ffd4f33f67f1b37cd7) )
 	ROM_LOAD( "as06-.7d", 0x0e000, 0x02000, CRC(b02d270c) SHA1(beea3d44d367543b5b5075c5892580e690691e75) )  // different
 
-	ROM_REGION( 0x10000, "audio", 0 ) // sound CPU(encrypted)
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // sound CPU(encrypted)
 	ROM_LOAD( "as05", 0x0e000, 0x02000, CRC(afe9b0ac) SHA1(3c653cd4fff7f4e00971249900b5a810b6e74dfe) )
 
 	// Bottom Board(DE-0170-0)
@@ -609,9 +609,9 @@ static void fix_bwp3(void)
 
 static DRIVER_INIT( bwing )
 {
-	bwp123_membase[0] = memory_region(machine, "main");
+	bwp123_membase[0] = memory_region(machine, "maincpu");
 	bwp123_membase[1] = memory_region(machine, "sub");
-	bwp123_membase[2] = memory_region(machine, "audio");
+	bwp123_membase[2] = memory_region(machine, "audiocpu");
 
 	fix_bwp3();
 }

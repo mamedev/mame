@@ -506,15 +506,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( marineb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(marineb_map,0)
 	MDRV_CPU_IO_MAP(marineb_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(marineb)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000)	/* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -572,9 +572,9 @@ static MACHINE_DRIVER_START( wanted )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(marineb)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(wanted_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_GFXDECODE(wanted)
@@ -614,7 +614,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( marineb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "marineb.1",     0x0000, 0x1000, CRC(661d6540) SHA1(9ef6b58952be7ca245092916782311ee466fe3e1) )
 	ROM_LOAD( "marineb.2",     0x1000, 0x1000, CRC(922da17f) SHA1(e4925ae5afe937a0306af0a4fbbc6edcd13f1926) )
 	ROM_LOAD( "marineb.3",     0x2000, 0x1000, CRC(820a235b) SHA1(00bd8d9af1c88201100811518d3d795a80604711) )
@@ -634,7 +634,7 @@ ROM_START( marineb )
 ROM_END
 
 ROM_START( changes )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "changes.1",     0x0000, 0x1000, CRC(56f83813) SHA1(8b97e877b1819402703a9e9e641efc0e89b84cca) )
 	ROM_LOAD( "changes.2",     0x1000, 0x1000, CRC(0e627f0b) SHA1(59012c8f65b921387b381dbc5157a7a22b3d50dc) )
 	ROM_LOAD( "changes.3",     0x2000, 0x1000, CRC(ff8291e9) SHA1(c07394cb384259287a6820ce0e513e32c69d768b) )
@@ -653,7 +653,7 @@ ROM_START( changes )
 ROM_END
 
 ROM_START( changesa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "changes3.1",    0x0000, 0x1000, CRC(ff80cad7) SHA1(00a97137c0b92e8b9532c824bade89002ec5d63c) )
 	ROM_LOAD( "changes.2",     0x1000, 0x1000, CRC(0e627f0b) SHA1(59012c8f65b921387b381dbc5157a7a22b3d50dc) )
 	ROM_LOAD( "changes3.3",    0x2000, 0x1000, CRC(359bf7e1) SHA1(9c3cc4415ccaa0276f98224ca373922c2425bb40) )
@@ -672,7 +672,7 @@ ROM_START( changesa )
 ROM_END
 
 ROM_START( looper )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "changes.1",     0x0000, 0x1000, CRC(56f83813) SHA1(8b97e877b1819402703a9e9e641efc0e89b84cca) )
 	ROM_LOAD( "changes.2",     0x1000, 0x1000, CRC(0e627f0b) SHA1(59012c8f65b921387b381dbc5157a7a22b3d50dc) )
 	ROM_LOAD( "changes.3",     0x2000, 0x1000, CRC(ff8291e9) SHA1(c07394cb384259287a6820ce0e513e32c69d768b) )
@@ -691,7 +691,7 @@ ROM_START( looper )
 ROM_END
 
 ROM_START( springer )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "springer.1",    0x0000, 0x1000, CRC(0794103a) SHA1(71bb7f6bf4f41f50a39a552cc98ea111e4064acd) )
 	ROM_LOAD( "springer.2",    0x1000, 0x1000, CRC(f4aecd9a) SHA1(414d5385286d899f883bd70ee7fbb5f23e424ef9) )
 	ROM_LOAD( "springer.3",    0x2000, 0x1000, CRC(2f452371) SHA1(973839714322f517b51c224adf0792a3fe0a091b) )
@@ -714,7 +714,7 @@ ROM_START( springer )
 ROM_END
 
 ROM_START( hoccer )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hr1.cpu",       0x0000, 0x2000, CRC(12e96635) SHA1(5d330687dc117a319be355a541c9f634c6711889) )
 	ROM_LOAD( "hr2.cpu",       0x2000, 0x2000, CRC(cf1fc328) SHA1(c8669330d47fe3c8f855990ff9f27549bf94c5bd) )
 	ROM_LOAD( "hr3.cpu",       0x4000, 0x2000, CRC(048a0659) SHA1(7dc0ba2046f8985d4e3bfbba5284090dd4382aa1) )
@@ -732,7 +732,7 @@ ROM_START( hoccer )
 ROM_END
 
 ROM_START( hoccer2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hr.1",          0x0000, 0x2000, CRC(122d159f) SHA1(cc58fc746d6afebc39f8840c1ea6a68b5d033fbb) )
 	ROM_LOAD( "hr.2",          0x2000, 0x2000, CRC(48e1efc0) SHA1(6472423b129e0fc40e4f12855d70207a360ee378) )
 	ROM_LOAD( "hr.3",          0x4000, 0x2000, CRC(4e67b0be) SHA1(2c2e6a7798325621d1b67ee90fc2f198731b4ab1) )
@@ -750,7 +750,7 @@ ROM_START( hoccer2 )
 ROM_END
 
 ROM_START( wanted )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prg-1",		   0x0000, 0x2000, CRC(2dd90aed) SHA1(3982d47a66f653a046a95e38648a7c5a2bfe1470) )
 	ROM_LOAD( "prg-2",		   0x2000, 0x2000, CRC(67ac0210) SHA1(29fd01289c9ba5a3a992ac6740badbf2e37f05ac) )
 	ROM_LOAD( "prg-3",		   0x4000, 0x2000, CRC(373c7d82) SHA1(e68e1fd1d5e48c709280a714d7df330fc29df03a) )
@@ -799,7 +799,7 @@ AY-3-8912    AY-3-8912                                             BCM12COL.K7
 */
 
 ROM_START( bcruzm12 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d-84_3.bin",		   0x0000, 0x2000, CRC(132baa3d) SHA1(79f7a1dc49b6e45e68f4008f3ee4e383846f75d5) )
 	ROM_LOAD( "d-84_2.bin",		   0x2000, 0x2000, CRC(1a788d1f) SHA1(5029f93f45d328a282d56e010eee68287b6b9306) )
 	ROM_LOAD( "d-84_1.bin",		   0x4000, 0x2000, CRC(9d5b3017) SHA1(bced3f39faf94ce25cba382010f2c2ed322e9d7b) )
@@ -818,7 +818,7 @@ ROM_START( bcruzm12 )
 ROM_END
 
 ROM_START( hopprobo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hopper01.3k",   0x0000, 0x1000, CRC(fd7935c0) SHA1(08f1b1589203d0f5967cc780a15412ca599c5d2f) )
 	ROM_LOAD( "hopper02.3l",   0x1000, 0x1000, CRC(df1a479a) SHA1(27b56498887041692536f5f71abfa3d6b9098a7d) )
 	ROM_LOAD( "hopper03.3n",   0x2000, 0x1000, CRC(097ac2a7) SHA1(d7e571a1f44239cbe6080efdbe2feeff8a8653bb) )

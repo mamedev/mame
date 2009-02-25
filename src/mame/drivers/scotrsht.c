@@ -237,16 +237,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( scotrsht )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 18432000/6)        /* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", M6809, 18432000/6)        /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(scotrsht_map,0)
-	MDRV_CPU_VBLANK_INT("main", scotrsht_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", scotrsht_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 18432000/6)        /* 3.072 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 18432000/6)        /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(scotrsht_sound_map,0)
 	MDRV_CPU_IO_MAP(scotrsht_sound_port,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -275,12 +275,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( scotrsht )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gx545_g03_12c.bin", 0x8000, 0x4000, CRC(b808e0d3) SHA1(d42b6979ade705a7522bd0bbc3eaa6d661580902) )
 	ROM_CONTINUE(				   0x4000, 0x4000 )
 	ROM_LOAD( "gx545_g02_10c.bin", 0xc000, 0x4000, CRC(b22c0586) SHA1(07c21609c6cdfe2b8dd734d21086c5236ff8197b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound code */
 	ROM_LOAD( "gx545_g01_8c.bin",  0x0000, 0x4000, CRC(46a7cc65) SHA1(73389fe04ce40da124d630dc3f8e58600d9556fc) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )

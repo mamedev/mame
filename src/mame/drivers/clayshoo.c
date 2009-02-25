@@ -304,17 +304,17 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( clayshoo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,5068000/4)		/* 5.068/4 Mhz (divider is a guess) */
+	MDRV_CPU_ADD("maincpu", Z80,5068000/4)		/* 5.068/4 Mhz (divider is a guess) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_START(clayshoo)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(clayshoo)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 64, 255)
@@ -334,7 +334,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( clayshoo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0",      0x0000, 0x0800, CRC(9df9d9e3) SHA1(8ce71a6faf5df9c8c3dbb92a443b62c0f376491c) )
 	ROM_LOAD( "1",      0x0800, 0x0800, CRC(5134a631) SHA1(f0764a5161934564fd0416be26087cf812e0c422) )
 	ROM_LOAD( "2",      0x1000, 0x0800, CRC(5b5a67f6) SHA1(c97b4d44e6dc5dd0c42e04ffceed8934975fe769) )

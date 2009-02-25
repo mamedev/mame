@@ -353,16 +353,16 @@ static DRIVER_INIT( ashnojoe )
 static MACHINE_DRIVER_START( ashnojoe )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 8000000)
+	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(ashnojoe_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -388,12 +388,12 @@ static MACHINE_DRIVER_START( ashnojoe )
 MACHINE_DRIVER_END
 
 ROM_START( scessjoe )
-	ROM_REGION( 0xc0000, "main", 0 )     /* 68000 code */
+	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_BYTE( "5.4q", 0x00000, 0x10000, CRC(c805f9e7) SHA1(e1e85701bde496b1fd64211b94bfb0def597ae51) )
 	ROM_LOAD16_BYTE( "6.4s", 0x00001, 0x10000, CRC(eda7a537) SHA1(3bb19fbdfb6c8af4e2078958fa445ac1f4434d0d) )
 	ROM_LOAD16_WORD_SWAP( "sj201-nw.6m", 0x80000, 0x40000, CRC(5a64ca42) SHA1(660b8bca21ef3c2230adce7cb7e7d1f018714f23) )
 
-	ROM_REGION( 0x10000, "audio", 0 )     /* 32k for Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 32k for Z80 code */
 	ROM_LOAD( "9.8q", 0x0000, 0x8000, CRC(8767e212) SHA1(13bf927febedff9d7d164fbf0da7fb3a588c2a94) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -425,12 +425,12 @@ ROM_START( scessjoe )
 ROM_END
 
 ROM_START( ashnojoe )
-	ROM_REGION( 0xc0000, "main", 0 )     /* 68000 code */
+	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_BYTE( "5.bin", 0x00000, 0x10000, CRC(c61e1569) SHA1(422c18f5810539b5a9e3a9bd4e3b4d70bde8d1d5) )
 	ROM_LOAD16_BYTE( "6.bin", 0x00001, 0x10000, CRC(c0a16338) SHA1(fb127b9d38f2c9807b6e23ff71935fc8a22a2e8f) )
 	ROM_LOAD16_WORD_SWAP( "sj201-nw.6m", 0x80000, 0x40000, CRC(5a64ca42) SHA1(660b8bca21ef3c2230adce7cb7e7d1f018714f23) )
 
-	ROM_REGION( 0x10000, "audio", 0 )     /* 32k for Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 32k for Z80 code */
 	ROM_LOAD( "9.8q", 0x0000, 0x8000, CRC(8767e212) SHA1(13bf927febedff9d7d164fbf0da7fb3a588c2a94) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )

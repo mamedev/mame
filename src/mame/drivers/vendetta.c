@@ -527,12 +527,12 @@ static INTERRUPT_GEN( vendetta_irq )
 static MACHINE_DRIVER_START( vendetta )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 6000000)	/* this is strange, seems an overclock but */
-//  MDRV_CPU_ADD("main", KONAMI, 3000000)   /* is needed to have correct music speed */
+	MDRV_CPU_ADD("maincpu", KONAMI, 6000000)	/* this is strange, seems an overclock but */
+//  MDRV_CPU_ADD("maincpu", KONAMI, 3000000)   /* is needed to have correct music speed */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", vendetta_irq)
+	MDRV_CPU_VBLANK_INT("screen", vendetta_irq)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)	/* verified with PCB */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* verified with PCB */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
                             /* interrupts are triggered by the main CPU */
 
@@ -542,7 +542,7 @@ static MACHINE_DRIVER_START( vendetta )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -571,10 +571,10 @@ static MACHINE_DRIVER_START( esckids )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(vendetta)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(esckids_readmem,esckids_writemem)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 //MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )    /* black areas on the edges */
 	MDRV_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
 
@@ -591,11 +591,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( vendetta )
-	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081t01", 0x10000, 0x38000, CRC(e76267f5) SHA1(efef6c2edb4c181374661f358dad09123741b63d) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
@@ -613,11 +613,11 @@ ROM_START( vendetta )
 ROM_END
 
 ROM_START( vendetao )
-	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081r01", 0x10000, 0x38000, CRC(84796281) SHA1(e4330c6eaa17adda5b4bd3eb824388c89fb07918) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
@@ -635,11 +635,11 @@ ROM_START( vendetao )
 ROM_END
 
 ROM_START( vendet2p )
-	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081w01", 0x10000, 0x38000, CRC(cee57132) SHA1(8b6413877e127511daa76278910c2ee3247d613a) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
@@ -657,11 +657,11 @@ ROM_START( vendet2p )
 ROM_END
 
 ROM_START( vendetas )
-	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081u01", 0x10000, 0x38000, CRC(b4d9ade5) SHA1(fbd543738cb0b68c80ff05eed7849b608de03395) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
@@ -679,11 +679,11 @@ ROM_START( vendetas )
 ROM_END
 
 ROM_START( vendtaso )
-	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081d01", 0x10000, 0x38000, CRC(335da495) SHA1(ea74680eb898aeecf9f1eec95f151bcf66e6b6cb) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
@@ -701,11 +701,11 @@ ROM_START( vendtaso )
 ROM_END
 
 ROM_START( vendettj )
-	ROM_REGION( 0x49000, "main", 0 ) /* code + banked roms + banked ram */
+	ROM_REGION( 0x49000, "maincpu", 0 ) /* code + banked roms + banked ram */
 	ROM_LOAD( "081p01", 0x10000, 0x38000, CRC(5fe30242) SHA1(2ea98e66637fa2ad60044b1a2b0dd158a82403a2) )
 	ROM_CONTINUE(		0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them ) */
@@ -723,11 +723,11 @@ ROM_START( vendettj )
 ROM_END
 
 ROM_START( esckids )
-	ROM_REGION( 0x049000, "main", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
+	ROM_REGION( 0x049000, "maincpu", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
 	ROM_LOAD( "17c.bin", 0x010000, 0x018000, CRC(9dfba99c) SHA1(dbcb89aad5a9addaf7200b2524be999877313a6e) )
 	ROM_CONTINUE(		0x008000, 0x008000 )
 
-	ROM_REGION( 0x010000, "audio", 0 )		// Sound CPU (Z80) Code (512K x 1)
+	ROM_REGION( 0x010000, "audiocpu", 0 )		// Sound CPU (Z80) Code (512K x 1)
 	ROM_LOAD( "975f02", 0x000000, 0x010000, CRC(994fb229) SHA1(bf194ae91240225b8edb647b1a62cd83abfa215e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )		// Tilemap MASK-ROM (4M x 2)
@@ -746,11 +746,11 @@ ROM_END
 
 
 ROM_START( esckidsj )
-	ROM_REGION( 0x049000, "main", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
+	ROM_REGION( 0x049000, "maincpu", 0 )		// Main CPU (053248) Code & Banked (1M x 1)
 	ROM_LOAD( "975r01", 0x010000, 0x018000, CRC(7b5c5572) SHA1(b94b58c010539926d112c2dfd80bcbad76acc986) )
 	ROM_CONTINUE(		0x008000, 0x008000 )
 
-	ROM_REGION( 0x010000, "audio", 0 )		// Sound CPU (Z80) Code (512K x 1)
+	ROM_REGION( 0x010000, "audiocpu", 0 )		// Sound CPU (Z80) Code (512K x 1)
 	ROM_LOAD( "975f02", 0x000000, 0x010000, CRC(994fb229) SHA1(bf194ae91240225b8edb647b1a62cd83abfa215e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )		// Tilemap MASK-ROM (4M x 2)
@@ -776,7 +776,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( vendetta_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "maincpu");
 
 	if ( lines >= 0x1c )
 	{
@@ -790,11 +790,11 @@ static MACHINE_RESET( vendetta )
 {
 	konami_configure_set_lines(machine->cpu[0], vendetta_banking);
 
-	paletteram = &memory_region(machine, "main")[0x48000];
+	paletteram = &memory_region(machine, "maincpu")[0x48000];
 	irq_enabled = 0;
 
 	/* init banks */
-	memory_set_bankptr(machine,  1, &memory_region(machine, "main")[0x10000] );
+	memory_set_bankptr(machine,  1, &memory_region(machine, "maincpu")[0x10000] );
 	vendetta_video_banking( machine, 0 );
 }
 

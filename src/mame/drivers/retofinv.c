@@ -339,15 +339,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( retofinv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("audio", Z80, 18432000/6)	/* 3.072 MHz? */
+	MDRV_CPU_ADD("audiocpu", Z80, 18432000/6)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,2)
 
@@ -357,7 +357,7 @@ static MACHINE_DRIVER_START( retofinv )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -398,7 +398,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( retofinv )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a37-03.70", 0x0000, 0x2000, CRC(eae7459d) SHA1(c105f6adbd4c09decaad68ed13163d8f9b55e646) )
 	ROM_LOAD( "a37-02.71", 0x2000, 0x2000, CRC(72895e37) SHA1(42fb904338e9f92a79d587eac401d456e7fb6e55) )
 	ROM_LOAD( "a37-01.72", 0x4000, 0x2000, CRC(505dd20b) SHA1(3a34b1515bb834ff9e2d86b0b43a752d9619307b) )
@@ -406,7 +406,7 @@ ROM_START( retofinv )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a37-04.62", 0x0000, 0x2000, CRC(d2899cc1) SHA1(fdbec743b06f4cdcc134ef863e4e71337ad0b2c5) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a37-05.17", 0x0000, 0x2000, CRC(9025abea) SHA1(2f03e8572f23624d7cd1215a55109e97fd66e271) )
 
 	ROM_REGION( 0x0800, "68705", 0 )	/* 8k for the microcontroller */
@@ -434,7 +434,7 @@ ROM_START( retofinv )
 ROM_END
 
 ROM_START( retofin1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "roi.02",  0x0000, 0x2000, CRC(d98fd462) SHA1(fd35e13b7dee58639a01b040b8f84d42bb40b633) )
 	ROM_LOAD( "roi.01b", 0x2000, 0x2000, CRC(3379f930) SHA1(c67d687a10b6240bd6e2fbdb15e1b7d276e6fc07) )
 	ROM_LOAD( "roi.01",  0x4000, 0x2000, CRC(57679062) SHA1(4f121101ab1cb8de8e693e5984ef23fa587fe696) )
@@ -442,7 +442,7 @@ ROM_START( retofin1 )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a37-04.62", 0x0000, 0x2000, CRC(d2899cc1) SHA1(fdbec743b06f4cdcc134ef863e4e71337ad0b2c5) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a37-05.17", 0x0000, 0x2000, CRC(9025abea) SHA1(2f03e8572f23624d7cd1215a55109e97fd66e271) )
 
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
@@ -466,7 +466,7 @@ ROM_START( retofin1 )
 ROM_END
 
 ROM_START( retofin2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ri-c.1e", 0x0000, 0x2000, CRC(e3c31260) SHA1(cc8774251c567da2e4a54091223927c95f497fe8) )
 	ROM_LOAD( "roi.01b", 0x2000, 0x2000, CRC(3379f930) SHA1(c67d687a10b6240bd6e2fbdb15e1b7d276e6fc07) )
 	ROM_LOAD( "ri-a.1c", 0x4000, 0x2000, CRC(3ae7c530) SHA1(5d1be375494fa07124071067661c4bfc2d724d54) )
@@ -474,7 +474,7 @@ ROM_START( retofin2 )
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "a37-04.62", 0x0000, 0x2000, CRC(d2899cc1) SHA1(fdbec743b06f4cdcc134ef863e4e71337ad0b2c5) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a37-05.17", 0x0000, 0x2000, CRC(9025abea) SHA1(2f03e8572f23624d7cd1215a55109e97fd66e271) )
 
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )

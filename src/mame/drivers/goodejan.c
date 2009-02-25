@@ -326,17 +326,17 @@ static INTERRUPT_GEN( goodejan_irq )
 static MACHINE_DRIVER_START( goodejan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30, GOODEJAN_MHZ2/2)
+	MDRV_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)
 	MDRV_CPU_PROGRAM_MAP(goodejan_map,0)
 	MDRV_CPU_IO_MAP(common_io_map,goodejan_io_map)
-	MDRV_CPU_VBLANK_INT("main",goodejan_irq)
+	MDRV_CPU_VBLANK_INT("screen",goodejan_irq)
 
 	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
 
 	MDRV_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -355,19 +355,19 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( totmejan )
 	MDRV_IMPORT_FROM( goodejan )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(common_io_map,totmejan_io_map)
 MACHINE_DRIVER_END
 
 ROM_START( totmejan )
-	ROM_REGION( 0x100000, "main", 0 ) /* V30 code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */
 	ROM_LOAD16_BYTE( "1.022",  0xc0000, 0x20000, CRC(63c3c54f) SHA1(3116b73b848a1f7391a47b994951ba1af92ba298) )
 	ROM_LOAD16_BYTE( "2.023",  0xc0001, 0x20000, CRC(c0b9892f) SHA1(127f439a9e625d5a0f5e88102fed6500433cd9cc) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.1016", 0x000000, 0x08000,  CRC(8bfdb304) SHA1(454fd84eb7d9338f0b5f8de0ffae541d17b958d5) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x080000, "spr_gfx", ROMREGION_DISPOSE )
 	ROM_LOAD( "e-jan.078", 0x000000, 0x080000, CRC(ff9ee9d8) SHA1(5e49e9a666630ca9867ee96b9d2b8d6f503b25df) )
@@ -392,14 +392,14 @@ ROM_START( totmejan )
 ROM_END
 
 ROM_START( goodejan )
-	ROM_REGION( 0x100000, "main", 0 ) /* V30 code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */
 	ROM_LOAD16_BYTE( "1.022",  0xc0000, 0x20000, CRC(8555122f) SHA1(92e1ec02fb81ae972eb7492b5d226b40ca65c70d) )
 	ROM_LOAD16_BYTE( "2.023",  0xc0001, 0x20000, CRC(32704d74) SHA1(9722b7f1e506a17e0fa5234e05f79333cd99a364) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.1016", 0x000000, 0x08000,  CRC(732e9eae) SHA1(d306610f08630708bbbb97d71e9ed4d7e027579a) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x080000, "spr_gfx", ROMREGION_DISPOSE )
 	ROM_LOAD( "e_jan2obj.078", 0x000000, 0x080000, CRC(0f892ef2) SHA1(188ae43db1c48fb6870aa45c64718e901831499b) )
@@ -424,14 +424,14 @@ ROM_START( goodejan )
 ROM_END
 
 ROM_START( goodejaa )
-	ROM_REGION( 0x100000, "main", 0 ) /* V30 code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */
 	ROM_LOAD16_BYTE( "1.u022",  0xc0000, 0x20000, CRC(d496cdd1) SHA1(144a9d8850b3b62520b71efd2ed1459bd673ac92) )
 	ROM_LOAD16_BYTE( "2.u023",  0xc0001, 0x20000, CRC(5eda77bb) SHA1(ac54125988f9c929207becf0dcbab72eff4f054a) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.1016", 0x000000, 0x08000,  CRC(732e9eae) SHA1(d306610f08630708bbbb97d71e9ed4d7e027579a) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x080000, "spr_gfx", ROMREGION_DISPOSE )
 	ROM_LOAD( "e_jan2obj.078", 0x000000, 0x080000, CRC(0f892ef2) SHA1(188ae43db1c48fb6870aa45c64718e901831499b) )

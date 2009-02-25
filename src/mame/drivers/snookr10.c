@@ -756,15 +756,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( snookr10 )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD("main", M65SC02, MASTER_CLOCK/8)	/* 2 MHz (1.999 MHz measured) */
+	MDRV_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2 MHz (1.999 MHz measured) */
 	MDRV_CPU_PROGRAM_MAP(snookr10_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
     /* video hardware */
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -790,7 +790,7 @@ static MACHINE_DRIVER_START( apple10 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snookr10)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 
     /* video hardware */
 	MDRV_PALETTE_INIT(apple10)
@@ -802,7 +802,7 @@ static MACHINE_DRIVER_START( tenballs )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snookr10)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tenballs_map, 0)
 
 MACHINE_DRIVER_END
@@ -813,7 +813,7 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( snookr10 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u2", 0x8000, 0x8000, CRC(216ccb2d) SHA1(d86270cd03a08f6fd3e7b327b8173f66da28e5e8) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -829,7 +829,7 @@ ROM_START( snookr10 )
 ROM_END
 
 ROM_START( apple10 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.u2", 0x8000, 0x8000, CRC(7d538566) SHA1(2e805157010c366ab1f2313a2bedb071c1dde733) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -845,7 +845,7 @@ ROM_START( apple10 )
 ROM_END
 
 ROM_START( tenballs )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4.u2", 0x8000, 0x8000, CRC(2f334862) SHA1(61d57995451b6bc7de23900c460c3e073993899c) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )

@@ -222,7 +222,7 @@ static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",					/* screen we are acting on */
+	"screen",				/* screen we are acting on */
 	8,						/* number of pixels per video memory address */
 	NULL,					/* before pixel update callback */
 	NULL,					/* row update callback */
@@ -345,7 +345,7 @@ static void handle_lightpen( const device_config *device )
 
 static MC6845_ON_VSYNC_CHANGED(crtc_vsync)
 {
-	cputag_set_input_line(device->machine, "main", 0, vsync ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, vsync ? ASSERT_LINE : CLEAR_LINE);
 	handle_lightpen(device);
 }
 
@@ -1018,7 +1018,7 @@ static MACHINE_RESET( peplus )
 
 static MACHINE_DRIVER_START( peplus )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", I80C32, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(peplus_map, 0)
 	MDRV_CPU_IO_MAP(peplus_iomap, 0)
 
@@ -1026,7 +1026,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_NVRAM_HANDLER(peplus)
 
 	// video hardware
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE((52+1)*8, (31+1)*8)
@@ -1102,7 +1102,7 @@ static DRIVER_INIT( peplussbw )
 *************************/
 
 ROM_START( peset038 ) /* Normal board : Set Chip (Set038) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "set038.u68",   0x00000, 0x10000, CRC(9c4b1d1a) SHA1(8a65cd1d8e2d74c7b66f4dfc73e7afca8458e979) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1116,7 +1116,7 @@ ROM_START( peset038 ) /* Normal board : Set Chip (Set038) */
 ROM_END
 
 ROM_START( pepp0065 ) /* Normal board : Jokers Wild Poker (PP0065) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0065.u68",   0x00000, 0x10000, CRC(76c1a367) SHA1(ea8be9241e9925b5a4206db6875e1572f85fa5fe) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1130,7 +1130,7 @@ ROM_START( pepp0065 ) /* Normal board : Jokers Wild Poker (PP0065) */
 ROM_END
 
 ROM_START( pepp0158 ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0158.u68",   0x00000, 0x10000, CRC(5976cd19) SHA1(6a461ea9ddf78dffa3cf8b65903ebf3127f23d45) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1144,7 +1144,7 @@ ROM_START( pepp0158 ) /* Normal board : 4 of a Kind Bonus Poker (PP0158) */
 ROM_END
 
 ROM_START( pepp0188 ) /* Normal board : Standard Draw Poker (PP0188) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0188.u68",   0x00000, 0x10000, CRC(cf36a53c) SHA1(99b578538ab24d9ff91971b1f77599272d1dbfc6) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1158,7 +1158,7 @@ ROM_START( pepp0188 ) /* Normal board : Standard Draw Poker (PP0188) */
 ROM_END
 
 ROM_START( pepp0250 ) /* Normal board : Double Down Stud Poker (PP0250) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0250.u68",   0x00000, 0x10000, CRC(4c919598) SHA1(fe73503c6ccb3c5746fb96be58cd5b740c819713) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1172,7 +1172,7 @@ ROM_START( pepp0250 ) /* Normal board : Double Down Stud Poker (PP0250) */
 ROM_END
 
 ROM_START( pepp0447 ) /* Normal board : Standard Draw Poker (PP0447) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0447.u68",   0x00000, 0x10000, CRC(0ef0bb6c) SHA1(d0ef7a83417054f05d32d0a93ed0d5d618f4dfb9) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1186,7 +1186,7 @@ ROM_START( pepp0447 ) /* Normal board : Standard Draw Poker (PP0447) */
 ROM_END
 
 ROM_START( pepp0516 ) /* Normal board : Double Bonus Poker (PP0516) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0516.u68",   0x00000, 0x10000, CRC(d9da6e13) SHA1(421678d9cb42daaf5b21074cc3900db914dd26cf) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1200,7 +1200,7 @@ ROM_START( pepp0516 ) /* Normal board : Double Bonus Poker (PP0516) */
 ROM_END
 
 ROM_START( pebe0014 ) /* Normal board : Blackjack (BE0014) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "be0014.u68",   0x00000, 0x10000, CRC(232b32b7) SHA1(a3af9414577642fedc23b4c1911901cd31e9d6e0) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1214,7 +1214,7 @@ ROM_START( pebe0014 ) /* Normal board : Blackjack (BE0014) */
 ROM_END
 
 ROM_START( peke1012 ) /* Normal board : Keno (KE1012) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke1012.u68",   0x00000, 0x10000, CRC(470e8c10) SHA1(f8a65a3a73477e9e9d2f582eeefa93b470497dfa) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) // BAD DUMPS
@@ -1228,7 +1228,7 @@ ROM_START( peke1012 ) /* Normal board : Keno (KE1012) */
 ROM_END
 
 ROM_START( peps0014 ) /* Normal board : Super Joker Slots (PS0014) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0014.u68",   0x00000, 0x10000, CRC(368c3f58) SHA1(ebefcefbb5386659680719936bff72ad61087343) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1242,7 +1242,7 @@ ROM_START( peps0014 ) /* Normal board : Super Joker Slots (PS0014) */
 ROM_END
 
 ROM_START( peps0022 ) /* Normal board : Red White & Blue Slots (PS0022) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0022.u68",   0x00000, 0x10000, CRC(d65c0939) SHA1(d91f472a43f77f9df8845e97561540f988e522e3) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1256,7 +1256,7 @@ ROM_START( peps0022 ) /* Normal board : Red White & Blue Slots (PS0022) */
 ROM_END
 
 ROM_START( peps0043 ) /* Normal board : Double Diamond Slots (PS0043) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0043.u68",   0x00000, 0x10000, CRC(d612429c) SHA1(95eb4774482a930066456d517fb2e4f67d4df4cb) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1270,7 +1270,7 @@ ROM_START( peps0043 ) /* Normal board : Double Diamond Slots (PS0043) */
 ROM_END
 
 ROM_START( peps0045 ) /* Normal board : Red White & Blue Slots (PS0045) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0045.u68",   0x00000, 0x10000, CRC(de180b84) SHA1(0d592d7d535b0aacbd62c18ac222da770fab7b85) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1284,7 +1284,7 @@ ROM_START( peps0045 ) /* Normal board : Red White & Blue Slots (PS0045) */
 ROM_END
 
 ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0308.u68",   0x00000, 0x10000, CRC(fe30e081) SHA1(d216cbc6336727caf359e6b178c856ab2659cabd) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1298,7 +1298,7 @@ ROM_START( peps0308 ) /* Normal board : Double Jackpot Slots (PS0308) */
 ROM_END
 
 ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0615.u68",   0x00000, 0x10000, CRC(d27dd6ab) SHA1(b3f065f507191682edbd93b07b72ed87bf6ae9b1) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1312,7 +1312,7 @@ ROM_START( peps0615 ) /* Normal board : Chaos Slots (PS0615) */
 ROM_END
 
 ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps0716.u68",   0x00000, 0x10000, CRC(7615d7b6) SHA1(91fe62eec720a0dc2ebf48835065148f19499d16) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1326,7 +1326,7 @@ ROM_START( peps0716 ) /* Normal board : River Gambler Slots (PS0716) */
 ROM_END
 
 ROM_START( pex2069p ) /* Superboard : Double Double Bonus Poker (X002069P) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
@@ -1343,7 +1343,7 @@ ROM_START( pex2069p ) /* Superboard : Double Double Bonus Poker (X002069P) */
 ROM_END
 
 ROM_START( pexp0019 ) /* Superboard : Deuces Wild Poker (XP000019) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000019.u67",   0x00000, 0x10000, CRC(8ac876eb) SHA1(105b4aee2692ccb20795586ccbdf722c59db66cf) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
@@ -1360,7 +1360,7 @@ ROM_START( pexp0019 ) /* Superboard : Deuces Wild Poker (XP000019) */
 ROM_END
 
 ROM_START( pexp0112 ) /* Superboard : White Hot Aces Poker (XP000112) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xp000112.u67",   0x00000, 0x10000, CRC(c1ae96ad) SHA1(da109602f0fbe9b225cdcd60be0613fd41014864) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
@@ -1377,7 +1377,7 @@ ROM_START( pexp0112 ) /* Superboard : White Hot Aces Poker (XP000112) */
 ROM_END
 
 ROM_START( pexs0006 ) /* Superboard : Triple Triple Diamond Slots (XS000006) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xs000006.u67",   0x00000, 0x10000, CRC(4b11ca18) SHA1(f64a1fbd089c01bc35a5484e60b8834a2db4a79f) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
@@ -1394,7 +1394,7 @@ ROM_START( pexs0006 ) /* Superboard : Triple Triple Diamond Slots (XS000006) */
 ROM_END
 
 ROM_START( pexmp006 ) /* Superboard : Multi-Poker (XMP00006) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00006.u67",   0x00000, 0x10000, CRC(d61f1677) SHA1(2eca1315d6aa310a54de2dfa369e443a07495b76) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
@@ -1411,7 +1411,7 @@ ROM_START( pexmp006 ) /* Superboard : Multi-Poker (XMP00006) */
 ROM_END
 
 ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00017.u67",   0x00000, 0x10000, CRC(129e6eaa) SHA1(1dd2b83a672a618f338b553a6cbd598b6d4ce672) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
@@ -1436,7 +1436,7 @@ ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
 ROM_END
 
 ROM_START( pexmp024 ) /* Superboard : Multi-Poker (XMP00024) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00024.u67",   0x00000, 0x10000, CRC(f2df8870) SHA1(bc7fa1d79da07093cf3d3508e226a9c490990e04) )
 
 	ROM_REGION( 0x10000, "user1", 0 )

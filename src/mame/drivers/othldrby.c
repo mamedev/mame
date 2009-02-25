@@ -241,12 +241,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( othldrby )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -277,7 +277,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( othldrby )
-	ROM_REGION( 0x080000, "main", 0 )
+	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "db0.1",        0x00000, 0x80000, CRC(6b4008d3) SHA1(4cf838c47563ba482be8364b2e115569a4a06c83) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )

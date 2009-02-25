@@ -763,7 +763,7 @@ static INTERRUPT_GEN( rockola_interrupt )
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",		/* screen we are acting on */
+	"screen",	/* screen we are acting on */
 	8,			/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
@@ -821,7 +821,7 @@ static MACHINE_RESET( pballoon )
 
 static MACHINE_DRIVER_START( sasuke )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 16) // 700 kHz
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
 	MDRV_CPU_PROGRAM_MAP(sasuke_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(satansat_interrupt, 2)
 
@@ -829,7 +829,7 @@ static MACHINE_DRIVER_START( sasuke )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((MASTER_CLOCK / 16) / (45 * 32 * 8))
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -871,7 +871,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( satansat )
 	// basic machine hardware
 	MDRV_IMPORT_FROM(sasuke)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(satansat_map, 0)
 
 	MDRV_MACHINE_RESET(satansat)
@@ -894,8 +894,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vanguard )
 	// basic machine hardware
-	//MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
-	MDRV_CPU_ADD("main", M6502, 930000)		// adjusted
+	//MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
+	MDRV_CPU_ADD("maincpu", M6502, 930000)		// adjusted
 	MDRV_CPU_PROGRAM_MAP(vanguard_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(rockola_interrupt, 2)
 
@@ -903,7 +903,7 @@ static MACHINE_DRIVER_START( vanguard )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE((MASTER_CLOCK / 16) / (45 * 32 * 8))
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -941,7 +941,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fantasy )
 	// basic machine hardware
 	MDRV_IMPORT_FROM(vanguard)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(fantasy_map, 0)
 
 	// sound hardware
@@ -971,13 +971,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pballoon )
 	// basic machine hardware
 	MDRV_IMPORT_FROM(nibbler)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pballoon_map, 0)
 
 	MDRV_MACHINE_RESET(pballoon)
 
 	// video hardware
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 MACHINE_DRIVER_END
 
@@ -989,7 +989,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( sasuke )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sc1",          0x4000, 0x0800, CRC(34cbbe03) SHA1(3d643e11370e61dde0c42c7761a856c5cf53d621) )
 	ROM_LOAD( "sc2",          0x4800, 0x0800, CRC(38cc14f0) SHA1(d60df67f2a32c131e8957e225b79618d6262463d) )
 	ROM_LOAD( "sc3",          0x5000, 0x0800, CRC(54c41285) SHA1(5618c2ac745bbde96bfda7f01f7aee7e2b643d7e) )
@@ -1014,7 +1014,7 @@ ROM_START( sasuke )
 ROM_END
 
 ROM_START( satansat )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ss1",          0x4000, 0x0800, CRC(549dd13a) SHA1(06b55d0b1da84bef30857faa398aabfd04365eb6) )
 	ROM_LOAD( "ss2",          0x4800, 0x0800, CRC(04972fa8) SHA1(89833a7c893168acd5599ca7ad4b33a8f3df40c5) )
 	ROM_LOAD( "ss3",          0x5000, 0x0800, CRC(9caf9057) SHA1(26d439678e5e4d375ffac60126f45de599575bfd) )
@@ -1041,7 +1041,7 @@ ROM_START( satansat )
 ROM_END
 
 ROM_START( satansaa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic7.bin",   0x4000, 0x0800, CRC(549dd13a) SHA1(06b55d0b1da84bef30857faa398aabfd04365eb6) )
 	ROM_LOAD( "ic8.bin",   0x4800, 0x0800, CRC(04972fa8) SHA1(89833a7c893168acd5599ca7ad4b33a8f3df40c5) )
 	ROM_LOAD( "ic9.bin",   0x5000, 0x0800, CRC(9caf9057) SHA1(26d439678e5e4d375ffac60126f45de599575bfd) )
@@ -1068,7 +1068,7 @@ ROM_START( satansaa )
 ROM_END
 
 ROM_START( zarzon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "zarz122.07",   0x4000, 0x0800, CRC(bdfa67e2) SHA1(0de06cf53ee21b8f14b933b61e6dc706338746c4) )
 	ROM_LOAD( "zarz123.08",   0x4800, 0x0800, CRC(d034e61e) SHA1(dc802c3d7a9f7e473e323e3272fca406dab6d55d) )
 	ROM_LOAD( "zarz124.09",   0x5000, 0x0800, CRC(296397ea) SHA1(3a1ad7f3c4453bb20768b3e3ce04cd76873aa0ee) )
@@ -1095,7 +1095,7 @@ ROM_START( zarzon )
 ROM_END
 
 ROM_START( vanguard )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk4_ic07.bin", 0x4000, 0x1000, CRC(6a29e354) SHA1(ff953962ebc14a28cfc96f8e269cb1e1c188ed8a) )
 	ROM_LOAD( "sk4_ic08.bin", 0x5000, 0x1000, CRC(302bba54) SHA1(1944f229481328a0635fafda65054106f42a532a) )
 	ROM_LOAD( "sk4_ic09.bin", 0x6000, 0x1000, CRC(424755f6) SHA1(b4762b40c7ed70d4b90319a1a30983a41a096afb) )
@@ -1126,7 +1126,7 @@ ROM_START( vanguard )
 ROM_END
 
 ROM_START( vangrdce )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk4_ic07.bin", 0x4000, 0x1000, CRC(6a29e354) SHA1(ff953962ebc14a28cfc96f8e269cb1e1c188ed8a) )
 	ROM_LOAD( "sk4_ic08.bin", 0x5000, 0x1000, CRC(302bba54) SHA1(1944f229481328a0635fafda65054106f42a532a) )
 	ROM_LOAD( "sk4_ic09.bin", 0x6000, 0x1000, CRC(424755f6) SHA1(b4762b40c7ed70d4b90319a1a30983a41a096afb) )
@@ -1157,7 +1157,7 @@ ROM_START( vangrdce )
 ROM_END
 
 ROM_START( vanguarj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk4_ic07.bin", 0x4000, 0x1000, CRC(6a29e354) SHA1(ff953962ebc14a28cfc96f8e269cb1e1c188ed8a) )
 	ROM_LOAD( "sk4_ic08.bin", 0x5000, 0x1000, CRC(302bba54) SHA1(1944f229481328a0635fafda65054106f42a532a) )
 	ROM_LOAD( "sk4_ic09.bin", 0x6000, 0x1000, CRC(424755f6) SHA1(b4762b40c7ed70d4b90319a1a30983a41a096afb) )
@@ -1188,7 +1188,7 @@ ROM_START( vanguarj )
 ROM_END
 
 ROM_START( fantasyu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic12.cpu",     0x3000, 0x1000, CRC(22cb2249) SHA1(6c43e3fa9638b6d2e069199968923e470bd5d18b) )
 	ROM_LOAD( "ic07.cpu",     0x4000, 0x1000, CRC(0e2880b6) SHA1(666d6942864eb7a90178b3b6e2b0eb23aa3c967f) )
 	ROM_LOAD( "ic08.cpu",     0x5000, 0x1000, CRC(4c331317) SHA1(800850f4e8bcfbbade54eb9e47a53941f8798641) )
@@ -1221,7 +1221,7 @@ ROM_START( fantasyu )
 ROM_END
 
 ROM_START( fantasy )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5.12",         0x3000, 0x1000, CRC(0968ab50) SHA1(f09d03a171349895c5cb69e684901be63d272b32) )
 	ROM_LOAD( "1.7",          0x4000, 0x1000, CRC(de83000e) SHA1(ede1dda46406b4d340f1efea3bc85b2227af9e1d) )
 	ROM_LOAD( "2.8",          0x5000, 0x1000, CRC(90499b5a) SHA1(81a9d93a5655d2ff9504036bc764d8bb81e1470d) )
@@ -1254,7 +1254,7 @@ ROM_START( fantasy )
 ROM_END
 
 ROM_START( fantasyj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fs5jic12.bin", 0x3000, 0x1000, CRC(dd1eac89) SHA1(d63078d4666e3c6db0c9b3f8b45ef81606ed5a4f) )
 	ROM_LOAD( "fs1jic7.bin",  0x4000, 0x1000, CRC(7b8115ae) SHA1(6274f937c57ab9cbb7c6283022b81f70dad7c232) )
 	ROM_LOAD( "fs2jic8.bin",  0x5000, 0x1000, CRC(61531dd1) SHA1(f3bc405bafc8ced6c6fce93ad2ad20ff6aa603e8) )
@@ -1287,7 +1287,7 @@ ROM_START( fantasyj )
 ROM_END
 
 ROM_START( pballoon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk7_ic12.bin", 0x3000, 0x1000, CRC(dfe2ae05) SHA1(21c98bef9d4d5fcb65ce5e9b20cde2259840459e) )
 	ROM_LOAD( "sk7_ic07.bin", 0x4000, 0x1000, CRC(736e67df) SHA1(a58d9561f62d396ca90b0f69afe6240d809b10bb) )
 	ROM_LOAD( "sk7_ic08.bin", 0x5000, 0x1000, CRC(7a2032b2) SHA1(79570943468d647cda67d94b20eac1b2d9eb371f) )
@@ -1312,7 +1312,7 @@ ROM_START( pballoon )
 ROM_END
 
 ROM_START( nibbler )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g-0960-52.ic12", 0x3000, 0x1000, CRC(ac6a802b) SHA1(ac1072e30994f13097663dc24d9d1dc35a95d874) )
 	ROM_LOAD( "g-0960-48.ic7",  0x4000, 0x1000, CRC(35971364) SHA1(6430c7be9e5f47d3f1f2cc157d949246e4085e8b) )
 	ROM_LOAD( "g-0960-49.ic8",  0x5000, 0x1000, CRC(6b33b806) SHA1(29444e45bf5a6ab1d86e0aa19dc6c1bc64ba633f) )
@@ -1339,7 +1339,7 @@ ROM_START( nibbler )
 ROM_END
 
 ROM_START( nibblera )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic12",           0x3000, 0x1000, CRC(6dfa1be5) SHA1(bb265702a2f74cb7d5ba27081f9fb2fe01dd95a5) )
 	ROM_LOAD( "ic7",            0x4000, 0x1000, CRC(808e1a03) SHA1(a747a16ee0c8cb803b72ac84e80f791b2bf1813a) )
 	ROM_LOAD( "ic8",            0x5000, 0x1000, CRC(1571d4a2) SHA1(42cbaa262c2265d904fd5844c0d3c63d3beb67a8) )
@@ -1366,7 +1366,7 @@ ROM_START( nibblera )
 ROM_END
 
 ROM_START( nibblerb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "50-144.012",     0x3000, 0x1000, CRC(68af8f4b) SHA1(be6ddd3a9abb05563c927b1ec54dbaab44b65492) )
 	ROM_LOAD( "50-140.007",     0x4000, 0x1000, CRC(c18b3009) SHA1(c3703d0300f5f1546417ecdc27ab747d9c7eb267) )
 	ROM_LOAD( "50-141.008",     0x5000, 0x1000, CRC(b50fd79c) SHA1(cd9847bf8d570ca9411d1bbcbccb3c94220349f9) )
@@ -1393,7 +1393,7 @@ ROM_START( nibblerb )
 ROM_END
 
 ROM_START( nibblero )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "50-144g.012",    0x3000, 0x1000, CRC(1093f525) SHA1(6a63372300765acdbac1d2e30fd73af7773de80f) )
 	ROM_LOAD( "50-140g.007",    0x4000, 0x1000, CRC(848651dd) SHA1(a5aafbcca42baca8d0d5d28546733aefc778ba99) )
 	ROM_LOAD( "50-141.008",     0x5000, 0x1000, CRC(b50fd79c) SHA1(cd9847bf8d570ca9411d1bbcbccb3c94220349f9) )

@@ -290,16 +290,16 @@ static const ym3526_interface ym3526_config =
 static MACHINE_DRIVER_START( sidepckt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", M6502, 1500000)        /* 1.5 MHz */
+	MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main cpu */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* VERIFY:  May be 55 or 56 */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -328,16 +328,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sidepctj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 2000000)        /* 2 MHz */
+	MDRV_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,j_writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", M6502, 1500000)        /* 1.5 MHz */
+	MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are triggered by the main cpu */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* VERIFY:  May be 55 or 56 */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -369,10 +369,10 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( sidepckt )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "dh00",         0x00000, 0x10000, CRC(251b316e) SHA1(c777d87621b8fefe0e33156be03da8aed733db9a) )
 
-    ROM_REGION( 0x10000, "audio", 0 )
+    ROM_REGION( 0x10000, "audiocpu", 0 )
     ROM_LOAD( "dh04.bin",     0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
     ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -391,10 +391,10 @@ ROM_START( sidepckt )
 ROM_END
 
 ROM_START( sidepctj )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "dh00.bin",     0x00000, 0x10000, CRC(a66bc28d) SHA1(cd62ce1dce6fe42d9745eec50d11e86b076d28e1) )
 
-    ROM_REGION( 0x10000, "audio", 0 )
+    ROM_REGION( 0x10000, "audiocpu", 0 )
     ROM_LOAD( "dh04.bin",     0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
     ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -413,11 +413,11 @@ ROM_START( sidepctj )
 ROM_END
 
 ROM_START( sidepctb )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "sp_09.bin",    0x04000, 0x4000, CRC(3c6fe54b) SHA1(4025ac48d75f171f4c979d3fcd6a2f8da18cef4f) )
     ROM_LOAD( "sp_08.bin",    0x08000, 0x8000, CRC(347f81cd) SHA1(5ab06130f35788e51a881cc0f387649532145bd6) )
 
-    ROM_REGION( 0x10000, "audio", 0 )
+    ROM_REGION( 0x10000, "audiocpu", 0 )
     ROM_LOAD( "dh04.bin",     0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
 
     ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )

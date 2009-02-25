@@ -512,13 +512,13 @@ static const msm5232_interface msm5232_config =
 static MACHINE_DRIVER_START( msisaac )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* source of IRQs is unknown */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* source of IRQs is unknown */
 
 #ifdef USE_MCU
 	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
@@ -528,7 +528,7 @@ static MACHINE_DRIVER_START( msisaac )
 	MDRV_MACHINE_RESET(ta7630)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -569,13 +569,13 @@ MACHINE_DRIVER_END
 /*******************************************************************************/
 
 ROM_START( msisaac )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 main CPU */
 	ROM_LOAD( "a34_11.bin", 0x0000, 0x4000, CRC(40819334) SHA1(65352607165043909a09e96c07f7060f6ce087e6) )
 	ROM_LOAD( "a34_12.bin", 0x4000, 0x4000, CRC(4c50b298) SHA1(5962882ad37ba6990ba2a6312b570f214cd4c103) )
 	ROM_LOAD( "a34_13.bin", 0x8000, 0x4000, CRC(2e2b09b3) SHA1(daa715282ed9ef2e519e252a684ef28085becabd) )
 	ROM_LOAD( "a34_10.bin", 0xc000, 0x2000, CRC(a2c53dc1) SHA1(14f23511f92bcfc94447dabe2826555d68bc1caa) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 sound CPU */
 	ROM_LOAD( "a34_01.bin", 0x0000, 0x4000, CRC(545e45e7) SHA1(18ddb1ec8809bb62ae1c1068cd16cd3c933bf6ba) )
 
 	ROM_REGION( 0x0800,  "cpu2", 0 )	/* 2k for the microcontroller */

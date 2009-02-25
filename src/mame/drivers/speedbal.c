@@ -228,18 +228,18 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( speedbal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map,0)
 	MDRV_CPU_IO_MAP(main_cpu_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 2660000)	/* 2.66 MHz ???  Maybe yes */
+	MDRV_CPU_ADD("audiocpu", Z80, 2660000)	/* 2.66 MHz ???  Maybe yes */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map,0)
 	MDRV_CPU_IO_MAP(sound_cpu_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -268,11 +268,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( speedbal )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64K for code: main */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64K for code: main */
 	ROM_LOAD( "sb1.bin",  0x0000,  0x8000, CRC(1c242e34) SHA1(8b2e8983e0834c99761ce2b5ea765dba56e77964) )
 	ROM_LOAD( "sb3.bin",  0x8000,  0x8000, CRC(7682326a) SHA1(15a72bf088a9adfaa50c11202b4970e07c309a21) )
 
-	ROM_REGION( 0x10000, "audio", 0 )     /* 64K for second CPU: sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64K for second CPU: sound */
 	ROM_LOAD( "sb2.bin",  0x0000, 0x8000, CRC(e6a6d9b7) SHA1(35d228d13d4305f606fdd84adad1d6e435f4b7ce) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )

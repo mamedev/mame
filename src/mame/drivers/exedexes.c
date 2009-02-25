@@ -223,18 +223,18 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( exedexes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(exedexes_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 3000000)	/* 3 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -265,12 +265,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( exedexes )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "11m_ee04.bin", 0x0000, 0x4000, CRC(44140dbd) SHA1(7b56f614f7cd7655ffa3e1f4adba5a20fa25822d) )
 	ROM_LOAD( "10m_ee03.bin", 0x4000, 0x4000, CRC(bf72cfba) SHA1(9f0b9472890db95e16a71f26da954780d5ec7c16) )
 	ROM_LOAD( "09m_ee02.bin", 0x8000, 0x4000, CRC(7ad95e2f) SHA1(53fd8d6985d08106bab45e83827a509486d640b7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "11e_ee01.bin", 0x00000, 0x4000, CRC(73cdf3b2) SHA1(c9f2c91011bdeecec8fa76a42d95f3a5ec77cec9) )
 
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )
@@ -307,12 +307,12 @@ ROM_START( exedexes )
 ROM_END
 
 ROM_START( savgbees )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ee04e.11m",    0x0000, 0x4000, CRC(c0caf442) SHA1(f6e137c1707db620db4f79a1e038101bb3acf812) )
 	ROM_LOAD( "ee03e.10m",    0x4000, 0x4000, CRC(9cd70ae1) SHA1(ad2c5de469cdc04a8e877e334a93d68d722cec9a) )
 	ROM_LOAD( "ee02e.9m",     0x8000, 0x4000, CRC(a04e6368) SHA1(ed350fb490f8f84dcd9e4a9f5fb3b23079d6b996) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ee01e.11e",    0x00000, 0x4000, CRC(93d3f952) SHA1(5c86d1ddf03083ac2787efb7a29c09b2f46ec3fa) )
 
 	ROM_REGION( 0x02000, "gfx1", ROMREGION_DISPOSE )

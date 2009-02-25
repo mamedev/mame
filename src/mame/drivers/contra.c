@@ -42,7 +42,7 @@ VIDEO_START( contra );
 static WRITE8_HANDLER( contra_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 
 	bankaddress = 0x10000 + (data & 0x0f) * 0x2000;
@@ -248,17 +248,17 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( contra )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("main", M6809, 1500000)
+ 	MDRV_CPU_ADD("maincpu", M6809, 1500000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
- 	MDRV_CPU_ADD("audio", M6809, 2000000)
+ 	MDRV_CPU_ADD("audiocpu", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -282,12 +282,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( contra )
-	ROM_REGION( 0x28000, "main", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633m03.18a",   0x20000, 0x08000, CRC(d045e1da) SHA1(ec781e98a6efb14861223250c6239b06ec98ed0b) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633i02.17a",   0x10000, 0x10000, CRC(b2f7bd9a) SHA1(6c29568419bc49f0be3995b0c34edd9038f6f8d9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -306,12 +306,12 @@ ROM_START( contra )
 ROM_END
 
 ROM_START( contra1 )
-	ROM_REGION( 0x28000, "main", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633e03.18a",   0x20000, 0x08000, CRC(7fc0d8cf) SHA1(cf1cf15646a4e5dc72671e957bc51ca44d30995c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633i02.17a",   0x10000, 0x10000, CRC(b2f7bd9a) SHA1(6c29568419bc49f0be3995b0c34edd9038f6f8d9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -330,12 +330,12 @@ ROM_START( contra1 )
 ROM_END
 
 ROM_START( contrab )
-	ROM_REGION( 0x28000, "main", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633m03.18a",   0x20000, 0x08000, CRC(d045e1da) SHA1(ec781e98a6efb14861223250c6239b06ec98ed0b) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633i02.17a",   0x10000, 0x10000, CRC(b2f7bd9a) SHA1(6c29568419bc49f0be3995b0c34edd9038f6f8d9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -369,12 +369,12 @@ ROM_START( contrab )
 ROM_END
 
 ROM_START( contraj )
-	ROM_REGION( 0x28000, "main", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633n03.18a",   0x20000, 0x08000, CRC(fedab568) SHA1(7fd4546335bdeef7f8326d4cbde7fa36d74e5cfc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633k02.17a",   0x10000, 0x10000, CRC(5d5f7438) SHA1(489fe56ca57ef4f6a7792fba07a9656009f3f285) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -393,12 +393,12 @@ ROM_START( contraj )
 ROM_END
 
 ROM_START( contrajb )
-	ROM_REGION( 0x28000, "main", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "g-2.18a",      0x20000, 0x08000, CRC(bdb9196d) SHA1(fad170e8fda94c9c9d7b82433daa30b80af12efc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633k02.17a",   0x10000, 0x10000, CRC(5d5f7438) SHA1(489fe56ca57ef4f6a7792fba07a9656009f3f285) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -432,12 +432,12 @@ ROM_START( contrajb )
 ROM_END
 
 ROM_START( gryzor )
-	ROM_REGION( 0x28000, "main", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "g2.18a",       0x20000, 0x08000, CRC(92ca77bd) SHA1(3a56f51a617edff9f2a60df0141dff040881b82a) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "g3.17a",       0x10000, 0x10000, CRC(bbd9e95e) SHA1(fd5de1bcc485de7b8fc2e321351c2e3ddd25d053) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -456,12 +456,12 @@ ROM_START( gryzor )
 ROM_END
 
 ROM_START( gryzora )
-	ROM_REGION( 0x28000, "main", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "633j03.18a",   0x20000, 0x08000, CRC(20919162) SHA1(2f375166428ee03f6e8ac0372a373bb8ab35e64c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 	ROM_LOAD( "633j02.17a",   0x10000, 0x10000, CRC(b5922f9a) SHA1(441a23dc99a908ec2c09c855e73070dbab8c5ae2) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for SOUND code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for SOUND code */
 	ROM_LOAD( "633e01.12a",   0x08000, 0x08000, CRC(d1549255) SHA1(d700c7de36746ba247e3a5d0410b7aa036aa4073) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )

@@ -133,7 +133,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( gunsmoke )
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memory_region(machine, "main");
+	UINT8 *rombase = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x4000);
 
 	/* create tilemaps */

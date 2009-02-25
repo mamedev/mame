@@ -183,15 +183,15 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( blockout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(blockout_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -226,11 +226,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( blockout )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "bo29a0-2.bin", 0x00000, 0x20000, CRC(b0103427) SHA1(53cac2adc04783abbde21e9f3c0e655f22f68f69) )
 	ROM_LOAD16_BYTE( "bo29a1-2.bin", 0x00001, 0x20000, CRC(5984d5a2) SHA1(4b350856d0313d40eaa3d8a8d9e310f74bc20398) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bo29e3-0.bin", 0x0000, 0x8000, CRC(3ea01f78) SHA1(5fc4ad4d9f03d7c26d2afc3e7ede75589e40b0d8) )
 
 	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
@@ -241,11 +241,11 @@ ROM_START( blockout )
 ROM_END
 
 ROM_START( blckout2 )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "29a0",         0x00000, 0x20000, CRC(605f931e) SHA1(65fa7227dafde1fc8564e09fa949fe575b394d8a) )
 	ROM_LOAD16_BYTE( "29a1",         0x00001, 0x20000, CRC(38f07000) SHA1(e4070e3067d77cc1b0d8d0c63786f2729c5c703a) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bo29e3-0.bin", 0x0000, 0x8000, CRC(3ea01f78) SHA1(5fc4ad4d9f03d7c26d2afc3e7ede75589e40b0d8) )
 
 	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
@@ -256,11 +256,11 @@ ROM_START( blckout2 )
 ROM_END
 
 ROM_START( blckoutj )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "2.bin",         0x00000, 0x20000, CRC(e16cf065) SHA1(541b30b054cf08f10d6ca4746423759f4326c005) )
 	ROM_LOAD16_BYTE( "1.bin",         0x00001, 0x20000, CRC(950b28a3) SHA1(7d1635ac2a3fc1efdd2f78cd6038bd7b4c907b1b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bo29e3-0.bin", 0x0000, 0x8000, CRC(3ea01f78) SHA1(5fc4ad4d9f03d7c26d2afc3e7ede75589e40b0d8) )
 
 	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
@@ -326,11 +326,11 @@ Notes:
 */
 
 ROM_START( agress )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "palco1.81",         0x00000, 0x20000, CRC(3acc917a) SHA1(14960588673458d862daf14a8d7474af6c95c2ad) )
 	ROM_LOAD16_BYTE( "palco2.91",         0x00001, 0x20000, CRC(abfd5bcc) SHA1(bf0ea8ba00750ea2ddf2b8afc96393bf8a730068) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "palco3.73", 0x0000, 0x8000, CRC(2a21c97d) SHA1(7f71bf18db3e6ff9c69c589268450e66c6585cdd) )
 
 	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */
@@ -342,11 +342,11 @@ ROM_END
 
 // this is probably an original English version with copyright year hacked
 ROM_START( agressb )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "palco1.ic81",  0x00000, 0x20000, CRC(a1875175) SHA1(6c9946bcd4fe7987d4f817ea25bfc76432188883) )
 	ROM_LOAD16_BYTE( "palco2.ic91",  0x00001, 0x20000, CRC(ab3182c3) SHA1(788a3e7cf6ef889262f3d72af8be9ec951eb397b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "palco3.ic73",  0x000000, 0x08000, CRC(2a21c97d) SHA1(7f71bf18db3e6ff9c69c589268450e66c6585cdd) )
 
 	ROM_REGION( 0x20000, "oki", 0 )	/* 128k for ADPCM samples - sound chip is OKIM6295 */

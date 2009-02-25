@@ -574,16 +574,16 @@ static INTERRUPT_GEN( ddealer_interrupt )
 }
 
 static MACHINE_DRIVER_START( ddealer )
-	MDRV_CPU_ADD("main" , M68000, 10000000)
+	MDRV_CPU_ADD("maincpu" , M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(ddealer,0)
-	MDRV_CPU_VBLANK_INT("main", ddealer_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ddealer_interrupt)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 90)//guess,controls music tempo,112 is way too fast
 
 	// M50747 or NMK-110 8131 MCU
 
 	MDRV_GFXDECODE(ddealer)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -631,7 +631,7 @@ static DRIVER_INIT( ddealer )
 }
 
 ROM_START( ddealer )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "1.ic6", 0x00001, 0x20000, CRC(ce0dff50) SHA1(2d7a03f6b9609aea7511a4dc49560a901b0b9f19) )
 	ROM_LOAD16_BYTE( "2.ic28", 0x00000, 0x20000, CRC(f00c346f) SHA1(bd73efb19d5f9efc88210d92a82a3f4595b41097) )
 

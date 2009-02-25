@@ -140,7 +140,7 @@ WRITE8_HANDLER( c1943_colorram_w )
 WRITE8_HANDLER( c1943_c804_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(0, data & 0x01);

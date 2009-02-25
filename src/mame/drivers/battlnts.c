@@ -34,7 +34,7 @@ static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	int bankaddress;
 
 	/* bits 6 & 7 = bank number */
@@ -243,15 +243,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( battlnts )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", HD6309, 3000000*4)		/* ? */
+	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(battlnts_map,0)
-	MDRV_CPU_VBLANK_INT("main", battlnts_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", battlnts_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(battlnts_sound_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -281,11 +281,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( battlnts )
-	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "777_g02.7e", 0x08000, 0x08000, CRC(dbd8e17e) SHA1(586a22b714011c67a915c4a350ceca19ff875635) ) /* fixed ROM */
 	ROM_LOAD( "777_g03.8e", 0x10000, 0x10000, CRC(7bd44fef) SHA1(308ec5246f5537b34e368535672ac687f456750a) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
@@ -296,11 +296,11 @@ ROM_START( battlnts )
 ROM_END
 
 ROM_START( battlntj )
-	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "777_e02.7e",  0x08000, 0x08000, CRC(d631cfcb) SHA1(7787da0dd8cd218abc27204e517e04d7a1913a3b) ) /* fixed ROM */
 	ROM_LOAD( "777_e03.8e",  0x10000, 0x10000, CRC(5ef1f4ef) SHA1(e3e6e1fc5a65328d94c23e2e76eef3504b70e58b) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "777_c01.10a",  0x00000, 0x08000, CRC(c21206e9) SHA1(7b133e04be67dc061a186ab0481d848b69b370d7) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
@@ -311,11 +311,11 @@ ROM_START( battlntj )
 ROM_END
 
 ROM_START( rackemup )
-	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "765_l02.7e",  0x08000, 0x08000, CRC(3dfc48bd) SHA1(9ba98e9f27dd0a6efec145bea2a5ae7df8567437) ) /* fixed ROM */
 	ROM_LOAD( "765_j03.8e",  0x10000, 0x10000, CRC(a13fd751) SHA1(27ec66835c85b7ac0221a813d38e9cca0d9be3b8) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
@@ -326,11 +326,11 @@ ROM_START( rackemup )
 ROM_END
 
 ROM_START( thehustl )
-	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "765_m02.7e",  0x08000, 0x08000, CRC(934807b9) SHA1(84e13a5c1587ee28330f369f9a1180219edbda9d) ) /* fixed ROM */
 	ROM_LOAD( "765_j03.8e",  0x10000, 0x10000, CRC(a13fd751) SHA1(27ec66835c85b7ac0221a813d38e9cca0d9be3b8) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
@@ -341,11 +341,11 @@ ROM_START( thehustl )
 ROM_END
 
 ROM_START( thehustj )
-	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "765_j02.7e",  0x08000, 0x08000, CRC(2ac14c75) SHA1(b88f6279ab88719f4207e28486a0022554668382) ) /* fixed ROM */
 	ROM_LOAD( "765_j03.8e",  0x10000, 0x10000, CRC(a13fd751) SHA1(27ec66835c85b7ac0221a813d38e9cca0d9be3b8) ) /* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "765_j01.10a", 0x00000, 0x08000, CRC(77ae753e) SHA1(9e463a825d31bb79644b083d24b25670d96441c5) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )

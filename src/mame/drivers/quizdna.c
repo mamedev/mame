@@ -29,13 +29,13 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w );
 
 static WRITE8_HANDLER( quizdna_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1,&ROM[0x10000+0x4000*(data & 0x3f)]);
 }
 
 static WRITE8_HANDLER( gekiretu_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1,&ROM[0x10000+0x4000*((data & 0x3f) ^ 0x0a)]);
 }
 
@@ -459,13 +459,13 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( quizdna )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 8.000 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(quizdna_readmem,quizdna_writemem)
 	MDRV_CPU_IO_MAP(quizdna_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -498,7 +498,7 @@ static MACHINE_DRIVER_START( gakupara )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(quizdna)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(gakupara_io_map,0)
 
 MACHINE_DRIVER_END
@@ -508,7 +508,7 @@ static MACHINE_DRIVER_START( gekiretu )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(quizdna)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(quizdna_readmem,gekiretu_writemem)
 	MDRV_CPU_IO_MAP(gekiretu_io_map,0)
 
@@ -518,7 +518,7 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( quizdna )
-	ROM_REGION( 0xd0000, "main", 0 ) /* CPU */
+	ROM_REGION( 0xd0000, "maincpu", 0 ) /* CPU */
 	ROM_LOAD( "quiz2-pr.28",  0x00000,  0x08000, CRC(a428ede4) SHA1(cdca3bd84b2ea421fb05502ea29e9eb605e574eb) )
 	ROM_CONTINUE(             0x18000,  0x78000 ) /* banked */
 	/* empty */
@@ -543,7 +543,7 @@ ROM_START( quizdna )
 ROM_END
 
 ROM_START( gakupara )
-	ROM_REGION( 0xd0000, "main", 0 ) /* CPU */
+	ROM_REGION( 0xd0000, "maincpu", 0 ) /* CPU */
 	ROM_LOAD( "u28.bin",  0x00000,  0x08000, CRC(72124bb8) SHA1(e734acff7e9d6b8c6a95c76860732320a2e3a828) )
 	ROM_CONTINUE(         0x18000,  0x78000 )             /* banked */
 	ROM_LOAD( "u29.bin",  0x90000,  0x40000, CRC(09f4948e) SHA1(21ccf5af6935cf40c0cf73fbee14bff3c4e1d23d) ) /* banked */
@@ -568,7 +568,7 @@ ROM_START( gakupara )
 ROM_END
 
 ROM_START( gekiretu )
-	ROM_REGION( 0xd0000, "main", 0 ) /* CPU */
+	ROM_REGION( 0xd0000, "maincpu", 0 ) /* CPU */
 	ROM_LOAD( "quiz3-pr.28",  0x00000,  0x08000, CRC(a761e86f) SHA1(85331ef53598491e78c2d123b1ebd358aff46436) )
 	ROM_CONTINUE(             0x18000,  0x78000 ) /* banked */
 	/* empty */

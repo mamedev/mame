@@ -283,13 +283,13 @@ static INTERRUPT_GEN( dynduke_interrupt )
 
 static MACHINE_DRIVER_START( dynduke )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", V30, 16000000/2) // NEC V30-8 CPU
+	MDRV_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
-	MDRV_CPU_VBLANK_INT("main", dynduke_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", dynduke_interrupt)
 
 	MDRV_CPU_ADD("slave", V30, 16000000/2) // NEC V30-8 CPU
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
-	MDRV_CPU_VBLANK_INT("main", dynduke_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", dynduke_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START( dynduke )
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -321,14 +321,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dbldyn )
 	MDRV_IMPORT_FROM(dynduke)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(masterj_map,0)
 MACHINE_DRIVER_END
 
 /* ROMs */
 
 ROM_START( dynduke )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("1.cd8",     0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE("2.cd7",     0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
 	ROM_LOAD16_BYTE("3.e8",      0x0c0000, 0x20000, CRC(98b9d243) SHA1(db00ffafa1353425adb79f5bf6a0cf9223a0d031) )
@@ -338,10 +338,10 @@ ROM_START( dynduke )
 	ROM_LOAD16_BYTE("5.p8",    0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
 	ROM_LOAD16_BYTE("6.p7",    0x0e0001, 0x10000, CRC(d94cb4ff) SHA1(653247c420a2af037106470556e6801b29bc58e8) )
 
-	ROM_REGION( 0x20000*2, "audio", 0 ) /* sound Z80 */
+	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8.w8",         0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "9.5k",       0x000000, 0x04000, CRC(f2bc9af4) SHA1(9092ebe9dced243c3a7f63198a1180143dd42cea) ) /* chars */
@@ -376,7 +376,7 @@ ROM_START( dynduke )
 ROM_END
 
 ROM_START( dyndukf )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("1.cd8",     0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE("2.cd7",     0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
 	ROM_LOAD16_BYTE("dd3.ef8",   0x0c0000, 0x20000, CRC(a56f8692) SHA1(00d86c660efae30c008f8220fdfd397b7d69b2cd) )
@@ -386,10 +386,10 @@ ROM_START( dyndukf )
 	ROM_LOAD16_BYTE("5.p8",    0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
 	ROM_LOAD16_BYTE("6.p7",    0x0e0001, 0x10000, CRC(d94cb4ff) SHA1(653247c420a2af037106470556e6801b29bc58e8) )
 
-	ROM_REGION( 0x20000*2, "audio", 0 ) /* sound Z80 */
+	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8.w8",         0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "9.5k",       0x000000, 0x04000, CRC(f2bc9af4) SHA1(9092ebe9dced243c3a7f63198a1180143dd42cea) ) /* chars */
@@ -424,7 +424,7 @@ ROM_START( dyndukf )
 ROM_END
 
 ROM_START( dbldyn )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("1.cd8",   0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE("2.cd7",   0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
 	ROM_LOAD16_BYTE("3x.e8",   0x0c0000, 0x20000, CRC(633db1fe) SHA1(b8d67c3eedaf72a0d85eff878595af212f1246eb) )
@@ -434,10 +434,10 @@ ROM_START( dbldyn )
 	ROM_LOAD16_BYTE("5x.p8", 0x0e0000, 0x10000, CRC(ea56d719) SHA1(6cade731316c280ef4e809aa700fdbaaabff41d0) )
 	ROM_LOAD16_BYTE("6x.p7", 0x0e0001, 0x10000, CRC(9ffa0ecd) SHA1(a22c46312ab247cd824dadf840cf1f2b0305bb29) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8x.w8",        0x000000, 0x08000, CRC(f4066081) SHA1(0e5246f4f5513be11e6ed3ea26aada7e0a17a448) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "9x.5k",	    0x000000, 0x04000, CRC(913709E3) SHA1(A469043A09718409F7AF835F7C045BAEDAD92061) ) /* chars */
@@ -474,7 +474,7 @@ ROM_START( dbldyn )
 ROM_END
 
 ROM_START( dbldynf )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("1.cd8",   0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE("2.cd7",   0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
 	ROM_LOAD16_BYTE("3.8e",    0x0c0000, 0x20000, CRC(9b785028) SHA1(d94c41f9f8969c0effc05d5d6c44474a396a8177) )
@@ -484,10 +484,10 @@ ROM_START( dbldynf )
 	ROM_LOAD16_BYTE("5x.p8", 0x0e0000, 0x10000, CRC(ea56d719) SHA1(6cade731316c280ef4e809aa700fdbaaabff41d0) )
 	ROM_LOAD16_BYTE("6x.p7", 0x0e0001, 0x10000, CRC(9ffa0ecd) SHA1(a22c46312ab247cd824dadf840cf1f2b0305bb29) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound Z80 */
 	ROM_LOAD( "8x.w8",        0x000000, 0x08000, CRC(f4066081) SHA1(0e5246f4f5513be11e6ed3ea26aada7e0a17a448) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "9x.5k",	    0x000000, 0x04000, CRC(913709E3) SHA1(A469043A09718409F7AF835F7C045BAEDAD92061) ) /* chars */
@@ -527,7 +527,7 @@ ROM_END
 
 static DRIVER_INIT( dynduke )
 {
-	seibu_sound_decrypt(machine,"audio",0x20000);
+	seibu_sound_decrypt(machine,"audiocpu",0x20000);
 }
 
 /* Game Drivers */

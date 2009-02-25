@@ -66,12 +66,12 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( 3super8 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,24000000/4)		 /* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,24000000/4)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(0,map)
-	//MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	//MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -104,7 +104,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( 3super8 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "prgrom.bin", 0x00000, 0x20000, CRC(37c85dfe) SHA1(56bd2fb859b17dda1e675a385b6bcd6867ecceb0)  )
 
 	ROM_REGION( 0x1000, "pic", 0 )

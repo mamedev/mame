@@ -292,16 +292,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( wiping )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,120)	/* periodic interrupt, don't know about the frequency */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -330,12 +330,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( wiping )
-	ROM_REGION( 0x10000, "main", 0 )	/* main cpu code */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* main cpu code */
 	ROM_LOAD( "1",            0x0000, 0x2000, CRC(b55d0d19) SHA1(dac6096d3ee9dd8b1b6da5c2c613b54ce303cb7b) )
 	ROM_LOAD( "2",            0x2000, 0x2000, CRC(b1f96e47) SHA1(8f3f882a3c366e6a2d2682603d425eb0491b5487) )
 	ROM_LOAD( "3",            0x4000, 0x2000, CRC(c67bab5a) SHA1(3d74ed4be5a6bdc02cf1feb3ce3f4b1607ec6b80) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "4",            0x0000, 0x1000, CRC(a1547e18) SHA1(1f86d770e42ff1d94bf1f8b12f9b74accc3bb193) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
@@ -359,12 +359,12 @@ ROM_START( wiping )
 ROM_END
 
 ROM_START( rugrats )
-	ROM_REGION( 0x10000, "main", 0 )	/* main cpu code */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* main cpu code */
 	ROM_LOAD( "rugr1d1",      0x0000, 0x2000, CRC(e7e1bd6d) SHA1(985799b1bfd001c6304e6166180745cb019f834e) )
 	ROM_LOAD( "rugr2d2",      0x2000, 0x2000, CRC(5f47b9ad) SHA1(2d3eb737ea8e86691293e432e866d2623d6b6b1b) )
 	ROM_LOAD( "rugr3d3",      0x4000, 0x2000, CRC(3d748d1a) SHA1(2b301119b6eb3f0f9bb2ad734cff1d25365dfe99) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "rugr4c4",      0x0000, 0x2000, CRC(d4a92c38) SHA1(4a31cfef9f084b4d2934595155bf0f3dd589efb3) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )

@@ -287,15 +287,15 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( tumblep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000)
+	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", H6280, 32220000/8)	/* Custom chip 45; Audio section crystal is 32.220 MHz */
+	MDRV_CPU_ADD("audiocpu", H6280, 32220000/8)	/* Custom chip 45; Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -325,11 +325,11 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( tumblep )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE("hl00-1.f12", 0x00000, 0x40000, CRC(fd697c1b) SHA1(1a3dee4c7383f2bc2d73037e80f8f5d8297e7433) )
 	ROM_LOAD16_BYTE("hl01-1.f13", 0x00001, 0x40000, CRC(d5a62a3f) SHA1(7249563993fa8e1f19ddae51306d4a576b5cb206) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound cpu */
 	ROM_LOAD( "hl02-.f16",    0x00000, 0x10000, CRC(a5cab888) SHA1(622f6adb01e31b8f3adbaed2b9900b54c5922c57) )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
@@ -344,11 +344,11 @@ ROM_START( tumblep )
 ROM_END
 
 ROM_START( tumblepj )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE("hk00-1.f12", 0x00000, 0x40000, CRC(2d3e4d3d) SHA1(0acc8b93bd49395904dff11c582bdbaccdbd3eef) )
 	ROM_LOAD16_BYTE("hk01-1.f13", 0x00001, 0x40000, CRC(56912a00) SHA1(0545f6bff2a0aa2f36adda0f9d73b165387abc3a) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound cpu */
 	ROM_LOAD( "hl02-.f16",    0x00000, 0x10000, CRC(a5cab888) SHA1(622f6adb01e31b8f3adbaed2b9900b54c5922c57) )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
@@ -368,7 +368,7 @@ ROM_END
 void tumblep_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }

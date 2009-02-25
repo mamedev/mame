@@ -583,14 +583,14 @@ static INTERRUPT_GEN( darkhors )
 }
 
 static MACHINE_DRIVER_START( darkhors )
-	MDRV_CPU_ADD("main", M68EC020, 12000000) // 36MHz/3 ??
+	MDRV_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
 	MDRV_CPU_PROGRAM_MAP(darkhors_readmem,darkhors_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
 
 	MDRV_NVRAM_HANDLER(darkhors)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -620,7 +620,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( darkhors )
-	ROM_REGION( 0x100000, "main", 0 )	// 68EC020 code
+	ROM_REGION( 0x100000, "maincpu", 0 )	// 68EC020 code
 	ROM_LOAD32_WORD_SWAP( "prg2", 0x00000, 0x80000, CRC(f2ec5818) SHA1(326937a331496880f517f41b0b8ab54e55fd7af7) )
 	ROM_LOAD32_WORD_SWAP( "prg1", 0x00002, 0x80000, CRC(b80f8f59) SHA1(abc26dd8b36da0d510978364febe385f69fb317f) )
 
@@ -652,7 +652,7 @@ ROM_END
 
 static DRIVER_INIT( darkhors )
 {
-	UINT32 *rom    = (UINT32 *) memory_region(machine, "main");
+	UINT32 *rom    = (UINT32 *) memory_region(machine, "maincpu");
 	UINT8  *eeprom = (UINT8 *)  memory_region(machine, "user1");
 	int i;
 

@@ -1477,19 +1477,19 @@ static DRIVER_INIT( ghlpanic )
 
 static MACHINE_DRIVER_START( coh700 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",  CXD8661R, XTAL_100MHz )
+	MDRV_CPU_ADD("maincpu",  CXD8661R, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos12_map, 0 )
-	MDRV_CPU_VBLANK_INT("main", psx_vblank)
+	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
 	MDRV_CPU_ADD("sub", H83002, 14745600 )	/* verified 14.7456 MHz */
 	MDRV_CPU_PROGRAM_MAP( s12h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s12h8iomap, 0 )
-	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_MACHINE_RESET( namcos12 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

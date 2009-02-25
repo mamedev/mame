@@ -337,7 +337,7 @@ MACHINE_DRIVER_START( gottlieb_soundrev1 )
 
 	MDRV_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
 
-	MDRV_CPU_ADD("audio", M6502, SOUND1_CLOCK/4)	/* the board can be set to /2 as well */
+	MDRV_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4)	/* the board can be set to /2 as well */
 	MDRV_CPU_PROGRAM_MAP(gottlieb_sound1_map,0)
 
 	/* sound hardware */
@@ -387,7 +387,7 @@ static void gottlieb2_sh_w(const address_space *space, UINT8 data)
 		/* if the previous data was 0xff, clock an IRQ on each */
 		if (last_command == 0xff)
 		{
-			cputag_set_input_line(space->machine, "audio", M6502_IRQ_LINE, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, ASSERT_LINE);
 			cputag_set_input_line(space->machine, "speech", M6502_IRQ_LINE, ASSERT_LINE);
 		}
 	}
@@ -404,15 +404,15 @@ static READ8_HANDLER( speech_data_r )
 
 static READ8_HANDLER( audio_data_r )
 {
-	cputag_set_input_line(space->machine, "audio", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
 	return soundlatch2_r(space, offset);
 }
 
 
 static WRITE8_HANDLER( signal_audio_nmi_w )
 {
-	cputag_set_input_line(space->machine, "audio", INPUT_LINE_NMI, ASSERT_LINE);
-	cputag_set_input_line(space->machine, "audio", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -584,7 +584,7 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( gottlieb_soundrev2 )
 	/* audio CPUs */
-	MDRV_CPU_ADD("audio", M6502, SOUND2_CLOCK/4)
+	MDRV_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(gottlieb_audio2_map,0)
 
 	MDRV_CPU_ADD("speech", M6502, SOUND2_CLOCK/4)

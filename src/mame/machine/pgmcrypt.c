@@ -27,7 +27,7 @@ void pgm_kov_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main")+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu")+0x100000);
 
 	int rom_size = 0x400000;
 
@@ -89,7 +89,7 @@ void pgm_kovsh_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main")+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu")+0x100000);
 
 	int rom_size = 0x400000;
 
@@ -130,7 +130,7 @@ void pgm_dw2_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main")+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu")+0x100000);
 
 	int rom_size = 0x80000;
 
@@ -172,7 +172,7 @@ void pgm_djlzz_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main")+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu")+0x100000);
 
 	int rom_size = 0x400000;
 
@@ -232,7 +232,7 @@ void pgm_pstar_decrypt(running_machine *machine)
 {
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main")+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu")+0x100000);
 
 	int rom_size = 0x100000;
 
@@ -272,7 +272,7 @@ void pgm_dw3_decrypt(running_machine *machine)
 //  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main")+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu")+0x100000);
 
 	int rom_size = 0x100000;
 
@@ -304,7 +304,7 @@ void pgm_killbld_decrypt(running_machine *machine)
 //  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
 
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main")+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu")+0x100000);
 
 	int rom_size = 0x200000;
 
@@ -574,7 +574,7 @@ static const UINT8 puzzli2_tab[256] = {
 void pgm_puzzli2_decrypt(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main")+0x100000);
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu")+0x100000);
 
 	int rom_size = 0x100000;
 

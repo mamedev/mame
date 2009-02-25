@@ -316,7 +316,7 @@ INPUT_PORTS_START( tomcat )
 INPUT_PORTS_END
 
 ROM_START( tomcat )
-	ROM_REGION( 0x10000, "main", 0)
+	ROM_REGION( 0x10000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "rom1k.bin", 0x00001, 0x8000, CRC(5535a1ff) SHA1(b9807c749a8e6b5ddec3ff494130abda09f0baab) )
 	ROM_LOAD16_BYTE( "rom2k.bin", 0x00000, 0x8000, CRC(021a01d2) SHA1(01d99aab54ad57a664e8aaa91296bb879fc6e422) )
 
@@ -374,7 +374,7 @@ static const riot6532_interface tomcat_riot6532_intf =
 };
 
 static MACHINE_DRIVER_START(tomcat)
-	MDRV_CPU_ADD("main", M68010, XTAL_12MHz / 2)
+	MDRV_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(tomcat_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq1_line_assert, 5)
 	//MDRV_CPU_PERIODIC_INT(irq1_line_assert, (double)XTAL_12MHz / 16 / 16 / 16 / 12)
@@ -383,7 +383,7 @@ static MACHINE_DRIVER_START(tomcat)
 	MDRV_CPU_PROGRAM_MAP( dsp_map, 0 )
 	MDRV_CPU_IO_MAP( dsp_io_map, 0 )
 
-	MDRV_CPU_ADD("sound", M6502, XTAL_14_31818MHz / 8 )
+	MDRV_CPU_ADD("soundcpu", M6502, XTAL_14_31818MHz / 8 )
 	MDRV_CPU_FLAGS( CPU_DISABLE )
 	MDRV_CPU_PROGRAM_MAP( sound_map, 0 )
 
@@ -397,7 +397,7 @@ static MACHINE_DRIVER_START(tomcat)
 
 	MDRV_M48T02_ADD( "m48t02" )
 
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(40)
 	//MDRV_SCREEN_REFRESH_RATE((double)XTAL_12MHz / 16 / 16 / 16 / 12  / 5 )
 	MDRV_SCREEN_SIZE(400, 300)

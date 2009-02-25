@@ -445,7 +445,7 @@ static READ8_HANDLER( sfbonus_unk_r )
 
 static WRITE8_HANDLER( sfbonus_bank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	UINT8 bank;
 
 	bank = data & 7;
@@ -728,7 +728,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( sfbonus )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_set_bankptr(machine, 1, &ROM[0]);
 }
@@ -748,10 +748,10 @@ static NVRAM_HANDLER( sfbonus )
 
 
 static MACHINE_DRIVER_START( sfbonus )
-	MDRV_CPU_ADD("main", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
+	MDRV_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
 	MDRV_CPU_PROGRAM_MAP(0,sfbonus_map)
 	MDRV_CPU_IO_MAP(0,sfbonus_io)
-	MDRV_CPU_VBLANK_INT("main",irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
 //  MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
 
 	MDRV_MACHINE_RESET( sfbonus )
@@ -761,7 +761,7 @@ static MACHINE_DRIVER_START( sfbonus )
 
 	MDRV_GFXDECODE(sfbonus)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -782,7 +782,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( sfbonus )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfb16.bin", 0x00000, 0x40000, CRC(bfd53646) SHA1(bd58f8c6d5386649a6fc0f4bac46d1b6cd6248b1) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -798,7 +798,7 @@ ROM_START( sfbonus )
 ROM_END
 
 ROM_START( sfbonusa )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfb17.bin", 0x00000, 0x40000, CRC(e28ede82) SHA1(f320c4c9c30ec280ee2437d1ad4d2b6270580916) )
 
 	ROM_REGION( 0x010000, "debugram", ROMREGION_ERASE00 ) /* DEBUG */
@@ -817,7 +817,7 @@ ROM_START( sfbonusa )
 ROM_END
 
 ROM_START( sfbonusb )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfbb19r.bin", 0x00000, 0x40000, CRC(e185c0b7) SHA1(241aa3dc65f4399c465e43c5f7079f66f9998f01) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -833,7 +833,7 @@ ROM_START( sfbonusb )
 ROM_END
 
 ROM_START( sfbonusd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfbd19r.bin", 0x00000, 0x40000, CRC(9e189177) SHA1(bb48053c516d036a1d18713d45a186a994a4c685) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -849,7 +849,7 @@ ROM_START( sfbonusd )
 ROM_END
 
 ROM_START( sfbonusv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80  Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80  Code */
 	ROM_LOAD( "skfbv19r.bin", 0x00000, 0x40000, CRC(f032be45) SHA1(63007ee7de6203ed7bda34e127328d085df20369) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -866,7 +866,7 @@ ROM_END
 
 
 ROM_START( parrot3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p4p24.bin", 0x00000, 0x40000, CRC(356a49c8) SHA1(7e0ed7d1063675b66bfe28c427712249654be6ab) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -882,7 +882,7 @@ ROM_START( parrot3 )
 ROM_END
 
 ROM_START( parrot3b )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p4pb26r.bin", 0x00000, 0x40000, CRC(c23202ec) SHA1(49d6f996cb32a2d16f6475bd55a755e3f9ed0fe7) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -898,7 +898,7 @@ ROM_START( parrot3b )
 ROM_END
 
 ROM_START( parrot3d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p4pd26r.bin", 0x00000, 0x40000, CRC(f68a623c) SHA1(d2166364d4ade9c3cc5c4dfd0331b69de35ec011) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -914,7 +914,7 @@ ROM_START( parrot3d )
 ROM_END
 
 ROM_START( parrot3v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p4pv26e.bin", 0x00000, 0x40000, CRC(d9a7be80) SHA1(71dfc333ed9e0e89439cf0970cec66a5a30da1cd) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -930,7 +930,7 @@ ROM_START( parrot3v )
 ROM_END
 
 ROM_START( parrot3v2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p4pv26r.bin", 0x00000, 0x40000, CRC(f4f43a29) SHA1(b5f1eb40a6ffe1a1cc7df2f583b6fc0cfef2e703) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -946,7 +946,7 @@ ROM_START( parrot3v2 )
 ROM_END
 
 ROM_START( hldspin1 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs1p25t.bin", 0x00000, 0x40000, CRC(0fce5691) SHA1(4920ee490fdd690987bee92525b48596a051f83d) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -962,7 +962,7 @@ ROM_START( hldspin1 )
 ROM_END
 
 ROM_START( hldspin1b )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs1b27t.bin", 0x00000, 0x40000, CRC(b4928a82) SHA1(c5521eb51887525fd6850ac36d148d3206db5493) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -978,7 +978,7 @@ ROM_START( hldspin1b )
 ROM_END
 
 ROM_START( hldspin1d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs1d27t.bin", 0x00000, 0x40000, CRC(c3fc35a3) SHA1(59a02815e004738f5eee43dffbeaca34412da308) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -994,7 +994,7 @@ ROM_START( hldspin1d )
 ROM_END
 
 ROM_START( hldspin1v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs1v27t.bin", 0x00000, 0x40000, CRC(99347659) SHA1(f8af779046e93a2514dc59b11bb8d7a11487b08e) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1010,7 +1010,7 @@ ROM_START( hldspin1v )
 ROM_END
 
 ROM_START( hldspin2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs2p26.bin", 0x00000, 0x40000, CRC(35844d85) SHA1(cd9bd3a95d1aaf4171bc9c57dec45b59fcc11902) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1026,7 +1026,7 @@ ROM_START( hldspin2 )
 ROM_END
 
 ROM_START( hldspin2b )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs2b28r.bin", 0x00000, 0x40000, CRC(43c2a1b1) SHA1(da1e6d72e03297b014cb947e5c28769ad8457dec) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1042,7 +1042,7 @@ ROM_START( hldspin2b )
 ROM_END
 
 ROM_START( hldspin2d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs2d28r.bin", 0x00000, 0x40000, CRC(6e38ca1a) SHA1(9ef5522dfec75fa9b3809524f033e24817e325e3) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1058,7 +1058,7 @@ ROM_START( hldspin2d )
 ROM_END
 
 ROM_START( hldspin2v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hs2v28r.bin", 0x00000, 0x40000, CRC(6f2fd1b3) SHA1(fe45508d95f61415dc1961a20ebb99f24b773c7d) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1074,7 +1074,7 @@ ROM_START( hldspin2v )
 ROM_END
 
 ROM_START( pickwin )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pw25t.bin", 0x00000, 0x40000, CRC(9b6bd032) SHA1(241c772d191841c72e973d5dc494be445d6fd668) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1090,7 +1090,7 @@ ROM_START( pickwin )
 ROM_END
 
 ROM_START( pickwina )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pw26.bin", 0x00000, 0x40000, CRC(9bedbe5a) SHA1(fb9ee63932b5f86fe42f84a5e1b8a3c29194761b) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1106,7 +1106,7 @@ ROM_START( pickwina )
 ROM_END
 
 ROM_START( pickwinb )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pwb28t.bin", 0x00000, 0x40000, CRC(884ba143) SHA1(1210a9ee04468ef33902a358f4c1966f3a9169c9) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1122,7 +1122,7 @@ ROM_START( pickwinb )
 ROM_END
 
 ROM_START( pickwinb2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pwb29r.bin", 0x00000, 0x40000, CRC(cd28d461) SHA1(09c5994e3cd63995047c75339a4d93eb40043e97))
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1138,7 +1138,7 @@ ROM_START( pickwinb2 )
 ROM_END
 
 ROM_START( pickwind )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pwd28t.bin", 0x00000, 0x40000, CRC(8e3c50ee) SHA1(d673f89eb5755a0601c373874eb1789f9afd4ba3) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1156,7 +1156,7 @@ ROM_START( pickwind )
 ROM_END
 
 ROM_START( pickwind2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pwd29r.bin", 0x00000, 0x40000, CRC(cb9f77e1) SHA1(5c851e70537ad4e418c3b6aca394bd2ecc4b4c08) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1172,7 +1172,7 @@ ROM_START( pickwind2 )
 ROM_END
 
 ROM_START( pickwinv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pwv28t.bin", 0x00000, 0x40000, CRC(2a523363) SHA1(cb6f0e4b3126ee6952c2eb5c789f8c1e368d12ee) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1188,7 +1188,7 @@ ROM_START( pickwinv )
 ROM_END
 
 ROM_START( pickwinv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pwv29e.bin", 0x00000, 0x40000, CRC(9bd66421) SHA1(0bcaf151aecf31760e93199cf669a8b45293e98c))
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1205,7 +1205,7 @@ ROM_START( pickwinv2 )
 ROM_END
 
 ROM_START( pickwinv3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pwv29r.bin", 0x00000, 0x40000, CRC(a08dcc45) SHA1(441256e9dd9fdc551a6e1c4e20b03a7a559d2a6c))
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1221,7 +1221,7 @@ ROM_START( pickwinv3 )
 ROM_END
 
 ROM_START( tighook )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "thk17xt.bin", 0x00000, 0x40000, CRC(02ca5fe2) SHA1(daa66d5ef7336e311cc8bb78ec6625620b9b2800) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1237,7 +1237,7 @@ ROM_START( tighook )
 ROM_END
 
 ROM_START( tighooka )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "thk17.bin", 0x00000, 0x40000, CRC(0e27d3dd) SHA1(c85e2e03c36e0f6ec95e15597a6bd58e8eeb6353) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1255,7 +1255,7 @@ ROM_END
 
 
 ROM_START( tighookc )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkc21r.bin", 0x00000, 0x40000, CRC(04bf78b1) SHA1(75408eb3fe67177ac5364cf72579ba09cf16b2fd) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1271,7 +1271,7 @@ ROM_START( tighookc )
 ROM_END
 
 ROM_START( tighookc2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkc20lt.bin", 0x00000, 0x40000, CRC(dc683f21) SHA1(f0e570b9570969dcff0c5349c5de9712c2abc754) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1287,7 +1287,7 @@ ROM_START( tighookc2 )
 ROM_END
 
 ROM_START( tighookv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkv21r.bin", 0x00000, 0x40000, CRC(30ade52d) SHA1(ae59b7fd79581b3fa0b764648ccf34dc0fcc886e) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1303,7 +1303,7 @@ ROM_START( tighookv )
 ROM_END
 
 ROM_START( tighookv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkv21e.bin", 0x00000, 0x40000, CRC(df0df2fa) SHA1(244086e9233f36531c005f6f9a09128738771753) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1319,7 +1319,7 @@ ROM_START( tighookv2 )
 ROM_END
 
 ROM_START( tighookv3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkv20lt.bin", 0x00000, 0x40000, CRC(07a8e921) SHA1(2c92ec7187d441d1b205eea626d32a6a41a53918) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1335,7 +1335,7 @@ ROM_START( tighookv3 )
 ROM_END
 
 ROM_START( tighookd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkd21r.bin", 0x00000, 0x40000,  CRC(407a2a93) SHA1(c729e5fc4b08ea0e0fcc2e6b4fd742b1dc461a0e) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1351,7 +1351,7 @@ ROM_START( tighookd )
 ROM_END
 
 ROM_START( tighookd2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "thkd20lt.bin", 0x00000, 0x40000, CRC(2be25e14) SHA1(2d906ce8d505bc2620ed218fdb401c0faf426eda) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1367,7 +1367,7 @@ ROM_START( tighookd2 )
 ROM_END
 
 ROM_START( robadv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ra15.bin", 0x00000, 0x40000, CRC(dd7e4ec9) SHA1(038b03855eaa8be1a97e34534822465a10886e10) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1383,7 +1383,7 @@ ROM_START( robadv )
 ROM_END
 
 ROM_START( robadvc )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r1ac17r.bin", 0x00000, 0x40000, CRC(2e086ad9) SHA1(4cf96cf702fe38895d3ba3582cb7d74d79bc2208) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1399,7 +1399,7 @@ ROM_START( robadvc )
 ROM_END
 
 ROM_START( robadvd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r1ad17r.bin", 0x00000, 0x40000, CRC(a00411d0) SHA1(007a3cf7bdd99a0200a2e34b89487f74a60c5561) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1415,7 +1415,7 @@ ROM_START( robadvd )
 ROM_END
 
 ROM_START( robadvv1 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r1av17e.bin", 0x00000, 0x40000, CRC(75c6960a) SHA1(9ca85f04bf5549027dd89f47ddb78f2618d4620c) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1431,7 +1431,7 @@ ROM_START( robadvv1 )
 ROM_END
 
 ROM_START( robadvv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r1av17r.bin", 0x00000, 0x40000, CRC(1f97fa41) SHA1(b148bac2d96549a15135fe2a8a72913b880aa6c2) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1450,7 +1450,7 @@ ROM_END
 
 
 ROM_START( anibonus )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab15xt.bin", 0x00000, 0x40000,  CRC(3aed6e7f) SHA1(51f9af92286e8b2fcfeae30913fbab4626decb99) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1467,7 +1467,7 @@ ROM_START( anibonus )
 ROM_END
 
 ROM_START( anibonus2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab15.bin", 0x00000, 0x40000, CRC(4640a2e7) SHA1(2659c037e88f43f89a5d8cd563eec5e4eb2025b9) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1484,7 +1484,7 @@ ROM_START( anibonus2 )
 ROM_END
 
 ROM_START( anibonus3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab14xta.bin", 0x00000, 0x40000,  CRC(eddf38af) SHA1(56a920ba1af213719210d25e6d8b5c7a0d513119) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1509,7 +1509,7 @@ ROM_END
 
 
 ROM_START( anibonus4 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab14xt.bin", 0x00000, 0x40000,  CRC(c6107445) SHA1(22fd3a7987219a940b965c953494939e0892661e) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1532,7 +1532,7 @@ ROM_START( anibonus4 )
 ROM_END
 
 ROM_START( anibonus5 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab14a.bin", 0x00000, 0x40000, CRC(a8a0eea5) SHA1(c37a470b997ee5dbc976858c024bd67ed88061ce) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1555,7 +1555,7 @@ ROM_START( anibonus5 )
 ROM_END
 
 ROM_START( anibonus6 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab14.bin", 0x00000, 0x40000, CRC(d1dcb6e6) SHA1(4a95184e5d4f2e0527fdc8f29e56572cf3ba9987) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1581,7 +1581,7 @@ ROM_END
 
 
 ROM_START( anibonusb )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abb17r.bin", 0x00000, 0x40000, CRC(e49e6dfc) SHA1(358448f7f68ba53e8c9c04a8a0e54f1ba292705f) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1597,7 +1597,7 @@ ROM_START( anibonusb )
 ROM_END
 
 ROM_START( anibonusb2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abb17lt.bin", 0x00000, 0x40000, CRC(fd600bf2) SHA1(13b3685e1cced585af08d711f24688a9f4e1ff8c) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1613,7 +1613,7 @@ ROM_START( anibonusb2 )
 ROM_END
 
 ROM_START( anibonusd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abd17r.bin", 0x00000, 0x40000, CRC(32707445) SHA1(12005139862b209e0f187e27f61f779de81066a1) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1629,7 +1629,7 @@ ROM_START( anibonusd )
 ROM_END
 
 ROM_START( anibonusd2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abd17lt.bin", 0x00000, 0x40000, CRC(c718f9ab) SHA1(fdd9de6bd0a8e477412d8a9f1a442fec3361a067) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1645,7 +1645,7 @@ ROM_START( anibonusd2 )
 ROM_END
 
 ROM_START( anibonusv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abv18r.bin", 0x00000, 0x40000, CRC(56672865) SHA1(44d141b307a2cb0cb4731ad6db8235941f80ae23) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1661,7 +1661,7 @@ ROM_START( anibonusv )
 ROM_END
 
 ROM_START( anibonusv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abv18lt.bin", 0x00000, 0x40000, CRC(26bc1901) SHA1(c17f6bf5380c3c141cc79f4fb2e01bb8299e93b0) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1677,7 +1677,7 @@ ROM_START( anibonusv2 )
 ROM_END
 
 ROM_START( anibonusv3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abv18e.bin", 0x00000, 0x40000, CRC(c05b8fb5) SHA1(8ae4e00a66d2825ceea072c58750915618477304) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1693,7 +1693,7 @@ ROM_START( anibonusv3 )
 ROM_END
 
 ROM_START( abnudge )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ab17n.bin", 0x00000, 0x40000, CRC(aca7c2af) SHA1(8f23b4aff006fcd983769f833c2fabdbb087d36b) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1709,7 +1709,7 @@ ROM_START( abnudge )
 ROM_END
 
 ROM_START( abnudgeb )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abb20n.bin", 0x00000, 0x40000,  CRC(b202b40f) SHA1(fff2662b8c98aa1496b87df65177996b15b5befe) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1725,7 +1725,7 @@ ROM_START( abnudgeb )
 ROM_END
 
 ROM_START( abnudged )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abd20n.bin", 0x00000, 0x40000, CRC(e189ca0b) SHA1(ba3a3f84b302b737043ac56b0872d65c4ea77903) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1741,7 +1741,7 @@ ROM_START( abnudged )
 ROM_END
 
 ROM_START( abnudgev )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "abv21n.bin", 0x00000, 0x40000, CRC(48d8f3a6) SHA1(5ccde4bf574ba779dc43769fda62aa6d9b284a8e) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1757,7 +1757,7 @@ ROM_START( abnudgev )
 ROM_END
 
 ROM_START( anithunt )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ath17.bin", 0x00000, 0x40000, CRC(07facf55) SHA1(2de5ca12e06a6896099672ec7383e6324d23fa12) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1773,7 +1773,7 @@ ROM_START( anithunt )
 ROM_END
 
 ROM_START( anithunt2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ath15.bin", 0x00000, 0x40000, CRC(917ae674) SHA1(67808a9d3bd48a8f7f839eb85356269a357581ad) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1789,7 +1789,7 @@ ROM_START( anithunt2 )
 ROM_END
 
 ROM_START( anithuntb )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "athb19r.bin", 0x00000, 0x40000, CRC(71d0604f) SHA1(c2f40c58dce2f6b69dc0234c0fb7a656ea04168b) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1805,7 +1805,7 @@ ROM_START( anithuntb )
 ROM_END
 
 ROM_START( anithuntd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "athd19r.bin", 0x00000, 0x40000, CRC(807585d4) SHA1(643ceb51e81797b330310ddbe9e0d8b21ba215e5) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1821,7 +1821,7 @@ ROM_START( anithuntd )
 ROM_END
 
 ROM_START( anithuntv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "athv19r.bin", 0x00000, 0x40000, CRC(74c2cf89) SHA1(f3efad66f668a0a6dbf35a0c6518ece842d069e6) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -1838,7 +1838,7 @@ ROM_END
 
 
 ROM_START( dblchal )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "dc11.bin", 0x00000, 0x40000, CRC(05a27f07) SHA1(02b7b2731f8821bd7e0e3be005bd3024db0a7e42) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1854,7 +1854,7 @@ ROM_START( dblchal )
 ROM_END
 
 ROM_START( dblchalb )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "dcb15r.bin", 0x00000, 0x40000, CRC(d89a9756) SHA1(7a4cb88da9d02351a996202fb5b4545db042867b) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1870,7 +1870,7 @@ ROM_START( dblchalb )
 ROM_END
 
 ROM_START( dblchalc )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "dcc15r.bin", 0x00000, 0x40000, CRC(ac0ed555) SHA1(5ac93132a94fec8811b4b5525dd2d31eb6749d6e) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1886,7 +1886,7 @@ ROM_START( dblchalc )
 ROM_END
 
 ROM_START( dblchald )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "dcd15r.bin", 0x00000, 0x40000, CRC(2b72350d) SHA1(439765028417af6ceeb2724c7b7e737a209bf844) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1902,7 +1902,7 @@ ROM_START( dblchald )
 ROM_END
 
 ROM_START( dblchalv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "dcv15r.bin", 0x00000, 0x40000, CRC(1e5fc8fd) SHA1(9b688966bd52828fde31003510ee6a2a3444525d) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1919,7 +1919,7 @@ ROM_END
 
 
 ROM_START( robadv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2a15sh.bin", 0x00000, 0x40000, CRC(c53af9be) SHA1(86cb2dae1315227f01f430d23fb4e09d015f1206) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1935,7 +1935,7 @@ ROM_START( robadv2 )
 ROM_END
 
 ROM_START( robadv2a )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2a15.bin", 0x00000, 0x40000, CRC(e1932e13) SHA1(918d51e64aefaa308f92748bb5bfa92b88e00feb) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1951,7 +1951,7 @@ ROM_START( robadv2a )
 ROM_END
 
 ROM_START( robadv2c )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2ac17lt.bin", 0x00000, 0x40000, CRC(47ce9172) SHA1(e05be868c48e53f131936070abd350914f9befcf) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1967,7 +1967,7 @@ ROM_START( robadv2c )
 ROM_END
 
 ROM_START( robadv2v1 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2av17sh.bin", 0x00000, 0x40000, CRC(fe4a3199) SHA1(d8c8f3d4e399e757b551748435ede1cb6a04ee3b) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1983,7 +1983,7 @@ ROM_START( robadv2v1 )
 ROM_END
 
 ROM_START( robadv2v2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2av17r.bin", 0x00000, 0x40000, CRC(17350817) SHA1(5e1c978cd4cf0f319f49c366c3b7634500c873dd) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -1999,7 +1999,7 @@ ROM_START( robadv2v2 )
 ROM_END
 
 ROM_START( robadv2v3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2av17lt.bin", 0x00000, 0x40000, CRC(0ebc91fe) SHA1(d64a29e05ce62d662eccb025ea905275eb8806f9) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2015,7 +2015,7 @@ ROM_START( robadv2v3 )
 ROM_END
 
 ROM_START( robadv2v4 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2av17e.bin", 0x00000, 0x40000, CRC(81166cbd) SHA1(a2751752a95cac5181311af867457cac48854283) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2031,7 +2031,7 @@ ROM_START( robadv2v4 )
 ROM_END
 
 ROM_START( robadv2d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2ad17lt.bin", 0x00000, 0x40000, CRC(e0ea8ce9) SHA1(cf6a58d1cc654c41ae245f26fff6b26483bc01ce) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2047,7 +2047,7 @@ ROM_START( robadv2d )
 ROM_END
 
 ROM_START( robadv2d2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2ad17r.bin", 0x00000, 0x40000, CRC(2454cd69) SHA1(51be4a4522176e23f1cd172d4fca5bcaf8802d1c) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2063,7 +2063,7 @@ ROM_START( robadv2d2 )
 ROM_END
 
 ROM_START( robadv2d3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2ad17sh.bin", 0x00000, 0x40000, CRC(d65ac29a) SHA1(74ae9ae2d3d2e6fb460bddf6adb676b778e42920) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2079,7 +2079,7 @@ ROM_START( robadv2d3 )
 ROM_END
 
 ROM_START( robadv2c2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2ac17r.bin", 0x00000, 0x40000, CRC(92ad7e01) SHA1(47f41ed02b488e439f81936393618bde058ad661) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2095,7 +2095,7 @@ ROM_START( robadv2c2 )
 ROM_END
 
 ROM_START( robadv2c3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "r2ac17sh.bin", 0x00000, 0x40000, CRC(721fc8aa) SHA1(6985530f4dfb270f73f5c377b5831d5c2e087d05) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2112,7 +2112,7 @@ ROM_END
 
 
 ROM_START( pirpok2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3p20.bin", 0x00000, 0x40000, CRC(0e477094) SHA1(cd35c9ac1ed4b843886b1fc554e749f38573ca21) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2128,7 +2128,7 @@ ROM_START( pirpok2 )
 ROM_END
 
 ROM_START( pirpok2b )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3pb22r.bin", 0x00000, 0x40000, CRC(39303a7a) SHA1(ef4f1a01812818fe0f9fa5a23396094144c3ce83) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2144,7 +2144,7 @@ ROM_START( pirpok2b )
 ROM_END
 
 ROM_START( pirpok2d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3pd22r.bin", 0x00000, 0x40000, CRC(10262317) SHA1(561088d1ace055cd568d667f690e95fc9ee3fed3) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2160,7 +2160,7 @@ ROM_START( pirpok2d )
 ROM_END
 
 ROM_START( pirpok2v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3pv22r.bin", 0x00000, 0x40000, CRC(6e2aab96) SHA1(0e01c9cadcf947d68fab8626454ac06e2073b0e6) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2176,7 +2176,7 @@ ROM_START( pirpok2v )
 ROM_END
 
 ROM_START( pirpok2v2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p3pv24e.bin", 0x00000, 0x40000, CRC(0e77fb66) SHA1(732f9c160682dcfb6839c0ad28dfe7e4899e693c) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2194,7 +2194,7 @@ ROM_END
 
 
 ROM_START( fcnudge )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc17n.bin", 0x00000, 0x40000, CRC(b9193d4f) SHA1(5ed77802e5a8f246eb1a559c13ad544adae35201) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2210,7 +2210,7 @@ ROM_START( fcnudge )
 ROM_END
 
 ROM_START( fruitcar )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcv21n.bin", 0x00000, 0x40000, CRC(c1f839bd) SHA1(12da36b864adcabe0386dc2e17dd9550fb23b641) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2226,7 +2226,7 @@ ROM_START( fruitcar )
 ROM_END
 
 ROM_START( fruitcar2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcb20n.bin", 0x00000, 0x40000, CRC(f8de6fe2) SHA1(ff47b3f467e701897471b6aa912c086019d9ee6a) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2242,7 +2242,7 @@ ROM_START( fruitcar2 )
 ROM_END
 
 ROM_START( fruitcar3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcd20n.bin", 0x00000, 0x40000, CRC(64c6a5cc) SHA1(dadc22ef7c2415c269619f63bca7761775eacf74) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2258,7 +2258,7 @@ ROM_START( fruitcar3 )
 ROM_END
 
 ROM_START( sfruitb )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfb20b.bin", 0x00000, 0x40000, CRC(6fe1b8ba) SHA1(46fe3940d80578f3818702fd449fc4119ea5fc30) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2274,7 +2274,7 @@ ROM_START( sfruitb )
 ROM_END
 
 ROM_START( sfruitb2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfb20.bin", 0x00000, 0x40000, CRC(73a2be7f) SHA1(95b51a63ede10247fde944d980d85781947a8435) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2290,7 +2290,7 @@ ROM_START( sfruitb2 )
 ROM_END
 
 ROM_START( sfruitb3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfb18xt.bin", 0x00000, 0x40000, CRC(15a7fc47) SHA1(4f1af0bab7807a69f8c67c8e83b35c8c5c2a13f1) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2306,7 +2306,7 @@ ROM_START( sfruitb3 )
 ROM_END
 
 ROM_START( sfruitbb )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbb20lt.bin", 0x00000, 0x40000, CRC(418fbd9e) SHA1(b78e788b7bad85ce8f8709f20dcded25be9dac01) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2322,7 +2322,7 @@ ROM_START( sfruitbb )
 ROM_END
 
 ROM_START( sfruitbb2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbb22b.bin", 0x00000, 0x40000,  CRC(16abe969) SHA1(97ca2f223fb16c1003544c7454e470a31f54b3b3) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2338,7 +2338,7 @@ ROM_START( sfruitbb2 )
 ROM_END
 
 ROM_START( sfruitbb3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbb25r.bin", 0x00000, 0x40000, CRC(bcb51221) SHA1(6df07a52557d8305fec45c8a030141cb15204548) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2354,7 +2354,7 @@ ROM_START( sfruitbb3 )
 ROM_END
 
 ROM_START( sfruitbd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbd20lt.bin", 0x00000, 0x40000, CRC(9d0ebc24) SHA1(790050a35f91e683a5e2c2231c6b861a05eba04a) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2370,7 +2370,7 @@ ROM_START( sfruitbd )
 ROM_END
 
 ROM_START( sfruitbd2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbd22b.bin", 0x00000, 0x40000,  CRC(065bb398) SHA1(dd3092729bca420cdd338749d9bd779970dcd1c7) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2386,7 +2386,7 @@ ROM_START( sfruitbd2 )
 ROM_END
 
 ROM_START( sfruitbd3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbd25r.bin", 0x00000, 0x40000, CRC(bb7bee79) SHA1(c66e62df0996486bead90331b714e9aa62bd585f) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2403,7 +2403,7 @@ ROM_END
 
 
 ROM_START( sfruitbv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv25r.bin", 0x00000, 0x40000, CRC(beb1ee59) SHA1(d6f72d66085309f33965640b25c788657eee01e1) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2419,7 +2419,7 @@ ROM_START( sfruitbv )
 ROM_END
 
 ROM_START( sfruitbv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv25e.bin", 0x00000, 0x40000, CRC(a9c7edba) SHA1(f860b1077a9a12ff49e2dea0aac888e210787327) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2435,7 +2435,7 @@ ROM_START( sfruitbv2 )
 ROM_END
 
 ROM_START( sfruitbv3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv22eb.bin", 0x00000, 0x40000,  CRC(64d31a39) SHA1(cd2fc75b8d16e444796c52255de298b3b52e40e6) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2451,7 +2451,7 @@ ROM_START( sfruitbv3 )
 ROM_END
 
 ROM_START( sfruitbv4 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv22b.bin", 0x00000, 0x40000,  CRC(ec0e8486) SHA1(249b8ecada6b7c0b3e16baa614620af80d7d8c6e) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2467,7 +2467,7 @@ ROM_START( sfruitbv4 )
 ROM_END
 
 ROM_START( sfruitbv5 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "sfbv20lt.bin", 0x00000, 0x40000, CRC(63560472) SHA1(14446f2d8fd0314ca00478159cbb0507ac096e34) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2484,7 +2484,7 @@ ROM_END
 
 
 ROM_START( fb2gen )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb2g16xt.bin", 0x00000, 0x40000, CRC(ea525ebb) SHA1(965bba045ba69ac4316b27d0d69b130119f9ce04) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2500,7 +2500,7 @@ ROM_START( fb2gen )
 ROM_END
 
 ROM_START( fb2gena )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb2g15r.bin", 0x00000, 0x40000, CRC(a8daf67d) SHA1(6e980748ec77c4842676f14ffffe3f630879e9d9) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2517,7 +2517,7 @@ ROM_END
 
 
 ROM_START( fb2genc )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2gc18r.bin", 0x00000, 0x40000, CRC(f0adc7a4) SHA1(109490212d8c0bd25d6beb271939a83c06e468c6) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2533,7 +2533,7 @@ ROM_START( fb2genc )
 ROM_END
 
 ROM_START( fb2genc2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2gc18lt.bin", 0x00000, 0x40000, CRC(d22f7e92) SHA1(8e2a8554bcb2e8f86d6d43672e7e4535ee4f89cf) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2549,7 +2549,7 @@ ROM_START( fb2genc2 )
 ROM_END
 
 ROM_START( fb2genv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2gv18r.bin", 0x00000, 0x40000, CRC(c827362b) SHA1(3a407d8f009666cc80d1588d034ed135e18ec34b) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2565,7 +2565,7 @@ ROM_START( fb2genv )
 ROM_END
 
 ROM_START( fb2genv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2gv18lt.bin", 0x00000, 0x40000, CRC(d2b45ef3) SHA1(e058004d042aac6dde67f0e7f924d204965b3b72) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2581,7 +2581,7 @@ ROM_START( fb2genv2 )
 ROM_END
 
 ROM_START( fb2genv3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2gv18e.bin", 0x00000, 0x40000, CRC(a24059c0) SHA1(e9bcf506a82e35a8c69f20fa700dd5e7025d56c2) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2597,7 +2597,7 @@ ROM_START( fb2genv3 )
 ROM_END
 
 ROM_START( fb2gend )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2gd18r.bin", 0x00000, 0x40000, CRC(6a97bc44) SHA1(ef1d611c009cb1f5ff674fa30413607e3fbcbc45) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2613,7 +2613,7 @@ ROM_START( fb2gend )
 ROM_END
 
 ROM_START( fb2gend2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2gd18lt.bin", 0x00000, 0x40000, CRC(b9f7978b) SHA1(739f8000e589ecad50be072c5e90727e96b00765) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2629,7 +2629,7 @@ ROM_START( fb2gend2 )
 ROM_END
 
 ROM_START( fb2nd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb2e15.bin", 0x00000, 0x40000, CRC(40a4bc95) SHA1(f84d8615e5a247a6db7792e54d236fbd5008d794) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2646,7 +2646,7 @@ ROM_END
 
 
 ROM_START( fb2ndc )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2ec18r.bin", 0x00000, 0x40000, CRC(d993916c) SHA1(3ca93c42a6e6f7cfbd4bfbcd2375f66b66a066ca) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2662,7 +2662,7 @@ ROM_START( fb2ndc )
 ROM_END
 
 ROM_START( fb2ndc2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2ec18lt.bin", 0x00000, 0x40000, CRC(675e413d) SHA1(e15fc96a8be701a01e1154dfea2c7d24c8239215) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2678,7 +2678,7 @@ ROM_START( fb2ndc2 )
 ROM_END
 
 ROM_START( fb2ndv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2ev18r.bin", 0x00000, 0x40000, CRC(22abfee6) SHA1(f5542042aa60238decc0c29553e682971744f535) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2694,7 +2694,7 @@ ROM_START( fb2ndv )
 ROM_END
 
 ROM_START( fb2ndv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2ev18lt.bin", 0x00000, 0x40000, CRC(b59418b9) SHA1(8d45709176db09d052a26d57f41bc18d78632ad0) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2710,7 +2710,7 @@ ROM_START( fb2ndv2 )
 ROM_END
 
 ROM_START( fb2ndd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2ed18r.bin", 0x00000, 0x40000, CRC(48a4dbcd) SHA1(e1a2163be6345983d05b1931b5619678f025d667) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2726,7 +2726,7 @@ ROM_START( fb2ndd )
 ROM_END
 
 ROM_START( fb2ndd2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f2ed18lt.bin", 0x00000, 0x40000, CRC(3c469121) SHA1(0a694ff77dd2f797acf5889a8773bb798f64f11b) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2742,7 +2742,7 @@ ROM_START( fb2ndd2 )
 ROM_END
 
 ROM_START( fb4 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb24k13t.bin", 0x00000, 0x40000, CRC(ef2407cf) SHA1(4bfb8cd738d576e482828529bca3031b55cc165d) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2758,7 +2758,7 @@ ROM_START( fb4 )
 ROM_END
 
 ROM_START( fb4a )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb24k12b.bin", 0x00000, 0x40000, CRC(b238411c) SHA1(947a243141766583ce170e1f92769952281bf386) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2776,7 +2776,7 @@ ROM_START( fb4a )
 ROM_END
 
 ROM_START( fb4b )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4b15lt.bin", 0x00000, 0x40000, CRC(480651c3) SHA1(3ac434070b00c04eda9c78209e1c6e21fd488287) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2793,7 +2793,7 @@ ROM_START( fb4b )
 ROM_END
 
 ROM_START( fb4b2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4b15r.bin", 0x00000, 0x40000, CRC(511a1c54) SHA1(7b554be602e74088ca4ab90a0b10965dc30b18ab) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2811,7 +2811,7 @@ ROM_START( fb4b2 )
 ROM_END
 
 ROM_START( fb4v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4v15r.bin", 0x00000, 0x40000, CRC(891f119f) SHA1(1823826cd958a951a930b9a1a23f7cf092ed6ab2) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2829,7 +2829,7 @@ ROM_START( fb4v )
 ROM_END
 
 ROM_START( fb4v2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4v15lt.bin", 0x00000, 0x40000, CRC(d1cf9bd8) SHA1(59b1507e2d37eef8bea8d07194465506a52e7286))
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2845,7 +2845,7 @@ ROM_START( fb4v2 )
 ROM_END
 
 ROM_START( fb4v3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4v15e.bin", 0x00000, 0x40000, CRC(b28db56e) SHA1(b14c0b62fc1c3195ee3703b5500f5a36a2cde3e2) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2861,7 +2861,7 @@ ROM_START( fb4v3 )
 ROM_END
 
 ROM_START( fb4d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4d15r.bin", 0x00000, 0x40000, CRC(aeed6133) SHA1(8658708fbfd7f662f72a30a3f37baca98e931589) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2878,7 +2878,7 @@ ROM_START( fb4d )
 ROM_END
 
 ROM_START( fb4d2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4d15lt.bin", 0x00000, 0x40000,  CRC(41b0177b) SHA1(9fc74f54a21fb2846e9f818e9b9714643cad0295) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2895,7 +2895,7 @@ ROM_START( fb4d2 )
 ROM_END
 
 ROM_START( fb4c )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4c15r.bin", 0x00000, 0x40000, CRC(f50ce62f) SHA1(7a1c37f42da0506ff3bcebcd587f0105004b47e2) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2912,7 +2912,7 @@ ROM_START( fb4c )
 ROM_END
 
 ROM_START( fb4c2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb4c15lt.bin", 0x00000, 0x40000, CRC(280a0d31) SHA1(dba0dc3f14f08f8045934acd85cb549ca4292808) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2929,7 +2929,7 @@ ROM_START( fb4c2 )
 ROM_END
 
 ROM_START( ch2000 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2k39xt.bin", 0x00000, 0x40000, CRC(fa330fdc) SHA1(8bafb76762ca64d5d4e16e4542585083078ce719) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2945,7 +2945,7 @@ ROM_START( ch2000 )
 ROM_END
 
 ROM_START( ch2000x )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2k39d.bin", 0x00000, 0x40000, CRC(38fa136c) SHA1(cae17a6340829f2d1963ffcd8fde89fdf9425a6b) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2961,7 +2961,7 @@ ROM_START( ch2000x )
 ROM_END
 
 ROM_START( ch2000y )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2k39.bin", 0x00000, 0x40000, CRC(77901459) SHA1(f30c416973550bf2598eb5ec388158d864ace089) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2979,7 +2979,7 @@ ROM_END
 
 /* b type */
 ROM_START( ch2000b )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2b44r.bin", 0x00000, 0x40000, CRC(c9f9b0c7) SHA1(97bc35dcf0608c6211f1dc9678b4b2232c70cdca) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -2995,7 +2995,7 @@ ROM_START( ch2000b )
 ROM_END
 
 ROM_START( ch2000b2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2b41lt.bin", 0x00000, 0x40000, CRC(0c8c40b0) SHA1(091fe168b0915940f7a15e33845dfd62c0a581df))
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3012,7 +3012,7 @@ ROM_END
 
 /* v type */
 ROM_START( ch2000v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2v44r.bin", 0x00000, 0x40000,  CRC(8d375e98) SHA1(29edfcd05e1759be2c7e92c3cb8f9929f8485715) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3028,7 +3028,7 @@ ROM_START( ch2000v )
 ROM_END
 
 ROM_START( ch2000v2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2v44e.bin", 0x00000, 0x40000,  CRC(a9713624) SHA1(09bcecef4dec51ab573903e8652a3a7f6ae52e31) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3044,7 +3044,7 @@ ROM_START( ch2000v2 )
 ROM_END
 
 ROM_START( ch2000v3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2v41lt.bin", 0x00000, 0x40000, CRC(182ed2ff) SHA1(82df7021ec15fa2867f24292060d4a8089d5f49c) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3060,7 +3060,7 @@ ROM_START( ch2000v3 )
 ROM_END
 
 ROM_START( ch2000c )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2c41lt.bin", 0x00000, 0x40000, CRC(bb6ddba8) SHA1(9f95cc35408f61f07ce0306fb41f3c31ec9ebe87) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3076,7 +3076,7 @@ ROM_START( ch2000c )
 ROM_END
 
 ROM_START( ch2000c2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2c44r.bin", 0x00000, 0x40000,  CRC(d898129f) SHA1(1fdc35dd0332ecd705665db3b268e5d05f9d65dd) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3093,7 +3093,7 @@ ROM_END
 
 
 ROM_START( ch2000d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2d41lt.bin", 0x00000, 0x40000, CRC(d49d4303) SHA1(5e75e6d04ff96de212131fecf76c0e300b49b21d) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3109,7 +3109,7 @@ ROM_START( ch2000d )
 ROM_END
 
 ROM_START( ch2000d2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fc2d44r.bin", 0x00000, 0x40000,  CRC(c00fd8c5) SHA1(f7977ec5797f2d20f21b018207808ab9d9d36d71) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3159,7 +3159,7 @@ Dumped by Dang_Spot 08/12/04
 */
 
 ROM_START( act2000 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2k1-1.2.u28", 0x00000, 0x20000, CRC(ef9d7399) SHA1(8b4b7df85c4b0a22cb591be142bf8fea37c4b211) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3175,7 +3175,7 @@ ROM_START( act2000 )
 ROM_END
 
 ROM_START( act2000a )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2k33.bin", 0x00000, 0x20000, CRC(e096da60) SHA1(3e971ae152058c730a7ca35ce1ed3ce3896f34f5) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3191,7 +3191,7 @@ ROM_START( act2000a )
 ROM_END
 
 ROM_START( act2000a2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2k31xt.bin", 0x00000, 0x20000, CRC(46b3b809) SHA1(cbb88dda67fca89801c6db3bf0bf3a368fe26ad1) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3207,7 +3207,7 @@ ROM_START( act2000a2 )
 ROM_END
 
 ROM_START( act2000v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2v35r.bin", 0x00000, 0x40000, CRC(e9651cea) SHA1(5717bf21e8b82f7d3e668235f189af2aaac9c425) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3223,7 +3223,7 @@ ROM_START( act2000v )
 ROM_END
 
 ROM_START( act2000v2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2v35e.bin", 0x00000, 0x40000, CRC(dfe5c8b5) SHA1(09ac6df25395d0a5c632c05ba93bf784b69319a0) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3239,7 +3239,7 @@ ROM_START( act2000v2 )
 ROM_END
 
 ROM_START( act2000v3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2v33xt.bin", 0x00000, 0x40000, CRC(0e4fed4e) SHA1(d10ada62701f0165eac106d8b661d3c6a9597a71) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3255,7 +3255,7 @@ ROM_START( act2000v3 )
 ROM_END
 
 ROM_START( act2000d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2d35r.bin", 0x00000, 0x40000, CRC(6a6af0c9) SHA1(9a644dacb658a226a69dac448c7b53ceccf6005b) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3271,7 +3271,7 @@ ROM_START( act2000d )
 ROM_END
 
 ROM_START( act2000d2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2d33xt.bin", 0x00000, 0x40000, CRC(743ae2b5) SHA1(e1a9ade074159756daacad827791dae971e99d9d) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3287,7 +3287,7 @@ ROM_START( act2000d2 )
 ROM_END
 
 ROM_START( act2000b )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2b35r.bin", 0x00000, 0x40000, CRC(b8a560a5) SHA1(0b819ddcef8f8026664987de85f7b1931f344354))
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3303,7 +3303,7 @@ ROM_START( act2000b )
 ROM_END
 
 ROM_START( act2000b2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "a2b33xt.bin", 0x00000, 0x40000, CRC(5a9375a8) SHA1(cc663d20e98fe143f4bf5f4cd15d35ff181bff5e) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3319,7 +3319,7 @@ ROM_START( act2000b2 )
 ROM_END
 
 ROM_START( pir2001 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pirat23n.bin", 0x00000, 0x40000, CRC(e11722bb) SHA1(cc4b729f4d7d72ffee15e7958335843027378ece) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3335,7 +3335,7 @@ ROM_START( pir2001 )
 ROM_END
 
 ROM_START( pir2001a )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pirat23.bin", 0x00000, 0x40000, CRC(25ac8d18) SHA1(efc77735a418d298b16cba82ce1a0375dca2a7ef) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3351,7 +3351,7 @@ ROM_START( pir2001a )
 ROM_END
 
 ROM_START( pir2001b )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pira22xt.bin", 0x00000, 0x40000, CRC(0412c601) SHA1(979d0bf26f8b2e6204e7d1cfdaeb89dc8e82cfce) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3367,7 +3367,7 @@ ROM_START( pir2001b )
 ROM_END
 
 ROM_START( pir2001b2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1b24xt.bin", 0x00000, 0x40000, CRC(62adfe66) SHA1(e85ea2c0d00f29238f17c87e65a6b749336ffd50) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3383,7 +3383,7 @@ ROM_START( pir2001b2 )
 ROM_END
 
 ROM_START( pir2001b3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1b25r.bin", 0x00000, 0x40000, CRC(6f2624e4) SHA1(e1669d81bf708c65778d81ed4f5c793725edde3f) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3399,7 +3399,7 @@ ROM_START( pir2001b3 )
 ROM_END
 
 ROM_START( pir2001v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1v25r.bin", 0x00000, 0x40000, CRC(666207ea) SHA1(0d1fbd10aa85d4e5b8072266ce52b535b275fc5a) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3415,7 +3415,7 @@ ROM_START( pir2001v )
 ROM_END
 
 ROM_START( pir2001v2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1v25e.bin", 0x00000, 0x40000, CRC(0440d844) SHA1(14f62aee8cb56cdfa399b8052181f60fcbcedbba) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3431,7 +3431,7 @@ ROM_START( pir2001v2 )
 ROM_END
 
 ROM_START( pir2001v3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1v24xt.bin", 0x00000, 0x40000, CRC(bc69b7e2) SHA1(bb4fc3ce17a9e97823bd9801fa549e5ddba6787d) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3447,7 +3447,7 @@ ROM_START( pir2001v3 )
 ROM_END
 
 ROM_START( pir2001d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1d25r.bin", 0x00000, 0x40000, CRC(579a753e) SHA1(82d70362c22d4a4f4836f1e10effdc05041bd425) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3463,7 +3463,7 @@ ROM_START( pir2001d )
 ROM_END
 
 ROM_START( pir2001d2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi1d24xt.bin", 0x00000, 0x40000,CRC(0e3e68ed) SHA1(a0e007a1f905dd6e7ba6a8202c9e21893ff819e3) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3479,7 +3479,7 @@ ROM_START( pir2001d2 )
 ROM_END
 
 ROM_START( pir2002 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi218n.bin", 0x00000, 0x40000,  CRC(bd6a35f5) SHA1(1cf5c7e65f3d99aee3579d890dbac3c818735307) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3495,7 +3495,7 @@ ROM_START( pir2002 )
 ROM_END
 
 ROM_START( pir2002a )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi218.bin", 0x00000, 0x40000, CRC(1480722d) SHA1(bd46fa6011caebc63ebd8cd2765c5b61ce379b85) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3511,7 +3511,7 @@ ROM_START( pir2002a )
 ROM_END
 
 ROM_START( pir2002b )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi217xt.bin", 0x00000, 0x40000, CRC(0cc369cd) SHA1(7255fe1f544df248f41e6586d2632d65de0a5a98) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3528,7 +3528,7 @@ ROM_END
 
 /* these had the pir2001 sound rom in, mistake? */
 ROM_START( pir2002b2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2b19xt.bin", 0x00000, 0x40000, CRC(c9eed644) SHA1(6cd40196bdd8e84738c970198e770f87964aab5d) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3544,7 +3544,7 @@ ROM_START( pir2002b2 )
 ROM_END
 
 ROM_START( pir2002b3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2b20r.bin", 0x00000, 0x40000,  CRC(4b2e45c0) SHA1(b96ba54034a0e61d53e317559bfe83f337e63618) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3560,7 +3560,7 @@ ROM_START( pir2002b3 )
 ROM_END
 
 ROM_START( pir2002v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2v20r.bin", 0x00000, 0x40000,  CRC(e4155252) SHA1(136ac929633bc6ee759285dcdb725aaaf7cdf225) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3578,7 +3578,7 @@ ROM_START( pir2002v )
 ROM_END
 
 ROM_START( pir2002v2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2v20e.bin", 0x00000, 0x40000,  CRC(208fec36) SHA1(779f87cb436e7d59b6c410921b030430020577ec) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3594,7 +3594,7 @@ ROM_START( pir2002v2 )
 ROM_END
 
 ROM_START( pir2002v3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2v19xt.bin", 0x00000, 0x40000, CRC(0ef73818) SHA1(7d1c856c78f4d7b36f318725de3dffb5ad9279fe) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3610,7 +3610,7 @@ ROM_START( pir2002v3 )
 ROM_END
 
 ROM_START( pir2002d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2d20r.bin", 0x00000, 0x40000,  CRC(83a264c4) SHA1(7de1902f5b63d6c44df5726c450ff21b5d911ec4) )
 
 
@@ -3627,7 +3627,7 @@ ROM_START( pir2002d )
 ROM_END
 
 ROM_START( pir2002d2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2d19xt.bin", 0x00000, 0x40000, CRC(1c045c9a) SHA1(dd3c6d2c1f084b4af262e52339d0c25c7e733b70) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3643,7 +3643,7 @@ ROM_START( pir2002d2 )
 ROM_END
 
 ROM_START( classice )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcs16lt.bin", 0x00000, 0x40000, CRC(e4b3437a) SHA1(2ecbaead72bb20af58c7f470097901ac1c58f296) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3659,7 +3659,7 @@ ROM_START( classice )
 ROM_END
 
 ROM_START( classicea )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcs16r.bin", 0x00000, 0x40000, CRC(0813e904) SHA1(87b6bb3c1ac17eb663673c948e6c33d1058c22e2) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3675,7 +3675,7 @@ ROM_START( classicea )
 ROM_END
 
 ROM_START( classiced )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcsd16r.bin", 0x00000, 0x40000, CRC(097dd178) SHA1(b5e251ce8fb323d20ff3722d048d98c4fab0f4a4) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3691,7 +3691,7 @@ ROM_START( classiced )
 ROM_END
 
 ROM_START( classiced2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcsd16lt.bin", 0x00000, 0x40000, CRC(623c5e2e) SHA1(63bbb7b1f8668828c5c8da8ae025077eca0b5d53) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3707,7 +3707,7 @@ ROM_START( classiced2 )
 ROM_END
 
 ROM_START( classiced3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcsd16e.bin", 0x00000, 0x40000, CRC(74134183) SHA1(b59727dc0fae022e97bb60c444a3a78d811aa1ad) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3723,7 +3723,7 @@ ROM_START( classiced3 )
 ROM_END
 
 ROM_START( classicev )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcsv16r.bin", 0x00000, 0x40000, CRC(e0744057) SHA1(bb389cce5d77eed6f74eb46afa90712f803f357b) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3739,7 +3739,7 @@ ROM_START( classicev )
 ROM_END
 
 ROM_START( classicev2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcsv16lt.bin", 0x00000, 0x40000, CRC(33393a1f) SHA1(03da07380129f07e5126b5faa37157b97f2c902e) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3755,7 +3755,7 @@ ROM_START( classicev2 )
 ROM_END
 
 ROM_START( classicev3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fcsv16e.bin", 0x00000, 0x40000, CRC(fe472583) SHA1(dd8642c33456d62b47e272fb63d4bf88e11d4c70) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3771,7 +3771,7 @@ ROM_START( classicev3 )
 ROM_END
 
 ROM_START( seawld )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "swd16r.bin", 0x00000, 0x80000, CRC(081c84c1) SHA1(5f0d40c38ca26d3633cfe4c7ead2773a1dcc177d) )
 
 	ROM_REGION( 0x010000, "debugram", ROMREGION_ERASE00 ) /* DEBUG */
@@ -3790,7 +3790,7 @@ ROM_START( seawld )
 ROM_END
 
 ROM_START( seawlda )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "swv16e.bin", 0x00000, 0x80000, CRC(3f53a6b0) SHA1(2d00f3b5c04b47551f23799a3bcba29ab38ff63c) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3807,7 +3807,7 @@ ROM_END
 
 
 ROM_START( moneymac )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "mmv17r.bin", 0x00000, 0x40000, CRC(2c92617c) SHA1(85332981acf1938bb42b6ef432a57331ef3530a1) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3823,7 +3823,7 @@ ROM_START( moneymac )
 ROM_END
 
 ROM_START( moneymacv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "mmv17e.bin", 0x00000, 0x40000, CRC(53e43e39) SHA1(f5a02251825716cfa1f30afd6fd3b6c0de7e3146) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3839,7 +3839,7 @@ ROM_START( moneymacv )
 ROM_END
 
 ROM_START( moneymacv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "mmv17lt.bin", 0x00000, 0x40000, CRC(5f695601) SHA1(1fc099bea8d7c6ea76ec933193483fedd993823d) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3855,7 +3855,7 @@ ROM_START( moneymacv2 )
 ROM_END
 
 ROM_START( moneymacd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "mmd17r.bin", 0x00000, 0x40000, CRC(66dbacdd) SHA1(9d0440a3d8c58860cd2e59310677320b6e40c46b) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3871,7 +3871,7 @@ ROM_START( moneymacd )
 ROM_END
 
 ROM_START( moneymacd2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "mmd17lt.bin", 0x00000, 0x40000, CRC(85a72381) SHA1(eaee2504a205b3b8ce7cbe1f69d276ad131b0554) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3888,7 +3888,7 @@ ROM_END
 
 
 ROM_START( atworld )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "awd13r.bin", 0x00000, 0x80000, CRC(786079a8) SHA1(862abc511c5ac0d667c6b9abd914ce6035e9aed9) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3904,7 +3904,7 @@ ROM_START( atworld )
 ROM_END
 
 ROM_START( atworlda )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "awd13e.bin", 0x00000, 0x80000, CRC(ec46b48d) SHA1(bfae55520bb36a6dfb55e12b115e818d9cd060e7) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3921,7 +3921,7 @@ ROM_END
 
 #if 0 // incomplete / mixed sets etc. sort these first before doing anything else with them
 ROM_START( fb5 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb5b15h.bin", 0x00000, 0x40000, CRC(faba08b8) SHA1(4763f691b563ba23cc3edf86c18cdcda8c415003) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3937,7 +3937,7 @@ ROM_START( fb5 )
 ROM_END
 
 ROM_START( fb5c )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb5c15h.bin", 0x00000, 0x40000, CRC(62897a2b) SHA1(7a30c6453b9e04d25686deb97e25b89e49a6305d) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3953,7 +3953,7 @@ ROM_START( fb5c )
 ROM_END
 
 ROM_START( fb5d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb5d15h.bin", 0x00000, 0x40000, CRC(231b4083) SHA1(a009cae4943ba8d6a56eb4d70bc8b50f98b62fde) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3969,7 +3969,7 @@ ROM_START( fb5d )
 ROM_END
 
 ROM_START( fb5v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb5v15h.bin", 0x00000, 0x40000, CRC(c6b117f5) SHA1(186dcfd9fd9b077036af54f8632ba70118f2f510) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -3986,7 +3986,7 @@ ROM_END
 
 
 ROM_START( fb6 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06d17e.bin", 0x00000, 0x40000,  CRC(3c13d847) SHA1(c3ec365a507b960d8e97c19e1334da8fb3c9f4cf) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4002,7 +4002,7 @@ ROM_START( fb6 )
 ROM_END
 
 ROM_START( fb6d )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06d17lt.bin", 0x00000, 0x40000, CRC(e222e19f) SHA1(1cd7bc2b802ece74735ec2a794ab5be041c24189) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4018,7 +4018,7 @@ ROM_START( fb6d )
 ROM_END
 
 ROM_START( fb6d2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06d17r.bin", 0x00000, 0x40000, CRC(b3c1bb6f) SHA1(b8c46066a61ae48eb400014657dd80e7ef6de976) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4035,7 +4035,7 @@ ROM_END
 
 
 ROM_START( fb6v )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06v17r.bin", 0x00000, 0x40000, CRC(f65ef744) SHA1(1a4fb2b5d34b7466f398b115792a6f972c37e11e) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4051,7 +4051,7 @@ ROM_START( fb6v )
 ROM_END
 
 ROM_START( fb6v2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06v17lt.bin", 0x00000, 0x40000, CRC(ac70303d) SHA1(c00a776b10142d478d617890d638f260fdc2c356) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4067,7 +4067,7 @@ ROM_START( fb6v2 )
 ROM_END
 
 ROM_START( fb6v3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06v17e.bin", 0x00000, 0x40000, CRC(fa42f143) SHA1(e410cc7ae1c86b540c5f573974ee68944fc51a3d))
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4083,7 +4083,7 @@ ROM_START( fb6v3 )
 ROM_END
 
 ROM_START( fb6s )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s17r.bin", 0x00000, 0x40000, CRC(679747d1) SHA1(ca702324c436d54f4c23350b1af4f0250915883c) )
 	
 	// this is a 'compact' board,  the standard roms don't seem correct	
@@ -4102,7 +4102,7 @@ ROM_START( fb6s )
 ROM_END
 
 ROM_START( fb6s2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s17lt.bin", 0x00000, 0x40000, CRC(2008a56f) SHA1(1dec4818c49cd63cc29fcb5abdab7a256731ae7b) )
 	
 	// this is a 'compact' board,  the standard roms don't seem correct
@@ -4123,7 +4123,7 @@ ROM_END
 /* Special Edition */
 
 ROM_START( fb6se )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6d14r.bin", 0x00000, 0x40000, CRC(70567bf1) SHA1(2e2bb317d558c4a8a008a695097f474b5e58ccf4) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4139,7 +4139,7 @@ ROM_START( fb6se )
 ROM_END
 
 ROM_START( fb6sed )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6d14lt.bin", 0x00000, 0x40000, CRC(97cf4951) SHA1(a750d61e4a92a79512cfbef138927581a1e5494c) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4155,7 +4155,7 @@ ROM_START( fb6sed )
 ROM_END
 
 ROM_START( fb6sed2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6d14e.bin", 0x00000, 0x40000, CRC(e6e54c02) SHA1(f3c1ceb6ac551d2c9bcd244b57cdf0522768d99e) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4171,7 +4171,7 @@ ROM_START( fb6sed2 )
 ROM_END
 
 ROM_START( fb6sev )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6v14r.bin", 0x00000, 0x40000,  CRC(8c5a93c9) SHA1(d101a05327e957ab83dc8a45aa005126da3a8fc6) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4187,7 +4187,7 @@ ROM_START( fb6sev )
 ROM_END
 
 ROM_START( fb6sev2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6v14lt.bin", 0x00000, 0x40000, CRC(f5be2b37) SHA1(b3ff3ec456cbed064e5d05d58b4ff74d61b288dd) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4203,7 +4203,7 @@ ROM_START( fb6sev2 )
 ROM_END
 
 ROM_START( fb6sev3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6v14e.bin", 0x00000, 0x40000, CRC(00b681ea) SHA1(050bbe532c6869f64af47a9deec4e12652676e1b) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4219,7 +4219,7 @@ ROM_START( fb6sev3 )
 ROM_END
 
 ROM_START( version4 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "96d42r.bin", 0x00000, 0x40000, CRC(dab5706c) SHA1(9fc37b66942a5e7535b4590f132727d793f9d705) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4235,7 +4235,7 @@ ROM_START( version4 )
 ROM_END
 
 ROM_START( bugfever )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bfd17r.bin", 0x00000, 0x80000, CRC(6fc33307) SHA1(fdb10bd3e463cac2f9050d2d37fdfba9ccee91dc) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4251,7 +4251,7 @@ ROM_START( bugfever )
 ROM_END
 
 ROM_START( bugfeverd )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bfd17e.bin", 0x00000, 0x80000, CRC(35324195) SHA1(ad290912556f4ddbc33667b3bce5d05f321870d0) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4267,7 +4267,7 @@ ROM_START( bugfeverd )
 ROM_END
 
 ROM_START( bugfeverv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bfv17r.bin", 0x00000, 0x80000, CRC(8b6ee6f5) SHA1(981d60f04ab44ce8fc63019ac3e5b689aa80baf0) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4283,7 +4283,7 @@ ROM_START( bugfeverv )
 ROM_END
 
 ROM_START( bugfeverv2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bfv17e.bin", 0x00000, 0x80000, CRC(b9afd39a) SHA1(d331551f679b8694bf63812e5e1a54361c87c52a) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4299,7 +4299,7 @@ ROM_START( bugfeverv2 )
 ROM_END
 
 ROM_START( dvisland )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "did14r.bin", 0x00000, 0x80000, CRC(28c3a7eb) SHA1(5389338ef42e05542e3ff052b2bbc918cf619874) )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4315,7 +4315,7 @@ ROM_START( dvisland )
 ROM_END
 
 ROM_START( funriver )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "frd14r.bin", 0x00000, 0x80000, CRC(03ffabcc) SHA1(0e65be88dc4158f77082e5b50836197dd0e397da) )
 	
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4331,7 +4331,7 @@ ROM_START( funriver )
 ROM_END
 
 ROM_START( funriverv )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "frv14r.bin", 0x00000, 0x80000, CRC(5629d38e) SHA1(6404f70d94b1ec39d1df4e00c620eb5498d3ff83) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4348,7 +4348,7 @@ ROM_END
 
 // diagnostics?
 ROM_START( amclink )
-	ROM_REGION( 0x80000, "main", 0 ) /* Z80 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "link22.bin", 0x00000, 0x1ffff, BAD_DUMP CRC(e1acc705) SHA1(eb5684a0924add44f64637c2610f4c9650b8f4d9) )
 		
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
@@ -4387,8 +4387,8 @@ static DRIVER_INIT( sfbonus_common)
 
 	// dummy.rom helper
 	{
-		UINT8 *ROM = memory_region(machine, "main");
-		int length = memory_region_length(machine, "main");
+		UINT8 *ROM = memory_region(machine, "maincpu");
+		int length = memory_region_length(machine, "maincpu");
 		UINT8* ROM2 = memory_region(machine,"user1");
 
 		if (ROM2)
@@ -4433,8 +4433,8 @@ static DRIVER_INIT( sfbonus )
 {
 
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4458,9 +4458,9 @@ static DRIVER_INIT( sfbonus )
 DRIVER_INIT(act2000)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4486,9 +4486,9 @@ DRIVER_INIT(act2000)
 DRIVER_INIT(dblchal)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4516,9 +4516,9 @@ DRIVER_INIT(dblchal)
 static DRIVER_INIT(hldspin1)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4543,9 +4543,9 @@ static DRIVER_INIT(hldspin1)
 static DRIVER_INIT(hldspin2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4570,9 +4570,9 @@ static DRIVER_INIT(hldspin2)
 static DRIVER_INIT(pickwin)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4596,9 +4596,9 @@ static DRIVER_INIT(pickwin)
 static DRIVER_INIT(robadv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4622,9 +4622,9 @@ static DRIVER_INIT(robadv)
 static DRIVER_INIT(anibonus)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4648,9 +4648,9 @@ static DRIVER_INIT(anibonus)
 static DRIVER_INIT(pirpok2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4674,9 +4674,9 @@ static DRIVER_INIT(pirpok2)
 static DRIVER_INIT(tighook)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4700,9 +4700,9 @@ static DRIVER_INIT(tighook)
 static DRIVER_INIT(sfruitb)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4726,9 +4726,9 @@ static DRIVER_INIT(sfruitb)
 static DRIVER_INIT(fb2gen)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4752,9 +4752,9 @@ static DRIVER_INIT(fb2gen)
 static DRIVER_INIT(fb2nd)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4778,9 +4778,9 @@ static DRIVER_INIT(fb2nd)
 static DRIVER_INIT(fb4)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4804,9 +4804,9 @@ static DRIVER_INIT(fb4)
 static DRIVER_INIT(ch2000)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4830,9 +4830,9 @@ static DRIVER_INIT(ch2000)
 static DRIVER_INIT(anithunt)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4856,9 +4856,9 @@ static DRIVER_INIT(anithunt)
 static DRIVER_INIT(abnudge)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4882,9 +4882,9 @@ static DRIVER_INIT(abnudge)
 static DRIVER_INIT(pir2001)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4908,9 +4908,9 @@ static DRIVER_INIT(pir2001)
 static DRIVER_INIT(pir2002)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4935,9 +4935,9 @@ static DRIVER_INIT(pir2002)
 static DRIVER_INIT(classice)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4962,9 +4962,9 @@ static DRIVER_INIT(classice)
 static DRIVER_INIT(seawld)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -4990,9 +4990,9 @@ static DRIVER_INIT(seawld)
 static DRIVER_INIT(moneymac)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5017,9 +5017,9 @@ static DRIVER_INIT(moneymac)
 static DRIVER_INIT(atworld)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5045,9 +5045,9 @@ static DRIVER_INIT(atworld)
 static DRIVER_INIT(fruitcar)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5072,9 +5072,9 @@ static DRIVER_INIT(fruitcar)
 static DRIVER_INIT(act2000v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5098,9 +5098,9 @@ static DRIVER_INIT(act2000v)
 static DRIVER_INIT(ch2000v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5124,9 +5124,9 @@ static DRIVER_INIT(ch2000v)
 static DRIVER_INIT(ch2000v2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5152,9 +5152,9 @@ static DRIVER_INIT(ch2000v2)
 static DRIVER_INIT(ch2000d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5177,9 +5177,9 @@ static DRIVER_INIT(ch2000d)
 static DRIVER_INIT(ch2000v3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5202,9 +5202,9 @@ static DRIVER_INIT(ch2000v3)
 static DRIVER_INIT(ch2000c)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5227,9 +5227,9 @@ static DRIVER_INIT(ch2000c)
 static DRIVER_INIT(classiced)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5252,9 +5252,9 @@ static DRIVER_INIT(classiced)
 static DRIVER_INIT(classiced3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5277,9 +5277,9 @@ static DRIVER_INIT(classiced3)
 static DRIVER_INIT(classicev)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5302,9 +5302,9 @@ static DRIVER_INIT(classicev)
 static DRIVER_INIT(classicev3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5327,9 +5327,9 @@ static DRIVER_INIT(classicev3)
 static DRIVER_INIT(seawlda)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5352,9 +5352,9 @@ static DRIVER_INIT(seawlda)
 static DRIVER_INIT(atworlda)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5378,9 +5378,9 @@ static DRIVER_INIT(atworlda)
 static DRIVER_INIT(act2000v2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5403,9 +5403,9 @@ static DRIVER_INIT(act2000v2)
 static DRIVER_INIT(act2000v3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5428,9 +5428,9 @@ static DRIVER_INIT(act2000v3)
 static DRIVER_INIT(act2000d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5453,9 +5453,9 @@ static DRIVER_INIT(act2000d)
 static DRIVER_INIT(anibonus3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5478,9 +5478,9 @@ static DRIVER_INIT(anibonus3)
 static DRIVER_INIT(fruitcar2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5503,9 +5503,9 @@ static DRIVER_INIT(fruitcar2)
 static DRIVER_INIT(fruitcar3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5528,9 +5528,9 @@ static DRIVER_INIT(fruitcar3)
 static DRIVER_INIT(moneymacv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5554,9 +5554,9 @@ static DRIVER_INIT(moneymacv)
 static DRIVER_INIT(moneymacd)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5579,9 +5579,9 @@ static DRIVER_INIT(moneymacd)
 static DRIVER_INIT(pirpok2d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5604,9 +5604,9 @@ static DRIVER_INIT(pirpok2d)
 static DRIVER_INIT(pirpok2v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5629,9 +5629,9 @@ static DRIVER_INIT(pirpok2v)
 static DRIVER_INIT(pirpok2v2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5654,9 +5654,9 @@ static DRIVER_INIT(pirpok2v2)
 static DRIVER_INIT(dblchald)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5679,9 +5679,9 @@ static DRIVER_INIT(dblchald)
 static DRIVER_INIT(dblchalv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5704,9 +5704,9 @@ static DRIVER_INIT(dblchalv)
 static DRIVER_INIT(abnudged)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5730,9 +5730,9 @@ static DRIVER_INIT(abnudged)
 static DRIVER_INIT(abnudgev)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5755,9 +5755,9 @@ static DRIVER_INIT(abnudgev)
 static DRIVER_INIT(pickwind)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5780,9 +5780,9 @@ static DRIVER_INIT(pickwind)
 static DRIVER_INIT(pickwinv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5806,9 +5806,9 @@ static DRIVER_INIT(pickwinv)
 static DRIVER_INIT(pickwinv2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5831,9 +5831,9 @@ static DRIVER_INIT(pickwinv2)
 static DRIVER_INIT(anithuntd)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5856,9 +5856,9 @@ static DRIVER_INIT(anithuntd)
 static DRIVER_INIT(anithuntv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5881,9 +5881,9 @@ static DRIVER_INIT(anithuntv)
 static DRIVER_INIT(anibonusd)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5906,9 +5906,9 @@ static DRIVER_INIT(anibonusd)
 static DRIVER_INIT(anibonusv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5931,9 +5931,9 @@ static DRIVER_INIT(anibonusv)
 static DRIVER_INIT(anibonusv3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5956,9 +5956,9 @@ static DRIVER_INIT(anibonusv3)
 static DRIVER_INIT(hldspin1d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -5981,9 +5981,9 @@ static DRIVER_INIT(hldspin1d)
  static DRIVER_INIT(hldspin1v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6007,9 +6007,9 @@ static DRIVER_INIT(hldspin1d)
 static DRIVER_INIT(parrot3d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6032,9 +6032,9 @@ static DRIVER_INIT(parrot3d)
 static DRIVER_INIT(parrot3v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6057,9 +6057,9 @@ static DRIVER_INIT(parrot3v)
 static DRIVER_INIT(parrot3v2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6082,9 +6082,9 @@ static DRIVER_INIT(parrot3v2)
 static DRIVER_INIT(sfruitbd)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6107,9 +6107,9 @@ static DRIVER_INIT(sfruitbd)
 static DRIVER_INIT(sfruitbv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6132,9 +6132,9 @@ static DRIVER_INIT(sfruitbv)
 static DRIVER_INIT(sfruitbv2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6157,9 +6157,9 @@ static DRIVER_INIT(sfruitbv2)
 static DRIVER_INIT(sfbonusd)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6182,9 +6182,9 @@ static DRIVER_INIT(sfbonusd)
 static DRIVER_INIT(sfbonusv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6207,9 +6207,9 @@ static DRIVER_INIT(sfbonusv)
 static DRIVER_INIT(fb2ndv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6232,9 +6232,9 @@ static DRIVER_INIT(fb2ndv)
 static DRIVER_INIT(fb2ndd)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6257,9 +6257,9 @@ static DRIVER_INIT(fb2ndd)
 static DRIVER_INIT(robadv2v1)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6282,9 +6282,9 @@ static DRIVER_INIT(robadv2v1)
 static DRIVER_INIT(robadv2v4)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6307,9 +6307,9 @@ static DRIVER_INIT(robadv2v4)
 static DRIVER_INIT(robadv2d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6332,9 +6332,9 @@ static DRIVER_INIT(robadv2d)
 static DRIVER_INIT(hldspin2d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6357,9 +6357,9 @@ static DRIVER_INIT(hldspin2d)
 static DRIVER_INIT(hldspin2v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6382,9 +6382,9 @@ static DRIVER_INIT(hldspin2v)
 static DRIVER_INIT(tighookv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6407,9 +6407,9 @@ static DRIVER_INIT(tighookv)
 static DRIVER_INIT(tighookv2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6432,9 +6432,9 @@ static DRIVER_INIT(tighookv2)
 static DRIVER_INIT(tighookd)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6457,9 +6457,9 @@ static DRIVER_INIT(tighookd)
 static DRIVER_INIT(pir2001v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6482,9 +6482,9 @@ static DRIVER_INIT(pir2001v)
 static DRIVER_INIT(pir2001v2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6508,9 +6508,9 @@ static DRIVER_INIT(pir2001v2)
 static DRIVER_INIT(pir2001d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6534,9 +6534,9 @@ static DRIVER_INIT(pir2001d)
 static DRIVER_INIT(pir2002d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6560,9 +6560,9 @@ static DRIVER_INIT(pir2002d)
 static DRIVER_INIT(pir2002v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6586,9 +6586,9 @@ static DRIVER_INIT(pir2002v)
 static DRIVER_INIT(pir2002v2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6612,9 +6612,9 @@ static DRIVER_INIT(pir2002v2)
 static DRIVER_INIT(fb2genv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6637,9 +6637,9 @@ static DRIVER_INIT(fb2genv)
 static DRIVER_INIT(fb2genv3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6662,9 +6662,9 @@ static DRIVER_INIT(fb2genv3)
 static DRIVER_INIT(fb2gend)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6687,9 +6687,9 @@ static DRIVER_INIT(fb2gend)
 static DRIVER_INIT(fb4d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6712,9 +6712,9 @@ static DRIVER_INIT(fb4d)
 static DRIVER_INIT(fb4v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6737,9 +6737,9 @@ static DRIVER_INIT(fb4v)
 static DRIVER_INIT(fb4v3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6763,9 +6763,9 @@ static DRIVER_INIT(fb4v3)
 static DRIVER_INIT(fb5)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6788,9 +6788,9 @@ static DRIVER_INIT(fb5)
 static DRIVER_INIT(fb5d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6813,9 +6813,9 @@ static DRIVER_INIT(fb5d)
 static DRIVER_INIT(fb5v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6838,9 +6838,9 @@ static DRIVER_INIT(fb5v)
 static DRIVER_INIT(fb6)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6865,9 +6865,9 @@ static DRIVER_INIT(fb6)
  static DRIVER_INIT(fb6d)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6890,9 +6890,9 @@ static DRIVER_INIT(fb6)
 static DRIVER_INIT(fb6v)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6915,9 +6915,9 @@ static DRIVER_INIT(fb6v)
 static DRIVER_INIT(fb6v3)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6940,9 +6940,9 @@ static DRIVER_INIT(fb6v3)
 static DRIVER_INIT(fb6s)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6965,9 +6965,9 @@ static DRIVER_INIT(fb6s)
 static DRIVER_INIT(version4)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6990,9 +6990,9 @@ static DRIVER_INIT(version4)
 static DRIVER_INIT(bugfever)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -7015,9 +7015,9 @@ static DRIVER_INIT(bugfever)
 static DRIVER_INIT(bugfeverd)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -7040,9 +7040,9 @@ static DRIVER_INIT(bugfeverd)
 static DRIVER_INIT(bugfeverv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -7065,9 +7065,9 @@ static DRIVER_INIT(bugfeverv)
 static DRIVER_INIT(bugfeverv2)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -7090,9 +7090,9 @@ static DRIVER_INIT(bugfeverv2)
 static DRIVER_INIT(dvisland)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -7116,9 +7116,9 @@ static DRIVER_INIT(dvisland)
 static DRIVER_INIT(funriver)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -7141,9 +7141,9 @@ static DRIVER_INIT(funriver)
 static DRIVER_INIT(funriverv)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "main");i++)
+	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 

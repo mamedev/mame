@@ -410,7 +410,7 @@ GFXDECODE_END
 
 MACHINE_RESET( multfish )
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main"), 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu"), 0x4000);
 	memory_set_bank(machine, 1, 0);
 }
 
@@ -427,14 +427,14 @@ static const ay8910_interface ay8910_config =
 
 MACHINE_DRIVER_START( multfish )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,6000000) /* 6 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80,6000000) /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(multfish_map,0)
 	MDRV_CPU_IO_MAP(multfish_portmap,0)
-	MDRV_CPU_VBLANK_INT("main",irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
 
 	MDRV_MACHINE_RESET( multfish )
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -462,7 +462,7 @@ MACHINE_DRIVER_END
 
 #if ALL_REVISIONS
 ROM_START( mfish ) // 040316
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf040316.rom", 0x00000, 0x40000, MD5(66019927201954518261652147b05e43) SHA1(c1f4d1c51632a45b533d19c8b6f63d337d84d9cd) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -478,7 +478,7 @@ ROM_END
 #endif
 
 ROM_START( mfish_2 ) // 040308
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf040308.rom", 0x00000, 0x40000, CRC(adb9c1d9) SHA1(88c69f48766dc7c98a6f03c1a0a4aa63b76560b6) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -493,7 +493,7 @@ ROM_START( mfish_2 ) // 040308
 ROM_END
 
 ROM_START( mfish_2a ) // 040308
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf040308_alt.rom", 0x00000, 0x40000, CRC(44537648) SHA1(7bce6085778ff0b21c052ae91703de3b78b8eed0))
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -509,7 +509,7 @@ ROM_END
 
 #if ALL_REVISIONS
 ROM_START( mfish_3 ) // 031124
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf031124.rom", 0x00000, 0x40000, MD5(9cd800719c6e4a2267e3c140467238d3) SHA1(c0d1b541c4b076bbc810ad637acb4a2663a919ba) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -524,7 +524,7 @@ ROM_START( mfish_3 ) // 031124
 ROM_END
 
 ROM_START( mfish_4 ) // 031117
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf031117.rom", 0x00000, 0x40000, MD5(531a3e63c46be33a151c06bdd9479655) SHA1(1d244a332af0fb6aa593a246211ff2b6d2c48a59) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -539,7 +539,7 @@ ROM_START( mfish_4 ) // 031117
 ROM_END
 
 ROM_START( mfish_5 ) // 031026
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf031026.rom", 0x00000, 0x40000, MD5(a0a31829705ad78786f7c1bd36cee0cf) SHA1(451b390793f89188afe2b6e82fc02b474fb97a7c) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -554,7 +554,7 @@ ROM_START( mfish_5 ) // 031026
 ROM_END
 
 ROM_START( mfish_6 ) // 030522
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf030522.rom", 0x00000, 0x40000, MD5(17dc6bf0308a4ac53bdff0ade1216235) SHA1(fa80e12275b960374c84518bcaa1e32d0a4ff437) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -569,7 +569,7 @@ ROM_START( mfish_6 ) // 030522
 ROM_END
 
 ROM_START( mfish_7 ) // 030511
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf030511.rom", 0x00000, 0x40000, MD5(a910910ce7963a4385e31769789842f7) SHA1(06b3e3875f036782983e29e305f67a36f78a4f06) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -584,7 +584,7 @@ ROM_START( mfish_7 ) // 030511
 ROM_END
 
 ROM_START( mfish_8 ) // 030124
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf030124.rom", 0x00000, 0x40000, MD5(4772becb7c2b3220492c690501e174a7) SHA1(b119b086bad3f6f8acc64a5809ce449800615406) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -599,7 +599,7 @@ ROM_START( mfish_8 ) // 030124
 ROM_END
 
 ROM_START( mfish_9 ) // 021227
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021227.rom", 0x00000, 0x40000, MD5(1bbdff5bd2b89a0c9c474286c55d16db) SHA1(58b74c41a88a781da01dba52744dc74e41deae70) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -614,7 +614,7 @@ ROM_START( mfish_9 ) // 021227
 ROM_END
 
 ROM_START( mfish_10 ) // 021219
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021219.rom", 0x00000, 0x40000, MD5(c8810d803d320d9fefa46588c8ef28c0) SHA1(887d456b2ba89560329457d9eaea26fb72223a38) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -629,7 +629,7 @@ ROM_START( mfish_10 ) // 021219
 ROM_END
 
 ROM_START( mfish_11 ) // 021124
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021124.rom", 0x00000, 0x40000, MD5(a3bfe235ca1d2efa51cc55465a8161e4) SHA1(ea132f68e9c09c40369d4cc02c670ee6e26bdcbe) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -644,7 +644,7 @@ ROM_START( mfish_11 ) // 021124
 ROM_END
 
 ROM_START( mfish_12 ) // 021121
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021121.rom", 0x00000, 0x40000, MD5(727dc01459f6745caa2b19fbd4432055) SHA1(87a1fb81330cf4b66e17702c22fda694ebff58eb) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -659,7 +659,7 @@ ROM_START( mfish_12 ) // 021121
 ROM_END
 
 ROM_START( mfish_13 ) // 021120
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "mf021120.rom", 0x00000, 0x40000, MD5(6021e2bfa67abdfc0beb7f291fdc9d9c) SHA1(eb7eb5aae00a77edcf328f460970eb180d86d058) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )

@@ -239,12 +239,12 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( genesis_base )
 	/*basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 7)
-	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 7)
+	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK / 15)
+	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK / 15)
 	MDRV_CPU_PROGRAM_MAP(genesis_z80_readmem, genesis_z80_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* from vdp at scanline 0xe0 */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -254,7 +254,7 @@ static MACHINE_DRIVER_START( genesis_base )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(342,262)
@@ -277,12 +277,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( topshoot )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( genesis_base )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(topshoot_readmem,topshoot_writemem)
 
 	/* video hardware */
 	MDRV_VIDEO_START(genesis)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
 
 	/* sound hardware */
@@ -291,7 +291,7 @@ static MACHINE_DRIVER_START( topshoot )
 MACHINE_DRIVER_END
 
 ROM_START( topshoot ) /* Top Shooter (c)1995 Sun Mixing */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tc574000ad_u11_2.bin", 0x000000, 0x080000, CRC(b235c4d9) SHA1(fbb308a5f6e769f3277824cb6a3b50c308969ac2) )
 	ROM_LOAD16_BYTE( "tc574000ad_u12_1.bin", 0x000001, 0x080000, CRC(e826f6ad) SHA1(23ec8bb608f954d3b915f061e7076c0c63b8259e) )
 ROM_END
@@ -306,7 +306,7 @@ static DRIVER_INIT(topshoot)
 	/* hack -- fix vdp emulation instead */
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xC00004, 0xC00005, 0, 0, vdp_fake_r);
 
-	memory_set_bankptr(machine, 3, memory_region(machine, "main") );
+	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") );
 	memory_set_bankptr(machine, 4, genesis_68k_ram );
 }
 

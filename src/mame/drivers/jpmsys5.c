@@ -86,7 +86,7 @@ static void tms_interrupt(running_machine *machine, int state)
 
 static const struct tms34061_interface tms34061intf =
 {
-	"main",			/* The screen we are acting on */
+	"screen",		/* The screen we are acting on */
 	8,				/* VRAM address is (row << rowshift) | col */
 	0x40000,		/* Size of video RAM - FIXME: Should be 128kB + 32kB */
 	tms_interrupt	/* Interrupt gen callback */
@@ -211,7 +211,7 @@ static VIDEO_UPDATE( jpmsys5v )
 
 static WRITE16_HANDLER( rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	data &= 0x1f;
 	memory_set_bankptr(space->machine, 1, &rom[0x20000 + 0x20000 * data]);
 }
@@ -575,7 +575,7 @@ static ACIA6850_INTERFACE( acia2_if )
 
 static MACHINE_START( jpmsys5v )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "main"));
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
 	ptm6840_config(machine, 0, &ptm_intf);
 	touch_timer = timer_alloc(machine, touch_cb, NULL);
 }
@@ -596,7 +596,7 @@ static MACHINE_RESET( jpmsys5v )
  *************************************/
 
 static MACHINE_DRIVER_START( jpmsys5v )
-	MDRV_CPU_ADD("main", M68000, 8000000)
+	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(68000_map, 0)
 
 	MDRV_ACIA6850_ADD("acia6850_0", acia0_if)
@@ -608,7 +608,7 @@ static MACHINE_DRIVER_START( jpmsys5v )
 	MDRV_MACHINE_START(jpmsys5v)
 	MDRV_MACHINE_RESET(jpmsys5v)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_40MHz / 4, 676, 20*4, 147*4, 256, 0, 254)
 
@@ -635,7 +635,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( monopoly )
-	ROM_REGION( 0x300000, "main", 0 )
+	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7398.bin", 0x000000, 0x80000, CRC(62c80f20) SHA1(322514f920d6cb48887b624786b52af34bdb8e5f) )
 	ROM_LOAD16_BYTE( "7399.bin", 0x000001, 0x80000, CRC(5f410eb6) SHA1(f9949b5cba64db77187c1723a52570bdb182ce5c) )
 	ROM_LOAD16_BYTE( "6668.bin", 0x100000, 0x80000, CRC(30bf082a) SHA1(29ba67a86e82f0eb4feb816a2031d62028eb11b0) )
@@ -648,7 +648,7 @@ ROM_START( monopoly )
 ROM_END
 
 ROM_START( monoplcl )
-	ROM_REGION( 0x300000, "main", 0 )
+	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7401.bin", 0x000000, 0x80000, CRC(eec11426) SHA1(b732a5a64d3fba676134942768b823d088792a1f) )
 	ROM_LOAD16_BYTE( "7402.bin", 0x000001, 0x80000, CRC(c4c43269) SHA1(3cad3a66aae25308e8709f8eb3f29d6858b87791) )
 	ROM_LOAD16_BYTE( "6668.bin", 0x100000, 0x80000, CRC(30bf082a) SHA1(29ba67a86e82f0eb4feb816a2031d62028eb11b0) )
@@ -661,7 +661,7 @@ ROM_START( monoplcl )
 ROM_END
 
 ROM_START( monopldx )
-	ROM_REGION( 0x300000, "main", 0 )
+	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "8439.bin", 0x000000, 0x80000, CRC(fbd6caa4) SHA1(73e787ae41a0ce44d48a46dd623d5e1351335e3e) )
 	ROM_LOAD16_BYTE( "8440.bin", 0x000001, 0x80000, CRC(4e20aebf) SHA1(79aca78f023e7f7ae7875c18c3a7696f5ab63102) )
 	ROM_LOAD16_BYTE( "6879.bin", 0x100000, 0x80000, CRC(4fbd1222) SHA1(9a9c9e4768c18a6a3e717605d3c88179676b6ad1) )

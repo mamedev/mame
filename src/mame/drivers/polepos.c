@@ -833,18 +833,18 @@ static const namco_52xx_interface namco_52xx_config =
 static MACHINE_DRIVER_START( polepos )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 24576000/8)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_map,0)
 	MDRV_CPU_IO_MAP(z80_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
 
 	MDRV_CPU_ADD("sub", Z8000, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub2", Z8000, 24576000/8)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(z8002_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
@@ -859,7 +859,7 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -912,7 +912,7 @@ MACHINE_DRIVER_END
 
 ROM_START( polepos )
 	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp1_9b.6h",    0x0000, 0x2000, CRC(94436b70) SHA1(7495c2a8c3928c59146760d19e672afee01c5b17) )
 	ROM_LOAD( "136014.116",   0x2000, 0x1000, CRC(7174bcb7) SHA1(460326a6cea201db2df813013c95562a222ea95d) )
 
@@ -992,7 +992,7 @@ ROM_END
 
 ROM_START( poleposa )
 	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136014.105",   0x0000, 0x2000, CRC(c918c043) SHA1(abc1aa3d7b670b5a65b4565dc646cd3c4edf4e6f) )
 	ROM_LOAD( "136014.116",   0x2000, 0x1000, CRC(7174bcb7) SHA1(460326a6cea201db2df813013c95562a222ea95d) )
 
@@ -1069,7 +1069,7 @@ ROM_END
 
 ROM_START( polepos1 )
 	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136014.105",   0x0000, 0x2000, CRC(c918c043) SHA1(abc1aa3d7b670b5a65b4565dc646cd3c4edf4e6f) )
 	ROM_LOAD( "136014.116",   0x2000, 0x1000, CRC(7174bcb7) SHA1(460326a6cea201db2df813013c95562a222ea95d) )
 
@@ -1243,7 +1243,7 @@ Notes:
 */
 ROM_START( topracer )
 	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp1_9b.6h",    0x0000, 0x2000, CRC(94436b70) SHA1(7495c2a8c3928c59146760d19e672afee01c5b17) )
 	ROM_LOAD( "136014.116",   0x2000, 0x1000, CRC(7174bcb7) SHA1(460326a6cea201db2df813013c95562a222ea95d) )
 
@@ -1320,7 +1320,7 @@ ROM_END
 
 ROM_START( topracra )
 	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pole-c2",      0x0000, 0x2000, CRC(caab829a) SHA1(826f25f5c792ab8b24e73ebb735aebcad552454f) )
 	ROM_LOAD( "pole-h2",      0x2000, 0x1000, CRC(148f5000) SHA1(071f75518f06a317f53db78f11da3ee878569f86) )
 
@@ -1400,7 +1400,7 @@ ROM_END
 
 ROM_START( topracrb )
 	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tr9.f17",    0x0000, 0x2000, CRC(94436b70) SHA1(7495c2a8c3928c59146760d19e672afee01c5b17) )
 	ROM_LOAD( "tr10.f16",   0x2000, 0x1000, CRC(7174bcb7) SHA1(460326a6cea201db2df813013c95562a222ea95d) )
 
@@ -1478,7 +1478,7 @@ ROM_END
 
 ROM_START( polepos2 )
 	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp4_9.6h",      0x0000, 0x2000, CRC(bcf87004) SHA1(0c60cbb777fe72dfd11c6f3e9da806a515cd0f8a) )
 	ROM_LOAD( "136014.183",    0x2000, 0x1000, CRC(a9d4c380) SHA1(6048a8e858824936901e8e3e6b65d7505ccd82b4) )
 
@@ -1562,7 +1562,7 @@ ROM_END
 
 ROM_START( poleps2a )
 	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136014.180",   0x0000, 0x2000, CRC(f85212c4) SHA1(666e55a7662247e72393b105b3e719be4233f1ff) )
 	ROM_LOAD( "136014.183",   0x2000, 0x1000, CRC(a9d4c380) SHA1(6048a8e858824936901e8e3e6b65d7505ccd82b4) )
 
@@ -1643,7 +1643,7 @@ ROM_END
 
 ROM_START( poleps2b )
 	/* Z80 memory/ROM data */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136014.180",   0x0000, 0x2000, CRC(f85212c4) SHA1(666e55a7662247e72393b105b3e719be4233f1ff) )
 	ROM_LOAD( "136014.183",   0x2000, 0x1000, CRC(a9d4c380) SHA1(6048a8e858824936901e8e3e6b65d7505ccd82b4) )
 

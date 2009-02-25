@@ -288,7 +288,7 @@ GFXDECODE_END
 
 static void ctc0_interrupt(const device_config *device, int state)
 {
-	cputag_set_input_line(device->machine, "audio", 0, state);
+	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 }
 
 static const z80ctc_interface ctc_intf =
@@ -366,11 +366,11 @@ static PALETTE_INIT(pipeline)
 static MACHINE_DRIVER_START( pipeline )
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("main", Z80, 7372800/2)
+	MDRV_CPU_ADD("maincpu", Z80, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(cpu0_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80, 7372800/2)
+	MDRV_CPU_ADD("audiocpu", Z80, 7372800/2)
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(cpu1_mem, 0)
 	MDRV_CPU_IO_MAP(sound_port, 0)
@@ -378,14 +378,14 @@ static MACHINE_DRIVER_START( pipeline )
 	MDRV_CPU_ADD("mcu", M68705, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem, 0)
 
-	MDRV_Z80CTC_ADD( "ctc", 7372800/2 /* same as "audio" */, ctc_intf )
+	MDRV_Z80CTC_ADD( "ctc", 7372800/2 /* same as "audiocpu" */, ctc_intf )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -409,10 +409,10 @@ static MACHINE_DRIVER_START( pipeline )
 MACHINE_DRIVER_END
 
 ROM_START( pipeline )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom1.u77", 0x00000, 0x08000, CRC(6e928290) SHA1(e2c8c35c04fd8ce3ddd6ecec04b0193a248e4362) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rom2.u84", 0x00000, 0x08000, CRC(e77c43b7) SHA1(8b04005bc448083a429ace3319fc7e168a61f2f9) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )

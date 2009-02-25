@@ -424,13 +424,13 @@ static const ym2203_interface kothello_ym2203_interface =
 static MACHINE_DRIVER_START( shanghai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,16000000/2)	/* ? */
+	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(shanghai_map,0)
 	MDRV_CPU_IO_MAP(shanghai_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", shanghai_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", shanghai_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
@@ -457,13 +457,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( shangha2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,16000000/2)	/* ? */
+	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(shangha2_map,0)
 	MDRV_CPU_IO_MAP(shangha2_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", shanghai_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", shanghai_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
@@ -489,9 +489,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kothello )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,16000000/2)	/* ? */
+	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(kothello_map, 0)
-	MDRV_CPU_VBLANK_INT("main", shanghai_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", shanghai_interrupt)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -500,7 +500,7 @@ static MACHINE_DRIVER_START( kothello )
 	MDRV_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
@@ -532,7 +532,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( shanghai )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "shg-22a.rom", 0xa0001, 0x10000, CRC(e0a085be) SHA1(e281043f97c4cd34a33eb1ec7154abbe67a9aa03) )
 	ROM_LOAD16_BYTE( "shg-21a.rom", 0xa0000, 0x10000, CRC(4ab06d32) SHA1(02667d1270b101386b947d5b9bfe64052e498041) )
 	ROM_LOAD16_BYTE( "shg-28a.rom", 0xc0001, 0x10000, CRC(983ec112) SHA1(110e120e35815d055d6108a7603e83d2d990c666) )
@@ -542,7 +542,7 @@ ROM_START( shanghai )
 ROM_END
 
 ROM_START( shangha2 )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sht-27j", 0x80001, 0x20000, CRC(969cbf00) SHA1(350025f4e39c7d89cb72e46b52fb467e3e9056f4) )
 	ROM_LOAD16_BYTE( "sht-26j", 0x80000, 0x20000, CRC(4bf01ab4) SHA1(6928374db080212a371991ee98cd563e158907f0) )
 	ROM_LOAD16_BYTE( "sht-31j", 0xc0001, 0x20000, CRC(312e3b9d) SHA1(f15f76a087d4972aa72145eced8d1fb15329b359) )
@@ -602,13 +602,13 @@ Notes:
 
 
 ROM_START( kothello )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom1.3e", 0x80001, 0x20000, CRC(8601dcfa) SHA1(e7ffc6da0bfb5cec5a543a2a5223b235c3428eb3) )
 	ROM_LOAD16_BYTE( "rom2.5e", 0x80000, 0x20000, CRC(68f6b7a3) SHA1(9f7e217e07bc79b1e95551cd0fe107294bf5889f) )
 	ROM_LOAD16_BYTE( "rom3.3f", 0xc0001, 0x20000, CRC(2f3dacd1) SHA1(35bfdc1f377b87a80c3abbb48f9f0b52108fbfc0) )
 	ROM_LOAD16_BYTE( "rom4.5f", 0xc0000, 0x20000, CRC(ee8bbea7) SHA1(35dfa7aa89cecba6482b18a5233511bacc4bf331) )
 
-	ROM_REGION( 0x20000, "audio", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "rom5.5l",   0x00000, 0x02000, CRC(7eb6e697) SHA1(4476e13f9a9e04472581f2c069760f53b33d5672))
 	ROM_CONTINUE(          0x10000, 0x0e000 )
 

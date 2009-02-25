@@ -274,13 +274,13 @@ static const ym2203_interface ym2203_config =
 
 
 static MACHINE_DRIVER_START( mosaic )
-	MDRV_CPU_ADD("main", Z180, 7000000)	/* ??? */
+	MDRV_CPU_ADD("maincpu", Z180, 7000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -303,7 +303,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gfire2 )
 	MDRV_IMPORT_FROM(mosaic)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gfire2_readmem,gfire2_writemem)
 	MDRV_CPU_IO_MAP(gfire2_io_map,0)
 MACHINE_DRIVER_END
@@ -317,7 +317,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( mosaic )
-	ROM_REGION( 0x100000, "main", 0 )	/* 1024k for Z180 address space */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024k for Z180 address space */
 	ROM_LOAD( "mosaic.9", 0x00000, 0x10000, CRC(5794dd39) SHA1(28784371f4ca561e3c0fb74d1f0a204f58ccdd3a) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
@@ -334,7 +334,7 @@ ROM_START( mosaic )
 ROM_END
 
 ROM_START( mosaica )
-	ROM_REGION( 0x100000, "main", 0 )	/* 1024k for Z180 address space */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024k for Z180 address space */
 	ROM_LOAD( "mosaic_9.a02", 0x00000, 0x10000, CRC(ecb4f8aa) SHA1(e45c074bac92d1d079cf1bcc0a6a081beb3dbb8e) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )
@@ -351,7 +351,7 @@ ROM_START( mosaica )
 ROM_END
 
 ROM_START( gfire2 )
-	ROM_REGION( 0x100000, "main", 0 )	/* 1024k for Z180 address space */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024k for Z180 address space */
 	ROM_LOAD( "goldf2_i.7e",         0x00000, 0x10000, CRC(a102f7d0) SHA1(cfde51d0e9e69e9653fdfd70d4e4f4649b662005) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )

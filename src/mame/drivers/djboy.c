@@ -662,7 +662,7 @@ static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(space->machine, "main");
+	unsigned char *RAM = memory_region(space->machine, "maincpu");
 	data ^= bankxor;
 	memory_set_bankptr(space->machine, 4,&RAM[0x10000]); /* unsure if/how this area is banked */
 	if( data < 4 )
@@ -825,7 +825,7 @@ static INTERRUPT_GEN( djboy_interrupt )
 }
 
 static MACHINE_DRIVER_START( djboy )
-	MDRV_CPU_ADD("main", Z80,6000000)
+	MDRV_CPU_ADD("maincpu", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am,0)
 	MDRV_CPU_IO_MAP(cpu0_port_am,0)
 	MDRV_CPU_VBLANK_INT_HACK(djboy_interrupt,2)
@@ -833,16 +833,16 @@ static MACHINE_DRIVER_START( djboy )
 	MDRV_CPU_ADD("cpu1", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu1_am,0)
 	MDRV_CPU_IO_MAP(cpu1_port_am,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("cpu2", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu2_am,0)
 	MDRV_CPU_IO_MAP(cpu2_port_am,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -871,7 +871,7 @@ static MACHINE_DRIVER_START( djboy )
 MACHINE_DRIVER_END
 
 ROM_START( djboy )
-	ROM_REGION( 0x48000, "main", 0 )
+	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "bs64.4b",  0x00000, 0x08000, CRC(b77aacc7) SHA1(78100d4695738a702f13807526eb1bcac759cce3) )
 	ROM_CONTINUE( 0x10000, 0x18000 )
 	ROM_LOAD( "bs100.4d", 0x28000, 0x20000, CRC(081e8af8) SHA1(3589dab1cf31b109a40370b4db1f31785023e2ed) )
@@ -904,7 +904,7 @@ ROM_START( djboy )
 ROM_END
 
 ROM_START( djboya )
-	ROM_REGION( 0x48000, "main", 0 )
+	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "bs19s.rom",  0x00000, 0x08000, CRC(17ce9f6c) SHA1(a0c1832b05dc46991e8949067ca0278f5498835f) )
 	ROM_CONTINUE( 0x10000, 0x18000 )
 	ROM_LOAD( "bs100.4d", 0x28000, 0x20000, CRC(081e8af8) SHA1(3589dab1cf31b109a40370b4db1f31785023e2ed) )
@@ -937,7 +937,7 @@ ROM_START( djboya )
 ROM_END
 
 ROM_START( djboyj )
-	ROM_REGION( 0x48000, "main", 0 )
+	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "bs12.4b",  0x00000, 0x08000, CRC(0971523e) SHA1(f90cd02cedf8632f4b651de7ea75dc8c0e682f6e) )
 	ROM_CONTINUE( 0x10000, 0x18000 )
 	ROM_LOAD( "bs100.4d", 0x28000, 0x20000, CRC(081e8af8) SHA1(3589dab1cf31b109a40370b4db1f31785023e2ed) )

@@ -61,7 +61,7 @@ static INTERRUPT_GEN( dv_interrupt )
 
 static WRITE8_HANDLER( mainevt_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	int bankaddress;
 
 	/* bit 0-1 ROM bank select */
@@ -498,18 +498,18 @@ static const k007232_interface k007232_config =
 static MACHINE_DRIVER_START( mainevt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", HD6309, 3000000*4)	/* ?? */
+	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", mainevt_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", mainevt_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,8)	/* ??? */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -537,18 +537,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( devstors )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", HD6309, 3000000*4)	/* ?? */
+	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(dv_readmem,dv_writemem)
-	MDRV_CPU_VBLANK_INT("main", dv_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", dv_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(dv_sound_readmem,dv_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -584,11 +584,11 @@ MACHINE_DRIVER_END
 /* 4 players - English title screen - No "Warning" message in the ROM */
 
 ROM_START( mainevt )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "799c02.k11",   0x10000, 0x08000, CRC(e2e7dbd5) SHA1(80314cd42a9f47f7bb82a2160fb5ef2ddc6dff30) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -615,11 +615,11 @@ ROM_END
 /* 4 players - English title screen - No "Warning" message in the ROM */
 
 ROM_START( mainevto )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "799_02.k11",   0x10000, 0x08000, CRC(c143596b) SHA1(5da7efaf0f7c7a493cc242eae115f278bc9c134b) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -646,11 +646,11 @@ ROM_END
 /* 2 players - English title screen - "Warning" message in the ROM (not displayed) */
 
 ROM_START( mainev2p )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "799x02.k11",   0x10000, 0x08000, CRC(42cfc650) SHA1(2d1918ebc0d93a2356ad995a6854dbde7c3b8daf) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -677,11 +677,11 @@ ROM_END
 /* 2 players - Japan title screen - "Warning" message in the ROM (displayed) */
 
 ROM_START( ringohja )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "799n02.k11",   0x10000, 0x08000, CRC(f9305dd0) SHA1(7135053be9d46ac9c09ab63eca1eb71825a71a13) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "799c01.f7",    0x00000, 0x08000, CRC(447c4c5c) SHA1(86e42132793c59cc6feece143516f7ecd4ed14e8) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -705,11 +705,11 @@ ROM_START( ringohja )
 ROM_END
 
 ROM_START( devstors )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "890z02.k11",  0x10000, 0x08000, CRC(ebeb306f) SHA1(838fcfe95dfedd61f21f34301d48e337db765ab2) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -730,11 +730,11 @@ ROM_START( devstors )
 ROM_END
 
 ROM_START( devstor2 )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "890x02.k11",  0x10000, 0x08000, CRC(e58ebb35) SHA1(4253b6a7128534cc0866bc910a271d91ac8b40fd) )
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -755,11 +755,11 @@ ROM_START( devstor2 )
 ROM_END
 
 ROM_START( devstor3 )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "890k02.k11",   0x10000, 0x08000, CRC(52f4ccdd) SHA1(074e526ed170a5f2083c8c0808734291a2ea7403) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -780,11 +780,11 @@ ROM_START( devstor3 )
 ROM_END
 
 ROM_START( garuka )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "890w02.k11",   0x10000, 0x08000, CRC(b2f6f538) SHA1(95dad3258a2e4c5648d0fc22c06fa3e2da3b5ed1) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "890k01.f7",  0x00000, 0x08000, CRC(d44b3eb0) SHA1(26109fc56668b65f1a5aa6d8ec2c08fd70ca7c51) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */

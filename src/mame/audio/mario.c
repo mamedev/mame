@@ -365,7 +365,7 @@ static void set_ea(const address_space *space, int ea)
 {
 	mario_state	*state = space->machine->driver_data;
 	//printf("ea: %d\n", ea);
-	//cputag_set_input_line(machine, "audio", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
+	//cputag_set_input_line(machine, "audiocpu", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
 	if (state->eabank != 0)
 		memory_set_bank(space->machine, state->eabank, ea);
 }
@@ -379,9 +379,9 @@ static void set_ea(const address_space *space, int ea)
 static SOUND_START( mario )
 {
 	mario_state	*state = machine->driver_data;
-	const device_config *audiocpu = cputag_get_cpu(machine, "audio");
+	const device_config *audiocpu = cputag_get_cpu(machine, "audiocpu");
 #if USE_8039
-	UINT8 *SND = memory_region(machine, "audio");
+	UINT8 *SND = memory_region(machine, "audiocpu");
 
 	SND[0x1001] = 0x01;
 #endif
@@ -391,8 +391,8 @@ static SOUND_START( mario )
 	{
 		state->eabank = 1;
 		memory_install_read8_handler(cpu_get_address_space(audiocpu, ADDRESS_SPACE_PROGRAM), 0x000, 0x7ff, 0, 0, SMH_BANK1);
-		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "audio"), 0);
-	    memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "audio") + 0x1000, 0x800);
+		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "audiocpu"), 0);
+	    memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "audiocpu") + 0x1000, 0x800);
 	}
 
     state_save_register_global(machine, state->last);
@@ -447,8 +447,8 @@ static READ8_HANDLER( mario_sh_t1_r )
 
 static READ8_HANDLER( mario_sh_tune_r )
 {
-	UINT8 *SND = memory_region(space->machine, "audio");
-	UINT16 mask = memory_region_length(space->machine, "audio")-1;
+	UINT8 *SND = memory_region(space->machine, "audiocpu");
+	UINT16 mask = memory_region_length(space->machine, "audiocpu")-1;
 	UINT8 p2 = I8035_P2_R(space);
 
 	if ((p2 >> 7) & 1)
@@ -485,7 +485,7 @@ WRITE8_HANDLER( masao_sh_irqtrigger_w )
 	if (state->last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		cputag_set_input_line_and_vector(space->machine, "audio",0,HOLD_LINE,0xff);
+		cputag_set_input_line_and_vector(space->machine, "audiocpu",0,HOLD_LINE,0xff);
 	}
 
 	state->last = data;
@@ -519,9 +519,9 @@ WRITE8_HANDLER( mario_sh3_w )
 	{
 		case 0: /* death */
 			if (data)
-				cputag_set_input_line(space->machine, "audio",0,ASSERT_LINE);
+				cputag_set_input_line(space->machine, "audiocpu",0,ASSERT_LINE);
 			else
-				cputag_set_input_line(space->machine, "audio",0,CLEAR_LINE);
+				cputag_set_input_line(space->machine, "audiocpu",0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
 			I8035_T_W_AH(space,0,data & 1);
@@ -554,7 +554,7 @@ WRITE8_HANDLER( mario_sh3_w )
  *************************************/
 
 static ADDRESS_MAP_START( mario_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK(1) AM_REGION("audio", 0)
+	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK(1) AM_REGION("audiocpu", 0)
 	AM_RANGE(0x0800, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -583,7 +583,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -599,9 +599,9 @@ static const ay8910_interface ay8910_config =
 MACHINE_DRIVER_START( mario_audio )
 
 #if USE_8039
-	MDRV_CPU_ADD("audio", I8039, I8035_CLOCK)         /* 730 kHz */
+	MDRV_CPU_ADD("audiocpu", I8039, I8035_CLOCK)         /* 730 kHz */
 #else
-	MDRV_CPU_ADD("audio", M58715, I8035_CLOCK)        /* 730 kHz */
+	MDRV_CPU_ADD("audiocpu", M58715, I8035_CLOCK)        /* 730 kHz */
 #endif
 	MDRV_CPU_PROGRAM_MAP(mario_sound_map, 0)
 	MDRV_CPU_IO_MAP(mario_sound_io_map, 0)
@@ -618,7 +618,7 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( masao_audio )
 
-	MDRV_CPU_ADD("audio", Z80,24576000/16)	/* ???? */
+	MDRV_CPU_ADD("audiocpu", Z80,24576000/16)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(masao_sound_map,0)
 
 	MDRV_SOUND_START(mario)

@@ -149,7 +149,7 @@ static void outrun_generic_init(running_machine *machine)
 	workram              = auto_malloc(0x08000);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(cputag_get_cpu(machine, "main"), outrun_info, sound_data_w, NULL);
+	segaic16_memory_mapper_init(cputag_get_cpu(machine, "maincpu"), outrun_info, sound_data_w, NULL);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, segaic16_memory_mapper_set_decrypted);
@@ -805,13 +805,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( outrundx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(outrun_map,0)
 
 	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
-	MDRV_CPU_ADD("sound", Z80, SOUND_CLOCK/4)
+	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -824,7 +824,7 @@ static MACHINE_DRIVER_START( outrundx )
 	MDRV_GFXDECODE(segaorun)
 	MDRV_PALETTE_LENGTH(4096*3)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224)
 
@@ -854,7 +854,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( shangon )
 	MDRV_IMPORT_FROM(outrun)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 321, 262, 0, 224)
 
 	MDRV_VIDEO_START(shangon)
@@ -886,7 +886,7 @@ Note: Manuals for Upright Standard and Sitdown Standard list the same Main & Sub
 
 */
 ROM_START( outrun )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-10380b.133", 0x000000, 0x10000, CRC(1f6cadad) SHA1(31e870f307f44eb4f293b607123b623beee2bc3c) )
 	ROM_LOAD16_BYTE( "epr-10382b.118", 0x000001, 0x10000, CRC(c4c3fa1a) SHA1(69236cf9f27691dee290c79db1fc9b5e73ea77d7) )
 	ROM_LOAD16_BYTE( "epr-10381b.132", 0x020000, 0x10000, CRC(be8c412b) SHA1(bf3ff05bbf81bdd44567f3b9bb4919ed4a499624) ) /* Same as the "A" version belown ??? */
@@ -921,7 +921,7 @@ ROM_START( outrun )
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-10187.88", 0x00000, 0x8000, CRC(a10abaa9) SHA1(01c8a819587a66d2ee4d255656e36fa0904377b0) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -947,7 +947,7 @@ ROM_END
      VIDEO BD 837-6064-02
 */
 ROM_START( outrun2 )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-10380a.133", 0x000000, 0x10000, CRC(434fadbc) SHA1(83c861d331e69ef4f2452c313ae4b5ea9d8b7948) )
 	ROM_LOAD16_BYTE( "epr-10382a.118", 0x000001, 0x10000, CRC(1ddcc04e) SHA1(945d207d8d602d7fdb6d25f6b93c9c0b995e8d5a) )
 	ROM_LOAD16_BYTE( "epr-10381a.132", 0x020000, 0x10000, CRC(be8c412b) SHA1(bf3ff05bbf81bdd44567f3b9bb4919ed4a499624) )
@@ -982,7 +982,7 @@ ROM_START( outrun2 )
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-10187.88", 0x00000, 0x8000, CRC(a10abaa9) SHA1(01c8a819587a66d2ee4d255656e36fa0904377b0) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1009,7 +1009,7 @@ ROM_END
 */
 
 ROM_START( outrun1 )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
         /* Earlier version of CPU BD?? uses half size eproms compared to the above sets */
 	ROM_LOAD16_BYTE( "epr-10183.115", 0x000000, 0x8000, CRC(3d992396) SHA1(8cef43799b71cfd36d3fea140afff7fe0bafcfc1) )
 	ROM_LOAD16_BYTE( "epr-10261.130", 0x000001, 0x8000, CRC(1d034847) SHA1(664b24c13f7885403328906682213e38c1ad994e) )
@@ -1077,7 +1077,7 @@ ROM_START( outrun1 )
 	ROM_LOAD( "opr-10186.47", 0x0000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 	ROM_LOAD( "opr-10185.11", 0x8000, 0x8000, CRC(22794426) SHA1(a554d4b68e71861a0d0da4d031b3b811b246f082) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-10187.88", 0x00000, 0x8000, CRC(a10abaa9) SHA1(01c8a819587a66d2ee4d255656e36fa0904377b0) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1128,7 +1128,7 @@ ROM_END
     Dumped by Corrado Tomaselli
 */
 ROM_START( outrunb )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "a-10.bin", 0x000000, 0x10000, CRC(cddceea2) SHA1(34cb4ca61c941e96e585f3cd2aed79bdde67f8eb) )
 	ROM_LOAD16_BYTE( "a-9.bin",  0x000001, 0x10000, CRC(14e97a67) SHA1(a86ccb719ad695ed814bedfe02dbafa435fc65da) )
 	ROM_LOAD16_BYTE( "a-14.bin", 0x020000, 0x10000, CRC(3092d857) SHA1(8ebfeab9217b80a7983a4f8eb7bb7d3387d791b3) )
@@ -1167,7 +1167,7 @@ ROM_START( outrunb )
 	ROM_LOAD( "a-2.bin", 0x0000, 0x8000, CRC(ed5bda9c) SHA1(f09a34caf1f9f6b119700a00635ab8fa8244362d) )
 	ROM_LOAD( "a-3.bin", 0x8000, 0x8000, CRC(666fe754) SHA1(606090db53d658d7b04dca4748014a411e12f259) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "a-1.bin", 0x00000, 0x8000, CRC(209bb53a) SHA1(4ec9ca7532354f05f06295a01c4fa4982268e1d5) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1187,7 +1187,7 @@ ROM_END
     CPU: FD1094 (317-0109)
 */
 ROM_START( toutrun )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-12289.133", 0x000000, 0x10000, CRC(812fd035) SHA1(7bea9ba611333dfb86cfc2e2be8cff5f700b6f71) )
 	ROM_LOAD16_BYTE( "epr-12288.118", 0x000001, 0x10000, CRC(2f1151bb) SHA1(e91600d4f4e5d3d5a67cafb1ff34006f281434f1) )
 	ROM_LOAD16_BYTE( "epr-12291.132", 0x020000, 0x10000, CRC(8ca284d2) SHA1(93f71ec554ab000294aaa4de9ece0eecfcfe3c46) )
@@ -1231,7 +1231,7 @@ ROM_START( toutrun )
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) /* Manual shows both as EPR-12298 */
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-12300.88", 0x00000, 0x10000, CRC(e8ff7011) SHA1(6eaf3aea507007ea31d507ed7825d905f4b8e7ab) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1251,7 +1251,7 @@ ROM_END
      VIDEO BD 837-6906
 */
 ROM_START( toutrun2 )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-12410.133", 0x000000, 0x10000, CRC(aa74f3e9) SHA1(2daf6b17317542063c0a40beea5b45c797192591) )
 	ROM_LOAD16_BYTE( "epr-12409.118", 0x000001, 0x10000, CRC(c11c8ef7) SHA1(4c1c5100d7fd728642d58e4bf45fba48695841e3) )
 	ROM_LOAD16_BYTE( "epr-12412.132", 0x020000, 0x10000, CRC(b0534647) SHA1(40f2260ff0d0ac662d118cc7280bb26006ee75e9) )
@@ -1295,7 +1295,7 @@ ROM_START( toutrun2 )
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) /* Manual shows both as EPR-12298 */
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-12300.88", 0x00000, 0x10000, CRC(e8ff7011) SHA1(6eaf3aea507007ea31d507ed7825d905f4b8e7ab) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1318,7 +1318,7 @@ ROM_END
     Must set Turbo Switch dipswitch (DSW-B 4 to OFF) to Use Turbo Shifter
 */
 ROM_START( toutrun1 )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-12397.133", 0x000000, 0x10000, CRC(e4b57d7d) SHA1(62be55356c82b38ebebcc87a5458e23300019339) )
 	ROM_LOAD16_BYTE( "epr-12396.118", 0x000001, 0x10000, CRC(5e7115cb) SHA1(02c9ec91d9afb424e5045671ab0b5499181728c9) )
 	ROM_LOAD16_BYTE( "epr-12399.132", 0x020000, 0x10000, CRC(62c77b1b) SHA1(004803c68cb1b3e414296ffbf50dc3b33b9ffb9a) )
@@ -1362,7 +1362,7 @@ ROM_START( toutrun1 )
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) /* Manual shows both as EPR-12298 */
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-12300.88", 0x00000, 0x10000, CRC(e8ff7011) SHA1(6eaf3aea507007ea31d507ed7825d905f4b8e7ab) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1382,7 +1382,7 @@ ROM_END
      VIDEO BD 837-6906-02
 */
 ROM_START( toutrunu )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-12513.133", 0x000000, 0x10000, CRC(ae8835a5) SHA1(09573964d4f42ac0f08be3682b73e3420df27c6d) )
 	ROM_LOAD16_BYTE( "epr-12512.118", 0x000001, 0x10000, CRC(f90372ad) SHA1(b42dd8c580421b4d7ffacf8d3baa7b9fc9e392ef) )
 	ROM_LOAD16_BYTE( "epr-12515.132", 0x020000, 0x10000, CRC(1f047df4) SHA1(c1c67847f1390e671c19f0b90c3cbfbc237d960b) )
@@ -1419,7 +1419,7 @@ ROM_START( toutrunu )
 	ROM_LOAD( "epr-12299.47", 0x0000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) ) /* Manual shows both as EPR-12298 */
 	ROM_LOAD( "epr-12298.11", 0x8000, 0x8000, CRC(fc9bc41b) SHA1(9af73e096253cf2c4f283f227530110a4b37fcee) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-12300.88", 0x00000, 0x10000, CRC(e8ff7011) SHA1(6eaf3aea507007ea31d507ed7825d905f4b8e7ab) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1441,7 +1441,7 @@ ROM_END
      VIDEO BD SUPER HANG-ON 837-6279-01
 */
 ROM_START( shangon )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-10886.133", 0x000000, 0x10000, CRC(8be3cd36) SHA1(de96481807e782ca441d51e99f1a221bdee7d170) )
 	ROM_LOAD16_BYTE( "epr-10884.118", 0x000001, 0x10000, CRC(cb06150d) SHA1(840dada0cdeec444b554e6c1f2bdacc1047be567) )
 	ROM_LOAD16_BYTE( "epr-10887.132", 0x020000, 0x10000, CRC(8d248bb0) SHA1(7d8ed61609fd0df203255e7d046d9d30983f1dcd) )
@@ -1473,7 +1473,7 @@ ROM_START( shangon )
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	/* socket IC11 not populated */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-10649c.88", 0x0000, 0x08000, CRC(f6c1ce71) SHA1(12299f7e5378a56be3a31cce3b8b74e48744f33a) )
 
 	ROM_REGION( 0x40000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1494,7 +1494,7 @@ ROM_END
      VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, roms would be "OPR")
 */
 ROM_START( shangon3 )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code - protected */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code - protected */
 	ROM_LOAD16_BYTE( "epr-10789.133",  0x000000, 0x10000, CRC(6092c5ce) SHA1(dc010ab6d4dbbcb2f38de9f4f80674e9e1502dea) )
 	ROM_LOAD16_BYTE( "epr-10788.118",  0x000001, 0x10000, CRC(c3d8a1ea) SHA1(b7f5de5e9ab9e5fb59937c11acd960f8e4a9bc2f) )
 	ROM_LOAD16_BYTE( "epr-10637a.132", 0x020000, 0x10000, CRC(ad6c1308) SHA1(ee63168205bcb8b2c3dcbc3d7ba8a7f8f8a85952) )
@@ -1531,7 +1531,7 @@ ROM_START( shangon3 )
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	/* socket IC11 not populated */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-10649a.88", 0x0000, 0x08000, CRC(bf38330f) SHA1(3d825bb02ef5a9f5c4fcaa71b3735e7f8e47f178) )
 
 	ROM_REGION( 0x40000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1555,7 +1555,7 @@ ROM_END
      VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, roms would be "OPR")
 */
 ROM_START( shangon2 )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code - protected */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code - protected */
 	ROM_LOAD16_BYTE( "epr-10636a.133", 0x000000, 0x10000, CRC(74a64f4f) SHA1(3266a9a3c68e147bc8626de7ec45b59fd28f9d1d) )
 	ROM_LOAD16_BYTE( "epr-10634a.118", 0x000001, 0x10000, CRC(1608cb4a) SHA1(56b0a6a0a4951f15a269d94d18821809ac0d3d53) )
 	ROM_LOAD16_BYTE( "epr-10637a.132", 0x020000, 0x10000, CRC(ad6c1308) SHA1(ee63168205bcb8b2c3dcbc3d7ba8a7f8f8a85952) )
@@ -1592,7 +1592,7 @@ ROM_START( shangon2 )
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	/* socket IC11 not populated */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "ic88", 0x0000, 0x08000, CRC(1254efa6) SHA1(997770ccdd776de6e335a6d8b1e15d200cbd4410) ) /* EPR-10649 or EPR-10649B ??? */
 
 	ROM_REGION( 0x40000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1616,7 +1616,7 @@ ROM_END
      VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, roms would be "OPR")
 */
 ROM_START( shangon1 )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code - protected */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code - protected */
 	ROM_LOAD16_BYTE( "ic133", 0x000000, 0x10000, CRC(e52721fe) SHA1(21f0aa14d0cbda3d762bca86efe089646031aef5) ) /* All EPR numbers for this main CPU version are unknown */
 	ROM_LOAD16_BYTE( "ic118", 0x000001, 0x10000, BAD_DUMP CRC(5fee09f6) SHA1(b97a08ba75d8c617aceff2b03c1f2bfcb16181ef) )
 	ROM_LOAD16_BYTE( "ic132", 0x020000, 0x10000, CRC(5d55d65f) SHA1(d02d76b98d74746b078b0f49f0320b8be48e4c47) )
@@ -1653,7 +1653,7 @@ ROM_START( shangon1 )
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	/* socket IC11 not populated */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "ic88", 0x0000, 0x08000, CRC(1254efa6) SHA1(997770ccdd776de6e335a6d8b1e15d200cbd4410) ) /* EPR-10649 or EPR-10649B ??? */
 
 	ROM_REGION( 0x40000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1677,7 +1677,7 @@ ROM_END
      VIDEO BD SUPER HANG-ON 837-6279 (or 837-6279-02, rom would be "OPR")
 */
 ROM_START( shangnle )
-	ROM_REGION( 0x60000, "main", 0 ) /* 68000 code  */
+	ROM_REGION( 0x60000, "maincpu", 0 ) /* 68000 code  */
 	ROM_LOAD16_BYTE( "epr-13944.133", 0x000000, 0x10000, CRC(989a80db) SHA1(5026e5cf52d4fd85a0bab6c4ea7a34cf266b2a3b) )
 	ROM_LOAD16_BYTE( "epr-13943.118", 0x000001, 0x10000, CRC(426e3050) SHA1(f332ea76285b4e1361d818cbe5aab0640b4185c3) )
 	ROM_LOAD16_BYTE( "epr-10899.132", 0x020000, 0x10000, CRC(bb3faa37) SHA1(ccf3352255503fd6619e6e116d187a8cd1ff75e6) )
@@ -1714,7 +1714,7 @@ ROM_START( shangnle )
 	ROM_LOAD( "epr-10642.47", 0x0000, 0x8000, CRC(7836bcc3) SHA1(26f308bf96224311ddf685799d7aa29aac42dd2f) )
 	/* socket IC11 not populated */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-10649c.88", 0x0000, 0x08000, CRC(f6c1ce71) SHA1(12299f7e5378a56be3a31cce3b8b74e48744f33a) )
 
 	ROM_REGION( 0x40000, "pcm", ROMREGION_ERASEFF ) /* sound PCM data */
@@ -1757,8 +1757,8 @@ static DRIVER_INIT( outrunb )
 	custom_io_w = outrun_custom_io_w;
 
 	/* main CPU: swap bits 11,12 and 6,7 */
-	word = (UINT16 *)memory_region(machine, "main");
-	length = memory_region_length(machine, "main") / 2;
+	word = (UINT16 *)memory_region(machine, "maincpu");
+	length = memory_region_length(machine, "maincpu") / 2;
 	for (i = 0; i < length; i++)
 		word[i] = BITSWAP16(word[i], 15,14,11,12,13,10,9,8,6,7,5,4,3,2,1,0);
 
@@ -1780,8 +1780,8 @@ static DRIVER_INIT( outrunb )
 	}
 
 	/* Z80 code: swap bits 5,6 */
-	byte = memory_region(machine, "sound");
-	length = memory_region_length(machine, "sound");
+	byte = memory_region(machine, "soundcpu");
+	length = memory_region_length(machine, "soundcpu");
 	for (i = 0; i < length; i++)
 		byte[i] = BITSWAP8(byte[i], 7,5,6,4,3,2,1,0);
 }

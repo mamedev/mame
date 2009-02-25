@@ -276,12 +276,12 @@ static INTERRUPT_GEN( ripcord_interrupt )
 static MACHINE_DRIVER_START( circus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -311,12 +311,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( robotbwl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -345,12 +345,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( crash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -379,12 +379,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ripcord )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	//MDRV_CPU_VBLANK_INT("main", ripcord_interrupt) //AT
+	//MDRV_CPU_VBLANK_INT("screen", ripcord_interrupt) //AT
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -413,7 +413,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( circus )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9004.1a",    0x1000, 0x0200, CRC(7654ea75) SHA1(fa29417618157002b8ecb21f4c15104c8145a742) ) /* Code */
 	ROM_LOAD( "9005.2a",    0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
 	ROM_LOAD( "9006.3a",    0x1400, 0x0200, CRC(901dfff6) SHA1(c1f48845456e88d54981608afd00ddb92d97da99) )
@@ -435,7 +435,7 @@ ROM_START( circus )
 ROM_END
 
 ROM_START( circusse )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "93448.1a",    0x1000, 0x0200, CRC(44d65ccd) SHA1(0eb2515444486a4656a4accec555501e75b39a74) ) /* Code */
 	ROM_LOAD( "93448.2a",    0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
 	ROM_LOAD( "93448.3a",    0x1400, 0x0200, CRC(f2e25f7a) SHA1(6441e39fc7f710442dd6a3a047826862b0481c58) )
@@ -457,7 +457,7 @@ ROM_START( circusse )
 ROM_END
 
 ROM_START( robotbwl )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "robotbwl.1a",  0xf000, 0x0200, CRC(df387a0b) SHA1(97291f1a93cbbff987b0fbc16c2e87ad0db96e12) ) /* Code */
 	ROM_LOAD( "robotbwl.2a",  0xf200, 0x0200, CRC(c948274d) SHA1(1bf8c6e994d601d4e6d30ca2a9da97e140ff5eee) )
 	ROM_LOAD( "robotbwl.3a",  0xf400, 0x0200, CRC(8fdb3ec5) SHA1(a9290edccb8f75e7ec91416d46617516260d5944) )
@@ -478,7 +478,7 @@ ROM_START( robotbwl )
 ROM_END
 
 ROM_START( crash )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crash.a1",     0x1000, 0x0200, CRC(b9571203) SHA1(1299e476598d07a67aa1640f3320de1198280296) ) /* Code */
 	ROM_LOAD( "crash.a2",     0x1200, 0x0200, CRC(b4581a95) SHA1(b3662bda5013443a56eabbe21fefa91e255e18e7) )
 	ROM_LOAD( "crash.a3",     0x1400, 0x0200, CRC(597555ae) SHA1(39a6d10e229be0e0d52b1061f2aa2f678b351f0b) )
@@ -500,7 +500,7 @@ ROM_START( crash )
 ROM_END
 
 ROM_START( ripcord )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9027.1a",      0x1000, 0x0200, CRC(56b8dc06) SHA1(5432e4f2e321805a8dc9cfce20b8372793a9a4dd) ) /* Code */
 	ROM_LOAD( "9028.2a",      0x1200, 0x0200, CRC(a8a78a30) SHA1(e6ddcba608f9b34e07a5402872793dafe5054156) )
 	ROM_LOAD( "9029.4a",      0x1400, 0x0200, CRC(fc5c8e07) SHA1(4784a868491393f42520f6609266ffab21661ec3) )

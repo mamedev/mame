@@ -531,7 +531,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r)
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r)
 };
 
 static INTERRUPT_GEN( kingofb_interrupt ) {
@@ -543,19 +543,19 @@ static INTERRUPT_GEN( kingofb_interrupt ) {
 static MACHINE_DRIVER_START( kingofb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
-	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(video_readmem,video_writemem)
-	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sprite_readmem,sprite_writemem)
-	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
@@ -563,7 +563,7 @@ static MACHINE_DRIVER_START( kingofb )
 	MDRV_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -593,19 +593,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ringking )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(rk_main_readmem,rk_main_writemem)
-	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(rk_video_readmem,rk_video_writemem)
-	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
 	MDRV_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(rk_sprite_readmem,rk_sprite_writemem)
-	MDRV_CPU_VBLANK_INT("main", kingofb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)        /* 4.0 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(rk_sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( ringking )
 	MDRV_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -646,7 +646,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kingofb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d09_22.bin",   0x00000, 0x4000, CRC(6220bfa2) SHA1(cb329406ed07b71f9d2c40fc6c2c196daaa56fc8) )
 	ROM_LOAD( "e09_23.bin",   0x04000, 0x4000, CRC(5782fdd8) SHA1(6c8c1114ce7863f9e8331796e2c5fb4928904b55) )
 
@@ -656,7 +656,7 @@ ROM_START( kingofb )
 	ROM_REGION( 0x10000, "sprite", 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "j09_dcr.bin",  0x00000, 0x2000, CRC(379f4f84) SHA1(c8171e15fe243857b6ca8f32c1cc09f12fa4c07c) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "f05_18.bin",   0x00000, 0x4000, CRC(c057e28e) SHA1(714d8f14d55a070efcf205f8946269181bf2198b) )
 	ROM_LOAD( "h05_19.bin",   0x04000, 0x4000, CRC(060253dd) SHA1(9a24fc6aca64262e935971f96b3a103df9711f20) )
 	ROM_LOAD( "j05_20.bin",   0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )
@@ -692,7 +692,7 @@ ROM_END
 
 /* Ring King */
 ROM_START( ringking )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cx13.9f",      0x00000, 0x8000, CRC(93e38c02) SHA1(8f96f16f2904ef83101448fdf201b98b8e75e1d6) )
 	ROM_LOAD( "cx14.11f",     0x08000, 0x4000, CRC(a435acb0) SHA1(2c9d4e8471d87ce148f9c2180769350401914fc0) )
 
@@ -702,7 +702,7 @@ ROM_START( ringking )
 	ROM_REGION( 0x10000, "sprite", 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "cx00.4c",      0x00000, 0x2000, CRC(880b8aa7) SHA1(e5ee80cac85a62ae5a677115a74c08e433cd4fc9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cx12.4ef",     0x00000, 0x8000, CRC(1d5d6c6b) SHA1(ea771f3e25850319f2fecfc91400fc1b9df606ef) )
 	ROM_LOAD( "j05_20.bin",   0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )
 
@@ -729,7 +729,7 @@ ROM_START( ringking )
 ROM_END
 
 ROM_START( ringkin2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rkngm1.bin",   0x00000, 0x8000, CRC(086921ea) SHA1(c5a594be0738a80c5f912dc819332ff61aa6fc4b) )
 	ROM_LOAD( "rkngm2.bin",   0x08000, 0x4000, CRC(c0b636a4) SHA1(c3640a5597242e735673e1dbf8bf866e9122a20f) )
 
@@ -739,7 +739,7 @@ ROM_START( ringkin2 )
 	ROM_REGION( 0x10000, "sprite", 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "cx00.4c",      0x00000, 0x2000, CRC(880b8aa7) SHA1(e5ee80cac85a62ae5a677115a74c08e433cd4fc9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cx12.4ef",     0x00000, 0x8000, CRC(1d5d6c6b) SHA1(ea771f3e25850319f2fecfc91400fc1b9df606ef) )
 	ROM_LOAD( "j05_20.bin",   0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )
 
@@ -766,7 +766,7 @@ ROM_START( ringkin2 )
 ROM_END
 
 ROM_START( ringkin3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "14.9d",        0x00000, 0x4000, CRC(63627b8b) SHA1(eea736c8eec59fa561b9d1b5aa43df5410d8dde7) )
 	ROM_LOAD( "15.9e",        0x04000, 0x4000, CRC(e7557489) SHA1(49dce8f6ce26283fbdca17d75699de4d636a900a) )
 	ROM_LOAD( "16.9f",        0x08000, 0x4000, CRC(a3b3bb16) SHA1(4b4cb95a6bf4608ada1669208d9cabc3f856585a) )
@@ -777,7 +777,7 @@ ROM_START( ringkin3 )
 	ROM_REGION( 0x10000, "sprite", 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "j09_dcr.bin",  0x00000, 0x2000, CRC(379f4f84) SHA1(c8171e15fe243857b6ca8f32c1cc09f12fa4c07c) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "f05_18.bin",   0x00000, 0x4000, CRC(c057e28e) SHA1(714d8f14d55a070efcf205f8946269181bf2198b) )
 	ROM_LOAD( "h05_19.bin",   0x04000, 0x4000, CRC(060253dd) SHA1(9a24fc6aca64262e935971f96b3a103df9711f20) )
 	ROM_LOAD( "j05_20.bin",   0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )
@@ -808,7 +808,7 @@ ROM_START( ringkin3 )
 ROM_END
 
 ROM_START( ringkinw )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "15.9d",        0x00000, 0x4000, CRC(8263f517) SHA1(942012bfcc98dd2cd0437e015a164933c99d0f36) )
 	ROM_LOAD( "16.9e",        0x04000, 0x4000, CRC(daadd700) SHA1(2405e954a28d18ae8c30955d0ad7c25c9abb2bd3) )
 
@@ -818,7 +818,7 @@ ROM_START( ringkinw )
 	ROM_REGION( 0x10000, "sprite", 0 )     /* 64k for the sprite cpu */
 	ROM_LOAD( "17.xx",        0x00000, 0x2000, CRC(379f4f84) SHA1(c8171e15fe243857b6ca8f32c1cc09f12fa4c07c) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "18.4f",        0x00000, 0x4000, CRC(c057e28e) SHA1(714d8f14d55a070efcf205f8946269181bf2198b) )
 	ROM_LOAD( "19.4h",        0x04000, 0x4000, CRC(060253dd) SHA1(9a24fc6aca64262e935971f96b3a103df9711f20) )
 	ROM_LOAD( "20.4j",        0x08000, 0x4000, CRC(64c137a4) SHA1(e38adeb19e24357cc5581f0a3097c1d24914e25c) )

@@ -285,18 +285,18 @@ static INTERRUPT_GEN( pbaction_interrupt )
 static MACHINE_DRIVER_START( pbaction )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80, 3072000)
+	MDRV_CPU_ADD("audiocpu", Z80, 3072000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(pbaction_interrupt,2)	/* ??? */
 									/* IRQs are caused by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -331,12 +331,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pbaction )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b-p7.bin",     0x0000, 0x4000, CRC(8d6dcaae) SHA1(c9e605f9d291cb8c7163655ea96c605b7d30365f) )
 	ROM_LOAD( "b-n7.bin",     0x4000, 0x4000, CRC(d54d5402) SHA1(a4c3205bfe5fba8bb1ff3ad15941a77c35b44a27) )
 	ROM_LOAD( "b-l7.bin",     0x8000, 0x2000, CRC(e7412d68) SHA1(e75731d9bea80e0dc09798dd46e3b947fdb54aaa) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
 	ROM_LOAD( "a-e3.bin",     0x0000,  0x2000, CRC(0e53a91f) SHA1(df2827197cd55c3685e5ac8b26c20800623cb932) )
 
 	ROM_REGION( 0x06000, "fgchars", ROMREGION_DISPOSE )
@@ -358,12 +358,12 @@ ROM_END
 
 
 ROM_START( pbactio2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pba16.bin",     0x0000, 0x4000, CRC(4a239ebd) SHA1(74e6da0485ac78093b4f09953fa3accb14bc3e43) )
 	ROM_LOAD( "pba15.bin",     0x4000, 0x4000, CRC(3afef03a) SHA1(dec714415d2fd00c9021171a48f6c94b40888ae8) )
 	ROM_LOAD( "pba14.bin",     0x8000, 0x2000, CRC(c0a98c8a) SHA1(442f37af31db13fd98602dd7f9eeae5529da0f44) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )	/* 64k for a third Z80 (not emulated) */
@@ -387,12 +387,12 @@ ROM_START( pbactio2 )
 ROM_END
 
 ROM_START( pbactio3 )
-	ROM_REGION( 2*0x10000, "main", 0 )
+	ROM_REGION( 2*0x10000, "maincpu", 0 )
 	ROM_LOAD( "14.bin",     0x0000, 0x4000, CRC(f17a62eb) SHA1(8dabfc0ad127c154c0293a65df32d52d57dd9755) )
 	ROM_LOAD( "12.bin",     0x4000, 0x4000, CRC(ec3c64c6) SHA1(6130b80606d717f95e219316c2d3fa0a1980ea1d) )
 	ROM_LOAD( "13.bin",     0x8000, 0x4000, CRC(c93c851e) SHA1(b41077708fce4ccbcecdeae32af8821ca5322e87) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound board */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for sound board */
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
 	ROM_REGION( 0x06000, "fgchars", ROMREGION_DISPOSE )
@@ -425,7 +425,7 @@ static READ8_HANDLER( pbactio3_prot_kludge_r )
 static DRIVER_INIT( pbactio3 )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* first of all, do a simple bitswap */
 	for (i = 0;i < 0xc000;i++)
@@ -434,7 +434,7 @@ static DRIVER_INIT( pbactio3 )
 	}
 
 	/* then do the standard Sega decryption */
-	pbaction_decode(machine, "main");
+	pbaction_decode(machine, "maincpu");
 
 	/* install a protection (?) workaround */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );

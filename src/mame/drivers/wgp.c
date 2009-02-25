@@ -624,7 +624,7 @@ static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)	/* assumes Z80 sandwiched between the 68Ks */
 {
-	memory_set_bankptr(machine,  10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  10, memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -953,16 +953,16 @@ static MACHINE_START( wgp )
 static MACHINE_DRIVER_START( wgp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 16000000/4)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
-	MDRV_CPU_VBLANK_INT("main", wgp_cpub_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", wgp_cpub_interrupt)
 
 	MDRV_MACHINE_START(wgp)
 	MDRV_MACHINE_RESET(wgp)
@@ -970,7 +970,7 @@ static MACHINE_DRIVER_START( wgp )
 	MDRV_QUANTUM_TIME(HZ(30000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1009,7 +1009,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( wgp )
-	ROM_REGION( 0x100000, "main", 0 )	/* 256K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 256K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c32-25.12",      0x00000, 0x20000, CRC(0cc81e77) SHA1(435190bc24423e1e34134dff3cd4b79e120852d1) )
 	ROM_LOAD16_BYTE( "c32-29.13",      0x00001, 0x20000, CRC(fab47cf0) SHA1(c0129c0290b48f24c25e4dd7c6c937675e31842a) )
 	ROM_LOAD16_WORD_SWAP( "c32-10.9",  0x80000, 0x80000, CRC(a44c66e9) SHA1(b5fa978e43303003969033b8096fd68885cfc202) )	/* data rom */
@@ -1018,7 +1018,7 @@ ROM_START( wgp )
 	ROM_LOAD16_BYTE( "c32-28.64", 0x00000, 0x20000, CRC(38f3c7bf) SHA1(bfcaa036e5ff23f2bbf74d738498eda7d6ccd554) )
 	ROM_LOAD16_BYTE( "c32-27.63", 0x00001, 0x20000, CRC(be2397fb) SHA1(605a02d56ae6007b36299a2eceb7ca180cbf6df9) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "c32-24.34",   0x00000, 0x04000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
@@ -1062,7 +1062,7 @@ ROM_START( wgp )
 ROM_END
 
 ROM_START( wgpj )
-	ROM_REGION( 0x100000, "main", 0 )	/* 256K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 256K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c32-48.12",      0x00000, 0x20000, CRC(819cc134) SHA1(501bb1038979117586f6d8202ca6e1e44191f421) )
 	ROM_LOAD16_BYTE( "c32-49.13",      0x00001, 0x20000, CRC(4a515f02) SHA1(d0be52bbb5cc8151b23363092ac04e27b2d20a50) )
 	ROM_LOAD16_WORD_SWAP( "c32-10.9",  0x80000, 0x80000, CRC(a44c66e9) SHA1(b5fa978e43303003969033b8096fd68885cfc202) )	/* data rom */
@@ -1071,7 +1071,7 @@ ROM_START( wgpj )
 	ROM_LOAD16_BYTE( "c32-28.64", 0x00000, 0x20000, CRC(38f3c7bf) SHA1(bfcaa036e5ff23f2bbf74d738498eda7d6ccd554) )
 	ROM_LOAD16_BYTE( "c32-27.63", 0x00001, 0x20000, CRC(be2397fb) SHA1(605a02d56ae6007b36299a2eceb7ca180cbf6df9) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "c32-24.34",   0x00000, 0x04000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
@@ -1098,7 +1098,7 @@ ROM_START( wgpj )
 ROM_END
 
 ROM_START( wgpjoy )
-	ROM_REGION( 0x100000, "main", 0 )	/* 256K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 256K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c32-57.12",      0x00000, 0x20000, CRC(13a78911) SHA1(d3ace25dddce56cc35e93992f4fae01e87693d36) )
 	ROM_LOAD16_BYTE( "c32-58.13",      0x00001, 0x20000, CRC(326d367b) SHA1(cbfb15841f61fa856876d4321fbce190f89a5020) )
 	ROM_LOAD16_WORD_SWAP( "c32-10.9",  0x80000, 0x80000, CRC(a44c66e9) SHA1(b5fa978e43303003969033b8096fd68885cfc202) )	/* data rom */
@@ -1107,7 +1107,7 @@ ROM_START( wgpjoy )
 	ROM_LOAD16_BYTE( "c32-60.64", 0x00000, 0x20000, CRC(7a980312) SHA1(c85beff4c8201061b99d87f8db67e2b85dff00e3) )
 	ROM_LOAD16_BYTE( "c32-59.63", 0x00001, 0x20000, CRC(ed75b333) SHA1(fa47ea38f7ba1cb3463065357db9a9b0f0eeab77) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "c32-61.34",   0x00000, 0x04000, CRC(2fcad5a3) SHA1(f0f658490655b521af631af763c07e37834dc5a0) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
@@ -1134,7 +1134,7 @@ ROM_START( wgpjoy )
 ROM_END
 
 ROM_START( wgpjoya )	/* Older joystick version ??? */
-	ROM_REGION( 0x100000, "main", 0 )	/* 256K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 256K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c32-57.12",      0x00000, 0x20000, CRC(13a78911) SHA1(d3ace25dddce56cc35e93992f4fae01e87693d36) )
 	ROM_LOAD16_BYTE( "c32-58.13",      0x00001, 0x20000, CRC(326d367b) SHA1(cbfb15841f61fa856876d4321fbce190f89a5020) )
 	ROM_LOAD16_WORD_SWAP( "c32-10.9",  0x80000, 0x80000, CRC(a44c66e9) SHA1(b5fa978e43303003969033b8096fd68885cfc202) )	/* data rom */
@@ -1143,7 +1143,7 @@ ROM_START( wgpjoya )	/* Older joystick version ??? */
 	ROM_LOAD16_BYTE( "c32-46.64", 0x00000, 0x20000, CRC(64191891) SHA1(91d1d51478f1c2785470de0ac2a048e367f7ea48) )	// older rev?
 	ROM_LOAD16_BYTE( "c32-45.63", 0x00001, 0x20000, CRC(759b39d5) SHA1(ed4ccd295c5595bdcac965b59293efb3c21ce48a) )	// older rev?
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "c32-61.34",   0x00000, 0x04000, CRC(2fcad5a3) SHA1(f0f658490655b521af631af763c07e37834dc5a0) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
@@ -1170,7 +1170,7 @@ ROM_START( wgpjoya )	/* Older joystick version ??? */
 ROM_END
 
 ROM_START( wgp2 )
-	ROM_REGION( 0x100000, "main", 0 )	/* 256K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 256K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "c73-01.12",      0x00000, 0x20000, CRC(c6434834) SHA1(75b2937a9bf18d268fa7bbfb3e822fba510ec2f1) )
 	ROM_LOAD16_BYTE( "c73-02.13",      0x00001, 0x20000, CRC(c67f1ed1) SHA1(c30dc3fd46f103a75aa71f87c1fd6c0e7fed9214) )
 	ROM_LOAD16_WORD_SWAP( "c32-10.9",  0x80000, 0x80000, CRC(a44c66e9) SHA1(b5fa978e43303003969033b8096fd68885cfc202) )	/* data rom */
@@ -1179,7 +1179,7 @@ ROM_START( wgp2 )
 	ROM_LOAD16_BYTE( "c73-04.64", 0x00000, 0x20000, CRC(383aa776) SHA1(bad18f0506e99a07d53e50abe7a548ff3d745e09) )
 	ROM_LOAD16_BYTE( "c73-03.63", 0x00001, 0x20000, CRC(eb5067ef) SHA1(08d9d921c7a74877d7bb7641ae30c82d4d0653e3) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "c73-05.34",   0x00000, 0x04000, CRC(7e00a299) SHA1(93696a229f17a15a92a8d9ef3b34d340de5dec44) )
 	ROM_CONTINUE(            0x10000, 0x0c000 )	/* banked stuff */
 
@@ -1214,7 +1214,7 @@ static DRIVER_INIT( wgp )
 #if 0
 	/* Patch for coding error that causes corrupt data in
        sprite tilemapping area from $4083c0-847f */
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
 	ROM[0x25dc / 2] = 0x0602;	// faulty value is 0x0206
 #endif
 

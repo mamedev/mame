@@ -262,18 +262,18 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( deniam16b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,25000000/2)	/* ??? */
+	MDRV_CPU_ADD("maincpu", M68000,25000000/2)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(deniam16b_readmem,deniam16b_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,25000000/4)	/* (makes logicpro music tempo correct) */
+	MDRV_CPU_ADD("audiocpu", Z80,25000000/4)	/* (makes logicpro music tempo correct) */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_MACHINE_RESET(deniam)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -301,14 +301,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( deniam16c )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,25000000/2)	/* ??? */
+	MDRV_CPU_ADD("maincpu", M68000,25000000/2)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(deniam16c_readmem,deniam16c_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_RESET(deniam)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -342,11 +342,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( logicpro )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "logicpro.r4", 0x00000, 0x40000, CRC(c506d484) SHA1(5d662b109e1d2e09556bc4ecbc11bbf5ccb639d3) )
 	ROM_LOAD16_BYTE( "logicpro.r3", 0x00001, 0x40000, CRC(d5a4cf62) SHA1(138ea4f1629e453c1a00410eda7086d3633240e3) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "logicpro.r2", 0x0000, 0x10000, CRC(000d624b) SHA1(c0da218ee81d01b3dcef2159bbaaff5d3ddb7619) )
 
 	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )	/* chars */
@@ -363,11 +363,11 @@ ROM_START( logicpro )
 ROM_END
 
 ROM_START( croquis )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "r4.bin", 0x00000, 0x40000, CRC(03c9055e) SHA1(b1fa8e7a272887decca30eefe73ac782f296f0dd) )
 	ROM_LOAD16_BYTE( "r3.bin", 0x00001, 0x40000, CRC(a98ae4f6) SHA1(80fcedb4ee0f35eb2d0b4a248c15f872af2e08f2) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "logicpro.r2", 0x0000, 0x10000, CRC(000d624b) SHA1(c0da218ee81d01b3dcef2159bbaaff5d3ddb7619) )
 
 	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )	/* chars */
@@ -384,11 +384,11 @@ ROM_START( croquis )
 ROM_END
 
 ROM_START( karianx )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "even",        0x00000, 0x80000, CRC(fd0ce238) SHA1(4b727366c942c62187d8700666b42a85c059c060) )
 	ROM_LOAD16_BYTE( "odd",         0x00001, 0x80000, CRC(be173cdc) SHA1(13230b6129fd1910257624a69a3a4b74696e982e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
 	ROM_LOAD( "snd",         0x0000, 0x10000, CRC(fedd3375) SHA1(09fb2d5fc91704120f757acf9fa00d149f891a28) )
 
 	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE )	/* chars */
@@ -409,7 +409,7 @@ ROM_START( karianx )
 ROM_END
 
 ROM_START( logicpr2 )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lp2-2",       0x00000, 0x80000, CRC(cc1880bf) SHA1(5ea542b63947a570aaf924f7ab739e060e359af8) )
 	ROM_LOAD16_BYTE( "lp2-1",       0x00001, 0x80000, CRC(46d5e954) SHA1(7bf5ae19caeecd2123754698276bbc78d68984d9) )
 

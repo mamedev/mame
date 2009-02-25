@@ -240,22 +240,22 @@ static INTERRUPT_GEN( flower_cpu0_interrupt )
 static MACHINE_DRIVER_START( flower )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,8000000)
+	MDRV_CPU_ADD("maincpu", Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_cpu1_2,0)
 //  MDRV_CPU_VBLANK_INT_HACK(flower_cpu0_interrupt,10)
-  MDRV_CPU_VBLANK_INT("main", flower_cpu0_interrupt) //nmis stuff up the writes to shared ram
+  MDRV_CPU_VBLANK_INT("screen", flower_cpu0_interrupt) //nmis stuff up the writes to shared ram
 
 	MDRV_CPU_ADD("sub", Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_cpu1_2,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80,8000000)
+	MDRV_CPU_ADD("audiocpu", Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(flower_sound_cpu,0)
 	MDRV_CPU_PERIODIC_INT(sn_irq, 90)	/* periodic interrupt, don't know about the frequency */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -279,13 +279,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START( flower ) /* Komax version */
-	ROM_REGION( 0x10000, "main", 0 ) /* main cpu */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main cpu */
 	ROM_LOAD( "1.5j",   0x0000, 0x8000, CRC(a4c3af78) SHA1(d149b0e0d82318273dd9cc5a143b175cdc818d0d) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sub cpu */
 	ROM_LOAD( "2.5f",   0x0000, 0x8000, CRC(7c7ee2d8) SHA1(1e67bfe0f3585be5a6e6719ccf9db764bafbcb01) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
 	ROM_LOAD( "3.d9",   0x0000, 0x4000, CRC(8866c2b0) SHA1(d00f31994673e8087a1406f98e8832d07cedeb66) ) // 1xxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT | ROMREGION_DISPOSE ) /* tx layer */
@@ -322,13 +322,13 @@ ROM_START( flower ) /* Komax version */
 ROM_END
 
 ROM_START( flowers ) /* Sega/Alpha version.  Sega game number 834-5998 */
-	ROM_REGION( 0x10000, "main", 0 ) /* main cpu */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main cpu */
 	ROM_LOAD( "1",   0x0000, 0x8000, CRC(63a2ef04) SHA1(0770f5a18d58b780abcda7e000c2a5e46f96d319) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* sub cpu */
 	ROM_LOAD( "2.5f",   0x0000, 0x8000, CRC(7c7ee2d8) SHA1(1e67bfe0f3585be5a6e6719ccf9db764bafbcb01) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
 	ROM_LOAD( "3.d9",   0x0000, 0x4000, CRC(8866c2b0) SHA1(d00f31994673e8087a1406f98e8832d07cedeb66) ) // 1xxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT | ROMREGION_DISPOSE ) /* tx layer */

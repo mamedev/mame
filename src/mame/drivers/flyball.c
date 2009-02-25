@@ -69,7 +69,7 @@ static MACHINE_RESET( flyball )
 
 	/* address bits 0 through 8 are inverted */
 
-	UINT8* ROM = memory_region(machine, "main") + 0x2000;
+	UINT8* ROM = memory_region(machine, "maincpu") + 0x2000;
 
 	for (i = 0; i < 0x1000; i++)
 		rombase[i] = ROM[i ^ 0x1ff];
@@ -257,14 +257,14 @@ static PALETTE_INIT( flyball )
 static MACHINE_DRIVER_START( flyball )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK/16)
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
 	MDRV_CPU_PROGRAM_MAP(flyball_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(flyball)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 262)
@@ -282,7 +282,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( flyball )
-	ROM_REGION( 0x3000, "main", 0 )                  /* program */
+	ROM_REGION( 0x3000, "maincpu", 0 )                  /* program */
 	ROM_LOAD( "6129.d5", 0x2000, 0x0200, CRC(17eda069) SHA1(e4ef0bf4546cf00668d759a188e0989a4f003825) )
 	ROM_LOAD( "6130.f5", 0x2200, 0x0200, CRC(a756955b) SHA1(220b7f1789bba4481d595b36b4bae25f98d3ad8d) )
 	ROM_LOAD( "6131.h5", 0x2400, 0x0200, CRC(a9c7e858) SHA1(aee4a359d6a5729dc1be5b8ce8fbe54d032d12b0) )

@@ -121,13 +121,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( cheekyms )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,5000000/2)  /* 2.5 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,5000000/2)  /* 2.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -158,7 +158,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( cheekyms )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cm03.c5",       0x0000, 0x0800, CRC(1ad0cb40) SHA1(2a751395ac19a3218c22cfd3597f9a17b8e31527) )
 	ROM_LOAD( "cm04.c6",       0x0800, 0x0800, CRC(2238f607) SHA1(35df9eb49f6e3c6351fae220d773442cf8536f90) )
 	ROM_LOAD( "cm05.c7",       0x1000, 0x0800, CRC(4169eba8) SHA1(52a059f29c724d087483c7cd733f75d7b8a5b103) )

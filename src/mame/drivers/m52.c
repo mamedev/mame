@@ -383,16 +383,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( m52 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_GFXDECODE(m52)
 	MDRV_PALETTE_LENGTH(128*4+16*4+3*4)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 136, 376, 282, 22, 274)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
@@ -409,7 +409,7 @@ static MACHINE_DRIVER_START( alpha1v )
 	MDRV_IMPORT_FROM(m52)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(alpha1v_map,0)
 MACHINE_DRIVER_END
 
@@ -422,7 +422,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( mpatrol )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mpa-1.3m",      0x0000, 0x1000, CRC(5873a860) SHA1(8c03726d6e049c3edbc277440184e31679f78258) )
 	ROM_LOAD( "mpa-2.3l",      0x1000, 0x1000, CRC(f4b85974) SHA1(dfb2efb57378a20af6f20569f4360cde95596f93) )
 	ROM_LOAD( "mpa-3.3k",      0x2000, 0x1000, CRC(2e1a598c) SHA1(112c3c9678db8a8540a8df3708020c87fd10c91b) )
@@ -456,7 +456,7 @@ ROM_START( mpatrol )
 ROM_END
 
 ROM_START( mpatrolw )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mpa-1w.3m",    0x0000, 0x1000, CRC(baa1a1d4) SHA1(7968a7f221e7f4c9c81ddc8de17f6568e17b9ea8) )
 	ROM_LOAD( "mpa-2w.3l",    0x1000, 0x1000, CRC(52459e51) SHA1(ae685b7848baa1b87a3f2bce97356286171e16d4) )
 	ROM_LOAD( "mpa-3w.3k",    0x2000, 0x1000, CRC(9b249fe5) SHA1(c01e0d572c4c163f3cf4b2aa9f4246427811b78d) )
@@ -491,7 +491,7 @@ ROM_END
 
 
 ROM_START( alpha1v )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2-m3",      0x0000, 0x1000, CRC(3a679d34) SHA1(1a54a43070c56dc91d4d258f29e29613bb309f1c) )
 	ROM_LOAD( "3-l3",      0x1000, 0x1000, CRC(2f09df64) SHA1(e91602e9e41ad24dd1d7f384ed81b9bdaadd03e1) )
 	ROM_LOAD( "4-k3",      0x2000, 0x1000, CRC(64fb9c8a) SHA1(735fd00cc42193a417e6cde75f12b4cf2e804942) )

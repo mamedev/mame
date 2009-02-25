@@ -54,7 +54,7 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 
 static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "sound");
+	UINT8 *RAM = memory_region(space->machine, "soundcpu");
 	int bankaddr;
 
 	sound_set_output_gain(devtag_get_device(space->machine, SOUND, "msm1"), 0, (data & 0x08) ? 0.0 : 1.0);
@@ -661,15 +661,15 @@ static const msm5205_interface msm5205_interface2 =
 static MACHINE_DRIVER_START( fcrash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(fcrash_map,0)
-	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, 24000000/6) /* ? */
+	MDRV_CPU_ADD("soundcpu", Z80, 24000000/6) /* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -710,15 +710,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kodb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(kodb_map,0)
-	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
 
-//  MDRV_CPU_ADD("audio", Z80, 3579545)
+//  MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 //  MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -748,7 +748,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( fcrash )
-	ROM_REGION( 0x200000, "main", 0 )      /* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "9.bin",  0x00000, 0x20000, CRC(c6854c91) SHA1(29f01cc65be5eaa3f86e99eebdd284104623abb0) )
 	ROM_LOAD16_BYTE( "5.bin",  0x00001, 0x20000, CRC(77f7c2b3) SHA1(feea48d9555824a2e5bf5e99ce159edc015f0792) )
 	ROM_LOAD16_BYTE( "8.bin",  0x40000, 0x20000, CRC(1895b3df) SHA1(415a26050c50ed79a7ee5ddd1b8d61593b1ce876) )
@@ -758,7 +758,7 @@ ROM_START( fcrash )
 	ROM_LOAD16_BYTE( "6.bin",  0xc0000, 0x20000, CRC(d4bf37f6) SHA1(f47e1cc9aa3b3019ee57f59715e3a611acf9fe3e) )
 	ROM_LOAD16_BYTE( "2.bin",  0xc0001, 0x20000, CRC(07ac8f43) SHA1(7a41b003c76adaabd3f94929cc163461b70e0ed9) )
 
-	ROM_REGION( 0x30000, "sound", 0 ) /* Audio CPU + Sample Data */
+	ROM_REGION( 0x30000, "soundcpu", 0 ) /* Audio CPU + Sample Data */
 	ROM_LOAD( "1.bin",   0x00000, 0x20000, CRC(5b276c14) SHA1(73e53c077d4e3c1b919eee28b29e34176ee204f8) )
 	ROM_RELOAD(          0x10000, 0x20000 )
 
@@ -819,11 +819,11 @@ Note
 */
 
 ROM_START( kodb )
-	ROM_REGION( 0x400000, "main", 0 )      /* 68000 code */
+	ROM_REGION( 0x400000, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "3.ic172",    0x00000, 0x080000, CRC(036dd74c) SHA1(489344e56863429e86b4c362b82d89819c1d6afb) )
 	ROM_LOAD16_BYTE( "4.ic171",    0x00001, 0x080000, CRC(3e4b7295) SHA1(3245640bae7d141238051dfe5c7683d05c6d3848) )
 
-	ROM_REGION( 0x18000, "sound", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x18000, "soundcpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "1.ic28",        0x00000, 0x08000, CRC(01cae60c) SHA1(b2cdd883fd859f0b701230831aca1f1a74ad6087) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 

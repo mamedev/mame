@@ -646,14 +646,14 @@ static ADDRESS_MAP_START( qs1000_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( common )
-	MDRV_CPU_ADD("main", E116T, 50000000)	/* 50 MHz */
+	MDRV_CPU_ADD("maincpu", E116T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46_vamphalf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -680,7 +680,7 @@ static MACHINE_DRIVER_START( sound_ym_oki )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sound_qs1000 )
-	MDRV_CPU_ADD("audio", I8052, 24000000/4)	/* 6 MHz? */
+	MDRV_CPU_ADD("audiocpu", I8052, 24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(qs1000_prg_map, 0)
 	MDRV_CPU_IO_MAP( qs1000_io_map, 0 )
 
@@ -688,7 +688,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vamphalf )
 	MDRV_IMPORT_FROM(common)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(vamphalf_io,0)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
@@ -696,7 +696,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( misncrft )
 	MDRV_IMPORT_FROM(common)
-	MDRV_CPU_REPLACE("main", GMS30C2116, 50000000)	/* 50 MHz */
+	MDRV_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
 	MDRV_CPU_IO_MAP(misncrft_io,0)
 
 	MDRV_IMPORT_FROM(sound_qs1000)
@@ -704,7 +704,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coolmini )
 	MDRV_IMPORT_FROM(common)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(coolmini_io,0)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
@@ -712,7 +712,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( suplup )
 	MDRV_IMPORT_FROM(common)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(suplup_io,0)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
@@ -720,7 +720,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wyvernwg )
 	MDRV_IMPORT_FROM(common)
-	MDRV_CPU_REPLACE("main", E132T, 50000000)	/* 50 MHz */
+	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_32bit_map,0)
 	MDRV_CPU_IO_MAP(wyvernwg_io,0)
 
@@ -729,7 +729,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( finalgdr )
 	MDRV_IMPORT_FROM(common)
-	MDRV_CPU_REPLACE("main", E132T, 50000000)	/* 50 MHz */
+	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_32bit_map,0)
 	MDRV_CPU_IO_MAP(finalgdr_io,0)
 
@@ -740,15 +740,15 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( aoh )
-	MDRV_CPU_ADD("main", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(aoh_map,0)
 	MDRV_CPU_IO_MAP(aoh_io,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.185)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -906,7 +906,7 @@ ROM_START( misncrft )
 	/* 0 - 0x80000 empty */
 	ROM_LOAD( "prg-rom2.bin", 0x80000, 0x80000, CRC(059ae8c1) SHA1(2c72fcf560166cb17cd8ad665beae302832d551c) )
 
-	ROM_REGION( 0x400000, "audio", 0 )	/* i8052 code */
+	ROM_REGION( 0x400000, "audiocpu", 0 )	/* i8052 code */
 	ROM_LOAD( "snd-rom2.us1", 0x00000, 0x20000, CRC(8821e5b9) SHA1(4b8df97bc61b48aa16ed411614fcd7ed939cac33) )
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
@@ -1146,7 +1146,7 @@ ROM_START( wyvernwg )
 	ROM_LOAD( "rom1.bin", 0x000000, 0x080000, CRC(66bf3a5c) SHA1(037d5e7a6ef6f5b4ac08a9c811498c668a9d2522) )
 	ROM_LOAD( "rom2.bin", 0x080000, 0x080000, CRC(fd9b5911) SHA1(a01e8c6e5a9009024af385268ba3ba90e1ebec50) )
 
-	ROM_REGION( 0x020000, "audio", 0 ) /* QDSP ('51) Code */
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* QDSP ('51) Code */
 	ROM_LOAD( "u7", 0x0000, 0x20000, CRC(00a3f705) SHA1(f0a6bafd16bea53d4c05c8cc108983cbd41e5757) )
 
 	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )  /* gfx data */

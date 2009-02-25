@@ -68,7 +68,7 @@ static TIMER_DEVICE_CALLBACK( rst1_tick )
 	int state = inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
-	cputag_set_input_line_and_vector(timer->machine, "main", INPUT_LINE_IRQ0, state, 0xcf);
+	cputag_set_input_line_and_vector(timer->machine, "maincpu", INPUT_LINE_IRQ0, state, 0xcf);
 }
 
 static TIMER_DEVICE_CALLBACK( rst2_tick )
@@ -76,7 +76,7 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 	int state = inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
-	cputag_set_input_line_and_vector(timer->machine, "main", INPUT_LINE_IRQ0, state, 0xd7);
+	cputag_set_input_line_and_vector(timer->machine, "maincpu", INPUT_LINE_IRQ0, state, 0xd7);
 }
 
 static void n8080_inte_callback(const device_config *device, int state)
@@ -104,13 +104,13 @@ static const i8085_config n8080_cpu_config =
 static MACHINE_DRIVER_START( spacefev )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
+	MDRV_CPU_ADD("maincpu", 8080, 20160000 / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
@@ -121,8 +121,8 @@ static MACHINE_DRIVER_START( spacefev )
 	MDRV_VIDEO_START(spacefev)
 	MDRV_VIDEO_UPDATE(spacefev)
 
-	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "main", 128, 256)
-	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "main", 240, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( spacefev_sound )
@@ -132,13 +132,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sheriff )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
+	MDRV_CPU_ADD("maincpu", 8080, 20160000 / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
@@ -149,8 +149,8 @@ static MACHINE_DRIVER_START( sheriff )
 	MDRV_VIDEO_START(sheriff)
 	MDRV_VIDEO_UPDATE(sheriff)
 
-	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "main", 128, 256)
-	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "main", 240, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( sheriff_sound )
@@ -160,13 +160,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( helifire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 20160000 / 10)
+	MDRV_CPU_ADD("maincpu", 8080, 20160000 / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
@@ -178,8 +178,8 @@ static MACHINE_DRIVER_START( helifire )
 	MDRV_VIDEO_UPDATE(helifire)
 	MDRV_VIDEO_EOF(helifire)
 
-	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "main", 128, 256)
-	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "main", 240, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst1", rst1_tick, "screen", 128, 256)
+	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM( helifire_sound )
@@ -626,7 +626,7 @@ Notes:
 */
 
 ROM_START( spacefev )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sf.f1",    0x0000, 0x0400, CRC(35f295bd) SHA1(34d1df25fcdea598ca1191cecc2125e6f63dbce3) )
 	ROM_LOAD( "sf.f2",    0x0400, 0x0400, CRC(0c633f4c) SHA1(a551ddbf21670fb1f000404b92da87a97f7ba157) )
 	ROM_LOAD( "sf.g1",    0x0800, 0x0400, CRC(f3d851cb) SHA1(535c52a56e54a064aa3d1c48a129f714234a1007) )
@@ -635,7 +635,7 @@ ROM_START( spacefev )
 	ROM_LOAD( "sf.h2",    0x1400, 0x0400, CRC(a163e800) SHA1(e8817f3e17f099a0dc66213d2d3d3fdeb117b10e) )
 	ROM_LOAD( "sf.i1",    0x1800, 0x0400, CRC(00027be2) SHA1(551a779a2e5a6455b7a348d246731c094e0ec709) )
 
-	ROM_REGION( 0x0400, "audio", 0 )
+	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "sf.snd",   0x0000, 0x0400, CRC(95c2c1ee) SHA1(42a3a382fc7d2782052372d71f6d0e8a153e74d0) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -643,7 +643,7 @@ ROM_START( spacefev )
 ROM_END
 
 ROM_START( spacefva )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sf-a.f1",  0x0000, 0x0400, CRC(7fa305e8) SHA1(cda9fc9c76f57800de25ddf65f69fef19fd28481) )
 	ROM_LOAD( "sf-a.f2",  0x0400, 0x0400, CRC(7c1429aa) SHA1(8d8e0a4fc09fb1ecbfb86c67c20000ef30ab3fac) )
 	ROM_LOAD( "sf-a.g1",  0x0800, 0x0400, CRC(75f6efc1) SHA1(286bc75e35e8ad6277e9db7377e90731b9c2ec97) )
@@ -652,7 +652,7 @@ ROM_START( spacefva )
 	ROM_LOAD( "sf-a.h2",  0x1400, 0x0400, CRC(bddbc94f) SHA1(f90cbc3cd0f695cbb9ae03b608f4bf5a4a000c64) )
 	ROM_LOAD( "sf-a.i1",  0x1800, 0x0400, CRC(437786c5) SHA1(2ccdb0d48dbbfe47ae82e970ca37970602405cf6) )
 
-	ROM_REGION( 0x0400, "audio", 0 )
+	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "sf.snd",   0x0000, 0x0400, CRC(95c2c1ee) SHA1(42a3a382fc7d2782052372d71f6d0e8a153e74d0) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -660,7 +660,7 @@ ROM_START( spacefva )
 ROM_END
 
 ROM_START( highsplt )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "hs.f1",    0x0000, 0x0400, CRC(b8887351) SHA1(ccd49937f1cbd7a157b3715474ccc3e8fdcea2b2) )
 	ROM_LOAD( "hs.f2",    0x0400, 0x0400, CRC(cda933a7) SHA1(a0447c8c98e24674081c9bf4b1ef07dc186c6e2b) )
 	ROM_LOAD( "hs.g1",    0x0800, 0x0400, CRC(de17578a) SHA1(d9d5dbf38331f212d2a566c60756a788e169104d) )
@@ -670,7 +670,7 @@ ROM_START( highsplt )
 	ROM_LOAD( "hs.i1",    0x1800, 0x0400, CRC(41e18df9) SHA1(2212c836313775e7c507a875672c0b3635825e02) )
 	ROM_LOAD( "hs.i2",    0x1c00, 0x0400, CRC(eff9f82d) SHA1(5004e52dfa652ceefca9ed4210c0fa8f0591dc08) )
 
-	ROM_REGION( 0x0400, "audio", 0 )
+	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "hs.snd",   0x0000, 0x0400, CRC(939e01d4) SHA1(7c9ccd24e5da03831cd0aa821da17e3b81cd8381) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -678,7 +678,7 @@ ROM_START( highsplt )
 ROM_END
 
 ROM_START( highspla )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hs.f1",    0x0000, 0x0400, CRC(b8887351) SHA1(ccd49937f1cbd7a157b3715474ccc3e8fdcea2b2) )
 	ROM_LOAD( "hs.f2",    0x0400, 0x0400, CRC(cda933a7) SHA1(a0447c8c98e24674081c9bf4b1ef07dc186c6e2b) )
 	ROM_LOAD( "hs.g1",    0x0800, 0x0400, CRC(de17578a) SHA1(d9d5dbf38331f212d2a566c60756a788e169104d) )
@@ -688,7 +688,7 @@ ROM_START( highspla )
 	ROM_LOAD( "hs-a.i1",  0x1800, 0x0400, CRC(aa36b25d) SHA1(28f555aab27b206a8c6f550b6caa938cece6e204) )
 	ROM_LOAD( "hs.i2",    0x1c00, 0x0400, CRC(eff9f82d) SHA1(5004e52dfa652ceefca9ed4210c0fa8f0591dc08) )
 
-	ROM_REGION( 0x0400, "audio", 0 )
+	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "hs.snd",   0x0000, 0x0400, CRC(939e01d4) SHA1(7c9ccd24e5da03831cd0aa821da17e3b81cd8381) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -696,7 +696,7 @@ ROM_START( highspla )
 ROM_END
 
 ROM_START( spacelnc )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sl.f1",    0x0000, 0x0400, CRC(6ad59e40) SHA1(d416f7e6f5f55178df5c390548cd299650853022) )
 	ROM_LOAD( "sl.f2",    0x0400, 0x0400, CRC(2de568e2) SHA1(f13740d3d9bf7434b7760e9286ef6e2ede40845f) )
 	ROM_LOAD( "sl.g1",    0x0800, 0x0400, CRC(06d0ab36) SHA1(bf063100b065dbf511d6f32da169fb461568d15d) )
@@ -706,7 +706,7 @@ ROM_START( spacelnc )
 	ROM_LOAD( "sl.i1",    0x1800, 0x0400, CRC(d30007a3) SHA1(9e5905df8f7822385daef159a07f0e8257cb862a) )
 	ROM_LOAD( "sl.i2",    0x1c00, 0x0400, CRC(640ffd2f) SHA1(65c21396c39dc99ec263f66f400a8e4c7712b20a) )
 
-	ROM_REGION( 0x0400, "audio", 0 )
+	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "sl.snd",   0x0000, 0x0400, CRC(8e1ff929) SHA1(5c7da97b05fb8fff242158978199f5d35b234426) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -714,7 +714,7 @@ ROM_START( spacelnc )
 ROM_END
 
 ROM_START( sheriff )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sh.f1",    0x0000, 0x0400, CRC(e79df6e8) SHA1(908176de9bfc3d48e2da9af6ba7ebdee698ec2de) )
 	ROM_LOAD( "sh.f2",    0x0400, 0x0400, CRC(da67721a) SHA1(ee6a5fb98da1d1fcfad0ef27af300473a637f578) )
 	ROM_LOAD( "sh.g1",    0x0800, 0x0400, CRC(3fb7888e) SHA1(2c2d6b27d577d5ccf759e451e53c2e3314af40f6) )
@@ -725,7 +725,7 @@ ROM_START( sheriff )
 	ROM_LOAD( "sh.i2",    0x1c00, 0x0400, CRC(5c5f3f86) SHA1(25c64ccb7d0e136f67d6e1da7927ae6d89e0ceb9) )
 	ROM_LOAD( "sh.j1",    0x2000, 0x0400, CRC(0aa8b79a) SHA1(aed139e8c8ba912823c57fe4cc7231b2d638f479) )
 
-	ROM_REGION( 0x0400, "audio", 0 )
+	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "sh.snd",   0x0000, 0x0400, CRC(75731745) SHA1(538a63c9c60f1886fca4caf3eb1e0bada2d3f162) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
@@ -733,7 +733,7 @@ ROM_START( sheriff )
 ROM_END
 
 ROM_START( bandido )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sh-a.f1",  0x0000, 0x0400, CRC(aec94829) SHA1(aa6d241670ea061bac4a71dff82dfa832095eae6) )
 	ROM_LOAD( "sh.f2",    0x0400, 0x0400, CRC(da67721a) SHA1(ee6a5fb98da1d1fcfad0ef27af300473a637f578) )
 	ROM_LOAD( "sh.g1",    0x0800, 0x0400, CRC(3fb7888e) SHA1(2c2d6b27d577d5ccf759e451e53c2e3314af40f6) )
@@ -745,7 +745,7 @@ ROM_START( bandido )
 	ROM_LOAD( "sh.j1",    0x2000, 0x0400, CRC(0aa8b79a) SHA1(aed139e8c8ba912823c57fe4cc7231b2d638f479) )
 	ROM_LOAD( "sh-a.j2",  0x2400, 0x0400, CRC(a10b848a) SHA1(c045f1f6a11cbf49a1bae06c701b659d587292a3) )
 
-	ROM_REGION( 0x0400, "audio", 0 )
+	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "sh.snd",   0x0000, 0x0400, CRC(75731745) SHA1(538a63c9c60f1886fca4caf3eb1e0bada2d3f162) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
@@ -753,7 +753,7 @@ ROM_START( bandido )
 ROM_END
 
 ROM_START( helifire )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "hf.f1",    0x0000, 0x0400, CRC(032f89ca) SHA1(63b0310875ed78a6385e44eea781ddcc4a63557c) )
 	ROM_LOAD( "hf.f2",    0x0400, 0x0400, CRC(2774e70f) SHA1(98d845e80db61799493dbebe8db801567277432c) )
 	ROM_LOAD( "hf.g1",    0x0800, 0x0400, CRC(b5ad6e8a) SHA1(1eb4931e85bd6a559e85a2b978d383216d3988a7) )
@@ -765,12 +765,12 @@ ROM_START( helifire )
 	ROM_LOAD( "hf.j1",    0x2000, 0x0400, CRC(98ef24db) SHA1(70ad8dd6e1e8f4bf4ce431737ca1856eecc03d53) )
 	ROM_LOAD( "hf.j2",    0x2400, 0x0400, CRC(5e2b5877) SHA1(f7c747e8a1d9fe2dda71ee6304636cf3cdf727a7) )
 
-	ROM_REGION( 0x0400, "audio", 0 )
+	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "hf.snd",   0x0000, 0x0400, CRC(9d77a31f) SHA1(36db9b5087b6661de88042854874bc247c92d985) )
 ROM_END
 
 ROM_START( helifira )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "hf-a.f1",  0x0000, 0x0400, CRC(92c9d6c1) SHA1(860a7b3980e9e11d48769fad347c965e04ed3f89) )
 	ROM_LOAD( "hf-a.f2",  0x0400, 0x0400, CRC(a264dde8) SHA1(48f972ad5af6c2ab61117f60d9244df6df6d313c) )
 	ROM_LOAD( "hf.g1",    0x0800, 0x0400, CRC(b5ad6e8a) SHA1(1eb4931e85bd6a559e85a2b978d383216d3988a7) )
@@ -782,7 +782,7 @@ ROM_START( helifira )
 	ROM_LOAD( "hf.j1",    0x2000, 0x0400, CRC(98ef24db) SHA1(70ad8dd6e1e8f4bf4ce431737ca1856eecc03d53) )
 	ROM_LOAD( "hf.j2",    0x2400, 0x0400, CRC(5e2b5877) SHA1(f7c747e8a1d9fe2dda71ee6304636cf3cdf727a7) )
 
-	ROM_REGION( 0x0400, "audio", 0 )
+	ROM_REGION( 0x0400, "audiocpu", 0 )
 	ROM_LOAD( "hf.snd",   0x0000, 0x0400, CRC(9d77a31f) SHA1(36db9b5087b6661de88042854874bc247c92d985) )
 ROM_END
 

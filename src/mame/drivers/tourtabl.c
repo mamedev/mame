@@ -187,7 +187,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( tourtabl )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_START(tourtabl)
@@ -196,7 +196,7 @@ static MACHINE_DRIVER_START( tourtabl )
 	MDRV_RIOT6532_ADD("riot2", MASTER_CLOCK / 3, r6532_interface_1)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS( MASTER_CLOCK, 228, 34, 34 + 160, 262, 46, 46 + 200 )
 
@@ -215,7 +215,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( tourtabl )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "030751.ab2", 0x0800, 0x0800, CRC(4479a6f7) SHA1(bf3fd859614533a592f831e3539ea0a9d1964c82) )
 	ROM_RELOAD(             0xE800, 0x0800 )
 	ROM_LOAD( "030752.ab3", 0x1000, 0x0800, CRC(c92c49dc) SHA1(cafcf13e1b1087b477a667d1e785f5e2be187b0d) )
@@ -226,7 +226,7 @@ ROM_END
 
 
 ROM_START( tourtab2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "030929.ab2", 0x0800, 0x0800, CRC(fcdfafa2) SHA1(f35ab83366a334a110fbba0cef09f4db950dbb68) )
 	ROM_RELOAD(             0xE800, 0x0800 )
 	ROM_LOAD( "030752.ab3", 0x1000, 0x0800, CRC(c92c49dc) SHA1(cafcf13e1b1087b477a667d1e785f5e2be187b0d) )

@@ -296,17 +296,17 @@ static MACHINE_START( triothep )
 static MACHINE_DRIVER_START( actfancr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",H6280,21477200/3) /* Should be accurate */
+	MDRV_CPU_ADD("maincpu",H6280,21477200/3) /* Should be accurate */
 	MDRV_CPU_PROGRAM_MAP(actfan_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* VBL */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* VBL */
 
-	MDRV_CPU_ADD("audio",M6502, 1500000) /* Should be accurate */
+	MDRV_CPU_ADD("audiocpu",M6502, 1500000) /* Should be accurate */
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -339,11 +339,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( triothep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
+	MDRV_CPU_ADD("maincpu",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(triothep_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* VBL */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* VBL */
 
-	MDRV_CPU_ADD("audio",M6502, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu",M6502, XTAL_12MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(dec0_s_map,0)
 
     MDRV_MACHINE_START(triothep)
@@ -351,7 +351,7 @@ static MACHINE_DRIVER_START( triothep )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -384,12 +384,12 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( actfancr )
-	ROM_REGION( 0x30000, "main", 0 ) /* Need to allow full RAM allocation for now */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "fe08-2.bin", 0x00000, 0x10000, CRC(0d36fbfa) SHA1(cef5cfd053beac5ca2ac52421024c316bdbfba42) )
 	ROM_LOAD( "fe09-2.bin", 0x10000, 0x10000, CRC(27ce2bb1) SHA1(52a423dfc2bba7b3330d1a10f4149ae6eeb9198c) )
 	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -417,12 +417,12 @@ ROM_START( actfancr )
 ROM_END
 
 ROM_START( actfanc1 )
-	ROM_REGION( 0x30000, "main", 0 ) /* Need to allow full RAM allocation for now */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "08-1", 0x00000, 0x10000, CRC(3bf214a4) SHA1(f7513672b2292d3acb4332b392695888bf6560a5) )
 	ROM_LOAD( "09-1", 0x10000, 0x10000, CRC(13ae78d5) SHA1(eba77d3dbfe273e18c7fa9c0ca305ac2468f9381) )
 	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -450,12 +450,12 @@ ROM_START( actfanc1 )
 ROM_END
 
 ROM_START( actfancj )
-	ROM_REGION( 0x30000, "main", 0 ) /* Need to allow full RAM allocation for now */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "fd08-1.bin", 0x00000, 0x10000, CRC(69004b60) SHA1(7c6b876ca04377d2aa2d3c3f19d8e6cc7345363d) )
 	ROM_LOAD( "fd09-1.bin", 0x10000, 0x10000, CRC(a455ae3e) SHA1(960798271c8370c1c4ffce2a453f59d7a301c9f9) )
 	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -483,12 +483,12 @@ ROM_START( actfancj )
 ROM_END
 
 ROM_START( triothep )
-	ROM_REGION( 0x40000, "main", 0 ) /* Need to allow full RAM allocation for now */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "fg-16.bin", 0x00000, 0x20000, CRC(7238355a) SHA1(4ac6c3fd808e7c94025972fdb45956bd707ec89f) )
 	ROM_LOAD( "fg-15.bin", 0x20000, 0x10000, CRC(1c0551ab) SHA1(1f90f80db44d92af4b233bc16cb1023db2797e8a) )
 	ROM_LOAD( "fg-14.bin", 0x30000, 0x10000, CRC(4ba7de4a) SHA1(bf552fa33746f3d27f9b193424a38fef58fe0765) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "fg-18.bin", 0x00000, 0x10000, CRC(9de9ee63) SHA1(c91b824b9a791cb90365d45c8e1b69e67f7d065f) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -517,12 +517,12 @@ ROM_END
 
 /* All roms are FF even the ones matching the parent FG roms */
 ROM_START( triothej )
-	ROM_REGION( 0x40000, "main", 0 ) /* Need to allow full RAM allocation for now */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
 	ROM_LOAD( "ff-16.bin", 0x00000, 0x20000, CRC(84d7e1b6) SHA1(28381d2e1f6d22a959383eb2e8d73f2e03f4d39f) )
 	ROM_LOAD( "ff-15.bin", 0x20000, 0x10000, CRC(6eada47c) SHA1(98fc4e93c47bc42ea7c20e8ac994b117cd7cb5a5) )
 	ROM_LOAD( "ff-14.bin", 0x30000, 0x10000, CRC(4ba7de4a) SHA1(bf552fa33746f3d27f9b193424a38fef58fe0765) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 6502 Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "ff-18.bin", 0x00000, 0x10000, CRC(9de9ee63) SHA1(c91b824b9a791cb90365d45c8e1b69e67f7d065f) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )

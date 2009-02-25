@@ -84,7 +84,7 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 	flip_screen_set(space->machine, ~data & 0x01);
 
 	/* bits 1 and 2 select ROM bank */
-	RAM = memory_region(space->machine, "main");
+	RAM = memory_region(space->machine, "maincpu");
 	bank = (data & 0x06) >> 1;
 	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bank*0x4000]);
 
@@ -753,18 +753,18 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( lwings )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 6000000)        /* 4 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, 6000000)        /* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", lwings_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", lwings_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, 4000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -797,7 +797,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( trojan )
 	MDRV_IMPORT_FROM( lwings )
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem,trojan_writemem)
 
 	MDRV_CPU_ADD("adpcm", Z80, 4000000) // 3.579545 Mhz (?)
@@ -820,9 +820,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( avengers )
 	MDRV_IMPORT_FROM( trojan )
 
-	MDRV_CPU_MODIFY("main") //AT: (avengers37b16gre)
+	MDRV_CPU_MODIFY("maincpu") //AT: (avengers37b16gre)
 	MDRV_CPU_PROGRAM_MAP(avengers_readmem,avengers_writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) // RST 38h triggered by software
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) // RST 38h triggered by software
 
 	MDRV_CPU_MODIFY("adpcm")
 	MDRV_CPU_IO_MAP(avengers_adpcm_io_map,0)
@@ -838,12 +838,12 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( lwings )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "6c_lw01.bin",  0x00000, 0x8000, CRC(b55a7f60) SHA1(e28cc540892a9ad050693900356744f8f5d05237) )
 	ROM_LOAD( "7c_lw02.bin",  0x10000, 0x8000, CRC(a5efbb1b) SHA1(9126efa78fd39a50032826d0b4bd3acffceba508) )
 	ROM_LOAD( "9c_lw03.bin",  0x18000, 0x8000, CRC(ec5cc201) SHA1(1043c6a9678c18fef920be91b0796c93b83e0f73) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "11e_lw04.bin", 0x0000, 0x8000, CRC(a20337a2) SHA1(649e13a69ad9154657894fa7bf7c6e49b029a506) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -870,12 +870,12 @@ ROM_START( lwings )
 ROM_END
 
 ROM_START( lwings2 )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "u13-l",        0x00000, 0x8000, CRC(3069c01c) SHA1(84dfffeb58f7c5a75d2a59c2ce72c6db813af1be) )
 	ROM_LOAD( "u14-k",        0x10000, 0x8000, CRC(5d91c828) SHA1(e0b9eab5b290203f71de27a78689adb2e7b07cea) )
 	ROM_LOAD( "9c_lw03.bin",  0x18000, 0x8000, CRC(ec5cc201) SHA1(1043c6a9678c18fef920be91b0796c93b83e0f73) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "11e_lw04.bin", 0x0000, 0x8000, CRC(a20337a2) SHA1(649e13a69ad9154657894fa7bf7c6e49b029a506) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -902,12 +902,12 @@ ROM_START( lwings2 )
 ROM_END
 
 ROM_START( lwingsjp )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "a_06c.rom",    0x00000, 0x8000, CRC(2068a738) SHA1(1bbceee8138cdc3832a9330b967561b78b03933e) )
 	ROM_LOAD( "a_07c.rom",    0x10000, 0x8000, CRC(d6a2edc4) SHA1(ce7eef643b1570cab241355bfd7c2d7adb1e74b6) )
 	ROM_LOAD( "9c_lw03.bin",  0x18000, 0x8000, CRC(ec5cc201) SHA1(1043c6a9678c18fef920be91b0796c93b83e0f73) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "11e_lw04.bin", 0x0000, 0x8000, CRC(a20337a2) SHA1(649e13a69ad9154657894fa7bf7c6e49b029a506) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -934,12 +934,12 @@ ROM_START( lwingsjp )
 ROM_END
 
 ROM_START( lwingsb )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "ic17.bin",  0x00000, 0x8000, CRC(fe8a8823) SHA1(aa968fda368cc904b22ea68d7b5d4fcfba2227b1) )
 	ROM_LOAD( "ic18.bin",  0x10000, 0x8000, CRC(2a00cde8) SHA1(5b2ef3bb08aed1b99eee0c6d7f5b9d3af807c13e) )
 	ROM_LOAD( "ic19.bin",  0x18000, 0x8000, CRC(ec5cc201) SHA1(1043c6a9678c18fef920be91b0796c93b83e0f73) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ic37.bin", 0x0000, 0x8000, CRC(a20337a2) SHA1(649e13a69ad9154657894fa7bf7c6e49b029a506) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -966,12 +966,12 @@ ROM_START( lwingsb )
 ROM_END
 
 ROM_START( sectionz )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "6c_sz01.bin",  0x00000, 0x8000, CRC(69585125) SHA1(a341e3a5507e961d5763be6acf420695bb32709e) )
 	ROM_LOAD( "7c_sz02.bin",  0x10000, 0x8000, CRC(22f161b8) SHA1(094ee6b6c8750de682c1ba4e387b31d58f734604) )
 	ROM_LOAD( "9c_sz03.bin",  0x18000, 0x8000, CRC(4c7111ed) SHA1(57c6ad6a86c64ffb17ec8f584c5e003440390344) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "11e_sz04.bin", 0x0000, 0x8000, CRC(a6073566) SHA1(d7dc382ba780cc4f25f7d7e7630cff1090488843) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -998,12 +998,12 @@ ROM_START( sectionz )
 ROM_END
 
 ROM_START( sctionza )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "sz-01a.bin",   0x00000, 0x8000, CRC(98df49fd) SHA1(80d7d9f83ea2f606e48606dbfe69cf347aadf079) )
 	ROM_LOAD( "7c_sz02.bin",  0x10000, 0x8000, CRC(22f161b8) SHA1(094ee6b6c8750de682c1ba4e387b31d58f734604) )
 	ROM_LOAD( "sz-03j.bin",   0x18000, 0x8000, CRC(94547abf) SHA1(9af9e76e6657d7fd742630cfe2f2eb76d231dec4) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "11e_sz04.bin", 0x0000, 0x8000, CRC(a6073566) SHA1(d7dc382ba780cc4f25f7d7e7630cff1090488843) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -1030,12 +1030,12 @@ ROM_START( sctionza )
 ROM_END
 
 ROM_START( trojan )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "t4",           0x00000, 0x8000, CRC(c1bbeb4e) SHA1(248ae4184d25b642b282ef44ac729c0f7952834d) )
 	ROM_LOAD( "t6",           0x10000, 0x8000, CRC(d49592ef) SHA1(b538bac3c73f35474cc6745a4e4dc3ab6217eaac) )
 	ROM_LOAD( "tb05.bin",     0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.bin",     0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* 64k for ADPCM CPU (CPU not emulated) */
@@ -1077,12 +1077,12 @@ ROM_START( trojan )
 ROM_END
 
 ROM_START( trojanr )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "tb04.bin",     0x00000, 0x8000, CRC(92670f27) SHA1(d2cb35a9fade971770db1a58e961bc03cc3de6ff) )
 	ROM_LOAD( "tb06.bin",     0x10000, 0x8000, CRC(a4951173) SHA1(2d3db0ee3a1680f2cce21cf15f8bd434325d8648) )
 	ROM_LOAD( "tb05.bin",     0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.bin",     0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 ) /* 64k for ADPCM CPU (CPU not emulated) */
@@ -1124,12 +1124,12 @@ ROM_START( trojanr )
 ROM_END
 
 ROM_START( trojanj )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "troj-04.rom",  0x00000, 0x8000, CRC(0b5a7f49) SHA1(eebdfaf905a2b7ac8a0f0f9a7ae4a0daf130a5ea) )
 	ROM_LOAD( "troj-06.rom",  0x10000, 0x8000, CRC(dee6ed92) SHA1(80aa16f2ae23581d00f4d58a2075993e7171ed0c) )
 	ROM_LOAD( "tb05.bin",     0x18000, 0x8000, CRC(9273b264) SHA1(ab23b16bf53b5baf106ea0cac50754aa967300cf) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tb02.bin",     0x0000, 0x8000, CRC(21154797) SHA1(e1a3006746cc2d692ecd4369cc0a77c596abd60b) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* 64k for ADPCM CPU (CPU not emulated) */
@@ -1171,12 +1171,12 @@ ROM_START( trojanj )
 ROM_END
 
 ROM_START( avengers )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "04.10n",       0x00000, 0x8000, CRC(a94aadcc) SHA1(796545ab5c69c093aaac58f7cff36109dea8df80) )
 	ROM_LOAD( "06.13n",       0x10000, 0x8000, CRC(39cd80bd) SHA1(3f8df0096f393efae2d76982640ccc4d33bde8ca) )
 	ROM_LOAD( "05.12n",       0x18000, 0x8000, CRC(06b1cec9) SHA1(db5370f3ff1b4456461698af64962cad028561cd) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "02.15h",       0x0000, 0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) ) /* ?? */
 
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU (not emulated) */
@@ -1218,12 +1218,12 @@ ROM_START( avengers )
 ROM_END
 
 ROM_START( avenger2 )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "avg4.bin",     0x00000, 0x8000, CRC(0fea7ac5) SHA1(b978adf5fc90e1e51a995dbec2246d2776264afd) )
 	ROM_LOAD( "av_06a.13n",   0x10000, 0x8000, CRC(491a712c) SHA1(67a335b57117ba498d3ae412ac0025477bc79b16) )
 	ROM_LOAD( "av_05.12n",    0x18000, 0x8000, CRC(9a214b42) SHA1(e13d47dcf9fa055fef467a10751badffcc3b8734) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "02.15h",       0x0000,  0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) ) /* MISSING from this set */
 
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU (not emulated) */
@@ -1265,12 +1265,12 @@ ROM_START( avenger2 )
 ROM_END
 
 ROM_START( buraiken )
-	ROM_REGION( 0x20000, "main", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "av_04a.10n",   0x00000, 0x8000, CRC(361fc614) SHA1(0ecd9400dfcb03fc94685b33b060a524a5d3c575) )
 	ROM_LOAD( "av_06a.13n",   0x10000, 0x8000, CRC(491a712c) SHA1(67a335b57117ba498d3ae412ac0025477bc79b16) )
 	ROM_LOAD( "av_05.12n",    0x18000, 0x8000, CRC(9a214b42) SHA1(e13d47dcf9fa055fef467a10751badffcc3b8734) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "02.15h",       0x0000,  0x8000, CRC(107a2e17) SHA1(5aae2f4ac9f15ccb4122f3ba9fba588438d62f4f) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )     /* ADPCM CPU (not emulated) */

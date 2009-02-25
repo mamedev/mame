@@ -206,7 +206,7 @@ static MACHINE_DRIVER_START( mystston )
 	MDRV_DRIVER_DATA(mystston_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */
@@ -231,7 +231,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( mystston )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom6.bin",     0x4000, 0x2000, CRC(7bd9c6cd) SHA1(4d14edc783ba1a6c01d2fb9ea29ec85b8fec3c3b) )
 	ROM_LOAD( "rom5.bin",     0x6000, 0x2000, CRC(a83f04a6) SHA1(d8cdf310511c1fef4fbde80ef2161fda00f965d7) )
 	ROM_LOAD( "rom4.bin",     0x8000, 0x2000, CRC(46c73714) SHA1(5b9ac3a35aeeea6a0cd2d838c144925d83b36a7f) )
@@ -261,7 +261,7 @@ ROM_END
 
 
 ROM_START( myststno )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ms0",          0x4000, 0x2000, CRC(6dacc05f) SHA1(43054199901639516205c7ea145462d0abea8fb1) )
 	ROM_LOAD( "ms1",          0x6000, 0x2000, CRC(a3546df7) SHA1(89c0349885a9369406a1121cd3db28963b25f2e6) )
 	ROM_LOAD( "ms2",          0x8000, 0x2000, CRC(43bc6182) SHA1(dc36c10eee20009922e89d9bfdf6c2f6ffb881ce) )

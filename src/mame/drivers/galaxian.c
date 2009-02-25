@@ -389,7 +389,7 @@ static READ8_DEVICE_HANDLER( konami_sound_timer_r )
         current counter index, we use the sound cpu clock times 8 mod
         16*16*2*8*5*2.
     */
-	UINT32 cycles = (cputag_get_total_cycles(device->machine, "audio") * 8) % (UINT64)(16*16*2*8*5*2);
+	UINT32 cycles = (cputag_get_total_cycles(device->machine, "audiocpu") * 8) % (UINT64)(16*16*2*8*5*2);
 	UINT8 hibit = 0;
 
 	/* separate the high bit from the others */
@@ -456,7 +456,7 @@ static const ppi8255_interface konami_ppi8255_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
 	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
 	DEVCB_HANDLER(konami_portc_1_w)							/* Port C write */
 };
@@ -557,7 +557,7 @@ static const ppi8255_interface scramble_ppi8255_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_HANDLER(scramble_protection_r),					/* Port C read */
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
 	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
 	DEVCB_HANDLER(scramble_protection_w)					/* Port C write */
 };
@@ -621,7 +621,7 @@ static WRITE8_DEVICE_HANDLER( sfx_sample_control_w )
 
 static const ppi8255_interface sfx_ppi8255_2_intf =
 {
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch2_r),	/* Port A read */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch2_r),	/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_NULL,												/* Port C read */
 	DEVCB_NULL,												/* Port A write */
@@ -803,7 +803,7 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_HANDLER(scorpion_protection_r),					/* Port C read */
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
 	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
 	DEVCB_HANDLER(scorpion_protection_w)					/* Port C write */
 };
@@ -1559,7 +1559,7 @@ static const ay8910_interface frogger_ay8910_interface =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_HANDLER(frogger_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1579,7 +1579,7 @@ static const ay8910_interface konami_ay8910_interface_2 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_HANDLER(konami_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1611,7 +1611,7 @@ static const ay8910_interface sfx_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch2_w),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch2_w),
 	DEVCB_HANDLER(sfx_sample_control_w)
 };
 
@@ -1629,7 +1629,7 @@ static const ay8910_interface checkmaj_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1692,9 +1692,9 @@ DISCRETE_SOUND_END
 static MACHINE_DRIVER_START( galaxian_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
+	MDRV_CPU_ADD("maincpu", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
 	MDRV_CPU_PROGRAM_MAP(galaxian_map,0)
-	MDRV_CPU_VBLANK_INT("main", interrupt_gen)
+	MDRV_CPU_VBLANK_INT("screen", interrupt_gen)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 
@@ -1702,7 +1702,7 @@ static MACHINE_DRIVER_START( galaxian_base )
 	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART)
 
@@ -1738,7 +1738,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD("audio", Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(frogger_sound_map,0)
 	MDRV_CPU_IO_MAP(frogger_sound_portmap,0)
 
@@ -1758,7 +1758,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD("audio", Z80, KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audiocpu", Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(konami_sound_map,0)
 	MDRV_CPU_IO_MAP(konami_sound_portmap,0)
 
@@ -1827,7 +1827,7 @@ static MACHINE_DRIVER_START( mooncrst )
 	MDRV_IMPORT_FROM(galaxian)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mooncrst_map,0)
 MACHINE_DRIVER_END
 
@@ -1838,7 +1838,7 @@ static MACHINE_DRIVER_START( jumpbug )
 	MDRV_WATCHDOG_VBLANK_INIT(0)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(jumpbug_map,0)
 
 	/* sound hardware */
@@ -1851,10 +1851,10 @@ static MACHINE_DRIVER_START( checkman )
 	MDRV_IMPORT_FROM(mooncrst)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audio", Z80, 1620000)	/* 1.62 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 1620000)	/* 1.62 MHz */
 	MDRV_CPU_PROGRAM_MAP(checkman_sound_map,0)
 	MDRV_CPU_IO_MAP(checkman_sound_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMIs are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMIs are triggered by the main CPU */
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay", AY8910, 1789750)
@@ -1866,10 +1866,10 @@ static MACHINE_DRIVER_START( checkmaj )
 	MDRV_IMPORT_FROM(galaxian)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audio", Z80, 1620000)
+	MDRV_CPU_ADD("audiocpu", Z80, 1620000)
 	MDRV_CPU_PROGRAM_MAP(checkmaj_sound_map,0)
 
-	MDRV_TIMER_ADD_SCANLINE("irq0", checkmaj_irq0_gen, "main", 0, 8)
+	MDRV_TIMER_ADD_SCANLINE("irq0", checkmaj_irq0_gen, "screen", 0, 8)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ay", AY8910, 1620000)
@@ -1882,7 +1882,7 @@ static MACHINE_DRIVER_START( mshuttle )
 	MDRV_IMPORT_FROM(galaxian_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mshuttle_map,0)
 	MDRV_CPU_IO_MAP(mshuttle_portmap,0)
 
@@ -1901,7 +1901,7 @@ static MACHINE_DRIVER_START( kingball )
 	MDRV_IMPORT_FROM(mooncrst)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audio", Z80,5000000/2)
+	MDRV_CPU_ADD("audiocpu", Z80,5000000/2)
 	MDRV_CPU_PROGRAM_MAP(kingball_sound_map,0)
 	MDRV_CPU_IO_MAP(kingball_sound_portmap,0)
 
@@ -1916,7 +1916,7 @@ static MACHINE_DRIVER_START( frogger )
 	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(frogger_map,0)
 MACHINE_DRIVER_END
 
@@ -1926,7 +1926,7 @@ static MACHINE_DRIVER_START( froggrmc )
 	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mooncrst_map,0)
 MACHINE_DRIVER_END
 
@@ -1936,7 +1936,7 @@ static MACHINE_DRIVER_START( froggers )
 	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(theend_map,0)
 MACHINE_DRIVER_END
 
@@ -1946,7 +1946,7 @@ static MACHINE_DRIVER_START( frogf )
 	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(frogf_map,0)
 MACHINE_DRIVER_END
 
@@ -1956,7 +1956,7 @@ static MACHINE_DRIVER_START( turtles )
 	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(turtles_map,0)
 MACHINE_DRIVER_END
 
@@ -1966,7 +1966,7 @@ static MACHINE_DRIVER_START( theend )
 	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(theend_map,0)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", theend_ppi8255_0_intf )
@@ -1979,7 +1979,7 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(theend_map,0)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
@@ -1991,11 +1991,11 @@ static MACHINE_DRIVER_START( explorer )
 	MDRV_IMPORT_FROM(konami_base)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(theend_map,0)
 
 	/* 2nd CPU to drive sound */
-	MDRV_CPU_ADD("audio", Z80,KONAMI_SOUND_CLOCK/8)
+	MDRV_CPU_ADD("audiocpu", Z80,KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(konami_sound_map,0)
 	MDRV_CPU_IO_MAP(konami_sound_portmap,0)
 
@@ -2033,7 +2033,7 @@ static MACHINE_DRIVER_START( sfx )
 	MDRV_WATCHDOG_VBLANK_INIT(0)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sfx_map,0)
 
 	/* 3rd CPU for the sample player */
@@ -2060,7 +2060,7 @@ static MACHINE_DRIVER_START( scobra )
 	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(scobra_map,0)
 MACHINE_DRIVER_END
 
@@ -2095,7 +2095,7 @@ MACHINE_DRIVER_END
 
 static void decode_mooncrst(running_machine *machine, int length, UINT8 *dest)
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int offs;
 
 	for (offs = 0; offs < length; offs++)
@@ -2157,8 +2157,8 @@ static void decode_checkman(running_machine *machine)
 		{ 0,2,0,2 },
 		{ 1,4,1,4 }
 	};
-	UINT8 *rombase = memory_region(machine, "main");
-	UINT32 romlength = memory_region_length(machine, "main");
+	UINT8 *rombase = memory_region(machine, "maincpu");
+	UINT32 romlength = memory_region_length(machine, "maincpu");
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2174,8 +2174,8 @@ static void decode_checkman(running_machine *machine)
 
 static void decode_dingoe(running_machine *machine)
 {
-	UINT8 *rombase = memory_region(machine, "main");
-	UINT32 romlength = memory_region_length(machine, "main");
+	UINT8 *rombase = memory_region(machine, "maincpu");
+	UINT32 romlength = memory_region_length(machine, "maincpu");
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2197,7 +2197,7 @@ static void decode_dingoe(running_machine *machine)
 
 static void decode_frogger_sound(running_machine *machine)
 {
-	UINT8 *rombase = memory_region(machine, "audio");
+	UINT8 *rombase = memory_region(machine, "audiocpu");
 	UINT32 offs;
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
@@ -2264,7 +2264,7 @@ static void decode_superbon(running_machine *machine)
 
 	/* Deryption worked out by hand by Chris Hardy. */
 
-	RAM = memory_region(machine, "main");
+	RAM = memory_region(machine, "maincpu");
 
 	for (i = 0;i < 0x1000;i++)
 	{
@@ -2370,7 +2370,7 @@ static DRIVER_INIT( gmgalax )
 
 	/* ROM is banked */
 	memory_install_read8_handler(space, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
 	gmgalax_game_changed(machine->portconfig->fieldlist, NULL, 0, 0);
@@ -2428,7 +2428,7 @@ static DRIVER_INIT( mooncrst )
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(machine, 0x8000, memory_region(machine, "main"));
+	decode_mooncrst(machine, 0x8000, memory_region(machine, "maincpu"));
 }
 
 
@@ -2501,13 +2501,13 @@ static DRIVER_INIT( zigzag )
 	/* make ROMs 2 & 3 swappable */
 	memory_install_read8_handler(space, 0x2000, 0x2fff, 0, 0, SMH_BANK1);
 	memory_install_read8_handler(space, 0x3000, 0x3fff, 0, 0, SMH_BANK2);
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x2000, 0x1000);
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "main") + 0x2000, 0x1000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x1000);
 
 	/* also re-install the fixed ROM area as a bank in order to inform the memory system that
        the fixed area only extends to 0x1fff */
 	memory_install_read8_handler(space, 0x0000, 0x1fff, 0, 0, SMH_BANK3);
-	memory_set_bankptr(machine, 3, memory_region(machine, "main") + 0x0000);
+	memory_set_bankptr(machine, 3, memory_region(machine, "maincpu") + 0x0000);
 
 	/* handler for doing the swaps */
 	memory_install_write8_handler(space, 0x7002, 0x7002, 0, 0x07f8, zigzag_bankswap_w);
@@ -2619,7 +2619,7 @@ static DRIVER_INIT( skybase )
 
 	/* extend ROM */
 	memory_install_read8_handler(space, 0x0000, 0x5fff, 0, 0, SMH_BANK2);
-	memory_set_bankptr(machine, 2, memory_region(machine, "main"));
+	memory_set_bankptr(machine, 2, memory_region(machine, "maincpu"));
 }
 
 
@@ -2679,7 +2679,7 @@ static DRIVER_INIT( scorpnmc )
 
 	/* extra ROM */
 	memory_install_read8_handler(space, 0x5000, 0x67ff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x5000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5000);
 
 	/* install RAM at $4000-$4800 */
 	memory_install_readwrite8_handler(space, 0x4000, 0x47ff, 0, 0, SMH_BANK2, SMH_BANK2);
@@ -2745,7 +2745,7 @@ static DRIVER_INIT( sfx )
 
 	/* sound board has space for extra ROM */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(machine, 1, memory_region(machine, "audio"));
+	memory_set_bankptr(machine, 1, memory_region(machine, "audiocpu"));
 }
 
 
@@ -2848,7 +2848,7 @@ static DRIVER_INIT( scorpion )
 
 	/* extra ROM */
 	memory_install_read8_handler(space, 0x5800, 0x67ff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x5800);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5800);
 
 	/* no background related */
 //  memory_install_write8_handler(space, 0x6803, 0x6803, 0, 0, SMH_NOP);

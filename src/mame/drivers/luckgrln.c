@@ -121,12 +121,12 @@ static VIDEO_UPDATE(luckgrln)
 }
 
 static MACHINE_DRIVER_START( luckgrln )
-	MDRV_CPU_ADD("main", Z180,8000000)
+	MDRV_CPU_ADD("maincpu", Z180,8000000)
 	MDRV_CPU_PROGRAM_MAP(mainmap,0)
 	MDRV_CPU_IO_MAP(portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -175,7 +175,7 @@ static DRIVER_INIT( luckgrln )
 }
 
 ROM_START( luckgrln )
-	ROM_REGION( 0x4000, "main", 0 ) // internal Z180 rom
+	ROM_REGION( 0x4000, "maincpu", 0 ) // internal Z180 rom
 	ROM_LOAD( "lucky74.bin",  0x00000, 0x4000, CRC(fa128e05) SHA1(97a9534b8414f984159271db48b153b0724d22f9) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) // external data / cpu rom

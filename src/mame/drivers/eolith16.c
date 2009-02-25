@@ -165,14 +165,14 @@ static PALETTE_INIT( eolith16 )
 
 
 static MACHINE_DRIVER_START( eolith16 )
-	MDRV_CPU_ADD("main", E116T, 60000000)		/* no internal multiplier */
+	MDRV_CPU_ADD("maincpu", E116T, 60000000)		/* no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(eolith16_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
 
 	MDRV_NVRAM_HANDLER(eolith16_eeprom)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

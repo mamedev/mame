@@ -296,11 +296,11 @@ static const k007232_interface k007232_config =
 static MACHINE_DRIVER_START( gbusters )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 3000000)	/* Konami custom 052526 */
+	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* Konami custom 052526 */
 	MDRV_CPU_PROGRAM_MAP(gbusters_readmem,gbusters_writemem)
-	MDRV_CPU_VBLANK_INT("main", gbusters_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", gbusters_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)		/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(gbusters_readmem_sound,gbusters_writemem_sound)
 
 	MDRV_MACHINE_RESET(gbusters)
@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( gbusters )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -341,12 +341,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( gbusters )
-	ROM_REGION( 0x30800, "main", 0 ) /* code + banked roms + space for banked RAM */
+	ROM_REGION( 0x30800, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
 	ROM_LOAD( "878n02.k13", 0x10000, 0x08000, CRC(51697aaa) SHA1(1e6461e2e5e871d44085623a890158a4c1c4c404) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 	ROM_LOAD( "878j03.k15", 0x20000, 0x10000, CRC(3943a065) SHA1(6b0863f4182e6c973adfaa618f096bd4cc9b7b6d) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
@@ -365,12 +365,12 @@ ROM_START( gbusters )
 ROM_END
 
 ROM_START( gbustera )
-	ROM_REGION( 0x30800, "main", 0 ) /* code + banked roms + space for banked RAM */
+	ROM_REGION( 0x30800, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
 	ROM_LOAD( "878_02.k13", 0x10000, 0x08000, CRC(57178414) SHA1(89b1403158f6ce18706c8a941109554d03cf77d9) ) /* unknown region/version leter */
 	ROM_CONTINUE(           0x08000, 0x08000 )
 	ROM_LOAD( "878_03.k15", 0x20000, 0x10000, CRC(6c59e660) SHA1(66a92eb8a93c9f542489fa31bec6ed1819d174da) ) /* unknown region/version leter */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
@@ -389,12 +389,12 @@ ROM_START( gbustera )
 ROM_END
 
 ROM_START( crazycop )
-	ROM_REGION( 0x30800, "main", 0 ) /* code + banked roms + space for banked RAM */
+	ROM_REGION( 0x30800, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
 	ROM_LOAD( "878m02.k13", 0x10000, 0x08000, CRC(9c1c9f52) SHA1(7a60ad20aac92da8258b43b04f8c7f27bb71f1df) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 	ROM_LOAD( "878j03.k15", 0x20000, 0x10000, CRC(3943a065) SHA1(6b0863f4182e6c973adfaa618f096bd4cc9b7b6d) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "878h01.f8", 0x00000, 0x08000, CRC(96feafaa) SHA1(8b6547e610cb4fa1c1f5bf12cb05e9a12a353903) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
@@ -415,7 +415,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( gbusters_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "maincpu");
 	int offs = 0x10000;
 
 	/* bits 0-3 ROM bank */
@@ -432,7 +432,7 @@ static KONAMI_SETLINES_CALLBACK( gbusters_banking )
 
 static MACHINE_RESET( gbusters )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	konami_configure_set_lines(machine->cpu[0], gbusters_banking);
 

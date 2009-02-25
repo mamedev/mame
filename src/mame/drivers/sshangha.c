@@ -341,11 +341,11 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( sshangha )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 28000000/2)
+	MDRV_CPU_ADD("maincpu", M68000, 28000000/2)
 	MDRV_CPU_PROGRAM_MAP(sshangha_readmem,sshangha_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 16000000/4)
+	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_RESET(sshangha)	/* init machine */
@@ -353,7 +353,7 @@ static MACHINE_DRIVER_START( sshangha )
 	/* video hardware */
 	/*MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)*/
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -383,11 +383,11 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( sshangha )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ss007-1.u28", 0x00000, 0x20000, CRC(bc466edf) SHA1(b96525b2c879d15b46a7753fa6ebf12a851cd019) )
 	ROM_LOAD16_BYTE( "ss006-1.u27", 0x00001, 0x20000, CRC(872a2a2d) SHA1(42d7a01465d5c403354aaf0f2dab8adb9afe61b0) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "ss008.u82", 0x000000, 0x010000, CRC(04dc3647) SHA1(c06a7e8932c03de5759a9b69da0d761006b49517) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -403,11 +403,11 @@ ROM_START( sshangha )
 ROM_END
 
 ROM_START( sshanghb )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "sshanb_2.010", 0x00000, 0x20000, CRC(bc7ed254) SHA1(aeee4b8a8265902bb41575cc143738ecf3aff57d) )
 	ROM_LOAD16_BYTE( "sshanb_1.010", 0x00001, 0x20000, CRC(7b049f49) SHA1(2570077c67dbd35053d475a18c3f10813bf914f7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "ss008.u82", 0x000000, 0x010000, CRC(04dc3647) SHA1(c06a7e8932c03de5759a9b69da0d761006b49517) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -428,7 +428,7 @@ static DRIVER_INIT( sshangha )
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features
          of the first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	RAM[0x000384/2] = 0x4e71;
 	RAM[0x000386/2] = 0x4e71;
 	RAM[0x000388/2] = 0x4e71;

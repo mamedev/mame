@@ -272,7 +272,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( drw80pkr )
 {
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main"), 0x1000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu"), 0x1000);
 }
 
 
@@ -307,14 +307,14 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( drw80pkr )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", I8039, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", I8039, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drw80pkr_map, 0)
     MDRV_CPU_IO_MAP(drw80pkr_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -340,7 +340,7 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( drw80pkr )
-	ROM_REGION( 0x2000, "main", 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "pm0.u81",   0x0000, 0x1000, CRC(0f3e97d2) SHA1(aa9e4015246284f32435d7320de667e075412e5b) )
 	ROM_LOAD( "pm1.u82",   0x1000, 0x1000, CRC(5a6ad467) SHA1(0128bd70b65244a0f68031d5f451bf115eeb7609) )
 

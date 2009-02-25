@@ -209,7 +209,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( dorachan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 2000000)
+	MDRV_CPU_ADD("maincpu", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(dorachan_map,0)
 	MDRV_CPU_IO_MAP(dorachan_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
@@ -217,7 +217,7 @@ static MACHINE_DRIVER_START( dorachan )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(dorachan)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)
@@ -234,7 +234,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( dorachan )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c1.e1",      0x0000, 0x0400, CRC(29d66a96) SHA1(a0297d87574af65c6ded99aeb377ac407f6f163f) )
 	ROM_LOAD( "d2.e2",      0x0400, 0x0400, CRC(144b6cd1) SHA1(195ce86e912a4b395097008c6d812fd75a1a2482) )
 	ROM_LOAD( "d3.e3",      0x0800, 0x0400, CRC(a9a1bed7) SHA1(98af6f851c4477f770b6bd67e5465b5a271311ee) )

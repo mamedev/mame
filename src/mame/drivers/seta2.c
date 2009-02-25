@@ -784,7 +784,7 @@ ADDRESS_MAP_END
 static READ16_HANDLER( pzlbowl_protection_r )
 {
 	UINT32 address = (memory_read_word(space, 0x20ba16) << 16) | memory_read_word(space, 0x20ba18);
-	return memory_region(space->machine, "main")[address - 2];
+	return memory_region(space->machine, "maincpu")[address - 2];
 }
 
 static READ16_HANDLER( pzlbowl_coins_r )
@@ -2298,14 +2298,14 @@ static const x1_010_interface x1_010_sound_intf =
 static MACHINE_DRIVER_START( mj4simai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
+	MDRV_CPU_ADD("maincpu",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
 	MDRV_CPU_PROGRAM_MAP(mj4simai_readmem,mj4simai_writemem)
-	MDRV_CPU_VBLANK_INT("main", seta2_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", seta2_interrupt)
 
 	MDRV_MACHINE_RESET( tmp68301 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2332,24 +2332,24 @@ static MACHINE_DRIVER_START( gundamex )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gundamex_readmem,gundamex_writemem)
 
 	MDRV_NVRAM_HANDLER(93C46_gundamex)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x100, 0x1e0-1)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( grdians )
 
 	MDRV_IMPORT_FROM(mj4simai)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(grdians_readmem,grdians_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x80, 0x80 + 0xe8 -1)
 MACHINE_DRIVER_END
 
@@ -2358,11 +2358,11 @@ static MACHINE_DRIVER_START( myangel )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(myangel_readmem,myangel_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
 	MDRV_VIDEO_START(seta2_offset)
@@ -2373,11 +2373,11 @@ static MACHINE_DRIVER_START( myangel2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(myangel2_readmem,myangel2_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
 	MDRV_VIDEO_START(seta2_offset)
@@ -2388,11 +2388,11 @@ static MACHINE_DRIVER_START( pzlbowl )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pzlbowl_readmem,pzlbowl_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x100, 0x1f0-1)
 MACHINE_DRIVER_END
 
@@ -2401,11 +2401,11 @@ static MACHINE_DRIVER_START( penbros )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(penbros_readmem,penbros_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
 MACHINE_DRIVER_END
 
@@ -2413,14 +2413,14 @@ static MACHINE_DRIVER_START( samshoot )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mj4simai)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(samshoot_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(samshoot_interrupt,2)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
 MACHINE_DRIVER_END
 
@@ -2473,7 +2473,7 @@ static MACHINE_RESET( funcube )
 }
 
 static MACHINE_DRIVER_START( funcube )
-	MDRV_CPU_ADD("main", M68040, XTAL_25_447MHz) // !! XCF5206 actually !!
+	MDRV_CPU_ADD("maincpu", M68040, XTAL_25_447MHz) // !! XCF5206 actually !!
 	MDRV_CPU_PROGRAM_MAP(funcube_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(funcube_interrupt,2)
 
@@ -2487,7 +2487,7 @@ static MACHINE_DRIVER_START( funcube )
 	MDRV_MACHINE_RESET( funcube )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))	// not accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2515,7 +2515,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( gundamex )
-	ROM_REGION( 0x600000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x600000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE(	  "ka002002.u2",  0x000000, 0x080000, CRC(e850f6d8) SHA1(026325e305676b1f8d3d9e7573920f8b70d7bccb) )
 	ROM_LOAD16_BYTE(	  "ka002004.u3",  0x000001, 0x080000, CRC(c0fb1208) SHA1(84b25e4c73cb8e023ee5dbf69f588be98700b43f) )
 	ROM_LOAD16_BYTE(	  "ka002001.u4",  0x100000, 0x080000, CRC(553ebe6b) SHA1(7fb8a159513d31a1d60520ff14e4c4d133fd3e19) )
@@ -2540,7 +2540,7 @@ ROM_START( gundamex )
 ROM_END
 
 ROM_START( grdians )
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "u2.bin", 0x000000, 0x080000, CRC(36adc6f2) SHA1(544e87f88179fe1342e7a06a8948ac1828e85108) )
 	ROM_LOAD16_BYTE( "u3.bin", 0x000001, 0x080000, CRC(2704f416) SHA1(9081a12cbb9927d36e1c50b52aa2c6003810ee42) )
 	ROM_LOAD16_BYTE( "u4.bin", 0x100000, 0x080000, CRC(bb52447b) SHA1(61433f683210ab2bc2cf1cc4b5b7a39cc5b6493d) )
@@ -2569,7 +2569,7 @@ ROM_START( grdians )
 ROM_END
 
 ROM_START( mj4simai )
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "ll.u2",       0x000000, 0x080000, CRC(7be9c781) SHA1(d29e579706d98909933f6bed2ee292c88ed10d2c) )
 	ROM_LOAD16_BYTE( "lh1.u3",      0x000001, 0x080000, CRC(82aa3f72) SHA1(a93d5dc7cdf12f852a692759d91f6f2951b6b5b5) )
 	ROM_LOAD16_BYTE( "hl.u4",       0x100000, 0x080000, CRC(226063b7) SHA1(1737baffc16ff7261f887911187ece96925fa6ff) )
@@ -2590,7 +2590,7 @@ ROM_START( mj4simai )
 ROM_END
 
 ROM_START( myangel )
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "kq1-prge.u2", 0x000000, 0x080000, CRC(6137d4c0) SHA1(762341e11b56e4a7787a0662833b702b78aee0a9) )
 	ROM_LOAD16_BYTE( "kq1-prgo.u3", 0x000001, 0x080000, CRC(4aad10d8) SHA1(a08e1c4f57c64be829e0807ae2791da947fd60aa) )
 	ROM_LOAD16_BYTE( "kq1-tble.u4", 0x100000, 0x080000, CRC(e332a514) SHA1(dfd255239c80c48c9865e70681b9ddd175b8bf55) )
@@ -2612,7 +2612,7 @@ ROM_START( myangel )
 ROM_END
 
 ROM_START( myangel2 )
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "kqs1ezpr.u2", 0x000000, 0x080000, CRC(2469aac2) SHA1(7dade2de31252e305d24c659c4801dd4687ad1f6) )
 	ROM_LOAD16_BYTE( "kqs1ozpr.u3", 0x000001, 0x080000, CRC(6336375c) SHA1(72089f77e94832e74e0512944acadeccd0dec8b0) )
 	ROM_LOAD16_BYTE( "kqs1e-tb.u4", 0x100000, 0x080000, CRC(e759b4cc) SHA1(4f806a144a47935b2710f8af800ec0d771f12a18) )
@@ -2634,7 +2634,7 @@ ROM_START( myangel2 )
 ROM_END
 
 ROM_START( pzlbowl )
-	ROM_REGION( 0x100000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "kup-u06.i03", 0x000000, 0x080000, CRC(314e03ac) SHA1(999398e55161dd75570d418f4c9899e3bf311cc8) )
 	ROM_LOAD16_BYTE( "kup-u07.i03", 0x000001, 0x080000, CRC(a0423a04) SHA1(9539023c5c2f2bf72ee3fb6105443ffd3d61e2f8) )
 
@@ -2650,7 +2650,7 @@ ROM_START( pzlbowl )
 ROM_END
 
 ROM_START( penbros )
-	ROM_REGION( 0x100000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "u06.bin", 0x000000, 0x080000, CRC(7bbdffac) SHA1(d5766cb171b8d2e4c04a6bae37181fa5ada9d797) )
 	ROM_LOAD16_BYTE( "u07.bin", 0x000001, 0x080000, CRC(d50cda5f) SHA1(fc66f55f2070b447c5db85c948ce40adc37512f7) )
 
@@ -2666,7 +2666,7 @@ ROM_START( penbros )
 ROM_END
 
 ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) - The "E05" breaks version label conventions but is correct & verified */
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "as0906e05.u06", 0x000000, 0x100000, CRC(20c81f17) SHA1(d41d93d6ee88738cec55f7bf3ce6be1dbec68e09) ) /* checksum 694E printed on label */
 	ROM_LOAD16_BYTE( "as0907e05.u07", 0x000001, 0x100000, CRC(1731aa2a) SHA1(cffae7a99a7f960a62ef0c4454884df17a93c1a6) ) /* checksum 5D89 printed on label */
 
@@ -2682,7 +2682,7 @@ ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) - The "E05" breaks ve
 ROM_END
 
 ROM_START( deerhuna ) /* Deer Hunting USA V4.2 (xx/x/2000) */
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "as0906e04-v4_2.u06", 0x000000, 0x100000, CRC(bb3af36f) SHA1(f04071347e8ad361bf666fcb6c0136e522f19d47) ) /* checksum 6640 printed on label */
 	ROM_LOAD16_BYTE( "as0907e04-v4_2.u07", 0x000001, 0x100000, CRC(83f02117) SHA1(70fc2291bc93af3902aae88688be6a8078f7a07e) ) /* checksum 595A printed on label */
 
@@ -2698,7 +2698,7 @@ ROM_START( deerhuna ) /* Deer Hunting USA V4.2 (xx/x/2000) */
 ROM_END
 
 ROM_START( deerhunb ) /* Deer Hunting USA V4.0 (6/15/2000) */
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "as0906e04.u06", 0x000000, 0x100000, CRC(07d9b64a) SHA1(f9aac644aab920bbac84b14836ee589ccd51f6db) ) /* checksum 7BBB printed on label */
 	ROM_LOAD16_BYTE( "as0907e04.u07", 0x000001, 0x100000, CRC(19973d08) SHA1(da1cc02ce480a62ccaf94d0af1246a340f054b43) ) /* checksum 4C78 printed on label */
 
@@ -2716,7 +2716,7 @@ ROM_END
 	/* There are known versions 3.x of Deer Hunting USA.... just none are currently dumped.  roms should be "AS0906 E03 U06" & "AS0907 E03 U07" */
 
 ROM_START( deerhunc ) /* Deer Hunting USA V2.x - No version number is printed to screen but "E02" in EPROM label signifies V2 */
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "as0906e02.u06", 0x000000, 0x100000, CRC(190cca42) SHA1(aef63f5e8c71ed0156b8b0104c5d23872c119167) ) /* Version in program code is listed as 0.00 */
 	ROM_LOAD16_BYTE( "as0907e02.u07", 0x000001, 0x100000, CRC(9de2b901) SHA1(d271bc54c41e30c0d9962eedd22f3ef2b7b8c9e5) ) /* Verified with two different sets of chips */
 
@@ -2732,7 +2732,7 @@ ROM_START( deerhunc ) /* Deer Hunting USA V2.x - No version number is printed to
 ROM_END
 
 ROM_START( turkhunt ) /* V1.0 is currently the only known version */
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "asx906e01.u06", 0x000000, 0x100000, CRC(c96266e1) SHA1(0ca462b3b0f27198e36384eee6ea5c5d4e7e1293) ) /* checksum E510 printed on label */
 	ROM_LOAD16_BYTE( "asx907e01.u07", 0x000001, 0x100000, CRC(7c67b502) SHA1(6a0e8883a115dac4095d86897e7eca2a007a1c71) ) /* checksum AB40 printed on label */
 
@@ -2748,7 +2748,7 @@ ROM_START( turkhunt ) /* V1.0 is currently the only known version */
 ROM_END
 
 ROM_START( wschamp ) /* V2.0 */
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "as1006e02.u06", 0x000000, 0x100000, CRC(0ad01677) SHA1(63e09b9f7cc8b781af1756f86caa0cc0962ae584) ) /* checksum 421E printed on label */
 	ROM_LOAD16_BYTE( "as1007e02.u07", 0x000001, 0x100000, CRC(572624f0) SHA1(0c2f67daa22f4edd66a2be990dc6cd999faff0fa) ) /* checksum A48F printed on label */
 
@@ -2764,7 +2764,7 @@ ROM_START( wschamp ) /* V2.0 */
 ROM_END
 
 ROM_START( wschampa ) /* V1.01 */
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "as1006e01.u06", 0x000000, 0x100000, CRC(d3d3b2b5) SHA1(2d036d795b40a4ed78bb9f7751f875cfc76276a9) )
 	ROM_LOAD16_BYTE( "as1007e01.u07", 0x000001, 0x100000, CRC(78ede6d9) SHA1(e6d10f52cd4c6bf97288df44911f23bb64fc012c) )
 
@@ -2780,7 +2780,7 @@ ROM_START( wschampa ) /* V1.01 */
 ROM_END
 
 ROM_START( trophyh ) /* V1.0 is currently the only known version */
-	ROM_REGION( 0x200000, "main", 0 )		/* TMP68301 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* TMP68301 Code */
 	ROM_LOAD16_BYTE( "as1106e01.u06", 0x000000, 0x100000, CRC(b4950882) SHA1(2749f7ffc5b543c9f39815f0913a1d1e385b63f4) )
 	ROM_LOAD16_BYTE( "as1107e01.u07", 0x000001, 0x100000, CRC(19ee67cb) SHA1(e75ce66d3ff5aad46ba997c09d6514260e617f55) )
 
@@ -2796,7 +2796,7 @@ ROM_START( trophyh ) /* V1.0 is currently the only known version */
 ROM_END
 
 ROM_START( funcube2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* XCF5206 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* XCF5206 Code */
 	ROM_LOAD( "fc21_prg-0b.u3", 0x00000, 0x80000, CRC(add1c8a6) SHA1(bf91518da659098a4bad4e756533525fcc910570) )
 
 	ROM_REGION( 0x20000, "sub", 0 ) /* H8/3007 Code */
@@ -2814,7 +2814,7 @@ ROM_START( funcube2 )
 ROM_END
 
 ROM_START( funcube4 )
-	ROM_REGION( 0x80000, "main", 0 ) /* XCF5206 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* XCF5206 Code */
 	ROM_LOAD( "fc41_prg-0.u3", 0x00000, 0x80000, CRC(ef870874) SHA1(dcb8dc3f780ca135df55e4b4f3c95620597ad28f) )
 
 	ROM_REGION( 0x20000, "sub", 0 ) /* H8/3007 Code */
@@ -2833,7 +2833,7 @@ ROM_END
 
 static DRIVER_INIT( funcube2 )
 {
-	UINT32 *main_cpu = (UINT32 *) memory_region(machine, "main");
+	UINT32 *main_cpu = (UINT32 *) memory_region(machine, "maincpu");
 	UINT16 *sub_cpu  = (UINT16 *) memory_region(machine, "sub");
 
 	main_cpu[0x810/4] = 0xe0214e71;
@@ -2853,7 +2853,7 @@ static DRIVER_INIT( funcube2 )
 // Note: same as funcube2
 static DRIVER_INIT( funcube4 )
 {
-	UINT32 *main_cpu = (UINT32 *) memory_region(machine, "main");
+	UINT32 *main_cpu = (UINT32 *) memory_region(machine, "maincpu");
 	UINT16 *sub_cpu  = (UINT16 *) memory_region(machine, "sub");
 
 	main_cpu[0x810/4] = 0xe0214e71;

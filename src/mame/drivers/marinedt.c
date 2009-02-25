@@ -158,7 +158,7 @@ static READ8_HANDLER( marinedt_obj1_x_r )
 	//xxxx---- unknown
 	//----xxxx x pos in tile ram
 
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 if(RAM[0x430e]) --cx; else ++cx;
 //figure out why inc/dec based on 430e?
 	return cx | (cxh<<4);
@@ -576,13 +576,13 @@ static VIDEO_UPDATE( marinedt )
 static MACHINE_DRIVER_START( marinedt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,10000000/4)
+	MDRV_CPU_ADD("maincpu", Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(marinedt_readmem,marinedt_writemem)
 	MDRV_CPU_IO_MAP(marinedt_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -608,7 +608,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( marinedt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mg01",     0x0000, 0x0800, CRC(ad09f04d) SHA1(932fc973b4a2fbbebd7e6437ed30c8444e3d4afb))
 	ROM_LOAD( "mg02",     0x0800, 0x0800, CRC(555a2b0f) SHA1(143a8953ce5070c31dc4c1f623833b2a5a2cf657))
 	ROM_LOAD( "mg03",     0x1000, 0x0800, CRC(2abc79b3) SHA1(1afb331a2c0e320b6d026bc5cb47a53ac3356c2a))

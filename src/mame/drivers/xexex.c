@@ -282,7 +282,7 @@ static READ16_HANDLER( sound_status_r )
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine, 2, memory_region(machine, "audio") + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(machine, 2, memory_region(machine, "audiocpu") + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -454,13 +454,13 @@ static const k054539_interface k054539_config =
 static MACHINE_DRIVER_START( xexex )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)	// 16MHz (32MHz xtal)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)	// 16MHz (32MHz xtal)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(xexex_interrupt,2)
 
 	// 8MHz (PCB shows one 32MHz/18.432MHz xtal, reference: www.system16.com)
 	// more likely 32MHz since 18.432MHz yields 4.608MHz(too slow) or 9.216MHz(too fast) with integer divisors
-	MDRV_CPU_ADD("audio", Z80, 8000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(1920))
@@ -472,7 +472,7 @@ static MACHINE_DRIVER_START( xexex )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 //  MDRV_SCREEN_REFRESH_RATE(8000000/512/288)
 	MDRV_SCREEN_RAW_PARAMS(8000000, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -513,13 +513,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START( xexex ) /* Europe, Version AA */
-	ROM_REGION( 0x180000, "main", 0 )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "067eaa01.16d", 0x000000, 0x40000, CRC(3ebcb066) SHA1(83a20433d9fdcc8b8d7133991f9a8164dddb61f3) )
 	ROM_LOAD16_BYTE( "067eaa02.16f", 0x000001, 0x40000, CRC(36ea7a48) SHA1(34f8046d7ecf5ea66c59c5bc0d7627942c28fd3b) )
 	ROM_LOAD16_BYTE( "067_b03.rom",  0x100000, 0x40000, CRC(97833086) SHA1(a564f7b1b52c774d78a59f4418c7ecccaf94ad41) )
 	ROM_LOAD16_BYTE( "067_b04.rom",  0x100001, 0x40000, CRC(26ec5dc8) SHA1(9da62683bfa8f16607cbea2d59a1446ec8588c5b) )
 
-	ROM_REGION( 0x030000, "audio", 0 )
+	ROM_REGION( 0x030000, "audiocpu", 0 )
 	ROM_LOAD( "067eaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 	ROM_RELOAD(              0x010000, 0x020000 )
 
@@ -542,13 +542,13 @@ ROM_START( xexex ) /* Europe, Version AA */
 ROM_END
 
 ROM_START( xexexa ) /* Asia, Version AA */
-	ROM_REGION( 0x180000, "main", 0 )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "067aaa01.16d", 0x000000, 0x40000, CRC(cf557144) SHA1(4ce587580d953b88864652dd66485d49ca719ec5) )
 	ROM_LOAD16_BYTE( "067aaa02.16f", 0x000001, 0x40000, CRC(b7b98d52) SHA1(ca2343bf37f779699b6782772e559ea5662c1742) )
 	ROM_LOAD16_BYTE( "067_b03.rom",  0x100000, 0x40000, CRC(97833086) SHA1(a564f7b1b52c774d78a59f4418c7ecccaf94ad41) )
 	ROM_LOAD16_BYTE( "067_b04.rom",  0x100001, 0x40000, CRC(26ec5dc8) SHA1(9da62683bfa8f16607cbea2d59a1446ec8588c5b) )
 
-	ROM_REGION( 0x030000, "audio", 0 )
+	ROM_REGION( 0x030000, "audiocpu", 0 )
 	ROM_LOAD( "067eaa05.4e", 0x000000, 0x020000, CRC(0e33d6ec) SHA1(4dd68cb78c779e2d035e43fec35a7672ed1c259b) )
 	ROM_RELOAD(              0x010000, 0x020000 )
 
@@ -571,13 +571,13 @@ ROM_START( xexexa ) /* Asia, Version AA */
 ROM_END
 
 ROM_START( xexexj ) /* Japan, Version AA */
-	ROM_REGION( 0x180000, "main", 0 )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "067jaa01.16d", 0x000000, 0x40000, CRC(06e99784) SHA1(d53fe3724608992a6938c36aa2719dc545d6b89e) )
 	ROM_LOAD16_BYTE( "067jaa02.16f", 0x000001, 0x40000, CRC(30ae5bc4) SHA1(60491e31eef64a9206d1372afa32d83c6c0968b3) )
 	ROM_LOAD16_BYTE( "067_b03.rom",  0x100000, 0x40000, CRC(97833086) SHA1(a564f7b1b52c774d78a59f4418c7ecccaf94ad41) )
 	ROM_LOAD16_BYTE( "067_b04.rom",  0x100001, 0x40000, CRC(26ec5dc8) SHA1(9da62683bfa8f16607cbea2d59a1446ec8588c5b) )
 
-	ROM_REGION( 0x030000, "audio", 0 )
+	ROM_REGION( 0x030000, "audiocpu", 0 )
 	ROM_LOAD( "067jaa05.4e", 0x000000, 0x020000, CRC(2f4dd0a8) SHA1(bfa76c9c968f1beba648a2911510e3d666a8fe3a) )
 	ROM_RELOAD(              0x010000, 0x020000 )
 
@@ -633,8 +633,8 @@ static DRIVER_INIT( xexex )
 	if (!strcmp(machine->gamedrv->name, "xexex"))
 	{
 		// Invulnerability
-//      *(UINT16 *)(memory_region(machine, "main") + 0x648d4) = 0x4a79;
-//      *(UINT16 *)(memory_region(machine, "main") + 0x00008) = 0x5500;
+//      *(UINT16 *)(memory_region(machine, "maincpu") + 0x648d4) = 0x4a79;
+//      *(UINT16 *)(memory_region(machine, "maincpu") + 0x00008) = 0x5500;
 		xexex_strip0x1a = 1;
 	}
 

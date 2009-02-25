@@ -179,7 +179,7 @@ static WRITE8_HANDLER( champbwl_misc_w )
 	coin_lockout_w(0, ~data & 8);
 	coin_lockout_w(1, ~data & 4);
 
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x10000 + 0x4000 * ((data & 0x30)>>4));
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x10000 + 0x4000 * ((data & 0x30)>>4));
 }
 
 static WRITE8_HANDLER( champbwl_objctrl_w )
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( champbwl_objctrl_w )
 }
 
 static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("main", 0x10000)
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&tnzs_objram)
@@ -332,14 +332,14 @@ static const x1_010_interface champbwl_sound_intf =
 static MACHINE_DRIVER_START( champbwl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 16000000/4) /* 4MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(champbwl_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57.5)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -363,7 +363,7 @@ static MACHINE_DRIVER_START( champbwl )
 MACHINE_DRIVER_END
 
 ROM_START( champbwl )
-	ROM_REGION( 0x20000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x20000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "ab001001.u1",  0x10000, 0x10000, CRC(6c6f7675) SHA1(19834f25f2644ae5d156c1e1bbb3fc50cae10fd2) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )

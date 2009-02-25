@@ -37,7 +37,7 @@ VIDEO_UPDATE( kikcubic );
 static WRITE8_HANDLER( vigilant_bank_select_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
@@ -527,12 +527,12 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( vigilant )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3579645)		   /* 3.579645 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(vigilant_map,0)
 	MDRV_CPU_IO_MAP(vigilant_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 3579645)		   /* 3.579645 MHz */
+	MDRV_CPU_ADD("soundcpu", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1 */
@@ -540,7 +540,7 @@ static MACHINE_DRIVER_START( vigilant )
 	MDRV_MACHINE_RESET(m72_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -570,12 +570,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( buccanrs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 5688800)		   /* 5.688800 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 5688800)		   /* 5.688800 MHz */
 	MDRV_CPU_PROGRAM_MAP(vigilant_map,0)
 	MDRV_CPU_IO_MAP(vigilant_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 18432000/6)		   /* 3.072000 MHz */
+	MDRV_CPU_ADD("soundcpu", Z80, 18432000/6)		   /* 3.072000 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(buccanrs_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1 */
@@ -583,7 +583,7 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_MACHINE_RESET(m72_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -629,12 +629,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kikcubic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3579645)		   /* 3.579645 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(kikcubic_map,0)
 	MDRV_CPU_IO_MAP(kikcubic_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 3579645)		   /* 3.579645 MHz */
+	MDRV_CPU_ADD("soundcpu", Z80, 3579645)		   /* 3.579645 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1 */
@@ -642,7 +642,7 @@ static MACHINE_DRIVER_START( kikcubic )
 	MDRV_MACHINE_RESET(m72_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -678,12 +678,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( vigilant )
-	ROM_REGION( 0x30000, "main", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "g07_c03.bin",  0x00000, 0x08000, CRC(9dcca081) SHA1(6d086b70e6bf1fbafa746ef5c82334645f199be9) )
 	ROM_LOAD( "j07_c04.bin",  0x10000, 0x10000, CRC(e0159105) SHA1(da6d74ec075863c67c0ce21b07a54029d138f688) )
 	/* 0x20000-0x2ffff empty */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* 64k for sound */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
 	ROM_LOAD( "g05_c02.bin",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -715,12 +715,12 @@ ROM_START( vigilant )
 ROM_END
 
 ROM_START( vigilntu )
-	ROM_REGION( 0x30000, "main", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "a-8h",  0x00000, 0x08000, CRC(8d15109e) SHA1(9ef57047a0b53cd0143a260193b33e3d5680ca71) )
 	ROM_LOAD( "a-8l",  0x10000, 0x10000, CRC(7f95799b) SHA1(a371671c3c26976314aaac4e410bff0f13a8a085) )
 	/* 0x20000-0x2ffff empty */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* 64k for sound */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
 	ROM_LOAD( "g05_c02.bin",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -752,12 +752,12 @@ ROM_START( vigilntu )
 ROM_END
 
 ROM_START( vigilntj )
-	ROM_REGION( 0x30000, "main", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "vg_a-8h.rom",  0x00000, 0x08000, CRC(ba848713) SHA1(b357cbf404fb1874d555797ed9fb37f946cc4340) )
 	ROM_LOAD( "vg_a-8l.rom",  0x10000, 0x10000, CRC(3b12b1d8) SHA1(2f9207f8d8ec41ea1b8f5bf3c69a97d1d09f6c3f) )
 	/* 0x20000-0x2ffff empty */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* 64k for sound */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
 	ROM_LOAD( "g05_c02.bin",  0x00000, 0x10000, CRC(10582b2d) SHA1(6e7e5f07c49b347b427572efeb180c89f49bf2c7) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -789,12 +789,12 @@ ROM_START( vigilntj )
 ROM_END
 
 ROM_START( kikcubic )
-	ROM_REGION( 0x30000, "main", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "mqj-p0",       0x00000, 0x08000, CRC(9cef394a) SHA1(be9cc78420b4c35f8f9523b529bd56315749762c) )
 	ROM_LOAD( "mqj-b0",       0x10000, 0x10000, CRC(d9bcf4cd) SHA1(f1f1cb8609343dae8637f115e5c96fd88a00f5eb) )
 	ROM_LOAD( "mqj-b1",       0x20000, 0x10000, CRC(54a0abe1) SHA1(0fb1d050c1e299394609214c903bcf4cf11329ff) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* 64k for sound */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
 	ROM_LOAD( "mqj-sp",       0x00000, 0x10000, CRC(bbcf3582) SHA1(4a5b9d4161b26e3ca400573fa78268893e42d5db) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -815,13 +815,13 @@ ROM_START( kikcubic )
 ROM_END
 
 ROM_START( kikcubib )
-	ROM_REGION( 0x30000, "main", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "1.bin",        0x00000, 0x08000, CRC(d3a589ba) SHA1(be2fa4515ed3510fec2b182a3ffcf5ddb9d7256d) )
 	ROM_LOAD( "4.bin",        0x10000, 0x10000, CRC(9ae1e1a6) SHA1(7f3099206300eaa275b003e829dff0b7b91d8cc8) )
 	ROM_LOAD( "5.bin",        0x20000, 0x08000, CRC(a5a6bffd) SHA1(372452c8c9b2c65307434af19eddcb60e7cd0fa3) )
 	ROM_RELOAD(				  0x28000, 0x08000 )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* 64k for sound */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
 	ROM_LOAD( "mqj-sp",       0x00000, 0x10000, CRC(bbcf3582) SHA1(4a5b9d4161b26e3ca400573fa78268893e42d5db) ) /* 2.bin */
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -848,11 +848,11 @@ ROM_START( kikcubib )
 ROM_END
 
 ROM_START( buccanrs )
-	ROM_REGION( 0x30000, "main", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "11.u58",  0x00000, 0x10000, CRC(bf1d7e6f) SHA1(55dcf993515b57c3eb1fab98097a2171df3e38ed) ) // both halves are identical (correct for rom type on this board tho)
 	ROM_LOAD( "12.u25",  0x10000, 0x10000, CRC(87303ba8) SHA1(49a25393e853b9adf7df00a6f9c38a526a02ea4e) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* 64k for sound */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
 	ROM_LOAD( "1.u128",  0x00000, 0x10000, CRC(eb65f8c3) SHA1(82566becb630ce92303905dc0c5bef9e80e9caad) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -887,11 +887,11 @@ ROM_START( buccanrs )
 ROM_END
 
 ROM_START( buccanra )
-	ROM_REGION( 0x30000, "main", 0 ) /* 64k for code + 128k for bankswitching */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + 128k for bankswitching */
 	ROM_LOAD( "bc-011",  0x00000, 0x08000, CRC(6b657ef1) SHA1(a3356654d4b04177af23b39e924cc5ad64930bb6) )
 	ROM_LOAD( "12.u25",  0x10000, 0x10000, CRC(87303ba8) SHA1(49a25393e853b9adf7df00a6f9c38a526a02ea4e) ) // not from this set, hopefully its only a data rom
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* 64k for sound */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* 64k for sound */
 	ROM_LOAD( "1.u128",  0x00000, 0x10000, CRC(eb65f8c3) SHA1(82566becb630ce92303905dc0c5bef9e80e9caad) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )

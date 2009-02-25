@@ -331,10 +331,10 @@ void seibu_ym2203_irqhandler(const device_config *device, int linestate)
 
 MACHINE_RESET( seibu_sound )
 {
-	int romlength = memory_region_length(machine, "audio");
-	UINT8 *rom = memory_region(machine, "audio");
+	int romlength = memory_region_length(machine, "audiocpu");
+	UINT8 *rom = memory_region(machine, "audiocpu");
 
-	sound_cpu=cputag_get_cpu(machine, "audio");
+	sound_cpu=cputag_get_cpu(machine, "audiocpu");
 	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
 		memory_configure_bank(machine, 1, 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);

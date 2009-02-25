@@ -103,7 +103,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( amspdwy_port_r )
 {
-	UINT8 *Tracks = memory_region(space->machine, "main")+0x10000;
+	UINT8 *Tracks = memory_region(space->machine, "maincpu")+0x10000;
 	return Tracks[offset];
 }
 
@@ -269,18 +269,18 @@ static MACHINE_START( amspdwy )
 static MACHINE_DRIVER_START( amspdwy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,3000000)
+	MDRV_CPU_ADD("maincpu", Z80,3000000)
 	MDRV_CPU_PROGRAM_MAP(amspdwy_map,0)
 	MDRV_CPU_IO_MAP(amspdwy_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ: 60Hz, NMI: retn */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ: 60Hz, NMI: retn */
 
-	MDRV_CPU_ADD("audio", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
+	MDRV_CPU_ADD("audiocpu", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
 	MDRV_CPU_PROGRAM_MAP(amspdwy_sound_map,0)
 
     MDRV_MACHINE_START(amspdwy)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -361,11 +361,11 @@ HILO.5A     5A    2732   9B3C
 ***************************************************************************/
 
 ROM_START( amspdwy )
-	ROM_REGION( 0x18000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x18000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "game5807.u33", 0x00000, 0x8000, CRC(88233b59) SHA1(bfdf10dde1731cde5c579a9a5173cafe9295a80c) )
 	ROM_LOAD( "trks6092.u34", 0x10000, 0x8000, CRC(74a4e7b7) SHA1(b4f6e3faaf048351c6671205f52378a64b81bcb1) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "audi9463.u2", 0x00000, 0x8000, CRC(61b0467e) SHA1(74509e7712838dd760919893aeda9241d308d0c3) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )	/* Layer + Sprites */
@@ -376,11 +376,11 @@ ROM_START( amspdwy )
 ROM_END
 
 ROM_START( amspdwya )
-	ROM_REGION( 0x18000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x18000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "game.u33",     0x00000, 0x8000, CRC(facab102) SHA1(e232969eaaad8b89ac8e28ee0a7996107a7de9a2) )
 	ROM_LOAD( "trks6092.u34", 0x10000, 0x8000, CRC(74a4e7b7) SHA1(b4f6e3faaf048351c6671205f52378a64b81bcb1) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "audi9463.u2", 0x00000, 0x8000, CRC(61b0467e) SHA1(74509e7712838dd760919893aeda9241d308d0c3) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )	/* Layer + Sprites */

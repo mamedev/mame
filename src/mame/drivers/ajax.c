@@ -228,14 +228,14 @@ static const k007232_interface k007232_interface_2 =
 static MACHINE_DRIVER_START( ajax )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 3000000)	/* 12/4 MHz*/
+	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* 12/4 MHz*/
 	MDRV_CPU_PROGRAM_MAP(ajax_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", ajax_interrupt)	/* IRQs triggered by the 051960 */
+	MDRV_CPU_VBLANK_INT("screen", ajax_interrupt)	/* IRQs triggered by the 051960 */
 
 	MDRV_CPU_ADD("sub", M6809, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(ajax_sub_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)	/* 3.58 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(ajax_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -246,7 +246,7 @@ static MACHINE_DRIVER_START( ajax )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -290,7 +290,7 @@ MACHINE_DRIVER_END
 */
 
 ROM_START( ajax )
-	ROM_REGION( 0x28000, "main", 0 )	/* 052001 code */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 052001 code */
 	ROM_LOAD( "770_m01.n11",	0x10000, 0x08000, CRC(4a64e53a) SHA1(acd249bfcb5f248c41b3e40c7c1bce1b8c645d3a) )	/* banked ROM */
 	ROM_CONTINUE(				0x08000, 0x08000 )				/* fixed ROM */
 	ROM_LOAD( "770_l02.n12",	0x18000, 0x10000, CRC(ad7d592b) SHA1(c75d9696b16de231c479379dd02d33fe54021d88) )	/* banked ROM */
@@ -300,7 +300,7 @@ ROM_START( ajax )
 	ROM_CONTINUE(				0x0a000, 0x06000 )				/* fixed ROM */
 	ROM_LOAD( "770_f04.g16",	0x10000, 0x10000, CRC(e0e4ec9c) SHA1(15ae09c3ad67ec626d8178ec1417f0c57ca4eca4) )	/* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "770_h03.f16",	0x00000, 0x08000, CRC(2ffd2afc) SHA1(ca2ef684f87bcf9b70b3ec66ec80685edaf04b9b) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -356,7 +356,7 @@ ROM_START( ajax )
 ROM_END
 
 ROM_START( typhoon )
-	ROM_REGION( 0x28000, "main", 0 )	/* 052001 code */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 052001 code */
 	ROM_LOAD( "770_k01.n11",	0x10000, 0x08000, CRC(5ba74a22) SHA1(897d3309f2efb3bfa56e86581ee4a492e656788c) )	/* banked ROM */
 	ROM_CONTINUE(				0x08000, 0x08000 )				/* fixed ROM */
 	ROM_LOAD( "770_k02.n12",	0x18000, 0x10000, CRC(3bcf782a) SHA1(4b6127bced0b2519f8ad30587f32588a16368071) )	/* banked ROM */
@@ -366,7 +366,7 @@ ROM_START( typhoon )
 	ROM_CONTINUE(				0x0a000, 0x06000 )				/* fixed ROM */
 	ROM_LOAD( "770_f04.g16",	0x10000, 0x10000, CRC(e0e4ec9c) SHA1(15ae09c3ad67ec626d8178ec1417f0c57ca4eca4) )	/* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "770_h03.f16",	0x00000, 0x08000, CRC(2ffd2afc) SHA1(ca2ef684f87bcf9b70b3ec66ec80685edaf04b9b) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -392,7 +392,7 @@ ROM_START( typhoon )
 ROM_END
 
 ROM_START( ajaxj )
-	ROM_REGION( 0x28000, "main", 0 )	/* 052001 code */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 052001 code */
 	ROM_LOAD( "770_l01.n11",	0x10000, 0x08000, CRC(7cea5274) SHA1(8e3b2b11a8189e3a1703b3b4b453fbb386f5537f) )	/* banked ROM */
 	ROM_CONTINUE(				0x08000, 0x08000 )				/* fixed ROM */
 	ROM_LOAD( "770_l02.n12",	0x18000, 0x10000, CRC(ad7d592b) SHA1(c75d9696b16de231c479379dd02d33fe54021d88) )	/* banked ROM */
@@ -402,7 +402,7 @@ ROM_START( ajaxj )
 	ROM_CONTINUE(				0x0a000, 0x06000 )				/* fixed ROM */
 	ROM_LOAD( "770_f04.g16",	0x10000, 0x10000, CRC(e0e4ec9c) SHA1(15ae09c3ad67ec626d8178ec1417f0c57ca4eca4) )	/* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "770_f03.f16",	0x00000, 0x08000, CRC(3fe914fd) SHA1(c691920402bd859e2bf765084704a8bfad302cfa) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */

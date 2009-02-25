@@ -2195,7 +2195,7 @@ static const ay8910_interface bongo_ay8910_interface =
 static MACHINE_DRIVER_START( galaxold_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, PIXEL_CLOCK/2)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaxold_readmem,galaxold_writemem)
 
 	MDRV_MACHINE_RESET(galaxold)
@@ -2204,7 +2204,7 @@ static MACHINE_DRIVER_START( galaxold_base )
 	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32+2+64)		/* 32 for the characters, 2 for the bullets, 64 for the stars */
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -2243,7 +2243,7 @@ static MACHINE_DRIVER_START( mooncrst )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mooncrst_readmem,mooncrst_writemem)
 
 	/* video hardware */
@@ -2255,7 +2255,7 @@ static MACHINE_DRIVER_START( scramblb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(scramblb_readmem,scramblb_writemem)
 
 	/* video hardware */
@@ -2269,7 +2269,7 @@ static MACHINE_DRIVER_START( scramb2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(scramb2_readmem,scramb2_writemem)
 
 	/* video hardware */
@@ -2285,7 +2285,7 @@ static MACHINE_DRIVER_START( 4in1 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(_4in1_readmem,_4in1_writemem)
 
 	/* video hardware */
@@ -2299,7 +2299,7 @@ static MACHINE_DRIVER_START( bagmanmc )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bagmanmc_readmem,bagmanmc_writemem)
 
 	MDRV_MACHINE_RESET( devilfsg )
@@ -2315,7 +2315,7 @@ static MACHINE_DRIVER_START( dkongjrm )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dkongjrm_readmem,dkongjrm_writemem)
 
 	/* video hardware */
@@ -2325,7 +2325,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rockclim )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rockclim_readmem,rockclim_writemem)
 	MDRV_GFXDECODE(rockclim)
 	/* video hardware */
@@ -2333,7 +2333,7 @@ static MACHINE_DRIVER_START( rockclim )
 	MDRV_PALETTE_LENGTH(64+64+2)	/* 64 colors only, but still uses bullets so we need to keep the palette big */
 	MDRV_PALETTE_INIT(rockclim)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 
 MACHINE_DRIVER_END
@@ -2341,10 +2341,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ozon1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxold_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ozon1_readmem,ozon1_writemem)
 	MDRV_CPU_IO_MAP(ozon1_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(NULL)
 
@@ -2359,13 +2359,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( drivfrcg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 18432000/6)
+	MDRV_CPU_ADD("maincpu", S2650, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(drivfrcg,0)
 	MDRV_CPU_IO_MAP(drivfrcg_io,0)
-	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2390,7 +2390,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bongo )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxold_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bongo,0)
 	MDRV_CPU_IO_MAP(bongo_io,0)
 
@@ -2405,15 +2405,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hunchbkg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(hunchbkg,0)
 	MDRV_CPU_IO_MAP(hunchbkg_io,0)
-	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
 	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32+2+64)		/* 32 for the characters, 2 for the bullets, 64 for the stars */
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -2432,11 +2432,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( harem )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxold_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(harem_cpu1,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80, 1620000)
+	MDRV_CPU_ADD("audiocpu", Z80, 1620000)
 	MDRV_CPU_PROGRAM_MAP(harem_cpu2,0)
 	MDRV_CPU_IO_MAP(harem_cpu2_io,0)
 
@@ -2460,22 +2460,22 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tazzmang )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tazzmang,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( racknrol )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(racknrol,0)
 	MDRV_CPU_IO_MAP(racknrol_io,0)
-	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
 	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -2499,7 +2499,7 @@ static MACHINE_DRIVER_START( ckongg )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ckongg_readmem,ckongg_writemem)
 
 	MDRV_GFXDECODE(gmgalax)
@@ -2512,7 +2512,7 @@ static MACHINE_DRIVER_START( kkgalax )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxian)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(kkgalax_readmem,kkgalax_writemem)
 
 	MDRV_GFXDECODE(gmgalax)
@@ -2525,15 +2525,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hexpoola )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(racknrol,0)
 	MDRV_CPU_IO_MAP(hexpoola_io,0)
-	MDRV_CPU_VBLANK_INT("main", hunchbks_vh_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
 	MDRV_GFXDECODE(galaxian)
 	MDRV_PALETTE_LENGTH(32)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -2554,7 +2554,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( scramblb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "scramble.1k",  0x0000, 0x0800, CRC(9e025c4a) SHA1(a8cc9391bdd01a5a2fe7f0c4e889b4e2495df891) )
 	ROM_LOAD( "scramble.2k",  0x0800, 0x0800, CRC(306f783e) SHA1(92d19f90f1123cd211706294d668ab23c8b0760b) )
 	ROM_LOAD( "scramble.3k",  0x1000, 0x0800, CRC(0500b701) SHA1(54c84ccad2aae34f42fdddcfcd92cd9da2cd7119) )
@@ -2574,7 +2574,7 @@ ROM_END
 
 
 ROM_START( scramb2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "r1.7f1",  0x0000, 0x0800, CRC(4a43148c) SHA1(ea27fd3acf661101296a58a7a50fb8e4d5292760) )
 	ROM_LOAD( "r1.7f2",  0x0800, 0x0800, CRC(215a3b86) SHA1(bfddfea9f74064123629d89556240c7a59f7bea2) )
 	ROM_LOAD( "r2.7h1",  0x1000, 0x0800, CRC(28779444) SHA1(0abd3a89c8cdd5af2ac06afd38bcd2dcd6010bee) )
@@ -2599,7 +2599,7 @@ ROM_END
 
 
 ROM_START( 4in1 )
-	ROM_REGION( 0x20000, "main", 0 )   /* 64k for code  64k for banked code, encrypted */
+	ROM_REGION( 0x20000, "maincpu", 0 )   /* 64k for code  64k for banked code, encrypted */
 	/* Menu Code, Fixed at 0xc000 - 0xdfff */
 	ROM_LOAD( "rom1a",        0xc000, 0x1000, CRC(ce1af4d9) SHA1(260d81cb703ab33fa5f282454214dea06e59a5d6) )
 	ROM_LOAD( "rom1b",        0xd000, 0x1000, CRC(18484f9b) SHA1(2439841ba5882c287bd9656fbf79190ff9efe4ee) )
@@ -2649,7 +2649,7 @@ ROM_START( 4in1 )
 ROM_END
 
 ROM_START( bagmanmc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b1.bin",       0x0000, 0x1000, CRC(b74c75ee) SHA1(620083c30136e24a37b79eb4647d99b997107693) )
 	ROM_LOAD( "b2.bin",       0x1000, 0x1000, CRC(a7d99916) SHA1(13185e8ff6de92ad5135895e5a7fc8b956f009d3) )
 	ROM_LOAD( "b3.bin",       0x2000, 0x1000, CRC(c78f5360) SHA1(7ce9e94c33f1b8e60cc12a3df5f9555f1ca6130f) )
@@ -2671,7 +2671,7 @@ ROM_START( bagmanmc )
 ROM_END
 
 ROM_START( dkongjrm )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a1",           0x0000, 0x1000, CRC(299486e9) SHA1(cc4143ff8cb7a37c151bebab007a932381ae733b) )
 	ROM_LOAD( "a2",           0x1000, 0x1000, CRC(a74a193b) SHA1(46f208293c0944b468550738d1238de9b672f403) )
 	ROM_LOAD( "b2",           0x2000, 0x1000, CRC(7bc4f236) SHA1(84e7f5fcbea7d047f2a9a9006ae3ed646417c5e0) )
@@ -2692,7 +2692,7 @@ ROM_END
 
 ROM_START( rockclim )
 
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lc01.a1",   0x0000, 0x1000, CRC(8601ae8d) SHA1(6e0c3b34ce5e6879ce7a116c5c2660889a68320d) )
 	ROM_LOAD( "lc02.a2",   0x1000, 0x1000, CRC(2dde9d4c) SHA1(7e343113116b94894558819a7f77f77e4e952da7) )
 	ROM_LOAD( "lc03.a3",   0x2000, 0x1000, CRC(82c48a67) SHA1(abf95062eb5c9bd4bb3c9b9af59396a4ca6905d8) )
@@ -2716,7 +2716,7 @@ ROM_START( rockclim )
 ROM_END
 
 ROM_START( ozon1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom1.bin",     0x0000, 0x1000, CRC(54899e8b) SHA1(270af76ae4396ebda767f160535fa77c0b49726a) )
 	ROM_LOAD( "rom2.bin",     0x1000, 0x1000, CRC(3c90fbfc) SHA1(92da614dba3a644eac144bb0ed434d78a31fcb1a) )
 	ROM_LOAD( "rom3.bin",     0x2000, 0x1000, CRC(79fe313b) SHA1(ef8fd70f5669b7e7d7184eca2baaddcecb55c22d) )
@@ -2730,7 +2730,7 @@ ROM_START( ozon1 )
 ROM_END
 
 ROM_START( ladybugg )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lbuggx.1",   0x0000, 0x0800, CRC(e67e241d) SHA1(42b8eaca71c6b346ab54bc722850d6e6d169c517) )
 	ROM_LOAD( "lbuggx.2",   0x0800, 0x0800, CRC(3cb1fb9a) SHA1(ee76758c94329dfcc740571195a74d9242aaf49f) )
 	ROM_LOAD( "lbuggx.3",   0x1000, 0x0800, CRC(0937009e) SHA1(ef57ebf3d6ab3d6ac0e1faa10c3109d2c80a1248) )
@@ -2751,7 +2751,7 @@ ROM_START( ladybugg )
 ROM_END
 
 ROM_START( vpool )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vidpool1.bin", 0x0000, 0x0800, CRC(333f4732) SHA1(b57460c039c69137645bd4280ad877aa789277d6) )
 	ROM_CONTINUE(             0x2000, 0x0800 )
 	ROM_LOAD( "vidpool2.bin", 0x0800, 0x0800, CRC(eea6c0f1) SHA1(5b18caa78e246f55fd9cd778d6e83f79f0b3f157) )
@@ -2770,7 +2770,7 @@ ROM_START( vpool )
 ROM_END
 
 ROM_START( drivfrcg )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "dfgp1.bin",    0x2800, 0x0400, CRC(52d5e77d) SHA1(4e68ac1274bbc8cb5b6a7dfb511232bd83482453) )
 	ROM_CONTINUE(			  0x2c00, 0x0400 )
 	ROM_CONTINUE(			  0x0000, 0x0400 )
@@ -2801,7 +2801,7 @@ ROM_START( drivfrcg )
 ROM_END
 
 ROM_START( drivfrcb )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "dfp.bin",      0x2800, 0x0400, CRC(b5b2981d) SHA1(c9ff19791895bf05b569457b1e53dfa0aaeb8e95) )
 	ROM_CONTINUE(			  0x2c00, 0x0400 )
 	ROM_CONTINUE(			  0x0000, 0x0400 )
@@ -2832,7 +2832,7 @@ ROM_START( drivfrcb )
 ROM_END
 
 ROM_START( bongo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bg1.bin",    0x0000, 0x1000, CRC(de9a8ec6) SHA1(b5ee99b26d1a39e31b643ad0f5723ee8e364023e) )
 	ROM_LOAD( "bg2.bin",    0x1000, 0x1000, CRC(a19da662) SHA1(a2674392d489c5e5eeb9abc51572a37cc6045220) )
 	ROM_LOAD( "bg3.bin",    0x2000, 0x1000, CRC(9f6f2150) SHA1(26a1f872686ddddcdb690d7b826ba26c20cdec35) )
@@ -2849,7 +2849,7 @@ ROM_START( bongo )
 ROM_END
 
 ROM_START( hunchbkg )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "gal_hb_1",     0x0000, 0x0800, CRC(46590e9b) SHA1(5d26578c91adec20d8d8a17d5dade9ef2febcbe5) )
 	ROM_LOAD( "gal_hb_2",     0x0800, 0x0800, CRC(4e6e671c) SHA1(5948fc7f390f0343b367d333395427ce2f9b2931) )
 	ROM_LOAD( "gal_hb_3",     0x2000, 0x0800, CRC(d29dc242) SHA1(3f6087fe962ee63c2886ad3f502c1a37d357ba87) )
@@ -2868,11 +2868,11 @@ ROM_START( hunchbkg )
 ROM_END
 
 ROM_START( harem )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p0_ic85.bin",  0x0000, 0x2000, CRC(4521b753) SHA1(9033f9c3be8fec1e5ff251e9f60faaf3848a1a1e) )
 	ROM_LOAD( "p1_ic87.bin",  0x8000, 0x2000, BAD_DUMP CRC(3cc5d1e8) SHA1(827e2d20de2a00ec016ead249ed3afdccd0c856c) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "s1_ic12.bin",  0x0000, 0x2000, CRC(b54799dd) SHA1(b6aeb010257cba48a52afd33b4f8031c7d99550c) )
 	ROM_LOAD( "s2_ic13.bin",  0x2000, 0x1000, CRC(2d5573a4) SHA1(1fdcd99d89e078509634742b2116a35bb199fe4b) )
 
@@ -2888,7 +2888,7 @@ ROM_START( harem )
 ROM_END
 
 ROM_START( tazzmang )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tazzm1.4k",    0x0000, 0x1000, CRC(a14480a1) SHA1(60dac6b57e8331cc4daedaf87faf3e3acc68f378) )
 	ROM_LOAD( "tazzm2.5j",    0x1000, 0x1000, CRC(5609f5db) SHA1(3fc50109ea0e012e3e310ae4f5dd0cf460bdca52) )
 	ROM_LOAD( "tazzm3.6f",    0x2000, 0x1000, CRC(fe7f7002) SHA1(ac4134c07a798328b18994010bcaf6b3f728466a) )
@@ -2905,7 +2905,7 @@ ROM_START( tazzmang )
 ROM_END
 
 ROM_START( racknrol )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "horz_p.bin",   0x0000, 0x1000, CRC(32ca5b43) SHA1(f3e7662f947dcdd80f6eae4f002d2fe64a825aff) )
 	ROM_CONTINUE(			  0x2000, 0x1000 )
 	ROM_CONTINUE(			  0x4000, 0x1000 )
@@ -2923,7 +2923,7 @@ ROM_START( racknrol )
 ROM_END
 
 ROM_START( hexpool )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "vert_p.bin",   0x0000, 0x1000, CRC(bdb078fc) SHA1(85a65c3038dc05a98eae71edf9efdd6659a2966a) )
 	ROM_CONTINUE(			  0x2000, 0x1000 )
 	ROM_CONTINUE(			  0x4000, 0x1000 )
@@ -2941,7 +2941,7 @@ ROM_START( hexpool )
 ROM_END
 
 ROM_START( hexpoola )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "rom.4l",       0x0000, 0x1000, CRC(2ca8018d) SHA1(f0784d18bc7e77515bf2140d8993ae8178919853) )
 	ROM_CONTINUE(			  0x2000, 0x1000 )
 	ROM_CONTINUE(			  0x4000, 0x1000 )
@@ -2962,7 +2962,7 @@ ROM_START( hexpoola )
 ROM_END
 
 ROM_START( trvchlng )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "senko11.bin",  0x0000, 0x1000, CRC(3657331d) SHA1(d9a9a4e4e2e696e70dfb888725c959ec8ce24e3d) )
 	ROM_CONTINUE(			  0x2000, 0x1000 )
 	ROM_CONTINUE(			  0x4000, 0x1000 )
@@ -3019,7 +3019,7 @@ Notes:
 */
 
 ROM_START( ckongg )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ck1.bin",       0x2400, 0x0400, CRC(a4323b94) SHA1(1fed47e1df5efa8f40585bedab07b60067edc2bb) )
 	ROM_CONTINUE(              0x1C00, 0x0400)
 	ROM_CONTINUE(              0x4800, 0x0400)
@@ -3052,7 +3052,7 @@ ROM_START( ckongg )
 ROM_END
 
 ROM_START( kkgalax )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kc1.bin",       0x0000, 0x0800, CRC(a87fc828) SHA1(f66b72427d8cdfabdf2274e22bdb10018ac7d2f9) )
 	ROM_CONTINUE( 0x2000, 0x0800)
 	ROM_LOAD( "kc2.bin",       0x0800, 0x0800, CRC(94a13dec) SHA1(d3bfd5a266bb1f0e66d847e15b51bdd4c9a15e37) )
@@ -3075,7 +3075,7 @@ ROM_END
 
 
 ROM_START( porter )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "port1.bin",          0x0000, 0x0800, CRC(babaf7fe) SHA1(2138abf57990df9b6f9953efd3be9b2bede49520) )
 	ROM_CONTINUE(                   0x2000, 0x0800)
 	ROM_LOAD( "port2.bin",          0x0800, 0x0800, CRC(8f7eb0e3) SHA1(7ac5bfc0bb8b6a7a3e9acab5ce9a53f7cba1fca5) )

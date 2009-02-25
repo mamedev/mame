@@ -374,7 +374,7 @@ static READ8_HANDLER( dunhuang_input_r )
 
 static WRITE8_HANDLER( dunhuang_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine,  1, rom + 0x10000 + 0x8000 * ((data >> 2) & 0x7) );
 
 	// ?                data & 0x01
@@ -670,20 +670,20 @@ static const ay8910_interface dunhuang_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	//  A                   B
 	DEVCB_NULL,							DEVCB_HANDLER(dunhuang_dsw_r),	// R
-	DEVCB_MEMORY_HANDLER("main", PROGRAM, dunhuang_input_w),	DEVCB_NULL						// W
+	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, dunhuang_input_w),	DEVCB_NULL						// W
 };
 
 static MACHINE_DRIVER_START( dunhuang )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(dunhuang_map,0)
 	MDRV_CPU_IO_MAP(dunhuang_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_WATCHDOG_TIME_INIT(SEC(5))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -717,7 +717,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( dunhuang )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "rom1.u9", 0x00000, 0x40000, CRC(843a0117) SHA1(26a838cb3552ea6a9ec55940fcbf83b06c068743) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 

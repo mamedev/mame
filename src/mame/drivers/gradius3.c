@@ -336,16 +336,16 @@ static const k007232_interface k007232_config =
 static MACHINE_DRIVER_START( gradius3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(gradius3_map,0)
-	MDRV_CPU_VBLANK_INT("main", cpuA_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", cpuA_interrupt)
 
 	MDRV_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(gradius3_map2,0)
 	MDRV_CPU_VBLANK_INT_HACK(cpuB_interrupt,2)	/* has three interrupt vectors, 1 2 and 4 */
 								/* 4 is triggered by cpu A, the others are unknown but */
 								/* required for the game to run. */
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(gradius3_s_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( gradius3 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -391,7 +391,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( gradius3 )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "945_s13.f15",		0x00000, 0x20000, CRC(70c240a2) SHA1(82dc391572e1f61b0182cb031654d71adcdd5f6e) )
 	ROM_LOAD16_BYTE( "945_s12.e15",		0x00001, 0x20000, CRC(bbc300d4) SHA1(e1ca98bc591575285d7bd2d4fefdf35fed10dcb6) )
 
@@ -405,7 +405,7 @@ ROM_START( gradius3 )
 	ROM_LOAD16_BYTE( "945_l07d.r13",	0x0c0000, 0x20000, CRC(4c16d4bd) SHA1(01dcf169b78a1e495214b10181401d1920b0c924) )
 	ROM_LOAD16_BYTE( "945_l07b.n13",	0x0c0001, 0x20000, CRC(5e209d01) SHA1(0efa1bbfdc7e2ba1e0bb96245e2bfe961258b446) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_m05.d9",				0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )	/* fake */
@@ -433,7 +433,7 @@ ROM_START( gradius3 )
 ROM_END
 
 ROM_START( grdius3a )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "945_13.f15",		0x00000, 0x20000, CRC(9974fe6b) SHA1(c18ad8d7c93bf58d886715d8e210177cf49f220b) )
 	ROM_LOAD16_BYTE( "945_12.e15",		0x00001, 0x20000, CRC(e9771b91) SHA1(c9f4610b897c13742b44b546e2bed8ee21945f61) )
 
@@ -447,7 +447,7 @@ ROM_START( grdius3a )
 	ROM_LOAD16_BYTE( "945_l07d.r13",	0x0c0000, 0x20000, CRC(4c16d4bd) SHA1(01dcf169b78a1e495214b10181401d1920b0c924) )
 	ROM_LOAD16_BYTE( "945_l07b.n13",	0x0c0001, 0x20000, CRC(5e209d01) SHA1(0efa1bbfdc7e2ba1e0bb96245e2bfe961258b446) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_m05.d9",				0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )	/* fake */
@@ -475,7 +475,7 @@ ROM_START( grdius3a )
 ROM_END
 
 ROM_START( grdius3e )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "945_r13.f15",		0x00000, 0x20000, CRC(cffd103f) SHA1(6bd15e8c2e6e5223d7de9b0b375f36f3e81f60ba) )
 	ROM_LOAD16_BYTE( "945_r12.e15",		0x00001, 0x20000, CRC(0b968ef6) SHA1(ba28d16d94b13aac791b11d3d91df26f78e2e477) )
 
@@ -489,7 +489,7 @@ ROM_START( grdius3e )
 	ROM_LOAD16_BYTE( "945_l07d.r13",	0x0c0000, 0x20000, CRC(4c16d4bd) SHA1(01dcf169b78a1e495214b10181401d1920b0c924) )
 	ROM_LOAD16_BYTE( "945_l07b.n13",	0x0c0001, 0x20000, CRC(5e209d01) SHA1(0efa1bbfdc7e2ba1e0bb96245e2bfe961258b446) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "945_m05.d9",				0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) ) /* 945_r05.d9 */
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )	/* fake */

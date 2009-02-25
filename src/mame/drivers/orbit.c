@@ -290,16 +290,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( orbit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6800, MASTER_CLOCK / 16)
+	MDRV_CPU_ADD("maincpu", M6800, MASTER_CLOCK / 16)
 	MDRV_CPU_PROGRAM_MAP(orbit_map, 0)
-	MDRV_CPU_VBLANK_INT("main", orbit_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", orbit_interrupt)
 
-	MDRV_TIMER_ADD_SCANLINE("32v", nmi_32v, "main", 0, 32)
+	MDRV_TIMER_ADD_SCANLINE("32v", nmi_32v, "screen", 0, 32)
 
 	MDRV_MACHINE_RESET(orbit)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK*2, 384*2, 0, 256*2, 261*2, 0, 240*2)
 
@@ -327,7 +327,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( orbit )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD_NIB_LOW ( "033701.h2", 0x6800, 0x400, CRC(6de43b85) SHA1(1643972f45d3a0dd6540158c575cd84cee2b0c9a) )
 	ROM_LOAD_NIB_HIGH( "033693.l2", 0x6800, 0x400, CRC(8878409e) SHA1(a14e0161705bbc230f0aec1837ebc41d62178368) )
 	ROM_LOAD_NIB_LOW ( "033702.h1", 0x6C00, 0x400, CRC(8166bdcb) SHA1(b7ae6cd46b4aff6e1e1ec9273cf068dec4a8cd46) )

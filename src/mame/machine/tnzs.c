@@ -646,7 +646,7 @@ MACHINE_RESET( tnzs )
 	{
 		UINT8 *RAM;
 
-		RAM = memory_region(machine, "main");
+		RAM = memory_region(machine, "maincpu");
 		memory_set_bankptr(machine, 1,&RAM[0x18000]);
 
 		RAM = memory_region(machine, "sub");
@@ -669,7 +669,7 @@ WRITE8_HANDLER( tnzs_sharedram_w )
 
 WRITE8_HANDLER( tnzs_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 //  logerror("PC %04x: writing %02x to bankswitch\n", cpu_get_pc(space->cpu),data);
 

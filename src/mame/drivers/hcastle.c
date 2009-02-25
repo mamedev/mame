@@ -28,7 +28,7 @@ WRITE8_HANDLER( hcastle_pf2_control_w );
 
 static WRITE8_HANDLER( hcastle_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x1f) * 0x2000;
@@ -264,17 +264,17 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( hcastle )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 3000000)	/* Derived from 24 MHz clock */
+	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* Derived from 24 MHz clock */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second verified by comparison with real board */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -307,11 +307,11 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( hcastle )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "m03.k12",      0x08000, 0x08000, CRC(d85e743d) SHA1(314e2a2bbe650540306b85c8b89ec5bcaef11a0d) )
 	ROM_LOAD( "b06.k8",       0x10000, 0x20000, CRC(abd07866) SHA1(a261d0cd90f5909abd06e8b691669e63d890c3be) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "768.e01",      0x00000, 0x08000, CRC(b9fff184) SHA1(c55f468c0da6afdaa2af65a111583c0c42868bd1) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -334,11 +334,11 @@ ROM_START( hcastle )
 ROM_END
 
 ROM_START( hcastleo )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "768.k03",      0x08000, 0x08000, CRC(40ce4f38) SHA1(1ab6d62a75c818b2ccbbb714373d6c7418500eb7) )
 	ROM_LOAD( "768.g06",      0x10000, 0x20000, CRC(cdade920) SHA1(e15b7458ded4e4c811a737575ec3f16e5eec4121) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "768.e01",      0x00000, 0x08000, CRC(b9fff184) SHA1(c55f468c0da6afdaa2af65a111583c0c42868bd1) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -361,11 +361,11 @@ ROM_START( hcastleo )
 ROM_END
 
 ROM_START( hcastlej )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "768p03.k12",0x08000, 0x08000, CRC(d509e340) SHA1(3a8078bd89a80ab9529e4ee8658fcafb8dd65258) )
 	ROM_LOAD( "768j06.k8", 0x10000, 0x20000, CRC(42283c3e) SHA1(565a2eb607e262484f48919536c045d515cff89f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "768.e01",   0x00000, 0x08000, CRC(b9fff184) SHA1(c55f468c0da6afdaa2af65a111583c0c42868bd1) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -388,11 +388,11 @@ ROM_START( hcastlej )
 ROM_END
 
 ROM_START( hcastljo )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "768n03.k12",0x08000, 0x08000, CRC(3e4dca2a) SHA1(cd70fdc42b970b89ae16ab6c81d1a5003fa53dbd) )
 	ROM_LOAD( "768j06.k8", 0x10000, 0x20000, CRC(42283c3e) SHA1(565a2eb607e262484f48919536c045d515cff89f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "768.e01",   0x00000, 0x08000, CRC(b9fff184) SHA1(c55f468c0da6afdaa2af65a111583c0c42868bd1) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )

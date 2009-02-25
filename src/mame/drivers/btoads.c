@@ -320,7 +320,7 @@ INPUT_PORTS_END
 static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	VIDEO_CLOCK/2,					/* pixel clock */
 	1,								/* pixels per clock */
 	btoads_scanline_update,			/* scanline callback */
@@ -339,11 +339,11 @@ static const tms34010_config tms_config =
 
 static MACHINE_DRIVER_START( btoads )
 
-	MDRV_CPU_ADD("main", TMS34020, CPU_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, SOUND_CLOCK/4)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, 183)
@@ -356,7 +356,7 @@ static MACHINE_DRIVER_START( btoads )
 	MDRV_VIDEO_START(btoads)
 	MDRV_VIDEO_UPDATE(tms340x0)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 640, 0, 512, 257, 0, 224)
 
@@ -377,7 +377,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( btoads )
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound program, M27C256B rom */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound program, M27C256B rom */
 	ROM_LOAD( "bt.u102", 0x0000, 0x8000, CRC(a90b911a) SHA1(6ec25161e68df1c9870d48cc2b1f85cd1a49aba9) )
 
 	ROM_REGION16_LE( 0x800000, "user1", 0 )	/* 34020 code, M27C322 roms */

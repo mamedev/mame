@@ -194,7 +194,7 @@ static VIDEO_UPDATE(murogem)
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",		/* screen we are acting on */
+	"screen",	/* screen we are acting on */
 	8,			/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
@@ -207,12 +207,12 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_DRIVER_START( murogem )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6802,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", M6802,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(murogem_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -230,7 +230,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( murogem )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a11-8.8e", 0xf000, 0x0800, CRC(1135345e) SHA1(ae23786a6e2b1b077ce1a183d547af42318ac4d9)  )
 	ROM_LOAD( "a10-9.9e", 0xf800, 0x0800, CRC(f96791d9) SHA1(12b85e0f8b20ea9331f8cb2b2cf2a4383bdb8003)  )
 
@@ -243,7 +243,7 @@ ROM_START( murogem )
 ROM_END
 
 ROM_START( murogema )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poker.02", 0xf000, 0x0800, CRC(e82a5bed) SHA1(556a041cd90e628b6c26824e58cee679dfd59f50)  )
 	ROM_LOAD( "poker.03", 0xf800, 0x0800, CRC(f3fe3f12) SHA1(9c73fbaee20098c734431c6af3168986630dcb67)  )
 
@@ -256,7 +256,7 @@ ROM_START( murogema )
 ROM_END
 
 ROM_START( lasvegas )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pk8.8e", 0xf000, 0x0800, CRC(995bd527) SHA1(af96bd0118511b13a755925e3bf5138be61c09d8)  )
 	ROM_LOAD( "pk9.9e", 0xf800, 0x0800, CRC(2ab1556e) SHA1(cd7bd377b6a3f6c0f8df61b0da83e55468d599d6)  )
 

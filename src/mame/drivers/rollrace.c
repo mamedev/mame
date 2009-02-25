@@ -234,16 +234,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( rollrace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,XTAL_24MHz/8) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80,XTAL_24MHz/16) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_snd,writemem_snd)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -274,7 +274,7 @@ static MACHINE_DRIVER_START( rollace2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(rollrace)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0,255-24,16, 255-16)
 MACHINE_DRIVER_END
 
@@ -286,7 +286,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( fightrol )
-	ROM_REGION( 0x10000, "main",0 )
+	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "4.8k", 0x0000, 0x2000, CRC(efa2f430) SHA1(6aeb2a41e4fba97a0ac1b24fe5437e25b6c6b6c5) )
 	ROM_LOAD( "5.8h", 0x2000, 0x2000, CRC(2497d9f6) SHA1(4f4cfed47efc603bf057dd24b761beecf5b929f4) )
 	ROM_LOAD( "6.8f", 0x4000, 0x2000, CRC(f39727b9) SHA1(08a1300172b4100cb80c9a5d8942408255d8e330) )
@@ -328,12 +328,12 @@ ROM_START( fightrol )
 	ROM_LOAD("tbp24s10.7t", 0x0100, 0x0100, CRC(c0426582) SHA1(8e3e4d1e76243cce272aa099d2d6ad4fa6c99f7c) )
 	ROM_LOAD("tbp24s10.6t", 0x0200, 0x0100, CRC(c096e05c) SHA1(cb5b509e6124453f381a683ba446f8f4493d4610) )
 
-	ROM_REGION( 0x10000,"audio",0 )
+	ROM_REGION( 0x10000,"audiocpu",0 )
 	ROM_LOAD( "8.6f", 0x0000, 0x1000, CRC(6ec3c545) SHA1(1a2477b9e1563734195b0743f5dbbb005e06022e) )
 ROM_END
 
 ROM_START( rollace )
-	ROM_REGION( 0x10000, "main",0 )
+	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "w1.8k", 0x0000, 0x2000, CRC(c0bd3cf3) SHA1(a44d69b8c3249b5093261a32d0e0404992fa7f7a) )
 	ROM_LOAD( "w2.8h", 0x2000, 0x2000, CRC(c1900a75) SHA1(f7ec968b6bcb6ee6db98628cdf566ae0a501edba) )
 	ROM_LOAD( "w3.8f", 0x4000, 0x2000, CRC(16ceced6) SHA1(241119959ffdf26780258bcc5651eca0c6a6128f) )
@@ -375,12 +375,12 @@ ROM_START( rollace )
 	ROM_LOAD("tbp24s10.7t", 0x0100, 0x0100, CRC(c0426582) SHA1(8e3e4d1e76243cce272aa099d2d6ad4fa6c99f7c) )
 	ROM_LOAD("tbp24s10.6t", 0x0200, 0x0100, CRC(c096e05c) SHA1(cb5b509e6124453f381a683ba446f8f4493d4610) )
 
-	ROM_REGION( 0x10000,"audio",0 )
+	ROM_REGION( 0x10000,"audiocpu",0 )
 	ROM_LOAD( "8.6f", 0x0000, 0x1000, CRC(6ec3c545) SHA1(1a2477b9e1563734195b0743f5dbbb005e06022e) )
 ROM_END
 
 ROM_START( rollace2 )
-	ROM_REGION( 0x10000, "main",0 )
+	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "8k.764", 0x0000, 0x2000, CRC(a7abff82) SHA1(d49635f98b28b2b5e2833d25b0961addac2c3e6f) )
 	ROM_LOAD( "8h.764", 0x2000, 0x2000, CRC(9716ba03) SHA1(8a7bfc1dce3b1b0c634690e0637e0a30776c0334) )
 	ROM_LOAD( "8f.764", 0x4000, 0x2000, CRC(3eadb0e8) SHA1(6ff5b76360597f3a6a9718e505295c8557e569ae) )
@@ -423,7 +423,7 @@ ROM_START( rollace2 )
 	ROM_LOAD("tbp24s10.7t", 0x0100, 0x0100, CRC(c0426582) SHA1(8e3e4d1e76243cce272aa099d2d6ad4fa6c99f7c) )
 	ROM_LOAD("tbp24s10.6t", 0x0200, 0x0100, CRC(c096e05c) SHA1(cb5b509e6124453f381a683ba446f8f4493d4610) )
 
-	ROM_REGION( 0x10000,"audio",0 )
+	ROM_REGION( 0x10000,"audiocpu",0 )
 	ROM_LOAD( "8.6f", 0x0000, 0x1000, CRC(6ec3c545) SHA1(1a2477b9e1563734195b0743f5dbbb005e06022e) )
 ROM_END
 

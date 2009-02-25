@@ -185,7 +185,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( subs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,12096000/16)		/* clock input is the "4H" signal */
+	MDRV_CPU_ADD("maincpu", M6502,12096000/16)		/* clock input is the "4H" signal */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(subs_interrupt,4)
 
@@ -235,7 +235,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( subs )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "34190.p1",     0x2800, 0x0800, CRC(a88aef21) SHA1(3811c137041ca43a6e49fbaf7d9d8ef37ba190a2) )
 	ROM_LOAD( "34191.p2",     0x3000, 0x0800, CRC(2c652e72) SHA1(097b665e803cbc57b5a828403a8d9a258c19e97f) )
 	ROM_LOAD( "34192.n2",     0x3800, 0x0800, CRC(3ce63d33) SHA1(a413cb3e0d03dc40a50f5b03b76a4edbe7906f3e) )
@@ -267,7 +267,7 @@ ROM_END
 
 static DRIVER_INIT( subs )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	/* Merge nibble-wide roms together,

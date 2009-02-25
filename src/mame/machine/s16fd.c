@@ -199,8 +199,8 @@ void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_
 {
 	int i;
 
-	fd1094_cpuregion = (UINT16*)memory_region(machine, "main");
-	fd1094_cpuregionsize = memory_region_length(machine, "main");
+	fd1094_cpuregion = (UINT16*)memory_region(machine, "maincpu");
+	fd1094_cpuregionsize = memory_region_length(machine, "maincpu");
 	fd1094_key = memory_region(machine, "user1");
 	fd1094_set_decrypted = set_decrypted;
 
@@ -219,7 +219,7 @@ void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_
 	/* key debugging */
 	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0 && memory_region(machine, "user2") != NULL)
 	{
-		fd1094_init_debugging(machine, "main", "user1", "user2", key_changed);
+		fd1094_init_debugging(machine, "maincpu", "user1", "user2", key_changed);
 	}
 
 	state_save_register_global(machine, fd1094_selected_state);

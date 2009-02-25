@@ -441,14 +441,14 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( nomcu )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, MASTER_CLOCK/8)
+	MDRV_CPU_ADD("audiocpu", Z80, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_START(kangaroo)
 	MDRV_MACHINE_RESET(kangaroo)
@@ -456,7 +456,7 @@ static MACHINE_DRIVER_START( nomcu )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK, 320*2, 0*2, 256*2, 260, 8, 248)
 
@@ -489,13 +489,13 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( fnkyfish )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "tvg_64.0",    0x0000,  0x1000, CRC(af728803) SHA1(1cbbf863f0eb4c759d6037ef9d9d0f4586b7b570) )
 	ROM_LOAD( "tvg_65.1",    0x1000,  0x1000, CRC(71959e6b) SHA1(7336cbf3eefd081cd657a56fb6a8fbdac1b51c2c) )
 	ROM_LOAD( "tvg_66.2",    0x2000,  0x1000, CRC(5ccf68d4) SHA1(c885df8b2b1bcb578ceab6615caf633dac02a5b2) )
 	ROM_LOAD( "tvg_67.3",    0x3000,  0x1000, CRC(938ff36f) SHA1(bf660217ff82d5850ab97238ed2e32199d04f8c9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tvg_68.8",    0x0000,  0x1000, CRC(d36bb2be) SHA1(330160161857407fda62f16e7f43b8833744fd34) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
@@ -507,7 +507,7 @@ ROM_END
 
 
 ROM_START( kangaroo )
-	ROM_REGION( 0x14000, "main", 0 ) /* On TVG-1-CPU-B board */
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* On TVG-1-CPU-B board */
 	ROM_LOAD( "tvg_75.0",    0x0000, 0x1000, CRC(0d18c581) SHA1(0e0f89d644b79e887c53e5294783843ca7e875ba) ) /* IC7 */
 	ROM_LOAD( "tvg_76.1",    0x1000, 0x1000, CRC(5978d37a) SHA1(684c1092de4a0927a03752903c86c3bbe99e868a) ) /* IC8 */
 	ROM_LOAD( "tvg_77.2",    0x2000, 0x1000, CRC(522d1097) SHA1(09fe627a46d32df2e098d9fad7757f9d61bef41f) ) /* IC9 */
@@ -515,7 +515,7 @@ ROM_START( kangaroo )
 	ROM_LOAD( "tvg_79.4",    0x4000, 0x1000, CRC(9e5cf8ca) SHA1(015387f038c5670f88c9b22453d074bd9b2a129d) ) /* IC16 */
 	ROM_LOAD( "tvg_80.5",    0x5000, 0x1000, CRC(2fc18049) SHA1(31fcac8eb660739a1672346136a1581a5ef20325) ) /* IC17 */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* On TVG-1-CPU-B board */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* On TVG-1-CPU-B board */
 	ROM_LOAD( "tvg_81.8",    0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) ) /* IC24 */
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* internal ROM from the 8841 custom MCU */
@@ -533,7 +533,7 @@ ROM_END
 
 
 ROM_START( kangaroa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136008-101.ic7",    0x0000, 0x1000, CRC(0d18c581) SHA1(0e0f89d644b79e887c53e5294783843ca7e875ba) )
 	ROM_LOAD( "136008-102.ic8",    0x1000, 0x1000, CRC(5978d37a) SHA1(684c1092de4a0927a03752903c86c3bbe99e868a) )
 	ROM_LOAD( "136008-103.ic9",    0x2000, 0x1000, CRC(522d1097) SHA1(09fe627a46d32df2e098d9fad7757f9d61bef41f) )
@@ -541,7 +541,7 @@ ROM_START( kangaroa )
 	ROM_LOAD( "136008-105.ic16",   0x4000, 0x1000, CRC(82a26c7d) SHA1(09087552dbe4d27df79396072c0f9b916f78f89b) )
 	ROM_LOAD( "136008-106.ic17",   0x5000, 0x1000, CRC(3dead542) SHA1(0b5d329b1ebbacc650d06289b4e080304e728ea7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "136008-107.ic24",   0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* internal ROM from the 8841 custom MCU */
@@ -559,7 +559,7 @@ ROM_END
 
 
 ROM_START( kangarob )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "tvg_75.0",    0x0000, 0x1000, CRC(0d18c581) SHA1(0e0f89d644b79e887c53e5294783843ca7e875ba) )
 	ROM_LOAD( "tvg_76.1",    0x1000, 0x1000, CRC(5978d37a) SHA1(684c1092de4a0927a03752903c86c3bbe99e868a) )
 	ROM_LOAD( "tvg_77.2",    0x2000, 0x1000, CRC(522d1097) SHA1(09fe627a46d32df2e098d9fad7757f9d61bef41f) )
@@ -567,7 +567,7 @@ ROM_START( kangarob )
 	ROM_LOAD( "tvg_79.4",    0x4000, 0x1000, CRC(9e5cf8ca) SHA1(015387f038c5670f88c9b22453d074bd9b2a129d) )
 	ROM_LOAD( "k6",          0x5000, 0x1000, CRC(7644504a) SHA1(7a8a4bd163d2cdf27390ab2ef65fb7fa6fc1a361) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tvg_81.8",    0x0000, 0x1000, CRC(fb449bfd) SHA1(f593a0339f47e121736a927587132aeb52704557) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )

@@ -593,10 +593,10 @@ static MACHINE_RESET(viper)
 static MACHINE_DRIVER_START(viper)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", MPC8240, 200000000)
+	MDRV_CPU_ADD("maincpu", MPC8240, 200000000)
 	MDRV_CPU_CONFIG(viper_ppc_cfg)
 	MDRV_CPU_PROGRAM_MAP(viper_map, 0)
-	MDRV_CPU_VBLANK_INT("main", viper_vblank)
+	MDRV_CPU_VBLANK_INT("screen", viper_vblank)
 
 	MDRV_MACHINE_RESET(viper)
 
@@ -605,11 +605,11 @@ static MACHINE_DRIVER_START(viper)
 	MDRV_PCI_BUS_DEVICE(12, VOODOO_GRAPHICS, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
-	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "main")
-	MDRV_3DFX_VOODOO_CPU("main")
+	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
+	MDRV_3DFX_VOODOO_CPU("maincpu")
 
  	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(800, 600)

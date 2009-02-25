@@ -293,11 +293,11 @@ static const k007232_interface k007232_config =
 static MACHINE_DRIVER_START( crimfght )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 3000000)		/* ? */
+	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(crimfght_readmem,crimfght_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)	/* verified with PCB */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* verified with PCB */
 	MDRV_CPU_PROGRAM_MAP(crimfght_readmem_sound,crimfght_writemem_sound)
 
 	MDRV_MACHINE_RESET(crimfght)
@@ -305,7 +305,7 @@ static MACHINE_DRIVER_START( crimfght )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)	/* adjusted - compared with PCB speed */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -340,11 +340,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( crimfght )
-	ROM_REGION( 0x28000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x28000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "821l02.f24", 0x10000, 0x18000, CRC(588e7da6) SHA1(285febb3bcca31f82b34af3695a59eafae01cd30) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
@@ -363,11 +363,11 @@ ROM_START( crimfght )
 ROM_END
 
 ROM_START( crimfgtj )
-	ROM_REGION( 0x28000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x28000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "821p02.bin", 0x10000, 0x18000, CRC(f33fa2e1) SHA1(00fc9e8250fa51386f3af2fca0f137bec9e1c220) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
@@ -386,11 +386,11 @@ ROM_START( crimfgtj )
 ROM_END
 
 ROM_START( crimfgt2 )
-ROM_REGION( 0x28000, "main", 0 ) /* code + banked roms */
+ROM_REGION( 0x28000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "crimefb.r02", 0x10000, 0x18000, CRC(4ecdd923) SHA1(78e5260c4bb9b18d7818fb6300d7e1d3a577fb63) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "821l01.h4",  0x0000, 0x8000, CRC(0faca89e) SHA1(21c9c6d736b398a29e8709e1187c5bf3cacdc99d) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
@@ -416,7 +416,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "maincpu");
 	int offs = 0;
 
 	/* bit 5 = select work RAM or palette */
@@ -437,7 +437,7 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 
 static MACHINE_RESET( crimfght )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	konami_configure_set_lines(machine->cpu[0], crimfght_banking);
 

@@ -180,17 +180,17 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( carjmbre )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,18432000/6)
+	MDRV_CPU_ADD("maincpu", Z80,18432000/6)
 	MDRV_CPU_PROGRAM_MAP(carjmbre_readmem,carjmbre_writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80, 1500000)
+	MDRV_CPU_ADD("audiocpu", Z80, 1500000)
 	MDRV_CPU_PROGRAM_MAP(carjmbre_sound_readmem,carjmbre_sound_writemem)
 	MDRV_CPU_IO_MAP(carjmbre_sound_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -215,7 +215,7 @@ static MACHINE_DRIVER_START( carjmbre )
 MACHINE_DRIVER_END
 
 ROM_START( carjmbre )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c1",      0x0000, 0x1000, CRC(62b21739) SHA1(710e5c52f27603aa8f864f6f28d7272f21271d60) )
 	ROM_LOAD( "c2",      0x1000, 0x1000, CRC(9ab1a0fa) SHA1(519cf67b98e62b2b42232788ba01ab6637880afc) )
 	ROM_LOAD( "c3",      0x2000, 0x1000, CRC(bb29e100) SHA1(93e3cfcf7f8b0b36327f402d9a64c04c3b2c7549) )
@@ -225,7 +225,7 @@ ROM_START( carjmbre )
 	ROM_LOAD( "c7",      0x6000, 0x1000, CRC(2b8c4511) SHA1(428a48d6b14455d66720a115bc5f35293dc50de7) )
 	ROM_LOAD( "c8",      0x7000, 0x1000, CRC(51cc22a7) SHA1(f614368bfee04f084c70bf145801ac46e5631acb) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c15",     0x0000, 0x1000, CRC(7d7779d1) SHA1(f8f5246be4cc9632076d3330fc3d3343b911dfee) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

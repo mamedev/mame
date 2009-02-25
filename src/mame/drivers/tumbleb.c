@@ -824,7 +824,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(jumppop_z80_bank_w)
 {
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audio") + 0x10000 + (0x4000 * data));
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audiocpu") + 0x10000 + (0x4000 * data));
 }
 
 static ADDRESS_MAP_START( jumppop_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1995,12 +1995,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tumblepb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000)
+	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(tumblepopb_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2025,12 +2025,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tumbleb2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000)
+	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(tumblepopb_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", tumbleb2_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", tumbleb2_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2054,16 +2054,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jumpkids )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(jumpkids_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* z80? */
-	MDRV_CPU_ADD("audio", Z80, 8000000/2)
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000/2)
 	MDRV_CPU_PROGRAM_MAP(jumpkids_sound_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2086,12 +2086,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fncywld )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(fncywld_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2144,17 +2144,17 @@ static MACHINE_RESET (htchctch)
 
 static MACHINE_DRIVER_START( htchctch )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 15000000) /* verified */
+	MDRV_CPU_ADD("maincpu", M68000, 15000000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(htchctch_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 15000000/4) /* verified on dquizgo */
+	MDRV_CPU_ADD("audiocpu", Z80, 15000000/4) /* verified on dquizgo */
 	MDRV_CPU_PROGRAM_MAP(semicom_sound_map,0)
 
 	MDRV_MACHINE_RESET ( htchctch )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2400)) // ?? cookbib needs it above ~2400 or the Joystick on the How to Play screen is the wrong colour?!
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2219,17 +2219,17 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jumppop )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jumppop_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 3500000) /* verified */
+	MDRV_CPU_ADD("audiocpu", Z80, 3500000) /* verified */
 	MDRV_CPU_PROGRAM_MAP(jumppop_sound_map, 0)
 	MDRV_CPU_IO_MAP(jumppop_sound_io_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1953)	/* measured */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2257,15 +2257,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( suprtrio )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
+	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
 	MDRV_CPU_PROGRAM_MAP(suprtrio_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 8000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(suprtrio_sound_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2290,12 +2290,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pangpang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000)
+	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(pangpang_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", tumbleb2_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", tumbleb2_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2319,7 +2319,7 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( tumbleb )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE ("thumbpop.12", 0x00000, 0x40000, CRC(0c984703) SHA1(588d2b2464e0027c8d0703a2b62ebda225ba4276) )
 	ROM_LOAD16_BYTE( "thumbpop.13", 0x00001, 0x40000, CRC(864c4053) SHA1(013eb35e79aa7a7cd1a8061c4b75b37a8bfb10c6) )
 
@@ -2336,7 +2336,7 @@ ROM_START( tumbleb )
 ROM_END
 
 ROM_START( tumbleb2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE ("thumbpop.2", 0x00000, 0x40000, CRC(34b016e1) SHA1(b4c496358d48469d170a69e8bba58e0ea919b418) )
 	ROM_LOAD16_BYTE( "thumbpop.3", 0x00001, 0x40000, CRC(89501c71) SHA1(2c202218934b845fdf7c99eaf280dccad90767f2) )
 
@@ -2380,11 +2380,11 @@ Note
 */
 
 ROM_START( jumpkids )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "23-ic29.15c", 0x00000, 0x40000, CRC(6ba11e91) SHA1(9f83ef79beb97af1625e7b46858d6f0681dafb23) )
 	ROM_LOAD16_BYTE( "24-ic30.17c", 0x00001, 0x40000, CRC(5795d98b) SHA1(d1435f0b79a4fa45770c56b91f078c1885fbd048) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "22-ic19.3c", 0x00000, 0x08000, CRC(bd619530) SHA1(b4c050012b0f1c31877b3d489a68389be93cc82c) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE ) /* GFX */
@@ -2405,7 +2405,7 @@ ROM_START( jumpkids )
 ROM_END
 
 ROM_START( fncywld )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "01_fw02.bin", 0x000000, 0x080000, CRC(ecb978c1) SHA1(68fbf93a81875f744c6f9820dc4c7d88e912e0a0) )
 	ROM_LOAD16_BYTE( "02_fw03.bin", 0x000001, 0x080000, CRC(2d233b42) SHA1(aebeb5d3e06e73d14f713f201b25466bcac97a68) )
 
@@ -2426,11 +2426,11 @@ ROM_START( fncywld )
 ROM_END
 
 ROM_START( suprtrio )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "rom2",  0x00000, 0x40000, CRC(4102e59d) SHA1(f06f1273dbbb91fa61d84541aa124d9c88ee94c1) )
 	ROM_LOAD16_BYTE( "rom1",  0x00001, 0x40000, CRC(cc3a83c3) SHA1(6f8b1b6b666ce11c02e9defcba751d88621e572d) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 */
 	ROM_LOAD( "rom4l", 0x000000, 0x10000, CRC(466aa96d) SHA1(37f1ba148dbad27ed8e71a0b3434ff970fcb519f) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE ) /* bg tiles */
@@ -2467,7 +2467,7 @@ ROM_END
 */
 
 ROM_START( pangpang )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE ("2.bin", 0x00000, 0x40000, CRC(45436666) SHA1(a319d27320d74266b5e5af7eb1452ecc0b158318) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x40000, CRC(2725cbe7) SHA1(3ce2d8b1460a26ac0d982103d8796cdc296a64e1) )
 
@@ -2551,10 +2551,10 @@ Notes:
 */
 
 ROM_START( jumppop )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP ("68k_prg.bin", 0x00000, 0x80000, CRC(123536b9) SHA1(3597dec81e98d7bdf4ea9053983e62f127defcb7) )
 
-	ROM_REGION( 0x80000, "audio", 0 ) /* Z80 code */
+	ROM_REGION( 0x80000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "z80_prg.bin", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) )
 	ROM_RELOAD( 0x10000, 0x40000)
 
@@ -2607,11 +2607,11 @@ the arcade version on SemiCom type hardware?
 */
 
 ROM_START( metlsavr )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "first-3.ub18", 0x00001, 0x40000, CRC(87bf4ed2) SHA1(ee1a23232bc37d95dca6d612b4e22ed2b723bd01) )
 	ROM_LOAD16_BYTE( "first-4.ub17", 0x00000, 0x40000, CRC(667a494d) SHA1(282391ed7fa994ec51d39c6b086a808ee43e8af1) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "first-2.ua7", 0x00000, 0x10000, CRC(49505edf) SHA1(ea3007f1adbe8e2597ee6201bbd5d07fa9f7c733) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2638,13 +2638,13 @@ ROM_END
 /* BC Story */
 
 ROM_START( bcstry )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "bcstry_u.35",  0x40001, 0x20000, CRC(d25b80a4) SHA1(6ea1c28cf508b856e93a06063e634a09291cb32c) )
 	ROM_CONTINUE ( 0x00001, 0x20000)
 	ROM_LOAD16_BYTE( "bcstry_u.62",  0x40000, 0x20000, CRC(7f7aa244) SHA1(ee9bb2bf22d16f06d7935168e2bd09296fba3abc) )
 	ROM_CONTINUE ( 0x00000, 0x20000)
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bcstry_u.21", 0x04000, 0x4000 , CRC(3ba072d4) SHA1(8b64d3ab4c63132f2f77b2cf38a88eea1a8f11e0) )
 	ROM_CONTINUE( 0x0000, 0x4000 )
 	ROM_CONTINUE( 0xc000, 0x4000 )
@@ -2691,13 +2691,13 @@ ROM_START( bcstry )
 ROM_END
 
 ROM_START( bcstrya )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "prg1.ic35",  0x40001, 0x20000, CRC(2c55100a) SHA1(bc98a0015c99ef84ebd3fc3f7b7a3bdfd700e1da) )
 	ROM_CONTINUE ( 0x00001, 0x20000)
 	ROM_LOAD16_BYTE( "prg2.ic62",  0x40000, 0x20000, CRC(f54c0a96) SHA1(79a3635792a23f47fc914d1d5e118b5a643ca100) )
 	ROM_CONTINUE ( 0x00000, 0x20000)
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bcstry_u.21", 0x04000, 0x4000 , CRC(3ba072d4) SHA1(8b64d3ab4c63132f2f77b2cf38a88eea1a8f11e0) )
 	ROM_CONTINUE( 0x0000, 0x4000 )
 	ROM_CONTINUE( 0xc000, 0x4000 )
@@ -2791,11 +2791,11 @@ Lev 6 0x78 0012 0000 <- RAM shared with protection device (first 0x200 bytes?)
 */
 
 ROM_START( htchctch )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "p03.b16",  0x00001, 0x20000, CRC(eff14c40) SHA1(8fdda1fb859546c16f940e51f7e126768205154c) )
 	ROM_LOAD16_BYTE( "p04.b17",  0x00000, 0x20000, CRC(6991483a) SHA1(c8d868ef1f87655c37f0b1efdbb71cd26918f270) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "p02.b5", 0x00000, 0x10000 , CRC(c5a03186) SHA1(42561ab36e6d7a43828d3094e64bd1229ab893ba) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2822,11 +2822,11 @@ ROM_END
 /* Cookie & Bibi */
 
 ROM_START( cookbib )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "prg1.ub16",  0x00001, 0x20000, CRC(cda6335f) SHA1(34a57785a458d3e9a66c91734b4511fbc9f3455c) )
 	ROM_LOAD16_BYTE( "prg2.ub17",  0x00000, 0x20000, CRC(2664a335) SHA1(8d1c4825720a09db6156599ab905292640b04cba) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "prg-s.ub5", 0x00000, 0x10000 , CRC(547d6ea3) SHA1(42929e453c4f1c90c29197a9bed953139cfe2873) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2853,11 +2853,11 @@ ROM_END
 /* Choky Choky */
 
 ROM_START( chokchok )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ub18.bin",  0x00001, 0x40000, CRC(b183852a) SHA1(fd50c6d91dba64b936ac367e5e5235d09ed60fdd) )
 	ROM_LOAD16_BYTE( "ub17.bin",  0x00000, 0x40000, CRC(ecdb45ca) SHA1(03eb2d27ae4de25aa15477135d3b4de8b3b7f7f0) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ub5.bin", 0x00000, 0x10000 , CRC(30c2171d) SHA1(3954e286d57b955af6ba9b1a0b49c442d7f295ae) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2890,11 +2890,11 @@ ROM_END
 /* Date Quiz Go Go */
 
 ROM_START( dquizgo )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ub18",     0x00001, 0x80000, CRC(07f869f2) SHA1(1e69f8a6ce3bcf0feaeb43cc7c0fc3fa324466b2) )
 	ROM_LOAD16_BYTE( "ub17",     0x00000, 0x80000, CRC(0b96ab14) SHA1(fc132118eaa938c85d210713320b0a04425f48de) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ub5",    0x00000, 0x10000, CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2961,7 +2961,7 @@ OSC: 4.096MHz, 15.000MHz
 */
 
 ROM_START( sdfight )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u818", 0xc0001, 0x20000, CRC(a60e5b22) SHA1(eda1a5de881718f78a45720c3ca43a6288a0e65d) )
 	ROM_CONTINUE( 0x80001, 0x20000)
 	ROM_CONTINUE( 0x40001, 0x20000)
@@ -2971,7 +2971,7 @@ ROM_START( sdfight )
 	ROM_CONTINUE( 0x40000, 0x20000)
 	ROM_CONTINUE( 0x00000, 0x20000)
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ua7", 0x00000, 0x10000 , CRC(c3d36da4) SHA1(7290a977bfa9a3d5e0c98a0f589d877e38aa10a1) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -3060,11 +3060,11 @@ Second in a series of Baseball games:
 */
 
 ROM_START( wlstar )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "n-3.u818", 0x00001, 0x40000, CRC(f01bc623) SHA1(ef9d32071bd259fad8243ff4622a82062e67c196) )
 	ROM_LOAD16_BYTE( "n-4.u817", 0x00000, 0x40000, CRC(fc3e829b) SHA1(736835766f2b534c4ea3081f7a715a09a068a9f6) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ua7", 0x00000, 0x10000, CRC(90cafa5f) SHA1(2d2ba8e395544e49899cac662d87585592b12040) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -3097,11 +3097,11 @@ ROM_END
 /* Wonderleague '96 */
 
 ROM_START( wondl96 )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ub17.bin", 0x00000, 0x40000, CRC(41d8e03c) SHA1(a3ff92ac2ef9b829cf89ceff606f8dd913025bef) )
 	ROM_LOAD16_BYTE( "ub18.bin", 0x00001, 0x40000, CRC(0e4963af) SHA1(6c0607541ca0e5dd8aa4f8138d71150b1ab066cd) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ub5.bin", 0x00000, 0x10000, CRC(d99d19c4) SHA1(a7fae11275bb156cdbf2805fcc3aec44892d0817) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -3185,13 +3185,13 @@ Fourth in a series of Baseball games:
 */
 
 ROM_START( semibase )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ic35.68k",  0x40001, 0x20000, CRC(d2249605) SHA1(ab3faa832f14f799e4a975673495d30160c6eae5) )
 	ROM_CONTINUE ( 0x00001, 0x20000)
 	ROM_LOAD16_BYTE( "ic62.68k",  0x40000, 0x20000, CRC(85ea81c3) SHA1(7e97316f5f373b98fa4063acd74f784b312a1cc4) )
 	ROM_CONTINUE ( 0x00000, 0x20000)
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ic21.z80", 0x04000, 0x4000 , CRC(d95c64d0) SHA1(1b239e8b23b820610dbf67cbd525d4a6c956ba35) )
 	ROM_CONTINUE( 0x0000, 0x4000 )
 	ROM_CONTINUE( 0xc000, 0x4000 )
@@ -3245,7 +3245,7 @@ ROM_END
 void tumblepb_patch_code(running_machine *machine, UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }
@@ -3312,7 +3312,7 @@ static DRIVER_INIT( fncywld )
 	#if FNCYWLD_HACK
 	/* This is a hack to allow you to use the extra features
        of the 2 first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	RAM[0x0005fa/2] = 0x4e71;
 	RAM[0x00060a/2] = 0x4e71;
 	#endif
@@ -3340,7 +3340,7 @@ static DRIVER_INIT ( bcstory )
 static DRIVER_INIT( htchctch )
 {
 
-//  UINT16 *HCROM = (UINT16*)memory_region(machine, "main");
+//  UINT16 *HCROM = (UINT16*)memory_region(machine, "maincpu");
 	UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
 	int i, len = memory_region_length(machine, "user1");
 	/* simulate RAM initialization done by the protection MCU */
@@ -3594,7 +3594,7 @@ static DRIVER_INIT( htchctch )
 
 static void suprtrio_decrypt_code(running_machine *machine)
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	UINT16 *buf = malloc_or_die(0x80000);
 	int i;
 

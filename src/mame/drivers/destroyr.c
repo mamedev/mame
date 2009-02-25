@@ -340,14 +340,14 @@ static PALETTE_INIT( destroyr )
 static MACHINE_DRIVER_START( destroyr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6800, 12096000 / 16)
+	MDRV_CPU_ADD("maincpu", M6800, 12096000 / 16)
 	MDRV_CPU_PROGRAM_MAP(destroyr_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert, 4)
 
 	MDRV_MACHINE_RESET(destroyr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 262)
@@ -363,7 +363,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( destroyr )
-	ROM_REGION( 0x8000, "main", 0 )                  /* program code */
+	ROM_REGION( 0x8000, "maincpu", 0 )                  /* program code */
 	ROM_LOAD( "30146-01.c3", 0x7800, 0x0800, CRC(e560c712) SHA1(0505ab57eee5421b4ff4e87d14505e02b18fd54c) )
 
 	ROM_REGION( 0x0400, "gfx1", ROMREGION_DISPOSE )   /* alpha numerics */

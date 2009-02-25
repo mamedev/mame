@@ -1021,7 +1021,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( ampoker2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/2)		/* 3 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)		/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(ampoker2_map, 0)
 	MDRV_CPU_IO_MAP(ampoker2_io_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
@@ -1030,7 +1030,7 @@ static MACHINE_DRIVER_START( ampoker2 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	/*  if VBLANK is used, the watchdog timer stop to work.
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -1068,9 +1068,9 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( ampoker2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poker9.003", 0x4000, 0x8000, CRC(a31221fc) SHA1(4a8bdd8ce8d5bff7e7cfc4ae91e27c1d366dc54d) )
-	ROM_COPY( "main", 0x8000, 0x0000, 0x4000 ) /* poker9.003 contains the 16K halves swapped around */
+	ROM_COPY( "maincpu", 0x8000, 0x0000, 0x4000 ) /* poker9.003 contains the 16K halves swapped around */
 	ROM_LOAD( "poker9.002", 0x8000, 0x4000, CRC(bfde5bce) SHA1(c7c7ca2268694015e8ec673e8fa5c48043086d3f) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1081,7 +1081,7 @@ ROM_START( ampoker2 )
 ROM_END
 
 ROM_START( ampkr2b1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "airl-v00.512", 0x0000, 0x10000, CRC(e5953bf4) SHA1(291367431e3b21b57704228c63e4da853e6d25b7) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1092,7 +1092,7 @@ ROM_START( ampkr2b1 )
 ROM_END
 
 ROM_START( ampkr2b2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom9.u6", 0x0000, 0x10000, CRC(820a491d) SHA1(36654aacac010e7c086dd18d4e0ca5d959b9044f) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1103,7 +1103,7 @@ ROM_START( ampkr2b2 )
 ROM_END
 
 ROM_START( ampkr2b3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ampoker.u6", 0x0000, 0x10000, CRC(d7b055bd) SHA1(f5231d2ec80f740eabedaba07547ccbb977accc1) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1114,7 +1114,7 @@ ROM_START( ampkr2b3 )
 ROM_END
 
 ROM_START( ampkr95 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "amp95rus.u6", 0x0000, 0x10000, CRC(6ec74b2b) SHA1(2dca05bc111071f1407dd524b67b5a3dc5848c70) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1136,7 +1136,7 @@ ROM_END
 
 */
 ROM_START( ampkr228 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9.u6",  0x0000, 0x10000, CRC(747316cf) SHA1(7c2bb7a1a28e421a27f743eefe3c8878967ce4a9) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1152,10 +1152,10 @@ ROM_START( ampkr228 )
 ROM_END
 
 ROM_START( pkrdewin )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "poker7.001", 0x4000, 0x10000, CRC(eca16b9e) SHA1(5063d733721457ab3b08caafbe8d33b2cbe4f88b) )
-	ROM_COPY( "main",	0x8000, 0x0000, 0x4000 ) /* poker7.001 contains the 1st and 2nd 16K quarters swapped */
-	ROM_COPY( "main", 0x10000, 0x8000, 0x4000 ) /* poker7.001 contains the 1st and 2nd 16K quarters swapped */
+	ROM_COPY( "maincpu",	0x8000, 0x0000, 0x4000 ) /* poker7.001 contains the 1st and 2nd 16K quarters swapped */
+	ROM_COPY( "maincpu", 0x10000, 0x8000, 0x4000 ) /* poker7.001 contains the 1st and 2nd 16K quarters swapped */
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "poker7.002", 0x0000, 0x4000, CRC(65bccb40) SHA1(75f154a2aaf9f9be62e0e1dd8cbe630b9ea0145c) )
@@ -1165,7 +1165,7 @@ ROM_START( pkrdewin )
 ROM_END
 
 ROM_START( videomat )	/* polish bootleg */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom.bin", 0x0000, 0x10000, CRC(910cd941) SHA1(350ca70370c5082901343d0c0c1424729d77b006) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1176,7 +1176,7 @@ ROM_START( videomat )	/* polish bootleg */
 ROM_END
 
 ROM_START( sigmapkr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sigmapkr.u6", 0x0000, 0x10000, CRC(aa3f429a) SHA1(8c82e86de7280590ba157860cbf9783f893f8554) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1187,7 +1187,7 @@ ROM_START( sigmapkr )
 ROM_END
 
 ROM_START( sigma2k )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sigma2k.u6", 0x0000, 0x10000, CRC(608d1771) SHA1(0ec94d780565472c7e68da7e3ce19aea3f1ab4a5) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )

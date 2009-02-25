@@ -131,7 +131,7 @@ static int multigam_game_gfx_bank = 0;
 static WRITE8_HANDLER(multigam_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( space->machine, "main" );
+	UINT8* dst = memory_region( space->machine, "maincpu" );
 	UINT8* src = memory_region( space->machine, "user1" );
 
 	if ( data & 0x80 )
@@ -231,7 +231,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 			if ( multigam3_mmc3_last_bank != ( data & 0xc0 ) )
 			{
 				int bank;
-				UINT8 *prg = memory_region( space->machine, "main" );
+				UINT8 *prg = memory_region( space->machine, "maincpu" );
 
 				/* reset the banks */
 				if ( multigam3_mmc3_command & 0x40 )
@@ -284,7 +284,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 
 					case 6: /* program banking */
 					{
-						UINT8 *prg = memory_region( space->machine, "main" );
+						UINT8 *prg = memory_region( space->machine, "maincpu" );
 						if ( multigam3_mmc3_command & 0x40 )
 						{
 							/* high bank */
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 7: /* program banking */
 						{
 							/* mid bank */
-							UINT8 *prg = memory_region( space->machine, "main" );
+							UINT8 *prg = memory_region( space->machine, "maincpu" );
 							multigam3_mmc3_banks[1] = data & 0x1f;
 							bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
 
@@ -354,7 +354,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 
 static void multigam_init_smb3(running_machine *machine)
 {
-	UINT8* dst = memory_region( machine, "main" );
+	UINT8* dst = memory_region( machine, "maincpu" );
 	UINT8* src = memory_region( machine, "user1" );
 
 	memcpy(&dst[0x8000], &src[0xa0000 + 0x3c000], 0x4000);
@@ -388,7 +388,7 @@ static WRITE8_HANDLER(multigm3_mapper2_w)
 static WRITE8_HANDLER(multigm3_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( space->machine, "main" );
+	UINT8* dst = memory_region( space->machine, "maincpu" );
 	UINT8* src = memory_region( space->machine, "user1" );
 
 	if ( data == 0xa8 )
@@ -399,7 +399,7 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 	else
 	{
 		memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, multigm3_mapper2_w );
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x6000);
+		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x6000);
 	}
 
 	if ( data & 0x80 )
@@ -505,7 +505,7 @@ INPUT_PORTS_END
 
 static const nes_interface multigam_interface_1 =
 {
-	"main"
+	"maincpu"
 };
 
 static PALETTE_INIT( multigam )
@@ -569,13 +569,13 @@ static MACHINE_RESET( multigm3 )
 
 static MACHINE_DRIVER_START( multigam )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", N2A03, N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(multigam_map, 0)
 
 	MDRV_MACHINE_RESET( multigam )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)
@@ -601,14 +601,14 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( multigm3 )
 	MDRV_IMPORT_FROM(multigam)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(multigm3_map, 0)
 
 	MDRV_MACHINE_RESET( multigm3 )
 MACHINE_DRIVER_END
 
 ROM_START( multigam )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.bin", 0x0000, 0x8000, CRC(f0fa7cf2) SHA1(7f3b3dca796b964893197aef7f0f31dfd7a2c1a4) )
 
 	ROM_REGION( 0xC0000, "user1", 0 )
@@ -627,7 +627,7 @@ ROM_START( multigam )
 ROM_END
 
 ROM_START( multigmb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mg_4.bin", 0x0000, 0x8000, CRC(079226c1) SHA1(f4ceedd9b6cc3454550be7421dc75904ad664545) )
 
 	ROM_REGION( 0xC0000, "user1", 0 )
@@ -646,7 +646,7 @@ ROM_START( multigmb )
 ROM_END
 
 ROM_START( multigm3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mg3-6.bin", 0x0000, 0x8000, CRC(3c1e53f1) SHA1(2eaf84e592db58cd268738da2642c716895e4eaa) )
 
 	ROM_REGION( 0x100000, "user1", 0 )
@@ -683,7 +683,7 @@ static DRIVER_INIT(multigm3)
 {
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 
-	multigm3_decrypt(memory_region(machine, "main"), memory_region_length(machine, "main"), decode );
+	multigm3_decrypt(memory_region(machine, "maincpu"), memory_region_length(machine, "maincpu"), decode );
 	multigm3_decrypt(memory_region(machine, "user1"), memory_region_length(machine, "user1"), decode );
 
 	multigmc_mmc3_6000_ram = auto_malloc(0x2000);

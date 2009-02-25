@@ -484,7 +484,7 @@ static INTERRUPT_GEN( chl_interrupt )
 
 static MACHINE_DRIVER_START( changela )
 
-	MDRV_CPU_ADD("main", Z80,5000000)
+	MDRV_CPU_ADD("maincpu", Z80,5000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(chl_interrupt,4)
 
@@ -494,7 +494,7 @@ static MACHINE_DRIVER_START( changela )
 	MDRV_MACHINE_RESET(changela)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)  /* vert size is a guess */
@@ -518,7 +518,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( changela )
-	ROM_REGION( 0x10000, "main", 0 )	/* Z80 code */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* Z80 code */
 	ROM_LOAD( "cl25a",	0x0000, 0x2000, CRC(38530a60) SHA1(0b0ef1abe11c5271fcd1671322b77165217553c3) )
 	ROM_LOAD( "cl24a",	0x2000, 0x2000, CRC(2fcf4a82) SHA1(c33355e2d4d3fab32c8d713a680ec0fceedab341) )
 	ROM_LOAD( "cl23",	0x4000, 0x2000, CRC(08385891) SHA1(d8d66664ec25db067d5a4a6c35ec0ac65b9e0c6a) )

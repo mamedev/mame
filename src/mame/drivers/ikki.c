@@ -194,7 +194,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ikki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,8000000/2) /* 4.000MHz */
+	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
 	MDRV_CPU_PROGRAM_MAP(ikki_cpu1,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -205,7 +205,7 @@ static MACHINE_DRIVER_START( ikki )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -232,7 +232,7 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( ikki )
-	ROM_REGION( 0x10000, "main", 0 ) /* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
 	ROM_LOAD( "tvg17_1",  0x0000,  0x2000, CRC(cb28167c) SHA1(6843553faee0d3bbe432689fdf5f5454470e2b09) )
 	ROM_CONTINUE(         0x8000,  0x2000 )
 	ROM_LOAD( "tvg17_2",  0x2000,  0x2000, CRC(756c7450) SHA1(043e4f3085d1800b569ee397a968229d547ffbe1) )
@@ -265,7 +265,7 @@ ROM_START( ikki )
 ROM_END
 
 ROM_START( farmer )
-	ROM_REGION( 0x10000, "main", 0 ) /* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
 	ROM_LOAD( "tvg-1.10", 0x0000, 0x2000, CRC(2c0bd392) SHA1(138efa9bc2e40c847f5ac3d31bd62021fd894f49) )
 	ROM_CONTINUE(         0x8000, 0x2000 )
 	ROM_LOAD( "tvg-2.9",  0x2000, 0x2000, CRC(b86efe02) SHA1(a11cabd001b1577b5708c3f8b1f2717761096c75) )

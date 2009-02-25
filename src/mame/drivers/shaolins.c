@@ -219,12 +219,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( shaolins )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, XTAL_18_432MHz/12)        /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)        /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(shaolins_interrupt,16)	/* 1 IRQ + 8 NMI */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -256,7 +256,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kicker )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kikrd8.bin",   0x6000, 0x2000, CRC(2598dfdd) SHA1(70a9d81b73bbd4ff6b627a3e4102d5328a946d20) )
 	ROM_LOAD( "kikrd9.bin",   0x8000, 0x4000, CRC(0cf0351a) SHA1(a9da783b29a63a46912a29715e8d11dc4cd22265) )
 	ROM_LOAD( "kikrd11.bin",  0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) )
@@ -278,7 +278,7 @@ ROM_START( kicker )
 ROM_END
 
 ROM_START( shaolins )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kikrd8.bin",   0x6000, 0x2000, CRC(2598dfdd) SHA1(70a9d81b73bbd4ff6b627a3e4102d5328a946d20) )
 	ROM_LOAD( "kikrd9.bin",   0x8000, 0x4000, CRC(0cf0351a) SHA1(a9da783b29a63a46912a29715e8d11dc4cd22265) )
 	ROM_LOAD( "kikrd11.bin",  0xC000, 0x4000, CRC(654037f8) SHA1(52d098386fe87ae97d4dfefab0bd3a902f66d70b) )

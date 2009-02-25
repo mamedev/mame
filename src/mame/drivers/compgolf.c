@@ -209,12 +209,12 @@ static const ym2203_interface ym2203_config =
 };
 
 static MACHINE_DRIVER_START( compgolf )
-	MDRV_CPU_ADD("main", M6809, 2000000)
+	MDRV_CPU_ADD("maincpu", M6809, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -238,7 +238,7 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( compgolf )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cv05-3.bin",   0x08000, 0x8000, CRC(af9805bf) SHA1(bdde482906bb267e76317067785ac0ab7816df63) )
 
 	ROM_REGION( 0x8000, "user1", 0 ) // background data
@@ -264,7 +264,7 @@ ROM_START( compgolf )
 ROM_END
 
 ROM_START( compglfo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cv05.bin",     0x08000, 0x8000, CRC(3cef62c9) SHA1(c4827b45faf7aa4c80ddd3c57f1ed6ba76b5c49b) )
 
 	ROM_REGION( 0x8000, "user1", 0 ) // background data

@@ -272,16 +272,16 @@ static MACHINE_RESET( pkscramble)
 
 static MACHINE_DRIVER_START( pkscramble )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 8000000 )
+	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(pkscramble_map,0)
-	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold) /* only valid irq */
+	//MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) /* only valid irq */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_MACHINE_RESET(pkscramble)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -304,7 +304,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( pkscram )
-	ROM_REGION( 0x20000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "pk1.6e", 0x00000, 0x10000, CRC(80e972e5) SHA1(cbbc6e1e3fbb65b40164e140f368d8fff85c1521) )
 	ROM_LOAD16_BYTE( "pk2.6j", 0x00001, 0x10000, CRC(752c86d1) SHA1(2e0c669307bed6f9eab957b0e1316416e653a72f) )
 

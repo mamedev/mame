@@ -399,12 +399,12 @@ static INTERRUPT_GEN( jollyjgr_interrupt )
 }
 
 static MACHINE_DRIVER_START( jollyjgr )
-	MDRV_CPU_ADD("main", Z80, 3579545)		 /* 3,579545 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3579545)		 /* 3,579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(jollyjgr_map,0)
-	MDRV_CPU_VBLANK_INT("main", jollyjgr_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", jollyjgr_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -426,7 +426,7 @@ static MACHINE_DRIVER_START( jollyjgr )
 MACHINE_DRIVER_END
 
 ROM_START( jollyjgr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kd14.8a",      0x0000, 0x1000, CRC(404cfa2b) SHA1(023abecbc614d1deb6a239906f62e25bb688ac14) )
 	ROM_LOAD( "kd15.8b",      0x1000, 0x1000, CRC(4cdc4c8b) SHA1(07257863a2de3a0e6bc1b41b8dcaae8c89bc4720) )
 	ROM_LOAD( "kd16.8c",      0x2000, 0x1000, CRC(a2fa3500) SHA1(b85439e43a31c3445420896c231ac59f95331226) )

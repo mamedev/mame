@@ -151,7 +151,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( rotaryf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",8085A,4000000) /* 8080? */ /* 2 MHz? */
+	MDRV_CPU_ADD("maincpu",8085A,4000000) /* 8080? */ /* 2 MHz? */
 	MDRV_CPU_PROGRAM_MAP(rotaryf_map,0)
 	MDRV_CPU_IO_MAP(rotaryf_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(rotaryf_interrupt,5)
@@ -159,7 +159,7 @@ static MACHINE_DRIVER_START( rotaryf )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(rotaryf)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)
@@ -169,7 +169,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( rotaryf )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "krf-1.bin", 0x0000, 0x0400, CRC(f7b2d3e6) SHA1(be7afc1a14be60cb895fc4180167353c7156fc4c) )
 	ROM_LOAD( "krf-2.bin", 0x0400, 0x0400, CRC(be9f047a) SHA1(e5dd2b5b4fda7f178e7f1137592ba49fbc9cc82e) )
 	ROM_LOAD( "krf-3.bin", 0x0800, 0x0400, CRC(c7629eb6) SHA1(03aae964783ce4b1de77737e83fd2094483fbda4) )

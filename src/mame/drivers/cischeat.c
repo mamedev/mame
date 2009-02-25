@@ -1760,13 +1760,13 @@ static MACHINE_DRIVER_START( bigrun )
 
 	MDRV_CPU_ADD("cpu2", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(bigrun_readmem2,bigrun_writemem2)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("cpu3", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(bigrun_readmem3,bigrun_writemem3)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("sound", M68000, 6000000)
+	MDRV_CPU_ADD("soundcpu", M68000, 6000000)
 	MDRV_CPU_PROGRAM_MAP(bigrun_sound_readmem,bigrun_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq4_line_hold,CISCHEAT_SOUND_INTERRUPT_NUM)
 
@@ -1775,7 +1775,7 @@ static MACHINE_DRIVER_START( bigrun )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1818,11 +1818,11 @@ static MACHINE_DRIVER_START( cischeat )
 	MDRV_CPU_MODIFY("cpu3")
 	MDRV_CPU_PROGRAM_MAP(cischeat_readmem3,cischeat_writemem3)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(cischeat_sound_readmem,cischeat_sound_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-8-1)
 
 	MDRV_GFXDECODE(cischeat)
@@ -1846,7 +1846,7 @@ static MACHINE_DRIVER_START( f1gpstar )
 	MDRV_CPU_REPLACE("cpu3", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(f1gpstar_readmem3,f1gpstar_writemem3)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(f1gpstar_sound_readmem,f1gpstar_sound_writemem)
 
 	/* video hardware */
@@ -1866,12 +1866,12 @@ static MACHINE_DRIVER_START( f1gpstr2 )
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_readmem,f1gpstr2_writemem)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_sound_readmem,f1gpstr2_sound_writemem)
 
 	MDRV_CPU_ADD("cpu5", M68000, 12000000/* was 10000000 */)
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_io_readmem,f1gpstr2_io_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 MACHINE_DRIVER_END
 
 
@@ -1900,14 +1900,14 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 static MACHINE_DRIVER_START( scudhamm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000, 12000000)
+	MDRV_CPU_ADD("maincpu",M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_scudhamm,writemem_scudhamm)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_scudhamm,INTERRUPT_NUM_SCUDHAMM)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1952,7 +1952,7 @@ static MACHINE_DRIVER_START( armchmp2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scudhamm)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_armchmp2,writemem_armchmp2)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_armchmp2,INTERRUPT_NUM_SCUDHAMM)
 
@@ -2077,7 +2077,7 @@ ROM_START( bigrun )
 	ROM_LOAD16_BYTE( "br8952a.9",  0x000000, 0x020000, CRC(f803f0d9) SHA1(6d2e90e74bb15cd443d901ad0fc827117432daa6) ) // 1xxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "br8952a.10", 0x000001, 0x020000, CRC(8c0df287) SHA1(3a2e689e2d841e2089b18267a8462f1acc40ae99) ) // 1xxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x40000, "sound", 0 )
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "br8953c.2", 0x000000, 0x020000, CRC(b690d8d9) SHA1(317c0b4e9bef30c84daf16765af66f5a6f9d1c54) )
 	ROM_LOAD16_BYTE( "br8953c.1", 0x000001, 0x020000, CRC(79fc7bc0) SHA1(edb6cf626f93417cdc9525627d85a0ca9bcd1b1c) )
 
@@ -2137,7 +2137,7 @@ static DRIVER_INIT( bigrun )
 	rom_1 = (UINT16 *) memory_region(machine, "user1");
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
-	phantasm_rom_decode(machine, "sound");					// Decrypt sound cpu code
+	phantasm_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
 }
 
 
@@ -2204,7 +2204,7 @@ ROM_START( cischeat )
 	ROM_LOAD16_BYTE( "ch9073v1.03", 0x000000, 0x040000, CRC(bf1d1cbf) SHA1(0892ce5f35864393a6f899f02f811b8fdba03978) )
 	ROM_LOAD16_BYTE( "ch9073v1.04", 0x000001, 0x040000, CRC(1ec8a597) SHA1(311d4aa8bd92dd2eea0a64f881f64d19b7ba7d12) )
 
-	ROM_REGION( 0x40000, "sound", 0 )
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "ch9071.11", 0x000000, 0x020000, CRC(bc137bea) SHA1(ca6d781a617c797aec87e6ce0a002280aa62aebc) )
 	ROM_LOAD16_BYTE( "ch9071.10", 0x000001, 0x020000, CRC(bf7b634d) SHA1(29186c41a397df322cc2c40decd1c19963f89d36) )
 
@@ -2269,7 +2269,7 @@ static DRIVER_INIT( cischeat )
 	rom_3 = (UINT16 *) (memory_region(machine, "user1") + 0xc0000);
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
-	astyanax_rom_decode(machine, "sound");					// Decrypt sound cpu code
+	astyanax_rom_decode(machine, "soundcpu");					// Decrypt sound cpu code
 }
 
 
@@ -2411,7 +2411,7 @@ ROM_START( f1gpstar )
 	ROM_LOAD16_BYTE( "9188a-6.v10",  0x000000, 0x020000, CRC(18ba0340) SHA1(e46e10a350f18cf3a46c0d3a0cb08fc369fced6d) )
 	ROM_LOAD16_BYTE( "9188a-1.v10",  0x000001, 0x020000, CRC(109d2913) SHA1(e117556481e801d51b8526a143bc202dda222f7f) )
 
-	ROM_REGION( 0x40000, "sound", 0 )
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "9190a-2.v11", 0x000000, 0x020000, CRC(acb2fd80) SHA1(bbed505ce745490ae11df8efdd3633181cfd4dec) )
 	ROM_LOAD16_BYTE( "9190a-1.v11", 0x000001, 0x020000, CRC(7cccadaf) SHA1(d1b79fbd0e27e8d479ef533fa00b18d1f2982dda) )
 
@@ -2625,7 +2625,7 @@ ROM_START( wildplt )
 	ROM_LOAD16_BYTE( "gp-9188a_06_ver1-0.bin", 0x000000, 0x20000, CRC(99139696) SHA1(4f8c96012a8214ed952aa44d65ff92e9b3adcf73) )
 	ROM_LOAD16_BYTE( "gp-9188a_01_ver1-0.bin", 0x000001, 0x20000, CRC(2c3d7ec4) SHA1(30215b2ea106aa3c8069fef9411e5f41be5645f6) )
 
-	ROM_REGION( 0x40000, "sound", 0 )
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "wp-92116_3_ver1-1.bin", 0x000000, 0x20000, CRC(51dd594b) SHA1(3fbec13c1d2942797267820157180d374b38347c) )
 	ROM_LOAD16_BYTE( "wp-92116_4_ver1-1.bin", 0x000001, 0x20000, CRC(9ba3cb7b) SHA1(6f55e2675bde2756a2996e6ab6aaef4c9d3f4724) )
 
@@ -2840,7 +2840,7 @@ ROM_START( f1gpstr2 )
 	ROM_LOAD16_BYTE( "9188a-6.27",  0x000000, 0x020000, CRC(68faa23b) SHA1(b18c407cc1273295ec9fc30af191fccd94447ae8) )
 	ROM_LOAD16_BYTE( "9188a-1.2",   0x000001, 0x020000, CRC(e4d83b4f) SHA1(4022521e43f6361c5e04a604f8a7fa1e60a2ac99) )
 
-	ROM_REGION( 0x40000, "sound", 0 )
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "92116-3.37", 0x000000, 0x020000, CRC(2a541095) SHA1(934ef9b6bbe3f6e2e2649dde5671547b955ffc7c) )
 	ROM_LOAD16_BYTE( "92116-4.38", 0x000001, 0x020000, CRC(70da1825) SHA1(7f2077e9b40d5acf4da3f6bcc5d7b92d6d08f861) )
 
@@ -2947,7 +2947,7 @@ GP-9189:
 ***************************************************************************/
 
 ROM_START( scudhamm )
-	ROM_REGION( 0x080000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD16_BYTE( "3", 0x000000, 0x040000, CRC(a908e7bd) SHA1(be0a8f959ab5c19122eee6c3def6137f37f1a9c6) )
 	ROM_LOAD16_BYTE( "4", 0x000001, 0x040000, CRC(981c8b02) SHA1(db6c8993bf1c3993ab31dd649022ab76169975e1) )
 
@@ -3119,7 +3119,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( armchmp2 )
-	ROM_REGION( 0x080000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD16_BYTE( "ac-91106v2.6_4.ic63", 0x000000, 0x020000, CRC(e0cec032) SHA1(743b022b6de3efb045c4f1cca49caed0259ccfff) )
 	ROM_LOAD16_BYTE( "ac-91106v2.6_3.ic62", 0x000001, 0x020000, CRC(5de6da19) SHA1(1f46056596924789394ad2d99ec2d7fcb7845d3c) )
 
@@ -3164,7 +3164,7 @@ ROM_START( armchmp2 )
 ROM_END
 
 ROM_START( armchm2o )
-	ROM_REGION( 0x080000, "main", 0 )		/* Main CPU Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* Main CPU Code */
 	ROM_LOAD16_BYTE( "ac91106_ver1.7_4.ic63", 0x000000, 0x020000, CRC(aaa11bc7) SHA1(ac6186f45a006074d3a86d7437c5a3411bf27188) )
 	ROM_LOAD16_BYTE( "ac91106_ver1.7_3.ic62", 0x000001, 0x020000, CRC(a7965879) SHA1(556fecd6ea0f977b718d132c4180bb2160b9da7e) )
 

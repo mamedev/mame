@@ -100,7 +100,7 @@ extern UINT8 *himesiki_bg_ram;
 
 static WRITE8_HANDLER( himesiki_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1, &ROM[0x10000+0x800*(data & 8)]);
 
 	if (data & 0xf7)
@@ -279,17 +279,17 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( himesiki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 6.000 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(himesiki_prm0,0)
 	MDRV_CPU_IO_MAP(himesiki_iom0,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, MCLK/3) /* 4.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(himesiki_prm1,0)
 	MDRV_CPU_IO_MAP(himesiki_iom1,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -314,7 +314,7 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( himesiki )
-	ROM_REGION( 0x018000, "main", 0 ) /* z80 */
+	ROM_REGION( 0x018000, "maincpu", 0 ) /* z80 */
 	ROM_LOAD( "1.1k",  0x00000,  0x08000, CRC(fb4604b3) SHA1(e8155bbafb881125e1bf9a04808d6a6546887e90) )
 	ROM_LOAD( "2.1g",  0x10000,  0x08000, CRC(0c30ded1) SHA1(0ad67115fa15d0b6261a278a946a6d46c06430ef) )
 

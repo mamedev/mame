@@ -144,8 +144,8 @@ static DRIVER_INIT( shangkid )
 	shangkid_gfx_type = 1;
 
 	/* set up banking */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x8000, 0x8000);
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audio") + 0x0000, 0x10000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x8000, 0x8000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audiocpu") + 0x0000, 0x10000);
 }
 
 /***************************************************************************************/
@@ -376,16 +376,16 @@ static const ay8910_interface shangkid_ay8910_interface =
 static MACHINE_DRIVER_START( chinhero )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_18_432MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chinhero_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("bbx", Z80, XTAL_18_432MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chinhero_bbx_map,0)
 	MDRV_CPU_IO_MAP(chinhero_bbx_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_18_432MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chinhero_sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -394,7 +394,7 @@ static MACHINE_DRIVER_START( chinhero )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -424,14 +424,14 @@ static MACHINE_DRIVER_START( shangkid )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(chinhero)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(shangkid_main_map,0)
 
 	MDRV_CPU_MODIFY("bbx")
 	MDRV_CPU_PROGRAM_MAP(shangkid_bbx_map,0)
 	MDRV_CPU_IO_MAP(shangkid_bbx_portmap,0)
 
-	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(shangkid_sound_map,0)
 
 	MDRV_MACHINE_RESET(shangkid)
@@ -469,13 +469,13 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( dynamski )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3000000) /* ? */
+	MDRV_CPU_ADD("maincpu", Z80, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(dynamski_map,0)
 	MDRV_CPU_IO_MAP(dynamski_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -672,7 +672,7 @@ INPUT_PORTS_END
 /***************************************************************************************/
 
 ROM_START( chinhero )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code (main) */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code (main) */
 	ROM_LOAD( "ic2.1",		  0x0000, 0x2000, CRC(8974bac4) SHA1(932a677d0928f4146201f206b71ac2bcc0f6735c) )
 	ROM_LOAD( "ic3.2",		  0x2000, 0x2000, CRC(9b7a02fe) SHA1(b17593262ec24b999d66634b84eee95c1088f7eb) )
 	ROM_LOAD( "ic4.3",		  0x4000, 0x2000, CRC(e86d4195) SHA1(5081500e0a6d4fd19690134efd6f35b6047e6727) )
@@ -683,7 +683,7 @@ ROM_START( chinhero )
 	ROM_LOAD( "ic31.6",		  0x0000, 0x2000, CRC(7c56927b) SHA1(565a10b39f2d5d38cb5415aadd7fbdb90dcf13cb) )
 	ROM_LOAD( "ic32.7",		  0x2000, 0x2000, CRC(d67b8045) SHA1(0374cafb8d4828e195791784ac187772c49c18f9) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code (sound) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound) */
 	ROM_LOAD( "ic47.8",		  0x0000, 0x2000, CRC(3c396062) SHA1(2c1540eb123b3124e1679ba09e063e80f2423022) )
 	ROM_LOAD( "ic48.9",		  0x2000, 0x2000, CRC(b14f2bab) SHA1(3643b430e3b464b0bc9aca81122b07fb8eb0fb9f) )
 	ROM_LOAD( "ic49.10",	  0x4000, 0x2000, CRC(8c0e43d1) SHA1(acaead801b4782875c8b6092e987b73f9973f8b0) )
@@ -721,7 +721,7 @@ ROM_START( chinhero )
 ROM_END
 
 ROM_START( chinher2 )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code (main) */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code (main) */
 	ROM_LOAD( "1.128",        0x0000, 0x4000, CRC(68e247aa) SHA1(27c2b864e482ba10c81337ed7c03a58b395e52bb) )
 	ROM_LOAD( "2.128",        0x4000, 0x4000, CRC(0346d8c9) SHA1(458b9a37b0ad0cafecdb0348f7d93508531bc310) )
 	ROM_LOAD( "3.128",        0x8000, 0x4000, CRC(a78b8d78) SHA1(c2b7b2d56e2fdb7a2a11bb8b1aab35a841331b96) )
@@ -729,7 +729,7 @@ ROM_START( chinher2 )
 	ROM_REGION( 0x10000, "bbx", 0 ) /* Z80 code (coprocessor) */
 	ROM_LOAD( "4.128",        0x0000, 0x4000, CRC(6ab2e836) SHA1(61c84c0b685e29bac8020a0051586267ecd20166) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code (sound) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound) */
 	ROM_LOAD( "5.128",        0x0000, 0x4000, CRC(4e4f3f92) SHA1(57d0485f8a0110f5448b554d2fab1caba52551fd) )
 	ROM_LOAD( "ic49.10",      0x4000, 0x2000, CRC(8c0e43d1) SHA1(acaead801b4782875c8b6092e987b73f9973f8b0) )
 
@@ -785,7 +785,7 @@ There are present 12 bipolar proms but i cannot dump them,but i think that code 
  */
 
 ROM_START( chinhert )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code (main) */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code (main) */
 	ROM_LOAD( "chtaito1.bin",        0x0000, 0x4000, CRC(2bd64de0) SHA1(cce14f9779a830ed83fa185918d22de0658e40ea) )
 	ROM_LOAD( "chtaito2.bin",        0x4000, 0x4000, CRC(8fd04da9) SHA1(17f868c33ad01f0df96fe50e78dbde35ac8e2fe1) )
 	ROM_LOAD( "chtaito3.bin",        0x8000, 0x2000, CRC(cd6908e7) SHA1(0a9b1d91bf64e8722a4e9c89658f5d4ea96c07a4) )
@@ -793,7 +793,7 @@ ROM_START( chinhert )
 	ROM_REGION( 0x10000, "bbx", 0 ) /* Z80 code (coprocessor) */
 	ROM_LOAD( "chtaito4.bin",        0x0000, 0x4000, CRC(2a012614) SHA1(384575197f927a6acc8b77c3b3516e0d93e7784d) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code (sound) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound) */
 	ROM_LOAD( "chtaito5.bin",        0x0000, 0x4000, CRC(4e4f3f92) SHA1(57d0485f8a0110f5448b554d2fab1caba52551fd) )
 	ROM_LOAD( "chtaito6.bin",        0x4000, 0x2000, CRC(8c0e43d1) SHA1(acaead801b4782875c8b6092e987b73f9973f8b0) )
 
@@ -832,7 +832,7 @@ ROM_END
 
 ROM_START( shangkid )
 	/* Main CPU - handles game logic */
-	ROM_REGION( 0x12000, "main", 0 ) /* Z80 (NEC D780C-1) code */
+	ROM_REGION( 0x12000, "maincpu", 0 ) /* Z80 (NEC D780C-1) code */
 	ROM_LOAD( "cr00ic02.bin", 0x00000, 0x4000, CRC(2e420377) SHA1(73eb916b1693ffab8049ea0d8d3503629fa27948) )
 	ROM_LOAD( "cr01ic03.bin", 0x04000, 0x4000, CRC(161cd358) SHA1(2cc1c30b3d3215ddc7c7f96a3358ed50e0f850e3) )
 	ROM_LOAD( "cr02ic04.bin", 0x08000, 0x2000, CRC(85b6e455) SHA1(3b2cd1e55355d24c014c5afe0212c6c9f0899a28) )	/* banked at 0x8000 */
@@ -855,7 +855,7 @@ ROM_START( shangkid )
 	ROM_LOAD( "cr06ic33.bin", 0x8000, 0x2000, CRC(0f3bdbd8) SHA1(2e0e81425e4e5592d3e2c8395075720c2ad3f79a) )
 
 	/*  The Sound CPU is a dedicated Sample Player */
-	ROM_REGION( 0x1e000, "audio", 0 ) /* Z80 (NEC D780C-1) */
+	ROM_REGION( 0x1e000, "audiocpu", 0 ) /* Z80 (NEC D780C-1) */
 	ROM_LOAD( "cr11ic51.bin", 0x00000, 0x4000, CRC(2e2d6afe) SHA1(1414a06b6cf14dfd69ca6cf35e4eb7d75af3f219) )
 	ROM_LOAD( "cr12ic43.bin", 0x04000, 0x4000, CRC(dd29a0c8) SHA1(8411c31fefdce8c9233fe531b5bf3b6c43c03cba) )
 	ROM_LOAD( "cr13ic44.bin", 0x08000, 0x4000, CRC(879d0de0) SHA1(b1422cf239381ac949867c42ca8101fa8dcac9d6) )
@@ -896,7 +896,7 @@ ROM_END
 
 ROM_START( hiryuken )
 	/* Main CPU - handles game logic */
-	ROM_REGION( 0x12000, "main", 0 ) /* Z80 (NEC D780C-1) code */
+	ROM_REGION( 0x12000, "maincpu", 0 ) /* Z80 (NEC D780C-1) code */
 	ROM_LOAD( "1.2", 0x00000, 0x4000, CRC(c7af7f2e) SHA1(b035a4230e10bcf0891e41423a51fb6169087b8e) )
 	ROM_LOAD( "2.3", 0x04000, 0x4000, CRC(639afdb3) SHA1(50bd1deffb66049f101faceb108ee95eb3fe8ae6) )
 	ROM_LOAD( "3.4", 0x08000, 0x2000, CRC(ad210482) SHA1(9a32bbaf601d3b00f0a79ce90bb9a32e8e608977) ) /* banked at 0x8000 */
@@ -919,7 +919,7 @@ ROM_START( hiryuken )
 	ROM_LOAD( "7.33",         0x8000, 0x2000, CRC(3745ed36) SHA1(29a462a7d6e994cd2a917ce0b79fe342cfcc2417) )
 
 	/* The Sound CPU is a dedicated Sample Player */
-	ROM_REGION( 0x1e000, "audio", 0 ) /* Z80 (NEC D780C-1) */
+	ROM_REGION( 0x1e000, "audiocpu", 0 ) /* Z80 (NEC D780C-1) */
 	ROM_LOAD( "cr11ic51.bin", 0x00000, 0x4000, CRC(2e2d6afe) SHA1(1414a06b6cf14dfd69ca6cf35e4eb7d75af3f219) )	// 12.51
 //  ROM_LOAD( "cr12ic43.bin", 0x04000, 0x4000, CRC(dd29a0c8) SHA1(8411c31fefdce8c9233fe531b5bf3b6c43c03cba) )   // not present in this set
 //  ROM_LOAD( "cr13ic44.bin", 0x08000, 0x4000, CRC(879d0de0) SHA1(b1422cf239381ac949867c42ca8101fa8dcac9d6) )   // not present in this set
@@ -959,7 +959,7 @@ ROM_START( hiryuken )
 ROM_END
 
 ROM_START( dynamski )
-	ROM_REGION( 0x12000, "main", 0 ) /* Z80 code */
+	ROM_REGION( 0x12000, "maincpu", 0 ) /* Z80 code */
 	ROM_LOAD( "dynski.1",     0x00000, 0x1000, CRC(30191160) SHA1(5ffa3355f53e4be65bd96101088d2d7b66490141) ) /* code */
 	ROM_LOAD( "dynski.2",     0x01000, 0x1000, CRC(5e08a0b0) SHA1(89398752e8ea1ffd8ec8392f5c8e20f25cf8fdfb) )
 	ROM_LOAD( "dynski.3",     0x02000, 0x1000, CRC(29cfd740) SHA1(a5d6b7b59e631f387788f29e8f029eaf00d1ea3f) )

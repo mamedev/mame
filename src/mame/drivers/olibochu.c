@@ -366,16 +366,16 @@ static INTERRUPT_GEN( olibochu_interrupt )
 static MACHINE_DRIVER_START( olibochu )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz ?? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(olibochu_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ?? */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ?? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -405,7 +405,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( olibochu )
-	ROM_REGION( 0x10000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "1b.3n",        0x0000, 0x1000, CRC(bf17f4f4) SHA1(1075456f4b70a68548e0e1b6271fd4b845a77ce4) )
 	ROM_LOAD( "2b.3lm",       0x1000, 0x1000, CRC(63833b0d) SHA1(0135c449c92470241d03a87709c739209139d660) )
 	ROM_LOAD( "3b.3k",        0x2000, 0x1000, CRC(a4038e8b) SHA1(d7dce830239c8975ac135b213a99eec0c20ec3e2) )
@@ -415,7 +415,7 @@ ROM_START( olibochu )
 	ROM_LOAD( "7c.3e",        0x6000, 0x1000, CRC(89c26fb4) SHA1(ebc51e40612af894b20bd7fc3a5179cd35aaac9b) )
 	ROM_LOAD( "8b.3d",        0x7000, 0x1000, CRC(af19e5a5) SHA1(5a55bbee5b2f20e2988171a310c8293dabbd9a72) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound CPU */
 	ROM_LOAD( "17.4j",        0x0000, 0x1000, CRC(57f07402) SHA1(a763a835ac512c69b4351c1ec72b0a64e46203aa) )
 	ROM_LOAD( "18.4l",        0x1000, 0x1000, CRC(0a903e9c) SHA1(d893c2f5373f748d8bebf3673b15014f4a8d4b5c) )
 

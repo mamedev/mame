@@ -659,10 +659,10 @@ static INTERRUPT_GEN( skylncr_vblank_interrupt )
 static MACHINE_DRIVER_START( skylncr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(mem_map_skylncr,0)
 	MDRV_CPU_IO_MAP(io_map_skylncr,0)
-	MDRV_CPU_VBLANK_INT("main", skylncr_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", skylncr_vblank_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -671,7 +671,7 @@ static MACHINE_DRIVER_START( skylncr )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -726,7 +726,7 @@ Notes:
 */
 
 ROM_START( skylncr )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "27512.u35",  0x00000, 0x10000, CRC(98b1c9fe) SHA1(9ca1706d25038a078fb07ba5c2e6681ed468bc88) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -737,7 +737,7 @@ ROM_START( skylncr )
 ROM_END
 
 ROM_START( butrfly )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "butterfly.prg",  0x00000, 0x10000, CRC(b35b289c) SHA1(5a02bfb6e1fb608099b9f491c10795ef888a3b36) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -784,7 +784,7 @@ Notes:
 */
 
 ROM_START( madzoo )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "27512.u9",  0x00000, 0x10000, CRC(98b1c9fe) SHA1(9ca1706d25038a078fb07ba5c2e6681ed468bc88) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -801,7 +801,7 @@ ROM_START( madzoo )
 ROM_END
 
 ROM_START( leader )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "leader.prg",  0x00000, 0x10000, CRC(1a6e1129) SHA1(639f687e7720bab89628b377dca0475f17a35041) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )

@@ -595,9 +595,9 @@ static const samples_interface senjyo_samples_interface =
 static MACHINE_DRIVER_START( senjyo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", senjyo_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", senjyo_interrupt)
 
 	MDRV_CPU_ADD("sub", Z80, 2000000)	/* 2 MHz? */
 	MDRV_CPU_CONFIG(senjyo_daisy_chain)
@@ -610,7 +610,7 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_Z80CTC_ADD( "z80ctc", 2000000 /* same as "sub" */, senjyo_ctc_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -645,7 +645,7 @@ static MACHINE_DRIVER_START( starforb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(senjyo)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem,starforb_writemem)
 
 	MDRV_CPU_MODIFY("sub")
@@ -660,7 +660,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( senjyo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "08m_05t.bin", 0x0000, 0x2000, CRC(b1f3544d) SHA1(59997164dfb740fce1862d89754be7517303161a) )
 	ROM_LOAD( "08k_04t.bin", 0x2000, 0x2000, CRC(e34468a8) SHA1(1931788e4ebe0dab9525f795b639be6544a6b31a) )
 	ROM_LOAD( "08j_03t.bin", 0x4000, 0x2000, CRC(c33aedee) SHA1(5adf83268ef7b91194dea41204bdb931a14f2158) )
@@ -701,7 +701,7 @@ ROM_START( senjyo )
 ROM_END
 
 ROM_START( starforc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "starforc.3",   0x0000, 0x4000, CRC(8ba27691) SHA1(2b8b1e634ef5bed5c61a078e64a6dda77f84cdf5) )
 	ROM_LOAD( "starforc.2",   0x4000, 0x4000, CRC(0fc4d2d6) SHA1(0743e3928d5cc0e3f1bcdaf4b0cc83aeb7a2f7a8) )
 
@@ -738,7 +738,7 @@ ROM_START( starforc )
 ROM_END
 
 ROM_START( starforb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a2.8m",   0x0000, 0x2000, CRC(e81e8b7d) SHA1(829a082a335a0cf5bf8cc97bee96e62271f03ff4) )
 	ROM_LOAD( "a3.8k",   0x2000, 0x2000, CRC(7e98f0ab) SHA1(76eb387fbf5d04b7951a115d29076d1fd21346c4) )
 	ROM_LOAD( "a4.8j",   0x4000, 0x2000, CRC(285bc599) SHA1(c2f294a5e3ca39084e8f8503d6e9e00885ad0609) )
@@ -781,7 +781,7 @@ ROM_END
 
 
 ROM_START( starfora )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5.bin",   0x0000, 0x2000, CRC(7691bbd4) SHA1(efcab11ea0ed58b6a47c9d7a994c921dfaa1b47e) )
 	ROM_LOAD( "4.bin",   0x2000, 0x2000, CRC(32f3c34e) SHA1(9ecaa46fe296c2f2e9c8faf3d40085c0f10acbe1) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(5e99cfa0) SHA1(d16d5247f4afb7abb5b8331ad7ae9d4d1f6d6554) )
@@ -824,7 +824,7 @@ ROM_END
 
 
 ROM_START( starfore )
-	ROM_REGION( 2*0x10000, "main", 0 )     /* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "maincpu", 0 )     /* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "starfore.005", 0x0000, 0x2000, CRC(825f7ebe) SHA1(d63fd516e075bcc28d42189216b95bbf491a4cd1) )
 	ROM_LOAD( "starfore.004", 0x2000, 0x2000, CRC(fbcecb65) SHA1(0406ae134915539a171603ecdd1b549f98dd048c) )
 	ROM_LOAD( "starfore.003", 0x4000, 0x2000, CRC(9f8013b9) SHA1(5398c97d84b4458ff926e07d6189d60565fbd8f1) )
@@ -863,7 +863,7 @@ ROM_START( starfore )
 ROM_END
 
 ROM_START( megaforc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mf3.bin",      0x0000, 0x4000, CRC(d3ea82ec) SHA1(e15fda65ba24517cc04abc55b5d079a33327553c) )
 	ROM_LOAD( "mf2.bin",      0x4000, 0x4000, CRC(aa320718) SHA1(cbbf8e4d06a1ecf77d776058d965afdaa7f5b47f) )
 
@@ -900,7 +900,7 @@ ROM_START( megaforc )
 ROM_END
 
 ROM_START( baluba )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0",   		  0x0000, 0x4000, CRC(0e2ebe32) SHA1(d5cac260b19dc4e8d2064a7e3de5d52ab0eb95d0) )
 	ROM_LOAD( "1",   		  0x4000, 0x4000, CRC(cde97076) SHA1(ef47851b2ed0d820e1564545795b707d00d5c6ce) )
 
@@ -945,7 +945,7 @@ static DRIVER_INIT( starforc )
 static DRIVER_INIT( starfore )
 {
 	/* encrypted CPU */
-	suprloco_decode(machine, "main");
+	suprloco_decode(machine, "maincpu");
 
 	is_senjyo = 0;
 	senjyo_scrollhack = 0;
@@ -954,7 +954,7 @@ static DRIVER_INIT( starfore )
 static DRIVER_INIT( starfora )
 {
 	/* encrypted CPU */
-	yamato_decode(machine, "main");
+	yamato_decode(machine, "maincpu");
 
 	is_senjyo = 0;
 	senjyo_scrollhack = 1;

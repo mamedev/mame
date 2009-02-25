@@ -671,7 +671,7 @@ static WRITE16_HANDLER( bank_w )
 	if(ACCESSING_BITS_0_7) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
-			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
@@ -737,7 +737,7 @@ static INTERRUPT_GEN(model1_interrupt)
 
 static MACHINE_RESET(model1)
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x1000000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000000);
 	irq_init(machine);
 	model1_tgp_reset(machine, !strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwara"));
 	if (!strcmp(machine->gamedrv->name, "swa"))
@@ -756,7 +756,7 @@ static MACHINE_RESET(model1)
 
 static MACHINE_RESET(model1_vr)
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x1000000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000000);
 	irq_init(machine);
 	model1_vr_tgp_reset();
 	model1_sound_irq = 3;
@@ -1164,7 +1164,7 @@ INPUT_PORTS_END
 
 ROM_START( vf )
 
-	ROM_REGION( 0x2000000, "main", ROMREGION_ERASEFF ) /* v60 code */
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16082.14", 0x200000, 0x80000, CRC(b23f22ee) SHA1(9fd5b5a5974703a60a54de3d2bce4301bfc0e533) )
 	ROM_LOAD16_BYTE( "epr-16083.15", 0x200001, 0x80000, CRC(d12c77f8) SHA1(b4aeba8d5f1ab4aec024391407a2cb58ce2e94b0) )
 
@@ -1180,7 +1180,7 @@ ROM_START( vf )
 	ROM_LOAD16_BYTE( "mpr-16090.12", 0x1300000, 0x80000, CRC(90c76831) SHA1(5a3c25f2a131cfbb2ad067bef1ab7b1c95645d41) )
 	ROM_LOAD16_BYTE( "mpr-16091.13", 0x1300001, 0x80000, CRC(53115448) SHA1(af798d5b1fcb720d7288a5ac48839d9ace16a2f2) )
 
-	ROM_REGION( 0xc0000, "audio", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-16120.7", 0x00000, 0x20000, CRC(2bff8378) SHA1(854b08ab983e4e98cb666f2f44de9a6829b1eb52) )
 	ROM_LOAD16_WORD_SWAP( "epr-16121.8", 0x20000, 0x20000, CRC(ff6723f9) SHA1(53498b8c103745883657dfd6efe27edfd48b356f) )
 	ROM_RELOAD( 0x80000, 0x20000)
@@ -1207,7 +1207,7 @@ ROM_END
 ROM_START( vr )
 	MODEL1_CPU_BOARD
 
-	ROM_REGION( 0x2000000, "main", ROMREGION_ERASEFF ) /* v60 code */
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-14882.14", 0x200000, 0x80000, CRC(547D75AD) SHA1(a57c11966886c37de1d7df131ad60457669231dd) )
 	ROM_LOAD16_BYTE( "epr-14883.15", 0x200001, 0x80000, CRC(6BFAD8B1) SHA1(c1f780e456b405abd42d92f4e03e40aad88f8c22) )
 
@@ -1223,7 +1223,7 @@ ROM_START( vr )
 	ROM_LOAD16_BYTE( "mpr-14888.12", 0x1300000, 0x80000, CRC(04BFDC5B) SHA1(bb8788a761620d0440a62ae51c3b41f70a04b5e4) )
 	ROM_LOAD16_BYTE( "mpr-14889.13", 0x1300001, 0x80000, CRC(C49F0486) SHA1(cc2bb9059c016ba2c4f6e7508bd1687df07b8b48) )
 
-	ROM_REGION( 0xc0000, "audio", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-14870a.7", 0x00000, 0x20000, CRC(919d9b75) SHA1(27be79881cc9a2b5cf37e18f1e2d87251426b428) )
 
 	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
@@ -1257,7 +1257,7 @@ ROM_END
 ROM_START( vformula )
 	MODEL1_CPU_BOARD
 
-	ROM_REGION( 0x2000000, "main", ROMREGION_ERASEFF ) /* v60 code */
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr15638.14", 0x200000, 0x80000, CRC(b9db21a2) SHA1(db58c047977f5fc37f278afe7159a78e3fa6c015) )
 	ROM_LOAD16_BYTE( "epr15639.15", 0x200001, 0x80000, CRC(4c3796f5) SHA1(1bf312a4999a15fbc5d194627f9c0ad9dbc1f2c0) )
 
@@ -1273,7 +1273,7 @@ ROM_START( vformula )
 	ROM_LOAD16_BYTE( "mpr-14888.12", 0x1300000, 0x80000, CRC(04BFDC5B) SHA1(bb8788a761620d0440a62ae51c3b41f70a04b5e4) )
 	ROM_LOAD16_BYTE( "mpr-14889.13", 0x1300001, 0x80000, CRC(C49F0486) SHA1(cc2bb9059c016ba2c4f6e7508bd1687df07b8b48) )
 
-	ROM_REGION( 0xc0000, "audio", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP( "epr-14870a.7", 0x00000, 0x20000, CRC(919d9b75) SHA1(27be79881cc9a2b5cf37e18f1e2d87251426b428) )
 
 	ROM_REGION( 0x400000, "sega1", 0 ) /* Samples */
@@ -1309,7 +1309,7 @@ ROM_END
 
 
 ROM_START( swa )
-	ROM_REGION( 0x2000000, "main", ROMREGION_ERASEFF ) /* v60 code */
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16468.14", 0x200000, 0x80000, CRC(681d03c0) SHA1(4d21e26ce211466d429b84bca69a8147ff31ec6c) )
 	ROM_LOAD16_BYTE( "epr-16469.15", 0x200001, 0x80000, CRC(6f281f7c) SHA1(6a9179e48d14838bb2a1a3f63fdd3a68ed009e03) )
 
@@ -1317,7 +1317,7 @@ ROM_START( swa )
 	ROM_RELOAD(          0x000000, 0x80000 )
 	ROM_RELOAD(          0x080000, 0x80000 )
 
-	ROM_REGION( 0xc0000, "audio", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
         ROM_LOAD16_WORD_SWAP( "epr16470.bin", 0x000000, 0x020000, CRC(7da18cf7) SHA1(bd432d882d217277faee120e2577357a32eb4a6e) )
 	ROM_RELOAD(0x80000, 0x20000)
 
@@ -1355,7 +1355,7 @@ ROM_START( swa )
 ROM_END
 
 ROM_START( wingwar )
-	ROM_REGION( 0x2000000, "main", ROMREGION_ERASEFF ) /* v60 code */
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16729.14", 0x200000, 0x80000, CRC(7edec2cc) SHA1(3e423a868ca7c8475fbb5bc1a10526e69d94d865) )
 	ROM_LOAD16_BYTE( "epr-16730.15", 0x200001, 0x80000, CRC(bab24dee) SHA1(26c95139c1aa7f34b6a5cce39e5bd1dd2ef0dd49) )
 
@@ -1371,7 +1371,7 @@ ROM_START( wingwar )
 	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
-	ROM_REGION( 0xc0000, "audio", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr-16751.7", 0x000000, 0x20000, CRC(23ba5ebc) SHA1(b98aab546c5e980baeedbada4e7472eb4c588260) )
 	ROM_LOAD16_WORD_SWAP("epr-16752.8", 0x020000, 0x20000, CRC(6541c48f) SHA1(9341eff160e31a8574b9545fafc1c4059323fa0c) )
 	ROM_RELOAD(0x80000, 0x20000)
@@ -1402,7 +1402,7 @@ ROM_START( wingwar )
 ROM_END
 
 ROM_START( wingwara )
-	ROM_REGION( 0x2000000, "main", ROMREGION_ERASEFF ) /* v60 code */
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD16_BYTE( "epr-16729.14", 0x200000, 0x80000, CRC(7edec2cc) SHA1(3e423a868ca7c8475fbb5bc1a10526e69d94d865) )
 	ROM_LOAD16_BYTE( "epr-16730.15", 0x200001, 0x80000, CRC(bab24dee) SHA1(26c95139c1aa7f34b6a5cce39e5bd1dd2ef0dd49) )
 
@@ -1418,7 +1418,7 @@ ROM_START( wingwara )
 	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
 	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
 
-	ROM_REGION( 0xc0000, "audio", 0 )  /* 68K code */
+	ROM_REGION( 0xc0000, "audiocpu", 0 )  /* 68K code */
 	ROM_LOAD16_WORD_SWAP("epr17126.bin",0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
 	ROM_LOAD16_WORD_SWAP("epr-16752.8", 0x020000, 0x20000, CRC(6541c48f) SHA1(9341eff160e31a8574b9545fafc1c4059323fa0c) )
 	ROM_RELOAD(0x80000, 0x20000)
@@ -1449,12 +1449,12 @@ ROM_START( wingwara )
 ROM_END
 
 static MACHINE_DRIVER_START( model1 )
-	MDRV_CPU_ADD("main", V60, 16000000)
+	MDRV_CPU_ADD("maincpu", V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_mem, 0)
 	MDRV_CPU_IO_MAP(model1_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
 
-	MDRV_CPU_ADD("audio", M68000, 10000000)	// verified on real h/w
+	MDRV_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
 
 	MDRV_MACHINE_RESET(model1)
@@ -1462,7 +1462,7 @@ static MACHINE_DRIVER_START( model1 )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_16MHz, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 
@@ -1488,12 +1488,12 @@ static MACHINE_DRIVER_START( model1 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model1_vr )
-	MDRV_CPU_ADD("main", V60, 16000000)
+	MDRV_CPU_ADD("maincpu", V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_vr_mem, 0)
 	MDRV_CPU_IO_MAP(model1_vr_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(model1_interrupt, 2)
 
-	MDRV_CPU_ADD("audio", M68000, 10000000)	// verified on real h/w
+	MDRV_CPU_ADD("audiocpu", M68000, 10000000)	// verified on real h/w
 	MDRV_CPU_PROGRAM_MAP(model1_snd, 0)
 
 	MDRV_CPU_ADD("tgp", MB86233, 16000000)
@@ -1505,7 +1505,7 @@ static MACHINE_DRIVER_START( model1_vr )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_16MHz, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 

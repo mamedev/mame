@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( asteroid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE(SOUND, "discrete", asteroid_thump_w)
 	AM_RANGE(0x3c00, 0x3c05) AM_DEVWRITE(SOUND, "discrete", asteroid_sounds_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE(SOUND, "discrete", asteroid_noise_reset_w)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x4000)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x5000, 0x57ff) AM_ROM						/* vector rom */
 	AM_RANGE(0x6800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( astdelux_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3c04, 0x3c04) AM_WRITE(astdelux_bank_switch_w)
 	AM_RANGE(0x3c05, 0x3c07) AM_WRITE(astdelux_coin_counter_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE(SOUND, "discrete", asteroid_noise_reset_w)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x4000)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x4800, 0x57ff) AM_ROM						/* vector rom */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( llander_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_DEVWRITE(SOUND, "discrete", llander_sounds_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE(SOUND, "discrete", llander_snd_reset_w)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x4000)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x4800, 0x5fff) AM_ROM						/* vector rom */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -592,14 +592,14 @@ static const pokey_interface pokey_config =
 static MACHINE_DRIVER_START( asteroid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK/8)
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(asteroid_map,0)
 	MDRV_CPU_PERIODIC_INT(asteroid_interrupt, (double)MASTER_CLOCK/4096/12)
 
 	MDRV_MACHINE_RESET(asteroid)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(400,300)
 	MDRV_SCREEN_VISIBLE_AREA(522, 1566, 394, 1182)
@@ -619,7 +619,7 @@ static MACHINE_DRIVER_START( asterock )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(asteroid)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PERIODIC_INT(asterock_interrupt, (double)MASTER_CLOCK/4096/12)
 MACHINE_DRIVER_END
 
@@ -628,7 +628,7 @@ static MACHINE_DRIVER_START( astdelux )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(asteroid)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(astdelux_map,0)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
@@ -648,13 +648,13 @@ static MACHINE_DRIVER_START( llander )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(asteroid)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(llander_map,0)
 	MDRV_CPU_PERIODIC_INT(llander_interrupt, (double)MASTER_CLOCK/4096/12)
 
 	MDRV_MACHINE_RESET(avgdvg)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(40)
 	MDRV_SCREEN_VISIBLE_AREA(522, 1566, 270, 1070)
 	MDRV_VIDEO_START(dvg)
@@ -675,7 +675,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( asteroid )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "035145.02",    0x6800, 0x0800, CRC(0cc75459) SHA1(2af85c9689b878155004da47fedbde5853a18723) )
 	ROM_LOAD( "035144.02",    0x7000, 0x0800, CRC(096ed35c) SHA1(064d680ded7f30c543f93ae5ca85f90d550f73e5) )
 	ROM_LOAD( "035143.02",    0x7800, 0x0800, CRC(312caa02) SHA1(1ce2eac1ab90b972e3f1fc3d250908f26328d6cb) )
@@ -687,7 +687,7 @@ ROM_START( asteroid )
 ROM_END
 
 ROM_START( asteroi1 )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "035145.01",    0x6800, 0x0800, CRC(e9bfda64) SHA1(291dc567ebb31b35df83d9fb87f4080f251ff9c8) )
 	ROM_LOAD( "035144.01",    0x7000, 0x0800, CRC(e53c28a9) SHA1(d9f081e73511ec43377f0c6457747f15a470d4dc) )
 	ROM_LOAD( "035143.01",    0x7800, 0x0800, CRC(7d4e3d05) SHA1(d88000e904e158efde50e453e2889ecd2cb95f24) )
@@ -699,7 +699,7 @@ ROM_START( asteroi1 )
 ROM_END
 
 ROM_START( asteroib )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "035145ll.bin", 0x6800, 0x0800, CRC(605fc0f2) SHA1(8d897a3b75bd1f2537470f0a34a97a8c0853ee08) )
 	ROM_LOAD( "035144ll.bin", 0x7000, 0x0800, CRC(e106de77) SHA1(003e99d095bd4df6fae243ea1dd5b12f3eb974f1) )
 	ROM_LOAD( "035143ll.bin", 0x7800, 0x0800, CRC(6b1d8594) SHA1(ff3cd93f1bc5734bface285e442125b395602d7d) )
@@ -711,7 +711,7 @@ ROM_START( asteroib )
 ROM_END
 
 ROM_START( asterock )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sidamas.2",    0x6800, 0x0400, CRC(cdf720c6) SHA1(85fe748096478e28a06bd98ff3aad73ab21b22a4) )
 	ROM_LOAD( "sidamas.3",    0x6c00, 0x0400, CRC(ee58bdf0) SHA1(80094cb5dafd327aff6658ede33106f0493a809d) )
 	ROM_LOAD( "sidamas.4",    0x7000, 0x0400, CRC(8d3e421e) SHA1(5f5719ab84d4755e69bef205d313b455bc59c413) )
@@ -727,7 +727,7 @@ ROM_START( asterock )
 ROM_END
 
 ROM_START( meteorts )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "m0_c1.bin",    0x6800, 0x0800, CRC(dff88688) SHA1(7f4148a580fb6f605499c99e7dde7068eca1651a) )
 	ROM_LOAD( "m1_f1.bin",    0x7000, 0x0800, CRC(e53c28a9) SHA1(d9f081e73511ec43377f0c6457747f15a470d4dc) )
 	ROM_LOAD( "m2_j1.bin",    0x7800, 0x0800, CRC(64bd0408) SHA1(141d053cb4cce3fece98293136928b527d3ade0f) )
@@ -739,7 +739,7 @@ ROM_START( meteorts )
 ROM_END
 
 ROM_START( meteorho )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "g.bin",    0x6800, 0x0400, CRC(7420421b) SHA1(e84a340c0cbc8816bbe43120bc8e692d2a3db0ab) )
 	ROM_LOAD( "h.bin",    0x6c00, 0x0400, CRC(a6aa56bc) SHA1(8298e1667c3bd9af9e0be7d53c00d73ef59d742e) )
 	ROM_LOAD( "f.bin",    0x7000, 0x0400, CRC(2711bd52) SHA1(219499b9b8dcc221173f9b9a34c9e6f2fb936231) )
@@ -756,7 +756,7 @@ ROM_END
 
 
 ROM_START( astdelux )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "036430.02",    0x6000, 0x0800, CRC(a4d7a525) SHA1(abe262193ec8e1981be36928e9a89a8ac95cd0ad) )
 	ROM_LOAD( "036431.02",    0x6800, 0x0800, CRC(d4004aae) SHA1(aa2099b8fc62a79879efeea70ea1e9ed77e3e6f0) )
 	ROM_LOAD( "036432.02",    0x7000, 0x0800, CRC(6d720c41) SHA1(198218cd2f43f8b83e4463b1f3a8aa49da5015e4) )
@@ -770,7 +770,7 @@ ROM_START( astdelux )
 ROM_END
 
 ROM_START( astdelu2 )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "036430.01",    0x6000, 0x0800, CRC(8f5dabc6) SHA1(5d7543e19acab99ddb63c0ffd60f54d7a0f267f5) )
 	ROM_LOAD( "036431.01",    0x6800, 0x0800, CRC(157a8516) SHA1(9041d8c2369d004f198681e02b59a923fa8f70c9) )
 	ROM_LOAD( "036432.01",    0x7000, 0x0800, CRC(fdea913c) SHA1(ded0138a20d80317d67add5bb2a64e6274e0e409) )
@@ -822,7 +822,7 @@ by Andy Welburn
 www.andys-arcade.com
 */
 ROM_START( astdelu1 )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "036430.01",    0x6000, 0x0800, CRC(8f5dabc6) SHA1(5d7543e19acab99ddb63c0ffd60f54d7a0f267f5) )
 	ROM_LOAD( "036431.01",    0x6800, 0x0800, CRC(157a8516) SHA1(9041d8c2369d004f198681e02b59a923fa8f70c9) )
 	ROM_LOAD( "036432.01",    0x7000, 0x0800, CRC(fdea913c) SHA1(ded0138a20d80317d67add5bb2a64e6274e0e409) )
@@ -837,7 +837,7 @@ ROM_END
 
 
 ROM_START( llander )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "034572.02",    0x6000, 0x0800, CRC(b8763eea) SHA1(5a15eaeaf825ccdf9ce013a6789cf51da20f785c) )
 	ROM_LOAD( "034571.02",    0x6800, 0x0800, CRC(77da4b2f) SHA1(4be6cef5af38734d580cbfb7e4070fe7981ddfd6) )
 	ROM_LOAD( "034570.01",    0x7000, 0x0800, CRC(2724e591) SHA1(ecf4430a0040c227c896aa2cd81ee03960b4d641) )
@@ -854,7 +854,7 @@ ROM_START( llander )
 ROM_END
 
 ROM_START( llander1 )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "034572.01",    0x6000, 0x0800, CRC(2aff3140) SHA1(4fc8aae640ce655417c11d9a3121aae9a1238e7c) )
 	ROM_LOAD( "034571.01",    0x6800, 0x0800, CRC(493e24b7) SHA1(125a2c335338ccabababef12fd7096ef4b605a31) )
 	ROM_LOAD( "034570.01",    0x7000, 0x0800, CRC(2724e591) SHA1(ecf4430a0040c227c896aa2cd81ee03960b4d641) )

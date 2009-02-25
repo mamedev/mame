@@ -51,7 +51,7 @@ VIDEO_UPDATE( ninjemak );
 
 static MACHINE_RESET( galivan )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	memory_set_bankptr(machine, 1,&RAM[0x10000]);
 	device_reset(machine->cpu[0]);
@@ -440,12 +440,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( galivan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,8000000/2)		/* 4 MHz? */
+	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)  /* timed interrupt, ?? Hz */
@@ -453,7 +453,7 @@ static MACHINE_DRIVER_START( galivan )
 	MDRV_MACHINE_RESET(galivan)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -483,12 +483,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ninjemak )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,ninjemak_writemem)
 	MDRV_CPU_IO_MAP(ninjemak_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,8000000/2)		/* 4 MHz? */
+	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 7250)	/* timed interrupt, ?? Hz */
@@ -496,7 +496,7 @@ static MACHINE_DRIVER_START( ninjemak )
 	MDRV_MACHINE_RESET(galivan)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -531,12 +531,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( galivan )
-	ROM_REGION( 0x14000, "main", 0 )	/* main cpu code */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* main cpu code */
 	ROM_LOAD( "gv1.1b",       0x00000, 0x8000, CRC(5e480bfc) SHA1(f444de27d3d8aff579cf196a25b7f0c906617172) )
 	ROM_LOAD( "gv2.3b",       0x08000, 0x4000, CRC(0d1b3538) SHA1(aa1ee04ff3516e0121db0cf50cee849ba5058fd5) )
 	ROM_LOAD( "gv3.4b",       0x10000, 0x4000, CRC(82f0c5e6) SHA1(77dd3927c2161e4fce9e0adba81dc0c875d7e2f4) ) /* 2 banks at c000 */
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* sound cpu code */
 	ROM_LOAD( "gv11.14b",     0x0000, 0x4000, CRC(05f1a0e3) SHA1(c0f579130d64123c889c77d8f2f474ebcc3ba649) )
 	ROM_LOAD( "gv12.15b",     0x4000, 0x8000, CRC(5b7a0d6d) SHA1(0c15def9be8014aeb4e14b6967efe8f5abac51f2) )
 
@@ -568,12 +568,12 @@ ROM_START( galivan )
 ROM_END
 
 ROM_START( galivan2 )
-	ROM_REGION( 0x14000, "main", 0 )		/* main cpu code */
+	ROM_REGION( 0x14000, "maincpu", 0 )		/* main cpu code */
 	ROM_LOAD( "e-1",          0x00000, 0x8000, CRC(d8cc72b8) SHA1(73a46cd7dda3a912b14075b9b4ebc81a175a1461) )
 	ROM_LOAD( "e-2",          0x08000, 0x4000, CRC(9e5b3157) SHA1(1aa5f7f382468af815c929c63866bd39e7a9ac18) )
 	ROM_LOAD( "gv3.4b",       0x10000, 0x4000, CRC(82f0c5e6) SHA1(77dd3927c2161e4fce9e0adba81dc0c875d7e2f4) ) /* 2 banks at c000 */
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* sound cpu code */
 	ROM_LOAD( "gv11.14b",     0x0000, 0x4000, CRC(05f1a0e3) SHA1(c0f579130d64123c889c77d8f2f474ebcc3ba649) )
 	ROM_LOAD( "gv12.15b",     0x4000, 0x8000, CRC(5b7a0d6d) SHA1(0c15def9be8014aeb4e14b6967efe8f5abac51f2) )
 
@@ -605,12 +605,12 @@ ROM_START( galivan2 )
 ROM_END
 
 ROM_START( dangar )
-	ROM_REGION( 0x14000, "main", 0 )		/* main cpu code */
+	ROM_REGION( 0x14000, "maincpu", 0 )		/* main cpu code */
 	ROM_LOAD( "dangar08.1b",  0x00000, 0x8000, CRC(e52638f2) SHA1(6dd3ccb4574a410abf1ac35b4f9518ee21ecac91) )
 	ROM_LOAD( "dangar09.3b",  0x08000, 0x4000, CRC(809d280f) SHA1(931f811f1fe3c71ba82fc44f69ef461bdd9cd2d8) )
 	ROM_LOAD( "dangar10.5b",  0x10000, 0x4000, CRC(99a3591b) SHA1(45011043ff5620524d79076542bd8c602fe90cf4) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* sound cpu code */
 	ROM_LOAD( "dangar13.b14", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
 	ROM_LOAD( "dangar14.b15", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
 
@@ -642,12 +642,12 @@ ROM_START( dangar )
 ROM_END
 
 ROM_START( dangar2 )
-	ROM_REGION( 0x14000, "main", 0 )		/* main cpu code */
+	ROM_REGION( 0x14000, "maincpu", 0 )		/* main cpu code */
 	ROM_LOAD( "dangar2.016",  0x00000, 0x8000, CRC(743fa2d4) SHA1(55539796967532b57279801374b2f0cf82cfe1ae) )
 	ROM_LOAD( "dangar2.017",  0x08000, 0x4000, CRC(1cdc60a5) SHA1(65f776d14c9461f1a6939ad512eacf6a1a9da2c6) )
 	ROM_LOAD( "dangar2.018",  0x10000, 0x4000, CRC(db7f6613) SHA1(c55d1f2fdb86e2b9fbdfad0b156d4d084677b750) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* sound cpu code */
 	ROM_LOAD( "dangar13.b14", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
 	ROM_LOAD( "dangar14.b15", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
 
@@ -679,12 +679,12 @@ ROM_START( dangar2 )
 ROM_END
 
 ROM_START( dangarb )
-	ROM_REGION( 0x14000, "main", 0 )		/* main cpu code */
+	ROM_REGION( 0x14000, "maincpu", 0 )		/* main cpu code */
 	ROM_LOAD( "8",            0x00000, 0x8000, CRC(8136fd10) SHA1(5f2ca08fab0d9431af38ef66922fdb6bd9a132e2) )
 	ROM_LOAD( "9",            0x08000, 0x4000, CRC(3ce5ec11) SHA1(bcc0df6167d0b84b9f260435c1999b9d3605fcd4) )
 	ROM_LOAD( "dangar2.018",  0x10000, 0x4000, CRC(db7f6613) SHA1(c55d1f2fdb86e2b9fbdfad0b156d4d084677b750) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* sound cpu code */
 	ROM_LOAD( "dangar13.b14", 0x0000, 0x4000, CRC(3e041873) SHA1(8f9e1ec64509c8a7e9e45add9efc95f98f35fcfc) )
 	ROM_LOAD( "dangar14.b15", 0x4000, 0x8000, CRC(488e3463) SHA1(73ff7ab061be54162f3a548f6bd9ef55b9dec5d9) )
 
@@ -716,12 +716,12 @@ ROM_START( dangarb )
 ROM_END
 
 ROM_START( ninjemak )
-	ROM_REGION( 0x18000, "main", 0 )	/* main cpu code */
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* main cpu code */
 	ROM_LOAD( "ninjemak.1",   0x00000, 0x8000, CRC(12b0a619) SHA1(7b42097be6423931256d5b7fdafb98bee1b42e64) )
 	ROM_LOAD( "ninjemak.2",   0x08000, 0x4000, CRC(d5b505d1) SHA1(53935549754e8a71f0620630c2e59c21d52edcba) )
 	ROM_LOAD( "ninjemak.3",   0x10000, 0x8000, CRC(68c92bf6) SHA1(90633622dab0e450a29230b600e0d60a42f407f4) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu code */
 	ROM_LOAD( "ninjemak.12",  0x0000, 0x4000, CRC(3d1cd329) SHA1(6abd8e0dbecddfd67c4d358b958c850136fd3c29) )
 	ROM_LOAD( "ninjemak.13",  0x4000, 0x8000, CRC(ac3a0b81) SHA1(39f2c305706e313d5256c357a3c8b57bbe45d3d7) )
 
@@ -758,12 +758,12 @@ ROM_START( ninjemak )
 ROM_END
 
 ROM_START( youma )
-	ROM_REGION( 0x18000, "main", 0 )	/* main cpu code */
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* main cpu code */
 	ROM_LOAD( "ync-1.bin",    0x00000, 0x8000, CRC(0552adab) SHA1(183cf88d288875fbb2b60e2712e5a1671511351d) )
 	ROM_LOAD( "ync-2.bin",    0x08000, 0x4000, CRC(f961e5e6) SHA1(cbf9d3a256937da9e17734f89652e049242910b8) )
 	ROM_LOAD( "ync-3.bin",    0x10000, 0x8000, CRC(9ad50a5e) SHA1(2532b10e2468b1c74440fd8090489142e5fc240b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu code */
 	ROM_LOAD( "ninjemak.12",  0x0000, 0x4000, CRC(3d1cd329) SHA1(6abd8e0dbecddfd67c4d358b958c850136fd3c29) )
 	ROM_LOAD( "ninjemak.13",  0x4000, 0x8000, CRC(ac3a0b81) SHA1(39f2c305706e313d5256c357a3c8b57bbe45d3d7) )
 
@@ -800,7 +800,7 @@ ROM_START( youma )
 ROM_END
 
 ROM_START( youmab )
-	ROM_REGION( 0x18000, "main", 0 )	/* main cpu code */
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* main cpu code */
 	ROM_LOAD( "electric1.3u", 0x00000, 0x8000, CRC(cc4fdb92) SHA1(9ce963db23f91f91e775a0b9a819f00db869120f) )
 	ROM_LOAD( "electric3.3r", 0x10000, 0x8000, CRC(c1bc7387) SHA1(ad05bff02ece515465a9506e09c252c446c8f81d) )
 
@@ -809,7 +809,7 @@ ROM_START( youmab )
 	ROM_LOAD( "electric2.3t", 0x00000, 0x8000, CRC(99aee3bc) SHA1(5ffd60b959dda3fd41609c89a3486a989b1e2530) )
 
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu code */
 	ROM_LOAD( "electric12.5e",  0x0000, 0x4000, CRC(3d1cd329) SHA1(6abd8e0dbecddfd67c4d358b958c850136fd3c29) )
 	ROM_LOAD( "electric13.5d",  0x4000, 0x8000, CRC(ac3a0b81) SHA1(39f2c305706e313d5256c357a3c8b57bbe45d3d7) )
 
@@ -912,7 +912,7 @@ PR.8E        [ffb4b287] = YNCP-8E.BIN  from Youma Ninpou Chou (Nichibutsu, Ninja
 */
 
 ROM_START( youmab2 )
-	ROM_REGION( 0x18000, "main", 0 )	/* main cpu code */
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* main cpu code */
 	ROM_LOAD( "1.1d",	  0x00000, 0x8000, CRC(692ae497) SHA1(572e5a1eae9b0bb48f65dce5de2df5c5ae95a3bd) )
 	ROM_LOAD( "3.4d",     0x10000, 0x8000, CRC(ebf61afc) SHA1(30235a90e8316f5033d44d31f02cca97c64f2d5e) )
 
@@ -920,7 +920,7 @@ ROM_START( youmab2 )
 	/* This rom is double the size of the original one, appears to have extra (banked) code for 0x8000 */
 	ROM_LOAD( "2.2d", 0x00000, 0x8000, CRC(99aee3bc) SHA1(5ffd60b959dda3fd41609c89a3486a989b1e2530) ) // same as first bootleg
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound cpu code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu code */
 	ROM_LOAD( "11.13b",  0x0000, 0x4000, CRC(3d1cd329) SHA1(6abd8e0dbecddfd67c4d358b958c850136fd3c29) )
 	ROM_LOAD( "12.15b",  0x4000, 0x8000, CRC(ac3a0b81) SHA1(39f2c305706e313d5256c357a3c8b57bbe45d3d7) )
 
@@ -989,7 +989,7 @@ static DRIVER_INIT( youmab )
 {
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, SMH_BANK3);
-	memory_set_bankptr(machine,  3, memory_region(machine, "main") );
+	memory_set_bankptr(machine,  3, memory_region(machine, "maincpu") );
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK2);
 	memory_set_bankptr(machine,  2, memory_region(machine, "user2") );
 

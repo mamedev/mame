@@ -1021,7 +1021,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( midvcommon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS32031, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(midvunit_map,0)
 
 	MDRV_MACHINE_START(midvunit)
@@ -1031,7 +1031,7 @@ static MACHINE_DRIVER_START( midvcommon )
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
@@ -1052,7 +1052,7 @@ static MACHINE_DRIVER_START( midvplus )
 	MDRV_IMPORT_FROM(midvcommon)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(midvplus_config)
 	MDRV_CPU_PROGRAM_MAP(midvplus_map,0)
 

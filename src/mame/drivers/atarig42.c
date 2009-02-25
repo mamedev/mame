@@ -509,9 +509,9 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( atarig42 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz)
+	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
+	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	/* ASIC65 */
 	MDRV_IMPORT_FROM(asic65)
@@ -524,7 +524,7 @@ static MACHINE_DRIVER_START( atarig42 )
 	MDRV_GFXDECODE(atarig42)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS chip to generate video signals */
@@ -547,7 +547,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( roadriot )
-	ROM_REGION( 0x80004, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x80004, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "136089-2014.8d", 0x00000, 0x20000, CRC(bf8aaafc) SHA1(1594d91b56609d49921c866d8f5796619e79217b) ) /* Program ROMs in Blue labels,  */
 	ROM_LOAD16_BYTE( "136089-2013.8c", 0x00001, 0x20000, CRC(5dd2dd70) SHA1(8f6a0e809ec1f6feea8a18197a789086a7b9dd6a) ) /* other ROMs in Yellow labels   */
 	ROM_LOAD16_BYTE( "136089-2016.9d", 0x40000, 0x20000, CRC(6191653c) SHA1(97d1a84a585149e8f2c49cab7af22dc755dff350) ) /* PALs & BPROMs in White labels */
@@ -603,7 +603,7 @@ ROM_END
 
 
 ROM_START( guardian )
-	ROM_REGION( 0x80004, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x80004, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "136092-2021.8e",  0x00000, 0x20000, CRC(efea1e02) SHA1(f0f1ef300f36953aff73b68ffe6d9950ac575f7d) )
 	ROM_LOAD16_BYTE( "136092-2020.8cd", 0x00001, 0x20000, CRC(a8f655ba) SHA1(2defe4d138613e248718a617d103794e051746f7) )
 	ROM_LOAD16_BYTE( "136092-2023.9e",  0x40000, 0x20000, CRC(cfa29316) SHA1(4e0e76304e29ee59bc2ce9a704e3f651dc9d473c) )
@@ -738,7 +738,7 @@ static DRIVER_INIT( guardian )
 
 	/* it looks like they jsr to $80000 as some kind of protection */
 	/* put an RTS there so we don't die */
-	*(UINT16 *)&memory_region(machine, "main")[0x80000] = 0x4E75;
+	*(UINT16 *)&memory_region(machine, "maincpu")[0x80000] = 0x4E75;
 
 	sloop_base = memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);
 	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), sloop_direct_handler);

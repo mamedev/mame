@@ -561,12 +561,12 @@ static INTERRUPT_GEN( acommand_irq )
 static MACHINE_DRIVER_START( acommand )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000,12000000)
+	MDRV_CPU_ADD("maincpu",M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(acommand_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(acommand_irq,2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -599,7 +599,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( acommand )
-	ROM_REGION( 0x040000, "main", 0 )
+	ROM_REGION( 0x040000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jalcf3.bin",   0x000000, 0x020000, CRC(f031abf7) SHA1(e381742fd6a6df4ddae42ddb3a074a55dc550b3c) )
 	ROM_LOAD16_BYTE( "jalcf4.bin",   0x000001, 0x020000, CRC(dd0c0540) SHA1(3e788fcb30ae725bd0ec9b57424e3946db1e946f) )
 

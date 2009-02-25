@@ -183,7 +183,7 @@ static TILE_GET_INFO( ninjemak_get_tx_tile_info )
 VIDEO_START( galivan )
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memory_region(machine, "main");
+	UINT8 *rombase = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 2, &rombase[0x10000], 0x2000);
 
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,   16,16,128,128);
@@ -202,7 +202,7 @@ VIDEO_START( galivan )
 VIDEO_START( ninjemak )
 {
 	/* configure ROM banking */
-	UINT8 *rombase = memory_region(machine, "main");
+	UINT8 *rombase = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x2000);
 
 	bg_tilemap = tilemap_create(machine, ninjemak_get_bg_tile_info,tilemap_scan_cols,   16,16,512,32);

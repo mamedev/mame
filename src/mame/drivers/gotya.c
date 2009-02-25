@@ -183,12 +183,12 @@ static const samples_interface gotya_samples_interface =
 static MACHINE_DRIVER_START( gotya )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,18432000/6)	/* 3.072 MHz ??? */
+	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -217,7 +217,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( thehand )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hand6.bin",	0x0000, 0x1000, CRC(a33b806c) SHA1(1e552af5362e7b003f55e78bb59589e1db55557c) )
 	ROM_LOAD( "hand5.bin",	0x1000, 0x1000, CRC(89bcde82) SHA1(d074bb6a1975160eb533d5fd9289170a68209046) )
 	ROM_LOAD( "hand4.bin",	0x2000, 0x1000, CRC(c6844a83) SHA1(84e220dce3f5ddee9dd0377f3bebdd4027fc9108) )
@@ -245,7 +245,7 @@ ROM_START( thehand )
 ROM_END
 
 ROM_START( gotya )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gb-06.bin",	0x0000, 0x1000, CRC(7793985a) SHA1(23aa8bd161e700bea59b92075423cdf55e9a26c3) )
 	ROM_LOAD( "gb-05.bin",	0x1000, 0x1000, CRC(683d188b) SHA1(5341c62f5cf384c73be0d7a0a230bb8cebfbe709) )
 	ROM_LOAD( "gb-04.bin",	0x2000, 0x1000, CRC(15b72f09) SHA1(bd941722ed1310d5c8ca8a44899368cba3815f3b) )

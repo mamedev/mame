@@ -287,10 +287,10 @@ static INTERRUPT_GEN( sengokmj_interrupt )
 static MACHINE_DRIVER_START( sengokmj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30, 16000000/2) /* V30-8 */
+	MDRV_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */
 	MDRV_CPU_PROGRAM_MAP(sengokmj_map,0)
 	MDRV_CPU_IO_MAP(sengokmj_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", sengokmj_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", sengokmj_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -298,7 +298,7 @@ static MACHINE_DRIVER_START( sengokmj )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -317,14 +317,14 @@ MACHINE_DRIVER_END
 
 
 ROM_START( sengokmj )
-	ROM_REGION( 0x100000, "main", 0 ) /* V30 code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */
 	ROM_LOAD16_BYTE( "mm01-1-1.21",  0xc0000, 0x20000, CRC(74076b46) SHA1(64b0ed5a8c32e21157ae12fe40519e4c605b329c) )
 	ROM_LOAD16_BYTE( "mm01-2-1.24",  0xc0001, 0x20000, CRC(f1a7c131) SHA1(d0fbbdedbff8f05da0e0296baa41369bc41a67e4) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "mah1-2-1.013", 0x000000, 0x08000, CRC(6a4f31b8) SHA1(5e1d7ed299c1fd65c7a43faa02831220f4251733) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0,     0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0,     0x018000, 0x08000 )
 
 	ROM_REGION( 0x100000, "spr_gfx", ROMREGION_DISPOSE ) /*Sprites gfx rom*/
 	ROM_LOAD( "rssengo2.72", 0x00000, 0x100000, CRC(fb215ff8) SHA1(f98c0a53ad9b97d209dd1f85c994fc17ec585bd7) )

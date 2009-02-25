@@ -2698,16 +2698,16 @@ static MACHINE_RESET( stv )
 static MACHINE_DRIVER_START( stv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
+	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MDRV_CPU_PROGRAM_MAP(stv_mem, 0)
-	MDRV_CPU_VBLANK_INT("main",stv_interrupt)
+	MDRV_CPU_VBLANK_INT("screen",stv_interrupt)
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MDRV_CPU_PROGRAM_MAP(stv_mem, 0)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
-	MDRV_CPU_ADD("audio", M68000, MASTER_CLOCK_352/5) //11.46 MHz
+	MDRV_CPU_ADD("audiocpu", M68000, MASTER_CLOCK_352/5) //11.46 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_mem, 0)
 
 	MDRV_MACHINE_START(stv)
@@ -2717,7 +2717,7 @@ static MACHINE_DRIVER_START( stv )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(192))	// guess, needed to force video update after V-Blank OUT interrupt
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
@@ -2772,7 +2772,7 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 */
 
 #define STV_BIOS \
-	ROM_REGION( 0x080000, "main", 0 ) /* SH2 code */ \
+	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */ \
 	ROM_SYSTEM_BIOS( 0, "jp",   "EPR-20091 (Japan 97/08/21)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-20091.ic8",   0x000000, 0x080000, CRC(59ed40f4) SHA1(eff0f54c70bce05ff3a289bf30b1027e1c8cd117) ) \
 	ROM_SYSTEM_BIOS( 1, "jp1",  "EPR-19730 (Japan 97/02/17)" ) \
@@ -2793,7 +2793,7 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "stv1061.bin",     0x000000, 0x080000, CRC(728dbca3) SHA1(0ed2030177f0aa8285645c395ae9ad9f568ab1d6) ) \
 	\
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */ \
-	ROM_COPY( "main",0,0,0x080000) \
+	ROM_COPY( "maincpu",0,0,0x080000) \
 
 ROM_START( stvbios )
 	STV_BIOS
@@ -3630,10 +3630,10 @@ ROM_END
 ROM_START( sfish2 )
 //  STV_BIOS // - sports fishing 2 uses its own bios
 
-	ROM_REGION( 0x080000, "main", 0 ) /* SH2 code */
+	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "main",0,0,0x080000)
+	ROM_COPY( "maincpu",0,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "user1", 0 ) /* SH2 code */
 	ROM_LOAD(             "epr18427.bin",      0x0000000, 0x0100000, CRC(3f25bec8) SHA1(43a5342b882d5aec0f35a8777cb475659f43b1c4) )
@@ -3648,10 +3648,10 @@ ROM_END
 ROM_START( sfish2j )
 //  STV_BIOS // - sports fishing 2 uses its own bios
 
-	ROM_REGION( 0x080000, "main", 0 ) /* SH2 code */
+	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH2 code */
 	ROM_LOAD16_WORD_SWAP( "epr18343.bin",   0x000000, 0x080000, CRC(48e2eecf) SHA1(a38bfbd5f279525e413b18b5ed3f37f6e9e31cdc) ) /* sport fishing 2 bios */
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */
-	ROM_COPY( "main",0,0,0x080000)
+	ROM_COPY( "maincpu",0,0,0x080000)
 
 	ROM_REGION32_BE( 0x3000000, "user1", 0 ) /* SH2 code */
 	ROM_LOAD16_BYTE(             "epr18344.a",      0x0000001, 0x0100000,  CRC(5a7de018) SHA1(88e0c2a9a9d4ebf699878c0aa9737af85f95ccf8) )

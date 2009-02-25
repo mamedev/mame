@@ -364,7 +364,7 @@ static MC6845_ON_DE_CHANGED( display_enable_changed )
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",					/* screen we are acting on */
+	"screen",				/* screen we are acting on */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
@@ -510,10 +510,10 @@ INPUT_PORTS_END
  *************************************/
 
 static MACHINE_DRIVER_START( r2dtank )
-	MDRV_CPU_ADD("main", M6809,3000000)		 /* ?? too fast ? */
+	MDRV_CPU_ADD("maincpu", M6809,3000000)		 /* ?? too fast ? */
 	MDRV_CPU_PROGRAM_MAP(r2dtank_main_map,0)
 
-	MDRV_CPU_ADD("audio", M6802,3000000)			/* ?? */
+	MDRV_CPU_ADD("audiocpu", M6802,3000000)			/* ?? */
 	MDRV_CPU_PROGRAM_MAP(r2dtank_audio_map,0)
 
 	MDRV_MACHINE_START(r2dtank)
@@ -523,7 +523,7 @@ static MACHINE_DRIVER_START( r2dtank )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(r2dtank)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
@@ -555,13 +555,13 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( r2dtank )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "r2d1.1c",      0xc800, 0x0800, CRC(20606a0f) SHA1(9a55e595c7ea332bdc89142338947be8a28a92a3) )
 	ROM_LOAD( "r2d2.1a",      0xd000, 0x1000, CRC(7561c67f) SHA1(cccc7bbd7975db340fe571a4c31c25b41b2563b8) )
 	ROM_LOAD( "r2d3.2c",      0xe000, 0x1000, CRC(fc53c538) SHA1(8f9a2edcf7a2cb2a8ddd084828b52f1bf45f434a) )
 	ROM_LOAD( "r2d4.2a",      0xf000, 0x1000, CRC(56636225) SHA1(dcfc6e29b4c51a45cfbecf6790b7d88b89af433b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "r2d5.7l",      0xf800, 0x0800, CRC(c49bed15) SHA1(ffa635a65c024c532bb13fb91bbd3e54923e81bf) )
 ROM_END
 

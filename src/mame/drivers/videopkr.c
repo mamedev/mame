@@ -675,7 +675,7 @@ static READ8_HANDLER( videopkr_t0_latch )
 static WRITE8_HANDLER( prog_w )
 {
 	if (!data)
-		cputag_set_input_line(space->machine, "main", 0, CLEAR_LINE);	/* clear interrupt FF */
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);	/* clear interrupt FF */
 }
 
 /*************************
@@ -1158,20 +1158,20 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( videopkr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I8039, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", I8039, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem, 0)
 	MDRV_CPU_IO_MAP(i8039_io_port, 0)
 
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sound", I8039, SOUND_CLOCK)
+	MDRV_CPU_ADD("soundcpu", I8039, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(i8039_sound_mem, 0)
 	MDRV_CPU_IO_MAP(i8039_sound_port, 0)
 	MDRV_MACHINE_START(videopkr)
 	MDRV_NVRAM_HANDLER(videopkr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -1198,7 +1198,7 @@ static MACHINE_DRIVER_START( blckjack )
 	MDRV_IMPORT_FROM(videopkr)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 31*8-1, 2*8, 30*8-1)
 MACHINE_DRIVER_END
@@ -1208,10 +1208,10 @@ static MACHINE_DRIVER_START( videodad )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(videopkr)
-	MDRV_CPU_REPLACE("main", I8039, CPU_CLOCK_ALT)
+	MDRV_CPU_REPLACE("maincpu", I8039, CPU_CLOCK_ALT)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(32*16, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*16, 31*16-1, 2*8, 30*8-1)
 
@@ -1224,14 +1224,14 @@ static MACHINE_DRIVER_START( babypkr )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(videopkr)
-	MDRV_CPU_REPLACE("main", I8039, CPU_CLOCK_ALT)
+	MDRV_CPU_REPLACE("maincpu", I8039, CPU_CLOCK_ALT)
 	/* most likely romless or eprom */
-	MDRV_CPU_REPLACE("sound", I8031, CPU_CLOCK )
+	MDRV_CPU_REPLACE("soundcpu", I8031, CPU_CLOCK )
 	MDRV_CPU_PROGRAM_MAP(i8051_sound_mem, 0)
 	MDRV_CPU_IO_MAP(i8051_sound_port, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(32*16, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(5*16, 31*16-1, 3*8, 29*8-1)
 
@@ -1250,11 +1250,11 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( videopkr )
-	ROM_REGION( 0x1000, "main", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "vpoker.c5",		0x0000, 0x0800,	CRC(200d21e4) SHA1(d991c9f10a36a02491bb0aba32129675fed77a10) )
 	ROM_LOAD( "vpoker.c7",		0x0800, 0x0800,	CRC(f72c2a90) SHA1(e9c54d1f895cde0aaca4121a252da40594195a25) )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound cpu program */
 	ROM_LOAD( "vpsona3.pbj",	0x0000, 0x0800,	CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
 	ROM_LOAD( "vpsona2.pbj",	0x0800, 0x0800,	CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
 
@@ -1267,11 +1267,11 @@ ROM_START( videopkr )
 	ROM_END
 
 ROM_START( blckjack )
-	ROM_REGION( 0x1000, "main", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "bjc5org.old",	0x0000, 0x0800,	CRC(e266a28a) SHA1(1f90c85a2a817f1927c9ab2cbf79cfa2dd116dc8) )
 	ROM_LOAD( "bjc7org.old",	0x0800, 0x0800,	CRC(c60c565f) SHA1(c9ed232301750288bd000ac4e2dcf2253745ff0a) )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound cpu program */
 	ROM_LOAD( "vpsona3.pbj",	0x0000, 0x0800,	CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
 	ROM_LOAD( "vpsona2.pbj",	0x0800, 0x0800,	CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
 
@@ -1284,11 +1284,11 @@ ROM_START( blckjack )
 ROM_END
 
 ROM_START( videodad )
-	ROM_REGION( 0x1000, "main", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "dac5org.old",	0x0000, 0x0800,	CRC(b373c8e9) SHA1(7a99d6aa152f8e6adeddbfdfd13278edeaa529bc) )
 	ROM_LOAD( "dac7org.old",	0x0800, 0x0800,	CRC(afabae30) SHA1(c4198ba8de6811e3367b0154ff479f6738721bfa) )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound cpu program */
 	ROM_LOAD( "vdsona3.dad",	0x0000, 0x0800,	CRC(13f7a462) SHA1(2e2e904637ca7873a2ed67d7ab1524e51b324660) )
 	ROM_LOAD( "vdsona2.dad",	0x0800, 0x0800,	CRC(120e4512) SHA1(207748d4f5793180305bb115af877042517d901f) )
 
@@ -1303,11 +1303,11 @@ ROM_START( videodad )
 ROM_END
 
 ROM_START( videocba )
-	ROM_REGION( 0x1000, "main", 0 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "vcc5org.old",	0x0000, 0x0800,	CRC(96d72283) SHA1(056197a9e2ad40d1d6610bbe8a1855b81c0a6715) )
 	ROM_LOAD( "vcc7org.old",	0x0800, 0x0800,	CRC(fdec55c1) SHA1(19b740f3b7f2acaa0fc09f4c0a2fe69721ebbcaf) )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound cpu program */
 	ROM_LOAD( "vcsona3.rod",	0x0000, 0x0800,	CRC(b0948d6c) SHA1(6c45d350288f69b4b2b5ac16ab2b418f14c6eded) )
 	ROM_LOAD( "vcsona2.rod",	0x0800, 0x0800,	CRC(44ff9e85) SHA1(5d7988d2d3bca932b77e014dc61f7a2347b01603) )
 
@@ -1322,10 +1322,10 @@ ROM_START( videocba )
 ROM_END
 
 ROM_START( babypkr )
-	ROM_REGION( 0x4000, "main", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "pok8039.old",	0x0000, 0x4000,	CRC(c5400ef1) SHA1(1f27c92d2979319070a695f71ed494f6d47fe88f) )
 
-	ROM_REGION( 0x1000, "sound", 0 )
+	ROM_REGION( 0x1000, "soundcpu", 0 )
 	ROM_LOAD( "dadvpbj.son",	0x0000, 0x1000,	CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
 
 	ROM_REGION( 0x20000, "tiles", ROMREGION_DISPOSE )
@@ -1339,10 +1339,10 @@ ROM_START( babypkr )
 ROM_END
 
 ROM_START( babydad )
-	ROM_REGION( 0x4000, "main", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "da400org.old",	0x0000, 0x4000,	CRC(cbca3a0c) SHA1(5d9428f26edf2c5531398a6ae36b4e9169b2c1c1) )
 
-	ROM_REGION( 0x1000, "sound", 0 )
+	ROM_REGION( 0x1000, "soundcpu", 0 )
 	ROM_LOAD( "dadvpbj.son",	0x0000, 0x1000,	CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
 
 	ROM_REGION( 0x20000, "tiles", ROMREGION_DISPOSE )

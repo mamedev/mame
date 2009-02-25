@@ -540,7 +540,7 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
-	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "audio") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "audiocpu") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
 }
 
 static WRITE8_HANDLER( tecmosys_oki_bank_w )
@@ -898,12 +898,12 @@ static const ymf262_interface tecmosys_ymf262_interface =
 
 
 static MACHINE_DRIVER_START( deroon )
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(400) // guess
 
-	MDRV_CPU_ADD("audio", Z80, 16000000/2 )	/* 8 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80, 16000000/2 )	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 
@@ -913,7 +913,7 @@ static MACHINE_DRIVER_START( deroon )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57.4458)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -948,11 +948,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( deroon )
-	ROM_REGION( 0x100000, "main", 0 ) // Main Program
+	ROM_REGION( 0x100000, "maincpu", 0 ) // Main Program
 	ROM_LOAD16_BYTE( "t001.upau1", 0x00000, 0x80000, CRC(14b92c18) SHA1(b47b8c828222a3f7c0fe9271899bd38171d972fb) )
 	ROM_LOAD16_BYTE( "t002.upal1", 0x00001, 0x80000, CRC(0fb05c68) SHA1(5140592e15414770fb46d5ac9ba8f76e3d4ab323) )
 
-	ROM_REGION( 0x048000, "audio", 0 ) // Sound Porgram
+	ROM_REGION( 0x048000, "audiocpu", 0 ) // Sound Porgram
 	ROM_LOAD( "t003.uz1", 0x000000, 0x008000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
 	ROM_CONTINUE(         0x010000, 0x038000 ) /* banked part */
 
@@ -990,11 +990,11 @@ ROM_START( deroon )
 ROM_END
 
 ROM_START( tkdensho )
-	ROM_REGION( 0x600000, "main", 0 )
+	ROM_REGION( 0x600000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "aeprge-2.pal", 0x00000, 0x80000, CRC(25e453d6) SHA1(9c84e2af42eff5cc9b14c1759d5bab42fa7bb663) )
 	ROM_LOAD16_BYTE( "aeprgo-2.pau", 0x00001, 0x80000, CRC(22d59510) SHA1(5ade482d6ab9a22df2ee8337458c22cfa9045c73) )
 
-	ROM_REGION( 0x038000, "audio", 0 ) // Sound Porgram
+	ROM_REGION( 0x038000, "audiocpu", 0 ) // Sound Porgram
 	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
 	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
 
@@ -1034,11 +1034,11 @@ ROM_START( tkdensho )
 ROM_END
 
 ROM_START( tkdensha )
-	ROM_REGION( 0x600000, "main", 0 )
+	ROM_REGION( 0x600000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "aeprge.pal", 0x00000, 0x80000, CRC(17a209ff) SHA1(b5dbea9868cbb89d4e27bf19fdb616ac256985b4) )
 	ROM_LOAD16_BYTE( "aeprgo.pau", 0x00001, 0x80000, CRC(d265e6a1) SHA1(f39d8ce115f197a660f5210b2483108854eb12a9) )
 
-	ROM_REGION( 0x038000, "audio", 0 ) // Sound Porgram
+	ROM_REGION( 0x038000, "audiocpu", 0 ) // Sound Porgram
 	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
 	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
 

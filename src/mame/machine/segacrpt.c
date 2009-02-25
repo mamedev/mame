@@ -179,7 +179,7 @@
 static void lfkp(int mask)
 {
 	int A;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 
 	for (A = 0x0000;A < 0x8000-14;A++)

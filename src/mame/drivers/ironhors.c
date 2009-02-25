@@ -384,16 +384,16 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( ironhors )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
+	MDRV_CPU_ADD("maincpu", M6809,18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(ironhors_interrupt,8)
 
-	MDRV_CPU_ADD("sound",Z80,18432000/6)		 /* 3.072 MHz */
+	MDRV_CPU_ADD("soundcpu",Z80,18432000/6)		 /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
 	MDRV_CPU_IO_MAP(slave_io_map, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -461,11 +461,11 @@ static const ym2203_interface farwest_ym2203_config =
 static MACHINE_DRIVER_START( farwest )
 	MDRV_IMPORT_FROM(ironhors)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(farwest_master_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(farwest_interrupt,255)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(farwest_slave_map, 0)
 	MDRV_CPU_IO_MAP(0, 0)
 
@@ -486,11 +486,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ironhors )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "13c_h03.bin",  0x4000, 0x8000, CRC(24539af1) SHA1(1eb96a2cb03007665587d6ec114894ab4cafdb23) )
 	ROM_LOAD( "12c_h02.bin",  0xc000, 0x4000, CRC(fab07f86) SHA1(9f599d32d473d873113b89f2b24a54a435dbcbe5) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "10c_h01.bin",  0x0000, 0x4000, CRC(2b17930f) SHA1(be7b21f050f6b74c75a33c9284455bbed5b03c63) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -508,11 +508,11 @@ ROM_START( ironhors )
 ROM_END
 
 ROM_START( dairesya )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "560-k03.13c",  0x4000, 0x8000, CRC(2ac6103b) SHA1(331e1be3f29df85d65081831c215743354d76778) )
 	ROM_LOAD( "560-k02.12c",  0xc000, 0x4000, CRC(07bc13a9) SHA1(1d3a44ad41799f89bfa84cc05fbe0792e57305af) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "560-j01.10c",  0x0000, 0x4000, CRC(a203b223) SHA1(fd19ae55bda467a09151539be6dce3791c28f18a) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -530,12 +530,12 @@ ROM_START( dairesya )
 ROM_END
 
 ROM_START( farwest )
-	ROM_REGION( 0x12000, "main", 0 )	/* 64k for code + 8k for extra ROM */
+	ROM_REGION( 0x12000, "maincpu", 0 )	/* 64k for code + 8k for extra ROM */
 	ROM_LOAD( "ironhors.008", 0x04000, 0x4000, CRC(b1c8246c) SHA1(4ceb098bb0b4efcbe50bb4b23bd27a60dabf2b3e) )
 	ROM_LOAD( "ironhors.009", 0x08000, 0x8000, CRC(ea34ecfc) SHA1(8c7f12e76d2b9eb592ebf1bfd3e16a6b130da8e5) )
 	ROM_LOAD( "ironhors.007", 0x00000, 0x2000, CRC(471182b7) SHA1(48ff58cbbf971b257e8099ec331397cf73dc8325) )	/* don't know what this is for */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "ironhors.010", 0x0000, 0x4000, CRC(a28231a6) SHA1(617e8fdf8129081c6a1bbbf140837a375a51da72) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )

@@ -1646,7 +1646,7 @@ static const ay8910_interface ay8910_intf_eeprom =
 static MACHINE_DRIVER_START( berlwall )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* MC68000P12 */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12 */
 	MDRV_CPU_PROGRAM_MAP(berlwall,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1655,7 +1655,7 @@ static MACHINE_DRIVER_START( berlwall )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)	// mangled sprites otherwise
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1693,7 +1693,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bakubrkr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_12MHz) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bakubrkr,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1703,7 +1703,7 @@ static MACHINE_DRIVER_START( bakubrkr )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)	// mangled sprites otherwise
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1749,11 +1749,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blazeon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,12000000)	/* TMP68HC000-12 */
+	MDRV_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000-12 */
 	MDRV_CPU_PROGRAM_MAP(blazeon,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
-	MDRV_CPU_ADD("audio", Z80,4000000)	/* D780C-2 */
+	MDRV_CPU_ADD("audiocpu", Z80,4000000)	/* D780C-2 */
 	MDRV_CPU_PROGRAM_MAP(blazeon_soundmem,0)
 	MDRV_CPU_IO_MAP(blazeon_soundport,0)
 
@@ -1762,7 +1762,7 @@ static MACHINE_DRIVER_START( blazeon )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1811,7 +1811,7 @@ static MACHINE_DRIVER_START( gtmr )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1894,7 +1894,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mgcrystl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_12MHz) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mgcrystl,0)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1904,7 +1904,7 @@ static MACHINE_DRIVER_START( mgcrystl )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1964,14 +1964,14 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 static MACHINE_DRIVER_START( shogwarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(shogwarr,0)
 	MDRV_CPU_VBLANK_INT_HACK(shogwarr_interrupt,SHOGWARR_INTERRUPTS_NUM)
 
 	MDRV_MACHINE_RESET(shogwarr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2127,7 +2127,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( explbrkr )
- 	ROM_REGION( 0x080000, "main", 0 )			/* 68000 Code */
+ 	ROM_REGION( 0x080000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "ts100e.u18", 0x000000, 0x040000, CRC(cc84a985) SHA1(1732a607cc1f894dd45cfc915dfe0407335f0073) )
 	ROM_LOAD16_BYTE( "ts101e.u19", 0x000001, 0x040000, CRC(88f4afb7) SHA1(08b8efd6bd935bc1b8cf9753d58b38ccf9a70b4d) )
 
@@ -2170,7 +2170,7 @@ ROM_START( explbrkr )
 ROM_END
 
 ROM_START( bakubrkr )
- 	ROM_REGION( 0x080000, "main", 0 )			/* 68000 Code */
+ 	ROM_REGION( 0x080000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "ts100j.u18", 0x000000, 0x040000, CRC(8cc0a4fd) SHA1(e7e18b5ea236522a79ba9db8f573ac8f7ade504b) )
 	ROM_LOAD16_BYTE( "ts101j.u19", 0x000001, 0x040000, CRC(aea92195) SHA1(e89f964e7e936fd7774f21956eb4ff5c9104837b) )
 
@@ -2246,7 +2246,7 @@ PALs : BW-U47, BW-U48 (backgrounds encryption)
 ***************************************************************************/
 
 ROM_START( berlwall )
-	ROM_REGION( 0x040000, "main", 0 )			/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "u23_01.bin", 0x000000, 0x020000, CRC(76b526ce) SHA1(95ba7cccbe88fd695c28b6a7c25a1afd130c1aa6) )
 	ROM_LOAD16_BYTE( "u39_01.bin", 0x000001, 0x020000, CRC(78fa7ef2) SHA1(8392de6e307dcd2bf5bcbeb37d578d33246acfcf) )
 
@@ -2318,7 +2318,7 @@ berlwall and not berlwalt!
 */
 
 ROM_START( berlwalt )
- 	ROM_REGION( 0x040000, "main", 0 )			/* 68000 Code */
+ 	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "bw100a", 0x000000, 0x020000, CRC(e6bcb4eb) SHA1(220b8fddc79230b4f6a8cf33e1035355c485e8d1) )
 	ROM_LOAD16_BYTE( "bw101a", 0x000001, 0x020000, CRC(38056fb2) SHA1(48338b9a5ebea872286541a3c45016673c4af76b) )
 
@@ -2372,11 +2372,11 @@ CUSTOM:       KANEKO VU-002 x2
 ***************************************************************************/
 
 ROM_START( blazeon )
- 	ROM_REGION( 0x080000, "main", 0 )			/* 68000 Code */
+ 	ROM_REGION( 0x080000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "bz_prg1.u80", 0x000000, 0x040000, CRC(8409e31d) SHA1(a9dfc299f4b457df190314401aef309adfaf9bae) )
 	ROM_LOAD16_BYTE( "bz_prg2.u81", 0x000001, 0x040000, CRC(b8a0a08b) SHA1(5f275b98d3e49a834850b45179d26e8c2f9fd604) )
 
- 	ROM_REGION( 0x020000, "audio", 0 )			/* Z80 Code */
+ 	ROM_REGION( 0x020000, "audiocpu", 0 )			/* Z80 Code */
 	ROM_LOAD( "3.u45", 0x000000, 0x020000, CRC(52fe4c94) SHA1(896230e4627503292575bbd84edc3cf9cb18b27e) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
@@ -3036,7 +3036,7 @@ Yes, one program rom actually is a 27C010 and the other one is a 27C020
 ***************************************************************************/
 
 ROM_START( mgcrystl ) /* Master Up: 92/01/10 14:21:30 */
- 	ROM_REGION( 0x040000*2, "main", ROMREGION_ERASE )			/* 68000 Code */
+ 	ROM_REGION( 0x040000*2, "maincpu", ROMREGION_ERASE )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "mc100e02.u18", 0x000000, 0x020000, CRC(246a1335) SHA1(8333945a92e08a7bff425d2d6602557386016dc5) ) /* Labeled as MC100E/U18-02 */
 	ROM_LOAD16_BYTE( "mc101e02.u19", 0x000001, 0x040000, CRC(708ea1dc) SHA1(ae6eca6620729bc1e815f1bfbd8fe130f0ba943c) ) /* Labeled as MC101E/U19-02 */
 
@@ -3060,7 +3060,7 @@ ROM_START( mgcrystl ) /* Master Up: 92/01/10 14:21:30 */
 ROM_END
 
 ROM_START( mgcrysto ) /* Master Up: 91/12/10 01:56:06 */
- 	ROM_REGION( 0x040000*2, "main", ROMREGION_ERASE )			/* 68000 Code */
+ 	ROM_REGION( 0x040000*2, "maincpu", ROMREGION_ERASE )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "mc100h00.u18", 0x000000, 0x020000, CRC(c7456ba7) SHA1(96c25c3432069373fa86d7af3e093e02e39aea34) ) /* Labeled as MC100H/U18-00 */
 	ROM_LOAD16_BYTE( "mc101h00.u19", 0x000001, 0x040000, CRC(ea8f9300) SHA1(0cd0d448805aa45986b63befca00b08fe066dbb2) ) /* Labeled as MC101H/U19-00 */
 
@@ -3084,7 +3084,7 @@ ROM_START( mgcrysto ) /* Master Up: 91/12/10 01:56:06 */
 ROM_END
 
 ROM_START( mgcrystj ) /* Master Up: 92/01/13 14:44:20 */
- 	ROM_REGION( 0x040000*2, "main", ROMREGION_ERASE )			/* 68000 Code */
+ 	ROM_REGION( 0x040000*2, "maincpu", ROMREGION_ERASE )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "mc100j02.u18", 0x000000, 0x020000, CRC(afe5882d) SHA1(176e6e12e3df63c08d7aff781f5e5a9bd83ec293) ) /* Labeled as MC100J/U18-02 */
 	ROM_LOAD16_BYTE( "mc101j02.u19", 0x000001, 0x040000, CRC(60da5492) SHA1(82b90a617d355825624ce9fb30bddf4714bd0d18) ) /* Labeled as MC101J/U19-02 */
 
@@ -3150,7 +3150,7 @@ ROUTINES:
 ***************************************************************************/
 
 ROM_START( shogwarr )
- 	ROM_REGION( 0x040000, "main", 0 )			/* 68000 Code */
+ 	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "fb030a.u61", 0x000000, 0x020000, CRC(a04106c6) SHA1(95ab084f2e709be7cec2964cb09bcf5a8d3aacdf) )
 	ROM_LOAD16_BYTE( "fb031a.u62", 0x000001, 0x020000, CRC(d1def5e2) SHA1(f442de4433547e52b483549aca5786e4597a7122) )
 
@@ -3209,7 +3209,7 @@ KANEKO JAPAN 9203 T (44 PIN PQFP)         = KANEKO JAPAN 9204 T (44 PIN PQFP)
 ***************************************************************************/
 
 ROM_START( shogware )
- 	ROM_REGION( 0x040000, "main", 0 )			/* 68000 Code */
+ 	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "fb030e.u61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
 	ROM_LOAD16_BYTE( "fb031e.u62", 0x000001, 0x020000, CRC(228aeaf5) SHA1(5e080d7975bc5dcf6fccfbc286eafe939496d9bf) )
 
@@ -3294,7 +3294,7 @@ NOTE: U67 & U68 are empty on this Original board.
 ***************************************************************************/
 
 ROM_START( fjbuster )	// Fujiyama Buster - Japan version of Shogun Warriors
- 	ROM_REGION( 0x040000, "main", 0 )			/* 68000 Code */
+ 	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "fb030j.u61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
 	ROM_LOAD16_BYTE( "fb031j.u62", 0x000001, 0x020000, CRC(000c8c08) SHA1(439daac1541c34557b5a4308ed69dfebb93abe13) )
 
@@ -3436,7 +3436,7 @@ Game can be ROM Swapped onto a Shogun Warriors board and works
 ***************************************************************************/
 
 ROM_START( brapboys ) /* Single PCB, fully populated, no rom sub board */
- 	ROM_REGION( 0x040000, "main", 0 )			/* 68000 Code */
+ 	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "rb-030.u61", 0x000000, 0x020000, CRC(ccbe9a53) SHA1(b96baf0ecbf6550bfaf8e512d9275c53a3928bee) )
 	ROM_LOAD16_BYTE( "rb-031.u62", 0x000001, 0x020000, CRC(c72b8dda) SHA1(450e1fb8acb140fa0ab23630daad82924f7ce72b) )
 
@@ -3472,7 +3472,7 @@ ROM_START( brapboys ) /* Single PCB, fully populated, no rom sub board */
 ROM_END
 
 ROM_START( brapboyj ) /* The Japanese version has an extra rom??? and used a rom sub board */
- 	ROM_REGION( 0x040000, "main", 0 )			/* 68000 Code */
+ 	ROM_REGION( 0x040000, "maincpu", 0 )			/* 68000 Code */
 	ROM_LOAD16_BYTE( "rb-004.u61", 0x000000, 0x020000, CRC(5432442c) SHA1(f0f7328ece96ef25e6d4fd1958d734f64a9ef371) )
 	ROM_LOAD16_BYTE( "rb-005.u62", 0x000001, 0x020000, CRC(118b3cfb) SHA1(1690ecf5c629879bd97131ff77029e152919e45d) )
 

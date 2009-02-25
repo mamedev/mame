@@ -423,20 +423,20 @@ static const ay8910_interface survival_ay8910_interface =
 
 static MACHINE_RESET( phoenix )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x4000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x4000);
 }
 
 
 static MACHINE_DRIVER_START( phoenix )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8085A, CPU_CLOCK)	/* 2.75 MHz */
+	MDRV_CPU_ADD("maincpu", 8085A, CPU_CLOCK)	/* 2.75 MHz */
 	MDRV_CPU_PROGRAM_MAP(phoenix_memory_map, 0)
 
 	MDRV_MACHINE_RESET(phoenix)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -469,7 +469,7 @@ static MACHINE_DRIVER_START( pleiads )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(phoenix)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pleiads_memory_map, 0)
 
 	/* video hardware */
@@ -502,7 +502,7 @@ static const i8085_config survival_i8085_config =
 static MACHINE_DRIVER_START( survival )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8085A, CPU_CLOCK)	/* 5.50 MHz */
+	MDRV_CPU_ADD("maincpu", 8085A, CPU_CLOCK)	/* 5.50 MHz */
 	MDRV_CPU_CONFIG(survival_i8085_config)
 	MDRV_CPU_PROGRAM_MAP(survival_memory_map, 0)
 
@@ -513,7 +513,7 @@ static MACHINE_DRIVER_START( survival )
 	/* schematics fairly identical to phoenix, however the interesting
      * page is missing
      */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -540,7 +540,7 @@ static MACHINE_DRIVER_START( condor )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(phoenix)
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */
-	MDRV_CPU_REPLACE("main", Z80, 11000000/4)	/* 2.75 MHz??? */
+	MDRV_CPU_REPLACE("maincpu", Z80, 11000000/4)	/* 2.75 MHz??? */
 MACHINE_DRIVER_END
 
 
@@ -551,7 +551,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( phoenix )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic45",         0x0000, 0x0800, CRC(9f68086b) SHA1(fc3cef299bf03bf0586c4047c6b96ca666846220) )
 	ROM_LOAD( "ic46",         0x0800, 0x0800, CRC(273a4a82) SHA1(6f3019a074e73ff50ceb92f655fcf15659f34919) )
 	ROM_LOAD( "ic47",         0x1000, 0x0800, CRC(3d4284b9) SHA1(6e69f8f0d537fe89140cd95d2398531d7e93d102) )
@@ -575,7 +575,7 @@ ROM_START( phoenix )
 ROM_END
 
 ROM_START( phoenixa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1-ic45.1a",    0x0000, 0x0800, CRC(c7a9b499) SHA1(cda61de47956b3603ff6e48556ce528b5f45deab) )
 	ROM_LOAD( "2-ic46.2a",    0x0800, 0x0800, CRC(d0e6ae1b) SHA1(63c6df8365dcb8befa338e8479482e34a4259abf) )
 	ROM_LOAD( "3-ic47.3a",    0x1000, 0x0800, CRC(64bf463a) SHA1(6cd876e80b85fbac6374ea1f26620c026ba9e99a) )
@@ -599,7 +599,7 @@ ROM_START( phoenixa )
 ROM_END
 
 ROM_START( phoenixb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1-ic45.1a",    0x0000, 0x0800, CRC(c7a9b499) SHA1(cda61de47956b3603ff6e48556ce528b5f45deab) )
 	ROM_LOAD( "2-ic46.2a",    0x0800, 0x0800, CRC(d0e6ae1b) SHA1(63c6df8365dcb8befa338e8479482e34a4259abf) )
 	ROM_LOAD( "3-ic47.3a",    0x1000, 0x0800, CRC(64bf463a) SHA1(6cd876e80b85fbac6374ea1f26620c026ba9e99a) )
@@ -623,7 +623,7 @@ ROM_START( phoenixb )
 ROM_END
 
 ROM_START( phoenixt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "phoenix.45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
 	ROM_LOAD( "phoenix.46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
 	ROM_LOAD( "phoenix.47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
@@ -647,7 +647,7 @@ ROM_START( phoenixt )
 ROM_END
 
 ROM_START( phoenixj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pn01.45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
 	ROM_LOAD( "pn02.46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
 	ROM_LOAD( "pn03.47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
@@ -671,7 +671,7 @@ ROM_START( phoenixj )
 ROM_END
 
 ROM_START( phoenix3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "phoenix3.45",  0x0000, 0x0800, CRC(a362cda0) SHA1(5ab38afaf92179c965533326574c773f6a63dbbb) )
 	ROM_LOAD( "phoenix3.46",  0x0800, 0x0800, CRC(5748f486) SHA1(49e6fd836d26ec24105e95227b24cf668e8a470a) )
 	ROM_LOAD( "phoenix.47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
@@ -695,7 +695,7 @@ ROM_START( phoenix3 )
 ROM_END
 
 ROM_START( phoenixc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "phoenix.45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
 	ROM_LOAD( "phoenix.46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
 	ROM_LOAD( "phoenix.47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
@@ -719,7 +719,7 @@ ROM_START( phoenixc )
 ROM_END
 
 ROM_START( condor )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cond01c.bin",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
 	ROM_LOAD( "cond02c.bin",  0x0800, 0x0800, CRC(440d56e8) SHA1(b3147d5416cec8c00c7df40b878b826434121737) )
 	ROM_LOAD( "cond03c.bin",  0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
@@ -743,7 +743,7 @@ ROM_START( condor )
 ROM_END
 
 ROM_START( falcon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "falcon.45",    0x0000, 0x0800, CRC(80382b6c) SHA1(47e24f04b5dd8aa8258ce324a0e4ef68a75dc168) )
 	ROM_LOAD( "falcon.46",    0x0800, 0x0800, CRC(6a13193b) SHA1(760347695f1abc92cfe19ea7085e5aaf2dced383) )
 	ROM_LOAD( "phoenix.47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
@@ -767,7 +767,7 @@ ROM_START( falcon )
 ROM_END
 
 ROM_START( vautour )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vautor01.1e",  0x0000, 0x0800, CRC(cd2807ee) SHA1(79b9769f212d25b9ccb5124e2aa632c964c14a0b) )
 	ROM_LOAD( "phoenix.46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
 	ROM_LOAD( "phoenix.47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
@@ -791,7 +791,7 @@ ROM_START( vautour )
 ROM_END
 
 ROM_START( falconz )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "f45.bin",      0x0000, 0x0800, CRC(9158b43b) SHA1(222cbcfb3f95d09bb90148813541c2613d8b7e1c) )
 	ROM_LOAD( "f46.bin",      0x0800, 0x0800, CRC(22ddb600) SHA1(9606d11722261990c34b788baae5dc7516ba52d6) )
 	ROM_LOAD( "f47.bin",      0x1000, 0x0800, CRC(cb2838d9) SHA1(332e339475b17d17eeb43a524c5cb3bf9818837a) )
@@ -815,7 +815,7 @@ ROM_START( falconz )
 ROM_END
 
 ROM_START( vautourz )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vautour1.bin", 0x0000, 0x0800, CRC(a600f6a4) SHA1(f1aea5ec71da0d0664fb90b87602fe4c4eed2dbe) )
 	ROM_LOAD( "vautour2.bin", 0x0800, 0x0800, CRC(3699b11a) SHA1(7122685cbfcd75898eaa68f8c5bf87c11df59a3b) )
 	ROM_LOAD( "vautour3.bin", 0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
@@ -839,7 +839,7 @@ ROM_START( vautourz )
 ROM_END
 
 ROM_START( fenix )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0.1e",         0x0000, 0x0800, NO_DUMP )	// socket at location '1e' is empty.
 	ROM_LOAD( "1.1f",         0x0800, 0x0800, CRC(3699b11a) SHA1(7122685cbfcd75898eaa68f8c5bf87c11df59a3b) )	// 1.1f
 	ROM_LOAD( "2.1h",         0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )	// 2.1h
@@ -863,7 +863,7 @@ ROM_START( fenix )
 ROM_END
 
 ROM_START( griffon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "griffon0.a5",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
 	ROM_LOAD( "griffon1.a6",  0x0800, 0x0800, CRC(3cc33e4a) SHA1(45d16334f245cc185e18f63062e08627e9bd06bb) )
 	ROM_LOAD( "griffon2.a7",  0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
@@ -887,7 +887,7 @@ ROM_START( griffon )
 ROM_END
 
 ROM_START( nextfase )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nf01.bin",   0x0000, 0x0800, CRC(b31ce820) SHA1(dfdb17995a14b66d2571c2c8de481d2792f9ce6a) )
 	ROM_LOAD( "nf02.bin",   0x0800, 0x0800, CRC(891d21e1) SHA1(bea01962c0706c00eae42920bb2b3bfdb7e80d89) )
 	ROM_LOAD( "nf03.bin",   0x1000, 0x0800, CRC(2ab7389d) SHA1(c0bc0c235cae4a8e880237196ea1718f8c1d0123) )
@@ -913,7 +913,7 @@ ROM_END
 
 
 ROM_START( pleiads )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic47.r1",      0x0000, 0x0800, CRC(960212c8) SHA1(52a3232e99920805ce9e195b8a6338ae7044dd18) )
 	ROM_LOAD( "ic48.r2",      0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
 	ROM_LOAD( "ic47.bin",     0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) ) /* IC 49 on real board */
@@ -937,7 +937,7 @@ ROM_START( pleiads )
 ROM_END
 
 ROM_START( pleiadbl )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic45.bin",     0x0000, 0x0800, CRC(93fc2958) SHA1(d8723c4f4376e035e655f69352c1765fdbf4a602) )
 	ROM_LOAD( "ic46.bin",     0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
 	ROM_LOAD( "ic47.bin",     0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
@@ -961,7 +961,7 @@ ROM_START( pleiadbl )
 ROM_END
 
 ROM_START( pleiadce )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pleiades.47",  0x0000, 0x0800, CRC(711e2ba0) SHA1(62d9108b9066d3e2b99c712daf2b9412704970cc) )
 	ROM_LOAD( "pleiades.48",  0x0800, 0x0800, CRC(93a36943) SHA1(7cb4a9e8b60e28415df8401373ff4e595eaab7f5) )
 	ROM_LOAD( "ic47.bin",     0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
@@ -985,7 +985,7 @@ ROM_START( pleiadce )
 ROM_END
 
 ROM_START( capitol )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cp1.45",       0x0000, 0x0800, CRC(0922905b) SHA1(501342b0162bba43570b1cbefa1ada6302a54017) )
 	ROM_LOAD( "cp2.46",       0x0800, 0x0800, CRC(4f168f45) SHA1(8d268dad54a2cf7081f22a29a3e025174ae462e7) )
 	ROM_LOAD( "cp3.47",       0x1000, 0x0800, CRC(3975e0b0) SHA1(d509398aa8b90c7c451d9e60bc1ca6488b1563a9) )
@@ -1009,7 +1009,7 @@ ROM_START( capitol )
 ROM_END
 
 ROM_START( survival )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g959-32a.u45", 0x0000, 0x0800, CRC(0bc53541) SHA1(0d1bcf226b89d0cfe0864aab8126b276273a23c2) )
 	ROM_LOAD( "g959-33a.u46", 0x0800, 0x0800, CRC(726e9428) SHA1(515c6278ece9bf39827b9c886a1a900e274bd272) )
 	ROM_LOAD( "g959-34a.u47", 0x1000, 0x0800, CRC(78f166ff) SHA1(ad079372067319dcfad4a00e437d34a999ff9161) )

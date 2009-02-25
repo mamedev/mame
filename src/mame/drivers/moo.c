@@ -224,7 +224,7 @@ static READ16_HANDLER( sound_status_r )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(space->machine, 2, memory_region(space->machine, "sound") + 0x10000 + (data&0xf)*0x4000);
+	memory_set_bankptr(space->machine, 2, memory_region(space->machine, "soundcpu") + 0x10000 + (data&0xf)*0x4000);
 }
 
 
@@ -568,11 +568,11 @@ static MACHINE_RESET( moo )
 static MACHINE_DRIVER_START( moo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", moo_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", moo_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, 8000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(moo)
@@ -583,7 +583,7 @@ static MACHINE_DRIVER_START( moo )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200))	 // should give IRQ4 sufficient time to update scroll registers
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -610,9 +610,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( moobl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16100000)
+	MDRV_CPU_ADD("maincpu", M68000, 16100000)
 	MDRV_CPU_PROGRAM_MAP(readmembl,writemembl)
-	MDRV_CPU_VBLANK_INT("main", moobl_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", moobl_interrupt)
 
 	MDRV_MACHINE_START(moo)
 	MDRV_MACHINE_RESET(moo)
@@ -621,7 +621,7 @@ static MACHINE_DRIVER_START( moobl )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1200)) // should give IRQ4 sufficient time to update scroll registers
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -645,7 +645,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bucky )
 	MDRV_IMPORT_FROM(moo)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(buckyreadmem,buckywritemem)
 
 	/* video hardware */
@@ -655,7 +655,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( moo ) /* Version EA - Euro Ver A */
-	ROM_REGION( 0x180000, "main", 0 )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD16_BYTE( "151b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )
 	ROM_LOAD16_BYTE( "151b02.ea", 0x000001,  0x40000, CRC(37b30c01) SHA1(cb91739097a4a36f8f8d92998d822ffc851e1279) )
@@ -664,7 +664,7 @@ ROM_START( moo ) /* Version EA - Euro Ver A */
 	ROM_LOAD16_BYTE( "151a03", 0x100000,  0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
 	ROM_LOAD16_BYTE( "151a04", 0x100001,  0x40000, CRC(3b24706a) SHA1(c2a77944284e35ff57f0774fa7b67e53d3b63e1f) )
 
-	ROM_REGION( 0x050000, "sound", 0 )
+	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "151a07", 0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
 	ROM_RELOAD(         0x010000, 0x040000 )
@@ -687,7 +687,7 @@ ROM_START( moo ) /* Version EA - Euro Ver A */
 ROM_END
 
 ROM_START( mooua ) /* Version UA - USA Ver A */
-	ROM_REGION( 0x180000, "main", 0 )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD16_BYTE( "151b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )
 	ROM_LOAD16_BYTE( "151b02.ua", 0x000001,  0x40000, CRC(3d9f4d59) SHA1(db47044bd4935fce94ec659242c9819c30eb6d0f) )
@@ -696,7 +696,7 @@ ROM_START( mooua ) /* Version UA - USA Ver A */
 	ROM_LOAD16_BYTE( "151a03", 0x100000,  0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
 	ROM_LOAD16_BYTE( "151a04", 0x100001,  0x40000, CRC(3b24706a) SHA1(c2a77944284e35ff57f0774fa7b67e53d3b63e1f) )
 
-	ROM_REGION( 0x050000, "sound", 0 )
+	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "151a07", 0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
 	ROM_RELOAD(         0x010000, 0x040000 )
@@ -719,7 +719,7 @@ ROM_START( mooua ) /* Version UA - USA Ver A */
 ROM_END
 
 ROM_START( mooaa ) /* Version AA - Asia Ver A */
-	ROM_REGION( 0x180000, "main", 0 )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD16_BYTE( "151b01",    0x000000,  0x40000, CRC(fb2fa298) SHA1(f03b24681a2b329ba797fd2780ac9a3cf862ebcb) )
 	ROM_LOAD16_BYTE( "151b02.aa", 0x000001,  0x40000, CRC(2162d593) SHA1(a6cfe4a57b3f22b2aa0f04f91acefe3b7bea9e76) )
@@ -728,7 +728,7 @@ ROM_START( mooaa ) /* Version AA - Asia Ver A */
 	ROM_LOAD16_BYTE( "151a03", 0x100000,  0x40000, CRC(c896d3ea) SHA1(ea83c63e2c3dbc4f1e1d49f1852a78ffc1f0ea4b) )
 	ROM_LOAD16_BYTE( "151a04", 0x100001,  0x40000, CRC(3b24706a) SHA1(c2a77944284e35ff57f0774fa7b67e53d3b63e1f) )
 
-	ROM_REGION( 0x050000, "sound", 0 )
+	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "151a07", 0x000000, 0x040000, CRC(cde247fc) SHA1(cdee0228db55d53ae43d7cd2d9001dadd20c2c61) )
 	ROM_RELOAD(         0x010000, 0x040000 )
@@ -751,7 +751,7 @@ ROM_START( mooaa ) /* Version AA - Asia Ver A */
 ROM_END
 
 ROM_START( bucky )
-	ROM_REGION( 0x240000, "main", 0 )
+	ROM_REGION( 0x240000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD16_BYTE( "173ea.b01", 0x000000,  0x40000, CRC(7785ac8a) SHA1(ef78d14f54d3a0b724b9702a18c67891e2d366a7) )
 	ROM_LOAD16_BYTE( "173ea.b02", 0x000001,  0x40000, CRC(9b45f122) SHA1(325af1612e6f90ef9ae9353c43dc645be1f3465c) )
@@ -760,7 +760,7 @@ ROM_START( bucky )
 	ROM_LOAD16_BYTE( "t5", 0x200000,  0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
 	ROM_LOAD16_BYTE( "t6", 0x200001,  0x20000, CRC(7dd54d6f) SHA1(b0ee8ec445b92254bca881eefd4449972fed506a) )
 
-	ROM_REGION( 0x050000, "sound", 0 )
+	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD("173.a07", 0x000000, 0x40000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
 	ROM_RELOAD(         0x010000, 0x040000 )
@@ -784,7 +784,7 @@ ROM_START( bucky )
 ROM_END
 
 ROM_START( buckyua )
-	ROM_REGION( 0x240000, "main", 0 )
+	ROM_REGION( 0x240000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD16_BYTE( "q5", 0x000000,  0x40000, CRC(dcaecca0) SHA1(c41847c9d89cdaf7cfa81ad9cc018c32592a882f) )
 	ROM_LOAD16_BYTE( "q6", 0x000001,  0x40000, CRC(e3c856a6) SHA1(33cc8a29643e44b31ee280015c0c994bed72a0e3) )
@@ -793,7 +793,7 @@ ROM_START( buckyua )
 	ROM_LOAD16_BYTE( "t5", 0x200000,  0x20000, CRC(cd724026) SHA1(525445499604b713da4d8bc0a88e428654ceab95) )
 	ROM_LOAD16_BYTE( "t6", 0x200001,  0x20000, CRC(7dd54d6f) SHA1(b0ee8ec445b92254bca881eefd4449972fed506a) )
 
-	ROM_REGION( 0x050000, "sound", 0 )
+	ROM_REGION( 0x050000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD("173.a07", 0x000000, 0x40000, CRC(4cdaee71) SHA1(bdc05d4475415f6fac65d7cdbc48df398e57845e) )
 	ROM_RELOAD(         0x010000, 0x040000 )
@@ -826,7 +826,7 @@ static DRIVER_INIT( moo )
 }
 
 ROM_START( moobl )
-	ROM_REGION( 0x180000, "main", 0 )
+	ROM_REGION( 0x180000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "moo03.rom", 0x000000, 0x80000, CRC(fed6a1cb) SHA1(be58e266973930d643b5e15dcc974a82e1a3ae35) )
 	ROM_LOAD16_WORD_SWAP( "moo04.rom", 0x100000, 0x80000, CRC(ec45892a) SHA1(594330cbbfbca87e61ddf519e565018b6eaf5a20) )
 

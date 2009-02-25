@@ -465,7 +465,7 @@ static INTERRUPT_GEN( deco32_vbl_interrupt )
 static MACHINE_DRIVER_START( backfire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", ARM, 28000000/4) /* Unconfirmed */
+	MDRV_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
 	MDRV_CPU_PROGRAM_MAP(backfire_map,0)
 	MDRV_CPU_VBLANK_INT("left", deco32_vbl_interrupt)	/* or is it "right?" */
 
@@ -558,7 +558,7 @@ TSW1: Push Button TEST switch to access options menu (coins/lives etc).
 */
 
 ROM_START( backfire )
-	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "ra00-0.2j",    0x000002, 0x080000, CRC(790da069) SHA1(84fd90fb1833b97459cb337fdb92f7b6e93b5936) )
 	ROM_LOAD32_WORD( "ra01-0.3j",    0x000000, 0x080000, CRC(447cb57b) SHA1(1d503b9cf1cadd3fdd7c9d6d59d4c40a59fa25ab))
 
@@ -594,7 +594,7 @@ ROM_START( backfire )
 ROM_END
 
 ROM_START( backfira )
-	ROM_REGION( 0x100000, "main", 0 ) /* DE156 code (encrypted) */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* DE156 code (encrypted) */
 	ROM_LOAD32_WORD( "rb-00h.h2",    0x000002, 0x080000, CRC(60973046) SHA1(e70d9be9cb172920da2a2ac9d317768b1438c59d) )
 	ROM_LOAD32_WORD( "rb-01l.h3",    0x000000, 0x080000, CRC(27472f60) SHA1(d73b1e68dc51e28b1148db39ce22bd2e93f6fd0a) )
 

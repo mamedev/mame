@@ -154,7 +154,7 @@ this is the data written to internal ram on startup:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	int offs;
 
 	/* bit 0 = RAM bank? */
@@ -534,18 +534,18 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( spy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 3000000) /* ? */
+	MDRV_CPU_ADD("maincpu", M6809, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(spy_readmem,spy_writemem)
-	MDRV_CPU_VBLANK_INT("main", spy_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", spy_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(spy_sound_readmem,spy_sound_writemem)
 								/* nmi by the sound chip */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -583,12 +583,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( spy )
-	ROM_REGION( 0x29000, "main", 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x29000, "maincpu", 0 ) /* code + banked roms + space for banked ram */
 	ROM_LOAD( "857n03.bin",   0x10000, 0x10000, CRC(97993b38) SHA1(0afd561bc85fcbfe30f2d16807424ceec7188ce7) )
 	ROM_LOAD( "857n02.bin",   0x20000, 0x08000, CRC(31a97efe) SHA1(6c9ec3954e4d16634bf95835b8b404d3a6ef6e24) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "857d01.bin",   0x0000, 0x8000, CRC(aad4210f) SHA1(bb40b8673939b5ce51012606da86b4dcbfc52a57) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
@@ -610,12 +610,12 @@ ROM_START( spy )
 ROM_END
 
 ROM_START( spyu )
-	ROM_REGION( 0x29000, "main", 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x29000, "maincpu", 0 ) /* code + banked roms + space for banked ram */
 	ROM_LOAD( "857m03.bin",   0x10000, 0x10000, CRC(3bd87fa4) SHA1(257371ef31c8adcdc04f46e989b7a2f3531c2ab1) )
 	ROM_LOAD( "857m02.bin",   0x20000, 0x08000, CRC(306cc659) SHA1(91d150b8d320bf19c12bc46103ffdffacf4387c3) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "857d01.bin",   0x0000, 0x8000, CRC(aad4210f) SHA1(bb40b8673939b5ce51012606da86b4dcbfc52a57) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
@@ -646,8 +646,8 @@ static void gfx_untangle(running_machine *machine)
 
 static DRIVER_INIT( spy )
 {
-	paletteram = &memory_region(machine, "main")[0x28000];
-	pmcram =     &memory_region(machine, "main")[0x28800];
+	paletteram = &memory_region(machine, "maincpu")[0x28000];
+	pmcram =     &memory_region(machine, "maincpu")[0x28800];
 	gfx_untangle(machine);
 }
 

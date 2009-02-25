@@ -337,18 +337,18 @@ static MACHINE_START( astron )
 static MACHINE_DRIVER_START( astron )
 
 	/* main cpu */
-	MDRV_CPU_ADD("main", Z80, SCHEMATIC_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1000.0/59.94)
 
 	MDRV_MACHINE_START(astron)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(astron, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_GFXDECODE(segald)
 	MDRV_PALETTE_LENGTH(256)
@@ -364,7 +364,7 @@ MACHINE_DRIVER_END
 
 ROM_START( astron )
 	/* Last two ROMs are banked at 0x8000 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5473c", 0x0000, 0x4000, CRC(0f24baaa) SHA1(54fa344ad86c469f976ce469e39b2a4286da5f50) )
 	ROM_LOAD( "5474a", 0x4000, 0x4000, CRC(5d44603d) SHA1(e229ff14255a5a0d1e156745664d31418b36893c) )
 	ROM_LOAD( "5284",  0x8000, 0x4000, CRC(eec6db27) SHA1(f4c72d9d4137244c0a0b7a1b8f7fb0e7b032b1c4) )
@@ -397,7 +397,7 @@ ROM_END
 
 ROM_START( astronp )
 	/* Last two ROMs are banked at 0x8000 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5282", 0x0000, 0x4000, CRC(fd0dcfc9) SHA1(d797269f53f8a9e30b4d59d4f4f6e9858c133bbe) )
 	ROM_LOAD( "5283", 0x4000, 0x4000, CRC(a3746393) SHA1(97864967073f0425555748535d1aa68459bacfb2) )
 	ROM_LOAD( "5284", 0x8000, 0x4000, CRC(eec6db27) SHA1(f4c72d9d4137244c0a0b7a1b8f7fb0e7b032b1c4) )
@@ -430,7 +430,7 @@ ROM_END
 
 ROM_START( galaxyr )
 	/* Last two ROMs are banked at 0x8000 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gr5633.bin", 0x0000, 0x4000, CRC(398f6b23) SHA1(10f4bac2face29c2fb2422b70ba1b100acd0e968) )
 	ROM_LOAD( "gr5634.bin", 0x4000, 0x4000, CRC(2c5be1b7) SHA1(03375729aa00fece8b938fd1672a700157a7f710) )
 	ROM_LOAD( "gr5592.bin", 0x8000, 0x4000, CRC(d13715f8) SHA1(72e2570a1fa437faac0c52e24f801020b6e5a110) )
@@ -465,7 +465,7 @@ ROM_END
 
 ROM_START( galaxyrp )
 	/* Last two ROMs are banked at 0x8000 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5613.bin", 0x0000, 0x4000, CRC(6617e702) SHA1(9de760d0e5a654a6abaa1a8cd7b038638d61f523) )
 	ROM_LOAD( "epr-5614.bin", 0x4000, 0x4000, CRC(73ad8932) SHA1(ab0ff5e14bb58aa1f874fd135f1a8bd96de3f25e) )
 	ROM_LOAD( "gr5592.bin",   0x8000, 0x4000, CRC(d13715f8) SHA1(72e2570a1fa437faac0c52e24f801020b6e5a110) )
@@ -500,7 +500,7 @@ ROM_END
 
 ROM_START( sblazerp )
 	/* Last two ROMs are banked at 0x8000 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5590.bin", 0x0000, 0x4000, CRC(c06e41bb) SHA1(b2d47f04fe1a81040bbb07bdcb8930107d350e38) )
 	ROM_LOAD( "epr-5591.bin", 0x4000, 0x4000, CRC(b179d18c) SHA1(eccad49cfbff1101677b66c19c5d79d41b11b72e) )
 	ROM_LOAD( "gr5592.bin",   0x8000, 0x4000, CRC(d13715f8) SHA1(72e2570a1fa437faac0c52e24f801020b6e5a110) )
@@ -535,7 +535,7 @@ ROM_END
 
 ROM_START( cobraseg )
 	/* Banked ROMs aren't present */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic-1.bin", 0x0000, 0x4000, CRC(079783c7) SHA1(69f7821d94d62c8981a3879d8718d984c960ed25) )
 	ROM_LOAD( "ic-2.bin", 0x4000, 0x2000, CRC(40c0b825) SHA1(1bac33b90b5a9d4ea528c2e69ded2009f9d69285) )
 
@@ -567,7 +567,7 @@ ROM_END
 
 static DRIVER_INIT( astron )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 2, &ROM[0x8000], 0x4000);
 }
 

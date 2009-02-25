@@ -563,16 +563,16 @@ static const ymf278b_interface ymf278b_config =
 
 static MACHINE_DRIVER_START( psikyo3v1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", SH2, MASTER_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(ps3v1_readmem,ps3v1_writemem)
-	MDRV_CPU_VBLANK_INT("main", psikyosh_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", psikyosh_interrupt)
 
 	MDRV_NVRAM_HANDLER(93C56)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM ) /* If using alpha */
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -599,7 +599,7 @@ static MACHINE_DRIVER_START( psikyo5 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(psikyo3v1)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ps5_readmem,ps5_writemem)
 MACHINE_DRIVER_END
 
@@ -607,11 +607,11 @@ static MACHINE_DRIVER_START( psikyo5_240 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(psikyo3v1)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ps5_readmem,ps5_writemem)
 
 	/* It probably has a register to change visarea */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 MACHINE_DRIVER_END
 
@@ -796,7 +796,7 @@ INPUT_PORTS_END
 /* PS3 */
 
 ROM_START( soldivid )
-	ROM_REGION( 0x100000, "main", 0)
+	ROM_REGION( 0x100000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u18", 0x000002, 0x080000, CRC(cf179b04) SHA1(343f00a81cffd44334a4db81b6b828b7cf73c1e8) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u17", 0x000000, 0x080000, CRC(f467d1c4) SHA1(a011e6f310a54f09efa0bf4597783cd78c05ad6f) )
 
@@ -814,7 +814,7 @@ ROM_START( soldivid )
 ROM_END
 
 ROM_START( s1945ii )
-	ROM_REGION( 0x100000, "main", 0) /* Code */
+	ROM_REGION( 0x100000, "maincpu", 0) /* Code */
 	ROM_LOAD32_WORD_SWAP( "2_prog_l.u18", 0x000002, 0x080000, CRC(20a911b8) SHA1(82ba7b93bd621fc45a4dc2722752077b59a0a233) )
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(4c0fe85e) SHA1(74f810a1c3e9d629c8b190f68d73ce07b11f77b7) )
 
@@ -837,7 +837,7 @@ ROM_END
 
 ROM_START( daraku )
 	/* main program */
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "4_prog_l.u18", 0x000002, 0x080000, CRC(660b4609) SHA1(ee6b5606fae41881c3e671ee642baae5c03331ca) )
 	ROM_LOAD32_WORD_SWAP( "3_prog_h.u17", 0x000000, 0x080000, CRC(7a9cf601) SHA1(8df464ce3fd02b30dd2ab77828594f4916375fd5) )
 	ROM_LOAD16_WORD_SWAP( "prog.u16",     0x100000, 0x100000, CRC(3742e990) SHA1(dd4b8777e57245151b3d520ed1bdab207530420b) )
@@ -863,7 +863,7 @@ ROM_START( daraku )
 ROM_END
 
 ROM_START( sbomberb )
-	ROM_REGION( 0x100000, "main", 0)
+	ROM_REGION( 0x100000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_l.u18", 0x000002, 0x080000, CRC(52d12225) SHA1(0a31a5d557414e7bf51dc6f7fbdd417a20b78df1) )
 	ROM_LOAD32_WORD_SWAP( "1-b_pr_h.u17", 0x000000, 0x080000, CRC(1bbd0345) SHA1(c6ccb7c97cc9e9ea298c1883d1dd5563907a7255) )
 
@@ -886,7 +886,7 @@ ROM_END
 /* PS5 */
 
 ROM_START( gunbird2 )
-	ROM_REGION( 0x180000, "main", 0)
+	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2_prog_l.u16", 0x000002, 0x080000, CRC(76f934f0) SHA1(cf197796d66f15639a6b3d5311c18da33cefd06b) )
 	ROM_LOAD32_WORD_SWAP( "1_prog_h.u17", 0x000000, 0x080000, CRC(7328d8bf) SHA1(c640de1ab5b32400b2d77e0dc6e3ee0f78ab7803) )
 	ROM_LOAD16_WORD_SWAP( "3_pdata.u1",   0x100000, 0x080000, CRC(a5b697e6) SHA1(947f124fa585c2cf77c6571af7559bd652897b89) )
@@ -906,7 +906,7 @@ ROM_START( gunbird2 )
 ROM_END
 
 ROM_START( s1945iii )
-	ROM_REGION( 0x180000, "main", 0)
+	ROM_REGION( 0x180000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2_progl.u16", 0x000002, 0x080000, CRC(5d5d385f) SHA1(67b3bcabd71cf084bcea7a59939281a8d6257059) )
 	ROM_LOAD32_WORD_SWAP( "1_progh.u17", 0x000000, 0x080000, CRC(1b8a5a18) SHA1(718a176bd48e16f964fcb07c568b5227cfc0515f) )
 	ROM_LOAD16_WORD_SWAP( "3_data.u1",   0x100000, 0x080000, CRC(8ff5f7d3) SHA1(420a3d7f2d5ab6a56789d36b418431f12f5f73f5) )
@@ -929,7 +929,7 @@ ROM_END
 /* PS5v2 */
 
 ROM_START( dragnblz )
-	ROM_REGION( 0x100000, "main", 0)
+	ROM_REGION( 0x100000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2prog_h.u21",   0x000000, 0x080000, CRC(fc5eade8) SHA1(e5d05543641e4a3900b0d42e0d5f75734683d635) )
 	ROM_LOAD32_WORD_SWAP( "1prog_l.u22",   0x000002, 0x080000, CRC(95d6fd02) SHA1(2b2830e7fa66cbd13666191762bfddc40571caec) )
 
@@ -970,7 +970,7 @@ Starting with Gunbarich and including Mahjong G-Taste, Psikyo started to "recycl
 */
 
 ROM_START( gnbarich )
-	ROM_REGION( 0x100000, "main", 0)
+	ROM_REGION( 0x100000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2-prog_l.u21",   0x000000, 0x080000, CRC(c136cd9c) SHA1(ab66c4f5196a66a97dbb5832336a203421cf40fa) )
 	ROM_LOAD32_WORD_SWAP( "1-prog_h.u22",   0x000002, 0x080000, CRC(6588fc96) SHA1(3db29fcf17e8b2aee465319b557bd3e45bc966b2) )
 
@@ -1001,7 +1001,7 @@ ROM_START( gnbarich )
 ROM_END
 
 ROM_START( mjgtaste )
-	ROM_REGION( 0x100000, "main", 0)
+	ROM_REGION( 0x100000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(5f2041dc) SHA1(f3862ffdb8df0cf921ce1cb0236935731e7729a7) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(f5ff7876) SHA1(4c909db9c97f29fd79df6dacd29762688701b973) )
 
@@ -1032,7 +1032,7 @@ ROM_START( mjgtaste )
 ROM_END
 
 ROM_START( tgm2 )
-	ROM_REGION( 0x100000, "main", 0)
+	ROM_REGION( 0x100000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2.u21",   0x000000, 0x080000, CRC(b19f6c31) SHA1(c58346c575db71262aebc3993743cb031c41e4af) )
 	ROM_LOAD32_WORD_SWAP( "1.u22",   0x000002, 0x080000, CRC(c521bf24) SHA1(0ee5b9f74b6b8bcc01b2270c53f30d99e877ed64) )
 
@@ -1064,7 +1064,7 @@ ROM_START( tgm2 )
 ROM_END
 
 ROM_START( tgm2p )
-	ROM_REGION( 0x100000, "main", 0)
+	ROM_REGION( 0x100000, "maincpu", 0)
 	ROM_LOAD32_WORD_SWAP( "2b.u21",   0x000000, 0x080000, CRC(38bc626c) SHA1(783e8413b11f1fa08d331b09ef4ed63f62b87ead) )
 	ROM_LOAD32_WORD_SWAP( "1b.u22",   0x000002, 0x080000, CRC(7599fb19) SHA1(3f7e81756470c173cc17a7e7dee91437571fd0c3) )
 
@@ -1110,7 +1110,7 @@ static DRIVER_INIT( s1945ii )
 
 static DRIVER_INIT( daraku )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1,&RAM[0x100000]);
 	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DARAKU;
@@ -1124,7 +1124,7 @@ static DRIVER_INIT( sbomberb )
 
 static DRIVER_INIT( gunbird2 )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1,&RAM[0x100000]);
 	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
@@ -1132,7 +1132,7 @@ static DRIVER_INIT( gunbird2 )
 
 static DRIVER_INIT( s1945iii )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1,&RAM[0x100000]);
 	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_S1945III;

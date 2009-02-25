@@ -910,11 +910,11 @@ static MACHINE_RESET( gticlub )
 static MACHINE_DRIVER_START( gticlub )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(gticlub_map, 0)
-	MDRV_CPU_VBLANK_INT("main", gticlub_vblank)
+	MDRV_CPU_VBLANK_INT("screen", gticlub_vblank)
 
-	MDRV_CPU_ADD("audio", M68000, 64000000/4)	/* 16MHz */
+	MDRV_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
 
 	MDRV_CPU_ADD("dsp", ADSP21062, 36000000)
@@ -928,7 +928,7 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_MACHINE_RESET(gticlub)
 
  	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512, 384)
@@ -955,10 +955,10 @@ static MACHINE_RESET( hangplt )
 static MACHINE_DRIVER_START( hangplt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
+	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(gticlub_map, 0)
 
-	MDRV_CPU_ADD("audio", M68000, 64000000/4)	/* 16MHz */
+	MDRV_CPU_ADD("audiocpu", M68000, 64000000/4)	/* 16MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_memmap, 0)
 
 	MDRV_CPU_ADD("dsp1", ADSP21062, 36000000)
@@ -1025,7 +1025,7 @@ ROM_START(gticlub) /* Euro version EAA */
 	ROM_LOAD32_WORD_SWAP("688a05.14u", 0x000000, 0x200000, CRC(7caa3f80) SHA1(28409dc17c4e010173396fdc069a409fbea0d58d) )
 	ROM_LOAD32_WORD_SWAP("688a06.12u", 0x000002, 0x200000, CRC(83e7ce0a) SHA1(afe185f6ed700baaf4c8affddc29f8afdfec4423) )
 
-	ROM_REGION(0x80000, "audio", 0)		/* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68k program */
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
 	ROM_REGION(0x800000, "rf", 0)	/* sound roms */
@@ -1052,7 +1052,7 @@ ROM_START(gticluba) /* Asia version AAA */
 	ROM_LOAD32_WORD_SWAP("688a05.14u", 0x000000, 0x200000, CRC(7caa3f80) SHA1(28409dc17c4e010173396fdc069a409fbea0d58d) )
 	ROM_LOAD32_WORD_SWAP("688a06.12u", 0x000002, 0x200000, CRC(83e7ce0a) SHA1(afe185f6ed700baaf4c8affddc29f8afdfec4423) )
 
-	ROM_REGION(0x80000, "audio", 0)		/* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68k program */
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
 	ROM_REGION(0x800000, "rf", 0)	/* sound roms */
@@ -1079,7 +1079,7 @@ ROM_START(gticlubj) /* Japan version JAA */
 	ROM_LOAD32_WORD_SWAP("688a05.14u", 0x000000, 0x200000, CRC(7caa3f80) SHA1(28409dc17c4e010173396fdc069a409fbea0d58d) )
 	ROM_LOAD32_WORD_SWAP("688a06.12u", 0x000002, 0x200000, CRC(83e7ce0a) SHA1(afe185f6ed700baaf4c8affddc29f8afdfec4423) )
 
-	ROM_REGION(0x80000, "audio", 0)		/* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68k program */
 	ROM_LOAD16_WORD_SWAP( "688a07.13k", 0x000000, 0x040000, CRC(f0805f06) SHA1(4b87e02b89e7ea812454498603767668e4619025) )
 
 	ROM_REGION(0x800000, "rf", 0)	/* sound roms */
@@ -1106,7 +1106,7 @@ ROM_START( thunderh ) /* Euro version EAA */
         ROM_LOAD32_WORD_SWAP( "680a05.14u", 0x000000, 0x200000, CRC(0c9f334d) SHA1(99ac622a04a7140244d81031df69a796b6fd2657) )
         ROM_LOAD32_WORD_SWAP( "680a06.12u", 0x000002, 0x200000, CRC(83074217) SHA1(bbf782ac125cd98d9147ef4e0373bf61f74726f7) )
 
-	ROM_REGION(0x80000, "audio", 0)		/* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68k program */
         ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
 	ROM_REGION(0x20000, "dsp", 0)		/* 68k program for outboard sound? network? board */
@@ -1136,7 +1136,7 @@ ROM_START( thundrhu ) /* USA version UAA */
         ROM_LOAD32_WORD_SWAP( "680a05.14u", 0x000000, 0x200000, CRC(0c9f334d) SHA1(99ac622a04a7140244d81031df69a796b6fd2657) )
         ROM_LOAD32_WORD_SWAP( "680a06.12u", 0x000002, 0x200000, CRC(83074217) SHA1(bbf782ac125cd98d9147ef4e0373bf61f74726f7) )
 
-	ROM_REGION(0x80000, "audio", 0)		/* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68k program */
         ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
 	ROM_REGION(0x20000, "dsp", 0)		/* 68k program for outboard sound? network? board */
@@ -1166,7 +1166,7 @@ ROM_START( slrasslt ) /* USA version UAA */
         ROM_LOAD32_WORD_SWAP( "792a05.14u", 0x000000, 0x200000, CRC(9a27edfc) SHA1(c028b6440eb1b0c814c4db45918e580662ac2d9a) )
         ROM_LOAD32_WORD_SWAP( "792a06.12u", 0x000002, 0x200000, CRC(c272f171) SHA1(df492287eadc5e8668fe46cfa3ed3ca77c57feca) )
 
-	ROM_REGION(0x80000, "audio", 0)		/* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)		/* 68k program */
         ROM_LOAD16_WORD_SWAP( "792a07.10k", 0x000000, 0x080000, CRC(89a65ad1) SHA1(d814ef0b560c8e68da57ad5c6096e4fc05e9913e) )
 
 	ROM_REGION(0x800000, "rf", 0)	/* sound roms */
@@ -1193,7 +1193,7 @@ ROM_START( hangplt ) /* Japan version JAB */
         ROM_LOAD32_WORD_SWAP( "685a05.14u", 0x000000, 0x200000, CRC(ba1c8f40) SHA1(ce4ed641c1d6d44447eaaada16f305f1d7fb9ee2) )
         ROM_LOAD32_WORD_SWAP( "685a06.12u", 0x000002, 0x200000, CRC(2429935c) SHA1(4da9e169adcac81ea1bc135d727c2bd13ad372fa) )
 
-	ROM_REGION(0x80000, "audio", 0)	/* 68k program */
+	ROM_REGION(0x80000, "audiocpu", 0)	/* 68k program */
         ROM_LOAD16_WORD_SWAP( "685a07.13k", 0x000000, 0x080000, CRC(5b72fd80) SHA1(a150837fa0d66dc0c3832495a4c8ce4f9b92cd98) )
 
 	ROM_REGION(0x1000000, "rf", 0)	/* other roms */

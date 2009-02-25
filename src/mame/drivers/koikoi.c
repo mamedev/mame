@@ -257,13 +257,13 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( koikoi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,KOIKOI_CRYSTAL/4)	/* ?? */
+	MDRV_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem, 0)
 	MDRV_CPU_IO_MAP(readport, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -295,7 +295,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( koikoi )
-	ROM_REGION( 0x10000, "main", 0 )	/* code */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* code */
 	ROM_LOAD( "ic56", 0x0000, 0x1000, CRC(bdc68f9d) SHA1(c45fbc95abb37f750acc1d9f3b35ad0f41af097d) )
 	ROM_LOAD( "ic55", 0x1000, 0x1000, CRC(fe09248a) SHA1(c192795678068e387bd406f5cd1c5aba5f5ef66a) )
 	ROM_LOAD( "ic54", 0x2000, 0x1000, CRC(925fc57c) SHA1(4c79df92b6617fe84e61359c8e6e3b907b138777) )

@@ -1025,7 +1025,7 @@ static TIMER_CALLBACK( real_nmk004_init )
 	NMK004_state.oki1device = devtag_get_device(machine, SOUND, "oki1");
 	NMK004_state.oki2device = devtag_get_device(machine, SOUND, "oki2");
 
-	NMK004_state.rom = memory_region(machine, "audio");
+	NMK004_state.rom = memory_region(machine, "audiocpu");
 
 	ym2203_control_port_w(NMK004_state.ymdevice, 0, 0x2f);
 

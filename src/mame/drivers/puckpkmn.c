@@ -171,9 +171,9 @@ static const ym3438_interface ym3438_intf =
 static MACHINE_DRIVER_START( puckpkmn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000, MASTER_CLOCK/7) 		/*???*/
+	MDRV_CPU_ADD("maincpu",M68000, MASTER_CLOCK/7) 		/*???*/
 	MDRV_CPU_PROGRAM_MAP(puckpkmn_readmem,puckpkmn_writemem)
-	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
 	MDRV_MACHINE_START(genesis)
 	MDRV_MACHINE_RESET(genesis)
@@ -181,7 +181,7 @@ static MACHINE_DRIVER_START( puckpkmn )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(342,262)
@@ -284,19 +284,19 @@ Screenshots available on my site at http://unemulated.emuunlim.com (under PCB Sh
 
 static DRIVER_INIT( puckpkmn )
 {
-	UINT8 *rom	=	memory_region(machine, "main");
-	size_t len		=	memory_region_length(machine, "main");
+	UINT8 *rom	=	memory_region(machine, "maincpu");
+	size_t len		=	memory_region_length(machine, "maincpu");
 	int i;
 
 	for (i = 0; i < len; i++)
 		rom[i] = BITSWAP8(rom[i],1,4,2,0,7,5,3,6);
 
-	memory_set_bankptr(machine, 1, memory_region(machine, "main") );	// VDP reads the roms from here
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") );	// VDP reads the roms from here
 	memory_set_bankptr(machine, 2, main_ram );						// VDP reads the ram from here
 }
 
 ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "puckpoke.u5", 0x000000, 0x080000, CRC(fd334b91) SHA1(cf8bf6645a4082ea4392937e169b1686c9c7e246) )
 	ROM_LOAD16_BYTE( "puckpoke.u4", 0x000001, 0x080000, CRC(839cc76b) SHA1(e15662a7175db7a8e222dda176a8ed92e0d56e9d) )
 	ROM_LOAD16_BYTE( "puckpoke.u8", 0x100000, 0x080000, CRC(7936bec8) SHA1(4b350105abe514fbfeabae1c6f3aeee695c3d07a) )

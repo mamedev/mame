@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( route16 )
 	MDRV_CPU_ADD("cpu1", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
 	MDRV_CPU_PROGRAM_MAP(route16_cpu1_map,0)
 	MDRV_CPU_IO_MAP(cpu1_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("cpu2", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
 	MDRV_CPU_PROGRAM_MAP(route16_cpu2_map,0)
@@ -621,7 +621,7 @@ static MACHINE_DRIVER_START( route16 )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(route16)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)

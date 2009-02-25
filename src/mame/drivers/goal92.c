@@ -89,7 +89,7 @@ ADDRESS_MAP_END
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(device->machine, "audio");
+	UINT8 *RAM = memory_region(device->machine, "audiocpu");
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
@@ -314,16 +314,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( goal92 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,12000000)
+	MDRV_CPU_ADD("maincpu", M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(goal92_readmem,goal92_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold) /* VBL */
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold) /* VBL */
 
-	MDRV_CPU_ADD("audio", Z80, 2500000)
+	MDRV_CPU_ADD("audiocpu", Z80, 2500000)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 								/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -392,11 +392,11 @@ Z80 clock: 2.51MHz
 */
 
 ROM_START( goal92 )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x80000, CRC(db0a6c7c) SHA1(b609db7806b99bc921806d8b3e5e515b4651c375) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x80000, CRC(e4c45dee) SHA1(542749bd1ff51220a151fe66acdadac83df8f0ee) )
 
-	ROM_REGION( 0x18000, "audio", 0 )	/* Z80 code */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	/* Z80 code */
 	ROM_LOAD( "1.bin",        0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 

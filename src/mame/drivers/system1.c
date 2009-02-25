@@ -40,20 +40,20 @@ static MACHINE_RESET( system1 )
 static MACHINE_RESET( system1_banked )
 {
 	MACHINE_RESET_CALL(system1);
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 static MACHINE_RESET( dakkochn )
 {
 	MACHINE_RESET_CALL(system1);
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	dakkochn_mux_data = 0;
 }
 
 static MACHINE_RESET( wbml )
 {
 	system1_define_background_memory(system1_BACKGROUND_MEMORY_BANKED);
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 // nobb - these ports are used for some kind of replacement protection system used by the bootleg
@@ -1720,12 +1720,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( system1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_4MHz)	/* My Hero has 2 OSCs 8 & 20 MHz (Cabbe Info) */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)	/* My Hero has 2 OSCs 8 & 20 MHz (Cabbe Info) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, XTAL_4MHz)
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		 /* NMIs are caused by the main CPU */
 
@@ -1734,7 +1734,7 @@ static MACHINE_DRIVER_START( system1 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)// hw collisions
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1765,7 +1765,7 @@ static MACHINE_DRIVER_START( small )
 	MDRV_IMPORT_FROM( system1 )
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8+8, 32*8-1-8, 0*8, 28*8-1)
 
 MACHINE_DRIVER_END
@@ -1775,7 +1775,7 @@ static MACHINE_DRIVER_START( pitfall2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_REPLACE( "main", Z80, 3600000 )/* should be 4 MHz but that value makes the title screen disappear */
+	MDRV_CPU_REPLACE( "maincpu", Z80, 3600000 )/* should be 4 MHz but that value makes the title screen disappear */
 
 MACHINE_DRIVER_END
 
@@ -1784,7 +1784,7 @@ static MACHINE_DRIVER_START( hvymetal )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,writemem)
 	MDRV_CPU_IO_MAP(hvymetal_io_map,0)
 
@@ -1797,7 +1797,7 @@ static MACHINE_DRIVER_START( chplft )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,chplft_writemem)
 	MDRV_CPU_IO_MAP(chplft_io_map,0)
 
@@ -1812,7 +1812,7 @@ static MACHINE_DRIVER_START( gardiab )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( chplft )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,gardiab_writemem)
 	MDRV_CPU_IO_MAP(chplft_io_map,0)
 
@@ -1826,7 +1826,7 @@ static MACHINE_DRIVER_START( dakkochn )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( chplft )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,dakkochn_writemem)
 	MDRV_CPU_IO_MAP(wbml_io_map,0)
 
@@ -1840,7 +1840,7 @@ static MACHINE_DRIVER_START( brain )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,writemem)
 	MDRV_CPU_IO_MAP(brain_io_map,0)
 
@@ -1853,7 +1853,7 @@ static MACHINE_DRIVER_START( wbml )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(wbml_readmem,wbml_writemem)
 	MDRV_CPU_IO_MAP(wbml_io_map,0)
 
@@ -1870,14 +1870,14 @@ static MACHINE_DRIVER_START( shtngmst )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,chplft_writemem)
 	MDRV_CPU_IO_MAP(sht_io_map,0)
 
 	MDRV_MACHINE_RESET(system1_banked)
 
 	/* video hardware - same as small - left / right 8 pixels clipped */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8+8, 32*8-1-8, 0*8, 28*8-1)
 
 	MDRV_VIDEO_UPDATE(choplifter)
@@ -1888,14 +1888,14 @@ static MACHINE_DRIVER_START( nob )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_REPLACE( "main", Z80, 4000000)
+	MDRV_CPU_REPLACE( "maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,nobo_writemem)
 	MDRV_CPU_IO_MAP(nob_io_map,0)
 
 	MDRV_MACHINE_RESET(system1_banked)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
 
 MACHINE_DRIVER_END
@@ -1904,14 +1904,14 @@ static MACHINE_DRIVER_START( nobb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_REPLACE( "main", Z80, 4000000)
+	MDRV_CPU_REPLACE( "maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,nobo_writemem)
 	MDRV_CPU_IO_MAP(nobb_io_map,0)
 
 	MDRV_MACHINE_RESET(system1_banked)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
 
 MACHINE_DRIVER_END
@@ -1921,7 +1921,7 @@ static MACHINE_DRIVER_START( blckgalb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( system1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem,blckgalb_writemem)
 
 	/* video hardware */
@@ -1936,7 +1936,7 @@ static MACHINE_DRIVER_START( ufosensi )
 	MDRV_IMPORT_FROM( wbml )
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 27*8-1)
 
 	/* video hardware */
@@ -1953,7 +1953,7 @@ MACHINE_DRIVER_END
 /* Since the standard System 1 PROM has part # 5317, Star Jacker, whose first */
 /* ROM is #5318, is probably the first or second System 1 game produced */
 ROM_START( starjack )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr5320b.129",	0x0000, 0x2000, CRC(7ab72ecd) SHA1(28d3f87851cccc94a86eb0217893de0baf8e62fd) )
 	ROM_LOAD( "epr5321a.130",	0x2000, 0x2000, CRC(38b99050) SHA1(79fd23bb7db577d1dbf1b50503085eccdd17b98c) )
 	ROM_LOAD( "epr5322a.131",	0x4000, 0x2000, CRC(103a595b) SHA1(6bb8a063279c93341ff472351b79c92795845f74) )
@@ -1961,7 +1961,7 @@ ROM_START( starjack )
 	ROM_LOAD( "epr-5324.133",	0x8000, 0x2000, CRC(1e89efe2) SHA1(d36ef8f176d5e44884d3d0b9af81be6f7fbd0cde) )
 	ROM_LOAD( "epr-5325.134",	0xa000, 0x2000, CRC(d6e379a1) SHA1(27362b3e10d9d4235647eadb9cd1404700a8fb49) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5332.3",		0x0000, 0x2000, CRC(7a72ab3d) SHA1(4a6ad09949a438562d7043532d628cefdbb5a2fe) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -1981,7 +1981,7 @@ ROM_START( starjack )
 ROM_END
 
 ROM_START( starjacs )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a1_ic29.129",	0x0000, 0x2000, CRC(59a22a1f) SHA1(4827b537f8df04429ed53c2119c67a32efcf04a2) )
 	ROM_LOAD( "a1_ic30.130",	0x2000, 0x2000, CRC(7f4597dc) SHA1(7574853fc2e38880f8493cf628100a890f7aa7dc) )
 	ROM_LOAD( "a1_ic31.131",	0x4000, 0x2000, CRC(6074c046) SHA1(5d2bd679d6a13a6c3b203662ce5496b801383db9) )
@@ -1989,7 +1989,7 @@ ROM_START( starjacs )
 	ROM_LOAD( "a1_ic33.133",	0x8000, 0x2000, CRC(7598bd51) SHA1(0c18b83dc7874aefcd94593ffbe2b50cc0329367) )
 	ROM_LOAD( "a1_ic34.134",	0xa000, 0x2000, CRC(f66fa604) SHA1(d7a81920217fcf7a687ba5e2d10abad5c78085d2) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5332.3",		0x0000, 0x2000, CRC(7a72ab3d) SHA1(4a6ad09949a438562d7043532d628cefdbb5a2fe) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2009,7 +2009,7 @@ ROM_START( starjacs )
 ROM_END
 
 ROM_START( regulus )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5640a.129",	0x0000, 0x2000, CRC(dafb1528) SHA1(9140c5507bd931df3f8ef8d2910bc74f737b1a5a) ) /* encrypted */
 	ROM_LOAD( "epr-5641a.130",	0x2000, 0x2000, CRC(0fcc850e) SHA1(d2d6b06bf1e2dc404aa5451cc9f1b919fb5be0f5) ) /* encrypted */
 	ROM_LOAD( "epr-5642a.131",	0x4000, 0x2000, CRC(4feffa17) SHA1(9d9f4227c4e60a5cc53c369e7c9ce59ea8df3553) ) /* encrypted */
@@ -2017,7 +2017,7 @@ ROM_START( regulus )
 	ROM_LOAD( "epr-5644.133",	0x8000, 0x2000, CRC(ffd05b7d) SHA1(6fe471548d227d834c012d5d148b1ea1c12dfd00) )
 	ROM_LOAD( "epr-5645a.134",	0xa000, 0x2000, CRC(6b4bf77c) SHA1(0200efb58b85a6873db44ffa70c3c14dbca958a6) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5652.3",		0x0000, 0x2000, CRC(74edcb98) SHA1(bc181c73a6009ca723e715650adb920b77bd311c) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2037,7 +2037,7 @@ ROM_START( regulus )
 ROM_END
 
 ROM_START( reguluso )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5640.129",	0x0000, 0x2000, CRC(8324d0d4) SHA1(204713938bc85e8b62c161d8ae00d087ecc9089c) ) /* encrypted */
 	ROM_LOAD( "epr-5641.130",	0x2000, 0x2000, CRC(0a09f5c7) SHA1(0d45bff29442908b9f4111c89baea0326f0a9ec9) ) /* encrypted */
 	ROM_LOAD( "epr-5642.131",	0x4000, 0x2000, CRC(ff27b2f6) SHA1(fe294a53deffe2d46afa444fdae213e9d8763316) ) /* encrypted */
@@ -2045,7 +2045,7 @@ ROM_START( reguluso )
 	ROM_LOAD( "epr-5644.133",	0x8000, 0x2000, CRC(ffd05b7d) SHA1(6fe471548d227d834c012d5d148b1ea1c12dfd00) )
 	ROM_LOAD( "epr-5645.134",	0xa000, 0x2000, CRC(57a2b4b4) SHA1(9de8f5948c7993f1b6d8bf7032f7fc3d9dff5c77) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5652.3",		0x0000, 0x2000, CRC(74edcb98) SHA1(bc181c73a6009ca723e715650adb920b77bd311c) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2065,7 +2065,7 @@ ROM_START( reguluso )
 ROM_END
 
 ROM_START( regulusu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5950.129",	0x0000, 0x2000, CRC(3b047b67) SHA1(0164cb919a50013f23568f59caff19ff2d0bf11f) )
 	ROM_LOAD( "epr-5951.130",	0x2000, 0x2000, CRC(d66453ab) SHA1(9e339c716c646bd02bedbe27096b75f633554e7c) )
 	ROM_LOAD( "epr-5952.131",	0x4000, 0x2000, CRC(f3d0158a) SHA1(9b6d8b2e0a0bec45bfbb9f8ccc728e18e909685f) )
@@ -2073,7 +2073,7 @@ ROM_START( regulusu )
 	ROM_LOAD( "epr-5644.133",	0x8000, 0x2000, CRC(ffd05b7d) SHA1(6fe471548d227d834c012d5d148b1ea1c12dfd00) )
 	ROM_LOAD( "epr-5955.134",	0xa000, 0x2000, CRC(65ddb2a3) SHA1(4f94eaac900da5ca512289e2339776b1139e03e1) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5652.3",		0x0000, 0x2000, CRC(74edcb98) SHA1(bc181c73a6009ca723e715650adb920b77bd311c) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2093,7 +2093,7 @@ ROM_START( regulusu )
 ROM_END
 
 ROM_START( upndown )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr5516a.129",	0x0000, 0x2000, CRC(038c82da) SHA1(b7f403068ed9f97a4b960fb8863615892bb770ed) ) /* encrypted */
 	ROM_LOAD( "epr5517a.130",	0x2000, 0x2000, CRC(6930e1de) SHA1(8a5564c76e1fd20c8e5d95e5f538980e13c41744) ) /* encrypted */
 	ROM_LOAD( "epr-5518.131",	0x4000, 0x2000, CRC(2a370c99) SHA1(3d1b2f1cf0d5d2d6369a33e5b3b460a3113d6a3e) ) /* encrypted */
@@ -2101,7 +2101,7 @@ ROM_START( upndown )
 	ROM_LOAD( "epr-5520.133",	0x8000, 0x2000, CRC(208dfbdf) SHA1(eff0c91ce6c2c1f6e191bcbf9ae83dd377cbb408) )
 	ROM_LOAD( "epr-5521.134",	0xa000, 0x2000, CRC(e7b8d87a) SHA1(3419318bf6d87b902433bfe3b92baf5e5bad7df3) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5535.3",		0x0000, 0x2000, CRC(cf4e4c45) SHA1(d14a204a9966d37f4b9f3ea4c1d371c9d04e750a) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2121,7 +2121,7 @@ ROM_START( upndown )
 ROM_END
 
 ROM_START( upndownu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5679.129",	0x0000, 0x2000, CRC(c4f2f9c2) SHA1(7904ffb46a2c3ef69b9784f343ff37d81bbee11d) )
 	ROM_LOAD( "epr-5680.130",	0x2000, 0x2000, CRC(837f021c) SHA1(14cc846f03b71e0922689388a6757955cfd88bd8) )
 	ROM_LOAD( "epr-5681.131",	0x4000, 0x2000, CRC(e1c7ff7e) SHA1(440dc8c18183612c32486c617f5d7f38fd804f0e) )
@@ -2129,7 +2129,7 @@ ROM_START( upndownu )
 	ROM_LOAD( "epr-5520.133",	0x8000, 0x2000, CRC(208dfbdf) SHA1(eff0c91ce6c2c1f6e191bcbf9ae83dd377cbb408) ) /* epr-5683.133 */
 	ROM_LOAD( "epr-5684.133",	0xa000, 0x2000, CRC(32fa95da) SHA1(ebe87d28dde6b8356d40572e9f2cd35ec240075f) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5528.3",		0x0000, 0x2000, CRC(00cd44ab) SHA1(7f5385aa0773681329a4759b0fa6f975e3de6755) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2149,7 +2149,7 @@ ROM_START( upndownu )
 ROM_END
 
 ROM_START( mrviking )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5873.129",	0x0000, 0x2000, CRC(14d21624) SHA1(70e185d03e782be908e6b5c6342cf6a7ebae618c) ) /* encrypted */
 	ROM_LOAD( "epr-5874.130",	0x2000, 0x2000, CRC(6df7de87) SHA1(c2200e0c2f322a08af10e9c2e9191d1c595801a4) ) /* encrypted */
 	ROM_LOAD( "epr-5875.131",	0x4000, 0x2000, CRC(ac226100) SHA1(11568db9fbca44013eeb0035c0a0a67d6dd18d00) ) /* encrypted */
@@ -2157,7 +2157,7 @@ ROM_START( mrviking )
 	ROM_LOAD( "epr-5755.133",	0x8000, 0x2000, CRC(edd62ae1) SHA1(9648f1ae3033c30ed8ab8d9c87b111756dab7b5e) )
 	ROM_LOAD( "epr-5756.134",	0xa000, 0x2000, CRC(11974040) SHA1(a0904d19d06fb5ef5eb6da0dc4efe556bc29b33e) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5763.3",		0x0000, 0x2000, CRC(d712280d) SHA1(8393dfb57d9af22b3280ecaef736b6f9d856dbee) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2177,7 +2177,7 @@ ROM_START( mrviking )
 ROM_END
 
 ROM_START( mrvikngj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5751.129",	0x0000, 0x2000, CRC(ae97a4c5) SHA1(12edd757bd5b00d42ada1e10c43817f71cfe77dc) ) /* encrypted */
 	ROM_LOAD( "epr-5752.130",	0x2000, 0x2000, CRC(d48e6726) SHA1(934b5e7568c85005c5ec40d75e49727a18562d50) ) /* encrypted */
 	ROM_LOAD( "epr-5753.131",	0x4000, 0x2000, CRC(28c60887) SHA1(9673335586221336c3373f5d7c8ae4fc11cc4b7f) ) /* encrypted */
@@ -2185,7 +2185,7 @@ ROM_START( mrvikngj )
 	ROM_LOAD( "epr-5755.133",	0x8000, 0x2000, CRC(edd62ae1) SHA1(9648f1ae3033c30ed8ab8d9c87b111756dab7b5e) )
 	ROM_LOAD( "epr-5756.134",	0xa000, 0x2000, CRC(11974040) SHA1(a0904d19d06fb5ef5eb6da0dc4efe556bc29b33e) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5763.3",		0x0000, 0x2000, CRC(d712280d) SHA1(8393dfb57d9af22b3280ecaef736b6f9d856dbee) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2205,7 +2205,7 @@ ROM_START( mrvikngj )
 ROM_END
 
 ROM_START( swat )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr5807b.129",	0x0000, 0x2000, CRC(93db9c9f) SHA1(56e9d9a33f04b4d5971c0db24cc8719a52e64678) ) /* encrypted */
 	ROM_LOAD( "epr-5808.130",	0x2000, 0x2000, CRC(67116665) SHA1(e8aa72f2835d38367be5e8a9313e51b64f452ee7) ) /* encrypted */
 	ROM_LOAD( "epr-5809.131",	0x4000, 0x2000, CRC(fd792fc9) SHA1(a0b4f0c2e537bd16f7345590da00f2622947d7e4) ) /* encrypted */
@@ -2213,7 +2213,7 @@ ROM_START( swat )
 	ROM_LOAD( "epr-5811.133",	0x8000, 0x2000, CRC(093e3ab1) SHA1(abf1f23dc26a7518357d0c1749e869b539c3bbed) )
 	ROM_LOAD( "epr-5812.134",	0xa000, 0x2000, CRC(5bfd692f) SHA1(adc8dcf643d8d0b0a1d0dda0494567263ea11a00) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5819.3",		0x0000, 0x2000, CRC(f6afd0fd) SHA1(06062648b9ebc70b4b5c30b043f537adc0052047) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2233,11 +2233,11 @@ ROM_START( swat )
 ROM_END
 
 ROM_START( flicky )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr5978a.116",	0x0000, 0x4000, CRC(296f1492) SHA1(52e2c63ce376ab8124b2c68bdfa432b6621cfa78) ) /* encrypted */
 	ROM_LOAD( "epr5979a.109",	0x4000, 0x4000, CRC(64b03ef9) SHA1(7519aa7f036bce6d52a5d4be2418139559f9a8a5) ) /* encrypted */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5869.120",	0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2257,11 +2257,11 @@ ROM_START( flicky )
 ROM_END
 
 ROM_START( flicks2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6621.bin",	0x0000, 0x4000, CRC(b21ff546) SHA1(e1d5438eaf0efeaeb4687dcfc12bf325e804182f) )
 	ROM_LOAD( "epr-6622.bin",	0x4000, 0x4000, CRC(133a8bf1) SHA1(e5e620797daace0843a680cb4572586b5e639ca0) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5869.120",	0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2283,13 +2283,13 @@ ROM_END
 
 
 ROM_START( flicks1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic129",	0x0000, 0x2000, CRC(7011275c) SHA1(69d9d1a66734bf859dbd0200b5a772110bd522c1) ) /* encrypted */
 	ROM_LOAD( "ic130",	0x2000, 0x2000, CRC(e7ed012d) SHA1(7f378ad3e0b6721d7108b4ee10333422df92c039) ) /* encrypted */
 	ROM_LOAD( "ic131",	0x4000, 0x2000, CRC(c5e98cd1) SHA1(ea8d97bebfce4e41242169d34bccbf430b094fd7) ) /* encrypted */
 	ROM_LOAD( "ic132",	0x6000, 0x2000, CRC(0e5122c2) SHA1(cec34001d4eb8a983b3299462ec513049a3dab46) ) /* encrypted */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5869.120",	0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2309,13 +2309,13 @@ ROM_START( flicks1 )
 ROM_END
 
 ROM_START( flickyo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-5857.bin",	0x0000, 0x2000, CRC(a65ac88e) SHA1(1d1c276f7ffb33bc9f216b6b69517f1783d435a4) ) /* encrypted */
 	ROM_LOAD( "epr5858a.bin",	0x2000, 0x2000, CRC(18b412f4) SHA1(6205dc2a6c1092f9bc7752672b7c06d5faf2f65e) ) /* encrypted */
 	ROM_LOAD( "epr-5859.bin",	0x4000, 0x2000, CRC(a5558d7e) SHA1(ca59c7e57ae45f960f769db9a04ffa5c870005dd) ) /* encrypted */
 	ROM_LOAD( "epr-5860.bin",	0x6000, 0x2000, CRC(1b35fef1) SHA1(53ca5361309c59a2b3490ea0037c6e58f07837d9) ) /* encrypted */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-5869.120",	0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2335,7 +2335,7 @@ ROM_START( flickyo )
 ROM_END
 
 ROM_START( wmatch )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wm.129",			0x0000, 0x2000, CRC(b6db4442) SHA1(9f31b3b2d4b4a430f9de84141ebd66bdba063387) ) /* encrypted */
 	ROM_LOAD( "wm.130",			0x2000, 0x2000, CRC(59a0a7a0) SHA1(a1707d08ba968d1ad01f3249c046a62dde8e2730) ) /* encrypted */
 	ROM_LOAD( "wm.131",			0x4000, 0x2000, CRC(4cb3856a) SHA1(983f52bfb2f8e3871518137f424786a9a8e5c53d) ) /* encrypted */
@@ -2343,7 +2343,7 @@ ROM_START( wmatch )
 	ROM_LOAD( "wm.133",			0x8000, 0x2000, CRC(43a36445) SHA1(6cc5a6fa8319d4e2b454b326d8a908ff764fa65f) )
 	ROM_LOAD( "wm.134",			0xa000, 0x2000, CRC(5624794c) SHA1(7cfb0a35b7fb8394e0e7efa6b63ba83bd5c9b8e7) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "wm.3",			0x0000, 0x2000, CRC(50d2afb7) SHA1(21b109d389d0b52d89cf635467c3213f6b24d7df) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2363,7 +2363,7 @@ ROM_START( wmatch )
 ROM_END
 
 ROM_START( bullfgt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-.129",		0x0000, 0x2000, CRC(29f19156) SHA1(86cca9601f63b9b3d3aaaf21c3a3e456a50ca6b8) ) /* encrypted */
 	ROM_LOAD( "epr-.130",		0x2000, 0x2000, CRC(e37d2b95) SHA1(9d2523190e49c9d45a5832da912cbc0cd23e2496) ) /* encrypted */
 	ROM_LOAD( "epr-.131",		0x4000, 0x2000, CRC(eaf5773d) SHA1(7db6a7c1c4d9e5f5b4de97b41ab5dd591e2e1548) ) /* encrypted */
@@ -2371,7 +2371,7 @@ ROM_START( bullfgt )
 	ROM_LOAD( "epr-.133",		0x8000, 0x2000, CRC(7d9fa4cd) SHA1(b6f0d86281c7e8de7a23b0c55c1991350d5bc9b1) )
 	ROM_LOAD( "epr-.134",		0xa000, 0x2000, CRC(061f2797) SHA1(f13acd4c5b33ed85229a3907744283646e020867) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6077.120",	0x0000, 0x2000, CRC(02a37602) SHA1(1b67b0d80a228f7faf054bfd79aff120d92c8166) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2392,12 +2392,12 @@ ROM_START( bullfgt )
 ROM_END
 
 ROM_START( thetogyu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6071.116",	0x0000, 0x4000, CRC(96b57df9) SHA1(bfce24bf570961d3cfb449078e23e546fad7229e) ) /* encrypted */
 	ROM_LOAD( "epr-6072.109",	0x4000, 0x4000, CRC(f7baadd0) SHA1(45a05b72561d47e4ac5475509fe2b57d870c89cd) ) /* encrypted */
 	ROM_LOAD( "epr-6073.96",	0x8000, 0x4000, CRC(721af166) SHA1(0b345715227e70fa6857f5967f0c7da9577f8887) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6077.120",	0x0000, 0x2000, CRC(02a37602) SHA1(1b67b0d80a228f7faf054bfd79aff120d92c8166) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2417,12 +2417,12 @@ ROM_START( thetogyu )
 ROM_END
 
 ROM_START( pitfall2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr6456a.116",	0x0000, 0x4000, CRC(bcc8406b) SHA1(2e5c76886fce2c9863db7a914b85b088971aceef) ) /* encrypted */
 	ROM_LOAD( "epr6457a.109",	0x4000, 0x4000, CRC(a016fd2a) SHA1(866f82066466bc5eaf6ab1b6f85a1c173692a1f7) ) /* encrypted */
 	ROM_LOAD( "epr6458a.96",	0x8000, 0x4000, CRC(5c30b3e8) SHA1(9048091ebf054d0ba0c6a92520ddfac38a479034) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6462.120",	0x0000, 0x2000, CRC(86bb9185) SHA1(89add2e3784e8f5a20b895fb2c4466bdd6c34b0c) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2442,12 +2442,12 @@ ROM_START( pitfall2 )
 ROM_END
 
 ROM_START( pitfalla )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6505",	0x0000, 0x4000, CRC(b6769739) SHA1(e1b8401c20f77f8ec799b19d7bc94ae4f9ed702f) ) /* encrypted */
 	ROM_LOAD( "epr-6506",	0x4000, 0x4000, CRC(1ce6aec4) SHA1(69b54c4569ccfb1166a901e7044ae1026db01a82) ) /* encrypted */
 	ROM_LOAD( "epr6458a.96",	0x8000, 0x4000, CRC(5c30b3e8) SHA1(9048091ebf054d0ba0c6a92520ddfac38a479034) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6462.120",	0x0000, 0x2000, CRC(86bb9185) SHA1(89add2e3784e8f5a20b895fb2c4466bdd6c34b0c) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2467,12 +2467,12 @@ ROM_START( pitfalla )
 ROM_END
 
 ROM_START( pitfallu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6623.116",	0x0000, 0x4000, CRC(bcb47ed6) SHA1(d33421999f899c0a4dc0d4553614c1f5c7027257) )
 	ROM_LOAD( "epr6624a.109",	0x4000, 0x4000, CRC(6e8b09c1) SHA1(4869ca4d3f0b08cd3df4c82be9cfc774ddeb3010) )
 	ROM_LOAD( "epr-6625.96",	0x8000, 0x4000, CRC(dc5484ba) SHA1(62fffff7d935c104def5f09e9dc4a26fa4ce4f94) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6462.120",	0x0000, 0x2000, CRC(86bb9185) SHA1(89add2e3784e8f5a20b895fb2c4466bdd6c34b0c) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2492,12 +2492,12 @@ ROM_START( pitfallu )
 ROM_END
 
 ROM_START( seganinj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-.116",		0x0000, 0x4000, CRC(a5d0c9d0) SHA1(b60caccab8269f40d4f6e7a50f3aa0d4901c1e57) ) /* encrypted */
 	ROM_LOAD( "epr-.109",		0x4000, 0x4000, CRC(b9e6775c) SHA1(f39e815c3c034015125b96de34a2a225b81392b5) ) /* encrypted */
 	ROM_LOAD( "epr-6552.96",	0x8000, 0x4000, CRC(f2eeb0d8) SHA1(1f0d1c73ba9eaa2887ffc596f0038b0af37ced49) ) /* epr-7151.96 */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6559.120",	0x0000, 0x2000, CRC(5a1570ee) SHA1(fd9215e007b6687d057ea7aee01f6d3dcbc8f894) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2519,12 +2519,12 @@ ROM_START( seganinj )
 ROM_END
 
 ROM_START( seganinu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-7149.116",	0x0000, 0x4000, CRC(cd9fade7) SHA1(958ef5c449df6ef5346b8634cb34a646950f706e) )
 	ROM_LOAD( "epr-7150.109",	0x4000, 0x4000, CRC(c36351e2) SHA1(17734d3f410feb4cad617d1931b3356192b69ac0) )
 	ROM_LOAD( "epr-6552.96",	0x8000, 0x4000, CRC(f2eeb0d8) SHA1(1f0d1c73ba9eaa2887ffc596f0038b0af37ced49) ) /* epr-7151.96 */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6559.120",	0x0000, 0x2000, CRC(5a1570ee) SHA1(fd9215e007b6687d057ea7aee01f6d3dcbc8f894) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2546,7 +2546,7 @@ ROM_START( seganinu )
 ROM_END
 
 ROM_START( nprinces )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6612.129",	0x0000, 0x2000, CRC(1b30976f) SHA1(f76b7f3d88985a5c190e7880c27ab057f102db31) ) /* encrypted */
 	ROM_LOAD( "epr-6613.130",	0x2000, 0x2000, CRC(18281f27) SHA1(3fcf2fbd1fc13eda678b77c58c53aa881882286c) ) /* encrypted */
 	ROM_LOAD( "epr-6614.131",	0x4000, 0x2000, CRC(69fc3d73) SHA1(287e6b252ae3cd23812b56afe23d4f239f3a76d5) ) /* encrypted */
@@ -2554,7 +2554,7 @@ ROM_START( nprinces )
 	ROM_LOAD( "epr-6577.133",	0x8000, 0x2000, CRC(73616e03) SHA1(429615ee1e041d3e14fc557ec39c380fea07de71) ) /* epr-6616.133 */
 	ROM_LOAD( "epr-6617.134",	0xa000, 0x2000, CRC(20b6f895) SHA1(9c9cb3b0c33c4da2850a5756b63c3886634ec544) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6559.120",	0x0000, 0x2000, CRC(5a1570ee) SHA1(fd9215e007b6687d057ea7aee01f6d3dcbc8f894) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2577,12 +2577,12 @@ ROM_START( nprinces )
 ROM_END
 
 ROM_START( nprincso )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6550.116",	0x0000, 0x4000, CRC(5f6d59f1) SHA1(e151bf22799c6507a167f83262e48fe2ba74dbd9) ) /* encrypted */
 	ROM_LOAD( "epr-6551.109",	0x4000, 0x4000, CRC(1af133b2) SHA1(d3ff924782223ea0566d52ab8b45f17af433966e) ) /* encrypted */
 	ROM_LOAD( "epr-6552.96",	0x8000, 0x4000, CRC(f2eeb0d8) SHA1(1f0d1c73ba9eaa2887ffc596f0038b0af37ced49) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6559.120",	0x0000, 0x2000, CRC(5a1570ee) SHA1(fd9215e007b6687d057ea7aee01f6d3dcbc8f894) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2604,7 +2604,7 @@ ROM_START( nprincso )
 ROM_END
 
 ROM_START( nprincsu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6573.129",	0x0000, 0x2000, CRC(d2919c7d) SHA1(993fdde7dd8d4dbad42f8072829cfea794693a37) )
 	ROM_LOAD( "epr-6574.130",	0x2000, 0x2000, CRC(5a132833) SHA1(c21cdca6062a6ea2ca306a8dd26b572b3be86321) )
 	ROM_LOAD( "epr-6575.131",	0x4000, 0x2000, CRC(a94b0bd4) SHA1(068db579de3dbd545ae41f930a24f2997a2efedf) )
@@ -2612,7 +2612,7 @@ ROM_START( nprincsu )
 	ROM_LOAD( "epr-6577.133",	0x8000, 0x2000, CRC(73616e03) SHA1(429615ee1e041d3e14fc557ec39c380fea07de71) )
 	ROM_LOAD( "epr-6578.134",	0xa000, 0x2000, CRC(ab68499f) SHA1(6c662a0ff827cc68bcdb26f6b9d48add4f8ef2e9) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6559.120",	0x0000, 0x2000, CRC(5a1570ee) SHA1(fd9215e007b6687d057ea7aee01f6d3dcbc8f894) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2634,12 +2634,12 @@ ROM_START( nprincsu )
 ROM_END
 
 ROM_START( nprincsb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nprinces.001",	0x0000, 0x4000, CRC(e0de073c) SHA1(26aec99ddb080124225e0abf17aac4cc4aed1834) )  /* encrypted */
 	ROM_LOAD( "nprinces.002",	0x4000, 0x4000, CRC(27219c7f) SHA1(3f4b0ea9b49907231d10a38d89e2f1803dc168c9) )  /* encrypted */
 	ROM_LOAD( "epr-6552.96",	0x8000, 0x4000, CRC(f2eeb0d8) SHA1(1f0d1c73ba9eaa2887ffc596f0038b0af37ced49) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6559.120",	0x0000, 0x2000, CRC(5a1570ee) SHA1(fd9215e007b6687d057ea7aee01f6d3dcbc8f894) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2663,12 +2663,12 @@ ROM_START( nprincsb )
 ROM_END
 
 ROM_START( ninja )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr6594.bin",    0x0000, 0x4000, CRC(3ef0e5fc) SHA1(ba2d832aa33759c21582e728ca7e4a0ca03cb937) )
 	ROM_LOAD( "epr6595.bin",    0x4000, 0x4000, CRC(b16f13cd) SHA1(e4649ce76393fdf8d2a1f53f1c25ee27ed35db45) )
 	ROM_LOAD( "epr-6552.96",	0x8000, 0x4000, CRC(f2eeb0d8) SHA1(1f0d1c73ba9eaa2887ffc596f0038b0af37ced49) ) /* epr-7151.96 */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6559.120",	0x0000, 0x2000, CRC(5a1570ee) SHA1(fd9215e007b6687d057ea7aee01f6d3dcbc8f894) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2690,12 +2690,12 @@ ROM_START( ninja )
 ROM_END
 
 ROM_START( imsorry )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6676.116",	0x0000, 0x4000, CRC(eb087d7f) SHA1(b9bcc76bbdfa597d252e7db60fa0f7529e884cce) ) /* encrypted */
 	ROM_LOAD( "epr-6677.109",	0x4000, 0x4000, CRC(bd244bee) SHA1(ad9c722fde08f48d8bc835b244450b01a3d747c2) ) /* encrypted */
 	ROM_LOAD( "epr-6678.96",	0x8000, 0x4000, CRC(2e16b9fd) SHA1(3395fb769c79f048d099e2898bb7a15611b006c0) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6656.120",	0x0000, 0x2000, CRC(25e3d685) SHA1(a0267d6533af6ff5bf76b9858f2913821a915baf) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2715,12 +2715,12 @@ ROM_START( imsorry )
 ROM_END
 
 ROM_START( imsorryj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6647.116",	0x0000, 0x4000, CRC(cc5d915d) SHA1(1e2def1f7a03db3504177127dc784fe6c99a7440) ) /* encrypted */
 	ROM_LOAD( "epr-6648.109",	0x4000, 0x4000, CRC(37574d60) SHA1(c7c8507b608976973e766956bd28dfb17222de35) ) /* encrypted */
 	ROM_LOAD( "epr-6649.96",	0x8000, 0x4000, CRC(5f59bdee) SHA1(289ba35a7869a5b833c8aa4819e76fadde2d1ace) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6656.120",	0x0000, 0x2000, CRC(25e3d685) SHA1(a0267d6533af6ff5bf76b9858f2913821a915baf) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2740,12 +2740,12 @@ ROM_START( imsorryj )
 ROM_END
 
 ROM_START( teddybb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6768.116",	0x0000, 0x4000, CRC(5939817e) SHA1(84d78412d3e13da493d08a40deb2ff3fd51ff9f8) ) /* encrypted */
 	ROM_LOAD( "epr-6769.109",	0x4000, 0x4000, CRC(14a98ddd) SHA1(197fa05fb476c02d64e9027cde5aaac26f59b5e8) ) /* encrypted */
 	ROM_LOAD( "epr-6770.96",	0x8000, 0x4000, CRC(67b0c7c2) SHA1(b955719c954af5266e06ae7b04ff20f9dc414997) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr6748x.120",	0x0000, 0x2000, CRC(c2a1b89d) SHA1(55c5461640ccb26bed332c13adfbb99c27237bcb) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2767,12 +2767,12 @@ ROM_START( teddybb )
 ROM_END
 
 ROM_START( teddybbo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6739.116",	0x0000, 0x4000, CRC(81a37e69) SHA1(ddd0fd7ba5b3646c43ae4261f1e3fedd4184d92c) ) /* encrypted */
 	ROM_LOAD( "epr-6740.109",	0x4000, 0x4000, CRC(715388a9) SHA1(5affc4ecb1e0d58b69093aed732b1e292b8d3118) ) /* encrypted */
 	ROM_LOAD( "epr-6741.96",	0x8000, 0x4000, CRC(e5a74f5f) SHA1(ccf18b424d4aaeec0bae1e6f096b4c176f6ab554) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6748.120",	0x0000, 0x2000, CRC(9325a1cf) SHA1(555d137b1c974b144ebe6593b4c32c97b3bb5de9) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2795,12 +2795,12 @@ ROM_END
 
 /* This is the first System 1 game to have extended ROM space */
 ROM_START( hvymetal )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epra6790.1",   0x00000, 0x8000, CRC(59195bb9) SHA1(63dde673bd875dd23d445b152decb1d70c3750a4) ) /* encrypted */
 	ROM_LOAD( "epra6789.2",   0x10000, 0x8000, CRC(83e1d18a) SHA1(07ef58ee2a5212e1e2800efc2bd48d2b2a9ed10d) )
 	ROM_LOAD( "epra6788.3",   0x18000, 0x8000, CRC(6ecefd57) SHA1(3236313d5d826873d58af5ad80652c8d0ae0cc31) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr6787.120",  0x0000, 0x8000, CRC(b64ac7f0) SHA1(2b16c2702d3230891b700714a66ece95f1a74b44) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -2825,12 +2825,12 @@ ROM_START( hvymetal )
 ROM_END
 
 ROM_START( myhero )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr6963b.116",	0x0000, 0x4000, CRC(4daf89d4) SHA1(6fd69964d4e0dcd5637920711361f1879fcf330e) )
 	ROM_LOAD( "epr6964a.109",	0x4000, 0x4000, CRC(c26188e5) SHA1(48d7871a9c63de774c48f1bd9dcaf84b4188f84f) )
 	ROM_LOAD( "epr-6927.96",	0x8000, 0x4000, CRC(3cbbaf64) SHA1(fdb5f2ca38010729afa4ed24c087119cf398f27d) ) /* epr-6965.96 */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-69xx.120",	0x0000, 0x2000, CRC(0039e1e9) SHA1(ead2e8a8a518da5ac6ccd5cd6db4cf167ea47c76) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2852,12 +2852,12 @@ ROM_START( myhero )
 ROM_END
 
 ROM_START( sscandal )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr6925b.116",	0x0000, 0x4000, CRC(ff54dcec) SHA1(634ba5c79dc20dc6ab3efd9597b9fb1e4f86f58f) ) /* encrypted */
 	ROM_LOAD( "epr6926a.109",	0x4000, 0x4000, CRC(5c41eea8) SHA1(6a060a9739ee85c5c3a3e205bfac46bff1ed0b91) ) /* encrypted */
 	ROM_LOAD( "epr-6927.96",	0x8000, 0x4000, CRC(3cbbaf64) SHA1(fdb5f2ca38010729afa4ed24c087119cf398f27d) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6934.120",	0x0000, 0x2000, CRC(af467223) SHA1(d79a67e761fe483407cad645dd3b93d86e8790e3) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2879,14 +2879,14 @@ ROM_START( sscandal )
 ROM_END
 
 ROM_START( myherok )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* all the three program ROMs have bits 0-1 swapped */
 	/* when decoded, they are identical to the Japanese version */
 	ROM_LOAD( "ry-11.rom",		0x0000, 0x4000, CRC(6f4c8ee5) SHA1(bbbb87a66be383d9d44ae3bb7f4d1ff56933fd57) ) /* encrypted */
 	ROM_LOAD( "ry-09.rom",		0x4000, 0x4000, CRC(369302a1) SHA1(670bf97e401c0a665330d2264c126c275f4c5f8d) ) /* encrypted */
 	ROM_LOAD( "ry-07.rom",		0x8000, 0x4000, CRC(b8e9922e) SHA1(f563fd415d5218c2c3e0071776c91b6250cacea3) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6934.120",	0x0000, 0x2000, CRC(af467223) SHA1(d79a67e761fe483407cad645dd3b93d86e8790e3) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -2916,7 +2916,7 @@ ROM_END
 */
 
 ROM_START( shtngmst )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
     /* This rom is located on the daughter board .*/
 	ROM_LOAD( "epr7100a.ic18",  0x00000, 0x8000, CRC(661f0b6e) SHA1(a1d064839c95d8a6f6d89b0894259f666d637ec4) )
     /* These roms are located on the main board. */
@@ -2924,7 +2924,7 @@ ROM_START( shtngmst )
 	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
 
     /* This rom is located on the main board. */
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
 
     /* This mcu is located on the main board. */
@@ -2974,7 +2974,7 @@ ROM_END
 */
 
 ROM_START( shtngms1 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
     /* This rom is located on the daughter board .*/
 	ROM_LOAD( "epr7100.ic18",   0x00000, 0x8000, CRC(45e64431) SHA1(7edf818dc1f65365641e51abc197d13db7a8d4d9) )
     /* These roms are located on the main board. */
@@ -2982,7 +2982,7 @@ ROM_START( shtngms1 )
 	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
 
     /* This rom is located on the main board. */
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
 
     /* This mcu is located on the main board. */
@@ -3073,12 +3073,12 @@ this set seems to hang sometimes, is it bad, it could be hacked and failing chec
 */
 
 ROM_START( shtngmsa )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "7100.18",      0x00000, 0x8000, CRC(268ecb1d) SHA1(a9274c9718f7244235cc6df76331d6a0b7e4e4c8) ) // different..
 	ROM_LOAD( "epr7101.ic91",   0x10000, 0x8000, CRC(ebf5ff72) SHA1(13ae06e3a81cf00b80ec939d5baf30143d61d480) )
 	ROM_LOAD( "epr7102.ic92",   0x18000, 0x8000, CRC(c890a4ad) SHA1(4b59d37902ace3a69b380ff40652ee37c85f0e9d) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr7043.ic126",  0x0000, 0x8000, CRC(99a368ab) SHA1(a9451f39ee2613e5c3e2791d4d8d837b4a3ab666) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3115,12 +3115,12 @@ ROM_END
 */
 
 ROM_START( chplft )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr-7124.ic90",	0x00000, 0x8000, CRC(678d5c41) SHA1(7553979f78270c2ddc5b3f3ebf7817ead8e08de7) )
 	ROM_LOAD( "epr-7125.ic91",	0x10000, 0x8000, CRC(f5283498) SHA1(1ad40f6d7b4cd18212ee56917240c0796f1a4ec2) )
 	ROM_LOAD( "epr-7126.ic92",	0x18000, 0x8000, CRC(dbd192ab) SHA1(03d280c82599a14fc6a2065d57c6241cdc6f1143) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7130.ic126",	0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )	/* Internal i8751 MCU code */
@@ -3161,12 +3161,12 @@ ROM_END
 */
 
 ROM_START( chplftb )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr-7152.ic90",	0x00000, 0x8000, CRC(fe49d83e) SHA1(307be38dd73ed37b275c1b464d266a752cb06132) )
 	ROM_LOAD( "epr-7153.ic91",	0x10000, 0x8000, CRC(48697666) SHA1(0f4c6db9558272f5ceb347e742b284474f18b707) )
 	ROM_LOAD( "epr-7154.ic92",	0x18000, 0x8000, CRC(56d6222a) SHA1(ad8ccf15fe7f1d6716f78490892da0167d79f678) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7130.ic126",	0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3241,12 +3241,12 @@ ROM_END
 */
 
 ROM_START( chplftbl )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ep7124bl.90",	0x00000, 0x8000, CRC(71a37932) SHA1(72b6f8949d356b3adc5248fdaa13c2a1b9c0fa70) )
 	ROM_LOAD( "epr-7125.91",	0x10000, 0x8000, CRC(f5283498) SHA1(1ad40f6d7b4cd18212ee56917240c0796f1a4ec2) )
 	ROM_LOAD( "epr-7126.92",	0x18000, 0x8000, CRC(dbd192ab) SHA1(03d280c82599a14fc6a2065d57c6241cdc6f1143) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7130.126",	0x0000, 0x8000, CRC(346af118) SHA1(ef579818a45b8ebb276d5832092b26e232d5a737) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3291,12 +3291,12 @@ ROM_START( chplftbl )
 ROM_END
 
 ROM_START( 4dwarrio )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4d.116",       0x0000, 0x4000, CRC(546d1bc7) SHA1(724bb2f77a2b82fae85e535ae4a37820cfb323d0) ) /* encrypted */
 	ROM_LOAD( "4d.109",       0x4000, 0x4000, CRC(f1074ec3) SHA1(bc368abeb6c0a7172e03bd7a1754cf4a6ecbb4f8) ) /* encrypted */
 	ROM_LOAD( "4d.96",        0x8000, 0x4000, CRC(387c1e8f) SHA1(520ecbafd1c7271dad24410a68067dfd801fa6d6) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "4d.120",       0x0000, 0x2000, CRC(5241c009) SHA1(b7a21f95b63234f2496d5ea6e7dc8050ca1b39fc) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3318,14 +3318,14 @@ ROM_START( 4dwarrio )
 ROM_END
 
 ROM_START( brain )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "brain.1",      0x00000, 0x8000, CRC(2d2aec31) SHA1(02dfbb0e9ca01b864e3aa594cf38306fe82a4b5d) )
 	ROM_LOAD( "brain.2",      0x10000, 0x8000, CRC(810a8ab5) SHA1(87cd39f5b1047f355e1d257c691ef11fc55824ca) )
 	ROM_RELOAD(               0x08000, 0x8000 )	/* there's code falling through from 7fff */
 												/* so I have to copy the ROM there */
 	ROM_LOAD( "brain.3",      0x18000, 0x8000, CRC(9a225634) SHA1(9f137938592dd9c5ab2273864a11a682e0f7f783) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "brain.120",    0x0000, 0x8000, CRC(c7e50278) SHA1(9709a59004c6bc39173d0cb94f3602c358367976) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3347,12 +3347,12 @@ ROM_START( brain )
 ROM_END
 
 ROM_START( raflesia )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-7411.116",	0x0000, 0x4000, CRC(88a0c6c6) SHA1(1deaa8d8d607100966696e5e9dd5f799ba693af0) ) /* encrypted */
 	ROM_LOAD( "epr-7412.109",	0x4000, 0x4000, CRC(d3b8cddf) SHA1(368c74d8ae46442cacdb67813dc1c039245da266) ) /* encrypted */
 	ROM_LOAD( "epr-7413.96",	0x8000, 0x4000, CRC(b7e688b3) SHA1(ba5c6d5d19e7d51e41949fd5fa576fdae38f9c9c) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7420.120",	0x0000, 0x2000, CRC(14387666) SHA1(9cb18e3002c32f658e4725707069f9cd2f496507) ) /* epr-7420.3 */
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3375,12 +3375,12 @@ ROM_START( raflesia )
 ROM_END
 
 ROM_START( spatter )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6392.116",	0x0000, 0x4000, CRC(329b4506) SHA1(8f71ffc3015c4fcf84a895bf53760830602f1040) ) /* encrypted */
 	ROM_LOAD( "epr-6393.109",	0x4000, 0x4000, CRC(3b56e25f) SHA1(23f26f8632c8a370b5b3b7a3ec58f359cdf04f73) ) /* encrypted */
 	ROM_LOAD( "epr-6394.96",	0x8000, 0x4000, CRC(647c1301) SHA1(5142abfcc63772fd1b47eb584ccda0bc3830e337) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6316.120",	0x0000, 0x2000, CRC(1df95511) SHA1(5780631c8c5a2c3fcd4085f217affa660d72a4e9) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3403,12 +3403,12 @@ ROM_START( spatter )
 ROM_END
 
 ROM_START( ssanchan )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6310.116",	0x0000, 0x4000, CRC(26b43701) SHA1(e041bde10da12a3f698da09220f0a7cc2ee99abe) ) /* encrypted */
 	ROM_LOAD( "epr-6311.109",	0x4000, 0x4000, CRC(cb2bc620) SHA1(ecc69360ad9fcc825b35955fbc29da9ea28b8846) ) /* encrypted */
 	ROM_LOAD( "epr-6312.96",	0x8000, 0x4000, CRC(71b15b47) SHA1(7c955be049f9a8d7ca18d877183b698dd5ffe4da) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-6316.120",	0x0000, 0x2000, CRC(1df95511) SHA1(5780631c8c5a2c3fcd4085f217affa660d72a4e9) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3431,12 +3431,12 @@ ROM_START( ssanchan )
 ROM_END
 
 ROM_START( wboy )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-7489.116",	0x0000, 0x4000, CRC(130f4b70) SHA1(4a2ea5bc06f3a240c68813be3a9f9bef2bcf4e9c) ) /* encrypted */
 	ROM_LOAD( "epr-7490.109",	0x4000, 0x4000, CRC(9e656733) SHA1(2233beb874b7cb48899afe603fef567932951a88) ) /* encrypted */
 	ROM_LOAD( "epr-7491.96",	0x8000, 0x4000, CRC(1f7d0efe) SHA1(a1b4f8faf1614f4808df1292209c340f1490adbd) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7498.120",	0x0000, 0x2000, CRC(78ae1e7b) SHA1(86032f443359b0bb2766e33024ed2e320aa9bc84) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3458,12 +3458,12 @@ ROM_START( wboy )
 ROM_END
 
 ROM_START( wboyo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-.116",		0x0000, 0x4000, CRC(51d27534) SHA1(1cbc7201aacde89857f83b2600f309b514c5e758) ) /* encrypted */
 	ROM_LOAD( "epr-.109",		0x4000, 0x4000, CRC(e29d1cd1) SHA1(f6ff4a6fffea77cc5706549bb2d8bf9e96ed0be0) ) /* encrypted */
 	ROM_LOAD( "epr-7491.96",	0x8000, 0x4000, CRC(1f7d0efe) SHA1(a1b4f8faf1614f4808df1292209c340f1490adbd) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7498.120",	0x0000, 0x2000, CRC(78ae1e7b) SHA1(86032f443359b0bb2766e33024ed2e320aa9bc84) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3485,7 +3485,7 @@ ROM_START( wboyo )
 ROM_END
 
 ROM_START( wboy2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-7587.129",	0x0000, 0x2000, CRC(1bbb7354) SHA1(e299979299c93981f5d28a1a614ad644506911dd) ) /* encrypted */
 	ROM_LOAD( "epr-7588.130",	0x2000, 0x2000, CRC(21007413) SHA1(f45443a49e916465e5c8a8b348897ab426a897bd) ) /* encrypted */
 	ROM_LOAD( "epr-7589.131",	0x4000, 0x2000, CRC(44b30433) SHA1(558d799c8f48f76c651f19e2a81160eb78ac6642) ) /* encrypted */
@@ -3493,7 +3493,7 @@ ROM_START( wboy2 )
 	ROM_LOAD( "epr-7591.133",	0x8000, 0x2000, CRC(8379aa23) SHA1(da47e0150b724a00878ef5f953fa6ac80bb27d8d) )
 	ROM_LOAD( "epr-7592.134",	0xa000, 0x2000, CRC(c767a5d7) SHA1(a4e8d6a8278ac2227bde8c24d45aa7ab2a273579) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7498.120",	0x0000, 0x2000, CRC(78ae1e7b) SHA1(86032f443359b0bb2766e33024ed2e320aa9bc84) ) /* epr-7498.3 */
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3516,7 +3516,7 @@ ROM_START( wboy2 )
 ROM_END
 
 ROM_START( wboy2u )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic129_02.bin",	0x0000, 0x2000, CRC(32c4b709) SHA1(e57b7b6818f12fdd5f1600ed54c0b8a7f538aa71) )
 	ROM_LOAD( "ic130_03.bin",	0x2000, 0x2000, CRC(56463ede) SHA1(c58c220aa0d0e194581646e6db2491075fdc37b9) )
 	ROM_LOAD( "ic131_04.bin",	0x4000, 0x2000, CRC(775ed392) SHA1(073f8f70685913736eb04be8215a47b5253cb531) )
@@ -3524,7 +3524,7 @@ ROM_START( wboy2u )
 	ROM_LOAD( "epr-7591.133",	0x8000, 0x2000, CRC(8379aa23) SHA1(da47e0150b724a00878ef5f953fa6ac80bb27d8d) )
 	ROM_LOAD( "epr-7592.134",	0xa000, 0x2000, CRC(c767a5d7) SHA1(a4e8d6a8278ac2227bde8c24d45aa7ab2a273579) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr7498a.3",		0x0000, 0x2000, CRC(c198205c) SHA1(d2d5cd154ce6a5a3c6a099b4ab2ea7cc045ab0a1) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3547,12 +3547,12 @@ ROM_START( wboy2u )
 ROM_END
 
 ROM_START( wboy3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wb_1",			0x0000, 0x4000, CRC(bd6fef49) SHA1(6469a84cc1fd4ebf8c58b6efd3b255414bc86699) ) /* encrypted */
 	ROM_LOAD( "wb_2",			0x4000, 0x4000, CRC(4081b624) SHA1(892fd347638ec900a7afc3d338b68e9d0a14f2b4) ) /* encrypted */
 	ROM_LOAD( "wb_3",			0x8000, 0x4000, CRC(c48a0e36) SHA1(c9b9e51334e8b698be2195dda7701bb51760e502) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7498.120",	0x0000, 0x2000, CRC(78ae1e7b) SHA1(86032f443359b0bb2766e33024ed2e320aa9bc84) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3587,11 +3587,11 @@ The second piggyback is marked "SEGA 834-5755" and it contains proms and some lo
 */
 
 ROM_START( wboy4 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic2.bin",	0x0000, 0x8000, CRC(48b2c006) SHA1(35492330dae71d410712380466b4c09b81df8559) ) /* encrypted */
 	ROM_LOAD( "ic3.bin",	0x8000, 0x8000, CRC(466cae31) SHA1(e47e9084c83796a0a0dfeaa1f8f868cadd5f32c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )	// epr7583.ic120
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3608,12 +3608,12 @@ ROM_START( wboy4 )
 ROM_END
 
 ROM_START( wboyu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic116_89.bin",	0x0000, 0x4000, CRC(73d8cef0) SHA1(a6f1f8de44a88f995836ce03b5a073306c56aaeb) )
 	ROM_LOAD( "ic109_90.bin",	0x4000, 0x4000, CRC(29546828) SHA1(905d76bc2b212a161ad2f2bef144261bb73c94cb) )
 	ROM_LOAD( "ic096_91.bin",	0x8000, 0x4000, CRC(c7145c2a) SHA1(0b2fd6f519a4b87bc27db5d03c489c7ff75e942a) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr-7498.120",	0x0000, 0x2000, CRC(78ae1e7b) SHA1(86032f443359b0bb2766e33024ed2e320aa9bc84) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3635,11 +3635,11 @@ ROM_START( wboyu )
 ROM_END
 
 ROM_START( wboysys2 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "7580.90",  0x0000, 0x8000, CRC(d69927a5) SHA1(b633177146a83953131d4e03fa987416f222199a) ) /* encrypted */
 	ROM_LOAD( "7579.91",  0x10000, 0x8000, CRC(8a6f4b00) SHA1(2b1c26daa2e9c668292db73e28318257c62b175c) ) /* encrypted */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "7583.126", 0x0000, 0x8000, CRC(99334b3c) SHA1(dfc09f63082b7666fa2152e22810c0455a7e5051) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3659,7 +3659,7 @@ ROM_START( wboysys2 )
 ROM_END
 
 ROM_START( wbdeluxe )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wbd1.bin",		0x0000, 0x2000, CRC(a1bedbd7) SHA1(32d171847ca02b01a7ac810cac3185c81c923285) )
 	ROM_LOAD( "ic130_03.bin",	0x2000, 0x2000, CRC(56463ede) SHA1(c58c220aa0d0e194581646e6db2491075fdc37b9) )
 	ROM_LOAD( "wbd3.bin",		0x4000, 0x2000, CRC(6fcdbd4c) SHA1(4fb9a916c99bf267c0035cb80b16400732991f83) )
@@ -3667,7 +3667,7 @@ ROM_START( wbdeluxe )
 	ROM_LOAD( "wbd5.bin",		0x8000, 0x2000, CRC(f6b02902) SHA1(9a43b84d9537d70e9c0d75010a824bcaec57a50c) )
 	ROM_LOAD( "wbd6.bin",		0xa000, 0x2000, CRC(43df21fe) SHA1(c1b88505942f48b0df2362bbb618689febe00d1f) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr7498a.3",		0x0000, 0x2000, CRC(c198205c) SHA1(d2d5cd154ce6a5a3c6a099b4ab2ea7cc045ab0a1) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3690,12 +3690,12 @@ ROM_START( wbdeluxe )
 ROM_END
 
 ROM_START( gardia )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr10255.1",   0x00000, 0x8000, CRC(89282a6b) SHA1(f19e345e5fae6a518276cc1bd09d1e2083672b25) ) /* encrypted */
 	ROM_LOAD( "epr10254.2",   0x10000, 0x8000, CRC(2826b6d8) SHA1(de1faf33cca031b72052bf5244fcb0bd79d85659) )
 	ROM_LOAD( "epr10253.3",   0x18000, 0x8000, CRC(7911260f) SHA1(44196f0a6c4c2b22a68609ddfc75be6a7877a69a) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr10243.120", 0x0000, 0x4000, CRC(87220660) SHA1(3f2bfc03e0f1053a4aa0ec5ebb0d573f2e20964c) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3717,12 +3717,12 @@ ROM_START( gardia )
 ROM_END
 
 ROM_START( gardiab )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gardiabl.5",   0x00000, 0x8000, CRC(207f9cbb) SHA1(647de15ac69a904344f3c18c9da8cefd626387db) ) /* encrypted */
 	ROM_LOAD( "gardiabl.6",   0x10000, 0x8000, CRC(b2ed05dc) SHA1(c520bf7024c85dc759c27eccb0a31998f4d72b5f) )
 	ROM_LOAD( "gardiabl.7",   0x18000, 0x8000, CRC(0a490588) SHA1(18df754ebdf062096f2d631a722b168901610345) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr10243.120", 0x0000, 0x4000, CRC(87220660) SHA1(3f2bfc03e0f1053a4aa0ec5ebb0d573f2e20964c) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3744,7 +3744,7 @@ ROM_START( gardiab )
 ROM_END
 
 ROM_START( blockgal )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bg.116",       0x0000, 0x4000, CRC(a99b231a) SHA1(42ba45a4fd315255e9500bc3a0e8fe653c4c5a9c) ) /* encrypted */
 	ROM_LOAD( "bg.109",       0x4000, 0x4000, CRC(a6b573d5) SHA1(33547a3895bbe65d5a6c40453eeb93e1fedad6de) ) /* encrypted */
 	/* 0x8000-0xbfff empty (was same as My Hero) */
@@ -3752,7 +3752,7 @@ ROM_START( blockgal )
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0029.key",  0x0000, 0x2000, CRC(350d7f93) SHA1(7ef12d63b2c7150f8e74f65ec8340471d72b1c03) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bg.120",       0x0000, 0x2000, CRC(d848faff) SHA1(5974cc0c3090800ca79f580a620f5b6615f5d039) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3774,11 +3774,11 @@ ROM_START( blockgal )
 ROM_END
 
 ROM_START( blckgalb )
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "ic62",         0x10000, 0x8000, CRC(65c47676) SHA1(bc283761e6f9ebf65fb405b1c8922c3c98c8d00e) ) /* decrypted opcodes */
 	ROM_CONTINUE(             0x00000, 0x8000 )             /* decrypted data */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bg.120",       0x0000, 0x2000, CRC(d848faff) SHA1(5974cc0c3090800ca79f580a620f5b6615f5d039) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -3800,12 +3800,12 @@ ROM_START( blckgalb )
 ROM_END
 
 ROM_START( tokisens )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr10961.90",  0x00000, 0x8000, CRC(1466b61d) SHA1(99f93813834d3a7c9f6228076d400f74d9b6dea9) )
 	ROM_LOAD( "epr10962.91",  0x10000, 0x8000, CRC(a8479f91) SHA1(0700746fb481fd2bd22ae82c9881aa61222a6379) )
 	ROM_LOAD( "epr10963.92",  0x18000, 0x8000, CRC(b7193b39) SHA1(d40fb8591b1ff83f3d56b955ac11a07496a0adbb) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr10967.126", 0x0000, 0x8000, CRC(97966bf2) SHA1(b5a3d36afbb3d6e2e2e2c121609a30dc080ccf13) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3827,7 +3827,7 @@ ROM_START( tokisens )
 ROM_END
 
 ROM_START( wbml )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ep11031a.90",  0x00000, 0x8000, CRC(bd3349e5) SHA1(65cc16e5d3b08429388946df254b8122ad1da339) ) /* encrypted */
 	ROM_LOAD( "epr11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
 	ROM_LOAD( "epr11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
@@ -3835,7 +3835,7 @@ ROM_START( wbml )
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0043.key",  0x0000, 0x2000, CRC(e354abfc) SHA1(07b0d3c51301ebb25909234b6220a3ed20dbcc7d) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3857,7 +3857,7 @@ ROM_START( wbml )
 ROM_END
 
 ROM_START( wbmljo )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr11031.90",  0x00000, 0x8000, CRC(497ebfb4) SHA1(d90872c7d5285c85b05879bc67638f640e0339d5) ) /* encrypted */
 	ROM_LOAD( "epr11032.91",  0x10000, 0x8000, CRC(9d03bdb2) SHA1(7dbab23e7c7972d9b51a0d3d046374720b7d6af5) ) /* encrypted */
 	ROM_LOAD( "epr11033.92",  0x18000, 0x8000, CRC(7076905c) SHA1(562fbd9bd60851f7e4e60b725193395b4f193479) ) /* encrypted */
@@ -3865,7 +3865,7 @@ ROM_START( wbmljo )
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0043.key",  0x0000, 0x2000, CRC(e354abfc) SHA1(07b0d3c51301ebb25909234b6220a3ed20dbcc7d) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3887,7 +3887,7 @@ ROM_START( wbmljo )
 ROM_END
 
 ROM_START( wbmljb )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "wbml.01",      0x20000, 0x8000, CRC(66482638) SHA1(887f93015f0effa2d0fa1f1f59082f75ac072221) ) /* Unencrypted opcodes */
 	ROM_CONTINUE(             0x00000, 0x8000 )             /* Now load the operands in RAM */
 	ROM_LOAD( "m-6.bin",      0x30000, 0x8000, CRC(8c08cd11) SHA1(5103f3c887c213b09aee858c4a883f2869b9ffb5) ) /* Unencrypted opcodes */
@@ -3895,7 +3895,7 @@ ROM_START( wbmljb )
 	ROM_LOAD( "m-7.bin",      0x38000, 0x8000, CRC(11881703) SHA1(b5e4d477158e7653b0fef5a4806be7b4871e917d) ) /* Unencrypted opcodes */
 	ROM_CONTINUE(             0x18000, 0x8000 )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3917,7 +3917,7 @@ ROM_START( wbmljb )
 ROM_END
 
 ROM_START( wbmlb )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "wbml.01",      0x20000, 0x8000, CRC(66482638) SHA1(887f93015f0effa2d0fa1f1f59082f75ac072221) ) /* Unencrypted opcodes */
 	ROM_CONTINUE(             0x00000, 0x8000 )             /* Now load the operands in RAM */
 	ROM_LOAD( "wbml.02",      0x30000, 0x8000, CRC(48746bb6) SHA1(a0049cba53e7548afa8d7b16a7e9494e628d2a0f) ) /* Unencrypted opcodes */
@@ -3925,7 +3925,7 @@ ROM_START( wbmlb )
 	ROM_LOAD( "wbml.03",      0x38000, 0x8000, CRC(d57ba8aa) SHA1(16f095cb78e31af5ce76d36c20fe4c3e0d027aea) ) /* Unencrypted opcodes */
 	ROM_CONTINUE(             0x18000, 0x8000 )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3947,7 +3947,7 @@ ROM_START( wbmlb )
 ROM_END
 
 ROM_START( wbmlbg )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "galaxy.ic90",  0x20000, 0x8000, CRC(66482638) SHA1(887f93015f0effa2d0fa1f1f59082f75ac072221) ) /* Unencrypted opcodes */
 	ROM_CONTINUE(             0x00000, 0x8000 )             /* Now load the operands in RAM */
 	ROM_LOAD( "galaxy.ic91",  0x30000, 0x8000, CRC(89a8ab93) SHA1(11389604017e15aed9a8fcef60e42740acd79917) ) /* Unencrypted opcodes */
@@ -3955,7 +3955,7 @@ ROM_START( wbmlbg )
 	ROM_LOAD( "galaxy.ic92",  0x38000, 0x8000, CRC(39e07286) SHA1(70192f03e52dd34c9fe5698a5ec1c24d3c58543c) ) /* Unencrypted opcodes */
 	ROM_RELOAD(               0x18000, 0x8000 )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr11037.126", 0x0000, 0x8000, CRC(7a4ee585) SHA1(050436106cced5dcbf40a3d94d48202eedddc3ad) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -3977,7 +3977,7 @@ ROM_START( wbmlbg )
 ROM_END
 
 ROM_START( dakkochn )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr11224.90",  0x00000, 0x8000, CRC(9fb1972b) SHA1(1bb61c6ec2b5b8eb39f74f20d5bcd0f14501bd21) ) /* encrypted */
 	ROM_LOAD( "epr11225.91",  0x10000, 0x8000, CRC(c540f9e2) SHA1(dbda9355e8b796bcfaee2789714d248c4d7ad58c) ) /* encrypted */
 	/* 18000-1ffff empty */
@@ -3985,7 +3985,7 @@ ROM_START( dakkochn )
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0014.key",  0x0000, 0x2000, CRC(bb9df5ad) SHA1(7e7b7255149ae01d19883ecf4a88989f8a9bf4c6) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr11229.126", 0x0000, 0x8000, CRC(c11648d0) SHA1(c2df3d767d497c3365ae70748c4790f4ee394958) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -4007,7 +4007,7 @@ ROM_START( dakkochn )
 ROM_END
 
 ROM_START( ufosensi )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "epr11661.90",  0x00000, 0x8000, CRC(f3e394e2) SHA1(a295a2aa80a164a548995822c46f32fd9fad7a0b) ) /* encrypted */
 	ROM_LOAD( "epr11662.91",  0x10000, 0x8000, CRC(0c2e4120) SHA1(d81fbefa95868e3efd29ef3bacf108329781ca17) ) /* encrypted */
 	ROM_LOAD( "epr11663.92",  0x18000, 0x8000, CRC(4515ebae) SHA1(9b823f10999746292762c2f0a1ca9039efa22506) ) /* encrypted */
@@ -4015,7 +4015,7 @@ ROM_START( ufosensi )
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
 	ROM_LOAD( "317-0064.key",  0x0000, 0x2000, CRC(da326f36) SHA1(0871b351379a094ac578e0eca5cb17797f9085aa) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr11667.126", 0x0000, 0x8000, CRC(110baba9) SHA1(e14cf5af11ac9691eca897bbae7c238665cd2a4d) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -4037,7 +4037,7 @@ ROM_START( ufosensi )
 ROM_END
 
 ROM_START( ufosensb )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "k108.ic18.3-4s", 0x20000, 0x8000, CRC(6b1d0955) SHA1(dbda145d40eaecd30c1d55a9675c58a2967c20c4) )
 	ROM_CONTINUE(            	0x00000, 0x8000 )             /* Now load the operands in RAM */
 	ROM_LOAD( "k109.ic19.4s",   0x30000, 0x8000, CRC(fc543b26) SHA1(b9e1d2ca6f9811bf341edf104fe209dbf56e4b2d) )
@@ -4045,7 +4045,7 @@ ROM_START( ufosensb )
 	ROM_LOAD( "k110.ic20.4-5s", 0x38000, 0x8000, CRC(6ba2dc77) SHA1(09a65f55988ae28e285d402af9a2a1f1dc05a82c) )
 	ROM_CONTINUE(               0x18000, 0x8000 )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "epr11667.126", 0x0000, 0x8000, CRC(110baba9) SHA1(e14cf5af11ac9691eca897bbae7c238665cd2a4d) ) /* label on chip is "k111.ic168.10v" */
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -4158,7 +4158,7 @@ Notes:
 */
 
 ROM_START( nob )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "dm08.1f", 0x00000, 0x8000, CRC(98d602d6) SHA1(a0f1e6d243f2e07703bb641434dce46d0ddc15ae) )
 	ROM_LOAD( "dm10.1k", 0x10000, 0x8000, CRC(e7c06663) SHA1(8ae42b0875afe60ef672f2285aeb72da1c7e167b) )
 	ROM_LOAD( "dm09.1h", 0x18000, 0x8000, CRC(dc4c872f) SHA1(aab85203cfd2463ffddfd48e87733fb8d6d8bcf6) )
@@ -4166,7 +4166,7 @@ ROM_START( nob )
 	ROM_REGION( 0x8000, "mcu", 0 )
 	ROM_LOAD( "8751.mcu", 0x00000, 0x8000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "dm03.9h", 0x0000, 0x4000, CRC(415adf76) SHA1(fbd6f8921aa3246702983ba81fa9ae53fa10c19d) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -4190,12 +4190,12 @@ ROM_END
 
 /* the bootleg has different protection.. */
  ROM_START( nobb )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "nobo-t.bin", 0x00000, 0x8000, CRC(176fd168) SHA1(f262521f07e5340f175019e2a06a54120a4aa3b7) )
 	ROM_LOAD( "nobo-r.bin", 0x10000, 0x8000, CRC(d61cf3c9) SHA1(0f80011d713c51e67853810813ebba579ade0303) )
 	ROM_LOAD( "nobo-s.bin", 0x18000, 0x8000, CRC(b0e7697f) SHA1(ad5394ca629152a8c73fb85d3fce8ea620ae6ff1) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nobo-m.bin", 0x0000, 0x4000, CRC(415adf76) SHA1(fbd6f8921aa3246702983ba81fa9ae53fa10c19d) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -4222,31 +4222,31 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( regulus )	{ regulus_decode(machine, "main"); }
-static DRIVER_INIT( mrviking )	{ mrviking_decode(machine, "main"); }
-static DRIVER_INIT( swat )	{ swat_decode(machine, "main"); }
-static DRIVER_INIT( flicky )	{ flicky_decode(machine, "main"); }
-static DRIVER_INIT( wmatch )	{ wmatch_decode(machine, "main"); }
-static DRIVER_INIT( bullfgtj )	{ bullfgtj_decode(machine, "main"); }
-static DRIVER_INIT( spatter )	{ spatter_decode(machine, "main"); }
-static DRIVER_INIT( pitfall2 )	{ pitfall2_decode(machine, "main"); }
-static DRIVER_INIT( nprinces )	{ nprinces_decode(machine, "main"); }
-static DRIVER_INIT( seganinj )	{ seganinj_decode(machine, "main"); }
-static DRIVER_INIT( imsorry )	{ imsorry_decode(machine, "main"); }
-static DRIVER_INIT( teddybb )	{ teddybb_decode(machine, "main"); }
-static DRIVER_INIT( hvymetal )	{ hvymetal_decode(machine, "main"); }
-static DRIVER_INIT( myheroj )	{ myheroj_decode(machine, "main"); }
-static DRIVER_INIT( 4dwarrio )	{ fdwarrio_decode(machine, "main"); }
-static DRIVER_INIT( wboy )	{ astrofl_decode(machine, "main"); }
-static DRIVER_INIT( wboy2 )	{ wboy2_decode(machine, "main"); }
-static DRIVER_INIT( gardia )	{ gardia_decode(machine, "main"); }
-static DRIVER_INIT( gardiab )	{ gardiab_decode(machine, "main"); }
+static DRIVER_INIT( regulus )	{ regulus_decode(machine, "maincpu"); }
+static DRIVER_INIT( mrviking )	{ mrviking_decode(machine, "maincpu"); }
+static DRIVER_INIT( swat )	{ swat_decode(machine, "maincpu"); }
+static DRIVER_INIT( flicky )	{ flicky_decode(machine, "maincpu"); }
+static DRIVER_INIT( wmatch )	{ wmatch_decode(machine, "maincpu"); }
+static DRIVER_INIT( bullfgtj )	{ bullfgtj_decode(machine, "maincpu"); }
+static DRIVER_INIT( spatter )	{ spatter_decode(machine, "maincpu"); }
+static DRIVER_INIT( pitfall2 )	{ pitfall2_decode(machine, "maincpu"); }
+static DRIVER_INIT( nprinces )	{ nprinces_decode(machine, "maincpu"); }
+static DRIVER_INIT( seganinj )	{ seganinj_decode(machine, "maincpu"); }
+static DRIVER_INIT( imsorry )	{ imsorry_decode(machine, "maincpu"); }
+static DRIVER_INIT( teddybb )	{ teddybb_decode(machine, "maincpu"); }
+static DRIVER_INIT( hvymetal )	{ hvymetal_decode(machine, "maincpu"); }
+static DRIVER_INIT( myheroj )	{ myheroj_decode(machine, "maincpu"); }
+static DRIVER_INIT( 4dwarrio )	{ fdwarrio_decode(machine, "maincpu"); }
+static DRIVER_INIT( wboy )	{ astrofl_decode(machine, "maincpu"); }
+static DRIVER_INIT( wboy2 )	{ wboy2_decode(machine, "maincpu"); }
+static DRIVER_INIT( gardia )	{ gardia_decode(machine, "maincpu"); }
+static DRIVER_INIT( gardiab )	{ gardiab_decode(machine, "maincpu"); }
 
 
 
-static DRIVER_INIT( blockgal )	{ mc8123_decrypt_rom(machine, "main", "user1", 0, 0); }
-static DRIVER_INIT( wbml )	{ mc8123_decrypt_rom(machine, "main", "user1", 1, 4); }
-static DRIVER_INIT( ufosensi )  { mc8123_decrypt_rom(machine, "main", "user1", 1, 4); }
+static DRIVER_INIT( blockgal )	{ mc8123_decrypt_rom(machine, "maincpu", "user1", 0, 0); }
+static DRIVER_INIT( wbml )	{ mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 4); }
+static DRIVER_INIT( ufosensi )  { mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 4); }
 
 static UINT8 dakkochn_control;
 
@@ -4303,7 +4303,7 @@ static WRITE8_HANDLER( dakkochn_port_15_w )
 
 static DRIVER_INIT( dakkochn )
 {
-	mc8123_decrypt_rom(machine, "main", "user1", 1, 4);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 4);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
@@ -4321,7 +4321,7 @@ static DRIVER_INIT( myherok )
 
 	/* additionally to the usual protection, all the program ROMs have data lines */
 	/* D0 and D1 swapped. */
-	rom = memory_region(machine, "main");
+	rom = memory_region(machine, "maincpu");
 	for (A = 0;A < 0xc000;A++)
 		rom[A] = (rom[A] & 0xfc) | ((rom[A] & 1) << 1) | ((rom[A] & 2) >> 1);
 
@@ -4355,7 +4355,7 @@ static DRIVER_INIT( myherok )
 		}
 	}
 
-	myheroj_decode(machine, "main");
+	myheroj_decode(machine, "maincpu");
 }
 
 static DRIVER_INIT( nobb )
@@ -4363,7 +4363,7 @@ static DRIVER_INIT( nobb )
 	/* Patch to get PRG ROMS ('T', 'R' and 'S) status as "GOOD" in the "test mode" */
 	/* not really needed */
 
-//  UINT8 *ROM = memory_region(machine, "main");
+//  UINT8 *ROM = memory_region(machine, "maincpu");
 
 //  ROM[0x3296] = 0x18;     // 'jr' instead of 'jr z' - 'T' (PRG Main ROM)
 //  ROM[0x32be] = 0x18;     // 'jr' instead of 'jr z' - 'R' (Banked ROM 1)
@@ -4375,7 +4375,7 @@ static DRIVER_INIT( nobb )
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	UINT8 *ROM2 = memory_region(machine, "sound");
+	UINT8 *ROM2 = memory_region(machine, "soundcpu");
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
 }
@@ -4383,16 +4383,16 @@ static DRIVER_INIT( nobb )
 
 static DRIVER_INIT( bootleg )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
 }
 
 
 static DRIVER_INIT( bootlegb )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x20000);
-	memory_configure_bank_decrypted(machine, 1, 0, 4, memory_region(machine, "main") + 0x30000, 0x4000);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x20000);
+	memory_configure_bank_decrypted(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x30000, 0x4000);
 }
 
 /*************************************

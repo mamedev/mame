@@ -334,14 +334,14 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( galaxi )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)	// ?
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)	// ?
 	MDRV_CPU_PROGRAM_MAP(galaxi_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -380,7 +380,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( galaxi )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "5.u48", 0x00000, 0x20000, CRC(53d86ed0) SHA1(d04ad4c79b0ae46d3d5820b16481ea95c1370e6d) )
 	ROM_LOAD16_BYTE( "4.u47", 0x00001, 0x20000, CRC(ddd67683) SHA1(68f8969949e1db90a765c1f31cb8957eef505d5f) )
 
@@ -393,7 +393,7 @@ ROM_START( galaxi )
 ROM_END
 
 ROM_START( magjoker )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "25.u48", 0x00000, 0x20000, CRC(505bdef2) SHA1(9c2a525f2eb3cc39bdd6219bad7c5a1a8bc0b274) )
 	ROM_LOAD16_BYTE( "24.u47", 0x00001, 0x20000, CRC(380fd0cd) SHA1(bcd6d23e41e249c7e587b253958eec180440639a) )
 

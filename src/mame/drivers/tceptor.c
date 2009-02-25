@@ -380,11 +380,11 @@ static MACHINE_RESET( tceptor )
 static MACHINE_DRIVER_START( tceptor )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 49152000/32)
+	MDRV_CPU_ADD("maincpu", M6809, 49152000/32)
 	MDRV_CPU_PROGRAM_MAP(m6809_map,0)
 	MDRV_CPU_VBLANK_INT("2d", m6809_vb_interrupt)
 
-	MDRV_CPU_ADD("audio", M65C02, 49152000/24)
+	MDRV_CPU_ADD("audiocpu", M65C02, 49152000/24)
 	MDRV_CPU_PROGRAM_MAP(m6502_a_map,0)
 
 	MDRV_CPU_ADD("audio2", M65C02, 49152000/24)
@@ -463,10 +463,10 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tceptor )
-	ROM_REGION( 0x10000, "main", 0 )			// 68A09EP
+	ROM_REGION( 0x10000, "maincpu", 0 )			// 68A09EP
 	ROM_LOAD( "tc1-1.10f",  0x08000, 0x08000, CRC(4c6b063e) SHA1(d9701657186f8051391084f51a720037f9f418b1) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			// RC65C02
+	ROM_REGION( 0x10000, "audiocpu", 0 )			// RC65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
 	ROM_REGION( 0x10000, "audio2", 0 )			// RC65C02
@@ -519,10 +519,10 @@ ROM_START( tceptor )
 ROM_END
 
 ROM_START( tceptor2 )
-	ROM_REGION( 0x10000, "main", 0 )			// 68A09EP
+	ROM_REGION( 0x10000, "maincpu", 0 )			// 68A09EP
 	ROM_LOAD( "tc2-1.10f",  0x08000, 0x08000, CRC(f953f153) SHA1(f4cd0a133d23b4bf3c24c70c28c4ecf8ad4daf6f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			// RC65C02
+	ROM_REGION( 0x10000, "audiocpu", 0 )			// RC65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
 	ROM_REGION( 0x10000, "audio2", 0 )			// RC65C02

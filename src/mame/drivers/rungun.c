@@ -258,7 +258,7 @@ static WRITE8_HANDLER( z80ctrl_w )
 {
 	rng_z80_control = data;
 
-	memory_set_bankptr(space->machine, 2, memory_region(space->machine, "sound") + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(space->machine, 2, memory_region(space->machine, "soundcpu") + 0x10000 + (data & 0x07) * 0x4000);
 
 	if (data & 0x10)
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
@@ -324,11 +324,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( rng )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(rngreadmem,rngwritemem)
-	MDRV_CPU_VBLANK_INT("main", rng_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", rng_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, 10000000) // 8Mhz (10Mhz is much safer in self-test due to heavy sync)
+	MDRV_CPU_ADD("soundcpu", Z80, 10000000) // 8Mhz (10Mhz is much safer in self-test due to heavy sync)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
 
@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( rng )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS | VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -449,7 +449,7 @@ INPUT_PORTS_END
 
 ROM_START( rungun )
 	/* main program Europe Version AA  1993, 10.8 */
-	ROM_REGION( 0x300000, "main", 0)
+	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247eaa03.bin", 0x000000, 0x80000, CRC(f5c91ec0) SHA1(298926ea30472fa8d2c0578dfeaf9a93509747ef) )
 	ROM_LOAD16_BYTE( "247eaa04.bin", 0x000001, 0x80000, CRC(0e62471f) SHA1(2861b7a4e78ff371358d318a1b13a6488c0ac364) )
 
@@ -460,7 +460,7 @@ ROM_START( rungun )
 	ROM_CONTINUE(                  0x100001, 0x80000)
 
 	/* sound program */
-	ROM_REGION( 0x030000, "sound", 0 )
+	ROM_REGION( 0x030000, "soundcpu", 0 )
 	ROM_LOAD("247a05",  0x000000, 0x20000, CRC(64e85430) SHA1(542919c3be257c8f118fc21d3835d7b6426a22ed) )
 	ROM_RELOAD(         0x010000, 0x20000 )
 
@@ -487,7 +487,7 @@ ROM_END
 
 ROM_START( runguna )
 	/* main program Europe Version AA 1993, 10.4 */
-	ROM_REGION( 0x300000, "main", 0)
+	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247eaa03.rom", 0x000000, 0x80000, CRC(fec3e1d6) SHA1(cd89dc32ad06308134d277f343a7e8b5fe381f69) )
 	ROM_LOAD16_BYTE( "247eaa04.rom", 0x000001, 0x80000, CRC(1b556af9) SHA1(c8351ebd595307d561d089c66cd6ed7f6111d996) )
 
@@ -498,7 +498,7 @@ ROM_START( runguna )
 	ROM_CONTINUE(                  0x100001, 0x80000)
 
 	/* sound program */
-	ROM_REGION( 0x030000, "sound", 0 )
+	ROM_REGION( 0x030000, "soundcpu", 0 )
 	ROM_LOAD("1.13g",  0x000000, 0x20000, CRC(c0b35df9) SHA1(a0c73d993eb32bd0cd192351b5f86794efd91949) )
 	ROM_RELOAD(         0x010000, 0x20000 )
 
@@ -525,7 +525,7 @@ ROM_END
 
 ROM_START( rungunu )
 	/* main program US Version AB 1993 10.12 */
-	ROM_REGION( 0x300000, "main", 0)
+	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247uab03.bin", 0x000000, 0x80000, CRC(f259fd11) SHA1(60381a3fa7f78022dcb3e2f3d13ea32a10e4e36e) )
 	ROM_LOAD16_BYTE( "247uab04.bin", 0x000001, 0x80000, CRC(b918cf5a) SHA1(4314c611ef600ec081f409c78218de1639f8b463) )
 
@@ -534,7 +534,7 @@ ROM_START( rungunu )
 	ROM_LOAD16_BYTE( "247a02", 0x100001, 0x80000, CRC(f5ef3f45) SHA1(2e1d8f672c130dbfac4365dc1301b47beee10161) )
 
 	/* sound program */
-	ROM_REGION( 0x030000, "sound", 0 )
+	ROM_REGION( 0x030000, "soundcpu", 0 )
 	ROM_LOAD("247a05", 0x000000, 0x20000, CRC(64e85430) SHA1(542919c3be257c8f118fc21d3835d7b6426a22ed) )
 	ROM_RELOAD(        0x010000, 0x20000 )
 
@@ -561,7 +561,7 @@ ROM_END
 
 ROM_START( rungunua )
 	/* main program US Version BA 1993 10.8 */
-	ROM_REGION( 0x300000, "main", 0)
+	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247uba03.bin", 0x000000, 0x80000, CRC(c24d7500) SHA1(38e6ae9fc00bf8f85549be4733992336c46fe1f3) )
 	ROM_LOAD16_BYTE( "247uba04.bin", 0x000001, 0x80000, CRC(3f255a4a) SHA1(3a4d50ecec8546933ad8dabe21682ba0951eaad0) )
 
@@ -572,7 +572,7 @@ ROM_START( rungunua )
 	ROM_CONTINUE(                  0x100001, 0x80000)
 
 	/* sound program */
-	ROM_REGION( 0x030000, "sound", 0 )
+	ROM_REGION( 0x030000, "soundcpu", 0 )
 	ROM_LOAD("247a05", 0x000000, 0x20000, CRC(64e85430) SHA1(542919c3be257c8f118fc21d3835d7b6426a22ed) )
 	ROM_RELOAD(        0x010000, 0x20000 )
 
@@ -599,7 +599,7 @@ ROM_END
 
 ROM_START( slmdunkj )
 	/* main program Japan Version AA 1993 10.8 */
-	ROM_REGION( 0x300000, "main", 0)
+	ROM_REGION( 0x300000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "247jaa03.bin", 0x000000, 0x20000, CRC(87572078) SHA1(cfa784eb40ed8b3bda9d57abb6022bbe92056206) )
 	ROM_LOAD16_BYTE( "247jaa04.bin", 0x000001, 0x20000, CRC(aa105e00) SHA1(617ac14535048b6e0da43cc98c4b67c8e306bef1) )
 
@@ -610,7 +610,7 @@ ROM_START( slmdunkj )
 	ROM_CONTINUE(                  0x100001, 0x80000)
 
 	/* sound program */
-	ROM_REGION( 0x030000, "sound", 0 )
+	ROM_REGION( 0x030000, "soundcpu", 0 )
 	ROM_LOAD("247a05",  0x000000, 0x20000, CRC(64e85430) SHA1(542919c3be257c8f118fc21d3835d7b6426a22ed) )
 	ROM_RELOAD(         0x010000, 0x20000 )
 

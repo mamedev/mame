@@ -630,18 +630,18 @@ static INTERRUPT_GEN( wheelfir_irq )
 
 
 static MACHINE_DRIVER_START( wheelfir )
-	MDRV_CPU_ADD("main", M68000, 32000000)
+	MDRV_CPU_ADD("maincpu", M68000, 32000000)
 	MDRV_CPU_PROGRAM_MAP(wheelfir_main, 0)
 	MDRV_CPU_VBLANK_INT_HACK(wheelfir_irq,256)  // 1,3,5 valid
 
 	MDRV_CPU_ADD("sub", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(wheelfir_sub, 0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) // 1 valid
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) // 1 valid
 
 	MDRV_MACHINE_RESET (wheelfir)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -657,7 +657,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( wheelfir )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "tch1.u19", 0x00001, 0x80000, CRC(33bbbc67) SHA1(c2ecc0ab522ee442076ea7b9536aee6e1fad0540) )
 	ROM_LOAD16_BYTE( "tch2.u21", 0x00000, 0x80000, CRC(ed6b9e8a) SHA1(214c5aaf55963a219db33dd5d530492e09ad5e07) )
 
@@ -678,7 +678,7 @@ ROM_END
 
 static DRIVER_INIT(wheelfir)
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	RAM[0xdd3da/2] = 0x4e71; // hack!
 }
 

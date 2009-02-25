@@ -235,13 +235,13 @@ static VIDEO_EOF( raiden )
 static MACHINE_DRIVER_START( raiden )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
+	MDRV_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", raiden_interrupt)
 
 	MDRV_CPU_ADD("sub", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", raiden_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 
@@ -252,7 +252,7 @@ static MACHINE_DRIVER_START( raiden )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -274,13 +274,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( raidena )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
+	MDRV_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(alt_map,0)
-	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", raiden_interrupt)
 
 	MDRV_CPU_ADD("sub", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
-	MDRV_CPU_VBLANK_INT("main", raiden_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", raiden_interrupt)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
 
@@ -291,7 +291,7 @@ static MACHINE_DRIVER_START( raidena )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -312,7 +312,7 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( raiden )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "rai1.bin",   0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "rai2.bin",   0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "rai3.bin",   0x0c0000, 0x20000, CRC(9d735bf5) SHA1(531981eac2ef0c0635f067a649899f98738d5c67) )
@@ -322,10 +322,10 @@ ROM_START( raiden )
 	ROM_LOAD16_BYTE( "rai5.bin",   0x0c0000, 0x20000, CRC(7aca6d61) SHA1(4d80ec87e54d7495b9bdf819b9985b1c8183c80d) )
 	ROM_LOAD16_BYTE( "rai6a.bin",  0x0c0001, 0x20000, CRC(e3d35cc2) SHA1(4329865985aaf3fb524618e2e958563c8fa6ead5) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rai6.bin",     0x000000, 0x08000, CRC(723a483b) SHA1(50e67945e83ea1748fb748de3287d26446d4e0a0) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rai9.bin",     0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* chars */
@@ -349,7 +349,7 @@ ROM_START( raiden )
 ROM_END
 
 ROM_START( raidena )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "rai1.bin",     0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "rai2.bin",     0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "raiden03.rom", 0x0c0000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
@@ -359,10 +359,10 @@ ROM_START( raidena )
 	ROM_LOAD16_BYTE( "raiden05.rom",   0x0c0000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "raiden06.rom",   0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "raiden08.rom", 0x000000, 0x08000, CRC(731adb43) SHA1(d460ffc5dbec25482c695e6c4ac7b66655a67304) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rai9.bin",     0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* chars */
@@ -382,7 +382,7 @@ ROM_START( raidena )
 ROM_END
 
 ROM_START( raidenk )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "rai1.bin",     0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "rai2.bin",     0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "raiden03.rom", 0x0c0000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
@@ -392,10 +392,10 @@ ROM_START( raidenk )
 	ROM_LOAD16_BYTE( "raiden05.rom",   0x0c0000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "raiden06.rom",   0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8b",           0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rai9.bin",     0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* chars */
@@ -415,7 +415,7 @@ ROM_START( raidenk )
 ROM_END
 
 ROM_START( raident )
-	ROM_REGION( 0x100000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "rai1.bin",     0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
 	ROM_LOAD16_BYTE( "rai2.bin",     0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
 	ROM_LOAD16_BYTE( "raiden03.rom", 0x0c0000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
@@ -425,10 +425,10 @@ ROM_START( raident )
 	ROM_LOAD16_BYTE( "raiden05.rom",   0x0c0000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
 	ROM_LOAD16_BYTE( "raiden06.rom",   0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "raid08.212",   0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rai9.bin",     0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* chars */
@@ -487,7 +487,7 @@ encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
 static void common_decrypt(running_machine *machine)
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	int i;
 
 	for (i = 0; i < 0x20000; i++)
@@ -521,7 +521,7 @@ static DRIVER_INIT( raidena )
 {
 	memory_patcha(machine);
 	common_decrypt(machine);
-	seibu_sound_decrypt(machine,"audio",0x20000);
+	seibu_sound_decrypt(machine,"audiocpu",0x20000);
 }
 
 /***************************************************************************/

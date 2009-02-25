@@ -200,7 +200,7 @@ static READ8_HANDLER( shdancbl_soundbank_r )
 
 static WRITE8_HANDLER( shdancbl_bankctrl_w )
 {
-	UINT8 *mem = memory_region(space->machine, "sound");
+	UINT8 *mem = memory_region(space->machine, "soundcpu");
 
 	switch(data)
 	{
@@ -281,7 +281,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sys18_soundbank_w )
 {
-	UINT8 *mem = memory_region(space->machine, "sound");
+	UINT8 *mem = memory_region(space->machine, "soundcpu");
 	int rom = (data >> 6) & 3;
 	int bank = (data & 0x3f);
 	int mask = sys18_sound_info[rom*2+0];
@@ -739,7 +739,7 @@ static DRIVER_INIT( shdancbl )
 	sys16_MaxShadowColors=0;
 
 	/* Copy first 32K of IC45 to Z80 address space */
-	mem = memory_region(machine, "sound");
+	mem = memory_region(machine, "soundcpu");
 	memcpy(mem, mem+0x10000, 0x8000);
 }
 
@@ -868,7 +868,7 @@ static MACHINE_RESET( mwalkbl ){
 }
 
 static DRIVER_INIT( mwalkbl ){
-	UINT8 *RAM= memory_region(machine, "sound");
+	UINT8 *RAM= memory_region(machine, "soundcpu");
 	static const int mwalk_sound_info[] =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -1041,7 +1041,7 @@ static MACHINE_RESET( astormbl ){
 
 
 static DRIVER_INIT( astormbl ){
-	UINT8 *RAM= memory_region(machine, "sound");
+	UINT8 *RAM= memory_region(machine, "soundcpu");
 	static const int astormbl_sound_info[] =
 	{
 		0x0f, 0x00000, // ROM #1 = 128K
@@ -1065,15 +1065,15 @@ static DRIVER_INIT( astormbl ){
 static MACHINE_DRIVER_START( system18 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 8000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_18,sound_writemem_18)
 	MDRV_CPU_IO_MAP(sound_18_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1111,7 +1111,7 @@ static MACHINE_DRIVER_START( astormbl )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system18)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(astormbl_readmem,astormbl_writemem)
 
 	MDRV_MACHINE_RESET(astormbl)
@@ -1122,7 +1122,7 @@ static MACHINE_DRIVER_START( mwalkbl )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system18)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mwalkbl_readmem,mwalkbl_writemem)
 
 	MDRV_MACHINE_RESET(mwalkbl)
@@ -1133,10 +1133,10 @@ static MACHINE_DRIVER_START( shdancbl )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(system18)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(shdancbl_readmem,shdancbl_writemem)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(shdancbl_sound_readmem,shdancbl_sound_writemem)
 	MDRV_CPU_IO_MAP(shdancbl_sound_io_map,0)
 	MDRV_SOUND_REMOVE("5c68")
@@ -1290,7 +1290,7 @@ INPUT_PORTS_END
 /*****************************************************************************/
 
 ROM_START( astormbl )
-	ROM_REGION( 0x080000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "astorm.a6", 0x000000, 0x40000, CRC(7682ed3e) SHA1(b857352ad9c66488e91f60989472638c483e4ae8) )
 	ROM_LOAD16_BYTE( "astorm.a5", 0x000001, 0x40000, CRC(efe9711e) SHA1(496fd9e30941fde1658fab7292a669ef7964cecb) )
 
@@ -1309,7 +1309,7 @@ ROM_START( astormbl )
 	ROM_LOAD16_BYTE( "epr13079.bin", 0x180001, 0x40000, CRC(de9221ed) SHA1(5e2e434d1aa547be1e5652fc906d2e18c5122023) )
 	ROM_LOAD16_BYTE( "epr13086.bin", 0x180000, 0x40000, CRC(8c9a71c4) SHA1(40b774765ac888792aad46b6351a24b7ef40d2dc) )
 
-	ROM_REGION( 0x100000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x100000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr13083.bin", 0x10000, 0x20000, CRC(5df3af20) SHA1(e49105fcfd5bf37d14bd760f6adca5ce2412883d) )
 	ROM_LOAD( "epr13076.bin", 0x30000, 0x40000, CRC(94e6c76e) SHA1(f99e58a9bf372c41af211bd9b9ea3ac5b924c6ed) )
 	ROM_LOAD( "epr13077.bin", 0x70000, 0x40000, CRC(e2ec0d8d) SHA1(225b0d223b7282cba7710300a877fb4a2c6dbabb) )
@@ -1343,7 +1343,7 @@ on roms board:
 */
 
 ROM_START( astormb2 )
-	ROM_REGION( 0x080000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "1.a4", 0x000000, 0x10000, CRC(cca0d0af) SHA1(26fdbbeb8444d05f0ca2056a7c7fb81b0f1f2b5a) )
 	ROM_LOAD16_BYTE( "2.a3", 0x020000, 0x10000, CRC(f95eb883) SHA1(b25d9c0fd46a534e7612f4a3ffa708b73654ae2b) )
 	ROM_LOAD16_BYTE( "3.a2", 0x040000, 0x10000, CRC(4206ecd4) SHA1(45c65d7727cfaf215a7081159f6931185e92b39a) ) // epr13182.bin [3/4]      IDENTICAL
@@ -1380,7 +1380,7 @@ ROM_START( astormb2 )
 	ROM_LOAD16_BYTE( "26.021", 0x1c0000, 0x20000, CRC(c67fc986) SHA1(5fac826f9dde45201e3b93582dbe29c584a10229) ) // epr13086.bin [2/2]      99.987030%
 
 	/* Sound HW is very different to the originals */
-	ROM_REGION( 0x210000, "sound", ROMREGION_ERASEFF ) /* Z80 sound CPU */
+	ROM_REGION( 0x210000, "soundcpu", ROMREGION_ERASEFF ) /* Z80 sound CPU */
 	ROM_LOAD( "9.a5", 0x10000, 0x08000, CRC(0a4638e9) SHA1(0470e03a194464ff53c7583637193b585f5fd79f) )
 
 	ROM_REGION( 0x40000, "oki1", ROMREGION_ERASEFF ) /* Oki6295 Samples - fixed? samples */
@@ -1401,7 +1401,7 @@ ROM_END
 
 
 ROM_START( mwalkbl )
-	ROM_REGION( 0x080000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "mwalkbl.01", 0x000000, 0x10000, CRC(f49cdb16) SHA1(34b7e98d31c3b9db2f0f055d7b249b0e5e5cb746) )
 	ROM_LOAD16_BYTE( "mwalkbl.05", 0x000001, 0x10000, CRC(c483f29f) SHA1(8fdfa764d8e49754844a9dc001400d439f9af9f0) )
 	ROM_LOAD16_BYTE( "mwalkbl.02", 0x020000, 0x10000, CRC(0bde1896) SHA1(42731ae90d56918dc50c0dcb53d092dcfb957159) )
@@ -1426,7 +1426,7 @@ ROM_START( mwalkbl )
 	ROM_LOAD16_BYTE( "epr13221.b8",  0x180001, 0x40000, CRC(9ae7546a) SHA1(5413b0131881b0b32bac8de51da9a299835014bb) )
 	ROM_LOAD16_BYTE( "epr13228.a8",  0x180000, 0x40000, CRC(de3786be) SHA1(2279bb390aa3efab9aeee0a643e5cb6a4f5933b6) )
 
-	ROM_REGION( 0x100000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x100000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr13225.a4", 0x10000, 0x20000, CRC(56c2e82b) SHA1(d5755a1bb6e889d274dc60e883d4d65f12fdc877) )
 	ROM_LOAD( "mpr13219.b4", 0x30000, 0x40000, CRC(19e2061f) SHA1(2dcf1718a43dab4da53b4f67722664e70ddd2169) )
 	ROM_LOAD( "mpr13220.b5", 0x70000, 0x40000, CRC(58d4d9ce) SHA1(725e73a656845b02702ef131b4c0aa2a73cdd02e) )
@@ -1436,7 +1436,7 @@ ROM_END
 
 // Shadow Dancer
 ROM_START( shdancbl )
-	ROM_REGION( 0x080000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ic39", 0x000000, 0x10000, CRC(adc1781c) SHA1(b2ca2831a48779df7533e6b2a406ee539e1f650c) )
 	ROM_LOAD16_BYTE( "ic53", 0x000001, 0x10000, CRC(1c1ac463) SHA1(21075f7afae372daef197f04f5f12d14479a8140) )
 	ROM_LOAD16_BYTE( "ic38", 0x020000, 0x10000, CRC(cd6e155b) SHA1(e37b53cc431533091d26b37be9b8e30494de5faf) )
@@ -1506,7 +1506,7 @@ ROM_START( shdancbl )
 	ROM_LOAD16_BYTE( "ic88", 0x1C0000, 0x10000, CRC(9de140e1) SHA1(f1125e056a898a4fa519b49ae866c5c742e36bf7) )
 	ROM_LOAD16_BYTE( "ic87", 0x1E0000, 0x10000, CRC(8172a991) SHA1(6d12b1533a19cb02613b473cc8ba73ece1f2a2fc) )
 
-	ROM_REGION( 0x30000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x30000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "ic45", 0x10000, 0x10000, CRC(576b3a81) SHA1(b65356a3837ed3875634ab0cbcd61acce44f2bb9) )
 	ROM_LOAD( "ic46", 0x20000, 0x10000, CRC(c84e8c84) SHA1(f57895bedb6152c30733e91e6f4795702a62ac3a) )
 ROM_END

@@ -69,7 +69,7 @@ UINT16 *aquarium_bak_videoram;
 #if AQUARIUS_HACK
 static MACHINE_RESET( aquarium )
 {
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	int data = input_port_read(machine, "FAKE");
 
 	/* Language : 0x0000 = Japanese - Other value = English */
@@ -104,7 +104,7 @@ static WRITE16_HANDLER( aquarium_sound_w )
 static WRITE8_HANDLER( aquarium_z80_bank_w )
 {
 	int soundbank = ((data & 0x7) + 1) * 0x8000;
-	UINT8 *Z80 = (UINT8 *)memory_region(space->machine, "audio");
+	UINT8 *Z80 = (UINT8 *)memory_region(space->machine, "audiocpu");
 
 	memory_set_bankptr(space->machine, 1, &Z80[soundbank + 0x10000]);
 }
@@ -348,11 +348,11 @@ static MACHINE_START( aquarium )
 static MACHINE_DRIVER_START( aquarium )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 32000000/2)
+	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 6000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(snd_map,0)
 	MDRV_CPU_IO_MAP(snd_portmap,0)
 
@@ -362,7 +362,7 @@ static MACHINE_DRIVER_START( aquarium )
 #endif
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -389,10 +389,10 @@ static MACHINE_DRIVER_START( aquarium )
 MACHINE_DRIVER_END
 
 ROM_START( aquarium )
-	ROM_REGION( 0x080000, "main", 0 )     /* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 )     /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "aquar3",  0x000000, 0x080000, CRC(344509a1) SHA1(9deb610732dee5066b3225cd7b1929b767579235) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 (sound) code */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 (sound) code */
 	ROM_LOAD( "aquar5",  0x000000, 0x40000, CRC(fa555be1) SHA1(07236f2b2ba67e92984b9ddf4a8154221d535245) )
 	ROM_RELOAD( 		0x010000, 0x40000 )
 

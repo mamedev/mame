@@ -372,7 +372,7 @@ static READ8_HANDLER( psychic5_bankselect_r )
 
 static WRITE8_HANDLER( psychic5_bankselect_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	int bankaddress;
 
 	if (psychic5_bank_latch != data)
@@ -385,7 +385,7 @@ static WRITE8_HANDLER( psychic5_bankselect_w )
 
 static WRITE8_HANDLER( bombsa_bankselect_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	int bankaddress;
 
 	if (psychic5_bank_latch != data)
@@ -680,11 +680,11 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( psychic5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
 	MDRV_CPU_PROGRAM_MAP(psychic5_main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_12MHz/2)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)
 	MDRV_CPU_PROGRAM_MAP(psychic5_sound_map,0)
 	MDRV_CPU_IO_MAP(psychic5_soundport_map,0)
 
@@ -692,7 +692,7 @@ static MACHINE_DRIVER_START( psychic5 )
 	MDRV_MACHINE_RESET(psychic5)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(53.8)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	/* frames per second hand tuned to match game and music speed */
@@ -727,11 +727,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bombsa )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2 ) /* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(bombsa_main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_5MHz )
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
 	MDRV_CPU_PROGRAM_MAP(bombsa_sound_map,0)
 	MDRV_CPU_IO_MAP(bombsa_soundport_map,0)
 
@@ -739,7 +739,7 @@ static MACHINE_DRIVER_START( bombsa )
 	MDRV_MACHINE_RESET(psychic5)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)				/* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -780,11 +780,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( psychic5 )
-	ROM_REGION( 0x20000, "main", 0 ) 					/* Main CPU */
+	ROM_REGION( 0x20000, "maincpu", 0 ) 					/* Main CPU */
 	ROM_LOAD( "p5d",          0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
 	ROM_LOAD( "p5e",          0x10000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) 					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) 					/* Sound CPU */
 	ROM_LOAD( "p5a",          0x00000, 0x08000, CRC(50060ecd) SHA1(e6051fb4a1fa9429cfb6084e8a5dfe994a08280b) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* sprite tiles */
@@ -804,11 +804,11 @@ ROM_START( psychic5 )
 ROM_END
 
 ROM_START( psychic5a )
-	ROM_REGION( 0x20000, "main", 0 ) 					/* Main CPU */
+	ROM_REGION( 0x20000, "maincpu", 0 ) 					/* Main CPU */
 	ROM_LOAD( "myp5d",          0x00000, 0x08000, CRC(1d40a8c7) SHA1(79b36e690ea334c066b55b1e39ceb5fe0688cd7b) )
 	ROM_LOAD( "myp5e",          0x10000, 0x10000, CRC(2fa7e8c0) SHA1(d5096ebec58329346a3292ad2da1be3742fad093) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) 					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) 					/* Sound CPU */
 	ROM_LOAD( "myp5a",          0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* sprite tiles */
@@ -896,13 +896,13 @@ Notes:
 */
 
 ROM_START( bombsa )
-	ROM_REGION( 0x30000, "main", 0 )					/* Main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )					/* Main CPU */
 	ROM_LOAD( "4.7a",         0x00000, 0x08000, CRC(0191f6a7) SHA1(10a0434abbf4be068751e65c81b1a211729e3742) )
 	/* these fail their self-test... should be checked on real hw (hold start1+start2 on boot) */
 	ROM_LOAD( "5.7c",         0x10000, 0x08000, BAD_DUMP CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) ) // contains palettes etc. but fails rom check??
 	ROM_LOAD( "6.7d",         0x20000, 0x10000, BAD_DUMP CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
 
-	ROM_REGION( 0x10000, "audio", 0 )					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
 	ROM_LOAD( "1.3a",         0x00000, 0x08000, CRC(92801404) SHA1(c4ff47989d355b18a909eaa88f138e2f68178ecc) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* sprite tiles */

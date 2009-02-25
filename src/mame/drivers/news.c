@@ -122,12 +122,12 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( news )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -151,7 +151,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( news )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "virus.4", 0x00000, 0x08000, BAD_DUMP CRC(aa005dfb) SHA1(52f4dd399a30568851d43d052b83cfaa6682665d)  ) /* The Original was too short, I padded it with 0xFF */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -163,7 +163,7 @@ ROM_START( news )
 ROM_END
 
 ROM_START( newsa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "newsa_virus.4", 0x00000, 0x10000, CRC(74a257da) SHA1(f1f6db521312f152ec3b1e6efa45a514433b2ffc) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )

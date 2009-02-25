@@ -127,7 +127,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_0_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "main")[bank_address]);
+	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "maincpu")[bank_address]);
 }
 
 
@@ -139,7 +139,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "main")[bank_address]);
+	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "maincpu")[bank_address]);
 }
 
 
@@ -413,10 +413,10 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( supertnk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS9980, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
+	MDRV_CPU_ADD("maincpu", TMS9980, 2598750) /* ? to which frequency is the 20.79 Mhz crystal mapped down? */
 	MDRV_CPU_PROGRAM_MAP(supertnk_map,0)
 	MDRV_CPU_IO_MAP(supertnk_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", supertnk_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", supertnk_interrupt)
 
 	MDRV_MACHINE_RESET(supertnk)
 
@@ -424,7 +424,7 @@ static MACHINE_DRIVER_START( supertnk )
 	MDRV_VIDEO_START(supertnk)
 	MDRV_VIDEO_UPDATE(supertnk)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
@@ -447,7 +447,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( supertnk )
-	ROM_REGION( 0x14000, "main", 0 ) /* 64k for TMS9980 code + 16k of ROM */
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* 64k for TMS9980 code + 16k of ROM */
 	ROM_LOAD( "supertan.2d",  0x00000, 0x0800, CRC(1656a2c1) SHA1(1d49945aed105003a051cfbf646af7a4be1b7e86) )
 	ROM_LOAD( "supertnk.3d",  0x10800, 0x0800, CRC(8b023a9a) SHA1(1afdc8d75f2ca04153bac20c0e3e123e2a7acdb7) )
 	ROM_CONTINUE(			  0x10000, 0x0800)
@@ -479,8 +479,8 @@ static DRIVER_INIT( supertnk )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = memory_region(machine, "main");
-	size_t len = memory_region_length(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
+	size_t len = memory_region_length(machine, "maincpu");
 
 	for (offs = 0; offs < len; offs++)
 	{

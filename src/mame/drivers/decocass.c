@@ -370,12 +370,12 @@ static PALETTE_INIT( decocass )
 static MACHINE_DRIVER_START( decocass )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, HCLK4)
+	MDRV_CPU_ADD("maincpu", M6502, HCLK4)
 	MDRV_CPU_PROGRAM_MAP(decocass_map,0)
 
-	MDRV_CPU_ADD("audio", M6502, HCLK1/3/2)
+	MDRV_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
 	MDRV_CPU_PROGRAM_MAP(decocass_sound_map,0)
-	MDRV_TIMER_ADD_SCANLINE("audionmi", decocass_audio_nmi_gen, "main", 0, 8)
+	MDRV_TIMER_ADD_SCANLINE("audionmi", decocass_audio_nmi_gen, "screen", 0, 8)
 
 	MDRV_CPU_ADD("mcu", I8041, HCLK)
 	MDRV_CPU_IO_MAP(decocass_mcu_portmap,0)
@@ -388,7 +388,7 @@ static MACHINE_DRIVER_START( decocass )
 	MDRV_DECOCASS_TAPE_ADD("cassette")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 
@@ -639,7 +639,7 @@ static MACHINE_DRIVER_START( czeroize )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(czeroize)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
 MACHINE_DRIVER_END
 
@@ -649,7 +649,7 @@ MACHINE_DRIVER_END
 
 
 #define DECOCASS_BIOS \
-	ROM_REGION( 0x10000, "main", 0 ) \
+	ROM_REGION( 0x10000, "maincpu", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "rms8.cpu" ) \
 	ROM_LOAD_BIOS( 0, "rms8.cpu",     0xf000, 0x1000, CRC(23d929b7) SHA1(063f83020ba3d6f43ab8471f95ca919767b93aa4) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "dsp3.p0b & dsp3.p1b" ) \
@@ -659,7 +659,7 @@ MACHINE_DRIVER_END
 #define DECOCASS_COMMON_ROMS	\
 	DECOCASS_BIOS \
 \
-	ROM_REGION( 0x10000, "audio", 0 )	  \
+	ROM_REGION( 0x10000, "audiocpu", 0 )	  \
 	ROM_LOAD( "rms8.snd",     0xf800, 0x0800, CRC(b66b2c2a) SHA1(0097f38beb4872e735e560148052e258a26b08fd) ) \
 \
 	ROM_REGION( 0x10000, "mcu", 0 )	  /* 4k for the MCU (actually 1K ROM + 64 bytes RAM @ 0x800) */ \
@@ -1091,8 +1091,8 @@ ROM_END
 
 static DRIVER_INIT( decocass )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */

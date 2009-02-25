@@ -307,7 +307,7 @@ logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(space->cpu), offset*2, tatsu
 		// hack to make roundup 5 boot
 		if (cpu_get_pc(space->cpu)==0xec575)
 		{
-			UINT8 *dst = memory_region(space->machine, "main");
+			UINT8 *dst = memory_region(space->machine, "maincpu");
 			dst[BYTE_XOR_LE(0xec57a)]=0x46;
 			dst[BYTE_XOR_LE(0xec57b)]=0x46;
 
@@ -342,7 +342,7 @@ WRITE16_HANDLER( tatsumi_v30_68000_w )
 // self-test in Tatsumi games.  Needs fixed, but hack it here for now.
 READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
 {
-	const address_space *space = cputag_get_address_space(device->machine, "audio", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	int r=ym2151_status_port_r(device,0);
 
 	if (cpu_get_pc(space->cpu)==0x2aca || cpu_get_pc(space->cpu)==0x29fe
@@ -356,7 +356,7 @@ READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
 // Mame really should emulate the OKI status reads even with Mame sound off.
 READ8_DEVICE_HANDLER(tatsumi_hack_oki_r)
 {
-	const address_space *space = cputag_get_address_space(device->machine, "audio", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	int r=okim6295_r(device,0);
 
 	if (cpu_get_pc(space->cpu)==0x2b70 || cpu_get_pc(space->cpu)==0x2bb5

@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( mg_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(space->machine, 3,&RAM[bankaddress]);
@@ -264,17 +264,17 @@ static INTERRUPT_GEN( madgear_interrupt )
 static MACHINE_DRIVER_START( lastduel )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* Could be 8 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* Could be 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(lastduel_readmem,lastduel_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(lastduel_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
 
-	MDRV_CPU_ADD("audio", Z80, 3579545) /* Accurate */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -303,17 +303,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( madgear )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* Accurate */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(madgear_readmem,madgear_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(madgear_interrupt,3)	/* 1 for vbl, 2 for control reads?? */
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mg_sound_readmem,mg_sound_writemem)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -562,13 +562,13 @@ INPUT_PORTS_END
 /******************************************************************************/
 
 ROM_START( lastduel )
-	ROM_REGION( 0x60000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "ldu-06.rom",   0x00000, 0x20000, CRC(4228a00b) SHA1(8c23f74f682ba2074da9f3306600c881ce41e50f) )
 	ROM_LOAD16_BYTE( "ldu-05.rom",   0x00001, 0x20000, CRC(7260434f) SHA1(55eeb12977efb3c6afd86d68612782ba526c9055) )
 	ROM_LOAD16_BYTE( "ldu-04.rom",   0x40000, 0x10000, CRC(429fb964) SHA1(78769b05e62c190d846dd08214427d1abbbe2bba) )
 	ROM_LOAD16_BYTE( "ldu-03.rom",   0x40001, 0x10000, CRC(5aa4df72) SHA1(9e7315b793f09c8b422bad1ce776588e3a48d80c) )
 
-	ROM_REGION( 0x10000 , "audio", 0 ) /* audio CPU */
+	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "ld_02.bin",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -605,13 +605,13 @@ ROM_START( lastduel )
 ROM_END
 
 ROM_START( lstduela )
-	ROM_REGION( 0x60000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "06",   0x00000, 0x20000, CRC(0e71acaf) SHA1(e804c77bfd768ae2fc1917bcec1fd0ec7418b780) )
 	ROM_LOAD16_BYTE( "05",   0x00001, 0x20000, CRC(47a85bea) SHA1(9d6b2a4e27c84ffce8ed58aa1b314c67c7314932) )
 	ROM_LOAD16_BYTE( "04",   0x40000, 0x10000, CRC(aa4bf001) SHA1(3f14b174016c6fa4c82011d3d0f1c957096d6d93) )
 	ROM_LOAD16_BYTE( "03",   0x40001, 0x10000, CRC(bbaac8ab) SHA1(3c5773e39e7a96ef62da7b846ce4099222b3e66b) )
 
-	ROM_REGION( 0x10000 , "audio", 0 ) /* audio CPU */
+	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "ld_02.bin",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -648,7 +648,7 @@ ROM_START( lstduela )
 ROM_END
 
 ROM_START( lstduelb )
-	ROM_REGION( 0x60000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "ld_08.bin",    0x00000, 0x10000, CRC(43811a96) SHA1(79db50c941d8845f1642f2257c610768172923a3) )
 	ROM_LOAD16_BYTE( "ld_07.bin",    0x00001, 0x10000, CRC(63c30946) SHA1(cab7374839a68483b3f94821144546cc3eb1528e) )
 	ROM_LOAD16_BYTE( "ld_04.bin",    0x20000, 0x10000, CRC(46a4e0f8) SHA1(7d5fac209357090c5faeee3834c19f1d8125aac5) )
@@ -656,7 +656,7 @@ ROM_START( lstduelb )
 	ROM_LOAD16_BYTE( "ldu-04.rom",   0x40000, 0x10000, CRC(429fb964) SHA1(78769b05e62c190d846dd08214427d1abbbe2bba) )
 	ROM_LOAD16_BYTE( "ldu-03.rom",   0x40001, 0x10000, CRC(5aa4df72) SHA1(9e7315b793f09c8b422bad1ce776588e3a48d80c) )
 
-	ROM_REGION( 0x10000 , "audio", 0 ) /* audio CPU */
+	ROM_REGION( 0x10000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "ld_02.bin",    0x0000, 0x10000, CRC(91834d0c) SHA1(aaa63b8470fc19b82c25028ab27675a7837ab9a1) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -693,13 +693,13 @@ ROM_START( lstduelb )
 ROM_END
 
 ROM_START( madgear )
-	ROM_REGION( 0x80000, "main", 0 )	/* 256K for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 256K for 68000 code */
 	ROM_LOAD16_BYTE( "mg_04.rom",    0x00000, 0x20000, CRC(b112257d) SHA1(4acfd8ba0fe8d68ca7c9b0fde2b13ce0c9104258) )
 	ROM_LOAD16_BYTE( "mg_03.rom",    0x00001, 0x20000, CRC(b2672465) SHA1(96d10046e67181160daebb2b07c867c08f8600dc) )
 	ROM_LOAD16_BYTE( "mg_02.rom",    0x40000, 0x20000, CRC(9f5ebe16) SHA1(2183cb807157d48204d8d4d4b7555c9a7772ddfd) )
 	ROM_LOAD16_BYTE( "mg_01.rom",    0x40001, 0x20000, CRC(1cea2af0) SHA1(9f4642ed2d21fa525e9fecaac6235a3653df3030) )
 
-	ROM_REGION( 0x18000 , "audio", 0 ) /* audio CPU */
+	ROM_REGION( 0x18000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "mg_05.rom",    0x00000,  0x08000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
 	ROM_CONTINUE(             0x10000,  0x08000 )
 
@@ -731,13 +731,13 @@ ROM_START( madgear )
 ROM_END
 
 ROM_START( madgearj )
-	ROM_REGION( 0x80000, "main", 0 )	/* 256K for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 256K for 68000 code */
 	ROM_LOAD16_BYTE( "mdj_04.rom",   0x00000, 0x20000, CRC(9ebbebb1) SHA1(84a2b146c10c1635b11c3af0242fd4680994eb5a) )
 	ROM_LOAD16_BYTE( "mdj_03.rom",   0x00001, 0x20000, CRC(a5579c2d) SHA1(789dcb1cdf5cae20ab497c75460ad98c33d1a046) )
 	ROM_LOAD16_BYTE( "mg_02.rom",    0x40000, 0x20000, CRC(9f5ebe16) SHA1(2183cb807157d48204d8d4d4b7555c9a7772ddfd) )
 	ROM_LOAD16_BYTE( "mg_01.rom",    0x40001, 0x20000, CRC(1cea2af0) SHA1(9f4642ed2d21fa525e9fecaac6235a3653df3030) )
 
-	ROM_REGION(  0x18000 , "audio", 0 ) /* audio CPU */
+	ROM_REGION(  0x18000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "mg_05.rom",    0x00000,  0x08000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
 	ROM_CONTINUE(             0x10000,  0x08000 )
 
@@ -769,13 +769,13 @@ ROM_START( madgearj )
 ROM_END
 
 ROM_START( ledstorm )
-	ROM_REGION( 0x80000, "main", 0 )	/* 256K for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 256K for 68000 code */
 	ROM_LOAD16_BYTE( "mdu.04",    0x00000, 0x20000, CRC(7f7f8329) SHA1(9b7ecb7f5cc3f2c80e05da3b9055e2fbd64bf0ce) )
 	ROM_LOAD16_BYTE( "mdu.03",    0x00001, 0x20000, CRC(11fa542f) SHA1(1cedfc471058e0d0502a1eeafcab479dca4fea41) )
 	ROM_LOAD16_BYTE( "mg_02.rom", 0x40000, 0x20000, CRC(9f5ebe16) SHA1(2183cb807157d48204d8d4d4b7555c9a7772ddfd) )
 	ROM_LOAD16_BYTE( "mg_01.rom", 0x40001, 0x20000, CRC(1cea2af0) SHA1(9f4642ed2d21fa525e9fecaac6235a3653df3030) )
 
-	ROM_REGION(  0x18000 , "audio", 0 ) /* audio CPU */
+	ROM_REGION(  0x18000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "mg_05.rom",    0x00000,  0x08000, CRC(2fbfc945) SHA1(8066516dcf9261abee1edd103bdbe0cc18913ed3) )
 	ROM_CONTINUE(             0x10000,  0x08000 )
 
@@ -807,13 +807,13 @@ ROM_START( ledstorm )
 ROM_END
 
 ROM_START( ledstrm2 )
-	ROM_REGION( 0x80000, "main", 0 )	/* 256K for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 256K for 68000 code */
 	ROM_LOAD16_BYTE( "lsu-04.bin", 0x00000, 0x20000, CRC(56a2f079) SHA1(da581c117d92ac5c1e8e44324f1aed2858a3cdc8) )
 	ROM_LOAD16_BYTE( "lsu-03.bin", 0x00001, 0x20000, CRC(9b6408c0) SHA1(8ef8349f58c62a2d626b1053eae2032d168d602c) )
 	ROM_LOAD16_BYTE( "ls-02.bin", 0x40000, 0x20000, CRC(05c0285e) SHA1(b155d2d0c41f614bd324813c5d3d87a6765ad812) )
 	ROM_LOAD16_BYTE( "ls-01.bin", 0x40001, 0x20000, CRC(8bf934dd) SHA1(f2287a4361af4986eb010dfbfb6de3a3d4124937) )
 
-	ROM_REGION(  0x18000 , "audio", 0 ) /* audio CPU */
+	ROM_REGION(  0x18000 , "audiocpu", 0 ) /* audio CPU */
 	ROM_LOAD( "ls-07.bin",    0x00000,  0x08000, CRC(98af7838) SHA1(a0b87b9ce3c1b0e5d7696ffaab9cea483b9ee928) )
 	ROM_CONTINUE(             0x10000,  0x08000 )
 

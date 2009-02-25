@@ -513,12 +513,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( atarifb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 750000)
+	MDRV_CPU_ADD("maincpu", M6502, 750000)
 	MDRV_CPU_PROGRAM_MAP(atarifb_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2037)	/* 16.3ms * 1/8 = 2037.5. Is it 1/8th or 3/32nds? (1528?) */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -544,7 +544,7 @@ static MACHINE_DRIVER_START( atarifb4 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(atarifb)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(atarifb4_map,0)
 MACHINE_DRIVER_END
 
@@ -553,7 +553,7 @@ static MACHINE_DRIVER_START( abaseb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(atarifb)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(abaseb_map,0)
 
 	/* video hardware */
@@ -570,11 +570,11 @@ static MACHINE_DRIVER_START( soccer )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(atarifb)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(soccer_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
 	MDRV_GFXDECODE(soccer)
 	MDRV_VIDEO_UPDATE(soccer)
@@ -589,7 +589,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( atarifb )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "03302602.m1", 0x6800, 0x0800, CRC(352e35db) SHA1(ae3f1bdb274858edf203dbffe4ba2912c065cff2) )
 	ROM_LOAD( "03302801.p1", 0x7000, 0x0800, CRC(a79c79ca) SHA1(7791b431e9aadb09fd286ae56699c4beda54830a) )
 	ROM_LOAD( "03302702.n1", 0x7800, 0x0800, CRC(e7e916ae) SHA1(d3a188809e83c311699cb103040c4525b36a56e3) )
@@ -604,7 +604,7 @@ ROM_END
 
 
 ROM_START( atarifb1 )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "03302601.m1", 0x6800, 0x0800, CRC(f8ce7ed8) SHA1(54520d7d31c6c8f9028b7253a33aba3b2c35ae7c) )
 	ROM_LOAD( "03302801.p1", 0x7000, 0x0800, CRC(a79c79ca) SHA1(7791b431e9aadb09fd286ae56699c4beda54830a) )
 	ROM_LOAD( "03302701.n1", 0x7800, 0x0800, CRC(7740be51) SHA1(3f610061f081eb5589b00a496877bc58f6e0f09f) )
@@ -619,7 +619,7 @@ ROM_END
 
 
 ROM_START( atarifb4 )
-	ROM_REGION( 0x8000, "main", 0 ) /* 64k for code, the ROMs are nibble-wide */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* 64k for code, the ROMs are nibble-wide */
 	ROM_LOAD_NIB_LOW ( "34889.m1", 0x6000, 0x0400, CRC(5c63974a) SHA1(e91f318be80d985a09ff92f4db5792290a06dc0f) )
 	ROM_LOAD_NIB_HIGH( "34891.m2", 0x6000, 0x0400, CRC(9d03baa1) SHA1(1b57f39fa4d43e3f3d22f2d9a5478b5f5e4d0cb1) )
 	ROM_LOAD_NIB_LOW ( "34890.n1", 0x6400, 0x0400, CRC(2deb5844) SHA1(abc7cc80d5fcac13f50f6cc550ea7a8f322434c9) )
@@ -647,7 +647,7 @@ ROM_END
 
 
 ROM_START( abaseb )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "34738-01.n0", 0x6000, 0x0800, CRC(edcfffe8) SHA1(a445668352da5039ed1a090bcdf2ce092215f165) )
 	ROM_LOAD( "34737-03.m1", 0x6800, 0x0800, CRC(7250863f) SHA1(83ec735a60d74ca9c3e3f5d4b248071f3e3330af) )
 	ROM_LOAD( "34735-01.p1", 0x7000, 0x0800, CRC(54854d7c) SHA1(536d57b00929bf9d1cd1b209b41004cb78e2cd93) )
@@ -663,7 +663,7 @@ ROM_END
 
 
 ROM_START( abaseb2 )
-	ROM_REGION( 0x8000, "main", 0 ) /* 64k for code, the ROMs are nibble-wide */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* 64k for code, the ROMs are nibble-wide */
 	ROM_LOAD_NIB_LOW ( "034725.c0", 0x6000, 0x0400, CRC(95912c58) SHA1(cb15b60e31ee212e30a81c170611be1e36d2a6dd) )
 	ROM_LOAD_NIB_HIGH( "034723.m0", 0x6000, 0x0400, CRC(5eb1597f) SHA1(78f83d4e79de13d3723732d68738660c3f8d4787) )
 	ROM_LOAD_NIB_LOW ( "034726.b0", 0x6400, 0x0400, CRC(1f8d506c) SHA1(875464ca2ee50b36ceb5989cd40a28c69953c641) )
@@ -691,7 +691,7 @@ ROM_END
 
 
 ROM_START( soccer )
-	ROM_REGION( 0x4000, "main", 0 ) /* 64k for code, the ROMs are nibble-wide */
+	ROM_REGION( 0x4000, "maincpu", 0 ) /* 64k for code, the ROMs are nibble-wide */
 	ROM_LOAD_NIB_LOW ( "035222.e1", 0x2000, 0x0400, CRC(03ec6bce) SHA1(f81f2ac3bab5f1ae687543427e0187ca51d3be7e) )
 	ROM_LOAD_NIB_HIGH( "035224.e2", 0x2000, 0x0400, CRC(a1aeaa70) SHA1(2018318a0e652b1dbea7696ef3dc2b7f12ebd632) )
 	ROM_LOAD_NIB_LOW ( "035223.f1", 0x2400, 0x0400, CRC(9c600726) SHA1(f652b42b93e43124b0363b52f0f13cb9154987e3) )

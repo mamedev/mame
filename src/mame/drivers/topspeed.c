@@ -406,7 +406,7 @@ logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(s
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine,  10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  10, memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */
@@ -701,22 +701,22 @@ static MACHINE_RESET( topspeed )
 static MACHINE_DRIVER_START( topspeed )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(topspeed_readmem,topspeed_writemem)
-	MDRV_CPU_VBLANK_INT("main", topspeed_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", topspeed_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)	/* 12 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(topspeed_cpub_readmem,topspeed_cpub_writemem)
-	MDRV_CPU_VBLANK_INT("main", topspeed_cpub_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", topspeed_cpub_interrupt)
 
 	MDRV_MACHINE_START(topspeed)
 	MDRV_MACHINE_RESET(topspeed)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -751,7 +751,7 @@ Note: driver does NOT make use of the zoom sprite tables rom.
 ***************************************************************************/
 
 ROM_START( topspeed )
-	ROM_REGION( 0x100000, "main", 0 )	/* 128K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 128K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE( "b14-67-1.11", 0x00000, 0x10000, CRC(23f17616) SHA1(653ab6537f2e5898a77060c82b776852ab1f2b51) )
 	ROM_LOAD16_BYTE( "b14-68-1.9",  0x00001, 0x10000, CRC(835659d9) SHA1(e99967f795c3c6e14bad7a66315640ca5db43c72) )
 	ROM_LOAD16_BYTE( "b14-54.24",   0x80000, 0x20000, CRC(172924d5) SHA1(4a963f2e816f4b1c5acc6d38e99a68d3baeee8c6) )	/* 4 data roms */
@@ -763,7 +763,7 @@ ROM_START( topspeed )
 	ROM_LOAD16_BYTE( "b14-69.80",   0x00000, 0x10000, CRC(d652e300) SHA1(b559bdb564d96da4c656dc7b2c88dae84c4861ae) )
 	ROM_LOAD16_BYTE( "b14-70.81",   0x00001, 0x10000, CRC(b720592b) SHA1(13298b498a198dcc1a56e533d106545dd77e1bbc) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
 
@@ -805,7 +805,7 @@ ROM_START( topspeed )
 ROM_END
 
 ROM_START( topspedu )
-	ROM_REGION( 0x100000, "main", 0 )	/* 128K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 128K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE     ( "b14-23", 0x00000, 0x10000, CRC(dd0307fd) SHA1(63218a707c78b3c785d1741dabdc511a76f12af1) )
 	ROM_LOAD16_BYTE     ( "b14-24", 0x00001, 0x10000, CRC(acdf08d4) SHA1(506d48d27fc26684a3f884919665cf65a1b3062f) )
 	ROM_LOAD16_WORD_SWAP( "b14-05", 0x80000, 0x80000, CRC(6557e9d8) SHA1(ff528b27fcaef5c181f5f3a56d6a41b935cf07e1) )	/* data rom */
@@ -814,7 +814,7 @@ ROM_START( topspedu )
 	ROM_LOAD16_BYTE( "b14-26", 0x00000, 0x10000, CRC(659dc872) SHA1(0a168122fe6324510c830e21a56eace9c8a2c189) )
 	ROM_LOAD16_BYTE( "b14-56", 0x00001, 0x10000, CRC(d165cf1b) SHA1(bfbb8699c5671d3841d4057678ef4085c1927684) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
 
@@ -840,7 +840,7 @@ ROM_START( topspedu )
 ROM_END
 
 ROM_START( fullthrl )
-	ROM_REGION( 0x100000, "main", 0 )	/* 128K for 68000 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 128K for 68000 code (CPU A) */
 	ROM_LOAD16_BYTE     ( "b14-67", 0x00000, 0x10000, CRC(284c943f) SHA1(e4720b138052d9cbf1290aeca8f9dd7fe2cffcc5) )	// Later rev?
 	ROM_LOAD16_BYTE     ( "b14-68", 0x00001, 0x10000, CRC(54cf6196) SHA1(0e86a7bf7d43526222160f4cd09f8d29fa9abdc4) )
 	ROM_LOAD16_WORD_SWAP( "b14-05", 0x80000, 0x80000, CRC(6557e9d8) SHA1(ff528b27fcaef5c181f5f3a56d6a41b935cf07e1) )	/* data rom */
@@ -849,7 +849,7 @@ ROM_START( fullthrl )
 	ROM_LOAD16_BYTE( "b14-69.80", 0x00000, 0x10000, CRC(d652e300) SHA1(b559bdb564d96da4c656dc7b2c88dae84c4861ae) )
 	ROM_LOAD16_BYTE( "b14-71",    0x00001, 0x10000, CRC(f7081727) SHA1(f0ab6ce9975dd7a1fadd439fd3dfd2f1bf88796c) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* Z80 sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* Z80 sound cpu */
 	ROM_LOAD( "b14-25.67", 0x00000, 0x04000, CRC(9eab28ef) SHA1(9a90f2c1881f4664d6d6241f3bc57faeaf150ffc) )
 	ROM_CONTINUE(          0x10000, 0x0c000 )	/* banked stuff */
 

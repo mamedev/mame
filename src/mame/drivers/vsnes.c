@@ -1753,7 +1753,7 @@ INPUT_PORTS_END
 
 static const nes_interface nes_interface_1 =
 {
-	"main"
+	"maincpu"
 };
 
 static const nes_interface nes_interface_2 =
@@ -1764,13 +1764,13 @@ static const nes_interface nes_interface_2 =
 static MACHINE_DRIVER_START( vsnes )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", N2A03,N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(vsnes_cpu1_map,0)
 								/* some carts also trigger IRQs */
 	MDRV_MACHINE_RESET(vsnes)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)
@@ -1797,7 +1797,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vsdual )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", N2A03,N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(vsnes_cpu1_map,0)
 								/* some carts also trigger IRQs */
 	MDRV_CPU_ADD("sub", N2A03,N2A03_DEFAULTCLOCK)
@@ -1848,7 +1848,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( suprmrio)
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-sm4.1d",  0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
 	ROM_LOAD( "mds-sm4.1c",  0xa000, 0x2000, CRC(0011fc5a) SHA1(5c2c49938a12affc03e64e5bdab307998be20020) )
 	ROM_LOAD( "mds-sm4.1b",  0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
@@ -1860,7 +1860,7 @@ ROM_START( suprmrio)
 ROM_END
 
 ROM_START( suprmria )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-sm4.1d",  0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
 	ROM_LOAD( "mds-sm4.1c",  0xa000, 0x2000, CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) ) /* this rom differs by TWO BYTES from the other version in suprmrio. this version has been dumped/observed on two known boards and one anonymous board */
 	ROM_LOAD( "mds-sm4.1b",  0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
@@ -1872,7 +1872,7 @@ ROM_START( suprmria )
 ROM_END
 
 ROM_START( skatekds )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-sm4.1d",  0x8000, 0x2000,CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
 	ROM_LOAD( "mds-sm4.1c",  0xa000, 0x2000,CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) )
 	ROM_LOAD( "mds-sm4.1b",  0xc000, 0x2000,CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
@@ -1884,7 +1884,7 @@ ROM_START( skatekds )
 ROM_END
 
 ROM_START( iceclimb )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "ic-1d",  0x8000, 0x2000, CRC(65e21765) SHA1(900f1efe5e8005ee8cdccbf5039914dfe466aa3d) )
 	ROM_LOAD( "ic-1c",  0xa000, 0x2000, CRC(a7909c51) SHA1(04708a9e429cbddab6988ff7b3ec5aa0109f6228) )
 	ROM_LOAD( "ic-1b",  0xc000, 0x2000, CRC(7fb3cc21) SHA1(bed673211f2251d4112ea41c4a1f917fee32d93c) )
@@ -1896,7 +1896,7 @@ ROM_START( iceclimb )
 ROM_END
 
 ROM_START( iceclmbj )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-ic4-4_6d_b.bin",  0x8000, 0x2000, CRC(0ea5f9cb) SHA1(3ba6228ac8011371fc36ce9dde4fc158a81a99a2) )
 	ROM_LOAD( "mds-ic4-4_6c_b.bin",  0xa000, 0x2000, CRC(51fe438e) SHA1(f40812d4275dabaac6f9539e1300c08d07992654) )
 	ROM_LOAD( "mds-ic4-4_6b_b-1.bin",0xc000, 0x2000, CRC(a8afdc62) SHA1(f798da6c107926790026d4a4d384961dbff2380e) )
@@ -1909,7 +1909,7 @@ ROM_END
 
 /* Gun games */
 ROM_START( duckhunt )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-dh3.1d",  0x8000, 0x2000, CRC(3f51f0ed) SHA1(984d8a5cecddde776ffd4f718ee0ca7a9959228b) )
 	ROM_LOAD( "mds-dh3.1c",  0xa000, 0x2000, CRC(8bc7376c) SHA1(d90d663c5e5b6d5247089c8ba618912305049b19) )
 	ROM_LOAD( "mds-dh3.1b",  0xc000, 0x2000, CRC(a042b6e1) SHA1(df571c31a6a52df56869eda0621f7615a625e66d) )
@@ -1921,7 +1921,7 @@ ROM_START( duckhunt )
 ROM_END
 
 ROM_START( hogalley )
-	ROM_REGION( 0x10000, "main",0  ) /* 6502 memory */
+	ROM_REGION( 0x10000, "maincpu",0  ) /* 6502 memory */
 	ROM_LOAD( "mds-ha4-1_1d_or_6d_e-1.bin",  0x8000, 0x2000, CRC(2089e166) SHA1(7db09b5b6bcd87589bed89a5fc1a4b772155a0f3) )
 	ROM_LOAD( "mds-ha4-1_1c_or_6c_e-1.bin",  0xa000, 0x2000, CRC(a85934ae) SHA1(f26af4f60a4072c45e900dff7f74d9907bc2e1e0) )
 	ROM_LOAD( "mds-ha4-1_1b_or_6b_e-1.bin",  0xc000, 0x2000, CRC(718e25b3) SHA1(2710827931d3cd55984c3107c3b8e0f691965eaa) )
@@ -1933,7 +1933,7 @@ ROM_START( hogalley )
 ROM_END
 
 ROM_START( vsgshoe )
-	ROM_REGION( 0x14000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x14000,"maincpu", 0 ) /* 6502 memory */
 	/* 2 banks mapped at 0x8000 */
 	ROM_LOAD( "mds-gm5.1d",  0x10000, 0x4000, CRC(063b342f) SHA1(66f69de27db5b08969f9250d0a6760e7311bd9bf)  ) // its probably not bad .. just banked somehow
 	ROM_LOAD( "mds-gm5.1c",  0x0a000, 0x2000, CRC(e1b7915e) SHA1(ed0fdf74b05a3ccd1645c4f580436fd439f81dea) )
@@ -1946,7 +1946,7 @@ ROM_START( vsgshoe )
 ROM_END
 
 ROM_START( vsfdf )
-	ROM_REGION( 0x30000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x30000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "prg2", 0x10000, 0x10000, CRC(3bce8f0f) SHA1(5a9b91bae4b28c1df54fb290efdec4805f4f217e) )
 	ROM_LOAD( "prg1", 0x20000, 0x10000, CRC(c74499ce) SHA1(14f50d4d11c363e761a6472a6e57a5e5a6dab9ce) )
 
@@ -1955,7 +1955,7 @@ ROM_START( vsfdf )
 ROM_END
 
 ROM_START( goonies )
-	ROM_REGION( 0x20000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x20000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "prg.u7",  0x10000, 0x10000, CRC(1e438d52) SHA1(ac187904c125e56a71acff979e53f3398a05c075) )
 
 	ROM_REGION( 0x10000,"gfx1", 0 ) /* PPU memory */
@@ -1963,7 +1963,7 @@ ROM_START( goonies )
 ROM_END
 
 ROM_START( vsgradus )
-	ROM_REGION( 0x20000,"main", 0  ) /* 6502 memory */
+	ROM_REGION( 0x20000,"maincpu", 0  ) /* 6502 memory */
 	ROM_LOAD( "prg.u7",  0x10000, 0x10000, CRC(d99a2087) SHA1(b26efe78798453a903921723f3c9ac69f579b7d2) )
 
 	ROM_REGION( 0x10000,"gfx1", 0 ) /* PPU memory */
@@ -1971,7 +1971,7 @@ ROM_START( vsgradus )
 ROM_END
 
 ROM_START( btlecity )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "bc.1d",  0x8000, 0x2000, CRC(6aa87037) SHA1(f3313700955498800a3d59c523ba2a4e0cf443bc) )
 	ROM_LOAD( "bc.1c",  0xa000, 0x2000, CRC(bdb317db) SHA1(a8b3e8deb1e625d764aaffe86a513bc7ede51a46) )
 	ROM_LOAD( "bc.1b",  0xc000, 0x2000, CRC(1a0088b8) SHA1(ba90d8178a23caedbf0e7188256b7cbfebf35eeb) )
@@ -1983,7 +1983,7 @@ ROM_START( btlecity )
 ROM_END
 
 ROM_START( cluclu )
-	ROM_REGION( 0x10000,"main", 0  ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0  ) /* 6502 memory */
 	ROM_LOAD( "cl.6d",  0x8000, 0x2000, CRC(1e9f97c9) SHA1(47d847632145d8160d006f014f9e0a7483783d0e) )
 	ROM_LOAD( "cl.6c",  0xa000, 0x2000, CRC(e8b843a7) SHA1(03827b31d47d2a8a132bf9944fee724c6c1c6d2e) )
 	ROM_LOAD( "cl.6b",  0xc000, 0x2000, CRC(418ee9ea) SHA1(a68e8a97899e850884cb9484fe539b86c419f10f) )
@@ -1995,7 +1995,7 @@ ROM_START( cluclu )
 ROM_END
 
 ROM_START( excitebk )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-eb4.1d",  0x8000, 0x2000, CRC(7e54df1d) SHA1(38d878041976386e8608c73133040b18d0e4b9cd) )
 	ROM_LOAD( "mds-eb4.1c",  0xa000, 0x2000, CRC(89baae91) SHA1(6aebf13c415e3246edf7daa847533b7e3ae0425f) )
 	ROM_LOAD( "mds-eb4.1b",  0xc000, 0x2000, CRC(4c0c2098) SHA1(078f24ce02f5fb91d7ed7fa59aec8efbec38aed1) )
@@ -2007,7 +2007,7 @@ ROM_START( excitebk )
 ROM_END
 
 ROM_START( excitbkj )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-eb4-4_6d_a.bin",  0x8000, 0x2000, CRC(6aa87037) SHA1(f3313700955498800a3d59c523ba2a4e0cf443bc) )
 	ROM_LOAD( "mds-eb4-4_6c_a.bin",  0xa000, 0x2000, CRC(bdb317db) SHA1(a8b3e8deb1e625d764aaffe86a513bc7ede51a46) )
 	ROM_LOAD( "mds-eb4-4_6b_a.bin",  0xc000, 0x2000, CRC(d1afe2dd) SHA1(ef0f44d98464b7dab7c51be4379242f7a4e4fcdd) )
@@ -2019,7 +2019,7 @@ ROM_START( excitbkj )
 ROM_END
 
 ROM_START( jajamaru )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "10.bin", 0x8000, 0x2000, CRC(16af1704) SHA1(ebcf9ad06e302c51ee4432631a6b0fb85a9630ed) )
 	ROM_LOAD( "9.bin",  0xa000, 0x2000, CRC(db7d1814) SHA1(6a0c9cf97006a8a41dc2f025a5f8acbb798dec60) )
 	ROM_LOAD( "8.bin",  0xc000, 0x2000, CRC(ce263271) SHA1(1e5e2a9e0dcebeccd7df59491ca0bc5ac4d0d42b) )
@@ -2031,7 +2031,7 @@ ROM_START( jajamaru )
 ROM_END
 
 ROM_START( ladygolf)
-	ROM_REGION( 0x10000,"main", 0  ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0  ) /* 6502 memory */
 	ROM_LOAD( "lg-1d",  0x8000, 0x2000, CRC(8b2ab436) SHA1(145a75f30f1fab5b1babf01ada9ed23f59c2c18d) )
 	ROM_LOAD( "lg-1c",  0xa000, 0x2000, CRC(bda6b432) SHA1(c8322f07df0adbd70cb49f2284b046478a3a57c1) )
 	ROM_LOAD( "lg-1b",  0xc000, 0x2000, CRC(dcdd8220) SHA1(563028f8db9ad221d8ac8f8096b4587b822eedb7) )
@@ -2043,7 +2043,7 @@ ROM_START( ladygolf)
 ROM_END
 
 ROM_START( smgolfj )
-	ROM_REGION( 0x10000,"main", 0  ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0  ) /* 6502 memory */
 	ROM_LOAD( "mds-gf3_6d_b.bin",  0x8000, 0x2000, CRC(8ce375b6) SHA1(f787f5ebe584cc95428b63660cd41e2b3df6ddf2) )
 	ROM_LOAD( "mds-gf3_6c_b.bin",  0xa000, 0x2000, CRC(50a938d3) SHA1(5f5c5e50024fe113240f1b0b3b6d38cbf9130133) )
 	ROM_LOAD( "mds-gf3_6b_b.bin",  0xc000, 0x2000, CRC(7dc39f1f) SHA1(12ff2f0ec7418754f9b6e600746e15f345e3ddaa) )
@@ -2055,7 +2055,7 @@ ROM_START( smgolfj )
 ROM_END
 
 ROM_START( machridr )
-	ROM_REGION( 0x10000,"main",0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "mr-1d",  0x8000, 0x2000, CRC(379c44b9) SHA1(7b148ba7f7eea64509733f94b4eaafe5bfcf3527) )
 	ROM_LOAD( "mr-1c",  0xa000, 0x2000, CRC(cb864802) SHA1(65f06a8eaca3347432f3f2f673a24692415d869f) )
 	ROM_LOAD( "mr-1b",  0xc000, 0x2000, CRC(5547261f) SHA1(aedb7ab1ef0cd32f325ec9fc948ca1e21a78aa7a) )
@@ -2067,7 +2067,7 @@ ROM_START( machridr )
 ROM_END
 
 ROM_START( machridj )
-	ROM_REGION( 0x10000,"main",0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "mds-mr4-1_1d_or_6d_a.bin",  0x8000, 0x2000, CRC(ab7e0594) SHA1(fc5982a93791608a20e5ec9e3a4b71d702bda354) )
 	ROM_LOAD( "mds-mr4-1_1c_or_6c_a.bin",  0xa000, 0x2000, CRC(d4a341c3) SHA1(c799e40d0ebd1447032d8767fb2caeee6b33f31a) )
 	ROM_LOAD( "mds-mr4-1_1b_or_6b_a.bin",  0xc000, 0x2000, CRC(cbdcfece) SHA1(91f3a0e1e91bdbb61721e9777009299f7e8efa96) )
@@ -2079,7 +2079,7 @@ ROM_START( machridj )
 ROM_END
 
 ROM_START(smgolf)
-	ROM_REGION( 0x10000,"main",0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "golf-1d",  0x8000, 0x2000, CRC(a3e286d3) SHA1(ee7539a46e0e062ffd63d84e8b83de29b860a501) )
 	ROM_LOAD( "golf-1c",  0xa000, 0x2000, CRC(e477e48b) SHA1(2ebcc548ac8defc521860d2d2f585be0eee6620e) )
 	ROM_LOAD( "golf-1b",  0xc000, 0x2000, CRC(7d80b511) SHA1(52aa7e798ff8d933b023bcade81a39f7e27d02c5) )
@@ -2091,7 +2091,7 @@ ROM_START(smgolf)
 ROM_END
 
 ROM_START( smgolfb )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "gf4-2.1df",	0x8000, 0x2000, CRC(4a723087) SHA1(87dc063d295f55871598a1e1eb4e62ce298b2f0c) )
 	ROM_LOAD( "gf4-2.1cf",  0xa000, 0x2000, CRC(2debda63) SHA1(33b42eb5641ec947b2f2dcbc632ee6c81fa2ffe3) )
 	ROM_LOAD( "gf4-2.1bf",  0xc000, 0x2000, CRC(6783652f) SHA1(7165ee59d3787cb56eed4791351da07f4bcc68ed) )
@@ -2103,7 +2103,7 @@ ROM_START( smgolfb )
 ROM_END
 
 ROM_START( vspinbal )
-	ROM_REGION( 0x10000, "main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "pb-6d",  0x8000, 0x2000, CRC(69fc575e) SHA1(d5165959c3569f5ebccd03d2cad4714f9240cc4c) )
 	ROM_LOAD( "pb-6c",  0xa000, 0x2000, CRC(fa9472d2) SHA1(d20ffb156bea1f474ad7d9776e217cb05048f00f) )
 	ROM_LOAD( "pb-6b",  0xc000, 0x2000, CRC(f57d89c5) SHA1(03f3a27d806c61fef13b0d8b2d8b9a15ee968e80) )
@@ -2115,7 +2115,7 @@ ROM_START( vspinbal )
 ROM_END
 
 ROM_START( vspinblj )
-	ROM_REGION( 0x10000, "main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-pn3_6d_b.bin",  0x8000, 0x2000, CRC(fd50c42e) SHA1(4a3ea9e85b60caf8b6975fd2798bc59e86ec257f) )
 	ROM_LOAD( "mds-pn3_6c_b.bin",  0xa000, 0x2000, CRC(59beb9e5) SHA1(682b31dfbdf1ee44fd5d5d63169ab35409e93546) )
 	ROM_LOAD( "mds-pn3_6b_b.bin",  0xc000, 0x2000, CRC(ce7f47ce) SHA1(c548c1b94d3807b4968629c7fdce8aae3a61e6e0) )
@@ -2127,7 +2127,7 @@ ROM_START( vspinblj )
 ROM_END
 
 ROM_START( vsslalom )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-sl4.1d",  0x8000, 0x2000, CRC(6240a07d) SHA1(c9a3743a1caaa417c3828365a4c7a75272c20146) )
 	ROM_LOAD( "mds-sl4.1c",  0xa000, 0x2000, CRC(27c355e4) SHA1(ba55258396a17858e136fe45332f6cc13a46b072) )
 	ROM_LOAD( "mds-sl4.1b",  0xc000, 0x2000, CRC(d4825fbf) SHA1(5e7fcfa1999c52f94be28c693acffc6e5d434674) )
@@ -2138,7 +2138,7 @@ ROM_START( vsslalom )
 ROM_END
 
 ROM_START( vssoccer )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "soccer1d",  0x8000, 0x2000, CRC(0ac52145) SHA1(148d9850cd80fb64e28f478891c16dac71e67e96) )
 	ROM_LOAD( "soccer1c",  0xa000, 0x2000, CRC(f132e794) SHA1(f289f5acec7e2a62fc569a401e7ab5200df302f5) )
 	ROM_LOAD( "soccer1b",  0xc000, 0x2000, CRC(26bb7325) SHA1(80e97a36c364a07cf9862202454651fb2872cd51) )
@@ -2150,7 +2150,7 @@ ROM_START( vssoccer )
 ROM_END
 
 ROM_START( starlstr )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "sl_04.1d",  0x8000, 0x2000, CRC(4fd5b385) SHA1(a4cfdb9d74538a162825d9fbbed67e2a645bcc2c) )
 	ROM_LOAD( "sl_03.1c",  0xa000, 0x2000, CRC(f26cd7ca) SHA1(f6fd5a6028b111a8fca68684bad651a92e0fd7be) )
 	ROM_LOAD( "sl_02.1b",  0xc000, 0x2000, CRC(9308f34e) SHA1(4438d13dad793bbc158a5d163ccd4ae26f914fb5) )
@@ -2162,7 +2162,7 @@ ROM_START( starlstr )
 ROM_END
 
 ROM_START( vstetris )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "a000.6c",  0xa000, 0x2000, CRC(92a1cf10) SHA1(463f62aec3f26d70b35e804398a38baf8f41a5e3) )
 	ROM_LOAD( "c000.6b",  0xc000, 0x2000, CRC(9e9cda9d) SHA1(27d91b957ff0b3abd5567341574318548470fb3c) )
 	ROM_LOAD( "e000.6a",  0xe000, 0x2000, CRC(bfeaf6c1) SHA1(2f2150138c023cb7962f3e04d34bd01be9fa2e24) )
@@ -2172,7 +2172,7 @@ ROM_START( vstetris )
 ROM_END
 
 ROM_START( drmario )
-	ROM_REGION( 0x20000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x20000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "dm-uiprg",  0x10000, 0x10000, CRC(d5d7eac4) SHA1(cd74c3a7a2fc7c25420037ae5f4a25307aff6587) )
 
 	ROM_REGION( 0x8000,"gfx1", 0 ) /* PPU memory */
@@ -2180,21 +2180,21 @@ ROM_START( drmario )
 ROM_END
 
 ROM_START( cstlevna )
-	ROM_REGION( 0x30000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x30000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-cv.prg",  0x10000, 0x20000, CRC(ffbef374) SHA1(9eb3b75e7b45df51b8bcd29df84689a7e8557f4f) )
 
 	/* No cart gfx - uses vram */
 ROM_END
 
 ROM_START( topgun )
-	ROM_REGION( 0x30000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x30000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "rc-003",  0x10000, 0x20000, CRC(8c0c2df5) SHA1(d9b1b87204e025a637821a0168475e1209ce0c8a) )
 
 	/* No cart gfx - uses vram */
 ROM_END
 
 ROM_START( tkoboxng )
-	ROM_REGION( 0x20000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x20000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "tkoprg.bin",  0x10000, 0x10000, CRC(eb2dba63) SHA1(257c9f3565ff1d136094e99636ca57e300352b7e) )
 
 	ROM_REGION( 0x10000,"gfx1", 0 ) /* PPU memory */
@@ -2202,7 +2202,7 @@ ROM_START( tkoboxng )
 ROM_END
 
 ROM_START( rbibb )
-	ROM_REGION( 0x20000,"main",0 ) /* 6502 memory */
+	ROM_REGION( 0x20000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "rbi-prg",  0x10000, 0x10000, CRC(135adf7c) SHA1(e090b0aec98463c565e300a910561499d8bd9676) )
 
 	ROM_REGION( 0x8000,"gfx1", 0 ) /* PPU memory */
@@ -2210,7 +2210,7 @@ ROM_START( rbibb )
 ROM_END
 
 ROM_START( rbibba )
-	ROM_REGION( 0x20000,"main",0 ) /* 6502 memory */
+	ROM_REGION( 0x20000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "rbi-prga", 0x10000, 0x10000, CRC(a5939d0d) SHA1(476ac2a3974b69082bb8eebdfc0d15befaa2e165) )
 
 	ROM_REGION( 0x8000,"gfx1", 0 ) /* PPU memory */
@@ -2218,7 +2218,7 @@ ROM_START( rbibba )
 ROM_END
 
 ROM_START( vsskykid )
-	ROM_REGION( 0x18000,"main",0 ) /* 6502 memory */
+	ROM_REGION( 0x18000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "sk-prg1",  0x10000, 0x08000, CRC(cf36261e) SHA1(e4a3d2a223f066c231631d92504f08e60b303dfd) )
 
 	ROM_REGION( 0x8000,"gfx1" , 0) /* PPU memory */
@@ -2226,7 +2226,7 @@ ROM_START( vsskykid )
 ROM_END
 
 ROM_START( platoon )
-	ROM_REGION( 0x30000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x30000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "prgver0.ic4",  0x10000, 0x20000, CRC(e2c0a2be) SHA1(1f8e33d6da8402be6a376668a424bfde38471021) )
 
 	ROM_REGION( 0x20000,"gfx1", 0 ) /* PPU memory */
@@ -2234,7 +2234,7 @@ ROM_START( platoon )
 ROM_END
 
 ROM_START( bnglngby )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-rb4-2_6d_b.bin", 0x8000, 0x2000, CRC(d152d8c2) SHA1(d127195be8219df1c6f7bdd86658ed26c658470e) )
 	ROM_LOAD( "mds-rb4-2_6c_b.bin", 0xa000, 0x2000, CRC(c3383935) SHA1(8ed1e8ed36069e5e6f2f3c672aae5e1f3dabbdd0) )
 	ROM_LOAD( "mds-rb4-2_6b_b.bin", 0xc000, 0x2000, CRC(e2a24af8) SHA1(89cca4188b859882487fe64776c1ca0173fee142) )
@@ -2249,7 +2249,7 @@ ROM_START( bnglngby )
 ROM_END
 
 ROM_START( supxevs )
-	ROM_REGION( 0x30000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x30000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "prg2",  0x10000, 0x10000, CRC(645669f0) SHA1(3b18c0bb33dd5a95f52a2de7b9a5730990517ad9) )
 	ROM_LOAD( "prg1",  0x20000, 0x10000, CRC(ff762ceb) SHA1(04ca386ef4ad79f99d1efdc0a4d908ef0e523d75) )
 
@@ -2258,7 +2258,7 @@ ROM_START( supxevs )
 ROM_END
 
 ROM_START( mightybj )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "1d.bin",  0x8000, 0x2000, CRC(55dc8d77) SHA1(eafb8636d994a10caee9eb0ba544260281706058) )
 	ROM_LOAD( "1c.bin",  0xa000, 0x2000, CRC(151a6d15) SHA1(2652aef97aae122711ef471d9dc1d42f6393b91f) )
 	ROM_LOAD( "1b.bin",  0xc000, 0x2000, CRC(9f9944bc) SHA1(58b1aca3e0cd32769978c704177d6ddeb70ac95a) )
@@ -2271,7 +2271,7 @@ ROM_END
 /* Dual System */
 
 ROM_START( balonfgt )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "bf.1d",  0x08000, 0x02000, CRC(1248a6d6) SHA1(0f6c586e8e021a0710ec4e967750b55a74229d74) )
 	ROM_LOAD( "bf.1c",  0x0a000, 0x02000, CRC(14af0e42) SHA1(ceb749eca2dfe81fddc6cb57e4aa87a4bfac0316) )
 	ROM_LOAD( "bf.1b",  0x0c000, 0x02000, CRC(a420babf) SHA1(ab296a86132bb9103cbb107518b4ac9beb8b2e11) )
@@ -2293,7 +2293,7 @@ ROM_START( balonfgt )
 ROM_END
 
 ROM_START( vsmahjng )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mj.1c",  0x0a000, 0x02000, CRC(ec77671f) SHA1(3716a4d5ab1efee0416dd7f6466d29379dc6f296) )
 	ROM_LOAD( "mj.1b",  0x0c000, 0x02000, CRC(ac53398b) SHA1(2582c73efec233a389900949d6af7c4c9a9e7148) )
 	ROM_LOAD( "mj.1a",  0x0e000, 0x02000, CRC(62f0df8e) SHA1(5628397c5d9acf470cc0cbffdba20e9e4cc8ea91) )
@@ -2311,7 +2311,7 @@ ROM_START( vsmahjng )
 ROM_END
 
 ROM_START( vsbball )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "bb-1d",  0x08000, 0x02000, CRC(0cc5225f) SHA1(a8eb3153ce3f1282901c305177347112df0fb3b2) )
 	ROM_LOAD( "bb-1c",  0x0a000, 0x02000, CRC(9856ac60) SHA1(f033171c3dea6af63f1f328fee74e695c67adc92) )
 	ROM_LOAD( "bb-1b",  0x0c000, 0x02000, CRC(d1312e63) SHA1(0fc46a4ef0fb8a304320f8b3cac3edd1cd9ed286) )
@@ -2333,7 +2333,7 @@ ROM_START( vsbball )
 ROM_END
 
 ROM_START( vsbballj )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-ba_1d_a-1.bin",  0x08000, 0x02000, CRC(6dbc129b) SHA1(3e786632563364bf7ae13c7d25c522999f237009) )
 	ROM_LOAD( "mds-ba_1c_a-1.bin",  0x0a000, 0x02000, CRC(2a684b3a) SHA1(316aa1051a5ff33e5a2369f9e984b34f637595ff) )
 	ROM_LOAD( "mds-ba_1b_a-1.bin",  0x0c000, 0x02000, CRC(7ca0f715) SHA1(cf87e530c15c142efa48d6462870bbdf44002f45) )
@@ -2355,7 +2355,7 @@ ROM_START( vsbballj )
 ROM_END
 
 ROM_START( vsbbalja )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-ba_1d_a-2.bin",  0x08000, 0x02000, CRC(f3820b70) SHA1(c50d0c2e34f646dd186ee0f2774e94add733f21d) )
 	ROM_LOAD( "mds-ba_1c_a-2.bin",  0x0a000, 0x02000, CRC(39fbbf28) SHA1(9941defda548f2c51cf62f0ad62a041ee9a69c37) )
 	ROM_LOAD( "mds-ba_1b_a-2.bin",  0x0c000, 0x02000, CRC(b1377b12) SHA1(9afca83f343b768de8ac51c5967f8825de9d7883) )
@@ -2377,7 +2377,7 @@ ROM_START( vsbbalja )
 ROM_END
 
 ROM_START( vsbbaljb )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-ba_1d_a-3.bin",  0x08000, 0x02000, CRC(e234d609) SHA1(a148d6b57fbc9d5f91737fa30c2df2c2b66df404) )
 	ROM_LOAD( "mds-ba_1c_a-3.bin",  0x0a000, 0x02000, CRC(ca1a9591) SHA1(3544f244c59d3dab40c2745e84775b7c1defaf54) )
 	ROM_LOAD( "mds-ba_1b_a-3.bin",  0x0c000, 0x02000, CRC(50e1f6cf) SHA1(8eb4ccb4817295084280ffd1ee5261eee02485c5) )
@@ -2399,7 +2399,7 @@ ROM_START( vsbbaljb )
 ROM_END
 
 ROM_START( vstennis )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-te.1d",  0x08000, 0x02000, CRC(f4e9fca0) SHA1(05b91f578bc0a118ab75ce487b14adcd1fb6e714) )
 	ROM_LOAD( "mds-te.1c",  0x0a000, 0x02000, CRC(7e52df58) SHA1(a5ddebfa1f7f1a2b6b46d4b4a7f2c36477158e7e) )
 	ROM_LOAD( "mds-te.1b",  0x0c000, 0x02000, CRC(1a0d809a) SHA1(44ce2f9250940bf5f754918b4a2ae63f76181eff) )
@@ -2421,7 +2421,7 @@ ROM_START( vstennis )
 ROM_END
 
 ROM_START( vstennij )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-te_1d_a-3.bin", 0x08000, 0x2000, CRC(8d88fbe5) SHA1(1aa172d02d0d47325edf2f5ea4fc3c1c52f1efbe) )
 	ROM_LOAD( "mds-te_1c_a-2.bin", 0x0a000, 0x2000, CRC(5f00c129) SHA1(e9954ebedc037be0a177286bbfc2ecdaa9223d85) )
 	ROM_LOAD( "mds-te_1b_a-2.bin", 0x0c000, 0x2000, CRC(4b57910c) SHA1(1baeb31e0e9085ac6a9406a1802dfa47952d833e) )
@@ -2443,7 +2443,7 @@ ROM_START( vstennij )
 ROM_END
 
 ROM_START( wrecking )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "wr.1d",  0x08000, 0x02000, CRC(8897e1b9) SHA1(7d33f6ee78d8663d62e6e05e231fd3d19ad09baa) )
 	ROM_LOAD( "wr.1c",  0x0a000, 0x02000, CRC(d4dc5ebb) SHA1(bce9b2ebabe7b882f1bc71e2dd50906365521d78) )
 	ROM_LOAD( "wr.1b",  0x0c000, 0x02000, CRC(8ee4a454) SHA1(58e970780a2ef5d44950dba6b44e501d320c9588) )
@@ -2465,7 +2465,7 @@ ROM_START( wrecking )
 ROM_END
 
 ROM_START( iceclmrj )
-	ROM_REGION( 0x10000,"main", 0 ) /* 6502 memory */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-ic4-4_1d_a.bin",  0x08000, 0x02000, CRC(94e3197d) SHA1(414156809a3fe2c072d8947a91708f3ed40008b2) )
 	ROM_LOAD( "mds-ic4-4_1c_a.bin",  0x0a000, 0x02000, CRC(b253011e) SHA1(abc2c84e342d1f8e8d0dbb580370733ef4b38413) )
 	ROM_LOAD( "mds-ic4-4_1b_or_6b_a-1.bin",0x0c000, 0x02000, CRC(f3795874) SHA1(f22f786960a27ab886a7fad7e312bdf28ffa5362) )

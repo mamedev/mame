@@ -1078,9 +1078,9 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( raiden2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,XTAL_32MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(raiden2_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", raiden2_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", raiden2_interrupt)
 
 	MDRV_MACHINE_RESET(raiden2)
 
@@ -1090,7 +1090,7 @@ static MACHINE_DRIVER_START( raiden2 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1149,10 +1149,10 @@ ROM_START( raiden2 )
 	ROM_LOAD16_BYTE("prg1",   0x000001, 0x80000, CRC(4609b5f2) SHA1(272d2aa75b8ea4d133daddf42c4fc9089093df2e) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "snd",  0x000000, 0x08000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
 	ROM_CONTINUE(0x10000,0x8000)
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1202,7 +1202,7 @@ ROM_START( raiden2a )
 	ROM_LOAD16_BYTE("rom2e",  0x000001, 0x80000, CRC(458d619c) SHA1(842bf0eeb5d192a6b188f4560793db8dad697683) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom5",  0x000000, 0x10000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1233,7 +1233,7 @@ ROM_START( raiden2b )
 	ROM_LOAD16_BYTE("rom2j",  0x000001, 0x80000, CRC(e4e4fb4c) SHA1(7ccf33fe9a1cddf0c7e80d7ed66d615a828b3bb9) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom5",  0x000000, 0x10000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1303,7 +1303,7 @@ ROM_START( raiden2c )
 	ROM_LOAD16_BYTE("rom2j",  0x000001, 0x80000, CRC(e4e4fb4c) SHA1(7ccf33fe9a1cddf0c7e80d7ed66d615a828b3bb9) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rd2_5.110",  0x000000, 0x10000,  CRC(c2028ba2) SHA1(f6a9322b669ff82dea6ecf52ad3bd5d0901cce1b) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1335,7 +1335,7 @@ ROM_START( raiden2d )
 	ROM_LOAD16_BYTE("seibu2",   0x000001, 0x80000, CRC(28d5365f) SHA1(21efe29c2d373229c2ff302d86e59c2c94fa6d03) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5",  0x000000, 0x10000, CRC(5db9f922) SHA1(8257aab98657fe44df19d2a48d85fcf65b3d98c6) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1383,7 +1383,7 @@ ROM_START( raiden2e )
 	ROM_LOAD16_BYTE("r2_prg_1.bin",   0x000001, 0x80000, CRC(509ade43) SHA1(7cdee7bb00a6a1c7899d10b96385d54c261f6f5a) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2_snd.bin",  0x000000, 0x10000, CRC(6bad0a3e) SHA1(eb7ae42353e1984cd60b569c26cdbc3b025a7da6) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1413,7 +1413,7 @@ ROM_START( raiden2f )
 	ROM_LOAD16_BYTE("r2.2",  0x000001, 0x80000, CRC(bf7577ec) SHA1(98576af78760b8aef1ef3efe1ba963977c89d225) )
 	ROM_RELOAD(0x100001, 0x80000)
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2.5",  0x000000, 0x10000, CRC(f5f835af) SHA1(5be82ebc582d0da919e9ae1b9e64528bb295efc7) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1448,7 +1448,7 @@ ROM_START( raidndx )
 	ROM_LOAD32_BYTE("dx_3h.6n",   0x000002, 0x80000, CRC(6c495bcf) SHA1(fb6153ecc443dabc829dda6f8d11234ad48de88a) )
 	ROM_LOAD32_BYTE("dx_4h.6k",   0x000003, 0x80000, CRC(9ed6335f) SHA1(66975204b120915f23258a431e19dbc017afd912) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x10000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1481,7 +1481,7 @@ ROM_START( raidndxj )
 	ROM_LOAD32_BYTE("rdxj_3.bin",   0x000002, 0x80000, CRC(55ec0e1d) SHA1(6be7f268df51311a817c1c329a578b38abb659ae) )
 	ROM_LOAD32_BYTE("rdxj_4.bin",   0x000003, 0x80000, CRC(f8fb31b4) SHA1(b72fd7cbbebcf3d1b2253c309fcfa60674776467) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x10000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1518,7 +1518,7 @@ ROM_START( raidndxt )
 	ROM_LOAD32_BYTE("3d.u129",  0x000002, 0x80000, CRC(f0a47e67) SHA1(8cbd21993077b2e01295db6e343cae9e0e4bfefe) )
 	ROM_LOAD32_BYTE("4d.u1212", 0x000003, 0x80000, CRC(6bde6edc) SHA1(c3565a55b858c10659fd9b93b1cd92bc39e6446d) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.u1110", 0x000000, 0x10000, CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1551,7 +1551,7 @@ ROM_START( raidndxm )
 	ROM_LOAD32_BYTE("3d.bin",   0x000002, 0x80000, CRC(b4785576) SHA1(aa5eee7b0c635c6d18a7fc1e037bf570a677dd90) )
 	ROM_LOAD32_BYTE("4d.bin",   0x000003, 0x80000, CRC(5a77f7b4) SHA1(aa757e6308893ca63963170c5b1743de7c7ab034) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "dx_5.5b",  0x000000, 0x10000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1594,7 +1594,7 @@ ROM_START( zeroteam )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
 	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "sound",  0x000000, 0x10000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) // 5.5c
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1625,7 +1625,7 @@ ROM_START( zeroteaa )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
 	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5.bin",  0x000000, 0x10000, CRC(efc484ca) SHA1(c34b8e3e7f4c2967bc6414348993478ed637d338) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1656,7 +1656,7 @@ ROM_START( zerotsel )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
 	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "5_sel.bin",  0x000000, 0x10000, CRC(ed91046c) SHA1(de815c999aeeb814d3f091d5a9ac34ea9a388ddb) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1688,7 +1688,7 @@ ROM_START( zeroteab )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
 	ROM_LOAD( "copx-d2",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "sound",  0x000000, 0x10000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) ) // 5.5c
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1715,7 +1715,7 @@ ROM_START( nzerotea )
 	ROM_LOAD16_BYTE("prg1",   0x000000, 0x80000, CRC(3c7d9410) SHA1(25f2121b6c2be73f11263934266901ed5d64d2ee) )
 	ROM_LOAD16_BYTE("prg2",   0x000001, 0x80000, CRC(6cba032d) SHA1(bf5d488cd578fff09e62e3650efdee7658033e3f) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "sound",  0x000000, 0x10000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -1804,7 +1804,7 @@ Notes
 
 
 ROM_START( r2dx_v33 )
-	ROM_REGION( 0x400000, "main", 0 ) /* v33 main cpu */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* v33 main cpu */
 	ROM_LOAD("prg.223",   0x000000, 0x400000, CRC(b3dbcf98) SHA1(30d6ec2090531c8c579dff74c4898889902d7d87) )
 
 	ROM_REGION( 0x20000, "cpu1", ROMREGION_ERASE00 ) /* 64k code for sound Z80 */
@@ -1874,7 +1874,7 @@ ROM_START( xsedae )
 	ROM_REGION( 0x40000, "user2", ROMREGION_ERASEFF )	/* COPDX */
 	/* Not populated */
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "8.u1110",  0x000000, 0x20000, CRC(2dc2f81a) SHA1(0f6605042e0e295b4256b43dbdf5d53daebe1a9a) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
@@ -2124,15 +2124,15 @@ static MACHINE_RESET( rdx_v33 )
 static MACHINE_DRIVER_START( rdx_v33 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V33, 32000000/2 ) // ?
+	MDRV_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
 	MDRV_CPU_PROGRAM_MAP(rdx_v33_map, 0)
-	MDRV_CPU_VBLANK_INT("main", rdx_v33_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", rdx_v33_interrupt)
 
 	MDRV_MACHINE_RESET(rdx_v33)
 	MDRV_NVRAM_HANDLER(rdx_v33)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2157,7 +2157,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT(rdx_v33)
 {
-	UINT8 *prg = memory_region(machine, "main");
+	UINT8 *prg = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1,&prg[0x020000]);
 	memory_set_bankptr(machine, 2,&prg[0x030000]);
 	memory_set_bankptr(machine, 3,&prg[0x040000]);

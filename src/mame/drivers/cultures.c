@@ -100,7 +100,7 @@ static VIDEO_UPDATE( cultures )
 
 static WRITE8_HANDLER( cpu_bankswitch_w )
 {
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x4000 * (data & 0xf));
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + 0x4000 * (data & 0xf));
 	video_enable = ~data & 0x20;
 }
 
@@ -366,15 +366,15 @@ static MACHINE_RESET( cultures )
 static MACHINE_DRIVER_START( cultures )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 8.000 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(cultures_map,0)
 	MDRV_CPU_IO_MAP(cultures_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", cultures_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", cultures_interrupt)
 
 	MDRV_MACHINE_RESET( cultures )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -438,7 +438,7 @@ P custom      custom
 */
 
 ROM_START( cultures )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "ma01.u12",     0x000000, 0x040000, CRC(f57417b3) SHA1(9a2a50222f54e5da9bc5c66863b8be16e33b171f) )
 
 	ROM_REGION( 0x300000, "gfx1", 0 )

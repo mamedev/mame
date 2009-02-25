@@ -154,7 +154,7 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),	// read A
+		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),	// read A
 		DEVCB_DEVICE_HANDLER(SOUND, "oki", okim6295_r),			// read B
 		DEVCB_NULL,												// write A
 		DEVCB_DEVICE_HANDLER(SOUND, "oki", okim6295_w)			// write B
@@ -191,20 +191,20 @@ static PALETTE_INIT(cowrace)
 static MACHINE_DRIVER_START( cowrace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(mem_map_cowrace,0)
 	MDRV_CPU_IO_MAP(io_map_cowrace,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* missing slave z80? (like in King Derby)*/
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(mem_map_sound_cowrace,0)
 	MDRV_CPU_IO_MAP(io_map_sound_cowrace,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// NMI by main CPU
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// NMI by main CPU
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -233,10 +233,10 @@ MACHINE_DRIVER_END
 
 
 ROM_START( cowrace )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "u3.bin", 0x0000, 0x8000, CRC(c05c3bd3) SHA1(b7199a069ab45edd25e021589b79105cdfa5511a) )
 
-	ROM_REGION( 0x2000, "audio", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "u164.bin", 0x0000, 0x2000, CRC(9affa1c8) SHA1(bfc07693e8f749cbf20ab8cda33975b66f567962) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )

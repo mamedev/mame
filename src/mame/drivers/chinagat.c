@@ -210,7 +210,7 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine,  1,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
 }
 
@@ -549,20 +549,20 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( chinagat )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
+	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
 
@@ -588,14 +588,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( saiyugb1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
+	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
 	MDRV_CPU_PROGRAM_MAP(saiyugb1_sound_map,0)
 
 	MDRV_CPU_ADD("mcu", I8748, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
@@ -605,7 +605,7 @@ static MACHINE_DRIVER_START( saiyugb1 )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
 
@@ -631,20 +631,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( saiyugb2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
+	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", chinagat_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)		/* 3.579545 MHz oscillator */
 	MDRV_CPU_PROGRAM_MAP(ym2203c_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)	/* based on ddragon driver */
 
@@ -679,7 +679,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( chinagat )
-	ROM_REGION( 0x28000, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "cgate51.bin", 0x10000, 0x18000, CRC(439a3b19) SHA1(01393b4302ac7a66390270b01e2757582240f6b8) )	/* Banks 0x4000 long @ 0x4000 */
 	ROM_CONTINUE(            0x08000, 0x08000 )				/* Static code */
 
@@ -687,7 +687,7 @@ ROM_START( chinagat )
 	ROM_LOAD( "23j4-0.48",   0x10000, 0x18000, CRC(2914af38) SHA1(3d690fa50b7d36a22de82c026d59a16126a7b73c) ) /* Banks 0x4000 long @ 0x4000 */
 	ROM_CONTINUE(            0x08000, 0x08000 )				/* Static code */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Music CPU, 64KB */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Music CPU, 64KB */
 	ROM_LOAD( "23j0-0.40",   0x00000, 0x08000, CRC(9ffcadb6) SHA1(606dbdd73aee3cabb2142200ac6f8c96169e4b19) )
 
 	ROM_REGION(0x20000, "gfx1", ROMREGION_DISPOSE )	/* Text */
@@ -716,7 +716,7 @@ ROM_END
 
 
 ROM_START( saiyugou )
-	ROM_REGION( 0x28000, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "23j3-0.51",  0x10000, 0x18000, CRC(aa8132a2) SHA1(87c3bd447767f263113c4865afc905a0e484a625) )	/* Banks 0x4000 long @ 0x4000 */
 	ROM_CONTINUE(           0x08000, 0x08000)				/* Static code */
 
@@ -724,7 +724,7 @@ ROM_START( saiyugou )
 	ROM_LOAD( "23j4-0.48",  0x10000, 0x18000, CRC(2914af38) SHA1(3d690fa50b7d36a22de82c026d59a16126a7b73c) )	/* Banks 0x4000 long @ 0x4000 */
 	ROM_CONTINUE(           0x08000, 0x08000)				/* Static code */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Music CPU, 64KB */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Music CPU, 64KB */
 	ROM_LOAD( "23j0-0.40",  0x00000, 0x8000, CRC(9ffcadb6) SHA1(606dbdd73aee3cabb2142200ac6f8c96169e4b19) )
 
 	ROM_REGION(0x20000, "gfx1", ROMREGION_DISPOSE )	/* Text */
@@ -752,7 +752,7 @@ ROM_START( saiyugou )
 ROM_END
 
 ROM_START( saiyugb1 )
-	ROM_REGION( 0x28000, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "23j3-0.51",  0x10000, 0x18000, CRC(aa8132a2) SHA1(87c3bd447767f263113c4865afc905a0e484a625) )	/* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
        ROM_LOAD( "a-5.bin", 0x10000, 0x10000, CRC(39795aa5) )      Banks 0x4000 long @ 0x4000
@@ -768,7 +768,7 @@ ROM_START( saiyugb1 )
     */
 	ROM_CONTINUE(           0x08000, 0x08000 )				/* Static code */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Music CPU, 64KB */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Music CPU, 64KB */
 	ROM_LOAD( "a-1.bin",  0x00000, 0x8000,  CRC(46e5a6d4) SHA1(965ed7bdb727ab32ce3322ca49f1a4e3786e8051) )
 
 	ROM_REGION( 0x800, "mcu", 0 )		/* ADPCM CPU, 1KB */
@@ -817,7 +817,7 @@ ROM_START( saiyugb1 )
 ROM_END
 
 ROM_START( saiyugb2 )
-	ROM_REGION( 0x28000, "main", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* Main CPU: 128KB for code (bankswitched using $3F01) */
 	ROM_LOAD( "23j3-0.51",   0x10000, 0x18000, CRC(aa8132a2) SHA1(87c3bd447767f263113c4865afc905a0e484a625) )	/* Banks 0x4000 long @ 0x4000 */
 	/* Orientation of bootleg ROMs which are split, but otherwise the same.
        ROM_LOAD( "sai5.bin", 0x10000, 0x10000, CRC(39795aa5) )     Banks 0x4000 long @ 0x4000
@@ -833,7 +833,7 @@ ROM_START( saiyugb2 )
     */
 	ROM_CONTINUE(         0x08000, 0x08000 )				/* Static code */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Music CPU, 64KB */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Music CPU, 64KB */
 	ROM_LOAD( "sai-alt1.bin", 0x00000, 0x8000, CRC(8d397a8d) SHA1(52599521c3dbcecc1ae56bb80dc855e76d700134) )
 
 //  ROM_REGION( 0x800, "cpu3", 0 )     /* ADPCM CPU, 1KB */

@@ -72,7 +72,7 @@ static WRITE8_HANDLER( wc90_shared_w )
 static WRITE8_HANDLER( wc90_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
@@ -298,20 +298,20 @@ static const ym2608_interface ym2608_config =
 static MACHINE_DRIVER_START( wc90 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 6000000)	/* 6.0 MHz ??? */
+	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90_map_1,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, 6000000)	/* 6.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wc90_map_2,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ???? */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	/* NMIs are triggered by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -341,7 +341,7 @@ static MACHINE_DRIVER_START( wc90t )
 MACHINE_DRIVER_END
 
 ROM_START( wc90 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ic87_01.bin",  0x00000, 0x08000, CRC(4a1affbc) SHA1(bc531e97ca31c66fdac194e2d79d5c6ba1300556) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )	/* banked at f000-f7ff */
 
@@ -349,7 +349,7 @@ ROM_START( wc90 )
 	ROM_LOAD( "ic67_04.bin",  0x00000, 0x10000, CRC(dc6eaf00) SHA1(d53924070a59eee35dc0e6465702e4f04e61a073) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic56_03.bin",  0x10000, 0x10000, CRC(1ac02b3b) SHA1(4f8dc049d404072150342f3c2df04789a73ce244) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic54_05.bin",  0x00000, 0x10000, CRC(27c348b3) SHA1(cf19ff4ae4f323ae3e5a905249b7af8ae342202a) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -374,7 +374,7 @@ ROM_START( wc90 )
 ROM_END
 
 ROM_START( wc90a )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "wc90-1.bin",   0x00000, 0x08000, CRC(d1804e1a) SHA1(eec7374f4d23c89843f38fffff436635adb43b63) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )	/* banked at f000-f7ff */
 
@@ -382,7 +382,7 @@ ROM_START( wc90a )
 	ROM_LOAD( "ic67_04.bin",  0x00000, 0x10000, CRC(dc6eaf00) SHA1(d53924070a59eee35dc0e6465702e4f04e61a073) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic56_03.bin",  0x10000, 0x10000, CRC(1ac02b3b) SHA1(4f8dc049d404072150342f3c2df04789a73ce244) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic54_05.bin",  0x00000, 0x10000, CRC(27c348b3) SHA1(cf19ff4ae4f323ae3e5a905249b7af8ae342202a) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -407,7 +407,7 @@ ROM_START( wc90a )
 ROM_END
 
 ROM_START( wc90b )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ic87-1b.bin",  0x00000, 0x08000, CRC(d024a971) SHA1(856c6ab7abc1cd6db42703f70930b84e3da69db0) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic95_02.bin",  0x10000, 0x10000, CRC(847d439c) SHA1(eade31050da9e84feb4406e327d050a7496871b7) )	/* banked at f000-f7ff */
 
@@ -415,7 +415,7 @@ ROM_START( wc90b )
 	ROM_LOAD( "ic67_04.bin",  0x00000, 0x10000, CRC(dc6eaf00) SHA1(d53924070a59eee35dc0e6465702e4f04e61a073) )	/* c000-ffff is not used */
 	ROM_LOAD( "ic56_03.bin",  0x10000, 0x10000, CRC(1ac02b3b) SHA1(4f8dc049d404072150342f3c2df04789a73ce244) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic54_05.bin",  0x00000, 0x10000, CRC(27c348b3) SHA1(cf19ff4ae4f323ae3e5a905249b7af8ae342202a) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -440,7 +440,7 @@ ROM_START( wc90b )
 ROM_END
 
 ROM_START( wc90t )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "wc90a-1.bin",  0x00000, 0x08000, CRC(b6f51a68) SHA1(e0263dee35bf99cb4288a1df825bbbca17c85d36) )	/* c000-ffff is not used */
 	ROM_LOAD( "wc90a-2.bin",  0x10000, 0x10000, CRC(c50f2a98) SHA1(0fbeabadebfa75515d5e35bfcc565ecfa4d6e693) )	/* banked at f000-f7ff */
 
@@ -448,7 +448,7 @@ ROM_START( wc90t )
 	ROM_LOAD( "ic67_04.bin",  0x00000, 0x10000, CRC(dc6eaf00) SHA1(d53924070a59eee35dc0e6465702e4f04e61a073) )	/* c000-ffff is not used */
 	ROM_LOAD( "wc90a-3.bin",  0x10000, 0x10000, CRC(8c7a9542) SHA1(a06a7cd40d41692c4cc2a35d9c69b944c5baf163) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic54_05.bin",  0x00000, 0x10000, CRC(27c348b3) SHA1(cf19ff4ae4f323ae3e5a905249b7af8ae342202a) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )

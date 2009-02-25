@@ -168,13 +168,13 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( twins )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30, 8000000)
+	MDRV_CPU_ADD("maincpu", V30, 8000000)
 	MDRV_CPU_PROGRAM_MAP(twins_map, 0)
 	MDRV_CPU_IO_MAP(twins_io,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -256,13 +256,13 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( twinsa )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30, XTAL_16MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(twins_map, 0)
 	MDRV_CPU_IO_MAP(twinsa_io,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -284,7 +284,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( twins )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1.bin", 0x000000, 0x080000, CRC(d5ef7b0d) SHA1(7261dca5bb0aef755b4f2b85a159b356e7ac8219) )
 	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x080000, CRC(8a5392f4) SHA1(e6a2ecdb775138a87d27aa4ad267bdec33c26baa) )
 ROM_END
@@ -308,7 +308,7 @@ hmm, we're only emulating 1x ay-3-8910, is the other at port 0 on this?
 */
 
 ROM_START( twinsa )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lp.bin", 0x000000, 0x080000, CRC(4f07862e) SHA1(fbda1973f79c6938c7f026a4db706e78781c2df8) )
 	ROM_LOAD16_BYTE( "hp.bin", 0x000001, 0x080000, CRC(aaf74b83) SHA1(09bd76b9fc5cb7ba6ffe1a2581ffd5633fe440b3) )
 ROM_END

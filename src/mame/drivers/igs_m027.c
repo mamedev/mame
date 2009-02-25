@@ -365,17 +365,17 @@ static INTERRUPT_GEN( igs_majhong_interrupt )
 
 
 static MACHINE_DRIVER_START( igs_majhong )
-	MDRV_CPU_ADD("main",ARM7, 20000000)
+	MDRV_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MDRV_CPU_PROGRAM_MAP(igs_majhong_map,0)
 
-	MDRV_CPU_VBLANK_INT("main", igs_majhong_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", igs_majhong_interrupt)
 	//MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_GFXDECODE(igs_m027)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -409,7 +409,7 @@ static DRIVER_INIT( sdwx )
 
 ***************************************************************************/
 ROM_START( sdwx )
-	ROM_REGION( 0x04000, "main", 0 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "sdwx_igs027a", 0x00000, 0x4000, NO_DUMP )
 
@@ -430,7 +430,7 @@ ROM_END
 
 
 ROM_START( sddz )
-	ROM_REGION( 0x04000, "main", 0 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "sddz_igs027a", 0x00000, 0x4000, NO_DUMP )
 
@@ -450,7 +450,7 @@ ROM_END
 
 
 ROM_START( lhzb3 )
-	ROM_REGION( 0x04000, "main", 0 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "lhzb3_igs027a", 0x00000, 0x4000, NO_DUMP )
 
@@ -469,7 +469,7 @@ ROM_END
 
 
 ROM_START( lhzb4 )
-	ROM_REGION( 0x04000, "main", 0 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "lhzb4_igs027a", 0x00000, 0x4000, NO_DUMP )
 
@@ -489,7 +489,7 @@ ROM_END
 
 
 ROM_START( klxyj )
-	ROM_REGION( 0x04000, "main", 0 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "klxyj_igs027a", 0x00000, 0x4000, NO_DUMP )
 
@@ -508,7 +508,7 @@ ROM_END
 
 
 ROM_START( mgfx )
-	ROM_REGION( 0x04000, "main", 0 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "mgfx_igs027a", 0x00000, 0x4000, NO_DUMP )
 
@@ -572,7 +572,7 @@ Notes:
 */
 
 ROM_START( bigd2 )
-	ROM_REGION( 0x04000, "main", 0 )
+	ROM_REGION( 0x04000, "maincpu", 0 )
 	/* Internal rom of IGS027A ARM based MCU */
 	ROM_LOAD( "bigd2_igs027a", 0x00000, 0x4000, NO_DUMP )
 

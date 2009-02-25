@@ -653,10 +653,10 @@ static const mips3_config config =
 static MACHINE_DRIVER_START( kinst )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", R4600LE, MASTER_CLOCK*2)
+	MDRV_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_start)
+	MDRV_CPU_VBLANK_INT("screen", irq0_start)
 
 	MDRV_MACHINE_START(kinst)
 	MDRV_MACHINE_RESET(kinst)
@@ -666,7 +666,7 @@ static MACHINE_DRIVER_START( kinst )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

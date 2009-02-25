@@ -870,9 +870,9 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( hangon_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK_25MHz/4)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/4)
 	MDRV_CPU_PROGRAM_MAP(hangon_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK_25MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
@@ -887,7 +887,7 @@ static MACHINE_DRIVER_START( hangon_base )
 	MDRV_GFXDECODE(segahang)
 	MDRV_PALETTE_LENGTH(2048*3)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 
@@ -900,9 +900,9 @@ static MACHINE_DRIVER_START( sharrier_base )
 	MDRV_IMPORT_FROM(hangon_base)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", M68000, MASTER_CLOCK_10MHz)
+	MDRV_CPU_REPLACE("maincpu", M68000, MASTER_CLOCK_10MHz)
 	MDRV_CPU_PROGRAM_MAP(sharrier_map,0)
-	MDRV_CPU_VBLANK_INT("main", i8751_main_cpu_vblank)
+	MDRV_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
 
 	MDRV_CPU_REPLACE("sub", M68000, MASTER_CLOCK_10MHz)
 
@@ -914,7 +914,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_board_2203 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK_8MHz/2)
+	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map_2203,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2203,0)
 
@@ -942,7 +942,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_board_2203x2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK_8MHz/2)
+	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2203x2,0)
 
@@ -980,7 +980,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_board_2151 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK_8MHz/2)
+	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map_2151,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2151,0)
 
@@ -1017,7 +1017,7 @@ static MACHINE_DRIVER_START( shangupb )
 	MDRV_IMPORT_FROM(sound_board_2151)
 
 	/* not sure about these speeds, but at 6MHz, the road is not updated fast enough */
-	MDRV_CPU_REPLACE("main", M68000, 10000000)
+	MDRV_CPU_REPLACE("maincpu", M68000, 10000000)
 	MDRV_CPU_REPLACE("sub", M68000, 10000000)
 MACHINE_DRIVER_END
 
@@ -1028,7 +1028,7 @@ static MACHINE_DRIVER_START( sharrier )
 
 	MDRV_CPU_ADD("mcu", I8751, 8000000)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
 MACHINE_DRIVER_END
 
 
@@ -1070,7 +1070,7 @@ MACHINE_DRIVER_END
 
 */
 ROM_START( hangon )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-6918a.ic22", 0x000000, 0x8000, CRC(20b1c2b0) SHA1(01b4f5105e2bbeb6ec6dbd18bfb728e3a973e0ca) )
 	ROM_LOAD16_BYTE( "epr-6916a.ic8",  0x000001, 0x8000, CRC(7d9db1bf) SHA1(952ee3e7a0d57ec1bb3385e0e6675890b8378d31) )
 	ROM_LOAD16_BYTE( "epr-6917a.ic20", 0x010000, 0x8000, CRC(fea12367) SHA1(9a1ce5863c562160b657ad948812b43f42d7d0cc) )
@@ -1104,7 +1104,7 @@ ROM_START( hangon )
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
 	ROM_LOAD( "epr-6840.ic108", 0x0000, 0x8000, CRC(581230e3) SHA1(954eab35059322a12a197bba04bf85f816132f20) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-6833.ic73", 0x00000, 0x4000, CRC(3b942f5f) SHA1(4384b5c090954e69de561dde0ef32104aa11399a) )
 
 	ROM_REGION( 0x10000, "pcm", 0 ) /* Sega PCM sound data */
@@ -1129,7 +1129,7 @@ ROM_END
 
 */
 ROM_START( hangon1 )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-6918.ic22", 0x000000, 0x8000, CRC(0bf4f2ac) SHA1(26c5bb6fe805644a8d427ad77814f4b0b1128b1a) )
 	ROM_LOAD16_BYTE( "epr-6916.ic8",  0x000001, 0x8000, CRC(06c21c8a) SHA1(f06f21ff272a803c72e5041534053494f055e466) )
 	ROM_LOAD16_BYTE( "epr-6917.ic20", 0x010000, 0x8000, CRC(f48a6cbc) SHA1(6437efaeb0e4cb727c03eb83678a9e107d244af1) )
@@ -1163,7 +1163,7 @@ ROM_START( hangon1 )
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
 	ROM_LOAD( "epr-6840.ic108", 0x0000, 0x8000, CRC(581230e3) SHA1(954eab35059322a12a197bba04bf85f816132f20) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-6833.ic73", 0x00000, 0x4000, CRC(3b942f5f) SHA1(4384b5c090954e69de561dde0ef32104aa11399a) )
 
 	ROM_REGION( 0x10000, "pcm", 0 ) /* Sega PCM sound data */
@@ -1180,7 +1180,7 @@ ROM_END
     CPU: 68000 (317-????)
 */
 ROM_START( shangupb )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "s-hangon.30", 0x000000, 0x10000, CRC(d95e82fc) SHA1(bc6cd0b0ac98a9c53f2e22ac086521704ab59e4d) )
 	ROM_LOAD16_BYTE( "s-hangon.32", 0x000001, 0x10000, CRC(2ee4b4fb) SHA1(ba4042ab6e533c16c3cde848248d75e484be113f) )
 	ROM_LOAD16_BYTE( "s-hangon.29", 0x020000, 0x08000, CRC(12ee8716) SHA1(8e798d23d22f85cd046641184d104c17b27995b2) )
@@ -1216,7 +1216,7 @@ ROM_START( shangupb )
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
 	ROM_LOAD( "s-hangon.26", 0x0000, 0x8000, CRC(1bbe4fc8) SHA1(30f7f301e4d10d3b254d12bf3d32e5371661a566) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "s-hangon.03", 0x0000, 0x08000, CRC(83347dc0) SHA1(079bb750edd6372750a207764e8c84bb6abf2f79) )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) /* Sega PCM sound data */
@@ -1240,7 +1240,7 @@ ROM_END
      ASSY SOUND BD 834-5670-01
 */
 ROM_START( sharrier )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-7188a.ic97", 0x000000, 0x8000, CRC(45e173c3) SHA1(cbab555c5053f3e4a3f75ff78c41528e2d9d34c7) )
 	ROM_LOAD16_BYTE( "epr-7184a.ic84", 0x000001, 0x8000, CRC(e1934a51) SHA1(67817a360b3f1f6c2440986272975bd696a38e70) )
 	ROM_LOAD16_BYTE( "epr-7189.ic98",  0x010000, 0x8000, CRC(40b1309f) SHA1(9b050983f043a88f414745d02c912b59bbf1b121) )
@@ -1296,7 +1296,7 @@ ROM_START( sharrier )
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
 	ROM_LOAD( "epr-7181.ic2", 0x0000, 0x8000, CRC(b4740419) SHA1(8ece2dc85692e32d0ba0b427c260c3d10ac0b7cc) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-7234.ic73", 0x00000, 0x004000, CRC(d6397933) SHA1(b85bb47efb6c113b3676b10ab86f1798a89d45b4) )
 	ROM_LOAD( "epr-7233.ic72", 0x04000, 0x004000, CRC(504e76d9) SHA1(302af9101da01c97ca4be6acd21fb5b8e8f0b7ef) )
 
@@ -1320,7 +1320,7 @@ ROM_END
      ASSY SOUND BD 834-5670-01
 */
 ROM_START( sharrir1 )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-7188.ic97",  0x000000, 0x8000, CRC(7c30a036) SHA1(d3902342be714b4e181c87ad2bad7102e3eeec20) )
 	ROM_LOAD16_BYTE( "epr-7184.ic84",  0x000001, 0x8000, CRC(16deaeb1) SHA1(bdf85b924a914865bf876eda7fc2b20131a4cf2d) )
 	ROM_LOAD16_BYTE( "epr-7189.ic98",  0x010000, 0x8000, CRC(40b1309f) SHA1(9b050983f043a88f414745d02c912b59bbf1b121) )
@@ -1376,7 +1376,7 @@ ROM_START( sharrir1 )
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
 	ROM_LOAD( "epr-7181.ic2", 0x0000, 0x8000, CRC(b4740419) SHA1(8ece2dc85692e32d0ba0b427c260c3d10ac0b7cc) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-7234.ic73", 0x00000, 0x004000, CRC(d6397933) SHA1(b85bb47efb6c113b3676b10ab86f1798a89d45b4) )
 	ROM_LOAD( "epr-7233.ic72", 0x04000, 0x004000, CRC(504e76d9) SHA1(302af9101da01c97ca4be6acd21fb5b8e8f0b7ef) )
 
@@ -1405,7 +1405,7 @@ ROM_END
      ASSY SOUND BD 837-6003-01? (not verified)
 */
 ROM_START( enduror )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-7640a.ic97", 0x00000, 0x8000, CRC(1d1dc5d4) SHA1(8e7ae5abd23e949de5d5e1772f90e53d05c866ec) )
 	ROM_LOAD16_BYTE( "epr-7636a.ic84", 0x00001, 0x8000, CRC(84131639) SHA1(04981464577d2604eec36c14c5de9c91604ae501) )
 	ROM_LOAD16_BYTE( "epr-7641.ic98",  0x10000, 0x8000, CRC(2503ae7c) SHA1(27009d5b47dc207145048edfcc1ac8ffda5f0b78) )
@@ -1459,7 +1459,7 @@ ROM_START( enduror )
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
 	ROM_LOAD( "epr-7633.ic1", 0x0000, 0x8000, CRC(6f146210) SHA1(2f58f0c3563b434ed02700b9ca1545a696a5716e) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-7682.rom", 0x00000, 0x8000, CRC(c4efbf48) SHA1(2bcbc4757d98f291fcaec467abc36158b3f59be3) )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) /* Sega PCM sound data */
@@ -1484,7 +1484,7 @@ ROM_END
      ASSY SOUND BD 837-6005-01 (renumbered 834-5670)
 */
 ROM_START( enduror1 )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-7630.ic97", 0x00000, 0x8000, CRC(a1bdadab) SHA1(f52d747a6947ad2dbc12765133adfb41eb5a5f2f) )
 	ROM_LOAD16_BYTE( "epr-7629.ic84", 0x00001, 0x8000, CRC(f50f4169) SHA1(b4eebb5131bb472db03f0e340743437753a9efe3) )
 	ROM_LOAD16_BYTE( "epr-7641.ic98", 0x10000, 0x8000, CRC(2503ae7c) SHA1(27009d5b47dc207145048edfcc1ac8ffda5f0b78) )
@@ -1538,7 +1538,7 @@ ROM_START( enduror1 )
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
 	ROM_LOAD( "epr-7633.ic1", 0x0000, 0x8000, CRC(6f146210) SHA1(2f58f0c3563b434ed02700b9ca1545a696a5716e) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-7765.ic73", 0x00000, 0x4000, CRC(81c82fc9) SHA1(99eae7edc62d719993c46a703f9daaf332e236e9) )
 	ROM_LOAD( "epr-7764.ic72", 0x04000, 0x4000, CRC(755bfdad) SHA1(2942f3da5a45a3ac7bba6a73142663fd975f4379) )
 
@@ -1559,7 +1559,7 @@ ROM_END
     YM2203 sound board
 */
 ROM_START( endurobl )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "7.13j", 0x030000, 0x08000, CRC(f1d6b4b7) SHA1(32bd966191cbb36d1e60ed1a06d4caa023dd6b88) )
 	ROM_CONTINUE(             0x000000, 0x08000 )
 	ROM_LOAD16_BYTE( "4.13h", 0x030001, 0x08000, CRC(43bff873) SHA1(04e906c1965a6211fb8e13987db52f1f99cc0203) )	/* rom de-coded */
@@ -1615,7 +1615,7 @@ ROM_START( endurobl )
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
 	ROM_LOAD( "epr-7633.ic1", 0x0000, 0x8000, CRC(6f146210) SHA1(2f58f0c3563b434ed02700b9ca1545a696a5716e) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-7765.ic73", 0x00000, 0x4000, CRC(81c82fc9) SHA1(99eae7edc62d719993c46a703f9daaf332e236e9) )	/* was "13.16d" */
 	ROM_LOAD( "epr-7764.ic72", 0x04000, 0x4000, CRC(755bfdad) SHA1(2942f3da5a45a3ac7bba6a73142663fd975f4379) )	/* was "12.16e" */
 
@@ -1633,7 +1633,7 @@ ROM_END
     2xYM2203 sound board
 */
 ROM_START( endurob2 )
-	ROM_REGION( 0x040000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* 68000 code */
 	/* the program roms should be twice the size */
 	ROM_LOAD16_BYTE( "enduro.a07", 0x000000, 0x08000, BAD_DUMP CRC(259069bc) SHA1(42fa47ce4a29294f9eff3eddbba6c305d750aaa5) )
 //  ROM_CONTINUE(                  0x030000, 0x08000 )
@@ -1690,7 +1690,7 @@ ROM_START( endurob2 )
 	ROM_REGION( 0x8000, "gfx3", 0 ) /* road gfx */
 	ROM_LOAD( "epr-7633.ic1", 0x0000, 0x8000, CRC(6f146210) SHA1(2f58f0c3563b434ed02700b9ca1545a696a5716e) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "enduro.a16", 0x00000, 0x8000, CRC(d2cb6eb5) SHA1(80c5fab16ec4ddfa67fae94808026b2e6285b7f1) )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) /* Sega PCM sound data */
@@ -1731,8 +1731,8 @@ static DRIVER_INIT( enduror )
 
 static DRIVER_INIT( endurobl )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	UINT16 *decrypt = (UINT16 *)auto_malloc(0x40000);
 
 	hangon_generic_init();
@@ -1745,8 +1745,8 @@ static DRIVER_INIT( endurobl )
 
 static DRIVER_INIT( endurob2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	UINT16 *decrypt = (UINT16 *)auto_malloc(0x40000);
 
 	hangon_generic_init();

@@ -245,11 +245,11 @@ static PALETTE_INIT( itgambl2 )
 static MACHINE_DRIVER_START( itgambl2 )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a H8/3337 core ATM */
+	MDRV_CPU_ADD("maincpu", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a H8/3337 core ATM */
 	MDRV_CPU_PROGRAM_MAP(itgambl2_map,0)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -303,7 +303,7 @@ Note:
 */
 
 ROM_START( ntcash )
-	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "ntcash_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -346,7 +346,7 @@ Note:
 */
 
 ROM_START( wizard )
-	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "wizard_ver1.2_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -389,7 +389,7 @@ Note:
 */
 
 ROM_START( laser2k1 )
-	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "laser2k1_ver1.2_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -432,7 +432,7 @@ Note:
 */
 
 ROM_START( mdrink )
-	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "mdrink_ver1.2_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x180000, "gfx1", 0 ) /* only 3 ROMs?? */
@@ -484,7 +484,7 @@ Formely named "videopoker1"
 */
 
 ROM_START( te0144 )
-	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "te0144_ver1.2_hdy1a3-64f3337f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -534,7 +534,7 @@ Silkscreened on PCB:
 */
 
 ROM_START( cmagica )
-	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "cmagica_ver1.8_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x180000, "gfx1", 0 ) /* gfx seems 3bpp, not separated bitplanes? */
@@ -582,7 +582,7 @@ Silkscreened on PCB:
 */
 
 ROM_START( millsun )
-	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "millsun_hd64f3337f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx seems 4bpp */
@@ -631,7 +631,7 @@ Silkscreened on PCB:
 */
 
 ROM_START( sspac2k1 )
-	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "sspac2k1_hd64f3337f16.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx seems 4bpp */
@@ -679,7 +679,7 @@ Silkscreened on PCB:
 */
 
 ROM_START( elvis )
-	ROM_REGION( 0x1000000, "main", 0 ) /* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* all the program code is in here */
 	ROM_LOAD( "elvis_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )

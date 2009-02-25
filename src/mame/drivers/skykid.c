@@ -107,7 +107,7 @@ static WRITE8_HANDLER( skykid_irq_2_ctrl_w )
 static MACHINE_START( skykid )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 
 	state_save_register_global(machine, inputport_selected);
 }
@@ -451,21 +451,21 @@ static const namco_interface namco_config =
 static MACHINE_DRIVER_START( skykid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,49152000/32)
+	MDRV_CPU_ADD("maincpu", M6809,49152000/32)
 	MDRV_CPU_PROGRAM_MAP(skykid_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("mcu", HD63701,49152000/8)	/* or compatible 6808 with extra instructions */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_port_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
 
 	MDRV_MACHINE_START(skykid)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -489,7 +489,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( skykid )
-	ROM_REGION( 0x14000, "main", 0 )	/* 6809 code */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* 6809 code */
 	ROM_LOAD( "sk2_2.6c",     0x08000, 0x4000, CRC(ea8a5822) SHA1(5b13133410bcb7d647e662b476dbfd2edab8aac0) )
 	ROM_LOAD( "sk1-1c.6b",    0x0c000, 0x4000, CRC(7abe6c6c) SHA1(7d2631cc6149fa3e02b1355cb899de5474ff5d0a) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )	/* banked ROM */
@@ -519,7 +519,7 @@ ROM_START( skykid )
 ROM_END
 
 ROM_START( skykido )
-	ROM_REGION( 0x14000, "main", 0 )	/* 6809 code */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* 6809 code */
 	ROM_LOAD( "sk2_2.6c",     0x08000, 0x4000, CRC(ea8a5822) SHA1(5b13133410bcb7d647e662b476dbfd2edab8aac0) )
 	ROM_LOAD( "sk1_1.6b",     0x0c000, 0x4000, CRC(070a49d4) SHA1(4b994bde3e34b574bd927843804d2fb1a08d1bdf) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )	/* banked ROM */
@@ -549,7 +549,7 @@ ROM_START( skykido )
 ROM_END
 
 ROM_START( skykidd )
-	ROM_REGION( 0x14000, "main", 0 )	/* 6809 code */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* 6809 code */
 	ROM_LOAD( "sk1_2.6c",     0x08000, 0x4000, CRC(8370671a) SHA1(7038f952ebfc4482440b73ee4027fa908561d122) )
 	ROM_LOAD( "sk1_1.6b",     0x0c000, 0x4000, CRC(070a49d4) SHA1(4b994bde3e34b574bd927843804d2fb1a08d1bdf) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )	/* banked ROM */
@@ -579,7 +579,7 @@ ROM_START( skykidd )
 ROM_END
 
 ROM_START( skykids )
-	ROM_REGION( 0x14000, "main", 0 )	/* 6809 code */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* 6809 code */
 	ROM_LOAD( "sk2a.6c",     0x08000, 0x4000, CRC(68492672) SHA1(3dbe5ec930de5c526d3ef65513993c10f2153a36) )
 	ROM_LOAD( "sk1a.6b",     0x0c000, 0x4000, CRC(e16abe25) SHA1(78e0d30b15fb62c4399d847784ddc61f6819feba) )
 	ROM_LOAD( "sk1_3.6d",     0x10000, 0x4000, CRC(314b8765) SHA1(d90a8a853ce672fe5ee190f07bcb33262c73df3b) )	/* banked ROM */
@@ -609,7 +609,7 @@ ROM_START( skykids )
 ROM_END
 
 ROM_START( drgnbstr )
-	ROM_REGION( 0x14000, "main", 0 ) /* 6809 code */
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* 6809 code */
 	ROM_LOAD( "db1_2b.6c",    0x08000, 0x04000, CRC(0f11cd17) SHA1(691d853f4f08898ecf4bccfb70a568de309329f1) )
 	ROM_LOAD( "db1_1.6b",     0x0c000, 0x04000, CRC(1c7c1821) SHA1(8b6111afc42e2996bdc2fc276be0c40556cd431e) )
 	ROM_LOAD( "db1_3.6d",     0x10000, 0x04000, CRC(6da169ae) SHA1(235211c26562fef0660e3fde1e87f2e52626d119) )	/* banked ROM */

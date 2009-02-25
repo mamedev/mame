@@ -269,11 +269,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( 1942 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MAIN_CPU_CLOCK)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(c1942_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(c1942_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, SOUND_CPU_CLOCK)	/* 3 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)	/* 3 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
@@ -281,7 +281,7 @@ static MACHINE_DRIVER_START( 1942 )
 	MDRV_GFXDECODE(1942)
 	MDRV_PALETTE_LENGTH(64*4+4*32*8+16*16)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -310,14 +310,14 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( 1942 )
-	ROM_REGION( 0x1c000, "main", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x1c000, "maincpu", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "srb-03.m3", 0x00000, 0x4000, CRC(d9dafcc3) SHA1(a089a9bc55fb7d6d0ac53f91b258396d5d62677a) )
 	ROM_LOAD( "srb-04.m4", 0x04000, 0x4000, CRC(da0cf924) SHA1(856fbb302c9a4ec7850a26ab23dab8467f79bba4) )
 	ROM_LOAD( "srb-05.m5", 0x10000, 0x4000, CRC(d102911c) SHA1(35ba1d82bd901940f61d8619273463d02fc0a952) )
 	ROM_LOAD( "srb-06.m6", 0x14000, 0x2000, CRC(466f8248) SHA1(2ccc8fc59962d3001fbc10e8d2f20a254a74f251) )
 	ROM_LOAD( "srb-07.m7", 0x18000, 0x4000, CRC(0d31038c) SHA1(b588eaf6fddd66ecb2d9832dc197f286f1ccd846) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sr-01.c11", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -351,14 +351,14 @@ ROM_START( 1942 )
 ROM_END
 
 ROM_START( 1942a )
-	ROM_REGION( 0x1c000, "main", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x1c000, "maincpu", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "sra-03.m3", 0x00000, 0x4000, CRC(40201bab) SHA1(4886c07a4602223c21419118e10aadce9c99fa5a) )
 	ROM_LOAD( "sr-04.m4",  0x04000, 0x4000, CRC(a60ac644) SHA1(f37862db3cf5e6cc9ab3276f3bc45fd629fd70dd) )
 	ROM_LOAD( "sr-05.m5",  0x10000, 0x4000, CRC(835f7b24) SHA1(24b66827f08c43fbf5b9517d638acdfc38e1b1e7) )
 	ROM_LOAD( "sr-06.m6",  0x14000, 0x2000, CRC(821c6481) SHA1(06becb6bf8b4bde3a458098498eecad566a87711) )
 	ROM_LOAD( "sr-07.m7",  0x18000, 0x4000, CRC(5df525e1) SHA1(70cd2910e2945db76bd6ebfa0ff09a5efadc2d0b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sr-01.c11", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -392,14 +392,14 @@ ROM_START( 1942a )
 ROM_END
 
 ROM_START( 1942b )
-	ROM_REGION( 0x1c000, "main", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x1c000, "maincpu", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "sr-03.m3", 0x00000, 0x4000, CRC(612975f2) SHA1(f3744335862dd4c53925cc32792badd4a378c837) )
 	ROM_LOAD( "sr-04.m4", 0x04000, 0x4000, CRC(a60ac644) SHA1(f37862db3cf5e6cc9ab3276f3bc45fd629fd70dd) )
 	ROM_LOAD( "sr-05.m5", 0x10000, 0x4000, CRC(835f7b24) SHA1(24b66827f08c43fbf5b9517d638acdfc38e1b1e7) )
 	ROM_LOAD( "sr-06.m6", 0x14000, 0x2000, CRC(821c6481) SHA1(06becb6bf8b4bde3a458098498eecad566a87711) )
 	ROM_LOAD( "sr-07.m7", 0x18000, 0x4000, CRC(5df525e1) SHA1(70cd2910e2945db76bd6ebfa0ff09a5efadc2d0b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sr-01.c11", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -433,14 +433,14 @@ ROM_START( 1942b )
 ROM_END
 
 ROM_START( 1942w )
-	ROM_REGION( 0x1c000, "main", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x1c000, "maincpu", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "sw-03.m3", 0x00000, 0x4000, CRC(afd79770) SHA1(74c7a887fe3d4abfce1dcfec4c75b21ab81adc8c) )
 	ROM_LOAD( "sw-04.m4", 0x04000, 0x4000, CRC(933d9910) SHA1(9c73ef880f56e30a865be959f8bbdbe79c7ef8e2) )
 	ROM_LOAD( "sw-05.m5", 0x10000, 0x4000, CRC(e9a71bb6) SHA1(1f0d52c9282d15f9e4898b3b144ece25d345b71f) )
 	ROM_LOAD( "sw-06.m6", 0x14000, 0x2000, CRC(466f8248) SHA1(2ccc8fc59962d3001fbc10e8d2f20a254a74f251) )	/* matches srb-06.m6 from 1942 (Revision B) */
 	ROM_LOAD( "sw-07.m7", 0x18000, 0x4000, CRC(ec41655e) SHA1(dbe4bb11f2e88574cb43ba5cd216354c3b7f69a6) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sr-01.c11", 0x0000, 0x4000, CRC(bd87f06b) SHA1(821f85cf157f81117eeaba0c3cf0337eac357e58) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -476,7 +476,7 @@ ROM_END
 
 static DRIVER_INIT( 1942 )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 3, &ROM[0x10000], 0x4000);
 }
 

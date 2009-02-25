@@ -441,13 +441,13 @@ static PALETTE_INIT( bw )
 static MACHINE_DRIVER_START( blockade )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/10)
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/10)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", blockade_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", blockade_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -497,7 +497,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( blockade )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD_NIB_HIGH( "316-04.u2", 0x0000, 0x0400, CRC(a93833e9) SHA1(e29e7b29900f8305effa700a53806a12bf9d37bd) )
     ROM_LOAD_NIB_LOW(  "316-03.u3", 0x0000, 0x0400, CRC(85960d3b) SHA1(aabfe8f9c26126299d6c07a31ef1aac5300deff5) )
 
@@ -507,7 +507,7 @@ ROM_START( blockade )
 ROM_END
 
 ROM_START( comotion )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD_NIB_HIGH( "316-07.u2", 0x0000, 0x0400, CRC(5b9bd054) SHA1(324b844788945e7bc82d096d6d375e79e3e1a634) )
     ROM_LOAD_NIB_LOW(  "316-08.u3", 0x0000, 0x0400, CRC(1a856042) SHA1(91bdc260e8c88ce2b6ac05bfba043ed611bc30de) )
     ROM_LOAD_NIB_HIGH( "316-09.u4", 0x0400, 0x0400, CRC(2590f87c) SHA1(95a7af04b610d79fb3f6d74dda322e66164b9484) )
@@ -519,7 +519,7 @@ ROM_START( comotion )
 ROM_END
 
 ROM_START( blasto )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD_NIB_HIGH( "blasto.u2", 0x0000, 0x0400, CRC(ec99d043) SHA1(10650e54bf55f3ace5c199215c2fce211916d3b7) )
     ROM_LOAD_NIB_LOW(  "blasto.u3", 0x0000, 0x0400, CRC(be333415) SHA1(386cab720f0c2da16b9ec84f67ccebf23406c58d) )
     ROM_LOAD_NIB_HIGH( "blasto.u4", 0x0400, 0x0400, CRC(1c889993) SHA1(e23c72d075cf3d209081bca5a953c33c8ae042ea) )
@@ -531,7 +531,7 @@ ROM_START( blasto )
 ROM_END
 
 ROM_START( hustle )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD_NIB_HIGH( "3160016.u2", 0x0000, 0x0400, CRC(d983de7c) SHA1(af6e0ea78449bfba4fe8affd724d7b0eb3d38706) )
     ROM_LOAD_NIB_LOW(  "3160017.u3", 0x0000, 0x0400, CRC(edec9cb9) SHA1(548cc7b0a15a1c977b7ef4a99ff88101893f661a) )
     ROM_LOAD_NIB_HIGH( "3160018.u4", 0x0400, 0x0400, CRC(f599b9c0) SHA1(c55ed33ac51b9cfbb2fe4321bbb1e0a16694f065) )
@@ -543,7 +543,7 @@ ROM_START( hustle )
 ROM_END
 
 ROM_START( mineswpr )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD_NIB_HIGH( "mineswee.h0p", 0x0000, 0x0400, CRC(5850a4ba) SHA1(9f097d31428f4494573187049c53fbed2075ff32) )
     ROM_LOAD_NIB_LOW(  "mineswee.l0p", 0x0000, 0x0400, CRC(05961379) SHA1(3d59341be8a663e8c54c1556442c992a6eb886ab) )
 
@@ -553,7 +553,7 @@ ROM_START( mineswpr )
 ROM_END
 
 ROM_START( minesw4p )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD_NIB_HIGH( "mineswee.h0p", 0x0000, 0x0400, CRC(5850a4ba) SHA1(9f097d31428f4494573187049c53fbed2075ff32) )
     ROM_LOAD_NIB_LOW(  "mineswee.l0p", 0x0000, 0x0400, CRC(05961379) SHA1(3d59341be8a663e8c54c1556442c992a6eb886ab) )
 

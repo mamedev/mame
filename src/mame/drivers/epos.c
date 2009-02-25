@@ -39,7 +39,7 @@ static MACHINE_RESET( dealer );
 
 static WRITE8_HANDLER( dealer_decrypt_rom )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 	if (offset & 0x04)
 		counter = (counter + 1) & 0x03;
@@ -116,7 +116,7 @@ ADDRESS_MAP_END
 */
 static WRITE8_DEVICE_HANDLER( write_prtc )
 {
-	UINT8 *rom = memory_region(device->machine, "main");
+	UINT8 *rom = memory_region(device->machine, "maincpu");
 	memory_set_bankptr(device->machine, 2, rom + 0x6000 + (0x1000 * (data & 1)));
 }
 
@@ -381,15 +381,15 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( epos )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
+	MDRV_CPU_ADD("maincpu", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(epos)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -405,17 +405,17 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dealer )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
+	MDRV_CPU_ADD("maincpu", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
 	MDRV_CPU_PROGRAM_MAP(dealer_readmem,dealer_writemem)
 	MDRV_CPU_IO_MAP(dealer_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(epos)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -438,7 +438,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( megadon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2732u10b.bin",   0x0000, 0x1000, CRC(af8fbe80) SHA1(2d7857616462112fe17343a9357ee51d8f965a0f) )
 	ROM_LOAD( "2732u09b.bin",   0x1000, 0x1000, CRC(097d1e73) SHA1(b6141155b2c63c33a367dd18fe53ff9f01b99380) )
 	ROM_LOAD( "2732u08b.bin",   0x2000, 0x1000, CRC(526784da) SHA1(7d9f43dc6975a018bec95982029ce7ac9f675869) )
@@ -454,7 +454,7 @@ ROM_END
 
 
 ROM_START( catapult )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "co3223.u10",     0x0000, 0x1000, CRC(50abcfd2) SHA1(13ce04addc7bcaa1ec6659da26b1c13ed9dc28f9) )
 	ROM_LOAD( "co3223.u09",     0x1000, 0x1000, CRC(fd5a9a1c) SHA1(512374e8450459537ba2cc41e7d0178052445316) )
 	ROM_LOAD( "co3223.u08",     0x2000, 0x1000, BAD_DUMP CRC(4bfc36f3) SHA1(b916805eed40cfeff0c1b0cb3cdcbcc6e362a236)  ) /* BADADDR xxxx-xxxxxxx */
@@ -470,7 +470,7 @@ ROM_END
 
 
 ROM_START( suprglob )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u10",			0x0000, 0x1000, CRC(c0141324) SHA1(a54bd71da233eb22f45da630693fddd5a0bcf25b) )
 	ROM_LOAD( "u9",				0x1000, 0x1000, CRC(58be8128) SHA1(534f0a093b3ff577a2a5461498bc11ce14dc6d97) )
 	ROM_LOAD( "u8",				0x2000, 0x1000, CRC(6d088c16) SHA1(0929ea1b58eab997b5d9c9642f8b47557a4045f1) )
@@ -486,7 +486,7 @@ ROM_END
 
 
 ROM_START( theglob )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "globu10.bin",	0x0000, 0x1000, CRC(08fdb495) SHA1(739efa676b5a3df36a6061382aeb8c2d495ba23f) )
 	ROM_LOAD( "globu9.bin",		0x1000, 0x1000, CRC(827cd56c) SHA1(3aedc1cefb463cf6b31befb33e50c832dc2e3941) )
 	ROM_LOAD( "globu8.bin",		0x2000, 0x1000, CRC(d1219966) SHA1(571349f9c978fdcf826a0c66c3fb11a9e27b240a) )
@@ -502,7 +502,7 @@ ROM_END
 
 
 ROM_START( theglob2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "611293.u10",		0x0000, 0x1000, CRC(870af7ce) SHA1(f901619663313a72997f30ccecdeac8294fe200e) )
 	ROM_LOAD( "611293.u9",		0x1000, 0x1000, CRC(a3679782) SHA1(fbc26ae98e2bf10272d61159b084d78a6f410374) )
 	ROM_LOAD( "611293.u8",		0x2000, 0x1000, CRC(67499d1a) SHA1(dce7041df5ed1847e0ffc82672d09e00b16de3a9) )
@@ -518,7 +518,7 @@ ROM_END
 
 
 ROM_START( theglob3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "theglob3.u10",	0x0000, 0x1000, CRC(969cfaf6) SHA1(b63226b8694640d6452bca12755780d1b52d1d3c) )
 	ROM_LOAD( "theglob3.u9",	0x1000, 0x1000, CRC(8e6c010a) SHA1(ec9627742ce52eb29bbafc9d0555d16ac7146f2e) )
 	ROM_LOAD( "theglob3.u8",	0x2000, 0x1000, CRC(1c1ca5c8) SHA1(6e5f9d7f9f016a72003433375c806c5f921ed423) )
@@ -534,7 +534,7 @@ ROM_END
 
 
 ROM_START( igmo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "igmo-u10.732",	0x0000, 0x1000, CRC(a9f691a4) SHA1(e3f2dc41bd8760fc52e99b7e9faa12c7cf51ffe0) )
 	ROM_LOAD( "igmo-u9.732",	0x1000, 0x1000, CRC(3c133c97) SHA1(002b5aff6b947b6a9cbabeed5be798c1ddf2bda1) )
 	ROM_LOAD( "igmo-u8.732",	0x2000, 0x1000, CRC(5692f8d8) SHA1(6ab50775dff49330a85fbfb2d4d4c3a2e54df3d1) )
@@ -550,7 +550,7 @@ ROM_END
 
 
 ROM_START( dealer )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "u1.bin",			0x0000, 0x2000, CRC(e06f3563) SHA1(0d58cd1f2e1ca89adb9c64d7dd520bb1f2d50f1a) )
 	ROM_LOAD( "u2.bin",			0x2000, 0x2000, CRC(726bbbd6) SHA1(3538f3d655899c2a0f984c43fb7545ea4be1b231) )
 	ROM_LOAD( "u3.bin",			0x4000, 0x2000, CRC(ab721455) SHA1(a477da0590e0431172baae972e765473e19dcbff) )
@@ -581,7 +581,7 @@ EPOS TRISTAR 9000
 */
 
 ROM_START( revenger )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "r06124.u1",    0x0000, 0x2000, CRC(fad1a2a5) BAD_DUMP SHA1(a31052c91fe67e2e90441abc40b6483f921ecfe3) )
 	ROM_LOAD( "r06124.u2",    0x2000, 0x2000, CRC(a8e0ee7b) BAD_DUMP SHA1(f6f78e8ce40eab07de461b364876c1eb4a78d96e) )
 	ROM_LOAD( "r06124.u3",    0x4000, 0x2000, CRC(cca414a5) BAD_DUMP SHA1(1c9dd3ff63d57e9452e63083cdbd7f5d693bb686) )
@@ -593,7 +593,7 @@ ROM_END
 
 static MACHINE_RESET( dealer )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	counter = 0;
 	memory_set_bankptr(machine, 1, rom);
 	memory_set_bankptr(machine, 2, rom + 0x6000);
@@ -601,7 +601,7 @@ static MACHINE_RESET( dealer )
 
 static DRIVER_INIT( dealer )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 
 	/* Key 0 */

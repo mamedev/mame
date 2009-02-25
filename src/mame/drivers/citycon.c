@@ -193,8 +193,8 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
-		DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch2_r),
+		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch2_r),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
@@ -206,16 +206,16 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( citycon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 2048000)        /* 2.048 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 2.048 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", M6809, 640000)       /* 0.640 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", M6809, 640000)       /* 0.640 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -251,11 +251,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( citycon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c10",          0x4000, 0x4000, CRC(ae88b53c) SHA1(dd12310bd9c9b93462446e8e0a1c853506bf3aa1) )
 	ROM_LOAD( "c11",          0x8000, 0x8000, CRC(139eb1aa) SHA1(c570e8ca1499f7ea61938e78c32c1cc3050ca2b7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c1",           0x8000, 0x8000, CRC(1fad7589) SHA1(2e626bbbab8cffe11ee7de3e56aa1871c29d5fa9) )
 
 	ROM_REGION( 0x03000, "gfx1", ROMREGION_DISPOSE )
@@ -278,11 +278,11 @@ ROM_START( citycon )
 ROM_END
 
 ROM_START( citycona )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c10",          0x4000, 0x4000, CRC(ae88b53c) SHA1(dd12310bd9c9b93462446e8e0a1c853506bf3aa1) )
 	ROM_LOAD( "c11b",         0x8000, 0x8000, CRC(d64af468) SHA1(5bb3541af3ce632e8eca313231205713d72fb9dc) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c1",           0x8000, 0x8000, CRC(1fad7589) SHA1(2e626bbbab8cffe11ee7de3e56aa1871c29d5fa9) )
 
 	ROM_REGION( 0x03000, "gfx1", ROMREGION_DISPOSE )
@@ -305,11 +305,11 @@ ROM_START( citycona )
 ROM_END
 
 ROM_START( cruisin )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cr10",         0x4000, 0x4000, CRC(cc7c52f3) SHA1(69d76f146fb1dac62c6def3a4269012b3880f03b) )
 	ROM_LOAD( "cr11",         0x8000, 0x8000, CRC(5422f276) SHA1(d384fc4f853fe79b73e939a8fc7b7af780659c5e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "c1",           0x8000, 0x8000, CRC(1fad7589) SHA1(2e626bbbab8cffe11ee7de3e56aa1871c29d5fa9) )
 
 	ROM_REGION( 0x03000, "gfx1", ROMREGION_DISPOSE )

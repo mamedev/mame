@@ -60,7 +60,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static MACHINE_START( tutankhm )
 {
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x1000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
 	state_save_register_global(machine, irq_toggle);
 	state_save_register_global(machine, irq_enable);
 }
@@ -233,14 +233,14 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( tutankhm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 1500000)			/* 1.5 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", tutankhm_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", tutankhm_interrupt)
 
 	MDRV_MACHINE_START(tutankhm)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -270,7 +270,7 @@ MACHINE_DRIVER_END
 */
 
 ROM_START( tutankhm )
-	ROM_REGION( 0x20000, "main", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
+	ROM_REGION( 0x20000, "maincpu", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
 	ROM_LOAD( "h1.bin",       0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) /* program ROMs */
 	ROM_LOAD( "h2.bin",       0x0b000, 0x1000, CRC(a0f02c85) SHA1(29a78b3ffd6b597772953543b02dd59acf5af38c) )
 	ROM_LOAD( "h3.bin",       0x0c000, 0x1000, CRC(ea03a1ab) SHA1(27a3cca0595bac642caaf9ee2f276814442c8721) )
@@ -295,7 +295,7 @@ ROM_END
 
 
 ROM_START( tutankst )
-	ROM_REGION( 0x20000, "main", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
+	ROM_REGION( 0x20000, "maincpu", 0 )      /* 64k for M6809 CPU code + 64k for ROM banks */
 	ROM_LOAD( "h1.bin",       0x0a000, 0x1000, CRC(da18679f) SHA1(8d2a3665db937d0e1d19300ae22277d9db61fcbc) ) /* program ROMs */
 	ROM_LOAD( "h2.bin",       0x0b000, 0x1000, CRC(a0f02c85) SHA1(29a78b3ffd6b597772953543b02dd59acf5af38c) )
 	ROM_LOAD( "ra1_3h.cpu",   0x0c000, 0x1000, CRC(2d62d7b1) SHA1(910718f36735f2614cda0c3a1abdfa995d82dbd2) )

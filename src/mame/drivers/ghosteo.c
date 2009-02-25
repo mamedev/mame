@@ -490,12 +490,12 @@ static INTERRUPT_GEN( bballoon_interrupt )
 static MACHINE_DRIVER_START( bballoon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", ARM7, 24000000)
+	MDRV_CPU_ADD("maincpu", ARM7, 24000000)
 	MDRV_CPU_PROGRAM_MAP(bballoon_map,0)
-	MDRV_CPU_VBLANK_INT("main", bballoon_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", bballoon_interrupt)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

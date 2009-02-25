@@ -254,15 +254,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( sbasketb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 1400000)        /* 1.400 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_14_31818MHz / 4)	/* 3.5795 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)	/* 3.5795 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -314,12 +314,12 @@ MACHINE_DRIVER_END
 */
 
 ROM_START( sbasketb )
-	ROM_REGION( 0x10000, "main", 0 ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405h05.14j", 0x6000, 0x2000, CRC(263ec36b) SHA1(b445b600726ba4935623311e1a178aeb4a356b0a) )
 	ROM_LOAD( "405h03.11j", 0x8000, 0x4000, CRC(0a4d7a82) SHA1(2e0153b41e23284427881258a44bd55be3570eb2) )
 	ROM_LOAD( "405h01.9j",  0xc000, 0x4000, CRC(4f9dd9a0) SHA1(97f4c208509d50a7ce4c1ebe8a3f643ad75e833b) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* roms located on Sound Board  */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* roms located on Sound Board  */
 	ROM_LOAD( "405e13.7a",  0x0000, 0x2000, CRC(1ec7458b) SHA1(a015b982bff5f9e7ece33f2e69ff8c6c2174e710) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
@@ -347,14 +347,14 @@ ROM_END
 */
 
 ROM_START( sbasketg )
-	ROM_REGION( 0x10000, "main", 0 ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405g05",     0x6000, 0x2000, CRC(336dc0ab) SHA1(0fe47fdbf183683c569785fc6b980337a9cfde95) )
 	ROM_LOAD( "405g04",     0x8000, 0x2000, CRC(f064a9bc) SHA1(4f1b94a880385c6ba74cc0883b24f6fec934e35d) )
 	ROM_LOAD( "405g03",     0xa000, 0x2000, CRC(b9de7d53) SHA1(5a4e5491ff3511992d949367fd7b5d383c2727db) )
 	ROM_LOAD( "405g02",     0xc000, 0x2000, CRC(e98470a0) SHA1(79af25af941fe357a8c9f0a2f11e5558670b8027) )
 	ROM_LOAD( "405g01",     0xe000, 0x2000, CRC(1bd0cd2e) SHA1(d162f9b989f718d9882a02a8c64743adf3d8e239) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* roms located on Sound Board  */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* roms located on Sound Board  */
 	ROM_LOAD( "405e13.7a",  0x0000, 0x2000, CRC(1ec7458b) SHA1(a015b982bff5f9e7ece33f2e69ff8c6c2174e710) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
@@ -385,14 +385,14 @@ ROM_END
 */
 
 ROM_START( sbaskete )
-	ROM_REGION( 0x10000, "main", 0 ) /* roms located on the CPU/Video board */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* roms located on the CPU/Video board */
 	ROM_LOAD( "405e05",     0x6000, 0x2000, CRC(32ea5b71) SHA1(d917c31d2c9a7229396e4a930e8d27394329533a) )
 	ROM_LOAD( "405e04",     0x8000, 0x2000, CRC(7abf3087) SHA1(fbaaaaae0b8bed1bc6ad7f2da267c2ef8bd75b15) )
 	ROM_LOAD( "405e03",     0xa000, 0x2000, CRC(9c6fcdcd) SHA1(a644ec98f49f84311829149c181aba25e7681793) )
 	ROM_LOAD( "405e02",     0xc000, 0x2000, CRC(0f145648) SHA1(2e238eb0663295887bf6b4905f1fd386db16d82a) )
 	ROM_LOAD( "405e01",     0xe000, 0x2000, CRC(6a27f1b1) SHA1(38c0be98fb122a7a6ed833af011bda5663a06510) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* roms located on Sound Board  */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* roms located on Sound Board  */
 	ROM_LOAD( "405e13.7a",  0x0000, 0x2000, CRC(1ec7458b) SHA1(a015b982bff5f9e7ece33f2e69ff8c6c2174e710) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE ) /* roms located on the CPU/Video board */
@@ -420,7 +420,7 @@ ROM_END
 
 static DRIVER_INIT( sbasketb )
 {
-	konami1_decode(machine, "main");
+	konami1_decode(machine, "maincpu");
 }
 
 GAME( 1984, sbasketb, 0,        sbasketb, sbasketb, 0,        ROT90, "Konami", "Super Basketball (version H, unprotected)", GAME_SUPPORTS_SAVE )

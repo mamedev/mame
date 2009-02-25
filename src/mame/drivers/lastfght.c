@@ -349,8 +349,8 @@ static WRITE16_HANDLER( lastfght_sound_w )
 static ADDRESS_MAP_START( lastfght_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
-	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("main", 0)
-	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("main", 0)
+	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
 
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// battery
 
@@ -461,7 +461,7 @@ static INTERRUPT_GEN( unknown_interrupt )
 }
 
 static MACHINE_DRIVER_START( lastfght )
-	MDRV_CPU_ADD("main", H83044, 32000000/2)
+	MDRV_CPU_ADD("maincpu", H83044, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP( lastfght_map, 0 )
 	MDRV_CPU_VBLANK_INT_HACK(unknown_interrupt,2)
 
@@ -470,7 +470,7 @@ static MACHINE_DRIVER_START( lastfght )
 	/* video hardware */
 	MDRV_PALETTE_LENGTH( 256 )
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 512, 256 )
 	MDRV_SCREEN_VISIBLE_AREA( 0, 512-1, 0, 256-16-1 )
@@ -486,7 +486,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( lastfght )
-	ROM_REGION( 0x100000, "main", 0 )		// H8/3044 program
+	ROM_REGION( 0x100000, "maincpu", 0 )		// H8/3044 program
 	ROM_LOAD( "v106.u16", 0x000000, 0x080000, CRC(7aec89f4) SHA1(7cff00844ad82a0f8d19b1bd07ba3a2bced69d66) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )		// Blitter data
@@ -501,7 +501,7 @@ ROM_END
 
 static DRIVER_INIT(lastfght)
 {
-	UINT16 *rom = (UINT16*)memory_region(machine, "main");
+	UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
 
 	// pass initial check (protection ? hw?)
 	rom[0x00354/2] = 0x403e;

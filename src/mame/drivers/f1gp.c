@@ -60,7 +60,7 @@ static READ16_HANDLER( extrarom2_r )
 
 static WRITE8_HANDLER( f1gp_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
 	memory_set_bankptr(space->machine, 1,rom + (data & 0x01) * 0x8000);
 }
@@ -470,22 +470,22 @@ static const ym2610_interface ym2610_config =
 static MACHINE_DRIVER_START( f1gp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000,XTAL_20MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(f1gp_readmem1,f1gp_writemem1)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,XTAL_20MHz/4)	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -512,19 +512,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( f1gpb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000,10000000)	/* 10 MHz ??? */
+	MDRV_CPU_ADD("maincpu",M68000,10000000)	/* 10 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000,10000000)	/* 10 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(f1gpb_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	/* NO sound CPU */
 	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -550,12 +550,12 @@ static MACHINE_DRIVER_START( f1gp2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(f1gp)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(f1gp2_readmem1,f1gp2_writemem1)
 
 	/* video hardware */
 	MDRV_GFXDECODE(f1gp2)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
 
 	MDRV_VIDEO_START(f1gp2)
@@ -565,7 +565,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( f1gp )
-	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom1-a.3",     0x000000, 0x20000, CRC(2d8f785b) SHA1(6eca42ad2d57a31e055496141c89cb537f284378) )
 
 	ROM_REGION( 0x200000, "user1", 0 )	/* extra ROMs mapped at 100000 */
@@ -586,7 +586,7 @@ ROM_START( f1gp )
 	ROM_REGION( 0x20000, "sub", 0 )	/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom4-a.4",     0x000000, 0x20000, CRC(8e811d36) SHA1(2b806b50a3a307a21894687f16485ace287a7c4c) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* 64k for the audio CPU + banks */
 	ROM_LOAD( "rom5-a.8",     0x00000, 0x08000, CRC(9ea36e35) SHA1(9254dea8362318d8cfbd5e36e476e0e235e6326a) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 
@@ -617,7 +617,7 @@ ROM_END
  */
 
 ROM_START( f1gpb )
-	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
 	/* these have extra data at 0x30000 which isn't preset in the f1gp set, is it related to the changed sound hardware? */
 	ROM_LOAD16_BYTE( "1.ic38",     0x000001, 0x20000, CRC(046dd83a) SHA1(ea65fa88f9d9a79664de666e63594a7a7de86650) )
 	ROM_LOAD16_BYTE( "7.ic39",     0x000000, 0x20000, CRC(960f5db4) SHA1(addc461538e2140afae400e8d7364d0bcc42a0cb) )
@@ -674,7 +674,7 @@ ROM_END
 
 
 ROM_START( f1gp2 )
-	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "rom12.v1",     0x000000, 0x20000, CRC(c5c5f199) SHA1(56fcbf1d9b15a37204296c578e1585599f76a107) )
 	ROM_LOAD16_BYTE( "rom14.v2",     0x000001, 0x20000, CRC(dd5388e2) SHA1(66e88f86edc2407e5794519f988203a52d65636d) )
 
@@ -685,7 +685,7 @@ ROM_START( f1gp2 )
 	ROM_REGION( 0x20000, "sub", 0 )	/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rom13.v3",     0x000000, 0x20000, CRC(c37aa303) SHA1(0fe09b398191888620fb676ed0f1593be575512d) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* 64k for the audio CPU + banks */
 	ROM_LOAD( "rom5.v4",      0x00000, 0x08000, CRC(6a9398a1) SHA1(e907fe5f9c135c5b10ec650ec0c6d08cb856230c) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 

@@ -313,12 +313,12 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_DRIVER_START( tunhunt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,2000000)		/* ??? */
+	MDRV_CPU_ADD("maincpu", M6502,2000000)		/* ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ? probably wrong */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -374,7 +374,7 @@ ATARI TUBE CHASE
 */
 
 ROM_START( tunhunt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "001.lm1",	0x5000, 0x800, CRC(2601a3a4) SHA1(939bafc54576fdaccf688b49cc9d201b03feec3a) )
 	ROM_LOAD( "002.k1",		0x5800, 0x800, CRC(29bbf3df) SHA1(4a0ec4cfab362a976d3962b347f687db45095cfd) )
 	ROM_LOAD( "136000.103",	0x6000, 0x800, CRC(1a6a60a4) SHA1(7c60cc92595f1b90f421eabbaa20f657181ed4f0) )
@@ -398,7 +398,7 @@ ROM_START( tunhunt )
 ROM_END
 
 ROM_START( tunhuntc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "001.lm1",	0x5000, 0x800, CRC(2601a3a4) SHA1(939bafc54576fdaccf688b49cc9d201b03feec3a) )
 	ROM_LOAD( "002.k1",		0x5800, 0x800, CRC(29bbf3df) SHA1(4a0ec4cfab362a976d3962b347f687db45095cfd) )
 	ROM_LOAD( "003.j1",		0x6000, 0x800, CRC(360c0f47) SHA1(8e3d815836504c7651812e0e26423b0c7045621c) ) /* bad crc? fails self-test */

@@ -153,7 +153,7 @@ static WRITE8_HANDLER( ppmast93_bgram_w )
 
 static WRITE8_HANDLER( ppmast93_port4_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	int bank;
 
 	coin_counter_w(0, data & 0x08);
@@ -164,7 +164,7 @@ static WRITE8_HANDLER( ppmast93_port4_w )
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM) AM_WRITENOP AM_REGION("main", 0x10000)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM) AM_WRITENOP AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ppmast93_bgram_w) AM_BASE(&ppmast93_bgram) AM_SHARE(1)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITENOP
@@ -341,10 +341,10 @@ static VIDEO_UPDATE( ppmast93 )
 
 static MACHINE_DRIVER_START( ppmast93 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,5000000)		 /* 5 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,5000000)		 /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(ppmast93_cpu1_map,0)
 	MDRV_CPU_IO_MAP(ppmast93_cpu1_io,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,5000000)		 /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(ppmast93_cpu2_map,0)
@@ -352,7 +352,7 @@ static MACHINE_DRIVER_START( ppmast93 )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -378,7 +378,7 @@ static MACHINE_DRIVER_START( ppmast93 )
 MACHINE_DRIVER_END
 
 ROM_START( ppmast93 )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "2.up7", 0x10000, 0x20000, CRC(8854d8db) SHA1(9d93ddfb44d533772af6519747a6cb50b42065cd) )
 
 	ROM_REGION( 0x30000, "sub", 0 )

@@ -145,27 +145,27 @@ static READ8_HANDLER( catchall )
 
 static WRITE8_HANDLER( banksel_main_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x8000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "maincpu") + 0x8000);
 }
 static WRITE8_HANDLER( banksel_1_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x10000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "maincpu") + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x18000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "maincpu") + 0x18000);
 }
 static WRITE8_HANDLER( banksel_3_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x20000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "maincpu") + 0x20000);
 }
 static WRITE8_HANDLER( banksel_4_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x28000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "maincpu") + 0x28000);
 }
 static WRITE8_HANDLER( banksel_5_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x30000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "maincpu") + 0x30000);
 }
 
 
@@ -456,15 +456,15 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( findout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(findout)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -495,7 +495,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( reelfun ) /* v7.01 */
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "reelfun.cnt",          0x00000, 0x4000, CRC(d9d1e92b) SHA1(337f66a37b3734d565b3ff3d912e0f690fd7c445) )
 	ROM_LOAD( "reelfun.prg",          0x08000, 0x2000, CRC(615d846a) SHA1(ffa1c47393f4f364aa34d14cf3ac2f56d9eaecb0) )	/* banked */
 	ROM_LOAD( "reelfun-1-title",      0x10000, 0x8000, CRC(0e165fbc) SHA1(a3a5b7db72ab86efe973f649f5dfe5133830e3fc) )	/* banked ROMs for solution data */
@@ -506,7 +506,7 @@ ROM_START( reelfun ) /* v7.01 */
 ROM_END
 
 ROM_START( findout )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "12.bin",       0x00000, 0x4000, CRC(21132d4c) SHA1(e3562ee2f46b3f022a852a0e0b1c8fb8164f64a3) )
 	ROM_LOAD( "11.bin",       0x08000, 0x2000, CRC(0014282c) SHA1(c6792f2ff712ba3759ff009950d78750df844d01) )	/* banked */
 	ROM_LOAD( "13.bin",       0x10000, 0x8000, CRC(cea91a13) SHA1(ad3b395ab0362f3decf178824b1feb10b6335bb3) )	/* banked ROMs for solution data */
@@ -520,7 +520,7 @@ ROM_START( findout )
 ROM_END
 
 ROM_START( gt507uk )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "triv_3_2.bin",    0x00000, 0x4000, CRC(2d72a081) SHA1(8aa32acf335d027466799b097e0de66bcf13247f) )
 	ROM_LOAD( "rom_ad.bin",      0x08000, 0x2000, CRC(c81cc847) SHA1(057b7b75a2fe1abf88b23e7b2de230d9f96139f5) )
 	ROM_LOAD( "aerospace",       0x10000, 0x8000, CRC(cb555d46) SHA1(559ae05160d7893ff96311a2177eba039a4cf186) )
@@ -531,7 +531,7 @@ ROM_START( gt507uk )
 ROM_END
 
 ROM_START( gt103 )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "trvmast3.bin",    0x00000, 0x4000, CRC(9ea277bc) SHA1(f813de572a3b5e2ad601dc6559dc93c30bb7a38c) )
 	ROM_LOAD( "comics-cartoons", 0x10000, 0x8000, CRC(193c868e) SHA1(75f18eb6cc6467e927961271374bedaf7736e20b) )
 	ROM_LOAD( "general_3",       0x18000, 0x8000, CRC(b0376464) SHA1(d1812d6dd42cd7f3753fcc0d2647b56a91bfcc9d) )
@@ -541,7 +541,7 @@ ROM_START( gt103 )
 ROM_END
 
 ROM_START( gt5 ) /* v5.06, From a TRIV3D romboard */
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "program",         0x00000, 0x4000, CRC(e9d6226c) SHA1(42e62c5cafa3f051bf48c18c8c549ffcd4c766c5) )
 	ROM_LOAD( "entertainment_2", 0x10000, 0x8000, CRC(c75c2331) SHA1(9c5947616a4cba2623c599def6cf3b2b1981b681) ) /* rom / question set #15 */
 	ROM_LOAD( "facts_2",         0x18000, 0x8000, CRC(7836ef31) SHA1(6a84cfa39de392eed46a4b37752e00b6d094bbd6) )
@@ -551,7 +551,7 @@ ROM_START( gt5 ) /* v5.06, From a TRIV3D romboard */
 ROM_END
 
 ROM_START( gt103a )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin", 0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
 	ROM_LOAD( "rich-famous",  0x10000, 0x8000, CRC(39e07e4a) SHA1(6e5a0bcefaa1169f313e8818cf50919108b3e121) )
 	ROM_LOAD( "rock-n-roll",  0x18000, 0x8000, CRC(1be036b1) SHA1(0b262906044950319dd911b956ac2e0b433f6c7f) )
@@ -561,7 +561,7 @@ ROM_START( gt103a )
 ROM_END
 
 ROM_START( gt103a1 )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versiona",  0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) )
 	ROM_LOAD( "general",         0x10000, 0x8000, CRC(1efa01c3) SHA1(801ef5ab55184e488b08ef99ebd641ea4f7edb24) )
 	ROM_LOAD( "new_science_2",   0x18000, 0x8000, CRC(3bd80fb8) SHA1(9a196595bc5dc6ed5ee5853786839ed4847fa436) )
@@ -571,7 +571,7 @@ ROM_START( gt103a1 )
 ROM_END
 
 ROM_START( gt103a2 )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "cars-women",     0x10000, 0x8000, CRC(4c5dd1df) SHA1(f3e2146eeab07ec71617c7614c6e8f6bc844e6e3) )
 	ROM_LOAD( "cops_&_robbers", 0x18000, 0x8000, CRC(8b367c33) SHA1(013468157bf469c9cf138809fdc45b3ba60a423b) )
@@ -581,7 +581,7 @@ ROM_START( gt103a2 )
 ROM_END
 
 ROM_START( gt103a3 )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versionc", 0x00000, 0x4000, CRC(340246a4) SHA1(d655e1cf2b1e87a05e87ff6af4b794e6d54a2a52) )
 	ROM_LOAD( "new_sports",     0x10000, 0x8000, CRC(19eff1a3) SHA1(8e024ae6cc572176c90d819a438ace7b2512dbf2) )
 	ROM_LOAD( "new_general",    0x18000, 0x8000, CRC(ba1f5b92) SHA1(7e94be0ef6904331d3a6b266e5887e9a15c5e7f9) )
@@ -590,7 +590,7 @@ ROM_START( gt103a3 )
 ROM_END
 
 ROM_START( gt103a4 )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versiona",   0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) )
 	ROM_LOAD( "vices",            0x10000, 0x8000, CRC(e6069955) SHA1(68f7453f21a4ce1be912141bbe947fbd81d918a3) )
 	ROM_LOAD( "science",          0x18000, 0x8000, CRC(2f940ebd) SHA1(bead4988ac0a97d70f2a3c0b40a05968436de2ed) )
@@ -599,7 +599,7 @@ ROM_START( gt103a4 )
 ROM_END
 
 ROM_START( gt103aa )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin",    0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
 	ROM_LOAD( "rock-n-roll_alt", 0x10000, 0x8000, CRC(8eb83052) SHA1(93e3c1ae6c2048fb44ecafe1013b6a96da38fa84) )
 	ROM_LOAD( "science_alt",     0x18000, 0x8000, CRC(9eaebd18) SHA1(3a4d787cb006dbb23ce346577cb1bb5e543ba52c) )
@@ -609,7 +609,7 @@ ROM_START( gt103aa )
 ROM_END
 
 ROM_START( gt103ab )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin",      0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
 	ROM_LOAD( "entertainment_alt", 0x10000, 0x8000, CRC(9a6628b9) SHA1(c0cb7e974329d4d5b91f107296d21a674e35a51b) )
 	ROM_LOAD( "general_alt",       0x18000, 0x8000, CRC(df34f7f9) SHA1(329d123eea711d5135dc02dd7b89b220ce8ddd28) )
@@ -619,7 +619,7 @@ ROM_START( gt103ab )
 ROM_END
 
 ROM_START( gt103asx )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "t_3a-8_1.bin",    0x00000, 0x4000, CRC(02aef306) SHA1(1ffc10c79a55d41ea36bcaab13cb3f02cb3f9712) )
 	ROM_LOAD( "adult_sex_2",     0x10000, 0x8000, CRC(0d683f21) SHA1(f47ce3c31c4c5ed02247fa280303e6ae760315df) )
 	ROM_LOAD( "adult_sex_2_alt", 0x18000, 0x8000, CRC(8c0eacc8) SHA1(ddaa25548d161394b41c65a2db57a9fcf793062b) )
@@ -629,7 +629,7 @@ ROM_START( gt103asx )
 ROM_END
 
 ROM_START( quiz )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",        0x00000, 0x4000, CRC(4e3204da) SHA1(291f1c9b8c4c07881621c3ecbba7af80f86b9520) )
 	ROM_LOAD( "2.bin",        0x10000, 0x8000, CRC(b79f3ae1) SHA1(4b4aa50ec95138bc8ee4bc2a61bcbfa2515ac854) )
 	ROM_LOAD( "3.bin",        0x18000, 0x8000, CRC(9c7e9608) SHA1(35ee9aa36d16bca64875640224c7fe9d327a95c3) )
@@ -642,7 +642,7 @@ ROM_START( quiz )
 ROM_END
 
 ROM_START( quiz211 )
-	ROM_REGION( 0x38000, "main", 0 )
+	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "1a.bin",         0x000000, 0x4000, CRC(116de0ea) SHA1(9af97b100aa2c79a58de055abe726d6e2e00aab4) )
 	ROM_CONTINUE(				0x000000, 0x4000 ) // halves identical
 	ROM_LOAD( "hobby.bin",      0x10000, 0x8000, CRC(c86d0c2b) SHA1(987ef17c7b9cc119511a16cbd98ec44d24665af5) )

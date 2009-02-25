@@ -1589,7 +1589,7 @@ static const pokey_interface warlords_pokey_interface =
 static MACHINE_DRIVER_START( centiped )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
+	MDRV_CPU_ADD("maincpu", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
 	MDRV_CPU_PROGRAM_MAP(centiped_map,0)
 
 	MDRV_MACHINE_START(centiped)
@@ -1598,10 +1598,10 @@ static MACHINE_DRIVER_START( centiped )
 	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* timer */
-	MDRV_TIMER_ADD_SCANLINE("32v", generate_interrupt, "main", 0, 16)
+	MDRV_TIMER_ADD_SCANLINE("32v", generate_interrupt, "screen", 0, 16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -1636,7 +1636,7 @@ static MACHINE_DRIVER_START( centipdb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(centiped)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(centipdb_map,0)
 
 	/* sound hardware */
@@ -1663,7 +1663,7 @@ static MACHINE_DRIVER_START( milliped )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(centiped)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(milliped_map,0)
 
 	/* video hardware */
@@ -1688,7 +1688,7 @@ static MACHINE_DRIVER_START( warlords )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(centiped)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(warlords_map,0)
 
 	/* video hardware */
@@ -1710,7 +1710,7 @@ static MACHINE_DRIVER_START( mazeinv )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(milliped)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mazeinv_map,0)
 	MDRV_VIDEO_UPDATE(centiped)
 MACHINE_DRIVER_END
@@ -1719,14 +1719,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bullsdrt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 12096000/8)
+	MDRV_CPU_ADD("maincpu", S2650, 12096000/8)
 	MDRV_CPU_PROGRAM_MAP(bullsdrt_map,0)
 	MDRV_CPU_IO_MAP(bullsdrt_port_map,0)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -1754,7 +1754,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( centiped )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136001-307.d1",  0x2000, 0x0800, CRC(5ab0d9de) SHA1(8ea6e3304202831aabaf31dbd0f970a7b3bfe421) )
 	ROM_LOAD( "136001-308.e1",  0x2800, 0x0800, CRC(4c07fd3e) SHA1(af4fdbf32c23b1864819d620a874e7f205da3cdb) )
 	ROM_LOAD( "136001-309.fh1", 0x3000, 0x0800, CRC(ff69b424) SHA1(689fa560d40a384dcbcad7c8095bc12e91875580) )
@@ -1770,7 +1770,7 @@ ROM_END
 
 
 ROM_START( centipdd ) /* Centipede "Dux" graphics hack by Two Bit Score */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136001-307.d1",  0x2000, 0x0800, CRC(5ab0d9de) SHA1(8ea6e3304202831aabaf31dbd0f970a7b3bfe421) )
 	ROM_LOAD( "136001-308.e1",  0x2800, 0x0800, CRC(4c07fd3e) SHA1(af4fdbf32c23b1864819d620a874e7f205da3cdb) )
 	ROM_LOAD( "136001-309.fh1", 0x3000, 0x0800, CRC(ff69b424) SHA1(689fa560d40a384dcbcad7c8095bc12e91875580) )
@@ -1786,7 +1786,7 @@ ROM_END
 
 
 ROM_START( centipd2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136001-207.d1",  0x2000, 0x0800, CRC(b2909e2f) SHA1(90ec90bd1e262861730afd5b113ec8dddd958ed8) )
 	ROM_LOAD( "136001-208.e1",  0x2800, 0x0800, CRC(110e04ff) SHA1(4cb481792411b6aefac561744cfbe107aba8bab3) )
 	ROM_LOAD( "136001-209.fh1", 0x3000, 0x0800, CRC(cc2edb26) SHA1(b3ea580afa6a1ac44662051fae19c1efc320fcd3) )
@@ -1802,7 +1802,7 @@ ROM_END
 
 
 ROM_START( centtime )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cent_d1.bin",  0x2000, 0x0800, CRC(c4d995eb) SHA1(d0b2f0461cfa35842045d40ffb65e777703b773e) )
 	ROM_LOAD( "cent_e1.bin",  0x2800, 0x0800, CRC(bcdebe1b) SHA1(53f3bf88a79ce40661c0a9381928e55d8c61777a) )
 	ROM_LOAD( "cent_fh1.bin", 0x3000, 0x0800, CRC(66d7b04a) SHA1(8fa758095b618085090491dfb5ea114cdc87f9df) )
@@ -1818,7 +1818,7 @@ ROM_END
 
 
 ROM_START( caterplr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "olympia.c28",  0x2000, 0x0800, CRC(8a744e57) SHA1(0bc83fe01d929af4e5c7f2a8d1236560df41f9ce) )
 	ROM_LOAD( "olympia.c29",  0x2800, 0x0800, CRC(bb897b10) SHA1(bb1039fe64774277870f675eb72dd9f3f596f865) )
 	ROM_LOAD( "olympia.c30",  0x3000, 0x0800, CRC(2297c2ac) SHA1(129d111f80b837f7b44852162f4abfba31fc0d75) )
@@ -1834,7 +1834,7 @@ ROM_END
 
 
 ROM_START( centipdb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d1",  0x2000, 0x0800, CRC(b17b8e0b) SHA1(01944cf040cf23aeb4c50d4f2e63181e08a07310) )
 	ROM_LOAD( "e1",  0x2800, 0x0800, CRC(7684398e) SHA1(eea8e05506a7af2fec55c2689e3caafc62ea524f) )
 	ROM_LOAD( "h1",  0x3000, 0x0800, CRC(74580fe4) SHA1(35b8a8675e4e020e234e51c3e4bd4ee5c24b79d2) )
@@ -1851,7 +1851,7 @@ ROM_END
 
 
 ROM_START( millpac )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "millpac1.1d",  0x2000, 0x0800, CRC(4dd6913d) SHA1(9eca634e1a827f9bbcf3c532d44e175ac4751755) )
 	ROM_LOAD( "millpac2.1e",  0x2800, 0x0800, CRC(411c81f1) SHA1(15184642522f0b7eab81301295d435c10ce2d78d) )
 	ROM_LOAD( "millpac3.1h",  0x3000, 0x0800, CRC(577076cc) SHA1(3124fcfb56f33ebd17d2c0da1098023474187066) )
@@ -1868,7 +1868,7 @@ ROM_END
 
 
 ROM_START( magworm )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "11005-0.k0",  0x2000, 0x0800, CRC(a88e970a) SHA1(f0cc6fdcdecf05f11cef7ebae4e11783a8bbc5ba) )
 	ROM_LOAD( "11005-1.k1",  0x2800, 0x0800, CRC(7a04047e) SHA1(3c00756c8ffbc5e78d4a7409802cc2ed8f668264) )
 	ROM_LOAD( "11005-2.k2",  0x3000, 0x0800, CRC(f127f1c3) SHA1(3fddcd6f458ac60eaebacef921b522dd2c7b8141) )
@@ -1881,7 +1881,7 @@ ROM_END
 
 
 ROM_START( milliped )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136013-104.1mn", 0x4000, 0x1000, CRC(40711675) SHA1(b595d6a0f5d3c611ade1b83a94c3b909d2124dc4) )
 	ROM_LOAD( "136013-103.1l",  0x5000, 0x1000, CRC(fb01baf2) SHA1(9c1d0bbc20bf25dd21761a311fd1ed80aa029241) )
 	ROM_LOAD( "136013-102.1jk", 0x6000, 0x1000, CRC(62e137e0) SHA1(9fe40db55ba1d20d4f11704f7f5df9ff75b87f30) )
@@ -1897,7 +1897,7 @@ ROM_END
 
 
 ROM_START( millipdd ) /* Millipede "Dux" graphics hack by Two Bit Score */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "136013-104.1mn", 0x4000, 0x1000, CRC(40711675) SHA1(b595d6a0f5d3c611ade1b83a94c3b909d2124dc4) )
 	ROM_LOAD( "136013-103.1l",  0x5000, 0x1000, CRC(fb01baf2) SHA1(9c1d0bbc20bf25dd21761a311fd1ed80aa029241) )
 	ROM_LOAD( "136013-102.1jk", 0x6000, 0x1000, CRC(62e137e0) SHA1(9fe40db55ba1d20d4f11704f7f5df9ff75b87f30) )
@@ -1913,7 +1913,7 @@ ROM_END
 
 
 ROM_START( mazeinv )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "005.011",      0x3000, 0x1000, CRC(37129536) SHA1(356cb986a40b332100e00fb72194fd4dade2cba7) )
 	ROM_LOAD( "004.011",      0x4000, 0x1000, CRC(2d0fbf2f) SHA1(9d4c2bc9f80604d1ff5c5bf5a4a78378efdd8b33) )
 	ROM_LOAD( "003.011",      0x5000, 0x1000, CRC(0ff3747c) SHA1(1a7e1c487c24875dada967fb3a9ceaca25b7e2a7) )
@@ -1931,7 +1931,7 @@ ROM_END
 
 
 ROM_START( warlords )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "037154.1m",    0x5000, 0x0800, CRC(18006c87) SHA1(6b4aab1b1710819d29f4bbc29269eb9c915626c0) )
 	ROM_LOAD( "037153.1k",    0x5800, 0x0800, CRC(67758f4c) SHA1(b65ca677b54de7a8202838207d9a7bb0aed3e0f2) )
 	ROM_LOAD( "037158.1j",    0x6000, 0x0800, CRC(1f043a86) SHA1(b1e271c0979d62202ae86c4b6860fb67bbef6400) )
@@ -1952,7 +1952,7 @@ ROM_END
 
 
 ROM_START( bullsdrt )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "27128.bin", 0x0000, 0x1000, CRC(2729f585) SHA1(6ffbfa5b62c497c3932ab71d0e3f407cae99cb59) )
 	ROM_CONTINUE(          0x2000, 0x1000 )
 	ROM_CONTINUE(          0x4000, 0x1000 )

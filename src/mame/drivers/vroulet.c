@@ -259,10 +259,10 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static MACHINE_DRIVER_START( vroulet )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, 4000000)	//???
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	//???
 	MDRV_CPU_PROGRAM_MAP(vroulet_map, 0)
 	MDRV_CPU_IO_MAP(vroulet_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
@@ -271,7 +271,7 @@ static MACHINE_DRIVER_START( vroulet )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -296,7 +296,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( vroulet )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "roul1.bin", 0x0000, 0x2000, CRC(0cff99e5) SHA1(0aa6680c4b8d780d71b3e6c6fe511f86f40abc4c) )
 	ROM_LOAD( "roul2.bin", 0x2000, 0x2000, CRC(61924d9f) SHA1(8334d6825ed40e8347909817b8b73be97d23faf8) )
 	ROM_LOAD( "roul3.bin", 0x4000, 0x2000, CRC(73dedff6) SHA1(d01c4fc99ac8dc03bd6e0cf779c221d403b2b648) )

@@ -178,7 +178,7 @@ WRITE8_HANDLER( circus_clown_z_w )
 	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
 
 	clown_z = (data & 0x0f);
-	*(memory_region(space->machine, "main")+0x8000)=data; logerror("Z:%02x\n",data); //DEBUG
+	*(memory_region(space->machine, "maincpu")+0x8000)=data; logerror("Z:%02x\n",data); //DEBUG
 	/* Bits 4-6 enable/disable trigger different events */
 
 	switch (circus_game)

@@ -1222,15 +1222,15 @@ static MACHINE_RESET ( jalmah )
 }
 
 static MACHINE_DRIVER_START( jalmah )
-	MDRV_CPU_ADD("main" , M68000, 8000000) /* 68000-8 */
+	MDRV_CPU_ADD("maincpu" , M68000, 8000000) /* 68000-8 */
 	MDRV_CPU_PROGRAM_MAP(jalmah,0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	//M50747 MCU
 
 	MDRV_GFXDECODE(jalmah)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1254,7 +1254,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( urashima )
 	MDRV_IMPORT_FROM(jalmah)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(urashima,0)
 
 	MDRV_GFXDECODE(urashima)
@@ -1271,7 +1271,7 @@ Urashima Mahjong
 */
 
 ROM_START ( urashima )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "um-2.15d",  0x00000, 0x20000, CRC(a90a47e3) SHA1(2f912001e9177cce8c3795f3d299115b80fdca4e) )
 	ROM_RELOAD(                   0x40000, 0x20000 )
 	ROM_LOAD16_BYTE( "um-1.15c",  0x00001, 0x20000, CRC(5f5c8f39) SHA1(cef663965c3112f87788d6a871e609c0b10ef9a2) )
@@ -1319,7 +1319,7 @@ Mahjong Daireikai (JPN Ver.)
 */
 
 ROM_START( daireika )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "mj1.bin", 0x00001, 0x20000, CRC(3b4e8357) SHA1(1ad3e40ec6b6ff4f1c9c09d7b530f67b460151d8) )
 	ROM_RELOAD(                 0x40001, 0x20000 )
 	ROM_LOAD16_BYTE( "mj2.bin", 0x00000, 0x20000, CRC(c54d2f9b) SHA1(d59fc5a9e5bbb96b3b6a43378f4f2215c368b671) )
@@ -1361,7 +1361,7 @@ Mahjong Channel Zoom In (JPN Ver.)
 */
 
 ROM_START( mjzoomin )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "zoomin-1.bin", 0x00001, 0x20000, CRC(b8b04d30) SHA1(abb163a9965421b4d92114bba974ccb13bb57f5a) )
 	ROM_RELOAD(                      0x40001, 0x20000 )
 	ROM_LOAD16_BYTE( "zoomin-2.bin", 0x00000, 0x20000, CRC(c7eb982c) SHA1(9006ded2aa1fef38bde114110d76b20747c32658) )
@@ -1401,7 +1401,7 @@ Mahjong Kakumei (JPN Ver.)
 */
 
 ROM_START( kakumei )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "mj-re-1.bin", 0x00001, 0x20000, CRC(b90215be) SHA1(10384237f734836acefb4b5f53a6ddd9054d63ff) )
 	ROM_RELOAD(                     0x40001, 0x20000 )
 	ROM_LOAD16_BYTE( "mj-re-2.bin", 0x00000, 0x20000, CRC(37eff266) SHA1(1d9e88c0270daadfafff1f73eb617e77b1d199d6) )
@@ -1440,7 +1440,7 @@ Mahjong Kakumei2 Princess League (JPN Ver.)
 */
 
 ROM_START( kakumei2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "mj-8956.1", 0x00001, 0x40000, CRC(db4ce32f) SHA1(1ae13627b9922143f462b1c3bbed87374f6e1667) )
 	ROM_LOAD16_BYTE( "mj-8956.2", 0x00000, 0x40000, CRC(0f942507) SHA1(7ec2fbeb9a34dfc80c4df3de8397388db13f5c7c) )
 
@@ -1518,7 +1518,7 @@ NEC D65012GF303 9050KX016 (80pin QFP) x4
 */
 
 ROM_START( suchipi )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "1.bin", 0x00001, 0x40000, CRC(e37cc745) SHA1(73b3314d27a0332068e0d2bbc08d7401e371da1b) )
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x40000, CRC(42ecf88a) SHA1(7bb85470bc9f94c867646afeb91c4730599ea299) )
 

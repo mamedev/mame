@@ -347,15 +347,15 @@ static const namco_interface namco_config =
 static MACHINE_DRIVER_START( pengo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(pengo_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_GFXDECODE(pengo)
 	MDRV_PALETTE_LENGTH(128*4)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -378,7 +378,7 @@ static MACHINE_DRIVER_START( jrpacmbl )
 	MDRV_IMPORT_FROM(pengo)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(jrpacmbl_map,0)
 
 	MDRV_VIDEO_START(jrpacman)
@@ -393,7 +393,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( pengo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ep1689c.8",    0x0000, 0x1000, CRC(f37066a8) SHA1(0930de17a763a527057f60783a92662b09554426) )
 	ROM_LOAD( "ep1690b.7",    0x1000, 0x1000, CRC(baf48143) SHA1(4c97529e61eeca5d94938b1dfbeac41bf8cbaf7d) )
 	ROM_LOAD( "ep1691b.15",   0x2000, 0x1000, CRC(adf0eba0) SHA1(c8949fbdbfe5023ee17a789ef60205e834a76c81) )
@@ -420,7 +420,7 @@ ROM_END
 
 
 ROM_START( pengo2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic8.2",        0x0000, 0x1000, CRC(e4924b7b) SHA1(44297658af8f8c884eba02b792346c5008137dfe) )
 	ROM_LOAD( "ic7.2",        0x1000, 0x1000, CRC(72e7775d) SHA1(49e04178ee171f727dd023c019395679cfbad452) )
 	ROM_LOAD( "ic15.2",       0x2000, 0x1000, CRC(7410ef1e) SHA1(7ed8e16c6ce401904c0da9758e2a405d7b9b451b) )
@@ -447,7 +447,7 @@ ROM_END
 
 
 ROM_START( pengo2u )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr5128.u8",     0x0000, 0x1000, CRC(3dfeb20e) SHA1(a387b72501da77bf38b58619d2099083a0463e1f) )
 	ROM_LOAD( "epr5129.u7",     0x1000, 0x1000, CRC(1db341bd) SHA1(d1c66bb9cf479e6960dbcd35c820097a81eaa555) )
 	ROM_LOAD( "epr5130.u15",    0x2000, 0x1000, CRC(7c2842d5) SHA1(a8a568da68babd0ccb9f2cee4182fc01c3138494) )
@@ -474,7 +474,7 @@ ROM_END
 
 
 ROM_START( pengo3u )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ep5120.8",     0x0000, 0x1000, CRC(f01afb60) SHA1(1db732a17a9f79f8f1751f80c77889142928e41b) )
 	ROM_LOAD( "ep5121.7",     0x1000, 0x1000, CRC(2eb38353) SHA1(d351347f93a3ed01c8b5274ec19352dd611a8dd4) )
 	ROM_LOAD( "ep5122.15",    0x2000, 0x1000, CRC(c33400d7) SHA1(7b9617d22a9de8d3658abe34b5d2171ce37acc39) )
@@ -501,7 +501,7 @@ ROM_END
 
 
 ROM_START( pengo4 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ep1738.8",     0x0000, 0x1000, CRC(68ba25ea) SHA1(ce937831b7b210b4a625514bd4e6b3a7a36d008e) )
 	ROM_LOAD( "ep1739.7",     0x1000, 0x1000, CRC(41e7b5b3) SHA1(d512d41ee3f5716070250e7ab63342e4fbf92875) )
 	ROM_LOAD( "ep1740.15",    0x2000, 0x1000, CRC(27f05f59) SHA1(c0d40328a7dff34f6b84c991d9c88b240e55b4f3) )
@@ -528,7 +528,7 @@ ROM_END
 
 
 ROM_START( pengob )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",            0x0000, 0x2000, CRC(e04064db) SHA1(6689066b443807646894a357317f468bfc92368a) )
 	ROM_LOAD( "2",            0x2000, 0x2000, CRC(75752424) SHA1(634e696a692c7245dfa5c5dfd4ce87755c2a90d4) )
 	ROM_LOAD( "021_pn03.bin", 0x4000, 0x1000, CRC(7824e3ef) SHA1(3395bb537614de8da763d05f0d2e312145017e8f) ) // 3 (1/2)
@@ -553,7 +553,7 @@ ROM_END
 
 
 ROM_START( penta )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "008_pn01.bin", 0x0000, 0x1000, CRC(22f328df) SHA1(ba13b8d20ccde995a158cf62b4bc48cb369a0788) )
 	ROM_LOAD( "007_pn05.bin", 0x1000, 0x1000, CRC(15bbc7d3) SHA1(1823e3ba7388d3f4d9262e9b9cf70f123862c546) )
 	ROM_LOAD( "015_pn02.bin", 0x2000, 0x1000, CRC(de82b74a) SHA1(301c1223dd0b111f8439affcb96b6e29106364ed) )
@@ -580,7 +580,7 @@ ROM_END
 
 
 ROM_START( jrpacmbl )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jrpacpe-05.ic8",     0x0000, 0x1000, CRC(98049df4) SHA1(4ea022c8664dd9ec185f9d5990a548e867e5071f) )
 	ROM_LOAD( "jrpacpe-01.ic7",     0x1000, 0x1000, CRC(b7a5cef8) SHA1(c315970f0dd698a1036df12502e3fe3ec7f81d53) )
 	ROM_LOAD( "jrpacpe-06.ic6",     0x2000, 0x1000, CRC(ecf39785) SHA1(9e47f29f4cadb5d8fd3790c7e16c653fc0a96a88) )
@@ -614,7 +614,7 @@ ROM_END
 
 static DRIVER_INIT( pengo )
 {
-	pengo_decode(machine, "main");
+	pengo_decode(machine, "maincpu");
 }
 
 
@@ -660,9 +660,9 @@ static DRIVER_INIT( penta )
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },	/* ...1...1...0.... */
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 }		/* ...1...1...1.... */
 	};
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_malloc(0x8000);
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);

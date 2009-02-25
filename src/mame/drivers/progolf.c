@@ -182,16 +182,16 @@ static INTERRUPT_GEN( progolf_interrupt )
 
 static MACHINE_DRIVER_START( progolf )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 2000000)		 /* ? */
+	MDRV_CPU_ADD("maincpu", M6502, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
-//  MDRV_CPU_VBLANK_INT("main", progolf_interrupt)
+//  MDRV_CPU_VBLANK_INT("screen", progolf_interrupt)
 
-  	MDRV_CPU_ADD("audio", M6502, 500000)
+  	MDRV_CPU_ADD("audiocpu", M6502, 500000)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
-//  MDRV_CPU_VBLANK_INT("main",nmi_line_pulse)
+//  MDRV_CPU_VBLANK_INT("screen",nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -218,14 +218,14 @@ MACHINE_DRIVER_END
 
 
 ROM_START( progolf )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g4-m.2a",      0xb000, 0x1000, CRC(8f06ebc0) SHA1(c012dcaf06cbd9e49f3ae819d9cbed4df8751cec) )
 	ROM_LOAD( "g3-m.4a",      0xc000, 0x1000, CRC(8101b231) SHA1(d933992c93b3cd9a052ac40ec1fa92a181b28691) )
 	ROM_LOAD( "g2-m.6a",      0xd000, 0x1000, CRC(a4a0d8dc) SHA1(04db60d5cfca4834ac2cc7661f772704489cb329) )
 	ROM_LOAD( "g1-m.8a",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.9a",      0xf000, 0x1000, CRC(8f8b1e8e) SHA1(fc877a8f2b26ea48c5ba2324678d6077f3432a79) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "g6-m.1b",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
@@ -240,14 +240,14 @@ ROM_START( progolf )
 ROM_END
 
 ROM_START( progolfa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g4-m.a3",      0xb000, 0x1000, CRC(015a08d9) SHA1(671d5cd708e098dbda3e495a8b4ce3393c6971da) )
 	ROM_LOAD( "g3-m.a4",      0xc000, 0x1000, CRC(c1339da5) SHA1(e9728dcc5f67fbe79eea818ba48421c46d9e63e9) )
 	ROM_LOAD( "g2-m.a6",      0xd000, 0x1000, CRC(fafec36e) SHA1(70880d6f9b11505d466f36c12a43361ee2639fed) )
 	ROM_LOAD( "g1-m.a8",      0xe000, 0x1000, CRC(749032eb) SHA1(daa356b2c70bcd8cdd0c4df4268b6158bc8aae8e) )
 	ROM_LOAD( "g0-m.a9",      0xf000, 0x1000, CRC(a03c533f) SHA1(2e0006be40e32b64b1490bd339d9fc9302eee7c4) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "g5-m.b1",      0xf000, 0x1000, CRC(0c6fadf5) SHA1(9af2c2152b339cadab7aff0b0164d4431d2558bd) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
@@ -265,8 +265,8 @@ ROM_END
 static DRIVER_INIT( progolf )
 {
 	int A;
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8* decrypted = auto_malloc(0x10000);
 
 	memory_set_decrypted_region(space,0x0000,0xffff, decrypted);

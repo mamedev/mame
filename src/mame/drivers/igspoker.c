@@ -285,13 +285,13 @@ static CUSTOM_INPUT( hopper_r )
 
 static READ8_HANDLER( exp_rom_r )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	return rom[offset+0x10000];
 }
 
 static ADDRESS_MAP_START( igspoker_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("main", 0xf000)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( igspoker_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1386,7 +1386,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( igspoker )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80, 3579545)
+	MDRV_CPU_ADD("maincpu",Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(igspoker_prg_map,0)
 	MDRV_CPU_IO_MAP(igspoker_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(igs_interrupt,8)
@@ -1394,7 +1394,7 @@ static MACHINE_DRIVER_START( igspoker )
 	MDRV_MACHINE_RESET(igs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1435,10 +1435,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( number10 )
 
 	MDRV_IMPORT_FROM(igspoker)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(number10_io_map,0)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_VIDEO_UPDATE(number10)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz / 12)
@@ -1458,7 +1458,7 @@ MACHINE_DRIVER_END
  */
 
 ROM_START( cpoker )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "v220i1.bin",  0x0000, 0x8000, CRC(b7cae556) SHA1(bb43ee48634879029ed1a7cd4133d7f12413e2ac) )
 	ROM_LOAD( "v220i2.bin",  0x8000, 0x8000, CRC(8245e42c) SHA1(b7e7b9f643e6dc2f4d5aaf7d50d0a9154ed9a4e7) )
 	ROM_LOAD( "220i7.bin",   0x18000, 0x8000, CRC(8a2ff310) SHA1(a415a99dbb1448b4b2b94e17a3973e6347e3be18) )
@@ -1472,7 +1472,7 @@ ROM_START( cpoker )
 ROM_END
 
 ROM_START( csk227it )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "v227i.bin",   0x0000, 0x10000, CRC(df1ebf49) SHA1(829c7575d3d3780557405b3a61859901df6dbe4f) )
 	ROM_LOAD( "7.227",   0x10000, 0x10000, CRC(a10786ad) SHA1(82f5f81808ca70d67a2710cc66fbbf78588b33b5) )
 
@@ -1488,7 +1488,7 @@ ROM_START( csk227it )
 ROM_END
 
 ROM_START( csk234it )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "v234it.bin",   0x0000, 0x10000, CRC(344b7059)  SHA1(990cb84e35c0c50d3be9fbb76a11395114dc6c9b) )
 	ROM_LOAD( "7.234",   0x10000, 0x10000, CRC(ae6dd4ad) SHA1(4772d5c150d64d1ef3b68e16214f594eea0b3c1b) )
 
@@ -1527,7 +1527,7 @@ This doesn't attempt to decode the gfx.
 
 */
 ROM_START( stellecu )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	/* there is data at 0x18000 which is probably mapped somewhere */
 	ROM_LOAD( "u35.bin",   0x0000, 0x20000, CRC(914b7c59) SHA1(3275b5016524467199f32d653c757bfe4f9cfc60) )
 
@@ -1550,7 +1550,7 @@ ROM_END
 static DRIVER_INIT( cpoker )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1564,7 +1564,7 @@ static DRIVER_INIT( cpoker )
 
 static DRIVER_INIT( cpokert )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	/* decrypt the program ROM */
@@ -1594,7 +1594,7 @@ static DRIVER_INIT( cpokert )
 static DRIVER_INIT( cska )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1611,7 +1611,7 @@ static DRIVER_INIT( cska )
 static DRIVER_INIT( igs_ncs )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1658,7 +1658,7 @@ IGS PCB NO-T0039-8
 */
 
 ROM_START( cpokert )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "champingv-200g.u23", 0x00000, 0x10000, CRC(696cb684) SHA1(ce9e5bed83d0bd3b115f556cc89e3293ac6b69c3) )
 	ROM_LOAD( "cpoker7.u22", 0x18000, 0x8000, CRC(dae3ecda) SHA1(c881e143ec600c5a931f26cd097da6353e1da7c3) )
 
@@ -1680,7 +1680,7 @@ ROM_END
 
 
 ROM_START( igs_ncs )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "v.bin",   0x00000, 0x10000, CRC(8077724b) SHA1(1f6e01d5838e6ec4f91b07637c281a3f59631a51) )
 	ROM_LOAD( "7.bin",   0x10000, 0x10000, CRC(678e412c) SHA1(dba031d3576d098d314d6589dd1aeda44d17c650) )
 
@@ -1728,7 +1728,7 @@ Clocks
 
 DRIVER_INIT( igs_ncs2 )
 {
-	UINT8 *src = (UINT8 *) (memory_region(machine, "main"));
+	UINT8 *src = (UINT8 *) (memory_region(machine, "maincpu"));
 	int i;
 
 	for(i = 0; i < 0x10000; i++)
@@ -1782,7 +1782,7 @@ DRIVER_INIT( igs_ncs2 )
 }
 
 ROM_START( igs_ncs2 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ncs_v100n.u20", 0x00000, 0x10000, CRC(2bb91de5) SHA1(b0b7b3b9cee1ce4da10cf78ef1c8079f3d9cafbf) )
 	ROM_LOAD( "ncs_v100n.u21", 0x10000, 0x10000, CRC(678e412c) SHA1(dba031d3576d098d314d6589dd1aeda44d17c650) )
 
@@ -1805,8 +1805,8 @@ static DRIVER_INIT( chleague )
 	int length;
 	UINT8 *rom;
 
-	rom = memory_region(machine, "main");
-	length = memory_region_length(machine, "main");
+	rom = memory_region(machine, "maincpu");
+	length = memory_region_length(machine, "maincpu");
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -1836,7 +1836,7 @@ static DRIVER_INIT( chleague )
 }
 
 ROM_START( chleague )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "12b.bin", 0x00000, 0x10000, CRC(8b4fb718) SHA1(2ce7cf73aab8a644ecac4189c8ffe7dae9a21571) )
 	ROM_LOAD( "12a.bin", 0x10000, 0x10000, CRC(bd3af488) SHA1(3c5e7a8623d11bd50a1949e870f1044eec7fc463) )
 
@@ -1849,7 +1849,7 @@ ROM_START( chleague )
 ROM_END
 
 ROM_START( chleagul )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "12d.bin", 0x00000, 0x10000, CRC(7e143b05) SHA1(943a471fa16fd6c000f601ec8bdb35d70f12c033) )
 	ROM_LOAD( "12c.bin", 0x10000, 0x10000, CRC(bd3af488) SHA1(3c5e7a8623d11bd50a1949e870f1044eec7fc463) )
 
@@ -1869,8 +1869,8 @@ static DRIVER_INIT( number10 )
 	UINT8 *tmp;
 	UINT8 *rom;
 
-	rom = memory_region(machine, "main");
-	length = memory_region_length(machine, "main");
+	rom = memory_region(machine, "maincpu");
+	length = memory_region_length(machine, "maincpu");
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -1914,7 +1914,7 @@ static DRIVER_INIT( number10 )
 
 
 ROM_START( number10 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "10b.bin", 0x00000, 0x10000, CRC(149935d1) SHA1(8bb2f6bbe8fc5388e058cfce5c554ee9a5de2a6a) )
 	ROM_LOAD( "10a.bin", 0x10000, 0x10000, CRC(73c6335b) SHA1(df2893c9ede5379afdd2ffbc50de90d715240a1f) )
 
@@ -1931,7 +1931,7 @@ ROM_START( number10 )
 ROM_END
 
 ROM_START( numbr10l )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "10d.bin", 0x00000, 0x10000, CRC(e1c2b9cc) SHA1(a0943222531b5d0cdc44bd8e1a183107d2e1799d) )
 	ROM_LOAD( "10c.bin", 0x10000, 0x10000, CRC(34620db9) SHA1(63bda238f55888d964bad3d70a0dff7d635b7441) )
 
@@ -1951,7 +1951,7 @@ ROM_END
 static DRIVER_INIT( pktet346 )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1969,7 +1969,7 @@ static DRIVER_INIT( pktet346 )
 }
 
 ROM_START( pktet346 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v-346i.bin",  0x00000, 0x10000, CRC(8015ef13) SHA1(62841daff380d40c14ddb9c1b3fccdbb287e0b0d) )
 
 	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )

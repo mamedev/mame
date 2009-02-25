@@ -338,7 +338,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( strnskil )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,8000000/2) /* 4.000MHz */
+	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
 	MDRV_CPU_PROGRAM_MAP(strnskil_readmem1,strnskil_writemem1)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( strnskil )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -376,7 +376,7 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( strnskil )
-	ROM_REGION( 0x10000, "main", 0 ) /* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
 	ROM_LOAD( "tvg3.7",  0x0000,  0x2000, CRC(31fd793a) SHA1(b86efe8ea60edf414a23fb6abc09db691c085fe9) )
 	ROM_CONTINUE(        0x8000,  0x2000 )
 	ROM_LOAD( "tvg4.8",  0x2000,  0x2000, CRC(c58315b5) SHA1(2039cd89ef59d05f353f6c367fa851c0f60cdc4a) )
@@ -409,7 +409,7 @@ ROM_START( strnskil )
 ROM_END
 
 ROM_START( guiness )
-	ROM_REGION( 0x10000, "main", 0 ) /* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
 	ROM_LOAD( "tvg3.15", 0x0000,  0x2000, CRC(3a605ad8) SHA1(f6e2dd4989fdb68bc55857f5a8f06601416139d5) )
 	ROM_CONTINUE(        0x8000,  0x2000 )
 	ROM_LOAD( "tvg4.8",  0x2000,  0x2000, CRC(c58315b5) SHA1(2039cd89ef59d05f353f6c367fa851c0f60cdc4a) )
@@ -442,7 +442,7 @@ ROM_START( guiness )
 ROM_END
 
 ROM_START( pettanp )
-	ROM_REGION( 0x10000, "main", 0 ) /* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
 	ROM_LOAD( "tvg2-16a.7",  0x0000,  0x2000, CRC(4cbbbd01) SHA1(3905cf9e9d324bb23688ab29c98d71529d3dbf0c) )
 	ROM_CONTINUE(            0x8000,  0x2000 )
 	ROM_LOAD( "tvg3-16a.8",  0x2000,  0x2000, CRC(aaa0420f) SHA1(aa7ead51002f8b1bbefd07ff23b9064804fc31b3) )
@@ -477,7 +477,7 @@ ROM_START( pettanp )
 ROM_END
 
 ROM_START( banbam )
-	ROM_REGION( 0x10000, "main", 0 ) /* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
 	ROM_LOAD( "ban-rom2.ic7",  0x0000,  0x2000, CRC(a5aeef6e) SHA1(92c1ad6ccb96b723e122899150e3c1855c5017b8) )
 	ROM_CONTINUE(              0x8000,  0x2000 )
 	ROM_LOAD( "ban-rom3.ic8",  0x2000,  0x2000, CRC(f91472bf) SHA1(94988b7bf2be3d3704a802db544070251d6c6a9c) )

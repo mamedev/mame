@@ -734,16 +734,16 @@ static const vr0_interface vr0_config =
 
 
 static MACHINE_DRIVER_START( crystal )
-	MDRV_CPU_ADD("main", SE3208, 43000000)
+	MDRV_CPU_ADD("maincpu", SE3208, 43000000)
 	MDRV_CPU_PROGRAM_MAP(crystal_mem,0)
- 	MDRV_CPU_VBLANK_INT("main", crystal_interrupt)
+ 	MDRV_CPU_VBLANK_INT("screen", crystal_interrupt)
 
 	MDRV_MACHINE_START(crystal)
 	MDRV_MACHINE_RESET(crystal)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -771,14 +771,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( topbladv )
 	MDRV_IMPORT_FROM(crystal)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(320+32, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319+32, 0, 239)
 
 MACHINE_DRIVER_END
 
 ROM_START( crysbios )
-	ROM_REGION( 0x20000, "main", 0 ) // bios
+	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb) )
 
 	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
@@ -787,7 +787,7 @@ ROM_START( crysbios )
 ROM_END
 
 ROM_START( crysking )
-	ROM_REGION( 0x20000, "main", 0 ) // bios
+	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
 	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
@@ -799,7 +799,7 @@ ROM_START( crysking )
 ROM_END
 
 ROM_START( evosocc )
-	ROM_REGION( 0x20000, "main", 0 ) // bios
+	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
 	ROM_REGION32_LE( 0x3000000, "user1", 0 ) // Flash
@@ -811,7 +811,7 @@ ROM_START( evosocc )
 ROM_END
 
 ROM_START( topbladv )
-	ROM_REGION( 0x20000, "main", 0 ) // bios
+	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 ) // Flash
@@ -822,7 +822,7 @@ ROM_END
 
 
 ROM_START( officeye )
-	ROM_REGION( 0x20000, "main", 0 ) // bios (not the standard one)
+	ROM_REGION( 0x20000, "maincpu", 0 ) // bios (not the standard one)
 	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
 
 	ROM_REGION32_LE( 0x2000000, "user1", 0 ) // Flash

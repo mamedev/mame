@@ -361,18 +361,18 @@ static const ay8910_interface ay8910_interface_2 =
 static MACHINE_DRIVER_START( taxidrvr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
-	MDRV_CPU_ADD("audio", Z80,4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
 	MDRV_CPU_IO_MAP(cpu3_port_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -384,7 +384,7 @@ static MACHINE_DRIVER_START( taxidrvr )
 	MDRV_PPI8255_ADD( "ppi8255_4", ppi8255_intf[4] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -417,7 +417,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( taxidrvr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",            0x0000, 0x2000, CRC(6b2424e9) SHA1(a65bb01da8f3b0649d945981cc4f1324b7fac5c7) )
 	ROM_LOAD( "2",            0x2000, 0x2000, CRC(15111229) SHA1(0350918f9504b0e470684ebc94a823bb2513a54d) )
 	ROM_LOAD( "3",            0x4000, 0x2000, CRC(a7782eee) SHA1(0f10b7876420f4237937b1b922aa410de3f79af1) )
@@ -427,7 +427,7 @@ ROM_START( taxidrvr )
 	ROM_LOAD( "8",            0x0000, 0x2000, CRC(9f9a3865) SHA1(908cf4f2cc68c088649241997276ea25c27d9718) )
 	ROM_LOAD( "9",            0x2000, 0x2000, CRC(b28b766c) SHA1(21e08ef1e2671c8540380e3fa0858e8a4d821945) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "7",            0x0000, 0x2000, CRC(2b4cbfe6) SHA1(a2a900831116554d5aea1a81c93245d3bb424d48) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

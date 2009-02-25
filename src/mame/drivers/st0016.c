@@ -69,7 +69,7 @@ static WRITE8_HANDLER(mux_select_w)
 
 WRITE8_HANDLER(st0016_rom_bank_w)
 {
-	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "main") + (data* 0x4000) + 0x10000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "maincpu") + (data* 0x4000) + 0x10000 );
 	st0016_rom_bank=data;
 }
 
@@ -435,14 +435,14 @@ static const st0016_interface st0016_config =
 
 static MACHINE_DRIVER_START( st0016 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,8000000) /* 8 MHz ? */
+	MDRV_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
 	MDRV_CPU_IO_MAP(st0016_io,0)
 
 	MDRV_CPU_VBLANK_INT_HACK(st0016_int,5) /*  4*nmi + int0 */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -465,7 +465,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mayjinsn )
 	MDRV_IMPORT_FROM(st0016)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(st0016_m2_io,0)
 	MDRV_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
 	MDRV_CPU_PROGRAM_MAP(v810_mem,0)
@@ -509,17 +509,17 @@ Note:
 */
 
 ROM_START( renju )
-	ROM_REGION( 0x290000, "main", 0 )
+	ROM_REGION( 0x290000, "maincpu", 0 )
 	ROM_LOAD( "renjyu-1.u31",0x010000, 0x200000, CRC(e0fdbe9b) SHA1(52d31024d1a88b8fcca1f87366fcaf80e3c387a1) )
 	ROM_LOAD( "rnj2.u32",    0x210000, 0x080000, CRC(2015289c) SHA1(5223b6d3dbe4657cd63cf5b527eaab84cf23587a ) )
-	ROM_COPY( "main",   0x210000, 0x000000, 0x08000 )
+	ROM_COPY( "maincpu",   0x210000, 0x000000, 0x08000 )
 ROM_END
 
 ROM_START( nratechu )
-	ROM_REGION( 0x210000, "main", 0 )
+	ROM_REGION( 0x210000, "maincpu", 0 )
 	ROM_LOAD( "sx012-01",   0x10000, 0x80000,   CRC(6ca01d57) SHA1(065848f19ecf2dc1f7bbc7ddd87bca502e4b8b16) )
 	ROM_LOAD( "sx012-02",   0x110000, 0x100000, CRC(40a4e354) SHA1(8120ce8deee6805050a5b083a334c3743c09566b) )
-	ROM_COPY( "main",  0x10000, 0x00000, 0x08000 )
+	ROM_COPY( "maincpu",  0x10000, 0x00000, 0x08000 )
 ROM_END
 
 /*
@@ -553,14 +553,14 @@ E63-00001
 */
 
 ROM_START( koikois )
-	ROM_REGION( 0x410000, "main", 0 )
+	ROM_REGION( 0x410000, "maincpu", 0 )
 
 	ROM_LOAD16_BYTE( "koi-2.6c", 0x010001, 0x080000, CRC(2722be71) SHA1(1aa3d819eef01db042ee04a01c1b18c4d9dae65e) )
 	ROM_LOAD16_BYTE( "koi-1.4c", 0x010000, 0x080000, CRC(c79e2b43) SHA1(868174f7ab8e68e31d3302ae94dd742048deed9f) )
 	ROM_LOAD16_BYTE( "koi-4.8c", 0x110001, 0x080000, CRC(ace236df) SHA1(4bf56affe5b6d0ba3cc677eaa91f9be77f26c654) )
 	ROM_LOAD16_BYTE( "koi-3.5c", 0x110000, 0x080000, CRC(6fd88149) SHA1(87b1be32770232eb041e3ef9d1da45282af8a5d4) )
 	ROM_LOAD( "koi-5.2c", 0x210000, 0x200000, CRC(561e12c8) SHA1(a7aedf549bc3141fc01bc4a10c235af265ba4ee9) )
-	ROM_COPY( "main",  0x10000, 0x00000, 0x08000 )
+	ROM_COPY( "maincpu",  0x10000, 0x00000, 0x08000 )
 ROM_END
 
 
@@ -618,11 +618,11 @@ E52-00001
 */
 
 ROM_START(mayjinsn )
-	ROM_REGION( 0x190000, "main", 0 )
+	ROM_REGION( 0x190000, "maincpu", 0 )
 	ROM_LOAD( "sx003.05d",   0x010000, 0x80000,  CRC(2be6d620) SHA1(113db888fb657d45be55708bbbf9a9ac159a9636) )
 	ROM_LOAD( "sx003.06",    0x090000, 0x80000,  CRC(f0553386) SHA1(8915cb3ce03b9a12612694caec9bbec6de4dd070) )
 	ROM_LOAD( "sx003.07d",   0x110000, 0x80000, CRC(8db281c3) SHA1(f8b488dd28010f01f789217a4d62ba2116e06e94) )
-	ROM_COPY( "main",   0x010000, 0x00000, 0x08000 )
+	ROM_COPY( "maincpu",   0x010000, 0x00000, 0x08000 )
 
 	ROM_REGION32_LE( 0x20000*4, "user1", 0 ) /* V810 code */
 	ROM_LOAD32_BYTE( "sx003.04",   0x00003, 0x20000,   CRC(fa15459f) SHA1(4163ab842943705c550f137abbdd2cb51ba5390f) )
@@ -632,9 +632,9 @@ ROM_START(mayjinsn )
 ROM_END
 
 ROM_START(mayjisn2 )
-	ROM_REGION( 0x110000, "main", 0 )
+	ROM_REGION( 0x110000, "maincpu", 0 )
 	ROM_LOAD( "sx007-05.8b",   0x10000, 0x100000,  CRC(b13ea605) SHA1(75c067df02c988f170c24153d3852c472355fc9d) )
-	ROM_COPY( "main",  0x10000, 0x00000, 0x08000 )
+	ROM_COPY( "maincpu",  0x10000, 0x00000, 0x08000 )
 
 	ROM_REGION32_LE( 0x20000*4, "user1", 0 ) /* V810 code */
 	ROM_LOAD32_BYTE( "sx007-04.4b",   0x00003, 0x20000,   CRC(fa15459f) SHA1(4163ab842943705c550f137abbdd2cb51ba5390f) )

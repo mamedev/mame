@@ -167,16 +167,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( suprloco )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)			/* NMIs are caused by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -208,12 +208,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( suprloco )
-	ROM_REGION( 2*0x10000, "main", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "ic37.bin",     0x0000, 0x4000, CRC(57f514dd) SHA1(707800b90a22547a56b01d1e11775e9ee5555d23) )	/* encrypted */
 	ROM_LOAD( "ic15.bin",     0x4000, 0x4000, CRC(5a1d2fb0) SHA1(fdb9416e5530718245fd597073a63feddb233c3c) )	/* encrypted */
 	ROM_LOAD( "ic28.bin",     0x8000, 0x4000, CRC(a597828a) SHA1(61004d112591fd2d752c39df71c1304d9308daae) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic64.bin",     0x0000, 0x2000, CRC(0aa57207) SHA1(b29b533505cb5b47c90534f2f610baeb7265d030) )
 
 	ROM_REGION( 0xe000, "gfx1", ROMREGION_DISPOSE )
@@ -273,7 +273,7 @@ static DRIVER_INIT( suprloco )
 
 
 	/* decrypt program ROMs */
-	suprloco_decode(machine, "main");
+	suprloco_decode(machine, "maincpu");
 }
 
 

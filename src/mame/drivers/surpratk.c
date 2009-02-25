@@ -235,16 +235,16 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( surpratk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 3000000)	/* 053248 */
+	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* 053248 */
 	MDRV_CPU_PROGRAM_MAP(surpratk_readmem,surpratk_writemem)
-	MDRV_CPU_VBLANK_INT("main", surpratk_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", surpratk_interrupt)
 
 	MDRV_MACHINE_RESET(surpratk)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -273,7 +273,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( suratk )
-	ROM_REGION( 0x51000, "main", 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, "maincpu", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "911j01.f5", 0x10000, 0x20000, CRC(1e647881) SHA1(241e421d5599ebd9fcfb8be9c48dfd3b4c671958) )
 	ROM_LOAD( "911k02.h5", 0x30000, 0x18000, CRC(ef10e7b6) SHA1(0b41a929c0c579d688653a8d90dd6b40db12cfb3) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
@@ -288,7 +288,7 @@ ROM_START( suratk )
 ROM_END
 
 ROM_START( suratka )
-	ROM_REGION( 0x51000, "main", 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, "maincpu", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "911j01.f5", 0x10000, 0x20000, CRC(1e647881) SHA1(241e421d5599ebd9fcfb8be9c48dfd3b4c671958) )
 	ROM_LOAD( "911l02.h5", 0x30000, 0x18000, CRC(11db8288) SHA1(09fe187855172ebf0c57f561cce7f41e47f53114) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
@@ -303,7 +303,7 @@ ROM_START( suratka )
 ROM_END
 
 ROM_START( suratkj )
-	ROM_REGION( 0x51000, "main", 0 ) /* code + banked roms + palette RAM */
+	ROM_REGION( 0x51000, "maincpu", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "911m01.f5", 0x10000, 0x20000, CRC(ee5b2cc8) SHA1(4b05f7ba4e804a3bccb41fe9d3258cbcfe5324aa) )
 	ROM_LOAD( "911m02.h5", 0x30000, 0x18000, CRC(5d4148a8) SHA1(4fa5947db777b4c742775d588dea38758812a916) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
@@ -325,7 +325,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( surpratk_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "maincpu");
 	int offs = 0;
 
 logerror("%04x: setlines %02x\n",cpu_get_pc(device),lines);
@@ -339,7 +339,7 @@ static MACHINE_RESET( surpratk )
 {
 	konami_configure_set_lines(machine->cpu[0], surpratk_banking);
 
-	paletteram = &memory_region(machine, "main")[0x48000];
+	paletteram = &memory_region(machine, "maincpu")[0x48000];
 }
 
 static DRIVER_INIT( surpratk )

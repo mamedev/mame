@@ -415,18 +415,18 @@ static INTERRUPT_GEN( sound_int ) {
 static MACHINE_DRIVER_START( kchampvs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", kc_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", kc_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)		/* irq's triggered from main cpu */
 										/* nmi's from msm5205 */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -461,12 +461,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kchamp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kc_readmem,kc_writemem)
 	MDRV_CPU_IO_MAP(kc_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", kc_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", kc_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kc_sound_readmem,kc_sound_writemem)
 	MDRV_CPU_IO_MAP(kc_sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(sound_int, 125)	/* Hz */
@@ -474,7 +474,7 @@ static MACHINE_DRIVER_START( kchamp )
 											/* nmi's from 125 Hz clock */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -509,7 +509,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kchamp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b014.bin", 0x0000, 0x2000, CRC(0000d1a0) SHA1(0c584096825e1d3cc718e0bda1abb897a7f4d2df) )
 	ROM_LOAD( "b015.bin", 0x2000, 0x2000, CRC(03fae67e) SHA1(3b6a30f39f5ad512415e3b8ba6e07f3118e28d9e) )
 	ROM_LOAD( "b016.bin", 0x4000, 0x2000, CRC(3b6e1d08) SHA1(ecf7d2b0f31f04c0be7d5a1f450b9c95d9f54d80) )
@@ -517,7 +517,7 @@ ROM_START( kchamp )
 	ROM_LOAD( "b018.bin", 0x8000, 0x2000, CRC(b824abc7) SHA1(4a30fec025150e889600a78497700155e743c99e) )
 	ROM_LOAD( "b019.bin", 0xa000, 0x2000, CRC(3b487a46) SHA1(7837e480fd4648e0d3f792b79fa0019e063abdc6) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "b026.bin", 0x0000, 0x2000, CRC(999ed2c7) SHA1(f01e4ee81f8f7b0d1cf001d3ec01a9210f8109b4) )
 	ROM_LOAD( "b025.bin", 0x2000, 0x2000, CRC(33171e07) SHA1(55ee74c9f1d86ec13d92ea0d1b700bbe24b79def) ) /* adpcm */
 	ROM_LOAD( "b024.bin", 0x4000, 0x2000, CRC(910b48b9) SHA1(c6a2f8266ff1f14b462b92d47a4a86542df77cdd) ) /* adpcm */
@@ -551,7 +551,7 @@ ROM_START( kchamp )
 ROM_END
 
 ROM_START( karatedo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "be14", 0x0000, 0x2000, CRC(44e60aa0) SHA1(6d007d7082c15182832f947444b00b7feb0e7738) )
 	ROM_LOAD( "be15", 0x2000, 0x2000, CRC(a65e3793) SHA1(bf1e8fbc6755e85414eb7629e6fab3bf154f6546) )
 	ROM_LOAD( "be16", 0x4000, 0x2000, CRC(151d8872) SHA1(1bb27142fdb33e3aeaf95c7a0ad7e8c258bbcb66) )
@@ -559,7 +559,7 @@ ROM_START( karatedo )
 	ROM_LOAD( "be18", 0x8000, 0x2000, CRC(a09046ad) SHA1(665973bffc38e36b8b0f6bc79e10db280be0613e) )
 	ROM_LOAD( "be19", 0xa000, 0x2000, CRC(0cdc4da9) SHA1(405454deda311abb8badd58a47529e42ddce5f6a) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "be26", 0x0000, 0x2000, CRC(999ab0a3) SHA1(6aa545cee7a261f3dc5774dea2066f1412f63f49) )
 	ROM_LOAD( "be25", 0x2000, 0x2000, CRC(253bf0da) SHA1(33bae6401003dc57deaa14bf7f6a7ebad5b7efe3) ) /* adpcm */
 	ROM_LOAD( "be24", 0x4000, 0x2000, CRC(e2c188af) SHA1(b7a0801a4c634694f1556873fd21f7e13441be17) ) /* adpcm */
@@ -593,7 +593,7 @@ ROM_START( karatedo )
 ROM_END
 
 ROM_START( kchampvs )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "bs24", 0x0000, 0x2000, CRC(829da69b) SHA1(3266e7686e537f34ee5ce4cccc349eb12fc65038) )
 	ROM_LOAD( "bs23", 0x2000, 0x2000, CRC(091f810e) SHA1(283edb08ce106835185a1c2d6b88f7544d75f3b4) )
 	ROM_LOAD( "bs22", 0x4000, 0x2000, CRC(d4df2a52) SHA1(60d6cb1cb51c6f80a0f88913d4152ab8bda752d6) )
@@ -602,7 +602,7 @@ ROM_START( kchampvs )
 	ROM_LOAD( "bs19", 0xa000, 0x2000, CRC(43e196c4) SHA1(8029798ea0a560603c3dcde56db5a1ccde58c514) )
 	ROM_CONTINUE(     0xe000, 0x2000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "bs18", 0x0000, 0x2000, CRC(eaa646eb) SHA1(cbd48f4d5d225b71c2dd0b14f420838561e3f83e) )
 	ROM_LOAD( "bs17", 0x2000, 0x2000, CRC(d71031ad) SHA1(b168f4ef4feb4195305404df699acecb731eab02) ) /* adpcm */
 	ROM_LOAD( "bs16", 0x4000, 0x2000, CRC(6f811c43) SHA1(1d33ac8129562ab709bd7396b4c2457b6db99277) ) /* adpcm */
@@ -634,7 +634,7 @@ ROM_START( kchampvs )
 ROM_END
 
 ROM_START( karatevs )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "br24", 0x0000, 0x2000, CRC(ea9cda49) SHA1(7d753a8d391418d0fe5231eb88b3627f7d3fd99e) )
 	ROM_LOAD( "br23", 0x2000, 0x2000, CRC(46074489) SHA1(5593f819b6893820ef0c0fece13cf3ca83e1ab85) )
 	ROM_LOAD( "br22", 0x4000, 0x2000, CRC(294f67ba) SHA1(45f13a7deb75bb167176c5405128de3ca76e22f0) )
@@ -643,7 +643,7 @@ ROM_START( karatevs )
 	ROM_LOAD( "br19", 0xa000, 0x2000, CRC(dd2239d2) SHA1(0533d5abf8e25a4aeec2f7832b657eab56fd11f0) )
 	ROM_CONTINUE(     0xe000, 0x2000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
 	ROM_LOAD( "br18", 0x0000, 0x2000, CRC(00ccb8ea) SHA1(83d69684dc3ad37aca03c901fd23c7652134766f) )
 	ROM_LOAD( "bs17", 0x2000, 0x2000, CRC(d71031ad) SHA1(b168f4ef4feb4195305404df699acecb731eab02) ) /* adpcm */
 	ROM_LOAD( "br16", 0x4000, 0x2000, CRC(2512d961) SHA1(f0cd1be112b915d700e0587759606d48d115a83f) ) /* adpcm */
@@ -678,9 +678,9 @@ ROM_END
 
 static DRIVER_INIT( kchampvs )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x10000);
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 
 	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);

@@ -490,7 +490,7 @@ static MACHINE_START( draco )
 	MACHINE_START_CALL( cidelsa );
 
 	/* setup COP402 memory banking */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "audio"), 0x400);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "audiocpu"), 0x400);
 	memory_set_bank(machine, 1, 0);
 
 	/* register for state saving */
@@ -577,7 +577,7 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_MACHINE_START(draco)
 	MDRV_MACHINE_RESET(cidelsa)
 
-	MDRV_CPU_ADD("audio", COP402, DRACO_SND_CHR1) // COP402N
+	MDRV_CPU_ADD("audiocpu", COP402, DRACO_SND_CHR1) // COP402N
 	MDRV_CPU_PROGRAM_MAP(draco_sound_map, 0)
 	MDRV_CPU_IO_MAP(draco_sound_io_map, 0)
 	MDRV_CPU_CONFIG(draco_cop_intf)
@@ -632,7 +632,7 @@ ROM_START( draco )
 	ROM_LOAD( "dra g 1.ic16", 0x3000, 0x0800, CRC(f28546c0) SHA1(daedf1d64f94358b15580d697dd77d3c977aa22c) )
 	ROM_LOAD( "dra h 1.ic17", 0x3800, 0x0800, CRC(dce782ea) SHA1(f558096f43fb30337bc4a527169718326c265c2c) )
 
-	ROM_REGION( 0x800, "audio", 0 )
+	ROM_REGION( 0x800, "audiocpu", 0 )
 	ROM_LOAD( "dra s 1.ic4",  0x0000, 0x0800, CRC(292a57f8) SHA1(b34a189394746d77c3ee669db24109ee945c3be7) )
 ROM_END
 

@@ -703,11 +703,11 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( twincobr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,28000000/4)			/* 7.0MHz - Main board Crystal is 28MHz */
+	MDRV_CPU_ADD("maincpu", M68000,28000000/4)			/* 7.0MHz - Main board Crystal is 28MHz */
 	MDRV_CPU_PROGRAM_MAP(main_program_map, 0)
-	MDRV_CPU_VBLANK_INT("main", twincobr_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", twincobr_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,28000000/8)			/* 3.5MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,28000000/8)			/* 3.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_program_map, 0)
 	MDRV_CPU_IO_MAP(sound_io_map, 0)
 
@@ -723,7 +723,7 @@ static MACHINE_DRIVER_START( twincobr )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( (28000000.0 / 4) / (446 * 286) )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -754,13 +754,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( twincobr )
-	ROM_REGION( 0x30000, "main", 0 )	/* Main 68K code */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b30-01", 0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
 	ROM_LOAD16_BYTE( "b30-03", 0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
 	ROM_LOAD16_BYTE( "tc15",   0x20000, 0x08000, CRC(3a646618) SHA1(fc1ed8f3c491f5cf16a17e5ce08c5d8f3ce03683) )
 	ROM_LOAD16_BYTE( "tc13",   0x20001, 0x08000, CRC(d7d1e317) SHA1(57b8433b1677a390a7c7e00a1464bb8ed9cbfc73) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "tc12", 0x00000, 0x08000, CRC(e37b3c44) SHA1(5fed10b29c14e27aee0cd92ecde5c5cb422273b1) )	/* slightly different from the other two sets */
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
@@ -804,13 +804,13 @@ ROM_START( twincobr )
 ROM_END
 
 ROM_START( twincobu )
-	ROM_REGION( 0x30000, "main", 0 )	/* Main 68K code */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b30-01", 0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
 	ROM_LOAD16_BYTE( "b30-03", 0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
 	ROM_LOAD16_BYTE( "b30-26", 0x20000, 0x08000, CRC(bdd00ba4) SHA1(b76b22f03eb4b821a8c555edd9fcee814f2e66a7) )
 	ROM_LOAD16_BYTE( "b30-27", 0x20001, 0x08000, CRC(ed600907) SHA1(e5964db9eab2c334940795d71cb90f6679490227) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "b30-05", 0x00000, 0x08000, CRC(1a8f1e10) SHA1(0c37a7a50b2523506ad77ac03ae752eb94092ff6) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
@@ -849,13 +849,13 @@ ROM_START( twincobu )
 ROM_END
 
 ROM_START( ktiger )
-	ROM_REGION( 0x30000, "main", 0 )	/* Main 68K code */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b30-01", 0x00000, 0x10000, CRC(07f64d13) SHA1(864ce0f9369c40c3ae792fc4ab2444a168214749) )
 	ROM_LOAD16_BYTE( "b30-03", 0x00001, 0x10000, CRC(41be6978) SHA1(4784804b738a332c7f24a43bcbb7a1e607365735) )
 	ROM_LOAD16_BYTE( "b30-02", 0x20000, 0x08000, CRC(1d63e9c4) SHA1(bdf013487a6fe8f8cbb03fda5f4fae881064831c) )
 	ROM_LOAD16_BYTE( "b30-04", 0x20001, 0x08000, CRC(03957a30) SHA1(d809881a16b05595b6f184e44a36e592f46ba04a) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "b30-05", 0x00000, 0x08000, CRC(1a8f1e10) SHA1(0c37a7a50b2523506ad77ac03ae752eb94092ff6) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
@@ -894,11 +894,11 @@ ROM_START( ktiger )
 ROM_END
 
 ROM_START( fshark )
-	ROM_REGION( 0x30000, "main", 0 )	/* Main 68K code */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b02_18-1.m8", 0x00000, 0x10000, CRC(04739e02) SHA1(8a14284adb0f0f33adf9affdec081c90de85d594) )
 	ROM_LOAD16_BYTE( "b02_17-1.p8", 0x00001, 0x10000, CRC(fd6ef7a8) SHA1(ddbc05ce694ab4d929f5f621d95800b612bc5f66) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "b02_16.l5", 0x0000, 0x8000, CRC(cdd1a153) SHA1(de9827a959039cf753ecac6756fb1925c37466d8) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
@@ -943,11 +943,11 @@ ROM_START( fshark )
 ROM_END
 
 ROM_START( skyshark )
-	ROM_REGION( 0x30000, "main", 0 )	/* Main 68K code */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b02_18-2.m8", 0x00000, 0x10000, CRC(888e90f3) SHA1(3a40d7e7653cc929af8186e48f272989fb332e14) )
 	ROM_LOAD16_BYTE( "b02_17-2.p8", 0x00001, 0x10000, CRC(066d67be) SHA1(a66be35b956da2c2ddf97cae66d79c0efd228621) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "b02_16.l5",		0x0000, 0x8000, CRC(cdd1a153) SHA1(de9827a959039cf753ecac6756fb1925c37466d8) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
@@ -992,11 +992,11 @@ ROM_START( skyshark )
 ROM_END
 
 ROM_START( hishouza )
-	ROM_REGION( 0x30000, "main", 0 )	/* Main 68K code */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "b02_18.m8", 0x00000, 0x10000, CRC(4444bb94) SHA1(5ff955a5190d1b356187de105cfb8ea181fc1282) )
 	ROM_LOAD16_BYTE( "b02_17.p8", 0x00001, 0x10000, CRC(cdac7228) SHA1(6b0d67e4b0661a858653d2eabb8936af9148167e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "b02_16.l5", 0x0000, 0x8000, CRC(cdd1a153) SHA1(de9827a959039cf753ecac6756fb1925c37466d8) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
@@ -1041,11 +1041,11 @@ ROM_START( hishouza )
 ROM_END
 
 ROM_START( fsharkbt )
-	ROM_REGION( 0x30000, "main", 0 )	/* Main 68K code */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "r18",		0x00000, 0x10000, CRC(ef30f563) SHA1(755d6ce4c1e631d7c11d3fab99dae300b6a3452e) )
 	ROM_LOAD16_BYTE( "r17",		0x00001, 0x10000, CRC(0e18d25f) SHA1(82fc94830b3087c826d07cff699af9a3638e8087) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "b02_16.l5", 0x0000, 0x8000, CRC(cdd1a153) SHA1(de9827a959039cf753ecac6756fb1925c37466d8) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */
@@ -1090,11 +1090,11 @@ ROM_START( fsharkbt )
 ROM_END
 
 ROM_START( gulfwar2 )
-	ROM_REGION( 0x40000, "main", 0 )	/* Main 68K code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "08-u119.bin", 0x00000, 0x20000, CRC(41ebf9c0) SHA1(85207dda76abded727ed95717024a2ea2bd85dac) )
 	ROM_LOAD16_BYTE( "07-u92.bin",  0x00001, 0x20000, CRC(b73e6b25) SHA1(53cde41e5a2e8f721c3f43abf1fff46479f658d8) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "06-u51.bin", 0x00000, 0x08000, CRC(75504f95) SHA1(5bd23e700e1bd4f0fac622dfb7c8cc69ba764956) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 MCU code */

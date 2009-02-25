@@ -347,16 +347,16 @@ static const st0016_interface st0016_config =
 
 static MACHINE_DRIVER_START( macs )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,8000000) /* 8 MHz ? */
+	MDRV_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macs_mem,0)
 	MDRV_CPU_IO_MAP(macs_io,0)
 
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(macs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -394,7 +394,7 @@ ROM_START( macsbios )
 	ROM_REGION( 0x400000, "user2", ROMREGION_ERASEFF ) // Slot A
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
-	ROM_REGION( 0x1000000, "main", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
 	ROM_COPY( "user1",   0x00000, 0x000000, 0x0008000 )
 ROM_END
@@ -404,7 +404,7 @@ ROM_START( mac2bios )
 	ROM_REGION( 0x400000, "user2", ROMREGION_ERASEFF ) // Slot A
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
-	ROM_REGION( 0x1000000, "main", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "user1",   0x00000, 0x010000, 0x400000 )
 	ROM_COPY( "user1",   0x00000, 0x000000, 0x0008000 )
 ROM_END
@@ -421,7 +421,7 @@ ROM_START( kisekaem )
 
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
-	ROM_REGION( 0x1000000, "main", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
 	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
 ROM_END
@@ -438,7 +438,7 @@ ROM_START( kisekaeh )
 
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
-	ROM_REGION( 0x1000000, "main", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
 	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
 ROM_END
@@ -460,7 +460,7 @@ ROM_START( cultname ) // uses printer - two different games ? (slot a - checks f
 	ROM_LOAD16_BYTE( "cult-g3.u5", 0x200001, 0x100000, CRC(fe58b418) SHA1(512f5c544cfafaa98bd2b3791ff1cf67adecec8d) )
 
 
-	ROM_REGION( 0x1000000, "main", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
 	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
 ROM_END
@@ -479,7 +479,7 @@ ROM_START( yuka )
 
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASE00 ) // Slot B
 
-	ROM_REGION( 0x1000000, "main", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
 	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
 ROM_END
@@ -495,7 +495,7 @@ ROM_START( yujan )
 
 	ROM_REGION( 0x400000, "user3", ROMREGION_ERASEFF ) // Slot B
 
-	ROM_REGION( 0x1000000, "main", 0 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_COPY( "user2",   0x00000, 0x010000, 0x400000 )
 	ROM_COPY( "user2",   0x00000, 0x000000, 0x0008000 )
 ROM_END
@@ -583,7 +583,7 @@ static MACHINE_RESET(macs)
 		macs_ram1[0x0ff9]=0x07;
 		macs_ram1[0x1ff9]=0x07;
 
-		memory_set_bankptr(machine,  1, memory_region(machine, "main") + 0x10000 );
+		memory_set_bankptr(machine,  1, memory_region(machine, "maincpu") + 0x10000 );
 		memory_set_bankptr(machine,  2, macs_ram1+0x800);
 		memory_set_bankptr(machine,  3, macs_ram1+0x10000);
 }

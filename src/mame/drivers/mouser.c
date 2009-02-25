@@ -195,17 +195,17 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mouser )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", mouser_nmi_interrupt) /* NMI is masked externally */
+	MDRV_CPU_VBLANK_INT("screen", mouser_nmi_interrupt) /* NMI is masked externally */
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ??? */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
 	MDRV_CPU_IO_MAP(io_map_2,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4) /* ??? This controls the sound tempo */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -230,12 +230,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( mouser )
-	ROM_REGION( 0x20000, "main", 0 ) /* 64K for data, 64K for encrypted opcodes */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64K for data, 64K for encrypted opcodes */
 	ROM_LOAD( "m0.5e",         0x0000, 0x2000, CRC(b56e00bc) SHA1(f3b23212590d91f1d19b1c7a98c560fbe5943185) )
 	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )
 	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -254,12 +254,12 @@ ROM_END
 
 
 ROM_START( mouserc )
-	ROM_REGION( 0x20000, "main", 0 ) /* 64K for data, 64K for encrypted opcodes */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64K for data, 64K for encrypted opcodes */
 	ROM_LOAD( "83001.0",       0x0000, 0x2000, CRC(e20f9601) SHA1(f559a470784bda0bee9cab257a548238365acaa6) )
 	ROM_LOAD( "m1.5f",         0x2000, 0x2000, CRC(ae375d49) SHA1(8422f5a4d8560425f0c8612cf6f76029fcfe267c) )	// 83001.1
 	ROM_LOAD( "m2.5j",         0x4000, 0x2000, CRC(ef5817e4) SHA1(5cadc19f20fadf97c95852b280305fe4c75f1d19) )	// 83001.2
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "m5.3v",         0x0000, 0x1000, CRC(50705eec) SHA1(252cea3498722318638f0c98ae929463ffd7d0d6) )	// 83001.5
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -282,8 +282,8 @@ static DRIVER_INIT( mouser )
 	/* Decode the opcodes */
 
 	offs_t i;
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypted = auto_malloc(0x6000);
 	UINT8 *table = memory_region(machine, "user1");
 

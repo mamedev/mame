@@ -434,9 +434,9 @@ static MACHINE_DRIVER_START( bking )
 	MDRV_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(bking_map,0)
 	MDRV_CPU_IO_MAP(bking_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_6MHz/2)	/* 3 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2)	/* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(bking_audio_map,0)
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
@@ -445,7 +445,7 @@ static MACHINE_DRIVER_START( bking )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -502,7 +502,7 @@ ROM_START( bking )
 	ROM_LOAD( "dm_15.f7",  0x4000, 0x1000, CRC(fda31475) SHA1(784ffa089b7bd4ab4cbd454f4c1c26553a11fc48) )
 	ROM_LOAD( "dm_16.f5",  0x5000, 0x1000, CRC(b6c3c3ed) SHA1(6c7f67d5eba35e32b556b531e848ef375123de78) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Sound ROMs */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound ROMs */
 	ROM_LOAD( "dm_17.f4",  0x0000, 0x1000, CRC(54840bc3) SHA1(225daf7ff8a4095b0e69ce6ccce6d8eab26ec1c8) )
 	ROM_LOAD( "dm_18.d4",  0x1000, 0x1000, CRC(2abadd42) SHA1(d921d333ec9b9140a7d3ce7aaddab35f45fae018) )
 
@@ -541,7 +541,7 @@ ROM_START( bking2 )
 	ROM_LOAD( "07.4f",        0x6000, 0x1000, CRC(b3ed40b7) SHA1(d481094c0381234314f797928e3cdb22f36f4e32) )
 	ROM_LOAD( "08.2f",        0x7000, 0x1000, CRC(8fddb2e8) SHA1(6ee5f09d154440851f370a97b35450e3726e14e7) )
 
-	ROM_REGION( 0x10000, "audio", 0 )         /* Sound ROMs */
+	ROM_REGION( 0x10000, "audiocpu", 0 )         /* Sound ROMs */
 	ROM_LOAD( "15",           0x0000, 0x1000, CRC(f045d0fe) SHA1(3b34081fa6cd0423236d09b6f23e8cf8cfd627c5) )
 	ROM_LOAD( "16",           0x1000, 0x1000, CRC(92d50410) SHA1(e6f4c27031744bbc832a1eb121a7dba4da5286c4) )
 
@@ -740,7 +740,7 @@ ROM_START( bking3 )
 	ROM_LOAD( "a24-10.4f",    0x6000, 0x1000, CRC(a86b3e62) SHA1(f97a13e31e622b5ac55c23458c65a49c2998196a) )
 	ROM_LOAD( "a24-11.2f",    0x7000, 0x1000, CRC(b39db430) SHA1(4f48a34f3aaa1e998a4a5656bc3f399d9e6633c4) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Sound ROMs */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Sound ROMs */
 	ROM_LOAD( "a24-18.4f",    0x0000, 0x1000, CRC(fa3bfa98) SHA1(733924e154e301a9d692d80b485afc4ab0e200c1) )
 	ROM_LOAD( "a24-19.4d",    0x1000, 0x1000, CRC(817f9c2a) SHA1(7365ecf2700e1fd13016408f5493f8d51aab5bbd) )
 	ROM_LOAD( "a24-20.4b",    0x2000, 0x1000, CRC(0e9e16d6) SHA1(43c69602a8d9c34c527ce54472db84168acc4ef4) )

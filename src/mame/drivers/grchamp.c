@@ -675,19 +675,19 @@ static MACHINE_DRIVER_START( grchamp )
 
 	/* basic machine hardware */
 	/* CPU BOARD */
-	MDRV_CPU_ADD("main", Z80, PIXEL_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", grchamp_cpu0_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", grchamp_cpu0_interrupt)
 
 	/* GAME BOARD */
 	MDRV_CPU_ADD("sub", Z80, PIXEL_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 	MDRV_CPU_IO_MAP(sub_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", grchamp_cpu1_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", grchamp_cpu1_interrupt)
 
 	/* SOUND BOARD */
-	MDRV_CPU_ADD("audio", Z80, SOUND_CLOCK/2)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/4/16/16/10/16)
 
@@ -699,7 +699,7 @@ static MACHINE_DRIVER_START( grchamp )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MDRV_GFXDECODE(grchamp)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -735,7 +735,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( grchamp )
-	ROM_REGION( 0x4000, "main", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "gm03",   0x0000, 0x1000, CRC(47fda76e) SHA1(fd5f1a651481669d64e5e0799369c22472265535) )
 	ROM_LOAD( "gm04",   0x1000, 0x1000, CRC(07a623dc) SHA1(bb8a6531d95e996148c06fd336db4054eb1d28dd) )
 	ROM_LOAD( "gm05",	0x2000, 0x1000, CRC(716e1fba) SHA1(fe596873c932513227b982cd23af440d31612de9) )
@@ -747,7 +747,7 @@ ROM_START( grchamp )
 	ROM_LOAD( "gr16",	0x5000, 0x1000, CRC(885d708e) SHA1(d5d2978a0eeca167ec1fb9f6f981388de46fbf81) )
 	ROM_LOAD( "gr15",	0x6000, 0x1000, CRC(a822430b) SHA1(4d29612489362d2dc3f3a9eab609902a50c34aff) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "gm07",	0x0000, 0x1000, CRC(65dcc572) SHA1(c9b19af365fa7ade2698be0bb892591ba281ecb0) )
 	ROM_LOAD( "gm08",	0x1000, 0x1000, CRC(224d880c) SHA1(68aaaa0213d09cf34ba50c91d8c031d041f8a76f) )
 

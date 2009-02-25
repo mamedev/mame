@@ -134,7 +134,7 @@ WRITE16_HANDLER(sonic_level_load_protection)
 		}
 		else
 		{
-			const UINT8 *ROM = memory_region(space->machine, "main");
+			const UINT8 *ROM = memory_region(space->machine, "maincpu");
 			level =  *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
 			level |= *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
@@ -184,7 +184,7 @@ WRITE16_HANDLER(brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	switch (offset)
 	{

@@ -190,13 +190,13 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( hotblock )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I8088, 10000000)
+	MDRV_CPU_ADD("maincpu", I8088, 10000000)
 	MDRV_CPU_PROGRAM_MAP(hotblock_map, 0)
 	MDRV_CPU_IO_MAP(hotblock_io,0)
-	MDRV_CPU_VBLANK_INT("main", hotblocks_irq)
+	MDRV_CPU_VBLANK_INT("screen", hotblocks_irq)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -217,7 +217,7 @@ static MACHINE_DRIVER_START( hotblock )
 MACHINE_DRIVER_END
 
 ROM_START( hotblock )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "hotblk5.ic4", 0x000000, 0x080000, CRC(5f90f776) SHA1(5ca74714a7d264b4fafaad07dc11e57308828d30) )
 	ROM_LOAD( "hotblk6.ic5", 0x080000, 0x080000, CRC(3176d231) SHA1(ac22fd0e9820c6714f51a3d8315eb5d43ef91eeb) )
 ROM_END

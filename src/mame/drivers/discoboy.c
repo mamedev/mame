@@ -169,7 +169,7 @@ static VIDEO_UPDATE( discoboy )
 #ifdef UNUSED_FUNCTION
 void discoboy_setrombank(UINT8 data)
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	data &=0x2f;
 	memory_set_bankptr(space->machine, 1, &ROM[0x6000+(data*0x1000)] );
 }
@@ -189,7 +189,7 @@ static WRITE8_HANDLER( discoboy_port_00_w )
 
 static WRITE8_HANDLER( discoboy_port_01_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	int rombank;
 
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
@@ -459,19 +459,19 @@ static MACHINE_RESET( discoboy )
 
 static MACHINE_DRIVER_START( discoboy )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)		 /* 6 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,10000000/2)		 /* 5 MHz? */
+	MDRV_CPU_ADD("audiocpu", Z80,10000000/2)		 /* 5 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 //  MDRV_CPU_IO_MAP(sound_io_map,0)
-//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -501,7 +501,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( discoboy )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	discoboy_ram_part1 = auto_malloc(0x800);
 	discoboy_ram_part2 = auto_malloc(0x800);
@@ -529,11 +529,11 @@ static DRIVER_INIT( discoboy )
 }
 
 ROM_START( discoboy )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "u2",  0x00000, 0x10000, CRC(44a4fefa) SHA1(29b74bb739afffb7baefb5ed4da09cdb1559b011) )
 	ROM_LOAD( "u18", 0x10000, 0x20000, CRC(88d1282d) SHA1(1f11dad0f577198c54a1dc182ba7502e398b998f) )
 
-	ROM_REGION( 0x20000, "audio", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "2.u28",  0x00000, 0x10000, CRC(7c2ed174) SHA1(ace209dc4cc7a4ffca062842defd84cefc5b10d2))
 	ROM_LOAD( "1.u45",  0x10000, 0x10000, CRC(c266c6df) SHA1(f76e38ded43f56a486cf6569c679ddb57a4165fb) )
 

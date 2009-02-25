@@ -369,12 +369,12 @@ static const tms36xx_interface tms3615_interface =
 static MACHINE_DRIVER_START( naughtyb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", naughtyb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", naughtyb_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -405,12 +405,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( popflame )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
 	MDRV_CPU_PROGRAM_MAP(readmem,popflame_writemem)
-	MDRV_CPU_VBLANK_INT("main", naughtyb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", naughtyb_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -444,7 +444,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( naughtyb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.30",	   0x0000, 0x0800, CRC(f6e1178e) SHA1(5cd428e1f085ff82d7237b3e261b33ff876fd4cb) )
 	ROM_LOAD( "2.29",	   0x0800, 0x0800, CRC(b803eb8c) SHA1(c21b781eb329195e36e6fd1d7467bd9b0d9cbc5b) )
 	ROM_LOAD( "3.28",	   0x1000, 0x0800, CRC(004d0ba7) SHA1(5c182fa6f65f7caa3459fcc5cdc3b7faa8b34769) )
@@ -472,7 +472,7 @@ ROM_START( naughtyb )
 ROM_END
 
 ROM_START( naughtya )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "91", 	   0x0000, 0x0800, CRC(42b14bc7) SHA1(a5890834105b83f6761a5ea819e94533473f0e44) )
 	ROM_LOAD( "92", 	   0x0800, 0x0800, CRC(a24674b4) SHA1(2d93981c2f0dea190745cbc3926b012cfd561ec3) )
 	ROM_LOAD( "3.28",	   0x1000, 0x0800, CRC(004d0ba7) SHA1(5c182fa6f65f7caa3459fcc5cdc3b7faa8b34769) )
@@ -500,7 +500,7 @@ ROM_START( naughtya )
 ROM_END
 
 ROM_START( naughtyc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nb1ic30",   0x0000, 0x0800, CRC(3f482fa3) SHA1(5c670ad37be5bed12a65b8b02330525cfe5ae303) )
 	ROM_LOAD( "nb2ic29",   0x0800, 0x0800, CRC(7ddea141) SHA1(8a725614b156f1fdb249c2767ddb3f04681e7a3f) )
 	ROM_LOAD( "nb3ic28",   0x1000, 0x0800, CRC(8c72a069) SHA1(648df992a5b118d0c48aa20e8621172f50ee5b4c) )
@@ -528,7 +528,7 @@ ROM_START( naughtyc )
 ROM_END
 
 ROM_START( popflame )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic86.bin",	  0x0000, 0x1000, CRC(06397a4b) SHA1(12ef8aa60033161479ba2239b61a318cbf15b3cf) )
 	ROM_LOAD( "ic80.pop",	  0x1000, 0x1000, CRC(b77abf3d) SHA1(8626af8fe7d10c52bea7570dd6237de60607bab6) )
 	ROM_LOAD( "ic94.bin",	  0x2000, 0x1000, CRC(ae5248ae) SHA1(39a7feb94d0392a0eeeb506d2f52299151521692) )
@@ -548,7 +548,7 @@ ROM_START( popflame )
 ROM_END
 
 ROM_START( popflama )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic86.pop",	  0x0000, 0x1000, CRC(5e32bbdf) SHA1(b75e3125301d05f5fb6bcef85d0028de2ee75fab) )
 	ROM_LOAD( "ic80.pop",	  0x1000, 0x1000, CRC(b77abf3d) SHA1(8626af8fe7d10c52bea7570dd6237de60607bab6) )
 	ROM_LOAD( "ic94.pop",	  0x2000, 0x1000, CRC(945a3c0f) SHA1(353fce8904d869bbf654b7be99e76cadf325b47d) )
@@ -568,7 +568,7 @@ ROM_START( popflama )
 ROM_END
 
 ROM_START( popflamb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "popflama.30",	 0x0000, 0x1000, CRC(a9bb0e8a) SHA1(1948be9545401b8163e0f2fa8e962ea66c26d9e0) )
 	ROM_LOAD( "popflama.28",	 0x1000, 0x1000, CRC(debe6d03) SHA1(2365c57a0a08563bea31ab150934dcfc1e6eba58) )
 	ROM_LOAD( "popflama.26",	 0x2000, 0x1000, CRC(09df0d4d) SHA1(ddc0227035edd11bec045c09c535ad7a375698f1) )
@@ -606,7 +606,7 @@ This romset comes from a bootleg pcb.It's a Naughty Boy conversion.
 */
 
 ROM_START( popflamn )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pfb2-1.bin",	  0x0000, 0x0800, CRC(88cd3faa) SHA1(5232aaadfc0a7275e19176a6e49e178c29cd463b) )
 	ROM_LOAD( "pfb2-2.bin",	  0x0800, 0x0800, CRC(a09892e8) SHA1(7a56878e3b01023cfa412f7ce7515e34877ff062) )
 	ROM_LOAD( "pfb2-3.bin",	  0x1000, 0x0800, CRC(99fca5ed) SHA1(b4ced9038681e329b5dbe9b11ad3c91c2945daff) )
@@ -635,7 +635,7 @@ ROM_END
 
 
 ROM_START( trvmstr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic30.bin",     0x0000, 0x1000, CRC(4ccd0537) SHA1(f0991581c2efeb54626dd1f8acf33a28ed1b6f80) )
 	ROM_LOAD( "ic28.bin",     0x1000, 0x1000, CRC(782a2b8c) SHA1(611be829470c2fcbb301f48f5e80ad97e51ef821) )
 	ROM_LOAD( "ic26.bin",     0x2000, 0x1000, CRC(1362010a) SHA1(d721e051329b823e79515a631244eb77b77c731a) )
@@ -664,7 +664,7 @@ ROM_START( trvmstr )
 ROM_END
 
 ROM_START( trvmstra )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic30a.bin",    0x0000, 0x2000, CRC(4c175c45) SHA1(770e128ad30ef6ad9936cbf4da810c8b38c7b630) )
 	ROM_LOAD( "ic28a.bin",    0x1000, 0x2000, CRC(3a8ca87d) SHA1(bf82ca226daa13eabf8db3cabe2c047b831188e8) )
 	ROM_LOAD( "ic26a.bin",    0x2000, 0x2000, CRC(3c655400) SHA1(d536e7cf63834b0ce94fb4e597c370befa792f82) )
@@ -693,7 +693,7 @@ ROM_START( trvmstra )
 ROM_END
 
 ROM_START( trvmstrb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic30-3.bin",   0x0000, 0x1000, CRC(d3eb4197) SHA1(5843ffc8ec82ffe9a6519180e54c82b0375cc3dc) )
 	ROM_LOAD( "ic28.bin",     0x1000, 0x1000, CRC(70322d65) SHA1(498102236390f2e15444943e0fff8a53f37db083) )
 	ROM_LOAD( "ic26.bin",     0x2000, 0x1000, CRC(31dfa9cf) SHA1(007c6ef2381ce9e707932c66a451805cec342eeb) )
@@ -726,7 +726,7 @@ This may be a hacked/bootlegged version of trivia master, hacked to run on a nau
 */
 
 ROM_START( trvgns )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trvgns.30",   0x0000, 0x1000, CRC(a17f172c) SHA1(b831673f860f6b7566e248b13b349d82379b5e72) )
 	ROM_LOAD( "trvgns.28",   0x1000, 0x1000, CRC(681a1bff) SHA1(53da179185ae3bfb30502706cc623c2f4cc57128) )
 	ROM_LOAD( "trvgns.26",   0x2000, 0x1000, CRC(5b4068b8) SHA1(3b424dd8e2a6fa1e4628790f60c51d44f9a535a1) )

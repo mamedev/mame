@@ -1047,7 +1047,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 }
 
 static MACHINE_DRIVER_START( rabbit )
-	MDRV_CPU_ADD("main",M68EC020,24000000) /* 24 MHz */
+	MDRV_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MDRV_CPU_PROGRAM_MAP(rabbit_readmem,rabbit_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(rabbit_interrupts,262)
 	/* (rabbit) */
@@ -1065,7 +1065,7 @@ static MACHINE_DRIVER_START( rabbit )
 
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1176,7 +1176,7 @@ static INTERRUPT_GEN( tmmjprd_interrupt )
 
 static MACHINE_DRIVER_START( tmmjprd )
 	MDRV_IMPORT_FROM(rabbit)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tmmjprd_readmem,tmmjprd_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(tmmjprd_interrupt,2)
 
@@ -1203,7 +1203,7 @@ static DRIVER_INIT(tmmjprd)
 
 
 ROM_START( rabbit )
-	ROM_REGION( 0x200000, "main", 0 ) /* 68020 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code */
 	ROM_LOAD32_BYTE( "jpr0.0", 0x000000, 0x080000, CRC(52bb18c0) SHA1(625bc8a4daa6d08cacd92d9110cf67a95a91325a) )
 	ROM_LOAD32_BYTE( "jpr1.1", 0x000001, 0x080000, CRC(38299d0d) SHA1(72ccd51781b47636bb16ac18037cb3121d17199f) )
 	ROM_LOAD32_BYTE( "jpr2.2", 0x000002, 0x080000, CRC(fa3fd91a) SHA1(ac0e658af30b37b752ede833b44ff5423b93bdb1) )
@@ -1238,7 +1238,7 @@ ROM_START( rabbit )
 ROM_END
 
 ROM_START( tmmjprd )
-	ROM_REGION( 0x200000, "main", 0 ) /* 68020 Code - doesn't seem to dsam quite right, bitswap? */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code - doesn't seem to dsam quite right, bitswap? */
 	ROM_LOAD32_BYTE( "p00.bin", 0x000000, 0x080000, CRC(a1efd960) SHA1(7f41ab58de32777bccbfe28e6e5a1f2dca35bb90) )
 	ROM_LOAD32_BYTE( "p01.bin", 0x000001, 0x080000, CRC(9c325374) SHA1(1ddf1c292fc1bcf4dcefb5d4aa3abdeb1489c020) )
  	ROM_LOAD32_BYTE( "p02.bin", 0x000002, 0x080000, CRC(729a5f12) SHA1(615704d36afdceb4b1ff2e5dc34856e614181e16) )

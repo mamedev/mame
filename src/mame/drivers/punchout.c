@@ -598,7 +598,7 @@ GFXDECODE_END
 
 static const nes_interface nes_config =
 {
-	"audio"
+	"audiocpu"
 };
 
 static MACHINE_RESET( punchout )
@@ -611,12 +611,12 @@ static MACHINE_RESET( punchout )
 static MACHINE_DRIVER_START( punchout )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 8000000/2)	/* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(punchout_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", N2A03, N2A03_DEFAULTCLOCK)
+	MDRV_CPU_ADD("audiocpu", N2A03, N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
@@ -662,7 +662,7 @@ static MACHINE_DRIVER_START( armwrest )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(punchout)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(armwrest_map,0)
 
 	/* video hardware */
@@ -681,14 +681,14 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( punchout )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "chp1-c.8l",    0x0000, 0x2000, CRC(a4003adc) SHA1(a8026eb39aa883993a0c9cb4400bf1a7e5898a2b) )
 	ROM_LOAD( "chp1-c.8k",    0x2000, 0x2000, CRC(745ecf40) SHA1(430f80b688a515953fab177a3ec2eb31c886df22) )
 	ROM_LOAD( "chp1-c.8j",    0x4000, 0x2000, CRC(7a7f870e) SHA1(76bb9f3ef0a2fd514db63fb77f35bde12c15c29c) )
 	ROM_LOAD( "chp1-c.8h",    0x6000, 0x2000, CRC(5d8123d7) SHA1(04ddfcde969db93ff31e9c8a2af4dde285b82e2e) )
 	ROM_LOAD( "chp1-c.8f",    0x8000, 0x4000, CRC(c8a55ddb) SHA1(f91fb368542c50969a086f01a2e70ecce7f2697b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the sound CPU */
 	ROM_LOAD( "chp1-c.4k",    0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE | ROMREGION_ERASEFF | ROMREGION_INVERT )
@@ -746,14 +746,14 @@ ROM_END
 
 ROM_START( punchita )
 	/* Unique to this set */
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code */
 	ROM_LOAD( "chp1-c.8l",    0x0000, 0x2000, CRC(1d595ce2) SHA1(affd43bef96c68f953e66cfa14ad4e9c304dc022) )
 	ROM_LOAD( "chp1-c.8k",    0x2000, 0x2000, CRC(c062fa5c) SHA1(8ebd6fd76f1fd1b85216a4e21d8a13be8317b9e2) )
 	ROM_LOAD( "chp1-c.8j",    0x4000, 0x2000, CRC(48d453ef) SHA1(145f3ace8bec87e83b64c6472e2b71f1ebea13ea) )
 	ROM_LOAD( "chp1-c.8h",    0x6000, 0x2000, CRC(67f5aedc) SHA1(c63a8b0696eec87bb147d435c18ee7e26d19e2a4) )
 	ROM_LOAD( "chp1-c.8f",    0x8000, 0x4000, CRC(761de4f3) SHA1(66754bc762c14fea620fabf408f85e6e3acb89ad) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the sound CPU */
 	ROM_LOAD( "chp1-c.4k",    0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )
 
 	/* Unique to this set */
@@ -832,14 +832,14 @@ ROM_START( punchita )
 ROM_END
 
 ROM_START( spnchout )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "chs1-c.8l",    0x0000, 0x2000, CRC(703b9780) SHA1(93b2fd8392ef094413330cd2474ac406c3db426e) )
 	ROM_LOAD( "chs1-c.8k",    0x2000, 0x2000, CRC(e13719f6) SHA1(d0f08a0999801dd5d55f2f4ae3e76f25b765b8d6) )
 	ROM_LOAD( "chs1-c.8j",    0x4000, 0x2000, CRC(1fa629e8) SHA1(e0c37883e65c77e9f25e323fb4dc05f7dcdc6347) )
 	ROM_LOAD( "chs1-c.8h",    0x6000, 0x2000, CRC(15a6c068) SHA1(3f42697a6d79c6fd4b638feb366c80e98a7f02e2) )
 	ROM_LOAD( "chs1-c.8f",    0x8000, 0x4000, CRC(4ff3cdd9) SHA1(282edf9a3fa085bc82523249a519f2a3fe04e87e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the sound CPU */
 	ROM_LOAD( "chp1-c.4k",    0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
@@ -912,14 +912,14 @@ ROM_START( spnchout )
 ROM_END
 
 ROM_START( spnchotj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "chs1c8la.bin", 0x0000, 0x2000, CRC(dc2a592b) SHA1(a8a7fc5c836e2723ba6abcb1137f4c4f79e21c87) )
 	ROM_LOAD( "chs1c8ka.bin", 0x2000, 0x2000, CRC(ce687182) SHA1(f07d930d90eda199b089f9023b51fd4456c87bdf) )
 	ROM_LOAD( "chs1-c.8j",    0x4000, 0x2000, CRC(1fa629e8) SHA1(e0c37883e65c77e9f25e323fb4dc05f7dcdc6347) )
 	ROM_LOAD( "chs1-c.8h",    0x6000, 0x2000, CRC(15a6c068) SHA1(3f42697a6d79c6fd4b638feb366c80e98a7f02e2) )
 	ROM_LOAD( "chs1c8fa.bin", 0x8000, 0x4000, CRC(f745b5d5) SHA1(8130b5be011848625ebe6691fbb76dc338979b60) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the sound CPU */
 	ROM_LOAD( "chp1-c.4k",    0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE | ROMREGION_ERASEFF | ROMREGION_INVERT )
@@ -986,14 +986,14 @@ ROM_START( spnchotj )
 ROM_END
 
 ROM_START( armwrest )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "chv1-c.8l",    0x0000, 0x2000, CRC(b09764c1) SHA1(2f32acd689ef70ec81fe958c7a604855ae39cf5e) )
 	ROM_LOAD( "chv1-c.8k",    0x2000, 0x2000, CRC(0e147ff7) SHA1(7ea8b7b5562d9432c6cace2ee13377f91543975d) )
 	ROM_LOAD( "chv1-c.8j",    0x4000, 0x2000, CRC(e7365289) SHA1(9d4ed5ce73b93c3917b1411ed902974e2a4f3d35) )
 	ROM_LOAD( "chv1-c.8h",    0x6000, 0x2000, CRC(a2118eec) SHA1(93e1b19819352f88888b3caf67ed27cd50f866a9) )
 	ROM_LOAD( "chpv-c.8f",    0x8000, 0x4000, CRC(664a07c4) SHA1(a8a049be5beeab3940079465fb0c80382f3860f0) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the sound CPU */
 	ROM_LOAD( "chp1-c.4k",    0xe000, 0x2000, CRC(cb6ef376) SHA1(503dbcc1b18a497311bf129689d5650860bf96c7) )	/* same as Punch Out */
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )

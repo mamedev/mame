@@ -2747,7 +2747,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 }
 
 static MACHINE_DRIVER_START( namcos22s )
-	MDRV_CPU_ADD("main", M68EC020,SS22_MASTER_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(namcos22s_am,0)
 	MDRV_CPU_VBLANK_INT_HACK(namcos22s_interrupt,2)
 
@@ -2770,7 +2770,7 @@ static MACHINE_DRIVER_START( namcos22s )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_NVRAM_HANDLER(namcos22)
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -3163,7 +3163,7 @@ static MACHINE_RESET(namcos22)
 }
 
 static MACHINE_DRIVER_START( namcos22 )
-	MDRV_CPU_ADD("main", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
+	MDRV_CPU_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
 	MDRV_CPU_PROGRAM_MAP(namcos22_am,0)
 	MDRV_CPU_VBLANK_INT_HACK(namcos22_interrupt,2)
 
@@ -3183,7 +3183,7 @@ static MACHINE_DRIVER_START( namcos22 )
 	MDRV_CPU_IO_MAP( mcu_s22_io, 0 )
 
 	MDRV_NVRAM_HANDLER(namcos22)
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -3209,7 +3209,7 @@ MACHINE_DRIVER_END
 /*********************************************************************************/
 
 ROM_START( airco22b )
-	ROM_REGION( 0x400000, "main", 0 ) /* main program */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "acs1verb.1", 0x00003, 0x100000, CRC(062c4f61) SHA1(98e1c75dd0f493eb6ebb64b46543217c1d40116e) )
 	ROM_LOAD32_BYTE( "acs1verb.2", 0x00002, 0x100000, CRC(8ae69711) SHA1(4c5323fa8f0419275e330fec66d1fb2b89bb3795) )
 	ROM_LOAD32_BYTE( "acs1verb.3", 0x00001, 0x100000, CRC(71738e67) SHA1(eb8c66dedbeff911b6166ebbda466fb9656ef0fb) )
@@ -3266,7 +3266,7 @@ ROM_START( airco22b )
 ROM_END
 
 ROM_START( alpinerc )
-	ROM_REGION( 0x400000, "main", 0 ) /* main program */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "ar2ver-c.1", 0x00003, 0x100000, CRC(61323842) SHA1(e3c33248340bee252f230124fa9b7fa935a60565) )
 	ROM_LOAD32_BYTE( "ar2ver-c.2", 0x00002, 0x100000, CRC(43795b2d) SHA1(e060f3259661279a36300431c5ca7347bde8b6ec) )
 	ROM_LOAD32_BYTE( "ar2ver-c.3", 0x00001, 0x100000, CRC(acb3003b) SHA1(ea0cbf3a1607b06b108df051f38fec1f214f42d2) )
@@ -3322,7 +3322,7 @@ ROM_START( alpinerc )
 ROM_END
 
 ROM_START( alpinerd )
-	ROM_REGION( 0x400000, "main", 0 ) /* main program */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "ar2ver-d.1", 0x00003, 0x100000, CRC(fa3380b9) SHA1(2a46988745bd2672f8082399a68ae0d0ab3d28f2) )
 	ROM_LOAD32_BYTE( "ar2ver-d.2", 0x00002, 0x100000, CRC(76141352) SHA1(0f7230dd9cd6f1b83d499034affc7bc2c4385ab5) )
 	ROM_LOAD32_BYTE( "ar2ver-d.3", 0x00001, 0x100000, CRC(9beffe6a) SHA1(d8efd1e3829d32bb06537d7cecb59f8df9b6d663) )
@@ -3378,7 +3378,7 @@ ROM_START( alpinerd )
 ROM_END
 
 ROM_START( alpinr2b )
-	ROM_REGION( 0x800000, "main", 0 ) /* main program */
+	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
         ROM_LOAD32_BYTE( "ars2ver-b.2",  0x000003, 0x200000, CRC(ed977f83) SHA1(26c57cdfc15f799a999ee22f141e1c0cabfc91dc) )
         ROM_LOAD32_BYTE( "ars2ver-b.3",  0x000001, 0x200000, CRC(8e7a9983) SHA1(34c82e5f080efe04d6b77a77a8391cb48b69c1af) )
         ROM_LOAD32_BYTE( "ars2ver-b.4",  0x000002, 0x200000, CRC(610e49c2) SHA1(433c6d2216551bac31584306f748af1c912c3b07) )
@@ -3432,7 +3432,7 @@ ROM_START( alpinr2b )
 ROM_END
 
 ROM_START( alpinesa )
-	ROM_REGION( 0x800000, "main", 0 ) /* main program */
+	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
         ROM_LOAD32_BYTE( "af2ver-a_ll.ic2", 0x000003, 0x200000, CRC(e776159d) SHA1(5110364afb7ec606074d58a1d216d7d687b9df62) )
         ROM_LOAD32_BYTE( "af2ver-a_lm.ic3", 0x000002, 0x200000, CRC(c5333d38) SHA1(9486cead964f95f8e56dac2f88486f3b98561aa6) )
         ROM_LOAD32_BYTE( "af2ver-a_um.ic4", 0x000001, 0x200000, CRC(5977fc6e) SHA1(19b8041789f8987934fa461972976a3570b1b87b) )
@@ -3476,7 +3476,7 @@ ROM_START( alpinesa )
 ROM_END
 
 ROM_START( cybrcomm )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "cy1prgll.4d", 0x00003, 0x80000, CRC(b3eab156) SHA1(2a5c4e0360c3b9500687a4d70f7110a0c30da2a5) )
 	ROM_LOAD32_BYTE( "cy1prglm.2d", 0x00002, 0x80000, CRC(884a5b0e) SHA1(0e27ae366b8a2695fe112b4740c8c9013bb97e26) )
 	ROM_LOAD32_BYTE( "cy1prgum.8d", 0x00001, 0x80000, CRC(c9c4a921) SHA1(76a52461165a8bd8d984a34063fbeb4cb73624af) )
@@ -3535,7 +3535,7 @@ ROM_START( cybrcomm )
 ROM_END
 
 ROM_START( cybrcycc )
-	ROM_REGION( 0x400000, "main", 0 ) /* main program */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "cb2ver-c.1", 0x00003, 0x100000, CRC(a8e07a14) SHA1(9bef7068c9bf792960df922ea79e4565d7680433) )
 	ROM_LOAD32_BYTE( "cb2ver-c.2", 0x00002, 0x100000, CRC(054c504f) SHA1(9bde803ff09be0402f9b0388e55407362a2508e3) )
 	ROM_LOAD32_BYTE( "cb2ver-c.3", 0x00001, 0x100000, CRC(47e6306c) SHA1(39d6fc2c3cb9b4c9d3569cedb79b916a90537115) )
@@ -3588,7 +3588,7 @@ ROM_START( cybrcycc )
 ROM_END
 
 ROM_START( propcycl )
-	ROM_REGION( 0x400000, "main", 0 ) /* main program */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "pr2ver-a.1", 0x00003, 0x100000, CRC(3f58594c) SHA1(5fdd8c61b47b51088a201799ce0c2f08c32ef852) )
 	ROM_LOAD32_BYTE( "pr2ver-a.2", 0x00002, 0x100000, CRC(c0da354a) SHA1(f27a71a62385b842404fcd8ed6513158e3639b8f) )
 	ROM_LOAD32_BYTE( "pr2ver-a.3", 0x00001, 0x100000, CRC(74bf4b74) SHA1(02713aa07238cc9e30163ae24d12c034aa972ff3) )
@@ -3653,7 +3653,7 @@ ROM_START( propcycl )
 ROM_END
 
 ROM_START( acedrvrw )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "ad2prgll.4d", 0x00003, 0x80000, CRC(808c5ff8) SHA1(119c90ecb5aa099a0e5d1d7944c004beacead367) )
 	ROM_LOAD32_BYTE( "ad2prglm.2d", 0x00002, 0x80000, CRC(5f726a10) SHA1(d077312c6a387fbdf906d278c73c6a3730687f32) )
 	ROM_LOAD32_BYTE( "ad2prgum.8d", 0x00001, 0x80000, CRC(d5042d6e) SHA1(9ae93e7ea7126302831a879ba0aadcb6e5b842f5) )
@@ -3705,7 +3705,7 @@ ROM_START( acedrvrw )
 ROM_END
 
 ROM_START( victlapw )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "advprgll.4d", 0x00003, 0x80000, CRC(4dc1b0ab) SHA1(b5913388d16f824af6dbb01b5b0350d510667a87) )
 	ROM_LOAD32_BYTE( "advprglm.2d", 0x00002, 0x80000, CRC(7b658bef) SHA1(cf982b49fde0c1897c4c16e77f9eb2a145d8cd42) )
 	ROM_LOAD32_BYTE( "advprgum.8d", 0x00001, 0x80000, CRC(af67f2fb) SHA1(f391843ee0d053e33660c60e3718871142d932f2) )
@@ -3764,7 +3764,7 @@ ROM_START( victlapw )
 ROM_END
 
 ROM_START( raveracw )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "rv2prllb.4d", 0x00003, 0x80000, CRC(3017cd1e) SHA1(ccd648b4a5dfc74fd141815af2969f423311042f) )
 	ROM_LOAD32_BYTE( "rv2prlmb.2d", 0x00002, 0x80000, CRC(894be0c3) SHA1(4dba93dc3ca1cf502c5f54018b64ad79bb2a632b) )
 	ROM_LOAD32_BYTE( "rv2prumb.8d", 0x00001, 0x80000, CRC(6414a800) SHA1(c278ff644909d12a43ba6fc2bf8d2092e469c3e6) )
@@ -3826,7 +3826,7 @@ ROM_START( raveracw )
 ROM_END
 
 ROM_START( raveracj )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "rv1prllb.4d", 0x00003, 0x80000, CRC(71da3eea) SHA1(8a641bb23e0ad89cae5ee1570f8a3627b2434d20) )
 	ROM_LOAD32_BYTE( "rv1prlmb.2d", 0x00002, 0x80000, CRC(6ab7e9ce) SHA1(0c6376ca5a63409aeea344bbc201af6c47afe9ab) )
 	ROM_LOAD32_BYTE( "rv1prumb.8d", 0x00001, 0x80000, CRC(375fabcf) SHA1(448e3db3e3fab8c7c27e214ab5a5fa84e5f84366) )
@@ -3888,7 +3888,7 @@ ROM_START( raveracj )
 ROM_END
 
 ROM_START( raveraja )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "rv1prll.4d", 0x00003, 0x80000, CRC(5dfce6cd) SHA1(1aeeca1e507ae4cbe3d39ca5efd1cc4fe1ab03a8) )
 	ROM_LOAD32_BYTE( "rv1prlm.2d", 0x00002, 0x80000, CRC(0d4d9f74) SHA1(f886b0629cbf5a369af1f44e53c6fd3f51b3fbc9) )
 	ROM_LOAD32_BYTE( "rv1prum.8d", 0x00001, 0x80000, CRC(28e503e3) SHA1(a3071461f840f28c65c660de215c73f812f356b3) )
@@ -3950,7 +3950,7 @@ ROM_START( raveraja )
 ROM_END
 
 ROM_START( ridgera2 )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "rrs2prll.4d",  0x00003, 0x80000, CRC(88199c0f) SHA1(5cf5bb714c3d209943a8d815eaea60afd34641ff) )
 	ROM_LOAD32_BYTE( "rrs1prlmb.2d", 0x00002, 0x80000, CRC(8e86f199) SHA1(7bd9ec9147ef0380864508f66203ef2c6ad1f7f6) )
 	ROM_LOAD32_BYTE( "rrs1prumb.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) )
@@ -4001,7 +4001,7 @@ ROM_START( ridgera2 )
 ROM_END
 
 ROM_START( ridger2a )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "rrs1prllb.4d", 0x00003, 0x80000, CRC(22f069e5) SHA1(fcaec3aa83853c39d713ed01c511060663027ccd) )
 	ROM_LOAD32_BYTE( "rrs1prlmb.2d", 0x00002, 0x80000, CRC(8e86f199) SHA1(7bd9ec9147ef0380864508f66203ef2c6ad1f7f6) )
 	ROM_LOAD32_BYTE( "rrs1prumb.8d", 0x00001, 0x80000, CRC(78c360b6) SHA1(8ee502291359cbc8aef39145c8fe7538311cc58f) )
@@ -4053,7 +4053,7 @@ ROM_START( ridger2a )
 ROM_END
 
 ROM_START( ridger2b )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "rrs1prll.4d", 0x00003, 0x80000, CRC(fbf785a2) SHA1(b9333c7623f68f48aa6ae50913a22a527a19576a) )
 	ROM_LOAD32_BYTE( "rrs1prlm.2d", 0x00002, 0x80000, CRC(562f747a) SHA1(79d818b87c9a992fc9706fb39e6d560c2b0aa392) )
 	ROM_LOAD32_BYTE( "rrs1prum.8d", 0x00001, 0x80000, CRC(93259fb0) SHA1(c29787e873797a003db27adbd20d7b852e26d8c6) )
@@ -4104,7 +4104,7 @@ ROM_START( ridger2b )
 ROM_END
 
 ROM_START( ridgerac )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "rr3prgll.4d", 0x00003, 0x80000, CRC(856fe5ec) SHA1(72d95b8bd5da551c3d358b8ab266373a89f8aa6a) )
 	ROM_LOAD32_BYTE( "rr3prglm.2d", 0x00002, 0x80000, CRC(1e9ef0a9) SHA1(a4577bcdf13673568793d8a324945fca30b10f43) )
 	ROM_LOAD32_BYTE( "rr3prgum.8d", 0x00001, 0x80000, CRC(e160f63f) SHA1(9b4b7a13eb4bc19fcb53daedb87e4945c20a1b8e) )
@@ -4155,7 +4155,7 @@ ROM_START( ridgerac )
 ROM_END
 
 ROM_START( ridgerab )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "rr1prll.4d", 0x00003, 0x80000, CRC(4bb7fc86) SHA1(8291375b8ec4d37e0d9e3bf38da2d5907b0f31bd) )
 	ROM_LOAD32_BYTE( "rr1prlm.2d", 0x00002, 0x80000, CRC(68e13830) SHA1(ddc447c7afbb5c4238969d7e78bfe9cf8fac6061) )
 	ROM_LOAD32_BYTE( "rr1prum.8d", 0x00001, 0x80000, CRC(705ef78a) SHA1(881903413e66d6fd83d46eb18c4e1230531832ae) )
@@ -4206,7 +4206,7 @@ ROM_START( ridgerab )
 ROM_END
 
 ROM_START( ridgeraj )
-	ROM_REGION( 0x200000, "main", 0 ) /* main program */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "rr1prll.4d", 0x00003, 0x80000, CRC(4bb7fc86) SHA1(8291375b8ec4d37e0d9e3bf38da2d5907b0f31bd) )
 	ROM_LOAD32_BYTE( "rr1prlm.2d", 0x00002, 0x80000, CRC(68e13830) SHA1(ddc447c7afbb5c4238969d7e78bfe9cf8fac6061) )
 	ROM_LOAD32_BYTE( "rr1prum.8d", 0x00001, 0x80000, CRC(705ef78a) SHA1(881903413e66d6fd83d46eb18c4e1230531832ae) )
@@ -4257,7 +4257,7 @@ ROM_START( ridgeraj )
 ROM_END
 
 ROM_START( timecris )
-	ROM_REGION( 0x400000, "main", 0 ) /* main program */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "ts2ver-b.1", 0x00003, 0x100000, CRC(29b377f7) SHA1(21864ba964602115c1268fd5edd8006a13a86cfc) )
 	ROM_LOAD32_BYTE( "ts2ver-b.2", 0x00002, 0x100000, CRC(79512e25) SHA1(137a215ec192e76e93511456ad504481a566c9c9) )
 	ROM_LOAD32_BYTE( "ts2ver-b.3", 0x00001, 0x100000, CRC(9f4ced33) SHA1(32768b5ff263a9e3d11b7b36f6b2d7e951e07419) )
@@ -4312,7 +4312,7 @@ ROM_START( timecris )
 ROM_END
 
 ROM_START( timecrsa )
-	ROM_REGION( 0x400000, "main", 0 ) /* main program */
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD_SWAP( "ts2ver-a.1", 0x00002, 0x200000, CRC(d57eb74b) SHA1(536dd9305d0ac44110c575776333310cc57b5242) )
 	ROM_LOAD32_WORD_SWAP( "ts2ver-a.2", 0x00000, 0x200000, CRC(671588af) SHA1(63f992c6795521fd263a0ebf230f8dc88cbfc443) )
 
@@ -5134,7 +5134,7 @@ static DRIVER_INIT( airco22 )
 
 static DRIVER_INIT( propcycl )
 {
-   UINT32 *pROM = (UINT32 *)memory_region(machine, "main");
+   UINT32 *pROM = (UINT32 *)memory_region(machine, "maincpu");
 
 	/* patch out strange routine (uninitialized-eprom related?) */
 	pROM[0x1992C/4] = 0x4E754E75;
@@ -5210,7 +5210,7 @@ static DRIVER_INIT( raveracw )
 
 static DRIVER_INIT( cybrcomm )
 {
-	UINT32 *pROM = (UINT32 *)memory_region(machine, "main");
+	UINT32 *pROM = (UINT32 *)memory_region(machine, "maincpu");
 	pROM[0x18ade8/4] = 0x4e714e71;
 	pROM[0x18ae38/4] = 0x4e714e71;
 	pROM[0x18ae80/4] = 0x4e714e71;
@@ -5228,7 +5228,7 @@ static DRIVER_INIT( cybrcomm )
 static DRIVER_INIT( cybrcyc )
 {
 	/* patch DSP RAM test */
-	UINT32 *pROM = (UINT32 *)memory_region(machine, "main");
+	UINT32 *pROM = (UINT32 *)memory_region(machine, "maincpu");
 	pROM[0x355C/4] &= 0x0000ffff;
 	pROM[0x355C/4] |= 0x4e710000;
 

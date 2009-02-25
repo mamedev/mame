@@ -320,22 +320,22 @@ static MACHINE_RESET(speglsht)
 
 static MACHINE_DRIVER_START( speglsht )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80, 8000000) /* 8 MHz ? */
+	MDRV_CPU_ADD("maincpu",Z80, 8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(st0016_mem,0)
 	MDRV_CPU_IO_MAP(st0016_io,0)
 
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", R3000LE, 25000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(speglsht_mem,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_gen)
+	MDRV_CPU_VBLANK_INT("screen", irq4_gen)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_MACHINE_RESET(speglsht)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -357,10 +357,10 @@ static MACHINE_DRIVER_START( speglsht )
 MACHINE_DRIVER_END
 
 ROM_START( speglsht )
-	ROM_REGION( 0x210000, "main", 0 )
+	ROM_REGION( 0x210000, "maincpu", 0 )
 	ROM_LOAD( "sx004-07.u70", 0x010000, 0x200000, CRC(2d759cc4) SHA1(9fedd829190b2aab850b2f1088caaec91e8715dd) ) /* Noted as "ZPRO0" IE: Z80 (ST0016) Program 0 */
 	/* U71 unpopulated, Noted as ZPRO1 */
-	ROM_COPY( "main",  0x10000, 0x00000, 0x08000 )
+	ROM_COPY( "maincpu",  0x10000, 0x00000, 0x08000 )
 
 	ROM_REGION32_BE( 0x200000, "user1", 0 )
 	ROM_LOAD32_BYTE( "sx004-04.u33", 0x00000, 0x80000, CRC(e46d2e57) SHA1(b1fb836ab2ce547dc2e8d1046d7ef835b87bb04e) ) /* Noted as "RPRO3" IE: R3000 Program 3 */

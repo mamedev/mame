@@ -51,7 +51,7 @@ WRITE8_HANDLER( mjkjidai_videoram_w )
 
 WRITE8_HANDLER( mjkjidai_ctrl_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 //  logerror("%04x: port c0 = %02x\n",cpu_get_pc(space->cpu),data);
 

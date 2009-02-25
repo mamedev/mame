@@ -226,17 +226,17 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( sonson )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,12000000/6)	/* 2 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M6809,12000000/6)	/* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", M6809,12000000/6)	/* 2 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", M6809,12000000/6)	/* 2 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* FIRQs are triggered by the main CPU */
 
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -268,12 +268,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( sonson )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "ss.01e",       0x4000, 0x4000, CRC(cd40cc54) SHA1(4269586099638d31dd30381e94538701982e9f5a) )
 	ROM_LOAD( "ss.02e",       0x8000, 0x4000, CRC(c3476527) SHA1(499b879a12b55443ec833e5a2819e9da20e3b033) )
 	ROM_LOAD( "ss.03e",       0xc000, 0x4000, CRC(1fd0e729) SHA1(e04215b0c3d11ce844ab250ff3e1a845dd0b6c3e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ss_6.c11",     0xe000, 0x2000, CRC(1135c48a) SHA1(bfc10363fc42fb589088675a6e8e3d1668d8a6b8) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -297,7 +297,7 @@ ROM_START( sonson )
 ROM_END
 
 ROM_START( sonsonj )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "ss_0.l9",      0x4000, 0x2000, CRC(705c168f) SHA1(28d3b186cd0b927d96664051fb759b64ecc18908) )
 	ROM_LOAD( "ss_1.j9",      0x6000, 0x2000, CRC(0f03b57d) SHA1(7d14a88f43952d5c4df2951a5b62e399ba5ef37b) )
 	ROM_LOAD( "ss_2.l8",      0x8000, 0x2000, CRC(a243a15d) SHA1(a736a163fbb20fa0e318f53ccf29d155b6f77781) )
@@ -305,7 +305,7 @@ ROM_START( sonsonj )
 	ROM_LOAD( "ss_4.l7",      0xc000, 0x2000, CRC(4c3e9441) SHA1(4316bf4ada6598dd7a7b089f2720b1e1d59123be) )
 	ROM_LOAD( "ss_5.j7",      0xe000, 0x2000, CRC(847f660c) SHA1(33fe54622765ca68992d22b2d62778a027db1719) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ss_6.c11",     0xe000, 0x2000, CRC(1135c48a) SHA1(bfc10363fc42fb589088675a6e8e3d1668d8a6b8) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )

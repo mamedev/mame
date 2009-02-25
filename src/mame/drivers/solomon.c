@@ -201,18 +201,18 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( solomon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4.0 MHz (?????) */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4.0 MHz (?????) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80, 3072000)
+	MDRV_CPU_ADD("audiocpu", Z80, 3072000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? */
 						/* NMIs are caused by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -245,14 +245,14 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( solomon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6.3f",  0x00000, 0x4000, CRC(645eb0f3) SHA1(b911aa157ad94aa539dbe329a197d8902860c809) )
 	ROM_LOAD( "7.3h",  0x08000, 0x4000, CRC(1bf5c482) SHA1(3b6a8dde72cddf95438539c5dc4622c95f932a04) )
 	ROM_CONTINUE(      0x04000, 0x4000 )
 	ROM_LOAD( "8.3jk", 0x0f000, 0x1000, CRC(0a6cdefc) SHA1(101acaa19b779cb8b4fffddbe63fe011c7d4b6e9) )
 	ROM_IGNORE(                 0x7000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1.3jk",  0x0000, 0x4000, CRC(fa6e562e) SHA1(713036c0a80b623086aa674bb5f8a135b6fedb01) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -272,13 +272,13 @@ ROM_END
 
 
 ROM_START( solomonj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "slmn_06.bin",  0x00000, 0x4000, CRC(e4d421ff) SHA1(9599fa6e2d42bf0cfe77d62c6b162f56eae5efff) )
 	ROM_LOAD( "slmn_07.bin",  0x08000, 0x4000, CRC(d52d7e38) SHA1(8439eeeedd1e47d2b9719a05c85a05283c11d7a8) )
 	ROM_CONTINUE(             0x04000, 0x4000 )
 	ROM_LOAD( "slmn_08.bin",  0x0f000, 0x1000, CRC(b924d162) SHA1(6299b791ec874bc3ef0424b277ec8a736c8cdd9a) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "slmn_01.bin",  0x0000, 0x4000, CRC(fa6e562e) SHA1(713036c0a80b623086aa674bb5f8a135b6fedb01) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )

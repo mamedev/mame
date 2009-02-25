@@ -354,15 +354,15 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_DRIVER_START( spbactn )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(spbactn_readmem,spbactn_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq3_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -389,11 +389,11 @@ MACHINE_DRIVER_END
 
 ROM_START( spbactn )
 	/* Board 9002-A (CPU Board) */
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom1.bin", 0x00000, 0x20000, CRC(6741bd3f) SHA1(844eb6465a15d339043fd6d2b6ba20ba216de493) )
 	ROM_LOAD16_BYTE( "rom2.bin", 0x00001, 0x20000, CRC(488cc511) SHA1(41b4a01f35e0e93634b4843dbb894ab9840807bf) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-u14.3", 0x00000, 0x10000, CRC(57f4c503) SHA1(e5ddc63a43ba824bcaa4340eeba25a0d3f26cad9) )
 
 	ROM_REGION( 0x20000, "oki", 0 )
@@ -415,11 +415,11 @@ ROM_END
 
 ROM_START( spbactnj )
 	/* Board 9002-A (CPU Board) */
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "a-u68.1", 0x00000, 0x20000, CRC(b5b2d824) SHA1(be04ca370a381d7396f39e31fb2680973193daee) )
 	ROM_LOAD16_BYTE( "a-u67.2", 0x00001, 0x20000, CRC(9577b48b) SHA1(291d890a9d0e434455f183eb12ae6edf3156688d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-u14.3", 0x00000, 0x10000, CRC(57f4c503) SHA1(e5ddc63a43ba824bcaa4340eeba25a0d3f26cad9) )
 
 	ROM_REGION( 0x20000, "oki", 0 )

@@ -411,10 +411,10 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( snes )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", G65816, 3580000)	/* 2.68Mhz, also 3.58Mhz */
+	MDRV_CPU_ADD("maincpu", G65816, 3580000)	/* 2.68Mhz, also 3.58Mhz */
 	MDRV_CPU_PROGRAM_MAP(snes_map, 0)
 
-	MDRV_CPU_ADD("audio", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
+	MDRV_CPU_ADD("audiocpu", SPC700, 2048000/2)	/* 2.048 Mhz, but internal divider */
 	MDRV_CPU_PROGRAM_MAP(spc_mem, 0)
 
 	MDRV_QUANTUM_TIME(HZ(24000))
@@ -426,7 +426,7 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_VIDEO_UPDATE( snes )
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 

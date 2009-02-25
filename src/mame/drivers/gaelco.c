@@ -223,17 +223,17 @@ GFXDECODEINFO(0x100000,64)
 static MACHINE_DRIVER_START( bigkarnk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)	/* MC68000P10, 10 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* MC68000P10, 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(bigkarnk_readmem,bigkarnk_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", M6809, 8867000/4)	/* 68B09, 2.21675 MHz? */
+	MDRV_CPU_ADD("audiocpu", M6809, 8867000/4)	/* 68B09, 2.21675 MHz? */
 	MDRV_CPU_PROGRAM_MAP(bigkarnk_readmem_snd,bigkarnk_writemem_snd)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -259,11 +259,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( bigkarnk )
-	ROM_REGION( 0x080000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"d16",	0x000000, 0x040000, CRC(44fb9c73) SHA1(c33852b37afea15482f4a43cb045434660e7a056) )
 	ROM_LOAD16_BYTE(	"d19",	0x000001, 0x040000, CRC(ff79dfdd) SHA1(2bfa440299317967ba2018d3a148291ae0c144ae) )
 
-	ROM_REGION( 0x01e000, "audio", 0 )	/* 6809 code */
+	ROM_REGION( 0x01e000, "audiocpu", 0 )	/* 6809 code */
 	ROM_LOAD(	"d5",	0x000000, 0x010000, CRC(3b73b9c5) SHA1(1b1c5545609a695dab87d611bd53e0c3dd91e6b7) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )
@@ -384,12 +384,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( maniacsq )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,24000000/2)			/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(maniacsq_readmem,maniacsq_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -412,7 +412,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( maniacsp )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"d18",	0x000000, 0x020000, CRC(740ecab2) SHA1(8d8583364cc6aeea58ea2b9cb9a2aab2a43a44df) )
 	ROM_LOAD16_BYTE(	"d16",	0x000001, 0x020000, CRC(c6c42729) SHA1(1aac9f93d47a4eb57e06e206e9f50e349b1817da) )
 
@@ -439,7 +439,7 @@ ROM_END
 
 
 ROM_START( biomtoy )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"d18",	0x000000, 0x080000, CRC(4569ce64) SHA1(96557aca55779c23f7c2c11fddc618823c04ead0) )
 	ROM_LOAD16_BYTE(	"d16",	0x000001, 0x080000, CRC(739449bd) SHA1(711a8ea5081f15dea6067577516c9296239c4145) )
 
@@ -619,14 +619,14 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( squash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* MC68000P12, 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,squash_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -698,7 +698,7 @@ Notes:
 
 /* encrypted video ram */
 ROM_START( squash )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "squash.d18", 0x000000, 0x20000, CRC(ce7aae96) SHA1(4fe8666ae571bffc5a08fa68346c0623282989eb) )
 	ROM_LOAD16_BYTE( "squash.d16", 0x000001, 0x20000, CRC(8ffaedd7) SHA1(f4aada17ba67dd8b6c5a395e832bcbba2764c59d) )
 
@@ -770,14 +770,14 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( thoop )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* MC68000P12, 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12, 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(squash_readmem,thoop_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -800,7 +800,7 @@ MACHINE_DRIVER_END
 
 /* encrypted video ram */
 ROM_START( thoop )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "th18dea1.040", 0x000000, 0x80000, CRC(59bad625) SHA1(28e058b2290bc5f7130b801014d026432f9e7fd5) )
 	ROM_LOAD16_BYTE( "th161eb4.020", 0x000001, 0x40000, CRC(6add61ed) SHA1(0e789d9a0ac19b6143044fbc04ab2227735b2a8f) )
 

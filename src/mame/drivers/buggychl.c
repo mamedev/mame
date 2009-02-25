@@ -90,7 +90,7 @@ Dip locations and factory settings verified from dip listing
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "main")[0x10000 + (data & 7) * 0x2000]);
+	memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "maincpu")[0x10000 + (data & 7) * 0x2000]);
 }
 
 
@@ -403,11 +403,11 @@ static const msm5232_interface msm5232_config =
 static MACHINE_DRIVER_START( buggychl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000) /* 4 MHz??? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz??? */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,60)	/* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
@@ -416,7 +416,7 @@ static MACHINE_DRIVER_START( buggychl )
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -465,14 +465,14 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( buggychl )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "a22-04-2.23", 0x00000, 0x4000, CRC(16445a6a) SHA1(5ce7b0b1aeb3b6cd400965467f913558f39c251f) )
 	ROM_LOAD( "a22-05-2.22", 0x04000, 0x4000, CRC(d57430b2) SHA1(3e5b8c21a342d8e26c12a78535748073bc5b8742) )
 	ROM_LOAD( "a22-01.3",    0x10000, 0x4000, CRC(af3b7554) SHA1(fd4f5a6cf9253f64c7e86d566802a02baae3b379) ) /* banked */
 	ROM_LOAD( "a22-02.2",    0x14000, 0x4000, CRC(b8a645fb) SHA1(614a0656dee0cfa1d7e16ec1e0138a423ecaf18b) ) /* banked */
 	ROM_LOAD( "a22-03.1",    0x18000, 0x4000, CRC(5f45d469) SHA1(3a1b9ab2d57c06bfffb1271583944c90d3f6b5a2) ) /* banked */
 
-	ROM_REGION( 0x10000, "audio", 0 )  /* sound Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )  /* sound Z80 */
 	ROM_LOAD( "a22-24.28",   0x00000, 0x4000, CRC(1e7f841f) SHA1(2dc0787b08d32acb78291b689c02dbb83d04d08c) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
@@ -495,14 +495,14 @@ ROM_START( buggychl )
 ROM_END
 
 ROM_START( buggycht )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "bu04.bin",    0x00000, 0x4000, CRC(f90ab854) SHA1(d4536c98be35de3d888548e2de15f8435ca4f08c) )
 	ROM_LOAD( "bu05.bin",    0x04000, 0x4000, CRC(543d0949) SHA1(b7b0b0319f5376e7cfcfd0e8a4fa6fea566e0206) )
 	ROM_LOAD( "a22-01.3",    0x10000, 0x4000, CRC(af3b7554) SHA1(fd4f5a6cf9253f64c7e86d566802a02baae3b379) ) /* banked */
 	ROM_LOAD( "a22-02.2",    0x14000, 0x4000, CRC(b8a645fb) SHA1(614a0656dee0cfa1d7e16ec1e0138a423ecaf18b) ) /* banked */
 	ROM_LOAD( "a22-03.1",    0x18000, 0x4000, CRC(5f45d469) SHA1(3a1b9ab2d57c06bfffb1271583944c90d3f6b5a2) ) /* banked */
 
-	ROM_REGION( 0x10000, "audio", 0 )  /* sound Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )  /* sound Z80 */
 	ROM_LOAD( "a22-24.28",   0x00000, 0x4000, CRC(1e7f841f) SHA1(2dc0787b08d32acb78291b689c02dbb83d04d08c) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */

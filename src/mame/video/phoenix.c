@@ -229,7 +229,7 @@ VIDEO_START( phoenix )
 
 WRITE8_HANDLER( phoenix_videoram_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 	videoram_pg[videoram_pg_index][offset] = data;
 

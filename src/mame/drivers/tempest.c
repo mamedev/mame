@@ -390,7 +390,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x0d00, 0x0d00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(tempest_coin_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(avgdvg_go_w)
@@ -573,7 +573,7 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_DRIVER_START( tempest )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 8)
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
 	MDRV_WATCHDOG_TIME_INIT(HZ(CLOCK_3KHZ / 256))
@@ -583,7 +583,7 @@ static MACHINE_DRIVER_START( tempest )
 	MDRV_MACHINE_START(tempest)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 580, 0, 570)
@@ -615,7 +615,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( tempest ) /* rev 3 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
@@ -651,7 +651,7 @@ ROM_END
 
 
 ROM_START( tempest1 ) /* rev 1 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
@@ -687,7 +687,7 @@ ROM_END
 
 
 ROM_START( tempest2 ) /* rev 2 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )
@@ -723,7 +723,7 @@ ROM_END
 
 
 ROM_START( tempest3 ) /* rev 2 */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A037383-04 */
 	ROM_LOAD( "136002-237.p1",  0x9000, 0x1000, CRC(1d0cc503) SHA1(7bef95db9b1102d6b1166bda0ccb276ef4cc3764) )
 	ROM_LOAD( "136002-136.lm1", 0xa000, 0x1000, CRC(c88e3524) SHA1(89144baf1efc703b2336774793ce345b37829ee7) )
@@ -753,7 +753,7 @@ ROM_END
 
 
 ROM_START( temptube )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Roms are for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383-02 */
 	ROM_LOAD( "136002-113.d1",   0x9000, 0x0800, CRC(65d61fe7) SHA1(38a1e8a8f65b7887cf3e190269fe4ce2c6f818aa) )
 	ROM_LOAD( "136002-114.e1",   0x9800, 0x0800, CRC(11077375) SHA1(ed8ff0ca969da6672a7683b93d4fcf2935a0d903) )

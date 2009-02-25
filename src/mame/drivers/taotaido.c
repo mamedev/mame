@@ -126,7 +126,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( taotaido_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
 	memory_set_bankptr(space->machine, 1,rom + (data & 0x03) * 0x8000);
 }
@@ -317,18 +317,18 @@ static const ym2610_interface ym2610_config =
 };
 
 static MACHINE_DRIVER_START( taotaido )
-	MDRV_CPU_ADD("main", M68000, 32000000/2)
+	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,20000000/4) // ??
+	MDRV_CPU_ADD("audiocpu", Z80,20000000/4) // ??
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_port_map,0)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_GFXDECODE(taotaido)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -354,11 +354,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( taotaido )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "1-u90.bin", 0x00000, 0x80000, CRC(a3ee30da) SHA1(920a83ce9192bf785bffdc041e280f1a420de4c9) )
 	ROM_LOAD16_WORD_SWAP( "2-u91.bin", 0x80000, 0x80000, CRC(30b7e4fb) SHA1(15e1f6d252c736fdee33b691a0a1a45f0307bffb) )
 
-	ROM_REGION( 0x30000, "audio", 0 ) /* z80 Code */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
 	ROM_RELOAD ( 0x10000, 0x20000 )
 
@@ -378,11 +378,11 @@ ROM_START( taotaido )
 ROM_END
 
 ROM_START( taotaida )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "tt0-u90.bin", 0x00000, 0x80000, CRC(69d4cca7) SHA1(f1aba74fef8fe4271d19763f428fc0e2674d08b3) )
 	ROM_LOAD16_WORD_SWAP( "tt1-u91.bin", 0x80000, 0x80000, CRC(41025469) SHA1(fa3a424ca3ecb513f418e436e4191ff76f6a0de1) )
 
-	ROM_REGION( 0x30000, "audio", 0 ) /* z80 Code */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* z80 Code */
 	ROM_LOAD( "3-u113.bin", 0x000000, 0x20000, CRC(a167c4e4) SHA1(d32184e7040935cd440d4d82c66491b710ec87a8) )
 	ROM_RELOAD ( 0x10000, 0x20000 )
 

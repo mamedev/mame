@@ -69,7 +69,7 @@ static MACHINE_RESET( mjsister )
 
 static WRITE8_HANDLER( mjsister_banksel1_w )
 {
-	UINT8 *BANKROM = memory_region(space->machine, "main");
+	UINT8 *BANKROM = memory_region(space->machine, "maincpu");
 	int tmp = mjsister_colorbank;
 
 	switch (data)
@@ -105,7 +105,7 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 
 static WRITE8_HANDLER( mjsister_banksel2_w )
 {
-	UINT8 *BANKROM = memory_region(space->machine, "main");
+	UINT8 *BANKROM = memory_region(space->machine, "maincpu");
 
 	switch (data)
 	{
@@ -308,7 +308,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( mjsister )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 6.000 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(mjsister_readmem,mjsister_writemem)
 	MDRV_CPU_IO_MAP(mjsister_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
@@ -316,7 +316,7 @@ static MACHINE_DRIVER_START( mjsister )
 	MDRV_MACHINE_RESET(mjsister)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -347,7 +347,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( mjsister )
-	ROM_REGION( 0x30000, "main", 0 )   /* CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )   /* CPU */
 	ROM_LOAD( "ms00.bin",  0x00000, 0x08000, CRC(9468c33b) SHA1(63aecdcaa8493d58549dfd1d217743210cf953bc) )
 	ROM_LOAD( "ms01t.bin", 0x10000, 0x10000, CRC(a7b6e530) SHA1(fda9bea214968a8814d2c43226b3b32316581050) ) /* banked */
 	ROM_LOAD( "ms02t.bin", 0x20000, 0x10000, CRC(7752b5ba) SHA1(84dcf27a62eb290ba07c85af155897ec72f320a8) ) /* banked */

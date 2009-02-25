@@ -61,7 +61,7 @@ static NVRAM_HANDLER( nbmj9195 )
 
 static WRITE8_HANDLER( nbmj9195_soundbank_w )
 {
-	UINT8 *SNDROM = memory_region(space->machine, "audio");
+	UINT8 *SNDROM = memory_region(space->machine, "audiocpu");
 
 	memory_set_bankptr(space->machine, 1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
@@ -521,7 +521,7 @@ static MACHINE_RESET( sailorws )
 static DRIVER_INIT( nbmj9195 )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8 *ROM = memory_region(machine, "audio");
+	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	// sound program patch
 	ROM[0x0213] = 0x00;			// DI -> NOP
@@ -3623,26 +3623,26 @@ static const z80_daisy_chain daisy_chain_sound[] =
 static MACHINE_DRIVER_START( NBMJDRV1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 12000000/2)		/* TMPZ84C011, 6.00 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)		/* TMPZ84C011, 6.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_main)
 	MDRV_CPU_PROGRAM_MAP(readmem_sailorws, writemem_sailorws)
 	MDRV_CPU_IO_MAP(readport_sailorws, writeport_sailorws)
-	MDRV_CPU_VBLANK_INT("main", ctc0_trg1)				/* vblank is connect to ctc triggfer */
+	MDRV_CPU_VBLANK_INT("screen", ctc0_trg1)				/* vblank is connect to ctc triggfer */
 
-	MDRV_CPU_ADD("audio", Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000/1)					/* TMPZ84C011, 8.00 MHz */
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport, sound_writeport)
 
-	MDRV_Z80CTC_ADD("main_ctc", 12000000/2 /* same as "main" */, ctc_intf_main)
-	MDRV_Z80CTC_ADD("audio_ctc", 8000000/1 /* same as "audio" */, ctc_intf_audio)
+	MDRV_Z80CTC_ADD("main_ctc", 12000000/2 /* same as "maincpu" */, ctc_intf_main)
+	MDRV_Z80CTC_ADD("audio_ctc", 8000000/1 /* same as "audiocpu" */, ctc_intf_audio)
 
 	MDRV_MACHINE_RESET(sailorws)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(1024, 512)		/* no way this is correct */
@@ -3696,7 +3696,7 @@ static MACHINE_DRIVER_START( mjuraden )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_mjuraden, writemem_mjuraden)
 	MDRV_CPU_IO_MAP(readport_mjuraden, writeport_mjuraden)
 MACHINE_DRIVER_END
@@ -3706,7 +3706,7 @@ static MACHINE_DRIVER_START( koinomp )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_koinomp, writemem_koinomp)
 	MDRV_CPU_IO_MAP(readport_koinomp, writeport_koinomp)
 MACHINE_DRIVER_END
@@ -3716,7 +3716,7 @@ static MACHINE_DRIVER_START( patimono )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_patimono, writeport_patimono)
 MACHINE_DRIVER_END
 
@@ -3725,7 +3725,7 @@ static MACHINE_DRIVER_START( janbari )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_patimono, writeport_patimono)
 
 	MDRV_NVRAM_HANDLER(nbmj9195)
@@ -3736,7 +3736,7 @@ static MACHINE_DRIVER_START( mmehyou )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_koinomp, writemem_koinomp)
 	MDRV_CPU_IO_MAP(readport_mmehyou, writeport_mmehyou)
 
@@ -3748,7 +3748,7 @@ static MACHINE_DRIVER_START( ultramhm )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_koinomp, writemem_koinomp)
 	MDRV_CPU_IO_MAP(readport_koinomp, writeport_koinomp)
 
@@ -3760,7 +3760,7 @@ static MACHINE_DRIVER_START( gal10ren )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_gal10ren, writeport_gal10ren)
 MACHINE_DRIVER_END
 
@@ -3769,7 +3769,7 @@ static MACHINE_DRIVER_START( renaiclb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_renaiclb, writeport_renaiclb)
 MACHINE_DRIVER_END
 
@@ -3778,7 +3778,7 @@ static MACHINE_DRIVER_START( mjlaman )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_mjlaman, writeport_mjlaman)
 MACHINE_DRIVER_END
 
@@ -3787,7 +3787,7 @@ static MACHINE_DRIVER_START( mkeibaou )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_mkeibaou, writeport_mkeibaou)
 MACHINE_DRIVER_END
 
@@ -3796,7 +3796,7 @@ static MACHINE_DRIVER_START( pachiten )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_pachiten, writeport_pachiten)
 
 	MDRV_NVRAM_HANDLER(nbmj9195)
@@ -3814,7 +3814,7 @@ static MACHINE_DRIVER_START( sailorwr )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_sailorwr, writeport_sailorwr)
 
 	MDRV_NVRAM_HANDLER(nbmj9195)
@@ -3825,7 +3825,7 @@ static MACHINE_DRIVER_START( psailor1 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_psailor1, writeport_psailor1)
 MACHINE_DRIVER_END
 
@@ -3834,7 +3834,7 @@ static MACHINE_DRIVER_START( psailor2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_psailor2, writeport_psailor2)
 MACHINE_DRIVER_END
 
@@ -3843,7 +3843,7 @@ static MACHINE_DRIVER_START( otatidai )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_otatidai, writeport_otatidai)
 MACHINE_DRIVER_END
 
@@ -3852,7 +3852,7 @@ static MACHINE_DRIVER_START( yosimoto )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_yosimoto, writeport_yosimoto)
 MACHINE_DRIVER_END
 
@@ -3861,7 +3861,7 @@ static MACHINE_DRIVER_START( jituroku )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(readport_jituroku, writeport_jituroku)
 MACHINE_DRIVER_END
 
@@ -3870,7 +3870,7 @@ static MACHINE_DRIVER_START( ngpgal )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_ngpgal, writemem_ngpgal)
 	MDRV_CPU_IO_MAP(readport_ngpgal, writeport_ngpgal)
 MACHINE_DRIVER_END
@@ -3880,7 +3880,7 @@ static MACHINE_DRIVER_START( mjgottsu )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_ngpgal, writemem_ngpgal)
 	MDRV_CPU_IO_MAP(readport_mjgottsu, writeport_mjgottsu)
 MACHINE_DRIVER_END
@@ -3890,7 +3890,7 @@ static MACHINE_DRIVER_START( bakuhatu )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_ngpgal, writemem_ngpgal)
 	MDRV_CPU_IO_MAP(readport_mjgottsu, writeport_mjgottsu)
 MACHINE_DRIVER_END
@@ -3900,7 +3900,7 @@ static MACHINE_DRIVER_START( cmehyou )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_ngpgal, writemem_ngpgal)
 	MDRV_CPU_IO_MAP(readport_cmehyou, writeport_cmehyou)
 MACHINE_DRIVER_END
@@ -3910,7 +3910,7 @@ static MACHINE_DRIVER_START( mjkoiura )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_mjuraden, writemem_mjuraden)
 	MDRV_CPU_IO_MAP(readport_mjkoiura, writeport_mjkoiura)
 MACHINE_DRIVER_END
@@ -3920,7 +3920,7 @@ static MACHINE_DRIVER_START( mkoiuraa )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV2 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_mjuraden, writemem_mjuraden)
 	MDRV_CPU_IO_MAP(readport_mkoiuraa, writeport_mkoiuraa)
 MACHINE_DRIVER_END
@@ -3930,7 +3930,7 @@ static MACHINE_DRIVER_START( mscoutm )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV3 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_mscoutm, writemem_mscoutm)
 	MDRV_CPU_IO_MAP(readport_mscoutm, writeport_mscoutm)
 MACHINE_DRIVER_END
@@ -3940,7 +3940,7 @@ static MACHINE_DRIVER_START( imekura )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV3 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_mjegolf, writemem_mjegolf)
 	MDRV_CPU_IO_MAP(readport_imekura, writeport_imekura)
 MACHINE_DRIVER_END
@@ -3950,17 +3950,17 @@ static MACHINE_DRIVER_START( mjegolf )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( NBMJDRV3 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_mjegolf, writemem_mjegolf)
 	MDRV_CPU_IO_MAP(readport_mjegolf, writeport_mjegolf)
 MACHINE_DRIVER_END
 
 
 ROM_START( mjuraden )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",   0x00000,  0x10000, CRC(3b142791) SHA1(b5cf9e2c12967ad4ba035b7480419c91e412c753) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.13e",  0x00000,  0x20000, CRC(3a230c22) SHA1(13aa18dcd320039bca2530c62d1033e4e3335697) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -3973,10 +3973,10 @@ ROM_START( mjuraden )
 ROM_END
 
 ROM_START( koinomp )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",   0x00000,  0x10000, CRC(e4d626fc) SHA1(46bd9b494c7de4eae3e5dfb3bb2ce897ced0d6da) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.13e",  0x00000,  0x20000, CRC(4a5c814b) SHA1(8d06da85dd7f6a10e3cc81f0bb7bb60d07fb02a2) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -3991,10 +3991,10 @@ ROM_START( koinomp )
 ROM_END
 
 ROM_START( pachiten )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "pctn_01.bin", 0x00000,  0x10000, CRC(c033d7c6) SHA1(067cdff10819c8653e92981a5becdb73e52bbd70) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "pctn_02.bin", 0x00000,  0x20000, CRC(fe2f0dfa) SHA1(76a0ac1499bde3a05915711d882db132e720208e) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4008,10 +4008,10 @@ ROM_START( pachiten )
 ROM_END
 
 ROM_START( patimono )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(e4860829) SHA1(192d89b7915153dea8b7a53e1756be83a07f78ec) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.13e", 0x00000,  0x20000, CRC(30770363) SHA1(a6af371ca833878361b4a15857fa216272650a19) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4025,10 +4025,10 @@ ROM_START( patimono )
 ROM_END
 
 ROM_START( janbari )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(f82d26a9) SHA1(37f7de6e44254ae58c4589b400d0bd6c814fbfa7) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.13e", 0x00000,  0x20000, CRC(30770363) SHA1(a6af371ca833878361b4a15857fa216272650a19) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4042,10 +4042,10 @@ ROM_START( janbari )
 ROM_END
 
 ROM_START( mjanbari )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "11.7ca", 0x00000,  0x10000, CRC(1edde2ef) SHA1(fe0c23971cc25c8e2898ac697ce5111fda482f41) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.13e", 0x00000,  0x20000, CRC(30770363) SHA1(a6af371ca833878361b4a15857fa216272650a19) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4059,10 +4059,10 @@ ROM_START( mjanbari )
 ROM_END
 
 ROM_START( mmehyou )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(29d51130) SHA1(266b63c9efa7aca9725173d30bccc39527bc7b55) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.13e", 0x00000,  0x20000, CRC(d193a2e1) SHA1(36e5e7c3b35daac96bb48883db0ae6ebd194acf3) )
 
 	ROM_REGION( 0x260000, "gfx1", 0 ) /* gfx */
@@ -4076,10 +4076,10 @@ ROM_START( mmehyou )
 ROM_END
 
 ROM_START( ultramhm )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(152811b1) SHA1(6f020848252f95468890c9c35dea3fb211caa9c9) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.12e", 0x00000,  0x20000, CRC(a26ba18b) SHA1(593abfda2e082e1dbea37dc8840bd4d63014cde6) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4090,10 +4090,10 @@ ROM_START( ultramhm )
 ROM_END
 
 ROM_START( gal10ren )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "gl10_01.bin", 0x00000,  0x10000, CRC(f63f81b4) SHA1(a805e472f01f2a6d4acb17770e2490d67c0b51ee) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "gl10_02.bin", 0x00000,  0x20000, CRC(1317b788) SHA1(0e12057c2849e733d88ca094d5382207cd34d79d) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4108,10 +4108,10 @@ ROM_START( gal10ren )
 ROM_END
 
 ROM_START( renaiclb )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(82f99130) SHA1(afb19d716b71c10ca3e8c014be9e9a6105aa660b) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.12e", 0x00000,  0x20000, CRC(9f6204a1) SHA1(8d20e0893bb8ceaf8f5076fb0ade24c040f4fc82) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4123,10 +4123,10 @@ ROM_START( renaiclb )
 ROM_END
 
 ROM_START( mjlaman )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "mlmn_01.bin", 0x00000,  0x10000, CRC(5974740d) SHA1(1856ccb91abcfbab53bbd23d41ecfe5a3ffa363d) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "mlmn_02.bin", 0x00000,  0x20000, CRC(90adede6) SHA1(ec08b095b894807a6f6d774a21e1e459f1d022b5) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4137,10 +4137,10 @@ ROM_START( mjlaman )
 ROM_END
 
 ROM_START( mkeibaou )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "mkbo_01.bin", 0x00000,  0x10000, CRC(2e37b1fb) SHA1(e4fbfbe20fbc0ea204dc91ee0d133c9bd5bbefb5) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "mkbo_02.bin", 0x00000,  0x20000, CRC(c9a3109e) SHA1(615289fb9a7e11ceaa774eef8192ca7245e23449) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4154,10 +4154,10 @@ ROM_START( mkeibaou )
 ROM_END
 
 ROM_START( sailorws )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "slws_01.bin", 0x00000,  0x10000, CRC(33191e48) SHA1(55481f09469b239d7eeafc6e53f7bb86f499fae7) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "slws_02.bin", 0x00000,  0x20000, CRC(582f3f29) SHA1(de8f716e069ce0137f610746e477bb7cc841fc72) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4172,10 +4172,10 @@ ROM_START( sailorws )
 ROM_END
 
 ROM_START( sailorwa )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "01.bin",      0x00000,  0x10000, CRC(f3da8f19) SHA1(20f2d09e3178c19d3e64144d5785c0aa5a7de27d) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "slws_02.bin", 0x00000,  0x20000, CRC(582f3f29) SHA1(de8f716e069ce0137f610746e477bb7cc841fc72) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4190,10 +4190,10 @@ ROM_START( sailorwa )
 ROM_END
 
 ROM_START( sailorwr )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "slwr_01.bin", 0x00000,  0x10000, CRC(a0d65cd5) SHA1(3c617231309fd6919fd63c95ec0e3540c4b48a76) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "slws_02.bin", 0x00000,  0x20000, CRC(582f3f29) SHA1(de8f716e069ce0137f610746e477bb7cc841fc72) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4208,10 +4208,10 @@ ROM_START( sailorwr )
 ROM_END
 
 ROM_START( psailor1 )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "pts1_01.bin", 0x00000,  0x10000, CRC(a93dab87) SHA1(c4172bd8ed485b80c4fb7a617d8dc017b4fa01a1) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "pts1_02.bin", 0x00000,  0x20000, CRC(0bcc1a89) SHA1(386a979e9a482061fadb4c0bcf2808ad58caa0e6) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4226,10 +4226,10 @@ ROM_START( psailor1 )
 ROM_END
 
 ROM_START( psailor2 )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "pts2_01.bin", 0x00000,  0x10000, CRC(5a94677f) SHA1(ce8c4f99b619ba72fd3c53e512a83688c3dd54a4) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "pts2_02.bin", 0x00000,  0x20000, CRC(3432de51) SHA1(affd2c1207502a305ea350e20f9adaf6aadfcaec) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4244,10 +4244,10 @@ ROM_START( psailor2 )
 ROM_END
 
 ROM_START( otatidai )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "otcd_01.bin", 0x00000,  0x10000, CRC(a68acf90) SHA1(85d8d7d37fbdd334a5f489ce59dd630383c4e73c) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "otcd_02.bin", 0x00000,  0x20000, CRC(30ed0e78) SHA1(c04185d7e236aeafac5ee5882bfe1ddbf12ba430) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4262,10 +4262,10 @@ ROM_START( otatidai )
 ROM_END
 
 ROM_START( wcatcher )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(1f20adc8) SHA1(79e9fa0a97b1a7a26d03f6fe007ea7aca08da854) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.12e", 0x00000,  0x20000, CRC(470eacb2) SHA1(8054a3e8680133d56715a87e5fc6c6ca0b6b3b16) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 ) /* gfx */
@@ -4277,10 +4277,10 @@ ROM_START( wcatcher )
 ROM_END
 
 ROM_START( yosimoto )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(6059f773) SHA1(d1a8910463fc39a21dcbb80a220238e9980805a1) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.12e", 0x00000,  0x20000, CRC(cdc363b3) SHA1(72a43d8654f194a81ddaf4e51394817139dc916a) )
 
 	ROM_REGION( 0x300000, "gfx1", 0 ) /* gfx */
@@ -4293,10 +4293,10 @@ ROM_START( yosimoto )
 ROM_END
 
 ROM_START( ngpgal )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "ngpg_01.bin", 0x00000,  0x10000, CRC(c766378b) SHA1(b221908eb14ebf5c87ae896c3c27d261b26b5146) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "ngpg_02.bin", 0x00000,  0x20000, CRC(d193a2e1) SHA1(36e5e7c3b35daac96bb48883db0ae6ebd194acf3) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 ) /* gfx */
@@ -4318,10 +4318,10 @@ ROM_START( ngpgal )
 ROM_END
 
 ROM_START( mjgottsu )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "mgek_01.bin", 0x00000,  0x10000, CRC(949676d7) SHA1(2dfa4576c126e1b4f1d4c9ceb2c89905a700f20c) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.8d",        0x00000,  0x20000, CRC(52c6a1a1) SHA1(8beb94870b890c05e78f95dba4c7e11f6300542b) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 ) /* gfx */
@@ -4344,10 +4344,10 @@ ROM_START( mjgottsu )
 ROM_END
 
 ROM_START( bakuhatu )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.4c",  0x00000,  0x10000, CRC(687900ed) SHA1(6cb950e72e4ff62cdee7343f612569f4fccfde46) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.8d",  0x00000,  0x20000, CRC(52c6a1a1) SHA1(8beb94870b890c05e78f95dba4c7e11f6300542b) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 ) /* gfx */
@@ -4370,10 +4370,10 @@ ROM_START( bakuhatu )
 ROM_END
 
 ROM_START( cmehyou )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "cmhy_01.bin", 0x00000,  0x10000, CRC(436dfa6c) SHA1(92882cbc8c3d607045b514faed6bb34303d421d7) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "cmhy_02.bin", 0x00000,  0x20000, CRC(d193a2e1) SHA1(36e5e7c3b35daac96bb48883db0ae6ebd194acf3) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 ) /* gfx */
@@ -4397,10 +4397,10 @@ ROM_START( cmehyou )
 ROM_END
 
 ROM_START( mjkoiura )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "mjku_01.bin", 0x00000,  0x10000, CRC(ef9ae73e) SHA1(2e7fe8f55bc06b842d74efd246df04be647d17e3) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "mjku_02.bin", 0x00000,  0x20000, CRC(3a230c22) SHA1(13aa18dcd320039bca2530c62d1033e4e3335697) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 ) /* gfx */
@@ -4425,10 +4425,10 @@ ROM_START( mjkoiura )
 ROM_END
 
 ROM_START( mkoiuraa )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",   0x00000,  0x10000, CRC(06149bc0) SHA1(5d3f4c7a7dfc12ae08939b45d91553d45c6f1d70) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.13e",  0x00000,  0x20000, CRC(3a230c22) SHA1(13aa18dcd320039bca2530c62d1033e4e3335697) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 ) /* gfx */
@@ -4441,10 +4441,10 @@ ROM_START( mkoiuraa )
 ROM_END
 
 ROM_START( mscoutm )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "mscm_01.bin", 0x00000,  0x10000, CRC(9840ccd8) SHA1(b416606508abddbed50c7ae840e44067fc27d531) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "mscm_02.bin", 0x00000,  0x20000, CRC(4d2cbcab) SHA1(ad5c9257d32129c473e7f7124f84e381e35bbaa3) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4459,10 +4459,10 @@ ROM_START( mscoutm )
 ROM_END
 
 ROM_START( imekura )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.103",  0x00000,  0x10000, CRC(3491083b) SHA1(db73baecb757261d40282b99c87e230b4654fca9) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.804",  0x00000,  0x20000, CRC(1ef3e8f0) SHA1(1356047317481dfb28b05707abf039df3dec8e77) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4477,10 +4477,10 @@ ROM_START( imekura )
 ROM_END
 
 ROM_START( mjegolf )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "metg_01.bin", 0x00000,  0x10000, CRC(1d7c2fcc) SHA1(cc05036ca8ff0fa5c676049c705ec19b39eb433a) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "metg_02.bin", 0x00000,  0x20000, CRC(99f419cf) SHA1(496e5c0afcef9fd7707d87d3588e3a83d7d7f871) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */
@@ -4495,10 +4495,10 @@ ROM_START( mjegolf )
 ROM_END
 
 ROM_START( jituroku )
-	ROM_REGION( 0x10000, "main", 0 ) /* main program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "1.7c",  0x00000,  0x10000, CRC(fb483b47) SHA1(2bde43e717274224de1723e25e1259ab654d52fc) )
 
-	ROM_REGION( 0x20000, "audio", 0 ) /* sound program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound program */
 	ROM_LOAD( "2.12e", 0x00000,  0x20000, CRC(e3579df2) SHA1(ede5a288ee58410550816b3c5f204e178a4d4cd0) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* gfx */

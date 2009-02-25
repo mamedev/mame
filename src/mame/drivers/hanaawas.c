@@ -201,13 +201,13 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( hanaawas )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,18432000/6)	/* 3.072 MHz ??? */
+	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -237,7 +237,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( hanaawas )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.1e",    	0x0000, 0x2000, CRC(618dc1e3) SHA1(31817f256512352db0d27322998d9dcf95a993cf) )
 	ROM_LOAD( "2.3e",    	0x2000, 0x1000, CRC(5091b67f) SHA1(5a66740b8829b9b4d3aea274f9ff36e0b9e8c151) )
 	ROM_LOAD( "3.4e",    	0x4000, 0x1000, CRC(dcb65067) SHA1(37964ff4016bd927b9f13b4358b831bb667f993b) )

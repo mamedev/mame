@@ -265,17 +265,17 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( pass )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14318180/2 )
+	MDRV_CPU_ADD("maincpu", M68000, 14318180/2 )
 	MDRV_CPU_PROGRAM_MAP(pass_readmem,pass_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) /* all the same */
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) /* all the same */
 
-	MDRV_CPU_ADD("audio", Z80, 14318180/4 )
+	MDRV_CPU_ADD("audiocpu", Z80, 14318180/4 )
 	MDRV_CPU_PROGRAM_MAP(pass_sound_readmem,pass_sound_writemem)
 	MDRV_CPU_IO_MAP(pass_sound_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -301,11 +301,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( pass )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "33", 0x00001, 0x20000, CRC(0c5f18f6) SHA1(49b60d46e4149ad1d49b044522a6888737c17e7d) )
 	ROM_LOAD16_BYTE( "34", 0x00000, 0x20000, CRC(7b54573d) SHA1(251e99fa1f045ae4c90676e1953e49e8191440e4) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* z80 clone? */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* z80 clone? */
 	ROM_LOAD( "23", 0x00000, 0x10000, CRC(b9a0ccde) SHA1(33e7dda247aa44b1933ae9c033c161c152276ce6) )
 
 	ROM_REGION( 0x20000, "oki", 0 ) /* samples? */

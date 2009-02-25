@@ -115,11 +115,11 @@ static const ppi8255_interface ppi8255_intf[2] =
 static MACHINE_DRIVER_START( tcl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/4)
+	MDRV_CPU_ADD("maincpu", Z80,12000000/4)
 	MDRV_CPU_PROGRAM_MAP(tcl_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -149,7 +149,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tcl )
-	ROM_REGION( 0x10000*2, "main", 0 )
+	ROM_REGION( 0x10000*2, "maincpu", 0 )
 	ROM_LOAD( "tcl.16f",   0x00000, 0x20000, CRC(8e694a58) SHA1(7a3c20a7c740065b71fe66ec581edce0dd32f145) )
 
 	ROM_REGION( 0x8000*3, "gfx1", ROMREGION_DISPOSE )
@@ -180,9 +180,9 @@ static DRIVER_INIT(tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8 *dest = memory_region(machine, "main");
-	int len = memory_region_length(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *dest = memory_region(machine, "maincpu");
+	int len = memory_region_length(machine, "maincpu");
 	UINT8 *src = malloc_or_die(len);
 
 	int i,idx=0;

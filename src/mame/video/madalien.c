@@ -387,7 +387,7 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",				/* screen we are acting on */
+	"screen",		/* screen we are acting on */
 	8,                /* number of pixels per video memory address */
 	NULL,             /* before pixel update callback */
 	NULL,             /* row update callback */
@@ -399,7 +399,7 @@ static const mc6845_interface mc6845_intf =
 
 
 MACHINE_DRIVER_START( madalien_video )
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 

@@ -429,7 +429,7 @@ static MACHINE_RESET( mpu4 )
 
 /* init rom bank, some games don't set this */
 	{
-		UINT8 *rom = memory_region(machine, "main");
+		UINT8 *rom = memory_region(machine, "maincpu");
 
 		memory_configure_bank(machine, 1, 0, 8, &rom[0x01000], 0x10000);
 
@@ -1419,7 +1419,7 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 
 	MDRV_MACHINE_START(mpu4mod2)
 	MDRV_MACHINE_RESET(mpu4)
-	MDRV_CPU_ADD("main", M6809, MPU4_MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(mod2_memmap,0)
 
 	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))

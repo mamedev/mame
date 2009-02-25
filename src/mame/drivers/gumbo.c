@@ -261,14 +261,14 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( gumbo )
-	MDRV_CPU_ADD("main", M68000, 14318180 /2)	 // or 10mhz? ?
+	MDRV_CPU_ADD("maincpu", M68000, 14318180 /2)	 // or 10mhz? ?
 	MDRV_CPU_PROGRAM_MAP(gumbo_readmem,gumbo_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) // all the same
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) // all the same
 
 	MDRV_GFXDECODE(gumbo)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -290,18 +290,18 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mspuzzle )
 	MDRV_IMPORT_FROM(gumbo)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mspuzzle_readmem,mspuzzle_writemem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dblpoint )
 	MDRV_IMPORT_FROM(gumbo)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dblpoint_readmem,dblpoint_writemem)
 MACHINE_DRIVER_END
 
 ROM_START( gumbo )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u1.bin", 0x00001, 0x20000, CRC(e09899e4) SHA1(b62876dc3ada8509b766a80f496f1227b6af0ced) )
 	ROM_LOAD16_BYTE( "u2.bin", 0x00000, 0x20000, CRC(60e59acb) SHA1(dd11329374c8f63851ddf5af54c91f78fad4fd3d) )
 
@@ -318,7 +318,7 @@ ROM_START( gumbo )
 ROM_END
 
 ROM_START( mspuzzlg ) /* This version is a clone of Gumbo... NOT the other Miss Puzzle sets */
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u1", 0x00001, 0x20000, CRC(95218ff1) SHA1(9617d979d026872dbe68eaae21c3ab1f5f9f4bfd) ) /* Korean bootleg / clone / hack??? */
 	ROM_LOAD16_BYTE( "u2", 0x00000, 0x20000, CRC(7ea7d96c) SHA1(17b9afb3214a07b1af5913f1926c7aeac27ea0e8) )
 
@@ -335,7 +335,7 @@ ROM_START( mspuzzlg ) /* This version is a clone of Gumbo... NOT the other Miss 
 ROM_END
 
 ROM_START( msbingo )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u1.bin", 0x00001, 0x20000, CRC(6eeb6d89) SHA1(d3e8870a2e95a1ee1c0ce80995c902a97b25a85c) )
 	ROM_LOAD16_BYTE( "u2.bin", 0x00000, 0x20000, CRC(f15dd4b5) SHA1(b49713e92f11f8c603f561e071df9ffb838c8795) )
 
@@ -352,7 +352,7 @@ ROM_START( msbingo )
 ROM_END
 
 ROM_START( mspuzzle )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u1.bin", 0x00001, 0x40000, CRC(d9e63f12) SHA1(c826c604f101d68057fdebf1b231293e4b2811f0) )
 	ROM_LOAD16_BYTE( "u2.bin", 0x00000, 0x40000, CRC(9c3fc677) SHA1(193606fe739dbf5f26962f91be968ca371b7fd74) )
 
@@ -373,7 +373,7 @@ ROM_END
 ROM_START( mspuzzln )
 	/* all the roms for this game could do with checking on another board, this one was in pretty bad condition
        and reads weren't always consistent */
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u1.rom", 0x00001, 0x20000, BAD_DUMP CRC(ec940df4) SHA1(20bb6e2757868cf8fbbb11e05adf8c1d625ee172) )
 	ROM_LOAD16_BYTE( "u2.rom", 0x00000, 0x20000, BAD_DUMP CRC(7b9cac82) SHA1(c5edfb3fbdf43219ba317c18222e671ebed94469) )
 
@@ -392,7 +392,7 @@ ROM_START( mspuzzln )
 ROM_END
 
 ROM_START( dblpoint )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u1.bin", 0x00001, 0x20000, CRC(b05c9e02) SHA1(40ae2926cc4a77e8f871e3a4845314384a15c3e0) )
 	ROM_LOAD16_BYTE( "u2.bin", 0x00000, 0x20000, CRC(cab35cbe) SHA1(63a35a880c962a9c9560bf779bf9edec18c3878d) )
 
@@ -410,7 +410,7 @@ ROM_END
 
 /* based on the labels this doesn't seem to be an original Min Corp. board */
 ROM_START( dblpoind )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "d12.bin", 0x00001, 0x20000, CRC(44bc1bd9) SHA1(8b72909c53b09b9287bf90bcd8970bdf9c1b8798) )
 	ROM_LOAD16_BYTE( "d13.bin", 0x00000, 0x20000, CRC(625a311b) SHA1(38fa0d240b253fcc8dc89438582a9c446410b636) )
 

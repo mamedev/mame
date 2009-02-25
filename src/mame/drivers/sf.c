@@ -812,11 +812,11 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( sf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
+	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)	/* ? xtal is 3.579545MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* ? xtal is 3.579545MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* NMIs are caused by the main CPU */
 
@@ -826,7 +826,7 @@ static MACHINE_DRIVER_START( sf )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -863,7 +863,7 @@ static MACHINE_DRIVER_START( sfus )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sf)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmemus,writemem)
 MACHINE_DRIVER_END
 
@@ -872,7 +872,7 @@ static MACHINE_DRIVER_START( sfjp )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sf)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmemjp,writemem)
 MACHINE_DRIVER_END
 
@@ -881,13 +881,13 @@ static MACHINE_DRIVER_START( sfp )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sf)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 MACHINE_DRIVER_END
 
 
 ROM_START( sf )
-	ROM_REGION( 0x60000, "main", 0 )
+	ROM_REGION( 0x60000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("sfe-19", 0x00000, 0x10000, CRC(8346c3ca) SHA1(404e26d210e453ef0f03b092d70c770106eed1d1) )
 	ROM_LOAD16_BYTE("sfe-22", 0x00001, 0x10000, CRC(3a4bfaa8) SHA1(6a6fc8d967838eca7d2973de987bb350c25628d5) )
 	ROM_LOAD16_BYTE("sfe-20", 0x20000, 0x10000, CRC(b40e67ee) SHA1(394987dc4c306351b1657d10528ecb665700c4db) )
@@ -895,7 +895,7 @@ ROM_START( sf )
 	ROM_LOAD16_BYTE("sfe-21", 0x40000, 0x10000, CRC(2547192b) SHA1(aaf07c613a6c42ec1dc82ffa86d00044b4ea27fc) )
 	ROM_LOAD16_BYTE("sfe-24", 0x40001, 0x10000, CRC(79680f4e) SHA1(df596fa5b49a336fe462c2be7b454e695f5382db) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the music CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the music CPU */
 	ROM_LOAD( "sf-02.bin", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
 	ROM_REGION( 0x40000, "audio2", 0 )	/* 256k for the samples CPU */
@@ -951,7 +951,7 @@ ROM_START( sf )
 ROM_END
 
 ROM_START( sfus )
-	ROM_REGION( 0x60000, "main", 0 )
+	ROM_REGION( 0x60000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("sfd-19", 0x00000, 0x10000, CRC(faaf6255) SHA1(f6d0186c6109780839576c141fc6b557c170c182) )
 	ROM_LOAD16_BYTE("sfd-22", 0x00001, 0x10000, CRC(e1fe3519) SHA1(5c59343a8acaaa4f36636d8e28a4ca7854110dad) )
 	ROM_LOAD16_BYTE("sfd-20", 0x20000, 0x10000, CRC(44b915bd) SHA1(85772fb89712f97bb0489a7e43f8b1a5037c8081) )
@@ -959,7 +959,7 @@ ROM_START( sfus )
 	ROM_LOAD16_BYTE("sfd-21", 0x40000, 0x10000, CRC(e8db799b) SHA1(8443ba6a9b9ad29d5985d434658e685fd46d8f1e) )
 	ROM_LOAD16_BYTE("sfd-24", 0x40001, 0x10000, CRC(466a3440) SHA1(689823763bfdbc12ac11ff176acfd22f352e2658) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the music CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the music CPU */
 	ROM_LOAD( "sf-02.bin", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
 	ROM_REGION( 0x40000, "audio2", 0 )	/* 256k for the samples CPU */
@@ -1015,7 +1015,7 @@ ROM_START( sfus )
 ROM_END
 
 ROM_START( sfjp )
-	ROM_REGION( 0x60000, "main", 0 )
+	ROM_REGION( 0x60000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("sf-19.bin", 0x00000, 0x10000, CRC(116027d7) SHA1(6bcb117ee415aff4d8ea962d4eff4088ca94c251) )
 	ROM_LOAD16_BYTE("sf-22.bin", 0x00001, 0x10000, CRC(d3cbd09e) SHA1(7274c603100132102de09e10d2129cfeb6c06369) )
 	ROM_LOAD16_BYTE("sf-20.bin", 0x20000, 0x10000, CRC(fe07e83f) SHA1(252dd592c31e594103ac1eabd734d10748655701) )
@@ -1023,7 +1023,7 @@ ROM_START( sfjp )
 	ROM_LOAD16_BYTE("sf-21.bin", 0x40000, 0x10000, CRC(e086bc4c) SHA1(782134978ff0a7133768d9cc8050bc3b5016580b) )
 	ROM_LOAD16_BYTE("sf-24.bin", 0x40001, 0x10000, CRC(13a6696b) SHA1(c01f9b700928e427bc9914c61beeaa6bcbde4546) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the music CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the music CPU */
 	ROM_LOAD( "sf-02.bin", 0x0000, 0x8000, CRC(4a9ac534) SHA1(933645f8db4756aa2a35a843c3ac6f93cb8d565d) )
 
 	ROM_REGION( 0x40000, "audio2", 0 )	/* 256k for the samples CPU */
@@ -1079,11 +1079,11 @@ ROM_START( sfjp )
 ROM_END
 
 ROM_START( sfp )
-	ROM_REGION( 0x60000, "main", 0 )
+	ROM_REGION( 0x60000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("prg8.2a", 0x00000, 0x20000, CRC(d48d06a3) SHA1(d899771c66c1e7a5caa11f67a1122adb6f0f4d28) )
 	ROM_LOAD16_BYTE("prg0.2c", 0x00001, 0x20000, CRC(e8606c1a) SHA1(be94203cba733e337993e6f386ff5ce1e76d8913) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the music CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the music CPU */
 	ROM_LOAD( "sound.9j", 0x0000, 0x8000, CRC(43cd32ae) SHA1(42e59becde5761eb5d5bc310d2bc690f6f16882a) )
 
 	ROM_REGION( 0x10000, "audio2", 0 )	/* 256k for the samples CPU */

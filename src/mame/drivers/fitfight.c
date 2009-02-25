@@ -746,20 +746,20 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( fitfight )
-	MDRV_CPU_ADD("main",M68000, 12000000)
+	MDRV_CPU_ADD("maincpu",M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(fitfight_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(sound_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(snd_mem, 0)
 	MDRV_CPU_IO_MAP(snd_io, 0)
-	MDRV_CPU_VBLANK_INT("main", snd_irq)
+	MDRV_CPU_VBLANK_INT("screen", snd_irq)
 
 	MDRV_GFXDECODE(fitfight)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -779,14 +779,14 @@ static MACHINE_DRIVER_START( fitfight )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( bbprot )
-	MDRV_CPU_ADD("main",M68000, 12000000)
+	MDRV_CPU_ADD("maincpu",M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bbprot_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_GFXDECODE(prot)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -828,11 +828,11 @@ running!), but incredibly fun to see such a thing :) Hope you enjoy it!
 ***/
 
 ROM_START( fitfight )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u138_ff1.bin", 0x000001, 0x080000, CRC(165600fe) SHA1(b1987dbf34abdb6d08bdf7f71b256b62125e6517) )
 	ROM_LOAD16_BYTE( "u125_ff1.bin", 0x000000, 0x080000, CRC(2f9bdb66) SHA1(4c1ade349f1219d448453b27d4a7517966912ffa) )
 
-	ROM_REGION( 0x01c000, "audio", 0 ) /* Sound Program */
+	ROM_REGION( 0x01c000, "audiocpu", 0 ) /* Sound Program */
 	ROM_LOAD( "u23_ff1.bin",  0x000000, 0x004000, CRC(e2d6d768) SHA1(233e5501ffda8db48341fa66f16b630544803a89) )
 	ROM_CONTINUE(          0x010000, 0x00c000 )
 
@@ -882,11 +882,11 @@ It was dumped from a faulty board, wich doesn't boot, but with intact eproms :)
 ***/
 
 ROM_START( histryma )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "l_th.bin", 0x000001, 0x080000, CRC(5af9356a) SHA1(f3d797dcc528a3a2a4f0ebbf07d59bd2cc868622) )
 	ROM_LOAD16_BYTE( "r_th.bin", 0x000000, 0x080000, CRC(1a44b504) SHA1(621d95b67d413da3e8a90c0cde494b2529b92407) )
 
-	ROM_REGION( 0x01c000, "audio", 0 ) /* Sound Program */
+	ROM_REGION( 0x01c000, "audiocpu", 0 ) /* Sound Program */
 	ROM_LOAD( "y61f.bin",  0x000000, 0x004000, CRC(b588525a) SHA1(b768bd75d6351430f9656289146119e9c0308554) )
 	ROM_CONTINUE(          0x010000, 0x00c000 )
 
@@ -947,7 +947,7 @@ but with a different date wrote on the stickers, those are the ??_DD_MM.bin file
 ***/
 
 ROM_START( bbprot )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "l_bb.bin", 0x000001, 0x080000, CRC(2b7b9a9a) SHA1(51088358814cc337af150526ac7fd6216c102299) )
 	ROM_LOAD16_BYTE( "r_bb.bin", 0x000000, 0x080000, CRC(28480f3e) SHA1(b89533fd01781e1b83c98b0b61a77f554fbdb4f3) )
 
@@ -983,7 +983,7 @@ ROM_END
 
 static DRIVER_INIT( fitfight )
 {
-//  UINT16 *mem16 = (UINT16 *)memory_region(machine, "main");
+//  UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
 //  mem16[0x0165B2/2]=0x4e71; // for now so it boots
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x700000, 0x700001, 0, 0, fitfight_700000_r);
 	bbprot_kludge = 0;
@@ -991,7 +991,7 @@ static DRIVER_INIT( fitfight )
 
 static DRIVER_INIT( histryma )
 {
-//  UINT16 *mem16 = (UINT16 *)memory_region(machine, "main");
+//  UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
 //  mem16[0x017FDC/2]=0x4e71; // for now so it boots
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x700000, 0x700001, 0, 0, histryma_700000_r);
 	bbprot_kludge = 0;

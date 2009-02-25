@@ -1052,11 +1052,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mcr3_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_CONFIG(mcr_daisy_chain)
 	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
-	MDRV_Z80CTC_ADD("ctc", MASTER_CLOCK/4 /* same as "main" */, mcr_ctc_intf)
+	MDRV_Z80CTC_ADD("ctc", MASTER_CLOCK/4 /* same as "maincpu" */, mcr_ctc_intf)
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 	MDRV_MACHINE_START(mcr)
@@ -1066,7 +1066,7 @@ static MACHINE_DRIVER_START( mcr3_base )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1090,7 +1090,7 @@ static MACHINE_DRIVER_START( mcrmono )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mcr3_base)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mcrmono_map,0)
 	MDRV_CPU_IO_MAP(mcrmono_portmap,0)
 
@@ -1128,12 +1128,12 @@ static MACHINE_DRIVER_START( mcrscroll )
 	MDRV_IMPORT_FROM(mcr3_base)
 	MDRV_IMPORT_FROM(mcr_ssio)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spyhunt_map,0)
 	MDRV_CPU_IO_MAP(spyhunt_portmap,0)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(30*16, 30*16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
 	MDRV_GFXDECODE(spyhunt)
@@ -1162,7 +1162,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( demoderm )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pro0.3b",      0x00000, 0x8000, CRC(2e24527b) SHA1(df8d1129b52ca0f4326c7c7e4f10d81b4ced65b5) )
 	ROM_LOAD( "pro1.5b",      0x08000, 0x8000, CRC(034c00fc) SHA1(0f0e8f123a34c330021bce76ed7f38bcb2e9af4e) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1188,7 +1188,7 @@ ROM_END
 
 
 ROM_START( sarge )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpu_3b.bin",   0x00000, 0x8000, CRC(da31a58f) SHA1(29b97caf61f8f59042519a6b501cd1d15099dd59) )
 	ROM_LOAD( "cpu_5b.bin",   0x08000, 0x8000, CRC(6800e746) SHA1(018c2b622b3654530ebc2c299b3f745777163d4b) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1210,7 +1210,7 @@ ROM_END
 
 
 ROM_START( maxrpm )
-	ROM_REGION( 0x12000, "main", 0 )
+	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "pro.0",        0x00000, 0x8000, CRC(3f9ec35f) SHA1(ebdcf480aee5569af631106cc6478adc26c4ac24) )
 	ROM_LOAD( "pro.1",        0x08000, 0x8000, CRC(f628bb30) SHA1(0514906b9764a7f02a730a610affea4d42a4510d) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1232,7 +1232,7 @@ ROM_END
 
 
 ROM_START( rampage )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pro0rev3.3b",  0x00000, 0x8000, CRC(2f7ca03c) SHA1(1e3a1f213fd67938adf14ea0d04dab687ea8f4ef) )
 	ROM_LOAD( "pro1rev3.5b",  0x08000, 0x8000, CRC(d89bd9a4) SHA1(3531464ffe49dfaf2755d9e2dc1aea23819b3a5d) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1256,7 +1256,7 @@ ROM_END
 
 
 ROM_START( rampage2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pro0rev2.3b",  0x00000, 0x8000, CRC(3f1d0293) SHA1(d68f04b9b3fc377b9e57b823db4e7f9cfedbcf99) )
 	ROM_LOAD( "pro1rev2.5b",  0x08000, 0x8000, CRC(58523d75) SHA1(5cd512864568ec7793bda0164f21e7d72a7ea817) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1280,7 +1280,7 @@ ROM_END
 
 
 ROM_START( powerdrv )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pdrv3b.bin",   0x00000, 0x8000, CRC(d870b704) SHA1(300d6ff3c92a45f5c4f28c171280174924aecb6c) )
 	ROM_LOAD( "pdrv5b.bin",   0x08000, 0x8000, CRC(fa0544ad) SHA1(55a9cf8c8648761443e4a5a3b214f4d6236cbaff) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1304,7 +1304,7 @@ ROM_END
 
 
 ROM_START( stargrds )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pro-0.3b",  0x00000, 0x8000, CRC(3ad94aa2) SHA1(1e17ac70fddee1f3d0dd71172e15a7a256168a70) )
 	ROM_LOAD( "pro-1.5b",  0x08000, 0x8000, CRC(dba428b0) SHA1(72efa2f02e95f05a5503ced136fbdf3fcdf57554) )
 	ROM_FILL(              0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
@@ -1326,7 +1326,7 @@ ROM_END
 
 
 ROM_START( spyhunt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpu_pg0.6d",   0x0000, 0x2000, CRC(1721b88f) SHA1(c7a641f0c05bd343ebc79e1c1be3a26da5fb77f0) )
 	ROM_LOAD( "cpu_pg1.7d",   0x2000, 0x2000, CRC(909d044f) SHA1(67237c3efde568d52e9f8b0d36df726d05a9d9e4) )
 	ROM_LOAD( "cpu_pg2.8d",   0x4000, 0x2000, CRC(afeeb8bd) SHA1(fde32863d08a745dfe19f1c1382810eab6aebcec) )
@@ -1369,7 +1369,7 @@ ROM_END
 
 
 ROM_START( spyhuntp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sh_mb_2.bin",  0x0000, 0x2000, CRC(df6cd642) SHA1(e695aa3e3dc3b9df87bf2c1bcb75edbdf03fde98) )
 	ROM_LOAD( "cpu_pg1.7d",   0x2000, 0x2000, CRC(909d044f) SHA1(67237c3efde568d52e9f8b0d36df726d05a9d9e4) )
 	ROM_LOAD( "cpu_pg2.8d",   0x4000, 0x2000, CRC(afeeb8bd) SHA1(fde32863d08a745dfe19f1c1382810eab6aebcec) )
@@ -1412,7 +1412,7 @@ ROM_END
 
 
 ROM_START( crater )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crcpu.6d",     0x0000, 0x2000, CRC(ad31f127) SHA1(d03506570cd08bcdb39d7c6b9de4f9628c7373e9) )
 	ROM_LOAD( "crcpu.7d",     0x2000, 0x2000, CRC(3743c78f) SHA1(05605041c7a5ef2a8271cc3dd1aae4c82c8797eb) )
 	ROM_LOAD( "crcpu.8d",     0x4000, 0x2000, CRC(c95f9088) SHA1(2162c4ef2cc29857b10d64ec9e09ca6d086fa9e7) )
@@ -1450,7 +1450,7 @@ ROM_END
 
 
 ROM_START( turbotag )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ttprog0.bin",  0x0000, 0x2000, CRC(6110fd80) SHA1(544d3cd24b047797c2006a9fac499c14140960db) )
 	ROM_LOAD( "ttprog1.bin",  0x2000, 0x2000, BAD_DUMP CRC(b0505e18) SHA1(b6871484f9a0663a9bcffd58368be5ae7717d29c) )
 	ROM_LOAD( "ttprog2.bin",  0x4000, 0x2000, CRC(c4141237) SHA1(c1d10da4961e94bd8c2b30a2f9e0cbd8080eb56d) )

@@ -99,9 +99,9 @@ static TIMER_CALLBACK( setvector_callback )
 		logerror("You didn't call m72_init_sound()\n");
 
 	if (irqvector == 0xff)	/* no IRQs pending */
-		cputag_set_input_line_and_vector(machine, "sound",0,CLEAR_LINE, irqvector);
+		cputag_set_input_line_and_vector(machine, "soundcpu",0,CLEAR_LINE, irqvector);
 	else	/* IRQ pending */
-		cputag_set_input_line_and_vector(machine, "sound",0,ASSERT_LINE, irqvector);
+		cputag_set_input_line_and_vector(machine, "soundcpu",0,ASSERT_LINE, irqvector);
 }
 
 MACHINE_RESET( m72_sound )

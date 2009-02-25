@@ -223,12 +223,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( dommy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1500000)
+	MDRV_CPU_ADD("maincpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(dommy_readmem,dommy_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)        /* frames per second, vblank duration taken from Burger Time */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -256,12 +256,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( scregg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1500000)
+	MDRV_CPU_ADD("maincpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(eggs_readmem,eggs_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072)        /* frames per second, vblank duration taken from Burger Time */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -287,7 +287,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( dommy )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dommy.e01",  0xa000, 0x2000, CRC(9ae064ed) SHA1(73082e5254d54d8386f580cc82a74242a6debd84) )
 	ROM_LOAD( "dommy.e11",  0xc000, 0x2000, CRC(7c4fad5c) SHA1(fb733ac979092a6fc278836b82d8ed3fae7a20d9) )
 	ROM_LOAD( "dommy.e21",  0xe000, 0x2000, CRC(cd1a4d55) SHA1(f7f4f5ef2e89519652e8401e75dc4e2b8edf4bae) )
@@ -304,7 +304,7 @@ ROM_START( dommy )
 ROM_END
 
 ROM_START( scregg )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "scregg.e14",   0x3000, 0x1000, CRC(29226d77) SHA1(e1a329a4452eeb90801d001140ce865bf1ea7716) )
 	ROM_LOAD( "scregg.d14",   0x4000, 0x1000, CRC(eb143880) SHA1(73b3ca6e0d72cd0db951ae9ed1552cf8b7d91e68) )
 	ROM_LOAD( "scregg.c14",   0x5000, 0x1000, CRC(4455f262) SHA1(fc7b2d9094fa5e25c1bf4b68386f640f4502e0c0) )
@@ -326,7 +326,7 @@ ROM_START( scregg )
 ROM_END
 
 ROM_START( eggs )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "e14.bin",      0x3000, 0x1000, CRC(4e216f9d) SHA1(7b9d984481c8227e417dae4a1adbb5dec5f959b7) )
 	ROM_LOAD( "d14.bin",      0x4000, 0x1000, CRC(4edb267f) SHA1(f5d1a79b13d6fbb92561b4e4cfb78465114497d1) )
 	ROM_LOAD( "c14.bin",      0x5000, 0x1000, CRC(15a5c48c) SHA1(70141c739a8c019554a6c5257ad12606a1542b1f) )
@@ -350,14 +350,14 @@ ROM_END
 // rockduck - check gfx roms (planes) order
 
 ROM_START( rockduck )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rde.bin",	0x4000, 0x2000, CRC(56e2a030) SHA1(f03cca53ac30f1c4ec45afbe58c231673739e425) )
-	ROM_COPY( "main",	0x5000, 0x3000, 0x1000 ) // rgn,srcoffset,offset,length.
+	ROM_COPY( "maincpu",	0x5000, 0x3000, 0x1000 ) // rgn,srcoffset,offset,length.
 	ROM_LOAD( "rdc.bin",	0x6000, 0x2000, CRC(482d9a0c) SHA1(2838cbcd35edaf19848fcf1588ec3a35adf5b179) )
-	ROM_COPY( "main",	0x7000, 0x5000, 0x1000 ) // rgn,srcoffset,offset,length.
+	ROM_COPY( "maincpu",	0x7000, 0x5000, 0x1000 ) // rgn,srcoffset,offset,length.
 	ROM_LOAD( "rdb.bin",	0x8000, 0x2000, CRC(974626f2) SHA1(cfd767947df9aa99b22afbc0a83afd3f92e7d903) )
 	ROM_RELOAD(				0xe000, 0x2000 )	// for vectors/pointers
-	ROM_COPY( "main",	0x9000, 0x7000, 0x1000 ) // rgn,srcoffset,offset,length.
+	ROM_COPY( "maincpu",	0x9000, 0x7000, 0x1000 ) // rgn,srcoffset,offset,length.
 
 //  ROM_LOAD( "b.bin",  0x8000, 0x2000, CRC(637fbb50) SHA1(b31799f9cc6aefd9f4b39cc1afb1ca00d9200efb) ) // alternate rom, bad dump
 //  this rom is a bad dump of rdb.bin with only 1 bit different.

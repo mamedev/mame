@@ -645,7 +645,7 @@ static MACHINE_RESET( qdrmfgp2 )
 static MACHINE_DRIVER_START( qdrmfgp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 32000000/2)	/*  16.000 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(qdrmfgp_interrupt, 2)
 
@@ -656,7 +656,7 @@ static MACHINE_DRIVER_START( qdrmfgp )
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -680,9 +680,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( qdrmfgp2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 32000000/2)	/*  16.000 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(gp2_readmem,gp2_writemem)
-	MDRV_CPU_VBLANK_INT("main", qdrmfgp2_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", qdrmfgp2_interrupt)
 
 	MDRV_MACHINE_START(qdrmfgp)
 	MDRV_MACHINE_RESET(qdrmfgp2)
@@ -691,7 +691,7 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 	MDRV_IDE_CONTROLLER_ADD("ide", gp2_ide_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -719,7 +719,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( qdrmfgp )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "gq_460_b04.20e", 0x000000, 0x80000, CRC(293d8174) SHA1(cf507d0b29dab161190f0160c05c640f16306bae) )
 	ROM_LOAD16_WORD_SWAP( "gq_460_a05.22e", 0x080000, 0x80000, CRC(4128cb3c) SHA1(4a16d85a66934a20afd074546de362c40a1ea785) )
 
@@ -736,7 +736,7 @@ ROM_START( qdrmfgp )
 ROM_END
 
 ROM_START( qdrmfgp2 )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "ge_557_c05.20e", 0x000000, 0x80000, CRC(336df99f) SHA1(46fb36d40371761be0cfa17b34f28cc893a44a22) )
 	ROM_LOAD16_WORD_SWAP( "ge_557_a06.22e", 0x080000, 0x80000, CRC(ad77e10f) SHA1(4a762a59fe3096d48e3cbf0da3bb0d75c5087e78) )
 

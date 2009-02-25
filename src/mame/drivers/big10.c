@@ -240,7 +240,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( big10 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* guess */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_IO_MAP(main_io, 0)
 	MDRV_CPU_VBLANK_INT_HACK(big10_interrupt, 262)
@@ -250,7 +250,7 @@ static MACHINE_DRIVER_START( big10 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -276,7 +276,7 @@ MACHINE_DRIVER_END
 **************************************/
 
 ROM_START( big10 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1", 0x0000, 0x4000, CRC(03e50455) SHA1(36834d35d037303e8b9e4ce950d22f11a52e9388) )
 	ROM_LOAD( "2", 0x4000, 0x4000, CRC(b4626a5f) SHA1(a9b3b9575c657748a7f0b60ec2c7411dad0c83c1) )
 	ROM_LOAD( "3", 0x8000, 0x4000, CRC(8d15da74) SHA1(0e114de6fcf79beac800575bfb739e6a6bf35660) )

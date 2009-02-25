@@ -240,8 +240,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -253,14 +253,14 @@ static GFXDECODE_START( pitnrun )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( pitnrun )
-	MDRV_CPU_ADD("main", Z80,XTAL_18_432MHz/6)		 /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", pitnrun_nmi_source)
+	MDRV_CPU_VBLANK_INT("screen", pitnrun_nmi_source)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_5MHz/2)		 /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( pitnrun )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -297,13 +297,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START( pitnrun )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pr12", 0x0000, 0x2000, CRC(587a7b85) SHA1(f200ff9b706e13760a23e0187c6bffe496af0087) )
 	ROM_LOAD( "pr11", 0x2000, 0x2000, CRC(270cd6dd) SHA1(ad42562e18aa30319fc55c201e5507e8734a5b4d) )
 	ROM_LOAD( "pr10", 0x4000, 0x2000, CRC(65d92d89) SHA1(4030ccdb4d84e69c256e95431ee5a18cffeae5c0) )
 	ROM_LOAD( "pr9",  0x6000, 0x2000, CRC(3155286d) SHA1(45af8cb81d70f2e30b52bbc7abd9f8d15231735f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "pr13", 0x0000, 0x1000, CRC(fc8fd05c) SHA1(f40cc9c6fff6bda8411f4d638a0f5c5915aa3746) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
@@ -332,13 +332,13 @@ ROM_START( pitnrun )
 ROM_END
 
 ROM_START( pitnruna )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "pr_12-1.5d", 0x0000, 0x2000, CRC(2539aec3) SHA1(5ee87cf2379a6b6218f0c1f79374edafe5413616) )
 	ROM_LOAD( "pr_11-1.5c", 0x2000, 0x2000, CRC(818a49f8) SHA1(0a4c77055529967595984277f11dc1cd1eec4dae) )
 	ROM_LOAD( "pr_10-1.5b", 0x4000, 0x2000, CRC(69b3a864) SHA1(3d29e1f71f1a94650839696c3070d5739360bee0) )
 	ROM_LOAD( "pr_9-1.5a",  0x6000, 0x2000, CRC(ba0c4093) SHA1(0273e4bd09b9eebff490fdac27e6ae9b54bb3cd9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "pr-13", 0x0000, 0x1000, CRC(32a18d3b) SHA1(fcff1c13183b64ede0865dd04eee5182029bebdf) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )

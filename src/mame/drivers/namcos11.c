@@ -871,14 +871,14 @@ static MACHINE_RESET( namcos11 )
 
 static MACHINE_DRIVER_START( coh100 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",  PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos11_map, 0 )
-	MDRV_CPU_VBLANK_INT("main", namcos11_vblank)
+	MDRV_CPU_VBLANK_INT("screen", namcos11_vblank)
 
 	MDRV_MACHINE_RESET( namcos11 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( 60 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

@@ -254,7 +254,7 @@ static int scroll=0;
 	int i,j;
 	char buf[60];
 	struct osd_bitmap *mybitmap = bitmap;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 buf[0] = 0;
 for (i = 0;i < 8;i+=2)
@@ -718,20 +718,20 @@ static MACHINE_RESET( zerotrgt )
 
 
 static MACHINE_DRIVER_START( cntsteer )
-	MDRV_CPU_ADD("main", M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
-//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
+//  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
-//  MDRV_CPU_ADD("audio", M6502, 1500000)        /* ? */
+//  MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
 //  MDRV_CPU_PROGRAM_MAP(sound_map,0)
 //  MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16) /* ? */ // should be interrupt, 16?
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -752,21 +752,21 @@ static MACHINE_DRIVER_START( cntsteer )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zerotrgt )
-	MDRV_CPU_ADD("main", M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
-//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) /* ? */
+//  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD("audio", M6502, 1500000)		/* ? */
+	MDRV_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_pulse,16) /* ? */ // should be interrupt, 16?
 	MDRV_CPU_PERIODIC_INT(sound_interrupt, 1000)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -796,7 +796,7 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( cntsteer )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "by02", 0x8000, 0x4000, CRC(b6fdd7fd) SHA1(e54cc31628966f747f9ccbf9db1017ed1eee0d5d) )
 	ROM_LOAD( "by01", 0xc000, 0x4000, CRC(932423a5) SHA1(0d8164359a79ae554328dfb4d729a8d07de7ee75) )
 
@@ -836,7 +836,7 @@ ROM_START( cntsteer )
 ROM_END
 
 ROM_START( zerotrgt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
  	ROM_LOAD( "ct01-s.4c", 0x8000, 0x8000, CRC(b35a16cb) SHA1(49581324c3e3d5219f0512d08a40161185368b10) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
@@ -844,7 +844,7 @@ ROM_START( zerotrgt )
 	ROM_LOAD( "cty07.14a", 0x8000, 0x4000,  CRC(119b6211) SHA1(2042f06387d34fad6b63bcb8ac6f9b06377f634d) )
 	ROM_LOAD( "ct06.13a",  0xc000, 0x4000,  CRC(bce5adad) SHA1(86c4eef0d68679a24bab6460b49640a498f32ecd) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ct00.1c",  0xe000, 0x2000,  CRC(ae091b6c) SHA1(8b3a1c0acbfa56f05bcf65677f85d70c8c9640d6) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE ) /* Characters */
@@ -879,7 +879,7 @@ ROM_START( zerotrgt )
 ROM_END
 
 ROM_START( gekitsui )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
  	ROM_LOAD( "ct01", 0x8000, 0x8000, CRC(d3d82d8d) SHA1(c175c626d4cb89a2d82740c04892092db6faf616) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
@@ -887,7 +887,7 @@ ROM_START( gekitsui )
 	ROM_LOAD( "cty07.14a", 0x8000, 0x4000,  CRC(119b6211) SHA1(2042f06387d34fad6b63bcb8ac6f9b06377f634d) )
 	ROM_LOAD( "ct06.13a",  0xc000, 0x4000,  CRC(bce5adad) SHA1(86c4eef0d68679a24bab6460b49640a498f32ecd) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ct00.1c",  0xe000, 0x2000,  CRC(ae091b6c) SHA1(8b3a1c0acbfa56f05bcf65677f85d70c8c9640d6) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )

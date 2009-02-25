@@ -570,24 +570,24 @@ static const namco_interface namco_config =
 static MACHINE_DRIVER_START( liblrabl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
+	MDRV_CPU_ADD("maincpu", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
 	MDRV_CPU_PROGRAM_MAP(readmem_mainCPU_liblrabl,writemem_mainCPU_liblrabl)
-	MDRV_CPU_VBLANK_INT("main", toypop_main_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", toypop_main_interrupt)
 
-	MDRV_CPU_ADD("audio", M6809, 1536000)
+	MDRV_CPU_ADD("audiocpu", M6809, 1536000)
 	MDRV_CPU_PROGRAM_MAP(readmem_soundCPU,writemem_soundCPU)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", M68000, 6144000)	/* 6.144 MHz (measured on Libble Rabble board) */
 	MDRV_CPU_PROGRAM_MAP(readmem_68k,writemem_68k)
-	MDRV_CPU_VBLANK_INT("main", toypop_m68000_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", toypop_m68000_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_RESET(toypop)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( toypop )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(liblrabl)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(readmem_mainCPU_toypop,writemem_mainCPU_toypop)
 MACHINE_DRIVER_END
 
@@ -626,11 +626,11 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( liblrabl )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "5b.rom",   0x8000, 0x4000, CRC(da7a93c2) SHA1(fe4a02cdab66722eb7b8cf58825f899b1949a6a2) )
 	ROM_LOAD( "5c.rom",   0xc000, 0x4000, CRC(6cae25dc) SHA1(de74317a7d5de1865d096c377923a764be5e6879) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "2c.rom",   0xe000, 0x2000, CRC(7c09e50a) SHA1(5f004d60bbb7355e008a9cda137b28bc2192b8ef) )
 
 	ROM_REGION( 0x8000, "sub", 0 )		/* 32k for the third CPU */
@@ -656,11 +656,11 @@ ROM_START( liblrabl )
 ROM_END
 
 ROM_START( toypop )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "tp1-2.5b", 0x8000, 0x4000, CRC(87469620) SHA1(2ee257486c9c044386ac7d0cd4a90583eaeb3e97) )
 	ROM_LOAD( "tp1-1.5c", 0xc000, 0x4000, CRC(dee2fd6e) SHA1(b2c12008d6d3e7544ba3c12a52a6abf9181842c8) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the second CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "tp1-3.2c", 0xe000, 0x2000, CRC(5f3bf6e2) SHA1(d1b3335661b9b23cb10001416c515b77b5e783e9) )
 
 	ROM_REGION( 0x8000, "sub", 0 )		/* 32k for the third CPU */

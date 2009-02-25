@@ -309,18 +309,18 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( popper )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,18432000/6)
+	MDRV_CPU_ADD("maincpu", Z80,18432000/6)
 	MDRV_CPU_PROGRAM_MAP(popper_readmem,popper_writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80,18432000/12)
+	MDRV_CPU_ADD("audiocpu", Z80,18432000/12)
 	MDRV_CPU_PROGRAM_MAP(popper_sound_readmem,popper_sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		//NMIs caused by the main CPU
 
 	MDRV_QUANTUM_TIME(HZ(1800))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -346,12 +346,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( popper )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p1",   0x0000, 0x2000, CRC(56881b70) SHA1(d3ade7a54a6cb8a0babf0d667a6b27f492a739dc) )
 	ROM_LOAD( "p2",   0x2000, 0x2000, CRC(a054d9d2) SHA1(fcd86e7247b40cf07ea595a64c104b99b0e93ced) )
 	ROM_LOAD( "p3",   0x4000, 0x2000, CRC(6201928a) SHA1(53b571b9f2c0568f10cd974641863c2e00777b46) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "p0",   0x0000, 0x1000, CRC(ef5f7c5b) SHA1(c63a3d9ef2868ad7eaacddec810d62d2e124dc15) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

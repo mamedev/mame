@@ -152,15 +152,15 @@ static INTERRUPT_GEN( ninjakd2_interrupt )
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	memory_set_bank(machine, 1, 0);
 }
 
 static void robokid_init_banks(running_machine *machine)
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(machine, 1, 0,  2, memory_region(machine, "main"), 0x4000);
-	memory_configure_bank(machine, 1, 2, 14, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0,  2, memory_region(machine, "maincpu"), 0x4000);
+	memory_configure_bank(machine, 1, 2, 14, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	memory_set_bank(machine, 1, 0);
 }
 
@@ -929,18 +929,18 @@ static const samples_interface ninjakd2_samples_interface =
 static MACHINE_DRIVER_START( ninjakd2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MAIN_CLOCK_12/2)		/* verified */
+	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)		/* verified */
 	MDRV_CPU_PROGRAM_MAP(ninjakd2_main_cpu,0)
-	MDRV_CPU_VBLANK_INT("main", ninjakd2_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ninjakd2_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, MAIN_CLOCK_5)		/* verified */
+	MDRV_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)		/* verified */
 	MDRV_CPU_PROGRAM_MAP(ninjakd2_sound_cpu,0)
 	MDRV_CPU_IO_MAP(ninjakd2_sound_io,0)
 
 	MDRV_MACHINE_RESET(ninjakd2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -979,7 +979,7 @@ static MACHINE_DRIVER_START( mnight )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ninjakd2)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu,0)
 
 	/* video hardware */
@@ -994,7 +994,7 @@ static MACHINE_DRIVER_START( robokid )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mnight)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(robokid_main_cpu, 0)
 
 	MDRV_MACHINE_RESET(robokid)
@@ -1012,7 +1012,7 @@ static MACHINE_DRIVER_START( omegaf )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(robokid)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(omegaf_main_cpu, 0)
 
 	MDRV_MACHINE_RESET(omegaf)
@@ -1031,14 +1031,14 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( ninjakd2 )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "nk2_01.rom",   0x00000, 0x8000, CRC(3cdbb906) SHA1(f48f82528b5fc581ee3b1ccd0ef9cdecc7249bb3) )
 	ROM_LOAD( "nk2_02.rom",   0x10000, 0x8000, CRC(b5ce9a1a) SHA1(295a7e1d41e1a8ee45f1250086a0c9314837eded) )	// banked at 8000-bfff
 	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
 	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
 	ROM_LOAD( "nk2_05.rom",   0x28000, 0x8000, CRC(5dac9426) SHA1(0916cddbbe1e93c32b96fe28e145d34b2a892e80) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.rom",   0x00000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )	// encrypted
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
@@ -1060,14 +1060,14 @@ ROM_START( ninjakd2 )
 ROM_END
 
 ROM_START( ninjak2a )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "nk2_01.bin",   0x00000, 0x8000, CRC(e6adca65) SHA1(33d483dde0853f37455cde32b461f4e919601b4b) )
 	ROM_LOAD( "nk2_02.bin",   0x10000, 0x8000, CRC(d9284bd1) SHA1(e790fb1a718a1f7997931f2f390fe053655f231d) )	// banked at 8000-bfff
 	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )
 	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )
 	ROM_LOAD( "nk2_05.bin",   0x28000, 0x8000, CRC(960725fb) SHA1(160c8bfaf089cbeeef2023f12379793079bff93b) )
 
-	ROM_REGION( 2*0x10000, "sound", 0 )
+	ROM_REGION( 2*0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.bin",   0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) )	// decrypted opcodes
 	ROM_CONTINUE(             0x00000, 0x8000 )                                                              	// decrypted data
 
@@ -1087,14 +1087,14 @@ ROM_START( ninjak2a )
 ROM_END
 
 ROM_START( ninjak2b )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "1.3s",         0x00000, 0x8000, CRC(cb4f4624) SHA1(4fc66641adc0a2c0eca332f27c5777df62fa507b) )
 	ROM_LOAD( "2.3q",         0x10000, 0x8000, CRC(0ad0c100) SHA1(c5bbc107ba07bd6950bb4d7377e827c084b8229b) )	// banked at 8000-bfff
 	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )	// 3.3p
 	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )	// 4.3n
 	ROM_LOAD( "nk2_05.rom",   0x28000, 0x8000, CRC(5dac9426) SHA1(0916cddbbe1e93c32b96fe28e145d34b2a892e80) )	// 5.3l
 
-	ROM_REGION( 2*0x10000, "sound", 0 )
+	ROM_REGION( 2*0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.bin",   0x10000, 0x8000, CRC(7bfe6c9e) SHA1(aef8cbeb0024939bf65f77113a5cf777f6613722) )	// 6.3g  decrypted opcodes
 	ROM_CONTINUE(             0x00000, 0x8000 )                                                              	// decrypted data
 
@@ -1114,14 +1114,14 @@ ROM_START( ninjak2b )
 ROM_END
 
 ROM_START( rdaction )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "1.3u",         0x00000, 0x8000, CRC(5c475611) SHA1(2da88a95b5d68b259c8ae48af1438a82a1d601c1) )
 	ROM_LOAD( "2.3s",         0x10000, 0x8000, CRC(a1e23bd2) SHA1(c3b6574dc9fa66b4f41c37754a0d20a865f8bc28) )	// banked at 8000-bfff
 	ROM_LOAD( "nk2_03.rom",   0x18000, 0x8000, CRC(ad275654) SHA1(7d29a17132adb19aeee9b98be5b76bd6e91f308e) )	// 3.3r
 	ROM_LOAD( "nk2_04.rom",   0x20000, 0x8000, CRC(e7692a77) SHA1(84beb8b02c564bffa9cc00313214e8f109bd40f9) )	// 4.3p
 	ROM_LOAD( "nk2_05.bin",   0x28000, 0x8000, CRC(960725fb) SHA1(160c8bfaf089cbeeef2023f12379793079bff93b) )	// 5.3m
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "nk2_06.rom",   0x0000, 0x10000, CRC(d3a18a79) SHA1(e4df713f89d8a8b43ef831b14864c50ec9b53f0b) )	// 6.3h  encrypted
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* MC8123 key */
@@ -1143,14 +1143,14 @@ ROM_START( rdaction )
 ROM_END
 
 ROM_START( mnight )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "mn6-j19.bin",  0x00000, 0x8000, CRC(56678d14) SHA1(acf3a97ca29db8ab9cad69599c5567464af3ae44) )
 	ROM_LOAD( "mn5-j17.bin",  0x10000, 0x8000, CRC(2a73f88e) SHA1(0a7b769174f2b976650453d808cb23668dff0260) )	// banked at 8000-bfff
 	ROM_LOAD( "mn4-j16.bin",  0x18000, 0x8000, CRC(c5e42bb4) SHA1(1956e737ae393e987cb7e8eae520518f1e0f597f) )
 	ROM_LOAD( "mn3-j14.bin",  0x20000, 0x8000, CRC(df6a4f7a) SHA1(ce3cb84b514220d686b12c03567289fd23da0fe1) )
 	ROM_LOAD( "mn2-j12.bin",  0x28000, 0x8000, CRC(9c391d1b) SHA1(06e8c202337e3eba38c479e8b7e29a3f8ffc4ed1) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "mn1-j7.bin",   0x00000, 0x10000, CRC(a0782a31) SHA1(8abd2f0b0c2c2eb876f324f7a095a5cdc773c187) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	// fg tiles (need lineswapping)
@@ -1168,14 +1168,14 @@ ROM_START( mnight )
 ROM_END
 
 ROM_START( arkarea )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "arkarea.008",  0x00000, 0x8000, CRC(1ce1b5b9) SHA1(ab7755523d58736b124deb59779dedee870fd7d2) )
 	ROM_LOAD( "arkarea.009",  0x10000, 0x8000, CRC(db1c81d1) SHA1(64a2f51c218d84c4eaeb8c5a5a3f0f4cdf5d174c) )	// banked at 8000-bfff
 	ROM_LOAD( "arkarea.010",  0x18000, 0x8000, CRC(5a460dae) SHA1(e64d3662bb074a528cd71061621c0dd3765928b6) )
 	ROM_LOAD( "arkarea.011",  0x20000, 0x8000, CRC(63f022c9) SHA1(414f52d2b9584f08285b261d1dafcc9e6e5e0c74) )
 	ROM_LOAD( "arkarea.012",  0x28000, 0x8000, CRC(3c4c65d5) SHA1(e11f840f8b1da0933a0a4342f5fa1a17f0d6d3e2) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "arkarea.013",  0x00000, 0x8000, CRC(2d409d58) SHA1(6344b43db5459691728c3f843b643c84ea71dd8e) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	// fg tiles (need lineswapping)
@@ -1193,14 +1193,14 @@ ROM_START( arkarea )
 ROM_END
 
 ROM_START( robokid )
-	ROM_REGION( 0x48000, "main", 0 )
+	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "robokid1.18j", 0x00000, 0x08000, CRC(378c21fc) SHA1(58163bd6fbfa8385b1bd648cfde3d75bf81ac07d) )
 	ROM_CONTINUE(             0x10000, 0x08000 )                                                              	// banked at 8000-bfff
 	ROM_LOAD( "robokid2.18k", 0x18000, 0x10000, CRC(ddef8c5a) SHA1(a1dd2f51205863c3d5d3527991d538ca8adf7587) )
 	ROM_LOAD( "robokid3.15k", 0x28000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x38000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	// fg tiles
@@ -1241,14 +1241,14 @@ ROM_START( robokid )
 ROM_END
 
 ROM_START( robokidj )
-	ROM_REGION( 0x48000, "main", 0 )
+	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "1.29",         0x00000, 0x08000, CRC(59a1e2ec) SHA1(71f9d28dd8d2cf77a27fab163ce9562e3e75a540) )
 	ROM_CONTINUE(             0x10000, 0x08000 )                                                              	// banked at 8000-bfff
 	ROM_LOAD( "2.30",         0x18000, 0x10000, CRC(e3f73476) SHA1(bd1c8946d637df21432bd52ae9324255251570b9) )
 	ROM_LOAD( "robokid3.15k", 0x28000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x38000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	// fg tiles
@@ -1289,14 +1289,14 @@ ROM_START( robokidj )
 ROM_END
 
 ROM_START( robokdj2 )
-	ROM_REGION( 0x48000, "main", 0 )
+	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "1_rom29.18j",  0x00000, 0x08000, CRC(969fb951) SHA1(aa32f0cb33ba2ccbb933dab5444a7e0dbbb84b3d) )
 	ROM_CONTINUE(             0x10000, 0x08000 )                                                              	// banked at 8000-bfff
 	ROM_LOAD( "2_rom30.18k",  0x18000, 0x10000, CRC(c0228b63) SHA1(8f7e3a29a35723abc8b10bf511fc8611e31a2961) )
 	ROM_LOAD( "robokid3.15k", 0x28000, 0x10000, CRC(05295ec3) SHA1(33dd0853a2064cb4301cfbdc7856def81f6e1223) )
 	ROM_LOAD( "robokid4.12k", 0x38000, 0x10000, CRC(3bc3977f) SHA1(da394e12d197b0e109b03c854da06b1267bd9d59) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "robokid.k7",   0x00000, 0x10000, CRC(f490a2e9) SHA1(861d1256c090ce3d1f45f95cc894affbbc3f1466) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	// fg tiles
@@ -1337,12 +1337,12 @@ ROM_START( robokdj2 )
 ROM_END
 
 ROM_START( omegaf )
-	ROM_REGION( 0x48000, "main", 0 )
+	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "1.5",          0x00000, 0x08000, CRC(57a7fd96) SHA1(65ca290b48f8579fcce00db5b3b3f8694667a136) )
 	ROM_CONTINUE(             0x10000, 0x18000 )                                                              	// banked at 8000-bfff
 	ROM_LOAD( "6.4l",         0x28000, 0x20000, CRC(6277735c) SHA1(b0f91f0cc51d424a1a7834c126736f24c2e23c17) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "7.7m",         0x00000, 0x10000, CRC(d40fc8d5) SHA1(4f615a0fb786cafc20f82f0b5fa112a9c356378f) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	// fg tiles
@@ -1362,12 +1362,12 @@ ROM_START( omegaf )
 ROM_END
 
 ROM_START( omegafs )
-	ROM_REGION( 0x48000, "main", 0 )
+	ROM_REGION( 0x48000, "maincpu", 0 )
 	ROM_LOAD( "5.3l",         0x00000, 0x08000, CRC(503a3e63) SHA1(73420aecb653cd4fd3b6afe67d6f5726f01411dd) )
 	ROM_CONTINUE(             0x10000, 0x18000 )                                                              	// banked at 8000-bfff
 	ROM_LOAD( "6.4l",         0x28000, 0x20000, CRC(6277735c) SHA1(b0f91f0cc51d424a1a7834c126736f24c2e23c17) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "7.7m",         0x00000, 0x10000, CRC(d40fc8d5) SHA1(4f615a0fb786cafc20f82f0b5fa112a9c356378f) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )	// fg tiles
@@ -1445,15 +1445,15 @@ static void gfx_unscramble(running_machine *machine)
 
 static DRIVER_INIT( ninjakd2 )
 {
-	mc8123_decrypt_rom(machine, "sound", "user1", 0, 0);
+	mc8123_decrypt_rom(machine, "soundcpu", "user1", 0, 0);
 
 	gfx_unscramble(machine);
 }
 
 static DRIVER_INIT( bootleg )
 {
-	const address_space *space = cputag_get_address_space(machine, "sound", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "sound") + 0x10000);
+	const address_space *space = cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "soundcpu") + 0x10000);
 
 	gfx_unscramble(machine);
 }

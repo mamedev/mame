@@ -118,17 +118,17 @@ static INTERRUPT_GEN( pesadelo_interrupt )
 
 static MACHINE_DRIVER_START( pesadelo )
 
-	MDRV_CPU_ADD("main", Z80, 3579545)		  /* 3.579545 Mhz */
+	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(program_mem, 0)
 	MDRV_CPU_IO_MAP(io_mem, 0)
-	MDRV_CPU_VBLANK_INT("main",pesadelo_interrupt)
+	MDRV_CPU_VBLANK_INT("screen",pesadelo_interrupt)
 
 	MDRV_MACHINE_START( forte2 )
 	MDRV_MACHINE_RESET( forte2 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4458)) /* 70 lines */
@@ -143,8 +143,8 @@ MACHINE_DRIVER_END
 static DRIVER_INIT(pesadelo)
 {
 	int i;
-	UINT8 *mem = memory_region(machine, "main");
-	int memsize = memory_region_length(machine, "main");
+	UINT8 *mem = memory_region(machine, "maincpu");
+	int memsize = memory_region_length(machine, "maincpu");
 	UINT8 *buf;
 
 	// data swap
@@ -165,7 +165,7 @@ static DRIVER_INIT(pesadelo)
 }
 
 ROM_START( pesadelo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr2764.15", 0x00000, 0x10000, CRC(1ae2f724) SHA1(12880dd7ad82acf04861843fb9d4f0f926d18f6b) )
 ROM_END
 

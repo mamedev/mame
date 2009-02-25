@@ -1080,7 +1080,7 @@ static MACHINE_RESET( wecleman )
 static MACHINE_DRIVER_START( wecleman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)	/* Schems show 10MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* Schems show 10MHz */
 	MDRV_CPU_PROGRAM_MAP(wecleman_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(wecleman_interrupt,5 + 1)	/* in order to read the inputs once per frame */
 
@@ -1088,7 +1088,7 @@ static MACHINE_DRIVER_START( wecleman )
 	MDRV_CPU_PROGRAM_MAP(wecleman_sub_map,0)
 
 	/* Schems: can be reset, no nmi, soundlatch, 3.58MHz */
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(wecleman_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -1096,7 +1096,7 @@ static MACHINE_DRIVER_START( wecleman )
 	MDRV_MACHINE_RESET(wecleman)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1135,14 +1135,14 @@ static INTERRUPT_GEN( hotchase_sound_timer )
 static MACHINE_DRIVER_START( hotchase )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
 	MDRV_CPU_PROGRAM_MAP(hotchase_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
 	MDRV_CPU_PROGRAM_MAP(hotchase_sub_map,0)
 
-	MDRV_CPU_ADD("audio", M6809, 3579545 / 2)	/* 3.579/2 MHz - PCB is drawn in one set's readme */
+	MDRV_CPU_ADD("audiocpu", M6809, 3579545 / 2)	/* 3.579/2 MHz - PCB is drawn in one set's readme */
 	MDRV_CPU_PROGRAM_MAP(hotchase_sound_map,0)
 	MDRV_CPU_PERIODIC_INT( hotchase_sound_timer, 496 )
 
@@ -1151,7 +1151,7 @@ static MACHINE_DRIVER_START( hotchase )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1187,7 +1187,7 @@ MACHINE_DRIVER_END
 
 ROM_START( wecleman )
 
-	ROM_REGION( 0x40000, "main", 0 )	/* Main CPU Code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* Main CPU Code */
 	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(493b79d3) SHA1(9625e3b65c211d5081d8ed8977de287eff100842) )
 	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(6bb4f1fa) SHA1(2cfb7885b42b49dab9892e8dfd54914b64eeab06) )
 	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
@@ -1197,7 +1197,7 @@ ROM_START( wecleman )
 	ROM_LOAD16_BYTE( "602a06.18a", 0x00000, 0x08000, CRC(e12c0d11) SHA1(991afd48bf1b2c303b975ce80c754e5972c39111) )
 	ROM_LOAD16_BYTE( "602a07.20a", 0x00001, 0x08000, CRC(47968e51) SHA1(9b01b2c6a14dd80327a8f66a7f1994471a4bc38e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU Code */
 	ROM_LOAD( "602a01.6d",  0x00000, 0x08000, CRC(deafe5f1) SHA1(4cfbe2841233b1222c22160af7287b7a7821c3a0) )
 
 	ROM_REGION( 0x200000 * 2, "gfx1", 0 )	/* x2, do not dispose, zooming sprites */
@@ -1274,7 +1274,7 @@ static DRIVER_INIT( wecleman )
 {
 	int i, len;
 	UINT8 *RAM;
-//  UINT16 *RAM1 = (UINT16 *) memory_region(machine, "main");   /* Main CPU patches */
+//  UINT16 *RAM1 = (UINT16 *) memory_region(machine, "maincpu");   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
 	/* Decode GFX Roms - Compensate for the address lines scrambling */
@@ -1317,7 +1317,7 @@ static DRIVER_INIT( wecleman )
 ***************************************************************************/
 
 ROM_START( hotchase )
-	ROM_REGION( 0x40000, "main", 0 )	/* Main Code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* Main Code */
 	ROM_LOAD16_BYTE( "763k05", 0x000000, 0x010000, CRC(f34fef0b) SHA1(9edaf6da988348cb32d5686fe7a67fb92b1c9777) )
 	ROM_LOAD16_BYTE( "763k04", 0x000001, 0x010000, CRC(60f73178) SHA1(49c919d09fa464b205d7eccce337349e3a633a14) )
 	ROM_LOAD16_BYTE( "763k03", 0x020000, 0x010000, CRC(28e3a444) SHA1(106b22a3cbe8301eac2e46674a267b96e72ac72f) )
@@ -1327,7 +1327,7 @@ ROM_START( hotchase )
 	ROM_LOAD16_BYTE( "763k07", 0x000000, 0x010000, CRC(ae12fa90) SHA1(7f76f09916fe152411b5af3c504ee7be07497ef4) )
 	ROM_LOAD16_BYTE( "763k06", 0x000001, 0x010000, CRC(b77e0c07) SHA1(98bf492ac889d31419df706029fdf3d51b85c936) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Code */
 	ROM_LOAD( "763f01", 0x8000, 0x8000, CRC(4fddd061) SHA1(ff0aa18605612f6102107a6be1f93ae4c5edc84f) )
 
 	ROM_REGION( 0x300000 * 2, "gfx1", 0 )	/* x2, do not dispose, zooming sprites */
@@ -1415,7 +1415,7 @@ static void hotchase_sprite_decode( running_machine *machine, int num16_banks, i
 /* Unpack sprites data and do some patching */
 static DRIVER_INIT( hotchase )
 {
-//  UINT16 *RAM1 = (UINT16) memory_region(machine, "main"); /* Main CPU patches */
+//  UINT16 *RAM1 = (UINT16) memory_region(machine, "maincpu"); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
 	UINT8 *RAM;

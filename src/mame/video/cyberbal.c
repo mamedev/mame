@@ -356,7 +356,7 @@ static void update_one_screen(const device_config *screen, bitmap_t *bitmap, con
 	/* for 2p games, the left screen is the main screen */
 	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
 	if (left_screen == NULL)
-		left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "main");
+		left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "screen");
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, (screen == left_screen) ? atarigen_playfield_tilemap : atarigen_playfield2_tilemap, 0, 0);

@@ -412,15 +412,15 @@ static NVRAM_HANDLER( superchs )
 static MACHINE_DRIVER_START( superchs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(superchs_readmem,superchs_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)/* VBL */
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)/* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(superchs_cpub_readmem,superchs_cpub_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
@@ -428,7 +428,7 @@ static MACHINE_DRIVER_START( superchs )
 	MDRV_NVRAM_HANDLER(superchs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -448,13 +448,13 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( superchs )
-	ROM_REGION( 0x100000, "main", 0 )	/* 1024K for 68020 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024K for 68020 code (CPU A) */
 	ROM_LOAD32_BYTE( "d46-35.27", 0x00000, 0x40000, CRC(1575c9a7) SHA1(e3441d6018ed3315c62c5e5c4534d8712b025ae2) )
 	ROM_LOAD32_BYTE( "d46-34.25", 0x00001, 0x40000, CRC(c72a4d2b) SHA1(6ef64de15e52007406ce3255071a1f856e0e8b49) )
 	ROM_LOAD32_BYTE( "d46-33.23", 0x00002, 0x40000, CRC(3094bcd0) SHA1(b6779b81a3ebec440a9359868dc43fc3a631ee11) )
 	ROM_LOAD32_BYTE( "d46-31.21", 0x00003, 0x40000, CRC(38b983a3) SHA1(c4859cecc2f3506b7090c462cecd3e4eaabe85aa) )
 
-	ROM_REGION( 0x140000, "audio", 0 )	/* Sound cpu */
+	ROM_REGION( 0x140000, "audiocpu", 0 )	/* Sound cpu */
 	ROM_LOAD16_BYTE( "d46-37.8up", 0x100000, 0x20000, CRC(60b51b91) SHA1(0d0b017808e0a3bdabe8ef5a726bbe16428db06b) )
 	ROM_LOAD16_BYTE( "d46-36.7lo", 0x100001, 0x20000, CRC(8f7aa276) SHA1(b3e330e33099d3cbf4cdc43063119b041e9eea3a) )
 

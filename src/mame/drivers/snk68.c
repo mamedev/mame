@@ -600,16 +600,16 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( pow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_18MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pow_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, XTAL_8MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
@@ -638,7 +638,7 @@ static MACHINE_DRIVER_START( searchar )
 
 	MDRV_IMPORT_FROM(pow)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(searchar_map,0)
 
 	MDRV_VIDEO_START(searchar)
@@ -648,11 +648,11 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( pow )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "dg1ver1.j14",   0x000000, 0x20000, CRC(8e71a8af) SHA1(72c2eb2316c2684491331e8adabcb2be084aa6a2) )
 	ROM_LOAD16_BYTE( "dg2ver1.l14",   0x000001, 0x20000, CRC(4287affc) SHA1(59dfb37296edd3b42231319a9f4df819d384db38) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "dg8.e25",   0x000000, 0x10000, CRC(d1d61da3) SHA1(4e78643f8a7d44db3ff091acb0a5da1cc836e3cb) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -685,11 +685,11 @@ ROM_START( pow )
 ROM_END
 
 ROM_START( powj )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1-2",   0x000000, 0x20000, CRC(2f17bfb0) SHA1(8be18990829eb2586c00b9e8b35e8779bc48296a) )
 	ROM_LOAD16_BYTE( "2-2",   0x000001, 0x20000, CRC(baa32354) SHA1(a235b82527dc025e699ba2e8e9797dac15ea9440) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "dg8.e25",   0x000000, 0x10000, CRC(d1d61da3) SHA1(4e78643f8a7d44db3ff091acb0a5da1cc836e3cb) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -722,11 +722,11 @@ ROM_START( powj )
 ROM_END
 
 ROM_START( streetsm )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s2-1ver2.14h", 0x00000, 0x20000, CRC(655f4773) SHA1(5374a6cf0b895c5ff839b0f52402df4cc53241cf) )
 	ROM_LOAD16_BYTE( "s2-2ver2.14k", 0x00001, 0x20000, CRC(efae4823) SHA1(f3be25b76cf13feeaaaf0e9640c30a6a7371f108) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "s2-5.16c",    0x000000, 0x10000, CRC(ca4b171e) SHA1(a05fd81f68759a09be3ec09f38d7c9364dfb6c14) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -751,11 +751,11 @@ ROM_START( streetsm )
 ROM_END
 
 ROM_START( streets1 )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s2-1ver1.9c",  0x00000, 0x20000, CRC(b59354c5) SHA1(086c87541d422f90bdaad8d63b14d0d520c12564) )
 	ROM_LOAD16_BYTE( "s2-2ver1.10c", 0x00001, 0x20000, CRC(e448b68b) SHA1(08d674ab3d9bd3d3b1d50967a56fa6a002ce0b8d) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "s2-5.16c",    0x000000, 0x10000, CRC(ca4b171e) SHA1(a05fd81f68759a09be3ec09f38d7c9364dfb6c14) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -777,11 +777,11 @@ ROM_START( streets1 )
 ROM_END
 
 ROM_START( streetsw )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s-smart1.bin", 0x00000, 0x20000, CRC(a1f5ceab) SHA1(74f5a4288618fbce6ed3dc75b6ccfa695396193c) )
 	ROM_LOAD16_BYTE( "s-smart2.bin", 0x00001, 0x20000, CRC(263f615d) SHA1(4576f9d2abb31ecf747a5075716579e75613d57c) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "s2-5.16c",    0x000000, 0x10000, CRC(ca4b171e) SHA1(a05fd81f68759a09be3ec09f38d7c9364dfb6c14) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -803,11 +803,11 @@ ROM_START( streetsw )
 ROM_END
 
 ROM_START( streetsj )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s2v1j_01.bin", 0x00000, 0x20000, CRC(f031413c) SHA1(5d7dfeac03f786736914f047c28a7a0488175176) )
 	ROM_LOAD16_BYTE( "s2v1j_02.bin", 0x00001, 0x20000, CRC(e403a40b) SHA1(e740848d716586737eff6e3c201fb3e3da048a09) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "s2-5.16c",    0x000000, 0x10000, CRC(ca4b171e) SHA1(a05fd81f68759a09be3ec09f38d7c9364dfb6c14) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -829,11 +829,11 @@ ROM_START( streetsj )
 ROM_END
 
 ROM_START( ikari3 )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ik3-2.c10", 0x000000, 0x20000, CRC(a7b34dcd) SHA1(7c2f20ae4f7dbebd3dfa3ec5408ed714e6535b6a) )
 	ROM_LOAD16_BYTE( "ik3-3.c9",  0x000001, 0x20000, CRC(50f2b83d) SHA1(b1f0c554b262614dd2cff7a3857cb974d361937f) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "ik3-5.bin",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -873,11 +873,11 @@ ROM_START( ikari3 )
 ROM_END
 
 ROM_START( ikari3nr ) /* Normal Joystick */
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ik3-2-ver1.c10", 0x000000, 0x20000, CRC(1bae8023) SHA1(42d590a545cbabc596f2e0d9a3d56b1bc270ec9a) )
 	ROM_LOAD16_BYTE( "ik3-3-ver1.c9",  0x000001, 0x20000, CRC(10e38b66) SHA1(28cc82d868f59cd6dde1c4e4c890627012e5e978) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "ik3-5.bin",  0x000000, 0x10000, CRC(ce6706fc) SHA1(95505b90a9524abf0c8c1ec6b2c40d8f25cb1d92) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -917,11 +917,11 @@ ROM_START( ikari3nr ) /* Normal Joystick */
 ROM_END
 
 ROM_START( searchar )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bhw.2", 0x000000, 0x20000, CRC(e1430138) SHA1(eddc192524a13b2c09bd2bddcd5f8e8b771ceb21) )
 	ROM_LOAD16_BYTE( "bhw.3", 0x000001, 0x20000, CRC(ee1f9374) SHA1(fd41c74fd69d65713d8e1a9b8078328381119379) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "bh.5",       0x000000, 0x10000, CRC(53e2fa76) SHA1(cf25b1def82545a1fd013822ab3cf02483074623) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -947,11 +947,11 @@ ROM_START( searchar )
 ROM_END
 
 ROM_START( sercharu )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bh.2",  0x000000, 0x20000, CRC(c852e2e2) SHA1(c4b1b366f452122549046a3dec9b6b375bc273af) )
 	ROM_LOAD16_BYTE( "bh.3",  0x000001, 0x20000, CRC(bc04a4a1) SHA1(aa91583b987248a3e99813ab5e8ee03c02dac9b9) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "bh.5",       0x000000, 0x10000, CRC(53e2fa76) SHA1(cf25b1def82545a1fd013822ab3cf02483074623) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */
@@ -977,11 +977,11 @@ ROM_START( sercharu )
 ROM_END
 
 ROM_START( sercharj )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bh2ver3j.9c", 0x000000, 0x20000, CRC(7ef7b172) SHA1(85669ba72f59e4ff3a483bf611bf41c73f4e1930) )
 	ROM_LOAD16_BYTE( "bh3ver3j.10c", 0x000001, 0x20000, CRC(3fdea793) SHA1(49bafb53466afb7e4486a4894e4fd6fa08ea2eb2) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "bh.5",       0x000000, 0x10000, CRC(53e2fa76) SHA1(cf25b1def82545a1fd013822ab3cf02483074623) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )	/* characters */

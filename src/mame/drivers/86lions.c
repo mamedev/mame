@@ -298,7 +298,7 @@ static const via6522_interface via_interface =
 	/*inputs : CA/B1,CA/B2 */ DEVCB_HANDLER(input_ca1), DEVCB_HANDLER(input_cb1), DEVCB_HANDLER(input_ca2), DEVCB_HANDLER(input_cb2),
 	/*outputs: A/B         */ DEVCB_HANDLER(output_a), DEVCB_HANDLER(output_b),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_HANDLER(output_ca1), DEVCB_HANDLER(output_cb1), DEVCB_HANDLER(output_ca2), DEVCB_HANDLER(output_cb2),
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("main", M6809_FIRQ_LINE)
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
 };
 
 static INTERRUPT_GEN( lions_irq )
@@ -310,7 +310,7 @@ static const mc6845_interface mc6845_intf =
 	/* in fact is a mc6845 driving 4 pixels by memory address.
        that's why the big horizontal parameters */
 
-	"main",	/* screen we are acting on */
+	"screen",/* screen we are acting on */
 	4,		/* number of pixels per video memory address */
 	NULL,	/* before pixel update callback */
 	NULL,	/* row update callback */
@@ -322,12 +322,12 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_DRIVER_START( lions )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK/4)		 /* 3 MHz.(guess) */
+	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/4)		 /* 3 MHz.(guess) */
 	MDRV_CPU_PROGRAM_MAP(readmem,0)
-	MDRV_CPU_VBLANK_INT("main", lions_irq )
+	MDRV_CPU_VBLANK_INT("screen", lions_irq )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -353,7 +353,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( 86lions )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lion_std.u9", 0xe000, 0x2000, CRC(994842b0) SHA1(72fc31c577ee70b07ce9a4f2e864fe113d32affe) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )

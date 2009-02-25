@@ -561,10 +561,10 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_DRIVER_START( hnayayoi )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 20000000/4 )        /* 5 MHz ???? */
+	MDRV_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(hnayayoi_readmem,hnayayoi_writemem)
 	MDRV_CPU_IO_MAP(hnayayoi_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 8000)
 
 	MDRV_MACHINE_RESET(hnayayoi)
@@ -572,7 +572,7 @@ static MACHINE_DRIVER_START( hnayayoi )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -602,13 +602,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hnfubuki )
 	MDRV_IMPORT_FROM(hnayayoi)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hnfubuki_readmem,hnfubuki_writemem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( untoucha )
 	MDRV_IMPORT_FROM(hnayayoi)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(untoucha_readmem,untoucha_writemem)
 	MDRV_CPU_IO_MAP(untoucha_io_map,0)
 
@@ -623,7 +623,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( hnayayoi )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "021.4a",     0x00000, 0x08000, CRC(d9734da4) SHA1(a2c8f5113c8136bea990c282d60f67b2793f9a2c) )
 	ROM_LOAD( "022.3a",     0x08000, 0x08000, CRC(e6be5af4) SHA1(cdc56705ba0d191930f892618512cb687975ecbb) )
 
@@ -643,7 +643,7 @@ ROM_START( hnayayoi )
 ROM_END
 
 ROM_START( hnfubuki )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "s1.s2c",     0x00000, 0x10000, CRC(afe3179c) SHA1(fdfba1e7073318f9782d628f3c7dd0d9c84cbeea) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 )	/* blitter data */
@@ -659,7 +659,7 @@ ROM_START( hnfubuki )
 ROM_END
 
 ROM_START( untoucha )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b4.10b",     0x00000, 0x10000, CRC(4df04e41) SHA1(4d5232c2f383640394d85417aa973f92c78184c9) )
 
 	ROM_REGION( 0x90000, "gfx1", 0 )	/* blitter data */

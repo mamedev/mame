@@ -181,7 +181,7 @@ READ32_HANDLER(memc_logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)memory_region(space->machine, "main");
+		rom = (UINT32 *)memory_region(space->machine, "maincpu");
 
 		return rom[offset & 0x1fffff];
 	}
@@ -248,7 +248,7 @@ static DIRECT_UPDATE_HANDLER( a310_setopbase )
 		direct->bytemask = 0x1fffff;
 		direct->bytestart = 0;
 		direct->byteend = 0x1fffff;
-		direct->raw = direct->decrypted = memory_region(space->machine, "main");
+		direct->raw = direct->decrypted = memory_region(space->machine, "maincpu");
 	}
 	else	// executing from logical memory
 	{

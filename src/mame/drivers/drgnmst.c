@@ -379,18 +379,18 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( drgnmst )
-	MDRV_CPU_ADD("main", M68000, 12000000) /* Confirmed */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_CPU_ADD("audio", PIC16C55, 32000000/8)	/* Confirmed */
+	MDRV_CPU_ADD("audiocpu", PIC16C55, 32000000/8)	/* Confirmed */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(drgnmst_sound_io_map, 0)
 
 	MDRV_GFXDECODE(drgnmst)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -418,11 +418,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( drgnmst )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "dm1000e", 0x00000, 0x80000, CRC(29467dac) SHA1(42ca42340ffd9b04be23853ca4e936d0528a66ee) )
 	ROM_LOAD16_BYTE( "dm1000o", 0x00001, 0x80000, CRC(ba48e9cf) SHA1(1107f927424107918bb10ff23f40c50579b23836) )
 
-	ROM_REGION( 0x400, "audio", ROMREGION_ERASE00 ) /* PIC16C55 Code */
+	ROM_REGION( 0x400, "audiocpu", ROMREGION_ERASE00 ) /* PIC16C55 Code */
 //  ROM_LOAD( "pic16c55", 0x0000, 0x400, CRC(531c9f8d) SHA1(8ec180b0566f2ce1e08f0347e5ad402c73b44049) )
 	/* ROM will be copied here by the init code from the USER1 region */
 
@@ -470,7 +470,7 @@ static UINT8 drgnmst_asciitohex(UINT8 data)
 static DRIVER_INIT( drgnmst )
 {
 	UINT8 *drgnmst_PICROM_HEX = memory_region(machine, "user1");
-	UINT16 *drgnmst_PICROM = (UINT16 *)memory_region(machine, "audio");
+	UINT16 *drgnmst_PICROM = (UINT16 *)memory_region(machine, "audiocpu");
 	UINT8 *drgnmst_PCM = memory_region(machine, "oki1");
 	INT32   offs, data;
 	UINT16  src_pos = 0;
@@ -540,7 +540,7 @@ static DRIVER_INIT( drgnmst )
 			data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			pic16c5x_set_config(cputag_get_cpu(machine, "audio"), data);
+			pic16c5x_set_config(cputag_get_cpu(machine, "audiocpu"), data);
 
 			src_pos = 0x7fff;		/* Force Exit */
 		}

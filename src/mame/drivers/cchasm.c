@@ -162,20 +162,20 @@ extern z80ctc_interface cchasm_ctc_intf;
 static MACHINE_DRIVER_START( cchasm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
+	MDRV_CPU_ADD("maincpu", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
 
-	MDRV_CPU_ADD("audio", Z80,3584229)		/* 3.58  MHz (from schematics) */
+	MDRV_CPU_ADD("audiocpu", Z80,3584229)		/* 3.58  MHz (from schematics) */
 	MDRV_CPU_CONFIG(daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(sound_memmap,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
-	MDRV_Z80CTC_ADD("ctc", 3584229 /* same as "audio" */, cchasm_ctc_intf)
+	MDRV_Z80CTC_ADD("ctc", 3584229 /* same as "audiocpu" */, cchasm_ctc_intf)
 
 	MDRV_MACHINE_START(cchasm)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(40)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
@@ -210,7 +210,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( cchasm )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
     ROM_LOAD16_BYTE( "chasm.u4",  0x000000, 0x001000, CRC(19244f25) SHA1(79deaae82da8d1b16d05bbac43ba900c4b1d9f26) )
     ROM_LOAD16_BYTE( "chasm.u12", 0x000001, 0x001000, CRC(5d702c7d) SHA1(cbdceed45a1112594fbcbeb6976edc932b32d518) )
     ROM_LOAD16_BYTE( "chasm.u8",  0x002000, 0x001000, CRC(56a7ce8a) SHA1(14c790dcddb78d3b81b5a65fe3529e42c9708273) )
@@ -228,7 +228,7 @@ ROM_START( cchasm )
     ROM_LOAD16_BYTE( "chasm.u5",  0x00e000, 0x001000, CRC(e4a58b7d) SHA1(0e5f948cd110804e6119fafb4e3fa5904dd1390f) )
     ROM_LOAD16_BYTE( "chasm.u13", 0x00e001, 0x001000, CRC(877e849c) SHA1(bdeb97fcb7488e7f0866dd651204c362d2ec9f4f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "2732.bin", 0x0000, 0x1000, CRC(715adc4a) SHA1(426be4f3334ef7f2e8eb4d533e64276c30812aa3) )
 
 	ROM_REGION( 0x0200, "plds", ROMREGION_DISPOSE )
@@ -237,7 +237,7 @@ ROM_START( cchasm )
 ROM_END
 
 ROM_START( cchasm1 )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
     ROM_LOAD16_BYTE( "chasm.u4",  0x000000, 0x001000, CRC(19244f25) SHA1(79deaae82da8d1b16d05bbac43ba900c4b1d9f26) )
     ROM_LOAD16_BYTE( "chasm.u12", 0x000001, 0x001000, CRC(5d702c7d) SHA1(cbdceed45a1112594fbcbeb6976edc932b32d518) )
     ROM_LOAD16_BYTE( "chasm.u8",  0x002000, 0x001000, CRC(56a7ce8a) SHA1(14c790dcddb78d3b81b5a65fe3529e42c9708273) )
@@ -255,7 +255,7 @@ ROM_START( cchasm1 )
     ROM_LOAD16_BYTE( "chasm.u5",  0x00e000, 0x001000, CRC(e4a58b7d) SHA1(0e5f948cd110804e6119fafb4e3fa5904dd1390f) )
     ROM_LOAD16_BYTE( "chasm.u13", 0x00e001, 0x001000, CRC(877e849c) SHA1(bdeb97fcb7488e7f0866dd651204c362d2ec9f4f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "2732.bin", 0x0000, 0x1000, CRC(715adc4a) SHA1(426be4f3334ef7f2e8eb4d533e64276c30812aa3) )
 ROM_END
 

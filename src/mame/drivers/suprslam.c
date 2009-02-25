@@ -126,7 +126,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;
@@ -315,11 +315,11 @@ static const ym2610_interface ym2610_config =
 /*** MACHINE DRIVER **********************************************************/
 
 static MACHINE_DRIVER_START( suprslam )
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(suprslam_readmem,suprslam_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,8000000/2)	/* 4 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(suprslam_sound_io_map,0)
 
@@ -327,7 +327,7 @@ static MACHINE_DRIVER_START( suprslam )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2300) /* hand-tuned */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -352,11 +352,11 @@ MACHINE_DRIVER_END
 /*** ROM LOADING *************************************************************/
 
 ROM_START( suprslam )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "eb26ic47.bin", 0x000000, 0x080000, CRC(8d051fd8) SHA1(1820209306116e5b09cc10a8b3661d232c688b24) )
 	ROM_LOAD16_WORD_SWAP( "eb26ic73.bin", 0x080000, 0x080000, CRC(ca4ad383) SHA1(143ee475761fa54d5b3a9f4e3fb3acc8408972fd) )
 
-	ROM_REGION( 0x030000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "eb26ic38.bin", 0x000000, 0x020000, CRC(153f2c50) SHA1(b70f248cfb18239fcd26e36fb36159f219debf2c) )
 	ROM_RELOAD(               0x010000, 0x020000 )
 

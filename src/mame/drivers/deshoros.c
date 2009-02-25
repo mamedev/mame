@@ -157,14 +157,14 @@ static MACHINE_RESET( deshoros )
 static MACHINE_DRIVER_START( deshoros )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M6809,2000000)
+	MDRV_CPU_ADD("maincpu",M6809,2000000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main",deshoros_irq)
+	MDRV_CPU_VBLANK_INT("screen",deshoros_irq)
 
 	MDRV_MACHINE_RESET(deshoros)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -187,7 +187,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( deshoros )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ag12-4",   0xc000, 0x2000, CRC(03b2c850) SHA1(4e2c49a8d80bc559d0f406caddddb85bc107aac0) )
 	ROM_LOAD( "ag13-4",   0xe000, 0x2000, CRC(36959ef6) SHA1(9b3ed44416fcda6a8e89d11ad6e713abd4f63d83) )
 

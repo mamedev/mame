@@ -33,7 +33,7 @@ static MACHINE_RESET( tail2nos )
 	memory_set_bankptr(machine, 2,memory_region(machine, "user2"));
 
 	/* initialize sound bank */
-	memory_set_bankptr(machine, 3,memory_region(machine, "audio") + 0x10000);
+	memory_set_bankptr(machine, 3,memory_region(machine, "audiocpu") + 0x10000);
 }
 
 
@@ -65,7 +65,7 @@ static WRITE16_HANDLER( tail2nos_K051316_ctrl_0_w )
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(device->machine, 3,memory_region(device->machine, "audio") + 0x10000 + (data & 0x01) * 0x8000);
+	memory_set_bankptr(device->machine, 3,memory_region(device->machine, "audiocpu") + 0x10000 + (data & 0x01) * 0x8000);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -236,18 +236,18 @@ static const ym2608_interface ym2608_config =
 static MACHINE_DRIVER_START( tail2nos )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,XTAL_20MHz/2)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,XTAL_20MHz/4)	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_port_map,0)
 								/* IRQs are triggered by the YM2608 */
 	MDRV_MACHINE_RESET(tail2nos)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -274,7 +274,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( tail2nos )
-	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "v4",           0x00000, 0x10000, CRC(1d4240c2) SHA1(db8992d8e718e20acb7b3f2f0b1f358098863145) )
 	ROM_LOAD16_BYTE( "v7",           0x00001, 0x10000, CRC(0fb70066) SHA1(3d38672402d5ab70599c191cc274746a192b399b) )
 	ROM_LOAD16_BYTE( "v3",           0x20000, 0x10000, CRC(e2e0abad) SHA1(1a1054bada9654484fe81fe4b4b32af5ab7b53f0) )
@@ -289,7 +289,7 @@ ROM_START( tail2nos )
 	ROM_LOAD16_BYTE( "v5",           0x00000, 0x10000, CRC(a9fe15a1) SHA1(d90bf40c610ea7daaa338f83f82cdffbae7da08e) )
 	ROM_LOAD16_BYTE( "v8",           0x00001, 0x10000, CRC(4fb6a43e) SHA1(5cddda0029b3b141c88b0c128655d35bb12fa34d) )
 
-	ROM_REGION( 0x20000, "audio", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* 64k for the audio CPU + banks */
 	ROM_LOAD( "v2",           0x00000, 0x08000, CRC(920d8920) SHA1(b8d30903248fee6f985af7fafbe534cfc8c6e829) )
 	ROM_LOAD( "v1",           0x10000, 0x10000, CRC(bf35c1a4) SHA1(a838740e023dc3344dc528324a8dbc48bb98b574) )
 
@@ -309,7 +309,7 @@ ROM_START( tail2nos )
 ROM_END
 
 ROM_START( sformula )
-	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "ic129.4",      0x00000, 0x10000, CRC(672bf690) SHA1(b322234b47f20a36430bc03be0b52d9b7f82967b) )
 	ROM_LOAD16_BYTE( "ic130.7",      0x00001, 0x10000, CRC(73f0c91c) SHA1(faf14eb1a210c7330b47b78ca6c6563ea6482b3b) )
 	ROM_LOAD16_BYTE( "v3",           0x20000, 0x10000, CRC(e2e0abad) SHA1(1a1054bada9654484fe81fe4b4b32af5ab7b53f0) )
@@ -324,7 +324,7 @@ ROM_START( sformula )
 	ROM_LOAD16_BYTE( "v5",           0x00000, 0x10000, CRC(a9fe15a1) SHA1(d90bf40c610ea7daaa338f83f82cdffbae7da08e) )
 	ROM_LOAD16_BYTE( "v8",           0x00001, 0x10000, CRC(4fb6a43e) SHA1(5cddda0029b3b141c88b0c128655d35bb12fa34d) )
 
-	ROM_REGION( 0x20000, "audio", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* 64k for the audio CPU + banks */
 	ROM_LOAD( "v2",           0x00000, 0x08000, CRC(920d8920) SHA1(b8d30903248fee6f985af7fafbe534cfc8c6e829) )
 	ROM_LOAD( "v1",           0x10000, 0x10000, CRC(bf35c1a4) SHA1(a838740e023dc3344dc528324a8dbc48bb98b574) )
 

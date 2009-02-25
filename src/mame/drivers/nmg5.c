@@ -983,11 +983,11 @@ static MACHINE_RESET( nmg5 )
 static MACHINE_DRIVER_START( nmg5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(nmg5_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 4000000)		/* 4 MHz */
+	MDRV_CPU_ADD("soundcpu", Z80, 4000000)		/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(nmg5_sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
@@ -995,7 +995,7 @@ static MACHINE_DRIVER_START( nmg5 )
 	MDRV_MACHINE_RESET(nmg5)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1024,10 +1024,10 @@ static MACHINE_DRIVER_START( garogun )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nmg5)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pclubys_map,0)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map,0)
 MACHINE_DRIVER_END
 
@@ -1036,10 +1036,10 @@ static MACHINE_DRIVER_START( pclubys )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nmg5)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pclubys_map,0)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map,0)
 
 	MDRV_GFXDECODE(pclubys)
@@ -1049,7 +1049,7 @@ static MACHINE_DRIVER_START( searchp2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nmg5)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(55) // !
 
 	MDRV_GFXDECODE(pclubys)
@@ -1059,7 +1059,7 @@ static MACHINE_DRIVER_START( 7ordi )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(nmg5)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(pclubys_sound_map,0)
 MACHINE_DRIVER_END
 
@@ -1099,11 +1099,11 @@ Notes:
 */
 
 ROM_START( nmg5 )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "ub15.bin", 0x000000, 0x80000, CRC(36af3e2f) SHA1(735aaa901290b1d921242869e81e59649905eb30) )
 	ROM_LOAD16_BYTE( "ub16.bin", 0x000001, 0x80000, CRC(2d9923d4) SHA1(e27549da311244db14ae1d3ad5e814a731a0f440) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "xh15.bin", 0x00000, 0x10000, CRC(12d047c4) SHA1(3123b1856219380ff598a2fad97a66863e30d80f) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* 8x8x8 */
@@ -1128,11 +1128,11 @@ ROM_START( nmg5 )
 ROM_END
 
 ROM_START( nmg5e )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "ub15.rom", 0x000000, 0x80000, CRC(578516e2) SHA1(87785e0071c62f17664e875d95cd6124984b8080) )
 	ROM_LOAD16_BYTE( "ub16.rom", 0x000001, 0x80000, CRC(12fab483) SHA1(3b6a410b730d8bf5a81470ec9cdc46c05da0721b) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "xh15.bin", 0x00000, 0x10000, CRC(12d047c4) SHA1(3123b1856219380ff598a2fad97a66863e30d80f) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* 8x8x8 */
@@ -1157,11 +1157,11 @@ ROM_START( nmg5e )
 ROM_END
 
 ROM_START( searchey )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "u7.bin", 0x000000, 0x40000, CRC(287ce3dd) SHA1(32305f7b09c58b7f126d41b5b1991e349884cc02) )
 	ROM_LOAD16_BYTE( "u2.bin", 0x000001, 0x40000, CRC(b574f033) SHA1(8603926cef9df2495e97a071f08bbf418b9e01a8) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "u128.bin", 0x00000, 0x10000, CRC(85bae10c) SHA1(a1e58d8b8c8718cc346aae400bb4eadf6873b86d) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* 8x8x8 */
@@ -1229,11 +1229,11 @@ Notes:
 */
 
 ROM_START( searchp2 )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "u7", 0x000000, 0x80000, CRC(37fe9e18) SHA1(ddb5c8d7cc68823850af8a186a4500688115b00f) )
 	ROM_LOAD16_BYTE( "u2", 0x000001, 0x80000, CRC(8278513b) SHA1(a48870dc27147e0e9d9d76286028fab1088fa57a) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "u128", 0x00000, 0x10000, CRC(85bae10c) SHA1(a1e58d8b8c8718cc346aae400bb4eadf6873b86d) )
 
 	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )	/* 8x8x8 */
@@ -1293,11 +1293,11 @@ Notes:
 */
 
 ROM_START( pclubys )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom3.7", 0x000000, 0x80000, CRC(62e28e6d) SHA1(30307dfbb6bd02d78fb06d3c3522b41115f1c27a) )
 	ROM_LOAD16_BYTE( "rom4.2", 0x000001, 0x80000, CRC(b51dab41) SHA1(2ad3929c8cf2b66c36289c2c851769190916b718) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "rom1.128", 0x00000, 0x10000, CRC(25cd27f8) SHA1(97af1368381234361bbd97f4552209c435652372) )
 
 	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )	/* 8x8x8 */
@@ -1318,11 +1318,11 @@ ROM_START( pclubys )
 ROM_END
 
 ROM_START( pclubysa )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom3a.7", 0x000000, 0x80000, CRC(885aa07a) SHA1(a0af5b0704f7fb18ed21f42979a40a8b419377b1) )
 	ROM_LOAD16_BYTE( "rom4a.2", 0x000001, 0x80000, CRC(9bfbdeac) SHA1(263341b05883d4a9125da69d9d8d6f4d654f3475) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "rom1.128", 0x00000, 0x10000, CRC(25cd27f8) SHA1(97af1368381234361bbd97f4552209c435652372) )
 
 	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )	/* 8x8x8 */
@@ -1343,11 +1343,11 @@ ROM_START( pclubysa )
 ROM_END
 
 ROM_START( wondstck )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "u2.bin", 0x000001, 0x20000, CRC(9995b743) SHA1(178afd9c54758dd4fb4fb7debe4da2af5c10410a) )
 	ROM_LOAD16_BYTE( "u4.bin", 0x000000, 0x20000, CRC(46a3e9f6) SHA1(f39b6457b2c5772db16a5ba29d9114671e3d9749) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "u128.bin", 0x00000, 0x10000, CRC(86dba085) SHA1(6dedfb4bcf890490848409b6d9bce69e72bf1bba) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* 8x8x8 */
@@ -1372,11 +1372,11 @@ ROM_START( wondstck )
 ROM_END
 
 ROM_START( garogun )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "p1.u7", 0x000000, 0x80000, CRC(9b5627f8) SHA1(d336d4f34de7fdf5ba16bc76223e701369d24a5e) )
 	ROM_LOAD16_BYTE( "p2.u2", 0x000001, 0x80000, CRC(1d2ff271) SHA1(6b875be42f945b5793ba41ff20e23dacf8eb6a9a) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "rom.u128", 0x00000, 0x10000,  CRC(117b31ce) SHA1(1681aea60111274599c86b7050d46ea497878f9e) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )	/* 8x8x8 */
@@ -1441,11 +1441,11 @@ Notes (originaly for YS-2113, but should apply):
 */
 
 ROM_START( 7ordi )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "p1.u7", 0x000000, 0x20000, CRC(ebf21862) SHA1(ffbea41adb3f2ab276b2785bd6f98bb6ac622edd) )
 	ROM_LOAD16_BYTE( "p2.u2", 0x000001, 0x20000, CRC(f7943a6a) SHA1(1d36d92c0d349394ba71929215b704d34e5be87e) )
 
-	ROM_REGION( 0x10000, "sound", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "4.u128", 0x00000, 0x10000, CRC(ed73b565) SHA1(cb473b2b4ca9b9facf3bcb033f1ca9667bb5c587) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE ) /* 8x8x8 */

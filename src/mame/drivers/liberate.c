@@ -67,7 +67,7 @@ static WRITE8_HANDLER( deco16_bank_w )
 
 static READ8_HANDLER( deco16_io_r )
 {
-	const UINT8 *ROM = memory_region(space->machine, "main");
+	const UINT8 *ROM = memory_region(space->machine, "maincpu");
 
 	if (deco16_bank) {
 		if (offset==0) return input_port_read(space->machine, "IN1"); /* Player 1 controls */
@@ -516,19 +516,19 @@ static INTERRUPT_GEN( deco16_interrupt )
 static MACHINE_DRIVER_START( liberate )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",DECO16, 2000000)
+	MDRV_CPU_ADD("maincpu",DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
 	MDRV_CPU_IO_MAP(deco16_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", deco16_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
 
-	MDRV_CPU_ADD("audio",M6502, 1500000)
+	MDRV_CPU_ADD("audiocpu",M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -556,11 +556,11 @@ static MACHINE_DRIVER_START( liberatb )
 	MDRV_IMPORT_FROM(liberate)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_TYPE(M6502)
 	MDRV_CPU_PROGRAM_MAP(liberatb_readmem,liberatb_writemem)
 	MDRV_CPU_IO_MAP(0,0)
-	MDRV_CPU_VBLANK_INT("main", deco16_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( boomrang )
@@ -575,7 +575,7 @@ static MACHINE_DRIVER_START( prosoccr )
 	MDRV_IMPORT_FROM(liberate)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(3000000)
 	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
 	MDRV_CPU_IO_MAP(deco16_io_map,0)
@@ -587,18 +587,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( prosport )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", DECO16, 2000000)
+	MDRV_CPU_ADD("maincpu", DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(prosport_readmem,prosport_writemem)
 	MDRV_CPU_IO_MAP(deco16_io_map,0)
 
-	MDRV_CPU_ADD("audio", M6502, 1500000)
+	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -629,13 +629,13 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( prosoccr )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "am07.7e",  0x8000, 0x2000, CRC(55415fb5) SHA1(676feb07d4fbd76aae8349b46f7edc8f357f2ddf) )
 	ROM_LOAD( "am08.9e",  0xa000, 0x2000, CRC(73d45d0d) SHA1(07736286087478af404bd9c6b279d631a01cf4e2) )
 	ROM_LOAD( "am09.10e", 0xc000, 0x2000, CRC(a7ee0b3a) SHA1(87e487f863bd90c5b979c2d3c4317869ba1d71d9) )
 	ROM_LOAD( "am10.11e", 0xe000, 0x2000, CRC(5571bdb8) SHA1(a3740650453c9e4f78dcc7826eb112d0d9f65b22) )
 //low reload??
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "am06.10a", 0xe000, 0x2000, CRC(37a0c74f) SHA1(5757b9eaf5b1129ee2d03b0ab6c3b15c120cf43c) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
@@ -656,7 +656,7 @@ ROM_START( prosoccr )
 ROM_END
 
 ROM_START( prosport )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "ic21ar09.bin", 0x4000, 0x2000,  CRC(4faa8d12) SHA1(326216eb67d54ecd01701e4677f62b5c11b6763e) )
 	ROM_LOAD( "ic22ar10.bin", 0x6000, 0x2000,  CRC(389e405b) SHA1(263088e49ab14a0017b2ad130bd78afcd0f13a4b) )
 	ROM_LOAD( "ic23ar11.bin", 0x8000, 0x2000,  CRC(c0bc7f2a) SHA1(15d806bb8e28215178dbac0157d75e3ead42f6e9) )
@@ -664,7 +664,7 @@ ROM_START( prosport )
 	ROM_LOAD( "ic25ar13.bin", 0xc000, 0x2000,  CRC(2bdabdf3) SHA1(530cd84dc7fbfdd6805bc555c0e9a5fa2175bc59) )
 	ROM_LOAD( "ic26ar14.bin", 0xe000, 0x2000,  CRC(10ccfddb) SHA1(6c2d3cfd7be7cb4d3a217b1a70273ded5bd7e126) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic43ar16.bin", 0xc000, 0x2000,  CRC(113a4f89) SHA1(abbc7f5ad543f3500c0194100d236ac942e4739f) )
 	ROM_LOAD( "ic42ar15.bin", 0xe000, 0x2000,  CRC(635425a6) SHA1(2b95c3252046462f8886a309d02ea3a15b693780) )
 
@@ -687,12 +687,12 @@ ROM_START( prosport )
 ROM_END
 
 ROM_START( boomrang )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "bp13.9k",  0x8000, 0x4000,  CRC(b70439b1) SHA1(a020e9f6a71f72dfa72b8b202b4a08cca5e26ee0) )
 	ROM_RELOAD(           0x0000, 0x4000 )
 	ROM_LOAD( "bp14.11k", 0xc000, 0x4000,  CRC(98050e13) SHA1(2d936f95dc818883f735f92e9399470320e32a65) )
 
-	ROM_REGION(0x10000, "audio", 0)
+	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD( "bp11.11f", 0xc000, 0x4000,  CRC(d6106f00) SHA1(068117d68eaabceb2e5890caf3f1761d89434f6c) )
 
 	ROM_REGION(0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -712,7 +712,7 @@ ROM_START( boomrang )
 ROM_END
 
 ROM_START( boomrana )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "bp12-2",  0x8000, 0x2000,  CRC(87fc2f0b) SHA1(a5142cb3ee2c85906df2b5eccf7495486b162ae2) )
 	ROM_RELOAD(          0x0000, 0x2000 )
 	ROM_LOAD( "bp13-2",  0xa000, 0x2000,  CRC(8e864764) SHA1(8faea69cb087b19de77589ea24d6f99ca0237deb) )
@@ -721,7 +721,7 @@ ROM_START( boomrana )
 	ROM_LOAD( "bp15-",  0x0e000, 0x2000, CRC(d23a5c31) SHA1(e61fee651ee80b03bf5813ec0cebb022bd0285bf) )
 
 
-	ROM_REGION(0x10000, "audio", 0) /* same content, alt layout */
+	ROM_REGION(0x10000, "audiocpu", 0) /* same content, alt layout */
 	ROM_LOAD( "bp11-",  0x0c000, 0x2000, CRC(bbafe1ff) SHA1(c786465d714d576d5bbbfea588d34850a317dd9d) )
 	ROM_RELOAD(0xe000,0x2000)
 
@@ -747,11 +747,11 @@ ROM_START( boomrana )
 ROM_END
 
 ROM_START( kamikcab )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "bp11", 0x0c000, 0x4000, CRC(a69e5580) SHA1(554e45a3f5a91864b62a2439c2277cd18dbe45a7) )
 	ROM_RELOAD(       0x00000, 0x4000 )
 
-	ROM_REGION(0x10000, "audio", 0)	/* 64K for CPU 2 */
+	ROM_REGION(0x10000, "audiocpu", 0)	/* 64K for CPU 2 */
 	ROM_LOAD( "bp09", 0x0e000, 0x2000, CRC(16b13676) SHA1(f3cad959cbcde243db3ebc77a3692302a44beb09) )
 
 	ROM_REGION(0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -771,13 +771,13 @@ ROM_START( kamikcab )
 ROM_END
 
 ROM_START( yellowcb )
-	ROM_REGION(0x10000, "main", 0)
+	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "rom11.rom", 0xc000, 0x2000, CRC(af97d530) SHA1(b8b9bfcb2e9164daa115b91a533418a39c40c31d) )
 	ROM_RELOAD(            0x0000, 0x2000 )
 	ROM_LOAD( "rom10.rom", 0xe000, 0x2000, CRC(33c3e9b9) SHA1(7ea6602204c43a86842a0b0f7a0786913a6707d6) )
 	ROM_RELOAD(            0x2000, 0x2000 )
 
-	ROM_REGION(0x10000, "audio", 0)	/* 64K for CPU 2 */
+	ROM_REGION(0x10000, "audiocpu", 0)	/* 64K for CPU 2 */
 	ROM_LOAD( "bp09", 0x0e000, 0x2000, CRC(16b13676) SHA1(f3cad959cbcde243db3ebc77a3692302a44beb09) )
 
 	ROM_REGION(0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -801,12 +801,12 @@ ROM_START( yellowcb )
 ROM_END
 
 ROM_START( liberate )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
  	ROM_LOAD( "bt12-2.bin", 0x8000, 0x4000, CRC(a0079ffd) SHA1(340398352500a33f01dca07dd9c86ad3a78f227e) )
 	ROM_RELOAD(             0x0000, 0x4000 )
  	ROM_LOAD( "bt13-2.bin", 0xc000, 0x4000, CRC(19f8485c) SHA1(1e2a68e4cf6b96c53832f7d020f14a45de19967d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bt11.bin",  0xe000, 0x2000,  CRC(b549ccaa) SHA1(e4c8350fea61ed85d21037cbd4c3c50f9a9de09f) )
 
 	ROM_REGION( 0x12000, "gfx1", ROMREGION_DISPOSE )
@@ -830,12 +830,12 @@ ROM_START( liberate )
 ROM_END
 
 ROM_START( dualaslt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bt12",       0x8000, 0x4000, CRC(1434ee46) SHA1(c431982c25323787b8e2ac1b433fc0e81650fbf9) )
 	ROM_RELOAD(             0x0000, 0x4000 )
 	ROM_LOAD( "bt13",       0xc000, 0x4000, CRC(38e0ffa4) SHA1(c450960cdcfa9b2b136f96bc1e3a37995a37f60c) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bt11.bin",  0xe000, 0x2000,  CRC(b549ccaa) SHA1(e4c8350fea61ed85d21037cbd4c3c50f9a9de09f) )
 
 	ROM_REGION( 0x12000, "gfx1", ROMREGION_DISPOSE )
@@ -860,7 +860,7 @@ ROM_START( dualaslt )
 ROM_END
 
 ROM_START( liberatb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "liber6.c17", 0x8000, 0x2000, CRC(c1811fe0) SHA1(1f857042ce00e489c2e73bb459b81a2461ea0b25) )
 	ROM_RELOAD(             0x0000, 0x2000)
 	ROM_LOAD( "liber4.c18", 0xa000, 0x2000, CRC(0e8db1ce) SHA1(bb7b77c31b3bb2c0d523f5cad4ef46d42a9dc857) )
@@ -868,7 +868,7 @@ ROM_START( liberatb )
 	ROM_LOAD( "liber3.c20", 0xc000, 0x2000, CRC(16c423f3) SHA1(0cf3c46c9fc13eb0f61a3945d3db6ca2f9ab76fe) )
  	ROM_LOAD( "liber5.c19", 0xe000, 0x2000, CRC(7738c194) SHA1(54fb094150481640f40d8a2066e43dc647980cda) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bt11.bin",  0xe000, 0x2000,  CRC(b549ccaa) SHA1(e4c8350fea61ed85d21037cbd4c3c50f9a9de09f) )
 
 	ROM_REGION( 0x12000, "gfx1", ROMREGION_DISPOSE )
@@ -898,9 +898,9 @@ ROM_END
 
 static void sound_cpu_decrypt(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x4000);
-	UINT8 *rom = memory_region(machine, "audio");
+	UINT8 *rom = memory_region(machine, "audiocpu");
 	int i;
 
 	/* Bit swapping on sound cpu - Opcodes only */
@@ -912,7 +912,7 @@ static void sound_cpu_decrypt(running_machine *machine)
 
 static DRIVER_INIT( prosport )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	int i;
 
 	/* Main cpu has the nibbles swapped */
@@ -932,9 +932,9 @@ static DRIVER_INIT( yellowcb )
 static DRIVER_INIT( liberate )
 {
 	int A;
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x10000);
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
 

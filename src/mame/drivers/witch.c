@@ -354,7 +354,7 @@ static WRITE8_HANDLER(write_a00x)
 
 			if(newbank != bank)
 			{
-				UINT8 *ROM = memory_region(space->machine, "main");
+				UINT8 *ROM = memory_region(space->machine, "maincpu");
 				bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
 				memory_set_bankptr(space->machine, 1,ROM);
@@ -762,19 +762,19 @@ static INTERRUPT_GEN( witch_sub_interrupt )
 
 static MACHINE_DRIVER_START( witch )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,8000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(map_main, 0)
-	MDRV_CPU_VBLANK_INT("main", witch_main_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", witch_main_interrupt)
 
 	/* 2nd z80 */
 	MDRV_CPU_ADD("sub", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(map_sub, 0)
-	MDRV_CPU_VBLANK_INT("main", witch_sub_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", witch_sub_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -805,9 +805,9 @@ MACHINE_DRIVER_END
 
 /* this set has (c)1992 Sega / Vic Tokai in the roms? */
 ROM_START( witch )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "rom.u5", 0x10000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788)  )
-	ROM_COPY( "main" , 0x10000, 0x0000, 0x8000 )
+	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "rom.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0)  )
@@ -824,9 +824,9 @@ ROM_END
 
 /* no sega logo? a bootleg? */
 ROM_START( pbchmp95 )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "3.bin", 0x10000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433)  )
-	ROM_COPY( "main" , 0x10000, 0x0000, 0x8000 )
+	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "4.bin", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0)  )
@@ -843,7 +843,7 @@ ROM_END
 
 static DRIVER_INIT(witch)
 {
- 	UINT8 *ROM = (UINT8 *)memory_region(machine, "main");
+ 	UINT8 *ROM = (UINT8 *)memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1,&ROM[0x10000+UNBANKED_SIZE]);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);

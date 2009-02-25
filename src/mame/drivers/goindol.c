@@ -39,7 +39,7 @@ extern int goindol_char_bank;
 static WRITE8_HANDLER( goindol_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	bankaddress = 0x10000 + ((data & 3) * 0x4000);
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
@@ -246,16 +246,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( goindol )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 6000000)        /* 6 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, 6000000)        /* 6 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -285,12 +285,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( goindol )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "r1w", 0x00000, 0x8000, CRC(df77c502) SHA1(15d111e38d63a8a800fbf5f15c4fb72efb0e5cf4) ) /* Code 0000-7fff */
 	ROM_LOAD( "r2",  0x10000, 0x8000, CRC(1ff6e3a2) SHA1(321d32b5236f8fadc55b00412081cd17fbdb42bf) ) /* Paged data */
 	ROM_LOAD( "r3",  0x18000, 0x8000, CRC(e9eec24a) SHA1(d193dd23b8bee3a788114e6bb86902dddf6fdd99) ) /* Paged data */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "r10", 0x00000, 0x8000, CRC(72e1add1) SHA1(e8bdaffbbbf8ed22eb161cb8d7945ff09420f68f) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -310,12 +310,12 @@ ROM_START( goindol )
 ROM_END
 
 ROM_START( goindolu )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "r1", 0x00000, 0x8000, CRC(3111c61b) SHA1(6cc3834f946566646f06efe0b65c4704574ec6f1) ) /* Code 0000-7fff */
 	ROM_LOAD( "r2", 0x10000, 0x8000, CRC(1ff6e3a2) SHA1(321d32b5236f8fadc55b00412081cd17fbdb42bf) ) /* Paged data */
 	ROM_LOAD( "r3", 0x18000, 0x8000, CRC(e9eec24a) SHA1(d193dd23b8bee3a788114e6bb86902dddf6fdd99) ) /* Paged data */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "r10", 0x00000, 0x8000, CRC(72e1add1) SHA1(e8bdaffbbbf8ed22eb161cb8d7945ff09420f68f) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -335,12 +335,12 @@ ROM_START( goindolu )
 ROM_END
 
 ROM_START( goindolk )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "r1j", 0x00000, 0x8000, CRC(dde33ad3) SHA1(23cdb3494f5eeaeae2657a0101d5827aa32c526d) ) /* Code 0000-7fff */
 	ROM_LOAD( "r2",  0x10000, 0x8000, CRC(1ff6e3a2) SHA1(321d32b5236f8fadc55b00412081cd17fbdb42bf) ) /* Paged data */
 	ROM_LOAD( "r3",  0x18000, 0x8000, CRC(e9eec24a) SHA1(d193dd23b8bee3a788114e6bb86902dddf6fdd99) ) /* Paged data */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "r10", 0x00000, 0x8000, CRC(72e1add1) SHA1(e8bdaffbbbf8ed22eb161cb8d7945ff09420f68f) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -360,12 +360,12 @@ ROM_START( goindolk )
 ROM_END
 
 ROM_START( homo )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "homo.01", 0x00000, 0x8000, CRC(28c539ad) SHA1(64e950a4238a5656a9e0d0a699a6545da8c59548) ) /* Code 0000-7fff */
 	ROM_LOAD( "r2", 0x10000, 0x8000, CRC(1ff6e3a2) SHA1(321d32b5236f8fadc55b00412081cd17fbdb42bf) ) /* Paged data */
 	ROM_LOAD( "r3", 0x18000, 0x8000, CRC(e9eec24a) SHA1(d193dd23b8bee3a788114e6bb86902dddf6fdd99) ) /* Paged data */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "r10", 0x00000, 0x8000, CRC(72e1add1) SHA1(e8bdaffbbbf8ed22eb161cb8d7945ff09420f68f) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -388,7 +388,7 @@ ROM_END
 
 static DRIVER_INIT( goindol )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 
 	/* I hope that's all patches to avoid protection */

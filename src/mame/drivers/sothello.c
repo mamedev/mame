@@ -59,7 +59,7 @@ static int msm_data = 0;
 
 static WRITE8_HANDLER(bank_w)
 {
-    UINT8 *RAM = memory_region(space->machine, "main");
+    UINT8 *RAM = memory_region(space->machine, "maincpu");
     int bank=0;
     switch(data^0xff)
     {
@@ -348,12 +348,12 @@ static MACHINE_DRIVER_START( sothello )
 
     /* basic machine hardware */
 
-    MDRV_CPU_ADD("main",Z80, MAINCPU_CLOCK)
+    MDRV_CPU_ADD("maincpu",Z80, MAINCPU_CLOCK)
     MDRV_CPU_PROGRAM_MAP(maincpu_mem_map,0)
     MDRV_CPU_IO_MAP(maincpu_io_map,0)
     MDRV_CPU_VBLANK_INT_HACK(sothello_interrupt,262)
 
-    MDRV_CPU_ADD("sound",Z80, SOUNDCPU_CLOCK)
+    MDRV_CPU_ADD("soundcpu",Z80, SOUNDCPU_CLOCK)
     MDRV_CPU_PROGRAM_MAP(soundcpu_mem_map,0)
     MDRV_CPU_IO_MAP(soundcpu_io_map,0)
 
@@ -364,7 +364,7 @@ static MACHINE_DRIVER_START( sothello )
 
     MDRV_MACHINE_RESET(sothello)
 
-    MDRV_SCREEN_ADD("main", RASTER)
+    MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(60)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -399,12 +399,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( sothello )
-    ROM_REGION( 0x20000, "main", 0 )
+    ROM_REGION( 0x20000, "maincpu", 0 )
     ROM_LOAD( "3.7c",   0x0000, 0x8000, CRC(47f97bd4) SHA1(52c9638f098fdcf66903fad7dafe3ab171758572) )
     ROM_LOAD( "4.8c",   0x10000, 0x8000, CRC(a98414e9) SHA1(6d14e1f9c79b95101e0aa101034f398af09d7f32) )
     ROM_LOAD( "5.9c",   0x18000, 0x8000, CRC(e5b5d61e) SHA1(2e4b3d85f41d0796a4d61eae40dd824769e1db86) )
 
-    ROM_REGION( 0x10000, "sound", 0 )
+    ROM_REGION( 0x10000, "soundcpu", 0 )
     ROM_LOAD( "1.7a",   0x0000, 0x8000, CRC(6951536a) SHA1(64d07a692d6a167334c825dc173630b02584fdf6) )
     ROM_LOAD( "2.8a",   0x8000, 0x8000, CRC(9c535317) SHA1(b2e69b489e111d6f8105e68fade6e5abefb825f7) )
 

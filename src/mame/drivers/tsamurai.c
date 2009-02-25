@@ -718,19 +718,19 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tsamurai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(z80_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", samurai_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 2000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound1,writemem_sound1)
 
 	MDRV_CPU_ADD("audio2", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound2,writemem_sound2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -761,12 +761,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( m660 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_m660,writemem_m660)
 	MDRV_CPU_IO_MAP(z80_m660_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", samurai_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 2000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound1_m660,writemem_sound1_m660)
 
 	MDRV_CPU_ADD("audio2", Z80, 2000000)
@@ -775,10 +775,10 @@ static MACHINE_DRIVER_START( m660 )
 	MDRV_CPU_ADD("audio3", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound3_m660,writemem_sound3_m660)
 	MDRV_CPU_IO_MAP(sound3_m660_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -809,17 +809,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vsgongf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_vsgongf,writemem_vsgongf)
-	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", samurai_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound_vsgongf,writemem_sound_vsgongf)
 	MDRV_CPU_IO_MAP(vsgongf_audio_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(vsgongf_sound_interrupt,3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -846,12 +846,12 @@ MACHINE_DRIVER_END
 /*******************************************************************************/
 
 ROM_START( tsamurai )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "01.3r",      0x0000, 0x4000, CRC(d09c8609) SHA1(66b51897704250f520b4c58cb6f6f3aef8913459) )
 	ROM_LOAD( "02.3t",      0x4000, 0x4000, CRC(d0f2221c) SHA1(6cfa9a52b35d17776cfa3e14e679b1a6218d54fa) )
 	ROM_LOAD( "03.3v",      0x8000, 0x4000, CRC(eee8b0c9) SHA1(91dd47cdcd36d804e178b70d4338292ac36517f0) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sample player#1 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player#1 */
 	ROM_LOAD( "14.4e",      0x0000, 0x2000, CRC(220e9c04) SHA1(660351c866995147d2ba69940707879d6cf11718) )
 	ROM_LOAD( "a35-15.4c",  0x2000, 0x2000, CRC(1e0d1e33) SHA1(02612f10c264f06f59f61f0de4df0ef84249e963) )
 
@@ -880,12 +880,12 @@ ROM_START( tsamurai )
 ROM_END
 
 ROM_START( tsamura2 )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "a35-01.3r",  0x0000, 0x4000, CRC(282d96ad) SHA1(c9d7a9b7acbe6431c061a9b50c05fab3ae664094) )
 	ROM_LOAD( "a35-02.3t",  0x4000, 0x4000, CRC(e3fa0cfa) SHA1(3ed8a67789f666fe12d7597014d39deea3c12506) )
 	ROM_LOAD( "a35-03.3v",  0x8000, 0x4000, CRC(2fff1e0a) SHA1(0d54b0c9c4760a02bfe5b5d77fff4c858b15dbd8) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sample player#1 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player#1 */
 	ROM_LOAD( "a35-14.4e",  0x0000, 0x2000, CRC(f10aee3b) SHA1(c4fa2bd626b15b9ea1d5d7e6eaab4f1674841b02) )
 	ROM_LOAD( "a35-15.4c",  0x2000, 0x2000, CRC(1e0d1e33) SHA1(02612f10c264f06f59f61f0de4df0ef84249e963) )
 
@@ -914,12 +914,12 @@ ROM_START( tsamura2 )
 ROM_END
 
 ROM_START( nunchaku )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "nunchack.p1", 0x0000, 0x4000, CRC(4385aca6) SHA1(bf6b40340b773929189fb2a0a271040c79a405a1) )
 	ROM_LOAD( "nunchack.p2", 0x4000, 0x4000, CRC(f9beb72c) SHA1(548dc9187f87d7a47958691391d2494c2306d767) )
 	ROM_LOAD( "nunchack.p3", 0x8000, 0x4000, CRC(cde5d674) SHA1(0360fe81acb6fd77ef581a36a756db550de73732) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sample player */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player */
 	ROM_LOAD( "nunchack.m3", 0x0000, 0x2000, CRC(9036c945) SHA1(8e7cb6313b32a78ca0a7fa8595fb872e0f27d8c7) )
 	ROM_LOAD( "nunchack.m4", 0x2000, 0x2000, CRC(e7206724) SHA1(fb7f9bfe1e04e1f6af733fc3a79f88e942f3b0b1) )
 
@@ -949,12 +949,12 @@ ROM_START( nunchaku )
 ROM_END
 
 ROM_START( yamagchi )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "a38-01.3s", 0x0000, 0x4000, CRC(1a6c8498) SHA1(5c343ff09733507a1518e5a3cab315d9a51ae289) )
 	ROM_LOAD( "a38-02.3t", 0x4000, 0x4000, CRC(fa66b396) SHA1(7594549d0c90f5937d11b7ffe80f229df2cea352) )
 	ROM_LOAD( "a38-03.3v", 0x8000, 0x4000, CRC(6a4239cf) SHA1(7883f3a7ed18cc0dc0ebb3d929eb6f92df9200de) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sample player */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player */
 	ROM_LOAD( "a38-14.4e", 0x0000, 0x2000, CRC(5a758992) SHA1(ee30037ffddf45e9374ab01867c9f6604dede952) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player */
@@ -982,12 +982,12 @@ ROM_START( yamagchi )
 ROM_END
 
 ROM_START( ladymstr )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "a49-01-1.3r",0x0000, 0x4000, CRC(acbd0b64) SHA1(00a95ad28b6923dab808dd94af10cb1d70123d3e) )
 	ROM_LOAD( "a49-02.3t",  0x4000, 0x4000, CRC(b0a9020b) SHA1(78c777ffa6e9063fe4e816d9a58e394f45bd875b) )
 	ROM_LOAD( "a49-03.3v",  0x8000, 0x4000, CRC(641c94ed) SHA1(494502d2478f9d8ad29be6c1815a5e4639d6ba3a) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sample player#1 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player#1 */
 	ROM_LOAD( "a49-14.4e",  0x0000, 0x2000, CRC(d83a3c02) SHA1(43f49d8f57726a629533d37a11338fd071e2e2d7) )
 	ROM_LOAD( "a49-15.4c",  0x2000, 0x2000, CRC(d24ee5fd) SHA1(f35a602cd24427687580f80d4c045c42557cdf06) )
 
@@ -1017,12 +1017,12 @@ ROM_END
 
 
 ROM_START( m660 )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "660l.bin",    0x0000, 0x4000, CRC(57c0d1cc) SHA1(3d71d0554e445f27f5b57a185acddd58f70e95f4) )
 	ROM_LOAD( "660m.bin",    0x4000, 0x4000, CRC(628c6686) SHA1(e695ccfb1251bc7571122de30e682b135e773f20) )
 	ROM_LOAD( "660n.bin",    0x8000, 0x4000, CRC(1b418a97) SHA1(a9afa341c790e650fb91b6e9df4959c3bd7ab5c7) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sample player */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player */
 	ROM_LOAD( "14.4n",       0x0000, 0x4000, CRC(5734db5a) SHA1(ff99bf618018be20a4b38fcfbe75d9c5bb6fd176) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player */
@@ -1053,12 +1053,12 @@ ROM_START( m660 )
 ROM_END
 
 ROM_START( m660j )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "1.3c",        0x0000, 0x4000, CRC(4c8f96aa) SHA1(cc076bdc7ecc206f7e0b9c17fbba59507f515df1) )
 	ROM_LOAD( "2.3d",        0x4000, 0x4000, CRC(e6661504) SHA1(4ec208d49f95f378f3dbeb375e6c220d02a35092) )
 	ROM_LOAD( "3.3f",        0x8000, 0x4000, CRC(3a389ccd) SHA1(3d99312d7fa9d269fdd218917ceafdd61890617f) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sample player */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player */
 	ROM_LOAD( "14.4n",       0x0000, 0x4000, CRC(5734db5a) SHA1(ff99bf618018be20a4b38fcfbe75d9c5bb6fd176) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player */
@@ -1090,12 +1090,12 @@ ROM_START( m660j )
 ROM_END
 
 ROM_START( m660b )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "m660-1.bin",  0x0000, 0x4000, CRC(18f6c4be) SHA1(29a66be9216347b40ab0ccb95baf3e0a6207da8e) )
 	ROM_LOAD( "2.3d",        0x4000, 0x4000, CRC(e6661504) SHA1(4ec208d49f95f378f3dbeb375e6c220d02a35092) )
 	ROM_LOAD( "3.3f",        0x8000, 0x4000, CRC(3a389ccd) SHA1(3d99312d7fa9d269fdd218917ceafdd61890617f) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sample player */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player */
 	ROM_LOAD( "14.4n",       0x0000, 0x4000, CRC(5734db5a) SHA1(ff99bf618018be20a4b38fcfbe75d9c5bb6fd176) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player */
@@ -1126,12 +1126,12 @@ ROM_START( m660b )
 ROM_END
 
 ROM_START( alphaxz )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "az-01.bin",   0x0000, 0x4000, CRC(5336f842) SHA1(cf43c87fad9131120ac75dfd4e2aec260611af7b) )
 	ROM_LOAD( "az-02.bin",   0x4000, 0x4000, CRC(a0779b6b) SHA1(146c967253031d2bbbdbc49b5854c0676e458af1) )
 	ROM_LOAD( "az-03.bin",   0x8000, 0x4000, CRC(2797bc7b) SHA1(137ef537917a9f243208d2befee0c09a36782647) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sample player */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sample player */
 	ROM_LOAD( "14.4n",       0x0000, 0x4000, CRC(5734db5a) SHA1(ff99bf618018be20a4b38fcfbe75d9c5bb6fd176) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* Z80 code - sample player */
@@ -1162,13 +1162,13 @@ ROM_START( alphaxz )
 ROM_END
 
 ROM_START( vsgongf )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "1.5a",	0x0000, 0x2000, CRC(2c056dee) SHA1(f063fdd571949a1b7ac36f88e17feec7354ea894) ) /* good? */
 	ROM_LOAD( "2",		0x2000, 0x2000, CRC(1a634daf) SHA1(d282fbb2ca2c8db70cbbbf640ce507d4c142cc39) ) /* good? */
 	ROM_LOAD( "3.5d",	0x4000, 0x2000, CRC(5ac16861) SHA1(2af51811285fb2de44b023872e42aae37bfbf105) )
 	ROM_LOAD( "4.5f",	0x6000, 0x2000, CRC(1d1baf7b) SHA1(b05d3d7bca299c219a02966b3af2ac517472d0a5) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sound CPU */
 	ROM_LOAD( "6.5n",	0x0000, 0x2000, CRC(785b9000) SHA1(9eb32724b0611a93959485a7f9c806eb6d7ab013) )
 	ROM_LOAD( "5.5l",	0x2000, 0x2000, CRC(76dbfde9) SHA1(fe6e02f4b5a0a5baa59506636226c8ea7b551ef6) )
 
@@ -1192,11 +1192,11 @@ ROM_END
 
 
 ROM_START( ringfgt )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "rft04-1",	0x0000, 0x2000, CRC(11030866) SHA1(b95b231c241e5bdc002de3f6a732cd627c7dc145) )
 	ROM_LOAD( "rft03-1",	0x2000, 0x2000, CRC(357a2085) SHA1(0534f6c1a876dacfcff09a547290354eeddb3126) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sound CPU */
 	ROM_LOAD( "6.5n",	0x0000, 0x2000, CRC(785b9000) SHA1(9eb32724b0611a93959485a7f9c806eb6d7ab013) )
 	ROM_LOAD( "5.5l",	0x2000, 0x2000, CRC(76dbfde9) SHA1(fe6e02f4b5a0a5baa59506636226c8ea7b551ef6) )
 
@@ -1219,11 +1219,11 @@ ROM_START( ringfgt )
 ROM_END
 
 ROM_START( ringfgt2 )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code  - main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code  - main CPU */
 	ROM_LOAD( "rft.04",	0x0000, 0x2000, CRC(6b9b3f3d) SHA1(ea75e77e0e3379a22381b1d0aae7f96b53cd7562) )
 	ROM_LOAD( "rft.03",	0x2000, 0x2000, CRC(1821974b) SHA1(1ce52f20bf49c111000f870bbe3416d27673b91d) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code - sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code - sound CPU */
 	ROM_LOAD( "6.5n",	0x0000, 0x2000, CRC(785b9000) SHA1(9eb32724b0611a93959485a7f9c806eb6d7ab013) )
 	ROM_LOAD( "5.5l",	0x2000, 0x2000, CRC(76dbfde9) SHA1(fe6e02f4b5a0a5baa59506636226c8ea7b551ef6) )
 

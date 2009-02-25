@@ -45,7 +45,7 @@ static INTERRUPT_GEN( chqflag_interrupt )
 static WRITE8_HANDLER( chqflag_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	bankaddress = 0x10000 + (data & 0x1f)*0x4000;
@@ -346,11 +346,11 @@ static const k007232_interface k007232_interface_2 =
 static MACHINE_DRIVER_START( chqflag )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
+	MDRV_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(chqflag_readmem,chqflag_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(chqflag_interrupt,16)	/* ? */
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(chqflag_readmem_sound,chqflag_writemem_sound)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -358,7 +358,7 @@ static MACHINE_DRIVER_START( chqflag )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -392,13 +392,13 @@ static MACHINE_DRIVER_START( chqflag )
 MACHINE_DRIVER_END
 
 ROM_START( chqflag )
-	ROM_REGION( 0x58800, "main", 0 )	/* 052001 code */
+	ROM_REGION( 0x58800, "maincpu", 0 )	/* 052001 code */
 	ROM_LOAD( "717h02",		0x050000, 0x008000, CRC(f5bd4e78) SHA1(7bab02152d055a6c3a322c88e7ee0b85a39d8ef2) )	/* banked ROM */
 	ROM_CONTINUE(			0x008000, 0x008000 )				/* fixed ROM */
 	ROM_LOAD( "717e10",		0x010000, 0x040000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )	/* banked ROM */
 	/* extra memory for banked RAM */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "717e01",		0x000000, 0x008000, CRC(966b8ba8) SHA1(ab7448cb61fa5922b1d8ae5f0d0f42d734ed4f93) )
 
     ROM_REGION( 0x100000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -422,13 +422,13 @@ ROM_START( chqflag )
 ROM_END
 
 ROM_START( chqflagj )
-	ROM_REGION( 0x58800, "main", 0 )	/* 052001 code */
+	ROM_REGION( 0x58800, "maincpu", 0 )	/* 052001 code */
 	ROM_LOAD( "717j02.bin",	0x050000, 0x008000, CRC(05355daa) SHA1(130ddbc289c077565e44f33c63a63963e6417e19) )	/* banked ROM */
 	ROM_CONTINUE(			0x008000, 0x008000 )				/* fixed ROM */
 	ROM_LOAD( "717e10",		0x010000, 0x040000, CRC(72fc56f6) SHA1(433ea9a33f0230e046c731c70060f6a38db14ac7) )	/* banked ROM */
 	/* extra memory for banked RAM */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "717e01",		0x000000, 0x008000, CRC(966b8ba8) SHA1(ab7448cb61fa5922b1d8ae5f0d0f42d734ed4f93) )
 
     ROM_REGION( 0x100000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
@@ -455,7 +455,7 @@ ROM_END
 
 static DRIVER_INIT( chqflag )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	konami_rom_deinterleave_2(machine, "gfx1");
 	paletteram = &RAM[0x58000];

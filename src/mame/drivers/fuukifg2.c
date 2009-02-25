@@ -132,7 +132,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 {
 	if (data <= 2)
-		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audio") + 0x8000 * data + 0x10000);
+		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audiocpu") + 0x8000 * data + 0x10000);
 	else
 	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
@@ -468,10 +468,10 @@ static MACHINE_RESET( fuuki16 )
 static MACHINE_DRIVER_START( fuuki16 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(fuuki16_readmem,fuuki16_writemem)
 
-	MDRV_CPU_ADD("audio", Z80, 3000000)	/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(fuuki16_sound_readmem,fuuki16_sound_writemem)
 	MDRV_CPU_IO_MAP(fuuki16_sound_io_map,0)
 
@@ -479,7 +479,7 @@ static MACHINE_DRIVER_START( fuuki16 )
 	MDRV_MACHINE_RESET(fuuki16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 256)
@@ -557,11 +557,11 @@ Mitsubishi M60067-0901FP 452100 (208pin PQFP, GA1)
 ***************************************************************************/
 
 ROM_START( gogomile )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "fp2n", 0x000000, 0x080000, CRC(e73583a0) SHA1(05c6ee5cb2c151b32c462e8b920f9a57fb6cce5b) )
 	ROM_LOAD16_BYTE( "fp1n", 0x000001, 0x080000, CRC(7b110824) SHA1(980e326d3b9e113ed522be3076663a249da4e739) )
 
-	ROM_REGION( 0x28000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x28000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "fs1.24", 0x00000, 0x08000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )	// same as japanese version
 	ROM_CONTINUE(       0x10000, 0x18000             )
 
@@ -586,11 +586,11 @@ ROM_START( gogomile )
 ROM_END
 
 ROM_START( gogomilj )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "fp2.2", 0x000000, 0x080000, CRC(28fd3e4e) SHA1(3303e5759c0781035c74354587e1916719695754) )	// 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "fp1.1", 0x000001, 0x080000, CRC(35a5fc45) SHA1(307207791cee7f40e88feffc5805ac25008a8566) )	// 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x28000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x28000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "fs1.24", 0x00000, 0x08000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )
 	ROM_CONTINUE(       0x10000, 0x18000             )
 
@@ -649,11 +649,11 @@ Mitsubishi M60067-0901FP 452100 (208pin PQFP, GA1)
 ***************************************************************************/
 
 ROM_START( pbancho )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom2.no1", 0x000000, 0x080000, CRC(1b4fd178) SHA1(02cf3d2554b29cd253470d68ea959738f3b98dbe) )	// 1xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "rom1.no2", 0x000001, 0x080000, CRC(9cf510a5) SHA1(08e79b5bbd1c011c32f82dd15fba42d7898861be) )	// 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x28000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x28000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "rom24.no4", 0x00000, 0x08000, CRC(dfbfdb81) SHA1(84b0cbe843a9bbae43975afdbd029a9b76fd488b) )
 	ROM_CONTINUE(          0x10000, 0x18000             )
 

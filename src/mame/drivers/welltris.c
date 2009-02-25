@@ -335,7 +335,7 @@ VIDEO_UPDATE( welltris );
 
 static WRITE8_HANDLER( welltris_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
 	memory_set_bankptr(space->machine, 1,rom + (data & 0x03) * 0x8000);
 }
@@ -702,7 +702,7 @@ static DRIVER_INIT( welltris )
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	RAM[0xB91C/2] = 0x4e71;
 	RAM[0xB91E/2] = 0x4e71;
 #endif
@@ -718,16 +718,16 @@ static DRIVER_INIT( quiz18k )
 static MACHINE_DRIVER_START( welltris )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,20000000/2)	/* 10 MHz */
+	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,8000000/2)		/* 4 MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_port_map,0)	/* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -755,21 +755,21 @@ static MACHINE_DRIVER_START( quiz18k )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( welltris )
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(15, 335-1, 0, 224-1)
 MACHINE_DRIVER_END
 
 
 
 ROM_START( welltris )
-	ROM_REGION( 0x180000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x180000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "j2u.8", 0x000000, 0x20000, CRC(7488fe94) SHA1(41874366e2ab763cd827ff712b76ea2da0f9af6a) )
 	ROM_LOAD16_BYTE( "j1u.7", 0x000001, 0x20000, CRC(571413ac) SHA1(5eb9387efb9c1597005abff4d79f4b32aa7c93b2) )
 	/* Space */
 	ROM_LOAD16_BYTE( "lh532j10.10", 0x100000, 0x40000, CRC(1187c665) SHA1(c6c55016e46805694348b386e521a3ef1a443621) )
 	ROM_LOAD16_BYTE( "lh532j11.9",  0x100001, 0x40000, CRC(18eda9e5) SHA1(c01d1dc6bfde29797918490947c89440b58d5372) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* 64k for the audio CPU + banks */
 	ROM_LOAD( "3.144", 0x00000, 0x20000, CRC(ae8f763e) SHA1(255419e02189c2e156c1fbcb0cd4aedd14ed8ffa) )
 	ROM_RELOAD(        0x10000, 0x20000 )
 
@@ -789,14 +789,14 @@ ROM_START( welltris )
 ROM_END
 
 ROM_START( welltrij )
-	ROM_REGION( 0x180000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x180000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "j2.8", 0x000000, 0x20000, CRC(68ec5691) SHA1(8615415c5c98aa9caa0878a8251da7985f050f94) )
 	ROM_LOAD16_BYTE( "j1.7", 0x000001, 0x20000, CRC(1598ea2c) SHA1(e9150c3ab9b5c0eb9a5fee3e071358f92a005078) )
 	/* Space */
 	ROM_LOAD16_BYTE( "lh532j10.10", 0x100000, 0x40000, CRC(1187c665) SHA1(c6c55016e46805694348b386e521a3ef1a443621) )
 	ROM_LOAD16_BYTE( "lh532j11.9",  0x100001, 0x40000, CRC(18eda9e5) SHA1(c01d1dc6bfde29797918490947c89440b58d5372) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* 64k for the audio CPU + banks */
 	ROM_LOAD( "3.144", 0x00000, 0x20000, CRC(ae8f763e) SHA1(255419e02189c2e156c1fbcb0cd4aedd14ed8ffa) )
 	ROM_RELOAD(        0x10000, 0x20000 )
 
@@ -816,14 +816,14 @@ ROM_START( welltrij )
 ROM_END
 
 ROM_START( quiz18k )
-	ROM_REGION( 0x180000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x180000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "1-ic8.bin", 0x000000, 0x20000, CRC(10a64336) SHA1(d63c0752385e1d66b09a7197e267dcd0e5e93be8) )
 	ROM_LOAD16_BYTE( "2-ic7.bin", 0x000001, 0x20000, CRC(8b21b431) SHA1(278238ab4a5d11577c5ab3c7462b429f510a1d50) )
 	/* Space */
 	ROM_LOAD16_BYTE( "ic10.bin", 0x100000, 0x40000, CRC(501453a3) SHA1(d127f417f1c52333e478ac397fbe8a2f223b1ce7) )
 	ROM_LOAD16_BYTE( "ic9.bin",  0x100001, 0x40000, CRC(99b6840f) SHA1(8409a33c64729066bfed6e49dcd84f30906274cb) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* 64k for the audio CPU + banks */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* 64k for the audio CPU + banks */
 	ROM_LOAD( "3-ic144.bin", 0x00000, 0x20000, CRC(72d372e3) SHA1(d077e34947de1050b68d76506cc8926b06a94a76) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 

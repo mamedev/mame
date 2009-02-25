@@ -280,20 +280,20 @@ static MACHINE_START( esh )
 static MACHINE_DRIVER_START( esh )
 
 	/* main cpu */
-	MDRV_CPU_ADD("main", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */
+	MDRV_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */
 	MDRV_CPU_PROGRAM_MAP(z80_0_mem,0)
 	MDRV_CPU_IO_MAP(z80_0_io,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_callback_esh)
+	MDRV_CPU_VBLANK_INT("screen", vblank_callback_esh)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_MACHINE_START(esh)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(esh, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(esh)
@@ -311,7 +311,7 @@ MACHINE_DRIVER_END
 
 ROM_START( esh )
 	/* Main program CPU */
-	ROM_REGION( 0x4000, "main", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "is1.h8", 0x0000, 0x2000, CRC(114c912b) SHA1(7c033a102d046199f3e2c6787579dac5b5295d50) )
 	ROM_LOAD( "is2.f8", 0x2000, 0x2000, CRC(0e3b6e62) SHA1(5e8160180e20705e727329f9d70305fcde176a25) )
 
@@ -333,7 +333,7 @@ ROM_END
 
 ROM_START( esha )
 	/* Main program CPU */
-	ROM_REGION( 0x4000, "main", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "is1.h8", 0x0000, 0x2000, CRC(114c912b) SHA1(7c033a102d046199f3e2c6787579dac5b5295d50) )
 	ROM_LOAD( "is2.f8", 0x2000, 0x2000, CRC(7a562f49) SHA1(acfa49b3b3d96b001a5dbdee39cbb0ca80be1763) )
 
@@ -355,7 +355,7 @@ ROM_END
 
 ROM_START( eshb )
 	/* Main program CPU */
-	ROM_REGION( 0x4000, "main", 0 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "1.h8",   0x0000, 0x2000, CRC(8d27d363) SHA1(529d8e4283e736edb5a9193df1ed8d0164471864) )	/* Hand-written ROM label */
 	ROM_LOAD( "is2.f8", 0x2000, 0x2000, CRC(0e3b6e62) SHA1(5e8160180e20705e727329f9d70305fcde176a25) )
 

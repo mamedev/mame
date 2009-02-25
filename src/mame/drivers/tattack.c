@@ -181,12 +181,12 @@ static PALETTE_INIT( tattack  )
 static MACHINE_DRIVER_START( tattack )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 8000000 / 2)	/* 4 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 8000000 / 2)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mem, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -212,7 +212,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tattack )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom.9a",		0x0000, 0x1000, CRC(47120994) SHA1(b6e90abbc50cba77df4c0aaf50d1f97b99e33b6d) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -223,7 +223,7 @@ ROM_END
 static DRIVER_INIT(tattack)
 {
 
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	rom[0x1b4]=0;
 	rom[0x1b5]=0;

@@ -396,9 +396,9 @@ static INTERRUPT_GEN( groundfx_interrupt )
 static MACHINE_DRIVER_START( groundfx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(groundfx_readmem,groundfx_writemem)
-	MDRV_CPU_VBLANK_INT("main", groundfx_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", groundfx_interrupt)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
@@ -406,7 +406,7 @@ static MACHINE_DRIVER_START( groundfx )
 	MDRV_NVRAM_HANDLER(groundfx)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -428,13 +428,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( groundfx )
-	ROM_REGION( 0x200000, "main", 0 )	/* 2048K for 68020 code (CPU A) */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 2048K for 68020 code (CPU A) */
 	ROM_LOAD32_BYTE( "d51-24.79", 0x00000, 0x80000, CRC(5caaa031) SHA1(03e727e26df701e3f5e16c5f933d5b29a528945a) )
 	ROM_LOAD32_BYTE( "d51-23.61", 0x00001, 0x80000, CRC(462e3c9b) SHA1(7f116ee755748497b911868a948d3e3b5134e475) )
 	ROM_LOAD32_BYTE( "d51-22.77", 0x00002, 0x80000, CRC(b6b04d88) SHA1(58685ee8fd788dcbfe318f1e3c06d93e2128034c) )
 	ROM_LOAD32_BYTE( "d51-21.59", 0x00003, 0x80000, CRC(21ecde2b) SHA1(c6d3738f34c8e24346e7784b14aeff300ae2d225) )
 
-	ROM_REGION( 0x180000, "audio", 0 )
+	ROM_REGION( 0x180000, "audiocpu", 0 )
 	ROM_LOAD16_BYTE( "d51-29.54", 0x100000, 0x40000,  CRC(4b64f41d) SHA1(040427668d13f7320d23805098d6d0e1aa8d121e) )
 	ROM_LOAD16_BYTE( "d51-30.56", 0x100001, 0x40000,  CRC(45f339fe) SHA1(cc7adfb2b86070f5bb426542e3b7ed2a50b3c39e) )
 

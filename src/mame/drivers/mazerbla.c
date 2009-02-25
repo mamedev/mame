@@ -1471,7 +1471,7 @@ static const ay8910_interface ay8912_interface_2 =
 
 static MACHINE_DRIVER_START( mazerbla )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 
@@ -1487,14 +1487,14 @@ static MACHINE_DRIVER_START( mazerbla )
 and cleared on ANY port access.
 but handled differently for now
 */
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* synchronization forced on the fly */
 
 	MDRV_MACHINE_RESET(mazerbla)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1514,7 +1514,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( greatgun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(gg_io_map,0)
 
@@ -1529,12 +1529,12 @@ static MACHINE_DRIVER_START( greatgun )
 and cleared on ANY port access.
 but handled differently for now
 */
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(greatgun)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1567,7 +1567,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( mazerbla )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for main CPU (ZPU board) */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for main CPU (ZPU board) */
 	ROM_LOAD( "mblzpu0.bin",0x0000, 0x2000, CRC(82766187) SHA1(cfc425c87cccb84180f1091998eafeaede126d9d) )
 	ROM_LOAD( "mblzpu1.bin",0x2000, 0x2000, CRC(8ba2b3f9) SHA1(1d203332e434d1d9821f98c6ac959ae65dcc51ef) )
 	ROM_LOAD( "mblzpu2.bin",0x4000, 0x2000, CRC(48e5306c) SHA1(d27cc85d24c7b6c23c5c96be4dad5cae6e8069be) )
@@ -1593,7 +1593,7 @@ ROM_START( mazerbla )
 ROM_END
 
 ROM_START( mzrblzra )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for main CPU (ZPU board) */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for main CPU (ZPU board) */
 	ROM_LOAD( "zpu0",       0x0000, 0x2000, CRC(aa77705c) SHA1(ef93c3eaa66591bef495caa101ef2aff93f2de8c) )
 	ROM_LOAD( "zpu1",       0x2000, 0x2000, CRC(599e1b97) SHA1(ceeb3017d6130d4d54ff4436261f2d3f2a29f8ab) )
 	ROM_LOAD( "zpu2",       0x4000, 0x2000, CRC(e1504613) SHA1(815b56e067d60dda6c5ebed97ef8da3f6c2927ad) )
@@ -1620,7 +1620,7 @@ ROM_END
 
 
 ROM_START( greatgun )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for main CPU (ZPU board) */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for main CPU (ZPU board) */
 	ROM_LOAD( "zpu0",0x0000, 0x2000, CRC(80cf2cbf) SHA1(ea24b844ea6d8fc54adb2e28be68e1f3e1184b8b) )
 	ROM_LOAD( "zpu1",0x2000, 0x2000, CRC(fc12af94) SHA1(65f5bca2853271c232bd02dfc3467e6a4f7f0a6f) )
 	ROM_LOAD( "zpu2",0x4000, 0x2000, CRC(b34cfa26) SHA1(903adc6de0d34e5bc8fb0f8d3e74ff53204d8c68) )

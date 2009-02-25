@@ -158,16 +158,16 @@ static const vr0_interface vr0_config =
 
 
 static MACHINE_DRIVER_START( psattack )
-	MDRV_CPU_ADD("main", SE3208, 43000000)
+	MDRV_CPU_ADD("maincpu", SE3208, 43000000)
 	MDRV_CPU_PROGRAM_MAP(psattack_mem,0)
- 	MDRV_CPU_VBLANK_INT("main", psattack_interrupt)
+ 	MDRV_CPU_VBLANK_INT("screen", psattack_interrupt)
 
 	MDRV_MACHINE_START(psattack)
 	MDRV_MACHINE_RESET(psattack)
 
 	//MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -191,7 +191,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( psattack )
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD("5.sys",  0x000000, 0x200000, CRC(f09878e4) SHA1(25b8dbac47d3911615c8874746e420ece13e7181) )
 
 	ROM_REGION( 0x4010, "pic16c711", 0 )

@@ -447,15 +447,15 @@ static MACHINE_RESET( spdodgeb )
 static MACHINE_DRIVER_START( spdodgeb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,12000000/6)	/* 2MHz ? */
+	MDRV_CPU_ADD("maincpu", M6502,12000000/6)	/* 2MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(spdodgeb_interrupt,33)	/* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MDRV_CPU_ADD("audio", M6809,12000000/6)	/* 2MHz ? */
+	MDRV_CPU_ADD("audiocpu", M6809,12000000/6)	/* 2MHz ? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -493,11 +493,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( spdodgeb )
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "22a-04.139",	  0x10000, 0x08000, CRC(66071fda) SHA1(4a239295900e6234a2a693321ca821671747a58e) )  /* Two banks */
 	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* I/O mcu */
@@ -552,11 +552,11 @@ TJ22J2-0.35 /
 */
 
 ROM_START( nkdodge )
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "22j4-0.139",	  0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
 	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* I/O mcu */
@@ -582,11 +582,11 @@ ROM_END
 /* the bootleg just seems to have the gfx roms in a different format, program is identical */
 
 ROM_START( nkdodgeb )
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "12.bin",	      0x10000, 0x08000, CRC(aa674fd8) SHA1(4e8d3e07b54d23b221cb39cf10389bc7a56c4021) )  /* Two banks */
 	ROM_CONTINUE(             0x08000, 0x08000 )		 /* Static code */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio cpu */
 	ROM_LOAD( "22j5-0.33",    0x08000, 0x08000, CRC(c31e264e) SHA1(0828a2094122e3934b784ec9ad7c2b89d91a83bb) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* I/O mcu */

@@ -361,7 +361,7 @@ static READ8_DEVICE_HANDLER( pandoras_portA_r )
 
 static READ8_DEVICE_HANDLER( pandoras_portB_r )
 {
-	return (cputag_get_total_cycles(device->machine, "audio") / 512) & 0x0f;
+	return (cputag_get_total_cycles(device->machine, "audiocpu") / 512) & 0x0f;
 }
 
 static const ay8910_interface ay8910_config =
@@ -377,15 +377,15 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( pandoras )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,18432000/6)	/* CPU A */
+	MDRV_CPU_ADD("maincpu", M6809,18432000/6)	/* CPU A */
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_a,pandoras_writemem_a)
-	MDRV_CPU_VBLANK_INT("main", pandoras_interrupt_a)
+	MDRV_CPU_VBLANK_INT("screen", pandoras_interrupt_a)
 
 	MDRV_CPU_ADD("sub", M6809,18432000/6)	/* CPU B */
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_b,pandoras_writemem_b)
-	MDRV_CPU_VBLANK_INT("main", pandoras_interrupt_b)
+	MDRV_CPU_VBLANK_INT("screen", pandoras_interrupt_b)
 
-	MDRV_CPU_ADD("audio", Z80,14318000/8)
+	MDRV_CPU_ADD("audiocpu", Z80,14318000/8)
 	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_snd,pandoras_writemem_snd)
 
 	MDRV_CPU_ADD("mcu", I8039,14318000/2)
@@ -397,7 +397,7 @@ static MACHINE_DRIVER_START( pandoras )
 	MDRV_MACHINE_RESET(pandoras)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -430,7 +430,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pandoras )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64K for the CPU A */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64K for the CPU A */
 	ROM_LOAD( "pand_j13.cpu",	0x08000, 0x02000, CRC(7a0fe9c5) SHA1(e68c8d76d1abb69ac72b0e2cd8c1dfc540064ee3) )
 	ROM_LOAD( "pand_j12.cpu",	0x0a000, 0x02000, CRC(7dc4bfe1) SHA1(359c3051e5d7a34d0e49578e4c168fd19c73e202) )
 	ROM_LOAD( "pand_j10.cpu",	0x0c000, 0x02000, CRC(be3af3b7) SHA1(91321b53e17e58b674104cb95b1c35ee8fecae22) )
@@ -439,7 +439,7 @@ ROM_START( pandoras )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64K for the CPU B */
 	ROM_LOAD( "pand_j5.cpu",	0x0e000, 0x02000, CRC(4aab190b) SHA1(d2204953d6b6b34cea851bfc9c2b31426e75f90b) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64K for the Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64K for the Sound CPU */
 	ROM_LOAD( "pand_6c.snd",	0x00000, 0x02000, CRC(0c1f109d) SHA1(4e6cdee99261764bd2fea5abbd49d800baba0dc5) )
 
 	ROM_REGION( 0x1000, "mcu", 0 ) /* 4K for the Sound CPU 2 */

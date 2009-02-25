@@ -71,7 +71,7 @@ static WRITE8_HANDLER ( funybubl_vidram_bank_w )
 
 static WRITE8_HANDLER ( funybubl_cpurombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 		memory_set_bankptr(space->machine, 2,&rom[0x10000+0x4000*(data&0x3f)]);
 }
@@ -237,16 +237,16 @@ static DRIVER_INIT( funybubl )
 
 static MACHINE_DRIVER_START( funybubl )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)		 /* 6 MHz?? */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,8000000/2)		 /* 4 MHz?? */
+	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		 /* 4 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(soundreadmem,soundwritemem)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -271,7 +271,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( funybubl )
-	ROM_REGION( 0x50000, "main", 0 ) /* main z80, lots of banked data */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* main z80, lots of banked data */
 	ROM_LOAD( "a.ub16", 0x00000, 0x40000, CRC(4e799cdd) SHA1(c6474fd2f621c27224e847ecb88a1ae17a0dbaf9)  )
 	ROM_RELOAD ( 0x10000, 0x40000 )
 
@@ -291,7 +291,7 @@ ROM_START( funybubl )
 	ROM_LOAD( "j.ug3", 0x100000, 0x80000, CRC(9e8687cd) SHA1(42fcba2532ae5028fcfc1df50750d99ad2586820) )
 	ROM_LOAD( "k.ug4", 0x180000, 0x80000, CRC(63f0e810) SHA1(5c7ed32ee8dc1d9aabc8d136ec370471096356c2) )
 
-	ROM_REGION( 0x08000, "audio", 0 ) /* sound z80 (not much code here ..) */
+	ROM_REGION( 0x08000, "audiocpu", 0 ) /* sound z80 (not much code here ..) */
 	ROM_LOAD( "p.su6", 0x00000,  0x08000, CRC(33169d4d) SHA1(0ebc932d15b6df022c7e1f44df884e64b25ba745) ) /* Same as below, different label */
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -302,7 +302,7 @@ ROM_START( funybubl )
 ROM_END
 
 ROM_START( funybubc )
-	ROM_REGION( 0x50000, "main", 0 ) /* main z80, lots of banked data */
+	ROM_REGION( 0x50000, "maincpu", 0 ) /* main z80, lots of banked data */
 	ROM_LOAD( "2.ub16", 0x00000, 0x40000, CRC(d684c13f) SHA1(6a58b44dd775f374d6fd476a8fd175c28a83a495)  )
 	ROM_RELOAD ( 0x10000, 0x40000 )
 
@@ -322,7 +322,7 @@ ROM_START( funybubc )
 	ROM_LOAD( "11.ug3", 0x100000, 0x80000, CRC(9e8687cd) SHA1(42fcba2532ae5028fcfc1df50750d99ad2586820) )
 	ROM_LOAD( "12.ug4", 0x180000, 0x80000, CRC(63f0e810) SHA1(5c7ed32ee8dc1d9aabc8d136ec370471096356c2) )
 
-	ROM_REGION( 0x08000, "audio", 0 ) /* sound z80 (not much code here ..) */
+	ROM_REGION( 0x08000, "audiocpu", 0 ) /* sound z80 (not much code here ..) */
 	ROM_LOAD( "1.su6", 0x00000,  0x08000, CRC(33169d4d) SHA1(0ebc932d15b6df022c7e1f44df884e64b25ba745) )
 
 	ROM_REGION( 0x80000, "oki", 0 )

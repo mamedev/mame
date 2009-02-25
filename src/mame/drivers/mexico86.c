@@ -371,12 +371,12 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( mexico86 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
+	MDRV_CPU_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
-	MDRV_CPU_ADD("audio", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
+	MDRV_CPU_ADD("audiocpu", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
 	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
@@ -384,13 +384,13 @@ static MACHINE_DRIVER_START( mexico86 )
 
 	MDRV_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
 	MDRV_CPU_PROGRAM_MAP(sub_cpu_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -431,8 +431,8 @@ static MACHINE_DRIVER_START( kikikai )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(knightb)
 
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT("main", kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_VBLANK_INT("screen", kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
 
 	MDRV_CPU_REMOVE("mcu")	// we don't have code for the MC6801U4
 
@@ -448,13 +448,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kikikai )
-	ROM_REGION( 0x28000, "main", 0 )
+	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "a85-17.h16", 0x00000, 0x08000, CRC(c141d5ab) SHA1(fe3622ba283e514416c43a44f83f922a958b27cd) ) /* 1st half, main code        */
 	ROM_CONTINUE(           0x20000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "a85-16.h18", 0x10000, 0x10000, CRC(4094d750) SHA1(05e0ad177a3eb144b203784ecb6242a0fc5c4d4d) ) /* banked at 0x8000           */
-	ROM_COPY(  "main", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
+	ROM_COPY(  "maincpu", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a85-11.f6", 0x0000, 0x8000, CRC(cc3539db) SHA1(4239a40fdee65cba613e4b4ec54cf7899480e366) )
 
 	ROM_REGION( 0x0800, "cpu2", 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
@@ -474,13 +474,13 @@ ROM_START( kikikai )
 ROM_END
 
 ROM_START( knightb )
-	ROM_REGION( 0x28000, "main", 0 )
+	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "a85-17.h16", 0x00000, 0x08000, CRC(c141d5ab) SHA1(fe3622ba283e514416c43a44f83f922a958b27cd) ) /* 1st half, main code        */
 	ROM_CONTINUE(           0x20000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "a85-16.h18", 0x10000, 0x10000, CRC(4094d750) SHA1(05e0ad177a3eb144b203784ecb6242a0fc5c4d4d) ) /* banked at 0x8000           */
-	ROM_COPY(  "main", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
+	ROM_COPY(  "maincpu", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a85-11.f6", 0x0000, 0x8000, CRC(cc3539db) SHA1(4239a40fdee65cba613e4b4ec54cf7899480e366) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )    /* 2k for the microcontroller */
@@ -499,13 +499,13 @@ ROM_START( knightb )
 ROM_END
 
 ROM_START( kicknrun )
-	ROM_REGION( 0x28000, "main", 0 )
+	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "a87-08.h16", 0x00000, 0x08000, CRC(715e1b04) SHA1(60b7259758ec73f1cc945556e9c2b25766b745a8) ) /* 1st half, main code        */
 	ROM_CONTINUE(           0x20000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "a87-07.h18", 0x10000, 0x10000, CRC(6cb6ebfe) SHA1(fca61fc2ad8fadc1e15b9ff84c7469b68d16e885) ) /* banked at 0x8000           */
-	ROM_COPY(  "main", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
+	ROM_COPY(  "maincpu", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
@@ -532,13 +532,13 @@ ROM_START( kicknrun )
 ROM_END
 
 ROM_START( kicknruu )
-	ROM_REGION( 0x28000, "main", 0 )
+	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "a87-23.h16", 0x00000, 0x08000, CRC(37182560) SHA1(8db393131f50af88b2e7489d6aae65bad0a5a65b) ) /* 1st half, main code        */
 	ROM_CONTINUE(           0x20000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "a87-22.h18", 0x10000, 0x10000, CRC(3b5a8354) SHA1(e0db4cb0657989d5a21f9a8d4e8f842adba636ad) ) /* banked at 0x8000           */
-	ROM_COPY(  "main", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
+	ROM_COPY(  "maincpu", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )    /* 2k for the microcontroller (MC6801U4 type MCU) */
@@ -565,13 +565,13 @@ ROM_START( kicknruu )
 ROM_END
 
 ROM_START( mexico86 )
-	ROM_REGION( 0x28000, "main", 0 )
+	ROM_REGION( 0x28000, "maincpu", 0 )
 	ROM_LOAD( "2_g.bin",    0x00000, 0x08000, CRC(2bbfe0fb) SHA1(8f047e001ea8e49d28f73e546c82812af1c2533c) ) /* 1st half, main code        */
 	ROM_CONTINUE(           0x20000, 0x08000 )             /* 2nd half, banked at 0x8000 */
 	ROM_LOAD( "1_f.bin",    0x10000, 0x10000, CRC(0b93e68e) SHA1(c6fbcce83103e3e71a7a1ef9f18a10622ed6b951) ) /* banked at 0x8000           */
-	ROM_COPY(  "main", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
+	ROM_COPY(  "maincpu", 0x10000, 0x08000, 0x04000 ) //AT: set as default to avoid banking problems
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a87-06.f6", 0x0000, 0x8000, CRC(1625b587) SHA1(7336384e13c114915de5e439df5731ce3fc2054a) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )    /* 2k for the microcontroller */

@@ -756,7 +756,7 @@ static ADDRESS_MAP_START( naomi_base_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
 	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("main", 0)
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 /*
@@ -784,7 +784,7 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
 	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("main", 0)
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_DEVREADWRITE(NAOMI_BOARD, "rom_board", naomibd_r, naomibd_w)
 ADDRESS_MAP_END
@@ -865,13 +865,13 @@ static MACHINE_RESET( naomi )
 
 static MACHINE_DRIVER_START( naomi_base )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", SH4, CPU_CLOCK) // SH4!!!
+	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK) // SH4!!!
 	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(naomi_map,0)
 	MDRV_CPU_IO_MAP(naomi_port,0)
-	MDRV_CPU_VBLANK_INT("main", naomi_vblank)
+	MDRV_CPU_VBLANK_INT("screen", naomi_vblank)
 
-	MDRV_CPU_ADD("sound", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MDRV_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map, 0)
 
 	MDRV_MACHINE_START( dc )
@@ -880,7 +880,7 @@ static MACHINE_DRIVER_START( naomi_base )
 	MDRV_NVRAM_HANDLER(naomi_eeproms)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1029,7 +1029,7 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 
 /* only revisions d and higher support the GDROM, and there is an additional bios (and SH4!) on the DIMM board for the CD Controller */
 #define NAOMIGD_BIOS \
-	ROM_REGION( 0x200000, "main", 0) \
+	ROM_REGION( 0x200000, "maincpu", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21578e (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21578d (Export)" ) \
@@ -1077,7 +1077,7 @@ Region byte encoding is as follows:
 */
 
 #define NAOMI2_BIOS \
-	ROM_REGION( 0x200000, "main", 0) \
+	ROM_REGION( 0x200000, "maincpu", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr-23608b (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-23608b.bin",   0x000000, 0x200000, CRC(a554b1e3) SHA1(343b727a3619d1c75a9b6d4cc156a9050447f155) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-23608 (Export)"  ) \
@@ -1103,7 +1103,7 @@ Region byte encoding is as follows:
 
 
 ROM_START( naomi )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
@@ -1116,7 +1116,7 @@ ROM_START( naomigd )
 ROM_END
 
 ROM_START( hod2bios )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	HOTD2_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
@@ -1129,7 +1129,7 @@ ROM_START( naomi2 )
 ROM_END
 
 ROM_START( awbios )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
@@ -1137,7 +1137,7 @@ ROM_END
 
 
 ROM_START( fotns )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -1152,7 +1152,7 @@ ROM_START( fotns )
 ROM_END
 
 ROM_START( demofist )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -1304,7 +1304,7 @@ IC12    64M     BA24    102F
 */
 
 ROM_START( cspike )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1351,7 +1351,7 @@ IC13    64M     A12E    8DE4
 */
 
 ROM_START( capsnk )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1396,7 +1396,7 @@ Serial: BCHE-01A0803
 */
 
 ROM_START( csmash )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x4800000, "user1", ROMREGION_ERASE00)
@@ -1413,7 +1413,7 @@ ROM_START( csmash )
 ROM_END
 
 ROM_START( csmasho )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x4800000, "user1", ROMREGION_ERASE00)
@@ -1458,7 +1458,7 @@ Serial: BAXE-02A1386
 */
 
 ROM_START( derbyoc )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1515,7 +1515,7 @@ Serial: BBDE-01A0097
 */
 
 ROM_START( dybb99 )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1579,7 +1579,7 @@ Serial: BCCG-21A0451
 */
 
 ROM_START( gram2000 )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1623,7 +1623,7 @@ Serial: BAJE-01A0021
 */
 
 ROM_START( ggram2 )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1658,7 +1658,7 @@ IC11    64M     4F77    EEFE
 
 
 ROM_START( hmgeo )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1701,7 +1701,7 @@ IC10    64M     1E43    0F1A
 */
 
 ROM_START( gwing2 )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1745,7 +1745,7 @@ IC14    32M     81F9    DA1B
 */
 
 ROM_START( suchie3 )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x8000000, "user1", 0)
@@ -1771,7 +1771,7 @@ ROM_END
 /* toy fighter - 1999 sega */
 
 ROM_START( toyfight )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x8000000, "user1", 0)
@@ -1825,7 +1825,7 @@ Serial: BCLE-01A2130
 */
 
 ROM_START( pjustic )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1876,7 +1876,7 @@ IC8 64M C529    0501
 */
 
 ROM_START( pstone )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1917,7 +1917,7 @@ Serial: BBJE-01A1613
 */
 
 ROM_START( pstone2 )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -1970,7 +1970,7 @@ Serial (from 2 carts): BAZE-01A0288
 */
 
 ROM_START( otrigger )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -2027,7 +2027,7 @@ IC16    64M     A10B    DDB4
 */
 
 ROM_START( samba )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -2082,7 +2082,7 @@ IC17 64M    6586    1F3F
 */
 
 ROM_START( slasho )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -2133,7 +2133,7 @@ Serial: BAVE-02A1305
 */
 
 ROM_START( spawn )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -2186,7 +2186,7 @@ IC21    64M AD60    2F74
 */
 
 ROM_START( virnba )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -2244,7 +2244,7 @@ IC15    32M     0DF9    FC01    MPR21928
 */
 
 ROM_START( vs2_2k )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x8000000, "user1", 0)
@@ -2269,7 +2269,7 @@ ROM_END
 /* Sega Marine Fishing */
 
 ROM_START( smarinef )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x8000000, "user1", 0)
@@ -2313,7 +2313,7 @@ IC11    64M F590    D280
 */
 
 ROM_START( vtennis )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -2365,7 +2365,7 @@ IC19    64M 04B8    49FB
 */
 
 ROM_START( zombrvn )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)
@@ -2427,7 +2427,7 @@ IC21    64M     002C    8ECA
 */
 
 ROM_START( doa2 )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0xb000000, "user1", 0)
@@ -2492,7 +2492,7 @@ Serial: BALH-13A0175
 */
 
 ROM_START( doa2m )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0xb000000, "user1", 0)
@@ -2557,7 +2557,7 @@ Serial: ??? (sticker removed)
 */
 
 ROM_START( dybbnao )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
 	ROM_REGION( 0x400000, "user1", 0)

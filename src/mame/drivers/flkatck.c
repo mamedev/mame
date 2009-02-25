@@ -42,7 +42,7 @@ static INTERRUPT_GEN( flkatck_interrupt )
 
 static WRITE8_HANDLER( flkatck_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	int bankaddress = 0;
 
 	/* bits 3-4: coin counters */
@@ -282,11 +282,11 @@ static const k007232_interface k007232_config =
 static MACHINE_DRIVER_START( flkatck )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
+	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
 	MDRV_CPU_PROGRAM_MAP(flkatck_readmem,flkatck_writemem)
-	MDRV_CPU_VBLANK_INT("main", flkatck_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", flkatck_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,3579545)	/* NEC D780C-1, 3.579545 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,3579545)	/* NEC D780C-1, 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(flkatck_readmem_sound,flkatck_writemem_sound)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( flkatck )
 	MDRV_MACHINE_RESET(flkatck)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -325,11 +325,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( mx5000 )
-	ROM_REGION( 0x18000, "main", 0 )		/* 6309 code */
+	ROM_REGION( 0x18000, "maincpu", 0 )		/* 6309 code */
 	ROM_LOAD( "r01",          0x010000, 0x006000, CRC(79b226fc) SHA1(3bc4d93717230fecd54bd08a0c3eeedc1c8f571d) )/* banked ROM */
 	ROM_CONTINUE(			  0x006000, 0x00a000 )			/* fixed ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for the SOUND CPU */
 	ROM_LOAD( "m02.bin",        0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
@@ -340,11 +340,11 @@ ROM_START( mx5000 )
 ROM_END
 
 ROM_START( flkatck )
-	ROM_REGION( 0x18000, "main", 0 )		/* 6309 code */
+	ROM_REGION( 0x18000, "maincpu", 0 )		/* 6309 code */
 	ROM_LOAD( "gx669_p1.16c", 0x010000, 0x006000, CRC(c5cd2807) SHA1(22ddd911a23954ff2d52552e07323f5f0ddaeead) )/* banked ROM */
 	ROM_CONTINUE(			  0x006000, 0x00a000 )			/* fixed ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for the SOUND CPU */
 	ROM_LOAD( "m02.bin",        0x000000, 0x008000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )

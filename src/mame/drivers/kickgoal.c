@@ -668,12 +668,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( kickgoal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 	MDRV_CPU_PERIODIC_INT(kickgoal_interrupt, 240)
 
-	MDRV_CPU_ADD("audio", PIC16C57, 12000000/4)	/* 3MHz ? */
+	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000/4)	/* 3MHz ? */
 	MDRV_CPU_FLAGS(CPU_DISABLE)	/* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(kickgoal_sound_io_map, 0)
@@ -681,7 +681,7 @@ static MACHINE_DRIVER_START( kickgoal )
 	MDRV_NVRAM_HANDLER(kickgoal)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -704,11 +704,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( actionhw )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", PIC16C57, XTAL_12MHz/3)	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)	/* verified on pcb */
 	MDRV_CPU_FLAGS(CPU_DISABLE) /* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
 	MDRV_CPU_IO_MAP(actionhw_io_map, 0)
@@ -716,7 +716,7 @@ static MACHINE_DRIVER_START( actionhw )
 	MDRV_NVRAM_HANDLER(kickgoal) // 93C46 really
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -741,11 +741,11 @@ MACHINE_DRIVER_END
 /* Rom Loading ***************************************************************/
 
 ROM_START( kickgoal )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "ic6",   0x000000, 0x40000, CRC(498ca792) SHA1(c638c3a1755870010c5961b58bcb02458ff4e238) )
 	ROM_LOAD16_BYTE( "ic5",   0x000001, 0x40000, CRC(d528740a) SHA1(d56a71004aabc839b0833a6bf383e5ef9d4948fa) )
 
-	ROM_REGION( 0x1000, "audio", 0 )	/* sound? (missing) */
+	ROM_REGION( 0x1000, "audiocpu", 0 )	/* sound? (missing) */
 	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
 	ROM_LOAD( "pic16c57",     0x0000, 0x0800, NO_DUMP )
 
@@ -767,11 +767,11 @@ ROM_START( kickgoal )
 ROM_END
 
 ROM_START( actionhw )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "2.ic6",  0x000000, 0x80000, CRC(2b71d58c) SHA1(3e58531fa56d41a3c7944e3beab4850907564a89) )
 	ROM_LOAD16_BYTE( "1.ic5",  0x000001, 0x80000, CRC(136b9711) SHA1(553f9fdd99bb9ce2e1492d0755633075e59ba587) )
 
-	ROM_REGION( 0x1000, "audio", 0 )	/* sound? (missing) */
+	ROM_REGION( 0x1000, "audiocpu", 0 )	/* sound? (missing) */
 	/* Remove the CPU_DISABLED flag in MACHINE_DRIVER when the rom is dumped */
 	ROM_LOAD( "pic16c57",     0x0000, 0x0800, NO_DUMP )
 
@@ -801,7 +801,7 @@ ROM_END
 static DRIVER_INIT( kickgoal )
 {
 #if 0 /* we should find a real fix instead  */
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	/* fix "bug" that prevents game from writing to EEPROM */
 	rom[0x12b0/2] = 0x0001;

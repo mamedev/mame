@@ -226,12 +226,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( m57 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790)	/* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */)
 				/* the Lode Runner manual (similar but different hardware) */
@@ -260,7 +260,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( troangel )
-	ROM_REGION( 0x10000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "ta-a-3k", 0x0000, 0x2000, CRC(f21f8196) SHA1(7cbf74b77a559ee70312b799e707394d9b849f5b) )
 	ROM_LOAD( "ta-a-3m", 0x2000, 0x2000, CRC(58801e55) SHA1(91bdda778f2c4486001bc4ad26d6f21ba275ae08) )
 	ROM_LOAD( "ta-a-3n", 0x4000, 0x2000, CRC(de3dea44) SHA1(1290755ffc04dc3b3667e063118669a0eab6fb79) )
@@ -290,7 +290,7 @@ ROM_START( troangel )
 ROM_END
 
 ROM_START( newtangl ) /* Offical "upgrade" or hack? */
-	ROM_REGION( 0x10000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "3k",	0x0000, 0x2000, CRC(3c6299a8) SHA1(a21a8452b75ce6174076878128d4f20b39b6d69d) )
 	ROM_LOAD( "3m",	0x2000, 0x2000, CRC(8d09056c) SHA1(4d2585103cc6e6c04015501d3c9e1578a8f9c0f5) )
 	ROM_LOAD( "3n",	0x4000, 0x2000, CRC(17b5a775) SHA1(d85c3371080bea82f19ac96fa0f1b332e1c86e27) )

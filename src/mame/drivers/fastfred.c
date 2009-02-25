@@ -612,16 +612,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( fastfred )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CLOCK/6)     /* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, CLOCK/6)     /* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(fastfred_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80, CLOCK/12)	 /* 1.536 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, CLOCK/12)	 /* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))	//CLOCK/16/60
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -649,10 +649,10 @@ static MACHINE_DRIVER_START( jumpcoas )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fastfred)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(jumpcoas_map,0)
 
-	MDRV_CPU_REMOVE("audio")
+	MDRV_CPU_REMOVE("audiocpu")
 
 	/* video hardware */
 	MDRV_GFXDECODE(jumpcoas)
@@ -665,7 +665,7 @@ static MACHINE_DRIVER_START( imago )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fastfred)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(imago_map,0)
 
 	MDRV_MACHINE_START(imago)
@@ -687,7 +687,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( fastfred )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ffr.01",       0x0000, 0x1000, CRC(15032c13) SHA1(18ae84e87ac430e3f1cbc388ad16fb1d20aaba2f) )
 	ROM_LOAD( "ffr.02",       0x1000, 0x1000, CRC(f9642744) SHA1(b086ad284593b7f2ad314ad5002c9a2b293b8103) )
 	ROM_LOAD( "ffr.03",       0x2000, 0x1000, CRC(f0919727) SHA1(f16bc7de715acf0396818ce48ebe45b6a301b2cb) )
@@ -697,7 +697,7 @@ ROM_START( fastfred )
 	ROM_LOAD( "ffr.07",       0x6000, 0x1000, CRC(2935c76a) SHA1(acc2eec3c242dc904c5175e4b5b5fb025b956c17) )
 	ROM_LOAD( "ffr.08",       0x7000, 0x1000, CRC(0fb79e7b) SHA1(82cc315708064bc498268abb8dbca2e36c3a0dcd) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ffr.09",       0x0000, 0x1000, CRC(a1ec8d7e) SHA1(5b4884381d0df79d3ed4246a9cf78f9b3bb14f79) )
 	ROM_LOAD( "ffr.10",       0x1000, 0x1000, CRC(460ca837) SHA1(6d94f04e94ec15cbc5602bb303e9610ad20275fb) )
 
@@ -721,7 +721,7 @@ ROM_START( fastfred )
 ROM_END
 
 ROM_START( flyboy )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "flyboy01.cpu", 0x0000, 0x1000, CRC(b05aa900) SHA1(1ad394a438ddf96974b0b841d916766e45e8f3ba) )
 	ROM_LOAD( "flyboy02.cpu", 0x1000, 0x1000, CRC(474867f5) SHA1(b352318eee71218155046bba9f032364e1213c02) )
 	ROM_LOAD( "rom3.cpu",     0x2000, 0x1000, CRC(d2f8f085) SHA1(335d53b50c5ad8180bc7d77b808a638604eb7f39) )
@@ -731,7 +731,7 @@ ROM_START( flyboy )
 	ROM_LOAD( "rom7.cpu",     0x6000, 0x1000, CRC(50a1baff) SHA1(469913e7652c6a334fb071e65cc00058b411527f) )
 	ROM_LOAD( "rom8.cpu",     0x7000, 0x1000, CRC(fe2ae95d) SHA1(e44c36b7726892b4a360a7dc02820a3dbb21b398) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rom9.cpu",     0x0000, 0x1000, CRC(5d05d1a0) SHA1(cbf6144bf0b0686e4af41d8aeffd54c25f60eadc) )
 	ROM_LOAD( "rom10.cpu",    0x1000, 0x1000, CRC(7a28005b) SHA1(71c5779aec3c40614db3ba2c6f7820e6592bf101) )
 
@@ -755,7 +755,7 @@ ROM_START( flyboy )
 ROM_END
 
 ROM_START( flyboyb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom1.cpu",     0x0000, 0x1000, CRC(e9e1f527) SHA1(999b8054751ddaa1b5bad48eaa12fc11a915c74c) )
 	ROM_LOAD( "rom2.cpu",     0x1000, 0x1000, CRC(07fbe78c) SHA1(875e29e6ed7525678b52276248f0cf4c885bd521) )
 	ROM_LOAD( "rom3.cpu",     0x2000, 0x1000, CRC(d2f8f085) SHA1(335d53b50c5ad8180bc7d77b808a638604eb7f39) )
@@ -765,7 +765,7 @@ ROM_START( flyboyb )
 	ROM_LOAD( "rom7.cpu",     0x6000, 0x1000, CRC(50a1baff) SHA1(469913e7652c6a334fb071e65cc00058b411527f) )
 	ROM_LOAD( "rom8.cpu",     0x7000, 0x1000, CRC(fe2ae95d) SHA1(e44c36b7726892b4a360a7dc02820a3dbb21b398) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rom9.cpu",     0x0000, 0x1000, CRC(5d05d1a0) SHA1(cbf6144bf0b0686e4af41d8aeffd54c25f60eadc) )
 	ROM_LOAD( "rom10.cpu",    0x1000, 0x1000, CRC(7a28005b) SHA1(71c5779aec3c40614db3ba2c6f7820e6592bf101) )
 
@@ -789,7 +789,7 @@ ROM_START( flyboyb )
 ROM_END
 
 ROM_START( jumpcoas )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jumpcoas.001", 0x0000, 0x2000, CRC(0778c953) SHA1(7def6656532332e56d76700431e4c3199e407e50) )
 	ROM_LOAD( "jumpcoas.002", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) )
 	ROM_LOAD( "jumpcoas.003", 0x4000, 0x2000, CRC(d9fc93be) SHA1(e13476991720a1e900f4ab65175df7ee40c6960d) )
@@ -807,7 +807,7 @@ ROM_START( jumpcoas )
 ROM_END
 
 ROM_START( jumpcoat )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.d1", 0x0000, 0x2000, CRC(8ac220c5) SHA1(714dd34ca6c6c1803778a715b803f81a94286e1c) )
 	ROM_LOAD( "jumpcoas.002", 0x2000, 0x2000, CRC(57f59ce1) SHA1(1508afb34f77c829ed62b16be10b0ebf8e91a62c) )
 	ROM_LOAD( "3.d3", 0x4000, 0x2000, CRC(17e4deba) SHA1(880689304af9744de3c96936f03345968ab8085c) )
@@ -825,7 +825,7 @@ ROM_START( jumpcoat )
 ROM_END
 
 ROM_START( boggy84 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpurom1.bin", 0x0000, 0x2000, CRC(665266c0) SHA1(7785a7d710948718236f9be4b3e2a3fdc00662a5) )
 	ROM_LOAD( "cpurom2.bin", 0x2000, 0x2000, CRC(6c096798) SHA1(74ea860ef10cb566bcb07d67e6c79f542a66de91) )
 	ROM_LOAD( "cpurom3.bin", 0x4000, 0x2000, CRC(9da59104) SHA1(167af18d50d99e66111e4ebd52d0dd86d5d6d391) )
@@ -843,7 +843,7 @@ ROM_START( boggy84 )
 ROM_END
 
 ROM_START( redrobin )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "redro01f.16d", 0x0000, 0x1000, CRC(0788ce10) SHA1(32084714fe005d0489ab1a7e6684a49bd103ce5e) )
 	ROM_LOAD( "redrob02.17d", 0x1000, 0x1000, CRC(bf9b95b4) SHA1(55de12c36e193525159ecca6cff883b69709f5ba) )
 	ROM_LOAD( "redrob03.14b", 0x2000, 0x1000, CRC(9386e40b) SHA1(c55fe071a68fd8ca19a7919cef790e588d056b74) )
@@ -854,7 +854,7 @@ ROM_START( redrobin )
 	ROM_LOAD( "redrob08.17a", 0x7000, 0x1000, CRC(095cf908) SHA1(70005f7a1f05e666392f8e9139d125fa97fd9814) )
 	ROM_LOAD( "redrob20.15e", 0x8000, 0x4000, CRC(5cce22b7) SHA1(8cc763983766fbb9b995d5c157f66f170cd1d01e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "redrob09.1f",  0x0000, 0x1000, CRC(21af2d03) SHA1(6a73b85169bb8ae6f3dca5581a39802ca4dd6f58) )
 	ROM_LOAD( "redro10f.1e",  0x1000, 0x1000, CRC(bf0e772f) SHA1(e07f7a8876437822bb0c300905455c88125282d7) )
 
@@ -878,13 +878,13 @@ ROM_START( redrobin )
 ROM_END
 
 ROM_START( imago )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "imago11.82", 0x0000, 0x1000, CRC(3cce69b4) SHA1(e7d52e388e09e86abb597493f5807ee088cf7a40) )
 	ROM_CONTINUE(	        0x2000, 0x1000 )
 	ROM_LOAD( "imago12.83", 0x3000, 0x2000, CRC(8dff98c0) SHA1(e7311d9ca4544f1263e894e6d93ca52c87fc83bf) )
 	ROM_LOAD( "13.bin",     0x5000, 0x2000, CRC(ae684602) SHA1(d187abbe62ee58a8190d9f428ded0feeb9484abd) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "imago08.60", 0x0000, 0x1000, CRC(4f77c2c9) SHA1(1e046786fbad7fb8c7c462b7bd5d80152c6b8779) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
@@ -915,13 +915,13 @@ ROM_END
 
 /* this set has patched out the code to enable the cocktail mode for 2nd player at $5b24 */
 ROM_START( imagoa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "imago11.82", 0x0000, 0x1000, CRC(3cce69b4) SHA1(e7d52e388e09e86abb597493f5807ee088cf7a40) )
 	ROM_CONTINUE(	        0x2000, 0x1000 )
 	ROM_LOAD( "imago12.83", 0x3000, 0x2000, CRC(8dff98c0) SHA1(e7311d9ca4544f1263e894e6d93ca52c87fc83bf) )
 	ROM_LOAD( "imago13.84", 0x5000, 0x2000, CRC(f0f14b4d) SHA1(92b82080575a9c95df926c404c19875ac66c2b00) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "imago08.60", 0x0000, 0x1000, CRC(4f77c2c9) SHA1(1e046786fbad7fb8c7c462b7bd5d80152c6b8779) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )

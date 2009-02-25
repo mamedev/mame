@@ -1198,7 +1198,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ms32 )
 {
-	memory_set_bankptr(machine, 1, memory_region(machine, "main"));
+	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu"));
 	memory_set_bank(machine, 4, 0);
 	memory_set_bank(machine, 5, 1);
 	irq_init(machine);
@@ -1209,11 +1209,11 @@ static MACHINE_RESET( ms32 )
 static MACHINE_DRIVER_START( ms32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V70, 20000000) // 20MHz
+	MDRV_CPU_ADD("maincpu", V70, 20000000) // 20MHz
 	MDRV_CPU_PROGRAM_MAP(ms32_readmem,ms32_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(ms32_interrupt,32)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(ms32_snd_readmem, ms32_snd_writemem)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
@@ -1221,7 +1221,7 @@ static MACHINE_DRIVER_START( ms32 )
 	MDRV_MACHINE_RESET(ms32)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1246,7 +1246,7 @@ MACHINE_DRIVER_END
 /********** ROM LOADING **********/
 
 ROM_START( bbbxing )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "bbbx25.bin", 0x000003, 0x80000, CRC(b526b41e) SHA1(44945931b159646468a954d5acdd2c6c61daf098) )
 	ROM_LOAD32_BYTE( "bbbx27.bin", 0x000002, 0x80000, CRC(45b27ad8) SHA1(0af415b17400aabecdcb6d1d069f28b64780017f) )
 	ROM_LOAD32_BYTE( "bbbx29.bin", 0x000001, 0x80000, CRC(85bbbe79) SHA1(bc5ebb96491762e6a0d202ddf7faeb57c66211b4) )
@@ -1273,7 +1273,7 @@ ROM_START( bbbxing )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "bbbx32-2.bin",0x000000, 0x080000, CRC(3ffdae75) SHA1(2b837d28f7ecdd49e8525bd5c249e83021d5fe9f) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "bbbx21.bin",  0x000000, 0x040000, CRC(5f3ea01f) SHA1(761f6a5852312d2b12de009f3cf0476f5b2e906c) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1286,7 +1286,7 @@ ROM_START( bbbxing )
 ROM_END
 
 ROM_START( 47pie2 )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "93166-26.v11", 0x000003, 0x80000, CRC(e4e62134) SHA1(224b3e8dba56009bf2af6eceb7495e60302a6360) )
 	ROM_LOAD32_BYTE( "93166-27.v11", 0x000002, 0x80000, CRC(7bd00919) SHA1(60565b5e1da5fee00ac4a7fb1202d7150dab49ee) )
 	ROM_LOAD32_BYTE( "93166-28.v11", 0x000001, 0x80000, CRC(aa49eec2) SHA1(173afc596caa1c464fc3247cb64d36c1d97a1520) )
@@ -1311,7 +1311,7 @@ ROM_START( 47pie2 )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "93166-30.bin", 0x000000, 0x080000, CRC(0c738883) SHA1(e552c1842d759e5e617eb9c6cc178620a461b4dd) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "93166-21.bin", 0x000000, 0x040000, CRC(e7fd1bf4) SHA1(74567530364bfd93bffddb588758d8498e197668) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1324,7 +1324,7 @@ ROM_START( 47pie2 )
 ROM_END
 
 ROM_START( 47pie2o )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "93166-26.v10", 0x000003, 0x80000, CRC(21dc94dd) SHA1(faf2eea891cb061d5df47ef31d9538feb0c1233c) )
 	ROM_LOAD32_BYTE( "93166-27.v10", 0x000002, 0x80000, CRC(5bf18a7d) SHA1(70869dc37e6ad79ce4e85db71a03c5cccf9d732b) )
 	ROM_LOAD32_BYTE( "93166-28.v10", 0x000001, 0x80000, CRC(b1261d51) SHA1(3f393aeb7a076c4d2d2cc7f22ead05f405186d80) )
@@ -1349,7 +1349,7 @@ ROM_START( 47pie2o )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "93166-30.bin", 0x000000, 0x080000, CRC(0c738883) SHA1(e552c1842d759e5e617eb9c6cc178620a461b4dd) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "93166-21.bin", 0x000000, 0x040000, CRC(e7fd1bf4) SHA1(74567530364bfd93bffddb588758d8498e197668) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1362,7 +1362,7 @@ ROM_START( 47pie2o )
 ROM_END
 
 ROM_START( desertwr )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "93166-26.37", 0x000003, 0x80000, CRC(582b9584) SHA1(027a987cde7e9e1b24aef6a3086eba61679ad0b6) )
 	ROM_LOAD32_BYTE( "93166-27.38", 0x000002, 0x80000, CRC(cb60dda3) SHA1(0499b8ab19abdf8db8c18d778b3f9f6e0d277ff0) )
 	ROM_LOAD32_BYTE( "93166-28.39", 0x000001, 0x80000, CRC(0de40efb) SHA1(c49c3b27939e428dec1f642b7fdb9a1ff760289a) )
@@ -1389,7 +1389,7 @@ ROM_START( desertwr )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "93166-30.41", 0x000000, 0x080000, CRC(980ab89c) SHA1(8468fc13a5988e25750e8d99ff464f46e86ab412) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "93166-21.30", 0x000000, 0x040000, CRC(9300be4c) SHA1(a8e9c1704abf26545aeb9a5d28fd0cafd38f2d84) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1402,7 +1402,7 @@ ROM_START( desertwr )
 ROM_END
 
 ROM_START( f1superb )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "f1sb26.bin", 0x000003, 0x80000, CRC(042fccd5) SHA1(4a69de3aef51adad502d54987468170b9e7bb8ac) )
 	ROM_LOAD32_BYTE( "f1sb27.bin", 0x000002, 0x80000, CRC(5f96cf32) SHA1(c9c64576a8bb81a8e8bbe30b054ed33afd760b93) )
 	ROM_LOAD32_BYTE( "f1sb28.bin", 0x000001, 0x80000, CRC(cfda8003) SHA1(460146556f606bf213d7e2ab29d2eb8827131bd0) )
@@ -1444,7 +1444,7 @@ ROM_START( f1superb )
 	ROM_LOAD( "f1sb4b.bin", 0x400000, 0x200000, CRC(077180c5) SHA1(ab16739da709ecdbbb1264beba349ef6ecf3f8b1) )
 	ROM_LOAD( "f1sb5b.bin", 0x600000, 0x200000, CRC(efabc47d) SHA1(195afde8a1f45da4fc04c3080a3cf5fdfff7be5e) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "f1sb21.bin", 0x000000, 0x040000, CRC(e131e1c7) SHA1(33f95a074930c49548069518d8c6dcde7fa25627) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1457,7 +1457,7 @@ ROM_START( f1superb )
 ROM_END
 
 ROM_START( gratia )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "94019.026", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) )
 	ROM_LOAD32_BYTE( "94019.027", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) )
 	ROM_LOAD32_BYTE( "94019.028", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) )
@@ -1481,7 +1481,7 @@ ROM_START( gratia )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "94019_2.030",0x000000, 0x080000, CRC(f9543fcf) SHA1(8466c7893bc6c43e2a80b8f91a776fd0a345ea6c) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "94019.021",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1494,7 +1494,7 @@ ROM_START( gratia )
 ROM_END
 
 ROM_START( gratiaa )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "94019.026", 0x000003, 0x80000, CRC(f398cba5) SHA1(11e06abebfdfc8a99b5c56e9f6ed389f645b6c72) )
 	ROM_LOAD32_BYTE( "94019.027", 0x000002, 0x80000, CRC(ba3318c5) SHA1(9b100988b998c39b586b51fe9fee874dbf711610) )
 	ROM_LOAD32_BYTE( "94019.028", 0x000001, 0x80000, CRC(e0762e89) SHA1(a567c347e7f73f1ef1c753d14ac4f58311380fac) )
@@ -1518,7 +1518,7 @@ ROM_START( gratiaa )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "94019.030",0x000000, 0x080000, CRC(026b5379) SHA1(b9237477f1bf8ae83174e8231492fe667e6d6a13) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "94019.021",0x000000, 0x040000, CRC(6e8dd039) SHA1(f1e69c9b40b14ba0f8377a6d9b6c3933919bc803) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1531,7 +1531,7 @@ ROM_START( gratiaa )
 ROM_END
 
 ROM_START( gametngk )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "mr94041.26", 0x000003, 0x80000, CRC(e622e774) SHA1(203c2a3563a337af4cec92a66e0fa410d901b01f) )
 	ROM_LOAD32_BYTE( "mr94041.27", 0x000002, 0x80000, CRC(da862b9c) SHA1(17dc6da08d7f5551c8f4bc4d9c416dbfc82d8397) )
 	ROM_LOAD32_BYTE( "mr94041.28", 0x000001, 0x80000, CRC(b3738934) SHA1(cd07572e55e83807e76179cfc6b97e0410067911) )
@@ -1558,7 +1558,7 @@ ROM_START( gametngk )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "mr94041.30", 0x000000, 0x080000, CRC(c0f27b7f) SHA1(874fe80aa4b46520f844ef6efa61f28eabccbc4f) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "mr94041.21", 0x000000, 0x040000, CRC(38dcb837) SHA1(29fdde54e52dec4ee39a6f2db8e0d67774320d15) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1571,7 +1571,7 @@ ROM_START( gametngk )
 ROM_END
 
 ROM_START( hayaosi2 )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "mb93138a.25", 0x000003, 0x80000, CRC(563c6f2f) SHA1(bc2a61fd2e0adf58256feeef8491b67af6d6eacf) )
 	ROM_LOAD32_BYTE( "mb93138a.27", 0x000002, 0x80000, CRC(fe8e283a) SHA1(fc6c06ae296110b1f5794187d5208b17541614cb) )
 	ROM_LOAD32_BYTE( "mb93138a.29", 0x000001, 0x80000, CRC(e6fe3d0d) SHA1(9a0caab82b160991b4f2ac993e7e4b4c5d3bb15e) )
@@ -1594,7 +1594,7 @@ ROM_START( hayaosi2 )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "mb93138a.32", 0x000000, 0x080000, CRC(f563a144) SHA1(14d86e4992329811857e1faf282cd9ec530a364c) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "mb93138a.21", 0x000000, 0x040000, CRC(8e8048b0) SHA1(93285a0570ed829b36f4e8c57d133a7dd14f123d) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1674,7 +1674,7 @@ Lithium battery + LH5168D-10L(SRAM)
 
 
 ROM_START( hayaosi3 )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "mb93138.25", 0x000003, 0x80000, CRC(ba8cec03) SHA1(edaa52e0b07307bb21168205ee0d5d6ff8168de9) )
 	ROM_LOAD32_BYTE( "mb93138.27", 0x000002, 0x80000, CRC(571725df) SHA1(66575ec1a29d6fc1b50ae5a5ce8025bb1043deaf))
 	ROM_LOAD32_BYTE( "mb93138.29", 0x000001, 0x80000, CRC(da891976) SHA1(27e8c395e92ca01b47bffdf766bc95a6c2150815) )
@@ -1699,7 +1699,7 @@ ROM_START( hayaosi3 )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "mb93138.32", 0x000000, 0x080000, CRC(df5d00b4) SHA1(2bbbcd546d5b5170d81bf33b37b46b70b417c9c7) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "mb93138.21", 0x000000, 0x040000, CRC(008bc217) SHA1(eec66a86f285ccbc47eba17a4bb83cc1f8a5f425) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1712,7 +1712,7 @@ ROM_START( hayaosi3 )
 ROM_END
 
 ROM_START( kirarast )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "mr95025.26", 0x000003, 0x80000, CRC(eb7faf5f) SHA1(5b79ff3043db5ef2622ae1665145462d949c9bb8) )
 	ROM_LOAD32_BYTE( "mr95025.27", 0x000002, 0x80000, CRC(80644d05) SHA1(6da8bf8aeb1477112f9022c0c5f472cbcd27df8e) )
 	ROM_LOAD32_BYTE( "mr95025.28", 0x000001, 0x80000, CRC(6df8c384) SHA1(3ad01d3d51cfc1f48029c16ee1cc74fc59d7603c) )
@@ -1738,7 +1738,7 @@ ROM_START( kirarast )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "mr95025.30",  0x000000, 0x080000, CRC(aee6e0c2) SHA1(dee985f7a9773ba7a4d31a3833a7775d778bbe5a) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "mr95025.21",  0x000000, 0x040000, CRC(a6c70c7f) SHA1(fe2108f3e8d46ed53d8c5c98e8d0fdb19b77075d) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1751,7 +1751,7 @@ ROM_START( kirarast )
 ROM_END
 
 ROM_START( akiss )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "93166.26", 0x000003, 0x80000, CRC(5bdd01ee) SHA1(21b8e07bb7ef6b437a43719b02deeba970330900) )
 	ROM_LOAD32_BYTE( "93166.27", 0x000002, 0x80000, CRC(bb11b2c9) SHA1(86ba06d28bc8f560ac3d05515d061e05c90d1628) )
 	ROM_LOAD32_BYTE( "93166.28", 0x000001, 0x80000, CRC(20565478) SHA1(d532ab55be287f45d8d81317bb844c675eb1292c) )
@@ -1776,7 +1776,7 @@ ROM_START( akiss )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "93166.30",  0x000000, 0x080000, CRC(1807c1ea) SHA1(94696b8319c4982cb5d33423f56e2348f210cdb5) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "93166.21",  0x000000, 0x040000, CRC(01a03687) SHA1(2340c4ed19f434e8c23709edfc93259313aefaf9))
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1789,7 +1789,7 @@ ROM_START( akiss )
 ROM_END
 
 ROM_START( p47aces )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "p47-26.bin", 0x000003, 0x80000, CRC(e017b819) SHA1(942fb48e8bb3a263534a0351a1a9979d786bc475) )
 	ROM_LOAD32_BYTE( "p47-27.bin", 0x000002, 0x80000, CRC(bd1b81e0) SHA1(b15f157fe3a30295f999a4c285da2d6f22d7fba6) )
  	ROM_LOAD32_BYTE( "p47-28.bin", 0x000001, 0x80000, CRC(4742a5f7) SHA1(cd297aa150082c545647c9a755cf2cdbdc98c988) )
@@ -1816,7 +1816,7 @@ ROM_START( p47aces )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "p47-30.bin",  0x000000, 0x080000, CRC(7ba90fad) SHA1(c0a3d4458816f00b8f5eb4b6d4531d1abeaccbe5) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "p47-21.bin",  0x000000, 0x040000, CRC(f2d43927) SHA1(69ac20f339a515d58cafbcd6f7d7982ca5cda681) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1829,7 +1829,7 @@ ROM_START( p47aces )
 ROM_END
 
 ROM_START( tetrisp )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "mr95024.26", 0x000003, 0x80000, CRC(d318a9ba) SHA1(cae86d86518fdfeb736e7b2040277c76cc3b4017) )
 	ROM_LOAD32_BYTE( "mr95024.27", 0x000002, 0x80000, CRC(2d69b6d3) SHA1(f0a513f449aa25808672fb27e3691ccabfba48a1) )
 	ROM_LOAD32_BYTE( "mr95024.28", 0x000001, 0x80000, CRC(87522e16) SHA1(4f0d8abec046884d89c559e3a4a5ac9e0e47a0dc) )
@@ -1848,7 +1848,7 @@ ROM_START( tetrisp )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "mr95024.30", 0x000000, 0x080000, CRC(cea7002d) SHA1(5462edaeb9339790b95ed15a4bfaab8fae655b12) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "mr95024.21", 0x000000, 0x040000, CRC(5c565e3b) SHA1(d349a8ca50d03c06d8978e6d3632b624f019dee4) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1861,7 +1861,7 @@ ROM_START( tetrisp )
 ROM_END
 
 ROM_START( tp2m32 )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "tp2m3226.26", 0x000003, 0x80000, CRC(152f0ccf) SHA1(1e318e125a54216ebf3f85740db1dd85aacac819) )
 	ROM_LOAD32_BYTE( "tp2m3227.27", 0x000002, 0x80000, CRC(d89468d0) SHA1(023fbc13b0f6332217904c89225b330aa5742f20) )
 	ROM_LOAD32_BYTE( "tp2m3228.28", 0x000001, 0x80000, CRC(041aac23) SHA1(3f7863ffa897978493e98445fe020dccbe521752) )
@@ -1880,7 +1880,7 @@ ROM_START( tp2m32 )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "tp2m3230.30", 0x000000, 0x080000, CRC(6845e476) SHA1(61c33714db2e2b5ccdcef0e0d3efdc391fe6aba2) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "tp2m3221.21", 0x000000, 0x040000, CRC(2bcc4176) SHA1(74740fa13ab81b9819b4cfbe9d34a0749ba23b8f) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1894,7 +1894,7 @@ ROM_END
 
 
 ROM_START( bnstars ) /* ver 1.1 */
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
  	ROM_LOAD32_BYTE( "vsjanshi26.37", 0x000003, 0x80000, CRC(75eeec8f) SHA1(26315381baa0abb470203dc565ad98c52fe17b20) )
 	ROM_LOAD32_BYTE( "vsjanshi27.38", 0x000002, 0x80000, CRC(69f24ab9) SHA1(e019a444111e4ed7f9a378d6e2d13ddb9324bc49) )
 	ROM_LOAD32_BYTE( "vsjanshi28.39", 0x000001, 0x80000, CRC(d075cfb6) SHA1(f70741e9f536d5c7604126d36c7aa8ed8f25c329) )
@@ -1919,7 +1919,7 @@ ROM_START( bnstars ) /* ver 1.1 */
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "vsjanshi30.41",  0x000000, 0x080000, CRC(fdbbac21) SHA1(c77d852e53126cc8ebfe1e79d1134e42b54d1aab) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "vsjanshi21.30",  0x000000, 0x040000, CRC(d622bce1) SHA1(059fcc3c7216d3ea4f3a4226a06219375ce8c2bf) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -1969,7 +1969,7 @@ Custom chip: SS92046-01 9338EV 436091 06441
 */
 
 ROM_START( wpksocv2 )
-	ROM_REGION( 0x200000, "main", 0 ) /* V70 code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "25", 0x000003, 0x80000, CRC(6c22a56c) SHA1(a03cbcfc024b39d2776f9e9897d1da07df6ae2d7) )
 	ROM_LOAD32_BYTE( "27", 0x000002, 0x80000, CRC(50c594a8) SHA1(454a63d7b2a07399a64449205271b797bca1dec1) )
 	ROM_LOAD32_BYTE( "29", 0x000001, 0x80000, CRC(22acd835) SHA1(0fa96a6dfde737d541842f85dc257776044e15b5) )
@@ -1992,7 +1992,7 @@ ROM_START( wpksocv2 )
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles, don't dispose since we use GFX_RAW */
 	ROM_LOAD( "32", 0x000000, 0x080000, CRC(becc25c2) SHA1(4ae7665cd45ebd9586068e99327145194ba216fc) )
 
-	ROM_REGION( 0x50000, "audio", 0 ) /* z80 program */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* z80 program */
 	ROM_LOAD( "ws-21", 0x000000, 0x040000, CRC(bdeff5d6) SHA1(920a6fc983d53f09510887e4e81ee89ccd5079e6) )
 	ROM_RELOAD(              0x010000, 0x40000 )
 
@@ -2157,8 +2157,8 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 static void configure_banks(running_machine *machine)
 {
 	state_save_register_global(machine, to_main);
-	memory_configure_bank(machine, 4, 0, 16, memory_region(machine, "audio") + 0x14000, 0x4000);
-	memory_configure_bank(machine, 5, 0, 16, memory_region(machine, "audio") + 0x14000, 0x4000);
+	memory_configure_bank(machine, 4, 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
+	memory_configure_bank(machine, 5, 0, 16, memory_region(machine, "audiocpu") + 0x14000, 0x4000);
 }
 
 /* SS91022-10: desertwr, gratiaa, tp2m32, gametngk */
@@ -2210,7 +2210,7 @@ static DRIVER_INIT (47pie2)
 static DRIVER_INIT (f1superb)
 {
 #if 0 // we shouldn't need this hack, something else is wrong, and the x offsets are never copied either, v70 problems??
-	UINT32 *pROM = (UINT32 *)memory_region(machine, "main");
+	UINT32 *pROM = (UINT32 *)memory_region(machine, "maincpu");
 	pROM[0x19d04/4]=0x167a021a; // bne->br  : sprite Y offset table is always copied to RAM
 #endif
 	DRIVER_INIT_CALL(ss92046_01);

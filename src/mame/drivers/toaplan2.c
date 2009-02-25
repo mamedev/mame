@@ -341,7 +341,7 @@ static MACHINE_RESET( vfive )
 
 static MACHINE_RESET( bgaregga )
 {
-	UINT8 *Z80 = (UINT8 *)memory_region(machine, "audio");
+	UINT8 *Z80 = (UINT8 *)memory_region(machine, "audiocpu");
 
 	// Set Z80 bank switch - default bank is 2
 	current_bank = 4;
@@ -404,7 +404,7 @@ static DRIVER_INIT( fixeight )
 
 static DRIVER_INIT( fixeighb )
 {
-	UINT16 *bgdata = (UINT16 *)memory_region(machine, "main");
+	UINT16 *bgdata = (UINT16 *)memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1, &bgdata[0x40000]); /* $80000 - $fffff */
 
 	toaplan2_sub_cpu = CPU_2_NONE;
@@ -416,7 +416,7 @@ static DRIVER_INIT( pipibibi )
 	int A;
 	int oldword, newword;
 
-	UINT16 *pipibibi_68k_rom = (UINT16 *)(memory_region(machine, "main"));
+	UINT16 *pipibibi_68k_rom = (UINT16 *)(memory_region(machine, "maincpu"));
 
 	/* unscramble the 68K ROM data. */
 
@@ -1116,7 +1116,7 @@ static WRITE16_HANDLER( batrider_z80_busreq_w )
 
 static READ16_HANDLER( raizing_z80rom_r )
 {
-	UINT8 *Z80_ROM_test = (UINT8 *)memory_region(space->machine, "audio");
+	UINT8 *Z80_ROM_test = (UINT8 *)memory_region(space->machine, "audiocpu");
 
 	if (offset < 0x8000)
 		return Z80_ROM_test[offset] & 0xff;
@@ -3316,8 +3316,8 @@ GFXDECODE_END
 static GFXDECODE_START( truxton2 )
 	GFXDECODE_ENTRY( "gfx1", 0,       tilelayout            , 0, 128 )
 	GFXDECODE_ENTRY( "gfx1", 0,       spritelayout          , 0,  64 )
-//  GFXDECODE_ENTRY( "main", 0x40000, truxton2_tx_tilelayout, 0, 128 )  /* Truxton 2 */
-//  GFXDECODE_ENTRY( "main", 0x68000, truxton2_tx_tilelayout, 0, 128 )  /* Fix Eight */
+//  GFXDECODE_ENTRY( "maincpu", 0x40000, truxton2_tx_tilelayout, 0, 128 )  /* Truxton 2 */
+//  GFXDECODE_ENTRY( "maincpu", 0x68000, truxton2_tx_tilelayout, 0, 128 )  /* Fix Eight */
 	GFXDECODE_ENTRY( NULL, 0, truxton2_tx_tilelayout,  0, 128 )
 GFXDECODE_END
 
@@ -3361,9 +3361,9 @@ static const ymz280b_interface ymz280b_config =
 static MACHINE_DRIVER_START( tekipaki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #if USE_HD64x180
 	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
@@ -3375,7 +3375,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3400,9 +3400,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ghox )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(ghox_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #if USE_HD64x180
 	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
@@ -3414,7 +3414,7 @@ static MACHINE_DRIVER_START( ghox )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3438,12 +3438,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dogyuun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_25MHz/2)			/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_25MHz/2)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(dogyuun_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD("audio", V25, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3453,7 +3453,7 @@ static MACHINE_DRIVER_START( dogyuun )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3481,9 +3481,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kbash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(kbash_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	/* ROM based v25 */
 #if USE_V25
@@ -3497,7 +3497,7 @@ static MACHINE_DRIVER_START( kbash )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3524,16 +3524,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kbash2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(kbash2_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	MDRV_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3562,16 +3562,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( truxton2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)			/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(truxton2_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
 	MDRV_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3599,11 +3599,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pipibibs )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pipibibs_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80,XTAL_27MHz/8)			/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80,XTAL_27MHz/8)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -3613,7 +3613,7 @@ static MACHINE_DRIVER_START( pipibibs )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3638,11 +3638,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( whoopee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_27MHz/8)			/* This should be a HD647180 */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* This should be a HD647180 */
 											/* Change this to 10MHz when HD647180 gets dumped. 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
@@ -3653,7 +3653,7 @@ static MACHINE_DRIVER_START( whoopee )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3678,11 +3678,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pipibibi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(pipibibi_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_27MHz/8)			/* ??? 3.37MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* ??? 3.37MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -3692,7 +3692,7 @@ static MACHINE_DRIVER_START( pipibibi )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3717,12 +3717,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fixeight )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)			/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(fixeight_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD("audio", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3733,7 +3733,7 @@ static MACHINE_DRIVER_START( fixeight )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3760,16 +3760,16 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fixeighb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(fixeighb_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
 	MDRV_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3794,12 +3794,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vfive )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(vfive_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD("audio", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3809,7 +3809,7 @@ static MACHINE_DRIVER_START( vfive )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3850,12 +3850,12 @@ static const ym2151_interface batsugun_ym2151_interface =
 static MACHINE_DRIVER_START( batsugun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batsugun_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD("audio", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3865,7 +3865,7 @@ static MACHINE_DRIVER_START( batsugun )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3894,16 +3894,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( snowbro2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(snowbro2_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	MDRV_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3931,11 +3931,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mahoudai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(mahoudai_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -3945,7 +3945,7 @@ static MACHINE_DRIVER_START( mahoudai )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -3973,11 +3973,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( shippumd )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(shippumd_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -3987,7 +3987,7 @@ static MACHINE_DRIVER_START( shippumd )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -4015,11 +4015,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bgaregga )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem, 0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -4029,7 +4029,7 @@ static MACHINE_DRIVER_START( bgaregga )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -4057,11 +4057,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( batrider )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batrider_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batrider_sound_z80_mem, 0)
 	MDRV_CPU_IO_MAP(batrider_sound_z80_port, 0)
 
@@ -4072,7 +4072,7 @@ static MACHINE_DRIVER_START( batrider )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -4102,11 +4102,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbakraid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bbakraid_68k_mem, 0)
-	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq1)
+	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq1)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/6)		/* 5.3333MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6)		/* 5.3333MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bbakraid_sound_z80_mem, 0)
 	MDRV_CPU_IO_MAP(bbakraid_sound_z80_port, 0)
 	MDRV_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 448)
@@ -4119,7 +4119,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
@@ -4150,7 +4150,7 @@ MACHINE_DRIVER_END
 
 /* -------------------------- Toaplan games ------------------------- */
 ROM_START( tekipaki )
-	ROM_REGION( 0x040000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "tp020-1.bin", 0x000000, 0x010000, CRC(d8420bd5) SHA1(30c1ad9e053cd7e79adb42aa428ebee28e144755) )
 	ROM_LOAD16_BYTE( "tp020-2.bin", 0x000001, 0x010000, CRC(7222de8e) SHA1(8352ae23efc24a2e20cc24b6d37cb8fc6b1a730c) )
 
@@ -4167,7 +4167,7 @@ ROM_END
 
 
 ROM_START( ghox ) /* Spinner with single axis (up/down) controls */
-	ROM_REGION( 0x040000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "tp021-01.u10", 0x000000, 0x020000, CRC(9e56ac67) SHA1(daf241d9e55a6e60fc004ed61f787641595b1e62) )
 	ROM_LOAD16_BYTE( "tp021-02.u11", 0x000001, 0x020000, CRC(15cac60f) SHA1(6efa3a50a5dfe6ef4072738d6a7d0d95dca8a675) )
 
@@ -4184,7 +4184,7 @@ ROM_END
 
 
 ROM_START( ghoxj ) /* 8-way joystick for controls */
-	ROM_REGION( 0x040000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "tp021-01a.u10", 0x000000, 0x020000, CRC(c11b13c8) SHA1(da7defc1d3b6ddded910ba56c31fbbdb5ed57b09) )
 	ROM_LOAD16_BYTE( "tp021-02a.u11", 0x000001, 0x020000, CRC(8d426767) SHA1(1ed4a8bcbf4352257e7d58cb5c2c91eb48c2f047) )
 
@@ -4201,7 +4201,7 @@ ROM_END
 
 
 ROM_START( dogyuun )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp022_01.r16", 0x000000, 0x080000, CRC(79eb2429) SHA1(088c5ed0ed77557ab71f52cafe35028e3648ae1e) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-002-MACH  TOA PLAN) */
@@ -4225,7 +4225,7 @@ ROM_END
 
 
 ROM_START( dogyuunk )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "01.u64", 0x000000, 0x080000, CRC(fe5bd7f4) SHA1(9c725466112a514c9ed0fb074422d291c175c3f4) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-002-MACH  TOA PLAN) */
@@ -4249,7 +4249,7 @@ ROM_END
 
 
 ROM_START( kbash )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "kbash01.bin", 0x000000, 0x080000, CRC(2965f81d) SHA1(46f2df30fa92c80ba5a37f75e756424e15534784) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-004-Dash  TOA PLAN) */
@@ -4315,7 +4315,7 @@ Notes:
 */
 
 ROM_START( kbash2 )
-	ROM_REGION( 0x80000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x80000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "mecat-m", 0x000000, 0x80000, CRC(bd2263c6) SHA1(eb794c0fc9c1fb4337114d48149283d42d22e4b3) )
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
@@ -4334,7 +4334,7 @@ ROM_END
 
 
 ROM_START( truxton2 )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp024_1.bin", 0x000000, 0x080000, CRC(eb26f0e5) SHA1(4fb1e8f6d7d62138b408db932c15dd7dc8d4c367) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -4346,11 +4346,11 @@ ROM_START( truxton2 )
 ROM_END
 
 ROM_START( pipibibs )
-	ROM_REGION( 0x040000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "tp025-1.bin", 0x000000, 0x020000, CRC(b2ea8659) SHA1(400431b656dbfbd5a9bc5961c3ea04c4d38b6f77) )
 	ROM_LOAD16_BYTE( "tp025-2.bin", 0x000001, 0x020000, CRC(dc53b939) SHA1(e4de371f97ba7c350273ad43b7f58ff31672a269) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "tp025-5.bin", 0x0000, 0x8000, CRC(bf8ffde5) SHA1(79c09cc9a0ea979f5af5a7e5ad671ea486f5f43e) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -4360,11 +4360,11 @@ ROM_END
 
 
 ROM_START( whoopee )
-	ROM_REGION( 0x040000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "whoopee.1", 0x000000, 0x020000, CRC(28882e7e) SHA1(8fcd278a7d005eb81cd9e461139c0c0f756a4fa4) )
 	ROM_LOAD16_BYTE( "whoopee.2", 0x000001, 0x020000, CRC(6796f133) SHA1(d4e657be260ba3fd3f0556ade617882513b52685) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	/* use the Z80 version from the bootleg Pipi & Bibis set for now */
 	ROM_LOAD( "hd647180.025", 0x00000, 0x08000, BAD_DUMP CRC(101c0358) SHA1(162e02d00b7bdcdd3b48a0cd0527b7428435ec50)  )
@@ -4376,11 +4376,11 @@ ROM_END
 
 
 ROM_START( pipibibi )
-	ROM_REGION( 0x040000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "ppbb06.bin", 0x000000, 0x020000, CRC(14c92515) SHA1(2d7f7c89272bb2a8115f163ad651bef3bca5107e) )
 	ROM_LOAD16_BYTE( "ppbb05.bin", 0x000001, 0x020000, CRC(3d51133c) SHA1(d7bd94ad11e9aeb5a5165c5ac6f71950849bcd2f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "ppbb08.bin", 0x0000, 0x8000, CRC(101c0358) SHA1(162e02d00b7bdcdd3b48a0cd0527b7428435ec50) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -4396,7 +4396,7 @@ ROM_END
 
 
 ROM_START( fixeight )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp-026-1", 0x000000, 0x080000, CRC(f7b1746a) SHA1(0bbea6f111b818bc9b9b2060af4fe900f37cf7f9) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-001-Turbo  TOA PLAN) */
@@ -4456,7 +4456,7 @@ Notes:
 
 
 ROM_START( fixeighb )
-	ROM_REGION( 0x100000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x80000, CRC(cc77d4b4) SHA1(4d3376cbae13d90c6314d8bb9236c2183fc6253c) )
 	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x80000, CRC(ed715488) SHA1(37be9bc8ff6b54a1f660d89469c6c2da6301e9cd) )
 
@@ -4477,7 +4477,7 @@ ROM_END
 
 
 ROM_START( grindstm )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "01.bin", 0x000000, 0x080000, CRC(4923f790) SHA1(1c2d66b432d190d0fb6ac7ca0ec0687aea3ccbf4) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
@@ -4494,7 +4494,7 @@ ROM_END
 
 
 ROM_START( grindsta )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp027-01.rom", 0x000000, 0x080000, CRC(8d8c0392) SHA1(824dde274c8bef8a87c54d8ccdda7f0feb8d11e1) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
@@ -4511,7 +4511,7 @@ ROM_END
 
 
 ROM_START( vfive )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp027_01.bin", 0x000000, 0x080000, CRC(731d50f4) SHA1(794255d0a809cda9170f5bac473df9d7f0efdac8) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
@@ -4528,7 +4528,7 @@ ROM_END
 
 
 ROM_START( batsugun )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp030_01.bin", 0x000000, 0x080000, CRC(3873d7dd) SHA1(baf6187d7d554cfcf4a86b63f07fc30df7ef84c9) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
@@ -4554,7 +4554,7 @@ ROM_END
 
 
 ROM_START( batsugna )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp030_1a.bin", 0x000000, 0x080000,  CRC(cb1d4554) SHA1(ef31f24d77e1c13bdf5558a04a6253e2e3e6a790) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
@@ -4580,7 +4580,7 @@ ROM_END
 
 
 ROM_START( batugnsp )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "tp030-sp.u69", 0x000000, 0x080000, CRC(8072a0cd) SHA1(3a0a9cdf894926a16800c4882a2b00383d981367) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
@@ -4606,7 +4606,7 @@ ROM_END
 
 
 ROM_START( snowbro2 )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "pro-4", 0x000000, 0x080000, CRC(4c7ee341) SHA1(ad46c605a38565d0148daac301be4e4b72302fe7) )
 
 	ROM_REGION( 0x300000, "gfx1", ROMREGION_DISPOSE )
@@ -4649,10 +4649,10 @@ even if the roms contain different code / data
 */
 
 ROM_START( sstriker )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "ra-ma-01_01.u65", 0x000000, 0x080000, CRC(92259f84) SHA1(127e62e407d95efd360bfe2cac9577f326abf6ef) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "ra-ma-01_02.u66", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -4668,10 +4668,10 @@ ROM_END
 
 
 ROM_START( sstrikra )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "ra-ma_01_01.u65", 0x000000, 0x080000, CRC(708fd51d) SHA1(167186d4cf13af37ec0fa6a59c738c54dbbf3c7c) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "ra-ma-01_02.u66", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -4687,10 +4687,10 @@ ROM_END
 
 
 ROM_START( mahoudai )
-	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "ra_ma_01_01.u65", 0x000000, 0x080000, CRC(970ccc5c) SHA1(c87cab83bde0284e631f02e50068407fee81d941) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "ra-ma-01_02.u66", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -4706,11 +4706,11 @@ ROM_END
 
 
 ROM_START( kingdmgp )
-	ROM_REGION( 0x100000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "ma02rom1.bin", 0x000000, 0x080000, CRC(a678b149) SHA1(8c1a631e023dbba0a3fa6cd1b7d10dec1663213a) )
 	ROM_LOAD16_BYTE( "ma02rom0.bin", 0x000001, 0x080000, CRC(f226a212) SHA1(526acf3d05fdc88054a772fbea3de2af532bf3d2) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "ma02rom2.bin", 0x00000, 0x10000, CRC(dde8a57e) SHA1(f522a3f17e229c71512464349760a9e27778bf6a) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )
@@ -4726,11 +4726,11 @@ ROM_END
 
 
 ROM_START( shippumd )
-	ROM_REGION( 0x100000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "ma02rom1.bin", 0x000000, 0x080000, CRC(a678b149) SHA1(8c1a631e023dbba0a3fa6cd1b7d10dec1663213a) )
 	ROM_LOAD16_BYTE( "ma02rom0.bin", 0x000001, 0x080000, CRC(f226a212) SHA1(526acf3d05fdc88054a772fbea3de2af532bf3d2) )
 
-	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "ma02rom2.bin", 0x00000, 0x10000, CRC(dde8a57e) SHA1(f522a3f17e229c71512464349760a9e27778bf6a) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE )
@@ -4746,11 +4746,11 @@ ROM_END
 
 
 ROM_START( bgaregga )
-	ROM_REGION( 0x100000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f80c2fc2) SHA1(a9aac5c7f5439b6fe8d1b3db1fb02a27cc28fdf6) )
 	ROM_LOAD16_BYTE( "prg1.bin", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
 
-	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4769,11 +4769,11 @@ ROM_END
 
 
 ROM_START( bgareghk )
-	ROM_REGION( 0x100000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "prg_0.rom", 0x000000, 0x080000, CRC(26e0019e) SHA1(5197001f5d59246b137e19ed1952a8207b25d4c0) )
 	ROM_LOAD16_BYTE( "prg_1.rom", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
 
-	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4792,11 +4792,11 @@ ROM_END
 
 
 ROM_START( bgaregnv )
-	ROM_REGION( 0x100000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "prg_0.bin", 0x000000, 0x080000, CRC(951ecc07) SHA1(a82e4b59e4a974566e59f3ab2fbae1aec7d88a2b) )
 	ROM_LOAD16_BYTE( "prg_1.bin", 0x000001, 0x080000, CRC(729a60c6) SHA1(cb6f5d138bb82c32910f42d8ee16fa573a23cef3) )
 
-	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4815,11 +4815,11 @@ ROM_END
 
 
 ROM_START( bgaregt2 )
-	ROM_REGION( 0x100000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "prg0", 0x000000, 0x080000, CRC(84094099) SHA1(49fc68a8bcdae4477e20eade9dd569de88b0b798) )
 	ROM_LOAD16_BYTE( "prg1", 0x000001, 0x080000, CRC(46f92fe4) SHA1(62a02cc1dbdc3ac362339aebb62368eb89b06bad) )
 
-	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4838,11 +4838,11 @@ ROM_END
 
 
 ROM_START( bgaregcn )
-	ROM_REGION( 0x100000, "main", 0 )			/* Main 68K code */
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "u123", 0x000000, 0x080000, CRC(88a4e66a) SHA1(ca97e564eed0c5e028b937312e55da56400d5c8c) )
 	ROM_LOAD16_BYTE( "u65",  0x000001, 0x080000, CRC(5dea32a3) SHA1(59df6689e3eb5ea9e49a758604d21a64c65ca14d) )
 
-	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4929,13 +4929,13 @@ ROM_END
 
 
 ROM_START( batrid )
-	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_europe.u22", 0x000000, 0x080000, CRC(91d3e975) SHA1(682885fc17f2424d475c282f239f42faf1aae076) )
  	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 	ROM_CONTINUE(        0x10000, 0x38000 )
 
@@ -4953,13 +4953,13 @@ ROM_START( batrid )
 ROM_END
 
 ROM_START( batridu )
-	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_usa.u22", 0x000000, 0x080000, CRC(2049d007) SHA1(f2a43547a6fc5083b03c1d59a85abbf6e1ce4cd9) )
   	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 	ROM_CONTINUE(        0x10000, 0x38000 )
 
@@ -4977,13 +4977,13 @@ ROM_START( batridu )
 ROM_END
 
 ROM_START( batridc )
-	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_china.u22", 0x000000, 0x080000, CRC(c3b91f7e) SHA1(6b2376c37808dccda296d90ccd7f577ccff4e4dc) )
   	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 	ROM_CONTINUE(        0x10000, 0x38000 )
 
@@ -5001,13 +5001,13 @@ ROM_START( batridc )
 ROM_END
 
 ROM_START( batridj )
-	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0b.u22", 0x000000, 0x080000, CRC(4f3fc729) SHA1(b32d51c254741b82171a86c271679522a7aefd34) )
 	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 	ROM_CONTINUE(        0x10000, 0x38000 )
 
@@ -5025,13 +5025,13 @@ ROM_START( batridj )
 ROM_END
 
 ROM_START( batridk )
-	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_korea.u22", 0x000000, 0x080000, CRC(d9d8c907) SHA1(69c197f2a41f288913f042de9eb8274c0df3ac27) )
 	ROM_LOAD16_BYTE( "prg1.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 	ROM_CONTINUE(        0x10000, 0x38000 )
 
@@ -5050,13 +5050,13 @@ ROM_END
 
 /* Version A is older, might have been only released in Japan? */
 ROM_START( batridja )
-	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f93ea27c) SHA1(41023c2ee1efd70b5aa9c70e1ddd9e5c3d51d68a) )
 	ROM_LOAD16_BYTE( "prg1.bin", 0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
 	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 	ROM_CONTINUE(        0x10000, 0x38000 )
 
@@ -5127,13 +5127,13 @@ Notes:
 
 
 ROM_START( bkraidu )
-	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0u022_usa.bin", 0x000000, 0x080000, CRC(95fb2ffd) SHA1(c7f502f3945249573b66226e8bacc6a9bc230693) )
 	ROM_LOAD16_BYTE( "prg1u023.new", 0x000001, 0x080000, CRC(4ae9aa64) SHA1(45fdf72141c4c9f24a38d4218c65874799b9c868) )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 
@@ -5151,13 +5151,13 @@ ROM_END
 
 
 ROM_START( bkraiduj )
-	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0u022.new", 0x000000, 0x080000, CRC(fa8d38d3) SHA1(aba91d87a8a62d3fe1139b4437b16e2f844264ad) )
 	ROM_LOAD16_BYTE( "prg1u023.new", 0x000001, 0x080000, CRC(4ae9aa64) SHA1(45fdf72141c4c9f24a38d4218c65874799b9c868) )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 
@@ -5175,13 +5175,13 @@ ROM_END
 
 
 ROM_START( bkraidj )
-	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
+	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0u022.bin", 0x000000, 0x080000, CRC(0dd59512) SHA1(c6a4e6aa49c6ac3b04ae62a0a4cc8084ae048381) )
 	ROM_LOAD16_BYTE( "prg1u023.bin", 0x000001, 0x080000, CRC(fecde223) SHA1(eb5ac0eda49b4b0f3d25d8a8bb356e77a453d3a7) )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 

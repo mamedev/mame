@@ -519,10 +519,10 @@ static const ppi8255_interface ppi8255_intf[3] =
 static MACHINE_DRIVER_START( norautp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* guess */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(norautp_map, 0)
 	MDRV_CPU_IO_MAP(norautp_portmap, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -532,7 +532,7 @@ static MACHINE_DRIVER_START( norautp )
 	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -555,7 +555,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gtipoker )
 	MDRV_IMPORT_FROM(norautp)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gtipoker_map, 0)
 	MDRV_CPU_IO_MAP(gtipoker_portmap, 0)
 
@@ -567,7 +567,7 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( norautp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jpoker.bin",	    0x0000,  0x2000,  CRC(e22ed34d) SHA1(108f034335b5bed183ee316a61880f7b9485b34f) )
 
 	ROM_REGION( 0x10000, "gfx", ROMREGION_DISPOSE )
@@ -578,7 +578,7 @@ ROM_END
 /* Nothing else is known about this set / game */
 
 ROM_START( gtipoker )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u12.rom", 0x0000, 0x1000, CRC(abaa257a) SHA1(f830213ae0aaad5a9a44ec77c5a186e9e02fa041) )
 	ROM_LOAD( "u18.rom", 0x1000, 0x1000, CRC(1b7e2877) SHA1(717fb70889804baa468203f20b1e7f73b55cc21e) )
 
@@ -600,7 +600,7 @@ sound probably discrete with ne555 timer chip (located near amp/volume control)
 */
 
 ROM_START( norautpn )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prog.bin",   0x0000, 0x2000, CRC(8b1cfd24) SHA1(d673baed1c1e5b54a34b7a5857b269a725737e92) )
 
 	ROM_REGION( 0x1000,  "gfx", ROMREGION_DISPOSE )

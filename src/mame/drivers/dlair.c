@@ -694,16 +694,16 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( dlair_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK_US/4)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
 	MDRV_CPU_PROGRAM_MAP(dlus_map,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_callback)
+	MDRV_CPU_VBLANK_INT("screen", vblank_callback)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)MASTER_CLOCK_US/8/16/16/16/16)
 
 	MDRV_MACHINE_START(dlair)
 	MDRV_MACHINE_RESET(dlair)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -720,38 +720,38 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dlair_pr7820 )
 	MDRV_IMPORT_FROM(dlair_base)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( dlair_ldv1000 )
 	MDRV_IMPORT_FROM(dlair_base)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( dleuro )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK_EURO/4)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
 	MDRV_CPU_CONFIG(dleuro_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(dleuro_map,0)
 	MDRV_CPU_IO_MAP(dleuro_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_callback)
+	MDRV_CPU_VBLANK_INT("screen", vblank_callback)
 
-	MDRV_Z80CTC_ADD("ctc", MASTER_CLOCK_EURO/4 /* same as "main" */, ctc_intf)
-	MDRV_Z80SIO_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "main" */, sio_intf)
+	MDRV_Z80CTC_ADD("ctc", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, ctc_intf)
+	MDRV_Z80SIO_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, sio_intf)
 
 	MDRV_WATCHDOG_TIME_INIT(HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 
 	MDRV_MACHINE_START(dlair)
 	MDRV_MACHINE_RESET(dlair)
 
-	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(dleuro, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_PAL("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_PAL("screen", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_GFXDECODE(dlair)
 	MDRV_PALETTE_LENGTH(16)
@@ -779,7 +779,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( dlair )		/* revision F2 */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_f2_u1.bin", 0x0000, 0x2000,  CRC(f5ea3b9d) SHA1(c0cafff8b2982125fd3314ffc66681e47f027fc9) )
 	ROM_LOAD( "dl_f2_u2.bin", 0x2000, 0x2000,  CRC(dcc1dff2) SHA1(614ca8f6c5b6fa1d590f6b80d731377faa3a65a9) )
 	ROM_LOAD( "dl_f2_u3.bin", 0x4000, 0x2000,  CRC(ab514e5b) SHA1(29d1015b951f0f2d4e5257497f3bf007c5e2262c) )
@@ -790,7 +790,7 @@ ROM_START( dlair )		/* revision F2 */
 ROM_END
 
 ROM_START( dlaira )		/* revision A */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_a_u1.bin", 0x0000, 0x2000,  CRC(d76e83ec) SHA1(fc7ff5d883de9b38a9e0532c35990f4b319ba1d3) )
 	ROM_LOAD( "dl_a_u2.bin", 0x2000, 0x2000,  CRC(a6a723d8) SHA1(5c71cb0b6be7331083adaf6fac6bdfc8445cb485) )
 	ROM_LOAD( "dl_a_u3.bin", 0x4000, 0x2000,  CRC(52c59014) SHA1(d4015046bf1c1f51c29d9d9f8e8d008519b61cd1) )
@@ -802,7 +802,7 @@ ROM_START( dlaira )		/* revision A */
 ROM_END
 
 ROM_START( dlairb )		/* revision B */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_b_u1.bin", 0x0000, 0x2000,  CRC(d76e83ec) SHA1(fc7ff5d883de9b38a9e0532c35990f4b319ba1d3) )
 	ROM_LOAD( "dl_b_u2.bin", 0x2000, 0x2000,  CRC(6751103d) SHA1(e94e19f738e0eb69700e56c6069c7f3c0911303f) )
 	ROM_LOAD( "dl_b_u3.bin", 0x4000, 0x2000,  CRC(52c59014) SHA1(d4015046bf1c1f51c29d9d9f8e8d008519b61cd1) )
@@ -814,7 +814,7 @@ ROM_START( dlairb )		/* revision B */
 ROM_END
 
 ROM_START( dlairc )		/* revision C */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_c_u1.bin", 0x0000, 0x2000,  CRC(cebfe26a) SHA1(1c808de5c92fef67d8088621fbd743c1a0a3bb5e) )
 	ROM_LOAD( "dl_c_u2.bin", 0x2000, 0x2000,  CRC(6751103d) SHA1(e94e19f738e0eb69700e56c6069c7f3c0911303f) )
 	ROM_LOAD( "dl_c_u3.bin", 0x4000, 0x2000,  CRC(52c59014) SHA1(d4015046bf1c1f51c29d9d9f8e8d008519b61cd1) )
@@ -826,7 +826,7 @@ ROM_START( dlairc )		/* revision C */
 ROM_END
 
 ROM_START( dlaird )		/* revision D */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_d_u1.bin", 0x0000, 0x2000,  CRC(0b5ab120) SHA1(6ec59d6aaa27994d8de4f5635935fd6c1d42d2f6) )
 	ROM_LOAD( "dl_d_u2.bin", 0x2000, 0x2000,  CRC(93ebfffb) SHA1(2a8f6d7ab18845e22a2ba238b44d7c636908a125) )
 	ROM_LOAD( "dl_d_u3.bin", 0x4000, 0x2000,  CRC(22e6591f) SHA1(3176c07af6d942496c9ae338e3b93e28e2ce7982) )
@@ -838,7 +838,7 @@ ROM_START( dlaird )		/* revision D */
 ROM_END
 
 ROM_START( dlaire )		/* revision E */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_e_u1.bin", 0x0000, 0x2000,  CRC(02980426) SHA1(409de05045adbd054bc1fda24d4a9672832e2fae) )
 	ROM_LOAD( "dl_e_u2.bin", 0x2000, 0x2000,  CRC(979d4c97) SHA1(5da6ceab5029ac5f5846bf52841675c5c70b17af) )
 	ROM_LOAD( "dl_e_u3.bin", 0x4000, 0x2000,  CRC(897bf075) SHA1(d2ff9c2fec37544cfe8fb60273524c6610488502) )
@@ -849,7 +849,7 @@ ROM_START( dlaire )		/* revision E */
 ROM_END
 
 ROM_START( dlairf )		/* revision F */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "dl_f_u1.bin", 0x0000, 0x2000,  CRC(06fc6941) SHA1(ea8cf6d370f89d60721ab00ec58ff24027b5252f) )
 	ROM_LOAD( "dl_f_u2.bin", 0x2000, 0x2000,  CRC(dcc1dff2) SHA1(614ca8f6c5b6fa1d590f6b80d731377faa3a65a9) )
 	ROM_LOAD( "dl_f_u3.bin", 0x4000, 0x2000,  CRC(ab514e5b) SHA1(29d1015b951f0f2d4e5257497f3bf007c5e2262c) )
@@ -860,7 +860,7 @@ ROM_START( dlairf )		/* revision F */
 ROM_END
 
 ROM_START( dleuro )		/* European Atari version */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "elu45.bin", 0x0000, 0x2000, CRC(4d3a9eac) SHA1(e6cd274b4a0f92b1fb1f013f80f6fd2db3212431) )
 	ROM_LOAD( "elu46.bin", 0x2000, 0x2000, CRC(8479612b) SHA1(b5543a06928274bde0e1bdda0747d936feaff177) )
 	ROM_LOAD( "elu47.bin", 0x4000, 0x2000, CRC(6a66f6b4) SHA1(2bee981870e61977565439c34568952043656cfa) )
@@ -874,7 +874,7 @@ ROM_START( dleuro )		/* European Atari version */
 ROM_END
 
 ROM_START( dlital )		/* Italian Sidam version */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dlita45.bin", 0x0000, 0x2000, CRC(4d3a9eac) SHA1(e6cd274b4a0f92b1fb1f013f80f6fd2db3212431) )
 	ROM_LOAD( "dlita46.bin", 0x2000, 0x2000, CRC(8479612b) SHA1(b5543a06928274bde0e1bdda0747d936feaff177) )
 	ROM_LOAD( "dlita47.bin", 0x4000, 0x2000, CRC(6a66f6b4) SHA1(2bee981870e61977565439c34568952043656cfa) )
@@ -889,7 +889,7 @@ ROM_END
 
 
 ROM_START( spaceace )		/* revision A3 */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "sa_a3_u1.bin", 0x0000, 0x2000,  CRC(427522d0) SHA1(de4d5353af0be3e60afe1ed13d1d531c425cdb4d) )
 	ROM_LOAD( "sa_a3_u2.bin", 0x2000, 0x2000,  CRC(18d0262d) SHA1(c3920e3cabfe2b2add51881e262f090c5018e508) )
 	ROM_LOAD( "sa_a3_u3.bin", 0x4000, 0x2000,  CRC(4646832d) SHA1(9f1370b13cca9857b0ed13f58641ef4ba3c7326d) )
@@ -901,7 +901,7 @@ ROM_START( spaceace )		/* revision A3 */
 ROM_END
 
 ROM_START( spaceaa2 )		/* revision A2 */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "sa_a2_u1.bin", 0x0000, 0x2000,  CRC(71b39e27) SHA1(15a34eee9d541b186761a78b5c97449c7b496e4f) )
 	ROM_LOAD( "sa_a2_u2.bin", 0x2000, 0x2000,  CRC(18d0262d) SHA1(c3920e3cabfe2b2add51881e262f090c5018e508) )
 	ROM_LOAD( "sa_a2_u3.bin", 0x4000, 0x2000,  CRC(4646832d) SHA1(9f1370b13cca9857b0ed13f58641ef4ba3c7326d) )
@@ -913,7 +913,7 @@ ROM_START( spaceaa2 )		/* revision A2 */
 ROM_END
 
 ROM_START( spaceaa )		/* revision A */
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "sa_a_u1.bin", 0x0000, 0x2000,  CRC(8eb1889e) SHA1(bfa2c5fc139c448b7b6b5c5757d4f2f74e610b85) )
 	ROM_LOAD( "sa_a_u2.bin", 0x2000, 0x2000,  CRC(18d0262d) SHA1(c3920e3cabfe2b2add51881e262f090c5018e508) )
 	ROM_LOAD( "sa_a_u3.bin", 0x4000, 0x2000,  CRC(4646832d) SHA1(9f1370b13cca9857b0ed13f58641ef4ba3c7326d) )
@@ -925,7 +925,7 @@ ROM_START( spaceaa )		/* revision A */
 ROM_END
 
 ROM_START( saeuro )		/* Italian Sidam version */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sa_u45a.bin", 0x0000, 0x2000, CRC(41264d46) SHA1(3e0ecfb3249f857a29fe58a3853a55d31cbd63d6) )
 	ROM_LOAD( "sa_u46a.bin", 0x2000, 0x2000, CRC(bc1c70cf) SHA1(cd6d2456ac2fbbfb86e1f31bd7cbd0cec0d31b45) )
 	ROM_LOAD( "sa_u47a.bin", 0x4000, 0x2000, CRC(ff3f77c7) SHA1(d10ffd14ab9853cef8085c70aedfabea4059657e) )

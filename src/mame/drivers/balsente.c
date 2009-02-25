@@ -1191,11 +1191,11 @@ static const cem3394_interface cem_interface =
 static MACHINE_DRIVER_START( balsente )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 5000000/4)
+	MDRV_CPU_ADD("maincpu", M6809, 5000000/4)
 	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
-	MDRV_CPU_VBLANK_INT("main", balsente_update_analog_inputs)
+	MDRV_CPU_VBLANK_INT("screen", balsente_update_analog_inputs)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(cpu2_io_map,0)
 
@@ -1207,7 +1207,7 @@ static MACHINE_DRIVER_START( balsente )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(BALSENTE_PIXEL_CLOCK, BALSENTE_HTOTAL, BALSENTE_HBEND, BALSENTE_HBSTART, BALSENTE_VTOTAL, BALSENTE_VBEND, BALSENTE_VBSTART)
 	MDRV_PALETTE_LENGTH(1024)
@@ -1269,10 +1269,10 @@ MACHINE_DRIVER_END
 
 
 ROM_START( sentetst )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "sdiagef.bin",  0x2e000, 0x2000, CRC(2a39fc53) SHA1(04ea68bfad455cc928e57390eba5597c38bbab69) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",     0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1283,7 +1283,7 @@ ROM_END
 
 
 ROM_START( cshift )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "cs-ab0.bin", 0x10000, 0x2000, CRC(d2069e75) SHA1(17d5719e6e1976cebb332932cf3e900a88136928) )
 	ROM_LOAD( "cs-ab1.bin", 0x12000, 0x2000, CRC(198f25a8) SHA1(5ca25fe57e94d8362896c903196e0080efd35ef5) )
 	ROM_LOAD( "cs-ab2.bin", 0x14000, 0x2000, CRC(2e2b2b82) SHA1(a540f3ff2a0a10b19aafe1528b7dcaeae9b7393d) )
@@ -1293,7 +1293,7 @@ ROM_START( cshift )
 	ROM_LOAD( "cs-cd.bin",  0x2c000, 0x2000, CRC(f555a0b2) SHA1(49668f8363fdcec4686ec80bf2e99003cd11e2c1) )
 	ROM_LOAD( "cs-ef.bin",  0x2e000, 0x2000, CRC(368b1ce3) SHA1(8003ef99adcb26feb42e1b0945b1185e438582b2) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",   0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1308,7 +1308,7 @@ ROM_END
 
 
 ROM_START( gghost )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ggh-ab0.bin", 0x10000, 0x2000, CRC(ed0fdeac) SHA1(294cee47c0541c58d4d766388c281ed30b8f5426) )
 	ROM_LOAD( "ggh-ab1.bin", 0x12000, 0x2000, CRC(5bfbae58) SHA1(65c795354223cd5e2474ad9e779b77f58ed5b896) )
 	ROM_LOAD( "ggh-ab2.bin", 0x14000, 0x2000, CRC(f0baf921) SHA1(4b7ee06838dcdb68ddec51f5eafab53ff3f25bfe) )
@@ -1318,7 +1318,7 @@ ROM_START( gghost )
 	ROM_LOAD( "ggh-cd.bin",  0x2c000, 0x2000, CRC(d3d75f84) SHA1(f19f99ea05ad5b7e4b0485e80d7b6a329b8ef4d8) )
 	ROM_LOAD( "ggh-ef.bin",  0x2e000, 0x2000, CRC(a02b4243) SHA1(f242fc017c9ae1997409825c34e8f5c6e6a0615e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1338,14 +1338,14 @@ ROM_END
 */
 
 ROM_START( hattrick )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "rom-ab0.u9a", 0x10000, 0x2000, CRC(f25c1b99) SHA1(43b2334be7cfb8091eea963e10547295362372d3) )
 	ROM_LOAD( "rom-ab1.u8a", 0x12000, 0x2000, CRC(c1df3d1f) SHA1(754f537d12efe8891638fd11a2ee8a5b234fb079) )
 	ROM_LOAD( "rom-ab2.u7a", 0x14000, 0x2000, CRC(f6c41257) SHA1(05f5e71d08241c559da3bfc286c76cbb22710586) )
 	ROM_LOAD( "rom-cd.u3a",  0x2c000, 0x2000, CRC(fc44f36c) SHA1(227d0c93c579d743b615b1fa6da56128e8202e51) )
 	ROM_LOAD( "rom-ef.u2a",  0x2e000, 0x2000, CRC(d8f910fb) SHA1(b74a305dd848c7bf574e4b0aa32147b8d5c89e9e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1357,7 +1357,7 @@ ROM_END
 
 
 ROM_START( otwalls )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "otw-ab0.bin", 0x10000, 0x2000, CRC(474441c7) SHA1(16fb5be9f94e072d4f3003abcc9dcf6d7af2359a) )
 	ROM_LOAD( "otw-ab1.bin", 0x12000, 0x2000, CRC(2e9e9411) SHA1(7dfd8dafa34e4d22fa0c5e472e3e98a1c0969f43) )
 	ROM_LOAD( "otw-ab2.bin", 0x14000, 0x2000, CRC(ba092128) SHA1(a38305c3ea9c8bf3596c18829655049f9468166e) )
@@ -1367,7 +1367,7 @@ ROM_START( otwalls )
 	ROM_LOAD( "otw-cd.bin",  0x2c000, 0x2000, CRC(8e2d15ab) SHA1(8043fdf637de7752e8d42554ebad2e155a6f5939) )
 	ROM_LOAD( "otw-ef.bin",  0x2e000, 0x2000, CRC(57eab299) SHA1(475d800c03d6b2786bd23861d61dc113b837a585) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1383,7 +1383,7 @@ ROM_END
 
 
 ROM_START( snakepit )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "spit-ab0.bin", 0x10000, 0x2000, CRC(5aa86081) SHA1(e65e256661b13a0631398e115dd02fce281bafa4) )
 	ROM_LOAD( "spit-ab1.bin", 0x12000, 0x2000, CRC(588228b8) SHA1(b64032a4fd1f52179d38e2073380bba6ec321302) )
 	ROM_LOAD( "spit-ab2.bin", 0x14000, 0x2000, CRC(60173ab6) SHA1(45b27492023771a53ea5857592a2a113746a72b6) )
@@ -1393,7 +1393,7 @@ ROM_START( snakepit )
 	ROM_LOAD( "spit-cd.bin",  0x2c000, 0x2000, CRC(54095cbb) SHA1(a43b78b2876359a29ecb2f169c876a0026375ea2) )
 	ROM_LOAD( "spit-ef.bin",  0x2e000, 0x2000, CRC(5f836a66) SHA1(cc3c11003f9e49cac10c0296ab6d156e5677d0f8) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",     0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1409,7 +1409,7 @@ ROM_END
 
 
 ROM_START( snakjack )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "rom-ab0.u9a", 0x10000, 0x2000, CRC(da2dd119) SHA1(85ae452b137e69e051fa66648f295d180339794e) )
 	ROM_LOAD( "rom-ab1.u8a", 0x12000, 0x2000, CRC(657ddf26) SHA1(48591a6b0c30d576f0e08dd54c95cbda76b5dfbd) )
 	ROM_LOAD( "rom-ab2.u7a", 0x14000, 0x2000, CRC(15333dcf) SHA1(13546bd058a10513fe4cbe3a3fa268b7c38b5993) )
@@ -1419,7 +1419,7 @@ ROM_START( snakjack )
 	ROM_LOAD( "rom-cd.u3a",  0x2c000, 0x2000, CRC(7b44ca4c) SHA1(8697055da489fcf0244dc94fe5393418a8003bf7) )
 	ROM_LOAD( "rom-ef.u1a",  0x2e000, 0x2000, CRC(f5309b38) SHA1(864f759dc6822b548742140b7ea2ea2aba43beba) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1435,7 +1435,7 @@ ROM_END
 
 
 ROM_START( stocker )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "stkr-ab0.bin", 0x10000, 0x2000, CRC(784a00ad) SHA1(33e76be44207bc24dbb9c2f04204df22ba5154ff) )
 	ROM_LOAD( "stkr-ab1.bin", 0x12000, 0x2000, CRC(cdae01dc) SHA1(7c2956acae639fd2f2cf061d1c32ae9edabe9270) )
 	ROM_LOAD( "stkr-ab2.bin", 0x14000, 0x2000, CRC(18527d57) SHA1(cbb85f9e0b6169f4c2e03dc54b4937043535fc42) )
@@ -1443,7 +1443,7 @@ ROM_START( stocker )
 	ROM_LOAD( "stkr-cd.bin",  0x2c000, 0x2000, CRC(53dbc4e5) SHA1(e389978b5472174681fa180c6a2edf49903a6514) )
 	ROM_LOAD( "stkr-ef.bin",  0x2e000, 0x2000, CRC(cdcf46bc) SHA1(8b1e801dab1efed002d484135264998d255dc041) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1460,7 +1460,7 @@ ROM_END
 
 
 ROM_START( triviag1 )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "tpg1-ab0.bin", 0x10000, 0x2000, CRC(79fd3ac3) SHA1(52db0ba445f9a953f6ceb43c3d173b73c71af192) )
 	ROM_LOAD( "tpg1-ab1.bin", 0x12000, 0x2000, CRC(0ff677e9) SHA1(14fdc1ee87893ea91eea40949aeac5381c569bdd) )
 	ROM_LOAD( "tpg1-ab2.bin", 0x14000, 0x2000, CRC(3b4d03e7) SHA1(b5bb541daf59b2a62b17a10afa37bfae50563393) )
@@ -1470,7 +1470,7 @@ ROM_START( triviag1 )
 	ROM_LOAD( "tpg1-cd.bin",  0x2c000, 0x2000, CRC(35c9b9c2) SHA1(aac57022098656dac99bf9ceeaa2bf9a3d139986) )
 	ROM_LOAD( "tpg1-ef.bin",  0x2e000, 0x2000, CRC(64878342) SHA1(dd93d64b3fe351a9d2bd4c473ecefde58f0b0041) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1485,7 +1485,7 @@ ROM_START( triviag1 )
 ROM_END
 
 ROM_START( trivia12 )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab0.u9a", 0x10000, 0x2000, CRC(41ca9a81) SHA1(127beee924d4213de874f7def9875fd3a26c6b5f) )
 	ROM_LOAD( "ab1.u8a", 0x12000, 0x2000, CRC(b3b48a3d) SHA1(e9554887430014116ff8e5e3d0ef5678d13f224c) )
 	ROM_LOAD( "ab2.u7a", 0x14000, 0x2000, CRC(ab652ce9) SHA1(06f47c274b94f046a59a1dc432c55ee8f450a246) )
@@ -1495,7 +1495,7 @@ ROM_START( trivia12 )
 	ROM_LOAD( "cd.u3a",  0x2c000, 0x2000, CRC(12d870ba) SHA1(b86a8cbf8037df78437056f5ff57e7b8b5e4c94e) )
 	ROM_LOAD( "ef.u2a",  0x2e000, 0x2000, CRC(d902ee28) SHA1(18e3c96e1ac50f847d1b9f4f868f19e074d147ff) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1511,7 +1511,7 @@ ROM_END
 
 
 ROM_START( triviag2 )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.bin",  0x10000, 0x4000, CRC(4fca20c5) SHA1(595b32ff035036cafbf49d75aa170f39e9f52b38) )
 	ROM_LOAD( "ab23.bin",  0x14000, 0x4000, CRC(6cf2ddeb) SHA1(0d6667babd9ab70820cf165900d90003f0893be7) )
 	ROM_LOAD( "ab45.bin",  0x18000, 0x4000, CRC(a7ff789c) SHA1(a3421ae46dadd6f514cfc514ff07dfcca2cb1478) )
@@ -1519,7 +1519,7 @@ ROM_START( triviag2 )
 	ROM_LOAD( "cd45.bin",  0x28000, 0x4000, CRC(fc9c752a) SHA1(239507fb5d75e86aca295978aab1dd4514d8d761) )
 	ROM_LOAD( "cd6ef.bin", 0x2c000, 0x4000, CRC(23b56fb8) SHA1(9ac726de69e4b374886a3542829745f7477d7556) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1532,7 +1532,7 @@ ROM_END
 
 
 ROM_START( triviasp )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "allsport.8a", 0x10000, 0x4000, CRC(54b7ff31) SHA1(1bdf9c9eb1a0fb4c1013680372d289882abf4b47) )
 	ROM_LOAD( "allsport.7a", 0x14000, 0x4000, CRC(59fae9d2) SHA1(a555f0679c59bf7c9dad0ecb9656a2f8faf39902) )
 	ROM_LOAD( "allsport.6a", 0x18000, 0x4000, CRC(237b6b95) SHA1(9d2937c1ecea9d92775f380d40f465f68c44fe06) )
@@ -1540,7 +1540,7 @@ ROM_START( triviasp )
 	ROM_LOAD( "allsport.3a", 0x28000, 0x4000, CRC(e45d09d6) SHA1(8bde18d25f8bd1056e42672d428473be23eab260) )
 	ROM_LOAD( "allsport.1a", 0x2c000, 0x4000, CRC(8bb3e831) SHA1(ecc8fb0f2143e3ea03bb52773cc0a81d4dcc742d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",     0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1553,7 +1553,7 @@ ROM_END
 
 
 ROM_START( triviayp )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.bin",  0x10000, 0x4000, CRC(97d35a85) SHA1(3ee8400fc3a2bf8a2f6374ffc34a4d295ee13bab) )
 	ROM_LOAD( "ab23.bin",  0x14000, 0x4000, CRC(2ff67c70) SHA1(c45b5fde4ec979322c9e251e66183632552d35bd) )
 	ROM_LOAD( "ab45.bin",  0x18000, 0x4000, CRC(511a0fab) SHA1(a2fefe2b86028c7e8c15d6a737509b7dc30430cd) )
@@ -1561,7 +1561,7 @@ ROM_START( triviayp )
 	ROM_LOAD( "cd45.bin",  0x28000, 0x4000, CRC(ac45809e) SHA1(1151c4e55f21a7e2eb8e163ac782b4449af84cdc) )
 	ROM_LOAD( "cd6ef.bin", 0x2c000, 0x4000, CRC(a008059f) SHA1(45e4cfc259e801a189ec19fdc58135dbbbe130ea) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1574,7 +1574,7 @@ ROM_END
 
 
 ROM_START( triviabb )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.bin",  0x10000, 0x4000, CRC(1b7c439d) SHA1(8b3020dcb375b2f2e5e975a8067df6504aa8691e) )
 	ROM_LOAD( "ab23.bin",  0x14000, 0x4000, CRC(e4f1e704) SHA1(e5135134b54e1e2e95c5bfe6e5f0e2dd280db69d) )
 	ROM_LOAD( "ab45.bin",  0x18000, 0x4000, CRC(daa2d8bc) SHA1(feae215877ba42ab33182dfd74083f1d48443d8c) )
@@ -1582,7 +1582,7 @@ ROM_START( triviabb )
 	ROM_LOAD( "cd45.bin",  0x28000, 0x4000, CRC(07fd88ff) SHA1(c3168ecf6562e09790c4f18cdd91c7a347223323) )
 	ROM_LOAD( "cd6ef.bin", 0x2c000, 0x4000, CRC(2d03f241) SHA1(986ca6ea20c306e83ae88acc2d6837c7ed5fe351) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1597,7 +1597,7 @@ ROM_START( triviabb )
 ROM_END
 
 ROM_START( triviaes )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "tp_a2.bin",  0x10000, 0x04000, CRC(b4d69463) SHA1(8d6b2024600ab0a5d76d2b8ec53cf4c6c6618901) )
 	ROM_LOAD( "tp_a7.bin",  0x14000, 0x04000, CRC(d78bd4b6) SHA1(0542fc4ef2501c7649b9fd257340c4392a19d7ad) )
 	ROM_LOAD( "tp_a4.bin",  0x18000, 0x04000, CRC(0de9e14d) SHA1(3d5fdf8531cb10a41e3f604165fce682e7e019d5) )
@@ -1607,7 +1607,7 @@ ROM_START( triviaes )
 	ROM_LOAD( "tp_a6.bin",  0x28000, 0x04000, CRC(421c1a29) SHA1(3e0de8734a39fb887aff40e89cb0936d4cacf9a5) )
 	ROM_LOAD( "tp_a3.bin",  0x2c000, 0x04000, CRC(c6254f46) SHA1(47f3d05d0c31983ed1576f91fa193fe58e80bb60) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "tpsonido.bin",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1620,13 +1620,13 @@ ROM_END
 
 
 ROM_START( gimeabrk )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(18cc53db) SHA1(3bb47c349b3ab7b81e3557e3b4877617fb549c9e) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(6bd4190a) SHA1(b6562b3575dc8265c01719cfbcb554b69bc1b37f) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(5dca4f33) SHA1(aa45d5a960491c85f332f22cffe61999fe3db826) )
 	ROM_LOAD( "cd6ef.uia", 0x2c000, 0x4000, CRC(5e2b3510) SHA1(e3501b9bd73bc724aee0436700625bd2af94f72d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1641,14 +1641,14 @@ ROM_END
 
 
 ROM_START( minigolf )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(348f827f) SHA1(a013ef3068e14e0738bcfa4de26c0c2df4c0a7f6) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(19a6ff47) SHA1(70b6da3b4186e5b9463f2ea0fefefad21ec80637) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(925d76eb) SHA1(29d2d7b26d2e81817c4d135935dab70a5aa2d146) )
 	ROM_LOAD( "ab67.u5a",  0x1c000, 0x4000, CRC(6a311c9a) SHA1(b0409e5f4bd3bf898b8701561aac6dbbc28417bd) )
 	ROM_LOAD( "1a-ver2",   0x20000, 0x10000, CRC(60b6cd58) SHA1(f79bf2d1f6c4e63f666073c5ecb22604c1ab57d8) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1664,7 +1664,7 @@ ROM_END
 
 
 ROM_START( minigol2 )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(348f827f) SHA1(a013ef3068e14e0738bcfa4de26c0c2df4c0a7f6) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(19a6ff47) SHA1(70b6da3b4186e5b9463f2ea0fefefad21ec80637) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(925d76eb) SHA1(29d2d7b26d2e81817c4d135935dab70a5aa2d146) )
@@ -1672,7 +1672,7 @@ ROM_START( minigol2 )
 	ROM_LOAD( "cd23.u3a",  0x24000, 0x4000, CRC(52279801) SHA1(d8de92c296d5c91db3bea7a0093260158961036e) )
 	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(34c64f4c) SHA1(ce55f5f6ebddcacf20cb78fb738b5f569b531b61) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1688,7 +1688,7 @@ ROM_END
 
 
 ROM_START( toggle )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "tgle-ab0.bin", 0x10000, 0x2000, CRC(8c7b7fad) SHA1(13eaf5b3727ff8b7ce2cfbab99541ca1e538aeba) )
 	ROM_LOAD( "tgle-ab1.bin", 0x12000, 0x2000, CRC(771e5434) SHA1(b1bcefc81054c81a22a91106c5bc99ef204cd009) )
 	ROM_LOAD( "tgle-ab2.bin", 0x14000, 0x2000, CRC(9b4baa3f) SHA1(5b0776d983ad40a0051939810bb854f014fea28b) )
@@ -1698,7 +1698,7 @@ ROM_START( toggle )
 	ROM_LOAD( "tgle-cd.bin",  0x2c000, 0x2000, CRC(0a2bb949) SHA1(350dc782fc21640794c6ecb502554cb693adbb7d) )
 	ROM_LOAD( "tgle-ef.bin",  0x2e000, 0x2000, CRC(3ec10804) SHA1(ae719081e8114ccc23c6b24c7fe904a11fbdd992) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1710,7 +1710,7 @@ ROM_END
 
 
 ROM_START( nametune )
-	ROM_REGION( 0x70000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x70000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "nttab01.bin",  0x10000, 0x4000, CRC(f99054f1) SHA1(aaa3aae71f67be2df34b9682b1b4092a208fbf26) )
 	ROM_CONTINUE(             0x40000, 0x4000 )
 	ROM_LOAD( "nttab23.bin",  0x14000, 0x4000, CRC(f2b8f7fa) SHA1(b9f81a29b031af31118b77e77fc29e59f2059109) )
@@ -1728,7 +1728,7 @@ ROM_START( nametune )
 	ROM_LOAD( "nttcd6ef.bin", 0x2c000, 0x4000, CRC(0459e6f8) SHA1(7dbdbfa8f2e9e3956af926f5f782b8d3c3334099) )
 	ROM_CONTINUE(             0x5c000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1746,7 +1746,7 @@ ROM_END
 */
 
 ROM_START( nstocker )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(a635f973) SHA1(edb12469818a3114fb97d21e11c63eb37678a07b) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(223acbb2) SHA1(195ebd349722cce323616c81cc4e86f0a9c6fa13) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(27a728b5) SHA1(c72634112a04d58a695fb43bf30f44e3f7ba7de2) )
@@ -1756,7 +1756,7 @@ ROM_START( nstocker )
 	ROM_LOAD( "cd45.u2a",  0x28000, 0x4000, CRC(9bb292fe) SHA1(6fc7abcc110c2cf7399d11a478cfdadb3439b6ab) )
 	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(e77c1aea) SHA1(9e2e595530cb15c634a6052c773ff5d998c0c828) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1778,7 +1778,7 @@ ROM_START( nstocker )
 ROM_END
 
 ROM_START( nstockr2 )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(a635f973) SHA1(edb12469818a3114fb97d21e11c63eb37678a07b) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(223acbb2) SHA1(195ebd349722cce323616c81cc4e86f0a9c6fa13) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(27a728b5) SHA1(c72634112a04d58a695fb43bf30f44e3f7ba7de2) )
@@ -1788,7 +1788,7 @@ ROM_START( nstockr2 )
 	ROM_LOAD( "cd45.u2a",  0x28000, 0x4000, CRC(9bb292fe) SHA1(6fc7abcc110c2cf7399d11a478cfdadb3439b6ab) )
 	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(c77d2302) SHA1(2b0956a7d6bdff5e4f77084149a9528fb07154dc) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1811,13 +1811,13 @@ ROM_END
 
 
 ROM_START( sfootbal )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "sfbab01.bin",  0x10000, 0x4000, CRC(2a69803f) SHA1(ca86c9d079fbebae4c93c889d98a8573facc05da) )
 	ROM_LOAD( "sfbab23.bin",  0x14000, 0x4000, CRC(89f157c2) SHA1(59701b7770dce7ec01d0feb01d67450943e6cfbb) )
 	ROM_LOAD( "sfbab45.bin",  0x18000, 0x4000, CRC(91ad42c5) SHA1(0b6fc3ed3a633c825809668d49f209c130f3e978) )
 	ROM_LOAD( "sfbcd6ef.bin", 0x2c000, 0x4000, CRC(bf80bb1a) SHA1(2b70b36d946c36e3f354c7edfd3e34784ffce406) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1834,12 +1834,12 @@ ROM_END
 
 
 ROM_START( spiker )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(2d53d023) SHA1(01c1d2cd7d8be60c40527e9c1571b84388a39bd8) )
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(3be87edf) SHA1(0d4f1ff501d5d865abc3906f6b232ec04586d3dc) )
 	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(f2c73ece) SHA1(4fc108823102fd17c5b7d9be1a0c76667788ba1a) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1852,7 +1852,7 @@ ROM_END
 
 
 ROM_START( stompin )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab01.bin",  0x10000, 0x4000, CRC(46f428c6) SHA1(06c59d06ccc0bd7067e419f12781050ab4ac98c2) )
 	ROM_LOAD( "ab23.bin",  0x14000, 0x4000, CRC(0e13132f) SHA1(d572e5d170df99bb99db7d41ede881c24e5b8d1c) )
 	ROM_LOAD( "ab45.bin",  0x18000, 0x4000, CRC(6ed26069) SHA1(35f6b8cff54c35a1a0eeb9c23e446ade69d13375) )
@@ -1860,7 +1860,7 @@ ROM_START( stompin )
 	ROM_LOAD( "cd23.bin",  0x24000, 0x4000, CRC(52b29048) SHA1(e0873137201ad9b2e87a17dd68046e88dbeeb5e1) )
 	ROM_LOAD( "cd6ef.bin", 0x2c000, 0x4000, CRC(b880961a) SHA1(11700af516517b7176a840fd5a8fd5ed0fb9bd6e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1874,13 +1874,13 @@ ROM_END
 
 
 ROM_START( rescraid )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab1.a10",   0x10000, 0x8000, CRC(33a76b47) SHA1(72cefb3ae7d0ecfc099f9d09a26533dd7ca7c4f2) )
 	ROM_LOAD( "ab12.a12",  0x18000, 0x8000, CRC(7c7a9f12) SHA1(2dbe1158d124ecd24aeb6e46079a8e08fda61208) )
 	ROM_LOAD( "cd8.a16",   0x20000, 0x8000, CRC(90917a43) SHA1(3abd68d0c147ed792ace41f701c04bc225efede4) )
 	ROM_LOAD( "cd12.a18",  0x28000, 0x8000, CRC(0450e9d7) SHA1(b5d0a79d1bac3596d241f80ac4e3e13c98d28709) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1892,13 +1892,13 @@ ROM_END
 
 
 ROM_START( rescrdsa )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "ab1-sa.a10",   0x10000, 0x8000, CRC(aa0a9f48) SHA1(b871573df0abdba20de78f655da846423191f0b4) )
 	ROM_LOAD( "ab12-sa.a12",  0x18000, 0x8000, CRC(16d4da86) SHA1(240cfe8c5c4c005da9b9f370a04ed32fc245ec64) )
 	ROM_LOAD( "cd8-sa.a16",   0x20000, 0x8000, CRC(9dfb50c2) SHA1(24280b48106cbcedeb6d7b10f951db906a123819) )
 	ROM_LOAD( "cd12-sa.a18",  0x28000, 0x8000, CRC(18c62613) SHA1(a55b4b948805bdd5d1e8c8ff803826a7bbfa383e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",  0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1908,13 +1908,13 @@ ROM_END
 
 
 ROM_START( grudge )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "grudge.ab0", 0x10000, 0x8000, CRC(260965ca) SHA1(79eb5dc6605974ece3d5564f10c4598204907398) )
 	ROM_LOAD( "grudge.ab4", 0x18000, 0x8000, CRC(c6cd734d) SHA1(076546569e9c8ff40f96bd2cac014bcabc53099d) )
 	ROM_LOAD( "grudge.cd0", 0x20000, 0x8000, CRC(e51db1f2) SHA1(57fc0f1df358dd6ea982dcbe9c3f79b3f072be53) )
 	ROM_LOAD( "grudge.cd4", 0x28000, 0x8000, CRC(6b60e47e) SHA1(5a399942d4ef9b7349fffd07c07092b667cf6247) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",   0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )		/* up to 64k of sprites */
@@ -1925,7 +1925,7 @@ ROM_END
 
 
 ROM_START( shrike )
-	ROM_REGION( 0x40000, "main", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
 	ROM_LOAD( "savgu35.bin", 0x10000, 0x2000, CRC(dd2230a0) SHA1(72be0e07d76ee1f170ab457ae62db87111758697) )
 	ROM_LOAD( "savgu20.bin", 0x12000, 0x2000, CRC(3d140edc) SHA1(6c7e7dda7718e3f9644aad317da0b2277c2c1402) )
 	ROM_LOAD( "savgu34.bin", 0x14000, 0x2000, CRC(779eca9d) SHA1(6783a62885ed129f436471a1c4a93ad898eb7965) )
@@ -1937,7 +1937,7 @@ ROM_START( shrike )
 	ROM_LOAD( "savgu21.bin", 0x2c000, 0x2000, CRC(c22b93e1) SHA1(15d3925abb3e7e928925f5781f228d1bc0dfe31c) )
 	ROM_LOAD( "savgu36.bin", 0x2e000, 0x2000, CRC(28431c4a) SHA1(522df8224c559f51c36d2bc01c189b019fabc5eb) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* 64k for Z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* 64k for Z80 */
 	ROM_LOAD( "sentesnd",    0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
 
 	ROM_REGION( 0x4000, "68k", 0 )		/* 16k for M68000 */
@@ -1983,8 +1983,8 @@ static void expand_roms(running_machine *machine, UINT8 cd_rom_mask)
 
 	UINT8 *temp = malloc_or_die(0x20000);
 	{
-		UINT8 *rom = memory_region(machine, "main");
-		UINT32 len = memory_region_length(machine, "main");
+		UINT8 *rom = memory_region(machine, "maincpu");
+		UINT32 len = memory_region_length(machine, "maincpu");
 		UINT32 base;
 
 		for (base = 0x10000; base < len; base += 0x30000)
@@ -2051,7 +2051,7 @@ static DRIVER_INIT( stocker )  { expand_roms(machine, EXPAND_ALL);  balsente_sho
 static DRIVER_INIT( triviag1 ) { expand_roms(machine, EXPAND_ALL);  balsente_shooter = 0; /* noanalog */ }
 static DRIVER_INIT( triviag2 )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	memcpy(&rom[0x20000], &rom[0x28000], 0x4000);
 	memcpy(&rom[0x24000], &rom[0x28000], 0x4000);
 	expand_roms(machine, EXPAND_NONE); balsente_shooter = 0; /* noanalog */

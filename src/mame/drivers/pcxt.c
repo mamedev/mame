@@ -613,7 +613,7 @@ static WRITE8_HANDLER(dma_page_select_w)
 
 static const struct dma8237_interface dma8237_1_config =
 {
-	"main",
+	"maincpu",
 	1.0e-6, // 1us
 
 	pc_dma_read_byte,
@@ -905,7 +905,7 @@ static MACHINE_RESET( filetto )
 }
 
 static MACHINE_DRIVER_START( filetto )
-	MDRV_CPU_ADD("main", I8088, 8000000) //or regular PC-XT 14318180/3 clock?
+	MDRV_CPU_ADD("maincpu", I8088, 8000000) //or regular PC-XT 14318180/3 clock?
 	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
 	MDRV_CPU_IO_MAP(filetto_io,0)
 
@@ -924,7 +924,7 @@ static MACHINE_DRIVER_START( filetto )
 
 	MDRV_GFXDECODE(filetto)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -950,7 +950,7 @@ static MACHINE_DRIVER_START( filetto )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tetriskr )
-	MDRV_CPU_ADD("main", I8088, 14318180/3)
+	MDRV_CPU_ADD("maincpu", I8088, 14318180/3)
 	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
 	MDRV_CPU_IO_MAP(tetriskr_io,0)
 
@@ -969,7 +969,7 @@ static MACHINE_DRIVER_START( tetriskr )
 
 	MDRV_GFXDECODE(tetriskr)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -992,7 +992,7 @@ static MACHINE_DRIVER_START( tetriskr )
 MACHINE_DRIVER_END
 
 ROM_START( filetto )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD("u49.bin", 0xfc000, 0x2000, CRC(1be6948a) SHA1(9c433f63d347c211ee4663f133e8417221bc4bf0))
 	ROM_RELOAD(         0xf8000, 0x2000 )
 	ROM_RELOAD(         0xf4000, 0x2000 )
@@ -1017,7 +1017,7 @@ ROM_START( filetto )
 ROM_END
 
 ROM_START( tetriskr )
-	ROM_REGION( 0x100000, "main", 0 ) /* code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* code */
 	ROM_LOAD( "b-10.u10", 0xf0000, 0x10000, CRC(efc2a0f6) SHA1(5f0f1e90237bee9b78184035a32055b059a91eb3) )
 
 	ROM_REGION( 0x10000, "gfx1",0 ) /* gfx - 1bpp font*/

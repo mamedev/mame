@@ -285,17 +285,17 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( gunsmoke )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, 4000000)	// 4 MHz
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(gunsmoke_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 3000000)	// 3 MHz
+	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -328,12 +328,12 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( gunsmoke )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "09n_gs03.bin", 0x00000, 0x8000, CRC(40a06cef) SHA1(3e2a52d476298b7252f0adaefdb42090351e921c) ) /* Code 0000-7fff */
 	ROM_LOAD( "10n_gs04.bin", 0x10000, 0x8000, CRC(8d4b423f) SHA1(149274c2ed1526ca1f419fdf8a24059ff138f7f2) ) /* Paged code */
 	ROM_LOAD( "12n_gs05.bin", 0x18000, 0x8000, CRC(2b5667fb) SHA1(5b689bca1e76d803b4cae22feaa7744fa528e93f) ) /* Paged code */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14h_gs02.bin", 0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -376,12 +376,12 @@ ROM_START( gunsmoke )
 ROM_END
 
 ROM_START( gunsmokj )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gs03_9n.rom",  0x00000, 0x8000, CRC(b56b5df6) SHA1(0295a3ef491b6b8ee9c198fd08dddc29d88bbef6) ) /* Code 0000-7fff */
 	ROM_LOAD( "10n_gs04.bin", 0x10000, 0x8000, CRC(8d4b423f) SHA1(149274c2ed1526ca1f419fdf8a24059ff138f7f2) ) /* Paged code */
 	ROM_LOAD( "12n_gs05.bin", 0x18000, 0x8000, CRC(2b5667fb) SHA1(5b689bca1e76d803b4cae22feaa7744fa528e93f) ) /* Paged code */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14h_gs02.bin", 0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -424,12 +424,12 @@ ROM_START( gunsmokj )
 ROM_END
 
 ROM_START( gunsmoku )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "9n_gs03.bin",  0x00000, 0x8000, CRC(592f211b) SHA1(8de44b3cafa3d2ce9aba515cf3ec4bac0bcdeb5b) ) /* Code 0000-7fff */
 	ROM_LOAD( "10n_gs04.bin", 0x10000, 0x8000, CRC(8d4b423f) SHA1(149274c2ed1526ca1f419fdf8a24059ff138f7f2) ) /* Paged code */
 	ROM_LOAD( "12n_gs05.bin", 0x18000, 0x8000, CRC(2b5667fb) SHA1(5b689bca1e76d803b4cae22feaa7744fa528e93f) ) /* Paged code */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14h_gs02.bin", 0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -472,12 +472,12 @@ ROM_START( gunsmoku )
 ROM_END
 
 ROM_START( gunsmoka )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "gs03.9n",      0x00000, 0x8000, CRC(51dc3f76) SHA1(2a188fee73c3662b665b56a825eb908b7b42dcd0) ) /* Code 0000-7fff */
 	ROM_LOAD( "gs04.10n",     0x10000, 0x8000, CRC(5ecf31b8) SHA1(34ec9727330821a45b497c78c970a1a4f14ff4ee) ) /* Paged code */
 	ROM_LOAD( "gs05.12n",     0x18000, 0x8000, CRC(1c9aca13) SHA1(eb92c373d2241aea4c59248e1b82717733105ac0) ) /* Paged code */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14h_gs02.bin", 0x00000, 0x8000, CRC(cd7a2c38) SHA1(c76c471f694b76015370f0eacf5350e652f526ff) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )

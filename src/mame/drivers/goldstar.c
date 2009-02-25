@@ -4284,13 +4284,13 @@ static const ay8910_interface ladylinr_ay8910_config =
 static MACHINE_DRIVER_START( goldstar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(goldstar_map,0)
 	MDRV_CPU_IO_MAP(goldstar_readport,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4320,13 +4320,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( goldstbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(goldstar_map,0)
 	MDRV_CPU_IO_MAP(goldstar_readport,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4355,13 +4355,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( moonlght )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(goldstar_map,0)
 	MDRV_CPU_IO_MAP(goldstar_readport,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4451,10 +4451,10 @@ static PALETTE_INIT(lucky8)
 static MACHINE_DRIVER_START( chrygld )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(ncb3_map,0)
 	MDRV_CPU_IO_MAP(ncb3_readwriteport,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", ncb3_ppi8255_intf[0] )
@@ -4462,7 +4462,7 @@ static MACHINE_DRIVER_START( chrygld )
 	MDRV_PPI8255_ADD( "ppi8255_2", ncb3_ppi8255_intf[2] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4493,10 +4493,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ncb3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(ncb3_map,0)
 	MDRV_CPU_IO_MAP(ncb3_readwriteport,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", ncb3_ppi8255_intf[0] )
@@ -4504,7 +4504,7 @@ static MACHINE_DRIVER_START( ncb3 )
 	MDRV_PPI8255_ADD( "ppi8255_2", ncb3_ppi8255_intf[2] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4535,17 +4535,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cm_map,0)
 	MDRV_CPU_IO_MAP(cm_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4570,17 +4570,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cmnobmp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cm_map,0)
 	MDRV_CPU_IO_MAP(cm_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4605,17 +4605,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cmast91 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cm_map,0)
 	MDRV_CPU_IO_MAP(cmast91_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4640,10 +4640,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lucky8 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(lucky8_map,0)
 	//MDRV_CPU_IO_MAP(goldstar_readport,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", lucky8_ppi8255_intf[0] )
@@ -4651,7 +4651,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_PPI8255_ADD( "ppi8255_2", lucky8_ppi8255_intf[2] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4682,10 +4682,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kkojnoli )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(kkojnoli_map,0)
 	//MDRV_CPU_IO_MAP(goldstar_readport,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", kkojnoli_ppi8255_intf[0] )
@@ -4693,7 +4693,7 @@ static MACHINE_DRIVER_START( kkojnoli )
 	MDRV_PPI8255_ADD( "ppi8255_2", kkojnoli_ppi8255_intf[2] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4719,17 +4719,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ladylinr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(ladylinr_map,0)
 	//MDRV_CPU_IO_MAP(goldstar_readport,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* 2x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", ladylinr_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", ladylinr_ppi8255_intf[1] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4760,17 +4760,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( amcoe1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cm_map, 0)
 	MDRV_CPU_IO_MAP(amcoe1_portmap, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4801,17 +4801,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( amcoe1a )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cm_map, 0)
 	MDRV_CPU_IO_MAP(amcoe1_portmap, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4842,17 +4842,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( amcoe2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cm_map, 0)
 	MDRV_CPU_IO_MAP(amcoe2_portmap, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* 2x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", cm_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", cm_ppi8255_intf[1] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4882,7 +4882,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( goldstar )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gs4-cpu.bin",  0x0000, 0x10000, CRC(73e47d4d) SHA1(df2d8233572dc12e8a4b56e5d4f6c566e4ababc9) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -4897,7 +4897,7 @@ ROM_END
 
 
 ROM_START( goldstbl )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "gsb-cpu.bin",  0x0000, 0x10000, CRC(82b238c3) SHA1(1306e700e213f423bdd79b182aa11335796f7f38) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -4987,7 +4987,7 @@ Note
 */
 
 ROM_START( chry10 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ver.1h2.u20",  0x0000, 0x10000, CRC(85bbde06) SHA1(f44d335feb4697b195e9fc7e5aeaabf099e21ed8) )
 
 	ROM_REGION( 0x10000, "pic", 0 )
@@ -5014,7 +5014,7 @@ ROM_END
 
 
 ROM_START( chrygld )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ol-v9.u20",  0x00000, 0x10000, CRC(b61c0695) SHA1(63c44b20fd7f76bdb33331273d2610e8cfd31add) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -5037,7 +5037,7 @@ ROM_END
 
 
 ROM_START( moonlght )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "4.bin",  	  0x0000, 0x20000, CRC(ecb06cfb) SHA1(e32613cac5583a0fecf04fca98796b91698e530c) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -5053,7 +5053,7 @@ ROM_END
 
 
 ROM_START( ncb3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8.512", 0x00000, 0x10000, CRC(1f669cd0) SHA1(fd394119e33c017507fde87a710577e37dcdec07) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -5086,7 +5086,7 @@ C:\mame061208>src\mame\mamedriv.c
 */
 
 ROM_START( cb3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpu_u6.512", 0x00000, 0x10000, CRC(d17c936b) SHA1(bf90edd214118116da675bcfca41247d5891ac90) ) // encrypted??
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -5114,7 +5114,7 @@ Known differences with ncb3:
 */
 
 ROM_START( cb3a )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cb3a01.bin", 0x00000, 0x10000, CRC(53b099ab) SHA1(612d86d7f011a554903400e60e2c4a0d4f24e095) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -5135,7 +5135,7 @@ ROM_END
 
 
 ROM_START( cmv801 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prg512",   0x0000, 0x10000, CRC(2f6e3fe9) SHA1(c5ffa51478a0dc2d8ff6a0f286cfb461011bb55d) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -5204,7 +5204,7 @@ Notes:
 */
 
 ROM_START( cmv4 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27256.u81",  0x0000, 0x1000, CRC(e27e98a3) SHA1(1eb03f6c770f25ff5e3c25a1f9b9294c6b3c61d9) )
 	ROM_CONTINUE(0x3000,0x1000)
 	ROM_CONTINUE(0x7000,0x1000)
@@ -5271,7 +5271,7 @@ cmv4 vs. fruit2
 */
 
 ROM_START( cmv4a )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "holdx8.u81",	0x0000, 0x2000, CRC(2da4d267) SHA1(3deb6ce4703bb1cca2b58409a6fc5ba7cf601011) )
 	ROM_CONTINUE(0x4000,0x2000)
 	ROM_CONTINUE(0x2000,0x2000)
@@ -5303,7 +5303,7 @@ ROM_END
 
 /* looks like a bootleg of cmv4 */
 ROM_START( cmaster )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3.bin",   0x00000, 0x1000, CRC(ccb64229) SHA1(532f4b59952702a3609ff20239acbbacaf71f38f) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -5371,7 +5371,7 @@ ROM_END
 */
 
 ROM_START( cmasterb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u81.9",  0x0000,  0x1000, CRC(09e44314) SHA1(dbb7e9afc9a1dc0d4ce7b150324077f3f3579c02) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -5405,7 +5405,7 @@ ROM_START( cmasterb )
 ROM_END
 
 ROM_START( cmasterc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "msii841.u81",  0x3000,  0x1000, CRC(977db602) SHA1(0fd3d6781b654ac6befdc9278f84ca708d5d448c) )
 	ROM_CONTINUE(0x2000,0x1000)
 	ROM_CONTINUE(0x1000,0x1000)
@@ -5454,7 +5454,7 @@ all proms are type s129
 */
 
 ROM_START( cmast91 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8.bin",   0x00000, 0x01000, CRC(31a16d9f) SHA1(f007148449d66954b780f12a9f910968a4052482) )
 	ROM_CONTINUE(0x1000,0x1000)
 	ROM_CONTINUE(0x4000,0x1000)
@@ -5524,7 +5524,7 @@ ROM_END
 */
 
 ROM_START( lucky8 )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "8",	 0x0000, 0x4000, CRC(a187573e) SHA1(864627502025dbc83a0049fc98505655cec7b181) )
 	ROM_LOAD( "9",   0x4000, 0x4000, CRC(6f62672e) SHA1(05662ef1a70f93b09e48de497b049a282f070735) )
 
@@ -5604,7 +5604,7 @@ Seems to be related to timing since once patched the game is very fast.
 
 */
 ROM_START( lucky8a )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	// we have to patch this, it might be bad
 	ROM_LOAD( "1",	 0x0000, 0x8000, BAD_DUMP CRC(554cddff) SHA1(8a0678993c7010f70adc9e9443b51cf5929bf110) )
 
@@ -5671,7 +5671,7 @@ ROM_END
 */
 
 ROM_START( ladylinr )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "ladybrd.bin",	0x0000, 0x8000, CRC(44d2aed0) SHA1(1afe6178d1bf4ad0b623f33be879ed5180ad2db1) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -5723,7 +5723,7 @@ ROM_END
 
 */
 ROM_START( kkojnoli )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "9006.u66",	0x0000, 0x8000, CRC(5807a005) SHA1(9c7156656cd651c7785c42ce25e96aadd8e3d9ff) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -5771,7 +5771,7 @@ YM2203
 static DRIVER_INIT(mtonic)
 {
 	int A;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	for (A = 0;A < 0x8000;A++)
 	{
@@ -5784,7 +5784,7 @@ static DRIVER_INIT(mtonic)
 
 
 ROM_START( mtonic )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8.e6",	0x0000, 0x8000, CRC(01daf2af) SHA1(cb9b12c79dce3c9123510a49dffc9f3cee056cf6) )
 	ROM_LOAD( "9.e6",	0x8000, 0x8000, CRC(1770ac79) SHA1(cadfd00ae75b90b1d202d741828e0afbd5ba0bec) )
 
@@ -5811,7 +5811,7 @@ ROM_END
 /* these 'Amcoe' games look like bootlegs of cherry master
   the z80 roms are encrypted */
 ROM_START( skill98 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk98133.bin",	 0x0000, 0x1000, CRC(77a5dd54) SHA1(e693f477b42b83f1f5e45fb7c56486119bf91856) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -5863,7 +5863,7 @@ ROM_END
 
 
 ROM_START( schery97 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "sc352.bin",	 0x00000, 0x1000, CRC(d3857d85) SHA1(e97b2634f0993631023c08f6baf800461abfad12) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -5913,7 +5913,7 @@ ROM_START( schery97 )
 ROM_END
 
 ROM_START( schery97a )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "sc352c4.bin", 0x00000, 0x1000, CRC(44f55f6e) SHA1(8b6e8618281de480979de37c7b36a0e68a524f47) ) // ?? alt program?
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -5963,7 +5963,7 @@ ROM_START( schery97a )
 ROM_END
 
 ROM_START( roypok96 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rp35.bin",	 0x0000, 0x1000, CRC(e1509440) SHA1(30d931b02d4eb74f9a16c57eb12e834cf24f87a9) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -6003,7 +6003,7 @@ ROM_START( roypok96 )
 ROM_END
 
 ROM_START( roypok96a )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rp36.bin",	 0x0000, 0x1000, CRC(7fffff21) SHA1(85533e6aa0c6810cdaed9a6d1f1313f7bc871cbd) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -6045,7 +6045,7 @@ ROM_END
 
 
 ROM_START( roypok96b )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rp36c3.bin",	 0x0000, 0x1000, CRC(c7317ed7) SHA1(ca88d02c5ea5c03dd9407d71ab88e81c21791fe8) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -6089,7 +6089,7 @@ ROM_END
 
 
 ROM_START( pokonl97 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "po33.bin",	 0x00000, 0x1000, CRC(55bdd5cf) SHA1(7fd9e5c63ab2439db33710d7684f5df5e7324325) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -6134,7 +6134,7 @@ ROM_END
 
 
 ROM_START( nfb96 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "fb362c1.bin", 0x00000, 0x1000, CRC(5054418a) SHA1(a4bfe05b0eb3476651c06cb9ff78051e55c943c5) )
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6184,7 +6184,7 @@ ROM_START( nfb96 )
 ROM_END
 
 ROM_START( nfb96a )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "fb363c1.bin", 0x00000, 0x1000, CRC(ddc22974) SHA1(86f5d4d32f69d054ee1b444e2c4d470603e0391c) ) // ?? alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6235,7 +6235,7 @@ ROM_START( nfb96a )
 ROM_END
 
 ROM_START( nfb96b )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "fbse354.bin", 0x00000, 0x1000, CRC(89dd3290) SHA1(040aa1daae58a38db66a046a4379975e014a2598) ) // ?? alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6286,7 +6286,7 @@ ROM_START( nfb96b )
 ROM_END
 
 ROM_START( nfb96c )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "fbse362.bin", 0x00000, 0x1000, CRC(aa2576f2) SHA1(b6f0d6078dee01b90e08c09008f299439768c266) ) // ?? alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6331,7 +6331,7 @@ ROM_END
 
 
 ROM_START( nfb96txt )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "tf122axt.bin", 0x00000, 0x1000, CRC(50b5b105) SHA1(01348c463985d9967b2494b649fa02edbd61f698) )
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6376,7 +6376,7 @@ ROM_END
 
 
 ROM_START( nc96 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ch362c1.bin", 0x00000, 0x1000, CRC(10fa984b) SHA1(92ed9838db28deca038c4a5c080a723075ae0c53) )
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6421,7 +6421,7 @@ ROM_END
 
 
 ROM_START( nc96a )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ch363c1.bin", 0x00000, 0x1000, CRC(e566cea3) SHA1(be81b21267ae2ff64c4dbc58e99a9ff4bf1d21aa) ) // ?? alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6467,7 +6467,7 @@ ROM_END
 
 
 ROM_START( nc96b )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "chse354.bin", 0x00000, 0x1000, CRC(160f7b78) SHA1(537a91317e613676b748d4e4ec7015183872814b) ) // ?? alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6513,7 +6513,7 @@ ROM_END
 
 
 ROM_START( nc96c )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "chse362.bin", 0x00000, 0x1000, CRC(66df35d3) SHA1(da33f6413b8cf7b472023abc3e5cfe6d52ed1418) ) // ?? alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6557,7 +6557,7 @@ ROM_START( nc96c )
 ROM_END
 
 ROM_START( nc96txt )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "tc132axt.bin", 0x00000, 0x1000, CRC(a77dc042) SHA1(1076a6687da1871b666bd214a755b68f5e1aeb8c) )
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6601,7 +6601,7 @@ ROM_START( nc96txt )
 ROM_END
 
 ROM_START( match98 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "match133.bin", 0x00000, 0x1000, CRC(ddd82435) SHA1(4d7310f77e1f87e2b5c820a311aaefd82307b388) )
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6686,7 +6686,7 @@ c??? -> c???
 */
 
 ROM_START( nfb96se )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dogdptb.prg",0x00000, 0x1000, CRC(0690f915) SHA1(ed2477ba260a421013603017cfd1e1ba5ecd7f4e) ) // alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6729,7 +6729,7 @@ ROM_END
 
 // this set has an encrypted program rom
 ROM_START( nfb96sea )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dog_08.rom",   0x00000, 0x1000, CRC(357f13e8) SHA1(ca0872c9f7dc44a4c1c342f7f53c490f6342f1d2) )
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6771,7 +6771,7 @@ ROM_START( nfb96sea )
 ROM_END
 
 ROM_START( nfb96seb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dogdptb.prg",0x00000, 0x1000, CRC(0690f915) SHA1(ed2477ba260a421013603017cfd1e1ba5ecd7f4e) ) // alt program?
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6808,7 +6808,7 @@ ROM_END
 // this contains elephants etc. instead of the usual symbols, maybe
 // it's meant to work with the above program roms?
 ROM_START( carb2002 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dogd.prg",   0x00000, 0x1000, CRC(000102e0) SHA1(a1824576845b67fbc1a9a16d5aafa6cd000ea4fb) )
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6853,7 +6853,7 @@ ROM_END
 
 // same program as dogh set.. different gfx
 ROM_START( carb2003 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dogd.prg",   0x00000, 0x1000, CRC(000102e0) SHA1(a1824576845b67fbc1a9a16d5aafa6cd000ea4fb) )
 	ROM_CONTINUE(0x4000, 0x1000)
 	ROM_CONTINUE(0x3000, 0x1000)
@@ -6902,7 +6902,7 @@ ROM_END
 static DRIVER_INIT(goldstar)
 {
 	int A;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	for (A = 0;A < 0x10000;A++)
 	{
@@ -6987,8 +6987,8 @@ static UINT8 chry10_decrypt(UINT8 cipherText)
 
 static DRIVER_INIT( chry10 )
 {
-	UINT8 *ROM = memory_region(machine, "main");
-	int size = memory_region_length(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	int size = memory_region_length(machine, "maincpu");
 	int start = 0;
 
 	UINT8 *buffer;
@@ -7017,8 +7017,8 @@ static DRIVER_INIT( chry10 )
 
 static DRIVER_INIT( cb3 )
 {
-	UINT8 *ROM = memory_region(machine, "main");
-	int size = memory_region_length(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	int size = memory_region_length(machine, "maincpu");
 	int start = 0;
 
 	UINT8 *buffer;
@@ -7042,7 +7042,7 @@ static DRIVER_INIT( cb3 )
 static DRIVER_INIT( chrygld )
 {
 	int A;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	do_blockswaps(ROM);
 
 	// a data bitswap
@@ -7058,7 +7058,7 @@ static DRIVER_INIT( chrygld )
 
 static DRIVER_INIT(cm)
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -7069,7 +7069,7 @@ static DRIVER_INIT(cm)
 
 static DRIVER_INIT(cmv4)
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -7080,7 +7080,7 @@ static DRIVER_INIT(cmv4)
 
 static DRIVER_INIT(cmast91)
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -7091,7 +7091,7 @@ static DRIVER_INIT(cmast91)
 
 static DRIVER_INIT(lucky8a)
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	ROM[0x0010] = 0x21;
 }
@@ -7099,7 +7099,7 @@ static DRIVER_INIT(lucky8a)
 static DRIVER_INIT( nfb96sea )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	for (i = 0;i < 0x10000;i++)
 	{
@@ -7132,7 +7132,7 @@ static READ8_HANDLER( fixedvala8_r )
 static DRIVER_INIT( schery97 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7160,7 +7160,7 @@ static READ8_HANDLER( fixedval38_r )
 static DRIVER_INIT( schery97a )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7189,7 +7189,7 @@ static READ8_HANDLER( fixedvalea_r )
 static DRIVER_INIT( skill98 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7216,7 +7216,7 @@ static READ8_HANDLER( fixedval68_r )
 static DRIVER_INIT( fb36xc1 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7253,7 +7253,7 @@ static READ8_HANDLER( fixedvalaa_r )
 static DRIVER_INIT( fbse354 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7284,7 +7284,7 @@ static READ8_HANDLER( fixedvalbe_r )
 static DRIVER_INIT( fbse362 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7315,7 +7315,7 @@ static READ8_HANDLER( fixedval84_r )
 static DRIVER_INIT( rp35 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7341,7 +7341,7 @@ static READ8_HANDLER( fixedvalb2_r )
 static DRIVER_INIT( rp36 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7367,7 +7367,7 @@ static READ8_HANDLER( fixedval48_r )
 static DRIVER_INIT( rp36c3 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7399,7 +7399,7 @@ static READ8_HANDLER( fixedval74_r )
 static DRIVER_INIT( po33 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7426,7 +7426,7 @@ static READ8_HANDLER( fixedval58_r )
 static DRIVER_INIT( tc132axt )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -7457,7 +7457,7 @@ static READ8_HANDLER( fixedvalc7_r )
 static DRIVER_INIT( match133 )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];

@@ -317,9 +317,9 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( arcadecl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", atarigen_video_int_gen)
+	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	MDRV_MACHINE_RESET(arcadecl)
 	MDRV_NVRAM_HANDLER(atarigen)
@@ -329,7 +329,7 @@ static MACHINE_DRIVER_START( arcadecl )
 	MDRV_GFXDECODE(arcadecl)
 	MDRV_PALETTE_LENGTH(512)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
@@ -355,7 +355,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( arcadecl )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pgm0",  0x00000, 0x80000, CRC(b5b93623) SHA1(a2e96c0c6eceb3d8f205e28d6b8197055aeb8cc4) )
 	ROM_LOAD16_BYTE( "prog1", 0x00001, 0x80000, CRC(e7efef85) SHA1(05f2119d8ecc27f6efea85f5174ea7da404d7e9b) )
 
@@ -368,7 +368,7 @@ ROM_END
 
 
 ROM_START( sparkz )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sparkzpg.0", 0x00000, 0x80000, CRC(a75c331c) SHA1(855ed44bd23c1dd0ca64926cacc8be62aca82fe2) )
 	ROM_LOAD16_BYTE( "sparkzpg.1", 0x00001, 0x80000, CRC(1af1fc04) SHA1(6d92edb1a881ba6b63e0144c9c3e631b654bf8ae) )
 

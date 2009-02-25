@@ -76,7 +76,7 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 {
 	/* is this weird banking some form of protection? */
 
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	int addr;
 
 	switch (data)
@@ -296,16 +296,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( speedspn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,6000000)		 /* 6 MHz */
+	MDRV_CPU_ADD("maincpu",Z80,6000000)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,6000000)		 /* 6 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -329,12 +329,12 @@ MACHINE_DRIVER_END
 /*** ROM LOADING *************************************************************/
 
 ROM_START( speedspn )
-	ROM_REGION( 0x088000, "main", 0 )	/* CPU1 code */
+	ROM_REGION( 0x088000, "maincpu", 0 )	/* CPU1 code */
 	/* most of this is probably actually banked */
 	ROM_LOAD( "tch-ss1.u78", 0x00000, 0x008000, CRC(41b6b45b) SHA1(d969119959db4cc3be50f188bfa41e4b4896eaca) ) /* fixed code */
 	ROM_CONTINUE(            0x10000, 0x078000 ) /* banked data */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* CPU2 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* CPU2 code */
 	ROM_LOAD( "tch-ss2.u96", 0x00000, 0x10000, CRC(4611fd0c) SHA1(b49ad6a8be6ccfef0b2ed187fb3b008fb7eeb2b5) ) // FIRST AND SECOND HALF IDENTICAL
 
 	ROM_REGION( 0x080000, "user1", 0 )	/* Samples */

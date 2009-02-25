@@ -366,12 +366,12 @@ static const sn76477_interface sn76477_intf =
 static MACHINE_DRIVER_START( malzak )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 3800000/4)
+	MDRV_CPU_ADD("maincpu", S2650, 3800000/4)
 	MDRV_CPU_PROGRAM_MAP(malzak_map,0)
 	MDRV_CPU_IO_MAP(malzak_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	//MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(SAA5050_VBLANK))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -402,14 +402,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( malzak2 )
 	MDRV_IMPORT_FROM( malzak )
 
-	MDRV_CPU_MODIFY( "main" )
+	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(malzak2_map,0)
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
 MACHINE_DRIVER_END
 
 ROM_START( malzak )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "malzak.5",     0x0000, 0x0800, CRC(75355c98) SHA1(7036ed5d9ee38585b1a6bc204d410d5fb5ddd81f) )
 	ROM_CONTINUE( 0x2000, 0x0800 )
 	ROM_LOAD( "malzak.4",     0x0800, 0x0400, CRC(744c81e3) SHA1(c08d6df3cf2808a5f99d8247fc19a59be88121a9) )
@@ -430,7 +430,7 @@ ROM_START( malzak )
 ROM_END
 
 ROM_START( malzak2 )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "malz1a.bin",   0x000000, 0x000800, CRC(5c3cb14c) SHA1(2d3b5703cb9a47e34aa593f0e8d42d4e67c167d9) )
 	ROM_CONTINUE( 0x2000, 0x0800 )
 

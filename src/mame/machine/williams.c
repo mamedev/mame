@@ -142,7 +142,7 @@ const pia6821_interface williams_snd_pia_intf =
 const pia6821_interface lottofun_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(lottofun_input_port_0_r), DEVCB_HANDLER(input_port_1_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_MEMORY_HANDLER("main", PROGRAM, ticket_dispenser_w), DEVCB_NULL, DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, ticket_dispenser_w), DEVCB_NULL, DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_NULL, DEVCB_NULL
 };
 
@@ -396,7 +396,7 @@ MACHINE_RESET( williams )
 
 	/* configure the memory bank */
 	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "main") + 0x10000, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "maincpu") + 0x10000, 0);
 }
 
 
@@ -468,7 +468,7 @@ MACHINE_RESET( williams2 )
 
 	/* configure memory banks */
 	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, 1, 1, 4, memory_region(machine, "main") + 0x10000, 0x10000);
+	memory_configure_bank(machine, 1, 1, 4, memory_region(machine, "maincpu") + 0x10000, 0x10000);
 
 	/* make sure our banking is reset */
 	williams2_bank_select_w(space, 0, 0);
@@ -747,7 +747,7 @@ MACHINE_RESET( defender )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	memory_configure_bank(machine, 1, 0, 9, &memory_region(machine, "main")[0x10000], 0x1000);
+	memory_configure_bank(machine, 1, 0, 9, &memory_region(machine, "maincpu")[0x10000], 0x1000);
 	defender_bank_select_w(space, 0, 0);
 
 	state_save_register_postload(machine, defender_postload, NULL);
@@ -842,10 +842,10 @@ MACHINE_RESET( blaster )
 
 	/* banking is different for blaster */
 	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(machine, 1, 1, 16, memory_region(machine, "main") + 0x18000, 0x4000);
+	memory_configure_bank(machine, 1, 1, 16, memory_region(machine, "maincpu") + 0x18000, 0x4000);
 
 	memory_configure_bank(machine, 2, 0, 1, williams_videoram + 0x4000, 0);
-	memory_configure_bank(machine, 2, 1, 16, memory_region(machine, "main") + 0x10000, 0x0000);
+	memory_configure_bank(machine, 2, 1, 16, memory_region(machine, "maincpu") + 0x10000, 0x0000);
 
 	state_save_register_global(machine, blaster_bank);
 }

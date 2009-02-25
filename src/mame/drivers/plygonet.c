@@ -218,7 +218,7 @@ static WRITE32_HANDLER( sound_w )
 
 static WRITE32_HANDLER( sound_irq_w )
 {
-	cputag_set_input_line(space->machine, "sound", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 }
 
 /* DSP communications */
@@ -565,7 +565,7 @@ static int cur_sound_region;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine, 2, memory_region(machine, "sound") + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(machine, 2, memory_region(machine, "soundcpu") + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -633,15 +633,15 @@ static MACHINE_START(polygonet)
 }
 
 static MACHINE_DRIVER_START( plygonet )
-	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
-	MDRV_CPU_VBLANK_INT("main", polygonet_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", polygonet_interrupt)
 
 	MDRV_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
 	MDRV_CPU_PROGRAM_MAP(dsp_program_map, 0)
 	MDRV_CPU_DATA_MAP(dsp_data_map, 0)
 
-	MDRV_CPU_ADD("sound", Z80, 8000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
 
@@ -654,7 +654,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_QUANTUM_TIME(HZ(1200000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -728,14 +728,14 @@ static DRIVER_INIT(polygonet)
 
 ROM_START( plygonet )
 	/* main program */
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	ROM_LOAD32_BYTE( "305a01.4k", 0x000003, 512*1024, CRC(8bdb6c95) SHA1(e981833842f8fd89b9726901fbe2058444204792) )
 	ROM_LOAD32_BYTE( "305a02.2k", 0x000002, 512*1024, CRC(4d7e32b3) SHA1(25731526535036972577637d186f02ae467296bd) )
 	ROM_LOAD32_BYTE( "305a03.2h", 0x000001, 512*1024, CRC(36e4e3fe) SHA1(e8fcad4f196c9b225a0fbe70791493ff07c648a9) )
 	ROM_LOAD32_BYTE( "305a04.4h", 0x000000, 512*1024, CRC(d8394e72) SHA1(eb6bcf8aedb9ba5843204ab8aacb735cbaafb74d) )
 
 	/* Z80 sound program */
-	ROM_REGION( 0x30000, "sound", 0 )
+	ROM_REGION( 0x30000, "soundcpu", 0 )
 	ROM_LOAD("305b05.7b", 0x000000, 0x20000, CRC(2d3d9654) SHA1(784a409df47cee877e507b8bbd3610d161d63753) )
 	ROM_RELOAD( 0x10000, 0x20000)
 

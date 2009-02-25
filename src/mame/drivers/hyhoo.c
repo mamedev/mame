@@ -260,16 +260,16 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( hyhoo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 5000000/1)	/* 5.00 MHz ?? */
+	MDRV_CPU_ADD("maincpu", Z80, 5000000/1)	/* 5.00 MHz ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem_hyhoo, writemem_hyhoo)
 	MDRV_CPU_IO_MAP(hyhoo_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
 	MDRV_NVRAM_HANDLER(nb1413m3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -292,7 +292,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( hyhoo )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "hyhoo.1",     0x00000, 0x08000, CRC(c2852861) SHA1(ad23d8f5b196f15f863862010c8fb0dc4c072172) )
 
 	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
@@ -307,7 +307,7 @@ ROM_START( hyhoo )
 ROM_END
 
 ROM_START( hyhoo2 )
-	ROM_REGION( 0x10000, "main", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "hyhoo2.2",    0x00000, 0x08000, CRC(d8733cdc) SHA1(e683e3a799ed06fb5d4149e1ba76ebd6828b6369) )
 	ROM_LOAD( "hyhoo2.1",    0x08000, 0x08000, CRC(4a1d9493) SHA1(ee9288e9cb1f681216a98fb31539cb75b4548935) )
 

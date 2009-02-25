@@ -247,7 +247,7 @@ ADDRESS_MAP_END
 void taito_f3_soundsystem_reset(running_machine *machine)
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "audio");
+	UINT16 *ROM = (UINT16 *)memory_region(machine, "audiocpu");
 	memory_set_bankptr(machine, 1,&ROM[0x80000]);
 	memory_set_bankptr(machine, 2,&ROM[0x90000]);
 	memory_set_bankptr(machine, 3,&ROM[0xa0000]);
@@ -258,7 +258,7 @@ void taito_f3_soundsystem_reset(running_machine *machine)
 	sound_ram[3]=ROM[0x80003];
 
 	/* reset CPU to catch any banking of startup vectors */
-	device_reset(cputag_get_cpu(machine, "audio"));
+	device_reset(cputag_get_cpu(machine, "audiocpu"));
 	//cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 

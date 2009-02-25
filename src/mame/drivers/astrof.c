@@ -845,13 +845,13 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MAIN_CPU_CLOCK)
-	MDRV_TIMER_ADD_SCANLINE("vblank", irq_callback, "main", VBSTART, 0)
+	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MDRV_TIMER_ADD_SCANLINE("vblank", irq_callback, "screen", VBSTART, 0)
 
 	/* video hardware */
 	MDRV_VIDEO_START(astrof)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 MACHINE_DRIVER_END
@@ -861,7 +861,7 @@ static MACHINE_DRIVER_START( astrof )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(astrof_map,0)
 
 	MDRV_MACHINE_START(astrof)
@@ -888,7 +888,7 @@ static MACHINE_DRIVER_START( spfghmk2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spfghmk2_map,0)
 
 	MDRV_MACHINE_START(spfghmk2)
@@ -905,7 +905,7 @@ static MACHINE_DRIVER_START( tomahawk )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tomahawk_map,0)
 
 	MDRV_MACHINE_START(tomahawk)
@@ -926,7 +926,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( astrof )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "afii.6",       0xd000, 0x0800, CRC(d6cd13a4) SHA1(359b00b02f4256f1138c8526214c6a34d2e5b47a) )
 	ROM_LOAD( "afii.5",       0xd800, 0x0800, CRC(6fd3c4df) SHA1(73aad03e2588ac9f249d5751eb4a7c7cd12fd3b9) )
 	ROM_LOAD( "afii.4",       0xe000, 0x0800, CRC(9612dae3) SHA1(8ee1797c212e06c381972b7b555f240ff317d75d) )
@@ -940,7 +940,7 @@ ROM_END
 
 
 ROM_START( astrof2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kei2",         0xd000, 0x0400, CRC(9f0bd355) SHA1(45db9229dcd8bbd366ff13c683625c3d1c175598) )
 	ROM_LOAD( "keii",         0xd400, 0x0400, CRC(71f229f0) SHA1(be426360567066df01fb428dc5cd2d6ef01a4cf7) )
 	ROM_LOAD( "kei0",         0xd800, 0x0400, CRC(88114f7c) SHA1(e64ae3cac92d2a3c02edc8e81c88d5d275e89293) )
@@ -960,7 +960,7 @@ ROM_END
 
 
 ROM_START( astrof3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kei2",         0xd000, 0x0400, CRC(9f0bd355) SHA1(45db9229dcd8bbd366ff13c683625c3d1c175598) )
 	ROM_LOAD( "keii",         0xd400, 0x0400, CRC(71f229f0) SHA1(be426360567066df01fb428dc5cd2d6ef01a4cf7) )
 	ROM_LOAD( "kei0",         0xd800, 0x0400, CRC(88114f7c) SHA1(e64ae3cac92d2a3c02edc8e81c88d5d275e89293) )
@@ -980,7 +980,7 @@ ROM_END
 
 
 ROM_START( abattle )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10405-b.bin",  0xd000, 0x0400, CRC(9ba57987) SHA1(becf89b7d474f86839f13f9be5502c91491e8584) )
 	ROM_LOAD( "10405-a.bin",  0xd400, 0x0400, CRC(3fbbeeba) SHA1(1c9f519a0797f90524adf187b0761f150db0828d) )
 	ROM_LOAD( "10405-9.bin",  0xd800, 0x0400, CRC(354cf432) SHA1(138956ea8064eba0dcd8b2f175d4981b689a2077) )
@@ -1003,7 +1003,7 @@ ROM_END
 
 
 ROM_START( abattle2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10405-b.bin",  0xd000, 0x0400, CRC(9ba57987) SHA1(becf89b7d474f86839f13f9be5502c91491e8584) )
 	ROM_LOAD( "10405-a.bin",  0xd400, 0x0400, CRC(3fbbeeba) SHA1(1c9f519a0797f90524adf187b0761f150db0828d) )
 	ROM_LOAD( "10405-9.bin",  0xd800, 0x0400, CRC(354cf432) SHA1(138956ea8064eba0dcd8b2f175d4981b689a2077) )
@@ -1026,7 +1026,7 @@ ROM_END
 
 
 ROM_START( afire )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
 	ROM_LOAD( "a.bin",        0xd400, 0x0400, CRC(ce8b6e4f) SHA1(b85ab709d80324df5d2c4b0dbbc5e6aeb4003077) )
 	ROM_LOAD( "9.bin",        0xd800, 0x0400, CRC(e0f45b07) SHA1(091e1ea4b3726888dc488bb01e0bd4e588eccae5) )
@@ -1048,7 +1048,7 @@ ROM_END
 /* This is a newer revision of "Astro Combat" (most probably manufactured by Sidam),
    with correct spelling for FUEL and the main boss sporting "CB". */
 ROM_START( acombat )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
 	ROM_LOAD( "a.bin",        0xd400, 0x0400, CRC(ce8b6e4f) SHA1(b85ab709d80324df5d2c4b0dbbc5e6aeb4003077) )
 	ROM_LOAD( "9.bin",        0xd800, 0x0400, CRC(e0f45b07) SHA1(091e1ea4b3726888dc488bb01e0bd4e588eccae5) )
@@ -1070,7 +1070,7 @@ ROM_END
 /* It is on older revision of "Astro Combat" (most probably manufactured by Sidam),
    with incorrect spelling for fuel as FLUEL and the main boss sporting "PZ" */
 ROM_START( acombato )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
 	ROM_LOAD( "a.bin",        0xd400, 0x0400, CRC(ce8b6e4f) SHA1(b85ab709d80324df5d2c4b0dbbc5e6aeb4003077) )
 	ROM_LOAD( "9.bin",        0xd800, 0x0400, CRC(e0f45b07) SHA1(091e1ea4b3726888dc488bb01e0bd4e588eccae5) )
@@ -1090,7 +1090,7 @@ ROM_END
 
 
 ROM_START( sstarbtl )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.bin",        0xd000, 0x0400, CRC(16ad2bcc) SHA1(e7f55d17ee18afbb045cd0fd8d3ffc0c8300130a) )
 	ROM_LOAD( "a.rom",        0xd400, 0x0400, CRC(5a75891d) SHA1(71cde93a219ec3735cead7ec89f77bc8b11bfc64) )
 	ROM_LOAD( "9.rom",        0xd800, 0x0400, CRC(de3f8063) SHA1(77b89ef0b356316e463d7575c037069d0c14a850) )
@@ -1110,7 +1110,7 @@ ROM_END
 
 
 ROM_START( spfghmk2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2708.5e",      0xe400, 0x0400, CRC(cd5f66de) SHA1(aea3d88eb1d59a9279361369991fcace90c4b61a) )
 	ROM_LOAD( "2708.5d",      0xe800, 0x0400, CRC(385cca72) SHA1(8d38a127f7603f1573df24cb028e1f41098a61c1) )
 	ROM_LOAD( "2708.5c",      0xec00, 0x0400, CRC(e6eaac70) SHA1(3af366f190ed0aed43cc584c6bd472da957c725a) )
@@ -1125,7 +1125,7 @@ ROM_END
 
 
 ROM_START( spfgmk22 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2708mkii.5e",  0xe400, 0x0400, CRC(27d7060d) SHA1(796c44a395e1c54769dc57050503b4b111bde7ef) )
 	ROM_LOAD( "2708mkii.5d",  0xe800, 0x0400, CRC(6ccb3b0a) SHA1(566104ca2e0fae741d4650e7159c9ddb48f59e8b) )
 	ROM_LOAD( "2708mkii.5c",  0xec00, 0x0400, CRC(68eb0ad5) SHA1(d303685ffd67898cec3e7c51b3831558a837e5a3) )
@@ -1140,7 +1140,7 @@ ROM_END
 
 
 ROM_START( tomahawk )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "thawk.l8",     0xdc00, 0x0400, CRC(b01dab4b) SHA1(d8b4266359a3b18d649f539fad8dce4d73cec412) )
 	ROM_LOAD( "thawk.l7",     0xe000, 0x0400, CRC(3a6549e8) SHA1(2ba622d78596c72998784432cf8fbbe733c50ce5) )
 	ROM_LOAD( "thawk.l6",     0xe400, 0x0400, CRC(863e47f7) SHA1(e8e48560c217025796be20f51c50ec276dba3eb5) )
@@ -1157,7 +1157,7 @@ ROM_END
 
 
 ROM_START( tomahaw1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "l8-1",         0xdc00, 0x0400, CRC(7c911661) SHA1(3fc75bb0e6a89d41d76f82eeb0fde7d33809dddf) )
 	ROM_LOAD( "l7-1",         0xe000, 0x0400, CRC(adeffb69) SHA1(8ff7ada883825a8b56cae3368ce377228922ab1d) )
 	ROM_LOAD( "l6-1",         0xe400, 0x0400, CRC(9116e59d) SHA1(22a6d410fff8534b3aa7eb2ed0a8c096c890acf5) )
@@ -1183,7 +1183,7 @@ ROM_END
 static DRIVER_INIT( abattle )
 {
 	/* use the protection PROM to decrypt the ROMs */
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *prom = memory_region(machine, "user1");
 	int i;
 
@@ -1198,7 +1198,7 @@ static DRIVER_INIT( abattle )
 
 static DRIVER_INIT( afire )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1212,7 +1212,7 @@ static DRIVER_INIT( afire )
 
 static DRIVER_INIT( sstarbtl )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)

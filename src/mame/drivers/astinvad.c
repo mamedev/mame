@@ -521,7 +521,7 @@ static const samples_interface astinvad_samples_interface =
 static MACHINE_DRIVER_START( kamikaze )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(kamikaze_map,0)
 	MDRV_CPU_IO_MAP(kamikaze_portmap,0)
 
@@ -533,7 +533,7 @@ static MACHINE_DRIVER_START( kamikaze )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(astinvad)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 32, 256)
 
@@ -550,7 +550,7 @@ static MACHINE_DRIVER_START( spcking2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(kamikaze)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240)
 MACHINE_DRIVER_END
 
@@ -558,16 +558,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( spaceint )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK)        /* a guess */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
 	MDRV_CPU_PROGRAM_MAP(spaceint_map,0)
 	MDRV_CPU_IO_MAP(spaceint_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_START(spaceint)
 	MDRV_VIDEO_UPDATE(spaceint)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
@@ -590,7 +590,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( kamikaze )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "km01",         0x0000, 0x0800, CRC(8aae7414) SHA1(91cb5c268a03960d50401000903d70dc29f904fb) )
 	ROM_LOAD( "km02",         0x0800, 0x0800, CRC(6c7a2beb) SHA1(86447d077a58e8c1fc096d0d32b02d18523019a6) )
 	ROM_LOAD( "km03",         0x1000, 0x0800, CRC(3e8dedb6) SHA1(19679d0e8ebe2d19dc766b12a07335b1220fb568) )
@@ -601,7 +601,7 @@ ROM_START( kamikaze )
 ROM_END
 
 ROM_START( astinvad )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ai_cpu_1.rom", 0x0000, 0x0400, CRC(20e3ec41) SHA1(7e77fa3c51d1e83ce91a24808301d9f1e0bed18e) )
 	ROM_LOAD( "ai_cpu_2.rom", 0x0400, 0x0400, CRC(e8f1ab55) SHA1(b3e38f2d6bdb65ee7c53c8d5dd3951a3fd43c51c) )
 	ROM_LOAD( "ai_cpu_3.rom", 0x0800, 0x0400, CRC(a0092553) SHA1(34fced8ce06d912980ba45fad8d80d2a2e3357b9) )
@@ -615,7 +615,7 @@ ROM_START( astinvad )
 ROM_END
 
 ROM_START( kosmokil )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",     0x0000, 0x0400, CRC(8d851fb2) SHA1(06b3816ecb45c5d034447a875669a96f443339f5) )
 	ROM_LOAD( "us1-2.bin", 0x0400, 0x0400, CRC(786599d2) SHA1(70db8dae052c3556948d75b741ef4346aa947479) )
 	ROM_LOAD( "si1-3.bin", 0x0800, 0x0400, CRC(12621222) SHA1(062b1dff3e129dff23e55bef0d29c72ac5f212c4) )
@@ -629,7 +629,7 @@ ROM_START( kosmokil )
 ROM_END
 
 ROM_START( spcking2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",        0x0000, 0x0400, CRC(716fe9e0) SHA1(d5131abf6e3e6650ff9f649a999bf1d8ae8afb78) )
 	ROM_LOAD( "2.bin",        0x0400, 0x0400, CRC(6f6d4e5c) SHA1(0269c3b9da2723411c16ee13ff53e2140e49e7ff) )
 	ROM_LOAD( "3.bin",        0x0800, 0x0400, CRC(2ab1c280) SHA1(62cb2445b3f859bddd5617e4ebfb37eedf8bd11e) )
@@ -642,7 +642,7 @@ ROM_START( spcking2 )
 ROM_END
 
 ROM_START( spaceint )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",			  0x0000, 0x0400, CRC(184314d2) SHA1(76789780c46e19c73904b229d23c865819915558) )
 	ROM_LOAD( "2",			  0x0400, 0x0400, CRC(55459aa1) SHA1(5631d8de4e41682962cde65002b0fe86f2b189f9) )
 	ROM_LOAD( "3",			  0x0800, 0x0400, CRC(9d6819be) SHA1(da061b908ca6a9f3312d6adc4395a138eed473c8) )
@@ -655,7 +655,7 @@ ROM_START( spaceint )
 ROM_END
 
 ROM_START( spaceinj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3j",			  0x0000, 0x0800, CRC(b26c57a1) SHA1(456330c09130f910e847ef4bfe773421615d1448) )
 	ROM_LOAD( "3f",			  0x0800, 0x0800, CRC(bac8b96c) SHA1(5a7b24402c7a1a08e69cf15eb31c93d411a7e929) )
 	ROM_LOAD( "3e",			  0x1000, 0x0800, CRC(346125f3) SHA1(59c120ac3b120fa28acef3b9041c03939f2981f8) )

@@ -150,7 +150,7 @@ static MC6845_ON_VSYNC_CHANGED(vsync_changed)
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",					/* screen we are acting on */
+	"screen",				/* screen we are acting on */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
@@ -592,7 +592,7 @@ static const ay8910_interface scarn_ay8910_config =
 static MACHINE_DRIVER_START( slotcarn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK) // 2.5 Mhz?
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
 	MDRV_CPU_PROGRAM_MAP(slotcarn_map,0)
 	MDRV_CPU_IO_MAP(spielbud_io_map,0)
 
@@ -604,7 +604,7 @@ static MACHINE_DRIVER_START( slotcarn )
 	MDRV_MACHINE_START(merit)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
@@ -677,7 +677,7 @@ rom3 has mention of coin hopper and coin jam.
 */
 
 ROM_START( slotcarn )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "rom1.e10", 0x0000, 0x2000, CRC(a7ea6420) SHA1(4dd88f1bcaf354da93c3e88979a5e1a026105598) )
 	ROM_LOAD( "rom2.e9",  0x2000, 0x2000, CRC(8156a603) SHA1(92618ac2ac908d24adb75eb705dc2f84eef12211) )
 	ROM_LOAD( "rom3.e8",  0x4000, 0x2000, CRC(bf74ccad) SHA1(7f5049693de236790671b16dd1e1d0d2ac120e1a) )
@@ -724,7 +724,7 @@ Roms have stickers with only a number, so were renamed from lwing to spielbud.
 */
 
 ROM_START( spielbud )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "spielbud.00", 0x0000, 0x2000, CRC(201c7f19) SHA1(fb902824d1f6cfdf7ba124fca4c680af099ca4e1) )
 	ROM_LOAD( "spielbud.01", 0x2000, 0x2000, CRC(16339de8) SHA1(00b14c6bca268b98bfb6ac9840d59b9a64d43b92) )
 	ROM_LOAD( "spielbud.02", 0x4000, 0x2000, CRC(c791e75b) SHA1(b0276a82302a194fc1ab2608440a5bf1efe99e64) )

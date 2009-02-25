@@ -244,18 +244,18 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( blktiger )
 {
 	/* configure bankswitching */
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 static MACHINE_DRIVER_START( blktiger )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_24MHz/4)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
 	MDRV_CPU_IO_MAP(port_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_mem_map, 0)
 
 	MDRV_MACHINE_START(blktiger)
@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( blktiger )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -296,14 +296,14 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( blktiger )
-	ROM_REGION( 0x50000, "main", 0 )	/* 64k for code + banked ROMs images */
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "bdu-01a.5e",  0x00000, 0x08000, CRC(a8f98f22) SHA1(f77c0d0ebf3e52a21d2c0c5004350a408b8e6d24) )	/* CODE */
 	ROM_LOAD( "bdu-02a.6e",  0x10000, 0x10000, CRC(7bef96e8) SHA1(6d05a73d8400dead78c561b904bf6ef8311e7b91) )	/* 0+1 */
 	ROM_LOAD( "bdu-03a.8e",  0x20000, 0x10000, CRC(4089e157) SHA1(7972b1c745057802d4fd66d88b0101eb3c03e701) )	/* 2+3 */
 	ROM_LOAD( "bd-04.9e",    0x30000, 0x10000, CRC(ed6af6ec) SHA1(bed303c51bcddf233ad0701306d557a60ce9f5a5) )	/* 4+5 */
 	ROM_LOAD( "bd-05.10e",   0x40000, 0x10000, CRC(ae59b72e) SHA1(6e72214b71f2f337af236c8be891a18570cb6fbb) )	/* 6+7 */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bd-06.1l",  0x0000, 0x8000, CRC(2cf54274) SHA1(87df100c65999ba1e9d358ffd0fe4bba23ae0efb) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -329,14 +329,14 @@ ROM_START( blktiger )
 ROM_END
 
 ROM_START( bktigrb1 )
-	ROM_REGION( 0x50000, "main", 0 )	/* 64k for code + banked ROMs images */
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "btiger1.f6",   0x00000, 0x08000, CRC(9d8464e8) SHA1(c847ee9a22b8b636e85427214747e6bd779023e8) )	/* CODE */
 	ROM_LOAD( "bdu-02a.6e",   0x10000, 0x10000, CRC(7bef96e8) SHA1(6d05a73d8400dead78c561b904bf6ef8311e7b91) )	/* 0+1 */
 	ROM_LOAD( "btiger3.j6",   0x20000, 0x10000, CRC(52c56ed1) SHA1(b6ea61869dcfcedb8cfc14c613440e3f4649866f) )	/* 2+3 */
 	ROM_LOAD( "bd-04.9e",     0x30000, 0x10000, CRC(ed6af6ec) SHA1(bed303c51bcddf233ad0701306d557a60ce9f5a5) )	/* 4+5 */
 	ROM_LOAD( "bd-05.10e",    0x40000, 0x10000, CRC(ae59b72e) SHA1(6e72214b71f2f337af236c8be891a18570cb6fbb) )	/* 6+7 */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bd-06.1l",  0x0000, 0x8000, CRC(2cf54274) SHA1(87df100c65999ba1e9d358ffd0fe4bba23ae0efb) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -362,14 +362,14 @@ ROM_START( bktigrb1 )
 ROM_END
 
 ROM_START( bktigrb2 )
-	ROM_REGION( 0x50000, "main", 0 )	/* 64k for code + banked ROMs images */
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "1.bin",        0x00000, 0x08000, CRC(47e2b21e) SHA1(3f03543ace435239978a95f569ac89f6762253c0) )	/* CODE */
 	ROM_LOAD( "bdu-02a.6e",   0x10000, 0x10000, CRC(7bef96e8) SHA1(6d05a73d8400dead78c561b904bf6ef8311e7b91) )	/* 0+1 */
 	ROM_LOAD( "3.bin",        0x20000, 0x10000, CRC(52c56ed1) SHA1(b6ea61869dcfcedb8cfc14c613440e3f4649866f) )	/* 2+3 : same crc of btiger3.j6 from bktigerb */
 	ROM_LOAD( "bd-04.9e",     0x30000, 0x10000, CRC(ed6af6ec) SHA1(bed303c51bcddf233ad0701306d557a60ce9f5a5) )	/* 4+5 */
 	ROM_LOAD( "bd-05.10e",    0x40000, 0x10000, CRC(ae59b72e) SHA1(6e72214b71f2f337af236c8be891a18570cb6fbb) )	/* 6+7 */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bd-06.1l",  0x0000, 0x8000, CRC(2cf54274) SHA1(87df100c65999ba1e9d358ffd0fe4bba23ae0efb) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -395,14 +395,14 @@ ROM_START( bktigrb2 )
 ROM_END
 
 ROM_START( blkdrgon )
-	ROM_REGION( 0x50000, "main", 0 )	/* 64k for code + banked ROMs images */
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "blkdrgon.5e",  0x00000, 0x08000, CRC(27ccdfbc) SHA1(3caafe00735ba9b24d870ee61ad2cae541551024) )	/* CODE */
 	ROM_LOAD( "blkdrgon.6e",  0x10000, 0x10000, CRC(7d39c26f) SHA1(562a3f578e109ae020f65e341c876ad7e510a311) )	/* 0+1 */
 	ROM_LOAD( "blkdrgon.8e",  0x20000, 0x10000, CRC(d1bf3757) SHA1(b19f8b986406bde65ac7f0d55d54f87b37f5e42f) )	/* 2+3 */
 	ROM_LOAD( "blkdrgon.9e",  0x30000, 0x10000, CRC(4d1d6680) SHA1(e137624c59392de6aaffeded99b024938360bd25) )	/* 4+5 */
 	ROM_LOAD( "blkdrgon.10e", 0x40000, 0x10000, CRC(c8d0c45e) SHA1(66c2e5a74c5875a2c8e28740fe944bd943246ce5) )	/* 6+7 */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bd-06.1l",  0x0000, 0x8000, CRC(2cf54274) SHA1(87df100c65999ba1e9d358ffd0fe4bba23ae0efb) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -428,14 +428,14 @@ ROM_START( blkdrgon )
 ROM_END
 
 ROM_START( blkdrgnb )
-	ROM_REGION( 0x50000, "main", 0 )	/* 64k for code + banked ROMs images */
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "a1",           0x00000, 0x08000, CRC(7caf2ba0) SHA1(57b17caff67d36b24075f5865d433bfc8bcc9bc2) )	/* CODE */
 	ROM_LOAD( "blkdrgon.6e",  0x10000, 0x10000, CRC(7d39c26f) SHA1(562a3f578e109ae020f65e341c876ad7e510a311) )	/* 0+1 */
 	ROM_LOAD( "a3",           0x20000, 0x10000, CRC(f4cd0f39) SHA1(9efc5161c861c7ec8ae72509e71c6d7b71b22fc6) )	/* 2+3 */
 	ROM_LOAD( "blkdrgon.9e",  0x30000, 0x10000, CRC(4d1d6680) SHA1(e137624c59392de6aaffeded99b024938360bd25) )	/* 4+5 */
 	ROM_LOAD( "blkdrgon.10e", 0x40000, 0x10000, CRC(c8d0c45e) SHA1(66c2e5a74c5875a2c8e28740fe944bd943246ce5) )	/* 6+7 */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "bd-06.1l",  0x0000, 0x8000, CRC(2cf54274) SHA1(87df100c65999ba1e9d358ffd0fe4bba23ae0efb) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )

@@ -201,14 +201,14 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( glass )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
+	MDRV_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
 	MDRV_CPU_PROGRAM_MAP(glass_readmem,glass_writemem)
-	MDRV_CPU_VBLANK_INT("main", glass_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", glass_interrupt)
 
 	MDRV_MACHINE_RESET(glass)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -230,7 +230,7 @@ static MACHINE_DRIVER_START( glass )
 MACHINE_DRIVER_END
 
 ROM_START( glass )
-	ROM_REGION( 0x080000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "1.c23",	0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) )
 	ROM_LOAD16_BYTE( "2.c22",	0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
 
@@ -251,7 +251,7 @@ ROM_START( glass )
 ROM_END
 
 ROM_START( glass10 )
-	ROM_REGION( 0x080000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "c23.bin",	0x000000, 0x040000, CRC(688cdf33) SHA1(b59dcc3fc15f72037692b745927b110e97d8282e) )
 	ROM_LOAD16_BYTE( "c22.bin",	0x000001, 0x040000, CRC(ab17c992) SHA1(1509b5b4bbfb4e022e0ab6fbbc0ffc070adfa531) )
 
@@ -272,7 +272,7 @@ ROM_START( glass10 )
 ROM_END
 
 ROM_START( glass10a )
-	ROM_REGION( 0x080000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "gl.c23",	0x000000, 0x040000, CRC(c1393bea) SHA1(a5f877ba38305a7b49fa3c96b9344cbf71e8c9ef
 ) )
 	ROM_LOAD16_BYTE( "gl.c22",	0x000001, 0x040000, CRC(0d6fa33e) SHA1(37e9258ef7e108d034c80abc8e5e5ab6dacf0a61) )

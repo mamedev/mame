@@ -400,10 +400,10 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( nvram )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", NSC8105, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mcu_nvram_map,0)
@@ -414,7 +414,7 @@ static MACHINE_DRIVER_START( nvram )
 	MDRV_NVRAM_HANDLER(seicross)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -458,7 +458,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( friskyt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ftom.01",      0x0000, 0x1000, CRC(bce5d486) SHA1(b3226d5737490f18092227a663e89ad48f39d82c) )
 	ROM_LOAD( "ftom.02",      0x1000, 0x1000, CRC(63157d6e) SHA1(2792f3d918ffee3818eca98f52192a069ab60678) )
 	ROM_LOAD( "ftom.03",      0x2000, 0x1000, CRC(c8d9ef2c) SHA1(43dd6bfd93188004b977b97120df28c028e8582b) )
@@ -469,7 +469,7 @@ ROM_START( friskyt )
 	ROM_LOAD( "ft8_8.rom",    0x7000, 0x0800, CRC(10461a24) SHA1(c1f98316a4e90a2a6ef4953708b90c9546caaedd) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )	/* 64k for the protection mcu */
-	ROM_COPY( "main", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ftom.11",      0x0000, 0x1000, CRC(1ec6ff65) SHA1(aab589c89cd14549b35f4dece5d3c231033c0c1a) )
@@ -483,7 +483,7 @@ ROM_START( friskyt )
 ROM_END
 
 ROM_START( friskyta )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ft.01",        0x0000, 0x1000, CRC(0ea46e19) SHA1(3feb3ee882926c0efa602cf92e6879e84a6050ed) )
 	ROM_LOAD( "ft.02",        0x1000, 0x1000, CRC(4f7b8662) SHA1(400c47d7ab5f3a749dbadb2286255b969ec48348) )
 	ROM_LOAD( "ft.03",        0x2000, 0x1000, CRC(1eb1b77c) SHA1(c08d6c1f1bbe2d41b0f6336a0c53ec993556e6b4) )
@@ -494,7 +494,7 @@ ROM_START( friskyta )
 	ROM_LOAD( "ft8_8.rom",    0x7000, 0x0800, CRC(10461a24) SHA1(c1f98316a4e90a2a6ef4953708b90c9546caaedd) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )	/* 64k for the protection mcu */
-	ROM_COPY( "main", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ft.11",        0x0000, 0x1000, CRC(956d924a) SHA1(e61bf5f187932c6cb676b4120cd95fe422f6a1a6) )
@@ -508,7 +508,7 @@ ROM_START( friskyta )
 ROM_END
 
 ROM_START( radrad )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.3a",         0x0000, 0x1000, CRC(b1e958ca) SHA1(3ab5fc3314f202ba527470eacbb76d52fe969bca) )
 	ROM_LOAD( "2.3b",         0x1000, 0x1000, CRC(30ba76b3) SHA1(e6af1fc35fdc71d5436f0d29e5722cbcb4409196) )
 	ROM_LOAD( "3.3c",         0x2000, 0x1000, CRC(1c9f397b) SHA1(7f556c5bef5309d5048c3b9671b88ad646a8b648) )
@@ -519,7 +519,7 @@ ROM_START( radrad )
 	ROM_LOAD( "8.3h",         0x7000, 0x0800, CRC(911c90e8) SHA1(94fa91e767ab27a1616f1768f97a44a59a3f3294) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )	/* 64k for the protection mcu */
-	ROM_COPY( "main", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "11.l7",        0x0000, 0x1000, CRC(4ace7afb) SHA1(3c495f106505d5dfed93393db1f1b3842f603448) )
@@ -536,7 +536,7 @@ ROM_START( radrad )
 ROM_END
 
 ROM_START( seicross )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "smc1",         0x0000, 0x1000, CRC(f6c3aeca) SHA1(d57019e80f7e3d47ca74f54604e92d40ba9819fc) )
 	ROM_LOAD( "smc2",         0x1000, 0x1000, CRC(0ec6c218) SHA1(d8cffea48d8afd229f2008399afe3858c13653e5) )
 	ROM_LOAD( "smc3",         0x2000, 0x1000, CRC(ceb3c8f4) SHA1(e49f834637b4addcf362cd010e31802c3e145cbe) )
@@ -547,7 +547,7 @@ ROM_START( seicross )
 	ROM_LOAD( "smc8",         0x7000, 0x0800, CRC(2093461d) SHA1(0d640bc7ee1e9ffe32580e3143677475145b06d2) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )	/* 64k for the protection mcu */
-	ROM_COPY( "main", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sz11.7k",      0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )
@@ -564,7 +564,7 @@ ROM_START( seicross )
 ROM_END
 
 ROM_START( sectrzon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sz1.3a",       0x0000, 0x1000, CRC(f0a45cb4) SHA1(ab3b8d78e25cdbb2fd6a6c0718ae13767364994d) )
 	ROM_LOAD( "sz2.3c",       0x1000, 0x1000, CRC(fea68ddb) SHA1(b9ed0cad9a2ded04bcc7042d975b77be63313070) )
 	ROM_LOAD( "sz3.3d",       0x2000, 0x1000, CRC(baad4294) SHA1(e7fc3ccc940de6df8d786c986b602127c9db9ebb) )
@@ -575,7 +575,7 @@ ROM_START( sectrzon )
 	ROM_LOAD( "sz8.3j",       0x7000, 0x0800, CRC(9933526a) SHA1(2178ef8653f1d60be28bcaebe1033ef7ae480157) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )	/* 64k for the protection mcu */
-	ROM_COPY( "main", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
+	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )	/* shares the main program ROMs and RAM with the main CPU. */
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sz11.7k",      0x0000, 0x1000, CRC(fbd9b91d) SHA1(6b3581f4b518c058b970d569ced07dd7dc6a87e6) )

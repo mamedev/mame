@@ -356,17 +356,17 @@ static INTERRUPT_GEN( spoker_interrupt )
 
 static MACHINE_DRIVER_START( spoker )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
+	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(spoker_map,0)
 	MDRV_CPU_IO_MAP(spoker_portmap,0)
-	MDRV_CPU_VBLANK_INT("main",spoker_interrupt)
+	MDRV_CPU_VBLANK_INT("screen",spoker_interrupt)
 
 	MDRV_MACHINE_RESET(spoker)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -393,7 +393,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT( spk116it )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -408,7 +408,7 @@ static DRIVER_INIT( spk116it )
 
 
 ROM_START( spk115it )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v.bin",   0x0000, 0x10000, CRC(df52997b) SHA1(72a76e84aeedfdebd4c6cb47809117a28b5d3892) )
 
 	ROM_REGION( 0xc0000, "gfx1", ROMREGION_DISPOSE )
@@ -427,7 +427,7 @@ ROM_END
 
 
 ROM_START( spk116it )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v.bin",   0x0000, 0x10000, CRC(e44e943a)  SHA1(78e32d07e2be9a452be10735641cbcf269068c55) )
 
 	ROM_REGION( 0xc0000, "gfx1", ROMREGION_DISPOSE )

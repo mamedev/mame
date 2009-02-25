@@ -724,13 +724,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( geebee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/9) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/9) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(geebee_map,0)
 	MDRV_CPU_IO_MAP(geebee_port_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 
@@ -764,12 +764,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bombbee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/9) 		/* 18.432 MHz / 9 */
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK/9) 		/* 18.432 MHz / 9 */
 	MDRV_CPU_PROGRAM_MAP(bombbee_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224)
 
@@ -791,7 +791,7 @@ static MACHINE_DRIVER_START( warpwarp )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(bombbee)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(warpwarp_map,0)
 MACHINE_DRIVER_END
 
@@ -803,7 +803,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( geebee )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "geebee.1k",    0x0000, 0x1000, CRC(8a5577e0) SHA1(356d33e19c6b4f519816ee4b65ff9b59d6c1b565) )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
@@ -812,7 +812,7 @@ ROM_START( geebee )
 ROM_END
 
 ROM_START( geebeeb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.1m",    0x0000, 0x0400, CRC(23252fc7) SHA1(433f0f435ff741a789942194356aaec53192608a) )
 	ROM_LOAD( "2.1p",    0x0400, 0x0400, CRC(0bc4d4ca) SHA1(46028ce1dbf46e49b921cfabec78cded914af358) )
 	ROM_LOAD( "3.1s",    0x0800, 0x0400, CRC(7899b4c1) SHA1(70f609f9873f1a4d9c8a90361c7519bdd24ad9ea) )
@@ -824,7 +824,7 @@ ROM_START( geebeeb )
 ROM_END
 
 ROM_START( geebeeg )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "geebee.1k",    0x0000, 0x1000, CRC(8a5577e0) SHA1(356d33e19c6b4f519816ee4b65ff9b59d6c1b565) )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
@@ -833,7 +833,7 @@ ROM_START( geebeeg )
 ROM_END
 
 ROM_START( navarone )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "navalone.p1",  0x0000, 0x0800, CRC(5a32016b) SHA1(d856d069eba470a81341de0bf47eca2a629a69a6) )
 	ROM_LOAD( "navalone.p2",  0x0800, 0x0800, CRC(b1c86fe3) SHA1(0293b742806c1517cb126443701115a3427fc60a) )
 
@@ -842,7 +842,7 @@ ROM_START( navarone )
 ROM_END
 
 ROM_START( kaitei )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kaitein.p1",   0x0000, 0x0800, CRC(d88e10ae) SHA1(76d6cd46b6e59e528e7a8fff9965375a1446a91d) )
 	ROM_LOAD( "kaitein.p2",   0x0800, 0x0800, CRC(aa9b5763) SHA1(64a6c8f25b0510841dcce0b57505731aa0deeda7) )
 
@@ -851,7 +851,7 @@ ROM_START( kaitei )
 ROM_END
 
 ROM_START( kaiteik )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kaitei_7.1k",  0x0000, 0x0800, CRC(32f70d48) SHA1(c5ae606df1d0e513daea909f5474309a176096c1) )
 	ROM_RELOAD(               0x0800, 0x0800 )
     ROM_LOAD( "kaitei_1.1m",  0x1000, 0x0400, CRC(9a7ab3b9) SHA1(94a82ba66e51c8203ec61c9320edbddbb6462d33) )
@@ -865,7 +865,7 @@ ROM_START( kaiteik )
 ROM_END
 
 ROM_START( sos )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sos.p1",       0x0000, 0x0800, CRC(f70bdafb) SHA1(e71d552ccc9adad48225bdb4d62c31c5741a3e95) )
 	ROM_LOAD( "sos.p2",       0x0800, 0x0800, CRC(58e9c480) SHA1(0eeb5982183d0e9f9dbae04839b604a0c22b420e) )
 
@@ -874,7 +874,7 @@ ROM_START( sos )
 ROM_END
 
 ROM_START( bombbee )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bombbee.1k",   0x0000, 0x2000, CRC(9f8cd7af) SHA1(0d6e1ee5519660d1498eb7a093872ed5034423f2) )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
@@ -882,7 +882,7 @@ ROM_START( bombbee )
 ROM_END
 
 ROM_START( cutieq )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cutieq.1k",    0x0000, 0x2000, CRC(6486cdca) SHA1(914c36487fba2dd57c3fd1f011b2225d2baac2bf) )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
@@ -890,7 +890,7 @@ ROM_START( cutieq )
 ROM_END
 
 ROM_START( warpwarp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g-n9601n.2r",  0x0000, 0x1000, CRC(f5262f38) SHA1(1c64d0282b0a209390a548ceeaaf8b7b55e50896) )
 	ROM_LOAD( "g-09602n.2m",  0x1000, 0x1000, CRC(de8355dd) SHA1(133d137711d79aaeb45cd3ee041c0be3b73e1b2f) )
 	ROM_LOAD( "g-09603n.1p",  0x2000, 0x1000, CRC(bdd1dec5) SHA1(bb3d9d1500e31bb271a394facaec7adc3c987e5e) )
@@ -901,7 +901,7 @@ ROM_START( warpwarp )
 ROM_END
 
 ROM_START( warpwarr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g-09601.2r",   0x0000, 0x1000, CRC(916ffa35) SHA1(bca2087f8b78a128cdffc55db9814854b72daab5) )
 	ROM_LOAD( "g-09602.2m",   0x1000, 0x1000, CRC(398bb87b) SHA1(74373336288dc13d59e6f7e7c718aa51d857b087) )
 	ROM_LOAD( "g-09603.1p",   0x2000, 0x1000, CRC(6b962fc4) SHA1(0291d0c574a1048e52121ca57e01098bff04da40) )
@@ -912,7 +912,7 @@ ROM_START( warpwarr )
 ROM_END
 
 ROM_START( warpwar2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g-09601.2r",   0x0000, 0x1000, CRC(916ffa35) SHA1(bca2087f8b78a128cdffc55db9814854b72daab5) )
 	ROM_LOAD( "g-09602.2m",   0x1000, 0x1000, CRC(398bb87b) SHA1(74373336288dc13d59e6f7e7c718aa51d857b087) )
 	ROM_LOAD( "g-09603.1p",   0x2000, 0x1000, CRC(6b962fc4) SHA1(0291d0c574a1048e52121ca57e01098bff04da40) )

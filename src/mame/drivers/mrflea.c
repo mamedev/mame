@@ -231,10 +231,10 @@ static const ay8910_interface mrflea_ay8910_interface_1 =
 static MACHINE_DRIVER_START( mrflea )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000) /* 4 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* NMI resets the game */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* NMI resets the game */
 
 	MDRV_CPU_ADD("sub", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_io,writemem_io)
@@ -244,7 +244,7 @@ static MACHINE_DRIVER_START( mrflea )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( mrflea )
 MACHINE_DRIVER_END
 
 ROM_START( mrflea )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code; main CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code; main CPU */
 	ROM_LOAD( "cpu_d1",	0x0000, 0x2000, CRC(d286217c) SHA1(d750d64bb70f735a38b737881abb9a5fbde1c98c) )
 	ROM_LOAD( "cpu_d3",	0x2000, 0x2000, CRC(95cf94bc) SHA1(dd0a51d79b0b28952e6177f36af93f296b3cd954) )
 	ROM_LOAD( "cpu_d5",	0x4000, 0x2000, CRC(466ca77e) SHA1(513f41a888166a057d28bdc572571a713d77ae5f) )

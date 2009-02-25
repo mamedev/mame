@@ -459,7 +459,7 @@ static const ym2203_interface ym2203_config =
  *************************************/
 
 static MACHINE_DRIVER_START( lockon )
-	MDRV_CPU_ADD("main", V30, XTAL_16MHz / 2)
+	MDRV_CPU_ADD("maincpu", V30, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(main_v30, 0)
 
 	MDRV_CPU_ADD("ground", V30, XTAL_16MHz / 2)
@@ -468,7 +468,7 @@ static MACHINE_DRIVER_START( lockon )
 	MDRV_CPU_ADD("object", V30, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(object_v30, 0)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_16MHz / 4)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(sound_prg, 0)
 	MDRV_CPU_IO_MAP(sound_io, 0)
 
@@ -477,7 +477,7 @@ static MACHINE_DRIVER_START( lockon )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -526,7 +526,7 @@ MACHINE_DRIVER_END
 
 ROM_START( lockon )
 	/* TF012 V30 (Main) */
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lo1_02c.89", 0x60000, 0x8000, CRC(bbf17263) SHA1(96821a0ecd6efe6764380fef094f87c1d6e1d299) )
 	ROM_LOAD16_BYTE( "lo1_03c.88", 0x60001, 0x8000, CRC(fa58fd36) SHA1(16af24027610bf6d3fdc4c3df3bf6d94c6776420) )
 
@@ -549,7 +549,7 @@ ROM_START( lockon )
 	ROM_LOAD16_BYTE( "lo4_01b", 0x30001, 0x8000, CRC(7e88bcf2) SHA1(d541458ba6178ec3bce0e9b872b9fa1d8edb107c) )
 
 	/* TF014 Z80 (Sound) */
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "lo1_08b.24", 0x00000, 0x8000, CRC(73860ec9) SHA1(a94afa274321b9f9ac2184e133132f9829fb9485) )
 
 	/* 8x8x2 characters */
@@ -638,7 +638,7 @@ ROM_END
 
 ROM_START( lockonc )
 	/* TF012 V30 (Main) */
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lo1_02c.89", 0x60000, 0x8000, CRC(bbf17263) SHA1(96821a0ecd6efe6764380fef094f87c1d6e1d299) )
 	ROM_LOAD16_BYTE( "lo1_03c.88", 0x60001, 0x8000, CRC(fa58fd36) SHA1(16af24027610bf6d3fdc4c3df3bf6d94c6776420) )
 
@@ -661,7 +661,7 @@ ROM_START( lockonc )
 	ROM_LOAD16_BYTE( "lo4_01b", 0x30001, 0x8000, CRC(7e88bcf2) SHA1(d541458ba6178ec3bce0e9b872b9fa1d8edb107c) )
 
 	/* TF014 Z80 (Sound) */
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "lo1_08b.24", 0x00000, 0x8000, CRC(73860ec9) SHA1(a94afa274321b9f9ac2184e133132f9829fb9485) )
 
 	/* 8x8x2 characters */

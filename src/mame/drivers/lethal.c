@@ -274,7 +274,7 @@ static void sound_nmi(const device_config *device)
 
 static WRITE8_HANDLER( le_bankswitch_w )
 {
-	UINT8 *prgrom = (UINT8 *)memory_region(space->machine, "main")+0x10000;
+	UINT8 *prgrom = (UINT8 *)memory_region(space->machine, "maincpu")+0x10000;
 
 	memory_set_bankptr(space->machine, 1, &prgrom[data * 0x2000]);
 }
@@ -583,7 +583,7 @@ static MACHINE_START( lethalen )
 
 static MACHINE_RESET( lethalen )
 {
-	UINT8 *prgrom = (UINT8 *)memory_region(machine, "main");
+	UINT8 *prgrom = (UINT8 *)memory_region(machine, "maincpu");
 
 	memory_set_bankptr(machine, 1, &prgrom[0x10000]);
 	memory_set_bankptr(machine, 2, &prgrom[0x48000]);
@@ -611,11 +611,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( lethalen )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK/2)	// ???
+	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)	// ???
 	MDRV_CPU_PROGRAM_MAP(le_main, 0)
-	MDRV_CPU_VBLANK_INT("main", lethalen_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", lethalen_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, 8000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(le_sound, 0)
 
 	MDRV_MACHINE_START(lethalen)
@@ -628,7 +628,7 @@ static MACHINE_DRIVER_START( lethalen )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -652,16 +652,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lethalej )
 	MDRV_IMPORT_FROM(lethalen)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
 MACHINE_DRIVER_END
 
 ROM_START( lethalen )	// US version UAE
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191uae01.u4",    0x10000,  0x40000,  CRC(dca340e3) SHA1(8efbba0e3a459bcfe23c75c584bf3a4ce25148bb) )
 
-	ROM_REGION( 0x020000, "sound", 0 )
+	ROM_REGION( 0x020000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 	ROM_RELOAD(         0x010000, 0x010000 )
@@ -691,11 +691,11 @@ ROM_START( lethalen )	// US version UAE
 ROM_END
 
 ROM_START( lethalej )	// Japan version JAD
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191jad01.u4",    0x10000,  0x40000, CRC(160a25c0) SHA1(1d3ed5a158e461a73c079fe24a8e9d5e2a87e126) )
 
-	ROM_REGION( 0x020000, "sound", 0 )
+	ROM_REGION( 0x020000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 	ROM_RELOAD(         0x010000, 0x010000 )
@@ -725,11 +725,11 @@ ROM_START( lethalej )	// Japan version JAD
 ROM_END
 
 ROM_START( lethalux )	// US version ?, proto / hack?, very different to other sets
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191xxx01.u4",    0x10000,  0x40000, CRC(a3b9e790) SHA1(868b422850be129952c8b11c3c4aa730d8ea1544) ) // hacked? fails rom test
 
-	ROM_REGION( 0x020000, "sound", 0 )
+	ROM_REGION( 0x020000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 	ROM_RELOAD(         0x010000, 0x010000 )
@@ -759,11 +759,11 @@ ROM_START( lethalux )	// US version ?, proto / hack?, very different to other se
 ROM_END
 
 ROM_START( letheab )	// Euro ver. EAB
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191eab01.u4",    0x10000,  0x40000, CRC(d7ce111e) SHA1(e56137a0ba7664f09b5d05bb39ec6eb4d1e412c7) )
 
-	ROM_REGION( 0x020000, "sound", 0 )
+	ROM_REGION( 0x020000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 	ROM_RELOAD(         0x010000, 0x010000 )
@@ -793,11 +793,11 @@ ROM_START( letheab )	// Euro ver. EAB
 ROM_END
 
 ROM_START( letheae )	// Euro ver. EAE
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "191eae01.u4",    0x10000,  0x40000, CRC(c6a3c6ac) SHA1(96a209a3a5b4af40af36bd7090c59a74f8c8df59) )
 
-	ROM_REGION( 0x020000, "sound", 0 )
+	ROM_REGION( 0x020000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 	ROM_RELOAD(         0x010000, 0x010000 )
@@ -827,11 +827,11 @@ ROM_START( letheae )	// Euro ver. EAE
 ROM_END
 
 ROM_START( lethalua )	// *might* be UAA (writes UA to Eeprom)
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	/* main program */
 	ROM_LOAD( "6_usa.u4",    0x10000,  0x40000, CRC(ab6b8f16) SHA1(8de6c429a6e71144270e79d18ad47b5aad13fe04) )
 
-	ROM_REGION( 0x020000, "sound", 0 )
+	ROM_REGION( 0x020000, "soundcpu", 0 )
 	/* Z80 sound program */
 	ROM_LOAD( "191a02.f4", 0x000000, 0x010000, CRC(72b843cc) SHA1(b44b2f039358c26fa792d740639b66a5c8bf78e7) )
 	ROM_RELOAD(         0x010000, 0x010000 )

@@ -128,7 +128,7 @@ static const ay8910_interface redalert_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,		/* port A/B read */
 	DEVCB_NULL,
 	DEVCB_HANDLER(redalert_analog_w)	/* port A/B write */
@@ -221,7 +221,7 @@ static SOUND_START( redalert )
 
 static MACHINE_DRIVER_START( redalert_audio_m37b )
 
-	MDRV_CPU_ADD("audio", M6502, REDALERT_AUDIO_CPU_CLOCK)
+	MDRV_CPU_ADD("audiocpu", M6502, REDALERT_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(redalert_audio_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, REDALERT_AUDIO_CPU_IRQ_FREQ)
 
@@ -362,7 +362,7 @@ static const ay8910_interface demoneye_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,	/* port A/B read */
 	DEVCB_NULL,
 	DEVCB_NULL				/* port A/B write */
@@ -415,7 +415,7 @@ static SOUND_RESET( demoneye )
 
 MACHINE_DRIVER_START( demoneye_audio )
 
-	MDRV_CPU_ADD("audio", M6802, DEMONEYE_AUDIO_CPU_CLOCK)
+	MDRV_CPU_ADD("audiocpu", M6802, DEMONEYE_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(demoneye_audio_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
 

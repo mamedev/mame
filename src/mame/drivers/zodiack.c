@@ -457,11 +457,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( zodiack )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4.00 MHz??? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 14318000/8)	/* 1.78975 MHz??? */
+	MDRV_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
@@ -469,7 +469,7 @@ static MACHINE_DRIVER_START( zodiack )
 	MDRV_MACHINE_RESET(zodiack)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* frames per second, vblank duration */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -502,12 +502,12 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 ROM_START( zodiack )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ovg30c.2",     0x0000, 0x2000, CRC(a2125e99) SHA1(00ae4ed2c7b6895d2dc58aa2fc51c25b6428e4ba) )
 	ROM_LOAD( "ovg30c.3",     0x2000, 0x2000, CRC(aee2b77f) SHA1(2581b7a75d38663cc5ebc91a77385ca7eb9b4aba) )
 	ROM_LOAD( "ovg30c.6",     0x4000, 0x0800, CRC(1debb278) SHA1(98c9f09c5f3125ba8a1392be62fd469aa0ba4d98) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ovg20c.1",     0x0000, 0x1000, CRC(2d3c3baf) SHA1(e32937b947e591cba45da2dd456e4f655e62ddfd) )
 
 	ROM_REGION( 0x2800, "gfx1", ROMREGION_DISPOSE )
@@ -521,13 +521,13 @@ ROM_START( zodiack )
 ROM_END
 
 ROM_START( dogfight )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "df-2",         0x0000, 0x2000, CRC(ad24b28b) SHA1(5bfc24c9d176a987525c5ad3eff3308f679d4d44) )
 	ROM_LOAD( "df-3",         0x2000, 0x2000, CRC(cd172707) SHA1(9d7a494006db13cbe9c895875a18d9423a0128bc) )
 	ROM_LOAD( "df-5",         0x4000, 0x1000, CRC(874dc6bf) SHA1(2c34fdfb2838c41f239171bc9a14a5cc7a94a170) )
 	ROM_LOAD( "df-4",         0xc000, 0x1000, CRC(d8aa3d6d) SHA1(0863d566ff4a181ae8a8d552f9768dd028254605) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "df-1",         0x0000, 0x1000, CRC(dcbb1c5b) SHA1(51fa51ff64982455b00484d55f6a8cf89fc786f1) )
 
 	ROM_REGION( 0x2800, "gfx1", ROMREGION_DISPOSE )
@@ -541,12 +541,12 @@ ROM_START( dogfight )
 ROM_END
 
 ROM_START( moguchan )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2.5r",         0x0000, 0x1000, CRC(85d0cb7e) SHA1(20066f71d80161dff556bc86edf40fcc2ac3b993) )
 	ROM_LOAD( "4.5m",         0x1000, 0x1000, CRC(359ef951) SHA1(93e80fcd371e8d2026919d0e046b636b7c19002e) )
 	ROM_LOAD( "3.5np",        0x2000, 0x1000, CRC(c8776f77) SHA1(edc28a6a804b9573307faa25b6fdd096b7093593) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1.7hj",        0x0000, 0x1000, CRC(1a88d35f) SHA1(d9347723c0eb6508739a6c0de4984b8244b197cf) )
 
 	ROM_REGION( 0x2800, "gfx1", ROMREGION_DISPOSE )
@@ -560,14 +560,14 @@ ROM_START( moguchan )
 ROM_END
 
 ROM_START( percuss )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "percuss.1",    0x0000, 0x1000, CRC(ff0364f7) SHA1(048963d70e513068fdb591b4bc152473fe4cc2c3) )
 	ROM_LOAD( "percuss.3",    0x1000, 0x1000, CRC(7f646c59) SHA1(976210f1fed11c03e0a159c8189630a1fec63fc9) )
 	ROM_LOAD( "percuss.2",    0x2000, 0x1000, CRC(6bf72dd2) SHA1(447109a508a571650501d3dd3fa018513b4e4558) )
 	ROM_LOAD( "percuss.4",    0x3000, 0x1000, CRC(fb1b15ba) SHA1(778853a0fbef7dd80d1046e2b04adcd9d1241f83) )
 	ROM_LOAD( "percuss.5",    0x4000, 0x1000, CRC(8e5a9692) SHA1(17db644c3cd0435c380b2080bda02c6a6d45eaf6) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "percuss.8",    0x0000, 0x0800, CRC(d63f56f3) SHA1(2cf9cca55fb612c9efae06e62bd6d33fdd38de57) )
 	ROM_LOAD( "percuss.9",    0x0800, 0x0800, CRC(e08fef2f) SHA1(af41763f200c4c660ca7230eace4f443e57e809a) )
 
@@ -582,13 +582,13 @@ ROM_START( percuss )
 ROM_END
 
 ROM_START( bounty )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.4f",      0x0000, 0x1000, CRC(f495b19d) SHA1(df2de0869b10da1ee1d98d48615c9e1dce798c26) )
 	ROM_LOAD( "3.4k",      0x1000, 0x1000, CRC(fa3086c3) SHA1(b8bab26a4e68e6d2e5b899e900c9affd297c22de) )
 	ROM_LOAD( "2.4h",      0x2000, 0x1000, CRC(52ab5314) SHA1(ba399f8b86cc64d1dd585dde79d8036d24296475) )
 	ROM_LOAD( "4.4m",      0x3000, 0x1000, CRC(5c9d3f07) SHA1(340460f38c5b23c591f92d386c0df10ed75fa16f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "7.4n",      0x0000, 0x1000, CRC(45e369b8) SHA1(9799b2ece5e3b92da435255e1b49f5097d3f7972) )
 	ROM_LOAD( "8.4r",      0x1000, 0x1000, CRC(4f52c87d) SHA1(1738d798c341a54d293c70da7b6e4a3dfb00de38) )
 

@@ -389,11 +389,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( dcheese )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MAIN_OSC)
+	MDRV_CPU_ADD("maincpu", M68000, MAIN_OSC)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map,0)
-	MDRV_CPU_VBLANK_INT("main", dcheese_vblank)
+	MDRV_CPU_VBLANK_INT("screen", dcheese_vblank)
 
-	MDRV_CPU_ADD("audio", M6809, SOUND_OSC/16)
+	MDRV_CPU_ADD("audiocpu", M6809, SOUND_OSC/16)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map,0)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 480)	/* accurate for fredmem */
 
@@ -402,7 +402,7 @@ static MACHINE_DRIVER_START( dcheese )
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(360, 262)	/* guess, need to see what the games write to the vid registers */
@@ -425,7 +425,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fredmem )
 	MDRV_IMPORT_FROM(dcheese)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
 MACHINE_DRIVER_END
 
@@ -449,11 +449,11 @@ MACHINE_DRIVER_END
     (c)1993 Midway Manufacturing. ROM labels (c) 1993 HAR
 */
 ROM_START( dcheese )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "dchez.104", 0x00000, 0x20000, CRC(5b6233d8) SHA1(7fdb606b5780dd8f45db07d3ee50e14a27f39533) )
 	ROM_LOAD16_BYTE( "dchez.103", 0x00001, 0x20000, CRC(599c73ff) SHA1(f33e617ab7e9489c52b2434cfc61a5e1696e9400) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* M6809 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "dchez.102", 0x8000, 0x8000, CRC(5d110061) SHA1(10d852a408a75979b8e8843afc7b39737ca2c6c8) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -494,11 +494,11 @@ ROM_END
 
 
 ROM_START( lottof2 )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "u104.r20", 0x00000, 0x20000, CRC(0dfa710e) SHA1(b28676caf2074822e87bd213d76a892bcce07c1a) )
 	ROM_LOAD16_BYTE( "u103.r20", 0x00001, 0x20000, CRC(1bcd7c77) SHA1(891f066cbcf558e7a725154758cf5a7a58a4400a) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* M6809 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "u102.r10", 0x8000, 0x8000, CRC(fcb34c81) SHA1(f80cef85d0f4218c88c01b238f10eff2c6241d33) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -544,11 +544,11 @@ ROM_END
 
 
 ROM_START( fredmem )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "prog0.104", 0x00000, 0x20000, CRC(9e90ebc3) SHA1(ef86e5070ec64772b8e8b9b30910b88bbd46285b) ) /* Program 0 - V2.0 at U104 */
 	ROM_LOAD16_BYTE( "prog1.103", 0x00001, 0x20000, CRC(79cadede) SHA1(bfc04edf6dc3beb942ffba442fe4203d1e1a3c0e) ) /* Program 1 - V2.0 at U103 */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* M6809 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -577,11 +577,11 @@ ROM_END
 
 
 ROM_START( fredmeus )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "u104.us.hiscore", 0x00000, 0x20000, CRC(4460c690) SHA1(08fec2704baac4b83add8f1d5936f15336a67599) ) /* Program 0 - V2.0 at U104 */
 	ROM_LOAD16_BYTE( "u103.us.hiscore", 0x00001, 0x20000, CRC(ff5bfdc3) SHA1(c38b856d6a74df68bfc6fb15b521180f78742d45) ) /* Program 1 - V2.0 at U103 */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* M6809 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -609,11 +609,11 @@ ROM_START( fredmeus )
 ROM_END
 
 ROM_START( fredmeuk )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "u104.uk", 0x00000, 0x20000, CRC(e810daab) SHA1(99be21eb5df49fd8b665935c774798be270e0f27) ) /* Program 0 - V2.0 at U104 */
 	ROM_LOAD16_BYTE( "u103.uk", 0x00001, 0x20000, CRC(0f2e65fb) SHA1(533a45d2de0ee3c306197d2559355c3193f9ac6b) ) /* Program 1 - V2.0 at U103 */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* M6809 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -642,11 +642,11 @@ ROM_END
 
 /* Japan version, has a High Score table instead of tickets */
 ROM_START( fredmemj )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "prog0_japan.104", 0x00000, 0x20000, CRC(4f5e947e) SHA1(14c19832f98a14293a66e64d2d86e8c5cc8a9324) ) /* Program 0 - V2.0 at U104 */
 	ROM_LOAD16_BYTE( "prog1_japan.103", 0x00001, 0x20000, CRC(2df6affb) SHA1(d1d28090a857cb0b0464986c446b189e7911d3d3) ) /* Program 1 - V2.0 at U103 */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* M6809 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -674,11 +674,11 @@ ROM_START( fredmemj )
 ROM_END
 
 ROM_START( fredmemc )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "u104.mandarin", 0x00000, 0x20000, CRC(f46e4af6) SHA1(3bc5a7e7db7bcf86e4e8ab5df0c8bff89398d8c5) ) /* Program 0 - V2.0 at U104 */
 	ROM_LOAD16_BYTE( "u103.mandarin", 0x00001, 0x20000, CRC(160a7f47) SHA1(14704d1618320b2155c6387d03ac006b3b64fc58) ) /* Program 1 - V2.0 at U103 */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* M6809 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -706,11 +706,11 @@ ROM_START( fredmemc )
 ROM_END
 
 ROM_START( fredmesp )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "u104.spanish", 0x00000, 0x20000, CRC(ba150de6) SHA1(57aedc2c96309d6b5b67090e24e1e672404d34bf) ) /* Program 0 - V2.0 at U104 */
 	ROM_LOAD16_BYTE( "u103.spanish", 0x00001, 0x20000, CRC(4af72eb0) SHA1(c0addfc2900fb41c24ecf9b052ef1854206a4cba) ) /* Program 1 - V2.0 at U103 */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* M6809 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -739,11 +739,11 @@ ROM_END
 
 
 ROM_START( cecmatch )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "prog0.104", 0x00000, 0x20000, CRC(b13585e2) SHA1(dbf6db79e319157b5ac540471348682b45508c1f) ) /* Program 0 - V2.0 at U104 */
 	ROM_LOAD16_BYTE( "prog1.103", 0x00001, 0x20000, CRC(5baf4f50) SHA1(e7529a4cffa292a491093a74f9ea49f59e41617f) ) /* Program 1 - V2.0 at U103 */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* M6809 */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x8000, CRC(d452ccf4) SHA1(7de9a4f39bf0ba448fe4ebeb459e98a1910a66be) ) /* Sound Program 6809 code at U102 */
 	ROM_RELOAD(0x8000,0x8000)
 

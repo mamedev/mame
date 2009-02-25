@@ -106,7 +106,7 @@ static INTERRUPT_GEN( srmp2_interrupt )
 
 static DRIVER_INIT( srmp2 )
 {
-	UINT16 *RAM = (UINT16 *) memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
 
 	/* Fix "ERROR BACK UP" and "ERROR IOX" */
 	RAM[0x20c80 / 2] = 0x4e75;								// RTS
@@ -114,7 +114,7 @@ static DRIVER_INIT( srmp2 )
 
 static DRIVER_INIT( srmp3 )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	/* BANK ROM (0x08000 - 0x1ffff) Check skip [MAIN ROM side] */
 	RAM[0x00000 + 0x7b69] = 0x00;							// NOP
@@ -368,7 +368,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
     xxx- ---- : ADPCM ROM bank
 */
 
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	int addr;
 
 	srmp2_adpcm_bank = ((data & 0xe0) >> 5);
@@ -1058,7 +1058,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( srmp2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,16000000/2)				/* 8.00 MHz */
+	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(srmp2_readmem,srmp2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
@@ -1066,7 +1066,7 @@ static MACHINE_DRIVER_START( srmp2 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1096,17 +1096,17 @@ static MACHINE_DRIVER_START( srmp3 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("main", Z80, 3500000)		/* 3.50 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 3500000)		/* 3.50 MHz ? */
 	//      4000000,                /* 4.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(srmp3_readmem,srmp3_writemem)
 	MDRV_CPU_IO_MAP(srmp3_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(srmp3)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1135,7 +1135,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mjyuugi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,16000000/2)				/* 8.00 MHz */
+	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(mjyuugi_readmem,mjyuugi_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
@@ -1143,7 +1143,7 @@ static MACHINE_DRIVER_START( mjyuugi )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1212,7 +1212,7 @@ UB-3 (PAL16L8A - not dumped)
 ***************************************************************************/
 
 ROM_START( srmp1 )
-	ROM_REGION( 0x40000, "main", 0 )					/* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 )					/* 68000 Code */
 	ROM_LOAD16_BYTE( "ub0-2.17", 0x000000, 0x20000, CRC(71a00a3d) SHA1(8deb07a4621e0f0f1d6dd503cd7f4f826a63c255) )
 	ROM_LOAD16_BYTE( "ub0-3.18", 0x000001, 0x20000, CRC(2950841b) SHA1(1859636602375b4cadbd23457a0d16bc85063ff5) )
 
@@ -1235,7 +1235,7 @@ ROM_START( srmp1 )
 ROM_END
 
 ROM_START( srmp2 )
-	ROM_REGION( 0x040000, "main", 0 )					/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )					/* 68000 Code */
 	ROM_LOAD16_BYTE( "uco-2.17", 0x000000, 0x020000, CRC(0d6c131f) SHA1(be85f2578b0ae2a072565605b7dbeb970e5e3851) )
 	ROM_LOAD16_BYTE( "uco-3.18", 0x000001, 0x020000, CRC(e9fdf5f8) SHA1(aa1f8cc3f1d0ed942403c0473605775bc1537cbf) )
 
@@ -1258,7 +1258,7 @@ ROM_START( srmp2 )
 ROM_END
 
 ROM_START( srmp3 )
-	ROM_REGION( 0x028000, "main", 0 )					/* 68000 Code */
+	ROM_REGION( 0x028000, "maincpu", 0 )					/* 68000 Code */
 	ROM_LOAD( "za0-10.bin", 0x000000, 0x008000, CRC(939d126f) SHA1(7a5c7f7fbee8de11a08194d3c8f10a20f8dc2f0a) )
 	ROM_CONTINUE(           0x010000, 0x018000 )
 
@@ -1281,7 +1281,7 @@ ROM_START( srmp3 )
 ROM_END
 
 ROM_START( mjyuugi )
-	ROM_REGION( 0x080000, "main", 0 )					/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )					/* 68000 Code */
 	ROM_LOAD16_BYTE( "um001.001", 0x000000, 0x020000, CRC(28d5340f) SHA1(683d89987b8b794695fdb6104d8e6ff5204afafb) )
 	ROM_LOAD16_BYTE( "um001.003", 0x000001, 0x020000, CRC(275197de) SHA1(2f8efa112f23f172eaef9bb732b2a253307dd896) )
 	ROM_LOAD16_BYTE( "um001.002", 0x040000, 0x020000, CRC(d5dd4710) SHA1(b70c280f828af507c73ebec3209043eb7ce0ce95) )
@@ -1303,7 +1303,7 @@ ROM_START( mjyuugi )
 ROM_END
 
 ROM_START( mjyuugia )
-	ROM_REGION( 0x080000, "main", 0 )					/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )					/* 68000 Code */
 	ROM_LOAD16_BYTE( "um_001.001", 0x000000, 0x020000, CRC(76dc0594) SHA1(4bd81616769cdc59eaf6f7921e404e166500f67f) )
 	ROM_LOAD16_BYTE( "um001.003",  0x000001, 0x020000, CRC(275197de) SHA1(2f8efa112f23f172eaef9bb732b2a253307dd896) )
 	ROM_LOAD16_BYTE( "um001.002",  0x040000, 0x020000, CRC(d5dd4710) SHA1(b70c280f828af507c73ebec3209043eb7ce0ce95) )
@@ -1325,7 +1325,7 @@ ROM_START( mjyuugia )
 ROM_END
 
 ROM_START( ponchin )
-	ROM_REGION( 0x080000, "main", 0 )					/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )					/* 68000 Code */
 	ROM_LOAD16_BYTE( "um2_1_1.u22", 0x000000, 0x020000, CRC(cf88efbb) SHA1(7bd2304d365524fc5bcf3fb30752f5efec73a9f5) )
 	ROM_LOAD16_BYTE( "um2_1_3.u42", 0x000001, 0x020000, CRC(e053458f) SHA1(db4a34589a08d0252d700144a6260a0f6c4e8e30) )
 	ROM_LOAD16_BYTE( "um2_1_2.u29", 0x040000, 0x020000, CRC(5c2f9bcf) SHA1(e2880123373653c7e5d85fb957474e1c5774640d) )
@@ -1343,7 +1343,7 @@ ROM_START( ponchin )
 ROM_END
 
 ROM_START( ponchina )
-	ROM_REGION( 0x080000, "main", 0 )					/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )					/* 68000 Code */
 	ROM_LOAD16_BYTE( "u22.bin",     0x000000, 0x020000, CRC(9181de20) SHA1(03fdb289d862ff2d87249d35991bd60784e172d9) )
 	ROM_LOAD16_BYTE( "um2_1_3.u42", 0x000001, 0x020000, CRC(e053458f) SHA1(db4a34589a08d0252d700144a6260a0f6c4e8e30) )
 	ROM_LOAD16_BYTE( "um2_1_2.u29", 0x040000, 0x020000, CRC(5c2f9bcf) SHA1(e2880123373653c7e5d85fb957474e1c5774640d) )

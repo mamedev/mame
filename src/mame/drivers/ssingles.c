@@ -86,7 +86,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static const mc6845_interface mc6845_intf =
 {
-		"main",
+		"screen",
 		8,
 		NULL,
 		update_row,
@@ -257,12 +257,12 @@ static INPUT_PORTS_START( ssingles )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( ssingles )
-	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(ssingles_map,0)
 	MDRV_CPU_IO_MAP(ssingles_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
@@ -285,7 +285,7 @@ static MACHINE_DRIVER_START( ssingles )
 MACHINE_DRIVER_END
 
 ROM_START( ssingles )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 main CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 main CPU  */
 	ROM_LOAD( "1.bin", 0x00000, 0x2000, CRC(43f02215) SHA1(9f04a7d4671ff39fd2bd8ec7afced4981ee7be05) )
 	ROM_LOAD( "2.bin", 0x06000, 0x2000, CRC(281f27e4) SHA1(cef28717ab2ed991a5709464c01490f0ab1dc17c) )
 	ROM_LOAD( "3.bin", 0x08000, 0x2000, CRC(14fdcb65) SHA1(70f7fcb46e74937de0e4037c9fe79349a30d0d07) )

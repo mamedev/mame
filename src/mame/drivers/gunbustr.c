@@ -360,9 +360,9 @@ static NVRAM_HANDLER( gunbustr )
 static MACHINE_DRIVER_START( gunbustr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(gunbustr_readmem,gunbustr_writemem)
-	MDRV_CPU_VBLANK_INT("main", gunbustr_interrupt) /* VBL */
+	MDRV_CPU_VBLANK_INT("screen", gunbustr_interrupt) /* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
@@ -370,7 +370,7 @@ static MACHINE_DRIVER_START( gunbustr )
 	MDRV_NVRAM_HANDLER(gunbustr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -390,13 +390,13 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( gunbustr )
-	ROM_REGION( 0x100000, "main", 0 )	/* 1024K for 68020 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024K for 68020 code (CPU A) */
 	ROM_LOAD32_BYTE( "d27-23.bin", 0x00000, 0x40000, CRC(cd1037cc) SHA1(8005a6a84081ce609e7a605ec8e00e740bfc6846) )
 	ROM_LOAD32_BYTE( "d27-22.bin", 0x00001, 0x40000, CRC(475949fc) SHA1(3d5aa3411d2618004902f9d05dff61d9af01ff35) )
 	ROM_LOAD32_BYTE( "d27-21.bin", 0x00002, 0x40000, CRC(60950a8a) SHA1(a0336bf6970baa6eaa998a112db840a7fd0452d7) )
 	ROM_LOAD32_BYTE( "d27-20.bin", 0x00003, 0x40000, CRC(13735c60) SHA1(65b762b28d51b295f6fe190420af566b1b3d4a82) )
 
-	ROM_REGION( 0x140000, "audio", 0 )	/* Sound cpu */
+	ROM_REGION( 0x140000, "audiocpu", 0 )	/* Sound cpu */
 	ROM_LOAD16_BYTE( "d27-25.bin", 0x100000, 0x20000, CRC(c88203cf) SHA1(a918d395b471acdce56dacabd7a1e1e023948365) )
 	ROM_LOAD16_BYTE( "d27-24.bin", 0x100001, 0x20000, CRC(084bd8bd) SHA1(93229bc7de4550ead1bb12f666ddbacbe357488d) )
 

@@ -363,17 +363,17 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( oneshot )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(oneshot_readmem,oneshot_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 5000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(snd_readmem, snd_writemem)
 
 	MDRV_GFXDECODE(oneshot)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -407,11 +407,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( oneshot )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "1shot-u.a24", 0x00000, 0x20000, CRC(0ecd33da) SHA1(d050e9a1900cd9f629818034b1445e034b6cf81c) )
 	ROM_LOAD16_BYTE( "1shot-u.a22", 0x00001, 0x20000, CRC(26c3ae2d) SHA1(47e479abe06d508a9d9fe677d34d6a485bde5533) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "1shot.ua2", 0x00000, 0x010000, CRC(f655b80e) SHA1(2574a812c35801755c187a47f46ccdb0983c5feb) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
@@ -433,11 +433,11 @@ ROM_START( oneshot )
 ROM_END
 
 ROM_START( maddonna )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "maddonna.b16", 0x00000, 0x20000, CRC(643f9054) SHA1(77907ecdb02a525f9beed7fee203431eda16c831) )
 	ROM_LOAD16_BYTE( "maddonna.b15", 0x00001, 0x20000, CRC(e36c0e26) SHA1(f261b2c74eeca05df302aa4956f5d02121d42054) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "x13.ua2", 0x00000, 0x010000, CRC(f2080071) SHA1(68cbae9559879b2dc19c41a7efbd13ab4a569d3f) ) // b13
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
@@ -458,12 +458,12 @@ ROM_START( maddonna )
 ROM_END
 
 ROM_START( maddonnb )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
 	/* program roms missing in this dump, gfx don't seem 100% correct for other ones */
 	ROM_LOAD16_BYTE( "maddonnb.b16", 0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "maddonnb.b15", 0x00001, 0x20000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "x13.ua2", 0x00000, 0x010000, CRC(f2080071) SHA1(68cbae9559879b2dc19c41a7efbd13ab4a569d3f) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */

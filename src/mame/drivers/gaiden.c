@@ -870,18 +870,18 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( shadoww )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 18432000/2)	/* 9.216 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 18432000/2)	/* 9.216 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* IRQs are triggered by the YM2203 */
 
 	MDRV_MACHINE_RESET(raiga)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -918,7 +918,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( raiga )
 	MDRV_IMPORT_FROM(shadoww)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 
 	MDRV_VIDEO_START(raiga)
@@ -929,16 +929,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( drgnbowl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 20000000/2)	/* 10 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)	/* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(drgnbowl_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq5_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 12000000/2)	/* 6 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(drgnbowl_sound_map,0)
 	MDRV_CPU_IO_MAP(drgnbowl_sound_port_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -969,11 +969,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( shadoww )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "shadowa_1.3s",     0x00000, 0x20000, CRC(8290d567) SHA1(1e2f80c1548c853ec1127e79438f62eda6592a07) )
 	ROM_LOAD16_BYTE( "shadowa_2.4s",     0x00001, 0x20000, CRC(f3f08921) SHA1(df6bb7302714e0eab12cbd0a7f2a4ca751a600e1) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "gaiden_3.4b",     0x0000, 0x10000, CRC(75fd3e6a) SHA1(3333e84ed4983caa133e60a8e8895fa897ab4949) )   /* Audio CPU is a Z80  */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -1010,11 +1010,11 @@ ROM_START( shadoww )
 ROM_END
 
 ROM_START( shadowwa )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "shadoww_1.3s",    0x00000, 0x20000, CRC(fefba387) SHA1(20ce28da5877009494c3f3f67488bbe805d91340) )
 	ROM_LOAD16_BYTE( "shadoww_2.4s",    0x00001, 0x20000, CRC(9b9d6b18) SHA1(75068611fb1de61120be8bf840f61d90c0dc86ca) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "gaiden_3.4b",     0x0000, 0x10000, CRC(75fd3e6a) SHA1(3333e84ed4983caa133e60a8e8895fa897ab4949) )   /* Audio CPU is a Z80  */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -1051,11 +1051,11 @@ ROM_START( shadowwa )
 ROM_END
 
 ROM_START( gaiden )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "gaiden_1.3s",     0x00000, 0x20000, CRC(e037ff7c) SHA1(5418bcb80d4c52f05e3c26668193452fd51f1283) )
 	ROM_LOAD16_BYTE( "gaiden_2.4s",     0x00001, 0x20000, CRC(454f7314) SHA1(231296423870f00ea2e545faf0fbb37577430a4f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "gaiden_3.4b",     0x0000, 0x10000, CRC(75fd3e6a) SHA1(3333e84ed4983caa133e60a8e8895fa897ab4949) )   /* Audio CPU is a Z80  */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -1089,11 +1089,11 @@ ROM_START( gaiden )
 ROM_END
 
 ROM_START( ryukendn )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "ryukendn_1.3s",  0x00000, 0x20000, CRC(6203a5e2) SHA1(8cfe05c483a351e938b067ffa642d515e28605a3) )
 	ROM_LOAD16_BYTE( "ryukendn_2.4s",  0x00001, 0x20000, CRC(9e99f522) SHA1(b2277d8934b5e6e2f556aee5092f5d1050774a34) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3.4b",   0x0000, 0x10000, CRC(6b686b69) SHA1(f0fa553acb3945f8dbbf466073c8bae35a0375ef) )   /* Audio CPU is a Z80  */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -1139,11 +1139,11 @@ Dumped from an original Tecmo board. Board No. 6215-A. Serial A-59488.
 */
 
 ROM_START( ryukenda )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "1.3s",  0x00000, 0x20000, CRC(0ed5464c) SHA1(2eab6650ad1c38cd560ec3d084f47156756c97a4) )
 	ROM_LOAD16_BYTE( "2.4s",  0x00001, 0x20000, CRC(a93a8256) SHA1(6bf6c189f82cb9341d3427a822de83cbaed27bc0) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "3.4b",   0x0000, 0x10000, CRC(6b686b69) SHA1(f0fa553acb3945f8dbbf466073c8bae35a0375ef) )   /* Audio CPU is a Z80  */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -1179,11 +1179,11 @@ ROM_END
 
 
 ROM_START( tknight )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "tkni1.bin",    0x00000, 0x20000, CRC(9121daa8) SHA1(06ba7779602df8fae32e859371d27c0dbb8d3430) )
 	ROM_LOAD16_BYTE( "tkni2.bin",    0x00001, 0x20000, CRC(6669cd87) SHA1(8888522a3aef76a979ffc80ba457dd49f279abf1) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -1204,11 +1204,11 @@ ROM_START( tknight )
 ROM_END
 
 ROM_START( wildfang )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "1.3st",    0x00000, 0x20000, CRC(ab876c9b) SHA1(b02c822f107df4c9c4f0024998f225c1ddbbd496) )
 	ROM_LOAD16_BYTE( "2.5st",    0x00001, 0x20000, CRC(1dc74b3b) SHA1(c99051ebefd6ce666b13ab56c0a10b188f15ec28) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tkni3.bin",    0x0000, 0x10000, CRC(15623ec7) SHA1(db43fe6c417117d7cd90a26e12a52efb0e1a5ca6) )   /* Audio CPU is a Z80  */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -1232,11 +1232,11 @@ ROM_START( wildfang )
 ROM_END
 
 ROM_START( stratof )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1.3s",        0x00000, 0x20000, CRC(060822a4) SHA1(82abf6ea64695d2f7b5934ad2487e857648aeecf) )
 	ROM_LOAD16_BYTE( "2.4s",        0x00001, 0x20000, CRC(339358fa) SHA1(b662bccc2206ae888ea36f355d44bf98fcd2ee2c) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 )	/* protection NEC D8749 */
@@ -1260,11 +1260,11 @@ ROM_START( stratof )
 ROM_END
 
 ROM_START( raiga )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "a-3s.1",      0x00000, 0x20000, CRC(303c2a6c) SHA1(cd825329fd1f7d87661114f07cc87e43fd34e251) )
 	ROM_LOAD16_BYTE( "a-4s.2",      0x00001, 0x20000, CRC(5f31fecb) SHA1(b0c88d260d0108100c157ea92f7defdc3cbb8933) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a-4b.3",           0x00000, 0x10000, CRC(18655c95) SHA1(8357e0520565a201bb930cadffc759463931ec41) )
 
 	ROM_REGION( 0x1000, "cpu2", 0 )	/* protection NEC D8749 */
@@ -1334,11 +1334,11 @@ Notes:
 */
 
 ROM_START( drgnbowl )
-	ROM_REGION( 0x40000, "main", 0 )	/* 2*128k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "4.3h",         0x00000, 0x20000, CRC(90730008) SHA1(84f0668cf978d99f861cbaeb4b33f7cb1428a648) )
 	ROM_LOAD16_BYTE( "5.4h",         0x00001, 0x20000, CRC(193cc915) SHA1(e898f31766eaf515e0787848134b1365e75b32a9) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1.2r",         0x00000, 0x10000, CRC(d9cbf84a) SHA1(d14d749a41a440a56fea1d836a8d62be65786d68) ) /* Audio CPU is a Z80  */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -1397,8 +1397,8 @@ static DRIVER_INIT( raiga )
 static DRIVER_INIT( drgnbowl )
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "main");
-	size_t  size = memory_region_length(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	size_t  size = memory_region_length(machine, "maincpu");
 	UINT8 *buffer = malloc_or_die(size);
 
 	memcpy(buffer,ROM,size);

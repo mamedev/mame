@@ -589,18 +589,18 @@ static const samples_interface bowl3d_samples_interface =
 static MACHINE_DRIVER_START( meadows )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(meadows_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", meadows_interrupt) 	/* one interrupt per frame!? */
+	MDRV_CPU_VBLANK_INT("screen", meadows_interrupt) 	/* one interrupt per frame!? */
 
-	MDRV_CPU_ADD("audio", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_ADD("audiocpu", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, (double)5000000/131072)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 30*8)
@@ -628,13 +628,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( minferno )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, MASTER_CLOCK/24) 	/* 5MHz / 8 / 3 = 208.33 kHz */
+	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24) 	/* 5MHz / 8 / 3 = 208.33 kHz */
 	MDRV_CPU_PROGRAM_MAP(minferno_main_map,0)
 	MDRV_CPU_IO_MAP(minferno_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", minferno_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", minferno_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -670,7 +670,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( deadeye )
-	ROM_REGION( 0x08000, "main", 0 )
+	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "de1.8h",       0x0000, 0x0400, CRC(bd09e4dc) SHA1(5428835f6bc3d162496fdce174fcaaaba98c09f9) )
 	ROM_LOAD( "de2.9h",       0x0400, 0x0400, CRC(b89edec3) SHA1(5ce0058f23b7e5c832029ca97d9a40d1494bf972) )
 	ROM_LOAD( "de3.10h",      0x0800, 0x0400, CRC(acf24438) SHA1(d7ea668ee19a167cb006c92e9606e20ef13d052e) )
@@ -692,13 +692,13 @@ ROM_START( deadeye )
 	ROM_REGION( 0x0400, "gfx5", ROMREGION_DISPOSE )
 	/* empty */
 
-	ROM_REGION( 0x08000, "audio", 0 )
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "de_snd",       0x0000, 0x0400, CRC(c10a1b1a) SHA1(779ea261d23360634081295a164cacbd819d8719) )
 ROM_END
 
 
 ROM_START( bowl3d )
-	ROM_REGION( 0x08000, "main", 0 )
+	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "b3d.h8",       0x0000, 0x0400, CRC(be38feeb) SHA1(feab3c61ce1e351c02f6ffa7f7f2ac90e62e7719) )
 	ROM_LOAD( "b3d.h9",       0x0400, 0x0400, CRC(4e8acead) SHA1(3c00f0d05b9cb80a2245bc68a45732ab6ac87b7f) )
 	ROM_LOAD( "b3d.h10",      0x0800, 0x0400, CRC(16677267) SHA1(0131f68e87d6326870f95c1ff364a97436b6c4d8) )
@@ -707,7 +707,7 @@ ROM_START( bowl3d )
 	// h13 empty
 
     /* Universal Game Logic according to schematics  */
-    ROM_REGION( 0x08000, "audio", 0 ) 	/* 2650 CPU at j8 */
+    ROM_REGION( 0x08000, "audiocpu", 0 ) 	/* 2650 CPU at j8 */
 	ROM_LOAD( "82s115.a6",    0x0000, 0x0001, NO_DUMP ) /* 82s115 eprom */
 	ROM_LOAD( "82s115.c6",    0x0000, 0x0001, NO_DUMP ) /* 82s115 eprom */
 
@@ -731,7 +731,7 @@ ROM_END
 
 
 ROM_START( gypsyjug )
-	ROM_REGION( 0x08000, "main", 0 )
+	ROM_REGION( 0x08000, "maincpu", 0 )
 	ROM_LOAD( "gj.1b",        0x0000, 0x0400, CRC(f6a71d9f) SHA1(11a86ae781297e4077a69e6809487022fed9c444) )
 	ROM_LOAD( "gj.2b",        0x0400, 0x0400, CRC(94c14455) SHA1(ed704680c2b83d1726d1a17d64f5d57925a495b2) )
 	ROM_LOAD( "gj.3b",        0x0800, 0x0400, CRC(87ee0490) SHA1(7ecca4df9755b604d179d407e7c9c04d616b689b) )
@@ -753,7 +753,7 @@ ROM_START( gypsyjug )
 	ROM_REGION( 0x0400, "gfx5", ROMREGION_DISPOSE )
 	ROM_LOAD( "gj.y",         0x0000, 0x0400, NO_DUMP )		/* missing */
 
-	ROM_REGION( 0x08000, "audio", 0 )
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "gj.a4s",       0x0000, 0x0400, CRC(17a116bc) SHA1(797ba0b292afa3ba7eec985b533014acc00ed47d) )
 	ROM_LOAD( "gj.a5s",       0x0400, 0x0400, CRC(fc23ae09) SHA1(42be34a9ef8c4c8ef9f94c85ca031076f84faa96) )
 	ROM_LOAD( "gj.a6s",       0x0800, 0x0400, CRC(9e7bd71e) SHA1(e00801820c1a39cbfed124a29470da03cf8b40b4) )
@@ -761,7 +761,7 @@ ROM_END
 
 
 ROM_START( minferno )
-	ROM_REGION( 0x08000, "main", ROMREGION_INVERT )
+	ROM_REGION( 0x08000, "maincpu", ROMREGION_INVERT )
 	ROM_LOAD_NIB_LOW ( "inferno.f5",	0x0000, 0x0400, CRC(58472a73) SHA1(7f8b9502c3db11219d6b765dec7b6ff3f62d6c8b) )
 	ROM_LOAD_NIB_HIGH( "inferno.e5",	0x0000, 0x0400, CRC(451942af) SHA1(0a03d74c1b98771d2170c76ca41e972300c34c3a) )
 	ROM_LOAD_NIB_LOW ( "inferno.f6",	0x0400, 0x0400, CRC(d85a195b) SHA1(8250f8e80a9bf196d7bf122af9aad0ae00dedd26) )

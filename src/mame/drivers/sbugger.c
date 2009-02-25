@@ -226,7 +226,7 @@ INPUT_PORTS_END
 /* machine driver */
 
 static MACHINE_DRIVER_START( sbugger )
-	MDRV_CPU_ADD("main", 8085A, 6000000)        /* 3.00 MHz??? */
+	MDRV_CPU_ADD("maincpu", 8085A, 6000000)        /* 3.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq3_line_hold,NUM_INTS_FRAME)
@@ -234,7 +234,7 @@ static MACHINE_DRIVER_START( sbugger )
 	MDRV_GFXDECODE(sbugger)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -261,7 +261,7 @@ MACHINE_DRIVER_END
 /* rom loading */
 
 ROM_START( sbugger )
-	ROM_REGION( 0x10000, "main", 0 ) /* 8085 Code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 8085 Code */
 
 	ROM_LOAD( "spbugger.u35", 0x0000, 0x0800, CRC(7c2000a1) SHA1(01a60745ea8e9a70de37d1a785fad1d17eafc812) ) // seems to map at 0
 	ROM_LOAD( "spbugger.u22", 0x0800, 0x0800, BAD_DUMP CRC(66e00c53) SHA1(49ca567a98978308306cdb8455c61c022668693b) ) // FIXED BITS (xxxx1111)  it jumps here .... bad rom?
@@ -276,7 +276,7 @@ ROM_START( sbugger )
 ROM_END
 
 ROM_START( sbuggera )
-	ROM_REGION( 0x10000, "main", 0 ) /* 8085 Code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 8085 Code */
 	ROM_LOAD( "bug_g10.u35", 0x0000, 0x0800, CRC(60a3044d) SHA1(5b2be551a84e4a7a35637208a19b3477629f20d9) )
 	ROM_LOAD( "bug_c10.u22", 0x0800, 0x0800, CRC(34a829f7) SHA1(135ec2739879c2e47f3c6d4a5196c865b5940a84) )
 	ROM_LOAD( "bug_f10.u34", 0x1000, 0x0800, CRC(e2f7a51c) SHA1(ee221f6697021d14838fd6c4aff41678ce62e4ba) )

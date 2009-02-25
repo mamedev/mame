@@ -514,7 +514,7 @@ static void machine_init_common(running_machine *machine)
 static MACHINE_START( superqix )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -522,7 +522,7 @@ static MACHINE_START( superqix )
 static MACHINE_START( pbillian )
 {
 	/* configure the banks */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	machine_init_common(machine);
 }
@@ -977,15 +977,15 @@ static INTERRUPT_GEN( bootleg_interrupt )
 
 
 static MACHINE_DRIVER_START( pbillian )
-	MDRV_CPU_ADD("main", Z80,12000000/2)		 /* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(pbillian_port_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_START(pbillian)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1010,10 +1010,10 @@ static MACHINE_DRIVER_START( pbillian )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hotsmash )
-	MDRV_CPU_ADD("main", Z80,12000000/2)		 /* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(hotsmash_port_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("mcu", M68705, 4000000) /* ???? */
 	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
@@ -1021,7 +1021,7 @@ static MACHINE_DRIVER_START( hotsmash )
 	MDRV_MACHINE_START(pbillian)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1048,7 +1048,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sqix )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 12000000/2)	/* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(sqix_port_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
@@ -1061,7 +1061,7 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_MACHINE_START(superqix)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1090,7 +1090,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sqixbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 12000000/2)	/* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(bootleg_port_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,6)	/* ??? */
@@ -1098,7 +1098,7 @@ static MACHINE_DRIVER_START( sqixbl )
 	MDRV_MACHINE_START(superqix)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1132,7 +1132,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pbillian )
-	ROM_REGION( 0x018000, "main", 0 )
+	ROM_REGION( 0x018000, "maincpu", 0 )
 	ROM_LOAD( "1.6c",  0x00000, 0x08000, CRC(d379fe23) SHA1(e147a9151b1cdeacb126d9713687bd0aa92980ac) )
 	ROM_LOAD( "2.6d",  0x14000, 0x04000, CRC(1af522bc) SHA1(83e002dc831bfcedbd7096b350c9b34418b79674) )
 
@@ -1149,7 +1149,7 @@ ROM_START( pbillian )
 ROM_END
 
 ROM_START( hotsmash )
-	ROM_REGION( 0x018000, "main", 0 )
+	ROM_REGION( 0x018000, "maincpu", 0 )
 	ROM_LOAD( "b18-04",  0x00000, 0x08000, CRC(981bde2c) SHA1(ebcc901a036cde16b33d534d423500d74523b781) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )
@@ -1165,7 +1165,7 @@ ROM_START( hotsmash )
 ROM_END
 
 ROM_START( sqix )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b03-01-1",     0x00000, 0x08000, CRC(ad614117) SHA1(c461f00a2aecde1bc3860c15a3c31091b14665a2) )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
@@ -1184,7 +1184,7 @@ ROM_START( sqix )
 ROM_END
 
 ROM_START( sqixu )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b03-06.f3",     0x00000, 0x08000, CRC(4f59f7af) SHA1(6ea627ea8505cf8d1a5a1350258180c61fbd1ed9) )
 	ROM_LOAD( "b03-07.h3",     0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
 
@@ -1204,7 +1204,7 @@ ROM_END
 
 /* this was probably a bootleg */
 ROM_START( sqixa )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "sq01.97",      0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
@@ -1223,7 +1223,7 @@ ROM_START( sqixa )
 ROM_END
 
 ROM_START( sqixbl )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cpu.2",        0x00000, 0x08000, CRC(682e28e3) SHA1(fe9221d26d7397be5a0fc8fdc51672b5924f3cf2) )
 	ROM_LOAD( "b03-02",       0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
@@ -1239,7 +1239,7 @@ ROM_START( sqixbl )
 ROM_END
 
 ROM_START( perestrf )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	/* 0x8000 - 0x10000 in the rom is empty anyway */
 	ROM_LOAD( "rom1.bin",        0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) )
 
@@ -1254,7 +1254,7 @@ ROM_START( perestrf )
 ROM_END
 
 ROM_START( perestro )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	/* 0x8000 - 0x10000 in the rom is empty anyway */
 	ROM_LOAD( "rom1.bin",        0x00000, 0x20000, CRC(0cbf96c1) SHA1(cf2b1367887d1b8812a56aa55593e742578f220c) )
 
@@ -1298,8 +1298,8 @@ static DRIVER_INIT( perestro )
 	int i,j;
 
 	/* decrypt program code; the address lines are shuffled around in a non-trivial way */
-	src = memory_region(machine, "main");
-	len = memory_region_length(machine, "main");
+	src = memory_region(machine, "maincpu");
+	len = memory_region_length(machine, "maincpu");
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);

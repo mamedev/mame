@@ -1187,14 +1187,14 @@ static DRIVER_INIT( rockn3 )
 static MACHINE_DRIVER_START( tetrisp2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(tetrisp2_readmem,tetrisp2_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1219,14 +1219,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nndmseal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(nndmseal_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1251,14 +1251,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rockn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rockn1_readmem,rockn1_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1283,14 +1283,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rockn2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rockn2_readmem,rockn2_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1315,7 +1315,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( rocknms )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rocknms_main_readmem,rocknms_main_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq2_line_hold)
 
@@ -1410,7 +1410,7 @@ Japan Set:
 ***************************************************************************/
 
 ROM_START( tetrisp2 ) /* Unknown version */
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "t2p_04.rom", 0x000000, 0x080000, CRC(e67f9c51) SHA1(d8b2937699d648267b163c7c3f591426877f3701) )
 	ROM_LOAD16_BYTE( "t2p_01.rom", 0x000001, 0x080000, CRC(5020a4ed) SHA1(9c0f02fe3700761771ac026a2e375144e86e5eb7) )
 
@@ -1436,7 +1436,7 @@ ROM_START( tetrisp2 ) /* Unknown version */
 ROM_END
 
 ROM_START( teplus2j ) /* Version 2.2 */
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "tet2-4v2.2", 0x000000, 0x080000, CRC(5bfa32c8) SHA1(55fb2872695fcfbad13f5c0723302e72da69e44a) )
 	ROM_LOAD16_BYTE( "tet2-1v2.2", 0x000001, 0x080000, CRC(919116d0) SHA1(3e1c0fd4c9175b2900a4717fbb9e8b591c5f534d) )
 
@@ -1515,7 +1515,7 @@ dumped by sayu
 ***************************************************************************/
 
 ROM_START( nndmseal )
-	ROM_REGION( 0x80000, "main", 0 )		// 68000 Code
+	ROM_REGION( 0x80000, "maincpu", 0 )		// 68000 Code
 	ROM_LOAD16_BYTE( "1.1", 0x00000, 0x40000, CRC(45acea25) SHA1(f2f2e78be261c3d8c0145a639bc3771f0588401d) )	// 1xxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "3.3", 0x00001, 0x40000, CRC(0754d96a) SHA1(1da44994e8bcfd8832755e298c0125b38cfdd16e) )	// 1xxxxxxxxxxxxxxxxx = 0xFF
 
@@ -1608,7 +1608,7 @@ Sound chips: Yamaha YMZ280B-F & Yamaha YAC516-M
 /***  Rock 'n' Tread  ***/
 
 ROM_START( rockn )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rock_n_1_vj-98344_1.bin", 0x000001, 0x80000, CRC(4cf79e58) SHA1(f50e596d43c9ab2072ae0476169eee2a8512fd8d) )
 	ROM_LOAD16_BYTE( "rock_n_1_vj-98344_4.bin", 0x000000, 0x80000, CRC(caa33f79) SHA1(8ccff67091dac5ad871cae6cdb31e1fc37c1a4c2) )
 
@@ -1646,7 +1646,7 @@ ROM_START( rockn )
 ROM_END
 
 ROM_START( rockna )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rock_n_1_vj-98344_1", 0x000001, 0x80000, CRC(6078fa48) SHA1(e98c1a1abf026f2d5b5035ccbc9d412a08ca1f02) )
 	ROM_LOAD16_BYTE( "rock_n_1_vj-98344_4", 0x000000, 0x80000, CRC(c8310bd0) SHA1(1efee954cc94b668b7d9f28a099b8d1c83d3093f) )
 
@@ -1683,7 +1683,7 @@ ROM_START( rockna )
 ROM_END
 
 ROM_START( rockn2 )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rock_n_2_vj-98344_1_v1.0", 0x000001, 0x80000, CRC(854b5a45) SHA1(91496bc511fef1d552d2bd00b82d2470eae94528) )
 	ROM_LOAD16_BYTE( "rock_n_2_vj-98344_4_v1.0", 0x000000, 0x80000, CRC(4665bbd2) SHA1(3562c67b81a32d178a8bcb872e676bf7284855d7) )
 
@@ -1761,7 +1761,7 @@ IC43   (no label) XILINX 17S30PC  Serial Config rom
 ***************************************************************************/
 
 ROM_START( rockn3 )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rock_n_3_vj-98344_1_v1.0", 0x000001, 0x80000, CRC(abc6ab4a) SHA1(2f1983b95cd9e42d709edac5613b1f0b450df4ba) ) /* IC65 (alt PCB number 1) */
 	ROM_LOAD16_BYTE( "rock_n_3_vj-98344_4_v1.0", 0x000000, 0x80000, CRC(3ecba46e) SHA1(64ff5b7932a8d8dc01c649b9dcc1d55cf1e43387) ) /* IC59 (alt PCB number 4) */
 
@@ -1808,7 +1808,7 @@ ROM_START( rockn3 )
 ROM_END
 
 ROM_START( rockn4 ) /* Prototype */
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rock_n_4_vj-98344_1.bin", 0x000001, 0x80000, CRC(c666caea) SHA1(57018de40d71fe214a6b5cc33c8ad5e88622d010) )
 	ROM_LOAD16_BYTE( "rock_n_4_vj-98344_4.bin", 0x000000, 0x80000, CRC(cc94e557) SHA1(d38abed04239d9eecf1b1be7a9f765a1b7aa0d8d) )
 
@@ -1840,7 +1840,7 @@ ROM_START( rockn4 ) /* Prototype */
 ROM_END
 
 ROM_START( rocknms )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "mast_prg1", 0x000001, 0x80000, CRC(c36674f8) SHA1(8aeb19fcd6f786c9d76a72abee4b607d29fb7d56) )
 	ROM_LOAD16_BYTE( "mast_prg0", 0x000000, 0x80000, CRC(69382065) SHA1(2d528c2954556d440e790db209a2e3563580296a) )
 

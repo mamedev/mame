@@ -897,7 +897,7 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( tubep )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(tubep_main_map,0)
 	MDRV_CPU_IO_MAP(tubep_main_portmap,0)
 
@@ -905,7 +905,7 @@ static MACHINE_DRIVER_START( tubep )
 	MDRV_CPU_PROGRAM_MAP(tubep_second_map,0)
 	MDRV_CPU_IO_MAP(tubep_second_portmap,0)
 
-	MDRV_CPU_ADD("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MDRV_CPU_ADD("soundcpu",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MDRV_CPU_PROGRAM_MAP(tubep_sound_map,0)
 	MDRV_CPU_IO_MAP(tubep_sound_portmap,0)
 
@@ -918,7 +918,7 @@ static MACHINE_DRIVER_START( tubep )
 	MDRV_MACHINE_RESET(tubep)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 264)
@@ -955,14 +955,14 @@ static MACHINE_DRIVER_START( tubepb )
 
 	MDRV_CPU_ADD("mcu", M6802,6000000) /* ? MHz Xtal */
 	MDRV_CPU_PROGRAM_MAP(nsc_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( rjammer )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,16000000 / 4)	/* 4 MHz */
+	MDRV_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(rjammer_main_map,0)
 	MDRV_CPU_IO_MAP(rjammer_main_portmap,0)
 
@@ -970,7 +970,7 @@ static MACHINE_DRIVER_START( rjammer )
 	MDRV_CPU_PROGRAM_MAP(rjammer_second_map,0)
 	MDRV_CPU_IO_MAP(rjammer_second_portmap,0)
 
-	MDRV_CPU_ADD("sound",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MDRV_CPU_ADD("soundcpu",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
 	MDRV_CPU_PROGRAM_MAP(rjammer_sound_map,0)
 	MDRV_CPU_IO_MAP(rjammer_sound_portmap,0)
 
@@ -982,7 +982,7 @@ static MACHINE_DRIVER_START( rjammer )
 
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 264)
@@ -1024,7 +1024,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( tubep )
-	ROM_REGION( 0x10000,"main", 0 ) /* Z80 (master) cpu code */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* Z80 (master) cpu code */
 	ROM_LOAD( "tp-p.5", 0x0000, 0x2000, CRC(d5e0cc2f) SHA1(db9b062b14af52bb5458fe71996da295a69148ac) )
 	ROM_LOAD( "tp-p.6", 0x2000, 0x2000, CRC(97b791a0) SHA1(20ef87b3d3bdfc8b983bcb8231252f81d98ad452) )
 	ROM_LOAD( "tp-p.7", 0x4000, 0x2000, CRC(add9983e) SHA1(70a517451553a8c0e74a1995d9afddb779efc92c) )
@@ -1036,7 +1036,7 @@ ROM_START( tubep )
 	ROM_LOAD( "tp-p.3", 0x4000, 0x2000, CRC(f1d86e00) SHA1(5c26f20f49e09a736cede4f276f5bdf76f932400) )
 	ROM_LOAD( "tp-p.4", 0x6000, 0x2000, CRC(0a1027bc) SHA1(2ebb53a1da53a9c3f0b99da084030c4d2b62a7b3) )
 
-	ROM_REGION( 0x10000,"sound", 0 ) /* Z80 (sound) cpu code */
+	ROM_REGION( 0x10000,"soundcpu", 0 ) /* Z80 (sound) cpu code */
 	ROM_LOAD( "tp-s.1", 0x0000, 0x2000, CRC(78964fcc) SHA1(a2c6119275d6291d82ac11dcffdaf2e8726e935a) )
 	ROM_LOAD( "tp-s.2", 0x2000, 0x2000, CRC(61232e29) SHA1(a9ef0fefb7250392ef51173b69a69c903ff91ee8) )
 
@@ -1079,7 +1079,7 @@ ROM_END
 
 
 ROM_START( tubepb )
-	ROM_REGION( 0x10000,"main", 0 ) /* Z80 (master) cpu code */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* Z80 (master) cpu code */
 	ROM_LOAD( "a15.bin", 0x0000, 0x1000, CRC(806370a8) SHA1(c1915fae15bd766ffbd3c47d65ade51d36117eb8) )
 	ROM_LOAD( "a16.bin", 0x1000, 0x1000, CRC(0917fb76) SHA1(1ce2680700d6ce28dfd202f238f1fc6e9c4a2758) )
 	ROM_LOAD( "a13.bin", 0x2000, 0x1000, CRC(6e4bb47e) SHA1(092eba1a90f43eb298ee9e4dc0f13d5411a14b4a) )
@@ -1099,7 +1099,7 @@ ROM_START( tubepb )
 	ROM_LOAD( "a7.bin",  0x6000, 0x1000, CRC(417dd321) SHA1(aa0faa19eed1397e46a67e8793c5a27991ea9c1b) )
 	ROM_LOAD( "a8.bin",  0x7000, 0x1000, CRC(d26ab4c0) SHA1(8d92386e75114494d65df4cfebdbacd09fddb48e) )
 
-	ROM_REGION( 0x10000,"sound", 0 ) /* Z80 (sound) cpu code */
+	ROM_REGION( 0x10000,"soundcpu", 0 ) /* Z80 (sound) cpu code */
 	ROM_LOAD( "15.bin",  0x0000, 0x2000, CRC(78964fcc) SHA1(a2c6119275d6291d82ac11dcffdaf2e8726e935a) )
 	ROM_LOAD( "16.bin",  0x2000, 0x2000, CRC(61232e29) SHA1(a9ef0fefb7250392ef51173b69a69c903ff91ee8) )
 
@@ -1150,7 +1150,7 @@ ROM_END
 
 
 ROM_START( rjammer )
-	ROM_REGION( 0x10000,"main", 0 ) /* Z80 (master) cpu code */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* Z80 (master) cpu code */
 	ROM_LOAD( "tp-p.1", 0x0000, 0x2000, CRC(93eeed67) SHA1(9ccfc49f42c6b451ff1c541d6487276f4bf9338e) )
 	ROM_LOAD( "tp-p.2", 0x2000, 0x2000, CRC(ed2830c4) SHA1(078046e88604617342d29f0f4a0473fe6d484b19) )
 	ROM_LOAD( "tp-p.3", 0x4000, 0x2000, CRC(e29f25e3) SHA1(21abf0e7c315fac15dd39355c16f9401c2cf4593) )
@@ -1163,7 +1163,7 @@ ROM_START( rjammer )
 	ROM_LOAD( "tp-p.6", 0x4000, 0x2000, CRC(b5aa0f89) SHA1(d7e8b7e76fe6e5ef1d9bcad8469d56b81c9509ac) )
 	ROM_LOAD( "tp-p.5", 0x6000, 0x2000, CRC(56eae9ac) SHA1(e5cd75df0c38021b81de2abf049b12c10db4f3cb) )
 
-	ROM_REGION( 0x10000,"sound", 0 ) /* Z80 (sound) cpu code */
+	ROM_REGION( 0x10000,"soundcpu", 0 ) /* Z80 (sound) cpu code */
 	ROM_LOAD( "tp-b1.6d", 0x0000, 0x2000, CRC(b1c2525c) SHA1(7a184142e83982e33bc41cabae6fe804cec78748) )
 	ROM_LOAD( "tp-s3.4d", 0x2000, 0x2000, CRC(90c9d0b9) SHA1(8657ee93d7b67ba89848bf94e03b5c3bcace92c4) )
 	ROM_LOAD( "tp-s2.2d", 0x4000, 0x2000, CRC(444b6a1d) SHA1(1252b14d473d764a5326401aac782a1fa3419784) )

@@ -757,7 +757,7 @@ static COP400_INTERFACE( thayers_cop_intf )
 
 static MACHINE_DRIVER_START( thayers )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_4MHz)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(thayers_map, 0)
 	MDRV_CPU_IO_MAP(thayers_io_map, 0)
 
@@ -768,10 +768,10 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_MACHINE_START(thayers)
 	MDRV_MACHINE_RESET(thayers)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
 
 	MDRV_PALETTE_LENGTH(256)
 
@@ -787,7 +787,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( thayers )
-	ROM_REGION( 0xe000, "main", 0 )
+	ROM_REGION( 0xe000, "maincpu", 0 )
 	ROM_LOAD( "tq_u33.bin", 0x0000, 0x8000, CRC(82df5d89) SHA1(58dfd62bf8c5a55d1eba397d2c284e99a4685a3f) )
 	ROM_LOAD( "tq_u1.bin",  0xc000, 0x2000, CRC(e8e7f566) SHA1(df7b83ef465c65446c8418bc6007447693b75021) )
 
@@ -799,7 +799,7 @@ ROM_START( thayers )
 ROM_END
 
 ROM_START( thayersa )
-	ROM_REGION( 0xe000, "main", 0 )
+	ROM_REGION( 0xe000, "maincpu", 0 )
 	ROM_LOAD( "tq_u33.bin", 0x0000, 0x8000, CRC(82df5d89) SHA1(58dfd62bf8c5a55d1eba397d2c284e99a4685a3f) )
 	ROM_LOAD( "tq_u1.bin",  0xc000, 0x2000, CRC(33817e25) SHA1(f9750da863dd57fe2f5b6e8fce9c6695dc5c9adc) )
 

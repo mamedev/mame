@@ -106,7 +106,7 @@ static WRITE8_DEVICE_HANDLER(mario_dma_write_byte);
 
 static const z80dma_interface mario_dma =
 {
-	"main",
+	"maincpu",
 
 	mario_dma_read_byte,
 	mario_dma_write_byte,
@@ -340,16 +340,16 @@ static MACHINE_DRIVER_START( mario_base )
 	MDRV_DRIVER_DATA(mario_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, Z80_CLOCK)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, Z80_CLOCK)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mario_map, 0)
 	MDRV_CPU_IO_MAP(mario_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* devices */
 	MDRV_Z80DMA_ADD("z80dma", Z80_CLOCK, mario_dma)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MDRV_GFXDECODE(mario)
@@ -376,10 +376,10 @@ static MACHINE_DRIVER_START( masao )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mario_base )
 
-	MDRV_CPU_REPLACE("main", Z80, 4000000)        /* 4.000 MHz (?) */
+	MDRV_CPU_REPLACE("maincpu", Z80, 4000000)        /* 4.000 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(masao_map, 0)
 	MDRV_CPU_IO_MAP(mario_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(masao_audio)
@@ -393,13 +393,13 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( mario )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tma1-c.7f_e-1",     0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) )
 	ROM_LOAD( "tma1-c.7e_e-b",     0x2000, 0x2000, CRC(b09ab857) SHA1(35b91cd1c4c3dd2d543a1ea8ff7b951715727792) )
 	ROM_LOAD( "tma1-c.7d_e-1",     0x4000, 0x2000, CRC(dcceb6c1) SHA1(b19804e69ce2c98cf276c6055c3a250316b96b45) )
 	ROM_LOAD( "tma1-c.7c_e-3",     0xf000, 0x1000, CRC(0d31bd1c) SHA1(a2e238470ba2ea3c81225fec687f61f047c68c59) )
 
-	ROM_REGION( 0x1800, "audio", 0 )	/* sound */
+	ROM_REGION( 0x1800, "audiocpu", 0 )	/* sound */
 	/* internal rom */
 	ROM_FILL(                 0x0000, 0x0800, 0x00)
 	/* first half banked */
@@ -424,13 +424,13 @@ ROM_START( mario )
 ROM_END
 
 ROM_START( marioo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mario.7f",     0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) )
 	ROM_LOAD( "mario.7e",     0x2000, 0x2000, CRC(116b3856) SHA1(e372f846d0e5a2b9b47ebd0330293fcc8a12363f) )
 	ROM_LOAD( "mario.7d",     0x4000, 0x2000, CRC(dcceb6c1) SHA1(b19804e69ce2c98cf276c6055c3a250316b96b45) )
 	ROM_LOAD( "mario.7c",     0xf000, 0x1000, CRC(4a63d96b) SHA1(b09060b2c84ab77cc540a27b8f932cb60ec8d442) )
 
-	ROM_REGION( 0x1800, "audio", 0 )	/* sound */
+	ROM_REGION( 0x1800, "audiocpu", 0 )	/* sound */
 	/* internal rom */
 	ROM_FILL(                 0x0000, 0x0800, 0x00)
 	/* first half banked */
@@ -455,13 +455,13 @@ ROM_START( marioo )
 ROM_END
 
 ROM_START( marioj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tma1c-a1.7f",  0x0000, 0x2000, CRC(b64b6330) SHA1(f7084251ac325bbfa3fb804da16a50622e1fd213) )
 	ROM_LOAD( "tma1c-a2.7e",  0x2000, 0x2000, CRC(290c4977) SHA1(5af266be0ddc883c6548c90e4a9084024a1e91a0) )
 	ROM_LOAD( "tma1c-a1.7d",  0x4000, 0x2000, CRC(f8575f31) SHA1(710d0e72fcfce700ed2a22fb9c7c392cc76b250b) )
 	ROM_LOAD( "tma1c-a2.7c",  0xf000, 0x1000, CRC(a3c11e9e) SHA1(d0612b0f8c2ea4e798f551922a04a324f4ed5f3d) )
 
-	ROM_REGION( 0x1800, "audio", 0 )	/* sound */
+	ROM_REGION( 0x1800, "audiocpu", 0 )	/* sound */
 	/* internal rom */
 	ROM_FILL(                 0x0000, 0x0800, 0x00)
 	/* first half banked */
@@ -486,13 +486,13 @@ ROM_START( marioj )
 ROM_END
 
 ROM_START( masao )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "masao-4.rom",  0x0000, 0x2000, CRC(07a75745) SHA1(acc760242a8862d177e3cff90aa32c4f3dac4e65) )
 	ROM_LOAD( "masao-3.rom",  0x2000, 0x2000, CRC(55c629b6) SHA1(1f5b5699821871aadacc511663cb4bd4e357e215) )
 	ROM_LOAD( "masao-2.rom",  0x4000, 0x2000, CRC(42e85240) SHA1(bc8cdf867b743c5ee58fcacb63a44f826c8f8c1a) )
 	ROM_LOAD( "masao-1.rom",  0xf000, 0x1000, CRC(b2817af9) SHA1(95e83752e544671a68df2107fae1010b187f04a6) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for sound */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for sound */
 	ROM_LOAD( "masao-5.rom",  0x0000, 0x1000, CRC(bd437198) SHA1(ebae88461984afc97bbc103fc6d95bc3c1865eec) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

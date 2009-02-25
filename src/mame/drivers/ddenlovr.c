@@ -1885,7 +1885,7 @@ static READ8_HANDLER( rongrong_input_r )
 
 static WRITE8_HANDLER( rongrong_select_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 //logerror("%04x: rongrong_select_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bits 0-4 = **both** ROM bank **AND** input select */
@@ -2001,7 +2001,7 @@ static READ8_HANDLER( magic_r )
 
 static WRITE8_HANDLER( mmpanic_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	/* Bit 4? */
 }
@@ -2183,7 +2183,7 @@ static WRITE8_HANDLER( funkyfig_blitter_w )
 
 static WRITE8_HANDLER( funkyfig_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 	ddenlovr_select = data;
 
@@ -2296,7 +2296,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hanakanz_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
 
@@ -2675,7 +2675,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjmyster_rambank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 2, &rom[0x90000 + 0x1000 * (data & 0x07)]);
 //  logerror("%04x: rambank = %02x\n", cpu_get_pc(space->cpu), data);
 }
@@ -2791,7 +2791,7 @@ ADDRESS_MAP_END
 static UINT8 hginga_rombank;
 static WRITE8_HANDLER( hginga_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	hginga_rombank = data;
 }
@@ -2799,7 +2799,7 @@ static WRITE8_HANDLER( hginga_rombank_w )
 // similar to rongrong
 static READ8_HANDLER( hginga_protection_r )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	if (hginga_rombank & 0x10)
 		return hanakanz_rand_r(space,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xf601 - 0x8000];
@@ -3023,7 +3023,7 @@ static WRITE8_HANDLER( hgokou_input_w )
 // similar to rongrong
 static READ8_HANDLER( hgokou_protection_r )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	if (hginga_rombank == 0)
 		return hanakanz_rand_r(space,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xe601 - 0x8000];
@@ -3081,7 +3081,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hparadis_select_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 	ddenlovr_select = data;
 	hginga_ip = 0;
@@ -3318,7 +3318,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjflove_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
+	UINT8 *rom = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0xf)]);
 }
 
@@ -6814,12 +6814,12 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",M68000, XTAL_24MHz / 2)
+	MDRV_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(ddenlovr_readmem,ddenlovr_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -6853,13 +6853,13 @@ static MACHINE_DRIVER_START( ddenlvrj )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ddenlovr)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ddenlvrj_readmem,ddenlvrj_writemem)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ddenlvrk )
 	MDRV_IMPORT_FROM(ddenlovr)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ddenlvrk_readmem,ddenlvrk_writemem)
 MACHINE_DRIVER_END
 
@@ -6867,7 +6867,7 @@ static MACHINE_DRIVER_START( akamaru )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ddenlovr)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(akamaru_readmem,akamaru_writemem)
 MACHINE_DRIVER_END
 
@@ -6886,7 +6886,7 @@ static MACHINE_DRIVER_START( quiz365 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ddenlovr)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(quiz365_readmem,quiz365_writemem)
 
 	MDRV_SOUND_MODIFY("ay")
@@ -6898,7 +6898,7 @@ static MACHINE_DRIVER_START( nettoqc )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ddenlovr)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nettoqc_readmem,nettoqc_writemem)
 MACHINE_DRIVER_END
 
@@ -6939,13 +6939,13 @@ static INTERRUPT_GEN( rtc_irq )
 static MACHINE_DRIVER_START( quizchq )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 8000000)	/* ? */
+	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(quizchq_readmem,quizchq_writemem)
 	MDRV_CPU_IO_MAP(quizchq_readport,quizchq_writeport)
-	MDRV_CPU_VBLANK_INT("main", quizchq_irq)
+	MDRV_CPU_VBLANK_INT("screen", quizchq_irq)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -6976,7 +6976,7 @@ static MACHINE_DRIVER_START( rongrong )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(quizchq)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rongrong_readmem,rongrong_writemem)
 	MDRV_CPU_IO_MAP(rongrong_readport,rongrong_writeport)
 MACHINE_DRIVER_END
@@ -7012,18 +7012,18 @@ static INTERRUPT_GEN( mmpanic_irq )
 static MACHINE_DRIVER_START( mmpanic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 8000000)
+	MDRV_CPU_ADD("maincpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(mmpanic_readmem,mmpanic_writemem)
 	MDRV_CPU_IO_MAP(mmpanic_readport,mmpanic_writeport)
-	MDRV_CPU_VBLANK_INT("main", mmpanic_irq)
+	MDRV_CPU_VBLANK_INT("screen", mmpanic_irq)
 
-	MDRV_CPU_ADD("sound", Z80, 3579545)
+	MDRV_CPU_ADD("soundcpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(mmpanic_sound_readmem,mmpanic_sound_writemem)
 	MDRV_CPU_IO_MAP(mmpanic_sound_readport,mmpanic_sound_writeport)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// NMI by main cpu
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// NMI by main cpu
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -7084,13 +7084,13 @@ static INTERRUPT_GEN( hanakanz_irq )
 static MACHINE_DRIVER_START( hanakanz )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,8000000)	// TMPZ84C015BF-8
+	MDRV_CPU_ADD("maincpu",Z80,8000000)	// TMPZ84C015BF-8
 	MDRV_CPU_PROGRAM_MAP(hanakanz_readmem,hanakanz_writemem)
 	MDRV_CPU_IO_MAP(hanakanz_readport,hanakanz_writeport)
-	MDRV_CPU_VBLANK_INT("main", hanakanz_irq)
+	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -7120,14 +7120,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hkagerou )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( hanakanz )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(hkagerou_readport,hkagerou_writeport)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mjreach1 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( hanakanz )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjreach1_readport,mjreach1_writeport)
 MACHINE_DRIVER_END
 
@@ -7161,9 +7161,9 @@ static INTERRUPT_GEN( mjchuuka_irq )
 static MACHINE_DRIVER_START( mjchuuka )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( hanakanz )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjchuuka_readport,mjchuuka_writeport)
-	MDRV_CPU_VBLANK_INT("main", mjchuuka_irq)
+	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
 	MDRV_SOUND_ADD("ay", AY8910, 1789772)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -7173,12 +7173,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( funkyfig )
 
 	MDRV_IMPORT_FROM(mmpanic)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(funkyfig_readmem,funkyfig_writemem)
 	MDRV_CPU_IO_MAP(funkyfig_readport,funkyfig_writeport)
-	MDRV_CPU_VBLANK_INT("main", mjchuuka_irq)
+	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_IO_MAP(funkyfig_sound_readport,mmpanic_sound_writeport)
 
 	MDRV_VIDEO_START(ddenlovr)	// no extra layers?
@@ -7234,7 +7234,7 @@ static const ay8910_interface mjmyster_ay8910_interface =
 static MACHINE_DRIVER_START( mjmyster )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mjmyster_readmem,mjmyster_writemem)
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
@@ -7283,10 +7283,10 @@ static const ay8910_interface hginga_ay8910_interface =
 static MACHINE_DRIVER_START( hginga )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hginga_readmem,hginga_writemem)
 	MDRV_CPU_IO_MAP(hginga_readport,hginga_writeport)
-	MDRV_CPU_VBLANK_INT("main", hginga_irq)
+	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
 
 	MDRV_SOUND_ADD("ay", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
@@ -7296,10 +7296,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hgokou )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hgokou_readmem,hgokou_writemem)
 	MDRV_CPU_IO_MAP(hgokou_readport,hgokou_writeport)
-	MDRV_CPU_VBLANK_INT("main", hginga_irq)
+	MDRV_CPU_VBLANK_INT("screen", hginga_irq)
 
 	MDRV_SOUND_ADD("ay", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
@@ -7309,7 +7309,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mjmywrld )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( mjmyster )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hginga_readmem,hginga_writemem)
 	MDRV_CPU_IO_MAP(mjmywrld_readport,mjmywrld_writeport)
 MACHINE_DRIVER_END
@@ -7317,7 +7317,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mjmyuniv )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mjmyster_readmem,mjmyster_writemem)
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
@@ -7331,7 +7331,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mjmyornt )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjmyster_readport,mjmyster_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
 	MDRV_CPU_PERIODIC_INT(rtc_nmi_irq, 1)
@@ -7361,7 +7361,7 @@ static INTERRUPT_GEN( mjflove_irq )
 static MACHINE_DRIVER_START( mjflove )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rongrong_readmem,rongrong_writemem)
 	MDRV_CPU_IO_MAP(mjflove_readport,mjflove_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(mjflove_irq, 2)
@@ -7382,22 +7382,22 @@ static INTERRUPT_GEN( hparadis_irq )
 static MACHINE_DRIVER_START( hparadis )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( quizchq )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hparadis_readmem,hparadis_writemem)
 	MDRV_CPU_IO_MAP(hparadis_readport,hparadis_writeport)
-	MDRV_CPU_VBLANK_INT("main", hparadis_irq)
+	MDRV_CPU_VBLANK_INT("screen", hparadis_irq)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jongtei )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80, XTAL_20MHz / 2)	// ?
+	MDRV_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)	// ?
 	MDRV_CPU_PROGRAM_MAP(hanakanz_readmem,hanakanz_writemem)
 	MDRV_CPU_IO_MAP(jongtei_readport,jongtei_writeport)
-	MDRV_CPU_VBLANK_INT("main", hanakanz_irq)
+	MDRV_CPU_VBLANK_INT("screen", hanakanz_irq)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -7459,11 +7459,11 @@ The games are linkable (up to four) for competitive play.
 ***************************************************************************/
 
 ROM_START( mmpanic )
-	ROM_REGION( 0x50000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "nwc7002a",     0x00000, 0x40000, CRC(725b337f) SHA1(4d1f1ebc4de524d959dde60498d3f7038c7f3ed2) )
 	ROM_RELOAD(               0x10000, 0x40000 )
 
-	ROM_REGION( 0x20000, "sound", 0 )	/* Z80 Code */
+	ROM_REGION( 0x20000, "soundcpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "nwc7003",      0x00000, 0x20000, CRC(4f02ce44) SHA1(9a3abd9c555d5863a2110d84d1a3f582ba9d56b9) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x280000, "blitter", 0 )	/* blitter data */
@@ -7534,11 +7534,11 @@ probably 7501S is damaged, I can not get a consistent read. 10 reads supplied fo
 ***************************************************************************/
 
 ROM_START( animaljr )
-	ROM_REGION( 0x50000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x50000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "7502s.2e",     0x00000, 0x40000, CRC(4b14a4be) SHA1(79f7207f7311c627ece1a0d8571b4bddcdefb336) )
 	ROM_RELOAD(               0x10000, 0x40000 )
 
-	ROM_REGION( 0x20000, "sound", 0 )	/* Z80 Code */
+	ROM_REGION( 0x20000, "soundcpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "7503s.8e",     0x00000, 0x20000, CRC(d1fac899) SHA1(dde2824d73b13c18b83e4c4b63fe7835bce87ea4) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "blitter", 0 )	/* blitter data */
@@ -7577,7 +7577,7 @@ Others: M6242B (RTC?)
 ***************************************************************************/
 
 ROM_START( quizchq )
-	ROM_REGION( 0x118000, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x118000, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "nwc7302.3e",   0x00000, 0x80000, CRC(14217f2d) SHA1(3cdffcf73e62586893bfaa7c47520b0698d3afda) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	ROM_LOAD( "nwc7303.4e",   0x90000, 0x80000, CRC(ffc77601) SHA1(b25c4a027e1fa4397dd86299dfe9251022b0d174) )
@@ -7596,7 +7596,7 @@ ROM_START( quizchq )
 ROM_END
 
 ROM_START( quizchql )
-	ROM_REGION( 0x118000, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x118000, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "2.rom",        0x00000, 0x80000, CRC(1bf8fb25) SHA1(2f9a62654a018f19f6783be655d992c457551fc9) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	ROM_LOAD( "3.rom",        0x90000, 0x80000, CRC(6028198f) SHA1(f78c3cfc0663b44655cb75928941a5ec4a57c8ba) )
@@ -7619,7 +7619,7 @@ ROM_END
 
 
 ROM_START( quiz365 )
-	ROM_REGION( 0x180000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x180000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "7805.4b",  0x000000, 0x080000, CRC(70f93543) SHA1(03fb3f19b451c49359719e72baf294b2e9873307) )
 	ROM_LOAD16_BYTE( "7804.4d",  0x000001, 0x080000, CRC(2ae003f4) SHA1(4aafc75a68989d3a006a5959a64d589472f17474) )
 	ROM_LOAD16_BYTE( "7803.3b",  0x100000, 0x040000, CRC(10d315b1) SHA1(9f1bb57ba32152cca3b88fc3f841451b2b506a74) )
@@ -7639,7 +7639,7 @@ ROM_START( quiz365 )
 ROM_END
 
 ROM_START( quiz365t )
-	ROM_REGION( 0x180000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x180000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "7805.rom", 0x000000, 0x080000, CRC(6db33222) SHA1(5f0cc9a15815252d8d5e85975ce8770717eb3ac8) )
 	ROM_LOAD16_BYTE( "7804.rom", 0x000001, 0x080000, CRC(46d04ace) SHA1(b6489309d7704d2382802aa0f2f7526e367667ad) )
 	ROM_LOAD16_BYTE( "7803.rom", 0x100000, 0x040000, CRC(5b7a78d3) SHA1(6ade16df301b57e4a7309834a47ca72300f50ffa) )
@@ -7674,7 +7674,7 @@ For the sound it uses A YM2413
 ***************************************************************************/
 
 ROM_START( rongrong )
-	ROM_REGION( 0x118000, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x118000, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "8002e.3e",     0x00000, 0x80000, CRC(062fa1b6) SHA1(f15a78c4192dbc56bb6ac0f92cffee88040b0a17) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	/* 90000-10ffff empty */
@@ -7722,7 +7722,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( rongrngg )
-	ROM_REGION( 0x118000, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x118000, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "rr_8002g.rom", 0x00000, 0x80000, CRC(9a5d2885) SHA1(9ca049085d14b1cfba6bd48adbb0b883494e7d29) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 	/* 90000-10ffff empty */
@@ -7767,7 +7767,7 @@ ROMs  : 8001.2F      [9fc8a367] - Samples
 ***************************************************************************/
 
 ROM_START( rongrngj )
-	ROM_REGION( 0x118000, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x118000, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "8002.3e", 0x00000, 0x80000, CRC(27142684) SHA1(4626576d032a89b558c8542f82b286e5673f8662) )
 	ROM_RELOAD(          0x10000, 0x80000 )
 	/* 90000-10ffff empty */
@@ -7798,7 +7798,7 @@ XTAL2: 28.63636 MHz
 ***************************************************************************/
 
 ROM_START( nettoqc )
-	ROM_REGION( 0x180000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x180000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "10305.rom", 0x000000, 0x080000, CRC(ebb14a1f) SHA1(5e4511a878d0bcede79a287fb184e912c9eb7dc5) )
 	ROM_LOAD16_BYTE( "10303.rom", 0x000001, 0x080000, CRC(30c114c3) SHA1(fa9c26d465d2d919e141bbc080a04ac0f87c7010) )
 	ROM_LOAD16_BYTE( "10306.rom", 0x100000, 0x040000, CRC(f19fe827) SHA1(37907bf3206af5f4613dc80b6bd91c87dd6645ab) )
@@ -7849,7 +7849,7 @@ ROMs:
 ***************************************************************************/
 
 ROM_START( ddenlvrj )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "1124.2d", 0x000000, 0x040000, CRC(6a9ec557) SHA1(e1512601910a9d06e16a20e10ab7acc96a0819bd) )
 	ROM_LOAD16_BYTE( "1123.2h", 0x000001, 0x040000, CRC(d41cbed0) SHA1(5c80f6a6cf15518120f664a0446355e80eeb2a0f) )
 
@@ -7920,7 +7920,7 @@ Hardware info by Guru
 ***************************************************************************/
 
 ROM_START( ddenlvrk )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom.1a", 0x000000, 0x40000, CRC(868c45f8) SHA1(023ceaa30cfa03470ef005c8b739a85ae9764e15) )
 	ROM_LOAD16_BYTE( "rom.1b", 0x000001, 0x40000, CRC(4fab3c90) SHA1(61a756a3ccae39f3a649371116b9d940d3b1b852) )
 
@@ -7960,7 +7960,7 @@ GFX Chip - NAKANIHON NL-005 (208 pin, square, surface-mounted)
 ***************************************************************************/
 
 ROM_START( ddenlovr )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "1134h.1a", 0x000000, 0x040000, CRC(43accdff) SHA1(3023d4a071fc877f8e4325e95e586739077ccb02) )
 	ROM_LOAD16_BYTE( "1133h.1c", 0x000001, 0x040000, CRC(361bf7b6) SHA1(1727112284cd1dcc1ed17ccba214cb0f8993650a) )
 
@@ -8008,7 +8008,7 @@ Notes:
       VSync 60Hz
 */
 ROM_START( ddenlovb )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom2", 0x000000, 0x040000, CRC(cabdf78f) SHA1(789d4754c7b84964ee317b8a618f26a417f50bcc) )
 	ROM_LOAD16_BYTE( "rom3", 0x000001, 0x040000, CRC(36f8d05e) SHA1(78f75175541ebf377f5375ea30d80ea91f380971) )
 
@@ -8052,7 +8052,7 @@ REAL TIME CLOCK : MSM6242
 ***************************************************************************/
 
 ROM_START( hanakanz )
-	ROM_REGION( 0x90000+16*0x1000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "50720.5b",     0x00000, 0x80000, CRC(dc40fcfc) SHA1(32c8b3d23039ac47504c881552572f2c22afa585) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 
@@ -8099,7 +8099,7 @@ NM5108.12B
 ***************************************************************************/
 
 ROM_START( hkagerou )
-	ROM_REGION( 0x90000+16*0x1000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "nm5102.5b",    0x00000, 0x80000, CRC(c56c0856) SHA1(9b3c17c80498c9fa0ea91aa876aa4853c95ebb8c) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 
@@ -8149,7 +8149,7 @@ Others: M6242B (RTC)
 ***************************************************************************/
 
 ROM_START( mjreach1 )
-	ROM_REGION( 0x90000+16*0x1000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "52602-n.5b",   0x00000, 0x80000, CRC(6bef7978) SHA1(56e38448fb03e868094d75e5b7de4e4f4a4e850a) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 
@@ -8206,7 +8206,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjchuuka )
-	ROM_REGION( 0x90000+16*0x1000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "d12102.5b", 0x00000, 0x80000, CRC(585a0a8e) SHA1(94b3eede36117fe0a34b61454484c72cd7f0ce6a) )
 	ROM_RELOAD(            0x10000, 0x80000 )
 
@@ -8287,7 +8287,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjdchuka )
-	ROM_REGION( 0x90000+16*0x1000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "2.5b", 0x00000, 0x80000, CRC(7957b4e7) SHA1(8b76c15694e42ff0b2ec5aeae059bf342f6bf476) )
 	ROM_RELOAD(       0x10000, 0x80000 )
 
@@ -8343,11 +8343,11 @@ the second halves of 7408.13b, 7409.4b, 7410.3b and 7411.2b are identical
 ***************************************************************************/
 
 ROM_START( funkyfig )
-	ROM_REGION( 0x90000 + 0x1000*8, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "7403.3c",      0x00000, 0x80000, CRC(ad0f5e14) SHA1(82de58d7ba35266f2d96503d72487796a9693996) )
 	ROM_RELOAD(               0x10000, 0x80000 )
 
-	ROM_REGION( 0x20000, "sound", 0 )	/* Z80 Code */
+	ROM_REGION( 0x20000, "soundcpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "7401.1h",      0x00000, 0x20000, CRC(0f47d785) SHA1(d57733db6dcfb4c2cdaad04b5d3f0f569a0e7461) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 
 ROM_REGION( 0x500000, "blitter", ROMREGION_ERASE00 )	/* blitter data */
@@ -8393,7 +8393,7 @@ YM2413
 ***************************************************************************/
 
 ROM_START( mjmyster )
-	ROM_REGION( 0x90000 + 0x1000*8, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "77t2.c3", 0x00000, 0x40000, CRC(b1427cce) SHA1(1640f5bb6275cce92e38cf3e0c788b4e65606459) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -8457,7 +8457,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjmywrld )
-	ROM_REGION( 0x90000 + 0x1000*8, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "2.3d", 0x00000, 0x40000, CRC(a1ff31fa) SHA1(f132aaf59570cbbd2c4eff3ee7bd4cec26ce2fbb) )
 	ROM_RELOAD(       0x10000, 0x40000 )
 
@@ -8522,7 +8522,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( hginga )
-	ROM_REGION( 0x90000 + 0x1000*8, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "8101.2b", 0x00000, 0x40000, CRC(77a64b71) SHA1(3426998746c834435ff10a8d1c6502ea64a5f2e2) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -8584,7 +8584,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjmyornt )
-	ROM_REGION( 0x90000 + 0x1000*8, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "7102.3d", 0x00000, 0x40000, CRC(058f779b) SHA1(97253a86b2600c295f67e566ee3c0aa693ed117e) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -8646,7 +8646,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjmyuniv )
-	ROM_REGION( 0x90000 + 0x1000*8, "main", 0 )	/* Z80 Code + space for banked RAM */
+	ROM_REGION( 0x90000 + 0x1000*8, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "2.3d", 0x00000, 0x40000, CRC(3284d714) SHA1(be2d5c5129ba9d689e030cb53bc30ed01c941703) )
 	ROM_RELOAD(       0x10000, 0x40000 )
 
@@ -8692,7 +8692,7 @@ ROMs (on subboard):
 ***************************************************************************/
 
 ROM_START( akamaru )
-	ROM_REGION( 0x200000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "50107.1b", 0x000000, 0x080000, CRC(8364d627) SHA1(ed445561b3a35e6445d1074000621554a6f26fc4) )
 	ROM_LOAD16_BYTE( "50105.1d", 0x000001, 0x080000, CRC(42ff4bec) SHA1(4bab20706542056d39dfcd91314523bf0f7fff07) )
 	ROM_LOAD16_BYTE( "50108.1a", 0x100000, 0x080000, CRC(1520ecad) SHA1(eaf44511148252eac0c7a7aab9bd689f87e5a40f) )
@@ -8787,7 +8787,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( mjflove )
-	ROM_REGION( 0x90000+16*0x1000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "50004.2e", 0x00000, 0x80000, CRC(20afcdec) SHA1(b3e7d6083dab812a497b69a501e9d993a8ca86e7) )
 	ROM_RELOAD(           0x10000, 0x80000 )
 
@@ -8889,7 +8889,7 @@ Subboard
 ***************************************************************************/
 
 ROM_START( hparadis )
-	ROM_REGION( 0x50000+8*0x1000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x50000+8*0x1000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "1012.3e", 0x00000, 0x40000, CRC(bd3a3a8f) SHA1(35d70c2869a93192de7041b5c90b8a8a5e910946) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -8957,7 +8957,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( hgokou )
-	ROM_REGION( 0x90000+8*0x1000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000+8*0x1000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "1082b.2b", 0x00000, 0x40000, CRC(e33bc5a5) SHA1(cb723cc81b914b45f89236812492c105c93c4e0b) )
 	ROM_RELOAD(           0x10000, 0x40000 )
 
@@ -9009,7 +9009,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( jongtei )
-	ROM_REGION( 0x90000+16*0x1000, "main", 0 )	/* Z80 Code */
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "53202.5b", 0x00000, 0x80000, CRC(fa95a7f2) SHA1(bb67d74acb8908c222acdc92ee13d4a644358aef) )
 	ROM_RELOAD(           0x10000, 0x80000 )
 

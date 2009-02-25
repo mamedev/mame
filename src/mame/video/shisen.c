@@ -14,7 +14,7 @@ WRITE8_HANDLER( sichuan2_bankswitch_w )
 {
 	int bankaddress;
 	int bank;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	if (data & 0xc0) logerror("bank switch %02x\n",data);
 

@@ -694,17 +694,17 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( gsword )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 	MDRV_CPU_IO_MAP(cpu1_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_IO_MAP(cpu2_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(gsword_snd_interrupt,4)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(12000)) /* Allow time for 2nd cpu to interleave*/
@@ -717,7 +717,7 @@ static MACHINE_DRIVER_START( gsword )
 #endif
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -749,21 +749,21 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( josvolly )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18000000/6) /* ? */
+	MDRV_CPU_ADD("maincpu", Z80, 18000000/6) /* ? */
 	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 	MDRV_CPU_IO_MAP(josvolly_cpu1_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_CPU_ADD("audio", Z80, 12000000/4) /* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 12000000/4) /* ? */
 	MDRV_CPU_PROGRAM_MAP(josvolly_cpu2_map,0)
 	MDRV_CPU_IO_MAP(josvolly_cpu2_io_map,0)
-//  MDRV_CPU_VBLANK_INT("main", gsword_snd_interrupt)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen", gsword_snd_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(josvolly)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -802,7 +802,7 @@ MACHINE_DRIVER_END
 
 // ac10-* ROM labels were written using a typewriter. The board is a Taito original however.
 ROM_START( gsword )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ac10-01.2c",   0x0000, 0x2000, CRC(511b9389) SHA1(d24a083e812663522a06138dcc3aa60e48d27434) )
 	ROM_LOAD( "ac1-2.2d",     0x2000, 0x2000, CRC(d772accf) SHA1(08028c6f026c118cc375ecff5c24dcb549475633) )
 	ROM_LOAD( "ac10-03.2e",   0x4000, 0x2000, CRC(413a0ce6) SHA1(3dde7889db9f449aec5a05a4a3d27e12786df869) )
@@ -813,7 +813,7 @@ ROM_START( gsword )
 	ROM_LOAD( "ac10-15.5h",   0x0000, 0x2000, CRC(b74e9d43) SHA1(d6e9e05e2e652c9d467dba1f1501d2a7ec8f851c) )
 	ROM_LOAD( "ac0-16.7h",    0x2000, 0x2000, CRC(10accc10) SHA1(311961bfe852582a9c66aaecf9bc4c8f0ac7fccf) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64K for 3nd z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64K for 3nd z80 */
 	ROM_LOAD( "ac10-12.3a",   0x0000, 0x2000, CRC(56eac59f) SHA1(22bde858ddcafad3f731030c39fd525458ecdbdd) )
 	ROM_LOAD( "ac10-13.4a",   0x2000, 0x2000, CRC(3a920eaa) SHA1(256fafda0d522dee993b6840e60532f11a705345) )
 	ROM_LOAD( "ac10-14.3d",   0x4000, 0x2000, CRC(819db933) SHA1(5e8b10d94ca6ba608a074bd5f30f14b95122fe85) )
@@ -849,7 +849,7 @@ ROM_START( gsword )
 ROM_END
 
 ROM_START( gsword2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ac1-1.2c",     0x0000, 0x2000, CRC(565c4d9e) SHA1(17b86e86ab95aeb458b8368c8c04666a1ccd9eee) )
 	ROM_LOAD( "ac1-2.2d",     0x2000, 0x2000, CRC(d772accf) SHA1(08028c6f026c118cc375ecff5c24dcb549475633) )
 	ROM_LOAD( "ac1-3.2e",     0x4000, 0x2000, CRC(2cee1871) SHA1(df099209c56f2807e4fdb83c625368f5e7e583e5) )
@@ -860,7 +860,7 @@ ROM_START( gsword2 )
 	ROM_LOAD( "ac0-15.5h",    0x0000, 0x2000, CRC(1aa4690e) SHA1(7b0dbc38f3e6af2c9efa44b6759a3cdd9adc992d) )
 	ROM_LOAD( "ac0-16.7h",    0x2000, 0x2000, CRC(10accc10) SHA1(311961bfe852582a9c66aaecf9bc4c8f0ac7fccf) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64K for 3nd z80 */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64K for 3nd z80 */
 	ROM_LOAD( "ac0-12.3a",    0x0000, 0x2000, CRC(a6589068) SHA1(9385abe2449c5c5bac8f49d2afd140acea1791c3) )
 	ROM_LOAD( "ac0-13.4a",    0x2000, 0x2000, CRC(4ee79796) SHA1(3353625903f63910a18fae0a9568a96d75592328) )
 	ROM_LOAD( "ac0-14.3d",    0x4000, 0x2000, CRC(455364b6) SHA1(ebabf077d1ba113c13e7620d61720ed141acb5ad) )
@@ -896,13 +896,13 @@ ROM_START( gsword2 )
 ROM_END
 
 ROM_START( josvolly )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "aa2-1.2c",     0x0000, 0x2000, CRC(27f740a5) SHA1(3e038386e743fdf718e795a944ff4b631a492958) )
 	ROM_LOAD( "aa1-2.2d",     0x2000, 0x2000, CRC(3e02e3e1) SHA1(cc0aee321cf5232438cd6e38635c9060056ad361) )
 	ROM_LOAD( "aa0-3.2e",     0x4000, 0x2000, CRC(72843ffe) SHA1(fe70727bbcb0622df81eca2969c1a85398767479) )
 	ROM_LOAD( "aa1-4.2f",     0x6000, 0x2000, CRC(22c1466e) SHA1(d86093903e473252c35170e35d7f9ee34194086d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "aa3-12.2h",    0x0000, 0x1000, CRC(3796bbf6) SHA1(8741f556ddb06e7779d1e8abc3d06688881f8269) )
 	ROM_LOAD( "aa0-13.2j",    0x2000, 0x2000, CRC(58cc89ac) SHA1(9785ec27e593b3e249da7a1b6b025c6d573e28f9) )
 

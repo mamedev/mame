@@ -339,16 +339,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mnchmobl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 3750000) /* ? */
+	MDRV_CPU_ADD("maincpu", Z80, 3750000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(mnchmobl_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(mnchmobl_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 3750000) /* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 3750000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_assert)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -374,11 +374,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( joyfulr )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64k for CPUA */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for CPUA */
 	ROM_LOAD( "m1j.10e", 0x0000, 0x2000, CRC(1fe86e25) SHA1(e13abc20741dfd8a260f354efda3b3a25c820343) )
 	ROM_LOAD( "m2j.10d", 0x2000, 0x2000, CRC(b144b9a6) SHA1(efed5fd6ba941b2baa7c8a17fe7323172c8fb17c) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "mu.2j",	 0x0000, 0x2000, CRC(420adbd4) SHA1(3da18cda97ca604dc074b50c4f36287e0679224a) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -402,11 +402,11 @@ ROM_START( joyfulr )
 ROM_END
 
 ROM_START( mnchmobl )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64k for CPUA */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for CPUA */
 	ROM_LOAD( "m1.10e",	 0x0000, 0x2000, CRC(a4bebc6a) SHA1(7c13b2b87168dee3c1b8e931487a56d0a528386e) )
 	ROM_LOAD( "m2.10d",	 0x2000, 0x2000, CRC(f502d466) SHA1(4da5a32b3903fb7fbef38fc385408b9390b5f57f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "mu.2j",	 0x0000, 0x2000, CRC(420adbd4) SHA1(3da18cda97ca604dc074b50c4f36287e0679224a) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

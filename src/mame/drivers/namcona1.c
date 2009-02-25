@@ -744,8 +744,8 @@ static WRITE16_HANDLER( mcu_mailbox_w_mcu )
 static ADDRESS_MAP_START( namcona1_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&namcona1_workram)
 	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
-	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("main", 0x280000)	/* data */
-	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("main", 0x080000)	/* code */
+	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
+	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)	/* code */
 	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(&namcona1_vreg)
@@ -761,12 +761,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( namcona2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&namcona1_workram)
 	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
-	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("main", 0x280000)	/* data */
+	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(SMH_NOP) /* xday: serial out? */
 	AM_RANGE(0xd40000, 0xd40001) AM_WRITE(SMH_NOP) /* xday: serial out? */
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(SMH_NOP) /* xday: serial out? */
 	AM_RANGE(0xdc0000, 0xdc001f) AM_WRITE(SMH_NOP) /* xday: serial config? */
-	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("main", 0x080000)	/* code */
+	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)	/* code */
 	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
 	/* xday: additional battery-backed ram at 00E024FA? */
 	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
@@ -1006,7 +1006,7 @@ static const c140_interface C140_interface_typeA =
 /* cropped at sides */
 static MACHINE_DRIVER_START( namcona1 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 50113000/4)
+	MDRV_CPU_ADD("maincpu", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
 
@@ -1023,7 +1023,7 @@ static MACHINE_DRIVER_START( namcona1 )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1052,7 +1052,7 @@ static MACHINE_DRIVER_START( namcona1w )
 	MDRV_IMPORT_FROM(namcona1)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 38*8-1-0, 4*8, 32*8-1)
 MACHINE_DRIVER_END
 
@@ -1062,14 +1062,14 @@ static MACHINE_DRIVER_START( namcona2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(namcona1)
 
-	MDRV_CPU_REPLACE("main", M68000, 50113000/4)
+	MDRV_CPU_REPLACE("maincpu", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona2_main_map, 0)
 MACHINE_DRIVER_END
 
 
 static void init_namcona1( running_machine *machine, int gametype )
 {
-	UINT16 *pMem = (UINT16 *)memory_region( machine, "main" );
+	UINT16 *pMem = (UINT16 *)memory_region( machine, "maincpu" );
 
 	namcona1_gametype = gametype;
 	mpBank0 = &pMem[0x80000/2];
@@ -1092,7 +1092,7 @@ static DRIVER_INIT( tinklpit ){	init_namcona1(machine, NAMCO_TINKLPIT); }
 static DRIVER_INIT( xday2 ){		init_namcona1(machine, NAMCO_XDAY2); }
 
 ROM_START( bkrtmaq )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "mq1-ep0l.bin", 0x080001, 0x080000, CRC(f029bc57) SHA1(fdbf8b8b9f69d5755ca5197dda4f887b12dd66f4) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "mq1-ep0u.bin", 0x080000, 0x080000, CRC(4cff62b8) SHA1(5cac170dcfbeb3dcfa0840bdbe7541a9d2f44a14) )
 	ROM_LOAD16_BYTE( "mq1-ep1l.bin", 0x180001, 0x080000, CRC(e3be6f4b) SHA1(75d9a4cff25e63a9d6c092aa6e241eccd1c61f91) )
@@ -1109,7 +1109,7 @@ ROM_START( bkrtmaq )
 ROM_END
 
 ROM_START( cgangpzl )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cp2-ep0l.bin", 0x080001, 0x80000, CRC(8f5cdcc5) SHA1(925db3f3f16224bc28f97a57aba0ab2b51c5067c) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "cp2-ep0u.bin", 0x080000, 0x80000, CRC(3a816140) SHA1(613c367e08a0a20ec62e1938faab0128743b26f8) )
 
@@ -1119,7 +1119,7 @@ ROM_START( cgangpzl )
 ROM_END
 
 ROM_START( cgangpzj )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cp1-ep0l.bin", 0x080001, 0x80000, CRC(2825f7ba) SHA1(5f6f8df6bdf0f45656904411cdbb31fdcf8f3be0) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "cp1-ep0u.bin", 0x080000, 0x80000, CRC(94d7d6fc) SHA1(2460741e0dbb2ccff28f4fbc419a7507382467d2) )
 
@@ -1129,7 +1129,7 @@ ROM_START( cgangpzj )
 ROM_END
 
 ROM_START( emeraldj ) /* NA-1 Game PCB, parent is NA-2 version listed below */
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "em1-ep0lb.bin", 0x080001, 0x080000, CRC(fcd55293) SHA1(fdabf9d5f528c37196ac1e031b097618b4c887b5) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "em1-ep0ub.bin", 0x080000, 0x080000, CRC(a52f00d5) SHA1(85f95d2a69a2df2e9195f55583645c064b0b6fe6) )
 	ROM_LOAD16_BYTE( "em1-ep1l.bin",  0x180001, 0x080000, CRC(373c1c59) SHA1(385cb3bc056b798878de890dbff97a8bdd48fe4e) )
@@ -1141,7 +1141,7 @@ ROM_START( emeraldj ) /* NA-1 Game PCB, parent is NA-2 version listed below */
 ROM_END
 
 ROM_START( emerldja ) /* NA-1 Game PCB, parent is NA-2 version listed below */
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "em1-ep0l.bin", 0x080001, 0x080000, CRC(443f3fce) SHA1(35b6c834e5716c1e9b55f1e39f4e7336dbbe2d9b) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "em1-ep0u.bin", 0x080000, 0x080000, CRC(484a2a81) SHA1(1b60c18dfb2aebfd4aa8b2a85a1e90883a1f8e61) )
 	ROM_LOAD16_BYTE( "em1-ep1l.bin", 0x180001, 0x080000, CRC(373c1c59) SHA1(385cb3bc056b798878de890dbff97a8bdd48fe4e) )
@@ -1153,7 +1153,7 @@ ROM_START( emerldja ) /* NA-1 Game PCB, parent is NA-2 version listed below */
 ROM_END
 
 ROM_START( exvania )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ex1-ep0l.bin", 0x080001, 0x080000, CRC(18c12015) SHA1(e4f3524e798545c434549719b377c8b5863f580f) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "ex1-ep0u.bin", 0x080000, 0x080000, CRC(07d054d1) SHA1(e2d2cb81acd309c519686572804648bef4cbd191) )
 
@@ -1168,7 +1168,7 @@ ROM_START( exvania )
 ROM_END
 
 ROM_START( fghtatck )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fa2-ep0l.bin", 0x080001, 0x080000, CRC(8996db9c) SHA1(ebbe7d4cb2960a346cfbdf38c77638d71b6ba20e) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "fa2-ep0u.bin", 0x080000, 0x080000, CRC(58d5e090) SHA1(950219d4e9bf440f92e3c8765f47e23a9019d2d1) )
 	ROM_LOAD16_BYTE( "fa1-ep1l.bin", 0x180001, 0x080000, CRC(b23a5b01) SHA1(4ba9bc2102fffc93a5ff73a107d557fc0f3beefd) )
@@ -1185,7 +1185,7 @@ ROM_START( fghtatck )
 ROM_END
 
 ROM_START( fa )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fa1-ep0l.bin", 0x080001, 0x080000, CRC(182eee5c) SHA1(49769e3b72b59fc3e7b73364fe97168977dbe66b) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "fa1-ep0u.bin", 0x080000, 0x080000, CRC(7ea7830e) SHA1(79390943eea0b8029b2b8869233caf27228e776a) )
 	ROM_LOAD16_BYTE( "fa1-ep1l.bin", 0x180001, 0x080000, CRC(b23a5b01) SHA1(4ba9bc2102fffc93a5ff73a107d557fc0f3beefd) )
@@ -1202,7 +1202,7 @@ ROM_START( fa )
 ROM_END
 
 ROM_START( swcourt )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sc2-ep0l.4c",  0x080001, 0x080000, CRC(5053a02e) SHA1(8ab5a085969cef5e01be01d8f531233002ea5bff) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "sc2-ep0u.4f",  0x080000, 0x080000, CRC(7b3fc7fa) SHA1(f96c03a03339b7677b8dc8689d907f2c8895886c) )
 	ROM_LOAD16_BYTE( "sc1-ep1l.bin", 0x180001, 0x080000, CRC(fb45cf5f) SHA1(6ded351daa9b39d0b8149100caefc4fa0c598e79) )
@@ -1219,7 +1219,7 @@ ROM_START( swcourt )
 ROM_END
 
 ROM_START( swcourtj )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sc1-ep0l.4c",  0x080001, 0x080000, CRC(145111dd) SHA1(f8f74f77fb80af2ea37ea8ddbf02c1f3fcaf3fdb) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "sc1-ep0u.4f",  0x080000, 0x080000, CRC(c721c138) SHA1(5d30d66629d982b54c3bb62118be940dc7b69a6b) )
 	ROM_LOAD16_BYTE( "sc1-ep1l.bin", 0x180001, 0x080000, CRC(fb45cf5f) SHA1(6ded351daa9b39d0b8149100caefc4fa0c598e79) )
@@ -1236,7 +1236,7 @@ ROM_START( swcourtj )
 ROM_END
 
 ROM_START( tinklpit )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tk1-ep0l.bin", 0x080001, 0x080000, CRC(fdccae42) SHA1(398384482ccb3eb08bfb9db495513272a5188d92) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "tk1-ep0u.bin", 0x080000, 0x080000, CRC(62cdb48c) SHA1(73c7b99b117b8dc567bc254b0ffcc117c9d42fb5) )
 	ROM_LOAD16_BYTE( "tk1-ep1l.bin", 0x180001, 0x080000, CRC(7e90f104) SHA1(79e371426b2e32dc8f687e4d124d23c251198937) )
@@ -1261,7 +1261,7 @@ ROM_END
 
 
 ROM_START( emeralda ) /* NA-2 Game PCB, clones are NA-1 based; see games listed above */
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "em2-ep0l.6c", 0x080001, 0x080000, CRC(ff1479dc) SHA1(ea945d97ed909be13fb6e062742c7142c0d96c31) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "em2-ep0u.6f", 0x080000, 0x080000, CRC(ffe750a2) SHA1(d10d31489ae364572d7517dd515a6af2182ac764) )
 	ROM_LOAD16_BYTE( "em2-ep1l.7c", 0x180001, 0x080000, CRC(6c3e5b53) SHA1(72b941e28c7fda8cb81240a8226386fe55c14e2d) )
@@ -1273,7 +1273,7 @@ ROM_START( emeralda ) /* NA-2 Game PCB, clones are NA-1 based; see games listed 
 ROM_END
 
 ROM_START( knckhead )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "kh2-ep0l.bin", 0x080001, 0x080000, CRC(b4b88077) SHA1(9af03d1832ad6c77222e18427f4afca330a41ce6) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "kh2-ep0u.bin", 0x080000, 0x080000, CRC(a578d97e) SHA1(9a5bb6649cca7b98daf538a66c813f61cca2e2ec) )
 	ROM_LOAD16_BYTE( "kh1-ep1l.bin", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
@@ -1294,7 +1294,7 @@ ROM_START( knckhead )
 ROM_END
 
 ROM_START( knckhedj )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "kh1-ep0l.bin", 0x080001, 0x080000, CRC(94660bec) SHA1(42fa23f759cf66b05f30c2fc03a12fd14ae1f796) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "kh1-ep0u.bin", 0x080000, 0x080000, CRC(ad640d69) SHA1(62595a9d1d5952cbe3dd7266cfda9292be51d269) )
 	ROM_LOAD16_BYTE( "kh1-ep1l.bin", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
@@ -1315,7 +1315,7 @@ ROM_START( knckhedj )
 ROM_END
 
 ROM_START( numanath )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "nm2-ep0l.bin", 0x080001, 0x080000, CRC(f24414bb) SHA1(68b13dfdc2292afd5279edb891fe63972f991e7b) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "nm2-ep0u.bin", 0x080000, 0x080000, CRC(25c41616) SHA1(68ba67d3dd45f3bdddfa2fd21b574535306c1214) )
 	ROM_LOAD16_BYTE( "nm1-ep1l.bin", 0x180001, 0x080000, CRC(4581dcb4) SHA1(1f46f98e63a7c9cdfde9e8ee2696a13c3f9bcc8e) )
@@ -1336,7 +1336,7 @@ ROM_START( numanath )
 ROM_END
 
 ROM_START( numanatj )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "nm1-ep0l.bin", 0x080001, 0x080000, CRC(4398b898) SHA1(0d1517409ba181f796f7f413cac704c60085b505) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "nm1-ep0u.bin", 0x080000, 0x080000, CRC(be90aa79) SHA1(6884a8d72dd34c889527e8e653f5e5b4cf3fb5d6) )
 	ROM_LOAD16_BYTE( "nm1-ep1l.bin", 0x180001, 0x080000, CRC(4581dcb4) SHA1(1f46f98e63a7c9cdfde9e8ee2696a13c3f9bcc8e) )
@@ -1357,7 +1357,7 @@ ROM_START( numanatj )
 ROM_END
 
 ROM_START( quiztou )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "qt1ep0l.6c", 0x080001, 0x080000, CRC(b680e543) SHA1(f10f38113a46c821d8e9d66f52d7311d9d52e595) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "qt1ep0u.6f", 0x080000, 0x080000, CRC(143c5e4d) SHA1(24c584986c97a5e6fe7e73f0e9af4af28ed20c4a) )
 	ROM_LOAD16_BYTE( "qt1ep1l.7c", 0x180001, 0x080000, CRC(33a72242) SHA1(5d17f033878d28dbebba50931a549ccf84802c05) )
@@ -1378,7 +1378,7 @@ ROM_START( quiztou )
 ROM_END
 
 ROM_START( xday2 )
-	ROM_REGION( 0xa80000, "main", 0 )
+	ROM_REGION( 0xa80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "xds1-mpr0.4b", 0x080001, 0x080000, CRC(83539aaa) SHA1(42d97bb2daaf5ff48efac70f0ff37869c5ba177d) ) /* 0xc00000 */
 	ROM_LOAD16_BYTE( "xds1-mpr1.8b", 0x080000, 0x080000, CRC(468b36de) SHA1(52817be9913a6938ce6add2834ba1a727b1d677e) )
 

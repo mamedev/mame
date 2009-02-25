@@ -461,10 +461,10 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( gyrodine )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(gyrodine_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gyrodine_sub_map,0)
@@ -476,7 +476,7 @@ static MACHINE_DRIVER_START( gyrodine )
 	MDRV_MACHINE_RESET(kyugo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -514,7 +514,7 @@ static MACHINE_DRIVER_START( srdmissn )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gyrodine)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(srdmissn_portmap,0)
 
 	MDRV_CPU_MODIFY("sub")
@@ -526,7 +526,7 @@ static MACHINE_DRIVER_START( flashgal )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sonofphx)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(flashgal_portmap,0)
 MACHINE_DRIVER_END
 
@@ -534,7 +534,7 @@ static MACHINE_DRIVER_START( flashgla )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gyrodine)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(flashgla_portmap,0)
 
 	MDRV_CPU_MODIFY("sub")
@@ -559,7 +559,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( gyrodine )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a21.02", 0x0000, 0x2000, CRC(c5ec4a50) SHA1(4d012aabdc248143a4d3bab190ecb6e335c93427) )
 	ROM_LOAD( "a21.03", 0x2000, 0x2000, CRC(4e9323bd) SHA1(86ae4c6a29898fdb0e559ec2aac99fc874910fea) )
 	ROM_LOAD( "a21.04", 0x4000, 0x2000, CRC(57e659d4) SHA1(4c0e73d0661360731691a32a6e94f41b69315f93) )
@@ -600,7 +600,7 @@ ROM_END
 
 
 ROM_START( gyrodinc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom2",   0x0000, 0x2000, CRC(85ddea38) SHA1(fe7e8d7962850b17c39cac627994d78768b094f8) )
 	ROM_LOAD( "a21.03", 0x2000, 0x2000, CRC(4e9323bd) SHA1(86ae4c6a29898fdb0e559ec2aac99fc874910fea) )
 	ROM_LOAD( "a21.04", 0x4000, 0x2000, CRC(57e659d4) SHA1(4c0e73d0661360731691a32a6e94f41b69315f93) )
@@ -641,7 +641,7 @@ ROM_END
 
 
 ROM_START( buzzard )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom2",       0x0000, 0x2000, CRC(85ddea38) SHA1(fe7e8d7962850b17c39cac627994d78768b094f8) )
 	ROM_LOAD( "a21.03",     0x2000, 0x2000, CRC(4e9323bd) SHA1(86ae4c6a29898fdb0e559ec2aac99fc874910fea) )
 	ROM_LOAD( "a21.04",     0x4000, 0x2000, CRC(57e659d4) SHA1(4c0e73d0661360731691a32a6e94f41b69315f93) )
@@ -682,7 +682,7 @@ ROM_END
 
 
 ROM_START( sonofphx )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5.f4",   0x0000, 0x2000, CRC(e0d2c6cf) SHA1(87befaefa3e4f07523e9c4db19f13ff9309a7dcc) )
 	ROM_LOAD( "6.h4",   0x2000, 0x2000, CRC(3a0d0336) SHA1(8e538d45d27ad881fb2ed71647353c6535646047) )
 	ROM_LOAD( "7.j4",   0x4000, 0x2000, CRC(57a8e900) SHA1(bc878e27130f0a9afb50c1926b47621e5e58d8b2) )
@@ -718,7 +718,7 @@ ROM_START( sonofphx )
 ROM_END
 
 ROM_START( repulse )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "repulse.b5",   0x0000, 0x2000, CRC(fb2b7c9d) SHA1(7a6867a9deda7eb399bf5b01c5422400d443faea) )
 	ROM_LOAD( "repulse.b6",   0x2000, 0x2000, CRC(99129918) SHA1(9beba6ef62102d6a28cf7a52ce5ce2a2113f8dfc) )
 	ROM_LOAD( "7.j4",         0x4000, 0x2000, CRC(57a8e900) SHA1(bc878e27130f0a9afb50c1926b47621e5e58d8b2) )
@@ -754,7 +754,7 @@ ROM_START( repulse )
 ROM_END
 
 ROM_START( 99lstwar )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1999.4f",      0x0000, 0x2000, CRC(e3cfc09f) SHA1(e48905726c6308194c596117dd30444dcb748908) )
 	ROM_LOAD( "1999.4h",      0x2000, 0x2000, CRC(fd58c6e1) SHA1(005f3114425fd2bfb9452c790d40653661b3d1d9) )
 	ROM_LOAD( "7.j4",         0x4000, 0x2000, CRC(57a8e900) SHA1(bc878e27130f0a9afb50c1926b47621e5e58d8b2) )
@@ -790,7 +790,7 @@ ROM_START( 99lstwar )
 ROM_END
 
 ROM_START( 99lstwra )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4f.bin",       0x0000, 0x2000, CRC(efe2908d) SHA1(4de8661f523f002c6a9368f81d865c7cc98926dd) )
 	ROM_LOAD( "4h.bin",       0x2000, 0x2000, CRC(5b79c342) SHA1(293990dab3360139727a5c90aad0826d4a3746b7) )
 	ROM_LOAD( "4j.bin",       0x4000, 0x2000, CRC(d2a62c1b) SHA1(eef9103945db8cfc4c1e3a58d8ad222f8dc58492) )
@@ -826,7 +826,7 @@ ROM_START( 99lstwra )
 ROM_END
 
 ROM_START( 99lstwrk )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1999.4f",      0x0000, 0x2000, CRC(e3cfc09f) SHA1(e48905726c6308194c596117dd30444dcb748908) )
 	ROM_LOAD( "1999.4h",      0x2000, 0x2000, CRC(fd58c6e1) SHA1(005f3114425fd2bfb9452c790d40653661b3d1d9) )
 	ROM_LOAD( "7.j4",         0x4000, 0x2000, CRC(57a8e900) SHA1(bc878e27130f0a9afb50c1926b47621e5e58d8b2) )
@@ -865,7 +865,7 @@ ROM_START( 99lstwrk )
 ROM_END
 
 ROM_START( flashgal )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-7167.4f",  0x0000, 0x2000, CRC(cf5ad733) SHA1(24561db9a3d72c7a69a7ce5a85aaa78254788675) )
 	ROM_LOAD( "epr-7168.4h",  0x2000, 0x2000, CRC(00c4851f) SHA1(f29ef123702bb3506ac3740b2779ae2757d884c2) )
 	ROM_LOAD( "epr-7169.4j",  0x4000, 0x2000, CRC(1ef0b8f7) SHA1(9c3ded1f985f4fb6b38843e0ca90ec458633d145) )
@@ -902,7 +902,7 @@ ROM_START( flashgal )
 ROM_END
 
 ROM_START( flashgla )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "flashgal.5",   0x0000, 0x2000, CRC(aa889ace) SHA1(7CAAC8FAE723485ADB6990367BDB8A94BD273322) )
 	ROM_LOAD( "epr-7168.4h",  0x2000, 0x2000, CRC(00c4851f) SHA1(f29ef123702bb3506ac3740b2779ae2757d884c2) )
 	ROM_LOAD( "epr-7169.4j",  0x4000, 0x2000, CRC(1ef0b8f7) SHA1(9c3ded1f985f4fb6b38843e0ca90ec458633d145) )
@@ -939,7 +939,7 @@ ROM_START( flashgla )
 ROM_END
 
 ROM_START( srdmissn )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5.t2",   0x0000, 0x4000, CRC(a682b48c) SHA1(c7348cbe42e45cd336e0d03052e839781d1481d1) )
 	ROM_LOAD( "7.t3",   0x4000, 0x4000, CRC(1719c58c) SHA1(32faae584d0ada0a39b96655b1a9d7c449af4996) )
 
@@ -972,7 +972,7 @@ ROM_START( srdmissn )
 ROM_END
 
 ROM_START( fx )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fx.01", 0x0000, 0x4000, CRC(b651754b) SHA1(05024276aeac0c2a3d62f3a6f1027518fe206784) )
 	ROM_LOAD( "fx.02", 0x4000, 0x4000, CRC(f3d2dcc1) SHA1(466bed28ecf25f9e2653662d7cc382ceb916d8db) )
 
@@ -1006,7 +1006,7 @@ ROM_END
 
 
 ROM_START( airwolf )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.2s",        0x0000, 0x8000, CRC(8c993cce) SHA1(925a5a9a2ee382556e2c2e928fd483344eba72c3) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
@@ -1048,7 +1048,7 @@ ROM_START( airwolf )
 ROM_END
 
 ROM_START( airwolfa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "airwolf.2",        0x0000, 0x8000, CRC(bc1a8587) SHA1(5487096621c175759eb4a4a85b76ef32900ca522) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* the rom with this set was bad with FIXED BITS (11xxxxxx), but the remaining bits matched */
@@ -1090,7 +1090,7 @@ ROM_START( airwolfa )
 ROM_END
 
 ROM_START( skywolf )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "02s_03.bin",  0x0000, 0x4000, CRC(a0891798) SHA1(c1b1e1fce529509fb1dd921a0022d5367c3c495c) )
 	ROM_LOAD( "03s_04.bin",  0x4000, 0x4000, CRC(5f515d46) SHA1(ec12bddf72e98aeef5cd17d00f0fa6f2df59cf00) )
 
@@ -1123,7 +1123,7 @@ ROM_START( skywolf )
 ROM_END
 
 ROM_START( skywolf2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "z80_2.bin",   0x0000, 0x8000, CRC(34db7bda) SHA1(1a98d5cf97063453a0351f7dbe339c32d59a3d20) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
@@ -1155,7 +1155,7 @@ ROM_START( skywolf2 )
 ROM_END
 
 ROM_START( legend )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a_r2.rom",    0x0000, 0x4000, CRC(0cc1c4f4) SHA1(33f6a1b31eed75a92e06cb29f912321fe75c31e6) )
 	ROM_LOAD( "a_r3.rom",    0x4000, 0x4000, CRC(4b270c6b) SHA1(95ad79a9de037b6aaca325da75c8aef9a72dbfed) )
 

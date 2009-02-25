@@ -1011,9 +1011,9 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( nekkyoku )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_main,nekkyoku_writemem_main)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_sub,nekkyoku_writemem_sub)
@@ -1022,7 +1022,7 @@ static MACHINE_DRIVER_START( nekkyoku )
 	MDRV_MACHINE_RESET(fromance)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
@@ -1049,9 +1049,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( idolmj )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
@@ -1060,7 +1060,7 @@ static MACHINE_DRIVER_START( idolmj )
 	MDRV_MACHINE_RESET(fromance)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
@@ -1087,9 +1087,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( fromance )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,12000000/2)		/* 6.00 Mhz ? */
+	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
@@ -1098,7 +1098,7 @@ static MACHINE_DRIVER_START( fromance )
 	MDRV_MACHINE_RESET(fromance)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
@@ -1130,7 +1130,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( nekkyoku )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "1-ic1a.bin",  0x000000, 0x008000, CRC(bb52d959) SHA1(1dfeb108879978dbcc1398e64b26c36505bee6d0) )
 	ROM_LOAD( "2-ic2a.bin",  0x008000, 0x008000, CRC(61848d8b) SHA1(72048c53e4364544ca8a79e213db9d02b7b4778f) )
 
@@ -1158,7 +1158,7 @@ ROM_END
 
 
 ROM_START( idolmj )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "3-13g.bin", 0x000000, 0x008000, CRC(910e9e7a) SHA1(5d577549ca25def14fbc6db682afda105244b7c1) )
 
 	ROM_REGION( 0x410000, "sub", 0 )
@@ -1182,7 +1182,7 @@ ROM_END
 
 
 ROM_START( mjnatsu )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "3-ic70.bin", 0x000000, 0x008000, CRC(543eb9e1) SHA1(cfe1d33bdf6541e2207465a941f342be21b69f7d) )
 
 	ROM_REGION( 0x410000, "sub", 0 )
@@ -1207,7 +1207,7 @@ ROM_END
 
 
 ROM_START( natsuiro )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "3-ic70.bin", 0x000000, 0x008000, CRC(543eb9e1) SHA1(cfe1d33bdf6541e2207465a941f342be21b69f7d) )
 
 	ROM_REGION( 0x410000, "sub", 0 )
@@ -1233,7 +1233,7 @@ ROM_END
 
 
 ROM_START( mfunclub )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "3.70",        0x000000, 0x008000, CRC(e6f76ca3) SHA1(2f4292e50770c3325c1573781cb21940d73e8fb1) )
 
 	ROM_REGION( 0x410000, "sub", 0 )
@@ -1258,7 +1258,7 @@ ROM_END
 
 
 ROM_START( daiyogen )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "n1-ic70.bin", 0x000000, 0x008000, CRC(29af632b) SHA1(9a55cc7a82dc2735be6310de27521ff0f5c352bd) )
 
 	ROM_REGION( 0x130000, "sub", 0 )
@@ -1278,7 +1278,7 @@ ROM_END
 
 
 ROM_START( nmsengen )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "3-ic70.bin",   0x000000, 0x008000, CRC(4e6edbbb) SHA1(890f93569a6dec6bf7c917a3db4f268c6ec64564) )
 
 	ROM_REGION( 0x410000, "sub", 0 )
@@ -1303,7 +1303,7 @@ ROM_END
 
 
 ROM_START( fromance )
-	ROM_REGION( 0x010000, "main", 0 )
+	ROM_REGION( 0x010000, "maincpu", 0 )
 	ROM_LOAD( "2-ic70.bin", 0x000000, 0x008000, CRC(a0866e26) SHA1(019a8dfaa54dd397f642622d7ed847b7147a61f7) )
 
 	ROM_REGION( 0x410000, "sub", 0 )

@@ -109,7 +109,7 @@ static WRITE8_HANDLER( trigger_nmi_on_sub_cpu)
 
 static WRITE8_HANDLER( main_bankswitch_w )
 {
-	unsigned char *ROM = memory_region(space->machine, "main");
+	unsigned char *ROM = memory_region(space->machine, "maincpu");
 	int bank=data&7;
 	
 	ROM = &ROM[0x4000 * bank];
@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	unsigned char *ROM = memory_region(space->machine, "sound");
+	unsigned char *ROM = memory_region(space->machine, "soundcpu");
 	int bank=data&0x3;
 
 	ROM = &ROM[0x4000 * bank];
@@ -233,7 +233,7 @@ static INTERRUPT_GEN( hvyunit_interrupt )
 
 static MACHINE_DRIVER_START( hvyunit )
 
-	MDRV_CPU_ADD("main", Z80,6000000)
+	MDRV_CPU_ADD("maincpu", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(main_memory,0)
 	MDRV_CPU_IO_MAP(main_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(hvyunit_interrupt,2)
@@ -241,16 +241,16 @@ static MACHINE_DRIVER_START( hvyunit )
 	MDRV_CPU_ADD("sub", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(sub_memory,0)
 	MDRV_CPU_IO_MAP(sub_io,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 6000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(sound_memory,0)
 	MDRV_CPU_IO_MAP(sound_io,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 	
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -274,13 +274,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START( hvyunit )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b73.13",  0x00000, 0x20000, CRC(e2874601) SHA1(7f7f3287113b8622eb365d04135d2d9c35d70554) ) 
 		
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "b73.14",  0x00000, 0x10000, CRC(0dfb51d4) SHA1(0e6f3b3d4558f12fe1b1620f57a0f4ac2065fd1a) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "b73.12",  0x000000, 0x010000, CRC(d1d24fab) SHA1(ed0312535d0b136d79aa885b9e6eea19ebde6409))
 
 	ROM_REGION( 0x02000, "mermaid", 0 )
@@ -301,13 +301,13 @@ ROM_START( hvyunit )
 ROM_END
 
 ROM_START( hvyunita )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b73_10.5c",  0x00000, 0x20000, CRC(ca52210f) SHA1(346951962aa5bbad641117dbd66f035dddc7c0bf) ) 
 		
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "b73_11.5p",  0x00000, 0x10000, CRC(cb451695) SHA1(116fd59f96a54c22fae65eea9ee5e58cb9ce5074) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "b73.12",  0x000000, 0x010000, CRC(d1d24fab) SHA1(ed0312535d0b136d79aa885b9e6eea19ebde6409) )
 
 	ROM_REGION( 0x02000, "mermaid", 0 )
@@ -328,13 +328,13 @@ ROM_START( hvyunita )
 ROM_END
 
 ROM_START( hvyunitb )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b73-30.bin",  0x00000, 0x20000, CRC(600af545) SHA1(c52b9be2bae28848ad0818c296f000a1bda4fa4f) ) 
 		
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "b73.14",  0x00000, 0x10000, CRC(0dfb51d4) SHA1(0e6f3b3d4558f12fe1b1620f57a0f4ac2065fd1a) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "b73.12",  0x000000, 0x010000, CRC(d1d24fab) SHA1(ed0312535d0b136d79aa885b9e6eea19ebde6409))
 
 	ROM_REGION( 0x02000, "mermaid", 0 )

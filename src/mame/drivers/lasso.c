@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( lasso_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audio", 0x7000)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
 ADDRESS_MAP_END
 
 
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( chameleo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1806, 0x1806) AM_READ_PORT("1806")
 	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("main", 0xa000)
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0xa000)
 ADDRESS_MAP_END
 
 
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( chameleo_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audio", 0x7000)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
 ADDRESS_MAP_END
 
 
@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( wwjgtin_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1c03) AM_WRITE(SMH_RAM) AM_BASE(&wwjgtin_last_colors)
 	AM_RANGE(0x1c04, 0x1c07) AM_WRITE(SMH_RAM) AM_BASE(&wwjgtin_track_scroll)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("main", 0x8000)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
 
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( pinbo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1807, 0x1807) AM_READ_PORT("1807")
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("main", 0xa000)
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0xa000)
 ADDRESS_MAP_END
 
 
@@ -464,17 +464,17 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 11289000/16)	/* guess */
+	MDRV_CPU_ADD("maincpu", M6502, 11289000/16)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lasso_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", M6502, 600000)
+	MDRV_CPU_ADD("audiocpu", M6502, 600000)
 	MDRV_CPU_PROGRAM_MAP(lasso_audio_map, 0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)	/* guess, but avoids glitching of Chameleon's high score table */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -511,10 +511,10 @@ static MACHINE_DRIVER_START( chameleo )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(chameleo_main_map,0)
 
-	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(chameleo_audio_map,0)
 
 	/* video hardware */
@@ -525,14 +525,14 @@ static MACHINE_DRIVER_START( wwjgtin )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(wwjgtin_main_map,0)
 
-	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(wwjgtin_audio_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)	// Smaller visible area?
 	MDRV_GFXDECODE(wwjgtin)	// Has 1 additional layer
 	MDRV_PALETTE_LENGTH(0x40 + 16*16)
@@ -550,10 +550,10 @@ static MACHINE_DRIVER_START( pinbo )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pinbo_main_map,0)
 
-	MDRV_CPU_REPLACE("audio", Z80, 3000000)
+	MDRV_CPU_REPLACE("audiocpu", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(pinbo_audio_map,0)
 	MDRV_CPU_IO_MAP(pinbo_audio_io_map,0)
 
@@ -578,11 +578,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( lasso )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wm3",       0x8000, 0x2000, CRC(f93addd6) SHA1(b0a1b263874da8608c3bab4e8785358e2aa19c2e) )
 	ROM_LOAD( "wm4",       0xa000, 0x2000, CRC(77719859) SHA1(d206b6af9a567f70d69624866ae9973652527065) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "wmc",       0x5000, 0x1000, CRC(8b4eb242) SHA1(55ada50036abbaa10799f37e35254e6ff70ee947) )
 	ROM_LOAD( "wmb",       0x6000, 0x1000, CRC(4658bcb9) SHA1(ecc83ef99edbe5f69a884a142478ff0f56edba12) )
 	ROM_LOAD( "wma",       0x7000, 0x1000, CRC(2e7de3e9) SHA1(665a89b9914ca16b9c08b751e142cf7320aaf793) )
@@ -606,13 +606,13 @@ ROM_START( lasso )
 ROM_END
 
 ROM_START( chameleo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "chamel4.bin", 0x4000, 0x2000, CRC(97379c47) SHA1(b29fa2318d4260c29fc95d22a461173dc960ad1a) )
 	ROM_LOAD( "chamel5.bin", 0x6000, 0x2000, CRC(0a2cadfd) SHA1(1ccc43accd60ca15b8f03ed1c3fda76a840a2bb1) )
 	ROM_LOAD( "chamel6.bin", 0x8000, 0x2000, CRC(b023c354) SHA1(0424ecf81ac9f0e055f9ff01cf0bd6d5c9ff866c) )
 	ROM_LOAD( "chamel7.bin", 0xa000, 0x2000, CRC(a5a03375) SHA1(c1eac4596c2bda419f3c513ecd3df9fae49ae159) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "chamel3.bin", 0x1000, 0x1000, CRC(52eab9ec) SHA1(554c34134e3af970262da89fe82feeaf47fd30bc) )
 	ROM_LOAD( "chamel2.bin", 0x6000, 0x1000, CRC(81dcc49c) SHA1(7e1b4351775f9c140a43f531da8b055271b7b28c) )
 	ROM_LOAD( "chamel1.bin", 0x7000, 0x1000, CRC(96031d3b) SHA1(a143b54b98891423d355e0ba08c3b88d70fa0e23) )
@@ -633,11 +633,11 @@ ROM_START( chameleo )
 ROM_END
 
 ROM_START( wwjgtin )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic2.6", 0x4000, 0x4000, CRC(744ba45b) SHA1(cccf3e2dd3c27bf54d2abd366cd9a044311aa031) )
 	ROM_LOAD( "ic5.5", 0x8000, 0x4000, CRC(af751614) SHA1(fc0f0a3967524b1743a182c1da4f9b0c3097a157) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic59.9", 0x4000, 0x4000, CRC(2ecb4d98) SHA1(d5b0d447b24f64fca452dc13e6ff95b090fce2d7) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )
@@ -672,11 +672,11 @@ ROM_START( wwjgtin )
 ROM_END
 
 ROM_START( photof )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic2.bin", 0x4000, 0x4000, CRC(4d960b54) SHA1(fe6c4943cbf9a9c79a2fd1dd86bb6e1f414b3c8d) )
 	ROM_LOAD( "ic6.bin", 0x8000, 0x4000, CRC(a4ad21dc) SHA1(55b3ecdf80b4a384a0d9932756330fb3021502f8) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ic59.bin", 0x4000, 0x4000, CRC(2ecb4d98) SHA1(d5b0d447b24f64fca452dc13e6ff95b090fce2d7) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )
@@ -711,13 +711,13 @@ ROM_START( photof )
 ROM_END
 
 ROM_START( pinbo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom2.b7",     0x2000, 0x2000, CRC(9a185338) SHA1(4029cf927686b5e14ef7600b17ea3056cc58b15b) )
 	ROM_LOAD( "rom3.e7",     0x6000, 0x2000, CRC(1cd1b3bd) SHA1(388ea72568f5bfd39856d872415327a2afaf7fad) )
 	ROM_LOAD( "rom4.h7",     0x8000, 0x2000, CRC(ba043fa7) SHA1(ef3d67b6dab5c82035c58290879a3ca969a0256d) )
 	ROM_LOAD( "rom5.j7",     0xa000, 0x2000, CRC(e71046c4) SHA1(f49133544c98df5f3e1a1d2ae92e17261b1504fc) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "rom1.s8",     0x0000, 0x2000, CRC(ca45a1be) SHA1(d0b2d8f1e6d01b60cba83d2bd458a57548549b4b) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -753,13 +753,13 @@ ROM_START( pinbo )
 ROM_END
 
 ROM_START( pinboa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom2.b7",     0x2000, 0x2000, CRC(9a185338) SHA1(4029cf927686b5e14ef7600b17ea3056cc58b15b) )
 	ROM_LOAD( "6.bin",       0x6000, 0x2000, CRC(f80b204c) SHA1(ee9b4ae1d8ea2fc062022fcfae67df87ed7aff41) )
 	ROM_LOAD( "5.bin",       0x8000, 0x2000, CRC(c57fe503) SHA1(11b7371c07c9b2c73ab61420a2cc609653c48d37) )
 	ROM_LOAD( "4.bin",       0xa000, 0x2000, CRC(d632b598) SHA1(270a5a790a66eaf3d90bf8081ab144fd1af9db3d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8.bin",       0x0000, 0x2000, CRC(32d1df14) SHA1(c0d4181378bbd6f2c594e923e2f8b21647c7fb0e) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )
@@ -795,13 +795,13 @@ ROM_START( pinboa )
 ROM_END
 
 ROM_START( pinbos )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b4.bin",      0x2000, 0x2000, CRC(d9452d4f) SHA1(c744ee037275b880c0ddc2fd83b3c05eb0a53621) )
 	ROM_LOAD( "b5.bin",      0x6000, 0x2000, CRC(f80b204c) SHA1(ee9b4ae1d8ea2fc062022fcfae67df87ed7aff41) )
 	ROM_LOAD( "b6.bin",      0x8000, 0x2000, CRC(ae967d83) SHA1(e79db85917a31821d10f919c4c429da33e97894d) )
 	ROM_LOAD( "b7.bin",      0xa000, 0x2000, CRC(7a584b4e) SHA1(2eb55b706815228b3b12ee5c0f6c415cd1d612e6) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "b8.bin",      0x0000, 0x2000, CRC(32d1df14) SHA1(c0d4181378bbd6f2c594e923e2f8b21647c7fb0e) )
 
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE )

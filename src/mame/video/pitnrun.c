@@ -230,19 +230,19 @@ VIDEO_UPDATE( pitnrun )
 #ifdef MAME_DEBUG
 	if (input_code_pressed_once(KEYCODE_Q))
 	{
-		UINT8 *ROM = memory_region(screen->machine, "main");
+		UINT8 *ROM = memory_region(screen->machine, "maincpu");
 		ROM[0x84f6]=0; /* lap 0 - normal */
 	}
 
 	if (input_code_pressed_once(KEYCODE_W))
 	{
-		UINT8 *ROM = memory_region(screen->machine, "main");
+		UINT8 *ROM = memory_region(screen->machine, "maincpu");
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
 	if (input_code_pressed_once(KEYCODE_E))
 	{
-		UINT8 *ROM = memory_region(screen->machine, "main");
+		UINT8 *ROM = memory_region(screen->machine, "maincpu");
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */
 		ROM[0x8102]=1;
 	}

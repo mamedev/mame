@@ -22,7 +22,7 @@ static void patch_codeX( UINT16 *mem, offs_t offset, int data ){
 
 void sys16_patch_code( running_machine *machine, const sys16_patch *data, int count ){
 	int i;
-	UINT16 *mem = (UINT16 *)memory_region(machine, "main");
+	UINT16 *mem = (UINT16 *)memory_region(machine, "maincpu");
 	for (i=0; i<count; i++)
 		patch_codeX(mem, data[i].offset, data[i].data);
 }

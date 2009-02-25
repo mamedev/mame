@@ -140,20 +140,20 @@ static const TMS9928a_interface tms9928a_interface =
 
 static MACHINE_DRIVER_START( kingpin )
 /*  MAIN CPU */
-	MDRV_CPU_ADD("main", Z80, 3579545)
+	MDRV_CPU_ADD("maincpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_program_map,0)
 	MDRV_CPU_IO_MAP(kingpin_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", kingpin_video_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", kingpin_video_interrupt)
 
 /*  SOUND CPU */
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_sound_map,0)
 	/*MDRV_CPU_IO_MAP(sound_io_map,0)*/
 
 /*  VIDEO */
 	MDRV_IMPORT_FROM(tms9928a)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
@@ -177,19 +177,19 @@ static DRIVER_INIT( kingpin )
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* Hacks to keep the emu a'runnin */
-	code_base = memory_region(machine, "main");
+	code_base = memory_region(machine, "maincpu");
 	code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
 }
 
 ROM_START( kingpin )
-	ROM_REGION( 0xe000, "main", 0 )
+	ROM_REGION( 0xe000, "maincpu", 0 )
 	ROM_LOAD( "1.u12", 0x0000, 0x2000, CRC(5ba9aca3) SHA1(480bfcf4d6223c00f50ff9ef9dc3b5a7a8a2982c) )
 	ROM_LOAD( "2.u13", 0x2000, 0x2000, CRC(aedb5cc6) SHA1(7800d8d757180089d5ff4de0386bbb264b9f65e0) )
 	ROM_LOAD( "3.u14", 0x4000, 0x2000, CRC(27849017) SHA1(60dd3d0448b5ee96df207c57644569dab630e3e6) )
 	ROM_LOAD( "4.u15", 0x6000, 0x2000, CRC(1a483d5c) SHA1(b0775f70be7fff334fd7991d8852127739373b3b) )
 	ROM_LOAD( "5.u16", 0x8000, 0x2000, CRC(70a52bcd) SHA1(9c72e501777d4d36933242276a5b0c4a01bc5543) )
 
-	ROM_REGION( 0x2000, "audio", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "7.u22", 0x0000, 0x2000, CRC(077f533d) SHA1(74d0115b2cef5c35294ecb29771689b40ad1c25a) )
 
 	ROM_REGION( 0x40, "user1", 0 )
@@ -198,7 +198,7 @@ ROM_START( kingpin )
 ROM_END
 
 ROM_START( kingpinm )
-	ROM_REGION( 0xe000, "main", 0 )
+	ROM_REGION( 0xe000, "maincpu", 0 )
 	ROM_LOAD( "mdc0.u12", 0x0000, 0x2000, CRC(0a73dd98) SHA1(ef3e20ecae646c2eda7364f566f3841747f982a5) )
 	ROM_LOAD( "mdc1.u13", 0x2000, 0x2000, CRC(18c2550c) SHA1(1466f7d9601c336b4c802821bd2ba0091c9ff143) )
 	ROM_LOAD( "mdc2.u14", 0x4000, 0x2000, CRC(ae2dd544) SHA1(c1380be538e4e952fad30a1725b23eb7358889dd) )
@@ -207,7 +207,7 @@ ROM_START( kingpinm )
 	ROM_LOAD( "mdc5.u17", 0xa000, 0x2000, CRC(1df82ad1) SHA1(03efe6fb5362a7488e325f1f7e35376e6b7455b2) )
 	ROM_LOAD( "mdc6.u18", 0xc000, 0x2000, CRC(c59f8f92) SHA1(d95e38bec50f0e6522e4d75a50702e09aced3d1c) )
 
-	ROM_REGION( 0x2000, "audio", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "7.u22", 0x0000, 0x2000, CRC(077f533d) SHA1(74d0115b2cef5c35294ecb29771689b40ad1c25a) )
 
 	ROM_REGION( 0x40, "user1", 0 )

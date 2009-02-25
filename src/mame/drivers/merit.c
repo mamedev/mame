@@ -253,7 +253,7 @@ static MC6845_ON_VSYNC_CHANGED(vsync_changed)
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",					/* screen we are acting on */
+	"screen",				/* screen we are acting on */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
@@ -1167,14 +1167,14 @@ static NVRAM_HANDLER(dodge)
 static MACHINE_START(casino5)
 {
 	MACHINE_START_CALL(merit);
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x2000, 0x2000);
-	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "main") + 0x6000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x2000, 0x2000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "maincpu") + 0x6000, 0x2000);
 	memory_set_bank(machine, 1, 0);
 	memory_set_bank(machine, 2, 0);
 }
 
 static MACHINE_DRIVER_START( pitboss )
-	MDRV_CPU_ADD("main",Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu",Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(pitboss_map,0)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
 
@@ -1184,7 +1184,7 @@ static MACHINE_DRIVER_START( pitboss )
 	MDRV_MACHINE_START(merit)
 	/* video hardware */
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
@@ -1203,7 +1203,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( casino5 )
 	MDRV_IMPORT_FROM(pitboss)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(casino5_map, 0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1214,7 +1214,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bigappg )
 	MDRV_IMPORT_FROM(pitboss)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bigappg_map,0)
 	MDRV_CPU_IO_MAP(tictac_io_map,0)
 
@@ -1224,7 +1224,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dodge )
 	MDRV_IMPORT_FROM(pitboss)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dodge_map,0)
 
 	MDRV_NVRAM_HANDLER(dodge)
@@ -1233,7 +1233,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tictac )
 	MDRV_IMPORT_FROM(pitboss)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tictac_map,0)
 	MDRV_CPU_IO_MAP(tictac_io_map,0)
 MACHINE_DRIVER_END
@@ -1241,7 +1241,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( trvwhiz )
 	MDRV_IMPORT_FROM(pitboss)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(trvwhiz_map,0)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
 MACHINE_DRIVER_END
@@ -1249,7 +1249,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( phrcraze )
 	MDRV_IMPORT_FROM(pitboss)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(phrcraze_map,0)
 	MDRV_CPU_IO_MAP(phrcraze_io_map,0)
 MACHINE_DRIVER_END
@@ -1257,7 +1257,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( trvwhziv )
 	MDRV_IMPORT_FROM(pitboss)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(trvwhziv_map,0)
 	MDRV_CPU_IO_MAP(tictac_io_map,0)
 MACHINE_DRIVER_END
@@ -1265,7 +1265,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( couple )
 	MDRV_IMPORT_FROM(pitboss)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(couple_map,0)
 	MDRV_CPU_IO_MAP(tictac_io_map,0)
 
@@ -1277,7 +1277,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( pitboss )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5-0c.rom", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) ) /* Games included in this set are: */
 	ROM_LOAD( "u6-0.rom",  0x2000, 0x2000, CRC(bf903b01) SHA1(1f5f69cfd3eb105bd9bad071016931a79defa16b) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
 	ROM_LOAD( "u7-0.rom",  0x4000, 0x2000, CRC(306351b9) SHA1(32cd243aa65571ee7fc72971b6a16beeb4ed9d85) )
@@ -1292,7 +1292,7 @@ ROM_START( pitboss )
 ROM_END
 
 ROM_START( pitbossa ) /* Program roms were hand labeled */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pbhd.u5", 0x0000, 0x2000, CRC(97f870bd) SHA1(b1b01abff0385e3b0585e49f78b93bcf56e434ef) ) /* Games included in this set are: */
 	ROM_LOAD( "pbhd.u6", 0x2000, 0x2000, CRC(086e699b) SHA1(a1d1eafaac9262f924f175961aa52c6d8e779bf0) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
 	ROM_LOAD( "pbhd.u7", 0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) )
@@ -1307,7 +1307,7 @@ ROM_START( pitbossa ) /* Program roms were hand labeled */
 ROM_END
 
 ROM_START( pitbossb )
- 	ROM_REGION( 0x10000, "main", 0 )
+ 	ROM_REGION( 0x10000, "maincpu", 0 )
  	ROM_LOAD( "m4a1.u5",   0x0000, 0x2000, CRC(f5284472) SHA1(9170b90d06caa382be29feb2f6e80993bba1e07e) ) /* Games included in this set are: */
  	ROM_LOAD( "m4a1.u6",   0x2000, 0x2000, CRC(dd8df5fe) SHA1(dab8c1077058263729b2589dd9bf9989ad53be1c) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
  	ROM_LOAD( "m4a1.u7",   0x4000, 0x2000, CRC(5fa5d436) SHA1(9f3fd81eae7f378268f3b4af8fd299ffb97d7fb6) )
@@ -1322,7 +1322,7 @@ ROM_START( pitbossb )
 ROM_END
 
 ROM_START( pitbossc ) /* Program roms on a CTR-202 daughter card */
- 	ROM_REGION( 0x10000, "main", 0 )
+ 	ROM_REGION( 0x10000, "maincpu", 0 )
  	ROM_LOAD( "2214-04.u5-0",   0x0000, 0x2000, CRC(10b782e7) SHA1(158819898ad81506c47b76ffe2a949ee7208740f) ) /* Games included in this set are: */
  	ROM_LOAD( "2214-04.u6-0",   0x2000, 0x2000, CRC(c3fd6510) SHA1(8c89fd2cbcb6f12fa6427883700971f7c39f6ccf) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
 	ROM_RELOAD( 0x4000, 0x2000 )
@@ -1338,7 +1338,7 @@ ROM_START( pitbossc ) /* Program roms on a CTR-202 daughter card */
 ROM_END
 
 ROM_START( casino5 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5",           0x0000, 0x2000, CRC(abe240d8) SHA1(296eb3251dd51147d6984a8c08c3be22e5ed8e86) )
 	ROM_LOAD( "u6",           0x2000, 0x4000, CRC(4d9f0c57) SHA1(d19b4b4f42d329ea35907d17c15a55b954b07295) )
 	ROM_LOAD( "u7",           0x6000, 0x4000, CRC(d3bc510d) SHA1(6222badabf629dd6334591867596f811883aed52) )
@@ -1353,7 +1353,7 @@ ROM_START( casino5 )
 ROM_END
 
 ROM_START( bigappg )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "merit.u5",     0x0000, 0x8000, CRC(47bad6fd) SHA1(87f6c603b52e184f82179869d7b58453cbd34814) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
@@ -1366,7 +1366,7 @@ ROM_START( bigappg )
 ROM_END
 
 ROM_START( trvwzh )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trivia.u5",    0x0000, 0x2000, CRC(731fd5b1) SHA1(1074780321029446da0e6765b9e036b06b067a48) )
 	ROM_LOAD( "trivia.u6",    0x2000, 0x2000, CRC(af6886c0) SHA1(48005b921d7ce33ffc0ba160be82053a26382a9d) )
 
@@ -1388,7 +1388,7 @@ ROM_START( trvwzh )
 ROM_END
 
 ROM_START( trvwzha )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trivia.u5",    0x0000, 0x2000, CRC(731fd5b1) SHA1(1074780321029446da0e6765b9e036b06b067a48) )
 	ROM_LOAD( "trivia.u6",    0x2000, 0x2000, CRC(af6886c0) SHA1(48005b921d7ce33ffc0ba160be82053a26382a9d) )
 
@@ -1409,7 +1409,7 @@ ROM_END
 /* question board only - this contained a variety of roms from the 'trvwzh' and 'trvwzha' sets
   as well as 2 unique general knowledge ones */
 ROM_START( trvwzhb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trivia.u5",    0x0000, 0x2000, CRC(731fd5b1) SHA1(1074780321029446da0e6765b9e036b06b067a48) )
 	ROM_LOAD( "trivia.u6",    0x2000, 0x2000, CRC(af6886c0) SHA1(48005b921d7ce33ffc0ba160be82053a26382a9d) )
 
@@ -1427,7 +1427,7 @@ ROM_START( trvwzhb )
 ROM_END
 
 ROM_START( trvwzv )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5.bin",       0x0000, 0x2000, CRC(fd3531ac) SHA1(d11573df65676e704b28cc2d99fb004b48a358a4) )
 	ROM_LOAD( "u6.bin",       0x2000, 0x2000, CRC(29e43d0e) SHA1(ad610748fe37436880648078f5d1a305cb147c5d) )
 
@@ -1449,7 +1449,7 @@ ROM_START( trvwzv )
 ROM_END
 
 ROM_START( trvwzva )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5.bin",       0x0000, 0x2000, CRC(fd3531ac) SHA1(d11573df65676e704b28cc2d99fb004b48a358a4) )
 	ROM_LOAD( "u6.bin",       0x2000, 0x2000, CRC(29e43d0e) SHA1(ad610748fe37436880648078f5d1a305cb147c5d) )
 
@@ -1468,7 +1468,7 @@ ROM_START( trvwzva )
 ROM_END
 
 ROM_START( trvwz2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5_0e",        0x0000, 0x2000, CRC(97b8d320) SHA1(573945531113d8aae9418ba1e9a2063052227029) )
 	ROM_LOAD( "u6_0e",        0x2000, 0x2000, CRC(2e86288d) SHA1(62c7024d8dfebed9bb05ea91302efe5d18cb7d2a) )
 
@@ -1496,7 +1496,7 @@ ROM_END
 /* questions only - this dump contained a variety of questions from the 'trvwz2' ones above,
  and 2 unique roms, which are Sex Trivia */
 ROM_START( trvwz2a )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5_0e",        0x0000, 0x2000, CRC(97b8d320) SHA1(573945531113d8aae9418ba1e9a2063052227029) )
 	ROM_LOAD( "u6_0e",        0x2000, 0x2000, CRC(2e86288d) SHA1(62c7024d8dfebed9bb05ea91302efe5d18cb7d2a) )
 
@@ -1514,7 +1514,7 @@ ROM_START( trvwz2a )
 ROM_END
 
 ROM_START( trvwz3h )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5",           0x0000, 0x2000, CRC(ad4ab519) SHA1(80e99f4e5542115e34074b41bbc69906e01a408f) )
 	ROM_LOAD( "u6",           0x2000, 0x2000, CRC(21a44014) SHA1(331f8b4fa3f837de070b68b959c818122aedc68a) )
 
@@ -1539,7 +1539,7 @@ ROM_START( trvwz3h )
 ROM_END
 
 ROM_START( trvwz3v )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5",    0x0000, 0x2000, CRC(97b8d320) SHA1(573945531113d8aae9418ba1e9a2063052227029) )
 	ROM_LOAD( "u6",    0x2000, 0x2000, CRC(2e86288d) SHA1(62c7024d8dfebed9bb05ea91302efe5d18cb7d2a) )
 
@@ -1565,7 +1565,7 @@ ROM_START( trvwz3v )
 ROM_END
 
 ROM_START( trvwz3ha )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "merit6.u5",           0x0000, 0x2000, CRC(e0a07f06) SHA1(02cde0fc4a62d108ecd3e2f7704b9166c31707f2) )
 	ROM_LOAD( "merit6.u6",           0x2000, 0x2000, CRC(223482d6) SHA1(4d9dbce7505b98ccd8e2b55f6f86a59b213d72a1) )
 
@@ -1593,7 +1593,7 @@ ROM_START( trvwz3ha )
 ROM_END
 
 ROM_START( trvwz4 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5.bin",       0x0000, 0x8000, CRC(bc23a1ab) SHA1(b9601f316e373c568c5b208de417617094046559) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
@@ -1621,7 +1621,7 @@ ROM_END
   of roms from the above 'trvwz4' set, and one additional one which is Sex Trivia III
 */
 ROM_START( trvwz4a )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5.bin",       0x0000, 0x8000, CRC(bc23a1ab) SHA1(b9601f316e373c568c5b208de417617094046559) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
@@ -1660,7 +1660,7 @@ pba pb9 pb8 pb7 pb6 pb5 pb4 pb3 pb2 pb1
 */
 
 ROM_START( tictac )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "merit.u5",     0x00000, 0x8000, CRC(f0dd73f5) SHA1(f2988b84255ce5f7ea6d25150cdbae88b98e1be3) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
@@ -1685,7 +1685,7 @@ ROM_START( tictac )
 ROM_END
 
 ROM_START( phrcraze )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "phrz.11",      0x00000, 0x8000, CRC(ccd33a0c) SHA1(869b66af4369f3b4bc19336ca2b8104c7f652de7) )
 
 	// probably over-dumped, 1st and 2nd half identical
@@ -1708,7 +1708,7 @@ ROM_START( phrcraze )
 ROM_END
 
 ROM_START( phrcraza )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "merit5.u5",      0x00000, 0x8000, CRC(d04c7657) SHA1(0b59fbf553eb5b68544ee2f94cf8106ab30ff1ed) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -1733,7 +1733,7 @@ ROM_START( phrcraza )
 ROM_END
 
 ROM_START( phrcrazs )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5.bin",       0x00000, 0x8000, CRC(6122b5bb) SHA1(9952b14334287a992eefefbdc887b9a9215304ef) )
 
 	ROM_REGION( 0xc000, "gfx1", 0 )
@@ -1758,7 +1758,7 @@ ROM_START( phrcrazs )
 ROM_END
 
 ROM_START( dodge )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2131-82.u5",     0x0000, 0x8000, CRC(eb82515d) SHA1(d2c15bd633472f50b621ba90598559e345246d01) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -1777,7 +1777,7 @@ ROM_START( dodge )
 ROM_END
 
 ROM_START( couple )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(bc70337a) SHA1(ffc484bc3965f0780d3fa5d8801af27a7164a417) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
@@ -1797,7 +1797,7 @@ ROM_END
 it doesn't jump to the backup ram area and it gives an extra play if you reach a certain
 amount of points (there is a dip switch to select the trigger: 150.000 or 200.000*/
 ROM_START( couplep )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(4601ace6) SHA1(a824ceebf8b9ce77ef2c8e92636e4261f2ae0420) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
@@ -1816,7 +1816,7 @@ ROM_END
 /*f205v's dump,this one looks like an intermediate release between set1 and set2;
 it has same dips as set1, but remaining machine code is the same as set2*/
 ROM_START( couplei )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "1.1d",  0x00000, 0x8000, CRC(760fa29e) SHA1(a37a1562028d9615adff3d2ef88e0156354c720a) )
 	ROM_LOAD( "2.1e",  0x10000, 0x8000, CRC(17372a93) SHA1(e0f0980003473555c2543d98d1494f82afa49f1a) )
 
@@ -1859,7 +1859,7 @@ static DRIVER_INIT( key_7 )
 
 static DRIVER_INIT( couple )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	#if 0 //quick rom compare test
 	{

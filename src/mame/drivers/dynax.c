@@ -269,13 +269,13 @@ static WRITE8_HANDLER( hanamai_keyboard_w )
 
 static WRITE8_HANDLER( dynax_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1,&ROM[0x08000+0x8000*(data & 0x0f)]);
 }
 
 static WRITE8_HANDLER( jantouki_sound_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "sound");
+	UINT8 *ROM = memory_region(space->machine, "soundcpu");
 	memory_set_bankptr(space->machine, 2,&ROM[0x08000+0x8000*data]);
 }
 
@@ -284,7 +284,7 @@ static int hnoridur_bank;
 
 static WRITE8_HANDLER( hnoridur_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main") + 0x10000 + 0x8000*data;
+	UINT8 *ROM = memory_region(space->machine, "maincpu") + 0x10000 + 0x8000*data;
 //logerror("%04x: rom bank = %02x\n",cpu_get_pc(space->cpu),data);
 	memory_set_bankptr(space->machine, 1,ROM);
 	hnoridur_bank = data;
@@ -316,7 +316,7 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 		// hnoridur: R/W RAM
 		case 0x18:
 		{
-			UINT8 *RAM = memory_region(space->machine, "main") + 0x10000 + hnoridur_bank * 0x8000;
+			UINT8 *RAM = memory_region(space->machine, "maincpu") + 0x10000 + hnoridur_bank * 0x8000;
 			RAM[offset] = data;
 			return;
 		}
@@ -652,7 +652,7 @@ static READ8_HANDLER( yarunara_input_r )
 
 static WRITE8_HANDLER( yarunara_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main") + 0x10000 + 0x8000 * data;
+	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000 + 0x8000 * data;
 	memory_set_bankptr(space->machine, 1, rom);
 
 	hnoridur_bank = data;
@@ -873,7 +873,7 @@ static READ8_HANDLER( jantouki_blitter_busy_r )
 
 static WRITE8_HANDLER( jantouki_rombank_w )
 {
-	UINT8 *ROM = memory_region(space->machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
 	memory_set_bankptr(space->machine, 1,&ROM[0x8000 + 0x8000*(data&0x0f)]);
 	set_led_status(0,data & 0x10);	// maybe
 }
@@ -1090,7 +1090,7 @@ static READ8_HANDLER( htengoku_coin_r )
 
 static WRITE8_HANDLER( htengoku_rombank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main") + 0x10000 + 0x8000 * (data & 0x7);
+	UINT8 *rom = memory_region(space->machine, "maincpu") + 0x10000 + 0x8000 * (data & 0x7);
 	memory_set_bankptr(space->machine, 1, rom);
 
 	hnoridur_bank = data;
@@ -1274,7 +1274,7 @@ static WRITE8_HANDLER( tenkai_palette_w )
 
 static void tenkai_update_rombank(running_machine *machine)
 {
-	romptr = memory_region(machine, "main") + 0x10000 + 0x8000 * rombank;
+	romptr = memory_region(machine, "maincpu") + 0x10000 + 0x8000 * rombank;
 //  logerror("rombank = %02x\n",rombank);
 }
 
@@ -3617,17 +3617,17 @@ static const msm5205_interface hanamai_msm5205_interface =
 static MACHINE_DRIVER_START( hanamai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(hanamai_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3674,17 +3674,17 @@ static const ay8910_interface hnoridur_ay8910_interface =
 static MACHINE_DRIVER_START( hnoridur )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(hnoridur_mem_map,0)
 	MDRV_CPU_IO_MAP(hnoridur_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_MACHINE_RESET(adpcm)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3732,15 +3732,15 @@ static const ym2203_interface sprtmtch_ym2203_interface =
 static MACHINE_DRIVER_START( sprtmtch )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("maincpu", Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(sprtmtch_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3772,15 +3772,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mjfriday )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,24000000/4)	/* 6 MHz? */
+	MDRV_CPU_ADD("maincpu",Z80,24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map,0)
 	MDRV_CPU_IO_MAP(mjfriday_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3809,7 +3809,7 @@ static MACHINE_DRIVER_START( mjdialq2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( mjfriday )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mjdialq2_mem_map,0)
 MACHINE_DRIVER_END
 
@@ -3843,14 +3843,14 @@ static MACHINE_DRIVER_START( yarunara )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( hnoridur )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map,0)
 	MDRV_CPU_IO_MAP(yarunara_io_map,0)
 	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 8, 256-1-8-1)
 
@@ -3866,7 +3866,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mcnpshnt )
 
 	MDRV_IMPORT_FROM( hnoridur )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mcnpshnt_mem_map,0)
 	MDRV_CPU_IO_MAP(mcnpshnt_io_map,0)
 
@@ -3881,7 +3881,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nanajign )
 
 	MDRV_IMPORT_FROM( hnoridur )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map,0)
 	MDRV_CPU_IO_MAP(nanajign_io_map,0)
 MACHINE_DRIVER_END
@@ -3912,12 +3912,12 @@ static const msm5205_interface jantouki_msm5205_interface =
 static MACHINE_DRIVER_START( jantouki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_io_map,0)
 	MDRV_CPU_VBLANK_INT("top", jantouki_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_CPU_ADD("sound",Z80,22000000 / 4)	/* 5.5MHz */
+	MDRV_CPU_ADD("soundcpu",Z80,22000000 / 4)	/* 5.5MHz */
 	MDRV_CPU_PROGRAM_MAP(jantouki_sound_mem_map,0)
 	MDRV_CPU_IO_MAP(jantouki_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("top", jantouki_sound_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
@@ -3994,10 +3994,10 @@ static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 static MACHINE_DRIVER_START( mjelctrn )
 
 	MDRV_IMPORT_FROM( hnoridur )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map,0)
 	MDRV_CPU_IO_MAP(mjelctrn_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_VBLANK_INT("screen", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(mjelctrn)
 MACHINE_DRIVER_END
@@ -4033,7 +4033,7 @@ static INTERRUPT_GEN( neruton_vblank_interrupt )
 static MACHINE_DRIVER_START( neruton )
 
 	MDRV_IMPORT_FROM( mjelctrn )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT_HACK(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(neruton)
@@ -4058,8 +4058,8 @@ static INTERRUPT_GEN( majxtal7_vblank_interrupt )
 static MACHINE_DRIVER_START( majxtal7 )
 
 	MDRV_IMPORT_FROM( neruton )
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT("main", majxtal7_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_VBLANK_INT("screen", majxtal7_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 MACHINE_DRIVER_END
 
@@ -4080,16 +4080,16 @@ static const ay8910_interface htengoku_ay8910_interface =
 static MACHINE_DRIVER_START( htengoku )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",Z80,20000000 / 4)
+	MDRV_CPU_ADD("maincpu",Z80,20000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map,0)
 	MDRV_CPU_IO_MAP(htengoku_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4143,7 +4143,7 @@ static const ay8910_interface tenkai_ay8910_interface =
 static MACHINE_DRIVER_START( tenkai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",TMP91640, 21472700 / 2)
+	MDRV_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
 	MDRV_CPU_PROGRAM_MAP(tenkai_map,0)
 	MDRV_CPU_IO_MAP(tenkai_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)
@@ -4151,7 +4151,7 @@ static MACHINE_DRIVER_START( tenkai )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4209,7 +4209,7 @@ Custom: (TC17G032AP-0246)
 ***************************************************************************/
 
 ROM_START( hanamai )
-	ROM_REGION( 0x90000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x90000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "1611.13a", 0x00000, 0x10000, CRC(5ca0b073) SHA1(56b64077e7967fdbb87a7685ca9662cc7881b5ec) )
 	ROM_LOAD( "1610.14a", 0x48000, 0x10000, CRC(b20024aa) SHA1(bb6ce9821c1edbf7d4cfadc58a2b257755856937) )
 
@@ -4252,7 +4252,7 @@ Custom: (TC17G032AP-0246)
 ***************************************************************************/
 
 ROM_START( hnkochou )
-	ROM_REGION( 0x90000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x90000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "2009.s4a", 0x00000, 0x10000, CRC(b3657123) SHA1(3385edb2055abc7be3abb030509c6ac71907a5f3) )
 	ROM_LOAD( "2008.s3a", 0x18000, 0x10000, CRC(1c009be0) SHA1(0f950d2685f8b67f37065e19deae0cf0cb9594f1) )
 
@@ -4289,7 +4289,7 @@ Custom chip: DYNAX TC17G032AP-0246 JAPAN 8929EAI
 ***************************************************************************/
 
 ROM_START( hnoridur )
-	ROM_REGION( 0x10000 + 0x19*0x8000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x19*0x8000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "2309.12",  0x00000, 0x20000, CRC(5517dd68) SHA1(3da27032a412b51b67e852b61166c2fdc138a370) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 
@@ -4331,7 +4331,7 @@ Dynax 1989
 ***************************************************************************/
 
 ROM_START( drgpunch )
-	ROM_REGION( 0x90000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x90000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "2401.3d", 0x00000, 0x10000, CRC(b310709c) SHA1(6ad6cfb54856f65a888ac44e694890f32f26e049) )
 	ROM_LOAD( "2402.6d", 0x28000, 0x10000, CRC(d21ed237) SHA1(7e1c7b40c300578132ebd79cbad9f7976cc85947) )
 
@@ -4349,7 +4349,7 @@ ROM_START( drgpunch )
 ROM_END
 
 ROM_START( sprtmtch )
-	ROM_REGION( 0x90000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x90000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "3101.3d", 0x00000, 0x08000, CRC(d8fa9638) SHA1(9851d38b6b3f56cf3cc101419c24f8d5f97950a9) )
 	ROM_CONTINUE(        0x28000, 0x08000 )
 
@@ -4379,7 +4379,7 @@ Custom chip: DYNAX TC17G032AP-0246 JAPAN 8828EAI
 ***************************************************************************/
 
 ROM_START( mjfriday )
-	ROM_REGION( 0x90000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x90000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "2606.2b",  0x00000, 0x10000, CRC(00e0e0d3) SHA1(89fa4d684ec36d5e974e39294efd65a9fd832517) )
 	ROM_LOAD( "2605.2c",  0x28000, 0x10000, CRC(5459ebda) SHA1(86e51f0c120de87be8f51b498a562360e6b242b8) )
 
@@ -4424,7 +4424,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( maya )
-	ROM_REGION( 0x90000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x90000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "1.17e", 0x00000, 0x10000, CRC(5aaa015e) SHA1(b84d02b1b6c07636176f226fef09a034d00445f0) )
 	ROM_LOAD( "2.15e", 0x28000, 0x10000, CRC(7ea5b49a) SHA1(aaae848669d9f88c0660f46cc801e4eb0f5e3b89) )
 
@@ -4439,7 +4439,7 @@ ROM_START( maya )
 ROM_END
 
 ROM_START( inca )
-	ROM_REGION( 0x90000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x90000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "am27c512.1", 0x00000, 0x10000, CRC(b0d513f7) SHA1(65ef4702302bbfc7c7a77f7353120ee3f5c94b31) )
 	ROM_LOAD( "2.15e", 0x28000, 0x10000, CRC(7ea5b49a) SHA1(aaae848669d9f88c0660f46cc801e4eb0f5e3b89) )
 
@@ -4490,7 +4490,7 @@ Notes:
  */
 
 ROM_START( blktouch )
-	ROM_REGION( 0x90000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x90000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "u43_d8",  0x00000, 0x10000, CRC(0972ab8c) SHA1(ff751fbb37562f216a4fddebd9190acee1f357c8) )
 	ROM_LOAD( "u45_d10", 0x28000, 0x10000, CRC(5745424a) SHA1(d244d9a9b4c49d255f114842147ba0a795a3e9ac) )
 
@@ -4507,7 +4507,7 @@ ROM_END
 static DRIVER_INIT( blktouch )
 {
 	// fearsome encryption ;-)
-	UINT8	*src = (UINT8 *)memory_region(machine, "main");
+	UINT8	*src = (UINT8 *)memory_region(machine, "maincpu");
 	int i;
 
 	for (i=0;i<0x90000;i++)
@@ -4530,7 +4530,7 @@ static DRIVER_INIT( maya )
 	/* Address lines scrambling on 1 z80 rom */
 	int i;
 	UINT8	*gfx = (UINT8 *)memory_region(machine, "gfx1");
-	UINT8	*rom = memory_region(machine, "main") + 0x28000,
+	UINT8	*rom = memory_region(machine, "maincpu") + 0x28000,
 			*end = rom + 0x10000;
 	for (;rom < end; rom+=8)
 	{
@@ -4566,7 +4566,7 @@ CRT Controller: HD46505SP (6845)
 ***************************************************************************/
 
 ROM_START( mjdialq2 )
-	ROM_REGION( 0x78000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x78000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "5201.2b", 0x00000, 0x10000, CRC(5186c2df) SHA1(f05ae3fd5e6c39f3bf2263eaba645d89c454bd70) )
 	ROM_RELOAD(          0x10000, 0x08000 )				// 1
 	ROM_CONTINUE(        0x20000, 0x08000 )				// 3
@@ -4636,7 +4636,7 @@ DYNAX NL-001 WD10100
 ***************************************************************************/
 
 ROM_START( yarunara )
-	ROM_REGION( 0x10000 + 0x1d*0x8000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x1d*0x8000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "5501m.2d",  0x00000, 0x20000, CRC(d86fade5) SHA1(4ae5e22972eb4ead9aa4a455ff1a18e128c33ed6) )
 	ROM_RELOAD(            0x10000, 0x20000 )
 	ROM_LOAD( "5502m.4d",  0x30000, 0x20000, CRC(1ef09ff0) SHA1(bbedcc1c0f5b43c78e0c3ce0fc1a3c28025562ec) )
@@ -4703,7 +4703,7 @@ dumped by sayu
 ***************************************************************************/
 
 ROM_START( hanayara )
-	ROM_REGION( 0x10000 + 0x1d*0x8000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x1d*0x8000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "5501h.2d", 0x00000, 0x20000, CRC(124860b7) SHA1(205459d95f876433a9ca329fe31cfe9b08023baf) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 	ROM_LOAD( "5502h.4d", 0x30000, 0x20000, CRC(93407801) SHA1(63dc3419f97d86221dbdd67b5be41d713364496b) )
@@ -4757,7 +4757,7 @@ D6410288L-1 (SUB)
 ***************************************************************************/
 
 ROM_START( quiztvqq )
-	ROM_REGION( 0x10000 + 0x28*0x8000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x28*0x8000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "6401.2d",  0x000000, 0x020000, CRC(ce0e237c) SHA1(fd94a45052e3a68ef8cda2853b911a9993675fa6) )
 	// 14-17
 	ROM_RELOAD(           0x0b0000, 0x020000 )
@@ -4814,7 +4814,7 @@ D6107068L-1 (SUB)
 ***************************************************************************/
 
 ROM_START( mjangels )
-	ROM_REGION( 0x10000 + 0x28*0x8000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x28*0x8000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "612-01.2d",    0x000000, 0x020000, CRC(cd353ba9) SHA1(8344dc5dd482ad6d36aa1e6b5824a09a3627dc65) )
 	// 00-03
 	ROM_RELOAD(               0x010000, 0x20000 )
@@ -4896,7 +4896,7 @@ DYNAX TC17G032AP-0246 JAPAN 8951EAY
 ***************************************************************************/
 
 ROM_START( mcnpshnt )
-	ROM_REGION( 0x10000 + 0xc*0x8000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0xc*0x8000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "3318.12", 0x000000, 0x020000, CRC(e3b457a8) SHA1(b768895797157cad029ac1f652a838ecf6587d4f) )
 	ROM_RELOAD(          0x010000, 0x020000 )
 	ROM_LOAD( "3317.11", 0x030000, 0x020000, CRC(4bb62bb4) SHA1(0de5605cecb1e729a5b5b866274395945cf88aa3) )
@@ -4968,7 +4968,7 @@ Custom: (TC17G032AP-0246)
 ***************************************************************************/
 
 ROM_START( 7jigen )
-	ROM_REGION( 0x10000 + 0xc*0x8000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0xc*0x8000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "3701.1a",  0x00000, 0x20000, CRC(ee8ab3c4) SHA1(9ccc9e9697dd452cd28e38c81cebea0b862f0642) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 	ROM_LOAD( "3702.3a",  0x30000, 0x20000, CRC(4e43a0bb) SHA1(d98a1ab43dcfab3d2a17f99db797f7bfa17e5ecc) )
@@ -5046,11 +5046,11 @@ Custom: (TC17G032AP-0246) x2
 ***************************************************************************/
 
 ROM_START( jantouki )
-	ROM_REGION( 0x20000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x20000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "2702.6d", 0x000000, 0x010000, CRC(9e9bea93) SHA1(c8b1a0621d3dae37d809bdbaa4ed4af73847b714) )
 	ROM_LOAD( "2701.6c", 0x010000, 0x010000, CRC(a58bc982) SHA1(5cdea3cdf3eaacb6bdf6ddb68e3d57fe53d70bb9) )
 
-	ROM_REGION( 0x68000, "sound", 0 )	// Z80 Code
+	ROM_REGION( 0x68000, "soundcpu", 0 )	// Z80 Code
 	ROM_LOAD( "2705.6g", 0x000000, 0x010000, CRC(9d21e4af) SHA1(454601f4cb89da53c6881f4d8109d3c0babcfe5e) )
 	// banks 4-b:
 	ROM_LOAD( "2704.6f", 0x028000, 0x020000, CRC(4bb62bb4) SHA1(0de5605cecb1e729a5b5b866274395945cf88aa3) )
@@ -5092,7 +5092,7 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( mjelctrn )
-	ROM_REGION( 0x30000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x30000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "u27b-020", 0x00000, 0x20000, CRC(7773d382) SHA1(1d2ae799677e99c7cba09b0a2c49bb9310232e80) )
 	ROM_CONTINUE(         0x00000, 0x20000 )
 	ROM_RELOAD(           0x10000, 0x20000 )
@@ -5112,7 +5112,7 @@ ROM_START( mjelctrn )
 ROM_END
 
 ROM_START( mjelct3 )
-	ROM_REGION( 0x30000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x30000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "se-3010", 0x00000, 0x20000, CRC(370347e7) SHA1(2dc9f1fde4efaaff887722aae6507d7e9fac8eb6) )
 	ROM_RELOAD(          0x10000, 0x08000 )
 	ROM_CONTINUE(        0x28000, 0x08000 )
@@ -5127,7 +5127,7 @@ ROM_START( mjelct3 )
 ROM_END
 
 ROM_START( mjelct3a )
-	ROM_REGION( 0x30000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x30000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "dz-00.rom", 0x00000, 0x20000, CRC(d28358f7) SHA1(995c16e0865048069f79411574256a88d58c6be9) )
 	ROM_RELOAD(            0x10000, 0x08000 )
 	ROM_CONTINUE(          0x28000, 0x08000 )
@@ -5180,7 +5180,7 @@ Z84C015 - Toshiba TMPZ84C015BF-6 Z80 compatible CPU
 ***************************************************************************/
 
 ROM_START( mjelctrb )
-	ROM_REGION( 0x30000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x30000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "prog.u27", 0x00000, 0x20000, CRC(688990ca) SHA1(34825cee8f76de93f12ccf2a1021f9c5369da46a) )
 	ROM_RELOAD(          0x28000, 0x08000 )
 	ROM_CONTINUE(        0x20000, 0x08000 )
@@ -5221,7 +5221,7 @@ VER:1.30
 */
 
 ROM_START( shpeng )
-	ROM_REGION( 0x90000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x90000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "u43.8d", 0x00000, 0x10000, CRC(6b993f68) SHA1(4d3ad750e23be93342c61c454498d432e40587bb) )
 	ROM_LOAD( "u45.9d", 0x28000, 0x10000, CRC(6e79a1d1) SHA1(a72706425bcbd0faee4cf0220942fdcf510d4e89) )
 
@@ -5248,8 +5248,8 @@ ROM_END
 static DRIVER_INIT( mjelct3 )
 {
 	int i;
-	UINT8	*rom = memory_region(machine, "main");
-	size_t  size = memory_region_length(machine, "main");
+	UINT8	*rom = memory_region(machine, "maincpu");
+	size_t  size = memory_region_length(machine, "maincpu");
 	UINT8	*rom1 = malloc_or_die(size);
 
 		memcpy(rom1,rom,size);
@@ -5261,8 +5261,8 @@ static DRIVER_INIT( mjelct3 )
 static DRIVER_INIT( mjelct3a )
 {
 	int i,j;
-	UINT8	*rom = memory_region(machine, "main");
-	size_t  size = memory_region_length(machine, "main");
+	UINT8	*rom = memory_region(machine, "maincpu");
+	size_t  size = memory_region_length(machine, "maincpu");
 	UINT8	*rom1 = malloc_or_die(size);
 
 		memcpy(rom1,rom,size);
@@ -5347,7 +5347,7 @@ HD46505SP (6845)
 ***************************************************************************/
 
 ROM_START( neruton )
-	ROM_REGION( 0x50000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x50000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "4501b.1a", 0x000000, 0x020000, CRC(0e53eeee) SHA1(883138618a11295bfac148da4a092e01d92229b3) )
 	ROM_RELOAD(           0x010000, 0x020000 )
 	ROM_LOAD( "4502.3a",  0x030000, 0x020000, CRC(c296293f) SHA1(466e87f7eca102568f1f00c6ba77dacc3df300dd) )
@@ -5428,7 +5428,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( majxtal7 )
-	ROM_REGION( 0x50000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x50000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "4001.1a",  0x00000, 0x20000, CRC(82fc6dd5) SHA1(3c6e58d4c302a0f305c67c31fce6a1d4cbfe5f78) )
 	ROM_RELOAD(           0x10000, 0x20000 )
 	ROM_LOAD( "4002.3a",  0x30000, 0x10000, CRC(b5fec88f) SHA1(bc3a2404150edd570ea7d320b2d43735fbdce195) )
@@ -5536,7 +5536,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( majrjhdx )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "1051d.5e",         0x00000, 0x40000, CRC(54c31732) SHA1(049e76c42fd248f975c7cce7e74b1f79e2a96bea) )
 	ROM_RELOAD(                   0x10000, 0x40000 )	// the first 0x4000 bytes are Z80 code from "MAHJONG THE MYSTERIOUS ORIENT"!
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP )
@@ -5584,7 +5584,7 @@ PCB Layout
 ***************************************************************************/
 
 ROM_START( mjreach )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "rom.u15", 0x00000, 0x40000, CRC(d914ac92) SHA1(f3284d2a74380b33fd5fe8f73fe88c8360a9b783) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
@@ -5667,7 +5667,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( tenkai )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "taicom00.2c",      0x00000, 0x40000, CRC(a35e54db) SHA1(247c856e19989fb834e8ed135393927bbd9c0277) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) )
@@ -5731,7 +5731,7 @@ mc3.u15      [2/2]      taicom00.2c  [4/4]      IDENTICAL
 ***************************************************************************/
 
 ROM_START( tenkai2b )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "mc0.u11",          0x00000, 0x40000, CRC(8488a3ab) SHA1(f367a2dcc65410929db595b3c442d310d50a4940) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	// tenkai internal rom is incompatible with the code of this set
@@ -5805,7 +5805,7 @@ tdh-12m.u11  [4/4]      taicom00.2c  [4/4]      IDENTICAL
 ***************************************************************************/
 
 ROM_START( tenkaibb )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "tdh-12m.u11", 0x00000, 0x40000, CRC(7b877721) SHA1(41bba10ffb3d72af84d6577d4785225fe1ecc640) )
 	ROM_RELOAD(              0x10000, 0x40000 )
 
@@ -5863,7 +5863,7 @@ taicom03.13b            rom.u13                 IDENTICAL
 ***************************************************************************/
 
 ROM_START( tenkaicb )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "rom.u15", 0x00000, 0x40000, CRC(7b877721) SHA1(41bba10ffb3d72af84d6577d4785225fe1ecc640) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 	// it doesn't need the internal rom from tenkai
@@ -5945,7 +5945,7 @@ tydg004.u21  [4/4]      taicom03.13b [4/4]      24.230194%
 ***************************************************************************/
 
 ROM_START( tenkaid )
-	ROM_REGION( 0x90000, "main", 0 )
+	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "tydg001.u11",      0x00000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	ROM_RELOAD(                   0x50000, 0x40000 )
@@ -5977,7 +5977,7 @@ lzc-02.rom   [2/2]      taicom03.13b            IDENTICAL
 ***************************************************************************/
 
 ROM_START( tenkaie )
-	ROM_REGION( 0x50000, "main", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "epr-a01.rom",      0x00000, 0x40000, CRC(a35e54db) SHA1(247c856e19989fb834e8ed135393927bbd9c0277) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
 	ROM_LOAD( "tmp91p640n-10.5b", 0x00000, 0x04000, NO_DUMP CRC(509f1c97) SHA1(08557bea2e924053fd5bc9de5e306f3ecf8e98e6) )
@@ -6032,7 +6032,7 @@ d61b.7b -- PAL16CEV8 (not dumped)
 ***************************************************************************/
 
 ROM_START( mjcomv1 )
-	ROM_REGION( 0x10000 + 0x28*0x8000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x10000 + 0x28*0x8000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "6101.2d", 0x000000, 0x20000, CRC(60552776) SHA1(9876f1aece8f25b7e495c6fac24ebb5028916f73) )
 	// 00-03
 	ROM_RELOAD(          0x010000, 0x20000 )
@@ -6114,7 +6114,7 @@ H10B.4A             = 5509m.17c             Mahjong Yarunara (Japan)
 ***************************************************************************/
 
 ROM_START( hjingi )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "hanajngi.code",  0x00000, 0x20000, NO_DUMP )
 	ROM_RELOAD(                 0x10000, 0x20000 )
 
@@ -6187,7 +6187,7 @@ DSWs - 4x 10-position, 1x 4-position
 ***************************************************************************/
 
 ROM_START( htengoku )
-	ROM_REGION( 0x50000, "main", 0 )	// Z80 Code
+	ROM_REGION( 0x50000, "maincpu", 0 )	// Z80 Code
 	ROM_LOAD( "6501.4b", 0x00000, 0x40000, CRC(29a7fc83) SHA1(5d3cf0a72918e58b5b60f7c978e559c7c1306bce) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 

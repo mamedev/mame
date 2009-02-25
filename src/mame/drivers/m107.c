@@ -50,7 +50,7 @@ static WRITE16_HANDLER( bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(space->machine, "main");
+		UINT8 *RAM = memory_region(space->machine, "maincpu");
 		memory_set_bankptr(space->machine, 1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
 	}
 }
@@ -438,11 +438,11 @@ static const nec_config firebarr_config ={ rtypeleo_decryption_table, };
 static MACHINE_DRIVER_START( firebarr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V33, 28000000/2)	/* NEC V33, 28MHz clock */
+	MDRV_CPU_ADD("maincpu", V33, 28000000/2)	/* NEC V33, 28MHz clock */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
 
-	MDRV_CPU_ADD("sound", V30, 14318000/2)
+	MDRV_CPU_ADD("soundcpu", V30, 14318000/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_CONFIG(firebarr_config)
 
@@ -450,7 +450,7 @@ static MACHINE_DRIVER_START( firebarr )
 	MDRV_MACHINE_RESET(m107)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -481,9 +481,9 @@ static MACHINE_DRIVER_START( dsoccr94 )
 	MDRV_IMPORT_FROM(firebarr)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", V33, 20000000/2)	/* NEC V33, Could be 28MHz clock? */
+	MDRV_CPU_REPLACE("maincpu", V33, 20000000/2)	/* NEC V33, Could be 28MHz clock? */
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_CONFIG(dsoccr94_config)
 
 	/* video hardware */
@@ -494,20 +494,20 @@ MACHINE_DRIVER_END
 static const nec_config wpksoc_config ={ leagueman_decryption_table, };
 static MACHINE_DRIVER_START( wpksoc )
 	MDRV_IMPORT_FROM(firebarr)
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_CONFIG(wpksoc_config)
 MACHINE_DRIVER_END
 
 /***************************************************************************/
 
 ROM_START( firebarr )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "f4-a-h0-c.9d", 0x000001, 0x40000, CRC(2aa5676e) SHA1(7f51c462c58b63fa4f34ec9dd2ee69c932ebf718) )
 	ROM_LOAD16_BYTE( "f4-a-l0-c.9f", 0x000000, 0x40000, CRC(42f75d59) SHA1(eba3a02874d608ecb8c93160c8f0b4c8bb8061d2) )
 	ROM_LOAD16_BYTE( "f4-a-h1-c.9e", 0x080001, 0x20000, CRC(bb7f6968) SHA1(366747672aac939454d9915cda5277b0438f063b) )
 	ROM_LOAD16_BYTE( "f4-a-l1-c.9h", 0x080000, 0x20000, CRC(9d57edd6) SHA1(16122829b61aa3aee88aeb6634831e8cf95eaee0) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "f4-b-sh0-b", 0x000001, 0x10000, CRC(30a8e232) SHA1(d4695aed35a1aa796b2872e58a6014e8b28bc154) )
 	ROM_LOAD16_BYTE( "f4-b-sl0-b", 0x000000, 0x10000, CRC(204b5f1f) SHA1(f0386500773cd7cca93f0e8e740db29182320c70) )
 
@@ -536,13 +536,13 @@ ROM_START( firebarr )
 ROM_END
 
 ROM_START( dsoccr94 )
-	ROM_REGION( 0x180000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x180000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ds_h0-c.rom", 0x000001, 0x040000, CRC(d01d3fd7) SHA1(925dff999252bf3b920bc0f427744e1464620fe8) )
 	ROM_LOAD16_BYTE( "ds_l0-c.rom", 0x000000, 0x040000, CRC(8af0afe2) SHA1(423c77d392a79cdaed66ad8c13039450d34d3f6d) )
 	ROM_LOAD16_BYTE( "ds_h1-c.rom", 0x100001, 0x040000, CRC(6109041b) SHA1(063898a88f8a6a9f1510aa55e53a39f037b02903) )
 	ROM_LOAD16_BYTE( "ds_l1-c.rom", 0x100000, 0x040000, CRC(97a01f6b) SHA1(e188e28f880f5f3f4d7b49eca639d643989b1468) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "ds_sh0.rom", 0x000001, 0x010000, CRC(23fe6ffc) SHA1(896377961cafc19e44d9d889f9fbfdbaedd556da) )
 	ROM_LOAD16_BYTE( "ds_sl0.rom", 0x000000, 0x010000, CRC(768132e5) SHA1(1bb64516eb58d3b246f08e1c07f091e78085689f) )
 
@@ -563,11 +563,11 @@ ROM_START( dsoccr94 )
 ROM_END
 
 ROM_START( wpksoc )
-	ROM_REGION( 0x180000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x180000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "pk-h0-eur-d.h0", 0x000001, 0x040000, CRC(b4917788) SHA1(673294c518eaf28354fa6a3058f9325c6d9ddde6) )
 	ROM_LOAD16_BYTE( "pk-l0-eur-d.l0", 0x000000, 0x040000, CRC(03816bae) SHA1(832e2ec722b41d41626fec583fc11e9ff62cdaa0) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "pk-sh0.sh0", 0x000001, 0x010000, CRC(1145998c) SHA1(cdb2a428e0f35302b81696dab02d3dd2c433f6e5) )
 	ROM_LOAD16_BYTE( "pk-sl0.sl0", 0x000000, 0x010000, CRC(542ee1c7) SHA1(b934adeecbba17cf96b06a2b1dc1ceaebdf9ad10) )
 
@@ -592,11 +592,11 @@ ROM_START( wpksoc )
 ROM_END
 
 ROM_START( kftgoal )
-	ROM_REGION( 0x180000, "main", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x180000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "pk-h0-usa-d.h0", 0x000001, 0x040000, CRC(aed4cde0) SHA1(2fe04bf93c353108b82a0b6017229e9b0f451b06) )
 	ROM_LOAD16_BYTE( "pk-l0-usa-d.l0", 0x000000, 0x040000, CRC(39fe30d2) SHA1(e0c117da4fe9c779dd534ee0d09685aeb5f579c6) )
 
-	ROM_REGION( 0x100000, "sound", 0 )
+	ROM_REGION( 0x100000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "pk-sh0.sh0", 0x000001, 0x010000, CRC(1145998c) SHA1(cdb2a428e0f35302b81696dab02d3dd2c433f6e5) )
 	ROM_LOAD16_BYTE( "pk-sl0.sl0", 0x000000, 0x010000, CRC(542ee1c7) SHA1(b934adeecbba17cf96b06a2b1dc1ceaebdf9ad10) )
 
@@ -627,12 +627,12 @@ ROM_END
 
 static DRIVER_INIT( firebarr )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
 	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
 
-	RAM = memory_region(machine, "sound");
+	RAM = memory_region(machine, "soundcpu");
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
 
 	m107_irq_vectorbase=0x20;
@@ -641,12 +641,12 @@ static DRIVER_INIT( firebarr )
 
 static DRIVER_INIT( dsoccr94 )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
 	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
 
-	RAM = memory_region(machine, "sound");
+	RAM = memory_region(machine, "soundcpu");
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
 
 	m107_irq_vectorbase=0x80;
@@ -655,12 +655,12 @@ static DRIVER_INIT( dsoccr94 )
 
 static DRIVER_INIT( wpksoc )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
 	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
 
-	RAM = memory_region(machine, "sound");
+	RAM = memory_region(machine, "soundcpu");
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
 
 

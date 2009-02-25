@@ -191,15 +191,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( yard )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/3/2)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
 	MDRV_CPU_PROGRAM_MAP(yard_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_GFXDECODE(yard)
 	MDRV_PALETTE_LENGTH(256+256+256)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 384, 0, 256, 282, 42, 266)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
@@ -220,7 +220,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( 10yard )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "yf-a-3p-b",    0x0000, 0x2000, CRC(2e205ec2) SHA1(fcfa08f45423b35f2c99d4e6b5474ab1b3a84fec) )
 	ROM_LOAD( "yf-a-3n-b",    0x2000, 0x2000, CRC(82fcd980) SHA1(7846705b29961cb95ee1571ee7e16baceea522d4) )
 	ROM_LOAD( "yf-a-3m-b",    0x4000, 0x2000, CRC(a8d5c311) SHA1(28edb5cfd943a2262d7e37ef9a7245f7017cbc51) )
@@ -254,7 +254,7 @@ ROM_START( 10yard )
 ROM_END
 
 ROM_START( 10yardj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "yf-a.3p",      0x0000, 0x2000, CRC(4586114f) SHA1(a31c68770e7a7eed805c5ba46af302c2895e3cee) )
 	ROM_LOAD( "yf-a.3n",      0x2000, 0x2000, CRC(947fa760) SHA1(bd6c2ee6e6800b063b81dbdd9fc929120019439d) )
 	ROM_LOAD( "yf-a.3m",      0x4000, 0x2000, CRC(d4975633) SHA1(84a506ae680a9dd26ef6f33880400e965ccf8260) )
@@ -288,7 +288,7 @@ ROM_START( 10yardj )
 ROM_END
 
 ROM_START( vs10yard )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a.3p",         0x0000, 0x2000, CRC(1edac08f) SHA1(c6a3290e9dba663dccf0613853abfab8e912477d) )
 	ROM_LOAD( "vyf-a.3m",     0x2000, 0x2000, CRC(3b9330f8) SHA1(b35fe72cf724cfb887906060bbcf40b0c896ccf0) )
 	ROM_LOAD( "a.3m",         0x4000, 0x2000, CRC(cf783dad) SHA1(0b1b875ac65ba90c92ca06d0aa01c477b7427322) )
@@ -322,7 +322,7 @@ ROM_START( vs10yard )
 ROM_END
 
 ROM_START( vs10yarj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vyf-a.3n",     0x0000, 0x2000, CRC(418e01fc) SHA1(56a6515735cd88ec803e24574a28aef823a5d36b) )
 	ROM_LOAD( "vyf-a.3m",     0x2000, 0x2000, CRC(3b9330f8) SHA1(b35fe72cf724cfb887906060bbcf40b0c896ccf0) )
 	ROM_LOAD( "vyf-a.3k",     0x4000, 0x2000, CRC(a0ec15bb) SHA1(a5ce9341e9d05e33c025ac62a27faf738c88326e) )

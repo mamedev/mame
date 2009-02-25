@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( redalert_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_bitmap_color)
 	AM_RANGE(0xc060, 0xc060) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, redalert_voice_command_w)
 	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("main", 0x8000)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ww3_main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( ww3_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_video_control)
 	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_bitmap_color)
 	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("main", 0x8000)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
 
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( demoneye_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc061, 0xc061) AM_MIRROR(0x0f80) AM_READWRITE(SMH_NOP, SMH_NOP)	/* unknown */
 	AM_RANGE(0xc062, 0xc062) AM_MIRROR(0x0f80) AM_READWRITE(SMH_NOP, SMH_NOP)	/* unknown */
 	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)	/* probably not correct */
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("main", 0x8000)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
 
@@ -307,9 +307,9 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( redalert )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(redalert_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", redalert_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(redalert_video)
@@ -321,9 +321,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ww3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(ww3_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", redalert_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(ww3_video)
@@ -335,9 +335,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( demoneye )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(demoneye_main_map,0)
-	MDRV_CPU_VBLANK_INT("main", redalert_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(demoneye_video)
@@ -355,7 +355,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( ww3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w3i5.3f",      0x5000, 0x1000, CRC(9fc24ad3) SHA1(697ab22555ff5aae09f50051ccda545c17a0ac8a) )
 	ROM_LOAD( "w3i6.3d",      0x6000, 0x1000, CRC(cb2a308c) SHA1(9f3bc22bad31165e080e81d4a3fb0ec2aad235fe) )
 	ROM_LOAD( "w3i7b.3b",     0x7000, 0x1000, CRC(1a0c3936) SHA1(fa2d0a1425624ae4d811adc9ea75850641207682) )
@@ -364,7 +364,7 @@ ROM_START( ww3 )
 	ROM_LOAD( "w3ia.3c",      0xa000, 0x1000, CRC(dccb8605) SHA1(f4c5e1a5de0828c5e39f37e2bf10f4f60bef856a) )
 	ROM_LOAD( "w3ib.3a",      0xb000, 0x1000, CRC(3658e465) SHA1(2c910b2e9d689cb577d8a63bc4d07d0770a6de68) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "w3s1",         0x7000, 0x0800, CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
@@ -372,7 +372,7 @@ ROM_START( ww3 )
 ROM_END
 
 ROM_START( redalert )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rag5",         0x5000, 0x1000, CRC(d7c9cdd6) SHA1(5ff5cdceaa00083b745cf5c74b096f7edfadf737) )
 	ROM_LOAD( "rag6",         0x6000, 0x1000, CRC(cb2a308c) SHA1(9f3bc22bad31165e080e81d4a3fb0ec2aad235fe) )
 	ROM_LOAD( "rag7n",        0x7000, 0x1000, CRC(82ab2dae) SHA1(f8328b048384afac245f1c16a2d0864ffe0b4741) )
@@ -381,7 +381,7 @@ ROM_START( redalert )
 	ROM_LOAD( "ragab",        0xa000, 0x1000, CRC(ab99f5ed) SHA1(a93713bb03d61cce64adc89b874b67adea7c53cd) )
 	ROM_LOAD( "ragb",         0xb000, 0x1000, CRC(8e0d1661) SHA1(bff4ddca761ddd70113490f50777e62c66813685) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "w3s1",         0x7000, 0x0800, CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
 
 	ROM_REGION( 0x10000, "voice", 0 )
@@ -396,7 +396,7 @@ ROM_END
 
 
 ROM_START( demoneye )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "demoneye.6",   0x6000, 0x1000, CRC(b03ee3a9) SHA1(66b6115fbb4e8097152702022c59c464e8211e5a) )
 	ROM_LOAD( "demoneye.7",   0x7000, 0x1000, CRC(667a5de7) SHA1(c3ce7fbbc6c98250e9d5f85854e6887017ca5ff9) )
 	ROM_LOAD( "demoneye.8",   0x8000, 0x1000, CRC(257484d7) SHA1(3937cce546462a471adbdc1da63ddfc20cfc7b79) )
@@ -404,7 +404,7 @@ ROM_START( demoneye )
 	ROM_LOAD( "demoneye.a",   0xa000, 0x1000, CRC(a27d08aa) SHA1(659ad22778e852fc58f3951d62bc01151c973d36) )
 	ROM_LOAD( "demoneye.b",   0xb000, 0x1000, CRC(1fd3585b) SHA1(b1697b7b21b739499fda1e155530dbfab89f3358) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "demoneye.7s",  0x2000, 0x1000, CRC(8fdc9364) SHA1(3fccb5b22f08d6a0cde85863c1ce5399c84f233e) )
 	ROM_LOAD( "demoneye.6s",  0x3000, 0x1000, CRC(0a23def9) SHA1(b52f52be312ec7810e3c9cbd3913e887f983b1ee) )
 

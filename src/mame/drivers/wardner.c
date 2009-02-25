@@ -139,7 +139,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		int bankaddress = 0;
 
 		const address_space *mainspace;
-		UINT8 *RAM = memory_region(space->machine, "main");
+		UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 		mainspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 		wardner_membank = data;
@@ -437,12 +437,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( wardner )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,24000000/4)			/* 6MHz ??? - Real board crystal is 24MHz */
+	MDRV_CPU_ADD("maincpu", Z80,24000000/4)			/* 6MHz ??? - Real board crystal is 24MHz */
 	MDRV_CPU_PROGRAM_MAP(main_program_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", wardner_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", wardner_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,24000000/7)			/* 3.43MHz ??? */
+	MDRV_CPU_ADD("audiocpu", Z80,24000000/7)			/* 3.43MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_program_map, 0)
 	MDRV_CPU_IO_MAP(sound_io_map, 0)
 
@@ -458,7 +458,7 @@ static MACHINE_DRIVER_START( wardner )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -491,13 +491,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START( wardner )
-	ROM_REGION( 0x40000, "main", 0 )	/* Banked Main Z80 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* Banked Main Z80 code */
 	ROM_LOAD( "wardner.17", 0x00000, 0x08000, CRC(c5dd56fd) SHA1(f0a09557150e9c1c6b9d8e125f5408fc269c9d17) )	/* Main Z80 code */
 	ROM_LOAD( "b25-18.rom", 0x10000, 0x10000, CRC(9aab8ee2) SHA1(16fa44b75f4a3a5b1ff713690a299ecec2b5a4bf) )	/* OBJ ROMs */
 	ROM_LOAD( "b25-19.rom", 0x20000, 0x10000, CRC(95b68813) SHA1(06ea1b1d6e2e6326ceb9324fc471d082fda6112e) )
 	ROM_LOAD( "wardner.20", 0x38000, 0x08000, CRC(347f411b) SHA1(1fb2883d74d10350cb1c62fb58d5783652861b37) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "b25-16.rom", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 */
@@ -542,13 +542,13 @@ ROM_START( wardner )
 ROM_END
 
 ROM_START( pyros )
-	ROM_REGION( 0x40000, "main", 0 )	/* Banked Z80 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* Banked Z80 code */
 	ROM_LOAD( "b25-29.rom", 0x00000, 0x08000, CRC(b568294d) SHA1(5d04dd006f5180fa0c9340e2efa6613625d712a8) )	/* Main Z80 code */
 	ROM_LOAD( "b25-18.rom", 0x10000, 0x10000, CRC(9aab8ee2) SHA1(16fa44b75f4a3a5b1ff713690a299ecec2b5a4bf) )	/* OBJ ROMs */
 	ROM_LOAD( "b25-19.rom", 0x20000, 0x10000, CRC(95b68813) SHA1(06ea1b1d6e2e6326ceb9324fc471d082fda6112e) )
 	ROM_LOAD( "b25-30.rom", 0x38000, 0x08000, CRC(5056c799) SHA1(9750fa8bf5d1181a4fecbcbf822f8f027bebd5a8) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "b25-16.rom", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 */
@@ -593,13 +593,13 @@ ROM_START( pyros )
 ROM_END
 
 ROM_START( wardnerj )
-	ROM_REGION( 0x40000, "main", 0 )	/* Banked Z80 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* Banked Z80 code */
 	ROM_LOAD( "b25-17.bin",  0x00000, 0x08000, CRC(4164dca9) SHA1(1f02c0991d7c14230043e34cb4b8e089b467b234) )	/* Main Z80 code */
 	ROM_LOAD( "b25-18.rom",  0x10000, 0x10000, CRC(9aab8ee2) SHA1(16fa44b75f4a3a5b1ff713690a299ecec2b5a4bf) )	/* OBJ ROMs */
 	ROM_LOAD( "b25-19.rom",  0x20000, 0x10000, CRC(95b68813) SHA1(06ea1b1d6e2e6326ceb9324fc471d082fda6112e) )
 	ROM_LOAD( "b25-20.bin",  0x38000, 0x08000, CRC(1113ad38) SHA1(88f89054954b1d2776ceaedc7a3605190808d7e5) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound Z80 code */
 	ROM_LOAD( "b25-16.rom", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
 	ROM_REGION( 0x2000, "dsp", 0 )	/* Co-Processor TMS320C10 */

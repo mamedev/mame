@@ -230,7 +230,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( embargo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 625000)
+	MDRV_CPU_ADD("maincpu", S2650, 625000)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
 
@@ -239,7 +239,7 @@ static MACHINE_DRIVER_START( embargo )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(embargo)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
@@ -256,7 +256,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( embargo )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "emb1", 0x0000, 0x0200, CRC(00dcbc24) SHA1(67018a20d7694618123499640f041fb518ea29fa) )
 	ROM_LOAD( "emb2", 0x0200, 0x0200, CRC(e7069b11) SHA1(b933095087cd4fe10f12fd244606aaaed1c31bca) )
 	ROM_LOAD( "emb3", 0x0400, 0x0200, CRC(1af7a966) SHA1(a8f6d1063927106f44c43f64c26b52c07c5450df) )

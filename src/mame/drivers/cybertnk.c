@@ -207,7 +207,7 @@ static VIDEO_UPDATE( cybertnk )
 static DRIVER_INIT( cybertnk )
 {
 #ifdef IGNORE_MISSING_ROM
-	UINT16 *ROM = (UINT16*)memory_region(machine, "main");
+	UINT16 *ROM = (UINT16*)memory_region(machine, "maincpu");
 
 	/* nop the rom checksum branch */
 	ROM[0x1546/2] = 0x4e71;
@@ -562,7 +562,7 @@ static const y8950_interface y8950_config = {
 };
 
 static MACHINE_DRIVER_START( cybertnk )
-	MDRV_CPU_ADD("main", M68000,20000000/2)
+	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(master_mem,0)
 	MDRV_CPU_VBLANK_INT_HACK(master_irq,2)
 
@@ -570,13 +570,13 @@ static MACHINE_DRIVER_START( cybertnk )
 	MDRV_CPU_PROGRAM_MAP(slave_mem,0)
 	MDRV_CPU_VBLANK_INT_HACK(slave_irq,2)
 
-	MDRV_CPU_ADD("audio", Z80,3579500)
+	MDRV_CPU_ADD("audiocpu", Z80,3579500)
 	MDRV_CPU_PROGRAM_MAP(sound_mem,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))//arbitrary value,needed to get the communication to work
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -610,7 +610,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( cybertnk )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "p1a",   0x00000, 0x20000, BAD_DUMP CRC(de7ff83a) SHA1(64a34443b532db24ec2c86f0e288eaf12a2212af) )
 	ROM_LOAD16_BYTE( "p2a",   0x00001, 0x20000, BAD_DUMP CRC(9b6afa26) SHA1(387a6eb6e5da9752869fcc6433cc7516a28d6d30) )
 
@@ -618,7 +618,7 @@ ROM_START( cybertnk )
 	ROM_LOAD16_BYTE( "subl",   0x00000, 0x10000, CRC(3814a2eb) SHA1(252800b21f5cfada34ef5208cda33088daab132b) )
 	ROM_LOAD16_BYTE( "subh",   0x00001, 0x10000, CRC(1af7ad58) SHA1(450c65289729d74cd4d17e11be16469246e61b7d) )
 
-	ROM_REGION( 0x8000, "audio", 0 )
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "ss1",    0x0000, 0x8000, CRC(c3ba160b) SHA1(cfbfcad443ff83cd4e707f045a650417aca03d85) )
 
 	ROM_REGION( 0x80000, "ym1", 0 )

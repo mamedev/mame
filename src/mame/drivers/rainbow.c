@@ -349,7 +349,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( bankswitch_w )
 {
-	memory_set_bankptr(device->machine, 5, memory_region(device->machine, "audio") + ((data - 1) & 3) * 0x4000 + 0x10000);
+	memory_set_bankptr(device->machine, 5, memory_region(device->machine, "audiocpu") + ((data - 1) & 3) * 0x4000 + 0x10000);
 }
 
 static READ8_HANDLER( jumping_latch_r )
@@ -608,17 +608,17 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( rainbow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_16MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rainbow_readmem,rainbow_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(rainbow_s_readmem,rainbow_s_writemem)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -645,17 +645,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jumping )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_24MHz/3)	/* not verified but matches original */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)	/* not verified but matches original */
 	MDRV_CPU_PROGRAM_MAP(jumping_readmem,jumping_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_18_432MHz/6)	/* not verified but music tempo matches original */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)	/* not verified but music tempo matches original */
 	MDRV_CPU_PROGRAM_MAP(jumping_sound_readmem,jumping_sound_writemem)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough ? */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -684,7 +684,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( rainbow )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "b22-10-1.19",   0x00000, 0x10000, CRC(e34a50ca) SHA1(17a92cd7182db1e18000b1ae689758fcfd70fe16) )
 	ROM_LOAD16_BYTE( "b22-11-1.20",   0x00001, 0x10000, CRC(6a31a093) SHA1(1e99ae47811c0d3774d138dab02ac50bc1b92173) )
 	ROM_LOAD16_BYTE( "b22-08-1.21",   0x20000, 0x10000, CRC(15d6e17a) SHA1(7b0339180239e75adf1437aee276b652a1bfee51) )
@@ -692,7 +692,7 @@ ROM_START( rainbow )
 	ROM_LOAD16_BYTE( "b22-03.23",     0x40000, 0x20000, CRC(3ebb0fb8) SHA1(1b41b305623d121255eb70cb992e4d9da13abd82) )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )
+	ROM_REGION( 0x1c000, "audiocpu", 0 )
 	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
 	ROM_CONTINUE(                     0x10000, 0xc000 )
 
@@ -706,7 +706,7 @@ ROM_START( rainbow )
 ROM_END
 
 ROM_START( rainbowo )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "b22-10.19",     0x00000, 0x10000, CRC(3b013495) SHA1(fc89f401a80b9bde174df8a257bb7fad4937c838) )
 	ROM_LOAD16_BYTE( "b22-11.20",     0x00001, 0x10000, CRC(80041a3d) SHA1(619d71a2bef5fd898a15d37d8016850f832428c3) )
 	ROM_LOAD16_BYTE( "b22-08.21",     0x20000, 0x10000, CRC(962fb845) SHA1(1c5581e697902ee5cde0fb841ef05eade04a901b) )
@@ -714,7 +714,7 @@ ROM_START( rainbowo )
 	ROM_LOAD16_BYTE( "b22-03.23",     0x40000, 0x20000, CRC(3ebb0fb8) SHA1(1b41b305623d121255eb70cb992e4d9da13abd82) )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )
+	ROM_REGION( 0x1c000, "audiocpu", 0 )
 	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
 	ROM_CONTINUE(                     0x10000, 0xc000 )
 
@@ -728,7 +728,7 @@ ROM_START( rainbowo )
 ROM_END
 
 ROM_START( rainbowe )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "b39-01.19",     0x00000, 0x10000, CRC(50690880) SHA1(88cd8739eaa6e4e5988be225c31d2a6605173d39) )
 	ROM_LOAD16_BYTE( "b39-02.20",     0x00001, 0x10000, CRC(4dead71f) SHA1(03e9df33fc8fc64d6eeb1c3a763acac00b10c071) )
 	ROM_LOAD16_BYTE( "b39-03.21",     0x20000, 0x10000, CRC(4a4cb785) SHA1(6ba7de3901a001cbb31713664ccb68b943a5578f) )
@@ -736,7 +736,7 @@ ROM_START( rainbowe )
 	ROM_LOAD16_BYTE( "b22-03.23",     0x40000, 0x20000, CRC(3ebb0fb8) SHA1(1b41b305623d121255eb70cb992e4d9da13abd82) )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )
+	ROM_REGION( 0x1c000, "audiocpu", 0 )
 	ROM_LOAD( "b22-14.43",            0x00000, 0x4000, CRC(113c1a5b) SHA1(effa2adf54a6be78b2d4baf3a47529342fb0d895) )
 	ROM_CONTINUE(                     0x10000, 0xc000 )
 
@@ -750,7 +750,7 @@ ROM_START( rainbowe )
 ROM_END
 
 ROM_START( jumping )
-	ROM_REGION( 0xa0000, "main", 0 )
+	ROM_REGION( 0xa0000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jb1_h4",        0x00000, 0x10000, CRC(3fab6b31) SHA1(57803478949cb62f7eab2ef9be08b13aa2237dbc) )
 	ROM_LOAD16_BYTE( "jb1_h8",        0x00001, 0x10000, CRC(8c878827) SHA1(4a54a217b7c442305c3ce9298aa36ae225382444) )
 	ROM_LOAD16_BYTE( "jb1_i4",        0x20000, 0x10000, CRC(443492cf) SHA1(fc3809d784d611df4fd446ca2443eebdf4f0bfd7) )
@@ -759,7 +759,7 @@ ROM_START( jumping )
 	ROM_LOAD16_BYTE( "b22-04.24",     0x40001, 0x20000, CRC(91625e7f) SHA1(765afd973d9b82bb496b04beca284bf2769d6e6f) )
 	ROM_LOAD16_BYTE( "jb1_f89",       0x80001, 0x10000, CRC(0810d327) SHA1(fe91ac02e617bde413dc8a20b7cbcaf3e20aeb28) )	/* c-chip substitute */
 
-	ROM_REGION( 0x14000, "audio", 0 )
+	ROM_REGION( 0x14000, "audiocpu", 0 )
 	ROM_LOAD( "jb1_cd67",             0x00000, 0x8000, CRC(8527c00e) SHA1(86e3824caca39aca4ca4df63bb4474adacfc4c53) )
 	ROM_CONTINUE(                     0x10000, 0x4000 )
 	ROM_CONTINUE(                     0x0c000, 0x4000 )

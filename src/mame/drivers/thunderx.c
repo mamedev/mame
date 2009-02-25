@@ -317,7 +317,7 @@ static WRITE8_HANDLER( thunderx_1f98_w )
 
 static WRITE8_HANDLER( scontra_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	int offs;
 
 //logerror("%04x: bank switch %02x\n",cpu_get_pc(space->cpu),data);
@@ -694,11 +694,11 @@ static const k007232_interface k007232_config =
 static MACHINE_DRIVER_START( scontra )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 3000000)	/* 052001 */
+	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* 052001 */
 	MDRV_CPU_PROGRAM_MAP(scontra_readmem,scontra_writemem)
-	MDRV_CPU_VBLANK_INT("main", scontra_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", scontra_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)		/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(scontra_readmem_sound,scontra_writemem_sound)
 
 	MDRV_MACHINE_RESET(scontra)
@@ -706,7 +706,7 @@ static MACHINE_DRIVER_START( scontra )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -735,11 +735,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( thunderx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 3000000)		/* ? */
+	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(thunderx_readmem,thunderx_writemem)
-	MDRV_CPU_VBLANK_INT("main", scontra_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", scontra_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)		/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(thunderx_readmem_sound,thunderx_writemem_sound)
 
 	MDRV_MACHINE_RESET(thunderx)
@@ -747,7 +747,7 @@ static MACHINE_DRIVER_START( thunderx )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -775,12 +775,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( scontra )
-	ROM_REGION( 0x30800, "main", 0 )	/* ROMs + banked RAM */
+	ROM_REGION( 0x30800, "maincpu", 0 )	/* ROMs + banked RAM */
 	ROM_LOAD( "775-e02.k11",     0x10000, 0x08000, CRC(a61c0ead) SHA1(9a0aadc8d3538fc1d88b761753fffcac8923a218) )	/* banked ROM */
 	ROM_CONTINUE(            0x08000, 0x08000 )				/* fixed ROM */
 	ROM_LOAD( "775-e03.k13",     0x20000, 0x10000, CRC(00b02622) SHA1(caf1da53815e437e3fb952d29e71f2c314684cd9) )	/* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "775-c01.bin", 0x00000, 0x08000, CRC(0ced785a) SHA1(1eebe005a968fbaac595c168499107e34763976c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* tiles */
@@ -830,12 +830,12 @@ ROM_START( scontra )
 ROM_END
 
 ROM_START( scontraj )
-	ROM_REGION( 0x30800, "main", 0 )	/* ROMs + banked RAM */
+	ROM_REGION( 0x30800, "maincpu", 0 )	/* ROMs + banked RAM */
 	ROM_LOAD( "775-f02.bin", 0x10000, 0x08000, CRC(8d5933a7) SHA1(e13ec62a4209b790b609429d98620ec0d07bd0ee) )	/* banked ROM */
 	ROM_CONTINUE(            0x08000, 0x08000 )				/* fixed ROM */
 	ROM_LOAD( "775-f03.bin", 0x20000, 0x10000, CRC(1ef63d80) SHA1(8fa41038ec2928f9572d0d4511a4bb3a3d8de06d) )	/* banked ROM */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the SOUND CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the SOUND CPU */
 	ROM_LOAD( "775-c01.bin", 0x00000, 0x08000, CRC(0ced785a) SHA1(1eebe005a968fbaac595c168499107e34763976c) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* tiles */
@@ -885,12 +885,12 @@ ROM_START( scontraj )
 ROM_END
 
 ROM_START( thunderx )
-	ROM_REGION( 0x29000, "main", 0 )	/* ROMs + banked RAM */
+	ROM_REGION( 0x29000, "maincpu", 0 )	/* ROMs + banked RAM */
 	ROM_LOAD( "873-s03.k15", 0x10000, 0x10000, CRC(2aec2699) SHA1(8f52703a6a1ba6417c484925192ce697af9c73f1) )
 	ROM_LOAD( "873-s02.k13", 0x20000, 0x08000, CRC(6619333a) SHA1(1961658d528b0870c57f1cb78e016fb881f50392) )
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-f01.f8",   0x0000, 0x8000, CRC(ea35ffa3) SHA1(91e82b77d4f3af8238fb198db26182bebc5026e4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )	/* temporary space for graphics (disposed after conversion) */
@@ -918,12 +918,12 @@ ROM_START( thunderx )
 ROM_END
 
 ROM_START( thnderxa ) /* Alternate Starting stage then the other 2 sets, Perhaps a US set? */
-	ROM_REGION( 0x29000, "main", 0 )	/* ROMs + banked RAM */
+	ROM_REGION( 0x29000, "maincpu", 0 )	/* ROMs + banked RAM */
 	ROM_LOAD( "873-k03.k15", 0x10000, 0x10000, CRC(276817ad) SHA1(34b1beecf2a4c54dd7cd150c5d83b44f67be288a) )
 	ROM_LOAD( "873-k02.k13", 0x20000, 0x08000, CRC(80cc1c45) SHA1(881bc6eea94671e8c3fdb7a10b0e742b18cb7212) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-h01.f8",    0x0000, 0x8000, CRC(990b7a7c) SHA1(0965e7350c6006a9652cea0f24d836b4979910fd) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )	/* temporary space for graphics (disposed after conversion) */
@@ -951,12 +951,12 @@ ROM_START( thnderxa ) /* Alternate Starting stage then the other 2 sets, Perhaps
 ROM_END
 
 ROM_START( thnderxb ) /* Set had no labels, same starting stage as parent set */
-	ROM_REGION( 0x29000, "main", 0 )	/* ROMs + banked RAM */
+	ROM_REGION( 0x29000, "maincpu", 0 )	/* ROMs + banked RAM */
 	ROM_LOAD( "873-03.k15", 0x10000, 0x10000, CRC(36680a4e) SHA1(9b3b6bf75a9c04e764448cd958277bd081cc4a53) )
 	ROM_LOAD( "873-02.k13", 0x20000, 0x08000, CRC(c58b2c34) SHA1(4050d2edc579ffedba3d40782a08e43ac89b1b86) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-f01.f8",   0x0000, 0x8000, CRC(ea35ffa3) SHA1(91e82b77d4f3af8238fb198db26182bebc5026e4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )	/* temporary space for graphics (disposed after conversion) */
@@ -984,12 +984,12 @@ ROM_START( thnderxb ) /* Set had no labels, same starting stage as parent set */
 ROM_END
 
 ROM_START( thnderxj )
-	ROM_REGION( 0x29000, "main", 0 )	/* ROMs + banked RAM */
+	ROM_REGION( 0x29000, "maincpu", 0 )	/* ROMs + banked RAM */
 	ROM_LOAD( "873-n03.k15", 0x10000, 0x10000, CRC(a01e2e3e) SHA1(eba0d95dc0c5eed18743a96e4bbda5e60d5d9c97) )
 	ROM_LOAD( "873-n02.k13", 0x20000, 0x08000, CRC(55afa2cc) SHA1(5fb9df0c7c7c0c2029dbe0f3c1e0340234a03e8a) )
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "873-f01.f8",   0x0000, 0x8000, CRC(ea35ffa3) SHA1(91e82b77d4f3af8238fb198db26182bebc5026e4) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )	/* temporary space for graphics (disposed after conversion) */
@@ -1020,7 +1020,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( thunderx_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "maincpu");
 	int offs;
 
 //  logerror("thunderx %04x: bank select %02x\n", cpu_get_pc(device->cpu), lines );
@@ -1032,14 +1032,14 @@ static KONAMI_SETLINES_CALLBACK( thunderx_banking )
 
 static MACHINE_RESET( scontra )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	paletteram = &RAM[0x30000];
 }
 
 static MACHINE_RESET( thunderx )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	konami_configure_set_lines(machine->cpu[0], thunderx_banking);
 	memory_set_bankptr(machine,  1, &RAM[0x10000] ); /* init the default bank */

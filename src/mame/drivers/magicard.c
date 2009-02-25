@@ -371,8 +371,8 @@ static WRITE16_HANDLER( philips_66470_w )
 static ADDRESS_MAP_START( magicard_mem, ADDRESS_SPACE_PROGRAM, 16 )
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE(&magicram) /*only 0-7ffff accessed in Magic Card*/
-//  AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_REGION("main", 0)
-	AM_RANGE(0x180000, 0x1ffbff) AM_ROM AM_REGION("main", 0)
+//  AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_REGION("maincpu", 0)
+	AM_RANGE(0x180000, 0x1ffbff) AM_ROM AM_REGION("maincpu", 0)
 	/* 1ffc00-1ffdff System I/O */
 	AM_RANGE(0x1ffc00, 0x1ffc01) AM_READ(test_r)
 	AM_RANGE(0x1ffc40, 0x1ffc41) AM_READ(test_r)
@@ -397,10 +397,10 @@ INPUT_PORTS_END
 
 MACHINE_RESET( magicard )
 {
-	UINT16 *src    = (UINT16*)memory_region( machine, "main" );
+	UINT16 *src    = (UINT16*)memory_region( machine, "maincpu" );
 	UINT16 *dst    = magicram;
 	memcpy (dst, src, 0x80000);
-	device_reset(cputag_get_cpu(machine, "main"));
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 /*************************
@@ -416,11 +416,11 @@ static INTERRUPT_GEN( magicard_irq )
 }
 
 static MACHINE_DRIVER_START( magicard )
-	MDRV_CPU_ADD("main", M68000, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
+	MDRV_CPU_ADD("maincpu", M68000, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
 	MDRV_CPU_PROGRAM_MAP(magicard_mem,0)
- 	MDRV_CPU_VBLANK_INT("main", magicard_irq) /* no interrupts? (it erases the vectors..) */
+ 	MDRV_CPU_VBLANK_INT("screen", magicard_irq) /* no interrupts? (it erases the vectors..) */
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -444,7 +444,7 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( magicard )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "magicorg.bin", 0x000000, 0x80000, CRC(810edf9f) SHA1(0f1638a789a4be7413aa019b4e198353ba9c12d9) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) /* Color PROM?? */
@@ -452,7 +452,7 @@ ROM_START( magicard )
 ROM_END
 
 ROM_START( magicrda )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "mcorigg2.bin", 0x00000, 0x20000, CRC(48546aa9) SHA1(23099a5e4c9f2c3386496f6d7f5bb7d435a6fb16) )
 	ROM_RELOAD(                           0x40000, 0x20000 )
 	ROM_LOAD16_WORD_SWAP( "mcorigg1.bin", 0x20000, 0x20000, CRC(c9e4a38d) SHA1(812e5826b27c7ad98142a0f52fbdb6b61a2e31d7) )
@@ -463,7 +463,7 @@ ROM_START( magicrda )
 ROM_END
 
 ROM_START( magicrdb )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code & GFX */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code & GFX */
 	ROM_LOAD16_WORD_SWAP( "mg_8.bin", 0x00000, 0x80000, CRC(f5499765) SHA1(63bcf40b91b43b218c1f9ec1d126a856f35d0844) )
 
 	/*bigger than the other sets?*/
@@ -489,17 +489,17 @@ GAME( 199?, magicrdb, 0,     magicard, 0,     magicard,    ROT0, "Impera", "Magi
 /*Below here there are CD-I bios defines,to be removed in the end*/
 /*
 ROM_START( mcdi200 )
-    ROM_REGION( 0x80000, "main", 0 )
+    ROM_REGION( 0x80000, "maincpu", 0 )
     ROM_LOAD16_WORD( "mgvx200.rom", 0x000000, 0x80000, CRC(40c4e6b9) SHA1(d961de803c89b3d1902d656ceb9ce7c02dccb40a) )
 ROM_END
 
 ROM_START( pcdi490 )
-    ROM_REGION( 0x80000, "main", 0 )
+    ROM_REGION( 0x80000, "maincpu", 0 )
     ROM_LOAD16_WORD( "phlp490.rom", 0x000000, 0x80000, CRC(e115f45b) SHA1(f71be031a5dfa837de225081b2ddc8dcb74a0552) )
 ROM_END
 
 ROM_START( pcdi910m )
-    ROM_REGION( 0x80000, "main", 0 )
+    ROM_REGION( 0x80000, "maincpu", 0 )
     ROM_LOAD16_WORD( "cdi910.rom", 0x000000, 0x80000,  CRC(8ee44ed6) SHA1(3fcdfa96f862b0cb7603fb6c2af84cac59527b05) )
 ROM_END
 

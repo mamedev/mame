@@ -341,9 +341,9 @@ static NVRAM_HANDLER( galastrm )
 
 static MACHINE_DRIVER_START( galastrm )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(galastrm_readmem,galastrm_writemem)
-	MDRV_CPU_VBLANK_INT("main", galastrm_interrupt) /* VBL */
+	MDRV_CPU_VBLANK_INT("screen", galastrm_interrupt) /* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
@@ -351,7 +351,7 @@ static MACHINE_DRIVER_START( galastrm )
 	MDRV_NVRAM_HANDLER(galastrm)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -371,13 +371,13 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( galastrm )
-	ROM_REGION( 0x100000, "main", 0 )	/* for 68020 code (CPU A) */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* for 68020 code (CPU A) */
 	ROM_LOAD32_BYTE( "c99_15.ic105", 0x00000, 0x40000,  CRC(7eae8efd) SHA1(6bbb3da697dfcd93337b53895678e2a4ff2de457) )
 	ROM_LOAD32_BYTE( "c99_12.ic102", 0x00001, 0x40000,  CRC(e059d1ee) SHA1(560951f95f270f0559b5289dda7f4ba74538cfcb) )
 	ROM_LOAD32_BYTE( "c99_13.ic103", 0x00002, 0x40000,  CRC(885fcb35) SHA1(be10e109c461c1f776e98efa1b2a4d588aa0c41c) )
 	ROM_LOAD32_BYTE( "c99_14.ic104", 0x00003, 0x40000,  CRC(457ef6b1) SHA1(06c2613d46addacd380a0f2413cd795b17ac9474) )
 
-	ROM_REGION( 0x180000, "audio", 0 )
+	ROM_REGION( 0x180000, "audiocpu", 0 )
 	ROM_LOAD16_BYTE( "c99_23.ic8",  0x100000, 0x20000,  CRC(5718ee92) SHA1(33cfa60c5bceb1525498f27b598067d2dc620431) )
 	ROM_LOAD16_BYTE( "c99_22.ic7",  0x100001, 0x20000,  CRC(b90f7c42) SHA1(e2fa9ee10ad61ae1a672c3357c0072b79ec7fbcb) )
 

@@ -704,12 +704,12 @@ static INTERRUPT_GEN( bomblord_interrupt )
 /* Basic hardware -- no decryption table is setup for CPU */
 static MACHINE_DRIVER_START( m90 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
+	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", m90_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -718,7 +718,7 @@ static MACHINE_DRIVER_START( m90 )
 	MDRV_MACHINE_RESET(m72_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -747,25 +747,25 @@ MACHINE_DRIVER_END
 static const nec_config hasamu_config ={ gunforce_decryption_table, };
 static MACHINE_DRIVER_START( hasamu )
 	MDRV_IMPORT_FROM( m90 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(hasamu_config)
 MACHINE_DRIVER_END
 
 static const nec_config quizf1_config ={ 	lethalth_decryption_table, };
 static MACHINE_DRIVER_START( quizf1 )
 	MDRV_IMPORT_FROM( m90 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(quizf1_config)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_DRIVER_END
 
 static const nec_config matchit2_config ={ 	matchit2_decryption_table, };
 static MACHINE_DRIVER_START( matchit2 )
 	MDRV_IMPORT_FROM( m90 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(matchit2_config)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(6*8, 54*8-1, 17*8-8, 47*8-1+8)
 MACHINE_DRIVER_END
 
@@ -773,9 +773,9 @@ MACHINE_DRIVER_END
 static const nec_config riskchal_config ={ 	gussun_decryption_table, };
 static MACHINE_DRIVER_START( riskchal )
 	MDRV_IMPORT_FROM( m90 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(riskchal_config)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(10*8, 50*8-1, 17*8, 47*8-1)
 MACHINE_DRIVER_END
 
@@ -784,14 +784,14 @@ static const nec_config bomberman_config ={ 	bomberman_decryption_table, };
 static MACHINE_DRIVER_START( bombrman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
+	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_CONFIG(bomberman_config)
 
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", m90_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -799,7 +799,7 @@ static MACHINE_DRIVER_START( bombrman )
 	MDRV_MACHINE_RESET(m72_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -829,14 +829,14 @@ static const nec_config dynablaster_config ={ 	dynablaster_decryption_table, };
 static MACHINE_DRIVER_START( bbmanw )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
+	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_CONFIG(dynablaster_config)
 
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", m90_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(bbmanw_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -844,7 +844,7 @@ static MACHINE_DRIVER_START( bbmanw )
 	MDRV_MACHINE_RESET(m72_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -874,7 +874,7 @@ static const nec_config no_table ={ NULL, };
 static MACHINE_DRIVER_START( bbmanwj )
 
 	MDRV_IMPORT_FROM( bbmanw )
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -885,7 +885,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bomblord )
 
 	MDRV_IMPORT_FROM( bbmanw )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(no_table)
 	MDRV_CPU_PROGRAM_MAP(bomblord_main_cpu,0)
 	MDRV_CPU_IO_MAP(dynablsb_cpu_io,0)
@@ -893,19 +893,19 @@ static MACHINE_DRIVER_START( bomblord )
 	MDRV_VIDEO_START(bomblord)
 	MDRV_VIDEO_UPDATE(bomblord)
 
-	MDRV_CPU_VBLANK_INT("main", bomblord_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", bomblord_interrupt)
 
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dynablsb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", V30,32000000/4)
+	MDRV_CPU_ADD("maincpu", V30,32000000/4)
 	MDRV_CPU_PROGRAM_MAP(dynablsb_main_cpu,0)
 	MDRV_CPU_IO_MAP(dynablsb_cpu_io,0)
-	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", m90_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, XTAL_3_579545MHz)	/* 3.579545 MHz */
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -913,7 +913,7 @@ static MACHINE_DRIVER_START( dynablsb )
 	MDRV_MACHINE_RESET(m72_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -943,12 +943,12 @@ MACHINE_DRIVER_END
 #define CODE_SIZE 0x100000
 
 ROM_START( hasamu )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hasc-p1.bin",  0x00001, 0x20000, CRC(53df9834) SHA1(2e7e38157a497e3def69c4abcae5803f71a098da) )
 	ROM_LOAD16_BYTE( "hasc-p0.bin",  0x00000, 0x20000, CRC(dff0ba6e) SHA1(83e20b3ae10b57c1e58d3d44bfca2ffd5f142056) )
-	ROM_COPY( "main", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "hasc-sp.bin",    0x0000, 0x10000, CRC(259b1687) SHA1(39c3a89b1d0f5fec2a94a3048cc4639fe96820e2) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -962,12 +962,12 @@ ROM_START( hasamu )
 ROM_END
 
 ROM_START( dynablst )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm-cp1e.62",   0x00001, 0x20000, CRC(27667681) SHA1(7d5f762026ea01817a65ea13b4b5793640e3e8fd) )
 	ROM_LOAD16_BYTE( "bbm-cp0e.65",   0x00000, 0x20000, CRC(95db7a67) SHA1(1a224d73615a60530cbcc54fdbb526e8d5a6c555) )
-	ROM_COPY( "main", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm-sp.23",    0x0000, 0x10000, CRC(251090cd) SHA1(9245072c1afbfa3e4a1d1549942765d58bd78ed3) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -981,12 +981,12 @@ ROM_START( dynablst )
 ROM_END
 
 ROM_START( bombrman )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm-p1.62",   0x00001, 0x20000, CRC(982bd166) SHA1(ed67393ec319127616bff5fa3b7f84e8ac8e1d93) )
 	ROM_LOAD16_BYTE( "bbm-p0.65",   0x00000, 0x20000, CRC(0a20afcc) SHA1(a42b7458938300b0c84c820c1ea627aed9080f1b) )
-	ROM_COPY( "main", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm-sp.23",    0x0000, 0x10000, CRC(251090cd) SHA1(9245072c1afbfa3e4a1d1549942765d58bd78ed3) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1000,12 +1000,12 @@ ROM_START( bombrman )
 ROM_END
 
 ROM_START( atompunk )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm-cp0d.65",   0x00001, 0x20000, CRC(860c0479) SHA1(7556d62955d0d7a7100fbd9d9cb7356b96a4df78) )
 	ROM_LOAD16_BYTE( "bbm-cp1d.62",   0x00000, 0x20000, CRC(be57bf74) SHA1(cd3f887f7ec8a5721551477ec2d4a7336f422c6f) )
-	ROM_COPY( "main", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm-sp.23",    0x0000, 0x10000, CRC(251090cd) SHA1(9245072c1afbfa3e4a1d1549942765d58bd78ed3) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1019,12 +1019,12 @@ ROM_START( atompunk )
 ROM_END
 
 ROM_START( dynablsb )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "db2-26.bin",   0x00001, 0x20000, CRC(a78c72f8) SHA1(e3ed1bce0278bada6357b5d0823511fa0241f3cd) )
 	ROM_LOAD16_BYTE( "db3-25.bin",   0x00000, 0x20000, CRC(bf3137c3) SHA1(64bbca4b3a509b552ee8a19b3b50fe6638fd90e2) )
-	ROM_COPY( "main", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "db1-17.bin",    0x0000, 0x10000, CRC(e693c32f) SHA1(b6f228d26318718eedae765de9479706a3e4c38d) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1078,12 +1078,12 @@ Notes:
 */
 
 ROM_START( bbmanw )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm2-h0-b.77",  0x00001, 0x40000, CRC(567d3709) SHA1(1447fc68798589a8757ee2d133d053b80f052113) )
 	ROM_LOAD16_BYTE( "bbm2-l0-b.79",  0x00000, 0x40000, CRC(e762c22b) SHA1(b389a65adf1348e6529a992d9b68178d7503238e) )
-	ROM_COPY( "main", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm2-sp.33",    0x0000, 0x10000, CRC(6bc1689e) SHA1(099c275632965e19eb6131863f69d2afa9916e90) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1097,12 +1097,12 @@ ROM_START( bbmanw )
 ROM_END
 
 ROM_START( bbmanwj )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm2-h0.77",  0x00001, 0x40000, CRC(e1407b91) SHA1(6c94afc6b1d2a469295890ee5dd9d9d5a02ae5c4) )
 	ROM_LOAD16_BYTE( "bbm2-l0.79",  0x00000, 0x40000, CRC(20873b49) SHA1(30ae595f7961cd56f2506608ae76973b2d0e73ca) )
-	ROM_COPY( "main", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm2-sp-b.bin", 0x0000, 0x10000, CRC(b8d8108c) SHA1(ef4fb46d843819c273db2083754eb312f5abd44e) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1116,12 +1116,12 @@ ROM_START( bbmanwj )
 ROM_END
 
 ROM_START( newapunk )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbm2-h0-a.77",  0x00001, 0x40000, CRC(7d858682) SHA1(03580e2903becb69766023585c6ecffbb8e0b9c5) )
 	ROM_LOAD16_BYTE( "bbm2-l0-a.79",  0x00000, 0x40000, CRC(c7568031) SHA1(ff4d0809260a088f530098a0173eec16fa6396f1) )
-	ROM_COPY( "main", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm2-sp.33",    0x0000, 0x10000, CRC(6bc1689e) SHA1(099c275632965e19eb6131863f69d2afa9916e90) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1135,12 +1135,12 @@ ROM_START( newapunk )
 ROM_END
 
 ROM_START( bomblord )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bomblord.3",  0x00001, 0x40000, CRC(65d5c54a) SHA1(f794a193d5927b5fb838ab2351c176d8cbd37236) )
 	ROM_LOAD16_BYTE( "bomblord.4",  0x00000, 0x40000, CRC(cfe65f81) SHA1(8dae94abc67bc53f1c8dbe13243dc08a62fd5d22) )
-	ROM_COPY( "main", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "bbm2-sp.33",    0x0000, 0x10000, CRC(6bc1689e) SHA1(099c275632965e19eb6131863f69d2afa9916e90) ) // bomblord.1
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1154,16 +1154,16 @@ ROM_START( bomblord )
 ROM_END
 
 ROM_START( quizf1 )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "qf1-h0-.77",   0x000001, 0x40000, CRC(280e3049) SHA1(3b1f303d803f844fd260ed93e4d12a72876e4dbe) )
 	ROM_LOAD16_BYTE( "qf1-l0-.79",   0x000000, 0x40000, CRC(94588a6f) SHA1(ee912739c7719fc2b099da0c63f7473eedcfc718) )
-	ROM_COPY( "main", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
 	ROM_REGION( 0x100000, "user1", 0 )
 	ROM_LOAD16_BYTE( "qf1-h1-.78",   0x000001, 0x80000, CRC(c6c2eb2b) SHA1(83de08b0c72da8c3e4786063802d83cb1015032a) )	/* banked at 80000-8FFFF */
 	ROM_LOAD16_BYTE( "qf1-l1-.80",   0x000000, 0x80000, CRC(3132c144) SHA1(de3ae35cdfbb1231cab343142ac700df00f9b77a) )
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "qf1-sp-.33",   0x0000, 0x10000, CRC(0664fa9f) SHA1(db003beb4f8461bf4411efa8df9f700770fb153b) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1177,12 +1177,12 @@ ROM_START( quizf1 )
 ROM_END
 
 ROM_START( riskchal )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rc_h0.rom",    0x00001, 0x40000, CRC(4c9b5344) SHA1(61e26950a672c6404e2386acdd098536b61b9933) )
 	ROM_LOAD16_BYTE( "rc_l0.rom",    0x00000, 0x40000, CRC(0455895a) SHA1(1072b8d280f7ccc48cd8fbd81323e1f8c8d0db95) )
-	ROM_COPY( "main", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "rc_sp.rom",    0x0000, 0x10000, CRC(bb80094e) SHA1(1c62e702c395b7ebb666a79af1912b270d5f95aa) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1196,12 +1196,12 @@ ROM_START( riskchal )
 ROM_END
 
 ROM_START( gussun )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "l4_h0.rom",    0x00001, 0x40000, CRC(9d585e61) SHA1(e108a9dc2dc1b75c1439271a2391f943c3a53fe1) )
 	ROM_LOAD16_BYTE( "l4_l0.rom",    0x00000, 0x40000, CRC(c7b4c519) SHA1(44887ccf54f5e507d2db4f09a7c2b7b9ea217058) )
-	ROM_COPY( "main", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "rc_sp.rom",    0x0000, 0x10000, CRC(bb80094e) SHA1(1c62e702c395b7ebb666a79af1912b270d5f95aa) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1215,12 +1215,12 @@ ROM_START( gussun )
 ROM_END
 
 ROM_START( matchit2 )
-	ROM_REGION( CODE_SIZE * 2, "main", 0 )
+	ROM_REGION( CODE_SIZE * 2, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sis2-h0b.bin", 0x00001, 0x40000, CRC(9a2556ac) SHA1(3e4d5ac2869c703c5d5b769c2a09e501b5e6462e) ) /* Actually labeled as "SIS2-H0-B" */
 	ROM_LOAD16_BYTE( "sis2-l0b.bin", 0x00000, 0x40000, CRC(d35d948a) SHA1(e4f119fa00fd8ede2533323e14d94ad4d5fabbc5) ) /* Actually labeled as "SIS2-L0-B" */
-	ROM_COPY( "main", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sis2-sp-.rom", 0x0000, 0x10000, CRC(6fc0ff3a) SHA1(2b8c648c1fb5d516552fc260b8f18ffd56bbe062) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1234,12 +1234,12 @@ ROM_START( matchit2 )
 ROM_END
 
 ROM_START( shisen2 )
-	ROM_REGION( CODE_SIZE, "main", 0 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sis2-h0-.rom", 0x00001, 0x40000, CRC(6fae0aea) SHA1(7ebecbfdb17e15b8c0ebd293cd42a618c596782e) )
 	ROM_LOAD16_BYTE( "sis2-l0-.rom", 0x00000, 0x40000, CRC(2af25182) SHA1(ec6dcc3913e1b7e7a3958b78610e83f51c404e07) )
-	ROM_COPY( "main", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
+	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
-	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sis2-sp-.rom", 0x0000, 0x10000, CRC(6fc0ff3a) SHA1(2b8c648c1fb5d516552fc260b8f18ffd56bbe062) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1273,7 +1273,7 @@ static DRIVER_INIT( quizf1 )
 
 static DRIVER_INIT( bomblord )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	int i;
 	for (i=0; i<0x100000; i+=8)

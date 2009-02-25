@@ -390,14 +390,14 @@ static const ay8910_interface ay8910_bs94 =
 static MACHINE_DRIVER_START( re900 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I8051, MAIN_CLOCK)
+	MDRV_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mem_prg, 0)
 	MDRV_CPU_IO_MAP(mem_io, 0)
-	MDRV_CPU_VBLANK_INT("main", re900_video_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", re900_video_interrupt)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -425,12 +425,12 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( re900 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "re900.bin", 0x0000, 0x10000, CRC(967ae944) SHA1(104bab79fd50a8e38ae15058dbe47a59f1ec4b05) )
 ROM_END
 
 ROM_START( bs94 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bs94.bin",  0x0000, 0x10000, CRC(bbd484ce) SHA1(4128e488ca806842c3639e05c4c9cf4c0da2990d) )
 ROM_END
 

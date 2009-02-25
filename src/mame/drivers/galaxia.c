@@ -198,13 +198,13 @@ static INTERRUPT_GEN( galaxia_interrupt )
 
 static MACHINE_DRIVER_START( galaxia )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650,2000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", S2650,2000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
 	MDRV_CPU_IO_MAP(io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", galaxia_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", galaxia_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -224,7 +224,7 @@ static MACHINE_DRIVER_START( astrowar )
 MACHINE_DRIVER_END
 
 ROM_START( galaxia )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "08h.bin", 0x00000, 0x0400, CRC(f3b4ffde) SHA1(15b004e7821bfc145158b1e9435f061c524f6b86) )
 	ROM_LOAD( "10h.bin", 0x00400, 0x0400, CRC(6d07fdd4) SHA1(d7d4b345a055275d59951788569db370bccd5195) )
 	ROM_LOAD( "11h.bin", 0x00800, 0x0400, CRC(1520eb3d) SHA1(3683174da701e1124af0f9c2ee4a9a84f3fea33a) )
@@ -246,7 +246,7 @@ ROM_END
 
 
 ROM_START( astrowar )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "astro8h.rom",  0x00000, 0x0400, CRC(b0ec246c) SHA1(f9123b5e317938655f5e8b3f8a5810d0b2b7c7af) )
 	ROM_LOAD( "astro10h.rom", 0x00400, 0x0400, CRC(090d360f) SHA1(528ddcdc30a5a291bd8850ff6f134fcc19af562f) )
 	ROM_LOAD( "astro11h.rom", 0x00800, 0x0400, CRC(72ab1378) SHA1(50743c64c4775076aa6f1d8ab2e05c14884bf0ba) )

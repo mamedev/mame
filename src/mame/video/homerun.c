@@ -20,9 +20,9 @@ WRITE8_DEVICE_HANDLER(homerun_banking_w)
 
 	data>>=5;
 	if(!data)
-		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "main") );
+		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "maincpu") );
 	else
-		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "main") + 0x10000 + (((data-1)&0x7)*0x4000 ));
+		memory_set_bankptr(device->machine, 1, memory_region(device->machine, "maincpu") + 0x10000 + (((data-1)&0x7)*0x4000 ));
 }
 
 WRITE8_HANDLER( homerun_videoram_w )

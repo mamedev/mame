@@ -41,14 +41,14 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( igs_m68 )
-	MDRV_CPU_ADD("main", M68000, 22000000 /2)	 // 11mhz
+	MDRV_CPU_ADD("maincpu", M68000, 22000000 /2)	 // 11mhz
 	MDRV_CPU_PROGRAM_MAP(igs_m68_map,0)
-	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	//MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	//MDRV_GFXDECODE(igs_m68)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -113,7 +113,7 @@ Notes:
 */
 
 ROM_START( lhzb2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "p1100.u30", 0x00000, 0x80000, CRC(68102b25) SHA1(6c1e8d204be0efda0e9b6c2f49b5c6760712475f) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
@@ -128,7 +128,7 @@ ROM_END
 /* alt hardware, no IGS025 (protection) chip */
 
 ROM_START( lhzb2a )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "p-4096", 0x00000, 0x80000, CRC(41293f32) SHA1(df4e993f4a458729ade13981e58f32d8116c0082) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
@@ -184,7 +184,7 @@ Notes:
 */
 
 ROM_START( slqz2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "p1100.u28", 0x00000, 0x80000, CRC(0b8e5c9e) SHA1(16572bd1163bba4da8a76b10649d2f71e50ad369) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
@@ -242,7 +242,7 @@ Notes:
 
 
 ROM_START( sdmg2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000,CRC(43366f51) SHA1(48dd965dceff7de15b43c2140226a8b17a792dbc) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
@@ -258,7 +258,7 @@ ROM_END
 static DRIVER_INIT( lhzb2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 
@@ -347,7 +347,7 @@ static DRIVER_INIT( lhzb2 )
 static DRIVER_INIT( lhzb2a )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 
@@ -407,7 +407,7 @@ static DRIVER_INIT( lhzb2a )
 static DRIVER_INIT( slqz2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 
@@ -484,7 +484,7 @@ static DRIVER_INIT( slqz2 )
 static DRIVER_INIT( sdmg2 )
 {
 	int i;
-	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
 
 	int rom_size = 0x80000;
 

@@ -1622,13 +1622,13 @@ static const samples_interface battles_samples_interface =
 static MACHINE_DRIVER_START( bosco )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
@@ -1655,7 +1655,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_MACHINE_RESET(bosco)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1691,13 +1691,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( galaga )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
@@ -1714,7 +1714,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_MACHINE_RESET(galaga)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1760,13 +1760,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( xevious )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", Z80,MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
@@ -1788,7 +1788,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_MACHINE_RESET(xevious)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1825,7 +1825,7 @@ static MACHINE_DRIVER_START( battles )
 
 	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem4_battles,0)
-	MDRV_CPU_VBLANK_INT("main", battles_interrupt_4)
+	MDRV_CPU_VBLANK_INT("screen", battles_interrupt_4)
 
 	MDRV_MACHINE_RESET(battles)
 
@@ -1844,13 +1844,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( digdug )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
@@ -1863,7 +1863,7 @@ static MACHINE_DRIVER_START( digdug )
 	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1921,7 +1921,7 @@ Namco/Midway, 1981
 
 
 ROM_START( bosco )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "bos3_1.bin",   0x0000, 0x1000, CRC(96021267) SHA1(bd49b0caabcccf9df45a272d767456a4fc8a7c07) )
 	ROM_LOAD( "bos1_2.bin",   0x1000, 0x1000, CRC(2d8f3ebe) SHA1(75de1cba7531ae4bf7fbbef7b8e37b9fec4ed0d0) )
 	ROM_LOAD( "bos1_3.bin",   0x2000, 0x1000, CRC(c80ccfa5) SHA1(f2bbec2ea9846d4601f06c0b4242744447a88fda) )
@@ -1962,7 +1962,7 @@ ROM_START( bosco )
 ROM_END
 
 ROM_START( boscoo )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "bos1_1.bin",   0x0000, 0x1000, CRC(0d9920e7) SHA1(e7633233f603ccb5b7a970ed5b58ef361ef2c94e) )
 	ROM_LOAD( "bos1_2.bin",   0x1000, 0x1000, CRC(2d8f3ebe) SHA1(75de1cba7531ae4bf7fbbef7b8e37b9fec4ed0d0) )
 	ROM_LOAD( "bos1_3.bin",   0x2000, 0x1000, CRC(c80ccfa5) SHA1(f2bbec2ea9846d4601f06c0b4242744447a88fda) )
@@ -2003,7 +2003,7 @@ ROM_START( boscoo )
 ROM_END
 
 ROM_START( boscoo2 )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "bos1_1.bin",   0x0000, 0x1000, CRC(0d9920e7) SHA1(e7633233f603ccb5b7a970ed5b58ef361ef2c94e) )
 	ROM_LOAD( "bos1_2.bin",   0x1000, 0x1000, CRC(2d8f3ebe) SHA1(75de1cba7531ae4bf7fbbef7b8e37b9fec4ed0d0) )
 	ROM_LOAD( "bos1_3.bin",   0x2000, 0x1000, CRC(c80ccfa5) SHA1(f2bbec2ea9846d4601f06c0b4242744447a88fda) )
@@ -2051,7 +2051,7 @@ ROM_END
 */
 
 ROM_START( boscomd )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "3n",       0x0000, 0x1000, CRC(441b501a) SHA1(7b4921ff40b3c56950fd32aa0ec5563b02a00929) )
 	ROM_LOAD( "3m",       0x1000, 0x1000, CRC(a3c5c7ef) SHA1(70a095a8dbca857245a70404f803916f519e0cbc) )
 	ROM_LOAD( "3l",       0x2000, 0x1000, CRC(6ca9a0cf) SHA1(8f70e29beae921e63cd65689a618ca678dd14614) )
@@ -2095,7 +2095,7 @@ ROM_START( boscomd )
 ROM_END
 
 ROM_START( boscomdo )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "2300.3n",      0x0000, 0x1000, CRC(db6128b0) SHA1(ddd285f7e00d5e58ab9b15838528e0020d47fcd2) )
 	ROM_LOAD( "2400.3m",      0x1000, 0x1000, CRC(86907614) SHA1(3295ab6c5171a069875c2239b3325296c1df6031) )
 	ROM_LOAD( "2500.3l",      0x2000, 0x1000, CRC(a21fae11) SHA1(dff38d90ee30558274d2d399edc3281c2ef5cb69) )
@@ -2311,7 +2311,7 @@ Notes:
 
 
 ROM_START( galaga )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "gg1-1b.3p",    0x0000, 0x1000, CRC(ab036c9f) SHA1(ca7f5da42d4e76fd89bb0b35198a23c01462fbfe) )
 	ROM_LOAD( "gg1-2b.3m",    0x1000, 0x1000, CRC(d9232240) SHA1(ab202aa259c3d332ef13dfb8fc8580ce2a5a253d) )
 	ROM_LOAD( "gg1-3.2m",     0x2000, 0x1000, CRC(753ce503) SHA1(481f443aea3ed3504ec2f3a6bfcf3cd47e2f8f81) )
@@ -2343,7 +2343,7 @@ ROM_START( galaga )
 ROM_END
 
 ROM_START( galagao )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "gg1-1",        0x0000, 0x1000, CRC(a3a0f743) SHA1(6907773db7c002ecde5e41853603d53387c5c7cd) )
 	ROM_LOAD( "gg1-2",        0x1000, 0x1000, CRC(43bb0d5c) SHA1(666975aed5ce84f09794c54b550d64d95ab311f0) )
 	ROM_LOAD( "gg1-3.2m",     0x2000, 0x1000, CRC(753ce503) SHA1(481f443aea3ed3504ec2f3a6bfcf3cd47e2f8f81) )
@@ -2375,7 +2375,7 @@ ROM_START( galagao )
 ROM_END
 
 ROM_START( galagamw )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "3200a.bin",    0x0000, 0x1000, CRC(3ef0b053) SHA1(0c04a362b737998c0952a753fb3fd8c8a17e9b46) )
 	ROM_LOAD( "3300b.bin",    0x1000, 0x1000, CRC(1b280831) SHA1(f7ea12e61929717ebe43a4198a97f109845a2c62) )
 	ROM_LOAD( "3400c.bin",    0x2000, 0x1000, CRC(16233d33) SHA1(a7eb799be5e23058754a92b15e6527bfbb47a354) )
@@ -2407,7 +2407,7 @@ ROM_START( galagamw )
 ROM_END
 
 ROM_START( galagamf )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "3200a.bin",    0x0000, 0x1000, CRC(3ef0b053) SHA1(0c04a362b737998c0952a753fb3fd8c8a17e9b46) )
 	ROM_LOAD( "3300b.bin",    0x1000, 0x1000, CRC(1b280831) SHA1(f7ea12e61929717ebe43a4198a97f109845a2c62) )
 	ROM_LOAD( "3400c.bin",    0x2000, 0x1000, CRC(16233d33) SHA1(a7eb799be5e23058754a92b15e6527bfbb47a354) )
@@ -2439,7 +2439,7 @@ ROM_START( galagamf )
 ROM_END
 
 ROM_START( galagamk )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "mk2-1",        0x0000, 0x1000, CRC(23cea1e2) SHA1(18db33ade0ca6e47cc48aa151d2ccbb4646e3ae3) )
 	ROM_LOAD( "mk2-2",        0x1000, 0x1000, CRC(89695b1a) SHA1(fda5557018884e903f855bf3b69a25d75ed8a767) )
 	ROM_LOAD( "3400c.bin",    0x2000, 0x1000, CRC(16233d33) SHA1(a7eb799be5e23058754a92b15e6527bfbb47a354) )
@@ -2471,7 +2471,7 @@ ROM_START( galagamk )
 ROM_END
 
 ROM_START( gallag )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "gg1-1",        0x0000, 0x1000, CRC(a3a0f743) SHA1(6907773db7c002ecde5e41853603d53387c5c7cd) )
 	ROM_LOAD( "gallag.2",     0x1000, 0x1000, CRC(5eda60a7) SHA1(853d7b974dd04abd7af3a8ba2681dfabce4dce18) )
 	ROM_LOAD( "gg1-3.2m",     0x2000, 0x1000, CRC(753ce503) SHA1(481f443aea3ed3504ec2f3a6bfcf3cd47e2f8f81) )
@@ -2504,7 +2504,7 @@ ROM_START( gallag )
 ROM_END
 
 ROM_START( gatsbee )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "1.4b",	      0x0000, 0x1000, CRC(9fb8e28b) SHA1(7171e3fb37b0d6cc8f7a023c1775080d5986de99) )
 	ROM_LOAD( "2.4c",	      0x1000, 0x1000, CRC(bf6cb840) SHA1(5763140d32d35a38cdcb49e6de1fd5b07a9e8cc2) )
 	ROM_LOAD( "3.4d",	      0x2000, 0x1000, CRC(3604e2dd) SHA1(1736cf8497f7ac28e92ca94fa137c144353dc192) )
@@ -2552,7 +2552,7 @@ ROM_END
 */
 
 ROM_START( xevious )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "xvi_1.3p",     0x0000, 0x1000, CRC(09964dda) SHA1(4882b25b0938a903f3a367455ba788a30759b5b0) )
 	ROM_LOAD( "xvi_2.3m",     0x1000, 0x1000, CRC(60ecce84) SHA1(8adc60a5fcbca74092518dbc570ffff0f04c5b17) )
 	ROM_LOAD( "xvi_3.2m",     0x2000, 0x1000, CRC(79754b7d) SHA1(c6a154858716e1f073b476824b183de20e06d093) )
@@ -2609,7 +2609,7 @@ ROM_END
 */
 
 ROM_START( xeviousa )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "xea-1m-a.bin", 0x0000, 0x2000, CRC(8c2b50ec) SHA1(f770873b711d838556dde67a8aac8a7f572fcc5b) )
 	ROM_LOAD( "xea-1l-a.bin", 0x2000, 0x2000, CRC(0821642b) SHA1(c6c322c61d0985a2ac59f5e92d4e351107afb9eb) )
 
@@ -2659,7 +2659,7 @@ ROM_START( xeviousa )
 ROM_END
 
 ROM_START( xeviousb )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "1m.bin",       0x0000, 0x2000, CRC(e82a22f6) SHA1(6fd09a7fb263cda3d5268cc6d7bfe71a57ac4b47) )
 	ROM_LOAD( "1l.bin",       0x2000, 0x2000, CRC(13831df9) SHA1(a7892d1d98868a83a5d1092976873b82577e9e94) )
 
@@ -2709,7 +2709,7 @@ ROM_START( xeviousb )
 ROM_END
 
 ROM_START( xeviousc )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "xvi_u_.3p",    0x0000, 0x1000, CRC(7b203868) SHA1(3bafaa42bccddfaf8d9197e93416a731b7f8fb94) )
 	ROM_LOAD( "xv_2-2.3m",    0x1000, 0x1000, CRC(b6fe738e) SHA1(23cdf1f2c2642f9bc3f843b5c338372027032380) )
 	ROM_LOAD( "xv_2-3.2m",    0x2000, 0x1000, CRC(dbd52ff5) SHA1(eb42393720fc1fd4a1f6cdba87ac4177fd5827fe) )
@@ -2768,7 +2768,7 @@ ROM_END
 */
 
 ROM_START( xevios )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "4.7h",         0x0000, 0x1000, CRC(1f8ca4c0) SHA1(9fdaa2e0016c07e274544f8334778fe81b8344a5) )
 	ROM_LOAD( "5.6h",         0x1000, 0x1000, CRC(2e47ce8f) SHA1(fb35dd086e98279a5f17036f624ef5294c777d84) )
 	ROM_LOAD( "xvi_3.2m",     0x2000, 0x1000, CRC(79754b7d) SHA1(c6a154858716e1f073b476824b183de20e06d093) )
@@ -2825,7 +2825,7 @@ ROM_START( xevios )
 ROM_END
 
 ROM_START( battles )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "b_1.bin",      0x0000, 0x2000, CRC(b6e4f4f3) SHA1(ceaaa63b50e75dcb05aeb68574336dfe56a8434a) )
 	ROM_LOAD( "b_2.bin",      0x2000, 0x2000, CRC(47017bc8) SHA1(0da73ae079fb6a64eed56197e2c88609ef34166c) )
 
@@ -2873,7 +2873,7 @@ ROM_START( battles )
 ROM_END
 
 ROM_START( sxevious )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for the first CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
 	ROM_LOAD( "cpu_3p.rom",   0x0000, 0x1000, CRC(1c8d27d5) SHA1(2c41303d8c74acb5840295a4b460a39a9a8e21bb) )
 	ROM_LOAD( "cpu_3m.rom",   0x1000, 0x1000, CRC(fd04e615) SHA1(7169e7f3bd1e9cfae9671b89f2a45f56b968e1ff) )
 	ROM_LOAD( "cpu_2m.rom",   0x2000, 0x1000, CRC(294d5404) SHA1(ecc39fb2c0065a36f20541747089b4e30dfb99b1) )
@@ -2931,7 +2931,7 @@ ROM_END
 	ROM_REGION_NAMCO_53XX( "53xx" ) \
 
 ROM_START( digdug )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code for the first CPU  */
 	ROM_LOAD( "dd1a.1",       0x0000, 0x1000, CRC(a80ec984) SHA1(86689980410b9429cd7582c7a76342721c87d030) )
 	ROM_LOAD( "dd1a.2",       0x1000, 0x1000, CRC(559f00bd) SHA1(fde17785df21956d6fd06bcfe675c392dadb1524) )
 	ROM_LOAD( "dd1a.3",       0x2000, 0x1000, CRC(8cbc6fe1) SHA1(57b8a5777f8bb9773caf0cafe5408c8b9768cb25) )
@@ -2972,7 +2972,7 @@ ROM_START( digdug )
 ROM_END
 
 ROM_START( digdugb )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "136007.101",   0x0000, 0x1000, CRC(b9198079) SHA1(1d3fe04020f584ed250e32fdc6f6a3b769342884) )
 	ROM_LOAD( "136007.102",   0x1000, 0x1000, CRC(b2acbe49) SHA1(c8f713e8cfa70d3bc64d3002ff7bffc65ee138e2) )
 	ROM_LOAD( "136007.103",   0x2000, 0x1000, CRC(d6407b49) SHA1(0e71a8f02778286488865e20439776dbb2a8ec78) )
@@ -3032,7 +3032,7 @@ ROM_END
 */
 
 ROM_START( digdugat )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "136007.201",   0x0000, 0x1000, CRC(23d0b1a4) SHA1(a118d55e03a9ccf069f37c7bac2c9044dccd1f5e) )
 	ROM_LOAD( "136007.202",   0x1000, 0x1000, CRC(5453dc1f) SHA1(8be091dd53e9b44e80e1ac9b1751efbe832db78d) )
 	ROM_LOAD( "136007.203",   0x2000, 0x1000, CRC(c9077dfa) SHA1(611b3e1b575a51639530917366557773534c80aa) )
@@ -3073,7 +3073,7 @@ ROM_START( digdugat )
 ROM_END
 
 ROM_START( digduga1 )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "136007.101",   0x0000, 0x1000, CRC(b9198079) SHA1(1d3fe04020f584ed250e32fdc6f6a3b769342884) )
 	ROM_LOAD( "136007.102",   0x1000, 0x1000, CRC(b2acbe49) SHA1(c8f713e8cfa70d3bc64d3002ff7bffc65ee138e2) )
 	ROM_LOAD( "136007.103",   0x2000, 0x1000, CRC(d6407b49) SHA1(0e71a8f02778286488865e20439776dbb2a8ec78) )
@@ -3118,7 +3118,7 @@ ROM_END
 */
 
 ROM_START( dzigzag )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "136007.101",   0x0000, 0x1000, CRC(b9198079) SHA1(1d3fe04020f584ed250e32fdc6f6a3b769342884) )
 	ROM_LOAD( "136007.102",   0x1000, 0x1000, CRC(b2acbe49) SHA1(c8f713e8cfa70d3bc64d3002ff7bffc65ee138e2) )
 	ROM_LOAD( "136007.103",   0x2000, 0x1000, CRC(d6407b49) SHA1(0e71a8f02778286488865e20439776dbb2a8ec78) )
@@ -3215,7 +3215,7 @@ on bottom PCB (Sidam 11510):
 */
 
 ROM_START( digsid )
-	ROM_REGION( 0x10000, "main", 0 )	/* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for code for the first CPU  */
 	ROM_LOAD( "digdug0.0",   0x0000, 0x1000, CRC(602197f0) SHA1(bea3b98a3f0f89d3b9e87aa38550ddd6f7883921) )
 	ROM_LOAD( "digdug1.1",   0x1000, 0x1000, CRC(c6c8306b) SHA1(53e63ccb7edfdeea75df961ac69ebe882d808920) )
 	ROM_LOAD( "digdug2.2",   0x2000, 0x1000, CRC(b695ec17) SHA1(46811106dbb686df6dc73b29e9e7db97b8c0d412) )

@@ -1533,16 +1533,16 @@ static MACHINE_RESET (finalttr)
 static MACHINE_DRIVER_START( snowbros )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 8000000) /* 8 Mhz - confirmed */
+	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
-	MDRV_CPU_ADD("sound", Z80, 6000000) /* 6 MHz - confirmed */
+	MDRV_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz - confirmed */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57.5) /* ~57.5 - confirmed */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1568,7 +1568,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( wintbob )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snowbros)
-	MDRV_CPU_REPLACE("main", M68000, 10000000) /* 10mhz - Confirmed */
+	MDRV_CPU_REPLACE("maincpu", M68000, 10000000) /* 10mhz - Confirmed */
 	MDRV_CPU_PROGRAM_MAP(wintbob_readmem,wintbob_writemem)
 
 	/* video hardware */
@@ -1582,10 +1582,10 @@ static MACHINE_DRIVER_START( semicom )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(snowbros)
-	MDRV_CPU_REPLACE("main", M68000, 16000000) /* 16mhz or 12mhz ? */
+	MDRV_CPU_REPLACE("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
 	MDRV_CPU_PROGRAM_MAP(hyperpac_readmem,hyperpac_writemem)
 
-	MDRV_CPU_REPLACE("sound", Z80, 4000000) /* 4.0 MHz ??? */
+	MDRV_CPU_REPLACE("soundcpu", Z80, 4000000) /* 4.0 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(hyperpac_sound_readmem,hyperpac_sound_writemem)
 
 	MDRV_GFXDECODE(hyperpac)
@@ -1629,16 +1629,16 @@ See included pics
 static MACHINE_DRIVER_START( honeydol )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(honeydol_readmem,honeydol_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
-	MDRV_CPU_ADD("sound", Z80, 4000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(honeydol_sound_readmem,honeydol_sound_writemem)
 	MDRV_CPU_IO_MAP(honeydol_sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57.5)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1668,17 +1668,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( twinadv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000) // or 12
+	MDRV_CPU_ADD("maincpu", M68000, 16000000) // or 12
 	MDRV_CPU_PROGRAM_MAP(twinadv_readmem,twinadv_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
-	MDRV_CPU_ADD("sound", Z80, 4000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(twinadv_sound_readmem,twinadv_sound_writemem)
 	MDRV_CPU_IO_MAP(twinadv_sound_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57.5)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1721,10 +1721,10 @@ Intel P8752 (mcu)
 static MACHINE_DRIVER_START( finalttr )
 	MDRV_IMPORT_FROM(semicom)
 
-	MDRV_CPU_REPLACE("main", M68000, 12000000)
+	MDRV_CPU_REPLACE("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(finalttr_readmem,finalttr_writemem)
 
-	MDRV_CPU_REPLACE("sound", Z80, 3578545)
+	MDRV_CPU_REPLACE("soundcpu", Z80, 3578545)
 
 	MDRV_MACHINE_RESET ( finalttr )
 
@@ -1748,12 +1748,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( snowbro3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000) /* 16mhz or 12mhz ? */
+	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem3,writemem3)
 	MDRV_CPU_VBLANK_INT_HACK(snowbro3_interrupt,3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1780,11 +1780,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( snowbros )
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "sn6.bin",  0x00000, 0x20000, CRC(4899ddcf) SHA1(47d750d3022a80e47ffabe47566bb2556cc8d477) )
 	ROM_LOAD16_BYTE( "sn5.bin",  0x00001, 0x20000, CRC(ad310d3f) SHA1(f39295b38d99087dbb9c5b00bf9cb963337a50e2) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1797,11 +1797,11 @@ ROM_START( snowbros )
 ROM_END
 
 ROM_START( snowbroa )
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "sbros-3a.5",  0x00000, 0x20000, CRC(10cb37e1) SHA1(786be4640f8df2c81a32decc189ea7657ace00c6) )
 	ROM_LOAD16_BYTE( "sbros-2a.6",  0x00001, 0x20000, CRC(ab91cc1e) SHA1(8cff61539dc7d35fcbf110d3e54fc1883e7b8509) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1809,11 +1809,11 @@ ROM_START( snowbroa )
 ROM_END
 
 ROM_START( snowbrob )
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "sbros3-a",     0x00000, 0x20000, CRC(301627d6) SHA1(0d1dc70091c87e9c27916d4232ff31b7381a64e1) )
 	ROM_LOAD16_BYTE( "sbros2-a",     0x00001, 0x20000, CRC(f6689f41) SHA1(e4fd27b930a31479c0d99e0ddd23d5db34044666) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1821,11 +1821,11 @@ ROM_START( snowbrob )
 ROM_END
 
 ROM_START( snowbroc )
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "3-a.ic5",  0x00000, 0x20000, CRC(e1bc346b) SHA1(a20c343d9ed2ad4f785d21076499008edad251f9) )
 	ROM_LOAD16_BYTE( "2-a.ic6",  0x00001, 0x20000, CRC(1be27f9d) SHA1(76dd14480b9274831e51016f7bb57459d7b15cf9) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1833,11 +1833,11 @@ ROM_START( snowbroc )
 ROM_END
 
 ROM_START( snowbrod ) /* Korean release, but no specific "For use in Korea only..." notice screen */
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "sbk_3-a.bin",   0x00000, 0x20000, CRC(97174d40) SHA1(481e8c680af8b03d4bcf97b87ca0ba5a3ffca0d7) )
 	ROM_LOAD16_BYTE( "sbk_2-a.bin",   0x00001, 0x20000, CRC(80cc80e5) SHA1(1eeca0924c93e9f0536683160e80c59871569088) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1845,11 +1845,11 @@ ROM_START( snowbrod ) /* Korean release, but no specific "For use in Korea only.
 ROM_END
 
 ROM_START( snowbroj )/* "For use in Japan only..." notice screen */
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "snowbros.3",   0x00000, 0x20000, CRC(3f504f9e) SHA1(700758b114c3fde6ea8f84222af0850dba13cd3b) )
 	ROM_LOAD16_BYTE( "snowbros.2",   0x00001, 0x20000, CRC(854b02bc) SHA1(4ad1548eef94dcb95119cb4a7dcdefa037591b5b) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "sbros-4.29",   0x0000, 0x8000, CRC(e6eab4e4) SHA1(d08187d03b21192e188784cb840a37a7bdb5ad32) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1858,7 +1858,7 @@ ROM_START( snowbroj )/* "For use in Japan only..." notice screen */
 ROM_END
 
 ROM_START( wintbob )
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "wb3", 0x00000, 0x10000, CRC(b9719767) SHA1(431c97d409f2a5ff7f46116a4d8907e446434431) )
 	ROM_LOAD16_BYTE( "wb1", 0x00001, 0x10000, CRC(a4488998) SHA1(4e927e31c1b865dbdba2b985c7a819a07e2e81b8) )
 
@@ -1874,7 +1874,7 @@ ROM_START( wintbob )
 	ROM_LOAD16_BYTE( "wb04.bin", 0x20000, 0x10000, CRC(53be758d) SHA1(56cf85ba23fe699031d73e8f367a1b8ac837d5f8) )
 	ROM_LOAD16_BYTE( "wb02.bin", 0x20001, 0x10000, CRC(fc8e292e) SHA1(857cfeb0be121e64e6117120514ae1f2ffeae4d6) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "wb05.bin",     0x0000, 0x10000, CRC(53fe59df) SHA1(a99053e82b9fed76f744fa9f67078294641c6317) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -1892,11 +1892,11 @@ ROM_END
 /* Barko */
 
 ROM_START( honeydol )
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "d-16.uh12",  0x00001, 0x20000, CRC(cee1a2e3) SHA1(6d1ff5358ec704616b724eea2ab9b60b84709eb1) )
 	ROM_LOAD16_BYTE( "d-17.ui12",  0x00000, 0x20000, CRC(cac44154) SHA1(2c30dc033001fc9303da7e117e3401bc7af16607) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "d-12.uh15",   0x0000, 0x8000, CRC(386f1b63) SHA1(d719875226cd3d380e2ebec49209590d91b6f07b) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE ) // 4 bpp gfx
@@ -1954,11 +1954,11 @@ ROMs
 */
 
 ROM_START( twinadv )
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "13.uh12",  0x00001, 0x20000, CRC(9f70a39b) SHA1(d49823be58b00c4c5a4f6cc4e4371531492aff1e) )
 	ROM_LOAD16_BYTE( "12.ui12",  0x00000, 0x20000, CRC(d8776495) SHA1(15b93ded80bf9f240faef2d89b6076f33f1f4ece) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "uh15.bin", 0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
 
 	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE ) /* 4bpp gfx */
@@ -1973,11 +1973,11 @@ ROM_START( twinadv )
 ROM_END
 
 ROM_START( twinadvk )
-	ROM_REGION( 0x40000, "main", 0 )	/* 6*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "uh12",  0x00001, 0x20000, CRC(e0bcc738) SHA1(7fc6a793fcdd80122c0ac6409ae4cac5597b7b5a) )
 	ROM_LOAD16_BYTE( "ui12",  0x00000, 0x20000, CRC(a3ee6451) SHA1(9c0b415a2f325513739f2047780c2a56df350aa5) )
 
-	ROM_REGION( 0x10000, "sound", 0 )	/* 64k for z80 sound code */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* 64k for z80 sound code */
 	ROM_LOAD( "uh15.bin", 0x0000, 0x8000, CRC(3d5acd08) SHA1(c19f686862dfc12d2fa91c2dd3d3b75d9cb410c3) )
 
 	ROM_REGION( 0x180000, "gfx1", ROMREGION_DISPOSE ) /* 4bpp gfx */
@@ -1995,11 +1995,11 @@ ROM_END
 /* SemiCom Games */
 
 ROM_START( hyperpac )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "hyperpac.h12", 0x00001, 0x20000, CRC(2cf0531a) SHA1(c4321d728845035507352d0bcf4348d28b92e85e) )
 	ROM_LOAD16_BYTE( "hyperpac.i12", 0x00000, 0x20000, CRC(9c7d85b8) SHA1(432d5fbe8bef875ce4a9aeb74a7b57dc79c709fd) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hyperpac.u1", 0x00000, 0x10000 , CRC(03faf88e) SHA1(a8da883d4b765b809452bbffca37ff224edbe86d) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2015,11 +2015,11 @@ ROM_START( hyperpac )
 ROM_END
 
 ROM_START( hyperpcb )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "hpacuh12.bin", 0x00001, 0x20000, CRC(633ab2c6) SHA1(534435fa602adebf651e1d42f7c96b01eb6634ef) )
 	ROM_LOAD16_BYTE( "hpacui12.bin", 0x00000, 0x20000, CRC(23dc00d1) SHA1(8d4d00f450b94912adcbb24073f9b3b01eab0450) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hyperpac.u1", 0x00000, 0x10000 , CRC(03faf88e) SHA1(a8da883d4b765b809452bbffca37ff224edbe86d) ) // was missing from this set, using the one from the original
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2032,11 +2032,11 @@ ROM_START( hyperpcb )
 ROM_END
 
 ROM_START( twinkle )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "uh12.bin", 0x00001, 0x20000, CRC(a99626fe) SHA1(489098a2ceb36df97b6b1d59b7b696300deee3ab) )
 	ROM_LOAD16_BYTE( "ui12.bin", 0x00000, 0x20000, CRC(5af73684) SHA1(9be43e5c71152d515366e422eb077a41dbb3fe62) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "u1.bin", 0x00000, 0x10000 , CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2056,11 +2056,11 @@ ROM_END
 
 
 ROM_START( toppyrap )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "uh12.bin", 0x00001, 0x40000, CRC(6f5ad699) SHA1(42f7201d6274ff8338a7d4627af99001f473e841) )
 	ROM_LOAD16_BYTE( "ui12.bin", 0x00000, 0x40000, CRC(caf5a7e1) SHA1(b521b2f06a804a52dad1b07657db2a29e1411844) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "u1.bin", 0x00000, 0x10000 , CRC(07f50947) SHA1(83740655ab5f677bd009191bb0de60e237aaa11c) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2083,11 +2083,11 @@ ROM_START( toppyrap )
 ROM_END
 
 ROM_START( moremore )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u52.bin",  0x00001, 0x40000, CRC(cea4b246) SHA1(5febcb5dda6581caccfe9079b28c2366dfc1db2b) )
 	ROM_LOAD16_BYTE( "u74.bin",  0x00000, 0x40000, CRC(2acdcb88) SHA1(74d661d07752bbccab7eab151209a414e9bf7675) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "u35.bin", 0x00000, 0x10000 , CRC(92dc95fc) SHA1(f04e63cc680835458246989532faf5657e28db13) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2109,11 +2109,11 @@ ROM_START( moremore )
 ROM_END
 
 ROM_START( moremorp )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "mmp_u52.bin",  0x00001, 0x40000, CRC(66baf9b2) SHA1(f1d383a94ef4313cb02c59ace17b9562eddcfb3c) )
 	ROM_LOAD16_BYTE( "mmp_u74.bin",  0x00000, 0x40000, CRC(7c6fede5) SHA1(41bc539a6efe9eb2304243701857b972d2170bcf) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "mmp_u35.bin", 0x00000, 0x10000 , CRC(4d098cad) SHA1(a79d417e7525a25dd6697da9f3d1de269e759d2e) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2135,11 +2135,11 @@ ROM_START( moremorp )
 ROM_END
 
 ROM_START( 3in1semi )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u52",  0x00001, 0x40000, CRC(b0e4a0f7) SHA1(e1f8b8ef020a85fcd7817814cf6c5d560e9e608d) )
 	ROM_LOAD16_BYTE( "u74",  0x00000, 0x40000, CRC(266862c4) SHA1(2c5c513fee99bdb6e0ae3e0e644e516bdaddd629) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "u35", 0x00000, 0x10000 , CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2161,11 +2161,11 @@ ROM_START( 3in1semi )
 ROM_END
 
 ROM_START( cookbib2 )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "cookbib2.02",  0x00001, 0x40000, CRC(b2909460) SHA1(2438638af870cfc105631d2b5e5a27a64ab5394d) )
 	ROM_LOAD16_BYTE( "cookbib2.01",  0x00000, 0x40000, CRC(65aafde2) SHA1(01f9f261527c35182f0445d641d987aa86ad750f) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "cookbib2.07", 0x00000, 0x10000 , CRC(f59f1c9a) SHA1(2830261fd55249e015514fcb4cf8392e83b7fd0d) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2186,11 +2186,11 @@ ROM_START( cookbib2 )
 ROM_END
 
 ROM_START( cookbib3 )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u52.bin",  0x00001, 0x40000, CRC(65134893) SHA1(b1f26794d1a85893aedf55adb2195ad244f90132) )
 	ROM_LOAD16_BYTE( "u74.bin",  0x00000, 0x40000, CRC(c4ab8435) SHA1(7f97d3deafb3eb5412a44308ef20d3317405e94c) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "u35.bin", 0x0c000, 0x4000 ,  CRC(5dfd2a98) SHA1(193c0cd9272144c25cbc3660967424d34d0da185) ) /* bit strange but verified, not the first time SemiCom have done this, see bcstory.. */
 	ROM_CONTINUE(0x8000,0x4000)
 	ROM_CONTINUE(0x4000,0x4000)
@@ -2215,11 +2215,11 @@ ROM_START( cookbib3 )
 ROM_END
 
 ROM_START( 4in1boot ) /* snow bros, tetris, hyperman 1, pacman 2 */
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "u52",  0x00001, 0x80000, CRC(71815878) SHA1(e3868f5687c1d8ec817671c50ade6c56ee83bfa1) )
 	ROM_LOAD16_BYTE( "u74",  0x00000, 0x80000, CRC(e22d3fa2) SHA1(020ab92d8cbf37a9f8186a81934abb97088c16f9) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "u35", 0x00000, 0x10000 , CRC(c894ac80) SHA1(ee896675b5205ab2dbd0cbb13db16aa145391d06) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
@@ -2230,7 +2230,7 @@ ROM_START( 4in1boot ) /* snow bros, tetris, hyperman 1, pacman 2 */
 ROM_END
 
 ROM_START( snowbro3 )
-	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "ur4",  0x00000, 0x20000, CRC(19c13ffd) SHA1(4f9db70354bd410b7bcafa96be4591de8dc33d90) )
 	ROM_LOAD16_BYTE( "ur3",  0x00001, 0x20000, CRC(3f32fa15) SHA1(1402c173c1df142ff9dd7b859689c075813a50e5) )
 
@@ -2259,11 +2259,11 @@ year : 1993.08.24
 */
 
 ROM_START( finalttr )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "10.7o",    0x00000, 0x20000, CRC(eecc83e5) SHA1(48088a2fae8852a73a325a9659c24b241515eac3) )
 	ROM_LOAD16_BYTE( "9.5o",     0x00001, 0x20000, CRC(58d3640e) SHA1(361bc64174a6c7b15a13e0d1f048c7ea270182ca) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "12.5r",    0x00000, 0x10000, CRC(4bc21361) SHA1(dab9bea665c0f2fd7cee8ab7f3762e427911bcca) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
@@ -2307,7 +2307,7 @@ static DRIVER_INIT( moremorp )
 
 static DRIVER_INIT( cookbib2 )
 {
-//  UINT16 *HCROM = (UINT16*)memory_region(machine, "main");
+//  UINT16 *HCROM = (UINT16*)memory_region(machine, "maincpu");
 //  UINT16 *PROTDATA = (UINT16*)memory_region(machine, "user1");
 //  int i;
 //  hyperpac_ram[0xf000/2] = 0x46fc;
@@ -2670,8 +2670,8 @@ static READ16_HANDLER ( _4in1_02_read )
 static DRIVER_INIT(4in1boot)
 {
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "main");
-	int len = memory_region_length(machine, "main");
+	UINT8 *src = memory_region(machine, "maincpu");
+	int len = memory_region_length(machine, "maincpu");
 
 	/* strange order */
 	buffer = malloc_or_die(len);
@@ -2685,8 +2685,8 @@ static DRIVER_INIT(4in1boot)
 		free(buffer);
 	}
 
-	src = memory_region(machine, "sound");
-	len = memory_region_length(machine, "sound");
+	src = memory_region(machine, "soundcpu");
+	len = memory_region_length(machine, "soundcpu");
 
 	/* strange order */
 	buffer = malloc_or_die(len);
@@ -2703,8 +2703,8 @@ static DRIVER_INIT(4in1boot)
 static DRIVER_INIT(snowbro3)
 {
 	UINT8 *buffer;
-	UINT8 *src = memory_region(machine, "main");
-	int len = memory_region_length(machine, "main");
+	UINT8 *src = memory_region(machine, "maincpu");
+	int len = memory_region_length(machine, "maincpu");
 
 	/* strange order */
 	buffer = malloc_or_die(len);

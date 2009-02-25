@@ -420,12 +420,12 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( bigfghtr )
-	MDRV_CPU_ADD("main", M68000, 8000000) /* 8 MHz?? */
+	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 3072000)	/* 3.072 MHz???? */
+	MDRV_CPU_ADD("audiocpu", Z80, 3072000)	/* 3.072 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(soundmem,0)
 	MDRV_CPU_IO_MAP(soundport,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)
@@ -433,7 +433,7 @@ static MACHINE_DRIVER_START( bigfghtr )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -540,7 +540,7 @@ INPUT_PORTS_END
 static DRIVER_INIT( skyrobo )
 {
 	//RAM TESTS
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	RAM[0x2e822/2] = 0x4ef9;
 	RAM[0x2e824/2] = 0x0002;
 	RAM[0x2e826/2] = 0xe9ae;
@@ -551,7 +551,7 @@ static DRIVER_INIT( skyrobo )
 static DRIVER_INIT( bigfghtr )
 {
 	//RAM TESTS
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 	RAM[0x2e8cc/2] = 0x4ef9;
 	RAM[0x2e8ce/2] = 0x0002;
 	RAM[0x2e8d0/2] = 0xea58;
@@ -559,13 +559,13 @@ static DRIVER_INIT( bigfghtr )
 }
 
 ROM_START( skyrobo )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3", 0x00000, 0x20000, CRC(02d8ba9f) SHA1(7622cc17561e5d1c069341b5f412f732f901d4a8) ) /* Rom location IC3 */
 	ROM_LOAD16_BYTE( "1", 0x00001, 0x20000, CRC(fcfd9e2e) SHA1(c69b34653f04af8d488e323bc2db89656f76c332) ) /* Rom location IC2 */
 	ROM_LOAD16_BYTE( "4", 0x40000, 0x20000, CRC(37ced4b7) SHA1(9ded66f795d3c0886f48e52de632e6edb8c57e84) ) /* Rom location IC5 */
 	ROM_LOAD16_BYTE( "2", 0x40001, 0x20000, CRC(88d52f8e) SHA1(33b0d2b3cd38a13d8580694e7c50c059914eebe2) ) /* Rom location IC4 */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Z80 code (sound) */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )	/* Intel C8751 read protected MCU */
@@ -591,13 +591,13 @@ ROM_START( skyrobo )
 ROM_END
 
 ROM_START( bigfghtr )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "3.ic3", 0x00000, 0x20000, CRC(e1e1f291) SHA1(dbbd707be6250d9ffcba3fee265869b72f790e26) )
 	ROM_LOAD16_BYTE( "1.ic2", 0x00001, 0x20000, CRC(1100d991) SHA1(3c79398804b3a26b3df0c5734b270c37e1ba6a60) )
 	ROM_LOAD16_BYTE( "4.ic5", 0x40000, 0x20000, CRC(2464a83b) SHA1(00f5ac81bc33148daafeab757647b63894e0e0ca) )
 	ROM_LOAD16_BYTE( "2.ic4", 0x40001, 0x20000, CRC(b47bbcd5) SHA1(811bd4bc8fb662abf4734ab51e24c863d5cc3df3) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Z80 code (sound) */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 )	/* Intel C8751 read protected MCU */

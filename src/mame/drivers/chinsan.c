@@ -74,7 +74,7 @@ static VIDEO_UPDATE(chinsan)
 
 static MACHINE_RESET( chinsan )
 {
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 
@@ -461,15 +461,15 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( chinsan )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,10000000/2)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,10000000/2)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(chinsan_map,0)
 	MDRV_CPU_IO_MAP(chinsan_io,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET( chinsan )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -496,7 +496,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( chinsan )
-	ROM_REGION( 0x20000, "main", 0 ) /* encrypted code / data */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* encrypted code / data */
 	ROM_LOAD( "mm00.7d", 0x00000, 0x08000, CRC(f7a4414f) SHA1(f65223b2928f610ab97fda2f2c008806cf2420e5) )
 	ROM_CONTINUE(        0x00000, 0x08000 )	// first half is blank
 	ROM_LOAD( "mm01.8d", 0x10000, 0x10000, CRC(c69ddbf5) SHA1(9533365c1761b113174d53a2e23ce6a7baca7dfe) )
@@ -528,7 +528,7 @@ static DRIVER_INIT( chinsan )
 	int i;
 	UINT8 *src = memory_region( machine, "user3" );
 
-	mc8123_decrypt_rom(machine, "main", "user1", 1, 4);
+	mc8123_decrypt_rom(machine, "maincpu", "user1", 1, 4);
 
 	for (i=0;i<0x100;i++)
 	{

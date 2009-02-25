@@ -1241,10 +1241,10 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( lucky74 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MDRV_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)	/* 3 MHz. */
 	MDRV_CPU_PROGRAM_MAP(lucky74_map, 0)
 	MDRV_CPU_IO_MAP(lucky74_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_interrupt)	/* 60 Hz. measured */
+	MDRV_CPU_VBLANK_INT("screen", nmi_interrupt)	/* 60 Hz. measured */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -1257,7 +1257,7 @@ static MACHINE_DRIVER_START( lucky74 )
 	MDRV_PPI8255_ADD( "ppi8255_3", ppi8255_intf[3] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1311,7 +1311,7 @@ MACHINE_DRIVER_END
 
 */
 ROM_START( lucky74 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "luckychi.00",	0x0000, 0x10000, CRC(3b906f0e) SHA1(1f9abd168c60b0d22fa6c7391bfdf5f3aabd66ef) )
 
 	ROM_REGION( 0x20000, "fgtiles", ROMREGION_DISPOSE )
@@ -1348,7 +1348,7 @@ ROM_END
 
 */
 ROM_START( lucky74a )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "luckygde.00",	0x0000, 0x10000, CRC(e3f7db99) SHA1(5c7d9d3fed9eb19d3d666c8c08b34968a9996a96) )	/* bad dump? */
 
 	ROM_REGION( 0x20000, "fgtiles", ROMREGION_DISPOSE )

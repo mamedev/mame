@@ -296,14 +296,14 @@ static const pokey_interface pokey_config =
 static MACHINE_DRIVER_START( irobot )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,1500000)
+	MDRV_CPU_ADD("maincpu", M6809,1500000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 
 	MDRV_MACHINE_RESET(irobot)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -343,7 +343,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( irobot )
-	ROM_REGION( 0x20000, "main", 0 ) /* 64k for code + 48K Banked ROM*/
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k for code + 48K Banked ROM*/
 	ROM_LOAD( "136029-208.bin",     0x06000, 0x2000, CRC(b4d0be59) SHA1(5b476dbee8b171a96301b2204420161333d4ca97) )
 	ROM_LOAD( "136029-209.bin",     0x08000, 0x4000, CRC(f6be3cd0) SHA1(a88ae0cc9ee22aa5dd3db0173f24313189f894f8) )
 	ROM_LOAD( "136029-210.bin",     0x0c000, 0x4000, CRC(c0eb2133) SHA1(daa77293678b7e822d0672b90789c53098c5451e) )

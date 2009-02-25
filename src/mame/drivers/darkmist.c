@@ -44,7 +44,7 @@ int darkmist_hw;
 static WRITE8_HANDLER(darkmist_hw_w)
 {
   darkmist_hw=data;
-  memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "main")[0x010000+((data&0x80)?0x4000:0)]);
+  memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "maincpu")[0x010000+((data&0x80)?0x4000:0)]);
 }
 
 static READ8_HANDLER(t5182shared_r)
@@ -248,7 +248,7 @@ static INTERRUPT_GEN( darkmist_interrupt )
 
 static MACHINE_DRIVER_START( darkmist )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_VBLANK_INT_HACK(darkmist_interrupt,2)
 
@@ -257,7 +257,7 @@ static MACHINE_DRIVER_START( darkmist )
 	MDRV_CPU_IO_MAP(t5182_io, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -281,7 +281,7 @@ static MACHINE_DRIVER_START( darkmist )
 MACHINE_DRIVER_END
 
 ROM_START( darkmist )
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "dm_15.rom", 0x00000, 0x08000, CRC(21e6503c) SHA1(09174fb424b76f7f2a381297e3420ddd2e76b008) )
 
 	ROM_LOAD( "dm_16.rom", 0x10000, 0x08000, CRC(094579d9) SHA1(2449bc9ba38396912ee9b72dd870ea9fcff95776) )
@@ -423,9 +423,9 @@ static void decrypt_snd(running_machine *machine)
 
 static DRIVER_INIT(darkmist)
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, len;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	UINT8 *buffer = malloc_or_die(0x10000);
 	UINT8 *decrypt = auto_malloc(0x8000);
 

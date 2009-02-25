@@ -312,7 +312,7 @@ static MACHINE_RESET( metlclsh )
 static MACHINE_DRIVER_START( metlclsh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 1500000)        // ?
+	MDRV_CPU_ADD("maincpu", M6809, 1500000)        // ?
 	MDRV_CPU_PROGRAM_MAP(metlclsh_readmem, metlclsh_writemem)
 	// IRQ by YM3526, NMI by cpu #2
 
@@ -324,7 +324,7 @@ static MACHINE_DRIVER_START( metlclsh )
 	MDRV_MACHINE_RESET(metlclsh)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -415,10 +415,10 @@ SW2
 ***************************************************************************/
 
 ROM_START( metlclsh )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cs04.bin",    0x00000, 0x8000, CRC(c2cc79a6) SHA1(0f586d4145afabbb45ea4865ed7a6590b14a2ab0) )
 	ROM_LOAD( "cs00.bin",    0x0a000, 0x2000, CRC(af0f2998) SHA1(09dd2516406168660d5cd3a36be1e5f0adbcdb8a) )
-	ROM_COPY( "main", 0x7ff0, 0xfff0, 0x10 )
+	ROM_COPY( "maincpu", 0x7ff0, 0xfff0, 0x10 )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "cs03.bin",    0x00000, 0x8000, CRC(51c4720c) SHA1(7fd93bdcf029e7d2509b73b32f61fddf85f3453f) )

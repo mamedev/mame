@@ -220,15 +220,15 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( drmicro )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,MCLK/6)	/* 3.072MHz? */
+	MDRV_CPU_ADD("maincpu", Z80,MCLK/6)	/* 3.072MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", drmicro_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", drmicro_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(60))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -262,7 +262,7 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( drmicro )
-	ROM_REGION( 0x10000, "main", 0 ) // CPU
+	ROM_REGION( 0x10000, "maincpu", 0 ) // CPU
 	ROM_LOAD( "dm-00.13b", 0x0000,  0x2000, CRC(270f2145) SHA1(1557428387e2c0f711c676a13a763c8d48aa497b) )
 	ROM_LOAD( "dm-01.14b", 0x2000,  0x2000, CRC(bba30c80) SHA1(a084429fad58fa6348936084652235d5f55e3b89) )
 	ROM_LOAD( "dm-02.15b", 0x4000,  0x2000, CRC(d9e4ca6b) SHA1(9fb6d1d6b45628891deae389cf1d142332b110ba) )

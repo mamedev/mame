@@ -463,9 +463,9 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( bloodbro )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M68000, XTAL_20MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bloodbro_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_7_15909MHz/2) /* verified on pcb */
 
@@ -473,7 +473,7 @@ static MACHINE_DRIVER_START( bloodbro )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -493,9 +493,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( weststry )
 	MDRV_IMPORT_FROM(bloodbro)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(weststry_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_GFXDECODE(weststry)
 	MDRV_PALETTE_LENGTH(1024)
@@ -506,8 +506,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( skysmash )
 	MDRV_IMPORT_FROM(bloodbro)
 
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_VIDEO_UPDATE(skysmash)
 MACHINE_DRIVER_END
@@ -515,16 +515,16 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( bloodbro )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bb_02.bin",    0x00001, 0x20000, CRC(c0fdc3e4) SHA1(31968f693de2054a0c8ba50a8d44a371dd9c2848) )
 	ROM_LOAD16_BYTE( "bb_01.bin",    0x00000, 0x20000, CRC(2d7e0fdf) SHA1(8fe22d8a1ef7d562a475a5b6c98303b0cb1af561) )
 	ROM_LOAD16_BYTE( "bb_04.bin",    0x40001, 0x20000, CRC(fd951c2c) SHA1(f4031bf303c67c82f2f78f7456f78382d8c1ac85) )
 	ROM_LOAD16_BYTE( "bb_03.bin",    0x40000, 0x20000, CRC(18d3c460) SHA1(93b86af1199f0fedeaf1fe64d27ffede4b819e42) )
 
-	ROM_REGION( 0x20000, "audio", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bb_07.bin",    0x000000, 0x08000, CRC(411b94e8) SHA1(6968441f64212c0935afeca68f07deaadf86d614) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "bb_05.bin",    0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )	/* characters */
@@ -541,16 +541,16 @@ ROM_START( bloodbro )
 ROM_END
 
 ROM_START( bloodbra )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2j.21",    0x00001, 0x20000, CRC(e8ca21b8) SHA1(65330368c29ec64ca03124d28a7f8b49d7a15566) )
 	ROM_LOAD16_BYTE( "1j.22",    0x00000, 0x20000, CRC(6b28cfc7) SHA1(dedd06cab61381f3e27dc14315f283d707d06bcb) )
 	ROM_LOAD16_BYTE( "bb_04.bin",    0x40001, 0x20000, CRC(fd951c2c) SHA1(f4031bf303c67c82f2f78f7456f78382d8c1ac85) )
 	ROM_LOAD16_BYTE( "bb_03.bin",    0x40000, 0x20000, CRC(18d3c460) SHA1(93b86af1199f0fedeaf1fe64d27ffede4b819e42) )
 
-	ROM_REGION( 0x20000, "audio", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "bb_07.bin",    0x000000, 0x08000, CRC(411b94e8) SHA1(6968441f64212c0935afeca68f07deaadf86d614) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "bb_05.bin",    0x00000, 0x10000, CRC(04ba6d19) SHA1(7333075c3323756d51917418b5234d785a9bee00) )	/* characters */
@@ -567,16 +567,16 @@ ROM_START( bloodbra )
 ROM_END
 
 ROM_START( weststry )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for cpu code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for cpu code */
 	ROM_LOAD16_BYTE( "ws13.bin",    0x00001, 0x20000, CRC(158e302a) SHA1(52cc1bf526424ff025a6b79f3fc7bba4b9bbfcbb) )
 	ROM_LOAD16_BYTE( "ws15.bin",    0x00000, 0x20000, CRC(672e9027) SHA1(71cb9fcef04edb972ba88de45d605dcff539ea2d) )
 	ROM_LOAD16_BYTE( "bb_04.bin",   0x40001, 0x20000, CRC(fd951c2c) SHA1(f4031bf303c67c82f2f78f7456f78382d8c1ac85) )
 	ROM_LOAD16_BYTE( "bb_03.bin",   0x40000, 0x20000, CRC(18d3c460) SHA1(93b86af1199f0fedeaf1fe64d27ffede4b819e42) )
 
-	ROM_REGION( 0x20000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "ws17.bin",    0x000000, 0x08000, CRC(e00a8f09) SHA1(e7247ce0ab99d0726f31dee5de5ba33f4ebd183e) )
 	ROM_CONTINUE(            0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ws09.bin",    0x00000, 0x08000, CRC(f05b2b3e) SHA1(6570d795d68655ace9668f32dc0bf5c2d2372411) )	/* characters */
@@ -613,16 +613,16 @@ ROM_START( weststry )
 ROM_END
 
 ROM_START( skysmash )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom5",    0x00000, 0x20000, CRC(867f9897) SHA1(7751f9d03d71bd5db0b82bda6e4d5231a30c1ad0) )
 	ROM_LOAD16_BYTE( "rom6",    0x00001, 0x20000, CRC(e9c1d308) SHA1(d7032345b91f87de64ad09ffea49e39b755cac44) )
 	ROM_LOAD16_BYTE( "rom7",    0x40000, 0x20000, CRC(d209db4d) SHA1(1cf85d39d12e92c1b97f7e5a148f3ad56cdca963) )
 	ROM_LOAD16_BYTE( "rom8",    0x40001, 0x20000, CRC(d3646728) SHA1(898606be662214d2ba99e9a3e3cc0c7e7609a719) )
 
-	ROM_REGION( 0x20000, "audio", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "rom2",    0x000000, 0x08000, CRC(75b194cf) SHA1(6aaf36cdab06c0aa5328f5176557387a5d3f7d26) )
 	ROM_CONTINUE(        0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "rom3",    0x00000, 0x10000, CRC(fbb241be) SHA1(cd94c328891538bbd8c062d90a47ddf3d7d05bb0) )	/* characters */

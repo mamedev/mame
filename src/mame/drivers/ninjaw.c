@@ -237,7 +237,7 @@ static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine,  10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  10, memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -625,11 +625,11 @@ Darius2: arbitrary interleaving of 10 to keep cpus synced.
 static MACHINE_DRIVER_START( ninjaw )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(ninjaw_readmem,ninjaw_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 16/4 MHz ? */
+	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 16/4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
 	MDRV_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
@@ -698,11 +698,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( darius2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,16000000/2)	/* 8 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(darius2_readmem,darius2_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,16000000/4)	/* 4 MHz ? */
+	MDRV_CPU_ADD("audiocpu", Z80,16000000/4)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
 	MDRV_CPU_ADD("sub", M68000,16000000/2)	/* 8 MHz ? */
@@ -773,7 +773,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ninjaw )
-	ROM_REGION( 0xc0000, "main", 0 )	/* 256K for 68000 CPUA code */
+	ROM_REGION( 0xc0000, "maincpu", 0 )	/* 256K for 68000 CPUA code */
 	ROM_LOAD16_BYTE( "b31-45",    0x00000, 0x10000, CRC(107902c3) SHA1(026f71a918059e3374ae262304a2ee1270f5c5bd) )
 	ROM_LOAD16_BYTE( "b31-47",    0x00001, 0x10000, CRC(bd536b1e) SHA1(39c86cbb3a33fc77a0141b5648a1aca862e0a5fd) )
 	ROM_LOAD16_BYTE( "b31_29.34", 0x20000, 0x10000, CRC(f2941a37) SHA1(cf1f231d9caddc903116a8b654f49181ca459697) )
@@ -792,7 +792,7 @@ ROM_START( ninjaw )
 	ROM_LOAD16_BYTE( "b31_31.85", 0x40000, 0x10000, CRC(837f47e2) SHA1(88d596f01566456ba18a01afd0a6a7c121d3ca88) )
 	ROM_LOAD16_BYTE( "b31_34.95", 0x40001, 0x10000, CRC(d6b5fb2a) SHA1(e3ae0d7ec62740465a90e4939b10341d3866d860) )
 
-	ROM_REGION( 0x2c000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x2c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "b31_37.11",  0x00000, 0x04000, CRC(0ca5799d) SHA1(6485dde076d15b69b9ee65880dda57ad4f8d129c) )
 	ROM_CONTINUE(           0x10000, 0x1c000 )  /* banked stuff */
 
@@ -829,7 +829,7 @@ ROM_START( ninjaw )
 ROM_END
 
 ROM_START( ninjawj )
-	ROM_REGION( 0xc0000, "main", 0 )	/* 256K for 68000 CPUA code */
+	ROM_REGION( 0xc0000, "maincpu", 0 )	/* 256K for 68000 CPUA code */
 	ROM_LOAD16_BYTE( "b31_30.35", 0x00000, 0x10000, CRC(056edd9f) SHA1(8922cede80b31ce0f7a00c8cab13d835464c6058) )
 	ROM_LOAD16_BYTE( "b31_28.32", 0x00001, 0x10000, CRC(cfa7661c) SHA1(a7a6abb33a514d910e3198d5acbd4c31b2434b6c) )
 	ROM_LOAD16_BYTE( "b31_29.34", 0x20000, 0x10000, CRC(f2941a37) SHA1(cf1f231d9caddc903116a8b654f49181ca459697) )
@@ -848,7 +848,7 @@ ROM_START( ninjawj )
 	ROM_LOAD16_BYTE( "b31_31.85", 0x40000, 0x10000, CRC(837f47e2) SHA1(88d596f01566456ba18a01afd0a6a7c121d3ca88) )
 	ROM_LOAD16_BYTE( "b31_34.95", 0x40001, 0x10000, CRC(d6b5fb2a) SHA1(e3ae0d7ec62740465a90e4939b10341d3866d860) )
 
-	ROM_REGION( 0x2c000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x2c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "b31_37.11",  0x00000, 0x04000, CRC(0ca5799d) SHA1(6485dde076d15b69b9ee65880dda57ad4f8d129c) )
 	ROM_CONTINUE(           0x10000, 0x1c000 )  /* banked stuff */
 
@@ -885,7 +885,7 @@ ROM_START( ninjawj )
 ROM_END
 
 ROM_START( darius2 )
-	ROM_REGION( 0xc0000, "main", 0 )	/* 256K for 68000 CPUA code */
+	ROM_REGION( 0xc0000, "maincpu", 0 )	/* 256K for 68000 CPUA code */
 	ROM_LOAD16_BYTE( "c07-32-1", 0x00000, 0x10000, CRC(216c8f6a) SHA1(493b0779b99a228911f56ef9d2d4a3945683bec0) )
 	ROM_LOAD16_BYTE( "c07-29-1", 0x00001, 0x10000, CRC(48de567f) SHA1(cdf50052933cd2603fd4374e8bae8b30a6c690b5) )
 	ROM_LOAD16_BYTE( "c07-31-1", 0x20000, 0x10000, CRC(8279d2f8) SHA1(bd3c80a024a58e4b554f4867f56d7f5741eb3031) )
@@ -904,7 +904,7 @@ ROM_START( darius2 )
 	ROM_LOAD16_BYTE( "c07-33-1", 0x40000, 0x10000, CRC(2da03a3f) SHA1(f1f2de82e0addc5e19c8935e4f5810896691118f) )
 	ROM_LOAD16_BYTE( "c07-36-1", 0x40001, 0x10000, CRC(02cf2b1c) SHA1(c94a64f26f94f182cfe2b6edb37e4ce35a0f681b) )
 
-	ROM_REGION( 0x2c000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x2c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "c07-28",  0x00000, 0x04000, CRC(da304bc5) SHA1(689b4f329d9a640145f82e12dff3dd1fcf8a28c8) )
 	ROM_CONTINUE(            0x10000, 0x1c000 )  /* banked stuff */
 

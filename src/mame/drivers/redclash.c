@@ -349,12 +349,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( zerohour )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)  /* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(zero_readmem,zero_writemem)
-	MDRV_CPU_VBLANK_INT("main", redclash_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", redclash_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -376,12 +376,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( redclash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)  /* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", redclash_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", redclash_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -406,7 +406,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( zerohour )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "zerohour.1",   0x0000, 0x0800, CRC(0dff4b48) SHA1(4911255f953851d0e5c2b66090b95254ac59ac9e) )
 	ROM_LOAD( "zerohour.2",   0x0800, 0x0800, CRC(cf41b6ac) SHA1(263794e6be22c20e2b10fe9099e475097475df7b) )
 	ROM_LOAD( "zerohour.3",	  0x1000, 0x0800, CRC(5ef48b67) SHA1(ae291aa84b109e6a51eebdd5526abca1d901b7b9) )
@@ -431,7 +431,7 @@ ROM_START( zerohour )
 ROM_END
 
 ROM_START( redclash )
-	ROM_REGION(0x10000, "main", 0 )
+	ROM_REGION(0x10000, "maincpu", 0 )
 	ROM_LOAD( "11.11c",       0x0000, 0x1000, CRC(695e070e) SHA1(8d0451a05572f62e0f282ab96bdd26d08b77a6c9) )
 	ROM_LOAD( "13.7c",        0x1000, 0x1000, CRC(c2090318) SHA1(71725cdf51aedf5f29fa1dd1a41ad5e62c9a580d) )
 	ROM_LOAD( "12.9c",        0x2000, 0x1000, CRC(b60e5ada) SHA1(37440f382c5e8852d804fa9837c36cc1e9d94d1d) )
@@ -455,7 +455,7 @@ ROM_START( redclash )
 ROM_END
 
 ROM_START( redclsha )
-	ROM_REGION(0x10000, "main", 0 )
+	ROM_REGION(0x10000, "maincpu", 0 )
 	ROM_LOAD( "rc1.11c",      0x0000, 0x1000, CRC(5b62ff5a) SHA1(981d3c72f28b7d136a0bad9243d39fd1ba3abc97) )
 	ROM_LOAD( "rc3.7c",       0x1000, 0x1000, CRC(409c4ee7) SHA1(15c03a4093d7695751a143aa749229fcb7721f46) )
 	ROM_LOAD( "rc2.9c",       0x2000, 0x1000, CRC(5f215c9a) SHA1(c305f7be19f6a052c08feb0b63a0326b6a1bd808) )
@@ -479,7 +479,7 @@ ROM_START( redclsha )
 ROM_END
 
 ROM_START( redclask )
-	ROM_REGION(0x10000, "main", 0 )
+	ROM_REGION(0x10000, "maincpu", 0 )
 	ROM_LOAD( "rc1.8c",       0x0000, 0x0800, CRC(fd90622a) SHA1(a65a32d519e7fee89b160f8152322df20b6af4ea) )
 	ROM_LOAD( "rc2.7c",       0x0800, 0x0800, CRC(c8f33440) SHA1(60d1faee415faa13102b8e744f444f1480b8bd73) )
 	ROM_LOAD( "rc3.6c",       0x1000, 0x0800, CRC(2172b1e9) SHA1(b6f7ee8924bda9f8da13baaa2db3ffb7d623236c) )

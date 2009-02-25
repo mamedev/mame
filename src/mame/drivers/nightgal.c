@@ -678,18 +678,18 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( nightgal )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,MASTER_CLOCK / 4)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 4)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(0,nightgal_map)
 	MDRV_CPU_IO_MAP(0,nightgal_io)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", NSC8105, MASTER_CLOCK / 4)
 	MDRV_CPU_PROGRAM_MAP(nsc_map, 0)
 
-	MDRV_QUANTUM_PERFECT_CPU("main")
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -713,14 +713,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sexygal )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( nightgal )
-  	MDRV_CPU_MODIFY("main")
+  	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(0,sexygal_map)
 	MDRV_CPU_IO_MAP(0,sexygal_io)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(sexygal_nsc_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_SOUND_REMOVE("ay")
 
@@ -759,7 +759,7 @@ Dumped by Uki. 2000/06/11
 */
 
 ROM_START( nightgal )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "ngal_10.bin", 0x00000, 0x02000, CRC(5eb28742) SHA1(d48045b7cbce69093494c4ec764cf4fb3c120bd6) )
 	ROM_LOAD( "ngal_11.bin", 0x02000, 0x02000, CRC(c52f7942) SHA1(e23b9e4936f9b3111ea14c0250190ee6de1ed4ab) )
 	ROM_LOAD( "ngal_12.bin", 0x04000, 0x02000, CRC(515e69a7) SHA1(234247c829c2b082360d7d44c1488fc5fcf45cd2) )
@@ -810,7 +810,7 @@ http://japump.i.am/
 
 */
 ROM_START( ngtbunny )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "6.3n", 0x00000, 0x02000, CRC(3e39c0ef) SHA1(56287fb19ff1a61ff606454315e433ecd2e9318a) )
 	ROM_LOAD( "7.3p", 0x02000, 0x02000, CRC(34024380) SHA1(ba535e2b198f55e68a45ad7030b12c9aa1389aea) )
 	ROM_LOAD( "8.3s", 0x04000, 0x02000, CRC(9bf96168) SHA1(f0e9302bc9577fe779b56cb72035672368c94481) )
@@ -829,7 +829,7 @@ ROM_START( ngtbunny )
 ROM_END
 
 ROM_START( royalngt )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "rn6.3n", 0x00000, 0x02000, CRC(abbf38b9) SHA1(455dcec2ac2187b7216ff53fbbb8975b763fb981) )
 	ROM_LOAD( "rn7.3p", 0x02000, 0x02000, CRC(ae9c082b) SHA1(ee3effea653f972fd732453e9ab72f48e75410f8) )
 	ROM_LOAD( "rn8.3s", 0x04000, 0x02000, CRC(1371a83a) SHA1(c7107b62534837dd51bb4a93ba9a690f91393930) )
@@ -889,7 +889,7 @@ SG.7E   color
 */
 
 ROM_START( sexygal )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10.3n",  0x00000, 0x04000, CRC(53425b74) SHA1(1239c0527d00d693313366b7e3da669565f99ffd) )
 	ROM_LOAD( "11.3pr", 0x04000, 0x04000, CRC(a3138b42) SHA1(1bf7f6e2c4020251379cc72fa731c17795f35e2e) )
 
@@ -916,7 +916,7 @@ ROM_START( sexygal )
 ROM_END
 
 ROM_START( sweetgal )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "10.3n",  0x00000, 0x04000, CRC(0f6c4bf0) SHA1(50e5c6f08e124641f5df8938ccfcdebde18f6a0f) )
 	ROM_LOAD( "11.3p", 0x04000, 0x04000, CRC(7388e9b3) SHA1(e318d2d3888679bbd43a0aab68252fd359b7969d) )
 
@@ -982,7 +982,7 @@ NG2.6U  color
 */
 
 ROM_START( ngalsumr )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "8.3s", 0x00000, 0x02000, CRC(30f81b12) SHA1(e264b0cdc6ff400643cba56847344c270e96a204) )
 	ROM_LOAD( "9.3t", 0x02000, 0x02000, CRC(879fc493) SHA1(ec7c6928b5d4e46dcc99271466e7eb801f601a70) )
 	ROM_LOAD( "10.3v", 0x04000, 0x02000, CRC(31211088) SHA1(960b781c420602be3de66565a030cf5ebdcc2ffb) )

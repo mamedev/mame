@@ -355,24 +355,24 @@ static INTERRUPT_GEN( missb2_interrupt )
 
 static MACHINE_DRIVER_START( missb2 )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, MAIN_XTAL/4)	// 6 MHz
+	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(master_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
 	MDRV_CPU_PROGRAM_MAP(slave_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, MAIN_XTAL/8)	// 3 MHz
+	MDRV_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
-//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-	MDRV_CPU_VBLANK_INT("main", missb2_interrupt)
+//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", missb2_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -399,7 +399,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( missb2 )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "msbub2-u.204", 0x00000, 0x10000, CRC(b633bdde) SHA1(29a389c52ff06718f1c4c39f6a854856c237356b) ) /* FIRST AND SECOND HALF IDENTICAL */
 	/* ROMs banked at 8000-bfff */
 	ROM_LOAD( "msbub2-u.203", 0x10000, 0x10000, CRC(29fd8afe) SHA1(94ead80d20cd3974dd4fb0358915e3bd8b793158) )
@@ -408,7 +408,7 @@ ROM_START( missb2 )
 	ROM_REGION( 0x10000, "slave", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "msbub2-u.11",  0x0000, 0x10000, CRC(003dc092) SHA1(dff3c2b31d0804a308e5c42cf9705cd3d6144ad7) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the third CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the third CPU */
 	ROM_LOAD( "msbub2-u.211", 0x0000, 0x08000, CRC(08e5d846) SHA1(8509a71df984f0348bdc6ab60eb2ba7ceb9b1246) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT )
@@ -433,7 +433,7 @@ ROM_END
 
 static void configure_banks(running_machine* machine)
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, 1, 0, 8, &ROM[0x10000], 0x4000);
 }
 

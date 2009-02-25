@@ -185,14 +185,14 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( quizo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,XTAL1/2)
+	MDRV_CPU_ADD("maincpu", Z80,XTAL1/2)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
 	MDRV_CPU_IO_MAP(portmap, 0)
 
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -212,7 +212,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( quizo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom1",   0x0000, 0x4000, CRC(6731735f) SHA1(7dbf48f833c7b7cde77df2a10781e5a8b6ae0533) )
 	ROM_CONTINUE(             0x0000, 0x04000 )
 
@@ -226,7 +226,7 @@ ROM_START( quizo )
 ROM_END
 
 ROM_START( quizoa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.bin",   0x0000, 0x4000, CRC(1579ae31) SHA1(b23539413d108223001a9fe827ea151d20682b7b) )
 
 	ROM_REGION( 0x18000, "user1", 0 )

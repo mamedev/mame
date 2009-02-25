@@ -254,16 +254,16 @@ static MACHINE_DRIVER_START( spcforce )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MDRV_CPU_ADD("main", 8085A, 8000000 * 2)        /* 4.00 MHz??? */
+	MDRV_CPU_ADD("maincpu", 8085A, 8000000 * 2)        /* 4.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq3_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", irq3_line_pulse)
 
-	MDRV_CPU_ADD("audio", I8035, 6144000)		/* divisor ??? */
+	MDRV_CPU_ADD("audiocpu", I8035, 6144000)		/* divisor ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -296,7 +296,7 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 ROM_START( spcforce )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "m1v4f.1a",  	  0x0000, 0x0800, CRC(7da0d1ed) SHA1(2ee145f590da557be057f181b4861014627872e7) )
 	ROM_LOAD( "m2v4f.1c",  	  0x0800, 0x0800, CRC(25605bff) SHA1(afda2884a00fdbc000191dd548fd8e34df3e2f49) )
 	ROM_LOAD( "m3v5f.2a",  	  0x1000, 0x0800, CRC(6f879366) SHA1(ef624619dbaad1f2adf4fab82e04bac117dbfac6) )
@@ -306,7 +306,7 @@ ROM_START( spcforce )
 	ROM_LOAD( "m7v4f.4a",  	  0x3000, 0x0800, CRC(978ad452) SHA1(fa84dcc6587403dd939da719a747d8c7332ed038) )
 	ROM_LOAD( "m8v4f.4c",  	  0x3800, 0x0800, CRC(f805c3cd) SHA1(78eb13b99aae895742b34ed56bee9313d3643de1) )
 
-	ROM_REGION( 0x1000, "audio", 0 )		/* sound MCU */
+	ROM_REGION( 0x1000, "audiocpu", 0 )		/* sound MCU */
 	ROM_LOAD( "vm5.k10",      0x0000, 0x0800, CRC(8820913c) SHA1(90002cafdf5f32f916e5457e013ebe53405d5ca8) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
@@ -319,7 +319,7 @@ ROM_START( spcforce )
 ROM_END
 
 ROM_START( spcforc2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "spacefor.1a",  0x0000, 0x0800, CRC(ef6fdccb) SHA1(2fff28437597958b39a821f93ac30f32c24f50aa) )
 	ROM_LOAD( "spacefor.1c",  0x0800, 0x0800, CRC(44bd1cdd) SHA1(6dd5ae7a64079c61b63667f06e0d34dec48eac7c) )
 	ROM_LOAD( "spacefor.2a",  0x1000, 0x0800, CRC(fcbc7df7) SHA1(b6e89dbfc80d5d9dcf889f618a8278c182773a14) )
@@ -329,7 +329,7 @@ ROM_START( spcforc2 )
 	ROM_LOAD( "spacefor.4a",  0x3000, 0x0800, CRC(89aefc0a) SHA1(0b56efa613bce972af4bbf145853bfc0cda60ef9) )
 	ROM_LOAD( "m8v4f.4c",  	  0x3800, 0x0800, CRC(f805c3cd) SHA1(78eb13b99aae895742b34ed56bee9313d3643de1) )
 
-	ROM_REGION( 0x1000, "audio", 0 )		/* sound MCU */
+	ROM_REGION( 0x1000, "audiocpu", 0 )		/* sound MCU */
 	ROM_LOAD( "vm5.k10",      0x0000, 0x0800, CRC(8820913c) SHA1(90002cafdf5f32f916e5457e013ebe53405d5ca8) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
@@ -342,7 +342,7 @@ ROM_START( spcforc2 )
 ROM_END
 
 ROM_START( meteor )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vm1", 	      0x0000, 0x0800, CRC(894fe9b1) SHA1(617e05523392e2ba2608ca13aa24d6601289fe87) )
 	ROM_LOAD( "vm2", 	      0x0800, 0x0800, CRC(28685a68) SHA1(f911a3ccb8d63cf82a6dc8f069f3f498e9081656) )
 	ROM_LOAD( "vm3", 	      0x1000, 0x0800, CRC(c88fb12a) SHA1(1eeb26caf7a1421ec2d570f71b8c4675ad7ea172) )
@@ -352,7 +352,7 @@ ROM_START( meteor )
 	ROM_LOAD( "vm7", 	      0x3000, 0x0800, CRC(39f43ac2) SHA1(b45275759f4003a22a32dc04227a98908bd140a9) )
 	ROM_LOAD( "vm8", 	      0x3800, 0x0800, CRC(a0508de3) SHA1(75666a4e46b6c433f1c1f8e76c30fd087354097b) )
 
-	ROM_REGION( 0x1000, "audio", 0 )		/* sound MCU */
+	ROM_REGION( 0x1000, "audiocpu", 0 )		/* sound MCU */
 	ROM_LOAD( "vm5", 	      0x0000, 0x0800, CRC(b14ccd57) SHA1(0349ec5d0ca7f98ffdd96d7bf01cf096fe547f7a) )
 
 	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )

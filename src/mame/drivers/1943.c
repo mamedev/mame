@@ -248,17 +248,17 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( 1943 )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, XTAL_24MHz/4)	/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(c1943_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_24MHz/8)	/* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -290,12 +290,12 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( 1943 )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + 128k for the banked ROMs images */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for the banked ROMs images */
 	ROM_LOAD( "1943.01",      0x00000, 0x08000, CRC(c686cc5c) SHA1(5efb2d9df737564d599f71b71a6438f7624b27c3) )
 	ROM_LOAD( "1943.02",      0x10000, 0x10000, CRC(d8880a41) SHA1(2f9b6a3922efa05eed66c63284bace5f337304ac) )
 	ROM_LOAD( "1943.03",      0x20000, 0x10000, CRC(3f0ee26c) SHA1(8da74fe91a6be3f23fc625f2a433f1f79c424994) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1943.05",      0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )
@@ -345,12 +345,12 @@ ROM_START( 1943 )
 ROM_END
 
 ROM_START( 1943j )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + 128k for the banked ROMs images */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for the banked ROMs images */
 	ROM_LOAD( "1943jap.001",  0x00000, 0x08000, CRC(f6935937) SHA1(6fe8885d734447c2a667cf80dd545200aad6c767) )
 	ROM_LOAD( "1943jap.002",  0x10000, 0x10000, CRC(af971575) SHA1(af1d8ce73e8671b7b41248ce6486c9b5aaf6a233) )
 	ROM_LOAD( "1943jap.003",  0x20000, 0x10000, CRC(300ec713) SHA1(f66d2356b413a418c887b4085a5315475c7a8bba) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1943.05",      0x00000, 0x8000, CRC(ee2bd2d7) SHA1(4d2d019a9f8452fbbb247e893280568a2e86073e) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )
@@ -400,12 +400,12 @@ ROM_START( 1943j )
 ROM_END
 
 ROM_START( 1943kai )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + 128k for the banked ROMs images */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for the banked ROMs images */
 	ROM_LOAD( "1943kai.01",   0x00000, 0x08000, CRC(7d2211db) SHA1(b02a0b3daf7e1e224b7cad8fbe93439bd5ec9f0b) )
 	ROM_LOAD( "1943kai.02",   0x10000, 0x10000, CRC(2ebbc8c5) SHA1(3be5ad061411642723e3f2bcb7b3c3caa11ee15f) )
 	ROM_LOAD( "1943kai.03",   0x20000, 0x10000, CRC(475a6ac5) SHA1(fa07a855ba9173b6f81641c806ec7d938b0c282e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "1943kai.05",   0x00000, 0x8000, CRC(25f37957) SHA1(1e50c2a920eb3b5c881843686db857e9fee5ba1d) )
 
 	ROM_REGION( 0x8000, "gfx1", ROMREGION_DISPOSE )

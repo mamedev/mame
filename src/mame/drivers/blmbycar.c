@@ -356,12 +356,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( blmbycar )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)	/* ? */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(blmbycar_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -386,12 +386,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( watrball )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)	/* ? */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(watrball_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -436,7 +436,7 @@ GFX : TI TPC1020AFN-084
 ***************************************************************************/
 
 ROM_START( blmbycar )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "bcrom4.bin", 0x000000, 0x080000, CRC(06d490ba) SHA1(6d113561b474bf613c6b91c9525a52025ae65ab7) )
 	ROM_LOAD16_BYTE( "bcrom6.bin", 0x000001, 0x080000, CRC(33aca664) SHA1(04fff492654d3edac62e9d35808e5946bcc78cbb) )
 
@@ -453,7 +453,7 @@ ROM_START( blmbycar )
 ROM_END
 
 ROM_START( blmbycau )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "bc_rom4", 0x000000, 0x080000, CRC(76f054a2) SHA1(198efd152b13033e5249119ca48b9e0f6351b0b9) )
 	ROM_LOAD16_BYTE( "bc_rom6", 0x000001, 0x080000, CRC(2570b4c5) SHA1(706465950023a6ef7c85ceb9c76246d7556b3859) )
 
@@ -486,7 +486,7 @@ The game has fonts identical to World rally and obiviously Blomby car ;)
 */
 
 ROM_START( watrball )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom4.bin", 0x000000, 0x020000, CRC(bfbfa720) SHA1(d6d14c0ba545eb7adee7190da2d3db1c6dd00d75) )
 	ROM_LOAD16_BYTE( "rom6.bin", 0x000001, 0x020000, CRC(acff9b01) SHA1(b85671bcc4f03fdf05eb1c9b5d4143e33ec1d7db) )
 
@@ -505,8 +505,8 @@ ROM_END
 
 static DRIVER_INIT( blmbycar )
 {
-	UINT16 *RAM  = (UINT16 *) memory_region(machine, "main");
-	size_t    size = memory_region_length(machine, "main") / 2;
+	UINT16 *RAM  = (UINT16 *) memory_region(machine, "maincpu");
+	size_t    size = memory_region_length(machine, "maincpu") / 2;
 	int i;
 
 	for (i = 0; i < size; i++)

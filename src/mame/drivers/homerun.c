@@ -187,17 +187,17 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( homerun )
-	MDRV_CPU_ADD("main", Z80, 5000000)
+	MDRV_CPU_ADD("maincpu", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(homerun_memmap, 0)
 	MDRV_CPU_IO_MAP(homerun_iomap, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(homerun)
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
@@ -249,7 +249,7 @@ Notes:
 */
 
 ROM_START( homerun )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "homerun.43",        0x0000, 0x4000, CRC(e759e476) SHA1(ad4f356ff26209033320a3e6353e4d4d9beb59c1) )
 	ROM_CONTINUE(        0x10000,0x1c000)
 
@@ -265,7 +265,7 @@ ROM_START( homerun )
 ROM_END
 
 ROM_START( dynashot )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "1.ic43",        0x0000, 0x4000, CRC(bf3c9586) SHA1(439effbda305f5fa265e5897c81dc1447e5d867d) )
 	ROM_CONTINUE(        0x10000,0x1c000)
 

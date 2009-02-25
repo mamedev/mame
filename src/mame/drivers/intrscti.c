@@ -89,13 +89,13 @@ static VIDEO_UPDATE(intrscti)
 
 static MACHINE_DRIVER_START( intrscti )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -111,7 +111,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( intrscti )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1911_1.7g", 0x0000, 0x1000, CRC(8940e6ee) SHA1(50da11a6fab8f31c72c08dbf374268fff18a74e3) )
 	ROM_LOAD( "1911_2.8g", 0x1000, 0x1000, CRC(a461031e) SHA1(338c8cd79b98c666edd204150dea65ce4b9ec288) )
 	ROM_LOAD( "epoxy_block", 0x8000,0x1000, NO_DUMP )
@@ -127,7 +127,7 @@ ROM_END
 
 static DRIVER_INIT( intrscti )
 {
-	UINT8 *cpu = memory_region( machine, "main" );
+	UINT8 *cpu = memory_region( machine, "maincpu" );
 	int i;
 	for (i=0x8000;i<0x8fff;i++)
 	{

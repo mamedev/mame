@@ -247,9 +247,9 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( wrally )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,XTAL_24MHz/2)		/* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(wrally_readmem, 0)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_CONFIG(dallas_config)
@@ -259,7 +259,7 @@ static MACHINE_DRIVER_START( wrally )
 	MDRV_QUANTUM_TIME(HZ(38400))					/* heavy sync */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -282,7 +282,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( wrally )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "worldr17.c23", 0x000000, 0x080000, CRC(050f5629) SHA1(74fc2cd5114f3bc4b2429f1d8d7eeb1658f9f179) ) /* Only difference compared to set 2 is how the Dallas DS5002FP */
 	ROM_LOAD16_BYTE( "worldr16.c22", 0x000001, 0x080000, CRC(9e0d126c) SHA1(369360b7ec2c3497af3bf62b4eba24c3d9f94675) ) /* power failure shows on screen, IE: "Tension  baja " */
 
@@ -310,7 +310,7 @@ ROM_START( wrally )
 ROM_END
 
 ROM_START( wrallya )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x080000, CRC(8b7d93c3) SHA1(ce4163eebc5d4a0c1266d650523b1ffc702d1b87) ) /* Only difference compared to set 1 is how the Dallas DS5002FP */
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x080000, CRC(56da43b6) SHA1(02db8f969ed5e7f5e5356c45c0312faf5f000335) ) /* power failure shows on screen, IE: "Power  Failure" */
 
@@ -338,7 +338,7 @@ ROM_START( wrallya )
 ROM_END
 
 ROM_START( wrallyb ) /* Board Marked 930217, Atari License */
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "rally.c23", 0x000000, 0x080000, CRC(366595ad) SHA1(e16341ed9eacf9b729c28184268150ea9b62f185) ) /* North & South America only... */
 	ROM_LOAD16_BYTE( "rally.c22", 0x000001, 0x080000, CRC(0ad4ec6f) SHA1(991557cf25fe960b1c586e990e6019befe5a11d0) )
 

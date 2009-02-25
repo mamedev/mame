@@ -1338,13 +1338,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( xboard )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
-	MDRV_CPU_ADD("sound", Z80, SOUND_CLOCK/4)
+	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -1356,7 +1356,7 @@ static MACHINE_DRIVER_START( xboard )
 	MDRV_GFXDECODE(segaxbd)
 	MDRV_PALETTE_LENGTH(8192*3)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224)
 
@@ -1403,7 +1403,7 @@ MACHINE_DRIVER_END
     Missing the Deluxe version rom set
 */
 ROM_START( aburner )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr10940.bin", 0x00000, 0x20000, CRC(4d132c4e) SHA1(007af52167c369177b86fc0f8b007ebceba2a30c) )
 	ROM_LOAD16_BYTE( "epr10941.bin", 0x00001, 0x20000, CRC(136ea264) SHA1(606ac67db53a6002ed1bd71287aed2e3e720cdf4) )
 
@@ -1437,7 +1437,7 @@ ROM_START( aburner )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	ROM_LOAD( "epr-10922.ic40", 0x000000, 0x10000, CRC(b49183d4) SHA1(71d87bfbce858049ccde9597ab15575b3cdba892) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-10923.ic17",0x00000, 0x10000, CRC(6888eb8f) SHA1(8f8fffb214842a5d356e33f5a97099bc6407384f) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -1454,7 +1454,7 @@ ROM_END
     CPU: 68000 (317-????)
 */
 ROM_START( aburner2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "11107.58",  0x00000, 0x20000, CRC(6d87bab7) SHA1(ab34fe78f1f216037b3e3dca3e61f1b31c05cedf) )
 	ROM_LOAD16_BYTE( "11108.104", 0x00001, 0x20000, CRC(202a3e1d) SHA1(cf2018bbad366de4b222eae35942636ca68aa581) )
 
@@ -1488,7 +1488,7 @@ ROM_START( aburner2 )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	ROM_LOAD( "epr-10922.ic40", 0x000000, 0x10000, CRC(b49183d4) SHA1(71d87bfbce858049ccde9597ab15575b3cdba892) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-11112.ic17",    0x00000, 0x10000, CRC(d777fc6d) SHA1(46ce1c3875437044c0a172960d560d6acd6eaa92) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -1505,7 +1505,7 @@ ROM_END
     CPU: FD1094 (317-0136)
 */
 ROM_START( loffire )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12849.rom", 0x000000, 0x20000, CRC(61cfd2fe) SHA1(b47ae9cdf741574ab9128dd3556b1ef35e81a149) )
 	ROM_LOAD16_BYTE( "epr12850.rom", 0x000001, 0x20000, CRC(14598f2a) SHA1(13a51529ed32acefd733d9f638621c3e023dbd6d) )
 
@@ -1554,7 +1554,7 @@ ROM_START( loffire )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12798.rom",	 0x00000, 0x10000, CRC(0587738d) SHA1(24c79b0c73616d5532a49a2c9121dfabe3a80c7d) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -1568,7 +1568,7 @@ ROM_END
     CPU: FD1094 (317-0135)
 */
 ROM_START( loffireu )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12847a.bin", 0x000000, 0x20000, CRC(c50eb4ed) SHA1(18a46c97aec2fefd160338c1760b6ee367dcb57f) )
 	ROM_LOAD16_BYTE( "epr12848a.bin", 0x000001, 0x20000, CRC(f8ff8640) SHA1(193bb8f42f3c5011ad1fbf87215f012de5e950fb) )
 
@@ -1607,7 +1607,7 @@ ROM_START( loffireu )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12798.rom",	 0x00000, 0x10000, CRC(0587738d) SHA1(24c79b0c73616d5532a49a2c9121dfabe3a80c7d) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -1621,7 +1621,7 @@ ROM_END
     CPU: FD1094 (317-0134)
 */
 ROM_START( loffirej )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	/* repaired using data from the loffire set since they are mostly identical
        when decrypted, they pass the rom check so are assumed to be ok but double
        checking them when possible never hurts */
@@ -1663,7 +1663,7 @@ ROM_START( loffirej )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12798.rom",	 0x00000, 0x10000, CRC(0587738d) SHA1(24c79b0c73616d5532a49a2c9121dfabe3a80c7d) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -1682,7 +1682,7 @@ ROM_END
     GAME BD NO. 834-6493-03 (Uses "MPR" mask roms) or 834-6493-05 (Uses "EPR" eproms)
 */
 ROM_START( thndrbld )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11405.ic58", 0x000000, 0x20000, CRC(e057dd5a) SHA1(4c032db4752dfb44dba3def5ee5377fffd94b79c) )
 	ROM_LOAD16_BYTE( "epr-11406.ic63", 0x000001, 0x20000, CRC(c6b994b8) SHA1(098b2ae30c4aafea35222369d60f8e89f87639eb) )
 	ROM_LOAD16_BYTE( "epr-11306.ic57", 0x040000, 0x20000, CRC(4b95f2b4) SHA1(9e0ff898a2af05c35db3551e52c7485748698c28) )
@@ -1723,7 +1723,7 @@ ROM_START( thndrbld )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* Road Data */
 	ROM_LOAD( "epr-11313.ic29", 0x00000, 0x10000, CRC(6a56c4c3) SHA1(c1b8023cb2ba4e96be052031c24b6ae424225c71) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-11396.ic17", 0x00000, 0x10000, CRC(d37b54a4) SHA1(c230fe7241a1f13ca13506d1492f348f506c40a7) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -1739,7 +1739,7 @@ ROM_END
     GAME BD NO. 834-6493-03 (Uses "MPR" mask roms) or 834-6493-05 (Uses "EPR" eproms)
 */
 ROM_START( thndrbd1 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-11304.ic58", 0x000000, 0x20000, CRC(a90630ef) SHA1(8f29e020119b2243b1c95e15546af1773327ae85) ) // patched?
 	ROM_LOAD16_BYTE( "epr-11305.ic63", 0x000001, 0x20000, CRC(9ba3ef61) SHA1(f75748b37ce35b0ef881804f73417643068dfbb2) ) // patched?
 	ROM_LOAD16_BYTE( "epr-11306.ic57", 0x040000, 0x20000, CRC(4b95f2b4) SHA1(9e0ff898a2af05c35db3551e52c7485748698c28) )
@@ -1777,7 +1777,7 @@ ROM_START( thndrbd1 )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* Road Data */
 	ROM_LOAD( "epr-11313.ic29", 0x00000, 0x10000, CRC(6a56c4c3) SHA1(c1b8023cb2ba4e96be052031c24b6ae424225c71) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-11312.ic17",   0x00000, 0x10000, CRC(3b974ed2) SHA1(cf18a2d0f01643c747a884bf00e5b7037ba2e64a) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -1794,7 +1794,7 @@ ROM_END
     CPU: FD1094 (317-0144)
 */
 ROM_START( rachero )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-13129.ic58", 0x00000, 0x20000,CRC(ad9f32e7) SHA1(dbcb3436782bee88dcac05d4f59c97f170a7387d) )
 	ROM_LOAD16_BYTE( "epr-13130.ic63", 0x00001, 0x20000,CRC(6022777b) SHA1(965c76565d740be3355c4b403a1629cffb9fcd78) )
 	ROM_LOAD16_BYTE( "epr-12855.ic57", 0x40000, 0x20000,CRC(cecf1e73) SHA1(3f8631379f32dbfda7720ef345276f9be23ada06) )
@@ -1833,7 +1833,7 @@ ROM_START( rachero )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* ground data */
 	/* none */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-12859.ic17",    0x00000, 0x10000, CRC(d57881da) SHA1(75b7f331ea8c2e33d6236e0c8fc8dabe5eef8160) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2072,7 +2072,7 @@ Notes:
 */
 
 ROM_START( smgp )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12563b.58", 0x00000, 0x20000, CRC(baf1f333) SHA1(f91a7a311237b9940a44b815716d4226a7ae1e8b) )
 	ROM_LOAD16_BYTE( "epr12564b.63", 0x00001, 0x20000, CRC(b5191af0) SHA1(d6fb19552e4816eefe751907ec55a2e07ad24879) )
 
@@ -2109,7 +2109,7 @@ ROM_START( smgp )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2127,7 +2127,7 @@ ROM_END
 */
 /* this set contained only prg roms */
 ROM_START( smgp6 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12563a.58", 0x00000, 0x20000, CRC(2e64b10e) SHA1(2be1ffb3120e4af6a61880e2a2602db07a73f373) )
 	ROM_LOAD16_BYTE( "epr12564a.63", 0x00001, 0x20000, CRC(5baba3e7) SHA1(37194d5a4d3ee48a276f6aeb35b2f20a7661caa2) )
 
@@ -2164,7 +2164,7 @@ ROM_START( smgp6 )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2231,7 +2231,7 @@ ROM_END
     Ep12505.8
 */
 ROM_START( smgp5 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12563.58", 0x00000, 0x20000, CRC(6d7325ae) SHA1(bf88ceddc49dab5b439080d5bf0e7e084a79546c) )
 	ROM_LOAD16_BYTE( "epr12564.63", 0x00001, 0x20000, CRC(adfbf921) SHA1(f3321e03dc37b14db065b85d63e321810e4ea797) )
 
@@ -2268,7 +2268,7 @@ ROM_START( smgp5 )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2296,7 +2296,7 @@ ROM_END
     CPU: FD1094 (317-0125a)
 */
 ROM_START( smgpu )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12561c.58", 0x00000, 0x20000, CRC(a5b0f3fe) SHA1(17103e56f822fdb52e72f597c01415ed375aa102) )
 	ROM_LOAD16_BYTE( "epr12562c.63", 0x00001, 0x20000, CRC(799e55f4) SHA1(2e02cdc63bda47b087c81021018287cfa961c083) )
 
@@ -2333,7 +2333,7 @@ ROM_START( smgpu )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2350,7 +2350,7 @@ ROM_END
     CPU: FD1094 (317-0125a)
 */
 ROM_START( smgpu1 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12561b.58", 0x00000, 0x20000, CRC(80a32655) SHA1(fe1ffa8af9f1ca175ba90b24a0853329b08d19af) )
 	ROM_LOAD16_BYTE( "epr12562b.63", 0x00001, 0x20000, CRC(d525f2a8) SHA1(f3241e11485c7428cd9f081ec6768fda39ae3250) )
 
@@ -2387,7 +2387,7 @@ ROM_START( smgpu1 )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2404,7 +2404,7 @@ ROM_END
     CPU: FD1094 (317-0125a)
 */
 ROM_START( smgpu2 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12561a.58", 0x00000, 0x20000, CRC(e505eb89) SHA1(bfb9a7a8b13ae454a92349e57215562477cd2cd2) )
 	ROM_LOAD16_BYTE( "epr12562a.63", 0x00001, 0x20000, CRC(c3af4215) SHA1(c46829e08d5492515de5d3269b0e899705d0b108) )
 
@@ -2441,7 +2441,7 @@ ROM_START( smgpu2 )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2459,7 +2459,7 @@ ROM_END
 */
 /* very first US version with demo sound on by default */
 ROM_START( smgpu3 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12561.58", 0x00000, 0x20000, CRC(80a32655) SHA1(fe1ffa8af9f1ca175ba90b24a0853329b08d19af) )
 	ROM_LOAD16_BYTE( "epr12562.63", 0x00001, 0x20000, CRC(d525f2a8) SHA1(f3241e11485c7428cd9f081ec6768fda39ae3250) )
 
@@ -2496,7 +2496,7 @@ ROM_START( smgpu3 )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2513,7 +2513,7 @@ ROM_END
     CPU: FD1094 (317-0124a)
 */
 ROM_START( smgpj )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12432b.58", 0x00000, 0x20000, CRC(c1a29db1) SHA1(0122d366899f98f7a60b0c9bddeece7995cebf83) )
 	ROM_LOAD16_BYTE( "epr12433b.63", 0x00001, 0x20000, CRC(97199eb1) SHA1(3baccf8159821d4b4d5caedf5eb691f07372be93) )
 
@@ -2550,7 +2550,7 @@ ROM_START( smgpj )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2567,7 +2567,7 @@ ROM_END
     CPU: FD1094 (317-0124a)
 */
 ROM_START( smgpja )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12432a.58", 0x00000, 0x20000, CRC(22517672) SHA1(db9ac40e83e9786bc9dad70f62c2080d3df694ee) )
 	ROM_LOAD16_BYTE( "epr12433a.63", 0x00001, 0x20000, CRC(a46b5d13) SHA1(3a7de5cb6f3e6d726f0ea886a87125dedc6f849f) )
 
@@ -2604,7 +2604,7 @@ ROM_START( smgpja )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12436.17",    0x00000, 0x10000, CRC(16ec5f0a) SHA1(307b7388b5c36fd4bc2a61f7941db44858e03c5c) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2624,7 +2624,7 @@ ROM_END
     CPU: FD1094 (317-0169b)
 */
 ROM_START( abcop )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-13568b.ic58", 0x00000, 0x20000, CRC(f88db35b) SHA1(7d85c1194a2aa08427333d2ffc2a8d4f7e1beff0) )
 	ROM_LOAD16_BYTE( "epr-13556b.ic63", 0x00001, 0x20000, CRC(337bf32e) SHA1(dafb9d9b3baf79ca76355278e8a14294f186790a) )
 	ROM_LOAD16_BYTE( "epr-13559.ic57",  0x40000, 0x20000, CRC(4588bf19) SHA1(6a8b3d4450ac0bc41b46e6a4e1b44d82112fcd64) )
@@ -2663,7 +2663,7 @@ ROM_START( abcop )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* ground data */
 	ROM_LOAD( "opr-13564.ic40",	 0x00000, 0x10000, CRC(e70ba138) SHA1(85eb6618f408642227056d278f10dec8dcc5a80d) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-13560.ic17",    0x00000, 0x10000, CRC(83050925) SHA1(118710e5789c7999bb7326df4d7bd207cbffdfd4) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2682,7 +2682,7 @@ ROM_END
     IC BD Number: 834-7626-03 (roms are "MPR") / 834-7626-05 (roms are "EPR")
 */
 ROM_START( gprider )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-13408.ic63", 0x00001, 0x20000, NO_DUMP )	/* we have a key for this set but no program roms */
 	ROM_LOAD16_BYTE( "epr-13409.ic58", 0x00000, 0x20000, NO_DUMP )
 
@@ -2721,7 +2721,7 @@ ROM_START( gprider )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */
@@ -2737,7 +2737,7 @@ ROM_END
     IC BD Number: 834-7626-01 (roms are "MPR") / 834-7626-04 (roms are "EPR")
 */
 ROM_START( gprider1 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr-13406.ic63", 0x00001, 0x20000, CRC(122c711f) SHA1(2bcc51347e771a7e7f770e68b24d82497d24aa2e) )
 	ROM_LOAD16_BYTE( "epr-13407.ic58", 0x00000, 0x20000, CRC(03553ebd) SHA1(041a71a2dce2ad56360f500cb11e29a629020160) )
 
@@ -2776,7 +2776,7 @@ ROM_START( gprider1 )
 	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASE00 ) /* road gfx */
 	/* none?? */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
 	ROM_LOAD( "epr-13388.ic17",    0x00000, 0x10000, CRC(706581e4) SHA1(51c9dbf2bf0d6b8826de24cd33596f5c95136870) )
 
 	ROM_REGION( 0x80000, "pcm", ROMREGION_ERASEFF ) /* Sega PCM sound data */

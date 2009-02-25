@@ -453,14 +453,14 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( pntnpuzl )
-	MDRV_CPU_ADD("main", M68000, 12000000)//??
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)//??
 	MDRV_CPU_PROGRAM_MAP(pntnpuzl_map,0)
-	MDRV_CPU_VBLANK_INT("main", pntnpuzl_irq)	// irq1 = coin irq2 = service irq4 = coin
+	MDRV_CPU_VBLANK_INT("screen", pntnpuzl_irq)	// irq1 = coin irq2 = service irq4 = coin
 
 	MDRV_NVRAM_HANDLER(pntnpuzl)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -474,7 +474,7 @@ static MACHINE_DRIVER_START( pntnpuzl )
 MACHINE_DRIVER_END
 
 ROM_START( pntnpuzl )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "pntnpuzl.u2", 0x00001, 0x40000, CRC(dfda3f73) SHA1(cca8ccdd501a26cba07365b1238d7b434559bbc6) )
 	ROM_LOAD16_BYTE( "pntnpuzl.u3", 0x00000, 0x40000, CRC(4173f250) SHA1(516fe6f91b925f71c36b97532608b82e63bda436) )
 ROM_END
@@ -482,7 +482,7 @@ ROM_END
 
 static DRIVER_INIT(pip)
 {
-//  UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+//  UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
 }

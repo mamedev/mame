@@ -273,7 +273,7 @@ static READ8_HANDLER( expram_r )
 
 static ADDRESS_MAP_START( jackie_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("main", 0xf000)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jackie_io_map, ADDRESS_SPACE_IO, 8 )
@@ -461,7 +461,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( jackie )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_12MHz / 2)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(jackie_prg_map,0)
 	MDRV_CPU_IO_MAP(jackie_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(jackie_interrupt,8)
@@ -469,7 +469,7 @@ static MACHINE_DRIVER_START( jackie )
 	MDRV_MACHINE_RESET(jackie)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -528,7 +528,7 @@ Note
 
 */
 ROM_START( jackie )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "jackiev110.u23",   0x0000, 0x10000, CRC(1b78a619) SHA1(a6eb6b6e544efa55225f2e947483614afb6ece3b) )
 
 	ROM_REGION( 0x60000, "gfx1", ROMREGION_DISPOSE )
@@ -555,7 +555,7 @@ static DRIVER_INIT( jackie )
 {
 
 	int A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	for (A = 0;A < 0xf000;A++)
 	{

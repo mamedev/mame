@@ -985,7 +985,7 @@ INPUT_PORTS_END
 static const tms34010_config zunit_tms_config =
 {
 	FALSE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	MEDRES_PIXEL_CLOCK,				/* pixel clock */
 	2,								/* pixels per clock */
 	midyunit_scanline_update,		/* scanline updater */
@@ -997,7 +997,7 @@ static const tms34010_config zunit_tms_config =
 static const tms34010_config yunit_tms_config =
 {
 	FALSE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	STDRES_PIXEL_CLOCK,				/* pixel clock */
 	2,								/* pixels per clock */
 	midyunit_scanline_update,		/* scanline updater */
@@ -1017,7 +1017,7 @@ static const tms34010_config yunit_tms_config =
 static MACHINE_DRIVER_START( zunit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS34010, FAST_MASTER_CLOCK)
+	MDRV_CPU_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
 	MDRV_CPU_CONFIG(zunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
@@ -1028,7 +1028,7 @@ static MACHINE_DRIVER_START( zunit )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MDRV_PALETTE_LENGTH(8192)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(MEDRES_PIXEL_CLOCK*2, 673, 0, 511, 433, 0, 399)
 
@@ -1050,7 +1050,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( yunit_core )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS34010, SLOW_MASTER_CLOCK)
+	MDRV_CPU_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
 	MDRV_CPU_CONFIG(yunit_tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
@@ -1061,7 +1061,7 @@ static MACHINE_DRIVER_START( yunit_core )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(STDRES_PIXEL_CLOCK*2, 505, 0, 399, 289, 0, 253)
 
@@ -1085,7 +1085,7 @@ static MACHINE_DRIVER_START( yunit_cvsd_4bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", TMS34010, FAST_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_cvsd_sound)
 
 	/* video hardware */
@@ -1110,7 +1110,7 @@ static MACHINE_DRIVER_START( yunit_adpcm_6bit_fast )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("main", TMS34010, FAST_MASTER_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", TMS34010, FAST_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_adpcm_sound)
 
 	/* video hardware */
@@ -1123,7 +1123,7 @@ static MACHINE_DRIVER_START( yunit_adpcm_6bit_faster )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
-	MDRV_CPU_REPLACE("main", TMS34010, FASTER_MASTER_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", TMS34010, FASTER_MASTER_CLOCK)
 	MDRV_IMPORT_FROM(williams_adpcm_sound)
 
 	/* video hardware */
@@ -1137,7 +1137,7 @@ static MACHINE_DRIVER_START( mkyawdim )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(yunit_core)
 
-	MDRV_CPU_ADD("audio", Z80, 5000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(yawdim_sound_map,0)
 
 	/* video hardware */
@@ -2056,7 +2056,7 @@ ROM_END
 
 
 ROM_START( mkyawdim )
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound CPU */
 	ROM_LOAD (  "1.u67", 0x00000, 0x10000, CRC(b58d229e) SHA1(3ed14ef650dfa7f9d460611b19e9233a022cbea6) )
 
 	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM */

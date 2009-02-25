@@ -348,13 +348,13 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( mermaid )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, 4000000)	// ???
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	// ???
 	MDRV_CPU_PROGRAM_MAP(mermaid_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -382,7 +382,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( mermaid )
-	ROM_REGION( 0x10000, "main", 0 )       // 64k for code
+	ROM_REGION( 0x10000, "maincpu", 0 )       // 64k for code
 	ROM_LOAD( "g960_32.15",	0x0000, 0x1000, CRC(8311f090) SHA1(c59485a712cf1cd384f03874c693b58e972fe4da) )
 	ROM_LOAD( "g960_33.16",	0x1000, 0x1000, CRC(9f274fc4) SHA1(4098e98c9d95f7e621de061925374154a23c5d35) )
 	ROM_LOAD( "g960_34.17",	0x2000, 0x1000, CRC(5f910179) SHA1(bcf1e24b7584d18f9e85a8b4aec6f03bb1034150) )
@@ -412,7 +412,7 @@ ROM_START( mermaid )
 ROM_END
 
 ROM_START( rougien )
-	ROM_REGION( 0x10000, "main", 0 )       // 64k for code
+	ROM_REGION( 0x10000, "maincpu", 0 )       // 64k for code
 	ROM_LOAD( "rou-00.bin", 0x0000, 0x1000, CRC(14cd1108) SHA1(46657fa4d900936e2a71ad43702d2c43fef09efe) )
 	ROM_LOAD( "rou-01.bin", 0x1000, 0x1000, CRC(ee40670d) SHA1(7c31c3b693999bc1ae42b9f2de1a9883d3db535d) )
 	ROM_LOAD( "rou-02.bin", 0x2000, 0x1000, CRC(5e528f46) SHA1(6bad10bb72eab423b6478e8d5a41e92f0b72793c) )
@@ -452,7 +452,7 @@ ROM_START( rougien )
 ROM_END
 
 ROM_START( yachtmn )
-	ROM_REGION( 0x10000, "main", 0 )       // 64k for code
+	ROM_REGION( 0x10000, "maincpu", 0 )       // 64k for code
 	ROM_LOAD( "mer-1.15",	0x0000, 0x1000, CRC(a102b180) SHA1(f1f029797d09d89c98ffc96b1e57f3ab8e89f35a) )
 	ROM_LOAD( "mer-2.16",	0x1000, 0x1000, CRC(0f2ba7fc) SHA1(5eac8300eb755f5f3a88776dbc5cf7995d2f3c44) )
 	ROM_LOAD( "mer-3.17",	0x2000, 0x1000, CRC(46c22b6b) SHA1(3d6293cf99e9263e986a6046a0f08ee0416a2856) )

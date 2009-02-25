@@ -72,7 +72,7 @@ VIDEO_START( quizdna )
 
 WRITE8_HANDLER( quizdna_bg_ram_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	quizdna_bg_ram[offset] = data;
 	RAM[0x12000+offset] = data;
 
@@ -83,7 +83,7 @@ WRITE8_HANDLER( quizdna_fg_ram_w )
 {
 	int i;
 	int offs = offset & 0xfff;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	RAM[0x10000+offs] = data;
 	RAM[0x11000+offs] = data; /* mirror */

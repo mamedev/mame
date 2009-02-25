@@ -23,7 +23,7 @@ extern VIDEO_UPDATE( rocnrope );
 /* Roc'n'Rope has the IRQ vectors in RAM. The rom contains $FFFF at this address! */
 static WRITE8_HANDLER( rocnrope_interrupt_vector_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 
 	RAM[0xFFF2+offset] = data;
@@ -220,12 +220,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( rocnrope )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -257,7 +257,7 @@ MACHINE_DRIVER_END
 */
 
 ROM_START( rocnrope )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rr1.1h",       0x6000, 0x2000, CRC(83093134) SHA1(c9509cfb9f9043cd6c226cc84dbc2e2b744488f6) )
 	ROM_LOAD( "rr2.2h",       0x8000, 0x2000, CRC(75af8697) SHA1(70bb4b838cdafedf3d94425fad84f77815898d83) )
 	ROM_LOAD( "rr3.3h",       0xa000, 0x2000, CRC(b21372b1) SHA1(c08ab3caaa646f4752f890d8339bce6b723864bb) )
@@ -288,7 +288,7 @@ ROM_START( rocnrope )
 ROM_END
 
 ROM_START( rocnropk )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rnr_h1.vid",   0x6000, 0x2000, CRC(0fddc1f6) SHA1(a9c6c033799883dc45eaa448387d4f0728b9e47e) )
 	ROM_LOAD( "rnr_h2.vid",   0x8000, 0x2000, CRC(ce9db49a) SHA1(7a6ffb65cb65aa90e953706ee67c6ae91322ebf6) )
 	ROM_LOAD( "rnr_h3.vid",   0xa000, 0x2000, CRC(6d278459) SHA1(a1417f158f288b0b0cbffc58f9e22b6c7cdf0fc7) )
@@ -322,14 +322,14 @@ ROM_END
 
 static DRIVER_INIT( rocnrope )
 {
-	UINT8 *decrypted = konami1_decode(machine, "main");
+	UINT8 *decrypted = konami1_decode(machine, "maincpu");
 
 	decrypted[0x703d] = 0x98;	/* fix one instruction */
 }
 
 static DRIVER_INIT( rocnropk )
 {
-	konami1_decode(machine, "main");
+	konami1_decode(machine, "maincpu");
 }
 
 

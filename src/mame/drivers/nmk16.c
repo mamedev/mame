@@ -286,7 +286,7 @@ static WRITE16_HANDLER( macross2_sound_command_w )
 
 static WRITE8_HANDLER( macross2_sound_bank_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0x10000;
 
 	memory_set_bankptr(space->machine, 1,rom + (data & 0x07) * 0x4000);
 }
@@ -1143,7 +1143,7 @@ static WRITE8_HANDLER( okibank_w )
 
 static WRITE8_HANDLER( raphero_sound_rombank_w )
 {
-	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "audio") + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "audiocpu") + 0x10000 + (data & 0x07) * 0x4000);
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3595,12 +3595,12 @@ static INTERRUPT_GEN( nmk_interrupt )
 static MACHINE_DRIVER_START( tharrier )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
 	MDRV_CPU_PROGRAM_MAP(tharrier_readmem,tharrier_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_CPU_ADD("audio", Z80, 3000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(tharrier_sound_readmem,tharrier_sound_writemem)
 	MDRV_CPU_IO_MAP(tharrier_sound_io_map,0)
 
@@ -3608,7 +3608,7 @@ static MACHINE_DRIVER_START( tharrier )
 
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3644,17 +3644,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( manybloc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10? MHz - check */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
 	MDRV_CPU_PROGRAM_MAP(manybloc_readmem,manybloc_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,56)/* this needs to equal the framerate on this, rather than being double it .. */
 
-	MDRV_CPU_ADD("audio", Z80, 3000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(tharrier_sound_readmem,tharrier_sound_writemem)
 	MDRV_CPU_IO_MAP(tharrier_sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3690,7 +3690,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mustang )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mustang_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
@@ -3698,7 +3698,7 @@ static MACHINE_DRIVER_START( mustang )
 	MDRV_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3735,7 +3735,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mustangb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mustangb_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
@@ -3745,7 +3745,7 @@ static MACHINE_DRIVER_START( mustangb )
 	MDRV_MACHINE_RESET(mustang_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3817,7 +3817,7 @@ Notes:
 static MACHINE_DRIVER_START( bioship )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
+	MDRV_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
 	MDRV_CPU_PROGRAM_MAP(bioship_readmem,bioship_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
@@ -3825,7 +3825,7 @@ static MACHINE_DRIVER_START( bioship )
 	MDRV_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3861,7 +3861,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vandyke )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(vandyke_readmem,vandyke_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
@@ -3869,7 +3869,7 @@ static MACHINE_DRIVER_START( vandyke )
 	MDRV_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3905,7 +3905,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vandykeb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(vandyke_readmem,vandyke_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
@@ -3916,7 +3916,7 @@ static MACHINE_DRIVER_START( vandykeb )
 	//MDRV_MACHINE_RESET(NMK004) // no NMK004
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3941,7 +3941,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( acrobatm )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10 MHz (verified on pcb) */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(acrobatm_readmem,acrobatm_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
@@ -3949,7 +3949,7 @@ static MACHINE_DRIVER_START( acrobatm )
 	MDRV_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3987,9 +3987,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tdragonb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(tdragon_readmem,tdragonb_writemem)
-	//MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	//MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
@@ -3998,7 +3998,7 @@ static MACHINE_DRIVER_START( tdragonb )
 	MDRV_MACHINE_RESET(mustang_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4019,16 +4019,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tdragon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_8MHz) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tdragon_readmem,tdragon_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
-	//MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	//MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
 	MDRV_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4065,18 +4065,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ssmissin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 8000000) /* 8 Mhz */
+	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
 	MDRV_CPU_PROGRAM_MAP(ssmissin_readmem,ssmissin_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112) /* input related */
 
-	MDRV_CPU_ADD("audio", Z80, 8000000/2) /* 4 Mhz */
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000/2) /* 4 Mhz */
 	MDRV_CPU_PROGRAM_MAP(ssmissin_sound_readmem,ssmissin_sound_writemem)
 
 	MDRV_MACHINE_RESET(nmk16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4102,7 +4102,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( strahl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000) /* 12 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(strahl_readmem,strahl_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
@@ -4110,7 +4110,7 @@ static MACHINE_DRIVER_START( strahl )
 	MDRV_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4147,15 +4147,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hachamf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(hachamf_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4193,15 +4193,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( macross )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macross_readmem,macross_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
 	MDRV_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4238,15 +4238,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gunnail )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000) /* 12 MHz? */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz? */
 	MDRV_CPU_PROGRAM_MAP(gunnail_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)
 
 	MDRV_MACHINE_RESET(NMK004)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 //  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4283,19 +4283,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( macross2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10 MHz ? */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,macross2_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macross2_sound_readmem,macross2_sound_writemem)
 	MDRV_CPU_IO_MAP(macross2_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(nmk16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4328,19 +4328,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tdragon2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* 10 MHz  */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,macross2_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz  */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz  */
 	MDRV_CPU_PROGRAM_MAP(macross2_sound_readmem,macross2_sound_writemem)
 	MDRV_CPU_IO_MAP(macross2_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(nmk16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4373,18 +4373,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( raphero )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14000000) /* 14 MHz measured */
+	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
 	MDRV_CPU_PROGRAM_MAP(macross2_readmem,raphero_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_CPU_ADD("audio",TMP90841, 8000000)
+	MDRV_CPU_ADD("audiocpu",TMP90841, 8000000)
 	MDRV_CPU_PROGRAM_MAP(raphero_sound_mem_map,0)
 
 	MDRV_MACHINE_RESET(nmk16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56) // measured
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4417,15 +4417,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bjtwin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bjtwin_readmem,bjtwin_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ?? drives music */
 
 	MDRV_MACHINE_RESET(nmk16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4558,8 +4558,8 @@ static void decode_tdragonb(running_machine *machine)
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = memory_region(machine, "main");
-	len = memory_region_length(machine, "main");
+	rom = memory_region(machine, "maincpu");
+	len = memory_region_length(machine, "maincpu");
 	for (A = 0;A < len;A += 2)
 	{
 #ifdef LSB_FIRST
@@ -4623,7 +4623,7 @@ static DRIVER_INIT( nmk )
 
 static DRIVER_INIT( hachamf )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	//rom[0x0006/2] = 0x7dc2;   /* replace reset vector with the "real" one */
 
@@ -4634,7 +4634,7 @@ static DRIVER_INIT( hachamf )
 
 static DRIVER_INIT( tdragonb )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	decode_tdragonb(machine);
 
@@ -4645,7 +4645,7 @@ static DRIVER_INIT( tdragonb )
 
 static DRIVER_INIT( tdragon )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	//rom[0x94b0/2] = 0; /* Patch out JMP to shared memory (protection) */
 	//rom[0x94b2/2] = 0x92f4;
@@ -4679,7 +4679,7 @@ static DRIVER_INIT( bjtwin )
  *  008F7E: 207C 000F 9000           movea.l #$f9000, A0
  */
 #if 0
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	rom[0x09172/2] = 0x6006;    /* patch checksum error */
 	rom[0x08f74/2] = 0x4e71;
 #endif
@@ -4929,15 +4929,15 @@ static const ym2151_interface afega_ym2151_intf =
 static MACHINE_DRIVER_START( stagger1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(afega,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_4MHz) /* verified on pcb */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(afega_sound_cpu,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -5003,15 +5003,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( firehawk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,12000000)
+	MDRV_CPU_ADD("maincpu", M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(afega,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80,4000000)
+	MDRV_CPU_ADD("audiocpu", Z80,4000000)
 	MDRV_CPU_PROGRAM_MAP(firehawk_sound_cpu,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -5042,16 +5042,16 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( twinactn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,12000000)
+	MDRV_CPU_ADD("maincpu", M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(twinactn_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)/* ???????? */
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(twinactn_sound_cpu,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -5089,8 +5089,8 @@ static void decryptcode( running_machine *machine, int a23, int a22, int a21, in
 	int a11, int a10, int a9, int a8, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0 )
 {
 	int i;
-	UINT8 *RAM = memory_region( machine, "main" );
-	size_t  size = memory_region_length( machine, "main" );
+	UINT8 *RAM = memory_region( machine, "maincpu" );
+	size_t  size = memory_region_length( machine, "maincpu" );
 	UINT8 *buffer = malloc_or_die( size );
 
 		memcpy( buffer, RAM, size );
@@ -5105,11 +5105,11 @@ static void decryptcode( running_machine *machine, int a23, int a22, int a21, in
 
 
 ROM_START( vandyke )
-	ROM_REGION( 0x40000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "vdk-1.16",  0x00000, 0x20000, CRC(c1d01c59) SHA1(04a7fd31ca4d87d078070390660edf08bf1d96b5) )
 	ROM_LOAD16_BYTE( "vdk-2.15",  0x00001, 0x20000, CRC(9d741cc2) SHA1(2d101044fba5fc5b7d63869a0a053c42fdc2598b) )
 
-	ROM_REGION(0x10000, "audio", 0 ) /* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* 64k for sound cpu code */
 	ROM_LOAD( "vdk-4.127",    0x00000, 0x10000, CRC(eba544f0) SHA1(36f6d048d15a392542a9220a244d8a7049aaff8b) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -5138,11 +5138,11 @@ ROM_START( vandyke )
 ROM_END
 
 ROM_START( vandyjal )
-	ROM_REGION( 0x40000, "main", 0 )  /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )  /* 68000 code */
 	ROM_LOAD16_BYTE( "vdk-1.16",   0x00000, 0x20000, CRC(c1d01c59) SHA1(04a7fd31ca4d87d078070390660edf08bf1d96b5) )
 	ROM_LOAD16_BYTE( "jaleco2.15", 0x00001, 0x20000, CRC(170e4d2e) SHA1(6009d19d30e345fea93e039d165061e2b20ff058) )
 
-	ROM_REGION(0x10000, "audio", 0 ) /* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* 64k for sound cpu code */
 	ROM_LOAD( "vdk-4.127",    0x00000, 0x10000, CRC(eba544f0) SHA1(36f6d048d15a392542a9220a244d8a7049aaff8b) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -5171,11 +5171,11 @@ ROM_START( vandyjal )
 ROM_END
 
 ROM_START( vandyja2 )
-	ROM_REGION( 0x40000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "vdk-even.16",  0x00000, 0x20000, CRC(cde05a84) SHA1(dab5981d7dad9abe86cfe011da8ca0b11d484a3f) ) /* Hand written labels, dated 2/12 */
 	ROM_LOAD16_BYTE( "vdk-odd.15",   0x00001, 0x20000, CRC(0f6fea40) SHA1(3acbe72c251d51b028d8c66274263a2b39b042ea) )
 
-	ROM_REGION(0x10000, "audio", 0 ) /* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audiocpu", 0 ) /* 64k for sound cpu code */
 	ROM_LOAD( "vdk-4.127",    0x00000, 0x10000, CRC(eba544f0) SHA1(36f6d048d15a392542a9220a244d8a7049aaff8b) )
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
@@ -5204,7 +5204,7 @@ ROM_START( vandyja2 )
 ROM_END
 
 ROM_START( vandykeb )
-	ROM_REGION( 0x40000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "2.bin",  0x00000, 0x20000, CRC(9c269702) SHA1(831ff9d499aa94d85f62b8613477a95f00f62b34) )
 	ROM_LOAD16_BYTE( "1.bin",  0x00001, 0x20000, CRC(dd6303a1) SHA1(3c225ff1696adc1af05b1b36d8cf1f220181861c) )
 
@@ -5236,11 +5236,11 @@ ROM_START( vandykeb )
 ROM_END
 
 ROM_START( tharrier )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2" ,   0x00000, 0x20000, CRC(78923aaa) SHA1(28338f49581180604403e1bd200f524fc4cb8b9f) )
 	ROM_LOAD16_BYTE( "3" ,   0x00001, 0x20000, CRC(99cea259) SHA1(75abfb08b2358dd13809ade5a2dfffeb8b8df82c) )
 
-	ROM_REGION( 0x010000, "audio", 0 )
+	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "12" ,   0x00000, 0x10000, CRC(b959f837) SHA1(073b14935e7d5b0cad19a3471fd26e9e3a363827) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5271,11 +5271,11 @@ ROM_START( tharrier )
 ROM_END
 
 ROM_START( tharierj )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2.bin" ,   0x00000, 0x20000, CRC(f3887a44) SHA1(4e5b660d33ba1d1e00263030efa67e2db376a234) )
 	ROM_LOAD16_BYTE( "3.bin" ,   0x00001, 0x20000, CRC(65c247f6) SHA1(9f35f2b6f54814b4c4d23e2d78db8043e678fef2) )
 
-	ROM_REGION( 0x010000, "audio", 0 )
+	ROM_REGION( 0x010000, "audiocpu", 0 )
 	ROM_LOAD( "12" ,   0x00000, 0x10000, CRC(b959f837) SHA1(073b14935e7d5b0cad19a3471fd26e9e3a363827) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5306,11 +5306,11 @@ ROM_START( tharierj )
 ROM_END
 
 ROM_START( mustang )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2.bin",    0x00000, 0x20000, CRC(bd9f7c89) SHA1(a0af46a8ff82b90bece2515e1bd74e7a7ddf5379) )
 	ROM_LOAD16_BYTE( "3.bin",    0x00001, 0x20000, CRC(0eec36a5) SHA1(c549fbcd3e2741a6d0f2633ded6a85909d37f633) )
 
-	ROM_REGION(0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "90058-7",    0x00000, 0x10000, CRC(920a93c8) SHA1(7660ca419e2fd98848ae7f5994994eaed023151e) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5337,11 +5337,11 @@ ROM_START( mustang )
 ROM_END
 
 ROM_START( mustangs )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "90058-2",    0x00000, 0x20000, CRC(833aa458) SHA1(a9924f7044397e3a36c674b064173ffae80a79ec) )
 	ROM_LOAD16_BYTE( "90058-3",    0x00001, 0x20000, CRC(e4b80f06) SHA1(ce589cebb5ea85c89eb44796b821a4bd0c44b9a8) )
 
-	ROM_REGION(0x10000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION(0x10000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "90058-7",    0x00000, 0x10000, CRC(920a93c8) SHA1(7660ca419e2fd98848ae7f5994994eaed023151e) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5368,14 +5368,14 @@ ROM_START( mustangs )
 ROM_END
 
 ROM_START( mustangb )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "mustang.14",    0x00000, 0x20000, CRC(13c6363b) SHA1(e2c1985d1c8ec9751c47cd7e1b85e007f3aeb6fd) )
 	ROM_LOAD16_BYTE( "mustang.13",    0x00001, 0x20000, CRC(d8ccce31) SHA1(e8e3e34a480fcd298f11833c6c968c5df77c0e2a) )
 
-	ROM_REGION(0x20000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION(0x20000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "mustang.16",    0x00000, 0x8000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "90058-1",    0x00000, 0x20000, CRC(81ccfcad) SHA1(70a0f769c0d4588f6f17bd52cc86a745f30e9f00) )
@@ -5392,7 +5392,7 @@ ROM_START( mustangb )
 ROM_END
 
 ROM_START( acrobatm )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "02_ic100.bin",    0x00000, 0x20000, CRC(3fe487f4) SHA1(29aba5debcfddff14e584a1c7c5a403e85fc6ec0) )
 	ROM_LOAD16_BYTE( "01_ic101.bin",    0x00001, 0x20000, CRC(17175753) SHA1(738865744badb78a0414ff650a94b97e516d0ea0) )
 
@@ -5406,7 +5406,7 @@ ROM_START( acrobatm )
 	ROM_LOAD( "07_ic42.bin",  0x000000, 0x100000, CRC(5672bdaa) SHA1(5401a104d72904de19b73125451767bc63d36809) ) /* Sprites */
 	ROM_LOAD( "08_ic29.bin",  0x100000, 0x080000, CRC(b4c0ace3) SHA1(5d638781d588cfbf4025d002d5a2309049fe1ee5) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "04_ic74.bin",    0x00000, 0x10000, CRC(176905fb) SHA1(135a184f44bedd93b293b9124fa0bd725e0ee93b) )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )	/* OKIM6295 samples */
@@ -5423,7 +5423,7 @@ ROM_START( acrobatm )
 ROM_END
 
 ROM_START( bioship )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2",    0x00000, 0x20000, CRC(acf56afb) SHA1(0e8ec494ab406cfee24cf586059878332265de75) )
 	ROM_LOAD16_BYTE( "1",    0x00001, 0x20000, CRC(820ef303) SHA1(d2ef29557b05abf8ae79a2c7ce0d15a91b36eeff) )
 
@@ -5443,7 +5443,7 @@ ROM_START( bioship )
 	ROM_LOAD16_BYTE( "8.ic27",    0x00000, 0x10000, CRC(75a46fea) SHA1(3d78cfc482b42779bb5aedb722c4a39cbc71bd10) )
 	ROM_LOAD16_BYTE( "9.ic26",    0x00001, 0x10000, CRC(d91448ee) SHA1(7f84ca3605edcab4bf226dab8dd7218cd5c3e5a4) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "6.ic120",    0x00000, 0x10000, CRC(5f39a980) SHA1(2a440f86685249f9c317634cad8cdedc8a8f1491) )
 
 	ROM_REGION(0xa0000, "oki1", 0 )	/* Oki sample data */
@@ -5461,7 +5461,7 @@ ROM_START( bioship )
 ROM_END
 
 ROM_START( sbsgomo )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "11.ic14",    0x00000, 0x20000, CRC(7916150b) SHA1(cbcc8918f35ded5130058860a7af6f1d3ecdbdd8) )
 	ROM_LOAD16_BYTE( "10.ic15",    0x00001, 0x20000, CRC(1d7accb8) SHA1(f80fb8748017e545c96bdc7d964aa18dcd42f528) )
 
@@ -5481,7 +5481,7 @@ ROM_START( sbsgomo )
 	ROM_LOAD16_BYTE( "8.ic27",    0x00000, 0x10000, CRC(75a46fea) SHA1(3d78cfc482b42779bb5aedb722c4a39cbc71bd10) )
 	ROM_LOAD16_BYTE( "9.ic26",    0x00001, 0x10000, CRC(d91448ee) SHA1(7f84ca3605edcab4bf226dab8dd7218cd5c3e5a4) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "6.ic120",    0x00000, 0x10000, CRC(5f39a980) SHA1(2a440f86685249f9c317634cad8cdedc8a8f1491) )
 
 	ROM_REGION(0xa0000, "oki1", 0 )	/* Oki sample data */
@@ -5499,11 +5499,11 @@ ROM_START( sbsgomo )
 ROM_END
 
 ROM_START( blkheart )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "blkhrt.7",  0x00000, 0x20000, CRC(5bd248c0) SHA1(0649f4f8682404aeb3fc80643fcabc2d7836bb23) )
 	ROM_LOAD16_BYTE( "blkhrt.6",  0x00001, 0x20000, CRC(6449e50d) SHA1(d8cd126d921c95478346da96c20da01212395d77) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "4.bin",      0x00000, 0x10000, CRC(7cefa295) SHA1(408f46613b3620cee31dec43281688d231b47ddd) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5529,11 +5529,11 @@ ROM_START( blkheart )
 ROM_END
 
 ROM_START( blkhearj )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "7.bin",  0x00000, 0x20000, CRC(e0a5c667) SHA1(3ef39b2dc1f7ffdddf586f0b3080ecd1f362ec37) )
 	ROM_LOAD16_BYTE( "6.bin",  0x00001, 0x20000, CRC(7cce45e8) SHA1(72491e30d1f9be2eede21fdde5a7484d4f65cfbf) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "4.bin",      0x00000, 0x10000, CRC(7cefa295) SHA1(408f46613b3620cee31dec43281688d231b47ddd) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5559,7 +5559,7 @@ ROM_START( blkhearj )
 ROM_END
 
 ROM_START( tdragon )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code -bitswapped- */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code -bitswapped- */
 	ROM_LOAD16_BYTE( "91070_68k.8",  0x00000, 0x20000, CRC(121c3ae7) SHA1(b88446df3b177d40e0b59a481f8e4de212e3afbc) )
 	ROM_LOAD16_BYTE( "91070_68k.7",  0x00001, 0x20000, CRC(6e154d8e) SHA1(29baea24d670ab63149efe281de25cca15b7b863) )
 
@@ -5572,7 +5572,7 @@ ROM_START( tdragon )
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD16_WORD_SWAP( "91070.4",	0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )	/* Sprites */
 
-	ROM_REGION( 0x010000, "audio", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x010000, "audiocpu", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "91070.1",      0x00000, 0x10000, CRC(bf493d74) SHA1(6f8f5eff4b71fb6cabda10075cfa88a3f607859e) )
 
 	ROM_REGION( 0x0a0000, "oki1", 0 )	/* OKIM6295 samples */
@@ -5589,7 +5589,7 @@ ROM_START( tdragon )
 ROM_END
 
 ROM_START( tdragon1 )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code -bitswapped- */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code -bitswapped- */
 	ROM_LOAD16_BYTE( "thund.8",  0x00000, 0x20000, CRC(edd02831) SHA1(d6bc8d2c37707768a8bf666090f33eea12dda336) )
 	ROM_LOAD16_BYTE( "thund.7",  0x00001, 0x20000, CRC(52192fe5) SHA1(9afef197410e7feb71dc48003e181fbbaf5c99b2) )
 
@@ -5602,7 +5602,7 @@ ROM_START( tdragon1 )
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD16_WORD_SWAP( "91070.4",	0x000000, 0x100000, CRC(3eedc2fe) SHA1(9f48986c231a8fbc07f2b39b2017d1e967b2ed3c) )	/* Sprites */
 
-	ROM_REGION( 0x010000, "audio", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x010000, "audiocpu", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "91070.1",      0x00000, 0x10000, CRC(bf493d74) SHA1(6f8f5eff4b71fb6cabda10075cfa88a3f607859e) )
 
 	ROM_REGION( 0x0a0000, "oki1", 0 )	/* OKIM6295 samples */
@@ -5619,14 +5619,14 @@ ROM_START( tdragon1 )
 ROM_END
 
 ROM_START( tdragonb )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code -bitswapped- */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code -bitswapped- */
 	ROM_LOAD16_BYTE( "td_04.bin",  0x00000, 0x20000, CRC(e8a62d3e) SHA1(dd221bcd80149fffb1bdddfd3d394996bd2f8ec5) )
 	ROM_LOAD16_BYTE( "td_03.bin",  0x00001, 0x20000, CRC(2fa1aa04) SHA1(ddf2b2ff179c31a1677d15d0403b00d77f9f0a6c) )
 
-	ROM_REGION(0x20000, "audio", 0 )	/* 64k for sound cpu code */
+	ROM_REGION(0x20000, "audiocpu", 0 )	/* 64k for sound cpu code */
 	ROM_LOAD( "td_02.bin",    0x00000, 0x8000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "td_08.bin",		0x000000, 0x20000, CRC(5144dc69) SHA1(e64d88dc0e7672f811868621f74ec209aeafbc6f) )	/* 8x8 tiles */
@@ -5644,7 +5644,7 @@ ROM_START( tdragonb )
 ROM_END
 
 ROM_START( ssmissin )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ssm14.165",    0x00001, 0x20000, CRC(eda61b74) SHA1(6247682c27d2be7dff1fad407ccf86fe2a25f11c) )
 	ROM_LOAD16_BYTE( "ssm15.166",    0x00000, 0x20000, CRC(aff15927) SHA1(258c2722ac7ca50360bfefa7b4e621373975a835) )
 
@@ -5659,7 +5659,7 @@ ROM_START( ssmissin )
 	ROM_LOAD16_BYTE( "ssm20.34",		0x000001, 0x080000, CRC(a0c16c4d) SHA1(e198f69b4d8660e33851a2631b5411611b1b2ea6) )	/* 16x16 tiles */
 	ROM_LOAD16_BYTE( "ssm19.33",		0x000000, 0x080000, CRC(b1943657) SHA1(97c05483b634315af338434bd2f565cc151a7283) )	/* 16x16 tiles */
 
-	ROM_REGION( 0x010000, "audio", 0 )		/* Code for Sound CPU */
+	ROM_REGION( 0x010000, "audiocpu", 0 )		/* Code for Sound CPU */
 	ROM_LOAD( "ssm11.188",      0x00000, 0x08000, CRC(8be6dce3) SHA1(d9a235c36e0bc44025c291247d6b0b753e4bc0c8) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )	/* OKIM6295 samples? */
@@ -5672,7 +5672,7 @@ ROM_START( ssmissin )
 ROM_END
 
 ROM_START( airattck )
-	ROM_REGION( 0x40000, "main", 0 )	/* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 Code */
 	ROM_LOAD16_BYTE( "ue10.bin",     0x000000, 0x20000, CRC(71deb9d8) SHA1(21da5a68a13c9017d787e88f7b293f263fbc6b20) )
 	ROM_LOAD16_BYTE( "uc10.bin",     0x000001, 0x20000, CRC(1837d4ba) SHA1(8dd5636a3a75c5d25d8850381e566a150ddc8ef1) )
 
@@ -5687,7 +5687,7 @@ ROM_START( airattck )
 	ROM_LOAD16_BYTE( "7.uo81",     0x000000, 0x80000, CRC(3c38d671) SHA1(f9c9aaa1622ee0c20f569f6048e2b78bd507a1e5) )	/* 16x16 tiles */
 	ROM_LOAD16_BYTE( "8.uo82",     0x000001, 0x80000, CRC(9a83e3d8) SHA1(c765c4d278cc7f54ccdf6f00f8c6902a56abc2b8) )	/* 16x16 tiles */
 
-	ROM_REGION( 0x010000, "audio", 0 )		/* Code for Sound CPU */
+	ROM_REGION( 0x010000, "audiocpu", 0 )		/* Code for Sound CPU */
 	ROM_LOAD( "3.su6",      0x000000, 0x08000, CRC(3e352370) SHA1(6e84881dc0b09a23f8b589431005459adc334c34) )
 
 	ROM_REGION( 0x100000, "oki1", 0 ) /* Samples */
@@ -5722,7 +5722,7 @@ XTALs 8MHz (for 68000/Z80/M6295), 12MHz (for FPGAs)
 */
 
 ROM_START( airattca )
-	ROM_REGION( 0x40000, "main", 0 )	/* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 Code */
 	ROM_LOAD16_BYTE( "6.uc10",     0x000000, 0x20000, CRC(3572baf0) SHA1(0a2fe3be16d95896dc757ef231b3708093fc7ffa) )
 	ROM_LOAD16_BYTE( "5.ue10",     0x000001, 0x20000, CRC(6589c005) SHA1(350a7b8685cacde6b72c10458c33962c5a45a255) )
 
@@ -5737,7 +5737,7 @@ ROM_START( airattca )
 	ROM_LOAD16_BYTE( "7.uo81",     0x000000, 0x80000, CRC(3c38d671) SHA1(f9c9aaa1622ee0c20f569f6048e2b78bd507a1e5) )	/* 16x16 tiles */
 	ROM_LOAD16_BYTE( "8.uo82",     0x000001, 0x80000, CRC(9a83e3d8) SHA1(c765c4d278cc7f54ccdf6f00f8c6902a56abc2b8) )	/* 16x16 tiles */
 
-	ROM_REGION( 0x010000, "audio", 0 )		/* Code for Sound CPU */
+	ROM_REGION( 0x010000, "audiocpu", 0 )		/* Code for Sound CPU */
 	ROM_LOAD( "3.su6",      0x000000, 0x08000, CRC(3e352370) SHA1(6e84881dc0b09a23f8b589431005459adc334c34) )
 
 	ROM_REGION( 0x100000, "oki1", 0 ) /* Samples */
@@ -5751,7 +5751,7 @@ ROM_END
 
 
 ROM_START( strahl )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "strahl-2.82", 0x00000, 0x20000, CRC(c9d008ae) SHA1(e9218a3143d5887e702df051354a9083a806c69c) )
 	ROM_LOAD16_BYTE( "strahl-1.83", 0x00001, 0x20000, CRC(afc3c4d6) SHA1(ab3dd7db692eb01e3a87f4216d322a702f3beaad) )
 
@@ -5769,7 +5769,7 @@ ROM_START( strahl )
 	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "str6b1w1.776", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) /* Tiles */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "strahl-4.66",    0x00000, 0x10000, CRC(60a799c4) SHA1(8ade3cf827a389f7cb4080957dc4d67077ea4166) )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )	/* Oki sample data */
@@ -5782,7 +5782,7 @@ ROM_START( strahl )
 ROM_END
 
 ROM_START( strahla )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom2", 0x00000, 0x20000, CRC(f80a22ef) SHA1(22099eb0bbb445702e0276713c3e48d60de60c30) )
 	ROM_LOAD16_BYTE( "rom1", 0x00001, 0x20000, CRC(802ecbfc) SHA1(cc776023c7bd6b6d6af9659a0c822a2887e50199) )
 
@@ -5800,7 +5800,7 @@ ROM_START( strahla )
 	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE )
 	ROM_LOAD( "str6b1w1.776", 0x000000, 0x80000, CRC(bb1bb155) SHA1(83a02e89180e15f0e7817e0e92b4bf4e209bb69a) ) /* Tiles */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "strahl-4.66",    0x00000, 0x10000, CRC(60a799c4) SHA1(8ade3cf827a389f7cb4080957dc4d67077ea4166) )
 
 	ROM_REGION( 0xa0000, "oki1", 0 )	/* Oki sample data */
@@ -5813,11 +5813,11 @@ ROM_START( strahla )
 ROM_END
 
 ROM_START( hachamf )
-	ROM_REGION( 0x40000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "hmf_07.rom",  0x00000, 0x20000, CRC(9d847c31) SHA1(1d370d8db9cadadb9c2cb213e32f681947d81b7f) )
 	ROM_LOAD16_BYTE( "hmf_06.rom",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* unknown  - sound cpu ?????? */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* unknown  - sound cpu ?????? */
 	ROM_LOAD( "hmf_01.rom",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5840,10 +5840,10 @@ ROM_START( hachamf )
 ROM_END
 
 ROM_START( macross )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "921a03",        0x00000, 0x80000, CRC(33318d55) SHA1(c99f85e09bd334dc8ce138b08cbed2331b0d67dd) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* sound program (unknown CPU) */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* sound program (unknown CPU) */
 	ROM_LOAD( "921a02",      0x00000, 0x10000, CRC(77c082c7) SHA1(be07aa14d0116f830f98e11a19f1debb48a5230e) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5941,11 +5941,11 @@ Other:NMK 111 x3,214 x2,901,903 x2,902,005,004,215,008,009 x2
 */
 
 ROM_START( gunnail )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "3e.bin",  0x00000, 0x40000, CRC(61d985b2) SHA1(96daca603f18accb47f98a3e584b2c84fc5a2ca4) )
 	ROM_LOAD16_BYTE( "3o.bin",  0x00001, 0x40000, CRC(f114e89c) SHA1(a12f5278167f446bb5277e87289c41b5aa365c86) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Code for (unknown?) CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Code for (unknown?) CPU */
 	ROM_LOAD( "92077_2.bin",      0x00000, 0x10000, CRC(cd4e55f8) SHA1(92182767ca0ec37ec4949bd1a88c2efdcdcb60ed) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -5972,10 +5972,10 @@ ROM_START( gunnail )
 ROM_END
 
 ROM_START( macross2 )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "mcrs2j.3",      0x00000, 0x80000, CRC(36a618fe) SHA1(56fdb2bcb4a39888cfbaf9692d66335524a6ac0c) )
 
-	ROM_REGION( 0x30000, "audio", 0 )		/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )		/* Z80 code */
 	ROM_LOAD( "mcrs2j.2",    0x00000, 0x20000, CRC(b4aa8ac7) SHA1(73a6de56cbfb468450d9b39fcbae0362f242f37b) )
 	ROM_RELOAD(              0x10000, 0x20000 )				/* banked */
 
@@ -6001,10 +6001,10 @@ ROM_START( macross2 )
 ROM_END
 
 ROM_START( tdragon2 )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "6.rom",      0x00000, 0x80000, CRC(ca348caf) SHA1(7c5b0b92560baf413591230e061d2d57b25deafe) )
 
-	ROM_REGION( 0x30000, "audio", 0 )		/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )		/* Z80 code */
 	ROM_LOAD( "5.bin",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) )
 	ROM_RELOAD(              0x10000, 0x20000 )				/* banked */
 
@@ -6030,10 +6030,10 @@ ROM_START( tdragon2 )
 ROM_END
 
 ROM_START( tdragn2a )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "6.bin",      0x00000, 0x80000, CRC(310d6bca) SHA1(f46ad1d13cf5014aef1f0e8862b369ab31c22866) )
 
-	ROM_REGION( 0x30000, "audio", 0 )		/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )		/* Z80 code */
 	ROM_LOAD( "5.bin",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) )
 	ROM_RELOAD(              0x10000, 0x20000 )				/* banked */
 
@@ -6059,10 +6059,10 @@ ROM_START( tdragn2a )
 ROM_END
 
 ROM_START( bigbang )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "eprom.3",      0x00000, 0x80000, CRC(28e5957a) SHA1(fe4f870a9c2235cc02b4e036a2a4116f071d59ad) )
 
-	ROM_REGION( 0x30000, "audio", 0 )		/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )		/* Z80 code */
 	ROM_LOAD( "5.bin",    0x00000, 0x20000, CRC(b870be61) SHA1(ea5d45c3a3ab805e55806967f00167cf6366212e) )
 	ROM_RELOAD(              0x10000, 0x20000 )				/* banked */
 
@@ -6150,10 +6150,10 @@ AWA94099-ROME
 */
 
 ROM_START( raphero )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "rhp94099.3",      0x00000, 0x80000, CRC(ec9b4f05) SHA1(e5bd797620dc449fd78b41d87e9ba5a764eb8b44) )
 
-	ROM_REGION( 0x30000, "audio", 0 )		/* tmp90c841 */
+	ROM_REGION( 0x30000, "audiocpu", 0 )		/* tmp90c841 */
 	ROM_LOAD( "rhp94099.2",    0x00000, 0x20000, CRC(fe01ece1) SHA1(c469fb79f2774089848c814f92ddd3c9e384050f) )
 	ROM_RELOAD(                0x10000, 0x20000 )
 
@@ -6185,7 +6185,7 @@ ROM_START( raphero )
 ROM_END
 
 ROM_START( sabotenb )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "ic76.sb1",  0x00000, 0x40000, CRC(b2b0b2cf) SHA1(219f1cefdb107d8404f4f8bfa0700fd3218d9320) )
 	ROM_LOAD16_BYTE( "ic75.sb2",  0x00001, 0x40000, CRC(367e87b7) SHA1(c950041529b5117686e4bb1ae77db82fe758c1d0) )
 
@@ -6206,7 +6206,7 @@ ROM_START( sabotenb )
 ROM_END
 
 ROM_START( sabotnba )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "sb1.76",  0x00000, 0x40000, CRC(df6f65e2) SHA1(6ad9e9f13539310646895c5e7992c6546e75684b) )
 	ROM_LOAD16_BYTE( "sb2.75",  0x00001, 0x40000, CRC(0d2c1ab8) SHA1(abb43a8c5398195c0ad48d8d772ef47635bf25c2) )
 
@@ -6227,7 +6227,7 @@ ROM_START( sabotnba )
 ROM_END
 
 ROM_START( bjtwin )
-	ROM_REGION( 0x80000, "main", 0 )  /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )  /* 68000 code */
 	ROM_LOAD16_BYTE( "93087-1.bin",  0x00000, 0x20000, CRC(93c84e2d) SHA1(ad0755cabfef78e7e689856379d6f8c88a9b27c1) )
 	ROM_LOAD16_BYTE( "93087-2.bin",  0x00001, 0x20000, CRC(30ff678a) SHA1(aa3ce4905e448e371e254545ef9ed7edb00b1cc3) )
 
@@ -6252,7 +6252,7 @@ ROM_START( bjtwin )
 ROM_END
 
 ROM_START( bjtwina )
-	ROM_REGION( 0x80000, "main", 0 )  /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )  /* 68000 code */
 	ROM_LOAD16_BYTE( "93087.1",  0x00000, 0x20000, CRC(c82b3d8e) SHA1(74435ba7842f1be9968006894cfa5eef05c47395) )
 	ROM_LOAD16_BYTE( "93087.2",  0x00001, 0x20000, CRC(9be1ec47) SHA1(bf37d9254a7bbdf49b006971886ed9845d72e4b3) )
 
@@ -6277,7 +6277,7 @@ ROM_START( bjtwina )
 ROM_END
 
 ROM_START( nouryoku )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "ic76.1",  0x00000, 0x40000, CRC(26075988) SHA1(c3d0eef0417be3f78008c026915fd7e2fd589563) )
 	ROM_LOAD16_BYTE( "ic75.2",  0x00001, 0x40000, CRC(75ab82cd) SHA1(fb828f87eebbe9d61766535efc18de9dfded110c) )
 
@@ -6298,11 +6298,11 @@ ROM_START( nouryoku )
 ROM_END
 
 ROM_START( manybloc )
-	ROM_REGION( 0x200000, "main", 0 )		/* 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "1-u33.bin",  0x00001, 0x20000, CRC(07473154) SHA1(e67f637e74dfe5f1be558f963c0b3225254afe33) )
 	ROM_LOAD16_BYTE( "2-u35.bin",  0x00000, 0x20000, CRC(04acd8c1) SHA1(3ef329e8d25565c7f7166f12137f4df5a057022f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80? CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80? CPU */
 	ROM_LOAD( "3-u146.bin",      0x00000, 0x10000, CRC(7bf5fafa) SHA1(d17feca628775860d6c7019a9725bd40fbc5b7d7) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
@@ -6349,11 +6349,11 @@ Parts:
 ***************************************************************************/
 
 ROM_START( stagger1 ) /* Japan only, with later (c) year of 1998 */
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "2.bin", 0x000000, 0x020000, CRC(8555929b) SHA1(b405d81c2a45191111b1a4458ac6b5c0a129b8f1) )
 	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x020000, CRC(5b0b63ac) SHA1(239f793b6845a88d1630da790a2762da730a450d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6395,11 +6395,11 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( redhawk ) /* U.S.A., Canada & South America, (c) 1997 */
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "2", 0x000000, 0x020000, CRC(3ef5f326) SHA1(e89c7c24a05886a14995d7c399958dc00ad35d63) )
 	ROM_LOAD16_BYTE( "3", 0x000001, 0x020000, CRC(9b3a10ef) SHA1(d03480329b23474e5a9e42a75b09d2140eed4443) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6417,11 +6417,11 @@ ROM_START( redhawk ) /* U.S.A., Canada & South America, (c) 1997 */
 ROM_END
 
 ROM_START( redhawke ) /* Excellent Co., Ldt license (no code scramble), (c) 1997 */
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rhawk2.bin", 0x000000, 0x020000, CRC(6d2e23b4) SHA1(54579d460844e022ab61f32bfec28f00f2d27140) )
 	ROM_LOAD16_BYTE( "rhawk3.bin", 0x000001, 0x020000, CRC(5e0d6188) SHA1(c6ce8a3adf940893fcb6281348fdb0cdd65fe654) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6439,7 +6439,7 @@ ROM_START( redhawke ) /* Excellent Co., Ldt license (no code scramble), (c) 1997
 ROM_END
 
 ROM_START( redhawki )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rhit-2.bin", 0x000000, 0x004000, CRC(30cade0e) SHA1(2123ca858bcaed5165739107ccc2830561af0b38) )
 	ROM_CONTINUE(0x20000,0x4000)
 	ROM_CONTINUE(0x10000,0x4000)
@@ -6458,7 +6458,7 @@ ROM_START( redhawki )
 	ROM_CONTINUE(0x18001,0x4000)
 	ROM_CONTINUE(0x38001,0x4000)
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6481,11 +6481,11 @@ static DRIVER_INIT( redhawk )
 }
 
 ROM_START( redhawkb )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rhb-1.bin", 0x000000, 0x020000, CRC(e733ea07) SHA1(b1ffeda633d5e701f0e97c79930a54d7b89a85c5) )
 	ROM_LOAD16_BYTE( "rhb-2.bin", 0x000001, 0x020000, CRC(f9fa5684) SHA1(057ea3eebbaa1a208a72beef21b9368df7032ce1) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6533,11 +6533,11 @@ GST-08.C03   read as 27C160  label = AF1=B1 (Backgrounds?)
 ***************************************************************************/
 
 ROM_START( grdnstrm )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "gst-04.112", 0x000000, 0x040000, CRC(922c931a) SHA1(1d1511033c8c424535a73f5c5bf58560a8b1842e) )
 	ROM_LOAD16_BYTE( "gst-05.107", 0x000001, 0x040000, CRC(d22ca2dc) SHA1(fa21c8ec804570d64f4b167b7f65fd5811435e46) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "gst-01.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6581,11 +6581,11 @@ The pcb might be missing an eprom in a socket
 */
 
 ROM_START( popspops )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "afega4.u112", 0x000000, 0x040000, CRC(db191762) SHA1(901fdc20374473127d694513d4291e29e65eafe8) )
 	ROM_LOAD16_BYTE( "afega5.u107", 0x000001, 0x040000, CRC(17e0c48b) SHA1(833c61c4b3ee293b0bcddfa86dfa9c1014375115) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "afega1.u92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASEFF | ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6619,11 +6619,11 @@ Dumped by Corrado Tomaselli
 */
 
 ROM_START( mangchi )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "afega9.u112", 0x00000, 0x40000, CRC(0b1517a5) SHA1(50e307641759bb2a35aff56ef9598364740803a0) )
 	ROM_LOAD16_BYTE( "afega10.u107", 0x00001, 0x40000, CRC(b1d0f33d) SHA1(68b5be3f7911f7299566c5bf5801e90099433613) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "sound.u92", 0x00000, 0x10000, CRC(bec4f9aa) SHA1(18fb2ee06892983c117a62b70cd72a98f60a08b6) )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6681,11 +6681,11 @@ rom11.107   27C040   /
 ***************************************************************************/
 
 ROM_START( bubl2000 )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom10.112", 0x00000, 0x20000, CRC(87f960d7) SHA1(d22fe1740217ac20963bd9003245850598ccecf2) )
 	ROM_LOAD16_BYTE( "rom11.107", 0x00001, 0x20000, CRC(b386041a) SHA1(cac36e22a39b5be0c5cd54dce5c912ff811edb28) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "rom01.92", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) /* same as the other games on this driver */
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6777,11 +6777,11 @@ Notes:
 */
 
 ROM_START( hotbubl )
-	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "c1.uc1",  0x00001, 0x40000, CRC(7bb240e9) SHA1(99048fa275182c3da3bfb0dedd790f4b5858bd92) )
 	ROM_LOAD16_BYTE( "c2.uc9",  0x00000, 0x40000, CRC(7917b95d) SHA1(0344bae9c373c5943e7693720e5e531bc2e0d7ee) )
 
-	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "s1.uc14", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) ) /* same as the other games on this driver */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
@@ -6852,11 +6852,11 @@ Notes:
 */
 
 ROM_START( firehawk )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 Code */
 	ROM_LOAD16_BYTE( "fhawk_p1.u59", 0x00001, 0x80000, CRC(d6d71a50) SHA1(e947720a0600d049b7ea9486442e1ba5582536c2) )
 	ROM_LOAD16_BYTE( "fhawk_p2.u60", 0x00000, 0x80000, CRC(9f35d245) SHA1(5a22146f16bff7db924550970ed2a3048bc3edab) )
 
-	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "fhawk_s1.u40", 0x00000, 0x20000, CRC(c6609c39) SHA1(fe9b5f6c3ab42c48cb493fecb1181901efabdb58) )
 
 	ROM_REGION( 0x200000, "gfx1",ROMREGION_DISPOSE ) /* Sprites, 16x16x4 */
@@ -6900,11 +6900,11 @@ Note
 */
 
 ROM_START( spec2k )
-	ROM_REGION( 0x80000, "main", 0 )	/* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 68000 Code */
 	ROM_LOAD16_BYTE( "yonatech5.u124", 0x00000, 0x40000, CRC(72ab5c05) SHA1(182a811982b89b8cda0677547ef0625c274f5c6b) )
 	ROM_LOAD16_BYTE( "yonatech6.u120", 0x00001, 0x40000, CRC(7e44bd9c) SHA1(da59685be14a09ec037743fcec34fb293f7d588d) )
 
-	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 Code */
 	ROM_LOAD( "yonatech1.u103", 0x00000, 0x10000, CRC(ef5acda7) SHA1(e55b36a1598ecbbbad984997d61599dfa3958f60) )
 
 	ROM_REGION( 0x200000, "gfx1",ROMREGION_DISPOSE ) /* Sprites, 16x16x4 */
@@ -6956,11 +6956,11 @@ static DRIVER_INIT( spec2k )
 */
 
 ROM_START( twinactn )
-	ROM_REGION( 0x40000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "afega.uj13", 0x00000, 0x20000, CRC(9187701d) SHA1(1da8d1e3969f60c7b0521cd22c723cb51619df9d) )
 	ROM_LOAD16_BYTE( "afega.uj12", 0x00001, 0x20000, CRC(fe8cff9c) SHA1(a1a04deff9e2cb54c69601898cf4e5133c2bc437) )
 
-	ROM_REGION( 0x8000, "audio", 0 )		/* Z80 Code */
+	ROM_REGION( 0x8000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "afega.su6", 0x0000, 0x8000, CRC(3a52dc88) SHA1(87941987d34d93df6df9ff33ccfbd1f5d4a39c51) )	// 1111xxxxxxxxxxx = 0x00
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */

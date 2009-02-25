@@ -76,23 +76,23 @@ extern const ym2203_interface seibu_ym2203_interface;
 
 
 #define SEIBU_SOUND_SYSTEM_CPU(freq)								\
-	MDRV_CPU_ADD("audio", Z80, freq)								\
+	MDRV_CPU_ADD("audiocpu", Z80, freq)								\
 	MDRV_CPU_PROGRAM_MAP(seibu_sound_map,0)							\
 
 #define SEIBU2_SOUND_SYSTEM_CPU(freq)								\
-	MDRV_CPU_ADD("audio", Z80, freq)								\
+	MDRV_CPU_ADD("audiocpu", Z80, freq)								\
 	MDRV_CPU_PROGRAM_MAP(seibu2_sound_map,0)						\
 
 #define SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(freq)						\
-	MDRV_CPU_ADD("audio",  Z80, freq)								\
+	MDRV_CPU_ADD("audiocpu",  Z80, freq)								\
 	MDRV_CPU_PROGRAM_MAP(seibu2_raiden2_sound_map,0)				\
 
 #define SEIBU3_SOUND_SYSTEM_CPU(freq)								\
-	MDRV_CPU_ADD("audio", Z80, freq)								\
+	MDRV_CPU_ADD("audiocpu", Z80, freq)								\
 	MDRV_CPU_PROGRAM_MAP(seibu3_sound_map,0)						\
 
 #define SEIBU3A_SOUND_SYSTEM_CPU(freq)								\
-	MDRV_CPU_ADD("audio", Z80, freq)								\
+	MDRV_CPU_ADD("audiocpu", Z80, freq)								\
 	MDRV_CPU_PROGRAM_MAP(seibu3_adpcm_sound_map,0)					\
 
 #define SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(freq1,freq2)			\

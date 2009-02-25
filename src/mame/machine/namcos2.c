@@ -720,8 +720,8 @@ INTERRUPT_GEN( namcos2_68k_gpu_vblank )
 
 WRITE8_HANDLER( namcos2_sound_bankselect_w )
 {
-	UINT8 *RAM=memory_region(space->machine, "audio");
-	UINT32 max = (memory_region_length(space->machine, "audio") - 0x10000) / 0x4000;
+	UINT8 *RAM=memory_region(space->machine, "audiocpu");
+	UINT32 max = (memory_region_length(space->machine, "audiocpu") - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max;	/* 991104.CAB */
 	memory_set_bankptr(space->machine,  CPU3_ROM1, &RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }

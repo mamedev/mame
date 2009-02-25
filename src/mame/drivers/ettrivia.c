@@ -238,15 +238,15 @@ static INTERRUPT_GEN( ettrivia_interrupt )
 }
 
 static MACHINE_DRIVER_START( ettrivia )
-	MDRV_CPU_ADD("main", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
+	MDRV_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", ettrivia_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", ettrivia_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -276,7 +276,7 @@ static MACHINE_DRIVER_START( ettrivia )
 MACHINE_DRIVER_END
 
 ROM_START( promutrv )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -303,7 +303,7 @@ ROM_START( promutrv )
 ROM_END
 
 ROM_START( promutra )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -330,7 +330,7 @@ ROM_START( promutra )
 ROM_END
 
 ROM_START( promutrb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -361,7 +361,7 @@ ROM_START( promutrb )
 ROM_END
 
 ROM_START( promutrc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u16.u16",      0x0000, 0x8000, CRC(e37d48be) SHA1(1d700cff0c28e50fa2851e0c46de21aa47a23416) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -392,7 +392,7 @@ ROM_START( promutrc )
 ROM_END
 
 ROM_START( strvmstr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "stm16.u16",    0x0000, 0x8000, CRC(ae734db9) SHA1(1bacdfdebaa1f250bfbd49053c3910f1396afe11) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

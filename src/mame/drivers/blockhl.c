@@ -194,11 +194,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( blockhl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI,3000000)		/* Konami custom 052526 */
+	MDRV_CPU_ADD("maincpu", KONAMI,3000000)		/* Konami custom 052526 */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", blockhl_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", blockhl_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 
 	MDRV_MACHINE_RESET(blockhl)
@@ -206,7 +206,7 @@ static MACHINE_DRIVER_START( blockhl )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -234,11 +234,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( blockhl )
-	ROM_REGION( 0x18800, "main", 0 ) /* code + banked roms + space for banked RAM */
+	ROM_REGION( 0x18800, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
 	ROM_LOAD( "973l02.e21", 0x10000, 0x08000, CRC(e14f849a) SHA1(d44cf178cc98998b72ed32c6e20b6ebdf1f97579) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "973d01.g6",  0x0000, 0x8000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
@@ -258,11 +258,11 @@ ROM_START( blockhl )
 ROM_END
 
 ROM_START( quarth )
-	ROM_REGION( 0x18800, "main", 0 ) /* code + banked roms + space for banked RAM */
+	ROM_REGION( 0x18800, "maincpu", 0 ) /* code + banked roms + space for banked RAM */
 	ROM_LOAD( "973j02.e21", 0x10000, 0x08000, CRC(27a90118) SHA1(51309385b93db29b9277d14252166c4ea1746303) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "973d01.g6",  0x0000, 0x8000, CRC(eeee9d92) SHA1(6c6c324b1f6f4fba0aa12e0d1fc5dbab133ef669) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* graphics (addressable by the main CPU) */
@@ -290,7 +290,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "maincpu");
 	int offs;
 
 	/* bits 0-1 = ROM bank */
@@ -317,7 +317,7 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 
 static MACHINE_RESET( blockhl )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	konami_configure_set_lines(machine->cpu[0], blockhl_banking);
 

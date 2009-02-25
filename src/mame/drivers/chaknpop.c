@@ -261,16 +261,16 @@ static MACHINE_DRIVER_START( chaknpop )
 
 	/* basic machine hardware */
 	/* the real board is 3.072MHz, but it is faster for MAME */
-	//MDRV_CPU_ADD("main", Z80, 18432000 / 6)   /* 3.072 MHz */
-	MDRV_CPU_ADD("main", Z80, 2350000)
-	//MDRV_CPU_ADD("main", Z80, 2760000)
+	//MDRV_CPU_ADD("maincpu", Z80, 18432000 / 6)   /* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 2350000)
+	//MDRV_CPU_ADD("maincpu", Z80, 2760000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(chaknpop)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -304,7 +304,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( chaknpop )
-	ROM_REGION( 0x18000, "main", 0 )			/* Main CPU */
+	ROM_REGION( 0x18000, "maincpu", 0 )			/* Main CPU */
 	ROM_LOAD( "a04-01.28",    0x00000, 0x2000, CRC(386fe1c8) SHA1(cca24abfb8a7f439251e7936036475c694002561) )
 	ROM_LOAD( "a04-02.27",    0x02000, 0x2000, CRC(5562a6a7) SHA1(0c5d81f9aaf858f88007a6bca7f83dc3ef59c5b5) )
 	ROM_LOAD( "a04-03.26",    0x04000, 0x2000, CRC(3e2f0a9c) SHA1(f1cf87a4cb07f77104d4a4d369807dac522e052c) )

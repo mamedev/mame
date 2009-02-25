@@ -173,13 +173,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mrjong )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,15468000/6)	/* 2.578 MHz?? */
+	MDRV_CPU_ADD("maincpu", Z80,15468000/6)	/* 2.578 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -211,7 +211,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( mrjong )
-	ROM_REGION( 0x10000, "main", 0 )	/* code */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* code */
 	ROM_LOAD( "mj00", 0x0000, 0x2000, CRC(d211aed3) SHA1(01f252ca1d2399146fa3ed44cb2daa1d5925cae5) )
 	ROM_LOAD( "mj01", 0x2000, 0x2000, CRC(49a9ca7e) SHA1(fc5279ba782da2c8288042bd17282366fcd788cc) )
 	ROM_LOAD( "mj02", 0x4000, 0x2000, CRC(4b50ae6a) SHA1(6fa6bae926c5e4cc154f5f1a6dc7bb7ef5bb484a) )
@@ -227,7 +227,7 @@ ROM_START( mrjong )
 ROM_END
 
 ROM_START( crazyblk )
-	ROM_REGION( 0x10000, "main", 0 )	/* code */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* code */
 	ROM_LOAD( "c1.a6", 0x0000, 0x2000, CRC(e2a211a2) SHA1(5bcf5a0cb25ce5adfb6519c8a3a4ee6e55e1e7de) )
 	ROM_LOAD( "c2.a7", 0x2000, 0x2000, CRC(75070978) SHA1(7f59460c094e596a521014f956d76e5c714022a2) )
 	ROM_LOAD( "c3.a7", 0x4000, 0x2000, CRC(696ca502) SHA1(8ce7e31e9a7161633fee7f28b215e4358d906c4b) )
@@ -243,7 +243,7 @@ ROM_START( crazyblk )
 ROM_END
 
 ROM_START( blkbustr )
-	ROM_REGION( 0x10000, "main", 0 )	/* code */
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* code */
 	ROM_LOAD( "6a.bin", 0x0000, 0x2000, CRC(9e4b426c) SHA1(831360c473ab2452f4d0da12609c96c601e21c17) )
 	ROM_LOAD( "c2.a7",  0x2000, 0x2000, CRC(75070978) SHA1(7f59460c094e596a521014f956d76e5c714022a2) )
 	ROM_LOAD( "8a.bin", 0x4000, 0x2000, CRC(0e803777) SHA1(bccc182ccbd7312fc6545ffcef4d54637416dae7) )

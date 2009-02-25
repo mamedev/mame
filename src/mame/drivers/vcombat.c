@@ -229,15 +229,15 @@ static WRITE16_HANDLER( wiggle_i860p1_pins_w )
 static READ16_HANDLER( main_irqiack_r )
 {
 	//fprintf(stderr, "M0: irq iack\n");
-	cpu_set_input_line(cputag_get_cpu(space->machine, "main"), M68K_IRQ_1, CLEAR_LINE);
-	//cpu_set_input_line(cputag_get_cpu(space->machine, "main"), INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(cputag_get_cpu(space->machine, "maincpu"), M68K_IRQ_1, CLEAR_LINE);
+	//cpu_set_input_line(cputag_get_cpu(space->machine, "maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
 }
 
 static READ16_HANDLER( sound_resetmain_r )
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//cpu_set_input_line(cputag_get_cpu(space->machine, "main"), INPUT_LINE_RESET, PULSE_LINE);
+	//cpu_set_input_line(cputag_get_cpu(space->machine, "maincpu"), INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -419,7 +419,7 @@ static DIRECT_UPDATE_HANDLER( vid_1_direct_handler )
 
 static DRIVER_INIT( vcombat )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* The two i860s execute out of RAM */
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "vid_0", ADDRESS_SPACE_PROGRAM), vid_0_direct_handler);
@@ -531,12 +531,12 @@ INPUT_PORTS_END
 static MC6845_ON_HSYNC_CHANGED(sound_update)
 {
 	/* Seems reasonable */
-	cpu_set_input_line(cputag_get_cpu(device->machine, "sound"), M68K_IRQ_1, hsync ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(cputag_get_cpu(device->machine, "soundcpu"), M68K_IRQ_1, hsync ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",		/* screen we are acting on */
+	"screen",		/* screen we are acting on */
 	16,			/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
@@ -548,9 +548,9 @@ static const mc6845_interface mc6845_intf =
 
 
 static MACHINE_DRIVER_START( vcombat )
-	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	/* The middle board i860 */
 	MDRV_CPU_ADD("vid_0", I860, XTAL_20MHz)
@@ -561,7 +561,7 @@ static MACHINE_DRIVER_START( vcombat )
 	MDRV_CPU_PROGRAM_MAP(vid_1_map,0)
 
 	/* Sound CPU */
-	MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
+	MDRV_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 15000)	/* Remove this if MC6845 is enabled */
 
@@ -571,14 +571,14 @@ static MACHINE_DRIVER_START( vcombat )
 /* Temporary hack for experimenting with timing. */
 #if 0
 	//MDRV_QUANTUM_TIME(HZ(1200))
-	MDRV_QUANTUM_PERFECT_CPU("main")
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 #endif
 
 	/* Disabled for now as it can't handle multiple screens */
 //  MDRV_MC6845_ADD("crtc", MC6845, 6000000 / 16, mc6845_intf)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_12MHz / 2, 400, 0, 256, 291, 0, 208)
 
@@ -596,16 +596,16 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( shadfgtr )
-	MDRV_CPU_ADD("main", M68000, XTAL_12MHz)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)
 
 	/* The middle board i860 */
 	MDRV_CPU_ADD("vid_0", I860, XTAL_20MHz)
 	MDRV_CPU_PROGRAM_MAP(vid_0_map,0)
 
 	/* Sound CPU */
-	MDRV_CPU_ADD("sound", M68000, XTAL_12MHz)
+	MDRV_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( shadfgtr )
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 4 / 16, mc6845_intf)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_20MHz / 4, 320, 0, 256, 277, 0, 224)
 
@@ -627,11 +627,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( vcombat )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ep8v2.b49", 0x00000, 0x80000, CRC(98d5a45d) SHA1(099e314f11c93ad6e642ceaa311e2a5b6fd7193c) )
 	ROM_LOAD16_BYTE( "ep7v2.b51", 0x00001, 0x80000, CRC(06185bcb) SHA1(855b11ae7644d6c7c1c935b2f5aec484071ca870) )
 
-	ROM_REGION( 0x40000, "sound", 0 )
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "ep1v2.b42", 0x00000, 0x20000, CRC(560b2e6c) SHA1(e35c0466a1e14beab080e3155f873e9c2a1c028b) )
 	ROM_LOAD16_BYTE( "ep6v2.b33", 0x00001, 0x20000, CRC(37928a5d) SHA1(7850be26dbd356cdeef2a0d87738de16420f6291) )
 
@@ -657,11 +657,11 @@ ROM_START( vcombat )
 ROM_END
 
 ROM_START( shadfgtr )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "shadfgtr.b49", 0x00000, 0x80000, CRC(2d9d31a1) SHA1(45854915bcb9db2e4076a7f26a0a349077cd10bc) )
 	ROM_LOAD16_BYTE( "shadfgtr.b51", 0x00001, 0x80000, CRC(03d0f075) SHA1(06013a4363305a23d7e8ba8fe2fa961cd540391d) )
 
-	ROM_REGION( 0x40000, "sound", 0 )
+	ROM_REGION( 0x40000, "soundcpu", 0 )
 	ROM_LOAD16_BYTE( "shadfgtr.b42", 0x00000, 0x20000, CRC(f8605dcd) SHA1(1b29f47856ccc757bc96674682ae48f87e6b0e54) )
 	ROM_LOAD16_BYTE( "shadfgtr.b33", 0x00001, 0x20000, CRC(291d59ac) SHA1(cc4904c2ac8ef6a12033c10893246a438ac44014) )
 

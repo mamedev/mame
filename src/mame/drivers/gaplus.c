@@ -541,23 +541,23 @@ static const samples_interface gaplus_samples_interface =
 static MACHINE_DRIVER_START( gaplus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,	24576000/16)	/* 1.536 MHz */
+	MDRV_CPU_ADD("maincpu", M6809,	24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
-	MDRV_CPU_VBLANK_INT("main", gaplus_interrupt_1)
+	MDRV_CPU_VBLANK_INT("screen", gaplus_interrupt_1)
 
 	MDRV_CPU_ADD("sub", M6809,	24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub2", M6809, 24576000/16)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu3,writemem_cpu3)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* a high value to ensure proper synchronization of the CPUs */
 	MDRV_MACHINE_RESET(gaplus)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -587,7 +587,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( gaplus )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64k for the MAIN CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "gp3-4c.8d",    0xa000, 0x2000, CRC(10d7f64c) SHA1(e39f77af16016d28170e4ac1c2a784b0a7ec5454) )
 	ROM_LOAD( "gp3-3c.8c",    0xc000, 0x2000, CRC(962411e8) SHA1(2b6bb2a5d77a837810180391ef6c0ce745bfed64) )
 	ROM_LOAD( "gp3-2d.8b",    0xe000, 0x2000, CRC(ecc01bdb) SHA1(b176b46bd6f2501d3a74ed11186be8411fd1105b) )
@@ -628,7 +628,7 @@ ROM_START( gaplus )
 ROM_END
 
 ROM_START( gapluso )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64k for the MAIN CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "gp2-4.8d",     0xa000, 0x2000, CRC(e525d75d) SHA1(93fcd8b940491abf6344181811d0b35765d7e45c) )
 	ROM_LOAD( "gp2-3b.8c",    0xc000, 0x2000, CRC(d77840a4) SHA1(81402b28a2d5ac2d1301252534afa0cb65d7e162) )
 	ROM_LOAD( "gp2-2b.8b",    0xe000, 0x2000, CRC(b3cb90db) SHA1(025c2f3978772e1ecbbf36842dc7c2203ee91a1f) )
@@ -669,7 +669,7 @@ ROM_START( gapluso )
 ROM_END
 
 ROM_START( gaplusa )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64k for the MAIN CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "gp2-4b.8d",    0xa000, 0x2000, CRC(484f11e0) SHA1(659756ae183dac3817440c8975f203c7dbe08c6b) )
 	ROM_LOAD( "gp2-3c.8c",    0xc000, 0x2000, CRC(a74b0266) SHA1(a534c6b4af569ed545bf52769c7d5ceb5f2c4935) )
 	ROM_LOAD( "gp2-2d.8b",    0xe000, 0x2000, CRC(69fdfdb7) SHA1(aec611336b8767897ad493d581d70b1f0e75aeba) )
@@ -710,7 +710,7 @@ ROM_START( gaplusa )
 ROM_END
 
 ROM_START( galaga3 )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64k for the MAIN CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "gp3-4c.8d",    0xa000, 0x2000, CRC(10d7f64c) SHA1(e39f77af16016d28170e4ac1c2a784b0a7ec5454) )
 	ROM_LOAD( "gp3-3c.8c",    0xc000, 0x2000, CRC(962411e8) SHA1(2b6bb2a5d77a837810180391ef6c0ce745bfed64) )
 	ROM_LOAD( "gp3-2c.8b",    0xe000, 0x2000, CRC(f72d6fc5) SHA1(7031c4a2c4374fb786fc563cbad3e3de0dbaa8d2) )
@@ -748,7 +748,7 @@ ROM_START( galaga3 )
 ROM_END
 
 ROM_START( galaga3a )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64k for the MAIN CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "gal3_9e.bin",  0xa000, 0x2000, CRC(f4845e7f) SHA1(7b1377254f594bea4a8ffc7e388d9106e0266b55) )
 	ROM_LOAD( "gal3_9d.bin",  0xc000, 0x2000, CRC(86fac687) SHA1(07f76af524dbb3e79de41ef4bf32e7380776d9f5) )
 	ROM_LOAD( "gal3_9c.bin",  0xe000, 0x2000, CRC(f1b00073) SHA1(5d998d938251f173cedf742b95d02cc0a2b9d3be) )
@@ -786,7 +786,7 @@ ROM_START( galaga3a )
 ROM_END
 
 ROM_START( galaga3m )
-	ROM_REGION( 0x10000, "main", 0 ) /* 64k for the MAIN CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
 	ROM_LOAD( "m1.9e",        0xa000, 0x2000, CRC(e392704e) SHA1(8eebd48dfe8491f491e844d4ad0964e25efb013b) )
 	ROM_LOAD( "gal3_9d.bin",  0xc000, 0x2000, CRC(86fac687) SHA1(07f76af524dbb3e79de41ef4bf32e7380776d9f5) )
 	ROM_LOAD( "gal3_9c.bin",  0xe000, 0x2000, CRC(f1b00073) SHA1(5d998d938251f173cedf742b95d02cc0a2b9d3be) )

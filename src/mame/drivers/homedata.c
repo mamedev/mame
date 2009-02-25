@@ -301,7 +301,7 @@ static READ8_HANDLER( mrokumei_sound_io_r )
 	if (sndbank & 4)
 		return(soundlatch_r(space,0));
 	else
-		return memory_region(space->machine, "audio")[0x10000 + offset + (sndbank & 1) * 0x10000];
+		return memory_region(space->machine, "audiocpu")[0x10000 + offset + (sndbank & 1) * 0x10000];
 }
 
 static WRITE8_HANDLER( mrokumei_sound_bank_w )
@@ -367,7 +367,7 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 //  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n",cpu_get_pc(space->cpu),data,BIT(data,2),BIT(data,6));
 
 
-	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audio") + 0x10000 * (data & 0x03));
+	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audiocpu") + 0x10000 * (data & 0x03));
 
 	coin_counter_w(0,~data & 0x80);
 
@@ -523,7 +523,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 //  logerror("%04x: port C wr %02x\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audio") + 0x10000 * ((data & 0x0c) >> 2));
+	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audiocpu") + 0x10000 * ((data & 0x0c) >> 2));
 
 	coin_counter_w(0,~data & 0x80);
 
@@ -546,8 +546,8 @@ static MACHINE_RESET( pteacher_upd7807 )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "main");
-	int len = memory_region_length(space->machine, "main") - 0x10000+0x4000;
+	UINT8 *rom = memory_region(space->machine, "maincpu");
+	int len = memory_region_length(space->machine, "maincpu") - 0x10000+0x4000;
 	int offs = (data * 0x4000) & (len-1);
 
 	/* last bank is fixed */
@@ -1210,16 +1210,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mrokumei )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mrokumei_readmem,mrokumei_writemem)
-	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
+	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
-	MDRV_CPU_ADD("audio", Z80, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mrokumei_sound_readmem,mrokumei_sound_writemem)
 	MDRV_CPU_IO_MAP(mrokumei_sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1273,22 +1273,22 @@ static const UPD7810_CONFIG upd_config =
 static MACHINE_DRIVER_START( reikaids )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(reikaids_readmem,reikaids_writemem)
-	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
+	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
-	MDRV_CPU_ADD("audio", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
+	MDRV_CPU_ADD("audiocpu", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_readmem,reikaids_upd7807_writemem)
 	MDRV_CPU_IO_MAP(reikaids_upd7807_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
+	MDRV_CPU_VBLANK_INT("screen", upd7807_irq)
 
 	MDRV_QUANTUM_TIME(HZ(30000))	// very high interleave required to sync for startup tests
 
 	MDRV_MACHINE_RESET(reikaids_upd7807)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1323,22 +1323,22 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pteacher )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 16000000/4)	/* 4MHz ? */
+	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(pteacher_readmem,pteacher_writemem)
-	MDRV_CPU_VBLANK_INT("main", homedata_irq)	/* also triggered by the blitter */
+	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
-	MDRV_CPU_ADD("audio", UPD7807, 9000000)	/* 9MHz ? */
+	MDRV_CPU_ADD("audiocpu", UPD7807, 9000000)	/* 9MHz ? */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_readmem,pteacher_upd7807_writemem)
 	MDRV_CPU_IO_MAP(pteacher_upd7807_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
+	MDRV_CPU_VBLANK_INT("screen", upd7807_irq)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	// should be enough
 
 	MDRV_MACHINE_RESET(pteacher_upd7807)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1368,7 +1368,7 @@ static MACHINE_DRIVER_START( mjkinjas )
 
 	MDRV_IMPORT_FROM(pteacher)
 
-	MDRV_CPU_REPLACE("audio", UPD7807, 11000000)	/* 11MHz ? */
+	MDRV_CPU_REPLACE("audiocpu", UPD7807, 11000000)	/* 11MHz ? */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( lemnangl )
@@ -1387,10 +1387,10 @@ MACHINE_DRIVER_END
 
 
 ROM_START( hourouki )
-	ROM_REGION( 0x010000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x77f01.bin", 0x08000, 0x8000, CRC(cd3197b8) SHA1(7dad9ce57a83d675a8a9a4e06df360c22100fe4b) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
 	ROM_LOAD( "x77a10.bin", 0x00000, 0x20000, CRC(dc1d616b) SHA1(93b8dfe1566556e9621c0d5f3998b31874f74a28) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -1410,10 +1410,10 @@ ROM_START( hourouki )
 ROM_END
 
 ROM_START( mhgaiden )
-	ROM_REGION( 0x010000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x72e01.bin", 0x08000, 0x8000, CRC(98cfa53e) SHA1(dd08f5f9ff9d4a9e01e531247fcb17a8407ca8b6) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
 	ROM_LOAD( "x72b10.bin", 0x00000, 0x20000, CRC(00ebbc45) SHA1(9e7ade202bf37a86153a38d705ae26a72732d2bb) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -1433,10 +1433,10 @@ ROM_START( mhgaiden )
 ROM_END
 
 ROM_START( mjhokite )
-	ROM_REGION( 0x010000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "a74_g01.6g", 0x08000, 0x8000, CRC(409cc501) SHA1(6e9ab81198a5a54489cca8b6dcafb67995351207) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
 	ROM_LOAD( "a74_a10.11k", 0x00000, 0x20000, CRC(2252f3ec) SHA1(018aaad087354b05b120aa42db572ed13f690f88) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 
@@ -1458,10 +1458,10 @@ ROM_START( mjhokite )
 ROM_END
 
 ROM_START( mjclinic )
-	ROM_REGION( 0x010000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x80_g01.6g", 0x08000, 0x8000, CRC(787b4fb5) SHA1(d1708979d209113b604f6d0973fe14a0c4348351) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
 	ROM_LOAD( "x80_a10.11k", 0x00000, 0x20000, CRC(afedbadf) SHA1(e2f101b59c0d23f9dc9b057c41d496fc3223cbb8) )
 	ROM_RELOAD(              0x10000, 0x20000 )
 
@@ -1483,10 +1483,10 @@ ROM_START( mjclinic )
 ROM_END
 
 ROM_START( mrokumei )
-	ROM_REGION( 0x010000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x010000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "m81d01.bin", 0x08000, 0x8000, CRC(6f81a78a) SHA1(5e16327b04b065ed4e39a147b18711902dba6384) )
 
-	ROM_REGION( 0x30000, "audio", 0 )	/* Z80 code */
+	ROM_REGION( 0x30000, "audiocpu", 0 )	/* Z80 code */
 	ROM_LOAD( "m81a10.bin", 0x00000, 0x20000, CRC(0866b2d3) SHA1(37a726830476e372db906382e1d0601c461c7c10) )
 	ROM_RELOAD(             0x10000, 0x20000 )
 
@@ -1509,11 +1509,11 @@ ROM_END
 
 
 ROM_START( reikaids )
-	ROM_REGION( 0x02c000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x02c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "j82c01.bin", 0x010000, 0x01c000, CRC(50fcc451) SHA1(ad717b8300f0903ef136569cf933b8af0e67eb6b) )
 	ROM_CONTINUE(           0x00c000, 0x004000             )
 
-	ROM_REGION( 0x40000, "audio", 0) /* uPD7807 code */
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
 	ROM_LOAD( "x82a04.bin", 0x000000, 0x040000, CRC(52c9028a) SHA1(9d5e37b2f741d5c0e64ba3d674a72330058b96f2) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1545,11 +1545,11 @@ ROM_END
 
 
 ROM_START( battlcry )
-	ROM_REGION( 0x02c000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x02c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "s88e01.j13", 0x010000, 0x01c000, CRC(b08438fe) SHA1(41a0fcdabee449081840848c45983984d7153d1b) )
 	ROM_CONTINUE(           0x00c000, 0x004000             )
 
-	ROM_REGION( 0x40000, "audio", 0) /* uPD7807 code */
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
 	ROM_LOAD( "s88b04.f20", 0x000000, 0x040000, CRC(c54b5a5e) SHA1(421082af349b170d74f5214d8b5eed44db472749) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1582,11 +1582,11 @@ ROM_END
 
 
 ROM_START( mjkojink )
-	ROM_REGION( 0x01c000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x83j01.16e", 0x010000, 0xc000, CRC(91f90376) SHA1(d452f538f4a1b774640ced49f0ab2784b112e8ba) )
 	ROM_CONTINUE(           0x00c000, 0x4000             )
 
-	ROM_REGION( 0x40000, "audio", 0) /* uPD7807 code */
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
 	ROM_LOAD( "x83b02.9g",  0x00000, 0x40000, CRC(46a11578) SHA1(4ff7797808610b4bb0550be71acc49bbd8556fad) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1610,11 +1610,11 @@ ROM_START( mjkojink )
 ROM_END
 
 ROM_START( vitaminc )
-	ROM_REGION( 0x01c000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x90e01.bin", 0x010000, 0xc000, CRC(bc982525) SHA1(30f5e9ab27f799b895a3d979109e331603d94249) )
 	ROM_CONTINUE(           0x00c000, 0x4000             )
 
-	ROM_REGION( 0x40000, "audio", 0) /* uPD7807 code */
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
 	ROM_LOAD( "x90a02.bin", 0x00000, 0x40000, CRC(811f540a) SHA1(21993e99835a8995da28c24565b8e5dcc7aeb23e) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1638,11 +1638,11 @@ ROM_START( vitaminc )
 ROM_END
 
 ROM_START( mjyougo )
-	ROM_REGION( 0x01c000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x91c01.bin", 0x010000, 0xc000, CRC(e28e8c21) SHA1(8039d764fb48269f0cab549c5a8861c05ecb1ef1) )
 	ROM_CONTINUE(           0x00c000, 0x4000             )
 
-	ROM_REGION( 0x40000, "audio", 0) /* uPD7807 code */
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
 	ROM_LOAD( "x91a02.bin", 0x00000, 0x40000, CRC(995b1399) SHA1(262f3d7ccffdaa578466d390d790f89186b3c993) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1666,11 +1666,11 @@ ROM_START( mjyougo )
 ROM_END
 
 ROM_START( mjkinjas )
-	ROM_REGION( 0x01c000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x07c01.bin", 0x010000, 0xc000, CRC(e6534904) SHA1(59c092f0369fc893763ad4b96551e0b4c2430a6a) )
 	ROM_CONTINUE(           0x00c000, 0x4000             )
 
-	ROM_REGION( 0x40000, "audio", 0) /* uPD7807 code */
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
 	ROM_LOAD( "x07a02.bin", 0x00000, 0x40000, CRC(31396a5b) SHA1(c444f0a651da70c050a4c69bd09c31fc80dbf1de) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1694,11 +1694,11 @@ ROM_START( mjkinjas )
 ROM_END
 
 ROM_START( jogakuen )
-	ROM_REGION( 0x01c000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "a01.bin",    0x010000, 0xc000, CRC(a189490a) SHA1(0d9f6389d4b16c3b885cdc8be20b19db25812aad) )
 	ROM_CONTINUE(           0x00c000, 0x4000             )
 
-	ROM_REGION( 0x40000, "audio", 0) /* uPD7807 code */
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
 	ROM_LOAD( "a02.bin",    0x00000, 0x40000, CRC(033add6c) SHA1(fc6b9333722228ba4270b1ba520e32e624b251c2) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
@@ -1723,11 +1723,11 @@ ROM_END
 
 
 ROM_START( lemnangl )
-	ROM_REGION( 0x01c000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "x02_d01.16e", 0x010000, 0xc000, CRC(4c2fae05) SHA1(86516399bd1eb1565b446dfa0f9a974bde6f9af2) )
 	ROM_CONTINUE(            0x00c000, 0x4000             )
 
-	ROM_REGION( 0x40000, "audio", 0) /* uPD7807 code */
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
 	ROM_LOAD( "x02a02.9g",  0x00000, 0x40000, CRC(e9aa8c80) SHA1(6db1345e20d53d8c69cebcac3b2a973fbcaa0e63) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -1751,11 +1751,11 @@ ROM_START( lemnangl )
 ROM_END
 
 ROM_START( mjikaga )
-	ROM_REGION( 0x01c000, "main", 0 ) /* 6809 Code */
+	ROM_REGION( 0x01c000, "maincpu", 0 ) /* 6809 Code */
 	ROM_LOAD( "m15a01.bin", 0x010000, 0xc000, CRC(938cc4fb) SHA1(f979c6eee0b72bf53be8c7ebbc4e1dc05bd447d4) )
 	ROM_CONTINUE(           0x00c000, 0x4000             )
 
-	ROM_REGION( 0x40000, "audio", 0) /* uPD7807 code */
+	ROM_REGION( 0x40000, "audiocpu", 0) /* uPD7807 code */
 	ROM_LOAD( "m15a02.bin", 0x00000, 0x40000, CRC(375933dd) SHA1(e813f02e53dc892714cd0e81301606600b72535c) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )

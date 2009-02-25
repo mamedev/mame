@@ -121,7 +121,7 @@ static WRITE8_HANDLER( wc90b_shared_w )
 static WRITE8_HANDLER( wc90b_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -383,20 +383,20 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( wc90b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_14MHz/2)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map1,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(wc90b_map2,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, XTAL_19_6608MHz/8)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_19_6608MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -422,7 +422,7 @@ static MACHINE_DRIVER_START( wc90b )
 MACHINE_DRIVER_END
 
 ROM_START( wc90b1 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )	/* c000-ffff is not used */
 	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )	/* banked at f000-f7ff */
 
@@ -430,7 +430,7 @@ ROM_START( wc90b1 )
 	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )	/* c000-ffff is not used */
 	ROM_LOAD( "a05.bin",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x18000, "audio", 0 )
+	ROM_REGION( 0x18000, "audiocpu", 0 )
 	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 
@@ -465,7 +465,7 @@ ROM_START( wc90b1 )
 ROM_END
 
 ROM_START( wc90b2 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a02",          0x00000, 0x10000, CRC(1e6e94c9) SHA1(1731e3e3b5d17ba676a7e42638d7206212a0080d) )	/* c000-ffff is not used */
 	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )	/* banked at f000-f7ff */
 
@@ -473,7 +473,7 @@ ROM_START( wc90b2 )
 	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )	/* c000-ffff is not used */
 	ROM_LOAD( "a05.bin",      0x10000, 0x10000, CRC(9e421c4b) SHA1(e23a1f1d5d1e960696f45df653869712eb889839) )	/* banked at f000-f7ff */
 
-	ROM_REGION( 0x18000, "audio", 0 )
+	ROM_REGION( 0x18000, "audiocpu", 0 )
 	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 
@@ -519,7 +519,7 @@ probably just a minor text mod from the supported set (only two bytes differs), 
     00000591: FF FA
 */
 ROM_START( wc90ba )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )	/* c000-ffff is not used */
 	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )	/* banked at f000-f7ff */
 
@@ -527,7 +527,7 @@ ROM_START( wc90ba )
 	ROM_LOAD( "a04.bin",              0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )	/* c000-ffff is not used */
 	ROM_LOAD( "el_ic98_27c512_05.bin",0x10000, 0x10000, CRC(c70d8c13) SHA1(365718725ea7d0355c68ba703b7f9624cb1134bc) )
 
-	ROM_REGION( 0x18000, "audio", 0 )
+	ROM_REGION( 0x18000, "audiocpu", 0 )
 	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 

@@ -402,12 +402,12 @@ static const ym2610_interface ym2610_config =
 };
 
 static MACHINE_DRIVER_START( drill )
-	MDRV_CPU_ADD("main", M68000, 16000000 )
+	MDRV_CPU_ADD("maincpu", M68000, 16000000 )
 	MDRV_CPU_PROGRAM_MAP(drill_map,0)
-	MDRV_CPU_VBLANK_INT("main", drill_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", drill_interrupt)
 	MDRV_GFXDECODE(2mindril)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -430,7 +430,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( 2mindril )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "d58-38.ic11", 0x00000, 0x40000, CRC(c58e8e4f) SHA1(648db679c3bfb5de1cd6c1b1217773a2fe56f11b) )
 	ROM_LOAD16_BYTE( "d58-37.ic9",  0x00001, 0x40000, CRC(19e5cc3c) SHA1(04ac0eef893c579fe90d91d7fd55c5741a2b7460) )
 
@@ -450,7 +450,7 @@ static DRIVER_INIT( drill )
 	// rearrange gfx roms to something we can decode, two of the roms form 4bpp of the graphics, the third forms another 2bpp but is in a different format
 	UINT32 *src = (UINT32*)memory_region( machine, "gfx2" );
 	UINT32 *dst = (UINT32*)memory_region( machine, "gfx1" );// + 0x400000;
-//  UINT8 *rom = memory_region( machine, "main" );
+//  UINT8 *rom = memory_region( machine, "maincpu" );
 	int i;
 
 	for (i=0; i< 0x400000/4; i++)

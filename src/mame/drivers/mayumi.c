@@ -31,7 +31,7 @@ static INTERRUPT_GEN( mayumi_interrupt )
 
 static WRITE8_HANDLER( bank_sel_w )
 {
-	UINT8 *BANKROM = memory_region(space->machine, "main");
+	UINT8 *BANKROM = memory_region(space->machine, "maincpu");
 	int bank = ((data & 0x80)) >> 7 | ((data & 0x40) >> 5);
 	memory_set_bankptr(space->machine, 1, &BANKROM[0x10000+bank*0x4000]);
 
@@ -278,15 +278,15 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( mayumi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 5.000 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 5.000 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", mayumi_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", mayumi_interrupt)
 
 	MDRV_MACHINE_RESET( mayumi )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -317,10 +317,10 @@ MACHINE_DRIVER_END
 /****************************************************************************/
 
 ROM_START( mayumi )
-	ROM_REGION( 0x20000, "main", 0 ) /* CPU */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* CPU */
 	ROM_LOAD( "my00.bin",  0x00000, 0x08000, CRC(33189e37) SHA1(cbf75f56360ef7da5b7b1207b58cd0d72bcaf207) )
 	ROM_LOAD( "my01.bin",  0x10000, 0x10000, CRC(5280fb39) SHA1(cee7653f4353031701ec1608881b37073b178d9f) ) // Banked
-	ROM_COPY( "main", 0x10000, 0x08000, 0x4000 )
+	ROM_COPY( "maincpu", 0x10000, 0x08000, 0x4000 )
 
 	ROM_REGION( 0x30000, "gfx1", ROMREGION_DISPOSE ) /* gfx */
 	ROM_LOAD( "my10.bin", 0x00000, 0x10000, CRC(3b4f4f97) SHA1(50bda1484e965f15630bd2e05861d74ddeb0d88e) )

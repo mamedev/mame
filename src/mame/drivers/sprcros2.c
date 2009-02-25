@@ -86,7 +86,7 @@ static WRITE8_HANDLER( sprcros2_sharedram_w )
 
 static WRITE8_HANDLER( sprcros2_m_port7_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	//76543210
 	//x------- unused
@@ -107,7 +107,7 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 
 static WRITE8_HANDLER( sprcros2_s_port3_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 
 	//76543210
 	//xxxx---- unused
@@ -295,12 +295,12 @@ static MACHINE_START( sprcros2 )
 static MACHINE_DRIVER_START( sprcros2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,10000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,10000000/2)
 	MDRV_CPU_PROGRAM_MAP(sprcros2_m_readmem,sprcros2_m_writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_m_interrupt,2)	//1 nmi + 1 irq
 
-	MDRV_CPU_ADD("audio", Z80,10000000/2)
+	MDRV_CPU_ADD("audiocpu", Z80,10000000/2)
 	MDRV_CPU_PROGRAM_MAP(sprcros2_s_readmem,sprcros2_s_writemem)
 	MDRV_CPU_IO_MAP(audio_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_s_interrupt,2)	//2 nmis
@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( sprcros2 )
 	MDRV_MACHINE_START(sprcros2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -336,14 +336,14 @@ static MACHINE_DRIVER_START( sprcros2 )
 MACHINE_DRIVER_END
 
 ROM_START( sprcros2 )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "scm-03.10g", 0x00000, 0x4000, CRC(b9757908) SHA1(d59cb2aac1b6268fc766306850f5711d4a12d897) )
 	ROM_LOAD( "scm-02.10j", 0x04000, 0x4000, CRC(849c5c87) SHA1(0e02c4990e371d6a290efa53301818e769648945) )
 	ROM_LOAD( "scm-01.10k", 0x08000, 0x4000, CRC(385a62de) SHA1(847bf9d97ab3fa8949d9198e4e509948a940d6aa) )
 
 	ROM_LOAD( "scm-00.10l", 0x10000, 0x4000, CRC(13fa3684) SHA1(611b7a237e394f285dcc5beb027dacdbdd58a7a0) )	//banked into c000-dfff
 
-	ROM_REGION( 0x14000, "audio", 0 )
+	ROM_REGION( 0x14000, "audiocpu", 0 )
 	ROM_LOAD( "scs-30.5f",  0x00000, 0x4000, CRC(c0a40e41) SHA1(e74131b353855749258dffa45091c825ccdbf05a) )
 	ROM_LOAD( "scs-29.5h",  0x04000, 0x4000, CRC(83d49fa5) SHA1(7112110df2f382bbc0e651adcec975054a485b9b) )
 	ROM_LOAD( "scs-28.5j",  0x08000, 0x4000, CRC(480d351f) SHA1(d1b86f441ae0e58b30e0f089ab25de219d5f30e3) )
@@ -373,14 +373,14 @@ ROM_END
 
 /* this is probably an old revision */
 ROM_START( sprcrs2a )
-	ROM_REGION( 0x14000, "main", 0 )
+	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "15.bin",     0x00000, 0x4000, CRC(b9d02558) SHA1(775404c6c7648d9dab02b496541739ea700cd481) )
 	ROM_LOAD( "scm-02.10j", 0x04000, 0x4000, CRC(849c5c87) SHA1(0e02c4990e371d6a290efa53301818e769648945) )
 	ROM_LOAD( "scm-01.10k", 0x08000, 0x4000, CRC(385a62de) SHA1(847bf9d97ab3fa8949d9198e4e509948a940d6aa) )
 
 	ROM_LOAD( "scm-00.10l", 0x10000, 0x4000, CRC(13fa3684) SHA1(611b7a237e394f285dcc5beb027dacdbdd58a7a0) )	//banked into c000-dfff
 
-	ROM_REGION( 0x14000, "audio", 0 )
+	ROM_REGION( 0x14000, "audiocpu", 0 )
 	ROM_LOAD( "scs-30.5f",  0x00000, 0x4000, CRC(c0a40e41) SHA1(e74131b353855749258dffa45091c825ccdbf05a) )
 	ROM_LOAD( "scs-29.5h",  0x04000, 0x4000, CRC(83d49fa5) SHA1(7112110df2f382bbc0e651adcec975054a485b9b) )
 	ROM_LOAD( "scs-28.5j",  0x08000, 0x4000, CRC(480d351f) SHA1(d1b86f441ae0e58b30e0f089ab25de219d5f30e3) )

@@ -444,18 +444,18 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( gpworld )
 
 	/* main cpu */
-	MDRV_CPU_ADD("main", Z80, GUESSED_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_callback_gpworld)
+	MDRV_CPU_VBLANK_INT("screen", vblank_callback_gpworld)
 
 	MDRV_MACHINE_START(gpworld)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(gpworld, 512, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_GFXDECODE(gpworld)
 	MDRV_PALETTE_LENGTH(1024)
@@ -470,7 +470,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( gpworld )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "epr6162a.ic51", 0x0000, 0x4000, CRC(70e42574) SHA1(2fa50c7a67a2efb6b2c313850ace40e42d18b0a8) )
 	ROM_LOAD( "epr6163.ic67",  0x4000, 0x4000, CRC(49539e46) SHA1(7cfd5b6b356c3fa5439e6fe3ac2e6a097b722a2c) )
 	ROM_LOAD( "epr6164.ic83",  0x8000, 0x4000, CRC(7f0e6853) SHA1(c255ac6e4b61faa8da9b5aa70f12c868b81acfe1) )

@@ -119,11 +119,11 @@ static MACHINE_DRIVER_START( rcorsair )
 	/* Main CPU is probably inside Custom Block with
        program code, unknown type */
 
-	MDRV_CPU_ADD("main", 8085A,8000000)		 /* Sound CPU? */
+	MDRV_CPU_ADD("maincpu", 8085A,8000000)		 /* Sound CPU? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -138,7 +138,7 @@ static MACHINE_DRIVER_START( rcorsair )
 MACHINE_DRIVER_END
 
 ROM_START( rcorsair )
-	ROM_REGION( 0x2000, "main", 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "rcs_6d.bin", 0x00000, 0x2000, CRC(b7f34f91) SHA1(16d5ed6a60db09f04727be8500c1c8c869281a8a) ) // sound code? (or part of the game code?)
 
 	ROM_REGION( 0x2000, "cpu1", 0 )

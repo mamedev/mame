@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( go2000_pcm_1_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "sound");
+	UINT8 *RAM = memory_region(space->machine, "soundcpu");
 	int bank = data & 7;
 
 	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x10000 + 0x400]);
@@ -288,18 +288,18 @@ static MACHINE_RESET(go2000)
 }
 
 static MACHINE_DRIVER_START( go2000 )
-	MDRV_CPU_ADD("main", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(go2000_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 4000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(go2000_sound_map,0)
 	MDRV_CPU_IO_MAP(go2000_sound_io,0)
 
 	MDRV_GFXDECODE(go2000)
 	MDRV_MACHINE_RESET(go2000)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -319,11 +319,11 @@ static MACHINE_DRIVER_START( go2000 )
 MACHINE_DRIVER_END
 
 ROM_START( go2000 )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "3.bin", 0x00000, 0x20000, CRC(fe1fb269) SHA1(266b8acddfcfd960b8e44f8606bf0873da42b9f8) )
 	ROM_LOAD16_BYTE( "4.bin", 0x00001, 0x20000, CRC(d6246ae3) SHA1(f2618dcabaa0c0a6e377e4acd1cdec8bea90bea8) )
 
-	ROM_REGION( 0x080000, "sound", 0 ) /* Z80? */
+	ROM_REGION( 0x080000, "soundcpu", 0 ) /* Z80? */
 	ROM_LOAD( "5.bin", 0x00000, 0x80000, CRC(a32676ee) SHA1(2dab73497c0818fce479be21ed589985db51560b) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT )

@@ -358,15 +358,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mjkjidai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,10000000/2)	/* 5 MHz ??? */
+	MDRV_CPU_ADD("maincpu", Z80,10000000/2)	/* 5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(mjkjidai)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -402,7 +402,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( mjkjidai )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "mkj-00.14g",   0x00000, 0x8000, CRC(188a27e9) SHA1(2306ad112aaf8d9ac77a89d0e4c3a17f36945130) )
 	ROM_LOAD( "mkj-01.15g",   0x08000, 0x4000, CRC(a6a5e9c7) SHA1(974f4343f4347a0065f833c1fdcc47e96d42932d) )	/* banked, there is code flowing from 7fff to this bank */
 	ROM_CONTINUE(             0x10000, 0x4000 )

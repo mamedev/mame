@@ -254,7 +254,7 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 
 static void setbank(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, 1, &RAM[bank ? 0x10000 : 0x4000]);
 }
 
@@ -798,18 +798,18 @@ static MACHINE_RESET( renegade )
 static MACHINE_DRIVER_START( renegade )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 12000000/8)	/* 1.5 MHz (measured) */
+	MDRV_CPU_ADD("maincpu", M6502, 12000000/8)	/* 1.5 MHz (measured) */
 	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(renegade_interrupt,2)
 
-	MDRV_CPU_ADD("audio", M6809, 12000000/8)
+	MDRV_CPU_ADD("audiocpu", M6809, 12000000/8)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 								/* IRQs are caused by the main CPU */
 	MDRV_MACHINE_START(renegade)
 	MDRV_MACHINE_RESET(renegade)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */*2)
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -836,12 +836,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( renegade )
-	ROM_REGION( 0x14000, "main", 0 )	/* 64k for code + bank switched ROM */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* 64k for code + bank switched ROM */
 	ROM_LOAD( "nb-5.bin",     0x08000, 0x8000, CRC(ba683ddf) SHA1(7516fac1c4fd14cbf43481e94c0c26c662c4cd28) )
 	ROM_LOAD( "na-5.bin",     0x04000, 0x4000, CRC(de7e7df4) SHA1(7d26ac29e0b5858d9a0c0cdc86c864e464145260) )
 	ROM_CONTINUE(		  0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* audio CPU (M6809) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU (M6809) */
 	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* mcu (missing) */
@@ -879,12 +879,12 @@ ROM_START( renegade )
 ROM_END
 
 ROM_START( kuniokun )
-	ROM_REGION( 0x14000, "main", 0 )	/* 64k for code + bank switched ROM */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* 64k for code + bank switched ROM */
 	ROM_LOAD( "nb-01.bin",    0x08000, 0x8000, CRC(93fcfdf5) SHA1(51cdb9377544ae17895e427f21d150ce195ab8e7) ) // original
 	ROM_LOAD( "ta18-11.bin",  0x04000, 0x4000, CRC(f240f5cd) SHA1(ed6875e8ad2988e88389d4f63ff448d0823c195f) )
 	ROM_CONTINUE(		  0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* audio CPU (M6809) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU (M6809) */
 	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* mcu (missing) */
@@ -922,12 +922,12 @@ ROM_START( kuniokun )
 ROM_END
 
 ROM_START( kuniokub )
-	ROM_REGION( 0x14000, "main", 0 )	/* 64k for code + bank switched ROM */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* 64k for code + bank switched ROM */
 	ROM_LOAD( "ta18-10.bin",  0x08000, 0x8000, CRC(a90cf44a) SHA1(6d63d9c29da7b8c5bc391e074b6b8fe6ae3892ae) ) // bootleg
 	ROM_LOAD( "ta18-11.bin",  0x04000, 0x4000, CRC(f240f5cd) SHA1(ed6875e8ad2988e88389d4f63ff448d0823c195f) )
 	ROM_CONTINUE(		  0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* audio CPU (M6809) */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU (M6809) */
 	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )

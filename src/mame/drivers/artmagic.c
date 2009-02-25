@@ -455,7 +455,7 @@ ADDRESS_MAP_END
 static const tms34010_config tms_config =
 {
 	TRUE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	MASTER_CLOCK_40MHz/6,			/* pixel clock */
 	1,								/* pixels per clock */
 	artmagic_scanline,				/* scanline update */
@@ -692,7 +692,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( artmagic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK_25MHz/2)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_CPU_ADD("tms", TMS34010, MASTER_CLOCK_40MHz)
@@ -707,7 +707,7 @@ static MACHINE_DRIVER_START( artmagic )
 	MDRV_VIDEO_START(artmagic)
 	MDRV_VIDEO_UPDATE(tms340x0)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_40MHz/6, 428, 0, 320, 313, 0, 256)
 
@@ -731,7 +731,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( stonebal )
 	MDRV_IMPORT_FROM(artmagic)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(stonebal_map,0)
 
 	MDRV_CPU_MODIFY("tms")
@@ -750,7 +750,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( cheesech )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(1d6e07c5) SHA1(8650868cce47f685d22131aa28aad45033cb0a52) )
 	ROM_LOAD16_BYTE( "u101",     0x00001, 0x40000, CRC(30ae9f95) SHA1(fede5d271aabb654c1efc077253d81ba23786f22) )
 
@@ -764,7 +764,7 @@ ROM_END
 
 
 ROM_START( ultennis )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "utu102.bin", 0x00000, 0x40000, CRC(ec31385e) SHA1(244e78619c549712d5541fb252656afeba639bb7) )
 	ROM_LOAD16_BYTE( "utu101.bin", 0x00001, 0x40000, CRC(08a7f655) SHA1(b8a4265472360b68bed71d6c175fc54dff088c1d) )
 
@@ -817,7 +817,7 @@ u1601.bin     32M Mask       8642h  /  Gfx
 */
 
 ROM_START( stonebal )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(712feda1) SHA1(c5b385f425786566fa274fe166a7116615a8ce86) )
 	ROM_LOAD16_BYTE( "u101",     0x00001, 0x40000, CRC(4f1656a9) SHA1(720717ae4166b3ec50bb572197a8c6c96b284648) )
 
@@ -831,7 +831,7 @@ ROM_END
 
 
 ROM_START( stoneba2 )
-	ROM_REGION( 0x80000, "main", 0 )	/* 64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 )	/* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "u102.bin", 0x00000, 0x40000, CRC(b3c4f64f) SHA1(6327e9f3cd9deb871a6910cf1f006c8ee143e859) )
 	ROM_LOAD16_BYTE( "u101.bin", 0x00001, 0x40000, CRC(fe373f74) SHA1(bafac4bbd1aae4ccc4ae16205309483f1bbdd464) )
 

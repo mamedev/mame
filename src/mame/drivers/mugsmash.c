@@ -426,17 +426,17 @@ static const ym2151_interface ym2151_config =
 };
 
 static MACHINE_DRIVER_START( mugsmash )
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mugsmash_readmem,mugsmash_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* Guess */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* Guess */
 	MDRV_CPU_PROGRAM_MAP(snd_readmem,snd_writemem)
 
 	MDRV_GFXDECODE(mugsmash)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -462,11 +462,11 @@ static MACHINE_DRIVER_START( mugsmash )
 MACHINE_DRIVER_END
 
 ROM_START( mugsmash )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "mugs_04.bin", 0x00000, 0x40000, CRC(2498fd27) SHA1(7b746efe8aaf346e4489118ac2a3fc9929a55b83) )
 	ROM_LOAD16_BYTE( "mugs_05.bin", 0x00001, 0x40000, CRC(95efb40b) SHA1(878c0a3754aa728f58044c6a7f243724b718fe1b) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 Code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "mugs_03.bin", 0x00000, 0x10000 , CRC(0101df2d) SHA1(35e1efa4a11c0f9d9db5ee057926e5de29c3a4c1) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */

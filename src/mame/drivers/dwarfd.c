@@ -696,7 +696,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( dwarfd )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MDRV_CPU_ADD("main", 8085A, 10595000/3*2)        /* ? MHz */
+	MDRV_CPU_ADD("maincpu", 8085A, 10595000/3*2)        /* ? MHz */
 	MDRV_CPU_CONFIG(dwarfd_i8085_config)
 	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
 	MDRV_CPU_IO_MAP(io_map, 0)
@@ -704,7 +704,7 @@ static MACHINE_DRIVER_START( dwarfd )
 	MDRV_CPU_VBLANK_INT_HACK(dwarfd_interrupt,NUM_LINES+4) //16 +vblank + 1 unused
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -725,7 +725,7 @@ static MACHINE_DRIVER_START( dwarfd )
 MACHINE_DRIVER_END
 
 ROM_START( dwarfd )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9l_pd_50-3196_m5l2732k.bin", 0x0000, 0x1000, CRC(34e942ae) SHA1(d4f0ee7f29e1c1a93b4b30b950023dbf60596100) )
 	ROM_LOAD( "9k_pd_50-3193_hn462732g.bin",0x1000, 0x1000, CRC(78f0c260) SHA1(d6c3b8b3ef4ce99a811e291f1396a47106683df9) )
 	ROM_LOAD( "9j_pd_50-3192_mbm2732.bin",  0x2000, 0x1000, CRC(9c66ee6e) SHA1(49c20fa276508b3c7b0134909295ae04ee46890f) )

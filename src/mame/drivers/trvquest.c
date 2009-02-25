@@ -211,9 +211,9 @@ static MACHINE_DRIVER_START( trvquest )
 
 	MDRV_DRIVER_DATA(gameplan_state)
 
-	MDRV_CPU_ADD("main", M6809,XTAL_6MHz/4)
+	MDRV_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
-	MDRV_CPU_VBLANK_INT("main", trvquest_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", trvquest_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)
 	MDRV_MACHINE_START(trvquest)
@@ -238,7 +238,7 @@ static MACHINE_DRIVER_START( trvquest )
 MACHINE_DRIVER_END
 
 ROM_START( trvquest )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom3", 0xb000, 0x1000, CRC(2ff7f370) SHA1(66f40426ed02ee44235e17a49d9054ede42b83b9) )
 	ROM_LOAD( "rom4", 0xc000, 0x1000, CRC(b1adebcb) SHA1(661cabc92b1defce5c2edb8e873a80d5032084d0) )
 	ROM_LOAD( "rom5", 0xd000, 0x1000, CRC(2fc10a15) SHA1(8ecce32a5a167056c8fb48554a8907ae6299921e) )

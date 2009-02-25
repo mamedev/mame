@@ -75,7 +75,7 @@ static MACHINE_RESET( yunsung8 )
 
 static WRITE8_HANDLER( yunsung8_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	int bank				=	data & 7;		// ROM bank
 	yunsung8_layers_ctrl	=	data & 0x30;	// Layers enable
@@ -132,7 +132,7 @@ static int adpcm;
 
 static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(device->machine, "audio");
+	UINT8 *RAM = memory_region(device->machine, "audiocpu");
 	int bank = data & 7;
 
 	if ( bank != (data&(~0x20)) ) 	logerror("%s: Bank %02X\n",cpuexec_describe_context(device->machine),data);
@@ -506,19 +506,19 @@ static const msm5205_interface yunsung8_msm5205_interface =
 static MACHINE_DRIVER_START( yunsung8 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 8000000)			/* Z80B */
+	MDRV_CPU_ADD("maincpu", Z80, 8000000)			/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* No nmi routine */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* No nmi routine */
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)			/* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)			/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMI caused by the MSM5205? */
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMI caused by the MSM5205? */
 
 	MDRV_MACHINE_RESET(yunsung8)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -566,11 +566,11 @@ OSC : 16.000
 
 ROM_START( magix )
 
-	ROM_REGION( 0x24000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x24000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "yunsung8.07", 0x00000, 0x0c000, CRC(d4d0b68b) SHA1(d7e1fb57a14f8b822791b98cecc6d5a053a89e0f) )
 	ROM_CONTINUE(         0x10000, 0x14000             )
 
-	ROM_REGION( 0x24000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x24000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "yunsung8.08", 0x00000, 0x0c000, CRC(6fd60be9) SHA1(87622dc2967842629e90a02b415bec86cc26cbc7) )
 	ROM_CONTINUE(         0x10000, 0x14000             )
 
@@ -604,11 +604,11 @@ Cy7c384A
 
 ROM_START( cannball )
 
-	ROM_REGION( 0x24000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x24000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "cannball.07", 0x00000, 0x0c000, CRC(17db56b4) SHA1(032e3dbde0b0e315dcb5f2b31f57e75e78818f2d) )
 	ROM_CONTINUE(            0x10000, 0x14000             )
 
-	ROM_REGION( 0x24000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x24000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "cannball.08", 0x00000, 0x0c000, CRC(11403875) SHA1(9f583bc4f08e7aef3fd0f3fe3f31cce1d226641a) )
 	ROM_CONTINUE(            0x10000, 0x14000             )
 
@@ -627,11 +627,11 @@ ROM_END
 
 ROM_START( cannbalv )
 
-	ROM_REGION( 0x24000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x24000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "yunsung1", 0x00000, 0x0c000, CRC(f7398b0d) SHA1(f2cdb9c4662cd325376d25ae9611f689605042db) )
 	ROM_CONTINUE(            0x10000, 0x14000             )
 
-	ROM_REGION( 0x24000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x24000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "yunsung8", 0x00000, 0x0c000, CRC(11403875) SHA1(9f583bc4f08e7aef3fd0f3fe3f31cce1d226641a) )
 	ROM_CONTINUE(            0x10000, 0x14000             )
 
@@ -670,11 +670,11 @@ they jumpered the first position)
 
 ROM_START( rocktris )
 
-	ROM_REGION( 0x24000, "main", 0 )		/* Main Z80 Code */
+	ROM_REGION( 0x24000, "maincpu", 0 )		/* Main Z80 Code */
 	ROM_LOAD( "cpu.bin",     0x00000, 0x0c000, CRC(46e3b79c) SHA1(81a587b9f986c4e39b1888ec6ed6b86d1469b9a0) )
 	ROM_CONTINUE(         0x10000, 0x14000             )
 
-	ROM_REGION( 0x24000, "audio", 0 )		/* Sound Z80 Code */
+	ROM_REGION( 0x24000, "audiocpu", 0 )		/* Sound Z80 Code */
 	ROM_LOAD( "cpu2.bin",    0x00000, 0x0c000, CRC(3a78a4cf) SHA1(f643c7a217cbb71f3a03f1f4a16545c546332819) )
 	ROM_CONTINUE(         0x10000, 0x14000             )
 

@@ -166,14 +166,14 @@ static const gaelcosnd_interface maniacsq_snd_interface =
 
 static MACHINE_DRIVER_START( maniacsq )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 26000000/2)		/* 13 MHz? */
+	MDRV_CPU_ADD("maincpu", M68000, 26000000/2)		/* 13 MHz? */
 	MDRV_CPU_PROGRAM_MAP(maniacsq_readmem, maniacsq_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -198,7 +198,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( maniacsq )
-	ROM_REGION( 0x040000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x040000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "d8-d15.1m",	0x000000, 0x020000, CRC(9121d1b6) SHA1(ad8f0d996b6d42fc0c6645466608e82ca96e0b66) )
 	ROM_LOAD16_BYTE( "d0-d7.1m",	0x000001, 0x020000, CRC(a95cfd2a) SHA1(b5bad76f12d2a1f6bf6b35482f2f933ceb00e552) )
 
@@ -294,7 +294,7 @@ static const gaelcosnd_interface bang_snd_interface =
 
 static MACHINE_DRIVER_START( bang )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 30000000/2)			/* 15 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(bang_readmem, bang_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(bang_interrupt, 6)
 
@@ -303,7 +303,7 @@ static MACHINE_DRIVER_START( bang )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -328,7 +328,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( bang )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "bang.u53",	0x000000, 0x080000, CRC(014bb939) SHA1(bb245acf7a3bd4a56b3559518bcb8d0ae39dbaf4) )
 	ROM_LOAD16_BYTE( "bang.u55",	0x000001, 0x080000, CRC(582f8b1e) SHA1(c9b0d4c1dee71cdb2c01d49f20ffde32eddc9583) )
 
@@ -357,7 +357,7 @@ ROM_END
 
 
 ROM_START( bangj )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "bang-a.u53",	0x000000, 0x080000, CRC(5ee514e9) SHA1(b78b507d18de41be58049f5c597acd107ec1273f) )
 	ROM_LOAD16_BYTE( "bang-a.u55",	0x000001, 0x080000, CRC(b90223ab) SHA1(7c097754a710169f41c574c3cc1a6346824853c4) )
 
@@ -498,14 +498,14 @@ static const gaelcosnd_interface alighunt_snd_interface =
 
 static MACHINE_DRIVER_START( alighunt )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 24000000/2)			/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(alighunt_readmem, alighunt_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -566,7 +566,7 @@ REF: 940411
 
 
 ROM_START( aligator )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"u45",	0x000000, 0x080000, CRC(61c47c56) SHA1(6dd3fc6fdab252e0fb43c0793eef70203c888d7f) )
 	ROM_LOAD16_BYTE(	"u44",	0x000001, 0x080000, CRC(f0be007a) SHA1(2112b2e5f020028b50c8f2c72c83c9fee7a78224) )
 
@@ -582,7 +582,7 @@ ROM_START( aligator )
 ROM_END
 
 ROM_START( aligatun )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"ahntu45n.040",	0x000000, 0x080000, CRC(fc02cb2d) SHA1(700aa60ec0d2bb705b1335de63daae678dcb8570) )
 	ROM_LOAD16_BYTE(	"ahntu44n.040",	0x000001, 0x080000, CRC(7fbea3a3) SHA1(89efa5b7908c2f010a3097954dbccd9cb7adc50c) )
 
@@ -750,7 +750,7 @@ static const gaelcosnd_interface touchgo_snd_interface =
 
 static MACHINE_DRIVER_START( touchgo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 32000000/2)			/* 16 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)			/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(touchgo_readmem, touchgo_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq6_line_hold)
 
@@ -832,7 +832,7 @@ REF: 950510-1
 
 
 ROM_START( touchgo ) /* REF: 950906 */
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "tg_56", 0x000000, 0x080000, CRC(8ab065f3) SHA1(7664abd7e5f66ffca4a2865bba56ac36bd04f4e9) )
 	ROM_LOAD16_BYTE( "tg_57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
 
@@ -848,7 +848,7 @@ ROM_START( touchgo ) /* REF: 950906 */
 ROM_END
 
 ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America Notice */
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "tg56.bin", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) )
 	ROM_LOAD16_BYTE( "tg57.bin", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) )
 
@@ -864,7 +864,7 @@ ROM_START( touchgon ) /* REF 950906, no plug-in daughterboard, Non North America
 ROM_END
 
 ROM_START( touchgoe ) /* REF: 950510-1 */
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "tg56", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) )
 	ROM_LOAD16_BYTE( "tg57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) )
 
@@ -954,16 +954,16 @@ static const gaelcosnd_interface snowboar_snd_interface =
 
 static MACHINE_DRIVER_START( snowboar )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 30000000/2)			/* 15 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(snowboar_readmem, snowboar_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_NVRAM_HANDLER(gaelco2)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1023,7 +1023,7 @@ REF: 960419/1
 */
 
 ROM_START( snowboar )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"sb53",	0x000000, 0x080000, CRC(e4eaefd4) SHA1(c7de2ae3a4a919fbe16d4997e3f9e2303b8c96b1) )
 	ROM_LOAD16_BYTE(	"sb55",	0x000001, 0x080000, CRC(e2476994) SHA1(2ad18652a1fc6ac058c8399373fb77e7a81d5bbd) )
 
@@ -1039,7 +1039,7 @@ ROM_START( snowboar )
 ROM_END
 
 ROM_START( snowbalt )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"sb.53",	0x000000, 0x080000, CRC(4742749e) SHA1(933e39893ab74895ae4a99a932f8245a03ea0b5d) )
 	ROM_LOAD16_BYTE(	"sb.55",	0x000001, 0x080000, CRC(6ddc431f) SHA1(8801c0cf1711bb956447ba1e631db28bd075caea) )
 
@@ -1206,7 +1206,7 @@ static const gaelcosnd_interface wrally2_snd_interface =
 
 static MACHINE_DRIVER_START( wrally2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 26000000/2)			/* 13 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 26000000/2)			/* 13 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrally2_readmem, wrally2_writemem)
 	MDRV_CPU_VBLANK_INT("left", irq6_line_hold)
 
@@ -1349,7 +1349,7 @@ TLC569 (IC2 and IC7) is a 8-bit serial ADC
 */
 
 ROM_START( wrally2 )
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "wr2.64",	0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
 	ROM_LOAD16_BYTE( "wr2.63",	0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
@@ -1409,7 +1409,7 @@ I don't know what's the correct title for this one...
 
 ROM_START( grtesoro )
 	/*at least 1.u40 is bad, on every 0x40 bytes the first four are always 0xff.*/
-	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "2.u39",	0x000000, 0x020000, BAD_DUMP CRC(9939299e) SHA1(55303a2adf199f4b5a60f57be7480b0e119f8624) )
 	ROM_LOAD16_BYTE( "1.u40",	0x000001, 0x020000, BAD_DUMP CRC(311c2f94) SHA1(963d6b5f479598145146fcb8b7c6ce77fbc92b07) )
 

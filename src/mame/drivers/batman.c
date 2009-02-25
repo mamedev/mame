@@ -234,7 +234,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( batman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz)
+	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_RESET(batman)
@@ -245,7 +245,7 @@ static MACHINE_DRIVER_START( batman )
 	MDRV_GFXDECODE(batman)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
@@ -267,7 +267,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( batman )
-	ROM_REGION( 0xc0000, "main", 0 )	/* 6*128k for 68000 code */
+	ROM_REGION( 0xc0000, "maincpu", 0 )	/* 6*128k for 68000 code */
 	ROM_LOAD16_BYTE( "136085-2030.10r",  0x00000, 0x20000, CRC(7cf4e5bf) SHA1(d6068a65fb524d839a34e596a272fac1ce90981c) )
 	ROM_LOAD16_BYTE( "136085-2031.7r",   0x00001, 0x20000, CRC(7d7f3fc4) SHA1(8ee3e9ad3464006a26c36155b6099433110e2a6e) )
 	ROM_LOAD16_BYTE( "136085-2032.91r",  0x40000, 0x20000, CRC(d80afb20) SHA1(5696627f6fa713dba4d12443c945f3e1cb6452a3) )

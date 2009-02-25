@@ -1293,18 +1293,18 @@ static INTERRUPT_GEN( namcos23_interrupt )
 static MACHINE_DRIVER_START( gorgon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", R4650BE, 133000000)
+	MDRV_CPU_ADD("maincpu", R4650BE, 133000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(gorgon_map, 0)
 
-	MDRV_CPU_ADD("audio", H83002, 14745600 )
+	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
-	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1331,24 +1331,24 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( s23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", R4650BE, 166000000)
+	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map, 0)
 
-	MDRV_CPU_ADD("audio", H83002, 14745600 )
+	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
-	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23iobrdmap, 0 )
 	MDRV_CPU_IO_MAP( s23iobrdiomap, 0 )
-	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1375,19 +1375,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ss23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", R4650BE, 166000000)
+	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map, 0)
-	MDRV_CPU_VBLANK_INT("main", namcos23_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", namcos23_interrupt)
 
-	MDRV_CPU_ADD("audio", H83002, 14745600 )
+	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
-	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1416,7 +1416,7 @@ ROM_START( rapidrvr )
         ROM_LOAD16_BYTE( "rd3verc.ic2",  0x000000, 0x200000, CRC(c15c0f30) SHA1(9f529232818f3e184f81f62408a5cad615b05613) )
         ROM_LOAD16_BYTE( "rd3verc.ic1",  0x000001, 0x200000, CRC(9d7f4411) SHA1(d049efaa539d36ed0f73ca3f50a8f7112e67f865) )
 
-	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "rd3verc.ic3",  0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) )
 
 	ROM_REGION( 0x800000, "sprite", 0 )	/* sprite? tilemap? tiles */
@@ -1475,7 +1475,7 @@ ROM_START( motoxgo )
         ROM_LOAD16_BYTE( "mg3vera.ic2",  0x000000, 0x200000, CRC(1bf06f00) SHA1(e9d04e9f19bff7a58cb280dd1d5db12801b68ba0) )
         ROM_LOAD16_BYTE( "mg3vera.ic1",  0x000001, 0x200000, CRC(f5e6e25b) SHA1(1de30e8e831be66987112645a9db3a3001b89fe6) )
 
-	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "mg3vera.ic3",  0x000000, 0x080000, CRC(9e3d46a8) SHA1(9ffa5b91ea51cc0fb97def25ce47efa3441f3c6f) )
 
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
@@ -1522,7 +1522,7 @@ ROM_START( timecrs2 )
         ROM_LOAD16_BYTE( "tss3verb.2",   0x000000, 0x200000, CRC(c7be691f) SHA1(5e2e7a0db3d8ce6dfeb6c0d99e9fe6a9f9cab467) )
         ROM_LOAD16_BYTE( "tss3verb.1",   0x000001, 0x200000, CRC(6e3f232b) SHA1(8007d8f31a605a5df89938d7c9f9d3d209c934be) )
 
-	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
 
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
@@ -1562,7 +1562,7 @@ ROM_START( timcrs2b )
         ROM_LOAD16_BYTE( "tss2verb.ic2", 0x000000, 0x200000, CRC(9f56a4df) SHA1(5ecb3cd93726ab6be02762853fd6a45266d6c0bc) )
         ROM_LOAD16_BYTE( "tss2verb.ic1", 0x000001, 0x200000, CRC(aa147f71) SHA1(e00267d1a8286942c83dc35289ad65bd3cb6d8db) )
 
-	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
 
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
@@ -1603,7 +1603,7 @@ ROM_START( 500gp )
         ROM_LOAD16_BYTE( "5gp3verc.2",   0x000000, 0x200000, CRC(e2d43468) SHA1(5e861dd223c7fa177febed9803ac353cba18e19d) )
         ROM_LOAD16_BYTE( "5gp3verc.1",   0x000001, 0x200000, CRC(f6efc94a) SHA1(785eee2bec5080d4e8ef836f28d446328c942b0e) )
 
-	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "5gp3verc.3",   0x000000, 0x080000, CRC(b323abdf) SHA1(8962e39b48a7074a2d492afb5db3f5f3e5ae2389) )
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
@@ -1646,7 +1646,7 @@ ROM_START( finfurl2 )
         ROM_LOAD16_BYTE( "29f016.ic2",   0x000000, 0x200000, CRC(13cbc545) SHA1(3e67a7bfbb1c1374e8e3996a0c09e4861b0dca14) )
         ROM_LOAD16_BYTE( "29f016.ic1",   0x000001, 0x200000, CRC(5b04e4f2) SHA1(8099fc3deab9ed14a2484a774666fbd928330de8) )
 
-	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
@@ -1685,7 +1685,7 @@ ROM_START( finfrl2j )
         ROM_LOAD16_BYTE( "29f016_jap1.ic2", 0x000000, 0x200000, CRC(0215125d) SHA1(a99f601441c152b0b00f4811e5752c71897b1ed4) )
         ROM_LOAD16_BYTE( "29f016_jap1.ic1", 0x000001, 0x200000, CRC(38c9ae96) SHA1(b50afc7276662267ff6460f82d0e5e8b00b341ea) )
 
-	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */

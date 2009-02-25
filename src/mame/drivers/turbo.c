@@ -1078,9 +1078,9 @@ static MACHINE_DRIVER_START( turbo )
 	MDRV_DRIVER_DATA(turbo_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(turbo_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", turbo_8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", turbo_8255_intf[1] )
@@ -1092,7 +1092,7 @@ static MACHINE_DRIVER_START( turbo )
 	MDRV_GFXDECODE(turbo)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -1109,9 +1109,9 @@ static MACHINE_DRIVER_START( subroc3d )
 	MDRV_DRIVER_DATA(turbo_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(subroc3d_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", subroc3d_8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", subroc3d_8255_intf[1] )
@@ -1120,7 +1120,7 @@ static MACHINE_DRIVER_START( subroc3d )
 	MDRV_GFXDECODE(turbo)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -1137,9 +1137,9 @@ static MACHINE_DRIVER_START( buckrog )
 	MDRV_DRIVER_DATA(turbo_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(buckrog_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(buckrog_cpu2_map,0)
@@ -1155,7 +1155,7 @@ static MACHINE_DRIVER_START( buckrog )
 	MDRV_GFXDECODE(turbo)
 	MDRV_PALETTE_LENGTH(1024)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -1176,7 +1176,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( turbo )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "epr-1513.cpu-ic76",  0x0000, 0x2000, CRC(0326adfc) SHA1(d9f06f0bc78667fa58c4b8ab3a3897d0dd0bdfbf) )
 	ROM_LOAD( "epr-1514.cpu-ic89",  0x2000, 0x2000, CRC(25af63b0) SHA1(9af4b3da83a4cef79b7dd0e9061132c499872c1c) )
 	ROM_LOAD( "epr-1515.cpu-ic103", 0x4000, 0x2000, CRC(059c1c36) SHA1(ba870e6f45ff15aa148b2c2f213c879144aaacf0) )
@@ -1230,7 +1230,7 @@ ROM_END
 
 
 ROM_START( turboa )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "epr-1262.cpu-ic76",  0x0000, 0x2000, CRC(1951b83a) SHA1(31933676140db66281b7ca016a1b42cb985f44dd) )
 	ROM_LOAD( "epr-1263.cpu-ic89",  0x2000, 0x2000, CRC(45e01608) SHA1(0a9812714c41904bef7a8777b4aae63b5a1dd633) )
 	ROM_LOAD( "epr-1264.cpu-ic103", 0x4000, 0x2000, CRC(1802f6c7) SHA1(5c575821d849d955059868b3dd3167b4bef9a8c4) )
@@ -1284,7 +1284,7 @@ ROM_END
 
 
 ROM_START( turbob )
-	ROM_REGION( 0x6000, "main", 0 )
+	ROM_REGION( 0x6000, "maincpu", 0 )
 	ROM_LOAD( "epr-1363.cpu-ic76",  0x0000, 0x2000, CRC(5c110fb6) SHA1(fdcdf488bd112db12aa22c4b7e9f34004185d4ce) )
 	ROM_LOAD( "epr-1364.cpu-ic89",  0x2000, 0x2000, CRC(6a341693) SHA1(428927c4a14bf82225875012c255d25dcffaf2ab) )
 	ROM_LOAD( "epr-1365.cpu-ic103", 0x4000, 0x2000, CRC(3b6b0dc8) SHA1(3ebfa3f9fabd444ee105591acb6984b6b3523725) )
@@ -1338,7 +1338,7 @@ ROM_END
 
 
 ROM_START( subroc3d )
-	ROM_REGION( 0xa000, "main", 0 )
+	ROM_REGION( 0xa000, "maincpu", 0 )
 	ROM_LOAD( "epr-1614a.cpu-ic88", 0x0000, 0x2000, CRC(0ed856b4) SHA1(c2f48170365a53bff312ca20df5b74466de6349a) )
 	ROM_LOAD( "epr-1615.cpu-ic87",  0x2000, 0x2000, CRC(6281eb2e) SHA1(591d7f184f51f33fb583c916eddacf4581d612d7) )
 	ROM_LOAD( "epr-1616.cpu-ic86",  0x4000, 0x2000, CRC(cc7b0c9b) SHA1(0b44c9a2421a51bdc16a2b590f24fbbfb47ef86f) )
@@ -1385,7 +1385,7 @@ ROM_END
 
 
 ROM_START( buckrog )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "cpu-ic3", 0x0000, 0x4000, CRC(f0055e97) SHA1(f6ee2afd6fef710949087d1cb04cbc242d1fa9f5) )	/* encrypted */
 	ROM_LOAD( "cpu-ic4", 0x4000, 0x4000, CRC(7d084c39) SHA1(ef2c0a2a59e14d9e196fd3837139fc5acf0f63be) )	/* encrypted */
 
@@ -1423,7 +1423,7 @@ ROM_END
 
 
 ROM_START( buckrogn )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "cpu-ic3.bin", 0x0000, 0x4000, CRC(7f1910af) SHA1(22d37750282676d8fd1f602e928c174f823245c9) )
 	ROM_LOAD( "cpu-ic4.bin", 0x4000, 0x4000, CRC(5ecd393b) SHA1(d069f12326644f2c685e516d91d33b97ec162c56) )
 
@@ -1595,7 +1595,7 @@ Notes:
 */
 
 ROM_START( zoom909 )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "epr-5217b.cpu-ic3",  0x0000, 0x4000, CRC(1b56e7dd) SHA1(ccf638c318ebce754ac9628271d2064e05ced35c) )	/* encrypted */
 	ROM_LOAD( "epr-5218b.cpu-ic4",  0x4000, 0x4000, CRC(77dfd911) SHA1(cc1d4aac863b2d6b52eff7de2b8233be21aac3c9) )	/* encrypted */
 
@@ -1725,7 +1725,7 @@ static void turbo_rom_decode(running_machine *machine)
 		2,1,2,1	 /* 0x5000-0x5fff */
 	};
 
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	int offs, i, j;
 	UINT8 src;
 
@@ -1755,7 +1755,7 @@ static DRIVER_INIT( turbo_enc )
 
 static DRIVER_INIT( buckrog_enc )
 {
-	buckrog_decode(machine, "main");
+	buckrog_decode(machine, "maincpu");
 }
 
 

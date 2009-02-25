@@ -199,13 +199,13 @@ static const ay8910_interface ay8910_interface_2 =
 static MACHINE_DRIVER_START( ambush )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4.00 MHz??? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -237,7 +237,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ambush )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ambush.h7",    0x0000, 0x2000, CRC(ce306563) SHA1(c69b5c4465187a8eda6367d6cd3e0b71a57588d1) )
 	ROM_LOAD( "ambush.g7",    0x2000, 0x2000, CRC(90291409) SHA1(82f1e109bd066ad9fdea1ce0086be6c334e2658a) )
 	ROM_LOAD( "ambush.f7",    0x4000, 0x2000, CRC(d023ca29) SHA1(1ac44960cf6d79936517a9ad4bae6ccd825c9496) )
@@ -257,7 +257,7 @@ ROM_END
 
 /* displays an M next to ROM 1 during the test, why is internal cheksum wrong (0x02 instead of 0x00) ? */
 ROM_START( ambusht )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a1.i7",    0x0000, 0x2000, CRC(a7cd149d) SHA1(470ebe60bc23a7908fb96caef8074d65f8c57625) )
 	ROM_LOAD( "a2.g7",    0x2000, 0x2000, CRC(8328d88a) SHA1(690f0af10a0550566b67ee570f849b2764448d15) )
 	ROM_LOAD( "a3.f7",    0x4000, 0x2000, CRC(8db57ab5) SHA1(5cc7d7ebdfc91fb8d9ed52836d70c1de68001402) )
@@ -276,7 +276,7 @@ ROM_START( ambusht )
 ROM_END
 
 ROM_START( ambushv )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "n1_h7.bin",    0x0000, 0x2000, CRC(3c0833b4) SHA1(dd0cfb6da281742114abfe652d38038b078b959e) )
 	ROM_LOAD( "ambush.g7",    0x2000, 0x2000, CRC(90291409) SHA1(82f1e109bd066ad9fdea1ce0086be6c334e2658a) )
 	ROM_LOAD( "ambush.f7",    0x4000, 0x2000, CRC(d023ca29) SHA1(1ac44960cf6d79936517a9ad4bae6ccd825c9496) )

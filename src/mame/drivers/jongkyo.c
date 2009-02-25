@@ -417,13 +417,13 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( jongkyo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,JONGKYO_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", Z80,JONGKYO_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(jongkyo_memmap,0)
 	MDRV_CPU_IO_MAP(jongkyo_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -444,7 +444,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( jongkyo )
-	ROM_REGION( 0x9000, "main", 0 )
+	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "epr-6258", 0x00000, 0x02000, CRC(fb8b7bcc) SHA1(8ece7c2c82c237b4b51829d412b2109b96ccd0e7) )
 	ROM_LOAD( "epr-6259", 0x02000, 0x02000, CRC(e46cde5d) SHA1(1cbe1677cfb3fa9f76ad90d5b1446ce9cefee6b7) )
 	ROM_LOAD( "epr-6260", 0x04000, 0x02000, CRC(369a5365) SHA1(037a2971a59ab339595b333cbdfd4cbb104de2be) )
@@ -465,7 +465,7 @@ ROM_END
 static DRIVER_INIT( jongkyo )
 {
 	int i;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* first of all, do a simple bitswap */
 	for (i = 0x6000; i < 0x9000; ++i)
@@ -474,7 +474,7 @@ static DRIVER_INIT( jongkyo )
 	}
 
 	/* then do the standard Sega decryption */
-	jongkyo_decode(machine, "main");
+	jongkyo_decode(machine, "maincpu");
 
 	videoram2 = auto_malloc(0x4000);
 	state_save_register_global_pointer(machine, videoram2, 0x4000);

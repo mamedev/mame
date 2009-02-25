@@ -863,17 +863,17 @@ static MACHINE_RESET( mastboy )
 
 
 static MACHINE_DRIVER_START( mastboy )
-	MDRV_CPU_ADD("main", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
+	MDRV_CPU_ADD("maincpu", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(port_readmem,0)
-	MDRV_CPU_VBLANK_INT("main", mastboy_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", mastboy_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	MDRV_MACHINE_RESET( mastboy )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(6000000.0f / 384.0f / 282.0f)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -899,7 +899,7 @@ MACHINE_DRIVER_END
 /* Romsets */
 
 ROM_START( mastboy )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
 	ROM_LOAD( "03.bin",       0x04000, 0x4000, CRC(5020a37f) SHA1(8bc75623232f3ab457b47d5af6cd1c3fb24c0d0e) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(             0x04000, 0x4000 )
@@ -939,7 +939,7 @@ ROM_END
 
 /* Is this actually official, or a hack? */
 ROM_START( mastboyi )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hd647180.bin", 0x00000, 0x4000, CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
 	ROM_LOAD( "3-mem-a.ic77", 0x04000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(             0x04000, 0x4000 )

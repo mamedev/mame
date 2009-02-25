@@ -262,11 +262,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( 88games )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", KONAMI, 3000000) /* ? */
+	MDRV_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", k88games_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", k88games_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(88games)
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( 88games )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -311,11 +311,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( 88games )
-	ROM_REGION( 0x21000, "main", 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x21000, "maincpu", 0 ) /* code + banked roms + space for banked ram */
     ROM_LOAD( "861m01.k18", 0x08000, 0x08000, CRC(4a4e2959) SHA1(95572686bef48b5c1ce1dedf0afc891d92aff00d) )
 	ROM_LOAD( "861m02.k16", 0x10000, 0x10000, CRC(e19f15f6) SHA1(6c801b274e87eaff7f40148381ade5b38120cc12) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "861d01.d9", 0x00000, 0x08000, CRC(0ff1dec0) SHA1(749dc98f8740beee1383f85effc9336081315f4b) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
@@ -365,11 +365,11 @@ ROM_START( 88games )
 ROM_END
 
 ROM_START( konami88 )
-	ROM_REGION( 0x21000, "main", 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x21000, "maincpu", 0 ) /* code + banked roms + space for banked ram */
 	ROM_LOAD( "861.e03", 0x08000, 0x08000, CRC(55979bd9) SHA1(d683cc514e2b41fc4033d5dc107ca22ba8981ada) )
 	ROM_LOAD( "861.e02", 0x10000, 0x10000, CRC(5b7e98a6) SHA1(39b6e93221d14a4695c79fb39c4eea54ec5ffb0c) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "861d01.d9", 0x00000, 0x08000, CRC(0ff1dec0) SHA1(749dc98f8740beee1383f85effc9336081315f4b) )
 
 	ROM_REGION(  0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
@@ -419,11 +419,11 @@ ROM_START( konami88 )
 ROM_END
 
 ROM_START( hypsptsp )
-	ROM_REGION( 0x21000, "main", 0 ) /* code + banked roms + space for banked ram */
+	ROM_REGION( 0x21000, "maincpu", 0 ) /* code + banked roms + space for banked ram */
 	ROM_LOAD( "861f03.k18", 0x08000, 0x08000, CRC(8c61aebd) SHA1(de720acfe07fd70fe467f9c73122e0fbeab2b8c8) )
 	ROM_LOAD( "861f02.k16", 0x10000, 0x10000, CRC(d2460c28) SHA1(936220aa3983ffa2330843f683347768772561af) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "861d01.d9", 0x00000, 0x08000, CRC(0ff1dec0) SHA1(749dc98f8740beee1383f85effc9336081315f4b) )
 
 	ROM_REGION(  0x080000, "gfx1", 0 ) /* graphics ( dont dispose as the program can read them, 0 ) */
@@ -476,7 +476,7 @@ ROM_END
 
 static KONAMI_SETLINES_CALLBACK( k88games_banking )
 {
-	UINT8 *RAM = memory_region(device->machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "maincpu");
 	int offs;
 
 logerror("%04x: bank select %02x\n",cpu_get_pc(device),lines);
@@ -517,7 +517,7 @@ logerror("%04x: bank select %02x\n",cpu_get_pc(device),lines);
 static MACHINE_RESET( 88games )
 {
 	konami_configure_set_lines(machine->cpu[0], k88games_banking);
-	paletteram = &memory_region(machine, "main")[0x20000];
+	paletteram = &memory_region(machine, "maincpu")[0x20000];
 }
 
 static MACHINE_START( 88games )

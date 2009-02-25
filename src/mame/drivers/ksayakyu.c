@@ -86,7 +86,7 @@ static WRITE8_HANDLER( bank_select_w )
         xxxxxxx  - unused ?
 
     */
-	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "main") + ((data&1) * 0x4000) + 0x10000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "maincpu") + ((data&1) * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( latch_w )
@@ -181,7 +181,7 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(dummy_w)
@@ -240,18 +240,18 @@ static GFXDECODE_START( ksayakyu )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( ksayakyu )
-	MDRV_CPU_ADD("main", Z80,8000000/2)
+	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(maincpu_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 80000000/2)
+	MDRV_CPU_ADD("audiocpu", Z80, 80000000/2)
 	MDRV_CPU_PROGRAM_MAP(soundcpu_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -281,7 +281,7 @@ static MACHINE_DRIVER_START( ksayakyu )
 MACHINE_DRIVER_END
 
 ROM_START( ksayakyu )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 
 	ROM_LOAD( "1.3a", 0x00000, 0x4000, CRC(6607976d) SHA1(23b15cae04922e54faf35a5a499ba5064b18ed46) )
 	ROM_LOAD( "2.3b", 0x04000, 0x4000, CRC(a289de5c) SHA1(d3b14364ef77ca74ac79c5099cf0e8f3baa97612) )
@@ -289,7 +289,7 @@ ROM_START( ksayakyu )
 	ROM_LOAD( "4.3d", 0x08000, 0x2000, CRC(db0ca023) SHA1(1356fa0239209dea6a4ac0af177fe8be47f12cd0) )
 	ROM_LOAD( "3.3c", 0x14000, 0x4000, CRC(bb4104a5) SHA1(1f793c4431a3476eeb92556228bf855efb73fb83) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "8.5l",  0x0000, 0x2000, CRC(3fbae535) SHA1(87b66091e33eee66f4d63c213a5a19b70e7b1e5a) )
 	ROM_LOAD( "7.5j",  0x2000, 0x2000, CRC(ad242eda) SHA1(928c04e4a48077ec9db148cb71d52ebfe01efa53) )
 	ROM_LOAD( "6.5h",  0x4000, 0x2000, CRC(17986662) SHA1(81b65e381b923c5544f4708efef09f0894c716b2) )

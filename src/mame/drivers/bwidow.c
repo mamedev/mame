@@ -353,7 +353,7 @@ static WRITE8_HANDLER( irq_ack_w )
 
 static ADDRESS_MAP_START( bwidow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x2800, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x6800, 0x6fff) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( spacduel_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0f00, 0x0f3f) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -712,14 +712,14 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_DRIVER_START( bwidow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 8)
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(bwidow_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
 
 	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 480, 0, 440)
@@ -746,7 +746,7 @@ static MACHINE_DRIVER_START( gravitar )
 	MDRV_IMPORT_FROM(bwidow)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 420, 0, 400)
 MACHINE_DRIVER_END
 
@@ -755,11 +755,11 @@ static MACHINE_DRIVER_START( lunarbat )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gravitar)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spacduel_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(45)
 	MDRV_SCREEN_VISIBLE_AREA(0, 500, 0, 440)
 MACHINE_DRIVER_END
@@ -769,11 +769,11 @@ static MACHINE_DRIVER_START( spacduel )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(gravitar)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spacduel_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(45)
 	MDRV_SCREEN_VISIBLE_AREA(0, 540, 0, 400)
 MACHINE_DRIVER_END
@@ -787,7 +787,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( bwidow )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "136017.107",   0x2800, 0x0800, CRC(97f6000c) SHA1(bbae93058228820ee67b05f23e45fb54ee0963ff) )
 	ROM_LOAD( "136017.108",   0x3000, 0x1000, CRC(3da354ed) SHA1(935295d66ad40ad702eb7a694296e836f53d22ec) )
@@ -807,7 +807,7 @@ ROM_START( bwidow )
 ROM_END
 
 ROM_START( gravitar )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "136010.210",   0x2800, 0x0800, CRC(debcb243) SHA1(2c50cd38d60739c126f1d0d8e7fbd46a0bde6e1c) )
 	ROM_LOAD( "136010.207",   0x3000, 0x1000, CRC(4135629a) SHA1(301ddb7a34b38140a1fdffc060cb08ff57f10cf1) )
@@ -827,7 +827,7 @@ ROM_START( gravitar )
 ROM_END
 
 ROM_START( gravitr2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "136010.210",   0x2800, 0x0800, CRC(debcb243) SHA1(2c50cd38d60739c126f1d0d8e7fbd46a0bde6e1c) )
 	ROM_LOAD( "136010.207",   0x3000, 0x1000, CRC(4135629a) SHA1(301ddb7a34b38140a1fdffc060cb08ff57f10cf1) )
@@ -847,7 +847,7 @@ ROM_START( gravitr2 )
 ROM_END
 
 ROM_START( gravp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "l7.bin",   0x2800, 0x0800, CRC(1da0d845) SHA1(99bccae0521c105388784175c475035bf19270a7) )
 	ROM_LOAD( "mn7.bin",  0x3000, 0x1000, CRC(650ba31e) SHA1(7f855ea13e2041a87b64fdff4b7ee0d7d97e4401) )
@@ -867,7 +867,7 @@ ROM_START( gravp )
 ROM_END
 
 ROM_START( lunarbat )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "010.010",      0x2800, 0x0800, CRC(48fd38aa) SHA1(e6ec31e784c2965369161c33d00903ba027f7f20) )
 	ROM_LOAD( "007.010",      0x3000, 0x1000, CRC(9754830e) SHA1(2e6885155a93d4eaf9a405f3eb740f2f4b30bc23) )
@@ -886,7 +886,7 @@ ROM_START( lunarbat )
 ROM_END
 
 ROM_START( lunarba1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "vrom1.bin",   0x2800, 0x0800, CRC(c60634d9) SHA1(b94f056b5e73a2e015ba9a4be66dc2abee325016) )
 	ROM_LOAD( "vrom2.bin",   0x3000, 0x1000, CRC(53d9a8a2) SHA1(c33766658dd3523e99e664ef42a4ba4ab884fa80) )
@@ -909,7 +909,7 @@ ROM_START( lunarba1 )
 ROM_END
 
 ROM_START( spacduel )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	/* Vector ROM */
 	ROM_LOAD( "136006.106",   0x2800, 0x0800, CRC(691122fe) SHA1(f53be76a49dba319050ca7767de3441521910e83) )
 	ROM_LOAD( "136006.107",   0x3000, 0x1000, CRC(d8dd0461) SHA1(58060b20b2511d30d2ec06479d21840bdd0b53c6) )

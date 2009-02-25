@@ -764,9 +764,9 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_DRIVER_START( arkanoid )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(arkanoid_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcu_map, 0)
@@ -778,7 +778,7 @@ static MACHINE_DRIVER_START( arkanoid )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -803,7 +803,7 @@ static MACHINE_DRIVER_START( bootleg )
 	MDRV_IMPORT_FROM(arkanoid)
 
 	// basic machine hardware
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bootleg_map, 0)
 
 	MDRV_CPU_REMOVE("mcu")
@@ -815,7 +815,7 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( arkanoid )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a75-01-1.rom", 0x0000, 0x8000, CRC(5bcda3b0) SHA1(52cadd38b5f8e8856f007a9c602d6b508f30be65) )
 	ROM_LOAD( "a75-11.rom",   0x8000, 0x8000, CRC(eafd7191) SHA1(d2f8843b716718b1de209e97a874e8ce600f3f87) )
 
@@ -834,7 +834,7 @@ ROM_START( arkanoid )
 ROM_END
 
 ROM_START( arknoidu )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a75-19.bin",   0x0000, 0x8000, CRC(d3ad37d7) SHA1(a172a1ef5bb83ee2d8ed2842ef8968af19ad411e) )
 	ROM_LOAD( "a75-18.bin",   0x8000, 0x8000, CRC(cdc08301) SHA1(05f54353cc8333af14fa985a2764960e20e8161a) )
 
@@ -853,7 +853,7 @@ ROM_START( arknoidu )
 ROM_END
 
 ROM_START( arknoiuo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a75-01-1.rom", 0x0000, 0x8000, CRC(5bcda3b0) SHA1(52cadd38b5f8e8856f007a9c602d6b508f30be65) )
 	ROM_LOAD( "a75-10.rom",   0x8000, 0x8000, CRC(a1769e15) SHA1(fbb45731246a098b29eb08de5d63074b496aaaba) )
 
@@ -872,7 +872,7 @@ ROM_START( arknoiuo )
 ROM_END
 
 ROM_START( arkatour )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a75-27.17",   0x0000, 0x8000, CRC(e3b8faf5) SHA1(4c09478fa41881fa89ee6afb676aeb780f17ac2e) )
 	ROM_LOAD( "a75-28.18",   0x8000, 0x8000, CRC(326aca4d) SHA1(5a194b7a0361236d471b24905dc6434372f81252) )
 
@@ -891,7 +891,7 @@ ROM_START( arkatour )
 ROM_END
 
 ROM_START( arknoidj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a75-21.rom",   0x0000, 0x8000, CRC(bf0455fc) SHA1(250522b84b9f491c3f4efc391bf6aa6124361369) )
 	ROM_LOAD( "a75-22.rom",   0x8000, 0x8000, CRC(3a2688d3) SHA1(9633a661352def3d85f95ca830f6d761b0b5450e) )
 
@@ -910,7 +910,7 @@ ROM_START( arknoidj )
 ROM_END
 
 ROM_START( arkmcubl )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "e1.6d",        0x0000, 0x8000, CRC(dd4f2b72) SHA1(399a8636030a702dafc1da926f115df6f045bef1) )
 	ROM_LOAD( "e2.6f",        0x8000, 0x8000, CRC(bbc33ceb) SHA1(e9b6fef98d0d20e77c7a1c25eff8e9a8c668a258) )
 
@@ -934,7 +934,7 @@ ROM_START( arkmcubl )
 ROM_END
 
 ROM_START( ark1ball )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a-1.7d",       0x0000, 0x8000, CRC(dd4f2b72) SHA1(399a8636030a702dafc1da926f115df6f045bef1) )
 	ROM_LOAD( "2palline.7f",  0x8000, 0x8000, CRC(ed6b62ab) SHA1(4d4991b422756bd304fc5ef236aac1422fe1f999) )
 
@@ -954,7 +954,7 @@ ROM_START( ark1ball )
 ROM_END
 
 ROM_START( arkangc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "arkgc.1",      0x0000, 0x8000, CRC(c54232e6) SHA1(beb759cee68009a06824b755d2aa26d7d436b5b0) )
 	ROM_LOAD( "arkgc.2",      0x8000, 0x8000, CRC(9f0d4754) SHA1(731c9224616a338084edd6944c754d68eabba7f2) )
 
@@ -970,7 +970,7 @@ ROM_START( arkangc )
 ROM_END
 
 ROM_START( arkangc2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.81",         0x0000, 0x8000, CRC(bd6eb996) SHA1(a048ff01156166595dca0b6bee46344f7db548a8) )
 	ROM_LOAD( "2.82",         0x8000, 0x8000, CRC(29dbe452) SHA1(b99cb98549bddf1e673e2e715c80664001581f9f) )
 
@@ -986,7 +986,7 @@ ROM_START( arkangc2 )
 ROM_END
 
 ROM_START( arkblock )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ark-6.bin",    0x0000, 0x8000, CRC(0be015de) SHA1(f4209085b59d2c96a62ac9657c7bf097da55362b) )
 	ROM_LOAD( "arkgc.2",      0x8000, 0x8000, CRC(9f0d4754) SHA1(731c9224616a338084edd6944c754d68eabba7f2) )
 
@@ -1002,7 +1002,7 @@ ROM_START( arkblock )
 ROM_END
 
 ROM_START( arkbloc2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "block01.bin",  0x0000, 0x8000, CRC(5be667e1) SHA1(fbc5c97d836c404a2e6c007c3836e36b52ae75a1) )
 	ROM_LOAD( "block02.bin",  0x8000, 0x8000, CRC(4f883ef1) SHA1(cb090a57fc75f17a3e2ba637f0e3ec93c1d02cea) )
 
@@ -1037,7 +1037,7 @@ Note:
 Dumped 19/03/2006 */
 
 ROM_START( arkgcbl )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "16.6e",        0x0000, 0x8000, CRC(b0f73900) SHA1(2c9a36cc1d2a3f33ec81d63c1c325554b818d2d3) )
 	ROM_LOAD( "17.6f",        0x8000, 0x8000, CRC(9827f297) SHA1(697874e73e045eb5a7bf333d7310934b239c0adf) )
 
@@ -1059,7 +1059,7 @@ ROM_START( arkgcbl )
 ROM_END
 
 ROM_START( paddle2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "paddle2.16",   0x0000, 0x8000, CRC(a286333c) SHA1(0b2c9cb0df236f327413d0c541453e1ba979ea38) )
 	ROM_LOAD( "paddle2.17",   0x8000, 0x8000, CRC(04c2acb5) SHA1(7ce8ba31224f705b2b6ed0200404ef5f8f688001) )
 
@@ -1075,7 +1075,7 @@ ROM_START( paddle2 )
 ROM_END
 
 ROM_START( arkatayt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic81-v.3f",   0x0000, 0x8000, CRC(154e2c6f) SHA1(dce3ae1ca83b5071ebec96f3ae18b96abe828ce5) )
 	ROM_LOAD( "ic82-w.5f",   0x8000, 0x8000, CRC(4fa8cefa) SHA1(fb825834da9c8638e6a328784922b5dc23f16564) )
 
@@ -1091,7 +1091,7 @@ ROM_START( arkatayt )
 ROM_END
 
 ROM_START( arktayt2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic81.3f",     0x0000, 0x8000, CRC(6e0a2b6f) SHA1(5227d7a944cb1e815f60ec87a67f7462870ff9fe) )
 	ROM_LOAD( "ic82.5f",     0x8000, 0x8000, CRC(5a97dd56) SHA1(b71c7b5ced2b0eebbcc5996dd21a1bb1c2da4819) )
 
@@ -1109,7 +1109,7 @@ ROM_END
 /* the other Dr. Korea game (Hexa, hexa.c) also appears to be derived from Arkanoid hardware */
 
 ROM_START( tetrsark )
-	ROM_REGION( 0x18000, "main", 0 )
+	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "ic17.1",      0x00000, 0x8000, CRC(1a505eda) SHA1(92f171a12cf0c326d29c244514718df04b998426) )
 	ROM_LOAD( "ic16.2",      0x08000, 0x8000, CRC(157bc4df) SHA1(b2c704148e7e3ca61ab51308ee0d66ea1088bff3) )
 
@@ -1173,7 +1173,7 @@ static DRIVER_INIT( paddle2 )
 
 static DRIVER_INIT( tetrsark )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	int x;
 
 	for (x=0;x<0x8000;x++)

@@ -244,11 +244,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( ultraman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,24000000/2)		/* 12 MHz? */
+	MDRV_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,24000000/6)	/* 4 MHz? */
+	MDRV_CPU_ADD("audiocpu", Z80,24000000/6)	/* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
@@ -257,7 +257,7 @@ static MACHINE_DRIVER_START( ultraman )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -285,11 +285,11 @@ MACHINE_DRIVER_END
 
 
 ROM_START( ultraman )
-	ROM_REGION( 0x040000, "main", 0 )	/* 68000 code */
+	ROM_REGION( 0x040000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"910-b01.c11",	0x000000, 0x020000, CRC(3d9e4323) SHA1(54ee218c9be1ac029836624839d0845b39e6e30f) )
 	ROM_LOAD16_BYTE(	"910-b02.d11",	0x000001, 0x020000, CRC(d24c82e9) SHA1(e792e2601e235939546fe98d52bfafe5a95b3491) )
 
-	ROM_REGION( 0x010000, "audio", 0 )	/* Z80 code */
+	ROM_REGION( 0x010000, "audiocpu", 0 )	/* Z80 code */
 	ROM_LOAD( "910-a05.d05",	0x00000, 0x08000, CRC(ebaef189) SHA1(73e6163466d55ae782f55839ba9c98f06c30876b) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	/* Sprites */

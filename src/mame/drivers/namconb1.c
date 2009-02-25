@@ -999,9 +999,9 @@ ADDRESS_MAP_END
 #define MASTER_CLOCK_HZ 48384000
 
 static MACHINE_DRIVER_START( namconb1 )
-	MDRV_CPU_ADD("main", M68EC020,MASTER_CLOCK_HZ/2)
+	MDRV_CPU_ADD("maincpu", M68EC020,MASTER_CLOCK_HZ/2)
 	MDRV_CPU_PROGRAM_MAP(namconb1_am,0)
-	MDRV_CPU_VBLANK_INT("main", namconb1_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", namconb1_interrupt)
 
 	MDRV_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
 	MDRV_CPU_PROGRAM_MAP(namcoc75_am, 0)
@@ -1012,7 +1012,7 @@ static MACHINE_DRIVER_START( namconb1 )
 	MDRV_MACHINE_START(namconb)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.7)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
@@ -1032,9 +1032,9 @@ static MACHINE_DRIVER_START( namconb1 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( namconb2 )
-	MDRV_CPU_ADD("main", M68EC020,MASTER_CLOCK_HZ/2)
+	MDRV_CPU_ADD("maincpu", M68EC020,MASTER_CLOCK_HZ/2)
 	MDRV_CPU_PROGRAM_MAP(namconb2_am,0)
-	MDRV_CPU_VBLANK_INT("main", namconb2_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", namconb2_interrupt)
 
 	MDRV_CPU_ADD("mcu", M37702, MASTER_CLOCK_HZ/3)
 	MDRV_CPU_PROGRAM_MAP(namcoc75_am, 0)
@@ -1045,7 +1045,7 @@ static MACHINE_DRIVER_START( namconb2 )
 	MDRV_MACHINE_START(namconb)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.7)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(NAMCONB1_HTOTAL, NAMCONB1_VTOTAL)
@@ -1067,7 +1067,7 @@ MACHINE_DRIVER_END
 /***************************************************************/
 
 ROM_START( ptblank )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn2mprlb.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) )
 	ROM_LOAD32_WORD( "gn2mprub.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) )
 
@@ -1097,7 +1097,7 @@ ROM_START( ptblank )
 ROM_END
 
 ROM_START( gunbulet )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn1-mprl.bin", 0x00002, 0x80000, CRC(f99e309e) SHA1(3fe0ddf756e6849f8effc7672456cbe32f65c98a) )
 	ROM_LOAD32_WORD( "gn1-mpru.bin", 0x00000, 0x80000, CRC(72a4db07) SHA1(8c5e1e51cd961b311d03f7b21f36a5bd5e8e9104) )
 
@@ -1127,7 +1127,7 @@ ROM_START( gunbulet )
 ROM_END
 
 ROM_START( nebulray )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "nr2-mpru.13b", 0x00000, 0x80000, CRC(049b97cb) SHA1(0e344b29a4d4bdc854fa9849589772df2eeb0a05) )
 	ROM_LOAD32_WORD( "nr2-mprl.15b", 0x00002, 0x80000, CRC(0431b6d4) SHA1(54c96e8ac9e753956c31bdef79d390f1c20e10ff) )
 
@@ -1164,7 +1164,7 @@ ROM_START( nebulray )
 ROM_END
 
 ROM_START( nebulryj )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "nr1-mpru", 0x00000, 0x80000, CRC(42ef71f9) SHA1(20e3cb63e1fde293c60c404b378d901d635c4b79) )
 	ROM_LOAD32_WORD( "nr1-mprl", 0x00002, 0x80000, CRC(fae5f62c) SHA1(143d716abbc834aac6270db3bbb89ec71ea3804d) )
 
@@ -1201,7 +1201,7 @@ ROM_START( nebulryj )
 ROM_END
 
 ROM_START( gslgr94u )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gse2mprl.bin", 0x00002, 0x80000, CRC(a514349c) SHA1(1f7ec81cd6193410d2f01e6f0f84878561fc8035) )
 	ROM_LOAD32_WORD( "gse2mpru.bin", 0x00000, 0x80000, CRC(b6afd238) SHA1(438a3411ac8ce3d22d5da8c0800738cb8d2994a9) )
 
@@ -1229,7 +1229,7 @@ ROM_START( gslgr94u )
 ROM_END
 
 ROM_START( gslgr94j )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gs41mprl.15b", 0x00002, 0x80000, CRC(5759bdb5) SHA1(a0fb332c484e168369a69cd9dd8ea72e5f4565df) )
 	ROM_LOAD32_WORD( "gs41mpru.13b", 0x00000, 0x80000, CRC(78bde1e7) SHA1(911d33897f03c59c6505f5f755d80471ff019812) )
 
@@ -1384,7 +1384,7 @@ Note! All ROMs are different to the Great Sluggers '94 set.
 */
 
 ROM_START( gslugrsj )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gs1mprl.15b", 0x00002, 0x80000, CRC(1e6c3626) SHA1(56abe21884fd87df10996db19c49ce14214d4b73) )
 	ROM_LOAD32_WORD( "gs1mpru.13b", 0x00000, 0x80000, CRC(ef355179) SHA1(0ab0ef4301a318681bb5827d35734a0732b35484) )
 
@@ -1412,7 +1412,7 @@ ROM_START( gslugrsj )
 ROM_END
 
 ROM_START( sws95 )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "ss51mprl.bin", 0x00002, 0x80000, CRC(c9e0107d) SHA1(0f10582416023a86ea1ef2679f3f06016c086e08) )
 	ROM_LOAD32_WORD( "ss51mpru.bin", 0x00000, 0x80000, CRC(0d93d261) SHA1(5edef26e2c86dbc09727d910af92747d022e4fed) )
 
@@ -1441,7 +1441,7 @@ ROM_START( sws95 )
 ROM_END
 
 ROM_START( sws96 )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "ss61mprl.bin", 0x00002, 0x80000, CRC(06f55e73) SHA1(6be26f8a2ef600bf07c580f210d7b265ac464002) )
 	ROM_LOAD32_WORD( "ss61mpru.bin", 0x00000, 0x80000, CRC(0abdbb83) SHA1(67e8b712291f9bcf2c3a52fbc451fad54679cab8) )
 
@@ -1469,7 +1469,7 @@ ROM_START( sws96 )
 ROM_END
 
 ROM_START( sws97 )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "ss71mprl.bin", 0x00002, 0x80000, CRC(bd60b50e) SHA1(9e00bacd506182ab2af2c0efdd5cc401b3e46485) )
 	ROM_LOAD32_WORD( "ss71mpru.bin", 0x00000, 0x80000, CRC(3444f5a8) SHA1(8d0f35b3ba8f65dbc67c3b2d273833227a8b8b2a) )
 
@@ -1497,7 +1497,7 @@ ROM_START( sws97 )
 ROM_END
 
 ROM_START( vshoot )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "vsj1mprl.15b", 0x00002, 0x80000, CRC(83a60d92) SHA1(c3db0c79f772a79418914353a3d6ecc4883ea54e) )
 	ROM_LOAD32_WORD( "vsj1mpru.13b", 0x00000, 0x80000, CRC(c63eb92d) SHA1(f93bd4b91daee645677955020dc8df14dc9bfd27) )
 
@@ -1685,7 +1685,7 @@ ou1obj4u.9b     OBJ4U     MB8316200B (16M SOP44)
 */
 
 ROM_START( outfxies )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "ou2mprl.11c", 0x00002, 0x80000, CRC(f414a32e) SHA1(9733ab087cfde1b8fb5b676d8a2eb5325ebdbb56) )
 	ROM_LOAD32_WORD( "ou2mpru.11d", 0x00000, 0x80000, CRC(ab5083fb) SHA1(cb2e7a4838c2b80057edb83ea63116bccb1394d3) )
 
@@ -1730,7 +1730,7 @@ ROM_START( outfxies )
 ROM_END
 
 ROM_START( outfxesj )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "ou1-mprl.11c", 0x00002, 0x80000, CRC(d3b9e530) SHA1(3f5fe5eea817a23dfe42e76f32912ce94d4c49c9) )
 	ROM_LOAD32_WORD( "ou1-mpru.11d", 0x00000, 0x80000, CRC(d98308fb) SHA1(fdefeebf56464a20e3aaefd88df4eee9f7b5c4f3) )
 
@@ -1776,7 +1776,7 @@ ROM_END
 
 
 ROM_START( machbrkr )
-	ROM_REGION( 0x100000, "main", 0 ) /* main program */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "mb1_mprl.11c", 0x00002, 0x80000, CRC(86cf0644) SHA1(07eeadda1d94c9be2f882edb6f2eb0b98292e500) )
 	ROM_LOAD32_WORD( "mb1_mpru.11d", 0x00000, 0x80000, CRC(fb1ff916) SHA1(e0ba96c1f26a60f87d8050e582e164d91e132183) )
 

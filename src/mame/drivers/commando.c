@@ -238,18 +238,18 @@ static INTERRUPT_GEN( commando_interrupt )
 
 static MACHINE_DRIVER_START( commando )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, PHI_MAIN)	// ???
+	MDRV_CPU_ADD("maincpu", Z80, PHI_MAIN)	// ???
 	MDRV_CPU_PROGRAM_MAP(commando_map, 0)
-	MDRV_CPU_VBLANK_INT("main", commando_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", commando_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, PHI_B)	// 3 MHz
+	MDRV_CPU_ADD("audiocpu", Z80, PHI_B)	// 3 MHz
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
 	// video hardware
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -277,11 +277,11 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( commando )
-	ROM_REGION( 2*0x10000, "main", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "cm04.9m",  0x0000, 0x8000, CRC(8438b694) SHA1(e154478d8f1b635355bd777370acabe49cb9d309) )
 	ROM_LOAD( "cm03.8m",  0x8000, 0x4000, CRC(35486542) SHA1(531a85c9e03970ce037be84f2240c2df6f6e3ec1) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cm02.9f",  0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -313,11 +313,11 @@ ROM_START( commando )
 ROM_END
 
 ROM_START( commandu )
-	ROM_REGION( 2*0x10000, "main", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "u4-f.9m",  0x0000, 0x8000, CRC(a6118935) SHA1(d5811968b23d61e344e151747bcc3c0ed2b9497b) )
 	ROM_LOAD( "u3-f.8m",  0x8000, 0x4000, CRC(24f49684) SHA1(d38a7bd9f3b506747a03f6b94c3f8a2d9fc59166) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cm02.9f",  0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -349,11 +349,11 @@ ROM_START( commandu )
 ROM_END
 
 ROM_START( commandj )
-	ROM_REGION( 2*0x10000, "main", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "so04.9m", 0x0000, 0x8000, CRC(d3f2bfb3) SHA1(738a5673ac6a907cb04cfb125e8aab3f7437b9d2) )
 	ROM_LOAD( "so03.8m", 0x8000, 0x4000, CRC(ed01f472) SHA1(fa181293ae8f0fee78d412259eb81f6de1e1307a) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "so02.9f", 0x0000, 0x4000, CRC(ca20aca5) SHA1(206a8fd4a8985e7ceed7de8349ba02627e881503) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -385,11 +385,11 @@ ROM_START( commandj )
 ROM_END
 
 ROM_START( commandb )
-	ROM_REGION( 2*0x10000, "main", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "commandb_04_9m_27256.bin",  0x0000, 0x8000, CRC(348a7654) SHA1(f3668c47c154a9c7d7afeabb0259c9bc56e847ac) )
 	ROM_LOAD( "cm03.8m",  0x8000, 0x4000, CRC(35486542) SHA1(531a85c9e03970ce037be84f2240c2df6f6e3ec1) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "cm02.9f",  0x0000, 0x4000, CRC(f9cc4a74) SHA1(ee8dd73919c6f47f62cc6d999de9510db9f79b8f) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -429,11 +429,11 @@ ROM_START( commandb )
 ROM_END
 
 ROM_START( sinvasn )
-	ROM_REGION( 2*0x10000, "main", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "sp04.9m",  0x0000, 0x8000, CRC(33f9601e) SHA1(71182227b77fccbbc1d89b5828aa86dcc64ca05e) )
 	ROM_LOAD( "sp03.8m",  0x8000, 0x4000, CRC(c7fb43b3) SHA1(36d0dffdacc36a6b6a77101d942c0821846f3275) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "u2.9f",    0x0000, 0x4000, CRC(cbf8c40e) SHA1(0c8dce034d96d075e012cbb8f68c2817b860d969) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -465,11 +465,11 @@ ROM_START( sinvasn )
 ROM_END
 
 ROM_START( sinvasnb )
-	ROM_REGION( 2*0x10000, "main", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "u4",       0x0000, 0x8000, CRC(834ba0de) SHA1(85f40559e6a436f3f752b6e862a419a5b9481fa8) )
 	ROM_LOAD( "u3",       0x8000, 0x4000, CRC(07e4ee3a) SHA1(6d7665b3072f075893ef37e55147b10271d069ef) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "u2",       0x0000, 0x4000, CRC(cbf8c40e) SHA1(0c8dce034d96d075e012cbb8f68c2817b860d969) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )
@@ -504,8 +504,8 @@ ROM_END
 
 static DRIVER_INIT( commando )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypt = auto_malloc(0xc000);
 	int A;
 
@@ -524,8 +524,8 @@ static DRIVER_INIT( commando )
 
 static DRIVER_INIT( spaceinv )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	UINT8 *rom = memory_region(machine, "main");
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypt = auto_malloc(0xc000);
 	int A;
 

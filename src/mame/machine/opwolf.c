@@ -427,7 +427,7 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 		if (offset == 0x14)
 		{
 #if OPWOLF_READ_COINAGE_FROM_ROM
-			UINT16* rom=(UINT16*)memory_region(space->machine, "main");
+			UINT16* rom=(UINT16*)memory_region(space->machine, "maincpu");
 			UINT32 coin_table[2]={0,0};
 			UINT8 coin_offset[2];
 			int slot;

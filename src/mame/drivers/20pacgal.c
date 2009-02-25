@@ -166,7 +166,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 	if (state->game_selected == 0)
 	{
-		UINT8 *rom = memory_region(space->machine, "main");
+		UINT8 *rom = memory_region(space->machine, "maincpu");
 		memcpy(rom+0x48000, rom+0x8000, 0x2000);
 	}
 }
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( rom_48000_w )
 		if (offset < 0x0800)
 			state->video_ram[offset & 0x07ff] = data;
 
-		memory_region(space->machine, "main")[0x48000 + offset] = data;
+		memory_region(space->machine, "maincpu")[0x48000 + offset] = data;
 	}
 }
 
@@ -290,10 +290,10 @@ static MACHINE_DRIVER_START( 20pacgal )
 	MDRV_DRIVER_DATA(_20pacgal_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z180, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z180, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(20pacgal_map,0)
 	MDRV_CPU_IO_MAP(20pacgal_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_NVRAM_HANDLER(eeprom)
 
@@ -320,7 +320,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( 20pacgal ) /* Version 1.04 */
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "20th_104.u13", 0x00000, 0x40000, CRC(6c474d2d) SHA1(5a150fc9d2ed0e908385b9f9d532aa33cf80dba4) )
 
 	ROM_REGION( 0x8000, "proms", 0 )	/* palette */
@@ -328,7 +328,7 @@ ROM_START( 20pacgal ) /* Version 1.04 */
 ROM_END
 
 ROM_START( 20pacgaa ) /* Version 1.01 */
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "20th_101.u13", 0x00000, 0x40000, CRC(77159582) SHA1(c05e005a941cbdc806dcd76b315069362c792a72) )
 
 	ROM_REGION( 0x8000, "proms", 0 )	/* palette */

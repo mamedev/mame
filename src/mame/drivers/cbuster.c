@@ -314,17 +314,17 @@ static const ym2151_interface ym2151_config =
 static MACHINE_DRIVER_START( twocrude )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000) /* Custom chip 59 */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59 */
 	MDRV_CPU_PROGRAM_MAP(twocrude_readmem,twocrude_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)/* VBL */
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("audio", H6280,32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	MDRV_CPU_ADD("audiocpu", H6280,32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -360,13 +360,13 @@ MACHINE_DRIVER_END
 /******************************************************************************/
 
 ROM_START( cbuster )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
   	ROM_LOAD16_BYTE( "fx01.rom", 0x00000, 0x20000, CRC(ddae6d83) SHA1(ce3fed1393b71821730fb8d87869a89c8e07c456) )
 	ROM_LOAD16_BYTE( "fx00.rom", 0x00001, 0x20000, CRC(5bc2c0de) SHA1(fa9c357ae4a5c814b7113df3b2f12982077f3e6b) )
   	ROM_LOAD16_BYTE( "fx03.rom", 0x40000, 0x20000, CRC(c3d65bf9) SHA1(99dd650fd4b427bca25a0776fbd6221f93504106) )
  	ROM_LOAD16_BYTE( "fx02.rom", 0x40001, 0x20000, CRC(b875266b) SHA1(a76f8e061392e17394a3f975584823ad39e0097e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fu11-.rom",     0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -398,13 +398,13 @@ ROM_START( cbuster )
 ROM_END
 
 ROM_START( cbusterw )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
   	ROM_LOAD16_BYTE( "fu01-.rom", 0x00000, 0x20000, CRC(0203e0f8) SHA1(7709636429f2cab43caba3422122dba970dfb50b) )
 	ROM_LOAD16_BYTE( "fu00-.rom", 0x00001, 0x20000, CRC(9c58626d) SHA1(6bc950929391221755972658258937a1ef96c244) )
   	ROM_LOAD16_BYTE( "fu03-.rom", 0x40000, 0x20000, CRC(def46956) SHA1(e1f71a440430f8f9351ee9e1826ca2d0d5a372f8) )
  	ROM_LOAD16_BYTE( "fu02-.rom", 0x40001, 0x20000, CRC(649c3338) SHA1(06373b364283706f0b00ab6d014c674e4b9818fa) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fu11-.rom",     0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -436,13 +436,13 @@ ROM_START( cbusterw )
 ROM_END
 
 ROM_START( cbusterj )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
   	ROM_LOAD16_BYTE( "fr01-1",   0x00000, 0x20000, CRC(af3c014f) SHA1(a7724c48f73e52b19f3688a413e2ed013e226c6b) )
 	ROM_LOAD16_BYTE( "fr00-1",   0x00001, 0x20000, CRC(f666ad52) SHA1(6f7325bc3bb79fd8112df677250c4bae572dfa43) )
   	ROM_LOAD16_BYTE( "fr03",     0x40000, 0x20000, CRC(02c06118) SHA1(a251f936f80d8a9af033fe6d0d42e1e17ebbbf98) )
  	ROM_LOAD16_BYTE( "fr02",     0x40001, 0x20000, CRC(b6c34332) SHA1(c1215c72a03b368655e20f4557475a2fc4c46c9e) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fu11-.rom",     0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -474,13 +474,13 @@ ROM_START( cbusterj )
 ROM_END
 
 ROM_START( twocrude )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ft01",     0x00000, 0x20000, CRC(08e96489) SHA1(1e75893cc086d6d6b428ca055851b51d0bc367aa) )
 	ROM_LOAD16_BYTE( "ft00",     0x00001, 0x20000, CRC(6765c445) SHA1(b2bbb86414eafe32ed66f3f8ab095a2bce3a1a4b) )
 	ROM_LOAD16_BYTE( "ft03",     0x40000, 0x20000, CRC(28002c99) SHA1(6397b05a1a237bb17657bee6c8185f61c60c6a2c) )
 	ROM_LOAD16_BYTE( "ft02",     0x40001, 0x20000, CRC(37ea0626) SHA1(ec1822eda83829c599cad217b6d5dd34fb970101) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "fu11-.rom",     0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
@@ -515,7 +515,7 @@ ROM_END
 
 static DRIVER_INIT( twocrude )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	UINT8 *PTR;
 	int i,j;
 

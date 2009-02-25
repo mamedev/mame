@@ -340,23 +340,23 @@ static MACHINE_START( lgp )
 /* DRIVER */
 static MACHINE_DRIVER_START( lgp )
 	/* main cpu */
-	MDRV_CPU_ADD("main", Z80, CPU_PCB_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_PCB_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_program_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_callback_lgp)
+	MDRV_CPU_VBLANK_INT("screen", vblank_callback_lgp)
 
 	/* sound cpu */
-	MDRV_CPU_ADD("audio", Z80, SOUND_PCB_CLOCK)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_PCB_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_program_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_MACHINE_START(lgp)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(lgp, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_LENGTH(256)
 	/* MDRV_PALETTE_INIT(lgp) */
@@ -375,7 +375,7 @@ MACHINE_DRIVER_END
 ROM_START( lgp )
 	/* CPU PCB */
 	/* Main program */
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "a02_01.63", 0x0000, 0x2000, CRC(088ca6e1) SHA1(b3f0869b0c333d991363ac46a1c53daa3f6c85e9) )
 	ROM_LOAD( "a02_02.62", 0x2000, 0x2000, CRC(8e1be578) SHA1(cfad7cb72c7d13b2b614680bccc6f807521f3bf4) )
 	ROM_LOAD( "a02_03.61", 0x4000, 0x2000, CRC(4978953a) SHA1(eec6596430238ffffb0d173852bdd7f11c60e9b2) )
@@ -420,7 +420,7 @@ ROM_START( lgp )
 
 	/* SOUND PCB */
 	/* Sound CPU - on Sound PCB */
-	ROM_REGION( 0x4000, "audio", 0 )
+	ROM_REGION( 0x4000, "audiocpu", 0 )
 	ROM_LOAD( "a02_29.ic11", 0x0000, 0x2000, CRC(c44026db) SHA1(93a6e8f272ca826c05a7be59e14a1a0c848fbaa0) )
 	ROM_LOAD( "a02_30.ic17", 0x2000, 0x2000, CRC(8c324556) SHA1(9e1f6f00d4023d9cfd414d3cc02af55be49dde2c) )	/* Sound data? */
 

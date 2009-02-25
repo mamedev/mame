@@ -387,7 +387,7 @@ static WRITE16_HANDLER( metro_soundstatus_w )
 static WRITE8_HANDLER( metro_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(space->machine, "audio");
+	UINT8 *ROM = memory_region(space->machine, "audiocpu");
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
@@ -398,7 +398,7 @@ static WRITE8_HANDLER( metro_sound_rombank_w )
 static WRITE8_HANDLER( daitorid_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(space->machine, "audio");
+	UINT8 *ROM = memory_region(space->machine, "audiocpu");
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
@@ -1933,7 +1933,7 @@ static WRITE16_HANDLER( blzntrnd_sound_w )
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
@@ -3754,14 +3754,14 @@ static const UPD7810_CONFIG metro_cpu_config =
 static MACHINE_DRIVER_START( balcube )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(balcube_readmem,balcube_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3787,14 +3787,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( daitoa )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(daitoa_readmem,daitoa_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3819,14 +3819,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bangball )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(bangball_readmem,bangball_writemem)
-	MDRV_CPU_VBLANK_INT("main", bangball_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", bangball_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3852,14 +3852,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( batlbubl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(batlbubl_readmem,batlbubl_writemem)
-	MDRV_CPU_VBLANK_INT("main", bangball_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", bangball_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3884,11 +3884,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( daitorid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(daitorid_readmem,daitorid_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(daitorid_snd_readmem,daitorid_snd_writemem)
 	MDRV_CPU_IO_MAP(daitorid_snd_readport,daitorid_snd_writeport)
@@ -3896,7 +3896,7 @@ static MACHINE_DRIVER_START( daitorid )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3927,11 +3927,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dharma )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(dharma_readmem,dharma_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(metro_snd_readmem,metro_snd_writemem)
 	MDRV_CPU_IO_MAP(metro_snd_readport,metro_snd_writeport)
@@ -3939,7 +3939,7 @@ static MACHINE_DRIVER_START( dharma )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -3969,11 +3969,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( karatour )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(karatour_readmem,karatour_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(metro_snd_readmem,metro_snd_writemem)
 	MDRV_CPU_IO_MAP(metro_snd_readport,metro_snd_writeport)
@@ -3981,7 +3981,7 @@ static MACHINE_DRIVER_START( karatour )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4011,11 +4011,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( 3kokushi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(kokushi_readmem,kokushi_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(metro_snd_readmem,metro_snd_writemem)
 	MDRV_CPU_IO_MAP(metro_snd_readport,metro_snd_writeport)
@@ -4023,7 +4023,7 @@ static MACHINE_DRIVER_START( 3kokushi )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4053,11 +4053,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lastfort )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(lastfort_readmem,lastfort_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(metro_snd_readmem,metro_snd_writemem)
 	MDRV_CPU_IO_MAP(metro_snd_readport,metro_snd_writeport)
@@ -4065,7 +4065,7 @@ static MACHINE_DRIVER_START( lastfort )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4094,11 +4094,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lastforg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(lastforg_readmem,lastforg_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(metro_snd_readmem,metro_snd_writemem)
 	MDRV_CPU_IO_MAP(metro_snd_readport,metro_snd_writeport)
@@ -4106,7 +4106,7 @@ static MACHINE_DRIVER_START( lastforg )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4135,14 +4135,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( dokyusei )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(dokyusei_readmem,dokyusei_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(dokyusei_interrupt,2)	/* ? */
 
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4185,15 +4185,15 @@ static NVRAM_HANDLER( dokyusp )
 static MACHINE_DRIVER_START( dokyusp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(dokyusp_readmem,dokyusp_writemem)
-	MDRV_CPU_VBLANK_INT("main", gakusai_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
 	MDRV_NVRAM_HANDLER(dokyusp)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4223,15 +4223,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gakusai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(gakusai_readmem,gakusai_writemem)
-	MDRV_CPU_VBLANK_INT("main", gakusai_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4261,15 +4261,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gakusai2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(gakusai2_readmem,gakusai2_writemem)
-	MDRV_CPU_VBLANK_INT("main", gakusai_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", gakusai_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4299,11 +4299,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pangpoms )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(pangpoms_readmem,pangpoms_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(metro_snd_readmem,metro_snd_writemem)
 	MDRV_CPU_IO_MAP(metro_snd_readport,metro_snd_writeport)
@@ -4311,7 +4311,7 @@ static MACHINE_DRIVER_START( pangpoms )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4341,11 +4341,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( poitto )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(poitto_readmem,poitto_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(metro_snd_readmem,metro_snd_writemem)
 	MDRV_CPU_IO_MAP(metro_snd_readport,metro_snd_writeport)
@@ -4353,7 +4353,7 @@ static MACHINE_DRIVER_START( poitto )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4383,11 +4383,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pururun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(pururun_readmem,pururun_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(daitorid_snd_readmem,daitorid_snd_writemem)
 	MDRV_CPU_IO_MAP(daitorid_snd_readport,daitorid_snd_writeport)
@@ -4395,7 +4395,7 @@ static MACHINE_DRIVER_START( pururun )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4426,11 +4426,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( skyalert )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(skyalert_readmem,skyalert_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(metro_snd_readmem,metro_snd_writemem)
 	MDRV_CPU_IO_MAP(metro_snd_readport,metro_snd_writeport)
@@ -4438,7 +4438,7 @@ static MACHINE_DRIVER_START( skyalert )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4468,11 +4468,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( toride2g )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(toride2g_readmem,toride2g_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", UPD7810, 12000000)
+	MDRV_CPU_ADD("audiocpu", UPD7810, 12000000)
 	MDRV_CPU_CONFIG(metro_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(metro_snd_readmem,metro_snd_writemem)
 	MDRV_CPU_IO_MAP(metro_snd_readport,metro_snd_writeport)
@@ -4480,7 +4480,7 @@ static MACHINE_DRIVER_START( toride2g )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4510,14 +4510,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mouja )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* ??? */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mouja_readmem,mouja_writemem)
-	MDRV_CPU_VBLANK_INT("main", mouja_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", mouja_interrupt)
 
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4546,18 +4546,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( blzntrnd )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(blzntrnd_readmem,blzntrnd_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", Z80, 8000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(blzntrnd_sound_readmem, blzntrnd_sound_writemem)
 	MDRV_CPU_IO_MAP(blzntrnd_sound_readport, blzntrnd_sound_writeport)
 
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4585,18 +4585,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gstrik2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(blzntrnd_readmem,blzntrnd_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(karatour_interrupt,10)	/* ? */
 
-	MDRV_CPU_ADD("audio", Z80, 8000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(blzntrnd_sound_readmem, blzntrnd_sound_writemem)
 	MDRV_CPU_IO_MAP(blzntrnd_sound_readport, blzntrnd_sound_writeport)
 
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4654,7 +4654,7 @@ static INTERRUPT_GEN( puzzlet_interrupt )
 static MACHINE_DRIVER_START( puzzlet )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", H83007, XTAL_20MHz)	// H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
+	MDRV_CPU_ADD("maincpu", H83007, XTAL_20MHz)	// H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
 
 	MDRV_CPU_PROGRAM_MAP(puzzlet_map,0)
 	MDRV_CPU_IO_MAP(puzzlet_io_map,0)
@@ -4663,7 +4663,7 @@ static MACHINE_DRIVER_START( puzzlet )
 	MDRV_MACHINE_RESET(metro)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -4846,7 +4846,7 @@ Metro 1996
 ***************************************************************************/
 
 ROM_START( balcube )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "6", 0x000000, 0x040000, CRC(c400f84d) SHA1(416eb82ec1201d24d9d964191a5a1792c9445923) )
 	ROM_LOAD16_BYTE( "5", 0x000001, 0x040000, CRC(15313e3f) SHA1(10a8702016f223194dc91875b4736253fd47dbb8) )
 
@@ -4867,7 +4867,7 @@ Daitoride (YMF278B version)
 
 
 ROM_START( daitoa )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "dt_ja-6.6", 0x000000, 0x040000, CRC(c753954e) SHA1(f895c776ec6e2da063d3fbf9630f4812ba7bc455) )
 	ROM_LOAD16_BYTE( "dt_ja-5.5", 0x000001, 0x040000, CRC(c4340290) SHA1(6748572a8733d88a1dd03604628e3d0e90171cf0) )
 
@@ -4938,7 +4938,7 @@ Limenko's web site states:
 ***************************************************************************/
 
 ROM_START( bangball )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom#006.u18", 0x000000, 0x040000, CRC(0e4124bc) SHA1(f5cd762df4e822ab5c8dba6f276b3366895235d1) )
 	ROM_LOAD16_BYTE( "rom#005.u19", 0x000001, 0x040000, CRC(3fa08587) SHA1(8fdafdde5e77d077b5cd8f94f97b5430fe062936) )
 
@@ -4954,7 +4954,7 @@ ROM_START( bangball )
 ROM_END
 
 ROM_START( batlbubl )
-	ROM_REGION( 0x100000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "lm-01.u11", 0x000000, 0x080000, CRC(1d562807) SHA1(3e5dbe6f4b04aa9e01b7b8938d0b46d4862054bf) )
 	ROM_LOAD16_WORD_SWAP( "lm-02.u12", 0x080000, 0x080000, CRC(852e4750) SHA1(d8b703ba65d0f267eba07f160b13dbe0f5ac40c2) )
 
@@ -4985,13 +4985,13 @@ Chips:  Imagetek 14220 071
 ***************************************************************************/
 
 ROM_START( blzntrnd )
-	ROM_REGION( 0x200000, "main", 0 )	/* 68000 */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68000 */
 	ROM_LOAD16_BYTE( "1k.bin", 0x000000, 0x80000, CRC(b007893b) SHA1(609363449c0218b8a38de72d37c66e6f3bb4f8cd) )
 	ROM_LOAD16_BYTE( "2k.bin", 0x000001, 0x80000, CRC(ec173252) SHA1(652d70055d2799442beede1ae68e54551931068f) )
 	ROM_LOAD16_BYTE( "3k.bin", 0x100000, 0x80000, CRC(1e230ba2) SHA1(ca96c82d57a6b5bacc1bfd2f7965503c2a6e162f) )
 	ROM_LOAD16_BYTE( "4k.bin", 0x100001, 0x80000, CRC(e98ca99e) SHA1(9346fc0d419add23eaceb5843c505f3ffa69e495) )
 
-	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 */
 	ROM_LOAD( "rom5.bin", 0x0000, 0x20000, CRC(7e90b774) SHA1(abd0eda9eababa1f7ab17a2f60534dcebda33c9c) )
 
 	ROM_REGION( 0x1800000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
@@ -5064,13 +5064,13 @@ Notes:
 */
 
 ROM_START( gstrik2 )
-	ROM_REGION( 0x200000, "main", 0 )	/* 68000 */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 68000 */
 	ROM_LOAD16_BYTE( "prg0.107", 0x000000, 0x80000, CRC(e60a8c19) SHA1(19be6cfcb60ede6fd4eb2e14914b174107c4b52d) )
 	ROM_LOAD16_BYTE( "prg1.108", 0x000001, 0x80000, CRC(853f6f7c) SHA1(8fb9d7cd0390f620560a1669bb13f2033eed7c81) )
 	ROM_LOAD16_BYTE( "prg2.109", 0x100000, 0x80000, CRC(ead86919) SHA1(eb9b68dff4e08d90ac90043c7f3021914caa007d) )
 	ROM_LOAD16_BYTE( "prg3.110", 0x100001, 0x80000, CRC(e0b026e3) SHA1(05f75c0432efda3dec0372199382e310bb268fba) )
 
-	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 */
+	ROM_REGION( 0x20000, "audiocpu", 0 )	/* Z80 */
 	ROM_LOAD( "sprg.30", 0x0000, 0x20000, CRC(aeef6045) SHA1(61b8c89ca495d3aac79e53413a85dd203db816f3) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
@@ -5125,11 +5125,11 @@ MTR5260-A
 ***************************************************************************/
 
 ROM_START( daitorid )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "dt-ja-5.19e", 0x000000, 0x020000, CRC(441efd77) SHA1(18b255f42ba7a180535f0897aaeebe5d2a33df46) )
 	ROM_LOAD16_BYTE( "dt-ja-6.19c", 0x000001, 0x020000, CRC(494f9cc3) SHA1(b88af581fee9e2d94a12a5c1fed0797614bb738e) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "dt-ja-8.3h", 0x000000, 0x004000, CRC(0351ad5b) SHA1(942c1cbb52bf2933aea4209335c1bc4cdd1cc3dd) )
 	ROM_CONTINUE(           0x010000, 0x01c000 )
 
@@ -5184,11 +5184,11 @@ Korean version of Dharma runs on Metro hardware PCB Number - METRO CORP. MTR527
 ***************************************************************************/
 
 ROM_START( dharma )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "jc-5", 0x000000, 0x020000, CRC(b5d44426) SHA1(d68aaf6b9976ccf5cb665d7ec0afa44e2453094d) )
 	ROM_LOAD16_BYTE( "jc-6", 0x000001, 0x020000, CRC(bc5a202e) SHA1(c2b6d2e44e3605e0525bde4030c5162badad4d4b) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "ja-8", 0x000000, 0x004000, CRC(af7ebc4c) SHA1(6abf0036346da10be56932f9674f8c250a3ea592) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
 	ROM_CONTINUE(     0x010000, 0x01c000 )
 
@@ -5203,11 +5203,11 @@ ROM_START( dharma )
 ROM_END
 
 ROM_START( dharmak )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "5.bin", 0x000000, 0x020000, CRC(7dec1f77) SHA1(86cda990392e738f1bacec9d7a232d27887c1135) )
 	ROM_LOAD16_BYTE( "6.bin", 0x000001, 0x020000, CRC(a194edbe) SHA1(676a4c0d4ee842a1b9d1c86ecd89417ebd6b5927) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "8.bin", 0x000000, 0x004000, CRC(d0e0a8e2) SHA1(99a3142589a1763ba162ed5b1b6c44961a5aaabc) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
 	ROM_CONTINUE(     0x010000, 0x01c000 )
 
@@ -5268,11 +5268,11 @@ ROMs 1-4 = GFX Data
 */
 
 ROM_START( gunmast )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "gmja-5.20e", 0x000000, 0x040000, CRC(7334b2a3) SHA1(23f0a00b7539329f23eb564bc2823383997f83a9) )
 	ROM_LOAD16_BYTE( "gmja-6.20c", 0x000001, 0x040000, CRC(c38d185e) SHA1(fdbc16a6ffc791778cb7ac2dafd15f4eb72c4cf9) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "gmja-8.3i", 0x000000, 0x004000, CRC(ab4bcc56) SHA1(9ef91e14d0974f30c874a12370ddd04ee8ab6d5d) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
 	ROM_CONTINUE(     0x010000, 0x01c000 )
 
@@ -5325,11 +5325,11 @@ KTMASK4.BIN 361A07 9239D    17D
 ***************************************************************************/
 
 ROM_START( karatour )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "kt002.8g",  0x000000, 0x040000, CRC(316a97ec) SHA1(4b099d2fa91822c9c85d647aab3d6779fc400250) )
 	ROM_LOAD16_BYTE( "kt003.10g", 0x000001, 0x040000, CRC(abe1b991) SHA1(9b6327169d66717dd9dd74816bc33eb208c3763c) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "kt001.1i", 0x000000, 0x004000, CRC(1dd2008c) SHA1(488b6f5d15bdbc069ee2cd6d7a0980a228d2f790) )	// 11xxxxxxxxxxxxxxx = 0xFF
 	ROM_CONTINUE(         0x010000, 0x01c000 )
 
@@ -5373,11 +5373,11 @@ Imagetek I4100 052 9330EK712
 ***************************************************************************/
 
 ROM_START( ladykill )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "e2.bin",    0x000000, 0x040000, CRC(211a4865) SHA1(4315c0a708383d357d8dd89a1820fe6cf7652adb) )
 	ROM_LOAD16_BYTE( "e3.bin",    0x000001, 0x040000, CRC(581a55ea) SHA1(41bfcaae84e583bf185948ab53ec39c05180a7a4) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "e1.1i",    0x000000, 0x004000, CRC(a4d95cfb) SHA1(2fd8a5cbb0dc289bd5294519dbd5369bfb4c2d4d) )	// 11xxxxxxxxxxxxxxx = 0xFF
 	ROM_CONTINUE(         0x010000, 0x01c000 )
 
@@ -5392,11 +5392,11 @@ ROM_START( ladykill )
 ROM_END
 
 ROM_START( moegonta )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "j2.8g",     0x000000, 0x040000, CRC(aa18d130) SHA1(6e0fd3b95d8589665b418bcae4fe64b288289c78) )
 	ROM_LOAD16_BYTE( "j3.10g",    0x000001, 0x040000, CRC(b555e6ab) SHA1(adfc6eafec612c8770b9f832a0a2574c53c3d047) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "e1.1i",    0x000000, 0x004000, CRC(a4d95cfb) SHA1(2fd8a5cbb0dc289bd5294519dbd5369bfb4c2d4d) )	// 11xxxxxxxxxxxxxxx = 0xFF
 	ROM_CONTINUE(         0x010000, 0x01c000 )
 
@@ -5434,11 +5434,11 @@ VG420
 ***************************************************************************/
 
 ROM_START( lastfort )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "tr_jc09", 0x000000, 0x020000, CRC(8b98a49a) SHA1(15adca78d54973820d04f8b308dc58d0784eb900) )
 	ROM_LOAD16_BYTE( "tr_jc10", 0x000001, 0x020000, CRC(8d04da04) SHA1(5c7e65a39929e94d1fa99aeb5fed7030b110451f) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "tr_jb12", 0x000000, 0x004000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
 	ROM_CONTINUE(        0x010000, 0x01c000 )
 
@@ -5457,11 +5457,11 @@ ROM_START( lastfort )
 ROM_END
 
 ROM_START( lastfork )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "7f-9",  0x000000, 0x020000, CRC(d2894c1f) SHA1(4f4ab6d8ce69999cd7c4a9ddabec8d1e8fefc6fc) )
 	ROM_LOAD16_BYTE( "8f-10", 0x000001, 0x020000, CRC(9696ea39) SHA1(27af0c6399cd7be40aa8a1c1b58e0db8408aff11) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "tr_jb12", 0x000000, 0x004000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
 	ROM_CONTINUE(        0x010000, 0x01c000 )
 
@@ -5482,11 +5482,11 @@ ROM_END
 /* German version on PCB VG460-(A) */
 
 ROM_START( lastforg )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "trma02.bin",    0x000000, 0x020000, CRC(e6f40918) SHA1(c8c9369103530b2214c779c8a643ba9349b3eac5) )
 	ROM_LOAD16_BYTE( "trma03.bin",    0x000001, 0x020000, CRC(b00fb126) SHA1(7dd4b7a2d1c5401fde2275ef76fac1ccc586a0bd) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "trma01.bin",  0x000000, 0x004000,  CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) ) /* Same as parent set, but different label */
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
@@ -5515,11 +5515,11 @@ OSC: 24.000 MHz
 ***************************************************************************/
 
 ROM_START( lastfero )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "tre_jc09", 0x000000, 0x020000, CRC(32f43390) SHA1(b5bad9d80f2155f277265fe487a59f0f4ec6575d) )
 	ROM_LOAD16_BYTE( "tre_jc10", 0x000001, 0x020000, CRC(9536369c) SHA1(39291e92c107be35d130ff29533b42581efc308b) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "tr_jb12", 0x000000, 0x004000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
 	ROM_CONTINUE(        0x010000, 0x01c000 )
 
@@ -5553,7 +5553,7 @@ Board Name?:VG330-B
 ***************************************************************************/
 
 ROM_START( dokyusei )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "330_a06.bin", 0x000000, 0x020000, CRC(36157c2e) SHA1(f855175143caf476dcbee5a8aaec802a8fdb64fa) )
 	ROM_LOAD16_BYTE( "330_a05.bin", 0x000001, 0x020000, CRC(177f50d2) SHA1(2298411152553041b907d9243aaa7983ca21c946) )
 
@@ -5586,7 +5586,7 @@ Custom: 14300 095
 ***************************************************************************/
 
 ROM_START( dokyusp )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x020000, CRC(01729b7f) SHA1(42a60f034ee5d5c2a42856b97d0d4c499b24627b) )
 	ROM_LOAD16_BYTE( "5.bin", 0x000001, 0x020000, CRC(57770776) SHA1(15093886f2fe49443e8d7541903714de0a14aa0b) )
 
@@ -5619,7 +5619,7 @@ Custom: 14300 095
 ***************************************************************************/
 
 ROM_START( gakusai )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x040000, CRC(6f8ab082) SHA1(18caf49a0c65f831d375f089f27b8570b094f029) )
 	ROM_LOAD16_BYTE( "5.bin", 0x000001, 0x040000, CRC(010176c4) SHA1(48fcea18c02c1426a699a636f44b21cf7625e8a0) )
 
@@ -5656,7 +5656,7 @@ Custom: 14300 095
 ***************************************************************************/
 
 ROM_START( gakusai2 )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "mg2a06.bin", 0x000000, 0x020000, CRC(8b006dd4) SHA1(893ec0e7c367d79bc99e65ab8abd0d290f2ede58) )
 	ROM_LOAD16_BYTE( "mg2a05.bin", 0x000001, 0x020000, CRC(7702b9ac) SHA1(09d0c11fa2c9ed9cde365cb1ff215d55e39b7734) )
 
@@ -5689,7 +5689,7 @@ other   :Imagetek Inc 14300 095
 ***************************************************************************/
 
 ROM_START( mouja )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "10.bin",      0x000000, 0x040000, CRC(f9742b69) SHA1(f8c6508b227403a82413ceeb0651922759d7e0f4) )
 	ROM_LOAD16_BYTE( "9.bin",       0x000001, 0x040000, CRC(dc77216f) SHA1(3b73d29f4e8e385f45f2abfb38eaffc2d8406948) )
 
@@ -5739,11 +5739,11 @@ Custom graphics chip - Imagetek 14100 052 9227KK701 (same as Karate Tournament)
 ***************************************************************************/
 
 ROM_START( pangpoms )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "ppoms09.bin", 0x000000, 0x020000, CRC(0c292dbc) SHA1(8b09de2a560e804e0dea514c95b317c2e2b6501d) )
 	ROM_LOAD16_BYTE( "ppoms10.bin", 0x000001, 0x020000, CRC(0bc18853) SHA1(68d50ad50caad34e72d32e7b9fea1d85af74b879) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "ppoms12.bin", 0x000000, 0x004000, CRC(a749357b) SHA1(1555f565c301c5be7c49fc44a004b5c0cb3777c6) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
@@ -5762,11 +5762,11 @@ ROM_START( pangpoms )
 ROM_END
 
 ROM_START( pangpomm )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "pa.c09", 0x000000, 0x020000, CRC(e01a7a08) SHA1(1890b290dfb1521ab73b2392409aaf44b99d63bb) )
 	ROM_LOAD16_BYTE( "pa.c10", 0x000001, 0x020000, CRC(5e509cee) SHA1(821cfbf5f65cc3091eb8008310266f9f2c838072) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "ppoms12.bin", 0x000000, 0x004000, CRC(a749357b) SHA1(1555f565c301c5be7c49fc44a004b5c0cb3777c6) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
@@ -5817,11 +5817,11 @@ AMD MACH110-20 (CPLD)
 ***************************************************************************/
 
 ROM_START( poitto )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "pt-jd05.20e", 0x000000, 0x020000, CRC(6b1be034) SHA1(270c94f6017c5ce77f562bfe17273c79d4455053) )
 	ROM_LOAD16_BYTE( "pt-jd06.20c", 0x000001, 0x020000, CRC(3092d9d4) SHA1(4ff95355fdf94eaa55c0ad46e6ce3b505e3ef790) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "pt-jc08.3i", 0x000000, 0x004000, CRC(f32d386a) SHA1(655c561aec1112d88c1b94725e932059e5d1d5a8) )	// 1xxxxxxxxxxxxxxxx = 0xFF
 	ROM_CONTINUE(           0x010000, 0x01c000 )
 
@@ -5880,7 +5880,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( puzzlet )
-	ROM_REGION( 0x200000, "main", 0 )	/* H8/3007 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* H8/3007 Code */
 	ROM_LOAD16_WORD_SWAP( "prg1_ver2.u9", 0x000000, 0x200000, CRC(592760da) SHA1(08f7493d2e50831438f53bbf0ae211ec40057da7) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
@@ -5915,11 +5915,11 @@ MTR5260-A                3.5759MHz  12MHz
 ***************************************************************************/
 
 ROM_START( puzzli )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "pz.jb5",       0x000000, 0x020000, CRC(33bbbd28) SHA1(41a98cfbdd60a638e4aa08f15f1730a2436106f9) )
 	ROM_LOAD16_BYTE( "pz.jb6",       0x000001, 0x020000, CRC(e0bdea18) SHA1(9941a2cd88d7a3c1a640f837d9f34c39ba643ee5) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "pz.jb8",      0x000000, 0x004000, CRC(c652da32) SHA1(907eba5103373ca6204f9d62c426ccdeef0a3791) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
@@ -5946,11 +5946,11 @@ sound: YM2413 + M6295
 ***************************************************************************/
 
 ROM_START( 3kokushi )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "5.bin",        0x000000, 0x040000, CRC(6104ea35) SHA1(efb4a9a98577894fac720028f18cb9877a00239a) )
 	ROM_LOAD16_BYTE( "6.bin",        0x000001, 0x040000, CRC(aac25540) SHA1(811de761bb1b3cc47d811b00f4b5c960c8f061d0) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "8.bin",       0x000000, 0x004000, CRC(f56cca45) SHA1(4739b83b0b3a4235fac10def3d26b0bd190eb12a) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
@@ -5997,11 +5997,11 @@ AMD MACH110-20 (CPLD)
 ***************************************************************************/
 
 ROM_START( pururun )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "pu9-19-5.20e", 0x000000, 0x020000, CRC(5a466a1b) SHA1(032eeaf66ce1b601385a8e76d2efd9ea6fd34680) )
 	ROM_LOAD16_BYTE( "pu9-19-6.20c", 0x000001, 0x020000, CRC(d155a53c) SHA1(6916a1bad82c624b8757f5124416dac50a8dd7f5) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "pu9-19-8.3i", 0x000000, 0x004000, CRC(edc3830b) SHA1(13ee759d10711218465f6d7155e9c443a82b323c) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
@@ -6030,11 +6030,11 @@ other   :D78C10ACW,Imagetek Inc 14100 052
 ***************************************************************************/
 
 ROM_START( skyalert )
-	ROM_REGION( 0x040000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x040000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "sa_c_09.bin", 0x000000, 0x020000, CRC(6f14d9ae) SHA1(37e134af3d8461280dab971bc3ee9112f25de335) )
 	ROM_LOAD16_BYTE( "sa_c_10.bin", 0x000001, 0x020000, CRC(f10bb216) SHA1(d904030fbb838d906ca69a77cffe286e903b273d) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "sa_b_12.bin", 0x000000, 0x004000, CRC(f358175d) SHA1(781d0f846217aa71e3c6d73c1d63bd87d1fa6b48) )	// (c)1992 Imagetek (1xxxxxxxxxxxxxxxx = 0xFF)
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
@@ -6085,11 +6085,11 @@ AMD MACH110-20 (CPLD)
 ***************************************************************************/
 
 ROM_START( toride2g )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "tr2aja-5.20e", 0x000000, 0x040000, CRC(b96a52f6) SHA1(353b5599d50d96b96bdd6352c046ad669cf8da44) )
 	ROM_LOAD16_BYTE( "tr2aja-6.20c", 0x000001, 0x040000, CRC(2918b6b4) SHA1(86ebb884759dc9a8a701784d19845467aa1ce11b) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "tr2aja-8.3i", 0x000000, 0x004000, CRC(fdd29146) SHA1(8e996e1afd33f16d35ebf5a40829feb3e92f781f) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
@@ -6104,11 +6104,11 @@ ROM_START( toride2g )
 ROM_END
 
 ROM_START( torid2gg )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "trii_ge_5", 0x000000, 0x040000, CRC(5e0815a8) SHA1(574c1bf1149b7e98222876b402b20d824f207c79) )
 	ROM_LOAD16_BYTE( "trii_ge_6", 0x000001, 0x040000, CRC(55eba67d) SHA1(c12a11a98d49baf3643404a594d2b87b434acb01) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "trii_jb_8", 0x000000, 0x004000, CRC(0168f46f) SHA1(01bf4cc425d72936897c3c572f6c0b1366fe4041) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 
@@ -6123,11 +6123,11 @@ ROM_START( torid2gg )
 ROM_END
 
 ROM_START( toride2j )
-	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "tr2_jk-5.20e", 0x000000, 0x040000, CRC(f2668578) SHA1(1dd18a5597efb25c937697b50fb1262f50580a63) )
 	ROM_LOAD16_BYTE( "tr2_jk-6.20c", 0x000001, 0x040000, CRC(4c87629f) SHA1(5fde8580bedb783491ee87ecfe4b1c22d0c9f716) )
 
-	ROM_REGION( 0x02c000, "audio", 0 )		/* NEC78C10 Code */
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
 	ROM_LOAD( "tr2_jb-8.3i", 0x000000, 0x004000, CRC(0168f46f) SHA1(01bf4cc425d72936897c3c572f6c0b1366fe4041) )
 	ROM_CONTINUE(            0x010000, 0x01c000 )
 

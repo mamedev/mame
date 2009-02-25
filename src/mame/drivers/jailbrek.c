@@ -251,9 +251,9 @@ static MACHINE_START( jailbrek )
 static MACHINE_DRIVER_START( jailbrek )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/12)
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/12)
 	MDRV_CPU_PROGRAM_MAP(jailbrek_map, 0)
-	MDRV_CPU_VBLANK_INT("main", jb_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", jb_interrupt)
 	MDRV_CPU_PERIODIC_INT(jb_interrupt_nmi, 500) /* ? */
 
 	MDRV_MACHINE_START(jailbrek)
@@ -262,7 +262,7 @@ static MACHINE_DRIVER_START( jailbrek )
 	MDRV_GFXDECODE(jailbrek)
 	MDRV_PALETTE_LENGTH(512)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/3, 396, 8, 248, 256, 16, 240)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
@@ -288,7 +288,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( jailbrek )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "507p03.11d", 0x8000, 0x4000, CRC(a0b88dfd) SHA1(f999e382b9d3b812fca41f4d0da3ea692fef6b19) )
 	ROM_LOAD( "507p02.9d",  0xc000, 0x4000, CRC(444b7d8e) SHA1(c708b67c2d249448dae9a3d10c24d13ba6849597) )
 
@@ -313,7 +313,7 @@ ROM_START( jailbrek )
 ROM_END
 
 ROM_START( manhatan )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "507n03.11d", 0x8000, 0x4000, CRC(e5039f7e) SHA1(0f12484ed40444d978e0405c27bdd027ae2e2a0b) )
     ROM_LOAD( "507n02.9d",  0xc000, 0x4000, CRC(143cc62c) SHA1(9520dbb1b6f1fa439e03d4caa9bed96ef8f805f2) )
 
@@ -374,7 +374,7 @@ ROM_END
 */
 
 ROM_START( jailbrkb )
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.k6",    0x8000, 0x8000, CRC(df0e8fc7) SHA1(62e59dbb3941ed8af365e96906315318d9aee060) )
 
     ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE ) /* characters */
@@ -422,7 +422,7 @@ static DRIVER_INIT( jailbrek )
         }
     }
 
-    konami1_decode(machine, "main");
+    konami1_decode(machine, "maincpu");
 }
 
 GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, jailbrek, ROT0, "Konami", "Jail Break", GAME_SUPPORTS_SAVE )

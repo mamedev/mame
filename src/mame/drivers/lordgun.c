@@ -70,7 +70,7 @@ VIDEO_UPDATE( lordgun );
 static DRIVER_INIT( lordgun )
 {
 	int i;
-	UINT16 *src = (UINT16 *)memory_region(machine, "main");
+	UINT16 *src = (UINT16 *)memory_region(machine, "maincpu");
 
 	int rom_size = 0x100000;
 
@@ -432,11 +432,11 @@ static const ym3812_interface lordgun_ym3812_interface =
 };
 
 static MACHINE_DRIVER_START( lordgun )
-	MDRV_CPU_ADD("main", M68000, 10000000)
+	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(lordgun_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 5000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(lordgun_soundmem_map,0)
 	MDRV_CPU_IO_MAP(lordgun_soundio_map,0)
 
@@ -448,7 +448,7 @@ static MACHINE_DRIVER_START( lordgun )
 	MDRV_GFXDECODE(lordgun)
 
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -477,10 +477,10 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( hfh )
 	MDRV_IMPORT_FROM(lordgun)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hfh_map,0)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_IO_MAP(hfh_soundio_map,0)
 
 	// sound hardware
@@ -673,11 +673,11 @@ NOTE: Speakers should be connected serially to Speaker (+) and Speaker (-).
 */
 
 ROM_START( lordgun )
-	ROM_REGION( 0x100000, "main", 0 ) // 68000
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000
 	ROM_LOAD16_BYTE( "lordgun.10", 0x00000, 0x80000, CRC(acda77ef) SHA1(7cd8580419e2f62a3b5a1e4a6020a3ef978ff1e8) )
 	ROM_LOAD16_BYTE( "lordgun.4",  0x00001, 0x80000, CRC(a1a61254) SHA1(b0c5aa656024cfb9be28a11061656159e7b72d00) )
 
-	ROM_REGION( 0x010000, "sound", 0 ) // Z80
+	ROM_REGION( 0x010000, "soundcpu", 0 ) // Z80
 	ROM_LOAD( "lordgun.90", 0x00000, 0x10000, CRC(d59b5e28) SHA1(36696058684d69306f463ed543c8b0195bafa21e) )	// 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0xc00000, "gfx1", 0 )	// Sprites
@@ -711,11 +711,11 @@ ROM_END
 */
 
 ROM_START( hfh )
-	ROM_REGION( 0x100000, "main", 0 ) // 68000
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000
 	ROM_LOAD16_BYTE( "hfh_p.u80", 0x00000, 0x80000, CRC(5175ebdc) SHA1(4a0bdda0f8291f895f888bfd45328b2b124b9051) )
 	ROM_LOAD16_BYTE( "hfh_p.u79", 0x00001, 0x80000, CRC(42ad978c) SHA1(eccb96e7170902b37989c8f207e1a821f29b2475) )
 
-	ROM_REGION( 0x010000, "sound", 0 ) // Z80
+	ROM_REGION( 0x010000, "soundcpu", 0 ) // Z80
 	ROM_LOAD( "hfh_s.u86", 0x00000, 0x10000, CRC(5728a9ed) SHA1(e5a9e4a1a2cc6c848b08608bc8727bc739270873) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )

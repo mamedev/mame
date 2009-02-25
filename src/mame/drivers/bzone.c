@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1840, 0x1840) AM_WRITE(bzone_sounds_w)
 	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE(MATHBOX, "mathbox", mathbox_go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE(ATARIVGEAROM, "earom", atari_vg_earom_r, atari_vg_earom_w)
 	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE(MATHBOX, "mathbox", mathbox_go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -546,14 +546,14 @@ static const pokey_interface redbaron_pokey_interface =
 static MACHINE_DRIVER_START( bzone )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, MASTER_CLOCK / 8)
+	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
 	MDRV_CPU_PROGRAM_MAP(bzone_map,0)
 	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)MASTER_CLOCK / 4096 / 12)
 
 	MDRV_MACHINE_START(bzone)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(40)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 580, 0, 400)
@@ -592,7 +592,7 @@ static MACHINE_DRIVER_START( redbaron )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(bzone)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(redbaron_map,0)
 	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)MASTER_CLOCK / 4096 / 12)
 
@@ -601,7 +601,7 @@ static MACHINE_DRIVER_START( redbaron )
 	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
 
@@ -625,7 +625,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( bzone )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "036414.01",  0x5000, 0x0800, CRC(efbc3fa0) SHA1(6d284fab34b09dde8aa0df7088711d4723f07970) )
 	ROM_LOAD( "036413.01",  0x5800, 0x0800, CRC(5d9d9111) SHA1(42638cff53a9791a0f18d316f62a0ea8eea4e194) )
 	ROM_LOAD( "036412.01",  0x6000, 0x0800, CRC(ab55cbd2) SHA1(6bbb8316d9f8588ea0893932f9174788292b8edc) )
@@ -652,7 +652,7 @@ ROM_END
 
 
 ROM_START( bzone2 )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "036414a.01", 0x5000, 0x0800, CRC(13de36d5) SHA1(40e356ddc5c042bc1ce0b71f51e8b6de72daf1e4) )
 	ROM_LOAD( "036413.01",  0x5800, 0x0800, CRC(5d9d9111) SHA1(42638cff53a9791a0f18d316f62a0ea8eea4e194) )
 	ROM_LOAD( "036412.01",  0x6000, 0x0800, CRC(ab55cbd2) SHA1(6bbb8316d9f8588ea0893932f9174788292b8edc) )
@@ -679,7 +679,7 @@ ROM_END
 
 
 ROM_START( bzonec ) /* cocktail version */
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "bz1g4800",   0x4800, 0x0800, CRC(e228dd64) SHA1(247c788b4ccadf6c1e9201ad4f31d55c0036ff0f) )
 	ROM_LOAD( "bz1f5000",   0x5000, 0x0800, CRC(dddfac9a) SHA1(e6f2761902e1ffafba437a1117e9ba40f116087d) )
 	ROM_LOAD( "bz1e5800",   0x5800, 0x0800, CRC(7e00e823) SHA1(008e491a8074dac16e56c3aedec32d4b340158ce) )
@@ -707,7 +707,7 @@ ROM_END
 
 
 ROM_START( bradley )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "btc1.bin",   0x4000, 0x0800, CRC(0bb8e049) SHA1(158517ff9a4e8ae7270ccf7eab87bf77427a4a8c) )
 	ROM_LOAD( "btd1.bin",   0x4800, 0x0800, CRC(9e0566d4) SHA1(f14aa5c3d14136c5e9a317004f82d44a8d5d6815) )
 	ROM_LOAD( "bte1.bin",   0x5000, 0x0800, CRC(64ee6a42) SHA1(33d0713ed2a1f4c1c443dce1f053321f2c279293) )
@@ -736,7 +736,7 @@ ROM_END
 
 
 ROM_START( redbaron )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "037587.01",  0x4800, 0x0800, CRC(60f23983) SHA1(7a9e5380bf49bf50a2d8ab0e0bd1ba3ac8efde24) )
 	ROM_CONTINUE(           0x5800, 0x0800 )
 	ROM_LOAD( "037000.01e", 0x5000, 0x0800, CRC(69bed808) SHA1(27d99efc74113cdcbbf021734b8a5a5fdb78c04c) )

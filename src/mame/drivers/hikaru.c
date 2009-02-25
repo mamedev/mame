@@ -308,11 +308,11 @@ ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( hikaru )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", SH4, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK)
 //  MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(hikaru_map,0)
 //  MDRV_CPU_IO_MAP(hikaru_port,0)
-//  MDRV_CPU_VBLANK_INT("main", hikaru,vblank)
+//  MDRV_CPU_VBLANK_INT("screen", hikaru,vblank)
 	MDRV_CPU_ADD("slave", SH4, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(hikaru_map_slave,0)
 
@@ -322,7 +322,7 @@ static MACHINE_DRIVER_START( hikaru )
 //  MDRV_NVRAM_HANDLER(hikaru_eeproms)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -357,7 +357,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( hikaru )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
 	ROM_REGION( 0x400000, "user1", ROMREGION_ERASE)
@@ -365,7 +365,7 @@ ROM_END
 
 
 ROM_START( airtrix )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
 	ROM_REGION( 0x800000, "user1", 0)
@@ -400,7 +400,7 @@ ROM_END
 
 
 ROM_START( pharrier )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
 	ROM_REGION( 0x2000000, "user1", 0)
@@ -434,7 +434,7 @@ ROM_START( pharrier )
 ROM_END
 
 ROM_START( podrace )
-	ROM_REGION( 0x200000, "main", 0)
+	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
 	ROM_REGION( 0x2000000, "user1", 0)

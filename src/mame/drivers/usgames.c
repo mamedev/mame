@@ -42,7 +42,7 @@ extern UINT8 *usgames_videoram,*usgames_charram;
 
 static WRITE8_HANDLER( usgames_rombank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 //  logerror ("BANK WRITE? -%02x-\n",data);
 //popmessage("%02x",data);
@@ -225,7 +225,7 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",		/* screen we are acting on */
+	"screen",	/* screen we are acting on */
 	8,			/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
@@ -239,14 +239,14 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( usg32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 2000000) /* ?? */
+	MDRV_CPU_ADD("maincpu", M6809, 2000000) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(usgames_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,5) /* ?? */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -271,14 +271,14 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( usg185 )
 	MDRV_IMPORT_FROM(usg32)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(usg185_map,0)
 MACHINE_DRIVER_END
 
 
 
 ROM_START( usg32 )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "usg32-0.bin", 0x08000, 0x08000, CRC(bc313387) SHA1(8df2e2736f14e965303993ae4105176bdd59f49d) )
 	/* for the banked region */
 	ROM_LOAD( "usg32-1.bin", 0x18000, 0x08000, CRC(baaea800) SHA1(1f35b8c0d40a923488c591497a3c3806d6d104e1) )
@@ -289,7 +289,7 @@ ROM_END
 
 /* You can't change the status of "Sexy Triv I" and "Sexy Triv II" */
 ROM_START( usg83 )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "grom08-3.rom", 0x08000, 0x08000, CRC(aae84186) SHA1(8385b5c1dded1ea6f90c277b045778c7110a45db) )
 	/* for the banked region */
 	ROM_LOAD( "usg83-1.bin", 0x18000, 0x08000, CRC(7b520b6f) SHA1(2231e63fecc6e9026dd4b6ee3e21a74cc0e0ae44) )
@@ -300,7 +300,7 @@ ROM_END
 
 /* Similar to 'usg83', but you can change the status of "Sexy Triv I" */
 ROM_START( usg83x )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "usg83-0.bin", 0x08000, 0x08000, CRC(4ad9b6e0) SHA1(54940619511b37577bbcd9d05b941079ba793c72) )
 	/* for the banked region */
 	ROM_LOAD( "usg83-1.bin", 0x18000, 0x08000, CRC(7b520b6f) SHA1(2231e63fecc6e9026dd4b6ee3e21a74cc0e0ae44) )
@@ -311,7 +311,7 @@ ROM_END
 
 /* Similar to 'usg83', but "Sport Triv" and "Rush Hour" aren't available by default */
 ROM_START( usg82 )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "rom0.rom",   0x08000, 0x08000, CRC(09c20b78) SHA1(8b622fef536e98e22866a15c6a5b5da583169e8c) )
 	/* for the banked region */
 	ROM_LOAD( "grom1.rom",   0x18000, 0x08000, CRC(915a9ff4) SHA1(5007210ed46a9cea530c18a8c4a67b07b87cb781) )
@@ -350,7 +350,7 @@ PCB Layout
 */
 
 ROM_START( usg182 )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "grom0.u12",    0x08000, 0x08000, CRC(f5a053c1) SHA1(ae2740cd9af0af7a74a88720ebafd785bfc8614b) )
 	/* for the banked region */
 	ROM_LOAD( "grom4.u36",    0x10000, 0x10000, CRC(b104744d) SHA1(fa2128c39a135b119ef625eed447afa523f912c0) )
@@ -361,7 +361,7 @@ ROM_END
 
 
 ROM_START( usg185 ) // an upgraded 182?
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "usg182.u12",   0x08000, 0x08000, CRC(2f4ed125) SHA1(6ea2ce263b8abe8d283d1c85d403ec908a422448) )
 	/* for the banked region */
 	ROM_LOAD( "usg185.u36",   0x10000, 0x10000, CRC(b104744d) SHA1(fa2128c39a135b119ef625eed447afa523f912c0) ) // ROM 4
@@ -372,7 +372,7 @@ ROM_END
 
 
 ROM_START( usg252 )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "usg252.u12",   0x08000, 0x08000, CRC(766a855a) SHA1(e67ca9944d92192de423de6aa8a60f2e28b17db1) )
 	/* for the banked region */
 	ROM_LOAD( "usg252.u28",   0x1c000, 0x04000, CRC(d44d2ffa) SHA1(8bd756418b4f8ad11cb0f2044fb91c63d7771497) )	// ROM 2

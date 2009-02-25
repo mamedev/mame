@@ -649,7 +649,7 @@ WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w )
 
 	coin_lockout_global_w(data & 0x04);  /* SX8 */
 
-	c8080bw_flip_screen_w(cputag_get_address_space(device->machine, "main", ADDRESS_SPACE_PROGRAM), data & 0x20);  /* SX11 */
+	c8080bw_flip_screen_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), data & 0x20);  /* SX11 */
 
 	/* 0x01 - SX6 - Plane Down */
 	discrete_sound_w(device, POLARIS_SX6_EN, data & 0x01);

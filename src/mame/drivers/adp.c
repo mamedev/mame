@@ -239,7 +239,7 @@ static PALETTE_INIT( adp )
 static VIDEO_START(adp)
 {
 //  UINT32 i;
-//  UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
+//  UINT16 *prgrom = (UINT16*)memory_region(machine, "maincpu");
 
 	HD63484_start();
 
@@ -515,16 +515,16 @@ static INTERRUPT_GEN( adp_int )
 */
 
 static MACHINE_DRIVER_START( quickjac )
-	MDRV_CPU_ADD("main", M68000, 8000000)
+	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
-//  MDRV_CPU_VBLANK_INT("main", adp_int)
+//  MDRV_CPU_VBLANK_INT("screen", adp_int)
 
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
 
 	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -543,16 +543,16 @@ static MACHINE_DRIVER_START( quickjac )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( skattv )
-	MDRV_CPU_ADD("main", M68000, 8000000)
+	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(skattv_mem, 0)
-//  MDRV_CPU_VBLANK_INT("main", adp_int)
+//  MDRV_CPU_VBLANK_INT("screen", adp_int)
 
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
 
 	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -571,10 +571,10 @@ static MACHINE_DRIVER_START( skattv )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( backgamn )
-	MDRV_CPU_ADD("main", M68000, 8000000)
+	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(backgamn_mem, 0)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -594,12 +594,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( funland )
 	MDRV_IMPORT_FROM( skattv )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(funland_mem, 0)
 MACHINE_DRIVER_END
 
 ROM_START( quickjac )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "quick_jack_index_a.1.u2.bin", 0x00000, 0x10000, CRC(c2fba6fe) SHA1(f79e5913f9ded1e370cc54dd55860263b9c51d61) )
 	ROM_LOAD16_BYTE( "quick_jack_index_a.2.u6.bin", 0x00001, 0x10000, CRC(210cb89b) SHA1(8eac60d40b60e845f9c02fee6c447f125ba5d1ab) )
 
@@ -609,7 +609,7 @@ ROM_START( quickjac )
 ROM_END
 
 ROM_START( skattv )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "f2_i.bin", 0x00000, 0x20000, CRC(3cb8b431) SHA1(e7930876b6cd4cba837c3da05d6948ef9167daea) )
 	ROM_LOAD16_BYTE( "f2_ii.bin", 0x00001, 0x20000, CRC(0db1d2d5) SHA1(a29b0299352e0b2b713caf02aa7978f2a4b34e37) )
 
@@ -619,7 +619,7 @@ ROM_START( skattv )
 ROM_END
 
 ROM_START( skattva )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "skat_tv_version_ts3.1.u2.bin", 0x00000, 0x20000, CRC(68f82fe8) SHA1(d5f9cb600531cdd748616d8c042b6a151ebe205a) )
 	ROM_LOAD16_BYTE( "skat_tv_version_ts3.2.u6.bin", 0x00001, 0x20000, CRC(4f927832) SHA1(bbe013005fd00dd42d12939eab5c80ec44a54b71) )
 
@@ -629,7 +629,7 @@ ROM_START( skattva )
 ROM_END
 
 ROM_START( backgamn )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "b_f2_i.bin", 0x00000, 0x10000, CRC(9e42937c) SHA1(85d462a560b85b03ee9d341e18815b7c396118ac) )
 	ROM_LOAD16_BYTE( "b_f2_ii.bin", 0x00001, 0x10000, CRC(8e0ee50c) SHA1(2a05c337db1131b873646aa4109593636ebaa356) )
 
@@ -639,7 +639,7 @@ ROM_START( backgamn )
 ROM_END
 
 ROM_START( fashiong )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fashion_gambler_s6_i.bin", 0x00000, 0x80000, CRC(827a164d) SHA1(dc16380226cabdefbfd893cb50cbfca9e134be40) )
 	ROM_LOAD16_BYTE( "fashion_gambler_s6_ii.bin", 0x00001, 0x80000, CRC(5a2466d1) SHA1(c113a2295beed2011c70887a1f2fcdec00b055cb) )
 
@@ -654,7 +654,7 @@ ROM_START( fashiong )
 ROM_END
 
 ROM_START( funlddlx )
-	ROM_REGION( 0x100000, "main", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fldl_f6_1.bin", 0x00001, 0x80000, CRC(85c74040) SHA1(24a7d3e6acbaf73ef9817379bef64c38a9ff7896) )
 	ROM_LOAD16_BYTE( "fldl_f6_2.bin", 0x00000, 0x80000, CRC(93bf1a4b) SHA1(5b4353feba1e0d4402cd26f4855e3803e6be43b9) )
 

@@ -268,7 +268,7 @@ static READ16_HANDLER( unknown_verify_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
-	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("main", 0x38000) AM_BASE(&bankrom_base)
+	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_BASE(&bankrom_base)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("260002")
@@ -397,7 +397,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( offtwall )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, ATARI_CLOCK_14MHz/2)
+	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_RESET(offtwall)
@@ -408,7 +408,7 @@ static MACHINE_DRIVER_START( offtwall )
 	MDRV_GFXDECODE(offtwall)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
@@ -430,7 +430,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( offtwall )
-	ROM_REGION( 0x40000, "main", 0 )	/* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "otw2012.bin", 0x00000, 0x20000, CRC(d08d81eb) SHA1(5a72aa2e4fc6455b94aa59a7719d0ddc8bcc80f2) )
 	ROM_LOAD16_BYTE( "otw2013.bin", 0x00001, 0x20000, CRC(61c2553d) SHA1(343d39f9b75fd236e9769ec21ab65310f85e31ca) )
 
@@ -449,7 +449,7 @@ ROM_END
 
 
 ROM_START( offtwalc )
-	ROM_REGION( 0x40000, "main", 0 )	/* 4*64k for 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )	/* 4*64k for 68000 code */
 	ROM_LOAD16_BYTE( "090-2612.rom", 0x00000, 0x20000, CRC(fc891a3f) SHA1(027815a20fbc6c0c9242768581b97362b39941c2) )
 	ROM_LOAD16_BYTE( "090-2613.rom", 0x00001, 0x20000, CRC(805d79d4) SHA1(943ec9f408ba875bdf1794ce7d24803043480401) )
 

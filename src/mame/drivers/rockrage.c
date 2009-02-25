@@ -71,7 +71,7 @@ static INTERRUPT_GEN( rockrage_interrupt )
 static WRITE8_HANDLER( rockrage_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	/* bits 4-6 = bank number */
 	bankaddress = 0x10000 + ((data & 0x70) >> 4) * 0x2000;
@@ -284,15 +284,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( rockrage )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", HD6309, 3000000*4)		/* 24MHz/8 */
+	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8 */
 	MDRV_CPU_PROGRAM_MAP(rockrage_readmem,rockrage_writemem)
-	MDRV_CPU_VBLANK_INT("main", rockrage_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", rockrage_interrupt)
 
-	MDRV_CPU_ADD("audio", M6809, 1500000)		/* 24MHz/16 */
+	MDRV_CPU_ADD("audiocpu", M6809, 1500000)		/* 24MHz/16 */
 	MDRV_CPU_PROGRAM_MAP(rockrage_readmem_sound,rockrage_writemem_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -325,11 +325,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( rockrage )
-	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "620q01.16c", 0x08000, 0x08000, CRC(0ddb5ef5) SHA1(71b38c9f957858371f0ac95720d3c6d07339e5c5) )	/* fixed ROM */
 	ROM_LOAD( "620q02.15c", 0x10000, 0x10000, CRC(b4f6e346) SHA1(43fded4484836ff315dd6e40991f909dad73f1ed) )	/* banked ROM */
 
-	ROM_REGION(  0x10000 , "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
 	ROM_REGION( 0x040000, "gfx1", ROMREGION_DISPOSE )
@@ -350,11 +350,11 @@ ROM_START( rockrage )
 ROM_END
 
 ROM_START( rockraga )
-	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "620n01.16c", 0x08000, 0x10000, CRC(f89f56ea) SHA1(64ba2575e09af257b242d913eab69130f7341894) )	/* fixed ROM */
 	ROM_LOAD( "620n02.15c", 0x10000, 0x10000, CRC(5bc1f1cf) SHA1(d5bb9971d778449e0c01495f9888c0da7ac617a7) )	/* banked ROM */
 
-	ROM_REGION(  0x10000 , "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) ) /* Same rom but labeled as ver "G" */
 
 	ROM_REGION( 0x040000, "gfx1", ROMREGION_DISPOSE )
@@ -379,11 +379,11 @@ ROM_START( rockraga )
 ROM_END
 
 ROM_START( rockragj )
-	ROM_REGION( 0x20000, "main", 0 ) /* code + banked roms */
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* code + banked roms */
 	ROM_LOAD( "620k01.16c", 0x08000, 0x08000, CRC(4f5171f7) SHA1(5bce9e3f9d01c113c697853763cd891b91297eb2) )	/* fixed ROM */
 	ROM_LOAD( "620k02.15c", 0x10000, 0x10000, CRC(04c4d8f7) SHA1(2a1a024fc38bb934c454092b0aed74d0f1d1c4af) )	/* banked ROM */
 
-	ROM_REGION(  0x10000 , "audio", 0 ) /* 64k for the sound CPU */
+	ROM_REGION(  0x10000 , "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "620k03.11c", 0x08000, 0x08000, CRC(9fbefe82) SHA1(ab42b7e519a0dd08f2249dad0819edea0976f39a) )
 
 	ROM_REGION( 0x040000, "gfx1", ROMREGION_DISPOSE )

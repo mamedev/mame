@@ -1363,7 +1363,7 @@ static VIDEO_UPDATE(segac2_new)
 static MACHINE_DRIVER_START( segac )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XL2_CLOCK/6)
+	MDRV_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_START(segac2)
@@ -1423,7 +1423,7 @@ MACHINE_DRIVER_END
 /* ----- System C Games ----- */
 
 ROM_START( bloxeedc ) /* Bloxeed (C System Version)  (c)1989 Sega / Elorg */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr12908.32", 0x000000, 0x020000, CRC(fc77cb91) SHA1(248a462e3858ffdc171af7d806e57deecb5dae50) )
 	ROM_LOAD16_BYTE( "epr12907.31", 0x000001, 0x020000, CRC(e5fcbac6) SHA1(a1adec5ef5574bff96a3d66619a24a6715097bb9) )
 	ROM_LOAD16_BYTE( "epr12993.34", 0x040000, 0x020000, CRC(487bc8fc) SHA1(3fb205bf56f35443e993e08b39c1a08c13ca5e3b) )
@@ -1431,7 +1431,7 @@ ROM_START( bloxeedc ) /* Bloxeed (C System Version)  (c)1989 Sega / Elorg */
 ROM_END
 
 ROM_START( bloxeedu ) /* Bloxeed USA (C System Version)  (c)1989 Sega / Elorg */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr12997a.32", 0x000000, 0x020000, CRC(23655bc9) SHA1(32fc1f75a43aa49dc656d40d34ec10f3f0a2bdb3) )
 	ROM_LOAD16_BYTE( "epr12996a.31", 0x000001, 0x020000, CRC(83c83f0c) SHA1(ca8e2ad7cceabd8de7a91b91cb92eafb6dd3171f) )
 	ROM_LOAD16_BYTE( "epr12993.34", 0x040000, 0x020000, CRC(487bc8fc) SHA1(3fb205bf56f35443e993e08b39c1a08c13ca5e3b) )
@@ -1440,39 +1440,39 @@ ROM_END
 
 
 ROM_START( columns ) /* Columns (World) (c)1990 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr13114.32", 0x000000, 0x020000, CRC(ff78f740) SHA1(0a034103a4b942f43e62f6e717f5dbf1bfb0b613) )
 	ROM_LOAD16_BYTE( "epr13113.31", 0x000001, 0x020000, CRC(9a426d9b) SHA1(3322e65ebf8d0a6047f7d408387c63ea401b8973) )
 ROM_END
 
 ROM_START( columnsu ) /* Columns (US) (c)1990 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr13116a.32", 0x000000, 0x020000, CRC(a0284b16) SHA1(a72c8567ab2386ef6bc7bb83cc1612f4c6bf8461) )
 	ROM_LOAD16_BYTE( "epr13115a.31", 0x000001, 0x020000, CRC(e37496f3) SHA1(30ebeed76613ae8d6d3ce9fca282124685067b27) )
 ROM_END
 
 ROM_START( columnsj ) /* Columns (Jpn) (c)1990 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr13112.32", 0x000000, 0x020000, CRC(bae6e53e) SHA1(2c2fd621eecd55591f22d076323972a7d0314615) )
 	ROM_LOAD16_BYTE( "epr13111.31", 0x000001, 0x020000, CRC(aa5ccd6d) SHA1(480e29e3112282d1790f1fb68075453325ba4336) )
 ROM_END
 
 
 ROM_START( columns2 ) /* Columns II - The Voyage Through Time  (c)1990 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr13363.bin", 0x000000, 0x020000, CRC(c99e4ffd) SHA1(67981aa08c8a625af35dd7689011364159cf9194) )
 	ROM_LOAD16_BYTE( "epr13362.bin", 0x000001, 0x020000, CRC(394e2419) SHA1(d4f726b32cf301d0d52611237b83177e69bfaf71) )
 ROM_END
 
 ROM_START( column2j ) /* Columns II - The Voyage Through Time (Jpn)  (c)1990 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr13361.rom", 0x000000, 0x020000, CRC(b54b5f12) SHA1(4d7fbae7d9bcadd433ebc25aef255dc43df611bc) )
 	ROM_LOAD16_BYTE( "epr13360.rom", 0x000001, 0x020000, CRC(a59b1d4f) SHA1(e9ee315677782e1c61ae8f11260101cc03176188) )
 ROM_END
 
 
 ROM_START( tantrbl2 ) /* Tant-R (Puzzle & Action) (Alt Bootleg Running on C Board?, No Samples) */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "trb2_2.32",    0x000000, 0x080000, CRC(8fc99c48) SHA1(d90ed673fe1f6e1f878c0d8fc62f5439b56d0a47) )
 	ROM_LOAD16_BYTE( "trb2_1.31",    0x000001, 0x080000, CRC(c318d00d) SHA1(703760d4ddc45bc0921ae96a27d9a8fbf12a1e96) )
 	ROM_LOAD16_BYTE( "mpr15616.34",  0x100000, 0x080000, CRC(17b80202) SHA1(f47bf2aa0c5972647438619b8453c7dede5c422f) )
@@ -1480,7 +1480,7 @@ ROM_START( tantrbl2 ) /* Tant-R (Puzzle & Action) (Alt Bootleg Running on C Boar
 ROM_END
 
 ROM_START( tantrbl3 ) /* Tant-R (Puzzle & Action) (Alt Bootleg Running on C Board?, No Samples) */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "2.u29",  0x000000, 0x080000, CRC(faecb7b1) SHA1(ddca61996dbd0d66e9ecc04647e61a6d0af25807) )
 	ROM_LOAD16_BYTE( "1.u28",  0x000001, 0x080000, CRC(3304556d) SHA1(586265c846bf6404dcb33404e961bf0733e24bf5) )
 	ROM_LOAD16_BYTE( "4.u31",  0x100000, 0x080000, CRC(17b80202) SHA1(f47bf2aa0c5972647438619b8453c7dede5c422f) )
@@ -1488,7 +1488,7 @@ ROM_START( tantrbl3 ) /* Tant-R (Puzzle & Action) (Alt Bootleg Running on C Boar
 ROM_END
 
 ROM_START( ichirjbl ) /* Ichident-R (Puzzle & Action 2) (Bootleg Running on C Board?, No Samples) */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "27c4000.2",0x000000, 0x080000, CRC(5a194f44) SHA1(67a4d21b91704f8c2210b5106e82e22ba3366f4c) )
 	ROM_LOAD16_BYTE( "27c4000.1",0x000001, 0x080000, CRC(de209f84) SHA1(0860d0ebfab2952e82fc1e292bf9410d673d9322) )
 	ROM_LOAD16_BYTE( "epr16888", 0x100000, 0x080000, CRC(85d73722) SHA1(7ebe81b4d6c89f87f60200a3a8cddb07d581adef) )
@@ -1499,7 +1499,7 @@ ROM_END
 /* ----- System C-2 Games ----- */
 
 ROM_START( borench ) /* Borench  (c)1990 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ic32.bin", 0x000000, 0x040000, CRC(2c54457d) SHA1(adf3ea5393d2633ec6215e64f0cd89ad4567e765) )
 	ROM_LOAD16_BYTE( "ic31.bin", 0x000001, 0x040000, CRC(b46445fc) SHA1(24e85ef5abbc5376a854b13ed90f08f0c30d7f25) )
 
@@ -1509,7 +1509,7 @@ ROM_END
 
 
 ROM_START( tfrceac ) /* ThunderForce AC  (c)1990 Technosoft / Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ic32.bin", 0x000000, 0x040000, CRC(95ecf202) SHA1(92b0f351f2bee7d59873a4991615f14f1afe4da7) )
 	ROM_LOAD16_BYTE( "ic31.bin", 0x000001, 0x040000, CRC(e63d7f1a) SHA1(a40d0a5a96f379a467048dc8fddd8aaaeb94da1d) )
 	/* 0x080000 - 0x100000 Empty */
@@ -1521,7 +1521,7 @@ ROM_START( tfrceac ) /* ThunderForce AC  (c)1990 Technosoft / Sega */
 ROM_END
 
 ROM_START( tfrceacj ) /* ThunderForce AC (Jpn)  (c)1990 Technosoft / Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr13657.32", 0x000000, 0x040000, CRC(a0f38ffd) SHA1(da548e7f61aed0e82a460553a119941da8857bc4) )
 	ROM_LOAD16_BYTE( "epr13656.31", 0x000001, 0x040000, CRC(b9438d1e) SHA1(598209c9fec3527fde720af09e5bebd7379f5b2b) )
 	/* 0x080000 - 0x100000 Empty */
@@ -1533,7 +1533,7 @@ ROM_START( tfrceacj ) /* ThunderForce AC (Jpn)  (c)1990 Technosoft / Sega */
 ROM_END
 
 ROM_START( tfrceacb ) /* ThunderForce AC (Bootleg)  (c)1990 Technosoft / Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "4.bin",    0x000000, 0x040000, CRC(eba059d3) SHA1(7bc04401f9a138fa151ac09a528b70acfb2021e3) )
 	ROM_LOAD16_BYTE( "3.bin",    0x000001, 0x040000, CRC(3e5dc542) SHA1(4a66dc842afaa145dab82b232738eea107bdf0f8) )
 	/* 0x080000 - 0x100000 Empty */
@@ -1546,7 +1546,7 @@ ROM_END
 
 
 ROM_START( twinsqua ) /* Twin Squash  (c)1991 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ep14657.32", 0x000000, 0x040000, CRC(becbb1a1) SHA1(787b1a4bf420186d05b5448582f6492e40d394fa) )
 	ROM_LOAD16_BYTE( "ep14656.31", 0x000001, 0x040000, CRC(411906e7) SHA1(68a4e66b9e18499d77cdb584470f35f67edec6fd) )
 
@@ -1556,10 +1556,10 @@ ROM_END
 
 
 ROM_START( ribbit ) /* Ribbit  (c)1991 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ep13833.32", 0x000000, 0x040000, CRC(5347f8ce) SHA1(b95b99536157edfbf0d74a42f64235f47dca7ee1) )
 	ROM_LOAD16_BYTE( "ep13832.31", 0x000001, 0x040000, CRC(889c42c2) SHA1(0839a50a68b64a66d995f1bfaff42fcb60bb4d45) )
-	ROM_COPY( "main", 0x000000, 0x080000, 0x080000 )
+	ROM_COPY( "maincpu", 0x000000, 0x080000, 0x080000 )
 	ROM_LOAD16_BYTE( "ep13838.34", 0x100000, 0x080000, CRC(a5d62ac3) SHA1(8d83a7bc4017e125ef4231278f766b2368d5fc1f) )
 	ROM_LOAD16_BYTE( "ep13837.33", 0x100001, 0x080000, CRC(434de159) SHA1(cf2973131cabf2bc0ebb2bfe9f804ad3d7d0a733) )
 
@@ -1569,7 +1569,7 @@ ROM_END
 
 
 ROM_START( tantr ) /* Tant-R (Puzzle & Action)  (c)1992 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr15614.32", 0x000000, 0x080000, CRC(557782bc) SHA1(1546a999ab97c380dc87f6c95d5687722206740d) )
 	ROM_LOAD16_BYTE( "epr15613.31", 0x000001, 0x080000, CRC(14bbb235) SHA1(8dbfec5fb1d7a695acbb2fc0e78e4bdf76eb8d9d) )
 	ROM_LOAD16_BYTE( "mpr15616.34", 0x100000, 0x080000, CRC(17b80202) SHA1(f47bf2aa0c5972647438619b8453c7dede5c422f) )
@@ -1580,7 +1580,7 @@ ROM_START( tantr ) /* Tant-R (Puzzle & Action)  (c)1992 Sega */
 ROM_END
 
 ROM_START( tantrkor ) /* Tant-R (Puzzle & Action) (Korea) (c)1993 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	/* strange names, but this is what was printed on the (original) chips */
 	ROM_LOAD16_BYTE( "m15592b.32", 0x000000, 0x080000, CRC(7efe26b3) SHA1(958420b9b400eafe392745af90bff729463427c7) )
 	ROM_LOAD16_BYTE( "m15592b.31", 0x000001, 0x080000, CRC(af5a860f) SHA1(cb0011f420721d035e9f0e43bb72cf286982fd32) )
@@ -1592,7 +1592,7 @@ ROM_START( tantrkor ) /* Tant-R (Puzzle & Action) (Korea) (c)1993 Sega */
 ROM_END
 
 ROM_START( tantrbl ) /* Tant-R (Puzzle & Action) (Bootleg)  (c)1992 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pa_e10.bin",  0x000000, 0x080000, CRC(6c3f711f) SHA1(55aa2d50422134b95d9a7c5cbdc453b207b91b4c) )
 	ROM_LOAD16_BYTE( "pa_f10.bin",  0x000001, 0x080000, CRC(75526786) SHA1(8f5aa7f6918b71a79e6fca18194beec2aef15844) )
 	ROM_LOAD16_BYTE( "mpr15616.34", 0x100000, 0x080000, CRC(17b80202) SHA1(f47bf2aa0c5972647438619b8453c7dede5c422f) )
@@ -1605,7 +1605,7 @@ ROM_END
 
 
 ROM_START( puyo ) /* Puyo Puyo  (c)1992 Sega / Compile */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-15198.32", 0x000000, 0x020000, CRC(9610d80c) SHA1(1ffad09d3369c1942d4db611c41bae47d08c7564) )
 	ROM_LOAD16_BYTE( "epr-15197.31", 0x000001, 0x020000, CRC(7b1f3229) SHA1(13d0905291e748973d7d17eb404a286ffb94de03) )
 	/* 0x040000 - 0x100000 Empty */
@@ -1617,7 +1617,7 @@ ROM_START( puyo ) /* Puyo Puyo  (c)1992 Sega / Compile */
 ROM_END
 
 ROM_START( puyoj ) /* Puyo Puyo  (c)1992 Sega / Compile */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr15036", 0x000000, 0x020000, CRC(5310ca1b) SHA1(dcfe2bf7476b640dfb790e8716e75b483d535e48) )
 	ROM_LOAD16_BYTE( "epr15035", 0x000001, 0x020000, CRC(bc62e400) SHA1(12bb6031574838a28889f6edb31dbb689265287c) )
 	/* 0x040000 - 0x100000 Empty */
@@ -1629,7 +1629,7 @@ ROM_START( puyoj ) /* Puyo Puyo  (c)1992 Sega / Compile */
 ROM_END
 
 ROM_START( puyoja ) /* Puyo Puyo (Rev A)  (c)1992 Sega / Compile */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ep15036a.32", 0x000000, 0x020000, CRC(61b35257) SHA1(e09a7e992999befc88fc7928a478d1e2d14d7b08) )
 	ROM_LOAD16_BYTE( "ep15035a.31", 0x000001, 0x020000, CRC(dfebb6d9) SHA1(6f685729ef4660c2eba409c5236c6d2f313eef5b) )
 	/* 0x040000 - 0x100000 Empty */
@@ -1641,7 +1641,7 @@ ROM_START( puyoja ) /* Puyo Puyo (Rev A)  (c)1992 Sega / Compile */
 ROM_END
 
 ROM_START( puyobl ) /* Puyo Puyo  (c)1992 Sega / Compile  Bootleg */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "puyopuyb.4bo", 0x000000, 0x020000, CRC(89ea4d33) SHA1(bef9d011524e71c072d309f6da3c2ebc38878e0e) )
 	ROM_LOAD16_BYTE( "puyopuyb.3bo", 0x000001, 0x020000, CRC(c002e545) SHA1(7a59ac764d60e9955830d9617b0bd122b44e7b2f) )
 	/* 0x040000 - 0x100000 Empty */
@@ -1653,7 +1653,7 @@ ROM_START( puyobl ) /* Puyo Puyo  (c)1992 Sega / Compile  Bootleg */
 ROM_END
 
 ROM_START( ichir ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (World) */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pa2_32.bin", 0x000000, 0x080000, CRC(7ba0c025) SHA1(855e9bb2a20c6f51b26381233c57c26aa96ad1f6) )
 	ROM_LOAD16_BYTE( "pa2_31.bin", 0x000001, 0x080000, CRC(5f86e5cc) SHA1(44e201de00dfbf7c66d0e0d40d17b162c6f0625b) )
 	ROM_LOAD16_BYTE( "epr16888",   0x100000, 0x080000, CRC(85d73722) SHA1(7ebe81b4d6c89f87f60200a3a8cddb07d581adef) )
@@ -1664,7 +1664,7 @@ ROM_START( ichir ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (World) */
 ROM_END
 
 ROM_START( ichirk ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Korea) */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	/* Again the part numbers are quite strange for the Korean verison */
 	ROM_LOAD16_BYTE( "epr_ichi.32", 0x000000, 0x080000, CRC(804dea11) SHA1(40bf8cbd40969a5880df10914252b7f64d5ce8e9) )
 	ROM_LOAD16_BYTE( "epr_ichi.31", 0x000001, 0x080000, CRC(92452353) SHA1(d2e1da5b139965611cd8d707d23396b5d4c07d12) )
@@ -1676,7 +1676,7 @@ ROM_START( ichirk ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Korea) */
 ROM_END
 
 ROM_START( ichirj ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Japan) */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr16886", 0x000000, 0x080000, CRC(38208e28) SHA1(07fc634bdf2d3e25274c9c374b3506dec765114c) )
 	ROM_LOAD16_BYTE( "epr16885", 0x000001, 0x080000, CRC(1ce4e837) SHA1(16600600e12e3f35e3da89524f7f51f019b5ad17) )
 	ROM_LOAD16_BYTE( "epr16888", 0x100000, 0x080000, CRC(85d73722) SHA1(7ebe81b4d6c89f87f60200a3a8cddb07d581adef) )
@@ -1687,7 +1687,7 @@ ROM_START( ichirj ) /* Ichident-R (Puzzle & Action 2)  (c)1994 Sega (Japan) */
 ROM_END
 
 ROM_START( stkclmns ) /* Stack Columns  (c)1994 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr16874.32", 0x000000, 0x080000, CRC(d78a871c) SHA1(7efcd5d07b089442be5170a3cf9e09579527252f) )
 	ROM_LOAD16_BYTE( "epr16873.31", 0x000001, 0x080000, CRC(1def1da4) SHA1(da534a971b40277b2d58ef22c07ca468250d23ca) )
 	ROM_LOAD16_BYTE( "mpr16797.34", 0x100000, 0x080000, CRC(b28e9bd5) SHA1(227eb591d10c9dbc52b35954ebd322e2a4451df2) )
@@ -1698,7 +1698,7 @@ ROM_START( stkclmns ) /* Stack Columns  (c)1994 Sega */
 ROM_END
 
 ROM_START( stkclmnj ) /* Stack Columns  (c)1994 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr16795.32", 0x000000, 0x080000, CRC(b478fd02) SHA1(aaf9d9f9f4dc900b4e8ff6f258f26e782e5c3166) )
 	ROM_LOAD16_BYTE( "epr16794.31", 0x000001, 0x080000, CRC(6d0e8c56) SHA1(8f98d9fd98a1faa70b173cfd72f15102d11e79ae) )
 	ROM_LOAD16_BYTE( "mpr16797.34", 0x100000, 0x080000, CRC(b28e9bd5) SHA1(227eb591d10c9dbc52b35954ebd322e2a4451df2) )
@@ -1710,7 +1710,7 @@ ROM_END
 
 
 ROM_START( puyopuy2 ) /* Puyo Puyo 2  (c)1994 Compile */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr17241.32", 0x000000, 0x080000, CRC(1cad1149) SHA1(77fb0482fa35e615c0bed65f4d7f4dd89b241f23) )
 	ROM_LOAD16_BYTE( "epr17240.31", 0x000001, 0x080000, CRC(beecf96d) SHA1(c2bdad4b6184c11f81f2a5db409cb4ea186205a7) )
 
@@ -1720,7 +1720,7 @@ ROM_END
 
 
 ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr16662", 0x000000, 0x040000, CRC(bbd305d6) SHA1(1a4f4869fefac188c69bc67df0b625e43a0c3f1f) )
 	ROM_LOAD16_BYTE( "epr16661", 0x000001, 0x040000, CRC(5a7d14f4) SHA1(a615b5f481256366db7b1c6302a8dcb69708102b) )
 
@@ -1730,7 +1730,7 @@ ROM_END
 
 
 ROM_START( zunkyou ) /* Zunzunkyou No Yabou  (c)1994 Sega */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr16812.32", 0x000000, 0x080000, CRC(eb088fb0) SHA1(69089a3516ad50f35e81971ef3c33eb3f5d52374) )
 	ROM_LOAD16_BYTE( "epr16811.31", 0x000001, 0x080000, CRC(9ac7035b) SHA1(1803ffbadc1213e04646d483e27da1591e22cd06) )
 	ROM_LOAD16_BYTE( "epr16814.34", 0x100000, 0x080000, CRC(821b3b77) SHA1(c45c7393a792ce8306a52f83f8ed8f6b0d7c11e9) )
@@ -1742,7 +1742,7 @@ ROM_END
 
 
 ROM_START( pclubj ) /* Print Club (c)1995 Atlus */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr18171.32", 0x000000, 0x080000, CRC(6c8eb8e2) SHA1(bbd885a83269524215c1d8470544086e3e82c05c) )
 	ROM_LOAD16_BYTE( "epr18170.31", 0x000001, 0x080000, CRC(72c631e6) SHA1(77c4ed793db6cb75346998f38a637db64fd258bd) )
 	ROM_LOAD16_BYTE( "epr18173.34", 0x100000, 0x080000, CRC(9809dc72) SHA1(6dbe6b7d4e525aa9b6174f8dc5aee12a5e00a009) )
@@ -1754,7 +1754,7 @@ ROM_END
 
 
 ROM_START( pclubjv2 ) /* Print Club vol.2 (c)1995 Atlus */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "p2jwn.u32", 0x000000, 0x080000, CRC(dfc0f7f1) SHA1(d2399f3ff05006590903f943cd77a9c709b9b5b1) )
 	ROM_LOAD16_BYTE( "p2jwn.u31", 0x000001, 0x080000, CRC(6ab4c694) SHA1(d8cfaa1a49e86842079c6e3800a95c5afaf76ab6) )
 	ROM_LOAD16_BYTE( "p2jwn.u34", 0x100000, 0x080000, CRC(854fd456) SHA1(eff7413a7acd8ee37cb73bc8dfd4f4ae53c04836) )
@@ -1766,7 +1766,7 @@ ROM_END
 
 
 ROM_START( pclubjv4 ) /* Print Club vol.4 (c)1996 Atlus */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "p4jsm.u32", 0x000000, 0x080000, CRC(36ff5f80) SHA1(33872aa00c8ca3f54dd7503a44562fbdad92df7d) )
 	ROM_LOAD16_BYTE( "p4jsm.u31", 0x000001, 0x080000, CRC(f3c021ad) SHA1(34792d861265b609d5022955eb7d2f471c63dfb8) )
 	ROM_LOAD16_BYTE( "p4jsm.u34", 0x100000, 0x080000, CRC(d0fd4b33) SHA1(c272404f09bdb6596740ab150eb158cc22cc9aa6) )
@@ -1778,7 +1778,7 @@ ROM_END
 
 
 ROM_START( pclubjv5 ) /* Print Club vol.5 (c)1996 Atlus */
-	ROM_REGION( 0x200000, "main", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "p5jat.u32", 0x000000, 0x080000, CRC(72220e69) SHA1(615de759d73469841987fb028eaf5d5598c32553) )
 	ROM_LOAD16_BYTE( "p5jat.u31", 0x000001, 0x080000, CRC(06d83fde) SHA1(dc68375ccb16cde7900eb05f702bc15e7e702ea5) )
 	ROM_LOAD16_BYTE( "p5jat.u34", 0x100000, 0x080000, CRC(b172ab58) SHA1(47a70bd678f6c4dafe70b83bd3db678cf44de48b) )
@@ -2155,7 +2155,7 @@ static DRIVER_INIT( ichirjbl )
 {
 
 	/* when did this actually work? - the protection is patched but the new check fails? */
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	rom[0x390/2] = 0x6600;
 
 	segac2_common_init(machine, NULL);

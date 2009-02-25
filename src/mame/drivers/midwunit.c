@@ -614,7 +614,7 @@ INPUT_PORTS_END
 static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	PIXEL_CLOCK,					/* pixel clock */
 	1,								/* pixels per clock */
 	midtunit_scanline_update,		/* scanline updater */
@@ -633,7 +633,7 @@ static const tms34010_config tms_config =
 
 static MACHINE_DRIVER_START( wunit )
 
-	MDRV_CPU_ADD("main", TMS34010, 50000000)
+	MDRV_CPU_ADD("maincpu", TMS34010, 50000000)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
@@ -643,7 +643,7 @@ static MACHINE_DRIVER_START( wunit )
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 505, 0, 399, 289, 0, 253)
 

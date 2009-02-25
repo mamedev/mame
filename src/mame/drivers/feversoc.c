@@ -235,12 +235,12 @@ static INTERRUPT_GEN( feversoc_irq )
 static MACHINE_DRIVER_START( feversoc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",SH2,MASTER_CLOCK)
+	MDRV_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(feversoc_map,0)
-	MDRV_CPU_VBLANK_INT("main",feversoc_irq)
+	MDRV_CPU_VBLANK_INT("screen",feversoc_irq)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -266,7 +266,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( feversoc )
-	ROM_REGION32_BE( 0x40000, "main", 0 )
+	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "prog0.u0139",   0x00001, 0x20000, CRC(fa699503) SHA1(96a834d4f7d5b764aa51db745afc2cd9a7c9783d) )
 	ROM_LOAD16_BYTE( "prog1.u0140",   0x00000, 0x20000, CRC(fd4d7943) SHA1(d7d782f878656bc79d70589f9df2cbcfff0adb5e) )
 

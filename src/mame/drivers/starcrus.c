@@ -163,13 +163,13 @@ static const samples_interface starcrus_samples_interface =
 static MACHINE_DRIVER_START( starcrus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080,9750000/9)  /* 8224 chip is a divide by 9 */
+	MDRV_CPU_ADD("maincpu", 8080,9750000/9)  /* 8224 chip is a divide by 9 */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -198,7 +198,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( starcrus )
-    ROM_REGION( 0x10000, "main", 0 )  /* code */
+    ROM_REGION( 0x10000, "maincpu", 0 )  /* code */
 	ROM_LOAD( "starcrus.j1",   0x0000, 0x0200, CRC(0ee60a50) SHA1(7419e7cb4c589da53d4a10ad129373502682464e) )
 	ROM_LOAD( "starcrus.k1",   0x0200, 0x0200, CRC(a7bc3bc4) SHA1(0e38076e921856608b1dd712687bef1c2522b4b8) )
 	ROM_LOAD( "starcrus.l1",   0x0400, 0x0200, CRC(10d233ec) SHA1(8933cf9fc51716a9e8f75a4444e7d7070cf5834d) )

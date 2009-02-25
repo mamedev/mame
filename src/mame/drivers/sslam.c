@@ -726,15 +726,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( sslam )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(sslam_program_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_CPU_ADD("audio", I8051, 12000000)
+	MDRV_CPU_ADD("audiocpu", I8051, 12000000)
 	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal code is not dumped - 2 boards were protected */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -758,15 +758,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( powerbls )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)	/* 12 MHz */
+	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(powerbls_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_CPU_ADD("audio", I80C51, 12000000)		/* 83C751 */
+	MDRV_CPU_ADD("audiocpu", I80C51, 12000000)		/* 83C751 */
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -790,7 +790,7 @@ MACHINE_DRIVER_END
 /* maybe one dump is bad .. which? -> 2nd set was verified good from 2 pcbs */
 
 ROM_START( sslam )
-	ROM_REGION( 0x1000000, "main", ROMREGION_ERASE00 ) /* 68000 Code */
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x80000, CRC(1ce52917) SHA1(b9b1d14ea44c248ce6e615c5c553c0d485c1302b) )
 	ROM_RELOAD ( 0x100000, 0x80000 )
 	ROM_RELOAD ( 0x200000, 0x80000 )
@@ -824,7 +824,7 @@ ROM_START( sslam )
 	ROM_RELOAD ( 0xe00001, 0x80000 )
 	ROM_RELOAD ( 0xf00001, 0x80000 )
 
-	ROM_REGION( 0x1000, "audio", 0 )
+	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE  ) /* Bg */
@@ -850,7 +850,7 @@ ROM_START( sslam )
 ROM_END
 
 ROM_START( sslama )
-	ROM_REGION( 0x1000000, "main", ROMREGION_ERASE00 ) /* 68000 Code */
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x80000, CRC(1ce52917) SHA1(b9b1d14ea44c248ce6e615c5c553c0d485c1302b) )
 	ROM_RELOAD ( 0x100000, 0x80000 )
 	ROM_RELOAD ( 0x200000, 0x80000 )
@@ -884,7 +884,7 @@ ROM_START( sslama )
 	ROM_RELOAD ( 0xe00001, 0x80000 )
 	ROM_RELOAD ( 0xf00001, 0x80000 )
 
-	ROM_REGION( 0x1000, "audio", 0 )
+	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE  ) /* Bg */
@@ -911,11 +911,11 @@ ROM_END
 
 // it's a conversion for a sslam pcb
 ROM_START( powerbls )
-	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "21.u67", 0x00000, 0x40000, CRC(4e302381) SHA1(5685d15fd3137866093ff13b95a7df2265a8bc64) )
 	ROM_LOAD16_BYTE( "22.u66", 0x00001, 0x40000, CRC(89b70599) SHA1(57a5d71e4d8ca62fffe2e81116c5236d2194ae11) )
 
-	ROM_REGION( 0x1000, "audio", 0 )
+	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, CRC(5b8b2d3a) SHA1(c3409243dfc0ca959a80f6890c87b4ce9eb0741d) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE  ) /* Bg */

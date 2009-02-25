@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER ( mcatadv_sound_bw_w )
 {
-	UINT8 *rom = memory_region(space->machine, "sound") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "soundcpu") + 0x10000;
 
 	memory_set_bankptr(space->machine, 1,rom + data * 0x4000);
 }
@@ -465,16 +465,16 @@ static const ym2610_interface mcatadv_ym2610_interface =
 static MACHINE_DRIVER_START( mcatadv )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, XTAL_16MHz) /* verified on pcb */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcatadv_readmem,mcatadv_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MDRV_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcatadv_sound_readmem,mcatadv_sound_writemem)
 	MDRV_CPU_IO_MAP(mcatadv_sound_io_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -504,7 +504,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( nost )
 	MDRV_IMPORT_FROM( mcatadv )
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(nost_sound_readmem,nost_sound_writemem)
 	MDRV_CPU_IO_MAP(nost_sound_io_map,0)
 MACHINE_DRIVER_END
@@ -512,18 +512,18 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( mcatadv )
 {
-	UINT8 *z80rom = memory_region(machine, "sound") + 0x10000;
+	UINT8 *z80rom = memory_region(machine, "soundcpu") + 0x10000;
 
 	memory_set_bankptr(machine, 1, z80rom + 0x4000);
 }
 
 
 ROM_START( mcatadv )
-	ROM_REGION( 0x100000, "main", 0 ) /* M68000 */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* M68000 */
 	ROM_LOAD16_BYTE( "mca-u30e", 0x00000, 0x80000, CRC(c62fbb65) SHA1(39a30a165d4811141db8687a4849626bef8e778e) )
 	ROM_LOAD16_BYTE( "mca-u29e", 0x00001, 0x80000, CRC(cf21227c) SHA1(4012811ebfe3c709ab49946f8138bc4bad881ef7) )
 
-	ROM_REGION( 0x030000, "sound", 0 ) /* Z80-A */
+	ROM_REGION( 0x030000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "u9.bin", 0x00000, 0x20000, CRC(fda05171) SHA1(2c69292573ec35034572fa824c0cae2839d23919) )
 	ROM_RELOAD( 0x10000, 0x20000 )
 
@@ -548,11 +548,11 @@ ROM_START( mcatadv )
 ROM_END
 
 ROM_START( mcatadvj )
-	ROM_REGION( 0x100000, "main", 0 ) /* M68000 */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* M68000 */
 	ROM_LOAD16_BYTE( "u30.bin", 0x00000, 0x80000, CRC(05762f42) SHA1(3675fb606bf9d7be9462324e68263f4a6c2fea1c) )
 	ROM_LOAD16_BYTE( "u29.bin", 0x00001, 0x80000, CRC(4c59d648) SHA1(2ab77ea254f2c11fc016078cedcab2fffbe5ee1b) )
 
-	ROM_REGION( 0x030000, "sound", 0 ) /* Z80-A */
+	ROM_REGION( 0x030000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "u9.bin", 0x00000, 0x20000, CRC(fda05171) SHA1(2c69292573ec35034572fa824c0cae2839d23919) )
 	ROM_RELOAD( 0x10000, 0x20000 )
 
@@ -577,11 +577,11 @@ ROM_START( mcatadvj )
 ROM_END
 
 ROM_START( catt )
-	ROM_REGION( 0x100000, "main", 0 ) /* M68000 */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* M68000 */
 	ROM_LOAD16_BYTE( "catt-u30.bin",  0x00000, 0x80000, CRC(8c921e1e) SHA1(2fdaa9b743e1731f3cfe9d8334f1b759cf46855d) )
 	ROM_LOAD16_BYTE( "catt-u29.bin",  0x00001, 0x80000, CRC(e725af6d) SHA1(78c08fa5744a6a953e13c0ff39736ccd4875fb72) )
 
-	ROM_REGION( 0x030000, "sound", 0 ) /* Z80-A */
+	ROM_REGION( 0x030000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "u9.bin", 0x00000, 0x20000, CRC(fda05171) SHA1(2c69292573ec35034572fa824c0cae2839d23919) )
 	ROM_RELOAD( 0x10000, 0x20000 )
 
@@ -610,11 +610,11 @@ ROM_START( catt )
 	ROM_END
 
 ROM_START( nost )
-	ROM_REGION( 0x100000, "main", 0 ) /* M68000 */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* M68000 */
 	ROM_LOAD16_BYTE( "nos-pe-u.bin", 0x00000, 0x80000, CRC(4b080149) SHA1(e1dbbe5bf554c7c5731cc3079850f257417e3caa) )
 	ROM_LOAD16_BYTE( "nos-po-u.bin", 0x00001, 0x80000, CRC(9e3cd6d9) SHA1(db5351ff9a05f602eceae62c0051c16ae0e4ead9) )
 
-	ROM_REGION( 0x050000, "sound", 0 ) /* Z80-A */
+	ROM_REGION( 0x050000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "nos-ps.u9", 0x00000, 0x40000, CRC(832551e9) SHA1(86fc481b1849f378c88593594129197c69ea1359) )
 	ROM_RELOAD( 0x10000, 0x40000 )
 
@@ -639,11 +639,11 @@ ROM_START( nost )
 ROM_END
 
 ROM_START( nostj )
-	ROM_REGION( 0x100000, "main", 0 ) /* M68000 */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* M68000 */
 	ROM_LOAD16_BYTE( "nos-pe-j.u30", 0x00000, 0x80000, CRC(4b080149) SHA1(e1dbbe5bf554c7c5731cc3079850f257417e3caa) )
 	ROM_LOAD16_BYTE( "nos-po-j.u29", 0x00001, 0x80000, CRC(7fe241de) SHA1(aa4ffd81cb73efc59690c2038ae9375021a775a4) )
 
-	ROM_REGION( 0x050000, "sound", 0 ) /* Z80-A */
+	ROM_REGION( 0x050000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "nos-ps.u9", 0x00000, 0x40000, CRC(832551e9) SHA1(86fc481b1849f378c88593594129197c69ea1359) )
 	ROM_RELOAD( 0x10000, 0x40000 )
 
@@ -668,11 +668,11 @@ ROM_START( nostj )
 ROM_END
 
 ROM_START( nostk )
-	ROM_REGION( 0x100000, "main", 0 ) /* M68000 */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* M68000 */
 	ROM_LOAD16_BYTE( "nos-pe-t.u30", 0x00000, 0x80000, CRC(bee5fbc8) SHA1(a8361fa004bb31471f973ece51a9a87b9f3438ab) )
 	ROM_LOAD16_BYTE( "nos-po-t.u29", 0x00001, 0x80000, CRC(f4736331) SHA1(7a6db2db1a4dbf105c22e15deff6f6032e04609c) )
 
-	ROM_REGION( 0x050000, "sound", 0 ) /* Z80-A */
+	ROM_REGION( 0x050000, "soundcpu", 0 ) /* Z80-A */
 	ROM_LOAD( "nos-ps.u9", 0x00000, 0x40000, CRC(832551e9) SHA1(86fc481b1849f378c88593594129197c69ea1359) )
 	ROM_RELOAD( 0x10000, 0x40000 )
 

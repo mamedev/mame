@@ -205,13 +205,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( battlex )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
+	MDRV_CPU_ADD("maincpu", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8) /* controls game speed? */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56) /* The video syncs at 15.8k H and 56 V (www.klov.com) */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -234,7 +234,7 @@ MACHINE_DRIVER_END
 /*** ROM LOADING *************************************************************/
 
 ROM_START( battlex )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "p-rom1.6",    0x0000, 0x1000, CRC(b00ae551) SHA1(32a963fea23ea58fc3aab93cc814784a932f045e) )
 	ROM_LOAD( "p-rom2.5",    0x1000, 0x1000, CRC(e765bb11) SHA1(99671e63f4c7d3d8754277451f0b35cba03b532d) )
 	ROM_LOAD( "p-rom3.4",    0x2000, 0x1000, CRC(21675a91) SHA1(5bbd5b53b1a1b7aaed5d8c7b09b57f35e4a774dc) )

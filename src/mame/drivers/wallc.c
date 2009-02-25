@@ -239,7 +239,7 @@ static DRIVER_INIT( wallc )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	for (i=0; i<0x2000*2; i++)
 	{
@@ -254,7 +254,7 @@ static DRIVER_INIT( wallca )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	for (i=0; i<0x4000; i++)
 	{
@@ -277,12 +277,12 @@ static DRIVER_INIT( wallca )
 
 static MACHINE_DRIVER_START( wallc )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 12288000 / 4)	/* 3.072 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 12288000 / 4)	/* 3.072 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(wallc_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -309,7 +309,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( wallc )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wac05.h7",   0x0000, 0x2000, CRC(ab6e472e) SHA1(a387fec24fb899df349a35d1d3a91e897b074712) )
 	ROM_LOAD( "wac1-52.h6", 0x2000, 0x2000, CRC(988eaa6d) SHA1(d5e5dbee6e7e0488fdecfb864198c686cbd5d59c) )
 
@@ -324,7 +324,7 @@ ROM_END
 
 /* this set uses a different encryption, but the decrypted code is the same */
 ROM_START( wallca )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rom4.rom",     0x0000, 0x2000, CRC(ce43af1b) SHA1(c05419cb4aa57c6187b469573a3787d9123c4a05) )
 	ROM_LOAD( "rom5.rom",     0x2000, 0x2000, CRC(b789a705) SHA1(2b62b14d1a3ad5eff5b8d502d7891e58379ee820) )
 

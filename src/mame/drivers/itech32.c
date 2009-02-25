@@ -600,7 +600,7 @@ static READ32_HANDLER( gtclass_prot_result_r )
 
 static WRITE8_HANDLER( sound_bank_w )
 {
-	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "sound")[0x10000 + data * 0x4000]);
+	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "soundcpu")[0x10000 + data * 0x4000]);
 }
 
 
@@ -717,7 +717,7 @@ static const via6522_interface via_interface =
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_NULL, DEVCB_HANDLER(pia_portb_out),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("sound", M6809_FIRQ_LINE)
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("soundcpu", M6809_FIRQ_LINE)
 };
 
 
@@ -727,7 +727,7 @@ static const via6522_interface drivedge_via_interface =
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_NULL, DEVCB_HANDLER(drivedge_portb_out),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(drivedge_turbo_light),
-	/*irq                  */ DEVCB_CPU_INPUT_LINE("sound", M6809_FIRQ_LINE)
+	/*irq                  */ DEVCB_CPU_INPUT_LINE("soundcpu", M6809_FIRQ_LINE)
 };
 
 
@@ -1673,11 +1673,11 @@ static const es5506_interface es5506_config =
 static MACHINE_DRIVER_START( timekill )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(timekill_map,0)
-	MDRV_CPU_VBLANK_INT("main", generate_int1)
+	MDRV_CPU_VBLANK_INT("screen", generate_int1)
 
-	MDRV_CPU_ADD("sound", M6809, SOUND_CLOCK/8)
+	MDRV_CPU_ADD("soundcpu", M6809, SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(itech32)
@@ -1687,7 +1687,7 @@ static MACHINE_DRIVER_START( timekill )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_PALETTE_LENGTH(8192)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 508, 0, 384, 262, 0, 256)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
@@ -1711,7 +1711,7 @@ static MACHINE_DRIVER_START( bloodstm )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(timekill)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bloodstm_map,0)
 
 	/* video hardware */
@@ -1724,7 +1724,7 @@ static MACHINE_DRIVER_START( drivedge )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(bloodstm)
 
-	MDRV_CPU_REPLACE("main", M68EC020, CPU020_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(NULL,0)
 
@@ -1746,10 +1746,10 @@ static MACHINE_DRIVER_START( sftm )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(bloodstm)
 
-	MDRV_CPU_REPLACE("main", M68EC020, CPU020_CLOCK)
+	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(itech020_map,0)
 
-	MDRV_CPU_MODIFY("sound")
+	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(sound_020_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq1_line_assert,4)
 
@@ -1785,7 +1785,7 @@ ROM_START( timekill )
 	ROM_LOAD16_BYTE( "tk00v132.u54", 0x00000, 0x40000, CRC(68c74b81) SHA1(acdf677f82d7428acc6cf01076d43dd6330e9cb3) )
 	ROM_LOAD16_BYTE( "tk01v132.u53", 0x00001, 0x40000, CRC(2158d8ef) SHA1(14aa66e020a9fa890fadbaf0936dfdc4e272f543) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "tksndv41.u17", 0x10000, 0x18000, CRC(c699af7b) SHA1(55863513a1c27dcb257dbc20e522cfafa9b92c9d) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -1811,7 +1811,7 @@ ROM_START( timek131 )
 	ROM_LOAD16_BYTE( "tk00v131.u54", 0x00000, 0x40000, CRC(e09ae32b) SHA1(b090a38600d0499f7b4cb80a2715f27216d408b0) )
 	ROM_LOAD16_BYTE( "tk01v131.u53", 0x00001, 0x40000, CRC(c29137ec) SHA1(4dcfba13b6f865a256bcb0406b6c83c309b17313) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "tksnd.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -1837,7 +1837,7 @@ ROM_START( bloodstm )
 	ROM_LOAD16_BYTE( "bld02.bin", 0x00000, 0x40000, CRC(95f36db6) SHA1(72ec5ca93aed8fb12d5e5b7ff3d07c5cf1dab4bb) )
 	ROM_LOAD16_BYTE( "bld01.bin", 0x00001, 0x40000, CRC(fcc04b93) SHA1(7029d68f20196b6c2c30339500c7da54f2b5b054) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "bldsnd.u17", 0x10000, 0x18000, CRC(dddeedbb) SHA1(f8ea786836630fc44bba968845fd2cb42cd81592) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
@@ -1875,7 +1875,7 @@ ROM_START( bloods22 )
 	ROM_LOAD16_BYTE( "bld00v22.u83", 0x00000, 0x40000, CRC(904e9208) SHA1(12e96027724b905140250db969130d90b1afec83) )
 	ROM_LOAD16_BYTE( "bld01v22.u88", 0x00001, 0x40000, CRC(78336a7b) SHA1(76002ce4a2d83ceae10d9c9c123013832a081150) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "bldsnd.u17", 0x10000, 0x18000, CRC(dddeedbb) SHA1(f8ea786836630fc44bba968845fd2cb42cd81592) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
@@ -1913,7 +1913,7 @@ ROM_START( bloods21 )
 	ROM_LOAD16_BYTE( "bld00v21.u83", 0x00000, 0x40000, CRC(71215c8e) SHA1(ee0f94c3a2619d7e3cc1ba5e1888a97b0c75a3ae) )
 	ROM_LOAD16_BYTE( "bld01v21.u88", 0x00001, 0x40000, CRC(da403da6) SHA1(0f09f38ae932acb4ddbb6323bce58be7284cb24b) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "bldsnd.u17", 0x10000, 0x18000, CRC(dddeedbb) SHA1(f8ea786836630fc44bba968845fd2cb42cd81592) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
@@ -1951,7 +1951,7 @@ ROM_START( bloods11 )
 	ROM_LOAD16_BYTE( "bld00-11.u83", 0x00000, 0x40000, CRC(4fff8f9b) SHA1(90f450497935322b0082a70e10abf758fc441dd0) )
 	ROM_LOAD16_BYTE( "bld01-11.u88", 0x00001, 0x40000, CRC(59ce23ea) SHA1(6aa02fff07f5ec6dff4f6db9ea7878a722079f81) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "bldsnd.u17", 0x10000, 0x18000, CRC(dddeedbb) SHA1(f8ea786836630fc44bba968845fd2cb42cd81592) )
 	ROM_CONTINUE(           0x08000, 0x08000 )
 
@@ -1989,7 +1989,7 @@ ROM_START( hardyard )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3,  P/N 106
 	ROM_LOAD16_BYTE( "fb00v12.u83", 0x00000, 0x40000, CRC(c7497692) SHA1(6c11535cf011e15dd7ffb5eba8e8da557c38277e) )
 	ROM_LOAD16_BYTE( "fb01v12.u88", 0x00001, 0x40000, CRC(3320c79a) SHA1(d1d32048c541782e60c525d9789fe12607a6df3a) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "fbsndv11.u17", 0x10000, 0x18000, CRC(d221b121) SHA1(06f351274a9dcb522f67f58499c9dc2ef5f06c07) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2021,7 +2021,7 @@ ROM_START( hardyd10 )	/* Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 1061
 	ROM_LOAD16_BYTE( "fb00v10.u83", 0x00000, 0x40000, CRC(f839393c) SHA1(ba06172bc4781f7738ce43019031715fee4b344c) )
 	ROM_LOAD16_BYTE( "fb01v10.u88", 0x00001, 0x40000, CRC(ca444702) SHA1(49bcc0994da9cd2c31c0cd78b822aceeaffd035f) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "fbsndv10.u17", 0x10000, 0x18000, CRC(6c6db5b8) SHA1(925e7c7cc7c3d290f4a334f24eef574aaac3150c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2053,7 +2053,7 @@ ROM_START( pairs )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N ???? Re
 	ROM_LOAD16_BYTE( "pair0v12.u83", 0x00000, 0x20000, CRC(a9c761d8) SHA1(2618c9c3f336cf30f760fd88f12c09985cfd4ee7) )
 	ROM_LOAD16_BYTE( "pair1v12.u88", 0x00001, 0x20000, CRC(5141eb86) SHA1(3bb10d588e6334a33e5c2c468651699e84f46cdc) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "snd.u17", 0x10000, 0x18000, CRC(7a514cfd) SHA1(ef5bc74c9560d2c058298051070fa748e58f07e1) )
 	ROM_CONTINUE(        0x08000, 0x08000 )
 
@@ -2080,7 +2080,7 @@ ROM_START( pairsa )	/* Version ?? (3-tier board set: P/N 1059 Rev 3, P/N ???? Re
 	ROM_LOAD16_BYTE( "pair0.u83", 0x00000, 0x20000, CRC(774995a3) SHA1(93df91378b56802d14c105f7f48ed8a4f7bafffd) )
 	ROM_LOAD16_BYTE( "pair1.u88", 0x00001, 0x20000, CRC(85d0b73a) SHA1(48a6ac6de94be13e407da13e3e2440d858714b4b) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "snd.u17", 0x10000, 0x18000, CRC(7a514cfd) SHA1(ef5bc74c9560d2c058298051070fa748e58f07e1) )
 	ROM_CONTINUE(        0x08000, 0x08000 )
 
@@ -2106,7 +2106,7 @@ ROM_START( hotmemry )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N ????
 	ROM_LOAD16_BYTE( "hotmem0.u83", 0x00000, 0x40000, CRC(5b9d87a2) SHA1(5a1ca7b622832fcb641e081d0c2a49c38ca795cd) )
 	ROM_LOAD16_BYTE( "hotmem1.u88", 0x00001, 0x40000, CRC(aeea087c) SHA1(3a8bdc04bc4051691823d0c5a1a3429475692100) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "hotmem_snd.u17", 0x10000, 0x18000, CRC(805941c7) SHA1(4a6832d93ff2b986cb54052658af62584782cb59) )
 	ROM_CONTINUE(               0x08000, 0x08000 )
 
@@ -2134,7 +2134,7 @@ ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1082 Rev 2), This version 
 	ROM_LOAD32_BYTE( "wcbdprm2.200", 0x00002, 0x20000, CRC(cb263173) SHA1(66acafaa9aba375124921774efc152e2a298a464) )
 	ROM_LOAD32_BYTE( "wcbdprm3.200", 0x00003, 0x20000, CRC(43ecad0b) SHA1(890a843c162c052a790e432db10f968875be835c) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
@@ -2170,7 +2170,7 @@ ROM_START( wcbwl140 )	/* Version 1.40 Tournament (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "wcbfprm2.140", 0x00002, 0x20000, CRC(d2fc4d09) SHA1(17983759ad6137a2e67b8414ea58880865311534) )
 	ROM_LOAD32_BYTE( "wcbfprm3.140", 0x00003, 0x20000, CRC(c41258a4) SHA1(182e8a25bdb126a4de8a44a1c26fd8b66f06d66e) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
@@ -2206,7 +2206,7 @@ ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "wcb_prm2.166", 0x00002, 0x20000, CRC(c54f5e40) SHA1(2cd92ba1db74b24e908d10f733757801db180dd0) )
 	ROM_LOAD32_BYTE( "wcb_prm3.166", 0x00003, 0x20000, CRC(dd72c796) SHA1(4c1542c51848a88a663e56ae0b47bf9d2d9f7d54) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
@@ -2238,7 +2238,7 @@ ROM_START( wcbwl165 )	/* Version 1.65 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "wcb_prm2.165", 0x00002, 0x20000, CRC(47259009) SHA1(78a6e70e747030a5ed43d49384061e53f4a77675) )
 	ROM_LOAD32_BYTE( "wcb_prm3.165", 0x00003, 0x20000, CRC(4c6b4e4f) SHA1(77f5f4b632dd1919ae210bbdc75042bdbebf6660) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcb_snd.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) /* Actual version is 4.01 but may be labeled V4.0 or V4.01 */
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
@@ -2270,7 +2270,7 @@ ROM_START( wcbwl161 )	/* Version 1.61 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "wcb_prm2.161", 0x00002, 0x20000, CRC(47259009) SHA1(78a6e70e747030a5ed43d49384061e53f4a77675) )
 	ROM_LOAD32_BYTE( "wcb_prm3.161", 0x00003, 0x20000, CRC(e5081f85) SHA1(a5513b8dd917a35f1c8b7f833c2d5622353d39f0) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcb_sndv4.u88", 0x10000, 0x18000, CRC(194a51d7) SHA1(c67b042008ff2a2713562d3789e5bc3a312fae17) ) /* Version 4.0 */
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2302,7 +2302,7 @@ ROM_START( wcbwl16 )	/* Version 1.6 (PCB P/N 1082 Rev 2), This is the first set 
 	ROM_LOAD32_BYTE( "wcb_prm2.16n", 0x00002, 0x20000, CRC(28f4ee8a) SHA1(a6a2b9cca622df0b9d181c35f4d01e8ab00392a0) )
 	ROM_LOAD32_BYTE( "wcb_prm3.16n", 0x00003, 0x20000, CRC(f0a58979) SHA1(c837b2a5b0e5ae993f1e453b59e3fbd9ed5de2a7) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcb_sndv3.u88", 0x10000, 0x18000, CRC(45c4f659) SHA1(cfd140b9947654f677409a0fb4fa0c7b65992f95) ) /* Version 3.0N */
 	ROM_CONTINUE(              0x08000, 0x08000 )
 
@@ -2333,7 +2333,7 @@ ROM_START( wcbwl15 )	/* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 1079 
 	ROM_LOAD16_BYTE( "wcb_v15.u83", 0x00000, 0x20000, CRC(3ca9ab85) SHA1(364946dceb3f7279b7d67d9d685a98ba7f4901aa) ) /* Labeled as "WCB V1.5 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v15.u88", 0x00001, 0x20000, CRC(d43e6fad) SHA1(fd72f6945e7f5ef86dc28503749d18086dd29906) ) /* Labeled as "WCB V1.5 (U88)" */
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcb_snd2.u17", 0x10000, 0x18000, CRC(c14907ba) SHA1(e52fb87c1f9b5847efc0ef15eb7e6c04dcf38110) ) /* Labeled as "WCB SND V2.0" */
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2368,7 +2368,7 @@ ROM_START( wcbwl13 )	/* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 1079 
 	ROM_LOAD16_BYTE( "wcb_v13.u83", 0x00000, 0x20000, CRC(2b6d284e) SHA1(339951661509d07b69c670b7249f30a616872bdf) ) /* Labeled as "WCB V1.3 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v13.u88", 0x00001, 0x20000, CRC(039af877) SHA1(2ac9a57e358ab1ccf9a4d18f7992b59f172e31cf) ) /* Labeled as "WCB V1.3 (U88)" */
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcb_snd2.u17", 0x10000, 0x18000, CRC(c14907ba) SHA1(e52fb87c1f9b5847efc0ef15eb7e6c04dcf38110) ) /* Labeled as "WCB SND V2.0" */
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2403,7 +2403,7 @@ ROM_START( wcbwl12 )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 1079 
 	ROM_LOAD16_BYTE( "wcb_v12.u83", 0x00000, 0x20000, CRC(0602c5ce) SHA1(4339f77301f9c607c6f1dc81270d03681e874e69) ) /* Labeled as "WCB V1.2 (U83)" */
 	ROM_LOAD16_BYTE( "wcb_v12.u88", 0x00001, 0x20000, CRC(49573493) SHA1(42813573f4ab951cd830193c0ffe2ce7d79c354b) ) /* Labeled as "WCB V1.2 (U88)" */
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "wcb_snd2.u17", 0x10000, 0x18000, CRC(c14907ba) SHA1(e52fb87c1f9b5847efc0ef15eb7e6c04dcf38110) ) /* Labeled as "WCB SND V2.0" */
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2437,7 +2437,7 @@ ROM_START( drivedge )
 	ROM_REGION32_BE( 0x8000, "user1", 0 )
 	ROM_LOAD( "de-u130.bin", 0x00000, 0x8000, CRC(873579b0) SHA1(ce7fcbea780aee376c2f4c659a75fcf6b7abbdb4) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "desndu17.bin", 0x10000, 0x18000, CRC(6e8ca8bc) SHA1(98ad36877b40123b0396943754234df8de183687) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2482,7 +2482,7 @@ ROM_START( sftm )	/* Version 1.12 */
 	ROM_LOAD32_BYTE( "sftmrom2.112", 0x00002, 0x40000, CRC(2f21a4f6) SHA1(66b158c40375a0f729d44fd4c888cf6a5bbe2bf1) )
 	ROM_LOAD32_BYTE( "sftmrom3.112", 0x00003, 0x40000, CRC(d26648d9) SHA1(9e3e1fa104da680c4a704d10d6518eea6382f039) )
 
-	ROM_REGION( 0x48000, "sound", 0 )
+	ROM_REGION( 0x48000, "soundcpu", 0 )
 	ROM_LOAD( "sfmsndv1.u23", 0x10000, 0x38000, CRC(10d85366) SHA1(10d539c3ba37e277642c0c5888cb1886fb0f55fc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2515,7 +2515,7 @@ ROM_START( sftm111 )	/* Version 1.11 */
 	ROM_LOAD32_BYTE( "sftmrom2.111", 0x00002, 0x40000, CRC(be20510e) SHA1(52e154fe4b77e461961fa23593383ef9b6dfb92f) )
 	ROM_LOAD32_BYTE( "sftmrom3.111", 0x00003, 0x40000, CRC(eead342f) SHA1(b6df89527b527543df5535ef00945e64ff321e09) )
 
-	ROM_REGION( 0x48000, "sound", 0 )
+	ROM_REGION( 0x48000, "soundcpu", 0 )
 	ROM_LOAD( "sfmsndv1.u23", 0x10000, 0x38000, CRC(10d85366) SHA1(10d539c3ba37e277642c0c5888cb1886fb0f55fc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2548,7 +2548,7 @@ ROM_START( sftm110 )	/* Version 1.10 */
 	ROM_LOAD32_BYTE( "sftmrom2.110", 0x00002, 0x40000, CRC(d7b36c92) SHA1(fbdb6f3636b84b76cf42351392492b791429a0e4) )
 	ROM_LOAD32_BYTE( "sftmrom3.110", 0x00003, 0x40000, CRC(be3efdbd) SHA1(169aff265d1520031988e51083d1f208cf2529b4) )
 
-	ROM_REGION( 0x48000, "sound", 0 )
+	ROM_REGION( 0x48000, "soundcpu", 0 )
 	ROM_LOAD( "sfmsndv1.u23", 0x10000, 0x38000, CRC(10d85366) SHA1(10d539c3ba37e277642c0c5888cb1886fb0f55fc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2581,7 +2581,7 @@ ROM_START( sftmj )	/* Version 1.12N (Japan) */
 	ROM_LOAD32_BYTE( "sfmprom2.12n", 0x00002, 0x40000, CRC(cec1dd7b) SHA1(4c4cf14bc17ddef216d16a7fbcef2e4694b45eb4) )
 	ROM_LOAD32_BYTE( "sfmprom3.12n", 0x00003, 0x40000, CRC(48fa60f4) SHA1(2d8bd4b5e3279af188feb3fb5e52a3d234bedd0a) )
 
-	ROM_REGION( 0x48000, "sound", 0 )
+	ROM_REGION( 0x48000, "soundcpu", 0 )
 	ROM_LOAD( "snd_v111.u23", 0x10000, 0x38000, CRC(004854ed) SHA1(7ecb74dc3f45b038cc9904fea5c89d3e74fcbcf3) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2614,7 +2614,7 @@ ROM_START( shufshot )	/* Version 1.40 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "shotprm2.140", 0x00002, 0x20000, CRC(ea10ada8) SHA1(e8167def9929876f6d2b4771b265114d9b04136e) )
 	ROM_LOAD32_BYTE( "shotprm3.140", 0x00003, 0x20000, CRC(4b28f28b) SHA1(602e230cc69ae872e40d72c85ec66f111826c15e) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
@@ -2649,7 +2649,7 @@ ROM_START( sshot139 )	/* Version 1.39 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "shotprm2.139", 0x00002, 0x20000, CRC(9f12414d) SHA1(c1120079173f7ed6118f7105443afd7d38d8af94) )
 	ROM_LOAD32_BYTE( "shotprm3.139", 0x00003, 0x20000, CRC(108a69be) SHA1(1b2ebe4767be084707522a90f009d3a70e03d578) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
@@ -2684,7 +2684,7 @@ ROM_START( sshot137 )	/* Version 1.37 (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "shotprm2.137", 0x00002, 0x20000, CRC(e0df3025) SHA1(edff5c5c4486981ac0783f337a0845854d0217f0) )
 	ROM_LOAD32_BYTE( "shotprm3.137", 0x00003, 0x20000, CRC(efa66ad8) SHA1(d8dc754529284e6c06b912e226c8a4520aab49fc) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "shotsnd.u88", 0x10000, 0x18000, CRC(e37d599d) SHA1(105f91e968ecf553d910a97726ddc536289bbb2b) )
 	ROM_CONTINUE(            0x08000, 0x08000 )
 
@@ -2719,7 +2719,7 @@ ROM_START( gt3d )	/* Version 1.93N for the single large type PCB P/N 1082 Rev 2 
 	ROM_LOAD32_BYTE( "gtg3prm2.93n", 0x00002, 0x80000, CRC(b53fe6f0) SHA1(4fbaa2f2a877c051b06ffa570e40156142d8e6bf) )
 	ROM_LOAD32_BYTE( "gtg3prm3.93n", 0x00003, 0x80000, CRC(78468761) SHA1(f3a785dffa5269b5dbd3aee63ed97fe8b8cdcc0e) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -2750,7 +2750,7 @@ ROM_START( gt3ds192 ) /* Version 1.92 for the 3 tier type PCB with short ROM boa
 	ROM_LOAD32_BYTE( "gtg3prm2.92s", 0x00002, 0x80000, CRC(7ab661a1) SHA1(9db0a64c91ba15dad6ca071639d8e2d366dc7756) )
 	ROM_LOAD32_BYTE( "gtg3prm3.92s", 0x00003, 0x80000, CRC(f9f96c01) SHA1(037c8d2d0d81c08745c044121c62f05a814db576) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt312snd.u23", 0x10000, 0x18000, CRC(cbbe41f9) SHA1(6a602addff87d32bb6df3ffb0563e8b2d3c4adcc) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2787,7 +2787,7 @@ ROM_START( gt3dl192 ) /* Version 1.92 for the 3 tier type PCB with long ROM boar
 	ROM_LOAD32_BYTE( "gtg3prm2.92l", 0x00002, 0x80000, CRC(eb959447) SHA1(62a6382c5dc7d97b19c2e21ed47bb87d530cb43d) )
 	ROM_LOAD32_BYTE( "gtg3prm3.92l", 0x00003, 0x80000, CRC(0265b798) SHA1(44c73f66f6b29a3cc6208cd7fde00605b61f8f15) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt322snd.u23", 0x10000, 0x18000, CRC(26fe2e92) SHA1(437ca0ea94dc0fa215f5375daa41d3dfe9bb17e0) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2824,7 +2824,7 @@ ROM_START( gt3dl191 ) /* Version 1.91 for the 3 tier type PCB with long ROM boar
 	ROM_LOAD32_BYTE( "gtg3prm2.91l", 0x00002, 0x80000, CRC(41720e87) SHA1(c699b9ac892649004f1437bd3fe68a23b5d7ba27) )
 	ROM_LOAD32_BYTE( "gtg3prm3.91l", 0x00003, 0x80000, CRC(30946139) SHA1(94ba341e13ffa27b56c12242b156fdf0698ad171) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt321snd.u23", 0x10000, 0x18000, CRC(6ae2646d) SHA1(0c62cc5f2911913167c5391648325409e7a3d892) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2861,7 +2861,7 @@ ROM_START( gt3dv18 ) /* Version 1.8 for the 3 tier type PCB with short ROM board
 	ROM_LOAD32_BYTE( "gtg3prm2.18", 0x00002, 0x80000, CRC(1d5fb128) SHA1(bef5ff44836a5d32431c4ef998c9041b5c769281) )
 	ROM_LOAD32_BYTE( "gtg3prm3.18", 0x00003, 0x80000, CRC(5542c335) SHA1(8e906512dc9c14f99c52faaa4315a7839dbd648c) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt311snd.u23", 0x10000, 0x18000, CRC(2f4cde9f) SHA1(571597e992e334e87307830e4a6a439c9d15fa76) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2898,7 +2898,7 @@ ROM_START( gt3dv17 ) /* Version 1.7 for the 3 tier type PCB with short ROM board
 	ROM_LOAD32_BYTE( "gtg3prm2.17", 0x00002, 0x80000, CRC(9c4d348b) SHA1(04167b9c4f3c99c5a1e0396c094cb9185c8d17c1) )
 	ROM_LOAD32_BYTE( "gtg3prm3.17", 0x00003, 0x80000, CRC(53b1d6e7) SHA1(f1662275d45316a892d7722cd2fa1c2259acbcfa) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt311snd.u23", 0x10000, 0x18000, CRC(2f4cde9f) SHA1(571597e992e334e87307830e4a6a439c9d15fa76) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2935,7 +2935,7 @@ ROM_START( gt3dv16 ) /* Version 1.6 for the 3 tier type PCB with short ROM board
 	ROM_LOAD32_BYTE( "gtg3prm2.16", 0x00002, 0x80000, CRC(02ce6085) SHA1(8148a0d67646ec1ecb440e087ac20d3e64bf525d) )
 	ROM_LOAD32_BYTE( "gtg3prm3.16", 0x00003, 0x80000, CRC(e77fa8a2) SHA1(34c6a5e24c115fdbb33d605aad07c7861ee7f3c8) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt311snd.u23", 0x10000, 0x18000, CRC(2f4cde9f) SHA1(571597e992e334e87307830e4a6a439c9d15fa76) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -2972,7 +2972,7 @@ ROM_START( gt3dv15 ) /* Version 1.5 for the 3 tier type PCB with short ROM board
 	ROM_LOAD32_BYTE( "gtg3prm2.15", 0x00002, 0x80000, CRC(e465c813) SHA1(b836cc01c6fb86980dda2d4418cd1ecb9899cb17) )
 	ROM_LOAD32_BYTE( "gtg3prm3.15", 0x00003, 0x80000, CRC(3b25e198) SHA1(5b8cd9771126739e8834c11d0d6ae08b2990e3b0) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt311snd.u23", 0x10000, 0x18000, CRC(2f4cde9f) SHA1(571597e992e334e87307830e4a6a439c9d15fa76) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -3009,7 +3009,7 @@ ROM_START( gt3dv14 ) /* Version 1.4 for the 3 tier type PCB with short ROM board
 	ROM_LOAD32_BYTE( "gtg3prm2.14", 0x00002, 0x80000, CRC(23991fcf) SHA1(5ba460ed88cebe1656501cadff27f2c0c90b721c) )
 	ROM_LOAD32_BYTE( "gtg3prm3.14", 0x00003, 0x80000, CRC(2f7b5a26) SHA1(d0e676fc03ff7592f2d6bae806bee242e42c4452) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt310snd.u23", 0x10000, 0x18000, CRC(4f106cd1) SHA1(a3c3e6c649084fe6472e0a1f95d538c67d29098c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -3046,7 +3046,7 @@ ROM_START( gt3dt231 ) /* Version 2.31 Tournament Edition (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "gtg3prm2.231", 0x00002, 0x100000, CRC(d1659616) SHA1(7035ce46bde63024237e6c4777ddd10b58caeb98) )
 	ROM_LOAD32_BYTE( "gtg3prm3.231", 0x00003, 0x100000, CRC(1d231ea2) SHA1(3001f25a337055d6fba522d10f5098c0acf6ff7a) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3077,7 +3077,7 @@ ROM_START( gt3dt211 ) /* Version 2.11 Tournament Edition (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "gtg3prm2.211", 0x00002, 0x100000, CRC(058b906a) SHA1(ff2cb3b955f7ce8041c967ed08b92e355d9abe2d) )
 	ROM_LOAD32_BYTE( "gtg3prm3.211", 0x00003, 0x100000, CRC(8dbeee1b) SHA1(76f003619f3b4e7c55949f8ebf85364b0c9e7115) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3108,7 +3108,7 @@ ROM_START( gt97 ) /* Version 1.30 */
 	ROM_LOAD32_BYTE( "gt97prm2.130", 0x00002, 0x80000, CRC(8292b51a) SHA1(f8167b0aef87fb286006a17043de041c71afe41d) )
 	ROM_LOAD32_BYTE( "gt97prm3.130", 0x00003, 0x80000, CRC(64539f72) SHA1(58fccee17987cb010d9b7f3b8f060a1b1040b21f) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3139,7 +3139,7 @@ ROM_START( gt97v122 ) /* Version 1.22 */
 	ROM_LOAD32_BYTE( "gt97prm2.122", 0x00002, 0x80000, CRC(d73a769f) SHA1(41c2416424efbd9d341ab5eea1451402dca1c340) )
 	ROM_LOAD32_BYTE( "gt97prm3.122", 0x00003, 0x80000, CRC(03962957) SHA1(9b2f6afb3a5ba9c93468baf595527df15fb0fcde) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3170,7 +3170,7 @@ ROM_START( gt97v121 ) /* Version 1.21 */
 	ROM_LOAD32_BYTE( "gt97prm2.121", 0x00002, 0x80000, CRC(a97ce668) SHA1(b392a3aab1f1887adc31fb802e7d7bedeb36c3c9) )
 	ROM_LOAD32_BYTE( "gt97prm3.121", 0x00003, 0x80000, CRC(7a6b1ad8) SHA1(da652e005d32494bc2363ef806c3facd03213437) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3201,7 +3201,7 @@ ROM_START( gt97s121 ) /* Version 1.21S for the 3 tier type PCB with short ROM bo
 	ROM_LOAD32_BYTE( "gt97prm2.21s", 0x00002, 0x80000, CRC(0cc24291) SHA1(941cada0f6c34ce8f6a23d5bf3ba052bb0edd9f1) )
 	ROM_LOAD32_BYTE( "gt97prm3.21s", 0x00003, 0x80000, CRC(922727c2) SHA1(57f8b772841fdf2fb575301698ed60b119392ec9) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt322_nr.u23", 0x10000, 0x18000, CRC(04effd73) SHA1(4277031655f8de851eba0e4134ba619a12f5dd4a) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -3232,7 +3232,7 @@ ROM_START( gt97v120 ) /* Version 1.20 */
 	ROM_LOAD32_BYTE( "gt97prm2.120", 0x00002, 0x80000, CRC(30b0d97e) SHA1(423808f0957cd259a33f5fad43222edbacb445ea) )
 	ROM_LOAD32_BYTE( "gt97prm3.120", 0x00003, 0x80000, CRC(77281d3a) SHA1(f400c8be5dc1b91008c84ddbd6c945c4cb96b0bd) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3263,7 +3263,7 @@ ROM_START( gt97t243 ) /* Version 2.43 Tournament Edition (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "gt97prm2.243", 0x00002, 0x100000, CRC(b80061be) SHA1(9a6a6281690b3bd2eabb081467bfda074639fa6a) )
 	ROM_LOAD32_BYTE( "gt97prm3.243", 0x00003, 0x100000, CRC(d184968d) SHA1(eecd4e9d060e4b8feabca715d3d7f9738641cfcc) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3294,7 +3294,7 @@ ROM_START( gt97t240 ) /* Version 2.40 Tournament Edition (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "gt97prm2.240", 0x00002, 0x100000, CRC(451be534) SHA1(2f78cdba607c4b936b5cbdb520757d038d9aa7a3) )
 	ROM_LOAD32_BYTE( "gt97prm3.240", 0x00003, 0x100000, CRC(70da8ca5) SHA1(baf56d04c5d75165fc9f3269650847e46bbbe2d3) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3325,7 +3325,7 @@ ROM_START( gt98 )	/* Version 1.10 */
 	ROM_LOAD32_BYTE( "gt98prm2.110", 0x00002, 0x80000, CRC(27a8a15f) SHA1(f1eb7b24f9cb77877ceaa033abfde124e159cb2b) )
 	ROM_LOAD32_BYTE( "gt98prm3.110", 0x00003, 0x80000, CRC(d61f2bb2) SHA1(6eb9f779b78ef396eff6dbc25fd6dba128c77124) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3356,7 +3356,7 @@ ROM_START( gt98v100 )	/* Version 1.00 */
 	ROM_LOAD32_BYTE( "gt98prm2.100", 0x00002, 0x80000, CRC(f940acdc) SHA1(3b5f5f299dbd7d4e0bef4aac8787f955f31754c2) )
 	ROM_LOAD32_BYTE( "gt98prm3.100", 0x00003, 0x80000, CRC(22d7e8dc) SHA1(7d22963f7948029cf74994abe0be4a5181112c32) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3387,7 +3387,7 @@ ROM_START( gt98s100 ) /* Version 1.00S for the 3 tier type PCB with short ROM bo
 	ROM_LOAD32_BYTE( "gt98prm2.10s", 0x00002, 0x80000, CRC(304e881c) SHA1(582ff2c1c03853eec9830663d5263b499e68f285) )
 	ROM_LOAD32_BYTE( "gt98prm3.10s", 0x00003, 0x80000, CRC(ac04ea81) SHA1(f8a7c896cb0af747bab49b3438f52aaa1b0dfc73) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt322_nr.u23", 0x10000, 0x18000, CRC(04effd73) SHA1(4277031655f8de851eba0e4134ba619a12f5dd4a) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -3418,7 +3418,7 @@ ROM_START( gt98t303 )	/* Version 3.03 Tournament Edition (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "gt98prm2.303", 0x00002, 0x100000, CRC(a695c1bc) SHA1(e10ce3a97c28ba439c06b2cbd3ebe0cb456687a9) )
 	ROM_LOAD32_BYTE( "gt98prm3.303", 0x00003, 0x100000, CRC(bd7f5c7a) SHA1(969833ff8c5fa7277abd2d03940fcd02853bb12e) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3449,7 +3449,7 @@ ROM_START( gt99 )	/* Version 1.00 */
 	ROM_LOAD32_BYTE( "gt99prm2.100", 0x00002, 0x80000, CRC(3eb2b13a) SHA1(6b6b79c7f07cc345f392d12625548c8fae6a1d42) )
 	ROM_LOAD32_BYTE( "gt99prm3.100", 0x00003, 0x80000, CRC(03454e7d) SHA1(be885433830976b6c684e944f1d3a96d261b27f2) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3483,7 +3483,7 @@ ROM_START( gt99s100 )	/* Version 1.00S for the 3 tier type PCB with short ROM bo
 	ROM_LOAD32_BYTE( "gt99prm2.10s", 0x00002, 0x80000, CRC(fd084b68) SHA1(bd39ea7d201892f5583db21685010c75354ac3b9) )
 	ROM_LOAD32_BYTE( "gt99prm3.10s", 0x00003, 0x80000, CRC(3ff88ff7) SHA1(ca59f5888932be78434ae9a1b5cb06b01156c8ba) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt322_nr.u23", 0x10000, 0x18000, CRC(04effd73) SHA1(4277031655f8de851eba0e4134ba619a12f5dd4a) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -3517,7 +3517,7 @@ ROM_START( gt99t400 )	/* Version 4.00 Tournament Edition (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "gt99prm2.400", 0x00002, 0x100000, CRC(891e26c1) SHA1(11eeb60160924fbf58e409465541ef1cb15ff933) )
 	ROM_LOAD32_BYTE( "gt99prm3.400", 0x00003, 0x100000, CRC(127f7aa7) SHA1(d83b4366b526b5f745d0556e5ec39faa02cb8570) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3551,7 +3551,7 @@ ROM_START( gtroyal )	/* Version 4.02T EDM (Tournament Edition, PCB P/N 1082 Rev 
 	ROM_LOAD32_BYTE( "gtr_prm2.402", 0x00002, 0x100000, CRC(a925d392) SHA1(07e398279a0abd058a4bda700a7f3fe90737cb04) )
 	ROM_LOAD32_BYTE( "gtr_prm3.402", 0x00003, 0x100000, CRC(1c442664) SHA1(abf8043719f0bd855df17c22b2b7fb13ae160b4d) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3585,7 +3585,7 @@ ROM_START( gt2k ) /* Version 1.00 */
 	ROM_LOAD32_BYTE( "gt2kprm2.100", 0x00002, 0x80000, CRC(b603d283) SHA1(dc02b4969f96a089766b07eb45a2eb6be6ae0aad) )
 	ROM_LOAD32_BYTE( "gt2kprm3.100", 0x00003, 0x80000, CRC(85ba9e2d) SHA1(f026d6dcf91848a40bcc9f9ba5e9262de33c30d1) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3619,7 +3619,7 @@ ROM_START( gt2ks100 )	/* Version 1.00S for the 3 tier type PCB with short ROM bo
 	ROM_LOAD32_BYTE( "gt2kprm2.10s", 0x00002, 0x80000, CRC(77a222cc) SHA1(bab3732c49c388f43db27c3c36c6eba02ec92708) )
 	ROM_LOAD32_BYTE( "gt2kprm3.10s", 0x00003, 0x80000, CRC(c3e77ad5) SHA1(3861779c1a60778a686c3cae5b77ea408de1bb1f) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt322_nr.u23", 0x10000, 0x18000, CRC(04effd73) SHA1(4277031655f8de851eba0e4134ba619a12f5dd4a) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
@@ -3653,7 +3653,7 @@ ROM_START( gt2kt500 ) /* Version 5.00 Tournament Edition (PCB P/N 1082 Rev 2) */
 	ROM_LOAD32_BYTE( "gt2kprm2.500", 0x00002, 0x100000, CRC(46666c15) SHA1(7a90a8131a68b0b7bc394bdf5ef702be8164c1ee) )
 	ROM_LOAD32_BYTE( "gt2kprm3.500", 0x00003, 0x100000, CRC(89544fbc) SHA1(6ce05ddccbca167cccd70cc73dbb7161e48c3e40) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3687,7 +3687,7 @@ ROM_START( gtsuprem ) /* Version 5.10T ELC S (Tournament Edition, PCB P/N 1082 R
 	ROM_LOAD32_BYTE( "gts_prm2.510", 0x00002, 0x100000, CRC(fbaae916) SHA1(dd436f71a89acf3a6de3feffebf35f071b73ae77) )
 	ROM_LOAD32_BYTE( "gts_prm3.510", 0x00003, 0x100000, CRC(69b13204) SHA1(88705d1acb44420ffbd3655e983455904f15a955) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3722,7 +3722,7 @@ ROM_START( gtclassc ) /* Version 1.00 */
 	ROM_LOAD32_BYTE( "gtc_prm2.100", 0x00002, 0x80000, CRC(2f260a93) SHA1(b953e003a588e6c1d7d7c065afd6cdfefb526642) )
 	ROM_LOAD32_BYTE( "gtc_prm3.100", 0x00003, 0x80000, CRC(03a1fcdd) SHA1(6cf96de58231a3734adc272c2631d09b93eca8ad) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3756,7 +3756,7 @@ ROM_START( gtclassp ) /* Version 1.00 Infinite Loop Protection */
 	ROM_LOAD32_BYTE( "gtcpprm2.100", 0x00002, 0x80000, CRC(a8dea029) SHA1(b2541879aab7e468da846e464f7f642262db03b3) )
 	ROM_LOAD32_BYTE( "gtcpprm3.100", 0x00003, 0x80000, CRC(6016299e) SHA1(ee92768615bddb74f63c4e2ccb46550fa8ece86c) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt_nr.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
 	ROM_CONTINUE(          0x08000, 0x08000 )
 
@@ -3790,7 +3790,7 @@ ROM_START( gtcls100 )  /* Version 1.00S for the 3 tier type PCB with short ROM b
 	ROM_LOAD32_BYTE( "gtc_prm2.10s", 0x00002, 0x80000, CRC(8896efcb) SHA1(59cb9793c610a9e9b3119d8d570a15253a821ede) )
 	ROM_LOAD32_BYTE( "gtc_prm3.10s", 0x00003, 0x80000, CRC(567a9490) SHA1(45379c9a26b82d0a8dbb5da26a9f23dbf1e87fc1) )
 
-	ROM_REGION( 0x28000, "sound", 0 )
+	ROM_REGION( 0x28000, "soundcpu", 0 )
 	ROM_LOAD( "gt322_nr.u23", 0x10000, 0x18000, CRC(04effd73) SHA1(4277031655f8de851eba0e4134ba619a12f5dd4a) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 

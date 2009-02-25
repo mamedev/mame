@@ -88,7 +88,7 @@ static void tms_interrupt(running_machine *machine, int state)
 
 static const struct tms34061_interface tms34061intf =
 {
-	"main",			/* The screen we are acting on */
+	"screen",		/* The screen we are acting on */
 	8,				/* VRAM address is (row << rowshift) | col */
 	0x40000,		/* Size of video RAM */
 	tms_interrupt	/* Interrupt gen callback */
@@ -657,7 +657,7 @@ static WRITE16_HANDLER( io_w )
 
 static ADDRESS_MAP_START( guab_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_ROM AM_REGION("main", 0x10000)
+	AM_RANGE(0x040000, 0x04ffff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x0c0000, 0x0c007f) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x0c0080, 0x0c0083) AM_NOP /* ACIA 1 */
 	AM_RANGE(0x0c00a0, 0x0c00a3) AM_NOP /* ACIA 2 */
@@ -762,14 +762,14 @@ static MACHINE_RESET( guab )
 
 static MACHINE_DRIVER_START( guab )
 	/* TODO: Verify clock */
-	MDRV_CPU_ADD("main", M68000, 8000000)
+	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(guab_map, 0)
 
 	MDRV_MACHINE_START(guab)
 	MDRV_MACHINE_RESET(guab)
 
 	/* TODO: Use real video timings */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -796,7 +796,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( guab )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "guab1a1.rom", 0x00000, 0x8000, CRC(f23a9d7d) SHA1(f933e131bdcf21cfa6001c8e20fd11d94c7a9450) )
 	ROM_LOAD16_BYTE( "guab1b1.rom", 0x00001, 0x8000, CRC(af3b5492) SHA1(6fd7f29e6ed2fadccc9246f1ebd049c3f9aeff13) )
 	ROM_LOAD16_BYTE( "guab2a1.rom", 0x10000, 0x8000, CRC(ae7a162c) SHA1(d69721818b8e4daba776a678b62bc7f44f371a3f) )
@@ -807,7 +807,7 @@ ROM_START( guab )
 ROM_END
 
 ROM_START( guab3 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "guab1a1.rom", 0x00000, 0x8000, CRC(f23a9d7d) SHA1(f933e131bdcf21cfa6001c8e20fd11d94c7a9450) )
 	ROM_LOAD16_BYTE( "guab1b1.rom", 0x00001, 0x8000, CRC(af3b5492) SHA1(6fd7f29e6ed2fadccc9246f1ebd049c3f9aeff13) )
 	ROM_LOAD16_BYTE( "guab2a1.rom", 0x10000, 0x8000, CRC(ae7a162c) SHA1(d69721818b8e4daba776a678b62bc7f44f371a3f) )
@@ -818,7 +818,7 @@ ROM_START( guab3 )
 ROM_END
 
 ROM_START( tenup )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tu-11.bin", 0x00000, 0x8000, CRC(01843086) SHA1(106a226900e8cf929f89edf801c627f02e4afce3) )
 	ROM_LOAD16_BYTE( "tu-12.bin", 0x00001, 0x8000, CRC(1c7f32b1) SHA1(2b14e2206695ae53909ae838a5c036248d9ab940) )
 	ROM_LOAD16_BYTE( "tu-13.bin", 0x10000, 0x8000, CRC(d19e2bf7) SHA1(76a9cbd4f604ad39eb0e319a9a6d5a6739b0ed8c) )
@@ -829,7 +829,7 @@ ROM_START( tenup )
 ROM_END
 
 ROM_START( tenup3 )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tu-11.bin", 0x00000, 0x8000, CRC(01843086) SHA1(106a226900e8cf929f89edf801c627f02e4afce3) )
 	ROM_LOAD16_BYTE( "tu-12.bin", 0x00001, 0x8000, CRC(1c7f32b1) SHA1(2b14e2206695ae53909ae838a5c036248d9ab940) )
 	ROM_LOAD16_BYTE( "tu-13.bin", 0x10000, 0x8000, CRC(d19e2bf7) SHA1(76a9cbd4f604ad39eb0e319a9a6d5a6739b0ed8c) )

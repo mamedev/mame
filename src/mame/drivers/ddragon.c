@@ -171,10 +171,10 @@ static TIMER_DEVICE_CALLBACK( ddragon_scanline )
 static MACHINE_START( ddragon )
 {
 	/* configure banks */
-	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* determine the sound CPU index */
-	snd_cpu = cputag_get_cpu(machine, "sound");
+	snd_cpu = cputag_get_cpu(machine, "soundcpu");
 
 	/* register for save states */
 	state_save_register_global(machine, dd_sub_cpu_busy);
@@ -966,14 +966,14 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( ddragon )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
+ 	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(ddragon_map,0)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)	/* 6 MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
- 	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+ 	MDRV_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(60000))	/* heavy interleaving to sync up sprite<->main cpu's */
@@ -985,7 +985,7 @@ static MACHINE_DRIVER_START( ddragon )
 	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(384)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
@@ -1032,14 +1032,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ddgn6809 )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("main", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+ 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(ddragon_map,0)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)	/* 1.5 Mhz */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
- 	MDRV_CPU_ADD("sound", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+ 	MDRV_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
@@ -1051,7 +1051,7 @@ static MACHINE_DRIVER_START( ddgn6809 )
 	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(384)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
@@ -1079,14 +1079,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ddragon2 )
 
 	/* basic machine hardware */
- 	MDRV_CPU_ADD("main", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
+ 	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
 	MDRV_CPU_PROGRAM_MAP(dd2_map,0)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "main", 0, 1)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)		/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(dd2_sub_map,0)
 
-	MDRV_CPU_ADD("sound", Z80, 3579545)
+	MDRV_CPU_ADD("soundcpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(dd2_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
@@ -1098,7 +1098,7 @@ static MACHINE_DRIVER_START( ddragon2 )
 	MDRV_GFXDECODE(ddragon)
 	MDRV_PALETTE_LENGTH(384)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
@@ -1150,7 +1150,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( ddragon )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "21j-1-5.26",   0x08000, 0x08000, CRC(42045dfd) SHA1(0983705ea3bb87c4c239692f400e02f15c243479) )
 	ROM_LOAD( "21j-2-3.25",   0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21j-3.24",     0x18000, 0x08000, CRC(3bdea613) SHA1(d9038c80646a6ce3ea61da222873237b0383680e) ) /* banked at 0x4000-0x8000 */
@@ -1159,7 +1159,7 @@ ROM_START( ddragon )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -1191,7 +1191,7 @@ ROM_START( ddragon )
 ROM_END
 
 ROM_START( ddragonw )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "21j-1.26",     0x08000, 0x08000, CRC(ae714964) SHA1(072522b97ca4edd099c6b48d7634354dc7088c53) )
 	ROM_LOAD( "21j-2-3.25",   0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3.24",     0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1200,7 +1200,7 @@ ROM_START( ddragonw )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -1232,7 +1232,7 @@ ROM_START( ddragonw )
 ROM_END
 
 ROM_START( ddragnw1 )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "e1-1.26",       0x08000, 0x08000, CRC(4b951643) SHA1(efb1f9ef2e46597d76123c9770854c1d83639eb2) )
 	ROM_LOAD( "21a-2-4.25",    0x10000, 0x08000, CRC(5cd67657) SHA1(96bc7a5354a76524bd43a4d7eb8b0053a89e39c4) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3.24",      0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1241,7 +1241,7 @@ ROM_START( ddragnw1 )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) ) /* Labeled as 21JM-0 */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -1273,7 +1273,7 @@ ROM_START( ddragnw1 )
 ROM_END
 
 ROM_START( ddragonu )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "21a-1-5.26",   0x08000, 0x08000, CRC(e24a6e11) SHA1(9dd97dd712d5c896f91fd80df58be9b8a2b198ee) )
 	ROM_LOAD( "21j-2-3.25",   0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3.24",     0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1282,7 +1282,7 @@ ROM_START( ddragonu )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -1314,7 +1314,7 @@ ROM_START( ddragonu )
 ROM_END
 
 ROM_START( ddragoua )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "21a-1",     0x08000, 0x08000, CRC(1d625008) SHA1(84cc19a55e7c91fca1943d9624d93e0347ed4150) )
 	ROM_LOAD( "21a-2_4",   0x10000, 0x08000, CRC(5cd67657) SHA1(96bc7a5354a76524bd43a4d7eb8b0053a89e39c4) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3",     0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1323,7 +1323,7 @@ ROM_START( ddragoua )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -1355,7 +1355,7 @@ ROM_START( ddragoua )
 ROM_END
 
 ROM_START( ddragonb ) /* Same program roms as the World set */
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "21j-1.26",     0x08000, 0x08000, CRC(ae714964) SHA1(072522b97ca4edd099c6b48d7634354dc7088c53) )
 	ROM_LOAD( "21j-2-3.25",   0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "21a-3.24",     0x18000, 0x08000, CRC(dbf24897) SHA1(1504faaf07c541330cd43b72dc6846911dfd85a3) ) /* banked at 0x4000-0x8000 */
@@ -1364,7 +1364,7 @@ ROM_START( ddragonb ) /* Same program roms as the World set */
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "ic38",         0x0c000, 0x04000, CRC(6a6a0325) SHA1(98a940a9f23ce9154ff94f7f2ce29efe9a92f71b) ) /* HD6903 instead of HD63701 */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -1396,7 +1396,7 @@ ROM_START( ddragonb ) /* Same program roms as the World set */
 ROM_END
 
 ROM_START( ddragnba )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "5.bin",     0x08000, 0x08000, CRC(ae714964) SHA1(072522b97ca4edd099c6b48d7634354dc7088c53) )
 	ROM_LOAD( "4.bin",     0x10000, 0x08000, CRC(48045762) SHA1(ca39eea71ca76627a98210ce9cc61457a58f16b9) ) /* banked at 0x4000-0x8000 */
 	ROM_CONTINUE(0x20000,0x8000) /* banked at 0x4000-0x8000 */
@@ -1405,7 +1405,7 @@ ROM_START( ddragnba )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "2_32.bin",         0x0c000, 0x04000, CRC(67875473) SHA1(66405cb22d41d353335f037ce5aee69e4c6f05c4) ) /* 6803 instead of HD63701 */
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "6.bin",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -1437,7 +1437,7 @@ ROM_START( ddragnba )
 ROM_END
 
 ROM_START( ddragob2 )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "4.bin",        0x08000, 0x08000, CRC(668dfa19) SHA1(9b2ff1b66eeba0989e4ed850b7df1f5719ba5572) )
 	ROM_LOAD( "5.bin",        0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "6.bin",        0x18000, 0x08000, CRC(3bdea613) SHA1(d9038c80646a6ce3ea61da222873237b0383680e) ) /* banked at 0x4000-0x8000 */
@@ -1446,7 +1446,7 @@ ROM_START( ddragob2 )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "3.bin",        0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -1485,7 +1485,7 @@ ROM_END
 
  */
 ROM_START( ddgn6809 )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "16.bin",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
 	ROM_LOAD( "17.bin",   0x10000, 0x08000, CRC(6489d637) SHA1(fd17fd870e9386a3e3bdd56c8d731c73d8c70b88) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "18.bin",   0x18000, 0x08000, CRC(154d50c4) SHA1(4ffdd29406b6c6b552344f820f83715b1c7727d1) ) /* banked at 0x4000-0x8000 */
@@ -1494,7 +1494,7 @@ ROM_START( ddgn6809 )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "20.bin",    0x8000, 0x8000, CRC(67e3b4f1) SHA1(4945d76b0694299f2f4739ebfba98da6d96fe4cb) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21.bin",      0x08000, 0x08000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
 
 	/* all the gfx roms are scrambled on this set */
@@ -1562,7 +1562,7 @@ Note
 */
 
 ROM_START( dd6809a )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "20.7f",   0x08000, 0x08000, CRC(c804819f) SHA1(cc570a90b7bef1c6263f5e1fd96ed377c508fe2b) )
 	ROM_LOAD( "19.7g",   0x10000, 0x08000, CRC(de08db4d) SHA1(e63b90c3bb3af01d2855de9a996b51068bed7b52) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "18.7h",   0x18000, 0x08000, CRC(154d50c4) SHA1(4ffdd29406b6c6b552344f820f83715b1c7727d1) ) /* banked at 0x4000-0x8000 */
@@ -1571,7 +1571,7 @@ ROM_START( dd6809a )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "21.7d",   0x08000, 0x8000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "16.7n",   0x08000, 0x08000, CRC(f4c72690) SHA1(c70d032355acf3f7f6586b6e57a94f80e099bf1a) )
 
 	/* all the gfx roms are scrambled on this set */
@@ -1611,7 +1611,7 @@ ROM_END
 
 
 ROM_START( ddragon2 )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "26a9-04.bin",  0x08000, 0x8000, CRC(f2cfc649) SHA1(d3f1e0bae02472914a940222e4f600170a91736d) )
 	ROM_LOAD( "26aa-03.bin",  0x10000, 0x8000, CRC(44dd5d4b) SHA1(427c4e419668b41545928cfc96435c010ecdc88b) )
 	ROM_LOAD( "26ab-0.bin",   0x18000, 0x8000, CRC(49ddddcd) SHA1(91dc53718d04718b313f23d86e241027c89d1a03) )
@@ -1620,7 +1620,7 @@ ROM_START( ddragon2 )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite CPU 64kb (Upper 16kb = 0) */
 	ROM_LOAD( "26ae-0.bin",   0x00000, 0x10000, CRC(ea437867) SHA1(cd910203af0565f981b9bdef51ea6e9c33ee82d3) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* music CPU, 64kb */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* music CPU, 64kb */
 	ROM_LOAD( "26ad-0.bin",   0x00000, 0x8000, CRC(75e36cd6) SHA1(f24805f4f6925b3ac508e66a6fc25c275b05f3b9) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -1647,7 +1647,7 @@ ROM_START( ddragon2 )
 ROM_END
 
 ROM_START( ddragn2u )
-	ROM_REGION( 0x30000, "main", 0 )
+	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "26a9-04.bin",  0x08000, 0x8000, CRC(f2cfc649) SHA1(d3f1e0bae02472914a940222e4f600170a91736d) )
 	ROM_LOAD( "26aa-03.bin",  0x10000, 0x8000, CRC(44dd5d4b) SHA1(427c4e419668b41545928cfc96435c010ecdc88b) )
 	ROM_LOAD( "26ab-0.bin",   0x18000, 0x8000, CRC(49ddddcd) SHA1(91dc53718d04718b313f23d86e241027c89d1a03) )
@@ -1656,7 +1656,7 @@ ROM_START( ddragn2u )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite CPU 64kb (Upper 16kb = 0) */
 	ROM_LOAD( "26ae-0.bin",   0x00000, 0x10000, CRC(ea437867) SHA1(cd910203af0565f981b9bdef51ea6e9c33ee82d3) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* music CPU, 64kb */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* music CPU, 64kb */
 	ROM_LOAD( "26ad-0.bin",   0x00000, 0x8000, CRC(75e36cd6) SHA1(f24805f4f6925b3ac508e66a6fc25c275b05f3b9) )
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -1684,7 +1684,7 @@ ROM_END
 
 
 ROM_START( tstrike )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "prog.rom",        0x08000, 0x08000, CRC(bf011a00) SHA1(09a55042a219dd37cb9e7feeab092ebfb903ddde) )
 	ROM_LOAD( "tstrike.25",      0x10000, 0x08000, CRC(b6a0c2f3) SHA1(3434689ca217f5af268058ad34c277db672d389c) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "tstrike.24",      0x18000, 0x08000, CRC(363816fa) SHA1(65c1ccbb950e09230196b49dc7312a13a34f3f79) ) /* banked at 0x4000-0x8000 */
@@ -1693,7 +1693,7 @@ ROM_START( tstrike )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "tstrike.30",      0x08000, 0x08000, CRC(3f3f04a1) SHA1(45d2b4542ec783c1c4122616606be6c160f76c06) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
@@ -1728,7 +1728,7 @@ ROM_START( tstrike )
 ROM_END
 
 ROM_START( tstrikea )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "tstrike.26",      0x08000, 0x08000, CRC(871b10bc) SHA1(c824775cf72c039612fda76c4a518cd89e4c8657) )
 	ROM_LOAD( "tstrike.25",      0x10000, 0x08000, CRC(b6a0c2f3) SHA1(3434689ca217f5af268058ad34c277db672d389c) ) /* banked at 0x4000-0x8000 */
 	ROM_LOAD( "tstrike.24",      0x18000, 0x08000, CRC(363816fa) SHA1(65c1ccbb950e09230196b49dc7312a13a34f3f79) ) /* banked at 0x4000-0x8000 */
@@ -1737,7 +1737,7 @@ ROM_START( tstrikea )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "tstrike.30",      0x08000, 0x08000, CRC(3f3f04a1) SHA1(45d2b4542ec783c1c4122616606be6c160f76c06) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
@@ -1773,7 +1773,7 @@ ROM_END
 
 
 ROM_START( ddungeon )
-	ROM_REGION( 0x30000, "main", 0 ) /* Main CPU? */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* Main CPU? */
 	ROM_LOAD( "dd25.25",    0x10000, 0x8000,  CRC(922e719c) SHA1(d1c73f56913cd368158abc613d7bbab669509742) )
 	ROM_LOAD( "dd26.26",    0x08000, 0x8000,  CRC(a6e7f608) SHA1(83b9301c39bfdc1e50a37f2bdc4d4f65a1111bee) )
 	/* IC23 is replaced with a daughterboard containing a 68705 MCU */
@@ -1781,7 +1781,7 @@ ROM_START( ddungeon )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",  0xc000,  0x4000,  CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "dd30.30",    0x08000, 0x08000, CRC(ef1af99a) SHA1(7ced695b81ca9efbb7b28b78013e112edac85672) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
@@ -1812,7 +1812,7 @@ ROM_END
    4 boards it's likely that the updated sound rom in the parent set was only shipped with the 'game room'
    version of the game */
 ROM_START( ddungene )
-	ROM_REGION( 0x30000, "main", 0 ) /* Main CPU? */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* Main CPU? */
 	ROM_LOAD( "dd25.25",    0x10000, 0x8000,  CRC(922e719c) SHA1(d1c73f56913cd368158abc613d7bbab669509742) ) /* 3 on this board */
 	ROM_LOAD( "dd26.26",    0x08000, 0x8000,  CRC(a6e7f608) SHA1(83b9301c39bfdc1e50a37f2bdc4d4f65a1111bee) ) /* 2 on this board */
 	/* IC23 is replaced with a daughterboard containing a 68705 MCU */
@@ -1820,7 +1820,7 @@ ROM_START( ddungene )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",  0xc000,  0x4000,  CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) ) /* from ddragon */
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
@@ -1848,7 +1848,7 @@ ROM_END
 
 
 ROM_START( darktowr )
-	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + bankswitched memory */
 	ROM_LOAD( "dt.26",         0x08000, 0x08000, CRC(8134a472) SHA1(7d42d2ed8d09855241d98ed94bce140a314c2f66) )
 	ROM_LOAD( "21j-2-3.25",    0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* from ddragon */
 	ROM_LOAD( "dt.24",         0x18000, 0x08000, CRC(523a5413) SHA1(71c04287e4f2e792c98abdeb97fe70abd0d5e918) ) /* banked at 0x4000-0x8000 */
@@ -1857,7 +1857,7 @@ ROM_START( darktowr )
 	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
 	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* audio cpu */
 	ROM_LOAD( "21j-0-1",      0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) ) /* from ddragon */
 
 	ROM_REGION( 0x0800, "mcu", 0 )	/* 8k for the microcontroller */
@@ -1893,11 +1893,11 @@ ROM_END
 
 
 ROM_START( toffy )
-	ROM_REGION( 0x30000, "main", 0 ) /* Main CPU? */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* Main CPU? */
 	ROM_LOAD( "2-27512.rom", 0x00000, 0x10000, CRC(244709dd) SHA1(b2db51b910f1a031b94fb50e684351f657a465dc) )
 	ROM_RELOAD( 0x10000, 0x10000 )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Sound CPU? */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Sound CPU? */
 	ROM_LOAD( "u142.1", 0x00000, 0x10000, CRC(541bd7f0) SHA1(3f0097f5877eae50651f94d46d7dd9127037eb6e) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* GFX? */
@@ -1914,11 +1914,11 @@ ROM_START( toffy )
 ROM_END
 
 ROM_START( stoffy )
-	ROM_REGION( 0x30000, "main", 0 ) /* Main CPU? */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* Main CPU? */
 	ROM_LOAD( "u70.2", 0x00000, 0x10000, CRC(3c156610) SHA1(d7fdbc595bdc77c452da39da8b20774db0952e33) )
 	ROM_RELOAD( 0x10000, 0x10000 )
 
-	ROM_REGION( 0x10000, "sound", 0 ) /* Sound CPU? */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Sound CPU? */
 	ROM_LOAD( "u142.1", 0x00000, 0x10000, CRC(541bd7f0) SHA1(3f0097f5877eae50651f94d46d7dd9127037eb6e) ) // same as 'toffy'
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* GFX? */
@@ -1980,8 +1980,8 @@ static DRIVER_INIT( toffy )
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3808, 0x3808, 0, 0, toffy_bankswitch_w);
 
 	/* the program rom has a simple bitswap encryption */
-	rom = memory_region(machine, "main");
-	length = memory_region_length(machine, "main");
+	rom = memory_region(machine, "maincpu");
+	length = memory_region_length(machine, "maincpu");
 	for (i = 0; i < length; i++)
 		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
 

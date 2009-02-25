@@ -495,7 +495,7 @@ static MC6845_ON_DE_CHANGED( display_enable_changed )
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",					/* screen we are acting on */
+	"screen",				/* screen we are acting on */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
 	update_row,				/* row update callback */
@@ -686,11 +686,11 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( spiders )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, 2800000)
+	MDRV_CPU_ADD("maincpu", M6809, 2800000)
 	MDRV_CPU_PROGRAM_MAP(spiders_main_map,0)
 	MDRV_CPU_PERIODIC_INT(update_pia_1, 25)
 
-	MDRV_CPU_ADD("audio", M6802, 3000000)
+	MDRV_CPU_ADD("audiocpu", M6802, 3000000)
 	MDRV_CPU_PROGRAM_MAP(spiders_audio_map,0)
 
 	MDRV_MACHINE_START(spiders)
@@ -700,7 +700,7 @@ static MACHINE_DRIVER_START( spiders )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(spiders)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
@@ -724,13 +724,13 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( spiders )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sp-ic74",      0xc000, 0x1000, CRC(6a2578f6) SHA1(ddfe4fb2ccc925df7ae97821f8681b32e47630b4) )
 	ROM_LOAD( "sp-ic73",      0xd000, 0x1000, CRC(d69b2f21) SHA1(ea2b07d19bd50c3b57da8fd8e13b8ab0e8ca3084) )
 	ROM_LOAD( "sp-ic72",      0xe000, 0x1000, CRC(464125da) SHA1(94e9edd52e8bd72bbb5dc91b0aa11955e940799c) )
 	ROM_LOAD( "sp-ic71",      0xf000, 0x1000, CRC(a9539b18) SHA1(2d02343a78a4a65e5a1798552cd015f16ad5423a) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sp-ic3",       0xf800, 0x0800, CRC(944d761e) SHA1(23b1f9234e0de678e96d1a6876d8d0a341150385) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -745,13 +745,13 @@ ROM_END
 
 
 ROM_START( spiders2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sp-ic74",      0xc000, 0x1000, CRC(6a2578f6) SHA1(ddfe4fb2ccc925df7ae97821f8681b32e47630b4) )
 	ROM_LOAD( "sp2.bin",      0xd000, 0x1000, CRC(cf71d12b) SHA1(369e91f637e8cd898354ddee04e24d4894968f79) )
 	ROM_LOAD( "sp-ic72",      0xe000, 0x1000, CRC(464125da) SHA1(94e9edd52e8bd72bbb5dc91b0aa11955e940799c) )
 	ROM_LOAD( "sp4.bin",      0xf000, 0x1000, CRC(f3d126bb) SHA1(ecc9156a7da661fa7543d7656aa7da77274e0842) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sp-ic3",       0xf800, 0x0800, CRC(944d761e) SHA1(23b1f9234e0de678e96d1a6876d8d0a341150385) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
@@ -766,13 +766,13 @@ ROM_END
 
 
 ROM_START( spinner )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sp01-100.r1",  0xc000, 0x1000, CRC(e85faa36) SHA1(ef1c479d503ef6a833ae1f9d5a260f9e50c1f2d4) )
 	ROM_LOAD( "sp02-99.s1",   0xd000, 0x1000, CRC(4bcd2b35) SHA1(dff3c6e68cc5384863a123661422d929e7406dee) )
 	ROM_LOAD( "sp03-98.t1",   0xe000, 0x1000, CRC(fdabc5df) SHA1(a3276eb1f09f6a3c406721f89993a39c92fb7728) )
 	ROM_LOAD( "sp04-97.v1",   0xf000, 0x1000, CRC(62798f96) SHA1(1407a2ccb2b8f998f2ee494f52a471b627895dbe) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sp41-28.d9",   0xf800, 0x0800, CRC(944d761e) SHA1(23b1f9234e0de678e96d1a6876d8d0a341150385) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )

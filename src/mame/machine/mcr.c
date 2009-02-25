@@ -189,7 +189,7 @@ static const pia6821_interface zwackery_pia_4_intf =
 
 static void ctc_interrupt(const device_config *device, int state)
 {
-	cputag_set_input_line(device->machine, "main", 0, state);
+	cputag_set_input_line(device->machine, "maincpu", 0, state);
 }
 
 

@@ -215,12 +215,12 @@ static PALETTE_INIT( poolshrk )
 static MACHINE_DRIVER_START( poolshrk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6800, 11055000 / 8) /* ? */
+	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */
 	MDRV_CPU_PROGRAM_MAP(poolshrk_cpu_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
@@ -242,7 +242,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( poolshrk )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7329.k1", 0x7000, 0x800, CRC(88152245) SHA1(c7c5e43ea488a197e92a1dc2231578f8ed86c98d) )
 	ROM_LOAD( "7330.l1", 0x7800, 0x800, CRC(fb41d3e9) SHA1(c17994179362da13acfcd36a28f45e328428c031) )
 

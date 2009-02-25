@@ -361,17 +361,17 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( calorie )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,4000000)		 /* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(calorie_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80,3000000)		 /* 3 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,3000000)		 /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(calorie_sound_map,0)
 	MDRV_CPU_IO_MAP(calorie_sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 64)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -399,12 +399,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( calorie )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr10072.1j", 0x00000, 0x4000, CRC(ade792c1) SHA1(6ea5afb00a87037d502c17adda7e4060d12680d7) )
 	ROM_LOAD( "epr10073.1k", 0x04000, 0x4000, CRC(b53e109f) SHA1(a41c5affe917232e7adf40d7c15cff778b197e90) )
 	ROM_LOAD( "epr10074.1m", 0x08000, 0x4000, CRC(a08da685) SHA1(69f9cfebc771312dbb1726350c2d9e9e8c46353f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "epr10075.4d", 0x0000, 0x4000, CRC(ca547036) SHA1(584a65482f2b92a4c08c37560450d6db68a56c7b) )
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* background tilemaps */
@@ -427,14 +427,14 @@ ROM_START( calorie )
 ROM_END
 
 ROM_START( calorieb )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "12.bin",      0x10000, 0x4000, CRC(cf5fa69e) SHA1(520d5652e93a672a1fc147295fbd63b873967885) )
 	ROM_CONTINUE(            0x00000, 0x4000 )
 	ROM_LOAD( "13.bin",      0x14000, 0x4000, CRC(52e7263f) SHA1(4d684c9e3f08ddb18b0b3b982aba82d3c809a633) )
 	ROM_CONTINUE(            0x04000, 0x4000 )
 	ROM_LOAD( "epr10074.1m", 0x08000, 0x4000, CRC(a08da685) SHA1(69f9cfebc771312dbb1726350c2d9e9e8c46353f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "epr10075.4d", 0x0000, 0x4000, CRC(ca547036) SHA1(584a65482f2b92a4c08c37560450d6db68a56c7b) )
 
 	ROM_REGION( 0x2000, "user1", 0 ) /* background tilemaps */
@@ -459,13 +459,13 @@ ROM_END
 
 static DRIVER_INIT( calorie )
 {
-	calorie_decode(machine, "main");
+	calorie_decode(machine, "maincpu");
 }
 
 static DRIVER_INIT( calorieb )
 {
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
 }
 
 

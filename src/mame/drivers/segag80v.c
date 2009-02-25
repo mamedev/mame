@@ -915,16 +915,16 @@ static const samples_interface zektor_samples_interface =
 static MACHINE_DRIVER_START( g80v_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK/2)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_START(g80v)
 	MDRV_MACHINE_RESET(g80v)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(40)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(512, 1536, 640-32, 1408+32)
@@ -1003,7 +1003,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( elim2 )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969.cpu-u25",   0x0000, 0x0800, CRC(411207f2) SHA1(2a082be4052b5d8f365abd0a51ea805d270d1189) )
 	ROM_LOAD( "1333.prom-u1",  0x0800, 0x0800, CRC(fd2a2916) SHA1(431d340c0c9257d66f5851a591861bcefb600cec) )
 	ROM_LOAD( "1334.prom-u2",  0x1000, 0x0800, CRC(79eb5548) SHA1(d951de5c0ab94fdb6e58207ee9a147674dd74220) )
@@ -1025,7 +1025,7 @@ ROM_START( elim2 )
 ROM_END
 
 ROM_START( elim2a )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969.cpu-u25",    0x0000, 0x0800, CRC(411207f2) SHA1(2a082be4052b5d8f365abd0a51ea805d270d1189) )
 	ROM_LOAD( "1158.prom-u1",   0x0800, 0x0800, CRC(a40ac3a5) SHA1(9cf707e3439def17390ae16b49552fb1996a6335) )
 	ROM_LOAD( "1159.prom-u2",   0x1000, 0x0800, CRC(ff100604) SHA1(1636337c702473b5a567832a622b0c09bd1e2aba) )
@@ -1047,7 +1047,7 @@ ROM_START( elim2a )
 ROM_END
 
 ROM_START( elim2c )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969t.cpu-u25",  0x0000, 0x0800, CRC(896a615c) SHA1(542386196eca9fd822e36508e173201ee8a962ed) )
 	ROM_LOAD( "1200.prom-u1",  0x0800, 0x0800, CRC(590beb6a) SHA1(307c33cbc0b90f290aac302366e3ce4f70e5265e) )
 	ROM_LOAD( "1201.prom-u2",  0x1000, 0x0800, CRC(fed32b30) SHA1(51fba99d3bf543318ebe70ee1aa91e3171767d6f) )
@@ -1069,7 +1069,7 @@ ROM_START( elim2c )
 ROM_END
 
 ROM_START( elim4 )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "1390.cpu-u25",  0x0000, 0x0800, CRC(97010c3e) SHA1(b07db05abf48461b633bbabe359a973a5bc6da13) )
 	ROM_LOAD( "1347.prom-u1",  0x0800, 0x0800, CRC(657d7320) SHA1(ef8a637d94dfa8b9dfa600269d914d635e597a9c) )
 	ROM_LOAD( "1348.prom-u2",  0x1000, 0x0800, CRC(b15fe578) SHA1(d53773a5f7ec3c130d4ff75a5348a9f37c82c7c8) )
@@ -1092,7 +1092,7 @@ ROM_START( elim4 )
 ROM_END
 
 ROM_START( elim4p )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "1390.cpu-u25",  0x0000, 0x0800, CRC(97010c3e) SHA1(b07db05abf48461b633bbabe359a973a5bc6da13) )
 	ROM_LOAD( "sw1.prom-u1",   0x0800, 0x0800, CRC(5350b8eb) SHA1(def9192971d1943e45cea1845b1d8c8e2a01bc38) )
 	ROM_LOAD( "sw2.prom-u2",   0x1000, 0x0800, CRC(44f45465) SHA1(e3139878602864509803dabc0f9c278e4b856431) )
@@ -1116,7 +1116,7 @@ ROM_END
 
 
 ROM_START( spacfury ) /* Revision C */
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969c.cpu-u25",    0x0000, 0x0800, CRC(411207f2) SHA1(2a082be4052b5d8f365abd0a51ea805d270d1189) )
 	ROM_LOAD( "960c.prom-u1",    0x0800, 0x0800, CRC(d071ab7e) SHA1(c7d2429e4fa77988d7ac62bc68f876ffb7467838) )
 	ROM_LOAD( "961c.prom-u2",    0x1000, 0x0800, CRC(aebc7b97) SHA1(d0a0328ed34de9bd2c83da4ddc2d017e2b5a8bdc) )
@@ -1128,7 +1128,7 @@ ROM_START( spacfury ) /* Revision C */
 	ROM_LOAD( "967c.prom-u8",    0x4000, 0x0800, CRC(330f0751) SHA1(07ae52fdbfa2cc326f88dc76c3dc8e145b592863) )
 	ROM_LOAD( "968c.prom-u9",    0x4800, 0x0800, CRC(8366eadb) SHA1(8e4cb30a730237da2e933370faf5eaa1a41cacbf) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808c.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
 	ROM_REGION( 0x4000, "speech", 0 )
@@ -1143,7 +1143,7 @@ ROM_START( spacfury ) /* Revision C */
 ROM_END
 
 ROM_START( spacfura ) /* Revision A */
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969a.cpu-u25",    0x0000, 0x0800, CRC(896a615c) SHA1(542386196eca9fd822e36508e173201ee8a962ed) )
 	ROM_LOAD( "960a.prom-u1",    0x0800, 0x0800, CRC(e1ea7964) SHA1(9c84c525973fcf1437b062d98195272723249d02) )
 	ROM_LOAD( "961a.prom-u2",    0x1000, 0x0800, CRC(cdb04233) SHA1(6f8d2fe6d46d04ebe94b7943006d63b24c88ed5a) )
@@ -1155,7 +1155,7 @@ ROM_START( spacfura ) /* Revision A */
 	ROM_LOAD( "967a.prom-u8",    0x4000, 0x0800, CRC(d60f667d) SHA1(821271ec1918e22ed29a5b1f4b0182765ef5ba10) )
 	ROM_LOAD( "968a.prom-u9",    0x4800, 0x0800, CRC(aea85b6a) SHA1(8778ff0be34cd4fd5b8f6f76c64bfca68d4d240e) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808a.speech-u7",  0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
 	ROM_REGION( 0x4000, "speech", 0 )
@@ -1170,7 +1170,7 @@ ROM_START( spacfura ) /* Revision A */
 ROM_END
 
 ROM_START( spacfurb ) /* Revision B */
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "969a.cpu-u25",    0x0000, 0x0800, CRC(896a615c) SHA1(542386196eca9fd822e36508e173201ee8a962ed) )
 	ROM_LOAD( "960b.prom-u1",    0x0800, 0x0800, CRC(8a99b63f) SHA1(4b9ec152e0fad50afeea11f5d61331f3211da606) )
 	ROM_LOAD( "961b.prom-u2",    0x1000, 0x0800, CRC(c72c1609) SHA1(b489423b52a15275b63f6b01b9aa75ad1ce777b5) )
@@ -1182,7 +1182,7 @@ ROM_START( spacfurb ) /* Revision B */
 	ROM_LOAD( "967b.prom-u8",    0x4000, 0x0800, CRC(82b5768d) SHA1(823d8c0a537bad62e8186f88f8d02a0f3dc6da0f) )
 	ROM_LOAD( "968b.prom-u9",    0x4800, 0x0800, CRC(fea68f02) SHA1(83bef40dfaac014b7929239d81075335ff8fd506) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808a.speech-u7",  0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
 	ROM_REGION( 0x4000, "speech", 0 )
@@ -1198,7 +1198,7 @@ ROM_END
 
 
 ROM_START( zektor )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "1611.cpu-u25",    0x0000, 0x0800, CRC(6245aa23) SHA1(815f3c7edad9c290b719a60964085e90e7268112) )
 	ROM_LOAD( "1586.prom-u1",    0x0800, 0x0800, CRC(efeb4fb5) SHA1(b337179c01870c953b8d38c20263802e9a7936d3) )
 	ROM_LOAD( "1587.prom-u2",    0x1000, 0x0800, CRC(daa6c25c) SHA1(061e390775b6dd24f85d51951267bca4339a3845) )
@@ -1222,7 +1222,7 @@ ROM_START( zektor )
 	ROM_LOAD( "1605.prom-u20",   0xa000, 0x0800, CRC(e27d7144) SHA1(5b82fda797d86e11882d1f9738a59092c5e3e7d8) )
 	ROM_LOAD( "1606.prom-u21",   0xa800, 0x0800, CRC(7965f636) SHA1(5c8720beedab4979a813ce7f0e8961c863973ff7) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "1607.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
 	ROM_REGION( 0x4000, "speech", 0 )
@@ -1238,7 +1238,7 @@ ROM_END
 
 
 ROM_START( tacscan )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "1711a.cpu-u25",  0x0000, 0x0800, CRC(0da13158) SHA1(256c5441a4841441501c9b7bcf09e0e99e8dd671) )
 	ROM_LOAD( "1670c.prom-u1",  0x0800, 0x0800, CRC(98de6fd5) SHA1(f22c215d7558e00366fec5092abb51c670468f8c) )
 	ROM_LOAD( "1671a.prom-u2",  0x1000, 0x0800, CRC(dc400074) SHA1(70093ef56e0784173a06da1ac781bb9d8c4e7fc5) )
@@ -1269,7 +1269,7 @@ ROM_END
 
 
 ROM_START( startrek )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "1873.cpu-u25",    0x0000, 0x0800, CRC(be46f5d9) SHA1(fadf13042d31b0dacf02a3166545c946f6fd3f33) )
 	ROM_LOAD( "1848.prom-u1",    0x0800, 0x0800, CRC(65e3baf3) SHA1(0c081ed6c8be0bb5eb3d5769ac1f0b8fe4735d11) )
 	ROM_LOAD( "1849.prom-u2",    0x1000, 0x0800, CRC(8169fd3d) SHA1(439d4b857083ae40df7d7f53c36ec13b05d86a86) )
@@ -1295,7 +1295,7 @@ ROM_START( startrek )
 	ROM_LOAD( "1869.prom-u22",   0xb000, 0x0800, CRC(e5663070) SHA1(735944c2b924964f72f3bb3d251a35ea2aef3d15) )
 	ROM_LOAD( "1870.prom-u23",   0xb800, 0x0800, CRC(4340616d) SHA1(e93686a29377933332523425532d102e30211111) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "1670.speech-u7",  0x0000, 0x0800, CRC(b779884b) SHA1(ac07e99717a1f51b79f3e43a5d873ebfa0559320) )
 
 	ROM_REGION( 0x4000, "speech", 0 )

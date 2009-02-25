@@ -231,7 +231,7 @@ static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(machine,  10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  10, memory_region(machine, "audiocpu") + (banknum * 0x4000) + 0x10000 );
 }
 
 static STATE_POSTLOAD( slapshot_postload )
@@ -524,11 +524,11 @@ static const ym2610_interface ym2610_config =
 static MACHINE_DRIVER_START( slapshot )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
+	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
 	MDRV_CPU_PROGRAM_MAP(slapshot_map,0)
-	MDRV_CPU_VBLANK_INT("main", slapshot_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", slapshot_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/8)	/* 4 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
 	MDRV_QUANTUM_TIME(HZ(600))
@@ -536,7 +536,7 @@ static MACHINE_DRIVER_START( slapshot )
 	MDRV_MACHINE_START(slapshot)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -566,17 +566,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( opwolf3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
+	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
 	MDRV_CPU_PROGRAM_MAP(opwolf3_map,0)
-	MDRV_CPU_VBLANK_INT("main", slapshot_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", slapshot_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/8)	/* 4 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -608,11 +608,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( slapshot )
-	ROM_REGION( 0x100000, "main", 0 )	/* 1024K for 68000 code */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 1024K for 68000 code */
 	ROM_LOAD16_BYTE( "d71-15.3",  0x00000, 0x80000, CRC(1470153f) SHA1(63fd5314fcaafba7326fd9481e3c686901dde65c) )
 	ROM_LOAD16_BYTE( "d71-16.1",  0x00001, 0x80000, CRC(f13666e0) SHA1(e8b475163ea7da5ee3f2b900004cc67c684bab75) )
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD    ( "d71-07.77",    0x00000, 0x4000, CRC(dd5f670c) SHA1(743a9563c40fe40178c9ec8eece71a08380c2239) )
 	ROM_CONTINUE(                 0x10000, 0xc000 )	/* banked stuff */
 
@@ -641,13 +641,13 @@ ROM_START( slapshot )
 ROM_END
 
 ROM_START( opwolf3 )
-	ROM_REGION( 0x200000, "main", 0 )	/* 1024K for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 1024K for 68000 code */
 	ROM_LOAD16_BYTE( "d74_16.3",  0x000000, 0x80000, CRC(198ff1f6) SHA1(f5b51e39cd73ea56cbf53731d3c885bfcecbd696) )
 	ROM_LOAD16_BYTE( "d74_21.1",  0x000001, 0x80000, CRC(c61c558b) SHA1(6340eb83ba4cd8d7c63b22ea738c8367c87c1de1) )
 	ROM_LOAD16_BYTE( "d74_18.18", 0x100000, 0x80000, CRC(bd5d7cdb) SHA1(29f1cd7b86bc05f873e93f088194113da87a3b86) )	// data ???
 	ROM_LOAD16_BYTE( "d74_17.17", 0x100001, 0x80000, CRC(ac35a672) SHA1(8136bd076443bfaeb3d339971d88951e8b2b59b4) )	// data ???
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD    ( "d74_22.77",    0x00000, 0x4000, CRC(118374a6) SHA1(cc1d0d28efdf1df3e648e7d932405811854ba4ee) )
 	ROM_CONTINUE(                 0x10000, 0xc000 )	/* banked stuff */
 
@@ -668,13 +668,13 @@ ROM_START( opwolf3 )
 ROM_END
 
 ROM_START( opwolf3u )
-	ROM_REGION( 0x200000, "main", 0 )	/* 1024K for 68000 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )	/* 1024K for 68000 code */
 	ROM_LOAD16_BYTE( "d74_16.3",  0x000000, 0x80000, CRC(198ff1f6) SHA1(f5b51e39cd73ea56cbf53731d3c885bfcecbd696) )
 	ROM_LOAD16_BYTE( "d74_20.1",  0x000001, 0x80000, CRC(960fd892) SHA1(2584a048d29a96b69428fba2b71269ea6ccf9010) )
 	ROM_LOAD16_BYTE( "d74_18.18", 0x100000, 0x80000, CRC(bd5d7cdb) SHA1(29f1cd7b86bc05f873e93f088194113da87a3b86) )	// data ???
 	ROM_LOAD16_BYTE( "d74_17.17", 0x100001, 0x80000, CRC(ac35a672) SHA1(8136bd076443bfaeb3d339971d88951e8b2b59b4) )	// data ???
 
-	ROM_REGION( 0x1c000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x1c000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD    ( "d74_19.77",    0x00000, 0x4000, CRC(05d53f06) SHA1(48b0cd68ad3758f424552a4e3833c5a1c2f1825b) )
 	ROM_CONTINUE(                 0x10000, 0xc000 )	/* banked stuff */
 

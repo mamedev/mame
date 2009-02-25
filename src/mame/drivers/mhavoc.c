@@ -484,7 +484,7 @@ static MACHINE_DRIVER_START( mhavoc )
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", VECTOR)
+	MDRV_SCREEN_ADD("screen", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 300, 0, 260)
@@ -526,7 +526,7 @@ static MACHINE_DRIVER_START( alphaone )
 	MDRV_CPU_PROGRAM_MAP(alphaone_map, 0)
 	MDRV_CPU_REMOVE("gamma")
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 580, 0, 500)
 
 	/* sound hardware */

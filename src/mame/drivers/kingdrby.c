@@ -627,14 +627,14 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",	/* screen we are acting on */
-	8,		/* number of pixels per video memory address */
-	NULL,	/* before pixel update callback */
-	NULL,	/* row update callback */
-	NULL,	/* after pixel update callback */
-	NULL,	/* callback for display state changes */
-	NULL,	/* HSYNC callback */
-	NULL	/* VSYNC callback */
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	NULL,		/* callback for display state changes */
+	NULL,		/* HSYNC callback */
+	NULL		/* VSYNC callback */
 };
 
 /*************************************
@@ -683,14 +683,14 @@ static MACHINE_DRIVER_START( kingdrby )
 	MDRV_CPU_ADD("master", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(master_map,0)
 	MDRV_CPU_IO_MAP(master_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("slave", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(slave_map,0)
 	MDRV_CPU_IO_MAP(slave_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, CLK_2)
+	MDRV_CPU_ADD("soundcpu", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,1000) /* guess, controls ay8910 tempo.*/
@@ -706,7 +706,7 @@ static MACHINE_DRIVER_START( kingdrby )
 	MDRV_PALETTE_LENGTH(0x200)
 	MDRV_PALETTE_INIT(kingdrby)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -732,14 +732,14 @@ ROM_START( kingdrby )
 	ROM_LOAD( "im5_d.c6",  0x1000, 0x1000, CRC(c192cecc) SHA1(63436bf3d9c1e34f6549830c8164295b7758d666) )
 	ROM_LOAD( "im6_d.b6",  0x2000, 0x1000, CRC(257f4e0d) SHA1(cd61f3cf70c536aa207ebfdd28be54ac586b5249) )
 
-	ROM_REGION( 0x1000, "sound", 0 )
+	ROM_REGION( 0x1000, "soundcpu", 0 )
 	ROM_LOAD( "sg1_b.e1", 0x0000, 0x1000, CRC(92ef3c13) SHA1(1bf1e4106b37aadfc02822184510740e18a54d5c) )
 
 	ROM_REGION( 0x4000, "slave", 0 )
 	ROM_LOAD( "im1_yk.g1", 0x0000, 0x1000, CRC(1921605d) SHA1(0aa6f7195ea59d0080620ab02a737e5c319dd3e7) )
 	ROM_LOAD( "im2_yk.f1", 0x1000, 0x1000, CRC(8504314e) SHA1(309645e17fb3149dce57ae6844cc58652a1eeb35) )
 	ROM_LOAD( "im3_yk.e1", 0x2000, 0x1000, CRC(b0e473ec) SHA1(234598548b2a2a8f53d40bc07c3b1759074b7d93) )
-	ROM_COPY( "sound", 0x0000, 0x3000, 0x1000 )
+	ROM_COPY( "soundcpu", 0x0000, 0x3000, 0x1000 )
 
 	/* sprites gfxs */
 	ROM_REGION( 0x8000, "gfx1", 0 )

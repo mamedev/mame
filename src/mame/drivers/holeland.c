@@ -299,13 +299,13 @@ static const ay8910_interface ay8910_interface_2 =
 static MACHINE_DRIVER_START( holeland )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -368,13 +368,13 @@ Notes:
 static MACHINE_DRIVER_START( crzrally )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 20000000/4)        /* 5 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(crzrally_readmem,crzrally_writemem)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -408,7 +408,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( holeland )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "holeland.0",  0x0000, 0x2000, CRC(b640e12b) SHA1(68d091a92747d2f4534386aff3ddb07c0d79384c) )
 	ROM_LOAD( "holeland.1",  0x2000, 0x2000, CRC(2f180851) SHA1(c21bcd3e9ff31a5cc415eb53d77a9cc9ebdd862d) )
 	ROM_LOAD( "holeland.2",  0x4000, 0x2000, CRC(35cfde75) SHA1(0a03c0464c771d049ae8706793ec43da5372fa58) )
@@ -433,7 +433,7 @@ ROM_END
 
 
 ROM_START( crzrally )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.7g",        0x0000, 0x4000, CRC(8fe01f86) SHA1(3e08f2cdcd08b25f2bb32d1c4d4caf4ac60c94d6) )
 	ROM_LOAD( "2.7f",        0x4000, 0x4000, CRC(67110f1d) SHA1(cc500017057e39cc8a6cb4e4ccae3c3cbab6c2ba) )
 	ROM_LOAD( "3.7d",        0x8000, 0x4000, CRC(25c861c3) SHA1(cc9f5f33833279b4430a4b8497cc16a222d31805) )
@@ -464,7 +464,7 @@ ROM_START( crzrally )
 ROM_END
 
 ROM_START( crzralla )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "crzralla_1.7g",        0x0000, 0x4000, CRC(8c6a70aa) SHA1(61b10cb16ddce813a768181483b03bead5b05702) )
 	ROM_LOAD( "crzralla_2.7f",        0x4000, 0x4000, CRC(7fdd4a45) SHA1(194d504adfd83adc52df2df27a18116a3072ea9d) )
 	ROM_LOAD( "crzralla_3.7d",        0x8000, 0x4000, CRC(a25edd17) SHA1(8f883bf3e42b9bf929717f6f13a281f0b83669b1) )
@@ -495,7 +495,7 @@ ROM_START( crzralla )
 ROM_END
 
 ROM_START( crzrallg )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "12.7g",       0x0000, 0x4000, CRC(0cab3ef9) SHA1(6de4d4a7159e0a6ad13dbca3344759410618ea26) )
 	ROM_LOAD( "13.7f",       0x4000, 0x4000, CRC(e19a8e13) SHA1(1462b21f16990eb9ae2f2d1cd5c097edf88bf614) )
 	ROM_LOAD( "14.7d",       0x8000, 0x4000, CRC(4c0351ba) SHA1(0ed04825d3affe0477bb963f1c96ff223e4bcf50) )

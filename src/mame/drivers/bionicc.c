@@ -327,11 +327,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bionicc )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(bionicc_interrupt,8)
 
-	MDRV_CPU_ADD("audio", Z80, EXO3_F0_CLK / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
+	MDRV_CPU_ADD("audiocpu", Z80, EXO3_F0_CLK / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	/* FIXME: interrupt timing
      * schematics indicate that nmi_line is set on  M680000 access with AB1=1
@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( bionicc )
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -365,13 +365,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START( bionicc ) /* "Not for use in Japan" */
-	ROM_REGION( 0x40000, "main", 0 )      /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "tse_02.1a",  0x00000, 0x10000, CRC(e4aeefaa) SHA1(77b6a2d4337bf350239abb50013d030d7c5c8640) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "tse_04.1b",  0x00001, 0x10000, CRC(d0c8ec75) SHA1(04138c75ca3939604100b7e9fb451f7fceee67ca) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "tse_03.2a",  0x20000, 0x10000, CRC(b2ac0a45) SHA1(d0933e74870efa9ea703251b30a56ef706ac24fe) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "tse_05.2b",  0x20001, 0x10000, CRC(a79cb406) SHA1(50eada2f3e80c28dcb5529890d9b279c73f0115a) ) /* 68000 code */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -406,13 +406,13 @@ ROM_START( bionicc ) /* "Not for use in Japan" */
 ROM_END
 
 ROM_START( bionicc1 ) /* "Not for use outside of USA or Canada" revision B */
-	ROM_REGION( 0x40000, "main", 0 )      /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "tsu_02b.1a",  0x00000, 0x10000, CRC(cf965a0a) SHA1(ab88742a3225a0b82ee2dfef6ed0058d3e11c38c) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "tsu_04b.1b",  0x00001, 0x10000, CRC(c9884bfb) SHA1(7d10cedff0a62847f8deb61a9611cc6661efb037) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "tsu_03b.2a",  0x20000, 0x10000, CRC(4e157ae2) SHA1(cc02931376d22a7fcfc320e6fd4129e03a461a49) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "tsu_05b.2b",  0x20001, 0x10000, CRC(e66ca0f9) SHA1(a503badf2fed38786d38c313d1dc315f3175d6de) ) /* 68000 code */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -447,13 +447,13 @@ ROM_START( bionicc1 ) /* "Not for use outside of USA or Canada" revision B */
 ROM_END
 
 ROM_START( bionicc2 ) /* "Not for use outside of USA or Canada" 1st release */
-	ROM_REGION( 0x40000, "main", 0 )      /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "tsu_02.1a",  0x00000, 0x10000, CRC(f2528f08) SHA1(04c793837c86d83312fd44b46a6a94378c90113b) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "tsu_04.1b",  0x00001, 0x10000, CRC(38b1c7e4) SHA1(14bf743726c214bd00177e7b410c272dd7ab3d3f) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "tsu_03.2a",  0x20000, 0x10000, CRC(72c3b76f) SHA1(f7f71eae7617e3348b727775088b496e86d51e38) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "tsu_05.2b",  0x20001, 0x10000, CRC(70621f83) SHA1(0a77c2827a5c50457d90ccc62e463508d83d2f20) ) /* 68000 code */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ts_01b.4e",  0x00000, 0x8000, CRC(a9a6cafa) SHA1(55e0a0e6ca11e8e73339d5b4604e130031211291) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -488,13 +488,13 @@ ROM_START( bionicc2 ) /* "Not for use outside of USA or Canada" 1st release */
 ROM_END
 
 ROM_START( topsecrt ) /* "Not for use in any other country but Japan" */
-	ROM_REGION( 0x40000, "main", 0 )      /* 68000 code */
+	ROM_REGION( 0x40000, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "ts_02.1a",  0x00000, 0x10000, CRC(b2fe1ddb) SHA1(892f19124993add96edabdba3aafeecc6668c5d9) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ts_04.1b",  0x00001, 0x10000, CRC(427a003d) SHA1(5a379fe2942e5565810939d5eb843003226222cc) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ts_03.2a",  0x20000, 0x10000, CRC(27f04bb6) SHA1(41d17b84b34dc8b2e5dfa67794a8df3e898b740b) ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ts_05.2b",  0x20001, 0x10000, CRC(c01547b1) SHA1(563bf6be4f10f5e6eb5b562266accf168f62bf30) ) /* 68000 code */
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "ts_01.4e",    0x00000, 0x8000, CRC(8ea07917) SHA1(e9ace70d89482fc3669860450a41aacacbee9083) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )

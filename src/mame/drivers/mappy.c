@@ -1575,13 +1575,13 @@ static const namco_interface namco_config =
 static MACHINE_DRIVER_START( superpac )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
+	MDRV_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(superpac_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT("main", mappy_interrupt_1)	// also update the custom I/O chips
+	MDRV_CPU_VBLANK_INT("screen", mappy_interrupt_1)	// also update the custom I/O chips
 
 	MDRV_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(superpac_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
@@ -1592,7 +1592,7 @@ static MACHINE_DRIVER_START( superpac )
 	MDRV_GFXDECODE(superpac)
 	MDRV_PALETTE_LENGTH(64*4+64*4)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -1622,17 +1622,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( phozon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809,	PIXEL_CLOCK/4)	/* MAIN CPU */
+	MDRV_CPU_ADD("maincpu", M6809,	PIXEL_CLOCK/4)	/* MAIN CPU */
 	MDRV_CPU_PROGRAM_MAP(phozon_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT("main", mappy_interrupt_1)	// also update the custom I/O chips
+	MDRV_CPU_VBLANK_INT("screen", mappy_interrupt_1)	// also update the custom I/O chips
 
 	MDRV_CPU_ADD("sub", M6809,	PIXEL_CLOCK/4)	/* SOUND CPU */
 	MDRV_CPU_PROGRAM_MAP(phozon_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_CPU_ADD("sub2", M6809,	PIXEL_CLOCK/4)	/* SUB CPU */
 	MDRV_CPU_PROGRAM_MAP(phozon_cpu3_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
@@ -1643,7 +1643,7 @@ static MACHINE_DRIVER_START( phozon )
 	MDRV_GFXDECODE(phozon)
 	MDRV_PALETTE_LENGTH(64*4+64*4)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -1663,13 +1663,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mappy )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
+	MDRV_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(mappy_cpu1_map,0)
-	MDRV_CPU_VBLANK_INT("main", mappy_interrupt_1)	// also update the custom I/O chips
+	MDRV_CPU_VBLANK_INT("screen", mappy_interrupt_1)	// also update the custom I/O chips
 
 	MDRV_CPU_ADD("sub", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
 	MDRV_CPU_PROGRAM_MAP(mappy_cpu2_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
@@ -1680,7 +1680,7 @@ static MACHINE_DRIVER_START( mappy )
 	MDRV_GFXDECODE(mappy)
 	MDRV_PALETTE_LENGTH(64*4+16*16)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -1716,7 +1716,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( superpac )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sp1-2.1c",     0xc000, 0x2000, CRC(4bb33d9c) SHA1(dd87f71b4db090a32a6b791079eedd17580cc741) )
 	ROM_LOAD( "sp1-1.1b",     0xe000, 0x2000, CRC(846fbb4a) SHA1(f6bf90281986b9b7a3ef1dbbeddb722182e84d7c) )
 
@@ -1739,7 +1739,7 @@ ROM_START( superpac )
 ROM_END
 
 ROM_START( superpcm )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "spc-2.1c",     0xc000, 0x2000, CRC(1a38c30e) SHA1(ae0ee9f3df0991a80698fe745a7a853a4bb60710) )
 	ROM_LOAD( "spc-1.1b",     0xe000, 0x2000, CRC(730e95a9) SHA1(ca73c8bcb03c2f5c05968c707a5d3f7f9956b886) )
 
@@ -1762,7 +1762,7 @@ ROM_START( superpcm )
 ROM_END
 
 ROM_START( pacnpal )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pap1-3b.1d",    0xa000, 0x2000, CRC(ed64a565) SHA1(b16930981490d97486d4df96acbb3d1cddbd3a80) )
 	ROM_LOAD( "pap1-2b.1c",    0xc000, 0x2000, CRC(15308bcf) SHA1(334603f8904f8968d05edc420b5f9e3b483ee86d) )
 	ROM_LOAD( "pap3-1.1b",     0xe000, 0x2000, CRC(3cac401c) SHA1(38a14228469fa4a20cbc5d862198dc901842682e) )
@@ -1786,7 +1786,7 @@ ROM_START( pacnpal )
 ROM_END
 
 ROM_START( pacnpal2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pap1-3.1d",    0xa000, 0x2000, CRC(d7ec2719) SHA1(b633a5360a199d528bcef209c06a21f266525769) )
 	ROM_LOAD( "pap1-2.1c",    0xc000, 0x2000, CRC(0245396e) SHA1(7e8467e317879621a7b31bc922b5187f20fcea78) )
 	ROM_LOAD( "pap1-1.1b",    0xe000, 0x2000, CRC(7f046b58) SHA1(2024019e5fafb698bb5775075c9b88c5ed35f7ba) )
@@ -1812,7 +1812,7 @@ ROM_END
 /* should there be a pacnchmp set with pap2-x program roms? */
 
 ROM_START( pacnchmp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pap3-3.1d",      0xa000, 0x2000, CRC(20a07d3d) SHA1(2135ad154b575a73cfb1b0f0f282dfc013672aec) )
 	ROM_LOAD( "pap3-2.1c",      0xc000, 0x2000, CRC(505bae56) SHA1(590ce9f0e92115a71eb76b71ab4eac16ffa2a28e) )
 	ROM_LOAD( "pap3-1.1b",      0xe000, 0x2000, CRC(3cac401c) SHA1(38a14228469fa4a20cbc5d862198dc901842682e) )
@@ -1836,7 +1836,7 @@ ROM_START( pacnchmp )
 ROM_END
 
 ROM_START( grobda )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "gr2-3.1d",  0xa000, 0x2000, CRC(8e3a23be) SHA1(e54c1366adc561609a3817e074b01245fb335153) )
 	ROM_LOAD( "gr2-2.1c",  0xc000, 0x2000, CRC(19ffa83d) SHA1(9f4faf5e0de783868d984f166b92ebcf8bb0f93f) )
 	ROM_LOAD( "gr2-1.1b",  0xe000, 0x2000, CRC(0089b13a) SHA1(286d6a60fc46a6db9a52c19c4e33114717747caf) )
@@ -1861,7 +1861,7 @@ ROM_START( grobda )
 ROM_END
 
 ROM_START( grobda2 )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "gr1-3.1d",  0xa000, 0x2000, CRC(4ef4a7c1) SHA1(33367e63531601c3d4f4a7b2170cb1c87f6d72a7) )
 	ROM_LOAD( "gr2-2a.1c", 0xc000, 0x2000, CRC(f93e82ae) SHA1(cb591bbcaab5ef26f097e7bab9b3638990465d4c) )
 	ROM_LOAD( "gr1-1.1b",  0xe000, 0x2000, CRC(32d42f22) SHA1(f83d17029f19fc2e8bac183771dbf9d786a56681) )
@@ -1886,7 +1886,7 @@ ROM_START( grobda2 )
 ROM_END
 
 ROM_START( grobda3 )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "gr1-3.1d",  0xa000, 0x2000, CRC(4ef4a7c1) SHA1(33367e63531601c3d4f4a7b2170cb1c87f6d72a7) )
 	ROM_LOAD( "gr1-2.1c",  0xc000, 0x2000, CRC(7dcc6e8e) SHA1(7580686b7082432a79217c3d7b5ebfa0c25952e3) )
 	ROM_LOAD( "gr1-1.1b",  0xe000, 0x2000, CRC(32d42f22) SHA1(f83d17029f19fc2e8bac183771dbf9d786a56681) )
@@ -1912,7 +1912,7 @@ ROM_END
 
 
 ROM_START( phozon )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the MAIN CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the MAIN CPU  */
 	ROM_LOAD( "6e.rom", 0x8000, 0x2000, CRC(a6686af1) SHA1(87a948b289356675d0418c87c3c0ae36ceba3ee0) )
 	ROM_LOAD( "6h.rom", 0xa000, 0x2000, CRC(72a65ba0) SHA1(b1d5146c009469d4c6695f08ea2c6ad5d05b5b9b) )
 	ROM_LOAD( "6c.rom", 0xc000, 0x2000, CRC(f1fda22e) SHA1(789881e94743efae01c63c1e3ce8d039cfa0324c) )
@@ -1945,7 +1945,7 @@ ROM_END
 
 
 ROM_START( mappy )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "mpx_3.1d",	0xa000, 0x2000, CRC(52e6c708) SHA1(b9722941438e93325e84691ada4e95620bec73b2) )
 	ROM_LOAD( "mp1_2.1c",	0xc000, 0x2000, CRC(a958a61c) SHA1(e5198703cdf47b2cd7fc9f2a5fde7bf4ab2275db) )
 	ROM_LOAD( "mpx_1.1b",	0xe000, 0x2000, CRC(203766d4) SHA1(1dbc4f42d4c16a08240a221bec27dcc3a8dd7461) )
@@ -1970,7 +1970,7 @@ ROM_START( mappy )
 ROM_END
 
 ROM_START( mappyj )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "mp1_3.1d",	0xa000, 0x2000, CRC(db9d5ab5) SHA1(32a0190f96f9c00c541b24dd17d6ad487938a8bf) )
 	ROM_LOAD( "mp1_2.1c",	0xc000, 0x2000, CRC(a958a61c) SHA1(e5198703cdf47b2cd7fc9f2a5fde7bf4ab2275db) )
 	ROM_LOAD( "mp1_1.1b",	0xe000, 0x2000, CRC(77c0b492) SHA1(631b73560ac59c3612e692fa59558773639ceda7) )
@@ -1995,7 +1995,7 @@ ROM_START( mappyj )
 ROM_END
 
 ROM_START( todruaga )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "td2_3.1d",	0x8000, 0x4000, CRC(fbf16299) SHA1(9abbaaaf0a53aff38df8287f62d091b13146cf13) )
 	ROM_LOAD( "td2_1.1b",	0xc000, 0x4000, CRC(b238d723) SHA1(ab8eadd45638ff1ab2dacbd5ab2c6870b9f79086) )
 
@@ -2019,7 +2019,7 @@ ROM_START( todruaga )
 ROM_END
 
 ROM_START( todruago )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "td1_3.1d",	0x8000, 0x4000, CRC(7ab4f5b2) SHA1(65035a5ecdff14bf23e01fe0f5e0935d156d94ff) )
 	ROM_LOAD( "td1_1.1b",	0xc000, 0x4000, CRC(8c20ef10) SHA1(12ea4875ce4d4590b88862139d3379ab9f5cec03) )
 
@@ -2043,7 +2043,7 @@ ROM_START( todruago )
 ROM_END
 
 ROM_START( digdug2 )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "d23_3.1d",	0x8000, 0x4000, CRC(cc155338) SHA1(d6796479ebb00081e9ae281380a4ce75f730766e) )
 	ROM_LOAD( "d23_1.1b",	0xc000, 0x4000, CRC(40e46af8) SHA1(698a5c425e23627331d85216a4edee9c391e5749) )
 
@@ -2067,7 +2067,7 @@ ROM_START( digdug2 )
 ROM_END
 
 ROM_START( digdug2o )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "d21_3.1d",	0x8000, 0x4000, CRC(be7ec80b) SHA1(a053274ffbf3200e9b89a8be1bd91744acb4a823) )
 	ROM_LOAD( "d21_1.1b",	0xc000, 0x4000, CRC(5c77c0d4) SHA1(56709e5db1686fd996d21c1005accf34e2d863e1) )
 
@@ -2092,7 +2092,7 @@ ROM_START( digdug2o )
 ROM_END
 
 ROM_START( motos )
-	ROM_REGION( 0x10000, "main", 0 )     /* 64k for code for the first CPU  */
+	ROM_REGION( 0x10000, "maincpu", 0 )     /* 64k for code for the first CPU  */
 	ROM_LOAD( "mo1_3.1d",	0x8000, 0x4000, CRC(1104abb2) SHA1(ade809a73ac24494b9f95f65b7592df5f86dce60) )
 	ROM_LOAD( "mo1_1.1b",	0xc000, 0x4000, CRC(57b157e2) SHA1(b050495fcc4a4d93551b29d4f05e49f64017c870) )
 

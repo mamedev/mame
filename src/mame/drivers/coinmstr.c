@@ -817,7 +817,7 @@ static const ay8910_interface ay8912_interface =
 
 static const mc6845_interface h46505_intf =
 {
-	"main",		/* screen we are acting on */
+	"screen",	/* screen we are acting on */
 	8,			/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
@@ -831,10 +831,10 @@ static const mc6845_interface h46505_intf =
 static MACHINE_DRIVER_START( coinmstr )
 	MDRV_CPU_ADD("cpu",Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(coinmstr_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

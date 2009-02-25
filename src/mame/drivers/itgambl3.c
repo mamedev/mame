@@ -235,11 +235,11 @@ static PALETTE_INIT( itgambl3 )
 static MACHINE_DRIVER_START( itgambl3 )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a M16C core ATM */
+	MDRV_CPU_ADD("maincpu", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a M16C core ATM */
 	MDRV_CPU_PROGRAM_MAP(itgambl3_map,0)
 
     /* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -309,7 +309,7 @@ Note:
 */
 
 ROM_START( ejollyx5 )	/* CPU and clock should be changed for this game */
-	ROM_REGION( 0x1000000, "main", 0 )	/* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 )	/* all the program code is in here */
 	ROM_LOAD( "ejollyx5_m30624fgafp.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x180000, "gfx1", 0 )	/* different encoded gfx */
@@ -366,7 +366,7 @@ PCB N? KGS0243-DF070283/03 made in Italy
 */
 
 ROM_START( grandprx )	/* CPU and clock should be changed for this game */
-	ROM_REGION( 0x1000000, "main", 0 )	/* all the program code is in here */
+	ROM_REGION( 0x1000000, "maincpu", 0 )	/* all the program code is in here */
 	ROM_LOAD( "grandprx_m30624fgafp.mcu", 0x00000, 0x4000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* different encoded gfx */

@@ -161,7 +161,7 @@ static MACHINE_START( jedi )
 	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), 32);
 
 	/* configure the banks */
-	memory_configure_bank(machine, 1, 0, 3, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 3, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* set up save state */
 	state_save_register_global(machine, state->nvram_enabled);
@@ -346,7 +346,7 @@ static MACHINE_DRIVER_START( jedi )
 	MDRV_DRIVER_DATA(jedi_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, JEDI_MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(240))
@@ -371,14 +371,14 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( jedi )
-	ROM_REGION( 0x1C000, "main", 0 )	/* 64k for code + 48k for banked ROMs */
+	ROM_REGION( 0x1C000, "maincpu", 0 )	/* 64k for code + 48k for banked ROMs */
 	ROM_LOAD( "136030-221.14f",  0x08000, 0x4000, CRC(414d05e3) SHA1(e5f5f8d85433467a13d6ca9e3889e07a62b00e52) )
 	ROM_LOAD( "136030-222.13f",  0x0c000, 0x4000, CRC(7b3f21be) SHA1(8fe62401f9b78c7a3e62b544c4b705b1bfa9b8f3) )
 	ROM_LOAD( "136030-123.13d",  0x10000, 0x4000, CRC(877f554a) SHA1(8b51109cabd84741b024052f892b3172fbe83223) ) /* Page 0 */
 	ROM_LOAD( "136030-124.13b",  0x14000, 0x4000, CRC(e72d41db) SHA1(1b3fcdc435f1e470e8d5b7241856e398a4c3910e) ) /* Page 1 */
 	ROM_LOAD( "136030-122.13a",  0x18000, 0x4000, CRC(cce7ced5) SHA1(bff031a637aefca713355dbf251dcb5c2cea0885) ) /* Page 2 */
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* space for the sound ROMs */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* space for the sound ROMs */
 	ROM_LOAD( "136030-133.01c",  0x8000, 0x4000, CRC(6c601c69) SHA1(618b77800bbbb4db34a53ca974a71bdaf89b5930) )
 	ROM_LOAD( "136030-134.01a",  0xC000, 0x4000, CRC(5e36c564) SHA1(4b0afceb9a1d912f1d5c1f26928d244d5b14ea4a) )
 

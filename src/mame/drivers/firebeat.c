@@ -1982,16 +1982,16 @@ static MACHINE_RESET( firebeat )
 static MACHINE_DRIVER_START(firebeat)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", PPC403GCX, 66000000)
+	MDRV_CPU_ADD("maincpu", PPC403GCX, 66000000)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
-	MDRV_CPU_VBLANK_INT("main", firebeat_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", firebeat_interrupt)
 
 	MDRV_MACHINE_START(firebeat)
 	MDRV_MACHINE_RESET(firebeat)
 	MDRV_NVRAM_HANDLER(firebeat)
 
  	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -2021,7 +2021,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(firebeat2)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", PPC403GCX, 66000000)
+	MDRV_CPU_ADD("maincpu", PPC403GCX, 66000000)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
 	MDRV_CPU_VBLANK_INT("left", firebeat_interrupt)
 
@@ -2066,7 +2066,7 @@ static MACHINE_DRIVER_START(firebeat_spu)
 
 	MDRV_IMPORT_FROM(firebeat)
 
-	MDRV_CPU_ADD("audio", M68000, 16000000)
+	MDRV_CPU_ADD("audiocpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(spu_map, 0)
 
 MACHINE_DRIVER_END
@@ -2368,7 +2368,7 @@ ROM_START( popn7 )
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
 	ROM_LOAD("gcb00-ja", 0x00, 0xc0, BAD_DUMP CRC(cc28625a) SHA1(e7de79ae72fdbd22328c9de74dfa17b5e6ae43b6))
 
-	ROM_REGION(0x80000, "audio", 0)			// SPU 68K program
+	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
 	DISK_REGION( "scsi0" )

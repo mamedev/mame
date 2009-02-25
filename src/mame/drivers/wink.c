@@ -322,12 +322,12 @@ static MACHINE_RESET( wink )
 
 static MACHINE_DRIVER_START( wink )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 12000000 / 4)
+	MDRV_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(wink_map,0)
 	MDRV_CPU_IO_MAP(wink_io,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", Z80, 12000000 / 8)
+	MDRV_CPU_ADD("audiocpu", Z80, 12000000 / 8)
 	MDRV_CPU_PROGRAM_MAP(wink_sound_map,0)
 	MDRV_CPU_IO_MAP(wink_sound_io,0)
 	MDRV_CPU_PERIODIC_INT(wink_sound, 15625)
@@ -336,7 +336,7 @@ static MACHINE_DRIVER_START( wink )
 	MDRV_MACHINE_RESET(wink)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -363,11 +363,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( wink )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "midcoin-wink00.rom", 0x0000, 0x4000, CRC(044f82d6) SHA1(4269333578c4fb14891b937c683aa5b105a193e7) )
 	ROM_LOAD( "midcoin-wink01.rom", 0x4000, 0x4000, CRC(acb0a392) SHA1(428c24845a27b8021823a4a930071b3b47108f01) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "midcoin-wink05.rom", 0x0000, 0x2000, CRC(c6c9d9cf) SHA1(99984905282c2310058d1ce93aec68d8a920b2c0) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
@@ -377,11 +377,11 @@ ROM_START( wink )
 ROM_END
 
 ROM_START( winka )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "wink0.bin",    0x0000, 0x4000, CRC(554d86e5) SHA1(bf2de874a62d9137f79063d6ca1906b1ed0c87e6) )
 	ROM_LOAD( "wink1.bin",    0x4000, 0x4000, CRC(9d8ad539) SHA1(77246df8195f7e3f3b06edc08d344801bf62e1ba) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "wink5.bin",    0x0000, 0x2000, CRC(c6c9d9cf) SHA1(99984905282c2310058d1ce93aec68d8a920b2c0) )
 
 	ROM_REGION( 0x6000, "gfx1", ROMREGION_DISPOSE )
@@ -393,7 +393,7 @@ ROM_END
 static DRIVER_INIT( wink )
 {
 	UINT32 i;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	UINT8 *buffer = malloc_or_die(0x8000);
 
 	// protection module reverse engineered by HIGHWAYMAN

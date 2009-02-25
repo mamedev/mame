@@ -136,9 +136,9 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( nitedrvr )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", M6502, 12096000/12) // 1 MHz
+	MDRV_CPU_ADD("maincpu", M6502, 12096000/12) // 1 MHz
 	MDRV_CPU_PROGRAM_MAP(nitedrvr_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(3)
 
 	MDRV_MACHINE_START(nitedrvr)
@@ -146,7 +146,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57) // how is this derived?
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -172,7 +172,7 @@ MACHINE_DRIVER_END
 
 /*
 ROM_START( nitedrvo )       // early revision has the program code stored in 8 chips
-    ROM_REGION( 0x10000, "main", 0 )
+    ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "006560-01.h1", 0x9000, 0x0200, NO_DUMP ) // PROM 1
     ROM_LOAD( "006561-01.c1", 0x9200, 0x0200, NO_DUMP ) // PROM 2
     ROM_LOAD( "006562-01.j1", 0x9400, 0x0200, NO_DUMP ) // PROM 3
@@ -185,7 +185,7 @@ ROM_END
 */
 
 ROM_START( nitedrvr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "006569-01.d2", 0x9000, 0x0800, CRC(7afa7542) SHA1(81018e25ebdeae1daf1308676661063b6fd7fd22) ) // MASK ROM 1
 	ROM_LOAD( "006570-01.f2", 0x9800, 0x0800, CRC(bf5d77b1) SHA1(6f603f8b0973bd89e0e721b66944aac8e9f904d9) ) // MASK ROM 2
 	ROM_RELOAD( 			  0xf800, 0x0800 ) // vectors

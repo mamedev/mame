@@ -339,7 +339,7 @@ static WRITE8_DEVICE_HANDLER( p8257_ctl_w );
 
 static const z80dma_interface dk3_dma =
 {
-	"main",
+	"maincpu",
 
 	dk_dma_read_byte,
 	dk_dma_write_byte,
@@ -349,7 +349,7 @@ static const z80dma_interface dk3_dma =
 
 static const dma8257_interface dk_dma =
 {
-	"main",
+	"maincpu",
 
 	dk_dma_read_byte,
 	dk_dma_write_byte,
@@ -361,7 +361,7 @@ static const dma8257_interface dk_dma =
 
 static const dma8257_interface hb_dma =
 {
-	"main",
+	"maincpu",
 
 	hb_dma_read_byte,
 	hb_dma_write_byte,
@@ -462,7 +462,7 @@ static MACHINE_RESET( dkong )
 static MACHINE_RESET( strtheat )
 {
 	dkong_state *state = machine->driver_data;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	MACHINE_RESET_CALL(dkong);
 
@@ -475,7 +475,7 @@ static MACHINE_RESET( strtheat )
 static MACHINE_RESET( drakton )
 {
 	dkong_state *state = machine->driver_data;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	MACHINE_RESET_CALL(dkong);
 
@@ -1574,9 +1574,9 @@ static MACHINE_DRIVER_START( dkong_base )
 	MDRV_DRIVER_DATA(dkong_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CLOCK_1H)
+	MDRV_CPU_ADD("maincpu", Z80, CLOCK_1H)
 	MDRV_CPU_PROGRAM_MAP(dkong_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong2b)
 	MDRV_MACHINE_RESET(dkong)
@@ -1584,7 +1584,7 @@ static MACHINE_DRIVER_START( dkong_base )
 	MDRV_DMA8257_ADD("dma8257", CLOCK_1H, dk_dma)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -1642,17 +1642,17 @@ static MACHINE_DRIVER_START( dkong3 )
 	MDRV_DRIVER_DATA(dkong_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_8MHz / 2)	/* verified in schematics */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)	/* verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(dkong3_map, 0)
 	MDRV_CPU_IO_MAP(dkong3_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong3)
 
 	MDRV_Z80DMA_ADD("z80dma", CLOCK_1H, dk3_dma)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -1671,7 +1671,7 @@ static MACHINE_DRIVER_START( dkongjr )
 
 	MDRV_IMPORT_FROM(dkong_base)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dkongjr_map, 0)
 
 	/* sound hardware */
@@ -1708,10 +1708,10 @@ static MACHINE_DRIVER_START( s2650 )
 	MDRV_IMPORT_FROM(dkong2b)
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", S2650, CLOCK_1H / 2)	/* ??? */
+	MDRV_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(s2650_map, 0)
 	MDRV_CPU_IO_MAP(s2650_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", s2650_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", s2650_interrupt)
 
 	MDRV_DEVICE_MODIFY("dma8257", DMA8257)
 	MDRV_DEVICE_CONFIG(hb_dma)
@@ -1724,7 +1724,7 @@ static MACHINE_DRIVER_START( spclforc )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(s2650)
-	MDRV_CPU_REMOVE("sound")
+	MDRV_CPU_REMOVE("soundcpu")
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(spclforc)
@@ -1741,7 +1741,7 @@ static MACHINE_DRIVER_START( strtheat )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(dkong2b)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(epos_readport,0)
 
 	MDRV_MACHINE_RESET(strtheat)
@@ -1751,7 +1751,7 @@ static MACHINE_DRIVER_START( drakton )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(dkong2b)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(epos_readport,0)
 
 	MDRV_MACHINE_RESET(drakton)
@@ -1761,7 +1761,7 @@ static MACHINE_DRIVER_START( drktnjr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(dkongjr)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(epos_readport,0)
 
 	MDRV_MACHINE_RESET(drakton)
@@ -1774,14 +1774,14 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( radarscp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trs2c5fc",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
 	ROM_LOAD( "trs2c5gc",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
 	ROM_LOAD( "trs2c5hc",     0x2000, 0x1000, CRC(51b8263d) SHA1(09687f2c40cf09ffc2aeddde4a4fa32800847f01) )
 	ROM_LOAD( "trs2c5kc",     0x3000, 0x1000, CRC(1f0101f7) SHA1(b9f988847fdefa64dfeae06c2244215cb0d64dbe) )
 	/* space for diagnostic ROM */
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "trs2s3i",      0x0000, 0x0800, CRC(78034f14) SHA1(548b44ac69f39df6687da1c0f60968009b1e0767) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0x00 )
@@ -1807,14 +1807,14 @@ ROM_START( radarscp )
 ROM_END
 
 ROM_START( radarsc1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trs01_5f",     0x0000, 0x1000, CRC(40949e0d) SHA1(94717b9d027600e25b863e89900df41325875961) )
 	ROM_LOAD( "trs01_5g",     0x1000, 0x1000, CRC(afa8c49f) SHA1(25880e9dcf2dc8862f7f3c38687f01dfe2424293) )
 	ROM_LOAD( "trs01_5h",     0x2000, 0x1000, CRC(51b8263d) SHA1(09687f2c40cf09ffc2aeddde4a4fa32800847f01) )
 	ROM_LOAD( "trs01_5k",     0x3000, 0x1000, CRC(1f0101f7) SHA1(b9f988847fdefa64dfeae06c2244215cb0d64dbe) )
 	/* space for diagnostic ROM */
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "trs015aa.bin", 0x0000, 0x0800, CRC(5166554c) SHA1(00bf501ca448929f6187598da6fdbc1ea488745a) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0xFF )
@@ -1850,14 +1850,14 @@ ROM_START( radarsc1 )
 ROM_END
 
 ROM_START( dkong )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c_5et_g.bin",  0x0000, 0x1000, CRC(ba70b88b) SHA1(d76ebecfea1af098d843ee7e578e480cd658ac1a) )
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )
 	ROM_LOAD( "c_5bt_g.bin",  0x2000, 0x1000, CRC(1c97d324) SHA1(c7966261f3a1d3296927e0b6ee1c58039fc53c1f) )
 	ROM_LOAD( "c_5at_g.bin",  0x3000, 0x1000, CRC(b9005ac0) SHA1(3fe3599f6fa7c496f782053ddf7bacb453d197c4) )
 	/* space for diagnostic ROM */
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
@@ -1879,14 +1879,14 @@ ROM_START( dkong )
 ROM_END
 
 ROM_START( dkongo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )	/* tkg3c.5f */
 	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )	/* tkg3c.5g */
 	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )	/* tkg3c.5h */
 	ROM_LOAD( "tkg3c.5k",     0x3000, 0x1000, CRC(553b89bb) SHA1(61611df9e2748fdcd31821038dcc0e16dc933873) )
 	/* space for diagnostic ROM */
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
@@ -1908,13 +1908,13 @@ ROM_START( dkongo )
 ROM_END
 
 ROM_START( dkongjp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )
 	ROM_LOAD( "5g.cpu",       0x1000, 0x1000, CRC(d326599b) SHA1(94c7382604d0a123a442d53f9641f366dfbb7631) )
 	ROM_LOAD( "5h.cpu",       0x2000, 0x1000, CRC(ff31ac89) SHA1(9626a9e6df0d1b0ff273dbbe986f670200f91f75) )
 	ROM_LOAD( "c_5k_b.bin",   0x3000, 0x1000, CRC(394d6007) SHA1(57e5ae76ef5d4a2fa9cd860b6c6be03b6d5ed5ba) )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
@@ -1936,13 +1936,13 @@ ROM_START( dkongjp )
 ROM_END
 
 ROM_START( dkongjo )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )
 	ROM_LOAD( "c_5g_b.bin",   0x1000, 0x1000, CRC(3b2a6635) SHA1(32c62e00863ab99c6f263587d9d5bb775a68f3de) )
 	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )
 	ROM_LOAD( "c_5k_b.bin",   0x3000, 0x1000, CRC(394d6007) SHA1(57e5ae76ef5d4a2fa9cd860b6c6be03b6d5ed5ba) )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
@@ -1964,13 +1964,13 @@ ROM_START( dkongjo )
 ROM_END
 
 ROM_START( dkongjo1 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )
 	ROM_LOAD( "5g.cpu",       0x1000, 0x1000, CRC(d326599b) SHA1(94c7382604d0a123a442d53f9641f366dfbb7631) )
 	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )
 	ROM_LOAD( "5k.bin",       0x3000, 0x1000, CRC(7961599c) SHA1(698a4c2b8d67840dca7526efb1ac0d3370a86925) )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
@@ -1992,14 +1992,14 @@ ROM_START( dkongjo1 )
 ROM_END
 
 ROM_START( dkongf ) /* Donkey Kong Foundry (hack) from Jeff's Romhack */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dk_f.5et",  0x0000, 0x1000, CRC(00b7efaf) SHA1(97ed5930eb5d0cb98a9008b1d329ba7f3b8b8dbf) )
 	ROM_LOAD( "dk_f.5ct",  0x1000, 0x1000, CRC(88af9b69) SHA1(c5621dd8198c333b3fa32fdece60ee5a3d8b2276) )
 	ROM_LOAD( "dk_f.5bt",  0x2000, 0x1000, CRC(de74ad91) SHA1(c80227361bdbc565e9f5764e6364b52d40ca778a) )
 	ROM_LOAD( "dk_f.5at",  0x3000, 0x1000, CRC(6a6bd420) SHA1(f012e2d21d906a2993af9cf8b2912ea6c928e94b) )
 	/* space for diagnostic ROM */
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_LOAD( "s_3j_b.bin",   0x1000, 0x0800, CRC(4743fe92) SHA1(6c82b57637c0212a580591397e6a5a1718f19fd2) )
@@ -2021,7 +2021,7 @@ ROM_START( dkongf ) /* Donkey Kong Foundry (hack) from Jeff's Romhack */
 ROM_END
 
 ROM_START( dkongjr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dkj.5b",       0x0000, 0x1000, CRC(dea28158) SHA1(08baf84ae6f9b40a2c743fe1d8c158c74a40e95a) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "dkj.5c",       0x2000, 0x0800, CRC(6fb5faf6) SHA1(ce1cfde71a9e2a8b5896a6301d386f72869a1d2e) )
@@ -2033,7 +2033,7 @@ ROM_START( dkongjr )
 	ROM_CONTINUE(             0x5000, 0x0800 )
 	ROM_CONTINUE(             0x1800, 0x0800 )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -2053,7 +2053,7 @@ ROM_START( dkongjr )
 ROM_END
 
 ROM_START( dkongjrj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c_5ba.bin",    0x0000, 0x1000, CRC(50a015ce) SHA1(edcafdf8f989dd25bb142817084d270a6942577a) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "c_5ca.bin",    0x2000, 0x0800, CRC(c0a18f0d) SHA1(6d7396b98c0a7fa508dc233f90e5a8359439c97b) )
@@ -2065,7 +2065,7 @@ ROM_START( dkongjrj )
 	ROM_CONTINUE(             0x5000, 0x0800 )
 	ROM_CONTINUE(             0x1800, 0x0800 )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "c_3h.bin",     0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -2085,7 +2085,7 @@ ROM_START( dkongjrj )
 ROM_END
 
 ROM_START( dkngjnrj )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dkjp.5b",      0x0000, 0x1000, CRC(7b48870b) SHA1(4f737559e2bf5cc28824220417d7a2827361221f) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "dkjp.5c",      0x2000, 0x0800, CRC(12391665) SHA1(3141ed5096097c48ac128636330ab6837a665d40) )
@@ -2097,7 +2097,7 @@ ROM_START( dkngjnrj )
 	ROM_CONTINUE(             0x5000, 0x0800 )
 	ROM_CONTINUE(             0x1800, 0x0800 )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -2117,7 +2117,7 @@ ROM_START( dkngjnrj )
 ROM_END
 
 ROM_START( dkongjrb )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dkjr1",        0x0000, 0x1000, CRC(ec7e097f) SHA1(c10885d8724434030094a106c5b6de7fa6976d0f) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "c_5ca.bin",    0x2000, 0x0800, CRC(c0a18f0d) SHA1(6d7396b98c0a7fa508dc233f90e5a8359439c97b) )
@@ -2129,7 +2129,7 @@ ROM_START( dkongjrb )
 	ROM_CONTINUE(             0x5000, 0x0800 )
 	ROM_CONTINUE(             0x1800, 0x0800 )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -2150,7 +2150,7 @@ ROM_END
 
 /* only the graphic roms differ from dkongjrb but it's a common bootleg */
 ROM_START( jrking )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b5.bin",    0x0000, 0x1000, CRC(ec7e097f) SHA1(c10885d8724434030094a106c5b6de7fa6976d0f) )
 	ROM_CONTINUE(          0x3000, 0x1000 )
 	ROM_LOAD( "c5.bin",    0x2000, 0x0800, CRC(c0a18f0d) SHA1(6d7396b98c0a7fa508dc233f90e5a8359439c97b) )
@@ -2162,7 +2162,7 @@ ROM_START( jrking )
 	ROM_CONTINUE(          0x5000, 0x0800 )
 	ROM_CONTINUE(          0x1800, 0x0800 )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "h3.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -2182,7 +2182,7 @@ ROM_START( jrking )
 ROM_END
 
 ROM_START( dkongjre )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "djr1-c.5b",    0x0000, 0x1000, CRC(ffe9e1a5) SHA1(715dc79d85169b4c1faf43458592e69b434afefd) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "djr1-c.5c",    0x2000, 0x0800, CRC(982e30e8) SHA1(4d93d79e6ab1cad678af509cb3be4166b239bfa6) )
@@ -2195,7 +2195,7 @@ ROM_START( dkongjre )
 	ROM_CONTINUE(             0x1800, 0x0800 )
 	ROM_LOAD( "djr1-c.5a",    0x8000, 0x1000, CRC(bb5f5180) SHA1(1ef6236b7204432cfd17c689760943ab603c6fb7) )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "c_3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -2215,7 +2215,7 @@ ROM_START( dkongjre )
 ROM_END
 
 ROM_START( pestplce )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pest.1p",      0x0000, 0x1000, CRC(80d50721) SHA1(9c0e7571b1664dce741595a2d13dc9d7709b35a9) )
 	ROM_CONTINUE(			  0x3000, 0x1000 )
 	ROM_LOAD( "pest.2p",      0x2000, 0x0800, CRC(9c3681cc) SHA1(c12e8e7ab79c9fde92cca2c589904f68cf52cbf1) )
@@ -2228,7 +2228,7 @@ ROM_START( pestplce )
 	ROM_CONTINUE(			  0x1800, 0x0800 )
 	ROM_LOAD( "pest.0",       0xb000, 0x1000, CRC(28952b56) SHA1(fa8abe594a88a61e85f074d03822d7e0dcd52fb2) )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "pest.4",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -2249,7 +2249,7 @@ ROM_START( pestplce )
 ROM_END
 
 ROM_START( dkong3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dk3c.7b",      0x0000, 0x2000, CRC(38d5f38e) SHA1(5a6bb0e5070211515e3d56bd7d4c2d1655ac1621) )
 	ROM_LOAD( "dk3c.7c",      0x2000, 0x2000, CRC(c9134379) SHA1(ecddb3694b93cb3dc98c3b1aeeee928e27529aba) )
 	ROM_LOAD( "dk3c.7d",      0x4000, 0x2000, CRC(d22e2921) SHA1(59a4a1a36aaca19ee0a7255d832df9d042ba34fb) )
@@ -2282,7 +2282,7 @@ ROM_START( dkong3 )
 ROM_END
 
 ROM_START( dkong3j )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dk3c.7b",      0x0000, 0x2000, CRC(38d5f38e) SHA1(5a6bb0e5070211515e3d56bd7d4c2d1655ac1621) )
 	ROM_LOAD( "dk3c.7c",      0x2000, 0x2000, CRC(c9134379) SHA1(ecddb3694b93cb3dc98c3b1aeeee928e27529aba) )
 	ROM_LOAD( "dk3c.7d",      0x4000, 0x2000, CRC(d22e2921) SHA1(59a4a1a36aaca19ee0a7255d832df9d042ba34fb) )
@@ -2315,7 +2315,7 @@ ROM_START( dkong3j )
 ROM_END
 
 ROM_START( dkong3b )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5b.bin",       0x0000, 0x1000, CRC(549979bc) SHA1(58532f39285db0b081089e54a23041d83bec49aa) )
 	ROM_CONTINUE(             0x3000, 0x1000 )
 	ROM_LOAD( "5c-2.bin",     0x2000, 0x0800, CRC(b9dcbae6) SHA1(a7a7a3d79cb1eed93e54dff508c61cbc24797007) )
@@ -2329,7 +2329,7 @@ ROM_START( dkong3b )
 	ROM_LOAD( "5c-1.bin",     0x9000, 0x1000, CRC(77a012d6) SHA1(334ae2c213acd50eda71b4102d0803bc596973ec) )
 	ROM_LOAD( "5e-1.bin",     0xd000, 0x1000, CRC(745ed767) SHA1(32f4678f3eea9dc88f4c99509719a42292d6833a) )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "3h.bin",       0x0000, 0x1000, CRC(715da5f8) SHA1(f708c3fd374da65cbd9fe2e191152f5d865414a0) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -2349,13 +2349,13 @@ ROM_START( dkong3b )
 ROM_END
 
 ROM_START( hunchbkd )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "hb.5e",        0x0000, 0x1000, CRC(4c3ac070) SHA1(636843b33f1b7e994b112fa29e65038098528b8c) )
 	ROM_LOAD( "hbsc-1.5c",    0x2000, 0x1000, CRC(9b0e6234) SHA1(a7405451e5cd42bc276c659ec5a2136dbb7b6aba) )
 	ROM_LOAD( "hb.5b",        0x4000, 0x1000, CRC(4cde80f3) SHA1(3d93d8e454b2c517971a99c5700b6e943f975a11) )
 	ROM_LOAD( "hb.5a",        0x6000, 0x1000, CRC(d60ef5b2) SHA1(b2b5528cb837d58ef632d7670820ad8b07e5af1b) )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "hb.3h",        0x0000, 0x0800, CRC(a3c240d4) SHA1(8cb6057ca617909c73b09988ba65a1176696cb5d) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0xFF )
@@ -2383,13 +2383,13 @@ ROM_START( hunchbkd )
 ROM_END
 
 ROM_START( sbdk )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "sb-dk.ap",     0x0000, 0x1000, CRC(fef0ef9c) SHA1(8d3de7f96354672d906b2e124f3fb355f3201ed2) )
 	ROM_LOAD( "sb-dk.ay",     0x2000, 0x1000, CRC(2e9dade2) SHA1(74e5770fd362fd0242b8174b0ea5383fdf893cb3) )
 	ROM_LOAD( "sb-dk.as",     0x4000, 0x1000, CRC(e6d200f3) SHA1(3787334df76e629baa9ef5362495cd3af7777358) )
 	ROM_LOAD( "sb-dk.5a",     0x6000, 0x1000, CRC(ca41ca56) SHA1(d862172b1cc6639d540efc140b63d1a598f75656) )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "sb-dk.3h",     0x0000, 0x0800, CRC(13e60b6e) SHA1(f5dca15db0f1a225ff0116726bb055bb7b9655cc) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0xFF )
@@ -2417,13 +2417,13 @@ ROM_START( sbdk )
 ROM_END
 
 ROM_START( herbiedk )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "5f.cpu",        0x0000, 0x1000, CRC(c7ab3ac6) SHA1(5ef8c0ac1acd09a0f6c1536d0525cc27bb87b167) )
 	ROM_LOAD( "5g.cpu",        0x2000, 0x1000, CRC(d1031aa6) SHA1(6f5eadf43f1a59333833b3ee72d8d3043ac8c899) )
 	ROM_LOAD( "5h.cpu",        0x4000, 0x1000, CRC(c0daf551) SHA1(f39058fa05ad69e839e7c0281cb1fad80cfa3134) )
 	ROM_LOAD( "5k.cpu",        0x6000, 0x1000, CRC(67442242) SHA1(0241281e8cc721f7fe22822f2cf168c2eed7983d) )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "3i.snd",        0x0000, 0x0800, CRC(20e30406) SHA1(e2b9c6b731e53651d26455c2753a6dc3d5e9d066) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0xFF )
@@ -2451,7 +2451,7 @@ ROM_START( herbiedk )
 ROM_END
 
 ROM_START( herodk )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "red-dot.rgt",  0x0c00, 0x0400, CRC(9c4af229) SHA1(8b7330457acdd8d92f2853f3e5f8c18f8991c5c9) )	/* encrypted */
 	ROM_CONTINUE(             0x0800, 0x0400 )
 	ROM_CONTINUE(             0x0400, 0x0400 )
@@ -2462,7 +2462,7 @@ ROM_START( herodk )
 	ROM_CONTINUE(             0x6000, 0x0e00 )
 	ROM_CONTINUE(             0x2e00, 0x0200 )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "silver.3h",    0x0000, 0x0800, CRC(67863ce9) SHA1(2b78e3d32a64cdef34afc476fed7ff0ab6a0277c) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0xFF )
@@ -2490,7 +2490,7 @@ ROM_START( herodk )
 ROM_END
 
 ROM_START( herodku )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2764.8h",      0x0c00, 0x0400, CRC(989ce053) SHA1(852401856a2d91118d1bd0b3db892b57d0ac949c) )
 	ROM_CONTINUE(             0x0800, 0x0400 )
 	ROM_CONTINUE(             0x0400, 0x0400 )
@@ -2499,7 +2499,7 @@ ROM_START( herodku )
 	ROM_LOAD( "2764.8f",      0x4000, 0x1000, CRC(835e0074) SHA1(187358973f595033a4745759f554a3dfd398889b) )
 	ROM_CONTINUE(             0x6000, 0x1000 )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "2716.3h",      0x0000, 0x0800, CRC(caf57bef) SHA1(60c19c65bf312b36c68631ccea5434ad8cf0f3df) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0xFF )
@@ -2527,7 +2527,7 @@ ROM_START( herodku )
 ROM_END
 
 ROM_START( spclforc )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "27128.8f",     0x0000, 0x1000, CRC(1e9b8d26) SHA1(783e733cfb5d8fa560a6e6a7b49f782abc60bb58) )
 	ROM_CONTINUE(			  0x2000, 0x1000 )
 	ROM_CONTINUE(			  0x4000, 0x1000 )
@@ -2556,7 +2556,7 @@ ROM_START( spclforc )
 ROM_END
 
 ROM_START( spcfrcii )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "spfc2.8f",     0x0000, 0x1000, CRC(87f9bb6c) SHA1(f432ff205336280ae11ef4b3061be48e19e07d76) )
 	ROM_CONTINUE(			  0x2000, 0x1000 )
 	ROM_CONTINUE(			  0x4000, 0x1000 )
@@ -2585,7 +2585,7 @@ ROM_START( spcfrcii )
 ROM_END
 
 ROM_START( 8ballact )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "8b-dk.5e",     0x0400, 0x0400, CRC(166c1c9b) SHA1(fd5661dbb4617a1daff7949ef030b8572bdebb85) )
 	ROM_CONTINUE(			  0x0000, 0x0400 )
 	ROM_CONTINUE(			  0x0c00, 0x0400 )
@@ -2594,7 +2594,7 @@ ROM_START( 8ballact )
 	ROM_LOAD( "8b-dk.5b",     0x4000, 0x1000, CRC(f836a962) SHA1(5a45514ea59cd92092523d116b0dc4a1f8fc46b7) )
 	ROM_LOAD( "8b-dk.5a",     0x6000, 0x1000, CRC(d45866d4) SHA1(5dfb121aa87bc5e6efadd9412b9f8d360c3dabd3) )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "8b-dk.3h",     0x0000, 0x0800, CRC(a8752c60) SHA1(0d7d35fd271d796e884a33071b83c000b91208a0) )
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0xFF )
@@ -2622,7 +2622,7 @@ ROM_START( 8ballact )
 ROM_END
 
 ROM_START( 8ballat2 )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "8b-jr.5b",     0x0400, 0x0400, CRC(579cd634) SHA1(93d81539459f7198d8cbf05b3e66a40466aee2d9) )
 	ROM_CONTINUE(			  0x0000, 0x0400 )
 	ROM_CONTINUE(			  0x0c00, 0x0400 )
@@ -2631,7 +2631,7 @@ ROM_START( 8ballat2 )
 	ROM_LOAD( "8b-jr.5c",     0x4000, 0x1000, CRC(9bccbe93) SHA1(dec4e1d41e1df36359f205bf090c4290311e4141) )
 	ROM_CONTINUE(			  0x2000, 0x1000 )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "8b-jr.3h",     0x0000, 0x1000, CRC(7f5c19fa) SHA1(9cde134137ee8e34bb745a72e67981c581561428) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -2658,12 +2658,12 @@ ROM_END
 
 /* encrypted */
 ROM_START( drakton )
-	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 4*16k for decrypted code */
+	ROM_REGION( 0x20000, "maincpu", 0 )	/* 64k for code + 4*16k for decrypted code */
 	ROM_LOAD( "2764.u2",      0x0000, 0x2000, CRC(d9a33205) SHA1(06dc96412e7162fd8a4f6ef4d14d1510c06b1d00) )
 	ROM_LOAD( "2764.u3",      0x2000, 0x2000, CRC(69583a35) SHA1(061271be4e9ddfd8dff4217f1434215ad35ba505) )
 
 	/* one is used for dkong conversions, the other one for dkongjr conversions */
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "2716.3h",      0x0000, 0x0800, CRC(3489a35b) SHA1(9ebcf4b20b212d54e6b1a6d9abbda3109298631b) ) /* dkong */
 	ROM_RELOAD(               0x0800, 0x0800 )
 	ROM_FILL(                 0x1000, 0x0800, 0x00 )
@@ -2686,11 +2686,11 @@ ROM_END
 
 /* encrypted */
 ROM_START( drktnjr )
-	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 4*16k for decrypted code */
+	ROM_REGION( 0x20000, "maincpu", 0 )	/* 64k for code + 4*16k for decrypted code */
 	ROM_LOAD( "2764.u2",      0x0000, 0x2000, CRC(d9a33205) SHA1(06dc96412e7162fd8a4f6ef4d14d1510c06b1d00) )
 	ROM_LOAD( "2764.u3",      0x2000, 0x2000, CRC(69583a35) SHA1(061271be4e9ddfd8dff4217f1434215ad35ba505) )
 
-	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1000, "soundcpu", 0 )	/* sound */
 	/* one is used for dkong conversions, the other one for dkongjr conversions */
 	ROM_LOAD( "2716.3h1",     0x0000, 0x0800, CRC(2a6ec016) SHA1(c95e185a39c8029f00798ce0a00759a4deb45677) ) /* dkongjr */
 
@@ -2712,11 +2712,11 @@ ROM_END
 
 /* encrypted */
 ROM_START( strtheat )
-	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 4*16k for decrypted code */
+	ROM_REGION( 0x20000, "maincpu", 0 )	/* 64k for code + 4*16k for decrypted code */
 	ROM_LOAD( "2764.u2",   0x0000, 0x2000, CRC(8d3e82c3) SHA1(ec26fb1c6015721da1f61eca76a4b3390d8dcc76) )
 	ROM_LOAD( "2764.u3",   0x2000, 0x2000, CRC(f0759e76) SHA1(e086f02d1861269194c4cd2ada71696b48ed1a1d) )
 
-	ROM_REGION( 0x1800, "sound", 0 )	/* sound */
+	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "2716.3h",   0x0000, 0x0800, CRC(4cd17174) SHA1(5ed9b5275b0779d1ca05d6e62d3ad8a682ebde37) )
 	ROM_RELOAD(            0x0800, 0x0800 )
 	ROM_FILL(              0x1000, 0x0800, 0xFF )
@@ -2799,11 +2799,11 @@ Speech PCB:    2x 2650A  (8-bit CPU)
 */
 
 ROM_START( shootgal )
-	ROM_REGION( 0x8000, "main", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "cpu.5e",       0x0000, 0x1000, CRC(c6d61b9c) SHA1(de3f4cf559313c4e5c5f7019aa6f68b3334e05c1) )
 	ROM_LOAD( "cpu.5a",       0x6000, 0x1000, CRC(5dabe5e3) SHA1(7a36d97b2604aa61fe468863651cf67b851bbfca) )
 
-	ROM_REGION( 0x1000, "sound", 0 )
+	ROM_REGION( 0x1000, "soundcpu", 0 )
 	ROM_LOAD( "sg-01-3h",    0x0000, 0x1000, CRC(80be5915) SHA1(a4f7d6a8319065a7a712df0195a3f8695d8f99f9) )
 
 	ROM_REGION( 0x0800, "cpu2", 0 )
@@ -2848,7 +2848,7 @@ static void drakton_decrypt_rom(running_machine *machine, UINT8 mod, int offs, i
 	UINT8 *ROM;
 	int mem;
 
-	ROM = memory_region(machine, "main");
+	ROM = memory_region(machine, "maincpu");
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -2874,7 +2874,7 @@ static void drakton_decrypt_rom(running_machine *machine, UINT8 mod, int offs, i
 static DRIVER_INIT( herodk )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* swap data lines D3 and D4 */
 	for (A = 0;A < 0x8000;A++)

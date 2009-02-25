@@ -114,8 +114,8 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	case 7: /* 0xe007 bankswitch */
 		/* bank 1 at 0x6000-9fff = from 0x10000 when bit0=0 else from 0x14000 */
 		/* bank 2 at 0xa000-bfff = from 0x18000 when bit0=0 else from 0x1a000 */
-		memory_set_bankptr(space->machine,  1, memory_region(space->machine, "main") + 0x10000 + ((data&1) * 0x4000) );
-		memory_set_bankptr(space->machine,  2, memory_region(space->machine, "main") + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
+		memory_set_bankptr(space->machine,  1, memory_region(space->machine, "maincpu") + 0x10000 + ((data&1) * 0x4000) );
+		memory_set_bankptr(space->machine,  2, memory_region(space->machine, "maincpu") + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
 	break;
 	}
 }
@@ -341,9 +341,9 @@ static MACHINE_RESET( tankbust )
 static MACHINE_DRIVER_START( tankbust )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)		/* 4 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)		/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, 4000000)		/* 3.072 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(map_cpu2,0)
@@ -354,7 +354,7 @@ static MACHINE_DRIVER_START( tankbust )
 	MDRV_MACHINE_RESET( tankbust )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -389,7 +389,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( tankbust )
-	ROM_REGION( 0x1c000, "main", 0 )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "a-s4-6.bin",		0x00000, 0x4000, CRC(8ebe7317) SHA1(bc45d530ad6335312c9c3efdcedf7acd2cdeeb55) )
 	ROM_LOAD( "a-s7-9.bin",		0x04000, 0x2000, CRC(047aee33) SHA1(62ee776c403b228e065baa9218f32597951ca935) )
 

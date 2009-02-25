@@ -35,7 +35,7 @@ static int firq_enable;
 
 static WRITE8_HANDLER( ajax_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	int bankaddress = 0;
 
 	/* rom select */

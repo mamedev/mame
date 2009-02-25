@@ -225,15 +225,15 @@ static MACHINE_START( appoooh )
 static MACHINE_DRIVER_START( appoooh )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
     MDRV_MACHINE_START(appoooh)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -429,15 +429,15 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( robowres )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
     MDRV_MACHINE_START(appoooh)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -474,7 +474,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( appoooh )
-	ROM_REGION( 0x14000, "main", 0 )	/* 64k for code + 16k bank */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* 64k for code + 16k bank */
 	ROM_LOAD( "epr-5906.bin", 0x00000, 0x2000, CRC(fffae7fe) SHA1(b4bb60eb6331e503759bd963eafefa69331d6b86) )
 	ROM_LOAD( "epr-5907.bin", 0x02000, 0x2000, CRC(57696cd6) SHA1(74a005d18d55fed9ece9b579d2e7e6619a47538b) )
 	ROM_LOAD( "epr-5908.bin", 0x04000, 0x2000, CRC(4537cddc) SHA1(ecb71cab7b9269d713399987cbc45ff54735019f) )
@@ -509,12 +509,12 @@ ROM_START( appoooh )
 ROM_END
 
 ROM_START( robowres )
-	ROM_REGION( 0x1c000, "main", 0 )	/* 64k for code + 16k bank */
+	ROM_REGION( 0x1c000, "maincpu", 0 )	/* 64k for code + 16k bank */
 	ROM_LOAD( "epr-7540.13d", 0x00000, 0x8000, CRC(a2a54237) SHA1(06c80fe6725582d19aa957728977e871e79e79e1) )
 	ROM_LOAD( "epr-7541.14d", 0x08000, 0x6000, CRC(cbf7d1a8) SHA1(5eb6d2130d4e5401a332df6db5cad07f3131e8e4) )
 	ROM_CONTINUE(             0x10000, 0x2000 )
 	ROM_LOAD( "epr-7542.15d", 0x14000, 0x8000, CRC(3475fbd4) SHA1(96b28d6492d2e6e8ca9c57abdc5ad4df3777894b) )
-	ROM_COPY( "main", 0x16000, 0x10000, 0x4000 )
+	ROM_COPY( "maincpu", 0x16000, 0x10000, 0x4000 )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "epr-7544.7h", 0x000000, 0x8000, CRC(07b846ce) SHA1(6d214fbb43003d2ab35340d5b9fece5f637cadc6) )
@@ -536,12 +536,12 @@ ROM_START( robowres )
 ROM_END
 
 ROM_START( robowrb )
-	ROM_REGION( 0x1c000+0x8000, "main", 0 )	/* 64k for code + 16k bank */
+	ROM_REGION( 0x1c000+0x8000, "maincpu", 0 )	/* 64k for code + 16k bank */
 	ROM_LOAD( "dg4.e13",      0x00000, 0x8000, CRC(f7585d4f) SHA1(718879f8262681b6b66968eb49a0fb04fda5160b) )
 	ROM_LOAD( "epr-7541.14d", 0x08000, 0x6000, CRC(cbf7d1a8) SHA1(5eb6d2130d4e5401a332df6db5cad07f3131e8e4) )
 	ROM_CONTINUE(             0x10000, 0x2000 )
 	ROM_LOAD( "epr-7542.15d", 0x14000, 0x8000, CRC(3475fbd4) SHA1(96b28d6492d2e6e8ca9c57abdc5ad4df3777894b) )
-	ROM_COPY( "main", 0x16000, 0x10000, 0x4000 )
+	ROM_COPY( "maincpu", 0x16000, 0x10000, 0x4000 )
 	ROM_LOAD( "dg1.f13",      0x1c000, 0x8000, CRC(b724968d) SHA1(36618fb81da919d578c2aa1c62d964871903c49f) )
 
 	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
@@ -566,12 +566,12 @@ ROM_END
 
 
 static DRIVER_INIT(robowres){
-	robowres_decode(machine, "main");
+	robowres_decode(machine, "maincpu");
 }
 
 static DRIVER_INIT(robowrb){
-	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x1c000);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x1c000);
 }
 
 

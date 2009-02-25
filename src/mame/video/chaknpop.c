@@ -76,7 +76,7 @@ PALETTE_INIT( chaknpop )
 
 static void set_vram_bank(running_machine *machine)
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 	int bankaddress;
 
 	if (gfxmode & GFX_VRAM_BANK)
@@ -181,7 +181,7 @@ static STATE_POSTLOAD( chaknpop_postload )
 
 VIDEO_START( chaknpop )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(machine, "maincpu");
 
 	/*                          info                       offset             type             w   h  col row */
 	tx_tilemap = tilemap_create(machine, chaknpop_get_tx_tile_info, tilemap_scan_rows,   8,  8, 32, 32);

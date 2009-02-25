@@ -573,7 +573,7 @@ static WRITE8_HANDLER( key_type3_w )
 
 WRITE8_HANDLER( namcos1_sound_bankswitch_w )
 {
-	UINT8 *rom = memory_region(space->machine, "audio") + 0xc000;
+	UINT8 *rom = memory_region(space->machine, "audiocpu") + 0xc000;
 
 	int bank = (data & 0x70) >> 4;
 	memory_set_bankptr(space->machine, 17,rom + 0x4000 * bank);

@@ -294,8 +294,8 @@ static VIDEO_UPDATE( igs017 )
 
 static void decrypt_program_rom(running_machine *machine, int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
-	int length = memory_region_length(machine, "main");
-	UINT8 *rom = memory_region(machine, "main");
+	int length = memory_region_length(machine, "maincpu");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *tmp = auto_malloc(length);
 	int i;
 
@@ -347,7 +347,7 @@ static void decrypt_program_rom(running_machine *machine, int mask, int a7, int 
 
 static void iqblocka_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 //  rom[0x7b64] = 0xc9;
 
@@ -422,7 +422,7 @@ static void tjsb_decrypt_sprites(running_machine *machine)
 
 static void tjsb_patch_rom(running_machine *machine)
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	rom[0x011df] = 0x18;
 }
 
@@ -440,7 +440,7 @@ static DRIVER_INIT( tjsb )
 static void mgcs_decrypt_program_rom(running_machine *machine)
 {
 	int i;
-	UINT16 *src = (UINT16 *)memory_region(machine, "main");
+	UINT16 *src = (UINT16 *)memory_region(machine, "maincpu");
 
 	int rom_size = 0x80000;
 
@@ -527,7 +527,7 @@ static void mgcs_flip_sprites(running_machine *machine)
 
 static void mgcs_patch_rom(running_machine *machine)
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	rom[0x4e036/2] = 0x6006;
 
@@ -1083,7 +1083,7 @@ static MACHINE_RESET( iqblocka )
 static MACHINE_DRIVER_START( iqblocka )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z180, XTAL_16MHz / 2)
+	MDRV_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(iqblocka_map,0)
 	MDRV_CPU_IO_MAP(iqblocka_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblocka_interrupt,2)
@@ -1093,7 +1093,7 @@ static MACHINE_DRIVER_START( iqblocka )
 	MDRV_MACHINE_RESET(iqblocka)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1152,7 +1152,7 @@ static const ppi8255_interface mgcs_ppi8255_intf =
 };
 
 static MACHINE_DRIVER_START( mgcs )
-	MDRV_CPU_ADD("main", M68000, XTAL_22MHz / 2)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(mgcs,0)
 	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
 
@@ -1161,7 +1161,7 @@ static MACHINE_DRIVER_START( mgcs )
 	MDRV_PPI8255_ADD( "ppi8255", mgcs_ppi8255_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1231,7 +1231,7 @@ Notes:
 */
 
 ROM_START( iqblocka )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "v.u18", 0x00000, 0x40000, CRC(2e2b7d43) SHA1(cc73f4c8f9a6e2219ee04c9910725558a80b4eb2) )
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_DISPOSE )
@@ -1245,7 +1245,7 @@ ROM_START( iqblocka )
 ROM_END
 
 ROM_START( iqblockf )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "v113fr.u18", 0x00000, 0x40000, CRC(346c68af) SHA1(ceae4c0143c288dc9c1dd1e8a51f1e3371ffa439) )
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_DISPOSE )
@@ -1307,7 +1307,7 @@ Notes:
 */
 
 ROM_START( tjsb )
-	ROM_REGION( 0x40000, "main", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "p0700.u16", 0x00000, 0x40000,CRC(1b2a50df) SHA1(95a272e624f727df9523667864f933118d9e633c) )
 
 	ROM_REGION( 0x200000, "sprites", ROMREGION_DISPOSE )
@@ -1365,7 +1365,7 @@ Notes:
 */
 
 ROM_START( mgcs )
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p1500.u8", 0x00000, 0x80000, CRC(a8cb5905) SHA1(37be7d926a1352869632d43943763accd4dec4b7) )
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_DISPOSE )

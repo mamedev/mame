@@ -59,7 +59,7 @@ extern VIDEO_UPDATE( pokechmp );
 
 static WRITE8_HANDLER( pokechmp_bank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	if (data == 0x00)
 	{
@@ -244,16 +244,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( pokechmp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 4000000)
+	MDRV_CPU_ADD("maincpu", M6502, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", M6502, 4000000)
+	MDRV_CPU_ADD("audiocpu", M6502, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -283,16 +283,16 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( pokechmp )
 {
-	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
 
 ROM_START( pokechmp )
-	ROM_REGION( 0x24000, "main", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x24000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
 	ROM_LOAD( "pokechamp_11_27010.bin",	   0x10000, 0x14000, CRC(9afb6912) SHA1(e45da9524e3bb6f64a68200b70d0f83afe6e4379) )
 	ROM_CONTINUE(			   0x04000, 0xc000)
 
-	ROM_REGION( 0x18000, "audio", 0 )	 /* 96k for code + 96k for decrypted opcodes */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* 96k for code + 96k for decrypted opcodes */
 	ROM_LOAD( "pokechamp_09_27c512.bin",	   0x10000, 0x8000, CRC(c78f6483) SHA1(a0d063effd8d1850f674edccb6e7a285b2311d21) )
 	ROM_CONTINUE(			   0x08000, 0x8000 )
 

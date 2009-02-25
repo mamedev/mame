@@ -182,7 +182,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( sstrangr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main",8080,1996800)	/* clock is a guess, taken from mw8080bw */
+	MDRV_CPU_ADD("maincpu",8080,1996800)	/* clock is a guess, taken from mw8080bw */
 	MDRV_CPU_PROGRAM_MAP(sstrangr_map,0)
 	MDRV_CPU_IO_MAP(sstrangr_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
@@ -190,7 +190,7 @@ static MACHINE_DRIVER_START( sstrangr )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(sstrangr)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
@@ -264,7 +264,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( sstrangr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hss-01.58",     0x0000, 0x0400, CRC(feec7600) SHA1(787a6be4e24ce931e7678e777699b9f6789bc199) )
 	ROM_LOAD( "hss-02.59",     0x0400, 0x0400, CRC(7281ff0b) SHA1(56649d1362be1b9f517cb8616cbf9e4f955e9a2d) )
 	ROM_LOAD( "hss-03.60",     0x0800, 0x0400, CRC(a09ec572) SHA1(9c4ad811a6c0460403f9cdc9fe5381c460249ff5) )
@@ -276,7 +276,7 @@ ROM_START( sstrangr )
 ROM_END
 
 ROM_START( sstrngr2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "4764.09",      0x0000, 0x2000, CRC(d88f86cc) SHA1(9f284ee50caf3c64bd04a79a798de620348881bc) )
 	ROM_LOAD( "2708.10",      0x6000, 0x0400, CRC(eba304c1) SHA1(3fa6fbb29fa46c146283f69a712bfc51cbb2a43c) )
 

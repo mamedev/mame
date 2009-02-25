@@ -613,7 +613,7 @@ ADDRESS_MAP_END
 static const tms34010_config vgb_config =
 {
 	FALSE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	XTAL_40MHz / 8,					/* pixel clock */
 	4,								/* pixels per clock */
 	micro3d_scanline_update,		/* scanline updater */
@@ -647,15 +647,15 @@ static MACHINE_RESET( micro3d )
 }
 
 static MACHINE_DRIVER_START( micro3d )
-	MDRV_CPU_ADD("main", M68000, XTAL_32MHz / 2)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(hostmem, 0)
-	MDRV_CPU_VBLANK_INT("main", micro3d_vblank)
+	MDRV_CPU_VBLANK_INT("screen", micro3d_vblank)
 
  	MDRV_CPU_ADD("vgb", TMS34010, XTAL_40MHz)
 	MDRV_CPU_CONFIG(vgb_config)
 	MDRV_CPU_PROGRAM_MAP(vgbmem, 0)
 
-	MDRV_CPU_ADD("audio", I8051, XTAL_11_0592MHz)
+	MDRV_CPU_ADD("audiocpu", I8051, XTAL_11_0592MHz)
 	MDRV_CPU_PROGRAM_MAP(soundmem_prg, 0)
 	MDRV_CPU_IO_MAP(soundmem_io, 0)
 
@@ -666,7 +666,7 @@ static MACHINE_DRIVER_START( micro3d )
 
 	MDRV_PALETTE_LENGTH(4096)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_40MHz/8*4, 192*4, 0, 144*4, 434, 0, 400)
 
@@ -700,7 +700,7 @@ static DRIVER_INIT( micro3d )
 
 static DRIVER_INIT( stankatk )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	rom[0x1f543] = 0x4e71;
 	rom[0x1f546] = 0x4e71;
@@ -718,7 +718,7 @@ static DRIVER_INIT( stankatk )
 
 static DRIVER_INIT( botss )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	rom[0x1fcc0] = 0x4e71; /* Eliminate startup Am29000 timeout */
 	rom[0x1fbf0] = 0x4e71; /* Skip AM29k code version detect */
@@ -737,7 +737,7 @@ static DRIVER_INIT( f15se )
 
 static DRIVER_INIT( f15se21 )
 {
-	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	rom[0x2a8b3] = 0x6006;
 	rom[0x2a8bf] = 0x4e71;
@@ -760,7 +760,7 @@ static DRIVER_INIT( f15se21 )
 /* NOTE: Dr. Math and sound PCB ROMs are not dumped and may be different to v2.1 */
 ROM_START( f15se )
 	/* Host PCB (MPG DW-00011C-0011-01) */
-	ROM_REGION( 0x140000, "main", 0 )
+	ROM_REGION( 0x140000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "host.u67", 0x000001, 0x20000, CRC(8f495ceb) SHA1(90998ad67e76928ed1a6cae56038b98d1aa2e7b0) )
 	ROM_LOAD16_BYTE( "host.u91", 0x000000, 0x20000, CRC(dfae5ec3) SHA1(29306eed5047e39a0a2350e61ab7126a84cb710b) )
 	ROM_LOAD16_BYTE( "host.u68", 0x040001, 0x20000, CRC(685fc355) SHA1(5bfe015a8deccb66e3317154d715f490f00ace74) )
@@ -803,7 +803,7 @@ ROM_START( f15se )
 	ROM_LOAD16_BYTE( "002.vgb", 0x80001, 0x20000, CRC(f6488e31) SHA1(d2f9304cc59f5523007592ae76ddd56107cc29e8) )
 
 	/* Sound PCB  (MPG 010-00018-002) */
-	ROM_REGION( 0x08000, "audio", 0 )
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "4-001.snd", 0x000000, 0x08000, CRC(705685a9) SHA1(311f7cac126a19e8bd555ebf31ff4ec4680ddfa4) )
 
 	ROM_REGION( 0x40000, "upd7759", 0 )
@@ -812,7 +812,7 @@ ROM_END
 
 ROM_START( f15se21 )
 	/* Host PCB (MPG DW-00011C-0011-01) */
-	ROM_REGION( 0x140000, "main", 0 )
+	ROM_REGION( 0x140000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "500.hst", 0x000001, 0x20000, CRC(6c26806d) SHA1(7cfd2b3b92b0fc6627c92a2013a317ca5abc66a0) )
 	ROM_LOAD16_BYTE( "501.hst", 0x000000, 0x20000, CRC(81f02bf7) SHA1(09976746fe4d9c88bd8840f6e7addb09226aa54b) )
 	ROM_LOAD16_BYTE( "502.hst", 0x040001, 0x20000, CRC(1eb945e5) SHA1(aba3ff038f2ca0f1200be5710073825ce80e3656) )
@@ -855,7 +855,7 @@ ROM_START( f15se21 )
 	ROM_LOAD16_BYTE( "017.dth", 0x20001, 0x20000, CRC(47f9a868) SHA1(7c8a9355893e4a3f3846fd05e0237ffd1404ffee) )
 
 	/* Sound PCB (MPG 010-00018-002) */
-	ROM_REGION( 0x08000, "audio", 0 )
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "4-001.snd", 0x000000, 0x08000, CRC(705685a9) SHA1(311f7cac126a19e8bd555ebf31ff4ec4680ddfa4) )
 
 	ROM_REGION( 0x40000, "upd7759", 0 )
@@ -864,7 +864,7 @@ ROM_END
 
 ROM_START( botss )
 	/* Host PCB (MPG DW-00011C-0011-02) */
-	ROM_REGION( 0x140000, "main", 0 )
+	ROM_REGION( 0x140000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "300hst.67", 0x000001, 0x20000, CRC(7f74362a) SHA1(41611ba8e6eb5d6b3dfe88e1cede7d9fb5472e40) )
 	ROM_LOAD16_BYTE( "301hst.91", 0x000000, 0x20000, CRC(a8100d1e) SHA1(69d3cac6f67563c0796560f7b874d7660720027d) )
 	ROM_LOAD16_BYTE( "302hst.68", 0x040001, 0x20000, CRC(af865ee4) SHA1(f00bce49401431bc749208399329d9f92457186b) )
@@ -907,7 +907,7 @@ ROM_START( botss )
 	ROM_LOAD16_BYTE( "102vgb.108", 0x080001, 0x20000, CRC(441e8490) SHA1(6cfe30cea3fa297b71e881fbddad6d65a96e4386) )
 
 	/* Sound PCB (MPG 010-00018-002) */
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "14-001snd.2", 0x000000, 0x08000, CRC(307fcb6d) SHA1(0cf63a39ac8920be6532974311804529d7218545) )
 
 	ROM_REGION( 0x40000, "upd7759", 0 )
@@ -915,7 +915,7 @@ ROM_START( botss )
 ROM_END
 
 ROM_START( stankatk )
-	ROM_REGION( 0x140000, "main", 0 )
+	ROM_REGION( 0x140000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "lo_u67",    0x000001, 0x20000, CRC(97aabac0) SHA1(12a0719d3332a63e912161200b0a942c27c1f5da) )
 	ROM_LOAD16_BYTE( "le_u91",    0x000000, 0x20000, CRC(977f90d9) SHA1(530fa5c32b1f28e2b90d20d98cc453cb290c0ad2) )
 //  ROM_LOAD16_BYTE( "host.u67",  0x000001, 0x20000, CRC(e79d9548) SHA1(84a4c181be81fff7d5e61faa32f6929fce8b62d0) ) // alt (bad?) rom
@@ -958,7 +958,7 @@ ROM_START( stankatk )
 	ROM_LOAD16_BYTE( "3cl_u114", 0x080000, 0x20000, CRC(bc04b0e6) SHA1(d08fddd52f2c1a565a80f5d4ff8b07f1c5f01a01) )
 	ROM_LOAD16_BYTE( "3ch_u108", 0x080001, 0x20000, CRC(7cb688af) SHA1(6be495ae0ed74739f62de65386810864c9ffaaee) )
 
-	ROM_REGION( 0x08000, "audio", 0 )
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "sound.u2", 0x000000, 0x08000, CRC(77190a90) SHA1(a36a5a8457cc1c325e6318b083e5e271e163f7cb) )
 
 	ROM_REGION( 0x40000, "upd7759", 0 )

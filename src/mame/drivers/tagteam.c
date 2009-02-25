@@ -227,16 +227,16 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tagteam )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 1500000)	/* 1.5 MHz ?? */
+	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ?? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", tagteam_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", tagteam_interrupt)
 
-	MDRV_CPU_ADD("audio", M6502, 975000)  /* 975 kHz ?? */
+	MDRV_CPU_ADD("audiocpu", M6502, 975000)  /* 975 kHz ?? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)   /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -266,13 +266,13 @@ MACHINE_DRIVER_END
 
 
 ROM_START( bigprowr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bf00-1.20",    0x08000, 0x2000, CRC(8aba32c9) SHA1(9228082a8251feaf25849311c3de63ca42cf659e) )
 	ROM_LOAD( "bf01.33",      0x0a000, 0x2000, CRC(0a41f3ae) SHA1(1b82cd864f0bd7f16f961fec0b88307996abb166) )
 	ROM_LOAD( "bf02.34",      0x0c000, 0x2000, CRC(a28b0a0e) SHA1(50b40048a3e2efb2afb7acfb4efde6dbc25fc009) )
 	ROM_LOAD( "bf03.46",      0x0e000, 0x2000, CRC(d4cf7ec7) SHA1(cfabe40adb05f6239c3e2f002a78efb50150d27d) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for audio code */
 	ROM_LOAD( "bf4.8",        0x04000, 0x2000, CRC(0558e1d8) SHA1(317011c0e3a9d5f73c67d044c1fab315ff8049fb) )
 	ROM_LOAD( "bf5.7",        0x06000, 0x2000, CRC(c1073f24) SHA1(0337c259c10fae3067e5e0e0acf54e6d0891b29f) )
 	ROM_LOAD( "bf6.6",        0x08000, 0x2000, CRC(208cd081) SHA1(e5f6379e7f7bc80cdea12de7e0a2bb232bb16b5a) )
@@ -297,13 +297,13 @@ ROM_START( bigprowr )
 ROM_END
 
 ROM_START( tagteam )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prowbf0.bin",  0x08000, 0x2000, CRC(6ec3afae) SHA1(8ae11cb41a72bda053ce8b79c383503da5324cd1) )
 	ROM_LOAD( "prowbf1.bin",  0x0a000, 0x2000, CRC(b8fdd176) SHA1(afa8e890ac54101eef0274c8aabe25d188085a18) )
 	ROM_LOAD( "prowbf2.bin",  0x0c000, 0x2000, CRC(3d33a923) SHA1(e6402290fca72f4fa3a76e37957b9d4f5b4aeddb) )
 	ROM_LOAD( "prowbf3.bin",  0x0e000, 0x2000, CRC(518475d2) SHA1(b26bb0bb658bfd5ac24ee8ebb7fc11a79917aeda) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for audio code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for audio code */
 	ROM_LOAD( "bf4.8",        0x04000, 0x2000, CRC(0558e1d8) SHA1(317011c0e3a9d5f73c67d044c1fab315ff8049fb) )
 	ROM_LOAD( "bf5.7",        0x06000, 0x2000, CRC(c1073f24) SHA1(0337c259c10fae3067e5e0e0acf54e6d0891b29f) )
 	ROM_LOAD( "bf6.6",        0x08000, 0x2000, CRC(208cd081) SHA1(e5f6379e7f7bc80cdea12de7e0a2bb232bb16b5a) )

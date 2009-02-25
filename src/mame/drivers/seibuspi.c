@@ -1717,11 +1717,11 @@ static MACHINE_RESET( spi )
 static MACHINE_DRIVER_START( spi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I386, 50000000/2)	/* Intel 386DX, 25MHz */
+	MDRV_CPU_ADD("maincpu", I386, 50000000/2)	/* Intel 386DX, 25MHz */
 	MDRV_CPU_PROGRAM_MAP(spi_map, 0)
-	MDRV_CPU_VBLANK_INT("main", spi_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", spi_interrupt)
 
-	MDRV_CPU_ADD("sound", Z80, 28636360/4)
+	MDRV_CPU_ADD("soundcpu", Z80, 28636360/4)
 	MDRV_CPU_PROGRAM_MAP(spisound_map, 0)
 
 	MDRV_QUANTUM_TIME(HZ(12000))
@@ -1730,7 +1730,7 @@ static MACHINE_DRIVER_START( spi )
 	MDRV_NVRAM_HANDLER(spi)
 
  	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1753,7 +1753,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( sxx2f )
 {
-	UINT8 *rom = memory_region(machine, "sound");
+	UINT8 *rom = memory_region(machine, "soundcpu");
 
 	z80_rom = auto_malloc(0x40000);
 	memory_set_bankptr(machine, 4, z80_rom);
@@ -1781,9 +1781,9 @@ static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured cloc
 
 	MDRV_IMPORT_FROM(spi)
 
-	MDRV_CPU_REPLACE("main", I386, 28636360) /* AMD AM386DX/DX-40, 28.63636MHz */
+	MDRV_CPU_REPLACE("maincpu", I386, 28636360) /* AMD AM386DX/DX-40, 28.63636MHz */
 
-	MDRV_CPU_REPLACE("sound", Z80, 4915200) /* 4.9152MHz */
+	MDRV_CPU_REPLACE("soundcpu", Z80, 4915200) /* 4.9152MHz */
 
 	MDRV_SOUND_REPLACE("ymf", YMF271, 16384000) /* 16.3840MHz */
 	MDRV_SOUND_CONFIG(ymf271_config)
@@ -2035,15 +2035,15 @@ static MACHINE_RESET( seibu386 )
 static MACHINE_DRIVER_START( seibu386 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I386, 40000000)	/* AMD 386DX, 40MHz */
+	MDRV_CPU_ADD("maincpu", I386, 40000000)	/* AMD 386DX, 40MHz */
 	MDRV_CPU_PROGRAM_MAP(seibu386_map, 0)
-	MDRV_CPU_VBLANK_INT("main", spi_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", spi_interrupt)
 
 	MDRV_NVRAM_HANDLER(sxx2f)
 	MDRV_MACHINE_RESET(seibu386)
 
  	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -2657,7 +2657,7 @@ ROM_START(rdft2us)	/* Single board version SXX2F */
 	ROM_LOAD("obj1.u073",  0x0c00000, 0x400000, CRC(c2c50f02) SHA1(b81397b5800c6d49f58b7ac7ff6eac56da3c5257) )
 	ROM_LOAD("obj1b.u076", 0x1000000, 0x200000, CRC(5259321f) SHA1(3c70c1147e49f81371d0f60f7108d9718d56faf4) )
 
-	ROM_REGION(0x40000, "sound", 0)		/* 256k for the Z80 */
+	ROM_REGION(0x40000, "soundcpu", 0)		/* 256k for the Z80 */
 	ROM_LOAD("zprg.u091", 0x000000, 0x20000, CRC(cc543c4f) SHA1(6e5c93fd3d21c594571b071d4a830211e1f162b2) )
 
 	ROM_REGION(0x280000, "ymf", ROMREGION_ERASE00)	/* sound roms */
@@ -3037,7 +3037,7 @@ ROM_START(rfjetus)	/* Single board version SXX2G */
 	ROM_LOAD("obj-2.u074", 0x0800000, 0x800000, CRC(a121d1e3) SHA1(1851ae81f2ae9d3404aadd9fbc0ed7f9230290b9) )
 	ROM_LOAD("obj-3.u075", 0x1000000, 0x800000, CRC(bc2c0c63) SHA1(c8d395722f7012c3be366a0fc9b224c537afabae) )
 
-	ROM_REGION(0x40000, "sound", 0)		/* 256k for the Z80 */
+	ROM_REGION(0x40000, "soundcpu", 0)		/* 256k for the Z80 */
 	ROM_LOAD("rfj-05.u091", 0x000000, 0x40000, CRC(a55e8799) SHA1(5d4ca9ae920ab54e23ee3b1b33db72711e744516) ) /* ZPRG */
 
 	ROM_REGION(0x280000, "ymf", ROMREGION_ERASE00)	/* sound roms */

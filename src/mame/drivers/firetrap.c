@@ -91,7 +91,7 @@ static WRITE8_HANDLER( firetrap_nmi_disable_w )
 static WRITE8_HANDLER( firetrap_bankselect_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
@@ -213,7 +213,7 @@ static WRITE8_HANDLER( firetrap_sound_2400_w )
 static WRITE8_HANDLER( firetrap_sound_bankselect_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(space->machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(space->machine, 2,&RAM[bankaddress]);
@@ -576,18 +576,18 @@ static INTERRUPT_GEN( bootleg )
 static MACHINE_DRIVER_START( firetrap )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 6000000)	/* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(firetrap,2)
 
-	MDRV_CPU_ADD("audio", M6502,3072000/2)	/* 1.536 MHz? */
+	MDRV_CPU_ADD("audiocpu", M6502,3072000/2)	/* 1.536 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 	MDRV_MACHINE_RESET(firetrap)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -615,17 +615,17 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( firetpbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 6000000)	/* 6 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_bootleg,writemem_bootleg)
-	MDRV_CPU_VBLANK_INT("main", bootleg)
+	MDRV_CPU_VBLANK_INT("screen", bootleg)
 
-	MDRV_CPU_ADD("audio", M6502,3072000/2) /* 1.536 MHz? */
+	MDRV_CPU_ADD("audiocpu", M6502,3072000/2) /* 1.536 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -659,12 +659,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( firetrap )
-	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 64k for banked ROMs */
+	ROM_REGION( 0x20000, "maincpu", 0 )	/* 64k for code + 64k for banked ROMs */
 	ROM_LOAD( "di02.bin",     0x00000, 0x8000, CRC(3d1e4bf7) SHA1(ee903b469619f49edb1727fb545c9a6085f50746) )
 	ROM_LOAD( "di01.bin",     0x10000, 0x8000, CRC(9bbae38b) SHA1(dc1d3ed5da71bfb104fd54fc70c56833f31d281f) )
 	ROM_LOAD( "di00.bin",     0x18000, 0x8000, CRC(d0dad7de) SHA1(8783ebf6ddfef32f6036913d403f76c1545b813d) )
 
-	ROM_REGION( 0x18000, "audio", 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
 	ROM_LOAD( "di17.bin",     0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "di18.bin",     0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 
@@ -721,13 +721,13 @@ ROM_START( firetrap )
 ROM_END
 
 ROM_START( firetpbl )
-	ROM_REGION( 0x28000, "main", 0 )	/* 64k for code + 96k for banked ROMs */
+	ROM_REGION( 0x28000, "maincpu", 0 )	/* 64k for code + 96k for banked ROMs */
 	ROM_LOAD( "ft0d.bin",     0x00000, 0x8000, CRC(793ef849) SHA1(5a2c587370733d43484ba0a38a357260cdde8357) )
 	ROM_LOAD( "ft0a.bin",     0x08000, 0x8000, CRC(613313ee) SHA1(54e386b2b1faada3441e3e0bb7822a63eab36930) )	/* unprotection code */
 	ROM_LOAD( "ft0c.bin",     0x10000, 0x8000, CRC(5c8a0562) SHA1(856766851faa4353445d944b7705e348fd1379e4) )
 	ROM_LOAD( "ft0b.bin",     0x18000, 0x8000, CRC(f2412fe8) SHA1(28a9143e36c31fe34f40888dc848aed3d572d801) )
 
-	ROM_REGION( 0x18000, "audio", 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	/* 64k for the sound CPU + 32k for banked ROMs */
 	ROM_LOAD( "di17.bin",     0x08000, 0x8000, CRC(8605f6b9) SHA1(4fba88f34afd91d2cbc578b3b70f5399b8844390) )
 	ROM_LOAD( "di18.bin",     0x10000, 0x8000, CRC(49508c93) SHA1(3812b0b1a33a1506d2896d2b676ed6aabb29dac0) )
 

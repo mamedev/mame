@@ -75,7 +75,7 @@ static NVRAM_HANDLER( dderby )
 static WRITE8_HANDLER( dderby_sound_w )
 {
 	soundlatch_w(space,0,data);
-	cpu_set_input_line(cputag_get_cpu(space->machine, "audio"), 0, HOLD_LINE);
+	cpu_set_input_line(cputag_get_cpu(space->machine, "audiocpu"), 0, HOLD_LINE);
 }
 
 static UINT8 io_port[8];
@@ -489,29 +489,29 @@ static PALETTE_INIT( dmnderby )
 /*Main Z80 is IM 0,HW-latched irqs. */
 static INTERRUPT_GEN( dderby_irq )
 {
-	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "main"), 0, HOLD_LINE, 0xd7); /* RST 10h */
+	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "maincpu"), 0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
 static INTERRUPT_GEN( dderby_timer_irq )
 {
-	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "main"), 0, HOLD_LINE, 0xcf); /* RST 08h */
+	cpu_set_input_line_and_vector(cputag_get_cpu(device->machine, "maincpu"), 0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
 static MACHINE_DRIVER_START( dderby )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,4000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
-	MDRV_CPU_VBLANK_INT("main", dderby_irq)
+	MDRV_CPU_VBLANK_INT("screen", dderby_irq)
 	MDRV_CPU_PERIODIC_INT(dderby_timer_irq, 244/2)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)	/* verified on schematics */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* verified on schematics */
 	MDRV_CPU_PROGRAM_MAP(dderby_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 	MDRV_NVRAM_HANDLER(dderby)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -533,12 +533,12 @@ MACHINE_DRIVER_END
 
 
 ROM_START( dmndrby )
-	ROM_REGION( 0x10000, "main", 0 ) /* main cpu */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main cpu */
 	ROM_LOAD( "dd04.m6", 0x00000, 0x02000, CRC(a3cfd28e) SHA1(7ba14876fa4409634a699e049bce3bc457522932) )
 	ROM_LOAD( "dd05.m7", 0x02000, 0x02000, CRC(16f7ac0b) SHA1(030b8c2b294a0287f3aaf72424304fc191315888) )
 	ROM_LOAD( "dd06.m8", 0x04000, 0x02000, CRC(914ba8f5) SHA1(d1b3f3d5d2625e42ea6cb5c777942cec7faea58e) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
 	ROM_LOAD( "dd03.j9", 0x00000, 0x01000, CRC(660f0cae) SHA1(b3b414e52342de877a5c20886a87002a63310a94) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 ) /* tiles */
@@ -582,12 +582,12 @@ ROM_START( dmndrby )
 ROM_END
 
 ROM_START( dmndrbya )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dd4", 0x00000, 0x02000, CRC(29b06e0f) SHA1(301fc2fe25ce47c2ad5112f0b795cd6bae605071) )
 	ROM_LOAD( "dd5", 0x02000, 0x02000, CRC(5299d020) SHA1(678d338d2cee5250154454be97456d5f80bb4759) )
 	ROM_LOAD( "dd6", 0x04000, 0x02000, CRC(f7e30ec0) SHA1(bf898987366ee9def190e3575108395b0aaef2d6) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
 	ROM_LOAD( "dd03.j9", 0x00000, 0x01000, CRC(660f0cae) SHA1(b3b414e52342de877a5c20886a87002a63310a94) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )

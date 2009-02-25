@@ -53,7 +53,7 @@ static VIDEO_UPDATE( 39in1 )
 
 static MACHINE_START(39in1)
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 	int i;
 
 	for (i = 0; i < 0x80000; i += 2)
@@ -65,12 +65,12 @@ static MACHINE_START(39in1)
 }
 
 static MACHINE_DRIVER_START( 39in1 )
-	MDRV_CPU_ADD("main", ARM7, 200000000)	// actually Xscale PXA255, but ARM7 is a compatible subset
+	MDRV_CPU_ADD("maincpu", ARM7, 200000000)	// actually Xscale PXA255, but ARM7 is a compatible subset
 	MDRV_CPU_PROGRAM_MAP(39in1_map,0)
 
 	MDRV_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(16777216/4, 308, 0,  240, 228, 0,  160)	// completely bogus for this h/w
 
@@ -83,7 +83,7 @@ MACHINE_DRIVER_END
 
 ROM_START( 39in1 )
 	// main program, encrypted
-	ROM_REGION( 0x80000, "main", 0 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
         ROM_LOAD( "27c4096_plz-v001_ver.300.bin", 0x000000, 0x080000, CRC(9149dbc4) SHA1(40efe1f654f11474f75ae7fee1613f435dbede38) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format

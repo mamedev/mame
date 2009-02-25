@@ -567,7 +567,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audio", PROGRAM, soundlatch_r),
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -590,12 +590,12 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_DRIVER_DATA(looping_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS9995, MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(looping_map,0)
 	MDRV_CPU_IO_MAP(looping_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", looping_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", looping_interrupt)
 
-	MDRV_CPU_ADD("audio", TMS9980, SOUND_CLOCK/4)
+	MDRV_CPU_ADD("audiocpu", TMS9980, SOUND_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(looping_sound_map,0)
 	MDRV_CPU_IO_MAP(looping_sound_io_map,0)
 
@@ -607,7 +607,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_MACHINE_START(looping)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -706,13 +706,13 @@ INPUT_PORTS_END
  *************************************/
 
 ROM_START( looping )
-	ROM_REGION( 0x8000, "main", 0 ) /* TMS9995 code */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
 	ROM_LOAD( "vli3.5a",		0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
 	ROM_LOAD( "vli1.2a",		0x2000, 0x2000, CRC(97755fd4) SHA1(4a6ef02b0128cd516ff95083a7caaad8f3756f09) )
 	ROM_LOAD( "l056-6.9a",		0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
 	ROM_LOAD( "vli9-5.8a",		0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
 
-	ROM_REGION( 0x3800, "audio", 0 ) /* TMS9980 code */
+	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
 	ROM_LOAD( "i-o.13c",		0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
 	ROM_LOAD( "i-o.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
 	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) ) /* speech */
@@ -729,14 +729,14 @@ ROM_START( looping )
 ROM_END
 
 ROM_START( loopinga )
-	ROM_REGION( 0x8000, "main", 0 ) /* TMS9995 code */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
 	ROM_LOAD( "vli3.5a",		0x0000, 0x2000, CRC(1ac3ccdf) SHA1(9d1cde8bd4d0f12eaf06225b3ecc4a5c3e4f0c11) )
 	ROM_LOAD( "vli-4-3",		0x2000, 0x1000, CRC(f32cae2b) SHA1(2c6ef82af438e588b56fd58b95cf969c97bb9a66) )
 	ROM_LOAD( "vli-8-4",		0x3000, 0x1000, CRC(611e1dbf) SHA1(0ab6669f1dec30c3f7bca49e158e4790a78fa308) )
 	ROM_LOAD( "l056-6.9a",		0x4000, 0x2000, CRC(548afa52) SHA1(0b88ac7394feede023519c585a4084591eb9661a) )
 	ROM_LOAD( "vli9-5.8a",		0x6000, 0x2000, CRC(5d122f86) SHA1(d1c66b890142bb4d4648f3edec6567f58107dbf0) )
 
-	ROM_REGION( 0x3800, "audio", 0 ) /* TMS9980 code */
+	ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
 	ROM_LOAD( "i-o-v2.13c",		0x0000, 0x0800, CRC(09765ebe) SHA1(93b035c3a94f2f6d5e463256e26b600a4dd5d3ea) )
     ROM_LOAD( "i-o.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) ) /* speech */
 	ROM_LOAD( "i-o.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
@@ -753,13 +753,13 @@ ROM_START( loopinga )
 ROM_END
 
 ROM_START( skybump )
-	ROM_REGION( 0x8000, "main", 0 ) /* TMS9995 code */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* TMS9995 code */
 	ROM_LOAD( "cpu.5a",			0x0000, 0x2000, CRC(dca38df0) SHA1(86abe04cbabf81399f842f53668fe7a3f7ed3757) )
 	ROM_LOAD( "cpu.2a",			0x2000, 0x2000, CRC(6bcc211a) SHA1(245ebae3934df9c3920743a941546d96bb2e7c03) )
 	ROM_LOAD( "cpu.9a",			0x4000, 0x2000, CRC(c7a50797) SHA1(60aa0a28ba970f12d0a0e538ae1c6807d105855c) )
 	ROM_LOAD( "cpu.8a",			0x6000, 0x2000, CRC(a718c6f2) SHA1(19afa8c353829232cb96c27b87f13b43166ab6fc) )
 
-    ROM_REGION( 0x3800, "audio", 0 ) /* TMS9980 code */
+    ROM_REGION( 0x3800, "audiocpu", 0 ) /* TMS9980 code */
 	ROM_LOAD( "snd.13c",		0x0000, 0x0800, CRC(21e9350c) SHA1(f30a180309e373a17569351944f5e7982c3b3f9d) )
 	ROM_LOAD( "snd.13a",		0x0800, 0x1000, CRC(1de29f25) SHA1(535acb132266d6137b0610ee9a9b946459ae44af) )
 	ROM_LOAD( "snd.11a",		0x2800, 0x1000, CRC(61c74c79) SHA1(9f34d18a919446dd76857b851cea23fc1526f3c2) )
@@ -785,8 +785,8 @@ ROM_END
 
 static DRIVER_INIT( looping )
 {
-	int length = memory_region_length(machine, "main");
-	UINT8 *rom = memory_region(machine, "main");
+	int length = memory_region_length(machine, "maincpu");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	int i;
 
 	/* bitswap the TMS9995 ROMs */

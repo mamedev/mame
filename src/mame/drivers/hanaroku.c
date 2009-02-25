@@ -240,12 +240,12 @@ static const ay8910_interface ay8910_config =
 
 
 static MACHINE_DRIVER_START( hanaroku )
-	MDRV_CPU_ADD("main", Z80,6000000)		 /* ? MHz */
+	MDRV_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -269,7 +269,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( hanaroku )
-	ROM_REGION( 0x10000, "main", 0 ) /* z80 code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* z80 code */
 	ROM_LOAD( "zc5_1a.u02",  0x00000, 0x08000, CRC(9e3b62ce) SHA1(81aee570b67950c21ab3c8f9235dd383529b34d5) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* tiles */

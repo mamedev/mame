@@ -123,9 +123,9 @@ static VIDEO_UPDATE(stepstag)
 
 static MACHINE_DRIVER_START( stepstag )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000 ) //??
+	MDRV_CPU_ADD("maincpu", M68000, 16000000 ) //??
 	MDRV_CPU_PROGRAM_MAP(stepstag_readmem,stepstag_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold) // 4 & 6 valid
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold) // 4 & 6 valid
 
 	MDRV_CPU_ADD("sub", M68000, 16000000 ) //??
 	MDRV_CPU_PROGRAM_MAP(stepstag_sub_readmem,stepstag_sub_writemem)
@@ -138,7 +138,7 @@ static MACHINE_DRIVER_START( stepstag )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -162,7 +162,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( stepstag )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68k */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "vj98348ver11.11", 0x00000, 0x80000, CRC(29b7f848) SHA1(c4d89e5c9be622b2d9038c359a5f65ce0dd461b0) )
 	ROM_LOAD16_BYTE( "vj98348ver11.14", 0x00001, 0x80000, CRC(e3314c6c) SHA1(61b0e9f9d0126d9f475304866a03cfa21701d9aa) )
 
@@ -201,7 +201,7 @@ ROM_START( stepstag )
 ROM_END
 
 ROM_START( step3 )
-ROM_REGION( 0x100000, "main", 0 ) /* 68k */
+ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "vj98344ver11.1", 0x00001, 0x80000, BAD_DUMP CRC(aedcb225) SHA1(f167c390e79ffbf7c019c326384ae656ae8b7d13) )
 	ROM_LOAD16_BYTE( "vj98344ver11.4", 0x00000, 0x80000, BAD_DUMP CRC(391ca913) SHA1(2cc329aa6419f8a0d7e0fb8a9f4c2b8ca25197b3) )
 	// c'est la programme de stepstag (avoir besoin de modifications, numero de chansons par example)

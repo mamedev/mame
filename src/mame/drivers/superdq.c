@@ -299,19 +299,19 @@ static MACHINE_START( superdq )
 static MACHINE_DRIVER_START( superdq )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/8)
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(superdq_map,0)
 	MDRV_CPU_IO_MAP(superdq_io,0)
-	MDRV_CPU_VBLANK_INT("main", superdq_vblank)
+	MDRV_CPU_VBLANK_INT("screen", superdq_vblank)
 
 	MDRV_MACHINE_START(superdq)
 	MDRV_MACHINE_RESET(superdq)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(superdq, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_GFXDECODE(superdq)
 	MDRV_PALETTE_LENGTH(32)
@@ -339,7 +339,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( superdq )		/* long scenes */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sdq-prog.bin", 0x0000, 0x4000, CRC(96b931e2) SHA1(a2408272e19b02755368a6d7e526eec15896e586) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -353,7 +353,7 @@ ROM_START( superdq )		/* long scenes */
 ROM_END
 
 ROM_START( superdqs )		/* short scenes */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sdq_c45.rom", 0x0000, 0x4000, CRC(0f4d4832) SHA1(c6db63721f0c73151eb9a678ceafd0e7d6121fd3) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
@@ -367,7 +367,7 @@ ROM_START( superdqs )		/* short scenes */
 ROM_END
 
 ROM_START( superdqa )		/* short scenes, alternate */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sdq_c45a.rom", 0x0000, 0x4000, CRC(b12ce1f8) SHA1(3f0238ea73a6d3e1fe62f83ed3343ca4c268bdd6) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )

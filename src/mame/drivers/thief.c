@@ -448,13 +448,13 @@ static const samples_interface natodef_samples_interface =
 static MACHINE_DRIVER_START( sharkatt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sharkatt_main_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", thief_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", thief_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -484,13 +484,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( thief )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000) /* 4 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(thief_main_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", thief_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", thief_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -520,13 +520,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( natodef )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000) /* 4 MHz? */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(thief_main_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", thief_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", thief_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -555,7 +555,7 @@ MACHINE_DRIVER_END
 /**********************************************************/
 
 ROM_START( sharkatt )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sharkatt.0",   0x0000, 0x800, CRC(c71505e9) SHA1(068c92e9d797918f281fa509f3c86578b3f0de3a) )
 	ROM_LOAD( "sharkatt.1",   0x0800, 0x800, CRC(3e3abf70) SHA1(ef69e72db583a22093a3c32ba437a6eaef4b132a) )
 	ROM_LOAD( "sharkatt.2",   0x1000, 0x800, CRC(96ded944) SHA1(e60db225111423b0a481e85fe38a85c3ea844351) )
@@ -572,7 +572,7 @@ ROM_START( sharkatt )
 ROM_END
 
 ROM_START( thief )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code */
 	ROM_LOAD( "t8a0ah0a",	0x0000, 0x1000, CRC(edbbf71c) SHA1(9f13841c54fbe5449280c24954a45517014a834e) )
 	ROM_LOAD( "t2662h2",	0x1000, 0x1000, CRC(85b4f6ff) SHA1(8e007bfff2f27809e7a9881bc3b2587bf35cff6d) )
 	ROM_LOAD( "tc162h4",	0x2000, 0x1000, CRC(70478a82) SHA1(547bad88a44c63657bf8f65f2877ab1323515521) )
@@ -595,7 +595,7 @@ ROM_START( thief )
 ROM_END
 
 ROM_START( natodef )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code */
 	ROM_LOAD( "natodef.cp0",	0x0000, 0x1000, CRC(8397c787) SHA1(5957613f1ace7dc4612f28f6fba3a7374be905ac) )
 	ROM_LOAD( "natodef.cp2",	0x1000, 0x1000, CRC(8cfbf26f) SHA1(a15f0d5d82cd96b80ee91dc91858b660c5895f34) )
 	ROM_LOAD( "natodef.cp4",	0x2000, 0x1000, CRC(b4c90fb2) SHA1(3ff4691415433863bfe74d51b9f3aa428f3bf88f) )
@@ -621,7 +621,7 @@ ROM_START( natodef )
 ROM_END
 
 ROM_START( natodefa )
-	ROM_REGION( 0x10000, "main", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code */
 	ROM_LOAD( "natodef.cp0",	0x0000, 0x1000, CRC(8397c787) SHA1(5957613f1ace7dc4612f28f6fba3a7374be905ac) )
 	ROM_LOAD( "natodef.cp2",	0x1000, 0x1000, CRC(8cfbf26f) SHA1(a15f0d5d82cd96b80ee91dc91858b660c5895f34) )
 	ROM_LOAD( "natodef.cp4",	0x2000, 0x1000, CRC(b4c90fb2) SHA1(3ff4691415433863bfe74d51b9f3aa428f3bf88f) )
@@ -649,7 +649,7 @@ ROM_END
 
 static DRIVER_INIT( thief )
 {
-	UINT8 *dest = memory_region( machine, "main" );
+	UINT8 *dest = memory_region( machine, "maincpu" );
 	const UINT8 *source = memory_region( machine, "cpu1" );
 
 	/* C8 is mapped (banked) in CPU1's address space; it contains Z80 code */

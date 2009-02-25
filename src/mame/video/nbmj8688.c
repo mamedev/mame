@@ -718,7 +718,7 @@ VIDEO_UPDATE( mbmj8688_LCD )
 {
 	int x, y, b;
 
-	const device_config *main_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "main");
+	const device_config *main_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "screen");
 	const device_config *lcd0_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lcd0");
 	const device_config *lcd1_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lcd1");
 

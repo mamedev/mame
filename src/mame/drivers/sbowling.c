@@ -330,14 +330,14 @@ static PALETTE_INIT( sbowling )
 
 static MACHINE_DRIVER_START( sbowling )
 
-	MDRV_CPU_ADD("main", 8080, 19968000/10 )
+	MDRV_CPU_ADD("maincpu", 8080, 19968000/10 )
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sbw_interrupt, 2)
 	MDRV_GFXDECODE(sbowling)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 262)		/* vert size taken from mw8080bw */
@@ -356,7 +356,7 @@ static MACHINE_DRIVER_START( sbowling )
 MACHINE_DRIVER_END
 
 ROM_START( sbowling )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kb01.6h",        0x0000, 0x1000, CRC(dd5d411a) SHA1(ca15676d234353bc47f642be13d58f3d6d880126))
 	ROM_LOAD( "kb02.5h",        0x1000, 0x1000, CRC(75d3c45f) SHA1(af6e6237b7b28efaac258e6ddd85518c3406b24a))
 	ROM_LOAD( "kb03.3h",        0x2000, 0x1000, CRC(955fbfb8) SHA1(05d501f924adc5b816670f6f5e58a98a0c1bc962))

@@ -44,7 +44,7 @@ paradise: I'm not sure it's working correctly:
 static WRITE8_HANDLER( paradise_rombank_w )
 {
 	int bank = data;
-	int bank_n = memory_region_length(space->machine, "main")/0x4000 - 1;
+	int bank_n = memory_region_length(space->machine, "maincpu")/0x4000 - 1;
 	if (bank >= bank_n)
 	{
 		logerror("PC %04X - invalid rom bank %x\n",cpu_get_pc(space->cpu),bank);
@@ -52,7 +52,7 @@ static WRITE8_HANDLER( paradise_rombank_w )
 	}
 
 	if (bank >= 3)	bank+=1;
-	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + bank * 0x4000);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "maincpu") + bank * 0x4000);
 }
 
 static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
@@ -543,13 +543,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( paradise )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
 	MDRV_CPU_PROGRAM_MAP(paradise_map,0)
 	MDRV_CPU_IO_MAP(paradise_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No nmi routine */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54) /* 54 verified */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* we're using IPT_VBLANK */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -577,14 +577,14 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( tgtball )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(paradise)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tgtball_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( torus )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(paradise)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(torus_map,0)
 	MDRV_CPU_IO_MAP(torus_io_map,0)
 
@@ -598,7 +598,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( madball )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(paradise)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(torus_map,0)
 	MDRV_CPU_IO_MAP(torus_io_map,0)
 
@@ -662,7 +662,7 @@ The year is not shown but must be >= 1994, since the development system
 ***************************************************************************/
 
 ROM_START( paradise )
-	ROM_REGION( 0x44000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "u128", 0x00000, 0x0c000, CRC(8e5b5a24) SHA1(a4e559d9329f8a7a9d12cd90d98d0525958085d8) )
 	ROM_CONTINUE(     0x10000, 0x34000    )
 
@@ -689,7 +689,7 @@ ROM_START( paradise )
 ROM_END
 
 ROM_START( paradlx )
-	ROM_REGION( 0x44000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "8.u128", 0x00000, 0x0c000, CRC(3a45ac9e) SHA1(24e1b508ef582c8429e09929fea387f3a137f0e3) )
 	ROM_CONTINUE(     0x10000, 0x34000    )
 
@@ -718,7 +718,7 @@ ROM_END
 
 
 ROM_START( para2dx )
-	ROM_REGION( 0x44000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "pdx2_u128.bin", 0x00000, 0x0c000, CRC(4cbd22e1) SHA1(ad69663109d3127f6472797ec8763097da94b7d4) )
 	ROM_CONTINUE(     0x10000, 0x34000    )
 
@@ -789,7 +789,7 @@ Notes:
 ***************************************************************************/
 
 ROM_START( tgtball )
-	ROM_REGION( 0x44000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "rom7.u128", 0x00000, 0x0c000, CRC(8dbeab12) SHA1(7181c23459990aecbe2d13377aaf19f65108eac6) )
 	ROM_CONTINUE(          0x10000, 0x34000 )
 
@@ -816,7 +816,7 @@ ROM_START( tgtball )
 ROM_END
 
 ROM_START( tgtballa )
-	ROM_REGION( 0x44000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x44000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "yunsung.u128", 0x00000, 0x0c000, CRC(cb0f3d46) SHA1(b56c4abbd4248074c1559a0f1902d2ea11cb01a8) )
 	ROM_CONTINUE(             0x10000, 0x34000 )
 
@@ -890,7 +890,7 @@ All roms had a Yun Sung label with no other ID markings or numbers
 */
 
 ROM_START( torus )
-	ROM_REGION( 0x14000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x14000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "yunsung.u1", 0x00000, 0xc000, CRC(55d3ef3e) SHA1(195463271fdb3f9f5c19068efd1c99105f761fe9) )
 	ROM_CONTINUE(           0x10000, 0x4000 )
 
@@ -968,7 +968,7 @@ All roms read with manufacturer's IDs and routines
 */
 
 ROM_START( madball ) /* Models in swimsuits only, no nudity */
-	ROM_REGION( 0x24000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x24000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "p.u1", 0x00000, 0xc000, CRC(73008425) SHA1(6eded60fd5c637a63783247c858d999d5974d378) )
 	ROM_CONTINUE(     0x10000, 0x14000 )
 
@@ -992,7 +992,7 @@ ROM_START( madball ) /* Models in swimsuits only, no nudity */
 ROM_END
 
 ROM_START( madballn ) /* Even numbered stages show topless models.  Is nudity controlled by a dipswitch? */
-	ROM_REGION( 0x24000, "main", 0 )		/* Z80 Code */
+	ROM_REGION( 0x24000, "maincpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "u1.bin", 0x00000, 0xc000, CRC(531fa919) SHA1(0eafc663b9ad50d0dfc5491fe96c9bcf30483991) )
 	ROM_CONTINUE(       0x10000, 0x14000 )
 

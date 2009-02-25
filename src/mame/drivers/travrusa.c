@@ -307,12 +307,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( travrusa )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* 4 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56.75)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790)	/* accurate frequency, measured on a Moon Patrol board, is 56.75Hz. */)
 				/* the Lode Runner manual (similar but different hardware) */
@@ -352,7 +352,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( travrusa )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "zr1-0.m3", 0x0000, 0x2000, CRC(be066c0a) SHA1(fed0ef114b08519b99d77485b73768a838d2f06e) )
 	ROM_LOAD( "zr1-5.l3", 0x2000, 0x2000, CRC(145d6b34) SHA1(c9e2bd1d3e62c496e4c5057c4012b069dfcf592d) )
 	ROM_LOAD( "zr1-6a.k3", 0x4000, 0x2000, CRC(e1b51383) SHA1(34f4476c1bcc28c53c8ffa7b614f443a329aae13) )
@@ -378,7 +378,7 @@ ROM_START( travrusa )
 ROM_END
 
 ROM_START( motorace )
-	ROM_REGION( 0x12000, "main", 0 )
+	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "mr.cpu",       0x0000, 0x2000, CRC(89030b0c) SHA1(dec4209385bbccff4a3c0d93d6507110ef841331) )	/* encrypted */
 	ROM_LOAD( "mr1.3l",       0x2000, 0x2000, CRC(0904ed58) SHA1(2776e031cb58f99103bc35299bffd7612d954608) )
 	ROM_LOAD( "mr2.3k",       0x4000, 0x2000, CRC(8a2374ec) SHA1(7159731f5ef2485e3c822e3e8e51e9583dd1c6bc) )
@@ -405,7 +405,7 @@ ROM_END
 
 /* it's probably a bootleg of the original Seibu version with the roms decrypted (no epoxy block) */
 ROM_START( shtrider )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sr01a.bin", 0x0000, 0x2000, CRC(de76d537) SHA1(5ad90571c451b0d7b7a569556cfe075ead00fa2b) )
 	ROM_LOAD( "sr02a.bin", 0x2000, 0x2000, CRC(cd1e1bfc) SHA1(fb156b5e5a5e7a24575264b391e0f3756ef3e021) )
 	ROM_LOAD( "sr03a.bin", 0x4000, 0x2000, CRC(3ade11b9) SHA1(70b9dbd510cf6192194acf6876856d4c19bdf279) )
@@ -432,7 +432,7 @@ ROM_START( shtrider )
 ROM_END
 
 ROM_START( shtridra )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.bin",   0x0000, 0x2000, CRC(eb51315c) SHA1(0101c008b6731cd8ec796fee645113e2be79bd08) ) /* was inside epoxy block with cpu, encrypted */
 	ROM_LOAD( "2.bin",   0x2000, 0x2000, CRC(97675d19) SHA1(774ce4d370fcbbd8a4109df023bf21db92d2e839) )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(78d051cd) SHA1(e1dc2dcfc4af35bdd5245d23977e8640d81a43f1) )
@@ -461,7 +461,7 @@ ROM_END
 static DRIVER_INIT( motorace )
 {
 	int A,j;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *buffer = malloc_or_die(0x2000);
 
 		memcpy(buffer,rom,0x2000);
@@ -479,7 +479,7 @@ static DRIVER_INIT( motorace )
 static DRIVER_INIT( shtridra )
 {
 	int A;
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)

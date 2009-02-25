@@ -603,10 +603,10 @@ static MACHINE_START( angelkds )
 }
 
 static MACHINE_DRIVER_START( angelkds )
-	MDRV_CPU_ADD("main", Z80, 8000000) /* 8MHz? 6 seems too slow? */
+	MDRV_CPU_ADD("maincpu", Z80, 8000000) /* 8MHz? 6 seems too slow? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, 4000000) /* 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sub_map,0)
@@ -617,7 +617,7 @@ static MACHINE_DRIVER_START( angelkds )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -647,7 +647,7 @@ MACHINE_DRIVER_END
 
 /*** Rom Loading
 
- "main" for the main code
+ "maincpu" for the main code
  "user1" for the banked data
  "sub" for the sound cpu code
  "gfx1" for the 8x8 Txt Layer Tiles
@@ -660,7 +660,7 @@ MACHINE_DRIVER_END
 
 ROM_START( angelkds )
 	/* Nasco X090-PC-A  (Sega 837-6600) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "11428.c10",    0x00000, 0x08000, CRC(90daacd2) SHA1(7e50ad1cbed0c1e6bad04ef1611cad25538c905f) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* Banked Code */
@@ -707,7 +707,7 @@ ROM_END
 
 ROM_START( spcpostn )
 	/* X090-PC-A 171-5383 */
-	ROM_REGION( 2*0x10000, "main", 0 ) /* D317-0005 (NEC Z80 Custom) */
+	ROM_REGION( 2*0x10000, "maincpu", 0 ) /* D317-0005 (NEC Z80 Custom) */
 	ROM_LOAD( "epr10125.c10", 0x00000, 0x08000, CRC(bffd38c6) SHA1(af02907124343ddecd21439d25f1ebb81ef9f51a) ) /* encrypted */
 
 	ROM_REGION( 0x28000, "user1", 0 ) /* Banked Code */
@@ -743,7 +743,7 @@ ROM_START( spcpostn )
 ROM_END
 
 
-static DRIVER_INIT( spcpostn )	{ spcpostn_decode(machine, "main"); }
+static DRIVER_INIT( spcpostn )	{ spcpostn_decode(machine, "maincpu"); }
 
 
 GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" , GAME_SUPPORTS_SAVE) /* Nasco not displayed but 'Exa Planning' is */

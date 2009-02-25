@@ -210,17 +210,17 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( victory )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, VICTORY_MAIN_CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
-	MDRV_CPU_VBLANK_INT("main", victory_vblank_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", victory_vblank_interrupt)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_ALWAYS_UPDATE)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* using the standard Exidy video parameters for now, needs to be confirmed */
 	MDRV_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
@@ -244,7 +244,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( victory )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "vic3.j2",  0x0000, 0x1000, CRC(4b614440) SHA1(3a91d273c0c936af955c491e1faadf17e4469ed5) )
 	ROM_LOAD( "vic3.k2",  0x1000, 0x1000, CRC(9f9eb12b) SHA1(8833cc6b862ccecdac65c6f2f7e56c74a83c7d58) )
 	ROM_LOAD( "vic3.kl2", 0x2000, 0x1000, CRC(a0db4bf9) SHA1(105f983a2ee6628d97d6207f5c04fc7de2c2d430) )
@@ -258,7 +258,7 @@ ROM_START( victory )
 	ROM_LOAD( "vic3.kl1", 0xa000, 0x1000, CRC(2b7e626f) SHA1(5a607faf05f81da44c68fe1a6efe2a7c4ac048c7) )
 	ROM_LOAD( "vic3.l1",  0xb000, 0x1000, CRC(7bb8e1f5) SHA1(0f624e859bb9c2203c0aebe89ac2f807b4fa9a47) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "vic1.7bc", 0xc000, 0x1000, CRC(d4927560) SHA1(f263419dec70b758cf429cd7e5b388258027bfde) )
 	ROM_LOAD( "vic1.7c",  0xd000, 0x1000, CRC(059efab5) SHA1(60259eb56a282a0fbab5e966a16430ab486b1492) )
 	ROM_LOAD( "vic1.7d",  0xe000, 0x1000, CRC(82c4767c) SHA1(64eac78e7dab5f435eb035be46e24e73a74f0eae) )
@@ -277,7 +277,7 @@ ROM_END
 
 
 ROM_START( victorba )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "j2.rom",  0x0000, 0x1000, CRC(dd788e93) SHA1(5912488a3631afd522f5336c297752bad2e0f7b6) )
 	ROM_LOAD( "k2.rom",  0x1000, 0x1000, CRC(f47bf046) SHA1(9e15eeee2729a8466e2c70d61cfa7c86e0ceeaf8) )
 	ROM_LOAD( "kl2.rom", 0x2000, 0x1000, CRC(baef885e) SHA1(b252d35c19b9def6bd695509fca409b7fbd693c1) )
@@ -291,7 +291,7 @@ ROM_START( victorba )
 	ROM_LOAD( "kl1.rom", 0xa000, 0x1000, CRC(6c82ebca) SHA1(3f30e92cbdca73948d285d4509bdee85d8fa57b7) )
 	ROM_LOAD( "l1.rom",  0xb000, 0x1000, CRC(03b89d8a) SHA1(37b501e910d3c3784a6696fab7fd6ba568470a8b) )
 
-	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "vic1.7bc", 0xc000, 0x1000, CRC(d4927560) SHA1(f263419dec70b758cf429cd7e5b388258027bfde) )
 	ROM_LOAD( "vic1.7c",  0xd000, 0x1000, CRC(059efab5) SHA1(60259eb56a282a0fbab5e966a16430ab486b1492) )
 	ROM_LOAD( "vic1.7d",  0xe000, 0x1000, CRC(82c4767c) SHA1(64eac78e7dab5f435eb035be46e24e73a74f0eae) )

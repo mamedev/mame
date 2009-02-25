@@ -197,16 +197,16 @@ static INTERRUPT_GEN( assert_irq )
 static MACHINE_DRIVER_START( mustache )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)
+	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(memmap, 0)
-	MDRV_CPU_VBLANK_INT("main", assert_irq)
+	MDRV_CPU_VBLANK_INT("screen", assert_irq)
 
 	MDRV_CPU_ADD(CPUTAG_T5182,Z80, T5182_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(t5182_map, 0)
 	MDRV_CPU_IO_MAP(t5182_io, 0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56.747)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -230,7 +230,7 @@ static MACHINE_DRIVER_START( mustache )
 MACHINE_DRIVER_END
 
 ROM_START( mustache )
-	ROM_REGION( 0x20000, "main", 0 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "mustache.h18", 0x0000, 0x8000, CRC(123bd9b8) SHA1(33a7cba5c3a54b0b1a15dd1e24d298b6f7274321) )
 	ROM_LOAD( "mustache.h16", 0x8000, 0x4000, CRC(62552beb) SHA1(ee10991d7de0596608fa1db48805781cbfbbdb9f) )
 
@@ -302,7 +302,7 @@ static DRIVER_INIT( mustache )
 		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
 
 	free(buf);
-	seibu_sound_decrypt(machine,"main",0x8000);
+	seibu_sound_decrypt(machine,"maincpu",0x8000);
 }
 
 

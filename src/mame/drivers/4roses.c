@@ -359,7 +359,7 @@ static const ay8910_interface ay8910_intf =
 
 static const mc6845_interface mc6845_intf =
 {
-	"main",		/* screen we are acting on */
+	"screen",	/* screen we are acting on */
 	8,			/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
@@ -376,15 +376,15 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_DRIVER_START( 4roses )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
+	MDRV_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
 	MDRV_CPU_PROGRAM_MAP(4roses_map, 0)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 //  MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -414,7 +414,7 @@ MACHINE_DRIVER_END
 *************************/
 
 ROM_START( 4roses )
-	ROM_REGION( 0x10000, "main", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* encrypted program ROM...*/
 	ROM_LOAD( "4.10.u32", 0x00000, 0x10000, CRC(e94440e9) SHA1(b2f81ba79f1f40ed35e45fd80c17eb8529ccdb4c) )
 
 	ROM_REGION( 0x0400,  "mcu", 0 )	/* protected... no dump available */
@@ -432,7 +432,7 @@ ROM_START( 4roses )
 ROM_END
 
 ROM_START( 4rosesa )
-	ROM_REGION( 0x10000, "main", 0 )	/* encrypted program ROM...*/
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* encrypted program ROM...*/
 	ROM_LOAD( "4.u15", 0x00000, 0x10000, CRC(66bb5b67) SHA1(438371c3918f0a285cb19caa650739df9fb24800) )
 
 	ROM_REGION( 0x0400,  "mcu", 0 )	/* protected... no dump available */

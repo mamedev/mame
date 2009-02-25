@@ -318,7 +318,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER ( fuuki32_sound_bw_w )
 {
-	UINT8 *rom = memory_region(space->machine, "sound");
+	UINT8 *rom = memory_region(space->machine, "soundcpu");
 
 	memory_set_bankptr(space->machine, 1, rom + 0x10000 + (data * 0x8000));
 }
@@ -590,10 +590,10 @@ static const ymf278b_interface fuuki32_ymf278b_interface =
 static MACHINE_DRIVER_START( fuuki32 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68EC020, CPU_CLOCK) /* 20MHz verified */
+	MDRV_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
 	MDRV_CPU_PROGRAM_MAP(fuuki32_readmem,fuuki32_writemem)
 
-	MDRV_CPU_ADD("sound", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
+	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
 	MDRV_CPU_PROGRAM_MAP(fuuki32_sound_readmem,fuuki32_sound_writemem)
 	MDRV_CPU_IO_MAP(fuuki32_sound_io_map,0)
 
@@ -603,7 +603,7 @@ static MACHINE_DRIVER_START( fuuki32 )
 	/* video hardware */
 	//MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM) // Buffered by 2 frames
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
@@ -642,13 +642,13 @@ Fuuki, 1999   Consists of a FG-3J MAIN-J mainboard &  FG-3J ROM-J combo
 ***************************************************************************/
 
 ROM_START( asurabld )
-	ROM_REGION( 0x200000, "main", 0 ) /* M68020 */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* M68020 */
 	ROM_LOAD32_BYTE( "pgm3.u1", 0x000000, 0x80000, CRC(053e9758) SHA1(c2754d3f0c607c81c8fa33b667b576eb0474fd0b) )
 	ROM_LOAD32_BYTE( "pgm2.u2", 0x000001, 0x80000, CRC(16b656ca) SHA1(5ffb551ce7dec462d3896f0fed693454496894bc) )
 	ROM_LOAD32_BYTE( "pgm1.u3", 0x000002, 0x80000, CRC(35104452) SHA1(03cfd81429f8a945d5419c9750925bfa997d0607) )
 	ROM_LOAD32_BYTE( "pgm0.u4", 0x000003, 0x80000, CRC(68615497) SHA1(de93751f151f195a863dc6fe83b6e7ed8f99430a) )
 
-	ROM_REGION( 0x090000, "sound", 0 ) /* Z80 */
+	ROM_REGION( 0x090000, "soundcpu", 0 ) /* Z80 */
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(bb1deb89) SHA1(b1c70abddc0b9a88beb69a592376ff69a7e091eb) )
 	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
 
@@ -685,13 +685,13 @@ Fuuki, 2000   Consists of a FG-3J MAIN-J mainboard &  FG-3J ROM-J combo
 ***************************************************************************/
 
 ROM_START( asurabus )
-	ROM_REGION( 0x200000, "main", 0 ) /* M68020 */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* M68020 */
 	ROM_LOAD32_BYTE( "pgm3.u1", 0x000000, 0x80000, CRC(2c6b5271) SHA1(188371f1f003823ac719e962e048719d76696b2f) )
 	ROM_LOAD32_BYTE( "pgm2.u2", 0x000001, 0x80000, CRC(8f8694ec) SHA1(3334df4aecc5ab2f8914ef6748c027a99b39ce26) )
 	ROM_LOAD32_BYTE( "pgm1.u3", 0x000002, 0x80000, CRC(0a040f0f) SHA1(d5e86d33efcbbde7ee62cfc8dfe867f250a33415) )
 	ROM_LOAD32_BYTE( "pgm0.u4", 0x000003, 0x80000, CRC(9b71e9d8) SHA1(9b705b5b6fff549f5679890422b481b5cf1d7bd7) )
 
-	ROM_REGION( 0x090000, "sound", 0 ) /* Z80 */
+	ROM_REGION( 0x090000, "soundcpu", 0 ) /* Z80 */
 	ROM_LOAD( "srom.u7", 0x00000, 0x80000, CRC(368da389) SHA1(1423b709da40bf3033c9032c4bd07658f1a969de) )
 	ROM_RELOAD(          0x10000, 0x80000) /* for banks */
 

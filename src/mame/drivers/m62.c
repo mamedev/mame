@@ -1012,13 +1012,13 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 24000000/6)
+	MDRV_CPU_ADD("maincpu", Z80, 24000000/6)
 	MDRV_CPU_PROGRAM_MAP(ldrun_readmem,ldrun_writemem)
 	MDRV_CPU_IO_MAP(kungfum_readport,kungfum_writeport)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(55)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1041,12 +1041,12 @@ static MACHINE_DRIVER_START( kungfum )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_REPLACE("main", Z80, 18432000/6)
+	MDRV_CPU_REPLACE("maincpu", Z80, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(kungfum_readmem,kungfum_writemem)
 	MDRV_CPU_IO_MAP(kungfum_readport,kungfum_writeport)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 
 	MDRV_VIDEO_START(kungfum)
@@ -1058,12 +1058,12 @@ static MACHINE_DRIVER_START( battroad )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_REPLACE("main", Z80, 18432000/6)
+	MDRV_CPU_REPLACE("maincpu", Z80, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(battroad_readmem,battroad_writemem)
 	MDRV_CPU_IO_MAP(kungfum_readport,battroad_writeport)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(battroad)
 	MDRV_PALETTE_LENGTH(544)
@@ -1078,7 +1078,7 @@ static MACHINE_DRIVER_START( ldrun2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ldrun2_readmem,ldrun2_writemem)
 	MDRV_CPU_IO_MAP(ldrun2_readport,ldrun2_writeport)
 
@@ -1091,7 +1091,7 @@ static MACHINE_DRIVER_START( ldrun3 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ldrun3_readmem,ldrun3_writemem)
 	MDRV_CPU_IO_MAP(kungfum_readport,ldrun3_writeport)
 
@@ -1106,7 +1106,7 @@ static MACHINE_DRIVER_START( ldrun4 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ldrun4_readmem,ldrun4_writemem)
 	MDRV_CPU_IO_MAP(kungfum_readport,ldrun4_writeport)
 
@@ -1121,7 +1121,7 @@ static MACHINE_DRIVER_START( lotlot )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lotlot_readmem,lotlot_writemem)
 
 	/* video hardware */
@@ -1138,7 +1138,7 @@ static MACHINE_DRIVER_START( kidniki )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(kidniki_readmem,kidniki_writemem)
 	MDRV_CPU_IO_MAP(kungfum_readport,kidniki_writeport)
 
@@ -1154,7 +1154,7 @@ static MACHINE_DRIVER_START( spelunkr )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spelunkr_readmem,spelunkr_writemem)
 
 	/* video hardware */
@@ -1169,7 +1169,7 @@ static MACHINE_DRIVER_START( spelunk2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spelunk2_readmem,spelunk2_writemem)
 
 	/* video hardware */
@@ -1186,12 +1186,12 @@ static MACHINE_DRIVER_START( youjyudn )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_REPLACE("main", Z80, 18432000/6)
+	MDRV_CPU_REPLACE("maincpu", Z80, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(youjyudn_readmem,youjyudn_writemem)
 	MDRV_CPU_IO_MAP(kungfum_readport,youjyudn_writeport)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 	MDRV_GFXDECODE(youjyudn)
 
@@ -1204,11 +1204,11 @@ static MACHINE_DRIVER_START( horizon )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(ldrun)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(horizon_readmem,horizon_writemem)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 
 	MDRV_VIDEO_START(horizon)
@@ -1223,7 +1223,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( kungfum )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a-4e-c.bin",   0x0000, 0x4000, CRC(b6e2d083) SHA1(17e2cfe2b9d6121239803aba7132918e54ae02bf) )
 	ROM_LOAD( "a-4d-c.bin",   0x4000, 0x4000, CRC(7532918e) SHA1(9d513d5a3b99cc54c4491371cd44af048ef0fb33) )
 
@@ -1264,7 +1264,7 @@ ROM_START( kungfum )
 ROM_END
 
 ROM_START( kungfud )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "snx_a-4e-d", 0x0000, 0x4000, CRC(fc330a46) SHA1(50edbd6131310afa17d476e278a7098ab1cfae73) )
 	ROM_LOAD( "snx_a-4d-d", 0x4000, 0x4000, CRC(1b2fd32f) SHA1(34487dacf2ec9fbf55148953a9f248fae9442568) )
 
@@ -1298,7 +1298,7 @@ ROM_START( kungfud )
 ROM_END
 
 ROM_START( spartanx )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a-4e-c-j.bin", 0x0000, 0x4000, CRC(32a0a9a6) SHA1(fbb601a4c98a131013ea49a6877f2cd8139434fa) )
 	ROM_LOAD( "a-4d-c-j.bin", 0x4000, 0x4000, CRC(3173ea78) SHA1(cb6102abf9cf8df531f6e808b59e076831456ff5) )
 
@@ -1339,7 +1339,7 @@ ROM_START( spartanx )
 ROM_END
 
 ROM_START( kungfub )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "c5.5h",        0x0000, 0x4000, CRC(5d8e791d) SHA1(90cd911f715a50a90427abd89b38272a6df08d69) )
 	ROM_LOAD( "c4.5k",        0x4000, 0x4000, CRC(4000e2b8) SHA1(719b0aa1fd0cbe671178ac728d76d439bd7932d9) )
 
@@ -1397,7 +1397,7 @@ ROM_START( kungfub )
 ROM_END
 
 ROM_START( kungfub2 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kf4",          0x0000, 0x4000, CRC(3f65313f) SHA1(bd584896f558440a0f7bf8e1ca49bf478fe77553) )
 	ROM_LOAD( "kf5",          0x4000, 0x4000, CRC(9ea325f3) SHA1(7c35128a3e70e5994a5e17db656dec1a53c1fe67) )
 
@@ -1438,7 +1438,7 @@ ROM_START( kungfub2 )
 ROM_END
 
 ROM_START( battroad )
-	ROM_REGION( 0x1e000, "main", 0 )
+	ROM_REGION( 0x1e000, "maincpu", 0 )
 	ROM_LOAD( "br-a-4e.b",	0x00000, 0x2000, CRC(9bf14768) SHA1(53169553b956e5bcbd3fae13b86ab859cd08c955) )
 	ROM_LOAD( "br-a-4d.b",	0x02000, 0x2000, CRC(39ca1627) SHA1(bbeb59ad93b4eb874dc3c1eebfc1136c0c5112c8) )
 	ROM_LOAD( "br-a-4b.b",	0x04000, 0x2000, CRC(1865bb22) SHA1(990cfffc4fc0ade8bb4ebd02d107f8657728f976) )
@@ -1486,7 +1486,7 @@ ROM_START( battroad )
 ROM_END
 
 ROM_START( ldrun )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lr-a-4e",      0x0000, 0x2000, CRC(5d7e2a4d) SHA1(fe8aeff360f6c3a8606d67a8b95148c3c2ef7267) )
 	ROM_LOAD( "lr-a-4d",      0x2000, 0x2000, CRC(96f20473) SHA1(e400c43f3f32e12f68ca204c60bcebdb2b3da55d) )
 	ROM_LOAD( "lr-a-4b",      0x4000, 0x2000, CRC(b041c4a9) SHA1(77768b03ea2497e25c3e47b68a0eb2fe3e9aea35) )
@@ -1519,7 +1519,7 @@ ROM_START( ldrun )
 ROM_END
 
 ROM_START( ldruna )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "roma4c",       0x0000, 0x2000, CRC(279421e1) SHA1(051e103b2ade4a332053ba05aa7f126dd9b97c2c) )
 	ROM_LOAD( "lr-a-4d",      0x2000, 0x2000, CRC(96f20473) SHA1(e400c43f3f32e12f68ca204c60bcebdb2b3da55d) )
 	ROM_LOAD( "roma4b",       0x4000, 0x2000, CRC(3c464bad) SHA1(df34a9ec2f29f8d2a2ef1a2fc065ba7541ea4178) )
@@ -1552,7 +1552,7 @@ ROM_START( ldruna )
 ROM_END
 
 ROM_START( ldrun2 )
-	ROM_REGION( 0x14000, "main", 0 )	/* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )	/* 64k for code + 16k for banks */
 	ROM_LOAD( "lr2-a-4e.a",   0x00000, 0x2000, CRC(22313327) SHA1(c82c9d3218e0384e26b86f9475fea5056cd9832b) )
 	ROM_LOAD( "lr2-a-4d",     0x02000, 0x2000, CRC(ef645179) SHA1(d4cae3cb223d7d10e2cce751af5c77493c1c60df) )
 	ROM_LOAD( "lr2-a-4a.a",   0x04000, 0x2000, CRC(b11ddf59) SHA1(9797cbf4b8cd7bfabe797bdc71c904f54d710491) )
@@ -1591,7 +1591,7 @@ ROM_START( ldrun2 )
 ROM_END
 
 ROM_START( ldrun3 )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lr3a4eb.bin",  0x0000, 0x4000, CRC(09affc47) SHA1(1cd56b967e4c8ada6c6e1015aead5f7551034358) )
 	ROM_LOAD( "lr3a4db.bin",  0x4000, 0x4000, CRC(23a02178) SHA1(0560b92dfc9b57d01abb62a7b270beb27fa42040) )
 	ROM_LOAD( "lr3a4bb.bin",  0x8000, 0x4000, CRC(3d501a1a) SHA1(a92ff743eb21145154fa717ee9e6ede4da458aa9) )
@@ -1627,7 +1627,7 @@ ROM_START( ldrun3 )
 ROM_END
 
 ROM_START( ldrun3jp )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lr3-a-4e",     0x0000, 0x4000, CRC(5b334e8e) SHA1(018ee450f88feaf5da025e01d2d839b29d5f1559) )
 	ROM_LOAD( "lr3-a-4d.a",   0x4000, 0x4000, CRC(a84bc931) SHA1(0348d238a85a059a6423794910adec4462e14f27) )
 	ROM_LOAD( "lr3-a-4b.a",   0x8000, 0x4000, CRC(be09031d) SHA1(c124163895d295969b66386fee91c89bbd8b8774) )
@@ -1660,7 +1660,7 @@ ROM_START( ldrun3jp )
 ROM_END
 
 ROM_START( ldrun4 )
-	ROM_REGION( 0x18000, "main", 0 )	/* 64k for code + 32k for banked ROM */
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* 64k for code + 32k for banked ROM */
 	ROM_LOAD( "lr4-a-4e",     0x00000, 0x4000, CRC(5383e9bf) SHA1(01f6f76b768107b389d7240bd15a5e0720defcb6) )
 	ROM_LOAD( "lr4-a-4d.c",   0x04000, 0x4000, CRC(298afa36) SHA1(077b5fa8a246059801232c5287225e3bb7507345) )
 	ROM_LOAD( "lr4-v-4k",     0x10000, 0x8000, CRC(8b248abd) SHA1(3e755c8f8011d6f878a1777a2c22b2156ef926e6) )	/* banked at 8000-bfff */
@@ -1696,7 +1696,7 @@ ROM_START( ldrun4 )
 ROM_END
 
 ROM_START( lotlot )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lot-a-4e",     0x0000, 0x4000, CRC(2913d08f) SHA1(829115333825a9483322a910efee9ee470d85a0e) )
 	ROM_LOAD( "lot-a-4d",     0x4000, 0x4000, CRC(0443095f) SHA1(2c3ca107b54519632513a75b80a1a7d8b971f2b1) )
 
@@ -1736,7 +1736,7 @@ ROM_START( lotlot )
 ROM_END
 
 ROM_START( kidniki )
-	ROM_REGION( 0x30000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "ky_a-4e-g.bin", 0x00000, 0x04000, CRC(2edcbcd7) SHA1(fbb8e3cddfba01523c0d253cbc74ddb259b6197d) )
 	ROM_LOAD( "dr03.4cd",      0x04000, 0x04000, CRC(dba20934) SHA1(a7aac4fcea5c1a94ddaf67e85bf2ce2e77c965cb) )
 	ROM_LOAD( "ky_t-8k-g.bin", 0x10000, 0x08000, CRC(dbc42f31) SHA1(a7c7fdde1a8b63660d3e38786dbc80b6d91bde1b) )	/* banked at 8000-9fff */
@@ -1786,7 +1786,7 @@ ROM_START( kidniki )
 ROM_END
 
 ROM_START( kidnikiu )
-	ROM_REGION( 0x30000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "dr04.4e",      0x00000, 0x04000, CRC(80431858) SHA1(3a387f63ce0c7601264f91ae1f6fe604f2ef8ef1) )
 	ROM_LOAD( "dr03.4cd",     0x04000, 0x04000, CRC(dba20934) SHA1(a7aac4fcea5c1a94ddaf67e85bf2ce2e77c965cb) )
 	ROM_LOAD( "dr11.8k",      0x10000, 0x08000, CRC(04d82d93) SHA1(a901659cbe12a284f30a6b98ea6907df0222ddbf) )	/* banked at 8000-9fff */
@@ -1837,7 +1837,7 @@ ROM_END
 
 
 ROM_START( yanchamr )
-	ROM_REGION( 0x30000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "ky_a-4e-.bin", 0x00000, 0x04000, CRC(c73ad2d6) SHA1(2e5d100e043f77c056b0d5bb80f310a6866fd2b1) )
 	ROM_LOAD( "ky_a-4d-.bin", 0x04000, 0x04000, CRC(401af828) SHA1(eec1c082f42e441071fcf005803205b2275b0327) )
 	ROM_LOAD( "ky_t-8k-.bin", 0x10000, 0x08000, CRC(e967de88) SHA1(75c0890eb98feb882fe01de5e93e228690e00904) )	/* banked at 8000-9fff */
@@ -1887,7 +1887,7 @@ ROM_START( yanchamr )
 ROM_END
 
 ROM_START( lithero )
-	ROM_REGION( 0x30000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "4.bin",        0x00000, 0x08000, CRC(80903766) SHA1(f16d603798f8a9ad62df8d89334758326257201a) )
 	ROM_LOAD( "11.bin",       0x10000, 0x08000, CRC(7a1ef8cb) SHA1(5c94a06a5f64365068daee3d7da7f2a8e52479da) ) /* banked at 8000-9fff */
 	ROM_LOAD( "12.bin",       0x18000, 0x08000, CRC(a929110b) SHA1(87334f946e14c79426bc7a14e8da984bb8ef9cfc) )
@@ -1930,7 +1930,7 @@ ROM_START( lithero )
 ROM_END
 
 ROM_START( spelunkr )
-	ROM_REGION( 0x18000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "spra.4e",      0x00000, 0x4000, CRC(cf811201) SHA1(9b29880b28e1d94b07a16b5455bc498dc882342f) )
 	ROM_LOAD( "spra.4d",      0x04000, 0x4000, CRC(bb4faa4f) SHA1(350f7b086ed6357354d60548419d139fddb34c9d) )
 	ROM_LOAD( "sprm.7c",      0x10000, 0x4000, CRC(fb6197e2) SHA1(8c3ccc2c14d076a1d6d14c2548a101a87af4211a) )	/* banked at 8000-9fff */
@@ -1996,7 +1996,7 @@ ROM_START( spelunkr )
 ROM_END
 
 ROM_START( spelnkrj )
-	ROM_REGION( 0x18000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "spr_a4ec.bin", 0x00000, 0x4000, CRC(4e94a80c) SHA1(591ec5aa3fb508eedd120d9f7fb9454c3547148a) )
 	ROM_LOAD( "spr_a4dd.bin", 0x04000, 0x4000, CRC(e7c0cbce) SHA1(19f914e9155972c91ccc8dc5b133f35246613c52) )
 	ROM_LOAD( "spr_m7cc.bin", 0x10000, 0x4000, CRC(57598a36) SHA1(7d9c5790eb2a79c7977ca7b590d228685bd3a6b2) )	/* banked at 8000-9fff */
@@ -2062,7 +2062,7 @@ ROM_START( spelnkrj )
 ROM_END
 
 ROM_START( spelunk2 )
-	ROM_REGION( 0x24000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x24000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "sp2-a.4e",     0x00000, 0x4000, CRC(96c04bbb) SHA1(5d7ee2d21d30e3ccbb428c2f9771568dbf3cfdb4) )
 	ROM_LOAD( "sp2-a.4d",     0x04000, 0x4000, CRC(cb38c2ff) SHA1(28ab5f0c65657ee0eaa82275bdb60298eedd3821) )
 	ROM_LOAD( "sp2-r.7d",     0x10000, 0x8000, CRC(558837ea) SHA1(5fa8a5ed55d155c3fc117391ab779c77e86fa349) )	/* banked at 9000-9fff */
@@ -2129,7 +2129,7 @@ ROM_START( spelunk2 )
 ROM_END
 
 ROM_START( youjyudn )
-	ROM_REGION( 0x18000, "main", 0 )	/* main CPU */
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* main CPU */
 	ROM_LOAD( "yju_a4eb.bin", 0x00000, 0x4000, CRC(0d356bdc) SHA1(20ddd68720d733791fb3cf791b26e100af12d609) )
 	ROM_LOAD( "yju_a4db.bin", 0x04000, 0x4000, CRC(c169be13) SHA1(2f7e65924d152206fae97e5f50197963e2c566df) )
 	ROM_LOAD( "yju_p4cb.0",   0x10000, 0x4000, CRC(60baf3b1) SHA1(2ab577bdbec7c8695a8f530b3e476aa91447cd60) )	/* banked at 8000-bfff */
@@ -2176,7 +2176,7 @@ ROM_START( youjyudn )
 ROM_END
 
 ROM_START( horizon )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hrza-4e",   0x0000, 0x4000, CRC(98b96ba2) SHA1(8478ec3b39c970c6008f078cbb5ab39462865015) )
 	ROM_LOAD( "hrza-4d",   0x4000, 0x4000, CRC(06b06ac7) SHA1(d9ae9633455733fd14fc4d448b85365bfebef446) )
 	ROM_LOAD( "hrza-4b",   0x8000, 0x4000, CRC(39c0bd02) SHA1(8d3b465ef7db11863cd2d343656e99cfb77c89ef) )
@@ -2213,50 +2213,50 @@ ROM_END
 static DRIVER_INIT( battroad )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun2 )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( ldrun4 )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( kidniki )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* in Kid Niki, bank 0 has code falling from 7fff to 8000, */
 	/* so I have to copy it there because bank switching wouldn't catch it */
 	memcpy(ROM + 0x08000, ROM + 0x10000, 0x2000);
 
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunkr )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 }
 
 static DRIVER_INIT( spelunk2 )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0,  4, memory_region(machine, "main") + 0x20000, 0x1000);
-	memory_configure_bank(machine, 2, 0, 16, memory_region(machine, "main") + 0x10000, 0x1000);
+	memory_configure_bank(machine, 1, 0,  4, memory_region(machine, "maincpu") + 0x20000, 0x1000);
+	memory_configure_bank(machine, 2, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
 }
 
 static DRIVER_INIT( youjyudn )
 {
 	/* configure memory banks */
-	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
 GAME( 1984, kungfum,  0,        kungfum,  kungfum,  0,        ROT0,   "Irem", "Kung-Fu Master", 0 )

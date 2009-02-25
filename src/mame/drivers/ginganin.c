@@ -340,16 +340,16 @@ static INTERRUPT_GEN( ginganin_sound_interrupt )
 static MACHINE_DRIVER_START( ginganin )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 6000000)	/* ? */
+	MDRV_CPU_ADD("maincpu", M68000, 6000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
-	MDRV_CPU_ADD("audio", M6809, 1000000)
+	MDRV_CPU_ADD("audiocpu", M6809, 1000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(ginganin_sound_interrupt,60)	/* Takahiro Nogi. 1999/09/27 (1 -> 60) */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -381,11 +381,11 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ginganin )
-	ROM_REGION( 0x20000, "main", 0 )	/* main cpu */
+	ROM_REGION( 0x20000, "maincpu", 0 )	/* main cpu */
 	ROM_LOAD16_BYTE( "gn_02.bin", 0x00000, 0x10000, CRC(4a4e012f) SHA1(7c94a5b6b71e037af355f3aa4623be1f585db8dc) )
 	ROM_LOAD16_BYTE( "gn_01.bin", 0x00001, 0x10000, CRC(30256fcb) SHA1(dc15e0da88ae5cabe0150f7290508c3d58c06c11) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "gn_05.bin", 0x00000, 0x10000, CRC(e76e10e7) SHA1(b16f10a1a01b7b04221c9bf1b0d157e936bc5fb5) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -416,11 +416,11 @@ ROM_START( ginganin )
 ROM_END
 
 ROM_START( gingania )
-	ROM_REGION( 0x20000, "main", 0 )	/* main cpu */
+	ROM_REGION( 0x20000, "maincpu", 0 )	/* main cpu */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x10000, CRC(6da1d8a3) SHA1(ea81f2934fa7901563e886f3d600edd08ec0ea24) )
 	ROM_LOAD16_BYTE( "1.bin", 0x00001, 0x10000, CRC(0bd32d59) SHA1(5ab2c0e4a1d9cafbd3448d981103508debd7ed96) )
 
-	ROM_REGION( 0x10000, "audio", 0 )	/* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound cpu */
 	ROM_LOAD( "gn_05.bin", 0x00000, 0x10000, CRC(e76e10e7) SHA1(b16f10a1a01b7b04221c9bf1b0d157e936bc5fb5) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
@@ -456,7 +456,7 @@ static DRIVER_INIT( ginganin )
 	UINT16 *rom;
 
 	/* main cpu patches */
-	rom = (UINT16 *)memory_region(machine, "main");
+	rom = (UINT16 *)memory_region(machine, "maincpu");
 	/* avoid writes to rom getting to the log */
 	rom[0x408/2] = 0x6000;
 	rom[0x40a/2] = 0x001c;
@@ -464,7 +464,7 @@ static DRIVER_INIT( ginganin )
 
 	/* sound cpu patches */
 	/* let's clear the RAM: ROM starts at 0x4000 */
-	memset(memory_region(machine, "audio"),0,0x800);
+	memset(memory_region(machine, "audiocpu"),0,0x800);
 }
 
 

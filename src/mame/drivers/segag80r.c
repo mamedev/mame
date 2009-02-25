@@ -833,10 +833,10 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( g80r_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, VIDEO_CLOCK/4)
+	MDRV_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(main_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", segag80r_vblank_start)
+	MDRV_CPU_VBLANK_INT("screen", segag80r_vblank_start)
 
 	MDRV_MACHINE_START(g80r)
 
@@ -844,7 +844,7 @@ static MACHINE_DRIVER_START( g80r_base )
 	MDRV_GFXDECODE(segag80r)
 	MDRV_PALETTE_LENGTH(64)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
@@ -872,7 +872,7 @@ static MACHINE_DRIVER_START( 005 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(g80r_base)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(main_ppi8255_portmap,0)
 
 	/* sound boards */
@@ -887,7 +887,7 @@ static MACHINE_DRIVER_START( spaceod )
 
 	/* background board changes */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_GFXDECODE(spaceod)
 	MDRV_PALETTE_LENGTH(64+64)
@@ -902,7 +902,7 @@ static MACHINE_DRIVER_START( monsterb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(g80r_base)
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(main_ppi8255_portmap,0)
 
 	/* background board changes */
@@ -933,9 +933,9 @@ static MACHINE_DRIVER_START( sindbadm )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(g80r_base)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(sindbadm_portmap,0)
-	MDRV_CPU_VBLANK_INT("main", sindbadm_vblank_start)
+	MDRV_CPU_VBLANK_INT("screen", sindbadm_vblank_start)
 
 	MDRV_PPI8255_ADD( "ppi8255", sindbadm_ppi_intf )
 
@@ -945,7 +945,7 @@ static MACHINE_DRIVER_START( sindbadm )
 
 	/* sound boards */
 
-	MDRV_CPU_ADD("audio", Z80, SINDBADM_SOUND_CLOCK/2)
+	MDRV_CPU_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(sindbadm_sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
@@ -966,7 +966,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( astrob )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "829b.cpu-u25",   0x0000, 0x0800, CRC(14ae953c) SHA1(eb63d1b95faa5193db7fa6ab245e99325d519b5e) )
 	ROM_LOAD( "907a.prom-u1",   0x0800, 0x0800, CRC(a9aaaf38) SHA1(73c2b9421b267563acb33d63fbbbda818793c4c1) )
 	ROM_LOAD( "908a.prom-u2",   0x1000, 0x0800, CRC(897f2b87) SHA1(5468e68053c9a29791f367658630d5c0af332f03) )
@@ -988,7 +988,7 @@ ROM_START( astrob )
 	ROM_LOAD( "924a.prom-u18",  0x9000, 0x0800, CRC(120a39c7) SHA1(d8fdf97290725cf9ebddab9eeb34d7adba097394) )
 	ROM_LOAD( "925a.prom-u19",  0x9800, 0x0800, CRC(790a7f4e) SHA1(16b7b8e864a8f5f59da6bf2ad17f1e4791f34abe) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
 	ROM_REGION( 0x4000, "speech", 0 )
@@ -999,7 +999,7 @@ ROM_START( astrob )
 ROM_END
 
 ROM_START( astrob2 )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "829b.cpu-u25",   0x0000, 0x0800, CRC(14ae953c) SHA1(eb63d1b95faa5193db7fa6ab245e99325d519b5e) )
 	ROM_LOAD( "888a.prom-u1",   0x0800, 0x0800, CRC(42601744) SHA1(6bb58384c28b2105746a2f410f5e0979609db9bf) )
 	ROM_LOAD( "889.prom-u2",    0x1000, 0x0800, CRC(dd9ab173) SHA1(35617bb4480a668bdd07b0f8a6a879fd83c53448) )
@@ -1021,7 +1021,7 @@ ROM_START( astrob2 )
 	ROM_LOAD( "905.prom-u18",   0x9000, 0x0800, CRC(4f08f9f4) SHA1(755a825b18ed50caa7bf274a0a5c3a1b00b1c070) )
 	ROM_LOAD( "906.prom-u19",   0x9800, 0x0800, CRC(58149df1) SHA1(2bba56576a225ca47ce31a5b6dcc491546dfffec) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
 	ROM_REGION( 0x4000, "speech", 0 )
@@ -1032,7 +1032,7 @@ ROM_START( astrob2 )
 ROM_END
 
 ROM_START( astrob2a )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "829b.cpu-u25",   0x0000, 0x0800, CRC(14ae953c) SHA1(eb63d1b95faa5193db7fa6ab245e99325d519b5e) )
 	ROM_LOAD( "888c.prom-u1",   0x0800, 0x0800, CRC(15fa9c3e) SHA1(8998a5fa21765eec1c393373e38015552735d119) )
 	ROM_LOAD( "889.prom-u2",    0x1000, 0x0800, CRC(dd9ab173) SHA1(35617bb4480a668bdd07b0f8a6a879fd83c53448) )
@@ -1054,7 +1054,7 @@ ROM_START( astrob2a )
 	ROM_LOAD( "905.prom-u18",   0x9000, 0x0800, CRC(4f08f9f4) SHA1(755a825b18ed50caa7bf274a0a5c3a1b00b1c070) )
 	ROM_LOAD( "906.prom-u19",   0x9800, 0x0800, CRC(58149df1) SHA1(2bba56576a225ca47ce31a5b6dcc491546dfffec) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
 	ROM_REGION( 0x4000, "speech", 0 )
@@ -1065,7 +1065,7 @@ ROM_START( astrob2a )
 ROM_END
 
 ROM_START( astrob1 )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "829.cpu-u25",    0x0000, 0x0800, CRC(5f66046e) SHA1(6aa7f94122db1a75a89c12ad9d087aec1a70d675) )
 	ROM_LOAD( "837.prom-u1",    0x0800, 0x0800, CRC(ce9c3763) SHA1(2cb4c3041905d38b040ef76f69f6197d699f9ec5) )
 	ROM_LOAD( "838.prom-u2",    0x1000, 0x0800, CRC(3557289e) SHA1(57258b149f0872c34f82fe3dc06bc1fc60d7393f) )
@@ -1084,7 +1084,7 @@ ROM_START( astrob1 )
 	ROM_LOAD( "851.prom-u15",   0x7800, 0x0800, CRC(3d4cf9f0) SHA1(11e996f33f3a104e50d0a54a0814ea3e07735683) )
 	ROM_LOAD( "852.prom-u16",   0x8000, 0x0800, CRC(af88a97e) SHA1(fe7993101c629b296b5da05519b0990cc2b78286) )
 
-	ROM_REGION( 0x0800, "audio", 0 )
+	ROM_REGION( 0x0800, "audiocpu", 0 )
 	ROM_LOAD( "808b.speech-u7", 0x0000, 0x0800, CRC(5988c767) SHA1(3b91a8cd46aa7e714028cc40f700fea32287afb1) )
 
 	ROM_REGION( 0x4000, "speech", 0 )
@@ -1096,7 +1096,7 @@ ROM_END
 
 
 ROM_START( 005 )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "1346b.cpu-u25",     0x0000, 0x0800, CRC(8e68533e) SHA1(a257c556d31691068ed5c991f1fb2b51da4826db) )
 	ROM_LOAD( "5092.prom-u1",      0x0800, 0x0800, CRC(29e10a81) SHA1(c4b4e6c75bcf276e53f39a456d8d633c83dcf485) )
 	ROM_LOAD( "5093.prom-u2",      0x1000, 0x0800, CRC(e1edc3df) SHA1(4f593546bbb0f50850dc6286cb514af6831c27a7) )
@@ -1128,7 +1128,7 @@ ROM_END
 
 
 ROM_START( spaceod )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "so-959.cpu-25",     0x0000, 0x0800, CRC(bbae3cd1) SHA1(2e99fd4b0db60462721b174b0db1b10b2fd13d25) )
 	ROM_LOAD( "spod941b.prom-u1",  0x0800, 0x0800, CRC(b396c097) SHA1(6fbff7cb72662f5d3e6940784c14ae40d03885d0) )
 	ROM_LOAD( "spod942a.prom-u2",  0x1000, 0x0800, CRC(e4451554) SHA1(ed2da0455c6d135cdc2fb0c0ed92e496f1871cdf) )
@@ -1165,7 +1165,7 @@ ROM_START( spaceod )
 ROM_END
 
 ROM_START( spaceod2 )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "so-959.cpu-25",   0x0000, 0x0800, CRC(bbae3cd1) SHA1(2e99fd4b0db60462721b174b0db1b10b2fd13d25) )
 	ROM_LOAD( "so-941.prom-u1",  0x0800, 0x0800, CRC(8b63585a) SHA1(eb064a2dca5cb44373f1acc86243a3dcca1951ee) )
 	ROM_LOAD( "so-942.prom-u2",  0x1000, 0x0800, CRC(93e7d900) SHA1(dd2ec1a48a243fd1abc5467e600b8aa10dca1cfb) )
@@ -1203,7 +1203,7 @@ ROM_END
 
 
 ROM_START( monsterb )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "1778.cpu-u25",   0x0000, 0x0800, CRC(19761be3) SHA1(551a5eb958b6efac41f32e7feb2786400fcfb6d3) )
 	ROM_LOAD( "1779c.prom-u1",  0x0800, 0x0800, CRC(5b67dc4c) SHA1(5d2c5128b6cba2d8aa98cae8cb78dbe0c998e965) )
 	ROM_LOAD( "1780b.prom-u2",  0x1000, 0x0800, CRC(fac5aac6) SHA1(52a6b98760f011aa68f374801cddf0aa3efa4e69) )
@@ -1229,7 +1229,7 @@ ROM_START( monsterb )
 	ROM_LOAD( "1800b.prom-u22", 0xb000, 0x0800, CRC(6a062a04) SHA1(cae125f5c0867898f2c0a159026da69ff5a2897f) )
 	ROM_LOAD( "1801b.prom-u23", 0xb800, 0x0800, CRC(f38488fe) SHA1(dd0f2c655970e8755f9ca1898313ff5fd9f11563) )
 
-	ROM_REGION( 0x400, "audio", 0 )
+	ROM_REGION( 0x400, "audiocpu", 0 )
 	ROM_LOAD( "7751.bin",       0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) ) /* 7751 - U34 */
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -1248,7 +1248,7 @@ ROM_START( monsterb )
 ROM_END
 
 ROM_START( monster2 )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "epr-1548",     0x0000, 0x2000, CRC(239f77c1) SHA1(2945e4b135c1c46bf3e0d947b3d9be052f12e8d8) )
 	ROM_LOAD( "epr-1549",     0x2000, 0x2000, CRC(40aeb223) SHA1(8e0cc1b53ded819673719ffe1fd69feb1ca6fa29) )
 	ROM_LOAD( "epr-1550",     0x4000, 0x2000, CRC(b42bb2b3) SHA1(88bd5b027c46cde9f89e90f50ae2c381681ae483) )
@@ -1256,7 +1256,7 @@ ROM_START( monster2 )
 	ROM_LOAD( "epr-1552",     0x8000, 0x2000, CRC(e876e216) SHA1(31301f2b576689aefcb42a4233f8fafb7f4791a7) )
 	ROM_LOAD( "epr-1553",     0xa000, 0x2000, CRC(4a839fb2) SHA1(3a15d74a0abd0548cb90c13f4d5baebe3ec83d23) )
 
-	ROM_REGION( 0x400, "audio", 0 )
+	ROM_REGION( 0x400, "audiocpu", 0 )
 	ROM_LOAD( "7751.bin",     0x0000, 0x0400, CRC(6a9534fc) SHA1(67ad94674db5c2aab75785668f610f6f4eccd158) ) /* 7751 - U34 */
 
 	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
@@ -1286,7 +1286,7 @@ ROM_END
 
 
 ROM_START( pignewt )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "cpu.u25",        0x0000, 0x0800, BAD_DUMP CRC(eccc814d) SHA1(d999d7d433bde5d7773cd7afaf3e673089ba2544))
 	ROM_LOAD( "1888c.prom-u1",  0x0800, 0x0800, CRC(fd18ed09) SHA1(8bba49d93ae72dbc0497a5a24991c5da26d169d3) )
 	ROM_LOAD( "1889c.prom-u2",  0x1000, 0x0800, CRC(f633f5ff) SHA1(b647bebfd8a2093b0b0b7587f7c816aade796b26) )
@@ -1321,7 +1321,7 @@ ROM_START( pignewt )
 ROM_END
 
 ROM_START( pignewta )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "cpu.u25",       0x0000, 0x0800, BAD_DUMP CRC(eccc814d) SHA1(d999d7d433bde5d7773cd7afaf3e673089ba2544))
 	ROM_LOAD( "1888a.prom-u1", 0x0800, 0x0800, CRC(491c0835) SHA1(65c917ebcfa8e5199e9923c04626c067fda3c637) )
 	ROM_LOAD( "1889a.prom-u2", 0x1000, 0x0800, CRC(0dcf0af2) SHA1(788c24c87f44f9206c994286c7ba093d365f056f) )
@@ -1358,7 +1358,7 @@ ROM_END
 
 
 ROM_START( sindbadm )
-	ROM_REGION( 0xc000, "main", 0 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
 	ROM_LOAD( "epr5393.new", 0x0000, 0x2000, CRC(51f2e51e) SHA1(0fd96863d0dfaa0bab09be6fea1e7d12b9c40d68) )
 	ROM_LOAD( "epr5394.new", 0x2000, 0x2000, CRC(d39ce2ee) SHA1(376065a40caa499da99e556098a03387edca5883) )
 	ROM_LOAD( "epr5395.new", 0x4000, 0x2000, CRC(b1d15c82) SHA1(04f888faee0103cce8c0cd57296d75474b770632) )
@@ -1366,7 +1366,7 @@ ROM_START( sindbadm )
 	ROM_LOAD( "epr5397.new", 0x8000, 0x2000, CRC(595d16dc) SHA1(ea8aa068fc45bb2ee64c4290fad4b8b51e1abe97) )
 	ROM_LOAD( "epr5398.new", 0xa000, 0x2000, CRC(e57ff63c) SHA1(eac36221cb210743d3c04e51da5956623a28dbdb) )
 
-	ROM_REGION( 0x2000, "audio", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 )
 	ROM_LOAD( "epr5400.new", 0x0000, 0x2000, CRC(5114f18e) SHA1(343f96c728f96df5d50a9888fc87488d9440d7f4) )
 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
@@ -1481,7 +1481,7 @@ static DRIVER_INIT( monsterb )
 static DRIVER_INIT( monster2 )
 {
 	/* configure the 315-5006 security chip */
-	spatter_decode(machine, "main");
+	spatter_decode(machine, "maincpu");
 	sega_security(0);
 
 	/* configure video */
@@ -1518,7 +1518,7 @@ static DRIVER_INIT( pignewt )
 static DRIVER_INIT( sindbadm )
 {
 	/* configure the encrypted Z80 */
-	sindbadm_decode(machine, "main");
+	sindbadm_decode(machine, "maincpu");
 	sega_security(0);
 
 	/* configure video */

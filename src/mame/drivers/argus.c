@@ -132,7 +132,7 @@ static const ym2203_interface ym2203_config =
 
 static WRITE8_HANDLER( argus_bankselect_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 	int bankaddress;
 
 	bankaddress = 0x10000 + ((data & 7) * 0x4000);
@@ -510,11 +510,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( argus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 5000000)			/* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 5000000)			/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(argus_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 5000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map_a,0)
 #if 0
 	MDRV_CPU_IO_MAP(sound_portmap_1,0)
@@ -525,7 +525,7 @@ static MACHINE_DRIVER_START( argus )
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* This value is refered to psychic5 driver */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -568,18 +568,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( valtric )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 5000000)			/* 5 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(valtric_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 5000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map_a,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2,0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* This value is refered to psychic5 driver */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -613,18 +613,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( butasan )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 5000000)			/* 5 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(butasan_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 5000000)
+	MDRV_CPU_ADD("audiocpu", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map_b,0)
 	MDRV_CPU_IO_MAP(sound_portmap_2,0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(54)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* This value is taken from psychic5 driver */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -663,13 +663,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( argus )
-	ROM_REGION( 0x28000, "main", 0 ) 					/* Main CPU */
+	ROM_REGION( 0x28000, "maincpu", 0 ) 					/* Main CPU */
 	ROM_LOAD( "ag_02.bin",    0x00000, 0x08000, CRC(278a3f3d) SHA1(c5ac5a004ebf0194c33f71dab4020fa636cefbc2) )
 	ROM_LOAD( "ag_03.bin",    0x10000, 0x08000, CRC(3a7f3bfa) SHA1(b11e134c084fc3c982dfe31836c1cf3fc0d481fd) )
 	ROM_LOAD( "ag_04.bin",    0x18000, 0x08000, CRC(76adc9f6) SHA1(e223a8b2371c51f121958ee3687c777f597334c9) )
 	ROM_LOAD( "ag_05.bin",    0x20000, 0x08000, CRC(f76692d6) SHA1(1dc353a042cdda909eb9f1b1ca749a3b3eaa01e4) )
 
-	ROM_REGION( 0x10000, "audio", 0 )					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
 	ROM_LOAD( "ag_01.bin",    0x00000, 0x04000, CRC(769e3f57) SHA1(209160a96486ab0b90967c015143ec28fba2e2a4) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* Sprite */
@@ -698,12 +698,12 @@ ROM_START( argus )
 ROM_END
 
 ROM_START( valtric )
-	ROM_REGION( 0x30000, "main", 0 ) 					/* Main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 ) 					/* Main CPU */
 	ROM_LOAD( "vt_04.bin",    0x00000, 0x08000, CRC(709c705f) SHA1(b82e2209a0371dcbc2708c485b02985cea04353f) )
 	ROM_LOAD( "vt_06.bin",    0x10000, 0x10000, CRC(c9cbb4e4) SHA1(3c84cda778263a9bb2031e29f6f29f29878d2070) )
 	ROM_LOAD( "vt_05.bin",    0x20000, 0x10000, CRC(7ab2684b) SHA1(9bca7e2fd3b5f4043de37cd439d5235957e5012f) )
 
-	ROM_REGION( 0x10000, "audio", 0 )					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
 	ROM_LOAD( "vt_01.bin",    0x00000, 0x08000, CRC(4616484f) SHA1(24d060218cc1542ebfc2100ecd6489a0e17b36ee) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* Sprite */
@@ -721,12 +721,12 @@ ROM_START( valtric )
 ROM_END
 
 ROM_START( butasan )
-	ROM_REGION( 0x30000, "main", 0 ) 					/* Main CPU */
+	ROM_REGION( 0x30000, "maincpu", 0 ) 					/* Main CPU */
 	ROM_LOAD( "buta-04.bin",  0x00000, 0x08000, CRC(47ff4ca9) SHA1(d89a41f6987c91d20b010f0cbda332cf54b21f8c) )
 	ROM_LOAD( "buta-03.bin",  0x10000, 0x10000, CRC(69fd88c7) SHA1(fd827d7926a2de5ffe2982b3a59ea43de00ee46b) )
 	ROM_LOAD( "buta-02.bin",  0x20000, 0x10000, CRC(519dc412) SHA1(48bbb01b217bd19c48ef7ab12c60805aaa02527c) )
 
-	ROM_REGION( 0x10000, "audio", 0 )					/* Sound CPU */
+	ROM_REGION( 0x10000, "audiocpu", 0 )					/* Sound CPU */
 	ROM_LOAD( "buta-01.bin",  0x00000, 0x10000, CRC(c9d23e2d) SHA1(cee289d5bf7626fc35808a09f9f1f4628fa16974) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )	/* Sprite */

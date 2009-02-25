@@ -205,11 +205,11 @@ static INTERRUPT_GEN( ultrsprt_vblank )
 
 static MACHINE_DRIVER_START( ultrsprt )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
+	MDRV_CPU_ADD("maincpu", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
 	MDRV_CPU_PROGRAM_MAP(ultrsprt_map, 0)
-	MDRV_CPU_VBLANK_INT("main", ultrsprt_vblank)
+	MDRV_CPU_VBLANK_INT("screen", ultrsprt_vblank)
 
-	MDRV_CPU_ADD("audio", M68000, 8000000)		/* Not sure about the frequency */
+	MDRV_CPU_ADD("audiocpu", M68000, 8000000)		/* Not sure about the frequency */
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_PERIODIC_INT(irq5_line_hold, 1)	// ???
 
@@ -219,7 +219,7 @@ static MACHINE_DRIVER_START( ultrsprt )
 	MDRV_MACHINE_START(ultrsprt)
 
  	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -260,7 +260,7 @@ ROM_START( fiveside )
 	ROM_LOAD32_BYTE("479uaa03.bin", 0x000001, 0x80000, CRC(5c0b176f) SHA1(9560259bc081d4cfd72eb485c3fdcecf484ba7a8))
 	ROM_LOAD32_BYTE("479uaa04.bin", 0x000000, 0x80000, CRC(01a3e4cb) SHA1(819df79909d57fa12481698ffdb32b00586131d8))
 
-	ROM_REGION(0x20000, "audio", 0)		/* M68K program */
+	ROM_REGION(0x20000, "audiocpu", 0)		/* M68K program */
 	ROM_LOAD("479_a05.bin", 0x000000, 0x20000, CRC(251ae299) SHA1(5ffd74357e3c6ddb3a208c39a3b32b53fea90282))
 
 	ROM_REGION(0x100000, "konami", 0)	/* Sound roms */

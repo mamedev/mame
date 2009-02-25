@@ -246,17 +246,17 @@ static DRIVER_INIT( volfied )
 static MACHINE_DRIVER_START( volfied )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, CPU_CLOCK)   /* 8MHz */
+	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
 	MDRV_CPU_PROGRAM_MAP(z80_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -286,7 +286,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( volfied )
-	ROM_REGION( 0x100000, "main", 0 )     /* 68000 code and tile data */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 68000 code and tile data */
 	ROM_LOAD16_BYTE( "c04-12-1.30", 0x00000, 0x10000, CRC(afb6a058) SHA1(fca488e86725a0a673332afeb0002f0e77ef2dbf) )
 	ROM_LOAD16_BYTE( "c04-08-1.10", 0x00001, 0x10000, CRC(19f7e66b) SHA1(51b5d0d00ec398ed717154286bec24b05c3f81b8) )
 	ROM_LOAD16_BYTE( "c04-11-1.29", 0x20000, 0x10000, CRC(1aaf6e9b) SHA1(4be643283dc78eb57e9fe4c5afebdc427e4354e8) )
@@ -306,7 +306,7 @@ ROM_START( volfied )
 	ROM_LOAD16_BYTE( "c04-09.14",  0x80001, 0x10000, CRC(c78cf057) SHA1(097982e57b1d20fbdf21986c23684adefe6f1ce1) )
 	ROM_RELOAD     (               0xa0001, 0x10000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )     /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "c04-06.71", 0x0000, 0x8000, CRC(b70106b2) SHA1(d71062f9d9b11492e13fc93982b95883f564f902) )
 
 	ROM_REGION( 0x00400, "proms", 0 )	/* unused PROMs */
@@ -315,7 +315,7 @@ ROM_START( volfied )
 ROM_END
 
 ROM_START( volfiedu )
-	ROM_REGION( 0x100000, "main", 0 )     /* 68000 code and tile data */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 68000 code and tile data */
 	ROM_LOAD16_BYTE( "c04-12-1.30", 0x00000, 0x10000, CRC(afb6a058) SHA1(fca488e86725a0a673332afeb0002f0e77ef2dbf) )
 	ROM_LOAD16_BYTE( "c04-08-1.10", 0x00001, 0x10000, CRC(19f7e66b) SHA1(51b5d0d00ec398ed717154286bec24b05c3f81b8) )
 	ROM_LOAD16_BYTE( "c04-11-1.29", 0x20000, 0x10000, CRC(1aaf6e9b) SHA1(4be643283dc78eb57e9fe4c5afebdc427e4354e8) )
@@ -335,7 +335,7 @@ ROM_START( volfiedu )
 	ROM_LOAD16_BYTE( "c04-09.14",  0x80001, 0x10000, CRC(c78cf057) SHA1(097982e57b1d20fbdf21986c23684adefe6f1ce1) )
 	ROM_RELOAD     (               0xa0001, 0x10000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )     /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "c04-06.71", 0x0000, 0x8000, CRC(b70106b2) SHA1(d71062f9d9b11492e13fc93982b95883f564f902) )
 
 	ROM_REGION( 0x00400, "proms", 0 )	/* unused PROMs */
@@ -344,7 +344,7 @@ ROM_START( volfiedu )
 ROM_END
 
 ROM_START( volfiedj )
-	ROM_REGION( 0x100000, "main", 0 )     /* 68000 code and tile data */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 68000 code and tile data */
 	ROM_LOAD16_BYTE( "c04-12-1.30", 0x00000, 0x10000, CRC(afb6a058) SHA1(fca488e86725a0a673332afeb0002f0e77ef2dbf) )
 	ROM_LOAD16_BYTE( "c04-08-1.10", 0x00001, 0x10000, CRC(19f7e66b) SHA1(51b5d0d00ec398ed717154286bec24b05c3f81b8) )
 	ROM_LOAD16_BYTE( "c04-11-1.29", 0x20000, 0x10000, CRC(1aaf6e9b) SHA1(4be643283dc78eb57e9fe4c5afebdc427e4354e8) )
@@ -364,7 +364,7 @@ ROM_START( volfiedj )
 	ROM_LOAD16_BYTE( "c04-09.14",  0x80001, 0x10000, CRC(c78cf057) SHA1(097982e57b1d20fbdf21986c23684adefe6f1ce1) )
 	ROM_RELOAD     (               0xa0001, 0x10000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )     /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "c04-06.71", 0x0000, 0x8000, CRC(b70106b2) SHA1(d71062f9d9b11492e13fc93982b95883f564f902) )
 
 	ROM_REGION( 0x00400, "proms", 0 )	/* unused PROMs */
@@ -373,7 +373,7 @@ ROM_START( volfiedj )
 ROM_END
 
 ROM_START( volfidjo )
-	ROM_REGION( 0x100000, "main", 0 )     /* 68000 code and tile data */
+	ROM_REGION( 0x100000, "maincpu", 0 )     /* 68000 code and tile data */
 	ROM_LOAD16_BYTE( "c04-12.30", 0x00000, 0x10000, CRC(e319c7ec) SHA1(e76fb872191fce0186ed0ac5066385a9913fdc4c) )
 	ROM_LOAD16_BYTE( "c04-08.10", 0x00001, 0x10000, CRC(81c6f755) SHA1(43ad72bb05d847f58b3043c674fb9b1e317691df) )
 	ROM_LOAD16_BYTE( "c04-11.29", 0x20000, 0x10000, CRC(f05696a6) SHA1(8514e5751e2f11840379e8cc6883a23cf1b3a4eb) )
@@ -393,7 +393,7 @@ ROM_START( volfidjo )
 	ROM_LOAD16_BYTE( "c04-09.14", 0x80001, 0x10000, CRC(c78cf057) SHA1(097982e57b1d20fbdf21986c23684adefe6f1ce1) )
 	ROM_RELOAD     (              0xa0001, 0x10000 )
 
-	ROM_REGION( 0x10000, "audio", 0 )     /* sound cpu */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
 	ROM_LOAD( "c04-06.71", 0x0000, 0x8000, CRC(b70106b2) SHA1(d71062f9d9b11492e13fc93982b95883f564f902) )
 
 	ROM_REGION( 0x00400, "proms", 0 )	/* unused PROMs */

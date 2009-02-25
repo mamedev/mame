@@ -125,15 +125,15 @@ static INPUT_PORTS_START( mosaicf2 )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( mosaicf2 )
-	MDRV_CPU_ADD("main", E132XN, 20000000*4)	/* 4x internal multiplier */
+	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(common_map,0)
 	MDRV_CPU_IO_MAP(mosaicf2_io,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

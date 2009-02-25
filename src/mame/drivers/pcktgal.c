@@ -29,7 +29,7 @@ extern VIDEO_UPDATE( pcktgal );
 
 static WRITE8_HANDLER( pcktgal_bank_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
 	if (data & 1) { memory_set_bankptr(space->machine, 1,&RAM[0x4000]); }
 	else { memory_set_bankptr(space->machine, 1,&RAM[0x10000]); }
@@ -234,17 +234,17 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( pcktgal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 2000000)
+	MDRV_CPU_ADD("maincpu", M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audio", M6502, 1500000)
+	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -281,13 +281,13 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 ROM_START( pcktgal )
-	ROM_REGION( 0x14000, "main", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
 	ROM_LOAD( "eb04.j7",	   0x10000, 0x4000, CRC(8215d60d) SHA1(ac26dfce7e215be21f2a17f864c5e966b8b8322e) )
 	ROM_CONTINUE(			   0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audio", 0 )	 /* 96k for code + 96k for decrypted opcodes */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* 96k for code + 96k for decrypted opcodes */
 	ROM_LOAD( "eb03.f2",	   0x10000, 0x8000, CRC(cb029b02) SHA1(fbb3da08ed05ae73fbeeb13e0e2ff735aaf83db8) )
 	ROM_CONTINUE(			   0x08000, 0x8000 )
 
@@ -304,13 +304,13 @@ ROM_START( pcktgal )
 ROM_END
 
 ROM_START( pcktgalb )
-	ROM_REGION( 0x14000, "main", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
 	ROM_LOAD( "sexybill.001", 0x10000, 0x4000, CRC(4acb3e84) SHA1(c83d03969587c6be80fb8fc84afe250907674a44) )
 	ROM_CONTINUE(			  0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audio", 0 )	 /* 96k for code + 96k for decrypted opcodes */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* 96k for code + 96k for decrypted opcodes */
 	ROM_LOAD( "eb03.f2",	   0x10000, 0x8000, CRC(cb029b02) SHA1(fbb3da08ed05ae73fbeeb13e0e2ff735aaf83db8) )
 	ROM_CONTINUE(			  0x08000, 0x8000 )
 
@@ -328,13 +328,13 @@ ROM_START( pcktgalb )
 ROM_END
 
 ROM_START( pcktgal2 )
-	ROM_REGION( 0x14000, "main", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
 	ROM_LOAD( "eb04-2.j7",   0x10000, 0x4000, CRC(0c7f2905) SHA1(882dbc1888a0149486c1fac5568dc3d297c2dadd) )
 	ROM_CONTINUE(			  0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audio", 0 )	 /* audio cpu */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* audio cpu */
 	ROM_LOAD( "eb03-2.f2",   0x10000, 0x8000, CRC(9408ffb4) SHA1(ddcb67da4acf3d986d54ad10404f213528a8bb62) )
 	ROM_CONTINUE(			  0x08000, 0x8000)
 
@@ -351,13 +351,13 @@ ROM_START( pcktgal2 )
 ROM_END
 
 ROM_START( pcktgl2j )
-	ROM_REGION( 0x14000, "main", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
 	ROM_LOAD( "eb04-2.j7",   0x10000, 0x4000, CRC(0c7f2905) SHA1(882dbc1888a0149486c1fac5568dc3d297c2dadd) )
 	ROM_CONTINUE(			  0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audio", 0 )	 /* audio cpu */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* audio cpu */
 	ROM_LOAD( "eb03-2.f2",   0x10000, 0x8000, CRC(9408ffb4) SHA1(ddcb67da4acf3d986d54ad10404f213528a8bb62) )
 	ROM_CONTINUE(			  0x08000, 0x8000)
 
@@ -374,13 +374,13 @@ ROM_START( pcktgl2j )
 ROM_END
 
 ROM_START( spool3 )
-	ROM_REGION( 0x14000, "main", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
 	ROM_LOAD( "eb04-2.j7",   0x10000, 0x4000, CRC(0c7f2905) SHA1(882dbc1888a0149486c1fac5568dc3d297c2dadd) )
 	ROM_CONTINUE(			  0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audio", 0 )	 /* audio cpu */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* audio cpu */
 	ROM_LOAD( "eb03-2.f2",   0x10000, 0x8000, CRC(9408ffb4) SHA1(ddcb67da4acf3d986d54ad10404f213528a8bb62) )
 	ROM_CONTINUE(			  0x08000, 0x8000)
 
@@ -397,13 +397,13 @@ ROM_START( spool3 )
 ROM_END
 
 ROM_START( spool3i )
-	ROM_REGION( 0x14000, "main", 0 )	 /* 64k for code + 16k for banks */
+	ROM_REGION( 0x14000, "maincpu", 0 )	 /* 64k for code + 16k for banks */
 	ROM_LOAD( "de1.bin",	  0x10000, 0x4000, CRC(a59980fe) SHA1(64b55af4d0b314d14184784e9f817b56be0f24f2) )
 	ROM_CONTINUE(			  0x04000, 0xc000)
 	/* 4000-7fff is banked but code falls through from 7fff to 8000, so */
 	/* I have to load the bank directly at 4000. */
 
-	ROM_REGION( 0x18000, "audio", 0 )	 /* audio cpu */
+	ROM_REGION( 0x18000, "audiocpu", 0 )	 /* audio cpu */
 	ROM_LOAD( "eb03-2.f2",   0x10000, 0x8000, CRC(9408ffb4) SHA1(ddcb67da4acf3d986d54ad10404f213528a8bb62) )
 	ROM_CONTINUE(			  0x08000, 0x8000)
 
@@ -424,9 +424,9 @@ ROM_END
 static DRIVER_INIT( deco222 )
 {
 	int A;
-	const address_space *space = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x10000);
-	UINT8 *rom = memory_region(machine, "audio");
+	UINT8 *rom = memory_region(machine, "audiocpu");
 
 	memory_set_decrypted_region(space, 0x8000, 0xffff, decrypted);
 
@@ -434,7 +434,7 @@ static DRIVER_INIT( deco222 )
 	for (A = 0x8000;A < 0x18000;A++)
 		decrypted[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);
 
-	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 	memory_configure_bank_decrypted(machine, 3, 0, 2, &decrypted[0x8000], 0x4000);
 }
 
@@ -444,7 +444,7 @@ static DRIVER_INIT( graphics )
 	int len = memory_region_length(machine, "gfx1");
 	int i,j,temp[16];
 
-	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 
 	/* Tile graphics roms have some swapped lines, original version only */
 	for (i = 0x00000;i < len;i += 32)

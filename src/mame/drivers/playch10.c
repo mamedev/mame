@@ -686,7 +686,7 @@ static const nes_interface nes_config =
 
 static MACHINE_DRIVER_START( playch10 )
 	// basic machine hardware
-	MDRV_CPU_ADD("main", Z80, 8000000/2)	// 4 MHz
+	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(bios_map, 0)
 	MDRV_CPU_IO_MAP(bios_io_map, 0)
 	MDRV_CPU_VBLANK_INT("top", playch10_interrupt)
@@ -747,7 +747,7 @@ MACHINE_DRIVER_END
 	ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define BIOS_CPU											\
-	ROM_REGION( 0x10000, "main", 0 )						\
+	ROM_REGION( 0x10000, "maincpu", 0 )						\
 	ROM_SYSTEM_BIOS( 0, "dual",   "Dual Monitor Version" ) \
 	ROM_LOAD_BIOS( 0, "pch1-c.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
 	ROM_SYSTEM_BIOS( 1, "single", "Single Monitor Version" ) \

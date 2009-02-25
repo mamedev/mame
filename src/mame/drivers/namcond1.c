@@ -284,15 +284,15 @@ static INTERRUPT_GEN( mcu_interrupt )
 static MACHINE_DRIVER_START( namcond1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12288000)
+	MDRV_CPU_ADD("maincpu", M68000, 12288000)
 	MDRV_CPU_PROGRAM_MAP(namcond1_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 	MDRV_CPU_PERIODIC_INT(ygv608_timed_interrupt, 1000)
 
 	MDRV_CPU_ADD("mcu", H83002, 16384000 )
 	MDRV_CPU_PROGRAM_MAP( nd1h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( nd1h8iomap, 0 )
-	MDRV_CPU_VBLANK_INT("main", mcu_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", mcu_interrupt)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START( namcond1 )
 	MDRV_MACHINE_RESET(namcond1)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60.0)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -326,7 +326,7 @@ static MACHINE_DRIVER_START( namcond1 )
 MACHINE_DRIVER_END
 
 ROM_START( ncv1 )
-	ROM_REGION( 0x100000,"main", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "nc2main0.14d", 0x00000, 0x80000, CRC(4ffc530b) SHA1(23d622d0261a3584236a77b2cefa522a0f46490e) )
 	ROM_LOAD16_WORD( "nc2main1.13d", 0x80000, 0x80000, CRC(26499a4e) SHA1(4af0c365713b4a51da684a3423b07cbb70d9599b) )
 
@@ -341,7 +341,7 @@ ROM_START( ncv1 )
 ROM_END
 
 ROM_START( ncv1j )
-	ROM_REGION( 0x100000,"main", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "nc1main0.14d",  0x00000, 0x80000, CRC(48ce0b2b) SHA1(07dfca8ba935ee0151211f9eb4d453f2da1d4bd7) )
 	ROM_LOAD16_WORD( "nc1main1.13d",  0x80000, 0x80000, CRC(49f99235) SHA1(97afde7f7dddd8538de78a74325d0038cb1217f7) )
 
@@ -356,7 +356,7 @@ ROM_START( ncv1j )
 ROM_END
 
 ROM_START( ncv1j2 )
-	ROM_REGION( 0x100000,"main", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "nc1main0b.14d", 0x00000, 0x80000, CRC(7207469d) SHA1(73faf1973a57c1bc2163e9ee3fe2febd3b8763a4) )
 	ROM_LOAD16_WORD( "nc1main1b.13d", 0x80000, 0x80000, CRC(52401b17) SHA1(60c9f20831d0101c02dafbc0bd15422f71f3ad81) )
 
@@ -371,7 +371,7 @@ ROM_START( ncv1j2 )
 ROM_END
 
 ROM_START( ncv2 )
-	ROM_REGION( 0x100000,"main", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "ncs2main0.14e", 0x00000, 0x80000, CRC(fb8a4123) SHA1(47acdfe9b5441d0e3649aaa9780e676f760c4e42) )
 	ROM_LOAD16_WORD( "ncs2main1.13e", 0x80000, 0x80000, CRC(7a5ef23b) SHA1(0408742424a6abad512b5baff63409fe44353e10) )
 
@@ -387,7 +387,7 @@ ROM_START( ncv2 )
 ROM_END
 
 ROM_START( ncv2j )
-	ROM_REGION( 0x100000,"main", 0 )		/* 16MB for Main CPU */
+	ROM_REGION( 0x100000,"maincpu", 0 )		/* 16MB for Main CPU */
 	ROM_LOAD16_WORD( "ncs1main0.14e", 0x00000, 0x80000, CRC(99991192) SHA1(e0b0e15ae23560b77119b3d3e4b2d2bb9d8b36c9) )
 	ROM_LOAD16_WORD( "ncs1main1.13e", 0x80000, 0x80000, CRC(af4ba4f6) SHA1(ff5adfdd462cfd3f17fbe2401dfc88ff8c71b6f8) )
 

@@ -569,7 +569,7 @@ INPUT_PORTS_END
 static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	VIDEO_CLOCK,					/* pixel clock */
 	1,								/* pixels per clock */
 	lethalj_scanline_update,		/* scanline update */
@@ -581,7 +581,7 @@ static const tms34010_config tms_config =
 static const tms34010_config tms_config_lethalj =
 {
 	FALSE,							/* halt on reset */
-	"main",							/* the screen operated on */
+	"screen",						/* the screen operated on */
 	VIDEO_CLOCK_LETHALJ,			/* pixel clock */
 	1,								/* pixels per clock */
 	lethalj_scanline_update,		/* scanline update */
@@ -601,12 +601,12 @@ static const tms34010_config tms_config_lethalj =
 static MACHINE_DRIVER_START( gameroom )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS34010, MASTER_CLOCK)
+	MDRV_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(lethalj_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 701, 0, 512, 263, 0, 236)
 
@@ -636,10 +636,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( lethalj )
 	MDRV_IMPORT_FROM( gameroom )
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(tms_config_lethalj)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236)
 MACHINE_DRIVER_END
 

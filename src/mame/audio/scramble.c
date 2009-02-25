@@ -46,7 +46,7 @@ static const int scramble_timer[10] =
 
 READ8_DEVICE_HANDLER( scramble_portB_r )
 {
-	return scramble_timer[(cputag_get_total_cycles(device->machine, "audio")/512) % 10];
+	return scramble_timer[(cputag_get_total_cycles(device->machine, "audiocpu")/512) % 10];
 }
 
 
@@ -75,7 +75,7 @@ static const int frogger_timer[10] =
 
 READ8_DEVICE_HANDLER( frogger_portB_r )
 {
-	return frogger_timer[(cputag_get_total_cycles(device->machine, "audio")/512) % 10];
+	return frogger_timer[(cputag_get_total_cycles(device->machine, "audiocpu")/512) % 10];
 }
 
 
@@ -428,7 +428,7 @@ static SOUND_START( ad2083 )
 
 MACHINE_DRIVER_START( ad2083_audio )
 
-	MDRV_CPU_ADD("audio", Z80, 14318000/8)	/* 1.78975 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(ad2083_sound_map,0)
 	MDRV_CPU_IO_MAP(ad2083_sound_io_map,0)
 

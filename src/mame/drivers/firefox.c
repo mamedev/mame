@@ -202,7 +202,7 @@ static TIMER_DEVICE_CALLBACK( video_timer_callback )
 {
 	video_screen_update_now(timer->machine->primary_screen);
 
-	cputag_set_input_line( timer->machine, "main", M6809_IRQ_LINE, ASSERT_LINE );
+	cputag_set_input_line( timer->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE );
 }
 
 static void set_rgba( running_machine *machine, int start, int index, unsigned char *palette_ram )
@@ -260,12 +260,12 @@ static WRITE8_HANDLER( main_to_sound_w )
 {
 	main_to_sound_flag = 1;
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine, "audio", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_reset_w )
 {
-	cputag_set_input_line(space->machine, "audio", INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 	if ((data & 0x80) != 0)
 		sound_to_main_flag = main_to_sound_flag = 0;
 }
@@ -322,7 +322,7 @@ static void riot_porta_w(const device_config *device, UINT8 newdata, UINT8 oldda
 
 static void riot_irq(const device_config *device, int state)
 {
-	cputag_set_input_line(device->machine, "audio", M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -394,17 +394,17 @@ static WRITE8_HANDLER( rom_bank_w )
 
 static WRITE8_HANDLER( main_irq_clear_w )
 {
-    cputag_set_input_line( space->machine, "main", M6809_IRQ_LINE, CLEAR_LINE );
+    cputag_set_input_line( space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( main_firq_clear_w )
 {
-    cputag_set_input_line( space->machine, "main", M6809_FIRQ_LINE, CLEAR_LINE );
+    cputag_set_input_line( space->machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( self_reset_w )
 {
-	cputag_set_input_line( space->machine, "main", INPUT_LINE_RESET, PULSE_LINE );
+	cputag_set_input_line( space->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE );
 }
 
 
@@ -430,13 +430,13 @@ static WRITE8_HANDLER( firefox_coin_counter_w )
 static void firq_gen(const device_config *device, int state)
 {
 	if (state)
-	    cputag_set_input_line( device->machine, "main", M6809_FIRQ_LINE, ASSERT_LINE );
+	    cputag_set_input_line( device->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 
 static MACHINE_START( firefox )
 {
-	memory_configure_bank(machine, 1, 0, 32, memory_region(machine, "main") + 0x10000, 0x1000);
+	memory_configure_bank(machine, 1, 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x1000);
 	nvram_1c = devtag_get_device(machine, X2212, "nvram_1c");
 	nvram_1d = devtag_get_device(machine, X2212, "nvram_1d");
 
@@ -651,12 +651,12 @@ static const riot6532_interface riot_intf =
 static MACHINE_DRIVER_START( firefox )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6809E, MASTER_XTAL/2)
+	MDRV_CPU_ADD("maincpu", M6809E, MASTER_XTAL/2)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	/* interrupts count starting at end of VBLANK, which is 44, so add 44 */
-	MDRV_TIMER_ADD_SCANLINE("32v", video_timer_callback, "main", 96+44, 128)
+	MDRV_TIMER_ADD_SCANLINE("32v", video_timer_callback, "screen", 96+44, 128)
 
-	MDRV_CPU_ADD("audio", M6502, MASTER_XTAL/8)
+	MDRV_CPU_ADD("audiocpu", M6502, MASTER_XTAL/8)
 	MDRV_CPU_PROGRAM_MAP(audio_map, 0)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
@@ -665,14 +665,14 @@ static MACHINE_DRIVER_START( firefox )
 	MDRV_WATCHDOG_TIME_INIT(HZ((double)MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
 
 	MDRV_GFXDECODE(firefox)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(firefox)
 
-	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP931, "main", "ldsound")
+	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP931, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(firefox, 64*8, 525, BITMAP_FORMAT_RGB32)
 	MDRV_LASERDISC_OVERLAY_CLIP(7*8, 53*8-1, 44, 480+44)
 
@@ -717,7 +717,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( firefox )
-	ROM_REGION( 0x30000, "main", 0 ) /* 64k for code + data & 128k for banked roms */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + data & 128k for banked roms */
 	ROM_LOAD( "136026.209",     0x04000, 0x4000, CRC(9f559f1b) SHA1(142d14cb5158ea77f6fc6d9bf0ce723842f345e2) ) /* 8b/c */
 	ROM_LOAD( "136026.210",     0x08000, 0x4000, CRC(d769b40d) SHA1(2d354649a381f3399cb0161267bd1c36a8f2bb4b) ) /* 7b/c */
 	ROM_LOAD( "136026.211",     0x0c000, 0x4000, CRC(7293ab03) SHA1(73d0d173da295ad59e431bab0a9814a71146cbc2) ) /* 6b/c */
@@ -731,7 +731,7 @@ ROM_START( firefox )
 	/* empty 2a */
 	/* empty 1a */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for code */
 	/* empty 4k/l */
 	ROM_LOAD( "136026.128",     0x08000, 0x2000, CRC(5358d870) SHA1(e8f2983a7e612e1a050a3c0b9f19b1077de4c146) ) /* 4m */
 	ROM_RELOAD( 0x0a000, 0x2000 )
@@ -759,7 +759,7 @@ ROM_START( firefox )
 ROM_END
 
 ROM_START( firefoxa )
-	ROM_REGION( 0x30000, "main", 0 ) /* 64k for code + data & 128k for banked roms */
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* 64k for code + data & 128k for banked roms */
 	ROM_LOAD( "136026.109",     0x04000, 0x4000, CRC(7639270c) SHA1(1b8f53c516d26aecb4478ac99783a37e5b1a107f)) /* 8b/c */
 	ROM_LOAD( "136026.110",     0x08000, 0x4000, CRC(f3102944) SHA1(460f18180b19b6360c99c7e70f86d745f69ba95d)) /* 7b/c */
 	ROM_LOAD( "136026.111",     0x0c000, 0x4000, CRC(8a230bb5) SHA1(0cfa1e981e4a8ccaf5903b4e761a2085b5a56181)) /* 6b/c */
@@ -772,7 +772,7 @@ ROM_START( firefoxa )
 	/* empty 2a */
 	/* empty 1a */
 
-	ROM_REGION( 0x10000, "audio", 0 ) /* 64k for code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for code */
 	/* empty 4k/l */
 	ROM_LOAD( "136026.113",     0x08000, 0x4000, CRC(90988b3b) SHA1(7571cf6b7e9e3e22f930d9ba991b730e734edfb7)) /* 4m */
 	ROM_LOAD( "136026.114",     0x0c000, 0x4000, CRC(1437ce14) SHA1(eef14172b3935a4afb3470852f93d30926b139e4)) /* 4n */

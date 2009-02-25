@@ -53,11 +53,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( tarzan )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80,8000000)		 /* ? */
+	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(tarzan_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -73,7 +73,7 @@ MACHINE_DRIVER_END
 
 DRIVER_INIT( tarzan )
 {
-	UINT16* ROM = (UINT16*)memory_region(machine,"main");
+	UINT16* ROM = (UINT16*)memory_region(machine,"maincpu");
 	int i;
 	int size = 0x040000;
 
@@ -112,7 +112,7 @@ DRIVER_INIT( tarzan )
 }
 
 ROM_START( tarzan )
-	ROM_REGION( 0x040000, "main", 0 )
+	ROM_REGION( 0x040000, "maincpu", 0 )
 	ROM_LOAD( "0228-u16.bin", 0x00000, 0x040000, CRC(e6c552a5) SHA1(f156de9459833474c85a1f5b35917881b390d34c)  )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
