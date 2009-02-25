@@ -165,8 +165,18 @@ WRITE8_HANDLER( goldstar_fa00_w )
 
 	/* bit 2 selects background gfx color (I think) */
 	bgcolor = (data & 0x04) >> 2;
+	tilemap_mark_all_tiles_dirty (goldstar_reel1_tilemap);
+	tilemap_mark_all_tiles_dirty (goldstar_reel2_tilemap);
+	tilemap_mark_all_tiles_dirty (goldstar_reel3_tilemap);	
 }
 
+WRITE8_HANDLER( cm_background_col_w )
+{
+	bgcolor = (data & 0x03) >> 0;
+	tilemap_mark_all_tiles_dirty (goldstar_reel1_tilemap);
+	tilemap_mark_all_tiles_dirty (goldstar_reel2_tilemap);
+	tilemap_mark_all_tiles_dirty (goldstar_reel3_tilemap);	
+}
 
 // are these hardcoded, or registers?
 static const rectangle visible1 = { 0*8, (14+48)*8-1,  4*8,  (4+7)*8-1 };

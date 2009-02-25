@@ -113,6 +113,7 @@ extern WRITE8_HANDLER( goldstar_fg_vidram_w );
 extern WRITE8_HANDLER( goldstar_fg_atrram_w );
 
 WRITE8_HANDLER( goldstar_fa00_w );
+WRITE8_HANDLER( cm_background_col_w );
 VIDEO_START( goldstar );
 VIDEO_START( cherrym );
 VIDEO_UPDATE( goldstar );
@@ -289,9 +290,9 @@ static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
-	AM_RANGE(0x11, 0x11) AM_WRITENOP
+//	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)	/* output port */
-	AM_RANGE(0x13, 0x13) AM_WRITENOP	/* seems control for an extra PPI device */
+	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
 ADDRESS_MAP_END
 
 
@@ -313,7 +314,7 @@ static ADDRESS_MAP_START( amcoe1_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)	/* output port */
-	AM_RANGE(0x13, 0x13) AM_WRITENOP	/* seems control for an extra PPI device */
+	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
 ADDRESS_MAP_END
 
@@ -326,7 +327,7 @@ static ADDRESS_MAP_START( amcoe2_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)	/* output port */
-	AM_RANGE(0x13, 0x13) AM_WRITENOP	/* seems control for an extra PPI device */
+	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
 ADDRESS_MAP_END
 
 
