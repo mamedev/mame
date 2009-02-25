@@ -846,7 +846,7 @@ static void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 
 static void circle(INT16 sx, INT16 sy, UINT16 r, INT16 col)
 {
-	const float DEG2RAD = 3.14159/180;
+	const float DEG2RAD = (float)3.14159/180;
 	int i;
 	for (i = 0; i < 360 * (r / 10); i++)
 	{
