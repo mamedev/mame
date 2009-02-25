@@ -376,6 +376,51 @@ ROM_START( grandprx )	/* CPU and clock should be changed for this game */
 	ROM_LOAD( "u3.bin", 0x00000, 0x80000, CRC(c9bb5858) SHA1(c154df7c7dfe394fc1963dc0c73f1d909f5b62ee) )
 ROM_END
 
+/*
+
+Super Jolly
+
+CPU:
+
+1x M30624FGAFP-03001A4 (u1)(main)(not dumped)
+1x OKI M6295 (u28)(sound)
+1x TDA2003 (sound)
+1x LM358M (u33)(sound)
+1x oscillator 16.000MHz (osc1)
+
+ROMs:
+
+1x MX26C1000A (u29)
+3x M27C4001 (u23,u24,u25)
+1x ST93C46 (u35)(not dumped)
+2x ispLSI1032E-70LJ (PLD)(not dumped)
+
+Note:
+1x JAMMA edge connector (JP11)
+1x RS232 connector (JP15) (along with an ST232C controller (u34)
+1x 4 legs connector (jp18)
+1x red led (d3)
+1x battery (bt1)
+1x trimmer (r9) (volume)
+1x trimmer (RVTRIMMER10KHOM)
+1x pushbutton (s1)
+
+*/
+
+ROM_START( supjolly )	/* CPU and clock should be changed for this game */
+	ROM_REGION( 0x1000000, "maincpu", 0 )	/* all the program code is in here */
+	ROM_LOAD( "supjolly_m30624fgafp.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, "gfx1", 0 )	/* different encoded gfx */
+	ROM_LOAD( "1.u23", 0x000000, 0x80000, CRC(feb4ef88) SHA1(5a86e92326096e4e0619a8aa6b491553eb46839d) )
+	ROM_LOAD( "2.u24", 0x080000, 0x80000, CRC(83b2dab0) SHA1(a65cae227a444fe7474f8f821dbb6a8b506e4ae6) )
+	ROM_LOAD( "3.u25", 0x100000, 0x80000, CRC(3648fcc4) SHA1(c3c4a4f47866783589ca7124efa30c7e902423c1) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* M6295 samples, identical halves */
+	ROM_LOAD( "saws.u29", 0x00000, 0x20000, CRC(e8612586) SHA1(bf536597a4cf1af5e9f701f2ecd1718320c06edd) )
+ROM_END
+
+
 
 /*************************
 *      Game Drivers      *
@@ -384,3 +429,4 @@ ROM_END
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT ROT    COMPANY        FULLNAME        FLAGS  */
 GAME( 200?, ejollyx5, 0,      itgambl3, itgambl3, 0,   ROT0, "Solar Games", "Euro Jolly X5", GAME_NOT_WORKING )
 GAME( 200?, grandprx, 0,      itgambl3, itgambl3, 0,   ROT0, "4fun",        "Grand Prix",    GAME_NOT_WORKING )
+GAME( 200?, supjolly, 0,      itgambl3, itgambl3, 0,   ROT0, "<unknown>",   "Super Jolly",   GAME_NOT_WORKING )

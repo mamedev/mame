@@ -8453,9 +8453,8 @@ Other Sun games
 	DRIVER( madzoo )	/* (c) 1995 Bordun International */
 	DRIVER( leader )	/* Bootleg? */
 	DRIVER( livequiz )	/* (c) 1999 Andamiro */
-	DRIVER( cowrace )	/* (c) 19?? unknown */
+	DRIVER( cowrace )	/* (c) 20?? hack */
 	DRIVER( discoboy )	/* (c) 1993 Soft Art Co. */
-	DRIVER( steaser )
 	DRIVER( pangofun )	/* (c) 1995 InfoCube */
 	DRIVER( 2mindril )	/* (c) 1993 Taito */
 	DRIVER( koikoi )	/* (c) 1983 Kiwako */
@@ -8566,14 +8565,18 @@ Other Sun games
  	DRIVER( cfever1k )	/* (c) 2000 High Video */
  	DRIVER( girotutt )	/* (c) 2000 High Video */
 
-	/* M68k based italian gambling games */
-	DRIVER( ilpag )		/* (c) 19?? unknown */
+	/* M68k-based gambling games */
+	DRIVER( steaser )   /* (c) 1993 unknown */
+	DRIVER( ilpag )		/* (c) 199? unknown */
+
+	/* Sure games */
 	DRIVER( mil4000 )	/* (c) 2000 Sure Milano */
 	DRIVER( mil4000a )	/* (c) 2000 Sure Milano */
 
 	/* Mitsubishi/Renesas M16/62A italian gambling games */
 	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */
-	DRIVER( grandprx )	/* (c) 4fun */
+	DRIVER( grandprx )	/* (c) 200? 4fun */
+	DRIVER( supjolly )  /* (c) 200? unknown */
 
 	/* Astro Corp. */
 	DRIVER( showhand )	/* (c) 1999? Astro Corp. */
