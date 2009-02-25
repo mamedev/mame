@@ -1117,7 +1117,7 @@ ROM_START( peset038 ) /* Normal board : Set Chip (Set038) */
 ROM_END
 
 ROM_START( pepp0043 ) /* Normal board : 10's or Better (PP0043) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0043.u68",   0x00000, 0x10000, CRC(04051a88) SHA1(e7a9ec2ab7f6f575245d47ee10a03f39c887d1b3) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
@@ -1426,7 +1426,7 @@ ROM_START( pexmp006 ) /* Superboard : Multi-Poker (XMP00006) */
 ROM_END
 
 ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00017.u67",   0x00000, 0x10000, CRC(129e6eaa) SHA1(1dd2b83a672a618f338b553a6cbd598b6d4ce672) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
