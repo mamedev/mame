@@ -1042,7 +1042,7 @@ ROM_START( mtrap )
 	ROM_LOAD( "mta6a.bin",   0x7000, 0x0800, CRC(c00f0c05) SHA1(398b0bc2a7e54b1e2326ed067bf6bb15cc52ed39) )
 	ROM_LOAD( "mta7a.bin",   0x7800, 0x0800, CRC(f3f16ca7) SHA1(3928c5da246c43036a7b4cbb140a1734d5f1fb03) )
 
-	ROM_REGION( 0x4000, "cvsd", 0 ) /* 16k for digital sound processor */
+	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
 	ROM_LOAD( "mta2a.bin",   0x0000, 0x1000, CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
 	ROM_LOAD( "mta3a.bin",   0x1000, 0x1000, CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
 	ROM_LOAD( "mta4a.bin",   0x2000, 0x1000, CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
@@ -1067,7 +1067,7 @@ ROM_START( mtrap3 )
 	ROM_LOAD( "mta6a.bin",   0x7000, 0x0800, CRC(c00f0c05) SHA1(398b0bc2a7e54b1e2326ed067bf6bb15cc52ed39) )
 	ROM_LOAD( "mta7a.bin",   0x7800, 0x0800, CRC(f3f16ca7) SHA1(3928c5da246c43036a7b4cbb140a1734d5f1fb03) )
 
-	ROM_REGION( 0x4000, "cvsd", 0 ) /* 16k for digital sound processor */
+	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
 	ROM_LOAD( "mta2a.bin",   0x0000, 0x1000, CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
 	ROM_LOAD( "mta3a.bin",   0x1000, 0x1000, CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
 	ROM_LOAD( "mta4a.bin",   0x2000, 0x1000, CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )
@@ -1092,7 +1092,7 @@ ROM_START( mtrap4 )
 	ROM_LOAD( "mta6a.bin",    0x7000, 0x0800, CRC(c00f0c05) SHA1(398b0bc2a7e54b1e2326ed067bf6bb15cc52ed39) )
 	ROM_LOAD( "mta7a.bin",    0x7800, 0x0800, CRC(f3f16ca7) SHA1(3928c5da246c43036a7b4cbb140a1734d5f1fb03) )
 
-	ROM_REGION( 0x4000, "cvsd", 0 ) /* 16k for digital sound processor */
+	ROM_REGION( 0x4000, "cvsdcpu", 0 ) /* 16k for digital sound processor */
 	ROM_LOAD( "mta2a.bin",    0x0000,0x1000,CRC(13db8ed3) SHA1(939352323bdcd7df25db5eb2e30f269bcaebe6af) )
 	ROM_LOAD( "mta3a.bin",    0x1000,0x1000,CRC(31bdfe5c) SHA1(b10bfe9e56dd617c5b4cd8b5bfec9c7f537b1086) )
 	ROM_LOAD( "mta4a.bin",    0x2000,0x1000,CRC(1502d0e8) SHA1(8ef51ad4601299016f1821a5c65bec0199dd5474) )

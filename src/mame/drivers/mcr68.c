@@ -1009,7 +1009,7 @@ ROM_START( zwackery )
 	ROM_LOAD16_BYTE( "pro12.bin",  0x30000, 0x4000, CRC(e2d25e1f) SHA1(5d8ff303441eccf431422b453a173983a4513630) )
 	ROM_LOAD16_BYTE( "pro13.bin",  0x30001, 0x4000, CRC(e131f9b8) SHA1(08b131f2acc84d4c2c931bfd24e7de3d92a8a817) )
 
-	ROM_REGION( 0x20000, "csd", 0 )
+	ROM_REGION( 0x20000, "csdcpu", 0 )
 	ROM_LOAD16_BYTE( "csd7.bin",  0x00000, 0x2000, CRC(5501f54b) SHA1(84c0851fb868e81400cfe3ebfd7b91fe98a47bac) )
 	ROM_LOAD16_BYTE( "csd17.bin", 0x00001, 0x2000, CRC(2e482580) SHA1(92bd3e64ff580800ee16579d97bcb8b3bd9f755c) )
 	ROM_LOAD16_BYTE( "csd8.bin",  0x04000, 0x2000, CRC(13366575) SHA1(bcf25a7d4c6b2ccd7cd9978edafc66ef0cadfe72) )
@@ -1061,7 +1061,7 @@ ROM_START( xenophob )
 	ROM_LOAD16_BYTE( "xeno_pro.2c",  0x20000, 0x10000, CRC(e45bf669) SHA1(52b0ffd2311e4d300410de57fbddacab4b9857a1) )
 	ROM_LOAD16_BYTE( "xeno_pro.2b",  0x20001, 0x10000, CRC(da5d39d5) SHA1(f61b239eb3108faec2f3dbb8139c8d01b0e29873) )
 
-	ROM_REGION( 0x40000, "sg", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
 	ROM_LOAD16_BYTE( "xeno_snd.u7",  0x00000, 0x10000, CRC(77561d15) SHA1(8c23a9270d54be6380f2d23939b6c6d8c31e334b) )
 	ROM_LOAD16_BYTE( "xeno_snd.u17", 0x00001, 0x10000, CRC(837a1a71) SHA1(d7d60ef1fd11e5e84dd1ffb9a077686bd2fb452e) )
 	ROM_LOAD16_BYTE( "xeno_snd.u8",  0x20000, 0x10000, CRC(6e2915c7) SHA1(df1f35f6b743afbab0a3a29adce3639a8c9dc66f) )
@@ -1096,11 +1096,11 @@ ROM_START( spyhunt2 )
 	ROM_LOAD16_BYTE( "sh22c.bin",  0x20000, 0x10000, CRC(8ee65009) SHA1(6adb00888f739b59e3ace1a6eaf1c58c4583d7fd) )
 	ROM_LOAD16_BYTE( "sh22b.bin",  0x20001, 0x10000, CRC(850c21ad) SHA1(3b944545cb469e2c53166a91eb2834c5f3891ddf) )
 
-	ROM_REGION( 0x10000, "tcs", 0 )  /* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcscpu", 0 )  /* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "turbo-cs.u5", 0x08000, 0x4000, CRC(4b1d8a66) SHA1(a1a2f9fe3fc42b668ec97ad6c6ea6032f1dc0695) )
 	ROM_LOAD( "turbo-cs.u4", 0x0c000, 0x4000, CRC(3722ce48) SHA1(ae064be590c067bda66ca7a72c212ad47f3eb1c5) )
 
-	ROM_REGION( 0x40000, "sg", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
 	ROM_LOAD16_BYTE( "sh2u7.bin",  0x00000, 0x10000, CRC(02362ea4) SHA1(2d37f06c9156554b8140ed565f6fdd1ef67bb54f) )
 	ROM_LOAD16_BYTE( "sh2u17.bin", 0x00001, 0x10000, CRC(e29a2c37) SHA1(e0d4df90b533d3325c905d42ddc6876667f32c82) )
 
@@ -1133,11 +1133,11 @@ ROM_START( spyhnt2a )
 	ROM_LOAD16_BYTE( "2c",  0x20000, 0x10000, CRC(bc834f3f) SHA1(05f6ab508ce2ebe55665e97114070e9d81db48c8) )
 	ROM_LOAD16_BYTE( "2b",  0x20001, 0x10000, CRC(8a9f7ef3) SHA1(353ebb0a3782c183cc9be800584903e23ca507d9) )
 
-	ROM_REGION( 0x10000, "tcs", 0 )  /* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcscpu", 0 )  /* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "turbo-cs.u5", 0x08000, 0x4000, CRC(4b1d8a66) SHA1(a1a2f9fe3fc42b668ec97ad6c6ea6032f1dc0695) )
 	ROM_LOAD( "turbo-cs.u4", 0x0c000, 0x4000, CRC(3722ce48) SHA1(ae064be590c067bda66ca7a72c212ad47f3eb1c5) )
 
-	ROM_REGION( 0x40000, "sg", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
 	ROM_LOAD16_BYTE( "sh2u7.bin",  0x00000, 0x10000, CRC(02362ea4) SHA1(2d37f06c9156554b8140ed565f6fdd1ef67bb54f) )
 	ROM_LOAD16_BYTE( "sh2u17.bin", 0x00001, 0x10000, CRC(e29a2c37) SHA1(e0d4df90b533d3325c905d42ddc6876667f32c82) )
 
@@ -1170,7 +1170,7 @@ ROM_START( blasted )
 	ROM_LOAD16_BYTE( "2c",  0x20000, 0x10000, CRC(026f30bf) SHA1(de327ab5bd4dc9456fa5a91f3ccd293b3ab8c5c2) )
 	ROM_LOAD16_BYTE( "2b",  0x20001, 0x10000, CRC(8e0e91a9) SHA1(2dc2927a1fd552ead446606a902a2ba0c4595798) )
 
-	ROM_REGION( 0x40000, "sg", 0 )  /* Sounds Good board */
+	ROM_REGION( 0x40000, "sgcpu", 0 )  /* Sounds Good board */
 	ROM_LOAD16_BYTE( "blasted.u7",  0x00000, 0x10000, CRC(8d7c8ef6) SHA1(a414e91c20202f800f3e01e4c430e3f99e3df5bb) )
 	ROM_LOAD16_BYTE( "blasted.u17", 0x00001, 0x10000, CRC(c79040b9) SHA1(e6fa173ff5fb681ddfef831f1ef237a7c4303f32) )
 	ROM_LOAD16_BYTE( "blasted.u8",  0x20000, 0x10000, CRC(c53094c0) SHA1(8c54cefe8030bf18b9585008a4a6cf8a7dc23f71) )
@@ -1205,7 +1205,7 @@ ROM_START( archrivl )
 	ROM_LOAD16_BYTE( "2c-rev2",  0x20000, 0x10000, CRC(cc2893f7) SHA1(44931299cb98e27ac2f11b3922da76895fbfe0a7) )
 	ROM_LOAD16_BYTE( "2b-rev2",  0x20001, 0x10000, CRC(fa977050) SHA1(67c66995da755401162f7e668b97eb42ac769ec0) )
 
-	ROM_REGION( 0x90000, "cvsd", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
 	ROM_LOAD( "u4.snd",  0x10000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) )
 	ROM_RELOAD(          0x18000, 0x08000 )
 	ROM_RELOAD(          0x20000, 0x08000 )
@@ -1252,7 +1252,7 @@ ROM_START( archriv2 )
 	ROM_LOAD16_BYTE( "archrivl.3",  0x20000, 0x10000, CRC(d6d08ff7) SHA1(bbbd4b5c3218c9bb461b17e536191d40ab39f67c) )
 	ROM_LOAD16_BYTE( "archrivl.1",  0x20001, 0x10000, CRC(92f3a43d) SHA1(45fdcbacd65f5898d54cc2ac95639b7ee2c097e6) )
 
-	ROM_REGION( 0x90000, "cvsd", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
 	ROM_LOAD( "u4.snd",  0x10000, 0x08000, CRC(96b3c652) SHA1(1bb576d0bf6b6b8df24e7b9352a33e97dd8ebdcb) )
 	ROM_RELOAD(          0x18000, 0x08000 )
 	ROM_RELOAD(          0x20000, 0x08000 )
@@ -1299,7 +1299,7 @@ ROM_START( pigskin )
 	ROM_LOAD16_BYTE( "pigskin.a6",  0x20000, 0x10000, CRC(4d8b7e50) SHA1(9e5d0edf1603e11f22d3129a2b8865ebcb5e27f9) )
 	ROM_LOAD16_BYTE( "pigskin.b6",  0x20001, 0x10000, CRC(1194f187) SHA1(e7cebe5322a5c8e382b6773939be5bc88492f289) )
 
-	ROM_REGION( 0x90000, "cvsd", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
 	ROM_LOAD( "pigskin.u4",  0x10000, 0x10000, CRC(6daf2d37) SHA1(4c8098520fe44e36b01389bcfcfe3ad1d027cbde) )
 	ROM_RELOAD(              0x20000, 0x10000 )
 	ROM_LOAD( "pigskin.u19", 0x30000, 0x10000, CRC(56fd16a3) SHA1(b91aabdbd3185355f2b7177fc4d3a86fa110f51d) )
@@ -1326,7 +1326,7 @@ ROM_START( trisport )
 	ROM_LOAD16_BYTE( "la3.a6",  0x20000, 0x10000, CRC(9c6a1398) SHA1(ee115d9207f3a9034b7c9eccd2ff151d9c923c9a) )
 	ROM_LOAD16_BYTE( "la3.b6",  0x20001, 0x10000, CRC(597b564c) SHA1(090da3ec0c86035cc41a9caea182b8a5419c3be9) )
 
-	ROM_REGION( 0x90000, "cvsd", 0 )  /* Audio System board */
+	ROM_REGION( 0x90000, "cvsdcpu", 0 )  /* Audio System board */
 	ROM_LOAD( "sl1-snd.u4",  0x10000, 0x10000, CRC(0ed8c904) SHA1(21292a001c4c44f87b8782c706e5c346b767cd6b) )
 	ROM_RELOAD(              0x20000, 0x10000 )
 	ROM_LOAD( "sl1-snd.u19", 0x30000, 0x10000, CRC(b57d7d7e) SHA1(483f718f1cc4549baf5696935532d30803254a19) )

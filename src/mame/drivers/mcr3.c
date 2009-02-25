@@ -1167,7 +1167,7 @@ ROM_START( demoderm )
 	ROM_LOAD( "pro1.5b",      0x08000, 0x8000, CRC(034c00fc) SHA1(0f0e8f123a34c330021bce76ed7f38bcb2e9af4e) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x10000, "tcs", 0 )	/* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcscpu", 0 )	/* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "tcs_u5.bin",   0x0c000, 0x2000, CRC(eca33b2c) SHA1(938b021ea3b0f23aed7a98a930a58af371a02303) )
 	ROM_LOAD( "tcs_u4.bin",   0x0e000, 0x2000, CRC(3490289a) SHA1(a9d56ea60bb901267da41ab408f8e1ed3742b0ac) )
 
@@ -1193,7 +1193,7 @@ ROM_START( sarge )
 	ROM_LOAD( "cpu_5b.bin",   0x08000, 0x8000, CRC(6800e746) SHA1(018c2b622b3654530ebc2c299b3f745777163d4b) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x10000, "tcs", 0 )  /* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcscpu", 0 )  /* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "tcs_u5.bin",   0xc000, 0x2000, CRC(a894ef8a) SHA1(7f53927fc185fff8ba1b1747f0d565e089d879e6) )
 	ROM_LOAD( "tcs_u4.bin",   0xe000, 0x2000, CRC(6ca6faf3) SHA1(4647e633dd11f55a65c3acf81adeb3af93624991) )
 
@@ -1215,7 +1215,7 @@ ROM_START( maxrpm )
 	ROM_LOAD( "pro.1",        0x08000, 0x8000, CRC(f628bb30) SHA1(0514906b9764a7f02a730a610affea4d42a4510d) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x10000, "tcs", 0 )  /* 64k for the Turbo Cheap Squeak */
+	ROM_REGION( 0x10000, "tcscpu", 0 )  /* 64k for the Turbo Cheap Squeak */
 	ROM_LOAD( "turbskwk.u5",   0x8000, 0x4000, CRC(55c3b759) SHA1(89d690a007a996e9c7df7b365942e4da755d15d7) )
 	ROM_LOAD( "turbskwk.u4",   0xc000, 0x4000, CRC(31a2da2e) SHA1(582434b5d6bc8e84f39191976d8aa0ef9245f253) )
 
@@ -1237,7 +1237,7 @@ ROM_START( rampage )
 	ROM_LOAD( "pro1rev3.5b",  0x08000, 0x8000, CRC(d89bd9a4) SHA1(3531464ffe49dfaf2755d9e2dc1aea23819b3a5d) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x40000, "sg", 0 )  /* 256k for the Sounds Good board */
+	ROM_REGION( 0x40000, "sgcpu", 0 )  /* 256k for the Sounds Good board */
 	ROM_LOAD16_BYTE( "ramp_u7.snd",  0x00000, 0x8000, CRC(cffd7fa5) SHA1(7c5cecce1d428f847fea37d53eb09c6f62055c6f) )	/* these are Revision 2 sound ROMs */
 	ROM_LOAD16_BYTE( "ramp_u17.snd", 0x00001, 0x8000, CRC(e92c596b) SHA1(4e2d87398f2e7b637cbad6cb16d832dfa8f8288c) )
 	ROM_LOAD16_BYTE( "ramp_u8.snd",  0x10000, 0x8000, CRC(11f787e4) SHA1(1fa195bf9169608099d17be5801738a4e17bec3d) )
@@ -1261,7 +1261,7 @@ ROM_START( rampage2 )
 	ROM_LOAD( "pro1rev2.5b",  0x08000, 0x8000, CRC(58523d75) SHA1(5cd512864568ec7793bda0164f21e7d72a7ea817) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x40000, "sg", 0 )  /* 256k for the Sounds Good board */
+	ROM_REGION( 0x40000, "sgcpu", 0 )  /* 256k for the Sounds Good board */
 	ROM_LOAD16_BYTE( "ramp_u7.snd",  0x00000, 0x8000, CRC(cffd7fa5) SHA1(7c5cecce1d428f847fea37d53eb09c6f62055c6f) )    /* these are Revision 2 sound ROMs */
 	ROM_LOAD16_BYTE( "ramp_u17.snd", 0x00001, 0x8000, CRC(e92c596b) SHA1(4e2d87398f2e7b637cbad6cb16d832dfa8f8288c) )
 	ROM_LOAD16_BYTE( "ramp_u8.snd",  0x10000, 0x8000, CRC(11f787e4) SHA1(1fa195bf9169608099d17be5801738a4e17bec3d) )
@@ -1285,7 +1285,7 @@ ROM_START( powerdrv )
 	ROM_LOAD( "pdrv5b.bin",   0x08000, 0x8000, CRC(fa0544ad) SHA1(55a9cf8c8648761443e4a5a3b214f4d6236cbaff) )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x40000, "sg", 0 )  /* 256k for the Sounds Good board */
+	ROM_REGION( 0x40000, "sgcpu", 0 )  /* 256k for the Sounds Good board */
 	ROM_LOAD16_BYTE( "pdsndu7.bin",  0x00000, 0x8000, CRC(78713e78) SHA1(11382c024536f743e051ba208ae02d0f5e07cf5e) )
 	ROM_LOAD16_BYTE( "pdsndu17.bin", 0x00001, 0x8000, CRC(c41de6e4) SHA1(0391afd96ee80dd1d4a34e661e5df1e01fbbd57a) )
 	ROM_LOAD16_BYTE( "pdsndu8.bin",  0x10000, 0x8000, CRC(15714036) SHA1(77ca5f703eb7f146e13d9c01f4427f6aaa31df39) )
@@ -1309,7 +1309,7 @@ ROM_START( stargrds )
 	ROM_LOAD( "pro-1.5b",  0x08000, 0x8000, CRC(dba428b0) SHA1(72efa2f02e95f05a5503ced136fbdf3fcdf57554) )
 	ROM_FILL(              0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
-	ROM_REGION( 0x40000, "sg", 0 )  /* 256k for the Sounds Good board */
+	ROM_REGION( 0x40000, "sgcpu", 0 )  /* 256k for the Sounds Good board */
 	ROM_LOAD16_BYTE( "snd0.u7",      0x00000, 0x8000, CRC(7755a493) SHA1(a888fba45a2a31de5b3082bfc5ccef94dafc4d16) )
 	ROM_LOAD16_BYTE( "snd1.u17",     0x00001, 0x8000, CRC(d98d14ae) SHA1(51dbb97655ab8a389ca67f0e796ab57894f5bb32) )
 
@@ -1334,11 +1334,11 @@ ROM_START( spyhunt )
 	ROM_LOAD( "cpu_pg4.10d",  0x8000, 0x2000, CRC(a3033c15) SHA1(e9811450a7c952561912777d679fe45a6b5a794a) )
 	ROM_LOAD( "cpu_pg5.11d",  0xa000, 0x4000, CRC(53a4f7cd) SHA1(051b07ae993e14b329507710c0f7cadaa952f9ae) )
 
-	ROM_REGION( 0x10000, "ssio", 0 )
+	ROM_REGION( 0x10000, "ssiocpu", 0 )
 	ROM_LOAD( "snd_0sd.a8",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
 	ROM_LOAD( "snd_1sd.a7",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
-	ROM_REGION( 0x8000, "csd", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csdcpu", 0 )  /* 32k for the Chip Squeak Deluxe */
 	ROM_LOAD16_BYTE( "csd_u7a.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
 	ROM_LOAD16_BYTE( "csd_u17b.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
 	ROM_LOAD16_BYTE( "csd_u8c.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
@@ -1377,11 +1377,11 @@ ROM_START( spyhuntp )
 	ROM_LOAD( "sh_mb_6.bin",  0x8000, 0x2000, CRC(8cbf04d8) SHA1(e45cb36935367e46ea41de0177b3453cd8bdce85) )
 	ROM_LOAD( "cpu_pg5.11d",  0xa000, 0x4000, CRC(53a4f7cd) SHA1(051b07ae993e14b329507710c0f7cadaa952f9ae) )
 
-	ROM_REGION( 0x10000, "ssio", 0 )
+	ROM_REGION( 0x10000, "ssiocpu", 0 )
 	ROM_LOAD( "snd_0sd.a8",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
 	ROM_LOAD( "snd_1sd.a7",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
-	ROM_REGION( 0x8000, "csd", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csdcpu", 0 )  /* 32k for the Chip Squeak Deluxe */
 	ROM_LOAD16_BYTE( "csd_u7a.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
 	ROM_LOAD16_BYTE( "csd_u17b.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
 	ROM_LOAD16_BYTE( "csd_u8c.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
@@ -1419,7 +1419,7 @@ ROM_START( crater )
 	ROM_LOAD( "crcpu.9d",     0x6000, 0x2000, CRC(a03c4b11) SHA1(6a442a0828942dc51dbe0d3f19be855a52c12f39) )
 	ROM_LOAD( "crcpu.10d",    0x8000, 0x2000, CRC(44ae4cbd) SHA1(2188bf697f1b3fcbb2ad6cbd4d9098e3b8d56a95) )
 
-	ROM_REGION( 0x10000, "ssio", 0 )
+	ROM_REGION( 0x10000, "ssiocpu", 0 )
 	ROM_LOAD( "crsnd4.a7",    0x0000, 0x1000, CRC(fd666cb5) SHA1(257174266e264db8ac9af5f2296fd0a22847f85f) )
 	ROM_LOAD( "crsnd1.a8",    0x1000, 0x1000, CRC(90bf2c4c) SHA1(7adfbf2251b5d46043d614554320e2fe544cc570) )
 	ROM_LOAD( "crsnd2.a9",    0x2000, 0x1000, CRC(3b8deef1) SHA1(a14186a33a7b5ca07086ce44fb1c8c64900654d0) )
@@ -1459,9 +1459,9 @@ ROM_START( turbotag )
 	ROM_LOAD( "ttprog5.bin",  0xa000, 0x2000, CRC(11e62fe4) SHA1(72897702c61486b654e4b4a3f6560c144c862e1f) )
 	ROM_RELOAD(               0xc000, 0x2000 )
 
-	ROM_REGION( 0x10000, "ssio", ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, "ssiocpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x8000, "csd", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csdcpu", 0 )  /* 32k for the Chip Squeak Deluxe */
 	ROM_LOAD16_BYTE( "ttu7.bin",  0x00000, 0x2000, CRC(8ebb3302) SHA1(c516abdae6eea524a6d2a039ed9bd7dff72ab986) )
 	ROM_LOAD16_BYTE( "ttu17.bin", 0x00001, 0x2000, CRC(605d6c74) SHA1(a6c2bc95cca372fa823ab256c9dd1f92b6ba45fd) )
 	ROM_LOAD16_BYTE( "ttu8.bin",  0x04000, 0x2000, CRC(6bfcb22a) SHA1(7b895e3ae1e99f195bb32b052f801b58c63a401c) )

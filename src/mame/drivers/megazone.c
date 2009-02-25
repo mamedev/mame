@@ -317,7 +317,7 @@ static MACHINE_DRIVER_START( megazone )
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("dac", I8039,14318000/2)	/* 1/2 14MHz crystal */
+	MDRV_CPU_ADD("daccpu", I8039,14318000/2)	/* 1/2 14MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
 	MDRV_CPU_IO_MAP(i8039_io_map,0)
 
@@ -377,7 +377,7 @@ ROM_START( megazone )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319e02.bin",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
-	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
+	ROM_REGION( 0x1000, "daccpu", 0 )     /* 4k for the 8039 DAC CPU */
 	ROM_LOAD( "319e01.bin",   0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -409,7 +409,7 @@ ROM_START( megaznik )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319e02.bin",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
-	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
+	ROM_REGION( 0x1000, "daccpu", 0 )     /* 4k for the 8039 DAC CPU */
 	ROM_LOAD( "319e01.bin",   0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -492,7 +492,7 @@ ROM_START( megazona )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319-h02",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
-	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
+	ROM_REGION( 0x1000, "daccpu", 0 )     /* 4k for the 8039 DAC CPU */
 	ROM_LOAD( "319-h01",   0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) ) // same as e01?
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -524,7 +524,7 @@ ROM_START( megazonb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319-h02",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
-	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
+	ROM_REGION( 0x1000, "daccpu", 0 )     /* 4k for the 8039 DAC CPU */
 	ROM_LOAD( "319-h01",   0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) ) // same as e01?
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
@@ -556,7 +556,7 @@ ROM_START( megazonc )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "319-h02",   0x0000, 0x2000, CRC(d5d45edb) SHA1(3808d1b58fe152f8f5b49bf0aa40c53e9c9dd4bd) )
 
-	ROM_REGION( 0x1000, "dac", 0 )     /* 4k for the 8039 DAC CPU */
+	ROM_REGION( 0x1000, "daccpu", 0 )     /* 4k for the 8039 DAC CPU */
 	ROM_LOAD( "319-h01",   0x0000, 0x1000, CRC(ed5725a0) SHA1(64f54621487291fbfe827fb4cecca299fd0db781) ) // same as e01?
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )

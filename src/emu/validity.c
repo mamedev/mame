@@ -594,7 +594,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 			if (ROMENTRY_ISREGION(romp))
 			{
 				const char *regiontag = ROMREGION_GETTAG(romp);
-
+				
 				/* if we haven't seen any items since the last region, print a warning */
 				if (items_since_region == 0)
 					mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
@@ -681,18 +681,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 						break;
 					}
 
-				/* if this is a bios rom, make sure it has the same flags as the last system bios entry */
-/*              bios_flags = ROM_GETBIOSFLAGS(romp);
-                if (bios_flags != 0)
-                {
-                    if (bios_flags != last_bios)
-                    {
-                        mame_printf_error("%s: %s has bios rom name %s without preceding matching system bios definition\n", driver->source_file, driver->name, last_name);
-                        error = TRUE;
-                    }
-                }*/
-
-				/* make sure the has is valid */
+				/* make sure the hash is valid */
 				hash = ROM_GETHASHDATA(romp);
 				if (!hash_verify_string(hash))
 				{
@@ -1554,9 +1543,18 @@ static int validate_devices(int drivnum, const machine_config *config)
 	for (device = device_list_first(config->devicelist, DEVICE_TYPE_WILDCARD); device != NULL; device = device_list_next(device, DEVICE_TYPE_WILDCARD))
 	{
 		device_validity_check_func validity_check = (device_validity_check_func) device_get_info_fct(device, DEVINFO_FCT_VALIDITY_CHECK);
+		const device_config *scandevice;
 
 		/* validate the device tag */
 		error |= validate_tag(driver, device_get_info_string(device, DEVINFO_STR_NAME), device->tag);
+		
+		/* look for duplicates */
+		for (scandevice = device_list_first(config->devicelist, DEVICE_TYPE_WILDCARD); scandevice != device; scandevice = device_list_next(scandevice, DEVICE_TYPE_WILDCARD))
+			if (strcmp(scandevice->tag, device->tag) == 0)
+			{
+				mame_printf_warning("%s: %s has multiple devices with the tag '%s'\n", driver->source_file, driver->name, device->tag);
+				break;
+			}
 
 		/* call the device-specific validity check */
 		if (validity_check != NULL && (*validity_check)(driver, device))

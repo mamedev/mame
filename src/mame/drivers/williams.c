@@ -2657,7 +2657,7 @@ ROM_START( joust2 )
 	ROM_LOAD( "ic08_r1.cpu", 0x0E000, 0x2000, CRC(84517c3c) SHA1(de0b6473953783c091ddcc7aaa89fc1ec3b9d378) )	/* IC08 ROM08 */
 
 	/* sound board */
-	ROM_REGION( 0x90000, "cvsd", 0 )
+	ROM_REGION( 0x90000, "cvsdcpu", 0 )
 	ROM_LOAD( "u04_r1.snd", 0x10000, 0x8000, CRC(3af6b47d) SHA1(aff19d65a4d9c249dec6a9e04a4066fada0f8fa1) )	/* IC04 ROM23 */
 	ROM_RELOAD(             0x18000, 0x8000 )
 	ROM_RELOAD(             0x20000, 0x8000 )

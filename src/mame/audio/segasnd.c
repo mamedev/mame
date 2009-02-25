@@ -646,7 +646,7 @@ static DEVICE_START( usb_sound )
 	int tchan, tgroup;
 
 	/* find the CPU we are associated with */
-	usb.cpu = cputag_get_cpu(machine, "usb");
+	usb.cpu = cputag_get_cpu(machine, "usbcpu");
 	assert(usb.cpu != NULL);
 
 	/* allocate work RAM */
@@ -919,12 +919,12 @@ ADDRESS_MAP_END
 MACHINE_DRIVER_START( sega_universal_sound_board )
 
 	/* CPU for the usb board */
-	MDRV_CPU_ADD("usb", I8035, USB_MASTER_CLOCK)		/* divide by 15 in CPU */
+	MDRV_CPU_ADD("usbcpu", I8035, USB_MASTER_CLOCK)		/* divide by 15 in CPU */
 	MDRV_CPU_PROGRAM_MAP(usb_map, 0)
 	MDRV_CPU_IO_MAP(usb_portmap, 0)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("usb", USB, 0)
+	MDRV_SOUND_ADD("usbsnd", USB, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -933,6 +933,6 @@ MACHINE_DRIVER_START( sega_universal_sound_board_rom )
 	MDRV_IMPORT_FROM( sega_universal_sound_board )
 
 	/* CPU for the usb board */
-	MDRV_CPU_MODIFY("usb")
+	MDRV_CPU_MODIFY("usbcpu")
 	MDRV_CPU_PROGRAM_MAP(usb_map_rom, 0)
 MACHINE_DRIVER_END

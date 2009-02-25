@@ -855,7 +855,7 @@ ADDRESS_MAP_END
 
 MACHINE_DRIVER_START( mtrap_cvsd_audio )
 
-	MDRV_CPU_ADD("cvsd", Z80, CVSD_Z80_CLOCK)
+	MDRV_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cvsd_map,0)
 	MDRV_CPU_IO_MAP(cvsd_iomap,0)
 
