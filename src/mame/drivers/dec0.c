@@ -993,7 +993,7 @@ static MACHINE_DRIVER_START( automat )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(automat_readmem, automat_writemem)
-	MDRV_CPU_VBLANK_INT("maincpu", irq6_line_hold)/* VBL */
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)// ?
 	MDRV_CPU_PROGRAM_MAP(automat_s_mem, 0)
@@ -1633,7 +1633,7 @@ ROM_START( robocop )
 	ROM_LOAD( "ep08", 0x50000, 0x08000, CRC(c45c7b4c) SHA1(70e3e475fe767eefa4cc1d6ca052271a099ff7a8) )
 	ROM_LOAD( "ep13", 0x60000, 0x10000, CRC(8fca9f28) SHA1(cac85bf2b66e49e22c33c85bdb5712feef6aae7e) )
 	ROM_LOAD( "ep12", 0x70000, 0x08000, CRC(3cd1d0c3) SHA1(ca3546cf51ebb10dfa4e78954f0212e8fcdb3d57) )
-	
+
 	ROM_REGION( 0x10000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "ep02", 0x00000, 0x10000, CRC(711ce46f) SHA1(939a8545e53776ff2180d2c7e63bc997689c088e) )
 ROM_END
@@ -1855,7 +1855,7 @@ ROM_END
 AUTOMAT (bootleg ROBOCOP)
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Dumped by Andrew Welburn on the evening of a day 
+Dumped by Andrew Welburn on the evening of a day
 of big snow! 02/02/09
 
 http://www.andys-arcade.com
@@ -1864,24 +1864,24 @@ http://www.andys-arcade.com
 **Do not seperate this text file from the roms.**
 *************************************************
 
-Take a look at the photos in the archive, the roms 
+Take a look at the photos in the archive, the roms
 should be failry explanatory, and you should be
 able to pick out the chips it uses.
 
-The most striking thing about this bootleg apart 
-from the obviously changed title screen is that 
-the music/melody is not right, they've copied the 
-digital sound effects, but appear to have ripepd 
-the music and circuit design from an earlier 
-capcom game, i can't work out whcih one, but 
+The most striking thing about this bootleg apart
+from the obviously changed title screen is that
+the music/melody is not right, they've copied the
+digital sound effects, but appear to have ripepd
+the music and circuit design from an earlier
+capcom game, i can't work out whcih one, but
 what an odd thing to do!
 
 you can see a youtube video of it runnign here:
 http://uk.youtube.com/watch?v=Y-KvbKtqzaQ
 
-Rom 21 is full of 0's... i cleaned and re-dumped 
+Rom 21 is full of 0's... i cleaned and re-dumped
 it numerous times, but i just got 0's everytime.
-It contains some of the the graphics for enemies 
+It contains some of the the graphics for enemies
 on the opening stage at the very least.
 
 enjoy..
@@ -1903,7 +1903,7 @@ ROM_START( automat )
 	ROM_LOAD( "7.bin",  0x10000, 0x10000, CRC(40218082) SHA1(6a5c83d20fe110d642d5730c52e2796655fb66b4) ) // y
 	ROM_LOAD( "10.bin", 0x20000, 0x10000, CRC(957da6dd) SHA1(53490d80ef108e93f13440de13b58761b89a419a) ) // y
 	ROM_LOAD( "12.bin", 0x30000, 0x10000, CRC(00cd0990) SHA1(3fc498fcee2110001e376f5ee38d7dd361bd3ee3) ) // y
-	
+
 	/* copy out the chars */
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE ) /* chars */
 	ROM_COPY( "gfxload1", 0x00000, 0x00000, 0x8000 )
@@ -1916,7 +1916,7 @@ ROM_START( automat )
 	ROM_COPY( "gfxload1", 0x18000, 0x08000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x28000, 0x10000, 0x8000 )
 	ROM_COPY( "gfxload1", 0x38000, 0x18000, 0x8000 )
-	
+
 	// we have to rearrange this with ROM_CONTINUE due to the way gfxdecode works */
 	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE ) /* tiles */
 	ROM_LOAD( "9.bin",  0x00000, 0x2000, CRC(ccf91ce0) SHA1(c976eddcea48da6e7fbd28a4d5c48706d61cabfb) )
@@ -1925,15 +1925,15 @@ ROM_START( automat )
 	ROM_CONTINUE(       0x0c000, 0x2000 )
 	ROM_CONTINUE(       0x02000, 0x2000 )
 	ROM_CONTINUE(       0x06000, 0x2000 )
-	ROM_CONTINUE(       0x0a000, 0x2000 )	
-	ROM_CONTINUE(       0x0e000, 0x2000 )	
+	ROM_CONTINUE(       0x0a000, 0x2000 )
+	ROM_CONTINUE(       0x0e000, 0x2000 )
 	ROM_LOAD( "6.bin",  0x10000, 0x2000, CRC(5a557765) SHA1(f081323dad532fae6ec5d2875ffb1c394ac0bcf9) )
 	ROM_CONTINUE(       0x14000, 0x2000 )
 	ROM_CONTINUE(       0x18000, 0x2000 )
 	ROM_CONTINUE(       0x1c000, 0x2000 )
 	ROM_CONTINUE(       0x12000, 0x2000 )
 	ROM_CONTINUE(       0x16000, 0x2000 )
-	ROM_CONTINUE(       0x1a000, 0x2000 )	
+	ROM_CONTINUE(       0x1a000, 0x2000 )
 	ROM_CONTINUE(       0x1e000, 0x2000 )
 	ROM_LOAD( "11.bin", 0x20000, 0x2000, CRC(8b196ab7) SHA1(030dc19f464db072c8dbbf043ae9334aa58510d0) )
 	ROM_CONTINUE(       0x24000, 0x2000 )
@@ -1941,17 +1941,17 @@ ROM_START( automat )
 	ROM_CONTINUE(       0x2c000, 0x2000 )
 	ROM_CONTINUE(       0x22000, 0x2000 )
 	ROM_CONTINUE(       0x26000, 0x2000 )
-	ROM_CONTINUE(       0x2a000, 0x2000 )	
-	ROM_CONTINUE(       0x2e000, 0x2000 )	
+	ROM_CONTINUE(       0x2a000, 0x2000 )
+	ROM_CONTINUE(       0x2e000, 0x2000 )
 	ROM_LOAD( "13.bin", 0x30000, 0x2000, CRC(7f12ed0e) SHA1(9340611b85f9866d086970ed5e9c0c704616c330) )
 	ROM_CONTINUE(       0x34000, 0x2000 )
 	ROM_CONTINUE(       0x38000, 0x2000 )
 	ROM_CONTINUE(       0x3c000, 0x2000 )
 	ROM_CONTINUE(       0x32000, 0x2000 )
 	ROM_CONTINUE(       0x36000, 0x2000 )
-	ROM_CONTINUE(       0x3a000, 0x2000 )	
-	ROM_CONTINUE(       0x3e000, 0x2000 )	
-	
+	ROM_CONTINUE(       0x3a000, 0x2000 )
+	ROM_CONTINUE(       0x3e000, 0x2000 )
+
 	// the sprite data is the same as robocop, but with the bits in each byte reversed
 	// 21.bin was repaired with this knowledge as the chip was faulty
 	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE |ROMREGION_INVERT) /* sprites */
@@ -2594,12 +2594,12 @@ static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 {
 	UINT8* R = memory_region(machine,"gfx4");
 	int i;
-	
+
 	for (i=0;i<0x80000;i++)
 	{
 		R[i] = BITSWAP8(R[i],0,1,2,3,4,5,6,7);
 	}
-	
+
 	dump_to_file(machine,R, 0x00000, 0x10000);
 	dump_to_file(machine,R, 0x10000, 0x08000);
 	dump_to_file(machine,R, 0x20000, 0x10000);
