@@ -172,6 +172,22 @@ WRITE8_HANDLER( goldstar_fa00_w )
 
 WRITE8_HANDLER( cm_background_col_w )
 {
+
+	//printf("cm_background_col_w %02x\n",data);
+	
+	/* cherry master writes
+	
+	00 (at start)
+	14 (win 1st round)
+	38 (win 2nd round)
+	4c etc.
+	20
+	5c
+		
+	after each of the rounds of the card game, probably controls the 'girl' display, there are 6 girls.
+	
+	*/
+	
 	bgcolor = (data & 0x03) >> 0;
 	tilemap_mark_all_tiles_dirty (goldstar_reel1_tilemap);
 	tilemap_mark_all_tiles_dirty (goldstar_reel2_tilemap);
