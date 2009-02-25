@@ -184,6 +184,23 @@ WRITE8_HANDLER( cm_background_col_w )
 	20
 	5c
 		
+	these are the following values in binary (sorted)
+	
+	0000 0000
+	0001 0100
+	0010 0000
+	0011 1000
+	0100 1100
+	0101 1100
+
+	so it's probably
+	
+	0ggg cc00
+	
+	where g is which girl to display and c is the colour palette
+		
+	(note, this doesn't apply to the amcoe games which have no girls, I'm unsure how the priority/positioning works)
+		
 	after each of the rounds of the card game, probably controls the 'girl' display, there are 6 girls.
 	
 	*/
