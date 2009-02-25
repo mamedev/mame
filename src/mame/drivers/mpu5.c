@@ -9,8 +9,7 @@
 
      -- the main CPU is a 68340, which is a 32-bit 680xx variant with modified opcodes etc.
 
-     -- should there be a bios using an 8-bit cpu like MPU4, or is the 68340 the only CPU?
-
+     -- Much of the communication is done via a 68681 DUART.
 */
 
 #include "driver.h"

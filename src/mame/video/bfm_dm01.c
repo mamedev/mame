@@ -30,7 +30,7 @@ Standard dm01 memorymap
 -----------+---+-----------------+-----------------------------------------
 
   TODO: - find out clockspeed of CPU
-
+        - make a non-hacky Artwork representation of dot matrix
   Layout notes: the dot matrix is set to screen 0.
   Multiple matrices and matrix/VFD combos are not yet supported.
 
@@ -42,8 +42,8 @@ Standard dm01 memorymap
 #include "bfm_dm01.h"
 // local prototypes ///////////////////////////////////////////////////////
 
-extern void Scorpion2_DMSetSwitchState(int strobe, int data, int state);
-extern int  Scorpion2_DMGetSwitchState(int strobe, int data);
+extern void Scorpion2_SetSwitchState(int strobe, int data, int state);
+extern int  Scorpion2_GetSwitchState(int strobe, int data);
 
 // local vars /////////////////////////////////////////////////////////////
 
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( control_w )
 		if ( data & 8 )	  busy = 0;
 		else			  busy = 1;
 
-		Scorpion2_DMSetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA, busy?0:1);
+		Scorpion2_SetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA, busy?0:1);
 	}
 }
 
@@ -254,7 +254,7 @@ VIDEO_UPDATE( bfm_dm01 )
 	copybitmap(bitmap, dm_bitmap, 0,0,0,0, visarea);
 
 	LOG(("Busy=%X",data_avail));
-	LOG(("%X",Scorpion2_DMGetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA)));
+	LOG(("%X",Scorpion2_GetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA)));
 
 	return 0;
 }
@@ -271,7 +271,7 @@ void BFM_dm01_reset(void)
 	xcounter = 0;
 	data_avail = 0;
 
-	Scorpion2_DMSetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA, busy?0:1);
+	Scorpion2_SetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA, busy?0:1);
 }
 
 PALETTE_INIT( bfm_dm01 )

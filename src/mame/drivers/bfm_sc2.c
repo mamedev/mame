@@ -145,6 +145,7 @@ Adder hardware:
 #include "sound/upd7759.h"
 
 /* fruit machines only */
+#include "video/awpvid.h"
 #include "machine/steppers.h" // stepper motor
 
 #include "machine/bfm_bd1.h"  // vfd
@@ -170,12 +171,6 @@ Adder hardware:
 #define LOG_SERIAL(x) do { if (VERBOSE) logerror x; } while (0)
 #define UART_LOG(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
-#ifndef AWP_VIDEO //Defined for fruit machines with mechanical reels
-#define draw_reel(x)
-#else
-#define draw_reel(x) awp_draw_reel x
-#endif
 
 #define MASTER_CLOCK		(XTAL_8MHz)
 
@@ -383,7 +378,7 @@ send data to them, although obviously there's no response. */
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void Scorpion2_SetSwitchState(int strobe, int data, int state)
+extern void Scorpion2_SetSwitchState(int strobe, int data, int state)
 {
 	if ( strobe < 11 && data < 8 )
 	{
@@ -416,7 +411,7 @@ static void Scorpion2_SetSwitchState(int strobe, int data, int state)
 
 ///////////////////////////////////////////////////////////////////////////
 
-static int Scorpion2_GetSwitchState(int strobe, int data)
+extern int Scorpion2_GetSwitchState(int strobe, int data)
 {
 	int state = 0;
 
@@ -575,8 +570,8 @@ static WRITE8_HANDLER( reel34_w )
 	if ( stepper_optic_state(3) ) optic_pattern |=  0x08;
 	else                          optic_pattern &= ~0x08;
 
-	draw_reel((2));
-	draw_reel((3));
+	awp_draw_reel(2);
+	awp_draw_reel(3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -593,8 +588,8 @@ static WRITE8_HANDLER( reel56_w )
 	if ( stepper_optic_state(5) ) optic_pattern |=  0x20;
 	else                          optic_pattern &= ~0x20;
 
-	draw_reel((4));
-	draw_reel((5));
+	awp_draw_reel(4);
+	awp_draw_reel(5);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -2638,71 +2633,11 @@ GAMEL( 1997, gldncrwn, 0,		  scorpion2_vid, gldncrwn,  gldncrwn,   0,       "BFM
 ***************************************************************************/
 
 /* fruit machines only */
-#include "video/awpvid.h"
 #include "video/bfm_dm01.h"
 #include "awpdmd.lh"
 #include "drwho.lh"
 #include "awpvid14.lh"
 #include "awpvid16.lh"
-
-/* Dot Matrix input override */
-extern void Scorpion2_DMSetSwitchState(int strobe, int data, int state)
-{
-	if ( strobe < 11 && data < 8 )
-	{
-		if ( strobe < 8 )
-		{
-			input_override[strobe] |= (1<<data);
-
-			if ( state ) sc2_Inputs[strobe] |=  (1<<data);
-			else		 sc2_Inputs[strobe] &= ~(1<<data);
-		}
-		else
-		{
-			if ( data > 2 )
-			{
-				input_override[strobe-8+4] |= (1<<(data+2));
-
-				if ( state ) sc2_Inputs[strobe-8+4] |=  (1<<(data+2));
-				else		 sc2_Inputs[strobe-8+4] &= ~(1<<(data+2));
-			}
-			else
-			{
-				input_override[strobe-8] |= (1<<(data+5));
-
-				if ( state ) sc2_Inputs[strobe-8] |=  (1 << (data+5));
-				else		 sc2_Inputs[strobe-8] &= ~(1 << (data+5));
-			}
-		}
-	}
-}
-
-
-extern int Scorpion2_DMGetSwitchState(int strobe, int data)
-{
-	int state = 0;
-
-	if ( strobe < 11 && data < 8 )
-	{
-		if ( strobe < 8 )
-		{
-			state = (sc2_Inputs[strobe] & (1<<data) ) ? 1 : 0;
-		}
-		else
-		{
-			if ( data > 2 )
-			{
-				state = (sc2_Inputs[strobe-8+4] & (1<<(data+2)) ) ? 1 : 0;
-			}
-			else
-			{
-				state = (sc2_Inputs[strobe-8] & (1 << (data+5)) ) ? 1 : 0;
-			}
-		}
-	}
-	return state;
-}
-
 
 /* Reels 1 and 2 */
 static WRITE8_HANDLER( reel12_w )
@@ -2717,8 +2652,8 @@ static WRITE8_HANDLER( reel12_w )
 	if ( stepper_optic_state(1) ) optic_pattern |=  0x02;
 	else                          optic_pattern &= ~0x02;
 
-	draw_reel((0));
-	draw_reel((1));
+	awp_draw_reel(0);
+	awp_draw_reel(1);
 }
 
 

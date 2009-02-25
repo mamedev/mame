@@ -1,6 +1,8 @@
 /***********************************************************************************************************
   Barcrest MPU4 highly preliminary driver by J.Wallace, and Anonymous.
-  This is the core driver, no game specific stuff should go in here.
+
+  This is the core driver, no video specific stuff should go in here.
+  This driver holds all the mechanical games.
 
      09-2007: Haze: Added Deal 'Em video support.
   03-08-2007: J Wallace: Removed audio filter for now, since sound is more accurate without them.
@@ -240,7 +242,6 @@ IRQ line connected to CPU
 TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
       - Distinguish door switches using manual
 ***********************************************************************************************************/
-
 #include "driver.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
@@ -249,6 +250,8 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #include "timer.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include "sound/okim6376.h"
+#include "sound/2413intf.h"
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
@@ -265,13 +268,10 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #define LOG_IC3(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
 #define LOG_IC8(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
 
-#ifndef AWP_VIDEO /*Defined for fruit machines with mechanical reels*/
-#define draw_reel(x)
-#else
-#define draw_reel(x) awp_draw_reel x
-#endif
-#include "mpu4.lh"
+#include "video/awpvid.h"		//Fruit Machines Only
 #include "connect4.lh"
+#include "gamball.lh"
+#include "mpu4.lh"
 #define MPU4_MASTER_CLOCK (6880000)
 
 /* local vars */
@@ -296,6 +296,9 @@ static int led_extend;
 static int serial_card_connected;
 static emu_timer *ic24_timer;
 static TIMER_CALLBACK( ic24_timeout );
+
+static int expansion_latch;// OKI MOD 4 and above only
+static int global_volume;// OKI MOD 4 and above only
 
 
 /* 32 multiplexed inputs - but a further 8 possible per AUX.
@@ -818,8 +821,8 @@ static WRITE8_HANDLER( pia_ic6_portb_w )
 		if ( stepper_optic_state(1) ) optic_pattern |=  0x02;
 		else                          optic_pattern &= ~0x02;
 	}
-	draw_reel((0));
-	draw_reel((1));
+	awp_draw_reel(0);
+	awp_draw_reel(1);
 }
 
 
@@ -880,8 +883,8 @@ static WRITE8_HANDLER( pia_ic7_porta_w )
 		if ( stepper_optic_state(3) ) optic_pattern |=  0x08;
 		else                          optic_pattern &= ~0x08;
 	}
-	draw_reel((2));
-	draw_reel((3));
+	awp_draw_reel(2);
+	awp_draw_reel(3);
 }
 
 
@@ -999,6 +1002,72 @@ static const pia6821_interface pia_ic8_intf =
 	/*irqs   : A/B             */ cpu0_irq, cpu0_irq
 };
 
+static WRITE8_HANDLER( pia_gb_porta_w )
+{
+	const device_config *msm6376 = devtag_get_device(space->machine, SOUND, "msm6376");
+
+	LOG(("%04x GAMEBOARD: PIA Port A Set to %2x\n", cpu_get_previouspc(space->cpu),data));
+	okim6376_w(msm6376, 0, data);
+}
+
+static WRITE8_HANDLER( pia_gb_portb_w )
+{
+	int changed = expansion_latch^data;
+
+	LOG(("%04x GAMEBOARD: PIA Port B Set to %2x\n", cpu_get_previouspc(space->cpu),data));
+
+	expansion_latch = data;
+
+	if ( changed & 0x20)
+	{ // digital volume clock line changed
+		if ( !(data & 0x20) )
+		{ // changed from high to low,
+			if ( !(data & 0x10) )
+			{
+				if ( global_volume < 31 ) global_volume++; //steps unknown
+			}
+			else
+			{
+				if ( global_volume > 0  ) global_volume--;
+			}
+
+			{
+//              float percent = (32-global_volume)/32.0; //volume_override?1.0:(32-global_volume)/32.0;
+//              LOG(("GAMEBOARD: OKI volume %f \n",percent));
+//              sndti_set_output_gain(SOUND_OKIM6295,  0, 0, percent);
+			}
+		}
+	}
+}
+static READ8_HANDLER( pia_gb_portb_r )
+{
+	LOG(("%04x GAMEBOARD: PIA Read of Port B\n",cpu_get_previouspc(space->cpu)));
+	//
+	// b7, 1 = OKI ready, 0 = OKI busy
+	// b5, vol clock
+	// b4, 1 = Vol down, 0 = Vol up
+	//
+
+//if (offset == 0x40)
+//{
+//  return OKIM6295_status_r(0);
+//}
+	return 0x40;
+}
+
+static WRITE8_HANDLER( pia_gb_ca2_w )
+{
+	LOG(("%04x GAMEBOARD: OKI RESET (offset = %d),data = %02X\n", cpu_get_previouspc(space->cpu), offset, data&0xFF));
+
+//	return okim6376_status_0_r();
+}
+
+static const pia6821_interface pia_gameboard_intf =
+{
+	/*inputs : A/B,CA/B1,CA/B2 */ 0, pia_gb_portb_r, 0, 0, 0, 0,
+	/*outputs: A/B,CA/B2       */ pia_gb_porta_w, pia_gb_portb_w, pia_gb_ca2_w, 0,
+	/*irqs   : A/B             */ 0,0
+};
 
 /* input ports for MPU4 board */
 static INPUT_PORTS_START( mpu4 )
@@ -1230,6 +1299,136 @@ static INPUT_PORTS_START( connect4 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gamball )
+	PORT_START("ORANGE1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("00")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("01")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("02")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("03")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("04")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("05")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("06")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("07")
+
+	PORT_START("ORANGE2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("08")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("09")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("10")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("11")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("12")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("13")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("14")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("15")
+
+	PORT_START("BLACK1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Hi")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Lo")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("18")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("19")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("20")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+
+	PORT_START("BLACK2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("24")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("25")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Cancel/Collect")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Hold/Nudge 1")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Hold/Nudge 2")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Hold/Nudge 3")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Hold/Nudge 4")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_START1)
+
+	PORT_START("DIL1")
+	PORT_DIPNAME( 0x01, 0x00, "DIL101" ) PORT_DIPLOCATION("DIL1:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL102" ) PORT_DIPLOCATION("DIL1:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL103" ) PORT_DIPLOCATION("DIL1:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL104" ) PORT_DIPLOCATION("DIL1:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL105" ) PORT_DIPLOCATION("DIL1:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL106" ) PORT_DIPLOCATION("DIL1:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL107" ) PORT_DIPLOCATION("DIL1:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL108" ) PORT_DIPLOCATION("DIL1:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("DIL2")
+	PORT_DIPNAME( 0x01, 0x00, "DIL201" ) PORT_DIPLOCATION("DIL2:01")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "DIL202" ) PORT_DIPLOCATION("DIL2:02")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "DIL203" ) PORT_DIPLOCATION("DIL2:03")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "DIL204" ) PORT_DIPLOCATION("DIL2:04")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x10, 0x00, "DIL205" ) PORT_DIPLOCATION("DIL2:05")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "DIL206" ) PORT_DIPLOCATION("DIL2:06")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "DIL207" ) PORT_DIPLOCATION("DIL2:07")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "DIL208" ) PORT_DIPLOCATION("DIL2:08")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("AUX1")
+/*	PORT_DIPNAME( 0x01, 0x00, "AUX101" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x02, 0x00, "AUX102" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x04, 0x00, "AUX103" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x08, 0x00, "AUX104" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )*/
+	PORT_DIPNAME( 0x10, 0x00, "AUX105" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x20, 0x00, "AUX106" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x40, 0x00, "AUX107" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
+	PORT_DIPNAME( 0x80, 0x00, "AUX108" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+
+	PORT_START("AUX2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
+INPUT_PORTS_END
+
 static const stepper_interface barcrest_reel_interface =
 {
 	BARCREST_48STEP_REEL,
@@ -1274,6 +1473,49 @@ static MACHINE_START( mpu4mod2 )
 	ROC10937_init(0, MSC1937,0);
 }
 
+static MACHINE_START( mpu4dutch )
+{
+	mpu4_config_common(machine);
+	pia_config(machine, 6,&pia_gameboard_intf);
+	pia_reset();
+
+	serial_card_connected=0;
+
+// setup 8 mechanical meters ////////////////////////////////////////////
+	Mechmtr_init(8);
+
+// setup 4 default 96 half step reels ///////////////////////////////////
+	stepper_config(machine, 0, &barcrest_reel_interface);
+	stepper_config(machine, 1, &barcrest_reel_interface);
+	stepper_config(machine, 2, &barcrest_reel_interface);
+	stepper_config(machine, 3, &barcrest_reel_interface);
+
+// setup the standard oki MSC1937 display ///////////////////////////////
+	ROC10937_init(0, MSC1937,1);	// does oldtimer use a OKI MSC1937 alpha display controller?
+}
+
+static MACHINE_START( mpu4mod4 )
+{
+	mpu4_config_common(machine);
+	pia_config(machine, 6,&pia_gameboard_intf);
+	pia_reset();
+
+	serial_card_connected=0;
+	mod_number=4;
+
+// setup 8 mechanical meters ////////////////////////////////////////////
+	Mechmtr_init(8);
+
+// setup 4 default 96 half step reels ///////////////////////////////////
+	stepper_config(machine, 0, &barcrest_reel_interface);
+	stepper_config(machine, 1, &barcrest_reel_interface);
+	stepper_config(machine, 2, &barcrest_reel_interface);
+	stepper_config(machine, 3, &barcrest_reel_interface);
+
+	awp_reel_setup();
+// setup the standard oki MSC1937 display ///////////////////////////////
+	ROC10937_init(0, MSC1937,0);
+}
 
 /*
 Characteriser (CHR)
@@ -1370,6 +1612,46 @@ static READ8_HANDLER( characteriser_r )
 	return 0;
 }
 
+static DRIVER_INIT (m_ccelbr)
+{
+	int x;
+	static const UINT8 chr_table[72]={	0x00,0x84,0x8C,0xB8,0x74,0x80,0x1C,0xB4,
+										0xD8,0x74,0x00,0xD4,0xC8,0x78,0xA4,0x4C,
+										0xE0,0xDC,0xF4,0x88,0x78,0x24,0x84,0xCC,
+										0xB8,0x74,0x90,0x48,0xA0,0x1C,0x24,0x94,
+										0xC8,0xB8,0x74,0x00,0x94,0x48,0x30,0x90,
+										0x08,0x60,0xD4,0x58,0xF4,0x18,0x74,0x80,
+										0xDC,0x74,0xD0,0x58,0x24,0x94,0xD8,0x34,
+										0x90,0x58,0xF4,0x88,0x38,0x24,0xD4,0x00,
+										0x00,0x50,0x00,0x50,0x10,0x40,0x04,0x00};
+
+	for (x=0; x<72; x++)
+	{
+		MPU4_chr_data[(x)] = chr_table[(x)];
+	}
+
+}
+
+DRIVER_INIT (m_gmball)
+{
+	int x;
+	static const UINT8 chr_table[72]= {	0x00,0x0C,0x50,0x90,0xB0,0x38,0xD4,0xA0,
+										0xBC,0xD4,0x30,0x90,0x38,0xC4,0xAC,0x70,
+										0x98,0xDC,0xDC,0x54,0x80,0xB4,0x38,0xCC,
+										0xE8,0xF8,0xD4,0x30,0x00,0x84,0x2C,0xC8,
+										0xF8,0x4C,0x58,0xD4,0xA8,0x78,0x44,0x0C,
+										0x48,0x50,0x98,0xD4,0xB0,0xA0,0xA4,0x3C,
+										0xDC,0xD4,0xB8,0xD4,0x30,0x88,0xE0,0x24,
+										0x8C,0xF8,0xCC,0x70,0x90,0x20,0x9C,0x00,
+										0x00,0x18,0x08,0x10,0x00,0x18,0x08,0x00};
+
+	for (x=0; x < 72; x++)
+	{
+		MPU4_chr_data[(x)] = chr_table[(x)];
+	}
+
+}
+
 
 /* generate a 50 Hz signal (based on an RC time) */
 static TIMER_DEVICE_CALLBACK( gen_50hz )
@@ -1403,6 +1685,78 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	/* 64k  paged ROM (4 pages)  */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mod4_yam_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+
+	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
+
+	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+
+	AM_RANGE(0x0880, 0x0881) AM_DEVWRITE( SOUND, "ym2413", ym2413_w )
+
+//  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w)
+
+	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)	// 6840PTM
+	AM_RANGE(0x0A00, 0x0A03) AM_READWRITE(pia_0_r,pia_0_w)	  	// PIA6821 IC3
+	AM_RANGE(0x0B00, 0x0B03) AM_READWRITE(pia_1_r,pia_1_w)	  	// PIA6821 IC4
+	AM_RANGE(0x0C00, 0x0C03) AM_READWRITE(pia_2_r,pia_2_w)	  	// PIA6821 IC5
+	AM_RANGE(0x0D00, 0x0D03) AM_READWRITE(pia_3_r,pia_3_w)		// PIA6821 IC6
+	AM_RANGE(0x0E00, 0x0E03) AM_READWRITE(pia_4_r,pia_4_w)		// PIA6821 IC7
+	AM_RANGE(0x0F00, 0x0F03) AM_READWRITE(pia_5_r,pia_5_w)		// PIA6821 IC8
+
+	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	// 64k  paged ROM (4 pages)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mod4_oki_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+
+	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
+
+	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+
+	AM_RANGE(0x0880, 0x0883) AM_READWRITE(pia_6_r,pia_6_w)      // PIA6821 on game board
+
+//  AM_RANGE(0x08C0, 0x08C7) AM_READERITE(ptm6840_1_r,ptm6840_1_w)  // 6840PTM on game board
+
+//  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w)
+
+	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)	// 6840PTM
+	AM_RANGE(0x0A00, 0x0A03) AM_READWRITE(pia_0_r,pia_0_w)	  	// PIA6821 IC3
+	AM_RANGE(0x0B00, 0x0B03) AM_READWRITE(pia_1_r,pia_1_w)	  	// PIA6821 IC4
+	AM_RANGE(0x0C00, 0x0C03) AM_READWRITE(pia_2_r,pia_2_w)	  	// PIA6821 IC5
+	AM_RANGE(0x0D00, 0x0D03) AM_READWRITE(pia_3_r,pia_3_w)		// PIA6821 IC6
+	AM_RANGE(0x0E00, 0x0E03) AM_READWRITE(pia_4_r,pia_4_w)		// PIA6821 IC7
+	AM_RANGE(0x0F00, 0x0F03) AM_READWRITE(pia_5_r,pia_5_w)		// PIA6821 IC8
+
+	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	// 64k  paged ROM (4 pages)
+ADDRESS_MAP_END
+
+// memory map for barcrest mpu4 board /////////////////////////////////////
+
+static ADDRESS_MAP_START( dutch_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+
+//  AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
+
+	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+	AM_RANGE(0x0880, 0x0883) AM_READWRITE(pia_6_r,pia_6_w)		// PIA6821 on game board
+
+//  AM_RANGE(0x08C0, 0x08C7) AM_READERITE(ptm6840_2_r,ptm6840_2_w)  // 6840PTM on game board
+
+//  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w)
+
+	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)	// 6840PTM
+	AM_RANGE(0x0A00, 0x0A03) AM_READWRITE(pia_0_r,pia_0_w)	  	// PIA6821 IC3
+	AM_RANGE(0x0B00, 0x0B03) AM_READWRITE(pia_1_r,pia_1_w)	  	// PIA6821 IC4
+	AM_RANGE(0x0C00, 0x0C03) AM_READWRITE(pia_2_r,pia_2_w)	  	// PIA6821 IC5
+	AM_RANGE(0x0D00, 0x0D03) AM_READWRITE(pia_3_r,pia_3_w)		// PIA6821 IC6
+	AM_RANGE(0x0E00, 0x0E03) AM_READWRITE(pia_4_r,pia_4_w)		// PIA6821 IC7
+	AM_RANGE(0x0F00, 0x0F03) AM_READWRITE(pia_5_r,pia_5_w)		// PIA6821 IC8
+
+	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	// 64k paged ROM (4 pages)
+ADDRESS_MAP_END
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_SINGLE_OUTPUT,
@@ -1434,5 +1788,53 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 	MDRV_DEFAULT_LAYOUT(layout_mpu4)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( mod4yam )
+	MDRV_IMPORT_FROM( mpu4mod2 )
+	MDRV_MACHINE_START(mpu4mod4)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(mod4_yam_map,0)
+
+	MDRV_SOUND_REMOVE("ay8913")
+	MDRV_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mod4oki )
+	MDRV_IMPORT_FROM( mpu4mod2 )
+	MDRV_MACHINE_START(mpu4mod4)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(mod4_oki_map,0)
+
+	MDRV_SOUND_REMOVE("ay8913")
+	MDRV_SOUND_ADD("msm6376", OKIM6376, 4000000) //?
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mpu4dutch )
+	MDRV_IMPORT_FROM( mod4oki )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(dutch_memmap,0)	  			// setup read and write memorymap
+	MDRV_MACHINE_START(mpu4dutch)						// main mpu4 board initialisation
+MACHINE_DRIVER_END
+
+ROM_START( m_oldtmr )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
+ROM_END
+
+ROM_START( m_ccelbr )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "cels.p1",  0x00000, 0x10000,  CRC(19d2162f) SHA1(24fe435809352725e7614c32e2184142f355298e))
+ROM_END
+
+ROM_START( m_gmball )
+	ROM_REGION( 0x10000, "main", ROMREGION_ERASE00  )
+	ROM_LOAD( "gbbx.p1",	0x0000, 0x10000,  CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc))
+ROM_END
+
+//    year, name,    parent,  machine,  input,       init,    monitor, company,         fullname,                                    flags
+GAME( 198?, m_oldtmr,0,       mpu4dutch,mpu4,		 0,        ROT0,   "Barcrest", 		"Old Timer",														GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
+GAME( 198?, m_ccelbr,0,       mpu4mod2, mpu4,		 m_ccelbr, ROT0,   "Barcrest", 		"Club Celebration",													GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+GAMEL(198?, m_gmball,0,		  mod4yam,  gamball,     m_gmball, ROT0,   "Barcrest",      "Gamball",															GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_gamball )
 
 #include "drivers/mpu4drvr.c"

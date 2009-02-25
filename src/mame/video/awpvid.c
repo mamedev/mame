@@ -29,16 +29,10 @@
 
 **************************************************************************************/
 
-
-
 #include "driver.h"
 #include "awpvid.h"
 #include "rendlay.h"
 #include "machine/steppers.h"
-
-
-//#include "awpvid14.lh"
-//#include "awpvid16.lh"
 
 static UINT8 steps[MAX_STEPPERS];
 static UINT8 symbols[MAX_STEPPERS];
@@ -123,5 +117,3 @@ void awp_draw_reel(int rno)
 		output_set_value(rg,(reelpos[rno]));
 	}
 }
-
-

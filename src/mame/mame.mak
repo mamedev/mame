@@ -350,6 +350,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/jpm.a \
 	$(MAMEOBJ)/kaneko.a \
 	$(MAMEOBJ)/konami.a \
+	$(MAMEOBJ)/maygay.a \
 	$(MAMEOBJ)/meadows.a \
 	$(MAMEOBJ)/merit.a \
 	$(MAMEOBJ)/metro.a \
@@ -554,15 +555,18 @@ $(MAMEOBJ)/atlus.a: \
 	$(DRIVERS)/powerins.o $(VIDEO)/powerins.o \
 
 $(MAMEOBJ)/barcrest.a: \
+	$(VIDEO)/awpvid.o \
 	$(MACHINE)/meters.o \
 	$(DRIVERS)/mpu4.o \
 	$(DRIVERS)/mpu5.o \
 	$(MACHINE)/steppers.o \
 
 $(MAMEOBJ)/bfm.a: \
+	$(DRIVERS)/bfm_sc1.o \
+	$(DRIVERS)/bfmsys85.o \
 	$(DRIVERS)/bfcobra.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
-	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o $(VIDEO)/awpvid.o\
+	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o \
 
 $(MAMEOBJ)/bmc.a: \
 	$(DRIVERS)/bmcbowl.o \
@@ -930,6 +934,10 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/yiear.o $(VIDEO)/yiear.o \
 	$(DRIVERS)/zr107.o \
 	$(MACHINE)/konamiic.o $(VIDEO)/konamiic.o \
+
+$(MAMEOBJ)/maygay.a: \
+	$(DRIVERS)/maygay1b.o \
+	$(DRIVERS)/maygayv1.o \
 
 $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/lazercmd.o $(VIDEO)/lazercmd.o \
@@ -1715,6 +1723,8 @@ $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
 
+$(DRIVERS)/bfm_sc1.o:	$(LAYOUT)/bfm_sc1.lh
+
 $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
 						$(LAYOUT)/awpdmd.lh \
 						$(LAYOUT)/awpvid14.lh \
@@ -1767,7 +1777,8 @@ $(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
 $(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
-						$(LAYOUT)/connect4.lh
+						$(LAYOUT)/connect4.lh \
+						$(LAYOUT)/gamball.lh
 
 $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/clowns.lh \
 						$(LAYOUT)/invaders.lh \

@@ -8905,6 +8905,27 @@ Other Sun games
 	DRIVER( m_luvjub )
 	DRIVER( m_cpeno1 )
 
+	/* System85 games */
+	DRIVER( m_supcrd )	/* (c) 198? BFM */
+
+	/* Scorpion1 games */
+	DRIVER( m_lotsse )	/* (c) 198? BFM Dutch ROMS, prelim*/
+	DRIVER( m_roulet )	/* (c) 198? BFM Dutch ROMS, prelim*/
+	DRIVER( m_clattr )	/* (c) 1990 BFM,     Game Card 39-370-196*/
+	DRIVER( m_tppokr )	/* (c) 1996 BFM/ELAM,Game Card 95-750-899, uses Adder board for feature gfx*/
+
+	/* Maygay Machines Ltd. */
+	DRIVER( m_sptlgt )
+
+	DRIVER( screenpl )
+	DRIVER( screenp1 )
+	DRIVER( screenp2 )
+
+	/* MPU4 */
+	DRIVER( m_oldtmr )	/* Barcrest - highly prelim*/
+	DRIVER( m_ccelbr )
+	DRIVER( m_gmball )
+
 	/* MPU5 */
 	DRIVER( m_honmon )
 
