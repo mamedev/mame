@@ -198,15 +198,15 @@ static const samples_interface gunfight_samples_interface =
 MACHINE_DRIVER_START( gunfight_audio )
 	MDRV_SOUND_START(samples)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("samples1", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gunfight_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gunfight_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -797,11 +797,11 @@ DISCRETE_SOUND_END
 
 
 MACHINE_DRIVER_START( boothill_audio )
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(boothill)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1616,15 +1616,15 @@ static const samples_interface gmissile_samples_interface =
 MACHINE_DRIVER_START( gmissile_audio )
 	MDRV_SOUND_START(samples)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("samples1", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gmissile_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.9)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.9)
 
 	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gmissile_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.9)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.9)
 MACHINE_DRIVER_END
 
 
@@ -1716,15 +1716,15 @@ static const samples_interface m4_samples_interface =
 MACHINE_DRIVER_START( m4_audio )
 	MDRV_SOUND_START(samples)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("samples1", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(m4_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1)
 
 	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(m4_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
 MACHINE_DRIVER_END
 
 

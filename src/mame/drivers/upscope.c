@@ -320,13 +320,13 @@ static MACHINE_DRIVER_START( upscope )
 	MDRV_VIDEO_UPDATE(amiga)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
-	MDRV_SOUND_ROUTE(0, "right", 0.50)
-	MDRV_SOUND_ROUTE(1, "left", 0.50)
-	MDRV_SOUND_ROUTE(2, "left", 0.50)
-	MDRV_SOUND_ROUTE(3, "right", 0.50)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(2, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.50)
 
 	/* cia */
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)

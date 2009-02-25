@@ -1762,19 +1762,19 @@ static MACHINE_DRIVER_START( model2o )
 	MDRV_VIDEO_START(model2)
 	MDRV_VIDEO_UPDATE(model2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM3438, 8000000)
-	MDRV_SOUND_ROUTE(0, "left", 0.60)
-	MDRV_SOUND_ROUTE(1, "right", 0.60)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
 
 	MDRV_SOUND_ADD("sega1", MULTIPCM, 8000000)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("sega2", MULTIPCM, 8000000)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /* 2A-CRX */
@@ -1807,12 +1807,12 @@ static MACHINE_DRIVER_START( model2a )
 	MDRV_VIDEO_START(model2)
 	MDRV_VIDEO_UPDATE(model2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_config)
-	MDRV_SOUND_ROUTE(0, "left", 2.0)
-	MDRV_SOUND_ROUTE(0, "right", 2.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_DRIVER_END
 
 
@@ -1857,12 +1857,12 @@ static MACHINE_DRIVER_START( model2b )
 	MDRV_VIDEO_START(model2)
 	MDRV_VIDEO_UPDATE(model2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_config)
-	MDRV_SOUND_ROUTE(0, "left", 2.0)
-	MDRV_SOUND_ROUTE(0, "right", 2.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_DRIVER_END
 
 /* 2C-CRX */
@@ -1891,12 +1891,12 @@ static MACHINE_DRIVER_START( model2c )
 	MDRV_VIDEO_START(model2)
 	MDRV_VIDEO_UPDATE(model2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_config)
-	MDRV_SOUND_ROUTE(0, "left", 2.0)
-	MDRV_SOUND_ROUTE(0, "right", 2.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_DRIVER_END
 
 /* ROM definitions */

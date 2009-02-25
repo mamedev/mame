@@ -341,17 +341,17 @@ static MACHINE_DRIVER_START( simpsons )
 	MDRV_VIDEO_UPDATE(simpsons)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_ROUTE(0, "left", 1.0)	/* only left channel is connected */
-	MDRV_SOUND_ROUTE(0, "right", 1.0)
-	MDRV_SOUND_ROUTE(1, "left", 0.0)
-	MDRV_SOUND_ROUTE(1, "right", 0.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)	/* only left channel is connected */
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.0)
 
 	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_ROUTE(0, "left", 0.75)
-	MDRV_SOUND_ROUTE(1, "right", 0.75)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_DRIVER_END
 
 

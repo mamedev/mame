@@ -2445,15 +2445,15 @@ static MACHINE_DRIVER_START( lgtnfght )
 	MDRV_VIDEO_UPDATE(lgtnfght)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 0.70)
-	MDRV_SOUND_ROUTE(1, "right", 0.70)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_DRIVER_END
 
 
@@ -2487,15 +2487,15 @@ static MACHINE_DRIVER_START( blswhstl )
 	MDRV_VIDEO_EOF( blswhstl )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 0.70)
-	MDRV_SOUND_ROUTE(1, "right", 0.70)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
 
 	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "right", 0.50)	/* fixed inverted stereo channels */
-	MDRV_SOUND_ROUTE(1, "left", 0.50)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)	/* fixed inverted stereo channels */
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -2544,11 +2544,11 @@ static MACHINE_DRIVER_START( glfgreat )
 	MDRV_VIDEO_UPDATE(glfgreat)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2594,12 +2594,12 @@ static MACHINE_DRIVER_START( prmrsocr )
 	MDRV_VIDEO_UPDATE(glfgreat)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("konami", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2636,15 +2636,15 @@ static MACHINE_DRIVER_START( tmnt2 )
 	MDRV_VIDEO_UPDATE(tmnt2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 0.75)
-	MDRV_SOUND_ROUTE(1, "right", 0.75)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_DRIVER_END
 
 
@@ -2677,15 +2677,15 @@ static MACHINE_DRIVER_START( ssriders )
 	MDRV_VIDEO_UPDATE(tmnt2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 0.70)
-	MDRV_SOUND_ROUTE(1, "right", 0.70)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_DRIVER_END
 
 
@@ -2714,12 +2714,12 @@ static MACHINE_DRIVER_START( sunsetbl )
 	MDRV_VIDEO_UPDATE(tmnt2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( thndrx2 )
@@ -2751,15 +2751,15 @@ static MACHINE_DRIVER_START( thndrx2 )
 	MDRV_VIDEO_UPDATE(thndrx2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("konami", K053260, XTAL_3_579545MHz)
-	MDRV_SOUND_ROUTE(0, "left", 0.75)
-	MDRV_SOUND_ROUTE(1, "right", 0.75)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_DRIVER_END
 
 

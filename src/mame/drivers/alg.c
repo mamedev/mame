@@ -421,17 +421,17 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_VIDEO_START(alg)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("amiga", AMIGA, 3579545)
-	MDRV_SOUND_ROUTE(0, "left", 0.25)
-	MDRV_SOUND_ROUTE(1, "right", 0.25)
-	MDRV_SOUND_ROUTE(2, "right", 0.25)
-	MDRV_SOUND_ROUTE(3, "left", 0.25)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.25)
+	MDRV_SOUND_ROUTE(3, "lspeaker", 0.25)
 
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* cia */
 	MDRV_CIA8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)

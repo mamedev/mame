@@ -371,24 +371,24 @@ static MACHINE_DRIVER_START( chqflag )
 	MDRV_VIDEO_UPDATE(chqflag)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	MDRV_SOUND_ADD("konami1", K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(k007232_interface_1)
-	MDRV_SOUND_ROUTE(0, "left", 0.20)
-	MDRV_SOUND_ROUTE(0, "right", 0.20)
-	MDRV_SOUND_ROUTE(1, "left", 0.20)
-	MDRV_SOUND_ROUTE(1, "right", 0.20)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.20)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
 
 	MDRV_SOUND_ADD("konami2", K007232, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(k007232_interface_2)
-	MDRV_SOUND_ROUTE(0, "left", 0.20)
-	MDRV_SOUND_ROUTE(1, "right", 0.20)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
 MACHINE_DRIVER_END
 
 ROM_START( chqflag )

@@ -354,7 +354,7 @@ static void update_one_screen(const device_config *screen, bitmap_t *bitmap, con
 	rectangle *visarea = (rectangle *)video_screen_get_visible_area(screen);
 
 	/* for 2p games, the left screen is the main screen */
-	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lscreen");
 	if (left_screen == NULL)
 		left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "screen");
 

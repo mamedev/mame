@@ -1305,13 +1305,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( astrocade_stereo_sound )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
 	MDRV_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1331,20 +1331,20 @@ static MACHINE_DRIVER_START( seawolf2 )
 	MDRV_CPU_IO_MAP(port_map,0)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(seawolf2_samples_interface)
-	MDRV_SOUND_ROUTE(0, "left", 0.25)
-	MDRV_SOUND_ROUTE(1, "left", 0.25)
-	MDRV_SOUND_ROUTE(2, "left", 0.25)
-	MDRV_SOUND_ROUTE(3, "left", 0.25)
-	MDRV_SOUND_ROUTE(4, "left", 0.25)
-	MDRV_SOUND_ROUTE(5, "right", 0.25)
-	MDRV_SOUND_ROUTE(6, "right", 0.25)
-	MDRV_SOUND_ROUTE(7, "right", 0.25)
-	MDRV_SOUND_ROUTE(8, "right", 0.25)
-	MDRV_SOUND_ROUTE(9, "right", 0.25)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.25)
+	MDRV_SOUND_ROUTE(2, "lspeaker", 0.25)
+	MDRV_SOUND_ROUTE(3, "lspeaker", 0.25)
+	MDRV_SOUND_ROUTE(4, "lspeaker", 0.25)
+	MDRV_SOUND_ROUTE(5, "rspeaker", 0.25)
+	MDRV_SOUND_ROUTE(6, "rspeaker", 0.25)
+	MDRV_SOUND_ROUTE(7, "rspeaker", 0.25)
+	MDRV_SOUND_ROUTE(8, "rspeaker", 0.25)
+	MDRV_SOUND_ROUTE(9, "rspeaker", 0.25)
 MACHINE_DRIVER_END
 
 

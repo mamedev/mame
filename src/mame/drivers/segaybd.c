@@ -995,17 +995,17 @@ static MACHINE_DRIVER_START( yboard )
 	MDRV_VIDEO_UPDATE(yboard)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.43)
-	MDRV_SOUND_ROUTE(1, "right", 0.43)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.43)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MDRV_SOUND_ADD("pcm", SEGAPCM, SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(segapcm_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

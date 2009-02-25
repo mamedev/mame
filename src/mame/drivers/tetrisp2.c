@@ -1208,11 +1208,11 @@ static MACHINE_DRIVER_START( tetrisp2 )
 	MDRV_VIDEO_UPDATE(tetrisp2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1272,11 +1272,11 @@ static MACHINE_DRIVER_START( rockn )
 	MDRV_VIDEO_UPDATE(rockntread)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1304,11 +1304,11 @@ static MACHINE_DRIVER_START( rockn2 )
 	MDRV_VIDEO_UPDATE(rockntread)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1317,11 +1317,11 @@ static MACHINE_DRIVER_START( rocknms )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rocknms_main_readmem,rocknms_main_writemem)
-	MDRV_CPU_VBLANK_INT("left", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("lscreen", irq2_line_hold)
 
 	MDRV_CPU_ADD("sub", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(rocknms_sub_readmem,rocknms_sub_writemem)
-	MDRV_CPU_VBLANK_INT("left", irq2_line_hold)
+	MDRV_CPU_VBLANK_INT("lscreen", irq2_line_hold)
 
 	MDRV_NVRAM_HANDLER(tetrisp2)
 
@@ -1331,14 +1331,14 @@ static MACHINE_DRIVER_START( rocknms )
 	MDRV_PALETTE_LENGTH(0x10000)
 	MDRV_DEFAULT_LAYOUT(layout_rocknms)
 
-	MDRV_SCREEN_ADD("left", RASTER)
+	MDRV_SCREEN_ADD("lscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(0x140, 0xe0)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0, 0xe0-1)
 
-	MDRV_SCREEN_ADD("right", RASTER)
+	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -1350,11 +1350,11 @@ static MACHINE_DRIVER_START( rocknms )
 	MDRV_VIDEO_UPDATE(rocknms)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

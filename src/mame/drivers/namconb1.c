@@ -1023,12 +1023,12 @@ static MACHINE_DRIVER_START( namconb1 )
 	MDRV_VIDEO_START(namconb1)
 	MDRV_VIDEO_UPDATE(namconb1)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("c352", C352, MASTER_CLOCK_HZ/3)
-	MDRV_SOUND_ROUTE(0, "right", 1.00)
-	MDRV_SOUND_ROUTE(1, "left", 1.00)
-	MDRV_SOUND_ROUTE(2, "right", 1.00)
-	MDRV_SOUND_ROUTE(3, "left", 1.00)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( namconb2 )
@@ -1056,12 +1056,12 @@ static MACHINE_DRIVER_START( namconb2 )
 	MDRV_VIDEO_START(namconb2)
 	MDRV_VIDEO_UPDATE(namconb2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("c352", C352, MASTER_CLOCK_HZ/3)
-	MDRV_SOUND_ROUTE(0, "right", 1.00)
-	MDRV_SOUND_ROUTE(1, "left", 1.00)
-	MDRV_SOUND_ROUTE(2, "right", 1.00)
-	MDRV_SOUND_ROUTE(3, "left", 1.00)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_DRIVER_END
 
 /***************************************************************/

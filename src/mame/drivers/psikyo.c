@@ -1232,14 +1232,14 @@ static MACHINE_DRIVER_START( sngkace )
 	MDRV_VIDEO_UPDATE(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(sngkace_ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "left",  1.2)
-	MDRV_SOUND_ROUTE(0, "right", 1.2)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  1.2)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1283,14 +1283,14 @@ static MACHINE_DRIVER_START( gunbird )
 	MDRV_VIDEO_UPDATE(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2610, 8000000)
 	MDRV_SOUND_CONFIG(gunbird_ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "left",  1.2)
-	MDRV_SOUND_ROUTE(0, "right", 1.2)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  1.2)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -1345,12 +1345,12 @@ static MACHINE_DRIVER_START( s1945 )
 	MDRV_VIDEO_UPDATE(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
 	MDRV_SOUND_CONFIG(ymf278b_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

@@ -398,7 +398,7 @@ static MACHINE_DRIVER_START( namcos10 )
 	MDRV_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( namcos10 )

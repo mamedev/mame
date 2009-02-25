@@ -706,15 +706,15 @@ static MACHINE_DRIVER_START( dlair_base )
 	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ay", AY8910, MASTER_CLOCK_US/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.33)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -759,15 +759,15 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_PALETTE_INIT(dleuro)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.33)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.33)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
 	MDRV_SOUND_ADD("laserdisc", LASERDISC, 0)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

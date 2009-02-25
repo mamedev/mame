@@ -468,8 +468,8 @@ VIDEO_UPDATE( fromanc2 )
 	int *scrolly = NULL;
 	tilemap **tilemaps = NULL;
 
-	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lscreen");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "rscreen");
 
 	if (screen == left_screen)
 	{

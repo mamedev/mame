@@ -2105,16 +2105,16 @@ static MACHINE_DRIVER_START( fncywld )
 	MDRV_VIDEO_UPDATE(fncywld)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 32220000/9)
-	MDRV_SOUND_ROUTE(0, "left", 0.20)
-	MDRV_SOUND_ROUTE(1, "right", 0.20)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2168,17 +2168,17 @@ static MACHINE_DRIVER_START( htchctch )
 	MDRV_VIDEO_UPDATE(semicom)
 
 	/* sound hardware - same as hyperpac */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
-	MDRV_SOUND_ROUTE(0, "left", 0.10)
-	MDRV_SOUND_ROUTE(1, "right", 0.10)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1024000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cookbib )
@@ -2192,8 +2192,8 @@ static MACHINE_DRIVER_START( bcstory )
 
 	MDRV_SOUND_REPLACE("ym", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
-	MDRV_SOUND_ROUTE(0, "left", 0.10)
-	MDRV_SOUND_ROUTE(1, "right", 0.10)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( semibase )
@@ -2213,8 +2213,8 @@ static MACHINE_DRIVER_START( metlsavr )
 
 	MDRV_SOUND_REPLACE("ym", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
-	MDRV_SOUND_ROUTE(0, "left", 0.10)
-	MDRV_SOUND_ROUTE(1, "right", 0.10)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( jumppop )
@@ -2242,16 +2242,16 @@ static MACHINE_DRIVER_START( jumppop )
 	MDRV_VIDEO_START(jumppop)
 	MDRV_VIDEO_UPDATE(jumppop)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM3812, 3500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.70)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.70)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 875000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( suprtrio )
@@ -2279,12 +2279,12 @@ static MACHINE_DRIVER_START( suprtrio )
 	MDRV_VIDEO_UPDATE(suprtrio)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 875000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pangpang )

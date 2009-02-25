@@ -468,8 +468,8 @@ VIDEO_UPDATE( gaelco2_dual )
 {
 	int i;
 
-	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lscreen");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "rscreen");
 
 	/* read scroll values */
 	int scroll0x = gaelco2_videoram[0x2802/2] + 0x14;

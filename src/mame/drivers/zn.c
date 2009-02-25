@@ -463,12 +463,12 @@ static MACHINE_DRIVER_START( zn1_1mb_vram )
 	MDRV_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE(0, "left", 0.35)
-	MDRV_SOUND_ROUTE(1, "right", 0.35)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
 
 	MDRV_AT28C16_ADD( "at28c16", NULL )
 MACHINE_DRIVER_END
@@ -501,12 +501,12 @@ static MACHINE_DRIVER_START( zn2 )
 	MDRV_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE(0, "left", 0.35)
-	MDRV_SOUND_ROUTE(1, "right", 0.35)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
 
 	MDRV_AT28C16_ADD( "at28c16", NULL )
 MACHINE_DRIVER_END
@@ -707,8 +707,8 @@ static MACHINE_DRIVER_START( coh1000c )
 	MDRV_MACHINE_RESET( coh1000c )
 
 	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coh1002c )
@@ -722,8 +722,8 @@ static MACHINE_DRIVER_START( coh1002c )
 	MDRV_MACHINE_RESET( coh1000c )
 
 	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /*
@@ -903,8 +903,8 @@ static MACHINE_DRIVER_START( coh3002c )
 	MDRV_MACHINE_RESET( coh3002c )
 
 	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /*
@@ -1229,10 +1229,10 @@ static MACHINE_DRIVER_START( coh1000ta )
 
 	MDRV_SOUND_ADD("ym", YM2610B, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "left",  0.25)
-	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static WRITE32_HANDLER( taitofx1b_volume_w )
@@ -1844,8 +1844,8 @@ static MACHINE_DRIVER_START( coh1002e )
 	MDRV_MACHINE_RESET( coh1002e )
 
 	MDRV_SOUND_ADD( "ymf", YMF271, 16934400 )
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2763,8 +2763,8 @@ static MACHINE_DRIVER_START( coh1002msnd )
 	MDRV_MACHINE_RESET( coh1002m )
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coh1002ml )

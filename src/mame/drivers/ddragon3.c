@@ -630,17 +630,17 @@ static MACHINE_DRIVER_START( ddragon3 )
 	MDRV_VIDEO_UPDATE(ddragon3)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym2151", YM2151, XTAL_3_579545MHz)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.50)
-	MDRV_SOUND_ROUTE(1, "right", 0.50)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1_056MHz)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ddrago3b )
@@ -662,12 +662,12 @@ static MACHINE_DRIVER_START( ctribe )
 	MDRV_VIDEO_UPDATE(ctribe)
 
 	MDRV_SOUND_MODIFY("ym2151")
-	MDRV_SOUND_ROUTE(0, "left", 1.20)
-	MDRV_SOUND_ROUTE(1, "right", 1.20)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.20)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.20)
 
 	MDRV_SOUND_MODIFY("oki")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 /*************************************

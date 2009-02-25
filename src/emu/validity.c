@@ -166,7 +166,9 @@ INLINE int validate_tag(const game_driver *driver, const char *object, const cha
 	/* some common names that are now deprecated */
 	if (strcmp(tag, "main") == 0 ||
 		strcmp(tag, "audio") == 0 ||
-		strcmp(tag, "sound") == 0)
+		strcmp(tag, "sound") == 0 ||
+		strcmp(tag, "left") == 0 ||
+		strcmp(tag, "right") == 0)
 	{
 		mame_printf_error("%s: %s has invalid generic tag '%s'\n", driver->source_file, driver->name, tag);
 		error = TRUE;

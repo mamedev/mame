@@ -45,10 +45,10 @@ void namcoc7x_set_host_ram(UINT32 *hostram);
 	MDRV_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
 
 #define NAMCO_C7X_SOUND(clock)	\
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")	\
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")	\
 	MDRV_SOUND_ADD("c352", C352, clock)	\
-	MDRV_SOUND_ROUTE(0, "right", 1.00)	\
-	MDRV_SOUND_ROUTE(1, "left", 1.00)	\
-	MDRV_SOUND_ROUTE(2, "right", 1.00)	\
-	MDRV_SOUND_ROUTE(3, "left", 1.00)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)	\
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)	\
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)	\
+	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 

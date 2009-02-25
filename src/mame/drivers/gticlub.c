@@ -275,7 +275,7 @@ static VIDEO_UPDATE( hangplt )
 {
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
-	if (strcmp(screen->tag, "left") == 0)
+	if (strcmp(screen->tag, "lscreen") == 0)
 	{
 		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo0");
 
@@ -285,7 +285,7 @@ static VIDEO_UPDATE( hangplt )
 
 		K001604_draw_front_layer(0, bitmap, cliprect);
 	}
-	else if (strcmp(screen->tag, "right") == 0)
+	else if (strcmp(screen->tag, "rscreen") == 0)
 	{
 		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo1");
 
@@ -939,11 +939,11 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_VIDEO_START(gticlub)
 	MDRV_VIDEO_UPDATE(gticlub)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("rf", RF5C400, 64000000/4)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_RESET( hangplt )
@@ -975,13 +975,13 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_MACHINE_START(gticlub)
 	MDRV_MACHINE_RESET(hangplt)
 
-	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "left")
+	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "lscreen")
 	MDRV_3DFX_VOODOO_CPU("dsp1")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
-	MDRV_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "right")
+	MDRV_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "rscreen")
 	MDRV_3DFX_VOODOO_CPU("dsp2")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 2)
@@ -990,13 +990,13 @@ static MACHINE_DRIVER_START( hangplt )
  	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)
 
-	MDRV_SCREEN_ADD("left", RASTER)
+	MDRV_SCREEN_ADD("lscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(512, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 
-	MDRV_SCREEN_ADD("right", RASTER)
+	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(512, 384)
@@ -1005,11 +1005,11 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_VIDEO_START(hangplt)
 	MDRV_VIDEO_UPDATE(hangplt)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("rf", RF5C400, 64000000/4)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /*************************************************************************/

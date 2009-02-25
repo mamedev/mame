@@ -354,12 +354,12 @@ static MACHINE_DRIVER_START( champbwl )
 	MDRV_VIDEO_EOF(tnzs)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("x1", X1_010, 16000000)
 	MDRV_SOUND_CONFIG(champbwl_sound_intf)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 ROM_START( champbwl )

@@ -334,12 +334,12 @@ static MACHINE_DRIVER_START( bestleag )
 	MDRV_VIDEO_START(bestleag)
 	MDRV_VIDEO_UPDATE(bestleag)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1000000) /* Hand-tuned */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.00)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_DRIVER_END
 
 /* Rom Loading */

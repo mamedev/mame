@@ -1623,16 +1623,16 @@ static MACHINE_DRIVER_START( default )
 	MDRV_VIDEO_START(namcos2)
 	MDRV_VIDEO_UPDATE(namcos2_default)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
 	MDRV_SOUND_CONFIG(c140_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.75)
-	MDRV_SOUND_ROUTE(1, "right", 0.75)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 /* adjusted machine driver start */
@@ -1641,8 +1641,8 @@ static MACHINE_DRIVER_START( default2 )
 
 	MDRV_SOUND_REPLACE("c140", C140, 8000000/374)
 	MDRV_SOUND_CONFIG(c140_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 /* end */
 
@@ -1651,12 +1651,12 @@ static MACHINE_DRIVER_START( default3 )
 
 	MDRV_SOUND_REPLACE("c140", C140, 8000000/374)
 	MDRV_SOUND_CONFIG(c140_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.45)
-	MDRV_SOUND_ROUTE(1, "right", 0.45)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.45)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.45)
 
 	MDRV_SOUND_REPLACE("ym", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gollygho )
@@ -1697,16 +1697,16 @@ static MACHINE_DRIVER_START( gollygho )
 	MDRV_VIDEO_START(namcos2)
 	MDRV_VIDEO_UPDATE(namcos2_default)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
 	MDRV_SOUND_CONFIG(c140_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.75)
-	MDRV_SOUND_ROUTE(1, "right", 0.75)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( finallap )
@@ -1747,16 +1747,16 @@ static MACHINE_DRIVER_START( finallap )
 	MDRV_VIDEO_START(finallap)
 	MDRV_VIDEO_UPDATE(finallap)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
 	MDRV_SOUND_CONFIG(c140_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.75)
-	MDRV_SOUND_ROUTE(1, "right", 0.75)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgunner )
@@ -1797,16 +1797,16 @@ static MACHINE_DRIVER_START( sgunner )
 	MDRV_VIDEO_START(sgunner)
 	MDRV_VIDEO_UPDATE(sgunner)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
 	MDRV_SOUND_CONFIG(c140_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.75)
-	MDRV_SOUND_ROUTE(1, "right", 0.75)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( luckywld )
@@ -1847,16 +1847,16 @@ static MACHINE_DRIVER_START( luckywld )
 	MDRV_VIDEO_START(luckywld)
 	MDRV_VIDEO_UPDATE(luckywld)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
 	MDRV_SOUND_CONFIG(c140_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.75)
-	MDRV_SOUND_ROUTE(1, "right", 0.75)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( metlhawk )
@@ -1897,16 +1897,16 @@ static MACHINE_DRIVER_START( metlhawk )
 	MDRV_VIDEO_START(metlhawk)
 	MDRV_VIDEO_UPDATE(metlhawk)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("c140", C140, 8000000/374)
 	MDRV_SOUND_CONFIG(c140_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579580)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_DRIVER_END
 
 

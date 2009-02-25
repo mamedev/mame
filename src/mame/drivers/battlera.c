@@ -259,20 +259,20 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_VIDEO_UPDATE(battlera)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2203, 12000000 / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.85)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.85)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
 
 	MDRV_SOUND_ADD("audiocpu", C6280, 21477270/6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_DRIVER_END
 
 /******************************************************************************/

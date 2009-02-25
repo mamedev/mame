@@ -555,16 +555,16 @@ static MACHINE_DRIVER_START( vigilant )
 	MDRV_VIDEO_UPDATE(vigilant)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579645)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.55)
-	MDRV_SOUND_ROUTE(1, "right", 0.55)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.55)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.55)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( buccanrs )
@@ -598,32 +598,32 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_VIDEO_UPDATE(vigilant)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 18432000/6)
 	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "left",  0.35)
-	MDRV_SOUND_ROUTE(0, "right", 0.35)
-	MDRV_SOUND_ROUTE(1, "left",  0.35)
-	MDRV_SOUND_ROUTE(1, "right", 0.35)
-	MDRV_SOUND_ROUTE(2, "left",  0.35)
-	MDRV_SOUND_ROUTE(2, "right", 0.35)
-	MDRV_SOUND_ROUTE(3, "left",  0.50)
-	MDRV_SOUND_ROUTE(3, "right", 0.50)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.35)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.35)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  0.35)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.35)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.35)
+	MDRV_SOUND_ROUTE(3, "lspeaker",  0.50)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.50)
 
 	MDRV_SOUND_ADD("ym2", YM2203, 18432000/6)
-	MDRV_SOUND_ROUTE(0, "left",  0.35)
-	MDRV_SOUND_ROUTE(0, "right", 0.35)
-	MDRV_SOUND_ROUTE(1, "left",  0.35)
-	MDRV_SOUND_ROUTE(1, "right", 0.35)
-	MDRV_SOUND_ROUTE(2, "left",  0.35)
-	MDRV_SOUND_ROUTE(2, "right", 0.35)
-	MDRV_SOUND_ROUTE(3, "left",  0.50)
-	MDRV_SOUND_ROUTE(3, "right", 0.50)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.35)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.35)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  0.35)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.35)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.35)
+	MDRV_SOUND_ROUTE(3, "lspeaker",  0.50)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.50)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.35)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.35)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kikcubic )
@@ -657,16 +657,16 @@ static MACHINE_DRIVER_START( kikcubic )
 	MDRV_VIDEO_UPDATE(kikcubic)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579645)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.55)
-	MDRV_SOUND_ROUTE(1, "right", 0.55)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.55)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.55)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

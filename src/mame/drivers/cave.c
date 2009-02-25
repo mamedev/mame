@@ -1987,12 +1987,12 @@ static MACHINE_DRIVER_START( dfeveron )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2026,12 +2026,12 @@ static MACHINE_DRIVER_START( ddonpach )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2065,17 +2065,17 @@ static MACHINE_DRIVER_START( donpachi )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_1_056MHz)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.60)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 2112000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2109,12 +2109,12 @@ static MACHINE_DRIVER_START( esprade )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2147,12 +2147,12 @@ static MACHINE_DRIVER_START( gaia )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2186,12 +2186,12 @@ static MACHINE_DRIVER_START( guwange )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -2228,23 +2228,23 @@ static MACHINE_DRIVER_START( hotdogst )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_4MHz)
 	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "left",  0.20)
-	MDRV_SOUND_ROUTE(0, "right", 0.20)
-	MDRV_SOUND_ROUTE(1, "left",  0.20)
-	MDRV_SOUND_ROUTE(1, "right", 0.20)
-	MDRV_SOUND_ROUTE(2, "left",  0.20)
-	MDRV_SOUND_ROUTE(2, "right", 0.20)
-	MDRV_SOUND_ROUTE(3, "left",  0.80)
-	MDRV_SOUND_ROUTE(3, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.20)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  0.20)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.20)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.20)
+	MDRV_SOUND_ROUTE(3, "lspeaker",  0.80)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1_056MHz)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2278,12 +2278,12 @@ static MACHINE_DRIVER_START( korokoro )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2323,23 +2323,23 @@ static MACHINE_DRIVER_START( mazinger )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_4MHz)
 	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "left",  0.20)
-	MDRV_SOUND_ROUTE(0, "right", 0.20)
-	MDRV_SOUND_ROUTE(1, "left",  0.20)
-	MDRV_SOUND_ROUTE(1, "right", 0.20)
-	MDRV_SOUND_ROUTE(2, "left",  0.20)
-	MDRV_SOUND_ROUTE(2, "right", 0.20)
-	MDRV_SOUND_ROUTE(3, "left",  0.60)
-	MDRV_SOUND_ROUTE(3, "right", 0.60)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.20)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  0.20)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.20)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.20)
+	MDRV_SOUND_ROUTE(3, "lspeaker",  0.60)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.60)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1_056MHz)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 2.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 2.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
 MACHINE_DRIVER_END
 
 
@@ -2379,22 +2379,22 @@ static MACHINE_DRIVER_START( metmqstr )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_16MHz / 4)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.20)
-	MDRV_SOUND_ROUTE(1, "right", 1.20)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.20)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.20)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_32MHz / 16 )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_32MHz / 16 )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2434,28 +2434,28 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_16MHz / 4)
 	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "left",  0.40)
-	MDRV_SOUND_ROUTE(0, "right", 0.40)
-	MDRV_SOUND_ROUTE(1, "left",  0.40)
-	MDRV_SOUND_ROUTE(1, "right", 0.40)
-	MDRV_SOUND_ROUTE(2, "left",  0.40)
-	MDRV_SOUND_ROUTE(2, "right", 0.40)
-	MDRV_SOUND_ROUTE(3, "left",  0.80)
-	MDRV_SOUND_ROUTE(3, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.40)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.40)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  0.40)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.40)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.40)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.40)
+	MDRV_SOUND_ROUTE(3, "lspeaker",  0.80)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.80)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_3MHz )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_3MHz )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.00)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_DRIVER_END
 
 
@@ -2495,21 +2495,21 @@ static MACHINE_DRIVER_START( sailormn )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_16MHz/4)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.30)
-	MDRV_SOUND_ROUTE(1, "right", 0.30)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, 2112000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 2112000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2542,12 +2542,12 @@ static MACHINE_DRIVER_START( uopoko )
 	MDRV_VIDEO_UPDATE(cave)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

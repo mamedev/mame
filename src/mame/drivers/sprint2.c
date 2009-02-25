@@ -524,12 +524,12 @@ static MACHINE_DRIVER_START( sprint2 )
 	MDRV_VIDEO_EOF(sprint2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(sprint2)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -538,8 +538,8 @@ static MACHINE_DRIVER_START( sprint1 )
 	MDRV_IMPORT_FROM(sprint2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_REMOVE("left")
-	MDRV_SPEAKER_REMOVE("right")
+	MDRV_SPEAKER_REMOVE("lspeaker")
+	MDRV_SPEAKER_REMOVE("rspeaker")
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_REMOVE("discrete")
@@ -555,8 +555,8 @@ static MACHINE_DRIVER_START( dominos )
 	MDRV_IMPORT_FROM(sprint2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_REMOVE("left")
-	MDRV_SPEAKER_REMOVE("right")
+	MDRV_SPEAKER_REMOVE("lspeaker")
+	MDRV_SPEAKER_REMOVE("rspeaker")
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_REMOVE("discrete")

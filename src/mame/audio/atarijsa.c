@@ -776,12 +776,12 @@ MACHINE_DRIVER_START( jsa_i_stereo )
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.60)
-	MDRV_SOUND_ROUTE(1, "right", 0.60)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_DRIVER_END
 
 
@@ -794,8 +794,8 @@ MACHINE_DRIVER_START( jsa_i_stereo_swapped )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ym", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "right", 0.60)
-	MDRV_SOUND_ROUTE(1, "left", 0.60)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.60)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.60)
 MACHINE_DRIVER_END
 
 
@@ -807,8 +807,8 @@ MACHINE_DRIVER_START( jsa_i_stereo_pokey )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_DRIVER_END
 
 
@@ -885,20 +885,20 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.60)
-	MDRV_SOUND_ROUTE(1, "right", 0.60)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
 
 	MDRV_SOUND_ADD("adpcml", OKIM6295, JSA_MASTER_CLOCK/3)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 
 	MDRV_SOUND_ADD("adpcmr", OKIM6295, JSA_MASTER_CLOCK/3)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_DRIVER_END
 
 

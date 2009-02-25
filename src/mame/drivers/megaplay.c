@@ -784,8 +784,8 @@ static MACHINE_DRIVER_START( mpnew )
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25) /* 3.58 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right",0.25) /* 3.58 MHz */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 
 	/* New update functions to handle the extra layer */
 	MDRV_VIDEO_START(megplay)

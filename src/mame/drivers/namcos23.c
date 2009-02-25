@@ -1319,13 +1319,13 @@ static MACHINE_DRIVER_START( gorgon )
 	MDRV_VIDEO_UPDATE(gorgon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("c352", C352, 14745600)
-	MDRV_SOUND_ROUTE(0, "right", 1.00)
-	MDRV_SOUND_ROUTE(1, "left", 1.00)
-	MDRV_SOUND_ROUTE(2, "right", 1.00)
-	MDRV_SOUND_ROUTE(3, "left", 1.00)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( s23 )
@@ -1363,13 +1363,13 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_VIDEO_UPDATE(ss23)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("c352", C352, 14745600)
-	MDRV_SOUND_ROUTE(0, "right", 1.00)
-	MDRV_SOUND_ROUTE(1, "left", 1.00)
-	MDRV_SOUND_ROUTE(2, "right", 1.00)
-	MDRV_SOUND_ROUTE(3, "left", 1.00)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ss23 )
@@ -1402,13 +1402,13 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_VIDEO_UPDATE(ss23)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("c352", C352, 14745600)
-	MDRV_SOUND_ROUTE(0, "right", 1.00)
-	MDRV_SOUND_ROUTE(1, "left", 1.00)
-	MDRV_SOUND_ROUTE(2, "right", 1.00)
-	MDRV_SOUND_ROUTE(3, "left", 1.00)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_DRIVER_END
 
 ROM_START( rapidrvr )

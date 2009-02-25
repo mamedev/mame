@@ -973,17 +973,17 @@ static MACHINE_DRIVER_START( mystwarr )
 	MDRV_VIDEO_UPDATE(mystwarr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("konami1", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "right", 1.0)	/* stereo channels are inverted */
-	MDRV_SOUND_ROUTE(1, "left", 1.0)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)	/* stereo channels are inverted */
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
 
 	MDRV_SOUND_ADD("konami2", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "right", 1.0)	/* stereo channels are inverted */
-	MDRV_SOUND_ROUTE(1, "left", 1.0)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)	/* stereo channels are inverted */
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( viostorm )

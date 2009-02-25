@@ -1543,22 +1543,22 @@ static MACHINE_DRIVER_START( system_A )
 	MDRV_VIDEO_UPDATE(megasys1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, OKI4_SOUND_CLOCK) /* 4MHz verified */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( system_A_hachoo )
@@ -1587,13 +1587,13 @@ static MACHINE_DRIVER_START( system_B_hayaosi1 )
 
 	MDRV_SOUND_REPLACE("oki1",OKIM6295, 2000000) /* correct speed, but unknown OSC + divider combo */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
 	MDRV_SOUND_REPLACE("oki2",OKIM6295, 2000000) /* correct speed, but unknown OSC + divider combo */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_DRIVER_END
 
 

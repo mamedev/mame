@@ -2827,14 +2827,14 @@ static MACHINE_DRIVER_START( qsound )
 
 	/* sound hardware */
 	MDRV_SPEAKER_REMOVE("mono")
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_REMOVE("2151")
 	MDRV_SOUND_REMOVE("oki")
 
 	MDRV_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /* bootlegs with PIC */

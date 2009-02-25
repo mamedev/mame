@@ -320,14 +320,14 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_VIDEO_START(superdq)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.8)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
 
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

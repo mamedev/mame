@@ -51,7 +51,7 @@ static MACHINE_DRIVER_START( mpu5 )
 	MDRV_VIDEO_START(mpu5)
 	MDRV_VIDEO_UPDATE(mpu5)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
 MACHINE_DRIVER_END
 

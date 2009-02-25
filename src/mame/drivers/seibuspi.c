@@ -1743,12 +1743,12 @@ static MACHINE_DRIVER_START( spi )
 	MDRV_VIDEO_START(spi)
 	MDRV_VIDEO_UPDATE(spi)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymf", YMF271, 16934400)
 	MDRV_SOUND_CONFIG(ymf271_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_RESET( sxx2f )
@@ -1788,8 +1788,8 @@ static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured cloc
 	MDRV_SOUND_REPLACE("ymf", YMF271, 16384000) /* 16.3840MHz */
 	MDRV_SOUND_CONFIG(ymf271_config)
 
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_MACHINE_RESET(sxx2f)
 	MDRV_NVRAM_HANDLER(sxx2f)

@@ -431,11 +431,11 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("snes", SNES, 0)
-	MDRV_SOUND_ROUTE(0, "left", 1.00)
-	MDRV_SOUND_ROUTE(1, "right", 1.00)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_DRIVER_END
 
 /***************************************************************************

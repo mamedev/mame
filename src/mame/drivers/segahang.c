@@ -919,23 +919,23 @@ static MACHINE_DRIVER_START( sound_board_2203 )
 	MDRV_CPU_IO_MAP(sound_portmap_2203,0)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2203, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "left",  0.13)
-	MDRV_SOUND_ROUTE(0, "right", 0.13)
-	MDRV_SOUND_ROUTE(1, "left",  0.13)
-	MDRV_SOUND_ROUTE(1, "right", 0.13)
-	MDRV_SOUND_ROUTE(2, "left",  0.13)
-	MDRV_SOUND_ROUTE(2, "right", 0.13)
-	MDRV_SOUND_ROUTE(3, "left",  0.37)
-	MDRV_SOUND_ROUTE(3, "right", 0.37)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.13)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.13)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  0.13)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.13)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.13)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.13)
+	MDRV_SOUND_ROUTE(3, "lspeaker",  0.37)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.37)
 
 	MDRV_SOUND_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz)
 	MDRV_SOUND_CONFIG(segapcm_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -947,33 +947,33 @@ static MACHINE_DRIVER_START( sound_board_2203x2 )
 	MDRV_CPU_IO_MAP(sound_portmap_2203x2,0)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym1", YM2203, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "left",  0.13)
-	MDRV_SOUND_ROUTE(0, "right", 0.13)
-	MDRV_SOUND_ROUTE(1, "left",  0.13)
-	MDRV_SOUND_ROUTE(1, "right", 0.13)
-	MDRV_SOUND_ROUTE(2, "left",  0.13)
-	MDRV_SOUND_ROUTE(2, "right", 0.13)
-	MDRV_SOUND_ROUTE(3, "left",  0.37)
-	MDRV_SOUND_ROUTE(3, "right", 0.37)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.13)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.13)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  0.13)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.13)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.13)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.13)
+	MDRV_SOUND_ROUTE(3, "lspeaker",  0.37)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.37)
 
 	MDRV_SOUND_ADD("ym2", YM2203, MASTER_CLOCK_8MHz/2)
-	MDRV_SOUND_ROUTE(0, "left",  0.13)
-	MDRV_SOUND_ROUTE(0, "right", 0.13)
-	MDRV_SOUND_ROUTE(1, "left",  0.13)
-	MDRV_SOUND_ROUTE(1, "right", 0.13)
-	MDRV_SOUND_ROUTE(2, "left",  0.13)
-	MDRV_SOUND_ROUTE(2, "right", 0.13)
-	MDRV_SOUND_ROUTE(3, "left",  0.37)
-	MDRV_SOUND_ROUTE(3, "right", 0.37)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.13)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.13)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  0.13)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.13)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.13)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.13)
+	MDRV_SOUND_ROUTE(3, "lspeaker",  0.37)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.37)
 
 	MDRV_SOUND_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(segapcm_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -985,17 +985,17 @@ static MACHINE_DRIVER_START( sound_board_2151 )
 	MDRV_CPU_IO_MAP(sound_portmap_2151,0)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.43)
-	MDRV_SOUND_ROUTE(1, "right", 0.43)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.43)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MDRV_SOUND_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz/2)
 	MDRV_SOUND_CONFIG(segapcm_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

@@ -683,8 +683,8 @@ VIDEO_UPDATE( rocknms )
 	int scr_pri;
 	int rot_pri;
 
-	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lscreen");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "rscreen");
 
 	/* Black background color */
 	if (screen == left_screen)

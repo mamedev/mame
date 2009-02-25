@@ -486,14 +486,14 @@ MACHINE_DRIVER_START(mcr_ssio)
 	MDRV_CPU_PROGRAM_MAP(ssio_map,0)
 	MDRV_CPU_PERIODIC_INT(ssio_14024_clock, SSIO_CLOCK/2/16/10)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("ssio.1", AY8910, SSIO_CLOCK/2/4)
 	MDRV_SOUND_CONFIG(ssio_ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.33)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 
 	MDRV_SOUND_ADD("ssio.2", AY8910, SSIO_CLOCK/2/4)
 	MDRV_SOUND_CONFIG(ssio_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.33)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 MACHINE_DRIVER_END
 
 
@@ -617,8 +617,8 @@ MACHINE_DRIVER_START(chip_squeak_deluxe_stereo)
 	MDRV_CPU_PROGRAM_MAP(csdeluxe_map,0)
 
 	MDRV_SOUND_ADD("csd", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -961,8 +961,8 @@ MACHINE_DRIVER_START(squawk_n_talk)
 
 	/* only used on Discs of Tron, which is stereo */
 	MDRV_SOUND_ADD("snt", TMS5200, 640000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	/* the board also supports an AY-8912 and/or an 8-bit DAC, neither of */
 	/* which are populated on the Discs of Tron board */

@@ -120,9 +120,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 VIDEO_UPDATE( darius )
 {
 	int xoffs = 0;
-	const device_config *left_screen   = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *middle_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "middle");
-	const device_config *right_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+	const device_config *left_screen   = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lscreen");
+	const device_config *middle_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "mscreen");
+	const device_config *right_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "rscreen");
 
 	if (screen == left_screen)
 		xoffs = 36*8*0;

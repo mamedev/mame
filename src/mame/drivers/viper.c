@@ -620,7 +620,7 @@ static MACHINE_DRIVER_START(viper)
 	MDRV_VIDEO_UPDATE(viper)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_M48T58_ADD( "m48t58" )
 MACHINE_DRIVER_END

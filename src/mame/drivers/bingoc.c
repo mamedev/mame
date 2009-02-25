@@ -151,15 +151,15 @@ static MACHINE_DRIVER_START( bingoc )
 	MDRV_VIDEO_START(bingoc)
 	MDRV_VIDEO_UPDATE(bingoc)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right") //might just be mono...
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker") //might just be mono...
 
 	MDRV_SOUND_ADD("ym", YM2151, 7159160/2)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 ROM_START( bingoc )

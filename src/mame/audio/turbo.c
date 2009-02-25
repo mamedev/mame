@@ -194,48 +194,48 @@ static const samples_interface turbo_samples_interface =
 MACHINE_DRIVER_START( turbo_samples )
 
 	/* this is the cockpit speaker configuration */
-	MDRV_SPEAKER_ADD("front", 0.0, 0.0, 1.0)
-	MDRV_SPEAKER_ADD("rear",  0.0, 0.0, -0.5)
-	MDRV_SPEAKER_ADD("left", -0.2, 0.0, 1.0)
-	MDRV_SPEAKER_ADD("right", 0.2, 0.0, 1.0)
+	MDRV_SPEAKER_ADD("fspeaker", 0.0, 0.0, 1.0)		/* front */
+	MDRV_SPEAKER_ADD("bspeaker",  0.0, 0.0, -0.5)	/* back */
+	MDRV_SPEAKER_ADD("lspeaker", -0.2, 0.0, 1.0)	/* left */
+	MDRV_SPEAKER_ADD("rspeaker", 0.2, 0.0, 1.0)		/* right */
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(turbo_samples_interface)
 
 	/* channel 0 = CRASH.S -> CRASH.S/SM */
-	MDRV_SOUND_ROUTE(0, "front", 0.25)
+	MDRV_SOUND_ROUTE(0, "fspeaker", 0.25)
 
 	/* channel 1 = TRIG1-4 -> ALARM.M/F/R/L */
-	MDRV_SOUND_ROUTE(1, "front", 0.25)
-	MDRV_SOUND_ROUTE(1, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  0.25)
+	MDRV_SOUND_ROUTE(1, "fspeaker", 0.25)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  0.25)
 
 	/* channel 2 = SLIP/SPIN -> SKID.F/R/L/M */
-	MDRV_SOUND_ROUTE(2, "front", 0.25)
-	MDRV_SOUND_ROUTE(2, "right", 0.25)
-	MDRV_SOUND_ROUTE(2, "left",  0.25)
+	MDRV_SOUND_ROUTE(2, "fspeaker", 0.25)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 0.25)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.25)
 
 	/* channel 3 = CRASH.L -> CRASH.L/LM */
-	MDRV_SOUND_ROUTE(3, "rear",  0.25)
+	MDRV_SOUND_ROUTE(3, "bspeaker",  0.25)
 
 	/* channel 4 = AMBU -> AMBULANCE/AMBULANCE.M */
-	MDRV_SOUND_ROUTE(4, "front", 0.25)
+	MDRV_SOUND_ROUTE(4, "fspeaker", 0.25)
 
 	/* channel 5 = ACCEL+BSEL -> MYCAR.F/W/M + MYCAR0.F/M + MYCAR1.F/M */
-	MDRV_SOUND_ROUTE(5, "front", 0.25)
-	MDRV_SOUND_ROUTE(5, "rear",  0.25)
+	MDRV_SOUND_ROUTE(5, "fspeaker", 0.25)
+	MDRV_SOUND_ROUTE(5, "bspeaker",  0.25)
 
 	/* channel 6 = OSEL -> OCAR.F/FM */
-	MDRV_SOUND_ROUTE(6, "front", 0.25)
+	MDRV_SOUND_ROUTE(6, "fspeaker", 0.25)
 
 	/* channel 7 = OSEL -> OCAR.L/LM */
-	MDRV_SOUND_ROUTE(7, "left",  0.25)
+	MDRV_SOUND_ROUTE(7, "lspeaker",  0.25)
 
 	/* channel 8 = OSEL -> OCAR.R/RM */
-	MDRV_SOUND_ROUTE(8, "right", 0.25)
+	MDRV_SOUND_ROUTE(8, "rspeaker", 0.25)
 
 	/* channel 9 = OSEL -> OCAR.W/WM */
-	MDRV_SOUND_ROUTE(9, "rear",  0.25)
+	MDRV_SOUND_ROUTE(9, "bspeaker",  0.25)
 MACHINE_DRIVER_END
 
 /*
@@ -450,42 +450,42 @@ static const samples_interface subroc3d_samples_interface =
 
 
 MACHINE_DRIVER_START( subroc3d_samples )
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(subroc3d_samples_interface)
 
 	/* MISSILE in channels 0 and 1 */
-	MDRV_SOUND_ROUTE(0, "left",  0.25)
-	MDRV_SOUND_ROUTE(1, "right", 0.25)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
 
 	/* TORPEDO in channels 2 and 3 */
-	MDRV_SOUND_ROUTE(2, "left",  0.25)
-	MDRV_SOUND_ROUTE(3, "right", 0.25)
+	MDRV_SOUND_ROUTE(2, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 0.25)
 
 	/* FIGHTER in channels 4 and 5 */
-	MDRV_SOUND_ROUTE(4, "left",  0.25)
-	MDRV_SOUND_ROUTE(5, "right", 0.25)
+	MDRV_SOUND_ROUTE(4, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(5, "rspeaker", 0.25)
 
 	/* HIT in channels 6 and 7 */
-	MDRV_SOUND_ROUTE(6, "left",  0.25)
-	MDRV_SOUND_ROUTE(7, "right", 0.25)
+	MDRV_SOUND_ROUTE(6, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(7, "rspeaker", 0.25)
 
 	/* FIRE sound in channel 8 */
-	MDRV_SOUND_ROUTE(8, "left",  0.25)
-	MDRV_SOUND_ROUTE(8, "right", 0.25)
+	MDRV_SOUND_ROUTE(8, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(8, "rspeaker", 0.25)
 
 	/* SHIP EXP sound in channel 9 */
-	MDRV_SOUND_ROUTE(9, "left",  0.25)
-	MDRV_SOUND_ROUTE(9, "right", 0.25)
+	MDRV_SOUND_ROUTE(9, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(9, "rspeaker", 0.25)
 
 	/* ALARM TRIG sound in channel 10 */
-	MDRV_SOUND_ROUTE(10, "left",  0.25)
-	MDRV_SOUND_ROUTE(10, "right", 0.25)
+	MDRV_SOUND_ROUTE(10, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(10, "rspeaker", 0.25)
 
 	/* PROLOGUE sound in channel 11 */
-	MDRV_SOUND_ROUTE(11, "left",  0.25)
-	MDRV_SOUND_ROUTE(11, "right", 0.25)
+	MDRV_SOUND_ROUTE(11, "lspeaker",  0.25)
+	MDRV_SOUND_ROUTE(11, "rspeaker", 0.25)
 MACHINE_DRIVER_END
 
 

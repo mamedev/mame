@@ -2229,23 +2229,23 @@ static MACHINE_DRIVER_START( salamand )
 	MDRV_VIDEO_UPDATE(salamand)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("vlm", VLM5030, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.10)
-	MDRV_SOUND_ROUTE(0, "right", 0.10)
-	MDRV_SOUND_ROUTE(1, "left", 0.10)
-	MDRV_SOUND_ROUTE(1, "right", 0.10)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.10)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2278,19 +2278,19 @@ static MACHINE_DRIVER_START( blkpnthr )
 	MDRV_VIDEO_UPDATE(salamand)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.10)
-	MDRV_SOUND_ROUTE(0, "right", 0.10)
-	MDRV_SOUND_ROUTE(1, "left", 0.10)
-	MDRV_SOUND_ROUTE(1, "right", 0.10)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.10)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2323,23 +2323,23 @@ static MACHINE_DRIVER_START( citybomb )
 	MDRV_VIDEO_UPDATE(salamand)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.30)
-	MDRV_SOUND_ROUTE(0, "right", 0.30)
-	MDRV_SOUND_ROUTE(1, "left", 0.30)
-	MDRV_SOUND_ROUTE(1, "right", 0.30)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.30)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
 	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("konami2", K051649, 3579545/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.38)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.38)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.38)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.38)
 MACHINE_DRIVER_END
 
 
@@ -2372,23 +2372,23 @@ static MACHINE_DRIVER_START( nyanpani )
 	MDRV_VIDEO_UPDATE(salamand)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.30)
-	MDRV_SOUND_ROUTE(0, "right", 0.30)
-	MDRV_SOUND_ROUTE(1, "left", 0.30)
-	MDRV_SOUND_ROUTE(1, "right", 0.30)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.30)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
 	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_SOUND_ADD("konami2", K051649, 3579545/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.38)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.38)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.38)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.38)
 MACHINE_DRIVER_END
 
 
@@ -2510,23 +2510,23 @@ static MACHINE_DRIVER_START( hcrash )
 	MDRV_VIDEO_UPDATE(salamand)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("vlm", VLM5030, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_CONFIG(k007232_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.10)
-	MDRV_SOUND_ROUTE(0, "right", 0.10)
-	MDRV_SOUND_ROUTE(1, "left", 0.10)
-	MDRV_SOUND_ROUTE(1, "right", 0.10)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.10)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.10)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 /***************************************************************************

@@ -2570,11 +2570,11 @@ static MACHINE_DRIVER_START( cps3 )
 	MDRV_VIDEO_UPDATE(cps3)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("cps3", CPS3, MASTER_CLOCK / 3)
-	MDRV_SOUND_ROUTE(1, "left", 1.0)
-	MDRV_SOUND_ROUTE(0, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

@@ -2806,16 +2806,16 @@ static MACHINE_DRIVER_START( konami573 )
 	MDRV_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
 	MDRV_SOUND_CONFIG( konami573_psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
+	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )
+	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
 	MDRV_M48T58_ADD( "m48t58" )
 MACHINE_DRIVER_END

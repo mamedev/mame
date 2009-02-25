@@ -73,12 +73,12 @@ static MACHINE_DRIVER_START( ddz )
 	MDRV_VIDEO_UPDATE(ddz)
 	MDRV_VIDEO_EOF(ddz)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("vrender", VRENDER0, 0)
 	MDRV_SOUND_CONFIG(vr0_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 

@@ -36,8 +36,8 @@ static VIDEO_START(jackpool)
 
 static VIDEO_UPDATE(jackpool)
 {
-	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lscreen");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "rscreen");
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count;// = 0x00000/2;
 
@@ -254,19 +254,19 @@ static INTERRUPT_GEN( jackpool_interrupt )
 static MACHINE_DRIVER_START( jackpool )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MDRV_CPU_PROGRAM_MAP(jackpool_mem,0)
-	MDRV_CPU_VBLANK_INT("left",jackpool_interrupt)  // ?
+	MDRV_CPU_VBLANK_INT("lscreen",jackpool_interrupt)  // ?
 
 	MDRV_GFXDECODE(jackpool)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("left", RASTER)
+	MDRV_SCREEN_ADD("lscreen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 
-	MDRV_SCREEN_ADD("right", RASTER)
+	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

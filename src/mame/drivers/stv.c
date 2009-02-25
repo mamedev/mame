@@ -2730,12 +2730,12 @@ static MACHINE_DRIVER_START( stv )
 	MDRV_VIDEO_START(stv_vdp2)
 	MDRV_VIDEO_UPDATE(stv_vdp2)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
 	MDRV_SOUND_CONFIG(scsp_config)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

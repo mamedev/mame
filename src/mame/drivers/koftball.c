@@ -220,12 +220,12 @@ static MACHINE_DRIVER_START( koftball )
 	MDRV_VIDEO_START(koftball)
 	MDRV_VIDEO_UPDATE(koftball)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1122000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low) /* clock frequency & pin 7 not verified */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END
 
 ROM_START( koftball )

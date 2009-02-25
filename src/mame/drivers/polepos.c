@@ -875,28 +875,28 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_VIDEO_UPDATE(polepos)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("namco", NAMCO, 24576000/512)
 	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(0, "left", 0.80)
-	MDRV_SOUND_ROUTE(1, "right", 0.80)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	MDRV_SOUND_ADD("namco52", NAMCO_52XX, 24576000/16)	/* 1.536 MHz */
 	MDRV_SOUND_CONFIG(namco_52xx_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
 	/* discrete circuit on the 54XX outputs */
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(polepos)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.90)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.90)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
 	/* engine sound */
 	MDRV_SOUND_ADD("polepos", POLEPOS, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.90 * 0.77)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.90 * 0.77)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
 MACHINE_DRIVER_END
 
 

@@ -603,7 +603,7 @@ static VIDEO_UPDATE( hornet )
 
 static VIDEO_UPDATE( hornet_2board )
 {
-	if (strcmp(screen->tag, "left") == 0)
+	if (strcmp(screen->tag, "lscreen") == 0)
 	{
 		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
@@ -611,7 +611,7 @@ static VIDEO_UPDATE( hornet_2board )
 		/* TODO: tilemaps per screen */
 		K037122_tile_draw(screen->machine, 0, bitmap, cliprect);
 	}
-	else if (strcmp(screen->tag, "right") == 0)
+	else if (strcmp(screen->tag, "rscreen") == 0)
 	{
 		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);
@@ -1042,11 +1042,11 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_VIDEO_START(hornet)
 	MDRV_VIDEO_UPDATE(hornet)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("rf", RF5C400, 64000000/4)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MDRV_M48T58_ADD( "m48t58" )
 MACHINE_DRIVER_END
@@ -1082,12 +1082,12 @@ static MACHINE_DRIVER_START( hornet_2board )
 	MDRV_VIDEO_UPDATE(hornet_2board)
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo0")
-	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "left")
+	MDRV_3DFX_VOODOO_1_ADD("voodoo0", STD_VOODOO_1_CLOCK, 2, "lscreen")
 	MDRV_3DFX_VOODOO_CPU("dsp")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
-	MDRV_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "right")
+	MDRV_3DFX_VOODOO_1_ADD("voodoo1", STD_VOODOO_1_CLOCK, 2, "rscreen")
 	MDRV_3DFX_VOODOO_CPU("dsp2")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)
@@ -1097,13 +1097,13 @@ static MACHINE_DRIVER_START( hornet_2board )
 
 	MDRV_SCREEN_REMOVE("screen")
 
-	MDRV_SCREEN_ADD("left", RASTER)
+	MDRV_SCREEN_ADD("lscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(512, 384)
 	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 
-	MDRV_SCREEN_ADD("right", RASTER)
+	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_SIZE(512, 384)
@@ -1114,13 +1114,13 @@ static MACHINE_DRIVER_START( hornet_2board_v2 )
 	MDRV_IMPORT_FROM(hornet_2board)
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo0")
-	MDRV_3DFX_VOODOO_2_ADD("voodoo0", STD_VOODOO_2_CLOCK, 2, "left")
+	MDRV_3DFX_VOODOO_2_ADD("voodoo0", STD_VOODOO_2_CLOCK, 2, "lscreen")
 	MDRV_3DFX_VOODOO_CPU("dsp")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_0)
 
 	MDRV_3DFX_VOODOO_REMOVE("voodoo1")
-	MDRV_3DFX_VOODOO_2_ADD("voodoo1", STD_VOODOO_2_CLOCK, 2, "right")
+	MDRV_3DFX_VOODOO_2_ADD("voodoo1", STD_VOODOO_2_CLOCK, 2, "rscreen")
 	MDRV_3DFX_VOODOO_CPU("dsp2")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
 	MDRV_3DFX_VOODOO_VBLANK(voodoo_vblank_1)

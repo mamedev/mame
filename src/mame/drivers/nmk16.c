@@ -4952,17 +4952,17 @@ static MACHINE_DRIVER_START( stagger1 )
 	MDRV_VIDEO_EOF(nmk)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_4MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(afega_ym2151_intf)
-	MDRV_SOUND_ROUTE(0, "left", 0.30)
-	MDRV_SOUND_ROUTE(1, "right", 0.30)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 
 	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_4MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.70)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.70)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( redhawki )

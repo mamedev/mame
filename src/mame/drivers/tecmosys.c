@@ -927,23 +927,23 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_VIDEO_UPDATE(deroon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymf", YMF262, 14318180)
 	MDRV_SOUND_CONFIG(tecmosys_ymf262_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.00)
-	MDRV_SOUND_ROUTE(1, "right", 1.00)
-	MDRV_SOUND_ROUTE(2, "left", 1.00)
-	MDRV_SOUND_ROUTE(3, "right", 1.00)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
+	MDRV_SOUND_ROUTE(2, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(3, "rspeaker", 1.00)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 16000000/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16900000)
-	MDRV_SOUND_ROUTE(0, "left", 0.30)
-	MDRV_SOUND_ROUTE(1, "right", 0.30)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_DRIVER_END
 
 

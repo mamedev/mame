@@ -447,11 +447,11 @@ static MACHINE_DRIVER_START( system16 )
 	MDRV_VIDEO_UPDATE(system16)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
-	MDRV_SOUND_ROUTE(0, "left", 0.32)
-	MDRV_SOUND_ROUTE(1, "right", 0.32)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.32)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.32)
 MACHINE_DRIVER_END
 
 
@@ -467,8 +467,8 @@ static MACHINE_DRIVER_START( system16_7759 )
 	/* sound hardware */
 	MDRV_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(sys16_upd7759_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.48)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.48)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
 MACHINE_DRIVER_END
 
 /***************************************************************************/
@@ -2045,8 +2045,8 @@ static MACHINE_DRIVER_START( tturfbl )
 	MDRV_SOUND_REMOVE("7759")
 	MDRV_SOUND_ADD("5205", MSM5205, 220000)
 	MDRV_SOUND_CONFIG(tturfbl_msm5205_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
 	MDRV_MACHINE_RESET(tturfbl)
 MACHINE_DRIVER_END

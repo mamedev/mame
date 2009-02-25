@@ -1712,10 +1712,10 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")/* Present on all video cards */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")/* Present on all video cards */
 	MDRV_SOUND_ADD("saa", SAA1099, 8000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.00)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	/* ACIAs */
 	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if)
