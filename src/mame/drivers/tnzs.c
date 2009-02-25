@@ -2150,8 +2150,8 @@ ROM_START( drtoppel )
 	ROM_LOAD( "b19-10.9c",  0x20000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )	/* banked at 8000-bfff */
 
 	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
-	ROM_LOAD( "b19-11w.3e", 0x00000, 0x08000, CRC(37a0d3fb) SHA1(f65fb9382af5f5b09725c39b660c5138b3912f53) ) /* Hacked??, need correct Taito rom number */
-	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
+	ROM_LOAD( "b19-15.3e", 0x00000, 0x08000, CRC(37a0d3fb) SHA1(f65fb9382af5f5b09725c39b660c5138b3912f53) ) /* Hacked??, need correct Taito rom number */
+	ROM_CONTINUE(          0x10000, 0x08000 )		/* banked at 8000-9fff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
@@ -2178,8 +2178,8 @@ ROM_START( drtopplu )
 	ROM_LOAD( "b19-10.9c",  0x20000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )	/* banked at 8000-bfff */
 
 	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
-	ROM_LOAD( "b19-11u.3e", 0x00000, 0x08000, CRC(05565b22) SHA1(d1aa47b438d3b44c5177337809e38b50f6445c36) ) /* Hacked??, need correct Taito rom number */
-	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
+	ROM_LOAD( "b19-14.3e", 0x00000, 0x08000, CRC(05565b22) SHA1(d1aa47b438d3b44c5177337809e38b50f6445c36) ) /* Hacked??, need correct Taito rom number */
+	ROM_CONTINUE(          0x10000, 0x08000 )		/* banked at 8000-9fff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* M-Chip (i8742 internal ROM) */
 	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
@@ -2548,7 +2548,7 @@ ROM_START( tnzsjo )
 	ROM_CONTINUE(          0x10000, 0x08000 )		/* banked at 8000-9fff */
 
 	ROM_REGION( 0x10000, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "b53-06.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
+	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	/* ROMs taken from another set (the ones from this set were read incorrectly) */
@@ -2572,7 +2572,7 @@ ROM_START( tnzso )
 	ROM_CONTINUE(           0x10000, 0x08000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "b53-06.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
+	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "ns_a13.rom",   0x00000, 0x20000, CRC(7e0bd5bb) SHA1(95dfb00ec915778e02d8bfa996735ab817191adc) )
