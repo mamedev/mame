@@ -385,6 +385,33 @@ static ADDRESS_MAP_START( midres_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( secretab_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x05ffff) AM_ROM
+	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf2_control_0_w)
+	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf2_control_1_w)
+	AM_RANGE(0x246000, 0x247fff) AM_RAM_WRITE(dec0_pf2_data_w) AM_BASE(&dec0_pf2_data)
+//	AM_RANGE(0x240000, 0x24007f) AM_RAM AM_BASE(&dec0_pf2_colscroll)
+//	AM_RANGE(0x240400, 0x2407ff) AM_RAM AM_BASE(&dec0_pf2_rowscroll)
+
+//	AM_RANGE(0x200000, 0x300007) AM_WRITE(dec0_pf1_control_0_w)
+//	AM_RANGE(0x300010, 0x300017) AM_WRITE(dec0_pf1_control_1_w)
+	AM_RANGE(0x24e000, 0x24ffff) AM_RAM_WRITE(dec0_pf1_data_w) AM_BASE(&dec0_pf1_data)
+//	AM_RANGE(0x340000, 0x34007f) AM_RAM AM_BASE(&dec0_pf1_colscroll)
+//	AM_RANGE(0x340400, 0x3407ff) AM_RAM AM_BASE(&dec0_pf1_rowscroll)
+
+	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
+//	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
+
+	AM_RANGE(0x300000, 0x300007) AM_WRITE(dec0_pf3_control_0_w)
+	AM_RANGE(0x300010, 0x300017) AM_WRITE(dec0_pf3_control_1_w)
+	AM_RANGE(0x300800, 0x30087f) AM_RAM AM_BASE(&dec0_pf3_colscroll)
+	AM_RANGE(0x300c00, 0x300fff) AM_RAM AM_BASE(&dec0_pf3_rowscroll)
+	AM_RANGE(0x301000, 0x3017ff) AM_RAM_WRITE(dec0_pf3_data_w) AM_BASE(&dec0_pf3_data)
+	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_BASE(&dec0_ram) /* Sly spy main ram */
+	AM_RANGE(0x310000, 0x3107ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE(&spriteram16) /* Sprites */
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( automat_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x242800, 0x243fff) AM_READ(SMH_RAM) /* Robocop only */
@@ -941,6 +968,59 @@ static GFXDECODE_START( midres )
 	GFXDECODE_ENTRY( "gfx4", 0, tilelayout,   0, 16 )	/* Sprites 16x16 */
 GFXDECODE_END
 
+/* TODO: clean up this. */
+static const gfx_layout secretab_charlayout =
+{
+	8,8,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout secretab_tilelayout =
+{
+	16,16,
+	0x400, // RGN_FRAC(1,16) causes divide by zero?!
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7, 0x4000*8+0, 0x4000*8+1, 0x4000*8+2, 0x4000*8+3, 0x4000*8+4, 0x4000*8+5, 0x4000*8+6, 0x4000*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0x2000*8+0*8, 0x2000*8+1*8, 0x2000*8+2*8, 0x2000*8+3*8, 0x2000*8+4*8, 0x2000*8+5*8, 0x2000*8+6*8, 0x2000*8+7*8 },
+	8*8
+};
+
+static const gfx_layout secretab_tilelayout2 =
+{
+	16,16,
+	0x800,
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7,0x8000*8+0, 0x8000*8+1, 0x8000*8+2, 0x8000*8+3, 0x8000*8+4, 0x8000*8+5, 0x8000*8+6, 0x8000*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 0x4000*8+0*8, 0x4000*8+1*8, 0x4000*8+2*8, 0x4000*8+3*8, 0x4000*8+4*8, 0x4000*8+5*8, 0x4000*8+6*8, 0x4000*8+7*8 },
+	8*8
+};
+
+static const gfx_layout secretab_tilelayout3 =
+{
+	16,16,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 0,1,2,3,4,5,6,7,16*8+0, 16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	16*16
+};
+
+static GFXDECODE_START( secretab )
+	GFXDECODE_ENTRY( "gfx1", 0, secretab_charlayout,     0x000, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0, secretab_tilelayout,     0x200, 0x10 )
+	GFXDECODE_ENTRY( "gfx3", 0, secretab_tilelayout,     0x300, 0x10 )
+	GFXDECODE_ENTRY( "gfx4", 0, secretab_tilelayout3,    0x100, 0x10 )
+GFXDECODE_END
+
 /******************************************************************************/
 
 static void sound_irq(const device_config *device, int linestate)
@@ -1317,6 +1397,49 @@ static MACHINE_DRIVER_START( slyspy )
 
 	MDRV_VIDEO_START(dec0_nodma)
 	MDRV_VIDEO_UPDATE(slyspy)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MDRV_SOUND_ROUTE(0, "mono", 0.90)
+	MDRV_SOUND_ROUTE(1, "mono", 0.90)
+	MDRV_SOUND_ROUTE(2, "mono", 0.90)
+	MDRV_SOUND_ROUTE(3, "mono", 0.35)
+
+	MDRV_SOUND_ADD("ym2", YM3812, XTAL_12MHz/4) /* verified on pcb */
+	MDRV_SOUND_CONFIG(ym3812b_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz/12) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( secretab )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MDRV_CPU_PROGRAM_MAP(secretab_map,0)
+	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
+
+	/* z80 */
+//	MDRV_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
+//	MDRV_CPU_PROGRAM_MAP(slyspy_s_readmem,slyspy_s_writemem)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(57.41)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 57.41 Hz, 529us Vblank */)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+
+	MDRV_GFXDECODE(secretab)
+	MDRV_PALETTE_LENGTH(1024)
+
+	MDRV_VIDEO_START(dec0_nodma)
+	MDRV_VIDEO_UPDATE(robocop)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2250,35 +2373,44 @@ ROM_START( secretab )
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Sound CPU */
 	ROM_LOAD( "sa_01.bin",      0x00000, 0x10000, CRC(9fdc503b) SHA1(7b258e0734ca88a7d3f574d75116f0fe3b628898) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* chars */
+	ROM_REGION( 0x40000, "charset", 0 )
+	ROM_LOAD( "sa_08.bin", 0x00000, 0x10000,CRC(4806b951) SHA1(a2fa5b8587132747067d7d64ccfd14129a34ef58) )
+	ROM_LOAD( "sa_10.bin", 0x10000, 0x10000,CRC(843c4679) SHA1(871f3e77aa7e628e924a40d06ddec700487e23fb) )
+	ROM_LOAD( "sa_12.bin", 0x20000, 0x10000,CRC(f9e2cd5f) SHA1(f2c3f6e763c6f80307e9daee533d316b05cd02c5) )
+	ROM_LOAD( "sa_14.bin", 0x30000, 0x10000,CRC(3dac9128) SHA1(f3a2068e90973c1f04f1bbaa209111e3f9669ee0) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE ) /* tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* chars */
+	ROM_COPY( "charset", 0x00000, 0x00000, 0x8000 )
+	ROM_COPY( "charset", 0x10000, 0x08000, 0x8000 )
+	ROM_COPY( "charset", 0x20000, 0x10000, 0x8000 )
+	ROM_COPY( "charset", 0x30000, 0x18000, 0x8000 )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE ) /* tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* tiles */
+	ROM_COPY( "charset", 0x08000, 0x00000, 0x8000 )
+	ROM_COPY( "charset", 0x18000, 0x08000, 0x8000 )
+	ROM_COPY( "charset", 0x28000, 0x10000, 0x8000 )
+	ROM_COPY( "charset", 0x38000, 0x18000, 0x8000 )
+
+	ROM_REGION( 0x40000, "gfx3", 0 ) /* tiles */
+	ROM_LOAD( "sa_09.bin",      0x00000, 0x10000,CRC(9e412267) SHA1(482cd6e772fa21f15db66c27acf85e8f97f7c5a5) )
+	ROM_LOAD( "sa_11.bin",      0x10000, 0x10000,CRC(e87650db) SHA1(381352428b12fd4a8cd13270009ff7602aa41a0b) )
+	ROM_LOAD( "sa_07.bin",      0x20000, 0x10000,CRC(6ad2e575) SHA1(b6b159cb36e222fe62fc10271602226f027440e4) )
+	ROM_LOAD( "sa_13.bin",      0x30000, 0x10000,CRC(e8601057) SHA1(fd73a36fb84049154248d250ffea68b1ee39a43f) )
 
 	ROM_REGION( 0x80000, "gfx4", ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD( "sa_17.bin",      0x10000, 0x10000,CRC(f61972c8) SHA1(fa9ddca3473091b4879171d8f3b302e8f2b45149) )
+	ROM_LOAD( "sa_18.bin",      0x00000, 0x10000,CRC(4f989f00) SHA1(ae7ae6e62e6a516ae3c8ebbeb5e39887c1961add) )
+	ROM_LOAD( "sa_21.bin",      0x30000, 0x10000,CRC(dc6a38df) SHA1(9043df911389d3f085299f2f2202cab356473a32) )
+	ROM_LOAD( "sa_22.bin",      0x20000, 0x10000,CRC(d234cae5) SHA1(0cd07bf087a4da19a5da29785385de9eee52d0fb) )
+	ROM_LOAD( "sa_15.bin",      0x50000, 0x10000,CRC(54fcbc39) SHA1(293a6799193b01424c3eac86cf90cc023aa771db) )
+	ROM_LOAD( "sa_16.bin",      0x40000, 0x10000,CRC(ff72b838) SHA1(fdc48ecdd2225fc69472313f34973f6add8fb558) )
+	ROM_LOAD( "sa_19.bin",      0x70000, 0x10000,CRC(d29bc22e) SHA1(ce0935d09f7e94fa32247c86e14a74b73514b29e) )
+	ROM_LOAD( "sa_20.bin",      0x60000, 0x10000,CRC(447e4f0b) SHA1(97db103e505a6e11eb9bdb3622e4aa3b796a9714) )
 
 	ROM_REGION( 0x20000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "sa_02.bin",      0x00000, 0x10000,CRC(439eb5a9) SHA1(8d6baad8a1e89279ef0a378941d3d9b49a606864) ) // both halves identical
-
-	ROM_REGION( 0x10000, "user1", 0 )	/* Other Roms, work out what they're equivalent to and the correct decodes */
-	ROM_LOAD( "sa_07.bin",      0x00000, 0x10000,CRC(6ad2e575) SHA1(b6b159cb36e222fe62fc10271602226f027440e4) )
-	ROM_LOAD( "sa_08.bin",      0x00000, 0x10000,CRC(4806b951) SHA1(a2fa5b8587132747067d7d64ccfd14129a34ef58) )
-	ROM_LOAD( "sa_09.bin",      0x00000, 0x10000,CRC(9e412267) SHA1(482cd6e772fa21f15db66c27acf85e8f97f7c5a5) )
-	ROM_LOAD( "sa_10.bin",      0x00000, 0x10000,CRC(843c4679) SHA1(871f3e77aa7e628e924a40d06ddec700487e23fb) )
-	ROM_LOAD( "sa_11.bin",      0x00000, 0x10000,CRC(e87650db) SHA1(381352428b12fd4a8cd13270009ff7602aa41a0b) )
-	ROM_LOAD( "sa_12.bin",      0x00000, 0x10000,CRC(f9e2cd5f) SHA1(f2c3f6e763c6f80307e9daee533d316b05cd02c5) )
-	ROM_LOAD( "sa_13.bin",      0x00000, 0x10000,CRC(e8601057) SHA1(fd73a36fb84049154248d250ffea68b1ee39a43f) )
-	ROM_LOAD( "sa_14.bin",      0x00000, 0x10000,CRC(3dac9128) SHA1(f3a2068e90973c1f04f1bbaa209111e3f9669ee0) )
-	ROM_LOAD( "sa_15.bin",      0x00000, 0x10000,CRC(54fcbc39) SHA1(293a6799193b01424c3eac86cf90cc023aa771db) )
-	ROM_LOAD( "sa_16.bin",      0x00000, 0x10000,CRC(ff72b838) SHA1(fdc48ecdd2225fc69472313f34973f6add8fb558) )
-	ROM_LOAD( "sa_17.bin",      0x00000, 0x10000,CRC(f61972c8) SHA1(fa9ddca3473091b4879171d8f3b302e8f2b45149) )
-	ROM_LOAD( "sa_18.bin",      0x00000, 0x10000,CRC(4f989f00) SHA1(ae7ae6e62e6a516ae3c8ebbeb5e39887c1961add) )
-	ROM_LOAD( "sa_19.bin",      0x00000, 0x10000,CRC(d29bc22e) SHA1(ce0935d09f7e94fa32247c86e14a74b73514b29e) )
-	ROM_LOAD( "sa_20.bin",      0x00000, 0x10000,CRC(447e4f0b) SHA1(97db103e505a6e11eb9bdb3622e4aa3b796a9714) )
-	ROM_LOAD( "sa_21.bin",      0x00000, 0x10000,CRC(dc6a38df) SHA1(9043df911389d3f085299f2f2202cab356473a32) )
-	ROM_LOAD( "sa_22.bin",      0x00000, 0x10000,CRC(d234cae5) SHA1(0cd07bf087a4da19a5da29785385de9eee52d0fb) )
 ROM_END
+
 
 ROM_START( midres )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
@@ -2630,7 +2762,7 @@ GAME( 1989, ffantasa, hippodrm, hippodrm, hippodrm, hippodrm, ROT0,   "Data East
 GAME( 1989, slyspy,   0,        slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 3)", 0 )
 GAME( 1989, slyspy2,  slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East USA",         "Sly Spy (US revision 2)", 0 )
 GAME( 1989, secretag, slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "Data East Corporation", "Secret Agent (World)", 0 )
-GAME( 1989, secretab, slyspy,   slyspy,   slyspy,   slyspy,   ROT0,   "bootleg",               "Secret Agent (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, secretab, slyspy,   secretab, slyspy,   slyspy,   ROT0,   "bootleg",               "Secret Agent (bootleg)", GAME_NOT_WORKING )
 GAME( 1989, midres,   0,        midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (World)", 0 )
 GAME( 1989, midresu,  midres,   midres,   midres,   0,        ROT0,   "Data East USA",         "Midnight Resistance (US)", 0 )
 GAME( 1989, midresj,  midres,   midres,   midres,   0,        ROT0,   "Data East Corporation", "Midnight Resistance (Japan)", 0 )
