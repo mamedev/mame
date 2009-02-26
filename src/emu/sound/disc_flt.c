@@ -1011,32 +1011,35 @@ static DISCRETE_RESET(dst_rcfilter)
 #define DST_RCFILTER_SW__R			(*(node->input[3]))
 #define DST_RCFILTER_SW__C(x)		(*(node->input[4+x]))
 
-#define CD4066_ON_RES  470
+#define CD4066_ON_RES  270
 
+// FIXME: This needs optimization !
 static DISCRETE_STEP(dst_rcfilter_sw)
 {
 	struct dst_rcfilter_sw_context *context = node->context;
 
-	int i;
+	int i,j ;
 	int bits = (int)DST_RCFILTER_SW__SWITCH;
 	double us = 0, rs = 0;
 
 	if (DST_RCFILTER_SW__ENABLE)
 	{
-		for (i = 0; i < 4; i++)
-		{
-			if (( bits & (1 << i)) != 0)
+		for (j=0;j<10;j++) {
+			for (i = 0; i < 4; i++)
 			{
-				us += context->vCap[i];
-				rs += DST_RCFILTER_SW__R;
+				if (( bits & (1 << i)) != 0)
+				{
+					us += context->vCap[i];
+					rs += DST_RCFILTER_SW__R;
+				}
 			}
-		}
-		node->output[0] = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN + DST_RCFILTER_SW__R / (CD4066_ON_RES + rs)  * us;
-		for (i = 0; i < 4; i++)
-		{
-			if (( bits & (1 << i)) != 0)
+			node->output[0] = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN + DST_RCFILTER_SW__R / (CD4066_ON_RES + rs)  * us;
+			for (i = 0; i < 4; i++)
 			{
-				context->vCap[i] += (node->output[0] - context->vCap[i]) * context->exp[i];
+				if (( bits & (1 << i)) != 0)
+				{
+					context->vCap[i] += (node->output[0] - context->vCap[i]) * context->exp[i];
+				}
 			}
 		}
 	}
@@ -1055,7 +1058,7 @@ static DISCRETE_RESET(dst_rcfilter_sw)
 	for (i = 0; i < 4; i++)
 	{
 		context->vCap[i] = 0;
-		context->exp[i] = RC_CHARGE_EXP(CD4066_ON_RES * DST_RCFILTER_SW__C(i));
+		context->exp[i] = RC_CHARGE_EXP(10.0f * CD4066_ON_RES * DST_RCFILTER_SW__C(i));
 	}
 	node->output[0] = 0;
 }
