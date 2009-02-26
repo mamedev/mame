@@ -665,7 +665,7 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 	AM_RANGE(0xff08, 0xff08) AM_WRITE(rombankswitch_w)
 
 #define COMMON_SINGLE_READ \
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD(SOUND, "ym", extport_select_and_ym2203_r)	\
+	AM_RANGE(0xa000, 0xa003) AM_DEVREAD(SOUND, "ym", extport_select_and_ym2203_r)	\
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
 
 #define COMMON_SINGLE_WRITE \
