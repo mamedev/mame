@@ -6,7 +6,7 @@ Notes:
   1) "tnzs".   New hardware revision. 3 Z80 and no M-Chip (8742 MPU).
   2) "tnzsj".  New hardware revision. 3 Z80 and no M-Chip (8742 MPU).
   3) "tnzsjo". Standard hardware. 2 Z80 and the M-Chip.
-  4) "tnzso".  Standard hardware. Harder gameplay, old Taito logo. Maybe a prototype?
+  4) "tnzsop".  Standard hardware. Harder gameplay, old Taito logo. Maybe a prototype?
 
 - TNZS hidden level select: keep service coin pressed (default:9) and reset the game.
   When SERVICE SWITCH ERROR appears, release service coin and press 1 player start
@@ -14,7 +14,7 @@ Notes:
   starting level and press 1 player start to start. You'll also get 255 lives.
   If you have enough patience and go up until the level reads "Q-1" (which corresponds
   to 1-1), AND the "Invulnerability" dip switch is On, you'll be invulnerable.
-  Invulnerability isn't possible in 'tnzso' (level select is stucked to level 6-1).
+  Invulnerability isn't possible in 'tnzsop' (level select is stucked to level 6-1).
 
 
 Hardware datails for the newer tnzs board (from pictures):
@@ -319,7 +319,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - New Taito logo
   - levels are different from 'tnzs'
 
-7c) 'tnzso'
+7c) 'tnzsop'
 
   - Region stored at 0x7fff.b (CPU1)
   - Sets :
@@ -1368,7 +1368,7 @@ static INPUT_PORTS_START( tnzsjo )
 	COMMON_COIN2(IP_ACTIVE_LOW)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tnzso )
+static INPUT_PORTS_START( tnzsop )
 	PORT_INCLUDE( tnzsjo )
 
 	PORT_MODIFY("DSWA")
@@ -2562,7 +2562,31 @@ ROM_START( tnzsjo )
 	ROM_LOAD( "b53-01.1",	0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
 ROM_END
 
-ROM_START( tnzso )
+ ROM_START( tnzso )
+ 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_LOAD( "u32", 0x00000, 0x08000, CRC(edf3b39e) SHA1(be221c99e50795d569611dba454c3954a259a859) )
+	ROM_CONTINUE(          0x18000, 0x18000 )		/* banked at 8000-bfff */
+
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_LOAD( "u38", 0x00000, 0x08000, CRC(60340d63) SHA1(12a26d19dc8e407e502f25617a5a4c9cea131ce2) )
+	ROM_CONTINUE(          0x10000, 0x08000 )		/* banked at 8000-9fff */
+
+	ROM_REGION( 0x10000, "mcu", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_LOAD( "b53-06.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	/* ROMs taken from another set (the ones from this set were read incorrectly) */
+	ROM_LOAD( "b53-08.8",	0x00000, 0x20000, CRC(c3519c2a) SHA1(30fe7946fbc95ab6b3ccb6944fb24bf47bf3d743) )
+	ROM_LOAD( "b53-07.7",	0x20000, 0x20000, CRC(2bf199e8) SHA1(4ed73e4f00ae2f5f4028a0ea5ae3cd238863a370) )
+	ROM_LOAD( "b53-06.6",	0x40000, 0x20000, CRC(92f35ed9) SHA1(5fdd8d6ddbb7be9887af3c8dea9ad3b58c4e86f9) )
+	ROM_LOAD( "b53-05.5",	0x60000, 0x20000, CRC(edbb9581) SHA1(539396a01ca0b69455f000d446759b232530b542) )
+	ROM_LOAD( "b53-04.4",	0x80000, 0x20000, CRC(59d2aef6) SHA1(b657b7603c3eb5f169000d38497ebb93f26f7832) )
+	ROM_LOAD( "b53-03.3",	0xa0000, 0x20000, CRC(74acfb9b) SHA1(90b544ed7ede7565660bdd13c94c15c54423cda9) )
+	ROM_LOAD( "b53-02.2",	0xc0000, 0x20000, CRC(095d0dc0) SHA1(ced2937d0594fa00ae344a4e3a3cba23772dc160) )
+	ROM_LOAD( "b53-01.1",	0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
+ROM_END
+
+ROM_START( tnzsop )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "ns_c-11.rom", 0x00000, 0x08000, CRC(3c1dae7b) SHA1(0004fccc171714c80565326f8690f9662c5b75d9) )
 	ROM_CONTINUE(            0x18000, 0x18000 )		/* banked at 8000-bfff */
@@ -2705,7 +2729,8 @@ GAME( 1988, chukataj, chukatai, tnzs,     chukatau, chukatai, ROT0,   "Taito Cor
 GAME( 1988, tnzs,     0,        tnzsb,    tnzs,     tnzsb,    ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, new version) (newer PCB)", 0 )
 GAME( 1988, tnzsj,    tnzs,     tnzsb,    tnzsj,    tnzsb,    ROT0,   "Taito Corporation", "The NewZealand Story (Japan, new version) (newer PCB)", 0 )
 GAME( 1988, tnzsjo,   tnzs,     tnzs,     tnzsjo,   tnzs,     ROT0,   "Taito Corporation", "The NewZealand Story (Japan, old version) (older PCB)", 0 )
-GAME( 1988, tnzso,    tnzs,     tnzs,     tnzso,    tnzs,     ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, prototype?) (older PCB)", 0 )
+GAME( 1988, tnzso,    tnzs,     tnzs,     tnzsop,   tnzs,     ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, old version) (older PCB)", 0 )
+GAME( 1988, tnzsop,   tnzs,     tnzs,     tnzsop,   tnzs,     ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, prototype?) (older PCB)", 0 )
 GAME( 1988, kabukiz,  0,        kabukiz,  kabukiz,  kabukiz,  ROT0,   "Taito Corporation Japan", "Kabuki-Z (World)", 0 )
 GAME( 1988, kabukizj, kabukiz,  kabukiz,  kabukizj, kabukiz,  ROT0,   "Taito Corporation", "Kabuki-Z (Japan)", 0 )
 GAME( 1989, insectx,  0,        insectx,  insectx,  insectx,  ROT0,   "Taito Corporation Japan", "Insector X (World)", 0 )
