@@ -3067,7 +3067,7 @@ GAME( 200?, gundmxgd,  naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",    
 GAME( 200?, cvs2gd,    naomigd,  naomigd,  naomi,    0,	  ROT0,   "Capcom",        "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi,    0,   ROT270, "Treasure",      "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, ggxx,      naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, chocomk,   naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, chocomk,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole Software Corporation", "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, quizqgd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, ggxxrl,    naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, shikgam2,  naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )

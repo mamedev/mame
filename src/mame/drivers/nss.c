@@ -602,4 +602,4 @@ GAME( 1992, nss_skin,  nss,	  snes,	     snes,    snes,		ROT0, "Irem",						"Ski
 GAME( 1992, nss_ssoc,  nss,	  snes,	     snes,    snes,		ROT0, "Human Inc.",					"Super Soccer (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) // some gfx issues
 GAME( 1991, nss_smw,   nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"Super Mario World (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, nss_fzer,  nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"F-Zero (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 199?, nss_sten,  nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"Super Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1991, nss_sten,  nss,	  snes,	     snes,    snes,		ROT0, "Nintendo",					"Super Tennis (Nintendo Super System)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

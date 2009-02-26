@@ -221,6 +221,6 @@ ROM_START( magictga )
 	#endif
 ROM_END
 
-GAME( 199?, magictg,  0,        magictg, magictg, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, magictga, magictg,  magictg, magictg, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, magictg,  0,        magictg, magictg, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, magictga, magictg,  magictg, magictg, 0, ROT0, "Acclaim", "Magic the Gathering: Armageddon (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 

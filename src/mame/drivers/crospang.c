@@ -590,5 +590,5 @@ static DRIVER_INIT( crospang )
 
 GAME( 1998, crospang, 0, crospang, crospang, crospang, ROT0, "F2 System", "Cross Pang", 0 )
 GAME( 199?, heuksun,  0, crospang, heuksun,  crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", 0 )
-GAME( 199?, bestri,   0, bestri,   bestri,   crospang, ROT0, "F2 System", "Bestri (Korea)", 0 )
+GAME( 1998, bestri,   0, bestri,   bestri,   crospang, ROT0, "F2 System", "Bestri (Korea)", 0 )
 

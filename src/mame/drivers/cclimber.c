@@ -1919,7 +1919,7 @@ GAME( 1981, ckonga,   ckong,    cclimber, ckong,    0,        ROT270, "Falcon", 
 GAME( 1981, ckongjeu, ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong Part II (Jeutel bootleg)", 0 )
 GAME( 1981, ckongo,   ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong (Orca bootleg)", 0 )
 GAME( 1981, ckongalc, ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Crazy Kong (Alca bootleg)", 0 )
-GAME( 198?, bigkong,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Big Kong", 0 )
+GAME( 1981, bigkong,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Big Kong", 0 )
 GAME( 1981, monkeyd,  ckong,    cclimber, ckong,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
 GAME( 198?, ckongb,   ckong,    cclimber, ckongb,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", 0 )
 GAME( 1981, rpatrol,  0,        cclimber, rpatrol,  0,        ROT0,   "Orca", "River Patrol (Orca)", 0 )

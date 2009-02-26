@@ -533,7 +533,7 @@ ROM_START( hitme )
 ROM_END
 
 
-ROM_START( mblkjack )
+ROM_START( m21 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
 	ROM_LOAD( "mirco1.bin", 0x0000, 0x0200, CRC(aa796ad7) SHA1(2908bdb4ab17a2f5bc4da2f957906bf2b57afa50) )
 	ROM_LOAD( "hm2.c7", 0x0200, 0x0200, CRC(25d47ba4) SHA1(6f3bb4ca6918dc07f37d0c0c7fe5ec53aa7171a5) )
@@ -577,6 +577,6 @@ ROM_END
  *************************************/
 
 GAME( 1976, hitme,    0,        hitme,    hitme,    0, ROT0, "RamTek", "Hit Me", 0 )
-GAME( 197?, mblkjack, hitme,    hitme,    hitme,    0, ROT0, "Mirco", "Black Jack (Mirco)", 0 )
+GAME( 1976, m21,      hitme,    hitme,    hitme,    0, ROT0, "Mirco", "21 (Mirco)", 0 )
 GAME( 1976, barricad, 0,        barricad, barricad, 0, ROT0, "RamTek", "Barricade", GAME_IMPERFECT_SOUND  )
 GAME( 1976, brickyrd, barricad, barricad, barricad, 0, ROT0, "RamTek", "Brickyard", GAME_IMPERFECT_SOUND  )
