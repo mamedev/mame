@@ -17,7 +17,7 @@
  *
  *************************************/
 
-#define LOG_MEMORY_MAP	(1)
+#define LOG_MEMORY_MAP	(0)
 #define LOG_MULTIPLY	(0)
 #define LOG_DIVIDE		(0)
 #define LOG_COMPARE		(0)
