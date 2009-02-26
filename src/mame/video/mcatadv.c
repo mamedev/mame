@@ -65,6 +65,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 	UINT16 *destline;
 	UINT8 *priline;
+	UINT8 *sprdata = memory_region ( machine, "gfx1" );
 
 	int xstart, xend, xinc;
 	int ystart, yend, yinc;
@@ -92,8 +93,6 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int height = ((source[3]&0xf000)>>12)*16;
 		int width = ((source[2]&0xf000)>>12)*16;
 		int offset = tileno * 256;
-
-		UINT8 *sprdata = memory_region ( machine, "gfx1" );
 
 		int drawxpos, drawypos;
 		int xcnt,ycnt;
@@ -130,16 +129,16 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 					for (xcnt = xstart; xcnt != xend; xcnt += xinc) {
 						drawxpos = x+xcnt-global_x;
 
-						if (offset >= 0x500000*2) offset = 0;
-						pix = sprdata[offset/2];
+						if((priline[drawxpos] < pri)) {
+							if (offset >= 0x500000*2) offset = 0;
+							pix = sprdata[offset/2];
+	
+							if (offset & 1)  pix = pix >> 4;
+							pix &= 0x0f;
 
-						if (offset & 1)  pix = pix >> 4;
-						pix &= 0x0f;
-
-						if ((drawxpos >= cliprect->min_x) && (drawxpos <= cliprect->max_x) && pix)
-							if((priline[drawxpos] < pri))
-								destline[drawxpos] = (pix + (pen<<4));
-
+							if ((drawxpos >= cliprect->min_x) && (drawxpos <= cliprect->max_x) && pix)
+								destline[drawxpos] = (pix + pen);
+						}
 						offset++;
 					}
 				}

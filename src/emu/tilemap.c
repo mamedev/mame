@@ -775,7 +775,6 @@ UINT8 *tilemap_get_tile_flags(tilemap *tmap)
 void tilemap_draw_primask(bitmap_t *dest, const rectangle *cliprect, tilemap *tmap, UINT32 flags, UINT8 priority, UINT8 priority_mask)
 {
 	UINT32 width, height;
-	rectangle original_cliprect;
 	blit_parameters blit;
 	int xpos, ypos;
 
@@ -786,7 +785,6 @@ void tilemap_draw_primask(bitmap_t *dest, const rectangle *cliprect, tilemap *tm
 profiler_mark(PROFILER_TILEMAP_DRAW);
 	/* configure the blit parameters based on the input parameters */
 	configure_blit_parameters(&blit, tmap, dest, cliprect, flags, priority, priority_mask);
-	original_cliprect = blit.cliprect;
 
 	/* if the whole map is dirty, mark it as such */
 	if (tmap->all_tiles_dirty || gfx_elements_changed(tmap))
