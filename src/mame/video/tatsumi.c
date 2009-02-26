@@ -1086,7 +1086,7 @@ VIDEO_UPDATE( apache3 )
 
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0]);
 	draw_sky(screen->machine, bitmap, cliprect, 256, apache3_rotate_ctrl[1]);
-//	draw_ground(screen->machine, bitmap, cliprect);
+//  draw_ground(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap,cliprect,0, (tatsumi_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);
 	return 0;

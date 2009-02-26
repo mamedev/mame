@@ -151,10 +151,10 @@ static READ8_HANDLER( m1_8279_r )
 	/* read status word */
 	else
 	{
-		if ( chip->read_sensor ) 
+		if ( chip->read_sensor )
 		{
 			result = input_port_read(space->machine,portnames[chip->sense_address]);
-//			break
+//          break
    		}
 		if ( chip->sense_auto_inc )
 		{
@@ -276,9 +276,9 @@ static WRITE8_HANDLER( m1_8279_w )
 				break;
 		}
 	}
-	if ( chip->write_display ) 
+	if ( chip->write_display )
 	{  // Data
-    if ( chip->ram[chip->disp_address] != data ) 
+    if ( chip->ram[chip->disp_address] != data )
 	{
 		m1_draw_lamps(chip->ram[chip->disp_address],chip->disp_address, 0);
     }
@@ -426,9 +426,9 @@ static WRITE8_HANDLER( m1_8279_2_w )
 				break;
 		}
 	}
-	if ( chip->write_display ) 
+	if ( chip->write_display )
 	{  // Data
-    if ( chip->ram[chip->disp_address] != data ) 
+    if ( chip->ram[chip->disp_address] != data )
 	{
 		m1_draw_lamps(chip->ram[chip->disp_address],chip->disp_address, 128);
     }

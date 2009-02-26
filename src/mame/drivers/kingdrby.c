@@ -235,7 +235,7 @@ static WRITE8_DEVICE_HANDLER( hopper_io_w )
 {
 	p1_hopper = (data & 0x8)<<3;
 	p2_hopper = (data & 0x4)<<5;
-//	printf("%02x\n",data);
+//  printf("%02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_cmd_w )
@@ -251,7 +251,7 @@ static UINT8 mux_data;
 /* No idea about what's this (if it's really a mux etc.)*/
 static WRITE8_DEVICE_HANDLER( outport2_w )
 {
-//	popmessage("PPI1 port C(upper) out: %02X", data);
+//  popmessage("PPI1 port C(upper) out: %02X", data);
 	mux_data = data & 0x80;
 }
 
@@ -323,12 +323,12 @@ static READ8_DEVICE_HANDLER( sound_cmd_r )
 static WRITE8_HANDLER( led_array_w )
 {
 	/*
-	offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
-	data = xxxx ---- p2 array
-	       ---- xxxx p1 array
-	they goes from 0 to 5, to indicate the number.
-	If one player bets something, the other led will toggle between p1 and p2 bets.
-	*/
+    offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
+    data = xxxx ---- p2 array
+           ---- xxxx p1 array
+    they goes from 0 to 5, to indicate the number.
+    If one player bets something, the other led will toggle between p1 and p2 bets.
+    */
 }
 
 /*************************************

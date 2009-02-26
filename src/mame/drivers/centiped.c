@@ -1594,7 +1594,7 @@ static MACHINE_DRIVER_START( centiped )
 
 	MDRV_MACHINE_START(centiped)
 	MDRV_MACHINE_RESET(centiped)
-	
+
 	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* timer */

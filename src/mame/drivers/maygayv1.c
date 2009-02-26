@@ -11,7 +11,7 @@
         * Believe it or not?
         * Caesar's Palace (reel to video)
         * Crossword Quiz
-		* Give us a Clue
+        * Give us a Clue
         * Special Effects (reel to video)
         * World Cup (reel to video)
 
@@ -307,8 +307,8 @@ static VIDEO_UPDATE( maygayv1 )
 				if ( BIT(w0, 4) )
 					break;
 
-//				if ( BIT(w0, 5) )
-//					printf("Blinking\n");
+//              if ( BIT(w0, 5) )
+//                  printf("Blinking\n");
 
 				/* Resolution: either 4bpp or 2bpp */
 				res = (w0 >> 9) & 3;
@@ -417,16 +417,16 @@ static VIDEO_EOF( maygayv1 )
  *************************************/
 
 /*
-	68681
-	YM2413
-	68B21
-	8279C
+    68681
+    YM2413
+    68B21
+    8279C
 
-	8a0008 0xe0
-	8a000c 0x7
-	8a000e 0x33
-	8a000a 0x8
-	8a001c 0xff R/W
+    8a0008 0xe0
+    8a000c 0x7
+    8a000e 0x33
+    8a000a 0x8
+    8a001c 0xff R/W
 */
 
 
@@ -477,17 +477,17 @@ static void update_outputs(UINT16 which)
 
 			val = i8279.ram[i] & 0xff;
 /*
-			val = i8279.ram[i] & 0x0f;
-			if (i8279.inhibit & 0x01)
-				val = i8279.clear & 0x0f;
+            val = i8279.ram[i] & 0x0f;
+            if (i8279.inhibit & 0x01)
+                val = i8279.clear & 0x0f;
 
-				if(val) printf("%x\n", val);
+                if(val) printf("%x\n", val);
 
-			val = i8279.ram[i] >> 4;
-			if (i8279.inhibit & 0x02)
-				val = i8279.clear >> 4;
+            val = i8279.ram[i] >> 4;
+            if (i8279.inhibit & 0x02)
+                val = i8279.clear >> 4;
 
-				if(val) printf("%x\n", val);
+                if(val) printf("%x\n", val);
 */
 		}
 }
@@ -725,13 +725,13 @@ static WRITE8_HANDLER( mcu_w )
 		// Bottom nibble = UPD
 		case 1:
 			p1 = data;
-//			upd7759_msg_w(0, data);//?
+//          upd7759_msg_w(0, data);//?
 			break;
 		case 3:
 			upd7759_reset_w (0, BIT(data, 2));
 			upd7759_start_w(0, BIT(data, 6));
 
-//			if ( !BIT(p3, 7) && BIT(data, 7) )
+//          if ( !BIT(p3, 7) && BIT(data, 7) )
 				// P1 propagates to outputs
 
 			p3 = data;
@@ -905,7 +905,7 @@ INPUT_PORTS_END
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
 	cpu_set_input_line_and_vector(device->machine->cpu[0], 5, ASSERT_LINE, vector);
-//	cpu_set_input_line(device->machine->cpu[0], 5, state ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(device->machine->cpu[0], 5, state ? ASSERT_LINE : CLEAR_LINE);
 };
 
 static int d68681_val;
@@ -969,7 +969,7 @@ static MACHINE_START( maygayv1 )
 
 	state_save_register_global_pointer(machine, i82716.dram, 0x40000);
 
-//	duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
+//  duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
 
 	i8051_set_serial_tx_callback(machine->cpu[1], data_from_i8031);
 	i8051_set_serial_rx_callback(machine->cpu[1], data_to_i8031);

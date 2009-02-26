@@ -1059,7 +1059,7 @@ static WRITE8_HANDLER( pia_gb_ca2_w )
 {
 	LOG(("%04x GAMEBOARD: OKI RESET (offset = %d),data = %02X\n", cpu_get_previouspc(space->cpu), offset, data&0xFF));
 
-//	return okim6376_status_0_r();
+//  return okim6376_status_0_r();
 }
 
 static const pia6821_interface pia_gameboard_intf =
@@ -1393,18 +1393,18 @@ static INPUT_PORTS_START( gamball )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
-/*	PORT_DIPNAME( 0x01, 0x00, "AUX101" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x02, 0x00, "AUX102" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x04, 0x00, "AUX103" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x08, 0x00, "AUX104" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On  ) )*/
+/*  PORT_DIPNAME( 0x01, 0x00, "AUX101" )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x01, DEF_STR( On  ) )
+    PORT_DIPNAME( 0x02, 0x00, "AUX102" )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( On  ) )
+    PORT_DIPNAME( 0x04, 0x00, "AUX103" )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( On  ) )
+    PORT_DIPNAME( 0x08, 0x00, "AUX104" )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x08, DEF_STR( On  ) )*/
 	PORT_DIPNAME( 0x10, 0x00, "AUX105" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )

@@ -390,17 +390,17 @@ static ADDRESS_MAP_START( secretab_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf2_control_0_w)
 	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf2_control_1_w)
 	AM_RANGE(0x246000, 0x247fff) AM_RAM_WRITE(dec0_pf2_data_w) AM_BASE(&dec0_pf2_data)
-//	AM_RANGE(0x240000, 0x24007f) AM_RAM AM_BASE(&dec0_pf2_colscroll)
-//	AM_RANGE(0x240400, 0x2407ff) AM_RAM AM_BASE(&dec0_pf2_rowscroll)
+//  AM_RANGE(0x240000, 0x24007f) AM_RAM AM_BASE(&dec0_pf2_colscroll)
+//  AM_RANGE(0x240400, 0x2407ff) AM_RAM AM_BASE(&dec0_pf2_rowscroll)
 
-//	AM_RANGE(0x200000, 0x300007) AM_WRITE(dec0_pf1_control_0_w)
-//	AM_RANGE(0x300010, 0x300017) AM_WRITE(dec0_pf1_control_1_w)
+//  AM_RANGE(0x200000, 0x300007) AM_WRITE(dec0_pf1_control_0_w)
+//  AM_RANGE(0x300010, 0x300017) AM_WRITE(dec0_pf1_control_1_w)
 	AM_RANGE(0x24e000, 0x24ffff) AM_RAM_WRITE(dec0_pf1_data_w) AM_BASE(&dec0_pf1_data)
-//	AM_RANGE(0x340000, 0x34007f) AM_RAM AM_BASE(&dec0_pf1_colscroll)
-//	AM_RANGE(0x340400, 0x3407ff) AM_RAM AM_BASE(&dec0_pf1_rowscroll)
+//  AM_RANGE(0x340000, 0x34007f) AM_RAM AM_BASE(&dec0_pf1_colscroll)
+//  AM_RANGE(0x340400, 0x3407ff) AM_RAM AM_BASE(&dec0_pf1_rowscroll)
 
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
-//	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
+//  AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
 
 	AM_RANGE(0x300000, 0x300007) AM_WRITE(dec0_pf3_control_0_w)
 	AM_RANGE(0x300010, 0x300017) AM_WRITE(dec0_pf3_control_1_w)
@@ -463,11 +463,11 @@ static WRITE8_HANDLER( automat_adpcm_w )
 
 static ADDRESS_MAP_START( automat_s_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-//	AM_RANGE(0xc800, 0xc800) AM_WRITE(ym2203_control_port_0_w)
-//	AM_RANGE(0xc801, 0xc801) AM_WRITE(ym2203_write_port_0_w)
+//  AM_RANGE(0xc800, 0xc800) AM_WRITE(ym2203_control_port_0_w)
+//  AM_RANGE(0xc801, 0xc801) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r)
-//	AM_RANGE(0xd000, 0xd000) AM_WRITE(ym2203_control_port_1_w)
-//	AM_RANGE(0xd001, 0xd001) AM_WRITE(ym2203_write_port_1_w)
+//  AM_RANGE(0xd000, 0xd000) AM_WRITE(ym2203_control_port_1_w)
+//  AM_RANGE(0xd001, 0xd001) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(automat_adpcm_w)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1424,8 +1424,8 @@ static MACHINE_DRIVER_START( secretab )
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	/* z80 */
-//	MDRV_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
-//	MDRV_CPU_PROGRAM_MAP(slyspy_s_readmem,slyspy_s_writemem)
+//  MDRV_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
+//  MDRV_CPU_PROGRAM_MAP(slyspy_s_readmem,slyspy_s_writemem)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

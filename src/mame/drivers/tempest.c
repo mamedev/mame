@@ -579,7 +579,7 @@ static MACHINE_DRIVER_START( tempest )
 	MDRV_WATCHDOG_TIME_INIT(HZ(CLOCK_3KHZ / 256))
 
 	MDRV_ATARIVGEAROM_ADD("earom")
-	
+
 	MDRV_MACHINE_START(tempest)
 
 	/* video hardware */
@@ -593,7 +593,7 @@ static MACHINE_DRIVER_START( tempest )
 
 	/* Drivers */
 	MDRV_MATHBOX_ADD("mathbox")
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 

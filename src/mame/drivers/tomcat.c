@@ -333,7 +333,7 @@ static MACHINE_START(tomcat)
 
 	tomcat_nvram = auto_malloc(0x800);
 
-	state_save_register_global_pointer(machine, tomcat_nvram, 0x800); 
+	state_save_register_global_pointer(machine, tomcat_nvram, 0x800);
 	state_save_register_global(machine, tomcat_control_num);
 	state_save_register_global(machine, dsp_BIO);
 	state_save_register_global(machine, dsp_idle);

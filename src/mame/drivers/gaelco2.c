@@ -1374,7 +1374,7 @@ ROM_START( wrally2 )
 ROM_END
 
 /*
-CPU	1x MC68HC000FN12 (main)(u18)
+CPU 1x MC68HC000FN12 (main)(u18)
 1x CG-1V-149 (u42)(sound/gfx? maybe the same as Gaelco)
 1x DALLAS DS5002FP (not dumped)(u44)
 1x TDA1543 (sound)(u20)
@@ -1382,7 +1382,7 @@ CPU	1x MC68HC000FN12 (main)(u18)
 1x TDA2003 (sound)(u1)
 1x oscillator 34.000 MHz (xtal1)
 1x oscillator 11.0592 MHz (xtal2)
-ROMs	2x AM27C010 (u39,u40)
+ROMs    2x AM27C010 (u39,u40)
 4x NM27C040Q (u50,u52,u53,u54)
 1x M27C801 (u51)
 
@@ -1392,7 +1392,7 @@ ROMs	2x AM27C010 (u39,u40)
 
 1x PALCE16V8H (u28)(read protected -> extracted with CmD's PALdumper - it's registered)
 1x PALCE16V8H (u29)(read protected -> extracted with CmD's PALdumper)
-Note	1x 28x2 edge connector
+Note    1x 28x2 edge connector
 1x 2 legs connector (jp1)
 1x 4 legs connector (jp2)
 1x 12 legs connector (jp3)

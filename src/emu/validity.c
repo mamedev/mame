@@ -162,7 +162,7 @@ INLINE int validate_tag(const game_driver *driver, const char *object, const cha
 	const char *begin = strrchr(tag, ':');
 	const char *p;
 	int error = FALSE;
-	
+
 	/* some common names that are now deprecated */
 	if (strcmp(tag, "main") == 0 ||
 		strcmp(tag, "audio") == 0 ||
@@ -594,7 +594,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 			if (ROMENTRY_ISREGION(romp))
 			{
 				const char *regiontag = ROMREGION_GETTAG(romp);
-				
+
 				/* if we haven't seen any items since the last region, print a warning */
 				if (items_since_region == 0)
 					mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
@@ -1547,7 +1547,7 @@ static int validate_devices(int drivnum, const machine_config *config)
 
 		/* validate the device tag */
 		error |= validate_tag(driver, device_get_info_string(device, DEVINFO_STR_NAME), device->tag);
-		
+
 		/* look for duplicates */
 		for (scandevice = device_list_first(config->devicelist, DEVICE_TYPE_WILDCARD); scandevice != device; scandevice = device_list_next(scandevice, DEVICE_TYPE_WILDCARD))
 			if (strcmp(scandevice->tag, device->tag) == 0)

@@ -852,7 +852,7 @@ static void circle(INT16 sx, INT16 sy, UINT16 r, INT16 col)
 	{
 		float degInRad = i * DEG2RAD / (r / 10);
 		dot(sx + cos(degInRad) * r,sy + sin(degInRad) * r,col & 7,cl0);
-	} 
+	}
 }
 
 static void paint(int sx, int sy, int col)

@@ -38,7 +38,7 @@ static VIDEO_START( cowrace )
 	tmap = tilemap_create(	machine, get_tile_info, tilemap_scan_rows,
 							8,8, 0x20,0x20	);
 
-//	tilemap_set_transparent_pen(tmap, 0);
+//  tilemap_set_transparent_pen(tmap, 0);
 }
 
 static VIDEO_UPDATE( cowrace )

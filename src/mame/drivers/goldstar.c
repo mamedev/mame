@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
-//	AM_RANGE(0x11, 0x11) AM_WRITENOP
+//  AM_RANGE(0x11, 0x11) AM_WRITENOP
 	AM_RANGE(0x12, 0x12) AM_WRITE (cm_outport1_w)	/* output port */
 	AM_RANGE(0x13, 0x13) AM_WRITE(cm_background_col_w)
 ADDRESS_MAP_END
@@ -5777,9 +5777,9 @@ static DRIVER_INIT(mtonic)
 	{
 		if ((A & 4) == 4)
 			ROM[A] ^= 0x01;
-			
+
 		ROM[A] = BITSWAP8(ROM[A], 3,6,5,4,7,2,1,0);
-	}	
+	}
 }
 
 

@@ -492,8 +492,8 @@ ROM_START( vball ) /* US version */
 	ROM_LOAD( "25j1-0.47",    0x00000, 0x8000,  CRC(10ca79ad) SHA1(aad4a09d6745ca0b5665cb00ff7a4e08ea434068) )
 
 	/* the original has the image data stored in a special ceramic embedded package made by Toshiba
-	with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
-	there are a few bytes different between the bootleg and the original (the original is correct though!) */
+    with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
+    there are a few bytes different between the bootleg and the original (the original is correct though!) */
 	ROM_REGION(0x80000, "gfx1", ROMREGION_DISPOSE ) /* fg tiles */
 	ROM_LOAD( "trj-101.96",   0x00000, 0x80000, CRC(f343eee4) SHA1(1ce95285631f7ec91fe3f6c3d62b13f565d3816a) )
 
@@ -520,8 +520,8 @@ ROM_START( vball2pj ) /* Japan version */
 //ROM_LOAD( "vball04.bin",        0x00000, 0x8000,  CRC(534dfbd9) SHA1(d0cb37caf94fa85da4ebdfe15e7a78109084bf91) )
 
 	/* the original has the image data stored in a special ceramic embedded package made by Toshiba
-	with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
-	there are a few bytes different between the bootleg and the original (the original is correct though!) */
+    with part number 'TOSHIBA TRJ-101' (which has been dumped using a custom made adapter)
+    there are a few bytes different between the bootleg and the original (the original is correct though!) */
 	ROM_REGION(0x80000, "gfx1", ROMREGION_DISPOSE ) /* fg tiles */
 	ROM_LOAD( "trj-101.96",   0x00000, 0x80000, CRC(f343eee4) SHA1(1ce95285631f7ec91fe3f6c3d62b13f565d3816a) )
 

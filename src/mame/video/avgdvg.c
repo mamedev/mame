@@ -1469,7 +1469,7 @@ static void register_state (running_machine *machine)
 	state_save_register_item(machine, "AVG", NULL, 0, vg->clipy_min);
 	state_save_register_item(machine, "AVG", NULL, 0, vg->clipx_max);
 	state_save_register_item(machine, "AVG", NULL, 0, vg->clipy_max);
-	
+
 	state_save_register_item(machine, "AVG", NULL, 0, flip_x);
 	state_save_register_item(machine, "AVG", NULL, 0, flip_y);
 
@@ -1546,7 +1546,7 @@ VIDEO_START( avg_tempest )
 {
 	vgc = &avg_tempest;
 	VIDEO_START_CALL(avg_common);
-	
+
 	state_save_register_item_pointer(machine, "AVG", NULL, 0, vectorram, vectorram_size);
 }
 

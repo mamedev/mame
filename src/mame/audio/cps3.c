@@ -33,7 +33,7 @@ static STREAM_UPDATE( cps3_stream_update )
 	// the actual 'user5' region only exists on the nocd sets, on the others it's allocated in the initialization.
 	// it's a shared gfx/sound region, so can't be allocated as part of the sound device.
 	chip.base = (INT8*)cps3_user5region;
-	
+
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples*sizeof(*outputs[1]));

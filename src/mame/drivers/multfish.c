@@ -56,7 +56,7 @@ static TILE_GET_INFO( get_multfish_tile_info )
 {
 	int code = multfish_vid[tile_index*2+0x0000] | (multfish_vid[tile_index*2+0x0001] << 8);
 	int attr = multfish_vid[tile_index*2+0x1000] | (multfish_vid[tile_index*2+0x1001] << 8);
-	
+
 	tileinfo->category = (attr&0x100)>>8;
 
 	SET_TILE_INFO(
@@ -69,7 +69,7 @@ static TILE_GET_INFO( get_multfish_tile_info )
 static TILE_GET_INFO( get_multfish_reel_tile_info )
 {
 	int code = multfish_vid[tile_index*2+0x2000] | (multfish_vid[tile_index*2+0x2001] << 8);
-	
+
 	SET_TILE_INFO(
 			0,
 			(code&0x1fff)+0x2000,
@@ -87,10 +87,10 @@ static VIDEO_START(multfish)
 	multfish_bram = auto_malloc(multfish_BRAM_SIZE);
 	memset(multfish_bram,0x00,multfish_BRAM_SIZE);
 	state_save_register_global_pointer(machine, multfish_bram, multfish_BRAM_SIZE);
-	
+
 	multfish_tilemap = tilemap_create(machine,get_multfish_tile_info,tilemap_scan_rows,16,16, 64, 32);
 	tilemap_set_transparent_pen(multfish_tilemap,255);
-	
+
 	multfish_reel_tilemap = tilemap_create(machine,get_multfish_reel_tile_info,tilemap_scan_rows,16,16, 64, 64);
 	tilemap_set_transparent_pen(multfish_reel_tilemap,255);
 	tilemap_set_scroll_cols(multfish_reel_tilemap, 64);
@@ -109,7 +109,7 @@ static VIDEO_UPDATE(multfish)
 
 	/* Draw lower part of static tilemap (low pri tiles) */
 	tilemap_draw(bitmap,cliprect,multfish_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
-	
+
 	/* Setup the column scroll and draw the reels */
 	for (i=0;i<64;i++)
 	{
@@ -127,7 +127,7 @@ static VIDEO_UPDATE(multfish)
 static WRITE8_HANDLER( multfish_vid_w )
 {
 	multfish_vid[offset]=data;
-	
+
 	// 0x0000 - 0x1fff is normal tilemap
 	if (offset < 0x2000)
 	{
@@ -151,7 +151,7 @@ static WRITE8_HANDLER( multfish_vid_w )
 		b = ( (coldat &0x00e0)>> (5));
 		b|= ( (coldat &0xe000)>> (8+5-3));
 
-		palette_set_color_rgb(space->machine, (offset-0x4000)/2, r<<3, g<<3, b<<2);		
+		palette_set_color_rgb(space->machine, (offset-0x4000)/2, r<<3, g<<3, b<<2);
 	}
 	else
 	{
@@ -356,18 +356,18 @@ static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
 
 	/* Write ports not hooked up yet (lights etc.) */
-//	AM_RANGE(0x30, 0x30) AM_WRITE(multfish_port30_w)
-//	AM_RANGE(0x31, 0x31) AM_WRITE(multfish_port31_w)
-//	AM_RANGE(0x32, 0x32) AM_WRITE(multfish_port32_w)
-//	AM_RANGE(0x33, 0x33) AM_WRITE(multfish_port33_w)
-//	AM_RANGE(0x34, 0x34) AM_WRITE(multfish_port34_w)
-//	AM_RANGE(0x35, 0x35) AM_WRITE(multfish_port35_w)
-//	AM_RANGE(0x36, 0x36) AM_WRITE(multfish_port36_w)
-//	AM_RANGE(0x37, 0x37) AM_WRITE(multfish_watchdog_reset_w)
+//  AM_RANGE(0x30, 0x30) AM_WRITE(multfish_port30_w)
+//  AM_RANGE(0x31, 0x31) AM_WRITE(multfish_port31_w)
+//  AM_RANGE(0x32, 0x32) AM_WRITE(multfish_port32_w)
+//  AM_RANGE(0x33, 0x33) AM_WRITE(multfish_port33_w)
+//  AM_RANGE(0x34, 0x34) AM_WRITE(multfish_port34_w)
+//  AM_RANGE(0x35, 0x35) AM_WRITE(multfish_port35_w)
+//  AM_RANGE(0x36, 0x36) AM_WRITE(multfish_port36_w)
+//  AM_RANGE(0x37, 0x37) AM_WRITE(multfish_watchdog_reset_w)
 	AM_RANGE(0x38, 0x38) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
 	AM_RANGE(0x39, 0x39) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
 	AM_RANGE(0x3a, 0x3a) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	
+
 	AM_RANGE(0x90, 0x90) AM_READ(ray_r)
 
 	AM_RANGE(0xe1, 0xe1)  AM_WRITE(multfish_bank_w)

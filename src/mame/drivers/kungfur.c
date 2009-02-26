@@ -103,7 +103,7 @@ static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 /* actually debugging purpose, it will be converted to the artwork system at some point. */
 VIDEO_UPDATE( kungfur )
 {
-//	popmessage("%02x %02x %02x %02x %02x %02x",io_data[0],io_data[1],io_data[2],io_data[3],io_data[4],io_data[5]);
+//  popmessage("%02x %02x %02x %02x %02x %02x",io_data[0],io_data[1],io_data[2],io_data[3],io_data[4],io_data[5]);
 	int i;
 
 	for(i=0;i<16;i++)
@@ -117,40 +117,40 @@ static WRITE8_DEVICE_HANDLER( test0_w )
 	mux_data = data & 7;	/* multiplexer selector? (00-06) */
 
 	mux_data|= (data & 0x10)>>1;
-//	printf("%02x MUX W\n",data);
+//  printf("%02x MUX W\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER( test1_w )
 {
-//	io_data[1] = data;	/* the whole port should be NULL */
-//	printf("%02x Unk 1 W\n",data);
+//  io_data[1] = data;  /* the whole port should be NULL */
+//  printf("%02x Unk 1 W\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER( test2_w )
 {
-//	io_data[2] = data;	/* lower nibble should be NULL */
+//  io_data[2] = data;  /* lower nibble should be NULL */
 	led[mux_data] = data;
-//	printf("%02x Unk 2 W\n",data);
+//  printf("%02x Unk 2 W\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER( test3_w )
 {
-//	io_data[3] = data;
-//	printf("%02x Unk 3 W\n",data);
+//  io_data[3] = data;
+//  printf("%02x Unk 3 W\n",data);
 }
 
 /*mux is always 0*/
 static WRITE8_DEVICE_HANDLER( test4_w )
 {
-//	io_data[4] = data;
+//  io_data[4] = data;
 	led[mux_data] = data;
 }
 
 /* this looks like lamps. */
 static WRITE8_DEVICE_HANDLER( test5_w )
 {
-//	io_data[5] = data;
-//	printf("%02x Unk 5 W\n",data);
+//  io_data[5] = data;
+//  printf("%02x Unk 5 W\n",data);
 }
 
 static UINT32 adpcm_pos[2];

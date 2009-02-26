@@ -156,7 +156,7 @@ VIDEO_START( cherrym )
 
 	cmaster_girl_num = 0;
 	cmaster_girl_pal = 0;
-	
+
 	goldstar_fg_tilemap = tilemap_create(machine,get_cherrym_fg_tile_info,tilemap_scan_rows,8,8, 64, 32);
 	tilemap_set_transparent_pen(goldstar_fg_tilemap,0);
 }
@@ -171,49 +171,33 @@ WRITE8_HANDLER( goldstar_fa00_w )
 	bgcolor = (data & 0x04) >> 2;
 	tilemap_mark_all_tiles_dirty (goldstar_reel1_tilemap);
 	tilemap_mark_all_tiles_dirty (goldstar_reel2_tilemap);
-	tilemap_mark_all_tiles_dirty (goldstar_reel3_tilemap);	
+	tilemap_mark_all_tiles_dirty (goldstar_reel3_tilemap);
 }
 
 WRITE8_HANDLER( cm_background_col_w )
 {
 
 	//printf("cm_background_col_w %02x\n",data);
-	
+
 	/* cherry master writes
-	
-	00 (at start)
-	14 (win 1st round)
-	38 (win 2nd round)
-	4c etc.
-	20
-	5c
-		
-	these are the following values in binary (sorted)
-	
-	0000 0000
-	0001 0100
-	0010 0000
-	0011 1000
-	0100 1100
-	0101 1100
 
-	so it's probably
-	
-	0ggg cc00
-	
-	where g is which girl to display and c is the colour palette
-		
-	(note, this doesn't apply to the amcoe games which have no girls, I'm unsure how the priority/positioning works)
-		
+    so it's probably
 
-	*/
+    0ggg cc00
+
+    where g is which girl to display and c is the colour palette
+
+    (note, this doesn't apply to the amcoe games which have no girls, I'm unsure how the priority/positioning works)
+
+
+    */
 	cmaster_girl_num = (data >> 4)&0x7;
 	cmaster_girl_pal = (data >> 2)&0x3;
-	
+
 	bgcolor = (data & 0x03) >> 0;
 	tilemap_mark_all_tiles_dirty (goldstar_reel1_tilemap);
 	tilemap_mark_all_tiles_dirty (goldstar_reel2_tilemap);
-	tilemap_mark_all_tiles_dirty (goldstar_reel3_tilemap);	
+	tilemap_mark_all_tiles_dirty (goldstar_reel3_tilemap);
 }
 
 // are these hardcoded, or registers?
@@ -254,9 +238,9 @@ VIDEO_UPDATE( goldstar )
 	{
 		const gfx_element *gfx = screen->machine->gfx[2];
 		drawgfxzoom(bitmap,gfx,cmaster_girl_num,cmaster_girl_pal,0,0,32*8,16*8,cliprect,TRANSPARENCY_PEN,0, 0x20000, 0x10000);
-	}		
+	}
 	#endif
-	
+
 	tilemap_draw(bitmap,cliprect, goldstar_fg_tilemap, 0, 0);
 
 	return 0;

@@ -1859,7 +1859,7 @@ static MACHINE_DRIVER_START( digdug )
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(digdug)
-	
+
 	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */

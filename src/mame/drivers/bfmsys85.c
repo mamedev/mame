@@ -440,7 +440,7 @@ static MACHINE_DRIVER_START( bfmsys85 )
 	MDRV_CPU_PROGRAM_MAP(memmap,0)						// setup read and write memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
 
-	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if) 
+	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay",AY8912, MASTER_CLOCK/4)			// add AY8912 soundchip

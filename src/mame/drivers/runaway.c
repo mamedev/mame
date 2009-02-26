@@ -366,7 +366,7 @@ static MACHINE_DRIVER_START( runaway )
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 
 	MDRV_MACHINE_RESET(runaway)
-	
+
 	MDRV_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */

@@ -126,7 +126,7 @@ MACHINE_RESET( mhavoc )
 	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock);
 	state_save_register_item(machine, "misc", NULL, 0, alpha_irq_clock_enable);
 	state_save_register_item(machine, "misc", NULL, 0, gamma_irq_clock);
-	
+
 	state_save_register_item(machine, "misc", NULL, 0, speech_write_buffer);
 }
 

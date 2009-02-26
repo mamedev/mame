@@ -3923,7 +3923,7 @@ ROM_END
 ROM_START( fb5 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb5b15h.bin", 0x00000, 0x40000, CRC(faba08b8) SHA1(4763f691b563ba23cc3edf86c18cdcda8c415003) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb5rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
@@ -3939,7 +3939,7 @@ ROM_END
 ROM_START( fb5c )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb5c15h.bin", 0x00000, 0x40000, CRC(62897a2b) SHA1(7a30c6453b9e04d25686deb97e25b89e49a6305d) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb5rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
@@ -3955,7 +3955,7 @@ ROM_END
 ROM_START( fb5d )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb5d15h.bin", 0x00000, 0x40000, CRC(231b4083) SHA1(a009cae4943ba8d6a56eb4d70bc8b50f98b62fde) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb5rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
@@ -3971,7 +3971,7 @@ ROM_END
 ROM_START( fb5v )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb5v15h.bin", 0x00000, 0x40000, CRC(c6b117f5) SHA1(186dcfd9fd9b077036af54f8632ba70118f2f510) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb5rom2.bin", 0x00000, 0x3ffff, BAD_DUMP CRC(bf49ba49) SHA1(eea40e34298f7fd98771f0869ef541c5e1514f2a) )
 
@@ -3988,7 +3988,7 @@ ROM_END
 ROM_START( fb6 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06d17e.bin", 0x00000, 0x40000,  CRC(3c13d847) SHA1(c3ec365a507b960d8e97c19e1334da8fb3c9f4cf) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4004,7 +4004,7 @@ ROM_END
 ROM_START( fb6d )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06d17lt.bin", 0x00000, 0x40000, CRC(e222e19f) SHA1(1cd7bc2b802ece74735ec2a794ab5be041c24189) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4020,7 +4020,7 @@ ROM_END
 ROM_START( fb6d2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06d17r.bin", 0x00000, 0x40000, CRC(b3c1bb6f) SHA1(b8c46066a61ae48eb400014657dd80e7ef6de976) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4037,7 +4037,7 @@ ROM_END
 ROM_START( fb6v )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06v17r.bin", 0x00000, 0x40000, CRC(f65ef744) SHA1(1a4fb2b5d34b7466f398b115792a6f972c37e11e) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4053,7 +4053,7 @@ ROM_END
 ROM_START( fb6v2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06v17lt.bin", 0x00000, 0x40000, CRC(ac70303d) SHA1(c00a776b10142d478d617890d638f260fdc2c356) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4069,7 +4069,7 @@ ROM_END
 ROM_START( fb6v3 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06v17e.bin", 0x00000, 0x40000, CRC(fa42f143) SHA1(e410cc7ae1c86b540c5f573974ee68944fc51a3d))
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4085,9 +4085,9 @@ ROM_END
 ROM_START( fb6s )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s17r.bin", 0x00000, 0x40000, CRC(679747d1) SHA1(ca702324c436d54f4c23350b1af4f0250915883c) )
-	
-	// this is a 'compact' board,  the standard roms don't seem correct	
-	
+
+	// this is a 'compact' board,  the standard roms don't seem correct
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4104,9 +4104,9 @@ ROM_END
 ROM_START( fb6s2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "f06s17lt.bin", 0x00000, 0x40000, CRC(2008a56f) SHA1(1dec4818c49cd63cc29fcb5abdab7a256731ae7b) )
-	
+
 	// this is a 'compact' board,  the standard roms don't seem correct
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "fb06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4125,7 +4125,7 @@ ROM_END
 ROM_START( fb6se )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6d14r.bin", 0x00000, 0x40000, CRC(70567bf1) SHA1(2e2bb317d558c4a8a008a695097f474b5e58ccf4) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "se06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4141,7 +4141,7 @@ ROM_END
 ROM_START( fb6sed )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6d14lt.bin", 0x00000, 0x40000, CRC(97cf4951) SHA1(a750d61e4a92a79512cfbef138927581a1e5494c) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "se06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4157,7 +4157,7 @@ ROM_END
 ROM_START( fb6sed2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6d14e.bin", 0x00000, 0x40000, CRC(e6e54c02) SHA1(f3c1ceb6ac551d2c9bcd244b57cdf0522768d99e) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "se06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4173,7 +4173,7 @@ ROM_END
 ROM_START( fb6sev )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6v14r.bin", 0x00000, 0x40000,  CRC(8c5a93c9) SHA1(d101a05327e957ab83dc8a45aa005126da3a8fc6) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "se06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4189,7 +4189,7 @@ ROM_END
 ROM_START( fb6sev2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6v14lt.bin", 0x00000, 0x40000, CRC(f5be2b37) SHA1(b3ff3ec456cbed064e5d05d58b4ff74d61b288dd) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "se06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4205,7 +4205,7 @@ ROM_END
 ROM_START( fb6sev3 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "se6v14e.bin", 0x00000, 0x40000, CRC(00b681ea) SHA1(050bbe532c6869f64af47a9deec4e12652676e1b) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "se06rom2.bin", 0x00000, 0x40000, CRC(f1adbcd5) SHA1(90a8830d000eb634c2db8a09431daba6cdcb2d34) )
 
@@ -4221,7 +4221,7 @@ ROM_END
 ROM_START( version4 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "96d42r.bin", 0x00000, 0x40000, CRC(dab5706c) SHA1(9fc37b66942a5e7535b4590f132727d793f9d705) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "96rom2.bin", 0x00000, 0x40000, NO_DUMP )
 
@@ -4237,7 +4237,7 @@ ROM_END
 ROM_START( bugfever )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bfd17r.bin", 0x00000, 0x80000, CRC(6fc33307) SHA1(fdb10bd3e463cac2f9050d2d37fdfba9ccee91dc) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, NO_DUMP )
 
@@ -4253,7 +4253,7 @@ ROM_END
 ROM_START( bugfeverd )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bfd17e.bin", 0x00000, 0x80000, CRC(35324195) SHA1(ad290912556f4ddbc33667b3bce5d05f321870d0) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, NO_DUMP )
 
@@ -4269,7 +4269,7 @@ ROM_END
 ROM_START( bugfeverv )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bfv17r.bin", 0x00000, 0x80000, CRC(8b6ee6f5) SHA1(981d60f04ab44ce8fc63019ac3e5b689aa80baf0) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, NO_DUMP )
 
@@ -4285,7 +4285,7 @@ ROM_END
 ROM_START( bugfeverv2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "bfv17e.bin", 0x00000, 0x80000, CRC(b9afd39a) SHA1(d331551f679b8694bf63812e5e1a54361c87c52a) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "bfrom2.bin", 0x00000, 0x40000, NO_DUMP )
 
@@ -4317,7 +4317,7 @@ ROM_END
 ROM_START( funriver )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "frd14r.bin", 0x00000, 0x80000, CRC(03ffabcc) SHA1(0e65be88dc4158f77082e5b50836197dd0e397da) )
-	
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, NO_DUMP )
 
@@ -4333,7 +4333,7 @@ ROM_END
 ROM_START( funriverv )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "frv14r.bin", 0x00000, 0x80000, CRC(5629d38e) SHA1(6404f70d94b1ec39d1df4e00c620eb5498d3ff83) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, NO_DUMP )
 
@@ -4350,11 +4350,11 @@ ROM_END
 ROM_START( amclink )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "link22.bin", 0x00000, 0x1ffff, BAD_DUMP CRC(e1acc705) SHA1(eb5684a0924add44f64637c2610f4c9650b8f4d9) )
-		
+
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASE00 )
-	
+
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00 )
 ROM_END
 #endif

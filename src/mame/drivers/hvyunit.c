@@ -1,6 +1,6 @@
 /***************************************************************************************
 
-very preliminary driver based on djboy.c 
+very preliminary driver based on djboy.c
 
 
 
@@ -42,13 +42,13 @@ Notes:
       YM2203 clock : 3.000MHz
       VSync        : 58Hz
       HSync        : 15.59kHz
-               \-\ : KANEKO 1988. DIP40 chip, probably 8751 MCU (clock pins match) 
+               \-\ : KANEKO 1988. DIP40 chip, probably 8751 MCU (clock pins match)
       MERMAID    | : pin 18,19 = 6.000MHz (main clock)
-                 | : pin 30 = 1.000MHz (prog/ale)               
+                 | : pin 30 = 1.000MHz (prog/ale)
                /-/ : pin 22 = 111.48Hz (port 2 bit 1)
-               
+
       PANDORA      : KANEKO PX79480FP-3 PANDORA-CHIP (C) KANEKO 1988
-      
+
 
 ***************************************************************************************/
 
@@ -61,22 +61,22 @@ Notes:
 
 static WRITE8_HANDLER( mermaid_data_w )
 {
-	
-} 
+
+}
 
 
 
 static READ8_HANDLER( mermaid_data_r )
-{ 
+{
 		return mame_rand(space->machine);
-} 
+}
 
 
 
 static READ8_HANDLER( mermaid_status_r )
 {
 		return mame_rand(space->machine);
-} 
+}
 
 static VIDEO_START(hvyunit)
 {
@@ -99,7 +99,7 @@ static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
 	soundlatch_w(space,0,data);
 	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
-} 
+}
 
 
 static WRITE8_HANDLER( trigger_nmi_on_sub_cpu)
@@ -111,7 +111,7 @@ static WRITE8_HANDLER( main_bankswitch_w )
 {
 	unsigned char *ROM = memory_region(space->machine, "maincpu");
 	int bank=data&7;
-	
+
 	ROM = &ROM[0x4000 * bank];
 
 	memory_set_bankptr(space->machine, 1,ROM);
@@ -133,11 +133,11 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sub_bankswitch_w )
 {
-	unsigned char *ROM = memory_region(space->machine, "sub");	
+	unsigned char *ROM = memory_region(space->machine, "sub");
 	int bank=data&0x3;
 
 	ROM = &ROM[0x4000 * bank];
-	
+
 	memory_set_bankptr(space->machine, 2,ROM);
 }
 
@@ -249,7 +249,7 @@ static MACHINE_DRIVER_START( hvyunit )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
-	
+
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -275,8 +275,8 @@ MACHINE_DRIVER_END
 
 ROM_START( hvyunit )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b73.13",  0x00000, 0x20000, CRC(e2874601) SHA1(7f7f3287113b8622eb365d04135d2d9c35d70554) ) 
-		
+	ROM_LOAD( "b73.13",  0x00000, 0x20000, CRC(e2874601) SHA1(7f7f3287113b8622eb365d04135d2d9c35d70554) )
+
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "b73.14",  0x00000, 0x10000, CRC(0dfb51d4) SHA1(0e6f3b3d4558f12fe1b1620f57a0f4ac2065fd1a) )
 
@@ -285,25 +285,25 @@ ROM_START( hvyunit )
 
 	ROM_REGION( 0x02000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.i8751_mcu",  0x000000, 0x02000, NO_DUMP )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b73.08",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
 	ROM_LOAD( "b73.01",  0x080000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
-	ROM_LOAD( "b73.02",  0x090000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) ) 
+	ROM_LOAD( "b73.02",  0x090000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
 	ROM_LOAD( "b73.03",  0x0a0000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
 	ROM_LOAD( "b73.04",  0x0b0000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
 	ROM_LOAD( "b73.05",  0x0c0000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
 	ROM_LOAD( "b73.06",  0x0d0000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
 	ROM_LOAD( "b73.07",  0x0e0000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
-	
+
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73.09",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 
 ROM_START( hvyunita )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b73_10.5c",  0x00000, 0x20000, CRC(ca52210f) SHA1(346951962aa5bbad641117dbd66f035dddc7c0bf) ) 
-		
+	ROM_LOAD( "b73_10.5c",  0x00000, 0x20000, CRC(ca52210f) SHA1(346951962aa5bbad641117dbd66f035dddc7c0bf) )
+
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "b73_11.5p",  0x00000, 0x10000, CRC(cb451695) SHA1(116fd59f96a54c22fae65eea9ee5e58cb9ce5074) )
 
@@ -312,25 +312,25 @@ ROM_START( hvyunita )
 
 	ROM_REGION( 0x02000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.i8751_mcu",  0x000000, 0x02000, NO_DUMP )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b73.08",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
 	ROM_LOAD( "b73.01",  0x080000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
-	ROM_LOAD( "b73.02",  0x090000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) ) 
+	ROM_LOAD( "b73.02",  0x090000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
 	ROM_LOAD( "b73.03",  0x0a0000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
 	ROM_LOAD( "b73.04",  0x0b0000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
 	ROM_LOAD( "b73.05",  0x0c0000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
 	ROM_LOAD( "b73.06",  0x0d0000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
 	ROM_LOAD( "b73.07",  0x0e0000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
-	
+
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73.09",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 
 ROM_START( hvyunitb )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "b73-30.bin",  0x00000, 0x20000, CRC(600af545) SHA1(c52b9be2bae28848ad0818c296f000a1bda4fa4f) ) 
-		
+	ROM_LOAD( "b73-30.bin",  0x00000, 0x20000, CRC(600af545) SHA1(c52b9be2bae28848ad0818c296f000a1bda4fa4f) )
+
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "b73.14",  0x00000, 0x10000, CRC(0dfb51d4) SHA1(0e6f3b3d4558f12fe1b1620f57a0f4ac2065fd1a) )
 
@@ -339,17 +339,17 @@ ROM_START( hvyunitb )
 
 	ROM_REGION( 0x02000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.i8751_mcu",  0x000000, 0x02000, NO_DUMP )
-	
+
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b73.08",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
 	ROM_LOAD( "b73.01",  0x080000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
-	ROM_LOAD( "b73.02",  0x090000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) ) 
+	ROM_LOAD( "b73.02",  0x090000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
 	ROM_LOAD( "b73.03",  0x0a0000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
 	ROM_LOAD( "b73.04",  0x0b0000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
 	ROM_LOAD( "b73.05",  0x0c0000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
 	ROM_LOAD( "b73.06",  0x0d0000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
 	ROM_LOAD( "b73.07",  0x0e0000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
-	
+
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73.09",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
