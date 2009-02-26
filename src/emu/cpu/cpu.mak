@@ -503,7 +503,7 @@ CPUDEFS += -DHAS_SH1=$(if $(filter SH1,$(CPUS)),1,0)
 
 ifneq ($(filter SH1,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh2
-CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o $(CPUOBJ)/sh2/sh2drc.o $(CPUOBJ)/sh2/sh2fe.o
+CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o $(CPUOBJ)/sh2/sh2drc.o $(CPUOBJ)/sh2/sh2fe.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/sh2/sh2dasm.o
 endif
 
@@ -511,7 +511,7 @@ CPUDEFS += -DHAS_SH2=$(if $(filter SH2,$(CPUS)),1,0)
 
 ifneq ($(filter SH2,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh2
-CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o $(CPUOBJ)/sh2/sh2drc.o $(CPUOBJ)/sh2/sh2fe.o
+CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o $(CPUOBJ)/sh2/sh2drc.o $(CPUOBJ)/sh2/sh2fe.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/sh2/sh2dasm.o
 endif
 
