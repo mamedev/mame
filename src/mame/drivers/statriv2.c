@@ -941,7 +941,7 @@ ROM_START( statriv4 )
 	ROM_LOAD( "triv4.u48",    0x0e000, 0x02000, CRC(30ca8393) SHA1(dfb2f16f9b014d23793efe085be1ed75342c00dc) )
 
 	ROM_REGION( 0x0140, "proms", 0 ) /* unknown */
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, verified */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -997,7 +997,6 @@ ROM_START( supertr2 )
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
-
 ROM_START( supertr3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "triv3.u07",    0x00000, 0x01000, CRC(f04a19d7) SHA1(f887ec976d9eb14329621ac75d6547fca6808bb3) )
@@ -1006,7 +1005,7 @@ ROM_START( supertr3 )
 	ROM_LOAD( "triv3.u10",    0x03000, 0x01000, CRC(df4b81b5) SHA1(b1ab666c51b838c4176f8b314677d6ae129997d0) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "ast2-0d.rom", 0x00000, 0x01000, BAD_DUMP CRC(a40f9201) SHA1(a87cfc3dbe5cff82926f5f8486c37fd3f4449135) )
+	ROM_LOAD( "triv3.u36",    0x00000, 0x01000, CRC(79277b08) SHA1(e8de06809853e030d1ee29a788f9bc8ff7175af0) )
 
 	ROM_REGION( 0x40000, "user1", 0 ) /* question data */
 	ROM_LOAD( "triv3.u41",    0x00000, 0x08000, CRC(d62960c4) SHA1(d6f7dbdb016c14ca1cab5a0e965c9ae40dcbbc28) )
@@ -1019,7 +1018,7 @@ ROM_START( supertr3 )
 	ROM_LOAD( "triv3.u48",    0x38000, 0x08000, CRC(1a99b268) SHA1(6369c79f645962b4a2f85b18e9d93c3cc65defc1) )
 
 	ROM_REGION( 0x0140, "proms", 0 ) /* unknown */
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, verified */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -1109,4 +1108,4 @@ GAME( 1985, statriv4, 0,        statriv4,  statriv4, 0, ROT0, "Status Games", "T
 GAME( 1985, sextriv,  0,        sextriv,   sextriv,  0, ROT0, "Status Games", "Sex Triv", GAME_SUPPORTS_SAVE )
 GAME( 1985, quaquiz2, 0,        quaquiz2,  quaquiz2, 0, ROT0, "Status Games", "Quadro Quiz II", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1986, supertr2, 0,        supertr2,  supertr2, 0, ROT0, "Status Games", "Super Triv II", GAME_SUPPORTS_SAVE )
-GAME( 1988, supertr3, 0,        supertr3,  supertr2, 0, ROT0, "Status Games", "Super Triv III", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+GAME( 1988, supertr3, 0,        supertr3,  supertr2, 0, ROT0, "Status Games", "Super Triv III", GAME_SUPPORTS_SAVE )
