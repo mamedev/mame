@@ -280,6 +280,7 @@ const game_driver * const drivers[] =
 	DRIVER( scobras )	/* GX316 (c) 1981 Stern */
 	DRIVER( scobrase )	/* GX316 (c) 1981 Stern */
 	DRIVER( scobrab )	/* GX316 (c) 1981 Karateco (bootleg?) */
+	DRIVER( suprheli )	/* bootleg */
 	DRIVER( stratgyx )	/* GX306 (c) 1981 Konami */
 	DRIVER( stratgys )	/* GX306 (c) 1981 Stern */
 	DRIVER( armorcar )	/* (c) 1981 Stern */

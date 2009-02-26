@@ -4702,6 +4702,29 @@ ROM_START( scobrab )
 	ROM_LOAD( "82s123.6e",    0x0000, 0x0020, CRC(9b87f90d) SHA1(d11ac5e4a6057301ea2a9cbb404c2b978eb4c1dc) )
 ROM_END
 
+ROM_START( suprheli )
+	/* this is a bootleg of Super Cobra */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.2c",         0x0000, 0x1000, CRC(b25141d8) SHA1(9df638ad2c482cc7d8b8c8b61c9f8872bfaff4d5) )
+	ROM_LOAD( "scobra2e.bin", 0x1000, 0x1000, CRC(a270e44d) SHA1(8b7307af458b9cd3c45bb72b35e682d6d109ed01) ) /* labeled "2" */
+	ROM_LOAD( "scobra2f.bin", 0x2000, 0x1000, CRC(bdd70346) SHA1(bda0dc5777233a86a3a0aceb6eded45145057ba8) ) /* labeled "3" */
+	ROM_LOAD( "scobra2h.bin", 0x3000, 0x1000, CRC(dca5ec31) SHA1(50073d44ccef76a3c36c73a6ed4479127f2c98ee) ) /* labeled "4" */
+	ROM_LOAD( "scobra2j.bin", 0x4000, 0x1000, CRC(0d8f6b6e) SHA1(0ca0096cd55cdb87d14cb7f4c7c7b853ec1661c7) ) /* labeled "5" */
+	ROM_LOAD( "6.2l",         0x5000, 0x1000, CRC(10a474d9) SHA1(3ba7ea791ab7b97bb4276550591812134f891708) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "epr1275.5c",   0x0000, 0x0800, CRC(deeb0dd3) SHA1(b815a586f05361b75078d58f1fddfdb36f9d8fae) ) /* all the rom stickers are reflective and have white printing, except this one has green and was labeled "10" and is at position 11D */
+	ROM_LOAD( "epr1276.5d",   0x0800, 0x0800, CRC(872c1a74) SHA1(20f05bf398ad2690f5ba4e4158ad62aeec226413) ) /* also labeled "10" but in white and is at position 10D */
+	ROM_LOAD( "9.9d",         0x1000, 0x0800, CRC(2b69b8f3) SHA1(89ed25e7295eff63b53046b78fcb7f6e78796873) )
+
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "epr1274.5h",   0x0000, 0x0800, CRC(64d113b4) SHA1(7b439bb74d5ecc792e0ca8964bcca8c6b7a51262) ) /* labeled "7" and is at position 5F, not H */
+	ROM_LOAD( "epr1273.5f",   0x0800, 0x0800, CRC(a96316d3) SHA1(9de0e94932e91dc34aea7c81880bde6a486d103b) ) /* labeled "8" and is at position 5H, not F */
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "k.6e",         0x0000, 0x0020, CRC(fd35c561) SHA1(590f60beb443dd689c890c37cc100e0b936bf8c9) ) /* this dump matches the prom from scobrase, it was labeled "K" with a marker here at 6E */
+ROM_END
+
 /*
     Lost Tomb
 
@@ -5139,6 +5162,7 @@ GAME( 1981, scobra,   0,        scobra,   scobra,   scobra,   ROT90,  "Konami", 
 GAME( 1981, scobras,  scobra,   scobra,   scobras,  scobra,   ROT90,  "[Konami] (Stern license)", "Super Cobra (Stern)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobrase, scobra,   scobra,   scobras,  scobra,   ROT90,  "[Konami] (Sega license)", "Super Cobra (Sega)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobrab,  scobra,   scobra,   scobras,  scobra,   ROT90,  "bootleg", "Super Cobra (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, suprheli, scobra,   scobra,   scobras,  scobra,   ROT90,  "bootleg", "Super Heli (Super Cobra bootleg)", GAME_SUPPORTS_SAVE )
 
 GAME( 1982, losttomb, 0,        scobra,   losttomb, losttomb, ROT90,  "Stern", "Lost Tomb (easy)", GAME_SUPPORTS_SAVE )
 GAME( 1982, losttmbh, losttomb, scobra,   losttomb, losttomb, ROT90,  "Stern", "Lost Tomb (hard)", GAME_SUPPORTS_SAVE )
