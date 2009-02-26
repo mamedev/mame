@@ -337,24 +337,25 @@ static READ8_HANDLER( konami_ay8910_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x20) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.0"), 0);
-	if (offset & 0x80) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.1"), 0);
+	if (offset & 0x20) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.1"), 0);
+	if (offset & 0x80) result &= ay8910_r(devtag_get_device(space->machine, SOUND, "8910.0"), 0);
 	return result;
 }
 
 
 static WRITE8_HANDLER( konami_ay8910_w )
 {
+	/* AV 4,5 ==> AY8910 #2 */
 	/* the decoding here is very simplistic, and you can address two simultaneously */
 	if (offset & 0x10)
-		ay8910_address_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
-	else if (offset & 0x20)
-		ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
-
-	if (offset & 0x40)
 		ay8910_address_w(devtag_get_device(space->machine, SOUND, "8910.1"), 0, data);
-	else if (offset & 0x80)
+	else if (offset & 0x20)
 		ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.1"), 0, data);
+	/* AV6,7 ==> AY8910 #1 */
+	if (offset & 0x40)
+		ay8910_address_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
+	else if (offset & 0x80)
+		ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
 }
 
 
@@ -415,6 +416,8 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 	int which, chan;
 
 	/* the offset is used as data, 6 channels * 2 bits each */
+	/* AV0 .. AV5 ==> AY8910 #2 */
+	/* AV6 .. AV11 ==> AY8910 #1 */
 	for (which = 0; which < 2; which++)
 		if (devtag_get_device(space->machine, SOUND, ayname[which]) != NULL)
 			for (chan = 0; chan < 3; chan++)
@@ -423,7 +426,7 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 
 				/* low bit goes to 0.22uF capacitor = 220000pF  */
 				/* high bit goes to 0.047uF capacitor = 47000pF */
-				discrete_sound_w(discrete, NODE(3 * (1-which) + chan + 11), bits);
+				discrete_sound_w(discrete, NODE(3 * which + chan + 11), bits);
 			}
 }
 
@@ -667,6 +670,7 @@ static READ8_HANDLER( frogger_ay8910_r )
 static WRITE8_HANDLER( frogger_ay8910_w )
 {
 	/* the decoding here is very simplistic */
+	/* AV6,7 ==> AY8910 #1 */
 	if (offset & 0x40)
 		ay8910_data_w(devtag_get_device(space->machine, SOUND, "8910.0"), 0, data);
 	else if (offset & 0x80)
@@ -1569,8 +1573,8 @@ static const ay8910_interface konami_ay8910_interface_1 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_HANDLER(konami_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1579,8 +1583,8 @@ static const ay8910_interface konami_ay8910_interface_2 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
-	DEVCB_HANDLER(konami_sound_timer_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1642,7 +1646,7 @@ static const discrete_mixer_desc konami_sound_mixer_desc =
 		{0,0,0,0,0,0},  /* no node capacitors      */
 		0, RES_K(2.2),
 		0,
-		CAP_U(0.15),
+		0, /* modelled separately */
 		0, 1};
 
 static DISCRETE_SOUND_START( konami_sound )
@@ -1677,7 +1681,10 @@ static DISCRETE_SOUND_START( konami_sound )
 	/* This is handled with sound_global_enable but    */
 	/* belongs here.                                   */
 
-	DISCRETE_OUTPUT(NODE_30, 12.0 )
+	/* Input impedance of a M51516L is typically 30k (datasheet) */
+	DISCRETE_CRFILTER(NODE_40,1,NODE_30,RES_K(30),CAP_U(0.15))
+	
+	DISCRETE_OUTPUT(NODE_40, 10.0 )
 
 DISCRETE_SOUND_END
 
@@ -1745,9 +1752,9 @@ static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 	/* sound hardware */
 	MDRV_SOUND_ADD("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(frogger_ay8910_interface)
-	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
-	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
-	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
 
 	MDRV_SOUND_ADD("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
