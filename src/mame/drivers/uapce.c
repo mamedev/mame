@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( pce_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
 	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
 	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( SOUND, "maincpu", c6280_r, c6280_w )
+	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( SOUND, "c6280", c6280_r, c6280_w )
 	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
 	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( h6280_irq_status_r, h6280_irq_status_w )
@@ -177,6 +177,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pce_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
 ADDRESS_MAP_END
+
+static const c6280_interface c6280_config =
+{
+	"maincpu"
+};
 
 static MACHINE_DRIVER_START( uapce )
 	/* basic machine hardware */
@@ -206,7 +211,8 @@ static MACHINE_DRIVER_START( uapce )
 	MDRV_VIDEO_UPDATE( pce )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MDRV_SOUND_ADD("maincpu", C6280, PCE_MAIN_CLOCK/6)
+	MDRV_SOUND_ADD("c6280", C6280, PCE_MAIN_CLOCK/6)
+	MDRV_SOUND_CONFIG(c6280_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 

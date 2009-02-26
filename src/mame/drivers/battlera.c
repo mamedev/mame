@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(battlera_adpcm_data_w)
-	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE(SOUND, "audiocpu", c6280_w)
+	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE(SOUND, "c6280", c6280_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(7) /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_r) AM_DEVWRITE(SOUND, "msm", battlera_adpcm_reset_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
@@ -234,6 +234,11 @@ static const msm5205_interface msm5205_config =
 
 /******************************************************************************/
 
+static const c6280_interface c6280_config =
+{
+	"audiocpu"
+};
+
 static MACHINE_DRIVER_START( battlera )
 
 	/* basic machine hardware */
@@ -270,7 +275,8 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
 
-	MDRV_SOUND_ADD("audiocpu", C6280, 21477270/6)
+	MDRV_SOUND_ADD("c6280", C6280, 21477270/6)
+	MDRV_SOUND_CONFIG(c6280_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_DRIVER_END

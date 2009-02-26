@@ -1791,7 +1791,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mod4yam )
 	MDRV_IMPORT_FROM( mpu4mod2 )
 	MDRV_MACHINE_START(mpu4mod4)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mod4_yam_map,0)
 
 	MDRV_SOUND_REMOVE("ay8913")
@@ -1802,7 +1802,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mod4oki )
 	MDRV_IMPORT_FROM( mpu4mod2 )
 	MDRV_MACHINE_START(mpu4mod4)
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mod4_oki_map,0)
 
 	MDRV_SOUND_REMOVE("ay8913")
@@ -1812,23 +1812,23 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mpu4dutch )
 	MDRV_IMPORT_FROM( mod4oki )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dutch_memmap,0)	  			// setup read and write memorymap
 	MDRV_MACHINE_START(mpu4dutch)						// main mpu4 board initialisation
 MACHINE_DRIVER_END
 
 ROM_START( m_oldtmr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
 ROM_END
 
 ROM_START( m_ccelbr )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cels.p1",  0x00000, 0x10000,  CRC(19d2162f) SHA1(24fe435809352725e7614c32e2184142f355298e))
 ROM_END
 
 ROM_START( m_gmball )
-	ROM_REGION( 0x10000, "main", ROMREGION_ERASE00  )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
 	ROM_LOAD( "gbbx.p1",	0x0000, 0x10000,  CRC(0b5adcd0) SHA1(1a198bd4a1e7d6bf4cf025c43d35aaef351415fc))
 ROM_END
 

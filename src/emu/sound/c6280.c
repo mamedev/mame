@@ -99,6 +99,7 @@ INLINE c6280_t *get_safe_token(const device_config *device)
 
 static void c6280_init(const device_config *device, c6280_t *p, double clk, double rate)
 {
+	const c6280_interface *intf = device->static_config;
     int i;
     double step;
 
@@ -109,7 +110,7 @@ static void c6280_init(const device_config *device, c6280_t *p, double clk, doub
     memset(p, 0, sizeof(c6280_t));
 
     p->device = device;
-    p->cpudevice = cputag_get_cpu(device->machine, device->tag);
+    p->cpudevice = cputag_get_cpu(device->machine, intf->cpu);
     if (p->cpudevice == NULL)
     	fatalerror("c6280_init: no CPU found with tag of '%s'\n", device->tag);
 

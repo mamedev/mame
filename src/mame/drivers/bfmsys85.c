@@ -436,7 +436,7 @@ ADDRESS_MAP_END
 static MACHINE_DRIVER_START( bfmsys85 )
 	MDRV_MACHINE_START(bfm_sys85)						// main system85 board initialisation
 	MDRV_MACHINE_RESET(bfm_sys85)
-	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap,0)						// setup read and write memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
 
@@ -479,7 +479,7 @@ INPUT_PORTS_END
 // ROM definition /////////////////////////////////////////////////////////
 
 ROM_START( m_supcrd )
-	ROM_REGION( 0x10000, "main", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sc271.bin",  0x8000, 0x8000,  CRC(58e9c9df) SHA1(345c5aa279327d7142edc6823aad0cfd40cbeb73))
 ROM_END
 

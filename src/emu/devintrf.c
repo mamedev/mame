@@ -104,7 +104,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 
 	/* find the end of the list, and ensure no duplicates along the way */
 	for (devptr = listheadptr; *devptr != NULL; devptr = &(*devptr)->next)
-		if (type == (*devptr)->type && strcmp(tag, (*devptr)->tag) == 0)
+		if (strcmp(tag, (*devptr)->tag) == 0)
 			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", device_get_name(*devptr), tag);
 
 	/* get the size of the inline config */

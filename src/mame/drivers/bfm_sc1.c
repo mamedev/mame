@@ -750,7 +750,7 @@ static MACHINE_RESET( bfm_sc1 )
 
 // init rom bank ////////////////////////////////////////////////////////////////////
 	{
-		UINT8 *rom = memory_region(machine, "main");
+		UINT8 *rom = memory_region(machine, "maincpu");
 
 		memory_configure_bank(machine,1, 0, 1, &rom[0x10000], 0);
 		memory_configure_bank(machine,1, 1, 3, &rom[0x02000], 0x02000);
@@ -1242,7 +1242,7 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( scorpion1 )
 	MDRV_MACHINE_RESET(bfm_sc1)							// main scorpion1 board initialisation
-	MDRV_CPU_ADD("main", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap,0)						// setup read and write memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
 
@@ -1261,7 +1261,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( scorpion1_adder2 )
 	MDRV_IMPORT_FROM( scorpion1 )
 
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(memmap_adder2,0)				// setup read and write memorymap
 
 	MDRV_DEFAULT_LAYOUT(layout_bfm_sc1)
@@ -1291,7 +1291,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( scorpion1_nec_uk )
 	MDRV_IMPORT_FROM( scorpion1 )
-	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sc1_nec_uk,0)					// setup read and write memorymap
 
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
@@ -1301,21 +1301,21 @@ MACHINE_DRIVER_END
 // ROM definition ///////////////////////////////////////////////////////////////////
 
 ROM_START( m_lotsse )
-	ROM_REGION( 0x12000, "main", 0 )
+	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "lotusse.bin",  0x0000, 0x10000,  CRC(636dadc4) SHA1(85bad5d76dac028fe9f3303dd09e8266aba7db4d))
 ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( m_roulet )
-	ROM_REGION( 0x12000, "main", 0 )
+	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "rou029.bin",   0x8000, 0x08000,  CRC(31723f0A) SHA1(e220976116a0aaf24dc0c4af78a9311a360e8104))
 ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( m_clattr )
-	ROM_REGION( 0x12000, "main", 0 )
+	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "39370196.1",   0x8000, 0x08000,  CRC(4c2e465f) SHA1(101939d37d9c033f6d1dfb83b4beb54e4061aec2))
 	ROM_LOAD( "39370196.2",   0x0000, 0x08000,  CRC(c809c22d) SHA1(fca7515bc84d432150ffe5e32fccc6aed458b8b0))
 ROM_END
@@ -1323,7 +1323,7 @@ ROM_END
 /////////////////////////////////////////////////////////////////////////////////////
 
 ROM_START( m_tppokr )
-	ROM_REGION( 0x12000, "main", 0 )
+	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "95750899.bin", 0x0000, 0x10000,  CRC(639d1d62) SHA1(80620c14bf9f953588555510fc2e6e930140923f))
 
 	ROM_REGION( 0x20000, "adder2", 0 )
@@ -1339,7 +1339,7 @@ static void sc1_common_init(running_machine *machine, int reels, int decrypt)
 {
 	UINT8 *rom, i;
 
-	rom = memory_region(machine, "main");
+	rom = memory_region(machine, "maincpu");
 	if ( rom )
 	{
 		memcpy(&rom[0x10000], &rom[0x00000], 0x2000);
@@ -1352,7 +1352,7 @@ static void sc1_common_init(running_machine *machine, int reels, int decrypt)
 	{
 		stepper_config(machine, i, &starpoint_interface_48step);
 	}
-	if (decrypt) decode_sc1(machine,"main");	// decode main rom
+	if (decrypt) decode_sc1(machine,"maincpu");	// decode main rom
 	if (reels)
 	{
 		awp_reel_setup();

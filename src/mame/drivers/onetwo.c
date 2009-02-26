@@ -313,7 +313,7 @@ MACHINE_DRIVER_END
 
 ROM_START( onetwo )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* main z80 */
-	ROM_LOAD( "main", 0x10000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
+	ROM_LOAD( "maincpu", 0x10000,  0x20000, CRC(83431e6e) SHA1(61ab386a1d0af050f091f5df28c55ad5ad1a0d4b) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound z80 */
 	ROM_LOAD( "sound_prog",  0x00000,  0x10000, CRC(90aba4f3) SHA1(914b1c8684993ddc7200a3d61e07f4f6d59e9d02) )
