@@ -11,7 +11,7 @@
 
 #include "corefile.h"
 #include "unicode.h"
-#include "zlib.h"
+#include <zlib.h>
 
 #include <stdarg.h>
 #include <ctype.h>

@@ -3448,7 +3448,7 @@ static void build_opcode_table(void)
 /* ======================================================================== */
 
 /* Disasemble one instruction at pc and store in str_buff */
-unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_type)
+static unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_type)
 {
 	if(!g_initialized)
 	{
@@ -3491,6 +3491,7 @@ unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_
 	return COMBINE_OPCODE_FLAGS(g_cpu_pc - pc);
 }
 
+#ifdef UNUSED_FUNCTION
 char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type)
 {
 	static char buff[100];
@@ -3498,6 +3499,7 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type)
 	m68k_disassemble(buff, pc, cpu_type);
 	return buff;
 }
+#endif
 
 unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type)
 {
@@ -3510,6 +3512,7 @@ unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigne
 	return result;
 }
 
+#ifdef UNUSED_FUNCTION
 /* Check if the instruction is a valid one */
 unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cpu_type)
 {
@@ -3710,7 +3713,7 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 
 	return 1;
 }
-
+#endif
 
 
 /* ======================================================================== */

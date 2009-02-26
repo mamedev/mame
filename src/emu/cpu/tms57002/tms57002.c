@@ -105,9 +105,6 @@ typedef struct {
 	int icount;
 } tms57002_t;
 
-int tr=0;
-int tt=0;
-
 static void tms57002_cache_flush(tms57002_t *s);
 
 static const char *tms57002_get_memadr(UINT32 opcode, char type)
@@ -343,6 +340,7 @@ void tms57002_sync(const device_config *device)
 	s->sti &= ~S_IDLE;
 }
 
+#ifdef UNUSED_FUNCTION
 static UINT32 tms57002_read_c(tms57002_t *s, UINT8 index)
 {
 	UINT32 v = s->cmem[index];
@@ -435,6 +433,7 @@ static UINT32 tms57002_opc_read_d(tms57002_t *s, UINT32 opcode)
 	else
 		return tms57002_read_d(s, s->id);
 }
+#endif
 
 static void tms57002_xm_init(tms57002_t *s)
 {
@@ -528,6 +527,7 @@ static void tms57002_xm_step_write(tms57002_t *s)
 		s->xm_adr = adr+1;
 }
 
+#ifdef UNUSED_FUNCTION
 static UINT32 tms57002_aacc_to_output(tms57002_t *s)
 {
 	if(s->st1 & ST1_SFAO)
@@ -603,6 +603,7 @@ static INT64 tms57002_macc_to_output(tms57002_t *s)
 	}
 	return m;
 }
+#endif
 
 static noinline INT64 tms57002_macc_to_output_0(tms57002_t *s, INT64 rounding, UINT64 rmask)
 {
@@ -820,6 +821,7 @@ static noinline INT64 tms57002_macc_to_output_3s(tms57002_t *s, INT64 rounding, 
 	return m;
 }
 
+#ifdef UNUSED_FUNCTION
 static INT64 tms57002_check_macc_overflow(tms57002_t *s)
 {
 	INT64 m = s->macc;
@@ -859,6 +861,7 @@ static INT64 tms57002_check_macc_overflow(tms57002_t *s)
 	}
 	return m;
 }
+#endif
 
 static noinline INT64 tms57002_check_macc_overflow_0(tms57002_t *s)
 {
@@ -960,6 +963,7 @@ static INT64 tms57002_check_macc_overflow_3s(tms57002_t *s)
 	return s->macc;
 }
 
+#ifdef UNUSED_FUNCTION
 static INT64 tms57002_macc_to_loop(tms57002_t *s)
 {
 	INT64 m = s->macc;
@@ -1080,6 +1084,7 @@ void tms57002_execute(tms57002_t *s)
 		}
 	}
 }
+#endif
 
 INLINE int xmode(UINT32 opcode, char type)
 {

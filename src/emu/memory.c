@@ -334,7 +334,7 @@ static UINT8 table_assign_handler(const address_space *space, handler_data **tab
 static void table_compute_subhandler(handler_data **table, UINT8 entry, read_or_write readorwrite, int spacebits, int spaceendian, int handlerbits, int handlerunitmask);
 static void table_populate_range(address_table *tabledata, offs_t bytestart, offs_t byteend, UINT8 handler);
 static void table_populate_range_mirrored(address_space *space, address_table *tabledata, offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handler);
-UINT8 table_derive_range(const address_table *table, offs_t byteaddress, offs_t *bytestart, offs_t *byteend);
+static UINT8 table_derive_range(const address_table *table, offs_t byteaddress, offs_t *bytestart, offs_t *byteend);
 
 /* subtable management */
 static UINT8 subtable_alloc(address_table *tabledata);
@@ -2661,7 +2661,7 @@ static void table_populate_range_mirrored(address_space *space, address_table *t
     of that range based on the lookup tables
 -------------------------------------------------*/
 
-UINT8 table_derive_range(const address_table *table, offs_t byteaddress, offs_t *bytestart, offs_t *byteend)
+static UINT8 table_derive_range(const address_table *table, offs_t byteaddress, offs_t *bytestart, offs_t *byteend)
 {
 	UINT32 curentry, entry, curl1entry, l1entry;
 	const handler_data *handler;

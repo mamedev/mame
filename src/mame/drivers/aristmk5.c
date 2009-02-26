@@ -25,12 +25,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( aristmk5 )
 INPUT_PORTS_END
 
-VIDEO_START(aristmk5)
+static VIDEO_START(aristmk5)
 {
 
 }
 
-VIDEO_UPDATE(aristmk5)
+static VIDEO_UPDATE(aristmk5)
 {
 	return 0;
 }

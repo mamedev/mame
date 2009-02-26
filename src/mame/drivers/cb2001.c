@@ -43,7 +43,7 @@ In test mode (c) is 2000
 
 #define xxxx 0x90 /* Unknown */
 
-const UINT8 cb2001_decryption_table[256] = {
+static const UINT8 cb2001_decryption_table[256] = {
 	0xe8,xxxx,xxxx,xxxx,xxxx,0x61,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* 00 */
 //  pppp                     ????
 	xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, 0x32,xxxx,0xa0,xxxx,0x3a,xxxx,xxxx,0x1f, /* 10 */

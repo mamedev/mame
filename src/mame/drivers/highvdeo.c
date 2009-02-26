@@ -91,12 +91,12 @@ Game is V30 based, with rom banking (2Mb)
 static UINT16 *blit_ram;
 
 
-VIDEO_START(tourvisn)
+static VIDEO_START(tourvisn)
 {
 
 }
 
-VIDEO_UPDATE(tourvisn)
+static VIDEO_UPDATE(tourvisn)
 {
 	int x,y,count;
 

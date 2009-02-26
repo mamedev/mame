@@ -80,7 +80,7 @@ static INTERRUPT_GEN( big10_interrupt )
 }
 
 
-VIDEO_START( big10 )
+static VIDEO_START( big10 )
 {
 	VIDEO_START_CALL(generic_bitmapped);
 	v9938_init (machine, 0, machine->primary_screen, tmpbitmap, MODEL_V9938, VDP_MEM, big10_vdp_interrupt);

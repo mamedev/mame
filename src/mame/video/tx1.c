@@ -1246,7 +1246,6 @@ static struct
 UINT16 *buggyboy_objram;
 UINT16 *buggyboy_rcram;
 UINT16 *buggyboy_vram;
-UINT16 *buggybjr_vram;
 size_t buggyboy_objram_size;
 size_t buggyboy_rcram_size;
 

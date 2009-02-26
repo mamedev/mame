@@ -140,7 +140,7 @@ enum
 	ROTNR, BONR, BOR1, SONR, SHFTNR, PRTNR, TONR
 } ops;
 
-void make_ops(esrip_state *cpustate)
+static void make_ops(esrip_state *cpustate)
 {
 	int inst;
 

@@ -100,7 +100,7 @@ static UINT8 		prot_write_buf;		/* remembers what was written */
 static UINT8		prot_read_buf;		/* remembers what was returned */
 
 /* palette-related variables */
-UINT8		segac2_alt_palette_mode;
+static UINT8		segac2_alt_palette_mode;
 static UINT8		palbank;
 static UINT8		bg_palbase;
 static UINT8		sp_palbase;

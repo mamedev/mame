@@ -1263,7 +1263,7 @@ static CPU_DISASSEMBLE( cquestrot )
 
 enum line_spf
 {
-	LSPF_UNUSUED = 0,
+	LSPF_UNUSED  = 0,
 	LSPF_FSTOP   = 1,
 	LSPF_SREG    = 2,
 	LSPF_FSTRT   = 3,

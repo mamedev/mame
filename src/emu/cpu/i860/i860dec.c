@@ -2987,7 +2987,7 @@ static struct
 	/* 1111 */ { OP_SRC1, OP_SRC2,        OP_T,           OP_APIPE|FLAGM, 0, 0}
 };
 
-float get_fval_from_optype_s (i860s *cpustate, UINT32 insn, int optype)
+static float get_fval_from_optype_s (i860s *cpustate, UINT32 insn, int optype)
 {
 	float retval = 0.0;
 	UINT32 fsrc1 = get_fsrc1 (insn);
@@ -3026,7 +3026,7 @@ float get_fval_from_optype_s (i860s *cpustate, UINT32 insn, int optype)
 }
 
 
-double get_fval_from_optype_d (i860s *cpustate, UINT32 insn, int optype)
+static double get_fval_from_optype_d (i860s *cpustate, UINT32 insn, int optype)
 {
 	double retval = 0.0;
 	UINT32 fsrc1 = get_fsrc1 (insn);

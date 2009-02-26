@@ -141,7 +141,7 @@ static void DSP2_op05( void )
 }
 
 //reverse bitmap
-void DSP2_op06( void )
+static void DSP2_op06( void )
 {
 // Input:
 //    size
@@ -154,7 +154,7 @@ void DSP2_op06( void )
 }
 
 //multiply
-void DSP2_op09( void )
+static void DSP2_op09( void )
 {
 	UINT32 r = 0;
 	DSP2_out_count = 4;
@@ -219,7 +219,7 @@ static void DSP2_op0d( void )
 }
 
 
-void DSP2_reset( void )
+static void DSP2_reset( void )
 {
 	DSP2_waiting_for_command = 1;
 	DSP2_in_count  = 0;

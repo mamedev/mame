@@ -1726,7 +1726,7 @@ Clocks
 
 */
 
-DRIVER_INIT( igs_ncs2 )
+static DRIVER_INIT( igs_ncs2 )
 {
 	UINT8 *src = (UINT8 *) (memory_region(machine, "maincpu"));
 	int i;

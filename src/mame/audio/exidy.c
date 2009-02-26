@@ -388,7 +388,7 @@ static DEVICE_START( common_sh_start )
     sh6840_register_state_globals(device->machine);
 }
 
-DEVICE_START( exidy_sound )
+static DEVICE_START( exidy_sound )
 {
 	/* indicate no additional hardware */
 	has_sh8253  = FALSE;

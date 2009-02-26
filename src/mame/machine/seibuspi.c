@@ -302,7 +302,7 @@ CPU 'main' (PC=00021C74): unmapped program memory dword write to 0601004C = 0300
 ******************************************************************************************/
 
 
-void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size,
+static void seibuspi_rise11_sprite_decrypt(UINT8 *rom, int size,
 	UINT32 k1, UINT32 k2, UINT32 k3, UINT32 k4, UINT32 k5, int feversoc_kludge)
 {
 	int i;

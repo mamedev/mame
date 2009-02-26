@@ -14,7 +14,7 @@
 int vb_scrollx_hi=0;
 int vb_scrollx_lo=0;
 int vb_scrolly_hi=0;
-int scrollx[256];
+int vb_scrollx[256];
 
 UINT8 *vb_scrolly_lo;
 UINT8 *vb_videoram;
@@ -169,8 +169,8 @@ VIDEO_UPDATE( vb )
 
 	/*To get linescrolling to work properly, we must ignore the 1st two scroll values, no idea why! -SJE */
 	for (i = 2; i < 256; i++) {
-		tilemap_set_scrollx(bg_tilemap,i,scrollx[i-2]);
-		//logerror("scrollx[%d] = %d\n",i,scrollx[i]);
+		tilemap_set_scrollx(bg_tilemap,i,vb_scrollx[i-2]);
+		//logerror("scrollx[%d] = %d\n",i,vb_scrollx[i]);
 	}
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect);

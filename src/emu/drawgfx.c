@@ -11,6 +11,7 @@
 
 #include "driver.h"
 #include "drawgfxm.h"
+#include "deprecat.h"
 
 
 /***************************************************************************

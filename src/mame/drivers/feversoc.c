@@ -65,12 +65,12 @@ U0564 LH28F800SU OBJ4-1
 
 #define MASTER_CLOCK XTAL_28_63636MHz
 
-VIDEO_START( feversoc )
+static VIDEO_START( feversoc )
 {
 
 }
 
-VIDEO_UPDATE( feversoc )
+static VIDEO_UPDATE( feversoc )
 {
 	int offs,spr_offs,colour,sx,sy,h,w,dx,dy;
 

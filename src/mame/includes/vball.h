@@ -7,7 +7,7 @@ extern int vb_scrollx_hi;
 extern int vb_scrolly_hi;
 extern int vb_scrollx_lo;
 extern int vball_gfxset;
-extern int scrollx[256];
+extern int vb_scrollx[256];
 
 VIDEO_START( vb );
 VIDEO_UPDATE( vb );

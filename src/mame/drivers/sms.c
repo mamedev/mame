@@ -310,7 +310,7 @@ static WRITE8_HANDLER(p03_w)
  *
  *************************************/
 
-INPUT_PORTS_START(sms)
+static INPUT_PORTS_START(sms)
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Draw")	/* Draw Button */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Deal")	/* Deal Button */
@@ -419,7 +419,7 @@ static bitmap_t *sms_bitmap;
 
 static UINT8 vid_regs[7];
 
-WRITE8_HANDLER(video_w)
+static WRITE8_HANDLER(video_w)
 {
 	vid_regs[offset] = data;
 	if ( offset == 5 )

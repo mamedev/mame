@@ -137,7 +137,7 @@ static TIMER_DEVICE_CALLBACK( vball_scanline )
 	/* Save the scroll x register value */
 	if (scanline < 256)
 	{
-		scrollx[255 - scanline] = (vb_scrollx_hi + vb_scrollx_lo+4);
+		vb_scrollx[255 - scanline] = (vb_scrollx_hi + vb_scrollx_lo+4);
 	}
 }
 

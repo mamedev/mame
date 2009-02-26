@@ -92,7 +92,6 @@ VIDEO_START( buggyboy );
 VIDEO_UPDATE( buggyboy );
 VIDEO_EOF( buggyboy );
 
-extern UINT16 *buggybjr_vram;
 VIDEO_START( buggybjr );
 VIDEO_UPDATE( buggybjr );
 WRITE16_HANDLER( buggyboy_slincs_w );

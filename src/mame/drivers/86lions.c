@@ -30,11 +30,11 @@ TODO:
 
 static UINT8 *lions_vram;
 
-VIDEO_START(lions)
+static VIDEO_START(lions)
 {
 }
 
-VIDEO_UPDATE(lions)
+static VIDEO_UPDATE(lions)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0;

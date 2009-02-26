@@ -68,10 +68,10 @@ const static pdesc pp_r[] = {
   { 0 }
 };
 
-instr cat1[0x40], cat2[0x80], cat3[0x80];
+static instr cat1[0x40], cat2[0x80], cat3[0x80];
 
-pinf parse_res[4096];
-int parse_count;
+static pinf parse_res[4096];
+static int parse_count;
 
 typedef struct {
   unsigned int mask;
@@ -82,7 +82,7 @@ typedef struct {
 
 enum { IxCMODE, IxDMODE, IxSFAI, IxCRM, IxDBP, IxSFAO, IxSFMO, IxRND, IxMOVM, IxSFMA, IxCOUNT };
 
-vinfo vinf[] = {
+static vinfo vinf[] = {
   { I_CMODE, 3, "cmode", "xmode(opcode, 'c')" },
   { I_DMODE, 3, "dmode", "xmode(opcode, 'd')" },
   { I_SFAI,  2, "sfai",  "sfai(s->st1)"       },
@@ -96,7 +96,7 @@ vinfo vinf[] = {
   { 0 }
 };
 
-char *sconcat(char *dest, const char *src)
+static char *sconcat(char *dest, const char *src)
 {
   char *r;
   int len = strlen(src);
@@ -108,7 +108,7 @@ char *sconcat(char *dest, const char *src)
   return r;
 }
 
-void next(char **q)
+static void next(char **q)
 {
   char *p = *q;
   while(*p && *p != ' ')
@@ -118,7 +118,7 @@ void next(char **q)
   *q = p;
 }
 
-void load(const char *fname)
+static void load(const char *fname)
 {
   char buf[4096];
   FILE *f;
@@ -248,7 +248,7 @@ void load(const char *fname)
   fclose(f);
 }
 
-void pstr(const char *s, const char *e)
+static void pstr(const char *s, const char *e)
 {
   parse_res[parse_count].start = s;
   parse_res[parse_count].size = e-s;
@@ -257,7 +257,7 @@ void pstr(const char *s, const char *e)
   parse_count++;
 }
 
-void parse_1(const char *start, const pdesc *inf, const char **str, int emode)
+static void parse_1(const char *start, const pdesc *inf, const char **str, int emode)
 {
   const char *p = *str;
   const char *s = p;
@@ -339,13 +339,13 @@ void parse_1(const char *start, const pdesc *inf, const char **str, int emode)
   }
 }
 
-void parse(const char *str, const pdesc *inf)
+static void parse(const char *str, const pdesc *inf)
 {
   parse_count = 0;
   parse_1(str, inf, &str, 0);
 }
 
-void compute_cache_ids_cat(instr *il, int count, int *baseval)
+static void compute_cache_ids_cat(instr *il, int count, int *baseval)
 {
   int i, j;
   for(i=0; i != count; i++)
@@ -384,20 +384,20 @@ void compute_cache_ids_cat(instr *il, int count, int *baseval)
 }
 
 
-void scp(char **str, int idx)
+static void scp(char **str, int idx)
 {
   memcpy(*str, parse_res[idx].start, parse_res[idx].size);
   (*str) += parse_res[idx].size;
 }
 
-void scs(char **str, const char *s)
+static void scs(char **str, const char *s)
 {
   int len = strlen(s);
   memcpy(*str, s, len);
   (*str) += len;
 }
 
-void save_dasm_cat(FILE *f, const char *def, instr *il, int count)
+static void save_dasm_cat(FILE *f, const char *def, instr *il, int count)
 {
   const static pdesc pp[] = {
     { "c", 0, PC },
@@ -460,7 +460,7 @@ void save_dasm_cat(FILE *f, const char *def, instr *il, int count)
   fprintf(f, "#endif\n\n");
 }
 
-void intrp_expand(char **p, int s, int e)
+static void intrp_expand(char **p, int s, int e)
 {
   int i;
   for(i=s; i<e;) {
@@ -550,7 +550,7 @@ void intrp_expand(char **p, int s, int e)
   }
 }
 
-void save_intrp_cat(FILE *f, const char *def, instr *il, int count, unsigned int fmask, unsigned int fval)
+static void save_intrp_cat(FILE *f, const char *def, instr *il, int count, unsigned int fmask, unsigned int fval)
 {
   int i;
   fprintf(f, "#ifdef %s\n", def);
@@ -571,7 +571,7 @@ void save_intrp_cat(FILE *f, const char *def, instr *il, int count, unsigned int
   fprintf(f, "#endif\n\n");
 }
 
-void save_cdec_cat(FILE *f, const char *def, instr *il, int count, unsigned int fmask, unsigned int fval)
+static void save_cdec_cat(FILE *f, const char *def, instr *il, int count, unsigned int fmask, unsigned int fval)
 {
   int i;
   fprintf(f, "#ifdef %s\n", def);
@@ -613,7 +613,7 @@ void save_cdec_cat(FILE *f, const char *def, instr *il, int count, unsigned int 
 }
 
 
-void cintrp_expand(char **p, int s, int e, const int *cv)
+static void cintrp_expand(char **p, int s, int e, const int *cv)
 {
   int i;
   for(i=s; i<e;) {
@@ -812,7 +812,7 @@ void cintrp_expand(char **p, int s, int e, const int *cv)
   }
 }
 
-void save_cintrp_cat(FILE *f, instr *il, int count)
+static void save_cintrp_cat(FILE *f, instr *il, int count)
 {
   int i;
   for(i=0; i != count; i++)
@@ -849,7 +849,7 @@ void save_cintrp_cat(FILE *f, instr *il, int count)
     }
 }
 
-void compute_cache_ids(void)
+static void compute_cache_ids(void)
 {
   int baseval = 1;
   compute_cache_ids_cat(cat1, 0x40, &baseval);
@@ -857,14 +857,14 @@ void compute_cache_ids(void)
   compute_cache_ids_cat(cat3, 0x80, &baseval);
 }
 
-void save_dasm(FILE *f)
+static void save_dasm(FILE *f)
 {
   save_dasm_cat(f, "DASM1", cat1, 0x40);
   save_dasm_cat(f, "DASM2", cat2, 0x80);
   save_dasm_cat(f, "DASM3", cat3, 0x80);
 }
 
-void save_intrp(FILE *f)
+static void save_intrp(FILE *f)
 {
   save_intrp_cat(f, "INTRP1",  cat1, 0x40, 0,      0);
   save_intrp_cat(f, "INTRP2A", cat2, 0x80, I_POST, 0);
@@ -872,7 +872,7 @@ void save_intrp(FILE *f)
   save_intrp_cat(f, "INTRP3",  cat3, 0x80, 0,      0);
 }
 
-void save_cdec(FILE *f)
+static void save_cdec(FILE *f)
 {
   save_cdec_cat(f, "CDEC1",  cat1, 0x40, 0,      0);
   save_cdec_cat(f, "CDEC2A", cat2, 0x80, I_POST, 0);
@@ -880,7 +880,7 @@ void save_cdec(FILE *f)
   save_cdec_cat(f, "CDEC3",  cat3, 0x80, 0,      0);
 }
 
-void save_cintrp(FILE *f)
+static void save_cintrp(FILE *f)
 {
   fprintf(f, "#ifdef CINTRP\n");
   save_cintrp_cat(f, cat1, 0x40);
@@ -889,7 +889,7 @@ void save_cintrp(FILE *f)
   fprintf(f, "#endif\n");
 }
 
-void save(const char *fname)
+static void save(const char *fname)
 {
   char buf[4096];
   FILE *f;

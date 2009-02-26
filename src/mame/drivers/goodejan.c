@@ -65,7 +65,7 @@ extern UINT16 *seibucrtc_vregs;
 extern UINT16 seibucrtc_sc0bank;
 static UINT16 goodejan_mux_data;
 
-WRITE16_HANDLER( goodejan_gfxbank_w )
+static WRITE16_HANDLER( goodejan_gfxbank_w )
 {
 	seibucrtc_sc0bank_w((data & 0x100)>>8);// = (data & 0x100)>>8;
 }

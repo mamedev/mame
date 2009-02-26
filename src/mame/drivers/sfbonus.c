@@ -165,7 +165,7 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 
 
 
-VIDEO_START(sfbonus)
+static VIDEO_START(sfbonus)
 {
 	temp_reel_bitmap = auto_bitmap_alloc(1024,512,BITMAP_FORMAT_INDEXED16);
 
@@ -329,7 +329,7 @@ static void sfbonus_draw_reel_layer(running_machine* machine, bitmap_t *bitmap, 
 
 }
 
-VIDEO_UPDATE(sfbonus)
+static VIDEO_UPDATE(sfbonus)
 {
 
 	int globalyscroll = (sfbonus_vregs[2] | sfbonus_vregs[3]<<8);
@@ -4455,7 +4455,7 @@ static DRIVER_INIT( sfbonus )
 	DRIVER_INIT_CALL(sfbonus_common);
 }
 
-DRIVER_INIT(act2000)
+static DRIVER_INIT(act2000)
 {
 	int i;
 	UINT8 *ROM = memory_region(machine, "maincpu");
@@ -4483,7 +4483,7 @@ DRIVER_INIT(act2000)
 	DRIVER_INIT_CALL(sfbonus_common);
 }
 
-DRIVER_INIT(dblchal)
+static DRIVER_INIT(dblchal)
 {
 	int i;
 	UINT8 *ROM = memory_region(machine, "maincpu");

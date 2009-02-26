@@ -538,7 +538,7 @@ static DISCRETE_STEP(dst_gain)
 #define DST_INTEGRATE__TRG0	(*(node->input[0]))
 #define DST_INTEGRATE__TRG1	(*(node->input[1]))
 
-int dst_trigger_function(int trig0, int trig1, int trig2, int function)
+static int dst_trigger_function(int trig0, int trig1, int trig2, int function)
 {
 	int result = 1;
 	switch (function)

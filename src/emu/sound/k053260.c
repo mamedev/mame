@@ -78,7 +78,7 @@ static void InitDeltaTable( k053260_state *ic, int rate, int clock ) {
 	}
 }
 
-DEVICE_RESET( k053260 ) {
+static DEVICE_RESET( k053260 ) {
 	k053260_state *ic = get_safe_token(device);
 	int i;
 

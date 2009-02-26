@@ -23,12 +23,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(  mpu5 )
 INPUT_PORTS_END
 
-VIDEO_START(mpu5)
+static VIDEO_START(mpu5)
 {
 
 }
 
-VIDEO_UPDATE(mpu5)
+static VIDEO_UPDATE(mpu5)
 {
 	return 0;
 }

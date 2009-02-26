@@ -71,7 +71,7 @@ static MACHINE_DRIVER_START( tarzan )
 	MDRV_VIDEO_UPDATE(tarzan)
 MACHINE_DRIVER_END
 
-DRIVER_INIT( tarzan )
+static DRIVER_INIT( tarzan )
 {
 	UINT16* ROM = (UINT16*)memory_region(machine,"maincpu");
 	int i;

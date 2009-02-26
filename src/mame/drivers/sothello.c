@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( subcpu_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-INPUT_PORTS_START( sothello )
+static INPUT_PORTS_START( sothello )
  PORT_START("INPUT1")
   PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
   PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -319,7 +319,7 @@ static msm5205_interface msm_interface =
     MSM5205_S48_4B  /* changed on the fly */
 };
 
-VIDEO_START( sothello )
+static VIDEO_START( sothello )
 {
     VIDEO_START_CALL(generic_bitmapped);
     v9938_init (machine, 0, machine->primary_screen, tmpbitmap, MODEL_V9938, VDP_MEM, sothello_vdp_interrupt);

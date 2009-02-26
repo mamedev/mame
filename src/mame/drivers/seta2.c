@@ -927,15 +927,15 @@ ADDRESS_MAP_END
                                   Funcube
 ***************************************************************************/
 
-UINT8 *funcube_outputs;
-UINT8 *funcube_leds;
+static UINT8 *funcube_outputs;
+static UINT8 *funcube_leds;
 
-UINT64 funcube_coin_start_cycles;
-UINT8 funcube_hopper_motor;
-UINT8 funcube_press;
+static UINT64 funcube_coin_start_cycles;
+static UINT8 funcube_hopper_motor;
+static UINT8 funcube_press;
 
-UINT8 funcube_serial_fifo[4];
-UINT8 funcube_serial_count;
+static UINT8 funcube_serial_fifo[4];
+static UINT8 funcube_serial_count;
 
 // Bus conversion functions:
 

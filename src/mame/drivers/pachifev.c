@@ -25,12 +25,12 @@ there's a correlation? Or the dump is bad/missing something?
 #include "cpu/z80/z80.h"
 #include "sound/msm5205.h"
 
-VIDEO_START( pachifev )
+static VIDEO_START( pachifev )
 {
 
 }
 
-VIDEO_UPDATE( pachifev )
+static VIDEO_UPDATE( pachifev )
 {
 	return 0;
 }

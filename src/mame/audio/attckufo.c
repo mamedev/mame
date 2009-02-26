@@ -207,7 +207,7 @@ static STREAM_UPDATE( attckufo_update )
 /************************************/
 
 
-DEVICE_START( attckufo_sound )
+static DEVICE_START( attckufo_sound )
 {
 	int i;
 

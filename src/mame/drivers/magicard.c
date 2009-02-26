@@ -395,7 +395,7 @@ static INPUT_PORTS_START( magicard )
 INPUT_PORTS_END
 
 
-MACHINE_RESET( magicard )
+static MACHINE_RESET( magicard )
 {
 	UINT16 *src    = (UINT16*)memory_region( machine, "maincpu" );
 	UINT16 *dst    = magicram;
