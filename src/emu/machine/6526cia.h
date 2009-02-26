@@ -45,6 +45,8 @@ typedef struct _cia6526_interface cia6526_interface;
 struct _cia6526_interface
 {
 	devcb_write_line irq_func;
+	devcb_write_line pc_func;
+
 	int tod_clock;
 
 	struct

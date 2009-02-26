@@ -67,6 +67,7 @@ struct _cia_state
 {
 	const device_config *device;
 	devcb_resolved_write_line irq_func;
+	devcb_resolved_write_line pc_func;
 
 	cia_port		port[2];
 	cia_timer		timer[2];
@@ -141,6 +142,7 @@ static DEVICE_START( cia )
 	memset(cia, 0, sizeof(*cia));
 	cia->device = device;
 	devcb_resolve_write_line(&cia->irq_func, &intf->irq_func, device);
+	devcb_resolve_write_line(&cia->pc_func, &intf->pc_func, device);
 
 	/* setup ports */
 	for (p = 0; p < (sizeof(cia->port) / sizeof(cia->port[0])); p++)
@@ -269,6 +271,20 @@ static DEVICE_VALIDITY_CHECK( cia )
 	}
 
 	return error;
+}
+
+
+/*-------------------------------------------------
+    cia_update_pc - pulse /pc output
+-------------------------------------------------*/
+
+static void cia_update_pc(const device_config *device)
+{
+	cia_state *cia = get_token(device);
+
+	/* this should really be one cycle long */
+	devcb_call_write_line(&cia->pc_func, 0);
+	devcb_call_write_line(&cia->pc_func, 1);
 }
 
 
@@ -651,6 +667,9 @@ READ8_DEVICE_HANDLER( cia_r )
 					else
 						data &= ~0x80;
 				}
+
+				/* pulse /PC following the read */
+				cia_update_pc(device);
 			}
 			break;
 
@@ -742,6 +761,11 @@ WRITE8_DEVICE_HANDLER( cia_w )
 			port->latch = data;
 			port->out = (data & port->ddr) | (port->in & ~port->ddr);
 			devcb_call_write8(&port->write, 0, port->out);
+
+			/* pulse /PC following the write */
+			if (offset == CIA_PRB)
+				cia_update_pc(device);
+
 			break;
 
 		/* port A/B direction */

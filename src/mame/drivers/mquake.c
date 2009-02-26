@@ -333,6 +333,7 @@ static MACHINE_RESET(mquake)
 static const cia6526_interface cia_0_intf =
 {
 	DEVCB_LINE(amiga_cia_0_irq),									/* irq_func */
+	DEVCB_NULL,	/* pc_func */
 	0,													/* tod_clock */
 	{
 		{ DEVCB_INPUT_PORT("CIA0PORTA"), DEVCB_HANDLER(mquake_cia_0_porta_w) },	/* port A */
@@ -343,6 +344,7 @@ static const cia6526_interface cia_0_intf =
 static const cia6526_interface cia_1_intf =
 {
 	DEVCB_LINE(amiga_cia_1_irq),									/* irq_func */
+	DEVCB_NULL,	/* pc_func */
 	0,													/* tod_clock */
 	{
 		{ DEVCB_NULL, DEVCB_NULL },									/* port A */
