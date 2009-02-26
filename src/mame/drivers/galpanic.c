@@ -1024,11 +1024,12 @@ static MACHINE_DRIVER_START( galhustl )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
 	MDRV_VIDEO_EOF(NULL)
+
+	/* sound hardware */
+	MDRV_SOUND_REPLACE("oki", OKIM6295, 1056000)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
-
-
-
-
 
 static MACHINE_DRIVER_START( zipzap )
 
