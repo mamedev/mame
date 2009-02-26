@@ -366,7 +366,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 					int pen;
 
 					/* left pixel */
-					if (left && HBEND >= 0 && currx < HBSTART)
+					if (left && currx >= HBEND && currx < HBSTART)
 					{
 						/* combine with the background */
 						pen = left | old[0];
@@ -379,7 +379,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 					currx++;
 
 					/* right pixel */
-					if (right && HBEND >= 0 && currx < HBSTART)
+					if (right && currx >= HBEND && currx < HBSTART)
 					{
 						/* combine with the background */
 						pen = right | old[1];
