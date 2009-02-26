@@ -7396,6 +7396,7 @@ Other Sun games
 	DRIVER( mjdiplob )	/* "07" (c) 1987 Dynax */
 	DRIVER( untoucha )	/* "08" (c) 1987 Dynax */
 	DRIVER( tontonb )	/* "09" (c) 1987 Dynax */
+	DRIVER( makaijan )	/*  ??  (c) 1987 Dynax */
 	DRIVER( hanamai )	/* "16" (c) 1988 Dynax */
 	DRIVER( majs101b )	/* "17" (c) [1988] Dynax */
 	DRIVER( mjapinky )	/* 1988 Dynax */

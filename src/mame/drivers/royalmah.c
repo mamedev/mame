@@ -419,6 +419,17 @@ static ADDRESS_MAP_START( dondenmj_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x87, 0x87 ) AM_WRITE( dynax_bank_w )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( makaijan_iomap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
+	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
+	AM_RANGE( 0x84, 0x84 ) AM_READ_PORT("DSW2")	// DSW2
+	AM_RANGE( 0x85, 0x85 ) AM_READ_PORT("DSW3")	// DSW3
+	AM_RANGE( 0x86, 0x86 ) AM_WRITE( dynax_bank_w )
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( mjdiplob_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( SOUND, "ay", ay8910_r )
@@ -1242,6 +1253,93 @@ static INPUT_PORTS_START( tontonb )
 	PORT_DIPNAME( 0x40, 0x40, "Full Tests" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+/* TODO: check dip-switches */
+static INPUT_PORTS_START( makaijan )
+	PORT_INCLUDE( mjctrl2 )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, "Pay Out Rate" )
+	PORT_DIPSETTING(    0x0f, "96%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPNAME( 0x30, 0x30, "Maximum Bet" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x30, "20" )
+	PORT_DIPNAME( 0x40, 0x00, "Background Color" )
+	PORT_DIPSETTING(    0x00, "Green" )
+	PORT_DIPSETTING(    0x40, "Black" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, "Special Combinations" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Full Tests" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -2276,6 +2374,12 @@ static MACHINE_DRIVER_START( dondenmj )
 	MDRV_CPU_IO_MAP(dondenmj_iomap,0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( makaijan )
+	MDRV_IMPORT_FROM(royalmah)
+	MDRV_CPU_REPLACE("maincpu", Z80, 8000000/2)	/* 4 MHz ? */
+	MDRV_CPU_IO_MAP(makaijan_iomap,0)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( ippatsu )
 	MDRV_IMPORT_FROM(dondenmj)
 	MDRV_CPU_MODIFY("maincpu")
@@ -2587,6 +2691,28 @@ ROM_START( tontonb )
 	ROM_LOAD( "093.5b",   	0x30000, 0x10000, CRC(24b6be55) SHA1(11390d6ed55d7d0b7b84c6d36d4ac5330a06abba) )	// 4,5
 	/**/													// 6,7 unused
 	ROM_LOAD( "092.5c",   	0x50000, 0x10000, CRC(7ff2738b) SHA1(89a49f89705f499439dc024fc70c87141a84780b) )	// 8,9
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
+ROM_END
+
+/***************************************************************************
+
+Makaijan
+(c)1987 Dynax
+
+***************************************************************************/
+
+ROM_START( makaijan )
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD( "ic1h.bin",     0x00000, 0x10000, CRC(7448c220) SHA1(ebb6564b83ce4f40a6e50a1be734e2086d97f592) )
+	/* bank switched ROMs follow */
+	ROM_COPY( "maincpu",    0x08000, 0x10000, 0x8000 )
+	ROM_COPY( "maincpu",    0x08000, 0x18000, 0x8000 )
+	ROM_LOAD( "052.1e",     0x50000, 0x10000, CRC(a881ca93) SHA1(499e17d2f57caa49c391d57dd737399fe4672f78) )
+	ROM_LOAD( "053.1d",     0x30000, 0x10000, CRC(5f1d3e88) SHA1(152fde9f8e506f7f4ca1b2ecf8a828ece0501f78) ) /*good*/
+	ROM_LOAD( "054.2h",     0x70000, 0x10000, CRC(ebc387c7) SHA1(7dfc892a5cccde7494ed06bbab88b4ea320dffbc) )
+	ROM_LOAD( "055.2e",     0x20000, 0x10000, CRC(e26852ae) SHA1(8f8edefe851fd3641a5b4b227fb4dd976cdfa3e9) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
@@ -2904,7 +3030,6 @@ ROM_START( mjapinky )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "18s030n.clr",   0x0000, 0x0020, CRC(5736d0aa) SHA1(298b51340d2697347842cfaa5921f31c7b7f9748) )
 ROM_END
-
 
 /***************************************************************************
 
@@ -3597,6 +3722,7 @@ GAME( 1986,  mjsenka,  0,        royalmah, royalmah, 0,        ROT0, "Visco",   
 GAME( 1986,  mjyarou,  0,        royalmah, royalmah, 0,        ROT0, "Visco / Video System",   	   "Mahjong Yarou [BET] (Japan",			GAME_NOT_WORKING )
 GAME( 1987,  mjdiplob, 0,        mjdiplob, mjdiplob, 0,        ROT0, "Dynax",                      "Mahjong Diplomat [BET] (Japan)",        0 )
 GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  0,        ROT0, "Dynax",                      "Tonton [BET] (Japan)",                  0 )
+GAME( 1987,  makaijan, 0,        makaijan, makaijan, 0,        ROT0, "Dynax",                      "Makaijan [BET] (Japan)",                0 )
 GAME( 1988,  majs101b, 0,        majs101b, majs101b, 0,        ROT0, "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
 GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, 0,        ROT0, "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
 GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, 0,        ROT0, "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     0 )
