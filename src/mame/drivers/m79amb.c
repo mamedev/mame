@@ -51,6 +51,7 @@ Ports:
 */
 
 #include "driver.h"
+#include "m79amb.h"
 #include "cpu/i8085/i8085.h"
 
 static UINT8 *ramtek_videoram;
@@ -97,26 +98,31 @@ static const int ControllerTable[32] = {
 
 static READ8_HANDLER( gray5bit_controller0_r )
 {
-    return (input_port_read(space->machine, "8004") & 0xe0) | (~ControllerTable[input_port_read(space->machine, "8004") & 0x1f] & 0x1f);
+    int port_data = input_port_read(space->machine, "8004");
+    return (port_data & 0xe0) | (~ControllerTable[port_data & 0x1f] & 0x1f);
 }
 
 static READ8_HANDLER( gray5bit_controller1_r )
 {
-    return (input_port_read(space->machine, "8005") & 0xe0) | (~ControllerTable[input_port_read(space->machine, "8005") & 0x1f] & 0x1f);
+    int port_data = input_port_read(space->machine, "8005");
+    return (port_data & 0xe0) | (~ControllerTable[port_data & 0x1f] & 0x1f);
 }
 
-static WRITE8_HANDLER( sound_w )
+static WRITE8_HANDLER( m79amb_8002_w )
 {
+	/* D1 may also be watchdog reset */
+	/* port goes to 0x7f to turn on explosion lamp */
+	output_set_value("EXP_LAMP", data ? 1 : 0);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(ramtek_videoram_w) AM_BASE(&ramtek_videoram)
 	AM_RANGE(0x6000, 0x63ff) AM_RAM		/* ?? */
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("8000") AM_WRITE(sound_w) /* sound_w listed twice?? */
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("8000") AM_DEVWRITE(SOUND, "discrete", m79amb_8000_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(SMH_RAM) AM_BASE(&mask)
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("8002") AM_WRITE(sound_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(sound_w)		/* Manual Shows sound control at 0x8002 */
+	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("8002") AM_WRITE(m79amb_8002_w)
+	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE(SOUND, "discrete", m79amb_8003_w)
 	AM_RANGE(0x8004, 0x8004) AM_READ(gray5bit_controller0_r)
 	AM_RANGE(0x8005, 0x8005) AM_READ(gray5bit_controller1_r)
 	AM_RANGE(0xc000, 0xc07f) AM_RAM					/* ?? */
@@ -127,14 +133,22 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( m79amb )
 	PORT_START("8000")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* dip switch */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x03, 0x00, "Play Time" )
+	PORT_DIPSETTING(    0x00, "60 Seconds" )
+	PORT_DIPSETTING(    0x01, "90 Seconds" )
+	PORT_DIPSETTING(    0x02, "90 Seconds" )
+	PORT_DIPSETTING(    0x03, "120 Seconds" )
+	PORT_DIPNAME( 0x1c, 0x04, "Points for Extended Time" )
+	PORT_DIPSETTING(    0x00, "1500" )
+	PORT_DIPSETTING(    0x04, "2500" )
+	PORT_DIPSETTING(    0x08, "3500" )
+	PORT_DIPSETTING(    0x0c, "5000" )
+	PORT_DIPSETTING(    0x1c, "No Extended Time" )
+	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coinage ))
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ))
 
 	PORT_START("8002")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -178,7 +192,7 @@ static DRIVER_INIT( m79amb )
 static MACHINE_DRIVER_START( m79amb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, 1996800)
+	MDRV_CPU_ADD("maincpu", 8080, XTAL_19_6608MHz / 10)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("screen", m79amb_interrupt)
 
@@ -193,6 +207,12 @@ static MACHINE_DRIVER_START( m79amb )
 	MDRV_VIDEO_UPDATE(ramtek)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(m79amb)
+
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -219,4 +239,4 @@ ROM_END
 
 
 
-GAME( 1977, m79amb, 0, m79amb, m79amb, m79amb, ROT0, "Ramtek", "M-79 Ambush", GAME_NO_SOUND )
+GAME( 1977, m79amb, 0, m79amb, m79amb, m79amb, ROT0, "Ramtek", "M-79 Ambush", GAME_IMPERFECT_SOUND )
