@@ -961,7 +961,7 @@ static READ8_HANDLER( mjelctrn_keyboard_1_r )
 static READ8_HANDLER( mjelctrn_dsw_r )
 {
 	int dsw = (keyb & 0xc0) >> 6;
-	static const char *const dswnames[] = { "DSW2", "DSW1", "DSW3", "DSW4" };
+	static const char *const dswnames[] = { "DSW0", "DSW1", "DSW3", "DSW4" };
 
 	return input_port_read(space->machine, dswnames[dsw]);
 }
