@@ -8,7 +8,7 @@
 
 #include "driver.h"
 
-
+#define DRAW_GIRL 0
 
 //UINT8 *goldstar_video1, *goldstar_video2, *goldstar_video3;
 //size_t goldstar_video_size;
@@ -25,7 +25,8 @@ static int bgcolor;
 ***************************************************************************/
 
 static tilemap *goldstar_fg_tilemap;
-
+static UINT8 cmaster_girl_num;
+static UINT8 cmaster_girl_pal;
 
 WRITE8_HANDLER( goldstar_fg_vidram_w )
 {
@@ -153,6 +154,9 @@ VIDEO_START( cherrym )
 	tilemap_set_scroll_cols(goldstar_reel2_tilemap, 64);
 	tilemap_set_scroll_cols(goldstar_reel3_tilemap, 64);
 
+	cmaster_girl_num = 0;
+	cmaster_girl_pal = 0;
+	
 	goldstar_fg_tilemap = tilemap_create(machine,get_cherrym_fg_tile_info,tilemap_scan_rows,8,8, 64, 32);
 	tilemap_set_transparent_pen(goldstar_fg_tilemap,0);
 }
@@ -201,9 +205,10 @@ WRITE8_HANDLER( cm_background_col_w )
 		
 	(note, this doesn't apply to the amcoe games which have no girls, I'm unsure how the priority/positioning works)
 		
-	after each of the rounds of the card game, probably controls the 'girl' display, there are 6 girls.
-	
+
 	*/
+	cmaster_girl_num = (data >> 4)&0x7;
+	cmaster_girl_pal = (data >> 2)&0x3;
 	
 	bgcolor = (data & 0x03) >> 0;
 	tilemap_mark_all_tiles_dirty (goldstar_reel1_tilemap);
@@ -238,10 +243,20 @@ VIDEO_UPDATE( goldstar )
 		tilemap_set_scrolly(goldstar_reel3_tilemap, i, goldstar_reel3_scroll[i]);
 	}
 
+
 	tilemap_draw(bitmap, &visible1, goldstar_reel1_tilemap, 0, 0);
 	tilemap_draw(bitmap, &visible2, goldstar_reel2_tilemap, 0, 0);
 	tilemap_draw(bitmap, &visible3, goldstar_reel3_tilemap, 0, 0);
 
+	/* need to figure out priority etc. */
+	#if DRAW_GIRL
+	if (memory_region(screen->machine,"user1"))
+	{
+		const gfx_element *gfx = screen->machine->gfx[2];
+		drawgfxzoom(bitmap,gfx,cmaster_girl_num,cmaster_girl_pal,0,0,32*8,16*8,cliprect,TRANSPARENCY_PEN,0, 0x20000, 0x10000);
+	}		
+	#endif
+	
 	tilemap_draw(bitmap,cliprect, goldstar_fg_tilemap, 0, 0);
 
 	return 0;

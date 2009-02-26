@@ -5151,7 +5151,7 @@ ROM_START( cmv801 )
 	ROM_LOAD( "m2.64",     0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_DISPOSE )
-	ROM_LOAD( "27512.u53",  0x0000, 0x10000, NO_DUMP )
+	ROM_LOAD( "27512.u53",  0x0000, 0x10000, BAD_DUMP CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) ) // taken from other set, was missing in this dump
 
 	ROM_REGION( 0x200, "proms", 0 ) // pal
 	ROM_LOAD( "prom2.287", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
@@ -5226,8 +5226,7 @@ ROM_START( cmv4 )
 	ROM_LOAD( "2764.u14",   0x4000, 0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
 	ROM_LOAD( "2764.u9",    0x6000, 0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
 
-	ROM_REGION( 0x10000, "user1", 0 )
-	// contains a bitmap? and an extra plane for gfx2, should it be used?
+	ROM_REGION( 0x10000, "user1", 0 ) // girl bitmaps
 	ROM_LOAD( "27512.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
 	ROM_REGION( 0x200, "proms", 0 )
