@@ -2542,7 +2542,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( chmplst2 )
 {
-	UINT16 *rom = (UINT16 *) memory_region(machine, "screen");
+	UINT16 *rom = (UINT16 *) memory_region(machine, "maincpu");
 
 	chmplst2_decrypt(machine);
 	chmplst2_decrypt_gfx(machine);
