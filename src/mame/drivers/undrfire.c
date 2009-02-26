@@ -195,6 +195,8 @@ Board contains only 29 ROMs and not much else.
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
 
+#include "cbombers.lh"
+
 VIDEO_START( undrfire );
 VIDEO_UPDATE( undrfire );
 VIDEO_UPDATE( cbombers );
@@ -1026,4 +1028,4 @@ static DRIVER_INIT( cbombers )
 GAME( 1993, undrfire, 0,        undrfire, undrfire, undrfire, ROT0, "Taito Corporation Japan", "Under Fire (World)", 0 )
 GAME( 1993, undrfiru, undrfire, undrfire, undrfire, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)", 0 )
 GAME( 1993, undrfirj, undrfire, undrfire, undrfire, undrfire, ROT0, "Taito Corporation", "Under Fire (Japan)", 0 )
-GAME( 1994, cbombers, 0,        cbombers, cbombers, cbombers, ROT0, "Taito Corporation", "Chase Bombers", GAME_IMPERFECT_GRAPHICS )
+GAMEL(1994, cbombers, 0,        cbombers, cbombers, cbombers, ROT0, "Taito Corporation", "Chase Bombers", GAME_IMPERFECT_GRAPHICS, layout_cbombers )

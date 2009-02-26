@@ -87,6 +87,8 @@ Dip locations and factory settings verified from dip listing
 #include "sound/msm5232.h"
 #include "includes/buggychl.h"
 
+#include "buggychl.lh"
+
 
 static WRITE8_HANDLER( bankswitch_w )
 {
@@ -525,5 +527,5 @@ ROM_START( buggycht )
 ROM_END
 
 
-GAME( 1984, buggychl, 0,        buggychl, buggychl, 0, ROT270, "Taito Corporation", "Buggy Challenge", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, buggycht, buggychl, buggychl, buggychl, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAMEL( 1984, buggychl, 0,        buggychl, buggychl, 0, ROT270, "Taito Corporation", "Buggy Challenge", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS, layout_buggychl )
+GAMEL( 1984, buggycht, buggychl, buggychl, buggychl, 0, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS, layout_buggychl )

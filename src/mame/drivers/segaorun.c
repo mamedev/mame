@@ -23,6 +23,8 @@
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
 
+#include "outrun.lh"
+
 
 #define MASTER_CLOCK   		(50000000)
 #define SOUND_CLOCK    		(16000000)
@@ -1811,16 +1813,16 @@ static DRIVER_INIT( shangon3 )
  *
  *************************************/
 
-GAME( 1986, outrun,   0,        outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev B)", 0 ) /* Upright/Sitdown determined by dipswitch settings */
-GAME( 1986, outrun2,  outrun,   outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev A)", 0 ) /* Upright/Sitdown determined by dipswitch settings */
-GAME( 1986, outrun1,  outrun,   outrundx, outrundx, outrun,   ROT0, "Sega",    "Out Run (deluxe sitdown)", 0 )
-GAME( 1986, outrunb,  outrun,   outrun,   outrun,   outrunb,  ROT0, "bootleg", "Out Run (bootleg)", 0 )
+GAMEL(1986, outrun,   0,        outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev B)", 0, layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
+GAMEL(1986, outrun2,  outrun,   outrun,   outrun,   outrun,   ROT0, "Sega",    "Out Run (sitdown/upright, Rev A)", 0, layout_outrun ) /* Upright/Sitdown determined by dipswitch settings */
+GAMEL(1986, outrun1,  outrun,   outrundx, outrundx, outrun,   ROT0, "Sega",    "Out Run (deluxe sitdown)", 0, layout_outrun )
+GAMEL(1986, outrunb,  outrun,   outrun,   outrun,   outrunb,  ROT0, "bootleg", "Out Run (bootleg)", 0, layout_outrun )
 GAME( 1987, shangon,  0,        shangon,  shangon,  shangon,  ROT0, "Sega",    "Super Hang-On (sitdown/upright, unprotected)", 0 )
 GAME( 1987, shangon3, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (sitdown/upright, FD1089B 317-0034)", 0 )
 GAME( 1987, shangon2, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (mini ride-on, Rev A, FD1089B 317-0034)", 0 )
 GAME( 1987, shangon1, shangon,  shangon,  shangon,  shangon3, ROT0, "Sega",    "Super Hang-On (mini ride-on?, FD1089B 317-0034)", GAME_NOT_WORKING ) /* bad program rom */
 GAME( 1991, shangnle, shangon,  shangon,  shangon,  shangon,  ROT0, "Sega",    "Limited Edition Hang-On", 0 )
-GAME( 1989, toutrun,  0,        outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-0109)", 0 )
-GAME( 1989, toutrun2, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (upright, FD1094 317-unknown)", 0 )
-GAME( 1989, toutrun1, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING ) /* FD1094 CPU not decrypted */
-GAME( 1989, toutrunu, toutrun,  outrun,   toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (Out Run upgrade, FD1094 317-0118)" , 0 )
+GAMEL(1989, toutrun,  0,        outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-0109)", 0, layout_outrun )
+GAMEL(1989, toutrun2, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (upright, FD1094 317-unknown)", 0, layout_outrun )
+GAMEL(1989, toutrun1, toutrun,  outrun,   toutrun1, outrun,   ROT0, "Sega",    "Turbo Out Run (cockpit, FD1094 317-unknown)", GAME_NOT_WORKING, layout_outrun ) /* FD1094 CPU not decrypted */
+GAMEL(1989, toutrunu, toutrun,  outrun,   toutrun,  outrun,   ROT0, "Sega",    "Turbo Out Run (Out Run upgrade, FD1094 317-0118)" , 0, layout_outrun )

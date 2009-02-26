@@ -1719,9 +1719,7 @@ $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
 
 $(DRIVERS)/avalnche.o:	$(LAYOUT)/avalnche.lh
 
-$(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
-
-$(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
+$(DRIVERS)/balsente.o:	$(LAYOUT)/stocker.lh
 
 $(DRIVERS)/bfm_sc1.o:	$(LAYOUT)/bfm_sc1.lh
 
@@ -1739,7 +1737,15 @@ $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
 						$(LAYOUT)/sltblgpo.lh \
 						$(LAYOUT)/sltblgtk.lh
 
+$(DRIVERS)/buggychl.o:	$(LAYOUT)/buggychl.lh
+
+$(DRIVERS)/bzone.o:		$(LAYOUT)/bzone.lh
+
 $(DRIVERS)/cardline.o:	$(LAYOUT)/cardline.lh
+
+$(DRIVERS)/changela.o:	$(LAYOUT)/changela.lh
+
+$(DRIVERS)/chqflag.o:	$(LAYOUT)/chqflag.lh
 
 $(DRIVERS)/cinemat.o:	$(LAYOUT)/armora.lh \
 						$(LAYOUT)/solarq.lh \
@@ -1766,6 +1772,10 @@ $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
 						$(LAYOUT)/pmpoker.lh \
 
+$(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
+
+$(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
+
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
 
 $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
@@ -1776,11 +1786,14 @@ $(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh
 
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
+$(DRIVERS)/mcr3.o:		$(LAYOUT)/turbotag.lh
+
 $(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \
 						$(LAYOUT)/connect4.lh \
 						$(LAYOUT)/gamball.lh
 
-$(DRIVERS)/mw8080bw.o:	$(LAYOUT)/clowns.lh \
+$(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
+						$(LAYOUT)/clowns.lh \
 						$(LAYOUT)/invaders.lh \
 						$(LAYOUT)/invad2ct.lh
 
@@ -1793,7 +1806,11 @@ $(DRIVERS)/mil4000.o:	$(LAYOUT)/mil4000.lh
 
 $(DRIVERS)/nbmj8688.o:	$(LAYOUT)/nbmj8688.lh
 
+$(DRIVERS)/namcos2.o:	$(LAYOUT)/finallap.lh
+
 $(DRIVERS)/neogeo.o:	$(LAYOUT)/neogeo.lh
+
+$(DRIVERS)/overdriv.o:	$(LAYOUT)/overdriv.lh
 
 $(DRIVERS)/peplus.o:	$(LAYOUT)/peplus.lh \
 						$(LAYOUT)/pe_schip.lh \
@@ -1806,7 +1823,7 @@ $(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh
 
 $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 
-$(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh
+$(DRIVERS)/re900.o:		$(LAYOUT)/re900.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
@@ -1814,11 +1831,26 @@ $(DRIVERS)/sderby.o:	$(LAYOUT)/sderby.lh \
 						$(LAYOUT)/spacewin.lh \
 						$(LAYOUT)/pmroulet.lh \
 
+$(DRIVERS)/segaorun.o:	$(LAYOUT)/outrun.lh
+
+$(DRIVERS)/segas32.o:	$(LAYOUT)/radr.lh
+
+$(DRIVERS)/segaybd.o:	$(LAYOUT)/pdrift.lh
+
 $(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
 
 $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
 
 $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
+
+$(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
+
+$(DRIVERS)/superchs.o:	$(LAYOUT)/superchs.lh
+
+$(DRIVERS)/taito_z.o:	$(LAYOUT)/contcirc.lh \
+						$(LAYOUT)/dblaxle.lh
+
+$(DRIVERS)/tatsumi.o:	$(LAYOUT)/roundup5.lh
 
 $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
 
@@ -1826,13 +1858,19 @@ $(DRIVERS)/tehkanwc.o:	$(LAYOUT)/gridiron.lh
 
 $(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
 
-$(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
-
 $(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh
+
+$(DRIVERS)/topspeed.o:	$(LAYOUT)/topspeed.lh
 
 $(DRIVERS)/turbo.o:		$(LAYOUT)/turbo.lh \
 						$(LAYOUT)/subroc3d.lh \
 						$(LAYOUT)/buckrog.lh
+
+$(DRIVERS)/tx1.o:		$(LAYOUT)/buggybjr.lh \
+						$(LAYOUT)/buggyboy.lh \
+						$(LAYOUT)/tx1.lh
+
+$(DRIVERS)/undrfire.o:	$(LAYOUT)/cbombers.lh
 
 $(DRIVERS)/videopin.o:	$(LAYOUT)/videopin.lh
 
@@ -1845,6 +1883,8 @@ $(DRIVERS)/videopkr.o:	$(LAYOUT)/videopkr.lh \
 
 $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 						$(LAYOUT)/sos.lh
+
+$(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 

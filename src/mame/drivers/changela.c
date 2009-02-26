@@ -15,6 +15,8 @@ Tomasz Slanina
 #include "sound/ay8910.h"
 #include "includes/changela.h"
 
+#include "changela.lh"
+
 
 static UINT8 portA_in,portA_out,ddrA;
 static UINT8 portB_out,ddrB;
@@ -577,4 +579,4 @@ static DRIVER_INIT(changela)
 	state_save_register_global(machine, changela_tree_collision_reset);
 }
 
-GAME( 1983, changela, 0, changela, changela, changela, ROT180, "Taito Corporation", "Change Lanes", GAME_SUPPORTS_SAVE )
+GAMEL( 1983, changela, 0, changela, changela, changela, ROT180, "Taito Corporation", "Change Lanes", GAME_SUPPORTS_SAVE, layout_changela )

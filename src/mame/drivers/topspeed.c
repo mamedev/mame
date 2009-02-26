@@ -238,6 +238,9 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
 
+#include "topspeed.lh"
+
+
 WRITE16_HANDLER( rainbow_spritectrl_w );
 WRITE16_HANDLER( rastan_spriteflip_w );
 
@@ -882,7 +885,7 @@ static DRIVER_INIT( topspeed )
 	cpua_ctrl = 0xff;
 }
 
-GAME( 1987, topspeed, 0,        topspeed, topspeed, topspeed, ROT0, "Taito Corporation Japan", "Top Speed (World)", 0 )
-GAME( 1987, topspedu, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", 0 )
-GAME( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito Corporation", "Full Throttle (Japan)", 0 )
+GAMEL( 1987, topspeed, 0,        topspeed, topspeed, topspeed, ROT0, "Taito Corporation Japan", "Top Speed (World)", 0, layout_topspeed )
+GAMEL( 1987, topspedu, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)", 0, layout_topspeed )
+GAMEL( 1987, fullthrl, topspeed, topspeed, fullthrl, topspeed, ROT0, "Taito Corporation", "Full Throttle (Japan)", 0, layout_topspeed )
 

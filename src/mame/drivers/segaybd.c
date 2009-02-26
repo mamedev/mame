@@ -30,6 +30,8 @@ Known games currently not dumped:
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
 
+#include "pdrift.lh"
+
 
 #define MASTER_CLOCK		50000000
 #define SOUND_CLOCK			32215900
@@ -1820,9 +1822,9 @@ GAME( 1988, gforce2,  0,       yboard, gforce2,  generic_yboard, ROT0, "Sega", "
 GAME( 1988, gforce2j, gforce2, yboard, gforce2,  generic_yboard, ROT0, "Sega", "Galaxy Force 2 (Japan)" , GAME_SUPPORTS_SAVE )
 GAME( 1990, gloc,     0,       yboard, gloc,     generic_yboard, ROT0, "Sega", "G-LOC Air Battle (US)" , GAME_SUPPORTS_SAVE )
 GAME( 1990, glocr360, gloc,    yboard, glocr360, generic_yboard, ROT0, "Sega", "G-LOC R360", GAME_SUPPORTS_SAVE )
-GAME( 1988, pdrift,   0,       yboard, pdrift,   generic_yboard, ROT0, "Sega", "Power Drift (World, Rev A)", GAME_SUPPORTS_SAVE )
-GAME( 1988, pdrifta,  pdrift,  yboard, pdrift,   generic_yboard, ROT0, "Sega", "Power Drift (World)", GAME_SUPPORTS_SAVE )
-GAME( 1988, pdrifte,  pdrift,  yboard, pdrifte,  generic_yboard, ROT0, "Sega", "Power Drift (World, Earlier)", GAME_SUPPORTS_SAVE )
-GAME( 1988, pdriftj,  pdrift,  yboard, pdriftj,  generic_yboard, ROT0, "Sega", "Power Drift (Japan)", GAME_SUPPORTS_SAVE )
+GAMEL(1988, pdrift,   0,       yboard, pdrift,   generic_yboard, ROT0, "Sega", "Power Drift (World, Rev A)", GAME_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdrifta,  pdrift,  yboard, pdrift,   generic_yboard, ROT0, "Sega", "Power Drift (World)", GAME_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdrifte,  pdrift,  yboard, pdrifte,  generic_yboard, ROT0, "Sega", "Power Drift (World, Earlier)", GAME_SUPPORTS_SAVE, layout_pdrift )
+GAMEL(1988, pdriftj,  pdrift,  yboard, pdriftj,  generic_yboard, ROT0, "Sega", "Power Drift (Japan)", GAME_SUPPORTS_SAVE, layout_pdrift )
 GAME( 1991, rchase,   0,       yboard, rchase,   generic_yboard, ROT0, "Sega", "Rail Chase (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1991, strkfgtr, 0,       yboard, strkfgtr, generic_yboard, ROT0, "Sega", "Strike Fighter (Japan)", GAME_SUPPORTS_SAVE )

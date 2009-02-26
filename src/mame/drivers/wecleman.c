@@ -278,6 +278,8 @@ TODO:
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
 
+#include "wecleman.lh"
+
 /* Variables only used here: */
 static UINT16 *blitter_regs;
 static int multiply_reg[2];
@@ -1440,5 +1442,5 @@ static DRIVER_INIT( hotchase )
                                 Game driver(s)
 ***************************************************************************/
 
-GAME( 1986, wecleman, 0, wecleman, wecleman, wecleman, ROT0, "Konami", "WEC Le Mans 24", 0 )
-GAME( 1988, hotchase, 0, hotchase, hotchase, hotchase, ROT0, "Konami", "Hot Chase", 0 )
+GAMEL( 1986, wecleman, 0, wecleman, wecleman, wecleman, ROT0, "Konami", "WEC Le Mans 24", 0, layout_wecleman )
+GAMEL( 1988, hotchase, 0, hotchase, hotchase, hotchase, ROT0, "Konami", "Hot Chase", 0, layout_wecleman )

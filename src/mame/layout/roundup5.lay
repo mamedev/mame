@@ -21,46 +21,50 @@
 			<bounds left="14" right="18" top="47" bottom="51" />
 			<color red="0.5" green="0.5" blue="0.5" />
 		</disk>
-		<text string="LOW" state="0">
+		<text string="LOW" state="1">
 			<bounds left="3" right="29" top="2" bottom="12" />
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
-		<text string="LOW" state="1">
+		<text string="LOW" state="0">
 			<bounds left="3" right="29" top="2" bottom="12" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 
-		<text string="HIGH" state="0">
+		<text string="HIGH" state="1">
 			<bounds left="3" right="29" top="52" bottom="62" />
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
-		<text string="HIGH" state="1">
+		<text string="HIGH" state="0">
 			<bounds left="3" right="29" top="52" bottom="62" />
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
-		<disk state="0">
+		<disk state="1">
 			<bounds left="9" right="23" top="14" bottom="28" />
 			<color red="0.8" green="0.0" blue="0.0" />
 		</disk>
-		<disk state="1">
+		<disk state="0">
 			<bounds left="9" right="23" top="36" bottom="50" />
 			<color red="0.8" green="0.0" blue="0.0" />
 		</disk>
 	</element>
-	<view name="Shifter-R">
-		<screen index="0">
-			<bounds x="0" y="0" width="640" height="480" />
-		</screen>		
-		<bezel element="shifter" inputtag="IN0" inputmask="0x02">
-			<bounds x="606" y="414" width="32" height="64" />
-			<color alpha="0.9" />
-		</bezel>
-	</view>
 	<view name="Shifter-L">
 		<screen index="0">
 			<bounds x="0" y="0" width="640" height="480" />
 		</screen>		
-		<bezel element="shifter" inputtag="IN0" inputmask="0x02">
+		
+<bezel element="shifter" inputtag="IN0" inputmask="0x0008">
+
+			<bounds x="606" y="414" width="32" height="64" />
+			<color alpha="0.9" />
+		</bezel>
+	</view>
+	<view name="Shifter-R">
+		<screen index="0">
+			<bounds x="0" y="0" width="640" height="480" />
+		</screen>		
+		
+<bezel element="shifter" inputtag="IN0" inputmask="0x0008">
+
 			<bounds x="2" y="414" width="32" height="64" />
 			<color alpha="0.9" />
 		</bezel>

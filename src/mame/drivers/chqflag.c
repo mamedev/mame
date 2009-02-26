@@ -19,6 +19,8 @@ Dip locations and recommended settings verified with manual
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
 
+#include "chqflag.lh"
+
 static int K051316_readroms;
 
 static WRITE8_DEVICE_HANDLER( k007232_extvolume_w );
@@ -461,5 +463,5 @@ static DRIVER_INIT( chqflag )
 	paletteram = &RAM[0x58000];
 }
 
-GAME( 1988, chqflag,        0, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1988, chqflagj, chqflag, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAMEL( 1988, chqflag,        0, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND, layout_chqflag )
+GAMEL( 1988, chqflagj, chqflag, chqflag, chqflag, chqflag, ROT90, "Konami", "Chequered Flag (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND, layout_chqflag )

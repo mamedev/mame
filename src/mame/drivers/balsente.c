@@ -231,6 +231,8 @@ DIP locations verified for:
 #include "balsente.h"
 #include "sound/cem3394.h"
 
+#include "stocker.lh"
+
 
 
 /*************************************
@@ -2134,7 +2136,7 @@ GAME( 1984, snakepit, 0,        balsente, sentetst, snakepit, ROT0, "Bally/Sente
 GAME( 1984, snakjack, 0,        balsente, snakjack, snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", GAME_SUPPORTS_SAVE )
 
 /* Board: 006-8025-01-0B Rev B */
-GAME( 1984, stocker,  0,        balsente, stocker,  stocker,  ROT0, "Bally/Sente",  "Stocker", GAME_SUPPORTS_SAVE )
+GAMEL(1984, stocker,  0,        balsente, stocker,  stocker,  ROT0, "Bally/Sente",  "Stocker", GAME_SUPPORTS_SAVE, layout_stocker )
 GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break", GAME_SUPPORTS_SAVE )
 GAME( 1985, minigolf, 0,        balsente, minigolf, minigolf, ROT0, "Bally/Sente",  "Mini Golf (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, minigol2, minigolf, balsente, minigol2, minigol2, ROT0, "Bally/Sente",  "Mini Golf (set 2)", GAME_SUPPORTS_SAVE )

@@ -42,6 +42,9 @@
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
 
+#include "superchs.lh"
+
+
 VIDEO_START( superchs );
 VIDEO_UPDATE( superchs );
 
@@ -505,4 +508,4 @@ static DRIVER_INIT( superchs )
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
 }
 
-GAME( 1992, superchs, 0, superchs, superchs, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0 )
+GAMEL( 1992, superchs, 0, superchs, superchs, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0, layout_superchs )

@@ -89,6 +89,8 @@
 #include "audio/mcr.h"
 #include "mcr.h"
 
+#include "turbotag.lh"
+
 
 #define MASTER_CLOCK		XTAL_20MHz
 
@@ -1625,4 +1627,4 @@ GAME( 1987, stargrds, 0,        mono_sg,   stargrds, stargrds, ROT0,  "Bally Mid
 GAME( 1983, spyhunt,  0,        mcrsc_csd, spyhunt,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter", GAME_SUPPORTS_SAVE )
 GAME( 1983, spyhuntp, spyhunt,  mcrsc_csd, spyhunt,  spyhunt,  ROT90, "Bally Midway", "Spy Hunter (Playtronic license)", GAME_SUPPORTS_SAVE )
 GAME( 1984, crater,   0,        mcrscroll, crater,   crater,   ORIENTATION_FLIP_X, "Bally Midway", "Crater Raider", GAME_SUPPORTS_SAVE )
-GAME( 1985, turbotag, 0,        mcrsc_csd, turbotag, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", GAME_SUPPORTS_SAVE )
+GAMEL(1985, turbotag, 0,        mcrsc_csd, turbotag, turbotag, ROT90, "Bally Midway", "Turbo Tag (prototype)", GAME_SUPPORTS_SAVE, layout_turbotag )

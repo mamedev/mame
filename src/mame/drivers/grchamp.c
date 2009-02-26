@@ -46,6 +46,7 @@
 #include "sound/ay8910.h"
 #include "grchamp.h"
 
+#include "grchamp.lh"
 
 
 /*************************************
@@ -789,4 +790,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, grchamp, 0, grchamp, grchamp, 0, ROT270, "Taito", "Grand Champion", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAMEL( 1981, grchamp, 0, grchamp, grchamp, 0, ROT270, "Taito", "Grand Champion", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS, layout_grchamp )

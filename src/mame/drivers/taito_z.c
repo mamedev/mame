@@ -867,6 +867,9 @@ J1100256A VIDEO PCB
 #include "sound/2610intf.h"
 #include "sound/flt_vol.h"
 
+#include "contcirc.lh"
+#include "dblaxle.lh"
+
 VIDEO_START( taitoz );
 VIDEO_START( spacegun );
 
@@ -4778,24 +4781,24 @@ static DRIVER_INIT( bshark )
 
 
 
-GAME( 1987, contcirc, 0,        contcirc, contcirc, taitoz,   ROT0,               "Taito Corporation Japan", "Continental Circus (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, contcrcu, contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, contcrua, contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, chasehq,  0,        chasehq,  chasehq,  taitoz,   ROT0,               "Taito Corporation Japan", "Chase H.Q. (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, chasehqj, chasehq,  chasehq,  chasehqj, taitoz,   ROT0,               "Taito Corporation", "Chase H.Q. (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAMEL(1987, contcirc, 0,        contcirc, contcirc, taitoz,   ROT0,               "Taito Corporation Japan", "Continental Circus (World)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
+GAMEL(1987, contcrcu, contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 1)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
+GAMEL(1987, contcrua, contcirc, contcirc, contcrcu, taitoz,   ROT0,               "Taito America Corporation", "Continental Circus (US set 2)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
+GAMEL(1988, chasehq,  0,        chasehq,  chasehq,  taitoz,   ROT0,               "Taito Corporation Japan", "Chase H.Q. (World)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
+GAMEL(1988, chasehqj, chasehq,  chasehq,  chasehqj, taitoz,   ROT0,               "Taito Corporation", "Chase H.Q. (Japan)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
 GAME( 1988, enforce,  0,        enforce,  enforce,  taitoz,   ROT0,               "Taito Corporation", "Enforce (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, bshark,   0,        bshark,   bshark,   bshark,   ORIENTATION_FLIP_X, "Taito America Corporation", "Battle Shark (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, bsharkj,  bshark,   bshark,   bsharkj,  bshark,   ORIENTATION_FLIP_X, "Taito Corporation", "Battle Shark (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, sci,      0,        sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (World set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, scia,     sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (World set 2)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, scij,     sci,      sci,      scij,     taitoz,   ROT0,               "Taito Corporation", "Special Criminal Investigation (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, sciu,     sci,      sci,      sciu,     taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", GAME_IMPERFECT_GRAPHICS )
+GAMEL(1989, sci,      0,        sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (World set 1)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
+GAMEL(1989, scia,     sci,      sci,      sci,      taitoz,   ROT0,               "Taito Corporation Japan", "Special Criminal Investigation (World set 2)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
+GAMEL(1989, scij,     sci,      sci,      scij,     taitoz,   ROT0,               "Taito Corporation", "Special Criminal Investigation (Japan)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
+GAMEL(1989, sciu,     sci,      sci,      sciu,     taitoz,   ROT0,               "Taito America Corporation", "Special Criminal Investigation (US)", GAME_IMPERFECT_GRAPHICS, layout_contcirc )
 GAME( 1989, nightstr, 0,        nightstr, nightstr, taitoz,   ROT0,               "Taito Corporation Japan", "Night Striker (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, nghtstrj, nightstr, nightstr, nghtstrj, taitoz,   ROT0,               "Taito Corporation", "Night Striker (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, nghtstru, nightstr, nightstr, nghtstru, taitoz,   ROT0,               "Taito America Corporation", "Night Striker (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, aquajack, 0,        aquajack, aquajack, taitoz,   ROT0,               "Taito Corporation Japan", "Aqua Jack (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, aquajckj, aquajack, aquajack, aquajckj, taitoz,   ROT0,               "Taito Corporation", "Aqua Jack (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1990, spacegun, 0,        spacegun, spacegun, bshark,   ORIENTATION_FLIP_X, "Taito Corporation Japan", "Space Gun (World)", 0 )
-GAME( 1991, dblaxle,  0,        dblaxle,  dblaxle,  taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS )
+GAMEL(1991, dblaxle,  0,        dblaxle,  dblaxle,  taitoz,   ROT0,               "Taito America Corporation", "Double Axle (US)", GAME_IMPERFECT_GRAPHICS, layout_dblaxle )
 GAME( 1991, pwheelsj, dblaxle,  dblaxle,  pwheelsj, taitoz,   ROT0,               "Taito Corporation", "Power Wheels (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, racingb,  0,        racingb,  dblaxle,  taitoz,   ROT0,               "Taito Corporation Japan", "Racing Beat (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

@@ -302,6 +302,8 @@ Stadium Cross EPR15093  EPR15094  EPR15018  EPR15019  EPR15192  EPR15020  EPR150
 #include "sound/rf5c68.h"
 #include "sound/multipcm.h"
 
+#include "radr.lh"
+
 
 
 /*************************************
@@ -4018,10 +4020,10 @@ GAME( 1994, jpark,    0,        system32,     jpark,    jpark,    ROT0, "Sega", 
 GAME( 1994, kokoroj2, 0,        system32,     radr,     radr,     ROT0, "Sega",   "Kokoroji 2", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING) // uses an Audio CD
 GAME( 1991, radm,     0,        system32,     radm,     radm,     ROT0, "Sega",   "Rad Mobile (World)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, radmu,    radm,     system32,     radm,     radm,     ROT0, "Sega",   "Rad Mobile (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, radr,     0,        system32,     radr,     radr,     ROT0, "Sega",   "Rad Rally (World)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, radru,    radr,     system32,     radr,     radr,     ROT0, "Sega",   "Rad Rally (US)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, slipstrm, 0,        system32,     slipstrm, slipstrm, ROT0, "Capcom", "Slipstream (950515 BRAZIL)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, slipstrh, slipstrm, system32,     slipstrm, slipstrm, ROT0, "Capcom", "Slipstream (950515 HISPANIC)", GAME_IMPERFECT_GRAPHICS )
+GAMEL(1991, radr,     0,        system32,     radr,     radr,     ROT0, "Sega",   "Rad Rally (World)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1991, radru,    radr,     system32,     radr,     radr,     ROT0, "Sega",   "Rad Rally (US)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrm, 0,        system32,     slipstrm, slipstrm, ROT0, "Capcom", "Slipstream (950515 BRAZIL)", GAME_IMPERFECT_GRAPHICS, layout_radr )
+GAMEL(1995, slipstrh, slipstrm, system32,     slipstrm, slipstrm, ROT0, "Capcom", "Slipstream (950515 HISPANIC)", GAME_IMPERFECT_GRAPHICS, layout_radr )
 GAME( 1992, sonic,    0,        system32,     sonic,    sonic,    ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, rev. C)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, sonicp,   sonic,    system32,     sonic,    sonicp,   ROT0, "Sega",   "SegaSonic The Hedgehog (Japan, prototype)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, spidman,  0,        system32,     spidman,  spidman,  ROT0, "Sega",   "Spider-Man: The Videogame (World)", GAME_IMPERFECT_GRAPHICS )

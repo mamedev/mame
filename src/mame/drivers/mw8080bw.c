@@ -147,6 +147,7 @@
 #include "mw8080bw.h"
 #include "machine/mb14241.h"
 
+#include "280zzzap.lh"
 #include "clowns.lh"
 #include "invaders.lh"
 #include "invad2ct.lh"
@@ -3063,14 +3064,14 @@ ROM_END
 /* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME( 1976, tornbase, 0,        tornbase, tornbase, 0, ROT0,   "Midway / Taito", "Tornado Baseball / Ball Park", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
-/* 610 */ GAME( 1976, 280zzzap, 0,        zzzap,    zzzap,    0, ROT0,   "Midway", "Datsun 280 Zzzap", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
+/* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap,    0, ROT0,   "Midway", "Datsun 280 Zzzap", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_280zzzap )
 /* 611 */ GAMEL(1976, maze,     0,        maze,     maze,     0, ROT0,   "Midway", "Amazing Maze", GAME_SUPPORTS_SAVE , layout_ho4f893d )
 /* 612 */ GAME( 1977, boothill, 0,        boothill, boothill, 0, ROT0,   "Midway", "Boot Hill" , GAME_SUPPORTS_SAVE  )
 /* 615 */ GAME( 1977, checkmat, 0,        checkmat, checkmat, 0, ROT0,   "Midway", "Checkmate", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 618 */ GAME( 1977, desertgu, 0,        desertgu, desertgu, 0, ROT0,   "Midway", "Desert Gun", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 618 */ GAME( 1977, roadrunm, desertgu, desertgu, desertgu, 0, ROT0,   "Midway", "Road Runner (Midway)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 619 */ GAME( 1977, dplay,    0,        dplay,    dplay,    0, ROT0,   "Midway", "Double Play", GAME_SUPPORTS_SAVE  )
-/* 622 */ GAME( 1977, lagunar,  0,        zzzap,    lagunar,  0, ROT90,  "Midway", "Laguna Racer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE  )
+/* 622 */ GAMEL(1977, lagunar,  0,        zzzap,    lagunar,  0, ROT90,  "Midway", "Laguna Racer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_280zzzap )
 /* 623 */ GAME( 1977, gmissile, 0,        gmissile, gmissile, 0, ROT0,   "Taito / Midway", "Missile X / Guided Missile", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 626 */ GAME( 1977, m4,       0,        m4,       m4,       0, ROT0,   "Midway", "M-4", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 630 */ GAMEL(1978, clowns,   0,        clowns,   clowns,   0, ROT0,   "Midway", "Clowns (rev. 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_clowns )

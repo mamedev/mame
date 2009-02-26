@@ -27,6 +27,8 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
 
+#include "overdriv.lh"
+
 
 VIDEO_START( overdriv );
 VIDEO_UPDATE( overdriv );
@@ -490,4 +492,4 @@ static DRIVER_INIT( overdriv )
 
 
 
-GAME( 1990, overdriv, 0, overdriv, overdriv, overdriv, ROT90, "Konami", "Over Drive", GAME_IMPERFECT_GRAPHICS )
+GAMEL( 1990, overdriv, 0, overdriv, overdriv, overdriv, ROT90, "Konami", "Over Drive", GAME_IMPERFECT_GRAPHICS, layout_overdriv )

@@ -47,6 +47,10 @@
 #include "rendlay.h"
 #include "tx1.h"
 
+#include "tx1.lh"
+#include "buggyboy.lh"
+#include "buggybjr.lh"
+
 
 /*************************************
  *
@@ -1249,7 +1253,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, tx1,      0,        tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1",                                   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1983, tx1a,     tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND )
-GAME( 1985, buggyboy, buggybjr, buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (Cockpit)",        GAME_NOT_WORKING )
-GAME( 1986, buggybjr, 0,        buggybjr, buggybjr, 0, ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (Upright)", 0 )
+GAMEL( 1983, tx1,      0,        tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1",                                   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1983, tx1a,     tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND, layout_tx1 )
+GAMEL( 1985, buggyboy, buggybjr, buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (Cockpit)",        GAME_NOT_WORKING, layout_buggyboy )
+GAMEL( 1986, buggybjr, 0,        buggybjr, buggybjr, 0, ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (Upright)", 0, layout_buggybjr )
