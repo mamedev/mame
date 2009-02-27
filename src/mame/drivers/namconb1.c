@@ -621,6 +621,11 @@ static DRIVER_INIT( gslgr94u )
 	namcos2_gametype = NAMCONB1_GSLGR94U;
 } /* gslgr94u */
 
+static DRIVER_INIT( gslgr94j )
+{
+	namcos2_gametype = NAMCONB1_GSLGR94J;
+} /* gslgr94j */
+
 static DRIVER_INIT( sws95 )
 {
 	namcos2_gametype = NAMCONB1_SWS95;
@@ -700,6 +705,14 @@ static READ32_HANDLER( custom_key_r )
 		{
 		case 0: return 0x0167;
 		case 1: return count<<16;
+		}
+		break;
+
+	case NAMCONB1_GSLGR94J:
+		switch( offset )
+		{
+		case 1: return 0;
+		case 3: return (0x0171<<16) | count;
 		}
 		break;
 
@@ -1245,8 +1258,8 @@ ROM_START( gslgr94j )
 	ROM_REGION( 0x800000, NAMCONB1_SPRITEGFXREGION, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "gs4obj0l.bin", 0x000001, 0x200000, CRC(3b499da0) SHA1(91ad5f68dbda64dd07e1133eb09ee69da3da3103) )
 	ROM_LOAD16_BYTE( "gs4obj0u.bin", 0x000000, 0x200000, CRC(80016b50) SHA1(9f7604c196835d31894ba4db1de43d7d2614da84) )
-	ROM_LOAD16_BYTE( "gs4obj1l.bin", 0x200001, 0x200000, CRC(1f4847a7) SHA1(908e419e42fa8bd786cc3bc96d5ccb3a47c8e2dc) )
-	ROM_LOAD16_BYTE( "gs4obj1u.bin", 0x200000, 0x200000, CRC(49bc48cd) SHA1(6bcc41546f3bd609e3aa962e5ce3bf5bc6b9229a) )
+	ROM_LOAD16_BYTE( "gs4obj1l.bin", 0x400001, 0x200000, CRC(1f4847a7) SHA1(908e419e42fa8bd786cc3bc96d5ccb3a47c8e2dc) )
+	ROM_LOAD16_BYTE( "gs4obj1u.bin", 0x400000, 0x200000, CRC(49bc48cd) SHA1(6bcc41546f3bd609e3aa962e5ce3bf5bc6b9229a) )
 
 	ROM_REGION( 0x400000, NAMCONB1_TILEGFXREGION, ROMREGION_DISPOSE )
 	ROM_LOAD( "gs4chr0.8j",  0x000000, 0x100000, CRC(8c6c682e) SHA1(ecf21035d5af28299c9cdb98d5d811b4d52857b8) )
@@ -1987,7 +2000,7 @@ GAME( 1994, ptblank,  0,        namconb1, gunbulet, gunbulet, ROT0,  "Namco", "P
 GAME( 1994, gunbulet, ptblank,  namconb1, gunbulet, gunbulet, ROT0,  "Namco", "Gun Bullet (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1993, gslugrsj, 0,        namconb1, nbsports, gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1994, gslgr94u, 0,        namconb1, nbsports, gslgr94u, ROT0,  "Namco", "Great Sluggers '94", GAME_IMPERFECT_SOUND )
-GAME( 1994, gslgr94j, gslgr94u, namconb1, nbsports, gslgr94u, ROT0,  "Namco", "Great Sluggers '94 (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1994, gslgr94j, gslgr94u, namconb1, nbsports, gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1995, sws95,    0,        namconb1, nbsports, sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1996, sws96,    0,        namconb1, nbsports, sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1997, sws97,    0,        namconb1, nbsports, sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", GAME_IMPERFECT_SOUND )
@@ -1995,5 +2008,5 @@ GAME( 1994, vshoot,   0,        namconb1, namconb1, vshoot,   ROT0,  "Namco", "J
 
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,   FLAGS */
 GAME( 1994, outfxies, 0,		namconb2, outfxies, outfxies, ROT0, "Namco", "Outfoxies", GAME_IMPERFECT_SOUND )
-GAME( 1994, outfxesj, outfxies, namconb2, outfxies	, outfxies, ROT0, "Namco", "Outfoxies (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1994, outfxesj, outfxies, namconb2, outfxies, outfxies, ROT0, "Namco", "Outfoxies (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1995, machbrkr, 0,		namconb2, namconb1, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan)", GAME_IMPERFECT_SOUND )
