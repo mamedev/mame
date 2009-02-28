@@ -10,6 +10,7 @@
 ###########################################################################
 
 
+LIBSRC = $(SRC)/lib
 LIBOBJ = $(OBJ)/lib
 
 OBJDIRS += \
@@ -62,6 +63,10 @@ EXPATOBJS = \
 
 $(OBJ)/libexpat.a: $(EXPATOBJS)
 
+$(LIBOBJ)/expat/%.o: $(LIBSRC)/explat/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
+
 
 
 #-------------------------------------------------
@@ -83,3 +88,7 @@ ZLIBOBJS = \
 	$(LIBOBJ)/zlib/zutil.o
 
 $(OBJ)/libz.a: $(ZLIBOBJS)
+
+$(LIBOBJ)/zlib/%.o: $(LIBSRC)/zlib/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@

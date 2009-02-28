@@ -593,7 +593,7 @@ chd_error chd_open_file(core_file *file, int mode, chd_file *parent, chd_file **
 		EARLY_EXIT(err = CHDERR_INVALID_PARAMETER);
 
 	/* allocate memory for the final result */
-	newchd = malloc(sizeof(**chd));
+	newchd = (chd_file *)malloc(sizeof(**chd));
 	if (newchd == NULL)
 		EARLY_EXIT(err = CHDERR_OUT_OF_MEMORY);
 	memset(newchd, 0, sizeof(*newchd));
@@ -645,15 +645,15 @@ chd_error chd_open_file(core_file *file, int mode, chd_file *parent, chd_file **
 		EARLY_EXIT(err);
 
 	/* allocate and init the hunk cache */
-	newchd->cache = malloc(newchd->header.hunkbytes);
-	newchd->compare = malloc(newchd->header.hunkbytes);
+	newchd->cache = (UINT8 *)malloc(newchd->header.hunkbytes);
+	newchd->compare = (UINT8 *)malloc(newchd->header.hunkbytes);
 	if (newchd->cache == NULL || newchd->compare == NULL)
 		EARLY_EXIT(err = CHDERR_OUT_OF_MEMORY);
 	newchd->cachehunk = ~0;
 	newchd->comparehunk = ~0;
 
 	/* allocate the temporary compressed buffer */
-	newchd->compressed = malloc(newchd->header.hunkbytes);
+	newchd->compressed = (UINT8 *)malloc(newchd->header.hunkbytes);
 	if (newchd->compressed == NULL)
 		EARLY_EXIT(err = CHDERR_OUT_OF_MEMORY);
 
@@ -994,7 +994,7 @@ chd_error chd_read(chd_file *chd, UINT32 hunknum, void *buffer)
 	wait_for_pending_async(chd);
 
 	/* perform the read */
-	return hunk_read_into_memory(chd, hunknum, buffer);
+	return hunk_read_into_memory(chd, hunknum, (UINT8 *)buffer);
 }
 
 
@@ -1048,7 +1048,7 @@ chd_error chd_write(chd_file *chd, UINT32 hunknum, const void *buffer)
 	wait_for_pending_async(chd);
 
 	/* then write out the hunk */
-	return hunk_write_from_memory(chd, hunknum, buffer);
+	return hunk_write_from_memory(chd, hunknum, (const UINT8 *)buffer);
 }
 
 
@@ -1105,7 +1105,7 @@ chd_error chd_async_complete(chd_file *chd)
 	osd_work_item_release(chd->workitem);
 	chd->workitem = NULL;
 
-	return (chd_error)result;
+	return (chd_error)(ptrdiff_t)result;
 }
 
 
@@ -1291,7 +1291,7 @@ chd_error chd_clone_metadata(chd_file *source, chd_file *dest)
 		/* otherwise, allocate a bigger temporary buffer */
 		else
 		{
-			UINT8 *allocbuffer = malloc(metasize);
+			UINT8 *allocbuffer = (UINT8 *)malloc(metasize);
 			if (allocbuffer == NULL)
 			{
 				err = CHDERR_OUT_OF_MEMORY;
@@ -1377,7 +1377,7 @@ chd_error chd_compress_hunk(chd_file *chd, const void *data, double *curratio)
 		return CHDERR_INVALID_STATE;
 
 	/* write out the hunk */
-	err = hunk_write_from_memory(chd, thishunk, data);
+	err = hunk_write_from_memory(chd, thishunk, (const UINT8 *)data);
 	if (err != CHDERR_NONE)
 		return err;
 
@@ -1396,8 +1396,8 @@ chd_error chd_compress_hunk(chd_file *chd, const void *data, double *curratio)
 	}
 	if (bytestochecksum > 0)
 	{
-		MD5Update(&chd->compmd5, crcdata, bytestochecksum);
-		sha1_update(&chd->compsha1, bytestochecksum, crcdata);
+		MD5Update(&chd->compmd5, (const unsigned char *)crcdata, bytestochecksum);
+		sha1_update(&chd->compsha1, bytestochecksum, (const UINT8 *)crcdata);
 	}
 
 	/* update our CRC map */
@@ -1594,11 +1594,11 @@ const char *chd_get_codec_name(UINT32 codec)
 
 static void *async_read_callback(void *param, int threadid)
 {
-	chd_file *chd = param;
+	chd_file *chd = (chd_file *)param;
 	chd_error err;
 
 	/* read the hunk into the cache */
-	err = hunk_read_into_memory(chd, chd->async_hunknum, chd->async_buffer);
+	err = hunk_read_into_memory(chd, chd->async_hunknum, (UINT8 *)chd->async_buffer);
 
 	/* return the error */
 	return (void *)err;
@@ -1612,11 +1612,11 @@ static void *async_read_callback(void *param, int threadid)
 
 static void *async_write_callback(void *param, int threadid)
 {
-	chd_file *chd = param;
+	chd_file *chd = (chd_file *)param;
 	chd_error err;
 
 	/* write the hunk from memory */
-	err = hunk_write_from_memory(chd, chd->async_hunknum, chd->async_buffer);
+	err = hunk_write_from_memory(chd, chd->async_hunknum, (const UINT8 *)chd->async_buffer);
 
 	/* return the error */
 	return (void *)err;
@@ -2131,10 +2131,11 @@ static chd_error map_read(chd_file *chd)
 	UINT64 fileoffset, maxoffset = 0;
 	UINT8 cookie[MAP_ENTRY_SIZE];
 	UINT32 count;
-	int i, err;
+	chd_error err;
+	int i;
 
 	/* first allocate memory */
-	chd->map = malloc(sizeof(chd->map[0]) * chd->header.totalhunks);
+	chd->map = (map_entry *)malloc(sizeof(chd->map[0]) * chd->header.totalhunks);
 	if (!chd->map)
 		return CHDERR_OUT_OF_MEMORY;
 
@@ -2224,12 +2225,12 @@ static void crcmap_init(chd_file *chd, int prepopulate)
 	chd->crctable = NULL;
 
 	/* allocate a list; one for each hunk */
-	chd->crcmap = malloc(chd->header.totalhunks * sizeof(chd->crcmap[0]));
+	chd->crcmap = (crcmap_entry *)malloc(chd->header.totalhunks * sizeof(chd->crcmap[0]));
 	if (chd->crcmap == NULL)
 		return;
 
 	/* allocate a CRC map table */
-	chd->crctable = malloc(CRCMAP_HASH_SIZE * sizeof(chd->crctable[0]));
+	chd->crctable = (crcmap_entry **)malloc(CRCMAP_HASH_SIZE * sizeof(chd->crctable[0]));
 	if (chd->crctable == NULL)
 	{
 		free(chd->crcmap);
@@ -2466,7 +2467,7 @@ static chd_error zlib_codec_init(chd_file *chd)
 	int zerr;
 
 	/* allocate memory for the 2 stream buffers */
-	data = malloc(sizeof(*data));
+	data = (zlib_codec_data *)malloc(sizeof(*data));
 	if (data == NULL)
 		return CHDERR_OUT_OF_MEMORY;
 
@@ -2517,7 +2518,7 @@ static chd_error zlib_codec_init(chd_file *chd)
 
 static void zlib_codec_free(chd_file *chd)
 {
-	zlib_codec_data *data = chd->codecdata;
+	zlib_codec_data *data = (zlib_codec_data *)chd->codecdata;
 
 	/* deinit the streams */
 	if (data != NULL)
@@ -2543,11 +2544,11 @@ static void zlib_codec_free(chd_file *chd)
 
 static chd_error zlib_codec_compress(chd_file *chd, const void *src, UINT32 *length)
 {
-	zlib_codec_data *data = chd->codecdata;
+	zlib_codec_data *data = (zlib_codec_data *)chd->codecdata;
 	int zerr;
 
 	/* reset the decompressor */
-	data->deflater.next_in = (void *)src;
+	data->deflater.next_in = (Bytef *)src;
 	data->deflater.avail_in = chd->header.hunkbytes;
 	data->deflater.total_in = 0;
 	data->deflater.next_out = chd->compressed;
@@ -2577,14 +2578,14 @@ static chd_error zlib_codec_compress(chd_file *chd, const void *src, UINT32 *len
 
 static chd_error zlib_codec_decompress(chd_file *chd, UINT32 srclength, void *dest)
 {
-	zlib_codec_data *data = chd->codecdata;
+	zlib_codec_data *data = (zlib_codec_data *)chd->codecdata;
 	int zerr;
 
 	/* reset the decompressor */
 	data->inflater.next_in = chd->compressed;
 	data->inflater.avail_in = srclength;
 	data->inflater.total_in = 0;
-	data->inflater.next_out = dest;
+	data->inflater.next_out = (Bytef *)dest;
 	data->inflater.avail_out = chd->header.hunkbytes;
 	data->inflater.total_out = 0;
 	zerr = inflateReset(&data->inflater);
@@ -2607,7 +2608,7 @@ static chd_error zlib_codec_decompress(chd_file *chd, UINT32 srclength, void *de
 
 static voidpf zlib_fast_alloc(voidpf opaque, uInt items, uInt size)
 {
-	zlib_codec_data *data = opaque;
+	zlib_codec_data *data = (zlib_codec_data *)opaque;
 	UINT32 *ptr;
 	int i;
 
@@ -2627,7 +2628,7 @@ static voidpf zlib_fast_alloc(voidpf opaque, uInt items, uInt size)
 	}
 
 	/* alloc a new one */
-	ptr = malloc(size + sizeof(UINT32));
+	ptr = (UINT32 *)malloc(size + sizeof(UINT32));
 	if (!ptr)
 		return NULL;
 
@@ -2652,7 +2653,7 @@ static voidpf zlib_fast_alloc(voidpf opaque, uInt items, uInt size)
 
 static void zlib_fast_free(voidpf opaque, voidpf address)
 {
-	zlib_codec_data *data = opaque;
+	zlib_codec_data *data = (zlib_codec_data *)opaque;
 	UINT32 *ptr = (UINT32 *)address - 1;
 	int i;
 
@@ -2705,7 +2706,7 @@ static chd_error av_codec_init(chd_file *chd)
 	av_codec_data *data;
 
 	/* allocate memory for the 2 stream buffers */
-	data = malloc(sizeof(*data));
+	data = (av_codec_data *)malloc(sizeof(*data));
 	if (data == NULL)
 		return CHDERR_OUT_OF_MEMORY;
 
@@ -2727,7 +2728,7 @@ static chd_error av_codec_init(chd_file *chd)
 
 static void av_codec_free(chd_file *chd)
 {
-	av_codec_data *data = chd->codecdata;
+	av_codec_data *data = (av_codec_data *)chd->codecdata;
 
 	/* deinit avcomp */
 	if (data != NULL)
@@ -2746,7 +2747,7 @@ static void av_codec_free(chd_file *chd)
 
 static chd_error av_codec_compress(chd_file *chd, const void *src, UINT32 *length)
 {
-	av_codec_data *data = chd->codecdata;
+	av_codec_data *data = (av_codec_data *)chd->codecdata;
 	int averr;
 	int size;
 
@@ -2761,14 +2762,14 @@ static chd_error av_codec_compress(chd_file *chd, const void *src, UINT32 *lengt
 	/* make sure short frames are padded with 0 */
 	if (src != NULL)
 	{
-		size = av_raw_data_size(src);
+		size = av_raw_data_size((const UINT8 *)src);
 		while (size < chd->header.hunkbytes)
 			if (((const UINT8 *)src)[size++] != 0)
 				return CHDERR_INVALID_DATA;
 	}
 
 	/* encode the audio and video */
-	averr = avcomp_encode_data(data->compstate, src, chd->compressed, length);
+	averr = avcomp_encode_data(data->compstate, (const UINT8 *)src, chd->compressed, length);
 	if (averr != AVCERR_NONE || *length > chd->header.hunkbytes)
 		return CHDERR_COMPRESSION_ERROR;
 
@@ -2783,7 +2784,7 @@ static chd_error av_codec_compress(chd_file *chd, const void *src, UINT32 *lengt
 
 static chd_error av_codec_decompress(chd_file *chd, UINT32 srclength, void *dest)
 {
-	av_codec_data *data = chd->codecdata;
+	av_codec_data *data = (av_codec_data *)chd->codecdata;
 	const UINT8 *source;
 	avcomp_error averr;
 	int size;
@@ -2798,14 +2799,14 @@ static chd_error av_codec_decompress(chd_file *chd, UINT32 srclength, void *dest
 
 	/* decode the audio and video */
 	source = chd->compressed;
-	averr = avcomp_decode_data(data->compstate, source, srclength, dest);
+	averr = avcomp_decode_data(data->compstate, source, srclength, (UINT8 *)dest);
 	if (averr != AVCERR_NONE)
 		return CHDERR_DECOMPRESSION_ERROR;
 
 	/* pad short frames with 0 */
 	if (dest != NULL)
 	{
-		size = av_raw_data_size(dest);
+		size = av_raw_data_size((const UINT8 *)dest);
 		while (size < chd->header.hunkbytes)
 			((UINT8 *)dest)[size++] = 0;
 	}
@@ -2821,7 +2822,7 @@ static chd_error av_codec_decompress(chd_file *chd, UINT32 srclength, void *dest
 
 static chd_error av_codec_config(chd_file *chd, int param, void *config)
 {
-	av_codec_data *data = chd->codecdata;
+	av_codec_data *data = (av_codec_data *)chd->codecdata;
 
 	/* if we're getting the compression configuration, apply it now */
 	if (param == AV_CODEC_COMPRESS_CONFIG)
@@ -2856,7 +2857,7 @@ static chd_error av_codec_postinit(chd_file *chd)
 {
 	int fps, fpsfrac, width, height, interlaced, channels, rate;
 	UINT32 fps_times_1million, max_samples_per_frame, bytes_per_frame;
-	av_codec_data *data = chd->codecdata;
+	av_codec_data *data = (av_codec_data *)chd->codecdata;
 	char metadata[256];
 	chd_error err;
 

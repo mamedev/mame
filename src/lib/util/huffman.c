@@ -424,7 +424,7 @@ huffman_error huffman_create_context(huffman_context **context, int maxbits)
 		return HUFFERR_TOO_MANY_BITS;
 
 	/* allocate a context */
-	*context = malloc(sizeof(**context));
+	*context = (huffman_context *)malloc(sizeof(**context));
 	if (*context == NULL)
 		return HUFFERR_OUT_OF_MEMORY;
 
@@ -1630,7 +1630,7 @@ static huffman_error build_lookup_table(huffman_context *context, UINT32 numcode
 
 	/* allocate a table if needed */
 	if (context->lookup == NULL)
-		context->lookup = malloc((UINT32)sizeof(context->lookup[0]) * (UINT32)(1 << context->maxbits));
+		context->lookup = (huffman_lookup_value *)malloc((UINT32)sizeof(context->lookup[0]) * (UINT32)(1 << context->maxbits));
 	if (context->lookup == NULL)
 		return HUFFERR_OUT_OF_MEMORY;
 

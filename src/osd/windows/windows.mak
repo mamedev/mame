@@ -88,7 +88,7 @@ RCFLAGS = -O coff -I $(WINSRC) -I $(WINOBJ)
 #-------------------------------------------------
 
 ifdef CYGWIN_BUILD
-CFLAGS += -mno-cygwin
+CCOMFLAGS += -mno-cygwin
 LDFLAGS	+= -mno-cygwin
 endif
 
@@ -115,24 +115,28 @@ RC = @$(VCONV) windres
 
 # make sure we use the multithreaded runtime
 ifdef DEBUG
-CC += /MTd
+CCOMFLAGS += /MTd
 else
-CC += /MT
+CCOMFLAGS += /MT
 endif
 
 # turn on link-time codegen if the MAXOPT flag is also set
 ifdef MAXOPT
-CC += /GL
-LD += /LTCG
+CCOMFLAGS += /GL
+LDFLAGS += /LTCG
+AR += /LTCG
 endif
 
 ifdef PTR64
-CC += /wd4267
+CCOMFLAGS += /wd4267
 endif
+
+# disable function pointer warnings in C++ which are evil to work around
+CPPONLYFLAGS += /wd4191
 
 # explicitly set the entry point for UNICODE builds
 ifdef UNICODE
-LD += /ENTRY:wmainCRTStartup
+LDFLAGS += /ENTRY:wmainCRTStartup
 endif
 
 # add some VC++-specific defines
@@ -194,10 +198,10 @@ endif
 #-------------------------------------------------
 
 # add our prefix files to the mix
-CFLAGS += -include $(WINSRC)/winprefix.h
+CCOMFLAGS += -include $(WINSRC)/winprefix.h
 
 ifdef WIN95_MULTIMON
-CFLAGS += -DWIN95_MULTIMON
+CCOMFLAGS += -DWIN95_MULTIMON
 endif
 
 # add the windows libraries
@@ -205,10 +209,10 @@ LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32
 
 ifeq ($(DIRECTINPUT),8)
 LIBS += -ldinput8
-CFLAGS += -DDIRECTINPUT_VERSION=0x0800
+CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0800
 else
 LIBS += -ldinput
-CFLAGS += -DDIRECTINPUT_VERSION=0x0700
+CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0700
 endif
 
 ifdef PTR64
@@ -263,7 +267,7 @@ OSDOBJS = \
 	$(WINOBJ)/winmain.o
 
 ifeq ($(DIRECT3D),9)
-CFLAGS += -DDIRECT3D_VERSION=0x0900
+CCOMFLAGS += -DDIRECT3D_VERSION=0x0900
 else
 OSDOBJS += $(WINOBJ)/d3d8intf.o
 endif

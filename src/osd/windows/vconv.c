@@ -49,80 +49,84 @@ struct _translation_info
 
 static const translation_info gcc_translate[] =
 {
-	{ 0,		"-D*",					"/D*" },
-	{ 0,		"-U*",					"/U*" },
-	{ 0,		"-I*",					"/I*" },
-	{ 0,		"-o*",					"~*" },
-	{ 0,		"-include*",			"/FI*" },
-	{ 0,		"-c",					"/c~/Fo" },
-	{ 0,		"-E",					"/c~/E >" },
-	{ 0,		"-S",					"/c~/Fa" },
-	{ VS7,		"-O0",					"/Od /GS /Oi" },
-	{ 0,		"-O0",					"/Od" },
-	{ 0,		"-O1",					"/O2" },
-	{ 0,		"-O2",					"/O2" },
-	{ 0,		"-O3",					"/O2" },
-	{ 0,		"-Os",					"/O1" },
-	{ 0,		"-g",					"/Zi" },
-	{ VS2005,	"-fno-strict-aliasing",	"" },		// deprecated in VS2005
-	{ 0,		"-fno-strict-aliasing",	"/Oa" },
+	{ 0,		"-D*",						"/D*" },
+	{ 0,		"-U*",						"/U*" },
+	{ 0,		"-I*",						"/I*" },
+	{ 0,		"-o*",						"~*" },
+	{ 0,		"-include*",				"/FI*" },
+	{ 0,		"-c",						"/c~/Fo" },
+	{ 0,		"-E",						"/c~/E >" },
+	{ 0,		"-S",						"/c~/Fa" },
+	{ VS7,		"-O0",						"/Od /GS /Oi" },
+	{ 0,		"-O0",						"/Od" },
+	{ 0,		"-O1",						"/O2" },
+	{ 0,		"-O2",						"/O2" },
+	{ 0,		"-O3",						"/O2" },
+	{ 0,		"-Os",						"/O1" },
+	{ 0,		"-g",						"/Zi" },
+	{ VS2005,	"-fno-strict-aliasing",		"" },		// deprecated in VS2005
+	{ 0,		"-fno-strict-aliasing",		"/Oa" },
 	{ 0,		"-fno-omit-frame-pointer",	"" },
-	{ 0,		"-Werror",				"/WX" },
-	{ VS7,		"-Wall",				"/Wall /W3 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
-	{ 0,		"-Wall",				"/W0" },
-	{ VS7,		"-Wno-unused",			"/wd4100 /wd4101 /wd4102" },
-	{ 0,		"-W*",					"" },
-	{ VS2005,	"-march=*",				"" },		// deprecated in VS2005
-	{ 0,		"-march=pentium",		"/G5" },
-	{ 0,		"-march=pentiumpro",	"/G6" },
-	{ 0,		"-march=pentium3",		"/G6" },
-	{ 0,		"-march=pentium-m",		"/G6" },
-	{ 0,		"-march=athlon",		"/G7" },
-	{ 0,		"-march=pentium4",		"/G7" },
-	{ 0,		"-march=athlon64",		"/G7" },
-	{ VS71,		"-msse2",				"/arch:SSE2" },
-	{ 0,		"-msse2",				"" },
-	{ 0,		"-msse3",				"" },
-	{ 0,		"-mwindows",			"" },
-	{ 0,		"-mno-cygwin",			"" },
-	{ 0,		"-std=gnu89",			"" },
-	{ 0,		"-pipe",				"" },
+	{ 0,		"-Werror",					"/WX" },
+	{ VS7,		"-Wall",					"/Wall /W3 /wd4018 /wd4146 /wd4242 /wd4244 /wd4619 /wd4702 /wd4706 /wd4710 /wd4711 /wd4738 /wd4826" },
+	{ 0,		"-Wall",					"/W0" },
+	{ VS7,		"-Wno-unused",				"/wd4100 /wd4101 /wd4102" },
+	{ 0,		"-W*",						"" },
+	{ VS2005,	"-march=*",					"" },		// deprecated in VS2005
+	{ 0,		"-march=pentium",			"/G5" },
+	{ 0,		"-march=pentiumpro",		"/G6" },
+	{ 0,		"-march=pentium3",			"/G6" },
+	{ 0,		"-march=pentium-m",			"/G6" },
+	{ 0,		"-march=athlon",			"/G7" },
+	{ 0,		"-march=pentium4",			"/G7" },
+	{ 0,		"-march=athlon64",			"/G7" },
+	{ VS71,		"-msse2",					"/arch:SSE2" },
+	{ 0,		"-msse2",					"" },
+	{ 0,		"-msse3",					"" },
+	{ 0,		"-mwindows",				"" },
+	{ 0,		"-mno-cygwin",				"" },
+	{ 0,		"-std=gnu89",				"" },
+	{ 0,		"-std=gnu++98",				"/TP" },
+	{ 0,		"-pipe",					"" },
+	{ 0,		"-x",						"" },
+	{ 0,		"c++",						"" },
 	{ 0 }
 };
 
 static const translation_info ld_translate[] =
 {
-	{ VS2008,	"-lbufferoverflowu","" },
-	{ 0,		"-l*",				"*.lib" },
-	{ 0,		"-o*",				"/out:*" },
-	{ 0,		"-Wl,-Map,*",		"/map:*" },
+	{ VS2008,	"-lbufferoverflowu",		"" },
+	{ 0,		"-l*",						"*.lib" },
+	{ 0,		"-o*",						"/out:*" },
+	{ 0,		"-Wl,-Map,*",				"/map:*" },
  	{ 0,		"-Wl,--allow-multiple-definition", "/force:multiple" },
-	{ 0,		"-Wl,--warn-common",	"" },
-	{ 0,		"-mno-cygwin",		"" },
-	{ 0,		"-s",				"" },
-	{ 0,		"-WO",				"" },
-	{ 0,		"-mconsole",		"/subsystem:console" },
-	{ 0,		"-mwindows",		"/subsystem:windows" },
-	{ 0,		"-shared",			"/dll" },
+	{ 0,		"-Wl,--warn-common",		"" },
+	{ 0,		"-mno-cygwin",				"" },
+	{ 0,		"-s",						"" },
+	{ 0,		"-WO",						"" },
+	{ 0,		"-mconsole",				"/subsystem:console" },
+	{ 0,		"-mwindows",				"/subsystem:windows" },
+	{ 0,		"-shared",					"/dll" },
 	{ 0 }
 };
 
 static const translation_info ar_translate[] =
 {
-	{ 0,		"-cr",				"" },
+	{ 0,		"-cr",						"" },
+	{ 0,		"/LTCG",					"/LTCG" },
 	{ 0 }
 };
 
 
 static const translation_info windres_translate[] =
 {
-	{ 0,		"-D*",				"/D*" },
-	{ 0,		"-U*",				"/U*" },
-	{ 0,		"-I*",				"/I*" },
-	{ 0,		"--include-dir*",	"/I*" },
-	{ 0,		"-o*",				"/fo*" },
-	{ 0,		"-O*",				"" },
-	{ 0,		"-i*",				"*" },
+	{ 0,		"-D*",						"/D*" },
+	{ 0,		"-U*",						"/U*" },
+	{ 0,		"-I*",						"/I*" },
+	{ 0,		"--include-dir*",			"/I*" },
+	{ 0,		"-o*",						"/fo*" },
+	{ 0,		"-O*",						"" },
+	{ 0,		"-i*",						"*" },
 	{ 0 }
 };
 
@@ -272,120 +276,123 @@ static void build_command_line(int argc, char *argv[])
 	for (param = 2; param < argc; param++)
 	{
 		const char *src = argv[param];
+		int firstchar = src[0];
 		int srclen = strlen(src);
+		int matched = FALSE;
 		int i;
 
 		// find a match
-		if (src[0] == '-')
+		for (i = 0; !matched && transtable[i].gcc_option != NULL; i++)
 		{
-			for (i = 0; transtable[i].gcc_option; i++)
-			{
-				const char *compare = transtable[i].gcc_option;
-				const char *replace;
-				int j;
+			const char *compare = transtable[i].gcc_option;
+			const char *replace;
+			int j;
 
-				// check version number
-				if (exe_version < transtable[i].vc_version)
-					continue;
+			// check version number
+			if (exe_version < transtable[i].vc_version)
+				continue;
 
-				// find a match
-				for (j = 0; j < srclen; j++)
-					if (src[j] != compare[j])
-						break;
-
-				// if we hit an asterisk, we're ok
-				if (compare[j] == '*')
-				{
-					// if this is the end of the parameter, use the next one
-					if (src[j] == 0)
-						src = argv[++param];
-					else
-						src += j;
-
-					// copy the replacement up to the asterisk
-					replace = transtable[i].vc_option;
-					while (*replace && *replace != '*')
-					{
-						if (*replace == '~')
-						{
-							dst += sprintf(dst, "%s", outstring);
-							replace++;
-						}
-						else
-							*dst++ = *replace++;
-					}
-
-					// if we have an asterisk in the replacement, copy the rest of the source
-					if (*replace == '*')
-					{
-						int addquote = (strchr(src, ' ') != NULL);
-
-						if (addquote)
-							*dst++ = '"';
-						while (*src)
-						{
-							*dst++ = (*src == '/') ? '\\' : *src;
-							src++;
-						}
-						if (addquote)
-							*dst++ = '"';
-
-						// if there's stuff after the asterisk, copy that
-						replace++;
-						while (*replace)
-							*dst++ = *replace++;
-					}
-
-					// append a final space
-					*dst++ = ' ';
+			// find a match
+			for (j = 0; j < srclen; j++)
+				if (src[j] != compare[j])
 					break;
-				}
 
-				// if we hit the end, we're also ok
-				else if (compare[j] == 0 && j == srclen)
+			// if we hit an asterisk, we're ok
+			if (compare[j] == '*')
+			{
+				// if this is the end of the parameter, use the next one
+				if (src[j] == 0)
+					src = argv[++param];
+				else
+					src += j;
+
+				// copy the replacement up to the asterisk
+				replace = transtable[i].vc_option;
+				while (*replace && *replace != '*')
 				{
-					// copy the replacement up to the tilde
-					replace = transtable[i].vc_option;
-					while (*replace && *replace != '~')
-						*dst++ = *replace++;
-
-					// if we hit a tilde, set the new output
 					if (*replace == '~')
-						outstring = replace + 1;
-
-					// append a final space
-					*dst++ = ' ';
-					break;
+					{
+						dst += sprintf(dst, "%s", outstring);
+						replace++;
+					}
+					else
+						*dst++ = *replace++;
 				}
 
-				// else keep looking
+				// if we have an asterisk in the replacement, copy the rest of the source
+				if (*replace == '*')
+				{
+					int addquote = (strchr(src, ' ') != NULL);
+
+					if (addquote)
+						*dst++ = '"';
+					while (*src)
+					{
+						*dst++ = (*src == '/') ? '\\' : *src;
+						src++;
+					}
+					if (addquote)
+						*dst++ = '"';
+
+					// if there's stuff after the asterisk, copy that
+					replace++;
+					while (*replace)
+						*dst++ = *replace++;
+				}
+
+				// append a final space
+				*dst++ = ' ';
+				matched = TRUE;
 			}
 
-			// warn if we didn't get a match
-			if (!transtable[i].gcc_option)
-				fprintf(stderr, "Unable to match parameter '%s'\n", src);
+			// if we hit the end, we're also ok
+			else if (compare[j] == 0 && j == srclen)
+			{
+				// copy the replacement up to the tilde
+				replace = transtable[i].vc_option;
+				while (*replace && *replace != '~')
+					*dst++ = *replace++;
+
+				// if we hit a tilde, set the new output
+				if (*replace == '~')
+					outstring = replace + 1;
+
+				// append a final space
+				*dst++ = ' ';
+				matched = TRUE;
+			}
+
+			// else keep looking
 		}
-
-		// otherwise, assume it's a filename and copy translating slashes
-		// it can also be a Windows-specific option which is passed through unscathed
-		else
+		
+		// if we didn't match, process
+		if (!matched)
 		{
-			int dotrans = (*src != '/');
+			// warn if we missed a parameter
+			if (transtable[i].gcc_option == NULL && firstchar == '-')
+				fprintf(stderr, "Unable to match parameter '%s'\n", src);
 
-			// if the output filename is implicitly first, append the out parameter
-			if (output_is_first)
+			// otherwise, assume it's a filename and copy translating slashes
+			// it can also be a Windows-specific option which is passed through unscathed
+			else if (firstchar != '-')
 			{
-				dst += sprintf(dst, "%s", outstring);
-				output_is_first = 0;
-			}
+				int dotrans = (*src != '/');
 
-			// now copy the rest of the string
-			while (*src)
-			{
-				*dst++ = (dotrans && *src == '/') ? '\\' : *src;
-				src++;
+				// if the output filename is implicitly first, append the out parameter
+				if (output_is_first)
+				{
+					dst += sprintf(dst, "%s", outstring);
+					output_is_first = 0;
+				}
+
+				// now copy the rest of the string
+				while (*src)
+				{
+					*dst++ = (dotrans && *src == '/') ? '\\' : *src;
+					src++;
+				}
+				*dst++ = ' ';
 			}
-			*dst++ = ' ';
 		}
 	}
 

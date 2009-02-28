@@ -10,7 +10,7 @@ typedef struct {
 
 typedef struct {
 	int		opcode;
-	char		name[7];
+	char		name[8];
 	int		operand;
 	UINT32		s_flag;
 } opcodeinfo;

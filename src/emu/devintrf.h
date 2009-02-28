@@ -235,7 +235,7 @@ struct _device_config
 
 	/* device properties (always valid) */
 	device_type				type;					/* device type */
-	device_class			class;					/* device class */
+	device_class			devclass;				/* device class */
 	device_set_info_func 	set_info;				/* quick pointer to set_info callback */
 
 	/* device configuration (always valid) */
@@ -306,22 +306,22 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 /* ----- class-based device access ----- */
 
 /* return the number of items of a given class */
-int device_list_class_items(const device_config *listhead, device_class class);
+int device_list_class_items(const device_config *listhead, device_class devclass);
 
 /* return the first device in the list of a given class */
-const device_config *device_list_class_first(const device_config *listhead, device_class class);
+const device_config *device_list_class_first(const device_config *listhead, device_class devclass);
 
 /* return the next device in the list of a given class */
-const device_config *device_list_class_next(const device_config *prevdevice, device_class class);
+const device_config *device_list_class_next(const device_config *prevdevice, device_class devclass);
 
 /* retrieve a device configuration based on a class and tag */
-const device_config *device_list_class_find_by_tag(const device_config *listhead, device_class class, const char *tag);
+const device_config *device_list_class_find_by_tag(const device_config *listhead, device_class devclass, const char *tag);
 
 /* return the index of a device based on its class and tag */
-int device_list_class_index(const device_config *listhead, device_class class, const char *tag);
+int device_list_class_index(const device_config *listhead, device_class devclass, const char *tag);
 
 /* retrieve a device configuration based on a class and index */
-const device_config *device_list_class_find_by_index(const device_config *listhead, device_class class, int index);
+const device_config *device_list_class_find_by_index(const device_config *listhead, device_class devclass, int index);
 
 
 

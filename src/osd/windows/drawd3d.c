@@ -302,9 +302,9 @@ INLINE void set_filter(d3d_info *d3d, int filter)
 	if (filter != d3d->last_filter)
 	{
 		d3d->last_filter = filter;
-		result = (*d3dintf->device.set_texture_stage_state)(d3d->device, 0, D3DTSS_MINFILTER, filter ? D3DTEXF_LINEAR : D3DTEXF_POINT);
+		result = (*d3dintf->device.set_texture_stage_state)(d3d->device, 0, (D3DTEXTURESTAGESTATETYPE)D3DTSS_MINFILTER, filter ? D3DTEXF_LINEAR : D3DTEXF_POINT);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture_stage_state call\n", (int)result);
-		result = (*d3dintf->device.set_texture_stage_state)(d3d->device, 0, D3DTSS_MAGFILTER, filter ? D3DTEXF_LINEAR : D3DTEXF_POINT);
+		result = (*d3dintf->device.set_texture_stage_state)(d3d->device, 0, (D3DTEXTURESTAGESTATETYPE)D3DTSS_MAGFILTER, filter ? D3DTEXF_LINEAR : D3DTEXF_POINT);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture_stage_state call\n", (int)result);
 	}
 }
@@ -316,9 +316,9 @@ INLINE void set_wrap(d3d_info *d3d, int wrap)
 	if (wrap != d3d->last_wrap)
 	{
 		d3d->last_wrap = wrap;
-		result = (*d3dintf->device.set_texture_stage_state)(d3d->device, 0, D3DTSS_ADDRESSU, wrap ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
+		result = (*d3dintf->device.set_texture_stage_state)(d3d->device, 0, (D3DTEXTURESTAGESTATETYPE)D3DTSS_ADDRESSU, wrap ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture_stage_state call\n", (int)result);
-		result = (*d3dintf->device.set_texture_stage_state)(d3d->device, 0, D3DTSS_ADDRESSV, wrap ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
+		result = (*d3dintf->device.set_texture_stage_state)(d3d->device, 0, (D3DTEXTURESTAGESTATETYPE)D3DTSS_ADDRESSV, wrap ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture_stage_state call\n", (int)result);
 	}
 }
@@ -500,7 +500,7 @@ static int drawd3d_window_init(win_window_info *window)
 	d3d_info *d3d;
 
 	// allocate memory for our structures
-	d3d = malloc_or_die(sizeof(*d3d));
+	d3d = (d3d_info *)malloc_or_die(sizeof(*d3d));
 	memset(d3d, 0, sizeof(*d3d));
 	window->drawdata = d3d;
 
@@ -537,7 +537,7 @@ error:
 
 static void drawd3d_window_destroy(win_window_info *window)
 {
-	d3d_info *d3d = window->drawdata;
+	d3d_info *d3d = (d3d_info *)window->drawdata;
 
 	// skip if nothing
 	if (d3d == NULL)
@@ -563,7 +563,7 @@ static void drawd3d_window_destroy(win_window_info *window)
 
 static const render_primitive_list *drawd3d_window_get_primitives(win_window_info *window)
 {
-	d3d_info *d3d = window->drawdata;
+	d3d_info *d3d = (d3d_info *)window->drawdata;
 	RECT client;
 
 	GetClientRectExceptMenu(window->hwnd, &client, window->fullscreen);
@@ -583,7 +583,7 @@ static const render_primitive_list *drawd3d_window_get_primitives(win_window_inf
 
 static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
 {
-	d3d_info *d3d = window->drawdata;
+	d3d_info *d3d = (d3d_info *)window->drawdata;
 	const render_primitive *prim;
 	HRESULT result;
 
@@ -669,7 +669,7 @@ mtlog_add("drawd3d_window_draw: present end");
 
 static int device_create(win_window_info *window)
 {
-	d3d_info *d3d = window->drawdata;
+	d3d_info *d3d = (d3d_info *)window->drawdata;
 	HRESULT result;
 	int verify;
 
@@ -819,7 +819,7 @@ static int device_create_resources(d3d_info *d3d)
 	}
 
 	// set the vertex format
-	result = (*d3dintf->device.set_vertex_shader)(d3d->device, VERTEX_FORMAT);
+	result = (*d3dintf->device.set_vertex_shader)(d3d->device, (D3DFORMAT)VERTEX_FORMAT);
 	if (result != D3D_OK)
 	{
 		mame_printf_error("Error setting vertex shader (%08X)", (UINT32)result);
@@ -1126,7 +1126,7 @@ static int device_test_cooperative(d3d_info *d3d)
 static int config_adapter_mode(win_window_info *window)
 {
 	d3d_adapter_identifier identifier;
-	d3d_info *d3d = window->drawdata;
+	d3d_info *d3d = (d3d_info *)window->drawdata;
 	HRESULT result;
 
 	// choose the monitor number
@@ -1244,7 +1244,7 @@ static void pick_best_mode(win_window_info *window)
 	const device_config *primary_screen = video_screen_first(window->machine->config);
 	double target_refresh = 60.0;
 	INT32 target_width, target_height;
-	d3d_info *d3d = window->drawdata;
+	d3d_info *d3d = (d3d_info *)window->drawdata;
 	INT32 minwidth, minheight;
 	float best_score = 0.0f;
 	int maxmodes;
@@ -1253,7 +1253,7 @@ static void pick_best_mode(win_window_info *window)
 	// determine the refresh rate of the primary screen
 	if (primary_screen != NULL)
 	{
-		const screen_config *config = primary_screen->inline_config;
+		const screen_config *config = (const screen_config *)primary_screen->inline_config;
 		target_refresh = ATTOSECONDS_TO_HZ(config->refresh);
 	}
 
@@ -1288,7 +1288,7 @@ static void pick_best_mode(win_window_info *window)
 			continue;
 
 		// compute initial score based on difference between target and current
-		size_score = 1.0f / (1.0f + fabs(mode.Width - target_width) + fabs(mode.Height - target_height));
+		size_score = 1.0f / (1.0f + fabs((float)(mode.Width - target_width)) + fabs((float)(mode.Height - target_height)));
 
 		// if the mode is too small, give a big penalty
 		if (mode.Width < minwidth || mode.Height < minheight)
@@ -1338,7 +1338,7 @@ static void pick_best_mode(win_window_info *window)
 
 static int update_window_size(win_window_info *window)
 {
-	d3d_info *d3d = window->drawdata;
+	d3d_info *d3d = (d3d_info *)window->drawdata;
 	RECT client;
 
 	// get the current window bounds
@@ -1658,7 +1658,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 	HRESULT result;
 
 	// allocate a new texture
-	texture = malloc_or_die(sizeof(*texture));
+	texture = (texture_info *)malloc_or_die(sizeof(*texture));
 	memset(texture, 0, sizeof(*texture));
 
 	// fill in the core data
@@ -1687,7 +1687,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 	{
 		D3DFORMAT format;
 		DWORD usage = d3d->dynamic_supported ? D3DUSAGE_DYNAMIC : 0;
-		DWORD pool = d3d->dynamic_supported ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+		D3DPOOL pool = d3d->dynamic_supported ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 		int maxdim = MAX(d3d->presentation.BackBufferWidth, d3d->presentation.BackBufferHeight);
 		int attempt;
 
@@ -1734,7 +1734,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 			else
 			{
 				int scwidth, scheight;
-				int finalfmt;
+				D3DFORMAT finalfmt;
 
 				// use an offscreen plain surface for stretching if supported
 				// (won't work for YUY textures)
@@ -2306,32 +2306,32 @@ static void texture_set_data(d3d_info *d3d, texture_info *texture, const render_
 		switch (PRIMFLAG_GET_TEXFORMAT(flags))
 		{
 			case TEXFORMAT_PALETTE16:
-				copyline_palette16(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
+				copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_PALETTEA16:
-				copyline_palettea16(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
+				copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_RGB15:
-				copyline_rgb15(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
+				copyline_rgb15((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_RGB32:
-				copyline_rgb32(dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
+				copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_ARGB32:
-				copyline_argb32(dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
+				copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_YUY16:
 				if (d3d->yuv_format == D3DFMT_YUY2)
-					copyline_yuy16_to_yuy2(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
+					copyline_yuy16_to_yuy2((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				else if (d3d->yuv_format == D3DFMT_UYVY)
-					copyline_yuy16_to_uyvy(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
+					copyline_yuy16_to_uyvy((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				else
-					copyline_yuy16_to_argb(dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
+					copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			default:

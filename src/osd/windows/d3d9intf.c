@@ -102,7 +102,7 @@ d3d *drawd3d9_init(void)
 	}
 
 	// allocate an object to hold our data
-	d3dptr = malloc_or_die(sizeof(*d3dptr));
+	d3dptr = (d3d *)malloc_or_die(sizeof(*d3dptr));
 	d3dptr->version = 9;
 	d3dptr->d3dobj = d3d9;
 	d3dptr->dllhandle = dllhandle;

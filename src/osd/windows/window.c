@@ -582,7 +582,7 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// allocate a new window object
-	window = malloc_or_die(sizeof(*window));
+	window = (win_window_info *)malloc_or_die(sizeof(*window));
 	memset(window, 0, sizeof(*window));
 	window->maxwidth = config->width;
 	window->maxheight = config->height;

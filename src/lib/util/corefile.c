@@ -127,7 +127,7 @@ file_error core_fopen(const char *filename, UINT32 openflags, core_file **file)
 	file_error filerr = FILERR_NOT_FOUND;
 
 	/* allocate the file itself */
-	*file = malloc(sizeof(**file));
+	*file = (core_file *)malloc(sizeof(**file));
 	if (*file == NULL)
 		return FILERR_OUT_OF_MEMORY;
 	memset(*file, 0, sizeof(**file));
@@ -161,7 +161,7 @@ static file_error core_fopen_ram_internal(const void *data, size_t length, int c
 		return FILERR_INVALID_ACCESS;
 
 	/* allocate the file itself */
-	*file = malloc(sizeof(**file) + (copy_buffer ? length : 0));
+	*file = (core_file *)malloc(sizeof(**file) + (copy_buffer ? length : 0));
 	if (*file == NULL)
 		return FILERR_OUT_OF_MEMORY;
 	memset(*file, 0, sizeof(**file));
@@ -284,7 +284,7 @@ file_error core_fcompress(core_file *file, int level)
 		int zerr;
 
 		/* allocate memory */
-		file->zdata = malloc(sizeof(*file->zdata));
+		file->zdata = (zlib_data *)malloc(sizeof(*file->zdata));
 		if (file->zdata == NULL)
 			return FILERR_OUT_OF_MEMORY;
 		memset(file->zdata, 0, sizeof(*file->zdata));
@@ -666,7 +666,7 @@ const void *core_fbuffer(core_file *file)
 		return file->data;
 
 	/* allocate some memory */
-	file->data = malloc(file->length);
+	file->data = (UINT8 *)malloc(file->length);
 	if (file->data == NULL)
 		return NULL;
 	file->data_allocated = TRUE;
@@ -735,9 +735,9 @@ int core_fputs(core_file *f, const char *s)
 	/* is this the beginning of the file?  if so, write a byte order mark */
 	if (f->offset == 0 && !(f->openflags & OPEN_FLAG_NO_BOM))
 	{
-		*pconvbuf++ = 0xef;
-		*pconvbuf++ = 0xbb;
-		*pconvbuf++ = 0xbf;
+		*pconvbuf++ = (char)0xef;
+		*pconvbuf++ = (char)0xbb;
+		*pconvbuf++ = (char)0xbf;
 	}
 
 	/* convert '\n' to platform dependant line endings */
@@ -890,7 +890,7 @@ static file_error osd_or_zlib_read(core_file *file, void *buffer, UINT64 offset,
 		return FILERR_INVALID_ACCESS;
 
 	/* set up the destination */
-	file->zdata->stream.next_out = buffer;
+	file->zdata->stream.next_out = (Bytef *)buffer;
 	file->zdata->stream.avail_out = length;
 	while (file->zdata->stream.avail_out != 0)
 	{
@@ -943,7 +943,7 @@ static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 
 		return FILERR_INVALID_ACCESS;
 
 	/* set up the source */
-	file->zdata->stream.next_in = (void *)buffer;
+	file->zdata->stream.next_in = (Bytef *)buffer;
 	file->zdata->stream.avail_in = length;
 	while (file->zdata->stream.avail_in != 0)
 	{

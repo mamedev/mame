@@ -229,7 +229,7 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 
 INLINE int devcb_call_read_line(const devcb_resolved_read_line *resolved)
 {
-	return (resolved->read != NULL) ? (*resolved->read)(resolved->target) : 0;
+	return (resolved->read != NULL) ? (*resolved->read)((const device_config *)resolved->target) : 0;
 }
 
 
@@ -240,7 +240,7 @@ INLINE int devcb_call_read_line(const devcb_resolved_read_line *resolved)
 
 INLINE int devcb_call_read8(const devcb_resolved_read8 *resolved, offs_t offset)
 {
-	return (resolved->read != NULL) ? (*resolved->read)(resolved->target, offset) : 0;
+	return (resolved->read != NULL) ? (*resolved->read)((const device_config *)resolved->target, offset) : 0;
 }
 
 
@@ -252,7 +252,7 @@ INLINE int devcb_call_read8(const devcb_resolved_read8 *resolved, offs_t offset)
 INLINE void devcb_call_write_line(const devcb_resolved_write_line *resolved, int state)
 {
 	if (resolved->write != NULL)
-		(*resolved->write)(resolved->target, state);
+		(*resolved->write)((const device_config *)resolved->target, state);
 }
 
 
@@ -264,7 +264,7 @@ INLINE void devcb_call_write_line(const devcb_resolved_write_line *resolved, int
 INLINE void devcb_call_write8(const devcb_resolved_write8 *resolved, offs_t offset, UINT8 data)
 {
 	if (resolved->write != NULL)
-		(*resolved->write)(resolved->target, offset, data);
+		(*resolved->write)((const device_config *)resolved->target, offset, data);
 }
 
 

@@ -58,7 +58,7 @@ hard_disk_file *hard_disk_open(chd_file *chd)
 		return NULL;
 
 	/* allocate memory for the hard disk file */
-	file = malloc(sizeof(hard_disk_file));
+	file = (hard_disk_file *)malloc(sizeof(hard_disk_file));
 	if (file == NULL)
 		return NULL;
 
@@ -72,7 +72,7 @@ hard_disk_file *hard_disk_open(chd_file *chd)
 	file->cachehunk = -1;
 
 	/* allocate a cache */
-	file->cache = malloc(chd_get_header(chd)->hunkbytes);
+	file->cache = (UINT8 *)malloc(chd_get_header(chd)->hunkbytes);
 	if (file->cache == NULL)
 	{
 		free(file);

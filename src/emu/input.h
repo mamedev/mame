@@ -42,7 +42,7 @@
 #define INPUT_CODE_DEVINDEX(c)			((UINT8)(((c) >> 20) & 0x0f))
 #define INPUT_CODE_ITEMCLASS(c)			((input_item_class)(((c) >> 16) & 0x0f))
 #define INPUT_CODE_MODIFIER(c)			((input_item_modifier)(((c) >> 12) & 0x0f))
-#define INPUT_CODE_ITEMID(c)			((int)((c) & 0xfff))
+#define INPUT_CODE_ITEMID(c)			((input_item_id)(int)((c) & 0xfff))
 
 /* build or modify input codes */
 #define INPUT_CODE(d,x,i,m,o)			((((d) & 0x0f) << 24) | (((x) & 0x0f) << 20) | (((i) & 0x0f) << 16) | (((m) & 0x0f) << 12) | ((o) & 0xfff))
@@ -331,7 +331,7 @@ enum _input_item_id
 	ITEM_ID_MAXIMUM,
 
 	/* absolute maximum ID */
-	ITEM_ID_ABSOLUTE_MAXIMUM = INPUT_CODE_ITEMID(~0)
+	ITEM_ID_ABSOLUTE_MAXIMUM = 0xfff
 };
 typedef enum _input_item_id input_item_id;
 

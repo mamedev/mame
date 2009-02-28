@@ -52,7 +52,7 @@ static int checked_for_try_enter = FALSE;
 
 osd_lock *osd_lock_alloc(void)
 {
-	osd_lock *lock = malloc(sizeof(*lock));
+	osd_lock *lock = (osd_lock *)malloc(sizeof(*lock));
 	if (lock == NULL)
 		return NULL;
 	InitializeCriticalSection(&lock->critsect);

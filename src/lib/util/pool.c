@@ -140,7 +140,7 @@ object_pool *pool_alloc(void (*fail)(const char *message))
 	object_pool *pool;
 
 	/* allocate memory for the pool itself */
-	pool = malloc(sizeof(*pool));
+	pool = (object_pool *)malloc(sizeof(*pool));
 	if (pool == NULL)
 		return NULL;
 	memset(pool, 0, sizeof(*pool));
@@ -168,7 +168,7 @@ void pool_type_register(object_pool *pool, object_type type, const char *friendl
 	if (newtype == NULL)
 	{
 		/* allocate a new entry */
-		newtype = malloc(sizeof(*newtype));
+		newtype = (objtype_entry *)malloc(sizeof(*newtype));
 		if (newtype == NULL)
 		{
 			report_failure(pool, "Error adding new type %s\n", friendly);
@@ -286,7 +286,7 @@ void *pool_object_add_file_line(object_pool *pool, object_type _type, void *obje
 		int entrynum;
 
 		/* if we need a new block, allocate that now */
-		block = malloc(sizeof(*block));
+		block = (object_entry_block *)malloc(sizeof(*block));
 		if (block == NULL)
 			return NULL;
 		memset(block, 0, sizeof(*block));
@@ -403,7 +403,7 @@ object_pool_iterator *pool_iterate_begin(object_pool *pool, object_type type)
 	object_pool_iterator *iter;
 
 	/* allocate the iterator */
-	iter = malloc(sizeof(*iter));
+	iter = (object_pool_iterator *)malloc(sizeof(*iter));
 	if (iter == NULL)
 		return NULL;
 	memset(iter, 0, sizeof(*iter));
@@ -505,7 +505,7 @@ void *pool_realloc_file_line(object_pool *pool, void *ptr, size_t size, const ch
 
 char *pool_strdup_file_line(object_pool *pool, const char *str, const char *file, int line)
 {
-	char *ptr = pool_malloc_file_line(pool, strlen(str) + 1, file, line);
+	char *ptr = (char *)pool_malloc_file_line(pool, strlen(str) + 1, file, line);
 	if (ptr != NULL)
 		strcpy(ptr, str);
 	return ptr;

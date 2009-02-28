@@ -374,7 +374,7 @@ INLINE avi_error set_stream_chunk_info(avi_stream *stream, UINT32 index, UINT64 
 	if (index >= stream->chunksalloc)
 	{
 		UINT32 newcount = MAX(index, stream->chunksalloc + 1000);
-		stream->chunk = realloc(stream->chunk, newcount * sizeof(stream->chunk[0]));
+		stream->chunk = (avi_chunk_list *)realloc(stream->chunk, newcount * sizeof(stream->chunk[0]));
 		if (stream->chunk == NULL)
 			return AVIERR_NO_MEMORY;
 		stream->chunksalloc = newcount;
@@ -450,7 +450,7 @@ INLINE avi_error expand_tempbuffer(avi_file *file, UINT32 length)
 	if (length > file->tempbuffersize)
 	{
 		file->tempbuffersize = 2 * length;
-		file->tempbuffer = realloc(file->tempbuffer, file->tempbuffersize);
+		file->tempbuffer = (UINT8 *)realloc(file->tempbuffer, file->tempbuffersize);
 		if (file->tempbuffer == NULL)
 			return AVIERR_NO_MEMORY;
 	}
@@ -475,7 +475,7 @@ avi_error avi_open(const char *filename, avi_file **file)
 	UINT64 length;
 
 	/* allocate the file */
-	newfile = malloc(sizeof(*newfile));
+	newfile = (avi_file *)malloc(sizeof(*newfile));
 	if (newfile == NULL)
 		return AVIERR_NO_MEMORY;
 	memset(newfile, 0, sizeof(*newfile));
@@ -541,7 +541,7 @@ avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file 
 		return AVIERR_UNSUPPORTED_AUDIO_FORMAT;
 
 	/* allocate the file */
-	newfile = malloc(sizeof(*newfile));
+	newfile = (avi_file *)malloc(sizeof(*newfile));
 	if (newfile == NULL)
 		return AVIERR_NO_MEMORY;
 	memset(newfile, 0, sizeof(*newfile));
@@ -561,7 +561,7 @@ avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file 
 	newfile->info.audio_numsamples = 0;
 
 	/* allocate two streams */
-	newfile->stream = malloc(2 * sizeof(newfile->stream[0]));
+	newfile->stream = (avi_stream *)malloc(2 * sizeof(newfile->stream[0]));
 	if (newfile->stream == NULL)
 	{
 		avierr = AVIERR_NO_MEMORY;
@@ -1058,7 +1058,7 @@ static avi_error read_chunk_data(avi_file *file, const avi_chunk *chunk, UINT8 *
 	UINT32 bytes_read;
 
 	/* allocate memory for the data */
-	*buffer = malloc(chunk->size);
+	*buffer = (UINT8 *)malloc(chunk->size);
 	if (*buffer == NULL)
 		return AVIERR_NO_MEMORY;
 
@@ -1392,7 +1392,7 @@ static avi_error parse_avih_chunk(avi_file *file, avi_chunk *avih)
 	file->streams = fetch_32bits(&chunkdata[24]);
 
 	/* allocate memory for the streams */
-	file->stream = malloc(sizeof(*file->stream) * file->streams);
+	file->stream = (avi_stream *)malloc(sizeof(*file->stream) * file->streams);
 	if (file->stream == NULL)
 		goto error;
 	memset(file->stream, 0, sizeof(*file->stream) * file->streams);
@@ -2044,7 +2044,7 @@ static avi_error write_indx_chunk(avi_file *file, avi_stream *stream, int initia
 				continue;
 
 			/* allocate memory */
-			tempbuf = malloc(24 + 8 * chunks_this_index);
+			tempbuf = (UINT8 *)malloc(24 + 8 * chunks_this_index);
 			if (tempbuf == NULL)
 				return AVIERR_NO_MEMORY;
 			memset(tempbuf, 0, 24 + 8 * chunks_this_index);
@@ -2113,7 +2113,7 @@ static avi_error write_idx1_chunk(avi_file *file)
 	UINT8 *tempbuf;
 
 	/* allocate a temporary buffer */
-	tempbuf = malloc(tempbuflength);
+	tempbuf = (UINT8 *)malloc(tempbuflength);
 	if (tempbuf == NULL)
 		return AVIERR_NO_MEMORY;
 
@@ -2170,7 +2170,7 @@ static avi_error soundbuf_initialize(avi_file *file)
 	file->soundbuf_samples = file->info.audio_samplerate * SOUND_BUFFER_MSEC / 1000;
 
 	/* allocate a buffer */
-	file->soundbuf = malloc(file->soundbuf_samples * file->info.audio_channels * sizeof(file->soundbuf[0]));
+	file->soundbuf = (INT16 *)malloc(file->soundbuf_samples * file->info.audio_channels * sizeof(file->soundbuf[0]));
 	if (file->soundbuf == NULL)
 		return AVIERR_NO_MEMORY;
 	memset(file->soundbuf, 0, file->soundbuf_samples * file->info.audio_channels * sizeof(file->soundbuf[0]));
@@ -2447,7 +2447,7 @@ static avi_error huffyuv_extract_tables(avi_stream *stream, const UINT8 *chunkda
 	int tabnum;
 
 	/* allocate memory for the data */
-	stream->huffyuv = malloc(sizeof(*stream->huffyuv));
+	stream->huffyuv = (huffyuv_data *)malloc(sizeof(*stream->huffyuv));
 	if (stream->huffyuv == NULL)
 	{
 		avierr = AVIERR_NO_MEMORY;
@@ -2535,7 +2535,7 @@ static avi_error huffyuv_extract_tables(avi_stream *stream, const UINT8 *chunkda
 		/* allocate the number of extra lookup tables we need */
 		if (bitsat16 > 0)
 		{
-			table->extralookup = malloc(bitsat16 * 65536 * sizeof(table->extralookup[0]));
+			table->extralookup = (UINT16 *)malloc(bitsat16 * 65536 * sizeof(table->extralookup[0]));
 			if (table->extralookup == NULL)
 			{
 				avierr = AVIERR_NO_MEMORY;

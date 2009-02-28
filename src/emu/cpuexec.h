@@ -317,7 +317,7 @@ void cpu_set_irq_callback(const device_config *cpu, cpu_irq_callback callback);
 
 INLINE cpu_type cpu_get_type(const device_config *device)
 {
-	const cpu_config *config = device->inline_config;
+	const cpu_config *config = (const cpu_config *)device->inline_config;
 	return config->type;
 }
 

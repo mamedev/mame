@@ -89,7 +89,7 @@ static int drawgdi_window_init(win_window_info *window)
 	int i;
 
 	// allocate memory for our structures
-	gdi = malloc_or_die(sizeof(*gdi));
+	gdi = (gdi_info *)malloc_or_die(sizeof(*gdi));
 	memset(gdi, 0, sizeof(*gdi));
 	window->drawdata = gdi;
 
@@ -123,7 +123,7 @@ static int drawgdi_window_init(win_window_info *window)
 
 static void drawgdi_window_destroy(win_window_info *window)
 {
-	gdi_info *gdi = window->drawdata;
+	gdi_info *gdi = (gdi_info *)window->drawdata;
 
 	// skip if nothing
 	if (gdi == NULL)
@@ -158,7 +158,7 @@ static const render_primitive_list *drawgdi_window_get_primitives(win_window_inf
 
 static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 {
-	gdi_info *gdi = window->drawdata;
+	gdi_info *gdi = (gdi_info *)window->drawdata;
 	int width, height, pitch;
 	RECT bounds;
 
@@ -178,7 +178,7 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 	if (pitch * height * 4 > gdi->bmsize)
 	{
 		gdi->bmsize = pitch * height * 4 * 2;
-		gdi->bmdata = realloc(gdi->bmdata, gdi->bmsize);
+		gdi->bmdata = (UINT8 *)realloc(gdi->bmdata, gdi->bmsize);
 	}
 
 	// draw the primitives to the bitmap

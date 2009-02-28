@@ -198,7 +198,7 @@ DEVICE_GET_INFO( speaker_output );
 
 INLINE sound_type sound_get_type(const device_config *device)
 {
-	const sound_config *config = device->inline_config;
+	const sound_config *config = (const sound_config *)device->inline_config;
 	return config->type;
 }
 

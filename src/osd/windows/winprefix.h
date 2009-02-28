@@ -30,7 +30,6 @@ void free_file_line(void *memory, const char *file, int line);
 #endif
 
 #ifdef _MSC_VER
-void *__cdecl _alloca(size_t);
 #define alloca _alloca
 #if _MSC_VER < 1500
 #define vsnprintf _vsnprintf

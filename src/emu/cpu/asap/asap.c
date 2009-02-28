@@ -135,7 +135,7 @@ static void leah_c0(asap_state *);
 static void subr(asap_state *);
 static void subr_c(asap_state *);
 static void subr_c0(asap_state *);
-static void xor(asap_state *);
+static void xor_(asap_state *);
 static void xor_c(asap_state *);
 static void xor_c0(asap_state *);
 static void xorn(asap_state *);
@@ -153,13 +153,13 @@ static void addc_c0(asap_state *);
 static void subc(asap_state *);
 static void subc_c(asap_state *);
 static void subc_c0(asap_state *);
-static void and(asap_state *);
+static void and_(asap_state *);
 static void and_c(asap_state *);
 static void and_c0(asap_state *);
 static void andn(asap_state *);
 static void andn_c(asap_state *);
 static void andn_c0(asap_state *);
-static void or(asap_state *);
+static void or_(asap_state *);
 static void or_c(asap_state *);
 static void or_c0(asap_state *);
 static void orn(asap_state *);
@@ -225,15 +225,15 @@ static void (*const opcodetable[32][4])(asap_state *) =
 	{	lea,		noop,		lea_c,		lea_c0		},
 	{	leah,		noop,		leah_c,		leah_c0		},
 	{	subr,		noop,		subr_c,		subr_c0		},
-	{	xor,		noop,		xor_c,		xor_c0		},
+	{	xor_,		noop,		xor_c,		xor_c0		},
 	{	xorn,		noop,		xorn_c,		xorn_c0		},
 	{	add,		noop,		add_c,		add_c0		},
 	{	sub,		noop,		sub_c,		sub_c0		},
 	{	addc,		noop,		addc_c,		addc_c0		},
 	{	subc,		noop,		subc_c,		subc_c0		},
-	{	and,		noop,		and_c,		and_c0		},
+	{	and_,		noop,		and_c,		and_c0		},
 	{	andn,		noop,		andn_c,		andn_c0		},
-	{	or,			noop,		or_c,		or_c0		},
+	{	or_,		noop,		or_c,		or_c0		},
 	{	orn,		noop,		orn_c,		orn_c0		},
 	{	ld,			ld_0,		ld_c,		ld_c0		},
 	{	ldh,		ldh_0,		ldh_c,		ldh_c0		},
@@ -949,7 +949,7 @@ static void subr_c0(asap_state *asap)
 
 /**************************** XOR ******************************/
 
-static void xor(asap_state *asap)
+static void xor_(asap_state *asap)
 {
 	DSTVAL(asap) = SRC1VAL(asap) ^ SRC2VAL(asap);
 }
@@ -1093,7 +1093,7 @@ static void subc_c0(asap_state *asap)
 
 /**************************** AND ******************************/
 
-static void and(asap_state *asap)
+static void and_(asap_state *asap)
 {
 	DSTVAL(asap) = SRC1VAL(asap) & SRC2VAL(asap);
 }
@@ -1133,7 +1133,7 @@ static void andn_c0(asap_state *asap)
 
 /**************************** OR ******************************/
 
-static void or(asap_state *asap)
+static void or_(asap_state *asap)
 {
 	DSTVAL(asap) = SRC1VAL(asap) | SRC2VAL(asap);
 }

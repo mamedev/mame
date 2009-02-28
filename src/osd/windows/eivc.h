@@ -47,7 +47,7 @@ unsigned char _BitScanReverse(unsigned long *Index, unsigned long Mask);
 INLINE UINT8 _count_leading_zeros(UINT32 value)
 {
 	UINT32 index;
-	return _BitScanReverse(&index, value) ? (index ^ 31) : 32;
+	return _BitScanReverse((unsigned long *)&index, value) ? (index ^ 31) : 32;
 }
 #endif
 
@@ -62,7 +62,7 @@ INLINE UINT8 _count_leading_zeros(UINT32 value)
 INLINE UINT8 _count_leading_ones(UINT32 value)
 {
 	UINT32 index;
-	return _BitScanReverse(&index, ~value) ? (index ^ 31) : 32;
+	return _BitScanReverse((unsigned long *)&index, ~value) ? (index ^ 31) : 32;
 }
 #endif
 
@@ -83,7 +83,7 @@ INLINE UINT8 _count_leading_ones(UINT32 value)
 #define compare_exchange32 _compare_exchange32
 INLINE INT32 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
-	return _InterlockedCompareExchange(ptr, exchange, compare);
+	return _InterlockedCompareExchange((volatile long *)ptr, exchange, compare);
 }
 #endif
 
@@ -116,7 +116,7 @@ INLINE INT64 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 excha
 #define atomic_exchange32 _atomic_exchange32
 INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 {
-	return _InterlockedExchange(ptr, exchange);
+	return _InterlockedExchange((volatile long *)ptr, exchange);
 }
 #endif
 
@@ -131,7 +131,7 @@ INLINE INT32 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 #define atomic_add32 _atomic_add32
 INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
-	return _InterlockedExchangeAdd(ptr, delta) + delta;
+	return _InterlockedExchangeAdd((volatile long *)ptr, delta) + delta;
 }
 #endif
 
@@ -146,7 +146,7 @@ INLINE INT32 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 #define atomic_increment32 _atomic_increment32
 INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
 {
-	return _InterlockedIncrement(ptr);
+	return _InterlockedIncrement((volatile long *)ptr);
 }
 #endif
 
@@ -161,7 +161,7 @@ INLINE INT32 _atomic_increment32(INT32 volatile *ptr)
 #define atomic_decrement32 _atomic_decrement32
 INLINE INT32 _atomic_decrement32(INT32 volatile *ptr)
 {
-	return _InterlockedDecrement(ptr);
+	return _InterlockedDecrement((volatile long *)ptr);
 }
 #endif
 

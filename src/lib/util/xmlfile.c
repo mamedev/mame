@@ -75,7 +75,7 @@ static const char *copystring(const char *input)
 		return NULL;
 
 	/* make a lower-case copy if the allocation worked */
-	newstr = malloc(strlen(input) + 1);
+	newstr = (char *)malloc(strlen(input) + 1);
 	if (newstr != NULL)
 		strcpy(newstr, input);
 
@@ -99,7 +99,7 @@ static const char *copystring_lower(const char *input)
 		return NULL;
 
 	/* make a lower-case copy if the allocation worked */
-	newstr = malloc(strlen(input) + 1);
+	newstr = (char *)malloc(strlen(input) + 1);
 	if (newstr != NULL)
 	{
 		for (i = 0; input[i] != 0; i++)
@@ -126,7 +126,7 @@ xml_data_node *xml_file_create(void)
 	xml_data_node *rootnode;
 
 	/* create a root node */
-	rootnode = malloc(sizeof(*rootnode));
+	rootnode = (xml_data_node *)malloc(sizeof(*rootnode));
 	if (rootnode == NULL)
 		return NULL;
 	memset(rootnode, 0, sizeof(*rootnode));
@@ -680,7 +680,7 @@ static void expat_data(void *data, const XML_Char *s, int len)
 		oldlen = (int)strlen((*curnode)->value);
 
 	/* realloc */
-	newdata = realloc((void *)(*curnode)->value, oldlen + len + 1);
+	newdata = (char *)realloc((void *)(*curnode)->value, oldlen + len + 1);
 	if (newdata == NULL)
 		return;
 
@@ -752,7 +752,7 @@ static xml_data_node *add_child(xml_data_node *parent, const char *name, const c
 	xml_data_node *node;
 
 	/* new element: create a new node */
-	node = malloc(sizeof(*node));
+	node = (xml_data_node *)malloc(sizeof(*node));
 	if (node == NULL)
 		return NULL;
 
@@ -793,7 +793,7 @@ static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, 
 	xml_attribute_node *anode, **panode;
 
 	/* allocate a new attribute node */
-	anode = malloc(sizeof(*anode));
+	anode = (xml_attribute_node *)malloc(sizeof(*anode));
 	if (anode == NULL)
 		return NULL;
 

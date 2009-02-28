@@ -65,7 +65,7 @@ INLINE int ensure_room(astring *str, int length)
 
 	/* allocate a new buffer with some slop */
 	alloclen = length + 256;
-	newbuf = malloc(alloclen);
+	newbuf = (char *)malloc(alloclen);
 	if (newbuf == NULL)
 		return FALSE;
 
@@ -124,7 +124,7 @@ astring *astring_alloc(void)
 	astring *str;
 
 	/* allocate memory; if we fail, return the dummy */
-	str = malloc(sizeof(*str));
+	str = (astring *)malloc(sizeof(*str));
 	if (str == NULL)
 		return &dummy_astring;
 	memset(str, 0, sizeof(*str));

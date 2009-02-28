@@ -132,7 +132,7 @@ INLINE sound_class_data *get_class_data(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->type == SOUND);
-	assert(device->class == DEVICE_CLASS_SOUND_CHIP);
+	assert(device->devclass == DEVICE_CLASS_SOUND_CHIP);
 	assert(device->token != NULL);
 	return (sound_class_data *)((UINT8 *)device->token + device->tokenbytes) - 1;
 }

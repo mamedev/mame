@@ -19,6 +19,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+#include <typeinfo>
+#endif
 
 
 /***************************************************************************
@@ -28,6 +31,12 @@
 /* The Win32 port requires this constant for variable arg routines. */
 #ifndef CLIB_DECL
 #define CLIB_DECL
+#endif
+
+
+/* In C++ we can do type checking via typeid */
+#ifdef __cplusplus
+#define TYPES_COMPATIBLE(a,b)	(typeid(a) == typeid(b))
 #endif
 
 
@@ -42,9 +51,11 @@
 #define ATTR_FORCE_INLINE		__attribute__((always_inline))
 #define ATTR_NONNULL			__attribute__((nonnull(1)))
 #define UNEXPECTED(exp)			__builtin_expect((exp), 0)
-#define TYPES_COMPATIBLE(a,b)	__builtin_types_compatible_p(a, b)
 #define RESTRICT				__restrict__
 #define SETJMP_GNUC_PROTECT()	(void)__builtin_return_address(1)
+#ifndef TYPES_COMPATIBLE
+#define TYPES_COMPATIBLE(a,b)	__builtin_types_compatible_p(a, b)
+#endif
 #else
 #define ATTR_UNUSED
 #define ATTR_NORETURN
@@ -55,9 +66,11 @@
 #define ATTR_FORCE_INLINE
 #define ATTR_NONNULL
 #define UNEXPECTED(exp)			(exp)
-#define TYPES_COMPATIBLE(a,b)	1
 #define RESTRICT
 #define SETJMP_GNUC_PROTECT()	do {} while (0)
+#ifndef TYPES_COMPATIBLE
+#define TYPES_COMPATIBLE(a,b)	1
+#endif
 #endif
 
 

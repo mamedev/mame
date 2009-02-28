@@ -74,7 +74,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	// allocate a file object, plus space for the converted filename
-	*file = malloc(sizeof(**file) + sizeof(TCHAR) * _tcslen(t_path));
+	*file = (osd_file *)malloc(sizeof(**file) + sizeof(TCHAR) * _tcslen(t_path));
 	if (*file == NULL)
 	{
 		filerr = FILERR_OUT_OF_MEMORY;
@@ -320,8 +320,8 @@ int osd_uchar_from_osdchar(UINT32 *uchar, const char *osdchar, size_t count)
 
 DWORD create_path_recursive(const TCHAR *path)
 {
-	TCHAR *sep = _tcsrchr(path, '\\');
-	file_error filerr;
+	TCHAR *sep = (TCHAR *)_tcsrchr(path, '\\');
+	DWORD filerr;
 
 	// if there's still a separator, and it's not the root, nuke it and recurse
 	if (sep != NULL && sep > path && sep[0] != ':' && sep[-1] != '\\')

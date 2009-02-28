@@ -149,7 +149,7 @@ zip_error zip_file_open(const char *filename, zip_file **zip)
 	}
 
 	/* allocate memory for the zip_file structure */
-	newzip = malloc(sizeof(*newzip));
+	newzip = (zip_file *)malloc(sizeof(*newzip));
 	if (newzip == NULL)
 		return ZIPERR_OUT_OF_MEMORY;
 	memset(newzip, 0, sizeof(*newzip));
@@ -175,7 +175,7 @@ zip_error zip_file_open(const char *filename, zip_file **zip)
 	}
 
 	/* allocate memory for the central directory */
-	newzip->cd = malloc(newzip->ecd.cd_size + 1);
+	newzip->cd = (UINT8 *)malloc(newzip->ecd.cd_size + 1);
 	if (newzip->cd == NULL)
 	{
 		ziperr = ZIPERR_OUT_OF_MEMORY;
@@ -191,7 +191,7 @@ zip_error zip_file_open(const char *filename, zip_file **zip)
 	}
 
 	/* make a copy of the filename for caching purposes */
-	string = malloc(strlen(filename) + 1);
+	string = (char *)malloc(strlen(filename) + 1);
 	if (string == NULL)
 	{
 		ziperr = ZIPERR_OUT_OF_MEMORY;
@@ -427,7 +427,7 @@ static zip_error read_ecd(zip_file *zip)
 			buflen = zip->length;
 
 		/* allocate buffer */
-		buffer = malloc(buflen + 1);
+		buffer = (UINT8 *)malloc(buflen + 1);
 		if (buffer == NULL)
 			return ZIPERR_OUT_OF_MEMORY;
 
@@ -556,7 +556,7 @@ static zip_error decompress_data_type_8(zip_file *zip, UINT64 offset, void *buff
 
     /* reset the stream */
     memset(&stream, 0, sizeof(stream));
-    stream.next_out = buffer;
+    stream.next_out = (Bytef *)buffer;
     stream.avail_out = length;
 
     /* initialize the decompressor */

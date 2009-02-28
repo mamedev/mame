@@ -254,7 +254,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	int threadnum;
 
 	// allocate a new queue
-	queue = malloc(sizeof(*queue));
+	queue = (osd_work_queue *)malloc(sizeof(*queue));
 	if (queue == NULL)
 		goto error;
 	memset(queue, 0, sizeof(*queue));
@@ -284,7 +284,7 @@ osd_work_queue *osd_work_queue_alloc(int flags)
 	queue->threads = MIN(queue->threads, WORK_MAX_THREADS);
 
 	// allocate memory for thread array (+1 to count the calling thread)
-	queue->thread = malloc((queue->threads + 1) * sizeof(queue->thread[0]));
+	queue->thread = (work_thread_info *)malloc((queue->threads + 1) * sizeof(queue->thread[0]));
 	if (queue->thread == NULL)
 		goto error;
 	memset(queue->thread, 0, (queue->threads + 1) * sizeof(queue->thread[0]));
@@ -512,7 +512,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		if (item == NULL)
 		{
 			// allocate the item
-			item = malloc(sizeof(*item));
+			item = (osd_work_item *)malloc(sizeof(*item));
 			if (item == NULL)
 				return NULL;
 			item->event = NULL;
@@ -668,7 +668,7 @@ static int effective_num_processors(void)
 
 static unsigned __stdcall worker_thread_entry(void *param)
 {
-	work_thread_info *thread = param;
+	work_thread_info *thread = (work_thread_info *)param;
 	osd_work_queue *queue = thread->queue;
 
 	// loop until we exit

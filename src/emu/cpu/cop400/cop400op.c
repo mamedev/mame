@@ -193,7 +193,7 @@ INSTRUCTION( sc )
 
 */
 
-INSTRUCTION( xor )
+INSTRUCTION( xor_ )
 {
 	A = A ^ RAM_R(B);
 }

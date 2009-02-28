@@ -552,38 +552,44 @@ static const struct {
 
 };
 
+enum _opcode_sel
+{
+	Complete=-1,
+	Illegal,
+	Opcode0, Opcode0E, Opcode0Ea,
+	Opcode1, Opcode10, Opcode11, Opcode12, Opcode13, Opcode14, Opcode15,
+	Opcode8, Opcode80, Opcode808, Opcode8081,
+	Opcode81, Opcode818, Opcode818a, Opcode819, Opcode819a,
+	Opcode81A, Opcode81Aa, Opcode81Aa0,Opcode81Aa1, Opcode81Aa2, Opcode81B,
+	Opcode8A, Opcode8B,
+	Opcode9, Opcode9a, Opcode9b,
+	OpcodeA, OpcodeAa, OpcodeAb,
+	OpcodeB, OpcodeBa, OpcodeBb,
+	OpcodeC,
+	OpcodeD,
+	OpcodeE,
+	OpcodeF
+};
+typedef enum _opcode_sel opcode_sel;
+
+enum _opcode_adr
+{
+	AdrNone,
+	AdrAF, AdrA, AdrB, AdrCount,
+	BranchReturn, TestBranchRet, ImmBranch,
+	ABranchReturn, // address field A
+	xBranchReturn, // address field specified in previous opcode entry
+	Imm, ImmCount, ImmCload, Imm2, Imm4, Imm5,
+	Dis3, Dis3Call, Dis4, Dis4Call, Abs,
+	FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW, FieldA,
+	AdrImmCount
+};
+typedef enum _opcode_adr opcode_adr;
+
 typedef struct
 {
-	enum
-	{
-		Complete=-1,
-		Illegal,
-		Opcode0, Opcode0E, Opcode0Ea,
-		Opcode1, Opcode10, Opcode11, Opcode12, Opcode13, Opcode14, Opcode15,
-		Opcode8, Opcode80, Opcode808, Opcode8081,
-		Opcode81, Opcode818, Opcode818a, Opcode819, Opcode819a,
-		Opcode81A, Opcode81Aa, Opcode81Aa0,Opcode81Aa1, Opcode81Aa2, Opcode81B,
-		Opcode8A, Opcode8B,
-		Opcode9, Opcode9a, Opcode9b,
-		OpcodeA, OpcodeAa, OpcodeAb,
-		OpcodeB, OpcodeBa, OpcodeBb,
-		OpcodeC,
-		OpcodeD,
-		OpcodeE,
-		OpcodeF
-	} sel;
-	enum
-	{
-		AdrNone,
-		AdrAF, AdrA, AdrB, AdrCount,
-		BranchReturn, TestBranchRet, ImmBranch,
-		ABranchReturn, // address field A
-		xBranchReturn, // address field specified in previous opcode entry
-		Imm, ImmCount, ImmCload, Imm2, Imm4, Imm5,
-		Dis3, Dis3Call, Dis4, Dis4Call, Abs,
-		FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW, FieldA,
-		AdrImmCount
-	} adr;
+	opcode_sel sel;
+	opcode_adr adr;
 	MNEMONICS mnemonic;
 } OPCODE;
 

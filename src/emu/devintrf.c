@@ -121,7 +121,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 
 	/* populate device properties */
 	device->type = type;
-	device->class = devtype_get_info_int(type, DEVINFO_INT_CLASS);
+	device->devclass = devtype_get_info_int(type, DEVINFO_INT_CLASS);
 	device->set_info = (device_set_info_func)devtype_get_info_fct(type, DEVINFO_FCT_SET_INFO);
 	device->execute = NULL;
 
@@ -153,7 +153,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	*tempdevptr = device;
 
 	/* and to the end of the class list */
-	tempdevice = (device_config *)device_list_class_first(*listheadptr, device->class);
+	tempdevice = (device_config *)device_list_class_first(*listheadptr, device->devclass);
 	for (tempdevptr = &tempdevice; *tempdevptr != NULL; tempdevptr = &(*tempdevptr)->classnext) ;
 	*tempdevptr = device;
 
@@ -192,7 +192,7 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
 	*tempdevptr = device->typenext;
 
 	/* and from the class list */
-	tempdevice = (device_config *)device_list_class_first(*listheadptr, device->class);
+	tempdevice = (device_config *)device_list_class_first(*listheadptr, device->devclass);
 	for (tempdevptr = &tempdevice; *tempdevptr != device; tempdevptr = &(*tempdevptr)->classnext) ;
 	assert(*tempdevptr == device);
 	*tempdevptr = device->classnext;
@@ -426,13 +426,13 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
     items of a given class
 -------------------------------------------------*/
 
-int device_list_class_items(const device_config *listhead, device_class class)
+int device_list_class_items(const device_config *listhead, device_class devclass)
 {
 	const device_config *curdev;
 	int count = 0;
 
 	/* locate all devices of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
 	for ( ; curdev != NULL; curdev = curdev->classnext)
 		count++;
 
@@ -445,12 +445,12 @@ int device_list_class_items(const device_config *listhead, device_class class)
     device in the list of a given class
 -------------------------------------------------*/
 
-const device_config *device_list_class_first(const device_config *listhead, device_class class)
+const device_config *device_list_class_first(const device_config *listhead, device_class devclass)
 {
 	const device_config *curdev;
 
 	/* first of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
 	return curdev;
 }
 
@@ -460,7 +460,7 @@ const device_config *device_list_class_first(const device_config *listhead, devi
     device in the list of a given class
 -------------------------------------------------*/
 
-const device_config *device_list_class_next(const device_config *prevdevice, device_class class)
+const device_config *device_list_class_next(const device_config *prevdevice, device_class devclass)
 {
 	assert(prevdevice != NULL);
 	return prevdevice->classnext;
@@ -472,14 +472,14 @@ const device_config *device_list_class_next(const device_config *prevdevice, dev
     device configuration based on a class and tag
 -------------------------------------------------*/
 
-const device_config *device_list_class_find_by_tag(const device_config *listhead, device_class class, const char *tag)
+const device_config *device_list_class_find_by_tag(const device_config *listhead, device_class devclass, const char *tag)
 {
 	const device_config *curdev;
 
 	assert(tag != NULL);
 
 	/* locate among all devices of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
 	for ( ; curdev != NULL; curdev = curdev->classnext)
 		if (strcmp(tag, curdev->tag) == 0)
 			return curdev;
@@ -494,7 +494,7 @@ const device_config *device_list_class_find_by_tag(const device_config *listhead
     device based on its class and tag
 -------------------------------------------------*/
 
-int device_list_class_index(const device_config *listhead, device_class class, const char *tag)
+int device_list_class_index(const device_config *listhead, device_class devclass, const char *tag)
 {
 	const device_config *curdev;
 	int index = 0;
@@ -502,7 +502,7 @@ int device_list_class_index(const device_config *listhead, device_class class, c
 	assert(tag != NULL);
 
 	/* locate among all devices of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
 	for ( ; curdev != NULL; curdev = curdev->classnext)
 	{
 		if (strcmp(tag, curdev->tag) == 0)
@@ -520,12 +520,12 @@ int device_list_class_index(const device_config *listhead, device_class class, c
     index
 -------------------------------------------------*/
 
-const device_config *device_list_class_find_by_index(const device_config *listhead, device_class class, int index)
+const device_config *device_list_class_find_by_index(const device_config *listhead, device_class devclass, int index)
 {
 	const device_config *curdev;
 
 	/* locate among all devices of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->class != class; curdev = curdev->next) ;
+	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
 	for ( ; curdev != NULL; curdev = curdev->classnext)
 		if (index-- == 0)
 			return curdev;

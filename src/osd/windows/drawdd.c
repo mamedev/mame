@@ -249,7 +249,7 @@ static int drawdd_window_init(win_window_info *window)
 	dd_info *dd;
 
 	// allocate memory for our structures
-	dd = malloc_or_die(sizeof(*dd));
+	dd = (dd_info *)malloc_or_die(sizeof(*dd));
 	memset(dd, 0, sizeof(*dd));
 	window->drawdata = dd;
 
@@ -277,7 +277,7 @@ error:
 
 static void drawdd_window_destroy(win_window_info *window)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 
 	// skip if nothing
 	if (dd == NULL)
@@ -299,7 +299,7 @@ static void drawdd_window_destroy(win_window_info *window)
 
 static const render_primitive_list *drawdd_window_get_primitives(win_window_info *window)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 
 	compute_blit_surface_size(window);
 	render_target_set_bounds(window->target, dd->blitwidth, dd->blitheight, 0);
@@ -316,7 +316,7 @@ static const render_primitive_list *drawdd_window_get_primitives(win_window_info
 
 static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 	const render_primitive *prim;
 	int usemembuffer = FALSE;
 	HRESULT result;
@@ -446,7 +446,7 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 
 static int ddraw_create(win_window_info *window)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 	HRESULT result;
 	int verify;
 
@@ -455,7 +455,7 @@ static int ddraw_create(win_window_info *window)
 		ddraw_delete(window);
 
 	// create the DirectDraw object
-	result = (*directdrawcreateex)(dd->adapter_ptr, (LPVOID *)&dd->ddraw, &IID_IDirectDraw7, NULL);
+	result = (*directdrawcreateex)(dd->adapter_ptr, (LPVOID *)&dd->ddraw, WRAP_REFIID(IID_IDirectDraw7), NULL);
 	if (result != DD_OK)
 	{
 		mame_printf_verbose("DirectDraw: Error %08X during DirectDrawCreateEx call\n", (int)result);
@@ -513,7 +513,7 @@ error:
 
 static int ddraw_create_surfaces(win_window_info *window)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 	HRESULT result;
 
 	// make a description of the primary surface
@@ -594,7 +594,7 @@ static int ddraw_create_surfaces(win_window_info *window)
 		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
 		{
 			// see if we can get a GammaControl object
-			result = IDirectDrawSurface_QueryInterface(dd->primary, &IID_IDirectDrawGammaControl, (void **)&dd->gamma);
+			result = IDirectDrawSurface_QueryInterface(dd->primary, WRAP_REFIID(IID_IDirectDrawGammaControl), (void **)&dd->gamma);
 			if (result != DD_OK)
 			{
 				mame_printf_warning("DirectDraw: Warning - device does not support full screen gamma correction.\n");
@@ -636,7 +636,7 @@ error:
 
 static void ddraw_delete(win_window_info *window)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 
 	// free surfaces
 	ddraw_delete_surfaces(window);
@@ -663,7 +663,7 @@ static void ddraw_delete(win_window_info *window)
 
 static void ddraw_delete_surfaces(win_window_info *window)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 
 	// release the gamma control
 	if (dd->gamma != NULL)
@@ -736,7 +736,7 @@ static int ddraw_verify_caps(dd_info *dd)
 
 static int ddraw_test_cooperative(win_window_info *window)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 	HRESULT result;
 
 	// check our current status; if we lost the device, punt to GDI
@@ -806,7 +806,7 @@ static HRESULT create_surface(dd_info *dd, DDSURFACEDESC2 *desc, IDirectDrawSurf
 
 static int create_clipper(win_window_info *window)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 	HRESULT result;
 
 	// create a clipper for the primary surface
@@ -843,7 +843,7 @@ static int create_clipper(win_window_info *window)
 
 static void compute_blit_surface_size(win_window_info *window)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 	INT32 newwidth, newheight;
 	int xscale, yscale;
 	RECT client;
@@ -967,7 +967,7 @@ static void calc_fullscreen_margins(win_window_info *window, DWORD desc_width, D
 
 static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight)
 {
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 	IDirectDrawSurface7 *target = (dd->back != NULL) ? dd->back : dd->primary;
 	win_monitor_info *monitor = winwindow_video_window_monitor(window, NULL);
 	DDBLTFX blitfx = { sizeof(DDBLTFX) };
@@ -1103,14 +1103,14 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 static int config_adapter_mode(win_window_info *window)
 {
 	DDDEVICEIDENTIFIER2 identifier;
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 	HRESULT result;
 
 	// choose the monitor number
 	get_adapter_for_monitor(dd, window->monitor);
 
 	// create a temporary DirectDraw object
-	result = (*directdrawcreateex)(dd->adapter_ptr, (LPVOID *)&dd->ddraw, &IID_IDirectDraw7, NULL);
+	result = (*directdrawcreateex)(dd->adapter_ptr, (LPVOID *)&dd->ddraw, WRAP_REFIID(IID_IDirectDraw7), NULL);
 	if (result != DD_OK)
 	{
 		mame_printf_verbose("DirectDraw: Error %08X during DirectDrawCreateEx call\n", (int)result);
@@ -1231,15 +1231,15 @@ static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor)
 static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 {
 	float size_score, refresh_score, final_score;
-	mode_enum_info *einfo = context;
-	dd_info *dd = einfo->window->drawdata;
+	mode_enum_info *einfo = (mode_enum_info *)context;
+	dd_info *dd = (dd_info *)einfo->window->drawdata;
 
 	// skip non-32 bit modes
 	if (desc->ddpfPixelFormat.dwRGBBitCount != 32)
 		return DDENUMRET_OK;
 
 	// compute initial score based on difference between target and current
-	size_score = 1.0f / (1.0f + fabs((INT32)desc->dwWidth - einfo->target_width) + fabs((INT32)desc->dwHeight - einfo->target_height));
+	size_score = 1.0f / (1.0f + fabs((float)((INT32)desc->dwWidth - einfo->target_width)) + fabs((float)((INT32)desc->dwHeight - einfo->target_height)));
 
 	// if the mode is too small, give a big penalty
 	if (desc->dwWidth < einfo->minimum_width || desc->dwHeight < einfo->minimum_height)
@@ -1288,7 +1288,7 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 static void pick_best_mode(win_window_info *window)
 {
 	const device_config *primary_screen = video_screen_first(window->machine->config);
-	dd_info *dd = window->drawdata;
+	dd_info *dd = (dd_info *)window->drawdata;
 	mode_enum_info einfo;
 	HRESULT result;
 
@@ -1306,7 +1306,7 @@ static void pick_best_mode(win_window_info *window)
 	einfo.target_refresh = 60.0;
 	if (primary_screen != NULL)
 	{
-		const screen_config *config = primary_screen->inline_config;
+		const screen_config *config = (const screen_config *)primary_screen->inline_config;
 		einfo.target_refresh = ATTOSECONDS_TO_HZ(config->refresh);
 	}
 	printf("Target refresh = %f\n", einfo.target_refresh);

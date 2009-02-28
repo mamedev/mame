@@ -503,7 +503,7 @@ static debugwin_info *debugwin_window_create(running_machine *machine, LPCSTR ti
 	RECT work_bounds;
 
 	// allocate memory
-	info = malloc_or_die(sizeof(*info));
+	info = (debugwin_info *)malloc_or_die(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
 	// create the window
@@ -584,7 +584,7 @@ static void debugwin_window_draw_contents(debugwin_info *info, HDC dc)
 
 	// fill the background with light gray
 	GetClientRect(info->wnd, &parent);
-	FillRect(dc, &parent, GetStockObject(LTGRAY_BRUSH));
+	FillRect(dc, &parent, (HBRUSH)GetStockObject(LTGRAY_BRUSH));
 
 	// get the parent bounds in screen coords
 	ClientToScreen(info->wnd, &((POINT *)&parent)[0]);
@@ -1007,7 +1007,7 @@ static void debugwin_view_draw_contents(debugview_info *view, HDC windc)
 
 static void debugwin_view_update(debug_view *view, void *osdprivate)
 {
-	debugview_info *info = osdprivate;
+	debugview_info *info = (debugview_info *)osdprivate;
 	RECT bounds, vscroll_bounds, hscroll_bounds;
 	debug_view_xy totalsize, visiblesize, topleft;
 	int show_vscroll, show_hscroll;
@@ -1727,7 +1727,7 @@ static void memory_create_window(running_machine *machine)
 	// create an edit box and override its key handling
 	info->editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
-	info->original_editproc = (void *)(FPTR)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
+	info->original_editproc = (WNDPROC)(FPTR)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
 	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
 	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debugwin_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
@@ -2036,7 +2036,7 @@ static void disasm_create_window(running_machine *machine)
 	// create an edit box and override its key handling
 	info->editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
-	info->original_editproc = (void *)(FPTR)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
+	info->original_editproc = (WNDPROC)(FPTR)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
 	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
 	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debugwin_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
@@ -2370,7 +2370,7 @@ void console_create_window(running_machine *machine)
 	// create an edit box and override its key handling
 	info->editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
 			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
-	info->original_editproc = (void *)(FPTR)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
+	info->original_editproc = (WNDPROC)(FPTR)GetWindowLongPtr(info->editwnd, GWLP_WNDPROC);
 	SetWindowLongPtr(info->editwnd, GWLP_USERDATA, (LONG_PTR)info);
 	SetWindowLongPtr(info->editwnd, GWLP_WNDPROC, (LONG_PTR)debugwin_edit_proc);
 	SendMessage(info->editwnd, WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);

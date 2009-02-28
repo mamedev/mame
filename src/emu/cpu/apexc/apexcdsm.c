@@ -52,10 +52,13 @@
     For vector instructions, replace the first space on the right of the mnemonic
     with a 'v'.
 */
+enum _format_type {branch, shiftl, shiftr, multiply, store, swap, one_address, two_address};
+typedef enum _format_type format_type;
+
 typedef struct instr_desc
 {
 	const char *mnemonic;
-	enum {branch, shiftl, shiftr, multiply, store, swap, one_address, two_address} format;	/* -> X and Y are format */
+	format_type format;	/* -> X and Y are format */
 } instr_desc;
 
 static const instr_desc instructions[16] =

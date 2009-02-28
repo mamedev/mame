@@ -3492,7 +3492,7 @@ while (0)
 																				\
 static void raster_##name(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid) \
 {																				\
-	const poly_extra_data *extra = extradata;									\
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;			\
 	voodoo_state *v = extra->state;												\
 	stats_block *stats = &v->thread_stats[threadid];							\
 	DECLARE_DITHER_POINTERS;													\

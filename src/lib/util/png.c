@@ -271,7 +271,7 @@ static png_error process_chunk(png_private *png, UINT8 *data, UINT32 type, UINT3
 		case PNG_CN_IDAT:
 
 			/* allocate a new image data descriptor */
-			*png->idata_next = malloc(sizeof(**png->idata_next));
+			*png->idata_next = (image_data_chunk *)malloc(sizeof(**png->idata_next));
 			if (*png->idata_next == NULL)
 				return PNGERR_OUT_OF_MEMORY;
 
@@ -301,7 +301,7 @@ static png_error process_chunk(png_private *png, UINT8 *data, UINT32 type, UINT3
 			png_text *text, *pt, *ct;
 
 			/* allocate a new text item */
-			text = malloc(sizeof(*text));
+			text = (png_text *)malloc(sizeof(*text));
 			if (text == NULL)
 				return PNGERR_OUT_OF_MEMORY;
 
@@ -668,7 +668,7 @@ png_error png_expand_buffer_8bit(png_info *pnginfo)
 		return PNGERR_NONE;
 
 	/* allocate a new buffer at 8-bit */
-	outbuf = malloc(pnginfo->width * pnginfo->height);
+	outbuf = (UINT8 *)malloc(pnginfo->width * pnginfo->height);
 	if (outbuf == NULL)
 		return PNGERR_OUT_OF_MEMORY;
 
@@ -713,13 +713,13 @@ png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text)
 	int keylen;
 
 	/* allocate a new text element */
-	newtext = malloc(sizeof(*newtext));
+	newtext = (png_text *)malloc(sizeof(*newtext));
 	if (newtext == NULL)
 		return PNGERR_OUT_OF_MEMORY;
 
 	/* allocate a string long enough to hold both */
 	keylen = (int)strlen(keyword);
-	textdata = malloc(keylen + 1 + strlen(text) + 1);
+	textdata = (char *)malloc(keylen + 1 + strlen(text) + 1);
 	if (textdata == NULL)
 	{
 		free(newtext);
@@ -887,7 +887,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 	rowbytes = pnginfo->width;
 
 	/* allocate memory for the palette */
-	pnginfo->palette = malloc(3 * 256);
+	pnginfo->palette = (UINT8 *)malloc(3 * 256);
 	if (pnginfo->palette == NULL)
 		return PNGERR_OUT_OF_MEMORY;
 
@@ -902,7 +902,7 @@ static png_error convert_bitmap_to_image_palette(png_info *pnginfo, const bitmap
 	}
 
 	/* allocate memory for the image */
-	pnginfo->image = malloc(pnginfo->height * (rowbytes + 1));
+	pnginfo->image = (UINT8 *)malloc(pnginfo->height * (rowbytes + 1));
 	if (pnginfo->image == NULL)
 	{
 		free(pnginfo->palette);
@@ -944,7 +944,7 @@ static png_error convert_bitmap_to_image_rgb(png_info *pnginfo, const bitmap_t *
 	rowbytes = pnginfo->width * (alpha ? 4 : 3);
 
 	/* allocate memory for the image */
-	pnginfo->image = malloc(pnginfo->height * (rowbytes + 1));
+	pnginfo->image = (UINT8 *)malloc(pnginfo->height * (rowbytes + 1));
 	if (pnginfo->image == NULL)
 		return PNGERR_OUT_OF_MEMORY;
 

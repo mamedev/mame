@@ -51,7 +51,7 @@ osd_directory *osd_opendir(const char *dirname)
 	size_t dirfilter_size;
 
 	// allocate memory to hold the osd_tool_directory structure
-	dir = malloc(sizeof(*dir));
+	dir = (osd_directory *)malloc(sizeof(*dir));
 	if (dir == NULL)
 		goto error;
 	memset(dir, 0, sizeof(*dir));

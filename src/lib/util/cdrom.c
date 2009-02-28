@@ -115,7 +115,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 		return NULL;
 
 	/* allocate memory for the CD-ROM file */
-	file = malloc(sizeof(cdrom_file));
+	file = (cdrom_file *)malloc(sizeof(cdrom_file));
 	if (file == NULL)
 		return NULL;
 
@@ -163,7 +163,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 	file->cdtoc.tracks[i].chdframeofs = chdofs;
 
 	/* allocate a cache */
-	file->cache = malloc(chd_get_header(chd)->hunkbytes);
+	file->cache = (UINT8 *)malloc(chd_get_header(chd)->hunkbytes);
 	if (file->cache == NULL)
 	{
 		free(file);

@@ -139,7 +139,7 @@ avcomp_state *avcomp_init(UINT32 maxwidth, UINT32 maxheight, UINT32 maxchannels)
 		return NULL;
 
 	/* allocate memory for state block */
-	state = malloc(sizeof(*state));
+	state = (avcomp_state *)malloc(sizeof(*state));
 	if (state == NULL)
 		return NULL;
 
@@ -152,7 +152,7 @@ avcomp_state *avcomp_init(UINT32 maxwidth, UINT32 maxheight, UINT32 maxchannels)
 	state->maxchannels = maxchannels;
 
 	/* now allocate data buffers */
-	state->audiodata = malloc(65536 * state->maxchannels * 2);
+	state->audiodata = (UINT8 *)malloc(65536 * state->maxchannels * 2);
 	if (state->audiodata == NULL)
 		goto cleanup;
 
@@ -300,7 +300,7 @@ avcomp_error avcomp_encode_data(avcomp_state *state, const UINT8 *source, UINT8 
 		videostride = width = height = 0;
 		if (state->compress.video != NULL)
 		{
-			videostart = state->compress.video->base;
+			videostart = (const UINT8 *)state->compress.video->base;
 			videostride = state->compress.video->rowpixels * 2;
 			width = state->compress.video->width;
 			height = state->compress.video->height;
@@ -455,7 +455,7 @@ avcomp_error avcomp_decode_data(avcomp_state *state, const UINT8 *source, UINT32
 		metastart = state->decompress.metadata;
 		for (chnum = 0; chnum < channels; chnum++)
 			audiostart[chnum] = (UINT8 *)state->decompress.audio[chnum];
-		videostart = (state->decompress.video != NULL) ? state->decompress.video->base : NULL;
+		videostart = (state->decompress.video != NULL) ? (UINT8 *)state->decompress.video->base : NULL;
 		videostride = (state->decompress.video != NULL) ? state->decompress.video->rowpixels * 2 : 0;
 
 		/* data is assumed to be native-endian */

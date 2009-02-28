@@ -107,7 +107,7 @@ palette_t *palette_alloc(UINT32 numcolors, UINT32 numgroups)
 	UINT32 index;
 
 	/* allocate memory */
-	palette = malloc(sizeof(*palette));
+	palette = (palette_t *)malloc(sizeof(*palette));
 	if (palette == NULL)
 		goto error;
 	memset(palette, 0, sizeof(*palette));
@@ -120,8 +120,8 @@ palette_t *palette_alloc(UINT32 numcolors, UINT32 numgroups)
 		palette->gamma_map[index] = index;
 
 	/* allocate an array of palette entries and individual contrasts for each */
-	palette->entry_color = malloc(sizeof(*palette->entry_color) * numcolors);
-	palette->entry_contrast = malloc(sizeof(*palette->entry_contrast) * numcolors);
+	palette->entry_color = (rgb_t *)malloc(sizeof(*palette->entry_color) * numcolors);
+	palette->entry_contrast = (float *)malloc(sizeof(*palette->entry_contrast) * numcolors);
 	if (palette->entry_color == NULL || palette->entry_contrast == NULL)
 		goto error;
 
@@ -133,8 +133,8 @@ palette_t *palette_alloc(UINT32 numcolors, UINT32 numgroups)
 	}
 
 	/* allocate an array of brightness and contrast for each group */
-	palette->group_bright = malloc(sizeof(*palette->group_bright) * numgroups);
-	palette->group_contrast = malloc(sizeof(*palette->group_contrast) * numgroups);
+	palette->group_bright = (float *)malloc(sizeof(*palette->group_bright) * numgroups);
+	palette->group_contrast = (float *)malloc(sizeof(*palette->group_contrast) * numgroups);
 	if (palette->group_bright == NULL || palette->group_contrast == NULL)
 		goto error;
 
@@ -146,8 +146,8 @@ palette_t *palette_alloc(UINT32 numcolors, UINT32 numgroups)
 	}
 
 	/* allocate arrays for the adjusted colors */
-	palette->adjusted_color = malloc(sizeof(*palette->adjusted_color) * (numcolors * numgroups + 2));
-	palette->adjusted_rgb15 = malloc(sizeof(*palette->adjusted_rgb15) * (numcolors * numgroups + 2));
+	palette->adjusted_color = (rgb_t *)malloc(sizeof(*palette->adjusted_color) * (numcolors * numgroups + 2));
+	palette->adjusted_rgb15 = (rgb_t *)malloc(sizeof(*palette->adjusted_rgb15) * (numcolors * numgroups + 2));
 	if (palette->adjusted_color == NULL || palette->adjusted_rgb15 == NULL)
 		goto error;
 
@@ -280,14 +280,14 @@ palette_client *palette_client_alloc(palette_t *palette)
 	palette_client *client;
 
 	/* allocate memory for the client */
-	client = malloc(sizeof(*client));
+	client = (palette_client *)malloc(sizeof(*client));
 	if (client == NULL)
 		goto error;
 	memset(client, 0, sizeof(*client));
 
 	/* allocate dirty lists */
-	client->live.dirty = malloc(dirty_dwords * sizeof(UINT32));
-	client->previous.dirty = malloc(dirty_dwords * sizeof(UINT32));
+	client->live.dirty = (UINT32 *)malloc(dirty_dwords * sizeof(UINT32));
+	client->previous.dirty = (UINT32 *)malloc(dirty_dwords * sizeof(UINT32));
 	if (client->live.dirty == NULL || client->previous.dirty == NULL)
 		goto error;
 

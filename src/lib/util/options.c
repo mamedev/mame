@@ -289,7 +289,7 @@ int options_add_entries(core_options *opts, const options_entry *entrylist)
 		int i;
 
 		/* allocate a new item */
-		options_data *data = malloc(sizeof(*data));
+		options_data *data = (options_data *)malloc(sizeof(*data));
 		if (data == NULL)
 			return FALSE;
 		memset(data, 0, sizeof(*data));
@@ -845,7 +845,7 @@ options_enumerator *options_enumerator_begin(core_options *opts)
 	options_enumerator *enumerator;
 
 	/* allocate memory for the enumerator */
-	enumerator = malloc(sizeof(*enumerator));
+	enumerator = (options_enumerator *)malloc(sizeof(*enumerator));
 	if (enumerator == NULL)
 		return NULL;
 

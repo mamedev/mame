@@ -191,7 +191,7 @@ static void process_field(jed_data *data, const UINT8 *cursrc, const UINT8 *srce
 
 int jed_parse(const void *data, size_t length, jed_data *result)
 {
-	const UINT8 *cursrc = data;
+	const UINT8 *cursrc = (const UINT8 *)data;
 	const UINT8 *srcend = cursrc + length;
 	const UINT8 *scan;
 	parse_info pinfo;
@@ -285,7 +285,7 @@ int jed_parse(const void *data, size_t length, jed_data *result)
 
 size_t jed_output(const jed_data *data, void *result, size_t length)
 {
-	UINT8 *curdst = result;
+	UINT8 *curdst = (UINT8 *)result;
 	UINT8 *dstend = curdst + length;
 	int i, zeros, ones;
 	char tempbuf[256];
@@ -357,7 +357,7 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 
 	/* now compute the transmission checksum */
 	checksum = 0;
-	for (temp = result; temp < curdst && temp < dstend; temp++)
+	for (temp = (UINT8 *)result; temp < curdst && temp < dstend; temp++)
 		checksum += *temp & 0x7f;
 	checksum += 0x03;
 
@@ -381,7 +381,7 @@ size_t jed_output(const jed_data *data, void *result, size_t length)
 
 int jedbin_parse(const void *data, size_t length, jed_data *result)
 {
-	const UINT8 *cursrc = data;
+	const UINT8 *cursrc = (const UINT8 *)data;
 
 	/* initialize the output */
 	memset(result, 0, sizeof(*result));
@@ -414,7 +414,7 @@ int jedbin_parse(const void *data, size_t length, jed_data *result)
 
 size_t jedbin_output(const jed_data *data, void *result, size_t length)
 {
-	UINT8 *curdst = result;
+	UINT8 *curdst = (UINT8 *)result;
 
 	/* ensure we have enough room */
 	if (length >= 4 + (data->numfuses + 7) / 8)

@@ -407,7 +407,7 @@ static void cop410_op33(cop400_state *cpustate, UINT8 opcode)
 
 static const cop400_opcode_map COP410_OPCODE_MAP[] =
 {
-	{1, clra		},{1, skmbz0	},{1, xor		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, clra		},{1, skmbz0	},{1, xor_		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 	{0, illegal		},{1, skmbz1	},{0, illegal	},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
@@ -538,7 +538,7 @@ static void cop420_op33(cop400_state *cpustate, UINT8 opcode)
 
 static const cop400_opcode_map COP420_OPCODE_MAP[] =
 {
-	{1, clra		},{1, skmbz0	},{1, xor		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, clra		},{1, skmbz0	},{1, xor_		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 	{1, casc		},{1, skmbz1	},{1, xabr		},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
@@ -669,7 +669,7 @@ static void cop444_op33(cop400_state *cpustate, UINT8 opcode)
 
 static const cop400_opcode_map COP444_OPCODE_MAP[256] =
 {
-	{1, clra		},{1, skmbz0	},{1, xor		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
+	{1, clra		},{1, skmbz0	},{1, xor_		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
 	{1, casc		},{1, skmbz1	},{1, cop444_xabr},{1, skmbz3		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},

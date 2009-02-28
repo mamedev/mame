@@ -19,6 +19,35 @@
 #include "streams.h"
 #include "rf5c400.h"
 
+typedef struct _rf5c400_channel rf5c400_channel;
+struct _rf5c400_channel
+{
+	UINT16	startH;
+	UINT16	startL;
+	UINT16	freq;
+	UINT16	endL;
+	UINT16	endHloopH;
+	UINT16	loopL;
+	UINT16	pan;
+	UINT16	effect;
+	UINT16	volume;
+
+	UINT16	attack;
+	UINT16	decay;
+	UINT16	release;
+
+	UINT16	cutoff;
+
+	UINT64 pos;
+	UINT64 step;
+	UINT16 keyon;
+
+	UINT8 env_phase;
+	double env_level;
+	double env_step;
+	double env_scale;
+};
+
 typedef struct _rf5c400_state rf5c400_state;
 struct _rf5c400_state
 {
@@ -31,33 +60,7 @@ struct _rf5c400_state
 	double env_dr_table[0x9f];
 	double env_rr_table[0x9f];
 
-	struct RF5C400_CHANNEL
-	{
-		UINT16	startH;
-		UINT16	startL;
-		UINT16	freq;
-		UINT16	endL;
-		UINT16	endHloopH;
-		UINT16	loopL;
-		UINT16	pan;
-		UINT16	effect;
-		UINT16	volume;
-
-		UINT16	attack;
-		UINT16	decay;
-		UINT16	release;
-
-		UINT16	cutoff;
-
-		UINT64 pos;
-		UINT64 step;
-		UINT16 keyon;
-
-		UINT8 env_phase;
-		double env_level;
-		double env_step;
-		double env_scale;
-	} channels[32];
+	rf5c400_channel channels[32];
 };
 
 static int volume_table[256];
@@ -129,7 +132,7 @@ static STREAM_UPDATE( rf5c400_update )
 
 	for (ch=0; ch < 32; ch++)
 	{
-		struct RF5C400_CHANNEL *channel = &info->channels[ch];
+		rf5c400_channel *channel = &info->channels[ch];
 		stream_sample_t *buf0 = outputs[0];
 		stream_sample_t *buf1 = outputs[1];
 
@@ -460,7 +463,7 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 		int ch = (offset >> 5) & 0x1f;
 		int reg = (offset & 0x1f);
 
-		struct RF5C400_CHANNEL *channel = &info->channels[ch];
+		rf5c400_channel *channel = &info->channels[ch];
 
 		switch (reg)
 		{

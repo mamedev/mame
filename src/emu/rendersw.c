@@ -201,7 +201,7 @@ INLINE UINT32 get_texel_palette16_nearest(const render_texinfo *texture, INT32 c
 
 INLINE UINT32 get_texel_palette16_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT16 *texbase = texture->base;
+	const UINT16 *texbase = (const UINT16 *)texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
 	INT32 u0, u1, v0, v1;
 
@@ -245,7 +245,7 @@ INLINE UINT32 get_texel_palette16a_nearest(const render_texinfo *texture, INT32 
 
 INLINE UINT32 get_texel_palette16a_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT16 *texbase = texture->base;
+	const UINT16 *texbase = (const UINT16 *)texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
 	INT32 u0, u1, v0, v1;
 
@@ -288,7 +288,7 @@ INLINE UINT32 get_texel_rgb15_nearest(const render_texinfo *texture, INT32 curu,
 
 INLINE UINT32 get_texel_rgb15_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT16 *texbase = texture->base;
+	const UINT16 *texbase = (const UINT16 *)texture->base;
 	rgb_t pix00, pix01, pix10, pix11, filtered;
 	INT32 u0, u1, v0, v1;
 
@@ -337,7 +337,7 @@ INLINE UINT32 get_texel_yuy16_nearest(const render_texinfo *texture, INT32 curu,
 
 INLINE UINT32 get_texel_yuy16_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT16 *texbase = texture->base;
+	const UINT16 *texbase = (const UINT16 *)texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
 	INT32 u0, u1, v0, v1;
 
@@ -406,7 +406,7 @@ INLINE UINT32 get_texel_rgb32_nearest(const render_texinfo *texture, INT32 curu,
 
 INLINE UINT32 get_texel_rgb32_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT32 *texbase = texture->base;
+	const UINT32 *texbase = (const UINT32 *)texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
 	INT32 u0, u1, v0, v1;
 
@@ -450,7 +450,7 @@ INLINE UINT32 get_texel_argb32_nearest(const render_texinfo *texture, INT32 curu
 
 INLINE UINT32 get_texel_argb32_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
 {
-	const UINT32 *texbase = texture->base;
+	const UINT32 *texbase = (const UINT32 *)texture->base;
 	rgb_t pix00, pix01, pix10, pix11;
 	INT32 u0, u1, v0, v1;
 
