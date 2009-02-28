@@ -37,9 +37,8 @@ WRITE8_HANDLER( polyplay_characterram_w )
 {
 	if (polyplay_characterram[offset] != data)
 	{
-		gfx_element_mark_dirty(space->machine->gfx[1], ((offset >> 3) & 0x7f) | 0x80);
-
 		polyplay_characterram[offset] = data;
+		gfx_element_decode(space->machine->gfx[1], (offset >> 3) & 0x7f);
 	}
 }
 
