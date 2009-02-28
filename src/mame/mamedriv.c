@@ -8177,6 +8177,7 @@ Other Sun games
 	DRIVER( ladyfrog )	/* (c) 1990 Mondial Games */
 	DRIVER( rabbit )	/* (c) 1997 Electronic Arts */
 	DRIVER( tmmjprd )	/* (c) 1997 Media / Sonnet */
+	DRIVER( tmpdoki )	/* (c) 1998 Media Syouji */
 	DRIVER( malzak )	/* (c) 1980? Kitronix */
 	DRIVER( malzak2 )	/* (c) 1980? Kitronix */
 	DRIVER( supertnk )	/* (c) 1981 VIDEO GAMES GmbH, W.-GERMANY */
