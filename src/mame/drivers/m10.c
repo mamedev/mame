@@ -126,18 +126,18 @@ Notes (couriersud)
 
 #define DEBUG		(0)
 
-#define LOG(x...) do { if (DEBUG) printf(x); } while (0) 
+#define LOG(x) do { if (DEBUG) printf x; } while (0) 
 
 static WRITE8_DEVICE_HANDLER(ic8j1_output_changed)
 {
-	LOG("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen));
+	LOG(("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen)));
 	cpu_set_input_line(device->machine->cpu[0], 0, !data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER(ic8j2_output_changed)
 {
 	/* written from /Q to A with slight delight */
-	LOG("ic8j2: %d\n", data);
+	LOG(("ic8j2: %d\n", data));
 	ttl74123_a_w(device, 0, data);
 	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "ic8j1"), 0, data);
 }
@@ -465,8 +465,8 @@ static WRITE8_HANDLER( m15_a100_w )
 
 static READ8_HANDLER( m10_a700_r )
 {
-   	//LOG("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen));
-	LOG("clear\n");
+   	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
+	LOG(("clear\n"));
 	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 0);
 	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 1);
 	return 0x00;
@@ -474,9 +474,9 @@ static READ8_HANDLER( m10_a700_r )
 
 static READ8_HANDLER( m11_a700_r )
 {
-   	//LOG("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen));
+   	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
 	//cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
-	LOG("clear\n");
+	LOG(("clear\n"));
 	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 0);
 	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 1);
 	return 0x00;
