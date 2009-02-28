@@ -51,6 +51,7 @@ struct _m10_state
 
 
 WRITE8_HANDLER( m10_colorram_w );
+WRITE8_HANDLER( m10_chargen_w );
 WRITE8_HANDLER( m15_chargen_w );
 
 VIDEO_UPDATE( m10 );

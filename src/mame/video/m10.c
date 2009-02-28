@@ -19,8 +19,8 @@ static UINT32			extyoffs[32*8];
 
 static const gfx_layout backlayout =
 {
-	8,8*32,	/* 8*8 characters */
-	4,		/* 256 characters */
+	8,8*32,	/* 8*(8*32) characters */
+	4,		/* 4 characters */
 	1,		/* 1 bit per pixel */
 	{ 0 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -58,6 +58,18 @@ WRITE8_HANDLER( m10_colorram_w )
 	{
 		tilemap_mark_tile_dirty(tx_tilemap, offset);
 		colorram[offset] = data;
+	}
+}
+
+
+WRITE8_HANDLER( m10_chargen_w )
+{
+	m10_state *state = space->machine->driver_data;
+	
+	if (state->chargen[offset] != data)
+	{
+		state->chargen[offset] = data;
+		gfx_element_mark_dirty(back_gfx, offset >> (3+5));
 	}
 }
 
