@@ -428,62 +428,97 @@ void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle
 		return;
 
 	if(ctrl & 0x6000) {
+		UINT16 v;
 		// Special window/scroll modes
 		if(layer & 1)
 			return;
 
-		tilemap_set_scrolly(sys24_tile_layer[layer],   0, +(vscr & 0x1ff));
-		tilemap_set_scrolly(sys24_tile_layer[layer|1], 0, +(vscr & 0x1ff));
+		v = vscr & 0x1ff;
+
+		tilemap_set_scrolly(sys24_tile_layer[layer],   0, v);
+		tilemap_set_scrolly(sys24_tile_layer[layer|1], 0, v);
 
 		if(hscr & 0x8000) {
-			//#ifdef MAME_DEBUG
-			popmessage("Linescroll with special mode %04x", ctrl);
-			//          return;
-			//#endif
+			UINT16 *hscrtb = sys24_tile_ram + 0x4000 + 0x200*layer;
+		
+			switch((ctrl & 0x6000) >> 13) {
+			case 1: {
+				popmessage("Linescroll subtype 1");
+				break;
+			}
+			case 2: case 3: {
+				int y;
+				for(y=0; y<384; y++) {
+					if(y >= cliprect->min_y && y <= cliprect->max_y) {
+						UINT16 h;
+						rectangle c1 = *cliprect;
+						rectangle c2 = *cliprect;
+						int l1 = layer;
+
+						// Whether it's tilemap-relative or screen-relative is unknown
+						hscr = hscrtb[v];
+
+						h = hscr & 0x1ff;
+						tilemap_set_scrollx(sys24_tile_layer[layer],   0, -h);
+						tilemap_set_scrollx(sys24_tile_layer[layer|1], 0, -h);
+
+						if(c1.max_x >= h)
+							c1.max_x = h-1;
+						if(c2.min_x < h)
+							c2.min_x = h;
+						if(!(hscr & 0x200))
+							l1 ^= 1;
+
+						c1.min_y = c1.max_y = c2.min_y = c2.max_y = y;
+
+						tilemap_draw(bitmap, &c1, sys24_tile_layer[l1],   tpri, lpri);
+						tilemap_draw(bitmap, &c2, sys24_tile_layer[l1^1], tpri, lpri);
+					}
+					v = (v + 1) & 0x1ff;
+				}
+				break;
+			}
+			}
+
 		} else {
 			tilemap_set_scrollx(sys24_tile_layer[layer],   0, -(hscr & 0x1ff));
 			tilemap_set_scrollx(sys24_tile_layer[layer|1], 0, -(hscr & 0x1ff));
-		}
 
-		switch((ctrl & 0x6000) >> 13) {
-		case 1: {
-			rectangle c1 = *cliprect;
-			rectangle c2 = *cliprect;
-			UINT16 v;
-			v = (-vscr) & 0x1ff;
-			if(c1.max_y >= v)
-				c1.max_y = v-1;
-			if(c2.min_y < v)
-				c2.min_y = v;
-			if(!((-vscr) & 0x200))
-				layer ^= 1;
-
-			tilemap_draw(bitmap, &c1, sys24_tile_layer[layer],   tpri, lpri);
-			tilemap_draw(bitmap, &c2, sys24_tile_layer[layer^1], tpri, lpri);
-			break;
+			switch((ctrl & 0x6000) >> 13) {
+			case 1: {
+				rectangle c1 = *cliprect;
+				rectangle c2 = *cliprect;
+				UINT16 v;
+				v = (-vscr) & 0x1ff;
+				if(c1.max_y >= v)
+					c1.max_y = v-1;
+				if(c2.min_y < v)
+					c2.min_y = v;
+				if(!((-vscr) & 0x200))
+					layer ^= 1;
+				
+				tilemap_draw(bitmap, &c1, sys24_tile_layer[layer],   tpri, lpri);
+				tilemap_draw(bitmap, &c2, sys24_tile_layer[layer^1], tpri, lpri);
+				break;
+			}
+			case 2: case 3: {
+				rectangle c1 = *cliprect;
+				rectangle c2 = *cliprect;
+				UINT16 h;
+				h = (+hscr) & 0x1ff;
+				if(c1.max_x >= h)
+					c1.max_x = h-1;
+				if(c2.min_x < h)
+					c2.min_x = h;
+				if(!((+hscr) & 0x200))
+					layer ^= 1;
+				
+				tilemap_draw(bitmap, &c1, sys24_tile_layer[layer],   tpri, lpri);
+				tilemap_draw(bitmap, &c2, sys24_tile_layer[layer^1], tpri, lpri);
+				break;
+			}
+			}
 		}
-		case 2: {
-			rectangle c1 = *cliprect;
-			rectangle c2 = *cliprect;
-			UINT16 h;
-			h = (+hscr) & 0x1ff;
-			if(c1.max_x >= h)
-				c1.max_x = h-1;
-			if(c2.min_x < h)
-				c2.min_x = h;
-			if(!((+hscr) & 0x200))
-				layer ^= 1;
-
-			tilemap_draw(bitmap, &c1, sys24_tile_layer[layer],   tpri, lpri);
-			tilemap_draw(bitmap, &c2, sys24_tile_layer[layer^1], tpri, lpri);
-			break;
-		}
-		case 3:
-			//#ifdef MAME_DEBUG
-			popmessage("Mode 3, please scream");
-			//#endif
-			break;
-		};
 
 	} else {
 		bitmap_t *bm, *tm;
@@ -612,19 +647,23 @@ void sys24_sprite_vh_start(running_machine *machine)
 
 /* System24 sprites
       Normal sprite:
-    0   00Znnnnn    nnnnnnnn    zoom mode (1 = separate x and y), next sprite
+    0   00Z--nnn    nnnnnnnn    zoom mode (1 = separate x and y), next sprite
     1   xxxxxxxx    yyyyyyyy    zoom x, zoom y (zoom y is used for both when mode = 0)
     2   --TTTTTT    TTTTTTTT    sprite number
-    3   -CCCCCCC    CCCCCCCC    indirect palette base
+    3   PPPPCCCC    CCCCCCCC    priority, indirect palette base
     4   FSSSYYYY    YYYYYYYY    flipy, y size, top
     5   FSSSXXXX    XXXXXXXX    flipx, x size, left
 
       Clip?
-    0   01-nnnnn    nnnnnnnn    next sprite
-    1   ????????    ????????
+    0   01---nnn    nnnnnnnn    next sprite
+    1   hVH-----    --------    hide/vflip/hflip
+	2   -------y    yyyyyyyy    Clip top
+	2   -------x    xxxxxxxx    Clip left
+	2   -------y    yyyyyyyy    Clip bottom
+	2   -------x    xxxxxxxx    Clip right
 
       Skipped entry
-    0   10-nnnnn    nnnnnnnn    next sprite
+    0   10---nnn    nnnnnnnn    next sprite
 
       End of sprite list
     0   11------    --------
@@ -654,7 +693,7 @@ void sys24_sprite_draw(bitmap_t *bitmap, const rectangle *cliprect, const int *s
 
 		curspr = source[0];
 		type = curspr & 0xc000;
-		curspr &= 0x1fff;
+		curspr &= 0x03ff;
 
 		if(type == 0xc000)
 			break;
