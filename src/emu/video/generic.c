@@ -815,6 +815,18 @@ WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_be_w )
 	set_color_444(space->machine, offset / 2, 8, 4, 0, paletteram16_be(offset));
 }
 
+WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_split1_w )
+{
+	paletteram[offset] = data;
+	set_color_444(space->machine, offset, 8, 4, 0, paletteram16_split(offset));
+}
+
+WRITE8_HANDLER( paletteram_xxxxRRRRGGGGBBBB_split2_w )
+{
+	paletteram_2[offset] = data;
+	set_color_444(space->machine, offset, 8, 4, 0, paletteram16_split(offset));
+}
+
 WRITE16_HANDLER( paletteram16_xxxxRRRRGGGGBBBB_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
