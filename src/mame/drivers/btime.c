@@ -1341,8 +1341,12 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
 		0,		/* Modelled separately */
 		0, 1};
 
+/* R49 has 4.7k in schematics, but listed as 47k in bill of material 
+ * 47k gives proper low pass filtering
+ */
+
 static const discrete_op_amp_filt_info btime_opamp_desc =
-	{RES_K(1), 0, RES_K(10), 0, RES_K(4.7), CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
+	{RES_K(1), 0, RES_K(10), 0, RES_K(47), CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
 
 static DISCRETE_SOUND_START( btime_sound )
 
@@ -1364,7 +1368,16 @@ static DISCRETE_SOUND_START( btime_sound )
 
 	DISCRETE_MIXER2(NODE_40, 1, NODE_22, NODE_30, &btime_sound_mixer_desc)
 	DISCRETE_CRFILTER(NODE_41, 1, NODE_40, RES_K(10), CAP_U(10))
-	/* Amplifier not modelled */
+	/* Amplifier is upc1181H3
+	 * 
+	 * http://www.mydarc.de/dj7oh/fad/ics/upc1181/upc1181.htm 
+	 * 
+	 * A linear frequency response is mentioned as well as a lower
+	 * edge frequency determined by cap on pin3, however no formula given.
+	 * 
+	 * not modelled here
+	 */
+	
 	/* Assuming a 4 Ohm impedance speaker */
 	DISCRETE_CRFILTER(NODE_42, 1, NODE_41, 3.0, CAP_U(100))
 
