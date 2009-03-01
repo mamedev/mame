@@ -60,26 +60,26 @@ static READ8_HANDLER( deco16_bank_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( deco16_bank_w )
-{
-	deco16_bank=data;
-}
-
 static READ8_HANDLER( deco16_io_r )
 {
-	const UINT8 *ROM = memory_region(space->machine, "maincpu");
+	if (offset==0) return input_port_read(space->machine, "IN1"); /* Player 1 controls */
+	if (offset==1) return input_port_read(space->machine, "IN2"); /* Player 2 controls */
+	if (offset==2) return input_port_read(space->machine, "IN3"); /* Vblank, coins */
+	if (offset==3) return input_port_read(space->machine, "DSW1"); /* Dip 1 */
+	if (offset==4) return input_port_read(space->machine, "DSW2"); /* Dip 2 */
 
-	if (deco16_bank) {
-		if (offset==0) return input_port_read(space->machine, "IN1"); /* Player 1 controls */
-		if (offset==1) return input_port_read(space->machine, "IN2"); /* Player 2 controls */
-		if (offset==2) return input_port_read(space->machine, "IN3"); /* Vblank, coins */
-		if (offset==3) return input_port_read(space->machine, "DSW1"); /* Dip 1 */
-		if (offset==4) return input_port_read(space->machine, "DSW2"); /* Dip 2 */
+	logerror("%04x:  Read input %d\n",cpu_get_pc(space->cpu),offset);
+	return 0xff;
+}
 
-		logerror("%04x:  Read input %d\n",cpu_get_pc(space->cpu),offset);
-		return 0xff;
-	}
-	return ROM[0x8000+offset];
+static WRITE8_HANDLER( deco16_bank_w )
+{
+	deco16_bank = data;
+
+	if (deco16_bank)
+		memory_install_read8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
+	else
+		memory_install_read8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, SMH_BANK1);
 }
 
 /*************************************
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( prosport_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_READ(SMH_RAM)
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x800f) AM_READ(deco16_io_r)
+	AM_RANGE(0x8000, 0x800f) AM_READ(SMH_BANK1)
 	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( liberate_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0x3fff) AM_READ(SMH_ROM) /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x8000, 0x800f) AM_READ(deco16_io_r)
+	AM_RANGE(0x8000, 0x800f) AM_READ(SMH_BANK1)
 	AM_RANGE(0x6200, 0x67ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -160,34 +160,35 @@ ADDRESS_MAP_END
 
 #if 0
 static ADDRESS_MAP_START( prosoccr_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-    AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
+	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prosoccr_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DeVWRITE(SOUND, "ay2", ay8910_address_w)
-    AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 #endif
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)
-    AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
-    AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /*************************************
@@ -944,6 +945,8 @@ static DRIVER_INIT( liberate )
 		decrypted[A] = (decrypted[A] & 0xbb) | ((decrypted[A] & 0x04) << 4) | ((decrypted[A] & 0x40) >> 4);
 		decrypted[A] = (decrypted[A] & 0x7d) | ((decrypted[A] & 0x02) << 6) | ((decrypted[A] & 0x80) >> 6);
 	}
+
+	memory_configure_bank_decrypted(machine, 1, 0, 1, decrypted + 0x8000, 0x10);
 
 	sound_cpu_decrypt(machine);
 }
