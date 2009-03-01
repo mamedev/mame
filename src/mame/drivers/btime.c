@@ -1344,9 +1344,31 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
 /* R49 has 4.7k in schematics, but listed as 47k in bill of material 
  * 47k gives proper low pass filtering
  */
+#define BTIME_R49	RES_K(47)
+
+/* The input divider R51 R50 is not independant of R52, which
+ * also depends on ay internal resistance.
+ * FIXME: Develop proper model when I am retired.
+ *
+ * With R51 being 1K, the gain is way to high (23.5). Therefore R51
+ * is set to 5k, but this is a hack. With the modification,
+ * sound levels are in line with observations. 
+ * FIXME: Verify R51,R50,R52 and R49 on real pcb
+ * 
+ * http://www.coinopvideogames.com/videogames01.php
+ * There are two recordings from 1982 where the filtered sound is way louder 
+ * than the music. There is a later recording
+ * http://www.coinopvideogames.com/videogames03.php
+ * in which the filtered sounds have volumes closer to the music.
+ * 
+ */ 
+
+#define BTIME_R52	RES_K(1)
+#define BTIME_R51	RES_K(5) 	/* schematics 1k */
+#define BTIME_R50	RES_K(10)
 
 static const discrete_op_amp_filt_info btime_opamp_desc =
-	{RES_K(1), 0, RES_K(10), 0, RES_K(47), CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
+	{BTIME_R51, 0, BTIME_R50, 0, BTIME_R49, CAP_U(0.068), CAP_U(0.068), 0, 0, 5.0, -5.0};
 
 static DISCRETE_SOUND_START( btime_sound )
 
@@ -1368,6 +1390,7 @@ static DISCRETE_SOUND_START( btime_sound )
 
 	DISCRETE_MIXER2(NODE_40, 1, NODE_22, NODE_30, &btime_sound_mixer_desc)
 	DISCRETE_CRFILTER(NODE_41, 1, NODE_40, RES_K(10), CAP_U(10))
+	
 	/* Amplifier is upc1181H3
 	 * 
 	 * http://www.mydarc.de/dj7oh/fad/ics/upc1181/upc1181.htm 
@@ -1379,9 +1402,9 @@ static DISCRETE_SOUND_START( btime_sound )
 	 */
 	
 	/* Assuming a 4 Ohm impedance speaker */
-	DISCRETE_CRFILTER(NODE_42, 1, NODE_41, 3.0, CAP_U(100))
+	DISCRETE_CRFILTER(NODE_43, 1, NODE_41, 3.0, CAP_U(100))
 
-	DISCRETE_OUTPUT(NODE_42, 32767.0 / 5. * 20.0)
+	DISCRETE_OUTPUT(NODE_43, 32767.0 / 5. * 35.0)
 
 DISCRETE_SOUND_END
 
