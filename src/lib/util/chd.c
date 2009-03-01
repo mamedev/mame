@@ -15,6 +15,7 @@
 #include "sha1.h"
 #include <zlib.h>
 #include <time.h>
+#include <stddef.h>
 
 
 
