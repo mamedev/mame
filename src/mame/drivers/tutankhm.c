@@ -13,6 +13,10 @@
     Note:
     * The sound board uses a 14.318 MHz xtal.
     * The cpu/video board uses a 18.432 MHz xtal.
+     
+    Todo:
+    * Discrete filters
+    * Starfield
 
 ***************************************************************************/
 
@@ -326,5 +330,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, 0, ROT90, "Konami", "Tutankham", GAME_SUPPORTS_SAVE )
-GAME( 1982, tutankst, tutankhm, tutankhm, tutankhm, 0, ROT90, "[Konami] (Stern license)", "Tutankham (Stern)", GAME_SUPPORTS_SAVE )
+GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, 0, ROT90, "Konami", "Tutankham", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankst, tutankhm, tutankhm, tutankhm, 0, ROT90, "[Konami] (Stern license)", "Tutankham (Stern)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
