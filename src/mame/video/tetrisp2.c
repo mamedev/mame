@@ -91,17 +91,6 @@ WRITE16_HANDLER( rocknms_sub_palette_w )
 
 ***************************************************************************/
 
-READ16_HANDLER( tetrisp2_priority_r )
-{
-	return tetrisp2_priority[offset];
-}
-
-READ16_HANDLER( rocknms_sub_priority_r )
-{
-	return rocknms_sub_priority[offset];
-}
-
-
 WRITE16_HANDLER( tetrisp2_priority_w )
 {
 	if (ACCESSING_BITS_8_15)
