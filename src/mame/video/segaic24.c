@@ -443,7 +443,30 @@ void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle
 		
 			switch((ctrl & 0x6000) >> 13) {
 			case 1: {
-				popmessage("Linescroll subtype 1");
+				int y;
+				UINT16 vv;
+				vv = (-vscr) & 0x1ff;
+				if(!((-vscr) & 0x200))
+					layer ^= 1;
+				for(y=0; y<384; y++) {
+					if(y >= cliprect->min_y && y <= cliprect->max_y) {
+						UINT16 h;
+						rectangle c = *cliprect;
+						int l1 = layer;
+						if(y >= vv)
+							l1 ^= 1;
+
+						c.min_y = c.max_y = y;
+
+						// Whether it's tilemap-relative or screen-relative is unknown
+						hscr = hscrtb[v];
+
+						h = hscr & 0x1ff;
+						tilemap_set_scrollx(sys24_tile_layer[l1],   0, -h);
+						tilemap_draw(bitmap, &c, sys24_tile_layer[l1],   tpri, lpri);
+					}
+					v = (v + 1) & 0x1ff;
+				}
 				break;
 			}
 			case 2: case 3: {
