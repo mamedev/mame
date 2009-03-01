@@ -114,6 +114,7 @@ extern WRITE8_HANDLER( goldstar_fg_atrram_w );
 
 WRITE8_HANDLER( goldstar_fa00_w );
 WRITE8_HANDLER( cm_background_col_w );
+WRITE8_HANDLER( cm_outport0_w );
 VIDEO_START( goldstar );
 VIDEO_START( cherrym );
 VIDEO_UPDATE( goldstar );
@@ -252,14 +253,11 @@ ADDRESS_MAP_END
 */
 
 
-static WRITE8_HANDLER( cm_outport0_w )
-{
-	/* lamps? */
-}
+
 
 static WRITE8_HANDLER( cm_outport1_w )
 {
-	/* quick extended writes */
+	/* lamps? */
 }
 
 static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
