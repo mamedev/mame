@@ -8936,21 +8936,21 @@ Other Sun games
 	/* Sanki Denshi Kogyo */
 	DRIVER( pachifev )	/* (c) 1983? */
 
-	/* Igro */
-	DRIVER( mfish )
+	/* Igrosoft - SHA1 information is not available for commented out sets, only MD5/CRC32 */
+	//DRIVER( mfish )
 	DRIVER( mfish_2 )
 	DRIVER( mfish_2a )
-	DRIVER( mfish_3 )
-	DRIVER( mfish_4 )
-	DRIVER( mfish_5 )
-	DRIVER( mfish_6 )
-	DRIVER( mfish_7 )
-	DRIVER( mfish_8 )
-	DRIVER( mfish_9 )
-	DRIVER( mfish_10 )
-	DRIVER( mfish_11 )
-	DRIVER( mfish_12 )
-	DRIVER( mfish_13 )
+	//DRIVER( mfish_3 )
+	//DRIVER( mfish_4 )
+	//DRIVER( mfish_5 )
+	//DRIVER( mfish_6 )
+	//DRIVER( mfish_7 )
+	//DRIVER( mfish_8 )
+	//DRIVER( mfish_9 )
+	//DRIVER( mfish_10 )
+	//DRIVER( mfish_11 )
+	//DRIVER( mfish_12 )
+	//DRIVER( mfish_13 )
 
 
 

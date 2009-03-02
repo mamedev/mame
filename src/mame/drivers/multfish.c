@@ -32,7 +32,7 @@
 
 // revision information comes from dat files, not all of them can be tested
 //  for some only MD5 and CRC information is present
-#define ALL_REVISIONS 1
+#define ALL_REVISIONS 0
 
 #include "driver.h"
 #include "sound/ay8910.h"
