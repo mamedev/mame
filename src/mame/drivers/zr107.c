@@ -510,9 +510,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_r(devtag_get_device(space->machine, SOUND, "konami2"), offset);
+		ret |= k054539_r(devtag_get_device(space->machine, "konami2"), offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_r(devtag_get_device(space->machine, SOUND, "konami1"), offset)<<8;
+		ret |= k054539_r(devtag_get_device(space->machine, "konami1"), offset)<<8;
 
 	return ret;
 }
@@ -520,9 +520,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_w(devtag_get_device(space->machine, SOUND, "konami2"), offset, data);
+		k054539_w(devtag_get_device(space->machine, "konami2"), offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_w(devtag_get_device(space->machine, SOUND, "konami1"), offset, data>>8);
+		k054539_w(devtag_get_device(space->machine, "konami1"), offset, data>>8);
 }
 
 static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )

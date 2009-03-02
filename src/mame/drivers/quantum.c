@@ -116,8 +116,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x01cfff) AM_RAM
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE(&quantum_vectorram) AM_SIZE(&vectorram_size)
-	AM_RANGE(0x840000, 0x84001f) AM_DEVREADWRITE8(SOUND, "pokey1", pokey_r, pokey_w, 0x00ff)
-	AM_RANGE(0x840020, 0x84003f) AM_DEVREADWRITE8(SOUND, "pokey2", pokey_r, pokey_w, 0x00ff)
+	AM_RANGE(0x840000, 0x84001f) AM_DEVREADWRITE8("pokey1", pokey_r, pokey_w, 0x00ff)
+	AM_RANGE(0x840020, 0x84003f) AM_DEVREADWRITE8("pokey2", pokey_r, pokey_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9001ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x940000, 0x940001) AM_READ(trackball_r) /* trackball */
 	AM_RANGE(0x948000, 0x948001) AM_READ_PORT("SYSTEM")

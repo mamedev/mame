@@ -1734,11 +1734,11 @@ static void memory_init_populate(running_machine *machine)
 				{
 					int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
 					void *object = space;
-					if (entry->read_devtype != NULL)
+					if (entry->read_devtag != NULL)
 					{
-						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->read_devtype, entry->read_devtag);
+						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->read_devtag);
 						if (object == NULL)
-							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_get_name(entry->read_devtype), entry->read_devtag);
+							fatalerror("Unidentified object in memory map: tag=%s\n", entry->read_devtag);
 					}
 					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, rhandler.generic, object, entry->read_name);
 				}
@@ -1748,11 +1748,11 @@ static void memory_init_populate(running_machine *machine)
 				{
 					int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
 					void *object = space;
-					if (entry->write_devtype != NULL)
+					if (entry->write_devtag != NULL)
 					{
-						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->write_devtype, entry->write_devtag);
+						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->write_devtag);
 						if (object == NULL)
-							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_get_name(entry->write_devtype), entry->write_devtag);
+							fatalerror("Unidentified object in memory map: tag=%s\n", entry->write_devtag);
 					}
 					space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, whandler.generic, object, entry->write_name);
 				}
@@ -2099,7 +2099,6 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
 				entry->read = TOKEN_GET_PTR(tokens, read);
 				entry->read_name = TOKEN_GET_STRING(tokens);
-				entry->read_devtype = TOKEN_GET_PTR(tokens, devtype);
 				if (entry->read_devtag_string == NULL)
 					entry->read_devtag_string = astring_alloc();
 				entry->read_devtag = device_inherit_tag(entry->read_devtag_string, cputag, TOKEN_GET_STRING(tokens));
@@ -2111,7 +2110,6 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
 				entry->write = TOKEN_GET_PTR(tokens, write);
 				entry->write_name = TOKEN_GET_STRING(tokens);
-				entry->write_devtype = TOKEN_GET_PTR(tokens, devtype);
 				if (entry->write_devtag_string == NULL)
 					entry->write_devtag_string = astring_alloc();
 				entry->write_devtag = device_inherit_tag(entry->write_devtag_string, cputag, TOKEN_GET_STRING(tokens));

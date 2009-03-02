@@ -68,8 +68,8 @@ VIDEO_UPDATE( vsnes )
 
 VIDEO_UPDATE( vsdual )
 {
-	const device_config *top_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
-	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
+	const device_config *top_screen = devtag_get_device(screen->machine, "top");
+	const device_config *bottom_screen = devtag_get_device(screen->machine, "bottom");
 
 	/* render the ppu's */
 	if (screen == top_screen)

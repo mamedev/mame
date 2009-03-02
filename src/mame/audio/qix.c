@@ -154,8 +154,8 @@ static WRITE_LINE_DEVICE_HANDLER( qix_pia_sint )
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x5ffc) AM_DEVREADWRITE(PIA6821, "sndpia2", pia_r, pia_w)
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE(PIA6821, "sndpia1", pia_r, pia_w)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x5ffc) AM_DEVREADWRITE("sndpia2", pia_r, pia_w)
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("sndpia1", pia_r, pia_w)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -175,9 +175,9 @@ static const pia6821_interface qixsnd_pia_0_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER(PIA6821, "sndpia1", sync_sndpia1_porta_w),	/* port A out */
-	DEVCB_DEVICE_HANDLER(SOUND, "discrete", qix_vol_w),				/* port B out */
-	DEVCB_DEVICE_HANDLER(PIA6821, "sndpia1", pia_ca1_w),			/* line CA2 out */
+	DEVCB_DEVICE_HANDLER("sndpia1", sync_sndpia1_porta_w),			/* port A out */
+	DEVCB_DEVICE_HANDLER("discrete", qix_vol_w),					/* port B out */
+	DEVCB_DEVICE_HANDLER("sndpia1", pia_ca1_w),						/* line CA2 out */
 	DEVCB_HANDLER(qix_flip_screen_w),								/* port CB2 out */
 	DEVCB_LINE(qix_pia_dint),										/* IRQA */
 	DEVCB_LINE(qix_pia_dint)										/* IRQB */
@@ -191,9 +191,9 @@ static const pia6821_interface qixsnd_pia_1_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER(PIA6821, "sndpia0", pia_porta_w),	/* port A out */
-	DEVCB_DEVICE_HANDLER(SOUND, "discrete", qix_dac_w),		/* port B out */
-	DEVCB_DEVICE_HANDLER(PIA6821, "sndpia0", pia_ca1_w),	/* line CA2 out */
+	DEVCB_DEVICE_HANDLER("sndpia0", pia_porta_w),			/* port A out */
+	DEVCB_DEVICE_HANDLER("discrete", qix_dac_w),			/* port B out */
+	DEVCB_DEVICE_HANDLER("sndpia0", pia_ca1_w),				/* line CA2 out */
 	DEVCB_NULL,		/* line CB2 out */
 	DEVCB_LINE(qix_pia_sint),								/* IRQA */
 	DEVCB_LINE(qix_pia_sint)								/* IRQB */

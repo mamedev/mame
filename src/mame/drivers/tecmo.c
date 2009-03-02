@@ -196,10 +196,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rygar_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE(SOUND, "ym", ym3812_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(SOUND, "msm", tecmo_adpcm_start_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", tecmo_adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(tecmo_adpcm_end_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "msm", tecmo_adpcm_vol_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", tecmo_adpcm_vol_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)	/* NMI acknowledge */
 ADDRESS_MAP_END
 
@@ -214,10 +214,10 @@ static ADDRESS_MAP_START( tecmo_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 									/* writes code to this area */
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym", ym3812_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(SOUND, "msm", tecmo_adpcm_start_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", tecmo_adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(tecmo_adpcm_end_w)
-	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE(SOUND, "msm", tecmo_adpcm_vol_w)
+	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("msm", tecmo_adpcm_vol_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(SMH_NOP)	/* NMI acknowledge */
 ADDRESS_MAP_END
 

@@ -372,13 +372,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map_skylncr, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
 
 	AM_RANGE(0x20, 0x20) AM_WRITE( skylncr_coin_w )
 
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE( SOUND, "ay", ay8910_address_data_w )
-	AM_RANGE(0x31, 0x31) AM_DEVREAD( SOUND, "ay", ay8910_r )
+	AM_RANGE(0x30, 0x31) AM_DEVWRITE( "ay", ay8910_address_data_w )
+	AM_RANGE(0x31, 0x31) AM_DEVREAD( "ay", ay8910_r )
 
 	AM_RANGE(0x40, 0x41) AM_WRITE( skylncr_paletteram_w )
 	AM_RANGE(0x50, 0x51) AM_WRITE( skylncr_paletteram2_w )

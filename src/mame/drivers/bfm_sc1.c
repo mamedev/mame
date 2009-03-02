@@ -780,8 +780,8 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)  // irq latch
 
 	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("ay", ay8910_address_w)
 
 	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
 	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
@@ -825,8 +825,8 @@ static ADDRESS_MAP_START( memmap_adder2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)  // irq latch
 
 	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("ay", ay8910_address_w)
 
 	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
 	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
@@ -874,8 +874,8 @@ static ADDRESS_MAP_START( sc1_nec_uk, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)	  // irq latch
 
 	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("ay", ay8910_address_w)
 
 	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
 	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
@@ -886,8 +886,8 @@ static ADDRESS_MAP_START( sc1_nec_uk, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(bankswitch_w) // write bank
 
-	AM_RANGE(0x3801, 0x3801) AM_DEVREAD(SOUND, "upd", nec_r)
-	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)
+	AM_RANGE(0x3801, 0x3801) AM_DEVREAD("upd", nec_r)
+	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE("upd", nec_latch_w)
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1)				// 8k  paged ROM (4 pages)

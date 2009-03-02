@@ -306,7 +306,7 @@ static int m6295_bank;
 static UINT16 m6295_key_delay;
 static INTERRUPT_GEN( kickgoal_interrupt )
 {
-	const device_config *adpcm = devtag_get_device(device->machine, SOUND, "oki");
+	const device_config *adpcm = devtag_get_device(device->machine, "oki");
 
 	if ((okim6295_r(adpcm,0) & 0x08) == 0)
 	{
@@ -500,11 +500,11 @@ static WRITE16_HANDLER( kickgoal_eeprom_w )
 
 static ADDRESS_MAP_START( kickgoal_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-/// AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE(SOUND, "oki", kickgoal_snd_w)
+/// AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE("oki", kickgoal_snd_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("SYSTEM")
 /// AM_RANGE(0x800004, 0x800005) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x800004, 0x800005) AM_DEVWRITE(SOUND, "oki", actionhw_snd_w)
+	AM_RANGE(0x800004, 0x800005) AM_DEVWRITE("oki", actionhw_snd_w)
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(kickgoal_eeprom_w)
 	AM_RANGE(0x900006, 0x900007) AM_READ(kickgoal_eeprom_r)
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(kickgoal_fgram_w) AM_BASE(&kickgoal_fgram) /* FG Layer */

@@ -66,7 +66,7 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static MACHINE_RESET( videopin )
 {
-	const device_config *discrete = devtag_get_device(machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(machine, "discrete");
 
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, interrupt_callback);
 
@@ -197,12 +197,12 @@ static WRITE8_DEVICE_HANDLER( videopin_note_dvsr_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(videopin_video_ram_w) AM_BASE(&videopin_video_ram)
-	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r) AM_DEVWRITE(SOUND, "discrete", videopin_note_dvsr_w)
+	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r) AM_DEVWRITE("discrete", videopin_note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0804, 0x0804) AM_WRITE(videopin_ball_w)
-	AM_RANGE(0x0805, 0x0805) AM_DEVWRITE(SOUND, "discrete", videopin_out1_w)
-	AM_RANGE(0x0806, 0x0806) AM_DEVWRITE(SOUND, "discrete", videopin_out2_w)
+	AM_RANGE(0x0805, 0x0805) AM_DEVWRITE("discrete", videopin_out1_w)
+	AM_RANGE(0x0806, 0x0806) AM_DEVWRITE("discrete", videopin_out2_w)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW")
 	AM_RANGE(0x2000, 0x3fff) AM_ROM

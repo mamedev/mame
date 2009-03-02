@@ -39,8 +39,8 @@ MACHINE_START( extra_8080bw_sh )
 
 WRITE8_HANDLER( invadpt2_sh_port_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
-	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
+	const device_config *sn = devtag_get_device(space->machine, "sn");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	sn76477_enable_w(sn, !(data & 0x01));			/* SAUCER SOUND */
@@ -67,7 +67,7 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
        D2 = 82K
        D3 = 100K */
 
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 4, 3, 0);		/* FLEET */
@@ -90,9 +90,9 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
 
 WRITE8_HANDLER( spcewars_sh_port_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
-	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
+	const device_config *sn = devtag_get_device(space->machine, "sn");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	sn76477_enable_w(sn, !(data & 0x01));			/* Saucer Sound */
@@ -136,7 +136,7 @@ const samples_interface lrescue_samples_interface =
 
 WRITE8_HANDLER( lrescue_sh_port_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 0, 3, 0);		/* Thrust */
@@ -154,8 +154,8 @@ WRITE8_HANDLER( lrescue_sh_port_1_w )
 
 WRITE8_HANDLER( lrescue_sh_port_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 1, 8, 0);		/* Footstep high tone */
@@ -195,7 +195,7 @@ WRITE8_HANDLER( cosmo_sh_port_2_w )
 
 WRITE8_HANDLER( ballbomb_sh_port_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 1, 2, 0);		/* Hit a balloon */
@@ -213,7 +213,7 @@ WRITE8_HANDLER( ballbomb_sh_port_1_w )
 
 WRITE8_HANDLER( ballbomb_sh_port_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (data & 0x01) sample_start(samples, 0, 7, 0);		/* Indicates plane will drop bombs */
@@ -273,7 +273,7 @@ WRITE8_HANDLER( indianbt_sh_port_1_w )
 {
 	/* bit 4 occurs every 5.25 seconds during gameplay */
 
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 1, 7, 0);	/* Death */
@@ -290,7 +290,7 @@ WRITE8_HANDLER( indianbt_sh_port_1_w )
 
 WRITE8_HANDLER( indianbt_sh_port_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 4, 0, 0);		/* Bird dropped an egg, Lasso used */
@@ -799,8 +799,8 @@ static const double schaser_effect_rc[8] =
 
 WRITE8_HANDLER( schaser_sh_port_1_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
-	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	const device_config *sn = devtag_get_device(space->machine, "sn");
 	static int last_effect = 0;
 	int effect;
 
@@ -874,7 +874,7 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
        bit 4 - Field Control B (SX10)
        bit 5 - Flip Screen */
 
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
     printf( "schaser_sh_port_2_w: %02x\n", data );
 
@@ -895,7 +895,7 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 
 static TIMER_CALLBACK( schaser_effect_555_cb )
 {
-	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(machine, "sn");
 	int effect = param;
 	attotime new_time;
 	/* Toggle 555 output */
@@ -963,7 +963,7 @@ MACHINE_RESET( schaser )
 
 WRITE8_HANDLER( rollingc_sh_port_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_3_last_extra;
 
 	if (rising_bits & 0x02) sample_start(samples, 4, 0, 0);	/* Steering */
@@ -987,7 +987,7 @@ WRITE8_HANDLER( rollingc_sh_port_w )
 
 WRITE8_HANDLER( invrvnge_sh_port_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	switch (data)
 	{
 		case 0x06:
@@ -1031,8 +1031,8 @@ WRITE8_HANDLER( invrvnge_sh_port_w )
 
 WRITE8_HANDLER( lupin3_sh_port_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
-	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
+	const device_config *sn = devtag_get_device(space->machine, "sn");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 0, 6, 0);		/* Walking, get money */
@@ -1048,7 +1048,7 @@ WRITE8_HANDLER( lupin3_sh_port_1_w )
 
 WRITE8_HANDLER( lupin3_sh_port_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 0, 3, 0);		/* Lands on top of building, wife kicks man */
@@ -1075,7 +1075,7 @@ WRITE8_HANDLER( schasrcv_sh_port_1_w )
        bit 3 = 1st speedup
        Death is a stream of ff's with some fe's thrown in */
 
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x02) sample_start(samples, 1, 6, 0);		/* Ran over a dot */
@@ -1086,7 +1086,7 @@ WRITE8_HANDLER( schasrcv_sh_port_1_w )
 
 WRITE8_HANDLER( schasrcv_sh_port_2_w )
 {
-	const device_config *speaker = devtag_get_device(space->machine, SOUND, "speaker");
+	const device_config *speaker = devtag_get_device(space->machine, "speaker");
 
 	speaker_level_w(speaker, (data & 0x01) ? 1 : 0);		/* End-of-Level */
 
@@ -1103,7 +1103,7 @@ WRITE8_HANDLER( schasrcv_sh_port_2_w )
 
 WRITE8_HANDLER( yosakdon_sh_port_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 0, 3, 0);			/* Game Over */
@@ -1119,8 +1119,8 @@ WRITE8_HANDLER( yosakdon_sh_port_1_w )
 
 WRITE8_HANDLER( yosakdon_sh_port_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
-	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
+	const device_config *sn = devtag_get_device(space->machine, "sn");
 	UINT8 rising_bits = data & ~port_2_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 1, 6, 0);			/* Ready? , Game Over */
@@ -1145,8 +1145,8 @@ WRITE8_HANDLER( shuttlei_sh_port_1_w )
 {
 	/* bit 3 is high while you are alive and playing */
 
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
-	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
+	const device_config *sn = devtag_get_device(space->machine, "sn");
 	UINT8 rising_bits = data & ~port_1_last_extra;
 
 	if (rising_bits & 0x01) sample_start(samples, 4, 4, 0);			/* Fleet move */
@@ -1159,7 +1159,7 @@ WRITE8_HANDLER( shuttlei_sh_port_1_w )
 
 WRITE8_HANDLER( shuttlei_sh_port_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	switch (data)
 	{
 		case 0x23:

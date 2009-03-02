@@ -417,8 +417,8 @@ static ADDRESS_MAP_START( dunhuang_io_map, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE( 0x001b, 0x001b ) AM_WRITE( dunhuang_block_dest_w )
 
-	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE( SOUND, "ym", ym2413_register_port_w	)
-	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE( SOUND, "ym", ym2413_data_port_w		)
+	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE( "ym", ym2413_register_port_w	)
+	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE( "ym", ym2413_data_port_w		)
 
 //  AM_RANGE( 0x0082, 0x0082 ) AM_WRITE( dunhuang_82_w )
 
@@ -431,9 +431,9 @@ static ADDRESS_MAP_START( dunhuang_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0086, 0x0086 ) AM_WRITE( dunhuang_rombank_w )
 	AM_RANGE( 0x0087, 0x0087 ) AM_WRITE( dunhuang_layers_w )
 
-	AM_RANGE( 0x0088, 0x0088 ) AM_DEVREAD( SOUND, "ay8910", ay8910_r )
-	AM_RANGE( 0x0090, 0x0090 ) AM_DEVWRITE( SOUND, "ay8910", ay8910_data_w )
-	AM_RANGE( 0x0098, 0x0098 ) AM_DEVWRITE( SOUND, "ay8910", ay8910_address_w )
+	AM_RANGE( 0x0088, 0x0088 ) AM_DEVREAD( "ay8910", ay8910_r )
+	AM_RANGE( 0x0090, 0x0090 ) AM_DEVWRITE( "ay8910", ay8910_data_w )
+	AM_RANGE( 0x0098, 0x0098 ) AM_DEVWRITE( "ay8910", ay8910_address_w )
 ADDRESS_MAP_END
 
 

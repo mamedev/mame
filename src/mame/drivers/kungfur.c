@@ -160,14 +160,14 @@ static WRITE8_DEVICE_HANDLER( kungfur_adpcm1_w )
 {
 	adpcm_pos[0] = 0x40000+(data & 0xff) * 0x100;
 	adpcm_idle[0] = 0;
-	msm5205_reset_w(devtag_get_device(device->machine, SOUND, "adpcm1"),0);
+	msm5205_reset_w(devtag_get_device(device->machine, "adpcm1"),0);
 }
 
 static WRITE8_DEVICE_HANDLER( kungfur_adpcm2_w )
 {
 	adpcm_pos[1] = (data & 0xff) * 0x400;
 	adpcm_idle[1] = 0;
-	msm5205_reset_w(devtag_get_device(device->machine, SOUND, "adpcm2"),0);
+	msm5205_reset_w(devtag_get_device(device->machine, "adpcm2"),0);
 }
 
 /*
@@ -182,10 +182,10 @@ static WRITE8_DEVICE_HANDLER( kungfur_adpcm2_w )
 */
 static ADDRESS_MAP_START( kungfur_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(SOUND, "adpcm1", kungfur_adpcm1_w)
-	AM_RANGE(0x4004, 0x4004) AM_DEVWRITE(SOUND, "adpcm2", kungfur_adpcm2_w)
-	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x400c, 0x400f) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("adpcm1", kungfur_adpcm1_w)
+	AM_RANGE(0x4004, 0x4004) AM_DEVWRITE("adpcm2", kungfur_adpcm2_w)
+	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x400c, 0x400f) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -262,7 +262,7 @@ static void kfr_adpcm1_int(const device_config *device)
 
 	if (adpcm_pos[0] >= 0x40000 || adpcm_idle[0])
 	{
-		msm5205_reset_w(devtag_get_device(device->machine, SOUND, "adpcm1"),1);
+		msm5205_reset_w(devtag_get_device(device->machine, "adpcm1"),1);
 		trigger = 0;
 	}
 	else
@@ -270,7 +270,7 @@ static void kfr_adpcm1_int(const device_config *device)
 		UINT8 *ROM = memory_region(device->machine, "adpcm1");
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos[0]] & 0x0f) : (ROM[adpcm_pos[0]] & 0xf0)>>4) );
-		msm5205_data_w(devtag_get_device(device->machine, SOUND, "adpcm1"),adpcm_data & 0xf);
+		msm5205_data_w(devtag_get_device(device->machine, "adpcm1"),adpcm_data & 0xf);
 		trigger^=1;
 		if(trigger == 0)
 		{
@@ -288,7 +288,7 @@ static void kfr_adpcm2_int(const device_config *device)
 
 	if (adpcm_pos[1] >= 0x10000 || adpcm_idle[1])
 	{
-		msm5205_reset_w(devtag_get_device(device->machine, SOUND, "adpcm2"),1);
+		msm5205_reset_w(devtag_get_device(device->machine, "adpcm2"),1);
 		trigger = 0;
 	}
 	else
@@ -296,7 +296,7 @@ static void kfr_adpcm2_int(const device_config *device)
 		UINT8 *ROM = memory_region(device->machine, "adpcm2");
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos[1]] & 0x0f) : (ROM[adpcm_pos[1]] & 0xf0)>>4) );
-		msm5205_data_w(devtag_get_device(device->machine, SOUND, "adpcm2"),adpcm_data & 0xf);
+		msm5205_data_w(devtag_get_device(device->machine, "adpcm2"),adpcm_data & 0xf);
 		trigger^=1;
 		if(trigger == 0)
 		{

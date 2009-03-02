@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tbowl_adpcm_start_w )
 {
-	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (offset & 1) ? "msm2" : "msm1");
+	const device_config *adpcm = devtag_get_device(space->machine, (offset & 1) ? "msm2" : "msm1");
 	adpcm_pos[offset & 1] = data << 8;
 	msm5205_reset_w(adpcm,0);
 }
@@ -175,7 +175,7 @@ static WRITE8_HANDLER( tbowl_adpcm_end_w )
 
 static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 {
-	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (offset & 1) ? "msm2" : "msm1");
+	const device_config *adpcm = devtag_get_device(space->machine, (offset & 1) ? "msm2" : "msm1");
 	msm5205_set_volume(adpcm, (data & 0x7f) * 100 / 0x7f);
 }
 
@@ -202,8 +202,8 @@ static void tbowl_adpcm_int(const device_config *device)
 static ADDRESS_MAP_START( 6206A_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE(SOUND, "ym1", ym3812_w)
-	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE(SOUND, "ym2", ym3812_w)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ym1", ym3812_w)
+	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(tbowl_adpcm_end_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(tbowl_adpcm_start_w)
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(tbowl_adpcm_vol_w)

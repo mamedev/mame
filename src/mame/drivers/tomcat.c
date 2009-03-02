@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( tomcat_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_BASE((UINT16**)&vectorram) AM_SIZE(&vectorram_size)
 	AM_RANGE(0xffa000, 0xffbfff) AM_READWRITE(tomcat_shared_ram_r, tomcat_shared_ram_w)
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_DEVREADWRITE8(M48T02, "m48t02", timekeeper_r, timekeeper_w, 0xff00)
+	AM_RANGE(0xffd000, 0xffdfff) AM_DEVREADWRITE8("m48t02", timekeeper_r, timekeeper_w, 0xff00)
 	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE8(tomcat_nvram_r, tomcat_nvram_w, 0x00ff)
 ADDRESS_MAP_END
 
@@ -287,13 +287,13 @@ static WRITE8_HANDLER(soundlatches_w)
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x3000, 0x30df) AM_WRITE(soundlatches_w)
 	AM_RANGE(0x30e0, 0x30e0) AM_NOP // COINRD Inputs: D7 = Coin L, D6 = Coin R, D5 = SOUNDFLAG
 	AM_RANGE(0x5000, 0x507f) AM_RAM	// 6532 ram
-	AM_RANGE(0x5080, 0x509f) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x6000, 0x601f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x5080, 0x509f) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x6000, 0x601f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x8000, 0xffff) AM_NOP // main sound program rom
 ADDRESS_MAP_END
 

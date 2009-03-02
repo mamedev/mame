@@ -50,7 +50,7 @@ struct _ide_config
 	MDRV_DEVICE_CONFIG_DATA32(ide_config, bmspace, ADDRESS_SPACE_##_space)
 
 #define MDRV_IDE_CONTROLLER_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, IDE_CONTROLLER)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 

@@ -101,14 +101,14 @@ static ADDRESS_MAP_START( paradise_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w	)	// ROM bank
-	AM_RANGE(0x2007, 0x2007) AM_DEVWRITE(SOUND, "oki2", paradise_okibank_w	)	// OKI 1 samples bank
-	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)	// OKI 0
+	AM_RANGE(0x2007, 0x2007) AM_DEVWRITE("oki2", paradise_okibank_w	)	// OKI 1 samples bank
+	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// OKI 0
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1"			)
 	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2"			)
 	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1"				)
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2"				)
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM"			)
-	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE(SOUND, "oki2", okim6295_r, okim6295_w)	// OKI 1
+	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	// OKI 1
 	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE(&videoram) 	// Pixmap
 ADDRESS_MAP_END
 
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( torus_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w	)	// ROM bank
-	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)	// OKI 0
+	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// OKI 0
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1"			)
 	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2"			)
 	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1"				)

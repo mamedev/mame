@@ -189,7 +189,7 @@ MACHINE_RESET( balsente )
 	{
 		char name[10];
 		sprintf(name, "cem%d", i+1);
-		cem_device[i] = devtag_get_device(machine, SOUND, name);
+		cem_device[i] = devtag_get_device(machine, name);
 		assert(cem_device[i] != NULL);
 	}
 

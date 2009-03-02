@@ -90,8 +90,8 @@ static WRITE8_HANDLER( mogura_tileram_w )
 
 static WRITE8_HANDLER(mogura_dac_w)
 {
-	dac_data_w(devtag_get_device(space->machine, SOUND, "dac1"), data & 0xf0 );	/* left */
-	dac_data_w(devtag_get_device(space->machine, SOUND, "dac2"), (data & 0x0f)<<4 );	/* right */
+	dac_data_w(devtag_get_device(space->machine, "dac1"), data & 0xf0 );	/* left */
+	dac_data_w(devtag_get_device(space->machine, "dac2"), (data & 0x0f)<<4 );	/* right */
 }
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )

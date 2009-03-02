@@ -146,7 +146,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( seawolf_audio_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* if (data & 0x01)  enable SHIP HIT sound */
@@ -212,8 +212,8 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( gunfight_audio_w )
 {
-	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
+	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
 
 	/* D0 and D1 are just tied to 1k resistors */
 
@@ -1645,8 +1645,8 @@ WRITE8_HANDLER( gmissile_audio_1_w )
        reversed (D5=R, D7=L), but the software confirms that
        ours is right */
 
-	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
+	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* D0 and D1 are not connected */
@@ -1741,8 +1741,8 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( m4_audio_1_w )
 {
-	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
+	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* D0 and D1 are not connected */
@@ -1769,8 +1769,8 @@ WRITE8_HANDLER( m4_audio_1_w )
 
 WRITE8_HANDLER( m4_audio_2_w )
 {
-	const device_config *samples0 = devtag_get_device(space->machine, SOUND, "samples1");
-	const device_config *samples1 = devtag_get_device(space->machine, SOUND, "samples2");
+	const device_config *samples0 = devtag_get_device(space->machine, "samples1");
+	const device_config *samples1 = devtag_get_device(space->machine, "samples2");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	/* if (data & 0x01)  enable LEFT PLAYER EXPLOSION sound via 510K res (goes to left speaker) */
@@ -2043,7 +2043,7 @@ WRITE8_HANDLER( clowns_audio_1_w )
 
 WRITE8_DEVICE_HANDLER( clowns_audio_2_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	discrete_sound_w(device, CLOWNS_POP_BOTTOM_EN, (data >> 0) & 0x01);
@@ -2745,7 +2745,7 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w )
 
 WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(device->machine, "sn");
 
 	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
 
@@ -2798,7 +2798,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( phantom2_audio_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	/* if (data & 0x01)  enable PLAYER SHOT sound */
@@ -2820,7 +2820,7 @@ WRITE8_HANDLER( phantom2_audio_1_w )
 
 WRITE8_HANDLER( phantom2_audio_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	/* D0-D2 are not connected */
@@ -3660,7 +3660,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(device->machine, "sn");
 
 	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
 
@@ -4042,7 +4042,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn1");
+	const device_config *sn = devtag_get_device(device->machine, "sn1");
 
 	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
 
@@ -4068,7 +4068,7 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w )
 
 WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w )
 {
-	const device_config *sn = devtag_get_device(device->machine, SOUND, "sn2");
+	const device_config *sn = devtag_get_device(device->machine, "sn2");
 
 	sn76477_enable_w(sn, (~data >> 0) & 0x01);	/* saucer sound */
 

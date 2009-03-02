@@ -130,11 +130,11 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
 	AM_RANGE(0x6800, 0x69ff) AM_WRITE(iqblock_fgvideoram_w)	/* initialized up to 6fff... bug or larger tilemap? */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE(PPI8255, "ppi8255", ppi8255_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVREAD(PPI8255, "ppi8255", ppi8255_r)
+	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE("ppi8255", ppi8255_w)
+	AM_RANGE(0x5080, 0x5083) AM_DEVREAD("ppi8255", ppi8255_r)
 	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("SW0")
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("SW1")
-	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE(SOUND, "ym", ym2413_w) // UM3567_data_port_0_w
+	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ym", ym2413_w) // UM3567_data_port_0_w
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(iqblock_irqack_w)
 	AM_RANGE(0x7000, 0x7fff) AM_READ(iqblock_bgvideoram_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(extrarom_r)

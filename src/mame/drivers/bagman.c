@@ -152,7 +152,7 @@ static WRITE8_HANDLER( bagman_ls259_w )
 
 		if (offset==3)
 		{
-			const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+			const device_config *tms = devtag_get_device(space->machine, "tms");
 			if (ls259_buf[3] == 0)	/* 1->0 transition */
 			{
 				reset_talking(tms);
@@ -221,14 +221,14 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)	/* ???? */
 
 	/* guess */
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("ay", ay8910_r)
 	//AM_RANGE(0x56, 0x56) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 

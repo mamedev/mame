@@ -259,9 +259,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tubep_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay3", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_READ(tubep_soundlatch_r)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tubep_sound_unknown)
 ADDRESS_MAP_END
@@ -613,12 +613,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rjammer_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(rjammer_soundlatch_r)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "msm", rjammer_voice_startstop_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE(SOUND, "msm", rjammer_voice_frequency_select_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("msm", rjammer_voice_startstop_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE("msm", rjammer_voice_frequency_select_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(rjammer_voice_input_w)
-	AM_RANGE(0x90, 0x91) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x92, 0x93) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0x94, 0x95) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
+	AM_RANGE(0x90, 0x91) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x92, 0x93) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x94, 0x95) AM_DEVWRITE("ay3", ay8910_address_data_w)
 	AM_RANGE(0x96, 0x96) AM_WRITE(rjammer_voice_intensity_control_w)
 ADDRESS_MAP_END
 

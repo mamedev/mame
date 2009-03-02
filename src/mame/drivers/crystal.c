@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( crystal_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_BASE(&vidregs)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_BASE(&textureram)
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(&frameram)
-	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE(SOUND, "vrender", vr0_snd_read, vr0_snd_write)
+	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vr0_snd_read, vr0_snd_write)
 
 	AM_RANGE(0x05000000, 0x05000003) AM_READ(FlashCmd_r) AM_WRITE(FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_READ(SMH_BANK1)
@@ -531,7 +531,7 @@ static MACHINE_RESET(crystal)
 		timer_adjust_oneshot(Timer[i],attotime_never,0);
 	}
 
-	vr0_snd_set_areas(devtag_get_device(machine, SOUND, "vrender"), textureram,frameram);
+	vr0_snd_set_areas(devtag_get_device(machine, "vrender"), textureram,frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	FlipCntRead=0;
 #endif

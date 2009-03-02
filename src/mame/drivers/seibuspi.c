@@ -851,7 +851,7 @@ static WRITE32_HANDLER( ds2404_clk_w )
 
 static WRITE32_HANDLER( eeprom_w )
 {
-	const device_config *oki2 = devtag_get_device(space->machine, SOUND, "oki2");
+	const device_config *oki2 = devtag_get_device(space->machine, "oki2");
 
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
@@ -1024,7 +1024,7 @@ static ADDRESS_MAP_START( spisound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x400b, 0x400b) AM_WRITENOP			/* Unknown */
 	AM_RANGE(0x4013, 0x4013) AM_READ(z80_coin_r)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)		/* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE(SOUND, "ymf", ymf271_r, ymf271_w)
+	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("ymf", ymf271_r, ymf271_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
@@ -1090,8 +1090,8 @@ static ADDRESS_MAP_START( seibu386_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE(eeprom_w)
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE(&spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE(2)
-	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8(SOUND, "oki1", okim6295_r, okim6295_w, 0x000000ff)
-	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8(SOUND, "oki2", okim6295_r, okim6295_w, 0x000000ff)
+	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x000000ff)
+	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE(2)		/* ROM location in real-mode */
 ADDRESS_MAP_END
 

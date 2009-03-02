@@ -14,7 +14,7 @@
 	MDRV_DEVICE_ADD(_tag, ATARIVGEAROM, 0)
 
 #define MDRV_ATARIVGEAROM_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, ATARIVGEAROM)
+	MDRV_DEVICE_REMOVE(_tag)
 
 /***************************************************************************
     FUNCTION PROTOTYPES

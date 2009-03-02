@@ -291,14 +291,12 @@ union _machine_config_token
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define MDRV_DEVICE_REMOVE(_tag, _type) \
+#define MDRV_DEVICE_REMOVE(_tag) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_REMOVE, 8), \
-	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define MDRV_DEVICE_MODIFY(_tag, _type)	\
+#define MDRV_DEVICE_MODIFY(_tag)	\
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_MODIFY, 8), \
-	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
 

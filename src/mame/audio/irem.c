@@ -62,8 +62,8 @@ static WRITE8_HANDLER( m6803_port2_w )
 	/* write latch */
 	if ((port2 & 0x01) && !(data & 0x01))
 	{
-		const device_config *ay1 = devtag_get_device(space->machine, SOUND, "ay1");
-		const device_config *ay2 = devtag_get_device(space->machine, SOUND, "ay2");
+		const device_config *ay1 = devtag_get_device(space->machine, "ay1");
+		const device_config *ay2 = devtag_get_device(space->machine, "ay2");
 
 		/* control or data port? */
 		if (port2 & 0x04)
@@ -98,9 +98,9 @@ static READ8_HANDLER( m6803_port1_r )
 {
 	/* PSG 0 or 1? */
 	if (port2 & 0x08)
-		return ay8910_r(devtag_get_device(space->machine, SOUND, "ay1"), 0);
+		return ay8910_r(devtag_get_device(space->machine, "ay1"), 0);
 	if (port2 & 0x10)
-		return ay8910_r(devtag_get_device(space->machine, SOUND, "ay2"), 0);
+		return ay8910_r(devtag_get_device(space->machine, "ay2"), 0);
 	return 0xff;
 }
 
@@ -120,8 +120,8 @@ static READ8_HANDLER( m6803_port2_r )
 
 static WRITE8_DEVICE_HANDLER( ay8910_0_portb_w )
 {
-	const device_config *adpcm0 = devtag_get_device(device->machine, SOUND, "msm1");
-	const device_config *adpcm1 = devtag_get_device(device->machine, SOUND, "msm2");
+	const device_config *adpcm0 = devtag_get_device(device->machine, "msm1");
+	const device_config *adpcm1 = devtag_get_device(device->machine, "msm2");
 
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
 	msm5205_playmode_w(adpcm0, (data >> 2) & 7);
@@ -160,12 +160,12 @@ static WRITE8_HANDLER( m52_adpcm_w )
 {
 	if (offset & 1)
 	{
-		const device_config *adpcm = devtag_get_device(space->machine, SOUND, "msm1");
+		const device_config *adpcm = devtag_get_device(space->machine, "msm1");
 		msm5205_data_w(adpcm, data);
 	}
 	if (offset & 2)
 	{
-		const device_config *adpcm = devtag_get_device(space->machine, SOUND, "msm2");
+		const device_config *adpcm = devtag_get_device(space->machine, "msm2");
 		if (adpcm != NULL)
 			msm5205_data_w(adpcm, data);
 	}
@@ -174,7 +174,7 @@ static WRITE8_HANDLER( m52_adpcm_w )
 
 static WRITE8_HANDLER( m62_adpcm_w )
 {
-	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (offset & 1) ? "msm2" : "msm1");
+	const device_config *adpcm = devtag_get_device(space->machine, (offset & 1) ? "msm2" : "msm1");
 	if (adpcm != NULL)
 		msm5205_data_w(adpcm, data);
 }
@@ -189,7 +189,7 @@ static WRITE8_HANDLER( m62_adpcm_w )
 
 static void adpcm_int(const device_config *device)
 {
-	const device_config *msm2 = devtag_get_device(device->machine, SOUND, "msm2");
+	const device_config *msm2 = devtag_get_device(device->machine, "msm2");
 
 	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 

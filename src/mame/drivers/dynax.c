@@ -347,7 +347,7 @@ static WRITE8_HANDLER( yarunara_palette_w )
 
 		case 0x1c:	// RTC
 		{
-			const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "rtc");
+			const device_config *rtc = devtag_get_device(space->machine, "rtc");
 			msm6242_w(rtc, offset, data);
 		}
 		return;
@@ -442,7 +442,7 @@ static MACHINE_RESET( adpcm )
 {
 	/* start with the MSM5205 reset */
 	resetkludge = 0;
-	msm5205_reset_w(devtag_get_device(machine, SOUND, "msm"),1);
+	msm5205_reset_w(devtag_get_device(machine, "msm"),1);
 }
 
 static WRITE8_HANDLER( yarunara_layer_half_w )
@@ -532,15 +532,15 @@ static ADDRESS_MAP_START( hanamai_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x6c, 0x6c ) AM_WRITE		( dynax_blit_palette01_w	)	// Layers Palettes (Low Bits)
 	AM_RANGE( 0x6d, 0x6d ) AM_WRITE		( dynax_blit_palette23_w	)	//
 	AM_RANGE( 0x6e, 0x6e ) AM_WRITE		( dynax_blit_backpen_w		)	// Background Color
-	AM_RANGE( 0x70, 0x70 ) AM_DEVWRITE	( SOUND, "msm", adpcm_reset_w)	// MSM5205 reset
+	AM_RANGE( 0x70, 0x70 ) AM_DEVWRITE	( "msm", adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x71, 0x71 ) AM_WRITE		( dynax_flipscreen_w		)	// Flip Screen
 	AM_RANGE( 0x72, 0x72 ) AM_WRITE		( dynax_coincounter_0_w		)	// Coin Counters
 	AM_RANGE( 0x73, 0x73 ) AM_WRITE		( dynax_coincounter_1_w		)	//
 	AM_RANGE( 0x74, 0x74 ) AM_WRITE		( dynax_blitter_ack_w		)	// Blitter IRQ Ack
 	AM_RANGE( 0x76, 0x76 ) AM_WRITE		( dynax_blit_palbank_w		)	// Layers Palettes (High Bit)
 	AM_RANGE( 0x77, 0x77 ) AM_WRITE		( hanamai_layer_half_w		)	// half of the interleaved layer to write to
-	AM_RANGE( 0x78, 0x79 ) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w	)	// 2 x DSW
-	AM_RANGE( 0x7a, 0x7b ) AM_DEVWRITE	( SOUND, "ay", ay8910_address_data_w	)	// AY8910
+	AM_RANGE( 0x78, 0x79 ) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w	)	// 2 x DSW
+	AM_RANGE( 0x7a, 0x7b ) AM_DEVWRITE	( "ay", ay8910_address_data_w	)	// AY8910
 //  AM_RANGE( 0x7c, 0x7c ) AM_WRITE     ( SMH_NOP                  )   // CRT Controller
 //  AM_RANGE( 0x7d, 0x7d ) AM_WRITE     ( SMH_NOP                  )   //
 	AM_RANGE( 0x7e, 0x7e ) AM_WRITE		( dynax_blit_romregion_w	)	// Blitter ROM bank
@@ -559,12 +559,12 @@ static ADDRESS_MAP_START( hnoridur_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT	( "DSW1"				)	// DSW2
 	AM_RANGE( 0x25, 0x25 ) AM_READ_PORT	( "DSW3"				)	// DSW4
 	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT	( "DSW2"				)	// DSW3
-	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( SOUND, "msm", adpcm_reset_w 	)	// MSM5205 reset
+	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( "msm", adpcm_reset_w 	)	// MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE	( adpcm_data_w				)	// MSM5205 data
-	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE( SOUND, "ym", ym2413_w	)	//
-	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD	( SOUND, "ay", ay8910_r			)	// AY8910, DSW1
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE	( SOUND, "ay", ay8910_data_w	)	// AY8910
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE	( SOUND, "ay", ay8910_address_w	)	//
+	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE( "ym", ym2413_w	)	//
+	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD	( "ay", ay8910_r			)	// AY8910, DSW1
+	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE	( "ay", ay8910_data_w	)	// AY8910
+	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE	( "ay", ay8910_address_w	)	//
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE	( dynax_blit_pen_w			)	// Destination Pen
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE	( dynax_blit_dest_w			)	// Destination Layer
 	AM_RANGE( 0x42, 0x42 ) AM_WRITE	( dynax_blit_palette01_w	)	// Layers Palettes
@@ -685,11 +685,11 @@ static ADDRESS_MAP_START( yarunara_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x00, 0x01 ) AM_WRITE	( yarunara_input_w			)	// Controls
 	AM_RANGE( 0x02, 0x03 ) AM_READ	( yarunara_input_r			)	//
 	AM_RANGE( 0x11, 0x17 ) AM_WRITE	( dynax_blitter_rev2_w		)	// Blitter
-	AM_RANGE( 0x20, 0x20 ) AM_DEVWRITE	( SOUND, "msm", adpcm_reset_w	)	// MSM5205 reset
+	AM_RANGE( 0x20, 0x20 ) AM_DEVWRITE	( "msm", adpcm_reset_w	)	// MSM5205 reset
 	AM_RANGE( 0x22, 0x22 ) AM_WRITE	( adpcm_data_w				)	// MSM5205 data
-	AM_RANGE( 0x24, 0x25 ) AM_DEVWRITE( SOUND, "ym", ym2413_w	)	//
-	AM_RANGE( 0x28, 0x28 ) AM_DEVWRITE	( SOUND, "ay", ay8910_data_w	)	// AY8910
-	AM_RANGE( 0x2a, 0x2a ) AM_DEVWRITE	( SOUND, "ay", ay8910_address_w	)	//
+	AM_RANGE( 0x24, 0x25 ) AM_DEVWRITE( "ym", ym2413_w	)	//
+	AM_RANGE( 0x28, 0x28 ) AM_DEVWRITE	( "ay", ay8910_data_w	)	// AY8910
+	AM_RANGE( 0x2a, 0x2a ) AM_DEVWRITE	( "ay", ay8910_address_w	)	//
 	AM_RANGE( 0x48, 0x48 ) AM_WRITE	( dynax_extra_scrollx_w		)	// screen scroll X
 	AM_RANGE( 0x49, 0x49 ) AM_WRITE	( dynax_extra_scrolly_w		)	// screen scroll Y
 	AM_RANGE( 0x4a, 0x4a ) AM_WRITE	( yarunara_rombank_w		)	// BANK ROM Select
@@ -724,11 +724,11 @@ static ADDRESS_MAP_START( mcnpshnt_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x23, 0x23 ) AM_READ	( hanamai_keyboard_0_r		)	// P1
 	AM_RANGE( 0x24, 0x24 ) AM_READ_PORT	( "DSW0"				)	// DSW2
 	AM_RANGE( 0x26, 0x26 ) AM_READ_PORT	( "DSW1"				)	// DSW3
-	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( SOUND, "msm", adpcm_reset_w	)	// MSM5205 reset
+	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( "msm", adpcm_reset_w	)	// MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE	( adpcm_data_w				)	// MSM5205 data
-	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE( SOUND, "ym", ym2413_w	)	//
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE	( SOUND, "ay", ay8910_data_w	)	// AY8910
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE	( SOUND, "ay", ay8910_address_w	)	//
+	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE( "ym", ym2413_w	)	//
+	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE	( "ay", ay8910_data_w	)	// AY8910
+	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE	( "ay", ay8910_address_w	)	//
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE	( dynax_blit_pen_w			)	// Destination Pen
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE	( dynax_blit_dest_w			)	// Destination Layer
 	AM_RANGE( 0x42, 0x42 ) AM_WRITE	( dynax_blit_palette01_w	)	// Layers Palettes
@@ -754,7 +754,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sprtmtch_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE		( dynax_blitter_rev2_w		)	// Blitter
-	AM_RANGE( 0x10, 0x11 ) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w	)	// 2 x DSW
+	AM_RANGE( 0x10, 0x11 ) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w	)	// 2 x DSW
 //  AM_RANGE( 0x12, 0x12 ) AM_WRITE     ( SMH_NOP                   )   // CRT Controller
 //  AM_RANGE( 0x13, 0x13 ) AM_WRITE     ( SMH_NOP                   )   // CRT Controller
 	AM_RANGE( 0x20, 0x20 ) AM_READ_PORT	( "P1"						)	// P1
@@ -769,7 +769,7 @@ static ADDRESS_MAP_START( sprtmtch_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x35, 0x35 ) AM_WRITE		( dynax_blit_palette23_w	)	//
 	AM_RANGE( 0x36, 0x36 ) AM_WRITE		( dynax_blit_backpen_w		)	// Background Color
 	AM_RANGE( 0x37, 0x37 ) AM_WRITE		( dynax_vblank_ack_w		)	// VBlank IRQ Ack
-//  AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE  ( SOUND, "msm", adpcm_reset_w   )   // MSM5205 reset
+//  AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE  ( "msm", adpcm_reset_w   )   // MSM5205 reset
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE		( dynax_flipscreen_w		)	// Flip Screen
 	AM_RANGE( 0x42, 0x42 ) AM_WRITE		( dynax_coincounter_0_w		)	// Coin Counters
 	AM_RANGE( 0x43, 0x43 ) AM_WRITE		( dynax_coincounter_1_w		)	//
@@ -800,18 +800,18 @@ static ADDRESS_MAP_START( mjfriday_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x63, 0x63 ) AM_READ	( hanamai_keyboard_0_r		)	// P1
 	AM_RANGE( 0x64, 0x64 ) AM_READ_PORT	( "DSW0"				)	// DSW
 	AM_RANGE( 0x67, 0x67 ) AM_READ_PORT	( "DSW1"				)	// DSW
-	AM_RANGE( 0x70, 0x71 ) AM_DEVWRITE ( SOUND, "ym", ym2413_w )	//
+	AM_RANGE( 0x70, 0x71 ) AM_DEVWRITE ( "ym", ym2413_w )	//
 //  AM_RANGE( 0x80, 0x80 ) AM_WRITE ( SMH_NOP                   )   // IRQ ack?
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nanajign_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE	( SOUND, "msm", adpcm_reset_w	)	// MSM5205 reset
+	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE	( "msm", adpcm_reset_w	)	// MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE	( adpcm_data_w				)	// MSM5205 data
-	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE( SOUND, "ym", ym2413_w	)	//
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE	( SOUND, "ay", ay8910_data_w	)	// AY8910
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE	( SOUND, "ay", ay8910_address_w	)	//
+	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE( "ym", ym2413_w	)	//
+	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE	( "ay", ay8910_data_w	)	// AY8910
+	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE	( "ay", ay8910_address_w	)	//
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE	( hanamai_keyboard_w		)	// keyboard row select
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT	( "IN0"					)	// Coins
 	AM_RANGE( 0x12, 0x12 ) AM_READ	( hanamai_keyboard_1_r		)	// P2
@@ -937,10 +937,10 @@ static ADDRESS_MAP_START( jantouki_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE		( jantouki_sound_rombank_w		)	// BANK ROM Select
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE		( jantouki_sound_vblank_ack_w	)	// VBlank IRQ Ack
-	AM_RANGE( 0x21, 0x21 ) AM_DEVREAD	( SOUND, "ay", ay8910_r			)	// AY8910
-	AM_RANGE( 0x22, 0x23 ) AM_DEVWRITE	( SOUND, "ay", ay8910_data_address_w )	//
-	AM_RANGE( 0x28, 0x29 ) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)	//
-	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( SOUND, "msm", adpcm_reset_w	)	// MSM5205 reset
+	AM_RANGE( 0x21, 0x21 ) AM_DEVREAD	( "ay", ay8910_r			)	// AY8910
+	AM_RANGE( 0x22, 0x23 ) AM_DEVWRITE	( "ay", ay8910_data_address_w )	//
+	AM_RANGE( 0x28, 0x29 ) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)	//
+	AM_RANGE( 0x30, 0x30 ) AM_DEVWRITE	( "msm", adpcm_reset_w	)	// MSM5205 reset
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE		( adpcm_data_w					)	// MSM5205 data
 	AM_RANGE( 0x50, 0x50 ) AM_READ		( jantouki_soundlatch_status_r	)	// Soundlatch status
 	AM_RANGE( 0x60, 0x60 ) AM_WRITE		( jantouki_soundlatch_ack_w		)	// Soundlatch status
@@ -973,11 +973,11 @@ static WRITE8_HANDLER( mjelctrn_blitter_ack_w )
 
 static ADDRESS_MAP_START( mjelctrn_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE	( SOUND, "msm", adpcm_reset_w	)	// MSM5205 reset
+	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE	( "msm", adpcm_reset_w	)	// MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE	( adpcm_data_w				)	// MSM5205 data
-	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE( SOUND, "ym", ym2413_w	)	//
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_w	)	// AY8910
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE( SOUND, "ay", ay8910_address_w	)	//
+	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE( "ym", ym2413_w	)	//
+	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE( "ay", ay8910_data_w	)	// AY8910
+	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE( "ay", ay8910_address_w	)	//
 	AM_RANGE( 0x11, 0x12 ) AM_WRITE	( mjelctrn_blitter_ack_w	)	//?
 //  AM_RANGE( 0x20, 0x20 ) AM_WRITE ( SMH_NOP                  )   // CRT Controller
 //  AM_RANGE( 0x21, 0x21 ) AM_WRITE ( SMH_NOP                  )   // CRT Controller
@@ -1119,11 +1119,11 @@ static ADDRESS_MAP_START( htengoku_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x21, 0x21 ) AM_WRITE ( htengoku_coin_w			)	//
 	AM_RANGE( 0x22, 0x22 ) AM_READ	( htengoku_coin_r			)	//
 	AM_RANGE( 0x23, 0x23 ) AM_READ	( htengoku_input_r			)	//
-	AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE	( SOUND, "ay", ay8910_address_w	)	// AY8910
-	AM_RANGE( 0x42, 0x42 ) AM_DEVREAD  ( SOUND, "ay", ay8910_r		)	//
-	AM_RANGE( 0x44, 0x44 ) AM_DEVWRITE	( SOUND, "ay", ay8910_data_w)	//
-	AM_RANGE( 0x46, 0x47 ) AM_DEVWRITE( SOUND, "ym", ym2413_w	)	//
-	AM_RANGE( 0x80, 0x8f ) AM_DEVREADWRITE(MSM6242, "rtc", msm6242_r, msm6242_w)	// 6242RTC
+	AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE	( "ay", ay8910_address_w	)	// AY8910
+	AM_RANGE( 0x42, 0x42 ) AM_DEVREAD  ( "ay", ay8910_r		)	//
+	AM_RANGE( 0x44, 0x44 ) AM_DEVWRITE	( "ay", ay8910_data_w)	//
+	AM_RANGE( 0x46, 0x47 ) AM_DEVWRITE( "ym", ym2413_w	)	//
+	AM_RANGE( 0x80, 0x8f ) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)	// 6242RTC
 	AM_RANGE( 0xa0, 0xa3 ) AM_WRITE ( ddenlovr_palette_base_w		)	// ddenlovr mixer chip
 	AM_RANGE( 0xa4, 0xa7 ) AM_WRITE ( ddenlovr_palette_mask_w		)
 	AM_RANGE( 0xa8, 0xab ) AM_WRITE ( ddenlovr_transparency_pen_w	)
@@ -1332,7 +1332,7 @@ static READ8_HANDLER( tenkai_8000_r )
 	}
 	else if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "rtc");
+		const device_config *rtc = devtag_get_device(space->machine, "rtc");
 		return msm6242_r(rtc, offset);
 	}
 	else if (rombank == 0x12)
@@ -1348,7 +1348,7 @@ static WRITE8_HANDLER( tenkai_8000_w )
 {
 	if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "rtc");
+		const device_config *rtc = devtag_get_device(space->machine, "rtc");
 		msm6242_w(rtc, offset, data);
 		return;
 	}
@@ -1393,10 +1393,10 @@ static ADDRESS_MAP_START( tenkai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(  0x6000,  0x6fff ) AM_RAM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE( tenkai_8000_r, tenkai_8000_w )
-	AM_RANGE( 0x10000, 0x10000 ) AM_DEVREAD ( SOUND, "ay", ay8910_r			)	// AY8910
-	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE( SOUND, "ay", ay8910_data_w	)	//
-	AM_RANGE( 0x10010, 0x10010 ) AM_DEVWRITE( SOUND, "ay", ay8910_address_w	)	//
-	AM_RANGE( 0x10020, 0x10021 ) AM_DEVWRITE(SOUND, "ym", ym2413_w	)	//
+	AM_RANGE( 0x10000, 0x10000 ) AM_DEVREAD ( "ay", ay8910_r			)	// AY8910
+	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE( "ay", ay8910_data_w	)	//
+	AM_RANGE( 0x10010, 0x10010 ) AM_DEVWRITE( "ay", ay8910_address_w	)	//
+	AM_RANGE( 0x10020, 0x10021 ) AM_DEVWRITE("ym", ym2413_w	)	//
 	AM_RANGE( 0x10040, 0x10040 ) AM_WRITE( dynax_blit_pen_w			)	// Destination Pen
 	AM_RANGE( 0x10044, 0x10044 ) AM_WRITE( tenkai_blit_dest_w		)	// Destination Layer
 	AM_RANGE( 0x10048, 0x10048 ) AM_WRITE( tenkai_blit_palette23_w	)	// Layers Palettes

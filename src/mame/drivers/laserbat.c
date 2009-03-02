@@ -602,7 +602,7 @@ static int active_8910,port0a;
 
 static READ8_HANDLER( zaccaria_port0a_r )
 {
-	return ay8910_r(devtag_get_device(space->machine, SOUND, (active_8910 == 0) ? "ay1" : "ay2"), 0);
+	return ay8910_r(devtag_get_device(space->machine, (active_8910 == 0) ? "ay1" : "ay2"), 0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -619,7 +619,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay1"), last >> 0, port0a);
+		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), last >> 0, port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -631,7 +631,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay2"), last >> 2, port0a);
+		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), last >> 2, port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{

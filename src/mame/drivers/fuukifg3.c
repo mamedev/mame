@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( fuuki32_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x40, 0x45) AM_DEVREADWRITE(SOUND, "ymf", ymf278b_r, ymf278b_w)
+	AM_RANGE(0x40, 0x45) AM_DEVREADWRITE("ymf", ymf278b_r, ymf278b_w)
 ADDRESS_MAP_END
 
 /***************************************************************************

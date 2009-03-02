@@ -38,8 +38,8 @@ void triplhnt_set_collision(running_machine *machine, int code)
 
 static void triplhnt_update_misc(running_machine *machine, int offset)
 {
-	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
-	const device_config *discrete = devtag_get_device(machine, SOUND, "discrete");
+	const device_config *samples = devtag_get_device(machine, "samples");
+	const device_config *discrete = devtag_get_device(machine, "discrete");
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
 

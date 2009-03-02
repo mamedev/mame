@@ -51,19 +51,19 @@ static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0xf9e) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0xf9e) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0xf9e) AM_READ(cchasm_coin_sound_r)
-	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD(SOUND, "ay1", ay8910_r)
-	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD("ay2", ay8910_r)
 	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch_r, soundlatch3_w)
 	AM_RANGE(0x6041, 0x6041) AM_MIRROR(0xf9e) AM_READWRITE(cchasm_soundlatch2_r, cchasm_soundlatch4_w)
-	AM_RANGE(0x6061, 0x6061) AM_MIRROR(0xf9e) AM_DEVWRITE(Z80CTC, "ctc", z80ctc_trg0_w)
+	AM_RANGE(0x6061, 0x6061) AM_MIRROR(0xf9e) AM_DEVWRITE("ctc", z80ctc_trg0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 static void cchasm_6840_irq(running_machine *machine, int state)
@@ -145,7 +145,7 @@ static MACHINE_START( cchasm )
 
 static const z80_daisy_chain daisy_chain[] =
 {
-	{ Z80CTC, "ctc" },
+	{ "ctc" },
 	{ NULL }
 };
 

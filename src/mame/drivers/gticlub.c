@@ -277,7 +277,7 @@ static VIDEO_UPDATE( hangplt )
 
 	if (strcmp(screen->tag, "lscreen") == 0)
 	{
-		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo0");
+		const device_config *voodoo = devtag_get_device(screen->machine, "voodoo0");
 
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
@@ -287,7 +287,7 @@ static VIDEO_UPDATE( hangplt )
 	}
 	else if (strcmp(screen->tag, "rscreen") == 0)
 	{
-		const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo1");
+		const device_config *voodoo = devtag_get_device(screen->machine, "voodoo1");
 
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
@@ -632,7 +632,7 @@ static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(K056800_sound_r, K056800_sound_w)
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE(SOUND, "rf", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rf", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
 ADDRESS_MAP_END
@@ -673,9 +673,9 @@ static ADDRESS_MAP_START( hangplt_sharc0_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo0", nwk_voodoo_0_r, voodoo_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo0", nwk_voodoo_0_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
-	AM_RANGE(0x3401000, 0x34fffff) AM_DEVWRITE(VOODOO_GRAPHICS, "voodoo0", nwk_fifo_0_w)
+	AM_RANGE(0x3401000, 0x34fffff) AM_DEVWRITE("voodoo0", nwk_fifo_0_w)
 	AM_RANGE(0x3500000, 0x3507fff) AM_READWRITE(K033906_0_r, K033906_0_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(5)
 ADDRESS_MAP_END
@@ -684,9 +684,9 @@ static ADDRESS_MAP_START( hangplt_sharc1_map, ADDRESS_SPACE_DATA, 32 )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo1", nwk_voodoo_1_r, voodoo_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo1", nwk_voodoo_1_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
-	AM_RANGE(0x3401000, 0x34fffff) AM_DEVWRITE(VOODOO_GRAPHICS, "voodoo1", nwk_fifo_1_w)
+	AM_RANGE(0x3401000, 0x34fffff) AM_DEVWRITE("voodoo1", nwk_fifo_1_w)
 	AM_RANGE(0x3500000, 0x3507fff) AM_READWRITE(K033906_1_r, K033906_1_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK(6)
 ADDRESS_MAP_END

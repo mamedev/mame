@@ -158,7 +158,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 //      logerror("PortB reading %02x from the 68K\n",data);
 	}
 	else if ((playmark_oki_control & 0x38) == 0x28) {
-		data = (okim6295_r(devtag_get_device(space->machine, SOUND, "oki"),0) & 0x0f);
+		data = (okim6295_r(devtag_get_device(space->machine, "oki"),0) & 0x0f);
 //      logerror("PortB reading %02x from the OKI status port\n",data);
 	}
 
@@ -341,9 +341,9 @@ ADDRESS_MAP_END
 	/* $000 - 07F  PIC16C57 Internal Data RAM */
 
 static ADDRESS_MAP_START( playmark_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "oki", playmark_oki_banking_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("oki", playmark_oki_banking_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
-	AM_RANGE(0x02, 0x02) AM_READ(playmark_snd_flag_r) AM_DEVWRITE(SOUND, "oki", playmark_snd_control_w)
+	AM_RANGE(0x02, 0x02) AM_READ(playmark_snd_flag_r) AM_DEVWRITE("oki", playmark_snd_control_w)
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 

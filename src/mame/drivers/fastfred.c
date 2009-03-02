@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( jumpcoas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf116, 0xf116) AM_WRITE(fastfred_flip_screen_x_w)
 	AM_RANGE(0xf117, 0xf117) AM_WRITE(fastfred_flip_screen_y_w)
 	//AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)  // Why doesn't this work???
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE(SOUND, "ay8910.1", SMH_NOP, ay8910_address_data_w)
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ay8910.1", SMH_NOP, ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -238,8 +238,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r, interrupt_enable_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM)  // Reset PSG's
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE(SOUND, "ay8910.1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "ay8910.2", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay8910.1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay8910.2", ay8910_address_data_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(SMH_NOP) // only for Imago, read but not used
 ADDRESS_MAP_END
 

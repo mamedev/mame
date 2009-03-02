@@ -271,7 +271,7 @@ static WRITE8_DEVICE_HANDLER( sndlamp_w )
 	output_set_lamp_value(9, (data >> 1) & 1);		/* Bet */
 
 	/* the 4 MSB are for discrete (or DAC) sound */
-	dac_data_w(devtag_get_device(device->machine, SOUND, "dac"), (data & 0xf0));		/* Sound DAC? */
+	dac_data_w(devtag_get_device(device->machine, "dac"), (data & 0xf0));		/* Sound DAC? */
 }
 
 /*game waits for bit 7 (0x80) to be set.*/
@@ -302,12 +302,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautp_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa0, 0xa3) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(vram_data_w)
 	AM_RANGE(0xc1, 0xc1) AM_WRITE(vram_addr_w)
 	AM_RANGE(0xc2, 0xc2) AM_READ(test_r)
-//  AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /*
@@ -327,12 +327,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gtipoker_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xdc, 0xdc) AM_WRITE(vram_data_w)
 	AM_RANGE(0xdd, 0xdd) AM_WRITE(vram_addr_w)
 	AM_RANGE(0xde, 0xde) AM_READ(test_r)
-//  AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xef, 0xef) AM_READ(test_r)
 ADDRESS_MAP_END
 

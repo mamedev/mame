@@ -136,9 +136,9 @@ static ADDRESS_MAP_START( snd_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(adpcm_w)
-	AM_RANGE(0x86, 0x87) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
-	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE(SOUND, "ay3", ay8910_data_address_w)
+	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_data_address_w)
+	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay2", ay8910_data_address_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 

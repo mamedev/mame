@@ -37,8 +37,8 @@ static ADDRESS_MAP_START( io_mem, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x98, 0x98) AM_READWRITE( TMS9928A_vram_r, TMS9928A_vram_w )
 	AM_RANGE(0x99, 0x99) AM_READWRITE( TMS9928A_register_r, TMS9928A_register_w )
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay", ay8910_r)
 
 //Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
 //( http://map.tni.nl/resources/msx_io_ports.php#ppi )

@@ -429,7 +429,7 @@ static WRITE8_HANDLER( ddragon_spriteram_w )
 
 static WRITE8_HANDLER( dd_adpcm_w )
 {
-	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (offset & 1) ? "adpcm2" : "adpcm1");
+	const device_config *adpcm = devtag_get_device(space->machine, (offset & 1) ? "adpcm2" : "adpcm1");
 	int chip = (strcmp(adpcm->tag, "adpcm1") == 0) ? 0 : 1;
 
 	switch (offset/2)
@@ -586,7 +586,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
 	AM_RANGE(0x1800, 0x1800) AM_READ(dd_adpcm_status_r)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE(SOUND, "fm", ym2151_r, ym2151_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("fm", ym2151_r, ym2151_w)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(dd_adpcm_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -595,8 +595,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dd2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE(SOUND, "fm", ym2151_r, ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("fm", ym2151_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

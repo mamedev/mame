@@ -60,9 +60,9 @@ static WRITE8_HANDLER( spcforce_SN76496_select_w )
 {
     spcforce_SN76496_select = data;
 
-	if (~data & 0x40)  sn76496_w(devtag_get_device(space->machine, SOUND, "sn1"), 0, spcforce_SN76496_latch);
-	if (~data & 0x20)  sn76496_w(devtag_get_device(space->machine, SOUND, "sn2"), 0, spcforce_SN76496_latch);
-	if (~data & 0x10)  sn76496_w(devtag_get_device(space->machine, SOUND, "sn3"), 0, spcforce_SN76496_latch);
+	if (~data & 0x40)  sn76496_w(devtag_get_device(space->machine, "sn1"), 0, spcforce_SN76496_latch);
+	if (~data & 0x20)  sn76496_w(devtag_get_device(space->machine, "sn2"), 0, spcforce_SN76496_latch);
+	if (~data & 0x10)  sn76496_w(devtag_get_device(space->machine, "sn3"), 0, spcforce_SN76496_latch);
 }
 
 static READ8_HANDLER( spcforce_t0_r )

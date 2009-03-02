@@ -121,12 +121,12 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	bank_source_data = &rgn[0x10000];
 
 	/* determine which sound hardware is installed */
-	tms5220 = devtag_get_device(machine, SOUND, "tms");
-	ym2151 = devtag_get_device(machine, SOUND, "ym");
-	pokey = devtag_get_device(machine, SOUND, "pokey");
-	oki6295 = devtag_get_device(machine, SOUND, "adpcm");
-	oki6295_l = devtag_get_device(machine, SOUND, "adpcml");
-	oki6295_r = devtag_get_device(machine, SOUND, "adpcmr");
+	tms5220 = devtag_get_device(machine, "tms");
+	ym2151 = devtag_get_device(machine, "ym");
+	pokey = devtag_get_device(machine, "pokey");
+	oki6295 = devtag_get_device(machine, "adpcm");
+	oki6295_l = devtag_get_device(machine, "adpcml");
+	oki6295_r = devtag_get_device(machine, "adpcmr");
 
 	/* install POKEY memory handlers */
 	if (pokey != NULL)
@@ -653,7 +653,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 			/* update the OKI bank */
 			oki6295_bank_base = (0x40000 * ((data >> 1) & 1)) | (oki6295_bank_base & 0x80000);
-			okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "adpcml"), oki6295_bank_base);
+			okim6295_set_bank_base(devtag_get_device(space->machine, "adpcml"), oki6295_bank_base);
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -679,8 +679,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 			/* update the OKI bank */
 			oki6295_bank_base = (0x80000 * ((data >> 4) & 1)) | (oki6295_bank_base & 0x40000);
-			okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "adpcml"), oki6295_bank_base);
-			okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "adpcmr"), 0x40000 * (data >> 6));
+			okim6295_set_bank_base(devtag_get_device(space->machine, "adpcml"), oki6295_bank_base);
+			okim6295_set_bank_base(devtag_get_device(space->machine, "adpcmr"), 0x40000 * (data >> 6));
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -716,7 +716,7 @@ static void update_all_volumes(running_machine *machine )
 
 static ADDRESS_MAP_START( atarijsa1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa1_io_r, jsa1_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -724,7 +724,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atarijsa2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa2_io_r, jsa2_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -733,7 +733,7 @@ ADDRESS_MAP_END
 /* full map verified from schematics and Batman GALs */
 static ADDRESS_MAP_START( atarijsa3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3_io_r, jsa3_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -741,7 +741,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atarijsa3s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3s_io_r, jsa3s_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END

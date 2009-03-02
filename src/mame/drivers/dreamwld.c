@@ -298,10 +298,10 @@ static ADDRESS_MAP_START( dreamwld_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
 
 	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE( dreamwld_6295_0_bank_w ) // sfx
-	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8( SOUND, "oki1", okim6295_r, okim6295_w, 0xff000000 ) // sfx
+	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8( "oki1", okim6295_r, okim6295_w, 0xff000000 ) // sfx
 
 	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE( dreamwld_6295_1_bank_w ) // sfx
-	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8( SOUND, "oki2", okim6295_r, okim6295_w, 0xff000000 ) // sfx
+	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8( "oki2", okim6295_r, okim6295_w, 0xff000000 ) // sfx
 
 	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
 

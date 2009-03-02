@@ -106,10 +106,10 @@ static WRITE8_HANDLER( adpcm_data_w )
 static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "msm", adpcm_control_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", adpcm_control_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE(SOUND, "ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE(SOUND, "ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

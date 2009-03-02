@@ -162,8 +162,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meijinsn_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END

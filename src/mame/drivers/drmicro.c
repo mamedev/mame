@@ -69,7 +69,7 @@ static void pcm_w(const device_config *device)
 static WRITE8_HANDLER( pcm_set_w )
 {
 	pcm_adr = ((data & 0x3f) << 9);
-	pcm_w(devtag_get_device(space->machine, SOUND, "msm"));
+	pcm_w(devtag_get_device(space->machine, "msm"));
 }
 
 /****************************************************************************/
@@ -90,9 +90,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE(SOUND, "sn1", sn76496_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE(SOUND, "sn2", sn76496_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "sn3", sn76496_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76496_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(pcm_set_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(SMH_NOP, SMH_NOP) // unused? / watchdog?

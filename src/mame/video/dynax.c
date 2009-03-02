@@ -1206,8 +1206,8 @@ VIDEO_UPDATE( jantouki )
 {
 	int layers_ctrl = dynax_layer_enable;
 
-	const device_config *top_screen    = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
-	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
+	const device_config *top_screen    = devtag_get_device(screen->machine, "top");
+	const device_config *bottom_screen = devtag_get_device(screen->machine, "bottom");
 
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();

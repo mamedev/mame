@@ -75,8 +75,8 @@ static ADDRESS_MAP_START( dommy_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(btime_mirrorvideoram_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -101,8 +101,8 @@ static ADDRESS_MAP_START( eggs_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(btime_mirrorcolorram_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(btime_video_control_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x3000, 0x7fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 

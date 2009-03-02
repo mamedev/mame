@@ -71,7 +71,7 @@ static int service_mode(running_machine *machine)
 
 static INTERRUPT_GEN( sprint2 )
 {
-	const device_config *discrete = devtag_get_device(device->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(device->machine, "discrete");
 	static UINT8 dial[2];
 
 	/* handle steering wheels */
@@ -267,9 +267,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_WRITE(sprint2_wram_w)
 	AM_RANGE(0x0400, 0x07ff) AM_WRITE(sprint2_video_ram_w) AM_BASE(&sprint2_video_ram)
-	AM_RANGE(0x0c00, 0x0c0f) AM_DEVWRITE(SOUND, "discrete", sprint2_attract_w)
-	AM_RANGE(0x0c10, 0x0c1f) AM_DEVWRITE(SOUND, "discrete", sprint2_skid1_w)
-	AM_RANGE(0x0c20, 0x0c2f) AM_DEVWRITE(SOUND, "discrete", sprint2_skid2_w)
+	AM_RANGE(0x0c00, 0x0c0f) AM_DEVWRITE("discrete", sprint2_attract_w)
+	AM_RANGE(0x0c10, 0x0c1f) AM_DEVWRITE("discrete", sprint2_skid1_w)
+	AM_RANGE(0x0c20, 0x0c2f) AM_DEVWRITE("discrete", sprint2_skid2_w)
 	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
 	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
 	AM_RANGE(0x0c60, 0x0c6f) AM_WRITE(SMH_NOP) /* SPARE */
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE(sprint2_collision_reset2_w)
 	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE(sprint2_steering_reset1_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_WRITE(sprint2_steering_reset2_w)
-	AM_RANGE(0x0f00, 0x0f7f) AM_DEVWRITE(SOUND, "discrete", sprint2_noise_reset_w)
+	AM_RANGE(0x0f00, 0x0f7f) AM_DEVWRITE("discrete", sprint2_noise_reset_w)
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END

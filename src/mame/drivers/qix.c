@@ -243,10 +243,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8bff) AM_READ(SMH_NOP)   /* 6850 ACIA */
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE(PIA6821, "sndpia0", pia_r, pia_w)
-	AM_RANGE(0x9400, 0x97ff) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, qix_pia_w)
-	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
-	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE(PIA6821, "pia2", pia_r, pia_w)
+	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE("sndpia0", pia_r, pia_w)
+	AM_RANGE(0x9400, 0x97ff) AM_DEVREADWRITE("pia0", pia_r, qix_pia_w)
+	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE("pia2", pia_r, pia_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -257,10 +257,10 @@ static ADDRESS_MAP_START( zoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_READ(SMH_NOP)   /* ACIA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE(PIA6821, "sndpia0", pia_r, pia_w)
-	AM_RANGE(0x1400, 0x17ff) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, qix_pia_w)
-	AM_RANGE(0x1800, 0x1bff) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_DEVREADWRITE(PIA6821, "pia2", pia_r, pia_w)
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("sndpia0", pia_r, pia_w)
+	AM_RANGE(0x1400, 0x17ff) AM_DEVREADWRITE("pia0", pia_r, qix_pia_w)
+	AM_RANGE(0x1800, 0x1bff) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+	AM_RANGE(0x1c00, 0x1fff) AM_DEVREADWRITE("pia2", pia_r, pia_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

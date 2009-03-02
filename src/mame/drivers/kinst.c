@@ -157,7 +157,7 @@ static const UINT8 *control_map;
 
 static MACHINE_START( kinst )
 {
-	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+	const device_config *ide = devtag_get_device(machine, "ide");
 	UINT8 *features = ide_get_features(ide);
 
 	if (strncmp(machine->gamedrv->name, "kinst2", 6) != 0)
@@ -403,8 +403,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&rambase)
 	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_BASE(&rambase2)
 	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_BASE(&kinst_control)
-	AM_RANGE(0x10000100, 0x1000013f) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", kinst_ide_r, kinst_ide_w)
-	AM_RANGE(0x10000170, 0x10000173) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", kinst_ide_extra_r, kinst_ide_extra_w)
+	AM_RANGE(0x10000100, 0x1000013f) AM_DEVREADWRITE("ide", kinst_ide_r, kinst_ide_w)
+	AM_RANGE(0x10000170, 0x10000173) AM_DEVREADWRITE("ide", kinst_ide_extra_r, kinst_ide_extra_w)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&rombase)
 ADDRESS_MAP_END
 

@@ -55,7 +55,7 @@ static void trigger_sample(const device_config *samples, UINT8 data);
 
 WRITE8_HANDLER( gottlieb_sh_w )
 {
-	const device_config *riot = device_list_find_by_tag(space->machine->config->devicelist, RIOT6532, "riot");
+	const device_config *riot = devtag_get_device(space->machine, "riot");
 
 	/* identify rev1 boards by the presence of a 6532 RIOT device */
 	if (riot != NULL)
@@ -74,7 +74,7 @@ WRITE8_HANDLER( gottlieb_sh_w )
 
 static void gottlieb1_sh_w(const device_config *riot, UINT8 data)
 {
-	const device_config *samples = devtag_get_device(riot->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(riot->machine, "samples");
 	int pa7 = (data & 0x0f) != 0xf;
 	int pa0_5 = ~data & 0x3f;
 
@@ -202,7 +202,7 @@ static void trigger_sample(const device_config *samples, UINT8 data)
 #ifdef UNUSED_FUNCTION
 void gottlieb_knocker(running_machine *machine)
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	if (!strcmp(machine->gamedrv->name,"reactor"))	/* reactor */
 	{
 	}
@@ -250,7 +250,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 	{
 		if (votrax_queuepos > 1)
 		{
-			const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+			const device_config *samples = devtag_get_device(space->machine, "samples");
 			int last = -1;
 			int i;
 			char phonemes[200];
@@ -317,8 +317,8 @@ static ADDRESS_MAP_START( gottlieb_sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	/* A15 not decoded except in expansion socket */
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
-	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0de0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVWRITE(SOUND, "dac", dac_w)
+	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0de0) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_WRITE(vortrax_data_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(speech_clock_dac_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -475,7 +475,7 @@ static WRITE8_HANDLER( nmi_rate_w )
 
 static CUSTOM_INPUT( speech_drq_custom_r )
 {
-	return sp0250_drq_r(devtag_get_device(field->port->machine, SOUND, "sp"));
+	return sp0250_drq_r(devtag_get_device(field->port->machine, "sp"));
 }
 
 
@@ -503,7 +503,7 @@ static WRITE8_HANDLER( speech_control_w )
 	{
 		/* bit 3 selects which of the two 8913 to enable */
 		/* bit 4 goes to the 8913 BC1 pin */
-		const device_config *ay = devtag_get_device(space->machine, SOUND, (data & 0x08) ? "ay1" : "ay2");
+		const device_config *ay = devtag_get_device(space->machine, (data & 0x08) ? "ay1" : "ay2");
 		ay8910_data_address_w(ay, data >> 4, *psg_latch);
 	}
 
@@ -512,14 +512,14 @@ static WRITE8_HANDLER( speech_control_w )
 	/* bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data */
 	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
 	{
-		const device_config *sp = devtag_get_device(space->machine, SOUND, "sp");
+		const device_config *sp = devtag_get_device(space->machine, "sp");
 		sp0250_w(sp, 0, *sp0250_latch);
 	}
 
 	/* bit 7 goes to the speech chip RESET pin */
 	if ((previous ^ data) & 0x80)
 	{
-		const device_config *sp = devtag_get_device(space->machine, SOUND, "sp");
+		const device_config *sp = devtag_get_device(space->machine, "sp");
 		device_reset(sp);
 	}
 }
@@ -569,7 +569,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gottlieb_audio2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x3c00) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x3ffe) AM_DEVWRITE(SOUND, "dac1", gottlieb_dac_w) AM_BASE(&dac_data)
+	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac1", gottlieb_dac_w) AM_BASE(&dac_data)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3fff) AM_READ(audio_data_r)
 	AM_RANGE(0xe000, 0xffff) AM_MIRROR(0x2000) AM_ROM
 ADDRESS_MAP_END

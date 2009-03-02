@@ -41,7 +41,7 @@ static const struct gotya_sample gotya_samples[] =
 
 WRITE8_HANDLER( gotya_soundlatch_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	static int theme_playing;
 	int sample_number;
 

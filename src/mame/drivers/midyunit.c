@@ -212,8 +212,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( yawdim_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_DEVWRITE(SOUND, "oki", yawdim_oki_bank_w)
-	AM_RANGE(0x9800, 0x9fff) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x9000, 0x97ff) AM_DEVWRITE("oki", yawdim_oki_bank_w)
+	AM_RANGE(0x9800, 0x9fff) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

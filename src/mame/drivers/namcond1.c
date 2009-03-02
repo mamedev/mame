@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( namcond1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_BASE(&namcond1_shared_ram)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(ygv608_r,ygv608_w)
-	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8(AT28C16, "at28c16", at28c16_r, at28c16_w, 0xff00)
+	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_r, at28c16_w, 0xff00)
 #ifdef MAME_DEBUG
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(ygv608_debug_trigger)
 #endif
@@ -251,7 +251,7 @@ static WRITE8_HANDLER( mcu_pa_write )
 static ADDRESS_MAP_START( nd1h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
-	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE( SOUND, "c352", c352_r, c352_w )
+	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE( "c352", c352_r, c352_w )
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xc00010, 0xc00011) AM_NOP

@@ -102,7 +102,7 @@ static WRITE8_HANDLER( firefox_disc_lock_w )
 
 static WRITE8_HANDLER( audio_enable_w )
 {
-	sound_set_output_gain(devtag_get_device(space->machine, SOUND, "ldsound"), ~offset & 1, (data & 0x80) ? 1.0 : 0.0);
+	sound_set_output_gain(devtag_get_device(space->machine, "ldsound"), ~offset & 1, (data & 0x80) ? 1.0 : 0.0);
 }
 
 static WRITE8_HANDLER( firefox_disc_reset_w )
@@ -301,14 +301,14 @@ static UINT8 riot_porta_r(const device_config *device, UINT8 olddata)
 	/* bit 1 = TMS /read */
 	/* bit 0 = TMS /write */
 
-	const device_config *tms = devtag_get_device(device->machine, SOUND, "tms");
+	const device_config *tms = devtag_get_device(device->machine, "tms");
 	return (main_to_sound_flag << 7) | (sound_to_main_flag << 6) | 0x10 | (!tms5220_ready_r(tms) << 2);
 }
 
 
 static void riot_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	const device_config *tms = devtag_get_device(device->machine, SOUND, "tms");
+	const device_config *tms = devtag_get_device(device->machine, "tms");
 
 	/* handle 5220 read */
 	if ((olddata & 2) != 0 && (newdata & 2) == 0)
@@ -437,10 +437,10 @@ static void firq_gen(const device_config *device, int state)
 static MACHINE_START( firefox )
 {
 	memory_configure_bank(machine, 1, 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x1000);
-	nvram_1c = devtag_get_device(machine, X2212, "nvram_1c");
-	nvram_1d = devtag_get_device(machine, X2212, "nvram_1d");
+	nvram_1c = devtag_get_device(machine, "nvram_1c");
+	nvram_1d = devtag_get_device(machine, "nvram_1d");
 
-	laserdisc = devtag_get_device(machine, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, "laserdisc");
 	vp931_set_data_ready_callback(laserdisc, firq_gen);
 
 	control_num = 0;
@@ -503,13 +503,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0700) AM_RAM /* RIOT ram */
-	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x07e0) AM_DEVREADWRITE(RIOT6532,"riot",riot6532_r, riot6532_w)
+	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x07e0) AM_DEVREADWRITE("riot",riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x1000) AM_READ(main_to_sound_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_to_main_w)
-	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE(SOUND, "pokey3", pokey_r, pokey_w)
-	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE(SOUND, "pokey4", pokey_r, pokey_w)
+	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x2800, 0x280f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey3", pokey_r, pokey_w)
+	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("pokey4", pokey_r, pokey_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

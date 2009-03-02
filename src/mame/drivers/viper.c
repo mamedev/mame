@@ -39,7 +39,7 @@
 
 static VIDEO_UPDATE(viper)
 {
-	const device_config *device = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
+	const device_config *device = devtag_get_device(screen->machine, "voodoo");
 	return voodoo_update(device, bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
@@ -552,14 +552,14 @@ static WRITE64_HANDLER(voodoo3_lfb_w)
 static ADDRESS_MAP_START(viper_map, ADDRESS_SPACE_PROGRAM, 64)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM
 	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE(epic_64be_r, epic_64be_w)
-	AM_RANGE(0x82000000, 0x83ffffff) AM_DEVREADWRITE32(VOODOO_GRAPHICS, "voodoo", banshee_r, banshee_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x84000000, 0x85ffffff) AM_DEVREADWRITE32(VOODOO_GRAPHICS, "voodoo", banshee_fb_r, banshee_fb_w, U64(0xffffffffffffffff))
-	AM_RANGE(0xfe800000, 0xfe8000ff) AM_DEVREADWRITE32(VOODOO_GRAPHICS, "voodoo", banshee_io_r, banshee_io_w, U64(0xffffffffffffffff))
-	AM_RANGE(0xfec00000, 0xfedfffff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_config_addr_r, pci_config_addr_w)
-	AM_RANGE(0xfee00000, 0xfeefffff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_config_data_r, pci_config_data_w)
-	AM_RANGE(0xff300000, 0xff300fff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ata_r, ata_w)
+	AM_RANGE(0x82000000, 0x83ffffff) AM_DEVREADWRITE32("voodoo", banshee_r, banshee_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x84000000, 0x85ffffff) AM_DEVREADWRITE32("voodoo", banshee_fb_r, banshee_fb_w, U64(0xffffffffffffffff))
+	AM_RANGE(0xfe800000, 0xfe8000ff) AM_DEVREADWRITE32("voodoo", banshee_io_r, banshee_io_w, U64(0xffffffffffffffff))
+	AM_RANGE(0xfec00000, 0xfedfffff) AM_DEVREADWRITE("pcibus", pci_config_addr_r, pci_config_addr_w)
+	AM_RANGE(0xfee00000, 0xfeefffff) AM_DEVREADWRITE("pcibus", pci_config_data_r, pci_config_data_w)
+	AM_RANGE(0xff300000, 0xff300fff) AM_DEVREADWRITE("ide", ata_r, ata_w)
 	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
-	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8(M48T58,"m48t58",timekeeper_r, timekeeper_w, U64(0xffffffffffffffff))
+	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8("m48t58",timekeeper_r, timekeeper_w, U64(0xffffffffffffffff))
 	AM_RANGE(0xffe40000, 0xffe4000f) AM_NOP
 	AM_RANGE(0xffe50000, 0xffe50007) AM_WRITE(unk2_w)
 	AM_RANGE(0xffe80000, 0xffe80007) AM_WRITE(unk1a_w)
@@ -587,7 +587,7 @@ static void ide_interrupt(const device_config *device, int state)
 
 static MACHINE_RESET(viper)
 {
-	devtag_reset(machine, IDE_CONTROLLER, "ide");
+	devtag_reset(machine, "ide");
 }
 
 static MACHINE_DRIVER_START(viper)
@@ -601,8 +601,8 @@ static MACHINE_DRIVER_START(viper)
 	MDRV_MACHINE_RESET(viper)
 
 	MDRV_PCI_BUS_ADD("pcibus", 0)
-	MDRV_PCI_BUS_DEVICE(0, NULL, NULL, mpc8240_pci_r, mpc8240_pci_w)
-	MDRV_PCI_BUS_DEVICE(12, VOODOO_GRAPHICS, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
+	MDRV_PCI_BUS_DEVICE(0, NULL, mpc8240_pci_r, mpc8240_pci_w)
+	MDRV_PCI_BUS_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
@@ -633,7 +633,7 @@ static DRIVER_INIT(viper)
 
 static DRIVER_INIT(vipercf)
 {
-	const device_config *ide = devtag_get_device(machine, IDE_CONTROLLER, "ide");
+	const device_config *ide = devtag_get_device(machine, "ide");
 
 	DRIVER_INIT_CALL(viper);
 

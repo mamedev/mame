@@ -13,7 +13,7 @@ WRITE8_HANDLER( fghtbskt_samples_w )
 {
 	if( data & 1 )
 	{
-		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+		const device_config *samples = devtag_get_device(space->machine, "samples");
 		sample_start_raw(samples, 0, samplebuf + ((data & 0xf0) << 8), 0x2000, 8000, 0);
 	}
 }

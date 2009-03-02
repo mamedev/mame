@@ -165,8 +165,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE(SOUND, "oki", aquarium_oki_r, aquarium_oki_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", aquarium_oki_r, aquarium_oki_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(aquarium_snd_ack_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)

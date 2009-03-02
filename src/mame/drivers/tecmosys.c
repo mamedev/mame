@@ -566,13 +566,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(SOUND, "ymf", ymf262_r, ymf262_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_r, ymf262_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("oki", okim6295_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE(SOUND, "ymz", ymz280b_r, ymz280b_w)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_r, ymz280b_w)
 ADDRESS_MAP_END
 
 

@@ -197,8 +197,8 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn1", sn76496_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE("sn2", sn76496_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(adpcm_w)
 ADDRESS_MAP_END
 

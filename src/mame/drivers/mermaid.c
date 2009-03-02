@@ -144,14 +144,14 @@ static UINT8 *mermaid_ay8910_enable;
 
 static WRITE8_HANDLER( mermaid_ay8910_write_port_w )
 {
-	if (mermaid_ay8910_enable[0]) ay8910_data_w(devtag_get_device(space->machine, SOUND, "ay1"), offset, data);
-	if (mermaid_ay8910_enable[1]) ay8910_data_w(devtag_get_device(space->machine, SOUND, "ay2"), offset, data);
+	if (mermaid_ay8910_enable[0]) ay8910_data_w(devtag_get_device(space->machine, "ay1"), offset, data);
+	if (mermaid_ay8910_enable[1]) ay8910_data_w(devtag_get_device(space->machine, "ay2"), offset, data);
 }
 
 static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 {
-	if (mermaid_ay8910_enable[0]) ay8910_address_w(devtag_get_device(space->machine, SOUND, "ay1"), offset, data);
-	if (mermaid_ay8910_enable[1]) ay8910_address_w(devtag_get_device(space->machine, SOUND, "ay2"), offset, data);
+	if (mermaid_ay8910_enable[0]) ay8910_address_w(devtag_get_device(space->machine, "ay1"), offset, data);
+	if (mermaid_ay8910_enable[1]) ay8910_address_w(devtag_get_device(space->machine, "ay2"), offset, data);
 }
 
 

@@ -91,7 +91,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym2203", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( farwest_master_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -131,7 +131,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( farwest_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE(SOUND, "ym2203", ym2203_r, ym2203_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -374,7 +374,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_DEVICE_HANDLER(SOUND, "disc_ih", ironhors_filter_w),
+		DEVCB_DEVICE_HANDLER("disc_ih", ironhors_filter_w),
 		DEVCB_NULL
 	},
 	NULL
@@ -450,7 +450,7 @@ static const ym2203_interface farwest_ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_HANDLER(farwest_soundlatch_r),
-		DEVCB_DEVICE_HANDLER(SOUND, "disc_ih", ironhors_filter_w),
+		DEVCB_DEVICE_HANDLER("disc_ih", ironhors_filter_w),
 		DEVCB_NULL
 	},
 	NULL

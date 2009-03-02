@@ -189,7 +189,7 @@ static int dsc0, dsc1;
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	switch (offset)
 	{
@@ -263,9 +263,9 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Stinger/Scion */
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE(SOUND, "8910.3", ay8910_address_data_w)
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE(SOUND, "8910.1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "8910.2", ay8910_address_data_w)				/* Wiz only */
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("8910.3", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_address_data_w)				/* Wiz only */
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Wiz */
 ADDRESS_MAP_END
 
@@ -273,8 +273,8 @@ static ADDRESS_MAP_START( stinger_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Stinger/Scion */
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE(SOUND, "8910.1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "8910.2", ay8910_address_data_w)				/* Wiz only */
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_address_data_w)				/* Wiz only */
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Wiz */
 ADDRESS_MAP_END
 

@@ -47,11 +47,11 @@ static WRITE8_HANDLER( bogeyman_8910_control_w )
 
 	// bit 5 goes to 8910 #0 BDIR pin
 	if ((last & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay1"), last >> 4, psg_latch);
+		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), last >> 4, psg_latch);
 
 	// bit 7 goes to 8910 #1 BDIR pin
 	if ((last & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(devtag_get_device(space->machine, SOUND, "ay2"), last >> 6, psg_latch);
+		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), last >> 6, psg_latch);
 
 	last = data;
 }

@@ -152,7 +152,7 @@ static int paletteram_bank;
 
 WRITE8_HANDLER( pang_gfxctrl_w )
 {
-	const device_config *oki = devtag_get_device(space->machine, SOUND, "oki");
+	const device_config *oki = devtag_get_device(space->machine, "oki");
 logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
 {
 #if 0
@@ -212,7 +212,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
 
 	/* bit 4 selects OKI M6295 bank */
-//  okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"), (data & 0x10) ? 0x40000 : 0x00000);
+//  okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x10) ? 0x40000 : 0x00000);
 	/* not here.. it has its own z80 + sound banking */
 
 	/* bit 5 is palette RAM bank selector (doesn't apply to mgakuen) */

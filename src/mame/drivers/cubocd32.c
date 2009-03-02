@@ -88,7 +88,7 @@ static WRITE32_HANDLER( aga_overlay_w )
 static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 {
 	/* bit 1 = cd audio mute */
-	sound_set_output_gain(devtag_get_device(device->machine, SOUND, "cdda"), 0, ( data & 1 ) ? 0.0 : 1.0 );
+	sound_set_output_gain(devtag_get_device(device->machine, "cdda"), 0, ( data & 1 ) ? 0.0 : 1.0 );
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(0, (data & 2) ? 0 : 1);

@@ -242,7 +242,7 @@ VIDEO_UPDATE(powerbls);
 static TIMER_CALLBACK( music_playback )
 {
 	int pattern = 0;
-	const device_config *device = devtag_get_device(machine, SOUND, "oki");
+	const device_config *device = devtag_get_device(machine, "oki");
 
 	if ((okim6295_r(device,0) & 0x08) == 0)
 	{
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( sslam_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300018, 0x300019) AM_READ_PORT("IN4")
 	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE(SOUND, "oki", sslam_snd_w)
+	AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE("oki", sslam_snd_w)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM	  /* Main RAM */
 
 	AM_RANGE(0x000000, 0xffffff) AM_ROM   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
@@ -458,7 +458,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 		data = soundlatch_r(space,0);
 	}
 	else if ((playmark_oki_control & 0x38) == 0x28) {
-		data = (okim6295_r(devtag_get_device(space->machine, SOUND, "oki"),0) & 0x0f);
+		data = (okim6295_r(devtag_get_device(space->machine, "oki"),0) & 0x0f);
 	}
 
 	return data;
@@ -478,13 +478,13 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 		if(playmark_oki_bank != ((data & 3) - 1))
 		{
 			playmark_oki_bank = (data & 3) - 1;
-			okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"), 0x40000 * playmark_oki_bank);
+			okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * playmark_oki_bank);
 		}
 	}
 
 	if ((data & 0x38) == 0x18)
 	{
-		okim6295_w(devtag_get_device(space->machine, SOUND, "oki"), 0, playmark_oki_command);
+		okim6295_w(devtag_get_device(space->machine, "oki"), 0, playmark_oki_command);
 	}
 
 //  !(data & 0x80) -> sound enable

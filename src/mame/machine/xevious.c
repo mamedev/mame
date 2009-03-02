@@ -154,7 +154,7 @@ WRITE8_HANDLER( battles_noise_sound_w )
 {
 	logerror("CPU3 %04x: 50%02x Write = %02x\n",cpu_get_pc(space->cpu),offset,data);
 	if( (battles_sound_played == 0) && (data == 0xFF) ){
-		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+		const device_config *samples = devtag_get_device(space->machine, "samples");
 		if( customio[0] == 0x40 ){
 			sample_start (samples, 0, 0, 0);
 		}

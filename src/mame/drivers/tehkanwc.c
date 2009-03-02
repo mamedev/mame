@@ -272,7 +272,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8001, 0x8001) AM_DEVWRITE(SOUND, "msm", msm_reset_w)/* MSM51xx reset */
+	AM_RANGE(0x8001, 0x8001) AM_DEVWRITE("msm", msm_reset_w)/* MSM51xx reset */
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(SMH_NOP)	/* ?? written in the IRQ handler */
 	AM_RANGE(0x8003, 0x8003) AM_WRITE(SMH_NOP)	/* ?? written in the NMI handler */
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(soundlatch_r, sound_answer_w)
@@ -280,10 +280,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD(SOUND, "ay1", ay8910_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD(SOUND, "ay2", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 

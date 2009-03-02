@@ -230,8 +230,8 @@ static ADDRESS_MAP_START( hitme_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1700, 0x17ff) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x1800, 0x18ff) AM_READ_PORT("IN4")
 	AM_RANGE(0x1900, 0x19ff) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d00, 0x1dff) AM_DEVWRITE(SOUND, "discrete", output_port_0_w)
-	AM_RANGE(0x1e00, 0x1fff) AM_DEVWRITE(SOUND, "discrete", output_port_1_w)
+	AM_RANGE(0x1d00, 0x1dff) AM_DEVWRITE("discrete", output_port_0_w)
+	AM_RANGE(0x1e00, 0x1fff) AM_DEVWRITE("discrete", output_port_1_w)
 ADDRESS_MAP_END
 
 
@@ -242,8 +242,8 @@ static ADDRESS_MAP_START( hitme_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x17, 0x17) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("IN4")
 	AM_RANGE(0x19, 0x19) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE(SOUND, "discrete", output_port_0_w)
-	AM_RANGE(0x1e, 0x1f) AM_DEVWRITE(SOUND, "discrete", output_port_1_w)
+	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE("discrete", output_port_0_w)
+	AM_RANGE(0x1e, 0x1f) AM_DEVWRITE("discrete", output_port_1_w)
 ADDRESS_MAP_END
 
 

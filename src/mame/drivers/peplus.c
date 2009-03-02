@@ -731,17 +731,17 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_BASE(&cmos_ram)
 
 	// CRT Controller
-	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE(R6545_1, "crtc", peplus_crtc_mode_w)
-	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE(R6545_1, "crtc", mc6845_status_r, mc6845_address_w)
-	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE(R6545_1, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x2083, 0x2083) AM_DEVREADWRITE(R6545_1, "crtc", mc6845_register_r, peplus_crtc_display_w)
+	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE("crtc", peplus_crtc_mode_w)
+	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_status_r, mc6845_address_w)
+	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x2083, 0x2083) AM_DEVREADWRITE("crtc", mc6845_register_r, peplus_crtc_display_w)
 
     // Superboard Data
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_BASE(&s3000_ram)
 
 	// Sound and Dipswitches
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE("ay", ay8910_data_w)
 
     // Superboard Data
 	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_BASE(&s5000_ram)

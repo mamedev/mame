@@ -163,12 +163,12 @@ static ADDRESS_MAP_START( fuuki16_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w 	)	// ROM Bank
 	AM_RANGE(0x11, 0x11) AM_READWRITE(soundlatch_r, SMH_NOP	)	// From Main CPU / ? To Main CPU ?
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE(SOUND, "oki", fuuki16_oki_banking_w		)	// Oki Banking
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("oki", fuuki16_oki_banking_w		)	// Oki Banking
 	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP					)	// ? In the NMI routine
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ym1", ym2203_w	)
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE(SOUND, "ym2", ym3812_r, ym3812_w		)
-	AM_RANGE(0x60, 0x60) AM_DEVREAD(SOUND, "oki", okim6295_r)	// M6295
-	AM_RANGE(0x61, 0x61) AM_DEVWRITE(SOUND, "oki", okim6295_w)	// M6295
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ym2203_w	)
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym2", ym3812_r, ym3812_w		)
+	AM_RANGE(0x60, 0x60) AM_DEVREAD("oki", okim6295_r)	// M6295
+	AM_RANGE(0x61, 0x61) AM_DEVWRITE("oki", okim6295_w)	// M6295
 ADDRESS_MAP_END
 
 

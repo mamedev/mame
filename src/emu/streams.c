@@ -920,7 +920,7 @@ static stream_sample_t *generate_resampled_data(stream_input *input, UINT32 nums
 	source = output->buffer + (basesample - input_stream->output_base_sampindex);
 
 	/* determine the current fraction of a sample */
-	basefrac = (basetime - basesample * input_stream->attoseconds_per_sample) / (input_stream->attoseconds_per_sample >> FRAC_BITS);
+	basefrac = (basetime - basesample * input_stream->attoseconds_per_sample) / ((input_stream->attoseconds_per_sample + FRAC_ONE - 1) >> FRAC_BITS);
 	assert(basefrac >= 0);
 	assert(basefrac < FRAC_ONE);
 

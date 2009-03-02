@@ -156,7 +156,7 @@ static READ8_HANDLER( spool99_io_r )
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
 			case 0xafe7: return eeprom_read_bit();
-			case 0xaff8: return okim6295_r(devtag_get_device(space->machine, SOUND, "oki"),0);
+			case 0xaff8: return okim6295_r(devtag_get_device(space->machine, "oki"),0);
 		}
 	}
 //  printf("%04x %d\n",offset+0xaf00,io_switch);
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xafed, 0xafed) AM_WRITE(eeprom_resetline_w )
 	AM_RANGE(0xafee, 0xafee) AM_WRITE(eeprom_clockline_w )
 	AM_RANGE(0xafef, 0xafef) AM_WRITE(eeprom_dataline_w )
-	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
 
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram) // palette
 

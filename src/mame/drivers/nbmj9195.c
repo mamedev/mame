@@ -359,10 +359,10 @@ static WRITE8_HANDLER( tmpz84c011_pio_w )
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_WRITE(devtag_get_device(space->machine, SOUND, "dac2"), 0, data);
+				DAC_WRITE(devtag_get_device(space->machine, "dac2"), 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_WRITE(devtag_get_device(space->machine, SOUND, "dac1"), 0, data);
+				DAC_WRITE(devtag_get_device(space->machine, "dac1"), 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
@@ -397,10 +397,10 @@ static WRITE8_HANDLER( tmpz84c011_pio_w )
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_WRITE(devtag_get_device(space->machine, SOUND, "dac2"), 0, data);
+				DAC_WRITE(devtag_get_device(space->machine, "dac2"), 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_WRITE(devtag_get_device(space->machine, SOUND, "dac1"), 0, data);
+				DAC_WRITE(devtag_get_device(space->machine, "dac1"), 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
@@ -482,7 +482,7 @@ static void ctc1_interrupt(const device_config *device, int state)
 /* CTC of main cpu, ch0 trigger is vblank */
 static INTERRUPT_GEN( ctc0_trg1 )
 {
-	const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "main_ctc");
+	const device_config *ctc = devtag_get_device(device->machine, "main_ctc");
 	z80ctc_trg1_w(ctc, 0, 1);
 	z80ctc_trg1_w(ctc, 0, 0);
 }
@@ -625,7 +625,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_mjuraden, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -642,7 +642,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_mjuraden, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -667,7 +667,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_koinomp, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -685,7 +685,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_koinomp, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -713,7 +713,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_patimono, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -731,7 +731,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_patimono, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -758,7 +758,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_mmehyou, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -775,7 +775,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_mmehyou, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -800,7 +800,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_gal10ren, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -818,7 +818,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_gal10ren, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -845,7 +845,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_renaiclb, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -863,7 +863,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_renaiclb, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -890,7 +890,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_mjlaman, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -908,7 +908,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_mjlaman, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -935,7 +935,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_mkeibaou, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -953,7 +953,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_mkeibaou, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -980,7 +980,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_pachiten, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -998,7 +998,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_pachiten, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1025,7 +1025,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_sailorws, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1043,7 +1043,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_sailorws, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1070,7 +1070,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_sailorwr, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1088,7 +1088,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_sailorwr, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1115,7 +1115,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_psailor1, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1133,7 +1133,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_psailor1, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1160,7 +1160,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_psailor2, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1178,7 +1178,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_psailor2, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1205,7 +1205,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_otatidai, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1223,7 +1223,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_otatidai, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1250,7 +1250,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_yosimoto, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1268,7 +1268,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_yosimoto, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1295,7 +1295,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_jituroku, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1313,7 +1313,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_jituroku, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1340,7 +1340,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_ngpgal, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1357,7 +1357,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ngpgal, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1382,7 +1382,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_mjgottsu, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1399,7 +1399,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_mjgottsu, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1424,7 +1424,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_cmehyou, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1441,7 +1441,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_cmehyou, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1466,7 +1466,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_mjkoiura, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1483,7 +1483,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_mjkoiura, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1508,7 +1508,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_mkoiuraa, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1525,7 +1525,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_mkoiuraa, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1550,7 +1550,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_mscoutm, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1571,7 +1571,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_mscoutm, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1597,7 +1597,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_imekura, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1618,7 +1618,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_imekura, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1644,7 +1644,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_mjegolf, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "main_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("main_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_0_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_0_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_0_pc_r)
@@ -1665,7 +1665,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_mjegolf, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "main_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("main_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_0_pc_w)
@@ -1691,7 +1691,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(Z80CTC, "audio_ctc", z80ctc_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD("audio_ctc", z80ctc_r)
 	AM_RANGE(0x50, 0x50) AM_READ(tmpz84c011_1_pa_r)
 	AM_RANGE(0x51, 0x51) AM_READ(tmpz84c011_1_pb_r)
 	AM_RANGE(0x52, 0x52) AM_READ(tmpz84c011_1_pc_r)
@@ -1706,7 +1706,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(Z80CTC, "audio_ctc", z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE("audio_ctc", z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(tmpz84c011_1_pa_w)
 	AM_RANGE(0x51, 0x51) AM_WRITE(tmpz84c011_1_pb_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(tmpz84c011_1_pc_w)
@@ -1718,7 +1718,7 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x34, 0x34) AM_WRITE(tmpz84c011_1_dir_pd_w)
 	AM_RANGE(0x44, 0x44) AM_WRITE(tmpz84c011_1_dir_pe_w)
 
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ym", ym3812_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym", ym3812_w)
 ADDRESS_MAP_END
 
 
@@ -3609,13 +3609,13 @@ INPUT_PORTS_END
 
 static const z80_daisy_chain daisy_chain_main[] =
 {
-	{ Z80CTC, "main_ctc" },
+	{ "main_ctc" },
 	{ NULL }
 };
 
 static const z80_daisy_chain daisy_chain_sound[] =
 {
-	{ Z80CTC, "audio_ctc" },
+	{ "audio_ctc" },
 	{ NULL }
 };
 

@@ -96,7 +96,7 @@ VIDEO_EOF( ultratnk )
 {
 	int i;
 	UINT16 BG = colortable_entry_get_value(machine->colortable, 0);
-	const device_config *discrete = devtag_get_device(machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(machine, "discrete");
 
 	/* check for sprite-playfield collisions */
 

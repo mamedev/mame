@@ -133,9 +133,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE(SOUND, "oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READWRITE(SMH_BANK8, SMH_BANK8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
@@ -284,8 +284,8 @@ static void sound_irq(const device_config *device, int state)
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	okim6295_set_bank_base(devtag_get_device(device->machine, SOUND, "oki2"), ((data & 2)>>1) * 0x40000);
-	okim6295_set_bank_base(devtag_get_device(device->machine, SOUND, "oki1"), (data & 1) * 0x40000);
+	okim6295_set_bank_base(devtag_get_device(device->machine, "oki2"), ((data & 2)>>1) * 0x40000);
+	okim6295_set_bank_base(devtag_get_device(device->machine, "oki1"), (data & 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =

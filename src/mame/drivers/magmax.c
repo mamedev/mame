@@ -116,9 +116,9 @@ static MACHINE_RESET( magmax )
 
 static WRITE8_DEVICE_HANDLER( ay8910_portA_0_w )
 {
-const device_config *ay1 = devtag_get_device(device->machine, SOUND, "ay1");
-const device_config *ay2 = devtag_get_device(device->machine, SOUND, "ay2");
-const device_config *ay3 = devtag_get_device(device->machine, SOUND, "ay3");
+const device_config *ay1 = devtag_get_device(device->machine, "ay1");
+const device_config *ay2 = devtag_get_device(device->machine, "ay2");
+const device_config *ay3 = devtag_get_device(device->machine, "ay3");
 float percent;
 
 /*There are three AY8910 chips and four(!) separate amplifiers on the board
@@ -246,9 +246,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magmax_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay3", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_READ(magmax_sound_r)
 ADDRESS_MAP_END
 

@@ -397,7 +397,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 	if (PGMLOGERROR) logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
 
 	if(data == 0x5050) {
-		devtag_reset(space->machine, SOUND, "ics");
+		devtag_reset(space->machine, "ics");
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 		if(0) {
@@ -702,7 +702,7 @@ static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE(SOUND, "ics", ics2115_r, ics2115_w)
+	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("ics", ics2115_r, ics2115_w)
 	AM_RANGE(0x8100, 0x81ff) AM_READWRITE(soundlatch3_r, z80_l3_w)
 	AM_RANGE(0x8200, 0x82ff) AM_READWRITE(soundlatch_r, soundlatch_w)
 	AM_RANGE(0x8400, 0x84ff) AM_READWRITE(soundlatch2_r, soundlatch2_w)

@@ -559,11 +559,11 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READWRITE(v9938_1_status_r, v9938_1_command_w)
 	AM_RANGE(0x22, 0x22) AM_WRITE(v9938_1_palette_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(v9938_1_register_w)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE(Z80PIO, "z80pio_0", z80pio_r, z80pio_w)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(Z80PIO, "z80pio_1", z80pio_r, z80pio_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_r, z80pio_w)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_r, z80pio_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
@@ -585,12 +585,12 @@ static ADDRESS_MAP_START( meritm_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READWRITE(v9938_1_status_r, v9938_1_command_w)
 	AM_RANGE(0x22, 0x22) AM_WRITE(v9938_1_palette_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(v9938_1_register_w)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE(Z80PIO, "z80pio_0", z80pio_r, z80pio_w)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(Z80PIO, "z80pio_1", z80pio_r, z80pio_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_r, z80pio_w)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_r, z80pio_w)
 	AM_RANGE(0x60, 0x67) AM_READWRITE(pc16552d_0_r,pc16552d_0_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_bank_w)
 ADDRESS_MAP_END
 
@@ -826,15 +826,15 @@ static const z80pio_interface meritm_io_pio_intf =
 
 static const z80_daisy_chain meritm_daisy_chain[] =
 {
-	{ Z80PIO, "z80pio_1" },
-	{ Z80PIO, "z80pio_0" },
+	{ "z80pio_1" },
+	{ "z80pio_0" },
 	{ NULL }
 };
 
 static MACHINE_START(merit_common)
 {
-	meritm_z80pio[0] = devtag_get_device( machine, Z80PIO, "z80pio_0" );
-	meritm_z80pio[1] = devtag_get_device( machine, Z80PIO, "z80pio_1" );
+	meritm_z80pio[0] = devtag_get_device( machine, "z80pio_0" );
+	meritm_z80pio[1] = devtag_get_device( machine, "z80pio_1" );
 
 };
 

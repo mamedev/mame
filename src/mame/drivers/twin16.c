@@ -224,7 +224,7 @@ static READ8_HANDLER( twin16_sres_r )
 static WRITE8_HANDLER( twin16_sres_w )
 {
 	/* bit 1 resets the UPD7795C sound chip */
-	upd7759_reset_w(devtag_get_device(space->machine, SOUND, "upd"), data & 0x02);
+	upd7759_reset_w(devtag_get_device(space->machine, "upd"), data & 0x02);
 	twin16_soundlatch = data;
 }
 
@@ -260,11 +260,11 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(twin16_sres_r, twin16_sres_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE(SOUND, "konami", k007232_r, k007232_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE(SOUND, "upd", upd7759_port_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "upd", twin16_upd_start_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREAD(SOUND, "upd", twin16_upd_busy_r) AM_WRITENOP	// ??? write ???
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_port_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("upd", twin16_upd_start_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("upd", twin16_upd_busy_r) AM_WRITENOP	// ??? write ???
 	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )

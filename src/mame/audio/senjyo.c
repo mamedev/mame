@@ -14,8 +14,8 @@ static int single_volume = 0;
 
 const z80_daisy_chain senjyo_daisy_chain[] =
 {
-	{ Z80CTC, "z80ctc" },
-	{ Z80PIO, "z80pio" },
+	{ "z80ctc" },
+	{ "z80pio" },
 	{ NULL }
 };
 
@@ -50,7 +50,7 @@ const z80ctc_interface senjyo_ctc_intf =
 
 WRITE8_HANDLER( senjyo_volume_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	single_volume = data & 0x0f;
 	sample_set_volume(samples,0,single_volume / 15.0);
 }
@@ -58,10 +58,10 @@ WRITE8_HANDLER( senjyo_volume_w )
 
 static TIMER_CALLBACK( senjyo_sh_update )
 {
-	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(machine, "samples");
 
 	/* ctc2 timer single tone generator frequency */
-	attotime period = z80ctc_getperiod (devtag_get_device(machine, Z80CTC, "z80ctc"), 2);
+	attotime period = z80ctc_getperiod (devtag_get_device(machine, "z80ctc"), 2);
 	if (attotime_compare(period, attotime_zero) != 0 )
 		single_rate = ATTOSECONDS_TO_HZ(period.attoseconds);
 	else

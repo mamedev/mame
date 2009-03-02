@@ -714,8 +714,8 @@ INLINE double CD4049(running_machine *machine, double x)
 static void radarscp_step(running_machine *machine, int line_cnt)
 {
 	dkong_state *state = machine->driver_data;
-	const device_config *dev6h = devtag_get_device(machine, LATCH8, "ls259.6h");
-	const device_config *devvp2 = devtag_get_device(machine, LATCH8, "virtual_p2");
+	const device_config *dev6h = devtag_get_device(machine, "ls259.6h");
+	const device_config *devvp2 = devtag_get_device(machine, "virtual_p2");
 
 	/* Condensator is illegible in schematics for TRS2 board.
      * TRS1 board states 3.3u.

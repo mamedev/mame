@@ -139,7 +139,7 @@ static WRITE8_DEVICE_HANDLER(ic8j2_output_changed)
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));
 	ttl74123_a_w(device, 0, data);
-	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "ic8j1"), 0, data);
+	ttl74123_a_w(devtag_get_device(device->machine, "ic8j1"), 0, data);
 }
 
 static const ttl74123_config ic8j1_intf =
@@ -224,7 +224,7 @@ static MACHINE_RESET( irem )
 
 static WRITE8_HANDLER( m10_ctrl_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	m10_state *state = space->machine->driver_data;
 
 #if DEBUG
@@ -372,7 +372,7 @@ static WRITE8_HANDLER( m10_a500_w )
 static WRITE8_HANDLER( m11_a100_w )
 {
 	static int last = 0x00;
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	int raising_bits = data & ~last;
 	//int falling_bits = ~data & last;
 
@@ -407,7 +407,7 @@ static WRITE8_HANDLER( m11_a100_w )
 static WRITE8_HANDLER( m15_a100_w )
 {
 	static int last = 0x00;
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	//int raising_bits = data & ~last;
 	int falling_bits = ~data & last;
 
@@ -467,8 +467,8 @@ static READ8_HANDLER( m10_a700_r )
 {
    	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
 	LOG(("clear\n"));
-	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 0);
-	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 1);
+	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 0);
+	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 1);
 	return 0x00;
 }
 
@@ -477,8 +477,8 @@ static READ8_HANDLER( m11_a700_r )
    	//LOG(("rd:%d\n",video_screen_get_vpos(space->machine->primary_screen)));
 	//cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 	LOG(("clear\n"));
-	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 0);
-	ttl74123_clear_w(devtag_get_device(space->machine, TTL74123, "ic8j1"), 0, 1);
+	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 0);
+	ttl74123_clear_w(devtag_get_device(space->machine, "ic8j1"), 0, 1);
 	return 0x00;
 }
 

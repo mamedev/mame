@@ -93,7 +93,7 @@
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_CDP1869_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, SOUND)
+	MDRV_DEVICE_REMOVE(_tag)
 
 #define CDP1869_INTERFACE(_name) const cdp1869_interface (_name) =
 

@@ -222,7 +222,7 @@ WRITE8_HANDLER( mhavoc_rom_banksel_w )
 
 CUSTOM_INPUT( tms5220_r )
 {
-	return tms5220_ready_r(devtag_get_device(field->port->machine, SOUND, "tms")) ? 0 : 1;
+	return tms5220_ready_r(devtag_get_device(field->port->machine, "tms")) ? 0 : 1;
 }
 
 CUSTOM_INPUT( mhavoc_bit67_r )
@@ -327,7 +327,7 @@ static WRITE8_HANDLER( mhavocrv_speech_data_w )
 
 static WRITE8_HANDLER( mhavocrv_speech_strobe_w )
 {
-	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+	const device_config *tms = devtag_get_device(space->machine, "tms");
 	tms5220_data_w(tms, 0, speech_write_buffer);
 }
 

@@ -147,7 +147,7 @@ static WRITE8_HANDLER( skydiver_nmion_w )
 
 static INTERRUPT_GEN( skydiver_interrupt )
 {
-	const device_config *discrete = devtag_get_device(device->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(device->machine, "discrete");
 
 	/* Convert range data to divide value and write to sound */
 	discrete_sound_w(discrete, SKYDIVER_RANGE_DATA, (0x01 << (~skydiver_videoram[0x394] & 0x07)) & 0xff);	// Range 0-2
@@ -197,11 +197,11 @@ static ADDRESS_MAP_START( skydiver_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0806, 0x0807) AM_MIRROR(0x47f0) AM_WRITE(skydiver_start_lamp_2_w)
 	AM_RANGE(0x0808, 0x0809) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_y_w)
 	AM_RANGE(0x080a, 0x080b) AM_MIRROR(0x47f0) AM_WRITE(skydiver_lamp_d_w)
-	AM_RANGE(0x080c, 0x080d) AM_MIRROR(0x47f0) AM_DEVWRITE(SOUND, "discrete", skydiver_sound_enable_w)
+	AM_RANGE(0x080c, 0x080d) AM_MIRROR(0x47f0) AM_DEVWRITE("discrete", skydiver_sound_enable_w)
 	// AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x47f0) AM_WRITE(skydiver_jump1_lamps_w)
 	AM_RANGE(0x1002, 0x1003) AM_MIRROR(0x47f0) AM_WRITE(skydiver_coin_lockout_w)
 	// AM_RANGE(0x1006, 0x1007) AM_MIRROR(0x47f0) AM_WRITE(skydiver_jump2_lamps_w)
-	AM_RANGE(0x1008, 0x100b) AM_MIRROR(0x47f0) AM_DEVWRITE(SOUND, "discrete", skydiver_whistle_w)
+	AM_RANGE(0x1008, 0x100b) AM_MIRROR(0x47f0) AM_DEVWRITE("discrete", skydiver_whistle_w)
 	AM_RANGE(0x100c, 0x100d) AM_MIRROR(0x47f0) AM_WRITE(skydiver_nmion_w)
 	AM_RANGE(0x100e, 0x100f) AM_MIRROR(0x47f0) AM_WRITE(skydiver_width_w)
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x47e0) AM_READ_PORT("IN0")

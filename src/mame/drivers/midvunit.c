@@ -92,7 +92,7 @@ static MACHINE_RESET( midvplus )
 	timer[0] = timer_alloc(machine, NULL, NULL);
 	timer[1] = timer_alloc(machine, NULL, NULL);
 
-	devtag_reset(machine, IDE_CONTROLLER, "ide");
+	devtag_reset(machine, "ide");
 }
 
 
@@ -527,7 +527,7 @@ static ADDRESS_MAP_START( midvplus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
-	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", midway_ide_asic_r, midway_ide_asic_w)
+	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE("ide", midway_ide_asic_r, midway_ide_asic_w)
 	AM_RANGE(0x9c0000, 0x9c7fff) AM_RAM_WRITE(midvunit_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE(midvplus_misc_r, midvplus_misc_w) AM_BASE(&midvplus_misc)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_BASE(&midvunit_textureram)

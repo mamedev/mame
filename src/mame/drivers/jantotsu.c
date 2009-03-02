@@ -270,9 +270,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jantotsu_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE(SOUND, "sn1", sn76496_w)
-	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "adpcm", jan_adpcm_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE("sn1", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("adpcm", jan_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(jantotsu_mux_r,jantotsu_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(bankaddr_w)
 ADDRESS_MAP_END

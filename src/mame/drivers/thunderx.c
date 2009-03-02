@@ -431,29 +431,29 @@ static ADDRESS_MAP_START( scontra_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami", k007232_r)	/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym2151_r)	/* YM2151 */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami", k007232_r)	/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r)	/* YM2151 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scontra_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami", k007232_w)		/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym2151_w)		/* YM2151 */
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE(SOUND, "konami", scontra_snd_bankswitch_w)	/* 007232 bank select */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami", k007232_w)		/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)		/* YM2151 */
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("konami", scontra_snd_bankswitch_w)	/* 007232 bank select */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thunderx_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thunderx_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)
 ADDRESS_MAP_END
 
 /***************************************************************************

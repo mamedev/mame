@@ -82,9 +82,9 @@ static ADDRESS_MAP_START( writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 		AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
 		AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_RAM)
 		AM_RANGE(0x3000, 0x3000) AM_WRITE(interrupt_enable_w)
-		AM_RANGE(0x4000, 0x4001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-		AM_RANGE(0x5000, 0x5001) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-		AM_RANGE(0x6000, 0x6001) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
+		AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
+		AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay2", ay8910_address_data_w)
+		AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay3", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

@@ -71,13 +71,13 @@ static READ8_HANDLER( test_r )
 
 static READ8_HANDLER(lions_via_r)
 {
-	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 	return via_r(via_0, offset);
 }
 
 static WRITE8_HANDLER(lions_via_w)
 {
-	const device_config *via_0 = device_list_find_by_tag(space->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(space->machine, "via6522_0");
 	via_w(via_0, offset, data);
 }
 
@@ -85,11 +85,11 @@ static WRITE8_HANDLER(lions_via_w)
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&lions_vram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x5000, 0x500f) AM_READWRITE(lions_via_r, lions_via_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ(test_r)//AM_READ_PORT("IN0")
-	AM_RANGE(0x5382, 0x5383) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x5382, 0x5383) AM_DEVWRITE("ay", ay8910_data_address_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

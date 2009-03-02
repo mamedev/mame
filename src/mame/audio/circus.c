@@ -174,8 +174,8 @@ DISCRETE_SOUND_END
 
 WRITE8_HANDLER( circus_clown_z_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	clown_z = (data & 0x0f);
 	*(memory_region(space->machine, "maincpu")+0x8000)=data; logerror("Z:%02x\n",data); //DEBUG

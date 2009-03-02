@@ -366,9 +366,9 @@ static READ8_HANDLER( soundlatch_clear_r )
 
 static ADDRESS_MAP_START( soundport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0, 0x1) AM_DEVWRITE(SOUND, "ym", ym3812_w)
-	AM_RANGE(0x2, 0x2) AM_DEVWRITE(SOUND, "dac1", dac_signed_w)
-	AM_RANGE(0x3, 0x3) AM_DEVWRITE(SOUND, "dac2", dac_signed_w)
+	AM_RANGE(0x0, 0x1) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_signed_w)
+	AM_RANGE(0x3, 0x3) AM_DEVWRITE("dac2", dac_signed_w)
 	AM_RANGE(0x4, 0x4) AM_READ(soundlatch_clear_r)
 	AM_RANGE(0x6, 0x6) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

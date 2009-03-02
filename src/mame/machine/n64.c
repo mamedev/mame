@@ -812,8 +812,8 @@ static void start_audio_dma(running_machine *machine)
 
 //  mame_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
 
-	dmadac[0] = devtag_get_device(machine, SOUND, "dac1");
-	dmadac[1] = devtag_get_device(machine, SOUND, "dac2");
+	dmadac[0] = devtag_get_device(machine, "dac1");
+	dmadac[1] = devtag_get_device(machine, "dac2");
     dmadac_transfer(&dmadac[0], 2, 2, 2, current->length/4, ram);
 
     ai_status |= 0x40000000;

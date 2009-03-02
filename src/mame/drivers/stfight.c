@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram_2)
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(stfight_fm_w)               /* play fm sound */
-	AM_RANGE(0xc600, 0xc600) AM_DEVWRITE(SOUND, "msm", stfight_adpcm_control_w)    /* voice control */
+	AM_RANGE(0xc600, 0xc600) AM_DEVWRITE("msm", stfight_adpcm_control_w)    /* voice control */
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)             /* coin mech */
 	AM_RANGE(0xc804, 0xc806) AM_WRITE(SMH_NOP)                    /* TBD */
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(stfight_sprite_bank_w)
@@ -268,8 +268,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym1", ym2203_r)
-	AM_RANGE(0xc800, 0xc801) AM_DEVREAD(SOUND, "ym2", ym2203_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym1", ym2203_r)
+	AM_RANGE(0xc800, 0xc801) AM_DEVREAD("ym2", ym2203_r)
 	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
 
@@ -277,8 +277,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym1", ym2203_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(stfight_e800_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 

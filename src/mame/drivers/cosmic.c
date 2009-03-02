@@ -59,7 +59,7 @@ static UINT32 pixel_clock = 0;
 
 static WRITE8_HANDLER( panic_sound_output_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
     static int sound_enabled=1;
 
     /* Sound Enable / Disable */
@@ -117,7 +117,7 @@ static WRITE8_HANDLER( panic_sound_output_w )
 					sample_stop(samples, 4);
 	  			 break;
 
-        case 10: dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), data); break;/* Bonus */
+        case 10: dac_data_w(devtag_get_device(space->machine, "dac"), data); break;/* Bonus */
 		case 15: if (data) sample_start(samples, 0, 6, 0); break;	/* Player Die */
 		case 16: if (data) sample_start(samples, 5, 7, 0); break;	/* Enemy Laugh */
         case 17: if (data) sample_start(samples, 0, 10, 0); break;	/* Coin - Not triggered by software */
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( panic_sound_output2_w )
 
 static WRITE8_HANDLER( cosmicg_output_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	static int march_select;
     static int gun_die_select;
     static int sound_enabled;
@@ -160,7 +160,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 		/* as other cosmic series games, but it never seems to */
 		/* be used for anything. It is implemented for sake of */
 		/* completness. Maybe it plays a tune if you win ?     */
-		case 1:  dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), -data); break;
+		case 1:  dac_data_w(devtag_get_device(space->machine, "dac"), -data); break;
 		case 2:  if (data) sample_start (samples, 0, march_select, 0); break;	/* March Sound */
 		case 3:  march_select = (march_select & 0xfe) | data; break;
         case 4:  march_select = (march_select & 0xfd) | (data << 1); break;
@@ -203,7 +203,7 @@ static WRITE8_HANDLER( cosmicg_output_w )
 
 static WRITE8_HANDLER( cosmica_sound_output_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
     static int  sound_enabled=1;
     static int dive_bomb_b_select=0;
 
@@ -539,7 +539,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magspot_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE(SOUND, "dac", dac_w)
+	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
@@ -1596,7 +1596,7 @@ static DRIVER_INIT( devzone )
 
 static DRIVER_INIT( nomnlnd )
 {
-	const device_config *dac = devtag_get_device(machine, SOUND, "dac");
+	const device_config *dac = devtag_get_device(machine, "dac");
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800, 0x4800, 0, 0, SMH_NOP);
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);

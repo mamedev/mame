@@ -435,7 +435,7 @@ ADDRESS_MAP_END
 
 static MACHINE_START( cubeqst )
 {
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, "laserdisc");
 }
 
 static MACHINE_RESET( cubeqst )
@@ -475,7 +475,7 @@ static void sound_dac_w(const device_config *device, UINT16 data)
 		"rdac6", "ldac6",
 		"rdac7", "ldac7"
 	};
-	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, dacs[data & 15]), (data & 0xfff0) ^ 0x8000);
+	dac_signed_data_16_w(devtag_get_device(device->machine, dacs[data & 15]), (data & 0xfff0) ^ 0x8000);
 }
 
 static const cubeqst_snd_config snd_config =

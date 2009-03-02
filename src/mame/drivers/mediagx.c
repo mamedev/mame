@@ -835,20 +835,20 @@ static ADDRESS_MAP_START( mediagx_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mediagx_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_master", io20_r, io20_w, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, "pit8254", pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", io20_r, io20_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8(PIC8259, "pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8(DMA8237, "dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP		// I/O delay port
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
-	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
 	AM_RANGE(0x0400, 0x04ff) AM_READWRITE(ad1847_r, ad1847_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_32le_r,	pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -944,11 +944,11 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(mediagx)
 {
-	mediagx_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
-	mediagx_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
-	mediagx_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
-	mediagx_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
-	mediagx_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	mediagx_devices.pit8254 = devtag_get_device( machine, "pit8254" );
+	mediagx_devices.pic8259_1 = devtag_get_device( machine, "pic8259_master" );
+	mediagx_devices.pic8259_2 = devtag_get_device( machine, "pic8259_slave" );
+	mediagx_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
+	mediagx_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
 }
 
 static MACHINE_RESET(mediagx)
@@ -966,10 +966,10 @@ static MACHINE_RESET(mediagx)
 	sound_timer = timer_alloc(machine, sound_timer_callback, NULL);
 	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);
 
-	dmadac[0] = devtag_get_device(machine, SOUND, "dac1");
-	dmadac[1] = devtag_get_device(machine, SOUND, "dac2");
+	dmadac[0] = devtag_get_device(machine, "dac1");
+	dmadac[1] = devtag_get_device(machine, "dac2");
 	dmadac_enable(&dmadac[0], 2, 1);
-	devtag_reset(machine, IDE_CONTROLLER, "ide");
+	devtag_reset(machine, "ide");
 }
 
 /*************************************************************
@@ -1038,7 +1038,7 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_MACHINE_RESET(mediagx)
 
 	MDRV_PCI_BUS_ADD("pcibus", 0)
-	MDRV_PCI_BUS_DEVICE(18, NULL, NULL, cx5510_pci_r, cx5510_pci_w)
+	MDRV_PCI_BUS_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
 
 	MDRV_PIT8254_ADD( "pit8254", mediagx_pit8254_config )
 

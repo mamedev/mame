@@ -177,15 +177,15 @@ static ADDRESS_MAP_START( showhand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ( astrocorp_eeprom_r )
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE( astrocorp_palette_w ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM
-	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE( SOUND, "oki", astrocorp_sound_bank_w )
+	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE( "oki", astrocorp_sound_bank_w )
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE( astrocorp_enable_w )
-	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ( astrocorp_unk_r ) AM_DEVWRITE8( SOUND, "oki", okim6295_w, 0xff00 )
+	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ( astrocorp_unk_r ) AM_DEVWRITE8( "oki", okim6295_w, 0xff00 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( showhanc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE( astrocorp_palette_w ) AM_BASE( &paletteram16 )
-	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE( SOUND, "oki", astrocorp_sound_bank_w )
+	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE( "oki", astrocorp_sound_bank_w )
 	AM_RANGE( 0x080000, 0x080fff ) AM_RAM AM_BASE( &spriteram16 ) AM_SIZE( &spriteram_size )
 	AM_RANGE( 0x082000, 0x082001 ) AM_WRITE( SMH_NOP )
 	AM_RANGE( 0x084000, 0x084001 ) AM_READ_PORT( "INPUTS" )
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( showhanc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ( astrocorp_eeprom_r )
 	AM_RANGE( 0x090000, 0x093fff ) AM_RAM
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE( astrocorp_enable_w )
-	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ( astrocorp_unk_r ) AM_DEVWRITE8( SOUND, "oki", okim6295_w, 0xff00 )
+	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ( astrocorp_unk_r ) AM_DEVWRITE8( "oki", okim6295_w, 0xff00 )
 ADDRESS_MAP_END
 
 /***************************************************************************

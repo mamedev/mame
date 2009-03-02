@@ -230,17 +230,17 @@ static void ipu_ctc_interrupt(const device_config *device, int state)
 
 const z80_daisy_chain mcr_daisy_chain[] =
 {
-	{ Z80CTC, "ctc" },
+	{ "ctc" },
 	{ NULL }
 };
 
 
 const z80_daisy_chain mcr_ipu_daisy_chain[] =
 {
-	{ Z80CTC, "ipu_ctc" },
-	{ Z80PIO, "ipu_pio1" },
-	{ Z80SIO, "ipu_sio" },
-	{ Z80PIO, "ipu_pio0" },
+	{ "ipu_ctc" },
+	{ "ipu_pio1" },
+	{ "ipu_sio" },
+	{ "ipu_pio0" },
 	{ NULL }
 };
 
@@ -426,7 +426,7 @@ MACHINE_RESET( zwackery )
 
 INTERRUPT_GEN( mcr_interrupt )
 {
-	const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "ctc");
+	const device_config *ctc = devtag_get_device(device->machine, "ctc");
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
@@ -445,7 +445,7 @@ INTERRUPT_GEN( mcr_interrupt )
 
 INTERRUPT_GEN( mcr_ipu_interrupt )
 {
-	const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "ipu_ctc");
+	const device_config *ctc = devtag_get_device(device->machine, "ipu_ctc");
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
@@ -612,14 +612,14 @@ static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
 
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
-	const device_config *pia = devtag_get_device(machine, PIA6821, "pia0");
+	const device_config *pia = devtag_get_device(machine, "pia0");
 	pia_ca1_w(pia, 0, 0);
 }
 
 
 static TIMER_CALLBACK( zwackery_493_callback )
 {
-	const device_config *pia = devtag_get_device(machine, PIA6821, "pia0");
+	const device_config *pia = devtag_get_device(machine, "pia0");
 
 	pia_ca1_w(pia, 0, 1);
 	timer_set(machine, video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);
@@ -976,10 +976,10 @@ static TIMER_CALLBACK( ipu_watchdog_reset )
 {
 	logerror("ipu_watchdog_reset\n");
 	cputag_set_input_line(machine, "ipu", INPUT_LINE_RESET, PULSE_LINE);
-	devtag_reset(machine, Z80CTC, "ipu_ctc");
-	devtag_reset(machine, Z80PIO, "ipu_pio0");
-	devtag_reset(machine, Z80PIO, "ipu_pio1");
-	devtag_reset(machine, Z80SIO, "ipu_sio");
+	devtag_reset(machine, "ipu_ctc");
+	devtag_reset(machine, "ipu_pio0");
+	devtag_reset(machine, "ipu_pio1");
+	devtag_reset(machine, "ipu_sio");
 }
 
 

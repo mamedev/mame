@@ -174,9 +174,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_r(devtag_get_device(space->machine, SOUND, "konami2"), offset);
+		ret |= k054539_r(devtag_get_device(space->machine, "konami2"), offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_r(devtag_get_device(space->machine, SOUND, "konami1"), offset)<<8;
+		ret |= k054539_r(devtag_get_device(space->machine, "konami1"), offset)<<8;
 
 	return ret;
 }
@@ -184,9 +184,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_w(devtag_get_device(space->machine, SOUND, "konami2"), offset, data);
+		k054539_w(devtag_get_device(space->machine, "konami2"), offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_w(devtag_get_device(space->machine, SOUND, "konami1"), offset, data>>8);
+		k054539_w(devtag_get_device(space->machine, "konami1"), offset, data>>8);
 }
 
 
@@ -480,11 +480,11 @@ static ADDRESS_MAP_START( memory_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x803800, 0x803fff) AM_READ(obj_rom_r)						// OBJECT ROM readthrough (for POST)
 	AM_RANGE(0xc00000, 0xc01fff) AM_READWRITE(K056832_ram_long_r, K056832_ram_long_w)	// VIDEO RAM (tilemap) (beatmania)
 	AM_RANGE(0xc02000, 0xc02047) AM_WRITE(unknownc02000_w)					// ??
-	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_std_r, ide_std_w)				// IDE control regs (hiphopmania)
-	AM_RANGE(0xd4000c, 0xd4000f) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_alt_r, ide_alt_w)				// IDE status control reg (hiphopmania)
+	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE("ide", ide_std_r, ide_std_w)				// IDE control regs (hiphopmania)
+	AM_RANGE(0xd4000c, 0xd4000f) AM_DEVREADWRITE("ide", ide_alt_r, ide_alt_w)				// IDE status control reg (hiphopmania)
 	AM_RANGE(0xe00000, 0xe01fff) AM_READWRITE(K056832_ram_long_r, K056832_ram_long_w)	// VIDEO RAM (tilemap) (hiphopmania)
-	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_std_r, ide_std_w)				// IDE control regs (beatmania)
-	AM_RANGE(0xf4000c, 0xf4000f) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_alt_r, ide_alt_w)				// IDE status control reg (beatmania)
+	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE("ide", ide_std_r, ide_std_w)				// IDE control regs (beatmania)
+	AM_RANGE(0xf4000c, 0xf4000f) AM_DEVREADWRITE("ide", ide_alt_r, ide_alt_w)				// IDE status control reg (beatmania)
 ADDRESS_MAP_END
 
 
@@ -991,7 +991,7 @@ static STATE_POSTLOAD( djmain_postload )
 
 static MACHINE_START( djmain )
 {
-	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+	const device_config *ide = devtag_get_device(machine, "ide");
 	UINT8 *region = memory_region(machine, "shared");
 
 	if (ide != NULL && ide_master_password != NULL)
@@ -1016,7 +1016,7 @@ static MACHINE_RESET( djmain )
 	sndram_set_bank(machine);
 
 	/* reset the IDE controller */
-	devtag_reset(machine, IDE_CONTROLLER, "ide");
+	devtag_reset(machine, "ide");
 
 	/* reset LEDs */
 	set_led_status(0, 1);

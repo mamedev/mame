@@ -324,12 +324,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinhero_bbx_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_bbx_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -346,7 +346,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(shangkid_soundlatch_r) AM_DEVWRITE(SOUND, "dac", dac_w)
+	AM_RANGE(0x00, 0x00) AM_READ(shangkid_soundlatch_r) AM_DEVWRITE("dac", dac_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -463,7 +463,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dynamski_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* ports are reversed */
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( dynamski )

@@ -46,7 +46,7 @@ static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
 
 	int bank_A = ((data >> 1) & 0x01);
 	int bank_B = ((data) & 0x01);
-	k007232_set_bank( devtag_get_device(device->machine, SOUND, "konami"), bank_A, bank_B );
+	k007232_set_bank( devtag_get_device(device->machine, "konami"), bank_A, bank_B );
 }
 
 
@@ -82,16 +82,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( crimfght_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM 821l01.h4 */
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD(SOUND, "ym", ym2151_r)	/* YM2151 */
+	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym", ym2151_r)	/* YM2151 */
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xe000, 0xe00d) AM_DEVREAD(SOUND, "konami", k007232_r)	/* 007232 registers */
+	AM_RANGE(0xe000, 0xe00d) AM_DEVREAD("konami", k007232_r)	/* 007232 registers */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crimfght_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM 821l01.h4 */
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym", ym2151_w)	/* YM2151 */
-	AM_RANGE(0xe000, 0xe00d) AM_DEVWRITE(SOUND, "konami", k007232_w)		/* 007232 registers */
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym", ym2151_w)	/* YM2151 */
+	AM_RANGE(0xe000, 0xe00d) AM_DEVWRITE("konami", k007232_w)		/* 007232 registers */
 ADDRESS_MAP_END
 
 /***************************************************************************

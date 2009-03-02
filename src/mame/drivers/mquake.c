@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8(SOUND, "ensoniq", es5503_r, mquake_es5503_w, 0x00ff)
+	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8("ensoniq", es5503_r, mquake_es5503_w, 0x00ff)
 	AM_RANGE(0x282000, 0x282001) AM_READ_PORT("SW.LO")
 	AM_RANGE(0x282002, 0x282003) AM_READ_PORT("SW.HI")
 	AM_RANGE(0x284000, 0x28400f) AM_WRITE(output_w)
@@ -319,7 +319,7 @@ static const es5503_interface es5503_intf =
 static MACHINE_RESET(mquake)
 {
 	/* set ES5503 wave memory (this is banked in 64k increments) */
-	es5503_set_base(devtag_get_device(machine, SOUND, "ensoniq"), memory_region(machine, "ensoniq"));
+	es5503_set_base(devtag_get_device(machine, "ensoniq"), memory_region(machine, "ensoniq"));
 
 	MACHINE_RESET_CALL(amiga);
 }

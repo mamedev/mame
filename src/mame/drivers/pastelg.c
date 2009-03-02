@@ -68,15 +68,15 @@ static ADDRESS_MAP_START( pastelg_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x90, 0x96) AM_WRITE(pastelg_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r, pastelg_romsel_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
-	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE(SOUND, "dac", DAC_WRITE)					// unknown
+	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", DAC_WRITE)					// unknown
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
 ADDRESS_MAP_END
 
@@ -117,15 +117,15 @@ static WRITE8_HANDLER( threeds_inputportsel_w )
 
 static ADDRESS_MAP_START( threeds_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM") AM_WRITE( threeds_romsel_w )
 	AM_RANGE(0xf0, 0xf6) AM_WRITE(pastelg_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(threeds_inputport1_r, threeds_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSWC")
-	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE(SOUND, "dac", DAC_WRITE)					// unknown
+	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", DAC_WRITE)					// unknown
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pastelg )

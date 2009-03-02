@@ -50,7 +50,7 @@ WRITE8_HANDLER( cheekyms_port_40_w )
 {
 	/* the lower bits probably trigger sound samples */
 
-	dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), data ? 0x80 : 0);
+	dac_data_w(devtag_get_device(space->machine, "dac"), data ? 0x80 : 0);
 }
 
 

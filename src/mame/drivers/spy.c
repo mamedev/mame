@@ -343,10 +343,10 @@ static WRITE8_HANDLER( sound_bank_w )
 
 	bank_A = (data >> 0) & 0x03;
 	bank_B = (data >> 2) & 0x03;
-	k007232_set_bank(devtag_get_device(space->machine, SOUND, "konami1"),bank_A,bank_B);
+	k007232_set_bank(devtag_get_device(space->machine, "konami1"),bank_A,bank_B);
 	bank_A = (data >> 4) & 0x03;
 	bank_B = (data >> 6) & 0x03;
-	k007232_set_bank(devtag_get_device(space->machine, SOUND, "konami2"),bank_A,bank_B);
+	k007232_set_bank(devtag_get_device(space->machine, "konami2"),bank_A,bank_B);
 }
 
 
@@ -380,9 +380,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spy_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREAD(SOUND, "konami1", k007232_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami2", k007232_r)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym3812_r)
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREAD("konami1", k007232_r)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami2", k007232_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym3812_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -390,9 +390,9 @@ static ADDRESS_MAP_START( spy_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVWRITE(SOUND, "konami1", k007232_w)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami2", k007232_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym3812_w)
+	AM_RANGE(0xa000, 0xa00d) AM_DEVWRITE("konami1", k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami2", k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym3812_w)
 ADDRESS_MAP_END
 
 

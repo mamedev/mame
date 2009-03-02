@@ -399,10 +399,10 @@ static ADDRESS_MAP_START( cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(TAITO8741_2_w) AM_READ(TAITO8741_2_r)
 	AM_RANGE(0x20, 0x21) AM_WRITE(TAITO8741_3_w) AM_READ(TAITO8741_3_r)
 	AM_RANGE(0x40, 0x41) AM_WRITE(TAITO8741_1_w) AM_READ(TAITO8741_1_r)
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE(SOUND, "ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r,        ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE(SOUND, "ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("ay1", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("ay2", ay8910_r,        ay8910_data_w)
 //
 	AM_RANGE(0xe0, 0xe0) AM_READ(SMH_NOP) /* ?? */
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(SMH_NOP) /* ?? */
@@ -413,7 +413,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "msm", gsword_adpcm_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("msm", gsword_adpcm_data_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -433,10 +433,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( josvolly_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(SOUND, "ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r,        ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(SOUND, "ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
-	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("ay1", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
+	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE("ay2", ay8910_r,        ay8910_data_w)
 
 	AM_RANGE(0x81, 0x81) AM_WRITE(josvolly_nmi_enable_w)
 	AM_RANGE(0xC1, 0xC1) AM_NOP // irq clear

@@ -335,9 +335,9 @@ static ADDRESS_MAP_START( nekkyoku_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0xe2, 0xe5) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0xe6, 0xe6) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0xe7, 0xe7) AM_DEVWRITE(SOUND, "msm", fromance_adpcm_reset_w)
+	AM_RANGE(0xe7, 0xe7) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0xe9, 0xea) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0xe9, 0xea) AM_DEVWRITE("ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idolmj_sub_io_map, ADDRESS_SPACE_IO, 8 )
@@ -349,9 +349,9 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0x27, 0x27) AM_DEVWRITE(SOUND, "msm", fromance_adpcm_reset_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x29, 0x2a) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_io_map, ADDRESS_SPACE_IO, 8 )
@@ -363,9 +363,9 @@ static ADDRESS_MAP_START( fromance_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0x27, 0x27) AM_DEVWRITE(SOUND, "msm", fromance_adpcm_reset_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE(SOUND, "ym", ym2413_w)
+	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE("ym", ym2413_w)
 ADDRESS_MAP_END
 
 

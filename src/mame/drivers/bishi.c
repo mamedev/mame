@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x840000, 0x840007) AM_WRITE(K056832_b_word_w)	// VSCCS
 	AM_RANGE(0x850000, 0x85001f) AM_WRITE(K054338_word_w)	// CLTC
 	AM_RANGE(0x870000, 0x8700ff) AM_WRITE(K055555_word_w)	// PCU2
-	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8(SOUND, "ymz", ymz280b_r, ymz280b_w, 0xff00)
+	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)	// Graphic planes
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)	// bug in the ram/rom test?

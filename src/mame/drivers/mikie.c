@@ -91,9 +91,9 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP	// sound command latch
 	AM_RANGE(0x8001, 0x8001) AM_WRITENOP	// ???
-	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE(SOUND, "sn1", sn76496_w)	// trigger read of latch
+	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE("sn1", sn76496_w)	// trigger read of latch
 	AM_RANGE(0x8003, 0x8003) AM_READ(soundlatch_r)
-	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE(SOUND, "sn2", sn76496_w)	// trigger read of latch
+	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("sn2", sn76496_w)	// trigger read of latch
 	AM_RANGE(0x8005, 0x8005) AM_READ(mikie_sh_timer_r)
 	AM_RANGE(0x8079, 0x8079) AM_WRITENOP	// ???
 	AM_RANGE(0xa003, 0xa003) AM_WRITENOP	// ???

@@ -221,7 +221,7 @@ static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 
 static WRITE8_HANDLER( rallyx_bang_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	static int last;
 
 	if (data == 0 && last != 0)
@@ -249,7 +249,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 
 		case 0x02:	/* SOUND ON */
 			/* this doesn't work in New Rally X so I'm not supporting it */
-//          pacman_sound_enable_w(devtag_get_device(space->machine, SOUND, "namco"),bit);
+//          pacman_sound_enable_w(devtag_get_device(space->machine, "namco"),bit);
 			break;
 
 		case 0x03:	/* FLIP */
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( rallyx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")
 	AM_RANGE(0xa000, 0xa00f) AM_WRITE(SMH_RAM) AM_BASE(&rallyx_radarattr)
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE(SOUND, "namco", pacman_sound_w) AM_BASE(&namco_soundregs)
+	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)
 	AM_RANGE(0xa170, 0xa170) AM_WRITE(SMH_NOP)			/* ? */

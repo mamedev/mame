@@ -205,10 +205,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gradius3_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE(SOUND, "konami", sound_bank_w)				/* 007232 bankswitch */
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("konami", sound_bank_w)				/* 007232 bankswitch */
 	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_r)
-	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE(SOUND, "konami", k007232_r, k007232_w)
-	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
+	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

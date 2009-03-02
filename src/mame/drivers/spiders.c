@@ -231,9 +231,9 @@ static READ8_DEVICE_HANDLER( gfx_rom_r );
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	const device_config *pia1 = devtag_get_device(device->machine, PIA6821, "pia1");
-	const device_config *pia2 = devtag_get_device(device->machine, PIA6821, "pia2");
-	const device_config *pia3 = devtag_get_device(device->machine, PIA6821, "pia3");
+	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
+	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
+	const device_config *pia3 = devtag_get_device(device->machine, "pia3");
 	int combined_state = pianew_get_irq_a(pia1) | pianew_get_irq_b(pia1) |
 						 					      pianew_get_irq_b(pia2) |
 						 pianew_get_irq_a(pia3) | pianew_get_irq_b(pia3);
@@ -279,7 +279,7 @@ static const pia6821_interface pia_1_intf =
 
 static INTERRUPT_GEN( update_pia_1 )
 {
-	const device_config *pia1 = devtag_get_device(device->machine, PIA6821, "pia1");
+	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
@@ -334,8 +334,8 @@ static const pia6821_interface pia_3_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER(SOUND, "discrete", spiders_audio_ctrl_w),		/* port A out */
-	DEVCB_DEVICE_HANDLER(PIA6821, "pia4", spiders_audio_command_w),		/* port B out */
+	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_ctrl_w),		/* port A out */
+	DEVCB_DEVICE_HANDLER("pia4", spiders_audio_command_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_LINE(main_cpu_irq),		/* IRQA */
@@ -358,8 +358,8 @@ static const pia6821_interface pia_4_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER(SOUND, "discrete", spiders_audio_a_w),		/* port A out */
-	DEVCB_DEVICE_HANDLER(SOUND, "discrete", spiders_audio_b_w),		/* port B out */
+	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_a_w),		/* port A out */
+	DEVCB_DEVICE_HANDLER("discrete", spiders_audio_b_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_LINE(audio_cpu_irq),		/* IRQA */
@@ -382,7 +382,7 @@ static const pia6821_interface pia_4_intf =
 
 static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 {
-	const device_config *pia2 = devtag_get_device(device->machine, PIA6821, "pia2");
+	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
 	pia_ca1_w(pia2, 0, data);
 }
 
@@ -509,7 +509,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
-	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "ic60"), 0, display_enabled);
+	ttl74123_a_w(devtag_get_device(device->machine, "ic60"), 0, display_enabled);
 }
 
 
@@ -528,7 +528,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_UPDATE( spiders )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
+	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -584,12 +584,12 @@ static READ8_DEVICE_HANDLER( gfx_rom_r )
 
 static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&spiders_ram)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
-	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE(PIA6821, "pia2", pia_alt_r, pia_alt_w)
-	AM_RANGE(0xc050, 0xc053) AM_DEVREADWRITE(PIA6821, "pia3", pia_r, pia_w)
+	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE("pia2", pia_alt_r, pia_alt_w)
+	AM_RANGE(0xc050, 0xc053) AM_DEVREADWRITE("pia3", pia_r, pia_w)
 	AM_RANGE(0xc060, 0xc060) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("DSW3")
@@ -599,7 +599,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spiders_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE(PIA6821, "pia4", pia_r, pia_w)
+	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("pia4", pia_r, pia_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

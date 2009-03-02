@@ -21,7 +21,7 @@ DEVICE_GET_INFO(x2212);
 	MDRV_DEVICE_ADD(_tag, X2212, 0)
 
 #define MDRV_X2212_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, X2212)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 extern void x2212_write( const device_config *device, int offset, int data );

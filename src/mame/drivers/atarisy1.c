@@ -429,9 +429,9 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 
 static const via6522_interface via_interface =
 {
-	/*inputs : A/B         */ DEVCB_HANDLER(via_pa_r), DEVCB_DEVICE_HANDLER(SOUND, "tms", via_pb_r),
+	/*inputs : A/B         */ DEVCB_HANDLER(via_pa_r), DEVCB_DEVICE_HANDLER("tms", via_pb_r),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_HANDLER(via_pa_w), DEVCB_DEVICE_HANDLER(SOUND, "tms", via_pb_w),
+	/*outputs: A/B         */ DEVCB_HANDLER(via_pa_w), DEVCB_DEVICE_HANDLER("tms", via_pb_w),
     /*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irq                  */ DEVCB_NULL
 };
@@ -493,12 +493,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(VIA6522, "via6522_0", via_r, via_w)
-	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x1810, 0x1810) AM_READWRITE(atarigen_6502_sound_r, atarigen_6502_sound_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ(switch_6502_r)
 	AM_RANGE(0x1824, 0x1825) AM_WRITE(led_w)
-	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

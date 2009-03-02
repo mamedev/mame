@@ -151,11 +151,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "msm", sound_control_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("msm", sound_control_w)
 ADDRESS_MAP_END
 
 /********************
@@ -214,9 +214,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kc_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "dac", dac_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_data_address_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

@@ -159,9 +159,9 @@ static WRITE8_DEVICE_HANDLER( shr_w )
 static READ8_HANDLER( ioread )
 {
 	if (offset & 0x08)
-		return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3);
+		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), offset & 3);
 	else if (offset & 0x10)
-		return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3);
+		return ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 3);
 	return 0xff;
 }
 
@@ -169,9 +169,9 @@ static READ8_HANDLER( ioread )
 static WRITE8_HANDLER( iowrite )
 {
 	if (offset & 0x08)
-		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3, data);
+		ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), offset & 3, data);
 	else if (offset & 0x10)
-		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3, data);
+		ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);
 	else if (offset & 0x40)
 	{
 		dr = ds;

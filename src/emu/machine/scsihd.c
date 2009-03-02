@@ -235,7 +235,7 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 
 #ifdef MESS
 	/* TODO: get rid of this ifdef MESS section */
-	our_this->disk = mess_hd_get_hard_disk_file( device_list_find_by_tag( machine->config->devicelist, HARDDISK, diskregion ) );
+	our_this->disk = mess_hd_get_hard_disk_file( devtag_get_device( machine, diskregion ) );
 #else
 	our_this->disk = hard_disk_open(get_disk_handle( diskregion ));
 

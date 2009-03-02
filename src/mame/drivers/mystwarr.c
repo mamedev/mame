@@ -793,9 +793,9 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREAD(SOUND, "konami1", k054539_r)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREAD("konami1", k054539_r)
 	AM_RANGE(0xe230, 0xe3ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREAD(SOUND, "konami2", k054539_r)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVREAD("konami2", k054539_r)
 	AM_RANGE(0xe630, 0xe7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
@@ -804,9 +804,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_DEVWRITE(SOUND, "konami1", k054539_w)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVWRITE("konami1", k054539_w)
 	AM_RANGE(0xe230, 0xe3ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe400, 0xe62f) AM_DEVWRITE(SOUND, "konami2", k054539_w)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVWRITE("konami2", k054539_w)
 	AM_RANGE(0xe630, 0xe7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
@@ -870,8 +870,8 @@ static MACHINE_START( mystwarr )
 
 static MACHINE_RESET(mystwarr)
 {
-	const device_config *k054539_1 = devtag_get_device(machine, SOUND, "konami1");
-	const device_config *k054539_2 = devtag_get_device(machine, SOUND, "konami2");
+	const device_config *k054539_1 = devtag_get_device(machine, "konami1");
+	const device_config *k054539_2 = devtag_get_device(machine, "konami2");
 	int i;
 
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
@@ -887,7 +887,7 @@ static MACHINE_RESET(mystwarr)
 
 static MACHINE_RESET(dadandrn)
 {
-	const device_config *k054539_1 = devtag_get_device(machine, SOUND, "konami1");
+	const device_config *k054539_1 = devtag_get_device(machine, "konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
@@ -896,7 +896,7 @@ static MACHINE_RESET(dadandrn)
 
 static MACHINE_RESET(viostorm)
 {
-	const device_config *k054539_1 = devtag_get_device(machine, SOUND, "konami1");
+	const device_config *k054539_1 = devtag_get_device(machine, "konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
@@ -905,8 +905,8 @@ static MACHINE_RESET(viostorm)
 
 static MACHINE_RESET(metamrph)
 {
-	const device_config *k054539_1 = devtag_get_device(machine, SOUND, "konami1");
-	const device_config *k054539_2 = devtag_get_device(machine, SOUND, "konami2");
+	const device_config *k054539_1 = devtag_get_device(machine, "konami1");
+	const device_config *k054539_2 = devtag_get_device(machine, "konami2");
 	int i;
 
 	// boost voice(chip 0 channel 4-7) and soften other channels
@@ -921,7 +921,7 @@ static MACHINE_RESET(metamrph)
 
 static MACHINE_RESET(martchmp)
 {
-	const device_config *k054539_1 = devtag_get_device(machine, SOUND, "konami1");
+	const device_config *k054539_1 = devtag_get_device(machine, "konami1");
 	int i;
 
 	k054539_init_flags(k054539_1, K054539_REVERSE_STEREO);
@@ -932,7 +932,7 @@ static MACHINE_RESET(martchmp)
 
 static MACHINE_RESET(gaiapols)
 {
-	const device_config *k054539_1 = devtag_get_device(machine, SOUND, "konami1");
+	const device_config *k054539_1 = devtag_get_device(machine, "konami1");
 	int i;
 
 	// boost voice(chip 0 channel 5-7)

@@ -90,9 +90,9 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3007) AM_READ(runaway_input_r)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("4000")
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD(ATARIVGEAROM, "earom", atari_vg_earom_r)
-	AM_RANGE(0x6000, 0x600f) AM_DEVREAD(SOUND, "pokey1", pokey_r)
-	AM_RANGE(0x7000, 0x700f) AM_DEVREAD(SOUND, "pokey2", pokey_r)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("earom", atari_vg_earom_r)
+	AM_RANGE(0x6000, 0x600f) AM_DEVREAD("pokey1", pokey_r)
+	AM_RANGE(0x7000, 0x700f) AM_DEVREAD("pokey2", pokey_r)
 	AM_RANGE(0x8000, 0xcfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)	/* for the interrupt vectors */
 ADDRESS_MAP_END
@@ -103,15 +103,15 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07bf) AM_WRITE(runaway_video_ram_w) AM_BASE(&runaway_video_ram)
 	AM_RANGE(0x07c0, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&runaway_sprite_ram)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(runaway_irq_ack_w)
-	AM_RANGE(0x1400, 0x143F) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE(ATARIVGEAROM, "earom", atari_vg_earom_ctrl_w)
+	AM_RANGE(0x1400, 0x143F) AM_DEVWRITE("earom", atari_vg_earom_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_WRITE(runaway_paletteram_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(SMH_NOP) /* coin counter? */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(SMH_NOP) /* coin counter? */
 	AM_RANGE(0x2003, 0x2004) AM_WRITE(runaway_led_w)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(runaway_tile_bank_w)
-	AM_RANGE(0x6000, 0x600f) AM_DEVWRITE(SOUND, "pokey1", pokey_w)
-	AM_RANGE(0x7000, 0x700f) AM_DEVWRITE(SOUND, "pokey2", pokey_w)
+	AM_RANGE(0x6000, 0x600f) AM_DEVWRITE("pokey1", pokey_w)
+	AM_RANGE(0x7000, 0x700f) AM_DEVWRITE("pokey2", pokey_w)
 	AM_RANGE(0x8000, 0xcfff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 

@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( powerins_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x10003e, 0x10003f) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff)	// OKI Status (used by powerina)
+	AM_RANGE(0x10003e, 0x10003f) AM_DEVREAD8("oki1", okim6295_r, 0x00ff)	// OKI Status (used by powerina)
 	AM_RANGE(0x120000, 0x120fff) AM_READ(SMH_RAM				)	// Palette
 	AM_RANGE(0x130000, 0x130007) AM_READ(SMH_RAM				)	// VRAM 0 Control
 	AM_RANGE(0x140000, 0x143fff) AM_READ(SMH_RAM				)	// VRAM 0
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( powerins_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w					)	// Tiles Banking (VRAM 0)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(powerins_soundlatch_w					)	// Sound Latch
 	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w					)	// Sound
-	AM_RANGE(0x10003e, 0x10003f) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff	)	// used by powerina
+	AM_RANGE(0x10003e, 0x10003f) AM_DEVWRITE8("oki1", okim6295_w, 0x00ff	)	// used by powerina
 	AM_RANGE(0x120000, 0x120fff) AM_WRITE(powerins_paletteram16_w) AM_BASE(&paletteram16	)	// Palette
 	AM_RANGE(0x130000, 0x130007) AM_WRITE(SMH_RAM) AM_BASE(&powerins_vctrl_0	)	// VRAM 0 Control
 	AM_RANGE(0x140000, 0x143fff) AM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0		)	// VRAM 0
@@ -136,9 +136,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerins_io_snd, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym2203", ym2203_r, ym2203_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(SOUND, "oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
 ADDRESS_MAP_END
 
@@ -146,8 +146,8 @@ static ADDRESS_MAP_START( powerinb_io_snd, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(powerinb_fake_ym2203_r, SMH_NOP)
 	AM_RANGE(0x01, 0x01) AM_NOP
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE(SOUND, "oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
 ADDRESS_MAP_END
 

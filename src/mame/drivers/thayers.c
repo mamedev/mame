@@ -715,7 +715,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( thayers )
 {
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, "laserdisc");
 	memset(&ssi263, 0, sizeof(ssi263));
 }
 

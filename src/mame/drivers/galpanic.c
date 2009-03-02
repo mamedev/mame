@@ -219,7 +219,7 @@ static WRITE16_HANDLER( galpanic_bgvideoram_mirror_w )
 
 static ADDRESS_MAP_START( galpanic, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galpanic_fgvideoram) AM_SIZE(&galpanic_fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_READWRITE(SMH_RAM,galpanic_bgvideoram_w) AM_BASE(&galpanic_bgvideoram)	/* + work RAM */
 	AM_RANGE(0x600000, 0x6007ff) AM_READWRITE(SMH_RAM,galpanic_paletteram_w) AM_BASE(&paletteram16)	/* 1024 colors, but only 512 seem to be used */
@@ -266,8 +266,8 @@ static ADDRESS_MAP_START( comad_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x80000c, 0x80000d) AM_READ(kludge)	/* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(SMH_RAM)	/* missw96 */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_READ(SMH_RAM)	/* fantasia, newfant */
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8(SOUND, "oki", comad_okim6295_r, 0xff00)	/* fantasia, missw96 */
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVREAD8(SOUND, "oki", comad_okim6295_r, 0xff00)	/* newfant */
+	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00)	/* fantasia, missw96 */
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00)	/* newfant */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( comad_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -279,8 +279,8 @@ static ADDRESS_MAP_START( comad_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(SMH_RAM)	/* missw96 */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_WRITE(SMH_RAM)	/* fantasia, newfant */
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0xff00)	/* fantasia, missw96 */
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0xff00)	/* newfant */
+	AM_RANGE(0xf00000, 0xf00001) AM_DEVWRITE8("oki", okim6295_w, 0xff00)	/* fantasia, missw96 */
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE8("oki", okim6295_w, 0xff00)	/* newfant */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantsia2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -295,7 +295,7 @@ static ADDRESS_MAP_START( fantsia2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x800006, 0x800007)    ??
 	AM_RANGE(0x800008, 0x800009) AM_READ(kludge)	/* bits 8-a = timer? palette update code waits for them to be 111 */
 	AM_RANGE(0xf80000, 0xf8ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc80000, 0xc80001) AM_DEVREAD8(SOUND, "oki", comad_okim6295_r, 0xff00)
+	AM_RANGE(0xc80000, 0xc80001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantsia2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( fantsia2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xf80000, 0xf8ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_NOP)	/* coin counters, + ? */
-	AM_RANGE(0xc80000, 0xc80001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0xff00)
+	AM_RANGE(0xc80000, 0xc80001) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( galhustl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1_P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0xff00)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8("oki", okim6295_r, 0xff00)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( galhustl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x780000, 0x78001f) AM_WRITE(SMH_RAM) // regs?
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0xff00)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -363,7 +363,7 @@ static ADDRESS_MAP_START( zipzap_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2_P2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8(SOUND, "oki", comad_okim6295_r, 0xff00)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00)
 
 	AM_RANGE(0xc80000, 0xc8ffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -379,7 +379,7 @@ static ADDRESS_MAP_START( zipzap_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x701000, 0x71ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x780000, 0x78001f) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpania_6295_bankswitch_w)
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0xff00)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
 	AM_RANGE(0xc80000, 0xc8ffff) AM_WRITE(SMH_RAM) // main ram
 ADDRESS_MAP_END
 
@@ -398,7 +398,7 @@ static ADDRESS_MAP_START( supmodel_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800006, 0x800007) AM_READ(kludge)
 	AM_RANGE(0x800008, 0x800009) AM_READ(kludge)
 	AM_RANGE(0xc80000, 0xc8ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVREAD8(SOUND, "oki", comad_okim6295_r, 0xff00)
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supmodel_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( supmodel_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xe00012, 0xe00013) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0xff00)
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
 ADDRESS_MAP_END
 
 #define COMMON_COIN0\

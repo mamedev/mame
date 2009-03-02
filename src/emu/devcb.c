@@ -65,11 +65,11 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 	}
 
 	/* device handlers */
-	else if (config->type != NULL && (config->readline != NULL || config->readdevice != NULL))
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->readline != NULL || config->readdevice != NULL))
 	{
-		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->type, config->tag);
+		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->tag);
 		if (resolved->target == NULL)
-			fatalerror("devcb_resolve_read_line: unable to find %s '%s' (requested by %s '%s')", devtype_get_name(config->type), config->tag, device_get_name(device), device->tag);
+			fatalerror("devcb_resolve_read_line: unable to find device '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
 
 		/* read_line to read_line is direct */
 		if (config->readline != NULL)
@@ -141,11 +141,11 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 	}
 
 	/* device handlers */
-	else if (config->type != NULL && (config->writeline != NULL || config->writedevice != NULL))
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->writeline != NULL || config->writedevice != NULL))
 	{
-		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->type, config->tag);
+		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->tag);
 		if (resolved->target == NULL)
-			fatalerror("devcb_resolve_write_line: unable to find %s '%s' (requested by %s '%s')", devtype_get_name(config->type), config->tag, device_get_name(device), device->tag);
+			fatalerror("devcb_resolve_write_line: unable to find device '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
 
 		/* write_line to write_line is direct */
 		if (config->writeline != NULL)
@@ -208,11 +208,11 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 	}
 
 	/* device handlers */
-	else if (config->type != NULL && (config->readline != NULL || config->readdevice != NULL))
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->readline != NULL || config->readdevice != NULL))
 	{
-		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->type, config->tag);
+		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->tag);
 		if (resolved->target == NULL)
-			fatalerror("devcb_resolve_read8: unable to find %s '%s' (requested by %s '%s')", devtype_get_name(config->type), config->tag, device_get_name(device), device->tag);
+			fatalerror("devcb_resolve_read8: unable to find device '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
 
 		/* read8 to read8 is direct */
 		if (config->readdevice != NULL)
@@ -261,11 +261,11 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 	}
 
 	/* device handlers */
-	else if (config->type != NULL && (config->writeline != NULL || config->writedevice != NULL))
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->writeline != NULL || config->writedevice != NULL))
 	{
-		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->type, config->tag);
+		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : devtag_get_device(device->machine, config->tag);
 		if (resolved->target == NULL)
-			fatalerror("devcb_resolve_write8: unable to find %s '%s' (requested by %s '%s')", devtype_get_name(config->type), config->tag, device_get_name(device), device->tag);
+			fatalerror("devcb_resolve_write8: unable to find device '%s' (requested by %s '%s')", config->tag, device_get_name(device), device->tag);
 
 		/* write8 to write8 is direct */
 		if (config->writedevice != NULL)

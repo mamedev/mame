@@ -133,7 +133,7 @@ VIDEO_UPDATE( playch10 )
 	/* Dual monitor version */
 	if (pc10_bios == 1)
 	{
-		const device_config *top_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
+		const device_config *top_screen = devtag_get_device(screen->machine, "top");
 
 		/* On Playchoice 10 single monitor, this bit toggles    */
 		/* between PPU and BIOS display.                        */

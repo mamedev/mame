@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x23, 0x23) AM_WRITE(sound_data_w)
-	AM_RANGE(0x33, 0x33) AM_DEVWRITE(SOUND, "ay", sound_control_w)
+	AM_RANGE(0x33, 0x33) AM_DEVWRITE("ay", sound_control_w)
 ADDRESS_MAP_END
 
 

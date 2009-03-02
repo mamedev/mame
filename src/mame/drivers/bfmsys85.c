@@ -414,15 +414,15 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE(mux_ctrl_r,mux_ctrl_w)// mux status register
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)		// irq latch ( MC6850 / timer )
 
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay", ay8910_data_w)
 	AM_RANGE(0x3001, 0x3001) AM_READNOP //sound latch
-	AM_RANGE(0x3200, 0x3200) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x3200, 0x3200) AM_DEVWRITE("ay", ay8910_address_w)
 
-	AM_RANGE(0x3402, 0x3402) AM_DEVWRITE(ACIA6850, "acia6850_0", acia6850_ctrl_w)
-	AM_RANGE(0x3403, 0x3403) AM_DEVWRITE(ACIA6850, "acia6850_0", acia6850_data_w)
+	AM_RANGE(0x3402, 0x3402) AM_DEVWRITE("acia6850_0", acia6850_ctrl_w)
+	AM_RANGE(0x3403, 0x3403) AM_DEVWRITE("acia6850_0", acia6850_data_w)
 
-	AM_RANGE(0x3406, 0x3406) AM_DEVREAD(ACIA6850, "acia6850_0", acia6850_stat_r)
-	AM_RANGE(0x3407, 0x3407) AM_DEVREAD(ACIA6850, "acia6850_0", acia6850_data_r)
+	AM_RANGE(0x3406, 0x3406) AM_DEVREAD("acia6850_0", acia6850_stat_r)
+	AM_RANGE(0x3407, 0x3407) AM_DEVREAD("acia6850_0", acia6850_data_r)
 
 	AM_RANGE(0x3600, 0x3600) AM_WRITE(mux_enable_w)		// mux enable
 

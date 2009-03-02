@@ -60,7 +60,7 @@ static DEVICE_START( wave )
 	const device_config *image = NULL;
 
 #ifdef MESS
-	image = device_list_find_by_tag( device->machine->config->devicelist, CASSETTE, device->tag );
+	image = devtag_get_device( device->machine, device->tag );
 #endif
 	stream_create(device, 0, 1, device->machine->sample_rate, (void *)image, wave_sound_update);
 }

@@ -109,9 +109,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x21) AM_WRITE(fortecar_videoregs_w) // MC6845?
-	AM_RANGE(0x40, 0x40) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0x60, 0x62) AM_DEVREADWRITE(PPI8255, "fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x60, 0x62) AM_DEVREADWRITE("fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
 	AM_RANGE(0x81, 0x81) AM_WRITE(rom_bank_w) //completely wrong,might not be there...
  	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0") //written too,multiplexer?
  	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("IN1")

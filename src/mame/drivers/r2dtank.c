@@ -73,8 +73,8 @@ static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	const device_config *pia0 = devtag_get_device(device->machine, PIA6821, "pia_main");
-	const device_config *pia1 = devtag_get_device(device->machine, PIA6821, "pia_audio");
+	const device_config *pia0 = devtag_get_device(device->machine, "pia_main");
+	const device_config *pia1 = devtag_get_device(device->machine, "pia_audio");
 	int combined_state = pianew_get_irq_a(pia0) | pianew_get_irq_b(pia0) |
 						 pianew_get_irq_a(pia1) | pianew_get_irq_b(pia1);
 
@@ -150,10 +150,10 @@ static READ8_DEVICE_HANDLER( AY8910_port_r )
 	UINT8 ret = 0;
 
 	if (AY8910_selected & 0x08)
-		ret = ay8910_r(devtag_get_device(device->machine, SOUND, "ay1"), 0);
+		ret = ay8910_r(devtag_get_device(device->machine, "ay1"), 0);
 
 	if (AY8910_selected & 0x10)
-		ret = ay8910_r(devtag_get_device(device->machine, SOUND, "ay2"), 0);
+		ret = ay8910_r(devtag_get_device(device->machine, "ay2"), 0);
 
 	return ret;
 }
@@ -162,10 +162,10 @@ static READ8_DEVICE_HANDLER( AY8910_port_r )
 static WRITE8_DEVICE_HANDLER( AY8910_port_w )
 {
 	if (AY8910_selected & 0x08)
-		ay8910_data_address_w(devtag_get_device(device->machine, SOUND, "ay1"), AY8910_selected >> 2, data);
+		ay8910_data_address_w(devtag_get_device(device->machine, "ay1"), AY8910_selected >> 2, data);
 
 	if (AY8910_selected & 0x10)
-		ay8910_data_address_w(devtag_get_device(device->machine, SOUND, "ay2"), AY8910_selected >> 2, data);
+		ay8910_data_address_w(devtag_get_device(device->machine, "ay2"), AY8910_selected >> 2, data);
 }
 
 
@@ -206,7 +206,7 @@ static const ay8910_interface ay8910_2_interface =
 
 static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 {
-	const device_config *pia = devtag_get_device(device->machine, PIA6821, "pia_main");
+	const device_config *pia = devtag_get_device(device->machine, "pia_main");
 	pia_ca1_w(pia, 0, data);
 	ttl74123_output = data;
 }
@@ -362,7 +362,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
-	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "74123"), 0, display_enabled);
+	ttl74123_a_w(devtag_get_device(device->machine, "74123"), 0, display_enabled);
 }
 
 
@@ -381,7 +381,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_UPDATE( r2dtank )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
+	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -406,10 +406,10 @@ static ADDRESS_MAP_START( r2dtank_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&r2dtank_colorram)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE(PIA6821, "pia_main", pia_r, pia_comp_w)
+	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("pia_main", pia_r, pia_comp_w)
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0xc000, 0xc007) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -417,7 +417,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( r2dtank_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE(PIA6821, "pia_audio", pia_r, pia_w)
+	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("pia_audio", pia_r, pia_w)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(audio_command_r, audio_answer_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END

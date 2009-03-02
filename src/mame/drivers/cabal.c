@@ -188,16 +188,16 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(seibu_irq_clear_w)
 	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE(SOUND, "adpcm1", seibu_adpcm_adr_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_adr_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE(SOUND, "adpcm1", seibu_adpcm_ctl_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_ctl_w)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
-	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE(SOUND, "adpcm2", seibu_adpcm_adr_w)
-	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE(SOUND, "adpcm2", seibu_adpcm_ctl_w)
+	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_adr_w)
+	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_ctl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( cabalbl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4008, 0x4008) AM_READ(cabalbl_snd2_r)
 	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
 	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x400e, 0x400f) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x400e, 0x400f) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(SMH_NOP)  /* ??? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -234,7 +234,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabalbl_talk1_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE(SOUND, "msm1", cabalbl_adpcm_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("msm1", cabalbl_adpcm_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabalbl_talk2_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -244,7 +244,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabalbl_talk2_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch4_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE(SOUND, "msm2", cabalbl_adpcm_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("msm2", cabalbl_adpcm_w)
 ADDRESS_MAP_END
 
 /***************************************************************************/

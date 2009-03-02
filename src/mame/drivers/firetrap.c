@@ -206,7 +206,7 @@ static WRITE8_HANDLER( firetrap_sound_command_w )
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
 {
-	msm5205_reset_w(devtag_get_device(space->machine, SOUND, "msm"),~data & 0x01);
+	msm5205_reset_w(devtag_get_device(space->machine, "msm"),~data & 0x01);
 	firetrap_irq_enable = data & 0x02;
 }
 
@@ -317,7 +317,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym", ym3526_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym", ym3526_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)

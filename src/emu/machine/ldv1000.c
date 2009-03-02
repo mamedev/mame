@@ -120,8 +120,8 @@ static WRITE8_DEVICE_HANDLER( ppi1_portc_w );
 static ADDRESS_MAP_START( ldv1000_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x9ff0) AM_DEVREADWRITE(PPI8255, "ldvppi0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x9ff0) AM_DEVREADWRITE(PPI8255, "ldvppi1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( ldv1000_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x07) AM_MIRROR(0x38) AM_READWRITE(decoder_display_port_r, decoder_display_port_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(controller_r)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(controller_w)
-	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80CTC, "ldvctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ldvctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 
@@ -157,7 +157,7 @@ static const z80ctc_interface ctcintf =
 
 static const z80_daisy_chain daisy_chain[] =
 {
-	{ Z80CTC, "ldvctc" },
+	{ "ldvctc" },
 	{ NULL }
 };
 
@@ -231,8 +231,8 @@ static void ldv1000_init(laserdisc_state *ld)
 
 	/* find our devices */
 	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device, "ldv1000"));
-	player->ctc = devtag_get_device(ld->device->machine, Z80CTC, device_build_tag(tempstring, ld->device, "ldvctc"));
-	player->multitimer = devtag_get_device(ld->device->machine, TIMER, device_build_tag(tempstring, ld->device, "multitimer"));
+	player->ctc = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "ldvctc"));
+	player->multitimer = devtag_get_device(ld->device->machine, device_build_tag(tempstring, ld->device, "multitimer"));
 	timer_device_set_ptr(player->multitimer, ld);
 	astring_free(tempstring);
 }

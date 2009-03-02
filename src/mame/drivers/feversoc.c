@@ -135,7 +135,7 @@ static WRITE32_HANDLER( output_w )
 		//data>>16 & 2 coin out
 		coin_counter_w(1,data>>16 & 4);
 		//data>>16 & 8 coin hopper
-		okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki"), 0x40000 * (((data>>16) & 0x20)>>5));
+		okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), 0x40000 * (((data>>16) & 0x20)>>5));
 	}
 	if(ACCESSING_BITS_0_15)
 	{
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( feversoc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
-	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff0000)
+	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff0000)
 //  AM_RANGE(0x06010000, 0x06017fff) AM_RAM //contains RISE11 keys and other related stuff.
 	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_BASE(&paletteram32)
 ADDRESS_MAP_END

@@ -26,7 +26,6 @@ struct _latch8_devread
 {
 	/* only for byte reads, does not affect bit reads and node_map */
 	UINT32					from_bit;
-	device_type				type;
 	const char				*tag;
 	read8_device_func		devread_handler;
 	read8_space_func		read_handler;
@@ -70,9 +69,8 @@ struct _latch8_config
 	MDRV_DEVICE_CONFIG_DATA32_ARRAY(latch8_config, node_map, _bit, _node)
 
 /* Upon read, replace bits by reading from another device handler */
-#define MDRV_LATCH8_DEVREAD(_bit, _type, _tag, _handler, _from_bit) \
+#define MDRV_LATCH8_DEVREAD(_bit, _tag, _handler, _from_bit) \
 	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, type, _type) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, tag, _tag) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, devread_handler, _handler) \
 
@@ -83,21 +81,21 @@ struct _latch8_config
 
 /* remove device */
 #define MDRV_LATCH8_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(LATCH8, _type)
+	MDRV_DEVICE_REMOVE(_tag)
 
 /* Accessor macros */
 
 #define AM_LATCH8_READ(_tag) \
-	AM_DEVREAD(LATCH8, _tag, latch8_r)
+	AM_DEVREAD(_tag, latch8_r)
 
 #define AM_LATCH8_READBIT(_tag, _bit) \
-	AM_DEVREAD(LATCH8, _tag, latch8_bit ## _bit ## _q_r)
+	AM_DEVREAD(_tag, latch8_bit ## _bit ## _q_r)
 
 #define AM_LATCH8_WRITE(_tag) \
-	AM_DEVWRITE(LATCH8, _tag, latch8_w)
+	AM_DEVWRITE(_tag, latch8_w)
 
 #define AM_LATCH8_READWRITE(_tag) \
-	AM_DEVREADWRITE(LATCH8, _tag, latch8_r, latch8_w)
+	AM_DEVREADWRITE(_tag, latch8_r, latch8_w)
 
 /* device interface */
 DEVICE_GET_INFO( latch8 );

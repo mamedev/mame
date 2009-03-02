@@ -412,8 +412,8 @@ WRITE8_DEVICE_HANDLER( bb_ym2_a_w )
 
 WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 {
-	const device_config *ym1 = devtag_get_device(device->machine, SOUND, "ym1");
-	const device_config *ym2 = devtag_get_device(device->machine, SOUND, "ym2");
+	const device_config *ym1 = devtag_get_device(device->machine, "ym1");
+	const device_config *ym2 = devtag_get_device(device->machine, "ym2");
 	double gain;
 
 	stream_update(stream);

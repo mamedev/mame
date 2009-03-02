@@ -341,7 +341,7 @@ static READ16_HANDLER( io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && sound_banks)
-				return (input_port_read(space->machine, portnames[offset]) & 0xbf) | (upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd")) << 6);
+				return (input_port_read(space->machine, portnames[offset]) & 0xbf) | (upd7759_busy_r(devtag_get_device(space->machine, "upd")) << 6);
 			return input_port_read(space->machine, portnames[offset]);
 
 		/* 'SEGA' protection */
@@ -428,7 +428,7 @@ static WRITE16_HANDLER( io_chip_w )
 			}
 			if (sound_banks > 1)
 			{
-				const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
+				const device_config *upd = devtag_get_device(space->machine, "upd");
 				newbank = (data >> 2) & (sound_banks - 1);
 				upd7759_set_bank_base(upd, newbank * 0x20000);
 			}
@@ -438,7 +438,7 @@ static WRITE16_HANDLER( io_chip_w )
 		case 0x1c/2:
 			if (sound_banks > 1)
 			{
-				const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
+				const device_config *upd = devtag_get_device(space->machine, "upd");
 				upd7759_reset_w(upd, (data >> 1) & 1);
 			}
 			break;
@@ -625,7 +625,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_MIRROR(0x13fdfe) AM_READWRITE(prot_r, prot_w)
 	AM_RANGE(0x800200, 0x800201) AM_MIRROR(0x13fdfe) AM_WRITE(control_w)
 	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE(io_chip_r, io_chip_w)
-	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8(SOUND, "ym", ym3438_r, ym3438_w, 0x00ff)
+	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8("ym", ym3438_r, ym3438_w, 0x00ff)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
@@ -1819,7 +1819,7 @@ it should be, otherwise I don't see how the formula could be computed.
 
 static void segac2_common_init(running_machine* machine, int (*func)(int in))
 {
-	const device_config *upd = devtag_get_device(machine, SOUND, "upd");
+	const device_config *upd = devtag_get_device(machine, "upd");
 
 	DRIVER_INIT_CALL( megadriv_c2 );
 

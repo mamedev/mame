@@ -327,7 +327,7 @@ static ADDRESS_MAP_START( quizpun2_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( SMH_NOP )	// IRQ end
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE( SMH_NOP )	// NMI end
 	AM_RANGE( 0x40, 0x40 ) AM_READ( soundlatch_r )
-	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w )
+	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w )
 ADDRESS_MAP_END
 
 

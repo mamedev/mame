@@ -828,7 +828,7 @@ static WRITE16_DEVICE_HANDLER(snd_w)
 
 static ADDRESS_MAP_START( namcona1_mcu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000800, 0x000fff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_mcu)	// "Mailslot" communications ports
-	AM_RANGE(0x001000, 0x001fff) AM_DEVREADWRITE(SOUND, "c140", snd_r, snd_w)	// C140-alike sound chip
+	AM_RANGE(0x001000, 0x001fff) AM_DEVREADWRITE("c140", snd_r, snd_w)	// C140-alike sound chip
 	AM_RANGE(0x002000, 0x002fff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w)	// mirror of first page of shared work RAM
 	AM_RANGE(0x003000, 0x00afff) AM_RAM						// there is a 32k RAM chip according to CGFM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0)			// internal ROM BIOS
@@ -919,7 +919,7 @@ static WRITE8_HANDLER( port8_w )
 
 static MACHINE_START( namcona1 )
 {
-	c140_set_base(devtag_get_device(machine, SOUND, "c140"), namcona1_workram);
+	c140_set_base(devtag_get_device(machine, "c140"), namcona1_workram);
 }
 
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.

@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map_sound_cowrace, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ym", ym2203_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym", ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -155,9 +155,9 @@ static const ym2203_interface ym2203_interface_1 =
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),	// read A
-		DEVCB_DEVICE_HANDLER(SOUND, "oki", okim6295_r),			// read B
-		DEVCB_NULL,												// write A
-		DEVCB_DEVICE_HANDLER(SOUND, "oki", okim6295_w)			// write B
+		DEVCB_DEVICE_HANDLER("oki", okim6295_r),					// read B
+		DEVCB_NULL,													// write A
+		DEVCB_DEVICE_HANDLER("oki", okim6295_w)						// write B
 	},
 	NULL
 };

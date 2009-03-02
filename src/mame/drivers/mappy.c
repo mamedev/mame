@@ -718,7 +718,7 @@ static WRITE8_HANDLER( superpac_latch_w )
 			break;
 
 		case 0x06:	/* SOUND ON */
-			mappy_sound_enable(devtag_get_device(space->machine, SOUND, "namco"), bit);
+			mappy_sound_enable(devtag_get_device(space->machine, "namco"), bit);
 			break;
 
 		case 0x08:	/* 4 RESET */
@@ -763,7 +763,7 @@ static WRITE8_HANDLER( phozon_latch_w )
 			break;
 
 		case 0x06:
-			mappy_sound_enable(devtag_get_device(space->machine, SOUND, "namco"), bit);
+			mappy_sound_enable(devtag_get_device(space->machine, "namco"), bit);
 			break;
 
 		case 0x08:
@@ -807,7 +807,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 			break;
 
 		case 0x06:	/* SOUND ON */
-			mappy_sound_enable(devtag_get_device(space->machine, SOUND, "namco"), bit);
+			mappy_sound_enable(devtag_get_device(space->machine, "namco"), bit);
 			break;
 
 		case 0x08:	/* 4 RESET */
@@ -873,7 +873,7 @@ static ADDRESS_MAP_START( superpac_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_BASE(&mappy_videoram)	/* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_BASE(&mappy_spriteram)		/* work RAM with embedded sprite RAM */
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(superpac_flipscreen_r, superpac_flipscreen_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_DEVWRITE(SOUND, "namco", mappy_snd_sharedram_w) AM_SHARE(1)	/* shared RAM with the sound CPU */
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_DEVWRITE("namco", mappy_snd_sharedram_w) AM_SHARE(1)	/* shared RAM with the sound CPU */
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x5000, 0x500f) AM_WRITE(superpac_latch_w)				/* various control bits */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
@@ -883,7 +883,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( phozon_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE(2) AM_BASE(&mappy_videoram)	/* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_BASE(&mappy_spriteram) AM_SHARE(3) /* shared RAM with CPU #2/sprite RAM*/
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_DEVWRITE(SOUND, "namco", mappy_snd_sharedram_w) AM_SHARE(1)	/* shared RAM with the sound CPU */
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_DEVWRITE("namco", mappy_snd_sharedram_w) AM_SHARE(1)	/* shared RAM with the sound CPU */
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x5000, 0x500f) AM_WRITE(phozon_latch_w)				/* various control bits */
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)		 		/* watchdog reset */
@@ -894,7 +894,7 @@ static ADDRESS_MAP_START( mappy_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(mappy_videoram_w) AM_BASE(&mappy_videoram)		/* video RAM */
 	AM_RANGE(0x1000, 0x27ff) AM_RAM AM_BASE(&mappy_spriteram)		/* work RAM with embedded sprite RAM */
 	AM_RANGE(0x3800, 0x3fff) AM_WRITE(mappy_scroll_w)				/* scroll */
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_DEVWRITE(SOUND, "namco", mappy_snd_sharedram_w) AM_SHARE(1)	/* shared RAM with the sound CPU */
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_DEVWRITE("namco", mappy_snd_sharedram_w) AM_SHARE(1)	/* shared RAM with the sound CPU */
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x5000, 0x500f) AM_WRITE(mappy_latch_w)				/* various control bits */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)				/* watchdog reset */
@@ -903,18 +903,18 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( superpac_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_DEVWRITE(SOUND, "namco", mappy_snd_sharedram_w) AM_SHARE(1) AM_BASE(&namco_soundregs) /* shared RAM with the main CPU (also sound registers) */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_DEVWRITE("namco", mappy_snd_sharedram_w) AM_SHARE(1) AM_BASE(&namco_soundregs) /* shared RAM with the main CPU (also sound registers) */
 	AM_RANGE(0x2000, 0x200f) AM_WRITE(superpac_latch_w)                   /* various control bits */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phozon_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_DEVWRITE(SOUND, "namco", mappy_snd_sharedram_w) AM_SHARE(1) AM_BASE(&namco_soundregs) /* shared RAM with the main CPU + sound registers */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_DEVWRITE("namco", mappy_snd_sharedram_w) AM_SHARE(1) AM_BASE(&namco_soundregs) /* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0xe000, 0xffff) AM_ROM											/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mappy_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_DEVWRITE(SOUND, "namco", mappy_snd_sharedram_w) AM_SHARE(1) AM_BASE(&namco_soundregs) /* shared RAM with the main CPU (also sound registers) */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_DEVWRITE("namco", mappy_snd_sharedram_w) AM_SHARE(1) AM_BASE(&namco_soundregs) /* shared RAM with the main CPU (also sound registers) */
 	AM_RANGE(0x2000, 0x200f) AM_WRITE(mappy_latch_w)						/* various control bits */
 	AM_RANGE(0xe000, 0xffff) AM_ROM											/* ROM code */
 ADDRESS_MAP_END
@@ -924,7 +924,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( phozon_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE(2)	/* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE(3) 			/* shared RAM with CPU #2/sprite RAM*/
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_DEVWRITE(SOUND, "namco", mappy_snd_sharedram_w) AM_SHARE(1)	/* shared RAM with CPU #2 */
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_DEVWRITE("namco", mappy_snd_sharedram_w) AM_SHARE(1)	/* shared RAM with CPU #2 */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM							/* RAM */
 	AM_RANGE(0xe000, 0xffff) AM_ROM							/* ROM */
 ADDRESS_MAP_END
@@ -2132,7 +2132,7 @@ static DRIVER_INIT( grobda )
        However, removing the 15XX from the board causes sound to disappear completely, so
        the DAC might be built-in after all.
       */
-    const device_config *dac = devtag_get_device(machine, SOUND, "dac");
+    const device_config *dac = devtag_get_device(machine, "dac");
 	memory_install_write8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
 
 	DRIVER_INIT_CALL(58_56);

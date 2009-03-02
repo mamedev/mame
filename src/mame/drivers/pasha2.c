@@ -220,10 +220,10 @@ static ADDRESS_MAP_START( pasha2_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x80, 0x83) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa0, 0xa3) AM_WRITENOP //soundlatch?
 	AM_RANGE(0xc0, 0xc3) AM_WRITE(pasha2_misc_w)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(SOUND, "oki1", oki_r, oki_w)
-	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(SOUND, "oki2", oki_r, oki_w)
-	AM_RANGE(0xe8, 0xeb) AM_DEVWRITE(SOUND, "oki1", oki_bank_w)
-	AM_RANGE(0xec, 0xef) AM_DEVWRITE(SOUND, "oki2", oki_bank_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("oki1", oki_r, oki_w)
+	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE("oki2", oki_r, oki_w)
+	AM_RANGE(0xe8, 0xeb) AM_DEVWRITE("oki1", oki_bank_w)
+	AM_RANGE(0xec, 0xef) AM_DEVWRITE("oki2", oki_bank_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pasha2 )

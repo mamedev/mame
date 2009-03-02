@@ -378,8 +378,8 @@ static WRITE8_HANDLER( vid_o1_callback )
 
 	if (data)
 	{
-		const device_config *acia_0 = device_list_find_by_tag(space->machine->config->devicelist, ACIA6850, "acia6850_0");
-		const device_config *acia_1 = device_list_find_by_tag(space->machine->config->devicelist, ACIA6850, "acia6850_1");
+		const device_config *acia_0 = devtag_get_device(space->machine, "acia6850_0");
+		const device_config *acia_1 = devtag_get_device(space->machine, "acia6850_1");
 		acia6850_tx_clock_in(acia_0);
 		acia6850_rx_clock_in(acia_0);
 		acia6850_tx_clock_in(acia_1);
@@ -1453,8 +1453,8 @@ static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&mpu4_vid_mainram) /* mainram / char address ram? */
 
 	/* what is here, the sound chip? Assume so */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8(SOUND, "saa", saa1099_control_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8(SOUND, "saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w) /* the palette chip */
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
@@ -1464,8 +1464,8 @@ static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
 
 	/* comms with the MPU4 */
-    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
-    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
+    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
+    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
 
 	AM_RANGE(0xff9000, 0xff900f) AM_READWRITE(ptm6840_1_lsb_r,ptm6840_1_lsb_w)	/* 6840PTM */
 
@@ -1476,8 +1476,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07FF) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE(ACIA6850, "acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(ACIA6850, "acia6850_0", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
 
 	AM_RANGE(0x0880, 0x0881) AM_NOP /* Could be a UART datalogger is here. */
 
@@ -1506,8 +1506,8 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 
 	/* what is here, the sound chip? Assume so */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8(SOUND, "saa", saa1099_control_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8(SOUND, "saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 
 	/* the palette chip */
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w) /* the palette chip */
@@ -1520,8 +1520,8 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0xe05000, 0xe05001) AM_READWRITE(adpcm_r, adpcm_w) */
 
 	/* comms with the MPU4 */
-    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
-    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(ACIA6850, "acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
+    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
+    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
 
 	AM_RANGE(0xff9000, 0xff900f) AM_READ(  ptm6840_1_lsb_r)
 	AM_RANGE(0xff9000, 0xff900f) AM_WRITE( ptm6840_1_lsb_w)
@@ -1660,8 +1660,8 @@ static const mc6845_interface hd6845_intf =
 static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(HD6845, "crtc", mc6845_address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(HD6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 
 /*  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w) */
 

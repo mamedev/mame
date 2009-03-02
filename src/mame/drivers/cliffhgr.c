@@ -211,7 +211,7 @@ static void vdp_interrupt (running_machine *machine, int state)
 
 static MACHINE_START( cliffhgr )
 {
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, "laserdisc");
 	irq_timer = timer_alloc(machine, cliff_irq_callback, NULL);
 }
 
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( mainport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x44, 0x44) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0x45, 0x45) AM_READ(TMS9928A_vram_r)
-	AM_RANGE(0x46, 0x46) AM_DEVWRITE(SOUND, "discrete", cliff_sound_overlay_w)
+	AM_RANGE(0x46, 0x46) AM_DEVWRITE("discrete", cliff_sound_overlay_w)
 	AM_RANGE(0x50, 0x52) AM_READ(cliff_phillips_code_r)
 	AM_RANGE(0x53, 0x53) AM_READ(cliff_irq_ack_r)
 	AM_RANGE(0x54, 0x54) AM_WRITE(TMS9928A_register_w)

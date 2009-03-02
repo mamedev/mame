@@ -164,7 +164,7 @@ AM_RANGE(0x9e00, 0x9e3f) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(senjyo_bg1videoram_w) AM_BASE(&senjyo_bg1videoram)
 	AM_RANGE(0xb800, 0xbbff) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_radarram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xd004, 0xd004) AM_DEVWRITE(Z80PIO, "z80pio", z80pio_p_w)
+	AM_RANGE(0xd004, 0xd004) AM_DEVWRITE("z80pio", z80pio_p_w)
 ADDRESS_MAP_END
 
 
@@ -176,9 +176,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE(SOUND, "sn3", sn76496_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
 #if 0
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( starforb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(senjyo_bg1videoram_w) AM_BASE(&senjyo_bg1videoram)
 	AM_RANGE(0xb800, 0xbbff) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_radarram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xd004, 0xd004) AM_DEVWRITE(Z80PIO, "z80pio", z80pio_p_w)
+	AM_RANGE(0xd004, 0xd004) AM_DEVWRITE("z80pio", z80pio_p_w)
 
 	/* these aren't used / written, left here to make sure memory is allocated */
 	AM_RANGE(0xfe00, 0xfe1f) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_fgscroll)
@@ -241,9 +241,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( starforb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(SOUND, "sn1", sn76496_w)
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE(SOUND, "sn2", sn76496_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE(SOUND, "sn3", sn76496_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_w)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
 #if 0
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
@@ -268,8 +268,8 @@ static READ8_DEVICE_HANDLER( pio_r )
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80PIO, "z80pio", pio_r, pio_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", pio_r, pio_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 

@@ -120,13 +120,13 @@ static ADDRESS_MAP_START( tank8_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(tank8_lockout_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(tank8_int_reset_w)
-	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE(SOUND, "discrete", tank8_crash_w)
-	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE(SOUND, "discrete", tank8_explosion_w)
-	AM_RANGE(0x1d03, 0x1d03) AM_DEVWRITE(SOUND, "discrete", tank8_bugle_w)
-	AM_RANGE(0x1d04, 0x1d04) AM_DEVWRITE(SOUND, "discrete", tank8_bug_w)
+	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE("discrete", tank8_crash_w)
+	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE("discrete", tank8_explosion_w)
+	AM_RANGE(0x1d03, 0x1d03) AM_DEVWRITE("discrete", tank8_bugle_w)
+	AM_RANGE(0x1d04, 0x1d04) AM_DEVWRITE("discrete", tank8_bug_w)
 	AM_RANGE(0x1d05, 0x1d05) AM_WRITE(SMH_RAM) AM_BASE(&tank8_team)
-	AM_RANGE(0x1d06, 0x1d06) AM_DEVWRITE(SOUND, "discrete", tank8_attract_w)
-	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE(SOUND, "discrete", tank8_motor_w)
+	AM_RANGE(0x1d06, 0x1d06) AM_DEVWRITE("discrete", tank8_attract_w)
+	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE("discrete", tank8_motor_w)
 
 ADDRESS_MAP_END
 

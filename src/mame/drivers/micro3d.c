@@ -524,7 +524,7 @@ static WRITE8_HANDLER( sound_io_w )
 		}
 		case 0x03:
 		{
-			const device_config *upd = devtag_get_device(space->machine, SOUND, "upd7759");
+			const device_config *upd = devtag_get_device(space->machine, "upd7759");
 			upd7759_set_bank_base(upd, (data & 0x4) ? 0x20000 : 0);
 			upd7759_reset_w(upd, (data & 0x10) ? 0 : 1);
 			break;
@@ -537,7 +537,7 @@ static READ8_HANDLER( sound_io_r )
 	switch (offset)
 	{
 		case 0x01:	return (sound_port_latch[offset] & 0x7f) | input_port_read_safe(space->machine, "SOUND_SW", 0);
-		case 0x03:	return (sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd7759")) ? 0x08 : 0);
+		case 0x03:	return (sound_port_latch[offset] & 0xf7) | (upd7759_busy_r(devtag_get_device(space->machine, "upd7759")) ? 0x08 : 0);
 		default:	return 0;
 	}
 }
@@ -568,7 +568,7 @@ static ADDRESS_MAP_START( hostmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(tms_host_r, tms_host_w)
 	AM_RANGE(0x9c0000, 0x9c0001) AM_NOP					/* ????? Write: 80, A0 and 00 (8-bit high byte) */
 	AM_RANGE(0x9e0000, 0x9e00cf) AM_RAM_WRITE(m68901_w) AM_BASE(&m68901_base)
-	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8(DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff00)
+	AM_RANGE(0xa00000, 0xa0003f) AM_DEVREADWRITE8("duart68681", duart68681_r, duart68681_w, 0xff00)
 	AM_RANGE(0xa20000, 0xa20001) AM_RAM					/* XY joystick input - sign? */
 	AM_RANGE(0xa40002, 0xa40003) AM_RAM					/* XY joystick input - actual values */
 ADDRESS_MAP_END
@@ -596,8 +596,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0xfd00, 0xfd01) AM_DEVREADWRITE(SOUND, "ym2151", ym2151_r, ym2151_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE(SOUND, "upd7759", upd7759_port_start_w)
+	AM_RANGE(0xfd00, 0xfd01) AM_DEVREADWRITE("ym2151", ym2151_r, ym2151_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_DEVWRITE("upd7759", upd7759_port_start_w)
 	AM_RANGE(0xff00, 0xff00) AM_NOP		/* DAC A */
 	AM_RANGE(0xff01, 0xff01) AM_NOP		/* DAC B */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(sound_io_r,sound_io_w)
@@ -695,7 +695,7 @@ static DRIVER_INIT( micro3d )
 	i8051_set_serial_tx_callback(machine->cpu[2], data_from_i8031);
 	i8051_set_serial_rx_callback(machine->cpu[2], data_to_i8031);
 
-	duart68681 = device_list_find_by_tag( machine->config->devicelist, DUART68681, "duart68681" );
+	duart68681 = devtag_get_device( machine, "duart68681" );
 }
 
 static DRIVER_INIT( stankatk )

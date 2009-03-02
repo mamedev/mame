@@ -64,7 +64,7 @@ WRITE8_HANDLER( cyberbal_sound_bank_select_w )
 	coin_counter_w(1, (data >> 5) & 1);
 	coin_counter_w(0, (data >> 4) & 1);
 	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
-	if (!(data & 0x01)) devtag_reset(space->machine, SOUND, "ym");
+	if (!(data & 0x01)) devtag_reset(space->machine, "ym");
 }
 
 
@@ -146,7 +146,7 @@ WRITE16_HANDLER( cyberbal_sound_68k_w )
 
 WRITE16_HANDLER( cyberbal_sound_68k_dac_w )
 {
-	const device_config *dac = devtag_get_device(space->machine, SOUND, (offset & 8) ? "dac2" : "dac1");
+	const device_config *dac = devtag_get_device(space->machine, (offset & 8) ? "dac2" : "dac1");
 	dac_data_16_w(dac, (((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
 
 	if (fast_68k_int)

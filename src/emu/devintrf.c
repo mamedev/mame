@@ -168,25 +168,24 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
     device list
 -------------------------------------------------*/
 
-void device_list_remove(device_config **listheadptr, device_type type, const char *tag)
+void device_list_remove(device_config **listheadptr, const char *tag)
 {
 	device_config **devptr, **tempdevptr;
 	device_config *device, *tempdevice;
 
 	assert(listheadptr != NULL);
-	assert(type != NULL);
 	assert(tag != NULL);
 
 	/* find the device in the list */
 	for (devptr = listheadptr; *devptr != NULL; devptr = &(*devptr)->next)
-		if (type == (*devptr)->type && strcmp(tag, (*devptr)->tag) == 0)
+		if (strcmp(tag, (*devptr)->tag) == 0)
 			break;
 	device = *devptr;
 	if (device == NULL)
-		fatalerror("Attempted to remove non-existant device: type=%s tag=%s\n", devtype_get_name(type), tag);
+		fatalerror("Attempted to remove non-existant device: tag=%s\n", tag);
 
 	/* before removing us from the global list, remove us from the type list */
-	tempdevice = (device_config *)device_list_first(*listheadptr, type);
+	tempdevice = (device_config *)device_list_first(*listheadptr, device->type);
 	for (tempdevptr = &tempdevice; *tempdevptr != device; tempdevptr = &(*tempdevptr)->typenext) ;
 	assert(*tempdevptr == device);
 	*tempdevptr = device->typenext;
@@ -317,28 +316,16 @@ const device_config *device_list_next(const device_config *prevdevice, device_ty
     DEVICE_TYPE_WILDCARD is allowed
 -------------------------------------------------*/
 
-const device_config *device_list_find_by_tag(const device_config *listhead, device_type type, const char *tag)
+const device_config *device_list_find_by_tag(const device_config *listhead, const char *tag)
 {
 	const device_config *curdev;
 
 	assert(tag != NULL);
 
 	/* locate among all devices */
-	if (type == DEVICE_TYPE_WILDCARD)
-	{
-		for (curdev = listhead; curdev != NULL; curdev = curdev->next)
-			if (strcmp(tag, curdev->tag) == 0)
-				return curdev;
-	}
-
-	/* locate among all devices of a given type */
-	else
-	{
-		for (curdev = listhead; curdev != NULL && curdev->type != type; curdev = curdev->next) ;
-		for ( ; curdev != NULL; curdev = curdev->typenext)
-			if (strcmp(tag, curdev->tag) == 0)
-				return curdev;
-	}
+	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
+		if (strcmp(tag, curdev->tag) == 0)
+			return curdev;
 
 	/* fail */
 	return NULL;
@@ -464,28 +451,6 @@ const device_config *device_list_class_next(const device_config *prevdevice, dev
 {
 	assert(prevdevice != NULL);
 	return prevdevice->classnext;
-}
-
-
-/*-------------------------------------------------
-    device_list_class_find_by_tag - retrieve a
-    device configuration based on a class and tag
--------------------------------------------------*/
-
-const device_config *device_list_class_find_by_tag(const device_config *listhead, device_class devclass, const char *tag)
-{
-	const device_config *curdev;
-
-	assert(tag != NULL);
-
-	/* locate among all devices of a given class */
-	for (curdev = listhead; curdev != NULL && curdev->devclass != devclass; curdev = curdev->next) ;
-	for ( ; curdev != NULL; curdev = curdev->classnext)
-		if (strcmp(tag, curdev->tag) == 0)
-			return curdev;
-
-	/* fail */
-	return NULL;
 }
 
 

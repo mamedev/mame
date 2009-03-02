@@ -18,7 +18,7 @@ static int sign_x_4, sign_y_4;
 
 WRITE8_HANDLER( atarifb_out1_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	CTRLD = data;
 
@@ -31,7 +31,7 @@ WRITE8_HANDLER( atarifb_out1_w )
 
 WRITE8_HANDLER( atarifb4_out1_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	CTRLD = data;
 
@@ -46,7 +46,7 @@ WRITE8_HANDLER( atarifb4_out1_w )
 
 WRITE8_HANDLER( abaseb_out1_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	CTRLD = data;
 
@@ -72,7 +72,7 @@ WRITE8_HANDLER( abaseb_out1_w )
 
 WRITE8_HANDLER( soccer_out1_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	CTRLD = data;
 
@@ -96,7 +96,7 @@ WRITE8_HANDLER( soccer_out1_w )
 
 WRITE8_HANDLER( atarifb_out2_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	discrete_sound_w(discrete, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
@@ -106,7 +106,7 @@ WRITE8_HANDLER( atarifb_out2_w )
 
 WRITE8_HANDLER( soccer_out2_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	discrete_sound_w(discrete, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 

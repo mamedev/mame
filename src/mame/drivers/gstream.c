@@ -258,8 +258,8 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 		bank_1 = 3;		// end sequence music
 	}
 
-	okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki1"), bank_0 * 0x40000);
-	okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki2"), bank_1 * 0x40000);
+	okim6295_set_bank_base(devtag_get_device(space->machine, "oki1"), bank_0 * 0x40000);
+	okim6295_set_bank_base(devtag_get_device(space->machine, "oki2"), bank_1 * 0x40000);
 }
 
 static WRITE32_HANDLER( gstream_oki_4040_w )
@@ -273,8 +273,8 @@ static ADDRESS_MAP_START( gstream_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2") 	// extra coin switches etc
 	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w) 	// oki banking
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w) 	// ??
-	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8(SOUND, "oki2", okim6295_r, okim6295_w, 0x000000ff) 	// music and samples
-	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8(SOUND, "oki1", okim6295_r, okim6295_w, 0x000000ff) 	// music and samples
+	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x000000ff) 	// music and samples
+	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x000000ff) 	// music and samples
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gstream )

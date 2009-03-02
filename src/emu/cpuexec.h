@@ -93,10 +93,10 @@ struct _cpu_class_header
 	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, type, CPU_##_type)
 
 #define MDRV_CPU_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, CPU)
+	MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_CPU_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag, CPU)
+	MDRV_DEVICE_MODIFY(_tag)
 
 #define MDRV_CPU_TYPE(_type) \
 	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, type, CPU_##_type)
@@ -105,7 +105,7 @@ struct _cpu_class_header
 	MDRV_DEVICE_CLOCK(_clock)
 
 #define MDRV_CPU_REPLACE(_tag, _type, _clock) \
-	MDRV_DEVICE_MODIFY(_tag, CPU) \
+	MDRV_DEVICE_MODIFY(_tag) \
 	MDRV_DEVICE_CONFIG_DATAPTR(cpu_config, type, CPU_##_type) \
 	MDRV_DEVICE_CLOCK(_clock)
 
@@ -145,10 +145,10 @@ struct _cpu_class_header
 #define INTERRUPT_GEN(func)		void func(const device_config *device)
 
 /* return a pointer to the given CPU by tag */
-#define cputag_get_cpu(mach, tag)										devtag_get_device(mach, CPU, tag)
+#define cputag_get_cpu(mach, tag)										devtag_get_device(mach, tag)
 
 /* helpers for using machine/cputag instead of cpu objects */
-#define cputag_reset(mach, tag)											devtag_reset(mach, CPU, tag)
+#define cputag_reset(mach, tag)											devtag_reset(mach, tag)
 #define cputag_get_index(mach, tag)										cpu_get_index(cputag_get_cpu(mach, tag))
 #define cputag_get_address_space(mach, tag, space)						cpu_get_address_space(cputag_get_cpu(mach, tag), space)
 #define cputag_suspend(mach, tag, reason, eat)							cpu_suspend(cputag_get_cpu(mach, tag), reason, eat)

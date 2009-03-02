@@ -848,7 +848,7 @@ static INT32 oki_bank = 0;
 
 static void reset_driveout_sound_region(running_machine *machine)
 {
-	okim6295_set_bank_base(devtag_get_device(machine, SOUND, "oki"), oki_bank*0x40000);
+	okim6295_set_bank_base(devtag_get_device(machine, "oki"), oki_bank*0x40000);
 }
 
 static WRITE8_HANDLER (oki_bank_w)
@@ -1668,7 +1668,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -1677,7 +1677,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -1693,27 +1693,27 @@ static ADDRESS_MAP_START( camltrya_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)	// I can't see a bank control, but there ARE some bytes past 0x8000
 //  AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2203_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD(SOUND, "oki", okim6295_r)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("oki", okim6295_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( camltrya_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym", ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE(unknown_w)    // probably controlling sample player?
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "oki", okim6295_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("oki", okim6295_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driveout_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREAD(SOUND, "oki", okim6295_r)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("oki", okim6295_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(driveout_sound_command_r)
 ADDRESS_MAP_END
 
@@ -1721,7 +1721,7 @@ static ADDRESS_MAP_START( driveout_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("oki", okim6295_w)
 ADDRESS_MAP_END
 
 /***********************************************************

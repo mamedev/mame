@@ -630,7 +630,7 @@ static ADDRESS_MAP_START( iqblocka_io, ADDRESS_SPACE_IO, 8 )
 
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
 
-	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
 
 	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE( nmi_enable_w )
 	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE( irq_enable_w )
@@ -641,11 +641,11 @@ static ADDRESS_MAP_START( iqblocka_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE( input_select_w )
 	AM_RANGE( 0x8001, 0x8001 ) AM_READ ( input_r )
 
-	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
+	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
 
 	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "BUTTONS" )
 
-	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE( SOUND, "ym", ym2413_w )
+	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE( "ym", ym2413_w )
 ADDRESS_MAP_END
 
 
@@ -759,7 +759,7 @@ static ADDRESS_MAP_START( mgcs, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE( (UINT16**)&spriteram )
 	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE( mgcs_paletteram_xRRRRRGGGGGBBBBB_w ) AM_BASE( &paletteram16 )
 
-	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREADWRITE(PPI8255, "ppi8255", mgcs_ppi8255_r, mgcs_ppi8255_w)
+	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREADWRITE("ppi8255", mgcs_ppi8255_r, mgcs_ppi8255_w)
 
 	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE( irq2_enable_w )
 	AM_RANGE( 0xa0402a, 0xa0402b ) AM_WRITE( irq1_enable_w )
@@ -768,7 +768,7 @@ static ADDRESS_MAP_START( mgcs, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE( bg_lsb_r, bg_lsb_w ) AM_BASE( (UINT16**)&bg_videoram )
 
 	// oki banking?
-	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8( SOUND, "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 ADDRESS_MAP_END
 
 

@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( superdq_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x04, 0x04) AM_READ(superdq_ld_r) AM_DEVWRITE(SOUND, "sn", sn76496_w)
+	AM_RANGE(0x04, 0x04) AM_READ(superdq_ld_r) AM_DEVWRITE("sn", sn76496_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(superdq_io_w)
 	AM_RANGE(0x0c, 0x0d) AM_NOP /* HD46505S */
 ADDRESS_MAP_END
@@ -292,7 +292,7 @@ GFXDECODE_END
 
 static MACHINE_START( superdq )
 {
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, "laserdisc");
 }
 
 

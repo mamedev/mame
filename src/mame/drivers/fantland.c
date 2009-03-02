@@ -282,13 +282,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantland_sound_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
-	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( SOUND, "ym", ym2151_r, ym2151_w )
-	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE( SOUND, "dac", dac_w )
+	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( "ym", ym2151_r, ym2151_w )
+	AM_RANGE( 0x0180, 0x0180 ) AM_DEVWRITE( "dac", dac_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galaxygn_sound_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
-	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( SOUND, "ym", ym2151_r, ym2151_w )
+	AM_RANGE( 0x0100, 0x0101 ) AM_DEVREADWRITE( "ym", ym2151_r, ym2151_w )
 ADDRESS_MAP_END
 
 
@@ -329,8 +329,8 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 		// Play / Stop
 		switch(data)
 		{
-			case 0x00:		borntofi_adpcm_stop(devtag_get_device(space->machine, SOUND, msm_name[voice]), voice);			break;
-			case 0x03:		borntofi_adpcm_start(devtag_get_device(space->machine, SOUND, msm_name[voice]), voice);		break;
+			case 0x00:		borntofi_adpcm_stop(devtag_get_device(space->machine, msm_name[voice]), voice);			break;
+			case 0x03:		borntofi_adpcm_start(devtag_get_device(space->machine, msm_name[voice]), voice);		break;
 			default:		logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", cpu_get_pc(space->cpu), reg, data);
 		}
 	}
@@ -399,7 +399,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wheelrun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym3526_r, ym3526_w )
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym3526_r, ym3526_w )
 
 	AM_RANGE(0xb000, 0xb000) AM_WRITE( SMH_NOP )	// on a car crash / hit
 	AM_RANGE(0xc000, 0xc000) AM_WRITE( SMH_NOP )	// ""
@@ -937,7 +937,7 @@ static MACHINE_RESET( borntofi )
 	MACHINE_RESET_CALL(fantland);
 
 	for (voice = 0; voice < 4; voice++)
-		borntofi_adpcm_stop(devtag_get_device(machine, SOUND, msm_name[voice]), voice);
+		borntofi_adpcm_stop(devtag_get_device(machine, msm_name[voice]), voice);
 }
 
 static MACHINE_DRIVER_START( borntofi )

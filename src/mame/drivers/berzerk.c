@@ -475,7 +475,7 @@ static WRITE8_HANDLER( berzerk_audio_w )
 	{
 	/* offset 4 writes to the S14001A */
 	case 4:
-		device = devtag_get_device(space->machine, SOUND, "speech");
+		device = devtag_get_device(space->machine, "speech");
 		switch (data >> 6)
 		{
 		/* write data to the S14001 */
@@ -493,7 +493,7 @@ static WRITE8_HANDLER( berzerk_audio_w )
 			break;
 
 		case 1:
-			device = devtag_get_device(space->machine, SOUND, "speech");
+			device = devtag_get_device(space->machine, "speech");
 			/* volume */
 			s14001a_set_volume(device, ((data & 0x38) >> 3) + 1);
 
@@ -525,7 +525,7 @@ static WRITE8_HANDLER( berzerk_audio_w )
 
 static READ8_HANDLER( berzerk_audio_r )
 {
-	const device_config *device = devtag_get_device(space->machine, SOUND, "speech");
+	const device_config *device = devtag_get_device(space->machine, "speech");
 	return ((offset == 4) && !s14001a_bsy_r(device)) ? 0x40 : 0x00;
 }
 

@@ -199,9 +199,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popper_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(SMH_NOP)					//?? same writes as 0x8000 (mostly)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(SMH_NOP)					//?? same writes as 0xa000
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(popper_sharedram_w)
 ADDRESS_MAP_END

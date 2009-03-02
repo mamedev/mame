@@ -823,7 +823,7 @@ static ADDRESS_MAP_START( dragngun_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(SMH_ROM)
 
-	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8(SOUND, "oki3", okim6295_r, 0x000000ff)
+	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8("oki3", okim6295_r, 0x000000ff)
 	AM_RANGE(0x420000, 0x420003) AM_READ(dragngun_eeprom_r)
 	AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
 	AM_RANGE(0x440000, 0x440003) AM_READ(dragngun_service_r)
@@ -863,7 +863,7 @@ static ADDRESS_MAP_START( dragngun_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x300000, 0x3fffff) AM_WRITE(SMH_ROM)
 
-	AM_RANGE(0x400000, 0x400003) AM_DEVWRITE8(SOUND, "oki3", okim6295_w, 0x000000ff)
+	AM_RANGE(0x400000, 0x400003) AM_DEVWRITE8("oki3", okim6295_w, 0x000000ff)
 	AM_RANGE(0x410000, 0x410003) AM_WRITE(SMH_NOP) /* Some kind of serial bit-stream - digital volume control? */
 	AM_RANGE(0x420000, 0x420003) AM_WRITE(dragngun_eeprom_w)
 	AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
@@ -903,7 +903,7 @@ static ADDRESS_MAP_START( lockload_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(SMH_ROM)
 
-	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8(SOUND, "oki3", okim6295_r, 0x000000ff)
+	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8("oki3", okim6295_r, 0x000000ff)
 	AM_RANGE(0x420000, 0x420003) AM_READ(dragngun_eeprom_r)
 //  AM_RANGE(0x438000, 0x438003) AM_READ(dragngun_lightgun_r)
 	AM_RANGE(0x440000, 0x440003) AM_READ(dragngun_service_r)
@@ -946,7 +946,7 @@ static ADDRESS_MAP_START( lockload_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x230000, 0x230003) AM_WRITE(dragngun_spriteram_dma_w)
 
 	AM_RANGE(0x300000, 0x3fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x400000, 0x400003) AM_DEVWRITE8(SOUND, "oki3", okim6295_w, 0x000000ff)
+	AM_RANGE(0x400000, 0x400003) AM_DEVWRITE8("oki3", okim6295_w, 0x000000ff)
 	AM_RANGE(0x420000, 0x420003) AM_WRITE(dragngun_eeprom_w)
 //  AM_RANGE(0x430000, 0x43001f) AM_WRITE(dragngun_lightgun_w)
 	AM_RANGE(0x500000, 0x500003) AM_WRITE(dragngun_sprite_control_w)
@@ -1112,7 +1112,7 @@ static WRITE8_HANDLER(deco32_bsmt_reset_w)
 	UINT8 diff = data ^ bsmt_reset;
 	bsmt_reset = data;
 	if ((diff & 0x80) && !(data & 0x80))
-		devtag_reset(space->machine, SOUND, "bsmt");
+		devtag_reset(space->machine, "bsmt");
 }
 
 static WRITE8_HANDLER(deco32_bsmt0_w)
@@ -1133,18 +1133,18 @@ static READ8_HANDLER(deco32_bsmt_status_r)
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREAD(SOUND, "ym", ym2151_r)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREAD(SOUND, "oki1", okim6295_r)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREAD(SOUND, "oki2", okim6295_r)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREAD("ym", ym2151_r)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("oki1", okim6295_r)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREAD("oki2", okim6295_r)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x110000, 0x110001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVWRITE(SOUND, "oki1", okim6295_w)
-	AM_RANGE(0x130000, 0x130001) AM_DEVWRITE(SOUND, "oki2", okim6295_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVWRITE("ym", ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVWRITE("oki1", okim6295_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVWRITE("oki2", okim6295_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
@@ -1161,7 +1161,7 @@ static ADDRESS_MAP_START( sound_writemem_tattass, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x2000, 0x2001) AM_WRITE(deco32_bsmt_reset_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(deco32_bsmt0_w)
-	AM_RANGE(0xa000, 0xa0ff) AM_DEVWRITE(SOUND, "bsmt", deco32_bsmt1_w)
+	AM_RANGE(0xa000, 0xa0ff) AM_DEVWRITE("bsmt", deco32_bsmt1_w)
 	AM_RANGE(0x2000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -1176,9 +1176,9 @@ static READ8_HANDLER(latch_r)
 static ADDRESS_MAP_START( nslasher_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE(SOUND, "oki1", okim6295_r, okim6295_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE(SOUND, "oki2", okim6295_r, okim6295_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(latch_r)
 ADDRESS_MAP_END
 
@@ -1782,8 +1782,8 @@ static void sound_irq_nslasher(const device_config *device, int state)
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	okim6295_set_bank_base(devtag_get_device(device->machine, SOUND, "oki1"), ((data >> 0)& 1) * 0x40000);
-	okim6295_set_bank_base(devtag_get_device(device->machine, SOUND, "oki2"), ((data >> 1)& 1) * 0x40000);
+	okim6295_set_bank_base(devtag_get_device(device->machine, "oki1"), ((data >> 0)& 1) * 0x40000);
+	okim6295_set_bank_base(devtag_get_device(device->machine, "oki2"), ((data >> 1)& 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =

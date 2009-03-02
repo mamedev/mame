@@ -1752,7 +1752,7 @@ static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x74000000, 0x740003ff) AM_READWRITE(ppc_spu_share_r, ppc_spu_share_w) // SPU shared RAM
 	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ(cabinet_r)
 	AM_RANGE(0x7d000340, 0x7d000347) AM_READ(sensor_r)
-	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8(SOUND, "ymz", ymz280b_r, ymz280b_w, 0xffff0000)
+	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xffff0000)
 	AM_RANGE(0x7d000800, 0x7d000803) AM_READ(input_r)
 	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE(flashram_r, flashram_w)
 	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE(soundflash_r, soundflash_w)
@@ -1976,7 +1976,7 @@ static MACHINE_RESET( firebeat )
 	}
 
 	SCSIGetDevice( atapi_device_data[1], &cd );
-	cdda_set_cdrom(devtag_get_device(machine, SOUND, "cdda"), cd);
+	cdda_set_cdrom(devtag_get_device(machine, "cdda"), cd);
 }
 
 static MACHINE_DRIVER_START(firebeat)

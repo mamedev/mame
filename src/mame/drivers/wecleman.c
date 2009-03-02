@@ -700,9 +700,9 @@ static ADDRESS_MAP_START( wecleman_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)	// Protection
 	AM_RANGE(0x9006, 0x9006) AM_WRITE(SMH_NOP)	// ?
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)	// From main CPU
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE(SOUND, "konami", k007232_r, k007232_w)	// K007232 (Reading offset 5/b triggers the sample)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE(SOUND, "konami", wecleman_K00723216_bank_w)	// Samples banking
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)	// K007232 (Reading offset 5/b triggers the sample)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("konami", wecleman_K00723216_bank_w)	// Samples banking
 ADDRESS_MAP_END
 
 
@@ -726,9 +726,9 @@ static WRITE8_HANDLER( hotchase_sound_control_w )
 
 	int reg[8];
 
-	sound[0] = devtag_get_device(space->machine, SOUND, "konami1");
-	sound[1] = devtag_get_device(space->machine, SOUND, "konami2");
-	sound[2] = devtag_get_device(space->machine, SOUND, "konami3");
+	sound[0] = devtag_get_device(space->machine, "konami1");
+	sound[1] = devtag_get_device(space->machine, "konami2");
+	sound[2] = devtag_get_device(space->machine, "konami3");
 
 	reg[offset] = data;
 
@@ -787,9 +787,9 @@ static WRITE8_DEVICE_HANDLER( hotchase_k007232_w )
 
 static ADDRESS_MAP_START( hotchase_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x100d) AM_DEVREADWRITE(SOUND, "konami1", hotchase_k007232_r, hotchase_k007232_w)	// 3 x K007232
-	AM_RANGE(0x2000, 0x200d) AM_DEVREADWRITE(SOUND, "konami2", hotchase_k007232_r, hotchase_k007232_w)
-	AM_RANGE(0x3000, 0x300d) AM_DEVREADWRITE(SOUND, "konami3", hotchase_k007232_r, hotchase_k007232_w)
+	AM_RANGE(0x1000, 0x100d) AM_DEVREADWRITE("konami1", hotchase_k007232_r, hotchase_k007232_w)	// 3 x K007232
+	AM_RANGE(0x2000, 0x200d) AM_DEVREADWRITE("konami2", hotchase_k007232_r, hotchase_k007232_w)
+	AM_RANGE(0x3000, 0x300d) AM_DEVREADWRITE("konami3", hotchase_k007232_r, hotchase_k007232_w)
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w)	// Sound volume, banking, etc.
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_NOP)	// ? (written with 0 on IRQ, 1 on FIRQ)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)	// From main CPU (Read on IRQ)
@@ -1076,7 +1076,7 @@ static INTERRUPT_GEN( wecleman_interrupt )
 
 static MACHINE_RESET( wecleman )
 {
-	k007232_set_bank( devtag_get_device(machine, SOUND, "konami"), 0, 1 );
+	k007232_set_bank( devtag_get_device(machine, "konami"), 0, 1 );
 }
 
 static MACHINE_DRIVER_START( wecleman )

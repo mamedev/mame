@@ -301,11 +301,11 @@ static WRITE8_HANDLER( lazercmd_hardware_w )
 			DAC_data=(data&0x80)^((data&0x40)<<1)^((data&0x20)<<2)^((data&0x10)<<3);
 			if (DAC_data)
 			{
-				dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), 0xff);
+				dac_data_w(devtag_get_device(space->machine, "dac"), 0xff);
 			}
 			else
 			{
-				dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), 0);
+				dac_data_w(devtag_get_device(space->machine, "dac"), 0);
 			}
 			break;
 		case 1: /* marker Y position */
@@ -332,11 +332,11 @@ static WRITE8_HANDLER( medlanes_hardware_w )
 			DAC_data=((data&0x20)<<2)^((data&0x10)<<3);
 			if (DAC_data)
 			{
-				dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), 0xff);
+				dac_data_w(devtag_get_device(space->machine, "dac"), 0xff);
 			}
 			else
 			{
-				dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), 0);
+				dac_data_w(devtag_get_device(space->machine, "dac"), 0);
 			}
 			break;
 		case 1: /* marker Y position */
@@ -363,11 +363,11 @@ static WRITE8_HANDLER( bbonk_hardware_w )
 			DAC_data=((data&0x20)<<2)^((data&0x10)<<3);
 			if (DAC_data)
 			{
-				dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), 0xff);
+				dac_data_w(devtag_get_device(space->machine, "dac"), 0xff);
 			}
 			else
 			{
-				dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), 0);
+				dac_data_w(devtag_get_device(space->machine, "dac"), 0);
 			}
 			break;
 		case 3: /* D4 clears coin detected and D0 toggles on attract mode */

@@ -118,9 +118,9 @@ static WRITE8_DEVICE_HANDLER( ddrible_vlm5030_ctrl_w )
 	/* b2 : SSG-C rc filter enable */
 	/* b1 : SSG-B rc filter enable */
 	/* b0 : SSG-A rc filter enable */
-	filter_rc_set_RC(devtag_get_device(device->machine, SOUND, "filter3"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
-	filter_rc_set_RC(devtag_get_device(device->machine, SOUND, "filter2"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
-	filter_rc_set_RC(devtag_get_device(device->machine, SOUND, "filter1"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	filter_rc_set_RC(devtag_get_device(device->machine, "filter3"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	filter_rc_set_RC(devtag_get_device(device->machine, "filter2"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	filter_rc_set_RC(devtag_get_device(device->machine, "filter1"),FLT_RC_LOWPASS, 1000,2200,1000,data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 
@@ -169,14 +169,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)					/* shared RAM with CPU #1 */
-	AM_RANGE(0x1000, 0x1001) AM_DEVREAD(SOUND, "ym", ym2203_r)		/* YM2203 */
+	AM_RANGE(0x1000, 0x1001) AM_DEVREAD("ym", ym2203_r)		/* YM2203 */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&ddrible_snd_sharedram)	/* shared RAM with CPU #1 */
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE(SOUND, "ym", ym2203_w)				/* YM2203 */
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w)						/* Speech data */
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym", ym2203_w)				/* YM2203 */
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_data_w)						/* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)							/* ROM */
 ADDRESS_MAP_END
 
@@ -318,8 +318,8 @@ static const ym2203_interface ym2203_config =
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
-		DEVCB_DEVICE_HANDLER(SOUND, "vlm", ddrible_vlm5030_busy_r),
-		DEVCB_DEVICE_HANDLER(SOUND, "vlm", ddrible_vlm5030_ctrl_w),
+		DEVCB_DEVICE_HANDLER("vlm", ddrible_vlm5030_busy_r),
+		DEVCB_DEVICE_HANDLER("vlm", ddrible_vlm5030_ctrl_w),
 		DEVCB_NULL
 	},
 	NULL

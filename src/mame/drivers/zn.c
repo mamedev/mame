@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
 	AM_RANGE(0x1f801000, 0x1f80100f) AM_RAM /* ?? */
 	AM_RANGE(0x1f801010, 0x1f801013) AM_NOP
-	AM_RANGE(0x1f801014, 0x1f801017) AM_DEVREADWRITE(SOUND, "spu", psx_spu_delay_r, psx_spu_delay_w)
+	AM_RANGE(0x1f801014, 0x1f801017) AM_DEVREADWRITE("spu", psx_spu_delay_r, psx_spu_delay_w)
 	AM_RANGE(0x1f801018, 0x1f80101f) AM_NOP
 	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE(psx_com_delay_r, psx_com_delay_w)
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_NOP
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f801100, 0x1f80112f) AM_READWRITE(psx_counter_r, psx_counter_w)
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE(psx_gpu_r, psx_gpu_w)
 	AM_RANGE(0x1f801820, 0x1f801827) AM_READWRITE(psx_mdec_r, psx_mdec_w)
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE(SOUND, "spu", psx_spu_r, psx_spu_w)
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_DEVREADWRITE("spu", psx_spu_r, psx_spu_w)
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1fa30000, 0x1fa30003) AM_NOP /* ?? */
 	AM_RANGE(0x1fa40000, 0x1fa40003) AM_READNOP /* ?? */
 	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READNOP /* ?? */
-	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8(AT28C16, "at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
+	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
 	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ(unknown_r)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE(1) /* ram mirror */
@@ -685,9 +685,9 @@ static MACHINE_RESET( coh1000c )
 static ADDRESS_MAP_START( qsound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(10)		/* banked (contains music data) */
-	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE(SOUND, "qsound", qsound_w)
+	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE("qsound", qsound_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_bankswitch_w)
-	AM_RANGE(0xd007, 0xd007) AM_DEVREAD(SOUND, "qsound", qsound_r)
+	AM_RANGE(0xd007, 0xd007) AM_DEVREAD("qsound", qsound_r)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1199,7 +1199,7 @@ static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)	/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE(SOUND, "ym", ym2610_r, ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -1592,7 +1592,7 @@ static void atpsx_interrupt(const device_config *device, int state)
 
 static void atpsx_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
-	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+	const device_config *ide = devtag_get_device(machine, "ide");
 
 	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
@@ -1620,7 +1620,7 @@ static void atpsx_dma_write( running_machine *machine, UINT32 n_address, INT32 n
 
 static DRIVER_INIT( coh1000w )
 {
-	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+	const device_config *ide = devtag_get_device(machine, "ide");
 
 	memory_install_read32_handler            ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f1fffff, 0, 0, SMH_BANK1 );
 	memory_install_write32_handler           ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f000003, 0, 0, SMH_NOP );
@@ -1636,7 +1636,7 @@ static MACHINE_RESET( coh1000w )
 	memory_set_bankptr(machine,  1, memory_region( machine, "user2" ) ); /* fixed game rom */
 	zn_machine_init(machine);
 
-	devtag_reset(machine, IDE_CONTROLLER, "ide");
+	devtag_reset(machine, "ide");
 	psx_dma_install_read_handler(5, atpsx_dma_read);
 	psx_dma_install_write_handler(5, atpsx_dma_write);
 }
@@ -1829,7 +1829,7 @@ static MACHINE_RESET( coh1002e )
 static ADDRESS_MAP_START( psarc_snd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8( SOUND, "ymf", ymf271_r, ymf271_w, 0x00ff )
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8( "ymf", ymf271_r, ymf271_w, 0x00ff )
 	AM_RANGE(0x180008, 0x180009) AM_READ8( soundlatch_r, 0x00ff )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITENOP
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
@@ -2293,7 +2293,7 @@ static DRIVER_INIT( coh1000a )
 	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
 		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
 	{
-		const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+		const device_config *ide = devtag_get_device(machine, "ide");
 
 		memory_install_read32_device_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), ide, 0x1fbfff8c, 0x1fbfff8f, 0, 0, jdredd_idestat_r );
 		memory_install_write32_handler      ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fbfff8c, 0x1fbfff8f, 0, 0, SMH_NOP );
@@ -2310,7 +2310,7 @@ static MACHINE_RESET( coh1000a )
 	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
 		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
 	{
-		devtag_reset(machine, IDE_CONTROLLER, "ide");
+		devtag_reset(machine, "ide");
 	}
 }
 
@@ -2741,7 +2741,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbaj_z80_port_map, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x84, 0x85 ) AM_DEVREADWRITE( SOUND, "ymz", ymz280b_r, ymz280b_w )
+	AM_RANGE( 0x84, 0x85 ) AM_DEVREADWRITE( "ymz", ymz280b_r, ymz280b_w )
 	AM_RANGE( 0x90, 0x90 ) AM_READWRITE( cbaj_z80_latch_r, cbaj_z80_latch_w )
 	AM_RANGE( 0x91, 0x91 ) AM_READ( cbaj_z80_ready_r )
 ADDRESS_MAP_END

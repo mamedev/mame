@@ -2041,7 +2041,7 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x00762, 0x00763) AM_READ(rdx_v33_unknown2_r)
 
-	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff) // single OKI chip on this version
+	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff) // single OKI chip on this version
 
 	AM_RANGE(0x00800, 0x0087f) AM_RAM // copies eeprom here?
 	AM_RANGE(0x00880, 0x0bfff) AM_RAM

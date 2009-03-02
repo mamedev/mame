@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( igspoker_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE( igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")			/* Not connected */
-	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE(SOUND, "ym", ym2413_w)
+	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ym", ym2413_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE( bg_tile_w )  AM_BASE( &bg_tile_ram )
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE( &fg_tile_ram )
@@ -926,7 +926,7 @@ static ADDRESS_MAP_START( number10_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE( igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
-	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE( &fg_tile_ram )
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE( &fg_color_ram )

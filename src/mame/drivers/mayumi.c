@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)
 	AM_RANGE(0xc1, 0xc2) AM_READ(key_matrix_r)	// 0xc0-c3 8255ppi
 	AM_RANGE(0xc3, 0xc3) AM_WRITE(SMH_NOP)		// 0xc0-c3 8255ppi
-	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
+	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/

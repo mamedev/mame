@@ -138,8 +138,8 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe4, 0xe4) AM_WRITENOP				// 8156 timer reg1 (write 7f = CNT length)
 	AM_RANGE(0xe5, 0xe5) AM_WRITENOP				// 8156 timer reg2 (write c0 = timer mode - automatic reload, i.e. single pulse every time TC is reached)
 
-	AM_RANGE(0xe8, 0xe8) AM_DEVWRITE(SOUND, "sn76489.1", sn76496_w)
-	AM_RANGE(0xe9, 0xe9) AM_DEVWRITE(SOUND, "sn76489.2", sn76496_w)
+	AM_RANGE(0xe8, 0xe8) AM_DEVWRITE("sn76489.1", sn76496_w)
+	AM_RANGE(0xe9, 0xe9) AM_DEVWRITE("sn76489.2", sn76496_w)
 ADDRESS_MAP_END
 
 /* gfx decode */

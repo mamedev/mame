@@ -94,9 +94,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(soundlatch_r, SMH_NOP)	/* the write is a clear pending command */
-	AM_RANGE(0x08, 0x0b) AM_DEVWRITE(SOUND, "ym", ym2608_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ym", ym2608_w)
 #if 0
-	AM_RANGE(0x18, 0x1b) AM_DEVREAD(SOUND, "ym", ym2608_r)
+	AM_RANGE(0x18, 0x1b) AM_DEVREAD("ym", ym2608_r)
 #endif
 ADDRESS_MAP_END
 

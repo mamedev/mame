@@ -204,12 +204,12 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 static ADDRESS_MAP_START( vsnes_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(&work_ram)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)
-	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE(SOUND, "dac1", dac_w)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE(SOUND, "nes1", nes_psg_r, nes_psg_w)
+	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac1", dac_w)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes1", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE(SOUND, "nes1", psg_4015_r, psg_4015_w)  /* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes1", psg_4015_r, psg_4015_w)  /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_r, vsnes_in0_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_r) AM_DEVWRITE(SOUND, "nes1", psg_4017_w) /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_r) AM_DEVWRITE("nes1", psg_4017_w) /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x4020, 0x4020) AM_READWRITE(vsnes_coin_counter_r, vsnes_coin_counter_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -217,12 +217,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vsnes_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(&work_ram_1)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_1_r, ppu2c0x_1_w)
-	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE(SOUND, "dac2", dac_w)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE(SOUND, "nes2", nes_psg_r, nes_psg_w)
+	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac2", dac_w)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes2", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_1_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE(SOUND, "nes2", psg_4015_r, psg_4015_w)	/* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes2", psg_4015_r, psg_4015_w)	/* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(vsnes_in0_1_r, vsnes_in0_1_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_1_r) AM_DEVWRITE(SOUND, "nes2", psg_4017_w) /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(vsnes_in1_1_r) AM_DEVWRITE("nes2", psg_4017_w) /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x4020, 0x4020) AM_WRITE(vsnes_coin_counter_1_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

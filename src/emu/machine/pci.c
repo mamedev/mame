@@ -218,7 +218,7 @@ static DEVICE_START( pci_bus )
 	/* find all our devices */
 	for (devicenum = 0; devicenum < ARRAY_LENGTH(pcibus->device); devicenum++)
 		if (pcibus->config->device[devicenum].devtag != NULL)
-			pcibus->device[devicenum] = devtag_get_device(device->machine, pcibus->config->device[devicenum].devtype, pcibus->config->device[devicenum].devtag);
+			pcibus->device[devicenum] = devtag_get_device(device->machine, pcibus->config->device[devicenum].devtag);
 
 	/* register pci states */
 	state_save_register_device_item(device, 0, pcibus->address);

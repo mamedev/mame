@@ -195,8 +195,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay", ay8910_address_w)
 ADDRESS_MAP_END
 
 
@@ -847,7 +847,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
-	DEVCB_DEVICE_HANDLER(CPU, "audiocpu", timer_r)
+	DEVCB_DEVICE_HANDLER("audiocpu", timer_r)
 };
 
 

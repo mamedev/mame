@@ -653,11 +653,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("maincpu", 0x80000)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(maygay_8279_r, maygay_8279_w)
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8( SOUND, "ym", ym2413_w, 0xff00 )
+	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8( "ym", ym2413_w, 0xff00 )
 	AM_RANGE(0x860000, 0x86000d) AM_READWRITE(read_odd, write_odd)
 	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
 	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
-	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff)
+	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff)
 	AM_RANGE(0x8c0000, 0x8c000f) AM_READWRITE(pia_lsb_r, pia_lsb_w)
 ADDRESS_MAP_END
 
@@ -978,7 +978,7 @@ static MACHINE_START( maygayv1 )
 static MACHINE_RESET( maygayv1 )
 {
 	// ?
-	maygayv1_devices.duart68681 = device_list_find_by_tag( machine->config->devicelist, DUART68681, "duart68681" );
+	maygayv1_devices.duart68681 = devtag_get_device( machine, "duart68681" );
 	memset(i82716.dram, 0, 0x40000);
 	i82716.r[RWBA] = 0x0200;
 }

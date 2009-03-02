@@ -154,10 +154,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe400, 0xebff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram2)	/* bg1 tilemap */
 	AM_RANGE(0xec00, 0xefff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram0)	/* fg tilemap */
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram3)	/* bg2 tilemap */
-	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* "sprite1" placement */
-	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE(PPI8255, "ppi8255_3", ppi8255_r, ppi8255_w)	/* "sprite2" placement */
-	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE(PPI8255, "ppi8255_4", ppi8255_r, ppi8255_w)	/* "sprite3" placement */
+	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* "sprite1" placement */
+	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* "sprite2" placement */
+	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE("ppi8255_4", ppi8255_r, ppi8255_w)	/* "sprite3" placement */
 	//AM_RANGE(0xf780, 0xf781) AM_WRITE(SMH_RAM)     /* more scroll registers? */
 	AM_RANGE(0xf782, 0xf787) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_scroll)	/* bg scroll (three copies always identical) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW2")
@@ -183,10 +183,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD(SOUND, "ay1", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD("ay2", ay8910_r)
 ADDRESS_MAP_END
 
 

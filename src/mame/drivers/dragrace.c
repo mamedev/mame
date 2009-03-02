@@ -44,7 +44,7 @@ static MACHINE_RESET( dragrace )
 
 static void dragrace_update_misc_flags(const address_space *space)
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
 
 	/* 0x0900 = set 3SPEED1         0x00000001
      * 0x0901 = set 4SPEED1         0x00000002

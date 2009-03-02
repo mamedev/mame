@@ -244,7 +244,7 @@ WRITE8_HANDLER( astrob_sound_w )
 	{
 		120.0f, 82.0f, 62.0f, 56.0f, 47.0f, 39.0f, 33.0f, 27.0f, 24.0f, 22.0f
 	};
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	float freq_factor;
 
 	UINT8 diff = data ^ sound_state[offset];
@@ -476,7 +476,7 @@ static SOUND_START( 005 )
 
 static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	UINT8 diff = data ^ sound_state[0];
 	sound_state[0] = data;
 
@@ -704,7 +704,7 @@ static SOUND_START( spaceod )
 
 WRITE8_HANDLER( spaceod_sound_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 diff = data ^ sound_state[offset];
 	sound_state[offset] = data;
 
@@ -814,9 +814,9 @@ static ADDRESS_MAP_START( monsterb_7751_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE(SOUND, "dac", dac_w)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_DEVWRITE(I8243, "audio_8243", n7751_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE(I8243, "audio_8243", i8243_prog_w)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_DEVWRITE("audio_8243", n7751_p2_w)
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("audio_8243", i8243_prog_w)
 ADDRESS_MAP_END
 
 
@@ -889,7 +889,7 @@ static SOUND_START( monsterb )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 {
-	const device_config *tms = devtag_get_device(device->machine, SOUND, "music");
+	const device_config *tms = devtag_get_device(device->machine, "music");
 	int enable_val;
 
 	/* Lower four data lines get decoded into 13 control lines */
@@ -910,7 +910,7 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	UINT8 diff = data ^ sound_state[1];
 	sound_state[1] = data;
 

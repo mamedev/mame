@@ -538,7 +538,7 @@ static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE(&jchan_spriteram_2) AM_WRITE(jchan_suprnova_sprite32_2_w)
 	AM_RANGE(0x780000, 0x78003f) AM_RAM AM_BASE(&jchan_sprregs_2) AM_WRITE(jchan_suprnova_sprite32regs_2_w)
 
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8(SOUND, "ymz", ymz280b_w, 0x00ff) // sound
+	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymz", ymz280b_w, 0x00ff) // sound
 
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END

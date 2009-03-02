@@ -502,7 +502,7 @@ static MACHINE_START( seattle )
 {
 	int index;
 
-	voodoo_device = device_list_find_by_tag(machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
+	voodoo_device = devtag_get_device(machine, "voodoo");
 
 	/* allocate timers for the galileo */
 	galileo.timer[0].timer = timer_alloc(machine, galileo_timer_callback, NULL);
@@ -1738,10 +1738,10 @@ static READ32_DEVICE_HANDLER( seattle_ide_r )
 static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
-	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD(VOODOO_GRAPHICS, "voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
-	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", seattle_ide_r, ide_controller32_w)
+	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD("voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
+	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE("ide", seattle_ide_r, ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
-	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_bus_master32_r, ide_bus_master32_w)
+	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE("ide", ide_bus_master32_r, ide_bus_master32_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
 	AM_RANGE(0x13000000, 0x13000003) AM_WRITE(asic_fifo_w)
 	AM_RANGE(0x16000000, 0x1600003f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
@@ -2793,7 +2793,7 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
-			device = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
+			device = devtag_get_device(machine, "ethernet");
 			memory_install_readwrite32_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
 			break;
 
@@ -2802,7 +2802,7 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 			memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
 
 			/* set up the ethernet controller */
-			device = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
+			device = devtag_get_device(machine, "ethernet");
 			memory_install_readwrite32_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
 			break;
 	}

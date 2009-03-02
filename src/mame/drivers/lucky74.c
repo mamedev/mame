@@ -825,15 +825,15 @@ static ADDRESS_MAP_START( lucky74_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(fg_colorram_w) AM_BASE(&fg_colorram)				/* VRAM1-2 */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)				/* VRAM2-1 */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(bg_colorram_w) AM_BASE(&bg_colorram)				/* VRAM2-2 */
-	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
-	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
-	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE(PPI8255, "ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */
-	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE(SOUND, "sn1", sn76496_w)							/* SN76489 #1 */
-	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports 2 & 4 */
-	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE(SOUND, "sn2", sn76496_w)							/* SN76489 #2 */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)						/* YM2149 control */
-	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE(SOUND, "sn3", sn76496_w)							/* SN76489 #3 */
-	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)			/* YM2149 (Input Port 1) */
+	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
+	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
+	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */
+	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE("sn1", sn76496_w)							/* SN76489 #1 */
+	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports 2 & 4 */
+	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE("sn2", sn76496_w)							/* SN76489 #2 */
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("ay", ay8910_address_w)						/* YM2149 control */
+	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("sn3", sn76496_w)							/* SN76489 #3 */
+	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)			/* YM2149 (Input Port 1) */
 	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)						/* USART 8251 port */
 	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
 ADDRESS_MAP_END

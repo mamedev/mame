@@ -511,8 +511,8 @@ static ADDRESS_MAP_START( saklove_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saklove_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
-	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE( SOUND, "ym", ym3812_w )
+	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE( "ym", ym3812_w )
 
 	AM_RANGE(0x0060, 0x0062) AM_WRITE( colordac_w )
 
@@ -530,7 +530,7 @@ static ADDRESS_MAP_START( saklove_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0307, 0x0307) AM_READ ( saklove_dsw_r )
 	AM_RANGE(0x0308, 0x0308) AM_WRITE( saklove_dsw_mask_w )
 
-	AM_RANGE(0x0312, 0x0312) AM_READ( saklove_vblank_r ) AM_DEVWRITE( SOUND, "oki", saklove_oki_bank_w )
+	AM_RANGE(0x0312, 0x0312) AM_READ( saklove_vblank_r ) AM_DEVWRITE( "oki", saklove_oki_bank_w )
 
 	// Peripheral Control Block
 	AM_RANGE(0xff00, 0xffff) AM_READWRITE( am188em_regs_r, am188em_regs_w ) AM_BASE( &am188em_regs )

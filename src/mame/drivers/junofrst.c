@@ -128,7 +128,7 @@ static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 		if (data & 1) C += 47000;	/* 47000pF = 0.047uF */
 		if (data & 2) C += 220000;	/* 220000pF = 0.22uF */
 		data >>= 2;
-		filter_rc_set_RC(devtag_get_device(device->machine, SOUND, fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
+		filter_rc_set_RC(devtag_get_device(device->machine, fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
 	}
 }
 
@@ -203,9 +203,9 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("ay", ay8910_data_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(junofrst_i8039_irq_w)
 ADDRESS_MAP_END
@@ -218,7 +218,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(SOUND, "dac", dac_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 

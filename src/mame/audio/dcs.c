@@ -934,7 +934,7 @@ void dcs_init(running_machine *machine)
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.rev = 1;
 	dcs.channels = 1;
-	dcs.dmadac[0] = devtag_get_device(machine, SOUND, "dac");
+	dcs.dmadac[0] = devtag_get_device(machine, "dac");
 
 	/* configure boot and sound ROMs */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -984,8 +984,8 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
 	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.channels = 2;
-	dcs.dmadac[0] = devtag_get_device(machine, SOUND, "dac1");
-	dcs.dmadac[1] = devtag_get_device(machine, SOUND, "dac2");
+	dcs.dmadac[0] = devtag_get_device(machine, "dac1");
+	dcs.dmadac[1] = devtag_get_device(machine, "dac2");
 
 	/* always boot from the base of "dcs" */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -1398,7 +1398,7 @@ static WRITE16_HANDLER( denver_w )
 				{
 					char buffer[10];
 					sprintf(buffer, "dac%d", chan + 1);
-					dcs.dmadac[chan] = devtag_get_device(space->machine, SOUND, buffer);
+					dcs.dmadac[chan] = devtag_get_device(space->machine, buffer);
 				}
 				dmadac_enable(&dcs.dmadac[0], dcs.channels, enable);
 				if (dcs.channels < 6)

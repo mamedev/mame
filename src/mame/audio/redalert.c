@@ -138,7 +138,7 @@ static const ay8910_interface redalert_ay8910_interface =
 static ADDRESS_MAP_START( redalert_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_DEVWRITE(SOUND, "ay", redalert_AY8910_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_DEVWRITE("ay", redalert_AY8910_w)
 	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x0ffe) AM_READWRITE(redalert_ay8910_latch_1_r, redalert_ay8910_latch_2_w)
 	AM_RANGE(0x2000, 0x6fff) AM_NOP
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
@@ -172,13 +172,13 @@ WRITE8_HANDLER( redalert_voice_command_w )
 
 static void sod_callback(const device_config *device, int data)
 {
-	hc55516_digit_w(devtag_get_device(device->machine, SOUND, "cvsd"), data);
+	hc55516_digit_w(devtag_get_device(device->machine, "cvsd"), data);
 }
 
 
 static int sid_callback(const device_config *device)
 {
-	return hc55516_clock_state_r(devtag_get_device(device->machine, SOUND, "cvsd"));
+	return hc55516_clock_state_r(devtag_get_device(device->machine, "cvsd"));
 }
 
 
@@ -311,8 +311,8 @@ static READ8_HANDLER( demoneye_ay8910_latch_2_r )
 
 static WRITE8_HANDLER( demoneye_ay8910_data_w )
 {
-	const device_config *ay1 = devtag_get_device(space->machine, SOUND, "ay1");
-	const device_config *ay2 = devtag_get_device(space->machine, SOUND, "ay2");
+	const device_config *ay1 = devtag_get_device(space->machine, "ay1");
+	const device_config *ay2 = devtag_get_device(space->machine, "ay2");
 
 	switch (ay8910_latch_1 & 0x03)
 	{

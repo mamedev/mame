@@ -7,7 +7,7 @@ static int scanline=0;
 
 INTERRUPT_GEN( beezer_interrupt )
 {
-	const device_config *via_0 = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via_0 = devtag_get_device(device->machine, "via6522_0");
 
 	scanline = (scanline + 1) % 0x80;
 	via_ca2_w (via_0, 0, scanline & 0x10);

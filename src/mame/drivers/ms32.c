@@ -1174,7 +1174,7 @@ static WRITE8_HANDLER( to_main_w )
 
 static ADDRESS_MAP_START( ms32_snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3eff) AM_READ(SMH_ROM)
-	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREAD(SOUND, "ymf", ymf271_r)
+	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREAD("ymf", ymf271_r)
 	AM_RANGE(0x3f10, 0x3f10) AM_READ(latch_r)
 	AM_RANGE(0x3f20, 0x3f20) AM_READ(SMH_NOP) /* 2nd latch ? */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_RAM)
@@ -1184,7 +1184,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ms32_snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3eff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x3f00, 0x3f0f) AM_DEVWRITE(SOUND, "ymf", ymf271_w)
+	AM_RANGE(0x3f00, 0x3f0f) AM_DEVWRITE("ymf", ymf271_w)
 	AM_RANGE(0x3f10, 0x3f10) AM_WRITE(to_main_w)
 	AM_RANGE(0x3f20, 0x3f20) AM_WRITE(SMH_NOP) /* to_main2_w  ? */
 	AM_RANGE(0x3f40, 0x3f40) AM_WRITE(SMH_NOP)   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */

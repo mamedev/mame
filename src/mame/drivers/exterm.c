@@ -342,7 +342,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE(SOUND, "ym", ym2151_data_latch_w)
+	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ym", ym2151_data_latch_w)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(sound_nmi_rate_w)
 	AM_RANGE(0x6800, 0x6fff) AM_READ(sound_master_latch_r)
 	AM_RANGE(0x7000, 0x77ff) AM_READ(sound_nmi_to_slave_r)
@@ -355,7 +355,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_READ(sound_slave_latch_r)
-	AM_RANGE(0x8000, 0xbfff) AM_DEVWRITE(SOUND, "dac", sound_slave_dac_w)
+	AM_RANGE(0x8000, 0xbfff) AM_DEVWRITE("dac", sound_slave_dac_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

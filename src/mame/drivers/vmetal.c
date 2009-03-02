@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE(&vmetal_videoregs)
 	AM_RANGE(0x179700, 0x179713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8(SOUND, "es", vmetal_control_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("es", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 
 	/* i have no idea whats meant to be going on here .. it seems to read one bit of the dips from some of them, protection ??? */
@@ -250,9 +250,9 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x31fffc, 0x31fffd) AM_READ(varia_dips_bit1_r )  // 0x40 = dip1-1 , 0x80 = dip2-1
 	AM_RANGE(0x31fffe, 0x31ffff) AM_READ(varia_random )  // nothing?
 
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8(SOUND, "oki", okim6295_r, okim6295_w, 0x00ff )
-	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)	// Volume/channel info
-	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8(SOUND, "es", vmetal_es8712_w, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)	// Volume/channel info
+	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8("es", vmetal_es8712_w, 0x00ff)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

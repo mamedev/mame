@@ -455,8 +455,8 @@ static READ8_DEVICE_HANDLER( port_c_r )
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	port_b_data = data;
-// const device_config *beep = devtag_get_device(device->machine, SOUND, "beep");
-// const device_config *cvsd = devtag_get_device(device->machine, SOUND, "cvsd");
+// const device_config *beep = devtag_get_device(device->machine, "beep");
+// const device_config *cvsd = devtag_get_device(device->machine, "cvsd");
 //  hc55516_digit_w(cvsd, data);
 //  popmessage("%02x\n",data);
 //  beep_set_state(beep, 0);
@@ -666,14 +666,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237_1", dma8237_r, dma8237_w ) //8237 DMA Controller
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE(PIC8259, "pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)    //8253 PIT
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", dma8237_r, dma8237_w ) //8237 DMA Controller
+	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)    //8253 PIT
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,mc146818_port_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE(PIC8259, "pic8259_2", pic8259_r, pic8259_w )
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_r, pic8259_w )
 //  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
 	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
@@ -695,14 +695,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetriskr_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237_1", dma8237_r, dma8237_w ) //8237 DMA Controller
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE(PIC8259, "pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)    //8253 PIT
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", dma8237_r, dma8237_w ) //8237 DMA Controller
+	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)    //8253 PIT
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,mc146818_port_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE(PIC8259, "pic8259_2", pic8259_r, pic8259_w )
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_r, pic8259_w )
   	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
 //  AM_RANGE(0x0201, 0x0201) AM_READ_PORT("IN1") //game port
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
@@ -897,11 +897,11 @@ static MACHINE_RESET( filetto )
 	lastvalue = -1;
 	hv_blank = 0;
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
-	filetto_devices.pit8253 = device_list_find_by_tag( machine->config->devicelist, PIT8253, "pit8253" );
-	filetto_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
-	filetto_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
-	filetto_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
-	filetto_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	filetto_devices.pit8253 = devtag_get_device( machine, "pit8253" );
+	filetto_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
+	filetto_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
+	filetto_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
+	filetto_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
 }
 
 static MACHINE_DRIVER_START( filetto )

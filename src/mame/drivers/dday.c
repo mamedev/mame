@@ -91,8 +91,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(dday_bgvideoram_w) AM_BASE(&dday_bgvideoram)
 	AM_RANGE(0x5c00, 0x5fff) AM_WRITE(dday_colorram_w) AM_BASE(&dday_colorram)
 	AM_RANGE(0x6000, 0x63ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6400, 0x6401) AM_MIRROR(0x000e) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x6800, 0x6801) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x6400, 0x6401) AM_MIRROR(0x000e) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x6800, 0x6801) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(dday_control_w)
 ADDRESS_MAP_END
 

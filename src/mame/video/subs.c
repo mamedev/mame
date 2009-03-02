@@ -41,9 +41,9 @@ VIDEO_UPDATE( subs )
 {
 	int offs;
 
-	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lscreen");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "rscreen");
-	const device_config *discrete = devtag_get_device(screen->machine, SOUND, "discrete");
+	const device_config *left_screen  = devtag_get_device(screen->machine, "lscreen");
+	const device_config *right_screen = devtag_get_device(screen->machine, "rscreen");
+	const device_config *discrete = devtag_get_device(screen->machine, "discrete");
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */

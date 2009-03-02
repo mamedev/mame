@@ -95,7 +95,7 @@ static WRITE8_DEVICE_HANDLER( ctc_timer_1_w )
 	{
 		output[0] ^= 0x7f;
 		channel_active[0] = 1;
-		dac_data_w(devtag_get_device(device->machine, SOUND, "dac1"), output[0]);
+		dac_data_w(devtag_get_device(device->machine, "dac1"), output[0]);
 	}
 }
 
@@ -105,7 +105,7 @@ static WRITE8_DEVICE_HANDLER( ctc_timer_2_w )
 	{
 		output[1] ^= 0x7f;
 		channel_active[1] = 1;
-		dac_data_w(devtag_get_device(device->machine, SOUND, "dac2"), output[0]);
+		dac_data_w(devtag_get_device(device->machine, "dac2"), output[0]);
 	}
 }
 
@@ -129,7 +129,7 @@ SOUND_START( cchasm )
     sound_flags = 0;
     output[0] = 0; output[1] = 0;
 
-	ctc = devtag_get_device(machine, Z80CTC, "ctc");
+	ctc = devtag_get_device(machine, "ctc");
 
 	timer_pulse(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, cchasm_sh_update);
 }

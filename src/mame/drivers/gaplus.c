@@ -282,7 +282,7 @@ static WRITE8_HANDLER( gaplus_sreset_w )
 	int bit = !BIT(offset,11);
     cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
     cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-	mappy_sound_enable(devtag_get_device(space->machine, SOUND, "namco"), bit);
+	mappy_sound_enable(devtag_get_device(space->machine, "namco"), bit);
 }
 
 static WRITE8_HANDLER( gaplus_freset_w )
@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(gaplus_videoram_w) AM_BASE(&gaplus_videoram)	/* tilemap RAM (shared with CPU #2) */
 	AM_RANGE(0x0800, 0x1fff) AM_WRITE(gaplus_spriteram_w) AM_BASE(&gaplus_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
-	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE(SOUND, "namco", gaplus_snd_sharedram_w) /* shared RAM with CPU #3 */
+	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("namco", gaplus_snd_sharedram_w) /* shared RAM with CPU #3 */
 	AM_RANGE(0x6820, 0x682f) AM_WRITE(gaplus_customio_3_w) AM_BASE(&gaplus_customio_3)/* custom I/O chip #3 interface */
 	AM_RANGE(0x6800, 0x6bff) AM_WRITE(namcoio_w)								/* custom I/O chips interface */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)					/* main CPU irq control */
@@ -355,7 +355,7 @@ ADDRESS_MAP_END
 
 	/* CPU 3 (SOUND CPU) write addresses */
 static ADDRESS_MAP_START( writemem_cpu3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE(SOUND, "namco", gaplus_snd_sharedram_w) AM_BASE(&namco_soundregs)	/* shared RAM with the main CPU + sound registers */
+	AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE("namco", gaplus_snd_sharedram_w) AM_BASE(&namco_soundregs)	/* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(watchdog_reset_w)		/* watchdog? */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(gaplus_irq_3_ctrl_w)	/* interrupt enable/disable */
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */

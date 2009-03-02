@@ -588,7 +588,7 @@ static DEVICE_RESET( cpu )
 
 		/* new style - use screen tag directly */
 		if (config->vblank_interrupt_screen != NULL)
-			screen = devtag_get_device(device->machine, VIDEO_SCREEN, config->vblank_interrupt_screen);
+			screen = devtag_get_device(device->machine, config->vblank_interrupt_screen);
 
 		/* old style 'hack' setup - use screen #0 */
 		else

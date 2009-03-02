@@ -309,7 +309,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine)
 	/* INIT THE PORTS *********************************************************************************************/
 
 	const address_space *io = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO);
-	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(machine, "sn");
 
 	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
@@ -367,7 +367,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
-	devtag_reset(machine, SOUND, "ym");
+	devtag_reset(machine, "ym");
 
 	sprintf(tempname, "game%d", gameno);
 	game_region = memory_region(machine, tempname);
@@ -587,8 +587,8 @@ static VIDEO_START(mtnew)
 //attotime_never
 static VIDEO_UPDATE(mtnew)
 {
-	const device_config *megadriv_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "megadriv");
-	const device_config *menu_screen     = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "menu");
+	const device_config *megadriv_screen = devtag_get_device(screen->machine, "megadriv");
+	const device_config *menu_screen     = devtag_get_device(screen->machine, "menu");
 
 	if (screen == megadriv_screen)
 	{

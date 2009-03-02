@@ -172,20 +172,20 @@ static ADDRESS_MAP_START( slotcarn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0xafff) AM_ROM // spielbud
 
 
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
-	AM_RANGE(0xb100, 0xb100) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0xb100, 0xb100) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
 
-	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xba00, 0xba03) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
-	AM_RANGE(0xbc00, 0xbc03) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xba00, 0xba03) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0xbc00, 0xbc03) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
 
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW3")
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW4")
 
 	AM_RANGE(0xd800, 0xd81f) AM_RAM // column scroll for reels?
 
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_register_w)
 
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&ram_video)
@@ -194,8 +194,8 @@ ADDRESS_MAP_END
 
 // spielbud - is the ay mirrored, or are there now 2?
 static ADDRESS_MAP_START( spielbud_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
-	AM_RANGE(0xb100, 0xb100) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0xb100, 0xb100) AM_DEVWRITE("ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 /********************************
@@ -523,7 +523,7 @@ GFXDECODE_END
 
 static VIDEO_UPDATE( slotcarn )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
+	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;

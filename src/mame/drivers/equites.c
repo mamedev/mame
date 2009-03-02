@@ -418,7 +418,7 @@ static float cymvol,hihatvol;
 
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
 {
-	const device_config *msm = devtag_get_device(machine, SOUND, "msm");
+	const device_config *msm = devtag_get_device(machine, "msm");
 	UINT8 frq = input_port_read(machine, FRQ_ADJUSTER_TAG);
 
 	msm5232_set_clock(msm, MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
@@ -560,10 +560,10 @@ static void equites_update_dac(running_machine *machine)
 	// Note that PB0 goes through three filters while PB1 only goes through one.
 
 	if (equites_8155_portb & 1)
-		dac_signed_data_w(devtag_get_device(machine, SOUND, "dac1"), equites_dac_latch);
+		dac_signed_data_w(devtag_get_device(machine, "dac1"), equites_dac_latch);
 
 	if (equites_8155_portb & 2)
-		dac_signed_data_w(devtag_get_device(machine, SOUND, "dac2"), equites_dac_latch);
+		dac_signed_data_w(devtag_get_device(machine, "dac2"), equites_dac_latch);
 }
 
 static WRITE8_HANDLER(equites_dac_latch_w)
@@ -612,7 +612,7 @@ static WRITE8_HANDLER(equites_8155_w)
 		case 1: //logerror( "8155 I/O Port A write %x\n", data );
 			eq8155_port_a = data;
 
-			device = devtag_get_device(space->machine, SOUND, "msm");
+			device = devtag_get_device(space->machine, "msm");
 			sound_set_output_gain(device, 0, (data >> 4) / 15.0);	/* group1 from msm5232 */
 			sound_set_output_gain(device, 1, (data >> 4) / 15.0);	/* group1 from msm5232 */
 			sound_set_output_gain(device, 2, (data >> 4) / 15.0);	/* group1 from msm5232 */
@@ -629,7 +629,7 @@ static WRITE8_HANDLER(equites_8155_w)
 		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
 			eq8155_port_c = data;
 
-			device = devtag_get_device(space->machine, SOUND, "msm");
+			device = devtag_get_device(space->machine, "msm");
 			sound_set_output_gain(device, 8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
 			if (data & 0x20)
 				sound_set_output_gain(device, 9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
@@ -759,8 +759,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE(SOUND, "msm", msm5232_w)
-	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE("msm", msm5232_w)
+	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE("ay", ay8910_data_address_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)	// followed by 1 (and usually 0) on 8155 port B
@@ -1131,8 +1131,8 @@ static const ay8910_interface equites_8910intf =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(SOUND, "samples", equites_8910porta_w),
-	DEVCB_DEVICE_HANDLER(SOUND, "samples", equites_8910portb_w)
+	DEVCB_DEVICE_HANDLER("samples", equites_8910porta_w),
+	DEVCB_DEVICE_HANDLER("samples", equites_8910portb_w)
 };
 
 

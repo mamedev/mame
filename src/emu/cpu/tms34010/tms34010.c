@@ -682,7 +682,7 @@ static CPU_INIT( tms34010 )
 	tms->irq_callback = irqcallback;
 	tms->device = device;
 	tms->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	tms->screen = devtag_get_device(device->machine, VIDEO_SCREEN, configdata->screen_tag);
+	tms->screen = devtag_get_device(device->machine, configdata->screen_tag);
 
 	/* set up the state table */
 	tms->state = state_table_template;

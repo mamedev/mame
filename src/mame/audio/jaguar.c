@@ -439,12 +439,12 @@ WRITE32_HANDLER( jaguar_serial_w )
 	{
 		/* right DAC */
 		case 2:
-			dac_signed_data_16_w(devtag_get_device(space->machine, SOUND, "dac2"), (data & 0xffff) ^ 0x8000);
+			dac_signed_data_16_w(devtag_get_device(space->machine, "dac2"), (data & 0xffff) ^ 0x8000);
 			break;
 
 		/* left DAC */
 		case 3:
-			dac_signed_data_16_w(devtag_get_device(space->machine, SOUND, "dac1"), (data & 0xffff) ^ 0x8000);
+			dac_signed_data_16_w(devtag_get_device(space->machine, "dac1"), (data & 0xffff) ^ 0x8000);
 			break;
 
 		/* frequency register */

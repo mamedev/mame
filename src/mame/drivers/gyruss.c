@@ -183,21 +183,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD(SOUND, "ay1", ay8910_r)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
-  	AM_RANGE(0x05, 0x05) AM_DEVREAD(SOUND, "ay2", ay8910_r)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE(SOUND, "ay3", ay8910_address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREAD(SOUND, "ay3", ay8910_r)
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE(SOUND, "ay3", ay8910_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE(SOUND, "ay4", ay8910_address_w)
-  	AM_RANGE(0x0d, 0x0d) AM_DEVREAD(SOUND, "ay4", ay8910_r)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE(SOUND, "ay4", ay8910_data_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "ay5", ay8910_address_w)
-  	AM_RANGE(0x11, 0x11) AM_DEVREAD(SOUND, "ay5", ay8910_r)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE(SOUND, "ay5", ay8910_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("ay1", ay8910_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay2", ay8910_address_w)
+  	AM_RANGE(0x05, 0x05) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay3", ay8910_address_w)
+	AM_RANGE(0x09, 0x09) AM_DEVREAD("ay3", ay8910_r)
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay3", ay8910_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("ay4", ay8910_address_w)
+  	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("ay4", ay8910_r)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("ay4", ay8910_data_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay5", ay8910_address_w)
+  	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay5", ay8910_r)
+	AM_RANGE(0x12, 0x12) AM_DEVWRITE("ay5", ay8910_data_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(gyruss_i8039_irq_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
@@ -208,7 +208,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(SOUND, "discrete", gyruss_dac_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("discrete", gyruss_dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)
 ADDRESS_MAP_END
 
@@ -366,7 +366,7 @@ static const ay8910_interface ay8910_interface_1 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(SOUND, "discrete", gyruss_filter0_w)
+	DEVCB_DEVICE_HANDLER("discrete", gyruss_filter0_w)
 };
 
 static const ay8910_interface ay8910_interface_2 =
@@ -376,7 +376,7 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(SOUND, "discrete", gyruss_filter1_w)
+	DEVCB_DEVICE_HANDLER("discrete", gyruss_filter1_w)
 };
 
 static const ay8910_interface ay8910_interface_3 =

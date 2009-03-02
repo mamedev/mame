@@ -80,7 +80,7 @@ void tms34061_start(running_machine *machine, const struct tms34061_interface *i
 	/* reset the data */
 	memset(&tms34061, 0, sizeof(tms34061));
 	tms34061.intf = *interface;
-	tms34061.screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, tms34061.intf.screen_tag);
+	tms34061.screen = devtag_get_device(machine, tms34061.intf.screen_tag);
 	tms34061.vrammask = tms34061.intf.vramsize - 1;
 
 	/* allocate memory for VRAM */

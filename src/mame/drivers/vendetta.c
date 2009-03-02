@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fd0, 0x5fd0) AM_READ(vendetta_eeprom_r) /* vblank, service */
 	AM_RANGE(0x5fd1, 0x5fd1) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x5fe4, 0x5fe4) AM_READ(vendetta_sound_interrupt_r)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREAD(SOUND, "konami", vendetta_sound_r)
+	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREAD("konami", vendetta_sound_r)
 	AM_RANGE(0x5fe8, 0x5fe9) AM_READ(K053246_r)
 	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
 	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
 	AM_RANGE(0x5fe4, 0x5fe4) AM_WRITE(z80_irq_w)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVWRITE(SOUND, "konami", k053260_w)
+	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVWRITE("konami", k053260_w)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_BANK3)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_BANK2)
@@ -313,7 +313,7 @@ static ADDRESS_MAP_START( esckids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f92, 0x3f92) AM_READ(vendetta_eeprom_r)	// vblank, TEST SW on PCB
 	AM_RANGE(0x3f93, 0x3f93) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x3fd4, 0x3fd4) AM_READ(vendetta_sound_interrupt_r)	// Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREAD(SOUND, "konami", vendetta_sound_r)				// Sound
+	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREAD("konami", vendetta_sound_r)				// Sound
 	AM_RANGE(0x3fd8, 0x3fd9) AM_READ(K053246_r)			// 053246 (Sprite)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_BANK3)			// 052109 (Tilemap) 0x0000-0x0fff
@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( esckids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)	// Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)	// EEPROM, Video banking
 	AM_RANGE(0x3fd4, 0x3fd4) AM_WRITE(z80_irq_w)			// Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVWRITE(SOUND, "konami", k053260_w)		// Sound
+	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVWRITE("konami", k053260_w)		// Sound
 	AM_RANGE(0x3fda, 0x3fda) AM_WRITE(SMH_NOP)			// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_BANK3)			// 052109 (Tilemap) 0x0000-0x0fff
@@ -345,16 +345,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf801) AM_DEVREAD(SOUND, "ym", ym2151_r)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREAD(SOUND, "konami", k053260_r)
+	AM_RANGE(0xf800, 0xf801) AM_DEVREAD("ym", ym2151_r)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREAD("konami", k053260_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("ym", ym2151_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVWRITE(SOUND, "konami", k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVWRITE("konami", k053260_w)
 ADDRESS_MAP_END
 
 

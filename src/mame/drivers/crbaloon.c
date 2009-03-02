@@ -159,8 +159,8 @@ static READ8_HANDLER( pc3259_r )
 
 static WRITE8_HANDLER( port_sound_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
-	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+	const device_config *discrete = devtag_get_device(space->machine, "discrete");
+	const device_config *sn = devtag_get_device(space->machine, "sn");
 
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
 	cpu_interrupt_enable(space->machine->cpu[0], (data & 0x01) ? TRUE : FALSE);
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)	/* not connected */
 	AM_RANGE(0x01, 0x01) AM_WRITE(SMH_NOP) /* watchdog */
 	AM_RANGE(0x02, 0x04) AM_WRITE(SMH_RAM) AM_BASE(&crbaloon_spriteram)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE(SOUND, "discrete", crbaloon_audio_set_music_freq)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("discrete", crbaloon_audio_set_music_freq)
 	AM_RANGE(0x06, 0x06) AM_WRITE(port_sound_w)
 	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_BASE(&pc3092_data)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(SMH_NOP) /* MSK - to PC3259 */
@@ -343,7 +343,7 @@ GFXDECODE_END
 static MACHINE_RESET( crballoon )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
-	const device_config *discrete = devtag_get_device(machine, SOUND, "discrete");
+	const device_config *discrete = devtag_get_device(machine, "discrete");
 
 	pc3092_reset();
 	port_sound_w(space, 0, 0);

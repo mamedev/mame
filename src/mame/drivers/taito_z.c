@@ -1494,7 +1494,7 @@ static WRITE8_HANDLER( taitoz_pancontrol )
 //  taitoz_pandata[offset] = data;
 //  popmessage(" pan %02x %02x %02x %02x", taitoz_pandata[0], taitoz_pandata[1], taitoz_pandata[2], taitoz_pandata[3] );
 
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, fltname[offset & 3]), data / 255.0f);
+	flt_volume_set_volume(devtag_get_device(space->machine, fltname[offset & 3]), data / 255.0f);
 }
 
 static WRITE16_HANDLER( spacegun_pancontrol )
@@ -1699,7 +1699,7 @@ static ADDRESS_MAP_START( bshark_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10bfff) AM_READ(SMH_RAM)
 	AM_RANGE(0x110000, 0x113fff) AM_READ(sharedram_r)
 //  AM_RANGE(0x40000a, 0x40000b) AM_READ(taitoz_unknown_r)  // ???
-	AM_RANGE(0x600000, 0x600007) AM_DEVREAD8(SOUND, "ym", ym2610_r, 0x00ff)
+	AM_RANGE(0x600000, 0x600007) AM_DEVREAD8("ym", ym2610_r, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_READ(SMH_NOP)
 	AM_RANGE(0x60000e, 0x60000f) AM_READ(SMH_NOP)
 	AM_RANGE(0x800000, 0x801fff) AM_READ(TC0150ROD_word_r)	/* "root ram" */
@@ -1710,7 +1710,7 @@ static ADDRESS_MAP_START( bshark_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x110000, 0x113fff) AM_WRITE(sharedram_w)
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(spacegun_pancontrol)  /* pan */
-	AM_RANGE(0x600000, 0x600007) AM_DEVWRITE8(SOUND, "ym", ym2610_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600007) AM_DEVWRITE8("ym", ym2610_w, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(SMH_NOP)	// interrupt controller?
 	AM_RANGE(0x60000e, 0x60000f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x800000, 0x801fff) AM_WRITE(TC0150ROD_word_w)	/* "root ram" */
@@ -1876,7 +1876,7 @@ static ADDRESS_MAP_START( spacegun_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20c000, 0x20ffff) AM_READ(SMH_RAM)	/* local CPUB ram */
 	AM_RANGE(0x210000, 0x21ffff) AM_READ(sharedram_r)
 	AM_RANGE(0x800000, 0x80000f) AM_READ(spacegun_input_bypass_r)
-	AM_RANGE(0xc00000, 0xc00007) AM_DEVREAD8(SOUND, "ym", ym2610_r, 0x00ff)
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVREAD8("ym", ym2610_r, 0x00ff)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ(SMH_NOP)
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(SMH_NOP)
 	AM_RANGE(0xf00000, 0xf00007) AM_READ(spacegun_lightgun_r)
@@ -1887,7 +1887,7 @@ static ADDRESS_MAP_START( spacegun_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20c000, 0x20ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x210000, 0x21ffff) AM_WRITE(sharedram_w)
 	AM_RANGE(0x800000, 0x80000f) AM_WRITE(spacegun_output_bypass_w)
-	AM_RANGE(0xc00000, 0xc00007) AM_DEVWRITE8(SOUND, "ym", ym2610_w, 0x00ff)
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVWRITE8("ym", ym2610_w, 0x00ff)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITE(SMH_NOP)	// interrupt controller?
 	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xc20000, 0xc20007) AM_WRITE(spacegun_pancontrol)  /* pan */
@@ -1993,7 +1993,7 @@ static ADDRESS_MAP_START( z80_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
@@ -2002,7 +2002,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(taitoz_pancontrol) /* pan */

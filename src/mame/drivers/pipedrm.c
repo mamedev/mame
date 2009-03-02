@@ -265,13 +265,13 @@ static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x16, 0x16) AM_READ(sound_command_r)
 	AM_RANGE(0x17, 0x17) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(SOUND, "ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hatris_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x08) AM_DEVREADWRITE(SOUND, "ym", ym2608_r, ym2608_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x08) AM_DEVREADWRITE("ym", ym2608_r, ym2608_w)
 	AM_RANGE(0x04, 0x04) AM_READ(sound_command_r)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(pending_command_r, pending_command_clear_w)
 ADDRESS_MAP_END

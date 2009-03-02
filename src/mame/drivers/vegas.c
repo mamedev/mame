@@ -528,7 +528,7 @@ static VIDEO_UPDATE( vegas )
 
 static MACHINE_START( vegas )
 {
-	voodoo_device = device_list_find_by_tag(machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
+	voodoo_device = devtag_get_device(machine, "voodoo");
 
 	/* allocate timers for the NILE */
 	timer[0] = timer_alloc(machine, NULL, NULL);
@@ -776,7 +776,7 @@ static WRITE32_HANDLER( pci_ide_w )
 
 		case 0x14:		/* interrupt pending */
 			if (data & 4)
-				ide_interrupt(device_list_find_by_tag(space->machine->config->devicelist, IDE_CONTROLLER, "ide"), 0);
+				ide_interrupt(devtag_get_device(space->machine, "ide"), 0);
 			break;
 	}
 	if (LOG_PCI)
@@ -1560,8 +1560,8 @@ INLINE void _add_dynamic_device_address(const device_config *device, offs_t star
 
 static void remap_dynamic_addresses(running_machine *machine)
 {
-	const device_config *ethernet = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
-	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+	const device_config *ethernet = devtag_get_device(machine, "ethernet");
+	const device_config *ide = devtag_get_device(machine, "ide");
 	int voodoo_type = voodoo_get_type(voodoo_device);
 	offs_t base;
 	int addr;

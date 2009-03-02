@@ -368,8 +368,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE(SOUND, "msm", msm5232_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(sound_command_r, beg_fromsound_w)	/* write to D800 sets bit 1 in status */

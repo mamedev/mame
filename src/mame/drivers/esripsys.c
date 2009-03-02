@@ -554,7 +554,7 @@ static READ8_HANDLER( tms5220_r )
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		const device_config *tms = devtag_get_device(space->machine, SOUND, "tms5220nl");
+		const device_config *tms = devtag_get_device(space->machine, "tms5220nl");
 		UINT8 status = tms5220_status_r(tms, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
@@ -567,7 +567,7 @@ static READ8_HANDLER( tms5220_r )
 /* TODO: Implement correctly using the state PROM */
 static WRITE8_HANDLER( tms5220_w )
 {
-	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms5220nl");
+	const device_config *tms = devtag_get_device(space->machine, "tms5220nl");
 	if (offset == 0)
 	{
 		tms_data = data;
@@ -648,7 +648,7 @@ static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* Not installed on later PCBs */
 	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
-	AM_RANGE(0x200a, 0x200b) AM_DEVWRITE(SOUND, "dac", esripsys_dac_w)
+	AM_RANGE(0x200a, 0x200b) AM_DEVWRITE("dac", esripsys_dac_w)
 	AM_RANGE(0x200c, 0x200c) AM_WRITE(volume_dac_w)
 	AM_RANGE(0x200d, 0x200d) AM_WRITE(control_w)
 	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)

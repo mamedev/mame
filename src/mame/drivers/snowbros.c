@@ -111,7 +111,7 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	const device_config *adpcm = devtag_get_device(device->machine, SOUND, "oki");
+	const device_config *adpcm = devtag_get_device(device->machine, "oki");
 	int status = okim6295_r(adpcm,0);
 
 	cpu_set_input_line(device, cpu_getiloops(device) + 2, HOLD_LINE);	/* IRQs 4, 3, and 2 */
@@ -197,7 +197,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -255,18 +255,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( honeydol_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe010, 0xe010) AM_DEVREAD(SOUND, "oki", okim6295_r)
+	AM_RANGE(0xe010, 0xe010) AM_DEVREAD("oki", okim6295_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe010, 0xe010) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0xe010, 0xe010) AM_DEVWRITE("oki", okim6295_w)
 	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)								// not connected?
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)								// not connected?
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -309,13 +309,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( twinadv_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-//  AM_RANGE(0xe010, 0xe010) AM_DEVREAD(SOUND, "oki", okim6295_r)
+//  AM_RANGE(0xe010, 0xe010) AM_DEVREAD("oki", okim6295_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twinadv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-//  AM_RANGE(0xe010, 0xe010) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+//  AM_RANGE(0xe010, 0xe010) AM_DEVWRITE("oki", okim6295_w)
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( twinadv_oki_bank_w )
@@ -330,8 +330,8 @@ static WRITE8_DEVICE_HANDLER( twinadv_oki_bank_w )
 static ADDRESS_MAP_START( twinadv_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(soundlatch_r, soundlatch_w) // back to 68k?
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "oki", twinadv_oki_bank_w) // oki bank?
-	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE(SOUND, "oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", twinadv_oki_bank_w) // oki bank?
+	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 ADDRESS_MAP_END
 
 
@@ -370,15 +370,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyperpac_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREAD("ym", ym2151_r)
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyperpac_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
-	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE(SOUND, "oki", okim6295_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE("ym", ym2151_w)
+	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE("oki", okim6295_w)
 //  AM_RANGE(0xf006, 0xf006) ???
 ADDRESS_MAP_END
 
@@ -504,7 +504,7 @@ static ADDRESS_MAP_START( writemem3, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE( 0x100000, 0x103fff) AM_WRITE(SMH_RAM)
 	AM_RANGE( 0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE( 0x300000, 0x300001) AM_DEVWRITE(SOUND, "oki", sb3_sound_w)  // ?
+	AM_RANGE( 0x300000, 0x300001) AM_DEVWRITE("oki", sb3_sound_w)  // ?
 	AM_RANGE( 0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE( 0x600000, 0x6003ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE (&paletteram16)
 	AM_RANGE( 0x700000, 0x7021ff) AM_WRITE(SMH_RAM) AM_BASE( &spriteram16) AM_SIZE( &spriteram_size )

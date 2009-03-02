@@ -50,11 +50,11 @@ static ADDRESS_MAP_START( ajax_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM F6 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM 2128SL at D16 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE(SOUND, "konami1", k007232_r, k007232_w)		/* 007232 registers (chip 1) */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE(SOUND, "konami2", k007232_r, k007232_w)		/* 007232 registers (chip 2) */
-	AM_RANGE(0xb80c, 0xb80c) AM_DEVWRITE(SOUND, "konami2", k007232_extvol_w)			/* extra volume, goes to the 007232 w/ A11 */
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("konami1", k007232_r, k007232_w)		/* 007232 registers (chip 1) */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami2", k007232_r, k007232_w)		/* 007232 registers (chip 2) */
+	AM_RANGE(0xb80c, 0xb80c) AM_DEVWRITE("konami2", k007232_extvol_w)			/* extra volume, goes to the 007232 w/ A11 */
 																/* selecting a different latch for the external port */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)		/* YM2151 */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)		/* YM2151 */
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)				/* soundlatch_r */
 ADDRESS_MAP_END
 
@@ -187,12 +187,12 @@ static WRITE8_HANDLER( sound_bank_w )
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 1) & 0x01);
 	bank_B = ((data >> 0) & 0x01);
-	k007232_set_bank( devtag_get_device(space->machine, SOUND, "konami1"), bank_A, bank_B );
+	k007232_set_bank( devtag_get_device(space->machine, "konami1"), bank_A, bank_B );
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank( devtag_get_device(space->machine, SOUND, "konami2"), bank_A, bank_B );
+	k007232_set_bank( devtag_get_device(space->machine, "konami2"), bank_A, bank_B );
 }
 
 static void volume_callback0(const device_config *device, int v)

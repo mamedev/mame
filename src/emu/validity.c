@@ -841,14 +841,14 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 				}
 
 				/* make sure all devices exist */
-				if (entry->read_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->read_devtype, entry->read_devtag) == NULL)
+				if (entry->read_devtag != NULL && device_list_find_by_tag(config->devicelist, entry->read_devtag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device %s '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], devtype_get_name(entry->read_devtype), entry->read_devtag);
+					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->read_devtag);
 					error = TRUE;
 				}
-				if (entry->write_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtype, entry->write_devtag) == NULL)
+				if (entry->write_devtag != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device %s '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], devtype_get_name(entry->write_devtype), entry->write_devtag);
+					mame_printf_error("%s: %s CPU '%s' %s space memory map entry references nonexistant device '%s'\n", driver->source_file, driver->name, device->tag, address_space_names[spacenum], entry->write_devtag);
 					error = TRUE;
 				}
 
@@ -876,7 +876,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 					mame_printf_error("%s: %s cpu '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver->source_file, driver->name, device->tag);
 					error = TRUE;
 				}
-				else if (cpuconfig->vblank_interrupt_screen != NULL && device_list_find_by_tag(config->devicelist, VIDEO_SCREEN, cpuconfig->vblank_interrupt_screen) == NULL)
+				else if (cpuconfig->vblank_interrupt_screen != NULL && device_list_find_by_tag(config->devicelist, cpuconfig->vblank_interrupt_screen) == NULL)
 				{
 					mame_printf_error("%s: %s cpu '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver->source_file, driver->name, device->tag, cpuconfig->vblank_interrupt_screen);
 					error = TRUE;

@@ -329,8 +329,8 @@ static WRITE8_HANDLER( snd_irq_w )
 
 static WRITE8_HANDLER( snddata_w )
 {
-	const device_config *ay1 = devtag_get_device(space->machine, SOUND, "ay1");
-	const device_config *ay2 = devtag_get_device(space->machine, SOUND, "ay2");
+	const device_config *ay1 = devtag_get_device(space->machine, "ay1");
+	const device_config *ay2 = devtag_get_device(space->machine, "ay2");
 
 	if ((p2 & 0xf0) == 0xe0)
 		ay8910_address_w(ay1,0,offset);

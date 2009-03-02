@@ -20,7 +20,6 @@ typedef void (*pci_write_func)(const device_config *pcibus, const device_config 
 typedef struct _pci_device_entry pci_device_entry;
 struct _pci_device_entry
 {
-	device_type			devtype;
 	const char *		devtag;
 	pci_read_func		read_callback;
 	pci_write_func		write_callback;
@@ -43,8 +42,7 @@ struct _pci_bus_config
 	MDRV_DEVICE_ADD(_tag, PCI_BUS, 0) \
 	MDRV_DEVICE_CONFIG_DATA32(pci_bus_config, busnum, _busnum)
 
-#define MDRV_PCI_BUS_DEVICE(_devnum, _devtype, _devtag, _configread, _configwrite) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtype, _devtype) \
+#define MDRV_PCI_BUS_DEVICE(_devnum, _devtag, _configread, _configwrite) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtag, _devtag) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, read_callback, _configread) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, write_callback, _configwrite)

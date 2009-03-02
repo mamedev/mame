@@ -567,7 +567,7 @@ static WRITE8_DEVICE_HANDLER( p8257_drq_w )
 static READ8_HANDLER( dkong_in2_r )
 {
 	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
-	const device_config *devvp2 = devtag_get_device(space->machine, LATCH8, "virtual_p2");
+	const device_config *devvp2 = devtag_get_device(space->machine, "virtual_p2");
 	UINT8 mcustatus = latch8_bit4_q_r(devvp2, 0);
 
 	UINT8 r;
@@ -752,19 +752,19 @@ static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
 									AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* sprite set 1 */
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
 							 		AM_BASE_MEMBER(dkong_state, video_ram)
-	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
+	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls175.3d")      /* IN0, sound CPU intf */
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)  /* IN1 */
 
 	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)								  /* IN2 */
-	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE(LATCH8, "ls259.6h", latch8_bit0_w)       /* Sound signals */
+	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE("ls259.6h", latch8_bit0_w)       /* Sound signals */
 
 	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)	  /* DSW0 */
 	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
 	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						  /* 2 PSL Signal */
 	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE(DMA8257, "dma8257", p8257_drq_w)		  /* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE("dma8257", p8257_drq_w)		  /* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 ADDRESS_MAP_END
 
@@ -776,23 +776,23 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
 									AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
 									AM_BASE_MEMBER(dkong_state, video_ram)
-	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
+	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE("dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
 
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls174.3d")    /* IN0, sound interface */
 
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
-	AM_RANGE(0x7c80, 0x7c87) AM_DEVWRITE(LATCH8, "ls259.4h", latch8_bit0_w)     /* latch for sound and signals above */
+	AM_RANGE(0x7c80, 0x7c87) AM_DEVWRITE("ls259.4h", latch8_bit0_w)     /* latch for sound and signals above */
 
 	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkongjr_in2_r)	                            /* IN2 */
-	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE(LATCH8, "ls259.6h",latch8_bit0_w)      /* Sound addrs */
+	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE("ls259.6h",latch8_bit0_w)      /* Sound addrs */
 
 	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
 	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
 	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE(DMA8257, "dma8257", p8257_drq_w)		/* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE("dma8257", p8257_drq_w)		/* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE(LATCH8, "ls259.5h", latch8_bit0_w)     /* latch for sound and signals above*/
+	AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE("ls259.5h", latch8_bit0_w)     /* latch for sound and signals above*/
 
 	AM_RANGE(0x8000, 0x9fff) AM_ROM	                                            /* bootleg DKjr only */
 	AM_RANGE(0xb000, 0xbfff) AM_ROM                                             /* pestplce only */
@@ -816,14 +816,14 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)				  /* 2 PSL Signal */
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE(Z80DMA, "z80dma", z80dma_rdy_w)  /* ==> DMA Chip */
+	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE("z80dma", z80dma_rdy_w)  /* ==> DMA Chip */
 	AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM	                                      /* DK3 and bootleg DKjr only */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(Z80DMA, "z80dma", z80dma_r, z80dma_w)	/* dma controller */
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("z80dma", z80dma_r, z80dma_w)	/* dma controller */
 ADDRESS_MAP_END
 
 /* Epos conversions */
@@ -839,21 +839,21 @@ static ADDRESS_MAP_START( s2650_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram)
 									AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* 0x7000 */
-	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("IN0") AM_DEVWRITE(LATCH8, "ls175.3d", latch8_w)
+	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("IN0") AM_DEVWRITE("ls175.3d", latch8_w)
 	AM_RANGE(0x1480, 0x1480) AM_READ_PORT("IN1")
 	AM_RANGE(0x1500, 0x1500) AM_READ(dkong_in2_r)                                 /* IN2 */
-	AM_RANGE(0x1500, 0x1507) AM_DEVWRITE(LATCH8, "ls259.6h", latch8_bit0_w)       /* Sound signals */
+	AM_RANGE(0x1500, 0x1507) AM_DEVWRITE("ls259.6h", latch8_bit0_w)       /* Sound signals */
 	AM_RANGE(0x1580, 0x1580) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)     /* DSW0 */
 	AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x1583, 0x1583) AM_WRITE(dkong_spritebank_w)						  /* 2 PSL Signal */
 	AM_RANGE(0x1584, 0x1584) AM_NOP			                                      /* Possibly still interupt enable */
-	AM_RANGE(0x1585, 0x1585) AM_DEVWRITE(DMA8257, "dma8257", p8257_drq_w)		  /* P8257 ==> /DRQ0 /DRQ1 */
+	AM_RANGE(0x1585, 0x1585) AM_DEVWRITE("dma8257", p8257_drq_w)		  /* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x1586, 0x1587) AM_WRITE(dkong_palettebank_w)
 	AM_RANGE(0x1600, 0x17ff) AM_RAM                                               /* 0x6400  spriteram location */
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(dkong_videoram_w)
 									AM_BASE_MEMBER(dkong_state, video_ram)		  /* 0x7400 */
 	AM_RANGE(0x1C00, 0x1f7f) AM_RAM                                               /* 0x6000 */
-	AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
+	AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE("dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
 	/* 0x6800 not remapped */
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
@@ -1713,7 +1713,7 @@ static MACHINE_DRIVER_START( s2650 )
 	MDRV_CPU_IO_MAP(s2650_io_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", s2650_interrupt)
 
-	MDRV_DEVICE_MODIFY("dma8257", DMA8257)
+	MDRV_DEVICE_MODIFY("dma8257")
 	MDRV_DEVICE_CONFIG(hb_dma)
 
 	MDRV_MACHINE_START(s2650)

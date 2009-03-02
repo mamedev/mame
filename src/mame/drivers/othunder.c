@@ -475,20 +475,20 @@ static WRITE8_HANDLER( othunder_TC0310FAM_w )
        because we are using the AY-3-8910 emulation. */
 	volr = (pan[0] + pan[2]) * 100 / (2 * 0x1f);
 	voll = (pan[1] + pan[3]) * 100 / (2 * 0x1f);
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "2610.0l"), voll / 100.0);
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "2610.0r"), volr / 100.0);
+	flt_volume_set_volume(devtag_get_device(space->machine, "2610.0l"), voll / 100.0);
+	flt_volume_set_volume(devtag_get_device(space->machine, "2610.0r"), volr / 100.0);
 
 	/* CH1 */
 	volr = pan[0] * 100 / 0x1f;
 	voll = pan[1] * 100 / 0x1f;
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "2610.1l"), voll / 100.0);
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "2610.1r"), volr / 100.0);
+	flt_volume_set_volume(devtag_get_device(space->machine, "2610.1l"), voll / 100.0);
+	flt_volume_set_volume(devtag_get_device(space->machine, "2610.1r"), volr / 100.0);
 
 	/* CH2 */
 	volr = pan[2] * 100 / 0x1f;
 	voll = pan[3] * 100 / 0x1f;
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "2610.2l"), voll / 100.0);
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "2610.2r"), volr / 100.0);
+	flt_volume_set_volume(devtag_get_device(space->machine, "2610.2l"), voll / 100.0);
+	flt_volume_set_volume(devtag_get_device(space->machine, "2610.2r"), volr / 100.0);
 }
 
 
@@ -518,7 +518,7 @@ static ADDRESS_MAP_START( z80_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(10)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE(SOUND, "ym", ym2610_r, ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(othunder_TC0310FAM_w) /* pan */

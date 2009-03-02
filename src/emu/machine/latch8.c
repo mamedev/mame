@@ -45,7 +45,7 @@ static void update(const device_config *device, UINT8 new_val, UINT8 mask)
 		UINT8 changed = old_val ^ latch8->value;
 		for (i=0; i<8; i++)
 			if (((changed & (1<<i)) != 0) && latch8->intf->node_map[i] != 0)
-				discrete_sound_w(devtag_get_device(device->machine, SOUND, latch8->intf->node_device[i]), latch8->intf->node_map[i] , (latch8->value >> i) & 1);
+				discrete_sound_w(devtag_get_device(device->machine, latch8->intf->node_device[i]), latch8->intf->node_map[i] , (latch8->value >> i) & 1);
 	}
 }
 
@@ -208,7 +208,6 @@ static DEVICE_START( latch8 )
 			if (latch8->devices[i] != NULL)
 				fatalerror("Device %s: Bit %d already has a handler.\n", device->tag, i);
 			latch8->devices[i] = devtag_get_device(device->machine,
-					latch8->intf->devread[i].type,
 					latch8->intf->devread[i].tag);
 			if (latch8->devices[i] == NULL)
 				fatalerror("Device %s: Unable to find device %s\n", device->tag, latch8->intf->devread[i].tag);

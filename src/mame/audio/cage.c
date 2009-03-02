@@ -178,7 +178,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	{
 		char buffer[10];
 		sprintf(buffer, "dac%d", chan + 1);
-		dmadac[chan] = devtag_get_device(machine, SOUND, buffer);
+		dmadac[chan] = devtag_get_device(machine, buffer);
 	}
 
 	state_save_register_global(machine, cpu_to_cage_ready);

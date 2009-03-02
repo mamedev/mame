@@ -196,8 +196,8 @@ static WRITE8_HANDLER(ppmast_sound_w)
 	switch(offset&0xff)
 	{
 		case 0:
-		case 1: ym2413_w(devtag_get_device(space->machine, SOUND, "ym"),offset,data); break;
-		case 2: dac_data_w(devtag_get_device(space->machine, SOUND, "dac"),data);break;
+		case 1: ym2413_w(devtag_get_device(space->machine, "ym"),offset,data); break;
+		case 2: dac_data_w(devtag_get_device(space->machine, "dac"),data);break;
 		default: logerror("%x %x - %x\n",offset,data,cpu_get_previouspc(space->cpu));
 	}
 }

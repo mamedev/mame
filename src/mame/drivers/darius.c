@@ -339,8 +339,8 @@ static UINT8 darius_pan[DARIUS_PAN_MAX];
 
 static void update_fm0( running_machine *machine )
 {
-	const device_config *lvol = devtag_get_device(machine, SOUND, "filter0.3l");
-	const device_config *rvol = devtag_get_device(machine, SOUND, "filter0.3r");
+	const device_config *lvol = devtag_get_device(machine, "filter0.3l");
+	const device_config *rvol = devtag_get_device(machine, "filter0.3r");
 	int left, right;
 	left  = (        darius_pan[0]  * darius_vol[6])>>8;
 	right = ((0xff - darius_pan[0]) * darius_vol[6])>>8;
@@ -352,8 +352,8 @@ static void update_fm0( running_machine *machine )
 
 static void update_fm1( running_machine *machine )
 {
-	const device_config *lvol = devtag_get_device(machine, SOUND, "filter1.3l");
-	const device_config *rvol = devtag_get_device(machine, SOUND, "filter1.3r");
+	const device_config *lvol = devtag_get_device(machine, "filter1.3l");
+	const device_config *rvol = devtag_get_device(machine, "filter1.3r");
 	int left, right;
 	left  = (        darius_pan[1]  * darius_vol[7])>>8;
 	right = ((0xff - darius_pan[1]) * darius_vol[7])>>8;
@@ -366,8 +366,8 @@ static void update_fm1( running_machine *machine )
 static void update_psg0( running_machine *machine, int port )
 {
 	static const char *fltname[3][2] = { { "filter0.0l", "filter0.0r" }, { "filter0.1l", "filter0.1r" }, { "filter0.2l", "filter0.2r" } };
-	const device_config *lvol = devtag_get_device(machine, SOUND, fltname[port][0]);
-	const device_config *rvol = devtag_get_device(machine, SOUND, fltname[port][1]);
+	const device_config *lvol = devtag_get_device(machine, fltname[port][0]);
+	const device_config *rvol = devtag_get_device(machine, fltname[port][1]);
 	int left, right;
 	left  = (        darius_pan[2]  * darius_vol[port])>>8;
 	right = ((0xff - darius_pan[2]) * darius_vol[port])>>8;
@@ -380,8 +380,8 @@ static void update_psg0( running_machine *machine, int port )
 static void update_psg1( running_machine *machine, int port )
 {
 	static const char *fltname[3][2] = { { "filter0.0l", "filter0.0r" }, { "filter0.1l", "filter0.1r" }, { "filter0.2l", "filter0.2r" } };
-	const device_config *lvol = devtag_get_device(machine, SOUND, fltname[port][0]);
-	const device_config *rvol = devtag_get_device(machine, SOUND, fltname[port][1]);
+	const device_config *lvol = devtag_get_device(machine, fltname[port][0]);
+	const device_config *rvol = devtag_get_device(machine, fltname[port][1]);
 	int left, right;
 	left  = (        darius_pan[3]  * darius_vol[port + 3])>>8;
 	right = ((0xff - darius_pan[3]) * darius_vol[port + 3])>>8;
@@ -393,8 +393,8 @@ static void update_psg1( running_machine *machine, int port )
 
 static void update_da( running_machine *machine )
 {
-	const device_config *lvol = devtag_get_device(machine, SOUND, "msm5205.l");
-	const device_config *rvol = devtag_get_device(machine, SOUND, "msm5205.r");
+	const device_config *lvol = devtag_get_device(machine, "msm5205.l");
+	const device_config *rvol = devtag_get_device(machine, "msm5205.r");
 	int left, right;
 	left  = darius_def_vol[(darius_pan[4]>>4)&0x0f];
 	right = darius_def_vol[(darius_pan[4]>>0)&0x0f];
@@ -489,8 +489,8 @@ static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
 static ADDRESS_MAP_START( darius_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym1", ym2203_r)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD(SOUND, "ym2", ym2203_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym1", ym2203_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym2", ym2203_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(SMH_NOP)
 	AM_RANGE(0xb001, 0xb001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -498,8 +498,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darius_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym1", ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym2", ym2203_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym1", ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym2", ym2203_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
@@ -573,7 +573,7 @@ static ADDRESS_MAP_START( darius_sound2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(adpcm_command_read, adpcm_nmi_disable)
 	AM_RANGE(0x01, 0x01) AM_WRITE(adpcm_nmi_enable)
-	AM_RANGE(0x02, 0x02) AM_READ(readport2) AM_DEVWRITE(SOUND, "msm", adpcm_data_w)	/* readport2 ??? */
+	AM_RANGE(0x02, 0x02) AM_READ(readport2) AM_DEVWRITE("msm", adpcm_data_w)	/* readport2 ??? */
 	AM_RANGE(0x03, 0x03) AM_READ(readport3)	/* ??? */
 ADDRESS_MAP_END
 

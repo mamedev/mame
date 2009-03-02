@@ -457,7 +457,7 @@ static void m1_stepper_reset(void)
 static MACHINE_RESET( m1 )
 {
 	ROC10937_reset(0);	// reset display1
-	maygaym1_devices.duart68681 = device_list_find_by_tag( machine->config->devicelist, DUART68681, "duart68681" );
+	maygaym1_devices.duart68681 = devtag_get_device( machine, "duart68681" );
 	m1_stepper_reset();
 }
 
@@ -751,17 +751,17 @@ static ADDRESS_MAP_START( m1_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2040, 0x2041) AM_READWRITE(m1_8279_2_r,m1_8279_2_w)
 	AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 
-	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE( DUART68681, "duart68681", duart68681_r, duart68681_w )
+	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE( "duart68681", duart68681_r, duart68681_w )
 
-	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0x20B0, 0x20B0) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x20B0, 0x20B0) AM_DEVREAD("ay", ay8910_r)
 
 	AM_RANGE(0x20A0, 0x20A3) AM_WRITE(pia_0_w)
 	AM_RANGE(0x20A0, 0x20A3) AM_READ( pia_0_r)
 
 	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
 
-	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE( SOUND, "ym", ym2413_w )
+	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE( "ym", ym2413_w )
 
 	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END

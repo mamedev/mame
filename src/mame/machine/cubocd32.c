@@ -757,7 +757,7 @@ READ32_HANDLER(amiga_akiko32_r)
 	switch( offset )
 	{
 		case 0x00/4:	/* ID */
-			if ( akiko.cdrom != NULL ) cdda_set_cdrom(devtag_get_device(space->machine, SOUND, "cdda"), akiko.cdrom);
+			if ( akiko.cdrom != NULL ) cdda_set_cdrom(devtag_get_device(space->machine, "cdda"), akiko.cdrom);
 			return 0x0000cafe;
 
 		case 0x04/4:	/* CDROM STATUS 1 */

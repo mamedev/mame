@@ -138,9 +138,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x30, 0x31) AM_DEVWRITE("ay3", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

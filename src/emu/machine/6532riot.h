@@ -38,7 +38,7 @@ struct _riot6532_interface
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_RIOT6532_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, RIOT6532)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 

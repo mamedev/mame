@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( srmp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(srmp2_cchip_status_0_r)	/* Custom chip status ??? */
 	AM_RANGE(0xb00002, 0xb00003) AM_READ(srmp2_cchip_status_1_r)	/* Custom chip status ??? */
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8(SOUND, "ay", ay8910_r, 0x00ff)
+	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -409,11 +409,11 @@ static ADDRESS_MAP_START( srmp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(srmp2_input_1_w)			/* I/O ??? */
 	AM_RANGE(0xa00002, 0xa00003) AM_WRITE(srmp2_input_2_w)			/* I/O ??? */
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE(SOUND, "msm", srmp2_adpcm_code_w)			/* ADPCM number */
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP)					/* ??? */
-	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8(SOUND, "ay", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( mjyuugi_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900002, 0x900003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(srmp2_cchip_status_0_r)	/* custom chip status ??? */
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_cchip_status_1_r)	/* custom chip status ??? */
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8(SOUND, "ay", ay8910_r, 0x00ff)
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00609) AM_READ(SMH_RAM)				/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_READ(SMH_RAM)				/* ??? */
 	AM_RANGE(0xe00000, 0xe03fff) AM_READ(SMH_RAM)				/* Sprites Code + X + Attr */
@@ -445,8 +445,8 @@ static ADDRESS_MAP_START( mjyuugi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(srmp2_input_1_w)			/* I/O ??? */
 	AM_RANGE(0x900002, 0x900003) AM_WRITE(srmp2_input_2_w)			/* I/O ??? */
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE(SOUND, "msm", srmp2_adpcm_code_w)			/* ADPCM number */
-	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8(SOUND, "ay", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
+	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0xd00000, 0xd00609) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)	/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_WRITE(SMH_RAM)					/* ??? only writes $00fa */
@@ -587,12 +587,12 @@ static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_WRITE(SMH_NOP)								/* elapsed interrupt signal */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE(srmp3_flags_w)	/* coin, service | GFX bank, counter, lockout */
 	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)						/* ROM bank select */
-	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE(SOUND, "msm", srmp3_adpcm_code_w)					/* ADPCM number */
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("msm", srmp3_adpcm_code_w)					/* ADPCM number */
 	AM_RANGE(0xa1, 0xa1) AM_READ(srmp3_cchip_status_0_r)				/* custom chip status ??? */
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(srmp3_input_r, srmp3_input_1_w)	/* key matrix | I/O ??? */
 	AM_RANGE(0xc1, 0xc1) AM_READWRITE(srmp3_cchip_status_1_r, srmp3_input_2_w)	/* custom chip status ??? | I/O ??? */
-	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0xe2, 0xe2) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("ay", ay8910_r)
 ADDRESS_MAP_END
 
 

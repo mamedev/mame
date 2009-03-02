@@ -152,9 +152,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE(SOUND, "ay3", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay3", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
 ADDRESS_MAP_END
 
@@ -164,7 +164,7 @@ static READ8_HANDLER( kludge ) { static int timer; return timer++; }
 
 static ADDRESS_MAP_START( mightguy_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ym", ym3526_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(SMH_NOP)	/* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_WRITE(SMH_NOP)	/* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_READ(kludge)	/* 1412M2? */

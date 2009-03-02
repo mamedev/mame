@@ -71,10 +71,10 @@ static WRITE8_HANDLER( sound_select_w )
 	UINT8 to_write = BITSWAP8(*lasso_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)	/* chip #0 */
-		sn76496_w(devtag_get_device(space->machine, SOUND, "sn76489.1"), 0, to_write);
+		sn76496_w(devtag_get_device(space->machine, "sn76489.1"), 0, to_write);
 
 	if (~data & 0x02)	/* chip #1 */
-		sn76496_w(devtag_get_device(space->machine, SOUND, "sn76489.2"), 0, to_write);
+		sn76496_w(devtag_get_device(space->machine, "sn76489.2"), 0, to_write);
 }
 
 
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( wwjgtin_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_RAM) AM_BASE(&lasso_chip_data)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE(SOUND, "dac", dac_w)
+	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -199,10 +199,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pinbo_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD(SOUND, "ay1", ay8910_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay2", ay8910_r)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(soundlatch_r, SMH_NOP) /* ??? */
 	AM_RANGE(0x14, 0x14) AM_WRITE(SMH_NOP)	/* ??? */
 ADDRESS_MAP_END

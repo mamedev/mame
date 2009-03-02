@@ -64,10 +64,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(watchdog_reset_r)	/* ? */
-	AM_RANGE(0x04, 0x04) AM_DEVREAD(SOUND, "ay1", ay8910_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD(SOUND, "ay2", ay8910_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

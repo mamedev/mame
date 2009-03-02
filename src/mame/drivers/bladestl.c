@@ -132,9 +132,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)		/* YM2203 */
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE(SOUND, "upd", bladestl_speech_ctrl_w)	/* UPD7759 */
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD(SOUND, "upd", bladestl_speech_busy_r)			/* UPD7759 */
+	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)		/* YM2203 */
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("upd", bladestl_speech_ctrl_w)	/* UPD7759 */
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("upd", bladestl_speech_busy_r)			/* UPD7759 */
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_NOP)					/* ??? */
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)				/* soundlatch_r */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -309,8 +309,8 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_DEVICE_HANDLER(SOUND, "upd", upd7759_port_w),
-		DEVCB_DEVICE_HANDLER(SOUND, "upd", bladestl_port_B_w)
+		DEVCB_DEVICE_HANDLER("upd", upd7759_port_w),
+		DEVCB_DEVICE_HANDLER("upd", bladestl_port_B_w)
 	},
 	NULL
 };

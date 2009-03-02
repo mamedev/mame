@@ -163,7 +163,7 @@ static WRITE32_HANDLER( control_w )
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (control_data & 0x80000000))
 	{
-		const device_config *device = devtag_get_device(space->machine, SOUND, "bsmt");
+		const device_config *device = devtag_get_device(space->machine, "bsmt");
 		bsmt2000_data_w(device, bsmt_data_bank, 0, 0xffff);
 		device_reset(device);
 	}
@@ -282,7 +282,7 @@ static ADDRESS_MAP_START( policetr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
 	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP		// copies ROM here at startup, plus checksum
 	AM_RANGE(0x00600000, 0x00600003) AM_READ(bsmt2000_data_r)
-	AM_RANGE(0x00700000, 0x00700003) AM_DEVWRITE(SOUND, "bsmt", policetr_bsmt2000_reg_w)
+	AM_RANGE(0x00700000, 0x00700003) AM_DEVWRITE("bsmt", policetr_bsmt2000_reg_w)
 	AM_RANGE(0x00800000, 0x00800003) AM_WRITE(policetr_bsmt2000_data_w)
 	AM_RANGE(0x00900000, 0x00900003) AM_WRITE(policetr_palette_offset_w)
 	AM_RANGE(0x00920000, 0x00920003) AM_WRITE(policetr_palette_data_w)
@@ -303,7 +303,7 @@ static ADDRESS_MAP_START( sshooter_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
 	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP		// copies ROM here at startup, plus checksum
 	AM_RANGE(0x00600000, 0x00600003) AM_READ(bsmt2000_data_r)
-	AM_RANGE(0x00700000, 0x00700003) AM_DEVWRITE(SOUND, "bsmt", policetr_bsmt2000_reg_w)
+	AM_RANGE(0x00700000, 0x00700003) AM_DEVWRITE("bsmt", policetr_bsmt2000_reg_w)
 	AM_RANGE(0x00800000, 0x0080000f) AM_WRITE(policetr_video_w)
 	AM_RANGE(0x00a00000, 0x00a00003) AM_WRITE(control_w)
 	AM_RANGE(0x00a00000, 0x00a00003) AM_READ_PORT("IN0")

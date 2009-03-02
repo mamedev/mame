@@ -47,10 +47,12 @@
     CONSTANTS
 ***************************************************************************/
 
-#define DEVCB_TYPE_SELF				((device_type)1)
-#define DEVCB_TYPE_INPUT			((device_type)2)
-#define DEVCB_TYPE_MEMORY(space)	((device_type)(4 + (space)))
-#define DEVCB_TYPE_CPU_LINE(line)	((device_type)(4 + ADDRESS_SPACES + (line)))
+#define DEVCB_TYPE_NULL				(0)
+#define DEVCB_TYPE_SELF				(1)
+#define DEVCB_TYPE_INPUT			(2)
+#define DEVCB_TYPE_DEVICE			(3)
+#define DEVCB_TYPE_MEMORY(space)	(4 + (space))
+#define DEVCB_TYPE_CPU_LINE(line)	(4 + ADDRESS_SPACES + (line))
 
 
 
@@ -58,15 +60,15 @@
     MACROS
 ***************************************************************************/
 
-#define DEVCB_NULL							{ 0 }
+#define DEVCB_NULL							{ DEVCB_TYPE_NULL }
 
 /* standard line or read/write handlers with the calling device passed */
 #define DEVCB_LINE(func)					{ DEVCB_TYPE_SELF, NULL, (func), NULL, NULL }
 #define DEVCB_HANDLER(func)					{ DEVCB_TYPE_SELF, NULL, NULL, (func), NULL }
 
 /* line or read/write handlers for another device */
-#define DEVCB_DEVICE_LINE(type,tag,func)	{ type, tag, (func), NULL, NULL }
-#define DEVCB_DEVICE_HANDLER(type,tag,func)	{ type, tag, NULL, (func), NULL }
+#define DEVCB_DEVICE_LINE(tag,func)			{ DEVCB_TYPE_DEVICE, tag, (func), NULL, NULL }
+#define DEVCB_DEVICE_HANDLER(tag,func)		{ DEVCB_TYPE_DEVICE, tag, NULL, (func), NULL }
 
 /* read/write handlers for a given CPU's address space */
 #define DEVCB_MEMORY_HANDLER(cpu,space,func) { DEVCB_TYPE_MEMORY(ADDRESS_SPACE_##space), (cpu), NULL, NULL, (func) }
@@ -97,7 +99,7 @@ typedef void (*write_line_device_func)(const device_config *device, int state);
 typedef struct _devcb_read_line devcb_read_line;
 struct _devcb_read_line
 {
-	device_type				type;			/* device type of target, or one of the special DEVCB_TYPE values */
+	UINT32					type;			/* one of the special DEVCB_TYPE values */
 	const char *			tag;			/* tag of target, where appropriate */
 	read_line_device_func	readline;		/* read line function */
 	read8_device_func		readdevice;		/* read device function */
@@ -122,7 +124,7 @@ struct _devcb_resolved_read_line
 typedef struct _devcb_write_line devcb_write_line;
 struct _devcb_write_line
 {
-	device_type				type;			/* device type of target, or one of the special DEVCB_TYPE values */
+	UINT32					type;			/* one of the special DEVCB_TYPE values */
 	const char *			tag;			/* tag of target, where appropriate */
 	write_line_device_func	writeline;		/* write line function */
 	write8_device_func		writedevice;	/* write device function */
@@ -148,7 +150,7 @@ struct _devcb_resolved_write_line
 typedef struct _devcb_read8 devcb_read8;
 struct _devcb_read8
 {
-	device_type				type;			/* device type of target, or one of the special DEVCB_TYPE values */
+	UINT32					type;			/* one of the special DEVCB_TYPE values */
 	const char *			tag;			/* tag of target, where appropriate */
 	read_line_device_func	readline;		/* read line function */
 	read8_device_func		readdevice;		/* read device function */
@@ -174,7 +176,7 @@ struct _devcb_resolved_read8
 typedef struct _devcb_write8 devcb_write8;
 struct _devcb_write8
 {
-	device_type				type;			/* device type of target, or one of the special DEVCB_TYPE values */
+	UINT32					type;			/* one of the special DEVCB_TYPE values */
 	const char *			tag;			/* tag of target, where appropriate */
 	write_line_device_func	writeline;		/* write line function */
 	write8_device_func		writedevice;	/* write device function */

@@ -147,7 +147,7 @@ static WRITE8_HANDLER( speech_strobe_w )
 
 	if ((new_speech_strobe_state != state->speech_strobe_state) && new_speech_strobe_state)
 	{
-		const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+		const device_config *tms = devtag_get_device(space->machine, "tms");
 		tms5220_data_w(tms, 0, *state->speech_data);
 	}
 	state->speech_strobe_state = new_speech_strobe_state;
@@ -156,7 +156,7 @@ static WRITE8_HANDLER( speech_strobe_w )
 
 static READ8_HANDLER( speech_ready_r )
 {
-	return (!tms5220_ready_r(devtag_get_device(space->machine, SOUND, "tms"))) << 7;
+	return (!tms5220_ready_r(devtag_get_device(space->machine, "tms"))) << 7;
 }
 
 
@@ -175,10 +175,10 @@ static WRITE8_HANDLER( speech_reset_w )
 
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x07c0) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x0810, 0x081f) AM_MIRROR(0x07c0) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x0820, 0x082f) AM_MIRROR(0x07c0) AM_DEVREADWRITE(SOUND, "pokey3", pokey_r, pokey_w)
-	AM_RANGE(0x0830, 0x083f) AM_MIRROR(0x07c0) AM_DEVREADWRITE(SOUND, "pokey4", pokey_r, pokey_w)
+	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x0810, 0x081f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x0820, 0x082f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey3", pokey_r, pokey_w)
+	AM_RANGE(0x0830, 0x083f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey4", pokey_r, pokey_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x00ff) AM_READWRITE(SMH_NOP, irq_ack_w)
 	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x00ff) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE_MEMBER(jedi_state, speech_data)
 	AM_RANGE(0x1200, 0x13ff) AM_READWRITE(SMH_NOP, speech_strobe_w)

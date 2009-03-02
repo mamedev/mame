@@ -123,7 +123,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	UINT8 diff = data ^ sound_state[0];
 	sound_state[0] = data;
 
@@ -158,7 +158,7 @@ WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w )
 
 WRITE8_DEVICE_HANDLER( zaxxon_sound_b_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	UINT8 diff = data ^ sound_state[1];
 	sound_state[1] = data;
 
@@ -175,7 +175,7 @@ WRITE8_DEVICE_HANDLER( zaxxon_sound_b_w )
 
 WRITE8_DEVICE_HANDLER( zaxxon_sound_c_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	UINT8 diff = data ^ sound_state[2];
 	sound_state[2] = data;
 
@@ -232,7 +232,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( congo_sound_b_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	UINT8 diff = data ^ sound_state[1];
 	sound_state[1] = data;
 
@@ -245,7 +245,7 @@ WRITE8_DEVICE_HANDLER( congo_sound_b_w )
 
 WRITE8_DEVICE_HANDLER( congo_sound_c_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	UINT8 diff = data ^ sound_state[2];
 	sound_state[2] = data;
 

@@ -122,10 +122,10 @@ static WRITE8_HANDLER( tmpz84c011_pio_w)
 			niyanpai_soundbank_w(space->machine, data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_WRITE(devtag_get_device(space->machine, SOUND, "dac2"), 0, data);
+			DAC_WRITE(devtag_get_device(space->machine, "dac2"), 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_WRITE(devtag_get_device(space->machine, SOUND, "dac1"), 0, data);
+			DAC_WRITE(devtag_get_device(space->machine, "dac1"), 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;
@@ -466,7 +466,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
@@ -477,7 +477,7 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
 	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
 	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "ym", ym3812_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym", ym3812_w)
 ADDRESS_MAP_END
 
 
@@ -839,7 +839,7 @@ static INTERRUPT_GEN( niyanpai_interrupt )
 
 static const z80_daisy_chain daisy_chain_sound[] =
 {
-	{ Z80CTC, "ctc" },
+	{ "ctc" },
 	{ NULL }
 };
 

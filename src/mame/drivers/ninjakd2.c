@@ -219,7 +219,7 @@ static SAMPLES_START( ninjakd2_init_samples )
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "pcm");
+	const device_config *samples = devtag_get_device(space->machine, "pcm");
 	const UINT8* const rom = memory_region(space->machine, "pcm");
 
 	// only Ninja Kid II uses this
@@ -471,8 +471,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjakd2_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE(SOUND, "2203.1", ym2203_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE(SOUND, "2203.2", ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("2203.1", ym2203_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("2203.2", ym2203_w)
 ADDRESS_MAP_END
 
 

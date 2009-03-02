@@ -314,7 +314,7 @@ static void latch_timer_cnt(int tmr)
 READ32_HANDLER(ioc_r)
 {
 	#ifdef MESS
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, "wd1772");
 	#endif
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
@@ -364,7 +364,7 @@ READ32_HANDLER(ioc_r)
 WRITE32_HANDLER(ioc_w)
 {
 	#ifdef MESS
-	device_config *fdc = (device_config*)devtag_get_device(space->machine, WD1772, "wd1772");
+	device_config *fdc = (device_config*)devtag_get_device(space->machine, "wd1772");
 	#endif
 	if (offset >= 0x80000 && offset < 0xc0000)
 	{
@@ -593,7 +593,7 @@ WRITE32_HANDLER(memc_w)
 				else
 				{
 					timer_adjust_oneshot(snd_timer, attotime_never, 0);
-					dac_signed_data_w(devtag_get_device(space->machine, SOUND, "dac"), 0x80);
+					dac_signed_data_w(devtag_get_device(space->machine, "dac"), 0x80);
 				}
 				break;
 

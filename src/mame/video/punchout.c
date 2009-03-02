@@ -370,8 +370,8 @@ static void punchout_copy_bot_palette(running_machine *machine, int bank)
 
 VIDEO_UPDATE( punchout )
 {
-	const device_config *top_screen    = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
-	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
+	const device_config *top_screen    = devtag_get_device(screen->machine, "top");
+	const device_config *bottom_screen = devtag_get_device(screen->machine, "bottom");
 
 	if (screen == top_screen)
 	{
@@ -404,8 +404,8 @@ VIDEO_UPDATE( punchout )
 
 VIDEO_UPDATE( armwrest )
 {
-	const device_config *top_screen    = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
-	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
+	const device_config *top_screen    = devtag_get_device(screen->machine, "top");
+	const device_config *bottom_screen = devtag_get_device(screen->machine, "bottom");
 
 	if (screen == top_screen)
 	{

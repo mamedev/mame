@@ -36,9 +36,9 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
     the given configuration
 -------------------------------------------------*/
 
-INLINE void remove_device(device_config **listheadptr, device_type type, const char *tag)
+INLINE void remove_device(device_config **listheadptr, const char *tag)
 {
-	device_config *device = (device_config *)device_list_find_by_tag(*listheadptr, type, tag);
+	device_config *device = (device_config *)device_list_find_by_tag(*listheadptr, tag);
 	device_custom_config_func custom;
 
 	assert(device != NULL);
@@ -49,7 +49,7 @@ INLINE void remove_device(device_config **listheadptr, device_type type, const c
 		(*custom)(device, MCONFIG_TOKEN_DEVICE_CONFIG_CUSTOM_FREE, NULL);
 
 	/* remove the device from the list */
-	device_list_remove(listheadptr, type, tag);
+	device_list_remove(listheadptr, tag);
 }
 
 
@@ -87,7 +87,7 @@ void machine_config_free(machine_config *config)
 {
 	/* release the device list */
 	while (config->devicelist != NULL)
-		remove_device(&config->devicelist, config->devicelist->type, config->devicelist->tag);
+		remove_device(&config->devicelist, config->devicelist->tag);
 
 	/* release the configuration itself */
 	free(config);
@@ -138,18 +138,16 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_REMOVE:
-				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				remove_device(&config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
+				remove_device(&config->devicelist, device_build_tag(tempstring, owner, tag));
 				device = NULL;
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_MODIFY:
-				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device = (device_config *)device_list_find_by_tag(config->devicelist, devtype, device_build_tag(tempstring, owner, tag));
+				device = (device_config *)device_list_find_by_tag(config->devicelist, device_build_tag(tempstring, owner, tag));
 				if (device == NULL)
-					fatalerror("Unable to find device: type=%s tag=%s\n", devtype_get_name(devtype), astring_c(tempstring));
+					fatalerror("Unable to find device: tag=%s\n", astring_c(tempstring));
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_CLOCK:

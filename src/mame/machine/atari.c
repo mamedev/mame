@@ -517,7 +517,7 @@ static const UINT8 keys[64][4] = {
 
 void a800_handle_keyboard(running_machine *machine)
 {
-	const device_config *pokey = devtag_get_device(machine, SOUND, "pokey");
+	const device_config *pokey = devtag_get_device(machine, "pokey");
 	static int atari_last = 0xff;
 	int i, modifiers, atari_code;
 	char tag[64];
@@ -563,7 +563,7 @@ void a800_handle_keyboard(running_machine *machine)
 /* absolutely no clue what to do here :((( */
 void a5200_handle_keypads(running_machine *machine)
 {
-	const device_config *pokey = devtag_get_device(machine, SOUND, "pokey");
+	const device_config *pokey = devtag_get_device(machine, "pokey");
 	int i, modifiers;
 	static int atari_last = 0xff;
 
@@ -693,7 +693,7 @@ static void a800_setbank(running_machine *machine, int n)
 
 static void pokey_reset(running_machine *machine)
 {
-	const device_config *pokey = devtag_get_device(machine, SOUND, "pokey");
+	const device_config *pokey = devtag_get_device(machine, "pokey");
 	pokey_w(pokey,15,0);
 }
 
@@ -718,7 +718,7 @@ static UINT8 console_read(const address_space *space)
 
 static void console_write(const address_space *space, UINT8 data)
 {
-	const device_config *dac = devtag_get_device(space->machine, SOUND, "dac");
+	const device_config *dac = devtag_get_device(space->machine, "dac");
 	if (data & 0x08)
 		dac_data_w(dac, -120);
 	else
@@ -747,7 +747,7 @@ static void atari_machine_start(running_machine *machine, int type, const pia682
 	memset(&gtia_intf, 0, sizeof(gtia_intf));
 	if (input_port_by_tag(machine->portconfig, "console") != NULL)
 		gtia_intf.console_read = console_read;
-	if (devtag_get_device(machine, SOUND, "dac") != NULL)
+	if (devtag_get_device(machine, "dac") != NULL)
 		gtia_intf.console_write = console_write;
 	gtia_init(machine, &gtia_intf);
 

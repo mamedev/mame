@@ -113,8 +113,8 @@ static WRITE8_HANDLER( audio_2_command_w );
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	const device_config *pia1 = devtag_get_device(device->machine, PIA6821, "pia1");
-	const device_config *pia2 = devtag_get_device(device->machine, PIA6821, "pia2");
+	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
+	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
 	int combined_state = pianew_get_irq_a(pia1) | pianew_get_irq_b(pia1) | pianew_get_irq_b(pia2);
 
 	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -136,7 +136,7 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
 
 static INTERRUPT_GEN( update_pia_1 )
 {
-	const device_config *pia1 = devtag_get_device(device->machine, PIA6821, "pia1");
+	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
@@ -227,7 +227,7 @@ static const pia6821_interface pia_2_intf =
 
 static WRITE8_DEVICE_HANDLER(ic48_1_74123_output_changed)
 {
-	const device_config *pia2 = devtag_get_device(device->machine, PIA6821, "pia2");
+	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
 	pia_ca1_w(pia2, 0, data);
 }
 
@@ -399,7 +399,7 @@ static MC6845_END_UPDATE( end_update )
 
 static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
-	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "ic48_1"), 0, display_enabled);
+	ttl74123_a_w(devtag_get_device(device->machine, "ic48_1"), 0, display_enabled);
 }
 
 
@@ -418,7 +418,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_UPDATE( nyny )
 {
-	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
+	const device_config *mc6845 = devtag_get_device(screen->machine, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -461,7 +461,7 @@ static const ay8910_interface ay8910_37_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(nyny_ay8910_37_port_a_w),
-	DEVCB_DEVICE_HANDLER(SOUND, "dac", dac_w)
+	DEVCB_DEVICE_HANDLER("dac", dac_w)
 };
 
 
@@ -499,8 +499,8 @@ static WRITE8_HANDLER( audio_2_command_w )
 
 static READ8_HANDLER( nyny_pia_1_2_r )
 {
-	const device_config *pia1 = devtag_get_device(space->machine, PIA6821, "pia1");
-	const device_config *pia2 = devtag_get_device(space->machine, PIA6821, "pia2");
+	const device_config *pia1 = devtag_get_device(space->machine, "pia1");
+	const device_config *pia2 = devtag_get_device(space->machine, "pia2");
 	UINT8 ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
@@ -513,8 +513,8 @@ static READ8_HANDLER( nyny_pia_1_2_r )
 
 static WRITE8_HANDLER( nyny_pia_1_2_w )
 {
-	const device_config *pia1 = devtag_get_device(space->machine, PIA6821, "pia1");
-	const device_config *pia2 = devtag_get_device(space->machine, PIA6821, "pia2");
+	const device_config *pia1 = devtag_get_device(space->machine, "pia1");
+	const device_config *pia2 = devtag_get_device(space->machine, "pia2");
 
 	/* the address bits are directly connected to the chip selects */
 	if (offset & 0x04)  pia_w(pia1, offset & 0x03, data);
@@ -529,8 +529,8 @@ static ADDRESS_MAP_START( nyny_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(&nyny_colorram_2)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* SRAM (coin counter, shown when holding F2) */
-	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0xa200, 0xa20f) AM_MIRROR(0x00f0) AM_READWRITE(nyny_pia_1_2_r, nyny_pia_1_2_w)
 	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_READWRITE(soundlatch3_r, audio_1_command_w)
 	AM_RANGE(0xa400, 0xa7ff) AM_NOP
@@ -546,10 +546,10 @@ static ADDRESS_MAP_START( nyny_audio_1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READWRITE(soundlatch_r, audio_1_answer_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ_PORT("SW3")
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_DEVREAD(SOUND, "ay1", ay8910_r)
-	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x0ffc) AM_DEVWRITE(SOUND, "ay1", ay8910_data_address_w)
-	AM_RANGE(0x3002, 0x3002) AM_MIRROR(0x0ffc) AM_DEVREAD(SOUND, "ay2", ay8910_r)
-	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x0ffc) AM_DEVWRITE(SOUND, "ay2", ay8910_data_address_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_data_address_w)
+	AM_RANGE(0x3002, 0x3002) AM_MIRROR(0x0ffc) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_data_address_w)
 	AM_RANGE(0x4000, 0x4fff) AM_NOP
 	AM_RANGE(0x5000, 0x57ff) AM_MIRROR(0x0800) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_MIRROR(0x0800) AM_ROM
@@ -562,8 +562,8 @@ static ADDRESS_MAP_START( nyny_audio_2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_r)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD(SOUND, "ay3", ay8910_r)
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0ffe) AM_DEVWRITE(SOUND, "ay3", ay8910_data_address_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD("ay3", ay8910_r)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0ffe) AM_DEVWRITE("ay3", ay8910_data_address_w)
 	AM_RANGE(0x3000, 0x6fff) AM_NOP
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
 ADDRESS_MAP_END

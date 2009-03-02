@@ -140,12 +140,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x0ffc) AM_READ(SMH_NOP)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_1_lamp_w)
-	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_DEVWRITE(SOUND, "discrete", avalnche_attract_enable_w)
+	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_DEVWRITE("discrete", avalnche_attract_enable_w)
 	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE(avalance_video_invert_w)
 	AM_RANGE(0x4003, 0x4003) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_2_lamp_w)
-	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_DEVWRITE(SOUND, "discrete", avalnche_audio_w)
+	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_DEVWRITE("discrete", avalnche_audio_w)
 	AM_RANGE(0x4007, 0x4007) AM_MIRROR(0x0ff8) AM_WRITE(avalance_start_lamp_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE(SOUND, "discrete", avalnche_noise_amplitude_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("discrete", avalnche_noise_amplitude_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 

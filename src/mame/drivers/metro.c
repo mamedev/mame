@@ -441,7 +441,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		if (!BIT(data,2))
 		{
-			const device_config *ym = devtag_get_device(space->machine, SOUND, "ym");
+			const device_config *ym = devtag_get_device(space->machine, "ym");
 			ym2413_w(ym,BIT(data,1),porta);
 		}
 		portb = data;
@@ -452,7 +452,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			okim6295_w(devtag_get_device(space->machine, SOUND, "oki"),0,porta);
+			okim6295_w(devtag_get_device(space->machine, "oki"),0,porta);
 	}
 	portb = data;
 }
@@ -480,7 +480,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
 
 	if (BIT(portb,6) && !BIT(data,6))	/* clock 1->0 */
 	{
-		const device_config *ym = devtag_get_device(space->machine, SOUND, "ym");
+		const device_config *ym = devtag_get_device(space->machine, "ym");
 		if (!BIT(data,2))
 		{
 			/* write */
@@ -499,13 +499,13 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			okim6295_w(devtag_get_device(space->machine, SOUND, "oki"),0,porta);
+			okim6295_w(devtag_get_device(space->machine, "oki"),0,porta);
 	}
 	if (BIT(portb,3) && !BIT(data,3))	/* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data,4))
-			porta = okim6295_r(devtag_get_device(space->machine, SOUND, "oki"),0);
+			porta = okim6295_r(devtag_get_device(space->machine, "oki"),0);
 	}
 	portb = data;
 }
@@ -897,7 +897,7 @@ static READ16_HANDLER( balcube_dsw_r )
 static ADDRESS_MAP_START( balcube_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8(SOUND, "ymf", ymf278b_r, 0x00ff)	// Sound
+	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)	// Sound
 	AM_RANGE(0x400000, 0x41ffff) AM_READ(balcube_dsw_r			)	// DSW x 3
 	AM_RANGE(0x600000, 0x61ffff) AM_READ(SMH_RAM				)	// Layer 0
 	AM_RANGE(0x620000, 0x63ffff) AM_READ(SMH_RAM				)	// Layer 1
@@ -915,7 +915,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( balcube_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0x300000, 0x30000b) AM_DEVWRITE8(SOUND, "ymf", ymf278b_w, 0x00ff)	// Sound
+	AM_RANGE(0x300000, 0x30000b) AM_DEVWRITE8("ymf", ymf278b_w, 0x00ff)	// Sound
 	AM_RANGE(0x500002, 0x500009) AM_WRITE(metro_coin_lockout_4words_w	)	// Coin Lockout
 	AM_RANGE(0x670000, 0x673fff) AM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w  ) AM_BASE(&paletteram16	)	// Palette
 	AM_RANGE(0x674000, 0x674fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size				)	// Sprites
@@ -943,7 +943,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( daitoa_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8(SOUND, "ymf", ymf278b_r, 0x00ff)	// Sound
+	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)	// Sound
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r			)	// DSW x 3
 	AM_RANGE(0x100000, 0x11ffff) AM_READ(SMH_RAM				)	// Layer 0
 	AM_RANGE(0x120000, 0x13ffff) AM_READ(SMH_RAM				)	// Layer 1
@@ -961,7 +961,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( daitoa_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8(SOUND, "ymf", ymf278b_w, 0x00ff)	// Sound
+	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8("ymf", ymf278b_w, 0x00ff)	// Sound
 	AM_RANGE(0x200002, 0x200009) AM_WRITE(metro_coin_lockout_4words_w	)	// Coin Lockout
 	AM_RANGE(0x170000, 0x173fff) AM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w  ) AM_BASE(&paletteram16	)	// Palette
 	AM_RANGE(0x174000, 0x174fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size				)	// Sprites
@@ -990,7 +990,7 @@ static ADDRESS_MAP_START( bangball_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(SMH_RAM				)	// RAM
 	AM_RANGE(0xf10000, 0xf10fff) AM_READ(SMH_RAM				)	// RAM (bug in the ram test routine)
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8(SOUND, "ymf", ymf278b_r, 0x00ff)	// Sound
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)	// Sound
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READ(balcube_dsw_r			)	// DSW x 3
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0")				// Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1")				//
@@ -1009,7 +1009,7 @@ static ADDRESS_MAP_START( bangball_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0xf10000, 0xf10fff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0xb00000, 0xb0000b) AM_DEVWRITE8(SOUND, "ymf", ymf278b_w, 0x00ff)	// Sound
+	AM_RANGE(0xb00000, 0xb0000b) AM_DEVWRITE8("ymf", ymf278b_w, 0x00ff)	// Sound
 	AM_RANGE(0xd00002, 0xd00009) AM_WRITE(metro_coin_lockout_4words_w	)	// Coin Lockout
 	AM_RANGE(0xe00000, 0xe1ffff) AM_WRITE(metro_vram_0_w) AM_BASE(&metro_vram_0	)	// Layer 0
 	AM_RANGE(0xe20000, 0xe3ffff) AM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1	)	// Layer 1
@@ -1048,7 +1048,7 @@ static ADDRESS_MAP_START( batlbubl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("IN0")
 	AM_RANGE(0x200006, 0x200007) AM_READ_PORT("IN2")
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r			)	// read but ignored?
-	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8(SOUND, "ymf", ymf278b_r, 0x00ff)	// Sound
+	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8("ymf", ymf278b_r, 0x00ff)	// Sound
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(SMH_RAM				)	// RAM
 	AM_RANGE(0xf10000, 0xf10fff) AM_READ(SMH_RAM				)	// RAM (bug in the ram test routine)
 ADDRESS_MAP_END
@@ -1072,7 +1072,7 @@ static ADDRESS_MAP_START( batlbubl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITE(SMH_RAM) AM_BASE(&metro_screenctrl	)	// Screen Control
 	AM_RANGE(0x179700, 0x179713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0x200002, 0x200009) AM_WRITE(metro_coin_lockout_4words_w	)	// Coin Lockout
-	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8(SOUND, "ymf", ymf278b_w, 0x00ff)	// Sound
+	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8("ymf", ymf278b_w, 0x00ff)	// Sound
 	AM_RANGE(0xf00000, 0xf0ffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0xf10000, 0xf10fff) AM_WRITE(SMH_RAM						)	// RAM
 ADDRESS_MAP_END
@@ -1460,7 +1460,7 @@ static ADDRESS_MAP_START( gakusai_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r			)	// Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x27880e, 0x27880f) AM_READ(SMH_RAM					)	// Screen Control
-	AM_RANGE(0x700000, 0x700001) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff	)	// Sound
+	AM_RANGE(0x700000, 0x700001) AM_DEVREAD8("oki", okim6295_r, 0x00ff	)	// Sound
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(gakusai_eeprom_r			)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1486,11 +1486,11 @@ static ADDRESS_MAP_START( gakusai_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x278888, 0x278889) AM_WRITE(SMH_RAM) AM_BASE(&gakusai_input_sel	)	// Inputs
 	AM_RANGE(0x279700, 0x279713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP						)	// ? 5
-	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE(SOUND, "oki", gakusai_oki_bank_lo_w			)	// Sound
-	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8(SOUND, "ym", ym2413_w, 0x00ff)
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff 		)
+	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w			)	// Sound
+	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff 		)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(gakusai_eeprom_w				)	// EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE(SOUND, "oki", gakusai_oki_bank_hi_w			)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w			)
 ADDRESS_MAP_END
 
 
@@ -1513,7 +1513,7 @@ static ADDRESS_MAP_START( gakusai2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x678880, 0x678881) AM_READ(gakusai_input_r			)	// Inputs
 	AM_RANGE(0x678882, 0x678883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x67880e, 0x67880f) AM_READ(SMH_RAM					)	// Screen Control
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff	)	// Sound
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("oki", okim6295_r, 0x00ff	)	// Sound
 	AM_RANGE(0xe00000, 0xe00001) AM_READ(gakusai_eeprom_r			)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1540,10 +1540,10 @@ static ADDRESS_MAP_START( gakusai2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x678888, 0x678889) AM_WRITE(SMH_RAM) AM_BASE(&gakusai_input_sel	)	// Inputs
 	AM_RANGE(0x679700, 0x679713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP						)	// ? 5
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE(SOUND, "oki", gakusai_oki_bank_lo_w			)	// Sound
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE(SOUND, "oki", gakusai_oki_bank_hi_w			)
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff 		)
-	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8(SOUND, "ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w			)	// Sound
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w			)
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff 		)
+	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gakusai_eeprom_w				)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1597,7 +1597,7 @@ static ADDRESS_MAP_START( dokyusp_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r			)	// Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x27880e, 0x27880f) AM_READ(SMH_RAM					)	// Screen Control
-	AM_RANGE(0x700000, 0x700001) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff	)	// Sound
+	AM_RANGE(0x700000, 0x700001) AM_DEVREAD8("oki", okim6295_r, 0x00ff	)	// Sound
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(dokyusp_eeprom_r			)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1623,9 +1623,9 @@ static ADDRESS_MAP_START( dokyusp_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x278888, 0x278889) AM_WRITE(SMH_RAM) AM_BASE(&gakusai_input_sel	)	// Inputs
 	AM_RANGE(0x279700, 0x279713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP						)	// ? 5
-	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE(SOUND, "oki", gakusai_oki_bank_lo_w			)	// Sound
-	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8(SOUND, "ym", ym2413_w, 0x00ff)
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff)
+	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w			)	// Sound
+	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w		)	// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(dokyusp_eeprom_bit_w			)	// EEPROM
 ADDRESS_MAP_END
@@ -1650,7 +1650,7 @@ static ADDRESS_MAP_START( dokyusei_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")					// 2 x DSW
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("DSW1")					//
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff	)	// Sound
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8("oki", okim6295_r, 0x00ff	)	// Sound
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dokyusei_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1675,11 +1675,11 @@ static ADDRESS_MAP_START( dokyusei_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478870, 0x478871) AM_WRITE(SMH_RAM) AM_BASE(&metro_rombank		)	// Rom Bank
 	AM_RANGE(0x479700, 0x479713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0x478888, 0x478889) AM_WRITE(SMH_RAM) AM_BASE(&gakusai_input_sel	)	// Inputs
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE(SOUND, "oki", gakusai_oki_bank_hi_w			)	// Samples Bank?
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("oki", gakusai_oki_bank_hi_w			)	// Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP						)	// ? 4
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE(SOUND, "oki", gakusai_oki_bank_lo_w			)	// Samples Bank
-	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8(SOUND, "ym", ym2413_w, 0x00ff)	//
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff			)	//
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("oki", gakusai_oki_bank_lo_w			)	// Samples Bank
+	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)	//
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff			)	//
 ADDRESS_MAP_END
 
 
@@ -1965,14 +1965,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blzntrnd_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	AM_RANGE(0x80, 0x83) AM_DEVREAD(SOUND, "ym", ym2610_r)
+	AM_RANGE(0x80, 0x83) AM_DEVREAD("ym", ym2610_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blzntrnd_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x80, 0x83) AM_DEVWRITE(SOUND, "ym", ym2610_w)
+	AM_RANGE(0x80, 0x83) AM_DEVWRITE("ym", ym2610_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blzntrnd_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2045,7 +2045,7 @@ static ADDRESS_MAP_START( mouja_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN1")				//
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")				//
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("IN2")				//
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8(SOUND, "oki", okim6295_r, 0x00ff)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8("oki", okim6295_r, 0x00ff)
 #if 0
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r		)	// Banked ROM
 #endif
@@ -2071,9 +2071,9 @@ static ADDRESS_MAP_START( mouja_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478850, 0x47885b) AM_WRITE(SMH_RAM) AM_BASE(&metro_scroll		)	// Scroll Regs
 	AM_RANGE(0x478888, 0x478889) AM_WRITE(SMH_NOP)								// ??
 	AM_RANGE(0x479700, 0x479713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
-	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8(SOUND, "ym", ym2413_w, 0x00ff)
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE(SOUND, "oki", mouja_sound_rombank_w			)
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8(SOUND, "oki", okim6295_w, 0x00ff  		)
+	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("oki", mouja_sound_rombank_w			)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff  		)
 
 #if 0
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs	)	// Tiles Blitter
@@ -2099,8 +2099,8 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x430000, 0x433fff ) AM_RAM
 	AM_RANGE( 0x470000, 0x47dfff ) AM_RAM
 
-	AM_RANGE( 0x500000, 0x500001 ) AM_DEVREADWRITE8( SOUND, "oki", okim6295_r, okim6295_w, 0xff00 )
-	AM_RANGE( 0x580000, 0x580003 ) AM_DEVWRITE8( SOUND, "ym", ym2413_w, 0xff00 )
+	AM_RANGE( 0x500000, 0x500001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0xff00 )
+	AM_RANGE( 0x580000, 0x580003 ) AM_DEVWRITE8( "ym", ym2413_w, 0xff00 )
 
 	AM_RANGE( 0x700000, 0x71ffff ) AM_READWRITE( SMH_RAM, metro_vram_0_w ) AM_BASE( &metro_vram_0 )	// Layer 0
 	AM_RANGE( 0x720000, 0x73ffff ) AM_READWRITE( SMH_RAM, metro_vram_1_w ) AM_BASE( &metro_vram_1 )	// Layer 1

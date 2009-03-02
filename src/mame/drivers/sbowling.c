@@ -187,8 +187,8 @@ static READ8_HANDLER (controls_r)
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0xf801, 0xf801) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -154,7 +154,7 @@ static TIMER_CALLBACK( noise_timer_cb )
 {
 	if( !noise_enable && noisevolume > 0 )
 	{
-		const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+		const device_config *samples = devtag_get_device(machine, "samples");
 		noisevolume -= (noisevolume / 10) + 1;
 		sample_set_volume(samples, CHANNEL_NOISE,noisevolume / 100.0);
 	}
@@ -166,7 +166,7 @@ WRITE8_HANDLER( galaxian_noise_enable_w )
 
 	if( noise_enable )
 	{
-		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+		const device_config *samples = devtag_get_device(space->machine, "samples");
 		noisevolume = 100;
 		sample_set_volume(samples, CHANNEL_NOISE,noisevolume / 100.0);
 	}
@@ -176,7 +176,7 @@ WRITE8_HANDLER( galaxian_shoot_enable_w )
 {
 	if( data & 1 && !(last_port2 & 1) )
 	{
-		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+		const device_config *samples = devtag_get_device(space->machine, "samples");
 		sample_start_raw(samples, CHANNEL_SHOOT, shootwave, shoot_length, shoot_rate, 0);
 		sample_set_volume(samples, CHANNEL_SHOOT,SHOOT_VOLUME);
 	}
@@ -417,7 +417,7 @@ static SAMPLES_START( galaxian_sh_start )
 
 WRITE8_HANDLER( galaxian_background_enable_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	sample_set_volume(samples, CHANNEL_LFO+offset,(data & 1) ? LFO_VOLUME : 0);
 }
 
@@ -542,7 +542,7 @@ WRITE8_HANDLER( galaxian_lfo_freq_w )
 
 static TIMER_CALLBACK( galaxian_sh_update )
 {
-	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(machine, "samples");
 
 	/*
      * NE555 8R, 8S and 8T are used as pulse position modulators

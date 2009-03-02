@@ -291,7 +291,7 @@ static READ8_DEVICE_HANDLER( nemesis_portA_r )
    bit 7:     unused by this software version. Bubble Memory version uses this bit.
 */
 
-	const device_config *vlm = devtag_get_device(device->machine, SOUND, "vlm");
+	const device_config *vlm = devtag_get_device(device->machine, "vlm");
 	int res = (cputag_get_total_cycles(device->machine, "audiocpu") / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
 
 	res |= 0xd0;
@@ -305,17 +305,17 @@ static READ8_DEVICE_HANDLER( nemesis_portA_r )
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE(SOUND, "konami", k005289_pitch_A_w)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE(SOUND, "konami", k005289_pitch_B_w)
+	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("konami", k005289_pitch_A_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("konami", k005289_pitch_B_w)
 	AM_RANGE(0xe001, 0xe001) AM_READ(soundlatch_r)
-	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE(SOUND, "konami", k005289_keylatch_A_w)
-	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE(SOUND, "konami", k005289_keylatch_B_w)
-	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
-	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
-	AM_RANGE(0xe086, 0xe086) AM_DEVREAD(SOUND, "ay1", ay8910_r)
-	AM_RANGE(0xe106, 0xe106) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
-	AM_RANGE(0xe205, 0xe205) AM_DEVREAD(SOUND, "ay2", ay8910_r)
-	AM_RANGE(0xe405, 0xe405) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
+	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE("konami", k005289_keylatch_A_w)
+	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("konami", k005289_keylatch_B_w)
+	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE("ay1", ay8910_address_w)
+	AM_RANGE(0xe086, 0xe086) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0xe106, 0xe106) AM_DEVWRITE("ay1", ay8910_data_w)
+	AM_RANGE(0xe205, 0xe205) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0xe405, 0xe405) AM_DEVWRITE("ay2", ay8910_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( konamigt_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -424,19 +424,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gx400_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x87ff) AM_RAM AM_BASE(&gx400_shared_ram)
-	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE(SOUND, "konami", k005289_pitch_A_w)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE(SOUND, "konami", k005289_pitch_B_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w)
+	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("konami", k005289_pitch_A_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("konami", k005289_pitch_B_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("vlm", vlm5030_data_w)
 	AM_RANGE(0xe001, 0xe001) AM_READ(soundlatch_r)
-	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE(SOUND, "konami", k005289_keylatch_A_w)
-	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE(SOUND, "konami", k005289_keylatch_B_w)
-	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
-	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
-	AM_RANGE(0xe030, 0xe030) AM_DEVWRITE(SOUND, "vlm", gx400_speech_start_w)
-	AM_RANGE(0xe086, 0xe086) AM_DEVREAD(SOUND, "ay1", ay8910_r)
-	AM_RANGE(0xe106, 0xe106) AM_DEVWRITE(SOUND, "ay1", ay8910_data_w)
-	AM_RANGE(0xe205, 0xe205) AM_DEVREAD(SOUND, "ay2", ay8910_r)
-	AM_RANGE(0xe405, 0xe405) AM_DEVWRITE(SOUND, "ay2", ay8910_data_w)
+	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE("konami", k005289_keylatch_A_w)
+	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("konami", k005289_keylatch_B_w)
+	AM_RANGE(0xe005, 0xe005) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE("ay1", ay8910_address_w)
+	AM_RANGE(0xe030, 0xe030) AM_DEVWRITE("vlm", gx400_speech_start_w)
+	AM_RANGE(0xe086, 0xe086) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0xe106, 0xe106) AM_DEVWRITE("ay1", ay8910_data_w)
+	AM_RANGE(0xe205, 0xe205) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0xe405, 0xe405) AM_DEVWRITE("ay2", ay8910_data_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -561,32 +561,32 @@ static ADDRESS_MAP_START( sal_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE(SOUND, "konami", k007232_r, k007232_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE(SOUND, "vlm", vlm5030_data_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("vlm", vlm5030_data_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE(SOUND, "vlm", salamand_speech_start_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("vlm", salamand_speech_start_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blkpnthr_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE(SOUND, "konami", k007232_r, k007232_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( city_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9800, 0x987f) AM_DEVWRITE(SOUND, "konami2", k051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE(SOUND, "konami2", k051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE(SOUND, "konami2", k051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE(SOUND, "konami2", k051649_keyonoff_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym3812_r, ym3812_w)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE(SOUND, "konami", k007232_r, k007232_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(SOUND, "konami", city_sound_bank_w) /* 7232 bankswitch */
+	AM_RANGE(0x9800, 0x987f) AM_DEVWRITE("konami2", k051649_waveform_w)
+	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("konami2", k051649_frequency_w)
+	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("konami2", k051649_volume_w)
+	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("konami2", k051649_keyonoff_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("konami", city_sound_bank_w) /* 7232 bankswitch */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -1891,8 +1891,8 @@ static const ay8910_interface ay8910_interface_2 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(SOUND, "konami", k005289_control_A_w),
-	DEVCB_DEVICE_HANDLER(SOUND, "konami", k005289_control_B_w)
+	DEVCB_DEVICE_HANDLER("konami", k005289_control_A_w),
+	DEVCB_DEVICE_HANDLER("konami", k005289_control_B_w)
 };
 
 static void sound_irq(const device_config *device, int state)

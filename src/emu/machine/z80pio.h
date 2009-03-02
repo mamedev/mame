@@ -61,7 +61,7 @@ struct _z80pio_interface
 	MDRV_DEVICE_CONFIG(_intrf)
 
 #define MDRV_Z80PIO_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, Z80PIO)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 

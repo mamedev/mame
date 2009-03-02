@@ -277,9 +277,9 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREAD(SOUND, "konami1", k054539_r)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREAD("konami1", k054539_r)
 	AM_RANGE(0xe230, 0xe3ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREAD(SOUND, "konami2", k054539_r)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVREAD("konami2", k054539_r)
 	AM_RANGE(0xe630, 0xe7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
@@ -288,9 +288,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_DEVWRITE(SOUND, "konami1", k054539_w)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVWRITE("konami1", k054539_w)
 	AM_RANGE(0xe230, 0xe3ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe400, 0xe62f) AM_DEVWRITE(SOUND, "konami2", k054539_w)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVWRITE("konami2", k054539_w)
 	AM_RANGE(0xe630, 0xe7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(z80ctrl_w)
@@ -641,7 +641,7 @@ static DRIVER_INIT( rng )
 
 static MACHINE_RESET( rng )
 {
-	k054539_init_flags(devtag_get_device(machine, SOUND, "konami1"), K054539_REVERSE_STEREO);
+	k054539_init_flags(devtag_get_device(machine, "konami1"), K054539_REVERSE_STEREO);
 
 	memset(rng_sysreg, 0, 0x20);
 

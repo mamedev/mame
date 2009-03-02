@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( metlclsh_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
 //  AM_RANGE(0xc800, 0xc82f) AM_READ(SMH_RAM                   )   // not actually read
 //  AM_RANGE(0xcc00, 0xcc2f) AM_READ(SMH_RAM                   )   // ""
-	AM_RANGE(0xd000, 0xd001) AM_DEVREAD(SOUND, "ym1", ym2203_r	)
+	AM_RANGE(0xd000, 0xd001) AM_DEVREAD("ym1", ym2203_r	)
 //  AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM                   )   // not actually read
 	AM_RANGE(0xe800, 0xe9ff) AM_READ(SMH_RAM					)
 	AM_RANGE(0xfff0, 0xffff) AM_READ(SMH_ROM					)	// Reset/IRQ vectors
@@ -97,8 +97,8 @@ static ADDRESS_MAP_START( metlclsh_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi			)	// nmi ack
 	AM_RANGE(0xc800, 0xc82f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram		)
 	AM_RANGE(0xcc00, 0xcc2f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2	)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE(SOUND, "ym1", ym2203_w	)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE(SOUND, "ym2", ym3526_w	)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ym1", ym2203_w	)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym2", ym3526_w	)
 	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(metlclsh_fgram_w) AM_BASE(&metlclsh_fgram		)
 	AM_RANGE(0xfff0, 0xffff) AM_WRITE(SMH_ROM					)

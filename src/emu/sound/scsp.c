@@ -727,7 +727,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			scsp_midi_in(devtag_get_device(space->machine, SOUND, "scsp"), 0, SCSP->udata.data[0x6/2]&0xff, 0);
+			scsp_midi_in(devtag_get_device(space->machine, "scsp"), 0, SCSP->udata.data[0x6/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:

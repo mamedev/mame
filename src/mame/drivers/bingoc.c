@@ -110,9 +110,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE(SOUND, "upd", bingoc_play_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "upd", upd7759_port_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("upd", bingoc_play_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("upd", upd7759_port_w)
 #if !SOUND_TEST
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r) //soundlatch
 #else

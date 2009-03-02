@@ -1367,7 +1367,7 @@ static DRIVER_INIT( spacfury )
 static DRIVER_INIT( zektor )
 {
 	const address_space *iospace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
-	const device_config *ay = devtag_get_device(machine, SOUND, "ay");
+	const device_config *ay = devtag_get_device(machine, "ay");
 
 	/* configure security */
 	sega_security(82);

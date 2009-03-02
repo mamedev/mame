@@ -100,9 +100,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(exerion_videoreg_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
-	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
-	AM_RANGE(0xd802, 0xd802) AM_DEVREAD(SOUND, "ay2", ay8910_r)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0xd802, 0xd802) AM_DEVREAD("ay2", ay8910_r)
 ADDRESS_MAP_END
 
 

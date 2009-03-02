@@ -295,10 +295,10 @@ static READ16_HANDLER(ac_devices_r)
 			return input_port_read(space->machine, "IN0");
 		case 0x0014/2:
 		case 0x0016/2:
-			return okim6295_r(devtag_get_device(space->machine, SOUND, "oki1"),0);
+			return okim6295_r(devtag_get_device(space->machine, "oki1"),0);
 		case 0x0018/2:
 		case 0x001a/2:
-			return okim6295_r(devtag_get_device(space->machine, SOUND, "oki2"),0);
+			return okim6295_r(devtag_get_device(space->machine, "oki2"),0);
 		case 0x0040/2:
 			/*
                 "Upper switch / Under Switch"
@@ -378,19 +378,19 @@ static WRITE16_HANDLER(ac_devices_w)
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki1"), 0x40000 * (data & 0x3));
-				okim6295_set_bank_base(devtag_get_device(space->machine, SOUND, "oki2"), 0x40000 * (data & 0x30) >> 4);
+				okim6295_set_bank_base(devtag_get_device(space->machine, "oki1"), 0x40000 * (data & 0x3));
+				okim6295_set_bank_base(devtag_get_device(space->machine, "oki2"), 0x40000 * (data & 0x30) >> 4);
 			}
 			break;
 		case 0x14/2:
 		case 0x16/2:
 			if(ACCESSING_BITS_0_7)
-				okim6295_w(devtag_get_device(space->machine, SOUND, "oki1"),0,data);
+				okim6295_w(devtag_get_device(space->machine, "oki1"),0,data);
 			break;
 		case 0x18/2:
 		case 0x1a/2:
 			if(ACCESSING_BITS_0_7)
-				okim6295_w(devtag_get_device(space->machine, SOUND, "oki2"),0,data);
+				okim6295_w(devtag_get_device(space->machine, "oki2"),0,data);
 			break;
 		case 0x1c/2:
 			/*IRQ mask?*/

@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN4") AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_READ(suprgolf_random) // game locks up or crashes? if this doesn't return right values?
 
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
  ADDRESS_MAP_END
 
 static INPUT_PORTS_START( suprgolf )

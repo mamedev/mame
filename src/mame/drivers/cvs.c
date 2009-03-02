@@ -418,7 +418,7 @@ static void cvs_set_speech_command_w(const address_space *space, UINT8 data)
 static READ8_HANDLER( cvs_speech_command_r )
 {
 	/* bit 7 is TMS status (active LO) */
-	return (~tms5110_status_r(devtag_get_device(space->machine, SOUND, "tms"), 0) << 7) | soundlatch2_r(space, 0);
+	return (~tms5110_status_r(devtag_get_device(space->machine, "tms"), 0) << 7) | soundlatch2_r(space, 0);
 }
 
 
@@ -489,7 +489,7 @@ static WRITE8_HANDLER( audio_command_w )
 
 	/* temporary code begin */
 	if ((data & 0x40) == 0)
-		speech_execute_command(devtag_get_device(space->machine, SOUND, "tms"), data & 0x03f);
+		speech_execute_command(devtag_get_device(space->machine, "tms"), data & 0x03f);
 	/* temporary code end */
 }
 
@@ -568,8 +568,8 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
     AM_RANGE(0x1000, 0x107f) AM_RAM
     AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
-    AM_RANGE(0x1840, 0x1840) AM_DEVWRITE(SOUND, "dac1", dac_w)
-    AM_RANGE(0x1880, 0x1883) AM_DEVWRITE(SOUND, "dac2", cvs_4_bit_dac_data_w) AM_BASE(&cvs_4_bit_dac_data)
+    AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("dac1", dac_w)
+    AM_RANGE(0x1880, 0x1883) AM_DEVWRITE("dac2", cvs_4_bit_dac_data_w) AM_BASE(&cvs_4_bit_dac_data)
     AM_RANGE(0x1884, 0x1887) AM_WRITE(SMH_NOP)		/* not connected to anything */
 ADDRESS_MAP_END
 
@@ -592,8 +592,8 @@ static ADDRESS_MAP_START( cvs_speech_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(cvs_speech_rom_address_lo_w)
 	AM_RANGE(0x1d40, 0x1d40) AM_WRITE(cvs_speech_rom_address_hi_w)
     AM_RANGE(0x1d80, 0x1d80) AM_READ(cvs_speech_command_r)
-	AM_RANGE(0x1ddd, 0x1dde) AM_DEVWRITE(SOUND, "tms", cvs_tms5110_ctl_w) AM_BASE(&cvs_tms5110_ctl_data)
-	AM_RANGE(0x1ddf, 0x1ddf) AM_DEVWRITE(SOUND, "tms", cvs_tms5110_pdc_w)
+	AM_RANGE(0x1ddd, 0x1dde) AM_DEVWRITE("tms", cvs_tms5110_ctl_w) AM_BASE(&cvs_tms5110_ctl_data)
+	AM_RANGE(0x1ddf, 0x1ddf) AM_DEVWRITE("tms", cvs_tms5110_pdc_w)
 ADDRESS_MAP_END
 
 

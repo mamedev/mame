@@ -208,7 +208,7 @@ static MACHINE_RESET( common )
 	{
 		char buffer[10];
 		sprintf(buffer, "dac%d", i + 1);
-		dmadac[i] = devtag_get_device(machine, SOUND, buffer);
+		dmadac[i] = devtag_get_device(machine, buffer);
 	}
 
 	/* Save state support */

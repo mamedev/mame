@@ -1340,7 +1340,7 @@ void decocass_machine_state_save_init(running_machine *machine)
 
 MACHINE_START( decocass )
 {
-	cassette_device = devtag_get_device(machine, DECOCASS_TAPE, "cassette");
+	cassette_device = devtag_get_device(machine, "cassette");
 }
 
 static void decocass_reset_common(running_machine *machine)

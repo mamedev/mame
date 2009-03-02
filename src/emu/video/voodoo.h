@@ -86,10 +86,10 @@ struct _voodoo_config
 	MDRV_DEVICE_CONFIG_DATAPTR(voodoo_config, cputag, _cputag)
 
 #define MDRV_3DFX_VOODOO_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag, VOODOO_GRAPHICS)
+	MDRV_DEVICE_MODIFY(_tag)
 
 #define MDRV_3DFX_VOODOO_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, VOODOO_GRAPHICS)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 

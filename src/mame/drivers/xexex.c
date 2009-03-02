@@ -293,10 +293,10 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static void ym_set_mixing(const device_config *device, double left, double right)
 {
-	flt_volume_set_volume(devtag_get_device(device->machine, SOUND, "filter1l"), (71.0*left)/55.0);
-	flt_volume_set_volume(devtag_get_device(device->machine, SOUND, "filter1r"), (71.0*right)/55.0);
-	flt_volume_set_volume(devtag_get_device(device->machine, SOUND, "filter2l"), (71.0*left)/55.0);
-	flt_volume_set_volume(devtag_get_device(device->machine, SOUND, "filter2r"), (71.0*right)/55.0);
+	flt_volume_set_volume(devtag_get_device(device->machine, "filter1l"), (71.0*left)/55.0);
+	flt_volume_set_volume(devtag_get_device(device->machine, "filter1r"), (71.0*right)/55.0);
+	flt_volume_set_volume(devtag_get_device(device->machine, "filter2l"), (71.0*left)/55.0);
+	flt_volume_set_volume(devtag_get_device(device->machine, "filter2r"), (71.0*right)/55.0);
 }
 
 static TIMER_CALLBACK( dmaend_callback )
@@ -395,8 +395,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE(SOUND, "konami", k054539_r, k054539_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r, k054539_w)
+	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
@@ -606,7 +606,7 @@ static MACHINE_RESET( xexex )
 	suspension_active = 0;
 	resume_trigger = 0;
 	frame = -1;
-	k054539_init_flags(devtag_get_device(machine, SOUND, "konami"), K054539_REVERSE_STEREO);
+	k054539_init_flags(devtag_get_device(machine, "konami"), K054539_REVERSE_STEREO);
 }
 
 static STATE_POSTLOAD( xexex_postload )

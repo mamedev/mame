@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READ(sound_latch_r)
 	AM_RANGE(0x06, 0x06) AM_READ(sound_latch_status_r)
@@ -317,7 +317,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_DEVICE_HANDLER(SOUND, "msm", ym2203_write_a),
+		DEVCB_DEVICE_HANDLER("msm", ym2203_write_a),
 		DEVCB_HANDLER(ym2203_write_b),
 	},
 	ym2203_irq_handler

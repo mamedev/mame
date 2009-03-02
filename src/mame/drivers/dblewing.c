@@ -468,11 +468,11 @@ static READ8_HANDLER(irq_latch_r)
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
- 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE(SOUND, "ym", ym2151_status_port_r,ym2151_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r,okim6295_w)
+ 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym2151_status_port_r,ym2151_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
  	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
- 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE(SOUND, "oki", okim6295_r,okim6295_w)
+ 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )

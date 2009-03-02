@@ -465,7 +465,7 @@ static NVRAM_HANDLER( korokoro )
 static ADDRESS_MAP_START( dfeveron_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8(SOUND, "ymz", ymz280b_r, 0x00ff)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8("ymz", ymz280b_r, 0x00ff)	// YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_READ(SMH_RAM				)	// Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_READ(SMH_RAM				)	// Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_READ(SMH_RAM				)	// Layer 0
@@ -482,7 +482,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dfeveron_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8(SOUND, "ymz", ymz280b_w, 0x00ff)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("ymz", ymz280b_w, 0x00ff)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
 	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
@@ -503,7 +503,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ddonpach_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8(SOUND, "ymz", ymz280b_r, 0x00ff)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8("ymz", ymz280b_r, 0x00ff)	// YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_READ(SMH_RAM				)	// Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_READ(SMH_RAM				)	// Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_READ(SMH_RAM				)	// Layer 0
@@ -521,7 +521,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ddonpach_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM							)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM							)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8(SOUND, "ymz", ymz280b_w, 0x00ff)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("ymz", ymz280b_w, 0x00ff)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
 	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2		)
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0		)	// Layer 0
@@ -578,8 +578,8 @@ static ADDRESS_MAP_START( donpachi_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x800000, 0x800005) AM_READ(SMH_RAM					)	// Layer 2 Control
 	AM_RANGE(0x900000, 0x90007f) AM_READ(donpachi_videoregs_r		)	// Video Regs
 /**/AM_RANGE(0xa08000, 0xa08fff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8(SOUND, "oki1", okim6295_r, 0x00ff	)	// M6295
-	AM_RANGE(0xb00010, 0xb00011) AM_DEVREAD8(SOUND, "oki2", okim6295_r, 0x00ff	)	//
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("oki1", okim6295_r, 0x00ff	)	// M6295
+	AM_RANGE(0xb00010, 0xb00011) AM_DEVREAD8("oki2", okim6295_r, 0x00ff	)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0"					)	// Inputs
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1"					)	// Inputs + EEPROM
 ADDRESS_MAP_END
@@ -597,8 +597,8 @@ static ADDRESS_MAP_START( donpachi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_2			)	// Layer 2 Control
 	AM_RANGE(0x900000, 0x90007f) AM_WRITE(SMH_RAM) AM_BASE(&cave_videoregs			)	// Video Regs
 	AM_RANGE(0xa08000, 0xa08fff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
-	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8(SOUND, "oki1", okim6295_w, 0x00ff		)	// M6295
-	AM_RANGE(0xb00010, 0xb00013) AM_DEVWRITE8(SOUND, "oki2", okim6295_w, 0x00ff		)	//
+	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("oki1", okim6295_w, 0x00ff		)	// M6295
+	AM_RANGE(0xb00010, 0xb00013) AM_DEVWRITE8("oki2", okim6295_w, 0x00ff		)	//
 	AM_RANGE(0xb00020, 0xb0002f) AM_WRITE(NMK112_okibank_lsb_w				)	//
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(cave_eeprom_msb_w					)	// EEPROM
 ADDRESS_MAP_END
@@ -611,7 +611,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( esprade_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8(SOUND, "ymz", ymz280b_r, 0x00ff)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8("ymz", ymz280b_r, 0x00ff)	// YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_READ(SMH_RAM				)	// Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_READ(SMH_RAM				)	// Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_READ(SMH_RAM				)	// Layer 0
@@ -629,7 +629,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( esprade_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8(SOUND, "ymz", ymz280b_w, 0x00ff)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("ymz", ymz280b_w, 0x00ff)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
 	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2)	// Sprites?
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
@@ -651,7 +651,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gaia_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8(SOUND, "ymz", ymz280b_r, 0x00ff)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8("ymz", ymz280b_r, 0x00ff)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_READ(SMH_RAM				)	// Sprite bank 1
 	AM_RANGE(0x408000, 0x40ffff) AM_READ(SMH_RAM				)	// Sprite bank 2
 	AM_RANGE(0x500000, 0x507fff) AM_READ(SMH_RAM				)	// Layer 0
@@ -673,7 +673,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gaia_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8(SOUND, "ymz", ymz280b_w, 0x00ff	)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("ymz", ymz280b_w, 0x00ff	)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprite bank 1
 	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2	)	// Sprite bank 2
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
@@ -705,7 +705,7 @@ static ADDRESS_MAP_START( guwange_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x500000, 0x507fff) AM_READ(SMH_RAM				)	// Layer 0
 /**/AM_RANGE(0x600000, 0x607fff) AM_READ(SMH_RAM				)	// Layer 1
 /**/AM_RANGE(0x700000, 0x707fff) AM_READ(SMH_RAM				)	// Layer 2
-	AM_RANGE(0x800000, 0x800003) AM_DEVREAD8(SOUND, "ymz", ymz280b_r, 0x00ff)	// YMZ280
+	AM_RANGE(0x800000, 0x800003) AM_DEVREAD8("ymz", ymz280b_r, 0x00ff)	// YMZ280
 /**/AM_RANGE(0x900000, 0x900005) AM_READ(SMH_RAM				)	// Layer 0 Control
 /**/AM_RANGE(0xa00000, 0xa00005) AM_READ(SMH_RAM				)	// Layer 1 Control
 /**/AM_RANGE(0xb00000, 0xb00005) AM_READ(SMH_RAM				)	// Layer 2 Control
@@ -723,7 +723,7 @@ static ADDRESS_MAP_START( guwange_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
 	AM_RANGE(0x600000, 0x607fff) AM_WRITE(cave_vram_1_w) AM_BASE(&cave_vram_1	)	// Layer 1
 	AM_RANGE(0x700000, 0x707fff) AM_WRITE(cave_vram_2_w) AM_BASE(&cave_vram_2	)	// Layer 2
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8(SOUND, "ymz", ymz280b_w, 0x00ff	)	// YMZ280
+	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymz", ymz280b_w, 0x00ff	)	// YMZ280
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_0		)	// Layer 0 Control
 	AM_RANGE(0xa00000, 0xa00005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_1		)	// Layer 1 Control
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_2		)	// Layer 2 Control
@@ -849,7 +849,7 @@ static ADDRESS_MAP_START( korokoro_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x180000, 0x187fff) AM_READ( SMH_RAM               )   // Sprites
 	AM_RANGE(0x1c0000, 0x1c0007) AM_READ( cave_irq_cause_r		)	// IRQ Cause
 //  AM_RANGE(0x200000, 0x207fff) AM_READ( SMH_RAM               )   // Palette
-//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8( SOUND, "ymz", ymz280b_r, 0x00ff )   // YMZ280
+//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8( "ymz", ymz280b_r, 0x00ff )   // YMZ280
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0"				)	// Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1"				)	// Inputs + EEPROM
 	AM_RANGE(0x300000, 0x30ffff) AM_READ( SMH_RAM				)	// RAM
@@ -862,7 +862,7 @@ static ADDRESS_MAP_START( korokoro_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x187fff) AM_WRITE( SMH_RAM				) AM_BASE( &spriteram16		) AM_SIZE(&spriteram_size	)	// Sprites
 	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE( SMH_RAM				) AM_BASE( &cave_videoregs	)	// Video Regs
 	AM_RANGE(0x200000, 0x207fff) AM_WRITE( SMH_RAM	) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
-	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8( SOUND, "ymz", ymz280b_w, 0x00ff)	// YMZ280
+	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8( "ymz", ymz280b_w, 0x00ff)	// YMZ280
 	AM_RANGE(0x280008, 0x280009) AM_WRITE( korokoro_leds_w			)
 	AM_RANGE(0x28000a, 0x28000b) AM_WRITE( korokoro_eeprom_msb_w	)	// EEPROM
 	AM_RANGE(0x28000c, 0x28000d) AM_WRITE( SMH_NOP					)	// 0 (watchdog?)
@@ -1116,7 +1116,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uopoko_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8(SOUND, "ymz", ymz280b_r, 0x00ff)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREAD8("ymz", ymz280b_r, 0x00ff)	// YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_READ(SMH_RAM				)	// Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_READ(SMH_RAM				)	// Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_READ(SMH_RAM				)	// Layer 0
@@ -1130,7 +1130,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uopoko_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM						)	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8(SOUND, "ymz", ymz280b_w, 0x00ff)	// YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVWRITE8("ymz", ymz280b_w, 0x00ff)	// YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
 	AM_RANGE(0x408000, 0x40ffff) AM_WRITE(SMH_RAM) AM_BASE(&cave_spriteram16_2	)
 	AM_RANGE(0x500000, 0x507fff) AM_WRITE(cave_vram_0_w) AM_BASE(&cave_vram_0	)	// Layer 0
@@ -1188,15 +1188,15 @@ static ADDRESS_MAP_START( hotdogst_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
-	AM_RANGE(0x50, 0x51) AM_DEVREAD(SOUND, "ym", ym2203_r	)	//
-	AM_RANGE(0x60, 0x60) AM_DEVREAD(SOUND, "oki", okim6295_r)	// M6295
+	AM_RANGE(0x50, 0x51) AM_DEVREAD("ym", ym2203_r	)	//
+	AM_RANGE(0x60, 0x60) AM_DEVREAD("oki", okim6295_r)	// M6295
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotdogst_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(hotdogst_rombank_w		)	// ROM bank
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE(SOUND, "ym", ym2203_w	)	//
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE(SOUND, "oki", okim6295_w)	// M6295
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ym", ym2203_w	)	//
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("oki", okim6295_w)	// M6295
 	AM_RANGE(0x70, 0x70) AM_WRITE(hotdogst_okibank_w		)	// Samples bank
 ADDRESS_MAP_END
 
@@ -1231,15 +1231,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mazinger_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
-	AM_RANGE(0x52, 0x53) AM_DEVREAD(SOUND, "ym", ym2203_r	)	// YM2203
+	AM_RANGE(0x52, 0x53) AM_DEVREAD("ym", ym2203_r	)	// YM2203
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazinger_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mazinger_rombank_w		)	// ROM bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w			)	// To Main CPU
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE(SOUND, "ym", ym2203_w	)	// YM2203
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE(SOUND, "oki", okim6295_w)	// M6295
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ym", ym2203_w	)	// YM2203
+	AM_RANGE(0x70, 0x70) AM_DEVWRITE("oki", okim6295_w)	// M6295
 	AM_RANGE(0x74, 0x74) AM_WRITE(hotdogst_okibank_w		)	// Samples bank
 ADDRESS_MAP_END
 
@@ -1292,16 +1292,16 @@ static ADDRESS_MAP_START( metmqstr_sound_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r				)	// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
-	AM_RANGE(0x50, 0x51) AM_DEVREAD(SOUND, "ym", ym2151_r	)	// YM2151
+	AM_RANGE(0x50, 0x51) AM_DEVREAD("ym", ym2151_r	)	// YM2151
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( metmqstr_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(metmqstr_rombank_w		)	// Rom Bank
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE(SOUND, "ym", ym2151_w	)	// YM2151
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE(SOUND, "oki1", okim6295_w)	// M6295 #0
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ym", ym2151_w	)	// YM2151
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("oki1", okim6295_w)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(metmqstr_okibank0_w		)	// Samples Bank #0
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "oki2", okim6295_w)	// M6295 #1
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki2", okim6295_w)	// M6295 #1
 	AM_RANGE(0x90, 0x90) AM_WRITE(metmqstr_okibank1_w		)	// Samples Bank #1
 ADDRESS_MAP_END
 
@@ -1333,19 +1333,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pwrinst2_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD(SOUND, "oki1", okim6295_r		)	// M6295
-	AM_RANGE(0x08, 0x08) AM_DEVREAD(SOUND, "oki2", okim6295_r		)	//
-	AM_RANGE(0x40, 0x41) AM_DEVREAD(SOUND, "ym", ym2203_r	)	//
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("oki1", okim6295_r		)	// M6295
+	AM_RANGE(0x08, 0x08) AM_DEVREAD("oki2", okim6295_r		)	//
+	AM_RANGE(0x40, 0x41) AM_DEVREAD("ym", ym2203_r	)	//
 	AM_RANGE(0x60, 0x60) AM_READ(soundlatch_hi_r			)	// From Main CPU
 	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_lo_r			)	//
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pwrinst2_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "oki1", okim6295_w			)	// M6295
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE(SOUND, "oki2", okim6295_w			)	//
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("oki1", okim6295_w			)	// M6295
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("oki2", okim6295_w			)	//
 	AM_RANGE(0x10, 0x17) AM_WRITE(NMK112_okibank_w			)	// Samples bank
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ym", ym2203_w	)	//
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym", ym2203_w	)	//
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w			)   // To Main CPU
 //  AM_RANGE(0x51, 0x51) AM_WRITE(SMH_NOP                   )   // ?? volume
 	AM_RANGE(0x80, 0x80) AM_WRITE(pwrinst2_rombank_w		)	// ROM bank
@@ -1412,19 +1412,19 @@ static ADDRESS_MAP_START( sailormn_sound_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r				)	// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
-	AM_RANGE(0x50, 0x51) AM_DEVREAD(SOUND, "ym", ym2151_r	)	// YM2151
-	AM_RANGE(0x60, 0x60) AM_DEVREAD(SOUND, "oki1", okim6295_r		)	// M6295 #0
-	AM_RANGE(0x80, 0x80) AM_DEVREAD(SOUND, "oki2", okim6295_r		)	// M6295 #1
+	AM_RANGE(0x50, 0x51) AM_DEVREAD("ym", ym2151_r	)	// YM2151
+	AM_RANGE(0x60, 0x60) AM_DEVREAD("oki1", okim6295_r		)	// M6295 #0
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("oki2", okim6295_r		)	// M6295 #1
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailormn_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sailormn_rombank_w		)	// Rom Bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w			)	// To Main CPU
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE(SOUND, "ym", ym2151_w	)	// YM2151
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE(SOUND, "oki1", okim6295_w			)	// M6295 #0
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ym", ym2151_w	)	// YM2151
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("oki1", okim6295_w			)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(sailormn_okibank0_w		)	// Samples Bank #0
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "oki2", okim6295_w			)	// M6295 #1
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki2", okim6295_w			)	// M6295 #1
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(sailormn_okibank1_w		)	// Samples Bank #1
 ADDRESS_MAP_END
 

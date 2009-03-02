@@ -392,7 +392,7 @@ static READ8_HANDLER( switch_6502_r )
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x01;
 	if (atarigen_sound_to_cpu_ready) result ^= 0x02;
-	if (!has_tms5220 || tms5220_ready_r(devtag_get_device(space->machine, SOUND, "tms"))) result ^= 0x04;
+	if (!has_tms5220 || tms5220_ready_r(devtag_get_device(space->machine, "tms"))) result ^= 0x04;
 	if (!(input_port_read(space->machine, "1801") & 0x80)) result ^= 0x10;
 
 	return result;
@@ -406,7 +406,7 @@ static WRITE8_HANDLER( switch_6502_w )
 	if (has_tms5220)
 	{
 		data = 12 | ((data >> 5) & 1);
-		tms5220_set_frequency(devtag_get_device(space->machine, SOUND, "tms"), MASTER_CLOCK/4 / (16 - data) / 2);
+		tms5220_set_frequency(devtag_get_device(space->machine, "tms"), MASTER_CLOCK/4 / (16 - data) / 2);
 	}
 }
 
@@ -631,7 +631,7 @@ static WRITE8_HANDLER( sound_reset_w )
 
 	/* a large number of signals are reset when this happens */
 	atarigen_sound_io_reset(space->machine->cpu[1]);
-	devtag_reset(space->machine, SOUND, "ym");
+	devtag_reset(space->machine, "ym");
 	mixer_w(space, 0, 0);
 	tms5220_data = 0;
 	tms5220_data_strobe = 0;
@@ -688,7 +688,7 @@ static WRITE8_HANDLER( tms5220_strobe_w )
 {
 	if (!(offset & 1) && tms5220_data_strobe && has_tms5220)
 	{
-		const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+		const device_config *tms = devtag_get_device(space->machine, "tms");
 		tms5220_data_w(tms, 0, tms5220_data);
 	}
 	tms5220_data_strobe = offset & 1;
@@ -751,11 +751,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_RAM AM_BASE((UINT8 **)&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x2780) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x1810, 0x1813) AM_MIRROR(0x278c) AM_READ(leta_r)
-	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x2780) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x1840, 0x1840) AM_MIRROR(0x278f) AM_READ(switch_6502_r)
-	AM_RANGE(0x1850, 0x1851) AM_MIRROR(0x278e) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x1850, 0x1851) AM_MIRROR(0x278e) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x1860, 0x1860) AM_MIRROR(0x278f) AM_READ(sound_6502_r)
 	AM_RANGE(0x1870, 0x1870) AM_MIRROR(0x2781) AM_WRITE(tms5220_w)
 	AM_RANGE(0x1872, 0x1873) AM_MIRROR(0x2780) AM_WRITE(tms5220_strobe_w)

@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( magicard_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1ffc40, 0x1ffc41) AM_READ(test_r)
 	AM_RANGE(0x1ffd00, 0x1ffd05) AM_WRITE(paletteram_io_w) //RAMDAC
 	/*not the right sound chip,unknown type,it should be an ADPCM with 8 channels.*/
-	AM_RANGE(0x1ffd40, 0x1ffd43) AM_DEVWRITE8(SOUND, "ym", ym2413_w, 0x00ff)
+	AM_RANGE(0x1ffd40, 0x1ffd43) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
 	AM_RANGE(0x1ffd80, 0x1ffd81) AM_READ(test_r)
 	AM_RANGE(0x1ffd80, 0x1ffd81) AM_WRITENOP //?
 	AM_RANGE(0x1fff80, 0x1fffbf) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?

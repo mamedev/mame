@@ -271,7 +271,7 @@ static WRITE8_HANDLER( cvsd_w )
 static TIMER_CALLBACK( cvsd_bit_timer_callback )
 {
 	/* Data is shifted out at the MSB */
-	hc55516_digit_w(devtag_get_device(machine, SOUND, "cvsd"), (cvsd_shiftreg >> 7) & 1);
+	hc55516_digit_w(devtag_get_device(machine, "cvsd"), (cvsd_shiftreg >> 7) & 1);
 	cvsd_shiftreg <<= 1;
 
 	/* Trigger an IRQ for every 8 shifted bits */
@@ -344,8 +344,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE("ay", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
@@ -415,8 +415,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntrygrl_cpu0_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE("ay", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)

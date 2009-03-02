@@ -540,7 +540,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dsp_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(dsp_cmd_r, dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "dac", dsp_dac_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dsp_dac_w)
 	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN1")

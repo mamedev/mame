@@ -231,7 +231,7 @@ static READ8_HANDLER( switch_6502_r )
 
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x80;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x40;
-	if (tms5220_ready_r(devtag_get_device(space->machine, SOUND, "tms"))) temp ^= 0x20;
+	if (tms5220_ready_r(devtag_get_device(space->machine, "tms"))) temp ^= 0x20;
 	if (!(input_port_read(space->machine, "803008") & 0x0008)) temp ^= 0x10;
 
 	return temp;
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( tms5220_w )
 
 static WRITE8_HANDLER( sound_ctl_w )
 {
-	const device_config *tms = devtag_get_device(space->machine, SOUND, "tms");
+	const device_config *tms = devtag_get_device(space->machine, "tms");
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */
@@ -356,8 +356,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_READ(atarigen_6502_sound_r)
 	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE(mixer_w)
 	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE(switch_6502_r, sound_ctl_w)
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE(SOUND, "pokey", pokey_r, pokey_w)
-	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_WRITE(tms5220_w)
 	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x27c0) AM_READWRITE(atarigen_6502_irq_ack_r, atarigen_6502_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM

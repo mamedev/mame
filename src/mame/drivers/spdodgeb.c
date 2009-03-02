@@ -61,7 +61,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( spd_adpcm_w )
 {
 	int chip = offset & 1;
-	const device_config *adpcm = devtag_get_device(space->machine, SOUND, (chip == 0) ? "msm1" : "msm2");
+	const device_config *adpcm = devtag_get_device(space->machine, (chip == 0) ? "msm1" : "msm2");
 
 	switch (offset/2)
 	{
@@ -300,7 +300,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE(SOUND, "ym", ym3812_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ym", ym3812_w)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(spd_adpcm_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END

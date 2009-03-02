@@ -339,7 +339,7 @@ static void on_scorpion2_reset(running_machine *machine)
 
 	e2ram_reset();
 
-	devtag_reset(machine, SOUND, "ym");
+	devtag_reset(machine, "ym");
 
   // reset stepper motors /////////////////////////////////////////////////
 	{
@@ -698,8 +698,8 @@ static WRITE8_HANDLER( volume_override_w )
 
 	if ( old != volume_override )
 	{
-		const device_config *ym = devtag_get_device(space->machine, SOUND, "ym");
-		const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
+		const device_config *ym = devtag_get_device(space->machine, "ym");
+		const device_config *upd = devtag_get_device(space->machine, "upd");
 		float percent = volume_override? 1.0f : (32-global_volume)/32.0f;
 
 		sound_set_output_gain(ym, 0, percent);
@@ -776,7 +776,7 @@ static READ8_HANDLER( vfd_status_hop_r )	// on video games, hopper inputs are co
 		}
 	}
 
-	if ( !upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd")) ) result |= 0x80;			  // update sound busy input
+	if ( !upd7759_busy_r(devtag_get_device(space->machine, "upd")) ) result |= 0x80;			  // update sound busy input
 
 	return result;
 }
@@ -812,8 +812,8 @@ static WRITE8_HANDLER( expansion_latch_w )
 			}
 
 			{
-				const device_config *ym = devtag_get_device(space->machine, SOUND, "ym");
-				const device_config *upd = devtag_get_device(space->machine, SOUND, "upd");
+				const device_config *ym = devtag_get_device(space->machine, "ym");
+				const device_config *upd = devtag_get_device(space->machine, "upd");
 				float percent = volume_override ? 1.0f : (32-global_volume)/32.0f;
 
 				sound_set_output_gain(ym, 0, percent);
@@ -1541,10 +1541,10 @@ static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)			// vfd1 data
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)			// vfd1+vfd2 reset line
 
-	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)			// this is where it reads?
-	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE(SOUND, "upd", nec_reset_w)			// upd7759 reset line
+	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE("upd", nec_latch_w)			// this is where it reads?
+	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE("upd", nec_reset_w)			// upd7759 reset line
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)				// custom chip unlock
-	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE(SOUND, "ym", ym2413_w)
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE("ym", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)			// write bank (rom page select for 0x6000 - 0x7fff )
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)			// vfd2 data
 
@@ -2666,7 +2666,7 @@ static READ8_HANDLER( vfd_status_r )
 
 	int result = optic_pattern;
 
-	if ( !upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd")) ) result |= 0x80;
+	if ( !upd7759_busy_r(devtag_get_device(space->machine, "upd")) ) result |= 0x80;
 
 	return result;
 }
@@ -2680,7 +2680,7 @@ static READ8_HANDLER( vfd_status_dm01_r )
 
 	int result = optic_pattern;
 
-	if ( !upd7759_busy_r(devtag_get_device(space->machine, SOUND, "upd")) ) result |= 0x80;
+	if ( !upd7759_busy_r(devtag_get_device(space->machine, "upd")) ) result |= 0x80;
 
 	if ( BFM_dm01_busy() ) result |= 0x40;
 
@@ -2781,10 +2781,10 @@ static ADDRESS_MAP_START( sc2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)					/* vfd1 data */
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)					/* vfd1+vfd2 reset line */
 
-	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)
-	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE(SOUND, "upd", nec_reset_w)
+	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE("upd", nec_latch_w)
+	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE("upd", nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)						/* custom chip unlock */
-	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE(SOUND, "ym", ym2413_w)
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE("ym", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)					/* vfd2 data */
 
@@ -2830,10 +2830,10 @@ static ADDRESS_MAP_START( sc3_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)
 
-	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)
-	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE(SOUND, "upd", nec_reset_w)
+	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE("upd", nec_latch_w)
+	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE("upd", nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)
-	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE(SOUND, "ym", ym2413_w)
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE("ym", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
@@ -2879,10 +2879,10 @@ static ADDRESS_MAP_START( memmap_sc2_dm01, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_dm01_w)
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)
 
-	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE(SOUND, "upd", nec_latch_w)
-	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE(SOUND, "upd", nec_reset_w)
+	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE("upd", nec_latch_w)
+	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE("upd", nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)
-	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE(SOUND, "ym", ym2413_w)
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE("ym", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)
 	AM_RANGE(0x3FFE, 0x3FFE) AM_READ( direct_input_r)

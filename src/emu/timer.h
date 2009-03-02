@@ -132,10 +132,10 @@ struct _timer_execution_state
 	MDRV_DEVICE_CONFIG_DATA32(timer_config, increment, _increment)
 
 #define MDRV_TIMER_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, TIMER_SCREEN)
+	MDRV_DEVICE_REMOVE(_tag)
 
 #define MDRV_TIMER_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag, TIMER_SCREEN)
+	MDRV_DEVICE_MODIFY(_tag)
 
 #define MDRV_TIMER_CALLBACK(_callback) \
 	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback)

@@ -13,7 +13,7 @@ WRITE8_HANDLER( laserbat_csound1_w )
 
 WRITE8_HANDLER( laserbat_csound2_w )
 {
-	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "sn");
 	int ksound = 0;
 
 	if (data & 0x01)
@@ -99,8 +99,8 @@ WRITE8_HANDLER( laserbat_csound2_w )
 
 	ksound = ((data & 0x02) << 23) + (ksound3 << 16) + (ksound2 << 8) + ksound1;
 
-	tms3615_enable_w(devtag_get_device(space->machine, SOUND, "tms1"), ksound & 0x1fff);
-	tms3615_enable_w(devtag_get_device(space->machine, SOUND, "tms2"), (ksound >> 13) << 1);
+	tms3615_enable_w(devtag_get_device(space->machine, "tms1"), ksound & 0x1fff);
+	tms3615_enable_w(devtag_get_device(space->machine, "tms2"), (ksound >> 13) << 1);
 
 	bit14 = (data & 0x20) ? 1 : 0;
 

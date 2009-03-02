@@ -248,12 +248,12 @@ static ADDRESS_MAP_START( rastan_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(rastan_msm5205_address_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(SOUND, "msm", rastan_msm5205_start_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE(SOUND, "msm", rastan_msm5205_stop_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", rastan_msm5205_start_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("msm", rastan_msm5205_stop_w)
 ADDRESS_MAP_END
 
 

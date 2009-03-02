@@ -68,7 +68,7 @@ MACHINE_START( astrof_audio )
 
 WRITE8_HANDLER( astrof_audio_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_1_last;
 
 	if (astrof_death_playing)
@@ -114,7 +114,7 @@ WRITE8_HANDLER( astrof_audio_1_w )
 
 WRITE8_HANDLER( astrof_audio_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	UINT8 rising_bits = data & ~port_2_last;
 
 	/* D0-D2 - explosion select (triggered by D2 of the other port */
@@ -219,7 +219,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( tomahawk_audio_w )
 {
-	const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(space->machine, "sn");
 
 	/* D0 - sonar */
 

@@ -170,13 +170,13 @@ static void stop_mono_flop(const device_config *sn, int n)
 
 static TIMER_CALLBACK( stop_mono_flop_callback )
 {
-	stop_mono_flop(devtag_get_device(machine, SOUND, "sn"), param);
+	stop_mono_flop(devtag_get_device(machine, "sn"), param);
 }
 
 
 static void spacefev_sound_pins_changed(running_machine *machine)
 {
-	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(machine, "sn");
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
 
 	if (changes & (1 << 0x3))
@@ -208,7 +208,7 @@ static void spacefev_sound_pins_changed(running_machine *machine)
 
 static void sheriff_sound_pins_changed(running_machine *machine)
 {
-	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(machine, "sn");
 	UINT16 changes = ~curr_sound_pins & prev_sound_pins;
 
 	if (changes & (1 << 0x6))
@@ -410,13 +410,13 @@ static READ8_HANDLER( helifire_8035_p2_r )
 
 static WRITE8_HANDLER( n8080_dac_w )
 {
-	dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), data & 0x80);
+	dac_data_w(devtag_get_device(space->machine, "dac"), data & 0x80);
 }
 
 
 static WRITE8_HANDLER( helifire_dac_w )
 {
-	dac_data_w(devtag_get_device(space->machine, SOUND, "dac"), data * helifire_dac_volume);
+	dac_data_w(devtag_get_device(space->machine, "dac"), data * helifire_dac_volume);
 }
 
 
@@ -442,7 +442,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 
 static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 {
-	const device_config *sn = devtag_get_device(machine, SOUND, "sn");
+	const device_config *sn = devtag_get_device(machine, "sn");
 	double voltage = 0;
 
 	if (mono_flop[2])

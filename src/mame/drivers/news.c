@@ -24,7 +24,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc002, 0xc002) AM_DEVREAD(SOUND, "oki", okim6295_r)
+	AM_RANGE(0xc002, 0xc002) AM_DEVREAD("oki", okim6295_r)
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -33,7 +33,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(news_fgram_w) AM_BASE(&news_fgram)
 	AM_RANGE(0x8800, 0x8fff) AM_WRITE(news_bgram_w) AM_BASE(&news_bgram)
 	AM_RANGE(0x9000, 0x91ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE(SOUND, "oki", okim6295_w) /* ?? */
+	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("oki", okim6295_w) /* ?? */
 	AM_RANGE(0xc003, 0xc003) AM_WRITE(news_bgpic_w)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END

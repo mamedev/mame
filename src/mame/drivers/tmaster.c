@@ -441,9 +441,9 @@ static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0x300010, 0x300011 ) AM_READ( tmaster_coins_r )
 
-	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
 
-	AM_RANGE( 0x300040, 0x300041 ) AM_DEVWRITE( SOUND, "oki", tmaster_oki_bank_w )
+	AM_RANGE( 0x300040, 0x300041 ) AM_DEVWRITE( "oki", tmaster_oki_bank_w )
 
 	AM_RANGE( 0x300070, 0x300071 ) AM_WRITE( tmaster_addr_w )
 
@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0x600000, 0x600fff ) AM_READWRITE( SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_BASE(&paletteram16) // looks like palettes, maybe
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8( SOUND, "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 
 	AM_RANGE( 0x800010, 0x800011 ) AM_WRITE( tmaster_color_w )
 ADDRESS_MAP_END
@@ -617,7 +617,7 @@ static ADDRESS_MAP_START( galgames_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x800020, 0x80003f ) AM_NOP	// ?
 	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE( watchdog_reset16_w )
 
-	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8( SOUND, "oki", okim6295_r, okim6295_w, 0x00ff )
+	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8( "oki", okim6295_r, okim6295_w, 0x00ff )
 	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE( galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
 
 	AM_RANGE( 0xc00000, 0xc00001 ) AM_WRITE( galgames_palette_offset_w )
@@ -750,7 +750,7 @@ static MACHINE_START( tmaster )
 
 static MACHINE_RESET( tmaster )
 {
-	tmaster_devices.duart68681 = device_list_find_by_tag( machine->config->devicelist, DUART68681, "duart68681" );
+	tmaster_devices.duart68681 = devtag_get_device( machine, "duart68681" );
 }
 
 static INTERRUPT_GEN( tm3k_interrupt )

@@ -326,8 +326,8 @@ static TIMER_CALLBACK( ssio_delayed_data_w )
 
 static void ssio_update_volumes(running_machine *machine)
 {
-	const device_config *ay0 = devtag_get_device(machine, SOUND, "ssio.1");
-	const device_config *ay1 = devtag_get_device(machine, SOUND, "ssio.2");
+	const device_config *ay0 = devtag_get_device(machine, "ssio.1");
+	const device_config *ay1 = devtag_get_device(machine, "ssio.2");
 	ay8910_set_volume(ay0, 0, ssio_mute ? 0 : ssio_ayvolume_lookup[ssio_duty_cycle[0][0]]);
 	ay8910_set_volume(ay0, 1, ssio_mute ? 0 : ssio_ayvolume_lookup[ssio_duty_cycle[0][1]]);
 	ay8910_set_volume(ay0, 2, ssio_mute ? 0 : ssio_ayvolume_lookup[ssio_duty_cycle[0][2]]);
@@ -458,12 +458,12 @@ static ADDRESS_MAP_START( ssio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x9000, 0x9003) AM_MIRROR(0x0ffc) AM_READ(ssio_data_r)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0ffc) AM_DEVWRITE(SOUND, "ssio.1", ay8910_address_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x0ffc) AM_DEVREAD(SOUND, "ssio.1", ay8910_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x0ffc) AM_DEVWRITE(SOUND, "ssio.1", ay8910_data_w)
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_DEVWRITE(SOUND, "ssio.2", ay8910_address_w)
-	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_DEVREAD(SOUND, "ssio.2", ay8910_r)
-	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE(SOUND, "ssio.2", ay8910_data_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ssio.1", ay8910_address_w)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x0ffc) AM_DEVREAD("ssio.1", ay8910_r)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ssio.1", ay8910_data_w)
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ssio.2", ay8910_address_w)
+	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_DEVREAD("ssio.2", ay8910_r)
+	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ssio.2", ay8910_data_w)
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_NOP, ssio_status_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITENOP	/* low bit controls yellow LED */
 	AM_RANGE(0xe000, 0xefff) AM_READ(ssio_irq_clear)
@@ -501,7 +501,7 @@ MACHINE_DRIVER_END
 static WRITE8_DEVICE_HANDLER( csdeluxe_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "csddac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, "csddac"), dacval << 6);
 }
 
 static WRITE8_DEVICE_HANDLER( csdeluxe_portb_w )
@@ -509,7 +509,7 @@ static WRITE8_DEVICE_HANDLER( csdeluxe_portb_w )
 	UINT8 z_mask = pianew_get_port_b_z_mask(device);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "csddac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, "csddac"), dacval << 6);
 
 	if (~z_mask & 0x10)  csdeluxe_status = (csdeluxe_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  csdeluxe_status = (csdeluxe_status & ~2) | ((data >> 4) & 2);
@@ -524,7 +524,7 @@ static WRITE_LINE_DEVICE_HANDLER( csdeluxe_irq )
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 {
-	const device_config *pia = devtag_get_device(machine, PIA6821, "csdpia");
+	const device_config *pia = devtag_get_device(machine, "csdpia");
 
 	pia_portb_w(pia, 0, param & 0x0f);
 	pia_ca1_w(pia, 0, ~param & 0x10);
@@ -579,7 +579,7 @@ static ADDRESS_MAP_START( csdeluxe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
-	AM_RANGE(0x018000, 0x018007) AM_DEVREADWRITE(PIA6821, "csdpia", csdeluxe_pia_r, csdeluxe_pia_w)
+	AM_RANGE(0x018000, 0x018007) AM_DEVREADWRITE("csdpia", csdeluxe_pia_r, csdeluxe_pia_w)
 	AM_RANGE(0x01c000, 0x01cfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -639,7 +639,7 @@ MACHINE_DRIVER_END
 static WRITE8_DEVICE_HANDLER( soundsgood_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "sgdac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, "sgdac"), dacval << 6);
 }
 
 static WRITE8_DEVICE_HANDLER( soundsgood_portb_w )
@@ -647,7 +647,7 @@ static WRITE8_DEVICE_HANDLER( soundsgood_portb_w )
 	UINT8 z_mask = pianew_get_port_b_z_mask(device);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "sgdac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, "sgdac"), dacval << 6);
 
 	if (~z_mask & 0x10)  soundsgood_status = (soundsgood_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  soundsgood_status = (soundsgood_status & ~2) | ((data >> 4) & 2);
@@ -662,7 +662,7 @@ static WRITE_LINE_DEVICE_HANDLER( soundsgood_irq )
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
 {
-	const device_config *pia = devtag_get_device(machine, PIA6821, "sgpia");
+	const device_config *pia = devtag_get_device(machine, "sgpia");
 
 	pia_portb_w(pia, 0, (param >> 1) & 0x0f);
 	pia_ca1_w(pia, 0, ~param & 0x01);
@@ -698,7 +698,7 @@ static ADDRESS_MAP_START( soundsgood_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8(PIA6821, "sgpia", pia_alt_r, pia_alt_w, 0xff00)
+	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("sgpia", pia_alt_r, pia_alt_w, 0xff00)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -747,13 +747,13 @@ MACHINE_DRIVER_END
 static WRITE8_DEVICE_HANDLER( turbocs_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "tcsdac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, "tcsdac"), dacval << 6);
 }
 
 static WRITE8_DEVICE_HANDLER( turbocs_portb_w )
 {
 	dacval = (dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "tcsdac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, "tcsdac"), dacval << 6);
 	turbocs_status = (data >> 4) & 3;
 }
 
@@ -766,7 +766,7 @@ static WRITE_LINE_DEVICE_HANDLER( turbocs_irq )
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
 {
-	const device_config *pia = devtag_get_device(machine, PIA6821, "tcspia");
+	const device_config *pia = devtag_get_device(machine, "tcspia");
 
 	pia_portb_w(pia, 0, (param >> 1) & 0x0f);
 	pia_ca1_w(pia, 0, ~param & 0x01);
@@ -800,7 +800,7 @@ void turbocs_reset_w(running_machine *machine, int state)
 static ADDRESS_MAP_START( turbocs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE(PIA6821, "tcspia", pia_alt_r, pia_alt_w)
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("tcspia", pia_alt_r, pia_alt_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -863,7 +863,7 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_porta2_w )
 
 static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 {
-	const device_config *tms = devtag_get_device(device->machine, SOUND, "sntspeech");
+	const device_config *tms = devtag_get_device(device->machine, "sntspeech");
 
 	/* bits 0-1 select read/write strobes on the TMS5200 */
 	data &= 0x03;
@@ -894,8 +894,8 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( squawkntalk_irq )
 {
-	const device_config *pia0 = devtag_get_device(device->machine, PIA6821, "sntpia0");
-	const device_config *pia1 = devtag_get_device(device->machine, PIA6821, "sntpia1");
+	const device_config *pia0 = devtag_get_device(device->machine, "sntpia0");
+	const device_config *pia1 = devtag_get_device(device->machine, "sntpia1");
 	int combined_state = pianew_get_irq_a(pia0) | pianew_get_irq_b(pia0) | pianew_get_irq_a(pia1) | pianew_get_irq_b(pia1);
 
 	cpu_set_input_line(squawkntalk_sound_cpu, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -903,7 +903,7 @@ static WRITE_LINE_DEVICE_HANDLER( squawkntalk_irq )
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 {
-	const device_config *pia0 = devtag_get_device(machine, PIA6821, "sntpia0");
+	const device_config *pia0 = devtag_get_device(machine, "sntpia0");
 
 	pia_porta_w(pia0, 0, ~param & 0x0f);
 	pia_cb1_w(pia0, 0, ~param & 0x10);
@@ -930,8 +930,8 @@ void squawkntalk_reset_w(running_machine *machine, int state)
 static ADDRESS_MAP_START( squawkntalk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE(PIA6821, "sntpia0", pia_r, pia_w)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_DEVREADWRITE(PIA6821, "sntpia1", pia_r, pia_w)
+	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("sntpia0", pia_r, pia_w)
+	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("sntpia1", pia_r, pia_w)
 	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0x4000) AM_WRITE(squawkntalk_dac_w)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM
 ADDRESS_MAP_END
@@ -942,8 +942,8 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( squawkntalk_alt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE(PIA6821, "sntpia0", pia_r, pia_w)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE(PIA6821, "sntpia1", pia_r, pia_w)
+	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("sntpia0", pia_r, pia_w)
+	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE("sntpia1", pia_r, pia_w)
 	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE(squawkntalk_dac_w)
 	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x6000) AM_ROM
 ADDRESS_MAP_END

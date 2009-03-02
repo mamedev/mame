@@ -467,7 +467,7 @@ static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 oldd
 
 static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	const device_config *tms = devtag_get_device(device->machine, SOUND, "tms");
+	const device_config *tms = devtag_get_device(device->machine, "tms");
 	if (device != NULL)
 	{
 		if ((olddata & 0x01) && !(newdata & 0x01))
@@ -489,7 +489,7 @@ static UINT8 r6532_portb_r(const device_config *device, UINT8 olddata)
 	UINT8 newdata = olddata;
 	if (has_tms5220)
 	{
-		const device_config *tms = devtag_get_device(device->machine, SOUND, "tms");
+		const device_config *tms = devtag_get_device(device->machine, "tms");
 		newdata &= ~0x0c;
 		if (!tms5220_ready_r(tms)) newdata |= 0x04;
 		if (!tms5220_int_r(tms)) newdata |= 0x08;
@@ -720,13 +720,13 @@ static DEVICE_START( venture_common_sh_start )
 
 	DEVICE_START_CALL(common_sh_start);
 
-	riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
+	riot = devtag_get_device(machine, "riot");
 
 	has_sh8253  = TRUE;
 	has_tms5220 = FALSE;
 
 	/* determine which sound hardware is installed */
-	has_mc3417 = (devtag_get_device(device->machine, SOUND, "cvsd") != NULL);
+	has_mc3417 = (devtag_get_device(device->machine, "cvsd") != NULL);
 
 	/* 8253 */
 	freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
@@ -782,7 +782,7 @@ static DEVICE_GET_INFO( venture_sound )
 static ADDRESS_MAP_START( venture_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
-	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(exidy_sound_filter_w)
@@ -816,7 +816,7 @@ MACHINE_DRIVER_END
 static WRITE8_HANDLER( mtrap_voiceio_w )
 {
 	if (!(offset & 0x10))
-		hc55516_digit_w(devtag_get_device(space->machine, SOUND, "cvsd"), data & 1);
+		hc55516_digit_w(devtag_get_device(space->machine, "cvsd"), data & 1);
 
 	if (!(offset & 0x20))
 		riot6532_portb_in_set(riot, data & 1, 0xff);
@@ -835,7 +835,7 @@ static READ8_HANDLER( mtrap_voiceio_r )
 	}
 
 	if (!(offset & 0x40))
-		return hc55516_clock_state_r(devtag_get_device(space->machine, SOUND, "cvsd")) << 7;
+		return hc55516_clock_state_r(devtag_get_device(space->machine, "cvsd")) << 7;
 
 	return 0;
 }
@@ -992,7 +992,7 @@ static DEVICE_GET_INFO( victory_sound )
 
 static ADDRESS_MAP_START( victory_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
-	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_READWRITE(exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x4000, 0x4fff) AM_NOP

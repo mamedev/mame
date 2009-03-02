@@ -333,7 +333,7 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 
 static MACHINE_START( lgp )
 {
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, "laserdisc");
 }
 
 

@@ -317,7 +317,7 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 	switch (offset & 0xff)
 	{
 		case 0x40:
-			dac_signed_data_w(devtag_get_device(space->machine, SOUND, "dac"),data);
+			dac_signed_data_w(devtag_get_device(space->machine, "dac"),data);
 			break;
 		default:
 			logerror("%04x: I/O write to port %04x\n",cpu_get_pc(space->cpu),offset);
@@ -373,13 +373,13 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* write clock 1->0 */
 	{
-		const device_config *device = devtag_get_device(space->machine, SOUND, "ym");
+		const device_config *device = devtag_get_device(space->machine, "ym");
 		ym2203_w(device, BIT(data,3), upd7807_porta);
 	}
 
 	if (BIT(upd7807_portc,4) && !BIT(data,4))	/* read clock 1->0 */
 	{
-		const device_config *device = devtag_get_device(space->machine, SOUND, "ym");
+		const device_config *device = devtag_get_device(space->machine, "ym");
 		upd7807_porta = ym2203_r(device, BIT(data,3));
 	}
 
@@ -528,7 +528,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 	coin_counter_w(0,~data & 0x80);
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* clock 1->0 */
-		sn76496_w(devtag_get_device(space->machine, SOUND, "sn"),0,upd7807_porta);
+		sn76496_w(devtag_get_device(space->machine, "sn"),0,upd7807_porta);
 
 	upd7807_portc = data;
 }
@@ -589,7 +589,7 @@ static ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE(SOUND, "sn", sn76496_w)
+	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("sn", sn76496_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(mrokumei_blitter_bank_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
@@ -651,7 +651,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(reikaids_upd7807_porta_r, reikaids_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE(SOUND, "dac", dac_signed_w)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_signed_w)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(reikaids_upd7807_portc_w)
 	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(reikaids_snd_command_r)
 ADDRESS_MAP_END
@@ -699,7 +699,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(pteacher_upd7807_porta_r, pteacher_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE(SOUND, "dac", dac_signed_w)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_signed_w)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_READ_PORT("COIN") AM_WRITE(pteacher_upd7807_portc_w)
 	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(pteacher_keyboard_r)
 ADDRESS_MAP_END

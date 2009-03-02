@@ -281,8 +281,8 @@ static void amiga_m68k_reset(const device_config *device)
 	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(space->cpu));
 
 	/* Initialize the various chips */
-	devtag_reset(device->machine, CIA8520, "cia_0");
-	devtag_reset(device->machine, CIA8520, "cia_1");
+	devtag_reset(device->machine, "cia_0");
+	devtag_reset(device->machine, "cia_1");
 	custom_reset(device->machine);
 	autoconfig_reset(device->machine);
 
@@ -326,8 +326,8 @@ MACHINE_RESET( amiga )
 static TIMER_CALLBACK( scanline_callback )
 {
 	int scanline = param;
-	const device_config *cia_0 = device_list_find_by_tag(machine->config->devicelist, CIA8520, "cia_0");
-	const device_config *cia_1 = device_list_find_by_tag(machine->config->devicelist, CIA8520, "cia_1");
+	const device_config *cia_0 = devtag_get_device(machine, "cia_0");
+	const device_config *cia_1 = devtag_get_device(machine, "cia_1");
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)
@@ -1026,14 +1026,14 @@ READ16_HANDLER( amiga_cia_r )
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
 	{
-		cia = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_1");
+		cia = devtag_get_device(space->machine, "cia_1");
 		shift = 8;
 	}
 
 	/* offsets 0800-0fff reference CIA A, and are accessed via the LSB */
 	else
 	{
-		cia = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_0");
+		cia = devtag_get_device(space->machine, "cia_0");
 		shift = 0;
 	}
 
@@ -1066,7 +1066,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	{
 		if (!ACCESSING_BITS_8_15)
 			return;
-		cia = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_1");
+		cia = devtag_get_device(space->machine, "cia_1");
 		data >>= 8;
 	}
 
@@ -1075,7 +1075,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	{
 		if (!ACCESSING_BITS_0_7)
 			return;
-		cia = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_0");
+		cia = devtag_get_device(space->machine, "cia_0");
 		data &= 0xff;
 	}
 
@@ -1397,8 +1397,8 @@ WRITE16_HANDLER( amiga_custom_w )
 				CUSTOM_REG(REG_SERDATR) &= ~0x8000;
 
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
-			cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_0");
-			cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_1");
+			cia_0 = devtag_get_device(space->machine, "cia_0");
+			cia_1 = devtag_get_device(space->machine, "cia_1");
 			if ( cia_get_irq( cia_0 ) ) data |= INTENA_PORTS;
 			if ( cia_get_irq( cia_1 ) )	data |= INTENA_EXTER;
 			CUSTOM_REG(offset) = data;

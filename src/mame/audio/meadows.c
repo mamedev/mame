@@ -60,7 +60,7 @@ SAMPLES_START( meadows_sh_start )
 /************************************/
 void meadows_sh_update(running_machine *machine)
 {
-	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(machine, "samples");
 	int preset, amp;
 
 	if (latched_0c01 != meadows_0c01 || latched_0c03 != meadows_0c03)
@@ -104,9 +104,9 @@ void meadows_sh_update(running_machine *machine)
 		dac_enable = meadows_0c03 & ENABLE_DAC;
 
 		if (dac_enable)
-			dac_data_w(devtag_get_device(machine, SOUND, "dac"), meadows_dac);
+			dac_data_w(devtag_get_device(machine, "dac"), meadows_dac);
 		else
-			dac_data_w(devtag_get_device(machine, SOUND, "dac"), 0);
+			dac_data_w(devtag_get_device(machine, "dac"), 0);
 	}
 
 	latched_0c01 = meadows_0c01;
@@ -121,9 +121,9 @@ void meadows_sh_dac_w(running_machine *machine, int data)
 {
 	meadows_dac = data;
 	if (dac_enable)
-		dac_data_w(devtag_get_device(machine, SOUND, "dac"), meadows_dac);
+		dac_data_w(devtag_get_device(machine, "dac"), meadows_dac);
 	else
-		dac_data_w(devtag_get_device(machine, SOUND, "dac"), 0);
+		dac_data_w(devtag_get_device(machine, "dac"), 0);
 }
 
 

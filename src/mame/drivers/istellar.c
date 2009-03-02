@@ -80,7 +80,7 @@ static VIDEO_UPDATE( istellar )
 
 static MACHINE_START( istellar )
 {
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, "laserdisc");
 }
 
 

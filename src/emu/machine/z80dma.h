@@ -14,7 +14,7 @@
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_Z80DMA_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, Z80DMA)
+	MDRV_DEVICE_REMOVE(_tag)
 
 typedef struct _z80dma_interface z80dma_interface;
 struct _z80dma_interface

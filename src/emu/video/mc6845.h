@@ -24,8 +24,8 @@
 	MDRV_DEVICE_ADD(_tag, _variant, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_MC6845_REMOVE(_tag, _variant) \
-	MDRV_DEVICE_REMOVE(_tag, _variant)
+#define MDRV_MC6845_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 

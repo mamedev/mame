@@ -865,7 +865,7 @@ static DEVICE_START( cdp1869 )
 	cdp1869->wnoff = 1;
 
 	/* get the screen device */
-	cdp1869->screen = devtag_get_device(device->machine, VIDEO_SCREEN, cdp1869->intf->screen_tag);
+	cdp1869->screen = devtag_get_device(device->machine, cdp1869->intf->screen_tag);
 	assert(cdp1869->screen != NULL);
 
 	/* get the CPU device */

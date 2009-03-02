@@ -61,11 +61,11 @@ static void adjust_sample(const device_config *samples, UINT8 freq)
 
 WRITE8_HANDLER( targ_audio_1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 
 	/* CPU music */
 	if ((data & 0x01) != (port_1_last & 0x01))
-		dac_data_w(devtag_get_device(space->machine, SOUND, "dac"),(data & 0x01) * 0xff);
+		dac_data_w(devtag_get_device(space->machine, "dac"),(data & 0x01) * 0xff);
 
 	/* shot */
 	if (FALLING_EDGE(0x02) && !sample_playing(samples, 0))  sample_start(samples, 0,1,0);
@@ -114,7 +114,7 @@ WRITE8_HANDLER( targ_audio_2_w )
 {
 	if ((data & 0x01) && !(port_2_last & 0x01))
 	{
-		const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+		const device_config *samples = devtag_get_device(space->machine, "samples");
 		UINT8 *prom = memory_region(space->machine, "targ");
 
 		tone_pointer = (tone_pointer + 1) & 0x0f;
@@ -128,7 +128,7 @@ WRITE8_HANDLER( targ_audio_2_w )
 
 WRITE8_HANDLER( spectar_audio_2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	adjust_sample(samples, data);
 }
 
@@ -147,7 +147,7 @@ static const char *const sample_names[] =
 
 static void common_audio_start(running_machine *machine, int freq)
 {
-	const device_config *samples = devtag_get_device(machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(machine, "samples");
 	max_freq = freq;
 
 	tone_freq = 0;

@@ -120,9 +120,9 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( SOUND, "ym", ym3812_w )
+	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ym", ym3812_w )
 
-	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVWRITE( SOUND, "oki", okim6295_w )
+	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVWRITE( "oki", okim6295_w )
 
 	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE( subsino_tiles_offset_w )
 

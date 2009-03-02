@@ -40,7 +40,7 @@
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_CDP1852_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, CDP1852)
+	MDRV_DEVICE_REMOVE(_tag)
 
 #define CDP1852_INTERFACE(_name) \
 	const cdp1852_interface (_name)=

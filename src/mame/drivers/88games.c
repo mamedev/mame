@@ -114,14 +114,14 @@ static WRITE8_HANDLER( speech_control_w )
 
 	strcpy((char *)speech_chip, ( data & 4 ) ? "upd2" : "upd1");
 
-	upd = devtag_get_device(space->machine, SOUND, (char *)speech_chip);
+	upd = devtag_get_device(space->machine, (char *)speech_chip);
 	upd7759_reset_w( upd, data & 2 );
 	upd7759_start_w( upd, data & 1 );
 }
 
 static WRITE8_HANDLER( speech_msg_w )
 {
-	upd7759_port_w( devtag_get_device(space->machine, SOUND, (char *)speech_chip), 0, data );
+	upd7759_port_w( devtag_get_device(space->machine, (char *)speech_chip), 0, data );
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(speech_msg_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE(SOUND, "ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(speech_control_w)
 ADDRESS_MAP_END
 

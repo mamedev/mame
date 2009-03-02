@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE(SOUND, "ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 	AM_RANGE(0x02, 0x02) AM_NOP
 ADDRESS_MAP_END
 
@@ -414,13 +414,13 @@ static WRITE8_HANDLER( sound_vol )
 	double lgain = gains[data & 0xf];
 	double rgain = gains[data >> 4];
 
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.1l"), lgain);
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.2l"), lgain);
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.3l"), lgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, "f2203.1l"), lgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, "f2203.2l"), lgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, "f2203.3l"), lgain);
 
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.1r"), rgain);
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.2r"), rgain);
-	flt_volume_set_volume(devtag_get_device(space->machine, SOUND, "f2203.3r"), rgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, "f2203.1r"), rgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, "f2203.2r"), rgain);
+	flt_volume_set_volume(devtag_get_device(space->machine, "f2203.3r"), rgain);
 }
 
 static void ym2203_irq(const device_config *device, int irq)

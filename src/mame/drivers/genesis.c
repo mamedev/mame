@@ -256,7 +256,7 @@ READ16_HANDLER ( genesis_68k_to_z80_r )
 	{
 		if (ACCESSING_BITS_0_7)
 			offset += 1;
-		return ym3438_r(devtag_get_device(space->machine, SOUND, "ym"), offset);
+		return ym3438_r(devtag_get_device(space->machine, "ym"), offset);
 	}
 
 	/* Bank Register */
@@ -308,7 +308,7 @@ READ16_HANDLER ( megaplay_68k_to_z80_r )
 	{
 		if (ACCESSING_BITS_0_7)
 			offset += 1;
-		return ym3438_r(devtag_get_device(space->machine, SOUND, "ym"), offset);
+		return ym3438_r(devtag_get_device(space->machine, "ym"), offset);
 	}
 
 	/* Bank Register */
@@ -350,7 +350,7 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 	/* YM2612 */
 	if ((offset >= 0x4000) && (offset <= 0x5fff))
 	{
-		const device_config *ym = devtag_get_device(space->machine, SOUND, "ym");
+		const device_config *ym = devtag_get_device(space->machine, "ym");
 		switch (offset & 3)
 		{
 		case 0:
@@ -383,7 +383,7 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 
 		if ( (offset >= 0x10) && (offset <=0x17) )
 		{
-			const device_config *sn = devtag_get_device(space->machine, SOUND, "sn");
+			const device_config *sn = devtag_get_device(space->machine, "sn");
 			if (ACCESSING_BITS_0_7) sn76496_w(sn, 0, data & 0xff);
 			if (ACCESSING_BITS_8_15) sn76496_w(sn, 0, (data >>8) & 0xff);
 		}
@@ -512,7 +512,7 @@ READ8_HANDLER ( genesis_z80_r )
 	/* YM2610 */
 	if ((offset >= 0x4000) && (offset <= 0x5fff))
 	{
-		return ym3438_r(devtag_get_device(space->machine, SOUND, "ym"), offset);
+		return ym3438_r(devtag_get_device(space->machine, "ym"), offset);
 	}
 
 	/* Bank Register */
@@ -543,7 +543,7 @@ WRITE8_HANDLER ( genesis_z80_w )
 	/* YM2610 */
 	if ((offset >= 0x4000) && (offset <= 0x5fff))
 	{
-		ym3438_w(devtag_get_device(space->machine, SOUND, "ym"), offset & 3, data);
+		ym3438_w(devtag_get_device(space->machine, "ym"), offset & 3, data);
 	}
 
 	/* Bank Register */

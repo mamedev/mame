@@ -232,14 +232,14 @@ static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE(SOUND, "msm", msm5232_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE(SOUND, "msm", sound_control_0_w)
-	AM_RANGE(0xce00, 0xce00) AM_DEVWRITE(SOUND, "msm", sound_control_1_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE("msm", sound_control_0_w)
+	AM_RANGE(0xce00, 0xce00) AM_DEVWRITE("msm", sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_r, to_main_w)
 	AM_RANGE(0xda00, 0xda00) AM_READWRITE(SMH_NOP, nmi_enable_w)			/* unknown read*/
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE(SOUND, "dac", dac_w)	/* signed 8-bit DAC &  unknown read */
+	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_w)	/* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
 ADDRESS_MAP_END
 
@@ -642,7 +642,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER(SOUND, "ay", sound_control_2_w),
+	DEVCB_DEVICE_HANDLER("ay", sound_control_2_w),
 	DEVCB_HANDLER(sound_control_3_w)
 };
 

@@ -622,7 +622,7 @@ static WRITE16_HANDLER( io_w )
 		}
 		case 0x30:
 		{
-			sn76496_w(devtag_get_device(space->machine, SOUND, "sn"), 0, data & 0xff);
+			sn76496_w(devtag_get_device(space->machine, "sn"), 0, data & 0xff);
 			break;
 		}
 		case 0x31:

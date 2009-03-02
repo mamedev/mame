@@ -435,7 +435,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x21000a, 0x21000b) AM_READ_PORT("P2")									\
 	AM_RANGE(0x21000c, 0x21000d) AM_READ_PORT("SYSTEM")								\
 	AM_RANGE(0x21000e, 0x21000f) AM_READ(SMH_NOP				)	/*          */	\
-	AM_RANGE(0x300000, 0x30007f) AM_DEVREAD8(SOUND, "ensoniq", es5506_r, 0x00ff	)	/*  Sound   */	\
+	AM_RANGE(0x300000, 0x30007f) AM_DEVREAD8("ensoniq", es5506_r, 0x00ff	)	/*  Sound   */	\
 	AM_RANGE(0x482000, 0x482fff) AM_RAM_WRITE(dsp_w) AM_BASE(&dsp_ram)				\
 	AM_RANGE(_ROM, 0xffffff) AM_READ(SMH_BANK1					)	/*  ROM  */	    \
 //AM_RANGE(0x990000, 0x99007f) AM_READ(fake_r)
@@ -451,7 +451,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x230000, 0x230071) AM_WRITE(SMH_RAM) AM_BASE(&ssv_irq_vectors)	          /* IRQ Vectors */ \
 	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                                 /* IRQ Ack */     \
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                               /* IRQ Enable */  \
-	AM_RANGE(0x300000, 0x30007f) AM_DEVWRITE8(SOUND, "ensoniq", es5506_w, 0x00ff)         /* Sound */       \
+	AM_RANGE(0x300000, 0x30007f) AM_DEVWRITE8("ensoniq", es5506_w, 0x00ff)         /* Sound */       \
 //AM_RANGE(0x990000, 0x99007f) AM_WRITE(ssv_scroll_w)
 
 
@@ -835,7 +835,7 @@ static WRITE16_HANDLER( srmp7_sound_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		const device_config *device = devtag_get_device(space->machine, SOUND, "ensoniq");
+		const device_config *device = devtag_get_device(space->machine, "ensoniq");
 		int bank = 0x400000/2 * (data & 1);	// UINT16 address
 		int voice;
 		for (voice = 0; voice < 32; voice++)

@@ -542,7 +542,7 @@ WRITE8_HANDLER( mario_sh3_w )
 			I8035_P1_W_AH(space,3,data & 1);
 			break;
 		case 7: /* skid */
-			discrete_sound_w(devtag_get_device(space->machine, SOUND, "discrete"),DS_SOUND7_INP,data & 1);
+			discrete_sound_w(devtag_get_device(space->machine, "discrete"),DS_SOUND7_INP,data & 1);
 			break;
 	}
 }
@@ -559,7 +559,7 @@ static ADDRESS_MAP_START( mario_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mario_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(mario_sh_tune_r) AM_DEVWRITE(SOUND, "discrete", mario_sh_sound_w)
+	AM_RANGE(0x00, 0xff) AM_READ(mario_sh_tune_r) AM_DEVWRITE("discrete", mario_sh_sound_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mario_sh_p1_r, mario_sh_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mario_sh_p2_r, mario_sh_p2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mario_sh_t0_r)
@@ -569,8 +569,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( masao_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE(SOUND, "ay", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay", ay8910_address_w)
 ADDRESS_MAP_END
 
 /*************************************

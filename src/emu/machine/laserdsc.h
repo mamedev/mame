@@ -127,8 +127,8 @@ struct _laserdisc_config
 	MDRV_DEVICE_CONFIG_DATAFP32(laserdisc_config, overscalex, _scalex, 24) \
 	MDRV_DEVICE_CONFIG_DATAFP32(laserdisc_config, overscaley, _scaley, 24)
 
-#define MDRV_LASERDISC_REMOVE(_tag, _type) \
-	MDRV_DEVICE_REMOVE(_tag, _type)
+#define MDRV_LASERDISC_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 /* use these to add laserdisc screens with proper video update parameters */

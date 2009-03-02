@@ -101,7 +101,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	interrupt_enable_w(space, 0,data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
-	dac_data_w(devtag_get_device(device->machine, SOUND, "dac"), ((data & 0x80) >> 7) * 255);
+	dac_data_w(devtag_get_device(device->machine, "dac"), ((data & 0x80) >> 7) * 255);
 
 //  logerror("%s: sound_w %02x\n",cpuexec_describe_context(device->machine),data);
 //  popmessage("%02x",data);
@@ -195,8 +195,8 @@ static WRITE8_HANDLER( signature_w )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREAD(PPI8255, "ppi8255_0", ppi8255_r)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREAD(PPI8255, "ppi8255_1", ppi8255_r)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREAD("ppi8255_0", ppi8255_r)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREAD("ppi8255_1", ppi8255_r)
 	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
@@ -206,8 +206,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x4800, 0x4803) AM_DEVWRITE(PPI8255, "ppi8255_0", ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVWRITE(PPI8255, "ppi8255_1", ppi8255_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVWRITE("ppi8255_0", ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVWRITE("ppi8255_1", ppi8255_w)
 	/* banked ROMs are enabled by low 6 bits of the address */
 	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_1_w)
 	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_2_w)

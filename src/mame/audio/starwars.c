@@ -21,7 +21,7 @@ static const device_config *riot;
 
 SOUND_START( starwars )
 {
-	riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
+	riot = devtag_get_device(machine, "riot");
 }
 
 
@@ -45,13 +45,13 @@ static UINT8 r6532_porta_r(const device_config *device, UINT8 olddata)
 	/* d0 (out) TMS5220 Not Write       */
 	/* Note: bit 4 is always set to avoid sound self test */
 
-	return (olddata & 0xc0) | 0x10 | (!tms5220_ready_r(devtag_get_device(device->machine, SOUND, "tms")) << 2);
+	return (olddata & 0xc0) | 0x10 | (!tms5220_ready_r(devtag_get_device(device->machine, "tms")) << 2);
 }
 
 
 static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	const device_config *tms = devtag_get_device(device->machine, SOUND, "tms");
+	const device_config *tms = devtag_get_device(device->machine, "tms");
 
 	/* handle 5220 read */
 	if ((olddata & 2) != 0 && (newdata & 2) == 0)

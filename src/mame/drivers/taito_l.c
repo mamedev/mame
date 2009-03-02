@@ -665,11 +665,11 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 	AM_RANGE(0xff08, 0xff08) AM_WRITE(rombankswitch_w)
 
 #define COMMON_SINGLE_READ \
-	AM_RANGE(0xa000, 0xa003) AM_DEVREAD(SOUND, "ym", extport_select_and_ym2203_r)	\
+	AM_RANGE(0xa000, 0xa003) AM_DEVREAD("ym", extport_select_and_ym2203_r)	\
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
 
 #define COMMON_SINGLE_WRITE \
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym", ym2203_w)		\
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym", ym2203_w)		\
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
 
 
@@ -716,7 +716,7 @@ static ADDRESS_MAP_START( fhawk_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(SMH_NOP)
 	AM_RANGE(0xe001, 0xe001) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREAD(SOUND, "ym", ym2203_r)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREAD("ym", ym2203_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fhawk_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -724,7 +724,7 @@ static ADDRESS_MAP_START( fhawk_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE("ym", ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raimais_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -763,7 +763,7 @@ static ADDRESS_MAP_START( raimais_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVREAD(SOUND, "ym", ym2610_r)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
 	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -779,7 +779,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static ADDRESS_MAP_START( raimais_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE(SOUND, "ym", ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
@@ -832,7 +832,7 @@ static ADDRESS_MAP_START( champwr_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2203_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2203_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(SMH_NOP)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -840,13 +840,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champwr_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2203_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym", ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(champwr_msm5205_hi_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(champwr_msm5205_lo_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE(SOUND, "msm", champwr_msm5205_start_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(SOUND, "msm", champwr_msm5205_stop_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("msm", champwr_msm5205_start_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", champwr_msm5205_stop_w)
 ADDRESS_MAP_END
 
 
@@ -871,7 +871,7 @@ static ADDRESS_MAP_START( kurikint_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(shared_r)
-	AM_RANGE(0xe800, 0xe801) AM_DEVREAD(SOUND, "ym", ym2203_r)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREAD("ym", ym2203_r)
 #if 0
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
@@ -885,7 +885,7 @@ static ADDRESS_MAP_START( kurikint_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE(SOUND, "ym", ym2203_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ym", ym2203_w)
 #if 0
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 #endif
@@ -1034,7 +1034,7 @@ static ADDRESS_MAP_START( evilston_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(shared_r)//shared_r },
-	AM_RANGE(0xe800, 0xe801) AM_DEVREAD(SOUND, "ym", ym2203_r)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREAD("ym", ym2203_r)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK7)
 ADDRESS_MAP_END
 
@@ -1042,7 +1042,7 @@ static ADDRESS_MAP_START( evilston_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE(SOUND, "ym", ym2203_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ym", ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -2050,7 +2050,7 @@ static const ym2203_interface ym2203_interface_champwr =
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_HANDLER(portA_w),
-		DEVCB_DEVICE_HANDLER(SOUND, "msm", champwr_msm5205_volume_w),
+		DEVCB_DEVICE_HANDLER("msm", champwr_msm5205_volume_w),
 	},
 	irqhandler
 };

@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(starwars_sout_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(starwars_sin_r)		/* SIN Read */
 	AM_RANGE(0x1000, 0x107f) AM_RAM							/* 6532 ram */
-	AM_RANGE(0x1080, 0x109f) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x1080, 0x109f) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x1800, 0x183f) AM_WRITE(quad_pokey_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM							/* program RAM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROM							/* sound roms */

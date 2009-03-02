@@ -364,9 +364,9 @@ static ADDRESS_MAP_START( multfish_portmap, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x35, 0x35) AM_WRITE(multfish_port35_w)
 //  AM_RANGE(0x36, 0x36) AM_WRITE(multfish_port36_w)
 //  AM_RANGE(0x37, 0x37) AM_WRITE(multfish_watchdog_reset_w)
-	AM_RANGE(0x38, 0x38) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
-	AM_RANGE(0x39, 0x39) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
-	AM_RANGE(0x3a, 0x3a) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0x38, 0x38) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x39, 0x39) AM_DEVWRITE("ay", ay8910_data_w)
+	AM_RANGE(0x3a, 0x3a) AM_DEVREAD("ay", ay8910_r)
 
 	AM_RANGE(0x90, 0x90) AM_READ(ray_r)
 

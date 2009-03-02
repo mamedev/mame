@@ -231,9 +231,9 @@ static READ8_HANDLER( kamikaze_ppi_r )
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset);
+		result &= ppi8255_r(devtag_get_device(space->machine, "ppi8255_0"), offset);
 	if (!(offset & 8))
-		result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset);
+		result &= ppi8255_r(devtag_get_device(space->machine, "ppi8255_1"), offset);
 	return result;
 }
 
@@ -242,9 +242,9 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset, data);
+		ppi8255_w(devtag_get_device(space->machine, "ppi8255_0"), offset, data);
 	if (!(offset & 8))
-		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset, data);
+		ppi8255_w(devtag_get_device(space->machine, "ppi8255_1"), offset, data);
 }
 
 
@@ -257,7 +257,7 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 
 static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	int bits_gone_hi = data & ~sound_state[0];
 	sound_state[0] = data;
 
@@ -274,7 +274,7 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 
 static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 {
-	const device_config *samples = devtag_get_device(device->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(device->machine, "samples");
 	int bits_gone_hi = data & ~sound_state[1];
 	sound_state[1] = data;
 
@@ -290,7 +290,7 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 
 static WRITE8_HANDLER( spaceint_sound1_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	int bits_gone_hi = data & ~sound_state[0];
 	sound_state[0] = data;
 
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( spaceint_sound1_w )
 
 static WRITE8_HANDLER( spaceint_sound2_w )
 {
-	const device_config *samples = devtag_get_device(space->machine, SOUND, "samples");
+	const device_config *samples = devtag_get_device(space->machine, "samples");
 	int bits_gone_hi = data & ~sound_state[1];
 	sound_state[1] = data;
 

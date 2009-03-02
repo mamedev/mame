@@ -609,7 +609,7 @@ static WRITE8_HANDLER( backupram_enable_w )
 
 static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 {
-	const device_config *adpcm = devtag_get_device(space->machine, SOUND, "msm");
+	const device_config *adpcm = devtag_get_device(space->machine, "msm");
 
 	mastboy_m5205_sambit0 = data & 1;
 	msm5205_playmode_w(adpcm,  (1 << 2) | (mastboy_m5205_sambit1 << 1) | (mastboy_m5205_sambit0) );
@@ -619,7 +619,7 @@ static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit0_w )
 
 static WRITE8_HANDLER( msm5205_mastboy_m5205_sambit1_w )
 {
-	const device_config *adpcm = devtag_get_device(space->machine, SOUND, "msm");
+	const device_config *adpcm = devtag_get_device(space->machine, "msm");
 
 	mastboy_m5205_sambit1 = data & 1;
 
@@ -701,13 +701,13 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xff000, 0xff7ff) AM_WRITE(mastboy_backupram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xff820, 0xff827) AM_WRITE(mastboy_bank_w)
-	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE(SOUND, "saa", saa1099_data_w)
-	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE(SOUND, "saa", saa1099_control_w)
+	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE("saa", saa1099_data_w)
+	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE("saa", saa1099_control_w)
 	AM_RANGE(0xff830, 0xff830) AM_WRITE(mastboy_msm5205_data_w)
 	AM_RANGE(0xff838, 0xff838) AM_WRITE(mastboy_irq0_ack_w)
 	AM_RANGE(0xff839, 0xff839) AM_WRITE(msm5205_mastboy_m5205_sambit0_w)
 	AM_RANGE(0xff83a, 0xff83a) AM_WRITE(msm5205_mastboy_m5205_sambit1_w)
-	AM_RANGE(0xff83b, 0xff83b) AM_DEVWRITE(SOUND, "msm", mastboy_msm5205_reset_w)
+	AM_RANGE(0xff83b, 0xff83b) AM_DEVWRITE("msm", mastboy_msm5205_reset_w)
 	AM_RANGE(0xff83c, 0xff83c) AM_WRITE(backupram_enable_w)
 	AM_RANGE(0xffc00, 0xfffff) AM_WRITE(SMH_RAM) // Internal RAM
 ADDRESS_MAP_END
@@ -856,7 +856,7 @@ static MACHINE_RESET( mastboy )
 	memset( mastboy_vram, 0x00, 0x10000);
 
 	mastboy_m5205_part = 0;
-	msm5205_reset_w(devtag_get_device(machine, SOUND, "msm"),1);
+	msm5205_reset_w(devtag_get_device(machine, "msm"),1);
 	mastboy_irq0_ack = 0;
 }
 

@@ -951,7 +951,7 @@ READ8_HANDLER( quad_pokey_r )
 	int control = (offset & 0x20) >> 2;
 	int pokey_reg = (offset % 8) | control;
 
-	return pokey_r(devtag_get_device(space->machine, SOUND, devname[pokey_num]), pokey_reg);
+	return pokey_r(devtag_get_device(space->machine, devname[pokey_num]), pokey_reg);
 }
 
 
@@ -1337,7 +1337,7 @@ WRITE8_HANDLER( quad_pokey_w )
     int control = (offset & 0x20) >> 2;
     int pokey_reg = (offset % 8) | control;
 
-    pokey_w(devtag_get_device(space->machine, SOUND, devname[pokey_num]), pokey_reg, data);
+    pokey_w(devtag_get_device(space->machine, devname[pokey_num]), pokey_reg, data);
 }
 
 void pokey_serin_ready(const device_config *device, int after)

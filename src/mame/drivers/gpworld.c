@@ -217,7 +217,7 @@ static VIDEO_UPDATE( gpworld )
 
 static MACHINE_START( gpworld )
 {
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, "laserdisc");
 }
 
 

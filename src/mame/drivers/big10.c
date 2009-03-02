@@ -140,8 +140,8 @@ static ADDRESS_MAP_START( main_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x99, 0x99) AM_WRITE(v9938_0_command_w) AM_READ(v9938_0_status_r)
 	AM_RANGE(0x9a, 0x9a) AM_WRITE(v9938_0_palette_w)
 	AM_RANGE(0x9b, 0x9b) AM_WRITE(v9938_0_register_w)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD(SOUND, "ay", ay8910_r) /* Dip-Switches routes here. */
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("ay", ay8910_r) /* Dip-Switches routes here. */
 ADDRESS_MAP_END
 
 

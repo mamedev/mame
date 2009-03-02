@@ -191,8 +191,8 @@ static ADDRESS_MAP_START( lordgun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x503c00, 0x503c01) AM_READ(lordgun_gun_0_y_r)
 	AM_RANGE(0x503e00, 0x503e01) AM_READ(lordgun_gun_1_y_r)
 	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
-	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", lordgun_ppi8255_r, lordgun_ppi8255_w)
-	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE(PPI8255, "ppi8255_1", lordgun_ppi8255_r, lordgun_ppi8255_w)
+	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE("ppi8255_0", lordgun_ppi8255_r, lordgun_ppi8255_w)
+	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE("ppi8255_1", lordgun_ppi8255_r, lordgun_ppi8255_w)
 	AM_RANGE(0x50a900, 0x50a9ff) AM_RAM	// protection
 ADDRESS_MAP_END
 
@@ -218,8 +218,8 @@ static ADDRESS_MAP_START( hfh_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x502e00, 0x502e01) AM_WRITE(SMH_RAM) AM_BASE(&lordgun_scroll_y_3)
 	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
 	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
-	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", lordgun_ppi8255_r, lordgun_ppi8255_w)
-	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE(PPI8255, "ppi8255_1", lordgun_ppi8255_r, lordgun_ppi8255_w)
+	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE("ppi8255_0", lordgun_ppi8255_r, lordgun_ppi8255_w)
+	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE("ppi8255_1", lordgun_ppi8255_r, lordgun_ppi8255_w)
 	AM_RANGE(0x50b900, 0x50b9ff) AM_RAM	// protection
 ADDRESS_MAP_END
 
@@ -243,12 +243,12 @@ static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 }
 
 static ADDRESS_MAP_START( lordgun_soundio_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE( SOUND, "ym", ym3812_w )
-	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE( "ym", ym3812_w )
+	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_READ( SMH_NOP )
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE( SOUND, "oki", lordgun_okibank_w )
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE( "oki", lordgun_okibank_w )
 ADDRESS_MAP_END
 
 
@@ -256,9 +256,9 @@ static ADDRESS_MAP_START( hfh_soundio_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_READ( SMH_NOP )
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE( SOUND, "ym", ym3812_w )
-	AM_RANGE(0x7400, 0x7400) AM_DEVREADWRITE( SOUND, "oki", okim6295_r, okim6295_w )
-	AM_RANGE(0x7800, 0x7800) AM_DEVREADWRITE( SOUND, "oki2", okim6295_r, okim6295_w )
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE( "ym", ym3812_w )
+	AM_RANGE(0x7400, 0x7400) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x7800, 0x7800) AM_DEVREADWRITE( "oki2", okim6295_r, okim6295_w )
 ADDRESS_MAP_END
 
 

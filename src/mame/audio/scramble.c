@@ -181,19 +181,19 @@ static void filter_w(const device_config *device, int data)
 
 WRITE8_HANDLER( scramble_filter_w )
 {
-	filter_w(devtag_get_device(space->machine, SOUND, "filter.1.0"), (offset >>  0) & 3);
-	filter_w(devtag_get_device(space->machine, SOUND, "filter.1.1"), (offset >>  2) & 3);
-	filter_w(devtag_get_device(space->machine, SOUND, "filter.1.2"), (offset >>  4) & 3);
-	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.0"), (offset >>  6) & 3);
-	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.1"), (offset >>  8) & 3);
-	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.2"), (offset >> 10) & 3);
+	filter_w(devtag_get_device(space->machine, "filter.1.0"), (offset >>  0) & 3);
+	filter_w(devtag_get_device(space->machine, "filter.1.1"), (offset >>  2) & 3);
+	filter_w(devtag_get_device(space->machine, "filter.1.2"), (offset >>  4) & 3);
+	filter_w(devtag_get_device(space->machine, "filter.0.0"), (offset >>  6) & 3);
+	filter_w(devtag_get_device(space->machine, "filter.0.1"), (offset >>  8) & 3);
+	filter_w(devtag_get_device(space->machine, "filter.0.2"), (offset >> 10) & 3);
 }
 
 WRITE8_HANDLER( frogger_filter_w )
 {
-	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.0"), (offset >>  6) & 3);
-	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.1"), (offset >>  8) & 3);
-	filter_w(devtag_get_device(space->machine, SOUND, "filter.0.2"), (offset >> 10) & 3);
+	filter_w(devtag_get_device(space->machine, "filter.0.0"), (offset >>  6) & 3);
+	filter_w(devtag_get_device(space->machine, "filter.0.1"), (offset >>  8) & 3);
+	filter_w(devtag_get_device(space->machine, "filter.0.2"), (offset >> 10) & 3);
 }
 
 
@@ -300,7 +300,7 @@ static UINT8 speech_cnt;
 
 static TIMER_CALLBACK( ad2083_step )
 {
-	const device_config *tms = devtag_get_device(machine, SOUND, "tms");
+	const device_config *tms = devtag_get_device(machine, "tms");
 
 	/* only 16 bytes needed ... The original dump is bad. This
      * is what is needed to get speech to work. The prom data has
@@ -407,10 +407,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ad2083_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ad2083_tms5110_ctrl_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE(SOUND, "ay1", ay8910_address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE(SOUND, "ay1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(SOUND, "ay2", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE(SOUND, "ay2", ay8910_address_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay2", ay8910_address_w)
 ADDRESS_MAP_END
 
 static SOUND_START( ad2083 )

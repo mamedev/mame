@@ -96,21 +96,21 @@ static WRITE8_DEVICE_HANDLER( sound_bank_w )
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD(SOUND, "ym", ym3812_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami1", k007232_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym", ym3812_r)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami1", k007232_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9800, 0x987f) AM_DEVWRITE(SOUND, "konami2", k051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE(SOUND, "konami2", k051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE(SOUND, "konami2", k051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE(SOUND, "konami2", k051649_keyonoff_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE(SOUND, "ym", ym3812_w)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami1", k007232_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(SOUND, "konami1", sound_bank_w) /* 7232 bankswitch */
+	AM_RANGE(0x9800, 0x987f) AM_DEVWRITE("konami2", k051649_waveform_w)
+	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("konami2", k051649_frequency_w)
+	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("konami2", k051649_volume_w)
+	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("konami2", k051649_keyonoff_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami1", k007232_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("konami1", sound_bank_w) /* 7232 bankswitch */
 ADDRESS_MAP_END
 
 /*****************************************************************************/

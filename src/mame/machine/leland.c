@@ -378,7 +378,7 @@ MACHINE_RESET( leland )
 
 	/* reset globals */
 	leland_gfx_control = 0x00;
-	leland_sound_port_w(devtag_get_device(machine, SOUND, "ay8910.1"), 0, 0xff);
+	leland_sound_port_w(devtag_get_device(machine, "ay8910.1"), 0, 0xff);
 	wcol_enable = 0;
 
 	dangerz_x = 512;
@@ -1169,7 +1169,7 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x03:	/* /IGID */
 		case 0x13:
-			result = ay8910_r(devtag_get_device(space->machine, SOUND, "ay8910.1"), offset);
+			result = ay8910_r(devtag_get_device(space->machine, "ay8910.1"), offset);
 			break;
 
 		case 0x10:	/* /GIN0 */
@@ -1209,7 +1209,7 @@ WRITE8_HANDLER( leland_master_output_w )
 
 		case 0x0a:	/* /OGIA */
 		case 0x0b:	/* /OGID */
-			ay8910_address_data_w(devtag_get_device(space->machine, SOUND, "ay8910.1"), offset, data);
+			ay8910_address_data_w(devtag_get_device(space->machine, "ay8910.1"), offset, data);
 			break;
 
 		case 0x0c:	/* /BKXL */

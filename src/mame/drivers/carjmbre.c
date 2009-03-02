@@ -97,10 +97,10 @@ static ADDRESS_MAP_START( carjmbre_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)				//?? written on init/0xff sound command reset
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE(SOUND, "ay1", ay8910_address_data_w)
+	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x22, 0x22) AM_WRITE(SMH_NOP)				//?? written before and after 0x21 with same value
 	AM_RANGE(0x24, 0x24) AM_READ(SMH_NOP)				//??
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE(SOUND, "ay2", ay8910_address_data_w)
+	AM_RANGE(0x30, 0x31) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x32, 0x32) AM_WRITE(SMH_NOP)				//?? written before and after 0x31 with same value
 ADDRESS_MAP_END
 

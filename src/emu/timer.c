@@ -1079,7 +1079,7 @@ static TIMER_CALLBACK( scanline_timer_device_timer_callback )
 	timer_config *config = timer->inline_config;
 
 	/* get the screen device and verify it */
-	const device_config *screen = device_list_find_by_tag(timer->machine->config->devicelist, VIDEO_SCREEN, config->screen);
+	const device_config *screen = devtag_get_device(timer->machine, config->screen);
 	assert(screen != NULL);
 
 	/* first time, start with the first scanline, but do not call the callback */

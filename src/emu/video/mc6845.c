@@ -759,7 +759,7 @@ static void common_start(const device_config *device, int device_type)
 		mc6845->hpixels_per_column = mc6845->intf->hpixels_per_column;
 
 		/* get the screen device */
-		mc6845->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, mc6845->intf->screen_tag);
+		mc6845->screen = devtag_get_device(device->machine, mc6845->intf->screen_tag);
 		assert(mc6845->screen != NULL);
 
 		/* create the timers */

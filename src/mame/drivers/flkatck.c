@@ -31,7 +31,7 @@ static int multiply_reg[2];
 
 static MACHINE_RESET( flkatck )
 {
-	k007232_set_bank( devtag_get_device(machine, SOUND, "konami"), 0, 1 );
+	k007232_set_bank( devtag_get_device(machine, "konami"), 0, 1 );
 }
 
 static INTERRUPT_GEN( flkatck_interrupt )
@@ -133,8 +133,8 @@ static ADDRESS_MAP_START( flkatck_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x9001, 0x9001) AM_READ(SMH_RAM)               /* ??? */
 	AM_RANGE(0x9004, 0x9004) AM_READ(SMH_RAM)				/* ??? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD(SOUND, "konami", k007232_r)	/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD(SOUND, "ym", ym2151_r) /* YM2151 */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami", k007232_r)	/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r) /* YM2151 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flkatck_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
@@ -143,8 +143,8 @@ static ADDRESS_MAP_START( flkatck_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)					/* ??? */
 //  AM_RANGE(0x9001, 0x9001) AM_WRITE(SMH_RAM)                  /* ??? */
 	AM_RANGE(0x9006, 0x9006) AM_WRITE(SMH_RAM)					/* ??? */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE(SOUND, "konami", k007232_w) 	/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE(SOUND, "ym", ym2151_w)		/* YM2151 */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami", k007232_w) 	/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)		/* YM2151 */
 ADDRESS_MAP_END
 
 

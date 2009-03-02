@@ -57,7 +57,7 @@ READ8_HANDLER( hyperspt_sh_timer_r )
 {
     UINT32 clock = cpu_get_total_cycles(space->cpu) / TIMER_RATE;
 
-    return (clock & 0x3) | (vlm5030_bsy(devtag_get_device(space->machine, SOUND, "vlm"))? 0x04 : 0);
+    return (clock & 0x3) | (vlm5030_bsy(devtag_get_device(space->machine, "vlm"))? 0x04 : 0);
 }
 
 WRITE8_DEVICE_HANDLER( hyperspt_sound_w )

@@ -50,7 +50,6 @@ typedef struct _z80_daisy_state z80_daisy_state;
 typedef struct _z80_daisy_chain z80_daisy_chain;
 struct _z80_daisy_chain
 {
-	device_type		devtype;					/* type of device */
 	const char *	devname;					/* name of the device */
 };
 

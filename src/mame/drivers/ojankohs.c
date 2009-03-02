@@ -88,7 +88,7 @@ static WRITE8_HANDLER( ojankoy_rombank_w )
 	ojankohs_adpcm_reset = ((data & 0x20) >> 5);
 	if (!ojankohs_adpcm_reset) ojankohs_vclk_left = 0;
 
-	msm5205_reset_w(devtag_get_device(space->machine, SOUND, "msm"), !ojankohs_adpcm_reset);
+	msm5205_reset_w(devtag_get_device(space->machine, "msm"), !ojankohs_adpcm_reset);
 }
 
 static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
@@ -131,7 +131,7 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 	memory_set_bankptr(space->machine, 1, &BANKROM[bank_address]);
 
 	ojankohs_adpcm_reset = ((data & 0x10) >> 4);
-	msm5205_reset_w(devtag_get_device(space->machine, SOUND, "msm"), (!(data & 0x10) >> 4));
+	msm5205_reset_w(devtag_get_device(space->machine, "msm"), (!(data & 0x10) >> 4));
 	ojankoc_flipscreen(space, data);
 }
 
@@ -275,11 +275,11 @@ static ADDRESS_MAP_START( ojankohs_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankohs_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(ojankohs_gfxreg_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "msm", ojankohs_adpcm_reset_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE("msm", ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ay", ay8910_data_address_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)				// unknown
 	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP)				// unknown
 ADDRESS_MAP_END
@@ -291,8 +291,8 @@ static ADDRESS_MAP_START( ojankoy_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(ojankoy_coinctr_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ay", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ccasino_io_map, ADDRESS_SPACE_IO, 8 )
@@ -300,11 +300,11 @@ static ADDRESS_MAP_START( ccasino_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankohs_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(ccasino_coinctr_w)
-	AM_RANGE(0x03, 0x03) AM_READ(ccasino_dipsw3_r) AM_DEVWRITE(SOUND, "msm", ojankohs_adpcm_reset_w)
+	AM_RANGE(0x03, 0x03) AM_READ(ccasino_dipsw3_r) AM_DEVWRITE("msm", ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(ccasino_dipsw4_r, ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ay", ay8910_data_address_w)
 	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w)		// 16bit address access
 	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP)
@@ -317,8 +317,8 @@ static ADDRESS_MAP_START( ojankoc_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfb, 0xfb) AM_WRITE(ojankoc_ctrl_w)
 	AM_RANGE(0xfc, 0xfd) AM_READ(ojankoc_keymatrix_r)
 	AM_RANGE(0xfd, 0xfd) AM_WRITE(ojankohs_portselect_w)
-	AM_RANGE(0xfe, 0xff) AM_DEVWRITE(SOUND, "ay", ay8910_data_address_w)
-	AM_RANGE(0xff, 0xff) AM_DEVREAD(SOUND, "ay", ay8910_r)
+	AM_RANGE(0xfe, 0xff) AM_DEVWRITE("ay", ay8910_data_address_w)
+	AM_RANGE(0xff, 0xff) AM_DEVREAD("ay", ay8910_r)
 ADDRESS_MAP_END
 
 

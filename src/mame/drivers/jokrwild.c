@@ -176,11 +176,11 @@ static ADDRESS_MAP_START( jokrwild_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_WRITE(jokrwild_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_WRITE(jokrwild_colorram_w) AM_BASE(&colorram)
 //  AM_RANGE(0x0010, 0x0010) AM_READ(random_gen_r)
-//  AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, pia_w)
-//  AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
+//  AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia_r, pia_w)
+//  AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia_r, pia_w)
 //  AM_RANGE(0x4010, 0x4010) AM_READNOP /* R ???? */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 //  AM_RANGE(0x6100, 0x6100) AM_READWRITENOP    /* R/W ???? */
 //  AM_RANGE(0x6200, 0x6203) another PIA?
 //  AM_RANGE(0x6300, 0x6300) unknown

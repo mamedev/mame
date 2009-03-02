@@ -169,8 +169,8 @@ static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectang
 
 static VIDEO_UPDATE(backfire)
 {
-	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "lscreen");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "rscreen");
+	const device_config *left_screen = devtag_get_device(screen->machine, "lscreen");
+	const device_config *right_screen = devtag_get_device(screen->machine, "rscreen");
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0x1e8000, 0x1e8003) AM_READ(backfire_wheel1_r)
 //  AM_RANGE(0x1e8004, 0x1e8007) AM_READ(backfire_wheel2_r)
 
-	AM_RANGE(0x1c0000, 0x1c0007) AM_DEVREADWRITE8(SOUND, "ymz", ymz280b_r, ymz280b_w, 0x000000ff)
+	AM_RANGE(0x1c0000, 0x1c0007) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
 ADDRESS_MAP_END
 
 

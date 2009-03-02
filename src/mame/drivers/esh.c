@@ -272,7 +272,7 @@ static INTERRUPT_GEN( vblank_callback_esh )
 
 static MACHINE_START( esh )
 {
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, "laserdisc");
 }
 
 

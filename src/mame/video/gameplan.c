@@ -142,7 +142,7 @@ static WRITE8_DEVICE_HANDLER( leprechn_video_command_w )
 
 static TIMER_CALLBACK( clear_screen_done_callback )
 {
-	const device_config *via = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via = devtag_get_device(machine, "via6522_0");
 
 	/* indicate that the we are done clearing the screen */
 	via_ca1_w(via, 0, 0);
@@ -195,7 +195,7 @@ static WRITE8_DEVICE_HANDLER( video_command_trigger_w )
 		case 3:
 			/* indicate that the we are busy */
 			{
-				const device_config *via = device_list_find_by_tag(device->machine->config->devicelist, VIA6522, "via6522_0");
+				const device_config *via = devtag_get_device(device->machine, "via6522_0");
 				via_ca1_w(via, 0, 1);
 			}
 
@@ -267,7 +267,7 @@ const via6522_interface trvquest_via_0_interface =
 static TIMER_CALLBACK( via_0_ca1_timer_callback )
 {
 	gameplan_state *state = machine->driver_data;
-	const device_config *via = device_list_find_by_tag(machine->config->devicelist, VIA6522, "via6522_0");
+	const device_config *via = devtag_get_device(machine, "via6522_0");
 
 	/* !VBLANK is connected to CA1 */
 	via_ca1_w(via, 0, (UINT8)param);

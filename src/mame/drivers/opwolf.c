@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD(SOUND, "ym", ym2151_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2151_r)
 	AM_RANGE(0x9002, 0x9100) AM_READ(SMH_RAM)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -322,8 +322,8 @@ static MACHINE_RESET( opwolf )
 	adpcm_end[0] = adpcm_end[1] = 0;
 	adpcm_data[0] = adpcm_data[1] = -1;
 
-	msm5205_reset_w(devtag_get_device(machine, SOUND, "msm1"), 1);
-	msm5205_reset_w(devtag_get_device(machine, SOUND, "msm2"), 1);
+	msm5205_reset_w(devtag_get_device(machine, "msm1"), 1);
+	msm5205_reset_w(devtag_get_device(machine, "msm2"), 1);
 }
 
 static void opwolf_msm5205_vck(const device_config *device)
@@ -402,11 +402,11 @@ static WRITE8_HANDLER( opwolf_adpcm_e_w )
 static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE(SOUND, "ym", ym2151_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym", ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xb000, 0xb006) AM_DEVWRITE(SOUND, "msm1", opwolf_adpcm_b_w)
-	AM_RANGE(0xc000, 0xc006) AM_DEVWRITE(SOUND, "msm2", opwolf_adpcm_c_w)
+	AM_RANGE(0xb000, 0xb006) AM_DEVWRITE("msm1", opwolf_adpcm_b_w)
+	AM_RANGE(0xc000, 0xc006) AM_DEVWRITE("msm2", opwolf_adpcm_c_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(opwolf_adpcm_d_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(opwolf_adpcm_e_w)
 ADDRESS_MAP_END

@@ -790,7 +790,7 @@ static ADDRESS_MAP_START( skns_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_WRITE(SMH_ROM) /* BIOS ROM */
 	AM_RANGE(0x00400000, 0x0040000f) AM_WRITE(skns_io_w) /* I/O Write */
 	AM_RANGE(0x00800000, 0x00801fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) /* 'backup' RAM */
-	AM_RANGE(0x00c00000, 0x00c00003) AM_DEVWRITE8(SOUND, "ymz", ymz280b_w, 0xffff0000) /* ymz280_w (sound) */
+	AM_RANGE(0x00c00000, 0x00c00003) AM_DEVWRITE8("ymz", ymz280b_w, 0xffff0000) /* ymz280_w (sound) */
 	AM_RANGE(0x01000000, 0x0100000f) AM_WRITE(skns_msm6242_w)
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(skns_hit2_w)
 	AM_RANGE(0x02000000, 0x02003fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size) /* sprite ram */

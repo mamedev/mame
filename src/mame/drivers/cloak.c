@@ -169,8 +169,8 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE(SOUND, "pokey1", pokey_r, pokey_w)		/* DSW0 also */
-	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE(SOUND, "pokey2", pokey_r, pokey_w)		/* DSW1 also */
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)		/* DSW0 also */
+	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)		/* DSW1 also */
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P1")
 	AM_RANGE(0x2200, 0x2200) AM_READ_PORT("P2")
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM")

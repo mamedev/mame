@@ -53,7 +53,7 @@
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_TTL74123_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, TTL74123)
+	MDRV_DEVICE_REMOVE(_tag)
 
 
 /* constants for the different ways the cap/res can be connected.

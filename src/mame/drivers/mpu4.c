@@ -772,14 +772,14 @@ static void update_ay(const address_space *space)
 		  	}
 		  	case 0x02:
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-	  			ay8910_data_w(devtag_get_device(space->machine, SOUND, "ay8913"), 0, pia_get_output_a(3));
+	  			ay8910_data_w(devtag_get_device(space->machine, "ay8913"), 0, pia_get_output_a(3));
 				LOG(("AY Chip Write \n"));
 				break;
 	  		}
 		  	case 0x03:
 			{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
              The register will remain selected until another is chosen.*/
-				ay8910_address_w(devtag_get_device(space->machine, SOUND, "ay8913"), 0, pia_get_output_a(3));
+				ay8910_address_w(devtag_get_device(space->machine, "ay8913"), 0, pia_get_output_a(3));
 				LOG(("AY Chip Select \n"));
 				break;
 	  		}
@@ -1004,7 +1004,7 @@ static const pia6821_interface pia_ic8_intf =
 
 static WRITE8_HANDLER( pia_gb_porta_w )
 {
-	const device_config *msm6376 = devtag_get_device(space->machine, SOUND, "msm6376");
+	const device_config *msm6376 = devtag_get_device(space->machine, "msm6376");
 
 	LOG(("%04x GAMEBOARD: PIA Port A Set to %2x\n", cpu_get_previouspc(space->cpu),data));
 	okim6376_w(msm6376, 0, data);
@@ -1692,7 +1692,7 @@ static ADDRESS_MAP_START( mod4_yam_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 
-	AM_RANGE(0x0880, 0x0881) AM_DEVWRITE( SOUND, "ym2413", ym2413_w )
+	AM_RANGE(0x0880, 0x0881) AM_DEVWRITE( "ym2413", ym2413_w )
 
 //  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w)
 

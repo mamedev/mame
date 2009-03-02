@@ -237,37 +237,37 @@ static void ca2_u2_u3_w(const device_config *device, UINT8 data)
 
 static WRITE8_HANDLER( port_a_u2_w )
 {
-	port_a_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn1"), data);
+	port_a_u2_u3_w(devtag_get_device(space->machine, "sn1"), data);
 }
 
 
 static WRITE8_HANDLER( port_a_u3_w )
 {
-	port_a_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn2"), data);
+	port_a_u2_u3_w(devtag_get_device(space->machine, "sn2"), data);
 }
 
 
 static WRITE8_HANDLER( port_b_u2_w )
 {
-	port_b_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn1"), data);
+	port_b_u2_u3_w(devtag_get_device(space->machine, "sn1"), data);
 }
 
 
 static WRITE8_HANDLER( port_b_u3_w )
 {
-	port_b_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn2"), data);
+	port_b_u2_u3_w(devtag_get_device(space->machine, "sn2"), data);
 }
 
 
 static WRITE8_HANDLER( ca2_u2_w )
 {
-	ca2_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn1"), data);
+	ca2_u2_u3_w(devtag_get_device(space->machine, "sn1"), data);
 }
 
 
 static WRITE8_HANDLER( ca2_u3_w )
 {
-	ca2_u2_u3_w(devtag_get_device(space->machine, SOUND, "sn2"), data);
+	ca2_u2_u3_w(devtag_get_device(space->machine, "sn2"), data);
 }
 
 

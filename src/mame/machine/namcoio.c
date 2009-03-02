@@ -931,7 +931,7 @@ static void namco_06xx_data_write(running_machine *machine,int chipnum,UINT8 dat
 		case NAMCOIO_50XX:   namco_50xx_write(machine, data); break;
 		case NAMCOIO_50XX_2: namco_50xx_2_write(machine, data); break;
 		case NAMCOIO_51XX:   namcoio_51XX_write(machine,chipnum,data); break;
-		case NAMCOIO_52XX:   namcoio_52xx_write(devtag_get_device(machine, SOUND, "namco52"), data); break;
+		case NAMCOIO_52XX:   namcoio_52xx_write(devtag_get_device(machine, "namco52"), data); break;
 		case NAMCOIO_54XX:   namco_54xx_write(machine, data); break;
 		default:
 			logerror("%s: custom IO type %d unsupported write\n",cpuexec_describe_context(machine),io[chipnum].type);

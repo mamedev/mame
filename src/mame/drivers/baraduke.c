@@ -178,7 +178,7 @@ static WRITE8_HANDLER( baraduke_irq_ack_w )
 static ADDRESS_MAP_START( baraduke_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(baraduke_spriteram_r,baraduke_spriteram_w) AM_BASE(&baraduke_spriteram)	/* Sprite RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(baraduke_videoram_r,baraduke_videoram_w) AM_BASE(&baraduke_videoram)	/* Video RAM */
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE(SOUND, "namco", namcos1_cus30_r,namcos1_cus30_w)		/* PSG device, shared RAM */
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namcos1_cus30_r,namcos1_cus30_w)		/* PSG device, shared RAM */
 	AM_RANGE(0x4800, 0x4fff) AM_READWRITE(baraduke_textram_r,baraduke_textram_w) AM_BASE(&baraduke_textram)/* video RAM (text layer) */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(baraduke_irq_ack_w)		/* irq acknowledge */
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_internal_registers_r,hd63701_internal_registers_w)/* internal registers */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM								/* built in RAM */
 	AM_RANGE(0x1105, 0x1105) AM_READ(soundkludge_r)				/* cures speech */
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE(SOUND, "namco", namcos1_cus30_r,namcos1_cus30_w) AM_BASE(&namco_wavedata)/* PSG device, shared RAM */
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r,namcos1_cus30_w) AM_BASE(&namco_wavedata)/* PSG device, shared RAM */
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_ROM)					/* MCU external ROM */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP)					/* watchdog reset? */
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(SMH_NOP)					/* irq acknoledge? */

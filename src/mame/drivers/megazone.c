@@ -69,7 +69,7 @@ static WRITE8_DEVICE_HANDLER( megazone_portB_w )
 		if (data & 1) C +=  10000;	/*  10000pF = 0.01uF */
 		if (data & 2) C += 220000;	/* 220000pF = 0.22uF */
 		data >>= 2;
-		filter_rc_set_RC(devtag_get_device(device->machine, SOUND, fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
+		filter_rc_set_RC(devtag_get_device(device->machine, fltname[i]),FLT_RC_LOWPASS,1000,2200,200,CAP_P(C));
 	}
 }
 
@@ -135,9 +135,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE(SOUND, "ay", ay8910_address_w)
-	AM_RANGE(0x00, 0x02) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE(SOUND, "ay", ay8910_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x00, 0x02) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("ay", ay8910_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -150,7 +150,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE(SOUND, "dac", dac_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
