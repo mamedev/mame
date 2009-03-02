@@ -63,7 +63,7 @@ static STREAM_UPDATE( mjkjidai_adpcm_callback )
 				state->playing = 0;
 		}
 
-		*dest++ = clock_adpcm(&state->adpcm, val);
+		*dest++ = clock_adpcm(&state->adpcm, val) << 4;
 		samples--;
 	}
 	while (samples > 0)
