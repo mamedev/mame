@@ -239,7 +239,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL,//input_port_5_r,
+	DEVCB_NULL,
 	DEVCB_INPUT_PORT("DSW"),
 	DEVCB_NULL,
 	DEVCB_NULL

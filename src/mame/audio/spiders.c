@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "sound/discrete.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "includes/spiders.h"
 
 
@@ -170,34 +170,31 @@ DISCRETE_SOUND_END
 
 
 
-WRITE8_HANDLER( spiders_audio_command_w )
+WRITE8_DEVICE_HANDLER( spiders_audio_command_w )
 {
-	pia_set_input_a(4, data & 0xf8, 0);
-	pia_set_input_ca1(4, data  & 0x80 ? 1 : 0);
+	pianew_set_input_a(device, data & 0xf8, 0);
+	pia_ca1_w(device, 0, data  & 0x80 ? 1 : 0);
 }
 
 
-WRITE8_HANDLER( spiders_audio_a_w )
+WRITE8_DEVICE_HANDLER( spiders_audio_a_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
-	discrete_sound_w(discrete, SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
+	discrete_sound_w(device, SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
 }
 
-WRITE8_HANDLER( spiders_audio_b_w )
+WRITE8_DEVICE_HANDLER( spiders_audio_b_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
-	discrete_sound_w(discrete, SPIDERS_WEB_SOUND_DATA, data);
+	discrete_sound_w(device, SPIDERS_WEB_SOUND_DATA, data);
 }
 
 
-WRITE8_HANDLER( spiders_audio_ctrl_w )
+WRITE8_DEVICE_HANDLER( spiders_audio_ctrl_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
-	discrete_sound_w(discrete, SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
-	discrete_sound_w(discrete, SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);
-	discrete_sound_w(discrete, SPIDERS_SUPER_WEB_EXPL_EN, data & 0x04 ? 1 : 0);
-	discrete_sound_w(discrete, SPIDERS_SUPER_WEB_EN, data & 0x02 ? 1 : 0);
-	discrete_sound_w(discrete, SPIDERS_X_EN, data & 0x01 ? 1 : 0);
+	discrete_sound_w(device, SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
+	discrete_sound_w(device, SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);
+	discrete_sound_w(device, SPIDERS_SUPER_WEB_EXPL_EN, data & 0x04 ? 1 : 0);
+	discrete_sound_w(device, SPIDERS_SUPER_WEB_EN, data & 0x02 ? 1 : 0);
+	discrete_sound_w(device, SPIDERS_X_EN, data & 0x01 ? 1 : 0);
 }
 
 

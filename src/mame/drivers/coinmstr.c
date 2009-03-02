@@ -24,7 +24,7 @@ x
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 
@@ -199,10 +199,10 @@ static ADDRESS_MAP_START( quizmstr_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0x41, 0x41) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x48, 0x4b) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, pia_w)
 	AM_RANGE(0x50, 0x53) AM_READNOP
 	AM_RANGE(0x50, 0x53) AM_WRITENOP
-	AM_RANGE(0x58, 0x5b) AM_READWRITE(pia_2_r, pia_2_w)
+	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE(PIA6821, "pia2", pia_r, pia_w)
 	AM_RANGE(0x70, 0x70) AM_DEVWRITE(H46505, "crtc", mc6845_address_w)
 	AM_RANGE(0x71, 0x71) AM_DEVWRITE(H46505, "crtc", mc6845_register_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP
@@ -217,9 +217,9 @@ static ADDRESS_MAP_START( trailblz_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE(H46505, "crtc", mc6845_register_w)
 	AM_RANGE(0x48, 0x49) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0x49, 0x49) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(pia_0_r, pia_0_w) //?
-	AM_RANGE(0x60, 0x63) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x70, 0x73) AM_READWRITE(pia_2_r, pia_2_w)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, pia_w) //?
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE(PIA6821, "pia2", pia_r, pia_w)
 	AM_RANGE(0xc1, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -251,15 +251,15 @@ static ADDRESS_MAP_START( pokeroul_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE(H46505, "crtc", mc6845_register_w)
 	AM_RANGE(0x48, 0x49) AM_DEVWRITE(SOUND, "ay", ay8910_address_data_w)
 	AM_RANGE(0x49, 0x49) AM_DEVREAD(SOUND, "ay", ay8910_r)
-	AM_RANGE(0x58, 0x5b) AM_READWRITE(pia_0_r, pia_0_w) /* confirmed */
-	AM_RANGE(0x68, 0x6b) AM_READWRITE(pia_1_r, pia_1_w) /* confirmed */
-	AM_RANGE(0x78, 0x7b) AM_READWRITE(pia_2_r, pia_2_w) /* confirmed */
+	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, pia_w) /* confirmed */
+	AM_RANGE(0x68, 0x6b) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w) /* confirmed */
+	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE(PIA6821, "pia2", pia_r, pia_w) /* confirmed */
 	AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)	/* needed to boot */
 ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( quizmstr )
-	PORT_START("IN0")
+	PORT_START("PIA0.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
  	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_NAME("Bookkeeping") PORT_TOGGLE /* Button 2 for second page, Button 3 erases data */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -268,21 +268,9 @@ static INPUT_PORTS_START( quizmstr )
  	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	/* If 0x40 is HIGH the DIP Test Mode does work but bookkeeping shows always 0's */
-	/* If 0x40 is LOW Bookkeeping does work, but the second page (selected categories) is missing */
- 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
- 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "2-01" )
+	
+	PORT_START("PIA0.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA0.B" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -307,8 +295,72 @@ static INPUT_PORTS_START( quizmstr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "3-01" )
+	PORT_START("PIA1.A")
+	PORT_DIPNAME( 0x01, 0x01, "PIA1.A" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA1.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA1.B" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA2.A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	/* If 0x40 is HIGH the DIP Test Mode does work but bookkeeping shows always 0's */
+	/* If 0x40 is LOW Bookkeeping does work, but the second page (selected categories) is missing */
+ 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+ 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PIA2.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA2.B" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -361,40 +413,8 @@ static INPUT_PORTS_START( quizmstr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( trailblz )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x02, 0x02, "1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Cont")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pass")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Sel")
-	PORT_DIPNAME( 0x40, 0x40, "Show Refill" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Show Stats" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "2" )
+	PORT_START("PIA0.A")
+	PORT_DIPNAME( 0x01, 0x01, "PIA0.A" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -419,8 +439,92 @@ static INPUT_PORTS_START( trailblz )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "3" )
+	PORT_START("PIA0.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA0.B" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA1.A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x02, 0x02, "1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Cont")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pass")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Sel")
+	PORT_DIPNAME( 0x40, 0x40, "Show Refill" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Show Stats" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA1.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA1.B" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA2.A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("PIA2.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA2.B" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -473,7 +577,7 @@ static INPUT_PORTS_START( trailblz )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supnudg2 )
-	PORT_START("IN0")
+	PORT_START("PIA0.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -487,26 +591,8 @@ static INPUT_PORTS_START( supnudg2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x02, 0x02, "1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Cont")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pass")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Sel")
-	PORT_DIPNAME( 0x40, 0x40, "Show Refill?" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Show Stats?" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "2" )
+	PORT_START("PIA0.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA0.B" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -531,8 +617,78 @@ static INPUT_PORTS_START( supnudg2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "3" )
+	PORT_START("PIA1.A")
+	PORT_DIPNAME( 0x01, 0x01, "PIA1.A" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA1.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA1.B" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA2.A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_DIPNAME( 0x02, 0x02, "1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Cont")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pass")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Sel")
+	PORT_DIPNAME( 0x40, 0x40, "Show Refill?" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Show Stats?" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("PIA2.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA2.B" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -585,7 +741,7 @@ static INPUT_PORTS_START( supnudg2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pokeroul )
-	PORT_START("IN0")
+	PORT_START("PIA0.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Cancel / Collect")                           PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 1 & 5 (auto?)")                         PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 2 / Bet / Half Gamble / Previous Hand") PORT_CODE(KEYCODE_X)
@@ -594,8 +750,34 @@ static INPUT_PORTS_START( pokeroul )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Short Term Meters")              PORT_TOGGLE PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Refill Mode")                    PORT_TOGGLE PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("0-8")                                        PORT_CODE(KEYCODE_S)
+	
+	PORT_START("PIA0.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA0.B" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN1")
+	PORT_START("PIA1.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE (2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE (2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -605,7 +787,7 @@ static INPUT_PORTS_START( pokeroul )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("PIA1.B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -615,7 +797,7 @@ static INPUT_PORTS_START( pokeroul )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN3")
+	PORT_START("PIA2.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -624,6 +806,32 @@ static INPUT_PORTS_START( pokeroul )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PIA2.B")
+	PORT_DIPNAME( 0x01, 0x01, "PIA2.B" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -695,115 +903,57 @@ static VIDEO_UPDATE( coinmstr )
 /* Declare PIA structure */
 
 /* PIA 0 */
-static const pia6821_interface quizmstr_pia_0_intf =
+static const pia6821_interface pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_INPUT_PORT("PIA0.A"),		/* port A in */
+	DEVCB_INPUT_PORT("PIA0.B"),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 /* PIA 1 */
-static const pia6821_interface quizmstr_pia_1_intf =
+static const pia6821_interface pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_INPUT_PORT("PIA1.A"),		/* port A in */
+	DEVCB_INPUT_PORT("PIA1.B"),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 /* PIA 2 */
-static const pia6821_interface quizmstr_pia_2_intf =
+static const pia6821_interface pia_2_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_1_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_INPUT_PORT("PIA2.A"),		/* port A in */
+	DEVCB_INPUT_PORT("PIA2.B"),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
-/* PIA 0 */
-static const pia6821_interface trailblz_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
-};
-
-/* PIA 1 */
-static const pia6821_interface trailblz_pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_1_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
-};
-
-/* PIA 2 */
-static const pia6821_interface trailblz_pia_2_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
-};
-
-
-/* PIA 0 */
-static const pia6821_interface pokeroul_pia_0_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
-};
-
-/* PIA 1 */
-static const pia6821_interface pokeroul_pia_1_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_1_r, input_port_2_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
-};
-
-/* PIA 2 */
-static const pia6821_interface pokeroul_pia_2_intf =
-{
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_3_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
-};
-
-
-static MACHINE_START( quizmstr )
-{
-	pia_config(machine, 0, &quizmstr_pia_0_intf);
-	pia_config(machine, 1, &quizmstr_pia_1_intf);
-	pia_config(machine, 2, &quizmstr_pia_2_intf);
-}
-
-static MACHINE_RESET( quizmstr )
-{
-	pia_reset();
-}
-
-static MACHINE_START( trailblz )
-{
-	pia_config(machine, 0, &trailblz_pia_0_intf);
-	pia_config(machine, 1, &trailblz_pia_1_intf);
-	pia_config(machine, 2, &trailblz_pia_2_intf);
-}
-
-static MACHINE_RESET( trailblz )
-{
-	pia_reset();
-}
-
-static MACHINE_START( pokeroul )
-{
-	pia_config(machine, 0, &pokeroul_pia_0_intf);
-	pia_config(machine, 1, &pokeroul_pia_1_intf);
-	pia_config(machine, 2, &pokeroul_pia_2_intf);
-}
-
-static MACHINE_RESET( pokeroul )
-{
-	pia_reset();
-}
 
 static const ay8910_interface ay8912_interface =
 {
@@ -832,6 +982,10 @@ static MACHINE_DRIVER_START( coinmstr )
 	MDRV_CPU_ADD("cpu",Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(coinmstr_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	
+	MDRV_PIA6821_ADD("pia0", pia_0_intf)
+	MDRV_PIA6821_ADD("pia1", pia_1_intf)
+	MDRV_PIA6821_ADD("pia2", pia_2_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -861,36 +1015,24 @@ static MACHINE_DRIVER_START( quizmstr )
 	MDRV_IMPORT_FROM(coinmstr)
 	MDRV_CPU_MODIFY("cpu")
 	MDRV_CPU_IO_MAP(quizmstr_io_map,0)
-
-	MDRV_MACHINE_START(quizmstr)
-	MDRV_MACHINE_RESET(quizmstr)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( trailblz )
 	MDRV_IMPORT_FROM(coinmstr)
 	MDRV_CPU_MODIFY("cpu")
 	MDRV_CPU_IO_MAP(trailblz_io_map,0)
-
-	MDRV_MACHINE_START(trailblz)
-	MDRV_MACHINE_RESET(trailblz)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supnudg2 )
 	MDRV_IMPORT_FROM(coinmstr)
 	MDRV_CPU_MODIFY("cpu")
 	MDRV_CPU_IO_MAP(supnudg2_io_map,0)
-
-	MDRV_MACHINE_START(quizmstr)
-	MDRV_MACHINE_RESET(quizmstr)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pokeroul )
 	MDRV_IMPORT_FROM(coinmstr)
 	MDRV_CPU_MODIFY("cpu")
 	MDRV_CPU_IO_MAP(pokeroul_io_map,0)
-
-	MDRV_MACHINE_START(pokeroul)
-	MDRV_MACHINE_RESET(pokeroul)
 MACHINE_DRIVER_END
 
 /*

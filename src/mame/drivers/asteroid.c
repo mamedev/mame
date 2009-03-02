@@ -880,8 +880,8 @@ ROM_END
 
 static DRIVER_INIT( asteroib )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, input_port_read_handler8(machine->portconfig, "IN0"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2003, 0x2003, 0, 0, input_port_read_handler8(machine->portconfig, "HS"));
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, "IN0");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2003, 0x2003, 0, 0, "HS");
 }
 
 

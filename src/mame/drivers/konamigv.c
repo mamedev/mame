@@ -722,11 +722,11 @@ static DRIVER_INIT( kdeadeye )
 {
 	intelflash_init( machine, 0, FLASH_SHARP_LH28F400, NULL );
 
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, input_port_read_handler32(machine->portconfig, "GUNX1") );
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, input_port_read_handler32(machine->portconfig, "GUNY1") );
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800a0, 0x1f6800a3, 0, 0, input_port_read_handler32(machine->portconfig, "GUNX2") );
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800b0, 0x1f6800b3, 0, 0, input_port_read_handler32(machine->portconfig, "GUNY2") );
-	memory_install_read32_handler     ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c3, 0, 0, input_port_read_handler32(machine->portconfig, "BUTTONS") );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, "GUNX1" );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, "GUNY1" );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800a0, 0x1f6800a3, 0, 0, "GUNX2" );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800b0, 0x1f6800b3, 0, 0, "GUNY2" );
+	memory_install_read_port_handler  ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c3, 0, 0, "BUTTONS" );
 	memory_install_write32_handler    ( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, kdeadeye_0_w );
 	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
 

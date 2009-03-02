@@ -1496,9 +1496,9 @@ static DRIVER_INIT( razmataz )
 	nprinces_decode(machine, "maincpu");
 
 	/* additional input ports are wired */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc004, 0xc004, 0, 0x18f3, input_port_read_handler8(machine->portconfig, "SW04"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc008, 0xc008, 0, 0x18f3, input_port_read_handler8(machine->portconfig, "SW08"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00c, 0xc00c, 0, 0x18f3, input_port_read_handler8(machine->portconfig, "SW0C"));
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc004, 0xc004, 0, 0x18f3, "SW04");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc008, 0xc008, 0, 0x18f3, "SW08");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);

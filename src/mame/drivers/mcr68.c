@@ -73,10 +73,10 @@ static UINT8 protection_data[5];
  *
  *************************************/
 
-READ8_HANDLER( zwackery_port_2_r )
+READ8_DEVICE_HANDLER( zwackery_port_2_r )
 {
-	int result = input_port_read(space->machine, "IN2");
-	int wheel = input_port_read(space->machine, "IN5");
+	int result = input_port_read(device->machine, "IN2");
+	int wheel = input_port_read(device->machine, "IN5");
 
 	return result | ((wheel >> 2) & 0x3e);
 }
@@ -334,9 +334,9 @@ static ADDRESS_MAP_START( zwackery_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x084000, 0x084fff) AM_RAM
 	AM_RANGE(0x100000, 0x10000f) AM_READWRITE(zwackery_6840_r, mcr68_6840_upper_w)
-	AM_RANGE(0x104000, 0x104007) AM_READWRITE8(pia_2_r, pia_2_w, 0xff00)
-	AM_RANGE(0x108000, 0x108007) AM_READWRITE8(pia_3_r, pia_3_w, 0x00ff)
-	AM_RANGE(0x10c000, 0x10c007) AM_READWRITE8(pia_4_r, pia_4_w, 0x00ff)
+	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8(PIA6821, "pia0", pia_r, pia_w, 0xff00)
+	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8(PIA6821, "pia1", pia_r, pia_w, 0x00ff)
+	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8(PIA6821, "pia2", pia_r, pia_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(zwackery_videoram_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(zwackery_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(zwackery_spriteram_w) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
@@ -888,6 +888,10 @@ static MACHINE_DRIVER_START( zwackery )
 //  MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_MACHINE_START(zwackery)
 	MDRV_MACHINE_RESET(zwackery)
+	
+	MDRV_PIA6821_ADD("pia0", zwackery_pia0_intf)
+	MDRV_PIA6821_ADD("pia1", zwackery_pia1_intf)
+	MDRV_PIA6821_ADD("pia2", zwackery_pia2_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -949,7 +953,9 @@ static MACHINE_DRIVER_START( spyhunt2 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(mcr68)
-	MDRV_IMPORT_FROM(turbo_chip_squeak_plus_sounds_good)
+	MDRV_IMPORT_FROM(sounds_good)
+	MDRV_SPEAKER_REMOVE("mono")
+	MDRV_IMPORT_FROM(turbo_chip_squeak)
 MACHINE_DRIVER_END
 
 

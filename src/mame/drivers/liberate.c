@@ -927,7 +927,7 @@ static DRIVER_INIT( yellowcb )
 {
 	DRIVER_INIT_CALL(prosport);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xa000, 0, 0, input_port_0_r);
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xa000, 0, 0, "IN0");
 }
 
 static DRIVER_INIT( liberate )

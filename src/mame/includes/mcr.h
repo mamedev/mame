@@ -8,6 +8,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
+#include "machine/6821new.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I		XTAL_19_968MHz
@@ -37,6 +38,10 @@ extern const gfx_layout mcr_sprite_layout;
 extern UINT32 mcr_cpu_board;
 extern UINT32 mcr_sprite_board;
 extern UINT32 mcr_ssio_board;
+
+extern const pia6821_interface zwackery_pia0_intf;
+extern const pia6821_interface zwackery_pia1_intf;
+extern const pia6821_interface zwackery_pia2_intf;
 
 MACHINE_START( mcr );
 MACHINE_RESET( mcr );

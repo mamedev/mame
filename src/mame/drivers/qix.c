@@ -224,7 +224,6 @@ Interrupts:
 #include "driver.h"
 #include "cpu/m6805/m6805.h"
 #include "rendlay.h"
-#include "machine/6821pia.h"
 #include "qix.h"
 #include "cpu/m6809/m6809.h"
 
@@ -244,10 +243,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8bff) AM_READ(SMH_NOP)   /* 6850 ACIA */
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(pia_3_r, pia_3_w)
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(pia_0_r, qix_pia_0_w)
-	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(pia_2_r, pia_2_w)
+	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE(PIA6821, "sndpia0", pia_r, pia_w)
+	AM_RANGE(0x9400, 0x97ff) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, qix_pia_w)
+	AM_RANGE(0x9800, 0x9bff) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
+	AM_RANGE(0x9c00, 0x9fff) AM_DEVREADWRITE(PIA6821, "pia2", pia_r, pia_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -258,10 +257,10 @@ static ADDRESS_MAP_START( zoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_READ(SMH_NOP)   /* ACIA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
-	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(pia_3_r, pia_3_w)
-	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(pia_0_r, qix_pia_0_w)
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(pia_2_r, pia_2_w)
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE(PIA6821, "sndpia0", pia_r, pia_w)
+	AM_RANGE(0x1400, 0x17ff) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, qix_pia_w)
+	AM_RANGE(0x1800, 0x1bff) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
+	AM_RANGE(0x1c00, 0x1fff) AM_DEVREADWRITE(PIA6821, "pia2", pia_r, pia_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -549,7 +548,7 @@ static const m6809_config encryption_config =
 	TRUE,		/* encrypt only the first byte in 10 xx and 11 xx opcodes */
 };
 
-static MACHINE_DRIVER_START( qix )
+static MACHINE_DRIVER_START( qix_base )
 
 	MDRV_DRIVER_DATA(qix_state)
 
@@ -562,14 +561,20 @@ static MACHINE_DRIVER_START( qix )
 	/* Zookeeper settings and high score table seem especially sensitive to this */
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(qix)
 	MDRV_MACHINE_RESET(qix)
 	MDRV_NVRAM_HANDLER(generic_0fill)
+	
+	MDRV_PIA6821_ADD("pia0", qix_pia_0_intf)
+	MDRV_PIA6821_ADD("pia1", qix_pia_1_intf)
+	MDRV_PIA6821_ADD("pia2", qix_pia_2_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(qix_video)
+MACHINE_DRIVER_END
 
-	/* audio hardware */
+
+static MACHINE_DRIVER_START( qix )
+	MDRV_IMPORT_FROM(qix_base)
 	MDRV_IMPORT_FROM(qix_audio)
 MACHINE_DRIVER_END
 
@@ -583,6 +588,9 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_MACHINE_START(qixmcu)
+
+	MDRV_PIA6821_MODIFY("pia0", qixmcu_pia_0_intf)
+	MDRV_PIA6821_MODIFY("pia2", qixmcu_pia_2_intf)
 MACHINE_DRIVER_END
 
 
@@ -602,12 +610,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( slither )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(qix)
+	MDRV_IMPORT_FROM(qix_base)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
 
-	MDRV_MACHINE_START(slither)
+	MDRV_PIA6821_MODIFY("pia1", slither_pia_1_intf)
+	MDRV_PIA6821_MODIFY("pia2", slither_pia_2_intf)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(slither_video)
@@ -635,7 +644,7 @@ ROM_START( qix )
 	ROM_LOAD( "u18", 0xf000, 0x0800, CRC(de77728b) SHA1(8e183bb27858aad9a996e4a2e5a95f0145d1f5b4) )
 	ROM_LOAD( "u19", 0xf800, 0x0800, CRC(c0994776) SHA1(9452a98c78a038679c4e58f4a9983adb28ea5e78) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "u4",  0xc800, 0x0800, CRC(5b906a09) SHA1(84a2e817d6718e0276fcea702811a91bc054a670) )
 	ROM_LOAD( "u5",  0xd000, 0x0800, CRC(254a3587) SHA1(66045c71cc1d04d4e03c728e578f570fbf7c650d) )
 	ROM_LOAD( "u6",  0xd800, 0x0800, CRC(ace30389) SHA1(50c6275d13cfbca7750d5a3e725faedba7574e04) )
@@ -660,7 +669,7 @@ ROM_START( qixa )
 	ROM_LOAD( "qu18", 0xf000, 0x0800, CRC(353be980) SHA1(a50e02fcc69771a13b238aa0e8dc3c56b01a58d5) )
 	ROM_LOAD( "qu19", 0xf800, 0x0800, CRC(f46a69ca) SHA1(dacb53c0318445da3fbb86f9a45914c5b7a4c4a1) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "qu3",  0xc000, 0x0800, CRC(8b4c0ef0) SHA1(6d18d1052f342e3b3313f2174b20f2a179e2c6bd) )
 	ROM_LOAD( "qu4",  0xc800, 0x0800, CRC(66a5c260) SHA1(8cce71bcd3a432650f0d0c94f3a2151ba8154220) )
 	ROM_LOAD( "qu5",  0xd000, 0x0800, CRC(70160ea3) SHA1(a411130c5c669a181564369a8921b26e0f0b5450) )
@@ -682,7 +691,7 @@ ROM_START( qixb )
 	ROM_LOAD( "lk16.bin", 0xe000, 0x1000, CRC(698b1f9c) SHA1(7e7637ca5985f072e821e16f8b65aedb87df136b) )
 	ROM_LOAD( "lk17.bin", 0xf000, 0x1000, CRC(7e3adde6) SHA1(dfe66317f87e10919f1ea4b4d565703e73039821) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "lk10.bin", 0xc000, 0x1000, CRC(7eac67d0) SHA1(ca5938422aaa1e380af0afa505876d4682ac69b9) )
 	ROM_LOAD( "lk11.bin", 0xd000, 0x1000, CRC(90ccbb6a) SHA1(b65592384597dc2aafc02f49b6b6f477c9112580) )
 	ROM_LOAD( "lk12.bin", 0xe000, 0x1000, CRC(be9b9f7d) SHA1(e681bdb9aa8b8c31af1c14e23d0f420577d6db63) )
@@ -704,7 +713,7 @@ ROM_START( qix2 )
 	ROM_LOAD( "u18.rmb", 0xf000, 0x0800, CRC(1f91ed7a) SHA1(85bb5370a244719663a4f859f66860613aa2b86e) )
 	ROM_LOAD( "u19.rmb", 0xf800, 0x0800, CRC(68e8d5a6) SHA1(d09252c393be2fdaf3b9b9f477c79f721d15943f) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "u3.rmb",  0xc000, 0x0800, CRC(19cebaca) SHA1(7d7e79ab0920952cf7618567c9c65397535b6d4f) )
 	ROM_LOAD( "u4.rmb",  0xc800, 0x0800, CRC(6cfb4185) SHA1(6545dece8eaeb716877aa6e7b24c21f6e5991451) )
 	ROM_LOAD( "u5.rmb",  0xd000, 0x0800, CRC(948f53f3) SHA1(db6eddec8ba41335316d80b6f97e932bf91139af) )
@@ -728,7 +737,7 @@ ROM_START( sdungeon )
 	ROM_LOAD( "sd18.u18", 0xe000, 0x1000, CRC(7ef1ffc0) SHA1(eca49a916b6b51b91ed45ff89bb37a67fee7db0e) )
 	ROM_LOAD( "sd19.u19", 0xf000, 0x1000, CRC(7b20b7ac) SHA1(554e29adc75cc465ea603a628f9d60d6d903e7ab) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "sd05.u5",  0xa000, 0x1000, CRC(0b2bf48e) SHA1(51bfb35521864f09a20b38aeeb98ab1399d139a5) )
 	ROM_LOAD( "sd06.u6",  0xb000, 0x1000, CRC(f86db512) SHA1(7e7ae64db7821f18a5eefdcc7a2e1abc37abd3ac) )
 	ROM_LOAD( "sd07.u7",  0xc000, 0x1000, CRC(7b796831) SHA1(cd3d8975e99886f51b27530f0e261f749aadee73) )
@@ -754,7 +763,7 @@ ROM_START( elecyoyo )
 	ROM_LOAD( "yy18",   0xe000, 0x1000, CRC(0b6661c0) SHA1(3e24acbfea1a3b83223d780ea34c83759a751175) )
 	ROM_LOAD( "yy19-1", 0xf000, 0x1000, CRC(95b8b244) SHA1(2852dcfc6a638118ee7fe60b957d8aa9a5a8984c) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "yy5",    0xa000, 0x1000, CRC(3793fec5) SHA1(d31f3ba6364755c98beb814b5e7d5541e8b4e1a0) )
 	ROM_LOAD( "yy6",    0xb000, 0x1000, CRC(2e8b1265) SHA1(6fb67b6a5b627bcbd10c72ac8c9e4d9f4dd7860f) )
 	ROM_LOAD( "yy7",    0xc000, 0x1000, CRC(20f93411) SHA1(126c27442a4e35d054a236c41930603241d08ccf) )
@@ -779,7 +788,7 @@ ROM_START( elecyoy2 )
 	ROM_LOAD( "yy18",  0xe000, 0x1000, CRC(0b6661c0) SHA1(3e24acbfea1a3b83223d780ea34c83759a751175) )
 	ROM_LOAD( "yy19",  0xf000, 0x1000, CRC(d0215d2e) SHA1(816131bc272252df6cea1b84a42750a71ce4f427) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "yy5",   0xa000, 0x1000, CRC(3793fec5) SHA1(d31f3ba6364755c98beb814b5e7d5541e8b4e1a0) )
 	ROM_LOAD( "yy6",   0xb000, 0x1000, CRC(2e8b1265) SHA1(6fb67b6a5b627bcbd10c72ac8c9e4d9f4dd7860f) )
 	ROM_LOAD( "yy7",   0xc000, 0x1000, CRC(20f93411) SHA1(126c27442a4e35d054a236c41930603241d08ccf) )
@@ -804,7 +813,7 @@ ROM_START( kram )
 	ROM_LOAD( "ks18",   0xe000, 0x1000, CRC(79158b03) SHA1(0d4873471b5b7ace0de8ec421ff3d74650790f7e) )
 	ROM_LOAD( "ks19-1", 0xf000, 0x1000, CRC(759ea6ce) SHA1(7962f713dd93c73475fa1f64635d8e965336484b) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "ks5",    0xa000, 0x1000, CRC(1c472080) SHA1(a85400be562ef6b817f8a654f29d966d3a198ab4) )
 	ROM_LOAD( "ks6",    0xb000, 0x1000, CRC(b8926622) SHA1(e25a8b2ff192f6ab0328fd7b3c58d638342f79e2) )
 	ROM_LOAD( "ks7",    0xc000, 0x1000, CRC(c98a7485) SHA1(e310d53ae65d456e12a2475e9ac578592b0e82ba) )
@@ -829,7 +838,7 @@ ROM_START( kram2 )
 	ROM_LOAD( "ks18", 0xe000, 0x1000, CRC(79158b03) SHA1(0d4873471b5b7ace0de8ec421ff3d74650790f7e) )
 	ROM_LOAD( "ks19", 0xf000, 0x1000, CRC(053c5e09) SHA1(cd6e5b54abf73c1ccf318ca18fceb56b51a3847f) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "ks5",  0xa000, 0x1000, CRC(1c472080) SHA1(a85400be562ef6b817f8a654f29d966d3a198ab4) )
 	ROM_LOAD( "ks6",  0xb000, 0x1000, CRC(b8926622) SHA1(e25a8b2ff192f6ab0328fd7b3c58d638342f79e2) )
 	ROM_LOAD( "ks7",  0xc000, 0x1000, CRC(c98a7485) SHA1(e310d53ae65d456e12a2475e9ac578592b0e82ba) )
@@ -854,7 +863,7 @@ ROM_START( kram3 )
 	ROM_LOAD( "kr-u18", 0xe000, 0x1000, CRC(da3aed8c) SHA1(0107d58fa006a39b47513381aead760190abef35) )
 	ROM_LOAD( "kr-u19", 0xf000, 0x1000, CRC(496ab571) SHA1(30e12b31ffd70a8a1ce23c845e89170ca3cabaa5) )
 
-	ROM_REGION( 2*0x10000, "video", 0 )	/* encrypted */
+	ROM_REGION( 2*0x10000, "videocpu", 0 )	/* encrypted */
 	ROM_LOAD( "kr-u5",  0xa000, 0x1000, CRC(9e63c2bc) SHA1(f61a2b93ed322b62818f31fddb324c666380eff7) )
 	ROM_LOAD( "kr-u6",  0xb000, 0x1000, CRC(a0ff1244) SHA1(5bc3f3f8caac0dfc8c1381d34e5b8ef5c8202982) )
 	ROM_LOAD( "kr-u7",  0xc000, 0x1000, CRC(20a15024) SHA1(094951c4cd06e32af2cb2faec04c31d55ade6b7b) )
@@ -878,7 +887,7 @@ ROM_START( zookeep )
 	ROM_LOAD( "za18", 0xe000, 0x1000, CRC(37886afe) SHA1(a0cc902b2d253466e21c4fbf9d3339069fe79ebe) )
 	ROM_LOAD( "za19", 0xf000, 0x1000, CRC(bbfb30d9) SHA1(bc6bd5525b159bee7b08b6967cd3088b7bd10fee) )
 
-	ROM_REGION( 0x12000, "video", 0 )
+	ROM_REGION( 0x12000, "videocpu", 0 )
 	ROM_LOAD( "za5",  0x0a000, 0x1000, CRC(dc0c3cbd) SHA1(8335cd91bbacc680a3a98a5242d4cb5a6f61b2b5) )
 	ROM_LOAD( "za3",  0x10000, 0x1000, CRC(cc4d0aee) SHA1(05c0025e96b432088b46100051a2c780e46b7457) )
 	ROM_LOAD( "za6",  0x0b000, 0x1000, CRC(27c787dd) SHA1(1142790d875573d0c39d846aba4b06946fd2bc88) )
@@ -910,7 +919,7 @@ ROM_START( zookeep2 )
 	ROM_LOAD( "za18",     0xe000, 0x1000, CRC(37886afe) SHA1(a0cc902b2d253466e21c4fbf9d3339069fe79ebe) )
 	ROM_LOAD( "za19.red", 0xf000, 0x1000, CRC(ec01760e) SHA1(169ab9d3a0abe325d960f9ed358258b3d6fcd4be) )
 
-	ROM_REGION( 0x12000, "video", 0 )
+	ROM_REGION( 0x12000, "videocpu", 0 )
 	ROM_LOAD( "za5",      0x0a000, 0x1000, CRC(dc0c3cbd) SHA1(8335cd91bbacc680a3a98a5242d4cb5a6f61b2b5) )
 	ROM_LOAD( "za3",      0x10000, 0x1000, CRC(cc4d0aee) SHA1(05c0025e96b432088b46100051a2c780e46b7457) )
 	ROM_LOAD( "za6",      0x0b000, 0x1000, CRC(27c787dd) SHA1(1142790d875573d0c39d846aba4b06946fd2bc88) )
@@ -942,7 +951,7 @@ ROM_START( zookeep3 )
 	ROM_LOAD( "za18",    0xe000, 0x1000, CRC(37886afe) SHA1(a0cc902b2d253466e21c4fbf9d3339069fe79ebe) )
 	ROM_LOAD( "za19",    0xf000, 0x1000, CRC(bbfb30d9) SHA1(bc6bd5525b159bee7b08b6967cd3088b7bd10fee) )
 
-	ROM_REGION( 0x12000, "video", 0 )
+	ROM_REGION( 0x12000, "videocpu", 0 )
 	ROM_LOAD( "za5",     0x0a000, 0x1000, CRC(dc0c3cbd) SHA1(8335cd91bbacc680a3a98a5242d4cb5a6f61b2b5) )
 	ROM_LOAD( "za3",     0x10000, 0x1000, CRC(cc4d0aee) SHA1(05c0025e96b432088b46100051a2c780e46b7457) )
 	ROM_LOAD( "za6",     0x0b000, 0x1000, CRC(27c787dd) SHA1(1142790d875573d0c39d846aba4b06946fd2bc88) )
@@ -971,7 +980,7 @@ ROM_START( slither )
 	ROM_LOAD( "u28.cpu", 0xf000, 0x0800, CRC(2762f612) SHA1(2f094832b199d8514ed04c517fca828c75ac7bfa) )
 	ROM_LOAD( "u27.cpu", 0xf800, 0x0800, CRC(9306d5b1) SHA1(e5a2c613b1e083b70d63e24dd45472364930398a) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "u41.cpu", 0xd000, 0x0800, CRC(e4c60a57) SHA1(5ce9fe3d84b7a5ded372f5c3fc14a335a37ad472) )
 	ROM_LOAD( "u40.cpu", 0xd800, 0x0800, CRC(5dcec622) SHA1(4c00b91106d1e505bdbd3aefb46bfb1a17f14fc1) )
 	ROM_LOAD( "u39.cpu", 0xe000, 0x0800, CRC(69829c2a) SHA1(5ea1f7e6db2b2cebab8663f7a05496f2e13131f9) )
@@ -989,7 +998,7 @@ ROM_START( slithera )
 	ROM_LOAD( "u28.cpu", 0xf000, 0x0800, CRC(2762f612) SHA1(2f094832b199d8514ed04c517fca828c75ac7bfa) )
 	ROM_LOAD( "u27.cpu", 0xf800, 0x0800, CRC(9306d5b1) SHA1(e5a2c613b1e083b70d63e24dd45472364930398a) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "u41.cpu", 0xd000, 0x0800, CRC(e4c60a57) SHA1(5ce9fe3d84b7a5ded372f5c3fc14a335a37ad472) )
 	ROM_LOAD( "u40.cpu", 0xd800, 0x0800, CRC(5dcec622) SHA1(4c00b91106d1e505bdbd3aefb46bfb1a17f14fc1) )
 	ROM_LOAD( "u39.cpu", 0xe000, 0x0800, CRC(69829c2a) SHA1(5ea1f7e6db2b2cebab8663f7a05496f2e13131f9) )
@@ -1007,7 +1016,7 @@ ROM_START( complexx )
 	ROM_LOAD( "cx18.bin", 0xe000, 0x1000, CRC(8f8c3984) SHA1(4cfc83c7a972eeb6e386c9f663388b57c1ebfd00) )
 	ROM_LOAD( "cx19.bin", 0xf000, 0x1000, CRC(13af3ba8) SHA1(79ce3dce960d89161db89821d9b211ffd1d399d7) )
 
-	ROM_REGION( 0x10000, "video", 0 )
+	ROM_REGION( 0x10000, "videocpu", 0 )
 	ROM_LOAD( "cx5.bin",  0xa000, 0x1000, CRC(62a2b87b) SHA1(eeecdfd3eeba15cd93d1514132919fdc9254c1cb) )
 	ROM_LOAD( "cx6.bin",  0xb000, 0x1000, CRC(dfa7c088) SHA1(626cae67db85ab8f87c59f5945032b4cb6683c8b) )
 	ROM_LOAD( "cx7.bin",  0xc000, 0x1000, CRC(c8bd6759) SHA1(5e2debc2f5acf5c14da2d0c3daf49a0f63ade07b) )
@@ -1227,7 +1236,7 @@ static int kram3_decrypt(int address, int value)
 static DRIVER_INIT( kram3 )
 {
 	const address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *videospace = cputag_get_address_space(machine, "video", ADDRESS_SPACE_PROGRAM);
+	const address_space *videospace = cputag_get_address_space(machine, "videocpu", ADDRESS_SPACE_PROGRAM);
 	const UINT8 *patch;
 	UINT8 *rom, *decrypted;
 	int i, size;
@@ -1262,7 +1271,7 @@ static DRIVER_INIT( kram3 )
 	i = 0;
 	patch = memory_region(machine, "user2");
 	size = memory_region_length(machine, "user2");
-	rom = memory_region(machine, "video");
+	rom = memory_region(machine, "videocpu");
 	decrypted = auto_malloc(0x6000);
 
 	memory_set_decrypted_region(videospace, 0xa000, 0xffff, decrypted);
@@ -1278,15 +1287,14 @@ static DRIVER_INIT( kram3 )
 static DRIVER_INIT( zookeep )
 {
 	/* configure the banking */
-	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "video") + 0xa000, 0);
-	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "video") + 0x10000, 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "videocpu") + 0xa000, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "videocpu") + 0x10000, 0);
 	memory_set_bank(machine, 1, 0);
 }
 
 
 static DRIVER_INIT( slither )
 {
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9800, 0x9bff, 0, 0, pia_1_r, pia_1_w);
 }
 
 

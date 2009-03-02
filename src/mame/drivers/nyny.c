@@ -63,7 +63,7 @@
 
 #include "driver.h"
 #include "machine/rescap.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/74123.h"
 #include "video/mc6845.h"
 #include "cpu/m6800/m6800.h"
@@ -100,7 +100,7 @@ static UINT16 star_shift_reg;
  *
  *************************************/
 
-static WRITE8_HANDLER( flipscreen_w );
+static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
 static WRITE8_HANDLER( audio_2_command_w );
 
 
@@ -111,17 +111,19 @@ static WRITE8_HANDLER( audio_2_command_w );
  *
  *************************************/
 
-static void main_cpu_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1) | pia_get_irq_b(2);
+	const device_config *pia1 = devtag_get_device(device->machine, PIA6821, "pia1");
+	const device_config *pia2 = devtag_get_device(device->machine, PIA6821, "pia2");
+	int combined_state = pianew_get_irq_a(pia1) | pianew_get_irq_b(pia1) | pianew_get_irq_b(pia2);
 
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void main_cpu_firq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( main_cpu_firq )
 {
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -134,17 +136,17 @@ static void main_cpu_firq(running_machine *machine, int state)
 
 static INTERRUPT_GEN( update_pia_1 )
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	const device_config *pia1 = devtag_get_device(device->machine, PIA6821, "pia1");
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
-	pia_1_ca1_w(space, 0, input_port_read(device->machine, "IN0") & 0x01);
+	pia_ca1_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x01);
 
 	/* CA2 - copy of PA1 (SERVICE1) */
-	pia_1_ca2_w(space, 0, input_port_read(device->machine, "IN0") & 0x02);
+	pia_ca2_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x02);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(space, 0, input_port_read(device->machine, "CROSS"));
+	pia_cb1_w(pia1, 0, input_port_read(device->machine, "CROSS"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -152,9 +154,18 @@ static INTERRUPT_GEN( update_pia_1 )
 
 static const pia6821_interface pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ input_port_0_r, input_port_1_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ main_cpu_irq, main_cpu_irq
+	DEVCB_INPUT_PORT("IN0"),		/* port A in */
+	DEVCB_INPUT_PORT("IN1"),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(main_cpu_irq),		/* IRQA */
+	DEVCB_LINE(main_cpu_irq)		/* IRQB */
 };
 
 
@@ -165,13 +176,13 @@ static const pia6821_interface pia_1_intf =
  *
  *************************************/
 
-static WRITE8_HANDLER( pia_2_port_a_w )
+static WRITE8_DEVICE_HANDLER( pia_2_port_a_w )
 {
 	star_delay_counter = (star_delay_counter & 0x0f00) | data;
 }
 
 
-static WRITE8_HANDLER( pia_2_port_b_w )
+static WRITE8_DEVICE_HANDLER( pia_2_port_b_w )
 {
 	/* bits 0-3 go to bits 8-11 of the star delay counter */
 	star_delay_counter = (star_delay_counter & 0x00ff) | ((data & 0x0f) << 8);
@@ -180,15 +191,24 @@ static WRITE8_HANDLER( pia_2_port_b_w )
 	star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	audio_2_command_w(space, 0, data & 0xe0);
+	audio_2_command_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, data & 0xe0);
 }
 
 
 static const pia6821_interface pia_2_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ pia_2_port_a_w, pia_2_port_b_w, flipscreen_w, 0,
-	/*irqs   : A/B             */ main_cpu_firq, main_cpu_irq
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(pia_2_port_a_w),		/* port A out */
+	DEVCB_HANDLER(pia_2_port_b_w),		/* port B out */
+	DEVCB_LINE(flipscreen_w),			/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(main_cpu_firq),		/* IRQA */
+	DEVCB_LINE(main_cpu_irq)		/* IRQB */
 };
 
 
@@ -207,8 +227,8 @@ static const pia6821_interface pia_2_intf =
 
 static WRITE8_DEVICE_HANDLER(ic48_1_74123_output_changed)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia_2_ca1_w(space, 0, data);
+	const device_config *pia2 = devtag_get_device(device->machine, PIA6821, "pia2");
+	pia_ca1_w(pia2, 0, data);
 }
 
 
@@ -233,27 +253,11 @@ static const ttl74123_config ic48_1_config =
 
 static MACHINE_START( nyny )
 {
-	pia_config(machine, 1, &pia_1_intf);
-	pia_config(machine, 2, &pia_2_intf);
-
 	/* setup for save states */
 	state_save_register_global(machine, flipscreen);
 	state_save_register_global(machine, star_enable);
 	state_save_register_global(machine, star_delay_counter);
 	state_save_register_global(machine, star_shift_reg);
-}
-
-
-
-/*************************************
- *
- *  Machine reset
- *
- *************************************/
-
-static MACHINE_RESET( nyny )
-{
-	pia_reset();
 }
 
 
@@ -267,9 +271,9 @@ static MACHINE_RESET( nyny )
 #define NUM_PENS	(8)
 
 
-static WRITE8_HANDLER( flipscreen_w )
+static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
 {
-	flipscreen = data ? 0 : 1;
+	flipscreen = state ? 0 : 1;
 }
 
 
@@ -495,11 +499,13 @@ static WRITE8_HANDLER( audio_2_command_w )
 
 static READ8_HANDLER( nyny_pia_1_2_r )
 {
+	const device_config *pia1 = devtag_get_device(space->machine, PIA6821, "pia1");
+	const device_config *pia2 = devtag_get_device(space->machine, PIA6821, "pia2");
 	UINT8 ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
-	if (offset & 0x04)  ret = pia_1_r(space, offset & 0x03);
-	if (offset & 0x08)  ret = pia_2_alt_r(space, offset & 0x03);
+	if (offset & 0x04)  ret = pia_r(pia1, offset & 0x03);
+	if (offset & 0x08)  ret = pia_alt_r(pia2, offset & 0x03);
 
 	return ret;
 }
@@ -507,9 +513,12 @@ static READ8_HANDLER( nyny_pia_1_2_r )
 
 static WRITE8_HANDLER( nyny_pia_1_2_w )
 {
+	const device_config *pia1 = devtag_get_device(space->machine, PIA6821, "pia1");
+	const device_config *pia2 = devtag_get_device(space->machine, PIA6821, "pia2");
+
 	/* the address bits are directly connected to the chip selects */
-	if (offset & 0x04)  pia_1_w(space, offset & 0x03, data);
-	if (offset & 0x08)  pia_2_alt_w(space, offset & 0x03, data);
+	if (offset & 0x04)  pia_w(pia1, offset & 0x03, data);
+	if (offset & 0x08)  pia_alt_w(pia2, offset & 0x03, data);
 }
 
 
@@ -667,7 +676,6 @@ static MACHINE_DRIVER_START( nyny )
 	MDRV_CPU_PROGRAM_MAP(nyny_audio_2_map,0)
 
 	MDRV_MACHINE_START(nyny)
-	MDRV_MACHINE_RESET(nyny)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
@@ -682,6 +690,9 @@ static MACHINE_DRIVER_START( nyny )
 	/* 74LS123 */
 
 	MDRV_TTL74123_ADD("ic48_1", ic48_1_config)
+	
+	MDRV_PIA6821_ADD("pia1", pia_1_intf)
+	MDRV_PIA6821_ADD("pia2", pia_2_intf)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

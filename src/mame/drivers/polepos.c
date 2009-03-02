@@ -1738,9 +1738,9 @@ static DRIVER_INIT( topracra )
 	polepos_gear_bit = 0x20;
 
 	/* extra direct mapped inputs read */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, input_port_read_handler8(machine->portconfig, "STEER"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, input_port_read_handler8(machine->portconfig, "IN0"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, input_port_read_handler8(machine->portconfig, "DSWA"));
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, "STEER");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "IN0");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSWA");
 
 }
 

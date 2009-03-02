@@ -923,8 +923,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( urashima, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x080002, 0x080003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
 	//       0x080004, 0x080005  MCU read,different for each game
 	AM_RANGE(0x080010, 0x080011) AM_WRITE(jalmah_flip_screen_w)
 	//       0x080012, 0x080013  MCU write related,same for each game

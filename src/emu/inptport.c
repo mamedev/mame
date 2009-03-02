@@ -286,50 +286,6 @@ static const char *const seqtypestrings[] = { "standard", "decrement", "incremen
 
 
 /***************************************************************************
-    PORT HANDLER TABLES
-***************************************************************************/
-
-static const read8_space_func port_handler8[] =
-{
-	input_port_0_r,			input_port_1_r,			input_port_2_r,			input_port_3_r,
-	input_port_4_r,			input_port_5_r,			input_port_6_r,			input_port_7_r,
-	input_port_8_r,			input_port_9_r,			input_port_10_r,		input_port_11_r,
-	input_port_12_r,		input_port_13_r,		input_port_14_r,		input_port_15_r,
-	input_port_16_r,		input_port_17_r,		input_port_18_r,		input_port_19_r,
-	input_port_20_r,		input_port_21_r,		input_port_22_r,		input_port_23_r,
-	input_port_24_r,		input_port_25_r,		input_port_26_r,		input_port_27_r,
-	input_port_28_r,		input_port_29_r,		input_port_30_r,		input_port_31_r
-};
-
-
-static const read16_space_func port_handler16[] =
-{
-	input_port_0_word_r,	input_port_1_word_r,	input_port_2_word_r,	input_port_3_word_r,
-	input_port_4_word_r,	input_port_5_word_r,	input_port_6_word_r,	input_port_7_word_r,
-	input_port_8_word_r,	input_port_9_word_r,	input_port_10_word_r,	input_port_11_word_r,
-	input_port_12_word_r,	input_port_13_word_r,	input_port_14_word_r,	input_port_15_word_r,
-	input_port_16_word_r,	input_port_17_word_r,	input_port_18_word_r,	input_port_19_word_r,
-	input_port_20_word_r,	input_port_21_word_r,	input_port_22_word_r,	input_port_23_word_r,
-	input_port_24_word_r,	input_port_25_word_r,	input_port_26_word_r,	input_port_27_word_r,
-	input_port_28_word_r,	input_port_29_word_r,	input_port_30_word_r,	input_port_31_word_r
-};
-
-
-static const read32_space_func port_handler32[] =
-{
-	input_port_0_dword_r,	input_port_1_dword_r,	input_port_2_dword_r,	input_port_3_dword_r,
-	input_port_4_dword_r,	input_port_5_dword_r,	input_port_6_dword_r,	input_port_7_dword_r,
-	input_port_8_dword_r,	input_port_9_dword_r,	input_port_10_dword_r,	input_port_11_dword_r,
-	input_port_12_dword_r,	input_port_13_dword_r,	input_port_14_dword_r,	input_port_15_dword_r,
-	input_port_16_dword_r,	input_port_17_dword_r,	input_port_18_dword_r,	input_port_19_dword_r,
-	input_port_20_dword_r,	input_port_21_dword_r,	input_port_22_dword_r,	input_port_23_dword_r,
-	input_port_24_dword_r,	input_port_25_dword_r,	input_port_26_dword_r,	input_port_27_dword_r,
-	input_port_28_dword_r,	input_port_29_dword_r,	input_port_30_dword_r,	input_port_31_dword_r
-};
-
-
-
-/***************************************************************************
     COMMON SHARED STRINGS
 ***************************************************************************/
 
@@ -1520,40 +1476,6 @@ const char *input_port_string_from_token(const input_port_token token)
 		if (input_port_default_strings[index].id == token.i)
 			return input_port_default_strings[index].string;
 	return "(Unknown Default)";
-}
-
-
-
-/*-------------------------------------------------
-    input_port_read_handler* - return a memory
-    handler corresponding to a given input port
-    tag
--------------------------------------------------*/
-
-read8_space_func input_port_read_handler8(const input_port_config *portlist, const char *tag)
-{
-	int portnum = get_port_index(portlist, tag);
-	return (portnum == -1) ? SMH_NOP : port_handler8[portnum];
-}
-
-
-read16_space_func input_port_read_handler16(const input_port_config *portlist, const char *tag)
-{
-	int portnum = get_port_index(portlist, tag);
-	return (portnum == -1) ? SMH_NOP : port_handler16[portnum];
-}
-
-
-read32_space_func input_port_read_handler32(const input_port_config *portlist, const char *tag)
-{
-	int portnum = get_port_index(portlist, tag);
-	return (portnum == -1) ? SMH_NOP : port_handler32[portnum];
-}
-
-
-read64_space_func input_port_read_handler64(const input_port_config *portlist, const char *tag)
-{
-	return SMH_NOP;
 }
 
 

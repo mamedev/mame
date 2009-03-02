@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "video/mc6845.h"
+#include "machine/6821new.h"
 
 
 #define MAIN_CLOCK_OSC			20000000	/* 20 MHz */
@@ -39,9 +40,15 @@ struct _qix_state
 
 /*----------- defined in machine/qix.c -----------*/
 
-MACHINE_START( qix );
+extern const pia6821_interface qix_pia_0_intf;
+extern const pia6821_interface qix_pia_1_intf;
+extern const pia6821_interface qix_pia_2_intf;
+extern const pia6821_interface qixmcu_pia_0_intf;
+extern const pia6821_interface qixmcu_pia_2_intf;
+extern const pia6821_interface slither_pia_1_intf;
+extern const pia6821_interface slither_pia_2_intf;
+
 MACHINE_START( qixmcu );
-MACHINE_START( slither );
 MACHINE_RESET( qix );
 
 WRITE8_HANDLER( zookeep_bankswitch_w );
@@ -63,7 +70,7 @@ WRITE8_HANDLER( qix_68705_portA_w );
 WRITE8_HANDLER( qix_68705_portB_w );
 WRITE8_HANDLER( qix_68705_portC_w );
 
-WRITE8_HANDLER( qix_pia_0_w );
+WRITE8_DEVICE_HANDLER( qix_pia_w );
 
 MC6845_ON_VSYNC_CHANGED( qix_vsync_changed );
 
@@ -74,7 +81,7 @@ MACHINE_DRIVER_EXTERN( qix_video );
 MACHINE_DRIVER_EXTERN( zookeep_video );
 MACHINE_DRIVER_EXTERN( slither_video );
 
-WRITE8_HANDLER( qix_flip_screen_w );
+WRITE8_DEVICE_HANDLER( qix_flip_screen_w );
 WRITE8_HANDLER( qix_palettebank_w );
 
 
@@ -82,6 +89,3 @@ WRITE8_HANDLER( qix_palettebank_w );
 
 MACHINE_DRIVER_EXTERN( qix_audio );
 MACHINE_DRIVER_EXTERN( slither_audio );
-
-WRITE8_HANDLER( qix_dac_w );
-WRITE8_HANDLER( qix_vol_w );

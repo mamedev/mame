@@ -83,10 +83,10 @@ static void subtract_from_counter(running_machine *machine, int counter, int cou
 static TIMER_CALLBACK( mcr68_493_callback );
 static TIMER_CALLBACK( zwackery_493_callback );
 
-static WRITE8_HANDLER( zwackery_pia_2_w );
-static WRITE8_HANDLER( zwackery_pia_3_w );
-static WRITE8_HANDLER( zwackery_ca2_w );
-static void zwackery_pia_irq(running_machine *machine, int state);
+static WRITE8_DEVICE_HANDLER( zwackery_pia0_w );
+static WRITE8_DEVICE_HANDLER( zwackery_pia1_w );
+static WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w );
+static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq );
 
 static void reload_count(int counter);
 static TIMER_CALLBACK( counter_fired_callback );
@@ -135,48 +135,77 @@ const gfx_layout mcr_sprite_layout =
  *
  *************************************/
 
-READ8_HANDLER( zwackery_port_2_r );
+READ8_DEVICE_HANDLER( zwackery_port_2_r );
 
 
-static READ8_HANDLER( zwackery_port_1_r )
+static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 {
-	UINT8 ret = input_port_read(space->machine, "IN1");
+	UINT8 ret = input_port_read(device->machine, "IN1");
 
-	pia_set_port_a_z_mask(3, ret);
+	pianew_set_port_a_z_mask(device, ret);
 
 	return ret;
 }
 
 
-static READ8_HANDLER( zwackery_port_3_r )
+static READ8_DEVICE_HANDLER( zwackery_port_3_r )
 {
-	UINT8 ret = input_port_read(space->machine, "IN3");
+	UINT8 ret = input_port_read(device->machine, "IN3");
 
-	pia_set_port_a_z_mask(4, ret);
+	pianew_set_port_a_z_mask(device, ret);
 
 	return ret;
 }
 
 
-static const pia6821_interface zwackery_pia_2_intf =
+const pia6821_interface zwackery_pia0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, input_port_0_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ zwackery_pia_2_w, 0, 0, 0,
-	/*irqs   : A/B             */ zwackery_pia_irq, zwackery_pia_irq
+	DEVCB_NULL,		/* port A in */
+	DEVCB_INPUT_PORT("IN0"),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(zwackery_pia0_w),		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(zwackery_pia_irq),		/* IRQA */
+	DEVCB_LINE(zwackery_pia_irq)		/* IRQB */
 };
 
-static const pia6821_interface zwackery_pia_3_intf =
+
+const pia6821_interface zwackery_pia1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ zwackery_port_1_r, zwackery_port_2_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ zwackery_pia_3_w, 0, zwackery_ca2_w, 0,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_HANDLER(zwackery_port_1_r),		/* port A in */
+	DEVCB_HANDLER(zwackery_port_2_r),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(zwackery_pia1_w),		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_LINE(zwackery_ca2_w),		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
-static const pia6821_interface zwackery_pia_4_intf =
+
+const pia6821_interface zwackery_pia2_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ zwackery_port_3_r, input_port_4_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, 0,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_HANDLER(zwackery_port_3_r),		/* port A in */
+	DEVCB_INPUT_PORT("DSW"),				/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -372,11 +401,6 @@ MACHINE_RESET( mcr68 )
 
 MACHINE_START( zwackery )
 {
-	/* append our PIA state onto the existing one and reinit */
-	pia_config(machine, 2, &zwackery_pia_2_intf);
-	pia_config(machine, 3, &zwackery_pia_3_intf);
-	pia_config(machine, 4, &zwackery_pia_4_intf);
-
 	MACHINE_START_CALL(mcr68);
 }
 
@@ -386,9 +410,6 @@ MACHINE_RESET( zwackery )
 	/* for the most part all MCR/68k games are the same */
 	mcr68_common_init(machine);
 	v493_callback = zwackery_493_callback;
-
-	/* append our PIA state onto the existing one and reinit */
-	pia_reset();
 
 	/* vectors are 5 and 6 */
 	v493_irq_vector = 5;
@@ -558,10 +579,10 @@ WRITE8_HANDLER( mcr_scroll_value_w )
  *
  *************************************/
 
-WRITE8_HANDLER( zwackery_pia_2_w )
+WRITE8_DEVICE_HANDLER( zwackery_pia0_w )
 {
 	/* bit 7 is the watchdog */
-	if (!(data & 0x80)) watchdog_reset_w(space, offset, data);
+	if (!(data & 0x80)) watchdog_reset(device->machine);
 
 	/* bits 5 and 6 control hflip/vflip */
 	/* bits 3 and 4 control coin counters? */
@@ -569,37 +590,38 @@ WRITE8_HANDLER( zwackery_pia_2_w )
 }
 
 
-WRITE8_HANDLER( zwackery_pia_3_w )
+WRITE8_DEVICE_HANDLER( zwackery_pia1_w )
 {
 	zwackery_sound_data = (data >> 4) & 0x0f;
 }
 
 
-WRITE8_HANDLER( zwackery_ca2_w )
+WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
 {
-	csdeluxe_data_w(space, offset, (data << 4) | zwackery_sound_data);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	csdeluxe_data_w(space, 0, (state << 4) | zwackery_sound_data);
 }
 
 
-static void zwackery_pia_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
 {
-	v493_irq_state = pia_get_irq_a(2) | pia_get_irq_b(2);
-	update_mcr68_interrupts(machine);
+	v493_irq_state = pianew_get_irq_a(device) | pianew_get_irq_b(device);
+	update_mcr68_interrupts(device->machine);
 }
 
 
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia_2_ca1_w(space, 0, 0);
+	const device_config *pia = devtag_get_device(machine, PIA6821, "pia0");
+	pia_ca1_w(pia, 0, 0);
 }
 
 
 static TIMER_CALLBACK( zwackery_493_callback )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *pia = devtag_get_device(machine, PIA6821, "pia0");
 
-	pia_2_ca1_w(space, 0, 1);
+	pia_ca1_w(pia, 0, 1);
 	timer_set(machine, video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);
 }
 

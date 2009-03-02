@@ -1029,11 +1029,5 @@ int input_condition_true(running_machine *machine, const input_condition *condit
 /* convert an input_port_token to a default string */
 const char *input_port_string_from_token(const input_port_token token);
 
-/* return a memory handler corresponding to a given input port tag */
-read8_space_func input_port_read_handler8(const input_port_config *portlist, const char *tag);
-read16_space_func input_port_read_handler16(const input_port_config *portlist, const char *tag);
-read32_space_func input_port_read_handler32(const input_port_config *portlist, const char *tag);
-read64_space_func input_port_read_handler64(const input_port_config *portlist, const char *tag);
-
 
 #endif	/* __INPTPORT_H__ */

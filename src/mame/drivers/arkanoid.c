@@ -570,7 +570,7 @@ static INPUT_PORTS_START( arkanoid )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
 
-	PORT_START("UNUSED")	/* This is read by input_port_4_r in ay8910_interface */
+	PORT_START("UNUSED")	/* This is read in ay8910_interface */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")		/* Spinner Player 1 */

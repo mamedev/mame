@@ -553,9 +553,9 @@ DRIVER_INIT( insectx )
 	mcu_type = MCU_NONE_INSECTX;
 
 	/* this game has no mcu, replace the handler with plain input port handlers */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, input_port_2_r );
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc001, 0xc001, 0, 0, input_port_3_r );
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc002, 0xc002, 0, 0, input_port_4_r );
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, "IN0" );
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc001, 0xc001, 0, 0, "IN1" );
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc002, 0xc002, 0, 0, "IN2" );
 }
 
 DRIVER_INIT( kageki )

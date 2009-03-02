@@ -605,7 +605,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "sound/discrete.h"
 
 #include "pmpoker.lh"
@@ -761,28 +761,28 @@ static UINT8 pia0_PA_data;
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-static READ8_HANDLER( goldnpkr_mux_port_r )
+static READ8_DEVICE_HANDLER( goldnpkr_mux_port_r )
 {
 	switch( mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(space->machine, "IN0-0");
-		case 0x20: return input_port_read(space->machine, "IN0-1");
-		case 0x40: return input_port_read(space->machine, "IN0-2");
-		case 0x80: return input_port_read(space->machine, "IN0-3");
+		case 0x10: return input_port_read(device->machine, "IN0-0");
+		case 0x20: return input_port_read(device->machine, "IN0-1");
+		case 0x40: return input_port_read(device->machine, "IN0-2");
+		case 0x80: return input_port_read(device->machine, "IN0-3");
 	}
 	return 0xff;
 }
 
-static READ8_HANDLER( pottnpkr_mux_port_r )
+static READ8_DEVICE_HANDLER( pottnpkr_mux_port_r )
 {
 	UINT8 pa_0_4 = 0xff, pa_7;	/* Temporary place holder for bits 0 to 4 & 7 */
 
 	switch( mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(space->machine, "IN0-0");
-		case 0x20: return input_port_read(space->machine, "IN0-1");
-		case 0x40: return input_port_read(space->machine, "IN0-2");
-		case 0x80: return input_port_read(space->machine, "IN0-3");
+		case 0x10: return input_port_read(device->machine, "IN0-0");
+		case 0x20: return input_port_read(device->machine, "IN0-1");
+		case 0x40: return input_port_read(device->machine, "IN0-2");
+		case 0x80: return input_port_read(device->machine, "IN0-3");
 	}
 
 	pa_7 = (pia0_PA_data >> 7) & 1;	/* To do: bit PA5 to pin CB1 */
@@ -791,12 +791,12 @@ static READ8_HANDLER( pottnpkr_mux_port_r )
 	return ( (pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7) ) ;
 }
 
-static WRITE8_HANDLER( mux_w )
+static WRITE8_DEVICE_HANDLER( mux_w )
 {
 	mux_data = data ^ 0xff;	/* inverted */
 }
 
-static WRITE8_HANDLER( mux_port_w )
+static WRITE8_DEVICE_HANDLER( mux_port_w )
 {
 	pia0_PA_data = data;
 }
@@ -836,7 +836,7 @@ static WRITE8_HANDLER( mux_port_w )
 
 */
 
-static WRITE8_HANDLER( lamps_a_w )
+static WRITE8_DEVICE_HANDLER( lamps_a_w )
 {
 	output_set_lamp_value(0, 1 - ((data) & 1));			/* Lamp 0 */
 	output_set_lamp_value(1, 1 - ((data >> 1) & 1));	/* Lamp 1 */
@@ -862,16 +862,14 @@ static WRITE8_HANDLER( lamps_a_w )
 */
 }
 
-static WRITE8_HANDLER( sound_w )
+static WRITE8_DEVICE_HANDLER( sound_w )
 {
-	const device_config *discrete = devtag_get_device(space->machine, SOUND, "discrete");
-
 	/* 555 voltage controlled */
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
-	discrete_sound_w(discrete, NODE_01, data >> 3 & 0x01);
-	discrete_sound_w(discrete, NODE_10, data & 0x07);
+	discrete_sound_w(device, NODE_01, data >> 3 & 0x01);
+	discrete_sound_w(device, NODE_10, data & 0x07);
 }
 
 
@@ -884,8 +882,8 @@ static ADDRESS_MAP_START( goldnpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x0844, 0x0847) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x0848, 0x084b) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, pia_w)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
@@ -896,8 +894,8 @@ static ADDRESS_MAP_START( pottnpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x0844, 0x0847) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x0848, 0x084b) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, pia_w)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
@@ -908,8 +906,8 @@ static ADDRESS_MAP_START( witchcrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x0844, 0x0847) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x0848, 0x084b) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE(PIA6821, "pia0", pia_r, pia_w)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE(PIA6821, "pia1", pia_r, pia_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW2")
@@ -2096,54 +2094,52 @@ GFXDECODE_END
 
 static const pia6821_interface goldnpkr_pia0_intf =
 {
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	goldnpkr_mux_port_r, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-	0, lamps_a_w, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
+	DEVCB_HANDLER(goldnpkr_mux_port_r),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(lamps_a_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 static const pia6821_interface goldnpkr_pia1_intf =
 {
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	input_port_4_r, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-
-	sound_w, mux_w, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
+	DEVCB_INPUT_PORT("SW1"),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_DEVICE_HANDLER(SOUND, "discrete", sound_w),		/* port A out */
+	DEVCB_HANDLER(mux_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 /***** Jack Potten's Poker & Witch Card *****/
 
 static const pia6821_interface pottnpkr_pia0_intf =
 {
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	pottnpkr_mux_port_r, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-	mux_port_w, lamps_a_w, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
-};
-
-static const pia6821_interface pottnpkr_pia1_intf =
-{
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	input_port_4_r, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-
-	sound_w, mux_w, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
+	DEVCB_HANDLER(pottnpkr_mux_port_r),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(mux_port_w),		/* port A out */
+	DEVCB_HANDLER(lamps_a_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -2312,6 +2308,9 @@ static MACHINE_DRIVER_START( goldnpkr_base )
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
+	
+	MDRV_PIA6821_ADD("pia0", goldnpkr_pia0_intf)
+	MDRV_PIA6821_ADD("pia1", goldnpkr_pia1_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2351,6 +2350,8 @@ static MACHINE_DRIVER_START( pottnpkr )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pottnpkr_map, 0)
 
+	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
@@ -2365,6 +2366,8 @@ static MACHINE_DRIVER_START( witchcrd )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(witchcrd_map, 0)
+
+	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
 	MDRV_PALETTE_INIT(witchcrd)
@@ -3193,18 +3196,6 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-static DRIVER_INIT( goldnpkr )
-{
-	pia_config(machine, 0, &goldnpkr_pia0_intf);
-	pia_config(machine, 1, &goldnpkr_pia1_intf);
-}
-
-static DRIVER_INIT( pottnpkr )
-{
-	pia_config(machine, 0, &pottnpkr_pia0_intf);
-	pia_config(machine, 1, &pottnpkr_pia1_intf);
-}
-
 /*
     Golden Poker H/W sets:
 
@@ -3250,9 +3241,6 @@ static DRIVER_INIT( royale )
 
 //  ROM[0x60bb] = 0xea;
 //  ROM[0x60bc] = 0xea;
-
-	pia_config(machine, 0, &pottnpkr_pia0_intf);
-	pia_config(machine, 1, &pottnpkr_pia1_intf);
 }
 
 /*************************
@@ -3260,46 +3248,46 @@ static DRIVER_INIT( royale )
 *************************/
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                      FULLNAME                                  FLAGS             LAYOUT  */
-GAMEL( 1981, goldnpkr, 0,        goldnpkr, goldnpkr, goldnpkr, ROT0,   "Bonanza Enterprises, Ltd",  "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
-GAMEL( 1981, goldnpkb, goldnpkr, goldnpkr, goldnpkr, goldnpkr, ROT0,   "Bonanza Enterprises, Ltd",  "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
-GAMEL( 1981, pmpoker,  0,        goldnpkr, pmpoker,  goldnpkr, ROT0,   "PlayMan",                   "PlayMan Poker (german)",                  0,                layout_pmpoker  )
-GAMEL( 198?, pottnpkr, 0,        pottnpkr, pottnpkr, pottnpkr, ROT0,   "Bootleg",                   "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkra, pottnpkr, pottnpkr, potnpkra, pottnpkr, ROT0,   "Bootleg on Coinmaster H/W", "Jack Potten's Poker (set 2)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrb, pottnpkr, pottnpkr, pottnpkr, pottnpkr, ROT0,   "Bootleg",                   "Jack Potten's Poker (set 3)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrc, pottnpkr, pottnpkr, potnpkrc, pottnpkr, ROT0,   "Bootleg",                   "Jack Potten's Poker (set 4)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrd, pottnpkr, pottnpkr, potnpkrc, pottnpkr, ROT0,   "Bootleg",                   "Jack Potten's Poker (set 5)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkre, pottnpkr, pottnpkr, pottnpkr, pottnpkr, ROT0,   "Bootleg",                   "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
-GAMEL( 1991, goodluck, 0,        witchcrd, goodluck, pottnpkr, ROT0,   "Unknown",                   "Good Luck",                               0,                layout_goldnpkr )
+GAMEL( 1981, goldnpkr, 0,        goldnpkr, goldnpkr, 0,        ROT0,   "Bonanza Enterprises, Ltd",  "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
+GAMEL( 1981, goldnpkb, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Bonanza Enterprises, Ltd",  "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
+GAMEL( 1981, pmpoker,  0,        goldnpkr, pmpoker,  0,        ROT0,   "PlayMan",                   "PlayMan Poker (german)",                  0,                layout_pmpoker  )
+GAMEL( 198?, pottnpkr, 0,        pottnpkr, pottnpkr, 0,        ROT0,   "Bootleg",                   "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkra, pottnpkr, pottnpkr, potnpkra, 0,        ROT0,   "Bootleg on Coinmaster H/W", "Jack Potten's Poker (set 2)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrb, pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "Bootleg",                   "Jack Potten's Poker (set 3)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrc, pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "Bootleg",                   "Jack Potten's Poker (set 4)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrd, pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "Bootleg",                   "Jack Potten's Poker (set 5)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkre, pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "Bootleg",                   "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
+GAMEL( 1991, goodluck, 0,        witchcrd, goodluck, 0,        ROT0,   "Unknown",                   "Good Luck",                               0,                layout_goldnpkr )
 GAMEL( 198?, royale,   0,        goldnpkr, royale,   royale,   ROT0,   "Unknown",                   "Royale (set 1)",                          GAME_NOT_WORKING, layout_goldnpkr )
 GAMEL( 198?, royalea,  royale,   goldnpkr, royale,   royale,   ROT0,   "Unknown",                   "Royale (set 2)",                          GAME_NOT_WORKING, layout_goldnpkr )
-GAME(  1991, witchcrd, 0,        witchcrd, witchcrd, pottnpkr, ROT0,   "Video Klein",               "Witch Card (Video Klein)",                GAME_NOT_WORKING )
-GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, pottnpkr, ROT0,   "Unknown",                   "Witch Card (spanish, witch game, set 1)", 0 )
-GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, pottnpkr, ROT0,   "Unknown",                   "Witch Card (spanish, witch game, set 2)", 0 )
-GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, pottnpkr, ROT0,   "Unknown",                   "Witch Card (english, no witch game)",     0 )
-GAME(  1993, sloco93,  0,        witchcrd, sloco93,  pottnpkr, ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 1)",          0 )
-GAME(  1993, sloco93a, sloco93,  witchcrd, sloco93,  pottnpkr, ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 2)",          0 )
-GAME(  198?, maverik,  0,        witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Maverik",                                 0 )
-GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Brasil 89",                               0,                layout_goldnpkr )
-GAME(  1991, poker91,  0,        witchcrd, poker91,  pottnpkr, ROT0,   "Unknown",                   "Poker 91",                                0 )
-GAMEL( 1990, bsuerte,  0,        witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 1)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertea, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 2)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteb, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 3)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertec, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 4)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerted, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 5)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertee, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 6)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertef, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 7)",           0,                layout_goldnpkr )
-GAME(  1991, bsuerteg, bsuerte,  witchcrd, bsuertew, pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 8)",           0 )
-GAME(  1991, bsuerteh, bsuerte,  witchcrd, bsuertew, pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 9)",           0 )
-GAMEL( 1991, bsuertei, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 10)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertej, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 11)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertek, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 12)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertel, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 13)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertem, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 14)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerten, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 15)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteo, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 16)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertep, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 17)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteq, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 18)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 19)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertes, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 20)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertet, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 21)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteu, bsuerte,  witchcrd, bsuerte,  pottnpkr, ROT0,   "Unknown",                   "Buena Suerte (spanish, set 22)",          0,                layout_goldnpkr )
+GAME(  1991, witchcrd, 0,        witchcrd, witchcrd, 0,        ROT0,   "Video Klein",               "Witch Card (Video Klein)",                GAME_NOT_WORKING )
+GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, 0,        ROT0,   "Unknown",                   "Witch Card (spanish, witch game, set 1)", 0 )
+GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, 0,        ROT0,   "Unknown",                   "Witch Card (spanish, witch game, set 2)", 0 )
+GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, 0,        ROT0,   "Unknown",                   "Witch Card (english, no witch game)",     0 )
+GAME(  1993, sloco93,  0,        witchcrd, sloco93,  0,        ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 1)",          0 )
+GAME(  1993, sloco93a, sloco93,  witchcrd, sloco93,  0,        ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 2)",          0 )
+GAME(  198?, maverik,  0,        witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Maverik",                                 0 )
+GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Brasil 89",                               0,                layout_goldnpkr )
+GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "Unknown",                   "Poker 91",                                0 )
+GAMEL( 1990, bsuerte,  0,        witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 1)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertea, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 2)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteb, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 3)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertec, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 4)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerted, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 5)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertee, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 6)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertef, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 7)",           0,                layout_goldnpkr )
+GAME(  1991, bsuerteg, bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 8)",           0 )
+GAME(  1991, bsuerteh, bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 9)",           0 )
+GAMEL( 1991, bsuertei, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 10)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertej, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 11)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertek, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 12)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertel, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 13)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertem, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 14)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerten, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 15)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteo, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 16)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertep, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 17)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteq, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 18)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 19)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertes, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 20)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertet, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 21)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteu, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "Unknown",                   "Buena Suerte (spanish, set 22)",          0,                layout_goldnpkr )

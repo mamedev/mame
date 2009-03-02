@@ -248,7 +248,8 @@ static const struct TAITO8741interface gsword_8741interface=
 	4,         /* 4 chips */
 	{ TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT },  /* program mode */
 	{ 1,0,0,0 },							     /* serial port connection */
-	{ input_port_7_r,input_port_6_r,gsword_8741_2_r,gsword_8741_3_r }    /* port handler */
+	{ NULL,NULL,gsword_8741_2_r,gsword_8741_3_r },    /* port handler */
+	{ "DSW2","DSW1",NULL,NULL }
 };
 
 static MACHINE_RESET( gsword )

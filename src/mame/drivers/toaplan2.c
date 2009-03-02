@@ -923,9 +923,9 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
 			memory_install_readwrite16_handler(space, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2);
 			memory_set_bankptr(space->machine, 2, fixeight_sec_cpu_mem);
-			memory_install_readwrite16_handler(space, 0x28f004, 0x28f005, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWA"), SMH_NOP);	/* Dip Switch A - Wrong !!! */
-			memory_install_readwrite16_handler(space, 0x28f006, 0x28f007, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWB"), SMH_NOP);	/* Dip Switch B - Wrong !!! */
-			memory_install_readwrite16_handler(space, 0x28f008, 0x28f009, 0, 0, input_port_read_handler16(space->machine->portconfig, "JMPR"), SMH_NOP);	/* Territory Jumper block - Wrong !!! */
+			memory_install_read_port_handler(space, 0x28f004, 0x28f005, 0, 0, "DSWA");	/* Dip Switch A - Wrong !!! */
+			memory_install_read_port_handler(space, 0x28f006, 0x28f007, 0, 0, "DSWB");	/* Dip Switch B - Wrong !!! */
+			memory_install_read_port_handler(space, 0x28f008, 0x28f009, 0, 0, "JMPR");	/* Territory Jumper block - Wrong !!! */
 
 			mcu_data = data;
 		}

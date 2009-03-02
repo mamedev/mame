@@ -128,7 +128,6 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	/* Turbo Chip Squeak */
 	if (mcr_sound_config & MCR_TURBO_CHIP_SQUEAK)
 	{
-		pia_config(machine, 0, &turbocs_pia_intf);
 		turbocs_sound_cpu = cputag_get_cpu(machine, "tcscpu");
 		state_save_register_global(machine, turbocs_status);
 	}
@@ -136,7 +135,6 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	/* Chip Squeak Deluxe */
 	if (mcr_sound_config & MCR_CHIP_SQUEAK_DELUXE)
 	{
-		pia_config(machine, 0, &csdeluxe_pia_intf);
 		csdeluxe_sound_cpu = cputag_get_cpu(machine, "csdcpu");
 		state_save_register_global(machine, csdeluxe_status);
 	}
@@ -144,8 +142,6 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	/* Sounds Good */
 	if (mcr_sound_config & MCR_SOUNDS_GOOD)
 	{
-		/* special case: Spy Hunter 2 has both Turbo CS and Sounds Good, so we use PIA slot 1 */
-		pia_config(machine, 1, &soundsgood_pia_intf);
 		soundsgood_sound_cpu = cputag_get_cpu(machine, "sgcpu");
 		state_save_register_global(machine, soundsgood_status);
 	}
@@ -153,8 +149,6 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	/* Squawk n Talk */
 	if (mcr_sound_config & MCR_SQUAWK_N_TALK)
 	{
-		pia_config(machine, 0, &squawkntalk_pia0_intf);
-		pia_config(machine, 1, &squawkntalk_pia1_intf);
 		squawkntalk_sound_cpu = cputag_get_cpu(machine, "sntcpu");
 		state_save_register_global(machine, squawkntalk_tms_command);
 		state_save_register_global(machine, squawkntalk_tms_strobes);
@@ -212,9 +206,6 @@ void mcr_sound_reset(running_machine *machine)
 		williams_cvsd_reset_w(1);
 		williams_cvsd_reset_w(0);
 	}
-
-	/* reset any PIAs */
-	pia_reset();
 }
 
 
@@ -507,60 +498,60 @@ MACHINE_DRIVER_END
  *************************************/
 
 /********* internal interfaces ***********/
-static WRITE8_HANDLER( csdeluxe_porta_w )
+static WRITE8_DEVICE_HANDLER( csdeluxe_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(devtag_get_device(space->machine, SOUND, "csddac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "csddac"), dacval << 6);
 }
 
-static WRITE8_HANDLER( csdeluxe_portb_w )
+static WRITE8_DEVICE_HANDLER( csdeluxe_portb_w )
 {
-	UINT8 z_mask = pia_get_port_b_z_mask(0);
+	UINT8 z_mask = pianew_get_port_b_z_mask(device);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(devtag_get_device(space->machine, SOUND, "csddac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "csddac"), dacval << 6);
 
 	if (~z_mask & 0x10)  csdeluxe_status = (csdeluxe_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  csdeluxe_status = (csdeluxe_status & ~2) | ((data >> 4) & 2);
 }
 
-static void csdeluxe_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( csdeluxe_irq )
 {
-	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
+	int combined_state = pianew_get_irq_a(device) | pianew_get_irq_b(device);
 
   	cpu_set_input_line(csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *pia = devtag_get_device(machine, PIA6821, "csdpia");
 
-	pia_0_portb_w(space, 0, param & 0x0f);
-	pia_0_ca1_w(space, 0, ~param & 0x10);
+	pia_portb_w(pia, 0, param & 0x0f);
+	pia_ca1_w(pia, 0, ~param & 0x10);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
 	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
-static READ16_HANDLER( csdeluxe_pia_r )
+static READ16_DEVICE_HANDLER( csdeluxe_pia_r )
 {
 	/* Spy Hunter accesses the MSB; Turbo Tag access via the LSB */
 	/* My guess is that Turbo Tag works through a fluke, whereby the 68000 */
 	/* using the MOVEP instruction outputs the same value on the high and */
 	/* low bytes. */
 	if (ACCESSING_BITS_8_15)
-		return pia_0_alt_r(space, offset) << 8;
+		return pia_alt_r(device, offset) << 8;
 	else
-		return pia_0_alt_r(space, offset);
+		return pia_alt_r(device, offset);
 }
 
-static WRITE16_HANDLER( csdeluxe_pia_w )
+static WRITE16_DEVICE_HANDLER( csdeluxe_pia_w )
 {
 	if (ACCESSING_BITS_8_15)
-		pia_0_alt_w(space, offset, data >> 8);
+		pia_alt_w(device, offset, data >> 8);
 	else
-		pia_0_alt_w(space, offset, data);
+		pia_alt_w(device, offset, data);
 }
 
 
@@ -588,7 +579,7 @@ static ADDRESS_MAP_START( csdeluxe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
-	AM_RANGE(0x018000, 0x018007) AM_READWRITE(csdeluxe_pia_r, csdeluxe_pia_w)
+	AM_RANGE(0x018000, 0x018007) AM_DEVREADWRITE(PIA6821, "csdpia", csdeluxe_pia_r, csdeluxe_pia_w)
 	AM_RANGE(0x01c000, 0x01cfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -596,9 +587,18 @@ ADDRESS_MAP_END
 /********* PIA interfaces ***********/
 static const pia6821_interface csdeluxe_pia_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ csdeluxe_porta_w, csdeluxe_portb_w, 0, 0,
-	/*irqs   : A/B             */ csdeluxe_irq, csdeluxe_irq
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(csdeluxe_porta_w),		/* port A out */
+	DEVCB_HANDLER(csdeluxe_portb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(csdeluxe_irq),		/* IRQA */
+	DEVCB_LINE(csdeluxe_irq)		/* IRQB */
 };
 
 
@@ -606,6 +606,8 @@ static const pia6821_interface csdeluxe_pia_intf =
 MACHINE_DRIVER_START(chip_squeak_deluxe)
 	MDRV_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(csdeluxe_map,0)
+	
+	MDRV_PIA6821_ADD("csdpia", csdeluxe_pia_intf)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("csddac", DAC, 0)
@@ -615,6 +617,8 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START(chip_squeak_deluxe_stereo)
 	MDRV_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(csdeluxe_map,0)
+	
+	MDRV_PIA6821_ADD("csdpia", csdeluxe_pia_intf)
 
 	MDRV_SOUND_ADD("csddac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
@@ -632,36 +636,36 @@ MACHINE_DRIVER_END
  *************************************/
 
 /********* internal interfaces ***********/
-static WRITE8_HANDLER( soundsgood_porta_w )
+static WRITE8_DEVICE_HANDLER( soundsgood_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(devtag_get_device(space->machine, SOUND, "sgdac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "sgdac"), dacval << 6);
 }
 
-static WRITE8_HANDLER( soundsgood_portb_w )
+static WRITE8_DEVICE_HANDLER( soundsgood_portb_w )
 {
-	UINT8 z_mask = pia_get_port_b_z_mask(1);
+	UINT8 z_mask = pianew_get_port_b_z_mask(device);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(devtag_get_device(space->machine, SOUND, "sgdac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "sgdac"), dacval << 6);
 
 	if (~z_mask & 0x10)  soundsgood_status = (soundsgood_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  soundsgood_status = (soundsgood_status & ~2) | ((data >> 4) & 2);
 }
 
-static void soundsgood_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( soundsgood_irq )
 {
-	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1);
+	int combined_state = pianew_get_irq_a(device) | pianew_get_irq_b(device);
 
   	cpu_set_input_line(soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *pia = devtag_get_device(machine, PIA6821, "sgpia");
 
-	pia_1_portb_w(space, 0, (param >> 1) & 0x0f);
-	pia_1_ca1_w(space, 0, ~param & 0x01);
+	pia_portb_w(pia, 0, (param >> 1) & 0x0f);
+	pia_ca1_w(pia, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -694,20 +698,26 @@ static ADDRESS_MAP_START( soundsgood_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_READWRITE8(pia_1_alt_r, pia_1_alt_w, 0xff00)
+	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8(PIA6821, "sgpia", pia_alt_r, pia_alt_w, 0xff00)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM
 ADDRESS_MAP_END
 
 
 /********* PIA interfaces ***********/
-/* Note: we map this board to PIA #1. It is only used in Spy Hunter and Spy Hunter 2 */
-/* For Spy Hunter 2, we also have a Turbo Chip Squeak in PIA slot 0, so we don't want */
-/* to interfere */
 static const pia6821_interface soundsgood_pia_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ soundsgood_porta_w, soundsgood_portb_w, 0, 0,
-	/*irqs   : A/B             */ soundsgood_irq, soundsgood_irq
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(soundsgood_porta_w),		/* port A out */
+	DEVCB_HANDLER(soundsgood_portb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(soundsgood_irq),		/* IRQA */
+	DEVCB_LINE(soundsgood_irq)		/* IRQB */
 };
 
 
@@ -715,6 +725,8 @@ static const pia6821_interface soundsgood_pia_intf =
 MACHINE_DRIVER_START(sounds_good)
 	MDRV_CPU_ADD("sgcpu", M68000, SOUNDSGOOD_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(soundsgood_map,0)
+	
+	MDRV_PIA6821_ADD("sgpia", soundsgood_pia_intf)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sgdac", DAC, 0)
@@ -732,32 +744,32 @@ MACHINE_DRIVER_END
  *************************************/
 
 /********* internal interfaces ***********/
-static WRITE8_HANDLER( turbocs_porta_w )
+static WRITE8_DEVICE_HANDLER( turbocs_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	dac_signed_data_16_w(devtag_get_device(space->machine, SOUND, "tcsdac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "tcsdac"), dacval << 6);
 }
 
-static WRITE8_HANDLER( turbocs_portb_w )
+static WRITE8_DEVICE_HANDLER( turbocs_portb_w )
 {
 	dacval = (dacval & ~0x003) | (data >> 6);
-	dac_signed_data_16_w(devtag_get_device(space->machine, SOUND, "tcsdac"), dacval << 6);
+	dac_signed_data_16_w(devtag_get_device(device->machine, SOUND, "tcsdac"), dacval << 6);
 	turbocs_status = (data >> 4) & 3;
 }
 
-static void turbocs_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( turbocs_irq )
 {
-	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
+	int combined_state = pianew_get_irq_a(device) | pianew_get_irq_b(device);
 
 	cpu_set_input_line(turbocs_sound_cpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *pia = devtag_get_device(machine, PIA6821, "tcspia");
 
-	pia_0_portb_w(space, 0, (param >> 1) & 0x0f);
-	pia_0_ca1_w(space, 0, ~param & 0x01);
+	pia_portb_w(pia, 0, (param >> 1) & 0x0f);
+	pia_ca1_w(pia, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -788,7 +800,7 @@ void turbocs_reset_w(running_machine *machine, int state)
 static ADDRESS_MAP_START( turbocs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_READWRITE(pia_0_alt_r, pia_0_alt_w)
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE(PIA6821, "tcspia", pia_alt_r, pia_alt_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -796,9 +808,18 @@ ADDRESS_MAP_END
 /********* PIA interfaces ***********/
 static const pia6821_interface turbocs_pia_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ turbocs_porta_w, turbocs_portb_w, 0, 0,
-	/*irqs   : A/B             */ turbocs_irq, turbocs_irq
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(turbocs_porta_w),		/* port A out */
+	DEVCB_HANDLER(turbocs_portb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(turbocs_irq),		/* IRQA */
+	DEVCB_LINE(turbocs_irq)		/* IRQB */
 };
 
 
@@ -806,23 +827,12 @@ static const pia6821_interface turbocs_pia_intf =
 MACHINE_DRIVER_START(turbo_chip_squeak)
 	MDRV_CPU_ADD("tcscpu", M6809E, TURBOCS_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(turbocs_map,0)
+	
+	MDRV_PIA6821_ADD("tcspia", turbocs_pia_intf)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("tcsdac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-
-MACHINE_DRIVER_START(turbo_chip_squeak_plus_sounds_good)
-	MDRV_IMPORT_FROM(turbo_chip_squeak)
-	MDRV_SPEAKER_REMOVE("mono")
-	MDRV_IMPORT_FROM(sounds_good)
-
-	MDRV_SOUND_REPLACE("tcsdac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MDRV_SOUND_REPLACE("sgdac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -836,7 +846,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 /********* internal interfaces ***********/
-static WRITE8_HANDLER( squawkntalk_porta1_w )
+static WRITE8_DEVICE_HANDLER( squawkntalk_porta1_w )
 {
 	logerror("Write to AY-8912 = %02X\n", data);
 }
@@ -846,14 +856,14 @@ static WRITE8_HANDLER( squawkntalk_dac_w )
 	logerror("Write to DAC = %02X\n", data);
 }
 
-static WRITE8_HANDLER( squawkntalk_porta2_w )
+static WRITE8_DEVICE_HANDLER( squawkntalk_porta2_w )
 {
 	squawkntalk_tms_command = data;
 }
 
-static WRITE8_HANDLER( squawkntalk_portb2_w )
+static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 {
-	const device_config *tms = devtag_get_device(space->machine, SOUND, "sntspeech");
+	const device_config *tms = devtag_get_device(device->machine, SOUND, "sntspeech");
 
 	/* bits 0-1 select read/write strobes on the TMS5200 */
 	data &= 0x03;
@@ -864,37 +874,39 @@ static WRITE8_HANDLER( squawkntalk_portb2_w )
 		tms5220_data_w(tms, offset, squawkntalk_tms_command);
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_1_ca2_w(space, 0, 1);
-		pia_1_ca2_w(space, 0, 0);
+		pia_ca2_w(device, 0, 1);
+		pia_ca2_w(device, 0, 0);
 	}
 
 	/* read strobe -- read the current status from the TMS5200 */
 	else if (((data ^ squawkntalk_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		pia_1_porta_w(space, 0, tms5220_status_r(tms, offset));
+		pia_porta_w(device, 0, tms5220_status_r(tms, offset));
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_1_ca2_w(space, 0, 1);
-		pia_1_ca2_w(space, 0, 0);
+		pia_ca2_w(device, 0, 1);
+		pia_ca2_w(device, 0, 0);
 	}
 
 	/* remember the state */
 	squawkntalk_tms_strobes = data;
 }
 
-static void squawkntalk_irq(running_machine *machine, int state)
+static WRITE_LINE_DEVICE_HANDLER( squawkntalk_irq )
 {
-	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
+	const device_config *pia0 = devtag_get_device(device->machine, PIA6821, "sntpia0");
+	const device_config *pia1 = devtag_get_device(device->machine, PIA6821, "sntpia1");
+	int combined_state = pianew_get_irq_a(pia0) | pianew_get_irq_b(pia0) | pianew_get_irq_a(pia1) | pianew_get_irq_b(pia1);
 
 	cpu_set_input_line(squawkntalk_sound_cpu, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const device_config *pia0 = devtag_get_device(machine, PIA6821, "sntpia0");
 
-	pia_0_porta_w(space, 0, ~param & 0x0f);
-	pia_0_cb1_w(space, 0, ~param & 0x10);
+	pia_porta_w(pia0, 0, ~param & 0x0f);
+	pia_cb1_w(pia0, 0, ~param & 0x10);
 }
 
 
@@ -918,8 +930,8 @@ void squawkntalk_reset_w(running_machine *machine, int state)
 static ADDRESS_MAP_START( squawkntalk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE(PIA6821, "sntpia0", pia_r, pia_w)
+	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_DEVREADWRITE(PIA6821, "sntpia1", pia_r, pia_w)
 	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0x4000) AM_WRITE(squawkntalk_dac_w)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM
 ADDRESS_MAP_END
@@ -930,8 +942,8 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( squawkntalk_alt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE(PIA6821, "sntpia0", pia_r, pia_w)
+	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE(PIA6821, "sntpia1", pia_r, pia_w)
 	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE(squawkntalk_dac_w)
 	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x6000) AM_ROM
 ADDRESS_MAP_END
@@ -941,16 +953,34 @@ ADDRESS_MAP_END
 /********* PIA interfaces ***********/
 static const pia6821_interface squawkntalk_pia0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ squawkntalk_porta1_w, 0, 0, 0,
-	/*irqs   : A/B             */ squawkntalk_irq, squawkntalk_irq
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(squawkntalk_porta1_w),		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(squawkntalk_irq),	/* IRQA */
+	DEVCB_LINE(squawkntalk_irq)		/* IRQB */
 };
 
 static const pia6821_interface squawkntalk_pia1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ squawkntalk_porta2_w, squawkntalk_portb2_w, 0, 0,
-	/*irqs   : A/B             */ squawkntalk_irq, squawkntalk_irq
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(squawkntalk_porta2_w),		/* port A out */
+	DEVCB_HANDLER(squawkntalk_portb2_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(squawkntalk_irq),	/* IRQA */
+	DEVCB_LINE(squawkntalk_irq)		/* IRQB */
 };
 
 
@@ -958,6 +988,9 @@ static const pia6821_interface squawkntalk_pia1_intf =
 MACHINE_DRIVER_START(squawk_n_talk)
 	MDRV_CPU_ADD("sntcpu", M6802, SQUAWKTALK_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(squawkntalk_map,0)
+	
+	MDRV_PIA6821_ADD("sntpia0", squawkntalk_pia0_intf)
+	MDRV_PIA6821_ADD("sntpia1", squawkntalk_pia1_intf)
 
 	/* only used on Discs of Tron, which is stereo */
 	MDRV_SOUND_ADD("sntspeech", TMS5200, 640000)

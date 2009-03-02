@@ -1947,8 +1947,8 @@ static DRIVER_INIT( topsecex )
 
 	/* extra input ports and scrolling */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec6, 0x2ec6, 0, 0, input_port_read_handler8(machine->portconfig, "AN0"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec7, 0x2ec7, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec6, 0x2ec6, 0, 0, "AN0");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec7, 0x2ec7, 0, 0, "IN4");
 
 	topsecex_yscroll = memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
 }

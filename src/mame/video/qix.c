@@ -86,9 +86,9 @@ static MC6845_ON_DE_CHANGED( display_enable_changed )
  *
  *************************************/
 
-WRITE8_HANDLER( qix_flip_screen_w )
+WRITE8_DEVICE_HANDLER( qix_flip_screen_w )
 {
-	qix_state *state = space->machine->driver_data;
+	qix_state *state = device->machine->driver_data;
 
 	state->flip = data;
 }
@@ -445,7 +445,7 @@ static const m6809_config encryption_config =
 
 
 MACHINE_DRIVER_START( qix_video )
-	MDRV_CPU_ADD("video", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
+	MDRV_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(qix_video_map,0)
 	MDRV_CPU_CONFIG(encryption_config)	// for kram3
 
@@ -461,12 +461,12 @@ MACHINE_DRIVER_END
 
 
 MACHINE_DRIVER_START( zookeep_video )
-	MDRV_CPU_MODIFY("video")
+	MDRV_CPU_MODIFY("videocpu")
 	MDRV_CPU_PROGRAM_MAP(zookeep_video_map,0)
 MACHINE_DRIVER_END
 
 
 MACHINE_DRIVER_START( slither_video )
-	MDRV_CPU_REPLACE("video", M6809, SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
+	MDRV_CPU_REPLACE("videocpu", M6809, SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
 	MDRV_CPU_PROGRAM_MAP(slither_video_map,0)
 MACHINE_DRIVER_END

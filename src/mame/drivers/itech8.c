@@ -2713,11 +2713,11 @@ static DRIVER_INIT( neckneck )
 static DRIVER_INIT( rimrockn )
 {
 	/* additional input ports */
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, input_port_read_handler8(machine->portconfig, "161"));
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, input_port_read_handler8(machine->portconfig, "162"));
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, input_port_read_handler8(machine->portconfig, "163"));
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, input_port_read_handler8(machine->portconfig, "164"));
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, input_port_read_handler8(machine->portconfig, "165"));
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, "161");
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, "162");
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, "163");
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, "164");
+	memory_install_read_port_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, "165");
 
 	/* different banking mechanism (disable the old one) */
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);

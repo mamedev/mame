@@ -2170,11 +2170,11 @@ static void init_ports_systeme(running_machine *machine)
 	memory_install_readwrite8_handler(io, 0xbe, 0xbe, 0, 0, sms_vdp_2_data_r, sms_vdp_2_data_w);
 	memory_install_readwrite8_handler(io, 0xbf, 0xbf, 0, 0, sms_vdp_2_ctrl_r, sms_vdp_2_ctrl_w);
 
-	memory_install_read8_handler     (io, 0xe0, 0xe0, 0, 0, input_port_read_handler8(machine->portconfig, "e0"));
-	memory_install_read8_handler     (io, 0xe1, 0xe1, 0, 0, input_port_read_handler8(machine->portconfig, "e1"));
-	memory_install_read8_handler     (io, 0xe2, 0xe2, 0, 0, input_port_read_handler8(machine->portconfig, "e2"));
-	memory_install_read8_handler     (io, 0xf2, 0xf2, 0, 0, input_port_read_handler8(machine->portconfig, "f2"));
-	memory_install_read8_handler     (io, 0xf3, 0xf3, 0, 0, input_port_read_handler8(machine->portconfig, "f3"));
+	memory_install_read_port_handler     (io, 0xe0, 0xe0, 0, 0, "e0");
+	memory_install_read_port_handler     (io, 0xe1, 0xe1, 0, 0, "e1");
+	memory_install_read_port_handler     (io, 0xe2, 0xe2, 0, 0, "e2");
+	memory_install_read_port_handler     (io, 0xf2, 0xf2, 0, 0, "f2");
+	memory_install_read_port_handler     (io, 0xf3, 0xf3, 0, 0, "f3");
 
 	memory_install_write8_handler    (io, 0xf7, 0xf7, 0, 0, systeme_bank_w );
 }

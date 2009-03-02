@@ -533,7 +533,7 @@ static ADDRESS_MAP_START( megatech_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("BIOS_IN0")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("BIOS_IN1")
 	AM_RANGE(0x6802, 0x6807) AM_READWRITE(bios_ctrl_r, bios_ctrl_w)
-//  AM_RANGE(0x6805, 0x6805) AM_READ(input_port_8_r)
+//  AM_RANGE(0x6805, 0x6805) AM_READ_PORT("???")
  	AM_RANGE(0x7000, 0x77ff) AM_ROM // from bios rom (0x7000-0x77ff populated in ROM)
 	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
 	AM_RANGE(0x8000, 0x9fff) AM_READ(megatech_instr_r) // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?

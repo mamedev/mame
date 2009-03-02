@@ -2802,10 +2802,10 @@ static DRIVER_INIT( spdball )
 	memory_install_readwrite8_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), pia_3, 0xc808, 0xc80b, 0, 0, pia_r, pia_w);
 
 	/* install extra input handlers */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xc800, 0, 0, input_port_read_handler8(machine->portconfig, "AN0"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc801, 0xc801, 0, 0, input_port_read_handler8(machine->portconfig, "AN1"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc802, 0xc802, 0, 0, input_port_read_handler8(machine->portconfig, "AN2"));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc803, 0xc803, 0, 0, input_port_read_handler8(machine->portconfig, "AN3"));
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xc800, 0, 0, "AN0");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc801, 0xc801, 0, 0, "AN1");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc802, 0xc802, 0, 0, "AN2");
+	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc803, 0xc803, 0, 0, "AN3");
 }
 
 

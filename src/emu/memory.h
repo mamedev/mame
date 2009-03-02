@@ -935,6 +935,9 @@ UINT32 *_memory_install_device_handler32(const address_space *space, const devic
 /* same as above but explicitly for 64-bit handlers */
 UINT64 *_memory_install_device_handler64(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name) ATTR_NONNULL;
 
+/* install a new input port handler into the given address space */
+void memory_install_read_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag) ATTR_NONNULL;
+
 
 
 /* ----- debugger helpers ----- */

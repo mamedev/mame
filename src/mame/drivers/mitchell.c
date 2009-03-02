@@ -391,8 +391,8 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
                                                        The Mahjong games and Block Block need special input treatment */
 	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_12_r) AM_DEVWRITE(SOUND, "ym", ym2413_data_port_w)		/* mgakuen only */
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_13_r) AM_DEVWRITE(SOUND, "ym", ym2413_register_port_w)	/* mgakuen only */
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(SOUND, "ym", ym2413_data_port_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(SOUND, "ym", ym2413_register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE(SOUND, "oki", okim6295_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)				/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
@@ -2105,6 +2105,8 @@ static DRIVER_INIT( mgakuen )
 {
 	input_type = 1;
 	configure_banks(machine);
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "DSW1");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSW2");
 }
 static DRIVER_INIT( mgakuen2 )
 {

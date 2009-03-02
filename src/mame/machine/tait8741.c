@@ -47,6 +47,7 @@ typedef struct TAITO8741_status{
 	int serial_out;
 	int coins;
 	read8_space_func portHandler;
+	const  char *portName;
 }I8741;
 
 static const struct TAITO8741interface *intf;
@@ -176,7 +177,7 @@ static void taito8741_update(const address_space *space, int num)
 					else
 					{ /* port select */
 						st->parallelselect = data & 0x07;
-						taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,st->parallelselect) : 0);
+						taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,st->parallelselect) : st->portName ? input_port_read(space->machine, st->portName) : 0);
 					}
 				}
 			}
@@ -187,7 +188,7 @@ static void taito8741_update(const address_space *space, int num)
 			case -1: /* no command data */
 				break;
 			case 0x00: /* read from parallel port */
-				taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,0) : 0 );
+				taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space,0) : st->portName ? input_port_read(space->machine, st->portName) : 0 );
 				break;
 			case 0x01: /* read receive buffer 0 */
 			case 0x02: /* read receive buffer 1 */
@@ -200,7 +201,7 @@ static void taito8741_update(const address_space *space, int num)
 				taito8741_hostdata_w(st,st->rxd[data-1]);
 				break;
 			case 0x08:	/* latch received serial data */
-				st->txd[0] = st->portHandler ? st->portHandler(space,0) : 0;
+				st->txd[0] = st->portHandler ? st->portHandler(space,0) : st->portName ? input_port_read(space->machine, st->portName) : 0;
 				if( sst )
 				{
 					timer_call_after_resynch(space->machine, NULL, num, taito8741_serial_tx);
@@ -264,6 +265,7 @@ int TAITO8741_start(const struct TAITO8741interface *taito8741intf)
 	{
 		taito8741[i].connect     = intf->serial_connect[i];
 		taito8741[i].portHandler = intf->portHandler_r[i];
+		taito8741[i].portName    = intf->portName_r[i];
 		taito8741[i].mode        = intf->mode[i];
 		TAITO8741_reset(i);
 	}
@@ -293,7 +295,7 @@ static int I8741_data_r(const address_space *space, int num)
 	switch( st->mode )
 	{
 	case TAITO8741_PORT: /* parallel data */
-		taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space, st->parallelselect) : 0);
+		taito8741_hostdata_w(st,st->portHandler ? st->portHandler(space, st->parallelselect) : st->portName ? input_port_read(space->machine, st->portName) : 0);
 		break;
 	}
 	return ret;
@@ -388,7 +390,7 @@ typedef struct josvolly_8741_struct {
 
 	UINT8 rst;
 
-	read8_space_func initReadPort;
+	const char *initReadPort;
 }JV8741;
 
 static JV8741 i8741[4];
@@ -413,10 +415,10 @@ void josvolly_8741_reset(void)
 	i8741[0].connect = 1;
 	i8741[1].connect = 0;
 
-	i8741[0].initReadPort = input_port_3_r;  /* DSW1 */
-	i8741[1].initReadPort = input_port_4_r;  /* DSW2 */
-	i8741[2].initReadPort = input_port_3_r;  /* DUMMY */
-	i8741[3].initReadPort = input_port_4_r;  /* DUMMY */
+	i8741[0].initReadPort = "DSW1";  /* DSW1 */
+	i8741[1].initReadPort = "DSW2";  /* DSW2 */
+	i8741[2].initReadPort = "DSW1";  /* DUMMY */
+	i8741[3].initReadPort = "DSW2";  /* DUMMY */
 }
 
 /* transmit data finish callback */
@@ -512,7 +514,7 @@ static INT8 josvolly_8741_r(const address_space *space,int num,int offset)
 	if(offset==1)
 	{
 		if(mcu->rst)
-			mcu->rxd = (mcu->initReadPort)(space,0); /* port in */
+			mcu->rxd = input_port_read(space->machine, mcu->initReadPort); /* port in */
 		ret = mcu->sts;
 		LOG(("%s:8741[%d]       SR %02X\n",cpuexec_describe_context(space->machine),num,ret));
 	}

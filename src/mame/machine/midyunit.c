@@ -7,7 +7,6 @@
 #include "driver.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
 #include "audio/williams.h"
 #include "midyunit.h"
 

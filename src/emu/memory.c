@@ -361,6 +361,12 @@ static const char *handler_to_string(const address_table *table, UINT8 entry);
 static void dump_map(FILE *file, const address_space *space, const address_table *table);
 static void mem_dump(running_machine *machine);
 
+/* input port handlers */
+static UINT8 input_port_read8(const input_port_config *port, offs_t offset);
+static UINT16 input_port_read16(const input_port_config *port, offs_t offset, UINT16 mem_mask);
+static UINT32 input_port_read32(const input_port_config *port, offs_t offset, UINT32 mem_mask);
+static UINT64 input_port_read64(const input_port_config *port, offs_t offset, UINT64 mem_mask);
+
 
 
 /***************************************************************************
@@ -1319,6 +1325,31 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 }
 
 
+/*-------------------------------------------------
+    memory_install_read_port_handler - install a 
+    new 8-bit input port handler into the given 
+    address space
+-------------------------------------------------*/
+
+void memory_install_read_port_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *tag)
+{
+	const input_port_config *port = input_port_by_tag(space->machine->portconfig, tag);
+	address_space *spacerw = (address_space *)space;
+	genf *handler = NULL;
+
+	if (port == NULL)
+		fatalerror("Non-existent port referenced: '%s'\n", tag);
+	switch (space->dbits)
+	{
+		case 8:		handler = (genf *)input_port_read8; 	break;
+		case 16:	handler = (genf *)input_port_read16; 	break;
+		case 32:	handler = (genf *)input_port_read32; 	break;
+		case 64:	handler = (genf *)input_port_read64; 	break;
+	}
+	space_map_range(spacerw, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, handler, (void *)port, tag);
+}
+
+
 
 /***************************************************************************
     DEBUGGER HELPERS
@@ -1682,15 +1713,20 @@ static void memory_init_populate(running_machine *machine)
 				/* if we have a read port tag, look it up */
 				if (entry->read_porttag != NULL)
 				{
-					switch (space->dbits)
-					{
-						case 8:		rhandler.shandler8  = input_port_read_handler8(machine->portconfig, entry->read_porttag);	break;
-						case 16:	rhandler.shandler16 = input_port_read_handler16(machine->portconfig, entry->read_porttag);	break;
-						case 32:	rhandler.shandler32 = input_port_read_handler32(machine->portconfig, entry->read_porttag);	break;
-						case 64:	rhandler.shandler64 = input_port_read_handler64(machine->portconfig, entry->read_porttag);	break;
-					}
-					if (rhandler.generic == NULL)
+					const input_port_config *port = input_port_by_tag(machine->portconfig, entry->read_porttag);
+					int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
+					genf *handler = NULL;
+
+					if (port == NULL)
 						fatalerror("Non-existent port referenced: '%s'\n", entry->read_porttag);
+					switch (bits)
+					{
+						case 8:		handler = (genf *)input_port_read8; 	break;
+						case 16:	handler = (genf *)input_port_read16; 	break;
+						case 32:	handler = (genf *)input_port_read32; 	break;
+						case 64:	handler = (genf *)input_port_read64; 	break;
+					}
+					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, handler, (void *)port, entry->read_porttag);
 				}
 
 				/* install the read handler if present */
@@ -3445,6 +3481,36 @@ static void mem_dump(running_machine *machine)
 			fclose(file);
 		}
 	}
+}
+
+
+
+/***************************************************************************
+    INPUT PORT READ HANDLERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    input port handlers
+-------------------------------------------------*/
+
+static UINT8 input_port_read8(const input_port_config *port, offs_t offset)
+{
+	return input_port_read_direct(port);
+}
+
+static UINT16 input_port_read16(const input_port_config *port, offs_t offset, UINT16 mem_mask)
+{
+	return input_port_read_direct(port);
+}
+
+static UINT32 input_port_read32(const input_port_config *port, offs_t offset, UINT32 mem_mask)
+{
+	return input_port_read_direct(port);
+}
+
+static UINT64 input_port_read64(const input_port_config *port, offs_t offset, UINT64 mem_mask)
+{
+	return input_port_read_direct(port);
 }
 
 
