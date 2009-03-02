@@ -1684,7 +1684,6 @@ static MACHINE_DRIVER_START( joust2 )
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_1", joust2_pia_1_intf)
-	MDRV_PIA6821_ADD("pia_3", joust2_pia_3_intf)
 MACHINE_DRIVER_END
 
 

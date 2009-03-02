@@ -40,7 +40,6 @@ extern const pia6821_interface tshoot_pia_0_intf;
 extern const pia6821_interface tshoot_pia_1_intf;
 extern const pia6821_interface tshoot_snd_pia_intf;
 extern const pia6821_interface joust2_pia_1_intf;
-extern const pia6821_interface joust2_pia_3_intf;
 
 /* initialization */
 MACHINE_RESET( defender );

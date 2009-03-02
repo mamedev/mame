@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/7474.h"
 #include "machine/74148.h"
 #include "machine/74153.h"
@@ -310,28 +310,28 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 }
 
 
-static WRITE8_HANDLER( coin1_interrupt_clear_w )
+static WRITE_LINE_DEVICE_HANDLER( coin1_interrupt_clear_w )
 {
-	TTL7474_clear_w(TTL7474_2S_1, data);
-	TTL7474_update(space->machine, TTL7474_2S_1);
+	TTL7474_clear_w(TTL7474_2S_1, state);
+	TTL7474_update(device->machine, TTL7474_2S_1);
 }
 
-static WRITE8_HANDLER( coin2_interrupt_clear_w )
+static WRITE_LINE_DEVICE_HANDLER( coin2_interrupt_clear_w )
 {
-	TTL7474_clear_w(TTL7474_2S_2, data);
-	TTL7474_update(space->machine, TTL7474_2S_2);
+	TTL7474_clear_w(TTL7474_2S_2, state);
+	TTL7474_update(device->machine, TTL7474_2S_2);
 }
 
-static WRITE8_HANDLER( coin3_interrupt_clear_w )
+static WRITE_LINE_DEVICE_HANDLER( coin3_interrupt_clear_w )
 {
-	TTL7474_clear_w(TTL7474_2U_1, data);
-	TTL7474_update(space->machine, TTL7474_2U_1);
+	TTL7474_clear_w(TTL7474_2U_1, state);
+	TTL7474_update(device->machine, TTL7474_2U_1);
 }
 
-static WRITE8_HANDLER( coin4_interrupt_clear_w )
+static WRITE_LINE_DEVICE_HANDLER( coin4_interrupt_clear_w )
 {
-	TTL7474_clear_w(TTL7474_2U_2, data);
-	TTL7474_update(space->machine, TTL7474_2U_2);
+	TTL7474_clear_w(TTL7474_2U_2, state);
+	TTL7474_update(device->machine, TTL7474_2U_2);
 }
 
 WRITE8_HANDLER( carpolo_ball_screen_interrupt_clear_w )
@@ -377,7 +377,7 @@ WRITE8_HANDLER( carpolo_timer_interrupt_clear_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( pia_0_port_a_w )
+static WRITE8_DEVICE_HANDLER( pia_0_port_a_w )
 {
 	/* bit 0 - Coin counter
        bit 1 - Player 4 crash sound
@@ -396,14 +396,14 @@ static WRITE8_HANDLER( pia_0_port_a_w )
 	TTL7474_clear_w(TTL7474_1C_1, data & 0x08);
 	TTL7474_clear_w(TTL7474_1A_1, data & 0x08);
 
-	TTL7474_update(space->machine, TTL7474_1F_1);
-	TTL7474_update(space->machine, TTL7474_1D_1);
-	TTL7474_update(space->machine, TTL7474_1C_1);
-	TTL7474_update(space->machine, TTL7474_1A_1);
+	TTL7474_update(device->machine, TTL7474_1F_1);
+	TTL7474_update(device->machine, TTL7474_1D_1);
+	TTL7474_update(device->machine, TTL7474_1C_1);
+	TTL7474_update(device->machine, TTL7474_1A_1);
 }
 
 
-static WRITE8_HANDLER( pia_0_port_b_w )
+static WRITE8_DEVICE_HANDLER( pia_0_port_b_w )
 {
 	/* bit 0 - Strobe speed bits sound
        bit 1 - Speed bit 0 sound
@@ -418,7 +418,7 @@ static WRITE8_HANDLER( pia_0_port_b_w )
 	TTL74153_update(TTL74153_1K);
 }
 
-static READ8_HANDLER( pia_0_port_b_r )
+static READ8_DEVICE_HANDLER( pia_0_port_b_r )
 {
 	/* bit 4 - Pedal bit 0
        bit 5 - Pedal bit 1 */
@@ -428,7 +428,7 @@ static READ8_HANDLER( pia_0_port_b_r )
 }
 
 
-static READ8_HANDLER( pia_1_port_a_r )
+static READ8_DEVICE_HANDLER( pia_1_port_a_r )
 {
 	UINT8 ret;
 
@@ -445,13 +445,13 @@ static READ8_HANDLER( pia_1_port_a_r )
 		  (TTL7474_output_r(TTL7474_1C_2) ? 0x02 : 0x00) |
 		  (TTL7474_output_r(TTL7474_1D_2) ? 0x04 : 0x00) |
 		  (TTL7474_output_r(TTL7474_1F_2) ? 0x08 : 0x00) |
-		  (input_port_read(space->machine, "IN2") & 0xf0);
+		  (input_port_read(device->machine, "IN2") & 0xf0);
 
 	return ret;
 }
 
 
-static READ8_HANDLER( pia_1_port_b_r )
+static READ8_DEVICE_HANDLER( pia_1_port_b_r )
 {
 	UINT8 ret;
 
@@ -469,18 +469,37 @@ static READ8_HANDLER( pia_1_port_b_r )
 }
 
 
-static const pia6821_interface pia_0_intf =
+const pia6821_interface carpolo_pia0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, pia_0_port_b_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ pia_0_port_a_w, pia_0_port_b_w, coin1_interrupt_clear_w, coin2_interrupt_clear_w,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_NULL,		/* port A in */
+	DEVCB_HANDLER(pia_0_port_b_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(pia_0_port_a_w),		/* port A out */
+	DEVCB_HANDLER(pia_0_port_b_w),		/* port B out */
+	DEVCB_LINE(coin1_interrupt_clear_w),		/* line CA2 out */
+	DEVCB_LINE(coin2_interrupt_clear_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
-static const pia6821_interface pia_1_intf =
+
+const pia6821_interface carpolo_pia1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ pia_1_port_a_r, pia_1_port_b_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, coin3_interrupt_clear_w, coin4_interrupt_clear_w,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_HANDLER(pia_1_port_a_r),		/* port A in */
+	DEVCB_HANDLER(pia_1_port_b_r),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_LINE(coin3_interrupt_clear_w),		/* line CA2 out */
+	DEVCB_LINE(coin4_interrupt_clear_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 static const struct TTL74148_interface TTL74148_3S_intf =
@@ -511,10 +530,6 @@ static const struct TTL7474_interface TTL7474_2U_2_intf =
 
 MACHINE_START( carpolo )
 {
-	/* set up the PIA's */
-	pia_config(machine, 0, &pia_0_intf);
-	pia_config(machine, 1, &pia_1_intf);
-
     state_save_register_global(machine, ball_screen_collision_cause);
     state_save_register_global(machine, car_ball_collision_x);
     state_save_register_global(machine, car_ball_collision_y);

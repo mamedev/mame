@@ -258,11 +258,6 @@ const pia6821_interface joust2_pia_1_intf =
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
 
-/* Joust 2 PIA 3 */
-const pia6821_interface joust2_pia_3_intf =
-{
-	DEVCB_NULL,
-};
 
 
 /*************************************
@@ -956,13 +951,13 @@ static WRITE8_DEVICE_HANDLER( tshoot_lamp_w )
 
 MACHINE_START( joust2 )
 {
-	williams_cvsd_init(machine, 3);
+	williams_cvsd_init(machine);
 }
 
 
 MACHINE_RESET( joust2 )
 {
-	const device_config *pia_3 = devtag_get_device(machine, "pia_3");
+	const device_config *pia_3 = devtag_get_device(machine, "cvsdpia");
 
 	/* standard init */
 	MACHINE_RESET_CALL(williams2);
@@ -980,7 +975,7 @@ static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 
 static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
 {
-	const device_config *pia_3 = devtag_get_device(device->machine, "pia_3");
+	const device_config *pia_3 = devtag_get_device(device->machine, "cvsdpia");
 
 	joust2_current_sound_data = (joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
 	pia_cb1_w(pia_3, offset, data);

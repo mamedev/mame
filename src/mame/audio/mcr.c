@@ -157,7 +157,7 @@ void mcr_sound_init(running_machine *machine, UINT8 config)
 	/* Advanced Audio */
 	if (mcr_sound_config & MCR_WILLIAMS_SOUND)
 	{
-		williams_cvsd_init(machine, 0);
+		williams_cvsd_init(machine);
 		sound_cpu++;
 	}
 }

@@ -8,7 +8,7 @@ MACHINE_DRIVER_EXTERN( williams_cvsd_sound );
 MACHINE_DRIVER_EXTERN( williams_adpcm_sound );
 MACHINE_DRIVER_EXTERN( williams_narc_sound );
 
-void williams_cvsd_init(running_machine *machine, int pianum);
+void williams_cvsd_init(running_machine *machine);
 void williams_cvsd_data_w(running_machine *machine, int data);
 void williams_cvsd_reset_w(int state);
 

@@ -6,7 +6,12 @@
 
 ****************************************************************************/
 
+#include "machine/6821new.h"
+
 /*----------- defined in machine/carpolo.c -----------*/
+
+extern const pia6821_interface carpolo_pia0_intf;
+extern const pia6821_interface carpolo_pia1_intf;
 
 MACHINE_START( carpolo );
 MACHINE_RESET( carpolo );

@@ -624,7 +624,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/6850acia.h"
 #include "sound/ay8910.h"
 
@@ -646,11 +646,6 @@ VIDEO_UPDATE( calomega );
 *    Read/Write Handlers    *
 ****************************/
 
-static READ8_HANDLER( dipsw_1_r )
-{
-	return input_port_read(space->machine, "SW1");
-}
-
 static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 {
 	int trx_clk;
@@ -662,19 +657,19 @@ static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 
 static int s903_mux_data = 0;
 
-static READ8_HANDLER( s903_mux_port_r )
+static READ8_DEVICE_HANDLER( s903_mux_port_r )
 {
 	switch( s903_mux_data & 0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(space->machine, "IN0-0");
-		case 0x20: return input_port_read(space->machine, "IN0-1");
-		case 0x40: return input_port_read(space->machine, "IN0-2");
-		case 0x80: return input_port_read(space->machine, "IN0-3");
+		case 0x10: return input_port_read(device->machine, "IN0-0");
+		case 0x20: return input_port_read(device->machine, "IN0-1");
+		case 0x40: return input_port_read(device->machine, "IN0-2");
+		case 0x80: return input_port_read(device->machine, "IN0-3");
 	}
 	return 0xff;
 }
 
-static WRITE8_HANDLER( s903_mux_w )
+static WRITE8_DEVICE_HANDLER( s903_mux_w )
 {
 	s903_mux_data = data ^ 0xff;	/* inverted */
 }
@@ -682,19 +677,19 @@ static WRITE8_HANDLER( s903_mux_w )
 
 static int s905_mux_data = 0;
 
-static READ8_HANDLER( s905_mux_port_r )
+static READ8_DEVICE_HANDLER( s905_mux_port_r )
 {
 	switch( s905_mux_data & 0x0f )	/* bits 0-3 */
 	{
-		case 0x01: return input_port_read(space->machine, "IN0-0");
-		case 0x02: return input_port_read(space->machine, "IN0-1");
-		case 0x04: return input_port_read(space->machine, "IN0-2");
-		case 0x08: return input_port_read(space->machine, "IN0-3");
+		case 0x01: return input_port_read(device->machine, "IN0-0");
+		case 0x02: return input_port_read(device->machine, "IN0-1");
+		case 0x04: return input_port_read(device->machine, "IN0-2");
+		case 0x08: return input_port_read(device->machine, "IN0-3");
 	}
 	return 0xff;
 }
 
-static WRITE8_HANDLER( s905_mux_w )
+static WRITE8_DEVICE_HANDLER( s905_mux_w )
 {
 	s905_mux_data = data ^ 0xff;	/* inverted */
 }
@@ -720,7 +715,7 @@ static WRITE8_HANDLER( s905_mux_w )
     0xff    0x7b    = Take
 
 */
-static WRITE8_HANDLER( lamps_a_w )
+static WRITE8_DEVICE_HANDLER( lamps_a_w )
 {
 	output_set_lamp_value(0, 1-((data) & 1));		// 0
 	output_set_lamp_value(1, 1-((data >> 1) & 1));	// 1
@@ -732,7 +727,7 @@ static WRITE8_HANDLER( lamps_a_w )
 	output_set_lamp_value(7, 1-((data >> 7) & 1));	// 7
 }
 
-static WRITE8_HANDLER( lamps_b_w )
+static WRITE8_DEVICE_HANDLER( lamps_b_w )
 {
 	output_set_lamp_value(8, 1-((data) & 1));		// 0
 	output_set_lamp_value(9, 1-((data >> 1) & 1));	// 1
@@ -755,8 +750,8 @@ static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
 	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia_r, pia_w)
+	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia_r, pia_w)
 	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
@@ -770,8 +765,8 @@ static ADDRESS_MAP_START( s903mod_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
 	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia_r, pia_w)
+	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia_r, pia_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1800, 0xffff) AM_ROM
@@ -783,8 +778,8 @@ static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1040, 0x1041) AM_DEVWRITE("ay8912", ay8910_address_data_w)
 	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x10c4, 0x10c7) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x10c8, 0x10cb) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x10c4, 0x10c7) AM_DEVREADWRITE("pia0", pia_r, pia_w)
+	AM_RANGE(0x10c8, 0x10cb) AM_DEVREADWRITE("pia1", pia_r, pia_w)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2800, 0xffff) AM_ROM
@@ -1647,14 +1642,18 @@ GFXDECODE_END
 */
 static const pia6821_interface sys903_pia0_intf =
 {
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	s903_mux_port_r, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-	0, lamps_a_w, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
+	DEVCB_HANDLER(s903_mux_port_r),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(lamps_a_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 /********** Systems 903/904 PIA-1 (U39) wiring **********
@@ -1705,14 +1704,18 @@ static const pia6821_interface sys903_pia0_intf =
 */
 static const pia6821_interface sys903_pia1_intf =
 {
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	dipsw_1_r, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-	lamps_b_w, s903_mux_w, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
+	DEVCB_INPUT_PORT("SW1"),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(lamps_b_w),		/* port A out */
+	DEVCB_HANDLER(s903_mux_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 /********** System 905 PIA-0 (U48) wiring **********
@@ -1763,14 +1766,18 @@ static const pia6821_interface sys903_pia1_intf =
 */
 static const pia6821_interface sys905_pia0_intf =
 {
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	s905_mux_port_r, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-	0, lamps_a_w, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
+	DEVCB_HANDLER(s905_mux_port_r),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(lamps_a_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 /********** Systems 905 PIA-1 (U63) wiring **********
@@ -1821,14 +1828,18 @@ static const pia6821_interface sys905_pia0_intf =
 */
 static const pia6821_interface sys905_pia1_intf =
 {
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	dipsw_1_r, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-	lamps_b_w, s905_mux_w, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
+	DEVCB_INPUT_PORT("SW1"),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(lamps_b_w),		/* port A out */
+	DEVCB_HANDLER(s905_mux_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -1857,28 +1868,6 @@ static ACIA6850_INTERFACE( acia6850_intf )
 	DEVCB_NULL,
 	DEVCB_LINE(tx_rx_clk)
 };
-
-
-/*******************************
-*    Machine Start & Reset     *
-*******************************/
-
-static MACHINE_START( sys903 )
-{
-	pia_config(machine, 0, &sys903_pia0_intf);
-	pia_config(machine, 1, &sys903_pia1_intf);
-}
-
-static MACHINE_START( sys905 )
-{
-	pia_config(machine, 0, &sys905_pia0_intf);
-	pia_config(machine, 1, &sys905_pia1_intf);
-}
-
-static MACHINE_RESET( calomega )
-{
-	pia_reset();
-}
 
 
 /*************************
@@ -1935,8 +1924,8 @@ static MACHINE_DRIVER_START( sys903 )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_MACHINE_START(sys903)
-	MDRV_MACHINE_RESET(calomega)
+	MDRV_PIA6821_ADD("pia0", sys903_pia0_intf)
+	MDRV_PIA6821_ADD("pia1", sys903_pia1_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1972,7 +1961,8 @@ static MACHINE_DRIVER_START( sys905 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sys905_map, 0)
 
-	MDRV_MACHINE_START(sys905)
+	MDRV_PIA6821_MODIFY("pia0", sys905_pia0_intf)
+	MDRV_PIA6821_MODIFY("pia1", sys905_pia1_intf)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("ay8912")

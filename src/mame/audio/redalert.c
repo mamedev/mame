@@ -12,7 +12,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "redalert.h"
@@ -297,22 +297,22 @@ WRITE8_HANDLER( demoneye_audio_command_w )
 }
 
 
-static WRITE8_HANDLER( demoneye_ay8910_latch_1_w )
+static WRITE8_DEVICE_HANDLER( demoneye_ay8910_latch_1_w )
 {
 	ay8910_latch_1 = data;
 }
 
 
-static READ8_HANDLER( demoneye_ay8910_latch_2_r )
+static READ8_DEVICE_HANDLER( demoneye_ay8910_latch_2_r )
 {
 	return ay8910_latch_2;
 }
 
 
-static WRITE8_HANDLER( demoneye_ay8910_data_w )
+static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 {
-	const device_config *ay1 = devtag_get_device(space->machine, "ay1");
-	const device_config *ay2 = devtag_get_device(space->machine, "ay2");
+	const device_config *ay1 = devtag_get_device(device->machine, "ay1");
+	const device_config *ay2 = devtag_get_device(device->machine, "ay2");
 
 	switch (ay8910_latch_1 & 0x03)
 	{
@@ -353,7 +353,7 @@ static WRITE8_HANDLER( demoneye_ay8910_data_w )
 static ADDRESS_MAP_START( demoneye_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0500, 0x0503) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE("sndpia", pia_r, pia_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -371,9 +371,18 @@ static const ay8910_interface demoneye_ay8910_interface =
 
 static const pia6821_interface demoneye_pia_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ demoneye_ay8910_latch_2_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ demoneye_ay8910_data_w, demoneye_ay8910_latch_1_w, 0, 0,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_HANDLER(demoneye_ay8910_latch_2_r),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(demoneye_ay8910_data_w),			/* port A out */
+	DEVCB_HANDLER(demoneye_ay8910_latch_1_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -386,23 +395,8 @@ static const pia6821_interface demoneye_pia_intf =
 
 static SOUND_START( demoneye )
 {
-	pia_config(machine, 0, &demoneye_pia_intf);
-
 	state_save_register_global(machine, ay8910_latch_1);
 	state_save_register_global(machine, ay8910_latch_2);
-}
-
-
-
-/*************************************
- *
- *  Demoneye-X audio reset
- *
- *************************************/
-
-static SOUND_RESET( demoneye )
-{
-	pia_reset();
 }
 
 
@@ -419,8 +413,9 @@ MACHINE_DRIVER_START( demoneye_audio )
 	MDRV_CPU_PROGRAM_MAP(demoneye_audio_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, REDALERT_AUDIO_CPU_IRQ_FREQ)  /* guess */
 
+	MDRV_PIA6821_ADD("sndpia", demoneye_pia_intf)
+
 	MDRV_SOUND_START( demoneye )
-	MDRV_SOUND_RESET( demoneye )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
