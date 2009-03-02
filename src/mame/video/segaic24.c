@@ -428,15 +428,12 @@ void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle
 		return;
 
 	if(ctrl & 0x6000) {
-		UINT16 v;
 		// Special window/scroll modes
 		if(layer & 1)
 			return;
 
-		v = vscr & 0x1ff;
-
-		tilemap_set_scrolly(sys24_tile_layer[layer],   0, v);
-		tilemap_set_scrolly(sys24_tile_layer[layer|1], 0, v);
+		tilemap_set_scrolly(sys24_tile_layer[layer],   0, vscr & 0x1ff);
+		tilemap_set_scrolly(sys24_tile_layer[layer|1], 0, vscr & 0x1ff);
 
 		if(hscr & 0x8000) {
 			UINT16 *hscrtb = sys24_tile_ram + 0x4000 + 0x200*layer;
@@ -444,60 +441,51 @@ void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle
 			switch((ctrl & 0x6000) >> 13) {
 			case 1: {
 				int y;
-				UINT16 vv;
-				vv = (-vscr) & 0x1ff;
+				UINT16 v = (-vscr) & 0x1ff;
 				if(!((-vscr) & 0x200))
 					layer ^= 1;
-				for(y=0; y<384; y++) {
-					if(y >= cliprect->min_y && y <= cliprect->max_y) {
-						UINT16 h;
-						rectangle c = *cliprect;
-						int l1 = layer;
-						if(y >= vv)
-							l1 ^= 1;
+				for(y=cliprect->min_y; y<=cliprect->max_y; y++) {
+					UINT16 h;
+					rectangle c = *cliprect;
+					int l1 = layer;
+					if(y >= v)
+						l1 ^= 1;
 
-						c.min_y = c.max_y = y;
+					c.min_y = c.max_y = y;
 
-						// Whether it's tilemap-relative or screen-relative is unknown
-						hscr = hscrtb[v];
+					hscr = hscrtb[y];
 
-						h = hscr & 0x1ff;
-						tilemap_set_scrollx(sys24_tile_layer[l1],   0, -h);
-						tilemap_draw(bitmap, &c, sys24_tile_layer[l1],   tpri, lpri);
-					}
-					v = (v + 1) & 0x1ff;
+					h = hscr & 0x1ff;
+					tilemap_set_scrollx(sys24_tile_layer[l1], 0, -h);
+					tilemap_draw(bitmap, &c, sys24_tile_layer[l1], tpri, lpri);
 				}
 				break;
 			}
 			case 2: case 3: {
 				int y;
-				for(y=0; y<384; y++) {
-					if(y >= cliprect->min_y && y <= cliprect->max_y) {
-						UINT16 h;
-						rectangle c1 = *cliprect;
-						rectangle c2 = *cliprect;
-						int l1 = layer;
+				for(y=cliprect->min_y; y<=cliprect->max_y; y++) {
+					UINT16 h;
+					rectangle c1 = *cliprect;
+					rectangle c2 = *cliprect;
+					int l1 = layer;
 
-						// Whether it's tilemap-relative or screen-relative is unknown
-						hscr = hscrtb[v];
+					hscr = hscrtb[y];
 
-						h = hscr & 0x1ff;
-						tilemap_set_scrollx(sys24_tile_layer[layer],   0, -h);
-						tilemap_set_scrollx(sys24_tile_layer[layer|1], 0, -h);
+					h = hscr & 0x1ff;
+					tilemap_set_scrollx(sys24_tile_layer[layer],   0, -h);
+					tilemap_set_scrollx(sys24_tile_layer[layer|1], 0, -h);
 
-						if(c1.max_x >= h)
-							c1.max_x = h-1;
-						if(c2.min_x < h)
-							c2.min_x = h;
-						if(!(hscr & 0x200))
-							l1 ^= 1;
+					if(c1.max_x >= h)
+						c1.max_x = h-1;
+					if(c2.min_x < h)
+						c2.min_x = h;
+					if(!(hscr & 0x200))
+						l1 ^= 1;
 
-						c1.min_y = c1.max_y = c2.min_y = c2.max_y = y;
+					c1.min_y = c1.max_y = c2.min_y = c2.max_y = y;
 
-						tilemap_draw(bitmap, &c1, sys24_tile_layer[l1],   tpri, lpri);
-						tilemap_draw(bitmap, &c2, sys24_tile_layer[l1^1], tpri, lpri);
-					}
-					v = (v + 1) & 0x1ff;
+					tilemap_draw(bitmap, &c1, sys24_tile_layer[l1],   tpri, lpri);
+					tilemap_draw(bitmap, &c2, sys24_tile_layer[l1^1], tpri, lpri);
 				}
 				break;
 			}
@@ -563,8 +551,7 @@ void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle
 			vscr &= 0x1ff;
 
 			for(y=0; y<384; y++) {
-				// Whether it's tilemap-relative or screen-relative is unknown
-				hscr = (-hscrtb[vscr]) & 0x1ff;
+				hscr = (-hscrtb[y]) & 0x1ff;
 				if(hscr + 496 <= 512) {
 					// Horizontal split unnecessary
 					draw(machine, bm, tm, bitmap, mask, tpri, lpri, win, hscr, vscr,        0,        y,      496,      y+1);
