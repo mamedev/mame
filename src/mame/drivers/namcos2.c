@@ -9,7 +9,7 @@ How to calibrate the guns:
   - after you've shot the target press 9 again to move onto the next one
   - once you get back to the start again press f2 to exit.
 
-How to calibrate the steering in DirtFox:
+How to calibrate the steering in Dirt Fox and Final Lap 2/3:
   - hold 9, press f2
   - verify that controls are set to zero then press f2 to exit.
 
@@ -29,7 +29,6 @@ known issues:
     - sprite size bit is bogus during splash screen
 
     Final Lap 3:
-    - bad steering
     - uses unaligned 32x32 sprites, which aren't handled correctly in video/namcos2.c yet
 
     Four Trax
@@ -1072,11 +1071,10 @@ static INPUT_PORTS_START( finalap3 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN5")		/* Steering Wheel */		/* sensitivity, delta, min, max */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
-
 	PORT_START("AN6")		/* Brake Pedal */
-	PORT_BIT( 0xff, 0xff, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
 	PORT_START("AN7")		/* Accelerator Pedal */
-	PORT_BIT( 0xff, 0xff, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("MCUH")		/* 63B05Z0 - PORT H */
 	PORT_DIPNAME( 0x01, 0x01, "PortH 0x01")
@@ -1148,7 +1146,6 @@ static INPUT_PORTS_START( fourtrax )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	/* Tags and additional input ports AN5 & AN6 are needed for the port handler */
 	PORT_START("AN0")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 2 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN1")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 3 */
@@ -1159,16 +1156,12 @@ static INPUT_PORTS_START( fourtrax )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("AN4")		/* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 6 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN5")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN6")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN7")		/* Steering Wheel 7 */		/* sensitivity, delta, min, max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(75) PORT_KEYDELTA(100) PORT_PLAYER(1)
-	PORT_START("AN8")		/* Brake Pedal 8 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
-	PORT_START("AN9")		/* Accelerator Pedal 9 */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	PORT_START("AN5")		/* Steering Wheel 7 */		/* sensitivity, delta, min, max */
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(75) PORT_KEYDELTA(50) PORT_PLAYER(1)
+	PORT_START("AN6")		/* Brake Pedal 8 */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_START("AN7")		/* Accelerator Pedal 9 */
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("MCUH")		/* 63B05Z0 - PORT H */
 	PORT_DIPNAME( 0x01, 0x01, "PortH 0x01")
