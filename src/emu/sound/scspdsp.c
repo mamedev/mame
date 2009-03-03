@@ -163,6 +163,8 @@ void SCSPDSP_Step(struct _SCSPDSP *DSP)
 			INPUTS=DSP->MIXS[IRA-0x20]<<4;	//MIXS is 20 bit
 		else if(IRA<=0x31)
 			INPUTS=0;
+		else
+			return;
 
 		INPUTS<<=8;
 		INPUTS>>=8;
