@@ -56,6 +56,7 @@ static int gameid, spr_offsx, spr_offsy, spr_count;
 static UINT16 *rgb_half;
 
 static int cloud_blend, cloud_ds, cloud_visible;
+static pen_t black_pen;
 
 
 /***************************************************************************
@@ -346,7 +347,10 @@ static void do_blit_zoom32(bitmap_t *bitmap, const rectangle *cliprect, struct s
 						if (pix != 0xa)
 							dst_ptr[sx] = base + pix;
 						else
-							dst_ptr[sx] |= 0x800;
+						{
+							if (dst_ptr[sx] != black_pen)
+								dst_ptr[sx] |= 0x800;
+						}
 					}
 					src_fpx += src_fdx;
 				}
@@ -929,6 +933,7 @@ VIDEO_START( wecleman )
 	cloud_blend = BLEND_MAX;
 	cloud_ds = 0;
 	cloud_visible = 0;
+	black_pen = get_black_pen(machine);
 
 	rgb_half     =          (UINT16*)(buffer + 0x00000);
 	t32x32pm     =             (int*)(buffer + 0x10020);
@@ -1027,6 +1032,7 @@ VIDEO_START( hotchase )
 	wecleman_gfx_bank = bank;
 	spr_offsx = -0xc0;
 	spr_offsy = 0;
+	black_pen = get_black_pen(machine);
 
 	spr_ptr_list = (struct sprite **)buffer;
 
@@ -1088,7 +1094,7 @@ VIDEO_UPDATE ( wecleman )
 
 	get_sprite_info(screen->machine);
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, black_pen);
 
 	/* Draw the road (lines which have priority 0x02) */
 	if (video_on) wecleman_draw_road(screen->machine, bitmap, cliprect, 0x02);
@@ -1149,7 +1155,7 @@ VIDEO_UPDATE( hotchase )
 
 	get_sprite_info(screen->machine);
 
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(bitmap, cliprect, black_pen);
 
 	/* Draw the background */
 	if (video_on) K051316_zoom_draw_0(bitmap,cliprect, 0, 0);
