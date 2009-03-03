@@ -13,7 +13,7 @@
     finish
         sprite fixes
 		correct roz rotation
-        colour fixes. Foreground layer & sprites
+        colour fixes for the foreground layer and the sprites
         Dip-Switches
         make cntsteer work, comms looks awkward and probably different than Zero Target
     cleanup
@@ -89,7 +89,7 @@ static VIDEO_START( zerotrgt )
 	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX|TILEMAP_FLIPY);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -97,20 +97,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int multi,fx,fy,sx,sy,sy2,code,code2,color;
 
+		if((spriteram[offs+1] & 1) == 1)
+			continue;
+
 		code = spriteram[offs+3] + ( ( spriteram[offs+1] & 0xc0 ) << 2 );
 
 		code2 = code+1;
-		sx = (241 - spriteram[offs+2]); //this is wrong.
-	//if (sx < -7) sx += 256;
+		sx = (spriteram[offs+2]);
 
-		sy = 241 - spriteram[offs];
-		color = (spriteram[offs+1] & 0x03) + ((spriteram[offs+1] & 0x08) >> 1);
+		sy = 0xf0 - spriteram[offs];
+		color = ((spriteram[offs+1] & 0x08) >> 3);
 
-//      if (pri==0 && color!=0) continue;
-//      if (pri==1 && color==0) continue;
-
-		fx = spriteram[offs+1] & 0x04;
-		fy = spriteram[offs+1] & 0x02;  //check
+		fx = !(spriteram[offs+1] & 0x04);
+		fy = (spriteram[offs+1] & 0x02);  //check
 
 		multi = spriteram[offs+1] & 0x10;
 
@@ -159,10 +158,8 @@ static VIDEO_UPDATE( zerotrgt )
 						0, 0);
 	}
 
+	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-
-	draw_sprites(screen->machine,bitmap,cliprect,0);
-	draw_sprites(screen->machine,bitmap,cliprect,1);
 
 	return 0;
 }
@@ -375,7 +372,7 @@ static const gfx_layout sprites =
 	16,16,
 	RGN_FRAC(1,3),
 	3,
- 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+ 	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
 	{ 16*8, 1+16*8, 2+16*8, 3+16*8, 4+16*8, 5+16*8, 6+16*8, 7+16*8,
 		0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
