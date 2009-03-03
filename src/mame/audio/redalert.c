@@ -12,7 +12,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "redalert.h"
@@ -353,7 +353,7 @@ static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 static ADDRESS_MAP_START( demoneye_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE("sndpia", pia_r, pia_w)
+	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE("sndpia", pia6821_r, pia6821_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

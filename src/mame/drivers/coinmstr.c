@@ -24,7 +24,7 @@ x
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 
@@ -199,10 +199,10 @@ static ADDRESS_MAP_START( quizmstr_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x41, 0x41) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("pia0", pia_r, pia_w)
+	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x50, 0x53) AM_READNOP
 	AM_RANGE(0x50, 0x53) AM_WRITENOP
-	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("pia2", pia_r, pia_w)
+	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("pia2", pia6821_r, pia6821_w)
 	AM_RANGE(0x70, 0x70) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x71, 0x71) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP
@@ -217,9 +217,9 @@ static ADDRESS_MAP_START( trailblz_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x48, 0x49) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x49, 0x49) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("pia0", pia_r, pia_w) //?
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia_r, pia_w)
-	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("pia2", pia_r, pia_w)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w) //?
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("pia2", pia6821_r, pia6821_w)
 	AM_RANGE(0xc1, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -251,9 +251,9 @@ static ADDRESS_MAP_START( pokeroul_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE("crtc", mc6845_register_w)
 	AM_RANGE(0x48, 0x49) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x49, 0x49) AM_DEVREAD("ay", ay8910_r)
-	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("pia0", pia_r, pia_w) /* confirmed */
-	AM_RANGE(0x68, 0x6b) AM_DEVREADWRITE("pia1", pia_r, pia_w) /* confirmed */
-	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE("pia2", pia_r, pia_w) /* confirmed */
+	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w) /* confirmed */
+	AM_RANGE(0x68, 0x6b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w) /* confirmed */
+	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE("pia2", pia6821_r, pia6821_w) /* confirmed */
 	AM_RANGE(0xc0, 0xc1) AM_READ(ff_r)	/* needed to boot */
 ADDRESS_MAP_END
 

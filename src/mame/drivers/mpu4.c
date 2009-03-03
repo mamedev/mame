@@ -243,7 +243,7 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
       - Distinguish door switches using manual
 ***********************************************************************************************************/
 #include "driver.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 
 #include "deprecat.h"
@@ -454,12 +454,12 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 	const device_config *pia8 = devtag_get_device(device->machine, "pia_ic8");
 
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
-	int combined_state = pianew_get_irq_a(pia3) | pianew_get_irq_b(pia3) |
-						 pianew_get_irq_a(pia4) | pianew_get_irq_b(pia4) |
-						 pianew_get_irq_a(pia5) | pianew_get_irq_b(pia5) |
-						 pianew_get_irq_a(pia6) | pianew_get_irq_b(pia6) |
-						 pianew_get_irq_a(pia7) | pianew_get_irq_b(pia7) |
-						 pianew_get_irq_a(pia8) | pianew_get_irq_b(pia8) |
+	int combined_state = pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3) |
+						 pia6821_get_irq_a(pia4) | pia6821_get_irq_b(pia4) |
+						 pia6821_get_irq_a(pia5) | pia6821_get_irq_b(pia5) |
+						 pia6821_get_irq_a(pia6) | pia6821_get_irq_b(pia6) |
+						 pia6821_get_irq_a(pia7) | pia6821_get_irq_b(pia7) |
+						 pia6821_get_irq_a(pia8) | pia6821_get_irq_b(pia8) |
 						 ptm6840_get_irq(0);
 
 	if (!serial_card_connected)
@@ -506,7 +506,7 @@ static WRITE8_HANDLER( ic2_o1_callback )
 static WRITE8_HANDLER( ic2_o2_callback )
 {
 	const device_config *pia = devtag_get_device(space->machine, "pia_ic3");
-	pia_ca1_w(pia, 0, data); /* copy output value to IC3 ca1 */
+	pia6821_ca1_w(pia, 0, data); /* copy output value to IC3 ca1 */
 
 	/* the output from timer2 is the input clock for timer3 */
 	ptm6840_set_c3(   space->machine, 0, data);
@@ -678,12 +678,12 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 	if ( serial_data )
 	{
 		ic4_input_b |=  0x80;
-		pia_cb1_w(device, 0, 1);
+		pia6821_cb1_w(device, 0, 1);
 	}
 	else
 	{
 		ic4_input_b &= ~0x80;
-		pia_cb1_w(device, 0, 0);
+		pia6821_cb1_w(device, 0, 0);
 	}
 
 	if ( optic_pattern & 0x01 ) ic4_input_b |=  0x40; /* reel A tab */
@@ -706,14 +706,14 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 	if ( lamp_undercurrent ) ic4_input_b |= 0x01;
 	#endif
 
-	LOG_IC3(("%04x IC4 PIA Read of Port B %x\n",cpuexec_describe_context(device->machine),ic4_input_b));
+	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",cpuexec_describe_context(device->machine),ic4_input_b));
 	return ic4_input_b;
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic4_ca2_w )
 {
-	LOG_IC3(("%04x IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", cpuexec_describe_context(device->machine),state));
+	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", cpuexec_describe_context(device->machine),state));
 
 	IC23GB = state;
 	ic23_update();
@@ -740,7 +740,7 @@ static const pia6821_interface pia_ic4_intf =
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
 static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 {
-	LOG(("%04x IC5 PIA Read of Port A (AUX1)\n",cpuexec_describe_context(device->machine)));
+	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",cpuexec_describe_context(device->machine)));
 	return input_port_read(device->machine, "AUX1");
 }
 
@@ -748,18 +748,18 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 {
 	const device_config *pia_ic5 = devtag_get_device(device->machine, "pia_ic5");
-	LOG(("%04x IC5 PIA Read of Port B (coin input AUX2)\n",cpuexec_describe_context(device->machine)));
-	coin_lockout_w(0, (pianew_get_output_b(pia_ic5) & 0x01) );
-	coin_lockout_w(1, (pianew_get_output_b(pia_ic5) & 0x02) );
-	coin_lockout_w(2, (pianew_get_output_b(pia_ic5) & 0x04) );
-	coin_lockout_w(3, (pianew_get_output_b(pia_ic5) & 0x08) );
+	LOG(("%s: IC5 PIA Read of Port B (coin input AUX2)\n",cpuexec_describe_context(device->machine)));
+	coin_lockout_w(0, (pia6821_get_output_b(pia_ic5) & 0x01) );
+	coin_lockout_w(1, (pia6821_get_output_b(pia_ic5) & 0x02) );
+	coin_lockout_w(2, (pia6821_get_output_b(pia_ic5) & 0x04) );
+	coin_lockout_w(3, (pia6821_get_output_b(pia_ic5) & 0x08) );
 	return input_port_read(device->machine, "AUX2");
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic5_ca2_w )
 {
-	LOG(("%04x IC5 PIA Write CA2 (Serial Tx) %2x\n",cpuexec_describe_context(device->machine),state));
+	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",cpuexec_describe_context(device->machine),state));
 	serial_data = state;
 }
 
@@ -789,7 +789,7 @@ BDIR BC1       |
 /* PSG function selected */
 static void update_ay(const device_config *device)
 {
-	if (!pianew_get_output_cb2(device))
+	if (!pia6821_get_output_cb2(device))
 	{
 		switch (ay8913_address)
 		{
@@ -801,14 +801,14 @@ static void update_ay(const device_config *device)
 		  	case 0x01:
 			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
 				const device_config *pia_ic6 = devtag_get_device(device->machine, "pia_ic6");
-				LOG(("AY8913 address = %d \n",pianew_get_output_a(pia_ic6)&0x0f));
+				LOG(("AY8913 address = %d \n",pia6821_get_output_a(pia_ic6)&0x0f));
 				break;
 		  	}
 		  	case 0x02:
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
 				const device_config *pia_ic6 = devtag_get_device(device->machine, "pia_ic6");
 				const device_config *ay = devtag_get_device(device->machine, "ay8913");
-	  			ay8910_data_w(ay, 0, pianew_get_output_a(pia_ic6));
+	  			ay8910_data_w(ay, 0, pia6821_get_output_a(pia_ic6));
 				LOG(("AY Chip Write \n"));
 				break;
 	  		}
@@ -817,7 +817,7 @@ static void update_ay(const device_config *device)
              The register will remain selected until another is chosen.*/
 				const device_config *pia_ic6 = devtag_get_device(device->machine, "pia_ic6");
 				const device_config *ay = devtag_get_device(device->machine, "ay8913");
-				ay8910_address_w(ay, 0, pianew_get_output_a(pia_ic6));
+				ay8910_address_w(ay, 0, pia6821_get_output_a(pia_ic6));
 				LOG(("AY Chip Select \n"));
 				break;
 	  		}
@@ -856,11 +856,11 @@ static const pia6821_interface pia_ic5_intf =
 /* IC6, Reel A and B and AY registers (MODs below 4 only) */
 static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 {
-	LOG(("%04x IC6 PIA Port B Set to %2x (Reel A and B)\n", cpuexec_describe_context(device->machine),data));
+	LOG(("%s: IC6 PIA Port B Set to %2x (Reel A and B)\n", cpuexec_describe_context(device->machine),data));
 	stepper_update(0, data & 0x0F );
 	stepper_update(1, (data>>4) & 0x0F );
 
-/*  if ( pia_get_output_cb2(1)) */
+/*  if ( pia6821_get_output_cb2(1)) */
 	{
 		if ( stepper_optic_state(0) ) optic_pattern |=  0x01;
 		else                          optic_pattern &= ~0x01;
@@ -875,7 +875,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 
 static WRITE8_DEVICE_HANDLER( pia_ic6_porta_w )
 {
-	LOG(("%04x IC6 PIA Write A %2x\n", cpuexec_describe_context(device->machine),data));
+	LOG(("%s: IC6 PIA Write A %2x\n", cpuexec_describe_context(device->machine),data));
 	if (mod_number <4)
 	{
 	  	ay_data = data;
@@ -886,7 +886,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_porta_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic6_ca2_w )
 {
-	LOG(("%04x IC6 PIA write CA2 %2x (AY8913 BC1)\n", cpuexec_describe_context(device->machine),state));
+	LOG(("%s: IC6 PIA write CA2 %2x (AY8913 BC1)\n", cpuexec_describe_context(device->machine),state));
 	if (mod_number <4)
 	{
 		if ( state ) ay8913_address |=  0x01;
@@ -898,7 +898,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic6_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic6_cb2_w )
 {
-	LOG(("%04x IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", cpuexec_describe_context(device->machine),state));
+	LOG(("%s: IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", cpuexec_describe_context(device->machine),state));
 	if (mod_number <4)
 	{
 		if ( state ) ay8913_address |=  0x02;
@@ -928,11 +928,11 @@ static const pia6821_interface pia_ic6_intf =
 /* IC7 Reel C and D, mechanical meters/Reel E and F, input strobe bit A */
 static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 {
-	LOG(("%04x IC7 PIA Port A Set to %2x (Reel C and D)\n", cpuexec_describe_context(device->machine),data));
+	LOG(("%s: IC7 PIA Port A Set to %2x (Reel C and D)\n", cpuexec_describe_context(device->machine),data));
 	stepper_update(2, data & 0x0F );
 	stepper_update(3, (data >> 4)& 0x0F );
 
-/*  if ( pia_get_output_cb2(1)) */
+/*  if ( pia6821_get_output_cb2(1)) */
 	{
 		if ( stepper_optic_state(2) ) optic_pattern |=  0x04;
 		else                          optic_pattern &= ~0x04;
@@ -961,22 +961,22 @@ all eight meters are driven from this port, giving the 8 line driver chip
 	mmtr_data = data;
 	if (mmtr_data)
 	{
-		pia_portb_w(device, 0, mmtr_data | 0x80);
+		pia6821_portb_w(device, 0, mmtr_data | 0x80);
 		for (meter = 0; meter < 8; meter ++)
 		if (mmtr_data & (1 << meter))	Mechmtr_update(meter, cycles, mmtr_data & (1 << meter));
 	}
 	else
 	{
-		pia_portb_w(device, 0, mmtr_data &~0x80);
+		pia6821_portb_w(device, 0, mmtr_data &~0x80);
 	}
 
-	LOG(("%04x IC7 PIA Port B Set to %2x (Meters, Reel E and F)\n", cpuexec_describe_context(device->machine),data));
+	LOG(("%s: IC7 PIA Port B Set to %2x (Meters, Reel E and F)\n", cpuexec_describe_context(device->machine),data));
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic7_ca2_w )
 {
-	LOG(("%04x IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", cpuexec_describe_context(device->machine),state));
+	LOG(("%s: IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", cpuexec_describe_context(device->machine),state));
 
 	IC23GA = state;
 	ic24_setup();
@@ -991,10 +991,10 @@ is on PB7. */
 	UINT64 cycles = cputag_get_total_cycles(device->machine, "maincpu");
 	if (state)
 	{
-		pia_portb_w(device, 0, mmtr_data|0x80);
+		pia6821_portb_w(device, 0, mmtr_data|0x80);
 		Mechmtr_update(7, cycles, state );
 	}
-	LOG(("%04x IC7 PIA write CB2 %2x \n", cpuexec_describe_context(device->machine),state));
+	LOG(("%s: IC7 PIA write CB2 %2x \n", cpuexec_describe_context(device->machine),state));
 }
 
 
@@ -1021,11 +1021,11 @@ static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
 	const device_config *pia_ic5 = devtag_get_device(device->machine, "pia_ic5");
 
-	LOG_IC8(("%04x IC8 PIA Read of Port A (MUX input data)\n", cpuexec_describe_context(device->machine)));
+	LOG_IC8(("%s: IC8 PIA Read of Port A (MUX input data)\n", cpuexec_describe_context(device->machine)));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
-	pia_cb1_w(pia_ic5, 0, (input_port_read(device->machine, "AUX2") & 0x80));
+	pia6821_cb1_w(pia_ic5, 0, (input_port_read(device->machine, "AUX2") & 0x80));
 	return input_port_read(device->machine, portnames[input_strobe]);
 }
 
@@ -1033,7 +1033,7 @@ static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 {
 	int i;
-	LOG_IC8(("%04x IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", cpuexec_describe_context(device->machine),data));
+	LOG_IC8(("%s: IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", cpuexec_describe_context(device->machine),data));
 	for (i = 0; i < 8; i++)
 		if ( data & (1 << i) )		output_set_indexed_value("triac", i, data & (1 << i));
 }
@@ -1041,7 +1041,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic8_ca2_w )
 {
-	LOG_IC8(("%04x IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", cpuexec_describe_context(device->machine), state & 0xFF));
+	LOG_IC8(("%s: IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", cpuexec_describe_context(device->machine), state & 0xFF));
 
 	IC23GC = state;
 	ic23_update();
@@ -1050,7 +1050,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic8_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic8_cb2_w )
 {
-	LOG_IC8(("%04x IC8 PIA write CB2 (alpha clock) %02X\n", cpuexec_describe_context(device->machine), state & 0xFF));
+	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", cpuexec_describe_context(device->machine), state & 0xFF));
 
 	if ( !alpha_clock && (state) )
 	{
@@ -1082,7 +1082,7 @@ static WRITE8_DEVICE_HANDLER( pia_gb_porta_w )
 {
 	const device_config *msm6376 = devtag_get_device(device->machine, "msm6376");
 
-	LOG(("%04x GAMEBOARD: PIA Port A Set to %2x\n", cpuexec_describe_context(device->machine),data));
+	LOG(("%s: GAMEBOARD: PIA Port A Set to %2x\n", cpuexec_describe_context(device->machine),data));
 	okim6376_w(msm6376, 0, data);
 }
 
@@ -1090,7 +1090,7 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 {
 	int changed = expansion_latch^data;
 
-	LOG(("%04x GAMEBOARD: PIA Port B Set to %2x\n", cpuexec_describe_context(device->machine),data));
+	LOG(("%s: GAMEBOARD: PIA Port B Set to %2x\n", cpuexec_describe_context(device->machine),data));
 
 	expansion_latch = data;
 
@@ -1117,7 +1117,7 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 }
 static READ8_DEVICE_HANDLER( pia_gb_portb_r )
 {
-	LOG(("%04x GAMEBOARD: PIA Read of Port B\n",cpuexec_describe_context(device->machine)));
+	LOG(("%s: GAMEBOARD: PIA Read of Port B\n",cpuexec_describe_context(device->machine)));
 	//
 	// b7, 1 = OKI ready, 0 = OKI busy
 	// b5, vol clock
@@ -1133,7 +1133,7 @@ static READ8_DEVICE_HANDLER( pia_gb_portb_r )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_gb_ca2_w )
 {
-	LOG(("%04x GAMEBOARD: OKI RESET data = %02X\n", cpuexec_describe_context(device->machine), state));
+	LOG(("%s: GAMEBOARD: OKI RESET data = %02X\n", cpuexec_describe_context(device->machine), state));
 
 //  return okim6376_status_0_r();
 }
@@ -1735,7 +1735,7 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
     oscillating signal.*/
 	signal_50hz = signal_50hz?0:1;
 
-	pia_ca1_w(devtag_get_device(timer->machine, "pia_ic4"), 0,  signal_50hz);	/* signal is connected to IC4 CA1 */
+	pia6821_ca1_w(devtag_get_device(timer->machine, "pia_ic4"), 0,  signal_50hz);	/* signal is connected to IC4 CA1 */
 }
 
 
@@ -1749,12 +1749,12 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)  /* 6840PTM */
 
-	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia_r,pia_w)	  	/* PIA6821 IC3 */
-	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia_r,pia_w)	  	/* PIA6821 IC4 */
-	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia_r,pia_w)	  	/* PIA6821 IC5 */
-	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia_r,pia_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia_r,pia_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia_r,pia_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia6821_r,pia6821_w)	  	/* PIA6821 IC3 */
+	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia6821_r,pia6821_w)	  	/* PIA6821 IC4 */
+	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia6821_r,pia6821_w)	  	/* PIA6821 IC5 */
+	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia6821_r,pia6821_w)		/* PIA6821 IC6 */
+	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia6821_r,pia6821_w)		/* PIA6821 IC7 */
+	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia6821_r,pia6821_w)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	/* 64k  paged ROM (4 pages)  */
 ADDRESS_MAP_END
@@ -1771,12 +1771,12 @@ static ADDRESS_MAP_START( mod4_yam_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w)
 
 	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)	// 6840PTM
-	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia_r,pia_w)	  	/* PIA6821 IC3 */
-	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia_r,pia_w)	  	/* PIA6821 IC4 */
-	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia_r,pia_w)	  	/* PIA6821 IC5 */
-	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia_r,pia_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia_r,pia_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia_r,pia_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia6821_r,pia6821_w)	  	/* PIA6821 IC3 */
+	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia6821_r,pia6821_w)	  	/* PIA6821 IC4 */
+	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia6821_r,pia6821_w)	  	/* PIA6821 IC5 */
+	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia6821_r,pia6821_w)		/* PIA6821 IC6 */
+	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia6821_r,pia6821_w)		/* PIA6821 IC7 */
+	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia6821_r,pia6821_w)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
@@ -1788,19 +1788,19 @@ static ADDRESS_MAP_START( mod4_oki_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 
-	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_gamebd", pia_r,pia_w)      // PIA6821 on game board
+	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_gamebd", pia6821_r,pia6821_w)      // PIA6821 on game board
 
 //  AM_RANGE(0x08C0, 0x08C7) AM_READERITE(ptm6840_1_r,ptm6840_1_w)  // 6840PTM on game board
 
 //  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w)
 
 	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)	// 6840PTM
-	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia_r,pia_w)	  	/* PIA6821 IC3 */
-	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia_r,pia_w)	  	/* PIA6821 IC4 */
-	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia_r,pia_w)	  	/* PIA6821 IC5 */
-	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia_r,pia_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia_r,pia_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia_r,pia_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia6821_r,pia6821_w)	  	/* PIA6821 IC3 */
+	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia6821_r,pia6821_w)	  	/* PIA6821 IC4 */
+	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia6821_r,pia6821_w)	  	/* PIA6821 IC5 */
+	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia6821_r,pia6821_w)		/* PIA6821 IC6 */
+	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia6821_r,pia6821_w)		/* PIA6821 IC7 */
+	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia6821_r,pia6821_w)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
@@ -1814,19 +1814,19 @@ static ADDRESS_MAP_START( dutch_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
-	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_gamebd", pia_r,pia_w)		// PIA6821 on game board
+	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_gamebd", pia6821_r,pia6821_w)		// PIA6821 on game board
 
 //  AM_RANGE(0x08C0, 0x08C7) AM_READERITE(ptm6840_2_r,ptm6840_2_w)  // 6840PTM on game board
 
 //  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w)
 
 	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)	// 6840PTM
-	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia_r,pia_w)	  	/* PIA6821 IC3 */
-	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia_r,pia_w)	  	/* PIA6821 IC4 */
-	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia_r,pia_w)	  	/* PIA6821 IC5 */
-	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia_r,pia_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia_r,pia_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia_r,pia_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia6821_r,pia6821_w)	  	/* PIA6821 IC3 */
+	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia6821_r,pia6821_w)	  	/* PIA6821 IC4 */
+	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia6821_r,pia6821_w)	  	/* PIA6821 IC5 */
+	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia6821_r,pia6821_w)		/* PIA6821 IC6 */
+	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia6821_r,pia6821_w)		/* PIA6821 IC7 */
+	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia6821_r,pia6821_w)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	// 64k paged ROM (4 pages)
 ADDRESS_MAP_END

@@ -23,7 +23,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "cpu/m6809/m6809.h"
 #include "williams.h"
 #include "sound/2151intf.h"
@@ -98,7 +98,7 @@ static WRITE8_HANDLER( narc_slave_sync_w );
 static ADDRESS_MAP_START( williams_cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("cvsdpia", pia_r, pia_w)
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("cvsdpia", pia6821_r, pia6821_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_DEVWRITE("cvsd", cvsd_digit_clock_clear_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_DEVWRITE("cvsd", cvsd_clock_set_w)
 	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_WRITE(cvsd_bank_select_w)
@@ -289,7 +289,7 @@ void williams_cvsd_init(running_machine *machine)
 	memory_set_bank(machine, 5, 0);
 
 	/* reset the IRQ state */
-	pia_ca1_w(devtag_get_device(machine, "cvsdpia"), 0, 1);
+	pia6821_ca1_w(devtag_get_device(machine, "cvsdpia"), 0, 1);
 
 	/* register for save states */
 	state_save_register_global(machine, williams_sound_int_state);
@@ -408,7 +408,7 @@ static void init_audio_state(running_machine *machine)
 
 static void cvsd_ym2151_irq(const device_config *device, int state)
 {
-	pia_ca1_w(devtag_get_device(device->machine, "cvsdpia"), 0, !state);
+	pia6821_ca1_w(devtag_get_device(device->machine, "cvsdpia"), 0, !state);
 }
 
 
@@ -473,9 +473,9 @@ static WRITE8_DEVICE_HANDLER( cvsd_clock_set_w )
 static TIMER_CALLBACK( williams_cvsd_delayed_data_w )
 {
 	const device_config *pia = devtag_get_device(machine, "cvsdpia");
-	pia_portb_w(pia, 0, param & 0xff);
-	pia_cb1_w(pia, 0, (param >> 8) & 1);
-	pia_cb2_w(pia, 0, (param >> 9) & 1);
+	pia6821_portb_w(pia, 0, param & 0xff);
+	pia6821_cb1_w(pia, 0, (param >> 8) & 1);
+	pia6821_cb2_w(pia, 0, (param >> 9) & 1);
 }
 
 

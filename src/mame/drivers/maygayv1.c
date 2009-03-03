@@ -128,7 +128,7 @@ Find lamps/reels after UPD changes.
 #include "cpu/m68000/m68000.h"
 #include "video/awpvid.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/68681.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
@@ -647,7 +647,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
 	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
 	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff)
-	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREADWRITE8("pia", pia_r, pia_w, 0xff)
+	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREADWRITE8("pia", pia6821_r, pia6821_w, 0xff)
 ADDRESS_MAP_END
 
 

@@ -19,7 +19,7 @@ TODO:
 
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "sound/sn76477.h"
 
 
@@ -36,10 +36,10 @@ static UINT8 clear_tv;
  *
  *************************************/
 
-static READ8_HANDLER( port_b_u3_r )
+static READ8_DEVICE_HANDLER( port_b_u3_r )
 {
-	logerror("%04x: read DIP\n",cpu_get_pc(space->cpu));
-	return input_port_read(space->machine, "DSW");
+	logerror("%s: read DIP\n",cpuexec_describe_context(device->machine));
+	return input_port_read(device->machine, "DSW");
 }
 
 
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( clear_tv_w )
 
 static WRITE8_DEVICE_HANDLER( port_b_u1_w )
 {
-	if (pianew_get_port_b_z_mask(device) & 0x20)
+	if (pia6821_get_port_b_z_mask(device) & 0x20)
 		coin_counter_w(0, 1);
 	else
 		coin_counter_w(0, data & 0x20);
@@ -119,7 +119,7 @@ static WRITE8_DEVICE_HANDLER( port_b_u1_w )
 
 static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
-	int combined_state = pianew_get_irq_a(device) | pianew_get_irq_b(device);
+	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
 logerror("GEN IRQ: %x\n", combined_state);
 	cpu_set_input_line(device->machine->cpu[0], 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -146,11 +146,11 @@ static UINT8 last = 0;
 		last = input_port_read(device->machine, "INPUT") & 0x0f;
 		generic_pulse_irq_line(device, 0);
 	}
-	pianew_set_input_a(pia, input_port_read(device->machine, "INPUT") & 0x0f, 0);
+	pia6821_set_input_a(pia, input_port_read(device->machine, "INPUT") & 0x0f, 0);
 
-	pia_ca1_w(pia, 0, input_port_read(device->machine, "INPUT") & 0x10);
+	pia6821_ca1_w(pia, 0, input_port_read(device->machine, "INPUT") & 0x10);
 
-	pia_ca2_w(pia, 0, input_port_read(device->machine, "INPUT") & 0x20);
+	pia6821_ca2_w(pia, 0, input_port_read(device->machine, "INPUT") & 0x20);
 }
 
 static READ8_HANDLER( timer_r )
@@ -279,7 +279,7 @@ static const pia6821_interface pia_u2_intf =
 static const pia6821_interface pia_u3_intf =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,		/* port B in */
+	DEVCB_HANDLER(port_b_u3_r),		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
@@ -313,9 +313,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)	/* the read is mark *LEDEN, but not used */
 	AM_RANGE(0xf04b, 0xf04b) AM_READWRITE(timer_r, clear_timer_w)
 	AM_RANGE(0xa04c, 0xf09f) AM_NOP
-	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE("pia_u1", pia_r, pia_w)
-	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE("pia_u3", pia_r, pia_w)
-	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE("pia_u2", pia_r, pia_w)
+	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE("pia_u1", pia6821_r, pia6821_w)
+	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE("pia_u3", pia6821_r, pia6821_w)
+	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE("pia_u2", pia6821_r, pia6821_w)
 	AM_RANGE(0xf0ac, 0xf7ff) AM_NOP
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END

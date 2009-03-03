@@ -5,7 +5,7 @@
 **************************************************************************/
 
 
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 
 /*----------- defined in drivers/williams.c -----------*/
 

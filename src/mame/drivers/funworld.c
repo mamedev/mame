@@ -1034,7 +1034,7 @@
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "sound/ay8910.h"
 #include "machine/eeprom.h"
 #include "funworld.lh"
@@ -1085,8 +1085,8 @@ static WRITE8_DEVICE_HANDLER(pia1_ca2_w)
 
 static ADDRESS_MAP_START( funworld_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia_r, pia_w)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -1100,8 +1100,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magicrd2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia_r, pia_w)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -1116,8 +1116,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cuoreuno_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia_r, pia_w)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -1131,8 +1131,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalmcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia0", pia_r, pia_w)
-	AM_RANGE(0x2a00, 0x2a03) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x2a00, 0x2a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x2c00, 0x2c00) AM_DEVREAD("ay8910", ay8910_r)
 	AM_RANGE(0x2c00, 0x2c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x2e00, 0x2e00) AM_DEVWRITE("crtc", mc6845_address_w)

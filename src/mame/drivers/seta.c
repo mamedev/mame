@@ -1293,7 +1293,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "seta.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/msm6242.h"
 #include "sound/2203intf.h"

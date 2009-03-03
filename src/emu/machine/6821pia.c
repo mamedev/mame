@@ -4,7 +4,7 @@
 
 **********************************************************************/
 
-#include "6821new.h"
+#include "6821pia.h"
 
 
 /***************************************************************************
@@ -428,7 +428,7 @@ static void set_out_cb2(const device_config *device, int data)
 {
 	pia6821 *p = get_token(device);
 
-	int z = pianew_get_output_cb2_z(device);
+	int z = pia6821_get_output_cb2_z(device);
 
 	if ((data != p->out_cb2) || (z != p->last_out_cb2_z))
 	{
@@ -552,7 +552,7 @@ static UINT8 control_a_r(const device_config *device)
 
 	/* update CA1 & CA2 if callback exists, these in turn may update IRQ's */
 	if (p->in_ca1_func.read != NULL)
-		pia_ca1_w(device, 0, devcb_call_read_line(&p->in_ca1_func));
+		pia6821_ca1_w(device, 0, devcb_call_read_line(&p->in_ca1_func));
 	else if (!p->logged_ca1_not_connected && (!p->in_ca1_pushed))
 	{
 		logerror("PIA #%s: Warning! No CA1 read handler. Assuming pin not connected\n", device->tag);
@@ -560,7 +560,7 @@ static UINT8 control_a_r(const device_config *device)
 	}
 
 	if (p->in_ca2_func.read != NULL)
-		pia_ca2_w(device, 0, devcb_call_read_line(&p->in_ca2_func));
+		pia6821_ca2_w(device, 0, devcb_call_read_line(&p->in_ca2_func));
 	else if ( !p->logged_ca2_not_connected && C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
 	{
 		logerror("PIA #%s: Warning! No CA2 read handler. Assuming pin not connected\n", device->tag);
@@ -594,7 +594,7 @@ static UINT8 control_b_r(const device_config *device)
 
 	/* update CB1 & CB2 if callback exists, these in turn may update IRQ's */
 	if (p->in_cb1_func.read != NULL)
-		pia_cb1_w(device, 0, devcb_call_read_line(&p->in_cb1_func));
+		pia6821_cb1_w(device, 0, devcb_call_read_line(&p->in_cb1_func));
 	else if (!p->logged_cb1_not_connected && !p->in_cb1_pushed)
 	{
 		logerror("PIA #%s: Error! no CB1 read handler. Three-state pin is undefined\n", device->tag);
@@ -602,7 +602,7 @@ static UINT8 control_b_r(const device_config *device)
 	}
 
 	if (p->in_cb2_func.read != NULL)
-		pia_cb2_w(device, 0, devcb_call_read_line(&p->in_cb2_func));
+		pia6821_cb2_w(device, 0, devcb_call_read_line(&p->in_cb2_func));
 	else if (!p->logged_cb2_not_connected && C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
 	{
 		logerror("PIA #%s: Error! No CB2 read handler. Three-state pin is undefined\n", device->tag);
@@ -626,10 +626,10 @@ static UINT8 control_b_r(const device_config *device)
 
 
 /*-------------------------------------------------
-    pia_r
+    pia6821_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(pia_r)
+READ8_DEVICE_HANDLER( pia6821_r )
 {
 	pia6821 *p = get_token(device);
 	UINT8 ret;
@@ -665,20 +665,20 @@ READ8_DEVICE_HANDLER(pia_r)
 
 
 /*-------------------------------------------------
-    pia_alt_r
+    pia6821_alt_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(pia_alt_r)
+READ8_DEVICE_HANDLER( pia6821_alt_r )
 {
-	return pia_r(device, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01));
+	return pia6821_r(device, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 
 /*-------------------------------------------------
-    pianew_get_port_b_z_mask
+    pia6821_get_port_b_z_mask
 -------------------------------------------------*/
 
-UINT8 pianew_get_port_b_z_mask(const device_config *device)
+UINT8 pia6821_get_port_b_z_mask(const device_config *device)
 {
 	pia6821 *p = get_token(device);
 	return ~p->ddr_b;
@@ -894,10 +894,10 @@ static void control_b_w(const device_config *device, UINT8 data)
 
 
 /*-------------------------------------------------
-    pia_w
+    pia6821_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(pia_w)
+WRITE8_DEVICE_HANDLER( pia6821_w )
 {
 	pia6821 *p = get_token(device);
 
@@ -930,20 +930,20 @@ WRITE8_DEVICE_HANDLER(pia_w)
 
 
 /*-------------------------------------------------
-    pia_alt_w
+    pia6821_alt_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(pia_alt_w)
+WRITE8_DEVICE_HANDLER( pia6821_alt_w )
 {
-	pia_w(device, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data);
+	pia6821_w(device, ((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 
 /*-------------------------------------------------
-    pianew_set_port_a_z_mask
+    pia6821_set_port_a_z_mask
 -------------------------------------------------*/
 
-void pianew_set_port_a_z_mask(const device_config *device, UINT8 data)
+void pia6821_set_port_a_z_mask(const device_config *device, UINT8 data)
 {
 	pia6821 *p = get_token(device);
 
@@ -952,10 +952,10 @@ void pianew_set_port_a_z_mask(const device_config *device, UINT8 data)
 
 
 /*-------------------------------------------------
-    pia_porta_r
+    pia6821_porta_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(pia_porta_r)
+READ8_DEVICE_HANDLER( pia6821_porta_r )
 {
 	pia6821 *p = get_token(device);
 
@@ -964,14 +964,14 @@ READ8_DEVICE_HANDLER(pia_porta_r)
 
 
 /*-------------------------------------------------
-    pianew_set_input_a
+    pia6821_set_input_a
 -------------------------------------------------*/
 
-void pianew_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask)
+void pia6821_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask)
 {
 	pia6821 *p = get_token(device);
 
-	assert_always(p->in_a_func.read == NULL, "pia_porta_w() called when in_a_func implemented");
+	assert_always(p->in_a_func.read == NULL, "pia6821_porta_w() called when in_a_func implemented");
 
 	LOG(("PIA #%s: set input port A = %02X\n", device->tag, data));
 
@@ -982,20 +982,20 @@ void pianew_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask)
 
 
 /*-------------------------------------------------
-    pia_porta_w
+    pia6821_porta_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(pia_porta_w)
+WRITE8_DEVICE_HANDLER( pia6821_porta_w )
 {
-	pianew_set_input_a(device, data, 0);
+	pia6821_set_input_a(device, data, 0);
 }
 
 
 /*-------------------------------------------------
-    pianew_get_output_a
+    pia6821_get_output_a
 -------------------------------------------------*/
 
-UINT8 pianew_get_output_a(const device_config *device)
+UINT8 pia6821_get_output_a(const device_config *device)
 {
 	pia6821 *p = get_token(device);
 
@@ -1006,10 +1006,10 @@ UINT8 pianew_get_output_a(const device_config *device)
 
 
 /*-------------------------------------------------
-    pia_ca1_r
+    pia6821_ca1_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(pia_ca1_r)
+READ8_DEVICE_HANDLER( pia6821_ca1_r )
 {
 	pia6821 *p = get_token(device);
 
@@ -1018,10 +1018,10 @@ READ8_DEVICE_HANDLER(pia_ca1_r)
 
 
 /*-------------------------------------------------
-    pia_ca1_w
+    pia6821_ca1_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(pia_ca1_w)
+WRITE8_DEVICE_HANDLER( pia6821_ca1_w )
 {
 	pia6821 *p = get_token(device);
 
@@ -1054,10 +1054,10 @@ WRITE8_DEVICE_HANDLER(pia_ca1_w)
 
 
 /*-------------------------------------------------
-    pia_ca2_r
+    pia6821_ca2_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(pia_ca2_r)
+READ8_DEVICE_HANDLER( pia6821_ca2_r )
 {
 	pia6821 *p = get_token(device);
 
@@ -1066,10 +1066,10 @@ READ8_DEVICE_HANDLER(pia_ca2_r)
 
 
 /*-------------------------------------------------
-    pia_ca2_w
+    pia6821_ca2_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(pia_ca2_w)
+WRITE8_DEVICE_HANDLER( pia6821_ca2_w )
 {
 	pia6821 *p = get_token(device);
 
@@ -1099,10 +1099,10 @@ WRITE8_DEVICE_HANDLER(pia_ca2_w)
 
 
 /*-------------------------------------------------
-    pianew_get_output_ca2
+    pia6821_get_output_ca2
 -------------------------------------------------*/
 
-int pianew_get_output_ca2(const device_config *device)
+int pia6821_get_output_ca2(const device_config *device)
 {
 	pia6821 *p = get_token(device);
 
@@ -1113,12 +1113,12 @@ int pianew_get_output_ca2(const device_config *device)
 
 
 /*-------------------------------------------------
-    pianew_get_output_ca2_z - version of
-    pianew_get_output_ca2, which takes account of internal
+    pia6821_get_output_ca2_z - version of
+    pia6821_get_output_ca2, which takes account of internal
     pullup resistor
 -------------------------------------------------*/
 
-int pianew_get_output_ca2_z(const device_config *device)
+int pia6821_get_output_ca2_z(const device_config *device)
 {
 	pia6821 *p = get_token(device);
 
@@ -1132,10 +1132,10 @@ int pianew_get_output_ca2_z(const device_config *device)
 
 
 /*-------------------------------------------------
-    pia_portb_r
+    pia6821_portb_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(pia_portb_r)
+READ8_DEVICE_HANDLER( pia6821_portb_r )
 {
 	pia6821 *p = get_token(device);
 
@@ -1144,10 +1144,10 @@ READ8_DEVICE_HANDLER(pia_portb_r)
 
 
 /*-------------------------------------------------
-    pia_portb_w
+    pia6821_portb_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(pia_portb_w)
+WRITE8_DEVICE_HANDLER( pia6821_portb_w )
 {
 	pia6821 *p = get_token(device);
 
@@ -1161,10 +1161,10 @@ WRITE8_DEVICE_HANDLER(pia_portb_w)
 
 
 /*-------------------------------------------------
-    pianew_get_output_b
+    pia6821_get_output_b
 -------------------------------------------------*/
 
-UINT8 pianew_get_output_b(const device_config *device)
+UINT8 pia6821_get_output_b(const device_config *device)
 {
 	pia6821 *p = get_token(device);
 
@@ -1175,10 +1175,10 @@ UINT8 pianew_get_output_b(const device_config *device)
 
 
 /*-------------------------------------------------
-    pia_cb1_r
+    pia6821_cb1_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(pia_cb1_r)
+READ8_DEVICE_HANDLER( pia6821_cb1_r )
 {
 	pia6821 *p = get_token(device);
 
@@ -1187,10 +1187,10 @@ READ8_DEVICE_HANDLER(pia_cb1_r)
 
 
 /*-------------------------------------------------
-    pia_cb1_w
+    pia6821_cb1_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(pia_cb1_w)
+WRITE8_DEVICE_HANDLER( pia6821_cb1_w )
 {
 	pia6821 *p = get_token(device);
 
@@ -1224,10 +1224,10 @@ WRITE8_DEVICE_HANDLER(pia_cb1_w)
 
 
 /*-------------------------------------------------
-    pia_cb2_r
+    pia6821_cb2_r
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(pia_cb2_r)
+READ8_DEVICE_HANDLER( pia6821_cb2_r )
 {
 	pia6821 *p = get_token(device);
 
@@ -1236,10 +1236,10 @@ READ8_DEVICE_HANDLER(pia_cb2_r)
 
 
 /*-------------------------------------------------
-    pia_cb2_w
+    pia6821_cb2_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(pia_cb2_w)
+WRITE8_DEVICE_HANDLER( pia6821_cb2_w )
 {
 	pia6821 *p = get_token(device);
 
@@ -1269,10 +1269,10 @@ WRITE8_DEVICE_HANDLER(pia_cb2_w)
 
 
 /*-------------------------------------------------
-    pianew_get_output_cb2
+    pia6821_get_output_cb2
 -------------------------------------------------*/
 
-int pianew_get_output_cb2(const device_config *device)
+int pia6821_get_output_cb2(const device_config *device)
 {
 	pia6821 *p = get_token(device);
 
@@ -1283,10 +1283,10 @@ int pianew_get_output_cb2(const device_config *device)
 
 
 /*-------------------------------------------------
-    pianew_get_output_cb2_z
+    pia6821_get_output_cb2_z
 -------------------------------------------------*/
 
-int pianew_get_output_cb2_z(const device_config *device)
+int pia6821_get_output_cb2_z(const device_config *device)
 {
 	pia6821 *p = get_token(device);
 
@@ -1295,10 +1295,10 @@ int pianew_get_output_cb2_z(const device_config *device)
 
 
 /*-------------------------------------------------
-    pianew_get_irq_a
+    pia6821_get_irq_a
 -------------------------------------------------*/
 
-int pianew_get_irq_a(const device_config *device)
+int pia6821_get_irq_a(const device_config *device)
 {
 	pia6821 *p = get_token(device);
 
@@ -1307,10 +1307,10 @@ int pianew_get_irq_a(const device_config *device)
 
 
 /*-------------------------------------------------
-    pianew_get_irq_b
+    pia6821_get_irq_b
 -------------------------------------------------*/
 
-int pianew_get_irq_b(const device_config *device)
+int pia6821_get_irq_b(const device_config *device)
 {
 	pia6821 *p = get_token(device);
 

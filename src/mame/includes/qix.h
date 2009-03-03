@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "video/mc6845.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 
 
 #define MAIN_CLOCK_OSC			20000000	/* 20 MHz */

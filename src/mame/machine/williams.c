@@ -8,7 +8,7 @@
 #include "audio/williams.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/ticket.h"
 #include "williams.h"
 #include "sound/dac.h"
@@ -190,7 +190,7 @@ const pia6821_interface williams2_muxed_pia_0_intf =
 const pia6821_interface williams2_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia_ca1_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
 
@@ -198,7 +198,7 @@ const pia6821_interface williams2_pia_1_intf =
 const pia6821_interface williams2_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER("pia_1", pia_portb_w), DEVCB_DEVICE_HANDLER("wmsdac", dac_w), DEVCB_DEVICE_HANDLER("pia_1", pia_cb1_w), DEVCB_NULL,
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER("pia_1", pia6821_portb_w), DEVCB_DEVICE_HANDLER("wmsdac", dac_w), DEVCB_DEVICE_HANDLER("pia_1", pia6821_cb1_w), DEVCB_NULL,
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 
@@ -222,7 +222,7 @@ const pia6821_interface mysticm_pia_0_intf =
 const pia6821_interface mysticm_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia_ca1_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(mysticm_main_irq), DEVCB_LINE(mysticm_main_irq)
 };
 
@@ -238,7 +238,7 @@ const pia6821_interface tshoot_pia_0_intf =
 const pia6821_interface tshoot_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia_ca1_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(tshoot_main_irq), DEVCB_LINE(tshoot_main_irq)
 };
 
@@ -246,7 +246,7 @@ const pia6821_interface tshoot_pia_1_intf =
 const pia6821_interface tshoot_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER("pia_1", pia_portb_w), DEVCB_DEVICE_HANDLER("wmsdac", dac_w), DEVCB_DEVICE_HANDLER("pia_1", pia_cb1_w), DEVCB_HANDLER(tshoot_maxvol_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_HANDLER("pia_1", pia6821_portb_w), DEVCB_DEVICE_HANDLER("wmsdac", dac_w), DEVCB_DEVICE_HANDLER("pia_1", pia6821_cb1_w), DEVCB_HANDLER(tshoot_maxvol_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
 };
 
@@ -254,7 +254,7 @@ const pia6821_interface tshoot_snd_pia_intf =
 const pia6821_interface joust2_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_HANDLER(input_port_2_device_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(joust2_snd_cmd_w), DEVCB_HANDLER(joust2_pia_3_cb1_w), DEVCB_DEVICE_HANDLER("pia_2", pia_ca1_w),
+	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_HANDLER(joust2_snd_cmd_w), DEVCB_HANDLER(joust2_pia_3_cb1_w), DEVCB_DEVICE_HANDLER("pia_2", pia6821_ca1_w),
 	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
 };
 
@@ -272,7 +272,7 @@ static TIMER_CALLBACK( williams_va11_callback )
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	pia_cb1_w(pia_1, 0, scanline & 0x20);
+	pia6821_cb1_w(pia_1, 0, scanline & 0x20);
 
 	/* set a timer for the next update */
 	scanline += 0x20;
@@ -286,7 +286,7 @@ static TIMER_CALLBACK( williams_count240_off_callback )
 	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
 
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	pia_ca1_w(pia_1, 0, 0);
+	pia6821_ca1_w(pia_1, 0, 0);
 }
 
 
@@ -295,7 +295,7 @@ static TIMER_CALLBACK( williams_count240_callback )
 	const device_config *pia_1 = devtag_get_device(machine, "pia_1");
 
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	pia_ca1_w(pia_1, 0, 1);
+	pia6821_ca1_w(pia_1, 0, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
@@ -308,7 +308,7 @@ static TIMER_CALLBACK( williams_count240_callback )
 static void williams_main_irq(const device_config *device, int state)
 {
 	const device_config *pia_1 = devtag_get_device(device->machine, "pia_1");
-	int combined_state = pianew_get_irq_a(pia_1) | pianew_get_irq_b(pia_1);
+	int combined_state = pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
 
 	/* IRQ to the main CPU */
 	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -325,7 +325,7 @@ static void williams_main_firq(const device_config *device, int state)
 static void williams_snd_irq(const device_config *device, int state)
 {
 	const device_config *pia_2 = devtag_get_device(device->machine, "pia_2");
-	int combined_state = pianew_get_irq_a(pia_2) | pianew_get_irq_b(pia_2);
+	int combined_state = pia6821_get_irq_a(pia_2) | pia6821_get_irq_b(pia_2);
 
 	/* IRQ to the sound CPU */
 	cpu_set_input_line(device->machine->cpu[1], M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -343,7 +343,7 @@ static void mysticm_main_irq(const device_config *device, int state)
 {
 	const device_config *pia_0 = devtag_get_device(device->machine, "pia_0");
 	const device_config *pia_1 = devtag_get_device(device->machine, "pia_1");
-	int combined_state = pianew_get_irq_b(pia_0) | pianew_get_irq_a(pia_1) | pianew_get_irq_b(pia_1);
+	int combined_state = pia6821_get_irq_b(pia_0) | pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
 
 	/* IRQ to the main CPU */
 	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -354,7 +354,7 @@ static void tshoot_main_irq(const device_config *device, int state)
 {
 	const device_config *pia_0 = devtag_get_device(device->machine, "pia_0");
 	const device_config *pia_1 = devtag_get_device(device->machine, "pia_1");
-	int combined_state = pianew_get_irq_a(pia_0) | pianew_get_irq_b(pia_0) | pianew_get_irq_a(pia_1) | pianew_get_irq_b(pia_1);
+	int combined_state = pia6821_get_irq_a(pia_0) | pia6821_get_irq_b(pia_0) | pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
 
 	/* IRQ to the main CPU */
 	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -409,8 +409,8 @@ static TIMER_CALLBACK( williams2_va11_callback )
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	pia_cb1_w(pia_0, 0, scanline & 0x20);
-	pia_ca1_w(pia_1, 0, scanline & 0x20);
+	pia6821_cb1_w(pia_0, 0, scanline & 0x20);
+	pia6821_ca1_w(pia_1, 0, scanline & 0x20);
 
 	/* set a timer for the next update */
 	scanline += 0x20;
@@ -424,7 +424,7 @@ static TIMER_CALLBACK( williams2_endscreen_off_callback )
 	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
 
 	/* the /ENDSCREEN signal comes into CA1 */
-	pia_ca1_w(pia_0, 0, 1);
+	pia6821_ca1_w(pia_0, 0, 1);
 }
 
 
@@ -433,7 +433,7 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
 	const device_config *pia_0 = devtag_get_device(machine, "pia_0");
 
 	/* the /ENDSCREEN signal comes into CA1 */
-	pia_ca1_w(pia_0, 0, 0);
+	pia6821_ca1_w(pia_0, 0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
 	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
@@ -544,8 +544,8 @@ static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
 {
 	const device_config *pia_2 = devtag_get_device(machine, "pia_2");
 
-	pia_portb_w(pia_2, 0, param);
-	pia_cb1_w(pia_2, 0, (param == 0xff) ? 0 : 1);
+	pia6821_portb_w(pia_2, 0, param);
+	pia6821_cb1_w(pia_2, 0, (param == 0xff) ? 0 : 1);
 }
 
 WRITE8_DEVICE_HANDLER( williams_snd_cmd_w )
@@ -564,7 +564,7 @@ static TIMER_CALLBACK( williams2_deferred_snd_cmd_w )
 {
 	const device_config *pia_2 = devtag_get_device(machine, "pia_2");
 
-	pia_porta_w(pia_2, 0, param);
+	pia6821_porta_w(pia_2, 0, param);
 }
 
 static WRITE8_DEVICE_HANDLER( williams2_snd_cmd_w )
@@ -961,7 +961,7 @@ MACHINE_RESET( joust2 )
 
 	/* standard init */
 	MACHINE_RESET_CALL(williams2);
-	pia_ca1_w(pia_3, 0, 1);
+	pia6821_ca1_w(pia_3, 0, 1);
 	state_save_register_global(machine, joust2_current_sound_data);
 }
 
@@ -969,7 +969,7 @@ MACHINE_RESET( joust2 )
 static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 {
 	const device_config *pia_2 = devtag_get_device(machine, "pia_2");
-	pia_porta_w(pia_2, 0, param & 0xff);
+	pia6821_porta_w(pia_2, 0, param & 0xff);
 }
 
 
@@ -978,7 +978,7 @@ static WRITE8_DEVICE_HANDLER( joust2_pia_3_cb1_w )
 	const device_config *pia_3 = devtag_get_device(device->machine, "cvsdpia");
 
 	joust2_current_sound_data = (joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
-	pia_cb1_w(pia_3, offset, data);
+	pia6821_cb1_w(pia_3, offset, data);
 }
 
 

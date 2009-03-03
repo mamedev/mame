@@ -142,7 +142,7 @@ static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 {
 	UINT8 ret = input_port_read(device->machine, "IN1");
 
-	pianew_set_port_a_z_mask(device, ret);
+	pia6821_set_port_a_z_mask(device, ret);
 
 	return ret;
 }
@@ -152,7 +152,7 @@ static READ8_DEVICE_HANDLER( zwackery_port_3_r )
 {
 	UINT8 ret = input_port_read(device->machine, "IN3");
 
-	pianew_set_port_a_z_mask(device, ret);
+	pia6821_set_port_a_z_mask(device, ret);
 
 	return ret;
 }
@@ -605,7 +605,7 @@ WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
 {
-	v493_irq_state = pianew_get_irq_a(device) | pianew_get_irq_b(device);
+	v493_irq_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 	update_mcr68_interrupts(device->machine);
 }
 
@@ -613,7 +613,7 @@ static WRITE_LINE_DEVICE_HANDLER( zwackery_pia_irq )
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
 	const device_config *pia = devtag_get_device(machine, "pia0");
-	pia_ca1_w(pia, 0, 0);
+	pia6821_ca1_w(pia, 0, 0);
 }
 
 
@@ -621,7 +621,7 @@ static TIMER_CALLBACK( zwackery_493_callback )
 {
 	const device_config *pia = devtag_get_device(machine, "pia0");
 
-	pia_ca1_w(pia, 0, 1);
+	pia6821_ca1_w(pia, 0, 1);
 	timer_set(machine, video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);
 }
 

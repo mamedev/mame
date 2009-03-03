@@ -19,7 +19,7 @@
 #include "includes/atari.h"
 #include "sound/speaker.h"
 #include "sound/pokey.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "video/gtia.h"
 
 #include "maxaflex.lh"
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START(a600xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
 	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-    AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia_alt_r, pia_alt_w)
+    AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_alt_r, pia6821_alt_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */

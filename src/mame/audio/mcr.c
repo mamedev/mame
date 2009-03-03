@@ -506,7 +506,7 @@ static WRITE8_DEVICE_HANDLER( csdeluxe_porta_w )
 
 static WRITE8_DEVICE_HANDLER( csdeluxe_portb_w )
 {
-	UINT8 z_mask = pianew_get_port_b_z_mask(device);
+	UINT8 z_mask = pia6821_get_port_b_z_mask(device);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
 	dac_signed_data_16_w(devtag_get_device(device->machine, "csddac"), dacval << 6);
@@ -517,7 +517,7 @@ static WRITE8_DEVICE_HANDLER( csdeluxe_portb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( csdeluxe_irq )
 {
-	int combined_state = pianew_get_irq_a(device) | pianew_get_irq_b(device);
+	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
   	cpu_set_input_line(csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -526,8 +526,8 @@ static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 {
 	const device_config *pia = devtag_get_device(machine, "csdpia");
 
-	pia_portb_w(pia, 0, param & 0x0f);
-	pia_ca1_w(pia, 0, ~param & 0x10);
+	pia6821_portb_w(pia, 0, param & 0x0f);
+	pia6821_ca1_w(pia, 0, ~param & 0x10);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -541,17 +541,17 @@ static READ16_DEVICE_HANDLER( csdeluxe_pia_r )
 	/* using the MOVEP instruction outputs the same value on the high and */
 	/* low bytes. */
 	if (ACCESSING_BITS_8_15)
-		return pia_alt_r(device, offset) << 8;
+		return pia6821_alt_r(device, offset) << 8;
 	else
-		return pia_alt_r(device, offset);
+		return pia6821_alt_r(device, offset);
 }
 
 static WRITE16_DEVICE_HANDLER( csdeluxe_pia_w )
 {
 	if (ACCESSING_BITS_8_15)
-		pia_alt_w(device, offset, data >> 8);
+		pia6821_alt_w(device, offset, data >> 8);
 	else
-		pia_alt_w(device, offset, data);
+		pia6821_alt_w(device, offset, data);
 }
 
 
@@ -644,7 +644,7 @@ static WRITE8_DEVICE_HANDLER( soundsgood_porta_w )
 
 static WRITE8_DEVICE_HANDLER( soundsgood_portb_w )
 {
-	UINT8 z_mask = pianew_get_port_b_z_mask(device);
+	UINT8 z_mask = pia6821_get_port_b_z_mask(device);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
 	dac_signed_data_16_w(devtag_get_device(device->machine, "sgdac"), dacval << 6);
@@ -655,7 +655,7 @@ static WRITE8_DEVICE_HANDLER( soundsgood_portb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( soundsgood_irq )
 {
-	int combined_state = pianew_get_irq_a(device) | pianew_get_irq_b(device);
+	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
   	cpu_set_input_line(soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -664,8 +664,8 @@ static TIMER_CALLBACK( soundsgood_delayed_data_w )
 {
 	const device_config *pia = devtag_get_device(machine, "sgpia");
 
-	pia_portb_w(pia, 0, (param >> 1) & 0x0f);
-	pia_ca1_w(pia, 0, ~param & 0x01);
+	pia6821_portb_w(pia, 0, (param >> 1) & 0x0f);
+	pia6821_ca1_w(pia, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -698,7 +698,7 @@ static ADDRESS_MAP_START( soundsgood_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("sgpia", pia_alt_r, pia_alt_w, 0xff00)
+	AM_RANGE(0x060000, 0x060007) AM_DEVREADWRITE8("sgpia", pia6821_alt_r, pia6821_alt_w, 0xff00)
 	AM_RANGE(0x070000, 0x070fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -759,7 +759,7 @@ static WRITE8_DEVICE_HANDLER( turbocs_portb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( turbocs_irq )
 {
-	int combined_state = pianew_get_irq_a(device) | pianew_get_irq_b(device);
+	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
 	cpu_set_input_line(turbocs_sound_cpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -768,8 +768,8 @@ static TIMER_CALLBACK( turbocs_delayed_data_w )
 {
 	const device_config *pia = devtag_get_device(machine, "tcspia");
 
-	pia_portb_w(pia, 0, (param >> 1) & 0x0f);
-	pia_ca1_w(pia, 0, ~param & 0x01);
+	pia6821_portb_w(pia, 0, (param >> 1) & 0x0f);
+	pia6821_ca1_w(pia, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -800,7 +800,7 @@ void turbocs_reset_w(running_machine *machine, int state)
 static ADDRESS_MAP_START( turbocs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
-	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("tcspia", pia_alt_r, pia_alt_w)
+	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("tcspia", pia6821_alt_r, pia6821_alt_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -874,18 +874,18 @@ static WRITE8_DEVICE_HANDLER( squawkntalk_portb2_w )
 		tms5220_data_w(tms, offset, squawkntalk_tms_command);
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_ca2_w(device, 0, 1);
-		pia_ca2_w(device, 0, 0);
+		pia6821_ca2_w(device, 0, 1);
+		pia6821_ca2_w(device, 0, 0);
 	}
 
 	/* read strobe -- read the current status from the TMS5200 */
 	else if (((data ^ squawkntalk_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		pia_porta_w(device, 0, tms5220_status_r(tms, offset));
+		pia6821_porta_w(device, 0, tms5220_status_r(tms, offset));
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_ca2_w(device, 0, 1);
-		pia_ca2_w(device, 0, 0);
+		pia6821_ca2_w(device, 0, 1);
+		pia6821_ca2_w(device, 0, 0);
 	}
 
 	/* remember the state */
@@ -896,7 +896,7 @@ static WRITE_LINE_DEVICE_HANDLER( squawkntalk_irq )
 {
 	const device_config *pia0 = devtag_get_device(device->machine, "sntpia0");
 	const device_config *pia1 = devtag_get_device(device->machine, "sntpia1");
-	int combined_state = pianew_get_irq_a(pia0) | pianew_get_irq_b(pia0) | pianew_get_irq_a(pia1) | pianew_get_irq_b(pia1);
+	int combined_state = pia6821_get_irq_a(pia0) | pia6821_get_irq_b(pia0) | pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1);
 
 	cpu_set_input_line(squawkntalk_sound_cpu, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -905,8 +905,8 @@ static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 {
 	const device_config *pia0 = devtag_get_device(machine, "sntpia0");
 
-	pia_porta_w(pia0, 0, ~param & 0x0f);
-	pia_cb1_w(pia0, 0, ~param & 0x10);
+	pia6821_porta_w(pia0, 0, ~param & 0x0f);
+	pia6821_cb1_w(pia0, 0, ~param & 0x10);
 }
 
 
@@ -930,8 +930,8 @@ void squawkntalk_reset_w(running_machine *machine, int state)
 static ADDRESS_MAP_START( squawkntalk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("sntpia0", pia_r, pia_w)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("sntpia1", pia_r, pia_w)
+	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("sntpia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x4f6c) AM_DEVREADWRITE("sntpia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0x4000) AM_WRITE(squawkntalk_dac_w)
 	AM_RANGE(0x8000, 0xbfff) AM_MIRROR(0x4000) AM_ROM
 ADDRESS_MAP_END
@@ -942,8 +942,8 @@ ADDRESS_MAP_END
 ADDRESS_MAP_START( squawkntalk_alt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("sntpia0", pia_r, pia_w)
-	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE("sntpia1", pia_r, pia_w)
+	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE("sntpia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x676c) AM_DEVREADWRITE("sntpia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x0800, 0x0fff) AM_MIRROR(0x6000) AM_WRITE(squawkntalk_dac_w)
 	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x6000) AM_ROM
 ADDRESS_MAP_END

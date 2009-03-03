@@ -63,7 +63,7 @@
 
 #include "driver.h"
 #include "machine/rescap.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/74123.h"
 #include "video/mc6845.h"
 #include "cpu/m6800/m6800.h"
@@ -115,7 +115,7 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 {
 	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
 	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
-	int combined_state = pianew_get_irq_a(pia1) | pianew_get_irq_b(pia1) | pianew_get_irq_b(pia2);
+	int combined_state = pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1) | pia6821_get_irq_b(pia2);
 
 	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -140,13 +140,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
-	pia_ca1_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x01);
+	pia6821_ca1_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x01);
 
 	/* CA2 - copy of PA1 (SERVICE1) */
-	pia_ca2_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x02);
+	pia6821_ca2_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x02);
 
 	/* CB1 - (crosshatch) */
-	pia_cb1_w(pia1, 0, input_port_read(device->machine, "CROSS"));
+	pia6821_cb1_w(pia1, 0, input_port_read(device->machine, "CROSS"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -228,7 +228,7 @@ static const pia6821_interface pia_2_intf =
 static WRITE8_DEVICE_HANDLER(ic48_1_74123_output_changed)
 {
 	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
-	pia_ca1_w(pia2, 0, data);
+	pia6821_ca1_w(pia2, 0, data);
 }
 
 
@@ -504,8 +504,8 @@ static READ8_HANDLER( nyny_pia_1_2_r )
 	UINT8 ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
-	if (offset & 0x04)  ret = pia_r(pia1, offset & 0x03);
-	if (offset & 0x08)  ret = pia_alt_r(pia2, offset & 0x03);
+	if (offset & 0x04)  ret = pia6821_r(pia1, offset & 0x03);
+	if (offset & 0x08)  ret = pia6821_alt_r(pia2, offset & 0x03);
 
 	return ret;
 }
@@ -517,8 +517,8 @@ static WRITE8_HANDLER( nyny_pia_1_2_w )
 	const device_config *pia2 = devtag_get_device(space->machine, "pia2");
 
 	/* the address bits are directly connected to the chip selects */
-	if (offset & 0x04)  pia_w(pia1, offset & 0x03, data);
-	if (offset & 0x08)  pia_alt_w(pia2, offset & 0x03, data);
+	if (offset & 0x04)  pia6821_w(pia1, offset & 0x03, data);
+	if (offset & 0x08)  pia6821_alt_w(pia2, offset & 0x03, data);
 }
 
 

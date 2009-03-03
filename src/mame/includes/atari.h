@@ -12,7 +12,7 @@
 #ifndef ATARI_H
 #define ATARI_H
 
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 
 /*----------- defined in machine/atari.c -----------*/
 

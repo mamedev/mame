@@ -253,7 +253,7 @@ MACHINE_START( qixmcu )
 MC6845_ON_VSYNC_CHANGED( qix_vsync_changed )
 {
 	const device_config *pia = devtag_get_device(device->machine, "sndpia0");
-	pia_cb1_w(pia, 0, vsync);
+	pia6821_cb1_w(pia, 0, vsync);
 }
 
 
@@ -359,7 +359,7 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coin_w )
 	qix_state *state = device->machine->driver_data;
 
 	logerror("6809:qixmcu_coin_w = %02X\n", data);
-	/* this is a callback called by pia_w(), so I don't need to synchronize */
+	/* this is a callback called by pia6821_w(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
 	state->_68705_port_in[0] = data;
 }
@@ -380,7 +380,7 @@ static WRITE8_DEVICE_HANDLER( qixmcu_coinctrl_w )
 	else
 		cputag_set_input_line(device->machine, "mcu", M68705_IRQ_LINE, CLEAR_LINE);
 
-	/* this is a callback called by pia_w(), so I don't need to synchronize */
+	/* this is a callback called by pia6821_w(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
 	state->coinctrl = data;
 	logerror("6809:qixmcu_coinctrl_w = %02X\n", data);
@@ -472,7 +472,7 @@ WRITE8_HANDLER( qix_68705_portC_w )
 static TIMER_CALLBACK( pia_w_callback )
 {
 	const device_config *device = ptr;
-	pia_w(device, param >> 8, param & 0xff);
+	pia6821_w(device, param >> 8, param & 0xff);
 }
 
 
@@ -511,8 +511,8 @@ static WRITE8_DEVICE_HANDLER( slither_76489_0_w )
 	sn76496_w(devtag_get_device(device->machine, "sn1"), 0, data);
 
 	/* clock the ready line going back into CB1 */
-	pia_cb1_w(device, 0, 0);
-	pia_cb1_w(device, 0, 1);
+	pia6821_cb1_w(device, 0, 0);
+	pia6821_cb1_w(device, 0, 1);
 }
 
 
@@ -522,8 +522,8 @@ static WRITE8_DEVICE_HANDLER( slither_76489_1_w )
 	sn76496_w(devtag_get_device(device->machine, "sn2"), 0, data);
 
 	/* clock the ready line going back into CB1 */
-	pia_cb1_w(device, 0, 0);
-	pia_cb1_w(device, 0, 1);
+	pia6821_cb1_w(device, 0, 0);
+	pia6821_cb1_w(device, 0, 1);
 }
 
 

@@ -192,7 +192,7 @@
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/74123.h"
 #include "spiders.h"
 
@@ -234,9 +234,9 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
 	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
 	const device_config *pia3 = devtag_get_device(device->machine, "pia3");
-	int combined_state = pianew_get_irq_a(pia1) | pianew_get_irq_b(pia1) |
-						 					      pianew_get_irq_b(pia2) |
-						 pianew_get_irq_a(pia3) | pianew_get_irq_b(pia3);
+	int combined_state = pia6821_get_irq_a(pia1) | pia6821_get_irq_b(pia1) |
+						 					      pia6821_get_irq_b(pia2) |
+						 pia6821_get_irq_a(pia3) | pia6821_get_irq_b(pia3);
 
 	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -283,13 +283,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia_ca1_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x02);
+	pia6821_ca1_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia_ca2_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x01);
+	pia6821_ca2_w(pia1, 0, input_port_read(device->machine, "IN0") & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia_cb1_w(pia1, 0, input_port_read(device->machine, "XHATCH"));
+	pia6821_cb1_w(pia1, 0, input_port_read(device->machine, "XHATCH"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -383,7 +383,7 @@ static const pia6821_interface pia_4_intf =
 static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 {
 	const device_config *pia2 = devtag_get_device(device->machine, "pia2");
-	pia_ca1_w(pia2, 0, data);
+	pia6821_ca1_w(pia2, 0, data);
 }
 
 
@@ -587,9 +587,9 @@ static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE("pia1", pia_r, pia_w)
-	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE("pia2", pia_alt_r, pia_alt_w)
-	AM_RANGE(0xc050, 0xc053) AM_DEVREADWRITE("pia3", pia_r, pia_w)
+	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE("pia2", pia6821_alt_r, pia6821_alt_w)
+	AM_RANGE(0xc050, 0xc053) AM_DEVREADWRITE("pia3", pia6821_r, pia6821_w)
 	AM_RANGE(0xc060, 0xc060) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("DSW3")
@@ -599,7 +599,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spiders_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("pia4", pia_r, pia_w)
+	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("pia4", pia6821_r, pia6821_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

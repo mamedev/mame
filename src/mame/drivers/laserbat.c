@@ -19,7 +19,7 @@ TODO:
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "video/s2636.h"
 #include "sound/ay8910.h"
 #include "sound/sn76477.h"
@@ -217,7 +217,7 @@ ADDRESS_MAP_END
 // the same as in zaccaria.c ?
 static ADDRESS_MAP_START( catnmous_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia_r, pia_w)
+	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -680,7 +680,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 	const device_config *pia = devtag_get_device(device->machine, "pia");
 	static int toggle;
 
-	pia_cb1_w(pia,0,toggle & 1);
+	pia6821_cb1_w(pia,0,toggle & 1);
 	toggle ^= 1;
 }
 

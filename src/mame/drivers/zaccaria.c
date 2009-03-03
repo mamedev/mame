@@ -36,7 +36,7 @@ Notes:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -156,7 +156,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 	const device_config *pia0 = devtag_get_device(device->machine, "pia0");
 	static int toggle;
 
-	pia_cb1_w(pia0,0, toggle & 1);
+	pia6821_cb1_w(pia0,0, toggle & 1);
 	toggle ^= 1;
 }
 
@@ -208,7 +208,7 @@ return counter;
 static void tms5220_irq_handler(const device_config *device, int state)
 {
 	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
-	pia_cb1_w(pia1,0,state ? 0 : 1);
+	pia6821_cb1_w(pia1,0,state ? 0 : 1);
 }
 
 
@@ -266,7 +266,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( sound1_command_w )
 {
 	const device_config *pia0 = devtag_get_device(space->machine, "pia0");
-	pia_ca1_w(pia0,0,data & 0x80);
+	pia6821_ca1_w(pia0,0,data & 0x80);
 	soundlatch2_w(space,0,data);
 }
 
@@ -355,14 +355,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map_1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia0", pia_r, pia_w)
+	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac2", mc1408_data_w)	/* MC1408 */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w)
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)

@@ -8,7 +8,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I		XTAL_19_968MHz

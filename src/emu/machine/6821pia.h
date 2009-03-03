@@ -3,12 +3,12 @@
     Motorola 6821 PIA interface and emulation
 
     Notes:
-        * pia_get_port_b_z_mask() gives the caller the bitmask
+        * pia6821_get_port_b_z_mask() gives the caller the bitmask
           that show which bits are high-impendance when
           reading port B, thus neither 0 or 1.
-          pia_get_output_cb2_z() returns the same
+          pia6821_get_output_cb2_z() returns the same
           information for the CB2 pin
-        * pia_set_port_a_z_mask allows the input callback to
+        * pia6821_set_port_a_z_mask allows the input callback to
           indicate which port A bits are disconnected.
           For these bit, the read operation will return the
           output buffer's contents
@@ -61,45 +61,45 @@ struct _pia6821_interface
     PROTOTYPES
 ***************************************************************************/
 
-DEVICE_GET_INFO(pia6821);
-DEVICE_GET_INFO(pia6822);
+DEVICE_GET_INFO( pia6821 );
+DEVICE_GET_INFO( pia6822 );
 
-READ8_DEVICE_HANDLER(pia_r);
-WRITE8_DEVICE_HANDLER(pia_w);
+READ8_DEVICE_HANDLER( pia6821_r );
+WRITE8_DEVICE_HANDLER( pia6821_w );
 
-READ8_DEVICE_HANDLER(pia_alt_r);
-WRITE8_DEVICE_HANDLER(pia_alt_w);
+READ8_DEVICE_HANDLER( pia6821_alt_r );
+WRITE8_DEVICE_HANDLER( pia6821_alt_w );
 
-UINT8 pianew_get_port_b_z_mask(const device_config *device);  /* see first note */
-void pianew_set_port_a_z_mask(const device_config *device, UINT8 data);  /* see second note */
+UINT8 pia6821_get_port_b_z_mask(const device_config *device);  /* see first note */
+void pia6821_set_port_a_z_mask(const device_config *device, UINT8 data);  /* see second note */
 
-READ8_DEVICE_HANDLER(pia_porta_r);
-WRITE8_DEVICE_HANDLER(pia_porta_w);
-void pianew_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask);
-UINT8 pianew_get_output_a(const device_config *device);
+READ8_DEVICE_HANDLER( pia6821_porta_r );
+WRITE8_DEVICE_HANDLER( pia6821_porta_w );
+void pia6821_set_input_a(const device_config *device, UINT8 data, UINT8 z_mask);
+UINT8 pia6821_get_output_a(const device_config *device);
 
-READ8_DEVICE_HANDLER(pia_ca1_r);
-WRITE8_DEVICE_HANDLER(pia_ca1_w);
+READ8_DEVICE_HANDLER( pia6821_ca1_r );
+WRITE8_DEVICE_HANDLER( pia6821_ca1_w );
 
-READ8_DEVICE_HANDLER(pia_ca2_r);
-WRITE8_DEVICE_HANDLER(pia_ca2_w);
-int pianew_get_output_ca2(const device_config *device);
-int pianew_get_output_ca2_z(const device_config *device);
+READ8_DEVICE_HANDLER( pia6821_ca2_r );
+WRITE8_DEVICE_HANDLER( pia6821_ca2_w );
+int pia6821_get_output_ca2(const device_config *device);
+int pia6821_get_output_ca2_z(const device_config *device);
 
-READ8_DEVICE_HANDLER(pia_portb_r);
-WRITE8_DEVICE_HANDLER(pia_portb_w);
-UINT8 pianew_get_output_b(const device_config *device);
+READ8_DEVICE_HANDLER( pia6821_portb_r );
+WRITE8_DEVICE_HANDLER( pia6821_portb_w );
+UINT8 pia6821_get_output_b(const device_config *device);
 
-READ8_DEVICE_HANDLER(pia_cb1_r);
-WRITE8_DEVICE_HANDLER(pia_cb1_w);
+READ8_DEVICE_HANDLER( pia6821_cb1_r );
+WRITE8_DEVICE_HANDLER( pia6821_cb1_w );
 
-READ8_DEVICE_HANDLER(pia_cb2_r);
-WRITE8_DEVICE_HANDLER(pia_cb2_w);
-int pianew_get_output_cb2(const device_config *device);
-int pianew_get_output_cb2_z(const device_config *device);
+READ8_DEVICE_HANDLER( pia6821_cb2_r );
+WRITE8_DEVICE_HANDLER( pia6821_cb2_w );
+int pia6821_get_output_cb2(const device_config *device);
+int pia6821_get_output_cb2_z(const device_config *device);
 
-int pianew_get_irq_a(const device_config *device);
-int pianew_get_irq_b(const device_config *device);
+int pia6821_get_irq_a(const device_config *device);
+int pia6821_get_irq_b(const device_config *device);
 
 
 /***************************************************************************

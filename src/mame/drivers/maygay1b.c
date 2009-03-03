@@ -13,7 +13,7 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "video/awpvid.h"		//Fruit Machines Only
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/68681.h"
 #include "machine/meters.h"
 #include "machine/roc10937.h"	// vfd
@@ -763,8 +763,8 @@ static ADDRESS_MAP_START( m1_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x20B0, 0x20B0) AM_DEVREAD("ay", ay8910_r)
 
-	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia_w)
-	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia_r)
+	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_w)
+	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_r)
 
 	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
 

@@ -93,7 +93,7 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 
 
 /*************************
@@ -176,8 +176,8 @@ static ADDRESS_MAP_START( jokrwild_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_WRITE(jokrwild_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_WRITE(jokrwild_colorram_w) AM_BASE(&colorram)
 //  AM_RANGE(0x0010, 0x0010) AM_READ(random_gen_r)
-//  AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia_r, pia_w)
-//  AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+//  AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+//  AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 //  AM_RANGE(0x4010, 0x4010) AM_READNOP /* R ???? */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)

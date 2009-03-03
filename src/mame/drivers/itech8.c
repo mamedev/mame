@@ -499,7 +499,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/hd6309/hd6309.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "machine/ticket.h"
 #include "video/tms34061.h"
@@ -991,7 +991,7 @@ static ADDRESS_MAP_START( sound3812_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia", pia_r, pia_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia", pia6821_r, pia6821_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

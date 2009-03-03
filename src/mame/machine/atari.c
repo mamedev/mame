@@ -12,7 +12,7 @@
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "sound/pokey.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "sound/dac.h"
 #include "video/gtia.h"
 

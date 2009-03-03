@@ -18,7 +18,7 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "machine/6821new.h"
+#include "machine/6821pia.h"
 #include "carpolo.h"
 
 
@@ -33,8 +33,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x3000, 0x30ff) AM_WRITEONLY AM_BASE(&carpolo_alpharam)
 	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_BASE(&carpolo_spriteram)
-	AM_RANGE(0x5400, 0x5403) AM_DEVREADWRITE("pia0", pia_r, pia_w)
-	AM_RANGE(0x5800, 0x5803) AM_DEVREADWRITE("pia1", pia_r, pia_w)
+	AM_RANGE(0x5400, 0x5403) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x5800, 0x5803) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(carpolo_ball_screen_collision_cause_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(carpolo_car_ball_collision_x_r)
 	AM_RANGE(0xa002, 0xa002) AM_READ(carpolo_car_ball_collision_y_r)
