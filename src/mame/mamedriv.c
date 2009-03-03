@@ -6615,6 +6615,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rfjeta )	/* (c) 1998 Seibu Kaihatsu (Dream Island license) */
 	DRIVER( rfjetj )	/* (c) 1998 Seibu Kaihatsu */
 	DRIVER( rfjetus )	/* (c) 1998 Seibu Kaihatsu (Fabtek license) */
+	
+	DRIVER( ejsakura )	/* (c) 1999 Seibu Kaihatsu */
 
 	/* Seibu System SH2B games */
 	DRIVER( feversoc )  /* (c) 2000 */
