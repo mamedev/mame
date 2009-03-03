@@ -155,7 +155,8 @@ void SCSPDSP_Step(struct _SCSPDSP *DSP)
 		}
 #endif
 		//INPUTS RW
-		assert(IRA<0x32);
+// colmns97 hits this
+//		assert(IRA<0x32);
 		if(IRA<=0x1f)
 			INPUTS=DSP->MEMS[IRA];
 		else if(IRA<=0x2F)
