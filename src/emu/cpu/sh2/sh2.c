@@ -2308,11 +2308,6 @@ static CPU_SET_INFO( sh2 )
 		case CPUINFO_INT_REGISTER + SH2_R14:			sh2->r[14] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH2_R15:			sh2->r[15] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH2_EA:				sh2->ea = info->i;						break;
-
-		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(device, info->i); break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_SH2_FTCSR_READ_CALLBACK:		sh2->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;
 	}
 }
 
@@ -2446,8 +2441,6 @@ CPU_GET_INFO( sh2 )
 		case CPUINFO_STR_REGISTER + SH2_R15:			sprintf(info->s, "R15 :%08X", sh2->r[15]); break;
 		case CPUINFO_STR_REGISTER + SH2_EA:				sprintf(info->s, "EA  :%08X", sh2->ea);    break;
 
-		case CPUINFO_FCT_SH2_FTCSR_READ_CALLBACK:		info->f = (genf*)sh2->ftcsr_read_callback; break;
-
 	}
 }
 
@@ -2463,6 +2456,16 @@ CPU_GET_INFO( sh1 )
 
 		default:							CPU_GET_INFO_CALL(sh2);			break;
 	}
+}
+
+void sh2drc_set_options(const device_config *device, UINT32 options)
+{
+	/* doesn't apply here */
+}
+
+void sh2drc_add_pcflush(const device_config *device, offs_t address)
+{
+	/* doesn't apply here */
 }
 
 #endif

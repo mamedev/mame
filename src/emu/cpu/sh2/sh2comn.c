@@ -500,6 +500,12 @@ READ32_HANDLER( sh2_internal_r )
 	return sh2->m[offset];
 }
 
+void sh2_set_ftcsr_read_callback(const device_config *device, void (*callback)(UINT32))
+{
+	SH2 *sh2 = GET_SH2(device);
+	sh2->ftcsr_read_callback = callback;
+}
+
 void sh2_set_frt_input(const device_config *device, int state)
 {
 	SH2 *sh2 = GET_SH2(device);

@@ -691,7 +691,7 @@ static CPU_INIT( sh2 )
 	sh2->cache = cache;
 
 	/* reset per-driver pcflushes */
-	sh2->pcfsel = sh2->maxpcfsel = -1;
+	sh2->pcfsel = 0;
 
 	/* initialize the UML generator */
 	if (FORCE_C_BACKEND)
@@ -1589,16 +1589,13 @@ static void generate_sequence_instruction(SH2 *sh2, drcuml_block *block, compile
 		}
 		else	// check for driver-selected flushes
 		{
-			if (sh2->maxpcfsel != -1)
-			{
-				int pcflush;
+			int pcflush;
 
-				for (pcflush = 0; pcflush <= sh2->maxpcfsel; pcflush++)
+			for (pcflush = 0; pcflush < sh2->pcfsel; pcflush++)
+			{
+				if (desc->pc == sh2->pcflushes[pcflush])
 				{
-					if (desc->pc == sh2->pcflushes[pcflush])
-					{
-						UML_MOV(block, MEM(&sh2->pc), IMM(desc->pc));		// mov sh2->pc, desc->pc
-					}
+					UML_MOV(block, MEM(&sh2->pc), IMM(desc->pc));		// mov sh2->pc, desc->pc
 				}
 			}
 		}
@@ -3140,6 +3137,31 @@ static int generate_group_12(SH2 *sh2, drcuml_block *block, compiler_state *comp
 ***************************************************************************/
 
 /*-------------------------------------------------
+    sh2drc_set_options - configure DRC options
+-------------------------------------------------*/
+
+void sh2drc_set_options(const device_config *device, UINT32 options)
+{
+	SH2 *sh2 = *(SH2 **)device->token;
+	sh2->drcoptions = options;
+}
+
+
+/*-------------------------------------------------
+    sh2drc_add_pcflush - add a new address where
+    the PC must be flushed for speedups to work
+-------------------------------------------------*/
+
+void sh2drc_add_pcflush(const device_config *device, offs_t address)
+{
+	SH2 *sh2 = *(SH2 **)device->token;
+
+	if (sh2->pcfsel < ARRAY_LENGTH(sh2->pcflushes))
+		sh2->pcflushes[sh2->pcfsel++] = address;
+}
+
+
+/*-------------------------------------------------
     sh2_dasm - disassemble an instruction
 -------------------------------------------------*/
 
@@ -3179,11 +3201,6 @@ static CPU_SET_INFO( sh2 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_SH2_DRC_OPTIONS:		sh2->drcoptions = info->i;				break;
-
-		case CPUINFO_INT_SH2_PCFLUSH_SELECT:		sh2->pcfsel = info->i;	if (sh2->pcfsel > sh2->maxpcfsel) sh2->maxpcfsel = sh2->pcfsel;	break;
-		case CPUINFO_INT_SH2_PCFLUSH_ADDR:		sh2->pcflushes[sh2->pcfsel] = info->i;		break;
-
 		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLIN:	sh2_set_irq_line(sh2, SH2_INT_VBLIN, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + SH2_INT_VBLOUT:	sh2_set_irq_line(sh2, SH2_INT_VBLOUT, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + SH2_INT_HBLIN:	sh2_set_irq_line(sh2, SH2_INT_HBLIN, info->i);	break;
@@ -3229,11 +3246,6 @@ static CPU_SET_INFO( sh2 )
 		case CPUINFO_INT_REGISTER + SH2_R14:			sh2->r[14] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH2_R15:			sh2->r[15] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH2_EA:				sh2->ea = info->i;						break;
-
-		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(device, info->i); break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_SH2_FTCSR_READ_CALLBACK:		sh2->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;
 	}
 }
 
@@ -3372,9 +3384,6 @@ CPU_GET_INFO( sh2 )
 		case CPUINFO_STR_REGISTER + SH2_R14:			sprintf(info->s, "R14 :%08X", sh2->r[14]); break;
 		case CPUINFO_STR_REGISTER + SH2_R15:			sprintf(info->s, "R15 :%08X", sh2->r[15]); break;
 		case CPUINFO_STR_REGISTER + SH2_EA:				sprintf(info->s, "EA  :%08X", sh2->ea);    break;
-
-		case CPUINFO_FCT_SH2_FTCSR_READ_CALLBACK:		info->f = (genf*)sh2->ftcsr_read_callback; break;
-
 	}
 }
 

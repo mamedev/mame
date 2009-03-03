@@ -694,7 +694,7 @@ static DRIVER_INIT( cps3 )
 	if (!cps3_user5region) cps3_user5region = auto_malloc(USER5REGION_LENGTH);
 
 	// set strict verify
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
+	sh2drc_set_options(machine->cpu[0], SH2DRC_STRICT_VERIFY);
 
 	cps3_decrypt_bios(machine);
 	decrypted_gamerom = auto_malloc(0x1000000);

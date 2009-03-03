@@ -119,15 +119,11 @@ NVRAM_HANDLER( stv )
 void install_stvbios_speedups(running_machine *machine)
 {
 	// flushes 0 & 1 on both CPUs are for the BIOS speedups
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60154b2);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6013aee);
+	sh2drc_add_pcflush(machine->cpu[0], 0x60154b2);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6013aee);
 
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60154b2);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6013aee);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60154b2);
+	sh2drc_add_pcflush(machine->cpu[1], 0x6013aee);
 }
 
 DRIVER_INIT(shienryu)
@@ -136,11 +132,9 @@ DRIVER_INIT(shienryu)
 	stv_default_eeprom_length = sizeof(shienryu_default_eeprom);
 
 	// master
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60041c6);
+	sh2drc_add_pcflush(machine->cpu[0], 0x60041c6);
 	// slave
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x600440e);
+	sh2drc_add_pcflush(machine->cpu[1], 0x600440e);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -155,11 +149,9 @@ DRIVER_INIT(prikura)
     (loops for 263473 instructions)
 */
 	// master
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6018640);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6018640);
 	// slave
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6018c6e);
+	sh2drc_add_pcflush(machine->cpu[1], 0x6018c6e);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -187,8 +179,7 @@ DRIVER_INIT(hanagumi)
 
    (loops for 288688 instructions)
 */
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6010160);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6010160);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -214,11 +205,9 @@ CPU0: Aids Screen
 
 DRIVER_INIT(puyosun)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6021cf0);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6021cf0);
 
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60236fe);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60236fe);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -238,8 +227,7 @@ CPU0 Data East Logo:
 
 DRIVER_INIT(mausuke)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60461A0);
+	sh2drc_add_pcflush(machine->cpu[0], 0x60461A0);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -249,10 +237,8 @@ DRIVER_INIT(mausuke)
 
 DRIVER_INIT(cottonbm)
 {
-//  device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-//  device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6030ee2);
-//  device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-//  device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6032b52);
+//  sh2drc_add_pcflush(machine->cpu[0], 0x6030ee2);
+//  sh2drc_add_pcflush(machine->cpu[1], 0x6032b52);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -261,10 +247,8 @@ DRIVER_INIT(cottonbm)
 
 DRIVER_INIT(cotton2)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6031c7a);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60338ea);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6031c7a);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60338ea);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -274,19 +258,13 @@ DRIVER_INIT(cotton2)
 DRIVER_INIT(dnmtdeka)
 {
 	// install all 3 speedups on both master and slave
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6027c90);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0xd04);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+2);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60051f2);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6027c90);
+	sh2drc_add_pcflush(machine->cpu[0], 0xd04);
+	sh2drc_add_pcflush(machine->cpu[0], 0x60051f2);
 
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6027c90);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0xd04);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+2);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60051f2);
+	sh2drc_add_pcflush(machine->cpu[1], 0x6027c90);
+	sh2drc_add_pcflush(machine->cpu[1], 0xd04);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60051f2);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -294,31 +272,22 @@ DRIVER_INIT(dnmtdeka)
 DRIVER_INIT(diehard)
 {
 	// install all 3 speedups on both master and slave
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6027c98);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0xd04);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+2);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60051f2);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6027c98);
+	sh2drc_add_pcflush(machine->cpu[0], 0xd04);
+	sh2drc_add_pcflush(machine->cpu[0], 0x60051f2);
 
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6027c98);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0xd04);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+2);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60051f2);
+	sh2drc_add_pcflush(machine->cpu[1], 0x6027c98);
+	sh2drc_add_pcflush(machine->cpu[1], 0xd04);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60051f2);
 
 	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(fhboxers)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60041c2);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x600bb0a);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+2);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x600b31e);
+	sh2drc_add_pcflush(machine->cpu[0], 0x60041c2);
+	sh2drc_add_pcflush(machine->cpu[0], 0x600bb0a);
+	sh2drc_add_pcflush(machine->cpu[0], 0x600b31e);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -342,15 +311,11 @@ static READ32_HANDLER( groovef_hack2_r )
 
 DRIVER_INIT( groovef )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6005e7c);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6005e86);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+2);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a4970);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6005e7c);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6005e86);
+	sh2drc_add_pcflush(machine->cpu[0], 0x60a4970);
 
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60060c2);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60060c2);
 
 	/* prevent game from hanging on startup -- todo: remove these hacks */
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60ca6cc, 0x60ca6cf, 0, 0, groovef_hack2_r );
@@ -399,12 +364,9 @@ static READ32_HANDLER( danchih_hack_r )
 
 DRIVER_INIT( danchih )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028b28);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028c8e);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602ae26);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6028b28);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6028c8e);
+	sh2drc_add_pcflush(machine->cpu[1], 0x602ae26);
 
 	/* prevent game from hanging on title screen -- todo: remove these hacks */
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60ffcbc, 0x60ffcbf, 0, 0, danchih_hack_r );
@@ -445,10 +407,8 @@ static READ32_HANDLER( astrass_hack_r )
 
 DRIVER_INIT( astrass )
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60011b8);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605b9da);
+	sh2drc_add_pcflush(machine->cpu[0], 0x60011b8);
+	sh2drc_add_pcflush(machine->cpu[0], 0x605b9da);
 
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x06000770, 0x06000773, 0, 0, astrass_hack_r );
 
@@ -459,12 +419,9 @@ DRIVER_INIT( astrass )
 
 DRIVER_INIT(thunt)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602A024);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6013EEA);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602AAF8);
+	sh2drc_add_pcflush(machine->cpu[0], 0x602A024);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6013EEA);
+	sh2drc_add_pcflush(machine->cpu[1], 0x602AAF8);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -473,12 +430,9 @@ DRIVER_INIT(thunt)
 
 DRIVER_INIT(sandor)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602a0f8);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6013fbe);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602abcc);
+	sh2drc_add_pcflush(machine->cpu[0], 0x602a0f8);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6013fbe);
+	sh2drc_add_pcflush(machine->cpu[1], 0x602abcc);
 
 	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(1);
@@ -487,10 +441,8 @@ DRIVER_INIT(sandor)
 
 DRIVER_INIT(grdforce)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6041e32);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6043aa2);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6041e32);
+	sh2drc_add_pcflush(machine->cpu[1], 0x6043aa2);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -499,10 +451,8 @@ DRIVER_INIT(grdforce)
 
 DRIVER_INIT(batmanfr)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60121c0);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60125bc);
+	sh2drc_add_pcflush(machine->cpu[0], 0x60121c0);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60125bc);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -512,8 +462,7 @@ DRIVER_INIT(batmanfr)
 
 DRIVER_INIT(colmns97)
 {
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60298a2);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60298a2);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -523,10 +472,8 @@ DRIVER_INIT(colmns97)
 
 DRIVER_INIT(winterht)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6098aea);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x609ae4e);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6098aea);
+	sh2drc_add_pcflush(machine->cpu[1], 0x609ae4e);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -535,10 +482,8 @@ DRIVER_INIT(winterht)
 
 DRIVER_INIT(seabass)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602cbfa);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60321ee);
+	sh2drc_add_pcflush(machine->cpu[0], 0x602cbfa);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60321ee);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -547,10 +492,8 @@ DRIVER_INIT(seabass)
 
 DRIVER_INIT(vfremix)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602c30c);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x604c332);
+	sh2drc_add_pcflush(machine->cpu[0], 0x602c30c);
+	sh2drc_add_pcflush(machine->cpu[1], 0x604c332);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -559,10 +502,8 @@ DRIVER_INIT(vfremix)
 
 DRIVER_INIT(sss)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6026398);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028cd6);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6026398);
+	sh2drc_add_pcflush(machine->cpu[1], 0x6028cd6);
 
 	install_standard_protection(machine);
 
@@ -573,10 +514,8 @@ DRIVER_INIT(sss)
 
 DRIVER_INIT(othellos)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602bcbe);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602d92e);
+	sh2drc_add_pcflush(machine->cpu[0], 0x602bcbe);
+	sh2drc_add_pcflush(machine->cpu[1], 0x602d92e);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -586,8 +525,7 @@ DRIVER_INIT(othellos)
 
 DRIVER_INIT(sasissu)
 {
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60710be);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60710be);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -596,16 +534,14 @@ DRIVER_INIT(sasissu)
 
 DRIVER_INIT(gaxeduel)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6012ee4);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6012ee4);
 
 	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(suikoenb)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6013f7a);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6013f7a);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -620,10 +556,8 @@ DRIVER_INIT(sokyugrt)
 
 DRIVER_INIT(znpwfv)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6012ec2);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60175a6);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6012ec2);
+	sh2drc_add_pcflush(machine->cpu[1], 0x60175a6);
 
 	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_NSEC(500);
@@ -631,10 +565,8 @@ DRIVER_INIT(znpwfv)
 
 DRIVER_INIT(twcup98)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605edde);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6062bca);
+	sh2drc_add_pcflush(machine->cpu[0], 0x605edde);
+	sh2drc_add_pcflush(machine->cpu[1], 0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
 	install_standard_protection(machine);
@@ -644,10 +576,8 @@ DRIVER_INIT(twcup98)
 
 DRIVER_INIT(smleague)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6063bf4);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6062bca);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6063bf4);
+	sh2drc_add_pcflush(machine->cpu[1], 0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -656,8 +586,7 @@ DRIVER_INIT(smleague)
 
 DRIVER_INIT(finlarch)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6064d60);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6064d60);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -665,10 +594,8 @@ DRIVER_INIT(finlarch)
 
 DRIVER_INIT(maruchan)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x601ba46);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x601ba46);
+	sh2drc_add_pcflush(machine->cpu[0], 0x601ba46);
+	sh2drc_add_pcflush(machine->cpu[1], 0x601ba46);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -677,26 +604,22 @@ DRIVER_INIT(maruchan)
 
 DRIVER_INIT(pblbeach)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605eb78);
+	sh2drc_add_pcflush(machine->cpu[0], 0x605eb78);
 
 	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(shanhigw)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6020c5c);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6020c5c);
 
 	DRIVER_INIT_CALL(stv);
 }
 
 DRIVER_INIT(elandore)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x604eac0);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605340a);
+	sh2drc_add_pcflush(machine->cpu[0], 0x604eac0);
+	sh2drc_add_pcflush(machine->cpu[1], 0x605340a);
 
 	install_standard_protection(machine);
 
@@ -707,10 +630,8 @@ DRIVER_INIT(elandore)
 
 DRIVER_INIT(rsgun)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6034d04);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6036152);
+	sh2drc_add_pcflush(machine->cpu[0], 0x6034d04);
+	sh2drc_add_pcflush(machine->cpu[1], 0x6036152);
 
 	install_standard_protection(machine);
 
@@ -734,10 +655,8 @@ DRIVER_INIT(decathlt)
 
 DRIVER_INIT(nameclv3)
 {
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x601eb4c);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	device_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602b80e);
+	sh2drc_add_pcflush(machine->cpu[0], 0x601eb4c);
+	sh2drc_add_pcflush(machine->cpu[1], 0x602b80e);
 
 	DRIVER_INIT_CALL(stv);
 }

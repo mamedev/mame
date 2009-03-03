@@ -6662,8 +6662,8 @@ DRIVER_INIT( _32x )
 	_32x_240mode = 0;
 
 // checking if these help brutal, they don't.
-	device_set_info_int(machine->cpu[2], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
-	device_set_info_int(machine->cpu[3], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(machine->cpu[2], SH2DRC_COMPATIBLE_OPTIONS);
+	sh2drc_set_options(machine->cpu[3], SH2DRC_COMPATIBLE_OPTIONS);
 
 	DRIVER_INIT_CALL(megadriv);
 }
