@@ -3974,6 +3974,7 @@ Sep.1994 Quiz Ghost Hunter
 
 	/* Step 1.5 */
 	DRIVER( scud )		/* 1996 */
+	DRIVER( scudj )		/* 1996 */
 	DRIVER( scuda )		/* 1996 */
 	DRIVER( scudp )		/* 1997 */
 	DRIVER( lostwsga )	/* 1997 */
