@@ -13,7 +13,7 @@
     finish
         sprite fixes
 		correct roz rotation
-        colour fixes for the foreground layer and the sprites
+        colour fixes for the sprites
         Dip-Switches
         make cntsteer work, comms looks awkward and probably different than Zero Target
     cleanup
@@ -42,19 +42,19 @@ static PALETTE_INIT( zerotrgt )
 		int bit0,bit1,bit2,r,g,b;
 
 		/* red component */
-		bit0 = (color_prom[i] >> 2) & 0x01;
+		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 0) & 0x01;
-		r = /*255 - */(0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		g = /*255 - */(0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 		/* green component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit0 = (color_prom[i] >> 4) & 0x01;
 		bit1 = (color_prom[i] >> 5) & 0x01;
-		bit2 = (color_prom[i] >> 4) & 0x01;
-		g =/* 255 - */(0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		bit2 = (color_prom[i] >> 6) & 0x01;
+		r =/* 255 - */(0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 		/* blue component */
-		bit0 = (color_prom[i+256] >> 2) & 0x01;
+		bit0 = (color_prom[i+256] >> 0) & 0x01;
 		bit1 = (color_prom[i+256] >> 1) & 0x01;
-		bit2 = (color_prom[i+256] >> 0) & 0x01;
+		bit2 = (color_prom[i+256] >> 2) & 0x01;
 		b = /*255 - */(0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
@@ -75,8 +75,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 	code|= (attr & 0x01)<<8;
 
-	/*TODO: bit 3 (8) used on the plane junctions but unknown purpose (color mask? Inverted bitplanes?) */
-	SET_TILE_INFO(0, code, 0x20+((attr & 0x70)>>4), 0);
+	SET_TILE_INFO(0, code, 0x30+((attr & 0x78)>>3), 0);
 }
 
 static VIDEO_START( zerotrgt )
@@ -147,7 +146,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static VIDEO_UPDATE( zerotrgt )
 {
 	if(disable_roz)
-		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine)); //black or pen 0?
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[8*bg_color_bank]); //guess, might just be 0
 	else
 	{
 		tilemap_draw_roz(bitmap, cliprect, bg_tilemap,
@@ -361,7 +360,7 @@ static const gfx_layout zerotrgt_charlayout =
 	8,8,
 	0x200,
 	2,
-	{ 4,0 },
+	{ 0,4 },
 	{ 0, 1, 2, 3, 1024*8*8+0, 1024*8*8+1, 1024*8*8+2, 1024*8*8+3 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8	/* every tile takes 32 consecutive bytes */
@@ -426,7 +425,7 @@ static MACHINE_DRIVER_START( cntsteer )
 
     MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
     MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_PERIODIC_INT(sound_interrupt, 1000)
+	MDRV_CPU_PERIODIC_INT(sound_interrupt, 640)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -465,7 +464,7 @@ static MACHINE_DRIVER_START( zerotrgt )
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_PERIODIC_INT(sound_interrupt, 1000)
+	MDRV_CPU_PERIODIC_INT(sound_interrupt, 640)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
