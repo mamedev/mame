@@ -432,16 +432,15 @@ static void route_sound(running_machine *machine)
 		/* iterate over all routes */
 		for (route = config->routelist; route != NULL; route = route->next)
 		{
-			const device_config *target_speaker = devtag_get_device(machine, route->target);
-			const device_config *target_sound = devtag_get_device(machine, route->target);
+			const device_config *target_device = devtag_get_device(machine, route->target);
 
 			/* if neither found, it's fatal */
-			if (target_speaker == NULL && target_sound == NULL)
+			if (target_device == NULL)
 				fatalerror("Sound route \"%s\" not found!\n", route->target);
 
 			/* if we got a speaker, bump its input count */
-			if (target_speaker != NULL)
-				get_safe_token(target_speaker)->inputs += (route->output == ALL_OUTPUTS) ? numoutputs : 1;
+			if (target_device->type == SPEAKER_OUTPUT)
+				get_safe_token(target_device)->inputs += (route->output == ALL_OUTPUTS) ? numoutputs : 1;
 		}
 	}
 
@@ -470,8 +469,7 @@ static void route_sound(running_machine *machine)
 		/* iterate over all routes */
 		for (route = config->routelist; route != NULL; route = route->next)
 		{
-			const device_config *target_speaker = devtag_get_device(machine, route->target);
-			const device_config *target_sound = devtag_get_device(machine, route->target);
+			const device_config *target_device = devtag_get_device(machine, route->target);
 			int inputnum = route->input;
 			sound_stream *stream;
 			int streamoutput;
@@ -481,12 +479,12 @@ static void route_sound(running_machine *machine)
 				if (route->output == outputnum || route->output == ALL_OUTPUTS)
 				{
 					/* if it's a speaker, set the input */
-					if (target_speaker != NULL)
+					if (target_device->type == SPEAKER_OUTPUT)
 					{
-						speaker_info *speakerinfo = get_safe_token(target_speaker);
+						speaker_info *speakerinfo = get_safe_token(target_device);
 
 						/* generate text for the UI */
-						astring_printf(tempstring, "Speaker '%s': %s '%s'", target_speaker->tag, device_get_name(sound), sound->tag);
+						astring_printf(tempstring, "Speaker '%s': %s '%s'", target_device->tag, device_get_name(sound), sound->tag);
 						if (numoutputs > 1)
 							astring_catprintf(tempstring, " Ch.%d", outputnum);
 
@@ -506,7 +504,7 @@ static void route_sound(running_machine *machine)
 						sound_stream *inputstream;
 						int streaminput;
 
-						if (stream_device_input_to_stream_input(target_sound, inputnum++, &inputstream, &streaminput))
+						if (stream_device_input_to_stream_input(target_device, inputnum++, &inputstream, &streaminput))
 							if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))
 								stream_set_input(inputstream, streaminput, stream, streamoutput, route->gain);
 					}
