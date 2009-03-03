@@ -105,7 +105,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sx = (spriteram[offs+2]);
 
 		sy = 0xf0 - spriteram[offs];
-		color = ((spriteram[offs+1] & 0x08) >> 3);
+		color = 0x10+((spriteram[offs+1] & 0x20) >> 4) + ((spriteram[offs+1] & 0x8)>>3); //trusted.
 
 		fx = !(spriteram[offs+1] & 0x04);
 		fy = (spriteram[offs+1] & 0x02);  //check
@@ -146,7 +146,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static VIDEO_UPDATE( zerotrgt )
 {
 	if(disable_roz)
-		bitmap_fill(bitmap, cliprect, screen->machine->pens[8*bg_color_bank]); //guess, might just be 0
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[8*bg_color_bank]);
 	else
 	{
 		tilemap_draw_roz(bitmap, cliprect, bg_tilemap,
@@ -371,7 +371,7 @@ static const gfx_layout sprites =
 	16,16,
 	RGN_FRAC(1,3),
 	3,
- 	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+ 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 16*8, 1+16*8, 2+16*8, 3+16*8, 4+16*8, 5+16*8, 6+16*8, 7+16*8,
 		0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
