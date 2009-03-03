@@ -19,7 +19,7 @@ TODO:
 #include "driver.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "video/s2636.h"
 #include "sound/ay8910.h"
 #include "sound/sn76477.h"
@@ -217,7 +217,7 @@ ADDRESS_MAP_END
 // the same as in zaccaria.c ?
 static ADDRESS_MAP_START( catnmous_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia_r, pia_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -595,22 +595,22 @@ static const sn76477_interface laserbat_sn76477_interface =
 
 /* Cat'N Mouse sound ***********************************/
 
-static void zaccaria_irq0a(running_machine *machine, int state) { cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static void zaccaria_irq0b(running_machine *machine, int state) { cpu_set_input_line(machine->cpu[1],0,state ? ASSERT_LINE : CLEAR_LINE); }
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a ) { cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b ) { cpu_set_input_line(device->machine->cpu[1],0,state ? ASSERT_LINE : CLEAR_LINE); }
 
 static int active_8910,port0a;
 
-static READ8_HANDLER( zaccaria_port0a_r )
+static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
 {
-	return ay8910_r(devtag_get_device(space->machine, (active_8910 == 0) ? "ay1" : "ay2"), 0);
+	return ay8910_r(devtag_get_device(device->machine, (active_8910 == 0) ? "ay1" : "ay2"), 0);
 }
 
-static WRITE8_HANDLER( zaccaria_port0a_w )
+static WRITE8_DEVICE_HANDLER( zaccaria_port0a_w )
 {
 	port0a = data;
 }
 
-static WRITE8_HANDLER( zaccaria_port0b_w )
+static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 {
 	static int last;
 
@@ -619,7 +619,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), last >> 0, port0a);
+		ay8910_data_address_w(devtag_get_device(device->machine, "ay1"), last >> 0, port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -631,7 +631,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), last >> 2, port0a);
+		ay8910_data_address_w(devtag_get_device(device->machine, "ay2"), last >> 2, port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -643,11 +643,20 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	last = data;
 }
 
-static const pia6821_interface pia_0_intf =
+static const pia6821_interface pia_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ zaccaria_port0a_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ zaccaria_port0a_w, zaccaria_port0b_w, 0, 0,
-	/*irqs   : A/B             */ zaccaria_irq0a, zaccaria_irq0b
+	DEVCB_HANDLER(zaccaria_port0a_r),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(zaccaria_port0a_w),		/* port A out */
+	DEVCB_HANDLER(zaccaria_port0b_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(zaccaria_irq0a),		/* IRQA */
+	DEVCB_LINE(zaccaria_irq0b)		/* IRQB */
 };
 
 static const ay8910_interface ay8910_config =
@@ -660,16 +669,6 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_START( catnmous )
-{
-	pia_config(machine, 0, &pia_0_intf);
-}
-
-static MACHINE_RESET( catnmous )
-{
-	pia_reset();
-}
-
 
 static INTERRUPT_GEN( laserbat_interrupt )
 {
@@ -678,9 +677,10 @@ static INTERRUPT_GEN( laserbat_interrupt )
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
+	const device_config *pia = devtag_get_device(device->machine, "pia");
 	static int toggle;
 
-	pia_0_cb1_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM),0,toggle & 1);
+	pia_cb1_w(pia,0,toggle & 1);
 	toggle ^= 1;
 }
 
@@ -729,9 +729,8 @@ static MACHINE_DRIVER_START( catnmous )
 	MDRV_CPU_ADD("audiocpu", M6802,3580000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(catnmous_sound_map,0)
 	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle, (double)3580000/4096)
-
-	MDRV_MACHINE_START(catnmous)
-	MDRV_MACHINE_RESET(catnmous)
+	
+	MDRV_PIA6821_ADD("pia", pia_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -36,7 +36,7 @@ Notes:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -103,22 +103,22 @@ static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 }
 
 
-static void zaccaria_irq0a(running_machine *machine, int state) { cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static void zaccaria_irq0b(running_machine *machine, int state) { cpu_set_input_line(machine->cpu[1],0,state ? ASSERT_LINE : CLEAR_LINE); }
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0a ) { cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
+static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b ) { cpu_set_input_line(device->machine->cpu[1],0,state ? ASSERT_LINE : CLEAR_LINE); }
 
 static int active_8910, port0a, acs;
 
-static READ8_HANDLER( zaccaria_port0a_r )
+static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
 {
-	return ay8910_r(devtag_get_device(space->machine, (active_8910 == 0) ? "ay1" : "ay2"), 0);
+	return ay8910_r(devtag_get_device(device->machine, (active_8910 == 0) ? "ay1" : "ay2"), 0);
 }
 
-static WRITE8_HANDLER( zaccaria_port0a_w )
+static WRITE8_DEVICE_HANDLER( zaccaria_port0a_w )
 {
 	port0a = data;
 }
 
-static WRITE8_HANDLER( zaccaria_port0b_w )
+static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 {
 	static int last;
 
@@ -127,7 +127,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay1"), last, port0a);
+		ay8910_data_address_w(devtag_get_device(device->machine, "ay1"), last, port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -139,7 +139,7 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	if ((last & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(space->machine, "ay2"), last >> 2, port0a);
+		ay8910_data_address_w(devtag_get_device(device->machine, "ay2"), last >> 2, port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -153,10 +153,10 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	const device_config *pia0 = devtag_get_device(device->machine, "pia0");
 	static int toggle;
 
-	pia_0_cb1_w(space,0, toggle & 1);
+	pia_cb1_w(pia0,0, toggle & 1);
 	toggle ^= 1;
 }
 
@@ -164,21 +164,21 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 
 static int port1a,port1b;
 
-static READ8_HANDLER( zaccaria_port1a_r )
+static READ8_DEVICE_HANDLER( zaccaria_port1a_r )
 {
-	const device_config *tms = devtag_get_device(space->machine, "tms");
+	const device_config *tms = devtag_get_device(device->machine, "tms");
 	if (~port1b & 1) return tms5220_status_r(tms,0);
 	else return port1a;
 }
 
-static WRITE8_HANDLER( zaccaria_port1a_w )
+static WRITE8_DEVICE_HANDLER( zaccaria_port1a_w )
 {
 	port1a = data;
 }
 
-static WRITE8_HANDLER( zaccaria_port1b_w )
+static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 {
-	const device_config *tms = devtag_get_device(space->machine, "tms");
+	const device_config *tms = devtag_get_device(device->machine, "tms");
 	port1b = data;
 
 	// bit 0 = /RS
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( zaccaria_port1b_w )
 	set_led_status(0,~data & 0x10);
 }
 
-static READ8_HANDLER( zaccaria_ca2_r )
+static READ_LINE_DEVICE_HANDLER( zaccaria_ca2_r )
 {
 // TODO: this doesn't work, why?
 //  return !tms5220_ready_r();
@@ -207,24 +207,42 @@ return counter;
 
 static void tms5220_irq_handler(const device_config *device, int state)
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	pia_1_cb1_w(space,0,state ? 0 : 1);
+	const device_config *pia1 = devtag_get_device(device->machine, "pia1");
+	pia_cb1_w(pia1,0,state ? 0 : 1);
 }
-
 
 
 static const pia6821_interface pia_0_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ zaccaria_port0a_r, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ zaccaria_port0a_w, zaccaria_port0b_w, 0, 0,
-	/*irqs   : A/B             */ zaccaria_irq0a, zaccaria_irq0b
+	DEVCB_HANDLER(zaccaria_port0a_r),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(zaccaria_port0a_w),		/* port A out */
+	DEVCB_HANDLER(zaccaria_port0b_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(zaccaria_irq0a),		/* IRQA */
+	DEVCB_LINE(zaccaria_irq0b)		/* IRQB */
 };
+
 
 static const pia6821_interface pia_1_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ zaccaria_port1a_r, 0, 0, 0, zaccaria_ca2_r, 0,
-	/*outputs: A/B,CA/B2       */ zaccaria_port1a_w, zaccaria_port1b_w, 0, 0,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_HANDLER(zaccaria_port1a_r),		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_LINE(zaccaria_ca2_r),		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(zaccaria_port1a_w),		/* port A out */
+	DEVCB_HANDLER(zaccaria_port1b_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -239,18 +257,6 @@ static const ppi8255_interface ppi8255_intf =
 };
 
 
-static MACHINE_START( zaccaria )
-{
-	pia_config(machine, 0, &pia_0_intf);
-	pia_config(machine, 1, &pia_1_intf);
-}
-
-static MACHINE_RESET( zaccaria )
-{
-	pia_reset();
-}
-
-
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(space,0,data);
@@ -259,7 +265,8 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( sound1_command_w )
 {
-	pia_0_ca1_w(space,0,data & 0x80);
+	const device_config *pia0 = devtag_get_device(space->machine, "pia0");
+	pia_ca1_w(pia0,0,data & 0x80);
 	soundlatch2_w(space,0,data);
 }
 
@@ -348,14 +355,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map_1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_READWRITE(pia_0_r, pia_0_w)
+	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia0", pia_r, pia_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0090, 0x0093) AM_READWRITE(pia_1_r, pia_1_w)
+	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia_r, pia_w)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac2", mc1408_data_w)	/* MC1408 */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w)
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
@@ -574,10 +581,9 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_2,0)
 
-	MDRV_MACHINE_START(zaccaria)
-	MDRV_MACHINE_RESET(zaccaria)
-
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
+	MDRV_PIA6821_ADD( "pia0", pia_0_intf )
+	MDRV_PIA6821_ADD( "pia1", pia_1_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

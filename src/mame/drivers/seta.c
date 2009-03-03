@@ -1293,7 +1293,7 @@ Note: on screen copyright is (c)1998 Coinmaster.
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "seta.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/6850acia.h"
 #include "machine/msm6242.h"
 #include "sound/2203intf.h"
@@ -8222,12 +8222,47 @@ static INTERRUPT_GEN( inttoote_interrupt )
 	}
 }
 
+static const pia6821_interface inttoote_pia0_intf =
+{
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
+};
+
+static const pia6821_interface inttoote_pia1_intf =
+{
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
+};
+
 static MACHINE_DRIVER_START( inttoote )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(inttoote_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(inttoote_interrupt,8+1+1+1)
+	
+	MDRV_PIA6821_ADD("pia0", inttoote_pia0_intf)
+	MDRV_PIA6821_ADD("pia1", inttoote_pia1_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -9626,30 +9661,6 @@ static DRIVER_INIT( crazyfgt )
                              International Toote
 ***************************************************************************/
 
-static const pia6821_interface inttoote_pia0_intf =
-{
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	0, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-	0, 0, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
-};
-
-static const pia6821_interface inttoote_pia1_intf =
-{
-	/* PIA inputs: A, B, CA1, CB1, CA2, CB2 */
-	0, 0, 0, 0, 0, 0,
-
-	/* PIA outputs: A, B, CA2, CB2 */
-	0, 0, 0, 0,
-
-	/* PIA IRQs: A, B */
-	0, 0
-};
-
 static DRIVER_INIT( inttoote )
 {
 	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
@@ -9663,10 +9674,6 @@ static DRIVER_INIT( inttoote )
 	ROM[0x4de2/2] = 0x4e71;
 
 	ROM[0x368a/2] = 0x50f9;	// betting count down
-
-	/* Initializing PIAs... (to be done) */
-	pia_config(machine, 0, &inttoote_pia0_intf);
-	pia_config(machine, 1, &inttoote_pia1_intf);
 }
 
 /***************************************************************************

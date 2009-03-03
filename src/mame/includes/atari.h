@@ -12,6 +12,8 @@
 #ifndef ATARI_H
 #define ATARI_H
 
+#include "machine/6821new.h"
+
 /*----------- defined in machine/atari.c -----------*/
 
 typedef struct {
@@ -29,11 +31,17 @@ typedef struct {
 }	ATARI_FDC;
 extern ATARI_FDC atari_fdc;
 
+extern const pia6821_interface atari_pia_interface;
+extern const pia6821_interface a600xl_pia_interface;
+extern const pia6821_interface a800xl_pia_interface;
+
 MACHINE_START( a400 );
 MACHINE_START( a800 );
 MACHINE_START( a600xl );
 MACHINE_START( a800xl );
 MACHINE_START( a5200 );
+
+WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w);
 
 #ifdef MESS
 DEVICE_IMAGE_LOAD( a800_floppy );

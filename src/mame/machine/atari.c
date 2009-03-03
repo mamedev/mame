@@ -12,7 +12,7 @@
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "sound/pokey.h"
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "sound/dac.h"
 #include "video/gtia.h"
 
@@ -77,44 +77,69 @@ void atari_interrupt_cb(const device_config *device, int mask)
  *
  **************************************************************/
 
-static READ8_HANDLER(atari_pia_pa_r)
+static READ8_DEVICE_HANDLER(atari_pia_pa_r)
 {
-	return atari_input_disabled() ? 0xFF : input_port_read_safe(space->machine, "djoy_0_1", 0);
+	return atari_input_disabled() ? 0xFF : input_port_read_safe(device->machine, "djoy_0_1", 0);
 }
 
-static READ8_HANDLER(atari_pia_pb_r)
+static READ8_DEVICE_HANDLER(atari_pia_pb_r)
 {
-	return atari_input_disabled() ? 0xFF : input_port_read_safe(space->machine, "djoy_2_3", 0);
+	return atari_input_disabled() ? 0xFF : input_port_read_safe(device->machine, "djoy_2_3", 0);
 }
 
-static WRITE8_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(space->machine, data); }
-static WRITE8_HANDLER(a800xl_pia_pb_w) { a800xl_mmu(space->machine, data); }
+static WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(device->machine, data); }
+static WRITE8_DEVICE_HANDLER(a800xl_pia_pb_w) { a800xl_mmu(device->machine, data); }
 
-#ifdef MESS
-extern WRITE8_HANDLER(atari_pia_cb2_w);
-#else
-#define atari_pia_cb2_w		(0)
+#ifndef MESS
+WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w) { }
 #endif
 
-static const pia6821_interface atari_pia_interface =
+const pia6821_interface atari_pia_interface =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ atari_pia_pa_r, atari_pia_pb_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, 0, 0, atari_pia_cb2_w,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
+	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_LINE(atari_pia_cb2_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
-static const pia6821_interface a600xl_pia_interface =
+const pia6821_interface a600xl_pia_interface =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ atari_pia_pa_r, atari_pia_pb_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, a600xl_pia_pb_w, 0, atari_pia_cb2_w,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
+	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(a600xl_pia_pb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_LINE(atari_pia_cb2_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
-static const pia6821_interface a800xl_pia_interface =
+const pia6821_interface a800xl_pia_interface =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ atari_pia_pa_r, atari_pia_pb_r, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ 0, a800xl_pia_pb_w, 0, atari_pia_cb2_w,
-	/*irqs   : A/B             */ 0, 0
+	DEVCB_HANDLER(atari_pia_pa_r),		/* port A in */
+	DEVCB_HANDLER(atari_pia_pb_r),	/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_HANDLER(a800xl_pia_pb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_LINE(atari_pia_cb2_w),		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 
@@ -726,18 +751,13 @@ static void console_write(const address_space *space, UINT8 data)
 }
 
 
-static void _pia_reset(running_machine *machine)
-{
-	pia_reset();
-}
-
 static void _antic_reset(running_machine *machine)
 {
 	antic_reset();
 }
 
 
-static void atari_machine_start(running_machine *machine, int type, const pia6821_interface *pia_intf, int has_cart)
+static void atari_machine_start(running_machine *machine, int type, int has_cart)
 {
 	gtia_interface gtia_intf;
 
@@ -753,13 +773,6 @@ static void atari_machine_start(running_machine *machine, int type, const pia682
 
 	/* pokey */
 	add_reset_callback(machine, pokey_reset);
-
-	/* PIA */
-	if (pia_intf)
-	{
-		pia_config(machine, 0, pia_intf);
-		add_reset_callback(machine, _pia_reset);
-	}
 
 	/* ANTIC */
 	add_reset_callback(machine, _antic_reset);
@@ -812,12 +825,12 @@ static void atari_machine_start(running_machine *machine, int type, const pia682
 
 MACHINE_START( a400 )
 {
-	atari_machine_start(machine, ATARI_400, &atari_pia_interface, TRUE);
+	atari_machine_start(machine, ATARI_400, TRUE);
 }
 
 MACHINE_START( a600xl )
 {
-	atari_machine_start(machine, ATARI_600XL, &a600xl_pia_interface, TRUE);
+	atari_machine_start(machine, ATARI_600XL, TRUE);
 }
 
 
@@ -830,7 +843,7 @@ MACHINE_START( a600xl )
 
 MACHINE_START( a800 )
 {
-	atari_machine_start(machine, ATARI_800, &atari_pia_interface, TRUE);
+	atari_machine_start(machine, ATARI_800, TRUE);
 }
 
 
@@ -884,7 +897,7 @@ DEVICE_IMAGE_UNLOAD( a800_cart )
 
 MACHINE_START( a800xl )
 {
-	atari_machine_start(machine, ATARI_800XL, &a800xl_pia_interface, TRUE);
+	atari_machine_start(machine, ATARI_800XL, TRUE);
 }
 
 
@@ -941,7 +954,7 @@ DEVICE_IMAGE_LOAD( a800xl_cart )
 
 MACHINE_START( a5200 )
 {
-	atari_machine_start(machine, ATARI_800XL, NULL, FALSE);
+	atari_machine_start(machine, ATARI_800XL, FALSE);
 }
 
 

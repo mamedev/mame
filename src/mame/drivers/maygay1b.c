@@ -13,7 +13,7 @@
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
 #include "video/awpvid.h"		//Fruit Machines Only
-#include "machine/6821pia.h"
+#include "machine/6821new.h"
 #include "machine/68681.h"
 #include "machine/meters.h"
 #include "machine/roc10937.h"	// vfd
@@ -487,7 +487,7 @@ static void cpu0_nmi(int state)
     6821 PIA
 ***************************************************************************/
 
-static WRITE8_HANDLER( m1_pia_porta_w )
+static WRITE8_DEVICE_HANDLER( m1_pia_porta_w )
 {
 	if ( data & 0x40 ) ROC10937_reset(0);
 
@@ -501,7 +501,7 @@ static WRITE8_HANDLER( m1_pia_porta_w )
 	ROC10937_draw_16seg(0);
 }
 
-static WRITE8_HANDLER( m1_pia_portb_w )
+static WRITE8_DEVICE_HANDLER( m1_pia_portb_w )
 {
 	int i;
 	for (i=0; i<8; i++)
@@ -510,9 +510,18 @@ static WRITE8_HANDLER( m1_pia_portb_w )
 
 static const pia6821_interface m1_pia_intf =
 {
-	/*inputs : A/B,CA/B1,CA/B2 */ 0, 0, 0, 0, 0, 0,
-	/*outputs: A/B,CA/B2       */ m1_pia_porta_w, m1_pia_portb_w, 0, 0,
-	/*irqs   : A/B             */ 0,0
+	DEVCB_NULL,		/* port A in */
+	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_HANDLER(m1_pia_porta_w),		/* port A out */
+	DEVCB_HANDLER(m1_pia_portb_w),		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_NULL,		/* IRQA */
+	DEVCB_NULL		/* IRQB */
 };
 
 // input ports for M1 board ////////////////////////////////////////
@@ -635,8 +644,6 @@ INPUT_PORTS_END
 static MACHINE_START( m1 )
 {
 	int i;
-	pia_config(machine, 0,&m1_pia_intf);
-	pia_reset();
 
 // setup 8 mechanical meters ////////////////////////////////////////////
 	Mechmtr_init(8);
@@ -756,8 +763,8 @@ static ADDRESS_MAP_START( m1_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x20B0, 0x20B0) AM_DEVREAD("ay", ay8910_r)
 
-	AM_RANGE(0x20A0, 0x20A3) AM_WRITE(pia_0_w)
-	AM_RANGE(0x20A0, 0x20A3) AM_READ( pia_0_r)
+	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia_w)
+	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia_r)
 
 	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
 
@@ -794,6 +801,7 @@ static MACHINE_DRIVER_START( m1 )
 	MDRV_CPU_PROGRAM_MAP(m1_memmap,0)
 
 	MDRV_DUART68681_ADD("duart68681", M1_DUART_CLOCK, maygaym1_duart68681_config)
+	MDRV_PIA6821_ADD("pia", m1_pia_intf)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay",AY8913, M1_MASTER_CLOCK)

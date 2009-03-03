@@ -1380,7 +1380,6 @@ static INTERRUPT_GEN(mpu4_vid_irq)
 MACHINE_START( mpu4_vid )
 {
 	mpu4_config_common(machine);
-	pia_reset();
 
 	ptm6840_config(machine, 1, &ptm_vid_intf );
 
@@ -1483,12 +1482,12 @@ static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)  /* 6840PTM */
 
-	AM_RANGE(0x0A00, 0x0A03) AM_READWRITE(pia_0_r,pia_0_w)	  	/* PIA6821 IC3 */
-	AM_RANGE(0x0B00, 0x0B03) AM_READWRITE(pia_1_r,pia_1_w)	  	/* PIA6821 IC4 */
-	AM_RANGE(0x0C00, 0x0C03) AM_READWRITE(pia_2_r,pia_2_w)	  	/* PIA6821 IC5 */
-	AM_RANGE(0x0D00, 0x0D03) AM_READWRITE(pia_3_r,pia_3_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0E00, 0x0E03) AM_READWRITE(pia_4_r,pia_4_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0F00, 0x0F03) AM_READWRITE(pia_5_r,pia_5_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia_r,pia_w)	  	/* PIA6821 IC3 */
+	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia_r,pia_w)	  	/* PIA6821 IC4 */
+	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia_r,pia_w)	  	/* PIA6821 IC5 */
+	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia_r,pia_w)		/* PIA6821 IC6 */
+	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia_r,pia_w)		/* PIA6821 IC7 */
+	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia_r,pia_w)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x4000, 0x40FF) AM_RAM /* it actually runs code from here... */
 
@@ -1667,12 +1666,12 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)  /* 6840PTM */
 
-	AM_RANGE(0x0A00, 0x0A03) AM_READWRITE(pia_0_r,pia_0_w)	  	/* PIA6821 IC3 */
-	AM_RANGE(0x0B00, 0x0B03) AM_READWRITE(pia_1_r,pia_1_w)	  	/* PIA6821 IC4 */
-	AM_RANGE(0x0C00, 0x0C03) AM_READWRITE(pia_2_r,pia_2_w)	  	/* PIA6821 IC5 */
-	AM_RANGE(0x0D00, 0x0D03) AM_READWRITE(pia_3_r,pia_3_w)		/* PIA6821 IC6 */
-	AM_RANGE(0x0E00, 0x0E03) AM_READWRITE(pia_4_r,pia_4_w)		/* PIA6821 IC7 */
-	AM_RANGE(0x0F00, 0x0F03) AM_READWRITE(pia_5_r,pia_5_w)		/* PIA6821 IC8 */
+	AM_RANGE(0x0A00, 0x0A03) AM_DEVREADWRITE("pia_ic3", pia_r,pia_w)	  	/* PIA6821 IC3 */
+	AM_RANGE(0x0B00, 0x0B03) AM_DEVREADWRITE("pia_ic4", pia_r,pia_w)	  	/* PIA6821 IC4 */
+	AM_RANGE(0x0C00, 0x0C03) AM_DEVREADWRITE("pia_ic5", pia_r,pia_w)	  	/* PIA6821 IC5 */
+	AM_RANGE(0x0D00, 0x0D03) AM_DEVREADWRITE("pia_ic6", pia_r,pia_w)		/* PIA6821 IC6 */
+	AM_RANGE(0x0E00, 0x0E03) AM_DEVREADWRITE("pia_ic7", pia_r,pia_w)		/* PIA6821 IC7 */
+	AM_RANGE(0x0F00, 0x0F03) AM_DEVREADWRITE("pia_ic8", pia_r,pia_w)		/* PIA6821 IC8 */
 
 	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_BASE(&dealem_videoram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM	AM_WRITENOP/* 64k  paged ROM (4 pages) */
@@ -1685,6 +1684,13 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
 	MDRV_NVRAM_HANDLER(generic_0fill)				/* confirm */
+
+	MDRV_PIA6821_ADD("pia_ic3", pia_ic3_intf)
+	MDRV_PIA6821_ADD("pia_ic4", pia_ic4_intf)
+	MDRV_PIA6821_ADD("pia_ic5", pia_ic5_intf)
+	MDRV_PIA6821_ADD("pia_ic6", pia_ic6_intf)
+	MDRV_PIA6821_ADD("pia_ic7", pia_ic7_intf)
+	MDRV_PIA6821_ADD("pia_ic8", pia_ic8_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1736,6 +1742,13 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)
 
 	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
+
+	MDRV_PIA6821_ADD("pia_ic3", pia_ic3_intf)
+	MDRV_PIA6821_ADD("pia_ic4", pia_ic4_intf)
+	MDRV_PIA6821_ADD("pia_ic5", pia_ic5_intf)
+	MDRV_PIA6821_ADD("pia_ic6", pia_ic6_intf)
+	MDRV_PIA6821_ADD("pia_ic7", pia_ic7_intf)
+	MDRV_PIA6821_ADD("pia_ic8", pia_ic8_intf)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
