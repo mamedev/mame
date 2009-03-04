@@ -209,11 +209,11 @@ logerror("EEPROM erase address %02x\n",address);
 		{
 			if (intf->data_bits == 16)
 			{
-				eeprom_data[2*address+0] = 0x00;
-				eeprom_data[2*address+1] = 0x00;
+				eeprom_data[2*address+0] = 0xff;
+				eeprom_data[2*address+1] = 0xff;
 			}
 			else
-				eeprom_data[address] = 0x00;
+				eeprom_data[address] = 0xff;
 		}
 		else
 logerror("Error: EEPROM is locked\n");
