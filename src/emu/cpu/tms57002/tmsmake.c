@@ -911,6 +911,23 @@ static void save(const char *fname)
   fclose(f);
 }
 
+static void clear_cat(instr *il, int count)
+{
+  int i;
+  for(i=0; i != count; i++) {
+    free(il[i].name);
+    free(il[i].dasm);
+    free(il[i].run);
+  }
+}
+
+static void clear(void)
+{
+  clear_cat(cat1, 0x40);
+  clear_cat(cat2, 0x80);
+  clear_cat(cat3, 0x80);
+}
+
 int main(int argc, char **argv)
 {
   if(argc != 3) {
@@ -924,6 +941,7 @@ int main(int argc, char **argv)
 
   load(argv[1]);
   save(argv[2]);
+  clear();
 
   return 0;
 }
