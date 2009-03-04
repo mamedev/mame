@@ -796,6 +796,9 @@ static INPUT_PORTS_START( splatter )
 	PORT_DIPNAME( 0x06, 0x06, "CPU #0&1 Kick Watchdog in IRQ" )
 	PORT_DIPSETTING(    0x06, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Stage Select (ver. SH3 only)" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1917,6 +1920,50 @@ Notes:
 */
 ROM_START( splatter )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
+	ROM_LOAD( "sh1_snd0b.bin",      0x0c000, 0x10000, CRC(03b47a5c) SHA1(6fc1cb95347880d0fcadac4d5c2a46734211afc4) )
+	ROM_LOAD( "sh1_snd1.bin",       0x1c000, 0x10000, CRC(8ece9e0a) SHA1(578da932a7684c6f633dde1d6412011c727c2380) )
+
+	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	ROM_LOAD_512( "sh1_prg0.bin",    0x000000, CRC(4e07e6d9) SHA1(9bca8aca0041c311c403cf3b9a2365d704b39769) )
+	ROM_LOAD_512( "sh1_prg1.bin",    0x080000, CRC(7a3efe09) SHA1(2271356be580e29cf70dbb70f797fb3c49666ada) )
+	ROM_LOAD_512( "sh1_prg2.bin",    0x100000, CRC(434dbe7d) SHA1(40bb1d4ed8e6563f98732501e212d7324c714af2) )
+	ROM_LOAD_512( "sh1_prg3.bin",    0x180000, CRC(955ce93f) SHA1(5ba493769595bc9ebf5404a50435aaf0918d7dd3) )
+	ROM_LOAD_512( "sh1_prg4.bin",    0x200000, CRC(350dee5b) SHA1(8928a7453ff52b3c7abbf28b2ab08b2e63b16d28) )
+	ROM_LOAD_512( "sh3_prg5.bin",    0x280000, CRC(3af893d9) SHA1(b7b6080d8d7769155d0ba8d193c2876ada9c5dc6) )
+	ROM_LOAD_512( "sh3_prg6.bin",    0x300000, CRC(0579e90e) SHA1(7ca32e370adce00d4f5152cfa1b691a1685e8dd1) )
+	ROM_LOAD_512( "sh3_prg7.bin",    0x380000, CRC(653b4509) SHA1(59fc84654acc88a1f748e5b632cbef8a78f4288e) )
+
+	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_LOAD( "sh_voi-0.bin",       0x10000, 0x20000, CRC(2199cb66) SHA1(f1c4e3fb0e7c6eae50c698cded8c85a3cbd36672) )
+	ROM_LOAD( "sh_voi-1.bin",       0x30000, 0x20000, CRC(9b6472af) SHA1(b7cde805a4d25f9c332c2c13ffa474e683ec76d5) )
+	ROM_LOAD( "sh_voi-2.bin",       0x50000, 0x20000, CRC(25ea75b6) SHA1(aafebbdddf4a2924d9e5a850ffb6861cb5c4a769) )
+	ROM_LOAD( "sh_voi-3.bin",       0x70000, 0x20000, CRC(5eebcdb4) SHA1(973e95a49cb1dda14e4c61580501c997fc7bc015) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_LOAD( "sh_chr-8.bin",       0x00000, 0x20000, CRC(321f483b) SHA1(84d75367d2e3ae210ecd17c163b336f609628a91) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE ) /* characters */
+	ROM_LOAD( "sh_chr-0.bin",       0x00000, 0x20000, CRC(4dd2ef05) SHA1(c756c0986db9e61cf44379fafb00295f0d434667) )
+	ROM_LOAD( "sh_chr-1.bin",       0x20000, 0x20000, CRC(7a764999) SHA1(836aee2c9abe2a8e3806b53e051f76dcf4266212) )
+	ROM_LOAD( "sh_chr-2.bin",       0x40000, 0x20000, CRC(6e6526ee) SHA1(f96a672b4293657398cfc6c1cf4ab4e4b223f7f9) )
+	ROM_LOAD( "sh_chr-3.bin",       0x60000, 0x20000, CRC(8d05abdb) SHA1(cdf6ae9edc880a1d750a4c36b9dc7150aab8e249) )
+	ROM_LOAD( "sh_chr-4.bin",       0x80000, 0x20000, CRC(1e1f8488) SHA1(3649564746516260b8b2df404e0ccf874d3441f9) )
+	ROM_LOAD( "sh_chr-5.bin",       0xa0000, 0x20000, CRC(684cf554) SHA1(77d3b6f03c8a96bd6e8bb7d2264fbfeb43bcde3d) )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD( "sh_obj-0.bin",       0x00000, 0x20000, CRC(1cedbbae) SHA1(22811a9376195794f18ee8d377b2548d27fc868e) )
+	ROM_LOAD( "sh_obj-1.bin",       0x20000, 0x20000, CRC(e56e91ee) SHA1(12b823ca92fb518d84c0432925ae8a4b33a1354d) )
+	ROM_LOAD( "sh_obj-2.bin",       0x40000, 0x20000, CRC(3dfb0230) SHA1(bf68a20544931b9673ce1f9e81b5f82e99f50bd0) )
+	ROM_LOAD( "sh_obj-3.bin",       0x60000, 0x20000, CRC(e4e5a581) SHA1(e6cebef3dafbcdfd8e9e25b0796af47c8673473f) )
+	ROM_LOAD( "sh_obj-4.bin",       0x80000, 0x20000, CRC(b2422182) SHA1(84cba3b7552756a206793f4c7b90fc6b8821963d) )
+	ROM_LOAD( "sh_obj-5.bin",       0xa0000, 0x20000, CRC(24d0266f) SHA1(5c768343554209a7d7858afe41489a58809dd5f1) )
+	ROM_LOAD( "sh_obj-6.bin",       0xc0000, 0x20000, CRC(80830b0e) SHA1(f9d69ece0827f5ec46473142d24f3191d40a0d57) )
+	ROM_LOAD( "sh_obj-7.bin",       0xe0000, 0x20000, CRC(08b1953a) SHA1(f84f97e8e14ed6fcf99565d2603651831101ed2f) )
+ROM_END
+
+ROM_START( splatteo )
+	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "sh1_snd0.bin",       0x0c000, 0x10000, CRC(90abd4ad) SHA1(caeba5befcf57d90671786c7ef1ce49d54821949) )
 	ROM_LOAD( "sh1_snd1.bin",       0x1c000, 0x10000, CRC(8ece9e0a) SHA1(578da932a7684c6f633dde1d6412011c727c2380) )
 
@@ -1959,7 +2006,6 @@ ROM_START( splatter )
 	ROM_LOAD( "sh_obj-7.bin",       0xe0000, 0x20000, CRC(08b1953a) SHA1(f84f97e8e14ed6fcf99565d2603651831101ed2f) )
 ROM_END
 
-/* Splatter House */
 ROM_START( splattej )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "sh1_snd0.bin",       0x0c000, 0x10000, CRC(90abd4ad) SHA1(caeba5befcf57d90671786c7ef1ce49d54821949) )
@@ -2577,7 +2623,8 @@ GAME( 1988, beraboho, berabohm, ns1,     berabohm, berabohm, ROT180, "Namco", "B
 GAME( 1988, mmaze,    0,        ns1,     mmaze,    alice,    ROT180, "Namco", "Marchen Maze (Japan)", 0 )
 GAME( 1988, bakutotu, 0,        ns1,     bakutotu, bakutotu, ROT180, "Namco", "Bakutotsu Kijuutei", 0 )
 GAME( 1988, wldcourt, 0,        ns1,     wldcourt, wldcourt, ROT180, "Namco", "World Court (Japan)", 0 )
-GAME( 1988, splatter, 0,        ns1,     splatter, splatter, ROT180, "Namco", "Splatter House (World)", 0 )
+GAME( 1988, splatter, 0,        ns1,     splatter, splatter, ROT180, "Namco", "Splatter House (World new version)", 0 )
+GAME( 1988, splatteo, splatter, ns1,     splatter, splatter, ROT180, "Namco", "Splatter House (World old version)", 0 )
 GAME( 1988, splattej, splatter, ns1,     splatter, splatter, ROT180, "Namco", "Splatter House (Japan)", 0 )
 GAME( 1988, faceoff,  0,        ns1,     faceoff,  faceoff,  ROT180, "Namco", "Face Off (Japan)", 0 )
 GAME( 1989, rompers,  0,        ns1,     ns1,      rompers,  ROT90,  "Namco", "Rompers (Japan)", 0 )

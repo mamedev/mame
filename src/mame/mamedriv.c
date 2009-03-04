@@ -732,6 +732,7 @@ const game_driver * const drivers[] =
 	DRIVER( bakutotu )	/* (c) 1988 (Japan) */
 	DRIVER( wldcourt )	/* (c) 1988 (Japan) */
 	DRIVER( splatter )	/* (c) 1988 (World) */
+	DRIVER( splatteo )	/* (c) 1988 (World) */
 	DRIVER( splattej )	/* (c) 1988 (Japan) */
 	DRIVER( faceoff )	/* (c) 1988 (Japan) */
 	DRIVER( rompers )	/* (c) 1989 (Japan) */
