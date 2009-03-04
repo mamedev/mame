@@ -6616,7 +6616,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rfjeta )	/* (c) 1998 Seibu Kaihatsu (Dream Island license) */
 	DRIVER( rfjetj )	/* (c) 1998 Seibu Kaihatsu */
 	DRIVER( rfjetus )	/* (c) 1998 Seibu Kaihatsu (Fabtek license) */
-	
+
 	DRIVER( ejsakura )	/* (c) 1999 Seibu Kaihatsu */
 
 	/* Seibu System SH2B games */
@@ -7470,6 +7470,7 @@ Other Sun games
 	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
 	DRIVER( mjsenka )	/* (c) 1986 Visco */
 	DRIVER( mjyarou )	/* (c) 1986 Visco / Video System */
+	DRIVER( daisyari )	/* (c) 1989 Best System */
 	DRIVER( suzume )	/*  ??  (c) 1986 Dyna Electronics */
 	DRIVER( hnayayoi )	/* "02" (c) 1987 Dyna Electronics */
 	DRIVER( dondenmj )	/* "03" (c) 1986 Dyna Electronics */
