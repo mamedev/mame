@@ -103,6 +103,7 @@ typedef struct {
 
 	const address_space *program, *data;
 	int icount;
+	int unsupported_inst_warning;
 } tms57002_t;
 
 static void tms57002_cache_flush(tms57002_t *s);
@@ -1159,6 +1160,22 @@ static void tms57002_cache_flush(tms57002_t *s)
 	}
 }
 
+static void tms57002_decode_error(tms57002_t *s, UINT32 opcode)
+{
+	char buf[256];
+	UINT8 opr[3];
+	if(s->unsupported_inst_warning)
+		return;
+
+	s->unsupported_inst_warning = 1;
+	opr[0] = opcode;
+	opr[1] = opcode >> 8;
+	opr[2] = opcode >> 16;
+
+	CPU_DISASSEMBLE_NAME(tms57002)(0, buf, s->pc, opr, opr);
+	popmessage("tms57002: %s - Contact Mamedev", buf);
+}
+
 static void tms57002_decode_cat1(tms57002_t *s, UINT32 opcode, unsigned short *op, cstate *cs)
 {
 	switch(opcode >> 18) {
@@ -1170,7 +1187,8 @@ static void tms57002_decode_cat1(tms57002_t *s, UINT32 opcode, unsigned short *o
 #undef CDEC1
 
 	default:
-		fatalerror("Unhandled case in tms57002_decode_cat1");
+		tms57002_decode_error(s, opcode);
+		break;
 	}
 }
 
@@ -1185,7 +1203,8 @@ static void tms57002_decode_cat2_pre(tms57002_t *s, UINT32 opcode, unsigned shor
 #undef CDEC2A
 
 	default:
-		fatalerror("Unhandled case in tms57002_decode_cat2_pre");
+		tms57002_decode_error(s, opcode);
+		break;
 	}
 }
 
@@ -1200,7 +1219,8 @@ static void tms57002_decode_cat2_post(tms57002_t *s, UINT32 opcode, unsigned sho
 #undef CDEC2B
 
 	default:
-		fatalerror("Unhandled case in tms57002_decode_cat2_post");
+		tms57002_decode_error(s, opcode);
+		break;
 	}
 }
 
@@ -1215,7 +1235,8 @@ static void tms57002_decode_cat3(tms57002_t *s, UINT32 opcode, unsigned short *o
 #undef CDEC3
 
 	default:
-		fatalerror("Unhandled case in tms57002_decode_cat3");
+		tms57002_decode_error(s, opcode);
+		break;
 	}
 }
 
