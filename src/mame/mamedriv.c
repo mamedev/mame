@@ -7470,6 +7470,7 @@ Other Sun games
 	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
 	DRIVER( mjsenka )	/* (c) 1986 Visco */
 	DRIVER( mjyarou )	/* (c) 1986 Visco / Video System */
+	DRIVER( mjclub )	/* (c) 1986 Xex */
 	DRIVER( daisyari )	/* (c) 1989 Best System */
 	DRIVER( suzume )	/*  ??  (c) 1986 Dyna Electronics */
 	DRIVER( hnayayoi )	/* "02" (c) 1987 Dyna Electronics */
