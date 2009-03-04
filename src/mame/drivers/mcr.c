@@ -586,13 +586,15 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 
 static READ8_HANDLER( demoderb_ip1_r )
 {
-	return input_port_read(space->machine, input_mux ? "SSIO.IP1.ALT" : "SSIO.IP1");
+	return input_port_read(space->machine, "SSIO.IP1") | 
+		(input_port_read(space->machine, input_mux ? "SSIO.IP1.ALT2" : "SSIO.IP1.ALT1") << 2);
 }
 
 
 static READ8_HANDLER( demoderb_ip2_r )
 {
-	return input_port_read(space->machine, input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
+	return input_port_read(space->machine, "SSIO.IP2") | 
+		(input_port_read(space->machine, input_mux ? "SSIO.IP2.ALT2" : "SSIO.IP2.ALT1") << 2);
 }
 
 
@@ -1416,12 +1418,22 @@ static INPUT_PORTS_START( demoderb )
 	PORT_START("SSIO.IP1")	/* J4 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("SSIO.IP1.ALT1")	/* J4 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
+	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("SSIO.IP1.ALT2")	/* IN1 (muxed) -- the high 6 bits contain the steering wheel value */
+	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 
 	PORT_START("SSIO.IP2")	/* J5 1-8 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("SSIO.IP2.ALT1")	/* J5 1-8 */	/* The high 6 bits contain the steering wheel value */
+	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("SSIO.IP2.ALT2")	/* IN2 (muxed) -- the high 6 bits contain the steering wheel value */
+	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(4)
 
 	PORT_START("SSIO.IP3")	/* DIPSW @ B3 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
@@ -1456,15 +1468,6 @@ static INPUT_PORTS_START( demoderb )
 	PORT_START("SSIO.DIP")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SSIO.IP1.ALT")	/* IN1 (muxed) -- the high 6 bits contain the steering wheel value */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
-
-	PORT_START("SSIO.IP2.ALT")	/* IN2 (muxed) -- the high 6 bits contain the steering wheel value */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(4)
 INPUT_PORTS_END
 
 
