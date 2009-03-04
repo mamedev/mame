@@ -38,6 +38,7 @@
 #define OPEN_FLAG_WRITE			0x0002		/* open for write */
 #define OPEN_FLAG_CREATE		0x0004		/* create & truncate file */
 #define OPEN_FLAG_CREATE_PATHS	0x0008		/* create paths as necessary */
+#define OPEN_FLAG_NO_PRELOAD 	0x0010		/* do not decompress on open */
 
 /* error codes returned by routines below */
 enum _file_error

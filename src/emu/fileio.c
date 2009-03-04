@@ -92,6 +92,7 @@ static int path_iterator_get_next(path_iterator *iterator, astring *buffer);
 /* misc helpers */
 static file_error load_zipped_file(mame_file *file);
 static int zip_filename_match(const zip_file_header *header, const astring *afilename);
+static int zip_header_is_path(const zip_file_header *header);
 
 
 
@@ -324,7 +325,7 @@ static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 ope
 		/* if that failed, look for a file with the right crc, but the wrong filename */
 		if (header == NULL && (openflags & OPEN_FLAG_HAS_CRC))
 			for (header = zip_file_first_file(zip); header != NULL; header = zip_file_next_file(zip))
-				if (header->crc == crc)
+				if (header->crc == crc && (!zip_header_is_path(header)))
 					break;
 
 		/* if that failed, look for a file with the right name; reporting a bad checksum */
@@ -351,7 +352,10 @@ static file_error fopen_attempt_zipped(astring *fullname, UINT32 crc, UINT32 ope
 			hash_data_insert_binary_checksum(file->hash, HASH_CRC, crcs);
 
 			astring_free(filename);
-			return FILERR_NONE;
+			if (openflags & OPEN_FLAG_NO_PRELOAD)
+				return FILERR_NONE;
+			else
+				return load_zipped_file(file);
 		}
 
 		/* close up the ZIP file and try the next level */
@@ -409,7 +413,10 @@ int mame_fseek(mame_file *file, INT64 offset, int whence)
 {
 	/* load the ZIP file now if we haven't yet */
 	if (file->zipfile != NULL)
-		load_zipped_file(file);
+	{
+		if (load_zipped_file(file) != FILERR_NONE)
+			return 1;
+	}
 
 	/* seek if we can */
 	if (file->file != NULL)
@@ -427,7 +434,10 @@ UINT64 mame_ftell(mame_file *file)
 {
 	/* load the ZIP file now if we haven't yet */
 	if (file->zipfile != NULL)
-		load_zipped_file(file);
+	{
+		if (load_zipped_file(file) != FILERR_NONE)
+			return 0;
+	}
 
 	/* tell if we can */
 	if (file->file != NULL)
@@ -446,7 +456,10 @@ int mame_feof(mame_file *file)
 {
 	/* load the ZIP file now if we haven't yet */
 	if (file->zipfile != NULL)
-		load_zipped_file(file);
+	{
+		if (load_zipped_file(file) != FILERR_NONE)
+			return 0;
+	}
 
 	/* return EOF if we can */
 	if (file->file != NULL)
@@ -487,7 +500,10 @@ UINT32 mame_fread(mame_file *file, void *buffer, UINT32 length)
 {
 	/* load the ZIP file now if we haven't yet */
 	if (file->zipfile != NULL)
-		load_zipped_file(file);
+	{
+		if (load_zipped_file(file) != FILERR_NONE)
+			return 0;
+	}
 
 	/* read the data if we can */
 	if (file->file != NULL)
@@ -505,7 +521,10 @@ int mame_fgetc(mame_file *file)
 {
 	/* load the ZIP file now if we haven't yet */
 	if (file->zipfile != NULL)
-		load_zipped_file(file);
+	{
+		if (load_zipped_file(file) != FILERR_NONE)
+			return EOF;
+	}
 
 	/* read the data if we can */
 	if (file->file != NULL)
@@ -524,7 +543,10 @@ int mame_ungetc(int c, mame_file *file)
 {
 	/* load the ZIP file now if we haven't yet */
 	if (file->zipfile != NULL)
-		load_zipped_file(file);
+	{
+		if (load_zipped_file(file) != FILERR_NONE)
+			return 1;
+	}
 
 	/* read the data if we can */
 	if (file->file != NULL)
@@ -542,7 +564,10 @@ char *mame_fgets(char *s, int n, mame_file *file)
 {
 	/* load the ZIP file now if we haven't yet */
 	if (file->zipfile != NULL)
-		load_zipped_file(file);
+	{
+		if (load_zipped_file(file) != FILERR_NONE)
+			return NULL;
+	}
 
 	/* read the data if we can */
 	if (file->file != NULL)
@@ -706,7 +731,10 @@ core_file *mame_core_file(mame_file *file)
 {
 	/* load the ZIP file now if we haven't yet */
 	if (file->zipfile != NULL)
-		load_zipped_file(file);
+	{
+		if (load_zipped_file(file) != FILERR_NONE)
+			return NULL;
+	}
 
 	/* return the core file */
 	return file->file;
@@ -743,7 +771,10 @@ const char *mame_fhash(mame_file *file, UINT32 functions)
 
 	/* load the ZIP file now if we haven't yet */
 	if (file->zipfile != NULL)
-		load_zipped_file(file);
+	{
+		if (load_zipped_file(file) != FILERR_NONE)
+			return file->hash;
+	}
 	if (file->file == NULL)
 		return file->hash;
 
@@ -862,4 +893,16 @@ static int zip_filename_match(const zip_file_header *header, const astring *file
 
 	return (zipfile >= header->filename && astring_icmpc(filename, zipfile) == 0 &&
 		(zipfile == header->filename || zipfile[-1] == '/'));
+}
+
+/*-------------------------------------------------
+    zip_header_is_path - check whether filename 
+                         in header is a path
+  -------------------------------------------------*/
+
+static int zip_header_is_path(const zip_file_header *header)
+{
+	const char *zipfile = header->filename + header->filename_length - 1;
+
+	return (zipfile >= header->filename && zipfile[0] == '/');
 }
