@@ -72,7 +72,7 @@ static void gpworld_draw_tiles(running_machine *machine, bitmap_t *bitmap,const 
 			int current_screen_character = (characterY*64) + characterX;
 
 			drawgfx(bitmap, machine->gfx[0], tile_RAM[current_screen_character],
-					0, 0, 0, characterX*8, characterY*8, cliprect, TRANSPARENCY_PEN, 0);
+					characterY, 0, 0, characterX*8, characterY*8, cliprect, TRANSPARENCY_PEN, 0);
 		}
 	}
 }
@@ -267,14 +267,14 @@ static WRITE8_HANDLER( palette_write )
 	/* "Round down" to the nearest palette entry */
 	pal_index = offset & 0xffe;
 
-	b = (palette_RAM[pal_index]   & 0xf0) << 0;
-	g = (palette_RAM[pal_index]   & 0x0f) << 4;
+	g = (palette_RAM[pal_index]   & 0xf0) << 0;
+	b = (palette_RAM[pal_index]   & 0x0f) << 4;
 	r = (palette_RAM[pal_index+1] & 0x0f) << 4;
 	a = (palette_RAM[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(space->machine, pal_index, MAKE_ARGB(a, r, g, b));
+	palette_set_color(space->machine, (pal_index & 0xffe) >> 1, MAKE_ARGB(a, r, g, b));
 }
 
 /* PROGRAM MAP */
@@ -430,7 +430,7 @@ static const gfx_layout gpworld_tile_layout =
 	8,8,
 	0x800/8,
 	2,
-	{ 0, 0x800*8 },
+	{ 0x800*8, 0 },
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
