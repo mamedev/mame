@@ -179,7 +179,7 @@ static void *open_chd(const char *filename, movie_info *info)
 	}
 
 	/* get the metadata */
-	chderr = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+	chderr = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL, NULL);
 	if (chderr != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_error_string(chderr));

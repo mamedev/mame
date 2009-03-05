@@ -309,7 +309,7 @@ static int do_createhd(int argc, char *argv[], int param)
 
 	/* write the metadata */
 	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
-	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
+	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
@@ -480,7 +480,7 @@ static int do_createcd(int argc, char *argv[], int param)
 		sprintf(metadata, CDROM_TRACK_METADATA_FORMAT, i + 1, cdrom_get_type_string(&toc.tracks[i]),
 				cdrom_get_subtype_string(&toc.tracks[i]), toc.tracks[i].frames);
 
-		err = chd_set_metadata(chd, CDROM_TRACK_METADATA_TAG, i, metadata, strlen(metadata) + 1);
+		err = chd_set_metadata(chd, CDROM_TRACK_METADATA_TAG, i, metadata, strlen(metadata) + 1, 0);
 		if (err != CHDERR_NONE)
 		{
 			fprintf(stderr, "Error adding CD-ROM metadata: %s\n", chd_error_string(err));
@@ -902,7 +902,7 @@ static int do_createav(int argc, char *argv[], int param)
 
 	/* write the metadata */
 	sprintf(metadata, AV_METADATA_FORMAT, fps_times_1million / 1000000, fps_times_1million % 1000000, width, height, interlaced, channels, rate);
-	err = chd_set_metadata(chd, AV_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
+	err = chd_set_metadata(chd, AV_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error adding AV metadata: %s\n", chd_error_string(err));
@@ -959,7 +959,7 @@ static int do_createav(int argc, char *argv[], int param)
 	/* write the final metadata */
 	if (ldframedata != NULL)
 	{
-		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, ldframedata, numframes * VBI_PACKED_BYTES);
+		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, ldframedata, numframes * VBI_PACKED_BYTES, 0);
 		if (err != CHDERR_NONE)
 		{
 			fprintf(stderr, "Error adding AVLD metadata: %s\n", chd_error_string(err));
@@ -1048,7 +1048,7 @@ static int do_createblankhd(int argc, char *argv[], int param)
 
 	/* write the metadata */
 	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sectorsize);
-	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
+	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
@@ -1478,7 +1478,7 @@ static int do_extractav(int argc, char *argv[], int param)
 	header = chd_get_header(chd);
 
 	/* get the metadata */
-	err = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+	err = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL, NULL);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_error_string(err));
@@ -1806,7 +1806,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 	header = *chd_get_header(chd);
 
 	/* get the metadata */
-	err = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+	err = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL, NULL);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_error_string(err));
@@ -1849,7 +1849,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 	}
 
 	/* read the metadata */
-	err = chd_get_metadata(chd, AV_LD_METADATA_TAG, 0, vbidata, header.totalhunks * VBI_PACKED_BYTES, &actlength, NULL);
+	err = chd_get_metadata(chd, AV_LD_METADATA_TAG, 0, vbidata, header.totalhunks * VBI_PACKED_BYTES, &actlength, NULL, NULL);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error getting VBI metadata: %s\n", chd_error_string(err));
@@ -1967,7 +1967,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 		}
 
 		/* write new metadata */
-		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, vbidata, header.totalhunks * VBI_PACKED_BYTES);
+		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, vbidata, header.totalhunks * VBI_PACKED_BYTES, 0);
 		if (err != CHDERR_NONE)
 		{
 			fprintf(stderr, "Error adding AVLD metadata: %s\n", chd_error_string(err));
@@ -2071,7 +2071,7 @@ static int do_info(int argc, char *argv[], int param)
 		UINT32 metatag, metasize;
 
 		/* get the indexed metadata item; stop when we hit an error */
-		err = chd_get_metadata(chd, CHDMETATAG_WILDCARD, i, metadata, sizeof(metadata), &metasize, &metatag);
+		err = chd_get_metadata(chd, CHDMETATAG_WILDCARD, i, metadata, sizeof(metadata), &metasize, &metatag, NULL);
 		if (err != CHDERR_NONE)
 			break;
 
@@ -2484,7 +2484,7 @@ static int do_setchs(int argc, char *argv[], int param)
 	}
 
 	/* get the hard disk metadata */
-	err = chd_get_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+	err = chd_get_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL, NULL);
 	if (err != CHDERR_NONE || sscanf(metadata, HARD_DISK_METADATA_FORMAT, &oldcyls, &oldhds, &oldsecs, &oldsecsize) != 4)
 	{
 		fprintf(stderr, "CHD file '%s' is not a hard disk!\n", inoutfile);
@@ -2494,7 +2494,7 @@ static int do_setchs(int argc, char *argv[], int param)
 
 	/* write our own */
 	sprintf(metadata, HARD_DISK_METADATA_FORMAT, cyls, hds, secs, oldsecsize);
-	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
+	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1, 0);
 	if (err != CHDERR_NONE)
 	{
 		fprintf(stderr, "Error writing new metadata to CHD file: %s\n", chd_error_string(err));

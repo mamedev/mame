@@ -76,6 +76,23 @@
     [100] UINT8  parentsha1[20];// SHA1 checksum of parent file
     [120] (V3 header length)
 
+    Proposed V4 header:
+
+    [  0] char   tag[8];        // 'MComprHD'
+    [  8] UINT32 length;        // length of header (including tag and length fields)
+    [ 12] UINT32 version;       // drive format version
+    [ 16] UINT32 flags;         // flags (see below)
+    [ 20] UINT32 compression;   // compression type
+    [ 24] UINT32 totalhunks;    // total # of hunks represented
+    [ 28] UINT64 logicalbytes;  // logical size of the data (in bytes)
+    [ 36] UINT64 metaoffset;    // offset to the first blob of metadata
+    [ 44] UINT32 hunkbytes;     // number of bytes per hunk
+    [ 48] UINT8  sha1[20];      // combined raw+meta SHA1
+    [ 68] UINT8  parentsha1[20];// combined raw+meta SHA1 of parent
+    [ 88] UINT8  rawsha1[20];   // raw data SHA1
+    [108] UINT8  metasha1[20];  // metadata SHA1
+    [128] (V4 header length)
+
     Flags:
         0x00000001 - set if this drive has a parent
         0x00000002 - set if this drive allows writes
@@ -116,6 +133,9 @@
 /* metadata parameters */
 #define CHDMETATAG_WILDCARD			0
 #define CHD_METAINDEX_APPEND		((UINT32)-1)
+
+/* metadata flags */
+#define CHD_MDFLAGS_CHECKSUM		0x01		/* indicates data is checksummed */
 
 /* standard hard disk metadata */
 #define HARD_DISK_METADATA_TAG		0x47444444	/* 'GDDD' */
@@ -271,10 +291,10 @@ chd_error chd_async_complete(chd_file *chd);
 /* ----- metadata management ----- */
 
 /* get indexed metadata of a particular sort */
-chd_error chd_get_metadata(chd_file *chd, UINT32 searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 *resultlen, UINT32 *resulttag);
+chd_error chd_get_metadata(chd_file *chd, UINT32 searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 *resultlen, UINT32 *resulttag, UINT8 *resultflags);
 
 /* set indexed metadata of a particular sort */
-chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen);
+chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen, UINT8 flags);
 
 /* clone all of the metadata from one CHD to another */
 chd_error chd_clone_metadata(chd_file *source, chd_file *dest);

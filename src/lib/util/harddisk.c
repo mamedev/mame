@@ -49,7 +49,7 @@ hard_disk_file *hard_disk_open(chd_file *chd)
 		return NULL;
 
 	/* read the hard disk metadata */
-	err = chd_get_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+	err = chd_get_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL, NULL);
 	if (err != CHDERR_NONE)
 		return NULL;
 

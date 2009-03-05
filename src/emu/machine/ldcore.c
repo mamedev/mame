@@ -1331,7 +1331,7 @@ static void init_disc(const device_config *device)
 			fatalerror("Laserdisc video must be compressed with the A/V codec!");
 
 		/* read the metadata */
-		err = chd_get_metadata(ldcore->disc, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+		err = chd_get_metadata(ldcore->disc, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL, NULL);
 		if (err != CHDERR_NONE)
 			fatalerror("Non-A/V CHD file specified");
 
@@ -1350,7 +1350,7 @@ static void init_disc(const device_config *device)
 
 		/* allocate memory for the precomputed per-frame metadata */
 		ldcore->vbidata = auto_malloc(totalhunks * VBI_PACKED_BYTES);
-		err = chd_get_metadata(ldcore->disc, AV_LD_METADATA_TAG, 0, ldcore->vbidata, totalhunks * VBI_PACKED_BYTES, &vbilength, NULL);
+		err = chd_get_metadata(ldcore->disc, AV_LD_METADATA_TAG, 0, ldcore->vbidata, totalhunks * VBI_PACKED_BYTES, &vbilength, NULL, NULL);
 		if (err != CHDERR_NONE || vbilength != totalhunks * VBI_PACKED_BYTES)
 			fatalerror("Precomputed VBI metadata missing or incorrect size");
 	}

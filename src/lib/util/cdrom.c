@@ -549,7 +549,7 @@ static chd_error parse_metadata(chd_file *chd, cdrom_toc *toc)
 		char type[11], subtype[11];
 
 		/* fetch the metadata for this track */
-		err = chd_get_metadata(chd, CDROM_TRACK_METADATA_TAG, toc->numtrks, metadata, sizeof(metadata), NULL, NULL);
+		err = chd_get_metadata(chd, CDROM_TRACK_METADATA_TAG, toc->numtrks, metadata, sizeof(metadata), NULL, NULL, NULL);
 		if (err != CHDERR_NONE)
 			break;
 
@@ -583,7 +583,7 @@ static chd_error parse_metadata(chd_file *chd, cdrom_toc *toc)
 		return CHDERR_NONE;
 
 	/* look for old-style metadata */
-	err = chd_get_metadata(chd, CDROM_OLD_METADATA_TAG, 0, oldmetadata, sizeof(oldmetadata), NULL, NULL);
+	err = chd_get_metadata(chd, CDROM_OLD_METADATA_TAG, 0, oldmetadata, sizeof(oldmetadata), NULL, NULL, NULL);
 	if (err != CHDERR_NONE)
 		return err;
 

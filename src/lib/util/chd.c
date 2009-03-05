@@ -114,6 +114,7 @@ struct _metadata_entry
 	UINT64					prev;			/* offset within the file of the previous header */
 	UINT32					length;			/* length of the metadata */
 	UINT32					metatag;		/* metadata tag */
+	UINT8					flags;			/* flag bits */
 };
 
 
@@ -1120,7 +1121,7 @@ chd_error chd_async_complete(chd_file *chd)
     of the given type
 -------------------------------------------------*/
 
-chd_error chd_get_metadata(chd_file *chd, UINT32 searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 *resultlen, UINT32 *resulttag)
+chd_error chd_get_metadata(chd_file *chd, UINT32 searchtag, UINT32 searchindex, void *output, UINT32 outputlen, UINT32 *resultlen, UINT32 *resulttag, UINT8 *resultflags)
 {
 	metadata_entry metaentry;
 	chd_error err;
@@ -1168,6 +1169,8 @@ chd_error chd_get_metadata(chd_file *chd, UINT32 searchtag, UINT32 searchindex, 
 		*resultlen = metaentry.length;
 	if (resulttag != NULL)
 		*resulttag = metaentry.metatag;
+	if (resultflags != NULL)
+		*resultflags = metaentry.flags;
 	return CHDERR_NONE;
 }
 
@@ -1177,7 +1180,7 @@ chd_error chd_get_metadata(chd_file *chd, UINT32 searchtag, UINT32 searchindex, 
     of the given type
 -------------------------------------------------*/
 
-chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen)
+chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, const void *inputbuf, UINT32 inputlen, UINT8 flags)
 {
 	UINT8 raw_meta_header[METADATA_HEADER_SIZE];
 	metadata_entry metaentry;
@@ -1195,6 +1198,10 @@ chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, cons
 
 	/* must write at least 1 byte */
 	if (inputlen < 1)
+		return CHDERR_INVALID_PARAMETER;
+	
+	/* no more than 16MB */
+	if (inputlen >= 16 * 1024 * 1024)
 		return CHDERR_INVALID_PARAMETER;
 
 	/* wait for any pending async operations */
@@ -1232,7 +1239,7 @@ chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, cons
 
 	/* now build us a new entry */
 	put_bigendian_uint32(&raw_meta_header[0], metatag);
-	put_bigendian_uint32(&raw_meta_header[4], inputlen);
+	put_bigendian_uint32(&raw_meta_header[4], (inputlen & 0x00ffffff) | (flags << 24));
 	put_bigendian_uint64(&raw_meta_header[8], (err == CHDERR_NONE) ? metaentry.next : 0);
 
 	/* write out the new header */
@@ -1266,13 +1273,14 @@ chd_error chd_clone_metadata(chd_file *source, chd_file *dest)
 {
 	UINT32 metatag, metasize, metaindex;
 	UINT8 metabuffer[1024];
+	UINT8 metaflags;
 	chd_error err;
 
 	/* clone the metadata */
 	for (metaindex = 0; ; metaindex++)
 	{
 		/* fetch the next piece of metadata */
-		err = chd_get_metadata(source, CHDMETATAG_WILDCARD, metaindex, metabuffer, sizeof(metabuffer), &metasize, &metatag);
+		err = chd_get_metadata(source, CHDMETATAG_WILDCARD, metaindex, metabuffer, sizeof(metabuffer), &metasize, &metatag, &metaflags);
 		if (err != CHDERR_NONE)
 		{
 			if (err == CHDERR_METADATA_NOT_FOUND)
@@ -1284,7 +1292,7 @@ chd_error chd_clone_metadata(chd_file *source, chd_file *dest)
 		if (metasize <= sizeof(metabuffer))
 		{
 			/* write it to the target */
-			err = chd_set_metadata(dest, metatag, CHD_METAINDEX_APPEND, metabuffer, metasize);
+			err = chd_set_metadata(dest, metatag, CHD_METAINDEX_APPEND, metabuffer, metasize, metaflags);
 			if (err != CHDERR_NONE)
 				break;
 		}
@@ -1300,7 +1308,7 @@ chd_error chd_clone_metadata(chd_file *source, chd_file *dest)
 			}
 
 			/* re-read the whole thing */
-			err = chd_get_metadata(source, CHDMETATAG_WILDCARD, metaindex, allocbuffer, metasize, &metasize, &metatag);
+			err = chd_get_metadata(source, CHDMETATAG_WILDCARD, metaindex, allocbuffer, metasize, &metasize, &metatag, &metaflags);
 			if (err != CHDERR_NONE)
 			{
 				free(allocbuffer);
@@ -1308,7 +1316,7 @@ chd_error chd_clone_metadata(chd_file *source, chd_file *dest)
 			}
 
 			/* write it to the target */
-			err = chd_set_metadata(dest, metatag, CHD_METAINDEX_APPEND, allocbuffer, metasize);
+			err = chd_set_metadata(dest, metatag, CHD_METAINDEX_APPEND, allocbuffer, metasize, metaflags);
 			free(allocbuffer);
 			if (err != CHDERR_NONE)
 				break;
@@ -2364,6 +2372,10 @@ static chd_error metadata_find_entry(chd_file *chd, UINT32 metatag, UINT32 metai
 		metaentry->metatag = get_bigendian_uint32(&raw_meta_header[0]);
 		metaentry->length = get_bigendian_uint32(&raw_meta_header[4]);
 		metaentry->next = get_bigendian_uint64(&raw_meta_header[8]);
+		
+		/* checksum is encoded as the high bit of length */
+		metaentry->flags = metaentry->length >> 24;
+		metaentry->length &= 0x00ffffff;
 
 		/* if we got a match, proceed */
 		if (metatag == CHDMETATAG_WILDCARD || metaentry->metatag == metatag)
@@ -2431,6 +2443,7 @@ static chd_error metadata_set_previous_next(chd_file *chd, UINT64 prevoffset, UI
 static chd_error metadata_set_length(chd_file *chd, UINT64 offset, UINT32 length)
 {
 	UINT8 raw_meta_header[METADATA_HEADER_SIZE];
+	UINT32 oldlength;
 	UINT32 count;
 
 	/* read the raw header */
@@ -2439,7 +2452,9 @@ static chd_error metadata_set_length(chd_file *chd, UINT64 offset, UINT32 length
 	if (count != sizeof(raw_meta_header))
 		return CHDERR_READ_ERROR;
 
-	/* update the length at offset 4 */
+	/* update the length at offset 4, preserving the flags in the upper byte */
+	oldlength = get_bigendian_uint32(&raw_meta_header[4]);
+	length = (length & 0x00ffffff) | (oldlength & 0xff000000);
 	put_bigendian_uint32(&raw_meta_header[4], length);
 
 	/* write the raw header */
@@ -2867,7 +2882,7 @@ static chd_error av_codec_postinit(chd_file *chd)
 		return CHDERR_OPERATION_PENDING;
 
 	/* get the metadata */
-	err = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+	err = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL, NULL);
 	if (err != CHDERR_NONE)
 		return err;
 
