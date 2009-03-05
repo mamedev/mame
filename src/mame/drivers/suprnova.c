@@ -1157,7 +1157,7 @@ ROM_START( galpans2 )
 	ROM_LOAD( "gs230000.u1",  0x000000, 0x400000, CRC(0348e8e1) SHA1(8a21c7e5cea0bc08a2595213d689c58c0251fdb5) )
 ROM_END
 
-ROM_START( galpns2a )
+ROM_START( galpans2a )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* SH-2 Code */
 	ROM_LOAD       ( "sknsa1.u10", 0x000000, 0x080000, CRC(745e5212) SHA1(caba649ab2d83b2d7e007eecee0fc582c019df38) ) /* Asia BIOS */
 
@@ -1623,7 +1623,7 @@ GAME( 1996, galpani4,  skns,     skns, cyvern,   galpani4,  ROT0,  "Kaneko", "Ga
 GAME( 1997, galpanis,  skns,     skns, galpanis, galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, cyvern,    skns,     skns, cyvern,   cyvern,    ROT90, "Kaneko", "Cyvern (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, galpans2,  skns,     skns, galpanis, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, galpns2a,  galpans2, skns, galpanis, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, galpans2a, galpans2, skns, galpanis, galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, galpansu,  galpans2, skns, galpanis, galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea)", GAME_IMPERFECT_GRAPHICS ) // official or hack?
 GAME( 1999, panicstr,  skns,     skns, galpanis, panicstr,  ROT0,  "Kaneko", "Panic Street (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1999, senknow ,  skns,     skns, skns,     senknow,   ROT0,  "Kaneko / Kouyousha", "Sen-Know (Japan)", GAME_IMPERFECT_GRAPHICS )
