@@ -3117,7 +3117,7 @@ ROM_START( von2 )	/* Step 2.0 */
 
 	ROM_REGION( 0x1000000, "samples", 0 )	/* SCSP samples */
 	/* WARNING: mpr- numbers here are a guess based on how other sets are ordered and may not be right.
-	If restoring a real PCB, go by the IC numbers in the extension! (.22, .24) */
+    If restoring a real PCB, go by the IC numbers in the extension! (.22, .24) */
 	ROM_LOAD( "mpr-20663.22",  0x000000, 0x400000, CRC(977eb6a4) SHA1(9dbba51630cbef2351d79b82ab6ae3af4aed99f0) )
 	ROM_LOAD( "mpr-20665.24",  0x400000, 0x400000, CRC(0efc0ca8) SHA1(1414becad21eb7d03d816a8cba47506f941b3c29) )
 	ROM_LOAD( "mpr-20664.23",  0x800000, 0x400000, CRC(89220782) SHA1(18a3585af960a76eb08f187223e9b69ad16809a1) )
@@ -3193,7 +3193,7 @@ ROM_START( von254g )	/* Step 2.0 */
 
 	ROM_REGION( 0x1000000, "samples", 0 )	/* SCSP samples */
 	/* WARNING: mpr- numbers here are a guess based on how other sets are ordered and may not be right.
-	If restoring a real PCB, go by the IC numbers in the extension! (.22, .24) */
+    If restoring a real PCB, go by the IC numbers in the extension! (.22, .24) */
 	ROM_LOAD( "mpr-20663.22",  0x000000, 0x400000, CRC(977eb6a4) SHA1(9dbba51630cbef2351d79b82ab6ae3af4aed99f0) )
 	ROM_LOAD( "mpr-20665.24",  0x400000, 0x400000, CRC(0efc0ca8) SHA1(1414becad21eb7d03d816a8cba47506f941b3c29) )
 	ROM_LOAD( "mpr-20664.23",  0x800000, 0x400000, CRC(89220782) SHA1(18a3585af960a76eb08f187223e9b69ad16809a1) )

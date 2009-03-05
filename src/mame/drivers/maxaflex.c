@@ -435,7 +435,7 @@ static MACHINE_DRIVER_START( a600xl )
 
 	MDRV_CPU_ADD("mcu", M68705, 3579545)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem,0)
-	
+
 	MDRV_PIA6821_ADD("pia", a600xl_pia_interface)
 
 	/* video hardware */

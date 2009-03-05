@@ -35,10 +35,10 @@ WRITE8_HANDLER( cm_outport0_w )
         ---- --x-  (fg enable)
         ---- -x--  (girl enable?)
         ---- x---  (reels enable)
-		
-		xxxx ----  unused?
-		
-	*/
+
+        xxxx ----  unused?
+
+    */
 	//popmessage("%02x",data);
 }
 
@@ -156,7 +156,7 @@ VIDEO_START( goldstar )
 
 	goldstar_fg_tilemap = tilemap_create(machine,get_goldstar_fg_tile_info,tilemap_scan_rows,8,8, 64, 32);
 	tilemap_set_transparent_pen(goldstar_fg_tilemap,0);
-	
+
 	// is there an enable reg for this game?
 	cm_enable_reg = 0x0b;
 }
@@ -236,12 +236,12 @@ static const rectangle am1a_visible3 = { 0*8, (14+48)*8-1, 16*8, (16+6)*8-1 };
 VIDEO_UPDATE( goldstar )
 {
 	int i;
-	
+
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (!cm_enable_reg &0x01)
-		return 0;	
-		
+		return 0;
+
 	if (cm_enable_reg &0x08)
 	{
 		for (i= 0;i < 64;i++)
@@ -256,7 +256,7 @@ VIDEO_UPDATE( goldstar )
 		tilemap_draw(bitmap, &visible2, goldstar_reel2_tilemap, 0, 0);
 		tilemap_draw(bitmap, &visible3, goldstar_reel3_tilemap, 0, 0);
 	}
-	
+
 	if (cm_enable_reg &0x04)
 	{
 		if (memory_region(screen->machine,"user1"))
@@ -265,12 +265,12 @@ VIDEO_UPDATE( goldstar )
 			drawgfxzoom(bitmap,gfx,cmaster_girl_num,cmaster_girl_pal,0,0,32*8,16*8,cliprect,TRANSPARENCY_PEN,0, 0x20000, 0x10000);
 		}
 	}
-	
+
 	if (cm_enable_reg &0x02)
 	{
 		tilemap_draw(bitmap,cliprect, goldstar_fg_tilemap, 0, 0);
 	}
-	
+
 	return 0;
 }
 
@@ -281,10 +281,10 @@ VIDEO_UPDATE( cmast91 )
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (!cm_enable_reg &0x01)
-		return 0;	
-	
+		return 0;
+
 	if (cm_enable_reg &0x08)
-	{		
+	{
 		for (i= 0;i < 64;i++)
 		{
 			tilemap_set_scrolly(goldstar_reel1_tilemap, i, goldstar_reel1_scroll[i]);
@@ -298,10 +298,10 @@ VIDEO_UPDATE( cmast91 )
 	}
 
 	if (cm_enable_reg &0x02)
-	{	
+	{
 		tilemap_draw(bitmap, cliprect, goldstar_fg_tilemap, 0, 0);
 	}
-	
+
 	return 0;
 }
 
@@ -312,7 +312,7 @@ VIDEO_UPDATE( amcoe1a )
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (!cm_enable_reg &0x01)
-		return 0;	
+		return 0;
 
 	if (cm_enable_reg &0x08)
 	{
@@ -327,14 +327,14 @@ VIDEO_UPDATE( amcoe1a )
 		tilemap_draw(bitmap, &am1a_visible2, goldstar_reel2_tilemap, 0, 0);
 		tilemap_draw(bitmap, &am1a_visible3, goldstar_reel3_tilemap, 0, 0);
 	}
-		
+
 	if (cm_enable_reg &0x04)
 	{
 		// no girls
 	}
-		
+
 	if (cm_enable_reg &0x02)
-	{	
+	{
 		tilemap_draw(bitmap, cliprect, goldstar_fg_tilemap, 0, 0);
 	}
 

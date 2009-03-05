@@ -437,7 +437,7 @@ void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 		if(hscr & 0x8000) {
 			UINT16 *hscrtb = sys24_tile_ram + 0x4000 + 0x200*layer;
-		
+
 			switch((ctrl & 0x6000) >> 13) {
 			case 1: {
 				int y;
@@ -507,7 +507,7 @@ void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle
 					c2.min_y = v;
 				if(!((-vscr) & 0x200))
 					layer ^= 1;
-				
+
 				tilemap_draw(bitmap, &c1, sys24_tile_layer[layer],   tpri, lpri);
 				tilemap_draw(bitmap, &c2, sys24_tile_layer[layer^1], tpri, lpri);
 				break;
@@ -523,7 +523,7 @@ void sys24_tile_draw(running_machine *machine, bitmap_t *bitmap, const rectangle
 					c2.min_x = h;
 				if(!((+hscr) & 0x200))
 					layer ^= 1;
-				
+
 				tilemap_draw(bitmap, &c1, sys24_tile_layer[layer],   tpri, lpri);
 				tilemap_draw(bitmap, &c2, sys24_tile_layer[layer^1], tpri, lpri);
 				break;
@@ -667,10 +667,10 @@ void sys24_sprite_vh_start(running_machine *machine)
       Clip?
     0   01---nnn    nnnnnnnn    next sprite
     1   hVH-----    --------    hide/vflip/hflip
-	2   -------y    yyyyyyyy    Clip top
-	2   -------x    xxxxxxxx    Clip left
-	2   -------y    yyyyyyyy    Clip bottom
-	2   -------x    xxxxxxxx    Clip right
+    2   -------y    yyyyyyyy    Clip top
+    2   -------x    xxxxxxxx    Clip left
+    2   -------y    yyyyyyyy    Clip bottom
+    2   -------x    xxxxxxxx    Clip right
 
       Skipped entry
     0   10---nnn    nnnnnnnn    next sprite

@@ -535,7 +535,7 @@ static MACHINE_DRIVER_START( r2dtank )
 	/* 74LS123 */
 
 	MDRV_TTL74123_ADD("74123", ttl74123_intf)
-	
+
 	MDRV_PIA6821_ADD("pia_main", pia_main_intf)
 	MDRV_PIA6821_ADD("pia_audio", pia_audio_intf)
 

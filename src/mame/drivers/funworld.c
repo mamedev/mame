@@ -2017,7 +2017,7 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
-	
+
 	MDRV_PIA6821_ADD("pia0", pia0_intf)
 	MDRV_PIA6821_ADD("pia1", pia1_intf)
 

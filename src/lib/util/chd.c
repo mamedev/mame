@@ -1199,7 +1199,7 @@ chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, cons
 	/* must write at least 1 byte */
 	if (inputlen < 1)
 		return CHDERR_INVALID_PARAMETER;
-	
+
 	/* no more than 16MB */
 	if (inputlen >= 16 * 1024 * 1024)
 		return CHDERR_INVALID_PARAMETER;
@@ -2372,7 +2372,7 @@ static chd_error metadata_find_entry(chd_file *chd, UINT32 metatag, UINT32 metai
 		metaentry->metatag = get_bigendian_uint32(&raw_meta_header[0]);
 		metaentry->length = get_bigendian_uint32(&raw_meta_header[4]);
 		metaentry->next = get_bigendian_uint64(&raw_meta_header[8]);
-		
+
 		/* checksum is encoded as the high bit of length */
 		metaentry->flags = metaentry->length >> 24;
 		metaentry->length &= 0x00ffffff;

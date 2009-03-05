@@ -690,7 +690,7 @@ static MACHINE_DRIVER_START( nyny )
 	/* 74LS123 */
 
 	MDRV_TTL74123_ADD("ic48_1", ic48_1_config)
-	
+
 	MDRV_PIA6821_ADD("pia1", pia_1_intf)
 	MDRV_PIA6821_ADD("pia2", pia_2_intf)
 

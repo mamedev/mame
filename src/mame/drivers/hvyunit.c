@@ -1,7 +1,7 @@
 /***************************************************************************************
 
  driver based on djboy.c / airbustr.c
- 
+
  PROTECTION SIMULATION IS VERY PRELIMINARY AND SHOULD BE TREATED AS 100% GUESSWORK
 
 
@@ -82,18 +82,18 @@ static MACHINE_RESET( mermaid )
 	/* ticks for the attract mode. */
 	mcu_ram.attract_timer = 0;
 	/*
-	helper for the program flow.
-	0 = title screen
-	1 = demo mode
-	2 = ranking
-	3 = Push 1p button
-	4 = Push 1p AND/OR 2p button
-	5 = player 1 plays
-	6 = player 2 plays
-	7 = service mode
-	8 = game over screen
-	...
-	*/
+    helper for the program flow.
+    0 = title screen
+    1 = demo mode
+    2 = ranking
+    3 = Push 1p button
+    4 = Push 1p AND/OR 2p button
+    5 = player 1 plays
+    6 = player 2 plays
+    7 = service mode
+    8 = game over screen
+    ...
+    */
 	mcu_ram.program_flow = 0;
 	if(input_port_read(machine, "DSW1") & 4) //service mode
 		mcu_ram.program_flow = 7;
@@ -102,7 +102,7 @@ static MACHINE_RESET( mermaid )
 
 static WRITE8_HANDLER( mermaid_data_w )
 {
-//	printf("%02x\n",data);
+//  printf("%02x\n",data);
 	if(mcu_ram.access_ram_w)
 	{
 		mcu_ram.internal_ram[(mcu_ram.internal_ram_index++)&0x7f] = data;
@@ -136,14 +136,14 @@ static READ8_HANDLER( mermaid_data_r )
 		return mcu_ram.internal_ram[(mcu_ram.internal_ram_index++)&0x7f];
 	}
 
-//	popmessage("%02x",test_mcu);
+//  popmessage("%02x",test_mcu);
 
 	switch(mcu_data)
 	{
 		/*
-		pc=55f1
-		store internal mcu ram values, not yet handled.
-		*/
+        pc=55f1
+        store internal mcu ram values, not yet handled.
+        */
 		case 0:
 		{
 			/*next data will be an internal protection RAM read*/
@@ -151,26 +151,26 @@ static READ8_HANDLER( mermaid_data_r )
 			return 0;
 		}
 		/*
-		(PC=4f20) 01 $e003 = val
-		(PC=4f2b) 01 $e004 = val
-		(PC=4f5c) 01 val > 0xa and e06f = val coin counter (5)
-			0 = title screen
-			4 = "push 1p button"
-			5 = "push 2p button"
-			6 = copyright Kaneko msg (what is for?)
-			7 = ranking
-			8 = (trigger) attract mode
-			b = (trigger?) player 1 plays
-			c = (trigger?) player 2 plays
-			0x10 = game over screen
-			0x80 = coin error! msg
-		(PC=4f82) 01 val<<=1 and check if < 0 program flow (6)
-		(PC=4ef3) 01 $e06c = val, (complement it and AND $3)
-		(PC=4f13) 01 $e06d = $e06e = val
-		(PC=4f13) 01
-		(PC=14b3) 01
-		(PC=14ca) 81
-		*/
+        (PC=4f20) 01 $e003 = val
+        (PC=4f2b) 01 $e004 = val
+        (PC=4f5c) 01 val > 0xa and e06f = val coin counter (5)
+            0 = title screen
+            4 = "push 1p button"
+            5 = "push 2p button"
+            6 = copyright Kaneko msg (what is for?)
+            7 = ranking
+            8 = (trigger) attract mode
+            b = (trigger?) player 1 plays
+            c = (trigger?) player 2 plays
+            0x10 = game over screen
+            0x80 = coin error! msg
+        (PC=4f82) 01 val<<=1 and check if < 0 program flow (6)
+        (PC=4ef3) 01 $e06c = val, (complement it and AND $3)
+        (PC=4f13) 01 $e06d = $e06e = val
+        (PC=4f13) 01
+        (PC=14b3) 01
+        (PC=14ca) 81
+        */
 		case 1:
 		{
 			switch(mcu_ram_mux[1])
@@ -228,20 +228,20 @@ static READ8_HANDLER( mermaid_data_r )
 			return res;
 		}
 		/*
-		(PC=4fbe) 03 ? (Is it read?)
-		*/
+        (PC=4fbe) 03 ? (Is it read?)
+        */
 		case 3:  return mame_rand(space->machine);
 		/*
-		(PC=4e4d) 06 complement and put it to e06a
-		(PC=4e59) 06 $e019 = val
-		(PC=4f5c) 06 $e06f = val if NOT > 09
-		(PC=4f82) 06 val<<=1 and check if < 0
-		*/
-//		case 6: return 0;
+        (PC=4e4d) 06 complement and put it to e06a
+        (PC=4e59) 06 $e019 = val
+        (PC=4f5c) 06 $e06f = val if NOT > 09
+        (PC=4f82) 06 val<<=1 and check if < 0
+        */
+//      case 6: return 0;
 		/*
-		pc=5621 put the value to e003 (and 8)
-		pc=562f put the value to e004 (and 4)
-		*/
+        pc=5621 put the value to e003 (and 8)
+        pc=562f put the value to e004 (and 4)
+        */
 		/* read back dsw. */
 		case 0xff: return 0;
 	}
@@ -262,13 +262,13 @@ static READ8_HANDLER( mermaid_data_r )
 static READ8_HANDLER( mermaid_status_r )
 {
 	static UINT8 unk_bit,mcu_status = 8;
-//	printf("R St\n");
+//  printf("R St\n");
 
 	unk_bit^=4;
 	mcu_status^=8;
 
 	return mcu_status | unk_bit | 0x10;
-//	return mame_rand(space->machine);
+//  return mame_rand(space->machine);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -291,11 +291,11 @@ static VIDEO_START(hvyunit)
 
 static VIDEO_UPDATE(hvyunit)
 {
-	
+
 	tilemap_set_scrollx( bg_tilemap,0, ((port0_data&0x40)<<2)+ hu_scrollx + SX_POS); //TODO
 	tilemap_set_scrolly( bg_tilemap,0, ((port0_data&0x80)<<1)+ hu_scrolly + SY_POS); // TODO
 
-//	popmessage("%02x %02x",hu_scrollx[0],hu_scrolly[0]);
+//  popmessage("%02x %02x",hu_scrollx[0],hu_scrolly[0]);
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
@@ -399,10 +399,10 @@ static ADDRESS_MAP_START(sub_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x08, 0x08) AM_WRITE(hu_scrollx_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(mermaid_status_r)
 	AM_RANGE(0x0e, 0x0e) AM_RAM
-	
-//	AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065 
-//	AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
-	
+
+//  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
+//  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
+
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sound_bankswitch_w )

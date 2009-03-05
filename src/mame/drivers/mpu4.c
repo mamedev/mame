@@ -1851,7 +1851,7 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 	MDRV_CPU_PROGRAM_MAP(mod2_memmap,0)
 
 	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
-	
+
 	MDRV_PIA6821_ADD("pia_ic3", pia_ic3_intf)
 	MDRV_PIA6821_ADD("pia_ic4", pia_ic4_intf)
 	MDRV_PIA6821_ADD("pia_ic5", pia_ic5_intf)

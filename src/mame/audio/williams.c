@@ -196,7 +196,7 @@ static const ym2151_interface adpcm_ym2151_interface =
 MACHINE_DRIVER_START( williams_cvsd_sound )
 	MDRV_CPU_ADD("cvsdcpu", M6809E, CVSD_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_cvsd_map,0)
-	
+
 	MDRV_PIA6821_ADD("cvsdpia", cvsd_pia_intf)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")

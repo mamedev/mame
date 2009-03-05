@@ -1341,7 +1341,7 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
 		0,		/* Modelled separately */
 		0, 1};
 
-/* R49 has 4.7k in schematics, but listed as 47k in bill of material 
+/* R49 has 4.7k in schematics, but listed as 47k in bill of material
  * 47k gives proper low pass filtering
  */
 #define BTIME_R49	RES_K(47)
@@ -1352,16 +1352,16 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
  *
  * With R51 being 1K, the gain is way to high (23.5). Therefore R51
  * is set to 5k, but this is a hack. With the modification,
- * sound levels are in line with observations. 
+ * sound levels are in line with observations.
  * FIXME: Verify R51,R50,R52 and R49 on real pcb
- * 
+ *
  * http://www.coinopvideogames.com/videogames01.php
- * There are two recordings from 1982 where the filtered sound is way louder 
+ * There are two recordings from 1982 where the filtered sound is way louder
  * than the music. There is a later recording
  * http://www.coinopvideogames.com/videogames03.php
  * in which the filtered sounds have volumes closer to the music.
- * 
- */ 
+ *
+ */
 
 #define BTIME_R52	RES_K(1)
 #define BTIME_R51	RES_K(5) 	/* schematics 1k */
@@ -1390,17 +1390,17 @@ static DISCRETE_SOUND_START( btime_sound )
 
 	DISCRETE_MIXER2(NODE_40, 1, NODE_22, NODE_30, &btime_sound_mixer_desc)
 	DISCRETE_CRFILTER(NODE_41, 1, NODE_40, RES_K(10), CAP_U(10))
-	
+
 	/* Amplifier is upc1181H3
-	 * 
-	 * http://www.mydarc.de/dj7oh/fad/ics/upc1181/upc1181.htm 
-	 * 
-	 * A linear frequency response is mentioned as well as a lower
-	 * edge frequency determined by cap on pin3, however no formula given.
-	 * 
-	 * not modelled here
-	 */
-	
+     *
+     * http://www.mydarc.de/dj7oh/fad/ics/upc1181/upc1181.htm
+     *
+     * A linear frequency response is mentioned as well as a lower
+     * edge frequency determined by cap on pin3, however no formula given.
+     *
+     * not modelled here
+     */
+
 	/* Assuming a 4 Ohm impedance speaker */
 	DISCRETE_CRFILTER(NODE_43, 1, NODE_41, 3.0, CAP_U(100))
 

@@ -123,14 +123,14 @@ static INT8 maxrpm_p2_shift;
 
 static READ8_HANDLER( demoderm_ip1_r )
 {
-	return input_port_read(space->machine, "MONO.IP1") | 
+	return input_port_read(space->machine, "MONO.IP1") |
 		(input_port_read(space->machine, input_mux ? "MONO.IP1.ALT2" : "MONO.IP1.ALT1") << 2);
 }
 
 
 static READ8_HANDLER( demoderm_ip2_r )
 {
-	return input_port_read(space->machine, "MONO.IP2") | 
+	return input_port_read(space->machine, "MONO.IP2") |
 		(input_port_read(space->machine, input_mux ? "MONO.IP2.ALT2" : "MONO.IP2.ALT1") << 2);
 }
 
@@ -536,7 +536,7 @@ static INPUT_PORTS_START( demoderm )
 
 	PORT_START("MONO.IP1.ALT1")	/* J2 10-13,15-18 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
-	
+
 	PORT_START("MONO.IP1.ALT2")	/* IN1 (muxed) -- the high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(3)
 
@@ -546,7 +546,7 @@ static INPUT_PORTS_START( demoderm )
 
 	PORT_START("MONO.IP2.ALT1")	/* J3 1-8 */	/* The high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
-	
+
 	PORT_START("MONO.IP2.ALT2")	/* IN2 (muxed) -- the high 6 bits contain the steering wheel value */
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(4)
 

@@ -586,14 +586,14 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 
 static READ8_HANDLER( demoderb_ip1_r )
 {
-	return input_port_read(space->machine, "SSIO.IP1") | 
+	return input_port_read(space->machine, "SSIO.IP1") |
 		(input_port_read(space->machine, input_mux ? "SSIO.IP1.ALT2" : "SSIO.IP1.ALT1") << 2);
 }
 
 
 static READ8_HANDLER( demoderb_ip2_r )
 {
-	return input_port_read(space->machine, "SSIO.IP2") | 
+	return input_port_read(space->machine, "SSIO.IP2") |
 		(input_port_read(space->machine, input_mux ? "SSIO.IP2.ALT2" : "SSIO.IP2.ALT1") << 2);
 }
 

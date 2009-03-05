@@ -1326,8 +1326,8 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 
 /*-------------------------------------------------
-    memory_install_read_port_handler - install a 
-    new 8-bit input port handler into the given 
+    memory_install_read_port_handler - install a
+    new 8-bit input port handler into the given
     address space
 -------------------------------------------------*/
 

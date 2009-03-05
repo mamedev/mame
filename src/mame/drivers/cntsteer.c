@@ -12,7 +12,7 @@
     todo:
     finish
         sprite fixes
-		correct roz rotation
+        correct roz rotation
         colour fixes for the sprites
         Dip-Switches
         make cntsteer work, comms looks awkward and probably different than Zero Target
@@ -178,10 +178,10 @@ static VIDEO_UPDATE( zerotrgt )
 */
 static WRITE8_HANDLER(cntsteer_vregs_w)
 {
-//	static UINT8 test[5];
+//  static UINT8 test[5];
 
-//	test[offset] = data;
-//	popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
+//  test[offset] = data;
+//  popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
 
 	switch(offset)
 	{

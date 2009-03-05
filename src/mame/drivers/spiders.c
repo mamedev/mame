@@ -726,7 +726,7 @@ static MACHINE_DRIVER_START( spiders )
 	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	/* 74LS123 */
-	
+
 	MDRV_PIA6821_ADD("pia1", pia_1_intf)
 	MDRV_PIA6821_ADD("pia2", pia_2_intf)
 	MDRV_PIA6821_ADD("pia3", pia_3_intf)

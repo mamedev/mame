@@ -10,7 +10,7 @@
   Mostly rewritten by couriersud in 2008
 
   Games using ADSR: gyruss
-  
+
   TODO:
   * The AY8930 has an extended mode which is currently
     not emulated.
@@ -287,7 +287,7 @@ static const ay_ym_param ay8910_param =
 
 /*
  * RL = 2000, Based on Matthew Westcott's measurements from Dec 2001.
- * 
+ *
  * http://groups.google.com/group/comp.sys.sinclair/browse_thread/thread/fb3091da4c4caf26/d5959a800cda0b5e?lnk=gst&q=Matthew+Westcott#d5959a800cda0b5e
  * After what Russell mentioned a couple of weeks back about the lack of
  * publicised measurements of AY chip volumes - I've finally got round to
@@ -298,7 +298,7 @@ static const ay_ym_param ay8910_param =
  * channel C (setting bits 2 and 5 of register 6), and varied the amplitude
  * (the low 4 bits of register 10). The voltages were measured between the
  * channel C output (pin 1) and ground (pin 6).
- * 
+ *
  * Level  Voltage
  *  0     1.147
  *  1     1.162
@@ -812,14 +812,14 @@ void ay8910_reset_ym(void *chip)
 	ay8910_write_reg(psg, AY_BCOARSE, 2);
 	ay8910_write_reg(psg, AY_CFINE, 0);
 	ay8910_write_reg(psg, AY_CCOARSE, 4);
-	//#define AY_NOISEPER	(6)
+	//#define AY_NOISEPER   (6)
 	ay8910_write_reg(psg, AY_ENABLE, ~7);
 	ay8910_write_reg(psg, AY_AVOL, 10);
 	ay8910_write_reg(psg, AY_BVOL, 10);
 	ay8910_write_reg(psg, AY_CVOL, 10);
-	//#define AY_EFINE	(11)
-	//#define AY_ECOARSE	(12)
-	//#define AY_ESHAPE	(13)
+	//#define AY_EFINE  (11)
+	//#define AY_ECOARSE    (12)
+	//#define AY_ESHAPE (13)
 #endif
 }
 

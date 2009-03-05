@@ -2308,7 +2308,7 @@ static MACHINE_DRIVER_START( goldnpkr_base )
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
-	
+
 	MDRV_PIA6821_ADD("pia0", goldnpkr_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", goldnpkr_pia1_intf)
 

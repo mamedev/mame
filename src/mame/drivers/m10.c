@@ -126,7 +126,7 @@ Notes (couriersud)
 
 #define DEBUG		(0)
 
-#define LOG(x) do { if (DEBUG) printf x; } while (0) 
+#define LOG(x) do { if (DEBUG) printf x; } while (0)
 
 static WRITE8_DEVICE_HANDLER(ic8j1_output_changed)
 {

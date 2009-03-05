@@ -729,7 +729,7 @@ static MACHINE_DRIVER_START( catnmous )
 	MDRV_CPU_ADD("audiocpu", M6802,3580000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(catnmous_sound_map,0)
 	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle, (double)3580000/4096)
-	
+
 	MDRV_PIA6821_ADD("pia", pia_intf)
 
 	/* video hardware */

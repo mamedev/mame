@@ -888,7 +888,7 @@ static MACHINE_DRIVER_START( zwackery )
 //  MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_MACHINE_START(zwackery)
 	MDRV_MACHINE_RESET(zwackery)
-	
+
 	MDRV_PIA6821_ADD("pia0", zwackery_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", zwackery_pia1_intf)
 	MDRV_PIA6821_ADD("pia2", zwackery_pia2_intf)

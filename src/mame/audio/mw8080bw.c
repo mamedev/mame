@@ -787,14 +787,14 @@ static DISCRETE_SOUND_START(boothill)
      * Combine all sound sources.
      ************************************************/
 	/* There is a 1uF cap on the input to the amp that I was too lazy to simulate.
-	 * It is just a DC blocking cap needed by the Norton amp.  Doing the extra
-	 * work to simulate it is not going to make a difference to the waveform
-	 * or to how it sounds.  Also I use a regular amp in place of the Norton
-	 * for the same reasons.  Ease of coding/simulation. */
+     * It is just a DC blocking cap needed by the Norton amp.  Doing the extra
+     * work to simulate it is not going to make a difference to the waveform
+     * or to how it sounds.  Also I use a regular amp in place of the Norton
+     * for the same reasons.  Ease of coding/simulation. */
 
 	/* The schematics show the Hit sounds as shown.
-	 * This makes the death of the enemy sound on the players side.
-	 * This should be verified. */
+     * This makes the death of the enemy sound on the players side.
+     * This should be verified. */
 
 	DISCRETE_MIXER2(NODE_91, BOOTHILL_GAME_ON_EN, BOOTHILL_L_SHOT_SND, BOOTHILL_L_HIT_SND, &boothill_l_mixer)
 

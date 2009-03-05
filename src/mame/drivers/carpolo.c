@@ -237,7 +237,7 @@ static MACHINE_DRIVER_START( carpolo )
                                                        times a sec, so it's a good place */
 	MDRV_MACHINE_START(carpolo)
 	MDRV_MACHINE_RESET(carpolo)
-	
+
 	MDRV_PIA6821_ADD("pia0", carpolo_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", carpolo_pia1_intf)
 

@@ -519,7 +519,7 @@ VIDEO_START( decocass )
 	gfx_element_set_source(machine->gfx[3], decocass_objectram);
 
 	/* This should ensure that the fake 17th tile is left blank
-	 * now that dirty-tile tracking is handled by the core */
+     * now that dirty-tile tracking is handled by the core */
 	gfx_element_decode(machine->gfx[2], 16);
 }
 

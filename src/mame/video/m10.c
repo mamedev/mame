@@ -65,7 +65,7 @@ WRITE8_HANDLER( m10_colorram_w )
 WRITE8_HANDLER( m10_chargen_w )
 {
 	m10_state *state = space->machine->driver_data;
-	
+
 	if (state->chargen[offset] != data)
 	{
 		state->chargen[offset] = data;

@@ -377,7 +377,7 @@ static WRITE8_HANDLER ( daisyari_bank_w )
 	dsw_select = (data & 0xc);
 
 	address = 0x10000 + ((data & 0x30)>>4) * 0x10000 + (data & 0x1) * 0x8000;
-//	printf("%08x %02x\n",address,data);
+//  printf("%08x %02x\n",address,data);
 
 	memory_set_bankptr(space->machine, 1,&rom[address]);
 
@@ -388,7 +388,7 @@ static READ8_HANDLER ( mjclub_dsw_r )
 {
 	switch (dsw_select)
 	{
-//		case 0x00: return input_port_read(space->machine, "DSW4");
+//      case 0x00: return input_port_read(space->machine, "DSW4");
 		case 0x40: return input_port_read(space->machine, "DSW2");
 		case 0x80: return input_port_read(space->machine, "DSW3");
 		case 0xc0: return input_port_read(space->machine, "DSW4");
@@ -407,7 +407,7 @@ static WRITE8_HANDLER ( mjclub_bank_w )
 	data &= 0x0f;
 
 	address = 0x10000 + data * 0x8000;
-//	printf("%08x\n",address);
+//  printf("%08x\n",address);
 
 	memory_set_bankptr(space->machine, 1,&rom[address]);
 

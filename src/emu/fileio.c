@@ -896,7 +896,7 @@ static int zip_filename_match(const zip_file_header *header, const astring *file
 }
 
 /*-------------------------------------------------
-    zip_header_is_path - check whether filename 
+    zip_header_is_path - check whether filename
                          in header is a path
   -------------------------------------------------*/
 

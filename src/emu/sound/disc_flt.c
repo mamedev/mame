@@ -1042,7 +1042,7 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 			node->output[0] = context->vCap[1] + (DST_RCFILTER_SW__VIN - context->vCap[1]) * context->factor;
 			break;
 		default:
-			for (j = 0; j < DST_RCFILTER_SW_ITERATIONS; j++) 
+			for (j = 0; j < DST_RCFILTER_SW_ITERATIONS; j++)
 			{
 				for (i = 0; i < 4; i++)
 				{

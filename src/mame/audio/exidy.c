@@ -814,7 +814,7 @@ MACHINE_DRIVER_START( venture_audio )
 	MDRV_CPU_PROGRAM_MAP(venture_audio_map,0)
 
 	MDRV_RIOT6532_ADD("riot", SH6532_CLOCK, r6532_interface)
-	
+
 	MDRV_PIA6821_ADD("pia0", venture_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", venture_pia1_intf)
 

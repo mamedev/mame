@@ -2103,7 +2103,7 @@ static MACHINE_DRIVER_START( sys386f2 )
 	MDRV_CPU_VBLANK_INT("screen", spi_interrupt)
 
 	/* no z80? */
-	
+
 	MDRV_NVRAM_HANDLER(sxx2f)
 	MDRV_MACHINE_RESET(seibu386)
 

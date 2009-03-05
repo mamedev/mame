@@ -364,7 +364,7 @@ static void build_command_line(int argc, char *argv[])
 
 			// else keep looking
 		}
-		
+
 		// if we didn't match, process
 		if (!matched)
 		{

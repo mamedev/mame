@@ -1794,7 +1794,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
 	MDRV_CPU_PROGRAM_MAP(sound3812_map,0)
-	
+
 	MDRV_PIA6821_ADD("pia", pia_interface)
 
 	/* sound hardware */

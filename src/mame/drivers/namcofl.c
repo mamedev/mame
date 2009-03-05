@@ -568,7 +568,7 @@ ROM_START( speedrcr )
 	ROM_REGION16_LE( 0x4000, "c75", 0 ) // C75 program
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data 
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // C75 data
 	ROM_LOAD("se1_spr.21l",   0x000000,  0x80000, CRC(850a27ac) SHA1(7d5db840ec67659a1f2e69a62cdb03ce6ee0b47b) )
 
 	ROM_REGION( 0x200000, NAMCONB1_ROTGFXREGION, 0 )	// "RCHAR" (roz characters)

@@ -8260,7 +8260,7 @@ static MACHINE_DRIVER_START( inttoote )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(inttoote_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(inttoote_interrupt,8+1+1+1)
-	
+
 	MDRV_PIA6821_ADD("pia0", inttoote_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", inttoote_pia1_intf)
 
@@ -9097,17 +9097,17 @@ ROM_START( jjsquawb )
 	ROM_REGION( 0x400000, "gfxtemp", 0  )
 	ROM_LOAD( "3.bin",  0x000000, 0x200000, CRC(b1e3a4bb) SHA1(be2241a4fbb99444487e7b550faac4ee1ee1ad15) )
 	ROM_LOAD( "1.bin",  0x200000, 0x200000, CRC(a5d37cf7) SHA1(9573777f3cdd6b25f0bd56f65f583fddda21c900) )
-	
+
 	ROM_REGION( 0x200000, "gfx2", 0 )	/* Layer 1 */
 	ROM_COPY( "gfxtemp", 0x000000, 0x000000, 0x100000 )
 	ROM_COPY( "gfxtemp", 0x200000, 0x100000, 0x100000 )
 
-	
+
 	ROM_REGION( 0x200000, "gfx3", 0 )	/* Layer 2 */
 	ROM_COPY( "gfxtemp", 0x100000, 0x000000, 0x100000 )
 	ROM_COPY( "gfxtemp", 0x300000, 0x100000, 0x100000 )
 
-		
+
 	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
 	ROM_LOAD( "1", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* jj-rom5.040 + jj-rom6.040 from jjsquawk */
 ROM_END

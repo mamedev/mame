@@ -13,7 +13,7 @@
     Note:
     * The sound board uses a 14.318 MHz xtal.
     * The cpu/video board uses a 18.432 MHz xtal.
-     
+
     Todo:
     * Discrete filters
     * Starfield

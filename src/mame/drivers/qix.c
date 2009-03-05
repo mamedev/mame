@@ -563,7 +563,7 @@ static MACHINE_DRIVER_START( qix_base )
 
 	MDRV_MACHINE_RESET(qix)
 	MDRV_NVRAM_HANDLER(generic_0fill)
-	
+
 	MDRV_PIA6821_ADD("pia0", qix_pia_0_intf)
 	MDRV_PIA6821_ADD("pia1", qix_pia_1_intf)
 	MDRV_PIA6821_ADD("pia2", qix_pia_2_intf)
