@@ -502,7 +502,7 @@ static WRITE16_HANDLER( scudhamm_paletteram16_w )
 }
 
 
-static UINT16 scudhamm_motor_command;
+UINT16 scudhamm_motor_command;
 
 /*  Motor Status.
 
@@ -512,14 +512,14 @@ static UINT16 scudhamm_motor_command;
     ---- ---- ---- --1-     Up Limit
     ---- ---- ---- ---0     Down Limit  */
 
-static READ16_HANDLER( scudhamm_motor_status_r )
+READ16_HANDLER( scudhamm_motor_status_r )
 {
 //  return 1 << (mame_rand(space->machine)&1);         // Motor Status
 	return scudhamm_motor_command;	// Motor Status
 }
 
 
-static READ16_HANDLER( scudhamm_motor_pos_r )
+READ16_HANDLER( scudhamm_motor_pos_r )
 {
 	return 0x00 << 8;
 }
@@ -539,7 +539,7 @@ static WRITE16_HANDLER( scudhamm_motor_command_w )
 }
 
 
-static READ16_HANDLER( scudhamm_analog_r )
+READ16_HANDLER( scudhamm_analog_r )
 {
 	return input_port_read(space->machine, "IN1");
 }
