@@ -504,7 +504,7 @@ static void ctc_interrupt(const device_config *device, int state)
 }
 
 
-static z80ctc_interface ctc_intf =
+static const z80ctc_interface ctc_intf =
 {
 	0,              	/* timer disables */
 	ctc_interrupt,  	/* interrupt handler */

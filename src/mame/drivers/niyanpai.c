@@ -170,7 +170,7 @@ static void ctc0_interrupt(const device_config *device, int state)
 	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 }
 
-static z80ctc_interface ctc_intf =
+static const z80ctc_interface ctc_intf =
 {
 	0,					/* timer disables */
 	ctc0_interrupt,		/* interrupt handler */

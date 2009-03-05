@@ -15,7 +15,7 @@
  *
  *************************************/
 
-struct
+static struct
 {
 	UINT8 *colour_buf;
 	UINT8 *intensity_buf;

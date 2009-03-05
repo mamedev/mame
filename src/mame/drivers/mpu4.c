@@ -1706,7 +1706,7 @@ static DRIVER_INIT (m_ccelbr)
 
 }
 
-DRIVER_INIT (m_gmball)
+static DRIVER_INIT (m_gmball)
 {
 	int x;
 	static const UINT8 chr_table[72]= {	0x00,0x0C,0x50,0x90,0xB0,0x38,0xD4,0xA0,

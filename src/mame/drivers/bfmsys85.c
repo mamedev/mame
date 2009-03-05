@@ -99,8 +99,8 @@ static UINT8 Inputs[64];		  // ??  multiplexed inputs
 // Serial Communications (Where does this go?) ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-UINT8 sys85_data_line_r;
-UINT8 sys85_data_line_t;
+static UINT8 sys85_data_line_r;
+static UINT8 sys85_data_line_t;
 
 static READ_LINE_DEVICE_HANDLER( sys85_data_r )
 {

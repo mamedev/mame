@@ -1412,7 +1412,7 @@ static const vgconf avg_quantum =
 	avg_vgrst
 };
 
-static vgconf avg_tomcat =
+static const vgconf avg_tomcat =
 {
 	{
 		avg_latch0,

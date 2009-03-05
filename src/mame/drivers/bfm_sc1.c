@@ -1012,7 +1012,7 @@ INPUT_PORTS_END
 
 // input ports for scorpion1 board ////////////////////////////////////////
 
-INPUT_PORTS_START( clatt )
+static INPUT_PORTS_START( clatt )
 	PORT_START("STROBE0")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("10p")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("20p")
@@ -1124,7 +1124,7 @@ INPUT_PORTS_START( clatt )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( toppoker )
+static INPUT_PORTS_START( toppoker )
 	PORT_START("STROBE0")
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(3) PORT_NAME("Fl 5.00")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(3) PORT_NAME("Fl 2.50")
@@ -1359,7 +1359,7 @@ static void sc1_common_init(running_machine *machine, int reels, int decrypt)
 	}
 }
 
-DRIVER_INIT(toppoker)
+static DRIVER_INIT(toppoker)
 {
 	sc1_common_init(machine,3,1);
 	adder2_decode_char_roms(machine);	// decode GFX roms
@@ -1368,7 +1368,7 @@ DRIVER_INIT(toppoker)
 	BFM_BD1_init(0);
 }
 
-DRIVER_INIT(lotse)
+static DRIVER_INIT(lotse)
 {
 	sc1_common_init(machine,6,1);
 	Mechmtr_init(8);
@@ -1379,7 +1379,7 @@ DRIVER_INIT(lotse)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-DRIVER_INIT(rou029)
+static DRIVER_INIT(rou029)
 {
 	sc1_common_init(machine,6,0);
 	Mechmtr_init(8);
@@ -1389,7 +1389,7 @@ DRIVER_INIT(rou029)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-DRIVER_INIT(clatt)
+static DRIVER_INIT(clatt)
 {
 	sc1_common_init(machine,6,1);
 	Mechmtr_init(8);

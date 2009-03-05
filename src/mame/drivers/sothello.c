@@ -313,7 +313,7 @@ static void adpcm_int(const device_config *device)
 }
 
 
-static msm5205_interface msm_interface =
+static const msm5205_interface msm_interface =
 {
     adpcm_int,      /* interrupt function */
     MSM5205_S48_4B  /* changed on the fly */

@@ -219,7 +219,7 @@ ADDRESS_MAP_END
 // Bet/Cancel  |  1 Line  |  3 Lines  |  5 Lines  | 7 Lines  | 9 Lines  | Start
 
 
-INPUT_PORTS_START( multfish )
+static INPUT_PORTS_START( multfish )
 	PORT_START("IN0")
 	PORT_DIPNAME(     0x01, 0x01, "Key In (35 A)" ) // Key In ( 35 A )
 	PORT_DIPSETTING(  0x01, DEF_STR( Off ) )
@@ -332,13 +332,13 @@ INPUT_PORTS_START( multfish )
 INPUT_PORTS_END
 
 
-WRITE8_HANDLER( multfish_f3_w )
+static WRITE8_HANDLER( multfish_f3_w )
 {
 	//popmessage("multfish_f3_w %02x",data);
 }
 
 
-WRITE8_HANDLER( multfish_f4_w )
+static WRITE8_HANDLER( multfish_f4_w )
 {
 	//popmessage("multfish_f4_w %02x",data); // display enable?
 	multfish_disp_enable = data;
@@ -408,7 +408,7 @@ static GFXDECODE_START( multfish )
 	GFXDECODE_ENTRY( "gfx", 0, tiles16x16_layout, 0, 16 )
 GFXDECODE_END
 
-MACHINE_RESET( multfish )
+static MACHINE_RESET( multfish )
 {
 	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu"), 0x4000);
 	memory_set_bank(machine, 1, 0);
@@ -425,7 +425,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-MACHINE_DRIVER_START( multfish )
+static MACHINE_DRIVER_START( multfish )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000) /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(multfish_map,0)

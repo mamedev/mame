@@ -100,15 +100,15 @@ static READ8_HANDLER( bishjan_videoram_2_hi_r )	{	return bishjan_videoram_2_hi[o
 
 // 16-bit handlers for an 8-bit chip
 
-WRITE8TO16BE_MSB( bishjan_byte_lo_msb,            bishjan_byte_lo_w );
+static WRITE8TO16BE_MSB( bishjan_byte_lo_msb,            bishjan_byte_lo_w );
 
-READWRITE8TO16BE( bishjan_videoram_1_lo_word,    bishjan_videoram_1_lo_r, bishjan_videoram_1_lo_w );
-READWRITE8TO16BE( bishjan_videoram_1_hi_word,    bishjan_videoram_1_hi_r, bishjan_videoram_1_hi_w );
-WRITE8TO16BE    ( bishjan_videoram_1_hi_lo_word, bishjan_videoram_1_hi_lo_w );
+static READ8TO16BE( bishjan_videoram_1_lo_word,    bishjan_videoram_1_lo_r );
+static READ8TO16BE( bishjan_videoram_1_hi_word,    bishjan_videoram_1_hi_r );
+static WRITE8TO16BE    ( bishjan_videoram_1_hi_lo_word, bishjan_videoram_1_hi_lo_w );
 
-READWRITE8TO16BE( bishjan_videoram_2_lo_word,    bishjan_videoram_2_lo_r, bishjan_videoram_2_lo_w );
-READWRITE8TO16BE( bishjan_videoram_2_hi_word,    bishjan_videoram_2_hi_r, bishjan_videoram_2_hi_w );
-WRITE8TO16BE    ( bishjan_videoram_2_hi_lo_word, bishjan_videoram_2_hi_lo_w );
+static READ8TO16BE( bishjan_videoram_2_lo_word,    bishjan_videoram_2_lo_r );
+static READ8TO16BE( bishjan_videoram_2_hi_word,    bishjan_videoram_2_hi_r );
+static WRITE8TO16BE    ( bishjan_videoram_2_hi_lo_word, bishjan_videoram_2_hi_lo_w );
 
 
 /***************************************************************************
@@ -163,15 +163,19 @@ static WRITE8_HANDLER( bishjan_scrollram_2_hi_lo_w )
 
 // 16-bit handlers for an 8-bit chip
 
-WRITE8TO16BE( bishjan_scroll_word, bishjan_scroll_w );
+static WRITE8TO16BE( bishjan_scroll_word, bishjan_scroll_w );
 
-READWRITE8TO16BE( bishjan_scrollram_1_lo_word,    bishjan_scrollram_1_lo_r, bishjan_scrollram_1_lo_w );
-READWRITE8TO16BE( bishjan_scrollram_1_hi_word,    bishjan_scrollram_1_hi_r, bishjan_scrollram_1_hi_w );
-WRITE8TO16BE    ( bishjan_scrollram_1_hi_lo_word, bishjan_scrollram_1_hi_lo_w );
+static READ8TO16BE( bishjan_scrollram_1_lo_word,    bishjan_scrollram_1_lo_r );
+static WRITE8TO16BE( bishjan_scrollram_1_lo_word,   bishjan_scrollram_1_lo_w );
+static READ8TO16BE( bishjan_scrollram_1_hi_word,    bishjan_scrollram_1_hi_r );
+static WRITE8TO16BE( bishjan_scrollram_1_hi_word,    bishjan_scrollram_1_hi_w );
+static WRITE8TO16BE    ( bishjan_scrollram_1_hi_lo_word, bishjan_scrollram_1_hi_lo_w );
 
-READWRITE8TO16BE( bishjan_scrollram_2_lo_word,    bishjan_scrollram_2_lo_r, bishjan_scrollram_2_lo_w );
-READWRITE8TO16BE( bishjan_scrollram_2_hi_word,    bishjan_scrollram_2_hi_r, bishjan_scrollram_2_hi_w );
-WRITE8TO16BE    ( bishjan_scrollram_2_hi_lo_word, bishjan_scrollram_2_hi_lo_w );
+static READ8TO16BE( bishjan_scrollram_2_lo_word,    bishjan_scrollram_2_lo_r );
+static WRITE8TO16BE( bishjan_scrollram_2_lo_word,    bishjan_scrollram_2_lo_w );
+static READ8TO16BE( bishjan_scrollram_2_hi_word,    bishjan_scrollram_2_hi_r );
+static WRITE8TO16BE( bishjan_scrollram_2_hi_word,    bishjan_scrollram_2_hi_w );
+static WRITE8TO16BE    ( bishjan_scrollram_2_hi_lo_word, bishjan_scrollram_2_hi_lo_w );
 
 
 /***************************************************************************
@@ -187,7 +191,7 @@ static WRITE8_HANDLER( bishjan_disable_w )
 
 // 16-bit handlers for an 8-bit chip
 
-WRITE8TO16BE_LSB( bishjan_disable_lsb, bishjan_disable_w );
+static WRITE8TO16BE_LSB( bishjan_disable_lsb, bishjan_disable_w );
 
 
 /***************************************************************************
@@ -298,7 +302,7 @@ static WRITE8_HANDLER(colordac_w)
 
 // 16-bit handlers for an 8-bit chip
 
-WRITE8TO16BE( colordac_word, colordac_w );
+static WRITE8TO16BE( colordac_word, colordac_w );
 
 
 /***************************************************************************

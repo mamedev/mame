@@ -133,12 +133,12 @@ UINT8 get_rip_status(const device_config *cpu)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-enum
+enum ops
 {
 	ROTR1, TOR1, ROTR2, ROTC, ROTM, BOR2, CRCF, CRCR,
 	SVSTR, PRT, SOR, TOR2, SHFTR, TEST, NOP, SETST, RSTST,
 	ROTNR, BONR, BOR1, SONR, SHFTNR, PRTNR, TONR
-} ops;
+};
 
 static void make_ops(esrip_state *cpustate)
 {

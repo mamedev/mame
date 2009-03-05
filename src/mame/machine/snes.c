@@ -41,7 +41,7 @@ static emu_timer *snes_nmi_timer;
 static emu_timer *snes_hirq_timer;
 static UINT16 hblank_offset;
 static UINT16 snes_htmult;	/* in 512 wide, we run HTOTAL double and halve it on latching */
-UINT8 has_addon_chip;
+UINT8 snes_has_addon_chip;
 
 // full graphic variables
 static UINT16 vram_fgr_high, vram_fgr_increment, vram_fgr_count, vram_fgr_mask, vram_fgr_shift, vram_read_buffer;
@@ -1174,18 +1174,18 @@ READ8_HANDLER( snes_r_bank1 )
 		value = snes_r_io(space, address);
 	else if (address < 0x8000)
 	{
-		if (has_addon_chip == HAS_OBC1)
+		if (snes_has_addon_chip == HAS_OBC1)
 			value = obc1_read(space, offset);
-		else if ((has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
+		else if ((snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 			value = (address < 0x7000) ? DSP2_read() : 0x00;
-		else if ((snes_cart.mode == SNES_MODE_21) && (has_addon_chip == HAS_DSP1) && (offset < 0x100000))
+		else if ((snes_cart.mode == SNES_MODE_21) && (snes_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
 			value = (address < 0x7000) ? DSP1_getDr() : DSP1_getSr();
 		else
 			value = 0xff;											/* Reserved */
 	}
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
 		value = (address < 0xc000) ? DSP1_getDr() : DSP1_getSr();
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 		value = (address < 0xc000) ? DSP2_read() : 0x00;
 	else
 		value = snes_ram[offset];
@@ -1205,9 +1205,9 @@ READ8_HANDLER( snes_r_bank2 )
 		value = snes_r_io(space, address);
 	else if (address < 0x8000)										/* SRAM for mode_21, Reserved othewise */
 	{
-		if (has_addon_chip == HAS_OBC1)
+		if (snes_has_addon_chip == HAS_OBC1)
 			value = obc1_read (space, offset);
-		else if (has_addon_chip == HAS_DSP2)
+		else if (snes_has_addon_chip == HAS_DSP2)
 			value = (address < 0x7000) ? DSP2_read() : 0x00;
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
 		{
@@ -1219,9 +1219,9 @@ READ8_HANDLER( snes_r_bank2 )
 			value = 0xff;
 	}
 	/* some dsp1 games use these banks 0x30 to 0x3f at address 0x8000 */
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP1))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP1))
 		value = (address < 0xc000) ? DSP1_getDr() : DSP1_getSr();
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP2))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2))
 		value = (address < 0xc000) ? DSP2_read() : 0x00;
 	else
 		value = snes_ram[0x300000 + offset];
@@ -1259,7 +1259,7 @@ READ8_HANDLER( snes_r_bank4 )
 		if (address >= 0x8000)
 			value = snes_ram[0x600000 + offset];
 		/* some other dsp1 games use these banks 0x60 to 0x6f at address 0x0000 */
-		else if (has_addon_chip == HAS_DSP1)
+		else if (snes_has_addon_chip == HAS_DSP1)
 			value = (address >= 0x4000) ? DSP1_getSr() : DSP1_getDr();
 		else
 			value = 0xff;							/* Reserved */
@@ -1316,9 +1316,9 @@ READ8_HANDLER( snes_r_bank6 )
 				value = 0xff;
 		}
 	}
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
 		value = (address < 0xc000) ? DSP1_getDr() : DSP1_getSr();
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 		value = (address < 0xc000) ? DSP2_read() : 0x00;
 	else
 		value = snes_ram[0x800000 + offset];
@@ -1357,18 +1357,18 @@ WRITE8_HANDLER( snes_w_bank1 )
 		snes_w_io(space, address, data);
 	else if (address < 0x8000)
 	{
-		if (has_addon_chip == HAS_OBC1)
+		if (snes_has_addon_chip == HAS_OBC1)
 			obc1_write(space, offset, data);
-		else if ((has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
+		else if ((snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 			DSP2_write(data);
-		else if ((snes_cart.mode == SNES_MODE_21) && (has_addon_chip == HAS_DSP1) && (offset < 0x100000))
+		else if ((snes_cart.mode == SNES_MODE_21) && (snes_has_addon_chip == HAS_DSP1) && (offset < 0x100000))
 			DSP1_setDr(data);
 		else
 			logerror( "Attempt to write to reserved address: %X\n", offset );
 	}
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
 		DSP1_setDr(data);
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP2) && (offset >= 0x200000) && (address < 0xc000))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000) && (address < 0xc000))
 		DSP2_write(data);
 	else
 		logerror( "Attempt to write to ROM address: %X\n", offset );
@@ -1385,9 +1385,9 @@ WRITE8_HANDLER( snes_w_bank2 )
 		snes_w_io(space, address, data);
 	else if (address < 0x8000)						/* SRAM for mode_21, Reserved othewise */
 	{
-		if (has_addon_chip == HAS_OBC1)
+		if (snes_has_addon_chip == HAS_OBC1)
 			obc1_write(space, offset, data);
-		else if (has_addon_chip == HAS_DSP2)
+		else if (snes_has_addon_chip == HAS_DSP2)
 			DSP2_write(data);
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
 		{
@@ -1399,9 +1399,9 @@ WRITE8_HANDLER( snes_w_bank2 )
 			logerror("Attempt to write to reserved address: %X\n", offset + 0x300000);
 	}
 	/* some dsp1 games use these banks 0x30 to 0x3f at address 0x8000 */
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP1))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP1))
 		DSP1_setDr(data);
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP2) && (address < 0xc000))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (address < 0xc000))
 		DSP2_write(data);
 	else
 		logerror("Attempt to write to ROM address: %X\n", offset + 0x300000);
@@ -1416,7 +1416,7 @@ WRITE8_HANDLER( snes_w_bank4 )
 	{
 		if (address >= 0x8000)
 			logerror("Attempt to write to ROM address: %X\n", offset + 0x600000);
-		else if (has_addon_chip == HAS_DSP1)
+		else if (snes_has_addon_chip == HAS_DSP1)
 			DSP1_setDr(data);
 		else
 			logerror("Attempt to write to reserved address: %X\n", offset + 0x600000);
@@ -1478,9 +1478,9 @@ WRITE8_HANDLER( snes_w_bank6 )
 				logerror("Attempt to write to reserved address: %X\n", offset + 0x800000);
 		}
 	}
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
 		DSP1_setDr(data);
-	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP2) && (offset >= 0x200000) && (address < 0xc000))
+	else if ((snes_cart.mode == SNES_MODE_20) && (snes_has_addon_chip == HAS_DSP2) && (offset >= 0x200000) && (address < 0xc000))
 		DSP2_write(data);
 	else
 		logerror("Attempt to write to ROM address: %X\n", offset + 0x800000);
@@ -1572,7 +1572,7 @@ static void snes_init_ram(running_machine *machine)
 	hblank_offset = 268;
 	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0);
 
-	switch (has_addon_chip)
+	switch (snes_has_addon_chip)
 	{
 		case HAS_DSP2:
 			DSP2_reset();
@@ -1679,7 +1679,7 @@ DRIVER_INIT( snes )
 	/* all NSS games seem to use MODE 20 */
 	snes_cart.mode = SNES_MODE_20;
 	snes_cart.sram_max = 0x40000;
-	has_addon_chip = HAS_NONE;
+	snes_has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
 	total_blocks = (memory_region_length(machine, "user3") / 0x8000);
@@ -1744,7 +1744,7 @@ DRIVER_INIT( snes_hirom )
 
 	snes_cart.mode = SNES_MODE_21;
 	snes_cart.sram_max = 0x40000;
-	has_addon_chip = HAS_NONE;
+	snes_has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
 	total_blocks = (memory_region_length(machine, "user3") / 0x10000);

@@ -399,7 +399,7 @@ extern WRITE8_HANDLER( snes_w_bank5 );
 extern WRITE8_HANDLER( snes_w_bank6 );
 extern WRITE8_HANDLER( snes_w_bank7 );
 
-extern UINT8 has_addon_chip;
+extern UINT8 snes_has_addon_chip;
 
 extern void snes_gdma( const address_space *space, UINT8 channels );
 extern void snes_hdma_init(void);

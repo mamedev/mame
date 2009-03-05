@@ -205,7 +205,7 @@ static struct
 	UINT8	*line_buf;	// there's actually two
 } i82716;
 
-WRITE16_HANDLER( i82716_w )
+static WRITE16_HANDLER( i82716_w )
 {
 	// Accessing register window?
 	if ((VREG(RWBA) & 0xfff0) == (offset & 0xfff0))
@@ -223,7 +223,7 @@ WRITE16_HANDLER( i82716_w )
 	}
 }
 
-READ16_HANDLER( i82716_r )
+static READ16_HANDLER( i82716_r )
 {
 	// Accessing register window?
 	if ((VREG(RWBA) & ~0xf) == (offset & ~0xf))
@@ -442,7 +442,7 @@ static READ16_HANDLER( read_odd )
 }
 
 
-struct _i8279_state
+static struct _i8279_state
 {
 	UINT8	command;
 	UINT8	mode;

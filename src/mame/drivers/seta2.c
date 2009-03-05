@@ -973,11 +973,13 @@ static READ16_HANDLER( paletteram16_word_r )
 	return paletteram16[offset];
 }
 
-READWRITE16BETO32BE( spriteram32_dword, spriteram16_word_r, spriteram16_word_w );
+static READ16BETO32BE( spriteram32_dword, spriteram16_word_r );
+static WRITE16BETO32BE( spriteram32_dword, spriteram16_word_w );
 
-READWRITE16BETO32BE( paletteram32_dword, paletteram16_word_r, paletteram16_xRRRRRGGGGGBBBBB_word_w );
+static READ16BETO32BE( paletteram32_dword, paletteram16_word_r );
+static WRITE16BETO32BE( paletteram32_dword, paletteram16_xRRRRRGGGGGBBBBB_word_w );
 
-WRITE16BETO32BE( seta2_vregs_dword, seta2_vregs_w );
+static WRITE16BETO32BE( seta2_vregs_dword, seta2_vregs_w );
 
 // Main CPU
 

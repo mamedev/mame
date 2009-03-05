@@ -157,8 +157,6 @@ static const z80_daisy_chain daisy_chain[] =
  *
  *************************************/
 
-extern z80ctc_interface cchasm_ctc_intf;
-
 static MACHINE_DRIVER_START( cchasm )
 
 	/* basic machine hardware */

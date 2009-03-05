@@ -1522,7 +1522,7 @@ static void ctc_interrupt(const device_config *device, int state)
 }
 
 
-static z80ctc_interface demon_z80ctc_interface =
+static const z80ctc_interface demon_z80ctc_interface =
 {
 	0,               /* timer disables */
 	ctc_interrupt,   /* interrupt handler */

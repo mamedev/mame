@@ -12,7 +12,7 @@ WRITE16_HANDLER( cchasm_led_w );
 
 /*----------- defined in audio/cchasm.c -----------*/
 
-extern z80ctc_interface cchasm_ctc_intf;
+extern const z80ctc_interface cchasm_ctc_intf;
 
 READ8_HANDLER( cchasm_coin_sound_r );
 READ8_HANDLER( cchasm_soundlatch2_r );

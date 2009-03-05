@@ -109,7 +109,7 @@ static WRITE8_DEVICE_HANDLER( ctc_timer_2_w )
 	}
 }
 
-z80ctc_interface cchasm_ctc_intf =
+const z80ctc_interface cchasm_ctc_intf =
 {
 	0,               /* timer disables */
 	ctc_interrupt,   /* interrupt handler */

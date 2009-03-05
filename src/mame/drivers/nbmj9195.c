@@ -487,7 +487,7 @@ static INTERRUPT_GEN( ctc0_trg1 )
 	z80ctc_trg1_w(ctc, 0, 0);
 }
 
-static z80ctc_interface ctc_intf_main =
+static const z80ctc_interface ctc_intf_main =
 {
 	0,							/* timer disables */
 	ctc0_interrupt,				/* interrupt handler */
@@ -496,7 +496,7 @@ static z80ctc_interface ctc_intf_main =
 	0,							/* ZC/TO2 callback */
 };
 
-static z80ctc_interface ctc_intf_audio =
+static const z80ctc_interface ctc_intf_audio =
 {
 	0,							/* timer disables */
 	ctc1_interrupt,				/* interrupt handler */
