@@ -118,13 +118,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			if (fx) fx=0; else fx=1;
 			sy2=sy-16;
 		}
-		else sy2=sy+16;
-
-		if (fy && multi) {
+		else if (fy && multi)
+		{
 			sy2=sy;
-			sy-=16;
+			sy+=16;
 			code++;
 			code2--;
+		}
+		else if(multi)
+		{
+			sy2=sy;
+			sy-=16;
 		}
 
     	drawgfx(bitmap,machine->gfx[1],
