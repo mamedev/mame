@@ -48,7 +48,7 @@
 #define MODEL2_CHECKER
 #define MODEL2_TEXTURED
 #define MODEL2_TRANSLUCENT
-#elif
+#else
 #error "Model 2 renderer: Invalif function selected!"
 #endif
 
