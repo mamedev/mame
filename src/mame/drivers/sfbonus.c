@@ -3919,7 +3919,7 @@ ROM_START( atworlda )
 	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
 ROM_END
 
-#if 0 // incomplete / mixed sets etc. sort these first before doing anything else with them
+#if 1 // incomplete / mixed sets etc. sort these first before doing anything else with them
 ROM_START( fb5 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "fb5b15h.bin", 0x00000, 0x40000, CRC(faba08b8) SHA1(4763f691b563ba23cc3edf86c18cdcda8c415003) )
@@ -6759,7 +6759,7 @@ static DRIVER_INIT(fb4v3)
 	DRIVER_INIT_CALL(sfbonus_common);
 }
 
-#if 0
+#if 1
 static DRIVER_INIT(fb5)
 {
 	int i;
@@ -7177,156 +7177,200 @@ static DRIVER_INIT(funriverv)
 
 */
 
-GAME( 199?, sfbonus,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, sfbonusa,    sfbonus,  sfbonus,    parrot3,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, sfbonusb,    sfbonus,  sfbonus,    parrot3,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, sfbonusd,    sfbonus,  sfbonus,    parrot3,    sfbonusd, ROT0,  "Amcoe", "Skill Fruit Bonus (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, sfbonusv,    sfbonus,  sfbonus,    parrot3,    sfbonusv, ROT0,  "Amcoe", "Skill Fruit Bonus (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonus,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.6)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 199?, parrot3,     0,        sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, parrot3b,    parrot3,  sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, parrot3d,    parrot3,  sfbonus,    parrot3,    parrot3d, ROT0,  "Amcoe", "Parrot Poker III (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, parrot3v,    parrot3,  sfbonus,    parrot3,    parrot3v, ROT0,  "Amcoe", "Parrot Poker III (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 199?, parrot3v2,   parrot3,  sfbonus,    parrot3,    parrot3v2, ROT0,  "Amcoe", "Parrot Poker III (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonusa,    sfbonus,  sfbonus,    parrot3,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, hldspin1,    0,        sfbonus,    parrot3,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin1b,   hldspin1, sfbonus,    parrot3,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin1d,   hldspin1, sfbonus,    parrot3,    hldspin1d, ROT0,  "Amcoe", "Hold & Spin I (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin1v,   hldspin1, sfbonus,    parrot3,    hldspin1v, ROT0,  "Amcoe", "Hold & Spin I (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonusb,    sfbonus,  sfbonus,    parrot3,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonusd,    sfbonus,  sfbonus,    parrot3,    sfbonusd,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonusv,    sfbonus,  sfbonus,    parrot3,    sfbonusv,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, hldspin2,    0,        sfbonus,    parrot3,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin2b,   hldspin2, sfbonus,    parrot3,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin2d,   hldspin2, sfbonus,    parrot3,    hldspin2d, ROT0,  "Amcoe", "Hold & Spin II (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin2v,   hldspin2, sfbonus,    parrot3,    hldspin2v, ROT0,  "Amcoe", "Hold & Spin II (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3,     0,        sfbonus,    parrot3,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fcnudge,     0,        sfbonus,    parrot3,    abnudge, ROT0,  "Amcoe", "Fruit Carnival Nudge (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fruitcar,    fcnudge,  sfbonus,    parrot3,    fruitcar, ROT0,  "Amcoe", "Fruit Carnival Nudge (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fruitcar2,   fcnudge,  sfbonus,    parrot3,    fruitcar2, ROT0,  "Amcoe", "Fruit Carnival Nudge (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fruitcar3,   fcnudge,  sfbonus,    parrot3,    fruitcar3, ROT0,  "Amcoe", "Fruit Carnival Nudge (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3b,    parrot3,  sfbonus,    parrot3,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3d,    parrot3,  sfbonus,    parrot3,    parrot3d, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3v2,   parrot3,  sfbonus,    parrot3,    parrot3v2,ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, pickwin,     0,        sfbonus,    parrot3,    pickwin, ROT0,  "Amcoe", "Pick & Win (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pickwina,    pickwin,  sfbonus,    parrot3,    pickwin, ROT0,  "Amcoe", "Pick & Win (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pickwinb,    pickwin,  sfbonus,    parrot3,    pickwin, ROT0,  "Amcoe", "Pick & Win (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pickwinb2,   pickwin,  sfbonus,    parrot3,    pickwin, ROT0,  "Amcoe", "Pick & Win (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pickwind,    pickwin,  sfbonus,    parrot3,    pickwind, ROT0,  "Amcoe", "Pick & Win (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pickwind2,   pickwin,  sfbonus,    parrot3,    pickwind, ROT0,  "Amcoe", "Pick & Win (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pickwinv,    pickwin,  sfbonus,    parrot3,    pickwinv, ROT0,  "Amcoe", "Pick & Win (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pickwinv2,   pickwin,  sfbonus,    parrot3,    pickwinv2, ROT0,  "Amcoe", "Pick & Win (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pickwinv3,   pickwin,  sfbonus,    parrot3,    pickwinv, ROT0,  "Amcoe", "Pick & Win (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3v,    parrot3,  sfbonus,    parrot3,    parrot3v, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, tighook,     0,        sfbonus,    parrot3,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighooka,    tighook,  sfbonus,    parrot3,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookc,    tighook,  sfbonus,    parrot3,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookc2,   tighook,  sfbonus,    parrot3,    tighook, ROT0,  "Amcoe", "Tiger Hook (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookv,    tighook,  sfbonus,    parrot3,    tighookv, ROT0,  "Amcoe", "Tiger Hook (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookv2,   tighook,  sfbonus,    parrot3,    tighookv2, ROT0,  "Amcoe", "Tiger Hook (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookv3,   tighook,  sfbonus,    parrot3,    tighookv, ROT0,  "Amcoe", "Tiger Hook (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookd,    tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, tighookd2,   tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin1,    0,        sfbonus,    parrot3,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I (Version 2.5T)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, robadv,      0,        sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadvc,     robadv,   sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadvd,     robadv,   sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadvv1,    robadv,   sfbonus,    parrot3,    robadv2v4, ROT0,  "Amcoe", "Robin Adventure (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadvv2,    robadv,   sfbonus,    parrot3,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin1b,   hldspin1, sfbonus,    parrot3,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin1d,   hldspin1, sfbonus,    parrot3,    hldspin1d, ROT0, "Amcoe", "Hold & Spin I (Version 2.7T, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin1v,   hldspin1, sfbonus,    parrot3,    hldspin1v, ROT0, "Amcoe", "Hold & Spin I (Version 2.7T Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, robadv2,     0,        sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2a,    robadv2,  sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2c,    robadv2,  sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2v1,   robadv2,  sfbonus,    parrot3,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure 2 (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2v2,   robadv2,  sfbonus,    parrot3,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure 2 (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2v3,   robadv2,  sfbonus,    parrot3,    robadv2v1, ROT0,  "Amcoe", "Robin Adventure 2 (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2v4,   robadv2,  sfbonus,    parrot3,    robadv2v4, ROT0,  "Amcoe", "Robin Adventure 2 (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2d,    robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2d2,    robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2d3,    robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2c2,    robadv2,  sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, robadv2c3,    robadv2,  sfbonus,    parrot3,    robadv, ROT0,  "Amcoe", "Robin Adventure 2 (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2,    0,        sfbonus,    parrot3,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (Version 2.6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2b,   hldspin2, sfbonus,    parrot3,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (Version 2.8R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2d,   hldspin2, sfbonus,    parrot3,    hldspin2d, ROT0, "Amcoe", "Hold & Spin II (Version 2.8R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2v,   hldspin2, sfbonus,    parrot3,    hldspin2v, ROT0, "Amcoe", "Hold & Spin II (Version 2.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, fcnudge,     0,        sfbonus,    parrot3,    abnudge,  ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, fruitcar,    fcnudge,  sfbonus,    parrot3,    fruitcar, ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.1 Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, fruitcar2,   fcnudge,  sfbonus,    parrot3,    fruitcar2,ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, fruitcar3,   fcnudge,  sfbonus,    parrot3,    fruitcar3,ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2001, pickwin,     0,        sfbonus,    parrot3,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.5T)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwina,    pickwin,  sfbonus,    parrot3,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2001, pickwinb2,   pickwin,  sfbonus,    parrot3,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.9R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwind2,   pickwin,  sfbonus,    parrot3,    pickwind, ROT0,  "Amcoe", "Pick & Win (Version 2.9R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwinv3,   pickwin,  sfbonus,    parrot3,    pickwinv, ROT0,  "Amcoe", "Pick & Win (Version 2.9R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2001, pickwinb,    pickwin,  sfbonus,    parrot3,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.8T, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwind,    pickwin,  sfbonus,    parrot3,    pickwind, ROT0,  "Amcoe", "Pick & Win (Version 2.8T, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwinv,    pickwin,  sfbonus,    parrot3,    pickwinv, ROT0,  "Amcoe", "Pick & Win (Version 2.8T, Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2001, pickwinv2,   pickwin,  sfbonus,    parrot3,    pickwinv2,ROT0,  "Amcoe", "Pick & Win (Version 2.9E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
-GAME( 2000, pirpok2,     0,        sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pirpok2b,    pirpok2,  sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pirpok2d,    pirpok2,  sfbonus,    parrot3,    pirpok2d, ROT0,  "Amcoe", "Pirate Poker II (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pirpok2v,    pirpok2,  sfbonus,    parrot3,    pirpok2v, ROT0,  "Amcoe", "Pirate Poker II (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, pirpok2v2,   pirpok2,  sfbonus,    parrot3,    pirpok2v2, ROT0,  "Amcoe", "Pirate Poker II (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighook,     0,        sfbonus,    parrot3,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 1.7XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighooka,    tighook,  sfbonus,    parrot3,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, anibonus,    0,        sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.50XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonus2,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonus3,   anibonus, sfbonus,    parrot3,    anibonus3, ROT0,  "Amcoe", "Animal Bonus (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonus4,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonus5,   anibonus, sfbonus,    parrot3,    anibonus3, ROT0,  "Amcoe", "Animal Bonus (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonus6,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonusb,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.7R)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonusb2,  anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonusd,   anibonus, sfbonus,    parrot3,    anibonusd, ROT0,  "Amcoe", "Animal Bonus (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonusd2,  anibonus, sfbonus,    parrot3,    anibonusd, ROT0,  "Amcoe", "Animal Bonus (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonusv,   anibonus, sfbonus,    parrot3,    anibonusv, ROT0,  "Amcoe", "Animal Bonus (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonusv2,  anibonus, sfbonus,    parrot3,    anibonusv, ROT0,  "Amcoe", "Animal Bonus (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anibonusv3,  anibonus, sfbonus,    parrot3,    anibonusv3, ROT0,  "Amcoe", "Animal Bonus (set 13)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookc,    tighook,  sfbonus,    parrot3,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookd,    tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookv,    tighook,  sfbonus,    parrot3,    tighookv, ROT0,  "Amcoe", "Tiger Hook (Version 2.1R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, abnudge,     0,        sfbonus,    parrot3,    abnudge, ROT0,  "Amcoe", "Animal Bonus Nudge (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, abnudgeb,    abnudge,  sfbonus,    parrot3,    abnudge, ROT0,  "Amcoe", "Animal Bonus Nudge (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, abnudged,    abnudge,  sfbonus,    parrot3,    abnudged, ROT0,  "Amcoe", "Animal Bonus Nudge (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, abnudgev,    abnudge,  sfbonus,    parrot3,    abnudgev, ROT0,  "Amcoe", "Animal Bonus Nudge (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookc2,   tighook,  sfbonus,    parrot3,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookd2,   tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookv3,   tighook,  sfbonus,    parrot3,    tighookv, ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, dblchal,     0,        sfbonus,    parrot3,    dblchal, ROT0,  "Amcoe", "Double Challenge (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, dblchalb,    dblchal,  sfbonus,    parrot3,    dblchal, ROT0,  "Amcoe", "Double Challenge (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, dblchalc,    dblchal,  sfbonus,    parrot3,    dblchal, ROT0,  "Amcoe", "Double Challenge (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, dblchald,    dblchal,  sfbonus,    parrot3,    dblchald, ROT0,  "Amcoe", "Double Challenge (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, dblchalv,    dblchal,  sfbonus,    parrot3,    dblchalv, ROT0,  "Amcoe", "Double Challenge (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookv2,   tighook,  sfbonus,    parrot3,    tighookv2,ROT0,  "Amcoe", "Tiger Hook (Version 2.1E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, anithunt,    0,        sfbonus,    parrot3,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anithunt2,   anithunt, sfbonus,    parrot3,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anithuntb,   anithunt, sfbonus,    parrot3,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anithuntd,   anithunt, sfbonus,    parrot3,    anithuntd, ROT0,  "Amcoe", "Animal Treasure Hunt (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, anithuntv,   anithunt, sfbonus,    parrot3,    anithuntv, ROT0,  "Amcoe", "Animal Treasure Hunt (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, robadv,      0,        sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, sfruitb,     0,        sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0B)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitb2,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbb,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbb2,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbb3,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbd,    sfruitb,  sfbonus,    parrot3,    sfruitbd, ROT0,  "Amcoe", "Super Fruit Bonus (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbd2,    sfruitb,  sfbonus,    parrot3,    sfruitbd, ROT0,  "Amcoe", "Super Fruit Bonus (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbd3,    sfruitb,  sfbonus,    parrot3,    sfruitbd, ROT0,  "Amcoe", "Super Fruit Bonus (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbv,    sfruitb,  sfbonus,    parrot3,    sfruitbv, ROT0,  "Amcoe", "Super Fruit Bonus (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbv2,    sfruitb,  sfbonus,    parrot3,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbv3,    sfruitb,  sfbonus,    parrot3,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbv4,    sfruitb,  sfbonus,    parrot3,    sfruitbv, ROT0,  "Amcoe", "Super Fruit Bonus (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitbv5,    sfruitb,  sfbonus,    parrot3,    sfruitbv, ROT0,  "Amcoe", "Super Fruit Bonus (set 13)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, sfruitb3,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Texas Super Fruit Bonus (Version 1.80XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, robadvc,     robadv,   sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure (Version 1.7R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, robadvd,     robadv,   sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure (Version 1.7R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, robadvv2,    robadv,   sfbonus,    parrot3,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, robadvv1,    robadv,   sfbonus,    parrot3,    robadv2v4,ROT0,  "Amcoe", "Robin Adventure (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, robadv2,     0,        sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.5SH)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, robadv2a,    robadv2,  sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, robadv2c,    robadv2,  sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2d,    robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2v3,   robadv2,  sfbonus,    parrot3,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, robadv2d2,   robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2c2,   robadv2,  sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2v2,   robadv2,  sfbonus,    parrot3,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, robadv2d3,   robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7SH, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2c3,   robadv2,  sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7SH, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2v1,   robadv2,  sfbonus,    parrot3,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7SH Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, robadv2v4,   robadv2,  sfbonus,    parrot3,    robadv2v4,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, pirpok2,     0,        sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, pirpok2b,    pirpok2,  sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, pirpok2d,    pirpok2,  sfbonus,    parrot3,    pirpok2d,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, pirpok2v,    pirpok2,  sfbonus,    parrot3,    pirpok2v,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, pirpok2v2,   pirpok2,  sfbonus,    parrot3,   pirpok2v2,ROT0,  "Amcoe", "Pirate Poker II (Version 2.4E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anibonus,    0,        sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.50XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anibonus2,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anibonus3,   anibonus, sfbonus,    parrot3,    anibonus3,ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonus4,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anibonus5,   anibonus, sfbonus,    parrot3,    anibonus3,ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonus6,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anibonusb,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusd,   anibonus, sfbonus,    parrot3,    anibonusd,ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusv,   anibonus, sfbonus,    parrot3,    anibonusv,ROT0,  "Amcoe", "Animal Bonus (Version 1.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anibonusb2,  anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusd2,  anibonus, sfbonus,    parrot3,    anibonusd,ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusv2,  anibonus, sfbonus,    parrot3,    anibonusv,ROT0,  "Amcoe", "Animal Bonus (Version 1.8LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anibonusv3,  anibonus, sfbonus,    parrot3,   anibonusv3,ROT0,  "Amcoe", "Animal Bonus (Version 1.8E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, abnudge,     0,        sfbonus,    parrot3,    abnudge, ROT0,  "Amcoe", "Animal Bonus Nudge (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, abnudgeb,    abnudge,  sfbonus,    parrot3,    abnudge, ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, abnudged,    abnudge,  sfbonus,    parrot3,    abnudged,ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, abnudgev,    abnudge,  sfbonus,    parrot3,    abnudgev,ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.1 Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, dblchal,     0,        sfbonus,    parrot3,    dblchal, ROT0,  "Amcoe", "Double Challenge (Version 1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, dblchalb,    dblchal,  sfbonus,    parrot3,    dblchal, ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, dblchalc,    dblchal,  sfbonus,    parrot3,    dblchal, ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, dblchald,    dblchal,  sfbonus,    parrot3,    dblchald,ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, dblchalv,    dblchal,  sfbonus,    parrot3,    dblchalv,ROT0,  "Amcoe", "Double Challenge (Version 1.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anithunt,    0,        sfbonus,    parrot3,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anithunt2,   anithunt, sfbonus,    parrot3,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2003, anithuntb,   anithunt, sfbonus,    parrot3,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anithuntd,   anithunt, sfbonus,    parrot3,    anithuntd,ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anithuntv,   anithunt, sfbonus,    parrot3,    anithuntv,ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2002, sfruitb2,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitb,     0,        sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0B)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+
+GAME( 2002, sfruitbb,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbd,    sfruitb,  sfbonus,    parrot3,    sfruitbd,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbv5,   sfruitb,  sfbonus,    parrot3,    sfruitbv,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2002, sfruitbb2,   sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+GAME( 2002, sfruitbd2,   sfruitb,  sfbonus,    parrot3,    sfruitbd,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+GAME( 2002, sfruitbv4,   sfruitb,  sfbonus,    parrot3,    sfruitbv,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B Dual)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+
+GAME( 2002, sfruitbb3,   sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbd3,   sfruitb,  sfbonus,    parrot3,    sfruitbd,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbv,    sfruitb,  sfbonus,    parrot3,    sfruitbv,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2002, sfruitbv2,    sfruitb,  sfbonus,    parrot3,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbv3,    sfruitb,  sfbonus,    parrot3,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2EB Dual)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+
+GAME( 2002, sfruitb3,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 1.80XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, fb2gen,      0,        sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.6XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, fb2gena,     fb2gen,   sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, fb2genc,     fb2gen,   sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2gend,     fb2gen,   sfbonus,    parrot3,    fb2gend,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2genv,     fb2gen,   sfbonus,    parrot3,    fb2genv,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, fb2genc2,    fb2gen,   sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2gend2,    fb2gen,   sfbonus,    parrot3,    fb2gend,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2genv2,    fb2gen,   sfbonus,    parrot3,    fb2genv,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, fb2genv3,    fb2gen,   sfbonus,    parrot3,   fb2genv3,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
-GAME( 2000, fb2gen,      0,        sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2gena,     fb2gen,   sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2genc,     fb2gen,   sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2genc2,    fb2gen,   sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2genv,     fb2gen,   sfbonus,    parrot3,    fb2genv, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2genv2,    fb2gen,   sfbonus,    parrot3,    fb2genv, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2genv3,    fb2gen,   sfbonus,    parrot3,    fb2genv3, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2gend,     fb2gen,   sfbonus,    parrot3,    fb2gend, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2gend2,    fb2gen,   sfbonus,    parrot3,    fb2gend, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2nd,       0,       sfbonus,    parrot3,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb2nd,       0,       sfbonus,    parrot3,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2ndc,      fb2nd,   sfbonus,    parrot3,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2ndc2,     fb2nd,   sfbonus,    parrot3,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2ndv,      fb2nd,   sfbonus,    parrot3,    fb2ndv, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2ndv2,     fb2nd,   sfbonus,    parrot3,    fb2ndv, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2ndd,      fb2nd,   sfbonus,    parrot3,    fb2ndd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb2ndd2,     fb2nd,   sfbonus,    parrot3,    fb2ndd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndc,      fb2nd,   sfbonus,    parrot3,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndd,      fb2nd,   sfbonus,    parrot3,    fb2ndd,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndv,      fb2nd,   sfbonus,    parrot3,    fb2ndv,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2004, fb2ndc2,     fb2nd,   sfbonus,    parrot3,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndd2,     fb2nd,   sfbonus,    parrot3,    fb2ndd,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndv2,     fb2nd,   sfbonus,    parrot3,    fb2ndv,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+
 
 GAME( 2000, fb4,         0,        sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.3XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 2000, fb4a,        fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4b,        fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4b2,       fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4c,        fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4c2,       fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4d,        fb4,      sfbonus,    parrot3,    fb4d, ROT0,  "Amcoe", "Fruit Bonus 4 (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4d2,       fb4,      sfbonus,    parrot3,    fb4d, ROT0,  "Amcoe", "Fruit Bonus 4 (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4v,        fb4,      sfbonus,    parrot3,    fb4v, ROT0,  "Amcoe", "Fruit Bonus 4 (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4v2,       fb4,      sfbonus,    parrot3,    fb4v, ROT0,  "Amcoe", "Fruit Bonus 4 (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4v3,       fb4,      sfbonus,    parrot3,    fb4v3, ROT0,  "Amcoe", "Fruit Bonus 4 (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
+GAME( 2000, fb4b,        fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT, set 1", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4c2,       fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4d2,       fb4,      sfbonus,    parrot3,    fb4d,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4v2,       fb4,      sfbonus,    parrot3,    fb4v,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb4b2,       fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4c,        fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4d,        fb4,      sfbonus,    parrot3,    fb4d,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4v,        fb4,      sfbonus,    parrot3,    fb4v,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb4v3,       fb4,      sfbonus,    parrot3,    fb4v3, ROT0, "Amcoe", "Fruit Bonus 4 (Version 1.5E Dual) (with 2005 title)", GAME_NOT_WORKING|GAME_NO_SOUND ) // the export version has '2005' title, but is considered the same game as fb4 and labeled as such
 
 
 GAME( 1999, act2000,     0,        sfbonus,    parrot3,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
@@ -7340,59 +7384,112 @@ GAME( 1999, act2000d2,   act2000,  sfbonus,    parrot3,    act2000d, ROT0,  "Amc
 GAME( 1999, act2000b,    act2000,  sfbonus,    parrot3,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1999, act2000b2,   act2000,  sfbonus,    parrot3,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, ch2000,      0,        sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000x,     ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000y,     ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000b,     ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000b2,    ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000v,     ch2000,   sfbonus,    parrot3,    ch2000v, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000v2,    ch2000,   sfbonus,    parrot3,    ch2000v2,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000v3,    ch2000,   sfbonus,    parrot3,    ch2000v3,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000c,     ch2000,   sfbonus,    parrot3,    ch2000c, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000c2,    ch2000,   sfbonus,    parrot3,    ch2000c,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000d,     ch2000,   sfbonus,    parrot3,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 11)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000d2,    ch2000,   sfbonus,    parrot3,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (set 12)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000,      0,        sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000x,     ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9D)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000y,     ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2001, pir2001,     0,        sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001a,    pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001b,    pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001b2,   pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001b3,   pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001v,    pir2001,  sfbonus,    parrot3,    pir2001v, ROT0,  "Amcoe", "Pirate 2001 (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001v2,   pir2001,  sfbonus,    parrot3,    pir2001v2, ROT0,  "Amcoe", "Pirate 2001 (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001v3,   pir2001,  sfbonus,    parrot3,    pir2001v, ROT0,  "Amcoe", "Pirate 2001 (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001d,    pir2001,  sfbonus,    parrot3,    pir2001d, ROT0,  "Amcoe", "Pirate 2001 (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001d2,   pir2001,  sfbonus,    parrot3,    pir2001d, ROT0,  "Amcoe", "Pirate 2001 (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000b2,    ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000c,     ch2000,   sfbonus,    parrot3,    ch2000c, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000d,     ch2000,   sfbonus,    parrot3,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000v3,    ch2000,   sfbonus,    parrot3,    ch2000v3,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2002, pir2002,     0,        sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002a,    pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002b,    pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002b2,   pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002b3,   pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002v,    pir2002,  sfbonus,    parrot3,    pir2002v, ROT0,  "Amcoe", "Pirate 2002 (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002v2,   pir2002,  sfbonus,    parrot3,    pir2002v2, ROT0,  "Amcoe", "Pirate 2002 (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002v3,   pir2002,  sfbonus,    parrot3,    pir2002v, ROT0,  "Amcoe", "Pirate 2002 (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002d,    pir2002,  sfbonus,    parrot3,    pir2002d, ROT0,  "Amcoe", "Pirate 2002 (set 9)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002d2,   pir2002,  sfbonus,    parrot3,    pir2002d, ROT0,  "Amcoe", "Pirate 2002 (set 10)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000b,     ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000c2,    ch2000,   sfbonus,    parrot3,    ch2000c,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000d2,    ch2000,   sfbonus,    parrot3,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000v,     ch2000,   sfbonus,    parrot3,    ch2000v, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000v2,    ch2000,   sfbonus,    parrot3,    ch2000v2,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, classice,    0,        sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classicea,   classice, sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classiced,   classice, sfbonus,    parrot3,    classiced,ROT0,  "Amcoe", "Classic Edition (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classiced2,  classice, sfbonus,    parrot3,    classiced,ROT0,  "Amcoe", "Classic Edition (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classiced3,  classice, sfbonus,    parrot3,    classiced3,ROT0,  "Amcoe", "Classic Edition (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classicev,   classice, sfbonus,    parrot3,    classicev,ROT0,  "Amcoe", "Classic Edition (set 6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classicev2,  classice, sfbonus,    parrot3,    classicev,ROT0,  "Amcoe", "Classic Edition (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classicev3,  classice, sfbonus,    parrot3,    classicev3,ROT0,  "Amcoe", "Classic Edition (set 8)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, seawld,      0,        sfbonus,    parrot3,    seawld, ROT0,  "Amcoe", "Sea World (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, seawlda,     seawld,   sfbonus,    parrot3,    seawlda, ROT0,  "Amcoe", "Sea World (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001,     0,        sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.3N)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001a,    pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001b,    pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.20XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, moneymac,    0,        sfbonus,    parrot3,    moneymac, ROT0,  "Amcoe", "Money Machine (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, moneymacv2,  moneymac, sfbonus,    parrot3,    moneymac, ROT0,  "Amcoe", "Money Machine (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, moneymacv,   moneymac, sfbonus,    parrot3,    moneymacv, ROT0,  "Amcoe", "Money Machine (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, moneymacd,   moneymac, sfbonus,    parrot3,    moneymacd, ROT0,  "Amcoe", "Money Machine (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, moneymacd2,  moneymac, sfbonus,    parrot3,    moneymacd, ROT0,  "Amcoe", "Money Machine (set 5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001b2,   pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001d2,   pir2001,  sfbonus,    parrot3,    pir2001d,ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001v3,   pir2001,  sfbonus,    parrot3,    pir2001v,ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, atworld,     0,        sfbonus,    parrot3,    atworld, ROT0,  "Amcoe", "Around The World (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, atworlda,    atworld,  sfbonus,    parrot3,    atworlda, ROT0,  "Amcoe", "Around The World (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001b3,   pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001d,    pir2001,  sfbonus,    parrot3,    pir2001d,ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001v,    pir2001,  sfbonus,    parrot3,    pir2001v,ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
+GAME( 2001, pir2001v2,   pir2001,  sfbonus,    parrot3,    pir2001v2,ROT0, "Amcoe", "Pirate 2001 (Version 2.5E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2002, pir2002,     0,        sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.8N)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002a,    pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.8)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002b,    pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.70XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2002, pir2002b2,   pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002d2,   pir2002,  sfbonus,    parrot3,    pir2002d,ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002v3,   pir2002,  sfbonus,    parrot3,    pir2002v, ROT0, "Amcoe", "Pirate 2002 (Version 1.90XT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2002, pir2002b3,   pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002d,    pir2002,  sfbonus,    parrot3,    pir2002d, ROT0, "Amcoe", "Pirate 2002 (Version 2.0R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002v,    pir2002,  sfbonus,    parrot3,    pir2002v,ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2002, pir2002v2,   pir2002,  sfbonus,    parrot3,    pir2002v2,ROT0, "Amcoe", "Pirate 2002 (Version 2.0E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, classice,    0,        sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classiced2,  classice, sfbonus,    parrot3,    classiced,ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicev2,  classice, sfbonus,    parrot3,    classicev,ROT0,  "Amcoe", "Classic Edition (Version 1.6LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, classicea,   classice, sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classiced,   classice, sfbonus,    parrot3,    classiced,ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicev,   classice, sfbonus,    parrot3,    classicev,ROT0,  "Amcoe", "Classic Edition (Version 1.6R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, classiced3,  classice, sfbonus,    parrot3,    classiced3,ROT0,  "Amcoe", "Classic Edition (Version 1.6E)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicev3,  classice, sfbonus,    parrot3,    classicev3,ROT0,  "Amcoe", "Classic Edition (Version 1.6E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, seawld,      0,        sfbonus,    parrot3,    seawld, ROT0,  "Amcoe", "Sea World (Version 1.6R CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, seawlda,     seawld,   sfbonus,    parrot3,    seawlda, ROT0,  "Amcoe", "Sea World (Version 1.6E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, moneymacd,   moneymac, sfbonus,    parrot3,    moneymacd,ROT0,  "Amcoe", "Money Machine (Version 1.7R)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, moneymac,    0,        sfbonus,    parrot3,    moneymac, ROT0,  "Amcoe", "Money Machine (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, moneymacd2,  moneymac, sfbonus,    parrot3,    moneymacd, ROT0, "Amcoe", "Money Machine (Version 1.7LT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, moneymacv2,  moneymac, sfbonus,    parrot3,    moneymac, ROT0,  "Amcoe", "Money Machine (Version 1.7LT Dual", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, moneymacv,   moneymac, sfbonus,    parrot3,    moneymacv, ROT0,  "Amcoe", "Money Machine (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 200?, atworld,     0,        sfbonus,    parrot3,    atworld, ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, atworlda,    atworld,  sfbonus,    parrot3,    atworlda, ROT0, "Amcoe", "Around The World (Version 1.3E CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb5,         0,        sfbonus,    parrot3,    fb5, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb5c,        fb5,      sfbonus,    parrot3,    fb5, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb5d,        fb5,      sfbonus,    parrot3,    fb5d, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb5v,        fb5,      sfbonus,    parrot3,    fb5v, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb6,         0,        sfbonus,    parrot3,    fb6, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7E CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb6v3,       fb6,      sfbonus,    parrot3,    fb6v3, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb6d2,       fb6,      sfbonus,    parrot3,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7R CGA, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6s,        fb6,      sfbonus,    parrot3,    fb6s, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7R CGA, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6v,        fb6,      sfbonus,    parrot3,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb6d,        fb6,      sfbonus,    parrot3,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7LT CGA, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6s2,       fb6,      sfbonus,    parrot3,    fb6s, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7LT CGA, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6v2,       fb6,      sfbonus,    parrot3,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb6se,       0,        sfbonus,    parrot3,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4R CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6sev,      fb6se,    sfbonus,    parrot3,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb6sed,      fb6se,    sfbonus,    parrot3,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4LT CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6sev2,     fb6se,    sfbonus,    parrot3,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+GAME( 2000, fb6sed2,     fb6se,    sfbonus,    parrot3,    fb6, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4E CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6sev3,     fb6se,    sfbonus,    parrot3,    fb6v3, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+// no gfx / sound roms
+GAME( 2000, version4,    0,        sfbonus,    parrot3,    version4, ROT0,  "Amcoe", "Version 4 (Version 4.2R)", GAME_NOT_WORKING|GAME_NO_SOUND )
+// no gfx / sound roms
+GAME( 2000, bugfever,    0,        sfbonus,    parrot3,    bugfever, ROT0,  "Amcoe", "Bug Fever (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, bugfeverd,   bugfever, sfbonus,    parrot3,    bugfeverd, ROT0,  "Amcoe", "Bug Fever (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, bugfeverv,   bugfever, sfbonus,    parrot3,    bugfeverv, ROT0,  "Amcoe", "Bug Fever (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, bugfeverv2,  bugfever, sfbonus,    parrot3,    bugfeverv2, ROT0,  "Amcoe", "Bug Fever (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+// no gfx / sound roms
+GAME( 2000, dvisland,    0,        sfbonus,    parrot3,    dvisland, ROT0,  "Amcoe", "Devil's Island", GAME_NOT_WORKING|GAME_NO_SOUND )
+// no gfx / sound roms
+GAME( 2000, funriver,    0,        sfbonus,    parrot3,    funriver, ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, funriverv,   funriver, sfbonus,    parrot3,    funriverv, ROT0,  "Amcoe", "Fun River (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+// ?? what is this
+GAME( 2000, amclink,    0,        sfbonus,    parrot3,    sfbonus_common, ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
