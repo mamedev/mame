@@ -5644,9 +5644,12 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rrrevenp )	/*     ??           (c) 1993 */
 	DRIVER( beathead )	/* (proto)          (c) 1993 */
 	DRIVER( tmek )		/* 136100           (c) 1994 */
-	DRIVER( tmekprot )	/* 136100           (c) 1994 */
+	DRIVER( tmek51p )	/* 136100           (c) 1994 */
+	DRIVER( tmek45 )	/* 136100           (c) 1994 */
+	DRIVER( tmek44 )	/* 136100           (c) 1994 */
+	DRIVER( tmek20 )	/* 136100           (c) 1994 */
 	DRIVER( primrage )	/* 136102           (c) 1994 */
-	DRIVER( primraga )	/* 136102           (c) 1994 */
+	DRIVER( primrage20 )/* 136102           (c) 1994 */
 	DRIVER( area51 )	/* 136105           (c) 1995 */
 	DRIVER( area51t )	/* 136105           (c) 1995 */
 	DRIVER( area51a )	/* 136105           (c) 1995 */
