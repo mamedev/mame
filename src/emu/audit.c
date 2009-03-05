@@ -230,9 +230,11 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 	int notfound = 0;
 	int recnum;
 
-	/* no count or records means not found */
-	if (count == 0 || records == NULL)
+	/* no count AND no records means not found, no count only means no ROMs required (= correct) */
+	if (count == 0 && records == NULL)
 		return NOTFOUND;
+        else if (count == 0)
+		return CORRECT;
 
 	/* loop over records */
 	for (recnum = 0; recnum < count; recnum++)
