@@ -7827,6 +7827,7 @@ Other Sun games
 	DRIVER( twins )		/* (c) 1994 */
 	DRIVER( twinsa )	/* (c) 1994 */
 	DRIVER( mwarr )
+	DRIVER( pzletime )
 
 	/* Arcadia System */
 	DRIVER( ar_bios )
