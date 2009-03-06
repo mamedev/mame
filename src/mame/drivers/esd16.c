@@ -982,10 +982,11 @@ ROM_START( hedpanio ) /* Story line & game instructions in English, copyright ye
 	ROM_LOAD16_BYTE( "esd1.rom", 0x000001, 0x040000, CRC(4e0682c5) SHA1(f4117f31b6426d7bf126a6c62c489b9347885b42) )
 
 	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
-	ROM_LOAD( "esd3.rom", 0x00000, 0x0c000, BAD_DUMP CRC(b72b761b) SHA1(9735e05ddc1db38bf81eac89a5312200fc008248) ) /* Should be twice the size, IE: 27C020 */
-	ROM_CONTINUE(         0x10000, 0x14000)
-	//ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
-	//ROM_CONTINUE(          0x10000, 0x34000)
+	// this rom is severely corrupted, however, I think it should be the same, so I'm using the one from the other sets
+	//ROM_LOAD( "esd3.rom", 0x00000, 0x0c000, BAD_DUMP CRC(b72b761b) SHA1(9735e05ddc1db38bf81eac89a5312200fc008248) ) /* Should be twice the size, IE: 27C020 */
+	//ROM_CONTINUE(         0x10000, 0x14000)
+	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
+	ROM_CONTINUE(          0x10000, 0x34000)
 	
 	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "sm1.bin", 0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
@@ -1172,7 +1173,7 @@ GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Mul
 GAME( 1999, mchampda, mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", 0 ) // 26/11/1999 ?
 GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", 0 ) // 17/01/2000 ?
 GAME( 2000, hedpanif, hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", 0 ) // 15/03/2000 ?
-GAME( 1999, hedpanio, hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", GAME_NO_SOUND ) // 15/06/1999 ?
+GAME( 1999, hedpanio, hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", 0 ) // 15/06/1999 ?
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", 0 ) // 26/05/2000 ?
