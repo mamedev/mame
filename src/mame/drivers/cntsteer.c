@@ -13,8 +13,6 @@
     finish
         sprite fixes
         correct roz rotation
-        colour fixes for the sprites
-        Dip-Switches
         make cntsteer work, comms looks awkward and probably different than Zero Target
     cleanup
         split into driver/video
@@ -25,6 +23,7 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include <math.h>
 
 static tilemap *bg_tilemap, *fg_tilemap;
 static UINT8 *videoram2;
@@ -80,12 +79,12 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static VIDEO_START( zerotrgt )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,       16,16,64,64);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,16,16,64,64);
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows_flip_x,8, 8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
-	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX|TILEMAP_FLIPY);
+//	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -153,10 +152,40 @@ static VIDEO_UPDATE( zerotrgt )
 		bitmap_fill(bitmap, cliprect, screen->machine->pens[8*bg_color_bank]);
 	else
 	{
+		static int p1,p2,p3,p4;
+		static int rot_val,x,y;
+
+		rot_val = rotation_sign ? (-rotation_x) : (rotation_x);
+
+//		popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
+
+		if(rot_val > 90) { rot_val = 90; }
+		if(rot_val < -90) { rot_val = -90; }
+
+		/*
+		(u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
+		*/
+		/*
+		     1
+		0----|----0
+		    -1
+		     0
+		0----|----1
+		     0
+		*/
+		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
+		p1 = -65536*1*cos(2*M_PI*(rot_val)/1024);
+		p2 = -65536*1*sin(2*M_PI*(rot_val)/1024);
+		p3 = 65536*1*sin(2*M_PI*(rot_val)/1024);
+		p4 = -65536*1*cos(2*M_PI*(rot_val)/1024);
+
+		x = -256-(scrollx | scrollx_hi);
+		y = 256+(scrolly | scrolly_hi);
+
 		tilemap_draw_roz(bitmap, cliprect, bg_tilemap,
-						(scrollx | scrollx_hi ) << 16, (scrolly | scrolly_hi) << 16,
-						1<<16, (rotation_sign) ? -rotation_x<<8 : rotation_x<<8,
-						0<<16, 1<<16,
+						(x << 16), (y << 16),
+						p1, p2,
+						p3, p4,
 						1,
 						0, 0);
 	}
@@ -185,7 +214,7 @@ static WRITE8_HANDLER(cntsteer_vregs_w)
 //  static UINT8 test[5];
 
 //  test[offset] = data;
-//  popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
+//    popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
 
 	switch(offset)
 	{
@@ -346,28 +375,26 @@ static INPUT_PORTS_START( cntsteer )
 	PORT_INCLUDE( zerotrgt )
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, "0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -457,7 +484,7 @@ static MACHINE_DRIVER_START( cntsteer )
 
     MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
     MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_PERIODIC_INT(sound_interrupt, 640)
+	MDRV_CPU_PERIODIC_INT(sound_interrupt, 480)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
