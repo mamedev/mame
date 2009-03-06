@@ -195,6 +195,8 @@ VIDEO_START( esd16 )
 
 - To Do: Flip X&Y ? They seem unused.
 
+  these are clearly the same as the tumble pop (bootleg?) sprites
+
 ***************************************************************************/
 
 static void esd16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -215,13 +217,16 @@ static void esd16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 		int dimy	=	1 << ((sy >> 9) & 3);
 
-		int	flipx	=	attr & 0x0000;
+		int	flipx	=	sy & 0x2000;
 		int	flipy	=	attr & 0x0000;
-
+		int flash   =   sy & 0x1000;
+		
 		int color	=	(sx >> 9) & 0xf;
 
 		int pri_mask;
 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+		
 		if(sx & 0x8000)
 			pri_mask = 0xfffe; // under "tilemap 1"
 		else
@@ -271,13 +276,17 @@ static void hedpanic_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		int dimy	=	1 << ((sy >> 9) & 3);
 
-		int	flipx	=	spriteram16[ offs + 0 ] & 0x2000;
+		int	flipx	=	sy & 0x2000;
 		int	flipy	=	sy & 0x0000;
+		int flash   =   sy & 0x1000;
 
 		int color	=	(sx >> 9) & 0xf;
 
 		int pri_mask;
 
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
+
+		
 		if(sx & 0x8000)
 			pri_mask = 0xfffe; // under "tilemap 1"
 		else
@@ -407,6 +416,68 @@ if ( input_code_pressed(KEYCODE_Z) )
 	}
 
 	if (layers_ctrl & 4)	hedpanic_draw_sprites(screen->machine,bitmap,cliprect);
+
+
+//  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
+	return 0;
+}
+
+// uses older style sprites
+VIDEO_UPDATE( hedpanio )
+{
+	int layers_ctrl = -1;
+
+	bitmap_fill(priority_bitmap,cliprect,0);
+
+
+#ifdef MAME_DEBUG
+if ( input_code_pressed(KEYCODE_Z) )
+{	int msk = 0;
+	if (input_code_pressed(KEYCODE_Q))	msk |= 1;
+	if (input_code_pressed(KEYCODE_W))	msk |= 2;
+	if (input_code_pressed(KEYCODE_A))	msk |= 4;
+	if (msk != 0) layers_ctrl &= msk;	}
+#endif
+
+	if (layers_ctrl & 1)
+	{
+		if (head_layersize[0]&0x0001)
+		{
+			tilemap_set_scrollx(esdtilemap_0_16x16, 0, esd16_scroll_0[0]);
+			tilemap_set_scrolly(esdtilemap_0_16x16, 0, esd16_scroll_0[1]);
+			tilemap_draw(bitmap,cliprect,esdtilemap_0_16x16,0,0);
+		}
+		else
+		{
+			tilemap_set_scrollx(esdtilemap_0, 0, esd16_scroll_0[0]);
+			tilemap_set_scrolly(esdtilemap_0, 0, esd16_scroll_0[1]);
+			tilemap_draw(bitmap,cliprect,esdtilemap_0,0,0);
+		}
+	}
+	else
+	{
+		bitmap_fill(bitmap,cliprect,0);
+	}
+
+
+	if (layers_ctrl & 2)
+	{
+		if (head_layersize[0]&0x0002)
+		{
+			tilemap_set_scrollx(esdtilemap_1_16x16, 0, esd16_scroll_1[0]);
+			tilemap_set_scrolly(esdtilemap_1_16x16, 0, esd16_scroll_1[1]);
+			tilemap_draw(bitmap,cliprect,esdtilemap_1_16x16,0,1);
+		}
+		else
+		{
+			tilemap_set_scrollx(esdtilemap_1, 0, esd16_scroll_1[0]);
+			tilemap_set_scrolly(esdtilemap_1, 0, esd16_scroll_1[1]);
+			tilemap_draw(bitmap,cliprect,esdtilemap_1,0,1);
+		}
+
+	}
+
+	if (layers_ctrl & 4)	esd16_draw_sprites(screen->machine,bitmap,cliprect);
 
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
