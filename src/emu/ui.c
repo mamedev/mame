@@ -931,9 +931,6 @@ static astring *warnings_string(running_machine *machine, astring *string)
 		if (machine->gamedrv->flags & GAME_REQUIRES_ARTWORK)
 			astring_catc(string, "The game requires external artwork files\n");
 
-
-
-
 		/* if there's a NOT WORKING or UNEMULATED PROTECTION warning, make it stronger */
 		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
 		{
@@ -942,10 +939,11 @@ static astring *warnings_string(running_machine *machine, astring *string)
 			int foundworking;
 
 			/* add the strings for these warnings */
-			if (machine->gamedrv->flags & GAME_NOT_WORKING)
-				astring_catc(string, "THIS " CAPGAMENOUN " DOESN'T WORK. You won't be able to make it work correctly.  Don't bother.\n");
 			if (machine->gamedrv->flags & GAME_UNEMULATED_PROTECTION)
 				astring_catc(string, "The game has protection which isn't fully emulated.\n");
+			if (machine->gamedrv->flags & GAME_NOT_WORKING)
+				astring_catc(string, "THIS " CAPGAMENOUN " DOESN'T WORK. The emulation for this game is not yet complete. "
+									 "There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 
 			/* find the parent of this driver */
 			clone_of = driver_get_clone(machine->gamedrv);
@@ -955,18 +953,22 @@ static astring *warnings_string(running_machine *machine, astring *string)
 				maindrv = machine->gamedrv;
 
 			/* scan the driver list for any working clones and add them */
-			foundworking = 0;
+			foundworking = FALSE;
 			for (i = 0; drivers[i] != NULL; i++)
 				if (drivers[i] == maindrv || driver_get_clone(drivers[i]) == maindrv)
 					if ((drivers[i]->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) == 0)
 					{
 						/* this one works, add a header and display the name of the clone */
-						if (foundworking == 0)
-							astring_catc(string, "\n\nThere are working clones of this game. They are:\n\n");
+						if (!foundworking)
+							astring_catc(string, "\n\nThere are working clones of this game: ");
+						else
+							astring_catc(string, ", ");
 						astring_catc(string, drivers[i]->name);
-						astring_catc(string, "\n");
-						foundworking = 1;
+						foundworking = TRUE;
 					}
+
+			if (foundworking)
+				astring_catc(string, "\n");
 		}
 	}
 
