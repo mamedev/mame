@@ -565,27 +565,9 @@ static CPU_DISASSEMBLE( mips3 )
 static CPU_SET_INFO( mips3 )
 {
 	mips3_state *mips3 = *(mips3_state **)device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_MIPS3_DRC_OPTIONS:				mips3->impstate->drcoptions = info->i;				break;
 
-		case CPUINFO_INT_MIPS3_FASTRAM_SELECT:			if (info->i >= 0 && info->i < MIPS3_MAX_FASTRAM) mips3->impstate->fastram_select = info->i; mips3->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_FASTRAM_START:			mips3->impstate->fastram[mips3->impstate->fastram_select].start = info->i; mips3->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_FASTRAM_END:				mips3->impstate->fastram[mips3->impstate->fastram_select].end = info->i; mips3->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_FASTRAM_READONLY:		mips3->impstate->fastram[mips3->impstate->fastram_select].readonly = info->i; mips3->impstate->cache_dirty = TRUE; break;
-
-		case CPUINFO_INT_MIPS3_HOTSPOT_SELECT:			if (info->i >= 0 && info->i < MIPS3_MAX_HOTSPOTS) mips3->impstate->hotspot_select = info->i; mips3->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_HOTSPOT_PC:				mips3->impstate->hotspot[mips3->impstate->hotspot_select].pc = info->i; mips3->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_HOTSPOT_OPCODE:			mips3->impstate->hotspot[mips3->impstate->hotspot_select].opcode = info->i; mips3->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_HOTSPOT_CYCLES:			mips3->impstate->hotspot[mips3->impstate->hotspot_select].cycles = info->i; mips3->impstate->cache_dirty = TRUE; break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_MIPS3_FASTRAM_BASE:			mips3->impstate->fastram[mips3->impstate->fastram_select].base = info->p;	break;
-
-		/* --- everything else is handled generically --- */
-		default:										mips3com_set_info(mips3, state, info);	break;
-	}
+	/* --- everything is handled generically --- */
+	mips3com_set_info(mips3, state, info);
 }
 
 
@@ -617,6 +599,53 @@ static CPU_GET_INFO( mips3 )
 
 		/* --- everything else is handled generically --- */
 		default:										mips3com_get_info(mips3, state, info); 			break;
+	}
+}
+
+
+/*-------------------------------------------------
+    mips3drc_set_options - configure DRC options
+-------------------------------------------------*/
+
+void mips3drc_set_options(const device_config *device, UINT32 options)
+{
+	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3->impstate->drcoptions = options;
+}
+
+
+/*-------------------------------------------------
+    mips3drc_add_fastram - add a new fastram
+    region
+-------------------------------------------------*/
+
+void mips3drc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+{
+	mips3_state *mips3 = *(mips3_state **)device->token;
+	if (mips3->impstate->fastram_select < ARRAY_LENGTH(mips3->impstate->fastram))
+	{
+		mips3->impstate->fastram[mips3->impstate->fastram_select].start = start;
+		mips3->impstate->fastram[mips3->impstate->fastram_select].end = end;
+		mips3->impstate->fastram[mips3->impstate->fastram_select].readonly = readonly;
+		mips3->impstate->fastram[mips3->impstate->fastram_select].base = base;
+		mips3->impstate->fastram_select++;
+	}
+}
+
+
+/*-------------------------------------------------
+    mips3drc_add_hotspot - add a new hotspot
+-------------------------------------------------*/
+
+void mips3drc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles)
+{
+	mips3_state *mips3 = *(mips3_state **)device->token;
+	if (mips3->impstate->hotspot_select < ARRAY_LENGTH(mips3->impstate->hotspot))
+	{
+		mips3->impstate->hotspot[mips3->impstate->hotspot_select].pc = pc;
+		mips3->impstate->hotspot[mips3->impstate->hotspot_select].opcode = opcode;
+		mips3->impstate->hotspot[mips3->impstate->hotspot_select].cycles = cycles;
+		mips3->impstate->hotspot_select++;
 	}
 }
 

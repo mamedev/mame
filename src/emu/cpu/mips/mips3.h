@@ -225,6 +225,11 @@ struct _mips3_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
+void mips3drc_set_options(const device_config *device, UINT32 options);
+void mips3drc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base);
+void mips3drc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles);
+
+
 #if (HAS_R4600)
 CPU_GET_INFO( r4600be );
 #define CPU_R4600BE CPU_GET_INFO_NAME( r4600be )

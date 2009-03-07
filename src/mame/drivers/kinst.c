@@ -190,26 +190,12 @@ static MACHINE_START( kinst )
 	}
 
 	/* set the fastest DRC options */
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS);
+	mips3drc_set_options(machine->cpu[0], MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x08000000);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x087fffff);
-	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase2);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
-
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x0007ffff);
-	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
-
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 2);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
-	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	mips3drc_add_fastram(machine->cpu[0], 0x08000000, 0x087fffff, FALSE, rambase2);
+	mips3drc_add_fastram(machine->cpu[0], 0x00000000, 0x0007ffff, FALSE, rambase);
+	mips3drc_add_fastram(machine->cpu[0], 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 }
 
 

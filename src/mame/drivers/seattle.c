@@ -456,8 +456,6 @@ static UINT32 *asic_reset;
 static UINT8 pending_analog_read;
 static UINT8 status_leds;
 
-static int speedup_index;
-
 static UINT32 cmos_write_enabled;
 
 
@@ -511,20 +509,11 @@ static MACHINE_START( seattle )
 	galileo.timer[3].timer = timer_alloc(machine, galileo_timer_callback, NULL);
 
 	/* set the fastest DRC options, but strict verification */
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(machine->cpu[0], MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x007fffff);
-	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
-
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
-	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	mips3drc_add_fastram(machine->cpu[0], 0x00000000, 0x007fffff, FALSE, rambase);
+	mips3drc_add_fastram(machine->cpu[0], 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 
 	/* register for save states */
 	state_save_register_global_array(machine, galileo.reg);
@@ -2806,17 +2795,6 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 			memory_install_readwrite32_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
 			break;
 	}
-
-	/* reset speedups */
-	speedup_index = 0;
-}
-
-static void add_speedup(running_machine *machine, offs_t pc, UINT32 op)
-{
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_SELECT, speedup_index++);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_PC, pc);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, op);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 250);
 }
 
 
@@ -2826,9 +2804,9 @@ static DRIVER_INIT( wg3dh )
 	init_common(machine, MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
 
 	/* speedups */
-	add_speedup(machine, 0x8004413C, 0x0C0054B4);		/* confirmed */
-	add_speedup(machine, 0x80094930, 0x00A2102B);		/* confirmed */
-	add_speedup(machine, 0x80092984, 0x3C028011);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x8004413C, 0x0C0054B4, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80094930, 0x00A2102B, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80092984, 0x3C028011, 250);		/* confirmed */
 }
 
 
@@ -2838,7 +2816,7 @@ static DRIVER_INIT( mace )
 	init_common(machine, MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(machine, 0x800108F8, 0x8C420000);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x800108F8, 0x8C420000, 250);		/* confirmed */
 }
 
 
@@ -2848,9 +2826,9 @@ static DRIVER_INIT( sfrush )
 	init_common(machine, MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	add_speedup(machine, 0x80059F34, 0x3C028012);		/* confirmed */
-	add_speedup(machine, 0x800A5AF4, 0x8E300010);		/* confirmed */
-	add_speedup(machine, 0x8004C260, 0x3C028012);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80059F34, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x800A5AF4, 0x8E300010, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x8004C260, 0x3C028012, 250);		/* confirmed */
 }
 
 
@@ -2860,10 +2838,10 @@ static DRIVER_INIT( sfrushrk )
 	init_common(machine, MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	add_speedup(machine, 0x800343E8, 0x3C028012);		/* confirmed */
-	add_speedup(machine, 0x8008F4F0, 0x3C028012);		/* confirmed */
-	add_speedup(machine, 0x800A365C, 0x8E300014);		/* confirmed */
-	add_speedup(machine, 0x80051DAC, 0x3C028012);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x800343E8, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x8008F4F0, 0x3C028012, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x800A365C, 0x8E300014, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80051DAC, 0x3C028012, 250);		/* confirmed */
 }
 
 
@@ -2874,8 +2852,8 @@ static DRIVER_INIT( calspeed )
 	midway_ioasic_set_auto_ack(1);
 
 	/* speedups */
-	add_speedup(machine, 0x80032534, 0x02221024);		/* confirmed */
-	add_speedup(machine, 0x800B1BE4, 0x8E110014);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80032534, 0x02221024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x800B1BE4, 0x8E110014, 250);		/* confirmed */
 }
 
 
@@ -2885,9 +2863,9 @@ static DRIVER_INIT( vaportrx )
 	init_common(machine, MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	add_speedup(machine, 0x80049F14, 0x3C028020);		/* confirmed */
-	add_speedup(machine, 0x8004859C, 0x3C028020);		/* confirmed */
-	add_speedup(machine, 0x8005922C, 0x8E020014);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80049F14, 0x3C028020, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x8004859C, 0x3C028020, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x8005922C, 0x8E020014, 250);		/* confirmed */
 }
 
 
@@ -2909,8 +2887,8 @@ static DRIVER_INIT( blitz )
 	rombase[0x934/4] += 4;
 
 	/* main CPU speedups */
-	add_speedup(machine, 0x80135510, 0x3C028024);		/* confirmed */
-	add_speedup(machine, 0x800087DC, 0x8E820010);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80135510, 0x3C028024, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x800087DC, 0x8E820010, 250);		/* confirmed */
 }
 
 
@@ -2920,8 +2898,8 @@ static DRIVER_INIT( blitz99 )
 	init_common(machine, MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(machine, 0x8014E41C, 0x3C038025);		/* confirmed */
-	add_speedup(machine, 0x80011F10, 0x8E020018);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x8014E41C, 0x3C038025, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80011F10, 0x8E020018, 250);		/* confirmed */
 }
 
 
@@ -2931,8 +2909,8 @@ static DRIVER_INIT( blitz2k )
 	init_common(machine, MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(machine, 0x8015773C, 0x3C038025);		/* confirmed */
-	add_speedup(machine, 0x80012CA8, 0x8E020018);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x8015773C, 0x3C038025, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80012CA8, 0x8E020018, 250);		/* confirmed */
 }
 
 
@@ -2945,8 +2923,8 @@ static DRIVER_INIT( carnevil )
 	memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
 
 	/* speedups */
-	add_speedup(machine, 0x8015176C, 0x3C03801A);		/* confirmed */
-	add_speedup(machine, 0x80011FBC, 0x8E020018);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x8015176C, 0x3C03801A, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80011FBC, 0x8E020018, 250);		/* confirmed */
 }
 
 
@@ -2956,9 +2934,9 @@ static DRIVER_INIT( hyprdriv )
 	init_common(machine, MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	add_speedup(machine, 0x801643BC, 0x3C03801B);		/* confirmed */
-	add_speedup(machine, 0x80011FB8, 0x8E020018);		/* confirmed */
-	//add_speedup(machine, 0x80136A80, 0x3C02801D);      /* potential */
+	mips3drc_add_hotspot(machine->cpu[0], 0x801643BC, 0x3C03801B, 250);		/* confirmed */
+	mips3drc_add_hotspot(machine->cpu[0], 0x80011FB8, 0x8E020018, 250);		/* confirmed */
+	//mips3drc_add_hotspot(machine->cpu[0], 0x80136A80, 0x3C02801D, 250);      /* potential */
 }
 
 

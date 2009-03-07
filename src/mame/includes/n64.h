@@ -84,6 +84,7 @@ extern WRITE32_HANDLER( n64_si_reg_w );
 extern READ32_HANDLER( n64_pif_ram_r );
 extern WRITE32_HANDLER( n64_pif_ram_w );
 
-void n64_machine_reset(running_machine *machine);
+MACHINE_START( n64 );
+MACHINE_RESET( n64 );
 
 #endif

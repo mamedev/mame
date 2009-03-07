@@ -288,6 +288,8 @@ struct _dcs_state
 	const address_space *program;
 	const address_space *data;
 	UINT8		rev;
+	offs_t		polling_offset;
+	UINT32		polling_count;
 
 	/* sound output */
 	UINT8		channels;
@@ -415,6 +417,7 @@ static void recompute_sample_rate(running_machine *machine);
 static void sound_tx_callback(const device_config *device, int port, INT32 data);
 
 static READ16_HANDLER( dcs_polling_r );
+static WRITE16_HANDLER( dcs_polling_w );
 
 static TIMER_CALLBACK( transfer_watchdog_callback );
 static int preprocess_write(running_machine *machine, UINT16 data);
@@ -1018,8 +1021,9 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs.auto_ack = FALSE;
 
 	/* install the speedup handler */
+	dcs.polling_offset = polling_offset;
 	if (polling_offset)
-		dcs_polling_base = memory_install_read16_handler(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA), polling_offset, polling_offset, 0, 0, dcs_polling_r);
+		dcs_polling_base = memory_install_readwrite16_handler(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA), polling_offset, polling_offset, 0, 0, dcs_polling_r, dcs_polling_w);
 
 	/* allocate a watchdog timer for HLE transfers */
 	transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
@@ -1161,6 +1165,10 @@ static void sdrc_remap_memory(running_machine *machine)
 
 	/* update the bank pointers */
 	sdrc_update_bank_pointers(machine);
+	
+	/* reinstall the polling hotspot */
+	if (dcs.polling_offset)
+		dcs_polling_base = memory_install_readwrite16_handler(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA), dcs.polling_offset, dcs.polling_offset, 0, 0, dcs_polling_r, dcs_polling_w);
 }
 
 
@@ -2058,8 +2066,16 @@ static void sound_tx_callback(const device_config *device, int port, INT32 data)
 
 static READ16_HANDLER( dcs_polling_r )
 {
-	cpu_eat_cycles(space->cpu, 1000);
+	if (dcs.polling_count++ > 5)
+		cpu_eat_cycles(space->cpu, 10000);
 	return *dcs_polling_base;
+}
+
+
+static WRITE16_HANDLER( dcs_polling_w )
+{
+	dcs.polling_count = 0;
+	COMBINE_DATA(dcs_polling_base);
 }
 
 

@@ -421,11 +421,6 @@ static INTERRUPT_GEN( n64_vblank )
 	signal_rcp_interrupt(device->machine, VI_INTERRUPT);
 }
 
-static MACHINE_RESET( aleck64 )
-{
-	n64_machine_reset(machine);
-}
-
 static MACHINE_DRIVER_START( aleck64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4600BE, 93750000)
@@ -437,7 +432,8 @@ static MACHINE_DRIVER_START( aleck64 )
 	MDRV_CPU_CONFIG(n64_rsp_config)
 	MDRV_CPU_PROGRAM_MAP(rsp_map, 0)
 
-	MDRV_MACHINE_RESET( aleck64 )
+	MDRV_MACHINE_START( n64 )
+	MDRV_MACHINE_RESET( n64 )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

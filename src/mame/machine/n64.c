@@ -1567,7 +1567,15 @@ WRITE32_HANDLER( n64_pif_ram_w )
 
 //static UINT16 crc_seed = 0x3f;
 
-void n64_machine_reset(running_machine *machine)
+MACHINE_START( n64 )
+{
+	mips3drc_set_options(machine->cpu[0], MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+
+		/* configure fast RAM regions for DRC */
+	mips3drc_add_fastram(machine->cpu[0], 0x00000000, 0x007fffff, FALSE, rdram);
+}
+
+MACHINE_RESET( n64 )
 {
 	int i;
 	//UINT32 *pif_rom   = (UINT32*)memory_region(machine, "user1");
@@ -1622,15 +1630,6 @@ void n64_machine_reset(running_machine *machine)
 	memset(mempack, 0, sizeof(mempack));
 
 	cic_status = 0;
-
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
-
-		/* configure fast RAM regions for DRC */
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x007fffff);
-	device_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rdram);
-	device_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
 	audio_timer = timer_alloc(machine, audio_timer_callback, NULL);
 	timer_adjust_oneshot(audio_timer, attotime_never, 0);
