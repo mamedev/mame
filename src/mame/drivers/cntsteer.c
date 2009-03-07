@@ -93,7 +93,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for (offs = 0;offs < 0x200;offs += 4)
 	{
-		int multi,fx,fy,sx,sy,sy2,code,code2,color;
+		int multi,fx,fy,sx,sy,sy2=0,code,code2,color;
 
 		if((spriteram[offs+1] & 1) == 1)
 			continue;
