@@ -1812,6 +1812,30 @@ ADDRESS_MAP_END
 
 
 /*-------------------------------------------------
+    ppc4xx_spu_set_tx_handler - PowerPC 4XX-
+    specific TX handler configuration
+-------------------------------------------------*/
+
+void ppc4xx_spu_set_tx_handler(const device_config *device, ppc4xx_spu_tx_handler handler)
+{
+	powerpc_state *ppc = *(powerpc_state **)device->token;
+	ppc->spu.tx_handler = handler;
+}
+
+
+/*-------------------------------------------------
+    ppc4xx_spu_receive_byte - PowerPC 4XX-
+    specific serial byte receive
+-------------------------------------------------*/
+
+void ppc4xx_spu_receive_byte(const device_config *device, UINT8 byteval)
+{
+	powerpc_state *ppc = *(powerpc_state **)device->token;
+	ppc4xx_spu_rx_data(ppc, byteval);
+}
+
+
+/*-------------------------------------------------
     ppc4xx_set_info - PowerPC 4XX-specific
     information setter
 -------------------------------------------------*/
@@ -1826,10 +1850,6 @@ void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_2:	ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT2, info->i);		break;
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_3:	ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT3, info->i);		break;
 		case CPUINFO_INT_INPUT_STATE + PPC_IRQ_LINE_4:	ppc4xx_set_irq_line(ppc, PPC4XX_IRQ_BIT_EXT4, info->i);		break;
-		case CPUINFO_INT_PPC_RX_DATA:					ppc4xx_spu_rx_data(ppc, info->i);					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SPU_TX_HANDLER:				ppc->spu.tx_handler = (ppc4xx_spu_tx_handler)info->f; break;
 
 		/* --- everything else is handled generically --- */
 		default:										ppccom_set_info(ppc, state, info);		break;

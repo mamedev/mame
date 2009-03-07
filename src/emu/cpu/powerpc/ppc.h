@@ -95,29 +95,6 @@ enum
 };
 
 
-/* interface extensions */
-enum
-{
-	CPUINFO_INT_PPC_DRC_OPTIONS = CPUINFO_INT_CPU_SPECIFIC,
-
-	CPUINFO_INT_PPC_FASTRAM_SELECT,
-	CPUINFO_INT_PPC_FASTRAM_START,
-	CPUINFO_INT_PPC_FASTRAM_END,
-	CPUINFO_INT_PPC_FASTRAM_READONLY,
-
-	CPUINFO_INT_PPC_HOTSPOT_SELECT,
-	CPUINFO_INT_PPC_HOTSPOT_PC,
-	CPUINFO_INT_PPC_HOTSPOT_OPCODE,
-	CPUINFO_INT_PPC_HOTSPOT_CYCLES,
-
-	CPUINFO_INT_PPC_RX_DATA,
-
-	CPUINFO_PTR_PPC_FASTRAM_BASE = CPUINFO_PTR_CPU_SPECIFIC,
-
-	CPUINFO_FCT_SPU_TX_HANDLER = CPUINFO_FCT_CPU_SPECIFIC
-};
-
-
 /* compiler-specific options */
 #define PPCDRC_STRICT_VERIFY		0x0001			/* verify all instructions */
 #define PPCDRC_FLUSH_PC				0x0002			/* flush the PC value before each memory access */
@@ -148,6 +125,14 @@ struct _powerpc_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
+void ppcdrc_set_options(const device_config *device, UINT32 options);
+void ppcdrc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base);
+void ppcdrc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles);
+
+void ppc4xx_spu_set_tx_handler(const device_config *device, ppc4xx_spu_tx_handler handler);
+void ppc4xx_spu_receive_byte(const device_config *device, UINT8 byteval);
+
+
 CPU_GET_INFO( ppc403ga );
 #define CPU_PPC403GA CPU_GET_INFO_NAME( ppc403ga )
 
@@ -174,24 +159,6 @@ CPU_GET_INFO( ppc604 );
 
 CPU_GET_INFO( mpc8240 );
 #define CPU_MPC8240 CPU_GET_INFO_NAME( mpc8240 )
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE void ppc4xx_spu_set_tx_handler(const device_config *cpu, ppc4xx_spu_tx_handler handler)
-{
-	device_set_info_fct(cpu, CPUINFO_FCT_SPU_TX_HANDLER, (genf *)handler);
-}
-
-
-INLINE void ppc4xx_spu_receive_byte(const device_config *cpu, UINT8 byteval)
-{
-	device_set_info_int(cpu, CPUINFO_INT_PPC_RX_DATA, byteval);
-}
-
 
 
 #endif	/* __PPC_H__ */

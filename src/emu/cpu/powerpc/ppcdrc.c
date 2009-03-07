@@ -764,27 +764,9 @@ static CPU_DISASSEMBLE( ppcdrc )
 static CPU_SET_INFO( ppcdrc )
 {
 	powerpc_state *ppc = *(powerpc_state **)device->token;
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PPC_DRC_OPTIONS:				ppc->impstate->drcoptions = info->i;				break;
 
-		case CPUINFO_INT_PPC_FASTRAM_SELECT:			if (info->i >= 0 && info->i < PPC_MAX_FASTRAM) ppc->impstate->fastram_select = info->i; ppc->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_PPC_FASTRAM_START:				ppc->impstate->fastram[ppc->impstate->fastram_select].start = info->i; ppc->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_PPC_FASTRAM_END:				ppc->impstate->fastram[ppc->impstate->fastram_select].end = info->i; ppc->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_PPC_FASTRAM_READONLY:			ppc->impstate->fastram[ppc->impstate->fastram_select].readonly = info->i; ppc->impstate->cache_dirty = TRUE; break;
-
-		case CPUINFO_INT_PPC_HOTSPOT_SELECT:			if (info->i >= 0 && info->i < PPC_MAX_HOTSPOTS) ppc->impstate->hotspot_select = info->i; ppc->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_PPC_HOTSPOT_PC:				ppc->impstate->hotspot[ppc->impstate->hotspot_select].pc = info->i; ppc->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_PPC_HOTSPOT_OPCODE:			ppc->impstate->hotspot[ppc->impstate->hotspot_select].opcode = info->i; ppc->impstate->cache_dirty = TRUE; break;
-		case CPUINFO_INT_PPC_HOTSPOT_CYCLES:			ppc->impstate->hotspot[ppc->impstate->hotspot_select].cycles = info->i; ppc->impstate->cache_dirty = TRUE; break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_PPC_FASTRAM_BASE:				ppc->impstate->fastram[ppc->impstate->fastram_select].base = info->p;	break;
-
-		/* --- everything else is handled generically --- */
-		default:										ppccom_set_info(ppc, state, info);	break;
-	}
+	/* --- everything is handled generically --- */
+	ppccom_set_info(ppc, state, info);
 }
 
 
@@ -816,6 +798,53 @@ static CPU_GET_INFO( ppcdrc )
 
 		/* --- everything else is handled generically --- */
 		default:										ppccom_get_info(ppc, state, info); 				break;
+	}
+}
+
+
+/*-------------------------------------------------
+    ppcdrc_set_options - configure DRC options
+-------------------------------------------------*/
+
+void ppcdrc_set_options(const device_config *device, UINT32 options)
+{
+	powerpc_state *ppc = *(powerpc_state **)device->token;
+	ppc->impstate->drcoptions = options;
+}
+
+
+/*-------------------------------------------------
+    ppcdrc_add_fastram - add a new fastram
+    region
+-------------------------------------------------*/
+
+void ppcdrc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+{
+	powerpc_state *ppc = *(powerpc_state **)device->token;
+	if (ppc->impstate->fastram_select < ARRAY_LENGTH(ppc->impstate->fastram))
+	{
+		ppc->impstate->fastram[ppc->impstate->fastram_select].start = start;
+		ppc->impstate->fastram[ppc->impstate->fastram_select].end = end;
+		ppc->impstate->fastram[ppc->impstate->fastram_select].readonly = readonly;
+		ppc->impstate->fastram[ppc->impstate->fastram_select].base = base;
+		ppc->impstate->fastram_select++;
+	}
+}
+
+
+/*-------------------------------------------------
+    ppcdrc_add_hotspot - add a new hotspot
+-------------------------------------------------*/
+
+void ppcdrc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles)
+{
+	powerpc_state *ppc = *(powerpc_state **)device->token;
+	if (ppc->impstate->hotspot_select < ARRAY_LENGTH(ppc->impstate->hotspot))
+	{
+		ppc->impstate->hotspot[ppc->impstate->hotspot_select].pc = pc;
+		ppc->impstate->hotspot[ppc->impstate->hotspot_select].opcode = opcode;
+		ppc->impstate->hotspot[ppc->impstate->hotspot_select].cycles = cycles;
+		ppc->impstate->hotspot_select++;
 	}
 }
 
