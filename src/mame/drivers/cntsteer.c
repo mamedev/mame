@@ -114,7 +114,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		code = spriteram[offs+3] + ( ( spriteram[offs+1] & 0xc0 ) << 2 );
 		sx = (spriteram[offs+2]);
 		sy = 0xf0 - spriteram[offs];
-		color = 0x10+((spriteram[offs+1] & 0x20) >> 4) + ((spriteram[offs+1] & 0x8)>>3);.
+		color = 0x10+((spriteram[offs+1] & 0x20) >> 4) + ((spriteram[offs+1] & 0x8)>>3);
 
 		fx = !(spriteram[offs+1] & 0x04);
 		fy = (spriteram[offs+1] & 0x02);
