@@ -7,15 +7,15 @@
     Emulation by Bryan McPhail, mish@tendril.co.uk
     Improvements by Pierpaolo Prazzoli, David Haywood, Angelo Salese
 
-    Various things aren't fully understood, for example the rotating BG layer
-
     todo:
     finish
-        sprite fixes
-        correct roz rotation
-        make cntsteer work, comms looks awkward and probably different than Zero Target
+        - correct roz rotation;
+        - make cntsteer work, comms looks awkward and probably different than Zero Target;
+        - flip screen support;
+        - according to a side-by-side test, sound should be "darker" by some octanes,
+          likely that a sound filter is needed;
     cleanup
-        split into driver/video
+        - split into driver/video;
 
 ***************************************************************************************/
 
@@ -87,27 +87,37 @@ static VIDEO_START( zerotrgt )
 //	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
+/*
+Sprite list:
+
+[0] xxxx xxxx Y attribute
+[1] xx-- ---- sprite number bank
+    --x- x--- color number
+    ---x ---- double-height attribute
+    ---- -x-- flip x (active low)
+    ---- --x- flip y
+    ---- ---x draw sprite flag (active low)
+[2] xxxx xxxx X attribute
+[3] xxxx xxxx sprite number
+*/
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
 	for (offs = 0;offs < 0x200;offs += 4)
 	{
-		int multi,fx,fy,sx,sy,sy2=0,code,code2,color;
+		int multi,fx,fy,sx,sy,code,color;
 
 		if((spriteram[offs+1] & 1) == 1)
 			continue;
 
 		code = spriteram[offs+3] + ( ( spriteram[offs+1] & 0xc0 ) << 2 );
-
-		code2 = code+1;
 		sx = (spriteram[offs+2]);
-
 		sy = 0xf0 - spriteram[offs];
-		color = 0x10+((spriteram[offs+1] & 0x20) >> 4) + ((spriteram[offs+1] & 0x8)>>3); //trusted.
+		color = 0x10+((spriteram[offs+1] & 0x20) >> 4) + ((spriteram[offs+1] & 0x8)>>3);.
 
 		fx = !(spriteram[offs+1] & 0x04);
-		fy = (spriteram[offs+1] & 0x02);  //check
+		fy = (spriteram[offs+1] & 0x02);
 
 		multi = spriteram[offs+1] & 0x10;
 
@@ -115,34 +125,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;
-			sy2=sy-16;
-		}
-		else if (fy && multi)
-		{
-			sy2=sy;
-			sy+=16;
-			code++;
-			code2--;
-		}
-		else if(multi)
-		{
-			sy2=sy;
-			sy-=16;
+			//sy2=sy-16;
 		}
 
-    	drawgfx(bitmap,machine->gfx[1],
-        		code,
-				color,
-				fx,fy,
-				sx,sy,
-				cliprect,TRANSPARENCY_PEN,0);
-        if (multi)
-    		drawgfx(bitmap,machine->gfx[1],
-				code2,
-				color,
-				fx,fy,
-				sx,sy2,
-				cliprect,TRANSPARENCY_PEN,0);
+        if(multi)
+        {
+			if(fy)
+			{
+				drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,machine->gfx[1],code+1,color,fx,fy,sx,sy-16,cliprect,TRANSPARENCY_PEN,0);
+			}
+			else
+			{
+        		drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy-16,cliprect,TRANSPARENCY_PEN,0);
+        		drawgfx(bitmap,machine->gfx[1],code+1,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+			}
+		}
+		else
+		   	drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
@@ -729,6 +729,6 @@ static DRIVER_INIT( zerotrgt )
 
 /***************************************************************************/
 
-GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT90,  "Data East Corporation", "Counter Steer", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
-GAME( 1985, zerotrgt, 0,        zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
-GAME( 1985, gekitsui, zerotrgt, zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
+GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT90,  "Data East Corporation", "Counter Steer", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
+GAME( 1985, zerotrgt, 0,        zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
+GAME( 1985, gekitsui, zerotrgt, zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
