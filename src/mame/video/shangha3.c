@@ -81,7 +81,7 @@ VIDEO_START( shangha3 )
 
 	for (i = 0;i < 14;i++)
 		drawmode_table[i] = DRAWMODE_SOURCE;
-	drawmode_table[14] = shangha3_do_shadows ? DRAWMODE_SHADOW : DRAWMODE_NONE;
+	drawmode_table[14] = shangha3_do_shadows ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
 	drawmode_table[15] = DRAWMODE_NONE;
 
 	if (shangha3_do_shadows)
