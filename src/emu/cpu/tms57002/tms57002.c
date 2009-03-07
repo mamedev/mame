@@ -97,7 +97,7 @@ typedef struct {
 
 	UINT32 xm_adr;
 
-	UINT8 host[4], hidx;
+	UINT8 host[4], hidx, allow_update;
 
 	cd cache;
 
@@ -275,6 +275,7 @@ WRITE8_DEVICE_HANDLER(tms57002_data_w)
 				UINT32 val = (s->host[0]<<24) | (s->host[1]<<16) | (s->host[2]<<8) | s->host[3];
 				s->cmem[s->sa] = val;
 				s->sti &= ~SU_CVAL;
+				s->allow_update = 0;
 			}
 		} else {
 			s->sa = data;
@@ -329,6 +330,7 @@ void tms57002_sync(const device_config *device)
 	if(s->sti & (IN_PLOAD | IN_CLOAD))
 		return;
 
+	s->allow_update = 1;
 	s->pc = 0;
 	s->ca = 0;
 	s->id = 0;
