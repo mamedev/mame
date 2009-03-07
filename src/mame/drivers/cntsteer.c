@@ -77,6 +77,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0, code, 0x30+((attr & 0x78)>>3), 0);
 }
 
+static VIDEO_START( cntsteer )
+{
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_cols,16,16,64,64);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows_flip_x,8, 8,32,32);
+
+	tilemap_set_transparent_pen(fg_tilemap,0);
+
+//	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+}
+
 static VIDEO_START( zerotrgt )
 {
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,16,16,64,64);
@@ -297,6 +307,29 @@ static ADDRESS_MAP_START( gekitsui_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( cntsteer_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM //AM_SHARE(1)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x1200, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE(&colorram)
+	AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cntsteer_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM //AM_SHARE(1)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(&videoram2)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
+	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("COINS")
+	AM_RANGE(0x3000, 0x3004) AM_WRITE(cntsteer_vregs_w)
+	AM_RANGE(0x3005, 0x3005) AM_WRITE(gekitsui_sub_irq_ack)
+	AM_RANGE(0x3007, 0x3007) AM_WRITE(cntsteer_sound_w)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
 /***************************************************************************/
 
 static int nmimask;
@@ -371,8 +404,87 @@ static INPUT_PORTS_START( zerotrgt )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+/* inputs needs some work in this one.*/
 static INPUT_PORTS_START( cntsteer )
 	PORT_INCLUDE( zerotrgt )
+
+	PORT_MODIFY("P1")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("P2")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("COINS")
+	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
@@ -401,7 +513,6 @@ INPUT_PORTS_END
 
 /***************************************************************************/
 
-/* this layout is bad and reads way beyond the end of the array */
 static const gfx_layout cntsteer_charlayout =
 {
 	8,8,	/* 8*8 characters */
@@ -413,7 +524,6 @@ static const gfx_layout cntsteer_charlayout =
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
-/* this layout is bad and reads way beyond the end of the array */
 static const gfx_layout zerotrgt_charlayout =
 {
 	8,8,
@@ -475,11 +585,11 @@ static MACHINE_RESET( zerotrgt )
 
 static MACHINE_DRIVER_START( cntsteer )
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
+	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
 	MDRV_CPU_ADD("sub", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
+	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu2_map,0)
 //  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
     MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
@@ -500,7 +610,7 @@ static MACHINE_DRIVER_START( cntsteer )
 	MDRV_PALETTE_LENGTH(256)
 //  MDRV_PALETTE_INIT(zerotrgt)
 
-	MDRV_VIDEO_START(zerotrgt)
+	MDRV_VIDEO_START(cntsteer)
 	MDRV_VIDEO_UPDATE(zerotrgt)
 
 	/* sound hardware */
