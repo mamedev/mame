@@ -14,7 +14,6 @@
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 
 extern UINT8 *tryout_gfx_control;
@@ -37,7 +36,7 @@ static WRITE8_HANDLER( tryout_nmi_ack_w )
 static WRITE8_HANDLER( tryout_sound_w )
 {
 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( tryout_sound_irq_ack_w )
@@ -56,7 +55,7 @@ static WRITE8_HANDLER( tryout_bankswitch_w )
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(tryout_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(tryout_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xc87f) AM_RAM AM_BASE(&spriteram)
@@ -195,7 +194,7 @@ static MACHINE_DRIVER_START( tryout )
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16) /* ? */
+	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,800) /* ? */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -203,7 +202,7 @@ static MACHINE_DRIVER_START( tryout )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(tryout)
 	MDRV_PALETTE_LENGTH(0x20)
