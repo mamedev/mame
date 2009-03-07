@@ -327,9 +327,10 @@ static void draw_single_sprite(bitmap_t *dest_bmp,const gfx_element *gfx,
 					if( c != 0 )
 					{
 						if (pri[x]<priority)
+						{
 							dest[x] = pal_base+c;
-
-						pri[x] = priority;
+							pri[x] = priority;
+						}
 
 					}
 					x_index += dx;
@@ -562,7 +563,8 @@ static INPUT_PORTS_START( sb2003 )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(spriteram_bit_r, NULL) //changes spriteram location
-	PORT_BIT( 0x5f10ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 ) // checked in dynabomb I/O test, but doesn't work in game
+	PORT_BIT( 0x5f00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spotty )
