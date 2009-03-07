@@ -31,7 +31,7 @@
           the Z180, but the cpu core doesn't support that yet.
         * Is the clock divide 3 or 4?
 
-    Versions known to exist but not dumped: v1.03
+    Versions known to exist but not dumped: v1.02 & v1.03
 
 ***************************************************************************/
 

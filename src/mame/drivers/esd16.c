@@ -27,7 +27,6 @@ Year + Game            PCB             Notes
 
 Other ESD games:
 
-Head Panic          (c) 1999 - missing 16Mbit flash roms & esd3 needs redumping
 3 Cushion Billiards (c) 2000 - Undumped
 Deluxe 5            (c) 2000 - Undumped
 Fire Hawk           (c) 2001 - see nmk16.c driver
