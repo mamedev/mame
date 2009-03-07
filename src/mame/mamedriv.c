@@ -7603,6 +7603,8 @@ Other Sun games
 	DRIVER( chleagul )	/* (c) 199? IGS */
 	DRIVER( number10 )	/* (c) IGS (Board labeled Playmark Srl) */
 	DRIVER( numbr10l )	/* (c) IGS (Board labeled Playmark Srl) */
+	DRIVER( citalian )
+	DRIVER( citaliana )
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */

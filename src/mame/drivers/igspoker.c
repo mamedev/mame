@@ -142,8 +142,9 @@ static WRITE8_HANDLER( fg_color_w )
 
 static VIDEO_START(igs_video)
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8,  32,	64, 8);
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,	8,  32,	64, 8);
+
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
@@ -1375,12 +1376,33 @@ static const gfx_layout charlayout2 =
 	8*32*2
 };
 
+static const gfx_layout charlayout8bpp =
+{
+	8, 8,	/* 8*8 characters */
+	RGN_FRAC(1, 1),
+	8,		
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0,8,16,24,32,40,48,56 },
+	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64 },
+	64*8
+};
+
+
 static GFXDECODE_START( igspoker )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, charlayout2,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x0c000, charlayout2,  0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( citalian )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout8bpp,   0, 1 )
+	/* these not used? */
+	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0x08000, charlayout2,  0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0x0c000, charlayout2,  0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  0, 1 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( igspoker )
@@ -1445,6 +1467,15 @@ static MACHINE_DRIVER_START( number10 )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( citalian )
+
+	MDRV_PALETTE_LENGTH(0x8000)
+
+	MDRV_IMPORT_FROM(number10)
+	MDRV_GFXDECODE(citalian)
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( pktetris )
 
@@ -1926,7 +1957,6 @@ ROM_START( number10 )
 	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 | ROMREGION_DISPOSE )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
-	/* missing sample tables at start of rom */
 	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
 ROM_END
 
@@ -1943,10 +1973,39 @@ ROM_START( numbr10l )
 	ROM_REGION( 0x30000, "gfx2", ROMREGION_ERASE00 | ROMREGION_DISPOSE )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
-	/* missing sample tables at start of rom */
 	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
 ROM_END
 
+ROM_START( citalian )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "cp.u35", 0x00000, 0x20000, CRC(25e129b9) SHA1(01dc9e09603cef233da28e30194e53ef4cd04475) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "3.u23", 0x00000, 0x40000, CRC(b72fe1e0) SHA1(0507df7e1495aa265b276337c9c151478dd9d376) )
+	ROM_LOAD16_BYTE( "2.u25", 0x00001, 0x40000, CRC(bdf55fa4) SHA1(487999d22941a0ef2f3874d31527f45d122aadb0) )
+
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_ERASE00 | ROMREGION_DISPOSE )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
+
+	ROM_REGION( 0x2dd, "plds",0 )
+	ROM_LOAD( "palce22v10h.u44.bad.dump", 0x000, 0x2dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )	
+ROM_END
+
+ROM_START( citaliana )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "ic.u35", 0x00000, 0x20000, CRC(f120eb31) SHA1(b87f638d4eebe05323b6952956d44368077f27aa) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "u23.bin", 0x00000, 0x40000, CRC(b8d2be66) SHA1(fc8cec6bbf7cd446e3388a7c0171643a8d8f3064) )
+	ROM_LOAD16_BYTE( "u25.bin", 0x00001, 0x40000, CRC(b53b8830) SHA1(9854ab83300e7d79c9ab4e154941bfeb607ae8ff) )
+
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_ERASE00 | ROMREGION_DISPOSE )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
+ROM_END
 
 static DRIVER_INIT( pktet346 )
 {
@@ -1992,6 +2051,8 @@ GAMEL( 198?,  csk234it, csk227it, csk234it, csk234,  cska,    ROT0, "IGS",    "C
 GAMEL( 2000, number10,  0,        number10, number10, number10, ROT0, "PlayMark Srl",   "Number Dieci (Poker)",            0,	layout_igspoker )
 GAMEL( 2000, numbr10l,  number10, number10, number10, number10, ROT0, "PlayMark Srl",   "Number Dieci (Lattine)",          0,	layout_igspoker )
 GAMEL( 198?,  igs_ncs,  0,        igs_ncs,  igs_ncs, igs_ncs, ROT0, "IGS",    "New Champion Skill (v100n)",                0,	layout_igspoker ) /* SU 062 */
+GAMEL( 199?, citalian,   0,       citalian,number10,  0,  ROT0, "SGS",    "Champion Italian Cup (bootleg, set 1)",                   GAME_NOT_WORKING, layout_igspoker )
+GAMEL( 199?, citaliana,  citalian,citalian,number10,  0,  ROT0, "SGS",    "Champion Italian Cup (bootleg, set 2)",                   GAME_NOT_WORKING, layout_igspoker )
 
 GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs, igs_ncs2, ROT0, "IGS",   "New Champion Skill (v100n 2000)",           GAME_IMPERFECT_GRAPHICS, layout_igspoker )
 
