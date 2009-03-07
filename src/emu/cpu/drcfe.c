@@ -60,7 +60,6 @@ struct _drcfe_state
 	const address_space *program;					/* program address space for this CPU */
 	offs_t				pageshift;					/* shift to convert address to a page index */
 	cpu_translate_func	translate;					/* pointer to translation function */
-	offs_t				codexor;					/* XOR to reach code */
 
 	/* opcode descriptor arrays */
 	opcode_desc *		desc_live_list;				/* head of list of live descriptions */
@@ -148,8 +147,6 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 	drcfe->program = memory_find_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->translate = (cpu_translate_func)device_get_info_fct(cpu, CPUINFO_FCT_TRANSLATE);
-	if (cpu_get_endianness(cpu) != ENDIANNESS_NATIVE)
-		drcfe->codexor = (cpu_get_databus_width(cpu, ADDRESS_SPACE_PROGRAM) / 8 / cpu_get_min_opcode_bytes(cpu) - 1) * cpu_get_min_opcode_bytes(cpu);
 
 	return drcfe;
 }

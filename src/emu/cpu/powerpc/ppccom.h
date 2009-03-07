@@ -555,6 +555,7 @@ struct _powerpc_state
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	const address_space *program;
+	offs_t			codexor;
 	UINT32			irq_pending;
 	UINT32			system_clock;
 	UINT32			cpu_clock;
