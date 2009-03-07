@@ -39,9 +39,11 @@ static WRITE8_HANDLER( tryout_sound_w )
 	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
+/*this is actually irq/nmi mask, polls only four values at start up (81->01->81->01) and then
+  stays on this state.*/
 static WRITE8_HANDLER( tryout_sound_irq_ack_w )
 {
-	cpu_set_input_line(space->cpu, 0, CLEAR_LINE);
+//	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( tryout_bankswitch_w )
