@@ -106,35 +106,33 @@ WRITE8_HANDLER( wc90b_txvideoram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
 {
-	int offs, sx;
+	int offs, sx, sy;
 
 	/* draw all visible sprites of specified priority */
-	for ( offs = spriteram_size - 8;offs >= 0;offs -= 8 ){
-
+	for ( offs = spriteram_size - 8 ; offs >= 0 ; offs -= 8 )
+	{
 		if ( ( ~( spriteram[offs+3] >> 7 ) & 1 ) == priority )
 		{
+			int code = ( spriteram[offs + 3] & 0x3f ) << 4;
+			int bank = spriteram[offs + 0];
+			int flags = spriteram[offs + 4];
 
-			if ( spriteram[offs+1] > 16 ) /* visible */
-			{
-				int code = ( spriteram[offs+3] & 0x3f ) << 4;
-				int bank = spriteram[offs+0];
-				int flags = spriteram[offs+4];
+			code += ( bank & 0xf0 ) >> 4;
+			code <<= 2;
+			code += ( bank & 0x0f ) >> 2;
 
-				code += ( bank & 0xf0 ) >> 4;
-				code <<= 2;
-				code += ( bank & 0x0f ) >> 2;
+			sx = spriteram[offs + 2];
+			if (!(spriteram[offs + 3] & 0x40)) sx -= 0x0100;
 
-				sx = spriteram[offs + 2];
-				if (!(spriteram[offs+3] & 0x40)) sx -= 0x0100;
+			sy = 240 - spriteram[offs + 1];
 
-				drawgfx( bitmap,machine->gfx[ 17 ], code,
-						flags >> 4, /* color */
-						bank&1, /* flipx */
-						bank&2, /* flipy */
-						sx, /* sx */
-						240 - spriteram[offs + 1], /* sy */
-						cliprect,TRANSPARENCY_PEN,15 );
-			}
+			drawgfx( bitmap, machine->gfx[17], code,
+					flags >> 4, /* color */
+					bank & 1, /* flipx */
+					bank & 2, /* flipy */
+					sx,
+					sy,
+					cliprect,TRANSPARENCY_PEN,15 );
 		}
 	}
 }
