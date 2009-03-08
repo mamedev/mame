@@ -334,8 +334,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			if ( bank & 4 ) { /* visible */
 				which = ( spriteram[offs+2] >> 2 ) + ( spriteram[offs+3] << 6 );
 
-				sx = spriteram[offs + 8] + ( (spriteram[offs + 9] & 1 ) << 8 );
+				sx = spriteram[offs + 8] + ( (spriteram[offs + 9] & 3 ) << 8 );
 				sy = spriteram[offs + 6] + ( (spriteram[offs + 7] & 1 ) << 8 );
+
+				if (sx >= 0x0300) sx -= 0x0400;
 
 				flags = spriteram[offs+4];
 				( *( draw_sprites_proc[ flags & 0x0f ] ) )(machine, bitmap,cliprect, which, sx, sy, bank, flags );
