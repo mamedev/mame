@@ -1031,6 +1031,13 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 		astring_free(fname);
 	}
 
+	if (filerr != FILERR_NONE)
+	{
+		astring *fname = astring_assemble_2(astring_alloc(), ROM_GETNAME(romp), ".chd");
+		filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ, image_file);
+		astring_free(fname);
+	}
+
 	/* did the file open succeed? */
 	if (filerr == FILERR_NONE)
 	{
@@ -1063,6 +1070,13 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 							for (searchdrv = drv; searchdrv != NULL && filerr != FILERR_NONE; searchdrv = driver_get_clone(searchdrv))
 							{
 								astring *fname = astring_assemble_4(astring_alloc(), searchdrv->name, PATH_SEPARATOR, ROM_GETNAME(rom), ".chd");
+								filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ, image_file);
+								astring_free(fname);
+							}
+
+							if (filerr != FILERR_NONE)
+							{
+								astring *fname = astring_assemble_2(astring_alloc(), ROM_GETNAME(rom), ".chd");
 								filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ, image_file);
 								astring_free(fname);
 							}
