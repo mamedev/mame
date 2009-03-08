@@ -14,7 +14,7 @@
 #define DEBUG_PVRTA	(0)
 #define DEBUG_PVRTA_REGS (0)
 #define DEBUG_PVRDLIST	(0)
-#define DEBUG_VERTICES	(0)
+#define DEBUG_VERTICES	(1)
 
 static UINT32 pvrctrl_regs[0x100/4];
 static UINT32 pvrta_regs[0x2000/4];
@@ -707,7 +707,7 @@ render_bounds line, clip;
 	ploty=line.y0;
 	ix = abs(dx);
 	iy = abs(dy);
-	inc = max(ix,iy);
+	inc = MAX(ix,iy);
 	x = y = 0;
 	dxix = (dx ? dx/ix : 0);
 	dyiy = (dy ? dy/iy : 0);
