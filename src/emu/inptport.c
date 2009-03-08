@@ -513,22 +513,19 @@ INLINE INT32 apply_analog_min_max(const analog_field_state *analog, INT32 value)
 	/* for relative devices, wrap around when we go past the edge */
 	else
 	{
-		INT32 adj1 = APPLY_INVERSE_SENSITIVITY(512, analog->sensitivity);
-		INT32 adjdif = adjmax - adjmin + adj1;
+		INT32 adj1 = APPLY_INVERSE_SENSITIVITY(INPUT_RELATIVE_PER_PIXEL, analog->sensitivity);
+		INT32 range = adjmax - adjmin + adj1;
+		/* rolls to other end when 1 position past end. */
+		adjmax += adj1;
+		adjmin -= adj1;
 
-		if (analog->reverse)
+		while (value >= adjmax)
 		{
-			while (value <= adjmin - adj1)
-				value += adjdif;
-			while (value > adjmax)
-				value -= adjdif;
+			value -= range;;
 		}
-		else
+		while (value <= adjmin)
 		{
-			while (value >= adjmax + adj1)
-				value -= adjdif;
-			while (value < adjmin)
-				value += adjdif;
+			value += range;;
 		}
 	}
 
@@ -1870,11 +1867,11 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 			/* adjust for signed */
 			state->adjmin = -state->adjmin;
 
-		state->minimum = (state->adjmin - state->adjdefvalue) * 512;
-		state->maximum = (state->adjmax - state->adjdefvalue) * 512;
+		state->minimum = (state->adjmin - state->adjdefvalue) * INPUT_RELATIVE_PER_PIXEL;
+		state->maximum = (state->adjmax - state->adjdefvalue) * INPUT_RELATIVE_PER_PIXEL;
 
 		/* make the scaling the same for easier coding when we need to scale */
-		state->scaleneg = state->scalepos = COMPUTE_SCALE(1, 512);
+		state->scaleneg = state->scalepos = COMPUTE_SCALE(1, INPUT_RELATIVE_PER_PIXEL);
 
 		if (field->flags & ANALOG_FLAG_RESET)
 			/* delta values reverse from center */
@@ -1886,7 +1883,7 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 
 			/* relative controls reverse from 1 past their max range */
 			if (state->positionalscale == 0)
-				state->reverse_val += 512;
+				state->reverse_val += INPUT_RELATIVE_PER_PIXEL;
 		}
 	}
 
@@ -2148,7 +2145,7 @@ static void frame_update_analog_field(analog_field_state *analog)
 				/* if port is positional, we will take the full analog control and divide it */
 				/* into positions, that way as the control is moved full scale, */
 				/* it moves through all the positions */
-				rawvalue = APPLY_SCALE(rawvalue - INPUT_ABSOLUTE_MIN, analog->positionalscale) * 512 + analog->minimum;
+				rawvalue = APPLY_SCALE(rawvalue - INPUT_ABSOLUTE_MIN, analog->positionalscale) * INPUT_RELATIVE_PER_PIXEL + analog->minimum;
 
 				/* clamp the high value so it does not roll over */
 				rawvalue = MIN(rawvalue, analog->maximum);
@@ -2186,24 +2183,24 @@ static void frame_update_analog_field(analog_field_state *analog)
 	if (input_seq_pressed(input_field_seq(analog->field, SEQ_TYPE_DECREMENT)))
 	{
 		keypressed = TRUE;
-		if (analog->field->delta != 0)
-			delta -= APPLY_SCALE(analog->field->delta, keyscale);
-		else if (analog->lastdigital != 1)
+		if (analog->delta != 0)
+			delta -= APPLY_SCALE(analog->delta, keyscale);
+		else if (!analog->lastdigital)
 			/* decrement only once when first pressed */
 			delta -= APPLY_SCALE(1, keyscale);
-		analog->lastdigital = 1;
+		analog->lastdigital = TRUE;
 	}
 
 	/* same for the increment code sequence */
 	if (input_seq_pressed(input_field_seq(analog->field, SEQ_TYPE_INCREMENT)))
 	{
 		keypressed = TRUE;
-		if (analog->field->delta)
-			delta += APPLY_SCALE(analog->field->delta, keyscale);
-		else if (analog->lastdigital != 2)
+		if (analog->delta)
+			delta += APPLY_SCALE(analog->delta, keyscale);
+		else if (!analog->lastdigital)
 			/* increment only once when first pressed */
 			delta += APPLY_SCALE(1, keyscale);
-		analog->lastdigital = 2;
+		analog->lastdigital = TRUE;
 	}
 
 	/* if resetting is requested, clear the accumulated position to 0 before */
@@ -2222,33 +2219,34 @@ static void frame_update_analog_field(analog_field_state *analog)
 	if (analog->autocenter)
 	{
 		INT32 center = APPLY_INVERSE_SENSITIVITY(analog->center, analog->sensitivity);
-		if (analog->lastdigital != 0 && !keypressed)
+		if (!analog->lastdigital && !keypressed)
 		{
 			/* autocenter from positive values */
 			if (analog->accum >= center)
 			{
-				analog->accum -= APPLY_SCALE(analog->field->centerdelta, analog->keyscalepos);
+				analog->accum -= APPLY_SCALE(analog->centerdelta, analog->keyscalepos);
 				if (analog->accum < center)
 				{
 					analog->accum = center;
-					analog->lastdigital = 0;
+					analog->lastdigital = FALSE;
 				}
 			}
 
 			/* autocenter from negative values */
 			else
 			{
-				analog->accum += APPLY_SCALE(analog->field->centerdelta, analog->keyscaleneg);
+				analog->accum += APPLY_SCALE(analog->centerdelta, analog->keyscaleneg);
 				if (analog->accum > center)
 				{
 					analog->accum = center;
-					analog->lastdigital = 0;
+					analog->lastdigital = FALSE;
 				}
 			}
 		}
 	}
-	else if (!keypressed)
-		analog->lastdigital = 0;
+
+	if (!keypressed)
+		analog->lastdigital = FALSE;
 }
 
 
