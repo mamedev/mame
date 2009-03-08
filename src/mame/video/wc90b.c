@@ -9,6 +9,7 @@ UINT8 *wc90b_scroll2x;
 UINT8 *wc90b_scroll1y;
 UINT8 *wc90b_scroll2y;
 
+UINT8 *wc90b_scroll_x_lo;
 
 static tilemap *tx_tilemap,*fg_tilemap,*bg_tilemap;
 
@@ -128,8 +129,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			drawgfx( bitmap, machine->gfx[17], code,
 					flags >> 4, /* color */
-					bank & 1, /* flipx */
-					bank & 2, /* flipy */
+					bank & 1,   /* flipx */
+					bank & 2,   /* flipy */
 					sx,
 					sy,
 					cliprect,TRANSPARENCY_PEN,15 );
@@ -139,10 +140,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( wc90b )
 {
-	tilemap_set_scrollx(bg_tilemap,0,8 * wc90b_scroll2x[0] + 256);
-	tilemap_set_scrolly(bg_tilemap,0,wc90b_scroll2y[0] + ((wc90b_scroll2y[0] < 0x10 || wc90b_scroll2y[0] == 0xff) ? 256 : 0));
-	tilemap_set_scrollx(fg_tilemap,0,8 * wc90b_scroll1x[0] + 256);
-	tilemap_set_scrolly(fg_tilemap,0,wc90b_scroll1y[0] + ((wc90b_scroll1y[0] < 0x10 || wc90b_scroll1y[0] == 0xff) ? 256 : 0));
+	tilemap_set_scrollx(bg_tilemap,0,8 * wc90b_scroll2x[0] + 256 - 4 + (wc90b_scroll_x_lo[0] & 0x07));
+	tilemap_set_scrolly(bg_tilemap,0,wc90b_scroll2y[0] + 1 + ((wc90b_scroll2y[0] < 0x10 || wc90b_scroll2y[0] == 0xff) ? 256 : 0));
+	tilemap_set_scrollx(fg_tilemap,0,8 * wc90b_scroll1x[0] + 256 - 6 + ((wc90b_scroll_x_lo[0] & 0x38) >> 3));
+	tilemap_set_scrolly(fg_tilemap,0,wc90b_scroll1y[0] + 1 + ((wc90b_scroll1y[0] < 0x10 || wc90b_scroll1y[0] == 0xff) ? 256 : 0));
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

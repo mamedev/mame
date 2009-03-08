@@ -98,6 +98,8 @@ extern UINT8 *wc90b_scroll2x;
 extern UINT8 *wc90b_scroll1y;
 extern UINT8 *wc90b_scroll2y;
 
+extern UINT8 *wc90b_scroll_x_lo;
+
 VIDEO_START( wc90b );
 WRITE8_HANDLER( wc90b_bgvideoram_w );
 WRITE8_HANDLER( wc90b_fgvideoram_w );
@@ -176,6 +178,7 @@ static ADDRESS_MAP_START( wc90b_map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfd06, 0xfd06) AM_WRITEONLY AM_BASE(&wc90b_scroll1x)
 	AM_RANGE(0xfd08, 0xfd08) AM_WRITEONLY AM_BASE(&wc90b_scroll2y)
 	AM_RANGE(0xfd0a, 0xfd0a) AM_WRITEONLY AM_BASE(&wc90b_scroll2x)
+	AM_RANGE(0xfd0e, 0xfd0e) AM_WRITEONLY AM_BASE(&wc90b_scroll_x_lo)
 	AM_RANGE(0xfd00, 0xfd00) AM_READ_PORT("P1")
 	AM_RANGE(0xfd02, 0xfd02) AM_READ_PORT("P2")
 	AM_RANGE(0xfd06, 0xfd06) AM_READ_PORT("DSW1")
