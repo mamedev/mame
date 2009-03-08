@@ -10,15 +10,15 @@ static char *make_signed_hex_str_16( UINT32 value )
 {
 	static char s_hex[ 20 ];
 
-	value &= 0xffff;
 	if( value & 0x8000 )
 	{
-		sprintf( s_hex, "-$%x", ( 0 - value ) & 0x7fff );
+		sprintf( s_hex, "-$%x", -value & 0xffff );
 	}
 	else
 	{
-		sprintf( s_hex, "$%x", value & 0x7fff );
+		sprintf( s_hex, "$%x", value & 0xffff );
 	}
+
 	return s_hex;
 }
 
