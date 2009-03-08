@@ -59,8 +59,11 @@ static DEVICE_START( wave )
 {
 	const device_config *image = NULL;
 
+	assert( device != NULL );
+	assert( device->static_config != NULL );
+
 #ifdef MESS
-	image = devtag_get_device( device->machine, device->tag );
+	image = devtag_get_device( device->machine, (const char *)device->static_config );
 #endif
 	stream_create(device, 0, 1, device->machine->sample_rate, (void *)image, wave_sound_update);
 }
@@ -76,7 +79,7 @@ DEVICE_GET_INFO( wave )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = 1;	 							break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = 0;	 							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( wave );		break;
