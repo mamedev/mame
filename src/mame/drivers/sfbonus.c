@@ -7,14 +7,12 @@ Notes:
 
 - The games don't cope well with corrupt NVRAM, and may fail to boot completely(!)
 
-- There are still some video problems, coin cut in half on pir2002v2 & missing spinning 7 on classice for example
-  maybe the reel tilemap should be one big tilemap, and the 'select' ram is extra scroll bits..
-
 - The code to handle the 'multple' reel layers is dubious.  rowscroll values are always used
   based on only one of the tilemaps displayed in that screen region.
 
-
 - Inputs not done, Lamps not done
+
+- Printer busy errors, Hopper timeout errors
 
  Thanks to Olivier Galibert for the handy bitswapper tool :-)
 
@@ -79,7 +77,7 @@ static TILE_GET_INFO( get_sfbonus_reel2_tile_info )
 	SET_TILE_INFO(
 			1,
 			code,
-			priority,  // colour aboused as priority
+			priority,  // colour abused as priority
 			TILE_FLIPYX(flipx | flipy));
 }
 
@@ -94,7 +92,7 @@ static TILE_GET_INFO( get_sfbonus_reel3_tile_info )
 	SET_TILE_INFO(
 			1,
 			code,
-			priority,  // colour aboused as priority
+			priority,  // colour abused as priority
 			TILE_FLIPYX(flipx | flipy));
 }
 
@@ -109,7 +107,7 @@ static TILE_GET_INFO( get_sfbonus_reel4_tile_info )
 	SET_TILE_INFO(
 			1,
 			code,
-			priority, // colour aboused as priority
+			priority, // colour abused as priority
 			TILE_FLIPYX(flipx | flipy));
 }
 
@@ -438,11 +436,6 @@ static ADDRESS_MAP_START( sfbonus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&nvram) AM_SIZE(&nvram_size)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( sfbonus_unk_r )
-{
-	return mame_rand(space->machine);
-}
-
 static WRITE8_HANDLER( sfbonus_bank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "maincpu");
@@ -453,17 +446,44 @@ static WRITE8_HANDLER( sfbonus_bank_w )
 	memory_set_bankptr(space->machine, 1, &ROM[bank * 0x10000]);
 }
 
+
+
+static READ8_HANDLER( sfbonus_2800_r )
+{
+	return mame_rand(space->machine);
+}
+
+static READ8_HANDLER( sfbonus_2801_r )
+{
+	return mame_rand(space->machine);
+}
+
+static READ8_HANDLER( sfbonus_2c00_r )
+{
+	return mame_rand(space->machine);
+}
+
+static READ8_HANDLER( sfbonus_2c01_r )
+{
+	return mame_rand(space->machine);
+}
+
+static READ8_HANDLER( sfbonus_3800_r )
+{
+	return 0xff;
+}
+
+
 static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("IN0")
-	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("IN1")
-	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("IN2")
+	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("KEY1")
+	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("KEY2")
+	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("KEY3")
 
-	AM_RANGE(0x0418, 0x0418) AM_READ_PORT("IN4")
-	AM_RANGE(0x0420, 0x0420) AM_READ_PORT("IN5")
-	AM_RANGE(0x0428, 0x0428) AM_READ_PORT("IN6")
-	AM_RANGE(0x0430, 0x0430) AM_READ_PORT("IN7")
-
-	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("IN3")
+	AM_RANGE(0x0418, 0x0418) AM_READ_PORT("SWITCH1")
+	AM_RANGE(0x0420, 0x0420) AM_READ_PORT("SWITCH2")
+	AM_RANGE(0x0428, 0x0428) AM_READ_PORT("SWITCH3")
+	AM_RANGE(0x0430, 0x0430) AM_READ_PORT("SWITCH4")
+	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("SWITCH5")
 
 	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 
@@ -471,15 +491,15 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x2400, 0x241f) AM_RAM AM_BASE(&sfbonus_vregs)
 
-	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_unk_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_unk_r)	AM_WRITE(SMH_NOP)
+	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_2800_r)
+	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(SMH_NOP)
 
-	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_unk_r)
-	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_unk_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_2c00_r)
+	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(SMH_NOP)
 
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
-	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_unk_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_3800_r) AM_WRITE(SMH_NOP)
 
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(SMH_NOP)
@@ -497,199 +517,240 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 /* 8-liners input define */
-static INPUT_PORTS_START( sfbonus )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+static INPUT_PORTS_START( amcoebase )
+	PORT_START("KEY1")
+	PORT_DIPNAME( 0x01, 0x01, "Key1-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) // credit clear
+	PORT_DIPNAME( 0x02, 0x02, "Key1-1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "Key1-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) //causes "printer busy" msg.
+	PORT_DIPNAME( 0x08, 0x08, "Key1-3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Account Test")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Port Test")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) //probably some kind of service button or remote
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 2") PORT_CODE(KEYCODE_X)
-	PORT_DIPNAME( 0x02, 0x02, "IN1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Stop 1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("All Stop") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x02, 0x02, "IN2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "Key1-4" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Key1-5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Help") PORT_CODE(KEYCODE_H)
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "IN3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key1-6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Move Reel") PORT_CODE(KEYCODE_Q)
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "IN4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Key1-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN5")
-	PORT_DIPNAME( 0x01, 0x01, "IN5" )
+	
+	PORT_START("KEY2")
+	PORT_DIPNAME( 0x01, 0x01, "Key2-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "Key2-1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "Key2-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "Key2-3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "Key2-4" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Key2-5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key2-6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Key2-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN6")
-	PORT_DIPNAME( 0x01, 0x01, "IN6" )
+	
+	PORT_START("KEY3")
+	PORT_DIPNAME( 0x01, 0x01, "Key3-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "Key3-1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "Key3-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "Key3-3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "Key3-4" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Key3-5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key3-6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Key3-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_START("IN7")
-	PORT_DIPNAME( 0x01, 0x01, "IN7" )
+	
+	/* the dipswitches are probably for debugging the games only, all settings are in NVRAM */
+	PORT_START("SWITCH1")
+	PORT_DIPNAME( 0x01, 0x01, "Switch1-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch1-1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch1-2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch1-3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch1-4" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch1-5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch1-6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch1-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
+
+	PORT_START("SWITCH2")
+	PORT_DIPNAME( 0x01, 0x01, "Switch2-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch2-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch2-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch2-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch2-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch2-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch2-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch2-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
+	
+	PORT_START("SWITCH3")
+	PORT_DIPNAME( 0x01, 0x01, "Switch3-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch3-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch3-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch3-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch3-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch3-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch3-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch3-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+			
+	PORT_START("SWITCH4")
+	PORT_DIPNAME( 0x01, 0x01, "Switch4-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch4-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch4-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch4-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch4-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch4-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch4-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch4-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
+	
+	PORT_START("SWITCH5")
+	PORT_DIPNAME( 0x01, 0x01, "Switch5-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch5-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch5-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch5-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch5-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch5-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch5-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch5-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* pokers input define */
-static INPUT_PORTS_START( parrot3 )
-	PORT_INCLUDE(sfbonus)
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4 / Small") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1 / Bet") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3 / W-Up") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cancel All") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2 / Big") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+static INPUT_PORTS_START( amcoetype1 )
+	PORT_INCLUDE(amcoebase)
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON9)  PORT_NAME("Payout?") PORT_CODE(KEYCODE_Y) // causes hopper error
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10) PORT_NAME("Clear SW.") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11) PORT_NAME("Account") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12) PORT_NAME("Confirm / Port Test") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)    PORT_IMPULSE(2) // causes coin jam if held
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2)    PORT_IMPULSE(2) // note (larger values)
+	
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1)  PORT_IMPULSE(2) // causes service jam if held
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3)     PORT_IMPULSE(2) // causes coin jam if held
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("All Stop / Left") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 1 / Select Letter / Double / Hold Help") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Stop 3 / Erase / Take") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Play / Bet") PORT_CODE(KEYCODE_B)	
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 2 / Right") PORT_CODE(KEYCODE_C)
+
+	PORT_MODIFY("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1)
+
 INPUT_PORTS_END
 
 static const gfx_layout sfbonus_layout =
@@ -4427,27 +4488,34 @@ static DRIVER_INIT( sfbonus_common)
 	}
 }
 
-
-
-static DRIVER_INIT( sfbonus )
+static void sfbonus_bitswap( running_machine* machine, 
+						UINT8 xor0, UINT8 b00, UINT8 b01, UINT8 b02, UINT8 b03, UINT8 b04, UINT8 b05, UINT8 b06,UINT8 b07,
+                        UINT8 xor1, UINT8 b10, UINT8 b11, UINT8 b12, UINT8 b13, UINT8 b14, UINT8 b15, UINT8 b16,UINT8 b17,
+	                    UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,					
+		                UINT8 xor3, UINT8 b30, UINT8 b31, UINT8 b32, UINT8 b33, UINT8 b34, UINT8 b35, UINT8 b36,UINT8 b37,					
+			            UINT8 xor4, UINT8 b40, UINT8 b41, UINT8 b42, UINT8 b43, UINT8 b44, UINT8 b45, UINT8 b46,UINT8 b47,					
+				        UINT8 xor5, UINT8 b50, UINT8 b51, UINT8 b52, UINT8 b53, UINT8 b54, UINT8 b55, UINT8 b56,UINT8 b57,					
+				        UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,					
+				        UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 )
 {
 
 	int i;
 	UINT8 *ROM = memory_region(machine, "maincpu");
+
 	for(i=0;i<memory_region_length(machine, "maincpu");i++)
 	{
 		UINT8 x = ROM[i];
 
 		switch(i & 7)
 		{
-			case 0: x = BITSWAP8(x^0x2a, 1,3,7,6,5,2,0,4); break;
-			case 1: x = BITSWAP8(x^0xe4, 3,7,6,5,2,0,4,1); break;
-			case 2: x = BITSWAP8(x^0x2d, 4,1,3,7,6,5,2,0); break;
-			case 3: x = BITSWAP8(x^0xba, 4,3,0,2,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x30, 2,1,7,6,5,0,3,4); break;
-			case 5: x = BITSWAP8(x^0xf1, 2,7,6,5,1,3,4,0); break;
-			case 6: x = BITSWAP8(x^0x3d, 2,1,4,7,6,5,3,0); break;
-			case 7: x = BITSWAP8(x^0xba, 4,3,0,1,2,7,6,5); break;
+			case 0: x = BITSWAP8(x^xor0, b00,b01,b02,b03,b04,b05,b06,b07); break;
+			case 1: x = BITSWAP8(x^xor1, b10,b11,b12,b13,b14,b15,b16,b17); break;
+			case 2: x = BITSWAP8(x^xor2, b20,b21,b22,b23,b24,b25,b26,b27); break;
+			case 3: x = BITSWAP8(x^xor3, b30,b31,b32,b33,b34,b35,b36,b37); break;
+			case 4: x = BITSWAP8(x^xor4, b40,b41,b42,b43,b44,b45,b46,b47); break;
+			case 5: x = BITSWAP8(x^xor5, b50,b51,b52,b53,b54,b55,b56,b57); break;
+			case 6: x = BITSWAP8(x^xor6, b60,b61,b62,b63,b64,b65,b66,b67); break;
+			case 7: x = BITSWAP8(x^xor7, b70,b71,b72,b73,b74,b75,b76,b77); break;
 		}
 
 		ROM[i] = x;
@@ -4455,3041 +4523,443 @@ static DRIVER_INIT( sfbonus )
 	DRIVER_INIT_CALL(sfbonus_common);
 }
 
-static DRIVER_INIT(act2000)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
 
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x25, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xE6, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x20, 2,4,1,7,6,5,0,3); break;
-			case 3: x = BITSWAP8(x^0xBF, 0,3,1,2,4,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2E, 1,3,7,6,5,2,0,4); break;
-			case 5: x = BITSWAP8(x^0xE0, 3,7,6,5,2,0,4,1); break;
-			case 6: x = BITSWAP8(x^0x2D, 4,1,2,7,6,5,0,3); break;
-			case 7: x = BITSWAP8(x^0xB2, 2,0,4,1,3,7,6,5); break;
+static DRIVER_INIT(sfbonus) { sfbonus_bitswap(machine,    0x2a, 1,3,7,6,5,2,0,4, 0xe4, 3,7,6,5,2,0,4,1, 0x2d, 4,1,3,7,6,5,2,0, 0xba, 4,3,0,2,1,7,6,5, 0x30, 2,1,7,6,5,0,3,4, 0xf1, 2,7,6,5,1,3,4,0, 0x3d, 2,1,4,7,6,5,3,0, 0xba, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(act2000) { sfbonus_bitswap(machine,    0x25, 1,2,7,6,5,4,3,0, 0xE6, 1,7,6,5,4,3,0,2, 0x20, 2,4,1,7,6,5,0,3, 0xBF, 0,3,1,2,4,7,6,5, 0x2E, 1,3,7,6,5,2,0,4, 0xE0, 3,7,6,5,2,0,4,1, 0x2D, 4,1,2,7,6,5,0,3, 0xB2, 2,0,4,1,3,7,6,5); }
+static DRIVER_INIT(dblchal) { sfbonus_bitswap(machine,    0x3D, 0,3,7,6,5,2,1,4, 0xF3, 3,7,6,5,1,0,4,2, 0x3D, 2,0,1,7,6,5,3,4, 0xA8, 3,4,2,0,1,7,6,5, 0x3D, 2,3,7,6,5,1,0,4, 0xEF, 2,7,6,5,1,0,3,4, 0x3A, 4,2,3,7,6,5,1,0, 0xBA, 2,4,1,0,3,7,6,5); }
+static DRIVER_INIT(hldspin1) { sfbonus_bitswap(machine,   0x21, 0,2,7,6,5,4,3,1, 0xe1, 1,7,6,5,4,3,2,0, 0x31, 1,4,3,7,6,5,2,0, 0xbc, 0,3,4,2,1,7,6,5, 0x24, 4,3,7,6,5,2,0,1, 0xf8, 3,7,6,5,2,0,1,4, 0x39, 1,4,2,7,6,5,0,3, 0xaf, 0,3,2,1,4,7,6,5); }
+static DRIVER_INIT(hldspin2) { sfbonus_bitswap(machine,   0x21, 1,3,7,6,5,0,4,2, 0xfe, 2,7,6,5,1,0,4,3, 0x33, 1,0,3,7,6,5,2,4, 0xa6, 1,0,4,3,2,7,6,5, 0x37, 0,1,7,6,5,3,2,4, 0xfe, 2,7,6,5,1,0,4,3, 0x36, 1,0,4,7,6,5,3,2, 0xa2, 1,0,2,4,3,7,6,5); }
+static DRIVER_INIT(pickwin) { sfbonus_bitswap(machine,    0x20, 1,3,7,6,5,2,4,0, 0xfa, 2,7,6,5,4,0,1,3, 0x37, 1,0,3,7,6,5,2,4, 0xb0, 4,0,1,3,2,7,6,5, 0x34, 0,1,7,6,5,3,2,4, 0xef, 3,7,6,5,2,0,1,4, 0x27, 1,0,4,7,6,5,3,2, 0xb0, 4,0,1,3,2,7,6,5); }
+static DRIVER_INIT(robadv) { sfbonus_bitswap(machine,     0x31, 0,3,7,6,5,2,1,4, 0xe0, 1,7,6,5,3,2,4,0, 0x2f, 4,0,2,7,6,5,3,1, 0xa7, 1,0,3,4,2,7,6,5, 0x33, 1,3,7,6,5,2,0,4, 0xed, 2,7,6,5,1,4,3,0, 0x34, 4,1,3,7,6,5,2,0, 0xaf, 2,0,4,1,3,7,6,5); }
+static DRIVER_INIT(anibonus) { sfbonus_bitswap(machine,   0x33, 0,3,7,6,5,2,1,4, 0xe7, 2,7,6,5,3,4,1,0, 0x3a, 4,2,3,7,6,5,1,0, 0xa8, 3,4,2,0,1,7,6,5, 0x3d, 2,3,7,6,5,1,0,4, 0xff, 3,7,6,5,1,0,2,4, 0x3a, 4,2,3,7,6,5,1,0, 0xbe, 3,4,1,0,2,7,6,5); }
+static DRIVER_INIT(pirpok2) { sfbonus_bitswap(machine,    0x26, 1,2,7,6,5,4,3,0, 0xf6, 1,7,6,5,4,3,0,2, 0x29, 4,0,1,7,6,5,2,3, 0xad, 0,3,1,2,4,7,6,5, 0x2e, 1,3,7,6,5,2,0,4, 0xe0, 3,7,6,5,2,0,4,1, 0x39, 4,1,2,7,6,5,0,3, 0xb2, 2,0,4,1,3,7,6,5); }
+static DRIVER_INIT(tighook) { sfbonus_bitswap(machine,    0x33, 0,1,7,6,5,2,3,4, 0xf3, 3,7,6,5,1,0,4,2, 0x2e, 4,0,2,7,6,5,3,1, 0xa7, 1,0,4,2,3,7,6,5, 0x2d, 1,2,7,6,5,3,4,0, 0xff, 2,7,6,5,1,0,3,4, 0x27, 1,0,2,7,6,5,3,4, 0xa7, 1,0,4,2,3,7,6,5); }
+static DRIVER_INIT(sfruitb) { sfbonus_bitswap(machine,    0x3e, 2,1,7,6,5,4,3,0, 0xfd, 1,7,6,5,0,3,2,4, 0x37, 4,1,3,7,6,5,2,0, 0xac, 2,0,4,1,3,7,6,5, 0x35, 2,3,7,6,5,1,0,4, 0xf6, 3,7,6,5,2,0,1,4, 0x37, 4,1,3,7,6,5,2,0, 0xb9, 0,3,4,1,2,7,6,5); }
+static DRIVER_INIT(fb2gen) { sfbonus_bitswap(machine,     0x35, 0,3,7,6,5,2,1,4, 0xe8, 2,7,6,5,4,3,1,0, 0x23, 4,3,2,7,6,5,1,0, 0xb8, 2,1,4,0,3,7,6,5, 0x2d, 0,1,7,6,5,4,2,3, 0xf8, 2,7,6,5,1,4,3,0, 0x23, 4,0,3,7,6,5,2,1, 0xb8, 2,1,4,0,3,7,6,5); }
+static DRIVER_INIT(fb2nd) { sfbonus_bitswap(machine,      0x2f, 0,2,7,6,5,3,4,1, 0xff, 2,7,6,5,3,0,4,1, 0x3e, 4,0,1,7,6,5,2,3, 0xad, 3,0,4,1,2,7,6,5, 0x35, 4,3,7,6,5,1,0,2, 0xfd, 4,7,6,5,3,1,2,0, 0x3a, 4,1,2,7,6,5,3,0, 0xbd, 3,4,2,0,1,7,6,5); }
+static DRIVER_INIT(fb4) { sfbonus_bitswap(machine,        0x37, 1,2,7,6,5,4,3,0, 0xeb, 1,7,6,5,4,0,2,3, 0x2d, 4,0,2,7,6,5,3,1, 0xbd, 2,0,4,1,3,7,6,5, 0x29, 4,1,7,6,5,2,3,0, 0xff, 1,7,6,5,2,3,0,4, 0x3f, 1,0,4,7,6,5,3,2, 0xae, 2,3,0,4,1,7,6,5); }
+static DRIVER_INIT(ch2000) { sfbonus_bitswap(machine,     0x29, 2,3,7,6,5,0,4,1, 0xfe, 2,7,6,5,1,0,3,4, 0x33, 0,1,3,7,6,5,2,4, 0xa6, 1,0,3,4,2,7,6,5, 0x25, 4,1,7,6,5,3,2,0, 0xfe, 2,7,6,5,1,0,3,4, 0x35, 0,1,4,7,6,5,3,2, 0xbe, 1,0,4,2,3,7,6,5); }
+static DRIVER_INIT(anithunt) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xe7, 4,7,6,5,0,3,1,2, 0x33, 0,2,1,7,6,5,4,3, 0xb3, 0,3,4,2,1,7,6,5, 0x2a, 1,3,7,6,5,2,0,4, 0xe4, 3,7,6,5,2,0,4,1, 0x2d, 4,1,3,7,6,5,2,0, 0xb6, 0,3,2,1,4,7,6,5); }
+static DRIVER_INIT(abnudge) { sfbonus_bitswap(machine,    0x33, 0,3,7,6,5,2,1,4, 0xff, 3,7,6,5,1,0,4,2, 0x36, 4,2,3,7,6,5,1,0, 0xa8, 3,2,4,0,1,7,6,5, 0x2c, 0,1,7,6,5,2,4,3, 0xff, 3,7,6,5,1,0,4,2, 0x26, 2,4,3,7,6,5,1,0, 0xbe, 4,1,3,0,2,7,6,5); }
+static DRIVER_INIT(pir2001) { sfbonus_bitswap(machine,    0x3a, 1,2,7,6,5,4,3,0, 0xfa, 3,7,6,5,2,0,4,1, 0x33, 4,1,3,7,6,5,2,0, 0xa8, 2,0,4,1,3,7,6,5, 0x2a, 2,4,7,6,5,0,3,1, 0xf7, 1,7,6,5,4,3,0,2, 0x27, 4,1,2,7,6,5,0,3, 0xaf, 0,3,2,4,1,7,6,5); }
+static DRIVER_INIT(pir2002) { sfbonus_bitswap(machine,    0x30, 3,2,7,6,5,4,0,1, 0xec, 2,7,6,5,4,0,1,3, 0x2d, 1,4,3,7,6,5,2,0, 0xa6, 4,0,1,3,2,7,6,5, 0x20, 4,1,7,6,5,2,3,0, 0xf9, 2,7,6,5,4,3,0,1, 0x3a, 4,1,2,7,6,5,0,3, 0xb7, 1,0,3,2,4,7,6,5); }
+static DRIVER_INIT(classice) { sfbonus_bitswap(machine,   0x3f, 2,0,7,6,5,4,3,1, 0xe9, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xab, 4,3,2,0,1,7,6,5, 0x3e, 2,1,7,6,5,4,3,0, 0xeb, 2,7,6,5,4,3,0,1, 0x22, 0,2,1,7,6,5,4,3, 0xad, 4,3,0,2,1,7,6,5); }
+static DRIVER_INIT(seawld) { sfbonus_bitswap(machine,     0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x24, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,2,0, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(moneymac) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xeb, 0,7,6,5,4,3,2,1, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(atworld) { sfbonus_bitswap(machine,    0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x26, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xe8, 1,7,6,5,4,3,0,2, 0x22, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
+static DRIVER_INIT(fruitcar) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 0,1,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(act2000v) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(ch2000v) { sfbonus_bitswap(machine,    0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 1,0,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(ch2000v2) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3e, 2,1,7,6,5,4,3,0, 0xec, 0,7,6,5,4,3,2,1, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(ch2000d) { sfbonus_bitswap(machine,    0x38, 0,2,7,6,5,4,3,1, 0xed, 0,7,6,5,4,3,2,1, 0x25, 2,0,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3c, 0,1,7,6,5,4,3,2, 0xed, 1,7,6,5,4,3,0,2, 0x25, 2,0,1,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(ch2000v3) { sfbonus_bitswap(machine,   0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 1,0,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(ch2000c) { sfbonus_bitswap(machine,    0x29, 2,3,7,6,5,0,4,1, 0xfe, 2,7,6,5,1,0,3,4, 0x33, 0,1,3,7,6,5,2,4, 0xa6, 1,0,3,4,2,7,6,5, 0x25, 4,1,7,6,5,3,2,0, 0xfe, 2,7,6,5,1,0,3,4, 0x35, 0,1,4,7,6,5,3,2, 0xbe, 1,0,4,2,3,7,6,5); }
+static DRIVER_INIT(classiced) { sfbonus_bitswap(machine,  0x38, 0,2,7,6,5,4,3,1, 0xea, 2,7,6,5,4,3,0,1, 0x24, 2,1,0,7,6,5,4,3, 0xaa, 4,3,2,0,1,7,6,5, 0x3e, 1,0,7,6,5,4,3,2, 0xe8, 0,7,6,5,4,3,1,2, 0x24, 2,1,0,7,6,5,4,3, 0xa8, 4,3,0,2,1,7,6,5); }
+static DRIVER_INIT(classiced3) { sfbonus_bitswap(machine, 0x3b, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x24, 2,1,0,7,6,5,4,3, 0xaa, 4,3,2,0,1,7,6,5, 0x3e, 1,0,7,6,5,4,3,2, 0xe8, 0,7,6,5,4,3,1,2, 0x24, 2,1,0,7,6,5,4,3, 0xae, 4,3,1,0,2,7,6,5); }
+static DRIVER_INIT(classicev) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(classicev3) { sfbonus_bitswap(machine, 0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xe9, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(seawlda) { sfbonus_bitswap(machine,    0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xea, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(atworlda) { sfbonus_bitswap(machine,   0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x26, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x22, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
+static DRIVER_INIT(act2000v2) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(act2000v3) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(act2000d) { sfbonus_bitswap(machine,   0x3d, 0,2,7,6,5,4,3,1, 0xef, 1,7,6,5,4,3,2,0, 0x27, 0,2,1,7,6,5,4,3, 0xad, 4,3,0,1,2,7,6,5, 0x3b, 2,1,7,6,5,4,3,0, 0xed, 0,7,6,5,4,3,2,1, 0x27, 0,2,1,7,6,5,4,3, 0xaa, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(anibonus3) { sfbonus_bitswap(machine,  0x33, 0,3,7,6,5,2,1,4, 0xff, 3,7,6,5,1,0,4,2, 0x36, 4,2,3,7,6,5,1,0, 0xa8, 3,2,4,0,1,7,6,5, 0x2c, 0,1,7,6,5,2,4,3, 0xff, 3,7,6,5,1,0,4,2, 0x26, 2,4,3,7,6,5,1,0, 0xbe, 4,1,3,0,2,7,6,5); }
+static DRIVER_INIT(fruitcar2) { sfbonus_bitswap(machine,  0x33, 0,3,7,6,5,2,1,4, 0xff, 3,7,6,5,1,0,4,2, 0x36, 4,2,3,7,6,5,1,0, 0xa8, 3,2,4,0,1,7,6,5, 0x2c, 0,1,7,6,5,2,4,3, 0xff, 3,7,6,5,1,0,4,2, 0x26, 2,4,3,7,6,5,1,0, 0xbe, 4,1,3,0,2,7,6,5); }
+static DRIVER_INIT(fruitcar3) { sfbonus_bitswap(machine,  0x3b, 0,1,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x21, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3d, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x21, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(moneymacv) { sfbonus_bitswap(machine,  0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x23, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xeb, 0,7,6,5,4,3,2,1, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(moneymacd) { sfbonus_bitswap(machine,  0x3a, 1,0,7,6,5,4,3,2, 0xe9, 0,7,6,5,4,3,1,2, 0x26, 0,2,1,7,6,5,4,3, 0xaf, 4,3,1,2,0,7,6,5, 0x3d, 0,2,7,6,5,4,3,1, 0xe9, 0,7,6,5,4,3,1,2, 0x23, 0,1,2,7,6,5,4,3, 0xae, 4,3,2,0,1,7,6,5); }
+static DRIVER_INIT(pirpok2d) { sfbonus_bitswap(machine,   0x3c, 0,1,7,6,5,4,3,2, 0xed, 0,7,6,5,4,3,2,1, 0x21, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x38, 0,2,7,6,5,4,3,1, 0xed, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(pirpok2v) { sfbonus_bitswap(machine,   0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x23, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3e, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,1,0, 0x22, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
+static DRIVER_INIT(pirpok2v2) { sfbonus_bitswap(machine,  0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,1,0, 0x22, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
+static DRIVER_INIT(dblchald) { sfbonus_bitswap(machine,   0x3c, 0,1,7,6,5,4,3,2, 0xed, 0,7,6,5,4,3,2,1, 0x27, 0,2,1,7,6,5,4,3, 0xae, 4,3,1,0,2,7,6,5, 0x3b, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x27, 0,2,1,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(dblchalv) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(abnudged) { sfbonus_bitswap(machine,   0x3b, 0,1,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x21, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3d, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x21, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(abnudgev) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 0,1,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(pickwind) { sfbonus_bitswap(machine,   0x3c, 0,1,7,6,5,4,3,2, 0xed, 0,7,6,5,4,3,2,1, 0x27, 0,2,1,7,6,5,4,3, 0xae, 4,3,1,0,2,7,6,5, 0x3b, 2,1,7,6,5,4,3,0, 0xe8, 0,7,6,5,4,3,1,2, 0x27, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(pickwinv) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(pickwinv2) { sfbonus_bitswap(machine,  0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x26, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(anithuntd) { sfbonus_bitswap(machine,  0x3c, 0,1,7,6,5,4,3,2, 0xee, 0,7,6,5,4,3,2,1, 0x21, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3d, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x21, 0,2,1,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(anithuntv) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(anibonusd) { sfbonus_bitswap(machine,  0x3b, 0,1,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x21, 0,2,1,7,6,5,4,3, 0xa8, 4,3,0,1,2,7,6,5, 0x3d, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x21, 0,2,1,7,6,5,4,3, 0xaa, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(anibonusv) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 0,1,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(anibonusv3) { sfbonus_bitswap(machine, 0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x21, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 0,1,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(hldspin1d) { sfbonus_bitswap(machine,  0x38, 0,1,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x27, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3e, 0,2,7,6,5,4,3,1, 0xeb, 1,7,6,5,4,3,0,2, 0x27, 1,0,2,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(hldspin1v) { sfbonus_bitswap(machine,  0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x26, 2,1,0,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(parrot3d) { sfbonus_bitswap(machine,   0x3b, 0,1,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x27, 0,2,1,7,6,5,4,3, 0xad, 4,3,0,1,2,7,6,5, 0x3b, 2,1,7,6,5,4,3,0, 0xee, 2,7,6,5,4,3,1,0, 0x27, 0,2,1,7,6,5,4,3, 0xaa, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(parrot3v) { sfbonus_bitswap(machine,   0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x26, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
+static DRIVER_INIT(parrot3v2) { sfbonus_bitswap(machine,  0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xe9, 2,7,6,5,4,3,1,0, 0x22, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
+static DRIVER_INIT(sfruitbd) { sfbonus_bitswap(machine,   0x3e, 1,0,7,6,5,4,3,2, 0xed, 1,7,6,5,4,3,0,2, 0x25, 2,0,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3c, 0,1,7,6,5,4,3,2, 0xed, 2,7,6,5,4,3,1,0, 0x25, 2,0,1,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(sfruitbv) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x25, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(sfruitbv2) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x25, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(sfbonusd) { sfbonus_bitswap(machine,   0x3b, 0,1,7,6,5,4,3,2, 0xef, 1,7,6,5,4,3,0,2, 0x24, 2,1,0,7,6,5,4,3, 0xad, 4,3,0,1,2,7,6,5, 0x3e, 1,0,7,6,5,4,3,2, 0xeb, 2,7,6,5,4,3,1,0, 0x24, 2,1,0,7,6,5,4,3, 0xaa, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(sfbonusv) { sfbonus_bitswap(machine,   0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x25, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb2ndv) { sfbonus_bitswap(machine,     0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 2,1,7,6,5,4,3,0, 0xec, 0,7,6,5,4,3,2,1, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb2ndd) { sfbonus_bitswap(machine,     0x3b, 1,0,7,6,5,4,3,2, 0xeb, 1,7,6,5,4,3,0,2, 0x25, 2,0,1,7,6,5,4,3, 0xad, 4,3,0,1,2,7,6,5, 0x3c, 0,1,7,6,5,4,3,2, 0xeb, 2,7,6,5,4,3,1,0, 0x25, 2,0,1,7,6,5,4,3, 0xaa, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(robadv2v1) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(robadv2v4) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(robadv2d) { sfbonus_bitswap(machine,   0x3c, 0,1,7,6,5,4,3,2, 0xe8, 0,7,6,5,4,3,1,2, 0x24, 2,1,0,7,6,5,4,3, 0xae, 4,3,1,0,2,7,6,5, 0x3e, 1,0,7,6,5,4,3,2, 0xed, 1,7,6,5,4,3,0,2, 0x24, 2,1,0,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(hldspin2d) { sfbonus_bitswap(machine,  0x3b, 0,1,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x27, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3e, 0,2,7,6,5,4,3,1, 0xeb, 1,7,6,5,4,3,0,2, 0x27, 1,0,2,7,6,5,4,3, 0xab, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(hldspin2v) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x23, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(tighookv) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 0,7,6,5,4,3,2,1, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(tighookv2) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xea, 0,7,6,5,4,3,2,1, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(tighookd) { sfbonus_bitswap(machine,   0x3d, 0,1,7,6,5,4,3,2, 0xed, 1,7,6,5,4,3,0,2, 0x26, 2,1,0,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3c, 1,0,7,6,5,4,3,2, 0xed, 2,7,6,5,4,3,1,0, 0x26, 2,1,0,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(pir2001v) { sfbonus_bitswap(machine,   0x39, 1,0,7,6,5,4,3,2, 0xea, 0,7,6,5,4,3,2,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xed, 2,7,6,5,4,3,1,0, 0x23, 0,1,2,7,6,5,4,3, 0xac, 4,3,2,1,0,7,6,5); }
+static DRIVER_INIT(pir2001v2) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x39, 1,0,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(pir2001d) { sfbonus_bitswap(machine,   0x3c, 0,1,7,6,5,4,3,2, 0xeb, 0,7,6,5,4,3,2,1, 0x27, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5, 0x3e, 0,2,7,6,5,4,3,1, 0xeb, 1,7,6,5,4,3,0,2, 0x27, 1,0,2,7,6,5,4,3, 0xae, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(pir2002d) { sfbonus_bitswap(machine,   0x3d, 2,0,7,6,5,4,3,1, 0xef, 1,7,6,5,4,3,2,0, 0x27, 0,2,1,7,6,5,4,3, 0xae, 4,3,1,0,2,7,6,5, 0x3b, 2,1,7,6,5,4,3,0, 0xed, 0,7,6,5,4,3,2,1, 0x27, 0,2,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(pir2002v) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(pir2002v2) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 1,0,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb2genv) { sfbonus_bitswap(machine,    0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xea, 0,7,6,5,4,3,2,1, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb2genv3) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xeb, 0,7,6,5,4,3,2,1, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb2gend) { sfbonus_bitswap(machine,    0x3d, 2,0,7,6,5,4,3,1, 0xeb, 1,7,6,5,4,3,0,2, 0x25, 2,0,1,7,6,5,4,3, 0xad, 4,3,0,1,2,7,6,5, 0x3c, 0,1,7,6,5,4,3,2, 0xeb, 2,7,6,5,4,3,1,0, 0x25, 2,0,1,7,6,5,4,3, 0xac, 4,3,2,1,0,7,6,5); }
+static DRIVER_INIT(fb4d) { sfbonus_bitswap(machine,       0x3d, 2,0,7,6,5,4,3,1, 0xeb, 1,7,6,5,4,3,0,2, 0x25, 2,0,1,7,6,5,4,3, 0xad, 4,3,2,1,0,7,6,5, 0x3c, 0,1,7,6,5,4,3,2, 0xeb, 2,7,6,5,4,3,1,0, 0x25, 2,0,1,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb4v) { sfbonus_bitswap(machine,       0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 2,1,7,6,5,4,3,0, 0xeb, 0,7,6,5,4,3,2,1, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb4v3) { sfbonus_bitswap(machine,      0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3e, 2,1,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb5) { sfbonus_bitswap(machine,        0x20, 0,3,7,6,5,1,4,2, 0xf1, 1,7,6,5,3,2,4,0, 0x33, 2,3,1,7,6,5,0,4, 0xaf, 2,0,1,4,3,7,6,5, 0x2d, 2,4,7,6,5,1,0,3, 0xfb, 4,7,6,5,1,0,3,2, 0x34, 2,0,4,7,6,5,3,1, 0xb7, 1,0,3,2,4,7,6,5); }
+static DRIVER_INIT(fb5d) { sfbonus_bitswap(machine,       0x3e, 2,1,7,6,5,4,3,0, 0xef, 1,7,6,5,4,3,2,0, 0x24, 2,1,0,7,6,5,4,3, 0xad, 4,3,0,1,2,7,6,5, 0x3e, 1,0,7,6,5,4,3,2, 0xeb, 2,7,6,5,4,3,1,0, 0x24, 2,1,0,7,6,5,4,3, 0xaa, 4,3,1,2,0,7,6,5); }
+static DRIVER_INIT(fb5v) { sfbonus_bitswap(machine,       0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,0,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3f, 1,0,7,6,5,4,3,2, 0xee, 1,7,6,5,4,3,0,2, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb6) { sfbonus_bitswap(machine,        0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x21, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb6d) { sfbonus_bitswap(machine,       0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x22, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb6v) { sfbonus_bitswap(machine,       0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x23, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xed, 2,7,6,5,4,3,1,0, 0x23, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb6v3) { sfbonus_bitswap(machine,      0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xea, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(fb6s) { sfbonus_bitswap(machine,       0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x24, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 0,7,6,5,4,3,2,1, 0x25, 1,0,2,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(version4) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 1,7,6,5,4,3,0,2, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(bugfever) { sfbonus_bitswap(machine,   0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x22, 2,1,0,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(bugfeverd) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xe8, 1,7,6,5,4,3,0,2, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(bugfeverv) { sfbonus_bitswap(machine,  0x3c, 1,0,7,6,5,4,3,2, 0xef, 0,7,6,5,4,3,2,1, 0x22, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3a, 0,1,7,6,5,4,3,2, 0xea, 2,7,6,5,4,3,1,0, 0x22, 0,1,2,7,6,5,4,3, 0xa9, 4,3,2,1,0,7,6,5); }
+static DRIVER_INIT(bugfeverv2) { sfbonus_bitswap(machine, 0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x23, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xed, 2,7,6,5,4,3,1,0, 0x26, 2,1,0,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(dvisland) { sfbonus_bitswap(machine,   0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x21, 1,0,2,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xe9, 1,7,6,5,4,3,0,2, 0x23, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(funriver) { sfbonus_bitswap(machine,   0x3c, 1,2,7,6,5,4,3,0, 0xea, 2,7,6,5,4,3,0,1, 0x24, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xec, 0,7,6,5,4,3,2,1, 0x23, 1,0,2,7,6,5,4,3, 0xa9, 4,3,0,1,2,7,6,5); }
+static DRIVER_INIT(funriverv) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0, 0xef, 2,7,6,5,4,3,0,1, 0x26, 0,2,1,7,6,5,4,3, 0xa8, 4,3,1,2,0,7,6,5, 0x3b, 0,1,7,6,5,4,3,2, 0xea, 2,7,6,5,4,3,1,0, 0x22, 2,1,0,7,6,5,4,3, 0xac, 4,3,0,1,2,7,6,5); }
 
-		}
-
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(dblchal)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-
-			case 0: x = BITSWAP8(x^0x3D, 0,3,7,6,5,2,1,4); break;
-			case 1: x = BITSWAP8(x^0xF3, 3,7,6,5,1,0,4,2); break;
-			case 2: x = BITSWAP8(x^0x3D, 2,0,1,7,6,5,3,4); break;
-			case 3: x = BITSWAP8(x^0xA8, 3,4,2,0,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3D, 2,3,7,6,5,1,0,4); break;
-			case 5: x = BITSWAP8(x^0xEF, 2,7,6,5,1,0,3,4); break;
-			case 6: x = BITSWAP8(x^0x3A, 4,2,3,7,6,5,1,0); break;
-			case 7: x = BITSWAP8(x^0xBA, 2,4,1,0,3,7,6,5); break;
-    		}
-
-		ROM[i] = x;
-	}
-
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-
-static DRIVER_INIT(hldspin1)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x21, 0,2,7,6,5,4,3,1); break;
-			case 1: x = BITSWAP8(x^0xe1, 1,7,6,5,4,3,2,0); break;
-			case 2: x = BITSWAP8(x^0x31, 1,4,3,7,6,5,2,0); break;
-			case 3: x = BITSWAP8(x^0xbc, 0,3,4,2,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x24, 4,3,7,6,5,2,0,1); break;
-			case 5: x = BITSWAP8(x^0xf8, 3,7,6,5,2,0,1,4); break;
-			case 6: x = BITSWAP8(x^0x39, 1,4,2,7,6,5,0,3); break;
-			case 7: x = BITSWAP8(x^0xaf, 0,3,2,1,4,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(hldspin2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x21, 1,3,7,6,5,0,4,2); break;
-			case 1: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,4,3); break;
-			case 2: x = BITSWAP8(x^0x33, 1,0,3,7,6,5,2,4); break;
-			case 3: x = BITSWAP8(x^0xa6, 1,0,4,3,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x37, 0,1,7,6,5,3,2,4); break;
-			case 5: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,4,3); break;
-			case 6: x = BITSWAP8(x^0x36, 1,0,4,7,6,5,3,2); break;
-			case 7: x = BITSWAP8(x^0xa2, 1,0,2,4,3,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pickwin)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x20, 1,3,7,6,5,2,4,0); break;
-			case 1: x = BITSWAP8(x^0xfa, 2,7,6,5,4,0,1,3); break;
-			case 2: x = BITSWAP8(x^0x37, 1,0,3,7,6,5,2,4); break;
-			case 3: x = BITSWAP8(x^0xb0, 4,0,1,3,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x34, 0,1,7,6,5,3,2,4); break;
-			case 5: x = BITSWAP8(x^0xef, 3,7,6,5,2,0,1,4); break;
-			case 6: x = BITSWAP8(x^0x27, 1,0,4,7,6,5,3,2); break;
-			case 7: x = BITSWAP8(x^0xb0, 4,0,1,3,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(robadv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x31, 0,3,7,6,5,2,1,4); break;
-			case 1: x = BITSWAP8(x^0xe0, 1,7,6,5,3,2,4,0); break;
-			case 2: x = BITSWAP8(x^0x2f, 4,0,2,7,6,5,3,1); break;
-			case 3: x = BITSWAP8(x^0xa7, 1,0,3,4,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x33, 1,3,7,6,5,2,0,4); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,1,4,3,0); break;
-			case 6: x = BITSWAP8(x^0x34, 4,1,3,7,6,5,2,0); break;
-			case 7: x = BITSWAP8(x^0xaf, 2,0,4,1,3,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(anibonus)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x33, 0,3,7,6,5,2,1,4); break;
-			case 1: x = BITSWAP8(x^0xe7, 2,7,6,5,3,4,1,0); break;
-			case 2: x = BITSWAP8(x^0x3a, 4,2,3,7,6,5,1,0); break;
-			case 3: x = BITSWAP8(x^0xa8, 3,4,2,0,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3d, 2,3,7,6,5,1,0,4); break;
-			case 5: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,2,4); break;
-			case 6: x = BITSWAP8(x^0x3a, 4,2,3,7,6,5,1,0); break;
-			case 7: x = BITSWAP8(x^0xbe, 3,4,1,0,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pirpok2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x26, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xf6, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x29, 4,0,1,7,6,5,2,3); break;
-			case 3: x = BITSWAP8(x^0xad, 0,3,1,2,4,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2e, 1,3,7,6,5,2,0,4); break;
-			case 5: x = BITSWAP8(x^0xe0, 3,7,6,5,2,0,4,1); break;
-			case 6: x = BITSWAP8(x^0x39, 4,1,2,7,6,5,0,3); break;
-			case 7: x = BITSWAP8(x^0xb2, 2,0,4,1,3,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(tighook)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x33, 0,1,7,6,5,2,3,4); break;
-			case 1: x = BITSWAP8(x^0xf3, 3,7,6,5,1,0,4,2); break;
-			case 2: x = BITSWAP8(x^0x2e, 4,0,2,7,6,5,3,1); break;
-			case 3: x = BITSWAP8(x^0xa7, 1,0,4,2,3,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2d, 1,2,7,6,5,3,4,0); break;
-			case 5: x = BITSWAP8(x^0xff, 2,7,6,5,1,0,3,4); break;
-			case 6: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,3,4); break;
-			case 7: x = BITSWAP8(x^0xa7, 1,0,4,2,3,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(sfruitb)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3e, 2,1,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xfd, 1,7,6,5,0,3,2,4); break;
-			case 2: x = BITSWAP8(x^0x37, 4,1,3,7,6,5,2,0); break;
-			case 3: x = BITSWAP8(x^0xac, 2,0,4,1,3,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x35, 2,3,7,6,5,1,0,4); break;
-			case 5: x = BITSWAP8(x^0xf6, 3,7,6,5,2,0,1,4); break;
-			case 6: x = BITSWAP8(x^0x37, 4,1,3,7,6,5,2,0); break;
-			case 7: x = BITSWAP8(x^0xb9, 0,3,4,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb2gen)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x35, 0,3,7,6,5,2,1,4); break;
-			case 1: x = BITSWAP8(x^0xe8, 2,7,6,5,4,3,1,0); break;
-			case 2: x = BITSWAP8(x^0x23, 4,3,2,7,6,5,1,0); break;
-			case 3: x = BITSWAP8(x^0xb8, 2,1,4,0,3,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2d, 0,1,7,6,5,4,2,3); break;
-			case 5: x = BITSWAP8(x^0xf8, 2,7,6,5,1,4,3,0); break;
-			case 6: x = BITSWAP8(x^0x23, 4,0,3,7,6,5,2,1); break;
-			case 7: x = BITSWAP8(x^0xb8, 2,1,4,0,3,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb2nd)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x2f, 0,2,7,6,5,3,4,1); break;
-			case 1: x = BITSWAP8(x^0xff, 2,7,6,5,3,0,4,1); break;
-			case 2: x = BITSWAP8(x^0x3e, 4,0,1,7,6,5,2,3); break;
-			case 3: x = BITSWAP8(x^0xad, 3,0,4,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x35, 4,3,7,6,5,1,0,2); break;
-			case 5: x = BITSWAP8(x^0xfd, 4,7,6,5,3,1,2,0); break;
-			case 6: x = BITSWAP8(x^0x3a, 4,1,2,7,6,5,3,0); break;
-			case 7: x = BITSWAP8(x^0xbd, 3,4,2,0,1,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb4)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x37, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xeb, 1,7,6,5,4,0,2,3); break;
-			case 2: x = BITSWAP8(x^0x2d, 4,0,2,7,6,5,3,1); break;
-			case 3: x = BITSWAP8(x^0xbd, 2,0,4,1,3,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x29, 4,1,7,6,5,2,3,0); break;
-			case 5: x = BITSWAP8(x^0xff, 1,7,6,5,2,3,0,4); break;
-			case 6: x = BITSWAP8(x^0x3f, 1,0,4,7,6,5,3,2); break;
-			case 7: x = BITSWAP8(x^0xae, 2,3,0,4,1,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(ch2000)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x29, 2,3,7,6,5,0,4,1); break;
-			case 1: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,3,4); break;
-			case 2: x = BITSWAP8(x^0x33, 0,1,3,7,6,5,2,4); break;
-			case 3: x = BITSWAP8(x^0xa6, 1,0,3,4,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x25, 4,1,7,6,5,3,2,0); break;
-			case 5: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,3,4); break;
-			case 6: x = BITSWAP8(x^0x35, 0,1,4,7,6,5,3,2); break;
-			case 7: x = BITSWAP8(x^0xbe, 1,0,4,2,3,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(anithunt)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xe7, 4,7,6,5,0,3,1,2); break;
-			case 2: x = BITSWAP8(x^0x33, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xb3, 0,3,4,2,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2a, 1,3,7,6,5,2,0,4); break;
-			case 5: x = BITSWAP8(x^0xe4, 3,7,6,5,2,0,4,1); break;
-			case 6: x = BITSWAP8(x^0x2d, 4,1,3,7,6,5,2,0); break;
-			case 7: x = BITSWAP8(x^0xb6, 0,3,2,1,4,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(abnudge)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x33, 0,3,7,6,5,2,1,4); break;
-			case 1: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,4,2); break;
-			case 2: x = BITSWAP8(x^0x36, 4,2,3,7,6,5,1,0); break;
-			case 3: x = BITSWAP8(x^0xa8, 3,2,4,0,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2c, 0,1,7,6,5,2,4,3); break;
-			case 5: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,4,2); break;
-			case 6: x = BITSWAP8(x^0x26, 2,4,3,7,6,5,1,0); break;
-			case 7: x = BITSWAP8(x^0xbe, 4,1,3,0,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pir2001)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x3a, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xfa, 3,7,6,5,2,0,4,1); break;
-			case 2: x = BITSWAP8(x^0x33, 4,1,3,7,6,5,2,0); break;
-			case 3: x = BITSWAP8(x^0xa8, 2,0,4,1,3,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2a, 2,4,7,6,5,0,3,1); break;
-			case 5: x = BITSWAP8(x^0xf7, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x27, 4,1,2,7,6,5,0,3); break;
-			case 7: x = BITSWAP8(x^0xaf, 0,3,2,4,1,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pir2002)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x30, 3,2,7,6,5,4,0,1); break;
-			case 1: x = BITSWAP8(x^0xec, 2,7,6,5,4,0,1,3); break;
-			case 2: x = BITSWAP8(x^0x2d, 1,4,3,7,6,5,2,0); break;
-			case 3: x = BITSWAP8(x^0xa6, 4,0,1,3,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x20, 4,1,7,6,5,2,3,0); break;
-			case 5: x = BITSWAP8(x^0xf9, 2,7,6,5,4,3,0,1); break;
-			case 6: x = BITSWAP8(x^0x3a, 4,1,2,7,6,5,0,3); break;
-			case 7: x = BITSWAP8(x^0xb7, 1,0,3,2,4,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-
-static DRIVER_INIT(classice)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x3f, 2,0,7,6,5,4,3,1); break;
-			case 1: x = BITSWAP8(x^0xe9, 2,7,6,5,4,3,1,0); break;
-			case 2: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xab, 4,3,2,0,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,0,1); break;
-			case 6: x = BITSWAP8(x^0x22, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xad, 4,3,0,2,1,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-//
-static DRIVER_INIT(seawld)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x24, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,2,0); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
- //mmv17r.bin
-
-static DRIVER_INIT(moneymac)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xeb, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-
-static DRIVER_INIT(atworld)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x26, 1,0,2,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3a, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe8, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x22, 0,1,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fruitcar)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
- 			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x21, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-
-static DRIVER_INIT(act2000v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(ch2000v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-} //
-
-static DRIVER_INIT(ch2000v2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xec, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-
-	DRIVER_INIT_CALL(sfbonus_common);
-} //
-
-
-
-static DRIVER_INIT(ch2000d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x38, 0,2,7,6,5,4,3,1); break;
-			case 1: x = BITSWAP8(x^0xed, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(ch2000v3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(ch2000c)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x29, 2,3,7,6,5,0,4,1); break;
-			case 1: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,3,4); break;
-			case 2: x = BITSWAP8(x^0x33, 0,1,3,7,6,5,2,4); break;
-			case 3: x = BITSWAP8(x^0xa6, 1,0,3,4,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x25, 4,1,7,6,5,3,2,0); break;
-			case 5: x = BITSWAP8(x^0xfe, 2,7,6,5,1,0,3,4); break;
-			case 6: x = BITSWAP8(x^0x35, 0,1,4,7,6,5,3,2); break;
-			case 7: x = BITSWAP8(x^0xbe, 1,0,4,2,3,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(classiced)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x38, 0,2,7,6,5,4,3,1); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xaa, 4,3,2,0,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe8, 0,7,6,5,4,3,1,2); break;
-			case 6: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa8, 4,3,0,2,1,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(classiced3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3b, 2,1,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xaa, 4,3,2,0,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe8, 0,7,6,5,4,3,1,2); break;
-			case 6: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae, 4,3,1,0,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(classicev)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3a, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}  //
-
-static DRIVER_INIT(classicev3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xe9, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}  //
-
-static DRIVER_INIT(seawlda)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3a, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}  //
-
-static DRIVER_INIT(atworlda)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x26, 1,0,2,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x22, 0,1,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}  //
-
-
-static DRIVER_INIT(act2000v2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x21, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3a, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(act2000v3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(act2000d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3d, 0,2,7,6,5,4,3,1); break;
-			case 1: x = BITSWAP8(x^0xef, 1,7,6,5,4,3,2,0); break;
-			case 2: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xad, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xaa, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(anibonus3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x33, 0,3,7,6,5,2,1,4); break;
-			case 1: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,4,2); break;
-			case 2: x = BITSWAP8(x^0x36, 4,2,3,7,6,5,1,0); break;
-			case 3: x = BITSWAP8(x^0xa8, 3,2,4,0,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2c, 0,1,7,6,5,2,4,3); break;
-			case 5: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,4,2); break;
-			case 6: x = BITSWAP8(x^0x26, 2,4,3,7,6,5,1,0); break;
-			case 7: x = BITSWAP8(x^0xbe, 4,1,3,0,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fruitcar2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x33, 0,3,7,6,5,2,1,4); break;
-			case 1: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,4,2); break;
-			case 2: x = BITSWAP8(x^0x36, 4,2,3,7,6,5,1,0); break;
-			case 3: x = BITSWAP8(x^0xa8, 3,2,4,0,1,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2c, 0,1,7,6,5,2,4,3); break;
-			case 5: x = BITSWAP8(x^0xff, 3,7,6,5,1,0,4,2); break;
-			case 6: x = BITSWAP8(x^0x26, 2,4,3,7,6,5,1,0); break;
-			case 7: x = BITSWAP8(x^0xbe, 4,1,3,0,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}//
-
-static DRIVER_INIT(fruitcar3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x21, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3d, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x21, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}//
-
-static DRIVER_INIT(moneymacv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xeb, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}//
-
-
-static DRIVER_INIT(moneymacd)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3a, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xe9, 0,7,6,5,4,3,1,2); break;
-			case 2: x = BITSWAP8(x^0x26, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xaf, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3d, 0,2,7,6,5,4,3,1); break;
-			case 5: x = BITSWAP8(x^0xe9, 0,7,6,5,4,3,1,2); break;
-			case 6: x = BITSWAP8(x^0x23, 0,1,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae, 4,3,2,0,1,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}//
-
-static DRIVER_INIT(pirpok2d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xed, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x38, 0,2,7,6,5,4,3,1); break;
-			case 5: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}//
-
-static DRIVER_INIT(pirpok2v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 0,1,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pirpok2v2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3a, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 0,1,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-} //
-
-static DRIVER_INIT(dblchald)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xed, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xae, 4,3,1,0,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 6: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(dblchalv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-} //
-
-static DRIVER_INIT(abnudged)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x21, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3d, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x21, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-
-static DRIVER_INIT(abnudgev)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x21, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pickwind)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xed, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xae, 4,3,1,0,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xe8, 0,7,6,5,4,3,1,2); break;
-			case 6: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-} //
-
-static DRIVER_INIT(pickwinv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x26, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-
-static DRIVER_INIT(pickwinv2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x26, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(anithuntd)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xee, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x21, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3d, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x21, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(anithuntv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}  //
-
-static DRIVER_INIT(anibonusd)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x21, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3d, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x21, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xaa,4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(anibonusv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x21, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(anibonusv3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x21, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(hldspin1d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x38, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 0,2,7,6,5,4,3,1); break;
-			case 5: x = BITSWAP8(x^0xeb, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae,  4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
- static DRIVER_INIT(hldspin1v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x26, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-
-static DRIVER_INIT(parrot3d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xad, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xee, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xaa, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(parrot3v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x26, 0,1,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(parrot3v2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xe9, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 0,1,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(sfruitbd)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(sfruitbv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x25, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(sfruitbv2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x25, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(sfbonusd)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xad, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xaa, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(sfbonusv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x25, 2,1,0,7,6,5,4,3); break; // 20176543
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb2ndv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3a, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xec, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb2ndd)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xeb, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xad, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xaa, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(robadv2v1)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x21, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3a, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(robadv2v4)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(robadv2d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xe8, 0,7,6,5,4,3,1,2); break;
-			case 2: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xae, 4,3,1,0,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(hldspin2d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 0,2,7,6,5,4,3,1); break;
-			case 5: x = BITSWAP8(x^0xeb, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xab, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(hldspin2v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(tighookv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x26, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(tighookv2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 0,2,1,7,6,5,4,3); break; // 01276543
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xea, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(tighookd)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3d, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xed, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x26, 2,1,0,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x26, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pir2001v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xea, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x23, 0,1,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,2,1,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pir2001v2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x39, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pir2001d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xeb, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 0,2,7,6,5,4,3,1); break;
-			case 5: x = BITSWAP8(x^0xeb, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x27, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xae, 4,3,1,2,0,7,6,5); break;
-
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pir2002d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3d, 2,0,7,6,5,4,3,1); break;
-			case 1: x = BITSWAP8(x^0xef, 1,7,6,5,4,3,2,0); break;
-			case 2: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xae, 4,3,1,0,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xed, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x27, 0,2,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pir2002v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,0,1,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(pir2002v2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x26, 2,0,1,7,6,5,4,3); break; //
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb2genv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xea, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb2genv3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xeb, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb2gend)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3d, 2,0,7,6,5,4,3,1); break;
-			case 1: x = BITSWAP8(x^0xeb, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xad, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,2,1,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb4d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3d, 2,0,7,6,5,4,3,1); break;
-			case 1: x = BITSWAP8(x^0xeb, 1,7,6,5,4,3,0,2); break;
-			case 2: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xad, 4,3,2,1,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3c, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x25, 2,0,1,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb4v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xeb, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb4v3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 2,1,7,6,5,4,3,0); break;
-			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-#if 1
-static DRIVER_INIT(fb5)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x20, 0,3,7,6,5,1,4,2); break;
-			case 1: x = BITSWAP8(x^0xf1, 1,7,6,5,3,2,4,0); break;
-			case 2: x = BITSWAP8(x^0x33, 2,3,1,7,6,5,0,4); break; //
-			case 3: x = BITSWAP8(x^0xaf, 2,0,1,4,3,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x2d, 2,4,7,6,5,1,0,3); break;
-			case 5: x = BITSWAP8(x^0xfb, 4,7,6,5,1,0,3,2); break;
-			case 6: x = BITSWAP8(x^0x34, 2,0,4,7,6,5,3,1); break;
-			case 7: x = BITSWAP8(x^0xb7, 1,0,3,2,4,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb5d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3e, 2,1,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 1,7,6,5,4,3,2,0); break;
-			case 2: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xad, 4,3,0,1,2,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3e, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xeb, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x24, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xaa, 4,3,1,2,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb5v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,0,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3f, 1,0,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xee, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb6)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-
-
- static DRIVER_INIT(fb6d)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb6v)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb6v3)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x26, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(fb6s)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x24, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x25, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(version4)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x26, 1,0,2,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(bugfever)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(bugfeverd)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x26, 1,0,2,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3a, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe8, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(bugfeverv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,0,7,6,5,4,3,2); break;
-			case 1: x = BITSWAP8(x^0xef, 0,7,6,5,4,3,2,1); break;
-			case 2: x = BITSWAP8(x^0x22, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3a, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 0,1,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,2,1,0,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(bugfeverv2)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x23, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xed, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x26, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(dvisland)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x21, 1,0,2,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xe9, 1,7,6,5,4,3,0,2); break;
-			case 6: x = BITSWAP8(x^0x23, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-
-static DRIVER_INIT(funriver)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x3c, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x24, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xec, 0,7,6,5,4,3,2,1); break;
-			case 6: x = BITSWAP8(x^0x23, 1,0,2,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xa9, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-
-static DRIVER_INIT(funriverv)
-{
-	int i;
-	UINT8 *ROM = memory_region(machine, "maincpu");
-
-	for(i=0;i<memory_region_length(machine, "maincpu");i++)
-	{
-		UINT8 x = ROM[i];
-
-		switch(i & 7)
-		{
-			case 0: x = BITSWAP8(x^0x39, 1,2,7,6,5,4,3,0); break;
-			case 1: x = BITSWAP8(x^0xef, 2,7,6,5,4,3,0,1); break;
-			case 2: x = BITSWAP8(x^0x26, 0,2,1,7,6,5,4,3); break;
-			case 3: x = BITSWAP8(x^0xa8, 4,3,1,2,0,7,6,5); break;
-			case 4: x = BITSWAP8(x^0x3b, 0,1,7,6,5,4,3,2); break;
-			case 5: x = BITSWAP8(x^0xea, 2,7,6,5,4,3,1,0); break;
-			case 6: x = BITSWAP8(x^0x22, 2,1,0,7,6,5,4,3); break;
-			case 7: x = BITSWAP8(x^0xac, 4,3,0,1,2,7,6,5); break;
-    	}
-		ROM[i] = x;
-	}
-	DRIVER_INIT_CALL(sfbonus_common);
-}
-#endif
 
 
 /*
-            case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-            case 1: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-            case 2: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-            case 3: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-            case 4: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-            case 5: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-            case 6: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
-            case 7: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0); break;
+            case 0: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0
+            case 1: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0
+            case 2: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0
+            case 3: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0
+            case 4: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0
+            case 5: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0
+            case 6: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0
+            case 7: x = BITSWAP8(x^0xff, 7,6,5,4,3,2,1,0
 
 */
 
-GAME( 2004, sfbonus,     0,        sfbonus,    sfbonus,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonus,     0,        sfbonus,    amcoetype1,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.6)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, sfbonusa,    sfbonus,  sfbonus,    parrot3,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonusa,    sfbonus,  sfbonus,    amcoetype1,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, sfbonusb,    sfbonus,  sfbonus,    parrot3,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, sfbonusd,    sfbonus,  sfbonus,    parrot3,    sfbonusd,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, sfbonusv,    sfbonus,  sfbonus,    parrot3,    sfbonusv,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonusb,    sfbonus,  sfbonus,    amcoetype1,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonusd,    sfbonus,  sfbonus,    amcoetype1,    sfbonusd,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, sfbonusv,    sfbonus,  sfbonus,    amcoetype1,    sfbonusv,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, parrot3,     0,        sfbonus,    parrot3,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3,     0,        sfbonus,    amcoetype1,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, parrot3b,    parrot3,  sfbonus,    parrot3,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, parrot3d,    parrot3,  sfbonus,    parrot3,    parrot3d, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, parrot3v2,   parrot3,  sfbonus,    parrot3,    parrot3v2,ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3b,    parrot3,  sfbonus,    amcoetype1,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3d,    parrot3,  sfbonus,    amcoetype1,    parrot3d, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3v2,   parrot3,  sfbonus,    amcoetype1,    parrot3v2,ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, parrot3v,    parrot3,  sfbonus,    parrot3,    parrot3v, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, parrot3v,    parrot3,  sfbonus,    amcoetype1,    parrot3v, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, hldspin1,    0,        sfbonus,    parrot3,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I (Version 2.5T)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin1,    0,        sfbonus,    amcoetype1,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I (Version 2.5T)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, hldspin1b,   hldspin1, sfbonus,    parrot3,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin1d,   hldspin1, sfbonus,    parrot3,    hldspin1d, ROT0, "Amcoe", "Hold & Spin I (Version 2.7T, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin1v,   hldspin1, sfbonus,    parrot3,    hldspin1v, ROT0, "Amcoe", "Hold & Spin I (Version 2.7T Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin1b,   hldspin1, sfbonus,    amcoetype1,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I (Version 2.7T, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin1d,   hldspin1, sfbonus,    amcoetype1,    hldspin1d, ROT0, "Amcoe", "Hold & Spin I (Version 2.7T, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin1v,   hldspin1, sfbonus,    amcoetype1,    hldspin1v, ROT0, "Amcoe", "Hold & Spin I (Version 2.7T Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, hldspin2,    0,        sfbonus,    parrot3,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (Version 2.6)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin2b,   hldspin2, sfbonus,    parrot3,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (Version 2.8R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin2d,   hldspin2, sfbonus,    parrot3,    hldspin2d, ROT0, "Amcoe", "Hold & Spin II (Version 2.8R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, hldspin2v,   hldspin2, sfbonus,    parrot3,    hldspin2v, ROT0, "Amcoe", "Hold & Spin II (Version 2.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2,    0,        sfbonus,    amcoetype1,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (Version 2.6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2b,   hldspin2, sfbonus,    amcoetype1,    hldspin2, ROT0,  "Amcoe", "Hold & Spin II (Version 2.8R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2d,   hldspin2, sfbonus,    amcoetype1,    hldspin2d, ROT0, "Amcoe", "Hold & Spin II (Version 2.8R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, hldspin2v,   hldspin2, sfbonus,    amcoetype1,    hldspin2v, ROT0, "Amcoe", "Hold & Spin II (Version 2.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, fcnudge,     0,        sfbonus,    parrot3,    abnudge,  ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, fruitcar,    fcnudge,  sfbonus,    parrot3,    fruitcar, ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.1 Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, fruitcar2,   fcnudge,  sfbonus,    parrot3,    fruitcar2,ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, fruitcar3,   fcnudge,  sfbonus,    parrot3,    fruitcar3,ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, fcnudge,     0,        sfbonus,    amcoetype1,    abnudge,  ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, fruitcar,    fcnudge,  sfbonus,    amcoetype1,    fruitcar, ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.1 Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, fruitcar2,   fcnudge,  sfbonus,    amcoetype1,    fruitcar2,ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, fruitcar3,   fcnudge,  sfbonus,    amcoetype1,    fruitcar3,ROT0,  "Amcoe", "Fruit Carnival Nudge (Version 2.0, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2001, pickwin,     0,        sfbonus,    parrot3,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.5T)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pickwina,    pickwin,  sfbonus,    parrot3,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.6)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwin,     0,        sfbonus,    amcoetype1,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.5T)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwina,    pickwin,  sfbonus,    amcoetype1,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.6)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2001, pickwinb2,   pickwin,  sfbonus,    parrot3,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.9R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pickwind2,   pickwin,  sfbonus,    parrot3,    pickwind, ROT0,  "Amcoe", "Pick & Win (Version 2.9R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pickwinv3,   pickwin,  sfbonus,    parrot3,    pickwinv, ROT0,  "Amcoe", "Pick & Win (Version 2.9R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwinb2,   pickwin,  sfbonus,    amcoetype1,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.9R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwind2,   pickwin,  sfbonus,    amcoetype1,    pickwind, ROT0,  "Amcoe", "Pick & Win (Version 2.9R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwinv3,   pickwin,  sfbonus,    amcoetype1,    pickwinv, ROT0,  "Amcoe", "Pick & Win (Version 2.9R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2001, pickwinb,    pickwin,  sfbonus,    parrot3,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.8T, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pickwind,    pickwin,  sfbonus,    parrot3,    pickwind, ROT0,  "Amcoe", "Pick & Win (Version 2.8T, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pickwinv,    pickwin,  sfbonus,    parrot3,    pickwinv, ROT0,  "Amcoe", "Pick & Win (Version 2.8T, Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwinb,    pickwin,  sfbonus,    amcoetype1,    pickwin,  ROT0,  "Amcoe", "Pick & Win (Version 2.8T, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwind,    pickwin,  sfbonus,    amcoetype1,    pickwind, ROT0,  "Amcoe", "Pick & Win (Version 2.8T, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwinv,    pickwin,  sfbonus,    amcoetype1,    pickwinv, ROT0,  "Amcoe", "Pick & Win (Version 2.8T, Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2001, pickwinv2,   pickwin,  sfbonus,    parrot3,    pickwinv2,ROT0,  "Amcoe", "Pick & Win (Version 2.9E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pickwinv2,   pickwin,  sfbonus,    amcoetype1,    pickwinv2,ROT0,  "Amcoe", "Pick & Win (Version 2.9E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
-GAME( 2004, tighook,     0,        sfbonus,    parrot3,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 1.7XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, tighooka,    tighook,  sfbonus,    parrot3,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighook,     0,        sfbonus,    amcoetype1,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 1.7XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighooka,    tighook,  sfbonus,    amcoetype1,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, tighookc,    tighook,  sfbonus,    parrot3,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, tighookd,    tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, tighookv,    tighook,  sfbonus,    parrot3,    tighookv, ROT0,  "Amcoe", "Tiger Hook (Version 2.1R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookc,    tighook,  sfbonus,    amcoetype1,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookd,    tighook,  sfbonus,    amcoetype1,    tighookd, ROT0,  "Amcoe", "Tiger Hook (Version 2.1R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookv,    tighook,  sfbonus,    amcoetype1,    tighookv, ROT0,  "Amcoe", "Tiger Hook (Version 2.1R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, tighookc2,   tighook,  sfbonus,    parrot3,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, tighookd2,   tighook,  sfbonus,    parrot3,    tighookd, ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, tighookv3,   tighook,  sfbonus,    parrot3,    tighookv, ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookc2,   tighook,  sfbonus,    amcoetype1,    tighook,  ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookd2,   tighook,  sfbonus,    amcoetype1,    tighookd, ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookv3,   tighook,  sfbonus,    amcoetype1,    tighookv, ROT0,  "Amcoe", "Tiger Hook (Version 2.0LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, tighookv2,   tighook,  sfbonus,    parrot3,    tighookv2,ROT0,  "Amcoe", "Tiger Hook (Version 2.1E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, tighookv2,   tighook,  sfbonus,    amcoetype1,    tighookv2,ROT0,  "Amcoe", "Tiger Hook (Version 2.1E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, robadv,      0,        sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, robadv,      0,        sfbonus,    amcoetype1,    robadv,   ROT0,  "Amcoe", "Robin Adventure (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, robadvc,     robadv,   sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure (Version 1.7R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, robadvd,     robadv,   sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure (Version 1.7R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, robadvv2,    robadv,   sfbonus,    parrot3,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, robadvc,     robadv,   sfbonus,    amcoetype1,    robadv,   ROT0,  "Amcoe", "Robin Adventure (Version 1.7R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, robadvd,     robadv,   sfbonus,    amcoetype1,    robadv2d, ROT0,  "Amcoe", "Robin Adventure (Version 1.7R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, robadvv2,    robadv,   sfbonus,    amcoetype1,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, robadvv1,    robadv,   sfbonus,    parrot3,    robadv2v4,ROT0,  "Amcoe", "Robin Adventure (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, robadvv1,    robadv,   sfbonus,    amcoetype1,    robadv2v4,ROT0,  "Amcoe", "Robin Adventure (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, robadv2,     0,        sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.5SH)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2,     0,        sfbonus,    amcoetype1,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.5SH)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, robadv2a,    robadv2,  sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2a,    robadv2,  sfbonus,    amcoetype1,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, robadv2c,    robadv2,  sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, robadv2d,    robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, robadv2v3,   robadv2,  sfbonus,    parrot3,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2c,    robadv2,  sfbonus,    amcoetype1,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2d,    robadv2,  sfbonus,    amcoetype1,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2v3,   robadv2,  sfbonus,    amcoetype1,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, robadv2d2,   robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, robadv2c2,   robadv2,  sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, robadv2v2,   robadv2,  sfbonus,    parrot3,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2d2,   robadv2,  sfbonus,    amcoetype1,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2c2,   robadv2,  sfbonus,    amcoetype1,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2v2,   robadv2,  sfbonus,    amcoetype1,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, robadv2d3,   robadv2,  sfbonus,    parrot3,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7SH, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, robadv2c3,   robadv2,  sfbonus,    parrot3,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7SH, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, robadv2v1,   robadv2,  sfbonus,    parrot3,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7SH Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2d3,   robadv2,  sfbonus,    amcoetype1,    robadv2d, ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7SH, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2c3,   robadv2,  sfbonus,    amcoetype1,    robadv,   ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7SH, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2v1,   robadv2,  sfbonus,    amcoetype1,    robadv2v1,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7SH Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, robadv2v4,   robadv2,  sfbonus,    parrot3,    robadv2v4,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, robadv2v4,   robadv2,  sfbonus,    amcoetype1,    robadv2v4,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, pirpok2,     0,        sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, pirpok2,     0,        sfbonus,    amcoetype1,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, pirpok2b,    pirpok2,  sfbonus,    parrot3,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, pirpok2d,    pirpok2,  sfbonus,    parrot3,    pirpok2d,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, pirpok2v,    pirpok2,  sfbonus,    parrot3,    pirpok2v,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, pirpok2b,    pirpok2,  sfbonus,    amcoetype1,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, pirpok2d,    pirpok2,  sfbonus,    amcoetype1,    pirpok2d,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, pirpok2v,    pirpok2,  sfbonus,    amcoetype1,    pirpok2v,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, pirpok2v2,   pirpok2,  sfbonus,    parrot3,   pirpok2v2,ROT0,  "Amcoe", "Pirate Poker II (Version 2.4E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, pirpok2v2,   pirpok2,  sfbonus,    amcoetype1,   pirpok2v2,ROT0,  "Amcoe", "Pirate Poker II (Version 2.4E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anibonus,    0,        sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.50XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonus,    0,        sfbonus,    amcoetype1,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.50XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anibonus2,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonus2,   anibonus, sfbonus,    amcoetype1,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anibonus3,   anibonus, sfbonus,    parrot3,    anibonus3,ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, anibonus4,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonus3,   anibonus, sfbonus,    amcoetype1,    anibonus3,ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonus4,   anibonus, sfbonus,    amcoetype1,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.40XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anibonus5,   anibonus, sfbonus,    parrot3,    anibonus3,ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, anibonus6,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonus5,   anibonus, sfbonus,    amcoetype1,    anibonus3,ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonus6,   anibonus, sfbonus,    amcoetype1,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.4, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anibonusb,   anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, anibonusd,   anibonus, sfbonus,    parrot3,    anibonusd,ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, anibonusv,   anibonus, sfbonus,    parrot3,    anibonusv,ROT0,  "Amcoe", "Animal Bonus (Version 1.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusb,   anibonus, sfbonus,    amcoetype1,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusd,   anibonus, sfbonus,    amcoetype1,    anibonusd,ROT0,  "Amcoe", "Animal Bonus (Version 1.7R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusv,   anibonus, sfbonus,    amcoetype1,    anibonusv,ROT0,  "Amcoe", "Animal Bonus (Version 1.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anibonusb2,  anibonus, sfbonus,    parrot3,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, anibonusd2,  anibonus, sfbonus,    parrot3,    anibonusd,ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, anibonusv2,  anibonus, sfbonus,    parrot3,    anibonusv,ROT0,  "Amcoe", "Animal Bonus (Version 1.8LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusb2,  anibonus, sfbonus,    amcoetype1,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusd2,  anibonus, sfbonus,    amcoetype1,    anibonusd,ROT0,  "Amcoe", "Animal Bonus (Version 1.7LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusv2,  anibonus, sfbonus,    amcoetype1,    anibonusv,ROT0,  "Amcoe", "Animal Bonus (Version 1.8LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anibonusv3,  anibonus, sfbonus,    parrot3,   anibonusv3,ROT0,  "Amcoe", "Animal Bonus (Version 1.8E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anibonusv3,  anibonus, sfbonus,    amcoetype1,   anibonusv3,ROT0,  "Amcoe", "Animal Bonus (Version 1.8E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, abnudge,     0,        sfbonus,    parrot3,    abnudge, ROT0,  "Amcoe", "Animal Bonus Nudge (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, abnudgeb,    abnudge,  sfbonus,    parrot3,    abnudge, ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, abnudged,    abnudge,  sfbonus,    parrot3,    abnudged,ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, abnudgev,    abnudge,  sfbonus,    parrot3,    abnudgev,ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.1 Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, abnudge,     0,        sfbonus,    amcoetype1,    abnudge, ROT0,  "Amcoe", "Animal Bonus Nudge (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, abnudgeb,    abnudge,  sfbonus,    amcoetype1,    abnudge, ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, abnudged,    abnudge,  sfbonus,    amcoetype1,    abnudged,ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.0, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, abnudgev,    abnudge,  sfbonus,    amcoetype1,    abnudgev,ROT0,  "Amcoe", "Animal Bonus Nudge (Version 2.1 Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, dblchal,     0,        sfbonus,    parrot3,    dblchal, ROT0,  "Amcoe", "Double Challenge (Version 1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, dblchal,     0,        sfbonus,    amcoetype1,    dblchal, ROT0,  "Amcoe", "Double Challenge (Version 1.1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, dblchalb,    dblchal,  sfbonus,    parrot3,    dblchal, ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, dblchalc,    dblchal,  sfbonus,    parrot3,    dblchal, ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, dblchald,    dblchal,  sfbonus,    parrot3,    dblchald,ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, dblchalv,    dblchal,  sfbonus,    parrot3,    dblchalv,ROT0,  "Amcoe", "Double Challenge (Version 1.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, dblchalb,    dblchal,  sfbonus,    amcoetype1,    dblchal, ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, dblchalc,    dblchal,  sfbonus,    amcoetype1,    dblchal, ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, dblchald,    dblchal,  sfbonus,    amcoetype1,    dblchald,ROT0,  "Amcoe", "Double Challenge (Version 1.5R, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, dblchalv,    dblchal,  sfbonus,    amcoetype1,    dblchalv,ROT0,  "Amcoe", "Double Challenge (Version 1.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anithunt,    0,        sfbonus,    parrot3,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anithunt,    0,        sfbonus,    amcoetype1,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.7)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anithunt2,   anithunt, sfbonus,    parrot3,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anithunt2,   anithunt, sfbonus,    amcoetype1,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2003, anithuntb,   anithunt, sfbonus,    parrot3,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, anithuntd,   anithunt, sfbonus,    parrot3,    anithuntd,ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2003, anithuntv,   anithunt, sfbonus,    parrot3,    anithuntv,ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anithuntb,   anithunt, sfbonus,    amcoetype1,    anithunt, ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anithuntd,   anithunt, sfbonus,    amcoetype1,    anithuntd,ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2003, anithuntv,   anithunt, sfbonus,    amcoetype1,    anithuntv,ROT0,  "Amcoe", "Animal Treasure Hunt (Version 1.9R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2002, sfruitb2,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, sfruitb,     0,        sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0B)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+GAME( 2002, sfruitb2,    sfruitb,  sfbonus,    amcoetype1,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitb,     0,        sfbonus,    amcoetype1,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0B)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
 
-GAME( 2002, sfruitbb,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, sfruitbd,    sfruitb,  sfbonus,    parrot3,    sfruitbd,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, sfruitbv5,   sfruitb,  sfbonus,    parrot3,    sfruitbv,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbb,    sfruitb,  sfbonus,    amcoetype1,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbd,    sfruitb,  sfbonus,    amcoetype1,    sfruitbd,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbv5,   sfruitb,  sfbonus,    amcoetype1,    sfruitbv,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.0LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2002, sfruitbb2,   sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
-GAME( 2002, sfruitbd2,   sfruitb,  sfbonus,    parrot3,    sfruitbd,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
-GAME( 2002, sfruitbv4,   sfruitb,  sfbonus,    parrot3,    sfruitbv,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B Dual)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+GAME( 2002, sfruitbb2,   sfruitb,  sfbonus,    amcoetype1,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+GAME( 2002, sfruitbd2,   sfruitb,  sfbonus,    amcoetype1,    sfruitbd,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+GAME( 2002, sfruitbv4,   sfruitb,  sfbonus,    amcoetype1,    sfruitbv,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2B Dual)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
 
-GAME( 2002, sfruitbb3,   sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, sfruitbd3,   sfruitb,  sfbonus,    parrot3,    sfruitbd,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, sfruitbv,    sfruitb,  sfbonus,    parrot3,    sfruitbv,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbb3,   sfruitb,  sfbonus,    amcoetype1,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbd3,   sfruitb,  sfbonus,    amcoetype1,    sfruitbd,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbv,    sfruitb,  sfbonus,    amcoetype1,    sfruitbv,ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2002, sfruitbv2,    sfruitb,  sfbonus,    parrot3,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, sfruitbv3,    sfruitb,  sfbonus,    parrot3,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2EB Dual)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
+GAME( 2002, sfruitbv2,    sfruitb,  sfbonus,    amcoetype1,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.5E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitbv3,    sfruitb,  sfbonus,    amcoetype1,    sfruitbv2, ROT0,  "Amcoe", "Super Fruit Bonus (Version 2.2EB Dual)", GAME_NOT_WORKING|GAME_NO_SOUND ) // 'high bonus version'
 
-GAME( 2002, sfruitb3,    sfruitb,  sfbonus,    parrot3,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 1.80XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, sfruitb3,    sfruitb,  sfbonus,    amcoetype1,    sfruitb, ROT0,  "Amcoe", "Super Fruit Bonus (Version 1.80XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, fb2gen,      0,        sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.6XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2gen,      0,        sfbonus,    amcoetype1,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.6XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, fb2gena,     fb2gen,   sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2gena,     fb2gen,   sfbonus,    amcoetype1,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, fb2genc,     fb2gen,   sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, fb2gend,     fb2gen,   sfbonus,    parrot3,    fb2gend,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, fb2genv,     fb2gen,   sfbonus,    parrot3,    fb2genv,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2genc,     fb2gen,   sfbonus,    amcoetype1,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2gend,     fb2gen,   sfbonus,    amcoetype1,    fb2gend,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2genv,     fb2gen,   sfbonus,    amcoetype1,    fb2genv,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, fb2genc2,    fb2gen,   sfbonus,    parrot3,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, fb2gend2,    fb2gen,   sfbonus,    parrot3,    fb2gend,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, fb2genv2,    fb2gen,   sfbonus,    parrot3,    fb2genv,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2genc2,    fb2gen,   sfbonus,    amcoetype1,    fb2gen, ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2gend2,    fb2gen,   sfbonus,    amcoetype1,    fb2gend,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2genv2,    fb2gen,   sfbonus,    amcoetype1,    fb2genv,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, fb2genv3,    fb2gen,   sfbonus,    parrot3,   fb2genv3,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2genv3,    fb2gen,   sfbonus,    amcoetype1,   fb2genv3,ROT0,  "Amcoe", "Fruit Bonus 2nd Generation (Version 1.8E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
-GAME( 2004, fb2nd,       0,       sfbonus,    parrot3,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2nd,       0,       sfbonus,    amcoetype1,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.5)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, fb2ndc,      fb2nd,   sfbonus,    parrot3,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, fb2ndd,      fb2nd,   sfbonus,    parrot3,    fb2ndd,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, fb2ndv,      fb2nd,   sfbonus,    parrot3,    fb2ndv,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndc,      fb2nd,   sfbonus,    amcoetype1,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndd,      fb2nd,   sfbonus,    amcoetype1,    fb2ndd,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndv,      fb2nd,   sfbonus,    amcoetype1,    fb2ndv,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2004, fb2ndc2,     fb2nd,   sfbonus,    parrot3,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, fb2ndd2,     fb2nd,   sfbonus,    parrot3,    fb2ndd,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2004, fb2ndv2,     fb2nd,   sfbonus,    parrot3,    fb2ndv,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndc2,     fb2nd,   sfbonus,    amcoetype1,    fb2nd, ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndd2,     fb2nd,   sfbonus,    amcoetype1,    fb2ndd,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2004, fb2ndv2,     fb2nd,   sfbonus,    amcoetype1,    fb2ndv,ROT0,  "Amcoe", "Fruit Bonus 2nd Edition (Version 1.8LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
 
-GAME( 2000, fb4,         0,        sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.3XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4a,        fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4,         0,        sfbonus,    amcoetype1,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.3XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4a,        fb4,      sfbonus,    amcoetype1,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb4b,        fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT, set 1", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4c2,       fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4d2,       fb4,      sfbonus,    parrot3,    fb4d,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4v2,       fb4,      sfbonus,    parrot3,    fb4v,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4b,        fb4,      sfbonus,    amcoetype1,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT, set 1", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4c2,       fb4,      sfbonus,    amcoetype1,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4d2,       fb4,      sfbonus,    amcoetype1,    fb4d,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4v2,       fb4,      sfbonus,    amcoetype1,    fb4v,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb4b2,       fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4c,        fb4,      sfbonus,    parrot3,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4d,        fb4,      sfbonus,    parrot3,    fb4d,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb4v,        fb4,      sfbonus,    parrot3,    fb4v,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4b2,       fb4,      sfbonus,    amcoetype1,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4c,        fb4,      sfbonus,    amcoetype1,    fb4, ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4d,        fb4,      sfbonus,    amcoetype1,    fb4d,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb4v,        fb4,      sfbonus,    amcoetype1,    fb4v,ROT0,  "Amcoe", "Fruit Bonus 4 (Version 1.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb4v3,       fb4,      sfbonus,    parrot3,    fb4v3, ROT0, "Amcoe", "Fruit Bonus 4 (Version 1.5E Dual) (with 2005 title)", GAME_NOT_WORKING|GAME_NO_SOUND ) // the export version has '2005' title, but is considered the same game as fb4 and labeled as such
+GAME( 2000, fb4v3,       fb4,      sfbonus,    amcoetype1,    fb4v3, ROT0, "Amcoe", "Fruit Bonus 4 (Version 1.5E Dual) (with 2005 title)", GAME_NOT_WORKING|GAME_NO_SOUND ) // the export version has '2005' title, but is considered the same game as fb4 and labeled as such
 
 
-GAME( 1999, act2000,     0,        sfbonus,    parrot3,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, act2000a,    act2000,  sfbonus,    parrot3,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, act2000a2,   act2000,  sfbonus,    parrot3,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.10XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, act2000v,    act2000,  sfbonus,    parrot3,    act2000v, ROT0,  "Amcoe", "Action 2000 (Version 3.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, act2000v2,   act2000,  sfbonus,    parrot3,    act2000v2, ROT0,  "Amcoe", "Action 2000 (Version 3.5E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, act2000v3,   act2000,  sfbonus,    parrot3,    act2000v3, ROT0,  "Amcoe", "Action 2000 (Version 3.30XT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, act2000d,    act2000,  sfbonus,    parrot3,    act2000d, ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, act2000d2,   act2000,  sfbonus,    parrot3,    act2000d, ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, act2000b,    act2000,  sfbonus,    parrot3,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, act2000b2,   act2000,  sfbonus,    parrot3,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000,     0,        sfbonus,    amcoetype1,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 1.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000a,    act2000,  sfbonus,    amcoetype1,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000a2,   act2000,  sfbonus,    amcoetype1,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.10XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000v,    act2000,  sfbonus,    amcoetype1,    act2000v, ROT0,  "Amcoe", "Action 2000 (Version 3.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000v2,   act2000,  sfbonus,    amcoetype1,    act2000v2, ROT0,  "Amcoe", "Action 2000 (Version 3.5E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000v3,   act2000,  sfbonus,    amcoetype1,    act2000v3, ROT0,  "Amcoe", "Action 2000 (Version 3.30XT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000d,    act2000,  sfbonus,    amcoetype1,    act2000d, ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000d2,   act2000,  sfbonus,    amcoetype1,    act2000d, ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000b,    act2000,  sfbonus,    amcoetype1,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, act2000b2,   act2000,  sfbonus,    amcoetype1,    act2000, ROT0,  "Amcoe", "Action 2000 (Version 3.30XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, ch2000,      0,        sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000x,     ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9D)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000y,     ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000,      0,        sfbonus,    amcoetype1,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000x,     ch2000,   sfbonus,    amcoetype1,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9D)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000y,     ch2000,   sfbonus,    amcoetype1,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 3.9)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, ch2000b2,    ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000c,     ch2000,   sfbonus,    parrot3,    ch2000c, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000d,     ch2000,   sfbonus,    parrot3,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000v3,    ch2000,   sfbonus,    parrot3,    ch2000v3,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000b2,    ch2000,   sfbonus,    amcoetype1,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000c,     ch2000,   sfbonus,    amcoetype1,    ch2000c, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000d,     ch2000,   sfbonus,    amcoetype1,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000v3,    ch2000,   sfbonus,    amcoetype1,    ch2000v3,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.1LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, ch2000b,     ch2000,   sfbonus,    parrot3,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000c2,    ch2000,   sfbonus,    parrot3,    ch2000c,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000d2,    ch2000,   sfbonus,    parrot3,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000v,     ch2000,   sfbonus,    parrot3,    ch2000v, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, ch2000v2,    ch2000,   sfbonus,    parrot3,    ch2000v2,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000b,     ch2000,   sfbonus,    amcoetype1,    ch2000, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000c2,    ch2000,   sfbonus,    amcoetype1,    ch2000c,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000d2,    ch2000,   sfbonus,    amcoetype1,    ch2000d, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000v,     ch2000,   sfbonus,    amcoetype1,    ch2000v, ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, ch2000v2,    ch2000,   sfbonus,    amcoetype1,    ch2000v2,ROT0,  "Amcoe", "Fruit Bonus 2000 / New Cherry 2000 (Version 4.4E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 
-GAME( 2001, pir2001,     0,        sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.3N)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001a,    pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001b,    pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.20XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001,     0,        sfbonus,    amcoetype1,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.3N)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001a,    pir2001,  sfbonus,    amcoetype1,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001b,    pir2001,  sfbonus,    amcoetype1,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.20XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2001, pir2001b2,   pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001d2,   pir2001,  sfbonus,    parrot3,    pir2001d,ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001v3,   pir2001,  sfbonus,    parrot3,    pir2001v,ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001b2,   pir2001,  sfbonus,    amcoetype1,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001d2,   pir2001,  sfbonus,    amcoetype1,    pir2001d,ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001v3,   pir2001,  sfbonus,    amcoetype1,    pir2001v,ROT0,  "Amcoe", "Pirate 2001 (Version 2.40XT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2001, pir2001b3,   pir2001,  sfbonus,    parrot3,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001d,    pir2001,  sfbonus,    parrot3,    pir2001d,ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, pir2001v,    pir2001,  sfbonus,    parrot3,    pir2001v,ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001b3,   pir2001,  sfbonus,    amcoetype1,    pir2001, ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001d,    pir2001,  sfbonus,    amcoetype1,    pir2001d,ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001v,    pir2001,  sfbonus,    amcoetype1,    pir2001v,ROT0,  "Amcoe", "Pirate 2001 (Version 2.5R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2001, pir2001v2,   pir2001,  sfbonus,    parrot3,    pir2001v2,ROT0, "Amcoe", "Pirate 2001 (Version 2.5E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, pir2001v2,   pir2001,  sfbonus,    amcoetype1,    pir2001v2,ROT0, "Amcoe", "Pirate 2001 (Version 2.5E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2002, pir2002,     0,        sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.8N)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002a,    pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.8)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002b,    pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.70XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002,     0,        sfbonus,    amcoetype1,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.8N)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002a,    pir2002,  sfbonus,    amcoetype1,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.8)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002b,    pir2002,  sfbonus,    amcoetype1,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.70XT)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2002, pir2002b2,   pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002d2,   pir2002,  sfbonus,    parrot3,    pir2002d,ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002v3,   pir2002,  sfbonus,    parrot3,    pir2002v, ROT0, "Amcoe", "Pirate 2002 (Version 1.90XT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002b2,   pir2002,  sfbonus,    amcoetype1,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002d2,   pir2002,  sfbonus,    amcoetype1,    pir2002d,ROT0,  "Amcoe", "Pirate 2002 (Version 1.90XT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002v3,   pir2002,  sfbonus,    amcoetype1,    pir2002v, ROT0, "Amcoe", "Pirate 2002 (Version 1.90XT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2002, pir2002b3,   pir2002,  sfbonus,    parrot3,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002d,    pir2002,  sfbonus,    parrot3,    pir2002d, ROT0, "Amcoe", "Pirate 2002 (Version 2.0R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2002, pir2002v,    pir2002,  sfbonus,    parrot3,    pir2002v,ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002b3,   pir2002,  sfbonus,    amcoetype1,    pir2002, ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002d,    pir2002,  sfbonus,    amcoetype1,    pir2002d, ROT0, "Amcoe", "Pirate 2002 (Version 2.0R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002v,    pir2002,  sfbonus,    amcoetype1,    pir2002v,ROT0,  "Amcoe", "Pirate 2002 (Version 2.0R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2002, pir2002v2,   pir2002,  sfbonus,    parrot3,    pir2002v2,ROT0, "Amcoe", "Pirate 2002 (Version 2.0E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2002, pir2002v2,   pir2002,  sfbonus,    amcoetype1,    pir2002v2,ROT0, "Amcoe", "Pirate 2002 (Version 2.0E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, classice,    0,        sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classiced2,  classice, sfbonus,    parrot3,    classiced,ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classicev2,  classice, sfbonus,    parrot3,    classicev,ROT0,  "Amcoe", "Classic Edition (Version 1.6LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classice,    0,        sfbonus,    amcoetype1,    classice, ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classiced2,  classice, sfbonus,    amcoetype1,    classiced,ROT0,  "Amcoe", "Classic Edition (Version 1.6LT, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicev2,  classice, sfbonus,    amcoetype1,    classicev,ROT0,  "Amcoe", "Classic Edition (Version 1.6LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, classicea,   classice, sfbonus,    parrot3,    classice, ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classiced,   classice, sfbonus,    parrot3,    classiced,ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classicev,   classice, sfbonus,    parrot3,    classicev,ROT0,  "Amcoe", "Classic Edition (Version 1.6R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicea,   classice, sfbonus,    amcoetype1,    classice, ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classiced,   classice, sfbonus,    amcoetype1,    classiced,ROT0,  "Amcoe", "Classic Edition (Version 1.6R, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicev,   classice, sfbonus,    amcoetype1,    classicev,ROT0,  "Amcoe", "Classic Edition (Version 1.6R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, classiced3,  classice, sfbonus,    parrot3,    classiced3,ROT0,  "Amcoe", "Classic Edition (Version 1.6E)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, classicev3,  classice, sfbonus,    parrot3,    classicev3,ROT0,  "Amcoe", "Classic Edition (Version 1.6E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classiced3,  classice, sfbonus,    amcoetype1,    classiced3,ROT0,  "Amcoe", "Classic Edition (Version 1.6E)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, classicev3,  classice, sfbonus,    amcoetype1,    classicev3,ROT0,  "Amcoe", "Classic Edition (Version 1.6E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, seawld,      0,        sfbonus,    parrot3,    seawld, ROT0,  "Amcoe", "Sea World (Version 1.6R CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, seawlda,     seawld,   sfbonus,    parrot3,    seawlda, ROT0,  "Amcoe", "Sea World (Version 1.6E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, seawld,      0,        sfbonus,    amcoetype1,    seawld, ROT0,  "Amcoe", "Sea World (Version 1.6R CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, seawlda,     seawld,   sfbonus,    amcoetype1,    seawlda, ROT0,  "Amcoe", "Sea World (Version 1.6E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, moneymacd,   moneymac, sfbonus,    parrot3,    moneymacd,ROT0,  "Amcoe", "Money Machine (Version 1.7R)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, moneymac,    0,        sfbonus,    parrot3,    moneymac, ROT0,  "Amcoe", "Money Machine (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, moneymacd,   moneymac, sfbonus,    amcoetype1,    moneymacd,ROT0,  "Amcoe", "Money Machine (Version 1.7R)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, moneymac,    0,        sfbonus,    amcoetype1,    moneymac, ROT0,  "Amcoe", "Money Machine (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, moneymacd2,  moneymac, sfbonus,    parrot3,    moneymacd, ROT0, "Amcoe", "Money Machine (Version 1.7LT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, moneymacv2,  moneymac, sfbonus,    parrot3,    moneymac, ROT0,  "Amcoe", "Money Machine (Version 1.7LT Dual", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, moneymacd2,  moneymac, sfbonus,    amcoetype1,    moneymacd, ROT0, "Amcoe", "Money Machine (Version 1.7LT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, moneymacv2,  moneymac, sfbonus,    amcoetype1,    moneymac, ROT0,  "Amcoe", "Money Machine (Version 1.7LT Dual", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, moneymacv,   moneymac, sfbonus,    parrot3,    moneymacv, ROT0,  "Amcoe", "Money Machine (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, moneymacv,   moneymac, sfbonus,    amcoetype1,    moneymacv, ROT0,  "Amcoe", "Money Machine (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 200?, atworld,     0,        sfbonus,    parrot3,    atworld, ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 200?, atworlda,    atworld,  sfbonus,    parrot3,    atworlda, ROT0, "Amcoe", "Around The World (Version 1.3E CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, atworld,     0,        sfbonus,    amcoetype1,    atworld, ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 200?, atworlda,    atworld,  sfbonus,    amcoetype1,    atworlda, ROT0, "Amcoe", "Around The World (Version 1.3E CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb5,         0,        sfbonus,    parrot3,    fb5, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb5c,        fb5,      sfbonus,    parrot3,    fb5, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb5d,        fb5,      sfbonus,    parrot3,    fb5d, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb5v,        fb5,      sfbonus,    parrot3,    fb5v, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb5,         0,        sfbonus,    amcoetype1,    fb5, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb5c,        fb5,      sfbonus,    amcoetype1,    fb5, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb5d,        fb5,      sfbonus,    amcoetype1,    fb5d, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH, set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb5v,        fb5,      sfbonus,    amcoetype1,    fb5v, ROT0,  "Amcoe", "Fruit Bonus 5 (Version 1.5SH Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb6,         0,        sfbonus,    parrot3,    fb6, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7E CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6,         0,        sfbonus,    amcoetype1,    fb6, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7E CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb6v3,       fb6,      sfbonus,    parrot3,    fb6v3, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6v3,       fb6,      sfbonus,    amcoetype1,    fb6v3, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb6d2,       fb6,      sfbonus,    parrot3,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7R CGA, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb6s,        fb6,      sfbonus,    parrot3,    fb6s, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7R CGA, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb6v,        fb6,      sfbonus,    parrot3,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6d2,       fb6,      sfbonus,    amcoetype1,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7R CGA, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6s,        fb6,      sfbonus,    amcoetype1,    fb6s, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7R CGA, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6v,        fb6,      sfbonus,    amcoetype1,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb6d,        fb6,      sfbonus,    parrot3,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7LT CGA, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb6s2,       fb6,      sfbonus,    parrot3,    fb6s, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7LT CGA, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb6v2,       fb6,      sfbonus,    parrot3,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6d,        fb6,      sfbonus,    amcoetype1,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7LT CGA, set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6s2,       fb6,      sfbonus,    amcoetype1,    fb6s, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7LT CGA, set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6v2,       fb6,      sfbonus,    amcoetype1,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 (Version 1.7LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb6se,       0,        sfbonus,    parrot3,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4R CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb6sev,      fb6se,    sfbonus,    parrot3,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6se,       0,        sfbonus,    amcoetype1,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4R CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6sev,      fb6se,    sfbonus,    amcoetype1,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4R Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb6sed,      fb6se,    sfbonus,    parrot3,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4LT CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb6sev2,     fb6se,    sfbonus,    parrot3,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6sed,      fb6se,    sfbonus,    amcoetype1,    fb6d, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4LT CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6sev2,     fb6se,    sfbonus,    amcoetype1,    fb6v, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4LT Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAME( 2000, fb6sed2,     fb6se,    sfbonus,    parrot3,    fb6, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4E CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, fb6sev3,     fb6se,    sfbonus,    parrot3,    fb6v3, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6sed2,     fb6se,    sfbonus,    amcoetype1,    fb6, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4E CGA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, fb6sev3,     fb6se,    sfbonus,    amcoetype1,    fb6v3, ROT0,  "Amcoe", "Fruit Bonus 6 Special Edition (Version 1.4E Dual)", GAME_NOT_WORKING|GAME_NO_SOUND )
 
 // no gfx / sound roms
-GAME( 2000, version4,    0,        sfbonus,    parrot3,    version4, ROT0,  "Amcoe", "Version 4 (Version 4.2R)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, version4,    0,        sfbonus,    amcoetype1,    version4, ROT0,  "Amcoe", "Version 4 (Version 4.2R)", GAME_NOT_WORKING|GAME_NO_SOUND )
 // no gfx / sound roms
-GAME( 2000, bugfever,    0,        sfbonus,    parrot3,    bugfever, ROT0,  "Amcoe", "Bug Fever (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, bugfeverd,   bugfever, sfbonus,    parrot3,    bugfeverd, ROT0,  "Amcoe", "Bug Fever (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, bugfeverv,   bugfever, sfbonus,    parrot3,    bugfeverv, ROT0,  "Amcoe", "Bug Fever (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, bugfeverv2,  bugfever, sfbonus,    parrot3,    bugfeverv2, ROT0,  "Amcoe", "Bug Fever (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, bugfever,    0,        sfbonus,    amcoetype1,    bugfever, ROT0,  "Amcoe", "Bug Fever (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, bugfeverd,   bugfever, sfbonus,    amcoetype1,    bugfeverd, ROT0,  "Amcoe", "Bug Fever (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, bugfeverv,   bugfever, sfbonus,    amcoetype1,    bugfeverv, ROT0,  "Amcoe", "Bug Fever (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, bugfeverv2,  bugfever, sfbonus,    amcoetype1,    bugfeverv2, ROT0,  "Amcoe", "Bug Fever (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
 // no gfx / sound roms
-GAME( 2000, dvisland,    0,        sfbonus,    parrot3,    dvisland, ROT0,  "Amcoe", "Devil's Island", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, dvisland,    0,        sfbonus,    amcoetype1,    dvisland, ROT0,  "Amcoe", "Devil's Island", GAME_NOT_WORKING|GAME_NO_SOUND )
 // no gfx / sound roms
-GAME( 2000, funriver,    0,        sfbonus,    parrot3,    funriver, ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, funriverv,   funriver, sfbonus,    parrot3,    funriverv, ROT0,  "Amcoe", "Fun River (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, funriver,    0,        sfbonus,    amcoetype1,    funriver, ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, funriverv,   funriver, sfbonus,    amcoetype1,    funriverv, ROT0,  "Amcoe", "Fun River (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
 // ?? what is this
-GAME( 2000, amclink,    0,        sfbonus,    parrot3,    sfbonus_common, ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, amclink,    0,        sfbonus,    amcoetype1,    sfbonus_common, ROT0,  "Amcoe", "Amcoe Link Control Box (Version 2.2)", GAME_NOT_WORKING|GAME_NO_SOUND )
