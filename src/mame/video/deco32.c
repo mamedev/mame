@@ -225,9 +225,9 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 			continue; //fix!!!!!
 
 		if (spritedata[offs+2]&0x20)
-			prival=0;
+			prival=0xfffe; // under PF2
 		else
-			prival=2;
+			prival=0; // above everything
 
 		sx = spritedata[offs+1];
 
@@ -1263,13 +1263,14 @@ VIDEO_UPDATE( captaven )
 		tilemap_draw(bitmap,cliprect,pf3_tilemap,0,1);
 	}
 
-	captaven_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram32,3);
-
 	/* PF1 can be in 8x8 mode or 16x16 mode */
 	if (deco32_pf12_control[6]&0x80)
-		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,2);
 	else
-		tilemap_draw(bitmap,cliprect,pf1a_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,pf1a_tilemap,0,2);
+	
+	captaven_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram32,3);
+	
 	return 0;
 }
 
