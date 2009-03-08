@@ -104,15 +104,18 @@ WRITE8_HANDLER( wc90b_txvideoram_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority ){
-  int offs;
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
+{
+	int offs, sx;
 
-  /* draw all visible sprites of specified priority */
+	/* draw all visible sprites of specified priority */
 	for ( offs = spriteram_size - 8;offs >= 0;offs -= 8 ){
 
-		if ( ( ~( spriteram[offs+3] >> 6 ) & 3 ) == priority ) {
+		if ( ( ~( spriteram[offs+3] >> 7 ) & 1 ) == priority )
+		{
 
-			if ( spriteram[offs+1] > 16 ) { /* visible */
+			if ( spriteram[offs+1] > 16 ) /* visible */
+			{
 				int code = ( spriteram[offs+3] & 0x3f ) << 4;
 				int bank = spriteram[offs+0];
 				int flags = spriteram[offs+4];
@@ -121,11 +124,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				code <<= 2;
 				code += ( bank & 0x0f ) >> 2;
 
+				sx = spriteram[offs + 2];
+				if (!(spriteram[offs+3] & 0x40)) sx -= 0x0100;
+
 				drawgfx( bitmap,machine->gfx[ 17 ], code,
 						flags >> 4, /* color */
 						bank&1, /* flipx */
 						bank&2, /* flipy */
-						spriteram[offs + 2], /* sx */
+						sx, /* sx */
 						240 - spriteram[offs + 1], /* sy */
 						cliprect,TRANSPARENCY_PEN,15 );
 			}
@@ -140,9 +146,7 @@ VIDEO_UPDATE( wc90b )
 	tilemap_set_scrollx(fg_tilemap,0,8 * wc90b_scroll1x[0] + 256);
 	tilemap_set_scrolly(fg_tilemap,0,wc90b_scroll1y[0] + ((wc90b_scroll1y[0] < 0x10 || wc90b_scroll1y[0] == 0xff) ? 256 : 0));
 
-//  draw_sprites(screen->machine, bitmap,cliprect, 3 );
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(screen->machine, bitmap,cliprect, 2 );
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect, 1 );
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
