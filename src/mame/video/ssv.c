@@ -878,6 +878,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					sy	=	ssv_sprites_offsy - sy - (ynum-1) * 8;
 				}
 
+				/* Sprite code masking */
+				if(xnum == 2 && ynum == 4) // needed by hypreact
+				{
+					code &= ~7;
+				}
+				
 				/* Draw the tiles */
 
 				for (x = xstart; x != xend; x += xinc)
