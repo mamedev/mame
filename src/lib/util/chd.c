@@ -225,6 +225,7 @@ static UINT32 crcmap_find_hunk(chd_file *chd, UINT32 hunknum, UINT32 crc, const 
 static chd_error metadata_find_entry(chd_file *chd, UINT32 metatag, UINT32 metaindex, metadata_entry *metaentry);
 static chd_error metadata_set_previous_next(chd_file *chd, UINT64 prevoffset, UINT64 nextoffset);
 static chd_error metadata_set_length(chd_file *chd, UINT64 offset, UINT32 length);
+static chd_error metadata_compute_hash(chd_file *chd, UINT8 *finalsha1);
 
 /* zlib compression codec */
 static chd_error zlib_codec_init(chd_file *chd);
@@ -432,6 +433,20 @@ INLINE void map_extract_old(const UINT8 *base, map_entry *entry, UINT32 hunkbyte
 
 
 /*-------------------------------------------------
+    compute_overall_sum - compute an overall
+    checksum from the raw + meta hashes
+-------------------------------------------------*/
+
+INLINE void compute_overall_sum(UINT8 *sha1, const UINT8 *rawsha1, const UINT8 *metasha1)
+{
+	int hashindex;
+	
+	for (hashindex = 0; hashindex < CHD_SHA1_BYTES; hashindex++)
+		sha1[hashindex] = rawsha1[hashindex] ^ metasha1[hashindex];
+}	
+
+
+/*-------------------------------------------------
     queue_async_operation - queue a new work
     item
 -------------------------------------------------*/
@@ -519,7 +534,7 @@ chd_error chd_create_file(core_file *file, UINT64 logicalbytes, UINT32 hunkbytes
 
 	/* build the header */
 	memset(&header, 0, sizeof(header));
-	header.length = CHD_V3_HEADER_SIZE;
+	header.length = CHD_V4_HEADER_SIZE;
 	header.version = CHD_HEADER_VERSION;
 	header.flags = CHDFLAGS_IS_WRITEABLE;
 	header.compression = compression;
@@ -1217,16 +1232,15 @@ chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, cons
 		core_fseek(chd->file, metaentry.offset + METADATA_HEADER_SIZE, SEEK_SET);
 		count = core_fwrite(chd->file, inputbuf, inputlen);
 		if (count != inputlen)
-			return CHDERR_WRITE_ERROR;
+		{
+			err = CHDERR_WRITE_ERROR;
+			goto update;
+		}
 
 		/* if the lengths don't match, we need to update the length in our header */
 		if (inputlen != metaentry.length)
-		{
 			err = metadata_set_length(chd, metaentry.offset, inputlen);
-			if (err != CHDERR_NONE)
-				return err;
-		}
-		return CHDERR_NONE;
+		goto update;
 	}
 
 	/* if we already have an entry, unlink it */
@@ -1234,7 +1248,7 @@ chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, cons
 	{
 		err = metadata_set_previous_next(chd, metaentry.prev, metaentry.next);
 		if (err != CHDERR_NONE)
-			return err;
+			goto update;
 	}
 
 	/* now build us a new entry */
@@ -1247,20 +1261,31 @@ chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, cons
 	core_fseek(chd->file, offset, SEEK_SET);
 	count = core_fwrite(chd->file, raw_meta_header, sizeof(raw_meta_header));
 	if (count != sizeof(raw_meta_header))
-		return CHDERR_WRITE_ERROR;
+	{
+		err = CHDERR_WRITE_ERROR;
+		goto update;
+	}
 
 	/* follow that with the data */
 	core_fseek(chd->file, offset + METADATA_HEADER_SIZE, SEEK_SET);
 	count = core_fwrite(chd->file, inputbuf, inputlen);
 	if (count != inputlen)
-		return CHDERR_WRITE_ERROR;
+	{
+		err = CHDERR_WRITE_ERROR;
+		goto update;
+	}
 
 	/* set the previous entry to point to us */
 	err = metadata_set_previous_next(chd, metaentry.prev, offset);
-	if (err != CHDERR_NONE)
-		return err;
 
-	return CHDERR_NONE;
+update:
+	/* update the hash */
+	if (metadata_compute_hash(chd, chd->header.metasha1) == CHDERR_NONE)
+	{
+		compute_overall_sum(chd->header.sha1, chd->header.rawsha1, chd->header.metasha1);
+		err = header_write(chd->file, &chd->header);
+	}
+	return err;
 }
 
 
@@ -1286,6 +1311,15 @@ chd_error chd_clone_metadata(chd_file *source, chd_file *dest)
 			if (err == CHDERR_METADATA_NOT_FOUND)
 				err = CHDERR_NONE;
 			break;
+		}
+		
+		/* promote certain bits of metadata to checksummed for older CHDs */
+		if (source->header.version <= 3 &&
+			(metatag == HARD_DISK_METADATA_TAG || metatag == CDROM_OLD_METADATA_TAG || 
+			 metatag == CDROM_TRACK_METADATA_TAG || metatag == AV_METADATA_TAG || 
+			 metatag == AV_LD_METADATA_TAG))
+		{
+			metaflags |= CHD_MDFLAGS_CHECKSUM;
 		}
 
 		/* if that fit, just write it back from the temporary buffer */
@@ -1439,7 +1473,8 @@ chd_error chd_compress_finish(chd_file *chd)
 	/* compute the final MD5/SHA1 values */
 	MD5Final(chd->header.md5, &chd->compmd5);
 	sha1_final(&chd->compsha1);
-	sha1_digest(&chd->compsha1, SHA1_DIGEST_SIZE, chd->header.sha1);
+	sha1_digest(&chd->compsha1, SHA1_DIGEST_SIZE, chd->header.rawsha1);
+	compute_overall_sum(chd->header.sha1, chd->header.rawsha1, chd->header.metasha1);
 
 	/* turn off the writeable flag and re-write the header */
 	chd->header.flags &= ~CHDFLAGS_IS_WRITEABLE;
@@ -1527,22 +1562,24 @@ chd_error chd_verify_hunk(chd_file *chd)
     the CHD
 -------------------------------------------------*/
 
-chd_error chd_verify_finish(chd_file *chd, UINT8 *finalmd5, UINT8 *finalsha1)
+chd_error chd_verify_finish(chd_file *chd, chd_verify_result *result)
 {
 	/* error if in the wrong state */
 	if (!chd->verifying)
 		return CHDERR_INVALID_STATE;
 
 	/* compute the final MD5 */
-	if (finalmd5 != NULL)
-		MD5Final(finalmd5, &chd->vermd5);
+	MD5Final(result->md5, &chd->vermd5);
 
 	/* compute the final SHA1 */
-	if (finalsha1 != NULL)
-	{
-		sha1_final(&chd->versha1);
-		sha1_digest(&chd->versha1, SHA1_DIGEST_SIZE, finalsha1);
-	}
+	sha1_final(&chd->versha1);
+	sha1_digest(&chd->versha1, SHA1_DIGEST_SIZE, result->rawsha1);
+
+	/* compute the metadata hash as well */
+	metadata_compute_hash(chd, result->metasha1);
+	
+	/* and the overall sum */
+	compute_overall_sum(result->sha1, result->rawsha1, result->metasha1);
 
 	/* return an error */
 	chd->verifying = FALSE;
@@ -1653,7 +1690,8 @@ static chd_error header_validate(const chd_header *header)
 	/* require a valid length */
 	if ((header->version == 1 && header->length != CHD_V1_HEADER_SIZE) ||
 		(header->version == 2 && header->length != CHD_V2_HEADER_SIZE) ||
-		(header->version == 3 && header->length != CHD_V3_HEADER_SIZE))
+		(header->version == 3 && header->length != CHD_V3_HEADER_SIZE) ||
+		(header->version == 4 && header->length != CHD_V4_HEADER_SIZE))
 		return CHDERR_INVALID_PARAMETER;
 
 	/* require valid flags */
@@ -1706,11 +1744,11 @@ static chd_error header_read(core_file *file, chd_header *header)
 	UINT32 count;
 
 	/* punt if NULL */
-	if (!header)
+	if (header == NULL)
 		return CHDERR_INVALID_PARAMETER;
 
 	/* punt if invalid file */
-	if (!file)
+	if (file == NULL)
 		return CHDERR_INVALID_FILE;
 
 	/* seek and read */
@@ -1735,14 +1773,13 @@ static chd_error header_read(core_file *file, chd_header *header)
 	/* make sure the length is expected */
 	if ((header->version == 1 && header->length != CHD_V1_HEADER_SIZE) ||
 		(header->version == 2 && header->length != CHD_V2_HEADER_SIZE) ||
-		(header->version == 3 && header->length != CHD_V3_HEADER_SIZE))
+		(header->version == 3 && header->length != CHD_V3_HEADER_SIZE) ||
+		(header->version == 4 && header->length != CHD_V4_HEADER_SIZE))
 		return CHDERR_INVALID_DATA;
 
 	/* extract the common data */
 	header->flags         = get_bigendian_uint32(&rawheader[16]);
 	header->compression   = get_bigendian_uint32(&rawheader[20]);
-	memcpy(header->md5, &rawheader[44], CHD_MD5_BYTES);
-	memcpy(header->parentmd5, &rawheader[60], CHD_MD5_BYTES);
 
 	/* extract the V1/V2-specific data */
 	if (header->version < 3)
@@ -1753,20 +1790,37 @@ static chd_error header_read(core_file *file, chd_header *header)
 		header->obsolete_cylinders = get_bigendian_uint32(&rawheader[32]);
 		header->obsolete_heads     = get_bigendian_uint32(&rawheader[36]);
 		header->obsolete_sectors   = get_bigendian_uint32(&rawheader[40]);
+		memcpy(header->md5, &rawheader[44], CHD_MD5_BYTES);
+		memcpy(header->parentmd5, &rawheader[60], CHD_MD5_BYTES);
 		header->logicalbytes = (UINT64)header->obsolete_cylinders * (UINT64)header->obsolete_heads * (UINT64)header->obsolete_sectors * (UINT64)seclen;
 		header->hunkbytes = seclen * header->obsolete_hunksize;
 		header->metaoffset = 0;
 	}
 
 	/* extract the V3-specific data */
+	else if (header->version == 3)
+	{
+		header->totalhunks   = get_bigendian_uint32(&rawheader[24]);
+		header->logicalbytes = get_bigendian_uint64(&rawheader[28]);
+		header->metaoffset   = get_bigendian_uint64(&rawheader[36]);
+		memcpy(header->md5, &rawheader[44], CHD_MD5_BYTES);
+		memcpy(header->parentmd5, &rawheader[60], CHD_MD5_BYTES);
+		header->hunkbytes    = get_bigendian_uint32(&rawheader[76]);
+		memcpy(header->sha1, &rawheader[80], CHD_SHA1_BYTES);
+		memcpy(header->parentsha1, &rawheader[100], CHD_SHA1_BYTES);
+	}
+
+	/* extract the V4-specific data */
 	else
 	{
 		header->totalhunks   = get_bigendian_uint32(&rawheader[24]);
 		header->logicalbytes = get_bigendian_uint64(&rawheader[28]);
 		header->metaoffset   = get_bigendian_uint64(&rawheader[36]);
-		header->hunkbytes    = get_bigendian_uint32(&rawheader[76]);
-		memcpy(header->sha1, &rawheader[80], CHD_SHA1_BYTES);
-		memcpy(header->parentsha1, &rawheader[100], CHD_SHA1_BYTES);
+		header->hunkbytes    = get_bigendian_uint32(&rawheader[44]);
+		memcpy(header->sha1, &rawheader[48], CHD_SHA1_BYTES);
+		memcpy(header->parentsha1, &rawheader[68], CHD_SHA1_BYTES);
+		memcpy(header->rawsha1, &rawheader[88], CHD_SHA1_BYTES);
+		memcpy(header->metasha1, &rawheader[108], CHD_SHA1_BYTES);
 	}
 
 	/* guess it worked */
@@ -1785,38 +1839,38 @@ static chd_error header_write(core_file *file, const chd_header *header)
 	UINT32 count;
 
 	/* punt if NULL */
-	if (!header)
+	if (header == NULL)
 		return CHDERR_INVALID_PARAMETER;
 
 	/* punt if invalid file */
-	if (!file)
+	if (file == NULL)
 		return CHDERR_INVALID_FILE;
 
 	/* only support writing modern headers */
-	if (header->version != 3)
+	if (header->version != 4)
 		return CHDERR_INVALID_PARAMETER;
 
 	/* assemble the data */
 	memset(rawheader, 0, sizeof(rawheader));
 	memcpy(rawheader, "MComprHD", 8);
 
-	put_bigendian_uint32(&rawheader[8],  CHD_V3_HEADER_SIZE);
+	put_bigendian_uint32(&rawheader[8],  CHD_V4_HEADER_SIZE);
 	put_bigendian_uint32(&rawheader[12], header->version);
 	put_bigendian_uint32(&rawheader[16], header->flags);
 	put_bigendian_uint32(&rawheader[20], header->compression);
 	put_bigendian_uint32(&rawheader[24], header->totalhunks);
 	put_bigendian_uint64(&rawheader[28], header->logicalbytes);
 	put_bigendian_uint64(&rawheader[36], header->metaoffset);
-	memcpy(&rawheader[44], header->md5, CHD_MD5_BYTES);
-	memcpy(&rawheader[60], header->parentmd5, CHD_MD5_BYTES);
-	put_bigendian_uint32(&rawheader[76], header->hunkbytes);
-	memcpy(&rawheader[80], header->sha1, CHD_SHA1_BYTES);
-	memcpy(&rawheader[100], header->parentsha1, CHD_SHA1_BYTES);
+	put_bigendian_uint32(&rawheader[44], header->hunkbytes);
+	memcpy(&rawheader[48], header->sha1, CHD_SHA1_BYTES);
+	memcpy(&rawheader[68], header->parentsha1, CHD_SHA1_BYTES);
+	memcpy(&rawheader[88], header->rawsha1, CHD_SHA1_BYTES);
+	memcpy(&rawheader[108], header->metasha1, CHD_SHA1_BYTES);
 
 	/* seek and write */
 	core_fseek(file, 0, SEEK_SET);
-	count = core_fwrite(file, rawheader, CHD_V3_HEADER_SIZE);
-	if (count != CHD_V3_HEADER_SIZE)
+	count = core_fwrite(file, rawheader, CHD_V4_HEADER_SIZE);
+	if (count != CHD_V4_HEADER_SIZE)
 		return CHDERR_WRITE_ERROR;
 
 	return CHDERR_NONE;
@@ -2373,7 +2427,7 @@ static chd_error metadata_find_entry(chd_file *chd, UINT32 metatag, UINT32 metai
 		metaentry->length = get_bigendian_uint32(&raw_meta_header[4]);
 		metaentry->next = get_bigendian_uint64(&raw_meta_header[8]);
 
-		/* checksum is encoded as the high bit of length */
+		/* flags are encoded in the high byte of length */
 		metaentry->flags = metaentry->length >> 24;
 		metaentry->length &= 0x00ffffff;
 
@@ -2464,6 +2518,89 @@ static chd_error metadata_set_length(chd_file *chd, UINT64 offset, UINT32 length
 		return CHDERR_WRITE_ERROR;
 
 	return CHDERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    metadata_compute_hash - compute the SHA1
+    hash of all metadata that requests it
+-------------------------------------------------*/
+
+static chd_error metadata_compute_hash(chd_file *chd, UINT8 *finalsha1)
+{
+	UINT32 metatag, metasize, metaindex;
+	UINT8 metabuffer[1024];
+	struct sha1_ctx sha1;
+	UINT8 metaflags;
+	chd_error err;
+	int count = 0;
+	
+	/* only works for V4 and above */
+	if (chd->header.version < 4)
+	{
+		memset(finalsha1, 0, SHA1_DIGEST_SIZE);
+		return CHDERR_NONE;
+	}
+	
+	/* initialize the hash computation */
+	sha1_init(&sha1);
+
+	/* iterate over the metadata */
+	for (metaindex = 0; ; metaindex++)
+	{
+		/* fetch the next piece of metadata */
+		err = chd_get_metadata(chd, CHDMETATAG_WILDCARD, metaindex, metabuffer, sizeof(metabuffer), &metasize, &metatag, &metaflags);
+		if (err != CHDERR_NONE)
+		{
+			if (err == CHDERR_METADATA_NOT_FOUND)
+				err = CHDERR_NONE;
+			break;
+		}
+		
+		/* if this entry doesn't participate, continue */
+		if (!(metaflags & CHD_MDFLAGS_CHECKSUM))
+			continue;
+		count++;
+
+		/* if that fit, compute the sum from the temporary buffer */
+		if (metasize <= sizeof(metabuffer))
+			sha1_update(&sha1, metasize, metabuffer);
+
+		/* otherwise, allocate a bigger temporary buffer */
+		else
+		{
+			UINT8 *allocbuffer = (UINT8 *)malloc(metasize);
+			if (allocbuffer == NULL)
+			{
+				err = CHDERR_OUT_OF_MEMORY;
+				break;
+			}
+
+			/* re-read the whole thing */
+			err = chd_get_metadata(chd, CHDMETATAG_WILDCARD, metaindex, allocbuffer, metasize, &metasize, &metatag, &metaflags);
+			if (err != CHDERR_NONE)
+			{
+				free(allocbuffer);
+				break;
+			}
+
+			/* compute the sum over that */
+			sha1_update(&sha1, metasize, allocbuffer);
+			free(allocbuffer);
+		}
+	}
+
+	/* finish the sum */
+	if (err == CHDERR_NONE)
+	{
+		sha1_final(&sha1);
+		sha1_digest(&sha1, SHA1_DIGEST_SIZE, finalsha1);
+		
+		/* special case: if no entries, zero the sum */
+		if (count == 0)
+			memset(finalsha1, 0, SHA1_DIGEST_SIZE);
+	}
+	return err;
 }
 
 
