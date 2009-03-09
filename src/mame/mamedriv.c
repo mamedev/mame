@@ -7604,8 +7604,9 @@ Other Sun games
 	DRIVER( chleagul )	/* (c) 199? IGS */
 	DRIVER( number10 )	/* (c) IGS (Board labeled Playmark Srl) */
 	DRIVER( numbr10l )	/* (c) IGS (Board labeled Playmark Srl) */
-	DRIVER( citalian )
-	DRIVER( citaliana )
+	DRIVER( cpokerpk )	/* (c) SGS (bootleg blue board) */
+	DRIVER( cpokerpkg )	/* (c) SGS (bootleg green board) */
+	DRIVER( citalcup )	/* (c) SGS (bootleg of IGS v220it) */
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */

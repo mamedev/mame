@@ -160,10 +160,13 @@ static VIDEO_UPDATE(igs_video)
 	return 0;
 }
 
-static VIDEO_UPDATE(number10)
+static VIDEO_START(cpokerpk)
 {
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,	8,  8,	64, 32);
+}
 
+static VIDEO_UPDATE(cpokerpk)
+{
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
 	return 0;
@@ -934,6 +937,28 @@ static ADDRESS_MAP_START( number10_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READ( exp_rom_r )
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( cpokerpk_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE( &paletteram )
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE( &paletteram_2 )
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
+	AM_RANGE(0x50f0, 0x50f0) AM_WRITE(igs_nmi_and_coins_w)
+	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")			/* Services */
+	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")			/* Coing & Kbd */
+	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
+	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE( igs_lamps_w )			/* Keyboard */
+	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
+	/* Sound synthesys has been patched out, replaced by ADPCM samples */
+	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE( "oki", okim6295_r, okim6295_w )
+	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE( fg_tile_w )  AM_BASE( &fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE( fg_color_w ) AM_BASE( &fg_color_ram )
+	AM_RANGE(0x0000, 0xffff) AM_READ( exp_rom_r )
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( number10 )
 
 	PORT_START("DSW1")
@@ -1055,6 +1080,148 @@ static INPUT_PORTS_START( number10 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Payout")
+
+	PORT_START("BUTTONS1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("BUTTONS2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_CODE(KEYCODE_N)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Hold1/High/Low")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("Hold5/Bet")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("Hold4/Take")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Hold3/W-Up")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Hold2/Red/Black")
+	PORT_BIT(0xC0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cpokerpk )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x06, 0x06, "Min Bet to Start" ) PORT_DIPLOCATION("SWA:7,6")
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x18, 0x10, "Max Bet" ) PORT_DIPLOCATION("SWA:5,4")
+	PORT_DIPSETTING(    0x18, "5" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x08, "20" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x60, 0x60, "Min Bet to play Fever" ) PORT_DIPLOCATION("SWA:3,2")
+	PORT_DIPSETTING(    0x60, "1" )
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x20, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x80, 0x00, "Credit Limit" ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x80, "50000" )
+	PORT_DIPSETTING(    0x00, "50000" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Coin In Rate" ) PORT_DIPLOCATION("SWB:8,7,6")
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x03, "20" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x18, 0x18, "Key In Rate" ) PORT_DIPLOCATION("SWB:5,4")
+	PORT_DIPSETTING(    0x18, "10" )
+	PORT_DIPSETTING(    0x10, "20" )
+	PORT_DIPSETTING(    0x08, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x60, 0x60, "Val Premio" ) PORT_DIPLOCATION("SWB:3,2")
+	PORT_DIPSETTING(    0x60, "1" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x20, "20" )
+	PORT_DIPSETTING(    0x00, "50" )
+	/* Whatever value is selected, code will force ACTIVE_LOW, thus Manual mode */
+	PORT_DIPNAME( 0x80, 0x80, "Payout" ) PORT_DIPLOCATION("SWB:1")
+	PORT_DIPSETTING(    0x80, "Manual" )
+	PORT_DIPSETTING(    0x00, "Auto" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "W-UP Limit" ) PORT_DIPLOCATION("SWC:8")
+	PORT_DIPSETTING(    0x01, "3000" )
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPNAME( 0x02, 0x02, "W-UP Pool" ) PORT_DIPLOCATION("SWC:7")
+	PORT_DIPSETTING(    0x02, "300" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x0c, 0x0c, "W-UP Chance" ) PORT_DIPLOCATION("SWC:6,5")
+	PORT_DIPSETTING(    0x0c, "94%" )
+	PORT_DIPSETTING(    0x08, "96%" )
+	PORT_DIPSETTING(    0x04, "98%" )
+	PORT_DIPSETTING(    0x00, "100%" )
+	PORT_DIPNAME( 0x30, 0x20, "W-UP Type" ) PORT_DIPLOCATION("SWC:4,3")
+	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x20, "High-Low" )
+	PORT_DIPSETTING(    0x10, "Red-Black" )		/* Bit 4 is equal for ON/OFF */
+	PORT_DIPNAME( 0x40, 0x00, "Strip Girl" ) PORT_DIPLOCATION("SWC:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x0f, 0x07, "Main Game Chance" ) PORT_DIPLOCATION("SWD:8,7,6,5")
+	PORT_DIPSETTING(    0x0f, "69%" )
+	PORT_DIPSETTING(    0x0e, "72%" )
+	PORT_DIPSETTING(    0x0d, "75%" )
+	PORT_DIPSETTING(    0x0c, "78%" )
+	PORT_DIPSETTING(    0x0b, "81%" )
+	PORT_DIPSETTING(    0x0a, "83%" )
+	PORT_DIPSETTING(    0x09, "85%" )
+	PORT_DIPSETTING(    0x08, "87%" )
+	PORT_DIPSETTING(    0x07, "89%" )
+	PORT_DIPSETTING(    0x06, "91%" )
+	PORT_DIPSETTING(    0x05, "93%" )
+	PORT_DIPSETTING(    0x04, "95%" )
+	PORT_DIPSETTING(    0x03, "97%" )
+	PORT_DIPSETTING(    0x02, "99%" )
+	PORT_DIPSETTING(    0x01, "101%" )
+	PORT_DIPSETTING(    0x00, "103%" )
+	PORT_DIPNAME( 0x10, 0x00, "Five Jokers" ) PORT_DIPLOCATION("SWD:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, "Royal Flush" ) PORT_DIPLOCATION("SWD:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" ) PORT_DIPLOCATION("SWD:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x00, "Anytime Key-in" ) PORT_DIPLOCATION("SWD:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x00, "Hopper" ) PORT_DIPLOCATION("SWE:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, "Payout Select" ) PORT_DIPLOCATION("SWE:7")
+	PORT_DIPSETTING(    0x02, "Hopper" )
+	PORT_DIPSETTING(    0x00, "Ticket" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Ticket Rate" ) PORT_DIPLOCATION("SWE:6,5")
+	PORT_DIPSETTING(    0x0c, "10:1" )
+	PORT_DIPSETTING(    0x08, "20:1" )
+	PORT_DIPSETTING(    0x04, "50:1" )
+	PORT_DIPSETTING(    0x00, "100:1" )
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM( hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Payout")
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F1) PORT_NAME("Statistics")
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_Q) PORT_NAME("Key In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_W) PORT_NAME("Key Down")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1376,17 +1543,6 @@ static const gfx_layout charlayout2 =
 	8*32*2
 };
 
-static const gfx_layout charlayout8bpp =
-{
-	8, 8,	/* 8*8 characters */
-	RGN_FRAC(1, 1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0,8,16,24,32,40,48,56 },
-	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64 },
-	64*8
-};
-
 
 static GFXDECODE_START( igspoker )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 16 )
@@ -1396,8 +1552,19 @@ static GFXDECODE_START( igspoker )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( citalian )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout8bpp,   0, 1 )
+static const gfx_layout charlayoutcpk =
+{
+	8, 8,	/* 8*8 characters */
+	RGN_FRAC(1, 1),
+	6,
+	{ 2,3,4,5,6,7 },
+	{ 0,8,16,24,32,40,48,56 },
+	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64 },
+	64*8
+};
+
+static GFXDECODE_START( cpokerpk )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayoutcpk,   0, 16 )
 	/* these not used? */
 	GFXDECODE_ENTRY( "gfx2", 0x04000, charlayout2,  0, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0x08000, charlayout2,  0, 1 )
@@ -1461,19 +1628,20 @@ static MACHINE_DRIVER_START( number10 )
 	MDRV_CPU_IO_MAP(number10_io_map,0)
 
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_VIDEO_UPDATE(number10)
+	MDRV_VIDEO_START(cpokerpk)
+	MDRV_VIDEO_UPDATE(cpokerpk)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_12MHz / 12)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( citalian )
-
-	MDRV_PALETTE_LENGTH(0x8000)
+static MACHINE_DRIVER_START( cpokerpk )
 
 	MDRV_IMPORT_FROM(number10)
-	MDRV_GFXDECODE(citalian)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(cpokerpk_io_map,0)
+	MDRV_GFXDECODE(cpokerpk)
 MACHINE_DRIVER_END
 
 
@@ -1976,7 +2144,30 @@ ROM_START( numbr10l )
 	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
 ROM_END
 
-ROM_START( citalian )
+static DRIVER_INIT( cpokerpk )
+{
+	int A;
+	UINT8 *rom = memory_region(machine, "maincpu");
+
+	for (A=0x0714; A < 0xF000; A+=0x1000)
+		rom[A] ^= 0x20;
+}
+
+ROM_START( cpokerpk )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "blue.bin", 0x00000, 0x20000, CRC(3e987389) SHA1(ab154db89406590d04270d7b29e60efab15758ca) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "red.bin",   0x00000, 0x40000, CRC(b72fe1e0) SHA1(0507df7e1495aa265b276337c9c151478dd9d376) )
+	ROM_LOAD16_BYTE( "white.bin", 0x00001, 0x40000, CRC(bdf55fa4) SHA1(487999d22941a0ef2f3874d31527f45d122aadb0) )
+
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_ERASE00 | ROMREGION_DISPOSE )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "yellow.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
+ROM_END
+
+ROM_START( cpokerpkg )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "cp.u35", 0x00000, 0x20000, CRC(25e129b9) SHA1(01dc9e09603cef233da28e30194e53ef4cd04475) )
 
@@ -1993,7 +2184,7 @@ ROM_START( citalian )
 	ROM_LOAD( "palce22v10h.u44.bad.dump", 0x000, 0x2dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )
 ROM_END
 
-ROM_START( citaliana )
+ROM_START( citalcup )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "ic.u35", 0x00000, 0x20000, CRC(f120eb31) SHA1(b87f638d4eebe05323b6952956d44368077f27aa) )
 
@@ -2051,8 +2242,9 @@ GAMEL( 198?,  csk234it, csk227it, csk234it, csk234,  cska,    ROT0, "IGS",    "C
 GAMEL( 2000, number10,  0,        number10, number10, number10, ROT0, "PlayMark Srl",   "Number Dieci (Poker)",            0,	layout_igspoker )
 GAMEL( 2000, numbr10l,  number10, number10, number10, number10, ROT0, "PlayMark Srl",   "Number Dieci (Lattine)",          0,	layout_igspoker )
 GAMEL( 198?,  igs_ncs,  0,        igs_ncs,  igs_ncs, igs_ncs, ROT0, "IGS",    "New Champion Skill (v100n)",                0,	layout_igspoker ) /* SU 062 */
-GAMEL( 199?, citalian,   0,       citalian,number10,  0,  ROT0, "SGS",    "Champion Italian Cup (bootleg, set 1)",                   GAME_NOT_WORKING, layout_igspoker )
-GAMEL( 199?, citaliana,  citalian,citalian,number10,  0,  ROT0, "SGS",    "Champion Italian Cup (bootleg, set 2)",                   GAME_NOT_WORKING, layout_igspoker )
+GAMEL( 199?, cpokerpk,  0,        cpokerpk, cpokerpk,  cpokerpk,  ROT0, "SGS",    "Champion Poker PK (bootleg, blue board)",   0,	layout_igspoker )
+GAMEL( 199?, cpokerpkg, cpokerpk, cpokerpk, cpokerpk,  cpokerpk,  ROT0, "SGS",    "Champion Poker PK (bootleg, green board)",  0, layout_igspoker )
+GAMEL( 199?, citalcup,  cpokerpk, cpokerpk, cpokerpk,  cpokerpk,  ROT0, "SGS",    "Champion Italian Cup (bootleg V220IT)",     0, layout_igspoker )
 
 GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs, igs_ncs2, ROT0, "IGS",   "New Champion Skill (v100n 2000)",           GAME_IMPERFECT_GRAPHICS, layout_igspoker )
 
