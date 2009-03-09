@@ -14,7 +14,6 @@
 
 static UINT16 * ml_tileram;
 static UINT16 * ml_spriteram;
-static UINT16 * ml_unk;
 static bitmap_t *ml_bitmap[8];
 #define ML_CHARS 0x2000
 static int status_bit;
@@ -125,7 +124,7 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READ(SMH_NOP) AM_WRITE(taitosound_port16_lsb_w)
 	AM_RANGE(0x2d0002, 0x2d0003) AM_READ(taitosound_comm16_msb_r) AM_WRITE(taitosound_comm16_lsb_w)
 
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&ml_unk)//AM_SHARE(2)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)//AM_SHARE(2)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM // is it shared with mecha ? tested around $940
 
 	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
@@ -229,10 +228,10 @@ static VIDEO_UPDATE(mlanding)
 					{
 						drawgfx(ml_bitmap[num],screen->machine->gfx[0],
 							code++,
-							0,
+							color,
 							0,0,
 							x+j*8,y+k*8,
-							cliprect,TRANSPARENCY_PEN,0);
+							cliprect,TRANSPARENCY_NONE,0);
 					}
 					else
 					{
@@ -319,7 +318,7 @@ static void irq_handler(const device_config *device, int irq)
 }
 
 static GFXDECODE_START( mlanding )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16*16 )
 GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
