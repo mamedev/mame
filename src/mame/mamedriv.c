@@ -7471,6 +7471,7 @@ Other Sun games
 	DRIVER( janoh )		/* (c) 1984 Toaplan */
 	DRIVER( janoha )	/* (c) 1984 Toaplan */
 	DRIVER( jansou )	/* (c) 1985 Dyna */
+	DRIVER( jansoua )	/* (c) 1985 Dyna */
 	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
 	DRIVER( mjsenka )	/* (c) 1986 Visco */
 	DRIVER( mjyarou )	/* (c) 1986 Visco / Video System */
