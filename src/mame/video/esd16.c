@@ -220,13 +220,13 @@ static void esd16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 		int	flipx	=	sy & 0x2000;
 		int	flipy	=	attr & 0x0000;
 		int flash   =   sy & 0x1000;
-		
+
 		int color	=	(sx >> 9) & 0xf;
 
 		int pri_mask;
 
 		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
-		
+
 		if(sx & 0x8000)
 			pri_mask = 0xfffe; // under "tilemap 1"
 		else
@@ -286,7 +286,7 @@ static void hedpanic_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
-		
+
 		if(sx & 0x8000)
 			pri_mask = 0xfffe; // under "tilemap 1"
 		else

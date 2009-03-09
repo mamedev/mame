@@ -101,18 +101,18 @@ static WRITE8_HANDLER( cpu_bankswitch_w )
 
 static WRITE8_HANDLER( bg0_videoram_w )
 {
-	
+
 	if(video_bank==0)
 	{
 		int r,g,b,datax;
 		paletteram[offset] = data;
 		offset>>=1;
 		datax=paletteram[offset*2]+256*paletteram[offset*2+1];
-		
+
 		r=((datax>>7)&0x1e)|((datax&0x4000)?0x1:0);
 		g=((datax>>3)&0x1e)|((datax&0x2000)?0x1:0);
 		b=((datax<<1)&0x1e)|((datax&0x1000)?0x1:0);
-			
+
 		palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 	else
@@ -332,7 +332,7 @@ GFXDECODE_END
 //WRONG!
 static PALETTE_INIT( cultures )
 {
-	
+
 }
 
 

@@ -986,7 +986,7 @@ ROM_START( hedpanio ) /* Story line & game instructions in English, copyright ye
 	//ROM_CONTINUE(         0x10000, 0x14000)
 	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) /* AT27C020 mask rom */
 	ROM_CONTINUE(          0x10000, 0x34000)
-	
+
 	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x5 */
 	ROM_LOAD( "sm1.bin", 0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
 	ROM_LOAD( "sm2.bin", 0x200000, 0x200000, CRC(7a9610e4) SHA1(21ae3ec3fbddfc66416c109b091bd885d5ba0558) )
@@ -997,7 +997,7 @@ ROM_START( hedpanio ) /* Story line & game instructions in English, copyright ye
 	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "sm3.bin", 0x000000, 0x200000, CRC(94dd4cfc) SHA1(a3f9c49611f0bc9d26166dafb44e2c5ebbb31127) )
 	ROM_LOAD16_BYTE( "sm4.bin", 0x000001, 0x200000, CRC(6da0fb9e) SHA1(c4e7487953f45c5f6ce2ebe558b4c325f6ec54eb) )
-	
+
 	ROM_REGION( 0x20000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "esd4.rom", 0x000000, 0x020000, CRC(d7ca6806) SHA1(8ad668bfb5b7561cc0f3e36dfc3c936b136a4274) )
 ROM_END

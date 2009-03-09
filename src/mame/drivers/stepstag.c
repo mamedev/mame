@@ -2,7 +2,7 @@
 
 *************************************************************************
  Naibo added:
- 
+
  A PC computer(Harddisk not dumped yet) + Two 68000 based board set.
 
  One 68000 drives 3 screens, another handles players input.

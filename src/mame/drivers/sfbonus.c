@@ -543,7 +543,7 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPNAME( 0x80, 0x80, "Key1-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("KEY2")
 	PORT_DIPNAME( 0x01, 0x01, "Key2-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -569,7 +569,7 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPNAME( 0x80, 0x80, "Key2-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("KEY3")
 	PORT_DIPNAME( 0x01, 0x01, "Key3-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -595,7 +595,7 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPNAME( 0x80, 0x80, "Key3-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	/* the dipswitches are probably for debugging the games only, all settings are in NVRAM */
 	PORT_START("SWITCH1")
 	PORT_DIPNAME( 0x01, 0x01, "Switch1-0" )
@@ -621,7 +621,7 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Switch1-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SWITCH2")
 	PORT_DIPNAME( 0x01, 0x01, "Switch2-0" )
@@ -647,8 +647,8 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Switch2-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
-	
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("SWITCH3")
 	PORT_DIPNAME( 0x01, 0x01, "Switch3-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -674,7 +674,7 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPNAME( 0x80, 0x80, "Switch3-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-			
+
 	PORT_START("SWITCH4")
 	PORT_DIPNAME( 0x01, 0x01, "Switch4-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -699,8 +699,8 @@ static INPUT_PORTS_START( amcoebase )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Switch4-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
-	
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
 	PORT_START("SWITCH5")
 	PORT_DIPNAME( 0x01, 0x01, "Switch5-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -737,14 +737,14 @@ static INPUT_PORTS_START( amcoecommon )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12) PORT_NAME("Confirm / Port Test") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2)    PORT_IMPULSE(2) // causes coin jam if held
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3)    // 'key in'
-	
+
 	PORT_MODIFY("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amcoetype1 )
 	PORT_INCLUDE(amcoecommon)
-	
+
 	PORT_MODIFY("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1)  PORT_IMPULSE(2) // causes service jam if held
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1)     PORT_IMPULSE(2) // causes coin jam if held
@@ -752,22 +752,22 @@ static INPUT_PORTS_START( amcoetype1 )
 	/*        0x08 ? */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 1 / Select Letter / Double / Hold Help") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Stop 3 / Erase / Take") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Play / Bet") PORT_CODE(KEYCODE_B)	
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Play / Bet") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 2 / Right") PORT_CODE(KEYCODE_C)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( amcoetype2 )
 	PORT_INCLUDE(amcoecommon)
-	
+
 	PORT_MODIFY("KEY2") // reverse order
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Small / Right") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Play / Bet") PORT_CODE(KEYCODE_B)	
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Play / Bet") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Take") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Double / Select") PORT_CODE(KEYCODE_X)
 	/*        0x10 ? */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Big / Left") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)     PORT_IMPULSE(2) // causes coin jam if held
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1)  PORT_IMPULSE(2) // causes service jam if held	
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1)  PORT_IMPULSE(2) // causes service jam if held
 INPUT_PORTS_END
 
 
@@ -4506,14 +4506,14 @@ static DRIVER_INIT( sfbonus_common)
 	}
 }
 
-static void sfbonus_bitswap( running_machine* machine, 
+static void sfbonus_bitswap( running_machine* machine,
 						UINT8 xor0, UINT8 b00, UINT8 b01, UINT8 b02, UINT8 b03, UINT8 b04, UINT8 b05, UINT8 b06,UINT8 b07,
                         UINT8 xor1, UINT8 b10, UINT8 b11, UINT8 b12, UINT8 b13, UINT8 b14, UINT8 b15, UINT8 b16,UINT8 b17,
-	                    UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,					
-		                UINT8 xor3, UINT8 b30, UINT8 b31, UINT8 b32, UINT8 b33, UINT8 b34, UINT8 b35, UINT8 b36,UINT8 b37,					
-			            UINT8 xor4, UINT8 b40, UINT8 b41, UINT8 b42, UINT8 b43, UINT8 b44, UINT8 b45, UINT8 b46,UINT8 b47,					
-				        UINT8 xor5, UINT8 b50, UINT8 b51, UINT8 b52, UINT8 b53, UINT8 b54, UINT8 b55, UINT8 b56,UINT8 b57,					
-				        UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,					
+	                    UINT8 xor2, UINT8 b20, UINT8 b21, UINT8 b22, UINT8 b23, UINT8 b24, UINT8 b25, UINT8 b26,UINT8 b27,
+		                UINT8 xor3, UINT8 b30, UINT8 b31, UINT8 b32, UINT8 b33, UINT8 b34, UINT8 b35, UINT8 b36,UINT8 b37,
+			            UINT8 xor4, UINT8 b40, UINT8 b41, UINT8 b42, UINT8 b43, UINT8 b44, UINT8 b45, UINT8 b46,UINT8 b47,
+				        UINT8 xor5, UINT8 b50, UINT8 b51, UINT8 b52, UINT8 b53, UINT8 b54, UINT8 b55, UINT8 b56,UINT8 b57,
+				        UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,
 				        UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 )
 {
 

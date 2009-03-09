@@ -883,7 +883,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				{
 					code &= ~7;
 				}
-				
+
 				/* Draw the tiles */
 
 				for (x = xstart; x != xend; x += xinc)

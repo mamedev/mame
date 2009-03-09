@@ -1,16 +1,16 @@
 /*****************************************************************************************
 
-	Puzzle Time (Prototype)
-	Elettronica Video-Games S.R.L, 199?
-	
-	driver by Angelo Salese and Pierpaolo Prazzoli
-	dump and info provided by Yoshi
-	
-	Notes:
-	- Is the brightness effect right or there's a different video effect?
-	- In the service menu, where you can configure game options, and when you have to
-	  choose the Game Mode, you can't see what is selected, becase the 2 halves of the
-	  palette used by txt tilemap have the same data. Is it a real game bug?
+    Puzzle Time (Prototype)
+    Elettronica Video-Games S.R.L, 199?
+
+    driver by Angelo Salese and Pierpaolo Prazzoli
+    dump and info provided by Yoshi
+
+    Notes:
+    - Is the brightness effect right or there's a different video effect?
+    - In the service menu, where you can configure game options, and when you have to
+      choose the Game Mode, you can't see what is selected, becase the 2 halves of the
+      palette used by txt tilemap have the same data. Is it a real game bug?
 
 *****************************************************************************************/
 
@@ -47,7 +47,7 @@ static VIDEO_START( pzletime )
 {
 	mid_tilemap = tilemap_create(machine, get_mid_tile_info,tilemap_scan_cols, 16,16,64,16);
 	txt_tilemap = tilemap_create(machine, get_txt_tile_info,tilemap_scan_rows,  8, 8,64,32);
-	
+
 	tilemap_set_transparent_pen(mid_tilemap,0);
 	tilemap_set_transparent_pen(txt_tilemap,0);
 }
@@ -61,7 +61,7 @@ static VIDEO_UPDATE( pzletime )
 
 	tilemap_set_scrolly(txt_tilemap, 0, tilemap_regs[0]-3);
 	tilemap_set_scrollx(txt_tilemap, 0, tilemap_regs[1]);
-	
+
 	tilemap_set_scrolly(mid_tilemap, 0, tilemap_regs[2]-3);
 	tilemap_set_scrollx(mid_tilemap, 0, tilemap_regs[3]-7);
 
@@ -82,7 +82,7 @@ static VIDEO_UPDATE( pzletime )
 			}
 		}
 	}
-		
+
 	tilemap_draw(bitmap,cliprect,mid_tilemap, 0,0);
 
 	{
@@ -92,20 +92,20 @@ static VIDEO_UPDATE( pzletime )
 		{
 			if(spriteram16[offs+0] == 8)
 				break;
-			
-			spr_offs = spriteram16[offs+3] & 0x0fff;			
+
+			spr_offs = spriteram16[offs+3] & 0x0fff;
 			sy = 0x200-(spriteram16[offs+0] & 0x1ff)-35;
 			sx = (spriteram16[offs+1] & 0x1ff)-30;
 			colour = (spriteram16[offs+0] & 0xf000)>>12;
-			
+
 			// is spriteram16[offs+0] & 0x200 flipy? it's always set
-			
+
 			drawgfx(bitmap,screen->machine->gfx[1],spr_offs,colour,0,1,sx,sy,cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
-	
+
 	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
-	
+
 	return 0;
 }
 
@@ -142,9 +142,9 @@ static WRITE16_HANDLER( ticket_w )
 static WRITE16_HANDLER( video_regs_w )
 {
 	int i;
-	
+
 	COMBINE_DATA(&video_regs[offset]);
-	
+
 	if(offset == 0)
 	{
 		if(video_regs[0] > 0)
@@ -205,7 +205,7 @@ static INPUT_PORTS_START( pzletime )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) /* eeprom */
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_status_r, NULL) /* ticket dispenser */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("INPUT")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( pzletime )
 	MDRV_CPU_ADD("cpu",M68000,10000000)
 	MDRV_CPU_PROGRAM_MAP(pzletime_map,0)
 	MDRV_CPU_VBLANK_INT("screen",irq4_line_hold)
-	
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -300,7 +300,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( pzletime )
-	ROM_REGION( 0x400000, "cpu", 0 )	
+	ROM_REGION( 0x400000, "cpu", 0 )
 	ROM_LOAD16_BYTE( "5.bin", 0x000000, 0x80000, CRC(78b027dc) SHA1(6719908a075ecf0666bb817ac8a31056a7f315c6) )
 	ROM_LOAD16_BYTE( "1.bin", 0x000001, 0x80000, CRC(0a69cbc7) SHA1(bae8b5746209c6773da27acaec7bd535a69019d2) )
 	ROM_LOAD16_BYTE( "6.bin", 0x100000, 0x80000, CRC(526733ef) SHA1(21a921416d1ae7b9d49789d70ae99f240b012489) )
@@ -309,10 +309,10 @@ ROM_START( pzletime )
 	ROM_LOAD16_BYTE( "3.bin", 0x200001, 0x80000, CRC(1ddacade) SHA1(78f09fdb541e369765abfdf39607ca8f4c771d16) )
 	ROM_LOAD16_BYTE( "8.bin", 0x300000, 0x80000, CRC(be7cf043) SHA1(5dadafb6f89f2fc373b77b18746b461117228f08) )
 	ROM_LOAD16_BYTE( "4.bin", 0x300001, 0x80000, CRC(374ab900) SHA1(bd7f649bdf2927c1f5cb53492a08cc66c4658a72) )
-	
+
 	ROM_REGION( 0x80000, "user1", 0 ) /* Samples */
 	ROM_LOAD( "12.bin",  0x00000, 0x80000,  CRC(203897c1) SHA1(c2495871c796bc7f2dabca1630317313b5aa740a) )
-	
+
 	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000 )
 	ROM_COPY( "user1", 0x000000, 0x020000, 0x020000 )
@@ -322,7 +322,7 @@ ROM_START( pzletime )
 	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000 )
 	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000 )
 	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000 )
-	
+
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "10.bin",  0x00000, 0x80000, CRC(d6ed11a5) SHA1(585aad4e962e7c9ba33e96d4d53e2feddd1a6cd9) )
 

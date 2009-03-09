@@ -43,7 +43,7 @@ static WRITE8_HANDLER( tryout_sound_w )
   stays on this state.*/
 static WRITE8_HANDLER( tryout_sound_irq_ack_w )
 {
-//	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+//  cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( tryout_bankswitch_w )

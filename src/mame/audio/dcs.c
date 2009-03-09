@@ -1165,7 +1165,7 @@ static void sdrc_remap_memory(running_machine *machine)
 
 	/* update the bank pointers */
 	sdrc_update_bank_pointers(machine);
-	
+
 	/* reinstall the polling hotspot */
 	if (dcs.polling_offset)
 		dcs_polling_base = memory_install_readwrite16_handler(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA), dcs.polling_offset, dcs.polling_offset, 0, 0, dcs_polling_r, dcs_polling_w);

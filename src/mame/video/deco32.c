@@ -1268,9 +1268,9 @@ VIDEO_UPDATE( captaven )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,2);
 	else
 		tilemap_draw(bitmap,cliprect,pf1a_tilemap,0,2);
-	
+
 	captaven_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram32,3);
-	
+
 	return 0;
 }
 

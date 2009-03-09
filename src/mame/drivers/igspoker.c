@@ -1380,7 +1380,7 @@ static const gfx_layout charlayout8bpp =
 {
 	8, 8,	/* 8*8 characters */
 	RGN_FRAC(1, 1),
-	8,		
+	8,
 	{ 0,1,2,3,4,5,6,7 },
 	{ 0,8,16,24,32,40,48,56 },
 	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64 },
@@ -1990,7 +1990,7 @@ ROM_START( citalian )
 	ROM_LOAD( "9.bin",   0x0000, 0x40000, CRC(dd213b5c) SHA1(82e32aa44eee227d7424553a743df48606bbd48e) )
 
 	ROM_REGION( 0x2dd, "plds",0 )
-	ROM_LOAD( "palce22v10h.u44.bad.dump", 0x000, 0x2dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )	
+	ROM_LOAD( "palce22v10h.u44.bad.dump", 0x000, 0x2dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )
 ROM_END
 
 ROM_START( citaliana )

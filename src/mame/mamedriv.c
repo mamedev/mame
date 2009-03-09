@@ -8874,7 +8874,7 @@ Other Sun games
 	DRIVER( fb4d2 )
 	DRIVER( fb4v )
 	DRIVER( fb4v2 )
-	DRIVER( fb4v3 )	
+	DRIVER( fb4v3 )
 	DRIVER( fb5 )
 	DRIVER( fb5c )
 	DRIVER( fb5d )
@@ -8902,8 +8902,8 @@ Other Sun games
 	DRIVER( funriver )
 	DRIVER( funriverv )
 	DRIVER( amclink )
-	
-	
+
+
 	DRIVER( act2000 )
 	DRIVER( act2000a )
 	DRIVER( act2000a2 )

@@ -362,7 +362,7 @@ static WRITE32_HANDLER( fghthist_eeprom_w )
 		eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(data & 0x10);
 		eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-		
+
 		deco32_pri_w(space,0,data&0x1,0xffffffff); /* Bit 0 - layer priority toggle */
 	}
 	else if (!ACCESSING_BITS_8_15)
