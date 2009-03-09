@@ -101,8 +101,7 @@ static WRITE8_HANDLER( cpu_bankswitch_w )
 
 static WRITE8_HANDLER( bg0_videoram_w )
 {
-
-	if(video_bank==0)
+	if(video_bank == 0)
 	{
 		int r,g,b,datax;
 		paletteram[offset] = data;
@@ -328,14 +327,6 @@ static GFXDECODE_START( culture )
 	GFXDECODE_ENTRY("gfx3", 0, gfxlayout, 0x1000, 0x10 )
 GFXDECODE_END
 
-
-//WRONG!
-static PALETTE_INIT( cultures )
-{
-
-}
-
-
 static INTERRUPT_GEN( cultures_interrupt )
 {
 	if (irq_enable)
@@ -347,7 +338,6 @@ static MACHINE_RESET( cultures )
 	old_bank = -1;
 }
 
-
 static MACHINE_DRIVER_START( cultures )
 
 	/* basic machine hardware */
@@ -356,7 +346,7 @@ static MACHINE_DRIVER_START( cultures )
 	MDRV_CPU_IO_MAP(cultures_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", cultures_interrupt)
 
-	MDRV_MACHINE_RESET( cultures )
+	MDRV_MACHINE_RESET(cultures)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -368,8 +358,6 @@ static MACHINE_DRIVER_START( cultures )
 
 	MDRV_GFXDECODE(culture)
 	MDRV_PALETTE_LENGTH(0x2000)
-
-	MDRV_PALETTE_INIT(cultures)
 
 	MDRV_VIDEO_START(cultures)
 	MDRV_VIDEO_UPDATE(cultures)
@@ -445,9 +433,9 @@ ROM_START( cultures )
 	ROM_RELOAD(               0x000000, 0x020000 )
 ROM_END
 
-static DRIVER_INIT(cultures)
+static DRIVER_INIT( cultures )
 {
-	paletteram=auto_malloc(0x4000);
+	paletteram = auto_malloc(0x4000);
 }
 
 GAME( 1994, cultures, 0, cultures, cultures, cultures, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", 0 )
