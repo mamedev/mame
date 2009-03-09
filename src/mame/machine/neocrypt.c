@@ -15,8 +15,10 @@
       Also contains 'S' (Text Layer) data on these games
       M1 (Z80) rom is also encrypted for CMC50
 
-     the M1 roms contain some additional data at 0xf800.  Some of this
+     The M1 roms contain some additional data at 0xf800.  Some of this
      is said to be related to the C rom encryption.
+     If CMC50 is used, data located at 0xff00 - 0xffff is required for
+     m1 encryption checksum?.
 
       Later games use additional basic scrambling on top of the standard
       CMC scramble.
@@ -1409,6 +1411,7 @@ void kof2003_decrypt_68k(running_machine *machine)
 }
 
 
+// Thanks to IQ_132 for the info
 void kof2003h_decrypt_68k(running_machine *machine)
 {
 	static const UINT8 xor1[0x20] = { 0xc2, 0x4b, 0x74, 0xfd, 0x0b, 0x34, 0xeb, 0xd7, 0x10, 0x6d, 0xf9, 0xce, 0x5d, 0xd5, 0x61, 0x29, 0xf5, 0xbe, 0x0d, 0x82, 0x72, 0x45, 0x0f, 0x24, 0xb3, 0x34, 0x1b, 0x99, 0xea, 0x09, 0xf3, 0x03 };
