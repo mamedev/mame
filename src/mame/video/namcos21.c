@@ -186,6 +186,7 @@ VIDEO_UPDATE( namcos21 )
 	if( namcos2_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
 		namco_obj_draw(screen->machine, bitmap, cliprect, 2 );
+		namco_obj_draw(screen->machine, bitmap, cliprect, 14 );	//driver's eyes
 	}
 
 	CopyVisiblePolyFrameBuffer( bitmap, cliprect,0x7fc0,0x7ffe );
@@ -205,6 +206,7 @@ VIDEO_UPDATE( namcos21 )
 		{
 			namco_obj_draw(screen->machine, bitmap, cliprect, pri );
 		}
+			namco_obj_draw(screen->machine, bitmap, cliprect, 15 );	//driver's eyes
 	}
 	else
 	{ /* winrun bitmap layer */

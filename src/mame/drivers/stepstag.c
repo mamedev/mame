@@ -1,5 +1,13 @@
 /*  Jaleco 'Stepping Stage'
 
+*************************************************************************
+ Naibo added:
+ 
+ A PC computer(Harddisk not dumped yet) + Two 68000 based board set.
+
+ One 68000 drives 3 screens, another handles players input.
+*************************************************************************
+
  dump is incomplete, these are leftovers from an upgrade
  music roms are missing at least
 
@@ -202,8 +210,8 @@ ROM_END
 
 ROM_START( step3 )
 ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
-	ROM_LOAD16_BYTE( "vj98344ver11.1", 0x00001, 0x80000, BAD_DUMP CRC(aedcb225) SHA1(f167c390e79ffbf7c019c326384ae656ae8b7d13) )
-	ROM_LOAD16_BYTE( "vj98344ver11.4", 0x00000, 0x80000, BAD_DUMP CRC(391ca913) SHA1(2cc329aa6419f8a0d7e0fb8a9f4c2b8ca25197b3) )
+	ROM_LOAD16_BYTE( "vj98344ver11.1", 0x00001, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "vj98344ver11.4", 0x00000, 0x80000, NO_DUMP )
 	// c'est la programme de stepstag (avoir besoin de modifications, numero de chansons par example)
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* 68k */
@@ -243,4 +251,4 @@ ROM_REGION( 0x100000, "maincpu", 0 ) /* 68k */
 ROM_END
 
 GAME( 1999, stepstag, 0, stepstag, stepstag, 0, ROT0, "Jaleco", "Stepping Stage", GAME_NO_SOUND| GAME_NOT_WORKING)
-GAME( 1999, step3, stepstag,	stepstag, stepstag, 0,	ROT0, "Jaleco", "Stepping 3 Superior", GAME_NO_SOUND| GAME_NOT_WORKING)
+GAME( 1999, step3, 0,	stepstag, stepstag, 0,	ROT0, "Jaleco", "Stepping 3 Superior", GAME_NO_SOUND| GAME_NOT_WORKING)

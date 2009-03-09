@@ -2599,4 +2599,4 @@ GAME( 1991, starblad, 0,       poly_c140_typeA,   s21default,   starblad, ROT0, 
 GAME( 1991, winrun91, 0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run 91",                GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, winrun,   0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 /* 1988, Winning Run */
-GAME( 1987, driveyes, 0,       driveyes,          winrun,       driveyes, ROT0,    "Namco", "Driver's Eyes",                 GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, driveyes, 0,       driveyes,          winrun,       driveyes, ROT0,    "Namco", "Driver's Eyes",                 GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
