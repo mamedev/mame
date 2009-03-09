@@ -684,7 +684,6 @@ $(MAMEOBJ)/dynax.a: \
 	$(DRIVERS)/ddenlovr.o \
 	$(DRIVERS)/dynax.o $(VIDEO)/dynax.o \
 	$(DRIVERS)/hnayayoi.o $(VIDEO)/hnayayoi.o \
-	$(DRIVERS)/rcasino.o \
 	$(DRIVERS)/realbrk.o $(VIDEO)/realbrk.o \
 	$(DRIVERS)/royalmah.o \
 
