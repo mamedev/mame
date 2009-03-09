@@ -910,6 +910,10 @@ MACHINE_DRIVER_END
 	ROM_REGION_NAMCO_52XX( "52xx" ) \
 	ROM_REGION_NAMCO_53XX( "53xx" ) \
 
+/*
+    Pole Position - Namco Version
+*/
+
 ROM_START( polepos )
 	/* Z80 memory/ROM data */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -989,6 +993,12 @@ ROM_START( polepos )
 	ROM_LOAD( "136014.117",   0x0000, 0x0100, CRC(2401c817) SHA1(8991b7994513a469e64392fa8f233af5e5f06d54) )    /* sync chain */
 ROM_END
 
+/*
+    Pole Position - Atari Version
+
+    CPU/Sound Board: A039185
+    Video Board:     A039187
+*/
 
 ROM_START( poleposa )
 	/* Z80 memory/ROM data */
@@ -1064,6 +1074,10 @@ ROM_START( poleposa )
 	/* unknown or unused (P)ROM data */
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "136014.117",   0x0000, 0x0100, CRC(2401c817) SHA1(8991b7994513a469e64392fa8f233af5e5f06d54) )    /* sync chain */
+
+    ROM_REGION( 0x0002, "cpu_pals", 0 ) /* PAL's located on the cpu board */
+    ROM_LOAD( "137316-001.2n", 0x0000, 0x0001, NO_DUMP ) /* MMI PAL16L6CN */
+    ROM_LOAD( "137316-00x.5c", 0x0000, 0x0001, NO_DUMP ) /* MMI PAL16L6CN */
 ROM_END
 
 
@@ -1141,6 +1155,10 @@ ROM_START( polepos1 )
 	/* unknown or unused (P)ROM data */
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "136014.117",   0x0000, 0x0100, CRC(2401c817) SHA1(8991b7994513a469e64392fa8f233af5e5f06d54) )    /* sync chain */
+
+    ROM_REGION( 0x0002, "cpu_pals", 0 ) /* PAL's located on the cpu board */
+    ROM_LOAD( "137316-001.2n", 0x0000, 0x0001, NO_DUMP ) /* MMI PAL16L6CN */
+    ROM_LOAD( "137316-00x.5c", 0x0000, 0x0001, NO_DUMP ) /* MMI PAL16L6CN */
 ROM_END
 
 /*
@@ -1476,6 +1494,10 @@ ROM_START( topracrb )
 ROM_END
 
 
+/*
+    Pole Position - Namco Version
+*/
+
 ROM_START( polepos2 )
 	/* Z80 memory/ROM data */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1560,6 +1582,16 @@ ROM_START( polepos2 )
 ROM_END
 
 
+/*
+    Pole Position 2 - Atari Version
+
+    CPU/Sound Board: A039185
+    Video Board:     A039187
+
+    Pole Position 2 uses the same hardware as Pole Position except there a
+    couple of extra roms.
+*/
+
 ROM_START( poleps2a )
 	/* Z80 memory/ROM data */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1638,6 +1670,10 @@ ROM_START( poleps2a )
 	/* unknown or unused (P)ROM data */
 	ROM_REGION( 0x0100, "user1", 0 )
 	ROM_LOAD( "136014.117",   0x0000, 0x0100, CRC(2401c817) SHA1(8991b7994513a469e64392fa8f233af5e5f06d54) )    /* sync chain */
+
+    ROM_REGION( 0x0002, "cpu_pals", 0 ) /* PAL's located on the cpu board */
+    ROM_LOAD( "137316-001.2n", 0x0000, 0x0001, NO_DUMP ) /* MMI PAL16L6CN */
+    ROM_LOAD( "137316-00x.5c", 0x0000, 0x0001, NO_DUMP ) /* MMI PAL16L6CN */
 ROM_END
 
 

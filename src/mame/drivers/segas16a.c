@@ -2524,6 +2524,9 @@ ROM_END
     Quartet 2, pre-System 16
     CPU: 68000
     i8751 317-0010
+
+    CPU/Video/Sound Board: 171-5335
+    ROM Board:             171-5336
  */
 ROM_START( quart21 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
