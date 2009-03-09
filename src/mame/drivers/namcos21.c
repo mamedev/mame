@@ -1997,11 +1997,11 @@ We load the "r" set, then load set2's sound CPU code over it to keep the "r" rom
 	ROM_LOAD16_BYTE( "de1-pt2-u.5n",  0x80000, 0x20000, CRC(10e83d81) SHA1(446fedc3b1e258a39fb9467e5327c9f9a9f1ac3f) )
 	ROM_LOAD16_BYTE( "de1-pt2-l.7n",  0x80001, 0x20000, CRC(3339a976) SHA1(c9eb9c04f7b3f2a85e5ab64ffb2fe4fcfb6c494b) )
 
-	ROM_REGION( 0x100000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("de1-voi0.12b",  0x00000, 0x40000, CRC(fc44adbd) SHA1(4268bb1f025e47a94212351d1c1cfd0e5029221f) )
-	ROM_LOAD("de1-voi1.12c",  0x40000, 0x40000, CRC(a71dc55a) SHA1(5e746184db9144ab4e3a97b20195b92b0f56c8cc) )
-	ROM_LOAD("de1-voi2.12d",  0x80000, 0x40000, CRC(4d32879a) SHA1(eae65f4b98cee9efe4e5dad7298c3717cfb1e6bf) )
-	ROM_LOAD("de1-voi3.12e",  0xc0000, 0x40000, CRC(e4832d18) SHA1(0460c79d3942aab89a765b0bd8bbddaf19a6d682) )
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("de1-voi0.12b",  0x040000, 0x40000, CRC(fc44adbd) SHA1(4268bb1f025e47a94212351d1c1cfd0e5029221f) )
+	ROM_LOAD("de1-voi1.12c",  0x0c0000, 0x40000, CRC(a71dc55a) SHA1(5e746184db9144ab4e3a97b20195b92b0f56c8cc) )
+	ROM_LOAD("de1-voi2.12d",  0x140000, 0x40000, CRC(4d32879a) SHA1(eae65f4b98cee9efe4e5dad7298c3717cfb1e6bf) )
+	ROM_LOAD("de1-voi3.12e",  0x1c0000, 0x40000, CRC(e4832d18) SHA1(0460c79d3942aab89a765b0bd8bbddaf19a6d682) )
 ROM_END
 
 ROM_START( starblad )
@@ -2146,8 +2146,8 @@ ROM_START( winrun )
 	ROM_LOAD16_BYTE( "sg1-gd1-l.3s",  0x80001, 0x40000, CRC(a6c4da96) SHA1(377dbf21a1bede01de16708c96c112abab4417ce) )
 
 	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("sg-voi-1.11c",0x000000,0x80000,CRC(7dcccb31) SHA1(4441b37691434b13eae5dee2d04dc12a56b04d2a) )
-	ROM_LOAD("sg-voi-3.11e",0x080000,0x80000,CRC(a198141c) SHA1(b4ca352e6aedd9d7a7e5e39e840f1d3a7145900e) )
+	ROM_LOAD("sg-voi-1.11c",0x080000,0x80000,CRC(7dcccb31) SHA1(4441b37691434b13eae5dee2d04dc12a56b04d2a) )
+	ROM_LOAD("sg-voi-3.11e",0x180000,0x80000,CRC(a198141c) SHA1(b4ca352e6aedd9d7a7e5e39e840f1d3a7145900e) )
 ROM_END
 
 ROM_START( winrun91 )
@@ -2195,8 +2195,8 @@ ROM_START( winrun91 )
 	ROM_LOAD16_BYTE( "gd1l.3s",  0x80001, 0x40000, CRC(64df59a2) SHA1(1e9d0945b94780bb0be16803e767466d2cda07e8) )
 
 	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
-	ROM_LOAD("avo1.11c",0x000000,0x80000,CRC(9fb33af3) SHA1(666630a8e5766ca4c3275961963c3e713dfdda2d) )
-	ROM_LOAD("avo3.11e",0x080000,0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
+	ROM_LOAD("avo1.11c",0x080000,0x80000,CRC(9fb33af3) SHA1(666630a8e5766ca4c3275961963c3e713dfdda2d) )
+	ROM_LOAD("avo3.11e",0x180000,0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
 ROM_END
 
 static void namcos21_init( running_machine *machine, int game_type )
