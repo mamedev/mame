@@ -7,6 +7,7 @@
 static tilemap *pgm_tx_tilemap, *pgm_bg_tilemap;
 static UINT16 *pgm_spritebufferram; // buffered spriteram
 static UINT16 *sprite_temp_render;
+static bitmap_t *tmppgmbitmap;
 
 /* Sprites - These are a pain! */
 
@@ -53,8 +54,8 @@ static void pgm_prepare_sprite(running_machine *machine, int wide, int high,int 
 }
 
 
-
-static void draw_sprite_line(int wide, UINT16* dest, int xzoom, int xgrow, int yoffset, int flip, int xpos)
+// in the dest bitmap 0x10000 is used to mark 'used pixel' and 0x8000 is used to mark 'high priority'
+static void draw_sprite_line(int wide, UINT32* dest, int xzoom, int xgrow, int yoffset, int flip, int xpos, int pri)
 {
 	int xcnt,xcntdraw;
 	int xzoombit;
@@ -77,7 +78,11 @@ static void draw_sprite_line(int wide, UINT16* dest, int xzoom, int xgrow, int y
 			xdrawpos = xpos + xcntdraw;
 			if (!(srcdat&0x8000))
 			{
-				if ((xdrawpos >= 0) && (xdrawpos < 448))  dest[xdrawpos] = srcdat;
+				if ((xdrawpos >= 0) && (xdrawpos < 448))
+				{
+					if (pri) dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
+					else dest[xdrawpos] = srcdat | 0x10000;
+				}
 			}
 			xcntdraw++;
 
@@ -85,7 +90,11 @@ static void draw_sprite_line(int wide, UINT16* dest, int xzoom, int xgrow, int y
 
 			if (!(srcdat&0x8000))
 			{
-				if ((xdrawpos >= 0) && (xdrawpos < 448))  dest[xdrawpos] = srcdat;
+				if ((xdrawpos >= 0) && (xdrawpos < 448))
+				{
+					if (pri) dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
+					else dest[xdrawpos] = srcdat | 0x10000;				
+				}
 			}
 			xcntdraw++;
 		}
@@ -98,7 +107,11 @@ static void draw_sprite_line(int wide, UINT16* dest, int xzoom, int xgrow, int y
 			xdrawpos = xpos + xcntdraw;
 			if (!(srcdat&0x8000))
 			{
-				if ((xdrawpos >= 0) && (xdrawpos < 448))  dest[xdrawpos] = srcdat;
+				if ((xdrawpos >= 0) && (xdrawpos < 448))
+				{
+					if (pri) dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
+					else dest[xdrawpos] = srcdat | 0x10000;
+				}
 			}
 			xcntdraw++;
 		}
@@ -109,11 +122,11 @@ static void draw_sprite_line(int wide, UINT16* dest, int xzoom, int xgrow, int y
 	}
 }
 /* this just loops over our decoded bitmap and puts it on the screen */
-static void draw_sprite_new_zoomed(running_machine *machine, int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow )
+static void draw_sprite_new_zoomed(running_machine *machine, int wide, int high, int xpos, int ypos, int palt, int boffset, int flip, bitmap_t* bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
 {
 	int ycnt;
 	int ydrawpos;
-	UINT16 *dest;
+	UINT32 *dest;
 	int yoffset;
 	int ycntdraw;
 	int yzoombit;
@@ -135,8 +148,8 @@ static void draw_sprite_new_zoomed(running_machine *machine, int wide, int high,
 			else yoffset = ( (high-ycnt-1)*(wide*16));
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = BITMAP_ADDR16(bitmap, ydrawpos, 0);
-				draw_sprite_line(wide, dest, xzoom, xgrow, yoffset, flip, xpos);
+				dest = BITMAP_ADDR32(bitmap, ydrawpos, 0);
+				draw_sprite_line(wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
 			}
 			ycntdraw++;
 
@@ -145,8 +158,8 @@ static void draw_sprite_new_zoomed(running_machine *machine, int wide, int high,
 			else yoffset = ( (high-ycnt-1)*(wide*16));
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = BITMAP_ADDR16(bitmap, ydrawpos, 0);
-				draw_sprite_line(wide, dest, xzoom, xgrow, yoffset, flip, xpos);
+				dest = BITMAP_ADDR32(bitmap, ydrawpos, 0);
+				draw_sprite_line(wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
 			}
 			ycntdraw++;
 
@@ -165,8 +178,8 @@ static void draw_sprite_new_zoomed(running_machine *machine, int wide, int high,
 			else yoffset = ( (high-ycnt-1)*(wide*16));
 			if ((ydrawpos >= 0) && (ydrawpos < 224))
 			{
-				dest = BITMAP_ADDR16(bitmap, ydrawpos, 0);
-				draw_sprite_line(wide, dest, xzoom, xgrow, yoffset, flip, xpos);
+				dest = BITMAP_ADDR32(bitmap, ydrawpos, 0);
+				draw_sprite_line(wide, dest, xzoom, xgrow, yoffset, flip, xpos, pri);
 			}
 			ycntdraw++;
 
@@ -180,7 +193,7 @@ static void draw_sprite_new_zoomed(running_machine *machine, int wide, int high,
 
 static UINT16 *pgm_sprite_source;
 
-static void draw_sprites(running_machine *machine, int priority, bitmap_t* bitmap)
+static void draw_sprites(running_machine *machine, bitmap_t* spritebitmap)
 {
 	/* ZZZZ Zxxx xxxx xxxx
        zzzz z-yy yyyy yyyy
@@ -232,9 +245,9 @@ static void draw_sprites(running_machine *machine, int priority, bitmap_t* bitma
 
 		if (high == 0) break; /* is this right? */
 
-		if ((priority == 1) && (pri == 0)) break;
+		//if ((priority == 1) && (pri == 0)) break;
 
-		draw_sprite_new_zoomed(machine, wide, high, xpos, ypos, palt, boff, flip, bitmap, xzoom,xgrow, yzoom,ygrow);
+		draw_sprite_new_zoomed(machine, wide, high, xpos, ypos, palt, boff, flip, spritebitmap, xzoom,xgrow, yzoom,ygrow, pri);
 
 		pgm_sprite_source += 5;
 	}
@@ -304,6 +317,8 @@ static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 
 VIDEO_START( pgm )
 {
+	int i;
+	
 	pgm_tx_tilemap= tilemap_create(machine, get_pgm_tx_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	tilemap_set_transparent_pen(pgm_tx_tilemap,15);
 
@@ -311,6 +326,11 @@ VIDEO_START( pgm )
 	tilemap_set_transparent_pen(pgm_bg_tilemap,31);
 	tilemap_set_scroll_rows(pgm_bg_tilemap,64*32);
 
+	tmppgmbitmap = auto_bitmap_alloc(448,224,BITMAP_FORMAT_RGB32);
+	
+	for (i=0; i < 0x1200/2; i++)
+		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));	
+	
 	pgm_spritebufferram = auto_malloc (0xa00);
 
 	/* we render each sprite to a bitmap then copy the bitmap to screen bitmap with zooming */
@@ -323,19 +343,54 @@ VIDEO_UPDATE( pgm )
 	int y;
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+	bitmap_fill(tmppgmbitmap, cliprect, 0x00000000);
 
+	
 	pgm_sprite_source = pgm_spritebufferram;
-	draw_sprites(screen->machine, 1, bitmap);
+	draw_sprites(screen->machine, tmppgmbitmap);
 
 	tilemap_set_scrolly(pgm_bg_tilemap,0, pgm_videoregs[0x2000/2]);
 
 	for (y = 0; y < 224; y++)
 		tilemap_set_scrollx(pgm_bg_tilemap,(y+pgm_videoregs[0x2000/2])&0x7ff, pgm_videoregs[0x3000/2]+pgm_rowscrollram[y]);
 
+	{
+		int y,x;
+
+		for (y=0;y<224;y++)
+		{
+			UINT32* src = BITMAP_ADDR32(tmppgmbitmap, y, 0);
+			UINT16* dst = BITMAP_ADDR16(bitmap, y, 0);
+
+			for (x=0;x<448;x++)
+			{
+				if (src[x]&0x10000)		
+					if ((src[x]&0x8000)==0x8000)
+						dst[x] = src[x]&0x7fff;
+			}
+		}
+	}
+		
+		
 	tilemap_draw(bitmap,cliprect,pgm_bg_tilemap,0,0);
 
-	draw_sprites(screen->machine, 0, bitmap);
+	{
+		int y,x;
 
+		for (y=0;y<224;y++)
+		{
+			UINT32* src = BITMAP_ADDR32(tmppgmbitmap, y, 0);
+			UINT16* dst = BITMAP_ADDR16(bitmap, y, 0);
+
+			for (x=0;x<448;x++)
+			{
+				if (src[x]&0x10000)	
+					if ((src[x]&0x8000)==0x0000)
+						dst[x] = src[x];
+			}
+		}
+	}	
+	
 	tilemap_set_scrolly(pgm_tx_tilemap,0, pgm_videoregs[0x5000/2]);
 	tilemap_set_scrollx(pgm_tx_tilemap,0, pgm_videoregs[0x6000/2]); // Check
 	tilemap_draw(bitmap,cliprect,pgm_tx_tilemap,0,0);

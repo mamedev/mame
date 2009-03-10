@@ -12,6 +12,7 @@ extern size_t	pgm_sprite_a_region_allocate;
 void pgm_kov_decrypt(running_machine *machine);
 void pgm_kovsh_decrypt(running_machine *machine);
 void pgm_kov2_decrypt(running_machine *machine);
+void pgm_kov2p_decrypt(running_machine *machine);
 void pgm_mm_decrypt(running_machine *machine);
 void pgm_dw2_decrypt(running_machine *machine);
 void pgm_djlzz_decrypt(running_machine *machine);
