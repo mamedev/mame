@@ -607,7 +607,7 @@ static UINT16 *olds_sharedprotram;
 static ADDRESS_MAP_START( olds_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
 	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK(1) /* Game ROM */
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE(&olds_sharedprotram) // Shared with protection device
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&olds_sharedprotram) // Shared with protection device
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
@@ -1818,36 +1818,93 @@ static DRIVER_INIT( puzzli2 )
 //  mem16[0x100072/2]=0x5D78;
 }
 
+static UINT16 olds_bs,olds_cmd3;
+
+static UINT32 olds_prot_addr( UINT16 addr)
+{
+	UINT32 mode = addr&0xff;
+	UINT32 offset = addr >> 8;
+	UINT32 realaddr;
+
+	switch(mode)
+	{
+		case 0:
+		case 5:
+		case 0xA:
+			realaddr= 0x402A00+(offset<<2);
+			break;
+
+		case 2:
+		case 8:
+			realaddr= 0x402E00+(offset<<2);
+			break;
+
+		case 1:
+			realaddr= 0x40307E;
+			break;
+
+		case 3:
+			realaddr= 0x403090;
+			break;
+
+		case 4:
+			realaddr= 0x40309A;
+			break;
+
+		case 6:
+			realaddr= 0x4030A4;
+			break;
+
+		case 7:
+			realaddr= 0x403000;
+			break;
+
+		case 9:
+			realaddr= 0x40306E;
+			break;
+
+		default:
+			realaddr= 0;
+	}
+	return realaddr;
+}
+
+static UINT32 olds_read_reg( UINT16 addr)
+{
+	UINT32 protaddr = (olds_prot_addr(addr)-0x400000)/2;
+	return olds_sharedprotram[protaddr]<<16|olds_sharedprotram[protaddr+1];
+}
+
+static void olds_write_reg( UINT16 addr, UINT32 val)
+{
+	olds_sharedprotram[(olds_prot_addr(addr)-0x400000)/2]=val>>16;
+	olds_sharedprotram[(olds_prot_addr(addr)-0x400000)/2+1]=val&0xffff;
+}
+
 static MACHINE_RESET( olds )
 {
 	UINT16 *mem16 = (UINT16 *)memory_region(machine, "user2");
-//  UINT16 *mem16_a = (UINT16 *)memory_region(machine, "maincpu");
 	int i;
 
 	MACHINE_RESET_CALL(pgm);
 
 	/* populate shared protection ram with data read from pcb .. */
 
-//  for(i=0;i<0x100000/2;i++)
-//  {
-//      mem16_a[i+(0x300000/2)] = mem16[i];
-//  }
-
-	for(i=0;i<0x100000/2;i++)
+	for(i=0;i<0x40000/2;i++)
 	{
-		olds_sharedprotram[i] = mem16[(0x100000/2)+i];
+		olds_sharedprotram[i] = mem16[i];
+	}
 
+	//ROM:004008B4                 .word 0xFBA5
+	for(i=0;i<0x20000/2;i++)
+	{
+		if(olds_sharedprotram[i]==(0xffff-i))
+			olds_sharedprotram[i]=0x4e75;
 	}
 }
 
-
-static UINT16 olds_bs,olds_cmd3;
-
-
-//UINT16 olds_r16(UINT32 addr)
 static READ16_HANDLER( olds_r16 )
 {
-//  int offset = addr&0xf;
 	UINT16 res ;
 	res = 0;
 
@@ -1870,11 +1927,8 @@ static READ16_HANDLER( olds_r16 )
 	return res;
 }
 
-//void olds_w16(UINT32 addr,UINT16 data)
 static WRITE16_HANDLER( olds_w16 )
 {
-//  int offset=addr&0xf;
-
 	if(offset==0)
 		kb_cmd=data;
 	else //offset==2
@@ -1897,18 +1951,26 @@ static WRITE16_HANDLER( olds_w16 )
 		}
 		else if(kb_cmd==3)
 		{
-			//UINT16 cmd=fast_r16(0x403026);
-			UINT16 cmd = 0;
-			if(cmd==0x12)	//memcpy
+			UINT16 cmd=olds_sharedprotram[0x3026/2];
+			switch(cmd)
 			{
-			//  UINT16 src=fast_r16(0x40306A);
-			//  UINT32 dst=0x400000+(fast_r16(0x403084)<<1);
-			//  UINT16 size=fast_r16(0x4030A2);
-			//  UINT16 mode=fast_r16(0x40303E)&0xf;
-				//int a=1;
+				case 0x11:
+				case 0x12:
+						break;
+				case 0x64:
+					{
+						UINT16 cmd0 = olds_sharedprotram[0x3082/2];
+						UINT16 val0 = olds_sharedprotram[0x3050/2];	//CMD_FORMAT
+						{
+							if((cmd0&0xff)==0x2) 
+								olds_write_reg(val0,olds_read_reg(val0)+0x10000);
+						}
+						break;
+					}
+
+				default:
+						break;
 			}
-			//else
-			//  int a=1;
 			olds_cmd3=((data>>4)+1)&0x3;
 		}
 		else if(kb_cmd==4)
@@ -1918,17 +1980,22 @@ static WRITE16_HANDLER( olds_w16 )
 	}
 }
 
+static READ16_HANDLER( olds_prot_swap_r16 )
+{
 
+	if(cpu_get_pc(space->cpu)<0x100000)		//bios
+		return pgm_mainram[0x178F4/2];
+	else						//game
+		return pgm_mainram[0x178D8/2];
 
+}
 
 static DRIVER_INIT( olds )
 {
-//  UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
-
 	pgm_basic_init(machine);
 
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdcb400, 0xdcb403, 0, 0, olds_r16, olds_w16);
-
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8178f4, 0x8178f5, 0, 0, olds_prot_swap_r16);
 }
 
 /*** Rom Loading *************************************************************/
@@ -3177,12 +3244,10 @@ ROM_START( olds100a )
 
 	ROM_REGION( 0x010000, "user1", ROMREGION_ERASEFF ) /* ASIC25? Protection Data */
 	/* missing from this set .. */
-	ROM_LOAD( "protection_data.u6", 0x000000, 0x010000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
+	ROM_REGION( 0x40000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
 	// used to simulate encrypted DMA protection device for now ..
-	ROM_LOAD16_WORD_SWAP( "ram_dump", 0x000000, 0x200000, CRC(e7b26aea) SHA1(17d101f760d790619ce4858984787b494bdbbc8a) )
-
+	ROM_LOAD16_WORD_SWAP( "ram_dump", 0x000000, 0x40000, CRC(619cc52d) SHA1(f249a0b58c8790a42d042ad09eb28d8d4eeb20eb) )
 
 	ROM_REGION( 0xc00000, "gfx1",  ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
@@ -3799,16 +3864,15 @@ GAME( 1999, photoy2k, pgm,        pgm, photoy2k,    djlzz,      ROT0,   "IGS", "
 GAME( 1999, raf102j,  photoy2k,   pgm, photoy2k,    djlzz,      ROT0,   "IGS", "Real and Fake / Photo Y2K (ver. 102, Japanese Board)", GAME_IMPERFECT_SOUND ) /* region provided by protection device */
 GAME( 2000, kov2,     pgm,       kov2, sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 (ver. 100)", GAME_IMPERFECT_SOUND )
 GAME( 2000, kov2106,  kov2,      kov2, sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 (ver. 106)", GAME_IMPERFECT_SOUND )
-GAME( 2000, kov2p,    kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons (ver. M204XX)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_SOUND )
-GAME( 2000, kov2p205, kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons (ver. M205XX)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_SOUND )
 GAME( 2001, martmast, pgm,       kov2, sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 102)", GAME_IMPERFECT_SOUND )
 GAME( 2001, martmasc, martmast,  kov2, sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 101, Chinese Board)", GAME_IMPERFECT_SOUND )
 
 /* Playable but maybe imperfect protection emulation */
 GAME( 1997, drgw2,    pgm,        drgw2, pgm,      drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1997, drgw2j,   drgw2,      drgw2, pgm,      drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, killbldt, killbld, killbld,killbld,    killbld,    ROT0,   "IGS", "The Killing Blade (Chinese Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION ) // it's playable, but there are some things unclear about the protection
-GAME( 1999, puzlstar, pgm,        pgm, sango,    pstar,      ROT0,   "IGS", "Puzzle Star", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )  // not playable past first few rounds
+GAME( 1998, killbldt, killbld, killbld,killbld,    killbld,    ROT0,   "IGS", "The Killing Blade (Chinese Board)", GAME_IMPERFECT_SOUND ) // it's playable, but there are some things unclear about the protection
+GAME( 1999, puzlstar, pgm,        pgm, sango,    pstar,      ROT0,   "IGS", "Puzzle Star", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )  // not playable past first few rounds
+GAME( 1999, olds100a, olds,       olds, olds,    olds,   ROT0,   "IGS", "Oriental Legend Super / Special (alt ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  ) // grashes on some bosses, high score table etc.
 
 
 /* not working */
@@ -3818,9 +3882,10 @@ GAME( 1999, kovsh,    kov,      kovsh, sango,    kovsh,      ROT0,   "IGS", "Kni
 GAME( 1998, killbld,  pgm,     killbld,killbld,  killbld,    ROT0,   "IGS", "The Killing Blade", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1999, olds,     pgm,        olds, olds,    olds,   ROT0,   "IGS", "Oriental Legend Super / Special (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1999, olds100,  olds,       olds, olds,    olds,   ROT0,   "IGS", "Oriental Legend Super / Special (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1999, olds100a, olds,       olds, olds,    olds,   ROT0,   "IGS", "Oriental Legend Super / Special (alt ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 2001, ddp2,     pgm,        pgm, ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 2001, puzzli2,  pgm,        pgm, sango,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 2001, theglad,  pgm,        pgm, sango,    pgm,        ROT0,   "IGS", "The Gladiator", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 2002, dmnfrnt,  pgm,        pgm, sango,    pgm,        ROT0,   "IGS", "Demon Front (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 2002, dmnfrnta, dmnfrnt,    pgm, sango,    pgm,        ROT0,   "IGS", "Demon Front (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 2000, kov2p,    kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons (ver. M204XX)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_SOUND ) // works if you hack the kov2 ARM rom
+GAME( 2000, kov2p205, kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons (ver. M205XX)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_SOUND ) // works if you hack the kov2 ARM rom
