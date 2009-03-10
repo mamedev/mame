@@ -1764,25 +1764,6 @@ static int do_verify(int argc, char *argv[], int param)
 						fixed = TRUE;
 					}
 				}
-
-				if (memcmp(header.rawsha1, verify.metasha1, sizeof(header.metasha1)) != 0)
-				{
-					fprintf(stderr, "Error: metadata SHA1 in header = ");
-					for (i = 0; i < CHD_SHA1_BYTES; i++)
-						fprintf(stderr, "%02x", header.metasha1[i]);
-					fprintf(stderr, "\n");
-					fprintf(stderr, "          actual metadata SHA1 = ");
-					for (i = 0; i < CHD_SHA1_BYTES; i++)
-						fprintf(stderr, "%02x", verify.metasha1[i]);
-					fprintf(stderr, "\n");
-
-					/* fix it */
-					if (param)
-					{
-						memcpy(header.metasha1, verify.metasha1, sizeof(header.metasha1));
-						fixed = TRUE;
-					}
-				}
 			}
 		}
 	}
@@ -2103,12 +2084,6 @@ static int do_info(int argc, char *argv[], int param)
 				header.rawsha1[8], header.rawsha1[9], header.rawsha1[10], header.rawsha1[11],
 				header.rawsha1[12], header.rawsha1[13], header.rawsha1[14], header.rawsha1[15],
 				header.rawsha1[16], header.rawsha1[17], header.rawsha1[18], header.rawsha1[19]);
-		printf("Metadata SHA1:%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x\n",
-				header.metasha1[0], header.metasha1[1], header.metasha1[2], header.metasha1[3],
-				header.metasha1[4], header.metasha1[5], header.metasha1[6], header.metasha1[7],
-				header.metasha1[8], header.metasha1[9], header.metasha1[10], header.metasha1[11],
-				header.metasha1[12], header.metasha1[13], header.metasha1[14], header.metasha1[15],
-				header.metasha1[16], header.metasha1[17], header.metasha1[18], header.metasha1[19]);
 	}
 	if (header.flags & CHDFLAGS_HAS_PARENT)
 	{

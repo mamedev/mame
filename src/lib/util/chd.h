@@ -90,8 +90,7 @@
     [ 48] UINT8  sha1[20];      // combined raw+meta SHA1
     [ 68] UINT8  parentsha1[20];// combined raw+meta SHA1 of parent
     [ 88] UINT8  rawsha1[20];   // raw data SHA1
-    [108] UINT8  metasha1[20];  // metadata SHA1
-    [128] (V4 header length)
+    [108] (V4 header length)
 
     Flags:
         0x00000001 - set if this drive has a parent
@@ -109,7 +108,7 @@
 #define CHD_V1_HEADER_SIZE			76
 #define CHD_V2_HEADER_SIZE			80
 #define CHD_V3_HEADER_SIZE			120
-#define CHD_V4_HEADER_SIZE			128
+#define CHD_V4_HEADER_SIZE			108
 #define CHD_MAX_HEADER_SIZE			CHD_V4_HEADER_SIZE
 
 /* checksumming information */
@@ -218,7 +217,6 @@ struct _chd_header
 	UINT8		parentmd5[CHD_MD5_BYTES];	/* overall MD5 checksum of parent */
 	UINT8		sha1[CHD_SHA1_BYTES];		/* overall SHA1 checksum */
 	UINT8		rawsha1[CHD_SHA1_BYTES];	/* SHA1 checksum of raw data */
-	UINT8		metasha1[CHD_SHA1_BYTES];	/* SHA1 checksum of metadata */
 	UINT8		parentsha1[CHD_SHA1_BYTES];	/* overall SHA1 checksum of parent */
 
 	UINT32		obsolete_cylinders;			/* obsolete field -- do not use! */

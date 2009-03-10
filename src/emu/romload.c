@@ -1195,10 +1195,9 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 			/* get the header and extract the MD5/SHA1 */
 			header = *chd_get_header(chd.origchd);
 			hash_data_clear(acthash);
-			hash_data_insert_binary_checksum(acthash, HASH_MD5, header.md5);
 			hash_data_insert_binary_checksum(acthash, HASH_SHA1, header.sha1);
 
-			/* verify the MD5 */
+			/* verify the hash */
 			if (!hash_data_is_equal(ROM_GETHASHDATA(romp), acthash, 0))
 			{
 				astring_catprintf(romdata->errorstring, "%s WRONG CHECKSUMS:\n", astring_c(filename));

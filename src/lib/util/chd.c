@@ -184,6 +184,15 @@ struct _av_codec_data
 };
 
 
+/* a single metadata hash entry */
+typedef struct _metadata_hash metadata_hash;
+struct _metadata_hash
+{
+	UINT8					tag[4];			/* tag of the metadata in big-endian */
+	UINT8					sha1[CHD_SHA1_BYTES]; /* hash */
+};
+
+
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -225,7 +234,8 @@ static UINT32 crcmap_find_hunk(chd_file *chd, UINT32 hunknum, UINT32 crc, const 
 static chd_error metadata_find_entry(chd_file *chd, UINT32 metatag, UINT32 metaindex, metadata_entry *metaentry);
 static chd_error metadata_set_previous_next(chd_file *chd, UINT64 prevoffset, UINT64 nextoffset);
 static chd_error metadata_set_length(chd_file *chd, UINT64 offset, UINT32 length);
-static chd_error metadata_compute_hash(chd_file *chd, UINT8 *finalsha1);
+static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT8 *finalsha1);
+static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2);
 
 /* zlib compression codec */
 static chd_error zlib_codec_init(chd_file *chd);
@@ -430,20 +440,6 @@ INLINE void map_extract_old(const UINT8 *base, map_entry *entry, UINT32 hunkbyte
 	entry->offset = (entry->offset << 20) >> 20;
 #endif
 }
-
-
-/*-------------------------------------------------
-    compute_overall_sum - compute an overall
-    checksum from the raw + meta hashes
--------------------------------------------------*/
-
-INLINE void compute_overall_sum(UINT8 *sha1, const UINT8 *rawsha1, const UINT8 *metasha1)
-{
-	int hashindex;
-	
-	for (hashindex = 0; hashindex < CHD_SHA1_BYTES; hashindex++)
-		sha1[hashindex] = rawsha1[hashindex] ^ metasha1[hashindex];
-}	
 
 
 /*-------------------------------------------------
@@ -1280,11 +1276,8 @@ chd_error chd_set_metadata(chd_file *chd, UINT32 metatag, UINT32 metaindex, cons
 
 update:
 	/* update the hash */
-	if (metadata_compute_hash(chd, chd->header.metasha1) == CHDERR_NONE)
-	{
-		compute_overall_sum(chd->header.sha1, chd->header.rawsha1, chd->header.metasha1);
+	if (metadata_compute_hash(chd, chd->header.rawsha1, chd->header.sha1) == CHDERR_NONE)
 		err = header_write(chd->file, &chd->header);
-	}
 	return err;
 }
 
@@ -1474,7 +1467,7 @@ chd_error chd_compress_finish(chd_file *chd)
 	MD5Final(chd->header.md5, &chd->compmd5);
 	sha1_final(&chd->compsha1);
 	sha1_digest(&chd->compsha1, SHA1_DIGEST_SIZE, chd->header.rawsha1);
-	compute_overall_sum(chd->header.sha1, chd->header.rawsha1, chd->header.metasha1);
+	metadata_compute_hash(chd, chd->header.rawsha1, chd->header.sha1);
 
 	/* turn off the writeable flag and re-write the header */
 	chd->header.flags &= ~CHDFLAGS_IS_WRITEABLE;
@@ -1575,11 +1568,8 @@ chd_error chd_verify_finish(chd_file *chd, chd_verify_result *result)
 	sha1_final(&chd->versha1);
 	sha1_digest(&chd->versha1, SHA1_DIGEST_SIZE, result->rawsha1);
 
-	/* compute the metadata hash as well */
-	metadata_compute_hash(chd, result->metasha1);
-	
-	/* and the overall sum */
-	compute_overall_sum(result->sha1, result->rawsha1, result->metasha1);
+	/* compute the overall hash including metadata */
+	metadata_compute_hash(chd, result->rawsha1, result->sha1);
 
 	/* return an error */
 	chd->verifying = FALSE;
@@ -1820,7 +1810,6 @@ static chd_error header_read(core_file *file, chd_header *header)
 		memcpy(header->sha1, &rawheader[48], CHD_SHA1_BYTES);
 		memcpy(header->parentsha1, &rawheader[68], CHD_SHA1_BYTES);
 		memcpy(header->rawsha1, &rawheader[88], CHD_SHA1_BYTES);
-		memcpy(header->metasha1, &rawheader[108], CHD_SHA1_BYTES);
 	}
 
 	/* guess it worked */
@@ -1865,7 +1854,6 @@ static chd_error header_write(core_file *file, const chd_header *header)
 	memcpy(&rawheader[48], header->sha1, CHD_SHA1_BYTES);
 	memcpy(&rawheader[68], header->parentsha1, CHD_SHA1_BYTES);
 	memcpy(&rawheader[88], header->rawsha1, CHD_SHA1_BYTES);
-	memcpy(&rawheader[108], header->metasha1, CHD_SHA1_BYTES);
 
 	/* seek and write */
 	core_fseek(file, 0, SEEK_SET);
@@ -2526,81 +2514,116 @@ static chd_error metadata_set_length(chd_file *chd, UINT64 offset, UINT32 length
     hash of all metadata that requests it
 -------------------------------------------------*/
 
-static chd_error metadata_compute_hash(chd_file *chd, UINT8 *finalsha1)
+static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT8 *finalsha1)
 {
-	UINT32 metatag, metasize, metaindex;
-	UINT8 metabuffer[1024];
+	metadata_hash *hasharray = NULL;
+	chd_error err = CHDERR_NONE;
 	struct sha1_ctx sha1;
-	UINT8 metaflags;
-	chd_error err;
-	int count = 0;
+	UINT32 hashindex = 0;
+	UINT32 hashalloc = 0;
+	UINT64 offset, next;
 	
 	/* only works for V4 and above */
 	if (chd->header.version < 4)
 	{
-		memset(finalsha1, 0, SHA1_DIGEST_SIZE);
+		memcpy(finalsha1, rawsha1, SHA1_DIGEST_SIZE);
 		return CHDERR_NONE;
 	}
 	
-	/* initialize the hash computation */
-	sha1_init(&sha1);
-
-	/* iterate over the metadata */
-	for (metaindex = 0; ; metaindex++)
+	/* loop until we run out of data */
+	for (offset = chd->header.metaoffset; offset != 0; offset = next)
 	{
-		/* fetch the next piece of metadata */
-		err = chd_get_metadata(chd, CHDMETATAG_WILDCARD, metaindex, metabuffer, sizeof(metabuffer), &metasize, &metatag, &metaflags);
-		if (err != CHDERR_NONE)
-		{
-			if (err == CHDERR_METADATA_NOT_FOUND)
-				err = CHDERR_NONE;
-			break;
-		}
+		UINT8 raw_meta_header[METADATA_HEADER_SIZE];
+		UINT32 count, metalength, metatag;
+		UINT8 *tempbuffer;
+		UINT8 metaflags;
 		
-		/* if this entry doesn't participate, continue */
+		/* read the raw header */
+		core_fseek(chd->file, offset, SEEK_SET);
+		count = core_fread(chd->file, raw_meta_header, sizeof(raw_meta_header));
+		if (count != sizeof(raw_meta_header))
+			break;
+
+		/* extract the data */
+		metatag = get_bigendian_uint32(&raw_meta_header[0]);
+		metalength = get_bigendian_uint32(&raw_meta_header[4]);
+		next = get_bigendian_uint64(&raw_meta_header[8]);
+
+		/* flags are encoded in the high byte of length */
+		metaflags = metalength >> 24;
+		metalength &= 0x00ffffff;
+		
+		/* if not checksumming, continue */
 		if (!(metaflags & CHD_MDFLAGS_CHECKSUM))
 			continue;
-		count++;
-
-		/* if that fit, compute the sum from the temporary buffer */
-		if (metasize <= sizeof(metabuffer))
-			sha1_update(&sha1, metasize, metabuffer);
-
-		/* otherwise, allocate a bigger temporary buffer */
-		else
+		
+		/* allocate memory */
+		tempbuffer = malloc(metalength);
+		if (tempbuffer == NULL)
 		{
-			UINT8 *allocbuffer = (UINT8 *)malloc(metasize);
-			if (allocbuffer == NULL)
+			err = CHDERR_OUT_OF_MEMORY;
+			goto cleanup;
+		}
+
+		/* seek and read the metadata */
+		core_fseek(chd->file, offset + METADATA_HEADER_SIZE, SEEK_SET);
+		count = core_fread(chd->file, tempbuffer, metalength);
+		if (count != metalength)
+		{
+			free(tempbuffer);
+			err = CHDERR_READ_ERROR;
+			goto cleanup;
+		}
+		
+		/* compute this entry's hash */
+		sha1_init(&sha1);
+		sha1_update(&sha1, metalength, tempbuffer);
+		sha1_final(&sha1);
+		free(tempbuffer);
+		
+		/* expand the hasharray if necessary */
+		if (hashindex >= hashalloc)
+		{
+			hashalloc += 256;
+			hasharray = realloc(hasharray, hashalloc * sizeof(hasharray[0]));
+			if (hasharray == NULL)
 			{
 				err = CHDERR_OUT_OF_MEMORY;
-				break;
+				goto cleanup;
 			}
-
-			/* re-read the whole thing */
-			err = chd_get_metadata(chd, CHDMETATAG_WILDCARD, metaindex, allocbuffer, metasize, &metasize, &metatag, &metaflags);
-			if (err != CHDERR_NONE)
-			{
-				free(allocbuffer);
-				break;
-			}
-
-			/* compute the sum over that */
-			sha1_update(&sha1, metasize, allocbuffer);
-			free(allocbuffer);
 		}
-	}
-
-	/* finish the sum */
-	if (err == CHDERR_NONE)
-	{
-		sha1_final(&sha1);
-		sha1_digest(&sha1, SHA1_DIGEST_SIZE, finalsha1);
 		
-		/* special case: if no entries, zero the sum */
-		if (count == 0)
-			memset(finalsha1, 0, SHA1_DIGEST_SIZE);
+		/* fill in the entry */
+		put_bigendian_uint32(hasharray[hashindex].tag, metatag);
+		sha1_digest(&sha1, SHA1_DIGEST_SIZE, hasharray[hashindex].sha1);
+		hashindex++;
 	}
+	
+	/* sort the array */
+	qsort(hasharray, hashindex, sizeof(hasharray[0]), metadata_hash_compare);
+	
+	/* compute the SHA1 of the raw plus the various metadata */
+	sha1_init(&sha1);
+	sha1_update(&sha1, CHD_SHA1_BYTES, rawsha1);
+	sha1_update(&sha1, hashindex * sizeof(hasharray[0]), (void *)hasharray);
+	sha1_final(&sha1);
+	sha1_digest(&sha1, SHA1_DIGEST_SIZE, finalsha1);
+
+cleanup:
+	if (hasharray != NULL)
+		free(hasharray);
 	return err;
+}
+
+
+/*-------------------------------------------------
+    metadata_hash_compare - compare two hash
+    entries
+-------------------------------------------------*/
+
+static int CLIB_DECL metadata_hash_compare(const void *elem1, const void *elem2)
+{
+	return memcmp(elem1, elem2, sizeof(metadata_hash));
 }
 
 
