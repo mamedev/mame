@@ -56,7 +56,6 @@ struct _cdrom_file
 ***************************************************************************/
 
 static chd_error read_sector_into_cache(cdrom_file *file, UINT32 lbasector, UINT32 *sectoroffs, UINT32 *tracknum);
-static chd_error parse_metadata(chd_file *chd, cdrom_toc *toc);
 
 
 
@@ -125,7 +124,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 	file->cachehunk = -1;
 
 	/* read the CD-ROM metadata */
-	err = parse_metadata(chd, &file->cdtoc);
+	err = cdrom_parse_metadata(chd, &file->cdtoc);
 	if (err != CHDERR_NONE)
 	{
 		free(file);
@@ -528,11 +527,11 @@ static chd_error read_sector_into_cache(cdrom_file *file, UINT32 lbasector, UINT
 
 
 /*-------------------------------------------------
-    parse_metadata - parse metadata into the TOC
-    structure
+    cdrom_parse_metadata - parse metadata into the 
+    TOC structure
 -------------------------------------------------*/
 
-static chd_error parse_metadata(chd_file *chd, cdrom_toc *toc)
+chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc)
 {
 	static UINT32 oldmetadata[CD_METADATA_WORDS], *mrp;
 	const chd_header *header = chd_get_header(chd);
@@ -544,9 +543,9 @@ static chd_error parse_metadata(chd_file *chd, cdrom_toc *toc)
 	/* start with no tracks */
 	for (toc->numtrks = 0; toc->numtrks < CD_MAX_TRACKS; toc->numtrks++)
 	{
-		cdrom_track_info *track = &toc->tracks[toc->numtrks];
 		int tracknum = -1, frames = 0, hunks;
 		char type[11], subtype[11];
+		cdrom_track_info *track;
 
 		/* fetch the metadata for this track */
 		err = chd_get_metadata(chd, CDROM_TRACK_METADATA_TAG, toc->numtrks, metadata, sizeof(metadata), NULL, NULL, NULL);
@@ -557,8 +556,9 @@ static chd_error parse_metadata(chd_file *chd, cdrom_toc *toc)
 		type[0] = subtype[0] = 0;
 		if (sscanf(metadata, CDROM_TRACK_METADATA_FORMAT, &tracknum, type, subtype, &frames) != 4)
 			return CHDERR_INVALID_DATA;
-		if (tracknum != toc->numtrks + 1)
+		if (tracknum == 0 || tracknum > CD_MAX_TRACKS)
 			return CHDERR_INVALID_DATA;
+		track = &toc->tracks[tracknum - 1];
 
 		/* extract the track type and determine the data size */
 		track->trktype = CD_TRACK_MODE1;
@@ -616,5 +616,29 @@ static chd_error parse_metadata(chd_file *chd, cdrom_toc *toc)
 		}
 	}
 
+	return CHDERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    cdrom_write_metadata - write metadata
+-------------------------------------------------*/
+
+chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
+{
+	chd_error err;
+	int i;
+	
+	/* write the metadata */
+	for (i = 0; i < toc->numtrks; i++)
+	{
+		char metadata[256];
+		sprintf(metadata, CDROM_TRACK_METADATA_FORMAT, i + 1, cdrom_get_type_string(&toc->tracks[i]),
+				cdrom_get_subtype_string(&toc->tracks[i]), toc->tracks[i].frames);
+
+		err = chd_set_metadata(chd, CDROM_TRACK_METADATA_TAG, i, metadata, strlen(metadata) + 1, CHD_MDFLAGS_CHECKSUM);
+		if (err != CHDERR_NONE)
+			return err;
+	}
 	return CHDERR_NONE;
 }

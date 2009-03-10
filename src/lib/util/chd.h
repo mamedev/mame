@@ -141,6 +141,15 @@
 #define HARD_DISK_METADATA_TAG		0x47444444	/* 'GDDD' */
 #define HARD_DISK_METADATA_FORMAT	"CYLS:%d,HEADS:%d,SECS:%d,BPS:%d"
 
+/* hard disk identify information */
+#define HARD_DISK_IDENT_METADATA_TAG 0x49444e54 /* 'IDNT' */
+
+/* hard disk key information */
+#define HARD_DISK_KEY_METADATA_TAG	0x4b455920  /* 'KEY '  */
+
+/* pcmcia CIS information */
+#define PCMCIA_CIS_METADATA_TAG		0x43495320  /* 'CIS '  */
+
 /* standard CD-ROM metadata */
 #define CDROM_OLD_METADATA_TAG		0x43484344	/* 'CHCD' */
 #define CDROM_TRACK_METADATA_TAG	0x43485452	/* 'CHTR' */

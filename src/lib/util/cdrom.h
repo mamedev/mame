@@ -114,6 +114,8 @@ void cdrom_convert_type_string_to_track_info(const char *typestring, cdrom_track
 void cdrom_convert_subtype_string_to_track_info(const char *typestring, cdrom_track_info *info);
 const char *cdrom_get_type_string(const cdrom_track_info *info);
 const char *cdrom_get_subtype_string(const cdrom_track_info *info);
+chd_error cdrom_parse_metadata(chd_file *chd, cdrom_toc *toc);
+chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc);
 
 
 
@@ -136,4 +138,3 @@ INLINE UINT32 lba_to_msf(UINT32 lba)
 }
 
 #endif	// __CDROM_H__
-

@@ -1306,15 +1306,6 @@ chd_error chd_clone_metadata(chd_file *source, chd_file *dest)
 			break;
 		}
 		
-		/* promote certain bits of metadata to checksummed for older CHDs */
-		if (source->header.version <= 3 &&
-			(metatag == HARD_DISK_METADATA_TAG || metatag == CDROM_OLD_METADATA_TAG || 
-			 metatag == CDROM_TRACK_METADATA_TAG || metatag == AV_METADATA_TAG || 
-			 metatag == AV_LD_METADATA_TAG))
-		{
-			metaflags |= CHD_MDFLAGS_CHECKSUM;
-		}
-
 		/* if that fit, just write it back from the temporary buffer */
 		if (metasize <= sizeof(metabuffer))
 		{
