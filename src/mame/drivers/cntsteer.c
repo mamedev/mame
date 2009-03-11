@@ -12,10 +12,13 @@
         - correct roz rotation;
         - make cntsteer work, comms looks awkward and probably different than Zero Target;
         - flip screen support;
-        - according to a side-by-side test, sound should be "darker" by some octanes,
+        - according to a side-by-side test, sound should be "darker" by some octaves,
           likely that a sound filter is needed;
     cleanup
         - split into driver/video;
+
+    note: To boot cntsteer, set a CPU #1 breakpoint on c225 and then 'do pc=c230'.
+          Protection maybe?
 
 ***************************************************************************************/
 
@@ -84,7 +87,7 @@ static VIDEO_START( cntsteer )
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
-//  tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+//	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 static VIDEO_START( zerotrgt )
@@ -94,7 +97,7 @@ static VIDEO_START( zerotrgt )
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
-//  tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+//	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 /*
@@ -110,7 +113,7 @@ Sprite list:
 [2] xxxx xxxx X attribute
 [3] xxxx xxxx sprite number
 */
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void zerotrgt_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -156,6 +159,61 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
+/*
+[00] --x- ---- magnify
+     ---x ---- double height
+     ---- -x-- flipy
+
+[80] -xxx ---- palette entry
+     ---- --xx tile bank
+*/
+
+static void cntsteer_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	int offs;
+
+	for (offs = 0;offs < 0x80;offs += 4)
+	{
+		int multi,fx,fy,sx,sy,code,color;
+
+		if((spriteram[offs+0] & 1) == 0)
+			continue;
+
+		code = spriteram[offs+1] + ( ( spriteram[offs+0x80] & 0x03 ) << 2 );
+		sx = spriteram[offs+3];
+		sy = 0x100-spriteram[offs+2];
+		color = 0x10+((spriteram[offs+0x80] & 0x70)>>4);
+
+		fx = (spriteram[offs+0] & 0x04);
+		fy = (spriteram[offs+0] & 0x02);
+
+		multi = spriteram[offs+0] & 0x10;
+
+		if (flipscreen) {
+			sy=240-sy;
+			sx=240-sx;
+			if (fx) fx=0; else fx=1;
+			//sy2=sy-16;
+		}
+
+        if(multi)
+        {
+			if(fy)
+			{
+				drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+				drawgfx(bitmap,machine->gfx[1],code+1,color,fx,fy,sx,sy-16,cliprect,TRANSPARENCY_PEN,0);
+			}
+			else
+			{
+        		drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy-16,cliprect,TRANSPARENCY_PEN,0);
+        		drawgfx(bitmap,machine->gfx[1],code+1,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+			}
+		}
+		else
+		   	drawgfx(bitmap,machine->gfx[1],code,color,fx,fy,sx,sy,cliprect,TRANSPARENCY_PEN,0);
+	}
+}
+
 static VIDEO_UPDATE( zerotrgt )
 {
 	if(disable_roz)
@@ -167,22 +225,22 @@ static VIDEO_UPDATE( zerotrgt )
 
 		rot_val = rotation_sign ? (-rotation_x) : (rotation_x);
 
-//      popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
+//		popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
 
 		if(rot_val > 90) { rot_val = 90; }
 		if(rot_val < -90) { rot_val = -90; }
 
 		/*
-        (u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
-        */
+		(u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
+		*/
 		/*
-             1
-        0----|----0
-            -1
-             0
-        0----|----1
-             0
-        */
+		     1
+		0----|----0
+		    -1
+		     0
+		0----|----1
+		     0
+		*/
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
 		p1 = -65536*1*cos(2*M_PI*(rot_val)/1024);
 		p2 = -65536*1*sin(2*M_PI*(rot_val)/1024);
@@ -200,12 +258,61 @@ static VIDEO_UPDATE( zerotrgt )
 						0, 0);
 	}
 
-	draw_sprites(screen->machine,bitmap,cliprect);
+	zerotrgt_draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
 	return 0;
 }
 
+static VIDEO_UPDATE( cntsteer )
+{
+	if(disable_roz)
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[8*bg_color_bank]);
+	else
+	{
+		static int p1,p2,p3,p4;
+		static int rot_val,x,y;
+
+		rot_val = rotation_sign ? (-rotation_x) : (rotation_x);
+
+//		popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
+
+		if(rot_val > 90) { rot_val = 90; }
+		if(rot_val < -90) { rot_val = -90; }
+
+		/*
+		(u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
+		*/
+		/*
+		     1
+		0----|----0
+		    -1
+		     0
+		0----|----1
+		     0
+		*/
+		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
+		p1 = -65536*1*cos(2*M_PI*(rot_val)/1024);
+		p2 = -65536*1*sin(2*M_PI*(rot_val)/1024);
+		p3 = 65536*1*sin(2*M_PI*(rot_val)/1024);
+		p4 = -65536*1*cos(2*M_PI*(rot_val)/1024);
+
+		x = 256-(scrollx | scrollx_hi);
+		y = 256+(scrolly | scrolly_hi);
+
+		tilemap_draw_roz(bitmap, cliprect, bg_tilemap,
+						(x << 16), (y << 16),
+						p1, p2,
+						p3, p4,
+						1,
+						0, 0);
+	}
+
+	cntsteer_draw_sprites(screen->machine,bitmap,cliprect);
+	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+
+	return 0;
+}
 
 /*
 [0] = scroll y
@@ -219,7 +326,7 @@ static VIDEO_UPDATE( zerotrgt )
       ---- ---x rotation sign (landscape should be turning right (0) == / , turning left (1) == \)
 [4] = xxxx xxxx rotation factor?
 */
-static WRITE8_HANDLER(cntsteer_vregs_w)
+static WRITE8_HANDLER(zerotrgt_vregs_w)
 {
 //  static UINT8 test[5];
 
@@ -232,6 +339,23 @@ static WRITE8_HANDLER(cntsteer_vregs_w)
 		case 1: scrollx = data; break;
 		case 2: bg_bank = (data & 0x30) << 4; bg_color_bank = (data & 7); disable_roz = (data & 0x40); tilemap_mark_all_tiles_dirty(bg_tilemap); break;
 		case 3:	rotation_sign = (data & 1); flip_screen_set(space->machine, !(data & 4)); scrolly_hi = (data & 0x30) << 4; scrollx_hi = (data & 0xc0) << 2; break;
+		case 4: rotation_x = data; break;
+	}
+}
+
+static WRITE8_HANDLER(cntsteer_vregs_w)
+{
+  static UINT8 test[5];
+
+  test[offset] = data;
+    popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
+
+	switch(offset)
+	{
+		case 0:	scrolly = data; break;
+		case 1: scrollx = data; break;
+		case 2: bg_bank = (data & 0x01) << 8; (bg_color_bank = (data & 6)>>1); tilemap_mark_all_tiles_dirty(bg_tilemap); break;
+		case 3:	rotation_sign = (data & 1);  disable_roz = (~data & 0x08); scrolly_hi = (data & 0x30) << 4; scrollx_hi = (data & 0xc0) << 2; break;
 		case 4: rotation_x = data; break;
 	}
 }
@@ -282,6 +406,53 @@ static WRITE8_HANDLER( zerotrgt_ctrl_w )
 //  if (offset==2) cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
+static WRITE8_HANDLER( cntsteer_sub_irq_w )
+{
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
+}
+
+static WRITE8_HANDLER( cntsteer_main_irq_w )
+{
+	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
+}
+
+/* Convert weird input handling with MAME standards.*/
+static READ8_HANDLER( cntsteer_adx_r )
+{
+	static UINT8 res,adx_val;
+
+	adx_val = input_port_read(space->machine, "AN_STEERING");
+
+	if(adx_val >= 0x70 && adx_val <= 0x90)
+		res = 0xff;
+	else if(adx_val > 0x90)
+	{
+		if(adx_val > 0x90 && adx_val <= 0xb0)
+			res = 0xef;
+		else if(adx_val > 0xb0 && adx_val <= 0xd0)
+			res = 0xcf;
+		else if(adx_val > 0xd0 && adx_val <= 0xf0)
+			res = 0x8f;
+		else if(adx_val > 0xf0)
+			res = 0x0f;
+	}
+	else
+	{
+		if(adx_val >= 0x50 && adx_val < 0x70)
+			res = 0xfe;
+		else if(adx_val >= 0x30 && adx_val < 0x50)
+			res = 0xfc;
+		else if(adx_val >= 0x10 && adx_val < 0x30)
+			res = 0xf8;
+		else if(adx_val < 0x10)
+			res = 0xf0;
+	}
+
+	popmessage("%02x",adx_val);
+
+	return res;
+}
+
 /***************************************************************************/
 
 static ADDRESS_MAP_START( gekitsui_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -301,32 +472,35 @@ static ADDRESS_MAP_START( gekitsui_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("COINS")
-	AM_RANGE(0x3000, 0x3004) AM_WRITE(cntsteer_vregs_w)
+	AM_RANGE(0x3000, 0x3004) AM_WRITE(zerotrgt_vregs_w)
 	AM_RANGE(0x3005, 0x3005) AM_WRITE(gekitsui_sub_irq_ack)
 	AM_RANGE(0x3007, 0x3007) AM_WRITE(cntsteer_sound_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM //AM_SHARE(1)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x1200, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE(&videoram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE(&colorram)
-	AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_sub_irq_w)
+	AM_RANGE(0x3001, 0x3001) AM_WRITE(cntsteer_sound_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM //AM_SHARE(1)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(&videoram2)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(&videoram2) AM_SHARE(3)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(&videoram2) AM_SHARE(3)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
+	AM_RANGE(0x3001, 0x3001) AM_READ(cntsteer_adx_r)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("COINS")
 	AM_RANGE(0x3000, 0x3004) AM_WRITE(cntsteer_vregs_w)
 	AM_RANGE(0x3005, 0x3005) AM_WRITE(gekitsui_sub_irq_ack)
-	AM_RANGE(0x3007, 0x3007) AM_WRITE(cntsteer_sound_w)
+	AM_RANGE(0x3006, 0x3006) AM_WRITE(cntsteer_main_irq_w)
+//	AM_RANGE(0x3007, 0x3007) AM_READWRITE(soundlatch2_r,cntsteer_sound_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -406,9 +580,7 @@ INPUT_PORTS_END
 
 /* inputs needs some work in this one.*/
 static INPUT_PORTS_START( cntsteer )
-	PORT_INCLUDE( zerotrgt )
-
-	PORT_MODIFY("P1")
+	PORT_START("P1")
 	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -434,7 +606,10 @@ static INPUT_PORTS_START( cntsteer )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_MODIFY("P2")
+	PORT_START("AN_STEERING")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(2)
+
+	PORT_START("COINS")
 	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -456,37 +631,9 @@ static INPUT_PORTS_START( cntsteer )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_MODIFY("COINS")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_MODIFY("DSW0")
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -611,7 +758,7 @@ static MACHINE_DRIVER_START( cntsteer )
 //  MDRV_PALETTE_INIT(zerotrgt)
 
 	MDRV_VIDEO_START(cntsteer)
-	MDRV_VIDEO_UPDATE(zerotrgt)
+	MDRV_VIDEO_UPDATE(cntsteer)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -633,7 +780,7 @@ static MACHINE_DRIVER_START( zerotrgt )
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
-	MDRV_CPU_PERIODIC_INT(sound_interrupt, 640)
+	MDRV_CPU_PERIODIC_INT(sound_interrupt, 480)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
@@ -703,14 +850,15 @@ ROM_START( cntsteer )
 	ROM_LOAD( "by18", 0x20000, 0x2000, CRC(1e9ce047) SHA1(7579ba6b401eb1bfc7d2d9311ebab623bd1095a2) )
 	ROM_LOAD( "by20", 0x30000, 0x2000, CRC(e2198c9e) SHA1(afea262db9154301f4b9e53e1fc91985dd934170) )
 
-	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 )
-	ROM_LOAD( "mb7118h.7k",  0x0000, 0x100, NO_DUMP )
-	ROM_LOAD( "mb7052.6k",   0x0100, 0x100, NO_DUMP )
+	ROM_REGION( 0x300, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "by21.j4",  0x0000, 0x100, NO_DUMP ) /* All 82s129 or equivalent */
+	ROM_LOAD( "by22.j5",  0x0100, 0x100, NO_DUMP )
+	ROM_LOAD( "by23.j6",  0x0200, 0x100, NO_DUMP )
 ROM_END
 
 ROM_START( zerotrgt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
- 	ROM_LOAD( "ct01-s.4c", 0x8000, 0x8000, CRC(b35a16cb) SHA1(49581324c3e3d5219f0512d08a40161185368b10) )
+	ROM_LOAD( "ct01-s.4c", 0x8000, 0x8000, CRC(b35a16cb) SHA1(49581324c3e3d5219f0512d08a40161185368b10) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "ct08.16a",  0x4000, 0x4000,  CRC(7e8db408) SHA1(2ae407d15645753a2a0d691c9f1cf1eb383d3e8a) )
@@ -753,7 +901,7 @@ ROM_END
 
 ROM_START( gekitsui )
 	ROM_REGION( 0x10000, "maincpu", 0 )
- 	ROM_LOAD( "ct01", 0x8000, 0x8000, CRC(d3d82d8d) SHA1(c175c626d4cb89a2d82740c04892092db6faf616) )
+	ROM_LOAD( "ct01", 0x8000, 0x8000, CRC(d3d82d8d) SHA1(c175c626d4cb89a2d82740c04892092db6faf616) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "ct08.16a",  0x4000, 0x4000,  CRC(7e8db408) SHA1(2ae407d15645753a2a0d691c9f1cf1eb383d3e8a) )
@@ -839,6 +987,6 @@ static DRIVER_INIT( zerotrgt )
 
 /***************************************************************************/
 
-GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT90,  "Data East Corporation", "Counter Steer", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
+GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT270, "Data East Corporation", "Counter Steer", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
 GAME( 1985, zerotrgt, 0,        zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
 GAME( 1985, gekitsui, zerotrgt, zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
