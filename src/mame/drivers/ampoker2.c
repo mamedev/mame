@@ -1113,6 +1113,17 @@ ROM_START( ampkr2b3 )
 	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
 ROM_END
 
+ROM_START( ampkr2b4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "9.bin", 0x0000, 0x10000, CRC(657fa846) SHA1(1ef8fea81627b86aab6f682919d7432c57816e5f) )
+
+	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "ampoker.u47", 0x0000, 0x4000, CRC(cefed6c7) SHA1(79591339eab2712b432dfe89929dbc97000a13d2) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
+ROM_END
+
 ROM_START( ampkr95 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "amp95rus.u6", 0x0000, 0x10000, CRC(6ec74b2b) SHA1(2dca05bc111071f1407dd524b67b5a3dc5848c70) )
@@ -1207,6 +1218,7 @@ GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, 0,    ROT0, "Novomatic",  "
 GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 1)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 2)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 3)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "American Poker II (bootleg, set 4)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg?",   "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  0,    ROT0, "Bootleg",    "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
 GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, 0,    ROT0, "Bootleg",    "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )

@@ -402,6 +402,26 @@ ROM_START( mil4000a )
 // palce22v10h.u74.bad.dump= palce22v10h-ch-jin-u27.u27  Jingle Bell (Italy, V133I)
 ROM_END
 
+ROM_START( mil4000b )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "27.u75", 0x000001, 0x20000, CRC(a5ca8a1e) SHA1(c42244e27031175c37e83995f548d960708eabab) )
+	ROM_LOAD16_BYTE( "28.u76", 0x000000, 0x20000, CRC(5bf4e681) SHA1(818d0ec1b2cc544334b0349ae15fd53ff32ef8c1) )
+
+	ROM_REGION( 0xa0000, "gfx1", 0 ) // 5bpp?
+	ROM_LOAD( "2.u36",   0x000000, 0x20000, CRC(bb4fcfde) SHA1(7e19722ce42b9ec86faac32a526429b0e56639b5) )
+	ROM_LOAD( "3.u35",   0x020000, 0x20000, CRC(21c43d81) SHA1(a266b85378723ad8e219dd63a639add64624de13) )
+	ROM_LOAD( "4.u34",   0x040000, 0x20000, CRC(372a67a4) SHA1(c1c1352dd3152603827224d8970e6cb04aa1e858) )
+	ROM_LOAD( "5.u33",   0x060000, 0x20000, CRC(8058882e) SHA1(2de7b1e6e39d89913b2d6c1290d3cf326d2527d4) )
+	ROM_LOAD( "6.u32",   0x080000, 0x20000, CRC(7217a8c2) SHA1(275c2d5a128960dd6cd56d5e3647354b17129a12) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // 6295 samples
+	ROM_LOAD( "1.u54",   0x000000, 0x40000, CRC(e4a89163) SHA1(c0622c4e97b23daf9775137a2754bf9c47a29385) )
+
+	ROM_REGION( 0x4d4c, "mcu", 0 ) // MCU code
+	ROM_LOAD( "pic16c65b_millennium4000.u60", 0x000, 0x4d4c, BAD_DUMP CRC(4f3f7b90) SHA1(fdf689dda57960820315dcf0138d2ade28248681) )
+ROM_END
+
 
 GAMEL( 2000, mil4000,    0,        mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 2.0)", 0, layout_mil4000 )
 GAMEL( 2000, mil4000a,   mil4000,  mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.8)", 0, layout_mil4000 )
+GAMEL( 2000, mil4000b,   mil4000,  mil4000,    mil4000,    0, ROT0,  "Sure Milano", "Millennium Nuovo 4000 (Version 1.5)", 0, layout_mil4000 )

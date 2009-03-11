@@ -8378,6 +8378,7 @@ Other Sun games
 	DRIVER( ampkr2b1 )	/* 1990 bootleg */
 	DRIVER( ampkr2b2 )	/* 1990 bootleg */
 	DRIVER( ampkr2b3 )	/* 1994 bootleg */
+	DRIVER( ampkr2b4 )	/* 1994 bootleg */
 	DRIVER( ampkr228 )	/* 1990 bootleg */
 	DRIVER( pkrdewin )	/* 1990 bootleg */
 	DRIVER( ampkr95 )	/* 1995 bootleg */
@@ -8671,6 +8672,7 @@ Other Sun games
 	/* Sure games */
 	DRIVER( mil4000 )	/* (c) 2000 Sure Milano */
 	DRIVER( mil4000a )	/* (c) 2000 Sure Milano */
+	DRIVER( mil4000b )	/* (c) 2000 Sure Milano */
 
 	/* Mitsubishi/Renesas M16/62A italian gambling games */
 	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */
