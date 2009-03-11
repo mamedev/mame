@@ -202,8 +202,9 @@ static astring *find_include_file(int srcrootlen, int dstrootlen, const astring 
 int main(int argc, char *argv[])
 {
 	astring *srcdir = NULL, *dstdir = NULL, *tempfilename = NULL, *tempheader = NULL, *tempfooter = NULL;
-	core_file *tempfile;
 	int unadorned = 0;
+	UINT32 bufsize;
+	void *buffer;
 	int result;
 	int argnum;
 
@@ -249,17 +250,10 @@ int main(int argc, char *argv[])
 		goto usage;
 
 	/* read the template file into an astring */
-	if (core_fopen(astring_c(tempfilename), OPEN_FLAG_READ, &tempfile) == FILERR_NONE)
+	if (core_fload(astring_c(tempfilename), &buffer, &bufsize) == FILERR_NONE)
 	{
-		UINT64 filesize = core_fsize(tempfile);
-		void *buffer = malloc(filesize);
-		if (buffer != NULL)
-		{
-			core_fread(tempfile, buffer, filesize);
-			tempheader = astring_dupch(buffer, filesize);
-			free(buffer);
-		}
-		core_fclose(tempfile);
+		tempheader = astring_dupch(buffer, bufsize);
+		free(buffer);
 	}
 
 	/* verify the template */

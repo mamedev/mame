@@ -167,7 +167,8 @@ static int usage(void)
 	printf("   or: chdman -diff parent.chd compare.chd diff.chd\n");
 	printf("   or: chdman -setchs inout.chd cylinders heads sectors\n");
 	printf("   or: chdman -fixavdata inout.chd\n");
-	printf("   or: chdman -addmeta inout.chd tag [index] sourcefile\n");
+	printf("   or: chdman -addmetabin inout.chd tag [index] sourcefile\n");
+	printf("   or: chdman -addmetatext inout.chd tag [index] sourcefile\n");
 	return 1;
 }
 
@@ -316,30 +317,14 @@ static int do_createhd(int argc, char *argv[], int param)
 				break;
 		if (*scan != 0)
 		{
-			file_error filerr;
-			core_file *ident;
-
-			/* attempt to open the file */
-			filerr = core_fopen(argv[4], OPEN_FLAG_READ, &ident);
+			/* attempt to load the file */
+			file_error filerr = core_fload(argv[4], (void **)&identdata, &identdatasize);
 			if (filerr != FILERR_NONE)
 			{
 				fprintf(stderr, "Error opening ident file '%s'\n", argv[4]);
 				return 1;
 			}
 			
-			/* allocate a buffer to hold the data */
-			identdatasize = core_fsize(ident);
-			identdata = malloc(identdatasize);
-			if (identdata == NULL)
-			{
-				fprintf(stderr, "Out of memory adding ident metadata\n");
-				goto cleanup;
-			}
-			
-			/* read the data, close the file */
-			core_fread(ident, identdata, identdatasize);
-			core_fclose(ident);
-
 			/* shift the remaining arguments down */
 			if (argc > 5)
 				memmove(&argv[4], &argv[5], (argc - 5) * sizeof(argv[0]));
@@ -2686,7 +2671,6 @@ static int do_addmeta(int argc, char *argv[], int param)
 {
 	const char *inoutfile, *srcfile, *tagstring;
 	UINT8 was_readonly = FALSE;
-	core_file *sourcefile = NULL;
 	UINT8 *metadata = NULL;
 	chd_file *chd = NULL;
 	chd_header header;
@@ -2694,9 +2678,7 @@ static int do_addmeta(int argc, char *argv[], int param)
 	UINT32 metalength;
 	UINT32 metaindex;
 	UINT32 metatag;
-	UINT32 chindex;
 	chd_error err;
-	int istext;
 
 	/* require 5 or 6 args total */
 	if (argc != 5 && argc != 6)
@@ -2768,7 +2750,7 @@ static int do_addmeta(int argc, char *argv[], int param)
 	}
 	
 	/* attempt to open the source file */
-	filerr = core_fopen(srcfile, OPEN_FLAG_READ, &sourcefile);
+	filerr = core_fload(srcfile, (void **)&metadata, &metalength);
 	if (filerr != FILERR_NONE)
 	{
 		fprintf(stderr, "Error opening source file '%s'\n", srcfile);
@@ -2776,43 +2758,17 @@ static int do_addmeta(int argc, char *argv[], int param)
 		goto cleanup;
 	}
 	
-	/* allocate memory */
-	metalength = core_fsize(sourcefile);
-	if (metalength == 0 || metalength >= 16 * 1024 * 1024)
-	{
-		fprintf(stderr, "Source file '%s' is either 0-length or too large (must be under 16MB)\n", srcfile);
-		err = CHDERR_INVALID_PARAMETER;
-		goto cleanup;
-	}
-	metadata = malloc(metalength + 1);
-	if (metadata == NULL)
-	{
-		fprintf(stderr, "Out of memory allocating source file buffer\n");
-		err = CHDERR_OUT_OF_MEMORY;
-		goto cleanup;
-	}
-	
-	/* read in the data */
-	if (core_fread(sourcefile, metadata, metalength) != metalength)
-	{
-		fprintf(stderr, "Error reading source file\n");
-		err = CHDERR_READ_ERROR;
-		goto cleanup;
-	}
-	
-	/* analyze the data */
-	istext = FALSE;
-	for (chindex = 0; chindex < metalength; chindex++)
-		if (metadata[chindex] != 0x0d && metadata[chindex] != 0x0a && metadata[chindex] != 0x09 &&
-			(metadata[chindex] < ' ' || metadata[chindex] >= 0x7f))
-			break;
-	
 	/* if it's text, strip any trailing Ctrl-Z and CR/LF and add a trailing NULL */
-	if (chindex == metalength || (chindex == metalength - 1 && metadata[chindex] == 0x1a))
+	if (param)
 	{
-		istext = TRUE;
-		metalength = chindex + 1;
-		metadata[metalength - 1] = 0;
+		metadata = realloc(metadata, metalength + 1);
+		if (metadata == NULL)
+		{
+			fprintf(stderr, "Out of memory preparing metadata\n");
+			err = CHDERR_OUT_OF_MEMORY;
+			goto cleanup;
+		}
+		metadata[metalength++] = 0;
 		while (metalength > 0 && (metadata[metalength - 2] == 0x0a || metadata[metalength - 2] == 0x0d || metadata[metalength - 2] == 0x1a))
 			metadata[--metalength] = 0;
 	}
@@ -2839,13 +2795,11 @@ static int do_addmeta(int argc, char *argv[], int param)
 			fprintf(stderr, "Error writing new header to CHD file: %s\n", chd_error_string(err));
 	}
 	if (err == CHDERR_NONE)
-		printf("Metadata added successfully as %s\n", istext ? "text" : "binary");
+		printf("Metadata added successfully as %s\n", param ? "text" : "binary");
 
 cleanup:
 	if (metadata != NULL)
 		free(metadata);
-	if (sourcefile != NULL)
-		core_fclose(sourcefile);
 	if (chd != NULL)
 		chd_close(chd);
 	if (err != CHDERR_NONE && was_readonly)
@@ -3208,7 +3162,8 @@ int CLIB_DECL main(int argc, char **argv)
 		{ "-diff",			do_diff, 0 },
 		{ "-setchs",		do_setchs, 0 },
 		{ "-fixavdata",		do_fixavdata, 0 },
-		{ "-addmeta",       do_addmeta, 0 },
+		{ "-addmetatext",   do_addmeta, TRUE },
+		{ "-addmetabin",    do_addmeta, FALSE },
 	};
 	extern char build_version[];
 	int i;

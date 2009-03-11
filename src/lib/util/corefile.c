@@ -687,6 +687,47 @@ const void *core_fbuffer(core_file *file)
 }
 
 
+/*-------------------------------------------------
+    core_fload - open a file with the specified 
+    filename, read it into memory, and return a 
+    pointer
+-------------------------------------------------*/
+
+file_error core_fload(const char *filename, void **data, UINT32 *length)
+{
+	core_file *file = NULL;
+	file_error err;
+	UINT64 size;
+	
+	/* attempt to open the file */
+	err = core_fopen(filename, OPEN_FLAG_READ, &file);
+	if (err != FILERR_NONE)
+		return err;
+	
+	/* get the size */
+	size = core_fsize(file);
+	if ((UINT32)size != size)
+	{
+		core_fclose(file);
+		return FILERR_OUT_OF_MEMORY;
+	}
+	
+	/* allocate memory */
+	*data = malloc(size);
+	if (length != NULL)
+		*length = (UINT32)size;
+	
+	/* read the data */
+	if (core_fread(file, *data, size) != size)
+	{
+		core_fclose(file);
+		free(*data);
+		return FILERR_FAILURE;
+	}
+	return FILERR_NONE;
+}
+
+
 
 /***************************************************************************
     FILE WRITE

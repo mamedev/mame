@@ -99,6 +99,9 @@ char *core_fgets(char *s, int n, core_file *file);
 /* this function may cause the full file data to be read */
 const void *core_fbuffer(core_file *file);
 
+/* open a file with the specified filename, read it into memory, and return a pointer */
+file_error core_fload(const char *filename, void **data, UINT32 *length);
+
 
 
 /* ----- file write ----- */
