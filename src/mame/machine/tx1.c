@@ -8,21 +8,10 @@
 #include "machine/8255ppi.h"
 #include "tx1.h"
 
-/*
-    6845 cursor output is connected to the main CPU interrupt pin.
-    The CRTC is programmed to provide a rudimentary VBLANK interrupt.
-
-    TODO: Calc TX-1 values...
-*/
-#define CURSOR_YPOS 239
-#define CURSOR_XPOS 168
-
 
 /*
     Globals
 */
-static UINT16 *prom;
-static emu_timer *interrupt_timer;
 
 static struct
 {
@@ -57,16 +46,6 @@ INLINE UINT8 reverse_nibble(UINT8 nibble)
 			(nibble & 8) >> 3;
 }
 
-
-
-/*
-    TODO: Check interrupt timing from CRT config. Probably different between games.
-*/
-static TIMER_CALLBACK( interrupt_callback )
-{
-	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, 0xff);
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
-}
 
 /*
     SN74S516 16x16 Multiplier/Divider
@@ -192,7 +171,7 @@ static void sn_divide(running_machine *machine)
 	INT32 Z = 0;
 	INT32 W = 0;
 
-	if ( SN74S516.X == 0 )
+	if (SN74S516.X == 0)
 	{
 		mame_printf_debug("%s:SN74S516 tried to divide by zero\n", cpuexec_describe_context(machine));
 		SN74S516.ZW.Z = 0xffff;
@@ -201,7 +180,7 @@ static void sn_divide(running_machine *machine)
 		return;
 	}
 
-	switch ( SN74S516.code )
+	switch (SN74S516.code)
 	{
 		case 4:
 		{
@@ -228,7 +207,7 @@ static void sn_divide(running_machine *machine)
 	}
 
 	/* Divide overflow Only happens during chip test anyway */
-	if ( Z > 0xffff )
+	if (Z > 0xffff)
 		Z |= 0xff00;
 
 	SN74S516.ZW.Z = Z;
@@ -240,12 +219,12 @@ static void sn74s516_update(running_machine *machine, int ins)
 {
 	SN74S516.state = state_table[SN74S516.state][ins];
 
-	if ( SN74S516.state == 4 )
+	if (SN74S516.state == 4)
 	{
 		sn_multiply();
 		SN74S516.state = 8;
 	}
-	else if ( SN74S516.state == 5 )
+	else if (SN74S516.state == 5)
 	{
 		sn_divide(machine);
 		SN74S516.state = 10;
@@ -266,8 +245,8 @@ static void kick_sn74s516(running_machine *machine, UINT16 *data, const int ins)
 #define CLEAR_SEQUENCE	(SN74S516.code = 0)
 
 	/*
-        Remember to change the Z/W flag.
-    */
+		Remember to change the Z/W flag.
+	*/
 	switch (SN74S516.state)
 	{
 		case 0:
@@ -460,14 +439,10 @@ INLINE UINT16 get_tx1_datarom_addr(void)
 
 	addr = ((math.inslatch & 0x1c00) << 1) | (math.ppshift & 0xff);
 
-	if ( (math.inslatch >> 8) & TX1_RADCHG )
-	{
+	if ((math.inslatch >> 8) & TX1_RADCHG)
 		addr |= (math.ppshift & 0x0700);
-	}
 	else
-	{
 		addr |= (math.promaddr << 3) & 0x0700;
-	}
 
 	return addr & 0x3fff;
 }
@@ -478,46 +453,44 @@ static void tx1_update_state(running_machine *machine)
 #define LLOEN(a)	!(a & 0x40)
 #define GO_EN(a)	!(a & 0x4000)
 
+	const UINT16 *prom = (UINT16*)memory_region(machine, "au_data") + (0x8000 >> 1);
+
 	for (;;)
 	{
 		int go = 0;
 
-		if ( !GO_EN(math.inslatch) && GO_EN(prom[math.promaddr]) )
-		{
+		if (!GO_EN(math.inslatch) && GO_EN(prom[math.promaddr]))
 			go = 1;
-		}
 		/*
-            Example:
-            120 /GO /LHIEN
-            121 /GO        /LLOEN
-            Both 120 and 121 are used.
-        */
-		else if ( (GO_EN(math.inslatch) && GO_EN(prom[math.promaddr])) && (LHIEN(math.inslatch) && LLOEN(prom[math.promaddr])) )
-		{
+			Example:
+			120 /GO /LHIEN
+			121 /GO        /LLOEN
+			Both 120 and 121 are used.
+		*/
+		else if ((GO_EN(math.inslatch) && GO_EN(prom[math.promaddr])) && (LHIEN(math.inslatch) && LLOEN(prom[math.promaddr])))
 			go = 1;
-		}
 
 		/* Now update the latch */
 		math.inslatch = prom[math.promaddr] & 0x7fff;
 		math.mux = (math.inslatch >> 3) & 7;
 
-		if ( math.mux == TX1_SEL_INSCL )
+		if (math.mux == TX1_SEL_INSCL)
 		{
-		   math.i0ff = 0;
+			math.i0ff = 0;
 		}
-		else if ( math.mux == TX1_SEL_PPSEN )
+		else if (math.mux == TX1_SEL_PPSEN)
 		{
 			// NOTE: Doesn't do anything without SPCS.
 		}
 
 		/* TODO */
-		if ( go )
+		if (go)
 		{
 			int ins = math.inslatch & 7;
 
 			TX1_SET_INS0_BIT;
 
-			if ( math.mux == TX1_SEL_DSELOE )
+			if (math.mux == TX1_SEL_DSELOE)
 			{
 				int		dsel = (math.inslatch >> 8) & TX1_DSEL;
 				int		tfad = (math.inslatch & 0x1c00) << 1;
@@ -534,52 +507,52 @@ static void tx1_update_state(running_machine *machine)
 
 				dsel = (dsel & 2) | ((dsel & o4) ^ 1);
 
-				if ( dsel == 0 )
+				if (dsel == 0)
 					data = math.muxlatch;
-				else if ( dsel == 1 )
+				else if (dsel == 1)
 				{
-					UINT16 *romdata = (UINT16*)memory_region(machine, "user1");
+					UINT16 *romdata = (UINT16*)memory_region(machine, "au_data");
 					UINT16 addr = get_tx1_datarom_addr();
 					data = romdata[addr];
 				}
-				else if ( dsel == 2 )
+				else if (dsel == 2)
 					data = ROL16(math.muxlatch, 4);
-				else if ( dsel == 3 )
+				else if (dsel == 3)
 					data = ROL16(SWAP16(math.muxlatch), 3);
 
 				kick_sn74s516(machine, &data, ins);
 			}
 			/*
-                TODO: Changed ppshift to muxlatch for TX-1
+				TODO: Changed ppshift to muxlatch for TX-1
 
-                /TMPLD1: /LHIEN
-                /TMPLD2: /LLOEN.!O4 + (/LHIEN.O4)
-                /TMPLD3: /LLOEN
-                     O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
-                         !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
-                         /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
-            */
-			else if ( LHIEN(math.inslatch) || LLOEN(math.inslatch) )
+				/TMPLD1: /LHIEN
+				/TMPLD2: /LLOEN.!O4 + (/LHIEN.O4)
+				/TMPLD3: /LLOEN
+					 O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+						 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+						 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+			*/
+			else if (LHIEN(math.inslatch) || LLOEN(math.inslatch))
 			{
 				UINT16 data;
 
 				kick_sn74s516(machine, &data, ins);
 
 				/* All latches enabled */
-				if ( LHIEN(math.inslatch) && LLOEN(math.inslatch) )
+				if (LHIEN(math.inslatch) && LLOEN(math.inslatch))
 				{
 					math.muxlatch = data;
 				}
-				else if ( math.mux == TX1_SEL_LMSEL ) // O4 = 0
+				else if (math.mux == TX1_SEL_LMSEL) // O4 = 0
 				{
 					// TMPLD2/TMPLD3 15-5
-					if ( LLOEN(math.inslatch) )
+					if (LLOEN(math.inslatch))
 					{
 						math.muxlatch &= 0x001f;
 						math.muxlatch |= data & 0xffe0;
 					}
 					// TMLPD1 4-0???????
-					else if ( LHIEN(math.inslatch) )
+					else if (LHIEN(math.inslatch))
 					{
 						math.muxlatch &= 0xffe0;
 						math.muxlatch |= data & 0x001f;
@@ -588,13 +561,13 @@ static void tx1_update_state(running_machine *machine)
 				else
 				{
 					/*
-                        /TMPLD1: /LHIEN
-                        /TMPLD2: /LLOEN.!O4 + /LHIEN.O4
-                        /TMPLD3: /LLOEN
-                             O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
-                                 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
-                                 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
-                    */
+						/TMPLD1: /LHIEN
+						/TMPLD2: /LLOEN.!O4 + /LHIEN.O4
+						/TMPLD3: /LLOEN
+						 O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+							 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+							 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+					*/
 					int		dsel = (math.inslatch >> 8) & TX1_DSEL;
 					int		tfad = (math.inslatch & 0x1c00) << 1;
 					int		sd   = math.ppshift;
@@ -607,7 +580,7 @@ static void tx1_update_state(running_machine *machine)
 						(!BIT(sd, 7) &&  BIT(sd, 8)) ||
 						!BIT(dsel, 1) || BIT(tfad, 13) || BIT(tfad, 12) || BIT(tfad, 11);
 
-					if ( LLOEN(math.inslatch) )
+					if (LLOEN(math.inslatch))
 					{
 						math.muxlatch &= 0x0fff;
 						math.muxlatch |= data & 0xf000;
@@ -619,7 +592,7 @@ static void tx1_update_state(running_machine *machine)
 							math.muxlatch |= data & 0x0fe0;
 						}
 					}
-					else if ( LHIEN(math.inslatch) )
+					else if (LHIEN(math.inslatch))
 					{
 						math.muxlatch &= 0xffe0;
 						math.muxlatch |= data & 0x001f;
@@ -635,7 +608,7 @@ static void tx1_update_state(running_machine *machine)
 			}
 			else
 			{
-				if ( math.mux == TX1_SEL_PPSEN )
+				if (math.mux == TX1_SEL_PPSEN)
 				{
 					kick_sn74s516(machine, &math.ppshift, ins);
 				}
@@ -649,7 +622,7 @@ static void tx1_update_state(running_machine *machine)
 		}
 
 		/* Is there another instruction in the sequence? */
-		if ( prom[math.promaddr] & 0x8000 )
+		if (prom[math.promaddr] & 0x8000)
 			break;
 		else
 			INC_PROM_ADDR;
@@ -661,11 +634,11 @@ READ16_HANDLER( tx1_math_r )
 	offset = offset << 1;
 
 	/* /MLPCS */
-	if ( offset < 0x400 )
+	if (offset < 0x400)
 	{
 		int ins;
 
-		if ( offset & 0x200 )
+		if (offset & 0x200)
 		{
 			ins = math.inslatch & 7;
 			TX1_SET_INS0_BIT;
@@ -679,20 +652,20 @@ READ16_HANDLER( tx1_math_r )
 		kick_sn74s516(space->machine, &math.retval, ins);
 	}
 	/* /PPSEN */
-	else if ( offset < 0x800 )
+	else if (offset < 0x800)
 	{
 		// Unused - just pullups?
 		math.retval = 0xffff;
 	}
 	/* /MUXCS */
-	else if ( (offset & 0xc00) == 0xc00 )
+	else if ((offset & 0xc00) == 0xc00)
 	{
 		int		dsel = (math.inslatch >> 8) & TX1_DSEL;
 		int		tfad = (math.inslatch & 0x1c00) << 1;
 		int		sd   = math.ppshift;
 		int		o4;
 
-		if ( math.mux == TX1_SEL_LMSEL )
+		if (math.mux == TX1_SEL_LMSEL)
 			o4 = 0;
 		else
 		{
@@ -706,39 +679,39 @@ READ16_HANDLER( tx1_math_r )
 
 		dsel = (dsel & 2) | ((dsel & o4) ^ 1);
 
-		if ( dsel == 0 )
+		if (dsel == 0)
 			math.retval = math.muxlatch;
-		else if ( dsel == 1 )
+		else if (dsel == 1 )
 		{
 			/*
-                TODO make this constant somewhere
-                e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
-            */
-			UINT16 *romdata = (UINT16*)memory_region(space->machine, "user1");
+				TODO make this constant somewhere
+				e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
+			*/
+			UINT16 *romdata = (UINT16*)memory_region(space->machine, "au_data");
 			UINT16 addr = get_tx1_datarom_addr();
 			math.retval = romdata[addr];
 		}
-		else if ( dsel == 2 )
+		else if (dsel == 2)
 			math.retval = ROL16(math.muxlatch, 4);
-		else if ( dsel == 3 )
+		else if (dsel == 3)
 			math.retval = ROL16(SWAP16(math.muxlatch), 3);
 
 		/* TODO for TX-1: This is /SPCS region? */
-		if ( offset < 0xe00 )
+		if (offset < 0xe00)
 		{
 			// Load the PP with retval??????
-			if ( math.mux == TX1_SEL_PPSEN )
+			if (math.mux == TX1_SEL_PPSEN)
 			{
 				math.ppshift = math.retval & 0x3fff;
 			}
-			else if ( math.mux == TX1_SEL_PSSEN )
+			else if (math.mux == TX1_SEL_PSSEN)
 			{
 				// WRONG!!!!
 				mame_printf_debug("Math Read with PSSEN!\n");
 				math.ppshift = math.retval;
 			}
 
-			if ( math.mux != TX1_SEL_ILDEN )
+			if (math.mux != TX1_SEL_ILDEN)
 			{
 				INC_PROM_ADDR;
 				tx1_update_state(space->machine);
@@ -750,21 +723,21 @@ READ16_HANDLER( tx1_math_r )
 	}
 	else
 	{
-		if ( math.mux == TX1_SEL_PPSEN )
+		if (math.mux == TX1_SEL_PPSEN)
 			math.retval = math.ppshift & 0x3fff;
 		else
 			/* Nothing is mapped - read from pull up resistors! */
 			math.retval = 0xffff;
 	}
 
-	if ( offset & TX1_INSLD )
+	if (offset & TX1_INSLD)
 	{
-	    math.promaddr = (offset << 2) & 0x1ff;
+		math.promaddr = (offset << 2) & 0x1ff;
 		tx1_update_state(space->machine);
 	}
-	else if ( offset & TX1_CNTST )
+	else if (offset & TX1_CNTST)
 	{
-	    INC_PROM_ADDR;
+		INC_PROM_ADDR;
 		tx1_update_state(space->machine);
 	}
 
@@ -779,11 +752,11 @@ WRITE16_HANDLER( tx1_math_w )
 //  printf("W %x: %x\n", 0x3000 + offset, data);
 
 	/* /MLPCS */
-	if ( offset < 0x400 )
+	if (offset < 0x400)
 	{
 		int ins;
 
-		if ( offset & 0x200 )
+		if (offset & 0x200)
 		{
 			ins = math.inslatch & 7;
 			TX1_SET_INS0_BIT;
@@ -796,20 +769,20 @@ WRITE16_HANDLER( tx1_math_w )
 		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
 	/* /PPSEN */
-	else if ( (offset & 0xc00) == 0x400 )
+	else if ((offset & 0xc00) == 0x400)
 	{
 		/* Input is 14 bits */
 		math.ppshift = math.cpulatch & 0x3fff;
 	}
 	/* /PSSEN */
-	else if ( (offset & 0xc00) == 0x800 )
+	else if ((offset & 0xc00) == 0x800)
 	{
-		//if ( ((math.inslatch >> 8) & TX1_DSEL) == 3 )
+		//if (((math.inslatch >> 8) & TX1_DSEL) == 3 )
 		{
 			int shift;
 			UINT16 val = math.ppshift;
 
-			if ( math.cpulatch & 0x3800 )
+			if (math.cpulatch & 0x3800)
 			{
 				shift = (math.cpulatch >> 11) & 0x7;
 
@@ -835,56 +808,56 @@ WRITE16_HANDLER( tx1_math_w )
 		}
 	}
 	/* /MUXCS */
-	else if ( (offset & 0xc00) == 0xc00 )
+	else if ((offset & 0xc00) == 0xc00)
 	{
 
 		/*
-            /TMPLD1: 0
-            /TMPLD2: 0
-            /TMPLD3: 0
-        */
+			/TMPLD1: 0
+			/TMPLD2: 0
+			/TMPLD3: 0
+		*/
 		math.muxlatch = math.cpulatch;
 	}
 
-	if ( offset & TX1_INSLD )
+	if (offset & TX1_INSLD)
 	{
-	    math.promaddr = (offset << 2) & 0x1ff;
+		math.promaddr = (offset << 2) & 0x1ff;
 		tx1_update_state(space->machine);
 	}
-	else if ( offset & TX1_CNTST )
+	else if (offset & TX1_CNTST)
 	{
-	    INC_PROM_ADDR;
+		INC_PROM_ADDR;
 		tx1_update_state(space->machine);
 	}
 }
 
 READ16_HANDLER( tx1_spcs_rom_r )
 {
-	math.cpulatch = *(UINT16*)((UINT8*)memory_region(space->machine, "math") + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)memory_region(space->machine, "math_cpu") + 0xfc000 + 0x1000 + offset*2);
 
-	if ( math.mux == TX1_SEL_ILDEN )
+	if (math.mux == TX1_SEL_ILDEN)
 	{
 		math.i0ff = math.cpulatch & (1 << 14) ? 1 : 0;
 	}
-	else if ( math.mux == TX1_SEL_MULEN )
+	else if (math.mux == TX1_SEL_MULEN)
 	{
 		int ins = math.inslatch & 7;
 
 		TX1_SET_INS0_BIT;
 		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
-	else if ( math.mux == TX1_SEL_PPSEN )
+	else if (math.mux == TX1_SEL_PPSEN)
 	{
 		math.ppshift = math.cpulatch;
 	}
-	else if ( math.mux == TX1_SEL_PSSEN )
+	else if (math.mux == TX1_SEL_PSSEN)
 	{
 			//if ( ((math.inslatch >> 8) & TX1_DSEL) == 3 )
 		{
 			int shift;
 			UINT16 val = math.ppshift;
 
-			if ( math.cpulatch & 0x3800 )
+			if (math.cpulatch & 0x3800)
 			{
 				shift = (math.cpulatch >> 11) & 0x7;
 
@@ -910,9 +883,9 @@ READ16_HANDLER( tx1_spcs_rom_r )
 		}
 	}
 
-	if ( math.mux != TX1_SEL_ILDEN )
+	if (math.mux != TX1_SEL_ILDEN)
 	{
-	    INC_PROM_ADDR;
+		INC_PROM_ADDR;
 		tx1_update_state(space->machine);
 	}
 
@@ -926,28 +899,28 @@ READ16_HANDLER( tx1_spcs_ram_r )
 
 	offset <<= 1;
 
-	if ( math.mux == TX1_SEL_ILDEN )
+	if (math.mux == TX1_SEL_ILDEN)
 	{
 		math.i0ff = math.cpulatch & (1 << 14) ? 1 : 0;
 	}
-	else if ( math.mux == TX1_SEL_MULEN )
+	else if (math.mux == TX1_SEL_MULEN)
 	{
 		int ins = math.inslatch & 7;
 
 		TX1_SET_INS0_BIT;
 		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
-	else if ( math.mux == TX1_SEL_PPSEN )
+	else if (math.mux == TX1_SEL_PPSEN)
 	{
 //      math.ppshift = math.retval & 0x3fff;
 		math.ppshift = math.cpulatch;
 	}
-	else if ( math.mux == TX1_SEL_PSSEN )
+	else if (math.mux == TX1_SEL_PSSEN)
 	{
 		int shift;
 		UINT16 val = math.ppshift;
 
-		if ( math.cpulatch & 0x3800 )
+		if (math.cpulatch & 0x3800)
 		{
 			shift = (math.cpulatch >> 11) & 0x7;
 
@@ -972,9 +945,9 @@ READ16_HANDLER( tx1_spcs_ram_r )
 		math.ppshift = val & 0x7ff;
 	}
 
-	if ( math.mux != TX1_SEL_ILDEN )
+	if (math.mux != TX1_SEL_ILDEN)
 	{
-	    INC_PROM_ADDR;
+		INC_PROM_ADDR;
 		tx1_update_state(space->machine);
 	}
 
@@ -1019,7 +992,7 @@ INLINE UINT16 get_bb_datarom_addr(void)
 
 	addr = ((math.inslatch & 0x1c00) << 1) | (math.ppshift & 0xff);
 
-	if ( (math.inslatch >> 8) & BB_RADCHG )
+	if ((math.inslatch >> 8) & BB_RADCHG)
 	{
 		addr |= (math.ppshift & 0x0700);
 	}
@@ -1037,22 +1010,24 @@ static void buggyboy_update_state(running_machine *machine)
 #define LLOEN(a)	!(a & 0x40)
 #define GO_EN(a)	!(a & 0x4000)
 
+	const UINT16 *prom = (UINT16*)memory_region(machine, "au_data") + (0x8000 >> 1);
+
 	for (;;)
 	{
 		int go = 0;
 
-		if ( !GO_EN(math.inslatch) && GO_EN(prom[math.promaddr]) )
+		if (!GO_EN(math.inslatch) && GO_EN(prom[math.promaddr]))
 			go = 1;
-		else if ( (GO_EN(math.inslatch) && GO_EN(prom[math.promaddr])) && (LHIEN(math.inslatch) && LLOEN(prom[math.promaddr])) )
+		else if ((GO_EN(math.inslatch) && GO_EN(prom[math.promaddr])) && (LHIEN(math.inslatch) && LLOEN(prom[math.promaddr])))
 			go = 1;
 
 		/* Now update the latch */
 		math.inslatch = prom[math.promaddr] & 0x7fff;
 		math.mux = (math.inslatch >> 3) & 7;
 
-		if ( math.mux == BB_MUX_INSCL )
-		   math.i0ff = 0;
-		else if ( math.mux == BB_MUX_PPSEN )
+		if (math.mux == BB_MUX_INSCL)
+			math.i0ff = 0;
+		else if (math.mux == BB_MUX_PPSEN)
 		{
 			// TODO: Needed?
 			//mame_printf_debug("/PPSEN with INS: %x\n", math.promaddr);
@@ -1066,37 +1041,37 @@ static void buggyboy_update_state(running_machine *machine)
 
 			BB_SET_INS0_BIT;
 
-			if ( math.mux == BB_MUX_DPROE )
+			if (math.mux == BB_MUX_DPROE)
 			{
-				UINT16 *romdata = (UINT16*)memory_region(machine, "user1");
+				UINT16 *romdata = (UINT16*)memory_region(machine, "au_data");
 				UINT16 addr = get_bb_datarom_addr();
 				kick_sn74s516(machine, &romdata[addr], ins);
 			}
-			else if ( math.mux == BB_MUX_PPOE )
+			else if (math.mux == BB_MUX_PPOE)
 			{
 				kick_sn74s516(machine, &math.ppshift, ins);
 			}
 			/* This is quite tricky. */
 			/* It can either be a read operation or */
 			/* What if /LHIEN and /LLOEN? */
-			else if ( LHIEN(math.inslatch) || LLOEN(math.inslatch) )
+			else if (LHIEN(math.inslatch) || LLOEN(math.inslatch))
 			{
 				UINT16 data;
 
 				kick_sn74s516(machine, &data, ins);
 
-				if ( LHIEN(math.inslatch) && LLOEN(math.inslatch) )
+				if (LHIEN(math.inslatch) && LLOEN(math.inslatch))
 				{
 					math.ppshift = data;
 				}
-				else if ( math.mux == BB_MUX_LMSEL )
+				else if (math.mux == BB_MUX_LMSEL)
 				{
-					if ( LLOEN(math.inslatch) )
+					if (LLOEN(math.inslatch))
 					{
 						math.ppshift &= 0x000f;
 						math.ppshift |= data & 0xfff0;
 					}
-					else if ( LHIEN(math.inslatch) )
+					else if (LHIEN(math.inslatch))
 					{
 						math.ppshift &= 0xfff0;
 						math.ppshift |= data & 0x000f;
@@ -1104,12 +1079,12 @@ static void buggyboy_update_state(running_machine *machine)
 				}
 				else
 				{
-					if ( LLOEN(math.inslatch) )
+					if (LLOEN(math.inslatch))
 					{
 						math.ppshift &= 0x0fff;
 						math.ppshift |= data & 0xf000;
 					}
-					else if ( LHIEN(math.inslatch) )
+					else if (LHIEN(math.inslatch))
 					{
 						math.ppshift &= 0xf000;
 						math.ppshift |= data & 0x0fff;
@@ -1118,7 +1093,7 @@ static void buggyboy_update_state(running_machine *machine)
 			}
 			else
 			{
-				if ( math.mux == BB_MUX_PPSEN )
+				if (math.mux == BB_MUX_PPSEN)
 				{
 					kick_sn74s516(machine, &math.ppshift, ins);
 				}
@@ -1132,17 +1107,17 @@ static void buggyboy_update_state(running_machine *machine)
 		}
 
 		/* Handle rotation */
-		if ( ((math.inslatch >> 8) & BB_DSEL) == 1 )
+		if (((math.inslatch >> 8) & BB_DSEL) == 1)
 		{
 			math.ppshift = ROR16(math.ppshift, 4);
 		}
-		else if ( ((math.inslatch >> 8) & BB_DSEL) == 2 )
+		else if (((math.inslatch >> 8) & BB_DSEL) == 2)
 		{
 			math.ppshift = ROL16(math.ppshift, 4);
 		}
 
 		/* Is there another instruction in the sequence? */
-		if ( prom[math.promaddr] & 0x8000 )
+		if (prom[math.promaddr] & 0x8000)
 			break;
 		else
 			INC_PROM_ADDR;
@@ -1154,11 +1129,11 @@ READ16_HANDLER( buggyboy_math_r )
 	offset = offset << 1;
 
 	/* /MLPCS */
-	if ( offset < 0x400 )
+	if (offset < 0x400)
 	{
 		int ins;
 
-		if ( offset & 0x200 )
+		if (offset & 0x200)
 		{
 			ins = math.inslatch & 7;
 			BB_SET_INS0_BIT;
@@ -1176,26 +1151,26 @@ READ16_HANDLER( buggyboy_math_r )
 		//  math.ppshift = math.retval;
 	}
 	/* /PPSEN */
-	else if ( offset < 0x800 )
+	else if (offset < 0x800)
 	{
 		math.retval = math.ppshift;
 	}
 	/* /DPROE */
-	else if ( (offset & 0xc00) == 0xc00 )
+	else if ((offset & 0xc00) == 0xc00)
 	{
-		UINT16 *romdata = (UINT16*)memory_region(space->machine, "user1");
+		UINT16 *romdata = (UINT16*)memory_region(space->machine, "au_data");
 		UINT16 addr = get_bb_datarom_addr();
 
 		math.retval = romdata[addr];
 
 		/* This is necessary */
-		if ( math.mux == BB_MUX_PPSEN )
+		if (math.mux == BB_MUX_PPSEN)
 			math.ppshift = romdata[addr];
 
 		/* This is /SPCS region? Necessary anyway */
-		if ( offset < 0xe00 )
+		if (offset < 0xe00)
 		{
-			if ( math.mux != BB_MUX_ILDEN )
+			if (math.mux != BB_MUX_ILDEN)
 			{
 				INC_PROM_ADDR;
 				buggyboy_update_state(space->machine);
@@ -1204,21 +1179,21 @@ READ16_HANDLER( buggyboy_math_r )
 	}
 	else
 	{
-		if ( math.mux == BB_MUX_PPSEN )
+		if (math.mux == BB_MUX_PPSEN)
 			math.retval = math.ppshift;
 		else
 			/* Nothing is mapped - read from pull up resistors! */
 			math.retval = 0xffff;
 	}
 
-	if ( offset & BB_INSLD )
+	if (offset & BB_INSLD)
 	{
-	    math.promaddr = (offset << 2) & 0x1ff;
+		math.promaddr = (offset << 2) & 0x1ff;
 		buggyboy_update_state(space->machine);
 	}
-	else if ( offset & BB_CNTST )
+	else if (offset & BB_CNTST)
 	{
-	    INC_PROM_ADDR;
+		INC_PROM_ADDR;
 		buggyboy_update_state(space->machine);
 	}
 
@@ -1232,11 +1207,11 @@ WRITE16_HANDLER( buggyboy_math_w )
 	offset <<= 1;
 
 	/* /MLPCS */
-	if ( offset < 0x400 )
+	if (offset < 0x400)
 	{
 		int ins;
 
-		if ( offset & 0x200 )
+		if (offset & 0x200)
 		{
 			ins = math.inslatch & 7;
 			BB_SET_INS0_BIT;
@@ -1249,19 +1224,19 @@ WRITE16_HANDLER( buggyboy_math_w )
 		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
 	/* /PPSEN */
-	else if ( (offset & 0xc00) == 0x400 )
+	else if ((offset & 0xc00) == 0x400)
 	{
 		math.ppshift = math.cpulatch;
 	}
 	/* /PSSEN */
-	else if ( (offset & 0xc00) == 0x800 )
+	else if ((offset & 0xc00) == 0x800)
 	{
-		if ( ((math.inslatch >> 8) & BB_DSEL) == 3 )
+		if (((math.inslatch >> 8) & BB_DSEL) == 3)
 		{
 			int shift;
 			UINT16 val = math.ppshift;
 
-			if ( math.cpulatch & 0x3800 )
+			if (math.cpulatch & 0x3800)
 			{
 				shift = (math.cpulatch >> 11) & 0x7;
 
@@ -1297,48 +1272,48 @@ WRITE16_HANDLER( buggyboy_math_w )
 		debugger_break(space->machine);
 	}
 
-	if ( offset & BB_INSLD )
+	if (offset & BB_INSLD)
 	{
-	    math.promaddr = (offset << 2) & 0x1ff;
+		math.promaddr = (offset << 2) & 0x1ff;
 		buggyboy_update_state(space->machine);
 	}
-	else if ( offset & BB_CNTST )
+	else if (offset & BB_CNTST)
 	{
-	    INC_PROM_ADDR;
+		INC_PROM_ADDR;
 		buggyboy_update_state(space->machine);
 	}
 }
 
 /*
-    This is for ROM range 0x5000-0x7fff
+	This is for ROM range 0x5000-0x7fff
 */
 READ16_HANDLER( buggyboy_spcs_rom_r )
 {
-	math.cpulatch = *(UINT16*)((UINT8*)memory_region(space->machine, "math") + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)memory_region(space->machine, "math_cpu") + 0xfc000 + 0x1000 + offset*2);
 
-	if ( math.mux == BB_MUX_ILDEN )
+	if (math.mux == BB_MUX_ILDEN)
 	{
 		math.i0ff = math.cpulatch & (1 << 14) ? 1 : 0;
 	}
-	else if ( math.mux == BB_MUX_MULEN )
+	else if (math.mux == BB_MUX_MULEN)
 	{
 		int ins = math.inslatch & 7;
 
 		BB_SET_INS0_BIT;
 		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
-	else if ( math.mux == BB_MUX_PPSEN )
+	else if (math.mux == BB_MUX_PPSEN)
 	{
 		math.ppshift = math.cpulatch;
 	}
-	else if ( math.mux == BB_MUX_PSSEN )
+	else if (math.mux == BB_MUX_PSSEN)
 	{
-		if ( ((math.inslatch >> 8) & BB_DSEL) == 3 )
+		if (((math.inslatch >> 8) & BB_DSEL) == 3)
 		{
 			int shift;
 			UINT16 val = math.ppshift;
 
-			if ( math.cpulatch & 0x3800 )
+			if (math.cpulatch & 0x3800)
 			{
 				shift = (math.cpulatch >> 11) & 0x7;
 
@@ -1364,9 +1339,9 @@ READ16_HANDLER( buggyboy_spcs_rom_r )
 		}
 	}
 
-	if ( math.mux != BB_MUX_ILDEN )
+	if (math.mux != BB_MUX_ILDEN)
 	{
-	    INC_PROM_ADDR;
+		INC_PROM_ADDR;
 		buggyboy_update_state(space->machine);
 	}
 
@@ -1384,29 +1359,29 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 
 	offset <<= 1;
 
-	if ( math.mux == BB_MUX_ILDEN )
+	if (math.mux == BB_MUX_ILDEN)
 	{
 		math.i0ff = math.cpulatch & (1 << 14) ? 1 : 0;
 	}
-	else if ( math.mux == BB_MUX_MULEN )
+	else if (math.mux == BB_MUX_MULEN)
 	{
 		int ins = math.inslatch & 7;
 
 		BB_SET_INS0_BIT;
 		kick_sn74s516(space->machine, &math.cpulatch, ins);
 	}
-	else if ( math.mux == BB_MUX_PPSEN )
+	else if (math.mux == BB_MUX_PPSEN)
 	{
 		math.ppshift = math.cpulatch;
 	}
-	else if ( math.mux == BB_MUX_PSSEN )
+	else if (math.mux == BB_MUX_PSSEN)
 	{
-		if ( ((math.inslatch >> 8) & BB_DSEL) == 3 )
+		if (((math.inslatch >> 8) & BB_DSEL) == 3)
 		{
 			int shift;
 			UINT16 val = math.ppshift;
 
-			if ( math.cpulatch & 0x3800 )
+			if (math.cpulatch & 0x3800)
 			{
 				shift = (math.cpulatch >> 11) & 0x7;
 
@@ -1432,9 +1407,9 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 		}
 	}
 
-	if ( math.mux != BB_MUX_ILDEN )
+	if (math.mux != BB_MUX_ILDEN)
 	{
-	    INC_PROM_ADDR;
+		INC_PROM_ADDR;
 		buggyboy_update_state(space->machine);
 	}
 
@@ -1462,46 +1437,4 @@ MACHINE_RESET( buggyboy )
 MACHINE_RESET( tx1 )
 {
 	memset(&math, 0, sizeof(math));
-}
-
-
-/*************************************
- *
- *  Machine Reset
- *
- *************************************/
-MACHINE_START( tx1 )
-{
-	/* Initialise for each game */
-	prom = (UINT16*)memory_region(machine, "user1") + (0x8000 >> 1);
-
-	/* set a timer to run the interrupts */
-	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
-
-	/* /CUDISP CRTC interrupt */
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
-}
-
-MACHINE_START( buggyboy )
-{
-	/* Initialise for each game */
-	prom = (UINT16*)memory_region(machine, "user1") + (0x8000 >> 1);
-
-	/* set a timer to run the interrupts */
-	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
-
-	/* /CUDISP CRTC interrupt */
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
-}
-
-MACHINE_START( buggybjr )
-{
-	/* Initialise for each game */
-	prom = (UINT16*)memory_region(machine, "user1") + (0x8000 >> 1);
-
-	/* set a timer to run the interrupts */
-	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
-
-	/* /CUDISP CRTC interrupt */
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
 }

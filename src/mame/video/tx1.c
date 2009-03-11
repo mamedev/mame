@@ -17,7 +17,27 @@
  *
  *************************************/
 
+#define CURSOR_YPOS 239
+#define CURSOR_XPOS 168
 #define PRINT_CRTC_DATA 0
+
+/*
+    6845 cursor output is connected to the main CPU interrupt pin.
+    The CRTC is programmed to provide a rudimentary VBLANK interrupt.
+
+    TODO: Calc TX-1 values...
+*/
+static emu_timer *interrupt_timer;
+
+/*
+    TODO: Check interrupt timing from CRT config. Probably different between games.
+*/
+static TIMER_CALLBACK( interrupt_callback )
+{
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, 0xff);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
+}
+
 
 READ16_HANDLER( tx1_crtc_r )
 {
@@ -161,15 +181,15 @@ WRITE16_HANDLER( tx1_bankcs_w )
 
 	offset <<= 1;
 
-	if ( offset & 0x04 )
+	if (offset & 0x04)
 	{
 		tx1_vregs.ba_inc &= ~0x0000ffff;
 		tx1_vregs.ba_inc |= data;
 
-		if ( !(offset & 2)  )
+		if (!(offset & 2))
 			tx1_vregs.ba_val &= ~0x000ffff;
 	}
-	if ( offset & 0x08 )
+	if (offset & 0x08)
 	{
 		data &= 0xff;
 		tx1_vregs.ba_inc &= ~0xffff0000;
@@ -178,23 +198,23 @@ WRITE16_HANDLER( tx1_bankcs_w )
 		// TODO: Schems say D15.
 		tx1_vregs.bank_mode = BIT(data, 1);
 
-		if ( !(offset & 2)  )
+		if (!(offset & 2))
 			tx1_vregs.ba_val &= ~0xffff0000;
 	}
 	if ( !(offset & 0x10) )
 	{
 		/* Ignore data */
-		if ( offset & 2 )
+		if (offset & 2)
 			tx1_vregs.ba_val = (tx1_vregs.ba_inc + tx1_vregs.ba_val) & 0x00ffffff;
 	}
-	if ( offset & 0x20 )
+	if (offset & 0x20)
 	{
 		tx1_vregs.h_inc = data;
 
 		if ( !(offset & 2) )
 			tx1_vregs.h_val = 0;
 	}
-	if ( !(offset & 0x40) )
+	if (!(offset & 0x40))
 	{
 		/* TODO: Looks safe to remove this */
 //      if ( offset & 2 )
@@ -204,7 +224,7 @@ WRITE16_HANDLER( tx1_bankcs_w )
 
 WRITE16_HANDLER( tx1_slincs_w )
 {
-	if ( offset == 1 )
+	if (offset == 1)
 		tx1_vregs.slin_inc = data;
 	else
 		tx1_vregs.slin_inc = tx1_vregs.slin_val = 0;
@@ -236,11 +256,11 @@ static void tx1_draw_char(running_machine *machine, UINT8 *bitmap)
 {
 	INT32 x, y;
 	UINT32 scroll_x;
-	UINT8 *gfx1, *gfx2;
+	UINT8 *chars, *gfx2;
 
 	/* 2bpp characters */
-	gfx1 = memory_region(machine, "gfx1");
-	gfx2 = gfx1 + 0x4000;
+	chars = memory_region(machine, "char_tiles");
+	gfx2 = chars + 0x4000;
 
 	/* X scroll value is the last word in char RAM */
 	scroll_x = tx1_vram[0xfff] & 0x3ff;
@@ -256,7 +276,7 @@ static void tx1_draw_char(running_machine *machine, UINT8 *bitmap)
 		/* No y-scrolling? */
 		y_offs = y;
 
-		if ( (y_offs >= 64) && (y_offs < 128) )
+		if ((y_offs >= 64) && (y_offs < 128))
 			x_offs = tx1_vregs.slock ? scroll_x : 0;
 		else
 			x_offs = 0;
@@ -271,7 +291,7 @@ static void tx1_draw_char(running_machine *machine, UINT8 *bitmap)
 			tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
 			colour = (ram_val & 0xfc00) >> 8;
 			d0 = *(gfx2 + (tilenum << 3) + y_gran);
-			d1 = *(gfx1 + (tilenum << 3) + y_gran);
+			d1 = *(chars + (tilenum << 3) + y_gran);
 		}
 
 		for (x = 0; x < 256 * 3; ++x)
@@ -286,7 +306,7 @@ static void tx1_draw_char(running_machine *machine, UINT8 *bitmap)
 				tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
 				colour = (ram_val & 0xfc00) >> 8;
 				d0 = *(gfx2 + (tilenum << 3) + y_gran);
-				d1 = *(gfx1 + (tilenum << 3) + y_gran);
+				d1 = *(chars + (tilenum << 3) + y_gran);
 			}
 
 			*bitmap++ = colour |
@@ -319,10 +339,10 @@ static void tx1_draw_char(running_machine *machine, UINT8 *bitmap)
 }
 
 INLINE void tx1_draw_road_pixel(int screen, UINT8 *bmpaddr,
-						 UINT8 apix[3], UINT8 bpix[3], UINT32 pixnuma, UINT32 pixnumb,
-						 UINT8 stl, UINT8 sld, UINT8 selb,
-						 UINT8 bnk, UINT8 rorev, UINT8 eb, UINT8 r, UINT8 delr,
-						 running_machine *machine)
+								UINT8 apix[3], UINT8 bpix[3], UINT32 pixnuma, UINT32 pixnumb,
+								UINT8 stl, UINT8 sld, UINT8 selb,
+								UINT8 bnk, UINT8 rorev, UINT8 eb, UINT8 r, UINT8 delr,
+								running_machine *machine)
 {
 	UINT8 a0 = BIT(apix[0], pixnuma);
 	UINT8 a1 = BIT(apix[1], pixnuma);
@@ -484,7 +504,7 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 		int febc[2] = { 0, 0 };
 
 		/* Road vertical address */
-		if ( BIT(tx1_vregs.h_val, 15) )
+		if (BIT(tx1_vregs.h_val, 15))
 			rva6_0 = 0x7f;
 		else
 			rva6_0 = (~tx1_vregs.h_val >> 7) & 0x7f;
@@ -655,7 +675,7 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 			scrcnt1 = (road1_hcnt >> 5) & 0xf;
 
 			/* Get new pixel data? */
-			if ( !(road0_pcnt & 7) )
+			if (!(road0_pcnt & 7))
 			{
 				TX1_GET_ROADPIX(0);
 
@@ -665,7 +685,7 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 				febr[0] = (scrcnt0 + 2) & 0xc;
 			}
 
-			if ( !(road1_pcnt & 7) )
+			if (!(road1_pcnt & 7))
 			{
 				UINT32 y4 = (road1_hcnt >> 4) & 1;
 				UINT32 temp = (road1_hcnt >> 5) & 0xf;
@@ -693,7 +713,7 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 			}
 
 			/* Road camber/banking */
-			if ( BIT(tx1_vregs.ba_val, 23) )
+			if (BIT(tx1_vregs.ba_val, 23))
 			{
 				bnkls = 1;
 				bnkcs = 1;
@@ -856,21 +876,18 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 	UINT32 offs;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const user3 = memory_region(machine, "user3");
-	const UINT8 *const ic48  = user3;
-	const UINT8 *const ic281 = user3 + 0x2000;
+	const UINT8 *const ic48 = memory_region(machine, "user3");
+	const UINT8 *const ic281 = ic48 + 0x2000;
 
 	const UINT8 *const proms = memory_region(machine, "proms");
-	const UINT8 *const ic25  = proms + 0x1000;
-
-	const UINT8 *const user2 = memory_region(machine, "user2");
-	const UINT8 *const ic106 = user2;
-	const UINT8 *const ic73  = user2 + 0x4000;
-
 	const UINT8 *const ic190 = proms + 0xc00;
 	const UINT8 *const ic162 = proms + 0xe00;
+	const UINT8 *const ic25  = proms + 0x1000;
 
-	const UINT8 *const pixdata_rgn = memory_region(machine, "gfx2");
+	const UINT8 *const ic106 = memory_region(machine, "obj_map");
+	const UINT8 *const ic73  = ic106 + 0x4000;
+
+	const UINT8 *const pixdata_rgn = memory_region(machine, "obj_tiles");
 
 	for (offs = 0x0; offs <= tx1_objram_size; offs += 8)
 	{
@@ -887,14 +904,14 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 		UINT8	code;
 
 		/* Check for end of object list */
-		if ( (tx1_objram[offs] & 0xff00) == 0xff00 )
+		if ((tx1_objram[offs] & 0xff00) == 0xff00)
 			break;
 
 		/* X scale */
 		x_scale = tx1_objram[offs + 2] & 0xff;
 
 		/* TODO: Confirm against hardware? */
-		if ( x_scale == 0 )
+		if (x_scale == 0)
 			continue;
 
 		/* 16-bit y-scale accumulator */
@@ -922,7 +939,7 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 			/* Are we drawing on this line? */
 
 			/* TODO: See big lampposts. */
-			if ( y_scale & 0x8000 )
+			if (y_scale & 0x8000)
 				break;
 
 			{
@@ -945,7 +962,7 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 				ic48_data = ic48[ic48_addr];
 
 				/* Reached the bottom of the object? (/PASS2E) */
-				if ( ic48_data == 0xff )
+				if (ic48_data == 0xff)
 					break;
 
 				/* Combine ROM and PROM data */
@@ -979,9 +996,9 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 						{
 							UINT32 xor_mask;
 
-							if ( BIT(psa0_11, 11) && BIT(psa0_11, 10) )
+							if (BIT(psa0_11, 11) && BIT(psa0_11, 10))
 								xor_mask = 0xf;
-							else if ( BIT(psa0_11, 11) || BIT(psa0_11, 10) || BIT(psa0_11, 9) )
+							else if (BIT(psa0_11, 11) || BIT(psa0_11, 10) || BIT(psa0_11, 9))
 								xor_mask = 0x7;
 							else
 								xor_mask = 0x3;
@@ -993,7 +1010,7 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 
 						ic106_data = ic106[rom_addr2 & 0x3fff];
 
-						if ( (ic106_data & 0x40) && dataend )
+						if ((ic106_data & 0x40) && dataend)
 							lasttile = 1;
 
 						dataend |= ic106_data & 0x40;
@@ -1001,24 +1018,24 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 						/* Retrieve data for an 8x8 tile */
 						ic73_data = ic73[rom_addr2];
 
-						// This is the data from the LUT pair
+						/* This is the data from the LUT pair */
 						lut_data = (ic106_data << 8) | ic73_data;
 						psbb0_12 = lut_data & 0x1fff;
 
 						pscb0_14 = (psbb0_12 & 0xc3f);
 
 						/* Bits 9_6 are from PCTMP11-8 or PSBB9-6 */
-						if ( BIT(psbb0_12, 12) )
+						if (BIT(psbb0_12, 12))
 							pscb0_14 |= psbb0_12 & 0x3c0;
 						else
 							pscb0_14 |= (pctmp0_7 & 0xf) << 6;
 
-						if ( BIT(lut_data, 13) )
-							pscb0_14 |= BIT(psbb0_12, 10) << 12;	// NOT USED
+						if (BIT(lut_data, 13))
+							pscb0_14 |= BIT(psbb0_12, 10) << 12;
 						else
 							pscb0_14 |= ((pctmp0_7 & 0x70) << 8);
 
-						/* Bit 12 is Bit 10 duplicated. */
+						/* Bit 12 is bit 10 duplicated. */
 						pscb0_14 &= ~(1 << 12);
 						pscb0_14 |= BIT(psbb0_12, 10) << 12;
 
@@ -1046,14 +1063,14 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 					}
 
 					/* Draw a pixel? */
-					if ( x < 768 )
+					if (x < 768)
 					{
 						UINT8	pix;
 						UINT8	bit;
 
 						bit	= (x_acc >> FRAC) & 7;
 
-						if ( xflip )
+						if (xflip)
 							bit ^= 7;
 
 						pix = (((data1 >> bit) & 1) << 1) | ((data2 >> bit) & 1);
@@ -1072,14 +1089,13 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 							else
 								color = ~ic162[prom_addr] & 0x3f;
 
-//                          *BITMAP_ADDR16(bitmap, y, x) = machine->pens[TX1_COLORS_OBJ + color];
 							*(bitmap + 768*y + x) = 0x40 | color;
 						}
 					}
 
 					/* Check if we've stepped into a new 8x8 tile */
-					/* TODO */
-					if ( (((x_acc + x_step) >> (FRAC + 3)) & TX1_MASK) != ((x_acc >> (FRAC + 3)) & TX1_MASK) )
+
+					if ((((x_acc + x_step) >> (FRAC + 3)) & TX1_MASK) != ((x_acc >> (FRAC + 3)) & TX1_MASK))
 					{
 						if (lasttile)
 							break;
@@ -1087,13 +1103,13 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 						newtile = 1;
 					}
 
-  					x = (x + 1) & TX1_MASK;
+					x = (x + 1) & TX1_MASK;
 					x_acc += x_step;
 				}
-			}// if (yscale)
+			}
 			y_scale += y_step;
-		} /* for (y) */
-	}/* for (offs) */
+		}
+	}
 }
 
 
@@ -1113,6 +1129,12 @@ VIDEO_START( tx1 )
 	tx1_chr_bmp = auto_malloc(sizeof(UINT8) * 256 * 3 * 240);
 	tx1_obj_bmp = auto_malloc(sizeof(UINT8) * 256 * 3 * 240);
 	tx1_rod_bmp = auto_malloc(sizeof(UINT8) * 256 * 3 * 240);
+
+	/* Set a timer to run the interrupts */
+	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
+
+	/* /CUDISP CRTC interrupt */
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
 }
 
 VIDEO_EOF( tx1 )
@@ -1320,13 +1342,13 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
 {
 	INT32 x, y;
 	UINT32 scroll_x, scroll_y;
-	UINT8 *gfx1, *gfx2;
+	UINT8 *chars, *gfx2;
 	UINT32 total_width;
 	UINT32 x_mask;
 
 	/* 2bpp characters */
-	gfx1 = memory_region(machine, "gfx1");
-	gfx2 = memory_region(machine, "gfx1") + 0x4000;
+	chars = memory_region(machine, "char_tiles");
+	gfx2 = memory_region(machine, "char_tiles") + 0x4000;
 
 	/* X/Y scroll values are the last word in char RAM */
 	if (wide)
@@ -1364,7 +1386,7 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
 				y_offs |= 0xc0;
 		}
 
-		if ( (y_offs >= 64) && (y_offs < 128) )
+		if ((y_offs >= 64) && (y_offs < 128))
 			x_offs = scroll_x;
 		else
 			x_offs = 0;
@@ -1385,7 +1407,7 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
 			tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
 			colour = (ram_val & 0xfc00) >> 8;
 			d0 = *(gfx2 + (tilenum << 3) + y_gran);
-			d1 = *(gfx1 + (tilenum << 3) + y_gran);
+			d1 = *(chars + (tilenum << 3) + y_gran);
 		}
 
 		for (x = 0; x < total_width; ++x)
@@ -1405,7 +1427,7 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
 				tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
 				colour = (ram_val & 0xfc00) >> 8;
 				d0 = *(gfx2 + (tilenum << 3) + y_gran);
-				d1 = *(gfx1 + (tilenum << 3) + y_gran);
+				d1 = *(chars + (tilenum << 3) + y_gran);
 			}
 
 			*bitmap++ = colour |
@@ -1422,7 +1444,7 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
 
   Buggy Boy Road Hardware
 
-  A mega-hack of TX-1 but without the second road.
+  A hacked up version of TX-1 but without the second road.
 
   There are two lists in road/common RAM (double buffered) starting at 0x800
   and 0xa00:
@@ -1446,7 +1468,7 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
   1 : Road list select
   0 : Wall angle enable ('WANGL')
 
-  Road PAL equations:
+  Buggy Boy Jr. Road PAL equations:
 
   http://philwip.mameworld.info/buggyboy/PAL14H4.149.htm
   http://philwip.mameworld.info/buggyboy/PAL14L4.151.htm
@@ -1456,10 +1478,73 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
 
 ***************************************************************************/
 
-static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide)
+void buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld, UINT32 *_rorev,
+						  UINT8 *rc0, UINT8 *rc1, UINT8 *rc2, UINT8 *rc3,
+						  const UINT8 *rom, const UINT8 *prom0, const UINT8 *prom1, const UINT8 *prom2)
 {
-#define X_ADJUST 384
-#define LOAD_HPOS_COUNTER( NUM )												\
+	/* Counter Q10-7 are added to 384 */
+	UINT16 ls283_159 = (ls161 & 0x780) + 128 + (256 * screen);
+	UINT32 ls283_159_co = ls283_159 & 0x800;
+	UINT32 rom_flip = ls283_159 & 0x200 ? 0 : 1;
+	UINT32 rom_en = !(ls283_159 & 0x400) && !(ls283_159_co ^ (ls161 & 0x800));
+	UINT8 d0 = 0;
+	UINT8 d1 = 0;
+
+	/* Latch road reverse bit */
+	*_rorev = !( (rom_en && rom_flip) || (!rom_en && (ls161 & 0x4000)) );
+
+	/* TODO: ROM data is 0xff if not enabled. */
+	if (rom_en)
+	{
+		UINT8  rom_data;
+		UINT16 prom_addr;
+
+		/* 6 bit road horizontal address */
+		UINT16 rha = (ls283_159 & 0x180) | (ls161 & 0x78);
+
+		if (rom_flip)
+			rha ^= 0x1f8;
+
+		/* Get road chunk first */
+		rom_data = rom[(1 << 13) | (rha << 4) | rva0_6];
+		prom_addr = (rom_flip ? 0x80 : 0) | (rom_data & 0x7f);
+
+		*rc0 = prom0[prom_addr];
+		*rc1 = prom1[prom_addr];
+		*rc2 = prom2[prom_addr];
+
+		/* Now get the dirt chunk */
+		rom_data = rom[(rha << 4) | rva0_6];
+		prom_addr = 0x100 | rom_data;
+
+		d0 = prom0[prom_addr];
+		d1 = prom1[prom_addr];
+	}
+	else
+	{
+		/*
+			TODO: When ROM is not enabled, data = 0xff
+			But does anybody care?
+		*/
+		*rc0 = *rc1 = *rc2 = *rc3 = 0;
+	}
+
+	/* The data is mixed by two TZ0314 PALs */
+	if (BIT(sld, 4))
+	{
+		if (BIT(sld, 5))
+			d1 = ~d1;
+
+		*rc3 = d0 & d1;
+
+		if (rom_flip)
+			*rc3 = BITSWAP8(*rc3, 0, 1, 2, 3, 4, 5, 6, 7);
+	}
+	else
+		*rc3 = 0;
+}
+
+#define LOAD_HPOS_COUNTER(NUM)													\
 	ram_val = buggyboy_rcram[(rva_offs + 0x1f8 + (2*NUM)) >> 1];				\
 	rcrs10 = ram_val & 0xfc00 ? 0x0400 : 0x0000;								\
 	hp = vregs.wa8 + ((BIT(ram_val, 15) << 11) | rcrs10 | (ram_val & 0x03ff));	\
@@ -1469,8 +1554,7 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 	hps##NUM##1 = (BIT(hp, 1) || BIT(hp, 2)) && !BIT(hp, 3);					\
 	hps##NUM##2 = BIT(hp, 2);													\
 
-/* Check carry out calc */
-#define UPDATE_HPOS( NUM )				\
+#define UPDATE_HPOS(NUM)				\
 	if (hp##NUM##_en)					\
 	{									\
 		if ((hp##NUM & 0xff) == 0xff)	\
@@ -1479,6 +1563,8 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 			hp##NUM = hp##NUM + 1;		\
 	}									\
 
+static void buggyboy_draw_road(running_machine *machine, UINT8 *bitmap)
+{
 	INT32 x;
 	UINT32 y;
 	UINT16 rva_offs;
@@ -1494,7 +1580,636 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 
 	/* ROM/PROM lookup tables */
 	const UINT8 *rcols = (UINT8*)(memory_region(machine, "proms") + 0x1500);
-	const UINT8 *rom   = memory_region(machine, "gfx6");
+	const UINT8 *rom   = memory_region(machine, "road");
+	const UINT8 *prom0 = rom + 0x4000;
+	const UINT8 *prom1 = rom + 0x4200;
+	const UINT8 *prom2 = rom + 0x4400;
+	const UINT8 *vprom = rom + 0x4600;
+
+	/* Extract constant values */
+	tcmd	 = ((vregs.scol & 0xc000) >> 12) | ((vregs.scol & 0x00c0) >> 6);
+	tnlmd0   = BIT(vregs.flags, BB_RDFLAG_TNLMD0);
+	tnlmd1   = BIT(vregs.flags, BB_RDFLAG_TNLMD1);
+	linf     = BIT(vregs.flags, BB_RDFLAG_LINF);
+	tnlf     = BIT(vregs.flags, BB_RDFLAG_TNLF);
+	wangl    = BIT(vregs.flags, BB_RDFLAG_WANGL);
+	wave0    = BIT(vregs.flags, BB_RDFLAG_WAVE0);
+	wave1    = BIT(vregs.flags, BB_RDFLAG_WAVE1);
+	rva_offs = BIT(vregs.flags, BB_RDFLAG_RVA7) ? 0x800 : 0xc00;
+
+	for (y = 0; y < 240; ++y)
+	{
+		UINT8	rva0_6;
+		UINT8	ram_addr;
+		UINT16	rcrdb0_15;
+		UINT16	rcrs10;
+		UINT16	ls161_156_a;
+		UINT16	ls161;
+		UINT8	sld;
+		UINT32	rva8;
+		UINT32	rm0, rm1;
+		UINT32	rcmd;
+		UINT32	bnkls = 1;
+		UINT32	bnkcs = 1;
+		UINT32	bnkrs = 1;
+
+		UINT32	x_offs;
+		UINT8 sf;
+
+		/* Vertical positions shift register */
+		UINT32	ram_val;
+		UINT32	hp;
+		UINT32	vp1, vp2, vp3, vp4, vp5, vp6, vp7;
+
+		/* Horizontal positions */
+		UINT32	hp0, hp1, hp2, hp3;
+		UINT8	hps00, hps01, hps02;
+		UINT8	hps10, hps11, hps12;
+		UINT8	hps20, hps21, hps22;
+		UINT8	hps30, hps31, hps32;
+
+		/* Road pixel data planes */
+		UINT8	rc0[3] = {0, 0, 0};
+		UINT8	rc1[3] = {0, 0, 0};
+		UINT8	rc2[3] = {0, 0, 0};
+		UINT8	rc3[3] = {0, 0, 0};
+
+		/* Horizontal position counter carry out */
+		UINT8	hp0_cy = 0, hp1_cy = 0, hp2_cy = 0, hp3_cy = 0;
+
+		UINT8	*bmpaddr = bitmap + (y * 256 * 3);
+
+		UINT32	bank_cnt;
+		UINT32	_rorevls = 0;
+		UINT32	_rorevcs = 0;
+		UINT32	_rorevrs = 0;
+
+		UINT32	ic96_o17;
+		UINT32	ic96_term1;
+		UINT32	ic97_o12;
+		UINT32	ic97_o13;
+		UINT32	ic79_p19;
+
+		rva8 = (vregs.h_val & 0x8000) || !(vregs.shift & 0x80);
+
+		/* Get RVA0_6 from TZ113 accumulator chain @ 122/123 */
+		rva0_6 = (vregs.h_val >> 7) & 0x7f;
+
+		/* For /WAVE bit logic later */
+		rva20_6 = ((rva0_6 >> 3) & 0xe) | ((rva0_6 & 2) >> 1);
+
+		/* RVA is inverted! */
+		ram_addr = (~rva0_6 & 0x7f) << 1;
+
+		/* Get the road RAM data for this line */
+		rcrdb0_15 = buggyboy_rcram[(rva_offs + ram_addr) >> 1];
+
+		/* If 15-10 == 000000, then 0 */
+		rcrs10 = rcrdb0_15 & 0xfc00 ? 0x0400 : 0x0000;
+
+		/* If 15-10 == 111111, then 1 */
+		ls161_156_a = (rcrdb0_15 & 0xfc00) == 0xfc00 ? 0x800 : 0x0000;
+
+		/* LS161 15-bit counter chain - loaded with RAM data (bar bits 10-13) */
+		ls161 =  ((rcrdb0_15 & 0x8000) >> 1) | ls161_156_a | rcrs10 | (rcrdb0_15 & 0x03ff);
+
+		/* SLD */
+		sld = (vprom[rva0_6] + vregs.slin) & 0x38;
+
+		/* Determine the x-offset */
+		x_offs = ls161 & 7;
+
+		/* Fill vertical position shift register with bits for this line */
+		/* TODO; cheated slightly to shift stuff up one pixel*/
+		vp1 = buggyboy_rcram[(rva_offs + 0x1e2) >> 1] >= y ? 0 : 1;
+		vp2 = buggyboy_rcram[(rva_offs + 0x1e4) >> 1] >= y ? 0 : 1;
+		vp3 = buggyboy_rcram[(rva_offs + 0x1e6) >> 1] >= y ? 0 : 1;
+		vp4 = buggyboy_rcram[(rva_offs + 0x1e8) >> 1] >= y ? 0 : 1;
+		vp5 = buggyboy_rcram[(rva_offs + 0x1ea) >> 1] >= y ? 0 : 1;
+		vp6 = buggyboy_rcram[(rva_offs + 0x1ec) >> 1] >= y ? 0 : 1;
+		vp7 = buggyboy_rcram[(rva_offs + 0x1ee) >> 1] >= y ? 0 : 1;
+
+		/* Stuff */
+		rm0 = vp7 ? BIT(vregs.scol, 4) : BIT(vregs.scol, 12);
+		rm1 = vp7 ? BIT(vregs.scol, 5) : BIT(vregs.scol, 13);
+
+		/* Wall/tunnel control */
+		rcmd = (vp7 ? vregs.scol : vregs.scol >> 8) & 0xf;
+
+		/* Load 'em up */
+		LOAD_HPOS_COUNTER(0);
+		LOAD_HPOS_COUNTER(1);
+		LOAD_HPOS_COUNTER(2);
+		LOAD_HPOS_COUNTER(3);
+
+		/* Load the bank counter with accumulator bits 14-5 */
+		bank_cnt = (vregs.ba_val >> 5) & 0x3ff;
+
+		/* Have we crossed a road gfx strip boundary? */
+		if (ls161 & 7)
+		{
+			buggyboy_get_roadpix(0, ls161, rva0_6, sld, &_rorevls, &rc0[0], &rc1[0], &rc2[0], &rc3[0], rom, prom0, prom1, prom2);
+			buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0[1], &rc1[1], &rc2[1], &rc3[1], rom, prom0, prom1, prom2);
+			buggyboy_get_roadpix(2, ls161, rva0_6, sld, &_rorevrs, &rc0[2], &rc1[2], &rc2[2], &rc3[2], rom, prom0, prom1, prom2);
+		}
+
+		/* We can evaluate some of the pixel logic outside of the x-loop */
+		ic96_term1 = !tnlf || (vp5 && vp6) || (!vp3 && vp6) || (!vp4 && vp5) || (!vp3 && !vp4);
+		ic96_o17 = (vp3 && vp4) || tnlmd0 || tnlmd1 || !vp1 || !tnlf;
+
+		ic97_o12 = (!vp1 && !vp2 && !vp6) || (!vp1 && !vp2 && vp7) || (vp4 && !vp6) || (vp4 && vp7);
+		ic97_o13 = (!vp1 && !vp2 && !vp5) || (!vp1 && !vp2 && vp7) || (vp3 && !vp5) || (vp3 && vp7);
+
+		ic79_p19 = !(!(vp5 || vp6) || vp7) && !(tnlmd0 || tnlmd1);
+
+		for (x = 0; x < 256; ++x)
+		{
+			UINT32	pix;
+			UINT32	hp0_en, hp1_en, hp2_en, hp3_en;
+
+			UINT32	ic97_o17;
+			UINT32	ic97_o18;
+			UINT32	ic97_o19;
+
+			UINT32	ic96_o14;
+			UINT32	ic96_o15;
+			UINT32	ic96_o16;
+
+			UINT32	ic79_o15;
+			UINT32	ic79_o16;
+			UINT32	ic79_o17;
+
+			UINT32	ic82_o17;
+			UINT32	ic82_o16;
+			UINT32	ic82_o15;
+			UINT32	ic82_o14;
+
+			UINT32	ic80_o17;
+			UINT32	ic80_o16;
+			UINT32	ic80_o15;
+			UINT32	ic80_o14;
+
+			UINT32	ic78_o17;
+			UINT32	ic78_o16;
+			UINT32	ic78_o15;
+			UINT32	ic78_o14;
+
+			UINT32	ic48_o12, ic50_o12, ic52_o12;
+			UINT32	ic48_o16, ic50_o16, ic52_o16;
+			UINT32	ic48_o17, ic50_o17, ic52_o17;
+			UINT32	ic48_o18, ic50_o18, ic52_o18;
+			UINT32	ic48_o19, ic50_o19, ic52_o19;
+
+			UINT32	tmp;
+
+			UINT8	px0[3];
+			UINT8	px1[3];
+			UINT8	px2[3];
+			UINT8	px3[3];
+
+			UINT32 lfsr = vregs.wave_lfsr;
+			UINT32 wave =
+						(wave0 ^ BIT(lfsr, 0))
+						&& (wave1 ^ BIT(lfsr, 3))
+						&& BIT(lfsr, 5)
+						&& !BIT(lfsr, 15)
+						&& BIT(lfsr, 11)
+						&& BIT(lfsr, 13)
+						&& (rva20_6 < ((lfsr >> 8) & 0xf));
+
+
+			/* Strip pixel number */
+			pix = (ls161 & 7) ^ 7;
+
+			/* Horizontal position counter enables - also used as PAL inputs */
+			hp0_en = !(hp0_cy || hps02);
+			hp1_en = !(hp1_cy || hps12);
+			hp2_en = !(hp2_cy || hps22);
+			hp3_en = !(hp3_cy || hps32);
+
+			/* Load in a new road gfx strip? */
+			if (!(ls161 & 7))
+			{
+				buggyboy_get_roadpix(0, ls161, rva0_6, sld, &_rorevls, &rc0[0], &rc1[0], &rc2[0], &rc3[0], rom, prom0, prom1, prom2);
+				buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0[1], &rc1[1], &rc2[1], &rc3[1], rom, prom0, prom1, prom2);
+				buggyboy_get_roadpix(2, ls161, rva0_6, sld, &_rorevrs, &rc0[2], &rc1[2], &rc2[2], &rc3[2], rom, prom0, prom1, prom2);
+			}
+
+			/* Road camber/banking */
+			if (BIT(vregs.ba_val, 23))
+			{
+				bnkls = 1; bnkcs = 1; bnkrs = 1;
+			}
+			else if (vregs.ba_val & 0x007f8000)
+			{
+				bnkls = 0; bnkcs = 0; bnkrs = 0;
+			}
+			else
+			{
+				bnkls = bank_cnt < 0x400;
+				bnkcs = bank_cnt < 0x300;
+				bnkrs = bank_cnt < 0x200;
+			}
+
+			if (vregs.bank_mode)
+			{
+				bnkls ^= 1; bnkcs ^= 1; bnkrs ^= 1;
+			}
+
+			px0[0] = BIT(rc0[0], pix);
+			px1[0] = BIT(rc1[0], pix);
+			px2[0] = BIT(rc2[0], pix);
+			px3[0] = BIT(rc3[0], pix);
+
+			px0[1] = BIT(rc0[1], pix);
+			px1[1] = BIT(rc1[1], pix);
+			px2[1] = BIT(rc2[1], pix);
+			px3[1] = BIT(rc3[1], pix);
+
+			px0[2] = BIT(rc0[2], pix);
+			px1[2] = BIT(rc1[2], pix);
+			px2[2] = BIT(rc2[2], pix);
+			px3[2] = BIT(rc3[2], pix);
+
+			/*
+				Now evaluate the pixel logic for each of the three screens
+
+				TODO: A lot of this could be macrofied to avoid repetition.
+				Shuffling the equations around would squeeze out some extra speed.
+			*/
+
+			/* Left */
+			ic96_o14 =
+			ic96_term1
+			|| (!hp1_en && hps10 && vp4 && !hps20 && !hps21)
+			|| (!hp1_en && hps10 && vp4 && hp2_en && !hps21)
+			|| (!hp1_en && hps10 && vp4 && vp6)
+			|| (hps11 && vp4 && !hps20 && !hps21)
+			|| (hps11 && vp4 && hp2_en && !hps21)
+			|| (vp5 && !hps20 && !hps21)
+			|| (!vp3 && !hps20 && !hps21)
+			|| (vp5 && hp2_en && !hps21)
+			|| (!vp3 && hp2_en && !hps21)
+			|| (!hp1_en && hps10 && !vp4)
+			|| (hps11 && vp4 && vp6)
+			|| (hps11 && !vp4);
+
+			/* Centre */
+			ic96_o15 =
+			ic96_term1
+			|| (hps10 && hps11 && vp4 && hp2_en && !hps20)
+			||(!hp1_en && hps11 && vp4 && hp2_en && !hps20)
+			|| (hps10 && hps11 && vp6)
+			|| (!hp1_en && hps11 && vp6)
+			|| (hps10 && hps11 && vp4 && !hps21)
+			|| (!hp1_en && hps11 && vp4 && !hps21)
+			|| (vp5 && hp2_en && !hps20)
+			|| (!vp3 && hp2_en && !hps20)
+			|| (hps10 && hps11 && !vp4)
+			|| (!hp1_en && hps11 && !vp4)
+			|| (vp5 && !hps21)
+			|| (!vp3 && !hps21);
+
+			/* Right */
+			ic96_o16 =
+			ic96_term1
+			|| (!hp1_en && hps10 && hps11 && vp6)
+			|| (!hp1_en && hps10 && hps11 && !vp4)
+			|| (!hp1_en && hps10 && hps11 && !hps20)
+			|| (!hp1_en && hps10 && hps11 && hp2_en)
+			|| (!hp1_en && hps10 && hps11 && !hps21)
+			|| (vp5 && !hps20)
+			|| (!vp3 && !hps20)
+			|| (vp5 && hp2_en)
+			|| (!vp3 && hp2_en)
+			|| (vp5 && !hps21)
+			|| (!vp3 && !hps21);
+
+			tmp = (!vp1 && !vp2) || (vp2 && vp7);
+			ic97_o17 = tmp || (!hp0_en && hps00 && vp2 && !hps30 && !hps31) || (!hp0_en && hps00 && vp2 && hp3_en && !hps31) || (hps01 && vp2 && !hps30 && !hps31) || (hps01 && vp2 && hp3_en && !hps31);
+			ic97_o18 = tmp || (hps00 && hps01 && vp2 && hp3_en && !hps30) || (!hp0_en && hps01 && vp2 && hp3_en && !hps30) || (hps00 && hps01 && vp2 && !hps31) || (!hp0_en && hps01 && vp2 && !hps31);
+			ic97_o19 = tmp || (!hp0_en && hps00 && hps01 && vp2 && !hps30) || (!hp0_en && hps00 && hps01 && vp2 && hp3_en) || (!hp0_en && hps00 && hps01 && vp2 && !hps31);
+
+
+			/* Left */
+			{
+			UINT32 P4, P6, P7, P18, P19;
+
+			P4 = !(ic96_o16 && ic96_o17 && ic97_o19);
+			P6 = BIT(sld, 3);
+			P7 = (!vp5 && !vp6) || vp7 || !linf;
+			P19 = wangl && bnkls;
+
+			ic78_o17 = (_rorevls && !tnlmd1 && tnlmd0) || (!_rorevls && tnlmd1 && !tnlmd0) || (_rorevls && ic97_o12) || (!_rorevls && ic97_o13);
+			P18 = ic78_o17;
+			ic78_o16 = P7 || (px1[0] && !px0[0] && tnlmd1 && !tnlmd0) || (px2[0] && tnlmd1 && tnlmd0);
+			ic78_o15 = !tnlf || (!P4 && px0[0] && P19) || (!P4 && px1[0] && P19) || (!P4 && P18) || (!P4 && px2[0]);
+			ic78_o14 = !P6 || tnlmd0 || tnlmd1 || P7;
+			}
+
+			/* Centre */
+			{
+			UINT32 P4, P6, P7, P18, P19;
+
+			P4 = !(ic96_o15 && ic96_o17 && ic97_o18);
+			P6 = BIT(sld, 3);
+			P7 = (!vp5 && !vp6) || vp7 || !linf;
+			P19 = wangl && bnkcs;
+
+			ic80_o17 = (_rorevcs && !tnlmd1 && tnlmd0) || (!_rorevcs && tnlmd1 && !tnlmd0) || (_rorevcs && ic97_o12) || (!_rorevcs && ic97_o13);
+			P18 = ic80_o17;
+			ic80_o16 = P7 || (px1[1] && !px0[1] && tnlmd1 && !tnlmd0) || (px2[1] && tnlmd1 && tnlmd0);
+			ic80_o15 = !tnlf || (!P4 && px0[1] && P19) || (!P4 && px1[1] && P19) || (!P4 && P18) || (!P4 && px2[1]);
+			ic80_o14 = !P6 || tnlmd0 || tnlmd1 || P7;
+			}
+
+			/* Right */
+			{
+			UINT32 P4, P6, P7, P18, P19;
+
+			P4 = !(ic96_o14 && ic96_o17 && ic97_o17);
+			P6 = BIT(sld, 3);
+			P7 = (!vp5 && !vp6) || vp7 || !linf;
+			P19 = wangl && bnkrs;
+
+			ic82_o17 = (_rorevrs && !tnlmd1 && tnlmd0) || (!_rorevrs && tnlmd1 && !tnlmd0) || (_rorevrs && ic97_o12) || (!_rorevrs && ic97_o13);
+			P18 = ic82_o17;
+			ic82_o16 = P7 || (px1[2] && !px0[2] && tnlmd1 && !tnlmd0) || (px2[2] && tnlmd1 && tnlmd0);
+			ic82_o15 = !tnlf || (!P4 && px0[2] && P19) || (!P4 && px1[2] && P19) || (!P4 && P18) || (!P4 && px2[2]);
+			ic82_o14 = !P6 || tnlmd0 || tnlmd1 || P7;
+			}
+
+
+			ic79_o17 = (!px2[0] && _rorevls && ic78_o15) || (tnlf && !ic97_o19) || (tnlf && ic79_p19 && px2[0] && ic78_o15);
+			ic79_o16 = (!px2[1] && _rorevcs && ic80_o15) || (tnlf && !ic97_o18) || (tnlf && ic79_p19 && px2[1] && ic80_o15);
+			ic79_o15 = (!px2[2] && _rorevrs && ic82_o15) || (tnlf && !ic97_o17) || (tnlf && ic79_p19 && px2[2] && ic82_o15);
+	
+
+			/* Left */
+			{
+			UINT32 P5,P7, P8;
+			UINT32 rcsd0_3;
+			UINT32 cprom_addr;
+
+			P5 = BIT(tcmd, 3) ? ((!vp5 && !vp6) || vp7 || !linf) : ic78_o16;
+			P7 = BIT(sld, 5);
+			P8 = BIT(sld, 4);
+
+			ic48_o19 = (px2[0] && !rva8) || !bnkls || !P5 || !ic78_o15;
+
+			if (ic48_o19)
+			{
+				ic48_o12 =
+				ic78_o14 &&
+				(
+					(px2[0] && px1[0] && px0[0] && rm1 && !rm0)
+					|| (!px2[0] && px1[0] && px0[0] && !P8 && rm0)
+					|| (px2[0] && px0[0] && !P7 && !rm1 && !rm0)
+					|| (px2[0] && !px1[0] && px0[0] && !P7 && !rm1)
+					|| (px2[0] && px1[0] && px0[0] && !P7 && !P8)
+					|| (px2[0] && px1[0] && px0[0] && !P8 && rm1)
+					|| (!px2[0] && !px3[0] && !rm0)
+					|| (!px1[0] && !px3[0] && rm1)
+					|| (!px2[0] && !px1[0] && !px3[0])
+					|| (rva8)
+					|| (!px0[0] && !px3[0])
+					|| (!ic78_o15)
+					|| (!P5)
+				);
+
+				ic48_o16 = (px2[0] && P5 && rm1) || (P5 && rva8 && ic78_o15) || (!px0[0] && P5) || !ic78_o15;
+				ic48_o17 = (px0[0] && P5 && !rm0 && ic78_o15) || (!px1[0] && P5 && ic78_o15) || (P5 && rva8 && ic78_o15);
+				ic48_o18 = (!px2[0] && P5 && ic78_o15) || (P5 && rva8 && ic78_o15);
+
+				if (vp6 || ic78_o16)
+				{
+					if (!(ic78_o15 && P5))
+						cprom_addr = (tcmd & 0x7) | (ic78_o16 << 3);
+					else
+						cprom_addr = rcmd;
+
+					cprom_addr = (~cprom_addr & 0xf) << 4;
+				}
+				else
+					cprom_addr = 0xf0;
+
+				cprom_addr |= (ic79_o17 << 3) |
+							  (ic48_o18 << 2) |
+							  (ic48_o17 << 1) |
+							  ic48_o16;
+
+				rcsd0_3 = rcols[cprom_addr] & 0xf;
+				*(bmpaddr + 0) = 0x40 | (!wave << 5) | (ic48_o12 << 4) | rcsd0_3;
+			}
+			else
+				*(bmpaddr + 0) = 0;
+			}
+
+			/* Centre */
+			{
+			UINT32 rcsd0_3;
+			UINT32 cprom_addr;
+			UINT32 P5, P7, P8;
+
+			P5 = BIT(tcmd, 3) ? ((!vp5 && !vp6) || vp7 || !linf) : ic80_o16;
+			P7 = BIT(sld, 5);
+			P8 = BIT(sld, 4);
+
+			ic50_o19 = (px2[1] && !rva8) || !bnkcs || !P5 || !ic80_o15;
+
+			if (ic50_o19)
+			{
+				if (ic80_o14)
+					ic50_o12 = 
+					(px2[1] && px1[1] && px0[1] && rm1 && !rm0)
+					|| (!px2[1] && px1[1] && px0[1] && !P8 && rm0)
+					|| (px2[1] && px0[1] && !P7 && !rm1 && !rm0)
+					|| (px2[1] && !px1[1] && px0[1] && !P7 && !rm1)
+					|| (px2[1] && px1[1] && px0[1] && !P7 && !P8)
+					|| (px2[1] && px1[1] && px0[1] && !P8 && rm1)
+					|| (!px2[1] && !px3[1] && !rm0)
+					|| (!px1[1] && !px3[1] && rm1)
+					|| (!px2[1] && !px1[1] && !px3[1])
+					|| (rva8)
+					|| (!px0[1] && !px3[1])
+					|| (!ic80_o15)
+					|| (!P5);
+				else
+					ic50_o12 = 0;
+
+
+				ic50_o16 = (P5 && px2[1] && rm1) || (P5 && rva8 && ic80_o15) || (P5 && !px0[1]) || !ic80_o15;
+				ic50_o17 = (P5 && px0[1] && !rm0 && ic80_o15) || (P5 && !px1[1] && ic80_o15) || (P5 && rva8 && ic80_o15);
+				ic50_o18 = (P5 && !px2[1] && ic80_o15) || (P5 && rva8 && ic80_o15);
+
+				if (vp6 || ic80_o16)
+				{
+					if (!(ic80_o15 && P5))
+						cprom_addr = (tcmd & 0x7) | (ic80_o16 << 3);
+					else
+						cprom_addr = rcmd;
+
+					cprom_addr = ((~cprom_addr) & 0xf) << 4;
+				}
+				else
+					cprom_addr = 0xf0;
+
+				cprom_addr |= (ic79_o16 << 3) |
+							  (ic50_o18 << 2) |
+							  (ic50_o17 << 1) |
+							  ic50_o16;
+
+				rcsd0_3 = rcols[cprom_addr] & 0xf;
+				*(bmpaddr + 256) = 0x40 | (!wave << 5) | (ic50_o12 << 4) | rcsd0_3;
+			}
+			else
+				*(bmpaddr + 256) = 0;
+			}
+
+			/* Right */
+			{
+			UINT32 rcsd0_3;
+			UINT32 cprom_addr;
+			UINT32 P5, P7, P8;
+
+			P5 = BIT(tcmd, 3) ? ((!vp5 && !vp6) || vp7 || !linf) : ic82_o16;
+			P7 = BIT(sld, 5);
+			P8 = BIT(sld, 4);
+
+			ic52_o19 = (px2[2] && !rva8) || !bnkrs || !P5 || !ic82_o15;
+
+			if (ic52_o19)
+			{
+				ic52_o12 =
+				ic82_o14 &&
+				(
+					(px2[2] && px1[2] && px0[2] && rm1 && !rm0)
+					|| (!px2[2] && px1[2] && px0[2] && !P8 && rm0)
+					|| (px2[2] && px0[2] && !P7 && !rm1 && !rm0)
+					|| (px2[2] && !px1[2] && px0[2] && !P7 && !rm1)
+					|| (px2[2] && px1[2] && px0[2] && !P7 && !P8)
+					|| (px2[2] && px1[2] && px0[2] && !P8 && rm1)
+					|| (!px2[2] && !px3[2] && !rm0)
+					|| (!px1[2] && !px3[2] && rm1)
+					|| (!px2[2] && !px1[2] && !px3[2])
+					|| (rva8)
+					|| (!px0[2] && !px3[2])
+					|| (!ic82_o15)
+					|| (!P5)
+				);
+
+				ic52_o16 = (px2[2] && P5 && rm1) || (P5 && rva8 && ic82_o15) || (!px0[2] && P5) || !ic82_o15;
+				ic52_o17 = (px0[2] && P5 && !rm0 && ic82_o15) || (!px1[2] && P5 && ic82_o15) || (P5 && rva8 && ic82_o15);
+				ic52_o18 = (P5 && ic82_o15 && !px2[2]) || (P5 && ic82_o15 && rva8);
+
+				if (vp6 || ic82_o16)
+				{
+					if (!(ic82_o15 && P5))
+						cprom_addr = (tcmd & 0x7) | (ic82_o16 << 3);
+					else
+						cprom_addr = rcmd;
+
+					cprom_addr = (~cprom_addr & 0xf) << 4;
+				}
+				else
+					cprom_addr = 0xf0;
+
+				cprom_addr |= (ic79_o15 << 3) |
+							  (ic52_o18 << 2) |
+							  (ic52_o17 << 1) |
+							  ic52_o16;
+
+				rcsd0_3 = rcols[cprom_addr] & 0xf;
+
+				*(bmpaddr + 512) = 0x40 | (!wave << 5) | (ic52_o12 ? 0x10 : 0) | rcsd0_3;
+			}
+			else
+				*(bmpaddr + 512) = 0;
+			}
+
+			/* Now update counters and whatnot */
+			++bmpaddr;
+
+			UPDATE_HPOS(0);
+			UPDATE_HPOS(1);
+			UPDATE_HPOS(2);
+			UPDATE_HPOS(3);
+
+			/* Update the wave LFSR */
+			vregs.wave_lfsr = (vregs.wave_lfsr << 1) | (BIT(vregs.wave_lfsr, 6) ^ !BIT(vregs.wave_lfsr, 15));
+
+			/* Increment the bank counter */
+			bank_cnt = (bank_cnt + 1) & 0x7ff;
+
+			/* X pos */
+			ls161 = (ls161 + 1) & 0x7fff;
+		}
+
+		/* WANGL active? Update the 8-bit counter */
+		if (wangl)
+		{
+			if (BIT(vregs.flags, BB_RDFLAG_TNLMD0))
+				--vregs.wa8;
+			else
+				++vregs.wa8;
+		}
+
+		/* No carry out - just increment */
+		if (vregs.wa4 != 0xf)
+			++vregs.wa4;
+		else
+		{
+			/* Carry out; increment again on /TMG2S rise */
+			if (wangl)
+			{
+				if (BIT(vregs.flags, BB_RDFLAG_TNLMD0))
+					--vregs.wa8;
+				else
+					++vregs.wa8;
+			}
+			vregs.wa4 = 1;
+		}
+
+		/* Update accumulator */
+		vregs.h_val += vregs.h_inc;
+
+		/* Seems correct */
+		sf = vregs.shift;
+
+		if ((vregs.shift & 0x80) == 0)
+		{
+			vregs.shift <<= 1;
+
+			if ((sf & 0x08) == 0)
+				vregs.shift |= BIT(vregs.h_val, 15);
+		}
+
+		if ((sf & 0x08) && !(vregs.shift & 0x08))
+			vregs.h_inc = vregs.gas;
+
+		/* Finally, increment the banking accumulator */
+		vregs.ba_val = (vregs.ba_val + vregs.ba_inc) & 0x00ffffff;
+	}
+}
+
+static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide)
+{
+	INT32 x;
+	UINT32 y;
+	UINT16 rva_offs;
+	UINT32 tnlmd0;
+	UINT32 tnlmd1;
+	UINT32 linf;
+	UINT32 tnlf;
+	UINT32 wangl;
+	UINT32 tcmd;
+	UINT32 wave0;
+	UINT32 wave1;
+	UINT32 rva20_6;
+
+	/* ROM/PROM lookup tables */
+	const UINT8 *rcols = (UINT8*)(memory_region(machine, "proms") + 0x1500);
+	const UINT8 *rom   = memory_region(machine, "road");
 	const UINT8 *prom0 = rom + 0x4000;
 	const UINT8 *prom1 = rom + 0x4200;
 	const UINT8 *prom2 = rom + 0x4400;
@@ -1526,6 +2241,7 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 		UINT32	bnkcs = 1;
 
 		UINT32	x_offs;
+		UINT8	sf;
 
 		/* Vertical positions shift register */
 		UINT32	ram_val;
@@ -1554,7 +2270,6 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 		UINT8	*bmpaddr = bitmap + (y * 256);
 
 		UINT32	bank_cnt;
-		UINT8	roadpix;
 		UINT32	_rorevcs = 0;
 
 		rva8 = (vregs.h_val & 0x8000) || !(vregs.shift & 0x80);
@@ -1585,7 +2300,6 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 
 		/* Determine the x-offset */
 		x_offs = ls161 & 7;
-		ls161 &= ~7;
 
 		/* Fill vertical position shift register with bits for this line */
 		/* TODO; cheated slightly to shift stuff up one pixel*/
@@ -1619,22 +2333,15 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 		/* Load the bank counter with accumulator bits 14-5 */
 		bank_cnt = (vregs.ba_val >> 5) & 0x3ff;
 
-		bnkcs = 1;
+		/* Have we crossed a road gfx strip boundary? */
+		if (ls161 & 7)
+			buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3, rom, prom0, prom1, prom2);
 
-		for (x = -x_offs; x < 256; ++x)
+		for (x = 0; x < 256; ++x)
 		{
-			UINT16	ls283_159;
-			UINT32	ls283_159_co;
-			UINT16	rha;
-			UINT32	rom_flip;
-			UINT32	rom_en;
 			UINT32	pix;
 			UINT32	hp0_en, hp1_en, hp2_en, hp3_en;
-
-			/* The many PALs */
-
 			UINT32	ic149_o16;
-
 			UINT32	ic4_o18;
 			UINT32	ic3_o15;
 			UINT32	ic150_o12 = 0;
@@ -1645,95 +2352,30 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 			UINT32	ic151_o15;
 			UINT32	ic151_o16;
 			UINT32	ic151_o17;
-
 			UINT32	rcsd0_3 = 0;
-
 			UINT32	sld5 = BIT(sld, 5);
 			UINT32	sld4 = BIT(sld, 4);
 			UINT32	mux;
-
 			UINT32	cprom_addr;
-
 			UINT8	px0, px1, px2, px3;
-
-			/* Counter Q10-7 are added to 384 */
-			ls283_159_co = (ls283_159 = (ls161 & 0x780) + X_ADJUST) & 0x800;
-			rom_flip = ls283_159 & 0x200 ? 0 : 1;
-			rom_en = !(ls283_159 & 0x400) && !(ls283_159_co ^ (ls161 & 0x800));
 
 			/* Strip pixel number */
 			pix = (ls161 & 7) ^ 7;
 
-			/* Horizotnal position counter enables - also used as PAL inputs */
+			/* Horizontal position counter enables - also used as PAL inputs */
 			hp0_en = !(hp0_cy || hps02);
 			hp1_en = !(hp1_cy || hps12);
 			hp2_en = !(hp2_cy || hps22);
 			hp3_en = !(hp3_cy || hps32);
 
-			/* Load in a new road gfx strip */
-			if ( (ls161 & 7) == 0 )
-			{
-				UINT8 d0 = 0;
-				UINT8 d1 = 0;
+			/* Load in a new road gfx strip? */
+			if (!(ls161 & 7))
+				buggyboy_get_roadpix(1, ls161, rva0_6, sld, &_rorevcs, &rc0, &rc1, &rc2, &rc3, rom, prom0, prom1, prom2);
 
-				/* I think it's correct to latch it here */
-				_rorevcs = !( (rom_en && rom_flip) || (!rom_en && (ls161 & 0x4000)) );
-
-				/* TODO: ROM data is 0xff if not enabled. */
-				if (rom_en)
-				{
-					UINT8  rom_data;
-					UINT16 prom_addr;
-
-					/* 6 bit road horizontal address */
-					rha = (ls283_159 & 0x180) | (ls161 & 0x78);
-
-					if (rom_flip)
-						rha ^= 0x1f8;
-
-					/* Get road chunk first */
-					rom_data = rom[(1 << 13) | (rha << 4) | rva0_6];
-					prom_addr = (rom_flip ? 0x80 : 0) | (rom_data & 0x7f);
-
-					rc0 = prom0[prom_addr];
-					rc1 = prom1[prom_addr];
-					rc2 = prom2[prom_addr];
-
-					/* Now get the dirt chunk */
-					rom_data = rom[(rha << 4) | rva0_6];
-					prom_addr = 0x100 | rom_data;
-
-					d0 = prom0[prom_addr];
-					d1 = prom1[prom_addr];
-				}
-				else
-				{
-					/*
-                        TODO: When ROM is not enabled, data = 0xff
-                        But does anybody care?
-                    */
-					rc0 = rc1 = rc2 = rc3 = 0;
-				}
-
-				/* The data is mixed by two TZ0314 PALs */
-				if (BIT(sld, 4))
-				{
-					if (BIT(sld, 5))
-						d1 = ~d1;
-
-					rc3 = d0 & d1;
-
-					if (rom_flip)
-						rc3 = BITSWAP8(rc3, 0, 1, 2, 3, 4, 5, 6, 7);
-				}
-				else
-					rc3 = 0;
-			}
-
-			/* NEW!!!! Road camber */
+			/* Road camber */
 			if (vregs.bank_mode == 0)
 			{
-				if ( BIT(vregs.ba_val, 23) )
+				if (BIT(vregs.ba_val, 23))
 					bnkcs = 1;
 				else if (vregs.ba_val & 0x007f8000)
 					bnkcs = 0;
@@ -1742,7 +2384,7 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 			}
 			else
 			{
-				if ( BIT(vregs.ba_val, 23) )
+				if (BIT(vregs.ba_val, 23))
 					bnkcs = 0;
 				else if (vregs.ba_val & 0x007f8000)
 					bnkcs = 1;
@@ -1755,9 +2397,7 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 			px2 = BIT(rc2, pix);
 			px3 = BIT(rc3, pix);
 
-			/*
-                Uh oh...
-            */
+			/* Now go through and evaluate all the pixel logic */
 			if (vp2)
 				ic4_o18 = (hps00 && hps01 && hp3_en && !hps30)		||
 						  (!hp0_en && hps01 && hp3_en && !hps30)	||
@@ -1790,7 +2430,7 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 							px2							||
 							!tnlf;
 			else
-				ic151_o15 =	!tnlf;
+				ic151_o15 = !tnlf;
 
 			ic151_o16 = (px1 && !px0 && tnlmd1 && !tnlmd0)	||
 						(px2 && tnlmd1 && tnlmd0)			||
@@ -1846,7 +2486,7 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 				{
 					UINT32 ic150_i5 = BIT(tcmd, 3) ? ic149_o15 : ic151_o16;
 
-					if ( !(ic151_o15 && ic150_i5) )
+					if (!(ic151_o15 && ic150_i5))
 						cprom_addr = (tcmd & 0x7) | (ic151_o16 ? 0x08 : 0);
 					else
 						cprom_addr = rcmd;
@@ -1876,55 +2516,49 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 								BIT(lfsr, 13)			&&
 								(rva20_6 < ((lfsr >> 8) & 0xf));
 
-					roadpix = 0x40 | (wave ? 0 : 0x20) | (ic150_o12 ? 0x10 : 0) | rcsd0_3;
+					*bmpaddr++ = 0x40 | (wave ? 0 : 0x20) | (ic150_o12 ? 0x10 : 0) | rcsd0_3;
 				}
 			}
 			else
-				roadpix = 0;
+				*bmpaddr++ = 0;
 
+			/* Update the various horizontal counters */
+			UPDATE_HPOS(0);
+			UPDATE_HPOS(1);
+			UPDATE_HPOS(2);
+			UPDATE_HPOS(3);
 
-			/* Horizontal position counters */
-			if (x >= 0)
-			{
-				*bmpaddr++ = roadpix;
+			/* Update the LFSR */
+			vregs.wave_lfsr = (vregs.wave_lfsr << 1) | (BIT(vregs.wave_lfsr, 6) ^ !BIT(vregs.wave_lfsr, 15));
 
-				UPDATE_HPOS(0);
-				UPDATE_HPOS(1);
-				UPDATE_HPOS(2);
-				UPDATE_HPOS(3);
-
-				/* Update the LFSR */
-				vregs.wave_lfsr = (vregs.wave_lfsr << 1) | (BIT(vregs.wave_lfsr, 6) ^ !BIT(vregs.wave_lfsr, 15));
-
-				/* Increment the bank counter */
-				bank_cnt = (bank_cnt + 1) & 0x7ff;
-			}
+			/* Increment the bank counter */
+			bank_cnt = (bank_cnt + 1) & 0x7ff;
 
 			/* X pos */
 			ls161 = (ls161 + 1) & 0x7fff;
 		}
 
-		/* WANGL active? Update the 8-bit counter */
-		if ( wangl )
+		/* WANGL active? Then update the 8-bit counter */
+		if (wangl)
 		{
-			if ( BIT(vregs.flags, BB_RDFLAG_TNLMD0) )
-				vregs.wa8 -= 1;
+			if (BIT(vregs.flags, BB_RDFLAG_TNLMD0))
+				--vregs.wa8;
 			else
-				vregs.wa8 += 1;
+				++vregs.wa8;
 		}
 
 		/* No carry out - just increment */
-		if ( vregs.wa4 != 0xf )
-			vregs.wa4 += 1;
+		if (vregs.wa4 != 0xf)
+			++vregs.wa4;
 		else
 		{
 			/* Carry out; increment again on /TMG2S rise */
-			if ( wangl )
+			if (wangl)
 			{
-				if ( BIT(vregs.flags, BB_RDFLAG_TNLMD0) )
-					vregs.wa8 -= 1;
+				if (BIT(vregs.flags, BB_RDFLAG_TNLMD0))
+					--vregs.wa8;
 				else
-					vregs.wa8 += 1;
+					++vregs.wa8;
 			}
 			vregs.wa4 = 1;
 		}
@@ -1933,24 +2567,22 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 		vregs.h_val += vregs.h_inc;
 
 		/* Seems correct */
+		sf = vregs.shift;
+
+		if ((vregs.shift & 0x80) == 0)
 		{
-			UINT8 sf = vregs.shift;
+			vregs.shift <<= 1;
 
-			if ((vregs.shift & 0x80) == 0)
-			{
-				vregs.shift <<= 1;
-
-				if ((sf & 0x08) == 0)
-					vregs.shift |= BIT(vregs.h_val, 15);
-			}
-
-			if ((sf & 0x08) && !(vregs.shift & 0x08))
-				vregs.h_inc = vregs.gas;
+			if ((sf & 0x08) == 0)
+				vregs.shift |= BIT(vregs.h_val, 15);
 		}
+
+		if ((sf & 0x08) && !(vregs.shift & 0x08))
+			vregs.h_inc = vregs.gas;
 
 		/* Finally, increment the banking accumulator */
 		vregs.ba_val = (vregs.ba_val + vregs.ba_inc) & 0x00ffffff;
-		}
+	}
 }
 
 
@@ -1987,21 +2619,21 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 	UINT32 x_stride;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const bug13  = (UINT8*)memory_region(machine, "user3");
-	const UINT8 *const bug18s = (UINT8*)memory_region(machine, "user3") + 0x2000;
+	const UINT8 *const bug13  = (UINT8*)memory_region(machine, "obj_luts");
+	const UINT8 *const bug18s = bug13 + 0x2000;
 	const UINT8 *const bb8    = (UINT8*)memory_region(machine, "proms") + 0x1600;
 
-	const UINT8 *const bug16s = (UINT8*)memory_region(machine, "user2");
-	const UINT8 *const bug17s = (UINT8*)memory_region(machine, "user2") + 0x8000;
+	const UINT8 *const bug16s = (UINT8*)memory_region(machine, "obj_map");
+	const UINT8 *const bug17s = bug16s + 0x8000;
 
 	const UINT8 *const bb9o = (UINT8*)memory_region(machine, "proms") + 0x500;
-	const UINT8 *const bb9e = (UINT8*)memory_region(machine, "proms") + 0xd00;
+	const UINT8 *const bb9e = bb9o + 0x800;
 
-	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, "gfx2");
+	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, "obj_tiles");
 
 	if (wide)
 	{
-		x_mask = 0x7ff; // ???????
+		x_mask = 0x7ff;
 		x_stride = 768;
 	}
 	else
@@ -2025,14 +2657,14 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 		UINT8	code;
 
 		/* Check for end of object list */
-		if ( (buggyboy_objram[offs] & 0xff00) == 0xff00 )
+		if ((buggyboy_objram[offs] & 0xff00) == 0xff00)
 			break;
 
 		/* X scale */
 		x_scale = buggyboy_objram[offs + 2] & 0xff;
 
 		/* TODO: Confirm against hardware? */
-		if ( x_scale == 0 )
+		if (x_scale == 0)
 			continue;
 
 		/* 16-bit y-scale accumulator */
@@ -2051,9 +2683,6 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 		/* Add 1 to account for line buffering */
 		y = (buggyboy_objram[offs] >> 8) + 1;
 
-		if (code == 0xa8)
-			code = 0xa8;
-
 		for (; y < 240; ++y)
 		{
 			UINT32	rom_addr2	= 0;
@@ -2063,7 +2692,7 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 			/* Are we drawing on this line? */
 
 			// TODO: See big lampposts.
-			if ( y_scale & 0x8000 )
+			if (y_scale & 0x8000)
 				break;
 
 			{
@@ -2118,18 +2747,18 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 						UINT32	low_addr = ((x_acc >> (FRAC + 3)) & x_mask);
 
 						/*
-                            Objects are grouped by width (either 16, 8 or 4 tiles) in
-                            the LUT ROMs. The ROM address lines therefore indicate
-                            width and are used to determine the correct scan order
-                            when x-flip is set.
-                        */
+							Objects are grouped by width (either 16, 8 or 4 tiles) in
+							the LUT ROMs. The ROM address lines therefore indicate
+							width and are used to determine the correct scan order
+							when x-flip is set.
+						*/
 						if (gxflip)
 						{
 							UINT32	xor_mask;
 
-							if	( BIT(psa0_12, 11) || !BIT(psa0_12, 12) )
+							if (BIT(psa0_12, 11) || !BIT(psa0_12, 12))
 								xor_mask = 0xf;
-							else if	( !BIT(psa0_12, 9) )
+							else if (!BIT(psa0_12, 9))
 								xor_mask = 0x7;
 							else
 								xor_mask = 0x3;
@@ -2147,7 +2776,7 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 						dataend |= (bug17s_data & 0x40);
 
 						/* Retrieve data for an 8x8 tile */
-						bug16s_data = bug16s[rom_addr2];
+						bug16s_data = bug16s[rom_addr2 & 0x7fff];
 						psbb0_15 = (bug17s_data << 8) | bug16s_data;
 						psbb6_7 = (BIT(psbb0_15, 12) ? psbb0_15 : (pctmp0_7 << 6)) & 0xc0;
 
@@ -2157,7 +2786,6 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 						/* Choose from one of three banks */
 						rombank = ((BIT(pctmp0_7, 4) << 1) | BIT(psbb0_15, 13)) & 3;
 
-						/* TODO: Remember to put all the data into one GFX region */
 						romptr = (UINT8*)(pixdata_rgn + rombank * (0x8000 * 2));
 
 						/* Get raw 8x8 pixel row data */
@@ -2194,7 +2822,7 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 						pix = (((data1 >> bit) & 1) << 1) | ((data2 >> bit) & 1);
 
 						/* Write the pixel if not transparent */
-						if ( !(!(opcd0_11 & 0x80) && !pix) )
+						if (!(!(opcd0_11 & 0x80) && !pix))
 						{
 							UINT8 color;
 							UINT32 bb9_addr;
@@ -2213,7 +2841,7 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 					}
 
 					/* Check if we've stepped into a new 8x8 tile */
-					if ( (((x_acc + x_step) >> (FRAC + 3)) & x_mask) != ((x_acc >> (FRAC + 3)) & x_mask) )
+					if ((((x_acc + x_step) >> (FRAC + 3)) & x_mask) != ((x_acc >> (FRAC + 3)) & x_mask))
 					{
 						if (lasttile)
 							break;
@@ -2329,7 +2957,7 @@ WRITE16_HANDLER( buggyboy_sky_w )
 
 WRITE16_HANDLER( buggyboy_slincs_w )
 {
-	if ( offset == 1 )
+	if (offset == 1)
 		vregs.slin_inc = data;
 	else
 		vregs.slin_inc = vregs.slin = 0;
@@ -2420,6 +3048,12 @@ VIDEO_START( buggyboy )
 	bb_chr_bmp = auto_malloc(sizeof(UINT8) * 3 * 256 * 240);
 	bb_obj_bmp = auto_malloc(sizeof(UINT8) * 3 * 256 * 240);
 	bb_rod_bmp = auto_malloc(sizeof(UINT8) * 3 * 256 * 240);
+
+	/* Set a timer to run the interrupts */
+	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
+
+	/* /CUDISP CRTC interrupt */
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
 }
 
 VIDEO_START( buggybjr )
@@ -2428,6 +3062,12 @@ VIDEO_START( buggybjr )
 	bb_chr_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
 	bb_obj_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
 	bb_rod_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
+
+	/* Set a timer to run the interrupts */
+	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
+
+	/* /CUDISP CRTC interrupt */
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
 }
 
 VIDEO_EOF( buggyboy )
@@ -2452,7 +3092,7 @@ VIDEO_UPDATE( buggyboy )
 		memset(bb_rod_bmp, 0, 768*240);
 
 		buggyboy_draw_char(screen->machine, bb_chr_bmp, 1);
-//      buggyboy_draw_road(screen->machine, bb_rod_bmp, 1);
+		buggyboy_draw_road(screen->machine, bb_rod_bmp);
 		buggyboy_draw_objs(screen->machine, bb_obj_bmp, 1);
 
 		bb_combine_layers(screen->machine, bitmap, 0);
