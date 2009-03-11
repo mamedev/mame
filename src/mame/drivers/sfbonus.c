@@ -10,6 +10,10 @@ Notes:
 - The code to handle the 'multple' reel layers is dubious.  rowscroll values are always used
   based on only one of the tilemaps displayed in that screen region.
 
+- There are still priority bugs in Tiger Hook, I thuoght I'd fixed these by doing the single
+  pass rendering of the reels, but they seem to have been reintroduced somehow, needs further
+  investigation
+  
 - Inputs not done, Lamps not done
 
 - Printer busy errors, Hopper timeout errors
@@ -819,9 +823,19 @@ static NVRAM_HANDLER( sfbonus )
 	else
 	{
 		if (file)
-			mame_fread(file,nvram,nvram_size);
-		else
+		{
 			memset(nvram,0x00,nvram_size);
+			mame_fread(file,nvram,nvram_size);
+		}
+		else
+		{
+			UINT8* defaultram = memory_region(machine, "defaults");
+			memset(nvram,0x00,nvram_size);		
+			
+			if (defaultram)
+				if ((defaultram[0x02]==0x00) && (defaultram[0x03]==0x00)) // hack! rom region optional regions get cleared with garbage if no rom is present, this is not good!
+					memcpy(nvram, memory_region(machine, "defaults"), memory_region_length(machine, "defaults"));
+		}
 	}
 }
 
@@ -831,7 +845,7 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_CPU_PROGRAM_MAP(0,sfbonus_map)
 	MDRV_CPU_IO_MAP(0,sfbonus_io)
 	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
-//  MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
+	//MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
 
 	MDRV_MACHINE_RESET( sfbonus )
 
@@ -909,6 +923,9 @@ ROM_START( sfbonusb )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "skfbrom5a.bin", 0x00000, 0x80000, CRC(ed07a635) SHA1(a31ee06d8cb78c43affa9d899e9cec87a0875934) )
 	ROM_LOAD16_BYTE( "skfbrom6a.bin", 0x00001, 0x80000, CRC(b9a39e5a) SHA1(cb875db25d8bccf48542bd6dbecc474b1205563b) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "skfb19rb.id", 0x00, 0x20, CRC(fc9c8ef9) SHA1(402eed23f820f09b18feca60cc90196e7c43db39) )
 ROM_END
 
 ROM_START( sfbonusd )
@@ -925,6 +942,9 @@ ROM_START( sfbonusd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "skfbrom5a.bin", 0x00000, 0x80000, CRC(ed07a635) SHA1(a31ee06d8cb78c43affa9d899e9cec87a0875934) )
 	ROM_LOAD16_BYTE( "skfbrom6a.bin", 0x00001, 0x80000, CRC(b9a39e5a) SHA1(cb875db25d8bccf48542bd6dbecc474b1205563b) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "skfb19r.id", 0x00, 0x20, CRC(431bc668) SHA1(10d0d96b3b50faa56f0a958449a7ad1d1f2c1382) )
 ROM_END
 
 ROM_START( sfbonusv )
@@ -941,6 +961,9 @@ ROM_START( sfbonusv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "skfbrom5a.bin", 0x00000, 0x80000, CRC(ed07a635) SHA1(a31ee06d8cb78c43affa9d899e9cec87a0875934) )
 	ROM_LOAD16_BYTE( "skfbrom6a.bin", 0x00001, 0x80000, CRC(b9a39e5a) SHA1(cb875db25d8bccf48542bd6dbecc474b1205563b) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "skfb19r.id", 0x00, 0x20, CRC(431bc668) SHA1(10d0d96b3b50faa56f0a958449a7ad1d1f2c1382) )
 ROM_END
 
 
@@ -974,6 +997,9 @@ ROM_START( parrot3b )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "p4rom5.bin", 0x00000, 0x80000, CRC(34a00b25) SHA1(a0bf3b6a40b73e69d790d0f36d12de4851411995) )
 	ROM_LOAD16_BYTE( "p4rom6.bin", 0x00001, 0x80000, CRC(4b9f30a6) SHA1(c6aac500085225d1684533dc765c6c5461a7e652) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "p4p26r_.id", 0x00, 0x20, CRC(ed815a5a) SHA1(dd2ff09025567725b047ca3750b76248d5eb2682) )		
 ROM_END
 
 ROM_START( parrot3d )
@@ -990,6 +1016,9 @@ ROM_START( parrot3d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "p4rom5.bin", 0x00000, 0x80000, CRC(34a00b25) SHA1(a0bf3b6a40b73e69d790d0f36d12de4851411995) )
 	ROM_LOAD16_BYTE( "p4rom6.bin", 0x00001, 0x80000, CRC(4b9f30a6) SHA1(c6aac500085225d1684533dc765c6c5461a7e652) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "p4p26r.id", 0x00, 0x20, CRC(0cd529ee) SHA1(c473d82a7e7255df057dcc78f9e00ebfceee6f09) )	
 ROM_END
 
 ROM_START( parrot3v )
@@ -1006,6 +1035,9 @@ ROM_START( parrot3v )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "p4rom5.bin", 0x00000, 0x80000, CRC(34a00b25) SHA1(a0bf3b6a40b73e69d790d0f36d12de4851411995) )
 	ROM_LOAD16_BYTE( "p4rom6.bin", 0x00001, 0x80000, CRC(4b9f30a6) SHA1(c6aac500085225d1684533dc765c6c5461a7e652) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "p4p26e.id", 0x00, 0x20, CRC(af6ee199) SHA1(e5cebc2a182f70366834390c64e9a2576b2cf4d2) )		
 ROM_END
 
 ROM_START( parrot3v2 )
@@ -1022,6 +1054,9 @@ ROM_START( parrot3v2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "p4rom5.bin", 0x00000, 0x80000, CRC(34a00b25) SHA1(a0bf3b6a40b73e69d790d0f36d12de4851411995) )
 	ROM_LOAD16_BYTE( "p4rom6.bin", 0x00001, 0x80000, CRC(4b9f30a6) SHA1(c6aac500085225d1684533dc765c6c5461a7e652) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "p4p26r.id", 0x00, 0x20, CRC(0cd529ee) SHA1(c473d82a7e7255df057dcc78f9e00ebfceee6f09) )	
 ROM_END
 
 ROM_START( hldspin1 )
@@ -1032,7 +1067,7 @@ ROM_START( hldspin1 )
 	ROM_LOAD( "hs_2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "hs1_3.bin", 0x00000, 0x40000, CRC(85a016cb) SHA1(abb32c0191a531706593088b2ecfb48ceb02a127)  )
+	ROM_LOAD16_BYTE( "hs1_3.bin", 0x00000, 0x40000, CRC(85a016cb) SHA1(abb32c0191a531706593088b2ecfb48ceb02a127) )
 	ROM_LOAD16_BYTE( "hs1_4.bin", 0x00001, 0x40000, CRC(4313c099) SHA1(620452ac607b044ce4c8a5a7b03bc831125c81eb) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
@@ -1048,12 +1083,15 @@ ROM_START( hldspin1b )
 	ROM_LOAD( "hs_2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "hs1_3.bin", 0x00000, 0x40000, CRC(85a016cb) SHA1(abb32c0191a531706593088b2ecfb48ceb02a127)  )
+	ROM_LOAD16_BYTE( "hs1_3.bin", 0x00000, 0x40000, CRC(85a016cb) SHA1(abb32c0191a531706593088b2ecfb48ceb02a127) )
 	ROM_LOAD16_BYTE( "hs1_4.bin", 0x00001, 0x40000, CRC(4313c099) SHA1(620452ac607b044ce4c8a5a7b03bc831125c81eb) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "hs_5.bin", 0x00000, 0x40000, CRC(09931910) SHA1(cac792f7c67d0ea274ecb369cef0554a033e8d88) )
 	ROM_LOAD16_BYTE( "hs_6.bin", 0x00001, 0x40000, CRC(801703e4) SHA1(7da822b03a6d4f53a49bb1fedc9e1262d8a84782) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "hsi27t_.id", 0x00, 0x20, CRC(f42e2f6c) SHA1(ae6c85b2f6419cdde6d7e074ef2feff7e6d8f9b6) )		
 ROM_END
 
 ROM_START( hldspin1d )
@@ -1064,12 +1102,15 @@ ROM_START( hldspin1d )
 	ROM_LOAD( "hs_2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "hs1_3.bin", 0x00000, 0x40000, CRC(85a016cb) SHA1(abb32c0191a531706593088b2ecfb48ceb02a127)  )
+	ROM_LOAD16_BYTE( "hs1_3.bin", 0x00000, 0x40000, CRC(85a016cb) SHA1(abb32c0191a531706593088b2ecfb48ceb02a127) )
 	ROM_LOAD16_BYTE( "hs1_4.bin", 0x00001, 0x40000, CRC(4313c099) SHA1(620452ac607b044ce4c8a5a7b03bc831125c81eb) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "hs_5.bin", 0x00000, 0x40000, CRC(09931910) SHA1(cac792f7c67d0ea274ecb369cef0554a033e8d88) )
 	ROM_LOAD16_BYTE( "hs_6.bin", 0x00001, 0x40000, CRC(801703e4) SHA1(7da822b03a6d4f53a49bb1fedc9e1262d8a84782) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "hsi27t.id", 0x00, 0x20, CRC(c3761302) SHA1(c2253092425650cf99098dbc8fd96966b5726a90) )		
 ROM_END
 
 ROM_START( hldspin1v )
@@ -1080,12 +1121,15 @@ ROM_START( hldspin1v )
 	ROM_LOAD( "hs_2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "hs1_3.bin", 0x00000, 0x40000, CRC(85a016cb) SHA1(abb32c0191a531706593088b2ecfb48ceb02a127)  )
+	ROM_LOAD16_BYTE( "hs1_3.bin", 0x00000, 0x40000, CRC(85a016cb) SHA1(abb32c0191a531706593088b2ecfb48ceb02a127) )
 	ROM_LOAD16_BYTE( "hs1_4.bin", 0x00001, 0x40000, CRC(4313c099) SHA1(620452ac607b044ce4c8a5a7b03bc831125c81eb) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "hs_5.bin", 0x00000, 0x40000, CRC(09931910) SHA1(cac792f7c67d0ea274ecb369cef0554a033e8d88) )
 	ROM_LOAD16_BYTE( "hs_6.bin", 0x00001, 0x40000, CRC(801703e4) SHA1(7da822b03a6d4f53a49bb1fedc9e1262d8a84782) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "hsi27t.id", 0x00, 0x20, CRC(c3761302) SHA1(c2253092425650cf99098dbc8fd96966b5726a90) )		
 ROM_END
 
 ROM_START( hldspin2 )
@@ -1118,6 +1162,9 @@ ROM_START( hldspin2b )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "hs_5.bin", 0x00000, 0x40000, CRC(09931910) SHA1(cac792f7c67d0ea274ecb369cef0554a033e8d88) )
 	ROM_LOAD16_BYTE( "hs_6.bin", 0x00001, 0x40000, CRC(801703e4) SHA1(7da822b03a6d4f53a49bb1fedc9e1262d8a84782) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "hsii28r_.id", 0x00, 0x20, CRC(a3aef393) SHA1(c21c425e598fb01b151bb37bc16791e26c96c021) )			
 ROM_END
 
 ROM_START( hldspin2d )
@@ -1134,6 +1181,9 @@ ROM_START( hldspin2d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "hs_5.bin", 0x00000, 0x40000, CRC(09931910) SHA1(cac792f7c67d0ea274ecb369cef0554a033e8d88) )
 	ROM_LOAD16_BYTE( "hs_6.bin", 0x00001, 0x40000, CRC(801703e4) SHA1(7da822b03a6d4f53a49bb1fedc9e1262d8a84782) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "hsii28r.id", 0x00, 0x20, CRC(ee237c53) SHA1(30b2cf73256a1815936cbb7147ea9d0bd2150a93) )		
 ROM_END
 
 ROM_START( hldspin2v )
@@ -1150,6 +1200,9 @@ ROM_START( hldspin2v )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "hs_5.bin", 0x00000, 0x40000, CRC(09931910) SHA1(cac792f7c67d0ea274ecb369cef0554a033e8d88) )
 	ROM_LOAD16_BYTE( "hs_6.bin", 0x00001, 0x40000, CRC(801703e4) SHA1(7da822b03a6d4f53a49bb1fedc9e1262d8a84782) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "hsii28r.id", 0x00, 0x20, CRC(ee237c53) SHA1(30b2cf73256a1815936cbb7147ea9d0bd2150a93) )			
 ROM_END
 
 ROM_START( pickwin )
@@ -1198,6 +1251,9 @@ ROM_START( pickwinb )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pw-5.bin", 0x00000, 0x40000, CRC(ec2ac284) SHA1(35cfab27db3740823b3cba821bd178d28e0be5f8) )
 	ROM_LOAD16_BYTE( "pw-6.bin", 0x00001, 0x40000, CRC(aba36d00) SHA1(5abb1fe7d4f212fa0f7d5314f76e7c6b07e6c4bb) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pw28t_.id", 0x00, 0x20, CRC(5cea03d7) SHA1(421afef36be9228a87bf81d8df001a91f6c9ec98) )		
 ROM_END
 
 ROM_START( pickwinb2 )
@@ -1214,6 +1270,9 @@ ROM_START( pickwinb2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pw-5.bin", 0x00000, 0x40000, CRC(ec2ac284) SHA1(35cfab27db3740823b3cba821bd178d28e0be5f8) )
 	ROM_LOAD16_BYTE( "pw-6.bin", 0x00001, 0x40000, CRC(aba36d00) SHA1(5abb1fe7d4f212fa0f7d5314f76e7c6b07e6c4bb) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pw29r_.id", 0x00, 0x20, CRC(f3903673) SHA1(e8ab992fcc19e271b141d6e3233db3fb0a1f6181) )			
 ROM_END
 
 ROM_START( pickwind )
@@ -1223,8 +1282,6 @@ ROM_START( pickwind )
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "pw-2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
-
-
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "pw-3.bin", 0x00000, 0x40000, CRC(9a27acbd) SHA1(3a3a6d0b5f6eeeebcb2ccaff773b8971b3bfd3c7) )
 	ROM_LOAD16_BYTE( "pw-4.bin", 0x00001, 0x40000, CRC(6b629619) SHA1(3842a7579f67866aa9744b0d6fa6a47c923be6fe) )
@@ -1232,6 +1289,9 @@ ROM_START( pickwind )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pw-5.bin", 0x00000, 0x40000, CRC(ec2ac284) SHA1(35cfab27db3740823b3cba821bd178d28e0be5f8) )
 	ROM_LOAD16_BYTE( "pw-6.bin", 0x00001, 0x40000, CRC(aba36d00) SHA1(5abb1fe7d4f212fa0f7d5314f76e7c6b07e6c4bb) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pw28t.id", 0x00, 0x20, CRC(9f6dbd2a) SHA1(56cb91bffc45000c0f600bdc55b98e464a041be3) )		
 ROM_END
 
 ROM_START( pickwind2 )
@@ -1248,6 +1308,9 @@ ROM_START( pickwind2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pw-5.bin", 0x00000, 0x40000, CRC(ec2ac284) SHA1(35cfab27db3740823b3cba821bd178d28e0be5f8) )
 	ROM_LOAD16_BYTE( "pw-6.bin", 0x00001, 0x40000, CRC(aba36d00) SHA1(5abb1fe7d4f212fa0f7d5314f76e7c6b07e6c4bb) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pw29r.id", 0x00, 0x20, CRC(4e79a0ee) SHA1(941d94da4f4bf40fb1c851b032ebb1d7f4241efb) )		
 ROM_END
 
 ROM_START( pickwinv )
@@ -1264,6 +1327,9 @@ ROM_START( pickwinv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pw-5.bin", 0x00000, 0x40000, CRC(ec2ac284) SHA1(35cfab27db3740823b3cba821bd178d28e0be5f8) )
 	ROM_LOAD16_BYTE( "pw-6.bin", 0x00001, 0x40000, CRC(aba36d00) SHA1(5abb1fe7d4f212fa0f7d5314f76e7c6b07e6c4bb) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pw28t.id", 0x00, 0x20, CRC(9f6dbd2a) SHA1(56cb91bffc45000c0f600bdc55b98e464a041be3) )
 ROM_END
 
 ROM_START( pickwinv2 )
@@ -1273,7 +1339,6 @@ ROM_START( pickwinv2 )
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "pw-2.bin", 0x00000, 0x40000, CRC(3b0f5374) SHA1(7e7b185b62d1a321e2853b4b08e8ee2aa54933f5) )
 
-
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "pw-3.bin", 0x00000, 0x40000, CRC(9a27acbd) SHA1(3a3a6d0b5f6eeeebcb2ccaff773b8971b3bfd3c7) )
 	ROM_LOAD16_BYTE( "pw-4.bin", 0x00001, 0x40000, CRC(6b629619) SHA1(3842a7579f67866aa9744b0d6fa6a47c923be6fe) )
@@ -1281,6 +1346,9 @@ ROM_START( pickwinv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pw-5.bin", 0x00000, 0x40000, CRC(ec2ac284) SHA1(35cfab27db3740823b3cba821bd178d28e0be5f8) )
 	ROM_LOAD16_BYTE( "pw-6.bin", 0x00001, 0x40000, CRC(aba36d00) SHA1(5abb1fe7d4f212fa0f7d5314f76e7c6b07e6c4bb) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pw29e.id", 0x00, 0x20, CRC(3a412685) SHA1(2c650d20dcf4f05154a9e589865d90496bbf4192) )
 ROM_END
 
 ROM_START( pickwinv3 )
@@ -1297,6 +1365,9 @@ ROM_START( pickwinv3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pw-5.bin", 0x00000, 0x40000, CRC(ec2ac284) SHA1(35cfab27db3740823b3cba821bd178d28e0be5f8) )
 	ROM_LOAD16_BYTE( "pw-6.bin", 0x00001, 0x40000, CRC(aba36d00) SHA1(5abb1fe7d4f212fa0f7d5314f76e7c6b07e6c4bb) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pw29r.id", 0x00, 0x20, CRC(4e79a0ee) SHA1(941d94da4f4bf40fb1c851b032ebb1d7f4241efb) )	
 ROM_END
 
 ROM_START( tighook )
@@ -1313,6 +1384,9 @@ ROM_START( tighook )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "thk17t.id", 0x00, 0x20, CRC(2732964b) SHA1(1a72804d993ec05bb92693a6bc1d3253a8f1ada0) )
 ROM_END
 
 ROM_START( tighooka )
@@ -1329,6 +1403,10 @@ ROM_START( tighooka )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "thk17r.id", 0x00, 0x20, CRC(4766771f) SHA1(9436d647dddc793cc373b1e45163f5af34d025b8) )
+
 ROM_END
 
 
@@ -1347,6 +1425,9 @@ ROM_START( tighookc )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "thk21r.id", 0x00, 0x20, CRC(6d92c0ad) SHA1(1f1be92bcbdda461f6d36382d72af389f767d63d) )
 ROM_END
 
 ROM_START( tighookc2 )
@@ -1363,6 +1444,9 @@ ROM_START( tighookc2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "thk20lt.id", 0x00, 0x20, CRC(042cd62e) SHA1(1d145001ddbab44dee055d8dea72426a95150922) )		
 ROM_END
 
 ROM_START( tighookv )
@@ -1379,6 +1463,9 @@ ROM_START( tighookv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "thk21r.id", 0x00, 0x20, CRC(6d92c0ad) SHA1(1f1be92bcbdda461f6d36382d72af389f767d63d) )
 ROM_END
 
 ROM_START( tighookv2 )
@@ -1395,6 +1482,9 @@ ROM_START( tighookv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+
+	ROM_REGION( 0x20, "defaults", ROMREGION_ERASE00 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "thk21e.id", 0x00, 0x20, CRC(cfeb62ed) SHA1(2e8032736b1b450a03ee21ba407494c273399a60) )
 ROM_END
 
 ROM_START( tighookv3 )
@@ -1411,6 +1501,9 @@ ROM_START( tighookv3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "thk20lt.id", 0x00, 0x20, CRC(042cd62e) SHA1(1d145001ddbab44dee055d8dea72426a95150922) )		
 ROM_END
 
 ROM_START( tighookd )
@@ -1427,6 +1520,9 @@ ROM_START( tighookd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "thk21r.id", 0x00, 0x20, CRC(6d92c0ad) SHA1(1f1be92bcbdda461f6d36382d72af389f767d63d) )	
 ROM_END
 
 ROM_START( tighookd2 )
@@ -1443,6 +1539,9 @@ ROM_START( tighookd2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "thkrom5.bin", 0x00000, 0x80000, CRC(4085e345) SHA1(38c8e4727a782630527141e1586fcceff1d07d76) )
 	ROM_LOAD16_BYTE( "thkrom6.bin", 0x00001, 0x80000, CRC(637695ff) SHA1(a5707b545968ac9d41c1a4ffd4de60a9df4bcbf1) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "thk20lt.id", 0x00, 0x20, CRC(042cd62e) SHA1(1d145001ddbab44dee055d8dea72426a95150922) )	
 ROM_END
 
 ROM_START( robadv )
@@ -1459,6 +1558,9 @@ ROM_START( robadv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "rarom5.bin", 0x00000, 0x80000, CRC(9bf41c2b) SHA1(8cc8ca5c2c63223e670e00ca5802b8677856bc16) )
 	ROM_LOAD16_BYTE( "rarom6.bin", 0x00001, 0x80000, CRC(0fb69b4c) SHA1(8e1aaf5ade707b4045d55ff64e72cfe5db696332) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra15r.id", 0x00, 0x20, CRC(7bc9c013) SHA1(83aa66ae0a9e9f9ee75541847c98df919907c5cb) )	
 ROM_END
 
 ROM_START( robadvc )
@@ -1475,6 +1577,9 @@ ROM_START( robadvc )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "rarom5.bin", 0x00000, 0x80000, CRC(9bf41c2b) SHA1(8cc8ca5c2c63223e670e00ca5802b8677856bc16) )
 	ROM_LOAD16_BYTE( "rarom6.bin", 0x00001, 0x80000, CRC(0fb69b4c) SHA1(8e1aaf5ade707b4045d55ff64e72cfe5db696332) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17r1.id", 0x00, 0x20, CRC(95984bfa) SHA1(b345e2a12795f8b8e3f301800c9b4c196db218c6) )		
 ROM_END
 
 ROM_START( robadvd )
@@ -1491,6 +1596,9 @@ ROM_START( robadvd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "rarom5.bin", 0x00000, 0x80000, CRC(9bf41c2b) SHA1(8cc8ca5c2c63223e670e00ca5802b8677856bc16) )
 	ROM_LOAD16_BYTE( "rarom6.bin", 0x00001, 0x80000, CRC(0fb69b4c) SHA1(8e1aaf5ade707b4045d55ff64e72cfe5db696332) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17r1.id", 0x00, 0x20, CRC(95984bfa) SHA1(b345e2a12795f8b8e3f301800c9b4c196db218c6) )	
 ROM_END
 
 ROM_START( robadvv1 )
@@ -1507,6 +1615,9 @@ ROM_START( robadvv1 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "rarom5.bin", 0x00000, 0x80000, CRC(9bf41c2b) SHA1(8cc8ca5c2c63223e670e00ca5802b8677856bc16) )
 	ROM_LOAD16_BYTE( "rarom6.bin", 0x00001, 0x80000, CRC(0fb69b4c) SHA1(8e1aaf5ade707b4045d55ff64e72cfe5db696332) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17e1.id", 0x00, 0x20, CRC(e1a0cd91) SHA1(7f1543374dff9c027c438fa71e622450c9d9bb11) )		
 ROM_END
 
 ROM_START( robadvv2 )
@@ -1523,6 +1634,9 @@ ROM_START( robadvv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "rarom5.bin", 0x00000, 0x80000, CRC(9bf41c2b) SHA1(8cc8ca5c2c63223e670e00ca5802b8677856bc16) )
 	ROM_LOAD16_BYTE( "rarom6.bin", 0x00001, 0x80000, CRC(0fb69b4c) SHA1(8e1aaf5ade707b4045d55ff64e72cfe5db696332) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17r1.id", 0x00, 0x20, CRC(95984bfa) SHA1(b345e2a12795f8b8e3f301800c9b4c196db218c6) )	
 ROM_END
 
 
@@ -1673,6 +1787,9 @@ ROM_START( anibonusb )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab17r_.id", 0x00, 0x20, CRC(429d536e) SHA1(29c3cae00c3a11f25fdc1fe2d5a99d28ab7e3fbd) )	
 ROM_END
 
 ROM_START( anibonusb2 )
@@ -1689,6 +1806,9 @@ ROM_START( anibonusb2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab17lt_.id", 0x00, 0x20, CRC(cee2a8e9) SHA1(8c5fe465f1397b3d40f616d6a4d842c2bbc767de) )		
 ROM_END
 
 ROM_START( anibonusd )
@@ -1705,6 +1825,9 @@ ROM_START( anibonusd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab17r.id", 0x00, 0x20, CRC(2dcec152) SHA1(092971dd78cf923a8b17d40d0aca5a8e67468425) )		
 ROM_END
 
 ROM_START( anibonusd2 )
@@ -1721,6 +1844,9 @@ ROM_START( anibonusd2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab17lt.id", 0x00, 0x20, CRC(5e9ea82a) SHA1(91adfef2b71be838929b2cd3b619b90270c2464f) )		
 ROM_END
 
 ROM_START( anibonusv )
@@ -1737,6 +1863,9 @@ ROM_START( anibonusv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab17r.id", 0x00, 0x20, CRC(2dcec152) SHA1(092971dd78cf923a8b17d40d0aca5a8e67468425) ) // game version is 1.8, but still writes 1.7 to nvram
 ROM_END
 
 ROM_START( anibonusv2 )
@@ -1753,6 +1882,9 @@ ROM_START( anibonusv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab17lt.id", 0x00, 0x20, CRC(5e9ea82a) SHA1(91adfef2b71be838929b2cd3b619b90270c2464f) ) // game version is 1.8, but still writes 1.7 to nvram
 ROM_END
 
 ROM_START( anibonusv3 )
@@ -1769,6 +1901,9 @@ ROM_START( anibonusv3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab17e.id", 0x00, 0x20, CRC(5a729357) SHA1(8a218c27fda8991ec9e122eb75675250aa7f73d6) ) // game version is 1.8, but still writes 1.7 to nvram	
 ROM_END
 
 ROM_START( abnudge )
@@ -1801,6 +1936,9 @@ ROM_START( abnudgeb )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab20n_.id", 0x00, 0x20, CRC(031117ce) SHA1(00b7eb7a4af62085273223354380924898f1e7f0) )
 ROM_END
 
 ROM_START( abnudged )
@@ -1817,6 +1955,9 @@ ROM_START( abnudged )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab20n.id", 0x00, 0x20, CRC(fb59eefe) SHA1(dd6f75440bd3c12a01233b54e7f618010152799d) )	
 ROM_END
 
 ROM_START( abnudgev )
@@ -1833,6 +1974,9 @@ ROM_START( abnudgev )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "abrom5n.bin", 0x00000, 0x80000, CRC(d3db86eb) SHA1(e7e2cdfa6b4795d4021f589d2a292c67cc32f03a) )
 	ROM_LOAD16_BYTE( "abrom6n.bin", 0x00001, 0x80000, CRC(0d8dcaa1) SHA1(a74c64bb89b4273e9d1e092786a5cf8ebd60477c) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ab20n.id", 0x00, 0x20, CRC(fb59eefe) SHA1(dd6f75440bd3c12a01233b54e7f618010152799d) )		
 ROM_END
 
 ROM_START( anithunt )
@@ -1881,6 +2025,9 @@ ROM_START( anithuntb )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ath-rom5.bin", 0x00000, 0x80000, CRC(536a7e23) SHA1(51dc6b2b022a672810b00e1006b0c7ee610a4e4f) )
 	ROM_LOAD16_BYTE( "ath-rom6.bin", 0x00001, 0x80000, CRC(23bc5067) SHA1(1e279e58437b897c7a68c9cdd15277c6a906a142) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ath19r_.id", 0x00, 0x20, CRC(1095cfc5) SHA1(3a2f83d2e442ee802e14191db48e7486097c50d3) )	
 ROM_END
 
 ROM_START( anithuntd )
@@ -1897,6 +2044,9 @@ ROM_START( anithuntd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ath-rom5.bin", 0x00000, 0x80000, CRC(536a7e23) SHA1(51dc6b2b022a672810b00e1006b0c7ee610a4e4f) )
 	ROM_LOAD16_BYTE( "ath-rom6.bin", 0x00001, 0x80000, CRC(23bc5067) SHA1(1e279e58437b897c7a68c9cdd15277c6a906a142) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ath19r.id", 0x00, 0x20, CRC(6c98b3ae) SHA1(63d7a2fe10871a0ee6d02180166f5b64d9d533fc) )		
 ROM_END
 
 ROM_START( anithuntv )
@@ -1913,6 +2063,9 @@ ROM_START( anithuntv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ath-rom5.bin", 0x00000, 0x80000, CRC(536a7e23) SHA1(51dc6b2b022a672810b00e1006b0c7ee610a4e4f) )
 	ROM_LOAD16_BYTE( "ath-rom6.bin", 0x00001, 0x80000, CRC(23bc5067) SHA1(1e279e58437b897c7a68c9cdd15277c6a906a142) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ath19r.id", 0x00, 0x20, CRC(6c98b3ae) SHA1(63d7a2fe10871a0ee6d02180166f5b64d9d533fc) )			
 ROM_END
 
 
@@ -1946,6 +2099,9 @@ ROM_START( dblchalb )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "dcrom5.bin", 0x00000, 0x80000, CRC(a55f4ed3) SHA1(9f7427357af84026c056624523fd20bc556f3c22) )
 	ROM_LOAD16_BYTE( "dcrom6.bin", 0x00001, 0x80000, CRC(cf783d82) SHA1(d3f8ae5cb3a5f848e2d84721a5a4ee486a52de85) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "dc15r_.id", 0x00, 0x20, CRC(5e39f9f5) SHA1(fa8b5bf53eaa6f332a2ae875409ec4015889a70f) )	
 ROM_END
 
 ROM_START( dblchalc )
@@ -1962,6 +2118,9 @@ ROM_START( dblchalc )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "dcrom5.bin", 0x00000, 0x80000, CRC(a55f4ed3) SHA1(9f7427357af84026c056624523fd20bc556f3c22) )
 	ROM_LOAD16_BYTE( "dcrom6.bin", 0x00001, 0x80000, CRC(cf783d82) SHA1(d3f8ae5cb3a5f848e2d84721a5a4ee486a52de85) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "dc15r.id", 0x00, 0x20, CRC(4a0f2f34) SHA1(a169f671b2e61e95ad071ca986711694ef2f7364) )		
 ROM_END
 
 ROM_START( dblchald )
@@ -1978,6 +2137,9 @@ ROM_START( dblchald )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "dcrom5.bin", 0x00000, 0x80000, CRC(a55f4ed3) SHA1(9f7427357af84026c056624523fd20bc556f3c22) )
 	ROM_LOAD16_BYTE( "dcrom6.bin", 0x00001, 0x80000, CRC(cf783d82) SHA1(d3f8ae5cb3a5f848e2d84721a5a4ee486a52de85) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "dc15r.id", 0x00, 0x20, CRC(4a0f2f34) SHA1(a169f671b2e61e95ad071ca986711694ef2f7364) )			
 ROM_END
 
 ROM_START( dblchalv )
@@ -1994,6 +2156,9 @@ ROM_START( dblchalv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "dcrom5.bin", 0x00000, 0x80000, CRC(a55f4ed3) SHA1(9f7427357af84026c056624523fd20bc556f3c22) )
 	ROM_LOAD16_BYTE( "dcrom6.bin", 0x00001, 0x80000, CRC(cf783d82) SHA1(d3f8ae5cb3a5f848e2d84721a5a4ee486a52de85) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "dc15r.id", 0x00, 0x20, CRC(4a0f2f34) SHA1(a169f671b2e61e95ad071ca986711694ef2f7364) )		
 ROM_END
 
 
@@ -2011,6 +2176,9 @@ ROM_START( robadv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra15r2.id", 0x00, 0x20, CRC(8d2a7cd7) SHA1(ce1a67b4848c74c50c957d2ced081298e9fde3ee) )		
 ROM_END
 
 ROM_START( robadv2a )
@@ -2027,6 +2195,9 @@ ROM_START( robadv2a )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra15r2.id", 0x00, 0x20, CRC(8d2a7cd7) SHA1(ce1a67b4848c74c50c957d2ced081298e9fde3ee) )	
 ROM_END
 
 ROM_START( robadv2c )
@@ -2043,6 +2214,9 @@ ROM_START( robadv2c )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17lt2.id", 0x00, 0x20, CRC(697f1668) SHA1(cbac3a24fd9f73c91a2903f5dfe2aee7944cffeb) )		
 ROM_END
 
 ROM_START( robadv2v1 )
@@ -2059,6 +2233,9 @@ ROM_START( robadv2v1 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17r2.id", 0x00, 0x20, CRC(a4705167) SHA1(97573248b4d35c665933e34e6e2fa2ea62e0c8a5) )	
 ROM_END
 
 ROM_START( robadv2v2 )
@@ -2075,6 +2252,9 @@ ROM_START( robadv2v2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17r2.id", 0x00, 0x20, CRC(a4705167) SHA1(97573248b4d35c665933e34e6e2fa2ea62e0c8a5) )	
 ROM_END
 
 ROM_START( robadv2v3 )
@@ -2091,6 +2271,9 @@ ROM_START( robadv2v3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17lt2.id", 0x00, 0x20, CRC(697f1668) SHA1(cbac3a24fd9f73c91a2903f5dfe2aee7944cffeb) )		
 ROM_END
 
 ROM_START( robadv2v4 )
@@ -2107,6 +2290,9 @@ ROM_START( robadv2v4 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17e2.id", 0x00, 0x20, CRC(d048d70c) SHA1(602b0bd23e02577e822e09b3b0bc363f3aeceaba) )	
 ROM_END
 
 ROM_START( robadv2d )
@@ -2123,6 +2309,9 @@ ROM_START( robadv2d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17lt2.id", 0x00, 0x20, CRC(697f1668) SHA1(cbac3a24fd9f73c91a2903f5dfe2aee7944cffeb) )		
 ROM_END
 
 ROM_START( robadv2d2 )
@@ -2139,6 +2328,9 @@ ROM_START( robadv2d2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17r2.id", 0x00, 0x20, CRC(a4705167) SHA1(97573248b4d35c665933e34e6e2fa2ea62e0c8a5) )			
 ROM_END
 
 ROM_START( robadv2d3 )
@@ -2155,6 +2347,9 @@ ROM_START( robadv2d3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17r2.id", 0x00, 0x20, CRC(a4705167) SHA1(97573248b4d35c665933e34e6e2fa2ea62e0c8a5) )	
 ROM_END
 
 ROM_START( robadv2c2 )
@@ -2171,6 +2366,9 @@ ROM_START( robadv2c2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17r2.id", 0x00, 0x20, CRC(a4705167) SHA1(97573248b4d35c665933e34e6e2fa2ea62e0c8a5) )	
 ROM_END
 
 ROM_START( robadv2c3 )
@@ -2187,6 +2385,9 @@ ROM_START( robadv2c3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "ra2rom5.bin", 0x00000, 0x80000, CRC(ad9379a2) SHA1(93126969677cfce20e5b2e287662ac6b2ceee425) )
 	ROM_LOAD16_BYTE( "ra2rom6.bin", 0x00001, 0x80000, CRC(12312874) SHA1(9d4d9d9fbec8536e8a003892643654d15f4535fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "ra17r2.id", 0x00, 0x20, CRC(a4705167) SHA1(97573248b4d35c665933e34e6e2fa2ea62e0c8a5) )	
 ROM_END
 
 
@@ -2220,6 +2421,9 @@ ROM_START( pirpok2b )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "p3rom5.bin", 0x00000, 0x80000, CRC(c5eca135) SHA1(bdaccd32e1434016c77579bc8c4214ab2a3ae474) )
 	ROM_LOAD16_BYTE( "p3rom6.bin", 0x00001, 0x80000, CRC(d990cbb8) SHA1(6f822e38bf401b2eb0b2e36f3b4fc6822fafd3fa) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "p3p22r_.id", 0x00, 0x20, CRC(30f56bca) SHA1(6325121e9f11ec96af90c0f3b57b98c11f8f97b7) )	
 ROM_END
 
 ROM_START( pirpok2d )
@@ -2236,6 +2440,9 @@ ROM_START( pirpok2d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "p3rom5.bin", 0x00000, 0x80000, CRC(c5eca135) SHA1(bdaccd32e1434016c77579bc8c4214ab2a3ae474) )
 	ROM_LOAD16_BYTE( "p3rom6.bin", 0x00001, 0x80000, CRC(d990cbb8) SHA1(6f822e38bf401b2eb0b2e36f3b4fc6822fafd3fa) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "p3p22r.id", 0x00, 0x20, CRC(fc07ce9b) SHA1(50ea8edd5c2f73f7e8abaa8af0d717152648dcd0) )		
 ROM_END
 
 ROM_START( pirpok2v )
@@ -2252,6 +2459,9 @@ ROM_START( pirpok2v )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "p3rom5.bin", 0x00000, 0x80000, CRC(c5eca135) SHA1(bdaccd32e1434016c77579bc8c4214ab2a3ae474) )
 	ROM_LOAD16_BYTE( "p3rom6.bin", 0x00001, 0x80000, CRC(d990cbb8) SHA1(6f822e38bf401b2eb0b2e36f3b4fc6822fafd3fa) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "p3p22r.id", 0x00, 0x20, CRC(fc07ce9b) SHA1(50ea8edd5c2f73f7e8abaa8af0d717152648dcd0) )			
 ROM_END
 
 ROM_START( pirpok2v2 )
@@ -2268,6 +2478,9 @@ ROM_START( pirpok2v2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "p3rom5.bin", 0x00000, 0x80000, CRC(c5eca135) SHA1(bdaccd32e1434016c77579bc8c4214ab2a3ae474) )
 	ROM_LOAD16_BYTE( "p3rom6.bin", 0x00001, 0x80000, CRC(d990cbb8) SHA1(6f822e38bf401b2eb0b2e36f3b4fc6822fafd3fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "p3p24e.id", 0x00, 0x20, CRC(99d30f6b) SHA1(fb7937e8b595def542f87c08ad69163d18bcde81) )			
 ROM_END
 
 
@@ -2302,6 +2515,9 @@ ROM_START( fcnudge2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcrom5n.bin", 0x00000, 0x80000, CRC(42955842) SHA1(383be3049da5b10ea57a278bc6578ece046058fd) )
 	ROM_LOAD16_BYTE( "fcrom6n.bin", 0x00001, 0x80000, CRC(eee0f84d) SHA1(4ac096ccea258710f58c8121e7f0af28593d6368) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fc20n.id", 0x00, 0x20, CRC(1d8fa4c9) SHA1(f389aab05538688e21bc41ded91f8a2ccf0a7a38) ) // game is 2.1, but writes 2.0 to nvram
 ROM_END
 
 ROM_START( fcnudge3 )
@@ -2318,6 +2534,9 @@ ROM_START( fcnudge3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcrom5n.bin", 0x00000, 0x80000, CRC(42955842) SHA1(383be3049da5b10ea57a278bc6578ece046058fd) )
 	ROM_LOAD16_BYTE( "fcrom6n.bin", 0x00001, 0x80000, CRC(eee0f84d) SHA1(4ac096ccea258710f58c8121e7f0af28593d6368) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fc20n_.id", 0x00, 0x20, CRC(b6072181) SHA1(f666cdc7be23bb2445cae6a338a6739c7f64f907) )
 ROM_END
 
 ROM_START( fcnudge4 )
@@ -2334,6 +2553,9 @@ ROM_START( fcnudge4 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcrom5n.bin", 0x00000, 0x80000, CRC(42955842) SHA1(383be3049da5b10ea57a278bc6578ece046058fd) )
 	ROM_LOAD16_BYTE( "fcrom6n.bin", 0x00001, 0x80000, CRC(eee0f84d) SHA1(4ac096ccea258710f58c8121e7f0af28593d6368) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fc20n.id", 0x00, 0x20, CRC(1d8fa4c9) SHA1(f389aab05538688e21bc41ded91f8a2ccf0a7a38) )	
 ROM_END
 
 ROM_START( sfruitb )
@@ -2398,6 +2620,9 @@ ROM_START( sfruitbb )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb20lt_.id", 0x00, 0x20, CRC(a3b85e54) SHA1(b0d07780f2047beb14f624f8306ad41d88502c10) )	
 ROM_END
 
 ROM_START( sfruitbb2 )
@@ -2414,6 +2639,9 @@ ROM_START( sfruitbb2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb22b_.id", 0x00, 0x20, CRC(29523bc1) SHA1(99ac1b7898c2f48ad3846bb59c8af6d04b5a6a55) )	
 ROM_END
 
 ROM_START( sfruitbb3 )
@@ -2430,6 +2658,9 @@ ROM_START( sfruitbb3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb25r_.id", 0x00, 0x20, CRC(ef2307d4) SHA1(31126388ffddeb346724d03ed5d983d2952dfc07) )		
 ROM_END
 
 ROM_START( sfruitbd )
@@ -2446,6 +2677,9 @@ ROM_START( sfruitbd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb20lt.id", 0x00, 0x20, CRC(eb233ded) SHA1(02882a386ebd3b739ab318cd97b3a371bbdba739) )		
 ROM_END
 
 ROM_START( sfruitbd2 )
@@ -2462,6 +2696,9 @@ ROM_START( sfruitbd2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb22b.id", 0x00, 0x20, CRC(6bccb043) SHA1(aed25ed09d34a98432436739a00fae4d6b3f6324) )	
 ROM_END
 
 ROM_START( sfruitbd3 )
@@ -2478,6 +2715,9 @@ ROM_START( sfruitbd3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb25r.id", 0x00, 0x20, CRC(06d72594) SHA1(53b8ddd2166e0345d7ab83c8ab5fc05672201b88) )	
 ROM_END
 
 
@@ -2495,6 +2735,9 @@ ROM_START( sfruitbv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb25r.id", 0x00, 0x20, CRC(06d72594) SHA1(53b8ddd2166e0345d7ab83c8ab5fc05672201b88) )		
 ROM_END
 
 ROM_START( sfruitbv2 )
@@ -2511,6 +2754,9 @@ ROM_START( sfruitbv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb25e.id", 0x00, 0x20, CRC(a4ae87d4) SHA1(d19b6cc31b6011f5467ba6fe70cced8ca5ddffc9) )		
 ROM_END
 
 ROM_START( sfruitbv3 )
@@ -2527,6 +2773,9 @@ ROM_START( sfruitbv3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb22eb.id", 0x00, 0x20, CRC(eb57209c) SHA1(1ea1acdd92bb399fe0ed20a53ced47d8923af6dc) )		
 ROM_END
 
 ROM_START( sfruitbv4 )
@@ -2543,6 +2792,9 @@ ROM_START( sfruitbv4 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb22b.id", 0x00, 0x20, CRC(6bccb043) SHA1(aed25ed09d34a98432436739a00fae4d6b3f6324) )		
 ROM_END
 
 ROM_START( sfruitbv5 )
@@ -2559,6 +2811,9 @@ ROM_START( sfruitbv5 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "sfbrom5.bin", 0x00000, 0x80000, CRC(31588ff3) SHA1(6e2a65d50457ec0e93a647fd8ca5ebeeb16bdb1c) )
 	ROM_LOAD16_BYTE( "sfbrom6.bin", 0x00001, 0x80000, CRC(232d6216) SHA1(ca7780adc85fa570698736785ad700797e6a98fb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sfb20lt.id", 0x00, 0x20, CRC(eb233ded) SHA1(02882a386ebd3b739ab318cd97b3a371bbdba739) )		
 ROM_END
 
 
@@ -2576,6 +2831,9 @@ ROM_START( fb2gen )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2grom5_older.bin", 0x00000, 0x80000, CRC(1c4172a8) SHA1(c45a57cd799681d442de02f8f07dbd9751929ca4) )
 	ROM_LOAD16_BYTE( "fb2grom6_older.bin", 0x00001, 0x80000, CRC(953fdcc4) SHA1(c57e2b4a8273e789b96d39fe28d02bec5359b5f4) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2g16t.id", 0x00, 0x20, CRC(fd1f2ea8) SHA1(8845b68132aead4a5d6dc0f69ccde7d0df898427) )
 ROM_END
 
 ROM_START( fb2gena )
@@ -2592,6 +2850,9 @@ ROM_START( fb2gena )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2grom5_older.bin", 0x00000, 0x80000, CRC(1c4172a8) SHA1(c45a57cd799681d442de02f8f07dbd9751929ca4) )
 	ROM_LOAD16_BYTE( "fb2grom6_older.bin", 0x00001, 0x80000, CRC(953fdcc4) SHA1(c57e2b4a8273e789b96d39fe28d02bec5359b5f4) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2g15r.id", 0x00, 0x20, CRC(18e86971) SHA1(2f0c277b211c43cf43a067e6bc166fec8e55f190) )
 ROM_END
 
 
@@ -2609,6 +2870,9 @@ ROM_START( fb2genc )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(6aa1e45d) SHA1(a821c98513ad851f5f9e2452620feb662c28f8bb) )
 	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(1a525dcf) SHA1(20b1b2d6bdb0953300a6d9937b582fd5e20931ed) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2g18r.id", 0x00, 0x20, CRC(b8fe27b5) SHA1(fdb5fe80e553f92647c023d4718242934bab59b0) )	
 ROM_END
 
 ROM_START( fb2genc2 )
@@ -2625,6 +2889,9 @@ ROM_START( fb2genc2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(6aa1e45d) SHA1(a821c98513ad851f5f9e2452620feb662c28f8bb) )
 	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(1a525dcf) SHA1(20b1b2d6bdb0953300a6d9937b582fd5e20931ed) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2g18lt.id", 0x00, 0x20, CRC(8f36bc08) SHA1(53d970cb1a1055c459e64a09f4e495c52aa2ab9f) )			
 ROM_END
 
 ROM_START( fb2genv )
@@ -2641,6 +2908,9 @@ ROM_START( fb2genv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(6aa1e45d) SHA1(a821c98513ad851f5f9e2452620feb662c28f8bb) )
 	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(1a525dcf) SHA1(20b1b2d6bdb0953300a6d9937b582fd5e20931ed) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2g18r.id", 0x00, 0x20, CRC(b8fe27b5) SHA1(fdb5fe80e553f92647c023d4718242934bab59b0) )		
 ROM_END
 
 ROM_START( fb2genv2 )
@@ -2657,6 +2927,9 @@ ROM_START( fb2genv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(6aa1e45d) SHA1(a821c98513ad851f5f9e2452620feb662c28f8bb) )
 	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(1a525dcf) SHA1(20b1b2d6bdb0953300a6d9937b582fd5e20931ed) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2g18lt.id", 0x00, 0x20, CRC(8f36bc08) SHA1(53d970cb1a1055c459e64a09f4e495c52aa2ab9f) )	
 ROM_END
 
 ROM_START( fb2genv3 )
@@ -2673,6 +2946,9 @@ ROM_START( fb2genv3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(6aa1e45d) SHA1(a821c98513ad851f5f9e2452620feb662c28f8bb) )
 	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(1a525dcf) SHA1(20b1b2d6bdb0953300a6d9937b582fd5e20931ed) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2g18e.id", 0x00, 0x20, CRC(a62d1596) SHA1(a04c248e7441e5c8afe7fc30392fe053734de4ef) )	
 ROM_END
 
 ROM_START( fb2gend )
@@ -2689,6 +2965,9 @@ ROM_START( fb2gend )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(6aa1e45d) SHA1(a821c98513ad851f5f9e2452620feb662c28f8bb) )
 	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(1a525dcf) SHA1(20b1b2d6bdb0953300a6d9937b582fd5e20931ed) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2g18r.id", 0x00, 0x20, CRC(b8fe27b5) SHA1(fdb5fe80e553f92647c023d4718242934bab59b0) )		
 ROM_END
 
 ROM_START( fb2gend2 )
@@ -2705,6 +2984,9 @@ ROM_START( fb2gend2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2grom5.bin", 0x00000, 0x80000, CRC(6aa1e45d) SHA1(a821c98513ad851f5f9e2452620feb662c28f8bb) )
 	ROM_LOAD16_BYTE( "fb2grom6.bin", 0x00001, 0x80000, CRC(1a525dcf) SHA1(20b1b2d6bdb0953300a6d9937b582fd5e20931ed) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2g18lt.id", 0x00, 0x20, CRC(8f36bc08) SHA1(53d970cb1a1055c459e64a09f4e495c52aa2ab9f) )		
 ROM_END
 
 ROM_START( fb2nd )
@@ -2721,6 +3003,9 @@ ROM_START( fb2nd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2erom5.bin", 0x00000, 0x80000, CRC(1bc55876) SHA1(d04ff7bf97145d45de943129bc9f3cbe27f4588e) )
 	ROM_LOAD16_BYTE( "fb2erom6.bin", 0x00001, 0x80000, CRC(71b43f19) SHA1(a0b7f2b1968e6c083f9793f1249edb339422370d) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2e15r.id", 0x00, 0x20, CRC(1c1db94c) SHA1(3438c43b31640b3d052bc4e740f9056b70a57550) )
 ROM_END
 
 
@@ -2738,6 +3023,9 @@ ROM_START( fb2ndc )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2erom5.bin", 0x00000, 0x80000, CRC(1bc55876) SHA1(d04ff7bf97145d45de943129bc9f3cbe27f4588e) )
 	ROM_LOAD16_BYTE( "fb2erom6.bin", 0x00001, 0x80000, CRC(71b43f19) SHA1(a0b7f2b1968e6c083f9793f1249edb339422370d) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2e18r.id", 0x00, 0x20, CRC(bc0bf788) SHA1(d0bb6887e6cf8c18897ce6057743117423bd3035) )
 ROM_END
 
 ROM_START( fb2ndc2 )
@@ -2754,6 +3042,9 @@ ROM_START( fb2ndc2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2erom5.bin", 0x00000, 0x80000, CRC(1bc55876) SHA1(d04ff7bf97145d45de943129bc9f3cbe27f4588e) )
 	ROM_LOAD16_BYTE( "fb2erom6.bin", 0x00001, 0x80000, CRC(71b43f19) SHA1(a0b7f2b1968e6c083f9793f1249edb339422370d) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2e18lt.id", 0x00, 0x20, CRC(8bc36c35) SHA1(fddbc8629df06c470a9cd76e609e0f7e5ae23202) )
 ROM_END
 
 ROM_START( fb2ndv )
@@ -2770,6 +3061,9 @@ ROM_START( fb2ndv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2erom5.bin", 0x00000, 0x80000, CRC(1bc55876) SHA1(d04ff7bf97145d45de943129bc9f3cbe27f4588e) )
 	ROM_LOAD16_BYTE( "fb2erom6.bin", 0x00001, 0x80000, CRC(71b43f19) SHA1(a0b7f2b1968e6c083f9793f1249edb339422370d) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2e18r.id", 0x00, 0x20, CRC(bc0bf788) SHA1(d0bb6887e6cf8c18897ce6057743117423bd3035) )
 ROM_END
 
 ROM_START( fb2ndv2 )
@@ -2786,6 +3080,9 @@ ROM_START( fb2ndv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2erom5.bin", 0x00000, 0x80000, CRC(1bc55876) SHA1(d04ff7bf97145d45de943129bc9f3cbe27f4588e) )
 	ROM_LOAD16_BYTE( "fb2erom6.bin", 0x00001, 0x80000, CRC(71b43f19) SHA1(a0b7f2b1968e6c083f9793f1249edb339422370d) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2e18lt.id", 0x00, 0x20, CRC(8bc36c35) SHA1(fddbc8629df06c470a9cd76e609e0f7e5ae23202) )	
 ROM_END
 
 ROM_START( fb2ndd )
@@ -2802,6 +3099,9 @@ ROM_START( fb2ndd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2erom5.bin", 0x00000, 0x80000, CRC(1bc55876) SHA1(d04ff7bf97145d45de943129bc9f3cbe27f4588e) )
 	ROM_LOAD16_BYTE( "fb2erom6.bin", 0x00001, 0x80000, CRC(71b43f19) SHA1(a0b7f2b1968e6c083f9793f1249edb339422370d) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2e18r.id", 0x00, 0x20, CRC(bc0bf788) SHA1(d0bb6887e6cf8c18897ce6057743117423bd3035) )
 ROM_END
 
 ROM_START( fb2ndd2 )
@@ -2818,6 +3118,9 @@ ROM_START( fb2ndd2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2erom5.bin", 0x00000, 0x80000, CRC(1bc55876) SHA1(d04ff7bf97145d45de943129bc9f3cbe27f4588e) )
 	ROM_LOAD16_BYTE( "fb2erom6.bin", 0x00001, 0x80000, CRC(71b43f19) SHA1(a0b7f2b1968e6c083f9793f1249edb339422370d) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb2e18lt.id", 0x00, 0x20, CRC(8bc36c35) SHA1(fddbc8629df06c470a9cd76e609e0f7e5ae23202) )	
 ROM_END
 
 ROM_START( fb4 )
@@ -2834,6 +3137,9 @@ ROM_START( fb4 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb413xt_.id", 0x00, 0x20, CRC(ecaf2430) SHA1(1e31019cad55d17571f9671d7f150e884b84246c) )
 ROM_END
 
 ROM_START( fb4a )
@@ -2852,6 +3158,9 @@ ROM_START( fb4a )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb412r_.id", 0x00, 0x20, CRC(cc3c192e) SHA1(cdaa8c78dcea5fee3bc88c0c88f5276f193112a9) )
 ROM_END
 
 ROM_START( fb4b )
@@ -2869,6 +3178,9 @@ ROM_START( fb4b )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb415lt_.id", 0x00, 0x20, CRC(17385187) SHA1(01e424457b37f79e02124245cf6d502fd54b2265) )
 ROM_END
 
 ROM_START( fb4b2 )
@@ -2887,6 +3199,8 @@ ROM_START( fb4b2 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
 
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb415r_.id", 0x00, 0x20, CRC(099b27a0) SHA1(f70e8ade2527b42a6b64382bc3a60a180578fba3) )
 ROM_END
 
 ROM_START( fb4v )
@@ -2905,6 +3219,8 @@ ROM_START( fb4v )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
 
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb415r.id", 0x00, 0x20, CRC(51592891) SHA1(4e1b0e6e88d73a37d025f7a21d6e13c409aed59a) )
 ROM_END
 
 ROM_START( fb4v2 )
@@ -2921,6 +3237,9 @@ ROM_START( fb4v2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb415lt.id", 0x00, 0x20, CRC(f44d3e8c) SHA1(af462959a37c271c840324d74b2619691fadf8bd) )
 ROM_END
 
 ROM_START( fb4v3 )
@@ -2937,6 +3256,9 @@ ROM_START( fb4v3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5e.bin", 0x00000, 0x80000, CRC(ddc02e07) SHA1(b1cce95ab09822646c835b066d4510a51633d107) )
 	ROM_LOAD16_BYTE( "fb4rom6e.bin", 0x00001, 0x80000, CRC(e3de53a4) SHA1(3168ec7e10eee205655ee259fb5ba7201d7eb711) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb415e.id", 0x00, 0x20, CRC(f1663488) SHA1(93ba94df442d90790cb0eafb6e5db0506ffa8bc5))
 ROM_END
 
 ROM_START( fb4d )
@@ -2954,6 +3276,9 @@ ROM_START( fb4d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb415r.id", 0x00, 0x20, CRC(51592891) SHA1(4e1b0e6e88d73a37d025f7a21d6e13c409aed59a) )
 ROM_END
 
 ROM_START( fb4d2 )
@@ -2967,10 +3292,12 @@ ROM_START( fb4d2 )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
 
-
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb415lt.id", 0x00, 0x20, CRC(f44d3e8c) SHA1(af462959a37c271c840324d74b2619691fadf8bd) )
 ROM_END
 
 ROM_START( fb4c )
@@ -2984,10 +3311,12 @@ ROM_START( fb4c )
 	ROM_LOAD16_BYTE( "fb4rom3.bin", 0x00000, 0x80000, CRC(4176937d) SHA1(dbde944a154f648a86628a8165fa27032115c417) )
 	ROM_LOAD16_BYTE( "fb4rom4.bin", 0x00001, 0x80000, CRC(f8c57041) SHA1(ca8f58e89d31563b363a78db89e2711402f3ba80) )
 
-
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb415r.id", 0x00, 0x20, CRC(51592891) SHA1(4e1b0e6e88d73a37d025f7a21d6e13c409aed59a) )
 ROM_END
 
 ROM_START( fb4c2 )
@@ -3005,6 +3334,9 @@ ROM_START( fb4c2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb4rom5.bin", 0x00000, 0x80000, CRC(41ad506c) SHA1(19086ab859a60e5127af0e51381cbb9fda6de74a) )
 	ROM_LOAD16_BYTE( "fb4rom6.bin", 0x00001, 0x80000, CRC(f6c07f3d) SHA1(709fe2a443fdd32a3f9ab9161d5321a01c0119bb) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb415lt.id", 0x00, 0x20, CRC(f44d3e8c) SHA1(af462959a37c271c840324d74b2619691fadf8bd) )	
 ROM_END
 
 ROM_START( ch2000 )
@@ -3071,6 +3403,9 @@ ROM_START( ch2000b )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x40000, CRC(494fd1fa) SHA1(01ca60e35b68da398612fc7c8a7da6f8835eabd5) )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb44r_.id", 0x00, 0x20, CRC(5ea37646) SHA1(1bfd7bdceb5831357c622997817e417bb028091d) )		
 ROM_END
 
 ROM_START( ch2000b2 )
@@ -3087,6 +3422,9 @@ ROM_START( ch2000b2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fbrom5.bin", 0x00000, 0x40000, CRC(494fd1fa) SHA1(01ca60e35b68da398612fc7c8a7da6f8835eabd5) )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x40000, CRC(0ebe2ea5) SHA1(d83c1ba940e43ce1d392969055f36b3c49ac9727) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb41lt_.id", 0x00, 0x20, CRC(9a3c83a5) SHA1(d09931228339ca744567095006ae1c512c462fee) )		
 ROM_END
 
 /* v type */
@@ -3104,6 +3442,9 @@ ROM_START( ch2000v )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2rom5.bin", 0x00000, 0x40000, CRC(1dbf0566) SHA1(9b643cf03b543b9d7689daa00b2b06af5bc57c90) )
 	ROM_LOAD16_BYTE( "fb2rom6.bin", 0x00001, 0x40000, CRC(a0116b86) SHA1(e2a0abbfbfa531683ea9077cdbed57d965f9c5c2) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb44r.id", 0x00, 0x20, CRC(1867578d) SHA1(47178b153fab7811d26fe49e851244a36182db15) )		
 ROM_END
 
 ROM_START( ch2000v2 )
@@ -3120,6 +3461,9 @@ ROM_START( ch2000v2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2rom5.bin", 0x00000, 0x40000, CRC(1dbf0566) SHA1(9b643cf03b543b9d7689daa00b2b06af5bc57c90) )
 	ROM_LOAD16_BYTE( "fb2rom6.bin", 0x00001, 0x40000, CRC(a0116b86) SHA1(e2a0abbfbfa531683ea9077cdbed57d965f9c5c2) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb44e.id", 0x00, 0x20, CRC(6c5fd1e6) SHA1(a26901ed4d02dfd374d807b0d7255f73d19ca2b7) )		
 ROM_END
 
 ROM_START( ch2000v3 )
@@ -3136,6 +3480,9 @@ ROM_START( ch2000v3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2rom5.bin", 0x00000, 0x40000, CRC(1dbf0566) SHA1(9b643cf03b543b9d7689daa00b2b06af5bc57c90) )
 	ROM_LOAD16_BYTE( "fb2rom6.bin", 0x00001, 0x40000, CRC(a0116b86) SHA1(e2a0abbfbfa531683ea9077cdbed57d965f9c5c2) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb41lt.id", 0x00, 0x20, CRC(21a07bba) SHA1(6fd88c243c554684e49667a8d2dc6b16348ae8dd) )		
 ROM_END
 
 ROM_START( ch2000c )
@@ -3152,6 +3499,9 @@ ROM_START( ch2000c )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2rom5.bin", 0x00000, 0x40000, CRC(1dbf0566) SHA1(9b643cf03b543b9d7689daa00b2b06af5bc57c90) )
 	ROM_LOAD16_BYTE( "fb2rom6.bin", 0x00001, 0x40000, CRC(a0116b86) SHA1(e2a0abbfbfa531683ea9077cdbed57d965f9c5c2) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb41lt.id", 0x00, 0x20, CRC(21a07bba) SHA1(6fd88c243c554684e49667a8d2dc6b16348ae8dd) )		
 ROM_END
 
 ROM_START( ch2000c2 )
@@ -3168,6 +3518,9 @@ ROM_START( ch2000c2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2rom5.bin", 0x00000, 0x40000, CRC(1dbf0566) SHA1(9b643cf03b543b9d7689daa00b2b06af5bc57c90) )
 	ROM_LOAD16_BYTE( "fb2rom6.bin", 0x00001, 0x40000, CRC(a0116b86) SHA1(e2a0abbfbfa531683ea9077cdbed57d965f9c5c2) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb44r.id", 0x00, 0x20, CRC(1867578d) SHA1(47178b153fab7811d26fe49e851244a36182db15) )	
 ROM_END
 
 
@@ -3185,6 +3538,9 @@ ROM_START( ch2000d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2rom5.bin", 0x00000, 0x40000, CRC(1dbf0566) SHA1(9b643cf03b543b9d7689daa00b2b06af5bc57c90) )
 	ROM_LOAD16_BYTE( "fb2rom6.bin", 0x00001, 0x40000, CRC(a0116b86) SHA1(e2a0abbfbfa531683ea9077cdbed57d965f9c5c2) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb41lt.id", 0x00, 0x20, CRC(21a07bba) SHA1(6fd88c243c554684e49667a8d2dc6b16348ae8dd) )		
 ROM_END
 
 ROM_START( ch2000d2 )
@@ -3201,6 +3557,9 @@ ROM_START( ch2000d2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb2rom5.bin", 0x00000, 0x40000, CRC(1dbf0566) SHA1(9b643cf03b543b9d7689daa00b2b06af5bc57c90) )
 	ROM_LOAD16_BYTE( "fb2rom6.bin", 0x00001, 0x40000, CRC(a0116b86) SHA1(e2a0abbfbfa531683ea9077cdbed57d965f9c5c2) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb44r.id", 0x00, 0x20, CRC(1867578d) SHA1(47178b153fab7811d26fe49e851244a36182db15) )		
 ROM_END
 
 
@@ -3299,6 +3658,9 @@ ROM_START( act2000v )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "a2klink5.bin", 0x00000, 0x80000, CRC(7083106a) SHA1(39e7da2ef91dda40b2a9d9b8d50c587d637fda54) )
 	ROM_LOAD16_BYTE( "a2klink6.bin", 0x00001, 0x80000, CRC(ba0de415) SHA1(fb4d718b9ad95eaa0ca259605fc1f2916bd1b7b7) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "a2k35r.id", 0x00, 0x20, CRC(66e3dc03) SHA1(d0be2d0b1c90e0b4b498cb6a3026d07e1946edcf) )	
 ROM_END
 
 ROM_START( act2000v2 )
@@ -3315,6 +3677,9 @@ ROM_START( act2000v2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "a2klink5.bin", 0x00000, 0x80000, CRC(7083106a) SHA1(39e7da2ef91dda40b2a9d9b8d50c587d637fda54) )
 	ROM_LOAD16_BYTE( "a2klink6.bin", 0x00001, 0x80000, CRC(ba0de415) SHA1(fb4d718b9ad95eaa0ca259605fc1f2916bd1b7b7) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "a2k35e.id", 0x00, 0x20, CRC(c6dcc01a) SHA1(745c2450967c28cc9477be1c8563b9b1c279e239) )	
 ROM_END
 
 ROM_START( act2000v3 )
@@ -3331,6 +3696,9 @@ ROM_START( act2000v3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "a2klink5.bin", 0x00000, 0x80000, CRC(7083106a) SHA1(39e7da2ef91dda40b2a9d9b8d50c587d637fda54) )
 	ROM_LOAD16_BYTE( "a2klink6.bin", 0x00001, 0x80000, CRC(ba0de415) SHA1(fb4d718b9ad95eaa0ca259605fc1f2916bd1b7b7) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "a2k33t.id", 0x00, 0x20, CRC(c11a5ee7) SHA1(36615ed41d2537493d18ff8e2b2e801aa71efd23) )		
 ROM_END
 
 ROM_START( act2000d )
@@ -3347,6 +3715,9 @@ ROM_START( act2000d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "a2klink5.bin", 0x00000, 0x80000, CRC(7083106a) SHA1(39e7da2ef91dda40b2a9d9b8d50c587d637fda54) )
 	ROM_LOAD16_BYTE( "a2klink6.bin", 0x00001, 0x80000, CRC(ba0de415) SHA1(fb4d718b9ad95eaa0ca259605fc1f2916bd1b7b7) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "a2k35r.id", 0x00, 0x20, CRC(66e3dc03) SHA1(d0be2d0b1c90e0b4b498cb6a3026d07e1946edcf) )			
 ROM_END
 
 ROM_START( act2000d2 )
@@ -3363,6 +3734,9 @@ ROM_START( act2000d2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "a2klink5.bin", 0x00000, 0x80000, CRC(7083106a) SHA1(39e7da2ef91dda40b2a9d9b8d50c587d637fda54) )
 	ROM_LOAD16_BYTE( "a2klink6.bin", 0x00001, 0x80000, CRC(ba0de415) SHA1(fb4d718b9ad95eaa0ca259605fc1f2916bd1b7b7) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "a2k33t.id", 0x00, 0x20, CRC(c11a5ee7) SHA1(36615ed41d2537493d18ff8e2b2e801aa71efd23) )		
 ROM_END
 
 ROM_START( act2000b )
@@ -3379,6 +3753,9 @@ ROM_START( act2000b )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "a2klink5.bin", 0x00000, 0x80000, CRC(7083106a) SHA1(39e7da2ef91dda40b2a9d9b8d50c587d637fda54) )
 	ROM_LOAD16_BYTE( "a2klink6.bin", 0x00001, 0x80000, CRC(ba0de415) SHA1(fb4d718b9ad95eaa0ca259605fc1f2916bd1b7b7) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "a2k35r_.id", 0x00, 0x20, CRC(6b54454b) SHA1(f90f4567f63739f6449a48b4a91b3b969ad6d22f) )
 ROM_END
 
 ROM_START( act2000b2 )
@@ -3395,6 +3772,9 @@ ROM_START( act2000b2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "a2klink5.bin", 0x00000, 0x80000, CRC(7083106a) SHA1(39e7da2ef91dda40b2a9d9b8d50c587d637fda54) )
 	ROM_LOAD16_BYTE( "a2klink6.bin", 0x00001, 0x80000, CRC(ba0de415) SHA1(fb4d718b9ad95eaa0ca259605fc1f2916bd1b7b7) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "a2k33t_.id", 0x00, 0x20, CRC(ecebf1ee) SHA1(8e2aea99bea43467fafb2629dc7551230ec4a6bb) )	
 ROM_END
 
 ROM_START( pir2001 )
@@ -3459,6 +3839,9 @@ ROM_START( pir2001b2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "piratrom5.bin", 0x00000, 0x80000, CRC(6d7e502a) SHA1(4910a0bb1e779e04e87eb6cba092f976f85c0f96) )
 	ROM_LOAD16_BYTE( "piratrom6.bin", 0x00001, 0x80000, CRC(470ff052) SHA1(b63293e2f244d992e64df085d6565931b982dcd3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi124xt_.id", 0x00, 0x20,  CRC(bb9624e0) SHA1(8827fabb48d51d88af0822d4e896568a898ca44b) )	
 ROM_END
 
 ROM_START( pir2001b3 )
@@ -3475,6 +3858,9 @@ ROM_START( pir2001b3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "piratrom5.bin", 0x00000, 0x80000, CRC(6d7e502a) SHA1(4910a0bb1e779e04e87eb6cba092f976f85c0f96) )
 	ROM_LOAD16_BYTE( "piratrom6.bin", 0x00001, 0x80000, CRC(470ff052) SHA1(b63293e2f244d992e64df085d6565931b982dcd3) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi125r_.id", 0x00, 0x20,  CRC(ec11baad) SHA1(4159a99fd732d3a42a1fb14f8cf2e4a7b5836436) )		
 ROM_END
 
 ROM_START( pir2001v )
@@ -3491,6 +3877,9 @@ ROM_START( pir2001v )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "piratrom5.bin", 0x00000, 0x80000, CRC(6d7e502a) SHA1(4910a0bb1e779e04e87eb6cba092f976f85c0f96) )
 	ROM_LOAD16_BYTE( "piratrom6.bin", 0x00001, 0x80000, CRC(470ff052) SHA1(b63293e2f244d992e64df085d6565931b982dcd3) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi125r.id", 0x00, 0x20,  CRC(2f0ddeb1) SHA1(0fb0871ee0b059eeedd782ac32d10ab268b00b52) )		
 ROM_END
 
 ROM_START( pir2001v2 )
@@ -3507,6 +3896,9 @@ ROM_START( pir2001v2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "piratrom5.bin", 0x00000, 0x80000, CRC(6d7e502a) SHA1(4910a0bb1e779e04e87eb6cba092f976f85c0f96) )
 	ROM_LOAD16_BYTE( "piratrom6.bin", 0x00001, 0x80000, CRC(470ff052) SHA1(b63293e2f244d992e64df085d6565931b982dcd3) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi125e.id", 0x00, 0x20,  CRC(339852cb) SHA1(02977f8cbca378f22ff43c299a61b1f1da3c5d50) )	
 ROM_END
 
 ROM_START( pir2001v3 )
@@ -3523,6 +3915,9 @@ ROM_START( pir2001v3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "piratrom5.bin", 0x00000, 0x80000, CRC(6d7e502a) SHA1(4910a0bb1e779e04e87eb6cba092f976f85c0f96) )
 	ROM_LOAD16_BYTE( "piratrom6.bin", 0x00001, 0x80000, CRC(470ff052) SHA1(b63293e2f244d992e64df085d6565931b982dcd3) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi124xt.id", 0x00, 0x20,  CRC(26f50e35) SHA1(53de077007ae042cf2c1eb2fa7cca06247768dd3) )	
 ROM_END
 
 ROM_START( pir2001d )
@@ -3539,6 +3934,9 @@ ROM_START( pir2001d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "piratrom5.bin", 0x00000, 0x80000, CRC(6d7e502a) SHA1(4910a0bb1e779e04e87eb6cba092f976f85c0f96) )
 	ROM_LOAD16_BYTE( "piratrom6.bin", 0x00001, 0x80000, CRC(470ff052) SHA1(b63293e2f244d992e64df085d6565931b982dcd3) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi125r.id", 0x00, 0x20,  CRC(2f0ddeb1) SHA1(0fb0871ee0b059eeedd782ac32d10ab268b00b52) )		
 ROM_END
 
 ROM_START( pir2001d2 )
@@ -3555,6 +3953,9 @@ ROM_START( pir2001d2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "piratrom5.bin", 0x00000, 0x80000, CRC(6d7e502a) SHA1(4910a0bb1e779e04e87eb6cba092f976f85c0f96) )
 	ROM_LOAD16_BYTE( "piratrom6.bin", 0x00001, 0x80000, CRC(470ff052) SHA1(b63293e2f244d992e64df085d6565931b982dcd3) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi124xt.id", 0x00, 0x20,  CRC(26f50e35) SHA1(53de077007ae042cf2c1eb2fa7cca06247768dd3) )	
 ROM_END
 
 ROM_START( pir2002 )
@@ -3603,7 +4004,7 @@ ROM_START( pir2002b )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
 	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
-ROM_END
+	ROM_END
 
 /* these had the pir2001 sound rom in, mistake? */
 ROM_START( pir2002b2 )
@@ -3620,6 +4021,9 @@ ROM_START( pir2002b2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
 	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi219xt_.id", 0x00, 0x20, CRC(7babba9f) SHA1(0ec0453d1368669d1829edd84123c871958a4fce) )			
 ROM_END
 
 ROM_START( pir2002b3 )
@@ -3636,6 +4040,9 @@ ROM_START( pir2002b3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
 	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi220r_.id", 0x00, 0x20, CRC(57eb901d) SHA1(a4815a043f7ce3c8bfd3c3a572ca3e561d69ab91) )		
 ROM_END
 
 ROM_START( pir2002v )
@@ -3644,9 +4051,7 @@ ROM_START( pir2002v )
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
-
-
-
+	
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "pirom3.bin", 0x00000, 0x80000, CRC(ad175fea) SHA1(07585fcb0d4828fb2b99bebfe583e54a835636ed) )
 	ROM_LOAD16_BYTE( "pirom4.bin", 0x00001, 0x80000, CRC(a94061ec) SHA1(2c3b37a1144a873f0b4b884cbeb938947270f5a3) )
@@ -3654,6 +4059,9 @@ ROM_START( pir2002v )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
 	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi220r.id", 0x00, 0x20, CRC(e4d79717) SHA1(fdcdd28a71293739a02dd958648300656a743567) )			
 ROM_END
 
 ROM_START( pir2002v2 )
@@ -3670,6 +4078,9 @@ ROM_START( pir2002v2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
 	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi220e.id", 0x00, 0x20, CRC(f8421b6d) SHA1(73ff95f558b93a661f2d6f15e0258a3698dc668e) )		
 ROM_END
 
 ROM_START( pir2002v3 )
@@ -3686,12 +4097,14 @@ ROM_START( pir2002v3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
 	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi219xt.id", 0x00, 0x20, CRC(e74d3531) SHA1(2a5df88c502ad85451796cdb3255e037e76470bd) )		
 ROM_END
 
 ROM_START( pir2002d )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "pi2d20r.bin", 0x00000, 0x40000,  CRC(83a264c4) SHA1(7de1902f5b63d6c44df5726c450ff21b5d911ec4) )
-
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "pirom2.bin", 0x00000, 0x20000, CRC(eeb92009) SHA1(e6c69437a7fd0f9fae375bf0b6dcfd6226823cf2) )
@@ -3703,6 +4116,9 @@ ROM_START( pir2002d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
 	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi220r.id", 0x00, 0x20, CRC(e4d79717) SHA1(fdcdd28a71293739a02dd958648300656a743567) )	
 ROM_END
 
 ROM_START( pir2002d2 )
@@ -3719,6 +4135,9 @@ ROM_START( pir2002d2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "pirom5.bin", 0x00000, 0x80000, CRC(c3ccb77b) SHA1(39ab58e2e55a7fabed0a0c8e5777b9be10ae67ae) )
 	ROM_LOAD16_BYTE( "pirom6.bin", 0x00001, 0x80000, CRC(c64bc2e5) SHA1(cfb231aa47d6e57481c24a4ba9d8623ed0fca58e) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "pi219xt.id", 0x00, 0x20, CRC(e74d3531) SHA1(2a5df88c502ad85451796cdb3255e037e76470bd) )	
 ROM_END
 
 ROM_START( classice )
@@ -3735,6 +4154,9 @@ ROM_START( classice )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
 	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs16lt.id", 0x00, 0x20,  CRC(9888f6bb) SHA1(638dbb61a26743159e012bca906206eae0ba1d66) )
 ROM_END
 
 ROM_START( classicea )
@@ -3751,6 +4173,9 @@ ROM_START( classicea )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
 	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs16r.id", 0x00, 0x20,  CRC(3d9ce0a6) SHA1(c1a9a0c26ab3b7faaf7734db6ffe5754f9d8eac1) )	
 ROM_END
 
 ROM_START( classiced )
@@ -3767,6 +4192,9 @@ ROM_START( classiced )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
 	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs16r.id", 0x00, 0x20,  CRC(3d9ce0a6) SHA1(c1a9a0c26ab3b7faaf7734db6ffe5754f9d8eac1) )	
 ROM_END
 
 ROM_START( classiced2 )
@@ -3783,6 +4211,9 @@ ROM_START( classiced2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
 	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs16lt.id", 0x00, 0x20,  CRC(9888f6bb) SHA1(638dbb61a26743159e012bca906206eae0ba1d66) )			
 ROM_END
 
 ROM_START( classiced3 )
@@ -3799,6 +4230,9 @@ ROM_START( classiced3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
 	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs16e.id", 0x00, 0x20,  CRC(9da3fcbf) SHA1(541d63dbe539718727eb8cb637bc02f824f0c264) )			
 ROM_END
 
 ROM_START( classicev )
@@ -3815,6 +4249,9 @@ ROM_START( classicev )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
 	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs16r.id", 0x00, 0x20,  CRC(3d9ce0a6) SHA1(c1a9a0c26ab3b7faaf7734db6ffe5754f9d8eac1) )
 ROM_END
 
 ROM_START( classicev2 )
@@ -3831,6 +4268,9 @@ ROM_START( classicev2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
 	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs16lt.id", 0x00, 0x20,  CRC(9888f6bb) SHA1(638dbb61a26743159e012bca906206eae0ba1d66) )
 ROM_END
 
 ROM_START( classicev3 )
@@ -3847,14 +4287,14 @@ ROM_START( classicev3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fcsrom5.bin", 0x00000, 0x40000, CRC(fb827363) SHA1(ff9630e8be8facbff040f8a23bf5ff66c62609df) )
 	ROM_LOAD16_BYTE( "fcsrom6.bin", 0x00001, 0x40000, CRC(9ec17dcd) SHA1(c1aefb7711feac1e9642eecbd41a1782d30bf7fa) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs16e.id", 0x00, 0x20,  CRC(9da3fcbf) SHA1(541d63dbe539718727eb8cb637bc02f824f0c264) )		
 ROM_END
 
 ROM_START( seawld )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "swd16r.bin", 0x00000, 0x80000, CRC(081c84c1) SHA1(5f0d40c38ca26d3633cfe4c7ead2773a1dcc177d) )
-
-	ROM_REGION( 0x010000, "debugram", ROMREGION_ERASE00 ) /* DEBUG */
-
 
 	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
 	ROM_LOAD( "swrom2.bin", 0x00000, 0x40000, CRC(e1afe0ad) SHA1(097233255b486944b79a8504b4312173ab1aad06) )
@@ -3866,6 +4306,9 @@ ROM_START( seawld )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "swrom5.bin", 0x00000, 0x80000, CRC(cd6aa69f) SHA1(abcbda547b0c6f4a03ed3500f55ff32bc23bedeb) )
 	ROM_LOAD16_BYTE( "swrom6.bin", 0x00001, 0x80000, CRC(5c9a4847) SHA1(f19aca69f42282e3e88e50e2b4fe05cde990a3e6) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sw16r.id", 0x00, 0x20, CRC(c582917f) SHA1(8a1bae27a54d3efa8014229f0bbe0c3d4f2d25c1) )	
 ROM_END
 
 ROM_START( seawlda )
@@ -3882,6 +4325,9 @@ ROM_START( seawlda )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "swrom5.bin", 0x00000, 0x80000, CRC(cd6aa69f) SHA1(abcbda547b0c6f4a03ed3500f55ff32bc23bedeb) )
 	ROM_LOAD16_BYTE( "swrom6.bin", 0x00001, 0x80000, CRC(5c9a4847) SHA1(f19aca69f42282e3e88e50e2b4fe05cde990a3e6) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "sw16ex.id", 0x00, 0x20,  CRC(48e315f1) SHA1(21a54386aaad3a37b2db18e7bbd159d289c99ddd) )
 ROM_END
 
 
@@ -3899,6 +4345,9 @@ ROM_START( moneymac )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "mmrom5.bin", 0x00000, 0x80000, CRC(7009308d) SHA1(8c09bfa025ae5cdab5c488af9cf1747da5d1ac67) )
 	ROM_LOAD16_BYTE( "mmrom6.bin", 0x00001, 0x80000, CRC(828dde28) SHA1(3024d5d449acce1f78254053866f3aa8d36aff53) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "mm17rx.id", 0x00, 0x20,  CRC(1a677994) SHA1(b351ce6a1cae30000d0c3c8bf5eade8ba560524d) )				
 ROM_END
 
 ROM_START( moneymacv )
@@ -3915,6 +4364,9 @@ ROM_START( moneymacv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "mmrom5.bin", 0x00000, 0x80000, CRC(7009308d) SHA1(8c09bfa025ae5cdab5c488af9cf1747da5d1ac67) )
 	ROM_LOAD16_BYTE( "mmrom6.bin", 0x00001, 0x80000, CRC(828dde28) SHA1(3024d5d449acce1f78254053866f3aa8d36aff53) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "mm17ex.id", 0x00, 0x20,  CRC(6e5fffff) SHA1(dbabb86903be2b0a0588041cccc5545142587f69) )		
 ROM_END
 
 ROM_START( moneymacv2 )
@@ -3931,6 +4383,9 @@ ROM_START( moneymacv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "mmrom5.bin", 0x00000, 0x80000, CRC(7009308d) SHA1(8c09bfa025ae5cdab5c488af9cf1747da5d1ac67) )
 	ROM_LOAD16_BYTE( "mmrom6.bin", 0x00001, 0x80000, CRC(828dde28) SHA1(3024d5d449acce1f78254053866f3aa8d36aff53) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "mm17lt.id", 0x00, 0x20,  CRC(b6b08ea0) SHA1(a56c7648424ca4dd0d405059f07af6f7cee0111a) )		
 ROM_END
 
 ROM_START( moneymacd )
@@ -3947,6 +4402,9 @@ ROM_START( moneymacd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "mmrom5.bin", 0x00000, 0x80000, CRC(7009308d) SHA1(8c09bfa025ae5cdab5c488af9cf1747da5d1ac67) )
 	ROM_LOAD16_BYTE( "mmrom6.bin", 0x00001, 0x80000, CRC(828dde28) SHA1(3024d5d449acce1f78254053866f3aa8d36aff53) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "mm17rx.id", 0x00, 0x20,  CRC(1a677994) SHA1(b351ce6a1cae30000d0c3c8bf5eade8ba560524d) )		
 ROM_END
 
 ROM_START( moneymacd2 )
@@ -3963,6 +4421,9 @@ ROM_START( moneymacd2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "mmrom5.bin", 0x00000, 0x80000, CRC(7009308d) SHA1(8c09bfa025ae5cdab5c488af9cf1747da5d1ac67) )
 	ROM_LOAD16_BYTE( "mmrom6.bin", 0x00001, 0x80000, CRC(828dde28) SHA1(3024d5d449acce1f78254053866f3aa8d36aff53) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "mm17lt.id", 0x00, 0x20,  CRC(b6b08ea0) SHA1(a56c7648424ca4dd0d405059f07af6f7cee0111a) )			
 ROM_END
 
 
@@ -3980,6 +4441,9 @@ ROM_START( atworld )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "aw_rom5.bin", 0x00000, 0x80000, CRC(c461c4d5) SHA1(2815511f8ae9b74c44aa9987eebf1a14642b4458) )
 	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
+	
+	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "aw13re.id", 0x00, 0x1000,  CRC(0f9991fb) SHA1(5ea9e49c6b8b00c2c3638cc39e479d6e5e112b7a) )			
 ROM_END
 
 ROM_START( atworlda )
@@ -3996,6 +4460,9 @@ ROM_START( atworlda )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "aw_rom5.bin", 0x00000, 0x80000, CRC(c461c4d5) SHA1(2815511f8ae9b74c44aa9987eebf1a14642b4458) )
 	ROM_LOAD16_BYTE( "aw_rom6.bin", 0x00001, 0x80000, CRC(686c9f2d) SHA1(94da22c775292020aa00c8f12f833a7f5c70ec36) )
+	
+	ROM_REGION( 0x1000, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "aw13ex.id", 0x00, 0x1000, CRC(c26305c9) SHA1(ee3aea8926ee4890d45896cf0be175c2262c7341) )		
 ROM_END
 
 #if 1 // incomplete / mixed sets etc. sort these first before doing anything else with them
@@ -4013,6 +4480,9 @@ ROM_START( fb5 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb5rom5.bin", 0x00000, 0x80000, CRC(f358df3e) SHA1(a82980ee04160e0ec541e114c198944b2802d0ff) )
 	ROM_LOAD16_BYTE( "fb5rom6.bin", 0x00001, 0x80000, CRC(7fba66f3) SHA1(7889394940db76172e1e78be852b0362197cbd8b) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb515sh_.id", 0x00, 0x20, CRC(8447a3b7) SHA1(8afb0154b60012d15b0296b395508946adc5ceb0) )	
 ROM_END
 
 ROM_START( fb5c )
@@ -4029,6 +4499,9 @@ ROM_START( fb5c )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb5rom5.bin", 0x00000, 0x80000, CRC(f358df3e) SHA1(a82980ee04160e0ec541e114c198944b2802d0ff) )
 	ROM_LOAD16_BYTE( "fb5rom6.bin", 0x00001, 0x80000, CRC(7fba66f3) SHA1(7889394940db76172e1e78be852b0362197cbd8b) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb515sh.id", 0x00, 0x20, CRC(d20771d2) SHA1(6a61d89d1c583c587106003849091a6c4f8b0faf) )	
 ROM_END
 
 ROM_START( fb5d )
@@ -4045,6 +4518,9 @@ ROM_START( fb5d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb5rom5.bin", 0x00000, 0x80000, CRC(f358df3e) SHA1(a82980ee04160e0ec541e114c198944b2802d0ff) )
 	ROM_LOAD16_BYTE( "fb5rom6.bin", 0x00001, 0x80000, CRC(7fba66f3) SHA1(7889394940db76172e1e78be852b0362197cbd8b) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb515sh.id", 0x00, 0x20, CRC(d20771d2) SHA1(6a61d89d1c583c587106003849091a6c4f8b0faf) )		
 ROM_END
 
 ROM_START( fb5v )
@@ -4061,6 +4537,9 @@ ROM_START( fb5v )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb5rom5.bin", 0x00000, 0x80000, CRC(f358df3e) SHA1(a82980ee04160e0ec541e114c198944b2802d0ff) )
 	ROM_LOAD16_BYTE( "fb5rom6.bin", 0x00001, 0x80000, CRC(7fba66f3) SHA1(7889394940db76172e1e78be852b0362197cbd8b) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb515sh.id", 0x00, 0x20, CRC(d20771d2) SHA1(6a61d89d1c583c587106003849091a6c4f8b0faf) )		
 ROM_END
 
 
@@ -4078,6 +4557,9 @@ ROM_START( fb6 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb06rom5.bin", 0x00000, 0x80000, CRC(97b80b5d) SHA1(871a3f90b6bc6c0b0aa2d1b863149bd17c8403bc) )
 	ROM_LOAD16_BYTE( "fb06rom6.bin", 0x00001, 0x80000, CRC(94f66c23) SHA1(c08ff1ffaf75621ab28cd7b7f43d3744614cd5c3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb617ex.id", 0x00, 0x20, CRC(0c5e0598) SHA1(978eb1924b6fd68798eb48f0a78eeb56ecd476f3) )				
 ROM_END
 
 ROM_START( fb6d )
@@ -4094,6 +4576,9 @@ ROM_START( fb6d )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb06rom5.bin", 0x00000, 0x80000, CRC(97b80b5d) SHA1(871a3f90b6bc6c0b0aa2d1b863149bd17c8403bc) )
 	ROM_LOAD16_BYTE( "fb06rom6.bin", 0x00001, 0x80000, CRC(94f66c23) SHA1(c08ff1ffaf75621ab28cd7b7f43d3744614cd5c3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb617lt.id", 0x00, 0x20, CRC(9903b0a6) SHA1(840873524b1cc33539926655ef94d23f6b219f76) )			
 ROM_END
 
 ROM_START( fb6d2 )
@@ -4109,7 +4594,10 @@ ROM_START( fb6d2 )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb06rom5.bin", 0x00000, 0x80000, CRC(97b80b5d) SHA1(871a3f90b6bc6c0b0aa2d1b863149bd17c8403bc) )
-	ROM_LOAD16_BYTE( "fb06rom6.bin", 0x00001, 0x80000, CRC(94f66c23) SHA1(c08ff1ffaf75621ab28cd7b7f43d3744614cd5c3) )
+	ROM_LOAD16_BYTE( "fb06rom6.bin", 0x00001, 0x80000, CRC(94f66c23) SHA1(c08ff1ffaf75621ab28cd7b7f43d3744614cd5c3) )	
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb617re.id", 0x00, 0x20, CRC(132908c4) SHA1(4e4c58327a181c511c8144349432a178936a997f) )
 ROM_END
 
 
@@ -4127,6 +4615,9 @@ ROM_START( fb6v )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb06rom5.bin", 0x00000, 0x80000, CRC(97b80b5d) SHA1(871a3f90b6bc6c0b0aa2d1b863149bd17c8403bc) )
 	ROM_LOAD16_BYTE( "fb06rom6.bin", 0x00001, 0x80000, CRC(94f66c23) SHA1(c08ff1ffaf75621ab28cd7b7f43d3744614cd5c3) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb617re.id", 0x00, 0x20, CRC(132908c4) SHA1(4e4c58327a181c511c8144349432a178936a997f) )
 ROM_END
 
 ROM_START( fb6v2 )
@@ -4143,6 +4634,9 @@ ROM_START( fb6v2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb06rom5.bin", 0x00000, 0x80000, CRC(97b80b5d) SHA1(871a3f90b6bc6c0b0aa2d1b863149bd17c8403bc) )
 	ROM_LOAD16_BYTE( "fb06rom6.bin", 0x00001, 0x80000, CRC(94f66c23) SHA1(c08ff1ffaf75621ab28cd7b7f43d3744614cd5c3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb617lt.id", 0x00, 0x20, CRC(9903b0a6) SHA1(840873524b1cc33539926655ef94d23f6b219f76) )		
 ROM_END
 
 ROM_START( fb6v3 )
@@ -4159,6 +4653,9 @@ ROM_START( fb6v3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "fb06rom5.bin", 0x00000, 0x80000, CRC(97b80b5d) SHA1(871a3f90b6bc6c0b0aa2d1b863149bd17c8403bc) )
 	ROM_LOAD16_BYTE( "fb06rom6.bin", 0x00001, 0x80000, CRC(94f66c23) SHA1(c08ff1ffaf75621ab28cd7b7f43d3744614cd5c3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb617ex.id", 0x00, 0x20, CRC(0c5e0598) SHA1(978eb1924b6fd68798eb48f0a78eeb56ecd476f3) )			
 ROM_END
 
 ROM_START( fb6s )
@@ -4178,6 +4675,9 @@ ROM_START( fb6s )
 	/* these should be different */
 	ROM_LOAD16_BYTE( "fb06rom5_s.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fb06rom6_s.bin", 0x00001, 0x80000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb617re.id", 0x00, 0x20, CRC(132908c4) SHA1(4e4c58327a181c511c8144349432a178936a997f) )
 ROM_END
 
 ROM_START( fb6s2 )
@@ -4197,6 +4697,9 @@ ROM_START( fb6s2 )
 	/* these should be different */
 	ROM_LOAD16_BYTE( "fb06rom5_s.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fb06rom6_s.bin", 0x00001, 0x80000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb617lt.id", 0x00, 0x20, CRC(9903b0a6) SHA1(840873524b1cc33539926655ef94d23f6b219f76) )
 ROM_END
 
 /* Special Edition */
@@ -4215,6 +4718,9 @@ ROM_START( fb6se )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "se06rom5.bin", 0x00000, 0x80000, CRC(d7530334) SHA1(faa336f2d4a32006c2854a34fb365e89e86660ce) )
 	ROM_LOAD16_BYTE( "se06rom6.bin", 0x00001, 0x80000, CRC(19f5873f) SHA1(c74a8b19faa754c77a50545a543e2b3069372046) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb6se14re.id", 0x00, 0x20, CRC(7261f79e) SHA1(ef66734cda8117d77cdd52e3079d472504010ead) )	
 ROM_END
 
 ROM_START( fb6sed )
@@ -4231,6 +4737,9 @@ ROM_START( fb6sed )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "se06rom5.bin", 0x00000, 0x80000, CRC(d7530334) SHA1(faa336f2d4a32006c2854a34fb365e89e86660ce) )
 	ROM_LOAD16_BYTE( "se06rom6.bin", 0x00001, 0x80000, CRC(19f5873f) SHA1(c74a8b19faa754c77a50545a543e2b3069372046) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb6se14lt.id", 0x00, 0x20, CRC(8d72c5a4) SHA1(51d874c14f4fcb5e0f72cbc0bef053170bdc5ee5) )	
 ROM_END
 
 ROM_START( fb6sed2 )
@@ -4247,6 +4756,9 @@ ROM_START( fb6sed2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "se06rom5.bin", 0x00000, 0x80000, CRC(d7530334) SHA1(faa336f2d4a32006c2854a34fb365e89e86660ce) )
 	ROM_LOAD16_BYTE( "se06rom6.bin", 0x00001, 0x80000, CRC(19f5873f) SHA1(c74a8b19faa754c77a50545a543e2b3069372046) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb6se14ex.id", 0x00, 0x20, CRC(188a49fb) SHA1(d94a238f34ff28c254a505adf49535871fd6e52f) )
 ROM_END
 
 ROM_START( fb6sev )
@@ -4263,6 +4775,9 @@ ROM_START( fb6sev )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "se06rom5.bin", 0x00000, 0x80000, CRC(d7530334) SHA1(faa336f2d4a32006c2854a34fb365e89e86660ce) )
 	ROM_LOAD16_BYTE( "se06rom6.bin", 0x00001, 0x80000, CRC(19f5873f) SHA1(c74a8b19faa754c77a50545a543e2b3069372046) )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb6se14re.id", 0x00, 0x20, CRC(7261f79e) SHA1(ef66734cda8117d77cdd52e3079d472504010ead) )
 ROM_END
 
 ROM_START( fb6sev2 )
@@ -4279,6 +4794,9 @@ ROM_START( fb6sev2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "se06rom5.bin", 0x00000, 0x80000, CRC(d7530334) SHA1(faa336f2d4a32006c2854a34fb365e89e86660ce) )
 	ROM_LOAD16_BYTE( "se06rom6.bin", 0x00001, 0x80000, CRC(19f5873f) SHA1(c74a8b19faa754c77a50545a543e2b3069372046) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb6se14lt.id", 0x00, 0x20, CRC(8d72c5a4) SHA1(51d874c14f4fcb5e0f72cbc0bef053170bdc5ee5) )		
 ROM_END
 
 ROM_START( fb6sev3 )
@@ -4295,6 +4813,9 @@ ROM_START( fb6sev3 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "se06rom5.bin", 0x00000, 0x80000, CRC(d7530334) SHA1(faa336f2d4a32006c2854a34fb365e89e86660ce) )
 	ROM_LOAD16_BYTE( "se06rom6.bin", 0x00001, 0x80000, CRC(19f5873f) SHA1(c74a8b19faa754c77a50545a543e2b3069372046) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fb6se14ex.id", 0x00, 0x20, CRC(188a49fb) SHA1(d94a238f34ff28c254a505adf49535871fd6e52f) )	
 ROM_END
 
 ROM_START( version4 )
@@ -4311,6 +4832,9 @@ ROM_START( version4 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "96rom5.bin", 0x00000, 0x40000, NO_DUMP )
 	ROM_LOAD16_BYTE( "96rom6.bin", 0x00001, 0x40000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )			
 ROM_END
 
 ROM_START( bugfever )
@@ -4327,6 +4851,9 @@ ROM_START( bugfever )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "bf17re.id", 0x00, 0x20, CRC(a482948d) SHA1(62b802e4906ebb00b2584bb0562a64e9a30aa6ed) )		
 ROM_END
 
 ROM_START( bugfeverd )
@@ -4343,6 +4870,9 @@ ROM_START( bugfeverd )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "bf17ex.id", 0x00, 0x20, CRC(38bd8ec4) SHA1(4e6b85348f2fa821934f7666f77ba0f016e200ec) )		
 ROM_END
 
 ROM_START( bugfeverv )
@@ -4359,6 +4889,9 @@ ROM_START( bugfeverv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "bf17re.id", 0x00, 0x20, CRC(a482948d) SHA1(62b802e4906ebb00b2584bb0562a64e9a30aa6ed) )		
 ROM_END
 
 ROM_START( bugfeverv2 )
@@ -4375,6 +4908,9 @@ ROM_START( bugfeverv2 )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "bfrom5.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "bfrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "bf17ex.id", 0x00, 0x20, CRC(38bd8ec4) SHA1(4e6b85348f2fa821934f7666f77ba0f016e200ec) )		
 ROM_END
 
 ROM_START( dvisland )
@@ -4391,6 +4927,9 @@ ROM_START( dvisland )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "dirom5.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "dirom6.bin", 0x00001, 0x80000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "di24re.id", 0x00, 0x20, CRC(d69c8ee5) SHA1(122c196fe03817b5c507339c7c64d6ee7ae12bad) )		
 ROM_END
 
 ROM_START( funriver )
@@ -4407,6 +4946,9 @@ ROM_START( funriver )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )		
 ROM_END
 
 ROM_START( funriverv )
@@ -4423,6 +4965,9 @@ ROM_START( funriverv )
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, NO_DUMP )
+	
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )		
 ROM_END
 
 // diagnostics?
@@ -4443,24 +4988,30 @@ ROM_END
 static DRIVER_INIT( sfbonus_common)
 {
 	sfbonus_tilemap_ram = auto_malloc(0x4000);
+	memset(sfbonus_tilemap_ram,0xff,0x4000);
 	state_save_register_global_pointer(machine, sfbonus_tilemap_ram , 0x4000);
 
 	sfbonus_reel_ram = auto_malloc(0x0800);
+	memset(sfbonus_reel_ram,0xff,0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel_ram , 0x0800);
 
 	sfbonus_reel2_ram = auto_malloc(0x0800);
+	memset(sfbonus_reel2_ram,0xff,0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel2_ram , 0x0800);
 
 	sfbonus_reel3_ram = auto_malloc(0x0800);
+	memset(sfbonus_reel3_ram,0xff,0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel3_ram , 0x0800);
 
 	sfbonus_reel4_ram = auto_malloc(0x0800);
+	memset(sfbonus_reel4_ram,0xff,0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel4_ram , 0x0800);
 
 	// hack, because the debugger is broken
 	sfbonus_videoram = memory_region(machine,"debugram");
 	if (!sfbonus_videoram) sfbonus_videoram = auto_malloc(0x10000);
 
+	memset(sfbonus_videoram,0xff,0x10000);
 
 	state_save_register_global_pointer(machine, sfbonus_videoram, 0x10000);
 
