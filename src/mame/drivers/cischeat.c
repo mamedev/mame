@@ -931,7 +931,7 @@ static ADDRESS_MAP_START( f1gpstr2_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM						)	// ROM
 	AM_RANGE(0x0e0000, 0x0fffff) AM_READ(SMH_RAM						)	// RAM
 	AM_RANGE(0x060004, 0x060005) AM_READ(soundlatch_word_r				)	// From Main CPU    (f1gpstar: 60000)
-	AM_RANGE(0x080002, 0x080003) AM_DEVREAD8("ym", ym2151_r, 0x00ff )
+	AM_RANGE(0x080000, 0x080003) AM_DEVREAD8("ym", ym2151_r, 0x00ff )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8("oki1", okim6295_r, 0x00ff		)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8("oki2", okim6295_r, 0x00ff		)
 ADDRESS_MAP_END
