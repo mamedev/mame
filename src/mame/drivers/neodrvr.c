@@ -314,6 +314,11 @@ INPUT_PORTS_END
   -- some may be missing, there have been multiple CRCs reported for the same
      revision in some cases
 
+ The 'japan-hotel' BIOS is a dump of an MVS which could be found in some japanese 
+ hotels. it is a custom MVS mobo which uses MVS carts but it hasn't jamma 
+ connector and it's similar to a console with a coin mechanism, so it's a sort 
+ of little coin op console installed in hotels.
+
  ****/
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -339,7 +344,7 @@ INPUT_PORTS_END
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "sp1.jipan.1024",0x00000, 0x020000, CRC(9fb0abe4) SHA1(18a987ce2229df79a8cf6a84f968f0e42ce4e59d) ) /* Japan, Older */ \
 	ROM_SYSTEM_BIOS( 8, "mv1c",   "NEO-MVH MV1C" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "sp-45.sp1",0x00000, 0x080000, CRC(03cc9f6a) SHA1(cdf1f49e3ff2bac528c21ed28449cf35b7957dc1) ) /* MV1C; redump required */ \
-	ROM_SYSTEM_BIOS( 9, "sp1v1",   "sp-1v1_3db8c" ) \
+	ROM_SYSTEM_BIOS( 9, "japan-hotel", "Custom Japanese Hotel" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 9, "sp-1v1_3db8c.bin",0x00000, 0x020000, CRC(162f0ebe) SHA1(fe1c6dd3dfcf97d960065b1bb46c1e11cb7bf271)  ) /* 'rare MVS found in japanese hotels' shows v1.3 in test mode */ \
 	ROM_SYSTEM_BIOS( 10, "uni-bios_2_3","Universe Bios (Hack, Ver. 2.3)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 10, "uni-bios_2_3.rom",  0x00000, 0x020000, CRC(27664eb5) SHA1(5b02900a3ccf3df168bdcfc98458136fd2b92ac0) ) /* Universe Bios v2.3 (hack) */ \
