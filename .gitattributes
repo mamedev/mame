@@ -1352,6 +1352,7 @@ src/mame/drivers/cheekyms.c svneol=native#text/plain
 src/mame/drivers/chinagat.c svneol=native#text/plain
 src/mame/drivers/chinsan.c svneol=native#text/plain
 src/mame/drivers/chqflag.c svneol=native#text/plain
+src/mame/drivers/chsuper.c svneol=native#text/plain
 src/mame/drivers/cidelsa.c svneol=native#text/plain
 src/mame/drivers/cinemat.c svneol=native#text/plain
 src/mame/drivers/circus.c svneol=native#text/plain

@@ -8983,6 +8983,8 @@ Other Sun games
 	DRIVER( atworld )
 	DRIVER( atworlda )
 
+	DRIVER( chsuper3 )	/* unknown */
+	DRIVER( chsuper2 )	/* unknown */
 	DRIVER( 3super8 )	/* unknown */
 	DRIVER( buster )	/* (c) 1987 Marian Electronics Ltd. */
 	DRIVER( spielbud )	/* (c) 1985 ADP */

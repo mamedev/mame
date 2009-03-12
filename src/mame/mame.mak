@@ -1559,6 +1559,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
+	$(DRIVERS)/chsuper.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
 	$(DRIVERS)/comebaby.o \
