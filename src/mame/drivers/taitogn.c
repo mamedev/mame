@@ -811,11 +811,28 @@ ROM_START( taitogn )
 	TAITOGNET_BIOS
 ROM_END
 
-ROM_START(spuzbobl)
+/* Taito */
+
+ROM_START(raycris)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "spuzbobl", 0, SHA1(ed9d621cffa313813d7b45b0228bc15514fe7e36))
+	DISK_IMAGE( "raycris", 0, SHA1(83c4bd9a8096d1939a241b34a7e5f53403a58e15) MD5(7c80cad1f13f4f16d5b829fdd26e0123) )
+ROM_END
+
+
+ROM_START(gobyrc)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "gobyrc", 0, SHA1(674c1a4a612a16abdb0f2b243b4bcf3b354adf7b) MD5(89055235dc0f3d3e3e1701603f229e53) )
+ROM_END
+
+ROM_START(rcdego)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "rcdego", 0, SHA1(b70effc7a01e6b5e51cc2d5bc8e4afab583cc635) MD5(e8c650e295f37dc334f79b06e0974015) )
 ROM_END
 
 ROM_START(chaoshea)
@@ -825,10 +842,109 @@ ROM_START(chaoshea)
 	DISK_IMAGE( "chaoshea", 0, SHA1(5b43c3597808792c3084367ed6bc3bf4bb8bc99e))
 ROM_END
 
+
+ROM_START(spuzbobl)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "spuzbobl", 0, SHA1(ed9d621cffa313813d7b45b0228bc15514fe7e36))
+ROM_END
+
+
+ROM_START(soutenry)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	//DISK_IMAGE( "soutenry", 0, SHA1(511732c56dcfd57518227247999d81271775aa9c) MD5(a4b6bcdd98aaaa749fd95a217b0346bc) )
+ROM_END
+
+ROM_START(shanghss)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	//DISK_IMAGE( "shanghss", 0, SHA1(9140cd7e9dc509093065dacfb7b189812917aa6d) MD5(c4375eaaa638b1ab0c043f1e31bf49d7) )
+ROM_END
+
+/* Success */
+
+ROM_START(psyvaria)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	//DISK_IMAGE( "psyvaria", 0,  SHA1(7bda7da6ad2d8ee820881c33f107aba6cb7959fd) MD5(055c6c1e72faf796f7029fc6f8f10129) )
+ROM_END
+
+ROM_START(psyvarrv)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	//DISK_IMAGE( "psyvarrv", 0, SHA1(2d947f87e2d924013f849839b51a9843b33e6da7) MD5(a9265c3d0b8d2fb0b091d677dac44f71) )
+ROM_END
+
+
+ROM_START(zokuoten)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	//DISK_IMAGE( "zokuoten", 0, SHA1(e067c45578acde0039ed6ed480265d2814296e22) MD5(41d3ff2c1674a651fd3b90d5498ed3b6) )
+ROM_END
+
+/* Takumi */
+
+ROM_START(nightrai)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	//DISK_IMAGE( "nightrai", 0, SHA1(069249c36d6678959bc1077c47090f254189ffc1) MD5(4df525e767e7168a6eda0dc49d0fb6fe) )
+ROM_END
+
+/* Warashi */
+
+ROM_START(usagi)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	//DISK_IMAGE( "usagi", 0, SHA1(a729a6dc2317f8be8f4de48edd7e6a5dcadc1f7c) MD5(3985d32f835e500cfcbd0a5f88e51bfe) )
+ROM_END
+
+ROM_START(mahjngoh)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	//DISK_IMAGE( "mahjngoh", 0, SHA1(ee97ba75282223afa41f21b1d38a6ed1d26962cd) MD5(22613e2b279225a671e3432fbd5cb1f3) )
+ROM_END
+
+/* Triangle Service */
+
+ROM_START(xiistag)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	//DISK_IMAGE( "xiistag", 0, SHA1(783ba9c58f56c36075678b58bed813451fb627cd) MD5(2e9bad0a6900a8fef00f37da457ad72b) )
+ROM_END
+
+
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-3002t.353 file, so that we do not have to include */
 /* it in every zip file */
 GAME( 1997, taitogn,  0, coh3002t, coh3002t, coh3002t, ROT0, "Sony/Taito", "Taito GNET", GAME_IS_BIOS_ROOT )
 
-GAME( 1998, chaoshea, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Chaos Heat", 0 )
-GAME( 1999, spuzbobl, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Super Puzzle Bobble", 0 )
+GAME( 199?, raycris,  taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Ray Crisis (V2.03J)", 0 )
+GAME( 199?, gobyrc, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING ) // custom inputs need calibrating
+GAME( 199?, rcdego, gobyrc,  coh3002t, coh3002t, coh3002t, ROT0, "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING ) // custom inputs need calibrating
+GAME( 1998, chaoshea, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Chaos Heat (V2.08J)", 0 )
+GAME( 1999, spuzbobl, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Super Puzzle Bobble (V2.05O)", 0 )
+GAME( 2000, soutenry, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Soutenryu (V2.07J)", 0 )
+GAME( 2000, shanghss, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Shanghai Shoryu Sairin (V2.03J)", 0 )
+
+GAME( 2000, psyvaria, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J)", 0 )
+GAME( 2000, psyvarrv, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", 0 )
+GAME( 2000, zokuoten, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", 0 )
+
+GAME( 199?, usagi,    taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Warashi/Mahjong Kobo/Taito", "Usagi (V2.02J)", GAME_NOT_WORKING ) // no inputs (mahjong panel?)
+GAME( 1999, mahjngoh, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Warashi/Mahjong Kobo/Taito", "Mahjong Oh (V2.06J)", GAME_NOT_WORKING ) // needs mahjong panel
+
+GAME( 2001, nightrai, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Night Raid (V2.03J)", GAME_NOT_WORKING ) // no background / enemy sprites
+
+GAME( 2002, xiistag,  taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Triangle Service", "XII Stag (V2.01J)", 0 )
+
