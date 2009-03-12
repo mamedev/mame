@@ -2952,6 +2952,8 @@ V-V                           TP-027
 
 	/* Taito GNET */
 	DRIVER( taitogn )
+	DRIVER( spuzbobl )
+	DRIVER( chaoshea )
 
 	/* Namco System 11 */
 	DRIVER( tekken )	/* Tekken (TE4/VER.C) */

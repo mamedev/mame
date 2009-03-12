@@ -66,11 +66,13 @@ void ide_set_user_password(const device_config *device, const UINT8 *password);
 int ide_bus_r(const device_config *config, int select, int offset);
 void ide_bus_w(const device_config *config, int select, int offset, int data);
 
-int ide_controller_r(const device_config *config, int reg);
-void ide_controller_w(const device_config *config, int reg, int data);
+UINT32 ide_controller_r(const device_config *config, int reg, int size);
+void ide_controller_w(const device_config *config, int reg, int size, UINT32 data);
 
 READ32_DEVICE_HANDLER( ide_controller32_r );
 WRITE32_DEVICE_HANDLER( ide_controller32_w );
+READ32_DEVICE_HANDLER( ide_controller32_pcmcia_r );
+WRITE32_DEVICE_HANDLER( ide_controller32_pcmcia_w );
 READ32_DEVICE_HANDLER( ide_bus_master32_r );
 WRITE32_DEVICE_HANDLER( ide_bus_master32_w );
 

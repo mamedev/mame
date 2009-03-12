@@ -47,20 +47,22 @@
 
 #define IDE_CONFIG_REGISTERS			0x10
 
-#define IDE_ADDR_CONFIG_UNK				0x034
-#define IDE_ADDR_CONFIG_REGISTER		0x038
-#define IDE_ADDR_CONFIG_DATA			0x03c
+#define BANK(b, v) (((v) << 4) | (b))
 
-#define IDE_ADDR_DATA					0x1f0
-#define IDE_ADDR_ERROR					0x1f1
-#define IDE_ADDR_SECTOR_COUNT			0x1f2
-#define IDE_ADDR_SECTOR_NUMBER			0x1f3
-#define IDE_ADDR_CYLINDER_LSB			0x1f4
-#define IDE_ADDR_CYLINDER_MSB			0x1f5
-#define IDE_ADDR_HEAD_NUMBER			0x1f6
-#define IDE_ADDR_STATUS_COMMAND			0x1f7
+#define IDE_BANK0_DATA					BANK(0, 0)
+#define IDE_BANK0_ERROR					BANK(0, 1)
+#define IDE_BANK0_SECTOR_COUNT			BANK(0, 2)
+#define IDE_BANK0_SECTOR_NUMBER			BANK(0, 3)
+#define IDE_BANK0_CYLINDER_LSB			BANK(0, 4)
+#define IDE_BANK0_CYLINDER_MSB			BANK(0, 5)
+#define IDE_BANK0_HEAD_NUMBER			BANK(0, 6)
+#define IDE_BANK0_STATUS_COMMAND		BANK(0, 7)
 
-#define IDE_ADDR_STATUS_CONTROL			0x3f6
+#define IDE_BANK1_STATUS_CONTROL		BANK(1, 6)
+
+#define IDE_BANK2_CONFIG_UNK			BANK(2, 4)
+#define IDE_BANK2_CONFIG_REGISTER		BANK(2, 8)
+#define IDE_BANK2_CONFIG_DATA			BANK(2, 0xc)
 
 #define IDE_COMMAND_READ_MULTIPLE		0x20
 #define IDE_COMMAND_READ_MULTIPLE_ONCE	0x21
@@ -79,6 +81,8 @@
 #define IDE_COMMAND_ATAPI_IDENTIFY		0xa1
 #define IDE_COMMAND_RECALIBRATE			0x10
 #define IDE_COMMAND_IDLE_IMMEDIATE		0xe1
+#define IDE_COMMAND_TAITO_GNET_UNLOCK_1 0xfe
+#define IDE_COMMAND_TAITO_GNET_UNLOCK_2 0xfc
 
 #define IDE_ERROR_NONE					0x00
 #define IDE_ERROR_DEFAULT				0x01
@@ -144,6 +148,7 @@ struct _ide_state
 	UINT8			config_register[IDE_CONFIG_REGISTERS];
 	UINT8			config_register_num;
 
+	chd_file       *handle;
 	hard_disk_file *disk;
 	emu_timer *		last_status_timer;
 	emu_timer *		reset_timer;
@@ -170,8 +175,8 @@ static TIMER_CALLBACK( read_sector_done_callback );
 static void read_first_sector(ide_state *ide);
 static void read_next_sector(ide_state *ide);
 
-static UINT32 ide_controller_read(const device_config *device, offs_t offset, int size);
-static void ide_controller_write(const device_config *device, offs_t offset, int size, UINT32 data);
+static UINT32 ide_controller_read(const device_config *device, int bank, offs_t offset, int size);
+static void ide_controller_write(const device_config *device, int bank, offs_t offset, int size, UINT32 data);
 
 
 
@@ -427,12 +432,10 @@ static void swap_strncpy(UINT8 *dst, const char *src, int field_size_in_words)
 }
 
 
-static void ide_build_features(ide_state *ide)
+static void ide_generate_features(ide_state *ide)
 {
 	int total_sectors = ide->num_cylinders * ide->num_heads * ide->num_sectors;
 	int sectors_per_track = ide->num_heads * ide->num_sectors;
-
-	memset(ide->buffer, 0, IDE_DISK_SECTOR_SIZE);
 
 	/* basic geometry */
 	ide->features[ 0*2+0] = 0x5a;						/*  0: configuration bits */
@@ -586,6 +589,12 @@ static void ide_build_features(ide_state *ide)
 }
 
 
+static void ide_build_features(ide_state *ide)
+{
+	memset(ide->features, 0, IDE_DISK_SECTOR_SIZE);
+	if (chd_get_metadata (ide->handle, HARD_DISK_IDENT_METADATA_TAG, 0, ide->features, IDE_DISK_SECTOR_SIZE, 0, 0, 0) != CHDERR_NONE)
+		ide_generate_features (ide);
+}
 
 /*************************************
  *
@@ -1160,6 +1169,28 @@ static void handle_command(ide_state *ide, UINT8 command)
 			signal_interrupt(ide);
 			break;
 
+		case IDE_COMMAND_TAITO_GNET_UNLOCK_1:
+			LOGPRINT(("IDE GNET Unlock 1\n"));
+
+			ide->sector_count = 1;
+			ide->status |= IDE_STATUS_DRIVE_READY;
+			ide->status &= ~IDE_STATUS_ERROR;
+			signal_interrupt(ide);
+			break;
+
+		case IDE_COMMAND_TAITO_GNET_UNLOCK_2:
+			LOGPRINT(("IDE GNET Unlock 2\n"));
+
+			/* reset the buffer */
+			ide->buffer_offset = 0;
+			ide->sectors_until_int = 0;
+			ide->dma_active = 0;
+
+			/* mark the buffer ready */
+			ide->status |= IDE_STATUS_BUFFER_READY;
+			signal_interrupt(ide);
+			break;
+
 		default:
 			LOGPRINT(("IDE unknown command (%02X)\n", command));
 			debugger_break(ide->device->machine);
@@ -1175,33 +1206,33 @@ static void handle_command(ide_state *ide, UINT8 command)
  *
  *************************************/
 
-static UINT32 ide_controller_read(const device_config *device, offs_t offset, int size)
+static UINT32 ide_controller_read(const device_config *device, int bank, offs_t offset, int size)
 {
 	ide_state *ide = get_safe_token(device);
 	UINT32 result = 0;
 
 	/* logit */
-//  if (offset != IDE_ADDR_DATA && offset != IDE_ADDR_STATUS_COMMAND && offset != IDE_ADDR_STATUS_CONTROL)
-		LOG(("%s:IDE read at %03X, size=%d\n", cpuexec_describe_context(device->machine), offset, size));
+//  if (BANK(bank, offset) != IDE_BANK0_DATA && BANK(bank, offset) != IDE_BANK0_STATUS_COMMAND && BANK(bank, offset) != IDE_BANK1_STATUS_CONTROL)
+		LOG(("%s:IDE read at %d:%X, size=%d\n", cpuexec_describe_context(device->machine), bank, offset, size));
 
-	switch (offset)
+	switch (BANK(bank, offset))
 	{
 		/* unknown config register */
-		case IDE_ADDR_CONFIG_UNK:
+		case IDE_BANK2_CONFIG_UNK:
 			return ide->config_unknown;
 
 		/* active config register */
-		case IDE_ADDR_CONFIG_REGISTER:
+		case IDE_BANK2_CONFIG_REGISTER:
 			return ide->config_register_num;
 
 		/* data from active config register */
-		case IDE_ADDR_CONFIG_DATA:
+		case IDE_BANK2_CONFIG_DATA:
 			if (ide->config_register_num < IDE_CONFIG_REGISTERS)
 				return ide->config_register[ide->config_register_num];
 			return 0;
 
 		/* read data if there's data to be read */
-		case IDE_ADDR_DATA:
+		case IDE_BANK0_DATA:
 			if (ide->status & IDE_STATUS_BUFFER_READY)
 			{
 				/* fetch the correct amount of data */
@@ -1224,33 +1255,33 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 			break;
 
 		/* return the current error */
-		case IDE_ADDR_ERROR:
+		case IDE_BANK0_ERROR:
 			return ide->error;
 
 		/* return the current sector count */
-		case IDE_ADDR_SECTOR_COUNT:
+		case IDE_BANK0_SECTOR_COUNT:
 			return ide->sector_count;
 
 		/* return the current sector */
-		case IDE_ADDR_SECTOR_NUMBER:
+		case IDE_BANK0_SECTOR_NUMBER:
 			return ide->cur_sector;
 
 		/* return the current cylinder LSB */
-		case IDE_ADDR_CYLINDER_LSB:
+		case IDE_BANK0_CYLINDER_LSB:
 			return ide->cur_cylinder & 0xff;
 
 		/* return the current cylinder MSB */
-		case IDE_ADDR_CYLINDER_MSB:
+		case IDE_BANK0_CYLINDER_MSB:
 			return ide->cur_cylinder >> 8;
 
 		/* return the current head */
-		case IDE_ADDR_HEAD_NUMBER:
+		case IDE_BANK0_HEAD_NUMBER:
 			return ide->cur_head_reg;
 
 		/* return the current status and clear any pending interrupts */
-		case IDE_ADDR_STATUS_COMMAND:
+		case IDE_BANK0_STATUS_COMMAND:
 		/* return the current status but don't clear interrupts */
-		case IDE_ADDR_STATUS_CONTROL:
+		case IDE_BANK1_STATUS_CONTROL:
 			result = ide->status;
 			if (attotime_compare(timer_timeelapsed(ide->last_status_timer), TIME_PER_ROTATION) > 0)
 			{
@@ -1259,7 +1290,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 			}
 
 			/* clear interrutps only when reading the real status */
-			if (offset == IDE_ADDR_STATUS_COMMAND)
+			if (BANK(bank, offset) == IDE_BANK0_STATUS_COMMAND)
 			{
 				if (ide->interrupt_pending)
 					clear_interrupt(ide);
@@ -1284,34 +1315,34 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
  *
  *************************************/
 
-static void ide_controller_write(const device_config *device, offs_t offset, int size, UINT32 data)
+static void ide_controller_write(const device_config *device, int bank, offs_t offset, int size, UINT32 data)
 {
 	ide_state *ide = get_safe_token(device);
 
 	/* logit */
-	if (offset != IDE_ADDR_DATA)
-		LOG(("%s:IDE write to %03X = %08X, size=%d\n", cpuexec_describe_context(device->machine), offset, data, size));
-
-	switch (offset)
+	if (BANK(bank, offset) != IDE_BANK0_DATA)
+		LOG(("%s:IDE write to %d:%X = %08X, size=%d\n", cpuexec_describe_context(device->machine), bank, offset, data, size));
+	//	fprintf(stderr, "ide write %03x %02x size=%d\n", offset, data, size);
+	switch (BANK(bank, offset))
 	{
 		/* unknown config register */
-		case IDE_ADDR_CONFIG_UNK:
+		case IDE_BANK2_CONFIG_UNK:
 			ide->config_unknown = data;
 			break;
 
 		/* active config register */
-		case IDE_ADDR_CONFIG_REGISTER:
+		case IDE_BANK2_CONFIG_REGISTER:
 			ide->config_register_num = data;
 			break;
 
 		/* data from active config register */
-		case IDE_ADDR_CONFIG_DATA:
+		case IDE_BANK2_CONFIG_DATA:
 			if (ide->config_register_num < IDE_CONFIG_REGISTERS)
 				ide->config_register[ide->config_register_num] = data;
 			break;
 
 		/* write data */
-		case IDE_ADDR_DATA:
+		case IDE_BANK0_DATA:
 			if (ide->status & IDE_STATUS_BUFFER_READY)
 			{
 				/* store the correct amount of data */
@@ -1328,9 +1359,7 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
 					LOG(("%s:IDE completed PIO write\n", cpuexec_describe_context(device->machine)));
-					if (ide->command != IDE_COMMAND_SECURITY_UNLOCK)
-						continue_write(ide);
-					else
+					if (ide->command == IDE_COMMAND_SECURITY_UNLOCK)
 					{
 						if (ide->user_password_enable && memcmp(ide->buffer, ide->user_password, 2 + 32) == 0)
 						{
@@ -1357,7 +1386,7 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 							mame_printf_debug("\n");
 						}
 
-						/* clear the busy adn error flags */
+						/* clear the busy and error flags */
 						ide->status &= ~IDE_STATUS_ERROR;
 						ide->status &= ~IDE_STATUS_BUSY;
 						ide->status &= ~IDE_STATUS_BUFFER_READY;
@@ -1367,37 +1396,56 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 						else
 							ide->status |= IDE_STATUS_DRIVE_READY;
 					}
+					else if (ide->command == IDE_COMMAND_TAITO_GNET_UNLOCK_2)
+					{
+						UINT8 key[5] = { 0, 0, 0, 0, 0 };
+						int i, bad = 0;
+						chd_get_metadata (ide->handle, HARD_DISK_KEY_METADATA_TAG, 0, key, 5, 0, 0, 0);
+
+						for (i=0; !bad && i<512; i++)
+							bad = ((i < 2 || i >= 7) && ide->buffer[i]) || ((i >= 2 && i < 7) && ide->buffer[i] != key[i-2]);
+
+						ide->status &= ~IDE_STATUS_BUSY;
+						ide->status &= ~IDE_STATUS_BUFFER_READY;
+						if (bad)
+							ide->status |= IDE_STATUS_ERROR;
+						else
+							ide->status &= ~IDE_STATUS_ERROR;
+					}
+					else
+						continue_write(ide);
+
 				}
 			}
 			break;
 
 		/* precompensation offset?? */
-		case IDE_ADDR_ERROR:
+		case IDE_BANK0_ERROR:
 			ide->precomp_offset = data;
 			break;
 
 		/* sector count */
-		case IDE_ADDR_SECTOR_COUNT:
+		case IDE_BANK0_SECTOR_COUNT:
 			ide->sector_count = data ? data : 256;
 			break;
 
 		/* current sector */
-		case IDE_ADDR_SECTOR_NUMBER:
+		case IDE_BANK0_SECTOR_NUMBER:
 			ide->cur_sector = data;
 			break;
 
 		/* current cylinder LSB */
-		case IDE_ADDR_CYLINDER_LSB:
+		case IDE_BANK0_CYLINDER_LSB:
 			ide->cur_cylinder = (ide->cur_cylinder & 0xff00) | (data & 0xff);
 			break;
 
 		/* current cylinder MSB */
-		case IDE_ADDR_CYLINDER_MSB:
+		case IDE_BANK0_CYLINDER_MSB:
 			ide->cur_cylinder = (ide->cur_cylinder & 0x00ff) | ((data & 0xff) << 8);
 			break;
 
 		/* current head */
-		case IDE_ADDR_HEAD_NUMBER:
+		case IDE_BANK0_HEAD_NUMBER:
 			ide->cur_head = data & 0x0f;
 			ide->cur_head_reg = data;
 			// drive index = data & 0x10
@@ -1405,12 +1453,12 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 			break;
 
 		/* command */
-		case IDE_ADDR_STATUS_COMMAND:
+		case IDE_BANK0_STATUS_COMMAND:
 			handle_command(ide, data);
 			break;
 
 		/* adapter control */
-		case IDE_ADDR_STATUS_CONTROL:
+		case IDE_BANK1_STATUS_CONTROL:
 			ide->adapter_control = data;
 
 			/* handle controller reset */
@@ -1539,8 +1587,7 @@ static void ide_bus_master_write(const device_config *device, offs_t offset, int
 */
 int ide_bus_r(const device_config *device, int select, int offset)
 {
-	offset += select ? 0x3f0 : 0x1f0;
-	return ide_controller_read(device, offset, (offset == 0x1f0) ? 2 : 1);
+	return ide_controller_read(device, select ? 1 : 0, offset, select == 0 && offset == 0 ? 2 : 1);
 }
 
 /*
@@ -1554,21 +1601,31 @@ int ide_bus_r(const device_config *device, int select, int offset)
 */
 void ide_bus_w(const device_config *device, int select, int offset, int data)
 {
-	offset += select ? 0x3f0 : 0x1f0;
-	if (offset == 0x1f0)
-		ide_controller_write(device, offset, 2, data);
+	if (select == 0 && offset == 0)
+		ide_controller_write(device, 0, 0, 2, data);
 	else
-		ide_controller_write(device, offset, 1, data & 0xff);
+		ide_controller_write(device, select ? 1 : 0, offset, 1, data & 0xff);
 }
 
-int ide_controller_r(const device_config *device, int reg)
+UINT32 ide_controller_r(const device_config *device, int reg, int size)
 {
-	return ide_controller_read(device, reg, 1);
+	if (reg >= 0x1f0 && reg < 0x1f8)
+		return ide_controller_read(device, 0, reg & 7, size);
+	if (reg >= 0x3f0 && reg < 0x3f8)
+		return ide_controller_read(device, 1, reg & 7, size);
+	if (reg >= 0x030 && reg < 0x040)
+		return ide_controller_read(device, 2, reg & 0xf, size);
+	return 0xffffffff;
 }
 
-void ide_controller_w(const device_config *device, int reg, int data)
+void ide_controller_w(const device_config *device, int reg, int size, UINT32 data)
 {
-	ide_controller_write(device, reg, 1, data);
+	if (reg >= 0x1f0 && reg < 0x1f8)
+		ide_controller_write(device, 0, reg & 7, size, data);
+	if (reg >= 0x3f0 && reg < 0x3f8)
+		ide_controller_write(device, 1, reg & 7, size, data);
+	if (reg >= 0x030 && reg < 0x040)
+		ide_controller_write(device, 2, reg & 0xf, size, data);
 }
 
 
@@ -1585,7 +1642,7 @@ READ32_DEVICE_HANDLER( ide_controller32_r )
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	return ide_controller_read(device, offset, size) << ((offset & 3) * 8);
+	return ide_controller_r(device, offset, size) << ((offset & 3) * 8);
 }
 
 
@@ -1595,10 +1652,42 @@ WRITE32_DEVICE_HANDLER( ide_controller32_w )
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
+	data = data >> ((offset & 3) * 8);
 
-	ide_controller_write(device, offset, size, data >> ((offset & 3) * 8));
+	ide_controller_w(device, offset, size, data);
 }
 
+
+READ32_DEVICE_HANDLER( ide_controller32_pcmcia_r )
+{
+	int size;
+	UINT32 res = 0xffffffff;
+
+	offset *= 4;
+	size = convert_to_offset_and_size32(&offset, mem_mask);
+
+	if (offset >= 0x000 && offset < 0x008)
+		res = ide_controller_read(device, 0, offset & 7, size);
+	if (offset >= 0x008 && offset < 0x010)
+		res = ide_controller_read(device, 1, offset & 7, size);
+
+	return res << ((offset & 3) * 8);
+}
+
+
+WRITE32_DEVICE_HANDLER( ide_controller32_pcmcia_w )
+{
+	int size;
+
+	offset *= 4;
+	size = convert_to_offset_and_size32(&offset, mem_mask);
+	data = data >> ((offset & 3) * 8);
+
+	if (offset >= 0x000 && offset < 0x008)
+		ide_controller_write(device, 0, offset & 7, size, data);
+	if (offset >= 0x008 && offset < 0x010)
+		ide_controller_write(device, 1, offset & 7, size, data);
+}
 
 READ32_DEVICE_HANDLER( ide_bus_master32_r )
 {
@@ -1633,10 +1722,10 @@ READ16_DEVICE_HANDLER( ide_controller16_r )
 {
 	int size;
 
-	offset *= 2;
+	offset *= 4;
 	size = convert_to_offset_and_size16(&offset, mem_mask);
 
-	return ide_controller_read(device, offset, size) << ((offset & 1) * 8);
+	return ide_controller_r(device, offset, size) << ((offset & 1) * 8);
 }
 
 
@@ -1647,7 +1736,7 @@ WRITE16_DEVICE_HANDLER( ide_controller16_w )
 	offset *= 2;
 	size = convert_to_offset_and_size16(&offset, mem_mask);
 
-	ide_controller_write(device, offset, size, data >> ((offset & 1) * 8));
+	ide_controller_w(device, offset, size, data >> ((offset & 1) * 8));
 }
 
 
@@ -1678,7 +1767,8 @@ static DEVICE_START( ide_controller )
 
 	/* set MAME harddisk handle */
 	config = (const ide_config *)device->inline_config;
-	ide->disk = hard_disk_open(get_disk_handle((config->master != NULL) ? config->master : device->tag));
+	ide->handle = get_disk_handle((config->master != NULL) ? config->master : device->tag);
+	ide->disk = hard_disk_open(ide->handle);
 	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
 
 	/* find the bus master space */

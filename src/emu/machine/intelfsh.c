@@ -98,6 +98,7 @@ void intelflash_init(running_machine *machine, int chip, int type, void *data)
 		c->device_id = 0xaa;
 		break;
 	case FLASH_SHARP_LH28F400:
+	case FLASH_INTEL_E28F400:
 		c->bits = 16;
 		c->size = 0x80000;
 		c->maker_id = 0xb0;

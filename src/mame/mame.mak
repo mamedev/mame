@@ -598,6 +598,7 @@ $(MAMEOBJ)/capcom.a: \
 	$(DRIVERS)/vulgus.o $(VIDEO)/vulgus.o \
 	$(DRIVERS)/tigeroad.o $(VIDEO)/tigeroad.o \
 	$(DRIVERS)/zn.o $(MACHINE)/znsec.o \
+	$(DRIVERS)/taitogn.o \
 	$(MACHINE)/cps2crpt.o \
 	$(MACHINE)/kabuki.o \
 

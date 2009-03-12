@@ -2075,6 +2075,7 @@ src/mame/drivers/taito_l.c svneol=native#text/plain
 src/mame/drivers/taito_x.c svneol=native#text/plain
 src/mame/drivers/taito_z.c svneol=native#text/plain
 src/mame/drivers/taitoair.c svneol=native#text/plain
+src/mame/drivers/taitogn.c svneol=native#text/plain
 src/mame/drivers/taitojc.c svneol=native#text/plain
 src/mame/drivers/taitopjc.c svneol=native#text/plain
 src/mame/drivers/taitosj.c svneol=native#text/plain
