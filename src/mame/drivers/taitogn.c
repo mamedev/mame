@@ -572,9 +572,27 @@ static READ32_HANDLER( coin_r )
 	return coin_info;
 }
 
+/* mahjong panel handler (for Usagi & Mahjong Oh) */
+static READ32_HANDLER( gnet_mahjong_panel_r )
+{
+	static UINT32 mux_data;
+
+	mux_data = coin_info;
+	mux_data &= 0xcc;
+
+	switch(mux_data)
+	{
+		case 0x04: return input_port_read(space->machine, "KEY0");
+		case 0x08: return input_port_read(space->machine, "KEY1");
+		case 0x40: return input_port_read(space->machine, "KEY2");
+		case 0x80: return input_port_read(space->machine, "KEY3");
+	}
+
+	/* mux disabled */
+	return input_port_read(space->machine, "P4");
+}
 
 // Init and reset
-
 
 static NVRAM_HANDLER( coh3002t )
 {
@@ -611,6 +629,12 @@ static DRIVER_INIT( coh3002t )
 
 	memset(cis, 0xff, 512);
 	chd_get_metadata(get_disk_handle("card"), PCMCIA_CIS_METADATA_TAG, 0, cis, 512, 0, 0, 0);
+}
+
+static DRIVER_INIT( coh3002t_mp )
+{
+	DRIVER_INIT_CALL(coh3002t);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10100, 0x1fa10103, 0, 0, gnet_mahjong_panel_r );
 }
 
 static MACHINE_RESET( coh3002t )
@@ -789,6 +813,46 @@ static INPUT_PORTS_START( coh3002t )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+/* input port define for the mahjong panel (standard type) */
+static INPUT_PORTS_START( coh3002t_mp )
+	PORT_INCLUDE( coh3002t )
+
+	PORT_START("KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) //rate button
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 //    ROM_LOAD( "flashv2.u30",    0x000000, 0x200000, CRC(f624ebf8) SHA1(be84ef1b083f819f3ab13c983c52bca97bb908ef) )
 
 #define TAITOGNET_BIOS \
@@ -954,8 +1018,8 @@ GAME( 2000, psyvaria, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", 
 GAME( 2000, psyvarrv, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", 0 )
 GAME( 2000, zokuoten, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", 0 )
 
-GAME( 199?, usagi,    taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Warashi/Mahjong Kobo/Taito", "Usagi (V2.02J)", GAME_NOT_WORKING ) // no inputs (mahjong panel?)
-GAME( 1999, mahjngoh, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Warashi/Mahjong Kobo/Taito", "Mahjong Oh (V2.06J)", GAME_NOT_WORKING ) // needs mahjong panel
+GAME( 199?, usagi,    taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Usagi (V2.02J)", 0 )
+GAME( 1999, mahjngoh, taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Mahjong Oh (V2.06J)", 0 )
 
 GAME( 2001, nightrai, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Night Raid (V2.03J)", GAME_NOT_WORKING ) // no background / enemy sprites
 
