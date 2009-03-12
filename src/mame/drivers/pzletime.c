@@ -8,9 +8,7 @@
 
     Notes:
     - Is the brightness effect right or there's a different video effect?
-    - In the service menu, where you can configure game options, and when you have to
-      choose the Game Mode, you can't see what is selected, becase the 2 halves of the
-      palette used by txt tilemap have the same data. Is it a real game bug?
+    - Text tilemap flickering could be a bit different.
 
 *****************************************************************************************/
 
@@ -40,7 +38,10 @@ static TILE_GET_INFO( get_txt_tile_info )
 	tileno = txt_videoram[tile_index] & 0x0fff;
 	colour = txt_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
+	
 	SET_TILE_INFO(0,tileno,colour,0);
+	
+	tileinfo->category = (colour & 8) ? 1 : 0;
 }
 
 static VIDEO_START( pzletime )
@@ -105,6 +106,8 @@ static VIDEO_UPDATE( pzletime )
 	}
 
 	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
+	if((video_screen_get_frame_number(screen) % 16) != 0)
+		tilemap_draw(bitmap,cliprect,txt_tilemap,1,0);
 
 	return 0;
 }
