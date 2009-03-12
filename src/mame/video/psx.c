@@ -3345,6 +3345,7 @@ void psx_gpu_write( running_machine *machine, UINT32 *p_ram, INT32 n_size )
 		case 0x48:
 		case 0x4a:
 		case 0x4c:
+		case 0x4e:		
 			if( m_n_gpu_buffer_offset < 3 )
 			{
 				m_n_gpu_buffer_offset++;
@@ -3367,6 +3368,7 @@ void psx_gpu_write( running_machine *machine, UINT32 *p_ram, INT32 n_size )
 			break;
 		case 0x50:
 		case 0x52:
+
 			if( m_n_gpu_buffer_offset < 3 )
 			{
 				m_n_gpu_buffer_offset++;
@@ -3378,6 +3380,7 @@ void psx_gpu_write( running_machine *machine, UINT32 *p_ram, INT32 n_size )
 				m_n_gpu_buffer_offset = 0;
 			}
 			break;
+		case 0x55:	
 		case 0x58:
 		case 0x5a:
 		case 0x5c:
