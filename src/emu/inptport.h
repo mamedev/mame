@@ -59,6 +59,7 @@ enum _input_seq_type
 	SEQ_TYPE_TOTAL
 };
 typedef enum _input_seq_type input_seq_type;
+DECLARE_ENUM_OPERATORS(input_seq_type)
 
 
 /* conditions for DIP switches */

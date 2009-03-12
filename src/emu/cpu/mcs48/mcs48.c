@@ -1192,7 +1192,7 @@ UINT8 upi41_master_r(const device_config *device, UINT8 a0)
 
 static TIMER_CALLBACK( master_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	mcs48_state *cpustate = device->token;
 	UINT8 a0 = (param >> 8) & 1;
 	UINT8 data = param;

@@ -624,7 +624,7 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 	time_t basetime;
 
 	/* allocate memory for our data structure */
-	machine->input_port_data = auto_malloc(sizeof(*machine->input_port_data));
+	machine->input_port_data = (input_port_private *)auto_malloc(sizeof(*machine->input_port_data));
 	memset(machine->input_port_data, 0, sizeof(*machine->input_port_data));
 	portdata = machine->input_port_data;
 
@@ -857,7 +857,7 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 	/* copy the basics */
 	for (seqtype = 0; seqtype < ARRAY_LENGTH(settings->seq); seqtype++)
 	{
-		const input_seq *defseq = input_type_seq(field->port->machine, field->type, field->player, seqtype);
+		const input_seq *defseq = input_type_seq(field->port->machine, field->type, field->player, (input_seq_type)seqtype);
 		if (input_seq_cmp(defseq, &settings->seq[seqtype]) == 0)
 			field->state->seq[seqtype] = default_seq;
 		else
@@ -1500,7 +1500,7 @@ static void init_port_types(running_machine *machine)
 	for (typenum = 0; typenum < ARRAY_LENGTH(core_types); typenum++)
 	{
 		/* allocate memory for the state and link it to the end of the list */
-		*stateptr = auto_malloc(sizeof(**stateptr));
+		*stateptr = (input_type_state *)auto_malloc(sizeof(**stateptr));
 		memset(*stateptr, 0, sizeof(**stateptr));
 
 		/* copy the type description and link the previous description to it */
@@ -1550,7 +1550,7 @@ static void init_port_state(running_machine *machine)
 		input_port_state *portstate;
 
 		/* allocate a new input_port_info structure */
-		portstate = auto_malloc(sizeof(*portstate));
+		portstate = (input_port_state *)auto_malloc(sizeof(*portstate));
 		memset(portstate, 0, sizeof(*portstate));
 		((input_port_config *)port)->state = portstate;
 		((input_port_config *)port)->machine = machine;
@@ -1567,7 +1567,7 @@ static void init_port_state(running_machine *machine)
 			int seqtype;
 
 			/* allocate a new input_field_info structure */
-			fieldstate = auto_malloc(sizeof(*fieldstate));
+			fieldstate = (input_field_state *)auto_malloc(sizeof(*fieldstate));
 			memset(fieldstate, 0, sizeof(*fieldstate));
 			((input_field_config *)field)->state = fieldstate;
 
@@ -1714,7 +1714,7 @@ static callback_field_info *init_field_callback_info(const input_field_config *f
 	input_port_value mask;
 
 	/* allocate memory */
-	info = auto_malloc(sizeof(*info));
+	info = (callback_field_info *)auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
 	/* fill in the data */
@@ -1737,7 +1737,7 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 	input_port_value mask;
 
 	/* allocate memory */
-	state = auto_malloc(sizeof(*state));
+	state = (analog_field_state *)auto_malloc(sizeof(*state));
 	memset(state, 0, sizeof(*state));
 
 	/* compute the shift amount and number of bits */
@@ -2403,7 +2403,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 
 				if (curport == NULL)
-					return error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_FIELD encountered with no active port (mask=%X defval=%X)\n", mask, defval);
+					return (input_port_config *)error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_FIELD encountered with no active port (mask=%X defval=%X)\n", mask, defval);
 
 				if (curfield != NULL)
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
@@ -2953,7 +2953,7 @@ static input_port_config *port_config_alloc(const input_port_config **listhead)
 	input_port_config *config;
 
 	/* allocate memory */
-	config = malloc_or_die(sizeof(*config));
+	config = (input_port_config *)malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
 
 	/* add it to the tail */
@@ -3015,7 +3015,7 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 	int seqtype;
 
 	/* allocate memory */
-	config = malloc_or_die(sizeof(*config));
+	config = (input_field_config *)malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
 
 	/* fill in the basic field values */
@@ -3123,7 +3123,7 @@ static input_setting_config *setting_config_alloc(input_field_config *field, inp
 	input_setting_config *config;
 
 	/* allocate memory */
-	config = malloc_or_die(sizeof(*config));
+	config = (input_setting_config *)malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
 
 	/* fill in the basic setting values */
@@ -3183,7 +3183,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		const char *comma, *colon, *number;
 
 		/* allocate a new entry */
-		*tailptr = malloc_or_die(sizeof(**tailptr));
+		*tailptr = (input_field_diplocation *)malloc_or_die(sizeof(**tailptr));
 		memset(*tailptr, 0, sizeof(**tailptr));
 		entries++;
 
@@ -3203,7 +3203,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		/* allocate and copy the name if it is present */
 		if (colon != NULL)
 		{
-			(*tailptr)->swname = lastname = malloc_or_die(colon - tempbuf + 1);
+			(*tailptr)->swname = lastname = (char *)malloc_or_die(colon - tempbuf + 1);
 			strncpy(lastname, tempbuf, colon - tempbuf);
 			lastname[colon - tempbuf] = 0;
 			number = colon + 1;
@@ -3218,7 +3218,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 				error_buf_append(errorbuf, errorbuflen, "Switch location '%s' missing switch name!\n", location);
 				lastname = (char *)"UNK";
 			}
-			(*tailptr)->swname = namecopy = malloc_or_die(strlen(lastname) + 1);
+			(*tailptr)->swname = namecopy = (char *)malloc_or_die(strlen(lastname) + 1);
 			strcpy(namecopy, lastname);
 		}
 
@@ -3450,8 +3450,8 @@ static void load_remap_table(running_machine *machine, xml_data_node *parentnode
 		int remapnum;
 
 		/* allocate tables */
-		oldtable = malloc_or_die(count * sizeof(*oldtable));
-		newtable = malloc_or_die(count * sizeof(*newtable));
+		oldtable = (input_code *)malloc_or_die(count * sizeof(*oldtable));
+		newtable = (input_code *)malloc_or_die(count * sizeof(*newtable));
 
 		/* build up the remap table */
 		count = 0;

@@ -86,12 +86,12 @@ void i2cmem_init( running_machine *machine, int chip, int slave_address, int pag
 
 	if( data == NULL )
 	{
-		data = auto_malloc( data_size );
+		data = (unsigned char *)auto_malloc( data_size );
 	}
 
 	if( page_size > 0 )
 	{
-		page = auto_malloc( page_size );
+		page = (unsigned char *)auto_malloc( page_size );
 	}
 
 	c->slave_address = slave_address;

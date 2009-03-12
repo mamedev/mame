@@ -31,7 +31,7 @@ static READ_LINE_DEVICE_HANDLER( trampoline_read_port_to_read_line )
 static READ_LINE_DEVICE_HANDLER( trampoline_read8_to_read_line )
 {
 	const devcb_resolved_read_line *resolved = (const devcb_resolved_read_line *)device;
-	return ((*resolved->real.readdevice)(resolved->realtarget, 0) & 1) ? ASSERT_LINE : CLEAR_LINE;
+	return ((*resolved->real.readdevice)((const device_config *)resolved->realtarget, 0) & 1) ? ASSERT_LINE : CLEAR_LINE;
 }
 
 void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_read_line *config, const device_config *device)
@@ -95,13 +95,13 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 static WRITE_LINE_DEVICE_HANDLER( trampoline_write8_to_write_line )
 {
 	const devcb_resolved_write_line *resolved = (const devcb_resolved_write_line *)device;
-	(*resolved->real.writedevice)(resolved->realtarget, 0, state);
+	(*resolved->real.writedevice)((const device_config *)resolved->realtarget, 0, state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( trampoline_writecpu_to_write_line )
 {
 	const devcb_resolved_write_line *resolved = (const devcb_resolved_write_line *)device;
-	const device_config *cpu = resolved->realtarget;
+	const device_config *cpu = (const device_config *)resolved->realtarget;
 	cpu_set_input_line(cpu, resolved->real.writeline, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -176,7 +176,7 @@ static READ8_DEVICE_HANDLER( trampoline_read_port_to_read8 )
 static READ8_DEVICE_HANDLER( trampoline_read_line_to_read8 )
 {
 	const devcb_resolved_read8 *resolved = (const devcb_resolved_read8 *)device;
-	return (*resolved->real.readline)(resolved->realtarget);
+	return (*resolved->real.readline)((const device_config *)resolved->realtarget);
 }
 
 void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *config, const device_config *device)
@@ -238,7 +238,7 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 static WRITE8_DEVICE_HANDLER( trampoline_write_line_to_write8 )
 {
 	const devcb_resolved_write8 *resolved = (const devcb_resolved_write8 *)device;
-	(*resolved->real.writeline)(resolved->realtarget, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	(*resolved->real.writeline)((const device_config *)resolved->realtarget, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *config, const device_config *device)

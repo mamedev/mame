@@ -657,7 +657,7 @@ static void	update(const device_config *device, struct pit8253_timer *timer)
 
 static TIMER_CALLBACK( update_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	pit8253_t	*pit8253 = get_safe_token(device);
 	struct pit8253_timer *timer = get_timer(pit8253,param);
 
@@ -1042,7 +1042,7 @@ static void common_start( const device_config *device, int device_type ) {
 	pit8253_t	*pit8253 = get_safe_token(device);
 	int			timerno;
 
-	pit8253->config = device->static_config;
+	pit8253->config = (const struct pit8253_config *)device->static_config;
 	pit8253->device_type = device_type;
 
 	/* register for state saving */

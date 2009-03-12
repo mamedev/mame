@@ -211,7 +211,7 @@ static DEVICE_START( pci_bus )
 	assert(device->machine->config != NULL);
 
 	/* store a pointer back to the device */
-	pcibus->config = device->inline_config;
+	pcibus->config = (const pci_bus_config *)device->inline_config;
 	pcibus->busdevice = device;
 	pcibus->devicenum = -1;
 

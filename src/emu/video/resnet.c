@@ -260,8 +260,8 @@ double compute_resistor_net_outputs(
 
 	/* parse input parameters */
 
-	o  = malloc_or_die( sizeof(double) * (1<<MAX_RES_PER_NET) *  MAX_NETS);
-	os = malloc_or_die( sizeof(double) * (1<<MAX_RES_PER_NET) *  MAX_NETS);
+	o  = (double *)malloc_or_die( sizeof(double) * (1<<MAX_RES_PER_NET) *  MAX_NETS);
+	os = (double *)malloc_or_die( sizeof(double) * (1<<MAX_RES_PER_NET) *  MAX_NETS);
 
 	networks_no = 0;
 	for (n = 0; n < MAX_NETS; n++)
@@ -700,7 +700,7 @@ rgb_t *compute_res_net_all(const UINT8 *prom, const res_net_decode_info *rdi, co
 	int i,j,k;
 	rgb_t *rgb;
 
-	rgb = malloc_or_die((rdi->end - rdi->start + 1)*sizeof(rgb_t));
+	rgb = (rgb_t *)malloc_or_die((rdi->end - rdi->start + 1)*sizeof(rgb_t));
 	for (i=rdi->start; i<=rdi->end; i++)
 	{
 		UINT8 t[3] = {0,0,0};

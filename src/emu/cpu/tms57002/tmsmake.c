@@ -101,7 +101,7 @@ static char *sconcat(char *dest, const char *src)
   char *r;
   int len = strlen(src);
   int pos = dest ? strlen(dest) : 0;
-  r = realloc(dest, pos+len+2);
+  r = (char *)realloc(dest, pos+len+2);
   memcpy(r + pos, src, len);
   r[pos+len] = '\n';
   r[pos+len+1] = 0;

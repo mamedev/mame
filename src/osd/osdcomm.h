@@ -54,7 +54,7 @@
 #define RESTRICT				__restrict__
 #define SETJMP_GNUC_PROTECT()	(void)__builtin_return_address(1)
 #ifndef TYPES_COMPATIBLE
-#define TYPES_COMPATIBLE(a,b)	__builtin_types_compatible_p(a, b)
+#define TYPES_COMPATIBLE(a,b)	__builtin_types_compatible_p(typeof(a), b)
 #endif
 #else
 #define ATTR_UNUSED

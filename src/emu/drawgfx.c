@@ -90,7 +90,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 	gfx_element *gfx;
 
 	/* allocate memory for the gfx_element structure */
-	gfx = malloc_or_die(sizeof(*gfx));
+	gfx = (gfx_element *)malloc_or_die(sizeof(*gfx));
 	memset(gfx, 0, sizeof(*gfx));
 
 	/* fill in the data */
@@ -120,7 +120,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 		}
 		else
 		{
-			UINT32 *buffer = malloc_or_die(sizeof(buffer[0]) * gfx->layout.width);
+			UINT32 *buffer = (UINT32 *)malloc_or_die(sizeof(buffer[0]) * gfx->layout.width);
 			memcpy(buffer, gfx->layout.extxoffs, sizeof(gfx->layout.extxoffs[0]) * gfx->layout.width);
 			gfx->layout.extxoffs = buffer;
 		}
@@ -135,7 +135,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 		}
 		else
 		{
-			UINT32 *buffer = malloc_or_die(sizeof(buffer[0]) * gfx->layout.height);
+			UINT32 *buffer = (UINT32 *)malloc_or_die(sizeof(buffer[0]) * gfx->layout.height);
 			memcpy(buffer, gfx->layout.extyoffs, sizeof(gfx->layout.extyoffs[0]) * gfx->layout.height);
 			gfx->layout.extyoffs = buffer;
 		}
@@ -143,10 +143,10 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 
 	/* allocate a pen usage array for entries with 32 pens or less */
 	if (gfx->color_depth <= 32)
-		gfx->pen_usage = malloc_or_die(gfx->total_elements * sizeof(*gfx->pen_usage));
+		gfx->pen_usage = (UINT32 *)malloc_or_die(gfx->total_elements * sizeof(*gfx->pen_usage));
 
 	/* allocate a dirty array */
-	gfx->dirty = malloc_or_die(gfx->total_elements * sizeof(*gfx->dirty));
+	gfx->dirty = (UINT8 *)malloc_or_die(gfx->total_elements * sizeof(*gfx->dirty));
 	memset(gfx->dirty, 1, gfx->total_elements * sizeof(*gfx->dirty));
 
 	/* raw graphics case */
@@ -173,7 +173,7 @@ gfx_element *gfx_element_alloc(running_machine *machine, const gfx_layout *gl, c
 		gfx->char_modulo = gfx->line_modulo * gfx->origheight;
 
 		/* allocate memory for the data */
-		gfx->gfxdata = malloc_or_die(gfx->total_elements * gfx->char_modulo);
+		gfx->gfxdata = (UINT8 *)malloc_or_die(gfx->total_elements * gfx->char_modulo);
 	}
 
 	return gfx;

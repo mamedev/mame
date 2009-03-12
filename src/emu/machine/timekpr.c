@@ -308,7 +308,7 @@ static DEVICE_START(timekeeper)
 	c->month = make_bcd( systime.local_time.month + 1 );
 	c->year = make_bcd( systime.local_time.year % 100 );
 	c->century = make_bcd( systime.local_time.year / 100 );
-	c->data = auto_malloc( c->size );
+	c->data = (UINT8 *)auto_malloc( c->size );
 
 	c->default_data = device->region;
 	if (c->default_data != NULL)

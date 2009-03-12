@@ -20,7 +20,7 @@ static int cr589_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 {
 	UINT8 *command;
 	int commandLength;
-	SCSICr589 *our_this = SCSIThis( &SCSIClassCr589, scsiInstance );
+	SCSICr589 *our_this = (SCSICr589 *)SCSIThis( &SCSIClassCr589, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch( command[ 0 ] )
@@ -48,7 +48,7 @@ static void cr589_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataLe
 {
 	UINT8 *command;
 	int commandLength;
-	SCSICr589 *our_this = SCSIThis( &SCSIClassCr589, scsiInstance );
+	SCSICr589 *our_this = (SCSICr589 *)SCSIThis( &SCSIClassCr589, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch( command[ 0 ] )
@@ -81,7 +81,7 @@ static void cr589_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 {
 	UINT8 *command;
 	int commandLength;
-	SCSICr589 *our_this = SCSIThis( &SCSIClassCr589, scsiInstance );
+	SCSICr589 *our_this = (SCSICr589 *)SCSIThis( &SCSIClassCr589, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch( command[ 0 ] )
@@ -111,7 +111,7 @@ static void cr589_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 static void cr589_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
 	running_machine *machine = scsiInstance->machine;
-	SCSICr589 *our_this = SCSIThis( &SCSIClassCr589, scsiInstance );
+	SCSICr589 *our_this = (SCSICr589 *)SCSIThis( &SCSIClassCr589, scsiInstance );
 
 	our_this->download = 0;
 	memcpy( &our_this->buffer[ identity_offset ], "MATSHITACD-ROM CR-589   GS0N", 28 );
@@ -128,24 +128,24 @@ static int cr589_dispatch( int operation, void *file, INT64 intparm, void *ptrpa
 	switch( operation )
 	{
 		case SCSIOP_EXEC_COMMAND:
-			return cr589_exec_command( file, ptrparm );
+			return cr589_exec_command( (SCSIInstance *)file, (UINT8 *)ptrparm );
 
 		case SCSIOP_READ_DATA:
-			cr589_read_data( file, ptrparm, intparm );
+			cr589_read_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			return 0;
 
 		case SCSIOP_WRITE_DATA:
-			cr589_write_data( file, ptrparm, intparm );
+			cr589_write_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			return 0;
 
 		case SCSIOP_ALLOC_INSTANCE:
-			params = ptrparm;
-			SCSIBase( &SCSIClassCr589, operation, file, intparm, ptrparm );
+			params = (SCSIAllocInstanceParams *)ptrparm;
+			SCSIBase( &SCSIClassCr589, operation, (SCSIInstance *)file, intparm, (UINT8 *)ptrparm );
 			cr589_alloc_instance( params->instance, params->diskregion );
 			return 0;
 	}
 
-	return SCSIBase( &SCSIClassCr589, operation, file, intparm, ptrparm );
+	return SCSIBase( &SCSIClassCr589, operation, (SCSIInstance *)file, intparm, (UINT8 *)ptrparm );
 }
 
 const SCSIClass SCSIClassCr589 =

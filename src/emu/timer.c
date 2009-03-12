@@ -300,7 +300,7 @@ void timer_init(running_machine *machine)
 	int i;
 
 	/* allocate global data */
-	global = machine->timer_data = auto_malloc(sizeof(*global));
+	global = machine->timer_data = (timer_private *)auto_malloc(sizeof(*global));
 	memset(global, 0, sizeof(*global));
 
 	/* we need to wait until the first call to timer_cyclestorun before using real CPU times */
@@ -339,7 +339,7 @@ void timer_init(running_machine *machine)
 
 void timer_destructor(void *ptr, size_t size)
 {
-	timer_remove(ptr);
+	timer_remove((emu_timer *)ptr);
 }
 
 
@@ -1056,9 +1056,9 @@ attotime timer_device_firetime(const device_config *timer)
 
 static TIMER_CALLBACK( periodic_timer_device_timer_callback )
 {
-	const device_config *timer = ptr;
+	const device_config *timer = (const device_config *)ptr;
 	timer_state *state = get_safe_token(timer);
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* call the real callback */
 	config->callback(timer, state->ptr, state->param);
@@ -1074,9 +1074,9 @@ static TIMER_CALLBACK( periodic_timer_device_timer_callback )
 static TIMER_CALLBACK( scanline_timer_device_timer_callback )
 {
 	int next_vpos;
-	const device_config *timer = ptr;
+	const device_config *timer = (const device_config *)ptr;
 	timer_state *state = get_safe_token(timer);
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* get the screen device and verify it */
 	const device_config *screen = devtag_get_device(timer->machine, config->screen);
@@ -1173,7 +1173,7 @@ static DEVICE_START( timer )
 	assert(device->machine->config != NULL);
 
 	/* get and validate the configuration */
-	config = device->inline_config;
+	config = (timer_config *)device->inline_config;
 	assert(config->type == TIMER_TYPE_PERIODIC || config->type == TIMER_TYPE_SCANLINE || config->type == TIMER_TYPE_GENERIC);
 	assert(config->callback != NULL);
 

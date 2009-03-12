@@ -158,7 +158,7 @@ void debug_cpu_init(running_machine *machine)
 	int regnum;
 
 	/* allocate and reset globals */
-	machine->debugcpu_data = global = auto_malloc(sizeof(*global));
+	machine->debugcpu_data = global = (debugcpu_private *)auto_malloc(sizeof(*global));
 	memset(global, 0, sizeof(*global));
 	global->execution_state = EXECUTION_STATE_STOPPED;
 	global->bpindex = 1;
@@ -190,7 +190,7 @@ void debug_cpu_init(running_machine *machine)
 		cpu_debug_data *info;
 
 		/* allocate some information */
-		info = auto_malloc(sizeof(*info));
+		info = (cpu_debug_data *)auto_malloc(sizeof(*info));
 		memset(info, 0, sizeof(*info));
 		classheader->debug = info;
 
@@ -983,7 +983,7 @@ int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed
 	assert_always(device != NULL, "debug_cpu_breakpoint_set() called with invalid cpu!");
 
 	/* allocate breakpoint */
-	bp = malloc_or_die(sizeof(*bp));
+	bp = (debug_cpu_breakpoint *)malloc_or_die(sizeof(*bp));
 	bp->index = global->bpindex++;
 	bp->enabled = TRUE;
 	bp->address = address;
@@ -991,7 +991,7 @@ int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed
 	bp->action = NULL;
 	if (action != NULL)
 	{
-		bp->action = malloc_or_die(strlen(action) + 1);
+		bp->action = (char *)malloc_or_die(strlen(action) + 1);
 		strcpy(bp->action, action);
 	}
 
@@ -1087,7 +1087,7 @@ int debug_cpu_watchpoint_set(const address_space *space, int type, offs_t addres
 {
 	debugcpu_private *global = space->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(space->cpu);
-	debug_cpu_watchpoint *wp = malloc_or_die(sizeof(*wp));
+	debug_cpu_watchpoint *wp = (debug_cpu_watchpoint *)malloc_or_die(sizeof(*wp));
 
 	/* fill in the structure */
 	wp->index = global->wpindex++;
@@ -1099,7 +1099,7 @@ int debug_cpu_watchpoint_set(const address_space *space, int type, offs_t addres
 	wp->action = NULL;
 	if (action != NULL)
 	{
-		wp->action = malloc_or_die(strlen(action) + 1);
+		wp->action = (char *)malloc_or_die(strlen(action) + 1);
 		strcpy(wp->action, action);
 	}
 
@@ -1245,7 +1245,7 @@ void debug_cpu_trace(const device_config *device, FILE *file, int trace_over, co
 	info->trace.trace_over_target = ~0;
 	if (action != NULL)
 	{
-		info->trace.action = malloc_or_die(strlen(action) + 1);
+		info->trace.action = (char *)malloc_or_die(strlen(action) + 1);
 		strcpy(info->trace.action, action);
 	}
 
@@ -1313,7 +1313,7 @@ int debug_cpu_hotspot_track(const device_config *device, int numspots, int thres
 	if (numspots > 0)
 	{
 		/* allocate memory for hotspots */
-		info->hotspots = malloc_or_die(sizeof(*info->hotspots) * numspots);
+		info->hotspots = (debug_hotspot_entry *)malloc_or_die(sizeof(*info->hotspots) * numspots);
 		memset(info->hotspots, 0xff, sizeof(*info->hotspots) * numspots);
 
 		/* fill in the info */
@@ -2429,7 +2429,7 @@ static const device_config *expression_cpu_index(running_machine *machine, const
 
 static UINT64 expression_read_memory(void *param, const char *name, int space, UINT32 address, int size)
 {
-	running_machine *machine = param;
+	running_machine *machine = (running_machine *)param;
 	const device_config *cpu = NULL;
 
 	switch (space)
@@ -2532,9 +2532,9 @@ static UINT64 expression_read_program_direct(const address_space *space, int opc
 
 			/* get the base of memory, aligned to the address minus the lowbits */
 			if (opcode & 1)
-				base = memory_decrypted_read_ptr(space, address & ~lowmask);
+				base = (UINT8 *)memory_decrypted_read_ptr(space, address & ~lowmask);
 			else
-				base = memory_get_read_ptr(space, address & ~lowmask);
+				base = (UINT8 *)memory_get_read_ptr(space, address & ~lowmask);
 
 			/* if we have a valid base, return the appropriate byte */
 			if (base != NULL)
@@ -2634,7 +2634,7 @@ static UINT64 expression_read_eeprom(running_machine *machine, offs_t address, i
 
 static void expression_write_memory(void *param, const char *name, int space, UINT32 address, int size, UINT64 data)
 {
-	running_machine *machine = param;
+	running_machine *machine = (running_machine *)param;
 	const device_config *cpu = NULL;
 
 	switch (space)
@@ -2743,9 +2743,9 @@ static void expression_write_program_direct(const address_space *space, int opco
 
 			/* get the base of memory, aligned to the address minus the lowbits */
 			if (opcode & 1)
-				base = memory_decrypted_read_ptr(space, address & ~lowmask);
+				base = (UINT8 *)memory_decrypted_read_ptr(space, address & ~lowmask);
 			else
-				base = memory_get_read_ptr(space, address & ~lowmask);
+				base = (UINT8 *)memory_get_read_ptr(space, address & ~lowmask);
 
 			/* if we have a valid base, write the appropriate byte */
 			if (base != NULL)
@@ -2866,7 +2866,7 @@ static void expression_write_eeprom(running_machine *machine, offs_t address, in
 
 static EXPRERR expression_validate(void *param, const char *name, int space)
 {
-	running_machine *machine = param;
+	running_machine *machine = (running_machine *)param;
 	const device_config *cpu = NULL;
 
 	switch (space)
@@ -2928,7 +2928,7 @@ static EXPRERR expression_validate(void *param, const char *name, int space)
 
 static UINT64 get_wpaddr(void *globalref, void *ref)
 {
-	running_machine *machine = globalref;
+	running_machine *machine = (running_machine *)globalref;
 	return machine->debugcpu_data->wpaddr;
 }
 
@@ -2940,7 +2940,7 @@ static UINT64 get_wpaddr(void *globalref, void *ref)
 
 static UINT64 get_wpdata(void *globalref, void *ref)
 {
-	running_machine *machine = globalref;
+	running_machine *machine = (running_machine *)globalref;
 	return machine->debugcpu_data->wpdata;
 }
 
@@ -2952,7 +2952,7 @@ static UINT64 get_wpdata(void *globalref, void *ref)
 
 static UINT64 get_cpunum(void *globalref, void *ref)
 {
-	running_machine *machine = globalref;
+	running_machine *machine = (running_machine *)globalref;
 	return cpu_get_index(machine->debugcpu_data->visiblecpu);
 }
 
@@ -2985,7 +2985,7 @@ static void set_tempvar(void *globalref, void *ref, UINT64 value)
 
 static UINT64 get_beamx(void *globalref, void *ref)
 {
-	const device_config *screen = ref;
+	const device_config *screen = (const device_config *)ref;
 	return (screen != NULL) ? video_screen_get_hpos(screen) : 0;
 }
 
@@ -2996,7 +2996,7 @@ static UINT64 get_beamx(void *globalref, void *ref)
 
 static UINT64 get_beamy(void *globalref, void *ref)
 {
-	const device_config *screen = ref;
+	const device_config *screen = (const device_config *)ref;
 	return (screen != NULL) ? video_screen_get_vpos(screen) : 0;
 }
 
@@ -3007,7 +3007,7 @@ static UINT64 get_beamy(void *globalref, void *ref)
 
 static UINT64 get_frame(void *globalref, void *ref)
 {
-	const device_config *screen = ref;
+	const device_config *screen = (const device_config *)ref;
 	return (screen != NULL) ? video_screen_get_frame_number(screen) : 0;
 }
 
@@ -3019,7 +3019,7 @@ static UINT64 get_frame(void *globalref, void *ref)
 
 static UINT64 get_current_pc(void *globalref, void *ref)
 {
-	const device_config *device = globalref;
+	const device_config *device = (const device_config *)globalref;
 	return cpu_get_pc(device);
 }
 
@@ -3031,7 +3031,7 @@ static UINT64 get_current_pc(void *globalref, void *ref)
 
 static UINT64 get_cycles(void *globalref, void *ref)
 {
-	const device_config *device = globalref;
+	const device_config *device = (const device_config *)globalref;
 	return *cpu_get_icount_ptr(device);
 }
 
@@ -3043,7 +3043,7 @@ static UINT64 get_cycles(void *globalref, void *ref)
 
 static UINT64 get_logunmap(void *globalref, void *ref)
 {
-	const address_space *space = ref;
+	const address_space *space = (const address_space *)ref;
 	return (space != NULL) ? memory_get_log_unmap(space) : TRUE;
 }
 
@@ -3055,7 +3055,7 @@ static UINT64 get_logunmap(void *globalref, void *ref)
 
 static void set_logunmap(void *globalref, void *ref, UINT64 value)
 {
-	const address_space *space = ref;
+	const address_space *space = (const address_space *)ref;
 	if (space != NULL)
 		memory_set_log_unmap(space, value ? 1 : 0);
 }
@@ -3068,7 +3068,7 @@ static void set_logunmap(void *globalref, void *ref, UINT64 value)
 
 static UINT64 get_cpu_reg(void *globalref, void *ref)
 {
-	const device_config *device = globalref;
+	const device_config *device = (const device_config *)globalref;
 	return cpu_get_reg(device, (FPTR)ref);
 }
 
@@ -3080,6 +3080,6 @@ static UINT64 get_cpu_reg(void *globalref, void *ref)
 
 static void set_cpu_reg(void *globalref, void *ref, UINT64 value)
 {
-	const device_config *device = globalref;
+	const device_config *device = (const device_config *)globalref;
 	cpu_set_reg(device, (FPTR)ref, value);
 }

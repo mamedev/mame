@@ -25,7 +25,7 @@ static STREAM_UPDATE( filter_volume_update )
 {
 	stream_sample_t *src = inputs[0];
 	stream_sample_t *dst = outputs[0];
-	filter_volume_state *info = param;
+	filter_volume_state *info = (filter_volume_state *)param;
 
 	while (samples--)
 		*dst++ = (*src++ * info->gain) >> 8;

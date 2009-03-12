@@ -798,7 +798,7 @@ void wd33c93_init( running_machine *machine, const struct WD33C93interface *inte
 	/* allocate a timer for commands */
 	scsi_data.cmd_timer = timer_alloc(machine, wd33c93_complete_cb, NULL);
 
-	scsi_data.temp_input = auto_malloc( TEMP_INPUT_LEN );
+	scsi_data.temp_input = (UINT8 *)auto_malloc( TEMP_INPUT_LEN );
 
 //  state_save_register_item_array(machine, "wd33c93", NULL, 0, scsi_data);
 }

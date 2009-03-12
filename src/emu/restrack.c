@@ -20,13 +20,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef enum _memory_block_overlap memory_block_overlap;
 enum _memory_block_overlap
 {
 	OVERLAP_NONE,
 	OVERLAP_PARTIAL,
 	OVERLAP_FULL
 };
+typedef enum _memory_block_overlap memory_block_overlap;
 
 
 
@@ -260,7 +260,7 @@ char *auto_strdup_allow_null_file_line(const char *str, const char *file, int li
 
 astring *auto_astring_alloc_file_line(const char *file, int line)
 {
-	return restrack_register_object(OBJTYPE_ASTRING, astring_alloc(), 0, file, line);
+	return (astring *)restrack_register_object(OBJTYPE_ASTRING, astring_alloc(), 0, file, line);
 }
 
 
@@ -271,7 +271,7 @@ astring *auto_astring_alloc_file_line(const char *file, int line)
 
 bitmap_t *auto_bitmap_alloc_file_line(int width, int height, bitmap_format format, const char *file, int line)
 {
-	return restrack_register_object(OBJTYPE_BITMAP, bitmap_alloc(width, height, format), width * height, file, line);
+	return (bitmap_t *)restrack_register_object(OBJTYPE_BITMAP, bitmap_alloc(width, height, format), width * height, file, line);
 }
 
 
@@ -317,7 +317,7 @@ void validate_auto_malloc_memory(void *memory, size_t memory_size)
 
 static void astring_destructor(void *object, size_t size)
 {
-	astring_free(object);
+	astring_free((astring *)object);
 }
 
 
@@ -328,7 +328,7 @@ static void astring_destructor(void *object, size_t size)
 
 static void bitmap_destructor(void *object, size_t size)
 {
-	bitmap_free(object);
+	bitmap_free((bitmap_t *)object);
 }
 
 
@@ -341,7 +341,7 @@ static memory_block_overlap pool_contains_block(object_pool *pool, void *ptr, si
 {
 	memory_block_overlap overlap = OVERLAP_NONE;
 	object_pool_iterator *iter;
-	UINT8 *ptrstart = ptr;
+	UINT8 *ptrstart = (UINT8 *)ptr;
 	UINT8 *ptrend = ptrstart + size - 1;
 	void *blockptr = NULL;
 	size_t blocksize = 0;

@@ -324,7 +324,7 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 	int group;
 
 	/* allocate the tilemap itself */
-	tmap = malloc_or_die(sizeof(*tmap));
+	tmap = (tilemap *)malloc_or_die(sizeof(*tmap));
 	memset(tmap, 0, sizeof(*tmap));
 
 	/* fill in the basic metrics */
@@ -354,18 +354,18 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 	/* initialize scroll information */
 	tmap->scrollrows = 1;
 	tmap->scrollcols = 1;
-	tmap->rowscroll = malloc_or_die(tmap->height * sizeof(*tmap->rowscroll));
+	tmap->rowscroll = (INT32 *)malloc_or_die(tmap->height * sizeof(*tmap->rowscroll));
 	memset(tmap->rowscroll, 0, tmap->height * sizeof(*tmap->rowscroll));
-	tmap->colscroll = malloc_or_die(tmap->width * sizeof(*tmap->colscroll));
+	tmap->colscroll = (INT32 *)malloc_or_die(tmap->width * sizeof(*tmap->colscroll));
 	memset(tmap->colscroll, 0, tmap->width * sizeof(*tmap->colscroll));
 
 	/* allocate the pixel data cache */
 	tmap->pixmap = bitmap_alloc(tmap->width, tmap->height, BITMAP_FORMAT_INDEXED16);
 
 	/* allocate transparency mapping data */
-	tmap->tileflags = malloc_or_die(tmap->max_logical_index);
+	tmap->tileflags = (UINT8 *)malloc_or_die(tmap->max_logical_index);
 	tmap->flagsmap = bitmap_alloc(tmap->width, tmap->height, BITMAP_FORMAT_INDEXED8);
-	tmap->pen_to_flags = malloc_or_die(sizeof(tmap->pen_to_flags[0]) * MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
+	tmap->pen_to_flags = (UINT8 *)malloc_or_die(sizeof(tmap->pen_to_flags[0]) * MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
 	memset(tmap->pen_to_flags, 0, sizeof(tmap->pen_to_flags[0]) * MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
 	for (group = 0; group < TILEMAP_NUM_GROUPS; group++)
 		tilemap_map_pens_to_layer(tmap, group, 0, 0, TILEMAP_PIXEL_LAYER0);
@@ -1095,7 +1095,7 @@ static void tilemap_exit(running_machine *machine)
 static STATE_POSTLOAD( tilemap_postload )
 {
 	/* recompute the mappings for this tilemap */
-	tilemap *tmap = param;
+	tilemap *tmap = (tilemap *)param;
 	mappings_update(tmap);
 }
 
@@ -1157,8 +1157,8 @@ static void mappings_create(tilemap *tmap)
 	tmap->max_memory_index++;
 
 	/* allocate the necessary mappings */
-	tmap->memory_to_logical = malloc_or_die(tmap->max_memory_index * sizeof(*tmap->memory_to_logical));
-	tmap->logical_to_memory = malloc_or_die(tmap->max_logical_index * sizeof(*tmap->logical_to_memory));
+	tmap->memory_to_logical = (tilemap_logical_index *)malloc_or_die(tmap->max_memory_index * sizeof(*tmap->memory_to_logical));
+	tmap->logical_to_memory = (tilemap_memory_index *)malloc_or_die(tmap->max_logical_index * sizeof(*tmap->logical_to_memory));
 
 	/* update the mappings */
 	mappings_update(tmap);
@@ -1969,7 +1969,7 @@ static void scanline_draw_masked_null(void *dest, const UINT16 *source, const UI
 
 static void scanline_draw_opaque_ind16(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
-	UINT16 *dest = _dest;
+	UINT16 *dest = (UINT16 *)_dest;
 	int pal = pcode >> 16;
 	int i;
 
@@ -2012,7 +2012,7 @@ static void scanline_draw_opaque_ind16(void *_dest, const UINT16 *source, int co
 
 static void scanline_draw_masked_ind16(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
-	UINT16 *dest = _dest;
+	UINT16 *dest = (UINT16 *)_dest;
 	int pal = pcode >> 16;
 	int i;
 
@@ -2046,7 +2046,7 @@ static void scanline_draw_masked_ind16(void *_dest, const UINT16 *source, const 
 static void scanline_draw_opaque_rgb16(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
-	UINT16 *dest = _dest;
+	UINT16 *dest = (UINT16 *)_dest;
 	int i;
 
 	/* priority case */
@@ -2076,7 +2076,7 @@ static void scanline_draw_opaque_rgb16(void *_dest, const UINT16 *source, int co
 static void scanline_draw_masked_rgb16(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
-	UINT16 *dest = _dest;
+	UINT16 *dest = (UINT16 *)_dest;
 	int i;
 
 	/* priority case */
@@ -2108,7 +2108,7 @@ static void scanline_draw_masked_rgb16(void *_dest, const UINT16 *source, const 
 static void scanline_draw_opaque_rgb16_alpha(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
-	UINT16 *dest = _dest;
+	UINT16 *dest = (UINT16 *)_dest;
 	int i;
 
 	/* priority case */
@@ -2139,7 +2139,7 @@ static void scanline_draw_opaque_rgb16_alpha(void *_dest, const UINT16 *source, 
 static void scanline_draw_masked_rgb16_alpha(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
-	UINT16 *dest = _dest;
+	UINT16 *dest = (UINT16 *)_dest;
 	int i;
 
 	/* priority case */
@@ -2171,7 +2171,7 @@ static void scanline_draw_masked_rgb16_alpha(void *_dest, const UINT16 *source, 
 static void scanline_draw_opaque_rgb32(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
-	UINT32 *dest = _dest;
+	UINT32 *dest = (UINT32 *)_dest;
 	int i;
 
 	/* priority case */
@@ -2201,7 +2201,7 @@ static void scanline_draw_opaque_rgb32(void *_dest, const UINT16 *source, int co
 static void scanline_draw_masked_rgb32(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
-	UINT32 *dest = _dest;
+	UINT32 *dest = (UINT32 *)_dest;
 	int i;
 
 	/* priority case */
@@ -2233,7 +2233,7 @@ static void scanline_draw_masked_rgb32(void *_dest, const UINT16 *source, const 
 static void scanline_draw_opaque_rgb32_alpha(void *_dest, const UINT16 *source, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
-	UINT32 *dest = _dest;
+	UINT32 *dest = (UINT32 *)_dest;
 	int i;
 
 	/* priority case */
@@ -2264,7 +2264,7 @@ static void scanline_draw_opaque_rgb32_alpha(void *_dest, const UINT16 *source, 
 static void scanline_draw_masked_rgb32_alpha(void *_dest, const UINT16 *source, const UINT8 *maskptr, int mask, int value, int count, const pen_t *pens, UINT8 *pri, UINT32 pcode, UINT8 alpha)
 {
 	const pen_t *clut = &pens[pcode >> 16];
-	UINT32 *dest = _dest;
+	UINT32 *dest = (UINT32 *)_dest;
 	int i;
 
 	/* priority case */

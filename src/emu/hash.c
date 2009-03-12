@@ -459,7 +459,7 @@ int hash_data_extract_binary_checksum(const char* data, unsigned int function, u
 
 int hash_data_has_info(const char* data, unsigned int info)
 {
-	char* res = strstr(data, info_strings[info]);
+	char* res = (char*)strstr(data, info_strings[info]);
 
 	if (!res)
 		return 0;

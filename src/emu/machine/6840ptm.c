@@ -355,7 +355,7 @@ static void reload_count(running_machine *machine, int which, int idx)
 	if (idx == 2) duration = attotime_mul(duration, currptr->t3_divisor);
 	PLOG(("MC6840 #%d: reload_count(%d): output = %lf\n", which, idx, attotime_to_double(duration)));
 
-	if (!currptr->control_reg[idx] & 0x02)
+	if (!(currptr->control_reg[idx] & 0x02))
 	{
 		if (!currptr->intf->external_clock[idx])
 		{
@@ -739,7 +739,7 @@ void ptm6840_set_ext_clock(int which, int counter, int clock)
 	ptm6840 *currptr = ptm + which;
 	currptr->external_clock[counter] = clock;
 
-	if (!currptr->control_reg[counter] & 0x02)
+	if (!(currptr->control_reg[counter] & 0x02))
 	{
 		if (!currptr->intf->external_clock[counter])
 		{

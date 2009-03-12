@@ -61,7 +61,7 @@ struct _screen_state
 	bitmap_t *				bitmap[2];				/* 2x bitmaps for rendering */
 	UINT8					curbitmap;				/* current bitmap index */
 	UINT8					curtexture;				/* current texture index */
-	bitmap_format			texture_format;			/* texture format of bitmap for this screen */
+	INT32					texture_format;			/* texture format of bitmap for this screen */
 	UINT8					changed;				/* has this bitmap changed? */
 	INT32					last_partial_scan;		/* scanline of last partial update */
 
@@ -131,8 +131,8 @@ struct _video_global
 	INT32					snap_height;			/* height of snapshots (0 == auto) */
 
 	/* movie recording */
-	mame_file *				mng_file;				/* handle to the open movie file */
-	avi_file *				avi_file;				/* handle to the open movie file */
+	mame_file *				mngfile;				/* handle to the open movie file */
+	avi_file *				avifile;				/* handle to the open movie file */
 	attotime				movie_frame_period;		/* period of a single movie frame */
 	attotime				movie_next_frame_time;	/* time of next frame */
 	UINT32 					movie_frame;			/* current movie frame number */
@@ -434,7 +434,7 @@ static void init_buffered_spriteram(running_machine *machine)
 	assert_always(spriteram_size != 0, "Video buffers spriteram but spriteram_size is 0");
 
 	/* allocate memory for the back buffer */
-	buffered_spriteram = auto_malloc(spriteram_size);
+	buffered_spriteram = (UINT8 *)auto_malloc(spriteram_size);
 
 	/* register for saving it */
 	state_save_register_global_pointer(machine, buffered_spriteram, spriteram_size);
@@ -443,7 +443,7 @@ static void init_buffered_spriteram(running_machine *machine)
 	if (spriteram_2_size)
 	{
 		/* allocate memory */
-		buffered_spriteram_2 = auto_malloc(spriteram_2_size);
+		buffered_spriteram_2 = (UINT8 *)auto_malloc(spriteram_2_size);
 
 		/* register for saving it */
 		state_save_register_global_pointer(machine, buffered_spriteram_2, spriteram_2_size);
@@ -651,7 +651,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 void video_screen_configure(const device_config *screen, int width, int height, const rectangle *visarea, attoseconds_t frame_period)
 {
 	screen_state *state = get_safe_token(screen);
-	screen_config *config = screen->inline_config;
+	screen_config *config = (screen_config *)screen->inline_config;
 
 	/* validate arguments */
 	assert(width > 0);
@@ -706,7 +706,7 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 static void realloc_screen_bitmaps(const device_config *screen)
 {
 	screen_state *state = get_safe_token(screen);
-	screen_config *config = screen->inline_config;
+	screen_config *config = (screen_config *)screen->inline_config;
 	if (config->type != SCREEN_TYPE_VECTOR)
 	{
 		int curwidth = 0, curheight = 0;
@@ -1202,7 +1202,7 @@ static DEVICE_START( video_screen )
 	assert(container != NULL);
 
 	/* get and validate the configuration */
-	config = screen->inline_config;
+	config = (screen_config *)screen->inline_config;
 	assert(config->width > 0);
 	assert(config->height > 0);
 	assert(config->refresh > 0);
@@ -1274,7 +1274,7 @@ static DEVICE_START( video_screen )
 
 static STATE_POSTLOAD( video_screen_postload )
 {
-	const device_config *screen = param;
+	const device_config *screen = (const device_config *)param;
 	realloc_screen_bitmaps(screen);
 	global.movie_next_frame_time = timer_get_time(machine);
 }
@@ -1358,7 +1358,7 @@ DEVICE_GET_INFO( video_screen )
 static TIMER_CALLBACK( vblank_begin_callback )
 {
 	int i;
-	device_config *screen = ptr;
+	device_config *screen = (device_config *)ptr;
 	screen_state *state = get_safe_token(screen);
 
 	/* reset the starting VBLANK time */
@@ -1392,7 +1392,7 @@ static TIMER_CALLBACK( vblank_begin_callback )
 static TIMER_CALLBACK( vblank_end_callback )
 {
 	int i;
-	const device_config *screen = ptr;
+	const device_config *screen = (const device_config *)ptr;
 	screen_state *state = get_safe_token(screen);
 
 	/* call the screen specific callbacks */
@@ -1427,7 +1427,7 @@ static TIMER_CALLBACK( screenless_update_callback )
 
 static TIMER_CALLBACK( scanline0_callback )
 {
-	const device_config *screen = ptr;
+	const device_config *screen = (const device_config *)ptr;
 	screen_state *state = get_safe_token(screen);
 
 	/* reset partial updates */
@@ -1445,7 +1445,7 @@ static TIMER_CALLBACK( scanline0_callback )
 
 static TIMER_CALLBACK( scanline_update_callback )
 {
-	const device_config *screen = ptr;
+	const device_config *screen = (const device_config *)ptr;
 	screen_state *state = get_safe_token(screen);
 	int scanline = param;
 
@@ -1557,7 +1557,7 @@ static int finish_screen_updates(running_machine *machine)
 		/* only update if live */
 		if (render_is_live_screen(screen))
 		{
-			const screen_config *config = screen->inline_config;
+			const screen_config *config = (const screen_config *)screen->inline_config;
 
 			/* only update if empty and not a vector game; otherwise assume the driver did it directly */
 			if (config->type != SCREEN_TYPE_VECTOR && (machine->config->video_attributes & VIDEO_SELF_RENDER) == 0)
@@ -2376,7 +2376,7 @@ static file_error mame_fopen_next(running_machine *machine, const char *pathopti
 
 int video_mng_is_movie_active(running_machine *machine)
 {
-	return (global.mng_file != NULL);
+	return (global.mngfile != NULL);
 }
 
 
@@ -2393,7 +2393,7 @@ void video_mng_begin_recording(running_machine *machine, const char *name)
 	int rate;
 
 	/* close any existing movie file */
-	if (global.mng_file != NULL)
+	if (global.mngfile != NULL)
 		video_mng_end_recording(machine);
 
 	/* look up the primary screen */
@@ -2405,13 +2405,13 @@ void video_mng_begin_recording(running_machine *machine, const char *name)
 
 	/* create a new movie file and start recording */
 	if (name != NULL)
-		filerr = mame_fopen(SEARCHPATH_MOVIE, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &global.mng_file);
+		filerr = mame_fopen(SEARCHPATH_MOVIE, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &global.mngfile);
 	else
-		filerr = mame_fopen_next(machine, SEARCHPATH_MOVIE, "mng", &global.mng_file);
+		filerr = mame_fopen_next(machine, SEARCHPATH_MOVIE, "mng", &global.mngfile);
 
 	/* start the capture */
 	rate = (state != NULL) ? ATTOSECONDS_TO_HZ(state->frame_period) : DEFAULT_FRAME_RATE;
-	pngerr = mng_capture_start(mame_core_file(global.mng_file), global.snap_bitmap, rate);
+	pngerr = mng_capture_start(mame_core_file(global.mngfile), global.snap_bitmap, rate);
 	if (pngerr != PNGERR_NONE)
 	{
 		video_mng_end_recording(machine);
@@ -2433,11 +2433,11 @@ void video_mng_begin_recording(running_machine *machine, const char *name)
 void video_mng_end_recording(running_machine *machine)
 {
 	/* close the file if it exists */
-	if (global.mng_file != NULL)
+	if (global.mngfile != NULL)
 	{
-		mng_capture_stop(mame_core_file(global.mng_file));
-		mame_fclose(global.mng_file);
-		global.mng_file = NULL;
+		mng_capture_stop(mame_core_file(global.mngfile));
+		mame_fclose(global.mngfile);
+		global.mngfile = NULL;
 		global.movie_frame = 0;
 	}
 }
@@ -2451,7 +2451,7 @@ void video_mng_end_recording(running_machine *machine)
 static void video_mng_record_frame(running_machine *machine)
 {
 	/* only record if we have a file */
-	if (global.mng_file != NULL)
+	if (global.mngfile != NULL)
 	{
 		attotime curtime = timer_get_time(machine);
 		png_info pnginfo = { 0 };
@@ -2480,7 +2480,7 @@ static void video_mng_record_frame(running_machine *machine)
 
 			/* write the next frame */
 			palette = (machine->palette != NULL) ? palette_entry_list_adjusted(machine->palette) : NULL;
-			error = mng_capture_frame(mame_core_file(global.mng_file), &pnginfo, global.snap_bitmap, machine->config->total_colors, palette);
+			error = mng_capture_frame(mame_core_file(global.mngfile), &pnginfo, global.snap_bitmap, machine->config->total_colors, palette);
 			png_free(&pnginfo);
 			if (error != PNGERR_NONE)
 			{
@@ -2517,7 +2517,7 @@ void video_avi_begin_recording(running_machine *machine, const char *name)
 	avi_error avierr;
 
 	/* close any existing movie file */
-	if (global.avi_file != NULL)
+	if (global.avifile != NULL)
 		video_avi_end_recording(machine);
 
 	/* look up the primary screen */
@@ -2562,7 +2562,7 @@ void video_avi_begin_recording(running_machine *machine, const char *name)
 		mame_fclose(tempfile);
 
 		/* create the file and free the string */
-		avierr = avi_create(astring_c(fullname), &info, &global.avi_file);
+		avierr = avi_create(astring_c(fullname), &info, &global.avifile);
 		astring_free(fullname);
 	}
 }
@@ -2576,10 +2576,10 @@ void video_avi_begin_recording(running_machine *machine, const char *name)
 void video_avi_end_recording(running_machine *machine)
 {
 	/* close the file if it exists */
-	if (global.avi_file != NULL)
+	if (global.avifile != NULL)
 	{
-		avi_close(global.avi_file);
-		global.avi_file = NULL;
+		avi_close(global.avifile);
+		global.avifile = NULL;
 		global.movie_frame = 0;
 	}
 }
@@ -2593,7 +2593,7 @@ void video_avi_end_recording(running_machine *machine)
 static void video_avi_record_frame(running_machine *machine)
 {
 	/* only record if we have a file */
-	if (global.avi_file != NULL)
+	if (global.avifile != NULL)
 	{
 		attotime curtime = timer_get_time(machine);
 		avi_error avierr;
@@ -2607,7 +2607,7 @@ static void video_avi_record_frame(running_machine *machine)
 		while (attotime_compare(global.movie_next_frame_time, curtime) <= 0)
 		{
 			/* write the next frame */
-			avierr = avi_append_video_frame_rgb32(global.avi_file, global.snap_bitmap);
+			avierr = avi_append_video_frame_rgb32(global.avifile, global.snap_bitmap);
 			if (avierr != AVIERR_NONE)
 			{
 				video_avi_end_recording(machine);
@@ -2632,16 +2632,16 @@ static void video_avi_record_frame(running_machine *machine)
 void video_avi_add_sound(running_machine *machine, const INT16 *sound, int numsamples)
 {
 	/* only record if we have a file */
-	if (global.avi_file != NULL)
+	if (global.avifile != NULL)
 	{
 		avi_error avierr;
 
 		profiler_mark(PROFILER_MOVIE_REC);
 
 		/* write the next frame */
-		avierr = avi_append_sound_samples(global.avi_file, 0, sound + 0, numsamples, 1);
+		avierr = avi_append_sound_samples(global.avifile, 0, sound + 0, numsamples, 1);
 		if (avierr == AVIERR_NONE)
-			avierr = avi_append_sound_samples(global.avi_file, 1, sound + 1, numsamples, 1);
+			avierr = avi_append_sound_samples(global.avifile, 1, sound + 1, numsamples, 1);
 		if (avierr != AVIERR_NONE)
 			video_avi_end_recording(machine);
 

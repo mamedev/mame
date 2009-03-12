@@ -27,7 +27,7 @@ static int scsihd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 {
 	UINT8 *command;
 	int commandLength;
-	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
+	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch ( command[0] )
@@ -103,7 +103,7 @@ static void scsihd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 	int i;
 	UINT8 *command;
 	int commandLength;
-	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
+	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch ( command[0] )
@@ -194,7 +194,7 @@ static void scsihd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 {
 	UINT8 *command;
 	int commandLength;
-	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
+	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch ( command[0] )
@@ -225,7 +225,7 @@ static void scsihd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
 	running_machine *machine = scsiInstance->machine;
-	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
+	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 
 	our_this->lba = 0;
 	our_this->blocks = 0;
@@ -249,7 +249,7 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 static void scsihd_delete_instance( SCSIInstance *scsiInstance )
 {
 #ifndef MESS
-	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
+	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 
 	if( our_this->disk )
 	{
@@ -260,13 +260,13 @@ static void scsihd_delete_instance( SCSIInstance *scsiInstance )
 
 static void scsihd_get_device( SCSIInstance *scsiInstance, hard_disk_file **disk )
 {
-	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
+	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 	*disk = our_this->disk;
 }
 
 static void scsihd_set_device( SCSIInstance *scsiInstance, hard_disk_file *disk )
 {
-	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
+	SCSIHd *our_this = (SCSIHd *)SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 	our_this->disk = disk;
 }
 
@@ -277,36 +277,36 @@ static int scsihd_dispatch(int operation, void *file, INT64 intparm, void *ptrpa
 	switch (operation)
 	{
 		case SCSIOP_EXEC_COMMAND:
-			return scsihd_exec_command( file, ptrparm );
+			return scsihd_exec_command( (SCSIInstance *)file, (UINT8 *)ptrparm );
 
 		case SCSIOP_READ_DATA:
-			scsihd_read_data( file, ptrparm, intparm );
+			scsihd_read_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			return 0;
 
 		case SCSIOP_WRITE_DATA:
-			scsihd_write_data( file, ptrparm, intparm );
+			scsihd_write_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			return 0;
 
 		case SCSIOP_ALLOC_INSTANCE:
-			params = ptrparm;
-			SCSIBase( &SCSIClassHARDDISK, operation, file, intparm, ptrparm );
+			params = (SCSIAllocInstanceParams *)ptrparm;
+			SCSIBase( &SCSIClassHARDDISK, operation, (SCSIInstance *)file, intparm, (UINT8 *)ptrparm );
 			scsihd_alloc_instance( params->instance, params->diskregion );
 			return 0;
 
 		case SCSIOP_DELETE_INSTANCE:
-			scsihd_delete_instance( file );
+			scsihd_delete_instance( (SCSIInstance *)file );
 			break;
 
 		case SCSIOP_GET_DEVICE:
-			scsihd_get_device( file, ptrparm );
+			scsihd_get_device( (SCSIInstance *)file, (hard_disk_file **)ptrparm );
 			return 0;
 
 		case SCSIOP_SET_DEVICE:
-			scsihd_set_device( file, ptrparm );
+			scsihd_set_device( (SCSIInstance *)file, (hard_disk_file *)ptrparm );
 			return 0;
 	}
 
-	return SCSIBase( &SCSIClassHARDDISK, operation, file, intparm, ptrparm );
+	return SCSIBase( &SCSIClassHARDDISK, operation, (SCSIInstance *)file, intparm, (UINT8 *)ptrparm );
 }
 
 const SCSIClass SCSIClassHARDDISK =

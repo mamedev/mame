@@ -197,7 +197,7 @@ INLINE void update_audio(laserdisc_state *ld)
 	ldcore_data *ldcore = ld->core;
 	if (ldcore->audiocustom != NULL)
 	{
-		sound_token *token = ldcore->audiocustom->token;
+		sound_token *token = (sound_token *)ldcore->audiocustom->token;
 		stream_update(token->stream);
 	}
 }
@@ -290,7 +290,7 @@ static void update_slider_pos(ldcore_data *ldcore, attotime curtime)
 
 static void vblank_state_changed(const device_config *screen, void *param, int vblank_state)
 {
-	const device_config *device = param;
+	const device_config *device = (const device_config *)param;
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	attotime curtime = timer_get_time(screen->machine);
@@ -318,7 +318,7 @@ static void vblank_state_changed(const device_config *screen, void *param, int v
 
 static TIMER_CALLBACK( perform_player_update )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldcore_data *ldcore = ld->core;
 	attotime curtime = timer_get_time(machine);
 
@@ -940,7 +940,7 @@ static void process_track_data(const device_config *device)
 
 static DEVICE_START( laserdisc_sound )
 {
-	sound_token *token = device->token;
+	sound_token *token = (sound_token *)device->token;
 	token->stream = stream_create(device, 0, 2, 48000, token, custom_stream_callback);
 	token->ld = NULL;
 }
@@ -975,7 +975,7 @@ DEVICE_GET_INFO( laserdisc_sound )
 
 static STREAM_UPDATE( custom_stream_callback )
 {
-	sound_token *token = param;
+	sound_token *token = (sound_token *)param;
 	laserdisc_state *ld = token->ld;
 	ldcore_data *ldcore = ld->core;
 	stream_sample_t *dst0 = outputs[0];
@@ -1103,7 +1103,7 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
 	/* iterate over disc devices */
 	for (device = device_list_first(machine->config->devicelist, LASERDISC); device != NULL; device = device_list_next(device, LASERDISC))
 	{
-		laserdisc_config *origconfig = device->inline_config;
+		laserdisc_config *origconfig = (laserdisc_config *)device->inline_config;
 		laserdisc_state *ld = get_safe_token(device);
 		ldcore_data *ldcore = ld->core;
 		xml_data_node *overnode;
@@ -1195,7 +1195,7 @@ VIDEO_UPDATE( laserdisc )
 	if (laserdisc != NULL)
 	{
 		const rectangle *visarea = video_screen_get_visible_area(screen);
-		laserdisc_state *ld = laserdisc->token;
+		laserdisc_state *ld = (laserdisc_state *)laserdisc->token;
 		ldcore_data *ldcore = ld->core;
 		bitmap_t *overbitmap = ldcore->overbitmap[ldcore->overindex];
 		bitmap_t *vidbitmap = NULL;
@@ -1299,7 +1299,7 @@ void laserdisc_set_config(const device_config *device, const laserdisc_config *c
 
 static void init_disc(const device_config *device)
 {
-	const laserdisc_config *config = device->inline_config;
+	const laserdisc_config *config = (const laserdisc_config *)device->inline_config;
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	chd_error err;
@@ -1349,7 +1349,7 @@ static void init_disc(const device_config *device)
 		ldcore->chdtracks = totalhunks / 2;
 
 		/* allocate memory for the precomputed per-frame metadata */
-		ldcore->vbidata = auto_malloc(totalhunks * VBI_PACKED_BYTES);
+		ldcore->vbidata = (UINT8 *)auto_malloc(totalhunks * VBI_PACKED_BYTES);
 		err = chd_get_metadata(ldcore->disc, AV_LD_METADATA_TAG, 0, ldcore->vbidata, totalhunks * VBI_PACKED_BYTES, &vbilength, NULL, NULL);
 		if (err != CHDERR_NONE || vbilength != totalhunks * VBI_PACKED_BYTES)
 			fatalerror("Precomputed VBI metadata missing or incorrect size");
@@ -1382,7 +1382,7 @@ static void init_video(const device_config *device)
 		fillbitmap_yuy16(frame->bitmap, 40, 109, 240);
 
 		/* make a copy of the bitmap that clips out the VBI and horizontal blanking areas */
-		frame->visbitmap = auto_malloc(sizeof(*frame->visbitmap));
+		frame->visbitmap = (bitmap_t *)auto_malloc(sizeof(*frame->visbitmap));
 		*frame->visbitmap = *frame->bitmap;
 		frame->visbitmap->base = BITMAP_ADDR16(frame->visbitmap, 44, frame->bitmap->width * 8 / 720);
 		frame->visbitmap->height -= 44;
@@ -1410,8 +1410,8 @@ static void init_video(const device_config *device)
 	if (ldcore->config.overwidth > 0 && ldcore->config.overheight > 0 && ldcore->config.overupdate != NULL)
 	{
 		ldcore->overenable = TRUE;
-		ldcore->overbitmap[0] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, ldcore->config.overformat);
-		ldcore->overbitmap[1] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, ldcore->config.overformat);
+		ldcore->overbitmap[0] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, (bitmap_format)ldcore->config.overformat);
+		ldcore->overbitmap[1] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, (bitmap_format)ldcore->config.overformat);
 		ldcore->overtex = render_texture_alloc(NULL, NULL);
 		if (ldcore->overtex == NULL)
 			fatalerror("Out of memory allocating overlay texture");
@@ -1435,8 +1435,8 @@ static void init_audio(const device_config *device)
 	/* allocate audio buffers */
 	ldcore->audiomaxsamples = ((UINT64)ldcore->samplerate * 1000000 + ldcore->fps_times_1million - 1) / ldcore->fps_times_1million;
 	ldcore->audiobufsize = ldcore->audiomaxsamples * 4;
-	ldcore->audiobuffer[0] = auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[0][0]));
-	ldcore->audiobuffer[1] = auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[1][0]));
+	ldcore->audiobuffer[0] = (INT16 *)auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[0][0]));
+	ldcore->audiobuffer[1] = (INT16 *)auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[1][0]));
 }
 
 
@@ -1451,7 +1451,7 @@ static void init_audio(const device_config *device)
 
 static DEVICE_START( laserdisc )
 {
-	const laserdisc_config *config = device->inline_config;
+	const laserdisc_config *config = (const laserdisc_config *)device->inline_config;
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore;
 	int statesize;
@@ -1470,7 +1470,7 @@ static DEVICE_START( laserdisc )
 	ld->device = device;
 
 	/* allocate memory for the core state */
-	ld->core = auto_malloc(sizeof(*ld->core));
+	ld->core = (ldcore_data *)auto_malloc(sizeof(*ld->core));
 	memset(ld->core, 0, sizeof(*ld->core));
 	ldcore = ld->core;
 
@@ -1478,7 +1478,7 @@ static DEVICE_START( laserdisc )
 	statesize = 0;
 	for (index = 0; index < ARRAY_LENGTH(player_interfaces); index++)
 		statesize = MAX(statesize, player_interfaces[index]->statesize);
-	ld->player = auto_malloc(statesize);
+	ld->player = (ldplayer_data *)auto_malloc(statesize);
 	memset(ld->player, 0, statesize);
 
 	/* copy config data to the live state */
@@ -1549,7 +1549,7 @@ static DEVICE_RESET( laserdisc )
 	/* attempt to wire up the audio */
 	if (ldcore->audiocustom != NULL)
 	{
-		sound_token *token = ldcore->audiocustom->token;
+		sound_token *token = (sound_token *)ldcore->audiocustom->token;
 		token->ld = ld;
 		stream_set_sample_rate(token->stream, ldcore->samplerate);
 	}
@@ -1608,8 +1608,8 @@ DEVICE_GET_INFO( laserdisc )
 	/* if we have a device, figure out where our config lives */
 	if (device != NULL)
 	{
-		laserdisc_state *ld = device->token;
-		config = device->inline_config;
+		laserdisc_state *ld = (laserdisc_state *)device->token;
+		config = (const laserdisc_config *)device->inline_config;
 		if (ld != NULL && ld->core != NULL)
 		{
 			config = &ld->core->config;

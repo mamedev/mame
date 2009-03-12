@@ -166,7 +166,7 @@ INLINE speaker_info *index_to_input(running_machine *machine, int index, int *in
 	/* scan through the speakers until we find the indexed input */
 	for (curspeak = speaker_output_first(machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
-		speaker_info *info = curspeak->token;
+		speaker_info *info = (speaker_info *)curspeak->token;
 		if (index < count + info->inputs)
 		{
 			*input = index - count;
@@ -202,9 +202,9 @@ void sound_init(running_machine *machine)
 	VPRINTF(("total speakers = %d\n", speaker_output_count(machine->config)));
 
 	/* allocate memory for mix buffers */
-	leftmix = auto_malloc(machine->sample_rate * sizeof(*leftmix));
-	rightmix = auto_malloc(machine->sample_rate * sizeof(*rightmix));
-	finalmix = auto_malloc(machine->sample_rate * sizeof(*finalmix));
+	leftmix = (INT32 *)auto_malloc(machine->sample_rate * sizeof(*leftmix));
+	rightmix = (INT32 *)auto_malloc(machine->sample_rate * sizeof(*rightmix));
+	finalmix = (INT16 *)auto_malloc(machine->sample_rate * sizeof(*finalmix));
 
 	/* allocate a global timer for sound timing */
 	sound_update_timer = timer_alloc(machine, sound_update, NULL);
@@ -270,7 +270,7 @@ static DEVICE_START( sound )
 	assert(device->machine->config != NULL);
 
 	/* get pointers to our data */
-	config = device->inline_config;
+	config = (const sound_config *)device->inline_config;
 	classdata = get_class_data(device);
 
 	/* get the chip's start function */
@@ -324,7 +324,7 @@ static DEVICE_START( sound )
 
 static DEVICE_CUSTOM_CONFIG( sound )
 {
-	sound_config *config = device->inline_config;
+	sound_config *config = (sound_config *)device->inline_config;
 
 	switch (entrytype)
 	{
@@ -341,7 +341,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 
 			/* allocate a new route */
 			for (routeptr = &config->routelist; *routeptr != NULL; routeptr = &(*routeptr)->next) ;
-			*routeptr = malloc_or_die(sizeof(**routeptr));
+			*routeptr = (sound_route *)malloc_or_die(sizeof(**routeptr));
 			(*routeptr)->next = NULL;
 			(*routeptr)->output = output;
 			(*routeptr)->input = input;
@@ -372,7 +372,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 
 DEVICE_GET_INFO( sound )
 {
-	const sound_config *config = (device != NULL) ? device->inline_config : NULL;
+	const sound_config *config = (device != NULL) ? (const sound_config *)device->inline_config : NULL;
 
 	switch (state)
 	{
@@ -425,7 +425,7 @@ static void route_sound(running_machine *machine)
 	/* first count up the inputs for each speaker */
 	for (sound = sound_first(machine->config); sound != NULL; sound = sound_next(sound))
 	{
-		const sound_config *config = sound->inline_config;
+		const sound_config *config = (const sound_config *)sound->inline_config;
 		int numoutputs = stream_get_device_outputs(sound);
 		const sound_route *route;
 
@@ -452,7 +452,7 @@ static void route_sound(running_machine *machine)
 		{
 			info->mixer_stream = stream_create(curspeak, info->inputs, 1, machine->sample_rate, info, mixer_update);
 			state_save_register_postload(machine, mixer_postload, info->mixer_stream);
-			info->input = auto_malloc(info->inputs * sizeof(*info->input));
+			info->input = (speaker_input *)auto_malloc(info->inputs * sizeof(*info->input));
 			info->inputs = 0;
 		}
 		else
@@ -462,7 +462,7 @@ static void route_sound(running_machine *machine)
 	/* iterate again over all the sound chips */
 	for (sound = sound_first(machine->config); sound != NULL; sound = sound_next(sound))
 	{
-		const sound_config *config = sound->inline_config;
+		const sound_config *config = (const sound_config *)sound->inline_config;
 		int numoutputs = stream_get_device_outputs(sound);
 		const sound_route *route;
 
@@ -693,7 +693,7 @@ static TIMER_CALLBACK( sound_update )
 	/* force all the speaker streams to generate the proper number of samples */
 	for (curspeak = speaker_output_first(machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
-		speaker_info *spk = curspeak->token;
+		speaker_info *spk = (speaker_info *)curspeak->token;
 		const stream_sample_t *stream_buf;
 
 		/* get the output buffer */
@@ -801,7 +801,7 @@ static TIMER_CALLBACK( sound_update )
 
 static STREAM_UPDATE( mixer_update )
 {
-	speaker_info *speaker = param;
+	speaker_info *speaker = (speaker_info *)param;
 	int numinputs = speaker->inputs;
 	int pos;
 
@@ -828,7 +828,7 @@ static STREAM_UPDATE( mixer_update )
 
 static STATE_POSTLOAD( mixer_postload )
 {
-	sound_stream *stream = param;
+	sound_stream *stream = (sound_stream *)param;
 	stream_set_sample_rate(stream, machine->sample_rate);
 }
 
@@ -845,10 +845,10 @@ static STATE_POSTLOAD( mixer_postload )
 
 static DEVICE_START( speaker_output )
 {
-	speaker_info *info = device->token;
+	speaker_info *info = (speaker_info *)device->token;
 
 	/* copy in all the relevant info */
-	info->speaker = device->inline_config;
+	info->speaker = (const speaker_config *)device->inline_config;
 	info->tag = device->tag;
 }
 
@@ -937,7 +937,7 @@ int sound_get_user_gain_count(running_machine *machine)
 	/* count up the number of speaker inputs */
 	for (curspeak = speaker_output_first(machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
-		speaker_info *info = curspeak->token;
+		speaker_info *info = (speaker_info *)curspeak->token;
 		count += info->inputs;
 	}
 	return count;

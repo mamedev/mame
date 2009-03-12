@@ -223,7 +223,7 @@ void cpuexec_init(running_machine *machine)
 	attotime min_quantum;
 
 	/* allocate global state */
-	machine->cpuexec_data = auto_malloc(sizeof(*machine->cpuexec_data));
+	machine->cpuexec_data = (cpuexec_private *)auto_malloc(sizeof(*machine->cpuexec_data));
 	memset(machine->cpuexec_data, 0, sizeof(*machine->cpuexec_data));
 
 	/* set the core scheduling quantum */
@@ -457,7 +457,7 @@ static DEVICE_START( cpu )
 	assert(device->machine->config != NULL);
 
 	/* get pointers to our data */
-	config = device->inline_config;
+	config = (const cpu_config *)device->inline_config;
 	header = cpu_get_class_header(device);
 	classdata = get_class_data(device);
 
@@ -553,7 +553,7 @@ static DEVICE_START( cpu )
 static DEVICE_RESET( cpu )
 {
 	cpu_class_data *classdata = get_class_data(device);
-	const cpu_config *config = device->inline_config;
+	const cpu_config *config = (const cpu_config *)device->inline_config;
 	cpu_reset_func reset;
 	int line;
 
@@ -685,7 +685,7 @@ static DEVICE_SET_INFO( cpu )
 
 DEVICE_GET_INFO( cpu )
 {
-	const cpu_config *config = (device != NULL) ? device->inline_config : NULL;
+	const cpu_config *config = (device != NULL) ? (const cpu_config *)device->inline_config : NULL;
 	cpuinfo cinfo = { 0 };
 
 	switch (state)
@@ -1363,7 +1363,7 @@ static void on_vblank(const device_config *device, void *param, int vblank_state
 		/* find any CPUs that have this screen as their VBLANK interrupt source */
 		for (cpu = device->machine->cpu[0]; cpu != NULL; cpu = cpu->typenext)
 		{
-			const cpu_config *config = cpu->inline_config;
+			const cpu_config *config = (const cpu_config *)cpu->inline_config;
 			cpu_class_data *classdata = get_class_data(cpu);
 			int cpu_interested;
 
@@ -1410,8 +1410,8 @@ static void on_vblank(const device_config *device, void *param, int vblank_state
 
 static TIMER_CALLBACK( trigger_partial_frame_interrupt )
 {
-	const device_config *device = ptr;
-	const cpu_config *config = device->inline_config;
+	const device_config *device = (const device_config *)ptr;
+	const cpu_config *config = (const cpu_config *)device->inline_config;
 	cpu_class_data *classdata = get_class_data(device);
 
 	if (classdata->iloops == 0)
@@ -1436,8 +1436,8 @@ static TIMER_CALLBACK( trigger_partial_frame_interrupt )
 
 static TIMER_CALLBACK( trigger_periodic_interrupt )
 {
-	const device_config *device = ptr;
-	const cpu_config *config = device->inline_config;
+	const device_config *device = (const device_config *)ptr;
+	const cpu_config *config = (const cpu_config *)device->inline_config;
 
 	/* bail if there is no routine */
 	if (config->timed_interrupt != NULL && !cpu_is_suspended(device, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
@@ -1462,7 +1462,7 @@ static TIMER_CALLBACK( triggertime_callback )
 
 static TIMER_CALLBACK( empty_event_queue )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	cpu_class_data *classdata = get_class_data(device);
 	cpu_input_data *inputline = &classdata->input[param];
 	int curevent;

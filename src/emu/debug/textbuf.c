@@ -88,12 +88,12 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	text_buffer *text;
 
 	/* allocate memory for the text buffer object */
-	text = malloc(sizeof(*text));
+	text = (text_buffer *)malloc(sizeof(*text));
 	if (!text)
 		return NULL;
 
 	/* allocate memory for the buffer itself */
-	text->buffer = malloc(bytes);
+	text->buffer = (char *)malloc(bytes);
 	if (!text->buffer)
 	{
 		free(text);
@@ -101,7 +101,7 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	}
 
 	/* allocate memory for the lines array */
-	text->lineoffs = malloc(lines * sizeof(text->lineoffs[0]));
+	text->lineoffs = (INT32 *)malloc(lines * sizeof(text->lineoffs[0]));
 	if (!text->lineoffs)
 	{
 		free(text->buffer);

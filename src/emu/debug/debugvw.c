@@ -342,7 +342,7 @@ void debug_view_init(running_machine *machine)
 	debugvw_private *global;
 
 	/* allocate memory for our globals */
-	global = machine->debugvw_data = auto_malloc(sizeof(*machine->debugvw_data));
+	global = machine->debugvw_data = (debugvw_private *)auto_malloc(sizeof(*machine->debugvw_data));
 	memset(global, 0, sizeof(*global));
 
 	/* register for some manual cleanup */
@@ -387,7 +387,7 @@ debug_view *debug_view_alloc(running_machine *machine, int type, debug_view_osd_
 	assert(type >= 0 && type < ARRAY_LENGTH(callback_table));
 
 	/* allocate memory for the view */
-	view = malloc(sizeof(*view));
+	view = (debug_view *)malloc(sizeof(*view));
 	if (view == NULL)
 		return NULL;
 	memset(view, 0, sizeof(*view));
@@ -405,7 +405,7 @@ debug_view *debug_view_alloc(running_machine *machine, int type, debug_view_osd_
 
 	/* allocate memory for the buffer */
 	view->viewdata_size = view->visible.y * view->visible.x;
-	view->viewdata = malloc(sizeof(view->viewdata[0]) * view->viewdata_size);
+	view->viewdata = (debug_view_char *)malloc(sizeof(view->viewdata[0]) * view->viewdata_size);
 	if (view->viewdata == NULL)
 	{
 		free(view);
@@ -499,7 +499,7 @@ void debug_view_end_update(debug_view *view)
 			if (size > view->viewdata_size)
 			{
 				view->viewdata_size = size;
-				view->viewdata = realloc(view->viewdata, sizeof(view->viewdata[0]) * view->viewdata_size);
+				view->viewdata = (debug_view_char *)realloc(view->viewdata, sizeof(view->viewdata[0]) * view->viewdata_size);
 			}
 
 			/* update the view */
@@ -908,7 +908,7 @@ static int textbuf_view_alloc(debug_view *view, text_buffer *textbuf)
 	debug_view_textbuf *textdata;
 
 	/* allocate memory */
-	textdata = malloc(sizeof(*textdata));
+	textdata = (debug_view_textbuf *)malloc(sizeof(*textdata));
 	if (textdata == NULL)
 		return FALSE;
 	memset(textdata, 0, sizeof(*textdata));
@@ -930,7 +930,7 @@ static int textbuf_view_alloc(debug_view *view, text_buffer *textbuf)
 
 static void textbuf_view_free(debug_view *view)
 {
-	debug_view_textbuf *textdata = view->extra_data;
+	debug_view_textbuf *textdata = (debug_view_textbuf *)view->extra_data;
 
 	/* free any memory we callocated */
 	if (textdata != NULL)
@@ -946,7 +946,7 @@ static void textbuf_view_free(debug_view *view)
 
 static void textbuf_view_update(debug_view *view)
 {
-	debug_view_textbuf *textdata = view->extra_data;
+	debug_view_textbuf *textdata = (debug_view_textbuf *)view->extra_data;
 	debug_view_char *dest = view->viewdata;
 	UINT32 curseq = 0, row;
 
@@ -1014,7 +1014,7 @@ static void textbuf_view_update(debug_view *view)
 
 static void textbuf_view_notify(debug_view *view, view_notification type)
 {
-	debug_view_textbuf *textdata = view->extra_data;
+	debug_view_textbuf *textdata = (debug_view_textbuf *)view->extra_data;
 
 	if (type == VIEW_NOTIFY_VISIBLE_CHANGED)
 	{
@@ -1053,7 +1053,7 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 
 		/* determine the string and allocate a subview large enough */
 		astring_printf(tempstring, "CPU '%s' (%s)", cpu->tag, cpu_get_name(cpu));
-		subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
+		subview = (registers_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
 		memset(subview, 0, sizeof(*subview));
 
 		/* populate the subview */
@@ -1087,7 +1087,7 @@ static int registers_view_alloc(debug_view *view)
 		return FALSE;
 
 	/* allocate memory */
-	regdata = malloc(sizeof(*regdata));
+	regdata = (debug_view_registers *)malloc(sizeof(*regdata));
 	if (regdata == NULL)
 		return FALSE;
 	memset(regdata, 0, sizeof(*regdata));
@@ -1108,7 +1108,7 @@ static int registers_view_alloc(debug_view *view)
 
 static void registers_view_free(debug_view *view)
 {
-	debug_view_registers *regdata = view->extra_data;
+	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
 
 	/* free any memory we callocated */
 	if (regdata != NULL)
@@ -1124,7 +1124,7 @@ static void registers_view_free(debug_view *view)
 
 static void registers_view_add_register(debug_view *view, int regnum, const char *str)
 {
-	debug_view_registers *regdata = view->extra_data;
+	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
 	int tagstart, taglen, valstart, vallen;
 	const char *colon;
 
@@ -1183,7 +1183,7 @@ static void registers_view_add_register(debug_view *view, int regnum, const char
 
 static void registers_view_recompute(debug_view *view)
 {
-	debug_view_registers *regdata = view->extra_data;
+	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
 	int regnum, maxtaglen, maxvallen;
 	const cpu_state_table *table;
 
@@ -1296,7 +1296,7 @@ static void registers_view_recompute(debug_view *view)
 static void registers_view_update(debug_view *view)
 {
 	const device_config *screen = view->machine->primary_screen;
-	debug_view_registers *regdata = view->extra_data;
+	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
 	debug_view_char *dest = view->viewdata;
 	UINT64 total_cycles;
 	UINT32 row, i;
@@ -1434,7 +1434,7 @@ const registers_subview_item *registers_view_get_subview_list(debug_view *view)
 
 int registers_view_get_subview(debug_view *view)
 {
-	debug_view_registers *regdata = view->extra_data;
+	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
 	const registers_subview_item *subview;
 	int index = 0;
 
@@ -1460,7 +1460,7 @@ int registers_view_get_subview(debug_view *view)
 void registers_view_set_subview(debug_view *view, int index)
 {
 	const registers_subview_item *subview = registers_view_get_subview_by_index(view->machine->debugvw_data->registers_subviews, index);
-	debug_view_registers *regdata = view->extra_data;
+	debug_view_registers *regdata = (debug_view_registers *)view->extra_data;
 
 	assert(view->type == DVT_REGISTERS);
 	assert(subview != NULL);
@@ -1506,7 +1506,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "CPU '%s' (%s)", cpu->tag, cpu_get_name(cpu));
-			subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
+			subview = (disasm_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
 			memset(subview, 0, sizeof(*subview));
 
 			/* populate the subview */
@@ -1543,7 +1543,7 @@ static int disasm_view_alloc(debug_view *view)
 		return FALSE;
 
 	/* allocate disasm */
-	dasmdata = malloc(sizeof(*dasmdata));
+	dasmdata = (debug_view_disasm *)malloc(sizeof(*dasmdata));
 	if (dasmdata == NULL)
 		return FALSE;
 	memset(dasmdata, 0, sizeof(*dasmdata));
@@ -1580,7 +1580,7 @@ static int disasm_view_alloc(debug_view *view)
 
 static void disasm_view_free(debug_view *view)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 
 	/* free any disasm we callocated */
 	if (dasmdata != NULL)
@@ -1615,7 +1615,7 @@ static void disasm_view_notify(debug_view *view, view_notification type)
 
 static void disasm_view_char(debug_view *view, int chval)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	debug_view_xy origcursor = view->cursor;
 	UINT8 end_buffer = 3;
 	INT32 temp;
@@ -1824,7 +1824,7 @@ static void disasm_view_generate_bytes(const address_space *space, offs_t pcbyte
 
 static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int lines)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	const address_space *space = dasmdata->space;
 	int minbytes, maxbytes, maxbytes_clamped;
 	int changed = FALSE;
@@ -1864,12 +1864,12 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 		/* allocate address array */
 		if (dasmdata->byteaddress != NULL)
 			free(dasmdata->byteaddress);
-		dasmdata->byteaddress = malloc_or_die(sizeof(dasmdata->byteaddress[0]) * dasmdata->allocated.y);
+		dasmdata->byteaddress = (offs_t *)malloc_or_die(sizeof(dasmdata->byteaddress[0]) * dasmdata->allocated.y);
 
 		/* allocate disassembly buffer */
 		if (dasmdata->dasm != NULL)
 			free(dasmdata->dasm);
-		dasmdata->dasm = malloc_or_die(sizeof(dasmdata->dasm[0]) * dasmdata->allocated.x * dasmdata->allocated.y);
+		dasmdata->dasm = (char *)malloc_or_die(sizeof(dasmdata->dasm[0]) * dasmdata->allocated.x * dasmdata->allocated.y);
 	}
 
 	/* iterate over lines */
@@ -1955,7 +1955,7 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 
 static void disasm_view_update(debug_view *view)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	const address_space *space = dasmdata->space;
 	debug_view_char *dest = view->viewdata;
 	int recomputed_this_time = FALSE;
@@ -2163,7 +2163,7 @@ const disasm_subview_item *disasm_view_get_subview_list(debug_view *view)
 
 int disasm_view_get_subview(debug_view *view)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	const disasm_subview_item *subview;
 	int index = 0;
 
@@ -2188,7 +2188,7 @@ int disasm_view_get_subview(debug_view *view)
 
 const char *disasm_view_get_expression(debug_view *view)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	assert(view->type == DVT_DISASSEMBLY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -2203,7 +2203,7 @@ const char *disasm_view_get_expression(debug_view *view)
 
 disasm_right_column disasm_view_get_right_column(debug_view *view)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	assert(view->type == DVT_DISASSEMBLY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -2219,7 +2219,7 @@ disasm_right_column disasm_view_get_right_column(debug_view *view)
 
 UINT32 disasm_view_get_backward_steps(debug_view *view)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	assert(view->type == DVT_DISASSEMBLY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -2235,7 +2235,7 @@ UINT32 disasm_view_get_backward_steps(debug_view *view)
 
 UINT32 disasm_view_get_disasm_width(debug_view *view)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	assert(view->type == DVT_DISASSEMBLY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -2251,7 +2251,7 @@ UINT32 disasm_view_get_disasm_width(debug_view *view)
 
 offs_t disasm_view_get_selected_address(debug_view *view)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	assert(view->type == DVT_DISASSEMBLY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -2267,7 +2267,7 @@ offs_t disasm_view_get_selected_address(debug_view *view)
 void disasm_view_set_subview(debug_view *view, int index)
 {
 	const disasm_subview_item *subview = disasm_view_get_subview_by_index(view->machine->debugvw_data->disasm_subviews, index);
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 
 	assert(view->type == DVT_DISASSEMBLY);
 	assert(subview != NULL);
@@ -2295,7 +2295,7 @@ void disasm_view_set_subview(debug_view *view, int index)
 
 void disasm_view_set_expression(debug_view *view, const char *expression)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 
 	assert(view->type == DVT_DISASSEMBLY);
 	assert(expression != NULL);
@@ -2314,7 +2314,7 @@ void disasm_view_set_expression(debug_view *view, const char *expression)
 
 void disasm_view_set_right_column(debug_view *view, disasm_right_column contents)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 
 	assert(view->type == DVT_DISASSEMBLY);
 	assert(contents == DASM_RIGHTCOL_RAW || contents == DASM_RIGHTCOL_ENCRYPTED || contents == DASM_RIGHTCOL_COMMENTS);
@@ -2337,7 +2337,7 @@ void disasm_view_set_right_column(debug_view *view, disasm_right_column contents
 
 void disasm_view_set_backward_steps(debug_view *view, UINT32 steps)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 
 	assert(view->type == DVT_DISASSEMBLY);
 
@@ -2359,7 +2359,7 @@ void disasm_view_set_backward_steps(debug_view *view, UINT32 steps)
 
 void disasm_view_set_disasm_width(debug_view *view, UINT32 width)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 
 	assert(view->type == DVT_DISASSEMBLY);
 
@@ -2381,7 +2381,7 @@ void disasm_view_set_disasm_width(debug_view *view, UINT32 width)
 
 void disasm_view_set_selected_address(debug_view *view, offs_t address)
 {
-	debug_view_disasm *dasmdata = view->extra_data;
+	debug_view_disasm *dasmdata = (debug_view_disasm *)view->extra_data;
 	offs_t byteaddress = memory_address_to_byte(dasmdata->space, address) & dasmdata->space->logbytemask;
 	int line;
 
@@ -2429,7 +2429,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 
 				/* determine the string and allocate a subview large enough */
 				astring_printf(tempstring, "CPU '%s' (%s) %s memory", cpu->tag, cpu_get_name(cpu), space->name);
-				subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
+				subview = (memory_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
 				memset(subview, 0, sizeof(*subview));
 
 				/* populate the subview */
@@ -2459,7 +2459,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "Region '%s'", rgntag);
-			subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
+			subview = (memory_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
 			memset(subview, 0, sizeof(*subview));
 
 			/* populate the subview */
@@ -2497,7 +2497,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "%s", strrchr(name, '/') + 1);
-			subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
+			subview = (memory_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
 			memset(subview, 0, sizeof(*subview));
 
 			/* populate the subview */
@@ -2536,7 +2536,7 @@ static int memory_view_alloc(debug_view *view)
 		return FALSE;
 
 	/* allocate memory */
-	memdata = malloc(sizeof(*memdata));
+	memdata = (debug_view_memory *)malloc(sizeof(*memdata));
 	if (memdata == NULL)
 		return FALSE;
 	memset(memdata, 0, sizeof(*memdata));
@@ -2570,7 +2570,7 @@ static int memory_view_alloc(debug_view *view)
 
 static void memory_view_free(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 
 	/* free any memory we allocated */
 	if (memdata != NULL)
@@ -2608,7 +2608,7 @@ static void memory_view_notify(debug_view *view, view_notification type)
 
 static void memory_view_update(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	const address_space *space = memdata->desc->space;
 	const memory_view_pos *posdata;
 	UINT32 row;
@@ -2704,7 +2704,7 @@ static void memory_view_update(debug_view *view)
 static void memory_view_char(debug_view *view, int chval)
 {
 	static const char hexvals[] = "0123456789abcdef";
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	offs_t address;
 	char *hexchar;
 	int ismapped;
@@ -2777,7 +2777,7 @@ static void memory_view_char(debug_view *view, int chval)
 			break;
 
 		default:
-			hexchar = strchr(hexvals, tolower(chval));
+			hexchar = (char *)strchr(hexvals, tolower(chval));
 			if (hexchar == NULL)
 				break;
 			ismapped = memory_view_read(memdata, memdata->bytes_per_chunk, address, &data);
@@ -2824,7 +2824,7 @@ static void memory_view_char(debug_view *view, int chval)
 
 static void memory_view_recompute(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	const address_space *space = memdata->desc->space;
 	offs_t cursoraddr;
 	UINT8 cursorshift;
@@ -2904,7 +2904,7 @@ static void memory_view_recompute(debug_view *view)
 
 static int memory_view_needs_recompute(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	const address_space *space = memdata->desc->space;
 	int recompute = view->recompute;
 
@@ -2931,7 +2931,7 @@ static int memory_view_needs_recompute(debug_view *view)
 
 static void memory_view_get_cursor_pos(debug_view *view, offs_t *address, UINT8 *shift)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	const memory_view_pos *posdata = &memory_pos_table[memdata->bytes_per_chunk];
 	int xposition, chunknum, chunkoffs;
 
@@ -2967,7 +2967,7 @@ static void memory_view_get_cursor_pos(debug_view *view, offs_t *address, UINT8 
 
 static void memory_view_set_cursor_pos(debug_view *view, offs_t address, UINT8 shift)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	const memory_view_pos *posdata = &memory_pos_table[memdata->bytes_per_chunk];
 	int chunknum;
 
@@ -3131,7 +3131,7 @@ const memory_subview_item *memory_view_get_subview_list(debug_view *view)
 
 int memory_view_get_subview(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 
 	assert(view->type == DVT_MEMORY);
 	debug_view_begin_update(view);
@@ -3148,7 +3148,7 @@ int memory_view_get_subview(debug_view *view)
 
 const char *memory_view_get_expression(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	assert(view->type == DVT_MEMORY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -3163,7 +3163,7 @@ const char *memory_view_get_expression(debug_view *view)
 
 UINT8 memory_view_get_bytes_per_chunk(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	assert(view->type == DVT_MEMORY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -3178,7 +3178,7 @@ UINT8 memory_view_get_bytes_per_chunk(debug_view *view)
 
 UINT32 memory_view_get_chunks_per_row(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	assert(view->type == DVT_MEMORY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -3193,7 +3193,7 @@ UINT32 memory_view_get_chunks_per_row(debug_view *view)
 
 UINT8 memory_view_get_reverse(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	assert(view->type == DVT_MEMORY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -3209,7 +3209,7 @@ UINT8 memory_view_get_reverse(debug_view *view)
 
 UINT8 memory_view_get_ascii(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	assert(view->type == DVT_MEMORY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -3225,7 +3225,7 @@ UINT8 memory_view_get_ascii(debug_view *view)
 
 UINT8 memory_view_get_physical(debug_view *view)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 	assert(view->type == DVT_MEMORY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
@@ -3241,7 +3241,7 @@ UINT8 memory_view_get_physical(debug_view *view)
 void memory_view_set_subview(debug_view *view, int index)
 {
 	const memory_subview_item *subview = memory_view_get_subview_by_index(view->machine->debugvw_data->memory_subviews, index);
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 
 	assert(view->type == DVT_MEMORY);
 	assert(subview != NULL);
@@ -3271,7 +3271,7 @@ void memory_view_set_subview(debug_view *view, int index)
 
 void memory_view_set_expression(debug_view *view, const char *expression)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 
 	assert(view->type == DVT_MEMORY);
 	assert(expression != NULL);
@@ -3290,7 +3290,7 @@ void memory_view_set_expression(debug_view *view, const char *expression)
 
 void memory_view_set_bytes_per_chunk(debug_view *view, UINT8 chunkbytes)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 
 	assert(view->type == DVT_MEMORY);
 	assert(chunkbytes < ARRAY_LENGTH(memory_pos_table) && memory_pos_table[chunkbytes].spacing != 0);
@@ -3325,7 +3325,7 @@ void memory_view_set_bytes_per_chunk(debug_view *view, UINT8 chunkbytes)
 
 void memory_view_set_chunks_per_row(debug_view *view, UINT32 rowchunks)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 
 	assert(view->type == DVT_MEMORY);
 
@@ -3354,7 +3354,7 @@ void memory_view_set_chunks_per_row(debug_view *view, UINT32 rowchunks)
 
 void memory_view_set_reverse(debug_view *view, UINT8 reverse)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 
 	assert(view->type == DVT_MEMORY);
 
@@ -3381,7 +3381,7 @@ void memory_view_set_reverse(debug_view *view, UINT8 reverse)
 
 void memory_view_set_ascii(debug_view *view, UINT8 ascii)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 
 	assert(view->type == DVT_MEMORY);
 
@@ -3408,7 +3408,7 @@ void memory_view_set_ascii(debug_view *view, UINT8 ascii)
 
 void memory_view_set_physical(debug_view *view, UINT8 physical)
 {
-	debug_view_memory *memdata = view->extra_data;
+	debug_view_memory *memdata = (debug_view_memory *)view->extra_data;
 
 	assert(view->type == DVT_MEMORY);
 

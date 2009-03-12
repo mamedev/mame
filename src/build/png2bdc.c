@@ -128,10 +128,10 @@ static int render_font_save_cached(render_font *font, const char *filename, UINT
 			numchars++;
 
 	/* allocate an array to hold the character data */
-	chartable = malloc(numchars * CACHED_CHAR_SIZE);
+	chartable = (UINT8 *)malloc(numchars * CACHED_CHAR_SIZE);
 
 	/* allocate a temp buffer to compress into */
-	tempbuffer = malloc(65536);
+	tempbuffer = (UINT8 *)malloc(65536);
 	if (chartable == NULL || tempbuffer == NULL)
 		goto error;
 
@@ -405,7 +405,7 @@ int main(int argc, char *argv[])
     bdcname = argv[argc - 1];
 
 	/* allocate a font */
-	font = malloc(sizeof(*font));
+	font = (render_font *)malloc(sizeof(*font));
 	if (font == NULL)
 		return 1;
 	memset(font, 0, sizeof(*font));

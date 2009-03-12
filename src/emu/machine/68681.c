@@ -120,7 +120,7 @@ static void duart68681_update_interrupts(duart68681_state *duart68681)
 
 static TIMER_CALLBACK( duart_timer_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	duart68681_state	*duart68681 = get_safe_token(device);
 
 	duart68681->ISR |= INT_COUNTER_READY;
@@ -275,7 +275,7 @@ static UINT8 duart68681_read_rx_fifo(duart68681_state *duart68681, int ch)
 
 static TIMER_CALLBACK( tx_timer_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	duart68681_state	*duart68681 = get_safe_token(device);
 	int ch = param & 1;
 
@@ -592,7 +592,7 @@ static DEVICE_RESET(duart68681)
 	duart68681_state *duart68681 = get_safe_token(device);
 
 	memset(duart68681, 0, sizeof(duart68681_state));
-	duart68681->duart_config = device->static_config;
+	duart68681->duart_config = (const duart68681_config *)device->static_config;
 	duart68681->device = device;
 	duart68681->IVR = 0x0f;
 

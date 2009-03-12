@@ -199,7 +199,7 @@ static TIMER_CALLBACK( mc146818_timer )
 
 void mc146818_init(running_machine *machine, MC146818_TYPE type)
 {
-	mc146818 = auto_malloc(sizeof(*mc146818));
+	mc146818 = (struct mc146818_chip *)auto_malloc(sizeof(*mc146818));
 	memset(mc146818, 0, sizeof(*mc146818));
 	mc146818->type = type;
 	mc146818->last_refresh = timer_get_time(machine);

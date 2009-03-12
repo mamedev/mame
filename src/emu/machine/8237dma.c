@@ -114,7 +114,7 @@ static int dma8237_do_operation(const device_config *device, int channel)
 
 static TIMER_CALLBACK( dma8237_timerproc )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	dma8237_t	*dma8237 = get_safe_token(device);
 	int channel = param % 4;
 	int done;
@@ -134,7 +134,7 @@ static TIMER_CALLBACK( dma8237_timerproc )
 
 static TIMER_CALLBACK( dma8237_msbflip_timerproc )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	dma8237_t	*dma8237 = get_safe_token(device);
 	dma8237->msb ^= 1;
 }
@@ -394,7 +394,7 @@ void dma8237_run_transfer(const device_config *device, int channel)
 static DEVICE_START( dma8237 ) {
 	dma8237_t	*dma8237 = get_safe_token(device);
 
-	dma8237->intf = device->static_config;
+	dma8237->intf = (struct dma8237_interface *)device->static_config;
 }
 
 

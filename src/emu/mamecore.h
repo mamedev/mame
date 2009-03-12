@@ -174,6 +174,18 @@ enum
     COMMON MACROS
 ***************************************************************************/
 
+/* Macro for declaring enumerator operators for easier porting */
+#ifdef __cplusplus
+#define DECLARE_ENUM_OPERATORS(type) \
+inline void operator++(type &value) { value = (type)((int)value + 1); } \
+inline void operator++(type &value, int) { value = (type)((int)value + 1); } \
+inline void operator--(type &value) { value = (type)((int)value - 1); } \
+inline void operator--(type &value, int) { value = (type)((int)value - 1); }
+#else
+#define DECLARE_ENUM_OPERATORS(type)
+#endif
+
+
 /* Standard MAME assertion macros */
 #undef assert
 #undef assert_always
@@ -182,7 +194,7 @@ enum
 #define assert(x)	do { if (!(x)) fatalerror("assert: %s:%d: %s", __FILE__, __LINE__, #x); } while (0)
 #define assert_always(x, msg) do { if (!(x)) fatalerror("Fatal error: %s\nCaused by assert: %s:%d: %s", msg, __FILE__, __LINE__, #x); } while (0)
 #else
-#define assert(x)
+#define assert(x)	do { } while (0)
 #define assert_always(x, msg) do { if (!(x)) fatalerror("Fatal error: %s (%s:%d)", msg, __FILE__, __LINE__); } while (0)
 #endif
 

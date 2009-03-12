@@ -52,7 +52,7 @@ typedef enum _state_save_error state_save_error;
 
 
 #define IS_COMPATIBLE_TYPE(_valtype, _checktype)										\
-	(sizeof(_valtype) == sizeof(_checktype) && TYPES_COMPATIBLE(typeof(_valtype), _checktype))
+	(sizeof(_valtype) == sizeof(_checktype) && TYPES_COMPATIBLE(_valtype, _checktype))
 
 #define IS_VALID_SAVE_TYPE(_valtype)													\
 	(IS_COMPATIBLE_TYPE(_valtype, double) || IS_COMPATIBLE_TYPE(_valtype, float)  ||	\

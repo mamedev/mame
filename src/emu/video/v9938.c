@@ -164,7 +164,7 @@ PALETTE_INIT( v9958 )
 	PALETTE_INIT_CALL(v9938);
 
 	/* set up YJK table */
-		pal_indYJK = auto_malloc(0x20000 * sizeof(UINT16));
+		pal_indYJK = (UINT16 *)auto_malloc(0x20000 * sizeof(UINT16));
 
 	LOG(("Building YJK table for V9958 screens, may take a while ... \n"));
 	i = 0;
@@ -494,7 +494,7 @@ void v9938_init (running_machine *machine, int which, const device_config *scree
 	vdp->size_old = -1;
 
 	/* allocate VRAM */
-	vdp->vram = auto_malloc (0x20000);
+	vdp->vram = (UINT8 *)auto_malloc (0x20000);
 	memset (vdp->vram, 0, 0x20000);
 	if (vdp->vram_size < 0x20000)
 	{
@@ -505,7 +505,7 @@ void v9938_init (running_machine *machine, int which, const device_config *scree
 	/* do we have expanded memory? */
 	if (vdp->vram_size > 0x20000)
 	{
-		vdp->vram_exp = auto_malloc (0x10000);
+		vdp->vram_exp = (UINT8 *)auto_malloc (0x10000);
 		memset (vdp->vram_exp, 0, 0x10000);
 	}
 	else

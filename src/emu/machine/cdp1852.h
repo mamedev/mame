@@ -49,11 +49,11 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef enum _cdp1852_mode cdp1852_mode;
 enum _cdp1852_mode {
 	CDP1852_MODE_INPUT = 0,
 	CDP1852_MODE_OUTPUT
 };
+typedef enum _cdp1852_mode cdp1852_mode;
 
 typedef struct _cdp1852_interface cdp1852_interface;
 struct _cdp1852_interface

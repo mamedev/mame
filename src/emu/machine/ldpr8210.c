@@ -521,7 +521,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 
 static TIMER_CALLBACK( vsync_off )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ld->player->vsync = FALSE;
 }
 
@@ -535,7 +535,7 @@ static TIMER_CALLBACK( vsync_off )
 
 static TIMER_CALLBACK( vbi_data_fetch )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldplayer_data *player = ld->player;
 	UINT8 focus_on = !(player->port1 & 0x08);
 	UINT8 laser_on = !(player->port2 & 0x01);
@@ -1097,7 +1097,7 @@ static void simutrek_init(laserdisc_state *ld)
 
 static TIMER_CALLBACK( irq_off )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldplayer_data *player = ld->player;
 	cpu_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
 	if (LOG_SIMUTREK)
@@ -1181,7 +1181,7 @@ static void simutrek_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 
 static TIMER_CALLBACK( simutrek_latched_data_w )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldplayer_data *player = ld->player;
 
 	/* store the data and set the ready flag */

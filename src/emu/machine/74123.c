@@ -73,7 +73,7 @@ static int timer_running(ttl74123_t *chip)
 
 static TIMER_CALLBACK( output_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	ttl74123_t *chip = get_safe_token(device);
 
 	chip->intf->output_changed_cb(device, 0, param);
@@ -93,7 +93,7 @@ static void set_output(const device_config *device)
 
 static TIMER_CALLBACK( clear_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	ttl74123_t *chip = get_safe_token(device);
 	int output = timer_running(chip);
 
@@ -191,7 +191,7 @@ static DEVICE_START( ttl74123 )
 	ttl74123_t *chip = get_safe_token(device);
 
 	/* validate arguments */
-	chip->intf = device->static_config;
+	chip->intf = (ttl74123_config *)device->static_config;
 
 	assert_always(chip->intf, "No interface specified");
 	assert_always((chip->intf->connection_type != TTL74123_GROUNDED) || (chip->intf->cap >= CAP_U(0.01)), "Only capacitors >= 0.01uF supported for GROUNDED type");

@@ -83,9 +83,9 @@ void render_resample_argb_bitmap_hq(void *dest, UINT32 drowpixels, UINT32 dwidth
 
 	/* if the source is higher res than the target, use full averaging */
 	if (dx > 0x1000 || dy > 0x1000)
-		resample_argb_bitmap_average(dest, drowpixels, dwidth, dheight, sbase, source->rowpixels, swidth, sheight, color, dx, dy);
+		resample_argb_bitmap_average((UINT32 *)dest, drowpixels, dwidth, dheight, sbase, source->rowpixels, swidth, sheight, color, dx, dy);
 	else
-		resample_argb_bitmap_bilinear(dest, drowpixels, dwidth, dheight, sbase, source->rowpixels, swidth, sheight, color, dx, dy);
+		resample_argb_bitmap_bilinear((UINT32 *)dest, drowpixels, dwidth, dheight, sbase, source->rowpixels, swidth, sheight, color, dx, dy);
 }
 
 

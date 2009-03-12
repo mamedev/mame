@@ -74,13 +74,15 @@
 enum _input_device_class
 {
 	DEVICE_CLASS_INVALID,
-	DEVICE_CLASS_KEYBOARD,
+	DEVICE_CLASS_FIRST_VALID,
+	DEVICE_CLASS_KEYBOARD = DEVICE_CLASS_FIRST_VALID,
 	DEVICE_CLASS_MOUSE,
 	DEVICE_CLASS_LIGHTGUN,
 	DEVICE_CLASS_JOYSTICK,
 	DEVICE_CLASS_MAXIMUM
 };
 typedef enum _input_device_class input_device_class;
+DECLARE_ENUM_OPERATORS(input_device_class)
 
 
 /* input item classes */
@@ -114,9 +116,10 @@ typedef enum _input_item_modifier input_item_modifier;
 enum _input_item_id
 {
 	ITEM_ID_INVALID,
+	ITEM_ID_FIRST_VALID,
 
 	/* standard keyboard IDs */
-	ITEM_ID_A,
+	ITEM_ID_A = ITEM_ID_FIRST_VALID,
 	ITEM_ID_B,
 	ITEM_ID_C,
 	ITEM_ID_D,
@@ -334,6 +337,7 @@ enum _input_item_id
 	ITEM_ID_ABSOLUTE_MAXIMUM = 0xfff
 };
 typedef enum _input_item_id input_item_id;
+DECLARE_ENUM_OPERATORS(input_item_id)
 
 
 /* expanded codes referencing specific devices for input definitions */

@@ -322,7 +322,7 @@ static UINT64 execute_if(void *globalref, void *ref, UINT32 params, const UINT64
 
 static UINT64 global_get(void *globalref, void *ref)
 {
-	global_entry *global = ref;
+	global_entry *global = (global_entry *)ref;
 	switch (global->size)
 	{
 		case 1:		return *(UINT8 *)global->base;
@@ -340,7 +340,7 @@ static UINT64 global_get(void *globalref, void *ref)
 
 static void global_set(void *globalref, void *ref, UINT64 value)
 {
-	global_entry *global = ref;
+	global_entry *global = (global_entry *)ref;
 	switch (global->size)
 	{
 		case 1:		*(UINT8 *)global->base = value;	break;

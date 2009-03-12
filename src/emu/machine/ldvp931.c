@@ -321,7 +321,7 @@ static UINT8 vp931_data_ready(laserdisc_state *ld)
 
 static TIMER_CALLBACK( vbi_data_fetch )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldplayer_data *player = ld->player;
 	int which = param & 3;
 	int line = param >> 2;
@@ -364,7 +364,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 
 static TIMER_CALLBACK( deferred_data_w )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldplayer_data *player = ld->player;
 
 	/* set the value and mark it pending */
@@ -389,7 +389,7 @@ static TIMER_CALLBACK( deferred_data_w )
 
 static TIMER_CALLBACK( irq_off )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	cpu_set_input_line(ld->player->cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
 }
 
@@ -401,7 +401,7 @@ static TIMER_CALLBACK( irq_off )
 
 static TIMER_CALLBACK( datastrobe_off )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ld->player->datastrobe = 0;
 }
 
@@ -412,7 +412,7 @@ static TIMER_CALLBACK( datastrobe_off )
 
 static TIMER_CALLBACK( erp_off )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ld->player->daticerp = 0;
 }
 
@@ -423,7 +423,7 @@ static TIMER_CALLBACK( erp_off )
 
 static TIMER_DEVICE_CALLBACK( track_timer )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldplayer_data *player = ld->player;
 
 	/* advance by the count and toggle the state */

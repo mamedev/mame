@@ -82,6 +82,7 @@ enum _script_state
 	SCRIPT_STATE_COUNT
 };
 typedef enum _script_state script_state;
+DECLARE_ENUM_OPERATORS(script_state)
 
 
 
@@ -265,7 +266,7 @@ void cheat_init(running_machine *machine)
 	add_exit_callback(machine, cheat_exit);
 
 	/* allocate memory */
-	cheatinfo = auto_malloc(sizeof(*cheatinfo));
+	cheatinfo = (cheat_private *)auto_malloc(sizeof(*cheatinfo));
 	memset(cheatinfo, 0, sizeof(*cheatinfo));
 	machine->cheat_data = cheatinfo;
 
@@ -343,7 +344,7 @@ void cheat_render_text(running_machine *machine)
 void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const char **description, const char **state, UINT32 *flags)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *preventry = previous;
+	cheat_entry *preventry = (cheat_entry *)previous;
 	cheat_entry *cheat;
 
 	/* NULL previous means get the first */
@@ -455,7 +456,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 int cheat_activate(running_machine *machine, void *entry)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = entry;
+	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
 
 	/* if we have no parameter and no run or off script, but we do have an on script, it's a oneshot cheat */
@@ -479,7 +480,7 @@ int cheat_activate(running_machine *machine, void *entry)
 int cheat_select_default_state(running_machine *machine, void *entry)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = entry;
+	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
 
 	/* if we have no parameter and no run or off script, it's either text or a oneshot cheat */
@@ -508,7 +509,7 @@ int cheat_select_default_state(running_machine *machine, void *entry)
 int cheat_select_previous_state(running_machine *machine, void *entry)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = entry;
+	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
 
 	/* if we have no parameter and no run or off script, it's either text or a oneshot cheat */
@@ -584,7 +585,7 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 int cheat_select_next_state(running_machine *machine, void *entry)
 {
 	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = entry;
+	cheat_entry *cheat = (cheat_entry *)entry;
 	int changed = FALSE;
 
 	/* if we have no parameter and no run or off script, it's a oneshot cheat */
@@ -937,7 +938,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	}
 
 	/* allocate memory for the cheat */
-	cheat = malloc_or_die(sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
+	cheat = (cheat_entry *)malloc_or_die(sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
 	memset(cheat, 0, sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
 	cheat->numtemp = tempcount;
 
@@ -1108,7 +1109,7 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 	cheat_parameter *param;
 
 	/* allocate memory for it */
-	param = malloc_or_die(sizeof(*param));
+	param = (cheat_parameter *)malloc_or_die(sizeof(*param));
 	memset(param, 0, sizeof(*param));
 
 	/* read the core attributes */
@@ -1126,7 +1127,7 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 		parameter_item *curitem;
 
 		/* allocate memory for it */
-		curitem = malloc_or_die(sizeof(*curitem));
+		curitem = (parameter_item *)malloc_or_die(sizeof(*curitem));
 		memset(curitem, 0, sizeof(*curitem));
 
 		/* check for NULL text */
@@ -1237,7 +1238,7 @@ static cheat_script *cheat_script_load(running_machine *machine, const char *fil
 	const char *state;
 
 	/* allocate memory for it */
-	script = malloc_or_die(sizeof(*script));
+	script = (cheat_script *)malloc_or_die(sizeof(*script));
 	memset(script, 0, sizeof(*script));
 
 	/* read the core attributes */
@@ -1352,7 +1353,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 	EXPRERR experr;
 
 	/* allocate memory for it */
-	entry = malloc_or_die(sizeof(*entry));
+	entry = (script_entry *)malloc_or_die(sizeof(*entry));
 	memset(entry, 0, sizeof(*entry));
 
 	/* read the condition if present */
@@ -1422,7 +1423,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 			output_argument *curarg;
 
 			/* allocate memory for it */
-			curarg = malloc_or_die(sizeof(*curarg));
+			curarg = (output_argument *)malloc_or_die(sizeof(*curarg));
 			memset(curarg, 0, sizeof(*curarg));
 
 			/* first extract attributes */

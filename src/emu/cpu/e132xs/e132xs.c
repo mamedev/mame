@@ -631,7 +631,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 
 static TIMER_CALLBACK( e132xs_timer_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	hyperstone_state *cpustate = device->token;
 	int update = param;
 

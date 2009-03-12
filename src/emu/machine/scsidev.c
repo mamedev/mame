@@ -17,7 +17,7 @@ static int scsidev_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 {
 	UINT8 *command;
 	int commandLength;
-//  SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
+//  SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch( command[ 0 ] )
@@ -36,7 +36,7 @@ static void scsidev_read_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 {
 	UINT8 *command;
 	int commandLength;
-//  SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
+//  SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch( command[ 0 ] )
@@ -51,7 +51,7 @@ static void scsidev_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dat
 {
 	UINT8 *command;
 	int commandLength;
-//  SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
+//  SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch( command[ 0 ] )
@@ -64,19 +64,19 @@ static void scsidev_write_data( SCSIInstance *scsiInstance, UINT8 *data, int dat
 
 static void scsidev_set_phase( SCSIInstance *scsiInstance, int phase )
 {
-	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
+	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
 	our_this->phase = phase;
 }
 
 static int scsidev_get_phase( SCSIInstance *scsiInstance )
 {
-	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
+	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
 	return our_this->phase;
 }
 
 static void scsidev_set_command( SCSIInstance *scsiInstance, void *command, int commandLength )
 {
-	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
+	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
 
 	if( commandLength > sizeof( our_this->command ) )
 	{
@@ -92,7 +92,7 @@ static void scsidev_set_command( SCSIInstance *scsiInstance, void *command, int 
 
 static int scsidev_get_command( SCSIInstance *scsiInstance, void **command )
 {
-	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
+	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
 	*command = our_this->command;
 	return our_this->commandLength;
 }
@@ -100,7 +100,7 @@ static int scsidev_get_command( SCSIInstance *scsiInstance, void **command )
 static void scsidev_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
 	running_machine *machine = scsiInstance->machine;
-	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
+	SCSIDev *our_this = (SCSIDev *)SCSIThis( &SCSIClassDevice, scsiInstance );
 
 	state_save_register_item_array( machine, "scsidev", diskregion, 0, our_this->command );
 	state_save_register_item( machine, "scsidev", diskregion, 0, our_this->commandLength );
@@ -114,38 +114,38 @@ static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptr
 	switch( operation )
 	{
 		case SCSIOP_EXEC_COMMAND:
-			return scsidev_exec_command( file, ptrparm );
+			return scsidev_exec_command( (SCSIInstance *)file, (UINT8 *)ptrparm );
 
 		case SCSIOP_READ_DATA:
-			scsidev_read_data( file, ptrparm, intparm );
+			scsidev_read_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			break;
 
 		case SCSIOP_WRITE_DATA:
-			scsidev_write_data( file, ptrparm, intparm );
+			scsidev_write_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			break;
 
 		case SCSIOP_SET_PHASE:
-			scsidev_set_phase( file, intparm );
+			scsidev_set_phase( (SCSIInstance *)file, intparm );
 			return 0;
 
 		case SCSIOP_GET_PHASE:
-			return scsidev_get_phase( file );
+			return scsidev_get_phase( (SCSIInstance *)file );
 
 		case SCSIOP_SET_COMMAND:
-			scsidev_set_command( file, ptrparm, intparm );
+			scsidev_set_command( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			return 0;
 
 		case SCSIOP_GET_COMMAND:
-			return scsidev_get_command( file, ptrparm );
+			return scsidev_get_command( (SCSIInstance *)file, (void **)ptrparm );
 
 		case SCSIOP_ALLOC_INSTANCE:
-			params = ptrparm;
-			params->instance = SCSIMalloc( params->machine, file );
+			params = (SCSIAllocInstanceParams *)ptrparm;
+			params->instance = SCSIMalloc( params->machine, (const SCSIClass *)file );
 			scsidev_alloc_instance( params->instance, params->diskregion );
 			return 0;
 
 		case SCSIOP_DELETE_INSTANCE:
-			free( file );
+			free( (SCSIInstance *)file );
 			return 0;
 	}
 	return 0;

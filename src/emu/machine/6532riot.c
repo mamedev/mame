@@ -166,7 +166,7 @@ INLINE UINT8 get_timer(riot6532_state *riot)
 
 static TIMER_CALLBACK( timer_end_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	riot6532_state *riot = get_safe_token(device);
 
 	assert(riot->timerstate != TIMER_IDLE);
@@ -434,7 +434,7 @@ static DEVICE_START( riot6532 )
 
 	/* set static values */
 	riot->device = device;
-	riot->intf = device->static_config;
+	riot->intf = (riot6532_interface *)device->static_config;
 	riot->index = device_list_index(device->machine->config->devicelist, RIOT6532, device->tag);
 
 	/* configure the ports */

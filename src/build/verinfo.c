@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
 	fseek(f, 0, SEEK_SET);
 
 	// allocate a buffer
-	buffer = malloc(size + 1);
+	buffer = (char *)malloc(size + 1);
 	if (buffer == NULL)
 	{
 		fclose(f);

@@ -460,7 +460,7 @@ static void init_fbi(voodoo_state *v, fbi_state *f, void *memory, int fbmem)
 	int pen;
 
 	/* allocate frame buffer RAM and set pointers */
-	f->ram = memory;
+	f->ram = (UINT8 *)memory;
 	f->mask = fbmem - 1;
 	f->rgboffs[0] = f->rgboffs[1] = f->rgboffs[2] = 0;
 	f->auxoffs = ~0;
@@ -546,7 +546,7 @@ static void init_tmu_shared(tmu_shared_state *s)
 static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memory, int tmem)
 {
 	/* allocate texture RAM */
-	t->ram = memory;
+	t->ram = (UINT8 *)memory;
 	t->mask = tmem - 1;
 	t->reg = reg;
 	t->regdirty = TRUE;
@@ -597,7 +597,7 @@ static void init_tmu(voodoo_state *v, tmu_state *t, voodoo_reg *reg, void *memor
 
 static STATE_POSTLOAD( voodoo_postload )
 {
-	voodoo_state *v = param;
+	voodoo_state *v = (voodoo_state *)param;
 	int index, subindex;
 
 	v->fbi.clut_dirty = TRUE;
@@ -955,7 +955,7 @@ static void adjust_vblank_timer(voodoo_state *v)
 
 static TIMER_CALLBACK( vblank_off_callback )
 {
-	voodoo_state *v = ptr;
+	voodoo_state *v = (voodoo_state *)ptr;
 
 	if (LOG_VBLANK_SWAP) logerror("--- vblank end\n");
 
@@ -971,7 +971,7 @@ static TIMER_CALLBACK( vblank_off_callback )
 
 static TIMER_CALLBACK( vblank_callback )
 {
-	voodoo_state *v = ptr;
+	voodoo_state *v = (voodoo_state *)ptr;
 
 	if (LOG_VBLANK_SWAP) logerror("--- vblank start\n");
 
@@ -1986,7 +1986,7 @@ static void cmdfifo_w(voodoo_state *v, cmdfifo_info *f, offs_t offset, UINT32 da
 
 static TIMER_CALLBACK( stall_cpu_callback )
 {
-	check_stalled_cpu(ptr, timer_get_time(machine));
+	check_stalled_cpu((voodoo_state *)ptr, timer_get_time(machine));
 }
 
 
@@ -4441,7 +4441,7 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 
 static DEVICE_START( voodoo )
 {
-	const voodoo_config *config = device->inline_config;
+	const voodoo_config *config = (const voodoo_config *)device->inline_config;
 	voodoo_state *v = get_safe_token(device);
 	const raster_info *info;
 	void *fbmem, *tmumem[2];
@@ -4471,7 +4471,7 @@ static DEVICE_START( voodoo )
 
 	/* create a multiprocessor work queue */
 	v->poly = poly_alloc(device->machine, 64, sizeof(poly_extra_data), 0);
-	v->thread_stats = auto_malloc(sizeof(v->thread_stats[0]) * WORK_MAX_THREADS);
+	v->thread_stats = (stats_block *)auto_malloc(sizeof(v->thread_stats[0]) * WORK_MAX_THREADS);
 
 	/* create a table of precomputed 1/n and log2(n) values */
 	/* n ranges from 1.0000 to 2.0000 */
@@ -4661,7 +4661,7 @@ static DEVICE_SET_INFO( voodoo )
 
 DEVICE_GET_INFO( voodoo )
 {
-	const voodoo_config *config = (device != NULL) ? device->inline_config : NULL;
+	const voodoo_config *config = (device != NULL) ? (const voodoo_config *)device->inline_config : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -4765,7 +4765,7 @@ static INT32 fastfill(voodoo_state *v)
 	/* iterate over blocks of extents */
 	for (y = sy; y < ey; y += ARRAY_LENGTH(extents))
 	{
-		poly_extra_data *extra = poly_get_extra_data(v->poly);
+		poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(v->poly);
 		int count = MIN(ey - y, ARRAY_LENGTH(extents));
 
 		extra->state = v;
@@ -5106,7 +5106,7 @@ static INT32 setup_and_draw_triangle(voodoo_state *v)
 
 static INT32 triangle_create_work_item(voodoo_state *v, UINT16 *drawbuf, int texcount)
 {
-	poly_extra_data *extra = poly_get_extra_data(v->poly);
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(v->poly);
 	raster_info *info = find_rasterizer(v, texcount);
 	poly_vertex vert[3];
 
@@ -5335,7 +5335,7 @@ static void dump_rasterizer_stats(voodoo_state *v)
 
 static void raster_fastfill(void *destbase, INT32 y, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	voodoo_state *v = extra->state;
 	stats_block *stats = &v->thread_stats[threadid];
 	INT32 startx = extent->startx;

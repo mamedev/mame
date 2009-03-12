@@ -196,7 +196,7 @@ INLINE ide_state *get_safe_token(const device_config *device)
 
 INLINE void signal_interrupt(ide_state *ide)
 {
-	const ide_config *config = ide->device->inline_config;
+	const ide_config *config = (const ide_config *)ide->device->inline_config;
 
 	LOG(("IDE interrupt assert\n"));
 
@@ -210,7 +210,7 @@ INLINE void signal_interrupt(ide_state *ide)
 
 INLINE void clear_interrupt(ide_state *ide)
 {
-	const ide_config *config = ide->device->inline_config;
+	const ide_config *config = (const ide_config *)ide->device->inline_config;
 
 	LOG(("IDE interrupt clear\n"));
 
@@ -228,7 +228,7 @@ INLINE void clear_interrupt(ide_state *ide)
 
 static TIMER_CALLBACK( delayed_interrupt )
 {
-	ide_state *ide = ptr;
+	ide_state *ide = (ide_state *)ptr;
 	ide->status &= ~IDE_STATUS_BUSY;
 	signal_interrupt(ide);
 }
@@ -236,7 +236,7 @@ static TIMER_CALLBACK( delayed_interrupt )
 
 static TIMER_CALLBACK( delayed_interrupt_buffer_ready )
 {
-	ide_state *ide = ptr;
+	ide_state *ide = (ide_state *)ptr;
 	ide->status &= ~IDE_STATUS_BUSY;
 	ide->status |= IDE_STATUS_BUFFER_READY;
 	signal_interrupt(ide);
@@ -289,7 +289,7 @@ void ide_set_user_password(const device_config *device, const UINT8 *password)
 
 static TIMER_CALLBACK( reset_callback )
 {
-	device_reset(ptr);
+	device_reset((const device_config *)ptr);
 }
 
 
@@ -595,7 +595,7 @@ static void ide_build_features(ide_state *ide)
 
 static TIMER_CALLBACK( security_error_done )
 {
-	ide_state *ide = ptr;
+	ide_state *ide = (ide_state *)ptr;
 
 	/* clear error state */
 	ide->status &= ~IDE_STATUS_ERROR;
@@ -763,7 +763,7 @@ static void read_sector_done(ide_state *ide)
 
 static TIMER_CALLBACK( read_sector_done_callback )
 {
-	read_sector_done(ptr);
+	read_sector_done((ide_state *)ptr);
 }
 
 
@@ -965,7 +965,7 @@ static void write_sector_done(ide_state *ide)
 
 static TIMER_CALLBACK( write_sector_done_callback )
 {
-	write_sector_done(ptr);
+	write_sector_done((ide_state *)ptr);
 }
 
 
@@ -1677,7 +1677,7 @@ static DEVICE_START( ide_controller )
 	ide->device = device;
 
 	/* set MAME harddisk handle */
-	config = device->inline_config;
+	config = (const ide_config *)device->inline_config;
 	ide->disk = hard_disk_open(get_disk_handle((config->master != NULL) ? config->master : device->tag));
 	assert_always(config->slave == NULL, "IDE controller does not yet support slave drives\n");
 

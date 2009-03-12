@@ -51,7 +51,7 @@ static void update(const device_config *device, UINT8 new_val, UINT8 mask)
 
 static TIMER_CALLBACK( latch8_timerproc )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	UINT8 new_val = param & 0xFF;
 	UINT8 mask = param >> 8;
 
@@ -96,7 +96,7 @@ READ8_DEVICE_HANDLER( latch8_r )
 		}
 	}
 
-	return (res & ~latch8->intf->maskout) ^ latch8->intf->xor;
+	return (res & ~latch8->intf->maskout) ^ latch8->intf->xorvalue;
 }
 
 
@@ -188,7 +188,7 @@ static DEVICE_START( latch8 )
 	int i;
 
 	/* validate arguments */
-	latch8->intf = device->inline_config;
+	latch8->intf = (latch8_config *)device->inline_config;
 
 	latch8->value = 0x0;
 

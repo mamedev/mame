@@ -373,7 +373,7 @@ NVRAM_HANDLER( generic_randfill )
 		mame_fread(file, nvram_select(), generic_nvram_size);
 	else
 	{
-		UINT8 *nvram = nvram_select();
+		UINT8 *nvram = (UINT8 *)nvram_select();
 		for (i = 0; i < generic_nvram_size; i++)
 			nvram[i] = mame_rand(machine);
 	}
@@ -570,7 +570,7 @@ static void interrupt_reset(running_machine *machine)
 
 static TIMER_CALLBACK( clear_all_lines )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	int inputcount = cpu_get_input_lines(device);
 	int line;
 
@@ -587,7 +587,7 @@ static TIMER_CALLBACK( clear_all_lines )
 
 static TIMER_CALLBACK( irq_pulse_clear )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	int irqline = param;
 	cpu_set_input_line(device, irqline, CLEAR_LINE);
 }
@@ -770,6 +770,6 @@ READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return 0x
 
 CUSTOM_INPUT( custom_port_read )
 {
-	const char *tag = param;
+	const char *tag = (const char *)param;
 	return input_port_read(field->port->machine, tag);
 }

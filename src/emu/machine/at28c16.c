@@ -137,15 +137,15 @@ static DEVICE_START(at28c16)
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
-	c->data = auto_malloc( SIZE_DATA );
-	c->id = auto_malloc( SIZE_ID );
+	c->data = (UINT8 *)auto_malloc( SIZE_DATA );
+	c->id = (UINT8 *)auto_malloc( SIZE_ID );
 	c->a9_12v = 0;
 	c->oe_12v = 0;
 	c->last_write = -1;
 	c->write_timer = timer_alloc(device->machine,  write_finished, c );
 	c->default_data = device->region;
 
-	config = device->inline_config;
+	config = (const at28c16_config *)device->inline_config;
 	if (config->id != NULL)
 		c->default_id = memory_region( device->machine, config->id );
 

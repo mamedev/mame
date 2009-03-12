@@ -218,7 +218,7 @@ void streams_init(running_machine *machine)
 	streams_private *strdata;
 
 	/* allocate memory for our private data */
-	strdata = auto_malloc(sizeof(*strdata));
+	strdata = (streams_private *)auto_malloc(sizeof(*strdata));
 	memset(strdata, 0, sizeof(*strdata));
 
 	/* reset globals */
@@ -343,7 +343,7 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 	char statetag[30];
 
 	/* allocate memory */
-	stream = auto_malloc(sizeof(*stream));
+	stream = (sound_stream *)auto_malloc(sizeof(*stream));
 	memset(stream, 0, sizeof(*stream));
 
 	VPRINTF(("stream_create(%d, %d, %d) => %p\n", inputs, outputs, sample_rate, stream));
@@ -365,9 +365,9 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 	/* allocate space for the inputs */
 	if (inputs > 0)
 	{
-		stream->input = auto_malloc(inputs * sizeof(*stream->input));
+		stream->input = (stream_input *)auto_malloc(inputs * sizeof(*stream->input));
 		memset(stream->input, 0, inputs * sizeof(*stream->input));
-		stream->input_array = auto_malloc(inputs * sizeof(*stream->input_array));
+		stream->input_array = (stream_sample_t **)auto_malloc(inputs * sizeof(*stream->input_array));
 		memset(stream->input_array, 0, inputs * sizeof(*stream->input_array));
 	}
 
@@ -382,9 +382,9 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 	/* allocate space for the outputs */
 	if (outputs > 0)
 	{
-		stream->output = auto_malloc(outputs * sizeof(*stream->output));
+		stream->output = (stream_output *)auto_malloc(outputs * sizeof(*stream->output));
 		memset(stream->output, 0, outputs * sizeof(*stream->output));
-		stream->output_array = auto_malloc(outputs * sizeof(*stream->output_array));
+		stream->output_array = (stream_sample_t **)auto_malloc(outputs * sizeof(*stream->output_array));
 		memset(stream->output_array, 0, outputs * sizeof(*stream->output_array));
 	}
 
@@ -698,7 +698,7 @@ void stream_set_output_gain(sound_stream *stream, int output, float gain)
 static STATE_POSTLOAD( stream_postload )
 {
 	streams_private *strdata = machine->streams_data;
-	sound_stream *stream = param;
+	sound_stream *stream = (sound_stream *)param;
 	int outputnum;
 
 	/* recompute the same rate information */
@@ -737,7 +737,7 @@ static void allocate_resample_buffers(streams_private *strdata, sound_stream *st
 		for (inputnum = 0; inputnum < stream->inputs; inputnum++)
 		{
 			stream_input *input = &stream->input[inputnum];
-			input->resample = auto_realloc(input->resample, stream->resample_bufalloc * sizeof(input->resample[0]));
+			input->resample = (stream_sample_t *)auto_realloc(input->resample, stream->resample_bufalloc * sizeof(input->resample[0]));
 		}
 	}
 }
@@ -767,7 +767,7 @@ static void allocate_output_buffers(streams_private *strdata, sound_stream *stre
 		for (outputnum = 0; outputnum < stream->outputs; outputnum++)
 		{
 			stream_output *output = &stream->output[outputnum];
-			output->buffer = auto_realloc(output->buffer, stream->output_bufalloc * sizeof(output->buffer[0]));
+			output->buffer = (stream_sample_t *)auto_realloc(output->buffer, stream->output_bufalloc * sizeof(output->buffer[0]));
 			memset(&output->buffer[oldsize], 0, (stream->output_bufalloc - oldsize) * sizeof(output->buffer[0]));
 		}
 	}

@@ -80,7 +80,7 @@ INLINE pic8259_t *get_safe_token(const device_config *device) {
 
 static TIMER_CALLBACK( pic8259_timerproc )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	pic8259_t	*pic8259 = get_safe_token(device);
 	int irq;
 	UINT8 mask;
@@ -394,7 +394,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 static DEVICE_START( pic8259 ) {
 	pic8259_t	*pic8259 = get_safe_token(device);
 
-	pic8259->intf = device->static_config;
+	pic8259->intf = (const struct pic8259_interface *)device->static_config;
 
 	pic8259->timer = timer_alloc( device->machine, pic8259_timerproc, (void *)device );
 }

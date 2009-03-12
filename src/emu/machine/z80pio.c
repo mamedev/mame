@@ -535,7 +535,7 @@ WRITE8_DEVICE_HANDLER(z80pio_w)
 
 static DEVICE_START( z80pio )
 {
-	const z80pio_interface *intf = device->static_config;
+	const z80pio_interface *intf = (const z80pio_interface *)device->static_config;
 	z80pio_t *z80pio = get_safe_token( device );
 
 	z80pio->intr = intf->intr;

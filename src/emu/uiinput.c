@@ -76,7 +76,7 @@ static void ui_input_frame_update(running_machine *machine);
 void ui_input_init(running_machine *machine)
 {
 	/* create the private data */
-	machine->ui_input_data = auto_malloc(sizeof(*machine->ui_input_data));
+	machine->ui_input_data = (ui_input_private *)auto_malloc(sizeof(*machine->ui_input_data));
 	memset(machine->ui_input_data, 0, sizeof(*machine->ui_input_data));
 	machine->ui_input_data->current_mouse_x = -1;
 	machine->ui_input_data->current_mouse_y = -1;

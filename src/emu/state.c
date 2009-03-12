@@ -133,19 +133,19 @@ INLINE void flip_data(state_entry *entry)
 	switch (entry->typesize)
 	{
 		case 2:
-			data16 = entry->data;
+			data16 = (UINT16 *)entry->data;
 			for (count = 0; count < entry->typecount; count++)
 				data16[count] = FLIPENDIAN_INT16(data16[count]);
 			break;
 
 		case 4:
-			data32 = entry->data;
+			data32 = (UINT32 *)entry->data;
 			for (count = 0; count < entry->typecount; count++)
 				data32[count] = FLIPENDIAN_INT32(data32[count]);
 			break;
 
 		case 8:
-			data64 = entry->data;
+			data64 = (UINT64 *)entry->data;
 			for (count = 0; count < entry->typecount; count++)
 				data64[count] = FLIPENDIAN_INT64(data64[count]);
 			break;
@@ -165,7 +165,7 @@ INLINE void flip_data(state_entry *entry)
 
 void state_init(running_machine *machine)
 {
-	machine->state_data = auto_malloc(sizeof(*machine->state_data));
+	machine->state_data = (state_private *)auto_malloc(sizeof(*machine->state_data));
 	memset(machine->state_data, 0, sizeof(*machine->state_data));
 }
 
@@ -264,7 +264,7 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 
 	/* didn't find one; allocate a new one */
 	next = *entryptr;
-	*entryptr = malloc_or_die(sizeof(**entryptr));
+	*entryptr = (state_entry *)malloc_or_die(sizeof(**entryptr));
 	memset(*entryptr, 0, sizeof(**entryptr));
 
 	/* fill in the rest */
@@ -314,7 +314,7 @@ void state_save_register_presave(running_machine *machine, state_presave_func fu
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	/* allocate a new entry */
-	*cbptr = malloc_or_die(sizeof(state_callback));
+	*cbptr = (state_callback *)malloc_or_die(sizeof(state_callback));
 
 	/* fill it in */
 	(*cbptr)->next         = NULL;
@@ -345,7 +345,7 @@ void state_save_register_postload(running_machine *machine, state_postload_func 
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	/* allocate a new entry */
-	*cbptr = malloc_or_die(sizeof(state_callback));
+	*cbptr = (state_callback *)malloc_or_die(sizeof(state_callback));
 
 	/* fill it in */
 	(*cbptr)->next          = NULL;

@@ -78,7 +78,7 @@ static void output_exit(running_machine *machine);
 
 INLINE const char *copy_string(const char *string)
 {
-	char *newstring = malloc_or_die(strlen(string) + 1);
+	char *newstring = (char *)malloc_or_die(strlen(string) + 1);
 	strcpy(newstring, string);
 	return newstring;
 }
@@ -118,7 +118,7 @@ INLINE output_item *find_item(const char *string)
 
 INLINE output_item *create_new_item(const char *outname, INT32 value)
 {
-	output_item *item = malloc_or_die(sizeof(*item));
+	output_item *item = (output_item *)malloc_or_die(sizeof(*item));
 	UINT32 hash = get_hash(outname);
 
 	/* fill in the data */
@@ -343,7 +343,7 @@ void output_set_notifier(const char *outname, output_notifier_func callback, voi
 	/* find the end of the list and add to it */
 	while (*headptr != NULL)
 		headptr = &(*headptr)->next;
-	*headptr = malloc_or_die(sizeof(**headptr));
+	*headptr = (output_notify *)malloc_or_die(sizeof(**headptr));
 
 	/* fill in the new record */
 	(*headptr)->next = NULL;

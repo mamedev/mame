@@ -304,7 +304,7 @@ INLINE EXPRERR pop_token_lval(parsed_expression *expr, parse_token *token, const
 	/* to be an lval, the token must be a valid read/write symbol or a memory token */
 	if (token->type == TOK_SYMBOL)
 	{
-		symbol_entry *symbol = token->value.p;
+		symbol_entry *symbol = (symbol_entry *)token->value.p;
 		if (symbol == NULL || symbol->type != SMT_REGISTER || symbol->info.reg.setter == NULL)
 			return MAKE_EXPRERR_NOT_LVAL(token->offset);
 	}
@@ -332,7 +332,7 @@ INLINE EXPRERR pop_token_rval(parsed_expression *expr, parse_token *token, const
 	/* symbol tokens get resolved down to number tokens */
 	if (token->type == TOK_SYMBOL)
 	{
-		symbol_entry *symbol = token->value.p;
+		symbol_entry *symbol = (symbol_entry *)token->value.p;
 		if (symbol == NULL || (symbol->type != SMT_REGISTER && symbol->type != SMT_VALUE))
 			return MAKE_EXPRERR_NOT_RVAL(token->offset);
 		token->type = TOK_NUMBER;
@@ -371,7 +371,7 @@ INLINE UINT64 get_lval_value(parsed_expression *expr, parse_token *token, const 
 {
 	if (token->type == TOK_SYMBOL)
 	{
-		symbol_entry *symbol = token->value.p;
+		symbol_entry *symbol = (symbol_entry *)token->value.p;
 		if (symbol != NULL && symbol->type == SMT_REGISTER)
 			return (*symbol->info.reg.getter)(symbol->table->globalref, symbol->ref);
 	}
@@ -396,7 +396,7 @@ INLINE void set_lval_value(parsed_expression *expr, parse_token *token, const sy
 {
 	if (token->type == TOK_SYMBOL)
 	{
-		symbol_entry *symbol = token->value.p;
+		symbol_entry *symbol = (symbol_entry *)token->value.p;
 		if (symbol != NULL && symbol->type == SMT_REGISTER && symbol->info.reg.setter)
 			(*symbol->info.reg.setter)(symbol->table->globalref, symbol->ref, value);
 	}
@@ -618,7 +618,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 	expr->table = table;
 
 	/* make a copy of the original string */
-	expr->original_string = malloc(strlen(stringstart) + 1);
+	expr->original_string = (char *)malloc(strlen(stringstart) + 1);
 	if (!expr->original_string)
 		return MAKE_EXPRERR_OUT_OF_MEMORY(0);
 	strcpy(expr->original_string, stringstart);
@@ -1214,7 +1214,7 @@ static EXPRERR execute_function(parsed_expression *expr, parse_token *token)
 		/* if it is a function symbol, break out of the loop */
 		if (peek->type == TOK_SYMBOL)
 		{
-			symbol = peek->value.p;
+			symbol = (symbol_entry *)peek->value.p;
 			if (symbol != NULL && symbol->type == SMT_FUNCTION)
 			{
 				pop_token(expr, &t1);
@@ -1666,7 +1666,7 @@ static char *add_expression_string(parsed_expression *expr, const char *string, 
 	expression_string *expstring;
 
 	/* allocate memory */
-	expstring = malloc(sizeof(expression_string) + length);
+	expstring = (expression_string *)malloc(sizeof(expression_string) + length);
 	if (expstring == NULL)
 		return NULL;
 
@@ -1800,7 +1800,7 @@ EXPRERR expression_parse(const char *expression, const symbol_table *table, cons
 		goto cleanup;
 
 	/* allocate memory for the result */
-	*result = malloc(sizeof(temp_expression));
+	*result = (parsed_expression *)malloc(sizeof(temp_expression));
 	if (!*result)
 	{
 		exprerr = MAKE_EXPRERR_OUT_OF_MEMORY(0);
@@ -1920,7 +1920,7 @@ symbol_table *symtable_alloc(symbol_table *parent, void *globalref)
 	symbol_table *table;
 
 	/* allocate memory for the table */
-	table = malloc(sizeof(*table));
+	table = (symbol_table *)malloc(sizeof(*table));
 	if (!table)
 		return NULL;
 
@@ -1980,13 +1980,13 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
 	}
 
 	/* otherwise, allocate a new entry */
-	symbol = malloc(sizeof(*symbol));
+	symbol = (internal_symbol_entry *)malloc(sizeof(*symbol));
 	if (!symbol)
 		return 0;
 	memset(symbol, 0, sizeof(*symbol));
 
 	/* allocate space for a copy of the string */
-	newstring = malloc(strlen(name) + 1);
+	newstring = (char *)malloc(strlen(name) + 1);
 	if (!newstring)
 	{
 		free(symbol);

@@ -42,7 +42,7 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 {
 	UINT8 *command;
 	int commandLength;
-	SCSICd *our_this = SCSIThis( &SCSIClassCDROM, scsiInstance );
+	SCSICd *our_this = (SCSICd *)SCSIThis( &SCSIClassCDROM, scsiInstance );
 
 	cdrom_file *cdrom = our_this->cdrom;
 	const device_config *cdda;
@@ -310,7 +310,7 @@ static void scsicd_read_data( SCSIInstance *scsiInstance, UINT8 *data, int dataL
 {
 	UINT8 *command;
 	int commandLength;
-	SCSICd *our_this = SCSIThis( &SCSIClassCDROM, scsiInstance );
+	SCSICd *our_this = (SCSICd *)SCSIThis( &SCSIClassCDROM, scsiInstance );
 
 	int i;
 	UINT32 last_phys_frame;
@@ -629,7 +629,7 @@ static void scsicd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 {
 	UINT8 *command;
 	int commandLength;
-	SCSICd *our_this = SCSIThis( &SCSIClassCDROM, scsiInstance );
+	SCSICd *our_this = (SCSICd *)SCSIThis( &SCSIClassCDROM, scsiInstance );
 	SCSIGetCommand( scsiInstance, &command, &commandLength );
 
 	switch (command[ 0 ])
@@ -673,7 +673,7 @@ static void scsicd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
 	running_machine *machine = scsiInstance->machine;
-	SCSICd *our_this = SCSIThis( &SCSIClassCDROM, scsiInstance );
+	SCSICd *our_this = (SCSICd *)SCSIThis( &SCSIClassCDROM, scsiInstance );
 
 	our_this->lba = 0;
 	our_this->blocks = 0;
@@ -707,7 +707,7 @@ static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 static void scsicd_delete_instance( SCSIInstance *scsiInstance )
 {
 #ifndef MESS
-	SCSICd *our_this = SCSIThis( &SCSIClassCDROM, scsiInstance );
+	SCSICd *our_this = (SCSICd *)SCSIThis( &SCSIClassCDROM, scsiInstance );
 	if( our_this->cdrom )
 	{
 		cdrom_close( our_this->cdrom );
@@ -717,13 +717,13 @@ static void scsicd_delete_instance( SCSIInstance *scsiInstance )
 
 static void scsicd_get_device( SCSIInstance *scsiInstance, cdrom_file **cdrom )
 {
-	SCSICd *our_this = SCSIThis( &SCSIClassCDROM, scsiInstance );
+	SCSICd *our_this = (SCSICd *)SCSIThis( &SCSIClassCDROM, scsiInstance );
 	*cdrom = our_this->cdrom;
 }
 
 static void scsicd_set_device( SCSIInstance *scsiInstance, cdrom_file *cdrom )
 {
-	SCSICd *our_this = SCSIThis( &SCSIClassCDROM, scsiInstance );
+	SCSICd *our_this = (SCSICd *)SCSIThis( &SCSIClassCDROM, scsiInstance );
 	our_this->cdrom = cdrom;
 }
 
@@ -734,36 +734,36 @@ static int scsicd_dispatch(int operation, void *file, INT64 intparm, void *ptrpa
 	switch (operation)
 	{
 		case SCSIOP_EXEC_COMMAND:
-			return scsicd_exec_command( file, ptrparm );
+			return scsicd_exec_command( (SCSIInstance *)file, (UINT8 *)ptrparm );
 
 		case SCSIOP_READ_DATA:
-			scsicd_read_data( file, ptrparm, intparm );
+			scsicd_read_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			return 0;
 
 		case SCSIOP_WRITE_DATA:
-			scsicd_write_data( file, ptrparm, intparm );
+			scsicd_write_data( (SCSIInstance *)file, (UINT8 *)ptrparm, intparm );
 			return 0;
 
 		case SCSIOP_ALLOC_INSTANCE:
-			params = ptrparm;
-			SCSIBase( &SCSIClassCDROM, operation, file, intparm, ptrparm );
+			params = (SCSIAllocInstanceParams *)ptrparm;
+			SCSIBase( &SCSIClassCDROM, operation, (SCSIInstance *)file, intparm, (UINT8 *)ptrparm );
 			scsicd_alloc_instance( params->instance, params->diskregion );
 			return 0;
 
 		case SCSIOP_DELETE_INSTANCE:
-			scsicd_delete_instance( file );
+			scsicd_delete_instance( (SCSIInstance *)file );
 			break;
 
 		case SCSIOP_GET_DEVICE:
-			scsicd_get_device( file, ptrparm );
+			scsicd_get_device( (SCSIInstance *)file, (cdrom_file **)ptrparm );
 			return 0;
 
 		case SCSIOP_SET_DEVICE:
-			scsicd_set_device( file, ptrparm );
+			scsicd_set_device( (SCSIInstance *)file, (cdrom_file *)ptrparm );
 			return 0;
 	}
 
-	return SCSIBase( &SCSIClassCDROM, operation, file, intparm, ptrparm );
+	return SCSIBase( &SCSIClassCDROM, operation, (SCSIInstance *)file, intparm, (UINT8 *)ptrparm );
 }
 
 const SCSIClass SCSIClassCDROM =

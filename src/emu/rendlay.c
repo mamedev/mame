@@ -217,7 +217,7 @@ INLINE void reduce_fraction(int *num, int *den)
 
 INLINE const char *copy_string(const char *string)
 {
-	char *newstring = malloc_or_die(strlen(string) + 1);
+	char *newstring = (char *)malloc_or_die(strlen(string) + 1);
 	strcpy(newstring, string);
 	return newstring;
 }
@@ -348,7 +348,7 @@ void layout_view_recompute(layout_view *view, int layerconfig)
 
 static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param)
 {
-	element_texture *elemtex = param;
+	element_texture *elemtex = (element_texture *)param;
 	element_component *component;
 
 	/* iterate over components that are part of the current state */
@@ -1340,7 +1340,7 @@ static int get_variable_value(const machine_config *config, const char *string, 
 	for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
 	{
 		int scrnum = device_list_index(config->devicelist, VIDEO_SCREEN, device->tag);
-		const screen_config *scrconfig = device->inline_config;
+		const screen_config *scrconfig = (const screen_config *)device->inline_config;
 
 		/* native X aspect factor */
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
@@ -1509,7 +1509,7 @@ layout_file *layout_file_load(const machine_config *config, const char *dirname,
 		return NULL;
 
 	/* allocate the layout group object first */
-	file = malloc_or_die(sizeof(*file));
+	file = (layout_file *)malloc_or_die(sizeof(*file));
 	memset(file, 0, sizeof(*file));
 
 	/* find the layout node */
@@ -1579,7 +1579,7 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	int first;
 
 	/* allocate a new element */
-	element = malloc_or_die(sizeof(*element));
+	element = (layout_element *)malloc_or_die(sizeof(*element));
 	memset(element, 0, sizeof(*element));
 
 	/* extract the name */
@@ -1642,7 +1642,7 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	}
 
 	/* allocate an array of element textures for the states */
-	element->elemtex = malloc_or_die((element->maxstate + 1) * sizeof(element->elemtex[0]));
+	element->elemtex = (element_texture *)malloc_or_die((element->maxstate + 1) * sizeof(element->elemtex[0]));
 	for (state = 0; state <= element->maxstate; state++)
 	{
 		element->elemtex[state].element = element;
@@ -1668,7 +1668,7 @@ static element_component *load_element_component(const machine_config *config, x
 	element_component *component;
 
 	/* allocate memory for the component */
-	component = malloc_or_die(sizeof(*component));
+	component = (element_component *)malloc_or_die(sizeof(*component));
 	memset(component, 0, sizeof(*component));
 
 	/* fetch common data */
@@ -1699,7 +1699,7 @@ static element_component *load_element_component(const machine_config *config, x
 
 		/* allocate a copy of the string */
 		component->type = COMPONENT_TYPE_TEXT;
-		string = malloc_or_die(strlen(text) + 1);
+		string = (char *)malloc_or_die(strlen(text) + 1);
 		strcpy(string, text);
 		component->string = string;
 	}
@@ -1756,7 +1756,7 @@ static layout_view *load_layout_view(const machine_config *config, xml_data_node
 	int layer;
 
 	/* first allocate memory */
-	view = malloc_or_die(sizeof(*view));
+	view = (layout_view *)malloc_or_die(sizeof(*view));
 	memset(view, 0, sizeof(*view));
 
 	/* allocate a copy of the name */
@@ -1810,7 +1810,7 @@ static view_item *load_view_item(const machine_config *config, xml_data_node *it
 	const char *name;
 
 	/* allocate a new item */
-	item = malloc_or_die(sizeof(*item));
+	item = (view_item *)malloc_or_die(sizeof(*item));
 	memset(item, 0, sizeof(*item));
 
 	/* allocate a copy of the output name */

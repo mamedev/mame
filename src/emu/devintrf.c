@@ -111,7 +111,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
 
 	/* allocate a new device */
-	device = malloc_or_die(sizeof(*device) + strlen(tag) + configlen);
+	device = (device_config *)malloc_or_die(sizeof(*device) + strlen(tag) + configlen);
 
 	/* populate device relationships */
 	device->next = NULL;
@@ -121,7 +121,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 
 	/* populate device properties */
 	device->type = type;
-	device->devclass = devtype_get_info_int(type, DEVINFO_INT_CLASS);
+	device->devclass = (device_class)(INT32)devtype_get_info_int(type, DEVINFO_INT_CLASS);
 	device->set_info = (device_set_info_func)devtype_get_info_fct(type, DEVINFO_FCT_SET_INFO);
 	device->execute = NULL;
 

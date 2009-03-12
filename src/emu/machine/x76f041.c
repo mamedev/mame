@@ -115,7 +115,7 @@ void x76f041_init( running_machine *machine, int chip, UINT8 *data )
 
 	if( data == NULL )
 	{
-		data = auto_malloc(
+		data = (UINT8 *)auto_malloc(
 			SIZE_RESPONSE_TO_RESET +
 			SIZE_READ_PASSWORD +
 			SIZE_WRITE_PASSWORD +

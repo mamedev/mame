@@ -83,7 +83,7 @@ static void f3853_timer_start(const device_config *device, UINT8 value)
 
 static TIMER_CALLBACK( f3853_timer_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	f3853_t	*f3853 = get_safe_token( device );
 
     if (f3853->timer_enable)
@@ -167,7 +167,7 @@ static DEVICE_START( f3853 )
 	UINT8 reg=0xfe;
 	int i;
 
-	f3853->config = device->static_config;
+	f3853->config = (const f3853_config *)device->static_config;
 
 	for (i=254/*known to get 0xfe after 255 cycles*/; i>=0; i--)
 	{

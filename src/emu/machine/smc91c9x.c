@@ -510,7 +510,7 @@ WRITE16_DEVICE_HANDLER( smc91c9x_w )
 
 static DEVICE_START( smc91c9x )
 {
-	const smc91c9x_config *config = device->inline_config;
+	const smc91c9x_config *config = (const smc91c9x_config *)device->inline_config;
 	smc91c9x_state *smc = get_safe_token(device);
 
 	/* validate some basic stuff */

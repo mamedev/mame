@@ -601,7 +601,7 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
 	/* iterate over screens */
 	for (screen = video_screen_first(config); screen != NULL; screen = video_screen_next(screen))
 	{
-		const screen_config *scrconfig = screen->inline_config;
+		const screen_config *scrconfig = (const screen_config *)screen->inline_config;
 
 		fprintf(out, "\t\t<display");
 

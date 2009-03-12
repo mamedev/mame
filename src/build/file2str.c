@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 	fseek(src, 0, SEEK_SET);
 
 	/* allocate memory */
-	buffer = malloc(bytes + 1);
+	buffer = (unsigned char *)malloc(bytes + 1);
 	if (buffer == NULL)
 	{
 		fprintf(stderr, "Out of memory allocating %d byte buffer\n", bytes);

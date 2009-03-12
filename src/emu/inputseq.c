@@ -361,7 +361,7 @@ int input_seq_poll(input_seq *finalseq)
 				{
 					/* increment the modifier, wrapping back to none */
 					input_item_modifier oldmod = INPUT_CODE_MODIFIER(lastcode);
-					input_item_modifier newmod = (oldmod < ITEM_MODIFIER_NEG) ? oldmod + 1 : ITEM_MODIFIER_NONE;
+					input_item_modifier newmod = (oldmod < ITEM_MODIFIER_NEG) ? (input_item_modifier)(oldmod + 1) : ITEM_MODIFIER_NONE;
 					newcode = INPUT_CODE_SET_MODIFIER(newcode, newmod);
 
 					/* back up over the previous code so we can re-append */
@@ -511,7 +511,7 @@ astring *input_seq_to_tokens(astring *string, const input_seq *seq)
 
 int input_seq_from_tokens(const char *string, input_seq *seq)
 {
-	char *strcopy = malloc_or_die(strlen(string) + 1);
+	char *strcopy = (char *)malloc_or_die(strlen(string) + 1);
 	char *str = strcopy;
 	int result = FALSE;
 

@@ -2549,7 +2549,7 @@ static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT
 			continue;
 		
 		/* allocate memory */
-		tempbuffer = malloc(metalength);
+		tempbuffer = (UINT8 *)malloc(metalength);
 		if (tempbuffer == NULL)
 		{
 			err = CHDERR_OUT_OF_MEMORY;
@@ -2576,7 +2576,7 @@ static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT
 		if (hashindex >= hashalloc)
 		{
 			hashalloc += 256;
-			hasharray = realloc(hasharray, hashalloc * sizeof(hasharray[0]));
+			hasharray = (metadata_hash *)realloc(hasharray, hashalloc * sizeof(hasharray[0]));
 			if (hasharray == NULL)
 			{
 				err = CHDERR_OUT_OF_MEMORY;
@@ -2596,7 +2596,7 @@ static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT
 	/* compute the SHA1 of the raw plus the various metadata */
 	sha1_init(&sha1);
 	sha1_update(&sha1, CHD_SHA1_BYTES, rawsha1);
-	sha1_update(&sha1, hashindex * sizeof(hasharray[0]), (void *)hasharray);
+	sha1_update(&sha1, hashindex * sizeof(hasharray[0]), (const UINT8 *)hasharray);
 	sha1_final(&sha1);
 	sha1_digest(&sha1, SHA1_DIGEST_SIZE, finalsha1);
 

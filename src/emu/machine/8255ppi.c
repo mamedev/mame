@@ -501,7 +501,7 @@ UINT8 ppi8255_get_port_c( const device_config *device ) {
 static DEVICE_START( ppi8255 ) {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
 
-	ppi8255->intf = device->static_config;
+	ppi8255->intf = (const ppi8255_interface *)device->static_config;
 
 	devcb_resolve_read8(&ppi8255->port_read[0], &ppi8255->intf->port_a_read, device);
 	devcb_resolve_read8(&ppi8255->port_read[1], &ppi8255->intf->port_b_read, device);

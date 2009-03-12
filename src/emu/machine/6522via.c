@@ -380,7 +380,7 @@ static void via_shift(const device_config *device)
 
 static TIMER_CALLBACK( via_shift_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	via_shift(device);
 }
 
@@ -391,7 +391,7 @@ static TIMER_CALLBACK( via_shift_callback )
 
 static TIMER_CALLBACK( via_t1_timeout )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	via6522_t *v = get_token(device);
 
 	if (T1_CONTINUOUS (v->acr))
@@ -424,7 +424,7 @@ static TIMER_CALLBACK( via_t1_timeout )
 
 static TIMER_CALLBACK( via_t2_timeout )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	via6522_t *v = get_token(device);
 
 	v->t2_active = 0;

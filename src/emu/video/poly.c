@@ -333,7 +333,7 @@ poly_manager *poly_alloc(running_machine *machine, int max_polys, size_t extra_d
 	poly_manager *poly;
 
 	/* allocate the manager itself */
-	poly = malloc_or_die(sizeof(*poly));
+	poly = (poly_manager *)malloc_or_die(sizeof(*poly));
 	memset(poly, 0, sizeof(*poly));
 	poly->flags = flags;
 
@@ -1314,7 +1314,7 @@ static void **allocate_array(size_t *itemsize, UINT32 itemcount)
 	*itemsize = ((*itemsize + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
 
 	/* allocate the array */
-	ptrarray = malloc_or_die(sizeof(*ptrarray) * itemcount);
+	ptrarray = (void **)malloc_or_die(sizeof(*ptrarray) * itemcount);
 	memset(ptrarray, 0, sizeof(*ptrarray) * itemcount);
 
 	/* allocate the actual items */
@@ -1352,7 +1352,7 @@ static void *poly_item_callback(void *param, int threadid)
 {
 	while (1)
 	{
-		work_unit *unit = param;
+		work_unit *unit = (work_unit *)param;
 		polygon_info *polygon = unit->shared.polygon;
 		int count = unit->shared.count_next & 0xffff;
 		UINT32 orig_count_next;
@@ -1422,6 +1422,6 @@ static void *poly_item_callback(void *param, int threadid)
 
 static STATE_PRESAVE( poly_state_presave )
 {
-	poly_manager *poly = param;
+	poly_manager *poly = (poly_manager *)param;
 	poly_wait(poly, "pre-save");
 }

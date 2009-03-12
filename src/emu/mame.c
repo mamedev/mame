@@ -458,7 +458,7 @@ void add_frame_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_frame_callback at init time!");
 
 	/* allocate memory */
-	cb = malloc_or_die(sizeof(*cb));
+	cb = (callback_item *)malloc_or_die(sizeof(*cb));
 
 	/* add us to the end of the list */
 	cb->func.frame = callback;
@@ -481,7 +481,7 @@ void add_reset_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_reset_callback at init time!");
 
 	/* allocate memory */
-	cb = malloc_or_die(sizeof(*cb));
+	cb = (callback_item *)malloc_or_die(sizeof(*cb));
 
 	/* add us to the end of the list */
 	cb->func.reset = callback;
@@ -504,7 +504,7 @@ void add_pause_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_pause_callback at init time!");
 
 	/* allocate memory */
-	cb = malloc_or_die(sizeof(*cb));
+	cb = (callback_item *)malloc_or_die(sizeof(*cb));
 
 	/* add us to the end of the list */
 	cb->func.pause = callback;
@@ -527,7 +527,7 @@ void add_exit_callback(running_machine *machine, void (*callback)(running_machin
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_exit_callback at init time!");
 
 	/* allocate memory */
-	cb = malloc_or_die(sizeof(*cb));
+	cb = (callback_item *)malloc_or_die(sizeof(*cb));
 
 	/* add us to the head of the list */
 	cb->func.exit = callback;
@@ -782,7 +782,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
     		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
 	/* allocate the region */
-	info = malloc_or_die(sizeof(*info) + length);
+	info = (region_info *)malloc_or_die(sizeof(*info) + length);
 	info->next = NULL;
 	info->name = astring_dupc(name);
 	info->length = length;
@@ -1247,7 +1247,7 @@ void add_logerror_callback(running_machine *machine, void (*callback)(running_ma
 
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_logerror_callback at init time!");
 
-	cb = auto_malloc(sizeof(*cb));
+	cb = (callback_item *)auto_malloc(sizeof(*cb));
 	cb->func.log = callback;
 	cb->next = NULL;
 
@@ -1318,7 +1318,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		config = machine_config_alloc(driver->machine_config);
 		for (device = video_screen_first(config); device != NULL; device = video_screen_next(device))
 		{
-			const screen_config *scrconfig = device->inline_config;
+			const screen_config *scrconfig = (const screen_config *)device->inline_config;
 			if (scrconfig->type == SCREEN_TYPE_VECTOR)
 			{
 				parse_ini_file(options, "vector");
@@ -1387,13 +1387,13 @@ static running_machine *create_machine(const game_driver *driver)
 	int cpunum;
 
 	/* allocate memory for the machine */
-	machine = malloc(sizeof(*machine));
+	machine = (running_machine *)malloc(sizeof(*machine));
 	if (machine == NULL)
 		goto error;
 	memset(machine, 0, sizeof(*machine));
 
 	/* allocate memory for the internal mame_data */
-	machine->mame_data = malloc(sizeof(*machine->mame_data));
+	machine->mame_data = (mame_private *)malloc(sizeof(*machine->mame_data));
 	if (machine->mame_data == NULL)
 		goto error;
 	memset(machine->mame_data, 0, sizeof(*machine->mame_data));

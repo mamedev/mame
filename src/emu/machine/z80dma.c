@@ -201,7 +201,7 @@ static int z80dma_do_write(const device_config *device)
 
 static TIMER_CALLBACK( z80dma_timerproc )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	z80dma_t *cntx = get_safe_token(device);
 	int done;
 
@@ -390,7 +390,7 @@ WRITE8_DEVICE_HANDLER( z80dma_w )
 
 static TIMER_CALLBACK( z80dma_rdy_write_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	int state = param & 0x01;
 	z80dma_t *cntx = get_safe_token(device);
 
@@ -447,7 +447,7 @@ static DEVICE_START( z80dma )
 	assert(device != NULL);
 	assert(device->tag != NULL);
 
-	z80dma->intf = device->static_config;
+	z80dma->intf = (const z80dma_interface *)device->static_config;
 
 	z80dma->timer = timer_alloc(device->machine, z80dma_timerproc, (void *) device);
 

@@ -82,7 +82,7 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 	if (records > 0)
 	{
 		/* allocate memory for the records */
-		*audit = malloc_or_die(sizeof(**audit) * records);
+		*audit = (audit_record *)malloc_or_die(sizeof(**audit) * records);
 		memset(*audit, 0, sizeof(**audit) * records);
 		record = *audit;
 
@@ -163,7 +163,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 		goto skip;
 
 	/* allocate memory for the records */
-	*audit = malloc_or_die(sizeof(**audit) * records);
+	*audit = (audit_record *)malloc_or_die(sizeof(**audit) * records);
 	memset(*audit, 0, sizeof(**audit) * records);
 	record = *audit;
 

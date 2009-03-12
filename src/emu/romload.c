@@ -125,7 +125,7 @@ void set_disk_handle(const char *region, mame_file *file, chd_file *chdfile)
 	chd.origfile = file;
 
 	/* we're okay, add to the list of disks */
-	*chd_list_tailptr = auto_malloc(sizeof(**chd_list_tailptr));
+	*chd_list_tailptr = (open_chd *)auto_malloc(sizeof(**chd_list_tailptr));
 	**chd_list_tailptr = chd;
 	chd_list_tailptr = &(*chd_list_tailptr)->next;
 }
@@ -165,7 +165,7 @@ const rom_source *rom_first_source(const game_driver *drv, const machine_config 
 	if (config != NULL)
 		for (device = config->devicelist; device != NULL; device = device->next)
 		{
-			const rom_entry *devromp = device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
+			const rom_entry *devromp = (const rom_entry *)device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
 			if (devromp != NULL)
 				return (rom_source *)device;
 		}
@@ -191,7 +191,7 @@ const rom_source *rom_next_source(const game_driver *drv, const machine_config *
 	/* look for further devices with ROM definitions */
 	for ( ; device != NULL; device = device->next)
 	{
-		const rom_entry *devromp = device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
+		const rom_entry *devromp = (const rom_entry *)device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
 		if (devromp != NULL)
 			return (rom_source *)device;
 	}
@@ -211,7 +211,7 @@ const rom_entry *rom_first_region(const game_driver *drv, const rom_source *sour
 	if (source == NULL || rom_source_is_gamedrv(drv, source))
 		romp = drv->rom;
 	else
-		romp = device_get_info_ptr((const device_config *)source, DEVINFO_PTR_ROM_REGION);
+		romp = (const rom_entry *)device_get_info_ptr((const device_config *)source, DEVINFO_PTR_ROM_REGION);
 
 	return (romp != NULL && !ROMENTRY_ISEND(romp)) ? romp : NULL;
 }
@@ -757,7 +757,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 
 	/* use a temporary buffer for complex loads */
 	tempbufsize = MIN(TEMPBUFFER_MAX_SIZE, numbytes);
-	tempbuf = malloc_or_die(tempbufsize);
+	tempbuf = (UINT8 *)malloc_or_die(tempbufsize);
 
 	/* chunky reads for complex loads */
 	skip += groupsize;
@@ -1225,7 +1225,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 			/* we're okay, add to the list of disks */
 			LOG(("Assigning to handle %d\n", DISK_GETINDEX(romp)));
-			*chd_list_tailptr = auto_malloc(sizeof(**chd_list_tailptr));
+			*chd_list_tailptr = (open_chd *)auto_malloc(sizeof(**chd_list_tailptr));
 			**chd_list_tailptr = chd;
 			chd_list_tailptr = &(*chd_list_tailptr)->next;
 		}

@@ -88,12 +88,12 @@ static DEVICE_START(x2212)
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
-	c->sram = auto_malloc( SIZE_DATA );
-	c->e2prom = auto_malloc( SIZE_DATA );
+	c->sram = (UINT8 *)auto_malloc( SIZE_DATA );
+	c->e2prom = (UINT8 *)auto_malloc( SIZE_DATA );
 	c->store = 1;
 	c->array_recall = 1;
 
-	config = device->static_config;
+	config = (const x2212_config *)device->static_config;
 	if( config != NULL && config->data != NULL )
 	{
 		c->default_data = memory_region( device->machine, config->data );

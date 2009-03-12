@@ -333,7 +333,7 @@ static UINT8 ldv1000_status_r(laserdisc_state *ld)
 
 static TIMER_CALLBACK( vsync_off )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ld->player->vsync = FALSE;
 }
 
@@ -347,7 +347,7 @@ static TIMER_CALLBACK( vsync_off )
 
 static TIMER_CALLBACK( vbi_data_fetch )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldplayer_data *player = ld->player;
 	UINT8 focus_on = !(player->portb1 & 0x01);
 	UINT8 laser_on = (player->portb1 & 0x40);
@@ -398,7 +398,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 
 static TIMER_DEVICE_CALLBACK( multijump_timer )
 {
-	laserdisc_state *ld = ptr;
+	laserdisc_state *ld = (laserdisc_state *)ptr;
 	ldplayer_data *player = ld->player;
 	int direction;
 

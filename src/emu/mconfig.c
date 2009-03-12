@@ -69,7 +69,7 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 	machine_config *config;
 
 	/* allocate a new configuration object */
-	config = malloc_or_die(sizeof(*config));
+	config = (machine_config *)malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
 
 	/* parse tokens into the config */
@@ -318,7 +318,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	if (depth == 0)
 		for (device = config->devicelist; device != NULL; device = device->next)
 		{
-			tokens = device_get_info_ptr(device, DEVINFO_PTR_MACHINE_CONFIG);
+			tokens = (const machine_config_token *)device_get_info_ptr(device, DEVINFO_PTR_MACHINE_CONFIG);
 			if (tokens != NULL)
 				machine_config_detokenize(config, tokens, device, depth + 1);
 		}

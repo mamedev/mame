@@ -379,8 +379,8 @@ static void palette_handle_keys(running_machine *machine, ui_gfx_state *state)
 	/* clamp within range */
 	if (state->palette.which < 0)
 		state->palette.which = 1;
-	if (state->palette.which > (machine->colortable != NULL))
-		state->palette.which = (machine->colortable != NULL);
+	if (state->palette.which > (int)(machine->colortable != NULL))
+		state->palette.which = (int)(machine->colortable != NULL);
 
 	/* cache some info in locals */
 	total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->config->total_colors;

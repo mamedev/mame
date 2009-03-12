@@ -448,7 +448,7 @@ static void cia_timer_underflow(const device_config *device, int timer)
 
 static TIMER_CALLBACK( cia_timer_proc )
 {
-	cia_timer *timer = ptr;
+	cia_timer *timer = (cia_timer *)ptr;
 	cia_state *cia = timer->cia;
 
 	cia_timer_underflow(cia->device, timer - cia->timer);
@@ -554,7 +554,7 @@ void cia_clock_tod(const device_config *device)
 
 static TIMER_CALLBACK( cia_clock_tod_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	cia_clock_tod(device);
 }
 

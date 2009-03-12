@@ -122,7 +122,7 @@ s2636_t *s2636_config(UINT8 *work_ram, int screen_height, int screen_width, int 
 	s2636_t *s2636;
 
 	/* allocate the object that holds the state */
-	s2636 = auto_malloc(sizeof(*s2636));
+	s2636 = (s2636_t *)auto_malloc(sizeof(*s2636));
 
 	s2636->work_ram = work_ram;
 	s2636->y_offset = y_offset;

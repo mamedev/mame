@@ -36,7 +36,7 @@ struct _latch8_config
 {
 	/* only for byte reads, does not affect bit reads and node_map */
 	UINT32					maskout;
-	UINT32					xor;  /* after mask */
+	UINT32					xorvalue;  /* after mask */
 	UINT32					nosync;
 	UINT32					node_map[8];
 	const char *			node_device[8];
@@ -57,7 +57,7 @@ struct _latch8_config
 
 /* Bit mask specifying bits to be inverted */
 #define MDRV_LATCH8_INVERT(_xor) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, xor, _xor)
+	MDRV_DEVICE_CONFIG_DATA32(latch8_config, xorvalue, _xor)
 
 /* Bit mask specifying bits not needing cpu synchronization. */
 #define MDRV_LATCH8_NOSYNC(_nosync) \

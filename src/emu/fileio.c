@@ -181,7 +181,7 @@ file_error mame_fopen_ram(const void *data, UINT32 length, UINT32 openflags, mam
 	file_error filerr;
 
 	/* allocate the file itself */
-	*file = malloc(sizeof(**file));
+	*file = (mame_file *)malloc(sizeof(**file));
 	if (*file == NULL)
 		return FILERR_OUT_OF_MEMORY;
 
@@ -222,7 +222,7 @@ static file_error fopen_internal(core_options *opts, const char *searchpath, con
 		return FILERR_INVALID_ACCESS;
 
 	/* allocate the file itself */
-	*file = malloc(sizeof(**file));
+	*file = (mame_file *)malloc(sizeof(**file));
 	if (*file == NULL)
 		return FILERR_OUT_OF_MEMORY;
 
@@ -651,7 +651,7 @@ mame_path *mame_openpath(core_options *opts, const char *searchpath)
 	mame_path *path;
 
 	/* allocate a new mame_path */
-	path = malloc(sizeof(*path));
+	path = (mame_path *)malloc(sizeof(*path));
 	if (path == NULL)
 		return NULL;
 	memset(path, 0, sizeof(*path));
@@ -779,7 +779,7 @@ const char *mame_fhash(mame_file *file, UINT32 functions)
 		return file->hash;
 
 	/* read the data if we can */
-	filedata = core_fbuffer(file->file);
+	filedata = (const UINT8 *)core_fbuffer(file->file);
 	if (filedata == NULL)
 		return file->hash;
 
@@ -853,7 +853,7 @@ static file_error load_zipped_file(mame_file *file)
 	assert(file->zipfile != NULL);
 
 	/* allocate some memory */
-	file->zipdata = malloc(file->ziplength);
+	file->zipdata = (UINT8 *)malloc(file->ziplength);
 	if (file->zipdata == NULL)
 		return FILERR_OUT_OF_MEMORY;
 

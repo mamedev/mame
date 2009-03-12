@@ -153,7 +153,7 @@ static int dma8257_do_operation(const device_config *device, int channel)
 
 static TIMER_CALLBACK( dma8257_timerproc )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	dma8257_t *dma8257 = get_safe_token(device);
 	int i, channel = 0, rr;
 	int done;
@@ -186,7 +186,7 @@ static TIMER_CALLBACK( dma8257_timerproc )
 
 static TIMER_CALLBACK( dma8257_msbflip_timerproc )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	dma8257_t *dma8257 = get_safe_token(device);
 	dma8257->msb ^= 1;
 }
@@ -324,7 +324,7 @@ WRITE8_DEVICE_HANDLER( dma8257_w )
 
 static TIMER_CALLBACK( dma8257_drq_write_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	dma8257_t *dma8257 = get_safe_token(device);
 	int channel = param >> 1;
 	int state = param & 0x01;
@@ -368,7 +368,7 @@ static DEVICE_START( dma8257 )
 	assert(device->tag != NULL);
 
 	//dma8257->device_type = device_type;
-	dma8257->intf = device->static_config;
+	dma8257->intf = (dma8257_interface *)device->static_config;
 
 	dma8257->status = 0x0f;
 	dma8257->timer = timer_alloc(device->machine, dma8257_timerproc, (void *) device);

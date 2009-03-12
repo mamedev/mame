@@ -148,13 +148,13 @@ INLINE mc6845_t *get_safe_token(const device_config *device)
 
 static STATE_POSTLOAD( mc6845_state_save_postload )
 {
-	recompute_parameters(param, TRUE);
+	recompute_parameters((mc6845_t *)param, TRUE);
 }
 
 
 static TIMER_CALLBACK( on_update_address_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 	int addr = (param >> 8);
 	int strobe = (param & 0xff);
@@ -463,7 +463,7 @@ static void update_vsync_changed_timers(mc6845_t *mc6845)
 
 static TIMER_CALLBACK( de_changed_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -475,7 +475,7 @@ static TIMER_CALLBACK( de_changed_timer_cb )
 
 static TIMER_CALLBACK( vsync_on_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -485,7 +485,7 @@ static TIMER_CALLBACK( vsync_on_timer_cb )
 
 static TIMER_CALLBACK( vsync_off_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -497,7 +497,7 @@ static TIMER_CALLBACK( vsync_off_timer_cb )
 
 static TIMER_CALLBACK( hsync_on_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -507,7 +507,7 @@ static TIMER_CALLBACK( hsync_on_timer_cb )
 
 static TIMER_CALLBACK( hsync_off_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
@@ -572,7 +572,7 @@ UINT8 mc6845_get_ra(const device_config *device)
 
 static TIMER_CALLBACK( light_pen_latch_timer_cb )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845->light_pen_addr = mc6845_get_ma(device);
@@ -746,7 +746,7 @@ static void common_start(const device_config *device, int device_type)
 	assert(device != NULL);
 	assert(device->tag != NULL);
 
-	mc6845->intf = device->static_config;
+	mc6845->intf = (const mc6845_interface *)device->static_config;
 	mc6845->device_type = device_type;
 
 	if (mc6845->intf != NULL)

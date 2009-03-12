@@ -524,7 +524,7 @@ READ8_DEVICE_HANDLER( z80sio_get_rts )
 
 static TIMER_CALLBACK( change_input_line )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	z80sio *sio = get_safe_token(device);
 	sio_channel *chan = &sio->chan[param & 1];
 	UINT8 line = (param >> 8) & 0xff;
@@ -607,7 +607,7 @@ WRITE8_DEVICE_HANDLER( z80sio_receive_data )
 
 static TIMER_CALLBACK( serial_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	z80sio *sio = get_safe_token(device);
 	sio_channel *chan = &sio->chan[param];
 	int ch = param;
@@ -782,7 +782,7 @@ static void z80sio_irq_reti(const device_config *device)
 
 static DEVICE_START( z80sio )
 {
-	const z80sio_interface *intf = device->static_config;
+	const z80sio_interface *intf = (const z80sio_interface *)device->static_config;
 	astring *tempstring = astring_alloc();
 	z80sio *sio = get_safe_token(device);
 	void *ptr = (void *)device;

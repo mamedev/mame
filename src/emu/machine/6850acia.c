@@ -39,12 +39,13 @@ enum serial_state
 	STOP2,
 };
 
-enum parity_type
+enum _parity_type
 {
 	NONE,
 	ODD,
 	EVEN
 };
+typedef enum _parity_type parity_type;
 
 typedef struct _acia6850_t acia6850_t;
 struct _acia6850_t
@@ -80,7 +81,7 @@ struct _acia6850_t
 
 	/* TX/RX state */
 	int	bits;
-	enum 	parity_type parity;
+	parity_type parity;
 	int	stopbits;
 	int tx_int;
 
@@ -295,7 +296,7 @@ WRITE8_DEVICE_HANDLER( acia6850_ctrl_w )
 	wordsel = (data & CR4_2) >> 2;
 
 	acia_p->bits = ACIA6850_WORD[wordsel][0];
-	acia_p->parity = ACIA6850_WORD[wordsel][1];
+	acia_p->parity = (parity_type)ACIA6850_WORD[wordsel][1];
 	acia_p->stopbits = ACIA6850_WORD[wordsel][2];
 
 	// Transmitter Control Bits
@@ -565,7 +566,7 @@ static void tx_tick(const device_config *device)
 
 static TIMER_CALLBACK( transmit_event )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	acia6850_t *acia_p = get_token(device);
 	tx_tick(device);
 	acia_p->tx_counter = 0;
@@ -756,7 +757,7 @@ static void rx_tick(const device_config *device)
 
 static TIMER_CALLBACK( receive_event )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	acia6850_t *acia_p = get_token(device);
 	rx_tick(device);
 	acia_p->rx_counter = 0;

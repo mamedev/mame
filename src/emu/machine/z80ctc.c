@@ -138,7 +138,7 @@ static void interrupt_check(const device_config *device)
 
 static TIMER_CALLBACK( timercallback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	z80ctc *ctc = get_safe_token(device);
 	ctc_channel *channel = &ctc->channel[param];
 
@@ -461,7 +461,7 @@ static void z80ctc_irq_reti(const device_config *device)
 
 static DEVICE_START( z80ctc )
 {
-	const z80ctc_interface *intf = device->static_config;
+	const z80ctc_interface *intf = (const z80ctc_interface *)device->static_config;
 	astring *tempstring = astring_alloc();
 	z80ctc *ctc = get_safe_token(device);
 	int ch;

@@ -75,7 +75,7 @@ static void set_sr_line(cdp1852_t *cdp1852, int level)
 
 static TIMER_CALLBACK( cdp1852_scan_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	cdp1852_t *cdp1852 = get_safe_token(device);
 
 	switch (cdp1852->mode)
@@ -161,7 +161,7 @@ static DEVICE_START( cdp1852 )
 	devcb_resolve_write_line(&cdp1852->out_sr_func, &intf->out_sr_func, device);
 
 	/* set initial values */
-	cdp1852->mode = intf->mode;
+	cdp1852->mode = (cdp1852_mode)intf->mode;
 
 	if (device->clock > 0)
 	{

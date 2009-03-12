@@ -28,7 +28,7 @@ static STREAM_UPDATE( filter_rc_update )
 {
 	stream_sample_t *src = inputs[0];
 	stream_sample_t *dst = outputs[0];
-	filter_rc_state *info = param;
+	filter_rc_state *info = (filter_rc_state *)param;
 	int memory = info->memory;
 
 	switch (info->type)
@@ -93,7 +93,7 @@ static void set_RC_info(filter_rc_state *info, int type, double R1, double R2, d
 static DEVICE_START( filter_rc )
 {
 	filter_rc_state *info = get_safe_token(device);
-	const flt_rc_config *conf = device->static_config;
+	const flt_rc_config *conf = (const flt_rc_config *)device->static_config;
 
 	info->device = device;
 	info->stream = stream_create(device, 1, 1, device->machine->sample_rate, info, filter_rc_update);

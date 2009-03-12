@@ -157,7 +157,7 @@ static void update_prd_changed_timer(cdp1869_t *cdp1869)
 
 static TIMER_CALLBACK( prd_changed_tick )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
 	devcb_call_write_line(&cdp1869->out_prd_func, param);
