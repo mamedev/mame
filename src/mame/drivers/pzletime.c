@@ -5,10 +5,12 @@
 
     driver by Angelo Salese and Pierpaolo Prazzoli
     dump and info provided by Yoshi
-
-    Notes:
-    - Is the brightness effect right or there's a different video effect?
-    - Text tilemap flickering could be a bit different.
+	
+	To initialize the eeprom, keep Service button pressed at boot.
+	
+	Notes:
+    - Text tilemap flickering could be a bit slower / faster
+	- Brightness effect could be a bit darker / lighter
 
 *****************************************************************************************/
 
