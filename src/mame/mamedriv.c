@@ -2956,9 +2956,11 @@ V-V                           TP-027
 	DRIVER( gobyrc )    /* Go By RC (V2.03O) */
 	DRIVER( rcdego )    /* RC De Go (V2.03J) */
 	DRIVER( chaoshea )  /* Chaos Heat (V2.08J) */
+	DRIVER( flipmaze )  /* Flip Maze (V2.04J) */
 	DRIVER( spuzbobl )  /* Super Puzzle Bobble (V2.05O) */
 	DRIVER( soutenry )  /* Soutenryu (V2.07J) */
 	DRIVER( shanghss )  /* Shanghai Shoryu Sairin (V2.03J) */
+	DRIVER( sianniv )   /* Space Invaders Anniversary (V2.02J) */
 	DRIVER( psyvaria )  /* Psyvariar -Medium Unit- (V2.04J) */
 	DRIVER( psyvarrv )  /* Psyvariar -Revision- (V2.04J) */
 	DRIVER( zokuoten )  /* Zoku Otenamihaiken (V2.03J) */

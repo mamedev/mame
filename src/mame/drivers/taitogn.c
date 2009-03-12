@@ -838,6 +838,14 @@ ROM_START(chaoshea)
 ROM_END
 
 
+ROM_START(flipmaze)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "flipmaze", 0, SHA1(015cb0e6c4421cc38809de28c4793b4491386aee))
+ROM_END
+
+
 ROM_START(spuzbobl)
 	TAITOGNET_BIOS
 
@@ -859,6 +867,14 @@ ROM_START(shanghss)
 	DISK_REGION( "card" )
 	DISK_IMAGE( "shanghss", 0, SHA1(7964f71ec5c81d2120d83b63a82f97fbad5a8e6d))
 ROM_END
+
+ROM_START(sianniv)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "sianniv", 0, SHA1(1e08b813190a9e1baf29bc16884172d6c8da7ae3))
+ROM_END
+
 
 /* Success */
 
@@ -924,13 +940,15 @@ ROM_END
 /* it in every zip file */
 GAME( 1997, taitogn,  0, coh3002t, coh3002t, coh3002t, ROT0, "Sony/Taito", "Taito GNET", GAME_IS_BIOS_ROOT )
 
-GAME( 199?, raycris,  taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Ray Crisis (V2.03J)", 0 )
+GAME( 1998, raycris,  taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Ray Crisis (V2.03J)", 0 )
 GAME( 199?, gobyrc, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING ) // custom inputs need calibrating
 GAME( 199?, rcdego, gobyrc,  coh3002t, coh3002t, coh3002t, ROT0, "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING ) // custom inputs need calibrating
 GAME( 1998, chaoshea, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Chaos Heat (V2.08J)", 0 )
+GAME( 1998, flipmaze, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito/Moss", "Flip Maze (V2.04J)", 0 )
 GAME( 1999, spuzbobl, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Super Puzzle Bobble (V2.05O)", 0 )
 GAME( 2000, soutenry, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Soutenryu (V2.07J)", 0 )
 GAME( 2000, shanghss, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Shanghai Shoryu Sairin (V2.03J)", 0 )
+GAME( 2003, sianniv,  taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING ) // IRQ at the wrong time
 
 GAME( 2000, psyvaria, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J)", 0 )
 GAME( 2000, psyvarrv, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", 0 )
@@ -942,4 +960,3 @@ GAME( 1999, mahjngoh, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Warashi/Mahj
 GAME( 2001, nightrai, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Night Raid (V2.03J)", GAME_NOT_WORKING ) // no background / enemy sprites
 
 GAME( 2002, xiistag,  taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Triangle Service", "XII Stag (V2.01J)", 0 )
-
