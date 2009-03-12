@@ -70,9 +70,9 @@ static void start_common(const device_config *device, UINT8 _shiftreg_mask, int 
 	hc55516_state *chip = get_safe_token(device);
 
 	/* compute the fixed charge, decay, and leak time constants */
-	charge = pow(exp(-1), 1.0 / (FILTER_CHARGE_TC * 16000.0));
-	decay = pow(exp(-1), 1.0 / (FILTER_DECAY_TC * 16000.0));
-	leak = pow(exp(-1), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
+	charge = pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * 16000.0));
+	decay = pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0));
+	leak = pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
 
 	chip->clock = device->clock;
 	chip->shiftreg_mask = _shiftreg_mask;
@@ -189,7 +189,7 @@ static void process_digit(hc55516_state *chip)
 
 static STREAM_UPDATE( hc55516_update )
 {
-	hc55516_state *chip = param;
+	hc55516_state *chip = (hc55516_state *)param;
 	stream_sample_t *buffer = outputs[0];
 	int i;
 	INT32 sample, slope;

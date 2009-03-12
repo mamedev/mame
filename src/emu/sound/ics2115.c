@@ -96,7 +96,7 @@ static void recalc_irq(ics2115_state *chip)
 
 static STREAM_UPDATE( update )
 {
-	ics2115_state *chip = param;
+	ics2115_state *chip = (ics2115_state *)param;
 	int osc, i;
 	int rec_irq = 0;
 
@@ -164,14 +164,14 @@ static void keyon(ics2115_state *chip, int osc)
 
 static TIMER_CALLBACK( timer_cb_0 )
 {
-	ics2115_state *chip = ptr;
+	ics2115_state *chip = (ics2115_state *)ptr;
 	chip->irq_pend |= 1<<0;
 	recalc_irq(chip);
 }
 
 static TIMER_CALLBACK( timer_cb_1 )
 {
-	ics2115_state *chip = ptr;
+	ics2115_state *chip = (ics2115_state *)ptr;
 	chip->irq_pend |= 1<<1;
 	recalc_irq(chip);
 }
@@ -455,11 +455,11 @@ static DEVICE_START( ics2115 )
 	int i;
 
 	chip->device = device;
-	chip->intf = device->static_config;
+	chip->intf = (const ics2115_interface *)device->static_config;
 	chip->rom = device->region;
 	chip->timer[0].timer = timer_alloc(device->machine, timer_cb_0, chip);
 	chip->timer[1].timer = timer_alloc(device->machine, timer_cb_1, chip);
-	chip->ulaw = auto_malloc(256*sizeof(INT16));
+	chip->ulaw = (INT16 *)auto_malloc(256*sizeof(INT16));
 	chip->stream = stream_create(device, 0, 2, 33075, chip, update);
 
 	for(i=0; i<256; i++) {

@@ -339,7 +339,7 @@ INLINE void build_3D_table(double rl, const ay_ym_param *par, const ay_ym_param 
 	double min = 10.0,  max = 0.0;
 	double *temp;
 
-	temp = malloc(8*32*32*32*sizeof(*temp));
+	temp = (double *)malloc(8*32*32*32*sizeof(*temp));
 
 	for (e=0; e < 8; e++)
 		for (j1=0; j1 < 32; j1++)
@@ -545,7 +545,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 
 static STREAM_UPDATE( ay8910_update )
 {
-	ay8910_context *psg = param;
+	ay8910_context *psg = (ay8910_context *)param;
 	stream_sample_t *buf[NUM_CHANNELS];
 	int chan;
 
@@ -731,11 +731,11 @@ static void ay8910_statesave(ay8910_context *psg, const device_config *device)
 
 void *ay8910_start_ym(void *infoptr, sound_type chip_type, const device_config *device, int clock, const ay8910_interface *intf)
 {
-	ay8910_context *info = infoptr;
+	ay8910_context *info = (ay8910_context *)infoptr;
 
 	if (info == NULL)
 	{
-		info = auto_malloc(sizeof(*info));
+		info = (ay8910_context *)auto_malloc(sizeof(*info));
 		memset(info, 0, sizeof(*info));
 	}
 	info->device = device;
@@ -787,7 +787,7 @@ void ay8910_stop_ym(void *chip)
 
 void ay8910_reset_ym(void *chip)
 {
-	ay8910_context *psg = chip;
+	ay8910_context *psg = (ay8910_context *)chip;
 	int i;
 
 	psg->register_latch = 0;
@@ -835,13 +835,13 @@ void ay8910_set_volume(const device_config *device,int channel,int volume)
 
 void ay8910_set_clock_ym(void *chip, int clock)
 {
-	ay8910_context *psg = chip;
+	ay8910_context *psg = (ay8910_context *)chip;
 	stream_set_sample_rate(psg->channel, clock / 8 );
 }
 
 void ay8910_write_ym(void *chip, int addr, int data)
 {
-	ay8910_context *psg = chip;
+	ay8910_context *psg = (ay8910_context *)chip;
 
 	if (addr & 1)
 	{	/* Data port */
@@ -864,7 +864,7 @@ void ay8910_write_ym(void *chip, int addr, int data)
 
 int ay8910_read_ym(void *chip)
 {
-	ay8910_context *psg = chip;
+	ay8910_context *psg = (ay8910_context *)chip;
 	int r = psg->register_latch;
 
 	if (r > 15) return 0;
@@ -912,7 +912,7 @@ static DEVICE_START( ay8910 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
+	const ay8910_interface *intf = (device->static_config ? (const ay8910_interface *)device->static_config : &generic_ay8910);
 	ay8910_start_ym(get_safe_token(device), SOUND_AY8910, device, device->clock, intf);
 }
 
@@ -924,7 +924,7 @@ static DEVICE_START( ym2149 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->static_config ? device->static_config : &generic_ay8910);
+	const ay8910_interface *intf = (device->static_config ? (const ay8910_interface *)device->static_config : &generic_ay8910);
 	ay8910_start_ym(get_safe_token(device), SOUND_YM2149, device, device->clock, intf);
 }
 

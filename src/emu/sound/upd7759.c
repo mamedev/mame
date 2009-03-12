@@ -473,7 +473,7 @@ static void advance_state(upd7759_state *chip)
 
 static STREAM_UPDATE( upd7759_update )
 {
-	upd7759_state *chip = param;
+	upd7759_state *chip = (upd7759_state *)param;
 	INT32 clocks_left = chip->clocks_left;
 	INT16 sample = chip->sample;
 	UINT32 step = chip->step;
@@ -536,7 +536,7 @@ static STREAM_UPDATE( upd7759_update )
 
 static TIMER_CALLBACK( upd7759_slave_update )
 {
-	upd7759_state *chip = ptr;
+	upd7759_state *chip = (upd7759_state *)ptr;
 	UINT8 olddrq = chip->drq;
 
 	/* update the stream */
@@ -593,7 +593,7 @@ static void upd7759_reset(upd7759_state *chip)
 
 static DEVICE_RESET( upd7759 )
 {
-	upd7759_reset(device->token);
+	upd7759_reset(get_safe_token(device));
 }
 
 
@@ -640,8 +640,8 @@ static void register_for_save(upd7759_state *chip, const device_config *device)
 static DEVICE_START( upd7759 )
 {
 	static const upd7759_interface defintrf = { 0 };
-	const upd7759_interface *intf = (device->static_config != NULL) ? device->static_config : &defintrf;
-	upd7759_state *chip = device->token;
+	const upd7759_interface *intf = (device->static_config != NULL) ? (const upd7759_interface *)device->static_config : &defintrf;
+	upd7759_state *chip = get_safe_token(device);
 
 	chip->device = device;
 

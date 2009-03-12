@@ -132,13 +132,13 @@ static void sp0250_load_values(sp0250_state *sp)
 
 static TIMER_CALLBACK( sp0250_timer_tick )
 {
-	sp0250_state *sp = ptr;
+	sp0250_state *sp = (sp0250_state *)ptr;
 	stream_update(sp->stream);
 }
 
 static STREAM_UPDATE( sp0250_update )
 {
-	sp0250_state *sp = param;
+	sp0250_state *sp = (sp0250_state *)param;
 	stream_sample_t *output = outputs[0];
 	int i;
 	for (i = 0; i < samples; i++)
@@ -205,7 +205,7 @@ static STREAM_UPDATE( sp0250_update )
 
 static DEVICE_START( sp0250 )
 {
-	const struct sp0250_interface *intf = device->static_config;
+	const struct sp0250_interface *intf = (const struct sp0250_interface *)device->static_config;
 	sp0250_state *sp = get_safe_token(device);
 
 	sp->device = device;

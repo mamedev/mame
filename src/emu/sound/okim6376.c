@@ -235,7 +235,7 @@ static void generate_adpcm(okim6376_state *chip, struct ADPCMVoice *voice, INT16
 
 static STREAM_UPDATE( okim6376_update )
 {
-	okim6376_state *chip = param;
+	okim6376_state *chip = (okim6376_state *)param;
 	int i;
 
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));

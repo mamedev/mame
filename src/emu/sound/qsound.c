@@ -118,7 +118,7 @@ static DEVICE_START( qsound )
 	/* Create pan table */
 	for (i=0; i<33; i++)
 	{
-		chip->pan_table[i]=(int)((256/sqrt(32)) * sqrt(i));
+		chip->pan_table[i]=(int)((256/sqrt(32.0)) * sqrt((double)i));
 	}
 
 	LOG(("Pan table\n"));
@@ -317,7 +317,7 @@ static void qsound_set_command(qsound_state *chip, int data, int value)
 
 static STREAM_UPDATE( qsound_update )
 {
-	qsound_state *chip = param;
+	qsound_state *chip = (qsound_state *)param;
 	int i,j;
 	int rvol, lvol, count;
 	struct QSOUND_CHANNEL *pC=&chip->channel[0];

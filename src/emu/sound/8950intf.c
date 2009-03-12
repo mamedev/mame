@@ -47,22 +47,22 @@ INLINE y8950_state *get_safe_token(const device_config *device)
 
 static void IRQHandler(void *param,int irq)
 {
-	y8950_state *info = param;
+	y8950_state *info = (y8950_state *)param;
 	if (info->intf->handler) (info->intf->handler)(info->device, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static TIMER_CALLBACK( timer_callback_0 )
 {
-	y8950_state *info = ptr;
+	y8950_state *info = (y8950_state *)ptr;
 	y8950_timer_over(info->chip,0);
 }
 static TIMER_CALLBACK( timer_callback_1 )
 {
-	y8950_state *info = ptr;
+	y8950_state *info = (y8950_state *)ptr;
 	y8950_timer_over(info->chip,1);
 }
 static void TimerHandler(void *param,int c,attotime period)
 {
-	y8950_state *info = param;
+	y8950_state *info = (y8950_state *)param;
 	if( attotime_compare(period, attotime_zero) == 0 )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[c], 0);
@@ -76,7 +76,7 @@ static void TimerHandler(void *param,int c,attotime period)
 
 static unsigned char Y8950PortHandler_r(void *param)
 {
-	y8950_state *info = param;
+	y8950_state *info = (y8950_state *)param;
 	if (info->intf->portread)
 		return info->intf->portread(info->device,0);
 	return 0;
@@ -84,14 +84,14 @@ static unsigned char Y8950PortHandler_r(void *param)
 
 static void Y8950PortHandler_w(void *param,unsigned char data)
 {
-	y8950_state *info = param;
+	y8950_state *info = (y8950_state *)param;
 	if (info->intf->portwrite)
 		info->intf->portwrite(info->device,0,data);
 }
 
 static unsigned char Y8950KeyboardHandler_r(void *param)
 {
-	y8950_state *info = param;
+	y8950_state *info = (y8950_state *)param;
 	if (info->intf->keyboardread)
 		return info->intf->keyboardread(info->device,0);
 	return 0;
@@ -99,20 +99,20 @@ static unsigned char Y8950KeyboardHandler_r(void *param)
 
 static void Y8950KeyboardHandler_w(void *param,unsigned char data)
 {
-	y8950_state *info = param;
+	y8950_state *info = (y8950_state *)param;
 	if (info->intf->keyboardwrite)
 		info->intf->keyboardwrite(info->device,0,data);
 }
 
 static STREAM_UPDATE( y8950_stream_update )
 {
-	y8950_state *info = param;
+	y8950_state *info = (y8950_state *)param;
 	y8950_update_one(info->chip, outputs[0], samples);
 }
 
 static void _stream_update(void *param, int interval)
 {
-	y8950_state *info = param;
+	y8950_state *info = (y8950_state *)param;
 	stream_update(info->stream);
 }
 
@@ -123,7 +123,7 @@ static DEVICE_START( y8950 )
 	y8950_state *info = get_safe_token(device);
 	int rate = device->clock/72;
 
-	info->intf = device->static_config ? device->static_config : &dummy;
+	info->intf = device->static_config ? (const y8950_interface *)device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */

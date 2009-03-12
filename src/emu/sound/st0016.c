@@ -66,7 +66,7 @@ WRITE8_DEVICE_HANDLER( st0016_snd_w )
 
 static STREAM_UPDATE( st0016_update )
 {
-	st0016_state *info = param;
+	st0016_state *info = (st0016_state *)param;
 	UINT8 *sound_ram = *info->sound_ram;
 	int v, i, snum;
 	unsigned char *slot;
@@ -142,7 +142,7 @@ static STREAM_UPDATE( st0016_update )
 
 static DEVICE_START( st0016 )
 {
-	const st0016_interface *intf = device->static_config;
+	const st0016_interface *intf = (const st0016_interface *)device->static_config;
 	st0016_state *info = get_safe_token(device);
 
 	info->sound_ram = intf->p_soundram;

@@ -29,25 +29,25 @@ INLINE ym2203_state *get_safe_token(const device_config *device)
 
 static void psg_set_clock(void *param, int clock)
 {
-	ym2203_state *info = param;
+	ym2203_state *info = (ym2203_state *)param;
 	ay8910_set_clock_ym(info->psg, clock);
 }
 
 static void psg_write(void *param, int address, int data)
 {
-	ym2203_state *info = param;
+	ym2203_state *info = (ym2203_state *)param;
 	ay8910_write_ym(info->psg, address, data);
 }
 
 static int psg_read(void *param)
 {
-	ym2203_state *info = param;
+	ym2203_state *info = (ym2203_state *)param;
 	return ay8910_read_ym(info->psg);
 }
 
 static void psg_reset(void *param)
 {
-	ym2203_state *info = param;
+	ym2203_state *info = (ym2203_state *)param;
 	ay8910_reset_ym(info->psg);
 }
 
@@ -62,7 +62,7 @@ static const ssg_callbacks psgintf =
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym2203_state *info = param;
+	ym2203_state *info = (ym2203_state *)param;
 	if (info->intf->handler != NULL)
 		(*info->intf->handler)(info->device, irq);
 }
@@ -70,27 +70,27 @@ static void IRQHandler(void *param,int irq)
 /* Timer overflow callback from timer.c */
 static TIMER_CALLBACK( timer_callback_2203_0 )
 {
-	ym2203_state *info = ptr;
+	ym2203_state *info = (ym2203_state *)ptr;
 	ym2203_timer_over(info->chip,0);
 }
 
 static TIMER_CALLBACK( timer_callback_2203_1 )
 {
-	ym2203_state *info = ptr;
+	ym2203_state *info = (ym2203_state *)ptr;
 	ym2203_timer_over(info->chip,1);
 }
 
 /* update request from fm.c */
 void ym2203_update_request(void *param)
 {
-	ym2203_state *info = param;
+	ym2203_state *info = (ym2203_state *)param;
 	stream_update(info->stream);
 }
 
 
 static void timer_handler(void *param,int c,int count,int clock)
 {
-	ym2203_state *info = param;
+	ym2203_state *info = (ym2203_state *)param;
 	if( count == 0 )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[c], 0);
@@ -105,14 +105,14 @@ static void timer_handler(void *param,int c,int count,int clock)
 
 static STREAM_UPDATE( ym2203_stream_update )
 {
-	ym2203_state *info = param;
+	ym2203_state *info = (ym2203_state *)param;
 	ym2203_update_one(info->chip, outputs[0], samples);
 }
 
 
 static STATE_POSTLOAD( ym2203_intf_postload )
 {
-	ym2203_state *info = param;
+	ym2203_state *info = (ym2203_state *)param;
 	ym2203_postload(info->chip);
 }
 
@@ -128,8 +128,8 @@ static DEVICE_START( ym2203 )
 		},
 		NULL
 	};
-	const ym2203_interface *intf = device->static_config ? device->static_config : &generic_2203;
-	ym2203_state *info = device->token;
+	const ym2203_interface *intf = device->static_config ? (const ym2203_interface *)device->static_config : &generic_2203;
+	ym2203_state *info = get_safe_token(device);
 	int rate = device->clock/72; /* ??? */
 
 	info->intf = intf;
@@ -153,14 +153,14 @@ static DEVICE_START( ym2203 )
 
 static DEVICE_STOP( ym2203 )
 {
-	ym2203_state *info = device->token;
+	ym2203_state *info = get_safe_token(device);
 	ym2203_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
 static DEVICE_RESET( ym2203 )
 {
-	ym2203_state *info = device->token;
+	ym2203_state *info = get_safe_token(device);
 	ym2203_reset_chip(info->chip);
 }
 

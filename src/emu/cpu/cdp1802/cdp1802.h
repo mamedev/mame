@@ -34,7 +34,6 @@ enum
 	EF4 = 0x08
 };
 
-typedef enum _cdp1802_control_mode cdp1802_control_mode;
 enum _cdp1802_control_mode
 {
 	CDP1802_MODE_LOAD,
@@ -42,8 +41,8 @@ enum _cdp1802_control_mode
 	CDP1802_MODE_PAUSE,
 	CDP1802_MODE_RUN
 };
+typedef enum _cdp1802_control_mode cdp1802_control_mode;
 
-typedef enum _cdp1802_state_code cdp1802_state_code;
 enum _cdp1802_state_code
 {
 	CDP1802_STATE_CODE_S0_FETCH,
@@ -51,6 +50,7 @@ enum _cdp1802_state_code
 	CDP1802_STATE_CODE_S2_DMA,
 	CDP1802_STATE_CODE_S3_INTERRUPT
 };
+typedef enum _cdp1802_state_code cdp1802_state_code;
 
 enum
 {

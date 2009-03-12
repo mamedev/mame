@@ -158,8 +158,8 @@ struct dsd_ls624_context
 
 static DISCRETE_STEP(dsd_555_astbl)
 {
-	const  discrete_555_desc     *info    = node->custom;
-	struct dsd_555_astbl_context *context = node->context;
+	const  discrete_555_desc     *info    = (const  discrete_555_desc *)node->custom;
+	struct dsd_555_astbl_context *context = (struct dsd_555_astbl_context *)node->context;
 
 	int		count_f = 0;
 	int		count_r = 0;
@@ -376,8 +376,8 @@ static DISCRETE_STEP(dsd_555_astbl)
 
 static DISCRETE_RESET(dsd_555_astbl)
 {
-	const  discrete_555_desc     *info    = node->custom;
-	struct dsd_555_astbl_context *context = node->context;
+	const  discrete_555_desc     *info    = (const  discrete_555_desc *)node->custom;
+	struct dsd_555_astbl_context *context = (struct dsd_555_astbl_context *)node->context;
 	node_description *v_charge_node;
 
 	context->use_ctrlv   = (node->input_is_node >> 4) & 1;
@@ -457,8 +457,8 @@ static DISCRETE_RESET(dsd_555_astbl)
 
 static DISCRETE_STEP(dsd_555_mstbl)
 {
-	const  discrete_555_desc     *info    = node->custom;
-	struct dsd_555_mstbl_context *context = node->context;
+	const  discrete_555_desc     *info    = (const  discrete_555_desc *)node->custom;
+	struct dsd_555_mstbl_context *context = (struct dsd_555_mstbl_context *)node->context;
 
 	double v_cap;			/* Current voltage on capacitor, before dt */
 	double v_cap_next = 0;	/* Voltage on capacitor, after dt */
@@ -542,8 +542,8 @@ static DISCRETE_STEP(dsd_555_mstbl)
 
 static DISCRETE_RESET(dsd_555_mstbl)
 {
-	const  discrete_555_desc     *info    = node->custom;
-	struct dsd_555_mstbl_context *context = node->context;
+	const  discrete_555_desc     *info    = (const  discrete_555_desc *)node->custom;
+	struct dsd_555_mstbl_context *context = (struct dsd_555_mstbl_context *)node->context;
 
 	context->output_type = info->options & DISC_555_OUT_MASK;
 	if ((context->output_type == DISC_555_OUT_COUNT_F) || (context->output_type == DISC_555_OUT_COUNT_R))
@@ -611,8 +611,8 @@ static DISCRETE_RESET(dsd_555_mstbl)
 
 static DISCRETE_STEP(dsd_555_cc)
 {
-	const  discrete_555_cc_desc *info    = node->custom;
-	struct dsd_555_cc_context   *context = node->context;
+	const  discrete_555_cc_desc *info    = (const  discrete_555_cc_desc *)node->custom;
+	struct dsd_555_cc_context   *context = (struct dsd_555_cc_context *)node->context;
 
 	int		count_f  = 0;
 	int		count_r  = 0;
@@ -931,8 +931,8 @@ static DISCRETE_STEP(dsd_555_cc)
 
 static DISCRETE_RESET(dsd_555_cc)
 {
-	const  discrete_555_cc_desc *info    = node->custom;
-	struct dsd_555_cc_context   *context = node->context;
+	const  discrete_555_cc_desc *info    = (const  discrete_555_cc_desc *)node->custom;
+	struct dsd_555_cc_context   *context = (struct dsd_555_cc_context *)node->context;
 
 	double	r_temp, r_discharge = 0, r_charge = 0;
 
@@ -1161,8 +1161,8 @@ static DISCRETE_RESET(dsd_555_cc)
 
 static DISCRETE_STEP(dsd_555_vco1)
 {
-	const  discrete_555_vco1_desc *info    = node->custom;
-	struct dsd_555_vco1_context   *context = node->context;
+	const  discrete_555_vco1_desc *info    = (const  discrete_555_vco1_desc *)node->custom;
+	struct dsd_555_vco1_context   *context = (struct dsd_555_vco1_context *)node->context;
 
 	int		count_f = 0;
 	int		count_r = 0;
@@ -1314,8 +1314,8 @@ static DISCRETE_STEP(dsd_555_vco1)
 
 static DISCRETE_RESET(dsd_555_vco1)
 {
-	const  discrete_555_vco1_desc *info    = node->custom;
-	struct dsd_555_vco1_context   *context = node->context;
+	const  discrete_555_vco1_desc *info    = (const  discrete_555_vco1_desc *)node->custom;
+	struct dsd_555_vco1_context   *context = (struct dsd_555_vco1_context *)node->context;
 
 	double v_ratio_r3, v_ratio_r4_1, r_in_1;
 
@@ -1392,8 +1392,8 @@ static DISCRETE_RESET(dsd_555_vco1)
 
 static DISCRETE_STEP(dsd_566)
 {
-	const  discrete_566_desc *info    = node->custom;
-	struct dsd_566_context   *context = node->context;
+	const  discrete_566_desc *info    = (const  discrete_566_desc *)node->custom;
+	struct dsd_566_context   *context = (struct dsd_566_context *)node->context;
 
 	double i;				/* Charging current created by vIn */
 	double dt;				/* change in time */
@@ -1513,8 +1513,8 @@ static DISCRETE_STEP(dsd_566)
 
 static DISCRETE_RESET(dsd_566)
 {
-	const  discrete_566_desc *info    = node->custom;
-	struct dsd_566_context   *context = node->context;
+	const  discrete_566_desc *info    = (const  discrete_566_desc *)node->custom;
+	struct dsd_566_context   *context = (struct dsd_566_context *)node->context;
 	node_description *v_charge_node;
 
 	double	v_diff, temp;
@@ -1598,7 +1598,7 @@ static DISCRETE_RESET(dsd_566)
 
 static DISCRETE_STEP(dsd_ls624)
 {
-	struct dsd_ls624_context *context = node->context;
+	struct dsd_ls624_context *context = (struct dsd_ls624_context *)node->context;
 
 	if (DSD_LS624__ENABLE)
 	{
@@ -1653,7 +1653,7 @@ static DISCRETE_STEP(dsd_ls624)
 
 static DISCRETE_RESET(dsd_ls624)
 {
-	struct dsd_ls624_context *context = node->context;
+	struct dsd_ls624_context *context = (struct dsd_ls624_context *)node->context;
 
 	context->remain   = 0;
 	context->state    = 0;

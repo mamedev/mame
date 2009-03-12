@@ -353,7 +353,7 @@ INLINE tms_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( tms36xx_sound_update )
 {
-	tms_state *tms = param;
+	tms_state *tms = (tms_state *)param;
 	int samplerate = tms->samplerate;
 	stream_sample_t *buffer = outputs[0];
 
@@ -501,7 +501,7 @@ static DEVICE_START( tms36xx )
 	tms_state *tms = get_safe_token(device);
 	int enable;
 
-	tms->intf = device->static_config;
+	tms->intf = (const tms36xx_interface *)device->static_config;
 
    tms->channel = stream_create(device, 0, 1, device->clock * 64, tms, tms36xx_sound_update);
 	tms->samplerate = device->clock * 64;

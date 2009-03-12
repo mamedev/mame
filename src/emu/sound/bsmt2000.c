@@ -186,7 +186,7 @@ static STREAM_UPDATE( bsmt2000_update )
 {
 	stream_sample_t *left = outputs[0];
 	stream_sample_t *right = outputs[1];
-	bsmt2000_chip *chip = param;
+	bsmt2000_chip *chip = (bsmt2000_chip *)param;
 	bsmt2000_voice *voice;
 	int samp, voicenum;
 

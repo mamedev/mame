@@ -1988,7 +1988,7 @@ static STREAM_UPDATE( SN76477_update )
 	double voltage_out;
 	double center_to_peak_voltage_out;
 
-	sn76477_state *sn = param;
+	sn76477_state *sn = (sn76477_state *)param;
 	stream_sample_t *buffer = outputs[0];
 
 

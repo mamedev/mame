@@ -74,7 +74,7 @@ INLINE dmadac_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( dmadac_update )
 {
-	dmadac_state *ch = param;
+	dmadac_state *ch = (dmadac_state *)param;
 	stream_sample_t *output = outputs[0];
 	INT16 *source = ch->buffer;
 	UINT32 curout = ch->bufout;
@@ -103,10 +103,10 @@ static STREAM_UPDATE( dmadac_update )
 
 static DEVICE_START( dmadac )
 {
-	dmadac_state *info = device->token;
+	dmadac_state *info = get_safe_token(device);
 
 	/* allocate a clear a buffer */
-	info->buffer = auto_malloc(sizeof(info->buffer[0]) * BUFFER_SIZE);
+	info->buffer = (INT16 *)auto_malloc(sizeof(info->buffer[0]) * BUFFER_SIZE);
 	memset(info->buffer, 0, sizeof(info->buffer[0]) * BUFFER_SIZE);
 
 	/* reset the state */

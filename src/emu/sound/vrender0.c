@@ -37,7 +37,7 @@ static void VR0_RenderAudio(vr0_state *VR0, int nsamples,stream_sample_t *l,stre
 
 static STREAM_UPDATE( VR0_Update )
 {
-	vr0_state *VR0 = param;
+	vr0_state *VR0 = (vr0_state *)param;
 	VR0_RenderAudio(VR0, samples,outputs[0],outputs[1]);
 }
 
@@ -109,7 +109,7 @@ static DEVICE_START( vrender0 )
 	const vr0_interface *intf;
 	vr0_state *VR0 = get_safe_token(device);
 
-	intf=device->static_config;
+	intf=(const vr0_interface *)device->static_config;
 
 	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
 	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));

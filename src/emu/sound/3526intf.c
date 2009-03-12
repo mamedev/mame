@@ -48,24 +48,24 @@ INLINE ym3526_state *get_safe_token(const device_config *device)
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym3526_state *info = param;
+	ym3526_state *info = (ym3526_state *)param;
 	if (info->intf->handler) (info->intf->handler)(info->device, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Timer overflow callback from timer.c */
 static TIMER_CALLBACK( timer_callback_0 )
 {
-	ym3526_state *info = ptr;
+	ym3526_state *info = (ym3526_state *)ptr;
 	ym3526_timer_over(info->chip,0);
 }
 static TIMER_CALLBACK( timer_callback_1 )
 {
-	ym3526_state *info = ptr;
+	ym3526_state *info = (ym3526_state *)ptr;
 	ym3526_timer_over(info->chip,1);
 }
 /* TimerHandler from fm.c */
 static void TimerHandler(void *param,int c,attotime period)
 {
-	ym3526_state *info = param;
+	ym3526_state *info = (ym3526_state *)param;
 	if( attotime_compare(period, attotime_zero) == 0 )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[c], 0);
@@ -79,13 +79,13 @@ static void TimerHandler(void *param,int c,attotime period)
 
 static STREAM_UPDATE( ym3526_stream_update )
 {
-	ym3526_state *info = param;
+	ym3526_state *info = (ym3526_state *)param;
 	ym3526_update_one(info->chip, outputs[0], samples);
 }
 
 static void _stream_update(void *param, int interval)
 {
-	ym3526_state *info = param;
+	ym3526_state *info = (ym3526_state *)param;
 	stream_update(info->stream);
 }
 
@@ -96,7 +96,7 @@ static DEVICE_START( ym3526 )
 	ym3526_state *info = get_safe_token(device);
 	int rate = device->clock/72;
 
-	info->intf = device->static_config ? device->static_config : &dummy;
+	info->intf = device->static_config ? (const ym3526_interface *)device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */

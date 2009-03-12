@@ -77,7 +77,7 @@ struct _gaelco_sound_state
 	INT16 volume_table[VOLUME_LEVELS][256];
 };
 
-static void *	wavraw;					/* raw waveform */
+static wav_file *	wavraw;					/* raw waveform */
 
 INLINE gaelco_sound_state *get_safe_token(const device_config *device)
 {
@@ -96,7 +96,7 @@ INLINE gaelco_sound_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( gaelco_update )
 {
-	gaelco_sound_state *info = param;
+	gaelco_sound_state *info = (gaelco_sound_state *)param;
 	int j, ch;
 
     /* fill all data needed */
@@ -256,7 +256,7 @@ WRITE16_DEVICE_HANDLER( gaelcosnd_w )
 static DEVICE_START( gaelco )
 {
 	int j, vol;
-	const gaelcosnd_interface *intf = device->static_config;
+	const gaelcosnd_interface *intf = (const gaelcosnd_interface *)device->static_config;
 
 	gaelco_sound_state *info = get_safe_token(device);
 

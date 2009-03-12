@@ -132,7 +132,7 @@ CCOMFLAGS += /wd4267
 endif
 
 # disable function pointer warnings in C++ which are evil to work around
-CPPONLYFLAGS += /wd4191 /wd4060 /wd4065
+CPPONLYFLAGS += /wd4191 /wd4060 /wd4065 /wd4640
 
 # explicitly set the entry point for UNICODE builds
 ifdef UNICODE

@@ -132,7 +132,7 @@ static INT16 clock_adpcm(okim6258_state *chip, UINT8 nibble)
 
 static STREAM_UPDATE( okim6258_update )
 {
-	okim6258_state *chip = param;
+	okim6258_state *chip = (okim6258_state *)param;
 	stream_sample_t *buffer = outputs[0];
 
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -194,7 +194,7 @@ static void okim6258_state_save_register(okim6258_state *info, const device_conf
 
 static DEVICE_START( okim6258 )
 {
-	const okim6258_interface *intf = device->static_config;
+	const okim6258_interface *intf = (const okim6258_interface *)device->static_config;
 	okim6258_state *info = get_safe_token(device);
 
 	compute_tables();

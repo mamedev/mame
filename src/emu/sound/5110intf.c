@@ -86,7 +86,7 @@ static DEVICE_START( tms5110 )
 	static const tms5110_interface dummy = { 0 };
 	tms5110_state *info = get_safe_token(device);
 
-	info->intf = device->static_config ? device->static_config : &dummy;
+	info->intf = device->static_config ? (const tms5110_interface *)device->static_config : &dummy;
 	info->table = device->region;
 
 	info->chip = tms5110_create(device, TMS5110_IS_5110A);
@@ -250,7 +250,7 @@ int tms5110_ready_r(const device_config *device)
 
 static STREAM_UPDATE( tms5110_update )
 {
-	tms5110_state *info = param;
+	tms5110_state *info = (tms5110_state *)param;
 	INT16 sample_data[MAX_SAMPLE_CHUNK];
 	stream_sample_t *buffer = outputs[0];
 

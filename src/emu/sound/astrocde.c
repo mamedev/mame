@@ -89,7 +89,7 @@ INLINE astrocade_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( astrocade_update )
 {
-	astrocade_state *chip = param;
+	astrocade_state *chip = (astrocade_state *)param;
 	stream_sample_t *dest = outputs[0];
 	UINT16 noise_state;
 	UINT8 master_count;

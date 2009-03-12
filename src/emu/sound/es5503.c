@@ -143,7 +143,7 @@ static void es5503_halt_osc(ES5503Chip *chip, int onum, int type, UINT32 *accumu
 
 static TIMER_CALLBACK( es5503_timer_cb )
 {
-	ES5503Osc *osc = ptr;
+	ES5503Osc *osc = (ES5503Osc *)ptr;
 	ES5503Chip *chip = (ES5503Chip *)osc->chip;
 
 	stream_update(chip->stream);
@@ -155,7 +155,7 @@ static STREAM_UPDATE( es5503_pcm_update )
 	INT32 *mixp;
 	int osc, snum, i;
 	UINT32 ramptr;
-	ES5503Chip *chip = param;
+	ES5503Chip *chip = (ES5503Chip *)param;
 
 	memset(mix, 0, sizeof(mix));
 
@@ -238,7 +238,7 @@ static DEVICE_START( es5503 )
 	int osc;
 	ES5503Chip *chip = get_safe_token(device);
 
-	intf = device->static_config;
+	intf = (const es5503_interface *)device->static_config;
 
 	chip->irq_callback = intf->irq_callback;
 	chip->adc_read = intf->adc_read;

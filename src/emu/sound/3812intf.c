@@ -48,24 +48,24 @@ INLINE ym3812_state *get_safe_token(const device_config *device)
 
 static void IRQHandler(void *param,int irq)
 {
-	ym3812_state *info = param;
+	ym3812_state *info = (ym3812_state *)param;
 	if (info->intf->handler) (info->intf->handler)(info->device, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static TIMER_CALLBACK( timer_callback_0 )
 {
-	ym3812_state *info = ptr;
+	ym3812_state *info = (ym3812_state *)param;
 	ym3812_timer_over(info->chip,0);
 }
 
 static TIMER_CALLBACK( timer_callback_1 )
 {
-	ym3812_state *info = ptr;
+	ym3812_state *info = (ym3812_state *)param;
 	ym3812_timer_over(info->chip,1);
 }
 
 static void TimerHandler(void *param,int c,attotime period)
 {
-	ym3812_state *info = param;
+	ym3812_state *info = (ym3812_state *)param;
 	if( attotime_compare(period, attotime_zero) == 0 )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[c], 0);
@@ -79,13 +79,13 @@ static void TimerHandler(void *param,int c,attotime period)
 
 static STREAM_UPDATE( ym3812_stream_update )
 {
-	ym3812_state *info = param;
+	ym3812_state *info = (ym3812_state *)param;
 	ym3812_update_one(info->chip, outputs[0], samples);
 }
 
 static void _stream_update(void * param, int interval)
 {
-	ym3812_state *info = param;
+	ym3812_state *info = (ym3812_state *)param;
 	stream_update(info->stream);
 }
 
@@ -96,7 +96,7 @@ static DEVICE_START( ym3812 )
 	ym3812_state *info = get_safe_token(device);
 	int rate = device->clock/72;
 
-	info->intf = device->static_config ? device->static_config : &dummy;
+	info->intf = device->static_config ? (const ym3812_interface *)device->static_config : &dummy;
 	info->device = device;
 
 	/* stream system initialize */

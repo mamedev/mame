@@ -114,7 +114,7 @@ INLINE x1_010_state *get_safe_token(const device_config *device)
 --------------------------------------------------------------*/
 static STREAM_UPDATE( seta_update )
 {
-	x1_010_state *info = param;
+	x1_010_state *info = (x1_010_state *)param;
 	X1_010_CHANNEL	*reg;
 	int		ch, i, volL, volR, freq;
 	register INT8	*start, *end, data;
@@ -204,8 +204,8 @@ static STREAM_UPDATE( seta_update )
 static DEVICE_START( x1_010 )
 {
 	int i;
-	const x1_010_interface *intf = device->static_config;
-	x1_010_state *info = device->token;
+	const x1_010_interface *intf = (const x1_010_interface *)device->static_config;
+	x1_010_state *info = get_safe_token(device);
 
 	info->region		= device->region;
 	info->base_clock	= device->clock;

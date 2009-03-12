@@ -59,7 +59,7 @@ INLINE namco_63701x *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( namco_63701x_update )
 {
-	namco_63701x *chip = param;
+	namco_63701x *chip = (namco_63701x *)param;
 	int ch;
 
 	for (ch = 0;ch < 2;ch++)

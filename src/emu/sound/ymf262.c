@@ -1181,9 +1181,9 @@ static int init_tables(void)
 		/* we never reach zero here due to ((i*2)+1) */
 
 		if (m>0.0)
-			o = 8*log(1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(1.0/m)/log(2.0);	/* convert to 'decibels' */
 		else
-			o = 8*log(-1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(-1.0/m)/log(2.0);	/* convert to 'decibels' */
 
 		o = o / (ENV_STEP/4);
 
@@ -2469,16 +2469,16 @@ void * ymf262_init(const device_config *device, int clock, int rate)
 
 void ymf262_shutdown(void *chip)
 {
-	OPL3Destroy(chip);
+	OPL3Destroy((OPL3 *)chip);
 }
 void ymf262_reset_chip(void *chip)
 {
-	OPL3ResetChip(chip);
+	OPL3ResetChip((OPL3 *)chip);
 }
 
 int ymf262_write(void *chip, int a, int v)
 {
-	return OPL3Write(chip, a, v);
+	return OPL3Write((OPL3 *)chip, a, v);
 }
 
 unsigned char ymf262_read(void *chip, int a)
@@ -2492,24 +2492,24 @@ unsigned char ymf262_read(void *chip, int a)
 
 	/* YMF278(OPL4) returns bit2 in LOW and bit1 in HIGH state ??? info from manual - not verified */
 
-	return OPL3Read(chip, a);
+	return OPL3Read((OPL3 *)chip, a);
 }
 int ymf262_timer_over(void *chip, int c)
 {
-	return OPL3TimerOver(chip, c);
+	return OPL3TimerOver((OPL3 *)chip, c);
 }
 
 void ymf262_set_timer_handler(void *chip, OPL3_TIMERHANDLER timer_handler, void *param)
 {
-	OPL3SetTimerHandler(chip, timer_handler, param);
+	OPL3SetTimerHandler((OPL3 *)chip, timer_handler, param);
 }
 void ymf262_set_irq_handler(void *chip,OPL3_IRQHANDLER IRQHandler,void *param)
 {
-	OPL3SetIRQHandler(chip, IRQHandler, param);
+	OPL3SetIRQHandler((OPL3 *)chip, IRQHandler, param);
 }
 void ymf262_set_update_handler(void *chip,OPL3_UPDATEHANDLER UpdateHandler,void *param)
 {
-	OPL3SetUpdateHandler(chip, UpdateHandler, param);
+	OPL3SetUpdateHandler((OPL3 *)chip, UpdateHandler, param);
 }
 
 
@@ -2522,7 +2522,7 @@ void ymf262_set_update_handler(void *chip,OPL3_UPDATEHANDLER UpdateHandler,void 
 */
 void ymf262_update_one(void *_chip, OPL3SAMPLE **buffers, int length)
 {
-	OPL3		*chip  = _chip;
+	OPL3		*chip  = (OPL3 *)_chip;
 	UINT8		rhythm = chip->rhythm&0x20;
 
 	OPL3SAMPLE	*ch_a = buffers[0];

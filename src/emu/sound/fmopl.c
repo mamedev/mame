@@ -1187,9 +1187,9 @@ static int init_tables(void)
 		/* we never reach zero here due to ((i*2)+1) */
 
 		if (m>0.0)
-			o = 8*log(1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(1.0/m)/log(2.0);	/* convert to 'decibels' */
 		else
-			o = 8*log(-1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(-1.0/m)/log(2.0);	/* convert to 'decibels' */
 
 		o = o / (ENV_STEP/4);
 
@@ -1978,7 +1978,7 @@ static FM_OPL *OPLCreate(const device_config *device, UINT32 clock, UINT32 rate,
 #endif
 
 	/* allocate memory block */
-	ptr = malloc(state_size);
+	ptr = (char *)malloc(state_size);
 
 	if (ptr==NULL)
 		return NULL;
@@ -2169,48 +2169,48 @@ void * ym3812_init(const device_config *device, UINT32 clock, UINT32 rate)
 
 void ym3812_shutdown(void *chip)
 {
-	FM_OPL *YM3812 = chip;
+	FM_OPL *YM3812 = (FM_OPL *)chip;
 
 	/* emulator shutdown */
 	OPLDestroy(YM3812);
 }
 void ym3812_reset_chip(void *chip)
 {
-	FM_OPL *YM3812 = chip;
+	FM_OPL *YM3812 = (FM_OPL *)chip;
 	OPLResetChip(YM3812);
 }
 
 int ym3812_write(void *chip, int a, int v)
 {
-	FM_OPL *YM3812 = chip;
+	FM_OPL *YM3812 = (FM_OPL *)chip;
 	return OPLWrite(YM3812, a, v);
 }
 
 unsigned char ym3812_read(void *chip, int a)
 {
-	FM_OPL *YM3812 = chip;
+	FM_OPL *YM3812 = (FM_OPL *)chip;
 	/* YM3812 always returns bit2 and bit1 in HIGH state */
 	return OPLRead(YM3812, a) | 0x06 ;
 }
 int ym3812_timer_over(void *chip, int c)
 {
-	FM_OPL *YM3812 = chip;
+	FM_OPL *YM3812 = (FM_OPL *)chip;
 	return OPLTimerOver(YM3812, c);
 }
 
 void ym3812_set_timer_handler(void *chip, OPL_TIMERHANDLER timer_handler, void *param)
 {
-	FM_OPL *YM3812 = chip;
+	FM_OPL *YM3812 = (FM_OPL *)chip;
 	OPLSetTimerHandler(YM3812, timer_handler, param);
 }
 void ym3812_set_irq_handler(void *chip,OPL_IRQHANDLER IRQHandler,void *param)
 {
-	FM_OPL *YM3812 = chip;
+	FM_OPL *YM3812 = (FM_OPL *)chip;
 	OPLSetIRQHandler(YM3812, IRQHandler, param);
 }
 void ym3812_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,void *param)
 {
-	FM_OPL *YM3812 = chip;
+	FM_OPL *YM3812 = (FM_OPL *)chip;
 	OPLSetUpdateHandler(YM3812, UpdateHandler, param);
 }
 
@@ -2224,7 +2224,7 @@ void ym3812_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,void *
 */
 void ym3812_update_one(void *chip, OPLSAMPLE *buffer, int length)
 {
-	FM_OPL		*OPL = chip;
+	FM_OPL		*OPL = (FM_OPL *)chip;
 	UINT8		rhythm = OPL->rhythm&0x20;
 	OPLSAMPLE	*buf = buffer;
 	int i;
@@ -2305,47 +2305,47 @@ void *ym3526_init(const device_config *device, UINT32 clock, UINT32 rate)
 
 void ym3526_shutdown(void *chip)
 {
-	FM_OPL *YM3526 = chip;
+	FM_OPL *YM3526 = (FM_OPL *)chip;
 	/* emulator shutdown */
 	OPLDestroy(YM3526);
 }
 void ym3526_reset_chip(void *chip)
 {
-	FM_OPL *YM3526 = chip;
+	FM_OPL *YM3526 = (FM_OPL *)chip;
 	OPLResetChip(YM3526);
 }
 
 int ym3526_write(void *chip, int a, int v)
 {
-	FM_OPL *YM3526 = chip;
+	FM_OPL *YM3526 = (FM_OPL *)chip;
 	return OPLWrite(YM3526, a, v);
 }
 
 unsigned char ym3526_read(void *chip, int a)
 {
-	FM_OPL *YM3526 = chip;
+	FM_OPL *YM3526 = (FM_OPL *)chip;
 	/* YM3526 always returns bit2 and bit1 in HIGH state */
 	return OPLRead(YM3526, a) | 0x06 ;
 }
 int ym3526_timer_over(void *chip, int c)
 {
-	FM_OPL *YM3526 = chip;
+	FM_OPL *YM3526 = (FM_OPL *)chip;
 	return OPLTimerOver(YM3526, c);
 }
 
 void ym3526_set_timer_handler(void *chip, OPL_TIMERHANDLER timer_handler, void *param)
 {
-	FM_OPL *YM3526 = chip;
+	FM_OPL *YM3526 = (FM_OPL *)chip;
 	OPLSetTimerHandler(YM3526, timer_handler, param);
 }
 void ym3526_set_irq_handler(void *chip,OPL_IRQHANDLER IRQHandler,void *param)
 {
-	FM_OPL *YM3526 = chip;
+	FM_OPL *YM3526 = (FM_OPL *)chip;
 	OPLSetIRQHandler(YM3526, IRQHandler, param);
 }
 void ym3526_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,void *param)
 {
-	FM_OPL *YM3526 = chip;
+	FM_OPL *YM3526 = (FM_OPL *)chip;
 	OPLSetUpdateHandler(YM3526, UpdateHandler, param);
 }
 
@@ -2359,7 +2359,7 @@ void ym3526_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,void *
 */
 void ym3526_update_one(void *chip, OPLSAMPLE *buffer, int length)
 {
-	FM_OPL		*OPL = chip;
+	FM_OPL		*OPL = (FM_OPL *)chip;
 	UINT8		rhythm = OPL->rhythm&0x20;
 	OPLSAMPLE	*buf = buffer;
 	int i;
@@ -2429,12 +2429,12 @@ void ym3526_update_one(void *chip, OPLSAMPLE *buffer, int length)
 
 static void Y8950_deltat_status_set(void *chip, UINT8 changebits)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	OPL_STATUS_SET(Y8950, changebits);
 }
 static void Y8950_deltat_status_reset(void *chip, UINT8 changebits)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	OPL_STATUS_RESET(Y8950, changebits);
 }
 
@@ -2462,52 +2462,52 @@ void *y8950_init(const device_config *device, UINT32 clock, UINT32 rate)
 
 void y8950_shutdown(void *chip)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	/* emulator shutdown */
 	OPLDestroy(Y8950);
 }
 void y8950_reset_chip(void *chip)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	OPLResetChip(Y8950);
 }
 
 int y8950_write(void *chip, int a, int v)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	return OPLWrite(Y8950, a, v);
 }
 
 unsigned char y8950_read(void *chip, int a)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	return OPLRead(Y8950, a);
 }
 int y8950_timer_over(void *chip, int c)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	return OPLTimerOver(Y8950, c);
 }
 
 void y8950_set_timer_handler(void *chip, OPL_TIMERHANDLER timer_handler, void *param)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	OPLSetTimerHandler(Y8950, timer_handler, param);
 }
 void y8950_set_irq_handler(void *chip,OPL_IRQHANDLER IRQHandler,void *param)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	OPLSetIRQHandler(Y8950, IRQHandler, param);
 }
 void y8950_set_update_handler(void *chip,OPL_UPDATEHANDLER UpdateHandler,void *param)
 {
-	FM_OPL *Y8950 = chip;
+	FM_OPL *Y8950 = (FM_OPL *)chip;
 	OPLSetUpdateHandler(Y8950, UpdateHandler, param);
 }
 
 void y8950_set_delta_t_memory(void *chip, void * deltat_mem_ptr, int deltat_mem_size )
 {
-	FM_OPL		*OPL = chip;
+	FM_OPL		*OPL = (FM_OPL *)chip;
 	OPL->deltat->memory = (UINT8 *)(deltat_mem_ptr);
 	OPL->deltat->memory_size = deltat_mem_size;
 }
@@ -2522,7 +2522,7 @@ void y8950_set_delta_t_memory(void *chip, void * deltat_mem_ptr, int deltat_mem_
 void y8950_update_one(void *chip, OPLSAMPLE *buffer, int length)
 {
 	int i;
-	FM_OPL		*OPL = chip;
+	FM_OPL		*OPL = (FM_OPL *)chip;
 	UINT8		rhythm  = OPL->rhythm&0x20;
 	YM_DELTAT	*DELTAT = OPL->deltat;
 	OPLSAMPLE	*buf    = buffer;
@@ -2592,7 +2592,7 @@ void y8950_update_one(void *chip, OPLSAMPLE *buffer, int length)
 
 void y8950_set_port_handler(void *chip,OPL_PORTHANDLER_W PortHandler_w,OPL_PORTHANDLER_R PortHandler_r,void * param)
 {
-	FM_OPL		*OPL = chip;
+	FM_OPL		*OPL = (FM_OPL *)chip;
 	OPL->porthandler_w = PortHandler_w;
 	OPL->porthandler_r = PortHandler_r;
 	OPL->port_param = param;
@@ -2600,7 +2600,7 @@ void y8950_set_port_handler(void *chip,OPL_PORTHANDLER_W PortHandler_w,OPL_PORTH
 
 void y8950_set_keyboard_handler(void *chip,OPL_PORTHANDLER_W KeyboardHandler_w,OPL_PORTHANDLER_R KeyboardHandler_r,void * param)
 {
-	FM_OPL		*OPL = chip;
+	FM_OPL		*OPL = (FM_OPL *)chip;
 	OPL->keyboardhandler_w = KeyboardHandler_w;
 	OPL->keyboardhandler_r = KeyboardHandler_r;
 	OPL->keyboard_param = param;

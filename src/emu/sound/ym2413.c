@@ -1198,9 +1198,9 @@ static int init_tables(void)
 		/* we never reach zero here due to ((i*2)+1) */
 
 		if (m>0.0)
-			o = 8*log(1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(1.0/m)/log(2.0);	/* convert to 'decibels' */
 		else
-			o = 8*log(-1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(-1.0/m)/log(2.0);	/* convert to 'decibels' */
 
 		o = o / (ENV_STEP/4);
 
@@ -2012,7 +2012,7 @@ static YM2413 *OPLLCreate(const device_config *device, int clock, int rate)
 	state_size  = sizeof(YM2413);
 
 	/* allocate memory block */
-	ptr = malloc(state_size);
+	ptr = (char *)malloc(state_size);
 
 	if (ptr==NULL)
 		return NULL;
@@ -2084,7 +2084,7 @@ void * ym2413_init(const device_config *device, int clock, int rate)
 
 void ym2413_shutdown(void *chip)
 {
-	YM2413 *OPLL = chip;
+	YM2413 *OPLL = (YM2413 *)chip;
 
 	/* emulator shutdown */
 	OPLLDestroy(OPLL);
@@ -2092,25 +2092,25 @@ void ym2413_shutdown(void *chip)
 
 void ym2413_reset_chip(void *chip)
 {
-	YM2413 *OPLL = chip;
+	YM2413 *OPLL = (YM2413 *)chip;
 	OPLLResetChip(OPLL);
 }
 
 void ym2413_write(void *chip, int a, int v)
 {
-	YM2413 *OPLL = chip;
+	YM2413 *OPLL = (YM2413 *)chip;
 	OPLLWrite(OPLL, a, v);
 }
 
 unsigned char ym2413_read(void *chip, int a)
 {
-	YM2413 *OPLL = chip;
+	YM2413 *OPLL = (YM2413 *)chip;
 	return OPLLRead(OPLL, a) & 0x03 ;
 }
 
 void ym2413_set_update_handler(void *chip,OPLL_UPDATEHANDLER UpdateHandler,void *param)
 {
-	YM2413 *OPLL = chip;
+	YM2413 *OPLL = (YM2413 *)chip;
 	OPLLSetUpdateHandler(OPLL, UpdateHandler, param);
 }
 
@@ -2124,7 +2124,7 @@ void ym2413_set_update_handler(void *chip,OPLL_UPDATEHANDLER UpdateHandler,void 
 */
 void ym2413_update_one(void *_chip, SAMP **buffers, int length)
 {
-	YM2413		*chip  = _chip;
+	YM2413		*chip  = (YM2413 *)_chip;
 	UINT8		rhythm = chip->rhythm&0x20;
 	SAMP		*bufMO = buffers[0];
 	SAMP		*bufRO = buffers[1];

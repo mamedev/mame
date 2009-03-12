@@ -203,7 +203,7 @@ INLINE void update_volumes(struct YMZ280BVoice *voice)
 
 static STATE_POSTLOAD( YMZ280B_state_save_update_step )
 {
-	ymz280b_state *chip = param;
+	ymz280b_state *chip = (ymz280b_state *)param;
 	int j;
 	for (j = 0; j < 8; j++)
 	{
@@ -217,7 +217,7 @@ static STATE_POSTLOAD( YMZ280B_state_save_update_step )
 
 static void update_irq_state_timer_common(void *param, int voicenum)
 {
-	ymz280b_state *chip = param;
+	ymz280b_state *chip = (ymz280b_state *)param;
 	struct YMZ280BVoice *voice = &chip->voice[voicenum];
 
 	if(!voice->irq_schedule) return;
@@ -500,7 +500,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, INT16 *buffer
 
 static STREAM_UPDATE( ymz280b_update )
 {
-	ymz280b_state *chip = param;
+	ymz280b_state *chip = (ymz280b_state *)param;
 	stream_sample_t *lacc = outputs[0];
 	stream_sample_t *racc = outputs[1];
 	int v;
@@ -640,7 +640,7 @@ static STREAM_UPDATE( ymz280b_update )
 static DEVICE_START( ymz280b )
 {
 	static const ymz280b_interface defintrf = { 0 };
-	const ymz280b_interface *intf = (device->static_config != NULL) ? device->static_config : &defintrf;
+	const ymz280b_interface *intf = (device->static_config != NULL) ? (const ymz280b_interface *)device->static_config : &defintrf;
 	ymz280b_state *chip = get_safe_token(device);
 
 	chip->device = device;
@@ -659,7 +659,7 @@ static DEVICE_START( ymz280b )
 	chip->stream = stream_create(device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
 
 	/* allocate memory */
-	chip->scratch = auto_malloc(sizeof(chip->scratch[0]) * MAX_SAMPLE_CHUNK);
+	chip->scratch = (INT16 *)auto_malloc(sizeof(chip->scratch[0]) * MAX_SAMPLE_CHUNK);
 
 	/* state save */
 	{

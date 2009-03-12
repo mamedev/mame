@@ -49,7 +49,7 @@ READ8_DEVICE_HANDLER(discrete_sound_r)
 	/* Read the node input value if allowed */
 	if (node)
 	{
-		UINT8 *node_data = node->context;
+		UINT8 *node_data = (UINT8 *)node->context;
 
 		/* Bring the system up to now */
 		stream_update(info->discrete_stream);
@@ -73,7 +73,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 	/* Update the node input value if it's a proper input node */
 	if (node)
 	{
-		UINT8 *node_data = node->context;
+		UINT8 *node_data = (UINT8 *)node->context;
 		UINT8 last_data  = *node_data;
 		UINT8 new_data    = 0;
 
@@ -129,7 +129,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 static DISCRETE_STEP(dss_adjustment)
 {
-	struct dss_adjustment_context *context = node->context;
+	struct dss_adjustment_context *context = (struct dss_adjustment_context *)node->context;
 
 	INT32  rawportval = input_port_read_direct(context->port);
 
@@ -149,13 +149,13 @@ static DISCRETE_STEP(dss_adjustment)
 
 static DISCRETE_RESET(dss_adjustment)
 {
-	struct dss_adjustment_context *context = node->context;
+	struct dss_adjustment_context *context = (struct dss_adjustment_context *)node->context;
 
 	double min, max;
 
 	if (node->custom)
 	{
-		context->port = input_port_by_tag(device->machine->portconfig, node->custom);
+		context->port = input_port_by_tag(device->machine->portconfig, (const char *)node->custom);
 		if (context->port == NULL)
 			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", node->node-NODE_00);
 	}
@@ -214,7 +214,7 @@ static DISCRETE_RESET(dss_constant)
  ************************************************************************/
 static DISCRETE_RESET(dss_input)
 {
-	UINT8 *node_data = node->context;
+	UINT8 *node_data = (UINT8 *)node->context;
 
 	switch (node->module.type)
 	{
@@ -234,7 +234,7 @@ static DISCRETE_RESET(dss_input)
 
 static DISCRETE_STEP(dss_input_pulse)
 {
-	UINT8 *node_data = node->context;
+	UINT8 *node_data = (UINT8 *)node->context;
 
 	/* Set a valid output */
 	node->output[0] = *node_data;
@@ -260,7 +260,7 @@ static DISCRETE_STEP(dss_input_pulse)
 static DISCRETE_STEP(dss_input_stream)
 {
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
-	stream_sample_t **ptr = node->context;
+	stream_sample_t **ptr = (stream_sample_t **)node->context;
 	stream_sample_t *data = *ptr;
 
 	node->output[0] = data ? (*data) * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET : 0;

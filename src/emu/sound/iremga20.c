@@ -69,7 +69,7 @@ INLINE ga20_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( IremGA20_update )
 {
-	ga20_state *chip = param;
+	ga20_state *chip = (ga20_state *)param;
 	UINT32 rate[4], pos[4], frac[4], end[4], vol[4], play[4];
 	UINT8 *pSamples;
 	stream_sample_t *outL, *outR;

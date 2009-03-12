@@ -337,7 +337,7 @@ static void c352_mix_one_channel(c352_state *info, unsigned long ch, long sample
 
 static STREAM_UPDATE( c352_update )
 {
-	c352_state *info = param;
+	c352_state *info = (c352_state *)param;
 	int i, j;
 	stream_sample_t *bufferl = outputs[0];
 	stream_sample_t *bufferr = outputs[1];

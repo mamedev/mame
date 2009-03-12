@@ -139,7 +139,7 @@ static void build_decoded_waveform(namco_sound *chip, UINT8 *rgnbase)
 		size = 32 * 8;		/* 32 samples, 8 waveforms */
 	}
 
-	p = auto_malloc(size * MAX_VOLUME * sizeof (INT16));
+	p = (INT16 *)auto_malloc(size * MAX_VOLUME * sizeof (INT16));
 
 	for (v = 0; v < MAX_VOLUME; v++)
 	{
@@ -172,7 +172,7 @@ INLINE UINT32 namco_update_one(namco_sound *chip, stream_sample_t *buffer, int l
 /* generate sound to the mix buffer in mono */
 static STREAM_UPDATE( namco_update_mono )
 {
-	namco_sound *chip = param;
+	namco_sound *chip = (namco_sound *)param;
 	stream_sample_t *buffer = outputs[0];
 	sound_channel *voice;
 
@@ -255,7 +255,7 @@ static STREAM_UPDATE( namco_update_mono )
 /* generate sound to the mix buffer in stereo */
 static STREAM_UPDATE( namco_update_stereo )
 {
-	namco_sound *chip = param;
+	namco_sound *chip = (namco_sound *)param;
 	sound_channel *voice;
 
 	/* zap the contents of the buffers */
@@ -366,7 +366,7 @@ static STREAM_UPDATE( namco_update_stereo )
 static DEVICE_START( namco )
 {
 	sound_channel *voice;
-	const namco_interface *intf = device->static_config;
+	const namco_interface *intf = (const namco_interface *)device->static_config;
 	int clock_multiple;
 	namco_sound *chip = get_safe_token(device);
 
@@ -701,7 +701,7 @@ WRITE8_DEVICE_HANDLER( namco_15xx_w )
 
 static WRITE8_DEVICE_HANDLER( namcos1_sound_w )
 {
-	namco_sound *chip = device->token;
+	namco_sound *chip = get_safe_token(device);
 	sound_channel *voice;
 	int ch;
 	int nssw;

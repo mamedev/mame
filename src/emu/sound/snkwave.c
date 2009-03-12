@@ -65,7 +65,7 @@ static void update_waveform(snkwave_state *chip, unsigned int offset, UINT8 data
 /* generate sound to the mix buffer */
 static STREAM_UPDATE( snkwave_update )
 {
-	snkwave_state *chip = param;
+	snkwave_state *chip = (snkwave_state *)param;
 	stream_sample_t *buffer = outputs[0];
 
 	/* zap the contents of the buffer */

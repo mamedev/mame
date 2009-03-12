@@ -58,6 +58,14 @@ CHANNEL_DEBUG enables the following keys:
    rendering instead of sample-based.
 */
 
+typedef struct _k054539_channel k054539_channel;
+struct _k054539_channel {
+	UINT32 pos;
+	UINT32 pfrac;
+	INT32 val;
+	INT32 pval;
+};
+
 typedef struct _k054539_state k054539_state;
 struct _k054539_state {
 	const k054539_interface *intf;
@@ -81,12 +89,7 @@ struct _k054539_state {
 	UINT32 rom_mask;
 	sound_stream * stream;
 
-	struct k054539_channel {
-		UINT32 pos;
-		UINT32 pfrac;
-		INT32 val;
-		INT32 pval;
-	} channels[8];
+	k054539_channel channels[8];
 };
 
 INLINE k054539_state *get_safe_token(const device_config *device)
@@ -132,7 +135,7 @@ static void k054539_keyoff(k054539_state *info, int channel)
 
 static STREAM_UPDATE( k054539_update )
 {
-	k054539_state *info = param;
+	k054539_state *info = (k054539_state *)param;
 #define VOL_CAP 1.80
 
 	static const INT16 dpcm[16] = {
@@ -146,7 +149,7 @@ static STREAM_UPDATE( k054539_update )
 	UINT32 rom_mask;
 
 	unsigned char *base1, *base2;
-	struct k054539_channel *chan;
+	k054539_channel *chan;
 	stream_sample_t *bufl, *bufr;
 	int cur_pos, cur_pfrac, cur_val, cur_pval;
 	int delta, rdelta, fdelta, pdelta;
@@ -438,7 +441,7 @@ else
 
 static TIMER_CALLBACK( k054539_irq )
 {
-	k054539_state *info = ptr;
+	k054539_state *info = (k054539_state *)ptr;
 	if(info->regs[0x22f] & 0x20)
 		info->intf->irq(info->device);
 }
@@ -452,7 +455,7 @@ static void k054539_init_chip(const device_config *device, k054539_state *info)
 	info->k054539_flags |= K054539_UPDATE_AT_KEYON; //* make it default until proven otherwise
 
 	// Real size of 0x4000, the addon is to simplify the reverb buffer computations
-	info->ram = auto_malloc(0x4000*2+device->clock/50*2);
+	info->ram = (unsigned char *)auto_malloc(0x4000*2+device->clock/50*2);
 	info->reverb_pos = 0;
 	info->cur_ptr = 0;
 	memset(info->ram, 0, 0x4000*2+device->clock/50*2);
@@ -611,7 +614,7 @@ WRITE8_DEVICE_HANDLER( k054539_w )
 
 static STATE_POSTLOAD( reset_zones )
 {
-	k054539_state *info = param;
+	k054539_state *info = (k054539_state *)param;
 	int data = info->regs[0x22e];
 	info->cur_zone =
 		data == 0x80 ? info->ram :
@@ -653,7 +656,7 @@ static DEVICE_START( k054539 )
 		info->k054539_gain[i] = 1.0;
 	info->k054539_flags = K054539_RESET_FLAGS;
 
-	info->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
+	info->intf = (device->static_config != NULL) ? (const k054539_interface *)device->static_config : &defintrf;
 
 	/*
         I've tried various equations on volume control but none worked consistently.
@@ -675,7 +678,7 @@ static DEVICE_START( k054539 )
 	// Formula is such that pan[i]**2+pan[0xe-i]**2 = 1 (constant output power)
 	// and pan[0xe] = 1 (full panning)
 	for(i=0; i<0xf; i++)
-		info->pantab[i] = sqrt(i) / sqrt(0xe);
+		info->pantab[i] = sqrt((double)i) / sqrt((double)0xe);
 
 	k054539_init_chip(device, info);
 

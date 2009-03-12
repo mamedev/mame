@@ -59,7 +59,7 @@ static DEVICE_START( tms5220 )
 	static const tms5220_interface dummy = { 0 };
 	tms5220_state *info = get_safe_token(device);
 
-	info->intf = device->static_config ? device->static_config : &dummy;
+	info->intf = device->static_config ? (const tms5220_interface *)device->static_config : &dummy;
 
 	info->chip = tms5220_create(device);
 	assert_always(info->chip != NULL, "Error creating TMS5220 chip");
@@ -203,7 +203,7 @@ int tms5220_int_r(const device_config *device)
 
 static STREAM_UPDATE( tms5220_update )
 {
-	tms5220_state *info = param;
+	tms5220_state *info = (tms5220_state *)param;
 	INT16 sample_data[MAX_SAMPLE_CHUNK];
 	stream_sample_t *buffer = outputs[0];
 

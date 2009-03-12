@@ -41,25 +41,25 @@ INLINE ym2610_state *get_safe_token(const device_config *device)
 
 static void psg_set_clock(void *param, int clock)
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	ay8910_set_clock_ym(info->psg, clock);
 }
 
 static void psg_write(void *param, int address, int data)
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	ay8910_write_ym(info->psg, address, data);
 }
 
 static int psg_read(void *param)
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	return ay8910_read_ym(info->psg);
 }
 
 static void psg_reset(void *param)
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	ay8910_reset_ym(info->psg);
 }
 
@@ -75,26 +75,26 @@ static const ssg_callbacks psgintf =
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	if(info->intf->handler) info->intf->handler(info->device, irq);
 }
 
 /* Timer overflow callback from timer.c */
 static TIMER_CALLBACK( timer_callback_0 )
 {
-	ym2610_state *info = ptr;
+	ym2610_state *info = (ym2610_state *)ptr;
 	ym2610_timer_over(info->chip,0);
 }
 
 static TIMER_CALLBACK( timer_callback_1 )
 {
-	ym2610_state *info = ptr;
+	ym2610_state *info = (ym2610_state *)ptr;
 	ym2610_timer_over(info->chip,1);
 }
 
 static void timer_handler(void *param,int c,int count,int clock)
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	if( count == 0 )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[c], 0);
@@ -111,27 +111,27 @@ static void timer_handler(void *param,int c,int count,int clock)
 /* update request from fm.c */
 void ym2610_update_request(void *param)
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	stream_update(info->stream);
 }
 
 
 static STREAM_UPDATE( ym2610_stream_update )
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	ym2610_update_one(info->chip, outputs, samples);
 }
 
 static STREAM_UPDATE( ym2610b_stream_update )
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	ym2610b_update_one(info->chip, outputs, samples);
 }
 
 
 static STATE_POSTLOAD( ym2610_intf_postload )
 {
-	ym2610_state *info = param;
+	ym2610_state *info = (ym2610_state *)param;
 	ym2610_postload(info->chip);
 }
 
@@ -145,7 +145,7 @@ static DEVICE_START( ym2610 )
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ym2610_interface *intf = device->static_config ? device->static_config : &generic_2610;
+	const ym2610_interface *intf = device->static_config ? (const ym2610_interface *)device->static_config : &generic_2610;
 	int rate = device->clock/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;

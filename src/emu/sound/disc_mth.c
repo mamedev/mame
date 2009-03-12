@@ -205,7 +205,7 @@ static DISCRETE_STEP(dst_adder)
 
 static DISCRETE_STEP(dst_comp_adder)
 {
-	struct dst_comp_adder_context    *context = node->context;
+	struct dst_comp_adder_context    *context = (struct dst_comp_adder_context *)node->context;
 	int select;
 
 	select = (int)DST_COMP_ADDER__SELECT;
@@ -215,8 +215,8 @@ static DISCRETE_STEP(dst_comp_adder)
 
 static DISCRETE_RESET(dst_comp_adder)
 {
-	const  discrete_comp_adder_table *info = node->custom;
-	struct dst_comp_adder_context    *context = node->context;
+	const  discrete_comp_adder_table *info = (const  discrete_comp_adder_table *)node->custom;
+	struct dst_comp_adder_context    *context = (struct dst_comp_adder_context *)node->context;
 
 	int i, bit;
 	int length = 1 << info->length;
@@ -298,8 +298,8 @@ static DISCRETE_STEP(dst_clamp)
 
 static DISCRETE_STEP(dst_dac_r1)
 {
-	const  discrete_dac_r1_ladder *info    = node->custom;
-	struct dst_dac_r1_context     *context = node->context;
+	const  discrete_dac_r1_ladder *info    = (const  discrete_dac_r1_ladder *)node->custom;
+	struct dst_dac_r1_context     *context = (struct dst_dac_r1_context *)node->context;
 
 	int		bit, bit_val, data;
 	double	v, i_bit, i_total, x_time;
@@ -355,8 +355,8 @@ static DISCRETE_STEP(dst_dac_r1)
 
 static DISCRETE_RESET(dst_dac_r1)
 {
-	const discrete_dac_r1_ladder *info = node->custom;
-	struct dst_dac_r1_context *context = node->context;
+	const discrete_dac_r1_ladder *info = (const discrete_dac_r1_ladder *)node->custom;
+	struct dst_dac_r1_context *context = (struct dst_dac_r1_context *)node->context;
 
 	int	bit;
 
@@ -420,7 +420,7 @@ static DISCRETE_RESET(dst_dac_r1)
 
 static DISCRETE_STEP(dst_diode_mix)
 {
-	struct	dst_diode_mix__context *context = node->context;
+	struct	dst_diode_mix__context *context = (struct	dst_diode_mix__context *)node->context;
 
 	double	val, max = 0;
 	int		addr;
@@ -436,8 +436,8 @@ static DISCRETE_STEP(dst_diode_mix)
 
 static DISCRETE_RESET(dst_diode_mix)
 {
-	const  double *info = node->custom;
-	struct dst_diode_mix__context *context = node->context;
+	const  double *info = (const  double *)node->custom;
+	struct dst_diode_mix__context *context = (struct dst_diode_mix__context *)node->context;
 
 	int		addr;
 
@@ -574,8 +574,8 @@ static int dst_trigger_function(int trig0, int trig1, int trig2, int function)
 
 static DISCRETE_STEP(dst_integrate)
 {
-	const  discrete_integrate_info *info    = node->custom;
-	struct dst_integrate_context   *context = node->context;
+	const  discrete_integrate_info *info    = (const  discrete_integrate_info *)node->custom;
+	struct dst_integrate_context   *context = (struct dst_integrate_context *)node->context;
 
 	int		trig0, trig1;
 	double	i_neg = 0;	/* current into - input */
@@ -619,8 +619,8 @@ static DISCRETE_STEP(dst_integrate)
 
 static DISCRETE_RESET(dst_integrate)
 {
-	const discrete_integrate_info *info = node->custom;
-	struct dst_integrate_context *context = node->context;
+	const discrete_integrate_info *info = (const discrete_integrate_info *)node->custom;
+	struct dst_integrate_context *context = (struct dst_integrate_context *)node->context;
 	double	i, v;
 
 	if (info->type & DISC_OP_AMP_IS_NORTON)
@@ -851,7 +851,7 @@ static DISCRETE_STEP(dst_logic_nxor)
 
 static DISCRETE_STEP(dst_logic_dff)
 {
-	struct dst_flipflop_context *context = node->context;
+	struct dst_flipflop_context *context = (struct dst_flipflop_context *)node->context;
 
 	int clk = (int)DST_LOGIC_DFF__CLOCK;
 
@@ -873,7 +873,7 @@ static DISCRETE_STEP(dst_logic_dff)
 
 static DISCRETE_RESET(dst_logic_ff)
 {
-	struct dst_flipflop_context *context = node->context;
+	struct dst_flipflop_context *context = (struct dst_flipflop_context *)node->context;
 
 	context->last_clk = 0;
 	node->output[0]   = 0;
@@ -901,7 +901,7 @@ static DISCRETE_RESET(dst_logic_ff)
 
 static DISCRETE_STEP(dst_logic_jkff)
 {
-	struct dst_flipflop_context *context = node->context;
+	struct dst_flipflop_context *context = (struct dst_flipflop_context *)node->context;
 
 	int clk = (int)DST_LOGIC_JKFF__CLOCK;
 	int j   = (int)DST_LOGIC_JKFF__J;
@@ -959,7 +959,7 @@ static DISCRETE_STEP(dst_logic_jkff)
 
 static DISCRETE_STEP(dst_lookup_table)
 {
-	const double *table = node->custom;
+	const double *table = (const double *)node->custom;
 
 	int	addr = DST_LOOKUP_TABLE__IN;
 
@@ -1025,8 +1025,8 @@ static DISCRETE_STEP(dst_lookup_table)
 
 static DISCRETE_STEP(dst_mixer)
 {
-	const  discrete_mixer_desc *info    = node->custom;
-	struct dst_mixer_context   *context = node->context;
+	const  discrete_mixer_desc *info    = (const  discrete_mixer_desc *)node->custom;
+	struct dst_mixer_context   *context = (struct dst_mixer_context *)node->context;
 
 	double	v, vTemp, r_total, rTemp, rTemp2 = 0;
 	double	i = 0;		/* total current of inputs */
@@ -1168,8 +1168,8 @@ static DISCRETE_STEP(dst_mixer)
 
 static DISCRETE_RESET(dst_mixer)
 {
-	const  discrete_mixer_desc *info    = node->custom;
-	struct dst_mixer_context   *context = node->context;
+	const  discrete_mixer_desc *info    = (const  discrete_mixer_desc *)node->custom;
+	struct dst_mixer_context   *context = (struct dst_mixer_context *)node->context;
 	node_description *r_node;
 
 	int		bit;
@@ -1292,7 +1292,7 @@ static DISCRETE_RESET(dst_mixer)
 
 static DISCRETE_STEP(dst_multiplex)
 {
-	struct dst_size_context *context = node->context;
+	struct dst_size_context *context = (struct dst_size_context *)node->context;
 
 	int addr;
 
@@ -1317,7 +1317,7 @@ static DISCRETE_STEP(dst_multiplex)
 
 static DISCRETE_RESET(dst_multiplex)
 {
-	struct dst_size_context *context = node->context;
+	struct dst_size_context *context = (struct dst_size_context *)node->context;
 
 	context->size = node->active_inputs - 2;
 
@@ -1345,7 +1345,7 @@ static DISCRETE_RESET(dst_multiplex)
 
 static DISCRETE_STEP(dst_oneshot)
 {
-	struct dst_oneshot_context *context = node->context;
+	struct dst_oneshot_context *context = (struct dst_oneshot_context *)node->context;
 
 	int trigger = (DST_ONESHOT__TRIG != 0);
 
@@ -1405,7 +1405,7 @@ static DISCRETE_STEP(dst_oneshot)
 
 static DISCRETE_RESET(dst_oneshot)
 {
-	struct dst_oneshot_context *context = node->context;
+	struct dst_oneshot_context *context = (struct dst_oneshot_context *)node->context;
 
 	context->countdown = 0;
 	context->state     = 0;
@@ -1436,7 +1436,7 @@ static DISCRETE_RESET(dst_oneshot)
 
 static DISCRETE_STEP(dst_ramp)
 {
-	struct dss_ramp_context *context = node->context;
+	struct dss_ramp_context *context = (struct dss_ramp_context *)node->context;
 
 	if(DST_RAMP__ENABLE)
 	{
@@ -1463,7 +1463,7 @@ static DISCRETE_STEP(dst_ramp)
 
 static DISCRETE_RESET(dst_ramp)
 {
-	struct dss_ramp_context *context = node->context;
+	struct dss_ramp_context *context = (struct dss_ramp_context *)node->context;
 
 	node->output[0]  = DST_RAMP__CLAMP;
 	context->step    = DST_RAMP__GRAD / discrete_current_context->sample_rate;
@@ -1489,7 +1489,7 @@ static DISCRETE_RESET(dst_ramp)
 
 static DISCRETE_STEP(dst_samphold)
 {
-	struct dst_samphold_context *context = node->context;
+	struct dst_samphold_context *context = (struct dst_samphold_context *)node->context;
 
 	if(DST_SAMPHOLD__ENABLE)
 	{
@@ -1526,7 +1526,7 @@ static DISCRETE_STEP(dst_samphold)
 
 static DISCRETE_RESET(dst_samphold)
 {
-	struct dst_samphold_context *context = node->context;
+	struct dst_samphold_context *context = (struct dst_samphold_context *)node->context;
 
 	node->output[0]     =  0;
 	context->last_input = -1;
@@ -1632,7 +1632,7 @@ static DISCRETE_STEP(dst_transform)
 	double	number1,top;
 	int		trans_stack_ptr = 0;
 
-	const char *fPTR = node->custom;
+	const char *fPTR = (const char *)node->custom;
 	node->output[0]  = 0;
 
 	top = HUGE_VAL;
@@ -1738,8 +1738,8 @@ static DISCRETE_STEP(dst_transform)
 
 static DISCRETE_STEP(dst_op_amp)
 {
-	const  discrete_op_amp_info *info    = node->custom;
-	struct dst_op_amp_context   *context = node->context;
+	const  discrete_op_amp_info *info    = (const  discrete_op_amp_info *)node->custom;
+	struct dst_op_amp_context   *context = (struct dst_op_amp_context *)node->context;
 
 	double i_pos = 0;
 	double i_neg = 0;
@@ -1798,8 +1798,8 @@ static DISCRETE_STEP(dst_op_amp)
 
 static DISCRETE_RESET(dst_op_amp)
 {
-	const discrete_op_amp_info *info = node->custom;
-	struct dst_op_amp_context *context = node->context;
+	const discrete_op_amp_info *info = (const discrete_op_amp_info *)node->custom;
+	struct dst_op_amp_context *context = (struct dst_op_amp_context *)node->context;
 
 	context->has_r1 = info->r1 > 0;
 	context->has_r4 = info->r4 > 0;
@@ -1840,8 +1840,8 @@ static DISCRETE_RESET(dst_op_amp)
 
 static DISCRETE_STEP(dst_op_amp_1sht)
 {
-	const  discrete_op_amp_1sht_info *info    = node->custom;
-	struct dst_op_amp_1sht_context   *context = node->context;
+	const  discrete_op_amp_1sht_info *info    = (const  discrete_op_amp_1sht_info *)node->custom;
+	struct dst_op_amp_1sht_context   *context = (struct dst_op_amp_1sht_context *)node->context;
 
 	double i_pos;
 	double i_neg;
@@ -1880,8 +1880,8 @@ static DISCRETE_STEP(dst_op_amp_1sht)
 
 static DISCRETE_RESET(dst_op_amp_1sht)
 {
-	const  discrete_op_amp_1sht_info *info    = node->custom;
-	struct dst_op_amp_1sht_context   *context = node->context;
+	const  discrete_op_amp_1sht_info *info    = (const  discrete_op_amp_1sht_info *)node->custom;
+	struct dst_op_amp_1sht_context   *context = (struct dst_op_amp_1sht_context *)node->context;
 
 	context->exponent1c = RC_CHARGE_EXP(RES_2_PARALLEL(info->r3, info->r4) * info->c1);
 	context->exponent1d = RC_CHARGE_EXP(info->r4 * info->c1);
@@ -1915,8 +1915,8 @@ static DISCRETE_RESET(dst_op_amp_1sht)
 
 static DISCRETE_STEP(dst_tvca_op_amp)
 {
-	const  discrete_op_amp_tvca_info *info    = node->custom;
-	struct dst_tvca_op_amp_context   *context = node->context;
+	const  discrete_op_amp_tvca_info *info    = (const  discrete_op_amp_tvca_info *)node->custom;
+	struct dst_tvca_op_amp_context   *context = (struct dst_tvca_op_amp_context *)node->context;
 
 	int		trig0, trig1, trig2, f3;
 	double	i2 = 0;		/* current through r2 */
@@ -1995,8 +1995,8 @@ static DISCRETE_STEP(dst_tvca_op_amp)
 
 static DISCRETE_RESET(dst_tvca_op_amp)
 {
-	const  discrete_op_amp_tvca_info *info    = node->custom;
-	struct dst_tvca_op_amp_context   *context = node->context;
+	const  discrete_op_amp_tvca_info *info    = (const  discrete_op_amp_tvca_info *)node->custom;
+	struct dst_tvca_op_amp_context   *context = (struct dst_tvca_op_amp_context *)node->context;
 
 	context->r67 = info->r6 + info->r7;
 

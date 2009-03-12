@@ -22,7 +22,7 @@ INLINE tia_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( tia_update )
 {
-	tia_state *info = param;
+	tia_state *info = (tia_state *)param;
 	tia_process(info->chip, outputs[0], samples);
 }
 

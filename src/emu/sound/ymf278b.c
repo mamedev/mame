@@ -266,7 +266,7 @@ static void ymf278b_envelope_next(YMF278BSlot *slot)
 
 static STREAM_UPDATE( ymf278b_pcm_update )
 {
-	YMF278BChip *chip = param;
+	YMF278BChip *chip = (YMF278BChip *)param;
 	int i, j;
 	YMF278BSlot *slot = NULL;
 	INT16 sample = 0;
@@ -355,7 +355,7 @@ static void ymf278b_irq_check(running_machine *machine, YMF278BChip *chip)
 
 static TIMER_CALLBACK( ymf278b_timer_a_tick )
 {
-	YMF278BChip *chip = ptr;
+	YMF278BChip *chip = (YMF278BChip *)ptr;
 	if(!(chip->enable & 0x40))
 	{
 		chip->current_irq |= 0x40;
@@ -365,7 +365,7 @@ static TIMER_CALLBACK( ymf278b_timer_a_tick )
 
 static TIMER_CALLBACK( ymf278b_timer_b_tick )
 {
-	YMF278BChip *chip = ptr;
+	YMF278BChip *chip = (YMF278BChip *)ptr;
 	if(!(chip->enable & 0x20))
 	{
 		chip->current_irq |= 0x20;
@@ -676,7 +676,7 @@ static void ymf278b_init(const device_config *device, YMF278BChip *chip, void (*
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = device->clock;
 
-	mix = auto_malloc(44100*2*sizeof(*mix));
+	mix = (INT32 *)auto_malloc(44100*2*sizeof(*mix));
 }
 
 static DEVICE_START( ymf278b )
@@ -687,7 +687,7 @@ static DEVICE_START( ymf278b )
 	YMF278BChip *chip = get_safe_token(device);
 
 	chip->device = device;
-	intf = (device->static_config != NULL) ? device->static_config : &defintrf;
+	intf = (device->static_config != NULL) ? (const ymf278b_interface *)device->static_config : &defintrf;
 
 	ymf278b_init(device, chip, intf->irq_callback);
 	chip->stream = stream_create(device, 0, 2, device->clock/768, chip, ymf278b_pcm_update);

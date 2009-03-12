@@ -72,7 +72,7 @@ static void make_mixer_table(k051649_state *info, int voices)
 	int gain = 8;
 
 	/* allocate memory */
-	info->mixer_table = auto_malloc(512 * voices * sizeof(INT16));
+	info->mixer_table = (INT16 *)auto_malloc(512 * voices * sizeof(INT16));
 
 	/* find the middle of the table */
 	info->mixer_lookup = info->mixer_table + (256 * voices);
@@ -91,7 +91,7 @@ static void make_mixer_table(k051649_state *info, int voices)
 /* generate sound to the mix buffer */
 static STREAM_UPDATE( k051649_update )
 {
-	k051649_state *info = param;
+	k051649_state *info = (k051649_state *)param;
 	k051649_sound_channel *voice=info->channel_list;
 	stream_sample_t *buffer = outputs[0];
 	short *mix;
@@ -145,7 +145,7 @@ static DEVICE_START( k051649 )
 	info->mclock = device->clock;
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
-	info->mixer_buffer = auto_malloc(2 * sizeof(short) * info->rate);
+	info->mixer_buffer = (short *)auto_malloc(2 * sizeof(short) * info->rate);
 
 	/* build the mixer table */
 	make_mixer_table(info, 5);

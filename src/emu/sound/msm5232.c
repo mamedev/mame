@@ -712,7 +712,7 @@ INLINE void TG_group_advance(MSM5232 *chip, int groupidx)
 
 static STREAM_UPDATE( MSM5232_update_one )
 {
-	MSM5232 * chip = param;
+	MSM5232 * chip = (MSM5232 *)param;
 	stream_sample_t *buf1 = outputs[0];
 	stream_sample_t *buf2 = outputs[1];
 	stream_sample_t *buf3 = outputs[2];
@@ -787,9 +787,9 @@ static STREAM_UPDATE( MSM5232_update_one )
 
 static DEVICE_START( msm5232 )
 {
-	const msm5232_interface *intf = device->static_config;
+	const msm5232_interface *intf = (const msm5232_interface *)device->static_config;
 	int rate = device->clock/CLOCK_RATE_DIVIDER;
-	MSM5232 *chip = device->token;
+	MSM5232 *chip = get_safe_token(device);
 
 	chip->device = device;
 

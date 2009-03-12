@@ -52,7 +52,7 @@ INLINE rf5c68_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( rf5c68_update )
 {
-	rf5c68_state *chip = param;
+	rf5c68_state *chip = (rf5c68_state *)param;
 	stream_sample_t *left = outputs[0];
 	stream_sample_t *right = outputs[1];
 	int i, j;

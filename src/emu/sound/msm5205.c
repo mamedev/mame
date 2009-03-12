@@ -103,7 +103,7 @@ static void ComputeTables (msm5205_state *voice)
 /* stream update callbacks */
 static STREAM_UPDATE( MSM5205_update )
 {
-	msm5205_state *voice = param;
+	msm5205_state *voice = (msm5205_state *)param;
 	stream_sample_t *buffer = outputs[0];
 
 	/* if this voice is active */
@@ -123,7 +123,7 @@ static STREAM_UPDATE( MSM5205_update )
 /* timer callback at VCLK low eddge */
 static TIMER_CALLBACK( MSM5205_vclk_callback )
 {
-	msm5205_state *voice = ptr;
+	msm5205_state *voice = (msm5205_state *)ptr;
 	int val;
 	int new_signal;
 	/* callback user handler and latch next data */
@@ -182,7 +182,7 @@ static DEVICE_START( msm5205 )
 	msm5205_state *voice = get_safe_token(device);
 
 	/* save a global pointer to our interface */
-	voice->intf = device->static_config;
+	voice->intf = (const msm5205_interface *)device->static_config;
 	voice->device = device;
 	voice->clock = device->clock;
 

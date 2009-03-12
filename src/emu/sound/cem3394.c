@@ -152,7 +152,7 @@ INLINE cem3394_state *get_safe_token(const device_config *device)
 /* generate sound to the mix buffer in mono */
 static STREAM_UPDATE( cem3394_update )
 {
-	cem3394_state *chip = param;
+	cem3394_state *chip = (cem3394_state *)param;
 	int int_volume = (chip->volume * chip->mixer_internal) / 256;
 	int ext_volume = (chip->volume * chip->mixer_external) / 256;
 	UINT32 step = chip->step, position, end_position = 0;
@@ -328,7 +328,7 @@ static STREAM_UPDATE( cem3394_update )
 
 static DEVICE_START( cem3394 )
 {
-	const cem3394_interface *intf = device->static_config;
+	const cem3394_interface *intf = (const cem3394_interface *)device->static_config;
 	cem3394_state *chip = get_safe_token(device);
 
 	chip->device = device;
@@ -344,8 +344,8 @@ static DEVICE_START( cem3394 )
 	chip->filter_zero_freq = intf->filter_zero_freq;
 
 	/* allocate memory for a mixer buffer and external buffer (1 second should do it!) */
-	chip->mixer_buffer = auto_malloc(chip->sample_rate * sizeof(INT16));
-	chip->external_buffer = auto_malloc(chip->sample_rate * sizeof(INT16));
+	chip->mixer_buffer = (INT16 *)auto_malloc(chip->sample_rate * sizeof(INT16));
+	chip->external_buffer = (INT16 *)auto_malloc(chip->sample_rate * sizeof(INT16));
 
 	state_save_register_device_item_array(device, 0, chip->values);
 	state_save_register_device_item(device, 0, chip->wave_select);

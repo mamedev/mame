@@ -153,7 +153,7 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 		unsigned char *tempptr;
 		int sindex;
 
-		sample->data = auto_malloc(sizeof(*sample->data) * length);
+		sample->data = (INT16 *)auto_malloc(sizeof(*sample->data) * length);
 		mame_fread(f, sample->data, length);
 
 		/* convert 8-bit data to signed samples */
@@ -164,7 +164,7 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 	else
 	{
 		/* 16-bit data is fine as-is */
-		sample->data = auto_malloc(sizeof(*sample->data) * (length/2));
+		sample->data = (INT16 *)auto_malloc(sizeof(*sample->data) * (length/2));
 		mame_fread(f, sample->data, length);
 		sample->length /= 2;
 		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
@@ -201,7 +201,7 @@ struct loaded_samples *readsamples(const char *const *samplenames, const char *b
 		return NULL;
 
 	/* allocate the array */
-	samples = auto_malloc(sizeof(struct loaded_samples) + (i-1) * sizeof(struct loaded_sample));
+	samples = (struct loaded_samples *)auto_malloc(sizeof(struct loaded_samples) + (i-1) * sizeof(struct loaded_sample));
 	memset(samples, 0, sizeof(struct loaded_samples) + (i-1) * sizeof(struct loaded_sample));
 	samples->total = i;
 
@@ -387,7 +387,7 @@ int sample_playing(const device_config *device,int channel)
 
 static STREAM_UPDATE( sample_update_sound )
 {
-	sample_channel *chan = param;
+	sample_channel *chan = (sample_channel *)param;
 	stream_sample_t *buffer = outputs[0];
 
 	if (chan->source && !chan->paused)
@@ -439,7 +439,7 @@ static STREAM_UPDATE( sample_update_sound )
 
 static STATE_POSTLOAD( samples_postload )
 {
-	samples_info *info = param;
+	samples_info *info = (samples_info *)param;
 	int i;
 
 	/* loop over channels */
@@ -475,7 +475,7 @@ static STATE_POSTLOAD( samples_postload )
 static DEVICE_START( samples )
 {
 	int i;
-	const samples_interface *intf = device->static_config;
+	const samples_interface *intf = (const samples_interface *)device->static_config;
 	samples_info *info = get_safe_token(device);
 
 	info->device = device;
@@ -487,7 +487,7 @@ static DEVICE_START( samples )
 	/* allocate channels */
 	info->numchannels = intf->channels;
 	assert(info->numchannels < MAX_CHANNELS);
-	info->channel = auto_malloc(sizeof(*info->channel) * info->numchannels);
+	info->channel = (sample_channel *)auto_malloc(sizeof(*info->channel) * info->numchannels);
 	for (i = 0; i < info->numchannels; i++)
 	{
 	    info->channel[i].stream = stream_create(device, 0, 1, device->machine->sample_rate, &info->channel[i], sample_update_sound);

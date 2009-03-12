@@ -232,7 +232,7 @@ static const discrete_module module_list[] =
 
 node_description *discrete_find_node(void *chip, int node)
 {
-	discrete_info *info = chip ? chip : discrete_current_context;
+	discrete_info *info = chip ? (discrete_info *)chip : discrete_current_context;
 	if (node < NODE_START || node > NODE_END) return NULL;
 	return info->indexed_node[NODE_INDEX(node)];
 }
@@ -248,7 +248,7 @@ node_description *discrete_find_node(void *chip, int node)
 static DEVICE_START( discrete )
 {
 	discrete_sound_block *intf = (discrete_sound_block *)device->static_config;
-	discrete_info *info = device->token;
+	discrete_info *info = get_safe_token(device);
 	char name[32];
 
 	info->device = device;
@@ -292,15 +292,15 @@ static DEVICE_START( discrete )
 	discrete_log("discrete_start() - Sanity check counted %d nodes", info->node_count);
 
 	/* allocate memory for the array of actual nodes */
-	info->node_list = auto_malloc(info->node_count * sizeof(info->node_list[0]));
+	info->node_list = (node_description *)auto_malloc(info->node_count * sizeof(info->node_list[0]));
 	memset(info->node_list, 0, info->node_count * sizeof(info->node_list[0]));
 
 	/* allocate memory for the node execution order array */
-	info->running_order = auto_malloc(info->node_count * sizeof(info->running_order[0]));
+	info->running_order = (node_description **)auto_malloc(info->node_count * sizeof(info->running_order[0]));
 	memset(info->running_order, 0, info->node_count * sizeof(info->running_order[0]));
 
 	/* allocate memory to hold pointers to nodes by index */
-	info->indexed_node = auto_malloc(DISCRETE_MAX_NODES * sizeof(info->indexed_node[0]));
+	info->indexed_node = (node_description **)auto_malloc(DISCRETE_MAX_NODES * sizeof(info->indexed_node[0]));
 	memset(info->indexed_node, 0, DISCRETE_MAX_NODES * sizeof(info->indexed_node[0]));
 
 	/* initialize the node data */
@@ -327,7 +327,7 @@ static DEVICE_START( discrete )
 
 static DEVICE_STOP( discrete )
 {
-	discrete_info *info = device->token;
+	discrete_info *info = get_safe_token(device);
 	int log_num;
 
 #if (DISCRETE_PROFILING)
@@ -387,7 +387,7 @@ static DEVICE_STOP( discrete )
 
 static DEVICE_RESET( discrete )
 {
-	discrete_info *info = device->token;
+	discrete_info *info = get_safe_token(device);
 	int nodenum;
 
 	discrete_current_context = info;
@@ -421,7 +421,7 @@ static DEVICE_RESET( discrete )
 
 static STREAM_UPDATE( discrete_stream_update )
 {
-	discrete_info *info = param;
+	discrete_info *info = (discrete_info *)param;
 	int samplenum, nodenum, outputnum;
 	double val;
 	INT16 wave_data_l, wave_data_r;
@@ -596,7 +596,7 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list, co
 		/* setup module if custom */
 		if (block->type == DST_CUSTOM)
 		{
-			const discrete_custom_info *custom = node->custom;
+			const discrete_custom_info *custom = (const discrete_custom_info *)node->custom;
 			node->module.reset = custom->reset;
 			node->module.step = custom->step;
 			node->module.contextsize = custom->contextsize;

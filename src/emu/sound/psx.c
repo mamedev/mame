@@ -124,7 +124,7 @@ INLINE int limit( int v )
 
 static STREAM_UPDATE( PSXSPU_update )
 {
-	struct psxinfo *chip = param;
+	struct psxinfo *chip = (struct psxinfo *)param;
 	int v;
 	int voll;
 	int volr;
@@ -267,7 +267,7 @@ static DEVICE_START( psxspu )
 	int n_effect;
 	int n_channel;
 
-	chip->intf = device->static_config;
+	chip->intf = (const psx_spu_interface *)device->static_config;
 	chip->device = device;
 	chip->g_p_n_psxram = *(chip->intf->p_psxram);
 
@@ -316,7 +316,7 @@ static DEVICE_START( psxspu )
 		chip->m_p_n_effect[ n_effect ] = 0;
 	}
 
-	chip->m_p_n_spuram = auto_malloc( SPU_RAM_SIZE );
+	chip->m_p_n_spuram = (UINT16 *)auto_malloc( SPU_RAM_SIZE );
 
 	state_save_register_device_item( device, 0, chip->m_n_mainvolumeleft );
 	state_save_register_device_item( device, 0, chip->m_n_mainvolumeright );

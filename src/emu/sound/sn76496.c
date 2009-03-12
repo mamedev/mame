@@ -145,7 +145,7 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 static STREAM_UPDATE( SN76496Update )
 {
 	int i;
-	sn76496_state *R = param;
+	sn76496_state *R = (sn76496_state *)param;
 	stream_sample_t *buffer = outputs[0];
 
 

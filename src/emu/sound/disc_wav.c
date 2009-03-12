@@ -183,7 +183,7 @@ static const int disc_7492_count[6] = {0x00, 0x01, 0x02, 0x04, 0x05, 0x06};
 
 static DISCRETE_STEP(dss_counter)
 {
-	struct	dss_counter_context *context = node->context;
+	struct	dss_counter_context *context = (struct	dss_counter_context *)node->context;
 	double	cycles;
 	int		clock = 0, last_count, inc = 0;
 	int		max;
@@ -282,7 +282,7 @@ static DISCRETE_STEP(dss_counter)
 
 static DISCRETE_RESET(dss_counter)
 {
-	struct dss_counter_context *context = node->context;
+	struct dss_counter_context *context = (struct dss_counter_context *)node->context;
 
 	if ((int)DSS_COUNTER__CLOCK_TYPE & DISC_COUNTER_IS_7492)
 	{
@@ -393,8 +393,8 @@ static DISCRETE_RESET(dss_lfsr);
 
 static DISCRETE_STEP(dss_lfsr)
 {
-	const  discrete_lfsr_desc *lfsr_desc = node->custom;
-	struct dss_lfsr_context   *context   = node->context;
+	const  discrete_lfsr_desc *lfsr_desc = (const discrete_lfsr_desc *)node->custom;
+	struct dss_lfsr_context   *context   = (struct dss_lfsr_context *)node->context;
 	double cycles;
 	int clock, inc = 0;
 	int fb0, fb1, fbresult;
@@ -483,8 +483,8 @@ static DISCRETE_STEP(dss_lfsr)
 
 static DISCRETE_RESET(dss_lfsr)
 {
-	const  discrete_lfsr_desc *lfsr_desc = node->custom;
-	struct dss_lfsr_context   *context   = node->context;
+	const  discrete_lfsr_desc *lfsr_desc = (const  discrete_lfsr_desc *)node->custom;
+	struct dss_lfsr_context   *context   = (struct dss_lfsr_context *)node->context;
 	int    fb0 , fb1, fbresult;
 
 	context->reset_on_high = (lfsr_desc->flags & DISC_LFSR_FLAG_RESET_TYPE_H) ? 1 : 0;
@@ -537,7 +537,7 @@ static DISCRETE_RESET(dss_lfsr)
 
 static DISCRETE_STEP(dss_noise)
 {
-	struct dss_noise_context *context = node->context;
+	struct dss_noise_context *context = (struct dss_noise_context *)node->context;
 
 	if(DSS_NOISE__ENABLE)
 	{
@@ -574,7 +574,7 @@ static DISCRETE_STEP(dss_noise)
 
 static DISCRETE_RESET(dss_noise)
 {
-	struct dss_noise_context *context = node->context;
+	struct dss_noise_context *context = (struct dss_noise_context *)node->context;
 
 	context->phase=0;
 	DISCRETE_STEP_CALL( dss_noise );
@@ -603,7 +603,7 @@ static DISCRETE_RESET(dss_noise)
 
 static DISCRETE_STEP(dss_note)
 {
-	struct dss_note_context *context = node->context;
+	struct dss_note_context *context = (struct dss_note_context *)node->context;
 
 	double	cycles;
 	int		clock  = 0, last_count2, inc = 0;
@@ -693,7 +693,7 @@ static DISCRETE_STEP(dss_note)
 
 static DISCRETE_RESET(dss_note)
 {
-	struct dss_note_context *context = node->context;
+	struct dss_note_context *context = (struct dss_note_context *)node->context;
 
 	context->clock_type = (int)DSS_NOTE__CLOCK_TYPE & DISC_CLK_MASK;
 	context->out_type   = (int)DSS_NOTE__CLOCK_TYPE & DISC_OUT_MASK;
@@ -732,8 +732,8 @@ static DISCRETE_RESET(dss_note)
 
 static DISCRETE_STEP(dss_op_amp_osc)
 {
-	const  discrete_op_amp_osc_info *info    = node->custom;
-	struct dss_op_amp_osc_context   *context = node->context;
+	const  discrete_op_amp_osc_info *info    = (const  discrete_op_amp_osc_info *)node->custom;
+	struct dss_op_amp_osc_context   *context = (struct dss_op_amp_osc_context *)node->context;
 
 
 	double i;			/* Charging current created by vIn */
@@ -905,8 +905,8 @@ static DISCRETE_STEP(dss_op_amp_osc)
 
 static DISCRETE_RESET(dss_op_amp_osc)
 {
-	const discrete_op_amp_osc_info *info = node->custom;
-	struct dss_op_amp_osc_context *context = node->context;
+	const discrete_op_amp_osc_info *info = (const discrete_op_amp_osc_info *)node->custom;
+	struct dss_op_amp_osc_context *context = (struct dss_op_amp_osc_context *)node->context;
 	const double *r_info_ptr;
 	const double **r_context_ptr;
 	int loop;
@@ -1048,7 +1048,7 @@ static DISCRETE_RESET(dss_op_amp_osc)
 
 static DISCRETE_STEP(dss_sawtoothwave)
 {
-	struct dss_sawtoothwave_context *context = node->context;
+	struct dss_sawtoothwave_context *context = (struct dss_sawtoothwave_context *)node->context;
 
 	if(DSS_SAWTOOTHWAVE__ENABLE)
 	{
@@ -1074,7 +1074,7 @@ static DISCRETE_STEP(dss_sawtoothwave)
 
 static DISCRETE_RESET(dss_sawtoothwave)
 {
-	struct dss_sawtoothwave_context *context = node->context;
+	struct dss_sawtoothwave_context *context = (struct dss_sawtoothwave_context *)node->context;
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
@@ -1108,8 +1108,8 @@ static DISCRETE_RESET(dss_sawtoothwave)
 
 static DISCRETE_STEP(dss_schmitt_osc)
 {
-	const  discrete_schmitt_osc_desc *info    = node->custom;
-	struct dss_schmitt_osc_context   *context = node->context;
+	const  discrete_schmitt_osc_desc *info    = (const  discrete_schmitt_osc_desc *)node->custom;
+	struct dss_schmitt_osc_context   *context = (struct dss_schmitt_osc_context *)node->context;
 
 	double supply, v_cap, new_vCap, t, exponent;
 
@@ -1182,8 +1182,8 @@ static DISCRETE_STEP(dss_schmitt_osc)
 
 static DISCRETE_RESET(dss_schmitt_osc)
 {
-	const  discrete_schmitt_osc_desc *info    = node->custom;
-	struct dss_schmitt_osc_context   *context = node->context;
+	const  discrete_schmitt_osc_desc *info    = (const  discrete_schmitt_osc_desc *)node->custom;
+	struct dss_schmitt_osc_context   *context = (struct dss_schmitt_osc_context *)node->context;
 	double rSource;
 
 	context->enable_type      =  info->options & DISC_SCHMITT_OSC_ENAB_MASK;
@@ -1227,7 +1227,7 @@ static DISCRETE_RESET(dss_schmitt_osc)
 
 static DISCRETE_STEP(dss_sinewave)
 {
-	struct dss_sinewave_context *context = node->context;
+	struct dss_sinewave_context *context = (struct dss_sinewave_context *)node->context;
 
 	/* Set the output */
 	if(DSS_SINEWAVE__ENABLE)
@@ -1253,7 +1253,7 @@ static DISCRETE_STEP(dss_sinewave)
 
 static DISCRETE_RESET(dss_sinewave)
 {
-	struct dss_sinewave_context *context = node->context;
+	struct dss_sinewave_context *context = (struct dss_sinewave_context *)node->context;
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
@@ -1286,7 +1286,7 @@ static DISCRETE_RESET(dss_sinewave)
 
 static DISCRETE_STEP(dss_squarewave)
 {
-	struct dss_squarewave_context *context = node->context;
+	struct dss_squarewave_context *context = (struct dss_squarewave_context *)node->context;
 
 	/* Establish trigger phase from duty */
 	context->trigger=((100-DSS_SQUAREWAVE__DUTY)/100)*(2.0*M_PI);
@@ -1319,7 +1319,7 @@ static DISCRETE_STEP(dss_squarewave)
 
 static DISCRETE_RESET(dss_squarewave)
 {
-	struct dss_squarewave_context *context = node->context;
+	struct dss_squarewave_context *context = (struct dss_squarewave_context *)node->context;
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
@@ -1352,7 +1352,7 @@ static DISCRETE_RESET(dss_squarewave)
 
 static DISCRETE_STEP(dss_squarewfix)
 {
-	struct dss_squarewfix_context *context = node->context;
+	struct dss_squarewfix_context *context = (struct dss_squarewfix_context *)node->context;
 
 	context->t_left -= context->sample_step;
 
@@ -1381,7 +1381,7 @@ static DISCRETE_STEP(dss_squarewfix)
 
 static DISCRETE_RESET(dss_squarewfix)
 {
-	struct dss_squarewfix_context *context = node->context;
+	struct dss_squarewfix_context *context = (struct dss_squarewfix_context *)node->context;
 
 	context->sample_step = 1.0 / discrete_current_context->sample_rate;
 	context->flip_flop   = 1;
@@ -1430,7 +1430,7 @@ static DISCRETE_RESET(dss_squarewfix)
 
 static DISCRETE_STEP(dss_squarewave2)
 {
-	struct dss_squarewave_context *context = node->context;
+	struct dss_squarewave_context *context = (struct dss_squarewave_context *)node->context;
 	double newphase;
 
 	if(DSS_SQUAREWAVE2__ENABLE)
@@ -1465,7 +1465,7 @@ static DISCRETE_STEP(dss_squarewave2)
 
 static DISCRETE_RESET(dss_squarewave2)
 {
-	struct dss_squarewave_context *context = node->context;
+	struct dss_squarewave_context *context = (struct dss_squarewave_context *)node->context;
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */
@@ -1501,8 +1501,8 @@ static DISCRETE_RESET(dss_squarewave2)
 
 INLINE double dss_inverter_tftab(node_description *node, double x)
 {
-	const  discrete_inverter_osc_desc *info    = node->custom;
-	struct dss_inverter_osc_context   *context = node->context;
+	const  discrete_inverter_osc_desc *info    = (const  discrete_inverter_osc_desc *)node->custom;
+	struct dss_inverter_osc_context   *context = (struct dss_inverter_osc_context *)node->context;
 
 	x = x / info->vB;
 	if (x > 0)
@@ -1513,8 +1513,8 @@ INLINE double dss_inverter_tftab(node_description *node, double x)
 
 INLINE double dss_inverter_tf(node_description *node, double x)
 {
-	const  discrete_inverter_osc_desc *info    = node->custom;
-	struct dss_inverter_osc_context   *context = node->context;
+	const  discrete_inverter_osc_desc *info    = (const  discrete_inverter_osc_desc *)node->custom;
+	struct dss_inverter_osc_context   *context = (struct dss_inverter_osc_context *)node->context;
 
 	if (x < 0.0)
 		return info->vB;
@@ -1526,8 +1526,8 @@ INLINE double dss_inverter_tf(node_description *node, double x)
 
 static DISCRETE_STEP(dss_inverter_osc)
 {
-	struct dss_inverter_osc_context   *context = node->context;
-	const  discrete_inverter_osc_desc *info = node->custom;
+	struct dss_inverter_osc_context   *context = (struct dss_inverter_osc_context *)node->context;
+	const  discrete_inverter_osc_desc *info = (const  discrete_inverter_osc_desc *)node->custom;
 
 	double diff, vG1, vG2, vG3, vI;
 	double vMix, rMix;
@@ -1633,8 +1633,8 @@ static DISCRETE_STEP(dss_inverter_osc)
 
 static DISCRETE_RESET(dss_inverter_osc)
 {
-	struct dss_inverter_osc_context   *context = node->context;
-	const  discrete_inverter_osc_desc *info    = node->custom;
+	struct dss_inverter_osc_context   *context = (struct dss_inverter_osc_context *)node->context;
+	const  discrete_inverter_osc_desc *info    = (const  discrete_inverter_osc_desc *)node->custom;
 
 	int i;
 
@@ -1677,7 +1677,7 @@ static DISCRETE_RESET(dss_inverter_osc)
 
 static DISCRETE_STEP(dss_trianglewave)
 {
-	struct dss_trianglewave_context *context = node->context;
+	struct dss_trianglewave_context *context = (struct dss_trianglewave_context *)node->context;
 
 	if(DSS_TRIANGLEWAVE__ENABLE)
 	{
@@ -1704,7 +1704,7 @@ static DISCRETE_STEP(dss_trianglewave)
 
 static DISCRETE_RESET(dss_trianglewave)
 {
-	struct dss_trianglewave_context *context = node->context;
+	struct dss_trianglewave_context *context = (struct dss_trianglewave_context *)node->context;
 	double start;
 
 	/* Establish starting phase, convert from degrees to radians */

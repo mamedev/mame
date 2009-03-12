@@ -1223,7 +1223,7 @@ int SCSP_IRQCB(void *param)
 
 static STREAM_UPDATE( SCSP_Update )
 {
-	struct _SCSP *SCSP = param;
+	struct _SCSP *SCSP = (struct _SCSP *)param;
 	bufferl = outputs[0];
 	bufferr = outputs[1];
 	length = samples;
@@ -1236,7 +1236,7 @@ static DEVICE_START( scsp )
 
 	struct _SCSP *SCSP = get_safe_token(device);
 
-	intf = device->static_config;
+	intf = (const scsp_interface *)device->static_config;
 
 	// init the emulation
 	SCSP_Init(device, SCSP, intf);
@@ -1255,8 +1255,8 @@ void scsp_set_ram_base(const device_config *device, void *base)
 	struct _SCSP *SCSP = get_safe_token(device);
 	if (SCSP)
 	{
-		SCSP->SCSPRAM = base;
-		SCSP->DSP.SCSPRAM = base;
+		SCSP->SCSPRAM = (unsigned char *)base;
+		SCSP->DSP.SCSPRAM = (UINT16 *)base;
 		SCSP->SCSPRAM_LENGTH = 0x80000;
 		SCSP->DSP.SCSPRAM_LENGTH = 0x80000/2;
 	}

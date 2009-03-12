@@ -144,7 +144,7 @@ WRITE16_DEVICE_HANDLER( nile_snd_w )
 
 static STREAM_UPDATE( nile_update )
 {
-	nile_state *info = param;
+	nile_state *info = (nile_state *)param;
 	UINT8 *sound_ram = info->sound_ram;
 	int v, i, snum;
 	UINT16 *slot;

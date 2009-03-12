@@ -272,7 +272,7 @@ INLINE int limit(INT32 in)
 
 static STREAM_UPDATE( update_stereo )
 {
-	c140_state *info = param;
+	c140_state *info = (c140_state *)param;
 	int		i,j;
 
 	INT32	rvol,lvol;
@@ -467,7 +467,7 @@ static STREAM_UPDATE( update_stereo )
 
 static DEVICE_START( c140 )
 {
-	const c140_interface *intf = device->static_config;
+	const c140_interface *intf = (const c140_interface *)device->static_config;
 	c140_state *info = get_safe_token(device);
 
 	info->sample_rate=info->baserate=device->clock;
@@ -496,7 +496,7 @@ static DEVICE_START( c140 )
 	}
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	info->mixer_buffer_left = auto_malloc(2 * sizeof(INT16)*info->sample_rate );
+	info->mixer_buffer_left = (INT16 *)auto_malloc(2 * sizeof(INT16)*info->sample_rate );
 	info->mixer_buffer_right = info->mixer_buffer_left + info->sample_rate;
 }
 

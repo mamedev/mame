@@ -179,7 +179,7 @@ static void generate_adpcm(es8712_state *chip, stream_sample_t *buffer, int samp
 static STREAM_UPDATE( es8712_update )
 {
 	stream_sample_t *buffer = outputs[0];
-	es8712_state *chip = param;
+	es8712_state *chip = (es8712_state *)param;
 
 	/* generate them into our buffer */
 	generate_adpcm(chip, buffer, samples);
@@ -220,7 +220,7 @@ static void es8712_state_save_register(es8712_state *chip, const device_config *
 
 static DEVICE_START( es8712 )
 {
-	es8712_state *chip = device->token;
+	es8712_state *chip = get_safe_token(device);
 
 	compute_tables();
 
@@ -250,7 +250,7 @@ static DEVICE_START( es8712 )
 
 static DEVICE_RESET( es8712 )
 {
-	es8712_state *chip = device->token;
+	es8712_state *chip = get_safe_token(device);
 
 	if (chip->playing)
 	{
@@ -270,7 +270,7 @@ static DEVICE_RESET( es8712 )
 
 void es8712_set_bank_base(const device_config *device, int base)
 {
-	es8712_state *chip = device->token;
+	es8712_state *chip = get_safe_token(device);
 	stream_update(chip->stream);
 	chip->bank_offset = base;
 }
@@ -284,7 +284,7 @@ void es8712_set_bank_base(const device_config *device, int base)
 
 void es8712_set_frequency(const device_config *device, int frequency)
 {
-	es8712_state *chip = device->token;
+	es8712_state *chip = get_safe_token(device);
 
 	/* update the stream and set the new base */
 	stream_update(chip->stream);

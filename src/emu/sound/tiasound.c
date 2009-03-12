@@ -160,7 +160,7 @@ static const UINT8 Div31[POLY5_SIZE] =
 
 void tia_write(void *_chip, offs_t offset, UINT8 data)
 {
-	struct tia *chip = _chip;
+	struct tia *chip = (struct tia *)_chip;
     UINT16 new_val = 0;
     UINT8 chan;
 
@@ -261,7 +261,7 @@ void tia_write(void *_chip, offs_t offset, UINT8 data)
 
 void tia_process(void *_chip, stream_sample_t *buffer, int length)
 {
-	struct tia *chip = _chip;
+	struct tia *chip = (struct tia *)_chip;
     UINT8 audc0, audc1;
     UINT8 div_n_cnt0, div_n_cnt1;
     UINT8 p5_0, p5_1;
@@ -547,7 +547,7 @@ void *tia_sound_init(int clock, int sample_rate, int gain)
 	struct tia *chip;
 	int chan;
 
-	chip = malloc(sizeof(*chip));
+	chip = (struct tia *)malloc(sizeof(*chip));
 	if (!chip)
 		return NULL;
 	memset(chip, 0, sizeof(*chip));

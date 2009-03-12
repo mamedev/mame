@@ -42,25 +42,25 @@ INLINE ym2608_state *get_safe_token(const device_config *device)
 
 static void psg_set_clock(void *param, int clock)
 {
-	ym2608_state *info = param;
+	ym2608_state *info = (ym2608_state *)param;
 	ay8910_set_clock_ym(info->psg, clock);
 }
 
 static void psg_write(void *param, int address, int data)
 {
-	ym2608_state *info = param;
+	ym2608_state *info = (ym2608_state *)param;
 	ay8910_write_ym(info->psg, address, data);
 }
 
 static int psg_read(void *param)
 {
-	ym2608_state *info = param;
+	ym2608_state *info = (ym2608_state *)param;
 	return ay8910_read_ym(info->psg);
 }
 
 static void psg_reset(void *param)
 {
-	ym2608_state *info = param;
+	ym2608_state *info = (ym2608_state *)param;
 	ay8910_reset_ym(info->psg);
 }
 
@@ -76,26 +76,26 @@ static const ssg_callbacks psgintf =
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym2608_state *info = param;
+	ym2608_state *info = (ym2608_state *)param;
 	if(info->intf->handler) info->intf->handler(info->device, irq);
 }
 
 /* Timer overflow callback from timer.c */
 static TIMER_CALLBACK( timer_callback_2608_0 )
 {
-	ym2608_state *info = ptr;
+	ym2608_state *info = (ym2608_state *)ptr;
 	ym2608_timer_over(info->chip,0);
 }
 
 static TIMER_CALLBACK( timer_callback_2608_1 )
 {
-	ym2608_state *info = ptr;
+	ym2608_state *info = (ym2608_state *)ptr;
 	ym2608_timer_over(info->chip,1);
 }
 
 static void timer_handler(void *param,int c,int count,int clock)
 {
-	ym2608_state *info = param;
+	ym2608_state *info = (ym2608_state *)param;
 	if( count == 0 )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[c], 0);
@@ -111,20 +111,20 @@ static void timer_handler(void *param,int c,int count,int clock)
 /* update request from fm.c */
 void ym2608_update_request(void *param)
 {
-	ym2608_state *info = param;
+	ym2608_state *info = (ym2608_state *)param;
 	stream_update(info->stream);
 }
 
 static STREAM_UPDATE( ym2608_stream_update )
 {
-	ym2608_state *info = param;
+	ym2608_state *info = (ym2608_state *)param;
 	ym2608_update_one(info->chip, outputs, samples);
 }
 
 
 static STATE_POSTLOAD( ym2608_intf_postload )
 {
-	ym2608_state *info = param;
+	ym2608_state *info = (ym2608_state *)param;
 	ym2608_postload(info->chip);
 }
 
@@ -140,7 +140,7 @@ static DEVICE_START( ym2608 )
 		},
 		NULL
 	};
-	const ym2608_interface *intf = device->static_config ? device->static_config : &generic_2608;
+	const ym2608_interface *intf = device->static_config ? (const ym2608_interface *)device->static_config : &generic_2608;
 	int rate = device->clock/72;
 	void *pcmbufa;
 	int  pcmsizea;

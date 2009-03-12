@@ -545,7 +545,7 @@ static STREAM_UPDATE( s14001a_pcm_update )
 {
 	INT32 mix[48000];
 	INT32 *mixp;
-	S14001AChip *chip = param;
+	S14001AChip *chip = (S14001AChip *)param;
 	int i;
 
 	memset(mix, 0, sizeof(mix));

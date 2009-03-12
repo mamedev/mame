@@ -30,7 +30,7 @@ INLINE dac_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( DAC_update )
 {
-	dac_state *info = param;
+	dac_state *info = (dac_state *)param;
 	stream_sample_t *buffer = outputs[0];
 	INT16 out = info->output;
 

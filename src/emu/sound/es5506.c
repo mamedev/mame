@@ -194,7 +194,7 @@ static void compute_tables(es5506_state *chip)
 	int i;
 
 	/* allocate ulaw lookup table */
-	chip->ulaw_lookup = auto_malloc(sizeof(chip->ulaw_lookup[0]) << ULAW_MAXBITS);
+	chip->ulaw_lookup = (INT16 *)auto_malloc(sizeof(chip->ulaw_lookup[0]) << ULAW_MAXBITS);
 
 	/* generate ulaw lookup table */
 	for (i = 0; i < (1 << ULAW_MAXBITS); i++)
@@ -213,7 +213,7 @@ static void compute_tables(es5506_state *chip)
 	}
 
 	/* allocate volume lookup table */
-	chip->volume_lookup = auto_malloc(sizeof(chip->volume_lookup[0]) * 4096);
+	chip->volume_lookup = (UINT16 *)auto_malloc(sizeof(chip->volume_lookup[0]) * 4096);
 
 	/* generate ulaw lookup table */
 	for (i = 0; i < 4096; i++)
@@ -781,7 +781,7 @@ logerror("IRQ raised on voice %d!!\n",v);
 
 static STREAM_UPDATE( es5506_update )
 {
-	es5506_state *chip = param;
+	es5506_state *chip = (es5506_state *)param;
 	INT32 *lsrc = chip->scratch, *rsrc = chip->scratch;
 	stream_sample_t *ldest = outputs[0];
 	stream_sample_t *rdest = outputs[1];
@@ -833,7 +833,7 @@ static STREAM_UPDATE( es5506_update )
 
 static void es5506_start_common(const device_config *device, const void *config, sound_type sndtype)
 {
-	const es5506_interface *intf = config;
+	const es5506_interface *intf = (const es5506_interface *)config;
 	es5506_state *chip = get_safe_token(device);
 	int j;
 	UINT32 accum_mask;
@@ -873,7 +873,7 @@ static void es5506_start_common(const device_config *device, const void *config,
 	}
 
 	/* allocate memory */
-	chip->scratch = auto_malloc(sizeof(chip->scratch[0]) * 2 * MAX_SAMPLE_CHUNK);
+	chip->scratch = (INT32 *)auto_malloc(sizeof(chip->scratch[0]) * 2 * MAX_SAMPLE_CHUNK);
 
 	/* success */
 }
@@ -1446,7 +1446,7 @@ void es5506_voice_bank_w(const device_config *device, int voice, int bank)
 
 static DEVICE_START( es5505 )
 {
-	const es5505_interface *intf = device->static_config;
+	const es5505_interface *intf = (const es5505_interface *)device->static_config;
 	es5506_interface es5506intf;
 
 	memset(&es5506intf, 0, sizeof(es5506intf));

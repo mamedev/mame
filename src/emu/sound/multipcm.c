@@ -427,7 +427,7 @@ static void WriteSlot(MultiPCM *ptChip,struct _SLOT *slot,int reg,unsigned char 
 
 static STREAM_UPDATE( MultiPCM_update )
 {
-	MultiPCM *ptChip = param;
+	MultiPCM *ptChip = (MultiPCM *)param;
 	stream_sample_t  *datap[2];
 	int i,sl;
 

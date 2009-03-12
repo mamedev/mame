@@ -86,7 +86,7 @@ chirp 12-..: vokume   0   : silent
 #define IP_SIZE_FAST    (120/FR_SIZE)
 #define IP_SIZE_FASTER  ( 80/FR_SIZE)
 
-typedef struct _vlm5030_state vml5030_state;
+typedef struct _vlm5030_state vlm5030_state;
 struct _vlm5030_state
 {
 	const device_config *device;
@@ -219,16 +219,16 @@ static const INT16 K5_table[] = {
        0,   -8127,  -16384,  -24511,   32638,   24511,   16254,    8127
 };
 
-INLINE vml5030_state *get_safe_token(const device_config *device)
+INLINE vlm5030_state *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == SOUND);
 	assert(sound_get_type(device) == SOUND_VLM5030);
-	return (vml5030_state *)device->token;
+	return (vlm5030_state *)device->token;
 }
 
-static int get_bits(vml5030_state *chip, int sbit,int bits)
+static int get_bits(vlm5030_state *chip, int sbit,int bits)
 {
 	int offset = chip->address + (sbit>>3);
 	int data;
@@ -242,7 +242,7 @@ static int get_bits(vml5030_state *chip, int sbit,int bits)
 }
 
 /* get next frame */
-static int parse_frame (vml5030_state *chip)
+static int parse_frame (vlm5030_state *chip)
 {
 	unsigned char cmd;
 	int i;
@@ -299,7 +299,7 @@ static int parse_frame (vml5030_state *chip)
 /* decode and buffering data */
 static STREAM_UPDATE( vlm5030_update_callback )
 {
-	vml5030_state *chip = param;
+	vlm5030_state *chip = (vlm5030_state *)param;
 	int buf_count=0;
 	int interp_effect;
 	int i;
@@ -454,13 +454,13 @@ phase_stop:
 }
 
 /* realtime update */
-static void vlm5030_update(vml5030_state *chip)
+static void vlm5030_update(vlm5030_state *chip)
 {
 	stream_update(chip->channel);
 }
 
 /* setup parameteroption when RST=H */
-static void vlm5030_setup_parameter(vml5030_state *chip, UINT8 param)
+static void vlm5030_setup_parameter(vlm5030_state *chip, UINT8 param)
 {
 	/* latch parameter value */
 	chip->parameter = param;
@@ -488,7 +488,7 @@ static void vlm5030_setup_parameter(vml5030_state *chip, UINT8 param)
 
 static STATE_POSTLOAD( vlm5030_restore_state )
 {
-	vml5030_state *chip = param;
+	vlm5030_state *chip = (vlm5030_state *)param;
 	int i;
 
 	int interp_effect = FR_SIZE - (chip->interp_count%FR_SIZE);
@@ -504,7 +504,7 @@ static STATE_POSTLOAD( vlm5030_restore_state )
 }
 
 
-static void vlm5030_reset(vml5030_state *chip)
+static void vlm5030_reset(vlm5030_state *chip)
 {
 	chip->phase = PH_RESET;
 	chip->address = 0;
@@ -534,14 +534,14 @@ static DEVICE_RESET( vlm5030 )
 /* set speech rom address */
 void vlm5030_set_rom(const device_config *device, void *speech_rom)
 {
-	vml5030_state *chip = get_safe_token(device);
+	vlm5030_state *chip = get_safe_token(device);
 	chip->rom = (UINT8 *)speech_rom;
 }
 
 /* get BSY pin level */
 int vlm5030_bsy(const device_config *device)
 {
-	vml5030_state *chip = get_safe_token(device);
+	vlm5030_state *chip = get_safe_token(device);
 	vlm5030_update(chip);
 	return chip->pin_BSY;
 }
@@ -549,14 +549,14 @@ int vlm5030_bsy(const device_config *device)
 /* latch contoll data */
 WRITE8_DEVICE_HANDLER( vlm5030_data_w )
 {
-	vml5030_state *chip = get_safe_token(device);
+	vlm5030_state *chip = get_safe_token(device);
 	chip->latch_data = (UINT8)data;
 }
 
 /* set RST pin level : reset / set table address A8-A15 */
 void vlm5030_rst (const device_config *device, int pin )
 {
-	vml5030_state *chip = get_safe_token(device);
+	vlm5030_state *chip = get_safe_token(device);
 	if( chip->pin_RST )
 	{
 		if( !pin )
@@ -581,7 +581,7 @@ void vlm5030_rst (const device_config *device, int pin )
 /* set VCU pin level : ?? unknown */
 void vlm5030_vcu(const device_config *device, int pin)
 {
-	vml5030_state *chip = get_safe_token(device);
+	vlm5030_state *chip = get_safe_token(device);
 	/* direct mode / indirect mode */
 	chip->pin_VCU = pin;
 	return;
@@ -590,7 +590,7 @@ void vlm5030_vcu(const device_config *device, int pin)
 /* set ST pin level  : set table address A0-A7 / start speech */
 void vlm5030_st(const device_config *device, int pin )
 {
-	vml5030_state *chip = get_safe_token(device);
+	vlm5030_state *chip = get_safe_token(device);
 	int table;
 
 	if( chip->pin_ST != pin )
@@ -651,10 +651,10 @@ static DEVICE_START( vlm5030 )
 {
 	const vlm5030_interface defintrf = { 0 };
 	int emulation_rate;
-	vml5030_state *chip = get_safe_token(device);
+	vlm5030_state *chip = get_safe_token(device);
 
 	chip->device = device;
-	chip->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
+	chip->intf = (device->static_config != NULL) ? (const vlm5030_interface *)device->static_config : &defintrf;
 
 	emulation_rate = device->clock / 440;
 
@@ -708,7 +708,7 @@ DEVICE_GET_INFO( vlm5030 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vml5030_state); 			break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vlm5030_state); 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( vlm5030 );		break;

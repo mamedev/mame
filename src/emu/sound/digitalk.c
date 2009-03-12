@@ -542,7 +542,7 @@ static void digitalker_step(digitalker *dg)
 
 static STREAM_UPDATE(digitalker_update)
 {
-	digitalker *dg = param;
+	digitalker *dg = (digitalker *)param;
 	stream_sample_t *sout = outputs[0];
 	int cpos = 0;
 	while(cpos != samples) {

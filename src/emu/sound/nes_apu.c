@@ -668,7 +668,7 @@ WRITE8_DEVICE_HANDLER( nes_psg_w ) {apu_write(get_safe_token(device),offset,data
 /* UPDATE APU SYSTEM */
 static STREAM_UPDATE( nes_psg_update_sound )
 {
-  nesapu_state *info = param;
+  nesapu_state *info = (nesapu_state *)param;
   apu_update(info, outputs[0], samples);
 }
 
@@ -676,7 +676,7 @@ static STREAM_UPDATE( nes_psg_update_sound )
 /* INITIALIZE APU SYSTEM */
 static DEVICE_START( nesapu )
 {
-	const nes_interface *intf = device->static_config;
+	const nes_interface *intf = (const nes_interface *)device->static_config;
 	nesapu_state *info = get_safe_token(device);
 	int rate = device->clock / 4;
 	int i;

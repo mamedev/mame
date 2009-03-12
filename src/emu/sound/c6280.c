@@ -99,7 +99,7 @@ INLINE c6280_t *get_safe_token(const device_config *device)
 
 static void c6280_init(const device_config *device, c6280_t *p, double clk, double rate)
 {
-	const c6280_interface *intf = device->static_config;
+	const c6280_interface *intf = (const c6280_interface *)device->static_config;
     int i;
     double step;
 
@@ -231,7 +231,7 @@ static STREAM_UPDATE( c6280_update )
     };
     int ch;
     int i;
-    c6280_t *p = param;
+    c6280_t *p = (c6280_t *)param;
 
     int lmal = (p->balance >> 4) & 0x0F;
     int rmal = (p->balance >> 0) & 0x0F;

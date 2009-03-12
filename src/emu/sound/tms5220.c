@@ -179,7 +179,7 @@ void *tms5220_create(const device_config *device)
 {
 	struct tms5220 *tms;
 
-	tms = malloc_or_die(sizeof(*tms));
+	tms = (struct tms5220 *)malloc_or_die(sizeof(*tms));
 	memset(tms, 0, sizeof(*tms));
 
 	tms->device = device;
@@ -248,7 +248,7 @@ void tms5220_destroy(void *chip)
 
 void tms5220_reset_chip(void *chip)
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
 
 	/* initialize the FIFO */
 	/*memset(tms->fifo, 0, sizeof(tms->fifo));*/
@@ -292,7 +292,7 @@ void tms5220_reset_chip(void *chip)
 
 void tms5220_set_irq(void *chip, void (*func)(const device_config *, int))
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
     tms->irq_func = func;
 }
 
@@ -305,7 +305,7 @@ void tms5220_set_irq(void *chip, void (*func)(const device_config *, int))
 
 void tms5220_set_read(void *chip, int (*func)(const device_config *, int))
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
 	tms->read_callback = func;
 }
 
@@ -318,7 +318,7 @@ void tms5220_set_read(void *chip, int (*func)(const device_config *, int))
 
 void tms5220_set_load_address(void *chip, void (*func)(const device_config *, int))
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
 	tms->load_address_callback = func;
 }
 
@@ -331,7 +331,7 @@ void tms5220_set_load_address(void *chip, void (*func)(const device_config *, in
 
 void tms5220_set_read_and_branch(void *chip, void (*func)(const device_config *))
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
 	tms->read_and_branch_callback = func;
 }
 
@@ -344,7 +344,7 @@ void tms5220_set_read_and_branch(void *chip, void (*func)(const device_config *)
 
 void tms5220_set_variant(void *chip, tms5220_variant new_variant)
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
 	tms->variant = new_variant;
 }
 
@@ -357,7 +357,7 @@ void tms5220_set_variant(void *chip, tms5220_variant new_variant)
 
 void tms5220_data_write(void *chip, int data)
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
 
     /* add this byte to the FIFO */
     if (tms->fifo_count < FIFO_SIZE)
@@ -411,7 +411,7 @@ void tms5220_data_write(void *chip, int data)
 
 int tms5220_status_read(void *chip)
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
 
 	if (tms->RDB_flag)
 	{	/* if last command was read, return data register */
@@ -440,7 +440,7 @@ int tms5220_status_read(void *chip)
 
 int tms5220_ready_read(void *chip)
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
     return (tms->fifo_count < FIFO_SIZE-1);
 }
 
@@ -453,7 +453,7 @@ int tms5220_ready_read(void *chip)
 
 int tms5220_cycles_to_ready(void *chip)
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
 	int answer;
 
 
@@ -495,7 +495,7 @@ int tms5220_cycles_to_ready(void *chip)
 
 int tms5220_int_read(void *chip)
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
     return tms->irq_pin;
 }
 
@@ -509,7 +509,7 @@ int tms5220_int_read(void *chip)
 
 void tms5220_process(void *chip, INT16 *buffer, unsigned int size)
 {
-	struct tms5220 *tms = chip;
+	struct tms5220 *tms = (struct tms5220 *)chip;
     int buf_count=0;
     int i, interp_period, bitout;
 
@@ -798,7 +798,7 @@ static INT16 clip_and_wrap(INT16 cliptemp)
 
 static INT16 lattice_filter(void *chip)
 {
-        struct tms5220 *tms = chip;
+        struct tms5220 *tms = (struct tms5220 *)chip;
         /* Lattice filter here */
         /* Aug/05/07: redone as unrolled loop, for clarity - LN*/
         /* Copied verbatim from table I in US patent 4,209,804:

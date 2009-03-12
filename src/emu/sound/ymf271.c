@@ -690,7 +690,7 @@ static STREAM_UPDATE( ymf271_update )
 	int i, j;
 	int op;
 	INT32 *mixp;
-	YMF271Chip *chip = param;
+	YMF271Chip *chip = (YMF271Chip *)param;
 
 	memset(mix, 0, sizeof(mix[0])*samples*2);
 
@@ -1358,7 +1358,7 @@ static void ymf271_write_pcm(YMF271Chip *chip, int data)
 
 static TIMER_CALLBACK( ymf271_timer_a_tick )
 {
-	YMF271Chip *chip = ptr;
+	YMF271Chip *chip = (YMF271Chip *)ptr;
 
 	chip->status |= 1;
 
@@ -1371,7 +1371,7 @@ static TIMER_CALLBACK( ymf271_timer_a_tick )
 
 static TIMER_CALLBACK( ymf271_timer_b_tick )
 {
-	YMF271Chip *chip = ptr;
+	YMF271Chip *chip = (YMF271Chip *)ptr;
 
 	chip->status |= 2;
 
@@ -1574,7 +1574,7 @@ static void init_tables(void)
 
 	for (i=0; i < ARRAY_LENGTH(wavetable); i++)
 	{
-		wavetable[i] = auto_malloc(SIN_LEN * sizeof(INT16));
+		wavetable[i] = (INT16 *)auto_malloc(SIN_LEN * sizeof(INT16));
 	}
 
 	for (i=0; i < SIN_LEN; i++)
@@ -1652,7 +1652,7 @@ static void init_tables(void)
 		alfo_table[3][i] = (i < (LFO_LENGTH/2)) ? ALFO_MAX-tri_wave : tri_wave;
 	}
 
-	mix = auto_malloc(48000*2*sizeof(*mix));
+	mix = (INT32 *)auto_malloc(48000*2*sizeof(*mix));
 }
 
 static void init_state(YMF271Chip *chip, const device_config *device)
@@ -1755,7 +1755,7 @@ static DEVICE_START( ymf271 )
 	chip->device = device;
 	chip->clock = device->clock;
 
-	intf = (device->static_config != NULL) ? device->static_config : &defintrf;
+	intf = (device->static_config != NULL) ? (const ymf271_interface *)device->static_config : &defintrf;
 
 	ymf271_init(device, chip, device->region, intf->irq_callback, &intf->ext_read, &intf->ext_write);
 	chip->stream = stream_create(device, 0, 2, device->clock/384, chip, ymf271_update);

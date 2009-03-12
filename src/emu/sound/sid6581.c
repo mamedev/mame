@@ -31,7 +31,7 @@ static STREAM_UPDATE( sid_update )
 
 static void sid_start(const device_config *device, SIDTYPE sidtype)
 {
-	SID6581 *sid = device->token;
+	SID6581 *sid = get_sid(device);
 	const sid6581_interface *iface = (const sid6581_interface*) device->static_config;
 
 	sid->device = device;
@@ -49,7 +49,7 @@ static void sid_start(const device_config *device, SIDTYPE sidtype)
 
 static DEVICE_RESET( sid )
 {
-	SID6581 *sid = device->token;
+	SID6581 *sid = get_sid(device);
 	sidEmuReset(sid);
 }
 

@@ -171,7 +171,7 @@ static TIMER_CALLBACK( prd_changed_tick )
 
 static STATE_POSTLOAD( cdp1869_state_save_postload )
 {
-	update_prd_changed_timer(param);
+	update_prd_changed_timer((cdp1869_t *)param);
 }
 
 /*-------------------------------------------------
@@ -783,7 +783,7 @@ void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectang
 
 static STREAM_UPDATE( cdp1869_stream_update )
 {
-	cdp1869_t *cdp1869 = param;
+	cdp1869_t *cdp1869 = (cdp1869_t *)param;
 	INT16 signal = cdp1869->signal;
 	stream_sample_t *buffer = outputs[0];
 
@@ -847,7 +847,7 @@ static DEVICE_START( cdp1869 )
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
 	/* validate arguments */
-	cdp1869->intf = device->static_config;
+	cdp1869->intf = (const cdp1869_interface *)device->static_config;
 
 	assert(cdp1869->intf->page_ram_r != NULL);
 	assert(cdp1869->intf->pcb_r != NULL);

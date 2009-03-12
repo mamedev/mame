@@ -117,7 +117,7 @@ static STREAM_UPDATE( k053260_update ) {
 	UINT32 delta[4], end[4], pos[4];
 	int dataL, dataR;
 	signed char d;
-	k053260_state *ic = param;
+	k053260_state *ic = (k053260_state *)param;
 
 	/* precache some values */
 	for ( i = 0; i < 4; i++ ) {
@@ -217,7 +217,7 @@ static DEVICE_START( k053260 )
 
 	/* Initialize our chip structure */
 	ic->device = device;
-	ic->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
+	ic->intf = (device->static_config != NULL) ? (const k053260_interface *)device->static_config : &defintrf;
 
 	ic->mode = 0;
 	ic->rom = device->region;

@@ -28,7 +28,7 @@ INLINE segapcm_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( SEGAPCM_update )
 {
-	segapcm_state *spcm = param;
+	segapcm_state *spcm = (segapcm_state *)param;
 	int ch;
 
 	/* clear the buffers */
@@ -88,12 +88,12 @@ static STREAM_UPDATE( SEGAPCM_update )
 
 static DEVICE_START( segapcm )
 {
-	const sega_pcm_interface *intf = device->static_config;
+	const sega_pcm_interface *intf = (const sega_pcm_interface *)device->static_config;
 	int mask, rom_mask, len;
 	segapcm_state *spcm = get_safe_token(device);
 
 	spcm->rom = (const UINT8 *)device->region;
-	spcm->ram = auto_malloc(0x800);
+	spcm->ram = (UINT8 *)auto_malloc(0x800);
 
 	memset(spcm->ram, 0xff, 0x800);
 

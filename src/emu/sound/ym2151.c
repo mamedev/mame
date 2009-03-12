@@ -543,9 +543,9 @@ static void init_tables(void)
 		/* we never reach zero here due to ((i*2)+1) */
 
 		if (m>0.0)
-			o = 8*log(1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(1.0/m)/log(2.0);	/* convert to 'decibels' */
 		else
-			o = 8*log(-1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(-1.0/m)/log(2.0);	/* convert to 'decibels' */
 
 		o = o / (ENV_STEP/4);
 
@@ -782,7 +782,7 @@ INLINE void envelope_KONKOFF(YM2151Operator * op, int v)
 
 static TIMER_CALLBACK( irqAon_callback )
 {
-	YM2151 *chip = ptr;
+	YM2151 *chip = (YM2151 *)ptr;
 	int oldstate = chip->irqlinestate;
 
 	chip->irqlinestate |= 1;
@@ -792,7 +792,7 @@ static TIMER_CALLBACK( irqAon_callback )
 
 static TIMER_CALLBACK( irqBon_callback )
 {
-	YM2151 *chip = ptr;
+	YM2151 *chip = (YM2151 *)ptr;
 	int oldstate = chip->irqlinestate;
 
 	chip->irqlinestate |= 2;
@@ -802,7 +802,7 @@ static TIMER_CALLBACK( irqBon_callback )
 
 static TIMER_CALLBACK( irqAoff_callback )
 {
-	YM2151 *chip = ptr;
+	YM2151 *chip = (YM2151 *)ptr;
 	int oldstate = chip->irqlinestate;
 
 	chip->irqlinestate &= ~1;
@@ -812,7 +812,7 @@ static TIMER_CALLBACK( irqAoff_callback )
 
 static TIMER_CALLBACK( irqBoff_callback )
 {
-	YM2151 *chip = ptr;
+	YM2151 *chip = (YM2151 *)ptr;
 	int oldstate = chip->irqlinestate;
 
 	chip->irqlinestate &= ~2;
@@ -822,7 +822,7 @@ static TIMER_CALLBACK( irqBoff_callback )
 
 static TIMER_CALLBACK( timer_callback_a )
 {
-	YM2151 *chip = ptr;
+	YM2151 *chip = (YM2151 *)ptr;
 	timer_adjust_oneshot(chip->timer_A, chip->timer_A_time[ chip->timer_A_index ], 0);
 	chip->timer_A_index_old = chip->timer_A_index;
 	if (chip->irq_enable & 0x04)
@@ -835,7 +835,7 @@ static TIMER_CALLBACK( timer_callback_a )
 }
 static TIMER_CALLBACK( timer_callback_b )
 {
-	YM2151 *chip = ptr;
+	YM2151 *chip = (YM2151 *)ptr;
 	timer_adjust_oneshot(chip->timer_B, chip->timer_B_time[ chip->timer_B_index ], 0);
 	chip->timer_B_index_old = chip->timer_B_index;
 	if (chip->irq_enable & 0x08)
@@ -847,7 +847,7 @@ static TIMER_CALLBACK( timer_callback_b )
 #if 0
 static TIMER_CALLBACK( timer_callback_chip_busy )
 {
-	YM2151 *chip = ptr;
+	YM2151 *chip = (YM2151 *)ptr;
 	chip->status &= 0x7f;	/* reset busy flag */
 }
 #endif
@@ -1043,7 +1043,7 @@ INLINE void refresh_EG(YM2151Operator * op)
 /* write a register on YM2151 chip number 'n' */
 void ym2151_write_reg(void *_chip, int r, int v)
 {
-	YM2151 *chip = _chip;
+	YM2151 *chip = (YM2151 *)_chip;
 	YM2151Operator *op = &chip->oper[ (r&0x07)*4+((r&0x18)>>3) ];
 
 	/* adjust bus to 8 bits */
@@ -1367,7 +1367,7 @@ static TIMER_CALLBACK( cymfile_callback )
 
 int ym2151_read_status( void *_chip )
 {
-	YM2151 *chip = _chip;
+	YM2151 *chip = (YM2151 *)_chip;
 	return chip->status;
 }
 
@@ -1557,7 +1557,7 @@ void * ym2151_init(const device_config *device, int clock, int rate)
 
 void ym2151_shutdown(void *_chip)
 {
-	YM2151 *chip = _chip;
+	YM2151 *chip = (YM2151 *)_chip;
 
 	free (chip);
 
@@ -1588,7 +1588,7 @@ void ym2151_shutdown(void *_chip)
 void ym2151_reset_chip(void *_chip)
 {
 	int i;
-	YM2151 *chip = _chip;
+	YM2151 *chip = (YM2151 *)_chip;
 
 
 	/* initialize hardware registers */
@@ -2377,7 +2377,7 @@ void ym2151_update_one(void *chip, SAMP **buffers, int length)
 	bufL = buffers[0];
 	bufR = buffers[1];
 
-	PSG = chip;
+	PSG = (YM2151 *)chip;
 
 #ifdef USE_MAME_TIMERS
 		/* ASG 980324 - handled by real timers now */
@@ -2483,13 +2483,13 @@ void ym2151_update_one(void *chip, SAMP **buffers, int length)
 
 void ym2151_set_irq_handler(void *chip, void(*handler)(const device_config *device, int irq))
 {
-	YM2151 *PSG = chip;
+	YM2151 *PSG = (YM2151 *)chip;
 	PSG->irqhandler = handler;
 }
 
 void ym2151_set_port_write_handler(void *chip, write8_device_func handler)
 {
-	YM2151 *PSG = chip;
+	YM2151 *PSG = (YM2151 *)chip;
 	PSG->porthandler = handler;
 }
 

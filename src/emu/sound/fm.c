@@ -1739,9 +1739,9 @@ static int init_tables(void)
 		/* we never reach zero here due to ((i*2)+1) */
 
 		if (m>0.0)
-			o = 8*log(1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(1.0/m)/log(2.0);	/* convert to 'decibels' */
 		else
-			o = 8*log(-1.0/m)/log(2);	/* convert to 'decibels' */
+			o = 8*log(-1.0/m)/log(2.0);	/* convert to 'decibels' */
 
 		o = o / (ENV_STEP/4);
 
@@ -2260,7 +2260,7 @@ typedef struct
 /* Generate samples for one of the YM2203s */
 void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length)
 {
-	YM2203 *F2203 = chip;
+	YM2203 *F2203 = (YM2203 *)chip;
 	FM_OPN *OPN =   &F2203->OPN;
 	int i;
 	FMSAMPLE *buf = buffer;
@@ -2344,7 +2344,7 @@ void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length)
 void ym2203_reset_chip(void *chip)
 {
 	int i;
-	YM2203 *F2203 = chip;
+	YM2203 *F2203 = (YM2203 *)chip;
 	FM_OPN *OPN = &F2203->OPN;
 
 	/* Reset Prescaler */
@@ -2454,7 +2454,7 @@ void * ym2203_init(void *param, const device_config *device, int clock, int rate
 /* shut down emulator */
 void ym2203_shutdown(void *chip)
 {
-	YM2203 *FM2203 = chip;
+	YM2203 *FM2203 = (YM2203 *)chip;
 
 	FMCloseTable();
 	free(FM2203);
@@ -2463,7 +2463,7 @@ void ym2203_shutdown(void *chip)
 /* YM2203 I/O interface */
 int ym2203_write(void *chip,int a,UINT8 v)
 {
-	YM2203 *F2203 = chip;
+	YM2203 *F2203 = (YM2203 *)chip;
 	FM_OPN *OPN = &F2203->OPN;
 
 	if( !(a&1) )
@@ -2504,7 +2504,7 @@ int ym2203_write(void *chip,int a,UINT8 v)
 
 UINT8 ym2203_read(void *chip,int a)
 {
-	YM2203 *F2203 = chip;
+	YM2203 *F2203 = (YM2203 *)chip;
 	int addr = F2203->OPN.ST.address;
 	UINT8 ret = 0;
 
@@ -2521,7 +2521,7 @@ UINT8 ym2203_read(void *chip,int a)
 
 int ym2203_timer_over(void *chip,int c)
 {
-	YM2203 *F2203 = chip;
+	YM2203 *F2203 = (YM2203 *)chip;
 
 	if( c )
 	{	/* Timer B */
@@ -3427,7 +3427,7 @@ INLINE void YM2608IRQMaskWrite(FM_OPN *OPN, YM2608 *F2608, int v)
 /* Generate samples for one of the YM2608s */
 void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
-	YM2608 *F2608 = chip;
+	YM2608 *F2608 = (YM2608 *)chip;
 	FM_OPN *OPN   = &F2608->OPN;
 	YM_DELTAT *DELTAT = &F2608->deltaT;
 	int i,j;
@@ -3630,12 +3630,12 @@ static void YM2608_save_state(YM2608 *F2608, const device_config *device)
 
 static void YM2608_deltat_status_set(void *chip, UINT8 changebits)
 {
-	YM2608 *F2608 = chip;
+	YM2608 *F2608 = (YM2608 *)chip;
 	FM_STATUS_SET(&(F2608->OPN.ST), changebits);
 }
 static void YM2608_deltat_status_reset(void *chip, UINT8 changebits)
 {
-	YM2608 *F2608 = chip;
+	YM2608 *F2608 = (YM2608 *)chip;
 	FM_STATUS_RESET(&(F2608->OPN.ST), changebits);
 }
 /* YM2608(OPNA) */
@@ -3698,7 +3698,7 @@ void * ym2608_init(void *param, const device_config *device, int clock, int rate
 /* shut down emulator */
 void ym2608_shutdown(void *chip)
 {
-	YM2608 *F2608 = chip;
+	YM2608 *F2608 = (YM2608 *)chip;
 
 	FMCloseTable();
 	free(F2608);
@@ -3708,7 +3708,7 @@ void ym2608_shutdown(void *chip)
 void ym2608_reset_chip(void *chip)
 {
 	int i;
-	YM2608 *F2608 = chip;
+	YM2608 *F2608 = (YM2608 *)chip;
 	FM_OPN *OPN   = &F2608->OPN;
 	YM_DELTAT *DELTAT = &F2608->deltaT;
 
@@ -3789,7 +3789,7 @@ void ym2608_reset_chip(void *chip)
 /* v = value   */
 int ym2608_write(void *chip, int a,UINT8 v)
 {
-	YM2608 *F2608 = chip;
+	YM2608 *F2608 = (YM2608 *)chip;
 	FM_OPN *OPN   = &F2608->OPN;
 	int addr;
 
@@ -3885,7 +3885,7 @@ int ym2608_write(void *chip, int a,UINT8 v)
 
 UINT8 ym2608_read(void *chip,int a)
 {
-	YM2608 *F2608 = chip;
+	YM2608 *F2608 = (YM2608 *)chip;
 	int addr = F2608->OPN.ST.address;
 	UINT8 ret = 0;
 
@@ -3925,7 +3925,7 @@ UINT8 ym2608_read(void *chip,int a)
 
 int ym2608_timer_over(void *chip,int c)
 {
-	YM2608 *F2608 = chip;
+	YM2608 *F2608 = (YM2608 *)chip;
 
     switch(c)
 	{
@@ -3970,7 +3970,7 @@ int ym2608_timer_over(void *chip,int c)
 /* Generate samples for one of the YM2610s */
 void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
-	YM2610 *F2610 = chip;
+	YM2610 *F2610 = (YM2610 *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 	int i,j;
@@ -4107,7 +4107,7 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 /* Generate samples for one of the YM2610Bs */
 void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
-	YM2610 *F2610 = chip;
+	YM2610 *F2610 = (YM2610 *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 	int i,j;
@@ -4314,12 +4314,12 @@ static void YM2610_save_state(YM2610 *F2610, const device_config *device)
 
 static void YM2610_deltat_status_set(void *chip, UINT8 changebits)
 {
-	YM2610 *F2610 = chip;
+	YM2610 *F2610 = (YM2610 *)chip;
 	F2610->adpcm_arrivedEndAddress |= changebits;
 }
 static void YM2610_deltat_status_reset(void *chip, UINT8 changebits)
 {
-	YM2610 *F2610 = chip;
+	YM2610 *F2610 = (YM2610 *)chip;
 	F2610->adpcm_arrivedEndAddress &= (~changebits);
 }
 
@@ -4375,7 +4375,7 @@ void *ym2610_init(void *param, const device_config *device, int clock, int rate,
 /* shut down emulator */
 void ym2610_shutdown(void *chip)
 {
-	YM2610 *F2610 = chip;
+	YM2610 *F2610 = (YM2610 *)chip;
 
 	FMCloseTable();
 	free(F2610);
@@ -4385,7 +4385,7 @@ void ym2610_shutdown(void *chip)
 void ym2610_reset_chip(void *chip)
 {
 	int i;
-	YM2610 *F2610 = chip;
+	YM2610 *F2610 = (YM2610 *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
 
@@ -4450,7 +4450,7 @@ void ym2610_reset_chip(void *chip)
 /* v = value   */
 int ym2610_write(void *chip, int a, UINT8 v)
 {
-	YM2610 *F2610 = chip;
+	YM2610 *F2610 = (YM2610 *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
 	int addr;
 	int ch;
@@ -4552,7 +4552,7 @@ int ym2610_write(void *chip, int a, UINT8 v)
 
 UINT8 ym2610_read(void *chip,int a)
 {
-	YM2610 *F2610 = chip;
+	YM2610 *F2610 = (YM2610 *)chip;
 	int addr = F2610->OPN.ST.address;
 	UINT8 ret = 0;
 
@@ -4580,7 +4580,7 @@ UINT8 ym2610_read(void *chip,int a)
 
 int ym2610_timer_over(void *chip,int c)
 {
-	YM2610 *F2610 = chip;
+	YM2610 *F2610 = (YM2610 *)chip;
 
 	if( c )
 	{	/* Timer B */
@@ -4626,7 +4626,7 @@ static int dacen;
 /* Generate samples for one of the YM2612s */
 void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
-	YM2612 *F2612 = chip;
+	YM2612 *F2612 = (YM2612 *)chip;
 	FM_OPN *OPN   = &F2612->OPN;
 	int i;
 	FMSAMPLE  *bufL,*bufR;
@@ -4827,7 +4827,7 @@ void * ym2612_init(void *param, const device_config *device, int clock, int rate
 /* shut down emulator */
 void ym2612_shutdown(void *chip)
 {
-	YM2612 *F2612 = chip;
+	YM2612 *F2612 = (YM2612 *)chip;
 
 	FMCloseTable();
 	free(F2612);
@@ -4837,7 +4837,7 @@ void ym2612_shutdown(void *chip)
 void ym2612_reset_chip(void *chip)
 {
 	int i;
-	YM2612 *F2612 = chip;
+	YM2612 *F2612 = (YM2612 *)chip;
 	FM_OPN *OPN   = &F2612->OPN;
 
 	OPNSetPres( OPN, 6*24, 6*24, 0);
@@ -4873,7 +4873,7 @@ void ym2612_reset_chip(void *chip)
 /* v = value   */
 int ym2612_write(void *chip, int a, UINT8 v)
 {
-	YM2612 *F2612 = chip;
+	YM2612 *F2612 = (YM2612 *)chip;
 	int addr;
 
 	v &= 0xff;	/* adjust to 8 bit bus */
@@ -4936,7 +4936,7 @@ int ym2612_write(void *chip, int a, UINT8 v)
 
 UINT8 ym2612_read(void *chip,int a)
 {
-	YM2612 *F2612 = chip;
+	YM2612 *F2612 = (YM2612 *)chip;
 
 	switch( a&3){
 	case 0:	/* status 0 */
@@ -4952,7 +4952,7 @@ UINT8 ym2612_read(void *chip,int a)
 
 int ym2612_timer_over(void *chip,int c)
 {
-	YM2612 *F2612 = chip;
+	YM2612 *F2612 = (YM2612 *)chip;
 
 	if( c )
 	{	/* Timer B */

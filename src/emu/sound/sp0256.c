@@ -1105,7 +1105,7 @@ static void sp0256_micro(sp0256_state *sp)
 
 static STREAM_UPDATE( sp0256_update )
 {
-	sp0256_state *sp = param;
+	sp0256_state *sp = (sp0256_state *)param;
 	stream_sample_t *output = outputs[0];
 	int output_index = 0;
 	int length, did_samp, old_idx;
@@ -1182,7 +1182,7 @@ static STREAM_UPDATE( sp0256_update )
 
 static DEVICE_START( sp0256 )
 {
-	const sp0256_interface *intf = device->static_config;
+	const sp0256_interface *intf = (const sp0256_interface *)device->static_config;
 	sp0256_state *sp = get_safe_token(device);
 
 	sp->device = device;
@@ -1201,7 +1201,7 @@ static DEVICE_START( sp0256 )
     /* -------------------------------------------------------------------- */
     /*  Allocate a scratch buffer for generating ~10kHz samples.             */
     /* -------------------------------------------------------------------- */
-    sp->scratch = malloc_or_die(SCBUF_SIZE * sizeof(INT16));
+    sp->scratch = (INT16 *)malloc_or_die(SCBUF_SIZE * sizeof(INT16));
     sp->sc_head = sp->sc_tail = 0;
 
     /* -------------------------------------------------------------------- */

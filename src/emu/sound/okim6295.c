@@ -263,7 +263,7 @@ static void generate_adpcm(okim6295_state *chip, struct ADPCMVoice *voice, INT16
 
 static STREAM_UPDATE( okim6295_update )
 {
-	okim6295_state *chip = param;
+	okim6295_state *chip = (okim6295_state *)param;
 	int i;
 
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -329,7 +329,7 @@ static void okim6295_state_save_register(okim6295_state *info, const device_conf
 
 static DEVICE_START( okim6295 )
 {
-	const okim6295_interface *intf = device->static_config;
+	const okim6295_interface *intf = (const okim6295_interface *)device->static_config;
 	okim6295_state *info = get_safe_token(device);
 	int voice;
 	int divisor = intf->pin7 ? 132 : 165;

@@ -44,7 +44,7 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
 
 static STREAM_UPDATE( cdda_update )
 {
-	cdda_info *info = param;
+	cdda_info *info = (cdda_info *)param;
 	get_audio_data(info, &outputs[0][0], &outputs[1][0], samples);
 }
 
@@ -59,9 +59,9 @@ static DEVICE_START( cdda )
 	cdda_info *info = get_safe_token(device);
 
 	/* allocate an audio cache */
-	info->audio_cache = auto_malloc( CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	info->audio_cache = (UINT8 *)auto_malloc( CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
-	intf = device->static_config;
+	intf = (const struct CDDAinterface *)device->static_config;
 
 	info->stream = stream_create(device, 0, 2, 44100, info, cdda_update);
 

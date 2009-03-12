@@ -33,7 +33,7 @@ INLINE tms_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( tms3615_sound_update )
 {
-	tms_state *tms = param;
+	tms_state *tms = (tms_state *)param;
 	int samplerate = tms->samplerate;
 	stream_sample_t *buffer8 = outputs[TMS3615_FOOTAGE_8];
 	stream_sample_t *buffer16 = outputs[TMS3615_FOOTAGE_16];

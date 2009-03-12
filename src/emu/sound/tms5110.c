@@ -157,7 +157,7 @@ static void parse_frame(struct tms5110 *tms);
 
 void tms5110_set_variant(void *chip, int variant)
 {
-	struct tms5110 *tms = chip;
+	struct tms5110 *tms = (struct tms5110 *)chip;
 
 	switch (variant)
 	{
@@ -181,7 +181,7 @@ void *tms5110_create(const device_config *device, int variant)
 {
 	struct tms5110 *tms;
 
-	tms = malloc_or_die(sizeof(*tms));
+	tms = (struct tms5110 *)malloc_or_die(sizeof(*tms));
 	memset(tms, 0, sizeof(*tms));
 
 	tms->device = device;
@@ -247,7 +247,7 @@ void tms5110_destroy(void *chip)
 
 void tms5110_reset_chip(void *chip)
 {
-	struct tms5110 *tms = chip;
+	struct tms5110 *tms = (struct tms5110 *)chip;
 
 	/* initialize the FIFO */
 	memset(tms->fifo, 0, sizeof(tms->fifo));
@@ -284,7 +284,7 @@ void tms5110_reset_chip(void *chip)
 
 void tms5110_set_M0_callback(void *chip, int (*func)(const device_config *))
 {
-	struct tms5110 *tms = chip;
+	struct tms5110 *tms = (struct tms5110 *)chip;
 	tms->M0_callback = func;
 }
 
@@ -296,7 +296,7 @@ void tms5110_set_M0_callback(void *chip, int (*func)(const device_config *))
 
 void tms5110_set_load_address(void *chip, void (*func)(const device_config *, int))
 {
-	struct tms5110 *tms = chip;
+	struct tms5110 *tms = (struct tms5110 *)chip;
 	tms->set_load_address = func;
 }
 
@@ -388,7 +388,7 @@ static void perform_dummy_read(struct tms5110 *tms)
 
 int tms5110_status_read(void *chip)
 {
-	struct tms5110 *tms = chip;
+	struct tms5110 *tms = (struct tms5110 *)chip;
 	if (DEBUG_5110) logerror("Status read: TS=%d\n", tms->talk_status);
 
 	return (tms->talk_status << 0); /*CTL1 = still talking ? */
@@ -404,7 +404,7 @@ int tms5110_status_read(void *chip)
 
 int tms5110_ready_read(void *chip)
 {
-	struct tms5110 *tms = chip;
+	struct tms5110 *tms = (struct tms5110 *)chip;
 	return (tms->fifo_count < FIFO_SIZE-1);
 }
 
@@ -418,7 +418,7 @@ int tms5110_ready_read(void *chip)
 
 void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 {
-	struct tms5110 *tms = chip;
+	struct tms5110 *tms = (struct tms5110 *)chip;
 	int buf_count=0;
 	int i, interp_period, bitout;
 	INT16 Y11, cliptemp;
@@ -738,7 +738,7 @@ empty:
 
 void tms5110_CTL_set(void *chip, int data)
 {
-	struct tms5110 *tms = chip;
+	struct tms5110 *tms = (struct tms5110 *)chip;
 	tms->CTL_pins = data & 0xf;
 }
 
@@ -750,7 +750,7 @@ void tms5110_CTL_set(void *chip, int data)
 
 void tms5110_PDC_set(void *chip, int data)
 {
-	struct tms5110 *tms = chip;
+	struct tms5110 *tms = (struct tms5110 *)chip;
 	if (tms->PDC != (data & 0x1) )
 	{
 		tms->PDC = data & 0x1;

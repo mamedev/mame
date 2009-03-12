@@ -227,7 +227,7 @@ static void KDAC_A_make_fncode( KDAC_A_PCM *info ){
 
 static STREAM_UPDATE( KDAC_A_update )
 {
-  KDAC_A_PCM *info = param;
+  KDAC_A_PCM *info = (KDAC_A_PCM *)param;
   int i;
 
   memset(outputs[0],0,samples * sizeof(*outputs[0]));
@@ -308,7 +308,7 @@ static DEVICE_START( k007232 )
 	int i;
 	KDAC_A_PCM *info = get_safe_token(device);
 
-	info->intf = (device->static_config != NULL) ? device->static_config : &defintrf;
+	info->intf = (device->static_config != NULL) ? (const k007232_interface *)device->static_config : &defintrf;
 
 	/* Set up the chips */
 

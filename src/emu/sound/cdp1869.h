@@ -114,11 +114,11 @@ typedef UINT8 (*cdp1869_page_ram_read_func)(const device_config *device, UINT16 
 typedef void (*cdp1869_page_ram_write_func)(const device_config *device, UINT16 pma, UINT8 data);
 typedef int (*cdp1869_pcb_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
 
-typedef enum _cdp1869_format cdp1869_format;
 enum _cdp1869_format {
 	CDP1869_NTSC = 0,
 	CDP1869_PAL
 };
+typedef enum _cdp1869_format cdp1869_format;
 
 /* interface */
 typedef struct _cdp1869_interface cdp1869_interface;

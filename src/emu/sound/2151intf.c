@@ -36,14 +36,14 @@ INLINE ym2151_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( ym2151_update )
 {
-	ym2151_state *info = param;
+	ym2151_state *info = (ym2151_state *)param;
 	ym2151_update_one(info->chip, outputs, samples);
 }
 
 
 static STATE_POSTLOAD( ym2151intf_postload )
 {
-	ym2151_state *info = param;
+	ym2151_state *info = (ym2151_state *)param;
 	ym2151_postload(machine, info->chip);
 }
 
@@ -51,10 +51,10 @@ static STATE_POSTLOAD( ym2151intf_postload )
 static DEVICE_START( ym2151 )
 {
 	static const ym2151_interface dummy = { 0 };
-	ym2151_state *info = device->token;
+	ym2151_state *info = get_safe_token(device);
 	int rate;
 
-	info->intf = device->static_config ? device->static_config : &dummy;
+	info->intf = device->static_config ? (const ym2151_interface *)device->static_config : &dummy;
 
 	rate = device->clock/64;
 
@@ -73,13 +73,13 @@ static DEVICE_START( ym2151 )
 
 static DEVICE_STOP( ym2151 )
 {
-	ym2151_state *info = device->token;
+	ym2151_state *info = get_safe_token(device);
 	ym2151_shutdown(info->chip);
 }
 
 static DEVICE_RESET( ym2151 )
 {
-	ym2151_state *info = device->token;
+	ym2151_state *info = get_safe_token(device);
 	ym2151_reset_chip(info->chip);
 }
 

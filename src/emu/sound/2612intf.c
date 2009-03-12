@@ -43,26 +43,26 @@ INLINE ym2612_state *get_safe_token(const device_config *device)
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym2612_state *info = param;
+	ym2612_state *info = (ym2612_state *)param;
 	if(info->intf->handler) info->intf->handler(info->device, irq);
 }
 
 /* Timer overflow callback from timer.c */
 static TIMER_CALLBACK( timer_callback_2612_0 )
 {
-	ym2612_state *info = ptr;
+	ym2612_state *info = (ym2612_state *)ptr;
 	ym2612_timer_over(info->chip,0);
 }
 
 static TIMER_CALLBACK( timer_callback_2612_1 )
 {
-	ym2612_state *info = ptr;
+	ym2612_state *info = (ym2612_state *)ptr;
 	ym2612_timer_over(info->chip,1);
 }
 
 static void timer_handler(void *param,int c,int count,int clock)
 {
-	ym2612_state *info = param;
+	ym2612_state *info = (ym2612_state *)param;
 	if( count == 0 )
 	{	/* Reset FM Timer */
 		timer_enable(info->timer[c], 0);
@@ -78,7 +78,7 @@ static void timer_handler(void *param,int c,int count,int clock)
 /* update request from fm.c */
 void ym2612_update_request(void *param)
 {
-	ym2612_state *info = param;
+	ym2612_state *info = (ym2612_state *)param;
 	stream_update(info->stream);
 }
 
@@ -88,14 +88,14 @@ void ym2612_update_request(void *param)
 
 static STREAM_UPDATE( ym2612_stream_update )
 {
-	ym2612_state *info = param;
+	ym2612_state *info = (ym2612_state *)param;
 	ym2612_update_one(info->chip, outputs, samples);
 }
 
 
 static STATE_POSTLOAD( ym2612_intf_postload )
 {
-	ym2612_state *info = param;
+	ym2612_state *info = (ym2612_state *)param;
 	ym2612_postload(info->chip);
 }
 
@@ -106,7 +106,7 @@ static DEVICE_START( ym2612 )
 	ym2612_state *info = get_safe_token(device);
 	int rate = device->clock/72;
 
-	info->intf = device->static_config ? device->static_config : &dummy;
+	info->intf = device->static_config ? (const ym2612_interface *)device->static_config : &dummy;
 	info->device = device;
 
 	/* FM init */

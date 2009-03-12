@@ -536,7 +536,7 @@ INLINE pokey_state *get_safe_token(const device_config *device)
 
 static STREAM_UPDATE( pokey_update )
 {
-	pokey_state *chip = param;
+	pokey_state *chip = (pokey_state *)param;
 	stream_sample_t *buffer = outputs[0];
 	PROCESS_POKEY(chip);
 }
@@ -679,7 +679,7 @@ static DEVICE_START( pokey )
 
 static TIMER_CALLBACK( pokey_timer_expire )
 {
-	pokey_state *p = ptr;
+	pokey_state *p = (pokey_state *)ptr;
 	int timers = param;
 
 	LOG_TIMER(("POKEY #%p timer %d with IRQEN $%02x\n", p, timers, p->IRQEN));
@@ -749,7 +749,7 @@ static char *audctl2str(int val)
 
 static TIMER_CALLBACK( pokey_serin_ready_cb )
 {
-	pokey_state *p = ptr;
+	pokey_state *p = (pokey_state *)ptr;
     if( p->IRQEN & IRQ_SERIN )
 	{
 		/* set the enabled timer irq status bits */
@@ -762,7 +762,7 @@ static TIMER_CALLBACK( pokey_serin_ready_cb )
 
 static TIMER_CALLBACK( pokey_serout_ready_cb )
 {
-	pokey_state *p = ptr;
+	pokey_state *p = (pokey_state *)ptr;
     if( p->IRQEN & IRQ_SEROR )
 	{
 		p->IRQST |= IRQ_SEROR;
@@ -773,7 +773,7 @@ static TIMER_CALLBACK( pokey_serout_ready_cb )
 
 static TIMER_CALLBACK( pokey_serout_complete )
 {
-	pokey_state *p = ptr;
+	pokey_state *p = (pokey_state *)ptr;
     if( p->IRQEN & IRQ_SEROC )
 	{
 		p->IRQST |= IRQ_SEROC;
@@ -784,7 +784,7 @@ static TIMER_CALLBACK( pokey_serout_complete )
 
 static TIMER_CALLBACK( pokey_pot_trigger )
 {
-	pokey_state *p = ptr;
+	pokey_state *p = (pokey_state *)ptr;
 	int pot = param;
 	LOG(("POKEY #%p POT%d triggers after %dus\n", p, pot, (int)(1000000 * attotime_to_double(timer_timeelapsed(p->ptimer[pot])))));
 	p->ALLPOT &= ~(1 << pot);	/* set the enabled timer irq status bits */

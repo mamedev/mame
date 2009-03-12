@@ -45,13 +45,13 @@ void YM2413DAC_update(int chip,stream_sample_t **inputs, stream_sample_t **_buff
 
 static STREAM_UPDATE( ym2413_stream_update )
 {
-	ym2413_state *info = param;
+	ym2413_state *info = (ym2413_state *)param;
 	ym2413_update_one(info->chip, outputs, samples);
 }
 
 static void _stream_update(void *param, int interval)
 {
-	ym2413_state *info = param;
+	ym2413_state *info = (ym2413_state *)param;
 	stream_update(info->stream);
 }
 

@@ -1275,7 +1275,7 @@ static int AICA_IRQCB(void *param)
 
 static STREAM_UPDATE( AICA_Update )
 {
-	aica_state *AICA = param;
+	aica_state *AICA = (aica_state *)param;
 	bufferl = outputs[0];
 	bufferr = outputs[1];
 	length = samples;
@@ -1288,7 +1288,7 @@ static DEVICE_START( aica )
 
 	aica_state *AICA = get_safe_token(device);
 
-	intf = device->static_config;
+	intf = (const aica_interface *)device->static_config;
 
 	// init the emulation
 	AICA_Init(device, AICA, intf);
@@ -1312,11 +1312,11 @@ void aica_set_ram_base(const device_config *device, void *base, int size)
 	aica_state *AICA = get_safe_token(device);
 	if (AICA)
 	{
-		AICA->AICARAM = base;
+		AICA->AICARAM = (unsigned char *)base;
 		AICA->AICARAM_LENGTH = size;
 		AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
 		AICA->RAM_MASK16 = AICA->RAM_MASK & 0x7ffffe;
-		AICA->DSP.AICARAM = base;
+		AICA->DSP.AICARAM = (UINT16 *)base;
 		AICA->DSP.AICARAM_LENGTH = size;
 	}
 }

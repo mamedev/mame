@@ -119,7 +119,7 @@ static UINT8 decode80(UINT8 val)
 static STREAM_UPDATE( rf5c400_update )
 {
 	int i, ch;
-	rf5c400_state *info = param;
+	rf5c400_state *info = (rf5c400_state *)param;
 	INT16 *rom = info->rom;
 	UINT32 start, end, loop;
 	UINT64 pos;

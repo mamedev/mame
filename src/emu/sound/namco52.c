@@ -86,7 +86,7 @@ static void namco_52xx_reset(namco_52xx *chip);
 
 static STREAM_UPDATE( namco_52xx_stream_update_one )
 {
-	namco_52xx *chip = param;
+	namco_52xx *chip = (namco_52xx *)param;
 	int i, rom_pos, whole_pb_cycles, buf;
 	stream_sample_t *buffer = outputs[0];
 
@@ -141,15 +141,15 @@ static void namco_52xx_reset(namco_52xx *chip)
 
 static DEVICE_RESET( namco_52xx )
 {
-	namco_52xx_reset(device->token);
+	namco_52xx_reset(get_safe_token(device));
 }
 
 static DEVICE_START( namco_52xx )
 {
-	namco_52xx *chip = device->token;
+	namco_52xx *chip = get_safe_token(device);
 	int rate = device->clock/32;
 
-	chip->intf = device->static_config;
+	chip->intf = (const namco_52xx_interface *)device->static_config;
 	chip->rom     = device->region;
 	chip->rom_len = device->regionbytes;
 

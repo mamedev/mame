@@ -226,7 +226,7 @@ static void saa1099_envelope(saa1099_state *saa, int ch)
 
 static STREAM_UPDATE( saa1099_update )
 {
-	saa1099_state *saa = param;
+	saa1099_state *saa = (saa1099_state *)param;
     int j, ch;
 
 	/* if the channels are disabled we're done */
