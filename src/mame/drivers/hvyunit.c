@@ -209,7 +209,7 @@ static READ8_HANDLER( mermaid_data_r )
 				{
 					mcu_ram.attract_timer++;
 					popmessage("%d",mcu_ram.attract_timer);
-					if(mcu_ram.attract_timer > 200 && mcu_ram.program_flow == 1) { res = 25;/*input_port_read(space->machine, "TEST");*/ mcu_ram.attract_timer = 0; mcu_ram.program_flow = 1; }
+					if(mcu_ram.attract_timer > 200 && mcu_ram.program_flow == 1) { res = 0;/*input_port_read(space->machine, "TEST");*/ mcu_ram.attract_timer = 0; mcu_ram.program_flow = 0; }
 				}
 				if(mcu_ram.program_flow == 3)
 					res = 4;
@@ -355,6 +355,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(main_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(main_bankswitch_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(main_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sub_cpu)
 ADDRESS_MAP_END
 
