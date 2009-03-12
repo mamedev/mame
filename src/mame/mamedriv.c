@@ -2952,8 +2952,20 @@ V-V                           TP-027
 
 	/* Taito GNET */
 	DRIVER( taitogn )
-	DRIVER( spuzbobl )
-	DRIVER( chaoshea )
+	DRIVER( raycris )   /* Ray Crisis (V2.03J) */
+	DRIVER( gobyrc )    /* Go By RC (V2.03O) */
+	DRIVER( rcdego )    /* RC De Go (V2.03J) */
+	DRIVER( chaoshea )  /* Chaos Heat (V2.08J) */
+	DRIVER( spuzbobl )  /* Super Puzzle Bobble (V2.05O) */
+	DRIVER( soutenry )  /* Soutenryu (V2.07J) */
+	DRIVER( shanghss )  /* Shanghai Shoryu Sairin (V2.03J) */
+	DRIVER( psyvaria )  /* Psyvariar -Medium Unit- (V2.04J) */
+	DRIVER( psyvarrv )  /* Psyvariar -Revision- (V2.04J) */
+	DRIVER( zokuoten )  /* Zoku Otenamihaiken (V2.03J) */
+	DRIVER( usagi )     /* Usagi (V2.02J) */
+	DRIVER( mahjngoh )  /* Mahjong Oh (V2.06J) */
+	DRIVER( nightrai )  /* Night Raid (V2.03J) */
+	DRIVER( xiistag )   /* XII Stag (V2.01J) */
 
 	/* Namco System 11 */
 	DRIVER( tekken )	/* Tekken (TE4/VER.C) */

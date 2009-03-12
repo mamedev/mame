@@ -586,12 +586,7 @@ static NVRAM_HANDLER( coh3002t )
 
 	if(!file) {
 		// Only the subbios needs to preexist for the board to work
-
-		// Of the subbios flash, only the range 000000-04ffff is the
-		// actual subbios, rest is flashed from the game
-
 		memcpy(intelflash_getmemptr(0), memory_region(machine, "subbios"), 0x200000);
-		memset((char *)intelflash_getmemptr(0)+0x50000, 0xff, 0x200000-0x50000);
 	}
 }
 
@@ -798,10 +793,10 @@ INPUT_PORTS_END
 
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "mainbios", 0 ) \
-	ROM_LOAD( "coh-3002t.353", 0x0000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
+	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
 \
-	ROM_REGION32_LE( 0x0200000, "subbios", 0 ) \
-    ROM_LOAD( "flash.u30",    0x000000, 0x200000, CRC(2d6740fc) SHA1(9a17411c1bd07b714227e84de23976ec900bdeed) ) \
+	ROM_REGION32_LE( 0x200000, "subbios", 0 ) \
+    ROM_LOAD( "flash.u30",     0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
 	ROM_REGION32_LE( 0x80000,  "soundcpu", 0) \
 	ROM_FILL( 0, 0x80000, 0xff) \
 	ROM_REGION32_LE( 0x600000, "samples", 0) \
@@ -817,7 +812,7 @@ ROM_START(raycris)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "raycris", 0, SHA1(83c4bd9a8096d1939a241b34a7e5f53403a58e15) MD5(7c80cad1f13f4f16d5b829fdd26e0123) )
+	DISK_IMAGE( "raycris", 0, SHA1(015cb0e6c4421cc38809de28c4793b4491386aee))
 ROM_END
 
 
@@ -825,21 +820,21 @@ ROM_START(gobyrc)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "gobyrc", 0, SHA1(674c1a4a612a16abdb0f2b243b4bcf3b354adf7b) MD5(89055235dc0f3d3e3e1701603f229e53) )
+	DISK_IMAGE( "gobyrc", 0, SHA1(0bee1f495fc8b033fd56aad9260ae94abb35eb58))
 ROM_END
 
 ROM_START(rcdego)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "rcdego", 0, SHA1(b70effc7a01e6b5e51cc2d5bc8e4afab583cc635) MD5(e8c650e295f37dc334f79b06e0974015) )
+	DISK_IMAGE( "rcdego", 0, SHA1(9e177f2a3954cfea0c8c5a288e116324d10f5dd1))
 ROM_END
 
 ROM_START(chaoshea)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "chaoshea", 0, SHA1(5b43c3597808792c3084367ed6bc3bf4bb8bc99e))
+	DISK_IMAGE( "chaoshea", 0, SHA1(2f211ac08675ea8ec33c7659a13951db94eaa627))
 ROM_END
 
 
@@ -847,7 +842,7 @@ ROM_START(spuzbobl)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	DISK_IMAGE( "spuzbobl", 0, SHA1(ed9d621cffa313813d7b45b0228bc15514fe7e36))
+	DISK_IMAGE( "spuzbobl", 0, SHA1(1b1c72fb7e5656021485fefaef8f2ba48e2b4ea8))
 ROM_END
 
 
@@ -855,14 +850,14 @@ ROM_START(soutenry)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "soutenry", 0, SHA1(511732c56dcfd57518227247999d81271775aa9c) MD5(a4b6bcdd98aaaa749fd95a217b0346bc) )
+	DISK_IMAGE( "soutenry", 0, SHA1(9204d0be833d29f37b8cd3fbdf09da69b622254b))
 ROM_END
 
 ROM_START(shanghss)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "shanghss", 0, SHA1(9140cd7e9dc509093065dacfb7b189812917aa6d) MD5(c4375eaaa638b1ab0c043f1e31bf49d7) )
+	DISK_IMAGE( "shanghss", 0, SHA1(7964f71ec5c81d2120d83b63a82f97fbad5a8e6d))
 ROM_END
 
 /* Success */
@@ -871,14 +866,14 @@ ROM_START(psyvaria)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "psyvaria", 0,  SHA1(7bda7da6ad2d8ee820881c33f107aba6cb7959fd) MD5(055c6c1e72faf796f7029fc6f8f10129) )
+	DISK_IMAGE( "psyvaria", 0,  SHA1(a80e164c09d795085b65659d1df60710530549c3))
 ROM_END
 
 ROM_START(psyvarrv)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "psyvarrv", 0, SHA1(2d947f87e2d924013f849839b51a9843b33e6da7) MD5(a9265c3d0b8d2fb0b091d677dac44f71) )
+	DISK_IMAGE( "psyvarrv", 0, SHA1(c12f0d5cbb6ec7f906e3dcdc3047c22de36457a5))
 ROM_END
 
 
@@ -886,7 +881,7 @@ ROM_START(zokuoten)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "zokuoten", 0, SHA1(e067c45578acde0039ed6ed480265d2814296e22) MD5(41d3ff2c1674a651fd3b90d5498ed3b6) )
+	DISK_IMAGE( "zokuoten", 0, SHA1(5ce13db00518f96af64935176c71ec68d2a51938))
 ROM_END
 
 /* Takumi */
@@ -895,7 +890,7 @@ ROM_START(nightrai)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "nightrai", 0, SHA1(069249c36d6678959bc1077c47090f254189ffc1) MD5(4df525e767e7168a6eda0dc49d0fb6fe) )
+	DISK_IMAGE( "nightrai", 0, SHA1(7a4d62018fd19ccbdec12b6d24052d49f8a8359e))
 ROM_END
 
 /* Warashi */
@@ -904,14 +899,14 @@ ROM_START(usagi)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "usagi", 0, SHA1(a729a6dc2317f8be8f4de48edd7e6a5dcadc1f7c) MD5(3985d32f835e500cfcbd0a5f88e51bfe) )
+	DISK_IMAGE( "usagi", 0, SHA1(edf9dd271957f6cb06feed238ae21100514bef8e))
 ROM_END
 
 ROM_START(mahjngoh)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "mahjngoh", 0, SHA1(ee97ba75282223afa41f21b1d38a6ed1d26962cd) MD5(22613e2b279225a671e3432fbd5cb1f3) )
+	DISK_IMAGE( "mahjngoh", 0, SHA1(3ef1110d15582d7c0187438d7ad61765dd121cff))
 ROM_END
 
 /* Triangle Service */
@@ -920,7 +915,7 @@ ROM_START(xiistag)
 	TAITOGNET_BIOS
 
 	DISK_REGION( "card" )
-	//DISK_IMAGE( "xiistag", 0, SHA1(783ba9c58f56c36075678b58bed813451fb627cd) MD5(2e9bad0a6900a8fef00f37da457ad72b) )
+	DISK_IMAGE( "xiistag", 0, SHA1(8e0b2ee88edf0b45b3b4063d65eae236c12ee8ff))
 ROM_END
 
 
