@@ -697,7 +697,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, const 
 	int spacenum;
 
 	/* allocate space in the cache for our state */
-	drcbe = drccache_memory_alloc_near(cache, sizeof(*drcbe));
+	drcbe = (drcbe_state *)drccache_memory_alloc_near(cache, sizeof(*drcbe));
 	if (drcbe == NULL)
 		return NULL;
 	memset(drcbe, 0, sizeof(*drcbe));
@@ -718,8 +718,8 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, const 
 
 	/* build up necessary arrays */
 	memcpy(drcbe->ssecontrol, sse_control, sizeof(drcbe->ssecontrol));
-	drcbe->absmask32 = drccache_memory_alloc_near(cache, 16*2 + 15);
-	drcbe->absmask32 = (void *)(((FPTR)drcbe->absmask32 + 15) & ~15);
+	drcbe->absmask32 = (UINT32 *)drccache_memory_alloc_near(cache, 16*2 + 15);
+	drcbe->absmask32 = (UINT32 *)(((FPTR)drcbe->absmask32 + 15) & ~15);
 	drcbe->absmask32[0] = drcbe->absmask32[1] = drcbe->absmask32[2] = drcbe->absmask32[3] = 0x7fffffff;
 	drcbe->absmask64 = (UINT64 *)&drcbe->absmask32[4];
 	drcbe->absmask64[0] = drcbe->absmask64[1] = U64(0x7fffffffffffffff);
@@ -2885,7 +2885,7 @@ static void emit_movsd_p64_r128(drcbe_state *drcbe, x86code **dst, const drcuml_
 
 static void fixup_label(void *parameter, drccodeptr labelcodeptr)
 {
-	drccodeptr src = parameter;
+	drccodeptr src = (drccodeptr)parameter;
 
 	/* find the end of the instruction */
 	if (src[0] == 0xe3)
@@ -2916,9 +2916,9 @@ static void fixup_label(void *parameter, drccodeptr labelcodeptr)
 static void fixup_exception(drccodeptr *codeptr, void *param1, void *param2, void *param3)
 {
 	drcuml_parameter handp, exp;
-	drcbe_state *drcbe = param1;
-	drccodeptr src = param2;
-	const drcuml_instruction *inst = param3;
+	drcbe_state *drcbe = (drcbe_state *)param1;
+	drccodeptr src = (drccodeptr)param2;
+	const drcuml_instruction *inst = (const drcuml_instruction *)param3;
 	drccodeptr dst = *codeptr;
 	drccodeptr *targetptr;
 

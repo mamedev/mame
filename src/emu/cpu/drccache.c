@@ -107,7 +107,7 @@ drccache *drccache_alloc(size_t bytes)
 
 	/* build a local structure first */
 	memset(&cache, 0, sizeof(cache));
-	cache.near = osd_alloc_executable(bytes);
+	cache.near = (drccodeptr)osd_alloc_executable(bytes);
 	cache.neartop = cache.near;
 	cache.base = cache.near + NEAR_CACHE_SIZE;
 	cache.top = cache.base;
@@ -115,7 +115,7 @@ drccache *drccache_alloc(size_t bytes)
 	cache.size = bytes;
 
 	/* now allocate the cache structure itself from that */
-	cacheptr = drccache_memory_alloc(&cache, sizeof(cache));
+	cacheptr = (drccache *)drccache_memory_alloc(&cache, sizeof(cache));
 	*cacheptr = cache;
 
 	/* return the allocated result */
@@ -237,7 +237,7 @@ void *drccache_memory_alloc(drccache *cache, size_t bytes)
 	}
 
 	/* if no space, we just fail */
-	ptr = ALIGN_PTR_DOWN(cache->end - bytes);
+	ptr = (drccodeptr)ALIGN_PTR_DOWN(cache->end - bytes);
 	if (cache->top > ptr)
 		return NULL;
 
@@ -272,7 +272,7 @@ void *drccache_memory_alloc_near(drccache *cache, size_t bytes)
 	}
 
 	/* if no space, we just fail */
-	ptr = ALIGN_PTR_UP(cache->neartop);
+	ptr = (drccodeptr)ALIGN_PTR_UP(cache->neartop);
 	if (ptr + bytes > cache->base)
 		return NULL;
 
@@ -290,7 +290,7 @@ void *drccache_memory_alloc_near(drccache *cache, size_t bytes)
 void drccache_memory_free(drccache *cache, void *memory, size_t bytes)
 {
 	free_link **linkptr;
-	free_link *link = memory;
+	free_link *link = (free_link *)memory;
 
 	assert(bytes < MAX_PERMANENT_ALLOC);
 	assert(((drccodeptr)memory >= cache->near && (drccodeptr)memory < cache->base) || ((drccodeptr)memory >= cache->end && (drccodeptr)memory < cache->near + cache->size));
@@ -324,7 +324,7 @@ void *drccache_memory_alloc_temporary(drccache *cache, size_t bytes)
 		return NULL;
 
 	/* otherwise, update the cache top */
-	cache->top = ALIGN_PTR_UP(ptr + bytes);
+	cache->top = (drccodeptr)ALIGN_PTR_UP(ptr + bytes);
 	return ptr;
 }
 
@@ -383,7 +383,7 @@ drccodeptr drccache_end_codegen(drccache *cache)
 	}
 
 	/* update the cache top */
-	cache->top = ALIGN_PTR_UP(cache->top);
+	cache->top = (drccodeptr)ALIGN_PTR_UP(cache->top);
 	cache->codegen = NULL;
 
 	return result;
@@ -402,7 +402,7 @@ void drccache_request_oob_codegen(drccache *cache, drccache_oob_func callback, v
 	assert(cache->codegen != NULL);
 
 	/* pull an item from the free list */
-	oob = drccache_memory_alloc(cache, sizeof(*oob));
+	oob = (oob_handler *)drccache_memory_alloc(cache, sizeof(*oob));
 	assert(oob != NULL);
 
 	/* fill it in */

@@ -90,11 +90,20 @@ TODO general:
 
 #include "g65816.h"
 
+INLINE g65816i_cpu_struct *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_G65816);
+	return (g65816i_cpu_struct *)device->token;
+}
+
 /* Temporary Variables */
 
 static CPU_READOP( g65816 )
 {
-	g65816i_cpu_struct *cpustate = device->token;
+	g65816i_cpu_struct *cpustate = get_safe_token(device);
 
 	*value = g65816_read_8_immediate(offset);
 
@@ -183,7 +192,7 @@ int (*const g65816i_execute[5])(g65816i_cpu_struct *cpustate, int cycles) =
 
 static CPU_RESET( g65816 )
 {
-	g65816i_cpu_struct *cpustate = device->token;
+	g65816i_cpu_struct *cpustate = get_safe_token(device);
 
 	/* Start the CPU */
 	CPU_STOPPED = 0;
@@ -234,7 +243,7 @@ static CPU_EXIT( g65816 )
 /* Execute some instructions */
 static CPU_EXECUTE( g65816 )
 {
-	g65816i_cpu_struct *cpustate = device->token;
+	g65816i_cpu_struct *cpustate = get_safe_token(device);
 
 	return FTABLE_EXECUTE(cpustate, cycles);
 }
@@ -300,7 +309,7 @@ static void g65816_set_irq_callback(g65816i_cpu_struct *cpustate, cpu_irq_callba
 
 static CPU_DISASSEMBLE( g65816 )
 {
-	g65816i_cpu_struct *cpustate = device->token;
+	g65816i_cpu_struct *cpustate = get_safe_token(device);
 
 	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, FLAG_M, FLAG_X);
 }
@@ -318,7 +327,7 @@ static STATE_POSTLOAD( g65816_restore_state )
 
 static CPU_INIT( g65816 )
 {
-	g65816i_cpu_struct *cpustate = device->token;
+	g65816i_cpu_struct *cpustate = get_safe_token(device);
 
 	memset(cpustate, 0, sizeof(cpustate));
 
@@ -360,7 +369,7 @@ static CPU_INIT( g65816 )
 
 static CPU_SET_INFO( g65816 )
 {
-	g65816i_cpu_struct *cpustate = device->token;
+	g65816i_cpu_struct *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -401,7 +410,7 @@ static CPU_SET_INFO( g65816 )
 
 CPU_GET_INFO( g65816 )
 {
-	g65816i_cpu_struct *cpustate = (device != NULL) ? device->token : NULL;
+	g65816i_cpu_struct *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

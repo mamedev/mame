@@ -644,6 +644,28 @@ INLINE void serial_transmit(mcs51_state_t *mcs51_state, UINT8 data);
     INLINE FUNCTIONS
 ***************************************************************************/
 
+INLINE mcs51_state_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_I8031 ||
+		   cpu_get_type(device) == CPU_I8032 ||
+		   cpu_get_type(device) == CPU_I8051 ||
+		   cpu_get_type(device) == CPU_I8751 ||
+		   cpu_get_type(device) == CPU_I8052 ||
+		   cpu_get_type(device) == CPU_I8752 ||
+		   cpu_get_type(device) == CPU_I80C31 ||
+		   cpu_get_type(device) == CPU_I80C32 ||
+		   cpu_get_type(device) == CPU_I80C51 ||
+		   cpu_get_type(device) == CPU_I80C52 ||
+		   cpu_get_type(device) == CPU_I87C51 ||
+		   cpu_get_type(device) == CPU_I87C52 ||
+		   cpu_get_type(device) == CPU_AT89C4051 ||
+		   cpu_get_type(device) == CPU_DS5002FP);
+	return (mcs51_state_t *)device->token;
+}
+
 INLINE void clear_current_irq(mcs51_state_t *mcs51_state)
 {
 	if (mcs51_state->cur_irq_prio >= 0)
@@ -1259,13 +1281,13 @@ INLINE void	update_irq_prio(mcs51_state_t *mcs51_state, UINT8 ipl, UINT8 iph)
 
 void i8051_set_serial_tx_callback(const device_config *device, mcs51_serial_tx_func tx_func)
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 	mcs51_state->serial_tx_callback = tx_func;
 }
 
 void i8051_set_serial_rx_callback(const device_config *device, mcs51_serial_rx_func rx_func)
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 	mcs51_state->serial_rx_callback = rx_func;
 }
 
@@ -1894,7 +1916,7 @@ static void mcs51_set_irq_line(mcs51_state_t *mcs51_state, int irqline, int stat
 /* Execute cycles - returns number of cycles actually run */
 static CPU_EXECUTE( mcs51 )
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 	UINT8 op;
 
 	update_ptrs(mcs51_state);
@@ -2045,7 +2067,7 @@ static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 
 static CPU_INIT( mcs51 )
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 
 	mcs51_state->irq_callback = irqcallback;
 	mcs51_state->device = device;
@@ -2081,7 +2103,7 @@ static CPU_INIT( mcs51 )
 
 static CPU_INIT( i80c51 )
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 	CPU_INIT_CALL(mcs51);
 	mcs51_state->features |= FEATURE_CMOS;
 }
@@ -2089,7 +2111,7 @@ static CPU_INIT( i80c51 )
 /* Reset registers to the initial values */
 static CPU_RESET( mcs51 )
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 
 	update_ptrs(mcs51_state);
 
@@ -2214,7 +2236,7 @@ static UINT8 i8052_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 
 static CPU_INIT( i8052 )
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 	CPU_INIT_CALL(mcs51);
 
 	mcs51_state->ram_mask = 0xFF;  			/* 256 bytes of ram */
@@ -2267,7 +2289,7 @@ static UINT8 i80c52_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 
 static CPU_INIT( i80c52 )
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 	CPU_INIT_CALL(i8052);
 
 	mcs51_state->features |= (FEATURE_I80C52 | FEATURE_CMOS);
@@ -2277,7 +2299,7 @@ static CPU_INIT( i80c52 )
 
 static CPU_INIT( i80c31 )
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 	CPU_INIT_CALL(i8052);
 
 	mcs51_state->ram_mask = 0x7F;  			/* 128 bytes of ram */
@@ -2360,7 +2382,7 @@ static CPU_INIT( ds5002fp )
 	/* default configuration */
 	static const ds5002fp_config default_config = { 0x00, 0x00, 0x00 };
 	const ds5002fp_config *sconfig = device->static_config ? device->static_config : &default_config;
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 
 	CPU_INIT_CALL( mcs51 );
 
@@ -2404,7 +2426,7 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( mcs51 )
 {
-	mcs51_state_t *mcs51_state = device->token;
+	mcs51_state_t *mcs51_state = get_safe_token(device);
 
 	switch (state)
 	{
@@ -2446,7 +2468,7 @@ static CPU_SET_INFO( mcs51 )
 
 static CPU_GET_INFO( mcs51 )
 {
-	mcs51_state_t *mcs51_state = (device != NULL) ? device->token : NULL;
+	mcs51_state_t *mcs51_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

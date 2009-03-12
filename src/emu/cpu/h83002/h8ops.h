@@ -107,7 +107,7 @@ static UINT32 h8_divxs16(h83xx_state *h8, INT16 src, INT32 dst);
 
 static CPU_EXECUTE(h8)
 {
-	h83xx_state *h8 = device->token;
+	h83xx_state *h8 = get_safe_token(device);
 	UINT16 opcode=0;
 
 	h8->cyccnt = cycles;
@@ -2631,7 +2631,7 @@ static INT8 h8_neg8(h83xx_state *h8, INT8 src)
 	{
 		// overflow !
 		h8->h8vflag = 1;
-		res = 0x80;
+		res = (INT8)0x80;
 	}
 	else
 	{
@@ -2665,7 +2665,7 @@ static INT16 h8_neg16(h83xx_state *h8, INT16 src)
 	{
 		// overflow !
 		h8->h8vflag = 1;
-		res = 0x8000;
+		res = (INT16)0x8000;
 	}
 	else
 	{

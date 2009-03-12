@@ -183,6 +183,15 @@ static void (* sharc_op[512])(SHARC_REGS *cpustate);
 						((UINT64)(cpustate->internal_ram[((pc-0x20000) * 3) + 1]) << 16) | \
 						((UINT64)(cpustate->internal_ram[((pc-0x20000) * 3) + 2]) << 0)
 
+INLINE SHARC_REGS *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_ADSP21062);
+	return (SHARC_REGS *)device->token;
+}
+
 INLINE void CHANGE_PC(SHARC_REGS *cpustate, UINT32 newpc)
 {
 	cpustate->pc = newpc;
@@ -363,7 +372,7 @@ static void build_opcode_table(void)
 
 void sharc_external_iop_write(const device_config *device, UINT32 address, UINT32 data)
 {
-	SHARC_REGS *cpustate = device->token;
+	SHARC_REGS *cpustate = get_safe_token(device);
 	if (address == 0x1c)
 	{
 		if (data != 0)
@@ -380,7 +389,7 @@ void sharc_external_iop_write(const device_config *device, UINT32 address, UINT3
 
 void sharc_external_dma_write(const device_config *device, UINT32 address, UINT64 data)
 {
-	SHARC_REGS *cpustate = device->token;
+	SHARC_REGS *cpustate = get_safe_token(device);
 	switch ((cpustate->dma[6].control >> 6) & 0x3)
 	{
 		case 2:			// 16/48 packing
@@ -423,8 +432,8 @@ static CPU_DISASSEMBLE( sharc )
 
 static CPU_INIT( sharc )
 {
-	SHARC_REGS *cpustate = device->token;
-	const sharc_config *cfg = device->static_config;
+	SHARC_REGS *cpustate = get_safe_token(device);
+	const sharc_config *cfg = (const sharc_config *)device->static_config;
 	int saveindex;
 
 	cpustate->boot_mode = cfg->boot_mode;
@@ -436,7 +445,7 @@ static CPU_INIT( sharc )
 
 	build_opcode_table();
 
-	cpustate->internal_ram = auto_malloc(2 * 0x10000 * sizeof(UINT16));		// 2x 128KB
+	cpustate->internal_ram = (UINT16 *)auto_malloc(2 * 0x10000 * sizeof(UINT16));		// 2x 128KB
 	cpustate->internal_ram_block0 = &cpustate->internal_ram[0];
 	cpustate->internal_ram_block1 = &cpustate->internal_ram[0x20000/2];
 
@@ -558,7 +567,7 @@ static CPU_INIT( sharc )
 
 static CPU_RESET( sharc )
 {
-	SHARC_REGS *cpustate = device->token;
+	SHARC_REGS *cpustate = get_safe_token(device);
 	memset(cpustate->internal_ram, 0, 2 * 0x10000 * sizeof(UINT16));
 
 	switch(cpustate->boot_mode)
@@ -614,7 +623,7 @@ static void sharc_set_irq_line(SHARC_REGS *cpustate, int irqline, int state)
 
 void sharc_set_flag_input(const device_config *device, int flag_num, int state)
 {
-	SHARC_REGS *cpustate = device->token;
+	SHARC_REGS *cpustate = get_safe_token(device);
 	if (flag_num >= 0 && flag_num < 4)
 	{
 		// Check if flag is set to input in MODE2 (bit == 0)
@@ -674,7 +683,7 @@ static void check_interrupts(SHARC_REGS *cpustate)
 
 static CPU_EXECUTE( sharc )
 {
-	SHARC_REGS *cpustate = device->token;
+	SHARC_REGS *cpustate = get_safe_token(device);
 	cpustate->icount = cycles;
 
 	if (cpustate->idle && cpustate->irq_active == 0)
@@ -853,7 +862,7 @@ static CPU_EXECUTE( sharc )
 
 static CPU_SET_INFO( sharc )
 {
-	SHARC_REGS *cpustate = device->token;
+	SHARC_REGS *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -954,7 +963,7 @@ static CPU_SET_INFO( adsp21062 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 2)
 	{
-		sharc_set_irq_line(device->token, state-CPUINFO_INT_INPUT_STATE, info->i);
+		sharc_set_irq_line(get_safe_token(device), state-CPUINFO_INT_INPUT_STATE, info->i);
 		return;
 	}
 	else if (state >= CPUINFO_INT_INPUT_STATE + SHARC_INPUT_FLAG0 && state <= CPUINFO_INT_INPUT_STATE + SHARC_INPUT_FLAG3)
@@ -972,7 +981,7 @@ static CPU_SET_INFO( adsp21062 )
 
 static CPU_READ( sharc )
 {
-	SHARC_REGS *cpustate = device->token;
+	SHARC_REGS *cpustate = get_safe_token(device);
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
 		int address = offset >> 3;
@@ -1035,7 +1044,7 @@ static CPU_READ( sharc )
 
 static CPU_READOP( sharc )
 {
-	SHARC_REGS *cpustate = device->token;
+	SHARC_REGS *cpustate = get_safe_token(device);
 	UINT64 mask = (size < 8) ? (((UINT64)1 << (8 * size)) - 1) : ~(UINT64)0;
 	int shift = 8 * (offset & 7);
 	offset >>= 3;
@@ -1065,7 +1074,7 @@ ADDRESS_MAP_END
 
 static CPU_GET_INFO( sharc )
 {
-	SHARC_REGS *cpustate = (device != NULL) ? device->token : NULL;
+	SHARC_REGS *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

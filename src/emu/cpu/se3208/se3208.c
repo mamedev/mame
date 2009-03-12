@@ -57,6 +57,15 @@ typedef void (*_OP)(se3208_state_t *se3208_state, UINT16 Opcode);
 #define INST(a) static void a(se3208_state_t *se3208_state, UINT16 Opcode)
 static _OP *OpTable=NULL;
 
+INLINE se3208_state_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_SE3208);
+	return (se3208_state_t *)device->token;
+}
+
 INLINE UINT32 read_dword_unaligned(const address_space *space, UINT32 address)
 {
 	if (address & 3)
@@ -1696,14 +1705,14 @@ static void BuildTable(void)
 {
 	int i;
 	if(!OpTable)
-		OpTable=malloc_or_die(sizeof(_OP)*0x10000);
+		OpTable=(_OP *)malloc_or_die(sizeof(_OP)*0x10000);
 	for(i=0;i<0x10000;++i)
 		OpTable[i]=DecodeOp(i);
 }
 
 static CPU_RESET( se3208 )
 {
-	se3208_state_t *se3208_state = device->token;
+	se3208_state_t *se3208_state = get_safe_token(device);
 
 	cpu_irq_callback save_irqcallback = se3208_state->irq_callback;
 	memset(se3208_state,0,sizeof(se3208_state_t));
@@ -1746,7 +1755,7 @@ static void SE3208_Interrupt(se3208_state_t *se3208_state)
 
 static CPU_EXECUTE( se3208 )
 {
-	se3208_state_t *se3208_state = device->token;
+	se3208_state_t *se3208_state = get_safe_token(device);
 
 	se3208_state->icount=cycles;
 	do
@@ -1776,7 +1785,7 @@ static CPU_EXECUTE( se3208 )
 
 static CPU_INIT( se3208 )
 {
-	se3208_state_t *se3208_state = device->token;
+	se3208_state_t *se3208_state = get_safe_token(device);
 
 	BuildTable();
 
@@ -1803,7 +1812,7 @@ static void set_irq_line(se3208_state_t *se3208_state, int line,int state)
 
 static CPU_SET_INFO( se3208 )
 {
-	se3208_state_t *se3208_state = device->token;
+	se3208_state_t *se3208_state = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1831,7 +1840,7 @@ static CPU_SET_INFO( se3208 )
 
 CPU_GET_INFO( se3208 )
 {
-	se3208_state_t *se3208_state = (device != NULL) ? device->token : NULL;
+	se3208_state_t *se3208_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

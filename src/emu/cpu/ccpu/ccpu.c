@@ -49,6 +49,15 @@ struct _ccpu_state
 };
 
 
+INLINE ccpu_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_CCPU);
+	return (ccpu_state *)device->token;
+}
+
 
 /***************************************************************************
     MACROS
@@ -98,14 +107,14 @@ static UINT8 read_jmi(const device_config *device)
 {
 	/* this routine is called when there is no external input */
 	/* and the JMI jumper is present */
-	ccpu_state *cpustate = device->token;
+	ccpu_state *cpustate = get_safe_token(device);
 	return TEST_MI(cpustate);
 }
 
 
 void ccpu_wdt_timer_trigger(const device_config *device)
 {
-	ccpu_state *cpustate = device->token;
+	ccpu_state *cpustate = get_safe_token(device);
 	cpustate->waiting = FALSE;
 	cpustate->watchdog++;
 	if (cpustate->watchdog >= 3)
@@ -115,8 +124,8 @@ void ccpu_wdt_timer_trigger(const device_config *device)
 
 static CPU_INIT( ccpu )
 {
-	const ccpu_config *configdata = device->static_config;
-	ccpu_state *cpustate = device->token;
+	const ccpu_config *configdata = (const ccpu_config *)device->static_config;
+	ccpu_state *cpustate = get_safe_token(device);
 
 	/* copy input params */
 	cpustate->external_input = configdata->external_input ? configdata->external_input : read_jmi;
@@ -150,7 +159,7 @@ static CPU_INIT( ccpu )
 
 static CPU_RESET( ccpu )
 {
-	ccpu_state *cpustate = device->token;
+	ccpu_state *cpustate = get_safe_token(device);
 
 	/* zero registers */
 	cpustate->PC = 0;
@@ -184,7 +193,7 @@ static CPU_RESET( ccpu )
 
 static CPU_EXECUTE( ccpu )
 {
-	ccpu_state *cpustate = device->token;
+	ccpu_state *cpustate = get_safe_token(device);
 
 	if (cpustate->waiting)
 		return cycles;
@@ -686,7 +695,7 @@ static CPU_EXECUTE( ccpu )
 
 static CPU_SET_INFO( ccpu )
 {
-	ccpu_state *cpustate = device->token;
+	ccpu_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -721,7 +730,7 @@ static CPU_SET_INFO( ccpu )
 
 CPU_GET_INFO( ccpu )
 {
-	ccpu_state *cpustate = (device != NULL) ? device->token : NULL;
+	ccpu_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

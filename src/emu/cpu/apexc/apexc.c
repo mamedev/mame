@@ -367,6 +367,16 @@ struct _apexc_state
 #define DELAY(n)	{cpustate->icount -= (n); cpustate->current_word = (cpustate->current_word + (n)) & 0x1f;}
 
 
+INLINE apexc_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_APEXC);
+	return (apexc_state *)device->token;
+}
+
+
 /*
     word accessor functions
 
@@ -787,7 +797,7 @@ special_fetch:
 
 static CPU_INIT( apexc )
 {
-	apexc_state *cpustate = device->token;
+	apexc_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -796,7 +806,7 @@ static CPU_INIT( apexc )
 
 static CPU_RESET( apexc )
 {
-	apexc_state *cpustate = device->token;
+	apexc_state *cpustate = get_safe_token(device);
 
 	/* mmmh...  I don't know what happens on reset with an actual APEXC. */
 
@@ -811,7 +821,7 @@ static CPU_RESET( apexc )
 
 static CPU_EXECUTE( apexc )
 {
-	apexc_state *cpustate = device->token;
+	apexc_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -832,7 +842,7 @@ static CPU_EXECUTE( apexc )
 
 static CPU_SET_INFO( apexc )
 {
-	apexc_state *cpustate = device->token;
+	apexc_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -867,7 +877,7 @@ static CPU_SET_INFO( apexc )
 
 CPU_GET_INFO( apexc )
 {
-	apexc_state *cpustate = (device != NULL) ? device->token : NULL;
+	apexc_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

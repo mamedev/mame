@@ -110,6 +110,15 @@ static const cpu_state_table state_table_template =
 	state_array					/* array of entries */
 };
 
+INLINE cdp1802_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_CDP1802);
+	return (cdp1802_state *)device->token;
+}
+
 #define OPCODE_R(addr)		memory_decrypted_read_byte(cpustate->program, addr)
 #define RAM_R(addr)			memory_read_byte_8be(cpustate->program, addr)
 #define RAM_W(addr, data)	memory_write_byte_8be(cpustate->program, addr, data)
@@ -211,7 +220,7 @@ INLINE void cdp1802_long_skip(cdp1802_state *cpustate, int taken)
 
 static void cdp1802_sample_ef(const device_config *device)
 {
-	cdp1802_state *cpustate = device->token;
+	cdp1802_state *cpustate = get_safe_token(device);
 
 	if (cpustate->intf->ef_r)
 	{
@@ -225,7 +234,7 @@ static void cdp1802_sample_ef(const device_config *device)
 
 static void cdp1802_output_state_code(const device_config *device)
 {
-	cdp1802_state *cpustate = device->token;
+	cdp1802_state *cpustate = get_safe_token(device);
 
 	if (cpustate->intf->sc_w)
 	{
@@ -259,7 +268,7 @@ static void cdp1802_output_state_code(const device_config *device)
 
 static void cdp1802_run(const device_config *device)
 {
-	cdp1802_state *cpustate = device->token;
+	cdp1802_state *cpustate = get_safe_token(device);
 
 	cdp1802_output_state_code(device);
 
@@ -872,7 +881,7 @@ static void cdp1802_run(const device_config *device)
 
 static CPU_EXECUTE( cdp1802 )
 {
-	cdp1802_state *cpustate = device->token;
+	cdp1802_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -933,14 +942,14 @@ static CPU_EXECUTE( cdp1802 )
 
 static CPU_RESET( cdp1802 )
 {
-	cdp1802_state *cpustate = device->token;
+	cdp1802_state *cpustate = get_safe_token(device);
 
 	cpustate->mode = CDP1802_MODE_RESET;
 }
 
 static CPU_INIT( cdp1802 )
 {
-	cdp1802_state *cpustate = device->token;
+	cdp1802_state *cpustate = get_safe_token(device);
 	int i;
 
 	cpustate->intf = (cdp1802_interface *) device->static_config;
@@ -1005,7 +1014,7 @@ static CPU_INIT( cdp1802 )
 
 static CPU_IMPORT_STATE( cdp1802 )
 {
-	cdp1802_state *cpustate = device->token;
+	cdp1802_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -1021,7 +1030,7 @@ static CPU_IMPORT_STATE( cdp1802 )
 
 static CPU_EXPORT_STATE( cdp1802 )
 {
-	cdp1802_state *cpustate = device->token;
+	cdp1802_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -1041,7 +1050,7 @@ static CPU_EXPORT_STATE( cdp1802 )
 
 static CPU_SET_INFO( cdp1802 )
 {
-	cdp1802_state *cpustate = device->token;
+	cdp1802_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1057,7 +1066,7 @@ static CPU_SET_INFO( cdp1802 )
 
 CPU_GET_INFO( cdp1802 )
 {
-	cdp1802_state *cpustate = (device != NULL) ? device->token : NULL;
+	cdp1802_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

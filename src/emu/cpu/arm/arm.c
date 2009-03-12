@@ -247,6 +247,15 @@ static void arm_check_irq_state(ARM_REGS* cpustate);
 
 /***************************************************************************/
 
+INLINE ARM_REGS *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_ARM);
+	return (ARM_REGS *)device->token;
+}
+
 INLINE void cpu_write32( ARM_REGS* cpustate, int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
@@ -298,7 +307,7 @@ INLINE void SetRegister( ARM_REGS* cpustate, int rIndex, UINT32 value )
 
 static CPU_RESET( arm )
 {
-	ARM_REGS *cpustate = device->token;
+	ARM_REGS *cpustate = get_safe_token(device);
 
 	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(ARM_REGS));
@@ -319,7 +328,7 @@ static CPU_EXECUTE( arm )
 {
 	UINT32 pc;
 	UINT32 insn;
-	ARM_REGS *cpustate = device->token;
+	ARM_REGS *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 	do
@@ -491,7 +500,7 @@ static CPU_DISASSEMBLE( arm )
 
 static CPU_INIT( arm )
 {
-	ARM_REGS *cpustate = device->token;
+	ARM_REGS *cpustate = get_safe_token(device);
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -1392,7 +1401,7 @@ static void HandleCoPro( ARM_REGS* cpustate, UINT32 insn )
 
 static CPU_SET_INFO( arm )
 {
-	ARM_REGS *cpustate = device->token;
+	ARM_REGS *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1442,7 +1451,7 @@ static CPU_SET_INFO( arm )
 
 CPU_GET_INFO( arm )
 {
-	ARM_REGS *cpustate = (device != NULL) ? device->token : NULL;
+	ARM_REGS *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

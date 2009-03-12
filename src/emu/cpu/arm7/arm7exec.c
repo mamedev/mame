@@ -43,7 +43,7 @@
 {
     UINT32 pc;
     UINT32 insn;
-    arm_state *cpustate = device->token;
+    arm_state *cpustate = get_safe_token(device);
 
     ARM7_ICOUNT = cycles;
     do

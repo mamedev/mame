@@ -66,6 +66,15 @@ static void test_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, vo
 #define ARM7REG(reg)        cpustate->sArmRegister[reg]
 #define ARM7_ICOUNT         cpustate->iCount
 
+INLINE arm_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_ARM7);
+	return (arm_state *)device->token;
+}
+
 /* include the arm7 core */
 #include "arm7core.c"
 
@@ -74,7 +83,7 @@ static void test_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, vo
  **************************************************************************/
 static CPU_INIT( arm7 )
 {
-	arm_state *cpustate = device->token;
+	arm_state *cpustate = get_safe_token(device);
 
 	// must call core
 	arm7_core_init("arm7", device);
@@ -119,7 +128,7 @@ static void set_irq_line(arm_state *cpustate, int irqline, int state)
 
 static CPU_DISASSEMBLE( arm7 )
 {
-    arm_state *cpustate = device->token;
+    arm_state *cpustate = get_safe_token(device);
 
     if (T_IS_SET(GET_CPSR))
     {
@@ -138,7 +147,7 @@ static CPU_DISASSEMBLE( arm7 )
 
 static CPU_SET_INFO( arm7 )
 {
-    arm_state *cpustate = device->token;
+    arm_state *cpustate = get_safe_token(device);
 
     switch (state)
     {
@@ -214,7 +223,7 @@ static CPU_SET_INFO( arm7 )
 
 CPU_GET_INFO( arm7 )
 {
-    arm_state *cpustate = (device != NULL) ? device->token : NULL;
+    arm_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
     switch (state)
     {

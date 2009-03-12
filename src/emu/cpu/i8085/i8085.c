@@ -244,6 +244,16 @@ static void execute_one(i8085_state *cpustate, int opcode);
     INLINE FUNCTIONS
 ***************************************************************************/
 
+INLINE i8085_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_8080 ||
+		   cpu_get_type(device) == CPU_8085A);
+	return (i8085_state *)device->token;
+}
+
 INLINE void set_sod(i8085_state *cpustate, int state)
 {
 	if (state != 0 && cpustate->sod_state == 0)
@@ -1459,7 +1469,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 
 static CPU_EXECUTE( i808x )
 {
-	i8085_state *cpustate = device->token;
+	i8085_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -1516,7 +1526,7 @@ static void init_tables (void)
 
 static void init_808x_common(const device_config *device, cpu_irq_callback irqcallback, int type)
 {
-	i8085_state *cpustate = device->token;
+	i8085_state *cpustate = get_safe_token(device);
 
 	init_tables();
 
@@ -1569,7 +1579,7 @@ static CPU_INIT( i8085 )
 
 static CPU_RESET( i808x )
 {
-	i8085_state *cpustate = device->token;
+	i8085_state *cpustate = get_safe_token(device);
 
 	cpustate->PC.d = 0;
 	cpustate->HALT = 0;
@@ -1590,7 +1600,7 @@ static CPU_RESET( i808x )
 
 static CPU_IMPORT_STATE( i808x )
 {
-	i8085_state *cpustate = device->token;
+	i8085_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -1617,7 +1627,7 @@ static CPU_IMPORT_STATE( i808x )
 
 static CPU_EXPORT_STATE( i808x )
 {
-	i8085_state *cpustate = device->token;
+	i8085_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -1671,7 +1681,7 @@ static void i808x_set_irq_line(i8085_state *cpustate, int irqline, int state)
 
 static CPU_SET_INFO( i808x )
 {
-	i8085_state *cpustate = device->token;
+	i8085_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1693,7 +1703,7 @@ static CPU_SET_INFO( i808x )
 
 CPU_GET_INFO( i8085 )
 {
-	i8085_state *cpustate = (device != NULL) ? device->token : NULL;
+	i8085_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

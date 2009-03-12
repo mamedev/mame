@@ -420,6 +420,27 @@ static int create_tables(void);
 static void check_irqs(adsp2100_state *adsp);
 
 
+
+/***************************************************************************
+    STATE ACCESSORS
+***************************************************************************/
+
+INLINE adsp2100_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_ADSP2100 ||
+		   cpu_get_type(device) == CPU_ADSP2101 ||
+		   cpu_get_type(device) == CPU_ADSP2104 ||
+		   cpu_get_type(device) == CPU_ADSP2105 ||
+		   cpu_get_type(device) == CPU_ADSP2115 ||
+		   cpu_get_type(device) == CPU_ADSP2181);
+	return (adsp2100_state *)device->token;
+}
+
+
+
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
@@ -672,8 +693,8 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
 
 static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callback irqcallback, int chiptype)
 {
-	const adsp21xx_config *config = device->static_config;
-	adsp2100_state *adsp = device->token;
+	const adsp21xx_config *config = (const adsp21xx_config *)device->static_config;
+	adsp2100_state *adsp = get_safe_token(device);
 
 	/* create the tables */
 	if (!create_tables())
@@ -828,7 +849,7 @@ static adsp2100_state *adsp21xx_init(const device_config *device, cpu_irq_callba
 
 static CPU_RESET( adsp21xx )
 {
-	adsp2100_state *adsp = device->token;
+	adsp2100_state *adsp = get_safe_token(device);
 	int irq;
 
 	/* ensure that zero is zero */
@@ -1030,7 +1051,7 @@ static CPU_EXIT( adsp21xx )
 static CPU_EXECUTE( adsp21xx )
 {
 	int check_debugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
-	adsp2100_state *adsp = device->token;
+	adsp2100_state *adsp = get_safe_token(device);
 
 	check_irqs(adsp);
 
@@ -1785,7 +1806,7 @@ extern CPU_DISASSEMBLE( adsp21xx );
 
 static CPU_IMPORT_STATE( adsp21xx )
 {
-	adsp2100_state *adsp = device->token;
+	adsp2100_state *adsp = get_safe_token(device);
 	switch (entry->index)
 	{
 		case ADSP2100_MSTAT:
@@ -1837,7 +1858,7 @@ static CPU_IMPORT_STATE( adsp21xx )
 
 static CPU_SET_INFO( adsp21xx )
 {
-	adsp2100_state *adsp = device->token;
+	adsp2100_state *adsp = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1864,7 +1885,7 @@ static CPU_SET_INFO( adsp21xx )
 
 static CPU_GET_INFO( adsp21xx )
 {
-	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
+	adsp2100_state *adsp = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -2152,20 +2173,20 @@ CPU_GET_INFO( adsp2181 )
 
 void adsp2181_idma_addr_w(const device_config *device, UINT16 data)
 {
-	adsp2100_state *adsp = device->token;
+	adsp2100_state *adsp = get_safe_token(device);
 	adsp->idma_addr = data;
 	adsp->idma_offs = 0;
 }
 
 UINT16 adsp2181_idma_addr_r(const device_config *device)
 {
-	adsp2100_state *adsp = device->token;
+	adsp2100_state *adsp = get_safe_token(device);
 	return adsp->idma_addr;
 }
 
 void adsp2181_idma_data_w(const device_config *device, UINT16 data)
 {
-	adsp2100_state *adsp = device->token;
+	adsp2100_state *adsp = get_safe_token(device);
 
 	/* program memory? */
 	if (!(adsp->idma_addr & 0x4000))
@@ -2192,7 +2213,7 @@ void adsp2181_idma_data_w(const device_config *device, UINT16 data)
 
 UINT16 adsp2181_idma_data_r(const device_config *device)
 {
-	adsp2100_state *adsp = device->token;
+	adsp2100_state *adsp = get_safe_token(device);
 	UINT16 result = 0xffff;
 
 	/* program memory? */

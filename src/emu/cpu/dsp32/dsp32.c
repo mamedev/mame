@@ -197,6 +197,21 @@ static CPU_RESET( dsp32c );
 
 
 /***************************************************************************
+    STATE ACCESSORS
+***************************************************************************/
+
+INLINE dsp32_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_DSP32C);
+	return (dsp32_state *)device->token;
+}
+
+
+
+/***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
 
@@ -296,8 +311,8 @@ static void update_pcr(dsp32_state *cpustate, UINT16 newval)
 
 static CPU_INIT( dsp32c )
 {
-	const dsp32_config *configdata = device->static_config;
-	dsp32_state *cpustate = device->token;
+	const dsp32_config *configdata = (const dsp32_config *)device->static_config;
+	dsp32_state *cpustate = get_safe_token(device);
 
 	/* copy in config data */
 	if (configdata != NULL)
@@ -310,7 +325,7 @@ static CPU_INIT( dsp32c )
 
 static CPU_RESET( dsp32c )
 {
-	dsp32_state *cpustate = device->token;
+	dsp32_state *cpustate = get_safe_token(device);
 
 	/* reset goes to 0 */
 	cpustate->PC = 0;
@@ -354,7 +369,7 @@ static CPU_EXIT( dsp32c )
 
 static CPU_EXECUTE( dsp32c )
 {
-	dsp32_state *cpustate = device->token;
+	dsp32_state *cpustate = get_safe_token(device);
 
 	/* skip if halted */
 	if ((cpustate->pcr & PCR_RESET) == 0)
@@ -496,7 +511,7 @@ INLINE void dma_store(dsp32_state *cpustate)
 
 void dsp32c_pio_w(const device_config *device, int reg, int data)
 {
-	dsp32_state *cpustate = device->token;
+	dsp32_state *cpustate = get_safe_token(device);
 	UINT16 mask;
 	UINT8 mode;
 
@@ -575,7 +590,7 @@ void dsp32c_pio_w(const device_config *device, int reg, int data)
 
 int dsp32c_pio_r(const device_config *device, int reg)
 {
-	dsp32_state *cpustate = device->token;
+	dsp32_state *cpustate = get_safe_token(device);
 	UINT16 mask, result = 0xffff;
 	UINT8 mode, shift = 0;
 
@@ -648,7 +663,7 @@ int dsp32c_pio_r(const device_config *device, int reg)
 
 static CPU_SET_INFO( dsp32c )
 {
-	dsp32_state *cpustate = device->token;
+	dsp32_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -720,7 +735,7 @@ static CPU_SET_INFO( dsp32c )
 
 CPU_GET_INFO( dsp32c )
 {
-	dsp32_state *cpustate = (device != NULL) ? device->token : NULL;
+	dsp32_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

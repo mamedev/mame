@@ -118,13 +118,23 @@ typedef struct
 } esrip_state;
 
 
+INLINE esrip_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_ESRIP);
+	return (esrip_state *)device->token;
+}
+
+
 /***************************************************************************
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
 UINT8 get_rip_status(const device_config *cpu)
 {
-	esrip_state *cpustate = cpu->token;
+	esrip_state *cpustate = get_safe_token(cpu);
 	return cpustate->status_out;
 }
 
@@ -237,7 +247,7 @@ static void make_ops(esrip_state *cpustate)
 
 static CPU_INIT( esrip )
 {
-	esrip_state *cpustate = device->token;
+	esrip_state *cpustate = get_safe_token(device);
 	esrip_config* _config = (esrip_config*)device->static_config;
 
 	memset(cpustate, 0, sizeof(cpustate));
@@ -250,13 +260,13 @@ static CPU_INIT( esrip )
 	cpustate->draw = _config->draw;
 
 	/* Allocate image pointer table RAM */
-	cpustate->ipt_ram = auto_malloc(IPT_RAM_SIZE);
+	cpustate->ipt_ram = (UINT16 *)auto_malloc(IPT_RAM_SIZE);
 
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* Create the instruction decode lookup table */
-	cpustate->optable = auto_malloc(65536);
+	cpustate->optable = (UINT8 *)auto_malloc(65536);
 	make_ops(cpustate);
 
 	/* Register stuff for state saving */
@@ -307,7 +317,7 @@ static CPU_INIT( esrip )
 
 static CPU_RESET( esrip )
 {
-	esrip_state *cpustate = device->token;
+	esrip_state *cpustate = get_safe_token(device);
 
 	cpustate->pc = 0;
 
@@ -1651,7 +1661,7 @@ INLINE void am29116_execute(esrip_state *cpustate, UINT16 inst, int _sre)
 
 static CPU_EXECUTE( esrip )
 {
-	esrip_state *cpustate = device->token;
+	esrip_state *cpustate = get_safe_token(device);
 	int calldebugger = (device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0;
 	UINT8 status;
 
@@ -1941,7 +1951,7 @@ static CPU_DISASSEMBLE( esrip )
 
 static CPU_SET_INFO( esrip )
 {
-	esrip_state *cpustate = device->token;
+	esrip_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1960,7 +1970,7 @@ static CPU_SET_INFO( esrip )
 
 CPU_GET_INFO( esrip )
 {
-	esrip_state *cpustate = device->token;
+	esrip_state *cpustate = (device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

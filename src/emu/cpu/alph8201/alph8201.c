@@ -223,6 +223,16 @@ typedef struct {
 #define LP1				lp1
 #define LP2				lp2
 
+INLINE alpha8201_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_ALPHA8201 ||
+		   cpu_get_type(device) == CPU_ALPHA8301);
+	return (alpha8201_state *)device->token;
+}
+
 /* Get next opcode argument and increment program counter */
 INLINE unsigned M_RDMEM_OPCODE (alpha8201_state *cpustate)
 {
@@ -660,7 +670,7 @@ static const s_opcode opcode_8301[256]=
  ****************************************************************************/
 static CPU_INIT( alpha8201 )
 {
-	alpha8201_state *cpustate = device->token;
+	alpha8201_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -692,7 +702,7 @@ static CPU_INIT( alpha8201 )
  ****************************************************************************/
 static CPU_RESET( alpha8201 )
 {
-	alpha8201_state *cpustate = device->token;
+	alpha8201_state *cpustate = get_safe_token(device);
 	cpustate->PC     = 0;
 	cpustate->regPtr = 0;
 	cpustate->zf     = 0;
@@ -725,7 +735,7 @@ static CPU_EXIT( alpha8201 )
 
 static int alpha8xxx_execute(const device_config *device,const s_opcode *op_map,int cycles)
 {
-	alpha8201_state *cpustate = device->token;
+	alpha8201_state *cpustate = get_safe_token(device);
 	unsigned opcode;
 	UINT8 pcptr;
 
@@ -832,7 +842,7 @@ static void set_irq_line(alpha8201_state *cpustate, int irqline, int state)
 
 static CPU_SET_INFO( alpha8201 )
 {
-	alpha8201_state *cpustate = device->token;
+	alpha8201_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 #if HANDLE_HALT_LINE
@@ -876,7 +886,7 @@ static CPU_SET_INFO( alpha8201 )
 /* 8201 and 8301 */
 static CPU_GET_INFO( alpha8xxx )
 {
-	alpha8201_state *cpustate = (device != NULL) ? device->token : NULL;
+	alpha8201_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

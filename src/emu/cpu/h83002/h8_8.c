@@ -213,7 +213,7 @@ static STATE_POSTLOAD( h8_onstateload )
 
 static CPU_INIT(h8bit)
 {
-	h83xx_state *h8 = device->token;
+	h83xx_state *h8 = get_safe_token(device);
 
 	h8->h8iflag = 1;
 
@@ -243,7 +243,7 @@ static CPU_INIT(h8bit)
 
 static CPU_RESET(h8bit)
 {
-	h83xx_state *h8 = device->token;
+	h83xx_state *h8 = get_safe_token(device);
 
 	h8->h8err = 0;
 	h8->pc = h8_mem_read16(h8, 0);
@@ -351,7 +351,7 @@ static void h8_check_irqs(h83xx_state *h8)
 
 static CPU_SET_INFO( h8 )
 {
-	h83xx_state *h8 = device->token;
+	h83xx_state *h8 = get_safe_token(device);
 
 	switch(state) {
 	case CPUINFO_INT_PC:			      		h8->pc = info->i; 								break;
@@ -513,7 +513,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3334 )
 {
-	h83xx_state *h8 = (device != NULL) ? device->token : NULL;
+	h83xx_state *h8 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state) {
 	// Interface functions and variables

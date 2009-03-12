@@ -42,6 +42,7 @@ enum _drcuml_ptype
 	DRCUML_PTYPE_MAX
 };
 typedef enum _drcuml_ptype drcuml_ptype;
+DECLARE_ENUM_OPERATORS(drcuml_ptype)
 
 
 /* these define the registers for the UML */

@@ -134,6 +134,16 @@ static void cfunc_DIV1(void *param);
     INLINE FUNCTIONS
 ***************************************************************************/
 
+INLINE SH2 *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_SH1 ||
+		   cpu_get_type(device) == CPU_SH2);
+	return *(SH2 **)device->token;
+}
+
 INLINE UINT16 RW(SH2 *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
@@ -221,7 +231,7 @@ INLINE void save_fast_iregs(SH2 *sh2, drcuml_block *block)
 
 static void cfunc_printf_probe(void *param)
 {
-	SH2 *sh2 = param;
+	SH2 *sh2 = (SH2 *)param;
 	UINT32 pc = sh2->pc;
 
 	printf(" PC=%08X          r0=%08X  r1=%08X  r2=%08X\n",
@@ -261,7 +271,7 @@ static void cfunc_printf_probe(void *param)
 
 static void cfunc_unimplemented(void *param)
 {
-	SH2 *sh2 = param;
+	SH2 *sh2 = (SH2 *)param;
 	UINT16 opcode = sh2->arg0;
 	fatalerror("PC=%08X: Unimplemented op %04X", sh2->pc, opcode);
 }
@@ -271,7 +281,7 @@ static void cfunc_unimplemented(void *param)
 -------------------------------------------------*/
 static void cfunc_checkirqs(void *param)
 {
-	SH2 *sh2 = param;
+	SH2 *sh2 = (SH2 *)param;
 	// if NMI is pending, evec etc are already set up
 	if (sh2->pending_nmi)
 	{
@@ -289,7 +299,7 @@ static void cfunc_checkirqs(void *param)
 -------------------------------------------------*/
 static void cfunc_fastirq(void *param)
 {
-	SH2 *sh2 = param;
+	SH2 *sh2 = (SH2 *)param;
 	sh2_exception(sh2, "fastirq",sh2->irqline);
 }
 
@@ -298,7 +308,7 @@ static void cfunc_fastirq(void *param)
 -------------------------------------------------*/
 static void cfunc_MAC_W(void *param)
 {
-	SH2 *sh2 = param;
+	SH2 *sh2 = (SH2 *)param;
 	INT32 tempm, tempn, dest, src, ans;
 	UINT32 templ;
 	UINT16 opcode;
@@ -381,7 +391,7 @@ static void cfunc_MAC_W(void *param)
 -------------------------------------------------*/
 static void cfunc_MAC_L(void *param)
 {
-	SH2 *sh2 = param;
+	SH2 *sh2 = (SH2 *)param;
 	UINT32 RnL, RnH, RmL, RmH, Res0, Res1, Res2;
 	UINT32 temp0, temp1, temp2, temp3;
 	INT32 tempm, tempn, fnLmL;
@@ -469,7 +479,7 @@ static void cfunc_MAC_L(void *param)
 -------------------------------------------------*/
 static void cfunc_DIV1(void *param)
 {
-	SH2 *sh2 = param;
+	SH2 *sh2 = (SH2 *)param;
 	UINT32 tmp0;
 	UINT32 old_q;
 	UINT16 opcode;
@@ -574,7 +584,7 @@ static void cfunc_DIV1(void *param)
 -------------------------------------------------*/
 static void cfunc_ADDV(void *param)
 {
-	SH2 *sh2 = param;
+	SH2 *sh2 = (SH2 *)param;
 	INT32 dest, src, ans;
 	UINT16 opcode;
 	int n, m;
@@ -617,7 +627,7 @@ static void cfunc_ADDV(void *param)
 -------------------------------------------------*/
 static void cfunc_SUBV(void *param)
 {
-	SH2 *sh2 = param;
+	SH2 *sh2 = (SH2 *)param;
 	INT32 dest, src, ans;
 	UINT16 opcode;
 	int n, m;
@@ -669,7 +679,7 @@ static CPU_INIT( sh2 )
 		COMPILE_MAX_SEQUENCE,		/* maximum instructions to include in a sequence */
 		sh2_describe			/* callback to describe a single instruction */
 	};
-	SH2 *sh2 = *(SH2 **)device->token;
+	SH2 *sh2 = get_safe_token(device);
 	drccache *cache;
 	drcbe_info beinfo;
 	UINT32 flags = 0;
@@ -681,7 +691,7 @@ static CPU_INIT( sh2 )
 		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(SH2)));
 
 	/* allocate the core memory */
-	*(SH2 **)device->token = sh2 = drccache_memory_alloc_near(cache, sizeof(SH2));
+	*(SH2 **)device->token = sh2 = (SH2 *)drccache_memory_alloc_near(cache, sizeof(SH2));
 	memset(sh2, 0, sizeof(SH2));
 
 	/* initialize the common core parts */
@@ -764,7 +774,7 @@ static CPU_INIT( sh2 )
 
 static CPU_EXIT( sh2 )
 {
-	SH2 *sh2 = *(SH2 **)device->token;
+	SH2 *sh2 = get_safe_token(device);
 
 	/* clean up the DRC */
 	drcfe_exit(sh2->drcfe);
@@ -779,8 +789,8 @@ static CPU_EXIT( sh2 )
 
 static CPU_RESET( sh2 )
 {
-	SH2 *sh2 = *(SH2 **)device->token;
-	void *tsave, *tsaved0, *tsaved1;
+	SH2 *sh2 = get_safe_token(device);
+	emu_timer *tsave, *tsaved0, *tsaved1;
 	UINT32 *m;
 
 	void (*f)(UINT32 data);
@@ -833,7 +843,7 @@ static CPU_RESET( sh2 )
 
 static CPU_RESET( sh1 )
 {
-	SH2 *sh2 = *(SH2 **)device->token;
+	SH2 *sh2 = get_safe_token(device);
 	CPU_RESET_CALL(sh2);
 	sh2->cpu_type = CPU_TYPE_SH1;
 }
@@ -869,7 +879,7 @@ static void code_flush_cache(SH2 *sh2)
 /* Execute cycles - returns number of cycles actually run */
 static CPU_EXECUTE( sh2 )
 {
-	SH2 *sh2 = *(SH2 **)device->token;
+	SH2 *sh2 = get_safe_token(device);
 	drcuml_state *drcuml = sh2->drcuml;
 	int execute_result;
 
@@ -3142,7 +3152,7 @@ static int generate_group_12(SH2 *sh2, drcuml_block *block, compiler_state *comp
 
 void sh2drc_set_options(const device_config *device, UINT32 options)
 {
-	SH2 *sh2 = *(SH2 **)device->token;
+	SH2 *sh2 = get_safe_token(device);
 	sh2->drcoptions = options;
 }
 
@@ -3154,7 +3164,7 @@ void sh2drc_set_options(const device_config *device, UINT32 options)
 
 void sh2drc_add_pcflush(const device_config *device, offs_t address)
 {
-	SH2 *sh2 = *(SH2 **)device->token;
+	SH2 *sh2 = get_safe_token(device);
 
 	if (sh2->pcfsel < ARRAY_LENGTH(sh2->pcflushes))
 		sh2->pcflushes[sh2->pcfsel++] = address;
@@ -3197,7 +3207,7 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( sh2 )
 {
-	SH2 *sh2 = *(SH2 **)device->token;
+	SH2 *sh2 = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -3256,7 +3266,7 @@ static CPU_SET_INFO( sh2 )
 
 CPU_GET_INFO( sh2 )
 {
-	SH2 *sh2 = (device != NULL && device->token != NULL) ? *(SH2 **)device->token : NULL;
+	SH2 *sh2 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

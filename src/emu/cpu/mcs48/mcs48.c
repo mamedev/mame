@@ -269,6 +269,32 @@ static int check_irqs(mcs48_state *cpustate);
     INLINE FUNCTIONS
 ***************************************************************************/
 
+INLINE mcs48_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_I8035 ||
+		   cpu_get_type(device) == CPU_I8048 ||
+		   cpu_get_type(device) == CPU_I8648 ||
+		   cpu_get_type(device) == CPU_I8748 ||
+		   cpu_get_type(device) == CPU_I8039 ||
+		   cpu_get_type(device) == CPU_I8049 ||
+		   cpu_get_type(device) == CPU_I8749 ||
+		   cpu_get_type(device) == CPU_I8040 ||
+		   cpu_get_type(device) == CPU_I8050 ||
+		   cpu_get_type(device) == CPU_I8041 ||
+		   cpu_get_type(device) == CPU_I8741 ||
+		   cpu_get_type(device) == CPU_I8042 ||
+		   cpu_get_type(device) == CPU_I8242 ||
+		   cpu_get_type(device) == CPU_I8742 ||
+		   cpu_get_type(device) == CPU_MB8884 ||
+		   cpu_get_type(device) == CPU_N7751 ||
+		   cpu_get_type(device) == CPU_M58715);
+	return (mcs48_state *)device->token;
+}
+
+
 /*-------------------------------------------------
     opcode_fetch - fetch an opcode byte
 -------------------------------------------------*/
@@ -869,7 +895,7 @@ static const mcs48_ophandler opcode_table[256]=
 
 static void mcs48_init(const device_config *device, cpu_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
 {
-	mcs48_state *cpustate = device->token;
+	mcs48_state *cpustate = get_safe_token(device);
 
 	/* External access line
      * EA=1 : read from external rom
@@ -997,7 +1023,7 @@ static CPU_INIT( upi41_2k_rom )
 
 static CPU_RESET( mcs48 )
 {
-	mcs48_state *cpustate = device->token;
+	mcs48_state *cpustate = get_safe_token(device);
 
 	/* confirmed from reset description */
 	cpustate->pc = 0;
@@ -1119,7 +1145,7 @@ static void burn_cycles(mcs48_state *cpustate, int count)
 
 static CPU_EXECUTE( mcs48 )
 {
-	mcs48_state *cpustate = device->token;
+	mcs48_state *cpustate = get_safe_token(device);
 	int curcycles;
 
 	update_regptr(cpustate);
@@ -1168,7 +1194,7 @@ static CPU_EXECUTE( mcs48 )
 
 UINT8 upi41_master_r(const device_config *device, UINT8 a0)
 {
-	mcs48_state *cpustate = device->token;
+	mcs48_state *cpustate = get_safe_token(device);
 
 	/* if just reading the status, return it */
 	if ((a0 & 1) != 0)
@@ -1193,7 +1219,7 @@ UINT8 upi41_master_r(const device_config *device, UINT8 a0)
 static TIMER_CALLBACK( master_callback )
 {
 	const device_config *device = (const device_config *)ptr;
-	mcs48_state *cpustate = device->token;
+	mcs48_state *cpustate = get_safe_token(device);
 	UINT8 a0 = (param >> 8) & 1;
 	UINT8 data = param;
 
@@ -1264,7 +1290,7 @@ ADDRESS_MAP_END
 
 static CPU_IMPORT_STATE( mcs48 )
 {
-	mcs48_state *cpustate = device->token;
+	mcs48_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -1293,7 +1319,7 @@ static CPU_IMPORT_STATE( mcs48 )
 
 static CPU_EXPORT_STATE( mcs48 )
 {
-	mcs48_state *cpustate = device->token;
+	mcs48_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -1322,7 +1348,7 @@ static CPU_EXPORT_STATE( mcs48 )
 
 static CPU_SET_INFO( mcs48 )
 {
-	mcs48_state *cpustate = device->token;
+	mcs48_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1340,7 +1366,7 @@ static CPU_SET_INFO( mcs48 )
 
 static CPU_GET_INFO( mcs48 )
 {
-	mcs48_state *cpustate = (device != NULL) ? device->token : NULL;
+	mcs48_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

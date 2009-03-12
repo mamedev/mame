@@ -92,7 +92,7 @@ drchash_state *drchash_alloc(drccache *cache, int modes, int addrbits, int ignor
 	drchash_state *drchash;
 
 	/* allocate permanent state from the cache */
-	drchash = drccache_memory_alloc(cache, sizeof(*drchash) + modes * sizeof(drchash->base[0]));
+	drchash = (drchash_state *)drccache_memory_alloc(cache, sizeof(*drchash) + modes * sizeof(drchash->base[0]));
 	if (drchash == NULL)
 		return NULL;
 	memset(drchash, 0, sizeof(*drchash) + modes * sizeof(drchash->base[0]));
@@ -127,7 +127,7 @@ int drchash_reset(drchash_state *drchash)
 	int modenum, entry;
 
 	/* allocate an empty l2 hash table */
-	drchash->emptyl2 = drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr) << drchash->l2bits);
+	drchash->emptyl2 = (drccodeptr *)drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr) << drchash->l2bits);
 	if (drchash->emptyl2 == NULL)
 		return FALSE;
 
@@ -136,7 +136,7 @@ int drchash_reset(drchash_state *drchash)
 		drchash->emptyl2[entry] = drchash->nocodeptr;
 
 	/* allocate an empty l1 hash table */
-	drchash->emptyl1 = drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr *) << drchash->l1bits);
+	drchash->emptyl1 = (drccodeptr **)drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr *) << drchash->l1bits);
 	if (drchash->emptyl1 == NULL)
 		return FALSE;
 
@@ -245,7 +245,7 @@ int drchash_set_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc, drccodep
 	/* copy-on-write for the l1 hash table */
 	if (drchash->base[mode] == drchash->emptyl1)
 	{
-		drccodeptr **newtable = drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr *) << drchash->l1bits);
+		drccodeptr **newtable = (drccodeptr **)drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr *) << drchash->l1bits);
 		if (newtable == NULL)
 			return FALSE;
 		memcpy(newtable, drchash->emptyl1, sizeof(drccodeptr *) << drchash->l1bits);
@@ -255,7 +255,7 @@ int drchash_set_codeptr(drchash_state *drchash, UINT32 mode, UINT32 pc, drccodep
 	/* copy-on-write for the l2 hash table */
 	if (drchash->base[mode][l1] == drchash->emptyl2)
 	{
-		drccodeptr *newtable = drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr) << drchash->l2bits);
+		drccodeptr *newtable = (drccodeptr *)drccache_memory_alloc_temporary(drchash->cache, sizeof(drccodeptr) << drchash->l2bits);
 		if (newtable == NULL)
 			return FALSE;
 		memcpy(newtable, drchash->emptyl2, sizeof(drccodeptr) << drchash->l2bits);
@@ -284,7 +284,7 @@ drcmap_state *drcmap_alloc(drccache *cache, UINT64 uniquevalue)
 	drcmap_state *drcmap;
 
 	/* allocate permanent state from the cache */
-	drcmap = drccache_memory_alloc(cache, sizeof(*drcmap));
+	drcmap = (drcmap_state *)drccache_memory_alloc(cache, sizeof(*drcmap));
 	if (drcmap == NULL)
 		return NULL;
 	memset(drcmap, 0, sizeof(*drcmap));
@@ -427,7 +427,7 @@ void drcmap_set_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar, 
 		return;
 
 	/* allocate a new entry and fill it in */
-	entry = drccache_memory_alloc(drcmap->cache, sizeof(*entry));
+	entry = (drcmap_entry *)drccache_memory_alloc(drcmap->cache, sizeof(*entry));
 	entry->next = NULL;
 	entry->codeptr = codebase;
 	entry->mapvar = mapvar - DRCUML_MAPVAR_M0;
@@ -542,7 +542,7 @@ drclabel_list *drclabel_list_alloc(drccache *cache)
 	drclabel_list *list;
 
 	/* allocate permanent state from the cache */
-	list = drccache_memory_alloc(cache, sizeof(*list));
+	list = (drclabel_list *)drccache_memory_alloc(cache, sizeof(*list));
 	if (list == NULL)
 		return NULL;
 	memset(list, 0, sizeof(*list));
@@ -655,7 +655,7 @@ static drclabel *label_find_or_allocate(drclabel_list *list, drcuml_codelabel la
 	/* if none found, allocate */
 	if (curlabel == NULL)
 	{
-		curlabel = drccache_memory_alloc(list->cache, sizeof(*curlabel));
+		curlabel = (drclabel *)drccache_memory_alloc(list->cache, sizeof(*curlabel));
 		curlabel->next = list->head;
 		curlabel->label = label;
 		curlabel->codeptr = NULL;
@@ -673,8 +673,8 @@ static drclabel *label_find_or_allocate(drclabel_list *list, drcuml_codelabel la
 
 static void label_oob_callback(drccodeptr *codeptr, void *param1, void *param2, void *param3)
 {
-	drclabel *label = param1;
-	drclabel_fixup_func callback = param2;
+	drclabel *label = (drclabel *)param1;
+	drclabel_fixup_func callback = (drclabel_fixup_func)param2;
 
 	(*callback)(param3, label->codeptr);
 }

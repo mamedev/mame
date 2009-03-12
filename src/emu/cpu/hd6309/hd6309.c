@@ -150,6 +150,15 @@ struct _m68_state_t
 	UINT8 const *index_cycle;
 };
 
+INLINE m68_state_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_HD6309);
+	return (m68_state_t *)device->token;
+}
+
 static void check_irq_lines( m68_state_t *m68_state );
 static void IIError(m68_state_t *m68_state);
 static void DZError(m68_state_t *m68_state);
@@ -496,8 +505,8 @@ static void check_irq_lines( m68_state_t *m68_state )
 
 static STATE_POSTLOAD( hd6309_postload )
 {
-	const device_config *device = param;
-	m68_state_t *m68_state = device->token;
+	const device_config *device = (const device_config *)param;
+	m68_state_t *m68_state = get_safe_token(device);
 
 	UpdateState(m68_state);
 }
@@ -508,7 +517,7 @@ static STATE_POSTLOAD( hd6309_postload )
 /****************************************************************************/
 static CPU_INIT( hd6309 )
 {
-	m68_state_t *m68_state = device->token;
+	m68_state_t *m68_state = get_safe_token(device);
 
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
@@ -543,7 +552,7 @@ static CPU_INIT( hd6309 )
 /****************************************************************************/
 static CPU_RESET( hd6309 )
 {
-	m68_state_t *m68_state = device->token;
+	m68_state_t *m68_state = get_safe_token(device);
 
 	m68_state->int_state = 0;
 	m68_state->nmi_state = CLEAR_LINE;
@@ -627,7 +636,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 {
-	m68_state_t *m68_state = device->token;
+	m68_state_t *m68_state = get_safe_token(device);
 
 	m68_state->icount = cycles - m68_state->extra_cycles;
 	m68_state->extra_cycles = 0;
@@ -1214,7 +1223,7 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 
 static CPU_SET_INFO( hd6309 )
 {
-	m68_state_t *m68_state = device->token;
+	m68_state_t *m68_state = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1249,7 +1258,7 @@ static CPU_SET_INFO( hd6309 )
 
 CPU_GET_INFO( hd6309 )
 {
-	m68_state_t *m68_state = (device != NULL) ? device->token : NULL;
+	m68_state_t *m68_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

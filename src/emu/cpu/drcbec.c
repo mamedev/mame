@@ -310,7 +310,7 @@ static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, const de
 	int spacenum;
 
 	/* allocate space in the cache for our state */
-	drcbe_state *drcbe = drccache_memory_alloc(cache, sizeof(*drcbe));
+	drcbe_state *drcbe = (drcbe_state *)drccache_memory_alloc(cache, sizeof(*drcbe));
 	if (drcbe == NULL)
 		return NULL;
 	memset(drcbe, 0, sizeof(*drcbe));
@@ -474,27 +474,27 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 
 				/* pre-expand opcodes that encode size in them */
 				if (opcode == DRCUML_OP_LOAD)
-					opcode = DRCUML_OP_LOAD1 + (inst->param[3].value & 3);
+					opcode = (drcuml_opcode)(DRCUML_OP_LOAD1 + (inst->param[3].value & 3));
 				if (opcode == DRCUML_OP_LOADS)
-					opcode = DRCUML_OP_LOADS1 + (inst->param[3].value & 3);
+					opcode = (drcuml_opcode)(DRCUML_OP_LOADS1 + (inst->param[3].value & 3));
 				if (opcode == DRCUML_OP_STORE)
-					opcode = DRCUML_OP_STORE1 + (inst->param[3].value & 3);
+					opcode = (drcuml_opcode)(DRCUML_OP_STORE1 + (inst->param[3].value & 3));
 				if (opcode == DRCUML_OP_READ)
-					opcode = DRCUML_OP_READ1 + (inst->param[2].value & 3);
+					opcode = (drcuml_opcode)(DRCUML_OP_READ1 + (inst->param[2].value & 3));
 				if (opcode == DRCUML_OP_READM)
-					opcode = DRCUML_OP_READM1 + (inst->param[3].value & 3);
+					opcode = (drcuml_opcode)(DRCUML_OP_READM1 + (inst->param[3].value & 3));
 				if (opcode == DRCUML_OP_WRITE)
-					opcode = DRCUML_OP_WRITE1 + (inst->param[2].value & 3);
+					opcode = (drcuml_opcode)(DRCUML_OP_WRITE1 + (inst->param[2].value & 3));
 				if (opcode == DRCUML_OP_WRITEM)
-					opcode = DRCUML_OP_WRITEM1 + (inst->param[3].value & 3);
+					opcode = (drcuml_opcode)(DRCUML_OP_WRITEM1 + (inst->param[3].value & 3));
 				if (opcode == DRCUML_OP_SEXT)
-					opcode = DRCUML_OP_SEXT1 + (inst->param[2].value & 3);
+					opcode = (drcuml_opcode)(DRCUML_OP_SEXT1 + (inst->param[2].value & 3));
 				if (opcode == DRCUML_OP_FTOINT)
-					opcode = DRCUML_OP_FTOI4T + 5 * ((inst->param[2].value & 3) - 2) + inst->param[3].value;
+					opcode = (drcuml_opcode)(DRCUML_OP_FTOI4T + 5 * ((inst->param[2].value & 3) - 2) + inst->param[3].value);
 				if (opcode == DRCUML_OP_FFRINT)
-					opcode = DRCUML_OP_FFRI4 + ((inst->param[2].value & 3) - 2);
+					opcode = (drcuml_opcode)(DRCUML_OP_FFRI4 + ((inst->param[2].value & 3) - 2));
 				if (opcode == DRCUML_OP_FFRFLT)
-					opcode = DRCUML_OP_FFRFS + ((inst->param[2].value & 3) - 2);
+					opcode = (drcuml_opcode)(DRCUML_OP_FFRFS + ((inst->param[2].value & 3) - 2));
 
 				/* count how many bytes of immediates we need */
 				immedbytes = 0;
@@ -1955,7 +1955,7 @@ static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, vo
 
 static void fixup_label(void *parameter, drccodeptr labelcodeptr)
 {
-	drcbec_instruction *dst = parameter;
+	drcbec_instruction *dst = (drcbec_instruction *)parameter;
 	dst->inst = (drcbec_instruction *)labelcodeptr;
 }
 

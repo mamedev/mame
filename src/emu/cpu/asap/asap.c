@@ -262,6 +262,21 @@ static void (*const conditiontable[16])(asap_state *) =
 
 
 /***************************************************************************
+    STATE ACCESSORS
+***************************************************************************/
+
+INLINE asap_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_ASAP);
+	return (asap_state *)device->token;
+}
+
+
+
+/***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
 
@@ -396,7 +411,7 @@ static void init_tables(void)
 {
 	/* allocate opcode table */
 	if (!opcode)
-		opcode = auto_malloc(32 * 32 * 2 * sizeof(void *));
+		opcode = (void (**)(asap_state *))auto_malloc(32 * 32 * 2 * sizeof(void *));
 
 	/* fill opcode table */
 	if (opcode)
@@ -421,7 +436,7 @@ static void init_tables(void)
 
 static CPU_INIT( asap )
 {
-	asap_state *asap = device->token;
+	asap_state *asap = get_safe_token(device);
 	int i;
 
 	init_tables();
@@ -434,7 +449,7 @@ static CPU_INIT( asap )
 
 static CPU_RESET( asap )
 {
-	asap_state *asap = device->token;
+	asap_state *asap = get_safe_token(device);
 
 	/* initialize the state */
 	asap->src2val[REGBASE + 0] = 0;
@@ -488,7 +503,7 @@ INLINE void execute_instruction(asap_state *asap)
 
 static CPU_EXECUTE( asap )
 {
-	asap_state *asap = device->token;
+	asap_state *asap = get_safe_token(device);
 
 	/* check for IRQs */
 	asap->icount = cycles;
@@ -1643,7 +1658,7 @@ static void trapf(asap_state *asap)
 
 static CPU_SET_INFO( asap )
 {
-	asap_state *asap = device->token;
+	asap_state *asap = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1698,7 +1713,7 @@ static CPU_SET_INFO( asap )
 
 CPU_GET_INFO( asap )
 {
-	asap_state *asap = (device != NULL) ? device->token : NULL;
+	asap_state *asap = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

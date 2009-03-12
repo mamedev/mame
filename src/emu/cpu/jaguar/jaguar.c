@@ -245,6 +245,16 @@ static void (*const dsp_op_table[64])(jaguar_state *jaguar, UINT16 op) =
     INLINE FUNCTIONS
 ***************************************************************************/
 
+INLINE jaguar_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_JAGUARGPU ||
+		   cpu_get_type(device) == CPU_JAGUARDSP);
+	return (jaguar_state *)device->token;
+}
+
 INLINE void update_register_banks(jaguar_state *jaguar)
 {
 	UINT32 temp;
@@ -357,7 +367,7 @@ static void init_tables(void)
 	}
 
 	/* fill in the mirror table */
-	mirror_table = malloc_or_die(65536 * sizeof(mirror_table[0]));
+	mirror_table = (UINT16 *)malloc_or_die(65536 * sizeof(mirror_table[0]));
 	for (i = 0; i < 65536; i++)
 		mirror_table[i] = ((i >> 15) & 0x0001) | ((i >> 13) & 0x0002) |
 		                  ((i >> 11) & 0x0004) | ((i >> 9)  & 0x0008) |
@@ -369,7 +379,7 @@ static void init_tables(void)
 		                  ((i << 13) & 0x4000) | ((i << 15) & 0x8000);
 
 	/* fill in the condition table */
-	condition_table = malloc_or_die(32 * 8 * sizeof(condition_table[0]));
+	condition_table = (UINT8 *)malloc_or_die(32 * 8 * sizeof(condition_table[0]));
 	for (i = 0; i < 8; i++)
 		for (j = 0; j < 32; j++)
 		{
@@ -389,8 +399,8 @@ static void init_tables(void)
 
 static STATE_POSTLOAD( jaguar_postload )
 {
-	const device_config *device = param;
-	jaguar_state *jaguar = device->token;
+	const device_config *device = (const device_config *)param;
+	jaguar_state *jaguar = get_safe_token(device);
 
 	update_register_banks(jaguar);
 	check_irqs(jaguar);
@@ -399,8 +409,8 @@ static STATE_POSTLOAD( jaguar_postload )
 
 static void init_common(int isdsp, const device_config *device, cpu_irq_callback irqcallback)
 {
-	const jaguar_cpu_config *configdata = device->static_config;
-	jaguar_state *jaguar = device->token;
+	const jaguar_cpu_config *configdata = (const jaguar_cpu_config *)device->static_config;
+	jaguar_state *jaguar = get_safe_token(device);
 
 	init_tables();
 
@@ -435,7 +445,7 @@ static CPU_INIT( jaguardsp )
 
 static CPU_RESET( jaguar )
 {
-	jaguar_state *jaguar = device->token;
+	jaguar_state *jaguar = get_safe_token(device);
 
 	jaguar->b0 = jaguar->r;
 	jaguar->b1 = jaguar->a;
@@ -464,7 +474,7 @@ static CPU_EXIT( jaguar )
 
 static CPU_EXECUTE( jaguargpu )
 {
-	jaguar_state *jaguar = device->token;
+	jaguar_state *jaguar = get_safe_token(device);
 
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar->ctrl[G_CTRL] & 1))
@@ -505,7 +515,7 @@ static CPU_EXECUTE( jaguargpu )
 
 static CPU_EXECUTE( jaguardsp )
 {
-	jaguar_state *jaguar = device->token;
+	jaguar_state *jaguar = get_safe_token(device);
 
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar->ctrl[G_CTRL] & 1))
@@ -1248,7 +1258,7 @@ void xor_rn_rn(jaguar_state *jaguar, UINT16 op)
 
 UINT32 jaguargpu_ctrl_r(const device_config *device, offs_t offset)
 {
-	jaguar_state *jaguar = device->token;
+	jaguar_state *jaguar = get_safe_token(device);
 
 	if (LOG_GPU_IO) logerror("GPU read register @ F021%02X\n", offset * 4);
 
@@ -1258,7 +1268,7 @@ UINT32 jaguargpu_ctrl_r(const device_config *device, offs_t offset)
 
 void jaguargpu_ctrl_w(const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
-	jaguar_state *jaguar = device->token;
+	jaguar_state *jaguar = get_safe_token(device);
 	UINT32 oldval, newval;
 
 	if (LOG_GPU_IO && offset != G_HIDATA)
@@ -1344,7 +1354,7 @@ void jaguargpu_ctrl_w(const device_config *device, offs_t offset, UINT32 data, U
 
 UINT32 jaguardsp_ctrl_r(const device_config *device, offs_t offset)
 {
-	jaguar_state *jaguar = device->token;
+	jaguar_state *jaguar = get_safe_token(device);
 
 	if (LOG_DSP_IO && offset != D_FLAGS)
 		logerror("DSP read register @ F1A1%02X\n", offset * 4);
@@ -1356,7 +1366,7 @@ UINT32 jaguardsp_ctrl_r(const device_config *device, offs_t offset)
 
 void jaguardsp_ctrl_w(const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
-	jaguar_state *jaguar = device->token;
+	jaguar_state *jaguar = get_safe_token(device);
 	UINT32 oldval, newval;
 
 	if (LOG_DSP_IO && offset != D_FLAGS)
@@ -1443,7 +1453,7 @@ void jaguardsp_ctrl_w(const device_config *device, offs_t offset, UINT32 data, U
 
 static CPU_SET_INFO( jaguargpu )
 {
-	jaguar_state *jaguar = device->token;
+	jaguar_state *jaguar = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1501,7 +1511,7 @@ static CPU_SET_INFO( jaguargpu )
 
 CPU_GET_INFO( jaguargpu )
 {
-	jaguar_state *jaguar = (device != NULL) ? device->token : NULL;
+	jaguar_state *jaguar = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1640,7 +1650,7 @@ CPU_GET_INFO( jaguargpu )
 
 static CPU_SET_INFO( jaguardsp )
 {
-	jaguar_state *jaguar = device->token;
+	jaguar_state *jaguar = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1654,7 +1664,7 @@ static CPU_SET_INFO( jaguardsp )
 
 CPU_GET_INFO( jaguardsp )
 {
-	jaguar_state *jaguar = (device != NULL) ? device->token : NULL;
+	jaguar_state *jaguar = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

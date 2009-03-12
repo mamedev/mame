@@ -60,6 +60,15 @@ struct _f8_Regs
 	int     irq_request;
 };
 
+INLINE f8_Regs *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_F8);
+	return (f8_Regs *)device->token;
+}
+
 /* timer shifter polynome values (will be used for timer interrupts) */
 static UINT8 timer_shifter[256];
 
@@ -1533,7 +1542,7 @@ static void f8_ns_isar_d(f8_Regs *cpustate)
 
 static CPU_RESET( f8 )
 {
-	f8_Regs *cpustate = device->token;
+	f8_Regs *cpustate = get_safe_token(device);
 	UINT8 data;
 	int i;
 	cpu_irq_callback save_callback;
@@ -1576,7 +1585,7 @@ static CPU_RESET( f8 )
 /* Execute cycles - returns number of cycles actually run */
 static CPU_EXECUTE( f8 )
 {
-    f8_Regs *cpustate = device->token;
+    f8_Regs *cpustate = get_safe_token(device);
     cpustate->icount = cycles;
 
     do
@@ -1889,7 +1898,7 @@ CPU_DISASSEMBLE( f8 );
 
 static CPU_INIT( f8 )
 {
-	f8_Regs *cpustate = device->token;
+	f8_Regs *cpustate = get_safe_token(device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -1898,7 +1907,7 @@ static CPU_INIT( f8 )
 
 static CPU_SET_INFO( f8 )
 {
-	f8_Regs *cpustate = device->token;
+	f8_Regs *cpustate = get_safe_token(device);
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1997,7 +2006,7 @@ static CPU_SET_INFO( f8 )
 
 CPU_GET_INFO( f8 )
 {
-	f8_Regs *cpustate = (device != NULL) ? device->token : NULL;
+	f8_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -545,7 +545,7 @@ drcuml_state *drcuml_alloc(const device_config *device, drccache *cache, UINT32 
 	int opnum;
 
 	/* allocate state */
-	drcuml = drccache_memory_alloc(cache, sizeof(*drcuml));
+	drcuml = (drcuml_state *)drccache_memory_alloc(cache, sizeof(*drcuml));
 	if (drcuml == NULL)
 		return NULL;
 	memset(drcuml, 0, sizeof(*drcuml));
@@ -686,7 +686,7 @@ drcuml_block *drcuml_block_begin(drcuml_state *drcuml, UINT32 maxinst, jmp_buf *
 	if (bestblock == NULL)
 	{
 		/* allocate the block structure itself */
-		bestblock = malloc(sizeof(*bestblock));
+		bestblock = (drcuml_block *)malloc(sizeof(*bestblock));
 		if (bestblock == NULL)
 			fatalerror("Out of memory allocating block in drcuml_block_begin");
 		memset(bestblock, 0, sizeof(*bestblock));
@@ -695,7 +695,7 @@ drcuml_block *drcuml_block_begin(drcuml_state *drcuml, UINT32 maxinst, jmp_buf *
 		bestblock->drcuml = drcuml;
 		bestblock->next = drcuml->blocklist;
 		bestblock->maxinst = maxinst * 3 / 2;
-		bestblock->inst = malloc(sizeof(drcuml_instruction) * bestblock->maxinst);
+		bestblock->inst = (drcuml_instruction *)malloc(sizeof(drcuml_instruction) * bestblock->maxinst);
 		if (bestblock->inst == NULL)
 			fatalerror("Out of memory allocating instruction array in drcuml_block_begin");
 
@@ -728,7 +728,7 @@ void drcuml_block_append_0(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 		fatalerror("Overran maxinst in drcuml_block_append");
 
 	/* fill in the instruction */
-	inst->opcode = (UINT8)op;
+	inst->opcode = (drcuml_opcode)(UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
 	inst->flags = 0;
@@ -755,7 +755,7 @@ void drcuml_block_append_1(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 		fatalerror("Overran maxinst in drcuml_block_append");
 
 	/* fill in the instruction */
-	inst->opcode = (UINT8)op;
+	inst->opcode = (drcuml_opcode)(UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
 	inst->flags = 0;
@@ -784,7 +784,7 @@ void drcuml_block_append_2(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 		fatalerror("Overran maxinst in drcuml_block_append");
 
 	/* fill in the instruction */
-	inst->opcode = (UINT8)op;
+	inst->opcode = (drcuml_opcode)(UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
 	inst->flags = 0;
@@ -815,7 +815,7 @@ void drcuml_block_append_3(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 		fatalerror("Overran maxinst in drcuml_block_append");
 
 	/* fill in the instruction */
-	inst->opcode = (UINT8)op;
+	inst->opcode = (drcuml_opcode)(UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
 	inst->flags = 0;
@@ -848,7 +848,7 @@ void drcuml_block_append_4(drcuml_block *block, drcuml_opcode op, UINT8 size, UI
 		fatalerror("Overran maxinst in drcuml_block_append");
 
 	/* fill in the instruction */
-	inst->opcode = (UINT8)op;
+	inst->opcode = (drcuml_opcode)(UINT8)op;
 	inst->size = size;
 	inst->condition = condition;
 	inst->flags = 0;
@@ -952,13 +952,13 @@ drcuml_codehandle *drcuml_handle_alloc(drcuml_state *drcuml, const char *name)
 	char *string;
 
 	/* allocate space for a copy of the string */
-	string = drccache_memory_alloc(drcuml->cache, strlen(name) + 1);
+	string = (char *)drccache_memory_alloc(drcuml->cache, strlen(name) + 1);
 	if (string == NULL)
 		return NULL;
 	strcpy(string, name);
 
 	/* allocate a new handle info */
-	handle = drccache_memory_alloc_near(drcuml->cache, sizeof(*handle));
+	handle = (drcuml_codehandle *)drccache_memory_alloc_near(drcuml->cache, sizeof(*handle));
 	if (handle == NULL)
 	{
 		drccache_memory_free(drcuml->cache, string, strlen(name) + 1);
@@ -1036,7 +1036,7 @@ void drcuml_symbol_add(drcuml_state *drcuml, void *base, UINT32 length, const ch
 	drcuml_symbol *symbol;
 
 	/* allocate memory to hold the symbol */
-	symbol = malloc(sizeof(*symbol) + strlen(name));
+	symbol = (drcuml_symbol *)malloc(sizeof(*symbol) + strlen(name));
 	if (symbol == NULL)
 		fatalerror("Out of memory allocating symbol in drcuml_symbol_add");
 
@@ -1060,7 +1060,7 @@ void drcuml_symbol_add(drcuml_state *drcuml, void *base, UINT32 length, const ch
 
 const char *drcuml_symbol_find(drcuml_state *drcuml, void *base, UINT32 *offset)
 {
-	drccodeptr search = base;
+	drccodeptr search = (drccodeptr)base;
 	drcuml_symbol *symbol;
 
 	/* simple linear search */
@@ -1121,7 +1121,7 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...)
 	va_end(va);
 
 	/* allocate space in the cache to hold the comment */
-	comment = drccache_memory_alloc_temporary(block->drcuml->cache, strlen(buffer) + 1);
+	comment = (char *)drccache_memory_alloc_temporary(block->drcuml->cache, strlen(buffer) + 1);
 	if (comment == NULL)
 		return;
 	strcpy(comment, buffer);
@@ -2177,7 +2177,7 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	int numparams;
 
 	/* allocate memory for parameters */
-	parammem = drccache_memory_alloc_near(drcuml->cache, sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
+	parammem = (UINT64 *)drccache_memory_alloc_near(drcuml->cache, sizeof(UINT64) * (ARRAY_LENGTH(test->param) + 1));
 
 	/* flush the cache */
 	drcuml_reset(drcuml);

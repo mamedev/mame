@@ -51,6 +51,15 @@ struct _cp1610_state
 	int icount;
 };
 
+INLINE cp1610_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_CP1610);
+	return (cp1610_state *)device->token;
+}
+
 #define cp1610_readop(A) memory_read_word_16be(cpustate->program, (A)<<1)
 #define cp1610_readmem16(A) memory_read_word_16be(cpustate->program, (A)<<1)
 #define cp1610_writemem16(A,B) memory_write_word_16be(cpustate->program, (A)<<1,B)
@@ -2165,7 +2174,7 @@ static void cp1610_do_jumps(cp1610_state *cpustate)
 /* Execute cycles - returns number of cycles actually run */
 static CPU_EXECUTE( cp1610 )
 {
-	cp1610_state *cpustate = device->token;
+	cp1610_state *cpustate = get_safe_token(device);
 	UINT16 opcode;
 
 	cpustate->icount = cycles;
@@ -3379,7 +3388,7 @@ static CPU_EXECUTE( cp1610 )
 
 static CPU_INIT( cp1610 )
 {
-	cp1610_state *cpustate = device->token;
+	cp1610_state *cpustate = get_safe_token(device);
 	cpustate->intr_enabled = 0;
 	cpustate->reset_pending = 0;
 	cpustate->intr_pending = 0;
@@ -3413,7 +3422,7 @@ static void cp1610_set_irq_line(cp1610_state *cpustate, UINT32 irqline, int stat
 
 static CPU_SET_INFO( cp1610 )
 {
-	cp1610_state *cpustate = device->token;
+	cp1610_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -3439,7 +3448,7 @@ static CPU_SET_INFO( cp1610 )
 
 CPU_GET_INFO( cp1610 )
 {
-	cp1610_state *cpustate = (device != NULL) ? device->token : NULL;
+	cp1610_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */

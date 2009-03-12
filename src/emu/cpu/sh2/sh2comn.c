@@ -108,7 +108,7 @@ static void sh2_timer_activate(SH2 *sh2)
 
 TIMER_CALLBACK( sh2_timer_callback )
 {
-	SH2 *sh2 = ptr;
+	SH2 *sh2 = (SH2 *)ptr;
 	UINT16 frc;
 
 	sh2_timer_resync(sh2);
@@ -136,7 +136,7 @@ TIMER_CALLBACK( sh2_timer_callback )
 TIMER_CALLBACK( sh2_dmac_callback )
 {
 	int dma = param & 1;
-	SH2 *sh2 = ptr;
+	SH2 *sh2 = (SH2 *)ptr;
 
 	LOG(("SH2.%s: DMA %d complete\n", sh2->device->tag, dma));
 	sh2->m[0x63+4*dma] |= 2;
@@ -701,7 +701,7 @@ void sh2_exception(SH2 *sh2, const char *message, int irqline)
 
 void sh2_common_init(SH2 *sh2, const device_config *device, cpu_irq_callback irqcallback)
 {
-	const sh2_cpu_core *conf = device->static_config;
+	const sh2_cpu_core *conf = (const sh2_cpu_core *)device->static_config;
 
 	sh2->timer = timer_alloc(device->machine, sh2_timer_callback, sh2);
 	timer_adjust_oneshot(sh2->timer, attotime_never, 0);
@@ -712,7 +712,7 @@ void sh2_common_init(SH2 *sh2, const device_config *device, cpu_irq_callback irq
 	sh2->dma_timer[1] = timer_alloc(device->machine, sh2_dmac_callback, sh2);
 	timer_adjust_oneshot(sh2->dma_timer[1], attotime_never, 0);
 
-	sh2->m = auto_malloc(0x200);
+	sh2->m = (UINT32 *)auto_malloc(0x200);
 
 	if(conf)
 	{

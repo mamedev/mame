@@ -43,6 +43,17 @@ struct _h83xx_state
 };
 extern h83xx_state h8;
 
+INLINE h83xx_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_H83002 ||
+		   cpu_get_type(device) == CPU_H83007 ||
+		   cpu_get_type(device) == CPU_H83044 ||
+		   cpu_get_type(device) == CPU_H83334);
+	return (h83xx_state *)device->token;
+}
 
 UINT8 h8_register_read8(h83xx_state *h8, UINT32 address);
 UINT8 h8_3007_register_read8(h83xx_state *h8, UINT32 address);

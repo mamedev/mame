@@ -37,6 +37,16 @@ struct _t11_state
 };
 
 
+INLINE t11_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_T11);
+	return (t11_state *)device->token;
+}
+
+
 
 /*************************************
  *
@@ -248,8 +258,8 @@ static CPU_INIT( t11 )
 		0xc000, 0x8000, 0x4000, 0x2000,
 		0x1000, 0x0000, 0xf600, 0xf400
 	};
-	const struct t11_setup *setup = device->static_config;
-	t11_state *cpustate = device->token;
+	const struct t11_setup *setup = (const struct t11_setup *)device->static_config;
+	t11_state *cpustate = get_safe_token(device);
 
 	cpustate->initial_pc = initial_pc[setup->mode >> 13];
 	cpustate->irq_callback = irqcallback;
@@ -281,7 +291,7 @@ static CPU_INIT( t11 )
 
 static CPU_RESET( t11 )
 {
-	t11_state *cpustate = device->token;
+	t11_state *cpustate = get_safe_token(device);
 
 	/* initial SP is 376 octal, or 0xfe */
 	cpustate->SP = 0x00fe;
@@ -333,7 +343,7 @@ static void set_irq_line(t11_state *cpustate, int irqline, int state)
 
 static CPU_EXECUTE( t11 )
 {
-	t11_state *cpustate = device->token;
+	t11_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 	t11_check_irqs(cpustate);
@@ -370,7 +380,7 @@ getout:
 
 static CPU_SET_INFO( t11 )
 {
-	t11_state *cpustate = device->token;
+	t11_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -402,7 +412,7 @@ static CPU_SET_INFO( t11 )
 
 CPU_GET_INFO( t11 )
 {
-	t11_state *cpustate = (device != NULL) ? device->token : NULL;
+	t11_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

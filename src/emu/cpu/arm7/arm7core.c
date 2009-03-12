@@ -509,7 +509,7 @@ static int storeDec(arm_state *cpustate, UINT32 pat, UINT32 rbv)
 // CPU INIT
 static void arm7_core_init(const char *cpuname, const device_config *device)
 {
-    arm_state *cpustate = device->token;
+    arm_state *cpustate = get_safe_token(device);
 
     state_save_register_device_item_array(device, 0, cpustate->sArmRegister);
     state_save_register_device_item(device, 0, cpustate->pendingIrq);
@@ -523,7 +523,7 @@ static void arm7_core_init(const char *cpuname, const device_config *device)
 // CPU RESET
 static void arm7_core_reset(const device_config *device)
 {
-    arm_state *cpustate = device->token;
+    arm_state *cpustate = get_safe_token(device);
 
     cpu_irq_callback save_irqcallback = cpustate->irq_callback;
 

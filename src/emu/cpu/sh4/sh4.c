@@ -27,6 +27,15 @@
 #include "sh4regs.h"
 #include "sh4comn.h"
 
+INLINE SH4 *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_SH4);
+	return (SH4 *)device->token;
+}
+
 /* Called for unimplemented opcodes */
 static void TODO(SH4 *sh4)
 {
@@ -3235,7 +3244,7 @@ INLINE void op1111(SH4 *sh4, UINT16 opcode)
 
 static CPU_RESET( sh4 )
 {
-	SH4 *sh4 = device->token;
+	SH4 *sh4 = get_safe_token(device);
 	void *tsaved[4];
 	emu_timer *tsave[5];
 	UINT32 *m;
@@ -3313,7 +3322,7 @@ static CPU_RESET( sh4 )
 /* Execute cycles - returns number of cycles actually run */
 static CPU_EXECUTE( sh4 )
 {
-	SH4 *sh4 = device->token;
+	SH4 *sh4 = get_safe_token(device);
 	sh4->sh4_icount = cycles;
 
 	if (sh4->cpu_off)
@@ -3374,8 +3383,8 @@ static CPU_DISASSEMBLE( sh4 )
 
 static CPU_INIT( sh4 )
 {
-	const struct sh4_config *conf = device->static_config;
-	SH4 *sh4 = device->token;
+	const struct sh4_config *conf = (const struct sh4_config *)device->static_config;
+	SH4 *sh4 = get_safe_token(device);
 
 	sh4_common_init(device);
 
@@ -3463,7 +3472,7 @@ static CPU_INIT( sh4 )
 
 static CPU_SET_INFO( sh4 )
 {
-	SH4 *sh4 = device->token;
+	SH4 *sh4 = get_safe_token(device);
 
 	switch (state)
 	{
@@ -3627,7 +3636,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( sh4 )
 {
-	SH4 *sh4 = (device != NULL) ? device->token : NULL;
+	SH4 *sh4 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

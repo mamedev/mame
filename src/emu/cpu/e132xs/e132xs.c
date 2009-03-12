@@ -429,6 +429,28 @@ ADDRESS_MAP_END
 
 #endif
 
+INLINE hyperstone_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_E116T ||
+		   cpu_get_type(device) == CPU_E116XT ||
+		   cpu_get_type(device) == CPU_E116XS ||
+		   cpu_get_type(device) == CPU_E116XSR ||
+		   cpu_get_type(device) == CPU_E132N ||
+		   cpu_get_type(device) == CPU_E132T ||
+		   cpu_get_type(device) == CPU_E132XN ||
+		   cpu_get_type(device) == CPU_E132XT ||
+		   cpu_get_type(device) == CPU_E132XS ||
+		   cpu_get_type(device) == CPU_E132XSR ||
+		   cpu_get_type(device) == CPU_GMS30C2116 ||
+		   cpu_get_type(device) == CPU_GMS30C2132 ||
+		   cpu_get_type(device) == CPU_GMS30C2216 ||
+		   cpu_get_type(device) == CPU_GMS30C2232);
+	return (hyperstone_state *)device->token;
+}
+
 /* Return the entry point for a determinated trap */
 static UINT32 get_trap_addr(hyperstone_state *cpustate, UINT8 trapno)
 {
@@ -632,7 +654,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 static TIMER_CALLBACK( e132xs_timer_callback )
 {
 	const device_config *device = (const device_config *)ptr;
-	hyperstone_state *cpustate = device->token;
+	hyperstone_state *cpustate = get_safe_token(device);
 	int update = param;
 
 	/* update the values if necessary */
@@ -1523,7 +1545,7 @@ static void set_irq_line(hyperstone_state *cpustate, int irqline, int state)
 
 static void hyperstone_init(const device_config *device, cpu_irq_callback irqcallback, int scale_mask)
 {
-	hyperstone_state *cpustate = device->token;
+	hyperstone_state *cpustate = get_safe_token(device);
 
 	state_save_register_device_item_array(device, 0, cpustate->global_regs);
 	state_save_register_device_item_array(device, 0, cpustate->local_regs);
@@ -1546,7 +1568,7 @@ static void hyperstone_init(const device_config *device, cpu_irq_callback irqcal
 #if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
 static void e116_init(const device_config *device, cpu_irq_callback irqcallback, int scale_mask)
 {
-	hyperstone_state *cpustate = device->token;
+	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
 	cpustate->opcodexor = 0;
 }
@@ -1597,7 +1619,7 @@ static CPU_INIT( gms30c2216 )
 #if (HAS_E132N || HAS_E132T || HAS_E132XN || HAS_E132XT || HAS_E132XS || HAS_E132XSR || HAS_GMS30C2132 || HAS_GMS30C2232)
 static void e132_init(const device_config *device, cpu_irq_callback irqcallback, int scale_mask)
 {
-	hyperstone_state *cpustate = device->token;
+	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
 	cpustate->opcodexor = WORD_XOR_BE(0);
 }
@@ -1661,7 +1683,7 @@ static CPU_INIT( gms30c2232 )
 
 static CPU_RESET( hyperstone )
 {
-	hyperstone_state *cpustate = device->token;
+	hyperstone_state *cpustate = get_safe_token(device);
 
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
@@ -1712,7 +1734,7 @@ static CPU_EXIT( hyperstone )
 
 static CPU_DISASSEMBLE( hyperstone )
 {
-	hyperstone_state *cpustate = device->token;
+	hyperstone_state *cpustate = get_safe_token(device);
 	return dasm_hyperstone( buffer, pc, oprom, GET_H, GET_FP );
 }
 
@@ -4683,7 +4705,7 @@ INLINE void hyperstone_trap(hyperstone_state *cpustate, struct regs_decode *deco
 
 static CPU_EXECUTE( hyperstone )
 {
-	hyperstone_state *cpustate = device->token;
+	hyperstone_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -4733,7 +4755,7 @@ static CPU_EXECUTE( hyperstone )
 
 static CPU_SET_INFO( hyperstone )
 {
-	hyperstone_state *cpustate = device->token;
+	hyperstone_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -4870,7 +4892,7 @@ static CPU_SET_INFO( hyperstone )
 
 static CPU_GET_INFO( hyperstone )
 {
-	hyperstone_state *cpustate = (device != NULL) ? device->token : NULL;
+	hyperstone_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
