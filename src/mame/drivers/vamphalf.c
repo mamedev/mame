@@ -9,9 +9,11 @@
 
 
     Minigame Cool Collection   (c) 1999 SemiCom
+	Jumping Break              (c) 1999 F2 System
     Lup Lup Puzzle             (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang           (c) 1999 Omega System       (version 2.8)
     Super Lup Lup Puzzle       (c) 1999 Omega System       (version 4.0)
+	Vamp 1/2                   (c) 1999 Danbi & F2 System  (Europe version)
     Vamp 1/2                   (c) 1999 Danbi & F2 System  (Korea version)
     Date Quiz Go Go Episode 2  (c) 2000 SemiCom
     Mission Craft              (c) 2000 Sun                (version 2.4)
@@ -77,6 +79,8 @@ static WRITE16_HANDLER( eeprom_w )
 		eeprom_write_bit(data & 0x01);
 		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
 		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		
+		// data & 8?
 	}
 }
 
@@ -106,6 +110,13 @@ static WRITE32_HANDLER( flipscreen32_w )
 {
 	flipscreen = data & flip_bit;
 }
+
+
+static WRITE16_HANDLER( jmpbreak_flipscreen_w )
+{
+	flipscreen = data & 0x8000;
+}
+
 
 static WRITE32_HANDLER( paletteram32_w )
 {
@@ -278,6 +289,18 @@ static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x60a0, 0x60a3) AM_DEVWRITE("oki", finalgdr_oki_bank_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( jmpbreak_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x0c0, 0x0c3) AM_NOP // ?
+	AM_RANGE(0x100, 0x103) AM_WRITENOP // ?
+	AM_RANGE(0x240, 0x243) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x280, 0x283) AM_WRITE(eeprom_w)
+	AM_RANGE(0x2c0, 0x2c3) AM_READ(eeprom_r)
+	AM_RANGE(0x440, 0x443) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x540, 0x543) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x680, 0x683) AM_DEVWRITE8("ym", ym2151_register_port_w, 0x00ff)
+	AM_RANGE(0x684, 0x687) AM_DEVREADWRITE8("ym", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( aoh_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&wram32)
@@ -357,7 +380,6 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap)
 
 				fx = tiles[offs] & 0x8000;
 				fy = tiles[offs] & 0x4000;
-
 			}
 			// 32bit version
 			else
@@ -776,6 +798,14 @@ static MACHINE_DRIVER_START( aoh )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( jmpbreak )
+	MDRV_IMPORT_FROM(common)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(jmpbreak_io,0)
+
+	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
 
 /*
@@ -1347,7 +1377,28 @@ ROM_START( aoh )
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
+/*
+Jumping Break
+F2 System, 1999
 
+F-E1-16-002
+
+*/
+
+ROM_START( jmpbreak )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(7e237f7d) SHA1(042e672be34644311eefc7b998bcdf6a9ea2c28a) )
+	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(c722f7be) SHA1(d8b3c6b5fd0942147e0a61169c3eb6334a3b5a40) )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, CRC(4b99190a) SHA1(30af068f7d9f9f349db5696c19ab53ac33304271) )
+	ROM_LOAD32_WORD( "romu00.bin", 0x000002, 0x200000, CRC(e93762f8) SHA1(cc589b59e3ab7aa7092e96a1ff8a9de8a499b257) )
+	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, CRC(6796a104) SHA1(3f7352cd37f78c1b01f7df45344ee7800db110f9) )
+	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, CRC(0cc907c8) SHA1(86029eca0870f3b7dd4f1ee8093ccb09077cc00b) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
+ROM_END
 
 static int irq_active(const address_space *space)
 {
@@ -1516,6 +1567,19 @@ static READ32_HANDLER( aoh_speedup_r )
 	return wram32[0x28a09c/4];
 }
 
+static READ16_HANDLER( jmpbreak_speedup_r )
+{
+	if(cpu_get_pc(space->cpu) == 0x983c)
+	{
+		if(irq_active(space))
+			cpu_spinuntil_int(space->cpu);
+		else
+			cpu_eat_cycles(space->cpu, 50);
+	}
+
+	return wram[(0x00906fc/2)+offset];
+}
+
 static DRIVER_INIT( vamphalf )
 {
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0004a840, 0x0004a843, 0, 0, vamphalf_speedup_r );
@@ -1619,8 +1683,17 @@ static DRIVER_INIT( aoh )
 	/* no flipscreen */
 }
 
+static DRIVER_INIT( jmpbreak )
+{
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00906fc, 0x00906ff, 0, 0, jmpbreak_speedup_r );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe0000000, 0xe0000003, 0, 0, jmpbreak_flipscreen_w );
+	
+	palshift = 0;
+}
+
 GAME( 1999, coolmini, 0,        coolmini, common,   coolmini, ROT0,   "SemiCom",           "Cool Minigame Collection", 0 )
-GAME( 1999, suplup,   0,        suplup,   common,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0)
+GAME( 1999, jmpbreak, 0,        jmpbreak, common,   jmpbreak, ROT0,   "F2 System",         "Jumping Break" , 0 )
+GAME( 1999, suplup,   0,        suplup,   common,   suplup,   ROT0,   "Omega System",      "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , 0 )
 GAME( 1999, luplup,   suplup,   suplup,   common,   luplup,   ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", 0 )
 GAME( 1999, luplup29, suplup,   suplup,   common,   luplup29, ROT0,   "Omega System",      "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", 0 )
 GAME( 1999, puzlbang, suplup,   suplup,   common,   puzlbang, ROT0,   "Omega System",      "Puzzle Bang Bang (version 2.8 / 990106)", 0 )

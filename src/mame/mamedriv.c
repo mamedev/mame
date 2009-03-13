@@ -8183,6 +8183,7 @@ Other Sun games
 	DRIVER( luplup29 )	/* (c) 1999 Omega System */
 	DRIVER( puzlbang )	/* (c) 1999 Omega System */
 	DRIVER( suplup )	/* (c) 1999 Omega System */
+	DRIVER( jmpbreak )	/* (c) 1999 F2 System */
 	DRIVER( vamphalf )	/* (c) 1999 DanBi & F2 System */
 	DRIVER( vamphafk )	/* (c) 1999 DanBi & F2 System */
 	DRIVER( dquizgo2 )	/* (c) 2000 Semicom */
