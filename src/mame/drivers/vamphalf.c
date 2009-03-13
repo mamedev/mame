@@ -9,11 +9,11 @@
 
 
     Minigame Cool Collection   (c) 1999 SemiCom
-	Jumping Break              (c) 1999 F2 System
+    Jumping Break              (c) 1999 F2 System
     Lup Lup Puzzle             (c) 1999 Omega System       (version 3.0 and 2.9)
     Puzzle Bang Bang           (c) 1999 Omega System       (version 2.8)
     Super Lup Lup Puzzle       (c) 1999 Omega System       (version 4.0)
-	Vamp 1/2                   (c) 1999 Danbi & F2 System  (Europe version)
+    Vamf 1/2                   (c) 1999 Danbi & F2 System  (Europe version)
     Vamp 1/2                   (c) 1999 Danbi & F2 System  (Korea version)
     Date Quiz Go Go Episode 2  (c) 2000 SemiCom
     Mission Craft              (c) 2000 Sun                (version 2.4)
@@ -691,6 +691,19 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sound_ym_oki )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MDRV_SOUND_ADD("ym", YM2151, 28000000/8)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MDRV_SOUND_ADD("oki", OKIM6295, 28000000/16 )
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( sound_suplup )
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
 	MDRV_SOUND_ADD("ym", YM2151, 14318180/4)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -737,6 +750,14 @@ static MACHINE_DRIVER_START( suplup )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(suplup_io,0)
 
+	MDRV_IMPORT_FROM(sound_suplup)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( jmpbreak )
+	MDRV_IMPORT_FROM(common)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(jmpbreak_io,0)
+
 	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
 
@@ -759,7 +780,6 @@ static MACHINE_DRIVER_START( finalgdr )
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
-
 
 static MACHINE_DRIVER_START( aoh )
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
@@ -800,14 +820,6 @@ static MACHINE_DRIVER_START( aoh )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( jmpbreak )
-	MDRV_IMPORT_FROM(common)
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(jmpbreak_io,0)
-
-	MDRV_IMPORT_FROM(sound_ym_oki)
-MACHINE_DRIVER_END
-
 /*
 
 Vamp 1/2 (Semi Vamp)
@@ -845,7 +857,7 @@ T2316162A:     Main program RAM
 E1-16T:        Hyperstone E1-16T CPU
 QL2003-XPL84C: QuickLogic PLCC84 PLD
 AD-65:         Compatible to OKI M6295
-KA12:          Compatible to Y3012 or Y3014
+KA12:          Compatible to Y3012
 BS901          Compatible to YM2151
 PROM1:         Main program
 VROM1:         OKI samples
@@ -882,127 +894,6 @@ ROM_START( vamphafk )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "snd.vrom1", 0x00000, 0x40000, CRC(ee9e371e) SHA1(3ead5333121a77d76e4e40a0e0bf0dbc75f261eb) )
-ROM_END
-
-
-/*
-
-Mission Craft
-Sun, 2000
-
-PCB Layout
-----------
-
-SUN2000
-|---------------------------------------------|
-|       |------|  SND-ROM1     ROMH00  ROMH01 |
-|       |QDSP  |                              |
-|       |QS1001|                              |
-|DA1311A|------|  SND-ROM2                    |
-|       /------\                              |
-|       |QDSP  |               ROML00  ROML01 |
-|       |QS1000|                              |
-|  24MHz\------/                              |
-|                                 |---------| |
-|                                 | ACTEL   | |
-|J               62256            |A40MX04-F| |
-|A  *  PRG-ROM2  62256            |PL84     | |
-|M   PAL                          |         | |
-|M                    62256 62256 |---------| |
-|A                    62256 62256             |
-|             |-------|           |---------| |
-|             |GMS    |           | ACTEL   | |
-|  93C46      |30C2116|           |A40MX04-F| |
-|             |       | 62256     |PL84     | |
-|  HY5118164C |-------| 62256     |         | |
-|                                 |---------| |
-|SW2                                          |
-|SW1                                          |
-|   50MHz                              28MHz  |
-|---------------------------------------------|
-Notes:
-      GMS30C2116 - based on Hyperstone technology, clock running at 50.000MHz
-      QS1001A    - Wavetable audio chip, 1M ROM, manufactured by AdMOS (Now LG Semi.), SOP32
-      QS1000     - Wavetable audio chip manufactured by AdMOS (Now LG Semi.), QFP100
-                   provides Creative Waveblaster functionality and General Midi functions
-      SW1        - Used to enter test mode
-      SW2        - PCB Reset
-      *          - Empty socket for additional program ROM
-
-*/
-
-ROM_START( misncrft )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
-	/* 0 - 0x80000 empty */
-	ROM_LOAD( "prg-rom2.bin", 0x80000, 0x80000, CRC(059ae8c1) SHA1(2c72fcf560166cb17cd8ad665beae302832d551c) )
-
-	ROM_REGION( 0x400000, "audiocpu", 0 )	/* i8052 code */
-	ROM_LOAD( "snd-rom2.us1", 0x00000, 0x20000, CRC(8821e5b9) SHA1(4b8df97bc61b48aa16ed411614fcd7ed939cac33) )
-
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(748c5ae5) SHA1(28005f655920e18c82eccf05c0c449dac16ee36e) )
-	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(f34ae697) SHA1(2282e3ef2d100f3eea0167b25b66b35a64ddb0f8) )
-	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(e37ece7b) SHA1(744361bb73905bc0184e6938be640d3eda4b758d) )
-	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(71fe4bc3) SHA1(08110b02707e835bf428d343d5112b153441e255) )
-
-	ROM_REGION( 0x80000, "sfx", 0 )
-	ROM_LOAD( "snd-rom1.u15", 0x00000, 0x80000, CRC(fb381da9) SHA1(2b1a5447ed856ab92e44d000f27a04d981e3ac52) )
-
-	ROM_REGION( 0x80000, "wavetable", 0 )
-	ROM_LOAD( "qs1001a.u17", 0x00000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
-ROM_END
-
-/*
-
-Cool Minigame Collection
-SemiCom, 1999
-
-PCB Layout
-----------
-
-F-E1-16-008
-|-------------------------------------------------------|
-|UPC1241            YM3012   VROM1                      |
-|      LM324  LM324 YM2151                              |
-|               MCM6206       M6295   ROML00    ROMU00  |
-|                                                       |
-|               MCM6206               ROML01    ROMU01  |
-|                                                       |
-|J              MCM6206               ROML02    ROMU02  |
-|A                                                      |
-|M              MCM6206               ROML03    ROMU03  |
-|M                                                      |
-|A              MCM6206                                 |
-|                                                       |
-|               MCM6206       QL2003    QL2003          |
-|                                                28MHz  |
-|               MCM6206                                 |
-|                                                       |
-|               MCM6206  E1-16T   GM71C1816     ROM1    |
-|                                                       |
-|              93C46                            ROM2    |
-|RESET  TEST          50MHz              PAL            |
-|-------------------------------------------------------|
-
-*/
-
-ROM_START( coolmini )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "cm-rom1.040", 0x00000, 0x80000, CRC(9688fa98) SHA1(d5ebeb1407980072f689c3b3a5161263c7082e9a) )
-	ROM_LOAD( "cm-rom2.040", 0x80000, 0x80000, CRC(9d588fef) SHA1(7b6b0ba074c7fa0aecda2b55f411557b015522b6) )
-
-	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )  /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(4b141f31) SHA1(cf4885789b0df67d00f9f3659c445248c4e72446) )
-	ROM_LOAD32_WORD( "romu00", 0x000002, 0x200000, CRC(9b2fb12a) SHA1(8dce367c4c2cab6e84f586bd8dfea3ea0b6d7225) )
-	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1e3a04bb) SHA1(9eb84b6a0172a8868f440065c30b4519e0c3fe33) )
-	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, CRC(06dd1a6c) SHA1(8c707d388848bc5826fbfc48c3035fdaf5018515) )
-	ROM_LOAD32_WORD( "roml02", 0x800000, 0x200000, CRC(1e8c12cb) SHA1(f57489e81eb1e476939148cfc8d03f3df03b2a84) )
-	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(4551d4fc) SHA1(4ec102120ab99e324d9574bfce93837d8334da06) )
-	ROM_LOAD32_WORD( "roml03", 0xc00000, 0x200000, CRC(231650bf) SHA1(065f742a37d5476ec6f72f0bd8ba2cfbe626b872) )
-	ROM_LOAD32_WORD( "romu03", 0xc00002, 0x200000, CRC(273d5654) SHA1(0ae3d1c4c4862a8642dbebd7c955b29df29c4938) )
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
-	ROM_LOAD( "cm-vrom1.020", 0x00000, 0x40000, CRC(fcc28081) SHA1(44031df0ee28ca49df12bcb73c83299fac205e21) )
 ROM_END
 
 /*
@@ -1114,6 +1005,150 @@ ROM_START( puzlbang ) /* version 2.8 / 990106 - Korea only, cannot select title 
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
 ROM_END
 
+/*
+
+Jumping Break
+F2 System, 1999
+
+sequel to "Die Break" from the Bestri 3 game collection (see crospang.c)
+
+F-E1-16-002
++----------------------------------------------+
+|     VR1                   M6295  VROM1 28MHz |
+|                 YM3012                       |
+|                 YM2151            MEM2       |
+|                                   MEM3       |
+|               CRAM1               MEM5       |
+|               CRAM2               MEM7       |
+|J                                             |
+|A              MEM1U  +----------++----------+|
+|M                     |          ||          ||
+|M              MEM1L  |Quicklogic||Quicklogic||
+|A                     | QL2003-  || QL2003-  ||
+|                      | XPL84C   || XPL84C   ||
+|                      |          ||          ||
+|                      +----------++----------+|
+|                                              |
+| 93C46          DRAM1      ROM1 ROML00  ROMU00|
+|P1 P2   50MHz   E1-16T     ROM2 ROML01  ROMU01|
+|                                              |
++----------------------------------------------+
+
+Notes:
+CPU: Hyperstone E1-16T @ 50.000MHz
+
+     DRAM1 - LG Semi GM71C18163 1M x16 EDO DRAM (SOJ44)
+MEMx/CRAMx - NKK N341256SJ-15 32K x8 SRAM (SOJ28)
+
+Oki M6295 rebaged as AD-65
+YM3012/YM2151 rebaged as KA12/BS901
+
+ P1 - Setup push button
+ P2 - Reset push button
+VR1 - Volume adjust pot
+
+ROMs:
+    ROML00/01, ROMU00/01 - Macronix MX29F1610MC-12 SOP44 16MBit FlashROM
+    VROM1                - AMD 27C020 2MBit DIP32 EPROM
+    ROM1/2               - TMS 27C040 4MBit DIP32 EPROM
+
+*/
+
+ROM_START( jmpbreak )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(7e237f7d) SHA1(042e672be34644311eefc7b998bcdf6a9ea2c28a) )
+	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(c722f7be) SHA1(d8b3c6b5fd0942147e0a61169c3eb6334a3b5a40) )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, CRC(4b99190a) SHA1(30af068f7d9f9f349db5696c19ab53ac33304271) )
+	ROM_LOAD32_WORD( "romu00.bin", 0x000002, 0x200000, CRC(e93762f8) SHA1(cc589b59e3ab7aa7092e96a1ff8a9de8a499b257) )
+	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, CRC(6796a104) SHA1(3f7352cd37f78c1b01f7df45344ee7800db110f9) )
+	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, CRC(0cc907c8) SHA1(86029eca0870f3b7dd4f1ee8093ccb09077cc00b) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
+ROM_END
+
+/*
+
+Cool Minigame Collection
+SemiCom, 1999
+
+PCB Layout
+----------
+
+F-E1-16-008
+|-------------------------------------------------------|
+|UPC1241            YM3012   VROM1                      |
+|      LM324  LM324 YM2151                              |
+|               MCM6206       M6295   ROML00    ROMU00  |
+|                                                       |
+|               MCM6206               ROML01    ROMU01  |
+|                                                       |
+|J              MCM6206               ROML02    ROMU02  |
+|A                                                      |
+|M              MCM6206               ROML03    ROMU03  |
+|M                                                      |
+|A              MCM6206                                 |
+|                                                       |
+|               MCM6206       QL2003    QL2003          |
+|                                                28MHz  |
+|               MCM6206                                 |
+|                                                       |
+|               MCM6206  E1-16T   GM71C1816     ROM1    |
+|                                                       |
+|              93C46                            ROM2    |
+|RESET  TEST          50MHz              PAL            |
+|-------------------------------------------------------|
+
+*/
+
+ROM_START( coolmini )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "cm-rom1.040", 0x00000, 0x80000, CRC(9688fa98) SHA1(d5ebeb1407980072f689c3b3a5161263c7082e9a) )
+	ROM_LOAD( "cm-rom2.040", 0x80000, 0x80000, CRC(9d588fef) SHA1(7b6b0ba074c7fa0aecda2b55f411557b015522b6) )
+
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_DISPOSE )  /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(4b141f31) SHA1(cf4885789b0df67d00f9f3659c445248c4e72446) )
+	ROM_LOAD32_WORD( "romu00", 0x000002, 0x200000, CRC(9b2fb12a) SHA1(8dce367c4c2cab6e84f586bd8dfea3ea0b6d7225) )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(1e3a04bb) SHA1(9eb84b6a0172a8868f440065c30b4519e0c3fe33) )
+	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, CRC(06dd1a6c) SHA1(8c707d388848bc5826fbfc48c3035fdaf5018515) )
+	ROM_LOAD32_WORD( "roml02", 0x800000, 0x200000, CRC(1e8c12cb) SHA1(f57489e81eb1e476939148cfc8d03f3df03b2a84) )
+	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(4551d4fc) SHA1(4ec102120ab99e324d9574bfce93837d8334da06) )
+	ROM_LOAD32_WORD( "roml03", 0xc00000, 0x200000, CRC(231650bf) SHA1(065f742a37d5476ec6f72f0bd8ba2cfbe626b872) )
+	ROM_LOAD32_WORD( "romu03", 0xc00002, 0x200000, CRC(273d5654) SHA1(0ae3d1c4c4862a8642dbebd7c955b29df29c4938) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "cm-vrom1.020", 0x00000, 0x40000, CRC(fcc28081) SHA1(44031df0ee28ca49df12bcb73c83299fac205e21) )
+ROM_END
+
+/*
+
+Date Quiz Go Go Episode 2
+SemiCom, 2000
+
+F-E1-16-010
+
+*/
+
+ROM_START( dquizgo2 )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "rom1",         0x00000, 0x080000, CRC(81eef038) SHA1(9c925d1ef261ea85069925ccd1a5aeb939f55d5a) )
+	ROM_LOAD( "rom2",         0x80000, 0x080000, CRC(e8789d8a) SHA1(1ee26c26cc7024c5df9d0da630b326021ece9f41) )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 16x16x8 Sprites */
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(de811dd7) SHA1(bf31e165440ed2e3cdddd2174521b15afd8b2e69) )
+	ROM_LOAD32_WORD( "romu00", 0x000002, 0x200000, CRC(2bdbfc6b) SHA1(8e755574e3c9692bd8f82c7351fe3623a31ec136) )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(f574a2a3) SHA1(c6a8aca75bd3a4e4109db5095f3a3edb9b1e6657) )
+	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, CRC(d05cf02f) SHA1(624316d4ee42c6257bc64747e4260a0d3950f9cd) )
+	ROM_LOAD32_WORD( "roml02", 0x800000, 0x200000, CRC(43ca2cff) SHA1(02ad7cce42d917dbefdba2e4e8886fc883b1dc60) )
+	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(b8218222) SHA1(1e1aa60e0de9c02b841896512a1163dda280c845) )
+	/* roml03 empty */
+	/* romu03 empty */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(24d5b55f) SHA1(cb4d3a22440831e37df0a7fe5433bea708d60f31) )
+ROM_END
 
 /*
 
@@ -1196,6 +1231,72 @@ ROM_START( wyvernwg )
 	ROM_LOAD( "qs1001a",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
 ROM_END
 
+/*
+
+Mission Craft
+Sun, 2000
+
+PCB Layout
+----------
+
+SUN2000
+|---------------------------------------------|
+|       |------|  SND-ROM1     ROMH00  ROMH01 |
+|       |QDSP  |                              |
+|       |QS1001|                              |
+|DA1311A|------|  SND-ROM2                    |
+|       /------\                              |
+|       |QDSP  |               ROML00  ROML01 |
+|       |QS1000|                              |
+|  24MHz\------/                              |
+|                                 |---------| |
+|                                 | ACTEL   | |
+|J               62256            |A40MX04-F| |
+|A  *  PRG-ROM2  62256            |PL84     | |
+|M   PAL                          |         | |
+|M                    62256 62256 |---------| |
+|A                    62256 62256             |
+|             |-------|           |---------| |
+|             |GMS    |           | ACTEL   | |
+|  93C46      |30C2116|           |A40MX04-F| |
+|             |       | 62256     |PL84     | |
+|  HY5118164C |-------| 62256     |         | |
+|                                 |---------| |
+|SW2                                          |
+|SW1                                          |
+|   50MHz                              28MHz  |
+|---------------------------------------------|
+Notes:
+      GMS30C2116 - based on Hyperstone technology, clock running at 50.000MHz
+      QS1001A    - Wavetable audio chip, 1M ROM, manufactured by AdMOS (Now LG Semi.), SOP32
+      QS1000     - Wavetable audio chip manufactured by AdMOS (Now LG Semi.), QFP100
+                   provides Creative Waveblaster functionality and General Midi functions
+      SW1        - Used to enter test mode
+      SW2        - PCB Reset
+      *          - Empty socket for additional program ROM
+
+*/
+
+ROM_START( misncrft )
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
+	/* 0 - 0x80000 empty */
+	ROM_LOAD( "prg-rom2.bin", 0x80000, 0x80000, CRC(059ae8c1) SHA1(2c72fcf560166cb17cd8ad665beae302832d551c) )
+
+	ROM_REGION( 0x400000, "audiocpu", 0 )	/* i8052 code */
+	ROM_LOAD( "snd-rom2.us1", 0x00000, 0x20000, CRC(8821e5b9) SHA1(4b8df97bc61b48aa16ed411614fcd7ed939cac33) )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(748c5ae5) SHA1(28005f655920e18c82eccf05c0c449dac16ee36e) )
+	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(f34ae697) SHA1(2282e3ef2d100f3eea0167b25b66b35a64ddb0f8) )
+	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(e37ece7b) SHA1(744361bb73905bc0184e6938be640d3eda4b758d) )
+	ROM_LOAD32_WORD( "romh01", 0x400002, 0x200000, CRC(71fe4bc3) SHA1(08110b02707e835bf428d343d5112b153441e255) )
+
+	ROM_REGION( 0x80000, "sfx", 0 )
+	ROM_LOAD( "snd-rom1.u15", 0x00000, 0x80000, CRC(fb381da9) SHA1(2b1a5447ed856ab92e44d000f27a04d981e3ac52) )
+
+	ROM_REGION( 0x80000, "wavetable", 0 )
+	ROM_LOAD( "qs1001a.u17", 0x00000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
 
 /*
 
@@ -1269,34 +1370,6 @@ ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
 	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
-ROM_END
-
-/*
-
-Date Quiz Go Go Episode 2
-SemiCom, 2000
-
-F-E1-16-010
-
-*/
-
-ROM_START( dquizgo2 )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "rom1",         0x00000, 0x080000, CRC(81eef038) SHA1(9c925d1ef261ea85069925ccd1a5aeb939f55d5a) )
-	ROM_LOAD( "rom2",         0x80000, 0x080000, CRC(e8789d8a) SHA1(1ee26c26cc7024c5df9d0da630b326021ece9f41) )
-
-	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "roml00", 0x000000, 0x200000, CRC(de811dd7) SHA1(bf31e165440ed2e3cdddd2174521b15afd8b2e69) )
-	ROM_LOAD32_WORD( "romu00", 0x000002, 0x200000, CRC(2bdbfc6b) SHA1(8e755574e3c9692bd8f82c7351fe3623a31ec136) )
-	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(f574a2a3) SHA1(c6a8aca75bd3a4e4109db5095f3a3edb9b1e6657) )
-	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, CRC(d05cf02f) SHA1(624316d4ee42c6257bc64747e4260a0d3950f9cd) )
-	ROM_LOAD32_WORD( "roml02", 0x800000, 0x200000, CRC(43ca2cff) SHA1(02ad7cce42d917dbefdba2e4e8886fc883b1dc60) )
-	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(b8218222) SHA1(1e1aa60e0de9c02b841896512a1163dda280c845) )
-	/* roml03 empty */
-	/* romu03 empty */
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
-	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(24d5b55f) SHA1(cb4d3a22440831e37df0a7fe5433bea708d60f31) )
 ROM_END
 
 /*
@@ -1375,29 +1448,6 @@ ROM_START( aoh )
 	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
 	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
-ROM_END
-
-/*
-Jumping Break
-F2 System, 1999
-
-F-E1-16-002
-
-*/
-
-ROM_START( jmpbreak )
-	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* Hyperstone CPU Code */
-	ROM_LOAD( "rom1.bin", 0x00000, 0x80000, CRC(7e237f7d) SHA1(042e672be34644311eefc7b998bcdf6a9ea2c28a) )
-	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(c722f7be) SHA1(d8b3c6b5fd0942147e0a61169c3eb6334a3b5a40) )
-
-	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE ) /* 16x16x8 Sprites */
-	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, CRC(4b99190a) SHA1(30af068f7d9f9f349db5696c19ab53ac33304271) )
-	ROM_LOAD32_WORD( "romu00.bin", 0x000002, 0x200000, CRC(e93762f8) SHA1(cc589b59e3ab7aa7092e96a1ff8a9de8a499b257) )
-	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, CRC(6796a104) SHA1(3f7352cd37f78c1b01f7df45344ee7800db110f9) )
-	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, CRC(0cc907c8) SHA1(86029eca0870f3b7dd4f1ee8093ccb09077cc00b) )
-
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
-	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
 ROM_END
 
 static int irq_active(const address_space *space)
@@ -1703,4 +1753,4 @@ GAME( 2000, dquizgo2, 0,        coolmini, common,   dquizgo2, ROT0,   "SemiCom",
 GAME( 2000, misncrft, 0,        misncrft, common,   misncrft, ROT90,  "Sun",               "Mission Craft (version 2.4)", GAME_NO_SOUND )
 GAME( 2001, finalgdr, 0,        finalgdr, finalgdr, finalgdr, ROT0,   "SemiCom",           "Final Godori (Korea, version 2.20.5915)", 0 )
 GAME( 2001, wyvernwg, 0,        wyvernwg, common,   wyvernwg, ROT270, "SemiCom (Game Vision License)", "Wyvern Wings", GAME_NO_SOUND )
-GAME( 2001, aoh,      0, 		aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
+GAME( 2001, aoh,      0,        aoh,      aoh,      aoh,      ROT0,   "Unico",             "Age Of Heroes - Silkroad 2 (v0.63 - 2001/02/07)", 0 )
