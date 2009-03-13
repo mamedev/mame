@@ -274,12 +274,11 @@ static VIDEO_UPDATE( cntsteer )
 		static int p1,p2,p3,p4;
 		static int rot_val,x,y;
 
-		rot_val = rotation_sign ? (-rotation_x) : (rotation_x);
+		rotation_x |= rotation_x|(rotation_sign & 3)<<8;
+
+		rot_val = (rotation_sign & 4) ? (rotation_x) : (-rotation_x);
 
 //		popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
-
-		if(rot_val > 90) { rot_val = 90; }
-		if(rot_val < -90) { rot_val = -90; }
 
 		/*
 		(u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
@@ -356,7 +355,7 @@ static WRITE8_HANDLER(cntsteer_vregs_w)
 		case 0:	scrolly = data; break;
 		case 1: scrollx = data; break;
 		case 2: bg_bank = (data & 0x01) << 8; (bg_color_bank = (data & 6)>>1); tilemap_mark_all_tiles_dirty(bg_tilemap); break;
-		case 3:	rotation_sign = (data & 1);  disable_roz = (~data & 0x08); scrolly_hi = (data & 0x30) << 4; scrollx_hi = (data & 0xc0) << 2; break;
+		case 3:	rotation_sign = (data & 7);  disable_roz = (~data & 0x08); scrolly_hi = (data & 0x30) << 4; scrollx_hi = (data & 0xc0) << 2; break;
 		case 4: rotation_x = data; break;
 	}
 }
@@ -437,24 +436,24 @@ static READ8_HANDLER( cntsteer_adx_r )
 	else if(adx_val > 0x90)
 	{
 		if(adx_val > 0x90 && adx_val <= 0xb0)
-			res = 0xef;
+			res = 0xfe;
 		else if(adx_val > 0xb0 && adx_val <= 0xd0)
-			res = 0xcf;
+			res = 0xfc;
 		else if(adx_val > 0xd0 && adx_val <= 0xf0)
-			res = 0x8f;
+			res = 0xf8;
 		else if(adx_val > 0xf0)
-			res = 0x0f;
+			res = 0xf0;
 	}
 	else
 	{
 		if(adx_val >= 0x50 && adx_val < 0x70)
-			res = 0xfe;
+			res = 0xef;
 		else if(adx_val >= 0x30 && adx_val < 0x50)
-			res = 0xfc;
+			res = 0xcf;
 		else if(adx_val >= 0x10 && adx_val < 0x30)
-			res = 0xf8;
+			res = 0x8f;
 		else if(adx_val < 0x10)
-			res = 0xf0;
+			res = 0x0f;
 	}
 
 	//popmessage("%02x",adx_val);
@@ -995,6 +994,6 @@ static DRIVER_INIT( zerotrgt )
 
 /***************************************************************************/
 
-GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT270, "Data East Corporation", "Counter Steer", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
 GAME( 1985, zerotrgt, 0,        zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
 GAME( 1985, gekitsui, zerotrgt, zerotrgt,  zerotrgt, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
+GAME( 1985, cntsteer, 0,        cntsteer,  cntsteer, zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_WRONG_COLORS|GAME_NO_COCKTAIL|GAME_NOT_WORKING )
