@@ -26,6 +26,7 @@
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 #include <math.h>
 
 static tilemap *bg_tilemap, *fg_tilemap;
@@ -47,17 +48,17 @@ static PALETTE_INIT( zerotrgt )
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		g = /*255 - */(0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		g = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 		/* green component */
 		bit0 = (color_prom[i] >> 4) & 0x01;
 		bit1 = (color_prom[i] >> 5) & 0x01;
 		bit2 = (color_prom[i] >> 6) & 0x01;
-		r =/* 255 - */(0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		r = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 		/* blue component */
 		bit0 = (color_prom[i+256] >> 0) & 0x01;
 		bit1 = (color_prom[i+256] >> 1) & 0x01;
 		bit2 = (color_prom[i+256] >> 2) & 0x01;
-		b = /*255 - */(0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
@@ -179,9 +180,9 @@ static void cntsteer_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		if((spriteram[offs+0] & 1) == 0)
 			continue;
 
-		code = spriteram[offs+1] + ( ( spriteram[offs+0x80] & 0x03 ) << 2 );
-		sx = spriteram[offs+3];
-		sy = 0x100-spriteram[offs+2];
+		code = spriteram[offs+1] + ( ( spriteram[offs+0x80] & 0x03 ) << 8 );
+		sx = 0x100 - spriteram[offs+3];
+		sy = 0x100 - spriteram[offs+2];
 		color = 0x10+((spriteram[offs+0x80] & 0x70)>>4);
 
 		fx = (spriteram[offs+0] & 0x04);
@@ -297,8 +298,8 @@ static VIDEO_UPDATE( cntsteer )
 		p3 = 65536*1*sin(2*M_PI*(rot_val)/1024);
 		p4 = -65536*1*cos(2*M_PI*(rot_val)/1024);
 
-		x = 256-(scrollx | scrollx_hi);
-		y = 256+(scrolly | scrolly_hi);
+		x = 256+(scrollx | scrollx_hi);
+		y = 256-(scrolly | scrolly_hi);
 
 		tilemap_draw_roz(bitmap, cliprect, bg_tilemap,
 						(x << 16), (y << 16),
@@ -345,10 +346,10 @@ static WRITE8_HANDLER(zerotrgt_vregs_w)
 
 static WRITE8_HANDLER(cntsteer_vregs_w)
 {
-  static UINT8 test[5];
+//  static UINT8 test[5];
 
-  test[offset] = data;
-    popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
+//  test[offset] = data;
+//   popmessage("%02x %02x %02x %02x %02x",test[0],test[1],test[2],test[3],test[4]);
 
 	switch(offset)
 	{
@@ -409,6 +410,14 @@ static WRITE8_HANDLER( zerotrgt_ctrl_w )
 static WRITE8_HANDLER( cntsteer_sub_irq_w )
 {
 	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
+//	printf("%02x IRQ\n",data);
+}
+
+static WRITE8_HANDLER( cntsteer_sub_nmi_w )
+{
+//	if(data)
+//	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+//	popmessage("%02x",data);
 }
 
 static WRITE8_HANDLER( cntsteer_main_irq_w )
@@ -448,7 +457,7 @@ static READ8_HANDLER( cntsteer_adx_r )
 			res = 0xf0;
 	}
 
-	popmessage("%02x",adx_val);
+	//popmessage("%02x",adx_val);
 
 	return res;
 }
@@ -481,18 +490,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cntsteer_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0x1200, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE(&videoram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE(&colorram)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_sub_irq_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(cntsteer_sound_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_sub_nmi_w)
+	AM_RANGE(0x3001, 0x3001) AM_WRITE(cntsteer_sub_irq_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(&videoram2) AM_SHARE(3)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(&videoram2) AM_SHARE(3)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE(3)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ(cntsteer_adx_r)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
@@ -500,7 +508,8 @@ static ADDRESS_MAP_START( cntsteer_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3004) AM_WRITE(cntsteer_vregs_w)
 	AM_RANGE(0x3005, 0x3005) AM_WRITE(gekitsui_sub_irq_ack)
 	AM_RANGE(0x3006, 0x3006) AM_WRITE(cntsteer_main_irq_w)
-//	AM_RANGE(0x3007, 0x3007) AM_READWRITE(soundlatch2_r,cntsteer_sound_w)
+	AM_RANGE(0x3007, 0x3007) AM_WRITE(cntsteer_sound_w)
+	AM_RANGE(0x3007, 0x3007) AM_READNOP //m6809 bug.
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -578,24 +587,15 @@ static INPUT_PORTS_START( zerotrgt )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/* inputs needs some work in this one.*/
+static INPUT_CHANGED( coin_inserted )
+{
+	cpu_set_input_line(field->port->machine->cpu[1], INPUT_LINE_NMI, newval ? CLEAR_LINE : PULSE_LINE);
+}
+
 static INPUT_PORTS_START( cntsteer )
 	PORT_START("P1")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x0f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) //todo
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -610,16 +610,10 @@ static INPUT_PORTS_START( cntsteer )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(2)
 
 	PORT_START("COINS")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) //unused
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
@@ -730,6 +724,16 @@ static MACHINE_RESET( zerotrgt )
 	nmimask = 0;
 }
 
+static const ay8910_interface ay8910_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("dac", dac_w),
+	DEVCB_NULL
+};
+
 static MACHINE_DRIVER_START( cntsteer )
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu1_map,0)
@@ -763,9 +767,13 @@ static MACHINE_DRIVER_START( cntsteer )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
