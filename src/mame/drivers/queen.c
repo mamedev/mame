@@ -67,7 +67,7 @@ ROM_START( queen )
 	ROM_LOAD( "bios-original.bin", 0x00000, 0x40000, CRC(feb542d4) SHA1(3cc5d8aeb0e3b7d9ed33248a4f3dc507d29debd9) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "pqiidediskonmodule", 0,SHA1(9134791a72c2218ddfd0e575e4c06743a02d0edc) MD5(fffff5010746e9e49b2f3d55ac9ffcb8) )
+	DISK_IMAGE( "pqiidediskonmodule", 0,SHA1(a56efcc711b1c5a2e63160b3088001a8c4fb56c2) )
 ROM_END
 
 

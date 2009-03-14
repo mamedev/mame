@@ -2302,7 +2302,7 @@ ROM_START( ppp )
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
 	DISK_REGION( "scsi0" )
-	DISK_IMAGE_READONLY( "977jaa01", 0, MD5(9abc766b72dab28db920f3d264fc2254) SHA1(05bce40c3b241cd1f634d6688ec179a86f57da9f) )
+	DISK_IMAGE_READONLY( "977jaa01", 0, SHA1(59c03d8eb366167feef741d42d9d8b54bfeb3c1e) )
 
 	// TODO: the audio CD is not dumped
 ROM_END
@@ -2336,7 +2336,7 @@ ROM_START( kbm2nd )
 	DISK_IMAGE_READONLY( "a01jaa01", 0, SHA1(87c21dc6b9fe8d9f696985cfd9dc14a23f0932fe) MD5(0eff2ca8ebef1fd8815d1d7cb0c2383a) )
 
 	DISK_REGION( "scsi1" )
-	DISK_IMAGE_READONLY( "a01jaa02", 1, SHA1(fabfcc02f97c867c361df7b9539e6b77f369b73f) MD5(25679474e987d0dd83a0db2bad24bc14) )
+	DISK_IMAGE_READONLY( "a01jaa02", 1, SHA1(a3fdeee0f85a7a9718c0fb1cc642ac22d3eff8db) )
 ROM_END
 
 ROM_START( kbm3rd )
@@ -2400,10 +2400,10 @@ ROM_START( ppp11 )
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
 	DISK_REGION( "scsi0" )
-	DISK_IMAGE_READONLY( "gc977jaa01", 0, SHA1(aa43526971dad6502e4b9583d8f5c18d93ced820) MD5(161ab0096d8def5ef133eec872afc645) )
+	DISK_IMAGE_READONLY( "gc977jaa01", 0, SHA1(6b93dd38029ea68f9572126e48d618edce68fbce) )
 
 	DISK_REGION( "scsi1" )
-	DISK_IMAGE_READONLY( "gc977jaa02", 1, SHA1(4a0edf424e091c33db91b00edf7c7246754cc8bb) MD5(9cb7cb79d2f0a47e994cfb91847ca190) )
+	DISK_IMAGE_READONLY( "gc977jaa02", 1, SHA1(b853a6f4edcaceb609fe2a3d6a18d4ac62bd3822) )
 ROM_END
 
 /*****************************************************************************/

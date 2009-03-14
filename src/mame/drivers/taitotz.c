@@ -140,7 +140,7 @@ ROM_START( landhigh )
 	ROM_LOAD( "e68-06.ic24", 0x3f4, 0x100, NO_DUMP )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "landhigh", 0, SHA1(c6b417a546db4b82870f49aaa66c8aba74195972) MD5(46e05e74f055548d1d981be152bacf9c) )
+	DISK_IMAGE( "landhigh", 0, SHA1(7cea4ea5c3899e6ac774a4eb12821f44541d9c9c) )
 ROM_END
 
 GAME( 1999, landhigh, 0, taitotz, taitotz, 0, ROT0, "Taito", "Landing High Japan", GAME_NOT_WORKING | GAME_NO_SOUND )

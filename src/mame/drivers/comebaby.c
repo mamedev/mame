@@ -101,7 +101,7 @@ ROM_START(comebaby)
 	ROM_LOAD("comeonbaby.pcbios", 0x000000, 0x10000, NO_DUMP )
 
 	DISK_REGION( "disks" )
-	DISK_IMAGE( "comebaby", 0, SHA1(e187db3d99f7a2b0f1c33727ad6716e695ac250e) MD5(ed1c8e13a34bbf348493d2848d351849) )
+	DISK_IMAGE( "comebaby", 0, SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
 ROM_END
 
 

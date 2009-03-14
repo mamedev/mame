@@ -199,7 +199,7 @@ ROM_START( psattack )
 	ROM_LOAD("16c711.bin",  0x0000, 0x4010, CRC(b316693f) SHA1(eba1f75043bd415268eedfdb95c475e73c14ff86) ) // converted to binary
 
 	DISK_REGION( "cfcard" )
-	DISK_IMAGE_READONLY( "psattack", 0, SHA1(5faa2525b159d3107d516e1d73a24bf689ffac92) MD5(880d79cffca06cd71e7e29746dd83970) )
+	DISK_IMAGE_READONLY( "psattack", 0, SHA1(c2ed467c73d46aacff7a740e2e5aada4be204750) )
 ROM_END
 
 
