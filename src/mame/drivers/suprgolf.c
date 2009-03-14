@@ -25,10 +25,12 @@ static int suprgolf_rom_bank;
 static TILE_GET_INFO( get_tile_info )
 {
 	int code = videoram[tile_index*2]+256*(videoram[tile_index*2+1]);
+	int color = videoram[tile_index*2+0x800] & 0x7f;
+
 	SET_TILE_INFO(
 		0,
 		code,
-		0,
+		color,
 		0);
 }
 
@@ -64,15 +66,67 @@ static MACHINE_RESET( suprgolf )
 static VIDEO_START( suprgolf )
 {
 	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
+	paletteram = auto_malloc(0x1000);
 }
 
 static VIDEO_UPDATE( suprgolf )
 {
-	tilemap_mark_all_tiles_dirty(suprgolf_tilemap);
-	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,TILEMAP_DRAW_OPAQUE,0);
+//	tilemap_mark_all_tiles_dirty(suprgolf_tilemap);
+	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,0,0);
 	return 0;
 }
 
+static UINT8 palette_switch;
+
+static READ8_HANDLER( suprgolf_videoram_r )
+{
+	if(palette_switch)
+		return paletteram[offset];
+	else
+		return videoram[offset];
+}
+
+static WRITE8_HANDLER( suprgolf_videoram_w )
+{
+	if(palette_switch)
+	{
+		int r,g,b,datax;
+		paletteram[offset] = data;
+		offset>>=1;
+		datax=paletteram[offset*2]+256*paletteram[offset*2+1];
+
+		b=((datax)&0x001f)>>0;
+		g=((datax)&0x03e0)>>5;
+		r=((datax)&0x7c00)>>10;
+
+		palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	}
+	else
+	{
+		videoram[offset] = data;
+		tilemap_mark_tile_dirty(suprgolf_tilemap, (offset & 0x7fe) >> 1);
+	}
+}
+
+static UINT8 suprgolf_vreg;
+
+static READ8_HANDLER( suprgolf_vregs_r )
+{
+	static UINT8 vblank;
+	//bit 6?
+
+	vblank^=0x20; //could be something else.
+
+	return suprgolf_vreg | vblank;
+}
+
+static WRITE8_HANDLER( suprgolf_vregs_w )
+{
+	//bits 0,1,2 and probably 3 controls the background vram banking
+	suprgolf_vreg = data;
+	palette_switch = (data & 0x80);
+//	printf("%02x\n",data);
+}
 
 // vidram is banked?
 
@@ -80,21 +134,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE( rom2_bank_select_w )
-
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
-
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM // banked background vram
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(&videoram)
 //  AM_RANGE(0xf000, 0xffff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
-
-static READ8_HANDLER( suprgolf_random )
-{
-	return mame_rand(space->machine);
-}
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -103,7 +148,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") // ??
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN4") AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0x06, 0x06) AM_READ(suprgolf_random) // game locks up or crashes? if this doesn't return right values?
+	AM_RANGE(0x06, 0x06) AM_READWRITE( suprgolf_vregs_r,suprgolf_vregs_w ) // game locks up or crashes? if this doesn't return right values?
 
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
  ADDRESS_MAP_END
@@ -285,7 +330,7 @@ static const gfx_layout gfxlayout =
 };
 
 static GFXDECODE_START( suprgolf )
-	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout,   0, 0x80 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( suprgolf )
@@ -310,7 +355,7 @@ static MACHINE_DRIVER_START( suprgolf )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 
 	MDRV_GFXDECODE(suprgolf)
-	MDRV_PALETTE_LENGTH(512)
+	MDRV_PALETTE_LENGTH(0x1000)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
