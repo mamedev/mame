@@ -2546,7 +2546,7 @@ ROM_START( wg3dh )
 	ROM_LOAD( "wg3dh_12.u32", 0x000000, 0x80000, CRC(15e4cea2) SHA1(72c0db7dc53ce645ba27a5311b5ce803ad39f131) )
 
 	DISK_REGION( "ide" )	/* Hard Drive Version 1.3 (Guts 10/15/96, Main 10/15/96) */
-	DISK_IMAGE( "wg3dh", 0, MD5(424dbda376e8c45ec873b79194bdb924) SHA1(c12875036487a9324734012e601d1f234d2e783e) )
+	DISK_IMAGE( "wg3dh", 0, SHA1(4fc6f25d7f043d9bcf8743aa8df1d9be3cbc375b) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version L1.1 */
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
@@ -2558,7 +2558,7 @@ ROM_START( mace )
 	ROM_LOAD( "mace10ce.u32", 0x000000, 0x80000, CRC(7a50b37e) SHA1(33788835f84a9443566c80bee9f20a1691490c6d) )
 
 	DISK_REGION( "ide" )	/* Hard Drive Version 1.0B 6/10/97 (Guts 7/2/97, Main 7/2/97) */
-	DISK_IMAGE( "mace", 0, MD5(668f6216114fe4c7c265b3d13398e71e) SHA1(6761c9a3da1f0b6b82b146ff2debd04986b8f460) )
+	DISK_IMAGE( "mace", 0, SHA1(96ec8d3ff5dd894e21aa81403bcdbeba44bb97ea) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version L1.1, Labeled as Version 1.0 */
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
@@ -2570,7 +2570,7 @@ ROM_START( macea )
 	ROM_LOAD( "maceboot.u32", 0x000000, 0x80000, CRC(effe3ebc) SHA1(7af3ca3580d6276ffa7ab8b4c57274e15ee6bcbb) )
 
 	DISK_REGION( "ide" )	/* Hard Drive Version 1.0a (Guts 6/9/97, Main 5/12/97) */
-	DISK_IMAGE( "macea", 0, BAD_DUMP MD5(276577faa5632eb23dc5a97c11c0a1b1) SHA1(e2cce4ff2e15267b7008422252bdf62b188cf743) )
+	DISK_IMAGE( "macea", 0, BAD_DUMP SHA1(9bd4a60627915d71932cab24f89c48ea21f4c1cb) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version L1.1 */
 	ROM_LOAD16_BYTE( "soundl11.u95", 0x000000, 0x8000, CRC(c589458c) SHA1(0cf970a35910a74cdcf3bd8119bfc0c693e19b00) )
@@ -2591,7 +2591,7 @@ ROM_START( sfrush )
 	ROM_LOAD32_WORD( "sfrush.u49",  0x800002, 0x200000, CRC(dfb0a54c) SHA1(ed34f9485f7a7e5bb73bf5c6428b27548e12db12) )
 
 	DISK_REGION( "ide" )	/* Hard Drive Version L1.06 */
-	DISK_IMAGE( "sfrush", 0, MD5(7a77addb141fc11fd5ca63850382e0d1) SHA1(0e5805e255e91f08c9802a04b42056d61ba5eb41) )
+	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
 ROM_END
 
 
@@ -2609,7 +2609,7 @@ ROM_START( sfrushrk )
 	ROM_LOAD32_WORD( "audio.u49",  0x800002, 0x200000, CRC(e6b684d3) SHA1(1f5bab7fae974cecc8756dd23e3c7aa2cf6e7dc7) )
 
 	DISK_REGION( "ide" )	/* Hard Drive Version 1.2 */
-	DISK_IMAGE( "sfrushrk", 0, MD5(425c83a4fd389d820aceabf2c72e6107) SHA1(75aba7be869996ff522163466c97f88f78904fe0) )
+	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
 ROM_END
 
 
@@ -2618,7 +2618,7 @@ ROM_START( calspeed )
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
 	DISK_REGION( "ide" )	/* Release version 2.1a (4/17/98) (Guts 1.25 4/17/98, Main 4/17/98) */
-	DISK_IMAGE( "calspeed", 0, MD5(1b79ff4ecaa52693bdb19c720332dd59) SHA1(94af22d5797dbbaf6178fba1194257a603fda9ee) )
+	DISK_IMAGE( "calspeed", 0, SHA1(08d411c591d4b8bbdd6437ea80d01c4cec8516f8) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
@@ -2630,7 +2630,7 @@ ROM_START( calspeda )
 	ROM_LOAD( "caspd1_2.u32", 0x000000, 0x80000, CRC(0a235e4e) SHA1(b352f10fad786260b58bd344b5002b6ea7aaf76d) )
 
 	DISK_REGION( "ide" )	/* Release version 1.0r7a (3/4/98) (Guts 3/3/98, Main 1/19/98) */
-	DISK_IMAGE( "calspeda", 0, MD5(dc8c919af86a1ab88a0b05ea2b6c74b3) SHA1(e6cbc8290af2df9704838a925cb43b6972b80d95) )
+	DISK_IMAGE( "calspeda", 0, SHA1(6b1c3a7530195ef7309b06a651b01c8b3ece92c6) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "sound102.u95", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
@@ -2642,7 +2642,7 @@ ROM_START( vaportrx )
 	ROM_LOAD( "vtrxboot.bin", 0x000000, 0x80000, CRC(ee487a6c) SHA1(fb9efda85047cf615f24f7276a9af9fd542f3354) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "vaportrx", 0, MD5(eb8dcf83fe8b7122481d24ad8fbc8a9a) SHA1(f6ddb8eb66d979d49799e39fa4d749636693a1b0) )
+	DISK_IMAGE( "vaportrx", 0, SHA1(fe53ca7643d2ed2745086abb7f2243c69678cab1) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "vaportrx.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
@@ -2669,7 +2669,7 @@ ROM_START( biofreak )
 	ROM_LOAD( "biofreak.u32", 0x000000, 0x80000, CRC(cefa00bb) SHA1(7e171610ede1e8a448fb8d175f9cb9e7d549de28) )
 
 	DISK_REGION( "ide" ) /* Build Date 12/11/97 */
-	DISK_IMAGE( "biofreak", 0, MD5(f4663a3fd0ceed436756710b97d283e4) SHA1(88b87cb651b97eac117c9342127938e30dc8c138) )
+	DISK_IMAGE( "biofreak", 0, SHA1(711241642f92ded8eaf20c418ea748989183fe10) )
 ROM_END
 
 
@@ -2681,7 +2681,7 @@ ROM_START( blitz )
 	ROM_LOAD( "blitz1_2.u32", 0x000000, 0x80000, CRC(38dbecf5) SHA1(7dd5a5b3baf83a7f8f877ff4cd3f5e8b5201b36f) )
 
 	DISK_REGION( "ide" )	/* Hard Drive Version 1.21 */
-	DISK_IMAGE( "blitz", 0, MD5(9cec59456c4d239ba05c7802082489e4) SHA1(0f001488b3709d40cee5e278603df2bbae1116b8) )
+	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
 ROM_END
 
 
@@ -2693,7 +2693,7 @@ ROM_START( blitz11 )
 	ROM_LOAD( "blitz1_1.u32", 0x000000, 0x80000, CRC(8163ce02) SHA1(89b432d8879052f6c5534ee49599f667f50a010f) )
 
 	DISK_REGION( "ide" )	/* Hard Drive Version 1.21 */
-	DISK_IMAGE( "blitz", 0, MD5(9cec59456c4d239ba05c7802082489e4) SHA1(0f001488b3709d40cee5e278603df2bbae1116b8) )
+	DISK_IMAGE( "blitz", 0, SHA1(9131c7888e89b3c172780156ed3fe1fe46f78b0a) )
 ROM_END
 
 
@@ -2705,7 +2705,7 @@ ROM_START( blitz99 )
 	ROM_LOAD( "bltz9910.u32", 0x000000, 0x80000, CRC(777119b2) SHA1(40d255181c2f3a787919c339e83593fd506779a5) )
 
 	DISK_REGION( "ide" )	/* Hard Drive Version 1.30 */
-	DISK_IMAGE( "blitz99", 0, MD5(4bb6caf8f985e90d99989eede5504188) SHA1(4675751875943b756c8db6997fd288938a7999bb) )
+	DISK_IMAGE( "blitz99", 0, SHA1(19877e26ffce81dd525031e9e2b4f83ff982e2d9) )
 ROM_END
 
 
@@ -2717,7 +2717,7 @@ ROM_START( blitz2k )
 	ROM_LOAD( "bltz2k14.u32", 0x000000, 0x80000, CRC(ac4f0051) SHA1(b8125c17370db7bfd9b783230b4ef3d5b22a2025) )
 
 	DISK_REGION( "ide" )	/* Hard Drive Version 1.5 */
-	DISK_IMAGE( "blitz2k", 0, MD5(7778a82f35c05ed797b315439843246c) SHA1(153a7df368833cd5f5a52c3fe17045c5549a0c17) )
+	DISK_IMAGE( "blitz2k", 0, SHA1(e89b7fbd4b4a9854d47ae97493e0afffbd1f69e7) )
 ROM_END
 
 
@@ -2741,7 +2741,7 @@ ROM_START( carnevi1 )
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
 	DISK_REGION( "ide" )	/* Hard Drive v1.0.1  Diagnostics v3.3 / Oct 20 1998 11:44:41 */
-	DISK_IMAGE( "carnevi1", 0, BAD_DUMP MD5(6eafae86091c0a915cf8cfdc3d73adc2) SHA1(5e6524d4b97de141c38e301a17e8af15661cb5d6) )
+	DISK_IMAGE( "carnevi1", 0, BAD_DUMP SHA1(94532727512280930a100fe473bf3a938fe2d44f) )
 ROM_END
 
 
@@ -2753,7 +2753,7 @@ ROM_START( hyprdriv )
 	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )
 
 	DISK_REGION( "ide" )	/* Version 1.40  Oct 23 1998  15:16:00 */
-	DISK_IMAGE( "hyprdriv", 0, MD5(480c43735b0b83eb10c0223283d4226c) SHA1(2e42fecbb8722c736cccdca7ed3b21fbc75e345a) )
+	DISK_IMAGE( "hyprdriv", 0, SHA1(8cfa343797575b32f46cc24150024be48963a03e) )
 ROM_END
 
 

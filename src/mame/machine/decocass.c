@@ -1961,7 +1961,7 @@ static const char *tape_describe_state(tape_state *tape)
 
 static TIMER_CALLBACK( tape_clock_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	tape_state *tape = get_safe_token(device);
 
 	/* advance by one clock in the desired direction */

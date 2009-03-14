@@ -1099,7 +1099,7 @@ ROM_START( bm1stmix )
 	ROM_LOAD16_BYTE( "753jaa10.27d", 0x100001, 0x80000, CRC(391F4BFD) SHA1(791c9889ea3ce639bbfb87934a1cad9aa3c9ccde) )
 
 	DISK_REGION( "ide" )			/* IDE HARD DRIVE */
-	DISK_IMAGE( "753jaa11", 0, MD5(d56ec7b9877d1f26d7fc1cabed404947) SHA1(71d200d1bd3f1f3a01f4daa78dc9abcca8b8a1fb) )	/* ver 1.00 JA */
+	DISK_IMAGE( "753jaa11", 0, SHA1(2e70cf31a853322f29f99b6f292c187a2cf33015) )	/* ver 1.00 JA */
 	// There is an alternate image
 	//DISK_IMAGE( "753jaa11", 0, MD5(260c9b72f4a03055e3abad61c6225324) SHA1(2cc3e149744516bf2353a2b47d33bc9d2072b6c4) ) /* ver 1.00 JA */
 ROM_END

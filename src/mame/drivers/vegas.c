@@ -2314,7 +2314,7 @@ ROM_START( gauntleg )
 	ROM_LOAD( "legend15.bin", 0x000000, 0x80000, CRC(a8372d70) SHA1(d8cd4fd4d7007ee38bb58b5a818d0f83043d5a48) )
 
 	DISK_REGION( "ide" )	/* Guts 1.5 1/14/1999 Game 1/14/1999 */
-	DISK_IMAGE( "gauntleg", 0, MD5(e8c0c5fafbf004ab2e5808bcd80bfb07) SHA1(fa042d9b565282e69192096bd6f66d8af5aacd2e) )
+	DISK_IMAGE( "gauntleg", 0, SHA1(66eb70e2fba574a7abe54be8bd45310654b24b08) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
@@ -2326,7 +2326,7 @@ ROM_START( gauntl12 )
 	ROM_LOAD( "legend12.bin", 0x000000, 0x80000, CRC(34674c5f) SHA1(92ec1779f3ab32944cbd953b6e1889503a57794b) )
 
 	DISK_REGION( "ide" )	/* Guts 1.4 10/22/1998 Main 10/23/1998 */
-	DISK_IMAGE( "gauntl12", 0, MD5(d5712ae31835bcae086ec7259c2541e0) SHA1(40ba1b8464ffd4003aac5511306b4c34bfa227ea) )
+	DISK_IMAGE( "gauntl12", 0, SHA1(c8208e3ce3b02a271dc6b089efa98dd996b66ce0) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* Vegas SIO boot ROM */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
@@ -2420,7 +2420,7 @@ ROM_START( cartfury )
 	ROM_LOAD( "bootu27", 0x000000, 0x80000, CRC(c44550a2) SHA1(ad30f1c3382ff2f5902a4cbacbb1f0c4e37f42f9) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "cartfury", 0, MD5(d8e9d2616f8d70155f1068f884aa39e5) SHA1(98597d79ea25c0e74a575ba636abccc68fd5d301) )
+	DISK_IMAGE( "cartfury", 0, SHA1(4c5bc2803297ea9a191bbd8b002d0e46b4ae1563) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2105 data */
 	ROM_LOAD16_BYTE( "vegassio.bin", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )

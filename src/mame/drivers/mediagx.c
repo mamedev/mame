@@ -1212,7 +1212,7 @@ static DRIVER_INIT( a51site4 )
 
 /*****************************************************************************/
 
-ROM_START(a51site4)
+ROM_START( a51site4 )
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("tinybios.rom", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe))
 
@@ -1220,9 +1220,9 @@ ROM_START(a51site4)
     ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "a51site4", 0, MD5(be0dd1a6f0bba175c25da3d056fa426d) SHA1(49dee1b903a37b99266cc3e19227942c3cf75821) )
+	DISK_IMAGE( "a51site4", 0, SHA1(48496666d1613700ae9274f9a5361ea5bbaebea0) )
 ROM_END
 
 /*****************************************************************************/
 
-GAME(1998, a51site4, 0,	mediagx, mediagx, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4", GAME_NOT_WORKING)
+GAME( 1998, a51site4, 0,	mediagx, mediagx, a51site4,	ROT0,   "Atari Games",  "Area 51: Site 4", GAME_NOT_WORKING )

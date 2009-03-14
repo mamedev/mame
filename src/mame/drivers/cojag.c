@@ -1189,7 +1189,7 @@ ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1
 	ROM_LOAD32_BYTE( "3k", 0x00003, 0x80000, CRC(729eb1b7) SHA1(21864b4281b1ad17b2903e3aa294e4be74161e80) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "area51", 0, MD5(130b330eff59403f8fc3433ff501852b) SHA1(9ea749404c9a5d44f407cdb8803293ec0d61410d) )
+	DISK_IMAGE( "area51", 0, SHA1(3b303bc37e206a6d7339352c869f050d04186f11) )
 ROM_END
 
 ROM_START( area51 ) /* R3000 based, labeled as "Area51 2-C"  Date: Nov 11 1996 */
@@ -1200,7 +1200,7 @@ ROM_START( area51 ) /* R3000 based, labeled as "Area51 2-C"  Date: Nov 11 1996 *
 	ROM_LOAD32_BYTE( "a51_2-c.ll", 0x00003, 0x80000, CRC(471b15d2) SHA1(4b5f45ee140b03a6be61475cae1c2dbef0f07457) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "area51", 0, MD5(130b330eff59403f8fc3433ff501852b) SHA1(9ea749404c9a5d44f407cdb8803293ec0d61410d) )
+	DISK_IMAGE( "area51", 0, SHA1(3b303bc37e206a6d7339352c869f050d04186f11) )
 ROM_END
 
 ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" */

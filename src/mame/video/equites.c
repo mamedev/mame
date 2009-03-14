@@ -121,7 +121,7 @@ static TILE_GET_INFO( splndrbt_bg_info )
 
 VIDEO_START( equites )
 {
-	equites_fg_videoram = auto_malloc(0x800);
+	equites_fg_videoram = (UINT8 *)auto_malloc(0x800);
 
 	fg_tilemap = tilemap_create(machine, equites_fg_info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
@@ -135,7 +135,7 @@ VIDEO_START( splndrbt )
 {
 	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_INDEXED16);
 
-	equites_fg_videoram = auto_malloc(0x800);
+	equites_fg_videoram = (UINT8 *)auto_malloc(0x800);
 
 	fg_tilemap = tilemap_create(machine, splndrbt_fg_info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);

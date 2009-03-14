@@ -471,7 +471,7 @@ WRITE8_HANDLER( qix_68705_portC_w )
 
 static TIMER_CALLBACK( pia_w_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	pia6821_w(device, param >> 8, param & 0xff);
 }
 
