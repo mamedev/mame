@@ -153,8 +153,8 @@ ROM_START( chsuper3 )
 	ROM_LOAD( "c.bin",  0x0000, 0x80000, CRC(e987ed1f) SHA1(8d1ee01914356714c7d1f8437d98b41a707a174a) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "a.bin",  0x80000, 0x80000, CRC(ace8b591) SHA1(e9ba5efebdc9b655056ed8b2621f062f50e0528f) )
-	ROM_LOAD( "b.bin",  0x00000, 0x80000, CRC(5f58c722) SHA1(d339ae27af010b058eae9084fba85fb2fbed3952) )
+	ROM_LOAD( "a.bin",  0x00000, 0x80000, CRC(ace8b591) SHA1(e9ba5efebdc9b655056ed8b2621f062f50e0528f) )
+	ROM_LOAD( "b.bin",  0x80000, 0x80000, CRC(5f58c722) SHA1(d339ae27af010b058eae9084fba85fb2fbed3952) )
 
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 ROM_END
@@ -177,7 +177,7 @@ static DRIVER_INIT( chsuper2 )
 
 static DRIVER_INIT( chsuper3 )
 {
-	chsuper_tilexor = 0x3e00;
+	chsuper_tilexor = 0x0e00;
 }
 
 
