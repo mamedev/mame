@@ -229,6 +229,16 @@ void mips3drc_set_options(const device_config *device, UINT32 options);
 void mips3drc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base);
 void mips3drc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles);
 
+#if (HAS_VR4300)
+CPU_GET_INFO( vr4300be );
+CPU_GET_INFO( vr4300le );
+#define CPU_VR4300BE CPU_GET_INFO_NAME( vr4300be )
+#define CPU_VR4300LE CPU_GET_INFO_NAME( vr4300le )
+CPU_GET_INFO( vr4310be );
+CPU_GET_INFO( vr4310le );
+#define CPU_VR4310BE CPU_GET_INFO_NAME( vr4310be )
+#define CPU_VR4310LE CPU_GET_INFO_NAME( vr4310le )
+#endif
 
 #if (HAS_R4600)
 CPU_GET_INFO( r4600be );

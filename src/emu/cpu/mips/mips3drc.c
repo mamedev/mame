@@ -3646,6 +3646,96 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 }
 
 
+/***************************************************************************
+    NEC VR4300 VARIANTS
+***************************************************************************/
+
+// NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
+#if (HAS_VR4300)
+static CPU_INIT( vr4300be )
+{
+	mips3_init(MIPS3_TYPE_VR4300, TRUE, device, irqcallback);
+}
+
+static CPU_INIT( vr4300le )
+{
+	mips3_init(MIPS3_TYPE_VR4300, FALSE, device, irqcallback);
+}
+
+CPU_GET_INFO( vr4300be )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300be);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "VR4300 (big)");			break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+CPU_GET_INFO( vr4300le )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300le);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "VR4300 (little)");		break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+// VR4310 = VR4300 with different speed bin
+CPU_GET_INFO( vr4310be )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300be);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "VR4310 (big)");			break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+
+CPU_GET_INFO( vr4310le )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(vr4300le);				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "VR4310 (little)");		break;
+
+		/* --- everything else is handled generically --- */
+		default:										CPU_GET_INFO_CALL(mips3);			break;
+	}
+}
+#endif
+
 
 /***************************************************************************
     R4600 VARIANTS

@@ -37,6 +37,7 @@ enum _mips3_flavor
 {
 	/* MIPS III variants */
 	MIPS3_TYPE_MIPS_III,
+	MIPS3_TYPE_VR4300,
 	MIPS3_TYPE_R4600,
 	MIPS3_TYPE_R4650,
 	MIPS3_TYPE_R4700,
@@ -103,6 +104,7 @@ typedef enum _mips3_flavor mips3_flavor;
 #define SR_SR					0x00100000
 #define SR_TS					0x00200000
 #define SR_BEV					0x00400000
+#define SR_ITS					0x01000000	/* VR4300 only, Application Note doesn't give purpose */
 #define SR_RE					0x02000000
 #define SR_FR					0x04000000
 #define SR_RP					0x08000000

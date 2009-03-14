@@ -885,6 +885,7 @@ $(CPUOBJ)/mips/r3000.o:	$(CPUSRC)/mips/r3000.c \
 # MIPS R4000 (MIPS III/IV) series
 #-------------------------------------------------
 
+CPUDEFS += -DHAS_VR4300=$(if $(filter VR4300,$(CPUS)),1,0)
 CPUDEFS += -DHAS_R4600=$(if $(filter R4600,$(CPUS)),1,0)
 CPUDEFS += -DHAS_R4650=$(if $(filter R4650,$(CPUS)),1,0)
 CPUDEFS += -DHAS_R4700=$(if $(filter R4700,$(CPUS)),1,0)
@@ -892,7 +893,7 @@ CPUDEFS += -DHAS_R5000=$(if $(filter R5000,$(CPUS)),1,0)
 CPUDEFS += -DHAS_QED5271=$(if $(filter QED5271,$(CPUS)),1,0)
 CPUDEFS += -DHAS_RM7000=$(if $(filter RM7000,$(CPUS)),1,0)
 
-ifneq ($(filter R4600 R4650 R4700 R5000 QED5271 RM7000,$(CPUS)),)
+ifneq ($(filter VR4300 R4600 R4650 R4700 R5000 QED5271 RM7000,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mips
 CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3fe.o $(CPUOBJ)/mips/mips3drc.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o

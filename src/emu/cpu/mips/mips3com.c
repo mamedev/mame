@@ -722,42 +722,63 @@ static UINT32 compute_config_register(const mips3_state *mips)
 	UINT32 configreg = 0x00026030;
 	int divisor;
 
-	/* set the data cache size */
-	     if (mips->icache_size <= 0x01000) configreg |= 0 << 6;
-	else if (mips->icache_size <= 0x02000) configreg |= 1 << 6;
-	else if (mips->icache_size <= 0x04000) configreg |= 2 << 6;
-	else if (mips->icache_size <= 0x08000) configreg |= 3 << 6;
-	else if (mips->icache_size <= 0x10000) configreg |= 4 << 6;
-	else if (mips->icache_size <= 0x20000) configreg |= 5 << 6;
-	else if (mips->icache_size <= 0x40000) configreg |= 6 << 6;
-	else                                   configreg |= 7 << 6;
+	// NEC VR series does not use a 100% compatible COP0/TLB implementation
+	if (mips->flavor == MIPS3_TYPE_VR4300)
+	{
+		/*
+		    For VR43xx, Config is as follows:
+		    bit 31 = always 0
+		    bits 28-30 = EC
+		    bits 24-27 = EP
+		    bits 16-23 = always b0000010
+		    bit 15 = endian indicator as standard MIPS III
+		    bits 4-14 = always b11001000110
+		    bit 3 = CU
+		    bits 0-2 = K0 ("Coherency algorithm of kseg0")
+		*/
 
-	/* set the instruction cache size */
-	     if (mips->icache_size <= 0x01000) configreg |= 0 << 9;
-	else if (mips->icache_size <= 0x02000) configreg |= 1 << 9;
-	else if (mips->icache_size <= 0x04000) configreg |= 2 << 9;
-	else if (mips->icache_size <= 0x08000) configreg |= 3 << 9;
-	else if (mips->icache_size <= 0x10000) configreg |= 4 << 9;
-	else if (mips->icache_size <= 0x20000) configreg |= 5 << 9;
-	else if (mips->icache_size <= 0x40000) configreg |= 6 << 9;
-	else                                   configreg |= 7 << 9;
+		configreg = 0x6460;
+	}
+	else
+	{
+		/* set the data cache size */
+			 if (mips->icache_size <= 0x01000) configreg |= 0 << 6;
+		else if (mips->icache_size <= 0x02000) configreg |= 1 << 6;
+		else if (mips->icache_size <= 0x04000) configreg |= 2 << 6;
+		else if (mips->icache_size <= 0x08000) configreg |= 3 << 6;
+		else if (mips->icache_size <= 0x10000) configreg |= 4 << 6;
+		else if (mips->icache_size <= 0x20000) configreg |= 5 << 6;
+		else if (mips->icache_size <= 0x40000) configreg |= 6 << 6;
+		else                                   configreg |= 7 << 6;
+	
+		/* set the instruction cache size */
+			 if (mips->icache_size <= 0x01000) configreg |= 0 << 9;
+		else if (mips->icache_size <= 0x02000) configreg |= 1 << 9;
+		else if (mips->icache_size <= 0x04000) configreg |= 2 << 9;
+		else if (mips->icache_size <= 0x08000) configreg |= 3 << 9;
+		else if (mips->icache_size <= 0x10000) configreg |= 4 << 9;
+		else if (mips->icache_size <= 0x20000) configreg |= 5 << 9;
+		else if (mips->icache_size <= 0x40000) configreg |= 6 << 9;
+		else                                   configreg |= 7 << 9;
+
+
+		/* set the system clock divider */
+		divisor = 2;
+		if (mips->system_clock != 0)
+		{
+			divisor = mips->cpu_clock / mips->system_clock;
+			if (mips->system_clock * divisor != mips->cpu_clock)
+			{
+				configreg |= 0x80000000;
+				divisor = mips->cpu_clock * 2 / mips->system_clock;
+			}
+		}
+		configreg |= (((divisor < 2) ? 2 : (divisor > 8) ? 8 : divisor) - 2) << 28;
+	}
 
 	/* set the endianness bit */
 	if (mips->bigendian)
 		configreg |= 0x00008000;
-
-	/* set the system clock divider */
-	divisor = 2;
-	if (mips->system_clock != 0)
-	{
-		divisor = mips->cpu_clock / mips->system_clock;
-		if (mips->system_clock * divisor != mips->cpu_clock)
-		{
-			configreg |= 0x80000000;
-			divisor = mips->cpu_clock * 2 / mips->system_clock;
-		}
-	}
-	configreg |= (((divisor < 2) ? 2 : (divisor > 8) ? 8 : divisor) - 2) << 28;
 
 	return configreg;
 }
@@ -772,6 +793,9 @@ static UINT32 compute_prid_register(const mips3_state *mips)
 {
 	switch (mips->flavor)
 	{
+		case MIPS3_TYPE_VR4300:
+			return 0x0b00;
+
 		case MIPS3_TYPE_R4600:
 		case MIPS3_TYPE_R4650:
 			return 0x2000;
@@ -830,8 +854,17 @@ static void tlb_map_entry(mips3_state *mips, int tlbindex)
 	{
 		UINT32 effvpn = vpn + count * which;
 		UINT64 lo = entry->entry_lo[which];
-		UINT32 pfn = (lo >> 6) & 0x00ffffff;
+		UINT32 pfn;
 		UINT32 flags = 0;
+
+		if (mips->flavor == MIPS3_TYPE_VR4300)
+		{
+			pfn = (lo >> 6) & 0x000fffff; 	// VR4300 and VR5432 have 4 fewer PFN bits
+		}
+		else
+		{
+			pfn = (lo >> 6) & 0x00ffffff; 
+		}
 
 		/* valid? */
 		if ((lo & 2) != 0)

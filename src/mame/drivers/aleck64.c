@@ -423,7 +423,7 @@ static INTERRUPT_GEN( n64_vblank )
 
 static MACHINE_DRIVER_START( aleck64 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R4600BE, 93750000)
+	MDRV_CPU_ADD("maincpu", VR4300BE, 93750000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(n64_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", n64_vblank)
