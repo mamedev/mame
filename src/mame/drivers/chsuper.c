@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "cpu/z180/z180.h"
 
+static int chsuper_tilexor;
 
 static VIDEO_START(chsuper)
 {
@@ -15,12 +16,14 @@ static VIDEO_UPDATE(chsuper)
 
 	for (y=0;y<64;y++)
 	{
-		for (x=0;x<64;x++)
+		for (x=0;x<128;x++)
 		{
-			int tile = ((vram[count+1]<<8) | vram[count]) & 0x3fff;
+			int tile = ((vram[count+1]<<8) | vram[count]) & 0xffff;
+			
+			tile ^=chsuper_tilexor;
 			//int colour = tile>>12;
 
-			drawgfx(bitmap,gfx,tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,gfx,tile,0,0,0,x*4,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count+=2;
 		}
 	}
@@ -99,17 +102,15 @@ static INPUT_PORTS_START( chsuper )
 INPUT_PORTS_END
 
 
-/* WRONG! */
-
 static const gfx_layout charlayout =
 {
-	8,8,
+	4,8,
 	RGN_FRAC(1,1),
 	8,
 	{ 0,1,2,3,4,5,6,7},
-	{ 2*8,3*8,0*8,1*8, 256+2*8, 256+3*8, 256+0*8, 256+1*8 },
+	{ 2*8,3*8,0*8,1*8 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32},
-	8*64
+	8*32
 };
 
 static GFXDECODE_START( chsuper )
@@ -152,8 +153,8 @@ ROM_START( chsuper3 )
 	ROM_LOAD( "c.bin",  0x0000, 0x80000, CRC(e987ed1f) SHA1(8d1ee01914356714c7d1f8437d98b41a707a174a) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "a.bin",  0x00000, 0x80000, CRC(ace8b591) SHA1(e9ba5efebdc9b655056ed8b2621f062f50e0528f) )
-	ROM_LOAD( "b.bin",  0x80000, 0x80000, CRC(5f58c722) SHA1(d339ae27af010b058eae9084fba85fb2fbed3952) )
+	ROM_LOAD( "a.bin",  0x80000, 0x80000, CRC(ace8b591) SHA1(e9ba5efebdc9b655056ed8b2621f062f50e0528f) )
+	ROM_LOAD( "b.bin",  0x00000, 0x80000, CRC(5f58c722) SHA1(d339ae27af010b058eae9084fba85fb2fbed3952) )
 
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 ROM_END
@@ -169,7 +170,16 @@ ROM_START( chsuper2 )
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
+static DRIVER_INIT( chsuper2 )
+{
+	chsuper_tilexor = 0x7f00;
+}
+
+static DRIVER_INIT( chsuper3 )
+{
+	chsuper_tilexor = 0x3e00;
+}
 
 
-GAME( 1999, chsuper3, 0,        chsuper, chsuper,  0, ROT0, "unknown",    "Champion Super 3", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, chsuper2, chsuper3, chsuper, chsuper,  0, ROT0, "unknown",    "Champion Super 2", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, chsuper3, 0,        chsuper, chsuper,  chsuper3, ROT0, "unknown",    "Champion Super 3", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, chsuper2, chsuper3, chsuper, chsuper,  chsuper2, ROT0, "unknown",    "Champion Super 2", GAME_NOT_WORKING|GAME_NO_SOUND )
