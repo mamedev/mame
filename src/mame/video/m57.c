@@ -177,11 +177,13 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	int y,x;
 	INT16 scrolly;
 
+	// from 64 to 127: not wrapped
 	for (y = 64; y < 128; y++)
 		tilemap_set_scrollx(bg_tilemap, y, m57_scroll[0x40]);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
+	// from 128 to 255: wrapped
 	for (y = 128; y <= cliprect->max_y; y++)
 	{
 		scrolly = m57_scroll[y] + (m57_scroll[y + 0x100] << 8);
