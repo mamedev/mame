@@ -53,13 +53,13 @@ static void IRQHandler(void *param,int irq)
 }
 static TIMER_CALLBACK( timer_callback_0 )
 {
-	ym3812_state *info = (ym3812_state *)param;
+	ym3812_state *info = (ym3812_state *)ptr;
 	ym3812_timer_over(info->chip,0);
 }
 
 static TIMER_CALLBACK( timer_callback_1 )
 {
-	ym3812_state *info = (ym3812_state *)param;
+	ym3812_state *info = (ym3812_state *)ptr;
 	ym3812_timer_over(info->chip,1);
 }
 
