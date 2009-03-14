@@ -9004,9 +9004,10 @@ Other Sun games
 	DRIVER( pachifev )	/* (c) 1983? */
 
 	/* Igrosoft - SHA1 information is not available for commented out sets, only MD5/CRC32 */
+	
+	/* Multifish */
 	//DRIVER( mfish )
-	DRIVER( mfish_2 )
-	DRIVER( mfish_2a )
+	//DRIVER( mfish_2 )
 	//DRIVER( mfish_3 )
 	//DRIVER( mfish_4 )
 	//DRIVER( mfish_5 )
@@ -9016,11 +9017,60 @@ Other Sun games
 	//DRIVER( mfish_9 )
 	//DRIVER( mfish_10 )
 	//DRIVER( mfish_11 )
-	//DRIVER( mfish_12 )
-	//DRIVER( mfish_13 )
+	DRIVER( mfish_12 )
+	DRIVER( mfish_12a )
+	
+	/* Crazy Monkey */
+	//DRIVER( crzmon )
+	//DRIVER( crzmon_2 )
+	//DRIVER( crzmon_3 )
+	//DRIVER( crzmon_4 )
+	//DRIVER( crzmon_5 )
+	//DRIVER( crzmon_6 )
+	DRIVER( crzmon_7 )
+	
+	/* Fruit Cocktail */
+	//DRIVER( fcock )
+	//DRIVER( fcock_2 )
+	//DRIVER( fcock_3 )
+	//DRIVER( fcock_4 )
+	//DRIVER( fcock_5 )	
+	DRIVER( fcock_6 )
+	
+	/* Lucky Haunter */
+	//DRIVER( lhaunt )
+	//DRIVER( lhaunt_2 )
+	//DRIVER( lhaunt_3 )
+	DRIVER( lhaunt_4 )
+	DRIVER( lhaunt_5 )
+	DRIVER( lhaunt_6 )
+	
+	/* Garage */
+	//DRIVER( garage )
+	//DRIVER( garage_2 )
+	//DRIVER( garage_3 )
+	DRIVER( garage_4 )
 
+	/* Rock Climber */
+	//DRIVER( rclimb )
+	//DRIVER( rclimb_2 )
+	DRIVER( rclimb_3 )
+	
+	/* Sweet Life */
+	DRIVER( sweetl )
+	
+	/* Resident */
+	//DRIVER( resdnt )
+	DRIVER( resdnt_2 )
+	
+	/* Rollfruit */
+	//DRIVER( rollfr )
+	//DRIVER( rollfr_2 )
 
+	
+	
 
+	
 	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
        These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
        emulation for pinball machiens.
