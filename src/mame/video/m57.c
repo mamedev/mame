@@ -175,28 +175,31 @@ WRITE8_HANDLER( m57_flipscreen_w )
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y,x;
+	INT16 scrolly;
 
-	for (y = 0; y < 128; y++)
-		tilemap_set_scrollx(bg_tilemap, y, (y < 64) ? 0 : m57_scroll[64]);
+	for (y = 64; y < 128; y++)
+		tilemap_set_scrollx(bg_tilemap, y, m57_scroll[0x40]);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	for (y = 128; y <= cliprect->max_y; y++)
 	{
-		if (m57_scroll[y] < 128)
+		scrolly = m57_scroll[y] + (m57_scroll[y + 0x100] << 8);
+
+		if (scrolly >= 0)
 		{
 			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 			{
-				if ((x + m57_scroll[y]) <= cliprect->max_x)
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, x + m57_scroll[y]);
+				if ((x + scrolly) <= cliprect->max_x)
+					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, x + scrolly);
 				else
 					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, cliprect->max_x);
 			}
 		} else {
 			for (x = cliprect->max_x; x >= cliprect->min_x; x--)
 			{
-				if ((x + m57_scroll[y] - 256) >= cliprect->min_x)
-					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, x + m57_scroll[y] - 256);
+				if ((x + scrolly) >= cliprect->min_x)
+					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, x + scrolly);
 				else
 					*BITMAP_ADDR16(bitmap, y, x) = *BITMAP_ADDR16(bitmap, y, cliprect->min_x);
 			}
