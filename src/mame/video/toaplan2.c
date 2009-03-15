@@ -72,7 +72,7 @@ There seems to be sprite buffering - double buffering actually.
   ---- xxxx  ---- ---- = Priority (0 - Fh)
   ---x ----  ---- ---- = Flip X
   --x- ----  ---- ---- = Flip Y
-  -?-- ----  ---- ---- = unknown / unused
+  -x-- ----  ---- ---- = Multi-sprite
   x--- ----  ---- ---- = Show sprite ?
 
   1
@@ -1315,12 +1315,15 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 {
 	const gfx_element *gfx = machine->gfx[ ((controller*2)+1) ];
 
-	int offs;
+	int offs, old_x, old_y;
 
 	UINT16 *source = (UINT16 *)(spriteram16_n[controller]);
 
 
 	priority_to_display <<= 8;
+
+	old_x = (-(sprite_scrollx[controller]+xoffset[3])) & 0x1ff;
+	old_y = (-(sprite_scrolly[controller]+yoffset[3])) & 0x1ff;
 
 	for (offs = 0; offs < (TOAPLAN2_SPRITERAM_SIZE/2); offs += 4)
 	{
@@ -1350,8 +1353,17 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			sprite_sizey = ((source[offs + 3] & 0x0f) + 1) * 8;
 
 			/***** find position to display sprite *****/
-			sx_base = ((source[offs + 2] >> 7) - (sprite_scrollx[controller]+xoffset[3])) & 0x1ff;
-			sy_base = ((source[offs + 3] >> 7) - (sprite_scrolly[controller]+yoffset[3])) & 0x1ff;
+			if (!(attrib & 0x4000))
+			{
+				sx_base = ((source[offs + 2] >> 7) - (sprite_scrollx[controller]+xoffset[3])) & 0x1ff;
+				sy_base = ((source[offs + 3] >> 7) - (sprite_scrolly[controller]+yoffset[3])) & 0x1ff;
+			} else {
+				sx_base = (old_x + (source[offs + 2] >> 7)) & 0x1ff;
+				sy_base = (old_y + (source[offs + 3] >> 7)) & 0x1ff;
+			}
+
+			old_x = sx_base;
+			old_y = sy_base;
 
 			flipx = attrib & TOAPLAN2_SPRITE_FLIPX;
 			flipy = attrib & TOAPLAN2_SPRITE_FLIPY;
