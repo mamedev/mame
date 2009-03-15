@@ -19,8 +19,10 @@
 #include "sound/2203intf.h"
 
 static tilemap *suprgolf_tilemap;
-
+static UINT8 *suprgolf_bg_vram;
 static int suprgolf_rom_bank;
+static UINT8 suprgolf_bg_bank;
+static UINT8 suprgolf_vreg;
 
 static TILE_GET_INFO( get_tile_info )
 {
@@ -55,6 +57,7 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 {
 	UINT8 *region_base = memory_region(space->machine, "user2");
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
+//	if(data == 0) data = 1; //test hack
 	memory_set_bankptr(space->machine, 1, region_base + (data&0x3f ) * 0x4000);
 }
 
@@ -67,11 +70,51 @@ static VIDEO_START( suprgolf )
 {
 	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 	paletteram = auto_malloc(0x1000);
+	suprgolf_bg_vram = auto_malloc(0x2000*0x20);
+
+	tilemap_set_transparent_pen(suprgolf_tilemap,15);
 }
 
 static VIDEO_UPDATE( suprgolf )
 {
-//	tilemap_mark_all_tiles_dirty(suprgolf_tilemap);
+	int x,y,count;
+	static int test_offs;
+
+	if(input_code_pressed_once(KEYCODE_A))
+		test_offs+=0x10000;
+
+	if(input_code_pressed_once(KEYCODE_S))
+		test_offs-=0x10000;
+
+	if(test_offs < 0)
+		test_offs = 0;
+
+	if(test_offs > 0x30000)
+		test_offs = 0x30000;
+
+	popmessage("%08x",test_offs);
+
+	count = (test_offs);
+
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<512;x+=2)
+		{
+			UINT8 color;
+
+			/*temporary*/
+			color = ((suprgolf_bg_vram[count]) | (suprgolf_bg_vram[count^0x80]<<4));
+
+			if((x)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+			{
+				*BITMAP_ADDR32(bitmap, y, x) = screen->machine->pens[color];
+				*BITMAP_ADDR32(bitmap, y, x+1) = screen->machine->pens[color];
+			}
+
+			count++;
+		}
+	}
+
 	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,0,0);
 	return 0;
 }
@@ -108,8 +151,6 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 	}
 }
 
-static UINT8 suprgolf_vreg;
-
 static READ8_HANDLER( suprgolf_vregs_r )
 {
 	static UINT8 vblank;
@@ -125,19 +166,38 @@ static WRITE8_HANDLER( suprgolf_vregs_w )
 	//bits 0,1,2 and probably 3 controls the background vram banking
 	suprgolf_vreg = data;
 	palette_switch = (data & 0x80);
+	suprgolf_bg_bank = (data & 0x1f);
 //	printf("%02x\n",data);
+}
+
+static UINT8 pen;
+
+static READ8_HANDLER( suprgolf_bg_vram_r )
+{
+	return suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000];
+}
+
+static WRITE8_HANDLER( suprgolf_bg_vram_w )
+{
+	suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
+	suprgolf_bg_vram[(offset^0x80)+suprgolf_bg_bank*0x2000] = pen;
+}
+
+static WRITE8_HANDLER( suprgolf_pen_w )
+{
+	pen = data;
 }
 
 // vidram is banked?
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE( rom2_bank_select_w )
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM // banked background vram
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE( suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(&videoram)
-//  AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0xf000, 0xf000) AM_WRITE( suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -350,7 +410,7 @@ static MACHINE_DRIVER_START( suprgolf )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 191)
 
