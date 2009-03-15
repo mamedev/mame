@@ -1211,7 +1211,7 @@ ROM_START( maxforce ) /* R3000 based, labeled as "Maximum Force 5-23-97 v1.05" *
 	ROM_LOAD32_BYTE( "maxf_105.ll", 0x00003, 0x80000, CRC(16d0768d) SHA1(665a6d7602a7f2f5b1f332b0220b1533143d56b1) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "maxforce", 0, MD5(b0a214c7b3f8ba9d592396332fc974c9) SHA1(59d77280afdb2d1f801ee81786aa7d3166ec2695) )
+	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
 
 
@@ -1238,7 +1238,7 @@ ROM_START( maxf_ng ) /* R3000 based, stickers say 'NO GORE' */
 	ROM_LOAD( "28c16.17z", 0x000, 0x800, CRC(1cdd9088) SHA1(4f01f02ff95f31ced87a3cdd7f171afd92551266) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "maxforce", 0, MD5(b0a214c7b3f8ba9d592396332fc974c9) SHA1(59d77280afdb2d1f801ee81786aa7d3166ec2695) )
+	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
 
 
