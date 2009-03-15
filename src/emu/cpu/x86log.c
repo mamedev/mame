@@ -42,8 +42,8 @@ struct _log_comment
 
 
 /* data ranges */
-typedef struct _data_range data_range;
-struct _data_range
+typedef struct _data_range_t data_range_t;
+struct _data_range_t
 {
 	x86code *		base;
 	x86code *		end;
@@ -57,7 +57,7 @@ struct _x86log_context
 	astring *		filename;						/* name of the file */
 	FILE *			file;							/* file we are logging to */
 
-	data_range 		data_range[MAX_DATA_RANGES];	/* list of data ranges */
+	data_range_t	data_range[MAX_DATA_RANGES];	/* list of data ranges */
 	int				data_range_count;				/* number of data ranges */
 
 	log_comment 	comment_list[MAX_COMMENTS];		/* list of comments */
@@ -161,7 +161,7 @@ void x86log_add_comment(x86log_context *log, x86code *base, const char *format, 
 
 void x86log_mark_as_data(x86log_context *log, x86code *base, x86code *end, int size)
 {
-	data_range *data;
+	data_range_t *data;
 
 	assert(log->data_range_count < MAX_DATA_RANGES);
 	assert(end >= base);
@@ -191,8 +191,8 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 {
 	const log_comment *lastcomment = &log->comment_list[log->comment_count];
 	const log_comment *curcomment = &log->comment_list[0];
-	const data_range *lastdata = &log->data_range[log->data_range_count];
-	const data_range *curdata = &log->data_range[0];
+	const data_range_t *lastdata = &log->data_range[log->data_range_count];
+	const data_range_t *curdata = &log->data_range[0];
 	x86code *cur = start;
 
 	/* print the optional label */

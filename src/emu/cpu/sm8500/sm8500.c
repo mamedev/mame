@@ -55,6 +55,15 @@ struct _sm8500_state
 	UINT8 internal_ram[0x500];
 };
 
+INLINE sm8500_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_SM8500);
+	return (sm8500_state *)device->token;
+}
+
 static const UINT8 sm8500_b2w[8] = {
         0, 8, 2, 10, 4, 12, 6, 14
 };
@@ -86,7 +95,7 @@ INLINE void sm85cpu_mem_writeword( sm8500_state *cpustate, UINT32 address, UINT1
 
 static CPU_INIT( sm8500 )
 {
-	sm8500_state *cpustate = device->token;
+	sm8500_state *cpustate = get_safe_token(device);
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -103,7 +112,7 @@ static CPU_INIT( sm8500 )
 
 static CPU_RESET( sm8500 )
 {
-	sm8500_state *cpustate = device->token;
+	sm8500_state *cpustate = get_safe_token(device);
 
 	cpustate->PC = 0x1020;
 	cpustate->IE0 = 0;
@@ -217,7 +226,7 @@ INLINE void sm8500_process_interrupts(sm8500_state *cpustate) {
 
 static CPU_EXECUTE( sm8500 )
 {
-	sm8500_state *cpustate = device->token;
+	sm8500_state *cpustate = get_safe_token(device);
 	UINT8	op;
 	UINT16 oldpc;
 	int	mycycles;
@@ -258,7 +267,7 @@ static CPU_EXECUTE( sm8500 )
 
 static CPU_BURN( sm8500 )
 {
-	sm8500_state *cpustate = device->token;
+	sm8500_state *cpustate = get_safe_token(device);
 
 	if ( cycles > 0 ) {
 		/* burn a number of 4 cycles */
@@ -381,7 +390,7 @@ static void sm8500_set_irq_line( sm8500_state *cpustate, int irqline, int state 
 
 static CPU_SET_INFO( sm8500 )
 {
-	sm8500_state *cpustate = device->token;
+	sm8500_state *cpustate = get_safe_token(device);
 
 	switch(state)
 	{
@@ -435,7 +444,7 @@ static CPU_SET_INFO( sm8500 )
 
 CPU_GET_INFO( sm8500 )
 {
-	sm8500_state *cpustate = (device != NULL) ? device->token : NULL;
+	sm8500_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

@@ -180,6 +180,19 @@ struct _nec_state_t
 
 };
 
+INLINE nec_state_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_V20 ||
+		   cpu_get_type(device) == CPU_V25 ||
+		   cpu_get_type(device) == CPU_V30 ||
+		   cpu_get_type(device) == CPU_V33 ||
+		   cpu_get_type(device) == CPU_V35);
+	return (nec_state_t *)device->token;
+}
+
 /* The interrupt number of a pending external interrupt pending NMI is 2.   */
 /* For INTR interrupts, the level is caught on the bus during an INTA cycle */
 
@@ -267,7 +280,7 @@ static UINT8 fetchop(nec_state_t *nec_state)
 
 static CPU_RESET( nec )
 {
-	nec_state_t *nec_state = device->token;
+	nec_state_t *nec_state = get_safe_token(device);
 	unsigned int i,j,c;
     static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
@@ -1082,15 +1095,15 @@ static void set_poll_line(nec_state_t *nec_state, int state)
 
 static CPU_DISASSEMBLE( nec )
 {
-	nec_state_t *nec_state = device->token;
+	nec_state_t *nec_state = get_safe_token(device);
 
 	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
 static void nec_init(const device_config *device, cpu_irq_callback irqcallback, int type)
 {
-	const nec_config *config = device->static_config ? device->static_config : &default_config;
-	nec_state_t *nec_state = device->token;
+	const nec_config *config = device->static_config ? (const nec_config *)device->static_config : &default_config;
+	nec_state_t *nec_state = get_safe_token(device);
 
 	nec_state->config = config;
 
@@ -1179,7 +1192,7 @@ static void configure_memory_16bit(nec_state_t *nec_state)
 
 static CPU_EXECUTE( necv )
 {
-	nec_state_t *nec_state = device->token;
+	nec_state_t *nec_state = get_safe_token(device);
 	int prev_ICount;
 
 	nec_state->icount=cycles;
@@ -1210,7 +1223,7 @@ static CPU_EXECUTE( necv )
 #if (HAS_V20||HAS_V25)
 static CPU_INIT( v20 )
 {
-	nec_state_t *nec_state = device->token;
+	nec_state_t *nec_state = get_safe_token(device);
 
 	nec_init(device, irqcallback, 0);
 	configure_memory_8bit(nec_state);
@@ -1223,7 +1236,7 @@ static CPU_INIT( v20 )
 #if (HAS_V30||HAS_V35)
 static CPU_INIT( v30 )
 {
-	nec_state_t *nec_state = device->token;
+	nec_state_t *nec_state = get_safe_token(device);
 
 	nec_init(device, irqcallback, 1);
 	configure_memory_16bit(nec_state);
@@ -1237,7 +1250,7 @@ static CPU_INIT( v30 )
 #if (HAS_V33)
 static CPU_INIT( v33 )
 {
-	nec_state_t *nec_state = device->token;
+	nec_state_t *nec_state = get_safe_token(device);
 
 	nec_init(device, irqcallback, 2);
 	nec_state->chip_type=V33;
@@ -1259,7 +1272,7 @@ static CPU_INIT( v33 )
 
 static CPU_SET_INFO( nec )
 {
-	nec_state_t *nec_state = device->token;
+	nec_state_t *nec_state = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1317,7 +1330,7 @@ static CPU_SET_INFO( nec )
 
 static CPU_GET_INFO( nec )
 {
-	nec_state_t *nec_state = (device != NULL) ? device->token : NULL;
+	nec_state_t *nec_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	int flags;
 
 	switch (state)

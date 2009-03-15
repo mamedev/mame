@@ -474,6 +474,20 @@ static const cpu_state_table state_table_template =
 
 
 
+INLINE m68ki_cpu_core *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_M68000 ||
+		   cpu_get_type(device) == CPU_M68008 ||
+		   cpu_get_type(device) == CPU_M68010 ||
+		   cpu_get_type(device) == CPU_M68EC020 ||
+		   cpu_get_type(device) == CPU_M68020 ||
+		   cpu_get_type(device) == CPU_M68040);
+	return (m68ki_cpu_core *)device->token;
+}
+
 /* ======================================================================== */
 /* ================================= API ================================== */
 /* ======================================================================== */
@@ -504,7 +518,7 @@ static void set_irq_line(m68ki_cpu_core *m68k, int irqline, int state)
 
 static void m68k_presave(running_machine *machine, void *param)
 {
-	m68ki_cpu_core *m68k = param;
+	m68ki_cpu_core *m68k = (m68ki_cpu_core *)param;
 	m68k->save_sr = m68ki_get_sr(m68k);
 	m68k->save_stopped = (m68k->stopped & STOP_LEVEL_STOP) != 0;
 	m68k->save_halted  = (m68k->stopped & STOP_LEVEL_HALT) != 0;
@@ -512,7 +526,7 @@ static void m68k_presave(running_machine *machine, void *param)
 
 static void m68k_postload(running_machine *machine, void *param)
 {
-	m68ki_cpu_core *m68k = param;
+	m68ki_cpu_core *m68k = (m68ki_cpu_core *)param;
 	m68ki_set_sr_noint_nosp(m68k, m68k->save_sr);
 	m68k->stopped = m68k->save_stopped ? STOP_LEVEL_STOP : 0
 		        | m68k->save_halted  ? STOP_LEVEL_HALT : 0;
@@ -523,7 +537,7 @@ static void m68k_postload(running_machine *machine, void *param)
 /* Execute some instructions until we use up cycles clock cycles */
 static CPU_EXECUTE( m68k )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	/* Set our pool of clock cycles available */
 	m68k->remaining_cycles = cycles;
@@ -572,7 +586,7 @@ static CPU_EXECUTE( m68k )
 static CPU_INIT( m68k )
 {
 	static UINT32 emulation_initialized = 0;
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	m68k->device = device;
 	m68k->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -614,7 +628,7 @@ static CPU_INIT( m68k )
 /* Pulse the RESET line on the CPU */
 static CPU_RESET( m68k )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	/* Clear all stop levels and eat up all remaining cycles */
 	m68k->stopped = 0;
@@ -650,7 +664,7 @@ static CPU_RESET( m68k )
 
 static CPU_DISASSEMBLE( m68k )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, m68k->dasm_type);
 }
 
@@ -662,7 +676,7 @@ static CPU_DISASSEMBLE( m68k )
 
 static CPU_IMPORT_STATE( m68k )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -700,7 +714,7 @@ static CPU_IMPORT_STATE( m68k )
 
 static CPU_EXPORT_STATE( m68k )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -728,7 +742,7 @@ static CPU_EXPORT_STATE( m68k )
 
 static CPU_SET_INFO( m68k )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -754,7 +768,7 @@ static CPU_SET_INFO( m68k )
 
 static CPU_GET_INFO( m68k )
 {
-	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
+	m68ki_cpu_core *m68k = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	int sr;
 
 	switch (state)
@@ -832,7 +846,7 @@ static CPU_GET_INFO( m68k )
 
 void m68k_set_encrypted_opcode_range(const device_config *device, offs_t start, offs_t end)
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 	m68k->encrypted_start = start;
 	m68k->encrypted_end = end;
 }
@@ -866,7 +880,7 @@ static const m68k_memory_interface interface_d8 =
 
 static UINT16 read_immediate_16(const address_space *space, offs_t address)
 {
-	m68ki_cpu_core *m68k = space->cpu->token;
+	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 	return memory_decrypted_read_word(space, (address) ^ m68k->memory.opcode_xor);
 }
 
@@ -972,7 +986,7 @@ static const m68k_memory_interface interface_d32 =
 
 static CPU_INIT( m68000 )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -1015,7 +1029,7 @@ CPU_GET_INFO( m68000 )
 
 static CPU_INIT( m68008 )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -1062,7 +1076,7 @@ CPU_GET_INFO( m68008 )
 
 static CPU_INIT( m68010 )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -1105,7 +1119,7 @@ CPU_GET_INFO( m68010 )
 
 static CPU_INIT( m68020 )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -1129,7 +1143,7 @@ static CPU_INIT( m68020 )
 
 CPU_GET_INFO( m68020 )
 {
-	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
+	m68ki_cpu_core *m68k = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	int sr;
 
 	switch (state)
@@ -1180,7 +1194,7 @@ CPU_GET_INFO( m68020 )
 
 static CPU_INIT( m68ec020 )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -1225,7 +1239,7 @@ CPU_GET_INFO( m68ec020 )
 
 static CPU_INIT( m68040 )
 {
-	m68ki_cpu_core *m68k = device->token;
+	m68ki_cpu_core *m68k = get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -1249,7 +1263,7 @@ static CPU_INIT( m68040 )
 
 CPU_GET_INFO( m68040 )
 {
-	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
+	m68ki_cpu_core *m68k = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	int sr;
 
 	switch (state)

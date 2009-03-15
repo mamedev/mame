@@ -73,16 +73,15 @@ enum
 };
 
 /* CKI bonding options */
-typedef enum _cop400_cki_bond cop400_cki_bond;
 enum _cop400_cki_bond {
 	COP400_CKI_DIVISOR_4 = 4,
 	COP400_CKI_DIVISOR_8 = 8,
 	COP400_CKI_DIVISOR_16 = 16,
 	COP400_CKI_DIVISOR_32 = 32
 };
+typedef enum _cop400_cki_bond cop400_cki_bond;
 
 /* CKO bonding options */
-typedef enum _cop400_cko_bond cop400_cko_bond;
 enum _cop400_cko_bond {
 	COP400_CKO_OSCILLATOR_OUTPUT = 0,
 	COP400_CKO_RAM_POWER_SUPPLY,
@@ -90,13 +89,14 @@ enum _cop400_cko_bond {
 	COP400_CKO_SYNC_INPUT,
 	COP400_CKO_GENERAL_PURPOSE_INPUT
 };
+typedef enum _cop400_cko_bond cop400_cko_bond;
 
 /* microbus bonding options */
-typedef enum _cop400_microbus cop400_microbus;
 enum _cop400_microbus {
 	COP400_MICROBUS_DISABLED = 0,
 	COP400_MICROBUS_ENABLED
 };
+typedef enum _cop400_microbus cop400_microbus;
 
 /* interface */
 typedef struct _cop400_interface cop400_interface;

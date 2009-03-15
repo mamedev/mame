@@ -435,6 +435,23 @@ static const UINT8 fcmp_cr_table_source[32] =
     INLINE FUNCTIONS
 ***************************************************************************/
 
+INLINE powerpc_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_PPC403GA ||
+		   cpu_get_type(device) == CPU_PPC403GCX ||
+		   cpu_get_type(device) == CPU_PPC601 ||
+		   cpu_get_type(device) == CPU_PPC602 ||
+		   cpu_get_type(device) == CPU_PPC603 ||
+		   cpu_get_type(device) == CPU_PPC603E ||
+		   cpu_get_type(device) == CPU_PPC603R ||
+		   cpu_get_type(device) == CPU_PPC604 ||
+		   cpu_get_type(device) == CPU_MPC8240);
+	return *(powerpc_state **)device->token;
+}
+
 /*-------------------------------------------------
     alloc_handle - allocate a handle if not
     already allocated
@@ -552,14 +569,14 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const 
 		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*ppc)));
 
 	/* allocate the core from the near cache */
-	*(powerpc_state **)device->token = ppc = drccache_memory_alloc_near(cache, sizeof(*ppc));
+	*(powerpc_state **)device->token = ppc = (powerpc_state *)drccache_memory_alloc_near(cache, sizeof(*ppc));
 	memset(ppc, 0, sizeof(*ppc));
 
 	/* initialize the core */
 	ppccom_init(ppc, flavor, cap, tb_divisor, device, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
-	ppc->impstate = drccache_memory_alloc_near(cache, sizeof(*ppc->impstate));
+	ppc->impstate = (ppcimp_state *)drccache_memory_alloc_near(cache, sizeof(*ppc->impstate));
 	memset(ppc->impstate, 0, sizeof(*ppc->impstate));
 	ppc->impstate->cache = cache;
 
@@ -670,7 +687,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const 
 
 static CPU_RESET( ppcdrc )
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 
 	/* reset the common code and mark the cache dirty */
 	ppccom_reset(ppc);
@@ -686,7 +703,7 @@ static CPU_RESET( ppcdrc )
 
 static CPU_EXECUTE( ppcdrc )
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 	drcuml_state *drcuml = ppc->impstate->drcuml;
 	int execute_result;
 
@@ -723,7 +740,7 @@ static CPU_EXECUTE( ppcdrc )
 
 static CPU_EXIT( ppcdrc )
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 	ppccom_exit(ppc);
 
 	/* clean up the DRC */
@@ -740,7 +757,7 @@ static CPU_EXIT( ppcdrc )
 
 static CPU_TRANSLATE( ppcdrc )
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 	return ppccom_translate_address(ppc, space, intention, address);
 }
 
@@ -751,7 +768,7 @@ static CPU_TRANSLATE( ppcdrc )
 
 static CPU_DISASSEMBLE( ppcdrc )
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 	return ppccom_dasm(ppc, buffer, pc, oprom, opram);
 }
 
@@ -763,7 +780,7 @@ static CPU_DISASSEMBLE( ppcdrc )
 
 static CPU_SET_INFO( ppcdrc )
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 
 	/* --- everything is handled generically --- */
 	ppccom_set_info(ppc, state, info);
@@ -777,7 +794,7 @@ static CPU_SET_INFO( ppcdrc )
 
 static CPU_GET_INFO( ppcdrc )
 {
-	powerpc_state *ppc = (device != NULL && device->token != NULL) ? *(powerpc_state **)device->token : NULL;
+	powerpc_state *ppc = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -808,7 +825,7 @@ static CPU_GET_INFO( ppcdrc )
 
 void ppcdrc_set_options(const device_config *device, UINT32 options)
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 	ppc->impstate->drcoptions = options;
 }
 
@@ -820,7 +837,7 @@ void ppcdrc_set_options(const device_config *device, UINT32 options)
 
 void ppcdrc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base)
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 	if (ppc->impstate->fastram_select < ARRAY_LENGTH(ppc->impstate->fastram))
 	{
 		ppc->impstate->fastram[ppc->impstate->fastram_select].start = start;
@@ -838,7 +855,7 @@ void ppcdrc_add_fastram(const device_config *device, offs_t start, offs_t end, U
 
 void ppcdrc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles)
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 	if (ppc->impstate->hotspot_select < ARRAY_LENGTH(ppc->impstate->hotspot))
 	{
 		ppc->impstate->hotspot[ppc->impstate->hotspot_select].pc = pc;
@@ -1032,7 +1049,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 
 static void cfunc_printf_exception(void *param)
 {
-	powerpc_state *ppc = param;
+	powerpc_state *ppc = (powerpc_state *)param;
 	printf("Exception: type=%2d EPC=%08X MSR=%08X\n", ppc->param0, ppc->spr[SPROEA_SRR0], ppc->spr[SPROEA_SRR1]);
 	cfunc_printf_probe(ppc);
 }
@@ -1045,7 +1062,7 @@ static void cfunc_printf_exception(void *param)
 
 static void cfunc_printf_debug(void *param)
 {
-	powerpc_state *ppc = param;
+	powerpc_state *ppc = (powerpc_state *)param;
 	printf(ppc->impstate->format, ppc->impstate->arg0, ppc->impstate->arg1);
 }
 
@@ -1057,7 +1074,7 @@ static void cfunc_printf_debug(void *param)
 
 static void cfunc_printf_probe(void *param)
 {
-	powerpc_state *ppc = param;
+	powerpc_state *ppc = (powerpc_state *)param;
 	UINT32 pc = (UINT32)(FPTR)param;
 
 	printf(" PC=%08X\n", pc);
@@ -1087,7 +1104,7 @@ static void cfunc_printf_probe(void *param)
 
 static void cfunc_unimplemented(void *param)
 {
-	powerpc_state *ppc = param;
+	powerpc_state *ppc = (powerpc_state *)param;
 	UINT32 opcode = ppc->impstate->arg0;
 	fatalerror("PC=%08X: Unimplemented op %08X", ppc->pc, opcode);
 }
@@ -1459,7 +1476,7 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I3 */
 	drcuml_state *drcuml = ppc->impstate->drcuml;
-	int fastxor = BYTE8_XOR_BE(0) >> (cpu_get_databus_width(ppc->device, ADDRESS_SPACE_PROGRAM) < 64);
+	int fastxor = BYTE8_XOR_BE(0) >> (int)(cpu_get_databus_width(ppc->device, ADDRESS_SPACE_PROGRAM) < 64);
 	drcuml_block *block;
 	jmp_buf errorbuf;
 	int translate_type;
@@ -4237,7 +4254,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 
 static CPU_GET_INFO( ppcdrc4xx )
 {
-	powerpc_state *ppc = (device != NULL && device->token != NULL) ? *(powerpc_state **)device->token : NULL;
+	powerpc_state *ppc = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	CPU_GET_INFO_CALL(ppcdrc);
 	ppc4xx_get_info(ppc, state, info);
 }
@@ -4250,7 +4267,7 @@ static CPU_GET_INFO( ppcdrc4xx )
 
 static CPU_SET_INFO( ppcdrc4xx )
 {
-	powerpc_state *ppc = *(powerpc_state **)device->token;
+	powerpc_state *ppc = get_safe_token(device);
 	CPU_SET_INFO_CALL(ppcdrc);
 	ppc4xx_set_info(ppc, state, info);
 }

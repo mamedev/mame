@@ -186,7 +186,7 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 
 void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, cpu_irq_callback irqcallback)
 {
-	const powerpc_config *config = device->static_config;
+	const powerpc_config *config = (const powerpc_config *)device->static_config;
 
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
@@ -429,7 +429,7 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	for (hashnum = 0; hashnum < 2; hashnum++)
 	{
 		offs_t ptegaddr = hashbase | ((hash << 6) & hashmask);
-		UINT32 *ptegptr = memory_get_read_ptr(ppc->program, ptegaddr);
+		UINT32 *ptegptr = (UINT32 *)memory_get_read_ptr(ppc->program, ptegaddr);
 
 		/* should only have valid memory here, but make sure */
 		if (ptegptr != NULL)
@@ -1246,7 +1246,7 @@ void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info)
 
 static TIMER_CALLBACK( decrementer_int_callback )
 {
-	powerpc_state *ppc = ptr;
+	powerpc_state *ppc = (powerpc_state *)ptr;
 	UINT64 cycles_until_next;
 
 	/* set the decrementer IRQ state */
@@ -1506,7 +1506,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 
 static TIMER_CALLBACK( ppc4xx_fit_callback )
 {
-	powerpc_state *ppc = ptr;
+	powerpc_state *ppc = (powerpc_state *)ptr;
 
 	/* if this is a real callback and we are enabled, signal an interrupt */
 	if (param)
@@ -1536,7 +1536,7 @@ static TIMER_CALLBACK( ppc4xx_fit_callback )
 
 static TIMER_CALLBACK( ppc4xx_pit_callback )
 {
-	powerpc_state *ppc = ptr;
+	powerpc_state *ppc = (powerpc_state *)ptr;
 
 	/* if this is a real callback and we are enabled, signal an interrupt */
 	if (param)
@@ -1647,7 +1647,7 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 
 static TIMER_CALLBACK( ppc4xx_spu_callback )
 {
-	powerpc_state *ppc = ptr;
+	powerpc_state *ppc = (powerpc_state *)ptr;
 
 	/* transmit enabled? */
 	if (ppc->spu.regs[SPU4XX_TX_COMMAND] & 0x80)

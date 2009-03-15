@@ -104,6 +104,18 @@ struct _pic16c5x_state
 	const	address_space *io;
 };
 
+INLINE pic16c5x_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_PIC16C54 ||
+		   cpu_get_type(device) == CPU_PIC16C55 ||
+		   cpu_get_type(device) == CPU_PIC16C56 ||
+		   cpu_get_type(device) == CPU_PIC16C57 ||
+		   cpu_get_type(device) == CPU_PIC16C58);
+	return (pic16c5x_state *)device->token;
+}
 
 /* opcode table entry */
 typedef struct _pic16c5x_opcode pic16c5x_opcode;
@@ -734,7 +746,7 @@ static const pic16c5x_opcode_00x opcode_00x[16]=
 
 static CPU_INIT( pic16c5x )
 {
-	pic16c5x_state *cpustate = device->token;
+	pic16c5x_state *cpustate = get_safe_token(device);
 
 	state_save_register_device_item(device, 0, cpustate->W);
 	state_save_register_device_item(device, 0, cpustate->ALU);
@@ -805,7 +817,7 @@ static void pic16c5x_soft_reset(pic16c5x_state *cpustate)
 
 void pic16c5x_set_config(const device_config *cpu, int data)
 {
-	pic16c5x_state *cpustate = cpu->token;
+	pic16c5x_state *cpustate = get_safe_token(cpu);
 
 	logerror("Writing %04x to the PIC16C5x config register\n",data);
 	cpustate->temp_config = (data & 0xfff);
@@ -889,7 +901,7 @@ static void pic16c5x_update_timer(pic16c5x_state *cpustate, int counts)
 
 static CPU_EXECUTE( pic16c5x )
 {
-	pic16c5x_state *cpustate = device->token;
+	pic16c5x_state *cpustate = get_safe_token(device);
 	int T0_in;
 	cpustate->icount = cycles;
 
@@ -964,7 +976,7 @@ static CPU_EXECUTE( pic16c5x )
 
 static CPU_SET_INFO( pic16c5x )
 {
-	pic16c5x_state *cpustate = device->token;
+	pic16c5x_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -998,7 +1010,7 @@ static CPU_SET_INFO( pic16c5x )
 
 static CPU_GET_INFO( pic16c5x )
 {
-	pic16c5x_state *cpustate = (device != NULL) ? device->token : NULL;
+	pic16c5x_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1118,7 +1130,7 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16c54 )
 {
-	pic16c5x_state *cpustate = device->token;
+	pic16c5x_state *cpustate = get_safe_token(device);
 
 	cpustate->picmodel = 0x16C54;
 	cpustate->picRAMmask = 0x1f;
@@ -1172,7 +1184,7 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16c55 )
 {
-	pic16c5x_state *cpustate = device->token;
+	pic16c5x_state *cpustate = get_safe_token(device);
 
 	cpustate->picmodel = 0x16C55;
 	cpustate->picRAMmask = 0x1f;
@@ -1226,7 +1238,7 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16c56 )
 {
-	pic16c5x_state *cpustate = device->token;
+	pic16c5x_state *cpustate = get_safe_token(device);
 
 	cpustate->picmodel = 0x16C56;
 	cpustate->picRAMmask = 0x1f;
@@ -1285,7 +1297,7 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16c57 )
 {
-	pic16c5x_state *cpustate = device->token;
+	pic16c5x_state *cpustate = get_safe_token(device);
 
 	cpustate->picmodel = 0x16C57;
 	cpustate->picRAMmask = 0x7f;
@@ -1345,7 +1357,7 @@ ADDRESS_MAP_END
 
 static CPU_RESET( pic16c58 )
 {
-	pic16c5x_state *cpustate = device->token;
+	pic16c5x_state *cpustate = get_safe_token(device);
 
 	cpustate->picmodel = 0x16C58;
 	cpustate->picRAMmask = 0x7f;

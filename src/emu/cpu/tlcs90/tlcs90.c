@@ -10,7 +10,8 @@
 #include "cpuexec.h"
 #include "tlcs90.h"
 
-typedef enum					{	UNKNOWN,	NOP,	EX,		EXX,	LD,		LDW,	LDA,	LDI,	LDIR,	LDD,	LDDR,	CPI,	CPIR,	CPD,	CPDR,	PUSH,	POP,	JP,		JR,		CALL,	CALLR,		RET,	RETI,	HALT,	DI,		EI,		SWI,	DAA,	CPL,	NEG,	LDAR,	RCF,	SCF,	CCF,	TSET,	BIT,	SET,	RES,	INC,	DEC,	INCX,	DECX,	INCW,	DECW,	ADD,	ADC,	SUB,	SBC,	AND,	XOR,	OR,		CP,		RLC,	RRC,	RL,		RR,		SLA,	SRA,	SLL,	SRL,	RLD,	RRD,	DJNZ,	MUL,	DIV		}	e_op;
+typedef enum					{	UNKNOWN,	NOP,	EX,		EXX,	LD,		LDW,	LDA,	LDI,	LDIR,	LDD,	LDDR,	CPI,	CPIR,	CPD,	CPDR,	PUSH,	POP,	JP,		JR,		CALL,	CALLR,		RET,	RETI,	HALT,	DI,		EI,		SWI,	DAA,	CPL,	NEG,	LDAR,	RCF,	SCF,	CCF,	TSET,	BIT,	SET,	RES,	INC,	DEC,	INCX,	DECX,	INCW,	DECW,	ADD,	ADC,	SUB,	SBC,	AND,	XOR,	OR,		CP,		RLC,	RRC,	RL,		RR,		SLA,	SRA,	SLL,	SRL,	RLD,	RRD,	DJNZ,	MUL,	DIV		}	_e_op;
+typedef UINT8 e_op;
 static const char *const op_names[] =	{	"??",		"nop",	"ex",	"exx",	"ld",	"ldw",	"lda",	"ldi",	"ldir",	"ldd",	"lddr",	"cpi",	"cpir",	"cpd",	"cpdr",	"push",	"pop",	"jp",	"jr",	"call",	"callr",	"ret",	"reti",	"halt",	"di",	"ei",	"swi",	"daa",	"cpl",	"neg",	"ldar",	"rcf",	"scf",	"ccf",	"tset",	"bit",	"set",	"res",	"inc",	"dec",	"incx",	"decx",	"incw",	"decw",	"add",	"adc",	"sub",	"sbc",	"and",	"xor",	"or",	"cp",	"rlc",	"rrc",	"rl",	"rr",	"sla",	"sra",	"sll",	"srl",	"rld",	"rrd",	"djnz",	"mul",	"div"	};
 
 typedef enum	{
@@ -58,6 +59,18 @@ typedef struct
 	UINT32	addr;
 
 }	t90_Regs;
+
+INLINE t90_Regs *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_TMP90840 ||
+		   cpu_get_type(device) == CPU_TMP90841 ||
+		   cpu_get_type(device) == CPU_TMP91640 ||
+		   cpu_get_type(device) == CPU_TMP91641);
+	return (t90_Regs *)device->token;
+}
 
 enum	{
 		T90_B,	T90_C,	T90_D,	T90_E,	T90_H,	T90_L,	T90_A,
@@ -997,7 +1010,7 @@ static int sprint_arg(char *buffer, UINT32 pc, const char *pre, const e_mode mod
 
 CPU_DISASSEMBLE( t90 )
 {
-	t90_Regs *cpustate = device->token;
+	t90_Regs *cpustate = get_safe_token(device);
 	int len;
 
 	cpustate->addr = pc;
@@ -1268,6 +1281,7 @@ INT2        P82         Rising Edge     -
 *************************************************************************************************************/
 
 typedef enum	{	INTSWI = 0,	INTNMI,	INTWD,	INT0,	INTT0,	INTT1,	INTT2,	INTT3,	INTT4,	INT1,	INTT5,	INT2,	INTRX,	INTTX,	INTMAX	}	e_irq;
+DECLARE_ENUM_OPERATORS(e_irq)
 
 INLINE void leave_halt(t90_Regs *cpustate)
 {
@@ -1326,7 +1340,7 @@ INLINE void Cyc_f(t90_Regs *cpustate)	{	cpustate->icount -= cpustate->cyc_f;	}
 
 static CPU_EXECUTE( t90 )
 {
-	t90_Regs *cpustate = device->token;
+	t90_Regs *cpustate = get_safe_token(device);
 	UINT8    a8,b8;
 	UINT16   a16,b16;
 	unsigned a32;
@@ -1968,7 +1982,7 @@ static CPU_EXECUTE( t90 )
 
 static CPU_RESET( t90 )
 {
-	t90_Regs *cpustate = device->token;
+	t90_Regs *cpustate = get_safe_token(device);
 	cpustate->irq_state = 0;
 	cpustate->irq_mask = 0;
 	cpustate->pc.d = 0x0000;
@@ -1988,7 +2002,7 @@ static CPU_EXIT( t90 )
 
 static CPU_BURN( t90 )
 {
-	t90_Regs *cpustate = device->token;
+	t90_Regs *cpustate = get_safe_token(device);
 	cpustate->icount -= 4 * ((cycles + 3) / 4);
 }
 
@@ -2266,7 +2280,7 @@ FFED    BX      R/W     Reset   Description
 
 static READ8_HANDLER( t90_internal_registers_r )
 {
-	t90_Regs *cpustate = space->cpu->token;
+	t90_Regs *cpustate = get_safe_token(space->cpu);
 
 	#define RIO		memory_read_byte_8le( cpustate->io, T90_IOBASE+offset )
 
@@ -2378,7 +2392,7 @@ static void t90_stop_timer4(t90_Regs *cpustate)
 
 static TIMER_CALLBACK( t90_timer_callback )
 {
-	t90_Regs *cpustate = ptr;
+	t90_Regs *cpustate = (t90_Regs *)ptr;
 	int is16bit;
 	int i = param;
 
@@ -2450,7 +2464,7 @@ static TIMER_CALLBACK( t90_timer4_callback )
 {
 //  logerror("CPU Timer 4 fired! value = %d\n", (unsigned)cpustate->timer_value[4]);
 
-	t90_Regs *cpustate = ptr;
+	t90_Regs *cpustate = (t90_Regs *)ptr;
 	cpustate->timer4_value++;
 
 	// Match
@@ -2480,7 +2494,7 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 {
 	#define WIO		memory_write_byte_8le( cpustate->io, T90_IOBASE+offset, data )
 
-	t90_Regs *cpustate = space->cpu->token;
+	t90_Regs *cpustate = get_safe_token(space->cpu);
 	UINT8 out_mask;
 	UINT8 old = cpustate->internal_registers[offset];
 	switch ( T90_IOBASE + offset )
@@ -2617,7 +2631,7 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 
 static CPU_INIT( t90 )
 {
-	t90_Regs *cpustate = device->token;
+	t90_Regs *cpustate = get_safe_token(device);
 	int i, p;
 
 //  state_save_register_device_item(device, 0, Z80.prvpc.w.l);
@@ -2691,7 +2705,7 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( t90 )
 {
-	t90_Regs *cpustate = device->token;
+	t90_Regs *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -2724,7 +2738,7 @@ static CPU_SET_INFO( t90 )
 
 CPU_GET_INFO( tmp90840 )
 {
-	t90_Regs *cpustate = (device != NULL) ? device->token : NULL;
+	t90_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

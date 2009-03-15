@@ -55,6 +55,14 @@ struct _ssp1601_state_t
 	const address_space *io;
 };
 
+INLINE ssp1601_state_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_SSP1601);
+	return (ssp1601_state_t *)device->token;
+}
 
 
 
@@ -502,7 +510,7 @@ static UINT32 ptr2_read(ssp1601_state_t *ssp1601_state, int op)
 
 static CPU_INIT( ssp1601 )
 {
-	ssp1601_state_t *ssp1601_state = device->token;
+	ssp1601_state_t *ssp1601_state = get_safe_token(device);
 
 	state_save_register_device_item(device, 0, rX);
 	state_save_register_device_item(device, 0, rY);
@@ -532,7 +540,7 @@ static CPU_EXIT( ssp1601 )
 
 static CPU_RESET( ssp1601 )
 {
-	ssp1601_state_t *ssp1601_state = device->token;
+	ssp1601_state_t *ssp1601_state = get_safe_token(device);
 
 	rPC = 0x400;
 	rSTACK = 0; // ? using ascending stack
@@ -542,7 +550,7 @@ static CPU_RESET( ssp1601 )
 
 static CPU_EXECUTE( ssp1601 )
 {
-	ssp1601_state_t *ssp1601_state = device->token;
+	ssp1601_state_t *ssp1601_state = get_safe_token(device);
 
 	ssp1601_state->g_cycles = cycles;
 
@@ -758,7 +766,7 @@ static CPU_EXECUTE( ssp1601 )
 
 static CPU_DISASSEMBLE( ssp1601 )
 {
-	//ssp1601_state_t *ssp1601_state = device->token;
+	//ssp1601_state_t *ssp1601_state = get_safe_token(device);
 
 	return dasm_ssp1601(buffer, pc, oprom);
 }
@@ -767,7 +775,7 @@ static CPU_DISASSEMBLE( ssp1601 )
 
 static CPU_SET_INFO( ssp1601 )
 {
-	ssp1601_state_t *ssp1601_state = device->token;
+	ssp1601_state_t *ssp1601_state = get_safe_token(device);
 
 	switch (state)
 	{
@@ -808,7 +816,7 @@ static CPU_SET_INFO( ssp1601 )
 
 CPU_GET_INFO( ssp1601 )
 {
-	ssp1601_state_t *ssp1601_state = (device != NULL) ? device->token : NULL;
+	ssp1601_state_t *ssp1601_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

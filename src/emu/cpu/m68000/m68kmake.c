@@ -1213,7 +1213,7 @@ static void read_insert(char* insert)
 /* ============================= MAIN FUNCTION ============================ */
 /* ======================================================================== */
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
 	/* File stuff */
 	char output_path[M68K_MAX_DIR] = "";

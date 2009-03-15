@@ -63,6 +63,15 @@ struct _hc11_state
 	int internal_ram_size;
 };
 
+INLINE hc11_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_MC68HC11);
+	return (hc11_state *)device->token;
+}
+
 #define HC11OP(XX)		hc11_##XX
 
 /*****************************************************************************/
@@ -316,7 +325,7 @@ static void (*hc11_optable_page4[256])(hc11_state *cpustate);
 
 static CPU_INIT( hc11 )
 {
-	hc11_state *cpustate = device->token;
+	hc11_state *cpustate = get_safe_token(device);
 	int i;
 
 	/* clear the opcode tables */
@@ -347,7 +356,7 @@ static CPU_INIT( hc11 )
 	}
 
 	cpustate->internal_ram_size = 1280;		/* FIXME: this is for MC68HC11M0 */
-	cpustate->internal_ram = auto_malloc(cpustate->internal_ram_size);
+	cpustate->internal_ram = (UINT8 *)auto_malloc(cpustate->internal_ram_size);
 
 	cpustate->reg_position = 0;
 	cpustate->ram_position = 0x100;
@@ -359,7 +368,7 @@ static CPU_INIT( hc11 )
 
 static CPU_RESET( hc11 )
 {
-	hc11_state *cpustate = device->token;
+	hc11_state *cpustate = get_safe_token(device);
 	cpustate->pc = READ16(cpustate, 0xfffe);
 }
 
@@ -370,7 +379,7 @@ static CPU_EXIT( hc11 )
 
 static CPU_EXECUTE( hc11 )
 {
-	hc11_state *cpustate = device->token;
+	hc11_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -392,7 +401,7 @@ static CPU_EXECUTE( hc11 )
 
 static CPU_SET_INFO( mc68hc11 )
 {
-	hc11_state *cpustate = device->token;
+	hc11_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -409,7 +418,7 @@ static CPU_SET_INFO( mc68hc11 )
 
 CPU_GET_INFO( mc68hc11 )
 {
-	hc11_state *cpustate = (device != NULL) ? device->token : NULL;
+	hc11_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

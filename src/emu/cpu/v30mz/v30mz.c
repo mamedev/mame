@@ -92,6 +92,15 @@ struct _v30mz_state
 	UINT16 e16;
 };
 
+INLINE v30mz_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_V30MZ);
+	return (v30mz_state *)device->token;
+}
+
 /***************************************************************************/
 /* cpu state                                                               */
 /***************************************************************************/
@@ -113,7 +122,7 @@ static UINT8 parity_table[256];
 
 static CPU_RESET( nec )
 {
-	v30mz_state *cpustate = device->token;
+	v30mz_state *cpustate = get_safe_token(device);
     unsigned int i,j,c;
     static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 	cpu_irq_callback save_irqcallback;
@@ -915,7 +924,7 @@ static CPU_DISASSEMBLE( nec )
 
 static void nec_init(const device_config *device, cpu_irq_callback irqcallback, int type)
 {
-	v30mz_state *cpustate = device->token;
+	v30mz_state *cpustate = get_safe_token(device);
 
 	state_save_register_device_item_array(device, 0, cpustate->regs.w);
 	state_save_register_device_item_array(device, 0, cpustate->sregs);
@@ -945,7 +954,7 @@ static void nec_init(const device_config *device, cpu_irq_callback irqcallback, 
 static CPU_INIT( v30mz ) { nec_init(device, irqcallback, 3); }
 static CPU_EXECUTE( v30mz )
 {
-	v30mz_state *cpustate = device->token;
+	v30mz_state *cpustate = get_safe_token(device);
 
 	cpustate->icount=cycles;
 
@@ -977,7 +986,7 @@ static CPU_EXECUTE( v30mz )
 
 static CPU_SET_INFO( nec )
 {
-	v30mz_state *cpustate = device->token;
+	v30mz_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1033,7 +1042,7 @@ static CPU_SET_INFO( nec )
 
 CPU_GET_INFO( v30mz )
 {
-	v30mz_state *cpustate = (device != NULL) ? device->token : NULL;
+	v30mz_state *cpustate = (device != NULL && device != NULL) ? get_safe_token(device) : NULL;
 	int flags;
 
 	switch (state)

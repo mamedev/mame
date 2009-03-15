@@ -564,7 +564,6 @@ struct _m68ki_cpu_core
 	int  initial_cycles;
 	int  remaining_cycles;                     /* Number of clocks remaining */
 	UINT32 tracing;
-	UINT32 address_space;
 
 	jmp_buf aerr_trap;
 	UINT32    aerr_address;

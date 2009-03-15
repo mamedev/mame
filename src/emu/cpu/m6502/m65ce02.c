@@ -80,6 +80,15 @@ struct 	_m65ce02_Regs {
 	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
 };
 
+INLINE m65ce02_Regs *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_M65CE02);
+	return (m65ce02_Regs *)device->token;
+}
+
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
@@ -91,7 +100,7 @@ static void default_wdmem_id(const address_space *space, offs_t address, UINT8 d
 
 static CPU_INIT( m65ce02 )
 {
-	m65ce02_Regs *cpustate = device->token;
+	m65ce02_Regs *cpustate = get_safe_token(device);
 
 	cpustate->rdmem_id = default_rdmem_id;
 	cpustate->wrmem_id = default_wdmem_id;
@@ -102,7 +111,7 @@ static CPU_INIT( m65ce02 )
 
 static CPU_RESET( m65ce02 )
 {
-	m65ce02_Regs *cpustate = device->token;
+	m65ce02_Regs *cpustate = get_safe_token(device);
 
 	cpustate->insn = insn65ce02;
 
@@ -148,7 +157,7 @@ INLINE void m65ce02_take_irq(m65ce02_Regs *cpustate)
 
 static CPU_EXECUTE( m65ce02 )
 {
-	m65ce02_Regs *cpustate = device->token;
+	m65ce02_Regs *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -227,7 +236,7 @@ static void m65ce02_set_irq_line(m65ce02_Regs *cpustate, int irqline, int state)
 
 static CPU_SET_INFO( m65ce02 )
 {
-	m65ce02_Regs *cpustate = device->token;
+	m65ce02_Regs *cpustate = get_safe_token(device);
 
 	switch( state )
  	{
@@ -260,7 +269,7 @@ static CPU_SET_INFO( m65ce02 )
 
 CPU_GET_INFO( m65ce02 )
 {
-	m65ce02_Regs *cpustate = (device != NULL) ? device->token : NULL;
+	m65ce02_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch( state )
 	{

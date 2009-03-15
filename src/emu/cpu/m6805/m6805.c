@@ -66,6 +66,17 @@ typedef struct
 	int		nmi_state;
 } m6805_Regs;
 
+INLINE m6805_Regs *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_M6805 ||
+		   cpu_get_type(device) == CPU_M68705 ||
+		   cpu_get_type(device) == CPU_HD63705);
+	return (m6805_Regs *)device->token;
+}
+
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
@@ -452,7 +463,7 @@ static void state_register(m6805_Regs *cpustate, const char *type, const device_
 
 static CPU_INIT( m6805 )
 {
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 
 	state_register(cpustate, "m6805", device);
 	cpustate->irq_callback = irqcallback;
@@ -462,7 +473,7 @@ static CPU_INIT( m6805 )
 
 static CPU_RESET( m6805 )
 {
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 
 	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(m6805_Regs));
@@ -509,7 +520,7 @@ static void set_irq_line( m6805_Regs *cpustate,	int irqline, int state )
 static CPU_EXECUTE( m6805 )
 {
 	UINT8 ireg;
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 
 	S = SP_ADJUST( S );		/* Taken from CPU_SET_CONTEXT when pointer'afying */
 	cpustate->iCount = cycles;
@@ -809,7 +820,7 @@ static CPU_EXECUTE( m6805 )
 #if (HAS_M68705)
 static CPU_INIT( m68705 )
 {
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 	state_register(cpustate, "m68705", device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -817,7 +828,7 @@ static CPU_INIT( m68705 )
 
 static CPU_RESET( m68705 )
 {
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 	CPU_RESET_CALL(m6805);
 
 	/* Overide default 6805 type */
@@ -840,7 +851,7 @@ static void m68705_set_irq_line(m6805_Regs *cpustate, int irqline, int state)
 #if (HAS_HD63705)
 static CPU_INIT( hd63705 )
 {
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 	state_register(cpustate, "hd63705", device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -848,7 +859,7 @@ static CPU_INIT( hd63705 )
 
 static CPU_RESET( hd63705 )
 {
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 	CPU_RESET_CALL(m6805);
 
 	/* Overide default 6805 types */
@@ -886,7 +897,7 @@ static void hd63705_set_irq_line(m6805_Regs *cpustate, int irqline, int state)
 
 static CPU_SET_INFO( m6805 )
 {
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -911,7 +922,7 @@ static CPU_SET_INFO( m6805 )
 
 CPU_GET_INFO( m6805 )
 {
-	m6805_Regs *cpustate = (device != NULL) ? device->token : NULL;
+	m6805_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -993,7 +1004,7 @@ CPU_GET_INFO( m6805 )
  **************************************************************************/
 static CPU_SET_INFO( m68705 )
 {
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 
 	switch(state)
 	{
@@ -1006,7 +1017,7 @@ static CPU_SET_INFO( m68705 )
 
 CPU_GET_INFO( m68705 )
 {
-	m6805_Regs *cpustate = (device != NULL) ? device->token : NULL;
+	m6805_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1034,7 +1045,7 @@ CPU_GET_INFO( m68705 )
 
 static CPU_SET_INFO( hd63705 )
 {
-	m6805_Regs *cpustate = device->token;
+	m6805_Regs *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1055,7 +1066,7 @@ static CPU_SET_INFO( hd63705 )
 
 CPU_GET_INFO( hd63705 )
 {
-	m6805_Regs *cpustate = (device != NULL) ? device->token : NULL;
+	m6805_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

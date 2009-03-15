@@ -60,6 +60,19 @@ struct _mb88_state
     int icount;
 };
 
+INLINE mb88_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_MB88 ||
+		   cpu_get_type(device) == CPU_MB8841 ||
+		   cpu_get_type(device) == CPU_MB8842 ||
+		   cpu_get_type(device) == CPU_MB8843 ||
+		   cpu_get_type(device) == CPU_MB8844);
+	return (mb88_state *)device->token;
+}
+
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -99,7 +112,7 @@ struct _mb88_state
 
 static CPU_INIT( mb88 )
 {
-	mb88_state *cpustate = device->token;
+	mb88_state *cpustate = get_safe_token(device);
 
 	if ( device->static_config )
 	{
@@ -138,7 +151,7 @@ static CPU_INIT( mb88 )
 
 static CPU_RESET( mb88 )
 {
-	mb88_state *cpustate = device->token;
+	mb88_state *cpustate = get_safe_token(device);
 
 	/* zero registers and flags */
 	cpustate->PC = 0;
@@ -216,7 +229,7 @@ static void update_pio( mb88_state *cpustate )
 
 static CPU_EXECUTE( mb88 )
 {
-	mb88_state *cpustate = device->token;
+	mb88_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -737,7 +750,7 @@ static CPU_EXECUTE( mb88 )
 
 static CPU_SET_INFO( mb88 )
 {
-	mb88_state *cpustate = device->token;
+	mb88_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -776,7 +789,7 @@ static CPU_SET_INFO( mb88 )
 
 CPU_GET_INFO( mb88 )
 {
-	mb88_state *cpustate = (device != NULL) ? device->token : NULL;
+	mb88_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

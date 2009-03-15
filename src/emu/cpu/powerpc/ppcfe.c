@@ -129,7 +129,7 @@ INLINE int is_603_class(const powerpc_state *ppc)
 
 int ppcfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 {
-	powerpc_state *ppc = param;
+	powerpc_state *ppc = (powerpc_state *)param;
 	UINT32 op, opswitch;
 	int regnum;
 

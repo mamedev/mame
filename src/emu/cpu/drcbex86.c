@@ -538,7 +538,7 @@ static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, const 
 	drcbe_state *drcbe;
 
 	/* allocate space in the cache for our state */
-	drcbe = drccache_memory_alloc(cache, sizeof(*drcbe));
+	drcbe = (drcbe_state *)drccache_memory_alloc(cache, sizeof(*drcbe));
 	if (drcbe == NULL)
 		return NULL;
 	memset(drcbe, 0, sizeof(*drcbe));
@@ -700,22 +700,26 @@ static void drcbex86_reset(drcbe_state *drcbe)
 	emit_mov_m32_r32(dst, MBD(REG_ECX, offsetof(drcuml_machine_state, exp)), REG_EAX);	// mov    state->exp,eax
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.r); regnum++)
 	{
+		int regoffsl = (int)&((drcuml_machine_state *)NULL)->r[regnum].w.l;
+		int regoffsh = (int)&((drcuml_machine_state *)NULL)->r[regnum].w.h;
 		if (int_register_map[regnum] != 0)
-			emit_mov_m32_r32(dst, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.l)), int_register_map[regnum]);
+			emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsl), int_register_map[regnum]);
 		else
 		{
 			emit_mov_r32_m32(dst, REG_EAX, MABS(&drcbe->state.r[regnum].w.l));
-			emit_mov_m32_r32(dst, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.l)), REG_EAX);
+			emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsl), REG_EAX);
 		}
 		emit_mov_r32_m32(dst, REG_EAX, MABS(&drcbe->state.r[regnum].w.h));
-		emit_mov_m32_r32(dst, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.h)), REG_EAX);
+		emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsh), REG_EAX);
 	}
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.f); regnum++)
 	{
+		int regoffsl = (int)&((drcuml_machine_state *)NULL)->f[regnum].s.l;
+		int regoffsh = (int)&((drcuml_machine_state *)NULL)->f[regnum].s.h;
 		emit_mov_r32_m32(dst, REG_EAX, MABS(&drcbe->state.f[regnum].s.l));
-		emit_mov_m32_r32(dst, MBD(REG_ECX, offsetof(drcuml_machine_state, f[regnum].s.l)), REG_EAX);
+		emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsl), REG_EAX);
 		emit_mov_r32_m32(dst, REG_EAX, MABS(&drcbe->state.f[regnum].s.h));
-		emit_mov_m32_r32(dst, MBD(REG_ECX, offsetof(drcuml_machine_state, f[regnum].s.h)), REG_EAX);
+		emit_mov_m32_r32(dst, MBD(REG_ECX, regoffsh), REG_EAX);
 	}
 	emit_ret(dst);																		// ret
 	if (drcbe->log != NULL && !drcbe->logged_common)
@@ -725,21 +729,25 @@ static void drcbex86_reset(drcbe_state *drcbe)
 	drcbe->restore = *dst;
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.r); regnum++)
 	{
+		int regoffsl = (int)&((drcuml_machine_state *)NULL)->r[regnum].w.l;
+		int regoffsh = (int)&((drcuml_machine_state *)NULL)->r[regnum].w.h;
 		if (int_register_map[regnum] != 0)
-			emit_mov_r32_m32(dst, int_register_map[regnum], MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.l)));
+			emit_mov_r32_m32(dst, int_register_map[regnum], MBD(REG_ECX, regoffsl));
 		else
 		{
-			emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.l)));
+			emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, regoffsl));
 			emit_mov_m32_r32(dst, MABS(&drcbe->state.r[regnum].w.l), REG_EAX);
 		}
-		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.h)));
+		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, regoffsh));
 		emit_mov_m32_r32(dst, MABS(&drcbe->state.r[regnum].w.h), REG_EAX);
 	}
 	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.f); regnum++)
 	{
-		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, f[regnum].s.l)));
+		int regoffsl = (int)&((drcuml_machine_state *)NULL)->f[regnum].s.l;
+		int regoffsh = (int)&((drcuml_machine_state *)NULL)->f[regnum].s.h;
+		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, regoffsl));
 		emit_mov_m32_r32(dst, MABS(&drcbe->state.f[regnum].s.l), REG_EAX);
-		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, f[regnum].s.h)));
+		emit_mov_r32_m32(dst, REG_EAX, MBD(REG_ECX, regoffsh));
 		emit_mov_m32_r32(dst, MABS(&drcbe->state.f[regnum].s.h), REG_EAX);
 	}
 	emit_movzx_r32_m8(dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, fmod)));// movzx eax,state->fmod
@@ -3014,7 +3022,7 @@ static void emit_fstp_p(x86code **dst, int size, const drcuml_parameter *param)
 
 static void fixup_label(void *parameter, drccodeptr labelcodeptr)
 {
-	drccodeptr src = parameter;
+	drccodeptr src = (drccodeptr)parameter;
 
 	/* find the end of the instruction */
 	if (src[0] == 0xe3)
@@ -3045,9 +3053,9 @@ static void fixup_label(void *parameter, drccodeptr labelcodeptr)
 static void fixup_exception(drccodeptr *codeptr, void *param1, void *param2, void *param3)
 {
 	drcuml_parameter handp, exp;
-	drcbe_state *drcbe = param1;
-	drccodeptr src = param2;
-	const drcuml_instruction *inst = param3;
+	drcbe_state *drcbe = (drcbe_state *)param1;
+	drccodeptr src = (drccodeptr)param2;
+	const drcuml_instruction *inst = (const drcuml_instruction *)param3;
 	drccodeptr dst = *codeptr;
 	drccodeptr *targetptr;
 

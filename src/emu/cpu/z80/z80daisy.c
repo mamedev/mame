@@ -29,7 +29,7 @@ z80_daisy_state *z80daisy_init(const device_config *cpudevice, const z80_daisy_c
 	/* create a linked list of devices */
 	for ( ; daisy->devname != NULL; daisy++)
 	{
-		*tailptr = auto_malloc(sizeof(**tailptr));
+		*tailptr = (z80_daisy_state *)auto_malloc(sizeof(**tailptr));
 		(*tailptr)->next = NULL;
 		(*tailptr)->device = devtag_get_device(cpudevice->machine, device_inherit_tag(tempstring, cpudevice->tag, daisy->devname));
 		if ((*tailptr)->device == NULL)

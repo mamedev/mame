@@ -5369,7 +5369,7 @@ static offs_t Dasm( char *buffer, offs_t pc, const struct dasm_s *dasmXX, const 
 	UINT32 flags = 0;
 
 	t = dasmXX[op].token;
-	a = dasmXX[op].args;
+	a = (const char *)dasmXX[op].args;
 
 	/* 0 token means prefix opcode (use table from args) */
 	if (0 == t)
@@ -5378,7 +5378,7 @@ static offs_t Dasm( char *buffer, offs_t pc, const struct dasm_s *dasmXX, const 
 
 		op2 = oprom[idx++];
 		t = p_dasm[op2].token;
-		a = p_dasm[op2].args;
+		a = (const char *)p_dasm[op2].args;
 	}
 
 	buffer += sprintf(buffer, "%-8.8s", token[t]);

@@ -1874,7 +1874,7 @@ static size_t dsp56k_op_cmpm(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 		if (absS &  U64(0x0000000080000000))
 			absS |= U64(0xffffffff80000000);
 	}
-	absS = abs(absS);
+	absS = (absS < 0) ? -absS : absS;
 
 	/* Sign extend and get absolute value of the destination */
 	if (D.addr == &A || D.addr == &B)
@@ -1889,7 +1889,7 @@ static size_t dsp56k_op_cmpm(dsp56k_core* cpustate, const UINT16 op_byte, typed_
 		if (absS &  U64(0x0000000080000000))
 			absS |= U64(0xffffffff80000000);
 	}
-	absD = abs(absD);
+	absD = (absD < 0) ? -absD : absD;
 
 	/* Compare */
 	absResult = absD - absS;

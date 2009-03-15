@@ -3,6 +3,7 @@
 #ifndef __I386_H__
 #define __I386_H__
 
+#include "i386.h"
 #include "cpuintrf.h"
 
 #define I386OP(XX)		i386_##XX
@@ -280,6 +281,17 @@ struct _i386_state
 	UINT8 *cycle_table_rm;
 };
 
+INLINE i386_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_I386 ||
+		   cpu_get_type(device) == CPU_I486 ||
+		   cpu_get_type(device) == CPU_PENTIUM ||
+		   cpu_get_type(device) == CPU_MEDIAGX);
+	return (i386_state *)device->token;
+}
 
 extern int i386_parity_table[256];
 

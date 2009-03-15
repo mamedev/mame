@@ -152,7 +152,20 @@ struct _m6800_state
 
 };
 
-//static void *token; /* for READ8/WRITE8 handlers */
+INLINE m6800_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_M6800 ||
+		   cpu_get_type(device) == CPU_M6801 ||
+		   cpu_get_type(device) == CPU_M6802 ||
+		   cpu_get_type(device) == CPU_M6803 ||
+		   cpu_get_type(device) == CPU_M6808 ||
+		   cpu_get_type(device) == CPU_HD63701 ||
+		   cpu_get_type(device) == CPU_NSC8105);
+	return (m6800_state *)device->token;
+}
 
 #if 0
 static void hd63701_trap_pc(m6800_state *cpustate);
@@ -663,7 +676,7 @@ static int m6800_rx(m6800_state *cpustate)
 
 static TIMER_CALLBACK(m6800_tx_tick)
 {
-    m6800_state *cpustate = ptr;
+    m6800_state *cpustate = (m6800_state *)ptr;
 
 	if (cpustate->trcsr & M6800_TRCSR_TE)
 	{
@@ -737,7 +750,7 @@ static TIMER_CALLBACK(m6800_tx_tick)
 
 static TIMER_CALLBACK(m6800_rx_tick)
 {
-    m6800_state *cpustate =ptr;
+    m6800_state *cpustate = (m6800_state *)ptr;
 
 	if (cpustate->trcsr & M6800_TRCSR_RE)
 	{
@@ -884,7 +897,7 @@ static void state_register(m6800_state *cpustate, const char *type)
 
 static CPU_INIT( m6800 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
@@ -900,7 +913,7 @@ static CPU_INIT( m6800 )
 
 static CPU_RESET( m6800 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 
 	SEI;				/* IRQ disabled */
 	PCD = RM16(cpustate,  0xfffe );
@@ -1242,7 +1255,7 @@ INLINE void m6800_execute_one(m6800_state *cpustate, UINT8 ireg)
  ****************************************************************************/
 static CPU_EXECUTE( m6800 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
 	cpustate->icount = cycles;
 
@@ -1276,7 +1289,7 @@ static CPU_EXECUTE( m6800 )
 #if (HAS_M6801)
 static CPU_INIT( m6801 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 //  cpustate->subtype = SUBTYPE_M6801;
 	cpustate->insn = m6803_insn;
 	cpustate->cycles = cycles_6803;
@@ -1301,7 +1314,7 @@ static CPU_INIT( m6801 )
 #if (HAS_M6802)
 static CPU_INIT( m6802 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 	//  cpustate->subtype   = SUBTYPE_M6802;
 	cpustate->insn = m6800_insn;
 	cpustate->cycles = cycles_6800;
@@ -1322,7 +1335,7 @@ static CPU_INIT( m6802 )
 #if (HAS_M6803)
 static CPU_INIT( m6803 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 	//  cpustate->subtype = SUBTYPE_M6803;
 	cpustate->insn = m6803_insn;
 	cpustate->cycles = cycles_6803;
@@ -1614,7 +1627,7 @@ INLINE void m6803_execute_one(m6800_state *cpustate, UINT8 ireg)
 #if (HAS_M6803||HAS_M6801)
 static CPU_EXECUTE( m6803 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
 	cpustate->icount = cycles;
 
@@ -1662,7 +1675,7 @@ ADDRESS_MAP_END
 #if (HAS_M6808)
 static CPU_INIT( m6808 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 	//  cpustate->subtype = SUBTYPE_M6808;
 	cpustate->insn = m6800_insn;
 	cpustate->cycles = cycles_6800;
@@ -1684,7 +1697,7 @@ static CPU_INIT( m6808 )
 
 static CPU_INIT( hd63701 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 	//  cpustate->subtype = SUBTYPE_HD63701;
 	cpustate->insn = hd63701_insn;
 	cpustate->cycles = cycles_63701;
@@ -1974,7 +1987,7 @@ INLINE void hd63071_execute_one(m6800_state *cpustate, UINT8 ireg)
  ****************************************************************************/
 static CPU_EXECUTE( hd63701 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
 	cpustate->icount = cycles;
 
@@ -2037,7 +2050,7 @@ WRITE8_HANDLER( hd63701_internal_registers_w )
 #if (HAS_NSC8105)
 static CPU_INIT( nsc8105 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 	//  cpustate->subtype = SUBTYPE_NSC8105;
 	cpustate->device = device;
 
@@ -2322,7 +2335,7 @@ INLINE void nsc8105_execute_one(m6800_state *cpustate, UINT8 ireg)
  ****************************************************************************/
 static CPU_EXECUTE( nsc8105 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
 	cpustate->icount = cycles;
 
@@ -2356,7 +2369,7 @@ static CPU_EXECUTE( nsc8105 )
 
 static READ8_HANDLER( m6803_internal_registers_r )
 {
-	m6800_state *cpustate = space->cpu->token;
+	m6800_state *cpustate = get_safe_token(space->cpu);
 
 	switch (offset)
 	{
@@ -2454,7 +2467,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 
 static WRITE8_HANDLER( m6803_internal_registers_w )
 {
-	m6800_state *cpustate = space->cpu->token;
+	m6800_state *cpustate = get_safe_token(space->cpu);
 
 	switch (offset)
 	{
@@ -2650,7 +2663,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 
 static CPU_SET_INFO( m6800 )
 {
-	m6800_state *cpustate = device->token;
+	m6800_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -2678,7 +2691,7 @@ static CPU_SET_INFO( m6800 )
 
 CPU_GET_INFO( m6800 )
 {
-	m6800_state *cpustate = device ? device->token : NULL;
+	m6800_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

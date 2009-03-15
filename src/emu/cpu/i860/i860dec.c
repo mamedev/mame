@@ -4440,7 +4440,7 @@ void reset_i860 (i860s *cpustate)
 
 static CPU_EXECUTE( i860 )
 {
-	i860_state_t *cpustate = device->token;
+	i860_state_t *cpustate = get_safe_token(device);
 
 	/* Check if the data bus is held by another device, and bail if so.
        Also check for reset.  */

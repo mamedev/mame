@@ -124,6 +124,15 @@ struct _z180_state
 	int icount;
 };
 
+INLINE z180_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_Z180);
+	return (z180_state *)device->token;
+}
+
 static void set_irq_line(z180_state *cpustate, int irqline, int state);
 
 #define CF	0x01
@@ -2004,10 +2013,10 @@ static void z180_write_iolines(z180_state *cpustate, UINT32 data)
 
 static CPU_INIT( z180 )
 {
-	z180_state *cpustate = device->token;
+	z180_state *cpustate = get_safe_token(device);
 	cpustate->daisy = NULL;
 	if (device->static_config)
-		cpustate->daisy = z80daisy_init(device, device->static_config);
+		cpustate->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->static_config);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -2050,7 +2059,7 @@ static CPU_INIT( z180 )
  ****************************************************************************/
 static CPU_RESET( z180 )
 {
-	z180_state *cpustate = device->token;
+	z180_state *cpustate = get_safe_token(device);
 	z80_daisy_state *save_daisy;
 	cpu_irq_callback save_irqcallback;
 	cpu_state_table save_table;
@@ -2303,7 +2312,7 @@ static void check_interrupts(z180_state *cpustate)
  ****************************************************************************/
 static CPU_EXECUTE( z180 )
 {
-	z180_state *cpustate = device->token;
+	z180_state *cpustate = get_safe_token(device);
 	int old_icount = cycles;
 	cpustate->icount = cycles;
 
@@ -2394,7 +2403,7 @@ again:
  ****************************************************************************/
 static CPU_BURN( z180 )
 {
-	z180_state *cpustate = device->token;
+	z180_state *cpustate = get_safe_token(device);
 	if( cycles > 0 )
 	{
 		/* NOP takes 3 cycles per instruction */
@@ -2434,7 +2443,7 @@ static CPU_TRANSLATE( z180 )
 {
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
-		z180_state *cpustate = device->token;
+		z180_state *cpustate = get_safe_token(device);
 		*address = MMU_REMAP_ADDR(cpustate, *address);
 	}
 	return TRUE;
@@ -2447,7 +2456,7 @@ static CPU_TRANSLATE( z180 )
 
 static CPU_IMPORT_STATE( z180 )
 {
-	z180_state *cpustate = device->token;
+	z180_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -2475,7 +2484,7 @@ static CPU_IMPORT_STATE( z180 )
 
 static CPU_EXPORT_STATE( z180 )
 {
-	z180_state *cpustate = device->token;
+	z180_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -2500,7 +2509,7 @@ static CPU_EXPORT_STATE( z180 )
 
 static CPU_SET_INFO( z180 )
 {
-	z180_state *cpustate = device->token;
+	z180_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -2508,12 +2517,12 @@ static CPU_SET_INFO( z180 )
 		case CPUINFO_INT_INPUT_STATE + Z180_INT0:		set_irq_line(cpustate, Z180_INT0, info->i);			break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		cc[Z180_TABLE_op] = info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		cc[Z180_TABLE_cb] = info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		cc[Z180_TABLE_ed] = info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		cc[Z180_TABLE_xy] = info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb: 	cc[Z180_TABLE_xycb] = info->p;				break;
-		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		cc[Z180_TABLE_ex] = info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_op: 		cc[Z180_TABLE_op] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_cb: 		cc[Z180_TABLE_cb] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ed: 		cc[Z180_TABLE_ed] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xy: 		cc[Z180_TABLE_xy] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_xycb: 	cc[Z180_TABLE_xycb] = (const UINT8 *)info->p;				break;
+		case CPUINFO_PTR_Z180_CYCLE_TABLE + Z180_TABLE_ex: 		cc[Z180_TABLE_ex] = (const UINT8 *)info->p;				break;
 	}
 }
 
@@ -2524,7 +2533,7 @@ static CPU_SET_INFO( z180 )
 
 CPU_GET_INFO( z180 )
 {
-	z180_state *cpustate = (device != NULL) ? device->token : NULL;
+	z180_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

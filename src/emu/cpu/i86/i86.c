@@ -69,6 +69,16 @@ struct _i8086_state
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
 };
 
+INLINE i8086_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_I8086 ||
+		   cpu_get_type(device) == CPU_I8088 ||
+		   cpu_get_type(device) == CPU_I80186);
+	return (i8086_state *)device->token;
+}
 
 /***************************************************************************
     CPU STATE DESCRIPTION
@@ -151,7 +161,7 @@ static UINT8 parity_table[256];
 /***************************************************************************/
 static void i8086_state_register(const device_config *device)
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 	state_save_register_device_item_array(device, 0, cpustate->regs.w);
 	state_save_register_device_item(device, 0, cpustate->pc);
 	state_save_register_device_item(device, 0, cpustate->prevpc);
@@ -178,7 +188,7 @@ static void i8086_state_register(const device_config *device)
 
 static CPU_INIT( i8086 )
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 	unsigned int i, j, c;
 	static const BREGS reg_name[8] = {AL, CL, DL, BL, AH, CH, DH, BH};
 	for (i = 0; i < 256; i++)
@@ -219,7 +229,7 @@ static CPU_INIT( i8086 )
 #if (HAS_I8088||HAS_I80188)
 static CPU_INIT( i8088 )
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 	CPU_INIT_CALL(i8086);
 	configure_memory_8bit(cpustate);
 }
@@ -227,7 +237,7 @@ static CPU_INIT( i8088 )
 
 static CPU_RESET( i8086 )
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 	cpu_irq_callback save_irqcallback;
     memory_interface save_mem;
     cpu_state_table save_state;
@@ -286,7 +296,7 @@ static void set_test_line(i8086_state *cpustate, int state)
 
 static CPU_EXECUTE( i8086 )
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 8086)
@@ -342,7 +352,7 @@ static CPU_DISASSEMBLE( i8086 )
 
 static CPU_EXECUTE( i80186 )
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 80186)
@@ -382,7 +392,7 @@ static CPU_EXECUTE( i80186 )
 
 static CPU_IMPORT_STATE( i8086 )
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -436,7 +446,7 @@ static CPU_IMPORT_STATE( i8086 )
 
 static CPU_EXPORT_STATE( i8086 )
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -461,7 +471,7 @@ static CPU_EXPORT_STATE( i8086 )
 
 static CPU_EXPORT_STRING( i8086 )
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -486,7 +496,7 @@ static CPU_EXPORT_STRING( i8086 )
 
 static CPU_SET_INFO( i8086 )
 {
-	i8086_state *cpustate = device->token;
+	i8086_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -505,7 +515,7 @@ static CPU_SET_INFO( i8086 )
 
 CPU_GET_INFO( i8086 )
 {
-	i8086_state *cpustate = (device != NULL) ? device->token : NULL;
+	i8086_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -67,6 +67,15 @@ struct _lh5810_state
 	int icount;
 };
 
+INLINE lh5801_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_LH5801);
+	return (lh5801_state *)device->token;
+}
+
 #define P cpustate->p.w.l
 #define S cpustate->s.w.l
 #define U cpustate->u.w.l
@@ -92,7 +101,7 @@ struct _lh5810_state
 
 static CPU_INIT( lh5801 )
 {
-	lh5801_state *cpustate = device->token;
+	lh5801_state *cpustate = get_safe_token(device);
 
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->config = (const lh5801_cpu_core *) device->static_config;
@@ -102,7 +111,7 @@ static CPU_INIT( lh5801 )
 
 static CPU_RESET( lh5801 )
 {
-	lh5801_state *cpustate = device->token;
+	lh5801_state *cpustate = get_safe_token(device);
 
 	P = (memory_read_byte(cpustate->program, 0xfffe)<<8) | memory_read_byte(cpustate->program, 0xffff);
 
@@ -111,7 +120,7 @@ static CPU_RESET( lh5801 )
 
 static CPU_EXECUTE( lh5801 )
 {
-	lh5801_state *cpustate = device->token;
+	lh5801_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -144,7 +153,7 @@ static void set_irq_line(lh5801_state *cpustate, int irqline, int state)
 
 static CPU_SET_INFO( lh5801 )
 {
-	lh5801_state *cpustate = device->token;
+	lh5801_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -174,7 +183,7 @@ static CPU_SET_INFO( lh5801 )
 
 CPU_GET_INFO( lh5801 )
 {
-	lh5801_state *cpustate = (device != NULL) ? device->token : NULL;
+	lh5801_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

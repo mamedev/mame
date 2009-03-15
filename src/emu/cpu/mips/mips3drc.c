@@ -274,6 +274,31 @@ static const UINT8 fpmode_source[4] =
     INLINE FUNCTIONS
 ***************************************************************************/
 
+INLINE mips3_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_VR4300BE ||
+		   cpu_get_type(device) == CPU_VR4300LE ||
+		   cpu_get_type(device) == CPU_VR4310BE ||
+		   cpu_get_type(device) == CPU_VR4310LE ||
+		   cpu_get_type(device) == CPU_R4600BE ||
+		   cpu_get_type(device) == CPU_R4600LE ||
+		   cpu_get_type(device) == CPU_R4650BE ||
+		   cpu_get_type(device) == CPU_R4650LE ||
+		   cpu_get_type(device) == CPU_R4700BE ||
+		   cpu_get_type(device) == CPU_R4700LE ||
+		   cpu_get_type(device) == CPU_R5000BE ||
+		   cpu_get_type(device) == CPU_R5000LE ||
+		   cpu_get_type(device) == CPU_QED5271BE ||
+		   cpu_get_type(device) == CPU_QED5271LE ||
+		   cpu_get_type(device) == CPU_RM7000BE ||
+		   cpu_get_type(device) == CPU_RM7000LE);
+	return *(mips3_state **)device->token;
+}
+
+
 /*-------------------------------------------------
     epc - compute the exception PC from a
     descriptor
@@ -352,19 +377,19 @@ static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *
 	int regnum;
 
 	/* allocate enough space for the cache and the core */
-	cache = drccache_alloc(CACHE_SIZE + sizeof(*mips3));
+	cache = (drccache *)drccache_alloc(CACHE_SIZE + sizeof(*mips3));
 	if (cache == NULL)
 		fatalerror("Unable to allocate cache of size %d", (UINT32)(CACHE_SIZE + sizeof(*mips3)));
 
 	/* allocate the core memory */
-	*(mips3_state **)device->token = mips3 = drccache_memory_alloc_near(cache, sizeof(*mips3));
+	*(mips3_state **)device->token = mips3 = (mips3_state *)drccache_memory_alloc_near(cache, sizeof(*mips3));
 	memset(mips3, 0, sizeof(*mips3));
 
 	/* initialize the core */
 	mips3com_init(mips3, flavor, bigendian, device, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
-	mips3->impstate = drccache_memory_alloc_near(cache, sizeof(*mips3->impstate));
+	mips3->impstate = (mips3imp_state *)drccache_memory_alloc_near(cache, sizeof(*mips3->impstate));
 	memset(mips3->impstate, 0, sizeof(*mips3->impstate));
 	mips3->impstate->cache = cache;
 
@@ -471,7 +496,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *
 
 static CPU_RESET( mips3 )
 {
-	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3_state *mips3 = get_safe_token(device);
 
 	/* reset the common code and mark the cache dirty */
 	mips3com_reset(mips3);
@@ -487,7 +512,7 @@ static CPU_RESET( mips3 )
 
 static CPU_EXECUTE( mips3 )
 {
-	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3_state *mips3 = get_safe_token(device);
 	drcuml_state *drcuml = mips3->impstate->drcuml;
 	int execute_result;
 
@@ -524,7 +549,7 @@ static CPU_EXECUTE( mips3 )
 
 static CPU_EXIT( mips3 )
 {
-	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3_state *mips3 = get_safe_token(device);
 	mips3com_exit(mips3);
 
 	/* clean up the DRC */
@@ -541,7 +566,7 @@ static CPU_EXIT( mips3 )
 
 static CPU_TRANSLATE( mips3 )
 {
-	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3_state *mips3 = get_safe_token(device);
 	return mips3com_translate_address(mips3, space, intention, address);
 }
 
@@ -552,7 +577,7 @@ static CPU_TRANSLATE( mips3 )
 
 static CPU_DISASSEMBLE( mips3 )
 {
-	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3_state *mips3 = get_safe_token(device);
 	return mips3com_dasm(mips3, buffer, pc, oprom, opram);
 }
 
@@ -564,7 +589,7 @@ static CPU_DISASSEMBLE( mips3 )
 
 static CPU_SET_INFO( mips3 )
 {
-	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3_state *mips3 = get_safe_token(device);
 
 	/* --- everything is handled generically --- */
 	mips3com_set_info(mips3, state, info);
@@ -578,7 +603,7 @@ static CPU_SET_INFO( mips3 )
 
 static CPU_GET_INFO( mips3 )
 {
-	mips3_state *mips3 = (device != NULL && device->token != NULL) ? *(mips3_state **)device->token : NULL;
+	mips3_state *mips3 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -609,7 +634,7 @@ static CPU_GET_INFO( mips3 )
 
 void mips3drc_set_options(const device_config *device, UINT32 options)
 {
-	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3_state *mips3 = get_safe_token(device);
 	mips3->impstate->drcoptions = options;
 }
 
@@ -621,7 +646,7 @@ void mips3drc_set_options(const device_config *device, UINT32 options)
 
 void mips3drc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base)
 {
-	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3_state *mips3 = get_safe_token(device);
 	if (mips3->impstate->fastram_select < ARRAY_LENGTH(mips3->impstate->fastram))
 	{
 		mips3->impstate->fastram[mips3->impstate->fastram_select].start = start;
@@ -639,7 +664,7 @@ void mips3drc_add_fastram(const device_config *device, offs_t start, offs_t end,
 
 void mips3drc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles)
 {
-	mips3_state *mips3 = *(mips3_state **)device->token;
+	mips3_state *mips3 = get_safe_token(device);
 	if (mips3->impstate->hotspot_select < ARRAY_LENGTH(mips3->impstate->hotspot))
 	{
 		mips3->impstate->hotspot[mips3->impstate->hotspot_select].pc = pc;
@@ -822,7 +847,7 @@ static void code_compile_block(mips3_state *mips3, UINT8 mode, offs_t pc)
 
 static void cfunc_get_cycles(void *param)
 {
-	mips3_state *mips3 = param;
+	mips3_state *mips3 = (mips3_state *)param;
 	mips3->impstate->numcycles = cpu_get_total_cycles(mips3->device);
 }
 
@@ -834,7 +859,7 @@ static void cfunc_get_cycles(void *param)
 
 static void cfunc_printf_exception(void *param)
 {
-	mips3_state *mips3 = param;
+	mips3_state *mips3 = (mips3_state *)param;
 	printf("Exception: EPC=%08X Cause=%08X BadVAddr=%08X Jmp=%08X\n", (UINT32)mips3->cpr[0][COP0_EPC], (UINT32)mips3->cpr[0][COP0_Cause], (UINT32)mips3->cpr[0][COP0_BadVAddr], mips3->pc);
 	cfunc_printf_probe(mips3);
 }
@@ -847,7 +872,7 @@ static void cfunc_printf_exception(void *param)
 
 static void cfunc_printf_debug(void *param)
 {
-	mips3_state *mips3 = param;
+	mips3_state *mips3 = (mips3_state *)param;
 	printf(mips3->impstate->format, mips3->impstate->arg0, mips3->impstate->arg1);
 }
 
@@ -859,7 +884,7 @@ static void cfunc_printf_debug(void *param)
 
 static void cfunc_printf_probe(void *param)
 {
-	mips3_state *mips3 = param;
+	mips3_state *mips3 = (mips3_state *)param;
 
 	printf(" PC=%08X          r1=%08X%08X  r2=%08X%08X  r3=%08X%08X\n",
 		mips3->pc,
@@ -914,7 +939,7 @@ static void cfunc_printf_probe(void *param)
 
 static void cfunc_unimplemented(void *param)
 {
-	mips3_state *mips3 = param;
+	mips3_state *mips3 = (mips3_state *)param;
 	UINT32 opcode = mips3->impstate->arg0;
 	fatalerror("PC=%08X: Unimplemented op %08X (%02X,%02X)", mips3->pc, opcode, opcode >> 26, opcode & 0x3f);
 }

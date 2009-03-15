@@ -589,7 +589,7 @@ drccodeptr drclabel_get_codeptr(drclabel_list *list, drcuml_codelabel label, drc
 
 	/* if no code pointer, request an OOB callback */
 	if (curlabel->codeptr == NULL && fixup != NULL)
-		drccache_request_oob_codegen(list->cache, label_oob_callback, curlabel, fixup, param);
+		drccache_request_oob_codegen(list->cache, label_oob_callback, curlabel, (void *)fixup, param);
 
 	return curlabel->codeptr;
 }

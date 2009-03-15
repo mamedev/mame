@@ -74,7 +74,7 @@ static DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
 {
 	if (address >= (0x0000<<1) && address <= (0x07ff<<1))
 	{
-		direct->raw = direct->decrypted = (void*)(dsp56k_program_ram - (0x0000<<1));
+		direct->raw = direct->decrypted = (UINT8 *)(dsp56k_program_ram - (0x0000<<1));
 		return ~0;
 	}
 
@@ -166,7 +166,7 @@ static void set_irq_line(dsp56k_core* cpustate, int irqline, int state)
 ***************************************************************************/
 static CPU_INIT( dsp56k )
 {
-	dsp56k_core* cpustate = device->token;
+	dsp56k_core* cpustate = get_safe_token(device);
 
 	// Call specific module inits
 	pcu_init(cpustate);
@@ -228,7 +228,7 @@ static void alu_reset(dsp56k_core* cpustate)
 
 static CPU_RESET( dsp56k )
 {
-	dsp56k_core* cpustate = device->token;
+	dsp56k_core* cpustate = get_safe_token(device);
 	logerror("Dsp56k reset\n");
 
 	cpustate->interrupt_cycles = 0;
@@ -266,7 +266,7 @@ static CPU_EXIT( dsp56k )
 
 static CPU_EXECUTE( dsp56k )
 {
-	dsp56k_core* cpustate = device->token;
+	dsp56k_core* cpustate = get_safe_token(device);
 
 	/* If reset line is asserted, do nothing */
 	if (cpustate->reset_state)
@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( dsp56k )
 {
-	dsp56k_core* cpustate = device->token;
+	dsp56k_core* cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -388,7 +388,7 @@ static CPU_SET_INFO( dsp56k )
 
 CPU_GET_INFO( dsp56k )
 {
-	dsp56k_core* cpustate = (device != NULL) ? device->token : NULL;
+	dsp56k_core* cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

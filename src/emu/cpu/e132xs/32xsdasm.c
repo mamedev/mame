@@ -514,12 +514,12 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned
 					lim = op & 0xfff;
 				}
 
-				sprintf(buffer, "XM%x %s, %s, $%x", (UINT8)(float) pow(2, xcode), dest, source, lim);
+				sprintf(buffer, "XM%x %s, %s, $%x", (UINT8)(float) pow(2.0, xcode), dest, source, lim);
 
 			}
 			else
 			{
-				sprintf(buffer, "XX%x %s, %s, 0", (UINT8)(float) pow(2, (xcode - 4)), dest, source);
+				sprintf(buffer, "XX%x %s, %s, 0", (UINT8)(float) pow(2.0, (xcode - 4)), dest, source);
 			}
 
 			break;

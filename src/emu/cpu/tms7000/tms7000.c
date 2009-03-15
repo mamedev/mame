@@ -86,6 +86,16 @@ struct _tms7000_state
 	UINT8		idle_state;	/* Set after the execution of an idle instruction */
 };
 
+INLINE tms7000_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_TMS7000 ||
+		   cpu_get_type(device) == CPU_TMS7000_EXL);
+	return (tms7000_state *)device->token;
+}
+
 #define pPC		cpustate->pc.w.l
 #define PC		cpustate->pc
 #define pSP		cpustate->sp
@@ -153,7 +163,7 @@ INLINE void WRF16( tms7000_state *cpustate, UINT32 mAddr, PAIR p )	/*Write regis
 
 static CPU_INIT( tms7000 )
 {
-	tms7000_state *cpustate = device->token;
+	tms7000_state *cpustate = get_safe_token(device);
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -185,7 +195,7 @@ static CPU_INIT( tms7000 )
 
 static CPU_RESET( tms7000 )
 {
-	tms7000_state *cpustate = device->token;
+	tms7000_state *cpustate = get_safe_token(device);
 
 //  cpustate->architecture = (int)param;
 
@@ -229,7 +239,7 @@ static CPU_RESET( tms7000 )
 
 static CPU_SET_INFO( tms7000 )
 {
-	tms7000_state *cpustate = device->token;
+	tms7000_state *cpustate = get_safe_token(device);
 
     switch (state)
     {
@@ -256,7 +266,7 @@ static CPU_SET_INFO( tms7000 )
 
 CPU_GET_INFO( tms7000 )
 {
-	tms7000_state *cpustate = (device != NULL) ? device->token : NULL;
+	tms7000_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
     switch( state )
     {
@@ -434,7 +444,7 @@ static void tms7000_do_interrupt( tms7000_state *cpustate, UINT16 address, UINT8
 
 static CPU_EXECUTE( tms7000 )
 {
-	tms7000_state *cpustate = device->token;
+	tms7000_state *cpustate = get_safe_token(device);
 	int op;
 
 	cpustate->icount = cycles;
@@ -476,7 +486,7 @@ static CPU_EXECUTE( tms7000 )
 
 static CPU_EXECUTE( tms7000_exl )
 {
-	tms7000_state *cpustate = device->token;
+	tms7000_state *cpustate = get_safe_token(device);
 	int op;
 
 	cpustate->icount = cycles;
@@ -522,7 +532,7 @@ static CPU_EXECUTE( tms7000_exl )
  ****************************************************************************/
 void tms7000_A6EC1( const device_config *device )
 {
-	tms7000_state *cpustate = device->token;
+	tms7000_state *cpustate = get_safe_token(device);
     if( (cpustate->pf[0x03] & 0x80) == 0x80 ) /* Is timer system active? */
     {
         if( (cpustate->pf[0x03] & 0x40) == 0x40) /* Is event counter the timer source? */
@@ -532,7 +542,7 @@ void tms7000_A6EC1( const device_config *device )
 
 static void tms7000_service_timer1( const device_config *device )
 {
-	tms7000_state *cpustate = device->token;
+	tms7000_state *cpustate = get_safe_token(device);
     if( --cpustate->t1_prescaler < 0 ) /* Decrement prescaler and check for underflow */
     {
         cpustate->t1_prescaler = cpustate->pf[3] & 0x1f; /* Reload prescaler (5 bit) */
@@ -552,7 +562,7 @@ static void tms7000_service_timer1( const device_config *device )
 
 static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 {
-	tms7000_state *cpustate = space->cpu->token;
+	tms7000_state *cpustate = get_safe_token(space->cpu);
 	UINT8	temp1, temp2, temp3;
 
 	switch( offset )
@@ -621,7 +631,7 @@ static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 
 static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 {
-	tms7000_state *cpustate = space->cpu->token;
+	tms7000_state *cpustate = get_safe_token(space->cpu);
 	UINT8 result;
 	UINT8	temp1, temp2, temp3;
 
@@ -714,11 +724,11 @@ static UINT16 bcd_sub( UINT16 a, UINT16 b)
 }
 
 static WRITE8_HANDLER( tms7000_internal_w ) {
-	tms7000_state *cpustate = space->cpu->token;
+	tms7000_state *cpustate = get_safe_token(space->cpu);
 	cpustate->rf[ offset ] = data;
 }
 
 static READ8_HANDLER( tms7000_internal_r ) {
-	tms7000_state *cpustate = space->cpu->token;
+	tms7000_state *cpustate = get_safe_token(space->cpu);
 	return cpustate->rf[ offset ];
 }

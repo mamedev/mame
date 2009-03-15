@@ -106,6 +106,15 @@ typedef struct {
 	int unsupported_inst_warning;
 } tms57002_t;
 
+INLINE tms57002_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_TMS57002);
+	return (tms57002_t *)device->token;
+}
+
 static void tms57002_cache_flush(tms57002_t *s);
 
 static const char *tms57002_get_memadr(UINT32 opcode, char type)
@@ -191,7 +200,7 @@ static CPU_DISASSEMBLE(tms57002)
 
 WRITE8_DEVICE_HANDLER(tms57002_pload_w)
 {
-	tms57002_t *s = device->token;
+	tms57002_t *s = get_safe_token(device);
 	UINT8 olds = s->sti;
 
 	if(data)
@@ -205,7 +214,7 @@ WRITE8_DEVICE_HANDLER(tms57002_pload_w)
 
 WRITE8_DEVICE_HANDLER(tms57002_cload_w)
 {
-	tms57002_t *s = device->token;
+	tms57002_t *s = get_safe_token(device);
 	UINT8 olds = s->sti;
 	if(data)
 		s->sti &= ~IN_CLOAD;
@@ -217,7 +226,7 @@ WRITE8_DEVICE_HANDLER(tms57002_cload_w)
 
 static CPU_RESET(tms57002)
 {
-	tms57002_t *s = device->token;
+	tms57002_t *s = get_safe_token(device);
 
 	s->sti = (s->sti & ~(SU_MASK|S_READ|S_WRITE|S_BRANCH|S_HOST)) | (SU_ST0|S_IDLE);
 	s->pc = 0;
@@ -240,7 +249,7 @@ static CPU_RESET(tms57002)
 
 WRITE8_DEVICE_HANDLER(tms57002_data_w)
 {
-	tms57002_t *s = device->token;
+	tms57002_t *s = get_safe_token(device);
 
 	switch(s->sti & (IN_PLOAD|IN_CLOAD)) {
 	case 0:
@@ -297,7 +306,7 @@ WRITE8_DEVICE_HANDLER(tms57002_data_w)
 
 READ8_DEVICE_HANDLER(tms57002_data_r)
 {
-	tms57002_t *s = device->token;
+	tms57002_t *s = get_safe_token(device);
 	UINT8 res;
 	if(!(s->sti & S_HOST))
 		return 0xff;
@@ -319,13 +328,13 @@ READ8_DEVICE_HANDLER(tms57002_empty_r)
 
 READ8_DEVICE_HANDLER(tms57002_dready_r)
 {
-	tms57002_t *s = device->token;
+	tms57002_t *s = get_safe_token(device);
 	return s->sti & S_HOST ? 0 : 1;
 }
 
 void tms57002_sync(const device_config *device)
 {
-	tms57002_t *s = device->token;
+	tms57002_t *s = get_safe_token(device);
 
 	if(s->sti & (IN_PLOAD | IN_CLOAD))
 		return;
@@ -1345,7 +1354,7 @@ static int tms57002_decode_get_pc(tms57002_t *s)
 
 static CPU_EXECUTE(tms57002)
 {
-	tms57002_t *s = device->token;
+	tms57002_t *s = get_safe_token(device);
 	int initial_cycles = cycles;
 	int ipc = -1;
 
@@ -1409,7 +1418,7 @@ static CPU_EXECUTE(tms57002)
 
 static CPU_INIT(tms57002)
 {
-	tms57002_t *s = device->token;
+	tms57002_t *s = get_safe_token(device);
 	tms57002_cache_flush(s);
 	s->sti = S_IDLE;
 	s->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -1427,7 +1436,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO(tms57002)
 {
-	tms57002_t *s = (device != NULL) ? device->token : NULL;
+	tms57002_t *s = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state) {
 	case CPUINFO_INT_CONTEXT_SIZE:				info->i = sizeof(tms57002_t); break;

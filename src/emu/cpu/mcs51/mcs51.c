@@ -687,8 +687,8 @@ INLINE UINT8 r_psw(mcs51_state_t *mcs51_state) { return SFR_A(ADDR_PSW); }
 
 INLINE void update_ptrs(mcs51_state_t *mcs51_state)
 {
-	mcs51_state->internal_ram = memory_get_write_ptr(mcs51_state->data, 0x00);
-	mcs51_state->sfr_ram = memory_get_write_ptr(mcs51_state->data, 0x100);
+	mcs51_state->internal_ram = (UINT8 *)memory_get_write_ptr(mcs51_state->data, 0x00);
+	mcs51_state->sfr_ram = (UINT8 *)memory_get_write_ptr(mcs51_state->data, 0x100);
 }
 
 
@@ -2381,7 +2381,7 @@ static CPU_INIT( ds5002fp )
 {
 	/* default configuration */
 	static const ds5002fp_config default_config = { 0x00, 0x00, 0x00 };
-	const ds5002fp_config *sconfig = device->static_config ? device->static_config : &default_config;
+	const ds5002fp_config *sconfig = device->static_config ? (const ds5002fp_config *)device->static_config : &default_config;
 	mcs51_state_t *mcs51_state = get_safe_token(device);
 
 	CPU_INIT_CALL( mcs51 );

@@ -9,7 +9,6 @@
 #define CDP1802_CYCLES_DMA			8
 #define CDP1802_CYCLES_INTERRUPT	8
 
-typedef enum _cdp1802_cpu_state cdp1802_cpu_state;
 enum _cdp1802_cpu_state
 {
 	CDP1802_STATE_0_FETCH,
@@ -20,6 +19,7 @@ enum _cdp1802_cpu_state
 	CDP1802_STATE_2_DMA_OUT,
 	CDP1802_STATE_3_INT
 };
+typedef enum _cdp1802_cpu_state cdp1802_cpu_state;
 
 typedef struct _cdp1802_state cdp1802_state;
 struct _cdp1802_state

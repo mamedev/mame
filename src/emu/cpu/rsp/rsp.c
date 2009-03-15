@@ -63,6 +63,14 @@ struct _rsp_state
 	int icount;
 };
 
+INLINE rsp_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_RSP);
+	return (rsp_state *)device->token;
+}
 
 
 #define RSREG		((op >> 21) & 0x1f)
@@ -343,10 +351,10 @@ static const int vector_elements_2[16][8] =
 
 static CPU_INIT( rsp )
 {
-	rsp_state *cpustate = device->token;
+	rsp_state *cpustate = get_safe_token(device);
     int regIdx;
     int accumIdx;
-	cpustate->config = device->static_config;
+	cpustate->config = (const rsp_config *)device->static_config;
 
 	if (LOG_INSTRUCTION_EXECUTION)
 		cpustate->exec_output = fopen("rsp_execute.txt", "wt");
@@ -387,7 +395,7 @@ static CPU_INIT( rsp )
 
 static CPU_EXIT( rsp )
 {
-	rsp_state *cpustate = device->token;
+	rsp_state *cpustate = get_safe_token(device);
 
 #if SAVE_DISASM
 	{
@@ -435,7 +443,7 @@ static CPU_EXIT( rsp )
 
 static CPU_RESET( rsp )
 {
-	rsp_state *cpustate = device->token;
+	rsp_state *cpustate = get_safe_token(device);
 	cpustate->nextpc = ~0;
 }
 
@@ -2528,7 +2536,7 @@ static void handle_vector_ops(rsp_state *cpustate, UINT32 op)
 						i = 0;
 					}
 				}
-				sqr = (INT32)(0x7fffffff / sqrt(sqr));
+				sqr = (INT32)(0x7fffffff / sqrt((double)sqr));
 				for (i = 31; i > 0; i--)
 				{
 					if (sqr & (1 << i))
@@ -2585,7 +2593,7 @@ static void handle_vector_ops(rsp_state *cpustate, UINT32 op)
 
 static CPU_EXECUTE( rsp )
 {
-	rsp_state *cpustate = device->token;
+	rsp_state *cpustate = get_safe_token(device);
 	UINT32 op;
 
 	cpustate->icount = cycles;
@@ -2869,7 +2877,7 @@ static CPU_DISASSEMBLE( rsp )
 
 static CPU_SET_INFO( rsp )
 {
-	rsp_state *cpustate = device->token;
+	rsp_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -2917,7 +2925,7 @@ static CPU_SET_INFO( rsp )
 
 CPU_GET_INFO( rsp )
 {
-	rsp_state *cpustate = (device != NULL) ? device->token : NULL;
+	rsp_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

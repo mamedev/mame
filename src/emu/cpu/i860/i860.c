@@ -27,7 +27,7 @@ TODO: Separate out i860XR and i860XP (make different types, etc).
 
 static CPU_INIT( i860 )
 {
-	i860_state_t *cpustate = device->token;
+	i860_state_t *cpustate = get_safe_token(device);
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	reset_i860(cpustate);
@@ -43,7 +43,7 @@ static CPU_INIT( i860 )
 
 static CPU_RESET( i860 )
 {
-	i860_state_t *cpustate = device->token;
+	i860_state_t *cpustate = get_safe_token(device);
 	reset_i860(cpustate);
 }
 
@@ -81,7 +81,7 @@ static CPU_DISASSEMBLE( i860 )
 
 static CPU_SET_INFO( i860 )
 {
-	i860_state_t *cpustate = device->token;
+	i860_state_t *cpustate = get_safe_token(device);
 
 	switch(state)
 	{
@@ -175,7 +175,7 @@ static CPU_SET_INFO( i860 )
 
 CPU_GET_INFO( i860 )
 {
-	i860_state_t *cpustate = (device != NULL) ? device->token : NULL;
+	i860_state_t *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

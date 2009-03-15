@@ -928,7 +928,7 @@ static void clear(void)
   clear_cat(cat3, 0x80);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char *argv[])
 {
   if(argc != 3) {
     fprintf(stderr, "Usage:\n%s tmsinstr.lst tms57002.inc\n", argv[0]);

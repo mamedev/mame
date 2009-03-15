@@ -203,7 +203,7 @@ static int compute_pixblt_b_cycles(int left_partials, int right_partials, int fu
 /* Shift register handling */
 static void shiftreg_w(const address_space *space, offs_t offset,UINT16 data)
 {
-	tms34010_state *tms = space->cpu->token;
+	tms34010_state *tms = get_safe_token(space->cpu);
 	if (tms->config->from_shiftreg)
 		(*tms->config->from_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
 	else
@@ -212,7 +212,7 @@ static void shiftreg_w(const address_space *space, offs_t offset,UINT16 data)
 
 static UINT16 shiftreg_r(const address_space *space, offs_t offset)
 {
-	tms34010_state *tms = space->cpu->token;
+	tms34010_state *tms = get_safe_token(space->cpu);
 	if (tms->config->to_shiftreg)
 		(*tms->config->to_shiftreg)(space, (UINT32)(offset << 3) & ~15, &tms->shiftreg[0]);
 	else
@@ -222,7 +222,7 @@ static UINT16 shiftreg_r(const address_space *space, offs_t offset)
 
 static UINT16 dummy_shiftreg_r(const address_space *space, offs_t offset)
 {
-	tms34010_state *tms = space->cpu->token;
+	tms34010_state *tms = get_safe_token(space->cpu);
 	return tms->shiftreg[0];
 }
 

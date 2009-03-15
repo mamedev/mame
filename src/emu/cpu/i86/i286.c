@@ -78,6 +78,15 @@ struct _i80286_state
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
 };
 
+INLINE i80286_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_I80286);
+	return (i80286_state *)device->token;
+}
+
 #define INT_IRQ 0x01
 #define NMI_IRQ 0x02
 
@@ -138,7 +147,7 @@ static void i80286_set_a20_line(i80286_state *cpustate, int state)
 
 static CPU_RESET( i80286 )
 {
-	i80286_state *cpustate = device->token;
+	i80286_state *cpustate = get_safe_token(device);
 	static int urinit=1;
 
 	/* in my docu not all registers are initialized! */
@@ -194,7 +203,7 @@ static void set_irq_line(i80286_state *cpustate, int irqline, int state)
 
 static CPU_EXECUTE( i80286 )
 {
-	i80286_state *cpustate = device->token;
+	i80286_state *cpustate = get_safe_token(device);
 
 	/* copy over the cycle counts if they're not correct */
 	if (timing.id != 80286)
@@ -233,7 +242,7 @@ static CPU_DISASSEMBLE( i80286 )
 
 static CPU_INIT( i80286 )
 {
-	i80286_state *cpustate = device->token;
+	i80286_state *cpustate = get_safe_token(device);
 
 	state_save_register_device_item_array(device, 0, cpustate->regs.w);
 	state_save_register_device_item(device, 0, cpustate->amask);
@@ -295,7 +304,7 @@ static CPU_INIT( i80286 )
 
 static CPU_SET_INFO( i80286 )
 {
-	i80286_state *cpustate = device->token;
+	i80286_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -368,7 +377,7 @@ static CPU_SET_INFO( i80286 )
 
 CPU_GET_INFO( i80286 )
 {
-	i80286_state *cpustate = (device != NULL) ? device->token : NULL;
+	i80286_state *cpustate = (device != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -129,6 +129,15 @@ struct _m37710i_cpu_struct
 	emu_timer *timers[8];
 };
 
+INLINE m37710i_cpu_struct *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_M37710 ||
+		   cpu_get_type(device) == CPU_M37702);
+	return (m37710i_cpu_struct *)device->token;
+}
 
 extern uint m37710i_adc_tbl[];
 extern uint m37710i_sbc_tbl[];

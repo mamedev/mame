@@ -110,6 +110,16 @@ struct _v60_state
 	UINT8 				moddim;
 };
 
+INLINE v60_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_V60 ||
+		   cpu_get_type(device) == CPU_V70);
+	return (v60_state *)device->token;
+}
+
 /*
  * Prevent warnings on NetBSD.  All identifiers beginning with an underscore
  * followed by an uppercase letter are reserved by the C standard (ISO / IEC
@@ -324,7 +334,7 @@ static UINT32 opUNHANDLED(v60_state *cpustate)
 
 static void base_init(const device_config *device, cpu_irq_callback irqcallback)
 {
-	v60_state *cpustate = device->token;
+	v60_state *cpustate = get_safe_token(device);
 
 	cpustate->stall_io = 0;
 	cpustate->irq_cb = irqcallback;
@@ -344,7 +354,7 @@ static void base_init(const device_config *device, cpu_irq_callback irqcallback)
 
 static CPU_INIT( v60 )
 {
-	v60_state *cpustate = device->token;
+	v60_state *cpustate = get_safe_token(device);
 
 	base_init(device, irqcallback);
 	// Set cpustate->PIR (Processor ID) for NEC cpustate-> LSB is reserved to NEC,
@@ -358,7 +368,7 @@ static CPU_INIT( v60 )
 
 static CPU_INIT( v70 )
 {
-	v60_state *cpustate = device->token;
+	v60_state *cpustate = get_safe_token(device);
 
 	base_init(device, irqcallback);
 	// Set cpustate->PIR (Processor ID) for NEC v70. LSB is reserved to NEC,
@@ -372,7 +382,7 @@ static CPU_INIT( v70 )
 
 static CPU_RESET( v60 )
 {
-	v60_state *cpustate = device->token;
+	v60_state *cpustate = get_safe_token(device);
 
 	cpustate->PSW	= 0x10000000;
 	cpustate->PC	= cpustate->info.start_pc;
@@ -393,7 +403,7 @@ static CPU_EXIT( v60 )
 
 void v60_stall(const device_config *device)
 {
-	v60_state *cpustate = device->token;
+	v60_state *cpustate = get_safe_token(device);
 	cpustate->stall_io = 1;
 }
 
@@ -450,7 +460,7 @@ static void set_irq_line(v60_state *cpustate, int irqline, int state)
 
 static CPU_EXECUTE( v60 )
 {
-	v60_state *cpustate = device->token;
+	v60_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 	if (cpustate->irq_line != CLEAR_LINE)
@@ -482,7 +492,7 @@ CPU_DISASSEMBLE( v70 );
 
 static CPU_SET_INFO( v60 )
 {
-	v60_state *cpustate = device->token;
+	v60_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -562,7 +572,7 @@ static CPU_SET_INFO( v60 )
 
 CPU_GET_INFO( v60 )
 {
-	v60_state *cpustate = (device != NULL) ? device->token : NULL;
+	v60_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

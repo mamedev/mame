@@ -155,6 +155,15 @@ struct _m4510_Regs {
 	m6510_port_write_func port_write;
 };
 
+INLINE m4510_Regs *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_M4510);
+	return (m4510_Regs *)device->token;
+}
+
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
@@ -176,18 +185,18 @@ INLINE int m4510_cpu_readop_arg(m4510_Regs *cpustate)
 
 static UINT8 default_rdmem_id(const address_space *space, offs_t address)
 {
-	m4510_Regs *cpustate = space->cpu->token;
+	m4510_Regs *cpustate = get_safe_token(space->cpu);
 	return memory_read_byte_8le(space, M4510_MEM(address));
 }
 static void default_wrmem_id(const address_space *space, offs_t address, UINT8 data)
 {
-	m4510_Regs *cpustate = space->cpu->token;
+	m4510_Regs *cpustate = get_safe_token(space->cpu);
 	memory_write_byte_8le(space, M4510_MEM(address), data);
 }
 
 static CPU_INIT( m4510 )
 {
-	m4510_Regs *cpustate = device->token;
+	m4510_Regs *cpustate = get_safe_token(device);
 
 	cpustate->interrupt_inhibit = 0;
 	cpustate->rdmem_id = default_rdmem_id;
@@ -199,7 +208,7 @@ static CPU_INIT( m4510 )
 
 static CPU_RESET( m4510 )
 {
-	m4510_Regs *cpustate = device->token;
+	m4510_Regs *cpustate = get_safe_token(device);
 
 	cpustate->insn = insn4510;
 
@@ -253,7 +262,7 @@ INLINE void m4510_take_irq(m4510_Regs *cpustate)
 
 static CPU_EXECUTE( m4510 )
 {
-	m4510_Regs *cpustate = device->token;
+	m4510_Regs *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -334,7 +343,7 @@ static UINT8 m4510_get_port(m4510_Regs *cpustate)
 static READ8_HANDLER( m4510_read_0000 )
 {
 	UINT8 result = 0x00;
-	m4510_Regs *cpustate = space->cpu->token;
+	m4510_Regs *cpustate = get_safe_token(space->cpu);
 
 	switch(offset)
 	{
@@ -352,7 +361,7 @@ static READ8_HANDLER( m4510_read_0000 )
 
 static WRITE8_HANDLER( m4510_write_0000 )
 {
-	m4510_Regs *cpustate = space->cpu->token;
+	m4510_Regs *cpustate = get_safe_token(space->cpu);
 
 	switch(offset)
 	{
@@ -374,7 +383,7 @@ ADDRESS_MAP_END
 
 static CPU_TRANSLATE( m4510 )
 {
-	m4510_Regs *cpustate = device->token;
+	m4510_Regs *cpustate = get_safe_token(device);
 
 	if (space == ADDRESS_SPACE_PROGRAM)
 		*address = M4510_MEM(*address);
@@ -387,7 +396,7 @@ static CPU_TRANSLATE( m4510 )
 
 static CPU_SET_INFO( m4510 )
 {
-	m4510_Regs *cpustate = device->token;
+	m4510_Regs *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -434,7 +443,7 @@ static CPU_SET_INFO( m4510 )
 
 CPU_GET_INFO( m4510 )
 {
-	m4510_Regs *cpustate = (device != NULL) ? device->token : NULL;
+	m4510_Regs *cpustate = (device != NULL && device != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -396,8 +396,8 @@ static void build_cycle_table(void)
 	int i, j;
 	for (j=0; j < X86_NUM_CPUS; j++)
 	{
-		cycle_table_rm[j] = auto_malloc(sizeof(UINT8) * CYCLES_NUM_OPCODES);
-		cycle_table_pm[j] = auto_malloc(sizeof(UINT8) * CYCLES_NUM_OPCODES);
+		cycle_table_rm[j] = (UINT8 *)auto_malloc(sizeof(UINT8) * CYCLES_NUM_OPCODES);
+		cycle_table_pm[j] = (UINT8 *)auto_malloc(sizeof(UINT8) * CYCLES_NUM_OPCODES);
 
 		for (i=0; i < sizeof(x86_cycle_table)/sizeof(X86_CYCLE_TABLE); i++)
 		{
@@ -445,8 +445,8 @@ static void I386OP(decode_two_byte)(i386_state *cpustate)
 
 static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	const device_config *device = ref;
-	i386_state *cpustate = device->token;
+	const device_config *device = (const device_config *)ref;
+	i386_state *cpustate = get_safe_token(device);
 	UINT32 result;
 	I386_SREG seg;
 
@@ -466,8 +466,8 @@ static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, cons
 
 static UINT64 i386_debug_seglimit(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	const device_config *device = ref;
-	i386_state *cpustate = device->token;
+	const device_config *device = (const device_config *)ref;
+	i386_state *cpustate = get_safe_token(device);
 	UINT32 result = 0;
 	I386_SREG seg;
 
@@ -491,8 +491,8 @@ static CPU_DEBUG_INIT( i386 )
 
 static STATE_POSTLOAD( i386_postload )
 {
-	const device_config *device = param;
-	i386_state *cpustate = device->token;
+	const device_config *device = (const device_config *)param;
+	i386_state *cpustate = get_safe_token(device);
 	int i;
 	for (i = 0; i < 6; i++)
 		i386_load_segment_descriptor(cpustate,i);
@@ -505,7 +505,7 @@ static CPU_INIT( i386 )
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
 	static const int regs16[8] = {AX,CX,DX,BX,SP,BP,SI,DI};
 	static const int regs32[8] = {EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI};
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 
 	build_cycle_table();
 
@@ -622,7 +622,7 @@ static void build_opcode_table(i386_state *cpustate, UINT32 features)
 
 static CPU_RESET( i386 )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 	cpu_irq_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
@@ -692,7 +692,7 @@ static void i386_set_a20_line(i386_state *cpustate,int state)
 
 static CPU_EXECUTE( i386 )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 
 	cpustate->cycles = cycles;
 	cpustate->base_cycles = cycles;
@@ -726,7 +726,7 @@ static CPU_EXECUTE( i386 )
 
 static CPU_TRANSLATE( i386 )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 	int result = 1;
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
@@ -739,13 +739,13 @@ static CPU_TRANSLATE( i386 )
 
 static CPU_DISASSEMBLE( i386 )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 	return i386_dasm_one(buffer, pc, oprom, cpustate->sreg[CS].d ? 32 : 16);
 }
 
 static CPU_SET_INFO( i386 )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 
 	if (state == CPUINFO_INT_INPUT_STATE+INPUT_LINE_A20)
 	{
@@ -846,7 +846,7 @@ static CPU_SET_INFO( i386 )
 
 CPU_GET_INFO( i386 )
 {
-	i386_state *cpustate = (device != NULL) ? device->token : NULL;
+	i386_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1071,7 +1071,7 @@ static CPU_INIT( i486 )
 
 static CPU_RESET( i486 )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 	cpu_irq_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
@@ -1115,7 +1115,7 @@ static CPU_EXIT( i486 )
 
 static CPU_SET_INFO( i486 )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		case CPUINFO_INT_REGISTER + X87_CTRL:			cpustate->fpu_control_word = info->i;			break;
@@ -1135,7 +1135,7 @@ static CPU_SET_INFO( i486 )
 
 CPU_GET_INFO( i486 )
 {
-	i386_state *cpustate = (device != NULL) ? device->token : NULL;
+	i386_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_FCT_SET_INFO:	      				info->setinfo = CPU_SET_INFO_NAME(i486);break;
@@ -1184,7 +1184,7 @@ static CPU_INIT( pentium )
 
 static CPU_RESET( pentium )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 	cpu_irq_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
@@ -1248,7 +1248,7 @@ static CPU_EXIT( pentium )
 
 static CPU_SET_INFO( pentium )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		case CPUINFO_INT_REGISTER + X87_CTRL:			cpustate->fpu_control_word = info->i;			break;
@@ -1268,7 +1268,7 @@ static CPU_SET_INFO( pentium )
 
 CPU_GET_INFO( pentium )
 {
-	i386_state *cpustate = (device != NULL) ? device->token : NULL;
+	i386_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_FCT_SET_INFO:	      				info->setinfo = CPU_SET_INFO_NAME(pentium);	break;
@@ -1317,7 +1317,7 @@ static CPU_INIT( mediagx )
 
 static CPU_RESET( mediagx )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 	cpu_irq_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
@@ -1381,7 +1381,7 @@ static CPU_EXIT( mediagx )
 
 static CPU_SET_INFO( mediagx )
 {
-	i386_state *cpustate = device->token;
+	i386_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		case CPUINFO_INT_REGISTER + X87_CTRL:			cpustate->fpu_control_word = info->i;			break;
@@ -1401,7 +1401,7 @@ static CPU_SET_INFO( mediagx )
 
 CPU_GET_INFO( mediagx )
 {
-	i386_state *cpustate = (device != NULL) ? device->token : NULL;
+	i386_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_FCT_SET_INFO:	      				info->setinfo = CPU_SET_INFO_NAME(mediagx);	break;

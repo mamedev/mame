@@ -3245,7 +3245,7 @@ INLINE void op1111(SH4 *sh4, UINT16 opcode)
 static CPU_RESET( sh4 )
 {
 	SH4 *sh4 = get_safe_token(device);
-	void *tsaved[4];
+	emu_timer *tsaved[4];
 	emu_timer *tsave[5];
 	UINT32 *m;
 	int save_is_slave;

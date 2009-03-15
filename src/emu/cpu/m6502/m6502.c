@@ -91,6 +91,22 @@ struct _m6502_Regs
 
 };
 
+INLINE m6502_Regs *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_M6502 ||
+		   cpu_get_type(device) == CPU_M6510 ||
+		   cpu_get_type(device) == CPU_M6510T ||
+		   cpu_get_type(device) == CPU_M7501 ||
+		   cpu_get_type(device) == CPU_M8502 ||
+		   cpu_get_type(device) == CPU_N2A03 ||
+		   cpu_get_type(device) == CPU_M65C02 ||
+		   cpu_get_type(device) == CPU_M65SC02 ||
+		   cpu_get_type(device) == CPU_DECO16);
+	return (m6502_Regs *)device->token;
+}
 
 static UINT8 default_rdmem_id(const address_space *space, offs_t offset) { return memory_read_byte_8le(space, offset); }
 static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 data) { memory_write_byte_8le(space, offset, data); }
@@ -132,7 +148,7 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
 
 static void m6502_common_init(const device_config *device, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -170,7 +186,7 @@ static CPU_INIT( m6502 )
 
 static CPU_RESET( m6502 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 	/* wipe out the rest of the m6502 structure */
 	/* read the reset vector into PC */
 	PCL = RDMEM(M6502_RST_VEC);
@@ -210,7 +226,7 @@ INLINE void m6502_take_irq(m6502_Regs *cpustate)
 
 static CPU_EXECUTE( m6502 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -322,7 +338,7 @@ static CPU_INIT( n2a03 )
    from the PSG core when such an occasion arises. */
 void n2a03_irq(const device_config *device)
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	m6502_take_irq(cpustate);
 }
@@ -341,7 +357,7 @@ static CPU_INIT( m6510 )
 
 static CPU_RESET( m6510 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	CPU_RESET_CALL(m6502);
 	cpustate->port = 0xff;
@@ -355,7 +371,7 @@ static UINT8 m6510_get_port(m6502_Regs *cpustate)
 
 static READ8_HANDLER( m6510_read_0000 )
 {
-	m6502_Regs *cpustate = space->cpu->token;
+	m6502_Regs *cpustate = get_safe_token(space->cpu);
 	UINT8 result = 0x00;
 
 	switch(offset)
@@ -374,7 +390,7 @@ static READ8_HANDLER( m6510_read_0000 )
 
 static WRITE8_HANDLER( m6510_write_0000 )
 {
-	m6502_Regs *cpustate = space->cpu->token;
+	m6502_Regs *cpustate = get_safe_token(space->cpu);
 
 	switch(offset)
 	{
@@ -409,7 +425,7 @@ static CPU_INIT( m65c02 )
 
 static CPU_RESET( m65c02 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	CPU_RESET_CALL(m6502);
 	P &=~F_D;
@@ -436,7 +452,7 @@ INLINE void m65c02_take_irq(m6502_Regs *cpustate)
 
 static CPU_EXECUTE( m65c02 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -521,7 +537,7 @@ static CPU_INIT( m65sc02 )
 
 static CPU_INIT( deco16 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 	m6502_common_init(device, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
@@ -529,7 +545,7 @@ static CPU_INIT( deco16 )
 
 static CPU_RESET( deco16 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	CPU_RESET_CALL(m6502);
 	cpustate->subtype = SUBTYPE_DECO16;
@@ -606,7 +622,7 @@ static void deco16_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 
 static CPU_EXECUTE( deco16 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -659,7 +675,7 @@ static CPU_EXECUTE( deco16 )
 
 static CPU_SET_INFO( m6502 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -693,7 +709,7 @@ static CPU_SET_INFO( m6502 )
 
 CPU_GET_INFO( m6502 )
 {
-	m6502_Regs *cpustate = (device != NULL) ? device->token : NULL;
+	m6502_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -808,7 +824,7 @@ CPU_GET_INFO( n2a03 )
 
 static CPU_SET_INFO( m6510 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -822,7 +838,7 @@ static CPU_SET_INFO( m6510 )
 
 CPU_GET_INFO( m6510 )
 {
-	m6502_Regs *cpustate = (device != NULL) ? device->token : NULL;
+	m6502_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -908,7 +924,7 @@ CPU_GET_INFO( m8502 )
 
 static CPU_SET_INFO( m65c02 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -972,7 +988,7 @@ CPU_GET_INFO( m65sc02 )
 
 static CPU_SET_INFO( deco16 )
 {
-	m6502_Regs *cpustate = device->token;
+	m6502_Regs *cpustate = get_safe_token(device);
 
 	switch (state)
 	{

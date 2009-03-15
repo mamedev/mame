@@ -149,6 +149,15 @@ struct _tms32051_state
 	int icount;
 };
 
+INLINE tms32051_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_TMS32051);
+	return (tms32051_state *)device->token;
+}
+
 static void delay_slot(tms32051_state *cpustate, UINT16 startpc);
 static void save_interrupt_context(tms32051_state *cpustate);
 static void restore_interrupt_context(tms32051_state *cpustate);
@@ -213,7 +222,7 @@ static void delay_slot(tms32051_state *cpustate, UINT16 startpc)
 
 static CPU_INIT( tms )
 {
-	tms32051_state *cpustate = device->token;
+	tms32051_state *cpustate = get_safe_token(device);
 
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -222,7 +231,7 @@ static CPU_INIT( tms )
 
 static CPU_RESET( tms )
 {
-	tms32051_state *cpustate = device->token;
+	tms32051_state *cpustate = get_safe_token(device);
 	int i;
 	UINT16 src, dst, length;
 
@@ -328,7 +337,7 @@ static CPU_EXIT( tms )
 
 static CPU_EXECUTE( tms )
 {
-	tms32051_state *cpustate = device->token;
+	tms32051_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -396,7 +405,7 @@ static CPU_EXECUTE( tms )
 
 static READ16_HANDLER( cpuregs_r )
 {
-	tms32051_state *cpustate = space->cpu->token;
+	tms32051_state *cpustate = get_safe_token(space->cpu);
 
 	switch (offset)
 	{
@@ -448,7 +457,7 @@ static READ16_HANDLER( cpuregs_r )
 
 static WRITE16_HANDLER( cpuregs_w )
 {
-	tms32051_state *cpustate = space->cpu->token;
+	tms32051_state *cpustate = get_safe_token(space->cpu);
 
 	switch (offset)
 	{
@@ -542,7 +551,7 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( tms )
 {
-	tms32051_state *cpustate = device->token;
+	tms32051_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -553,7 +562,7 @@ static CPU_SET_INFO( tms )
 
 static CPU_READ( tms )
 {
-	tms32051_state *cpustate = device->token;
+	tms32051_state *cpustate = get_safe_token(device);
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
 		*value = (PM_READ16(cpustate, offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
@@ -567,7 +576,7 @@ static CPU_READ( tms )
 
 static CPU_GET_INFO( tms )
 {
-	tms32051_state *cpustate = (device != NULL) ? device->token : NULL;
+	tms32051_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{
@@ -673,7 +682,7 @@ static CPU_GET_INFO( tms )
 #if (HAS_TMS32051)
 static CPU_SET_INFO( tms32051 )
 {
-	tms32051_state *cpustate = device->token;
+	tms32051_state *cpustate = get_safe_token(device);
 
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{

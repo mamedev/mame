@@ -148,9 +148,11 @@ struct _cop400_state
 	emu_timer *microbus_timer;
 };
 
+typedef void (*cop400_opcode_func) (cop400_state *cpustate, UINT8 opcode);
+
 struct _cop400_opcode_map {
 	unsigned cycles;
-	void (*function) (cop400_state *cpustate, UINT8 opcode);
+	cop400_opcode_func function;
 };
 
 /***************************************************************************
@@ -1206,7 +1208,7 @@ static CPU_EXECUTE( cop400 )
 
 			if (BIT(EN, 1) && BIT(IL, 1))
 			{
-				void *function = cpustate->opcode_map[ROM(PC)].function;
+				cop400_opcode_func function = cpustate->opcode_map[ROM(PC)].function;
 
 				if ((function != jp) &&	(function != jmp) && (function != jsr))
 				{
@@ -1231,7 +1233,7 @@ static CPU_EXECUTE( cop400 )
 
 			if (cpustate->skip)
 			{
-				void *function = cpustate->opcode_map[ROM(PC)].function;
+				cop400_opcode_func function = cpustate->opcode_map[ROM(PC)].function;
 
 				opcode = ROM(PC);
 

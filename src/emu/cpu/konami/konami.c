@@ -65,6 +65,15 @@ struct _konami_state
 	konami_set_lines_func setlines_callback;
 };
 
+INLINE konami_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_KONAMI);
+	return (konami_state *)device->token;
+}
+
 /* flag bits in the cc register */
 #define CC_C    0x01        /* Carry */
 #define CC_V    0x02        /* Overflow */
@@ -391,7 +400,7 @@ static void check_irq_lines(konami_state *cpustate)
 /****************************************************************************/
 static CPU_INIT( konami )
 {
-	konami_state *cpustate = device->token;
+	konami_state *cpustate = get_safe_token(device);
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -414,7 +423,7 @@ static CPU_INIT( konami )
 
 static CPU_RESET( konami )
 {
-	konami_state *cpustate = device->token;
+	konami_state *cpustate = get_safe_token(device);
 
 	cpustate->int_state = 0;
 	cpustate->nmi_state = CLEAR_LINE;
@@ -462,7 +471,7 @@ static void set_irq_line(konami_state *cpustate, int irqline, int state)
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( konami )
 {
-	konami_state *cpustate = device->token;
+	konami_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 	check_irq_lines(cpustate);
@@ -501,7 +510,7 @@ static CPU_EXECUTE( konami )
 
 static CPU_SET_INFO( konami )
 {
-	konami_state *cpustate = device->token;
+	konami_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -534,7 +543,7 @@ static CPU_SET_INFO( konami )
 
 CPU_GET_INFO( konami )
 {
-	konami_state *cpustate = (device != NULL) ? device->token : NULL;
+	konami_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

@@ -96,6 +96,14 @@ struct _tms32010_state
 	const	address_space *io;
 };
 
+INLINE tms32010_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_TMS32010);
+	return (tms32010_state *)device->token;
+}
 
 /* opcode table entry */
 typedef struct _tms32010_opcode tms32010_opcode;
@@ -377,7 +385,7 @@ static void adds(tms32010_state *cpustate)
 	cpustate->ACC.d += cpustate->ALU.d;
 	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
 }
-static void and(tms32010_state *cpustate)
+static void and_(tms32010_state *cpustate)
 {
 	getdata(cpustate, 0,0);
 	cpustate->ACC.d &= cpustate->ALU.d;
@@ -583,7 +591,7 @@ static void nop(tms32010_state *cpustate)
 {
 	/* Nothing to do */
 }
-static void or(tms32010_state *cpustate)
+static void or_(tms32010_state *cpustate)
 {
 	getdata(cpustate, 0,0);
 	cpustate->ACC.w.l |= cpustate->ALU.w.l;
@@ -690,7 +698,7 @@ static void tblw(tms32010_state *cpustate)
 	M_WRTROM(((cpustate->ACC.w.l & cpustate->addr_mask)),cpustate->ALU.w.l);
 	cpustate->STACK[0] = cpustate->STACK[1];
 }
-static void xor(tms32010_state *cpustate)
+static void xor_(tms32010_state *cpustate)
 {
 	getdata(cpustate, 0,0);
 	cpustate->ACC.w.l ^= cpustate->ALU.w.l;
@@ -735,7 +743,7 @@ static const tms32010_opcode opcode_main[256]=
 /*60*/  {1, addh	},{1, adds		},{1, subh		},{1, subs		},{1, subc		},{1, zalh		},{1, zals		},{3, tblr		},
 /*68*/  {1, larp_mar},{1, dmov		},{1, lt		},{1, ltd		},{1, lta		},{1, mpy		},{1, ldpk		},{1, ldp		},
 /*70*/  {1, lark_ar0},{1, lark_ar1	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},
-/*78*/  {1, xor		},{1, and		},{1, or		},{1, lst		},{1, sst		},{3, tblw		},{1, lack		},{0, opcodes_7F	},
+/*78*/  {1, xor_	},{1, and_		},{1, or_		},{1, lst		},{1, sst		},{3, tblw		},{1, lack		},{0, opcodes_7F	},
 /*80*/  {1, mpyk	},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},
 /*88*/  {1, mpyk	},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},
 /*90*/  {1, mpyk	},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},{1, mpyk		},
@@ -769,7 +777,7 @@ static const tms32010_opcode_7F opcode_7F[32]=
  ****************************************************************************/
 static CPU_INIT( tms32010 )
 {
-	tms32010_state *cpustate = device->token;
+	tms32010_state *cpustate = get_safe_token(device);
 
 	state_save_register_device_item(device, 0, cpustate->PC);
 	state_save_register_device_item(device, 0, cpustate->PREVPC);
@@ -803,7 +811,7 @@ static CPU_INIT( tms32010 )
  ****************************************************************************/
 static CPU_RESET( tms32010 )
 {
-	tms32010_state *cpustate = device->token;
+	tms32010_state *cpustate = get_safe_token(device);
 
 	cpustate->PC    = 0;
 	cpustate->STR   = 0x7efe;	// OV cleared
@@ -846,7 +854,7 @@ static int Ext_IRQ(tms32010_state *cpustate)
  ****************************************************************************/
 static CPU_EXECUTE( tms32010 )
 {
-	tms32010_state *cpustate = device->token;
+	tms32010_state *cpustate = get_safe_token(device);
 	cpustate->icount = cycles;
 
 	do
@@ -905,7 +913,7 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( tms32010 )
 {
-	tms32010_state *cpustate = device->token;
+	tms32010_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -935,7 +943,7 @@ static CPU_SET_INFO( tms32010 )
 
 CPU_GET_INFO( tms32010 )
 {
-	tms32010_state *cpustate = (device != NULL) ? device->token : NULL;
+	tms32010_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

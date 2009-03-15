@@ -68,6 +68,15 @@ struct _tx0_state
 	const address_space *program;
 };
 
+INLINE tx0_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_TX0_64KW ||
+		   cpu_get_type(device) == CPU_TX0_8KW);
+	return (tx0_state *)device->token;
+}
 
 #define READ_TX0_18BIT(A) ((signed)memory_read_dword_32be(cpustate->program, (A)<<2))
 #define WRITE_TX0_18BIT(A,V) (memory_write_dword_32be(cpustate->program, (A)<<2,(V)))
@@ -120,10 +129,10 @@ static void tx0_write(tx0_state *cpustate, offs_t address, int data)
 
 static void tx0_init_common(int is_64kw, const device_config *device, cpu_irq_callback irqcallback)
 {
-	tx0_state *cpustate = device->token;
+	tx0_state *cpustate = get_safe_token(device);
 
 	/* clean-up */
-	cpustate->iface = device->static_config;
+	cpustate->iface = (const tx0_reset_param_t *)device->static_config;
 
 	cpustate->address_mask = is_64kw ? ADDRESS_MASK_64KW : ADDRESS_MASK_8KW;
 	cpustate->ir_mask = is_64kw ? 03 : 037;
@@ -144,7 +153,7 @@ static CPU_INIT( tx0_8kw)
 
 static CPU_RESET( tx0 )
 {
-	tx0_state *cpustate = device->token;
+	tx0_state *cpustate = get_safe_token(device);
 
 	/* reset CPU flip-flops */
 	pulse_reset(device);
@@ -155,7 +164,7 @@ static CPU_RESET( tx0 )
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( tx0_64kw )
 {
-	tx0_state *cpustate = device->token;
+	tx0_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -265,7 +274,7 @@ static CPU_EXECUTE( tx0_64kw )
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( tx0_8kw )
 {
-	tx0_state *cpustate = device->token;
+	tx0_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -375,7 +384,7 @@ static CPU_EXECUTE( tx0_8kw )
 
 static CPU_SET_INFO( tx0 )
 {
-	tx0_state *cpustate = device->token;
+	tx0_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -426,7 +435,7 @@ static CPU_SET_INFO( tx0 )
 
 CPU_GET_INFO( tx0_64kw )
 {
-	tx0_state *cpustate = ( device != NULL ) ? device->token : NULL;
+	tx0_state *cpustate = ( device != NULL && device->token != NULL ) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -552,7 +561,7 @@ CPU_GET_INFO( tx0_64kw )
 
 CPU_GET_INFO( tx0_8kw )
 {
-	tx0_state *cpustate = ( device != NULL ) ? device->token : NULL;
+	tx0_state *cpustate = ( device != NULL && device->token != NULL ) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -680,7 +689,7 @@ CPU_GET_INFO( tx0_8kw )
 /* execute one instruction */
 static void execute_instruction_64kw(const device_config *device)
 {
-	tx0_state *cpustate = device->token;
+	tx0_state *cpustate = get_safe_token(device);
 
 	if (! cpustate->cycle)
 	{
@@ -779,13 +788,13 @@ static void execute_instruction_64kw(const device_config *device)
 			if ((MAR & 0000104) == 0000100)
 				/* (1.1) PEN = Read the light pen flip-flops 1 and 2 into AC(0) and
                     AC(1). */
-				/*...*/;
+				/*...*/{ }
 
 			if ((MAR & 0000104) == 0000004)
 				/* (1.1) TAC = Insert a one in each digital position of the AC
                     wherever there is a one in the corresponding digital position
                     of the TAC. */
-				/*...*/;
+				/*...*/ { }
 
 			if (MAR & 0000040)
 				/* (1.2) COM = Complement every digit in the accumulator */
@@ -797,7 +806,7 @@ static void execute_instruction_64kw(const device_config *device)
 
 			if ((MAR & 0000003) == 3)
 				/* (1.2) TBR = Store the contents of the TBR in the MBR. */
-				/*...*/;
+				/*...*/ { }
 
 			if ((MAR & 0000003) == 2)
 				/* (1.3) LMB = Store the contents of the LR in the MBR. */
@@ -871,7 +880,7 @@ static void indexed_address_eval(tx0_state *cpustate)
 /* execute one instruction */
 static void execute_instruction_8kw(const device_config *device)
 {
-	tx0_state *cpustate = device->token;
+	tx0_state *cpustate = get_safe_token(device);
 
 	if (! cpustate->cycle)
 	{
@@ -1277,7 +1286,7 @@ static void execute_instruction_8kw(const device_config *device)
 */
 static void pulse_reset(const device_config *device)
 {
-	tx0_state *cpustate = device->token;
+	tx0_state *cpustate = get_safe_token(device);
 
 	/* processor registers */
 	PC = 0;			/* ??? */

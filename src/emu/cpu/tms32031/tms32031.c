@@ -122,6 +122,15 @@ struct _tms32031_state
 	const address_space *program;
 };
 
+INLINE tms32031_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_TMS32031);
+	return (tms32031_state *)device->token;
+}
+
 
 
 /***************************************************************************
@@ -358,8 +367,8 @@ static void set_irq_line(tms32031_state *tms, int irqline, int state)
 
 static CPU_INIT( tms32031 )
 {
-	const tms32031_config *configdata = device->static_config;
-	tms32031_state *tms = device->token;
+	const tms32031_config *configdata = (const tms32031_config *)device->static_config;
+	tms32031_state *tms = get_safe_token(device);
 	int i;
 
 	tms->irq_callback = irqcallback;
@@ -388,7 +397,7 @@ static CPU_INIT( tms32031 )
 
 static CPU_RESET( tms32031 )
 {
-	tms32031_state *tms = device->token;
+	tms32031_state *tms = get_safe_token(device);
 
 	/* if we have a config struct, get the boot ROM address */
 	if (tms->bootoffset)
@@ -416,7 +425,7 @@ static CPU_RESET( tms32031 )
 
 static CPU_RESET( tms32032 )
 {
-	tms32031_state *tms = device->token;
+	tms32031_state *tms = get_safe_token(device);
 	CPU_RESET_CALL(tms32031);
 	tms->is_32032 = TRUE;
 }
@@ -452,7 +461,7 @@ static CPU_EXIT( tms32031 )
 
 static CPU_EXECUTE( tms32031 )
 {
-	tms32031_state *tms = device->token;
+	tms32031_state *tms = get_safe_token(device);
 
 	/* check IRQs up front */
 	tms->icount = cycles;
@@ -612,7 +621,7 @@ static UINT32 boot_loader(tms32031_state *tms, UINT32 boot_rom_addr)
 
 static CPU_SET_INFO( tms32031 )
 {
-	tms32031_state *tms = device->token;
+	tms32031_state *tms = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -691,7 +700,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( tms32031 )
 {
-	tms32031_state *tms = (device != NULL) ? device->token : NULL;
+	tms32031_state *tms = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	float ftemp;
 
 	switch (state)

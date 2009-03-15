@@ -41,7 +41,7 @@ static int describe_instruction_cop2(mips3_state *mips, UINT32 op, opcode_desc *
 
 int mips3fe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 {
-	mips3_state *mips = param;
+	mips3_state *mips = (mips3_state *)param;
 	UINT32 op, opswitch;
 
 	/* compute the physical PC */

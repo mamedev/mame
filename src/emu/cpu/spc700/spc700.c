@@ -97,6 +97,15 @@ typedef struct
 	int spc_int32;
 } spc700i_cpu;
 
+INLINE spc700i_cpu *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_SPC700);
+	return (spc700i_cpu *)device->token;
+}
+
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
 /* ======================================================================== */
@@ -1239,7 +1248,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 
 static CPU_INIT( spc700 )
 {
-	spc700i_cpu *cpustate = device->token;
+	spc700i_cpu *cpustate = get_safe_token(device);
 
 	INT_ACK = irqcallback;
 	cpustate->device = device;
@@ -1249,7 +1258,7 @@ static CPU_INIT( spc700 )
 
 static CPU_RESET( spc700 )
 {
-	spc700i_cpu *cpustate = device->token;
+	spc700i_cpu *cpustate = get_safe_token(device);
 
 	CPU_STOPPED = 0;
 #if !SPC700_OPTIMIZE_SNES
@@ -1307,7 +1316,7 @@ static void spc700_set_irq_line(spc700i_cpu *cpustate,int line, int state)
 /* Execute instructions for <clocks> cycles */
 static CPU_EXECUTE( spc700 )
 {
-	spc700i_cpu *cpustate = device->token;
+	spc700i_cpu *cpustate = get_safe_token(device);
 
 	CLOCKS = CPU_STOPPED ? 0 : cycles;
 	while(CLOCKS > 0)
@@ -1586,7 +1595,7 @@ static CPU_EXECUTE( spc700 )
 
 static CPU_SET_INFO( spc700 )
 {
-	spc700i_cpu *cpustate = device->token;
+	spc700i_cpu *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1613,7 +1622,7 @@ static CPU_SET_INFO( spc700 )
 
 CPU_GET_INFO( spc700 )
 {
-	spc700i_cpu *cpustate = (device != NULL) ? device->token : NULL;
+	spc700i_cpu *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	uint p = 0;
 
 	if (cpustate != NULL)

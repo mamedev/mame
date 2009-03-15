@@ -47,7 +47,7 @@ enum op_names {
 	oim,	ora,	orb,	psha,	pshb,	pshx,	pula,	pulb,
 	pulx,	rol,	rola,	rolb,	ror,	rora,	rorb,	rti,
 	rts,	sba,	sbca,	sbcb,	sec,	sev,	sta,	stb,
-	std,	sei,	sts,	stx,	suba,	subb,	subd,	swi,
+	_std,	sei,	sts,	stx,	suba,	subb,	subd,	swi,
 	wai,	tab,	tap,	tba,	tim,	tpa,	tst,	tsta,
 	tstb,	tsx,	txs,	asx1,	asx2,	xgdx,	addx,	adcx
 };
@@ -131,19 +131,19 @@ static const UINT8 table[0x102][3] = {
 	{subb,imb,0},{cmpb,imb,0},{sbcb,imb,0},{addd,imw,1},/* c0 */
 	{andb,imb,0},{bitb,imb,0},{ldb, imb,0},{stb, imb,0},
 	{eorb,imb,0},{adcb,imb,0},{orb, imb,0},{addb,imb,0},
-	{ldd, imw,1},{std, imw,1},{ldx, imw,0},{stx, imw,0},
+	{ldd, imw,1},{_std,imw,1},{ldx, imw,0},{stx, imw,0},
 	{subb,dir,0},{cmpb,dir,0},{sbcb,dir,0},{addd,dir,1},/* d0 */
 	{andb,dir,0},{bitb,dir,0},{ldb, dir,0},{stb, dir,0},
 	{eorb,dir,0},{adcb,dir,0},{orb, dir,0},{addb,dir,0},
-	{ldd, dir,1},{std, dir,1},{ldx, dir,0},{stx, dir,0},
+	{ldd, dir,1},{_std,dir,1},{ldx, dir,0},{stx, dir,0},
 	{subb,idx,0},{cmpb,idx,0},{sbcb,idx,0},{addd,idx,1},/* e0 */
 	{andb,idx,0},{bitb,idx,0},{ldb, idx,0},{stb, idx,0},
 	{eorb,idx,0},{adcb,idx,0},{orb, idx,0},{addb,idx,0},
-	{ldd, idx,1},{std, idx,1},{ldx, idx,0},{stx, idx,0},
+	{ldd, idx,1},{_std,idx,1},{ldx, idx,0},{stx, idx,0},
 	{subb,ext,0},{cmpb,ext,0},{sbcb,ext,0},{addd,ext,1},/* f0 */
 	{andb,ext,0},{bitb,ext,0},{ldb, ext,0},{stb, ext,0},
 	{eorb,ext,0},{adcb,ext,0},{orb, ext,0},{addb,ext,0},
-	{ldd, ext,1},{std, ext,1},{ldx, ext,0},{stx, ext,0},
+	{ldd, ext,1},{_std,ext,1},{ldx, ext,0},{stx, ext,0},
 
 	/* extra instruction $fc for NSC-8105 */
 	{addx,ext,0},

@@ -323,7 +323,7 @@ INLINE UINT8 argument_fetch(mcs48_state *cpustate)
 
 INLINE void update_regptr(mcs48_state *cpustate)
 {
-	cpustate->regptr = memory_get_write_ptr(cpustate->data, (cpustate->psw & B_FLAG) ? 24 : 0);
+	cpustate->regptr = (UINT8 *)memory_get_write_ptr(cpustate->data, (cpustate->psw & B_FLAG) ? 24 : 0);
 }
 
 

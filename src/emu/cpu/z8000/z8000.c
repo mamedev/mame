@@ -86,6 +86,15 @@ struct _z8000_state
 
 #include "z8000cpu.h"
 
+INLINE z8000_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_Z8000);
+	return (z8000_state *)device->token;
+}
+
 /* opcode execution table */
 Z8000_exec *z8000_exec = NULL;
 
@@ -335,7 +344,7 @@ INLINE void Interrupt(z8000_state *cpustate)
 
 static CPU_INIT( z8000 )
 {
-	z8000_state *cpustate = device->token;
+	z8000_state *cpustate = get_safe_token(device);
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -349,7 +358,7 @@ static CPU_INIT( z8000 )
 
 static CPU_RESET( z8000 )
 {
-	z8000_state *cpustate = device->token;
+	z8000_state *cpustate = get_safe_token(device);
 
 	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(*cpustate));
@@ -368,7 +377,7 @@ static CPU_EXIT( z8000 )
 
 static CPU_EXECUTE( z8000 )
 {
-	z8000_state *cpustate = device->token;
+	z8000_state *cpustate = get_safe_token(device);
 
     cpustate->icount = cycles;
 
@@ -461,7 +470,7 @@ static void set_irq_line(z8000_state *cpustate, int irqline, int state)
 
 static CPU_SET_INFO( z8000 )
 {
-	z8000_state *cpustate = device->token;
+	z8000_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -507,7 +516,7 @@ static CPU_SET_INFO( z8000 )
 
 CPU_GET_INFO( z8000 )
 {
-	z8000_state *cpustate = (device != NULL) ? device->token : NULL;
+	z8000_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

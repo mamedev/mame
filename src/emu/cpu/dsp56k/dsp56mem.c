@@ -612,7 +612,7 @@ static void dsp56k_host_interface_reset(dsp56k_core* cpustate)
 /* They represent the host side of the dsp56k's host interface */
 void dsp56k_host_interface_write(device_config* device, UINT8 offset, UINT8 data)
 {
-	dsp56k_core* cpustate = device->token;
+	dsp56k_core* cpustate = get_safe_token(device);
 
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
@@ -708,7 +708,7 @@ void dsp56k_host_interface_write(device_config* device, UINT8 offset, UINT8 data
 
 UINT8 dsp56k_host_interface_read(device_config* device, UINT8 offset)
 {
-	dsp56k_core* cpustate = device->token;
+	dsp56k_core* cpustate = get_safe_token(device);
 
 	/* Not exactly correct since the bootstrap hack doesn't need this to be true */
 	/*
@@ -936,6 +936,6 @@ static void dsp56k_io_reset(dsp56k_core* cpustate)
 /* MISC*/
 UINT16 dsp56k_get_peripheral_memory(device_config* device, UINT16 addr)
 {
-	// TODO // THIS COMES BACK dsp56k_core* cpustate = device->token;
+	// TODO // THIS COMES BACK dsp56k_core* cpustate = get_safe_token(device);
 	return dsp56k_peripheral_ram[A2O(addr)];
 }

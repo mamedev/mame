@@ -46,6 +46,15 @@ struct _s2650_regs {
 	const address_space *io;
 };
 
+INLINE s2650_regs *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_S2650);
+	return (s2650_regs *)device->token;
+}
+
 /* condition code changes for a byte */
 static const UINT8 ccc[0x200] = {
 	0x00,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
@@ -759,7 +768,7 @@ static void BRA_EA(void) _BRA_EA()
 
 static CPU_INIT( s2650 )
 {
-	s2650_regs *s2650c = device->token;
+	s2650_regs *s2650c = get_safe_token(device);
 
 	s2650c->irq_callback = irqcallback;
 	s2650c->device = device;
@@ -782,7 +791,7 @@ static CPU_INIT( s2650 )
 
 static CPU_RESET( s2650 )
 {
-	s2650_regs *s2650c = device->token;
+	s2650_regs *s2650c = get_safe_token(device);
 
 	s2650c->ppc = 0;
 	s2650c->page = 0,
@@ -851,7 +860,7 @@ static int s2650_get_sense(s2650_regs *s2650c)
 
 static CPU_EXECUTE( s2650 )
 {
-	s2650_regs *s2650c = device->token;
+	s2650_regs *s2650c = get_safe_token(device);
 
 	s2650c->icount = cycles;
 	do
@@ -1470,7 +1479,7 @@ static CPU_EXECUTE( s2650 )
 
 static CPU_SET_INFO( s2650 )
 {
-	s2650_regs *s2650c = device->token;
+	s2650_regs *s2650c = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1507,7 +1516,7 @@ static CPU_SET_INFO( s2650 )
 
 CPU_GET_INFO( s2650 )
 {
-	s2650_regs *s2650c = device ? device->token : NULL;
+	s2650_regs *s2650c = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

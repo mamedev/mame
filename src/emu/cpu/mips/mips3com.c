@@ -72,7 +72,7 @@ INLINE int tlb_entry_is_global(const mips3_tlb_entry *entry)
 
 void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const device_config *device, cpu_irq_callback irqcallback)
 {
-	const mips3_config *config = device->static_config;
+	const mips3_config *config = (const mips3_config *)device->static_config;
 	int tlbindex;
 
 	/* initialize based on the config */

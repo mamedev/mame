@@ -138,6 +138,15 @@ struct _z80_state
 	UINT8 rtemp;
 };
 
+INLINE z80_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_Z80);
+	return (z80_state *)device->token;
+}
+
 #define CF		0x01
 #define NF		0x02
 #define PF		0x04
@@ -3322,7 +3331,7 @@ static void take_interrupt(z80_state *z80)
  ****************************************************************************/
 static CPU_INIT( z80 )
 {
-	z80_state *z80 = device->token;
+	z80_state *z80 = get_safe_token(device);
 	int i, p;
 
 	/* setup cycle tables */
@@ -3444,7 +3453,7 @@ static CPU_INIT( z80 )
 	/* Reset registers to their initial values */
 	memset(z80, 0, sizeof(*z80));
 	if (device->static_config != NULL)
-		z80->daisy = z80daisy_init(device, device->static_config);
+		z80->daisy = z80daisy_init(device, (const z80_daisy_chain *)device->static_config);
 	z80->irq_callback = irqcallback;
 	z80->device = device;
 	z80->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -3463,7 +3472,7 @@ static CPU_INIT( z80 )
  ****************************************************************************/
 static CPU_RESET( z80 )
 {
-	z80_state *z80 = device->token;
+	z80_state *z80 = get_safe_token(device);
 
 	z80->PC = 0x0000;
 	z80->i = 0;
@@ -3493,7 +3502,7 @@ static CPU_EXIT( z80 )
  ****************************************************************************/
 static CPU_EXECUTE( z80 )
 {
-	z80_state *z80 = device->token;
+	z80_state *z80 = get_safe_token(device);
 
 	z80->icount = cycles;
 
@@ -3535,7 +3544,7 @@ static CPU_EXECUTE( z80 )
  ****************************************************************************/
 static CPU_BURN( z80 )
 {
-	z80_state *z80 = device->token;
+	z80_state *z80 = get_safe_token(device);
 
 	if( cycles > 0 )
 	{
@@ -3577,7 +3586,7 @@ static void set_irq_line(z80_state *z80, int irqline, int state)
 
 static CPU_IMPORT_STATE( z80 )
 {
-	z80_state *cpustate = device->token;
+	z80_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -3595,7 +3604,7 @@ static CPU_IMPORT_STATE( z80 )
 
 static CPU_EXPORT_STATE( z80 )
 {
-	z80_state *cpustate = device->token;
+	z80_state *cpustate = get_safe_token(device);
 
 	switch (entry->index)
 	{
@@ -3616,7 +3625,7 @@ static CPU_EXPORT_STATE( z80 )
 
 static CPU_SET_INFO( z80 )
 {
-	z80_state *z80 = device->token;
+	z80_state *z80 = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -3624,12 +3633,12 @@ static CPU_SET_INFO( z80 )
 		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line(z80, 0, info->i);		break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_op:	cc[Z80_TABLE_op] = info->p;			break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_cb:	cc[Z80_TABLE_cb] = info->p;			break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ed:	cc[Z80_TABLE_ed] = info->p;			break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_xy:	cc[Z80_TABLE_xy] = info->p;			break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_xycb:	cc[Z80_TABLE_xycb] = info->p;		break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ex:	cc[Z80_TABLE_ex] = info->p;			break;
+		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_op:	cc[Z80_TABLE_op] = (const UINT8 *)info->p;			break;
+		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_cb:	cc[Z80_TABLE_cb] = (const UINT8 *)info->p;			break;
+		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ed:	cc[Z80_TABLE_ed] = (const UINT8 *)info->p;			break;
+		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_xy:	cc[Z80_TABLE_xy] = (const UINT8 *)info->p;			break;
+		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_xycb:	cc[Z80_TABLE_xycb] = (const UINT8 *)info->p;		break;
+		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ex:	cc[Z80_TABLE_ex] = (const UINT8 *)info->p;			break;
 	}
 }
 
@@ -3641,7 +3650,7 @@ static CPU_SET_INFO( z80 )
 
 CPU_GET_INFO( z80 )
 {
-	z80_state *z80 = (device != NULL) ? device->token : NULL;
+	z80_state *z80 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

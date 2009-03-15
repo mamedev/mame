@@ -39,6 +39,15 @@ struct _i960_state_t {
 	int icount;
 };
 
+INLINE i960_state_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_I960);
+	return (i960_state_t *)device->token;
+}
+
 static void do_call(i960_state_t *i960, UINT32 adr, int type, UINT32 stack);
 
 INLINE UINT32 i960_read_dword_unaligned(i960_state_t *i960, UINT32 address)
@@ -1946,7 +1955,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 
 static CPU_EXECUTE( i960 )
 {
-	i960_state_t *i960 = device->token;
+	i960_state_t *i960 = get_safe_token(device);
 	UINT32 opcode;
 
 	i960->icount = cycles;
@@ -2035,7 +2044,7 @@ static void set_irq_line(i960_state_t *i960, int irqline, int state)
 
 static CPU_SET_INFO( i960 )
 {
-	i960_state_t *i960 = device->token;
+	i960_state_t *i960 = get_safe_token(device);
 
 	if(state >= CPUINFO_INT_REGISTER+I960_R0 && state <= CPUINFO_INT_REGISTER + I960_G15) {
 		i960->r[state - (CPUINFO_INT_REGISTER + I960_R0)] = info->i;
@@ -2057,7 +2066,7 @@ static CPU_SET_INFO( i960 )
 
 static CPU_INIT( i960 )
 {
-	i960_state_t *i960 = device->token;
+	i960_state_t *i960 = get_safe_token(device);
 
 	i960->irq_cb = irqcallback;
 	i960->device = device;
@@ -2090,7 +2099,7 @@ static CPU_DISASSEMBLE( i960  )
 
 static CPU_RESET( i960 )
 {
-	i960_state_t *i960 = device->token;
+	i960_state_t *i960 = get_safe_token(device);
 
 	i960->SAT        = memory_read_dword_32le(i960->program, 0);
 	i960->PRCB       = memory_read_dword_32le(i960->program, 4);
@@ -2111,7 +2120,7 @@ static CPU_RESET( i960 )
 
 CPU_GET_INFO( i960 )
 {
-	i960_state_t *i960 = (device != NULL) ? device->token : NULL;
+	i960_state_t *i960 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	if(state >= CPUINFO_INT_REGISTER+I960_R0 && state <= CPUINFO_INT_REGISTER + I960_G15) {
 		info->i = i960->r[state - (CPUINFO_INT_REGISTER + I960_R0)];
@@ -2224,12 +2233,12 @@ CPU_GET_INFO( i960 )
 // on the real hardware (e.g. Model 2's interrupt control registers)
 void i960_noburst(const device_config *device)
 {
-	i960_state_t *i960 = device->token;
+	i960_state_t *i960 = get_safe_token(device);
 	i960->bursting = 0;
 }
 
 void i960_stall(const device_config *device)
 {
-	i960_state_t *i960 = device->token;
+	i960_state_t *i960 = get_safe_token(device);
 	i960->IP = i960->PIP;
 }

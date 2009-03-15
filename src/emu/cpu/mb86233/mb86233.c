@@ -62,6 +62,15 @@ struct _mb86233_state
 	UINT32			*Tables;
 };
 
+INLINE mb86233_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_MB86233);
+	return (mb86233_state *)device->token;
+}
+
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -95,7 +104,7 @@ struct _mb86233_state
 
 static CPU_INIT( mb86233 )
 {
-	mb86233_state *cpustate = device->token;
+	mb86233_state *cpustate = get_safe_token(device);
 	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->static_config;
 	(void)irqcallback;
 
@@ -109,7 +118,7 @@ static CPU_INIT( mb86233 )
 		cpustate->fifo_write_cb = _config->fifo_write_cb;
 	}
 
-	cpustate->RAM = auto_malloc(2 * 0x200 * sizeof(UINT32));		/* 2x 2KB */
+	cpustate->RAM = (UINT32 *)auto_malloc(2 * 0x200 * sizeof(UINT32));		/* 2x 2KB */
 	memset( cpustate->RAM, 0, 2 * 0x200 * sizeof(UINT32) );
 	cpustate->ARAM = &cpustate->RAM[0];
 	cpustate->BRAM = &cpustate->RAM[0x200];
@@ -120,7 +129,7 @@ static CPU_INIT( mb86233 )
 
 static CPU_RESET( mb86233 )
 {
-	mb86233_state *cpustate = device->token;
+	mb86233_state *cpustate = get_safe_token(device);
 
 	/* zero registers and flags */
 	cpustate->pc = 0;
@@ -928,7 +937,7 @@ static UINT32 INDIRECT( mb86233_state *cpustate, UINT32 reg, int source )
 
 static CPU_EXECUTE( mb86233 )
 {
-	mb86233_state *cpustate = device->token;
+	mb86233_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -1568,7 +1577,7 @@ static CPU_DISASSEMBLE( mb86233 )
 
 static CPU_SET_INFO( mb86233 )
 {
-	mb86233_state *cpustate = device->token;
+	mb86233_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1609,7 +1618,7 @@ static CPU_SET_INFO( mb86233 )
 
 CPU_GET_INFO( mb86233 )
 {
-	mb86233_state *cpustate = (device != NULL) ? device->token : NULL;
+	mb86233_state *cpustate = (device != NULL && device != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

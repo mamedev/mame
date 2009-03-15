@@ -113,6 +113,15 @@ union _lr35902_state {
 	lr35902_8BitRegs b;
 };
 
+INLINE lr35902_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_LR35902);
+	return (lr35902_state *)device->token;
+}
+
 typedef int (*OpcodeEmulator) (lr35902_state *cpustate);
 
 #define IME     0x01
@@ -180,7 +189,7 @@ static const int CyclesCB[256] =
 
 static CPU_INIT( lr35902 )
 {
-	lr35902_state *cpustate = device->token;
+	lr35902_state *cpustate = get_safe_token(device);
 
 	cpustate->w.config = (const lr35902_cpu_core *) device->static_config;
 	cpustate->w.irq_callback = irqcallback;
@@ -195,7 +204,7 @@ static CPU_INIT( lr35902 )
 /************************************************************/
 static CPU_RESET( lr35902 )
 {
-	lr35902_state *cpustate = device->token;
+	lr35902_state *cpustate = get_safe_token(device);
 
 	cpustate->w.AF = 0x0000;
 	cpustate->w.BC = 0x0000;
@@ -300,7 +309,7 @@ INLINE void lr35902_ProcessInterrupts (lr35902_state *cpustate)
 /************************************************************/
 static CPU_EXECUTE( lr35902 )
 {
-	lr35902_state *cpustate = device->token;
+	lr35902_state *cpustate = get_safe_token(device);
 
 	cpustate->w.icount = cycles;
 
@@ -336,7 +345,7 @@ static CPU_EXECUTE( lr35902 )
 
 static CPU_BURN( lr35902 )
 {
-	lr35902_state *cpustate = device->token;
+	lr35902_state *cpustate = get_safe_token(device);
 
     if( cycles > 0 )
     {
@@ -378,7 +387,7 @@ static void lr35902_clear_pending_interrupts (lr35902_state *cpustate)
 
 static CPU_SET_INFO( lr35902 )
 {
-	lr35902_state *cpustate = device->token;
+	lr35902_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -406,7 +415,7 @@ static CPU_SET_INFO( lr35902 )
 
 CPU_GET_INFO( lr35902 )
 {
-	lr35902_state *cpustate = (device != NULL) ? device->token : NULL;
+	lr35902_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

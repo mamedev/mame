@@ -59,15 +59,24 @@ struct _sc61860_state
     int icount;
 };
 
+INLINE sc61860_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_SC61860);
+	return (sc61860_state *)device->token;
+}
+
 UINT8 *sc61860_internal_ram(const device_config *device)
 {
-	sc61860_state *cpustate = device->token;
+	sc61860_state *cpustate = get_safe_token(device);
 	return cpustate->ram;
 }
 
 static TIMER_CALLBACK(sc61860_2ms_tick)
 {
-	sc61860_state *cpustate = ptr;
+	sc61860_state *cpustate = (sc61860_state *)ptr;
 	if (--cpustate->timer.count == 0)
 	{
 		cpustate->timer.count = 128;
@@ -84,7 +93,7 @@ static TIMER_CALLBACK(sc61860_2ms_tick)
 
 static CPU_RESET( sc61860 )
 {
-	sc61860_state *cpustate = device->token;
+	sc61860_state *cpustate = get_safe_token(device);
 	cpustate->timer.t2ms=0;
 	cpustate->timer.t512ms=0;
 	cpustate->timer.count=256;
@@ -93,7 +102,7 @@ static CPU_RESET( sc61860 )
 
 static CPU_INIT( sc61860 )
 {
-	sc61860_state *cpustate = device->token;
+	sc61860_state *cpustate = get_safe_token(device);
 	cpustate->config = (sc61860_cpu_core *) device->static_config;
 	timer_pulse(device->machine, ATTOTIME_IN_HZ(500), cpustate, 0, sc61860_2ms_tick);
 	cpustate->device = device;
@@ -102,7 +111,7 @@ static CPU_INIT( sc61860 )
 
 static CPU_EXECUTE( sc61860 )
 {
-	sc61860_state *cpustate = device->token;
+	sc61860_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -140,7 +149,7 @@ static CPU_EXECUTE( sc61860 )
 
 static CPU_SET_INFO( sc61860 )
 {
-	sc61860_state *cpustate = device->token;
+	sc61860_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 
@@ -164,7 +173,7 @@ static CPU_SET_INFO( sc61860 )
 
 CPU_GET_INFO( sc61860 )
 {
-	sc61860_state *cpustate = (device != NULL) ? device->token : NULL;
+	sc61860_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

@@ -180,6 +180,15 @@ struct _tms32025_state
 	UINT16 *datamap[0x200];
 };
 
+INLINE tms32025_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_TMS32025 ||
+		   cpu_get_type(device) == CPU_TMS32026);
+	return (tms32025_state *)device->token;
+}
 
 /* opcode table entry */
 typedef struct _tms32025_opcode tms32025_opcode;
@@ -643,7 +652,7 @@ static void adrk(tms32025_state *cpustate)
 {
 	cpustate->AR[ARP] += cpustate->opcode.b.l;
 }
-static void and(tms32025_state *cpustate)
+static void and_(tms32025_state *cpustate)
 {
 	GETDATA(cpustate, 0, 0);
 	cpustate->ACC.d &= cpustate->ALU.d;
@@ -1223,7 +1232,7 @@ static void norm(tms32025_state *cpustate)
 		MODIFY_AR_ARP(cpustate);
 	}
 }
-static void or(tms32025_state *cpustate)
+static void or_(tms32025_state *cpustate)
 {
 	GETDATA(cpustate, 0, 0);
 	cpustate->ACC.w.l |= cpustate->ALU.w.l;
@@ -1577,7 +1586,7 @@ static void trap(tms32025_state *cpustate)
 	PUSH_STACK(cpustate, cpustate->PC);
 	SET_PC(0x001E);		/* Trap vector */
 }
-static void xor(tms32025_state *cpustate)
+static void xor_(tms32025_state *cpustate)
 {
 	GETDATA(cpustate, 0, 0);
 	cpustate->ACC.w.l ^= cpustate->ALU.w.l;
@@ -1626,7 +1635,7 @@ static const tms32025_opcode opcode_main[256]=
 /*30*/ {1*CLK, lar_ar0	},{1*CLK, lar_ar1	},{1*CLK, lar_ar2	},{1*CLK, lar_ar3	},{1*CLK, lar_ar4	},{1*CLK, lar_ar5	},{1*CLK, lar_ar6	},{1*CLK, lar_ar7	},
 /*38*/ {1*CLK, mpy		},{1*CLK, sqra		},{1*CLK, mpya		},{1*CLK, mpys		},{1*CLK, lt		},{1*CLK, lta		},{1*CLK, ltp		},{1*CLK, ltd		},
 /*40*/ {1*CLK, zalh		},{1*CLK, zals		},{1*CLK, lact		},{1*CLK, addc		},{1*CLK, subh		},{1*CLK, subs		},{1*CLK, subt		},{1*CLK, subc		},
-/*48*/ {1*CLK, addh		},{1*CLK, adds		},{1*CLK, addt		},{1*CLK, rpt		},{1*CLK, xor		},{1*CLK, or		},{1*CLK, and		},{1*CLK, subb		},
+/*48*/ {1*CLK, addh		},{1*CLK, adds		},{1*CLK, addt		},{1*CLK, rpt		},{1*CLK, xor_		},{1*CLK, or_		},{1*CLK, and_		},{1*CLK, subb		},
 /*50*/ {1*CLK, lst		},{1*CLK, lst1		},{1*CLK, ldp		},{1*CLK, lph		},{1*CLK, pshd		},{1*CLK, mar		},{1*CLK, dmov		},{1*CLK, bitt		},
 /*58*/ {3*CLK, tblr		},{2*CLK, tblw		},{1*CLK, sqrs		},{1*CLK, lts		},{2*CLK, macd		},{2*CLK, mac		},{2*CLK, bc		},{2*CLK, bnc		},
 /*60*/ {1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},
@@ -1699,9 +1708,9 @@ static const tms32025_opcode_Dx opcode_Dx_subset[8]=	/* Instructions living unde
  ****************************************************************************/
 static CPU_INIT( tms32025 )
 {
-	tms32025_state *cpustate = device->token;
+	tms32025_state *cpustate = get_safe_token(device);
 
-	cpustate->intRAM = auto_malloc(0x800*2);
+	cpustate->intRAM = (UINT16 *)auto_malloc(0x800*2);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -1754,7 +1763,7 @@ static CPU_INIT( tms32025 )
  ****************************************************************************/
 static CPU_RESET( tms32025 )
 {
-	tms32025_state *cpustate = device->token;
+	tms32025_state *cpustate = get_safe_token(device);
 
 	SET_PC(0);			/* Starting address on a reset */
 	cpustate->STR0 |= 0x0600;	/* INTM and unused bit set to 1 */
@@ -1790,7 +1799,7 @@ static CPU_RESET( tms32025 )
 #if (HAS_TMS32026)
 static CPU_RESET( tms32026 )
 {
-	tms32025_state *cpustate = device->token;
+	tms32025_state *cpustate = get_safe_token(device);
 
 	CPU_RESET_CALL(tms32025);
 
@@ -1941,7 +1950,7 @@ again:
  ****************************************************************************/
 static CPU_EXECUTE( tms32025 )
 {
-	tms32025_state *cpustate = device->token;
+	tms32025_state *cpustate = get_safe_token(device);
 	cpustate->icount = cycles;
 
 
@@ -2097,7 +2106,7 @@ static void set_irq_line(tms32025_state *cpustate, int irqline, int state)
  ****************************************************************************/
 static CPU_READOP( tms32025 )
 {
-	tms32025_state *cpustate = device->token;
+	tms32025_state *cpustate = get_safe_token(device);
 
 	void *ptr;
 
@@ -2122,7 +2131,7 @@ static CPU_READOP( tms32025 )
  ****************************************************************************/
 static CPU_READ( tms32025 )
 {
-	tms32025_state *cpustate = device->token;
+	tms32025_state *cpustate = get_safe_token(device);
 
 	void *ptr = NULL;
 	UINT64 temp = 0;
@@ -2175,7 +2184,7 @@ static CPU_READ( tms32025 )
  ****************************************************************************/
 static CPU_WRITE( tms32025 )
 {
-	tms32025_state *cpustate = device->token;
+	tms32025_state *cpustate = get_safe_token(device);
 
 	void *ptr = NULL;
 
@@ -2224,7 +2233,7 @@ static CPU_WRITE( tms32025 )
 
 static CPU_SET_INFO( tms32025 )
 {
-	tms32025_state *cpustate = device->token;
+	tms32025_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -2280,7 +2289,7 @@ static CPU_SET_INFO( tms32025 )
 
 CPU_GET_INFO( tms32025 )
 {
-	tms32025_state *cpustate = (device != NULL) ? device->token : NULL;
+	tms32025_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -82,6 +82,16 @@ struct _tms34010_state
 	cpu_state_table		state;
 };
 
+INLINE tms34010_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_TMS34010 ||
+		   cpu_get_type(device) == CPU_TMS34020);
+	return (tms34010_state *)device->token;
+}
+
 #include "34010ops.h"
 
 
@@ -673,8 +683,8 @@ static void check_interrupt(tms34010_state *tms)
 
 static CPU_INIT( tms34010 )
 {
-	const tms34010_config *configdata = device->static_config ? device->static_config : &default_config;
-	tms34010_state *tms = device->token;
+	const tms34010_config *configdata = device->static_config ? (const tms34010_config *)device->static_config : &default_config;
+	tms34010_state *tms = get_safe_token(device);
 
 	tms->external_host_access = FALSE;
 
@@ -694,7 +704,7 @@ static CPU_INIT( tms34010 )
 	timer_adjust_oneshot(tms->scantimer, attotime_zero, 0);
 
 	/* allocate the shiftreg */
-	tms->shiftreg = auto_malloc(SHIFTREG_SIZE);
+	tms->shiftreg = (UINT16 *)auto_malloc(SHIFTREG_SIZE);
 
 	state_save_register_device_item(device, 0, tms->pc);
 	state_save_register_device_item(device, 0, tms->st);
@@ -713,7 +723,7 @@ static CPU_INIT( tms34010 )
 static CPU_RESET( tms34010 )
 {
 	/* zap the state and copy in the config pointer */
-	tms34010_state *tms = device->token;
+	tms34010_state *tms = get_safe_token(device);
 	const tms34010_config *config = tms->config;
 	const device_config *screen = tms->screen;
 	UINT16 *shiftreg = tms->shiftreg;
@@ -746,7 +756,7 @@ static CPU_RESET( tms34010 )
 
 static CPU_RESET( tms34020 )
 {
-	tms34010_state *tms = device->token;
+	tms34010_state *tms = get_safe_token(device);
 	CPU_RESET_CALL(tms34010);
 	tms->is_34020 = 1;
 }
@@ -759,7 +769,7 @@ static CPU_RESET( tms34020 )
 
 static CPU_EXIT( tms34010 )
 {
-	tms34010_state *tms = device->token;
+	tms34010_state *tms = get_safe_token(device);
 	tms->shiftreg = NULL;
 }
 
@@ -800,7 +810,7 @@ static void set_irq_line(tms34010_state *tms, int irqline, int linestate)
 
 static TIMER_CALLBACK( internal_interrupt_callback )
 {
-	tms34010_state *tms = ptr;
+	tms34010_state *tms = (tms34010_state *)ptr;
 	int type = param;
 
 	/* call through to the CPU to generate the int */
@@ -819,7 +829,7 @@ static TIMER_CALLBACK( internal_interrupt_callback )
 
 static CPU_EXECUTE( tms34010 )
 {
-	tms34010_state *tms = device->token;
+	tms34010_state *tms = get_safe_token(device);
 
 	/* Get out if CPU is halted. Absolutely no interrupts must be taken!!! */
 	if (IOREG(tms, REG_HSTCTLH) & 0x8000)
@@ -948,7 +958,7 @@ static void set_raster_op(tms34010_state *tms)
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	tms34010_state *tms = ptr;
+	tms34010_state *tms = (tms34010_state *)ptr;
 	const rectangle *current_visarea;
 	int vsblnk, veblnk, vtotal;
 	int vcount = param;
@@ -1088,7 +1098,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 void tms34010_get_display_params(const device_config *cpu, tms34010_display_params *params)
 {
-	tms34010_state *tms = cpu->token;
+	tms34010_state *tms = get_safe_token(cpu);
 
 	params->enabled = ((SMART_IOREG(tms, DPYCTL) & 0x8000) != 0);
 	params->vcount = SMART_IOREG(tms, VCOUNT);
@@ -1134,7 +1144,7 @@ VIDEO_UPDATE( tms340x0 )
 		cpu_type type = cpu_get_type(cpu);
 		if (type == CPU_TMS34010 || type == CPU_TMS34020)
 		{
-			tms = cpu->token;
+			tms = get_safe_token(cpu);
 			if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == screen)
 				break;
 			tms = NULL;
@@ -1198,7 +1208,7 @@ static const char *const ioreg_name[] =
 
 WRITE16_HANDLER( tms34010_io_register_w )
 {
-	tms34010_state *tms = space->cpu->token;
+	tms34010_state *tms = get_safe_token(space->cpu);
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1341,7 +1351,7 @@ static const char *const ioreg020_name[] =
 
 WRITE16_HANDLER( tms34020_io_register_w )
 {
-	tms34010_state *tms = space->cpu->token;
+	tms34010_state *tms = get_safe_token(space->cpu);
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1504,7 +1514,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 READ16_HANDLER( tms34010_io_register_r )
 {
-	tms34010_state *tms = space->cpu->token;
+	tms34010_state *tms = get_safe_token(space->cpu);
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
@@ -1547,7 +1557,7 @@ READ16_HANDLER( tms34010_io_register_r )
 
 READ16_HANDLER( tms34020_io_register_r )
 {
-	tms34010_state *tms = space->cpu->token;
+	tms34010_state *tms = get_safe_token(space->cpu);
 	int result, total;
 
 //  if (LOG_CONTROL_REGS)
@@ -1589,7 +1599,7 @@ READ16_HANDLER( tms34020_io_register_r )
 
 static STATE_POSTLOAD( tms34010_state_postload )
 {
-	tms34010_state *tms = param;
+	tms34010_state *tms = (tms34010_state *)param;
 	set_raster_op(tms);
 	set_pixel_function(tms);
 }
@@ -1602,7 +1612,7 @@ static STATE_POSTLOAD( tms34010_state_postload )
 void tms34010_host_w(const device_config *cpu, int reg, int data)
 {
 	const address_space *space;
-	tms34010_state *tms = cpu->token;
+	tms34010_state *tms = get_safe_token(cpu);
 	unsigned int addr;
 
 	switch (reg)
@@ -1657,7 +1667,7 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 
 int tms34010_host_r(const device_config *cpu, int reg)
 {
-	tms34010_state *tms = cpu->token;
+	tms34010_state *tms = get_safe_token(cpu);
 	unsigned int addr;
 	int result = 0;
 
@@ -1714,7 +1724,7 @@ int tms34010_host_r(const device_config *cpu, int reg)
 
 static CPU_SET_INFO( tms34010 )
 {
-	tms34010_state *tms = device->token;
+	tms34010_state *tms = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1732,7 +1742,7 @@ static CPU_SET_INFO( tms34010 )
 
 CPU_GET_INFO( tms34010 )
 {
-	tms34010_state *tms = (device != NULL) ? device->token : NULL;
+	tms34010_state *tms = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

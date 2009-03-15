@@ -86,6 +86,15 @@ struct _saturn_state
 	int icount;
 };
 
+INLINE saturn_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_SATURN);
+	return (saturn_state *)device->token;
+}
+
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
@@ -101,7 +110,7 @@ struct _saturn_state
 
 static CPU_INIT( saturn )
 {
-	saturn_state *cpustate = device->token;
+	saturn_state *cpustate = get_safe_token(device);
 
 	cpustate->config = (saturn_cpu_core *) device->static_config;
 	cpustate->irq_callback = irqcallback;
@@ -135,7 +144,7 @@ static CPU_INIT( saturn )
 
 static CPU_RESET( saturn )
 {
-	saturn_state *cpustate = device->token;
+	saturn_state *cpustate = get_safe_token(device);
 
 	cpustate->pc=0;
 	cpustate->sleeping = 0;
@@ -159,7 +168,7 @@ INLINE void saturn_take_irq(saturn_state *cpustate)
 
 static CPU_EXECUTE( saturn )
 {
-	saturn_state *cpustate = device->token;
+	saturn_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 
@@ -238,7 +247,7 @@ static void IntReg64(Saturn64 r, INT64 d)
 
 static CPU_SET_INFO( saturn )
 {
-	saturn_state *cpustate = device->token;
+	saturn_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -295,7 +304,7 @@ static INT64 Reg64Int(Saturn64 r)
 
 CPU_GET_INFO( saturn )
 {
-	saturn_state *cpustate = (device != NULL) ? device->token : NULL;
+	saturn_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

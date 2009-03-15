@@ -36,6 +36,15 @@ struct _v810_state
 	int icount;
 };
 
+INLINE v810_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == CPU_V810);
+	return (v810_state *)device->token;
+}
+
 #define R0 reg[0]
 #define R1 reg[1]
 #define R2 reg[2]
@@ -987,7 +996,7 @@ static UINT32 (*const OpCodeTable[64])(v810_state *cpustate,UINT32 op) =
 
 static CPU_INIT( v810 )
 {
-	v810_state *cpustate = device->token;
+	v810_state *cpustate = get_safe_token(device);
 
 	cpustate->irq_line = CLEAR_LINE;
 	cpustate->nmi_line = CLEAR_LINE;
@@ -1005,7 +1014,7 @@ static CPU_INIT( v810 )
 
 static CPU_RESET( v810 )
 {
-	v810_state *cpustate = device->token;
+	v810_state *cpustate = get_safe_token(device);
 	int i;
 	for(i=0;i<64;i++)	cpustate->reg[i]=0;
 	cpustate->PC = 0xfffffff0;
@@ -1015,7 +1024,7 @@ static CPU_RESET( v810 )
 
 static CPU_EXECUTE( v810 )
 {
-	v810_state *cpustate = device->token;
+	v810_state *cpustate = get_safe_token(device);
 
 	cpustate->icount = cycles;
 	while(cpustate->icount>0)
@@ -1042,7 +1051,7 @@ static void set_irq_line(v810_state *cpustate, int irqline, int state)
 
 static CPU_SET_INFO( v810 )
 {
-	v810_state *cpustate = device->token;
+	v810_state *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1125,7 +1134,7 @@ static CPU_SET_INFO( v810 )
 
 CPU_GET_INFO( v810 )
 {
-	v810_state *cpustate = (device != NULL) ? device->token : NULL;
+	v810_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

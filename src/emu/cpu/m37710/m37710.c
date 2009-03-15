@@ -53,6 +53,7 @@
 
 #include "debugger.h"
 #include "cpuexec.h"
+#include "m37710.h"
 #include "m37710cm.h"
 
 #define M37710_DEBUG	(0)	// enables verbose logging for peripherals, etc.
@@ -260,7 +261,7 @@ static const char *const m37710_tnames[8] =
 
 static TIMER_CALLBACK( m37710_timer_cb )
 {
-	m37710i_cpu_struct *cpustate = ptr;
+	m37710i_cpu_struct *cpustate = (m37710i_cpu_struct *)ptr;
 	int which = param;
 	int curirq = M37710_LINE_TIMERA0 - which;
 
@@ -763,7 +764,7 @@ void m37710i_update_irqs(m37710i_cpu_struct *cpustate)
 
 static CPU_RESET( m37710 )
 {
-	m37710i_cpu_struct *cpustate = device->token;
+	m37710i_cpu_struct *cpustate = get_safe_token(device);
 
 	/* Start the CPU */
 	CPU_STOPPED = 0;
@@ -811,7 +812,7 @@ static CPU_EXIT( m37710 )
 /* Execute some instructions */
 static CPU_EXECUTE( m37710 )
 {
-	m37710i_cpu_struct *m37710 = device->token;
+	m37710i_cpu_struct *m37710 = get_safe_token(device);
 
 	m37710i_update_irqs(m37710);
 
@@ -869,7 +870,7 @@ void m37710_set_irq_callback(cpu_irq_callback callback)
 
 static CPU_DISASSEMBLE( m37710 )
 {
-	m37710i_cpu_struct *cpustate = device->token;
+	m37710i_cpu_struct *cpustate = get_safe_token(device);
 
 	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
 }
@@ -887,7 +888,7 @@ static STATE_POSTLOAD( m37710_restore_state )
 
 static CPU_INIT( m37710 )
 {
-	m37710i_cpu_struct *cpustate = device->token;
+	m37710i_cpu_struct *cpustate = get_safe_token(device);
 	int i;
 
 	memset(cpustate, 0, sizeof(cpustate));
@@ -963,7 +964,7 @@ static CPU_INIT( m37710 )
 
 static CPU_SET_INFO( m37710 )
 {
-	m37710i_cpu_struct *cpustate = device->token;
+	m37710i_cpu_struct *cpustate = get_safe_token(device);
 
 	switch (state)
 	{
@@ -1012,7 +1013,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( m37710 )
 {
-	m37710i_cpu_struct *cpustate = (device != NULL) ? device->token : NULL;
+	m37710i_cpu_struct *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

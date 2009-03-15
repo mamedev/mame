@@ -67,7 +67,7 @@
     FORWARD DECLARATIONS
 ***************************************************************************/
 
-void (*const tms32031ops[])(tms32031_state *tms, UINT32 op);
+extern void (*const tms32031ops[])(tms32031_state *tms, UINT32 op);
 
 
 

@@ -66,7 +66,7 @@ enum addr_mode {
 };
 
 enum opcodes {
-	adc,  and, asl,  bcc,  bcs,  beq,  bit,  bmi,
+	adc,  and_,asl,  bcc,  bcs,  beq,  bit,  bmi,
 	bne,  bpl, m6502_brk,  bvc,  bvs,  clc,  cld,  cli,
 	clv,  cmp, cpx,  cpy,  dec,  dex,  dey,  eor,
 	inc,  inx, iny,  jmp,  jsr,  lda,  ldx,  ldy,
@@ -148,14 +148,14 @@ static const struct op6502_info op6502[256] = {
 	{nop,zpx},{ora,zpx},{asl,zpx},{slo,zpx},
 	{clc,imp},{ora,aby},{nop,imp},{slo,aby},
 	{nop,abx},{ora,abx},{asl,abx},{slo,abx},
-	{jsr,adr},{and,idx},{kil,non},{rla,idx},/* 20 */
-	{bit,zpg},{and,zpg},{rol,zpg},{rla,zpg},
-	{plp,imp},{and,imm},{rol,acc},{anc,imm},
-	{bit,aba},{and,aba},{rol,aba},{rla,aba},
-	{bmi,rel},{and,idy},{kil,non},{rla,idy},/* 30 */
-	{nop,zpx},{and,zpx},{rol,zpx},{rla,zpx},
-	{sec,imp},{and,aby},{nop,imp},{rla,aby},
-	{nop,abx},{and,abx},{rol,abx},{rla,abx},
+	{jsr,adr},{and_,idx},{kil,non},{rla,idx},/* 20 */
+	{bit,zpg},{and_,zpg},{rol,zpg},{rla,zpg},
+	{plp,imp},{and_,imm},{rol,acc},{anc,imm},
+	{bit,aba},{and_,aba},{rol,aba},{rla,aba},
+	{bmi,rel},{and_,idy},{kil,non},{rla,idy},/* 30 */
+	{nop,zpx},{and_,zpx},{rol,zpx},{rla,zpx},
+	{sec,imp},{and_,aby},{nop,imp},{rla,aby},
+	{nop,abx},{and_,abx},{rol,abx},{rla,abx},
 	{rti,imp},{eor,idx},{kil,non},{sre,idx},/* 40 */
 	{nop,zpg},{eor,zpg},{lsr,zpg},{sre,zpg},
 	{pha,imp},{eor,imm},{lsr,acc},{asr,imm},
@@ -215,14 +215,14 @@ static const struct op6502_info op65c02[256] = {
 	{trb,zpg},{ora,zpx},{asl,zpx},{rmb,zpg},
 	{clc,imp},{ora,aby},{ina,imp},{ill,non},
 	{trb,aba},{ora,abx},{asl,abx},{bbr,zpb},
-	{jsr,adr},{and,idx},{ill,non},{ill,non},/* 20 */
-	{bit,zpg},{and,zpg},{rol,zpg},{rmb,zpg},
-	{plp,imp},{and,imm},{rol,acc},{ill,non},
-	{bit,aba},{and,aba},{rol,aba},{bbr,zpb},
-	{bmi,rel},{and,idy},{and,zpi},{ill,non},/* 30 */
-	{bit,zpx},{and,zpx},{rol,zpx},{rmb,zpg},
-	{sec,imp},{and,aby},{dea,imp},{ill,non},
-	{bit,abx},{and,abx},{rol,abx},{bbr,zpb},
+	{jsr,adr},{and_,idx},{ill,non},{ill,non},/* 20 */
+	{bit,zpg},{and_,zpg},{rol,zpg},{rmb,zpg},
+	{plp,imp},{and_,imm},{rol,acc},{ill,non},
+	{bit,aba},{and_,aba},{rol,aba},{bbr,zpb},
+	{bmi,rel},{and_,idy},{and_,zpi},{ill,non},/* 30 */
+	{bit,zpx},{and_,zpx},{rol,zpx},{rmb,zpg},
+	{sec,imp},{and_,aby},{dea,imp},{ill,non},
+	{bit,abx},{and_,abx},{rol,abx},{bbr,zpb},
 	{rti,imp},{eor,idx},{ill,non},{ill,non},/* 40 */
 	{ill,non},{eor,zpg},{lsr,zpg},{rmb,zpg},
 	{pha,imp},{eor,imm},{lsr,acc},{ill,non},
@@ -283,14 +283,14 @@ static const struct op6502_info op65sc02[256] = {
 	{trb,zpg},{ora,zpx},{asl,zpx},{rmb,zpg},
 	{clc,imp},{ora,aby},{ina,imp},{ill,non},
 	{trb,aba},{ora,abx},{asl,abx},{bbr,zpb},
-	{jsr,adr},{and,idx},{ill,non},{ill,non},/* 20 */
-	{bit,zpg},{and,zpg},{rol,zpg},{rmb,zpg},
-	{plp,imp},{and,imm},{rol,acc},{ill,non},
-	{bit,aba},{and,aba},{rol,aba},{bbr,zpb},
-	{bmi,rel},{and,idy},{and,zpi},{ill,non},/* 30 */
-	{bit,zpx},{and,zpx},{rol,zpx},{rmb,zpg},
-	{sec,imp},{and,aby},{dea,imp},{ill,non},
-	{bit,abx},{and,abx},{rol,abx},{bbr,zpb},
+	{jsr,adr},{and_,idx},{ill,non},{ill,non},/* 20 */
+	{bit,zpg},{and_,zpg},{rol,zpg},{rmb,zpg},
+	{plp,imp},{and_,imm},{rol,acc},{ill,non},
+	{bit,aba},{and_,aba},{rol,aba},{bbr,zpb},
+	{bmi,rel},{and_,idy},{and_,zpi},{ill,non},/* 30 */
+	{bit,zpx},{and_,zpx},{rol,zpx},{rmb,zpg},
+	{sec,imp},{and_,aby},{dea,imp},{ill,non},
+	{bit,abx},{and_,abx},{rol,abx},{bbr,zpb},
 	{rti,imp},{eor,idx},{ill,non},{ill,non},/* 40 */
 	{ill,non},{eor,zpg},{lsr,zpg},{rmb,zpg},
 	{pha,imp},{eor,imm},{lsr,acc},{ill,non},
@@ -351,14 +351,14 @@ static const struct op6502_info op65ce02[256] = {
 	{trb,zpg},{ora,zpx},{asl,zpx},{rmb,zpg},
 	{clc,imp},{ora,aby},{ina,imp},{inz,imp},
 	{trb,aba},{ora,abx},{asl,abx},{bbr,zpb},
-	{jsr,adr},{and,idx},{jsr,ind},{jsr,iax},/* 20 */
-	{bit,zpg},{and,zpg},{rol,zpg},{rmb,zpg},
-	{plp,imp},{and,imm},{rol,acc},{tys,imp},
-	{bit,aba},{and,aba},{rol,aba},{bbr,zpb},
-	{bmi,rel},{and,idz},{and,zpi},{bmi,rw2},/* 30 */
-	{bit,zpx},{and,zpx},{rol,zpx},{rmb,zpg},
-	{sec,imp},{and,aby},{dea,imp},{dez,imp},
-	{bit,abx},{and,abx},{rol,abx},{bbr,zpb},
+	{jsr,adr},{and_,idx},{jsr,ind},{jsr,iax},/* 20 */
+	{bit,zpg},{and_,zpg},{rol,zpg},{rmb,zpg},
+	{plp,imp},{and_,imm},{rol,acc},{tys,imp},
+	{bit,aba},{and_,aba},{rol,aba},{bbr,zpb},
+	{bmi,rel},{and_,idz},{and_,zpi},{bmi,rw2},/* 30 */
+	{bit,zpx},{and_,zpx},{rol,zpx},{rmb,zpg},
+	{sec,imp},{and_,aby},{dea,imp},{dez,imp},
+	{bit,abx},{and_,abx},{rol,abx},{bbr,zpb},
 	{rti,imp},{eor,idx},{neg,imp},{asr2,imp},/* 40 */
 	{asr2,zpg},{eor,zpg},{lsr,zpg},{rmb,zpg},
 	{pha,imp},{eor,imm},{lsr,acc},{taz,imp},
@@ -421,14 +421,14 @@ static const struct op6502_info op4510[256] = {
 	{trb,zpg},{ora,zpx},{asl,zpx},{rmb,zpg},
 	{clc,imp},{ora,aby},{ina,imp},{inz,imp},
 	{trb,aba},{ora,abx},{asl,abx},{bbr,zpb},
-	{jsr,adr},{and,idx},{jsr,ind},{jsr,iax},/* 20 */
-	{bit,zpg},{and,zpg},{rol,zpg},{rmb,zpg},
-	{plp,imp},{and,imm},{rol,acc},{tys,imp},
-	{bit,aba},{and,aba},{rol,aba},{bbr,zpb},
-	{bmi,rel},{and,idz},{and,zpi},{bmi,rw2},/* 30 */
-	{bit,zpx},{and,zpx},{rol,zpx},{rmb,zpg},
-	{sec,imp},{and,aby},{dea,imp},{dez,imp},
-	{bit,abx},{and,abx},{rol,abx},{bbr,zpb},
+	{jsr,adr},{and_,idx},{jsr,ind},{jsr,iax},/* 20 */
+	{bit,zpg},{and_,zpg},{rol,zpg},{rmb,zpg},
+	{plp,imp},{and_,imm},{rol,acc},{tys,imp},
+	{bit,aba},{and_,aba},{rol,aba},{bbr,zpb},
+	{bmi,rel},{and_,idz},{and_,zpi},{bmi,rw2},/* 30 */
+	{bit,zpx},{and_,zpx},{rol,zpx},{rmb,zpg},
+	{sec,imp},{and_,aby},{dea,imp},{dez,imp},
+	{bit,abx},{and_,abx},{rol,abx},{bbr,zpb},
 	{rti,imp},{eor,idx},{neg,imp},{asr2,imp},/* 40 */
 	{asr2,zpg},{eor,zpg},{lsr,zpg},{rmb,zpg},
 	{pha,imp},{eor,imm},{lsr,acc},{taz,imp},
@@ -491,14 +491,14 @@ static const struct op6502_info opdeco16[256] =
 	{ill,non},{ora,zpx},{asl,zpx},{ill,non},
 	{clc,imp},{ora,aby},{ill,non},{ill,non},
 	{ill,non},{ora,abx},{asl,abx},{ill,non},
-	{jsr,adr},{and,idx},{ill,non},{u23,zpg},/* 20 */
-	{bit,zpg},{and,zpg},{rol,zpg},{ill,non},
-	{plp,imp},{and,imm},{rol,acc},{ill,non},
-	{bit,aba},{and,aba},{rol,aba},{ill,non},
-	{bmi,rel},{and,idy},{ill,non},{ill,non},/* 30 */
-	{ill,non},{and,zpx},{rol,zpx},{ill,non},
-	{sec,imp},{and,aby},{ill,non},{ill,non},
-	{ill,non},{and,abx},{rol,abx},{u3F,zpg},
+	{jsr,adr},{and_,idx},{ill,non},{u23,zpg},/* 20 */
+	{bit,zpg},{and_,zpg},{rol,zpg},{ill,non},
+	{plp,imp},{and_,imm},{rol,acc},{ill,non},
+	{bit,aba},{and_,aba},{rol,aba},{ill,non},
+	{bmi,rel},{and_,idy},{ill,non},{ill,non},/* 30 */
+	{ill,non},{and_,zpx},{rol,zpx},{ill,non},
+	{sec,imp},{and_,aby},{ill,non},{ill,non},
+	{ill,non},{and_,abx},{rol,abx},{u3F,zpg},
 	{rti,imp},{eor,idx},{ill,non},{ill,non},/* 40 */
 	{ill,non},{eor,zpg},{lsr,zpg},{ill,non},
 	{pha,imp},{eor,imm},{lsr,acc},{u4B,zpg},

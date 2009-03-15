@@ -190,7 +190,6 @@ static CPU_RESET( h6280 )
     /* read the reset vector into PC */
 	PCL = RDMEM(cpustate, H6280_RESET_VEC);
 	PCH = RDMEM(cpustate, (H6280_RESET_VEC+1));
-	CHANGE_PC;
 
 	/* CPU starts in low speed mode */
     cpustate->clocks_per_cycle = 4;
@@ -226,8 +225,6 @@ static CPU_EXECUTE( h6280 )
 	/* Execute instructions */
 	do
     {
-    	if ((cpustate->ppc.w.l ^ cpustate->pc.w.l) & 0xe000)
-    		CHANGE_PC;
 		cpustate->ppc = cpustate->pc;
 
 		debugger_instruction_hook(device, PCW);

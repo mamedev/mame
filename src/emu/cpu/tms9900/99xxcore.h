@@ -511,6 +511,15 @@ struct _tms99xx_state
 	int extra_byte;	/* buffer holding the unused byte in a word read */
 };
 
+INLINE tms99xx_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == CPU);
+	assert(cpu_get_type(device) == TMS99XX_GET_INFO);
+	return (tms99xx_state *)device->token;
+}
+
 #if (TMS99XX_MODEL == TMS9995_ID)
 static void reset_decrementer(tms99xx_state *cpustate);
 #endif
@@ -536,13 +545,13 @@ READ16_HANDLER(ti990_10_internal_r)
 */
 READ8_HANDLER(tms9995_internal1_r)
 {
-	tms99xx_state *cpustate = space->cpu->token;
+	tms99xx_state *cpustate = get_safe_token(space->cpu);
 	return cpustate->RAM[offset];
 }
 
 WRITE8_HANDLER(tms9995_internal1_w)
 {
-	tms99xx_state *cpustate = space->cpu->token;
+	tms99xx_state *cpustate = get_safe_token(space->cpu);
 	cpustate->RAM[offset]=data;
 }
 
@@ -551,13 +560,13 @@ WRITE8_HANDLER(tms9995_internal1_w)
 */
 READ8_HANDLER(tms9995_internal2_r)
 {
-	tms99xx_state *cpustate = space->cpu->token;
+	tms99xx_state *cpustate = get_safe_token(space->cpu);
 	return cpustate->RAM[offset+0xfc];
 }
 
 WRITE8_HANDLER(tms9995_internal2_w)
 {
-	tms99xx_state *cpustate = space->cpu->token;
+	tms99xx_state *cpustate = get_safe_token(space->cpu);
 	cpustate->RAM[offset+0xfc]=data;
 }
 
@@ -928,7 +937,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			/* read decrementer */
 			if (cpustate->decrementer_enabled && !(cpustate->flag & 1))
 				/* timer mode, timer enabled */
-				return ceil(cpu_attotime_to_clocks(cpustate->device, attotime_div(timer_timeleft(cpustate->timer), 16)));
+				return cpu_attotime_to_clocks(cpustate->device, attotime_div(timer_timeleft(cpustate->timer), 16));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				return cpustate->decrementer_count;
@@ -992,7 +1001,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 
 			if (cpustate->decrementer_enabled && !(cpustate->flag & 1))
 				/* timer mode, timer enabled */
-				value = ceil(cpu_attotime_to_clocks(cpustate->device, attotime_div(timer_timeleft(cpustate->timer), 16)));
+				value = cpu_attotime_to_clocks(cpustate->device, attotime_div(timer_timeleft(cpustate->timer), 16));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				value = cpustate->decrementer_count;
@@ -1071,7 +1080,7 @@ INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 #if (TMS99XX_MODEL == TI990_10_ID)
 	READ8_HANDLER(ti990_10_mapper_cru_r)
 	{
-		tms99xx_state *cpustate = space->cpu->token;
+		tms99xx_state *cpustate = get_safe_token(space->cpu);
 		int reply = 0;
 
 		switch(cpustate->mapper_cru_read_register)
@@ -1110,7 +1119,7 @@ INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 
 	WRITE8_HANDLER(ti990_10_mapper_cru_w)
 	{
-		tms99xx_state *cpustate = space->cpu->token;
+		tms99xx_state *cpustate = get_safe_token(space->cpu);
 		switch (offset)
 		{
 		case 0:
@@ -1152,13 +1161,13 @@ INLINE void WRITEREG_DEBUG(tms99xx_state *cpustate, int reg, UINT16 data)
 
 	READ8_HANDLER(ti990_10_eir_cru_r)
 		{
-		tms99xx_state *cpustate = space->cpu->token;
+		tms99xx_state *cpustate = get_safe_token(space->cpu);
 		return (offset == 1) ? (cpustate->error_interrupt_register & 0xff) : 0;
 		}
 
 	WRITE8_HANDLER(ti990_10_eir_cru_w)
 		{
-		tms99xx_state *cpustate = space->cpu->token;
+		tms99xx_state *cpustate = get_safe_token(space->cpu);
 		if (offset < 4)	/* does not work for EIR_MAPERR */
 		{
 			cpustate->error_interrupt_register &= ~ (1 << offset);
@@ -1205,7 +1214,7 @@ static void set_flag1(tms99xx_state *cpustate, int val);
 
 static void register_for_save_state(const device_config *device)
 {
-	tms99xx_state *cpustate = device->token;
+	tms99xx_state *cpustate = get_safe_token(device);
 	state_save_register_device_item(device, 0, cpustate->WP);
 	state_save_register_device_item(device, 0, cpustate->PC);
 	state_save_register_device_item(device, 0, cpustate->STATUS);
@@ -1282,7 +1291,7 @@ static void register_for_save_state(const device_config *device)
 static CPU_INIT( tms99xx )
 {
 	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) device->static_config;
-	tms99xx_state *cpustate = device->token;
+	tms99xx_state *cpustate = get_safe_token(device);
 
 	register_for_save_state(device);
 
@@ -1328,7 +1337,7 @@ static CPU_INIT( tms99xx )
 */
 static CPU_RESET( tms99xx )
 {
-	tms99xx_state *cpustate = device->token;
+	tms99xx_state *cpustate = get_safe_token(device);
 
 	cpustate->STATUS = 0; /* TMS9980 and TMS9995 Data Books say so */
 	getstat(cpustate);
@@ -1397,7 +1406,7 @@ INLINE UINT16 fetch(tms99xx_state *cpustate)
 
 static CPU_EXECUTE( tms99xx )
 			{
-	tms99xx_state *cpustate = device->token;
+	tms99xx_state *cpustate = get_safe_token(device);
 	cpustate->icount = cycles;
 
 	cpustate->lds_flag = 0;
@@ -1776,7 +1785,7 @@ static void tms99xx_set_irq_line(tms99xx_state *cpustate, int irqline, int state
 */
 static TIMER_CALLBACK( decrementer_callback )
 {
-	tms99xx_state *cpustate = ptr;
+	tms99xx_state *cpustate = (tms99xx_state *)ptr;
 
 	/* request decrementer interrupt */
 	cpustate->int_latch |= 0x8;
@@ -4576,7 +4585,7 @@ INLINE void execute(tms99xx_state *cpustate, UINT16 opcode)
 
 static CPU_SET_INFO( tms99xx )
 {
-	tms99xx_state *cpustate = device->token;
+	tms99xx_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -4658,7 +4667,7 @@ static CPU_SET_INFO( tms99xx )
 
 void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 {
-	tms99xx_state *cpustate = (device != NULL) ? device->token : NULL;
+	tms99xx_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
