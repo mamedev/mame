@@ -741,6 +741,7 @@ $(MAMEOBJ)/gaelco.a: \
 	$(DRIVERS)/thoop2.o $(VIDEO)/thoop2.o \
 	$(DRIVERS)/xorworld.o $(VIDEO)/xorworld.o \
 	$(DRIVERS)/wrally.o $(MACHINE)/wrally.o $(VIDEO)/wrally.o \
+	$(DRIVERS)/tokyocop.o \
 
 $(MAMEOBJ)/gameplan.a: \
 	$(DRIVERS)/enigma2.o \

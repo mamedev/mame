@@ -6980,6 +6980,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
     2001: Smashing Drive
     2002: ATV Track
     */
+	
+	/* Galeco PC based games */
+	DRIVER( tokyocop )
 
 	/* Kaneko games */
 	DRIVER( hvyunit )	/* (c) 1988 Kaneko */

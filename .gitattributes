@@ -2119,6 +2119,7 @@ src/mame/drivers/tnzs.c svneol=native#text/plain
 src/mame/drivers/toaplan1.c svneol=native#text/plain
 src/mame/drivers/toaplan2.c svneol=native#text/plain
 src/mame/drivers/toki.c svneol=native#text/plain
+src/mame/drivers/tokyocop.c svneol=native#text/plain
 src/mame/drivers/tomcat.c svneol=native#text/plain
 src/mame/drivers/toobin.c svneol=native#text/plain
 src/mame/drivers/topshoot.c svneol=native#text/plain
