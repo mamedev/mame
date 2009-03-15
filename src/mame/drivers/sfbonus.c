@@ -26,6 +26,9 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 
+#include "pirpok2.lh"
+
+
 static bitmap_t *temp_reel_bitmap;
 static tilemap *sfbonus_tilemap;
 static tilemap *sfbonus_reel_tilemap;
@@ -41,6 +44,268 @@ static UINT8* sfbonus_videoram;
 static UINT8 *sfbonus_vregs;
 static UINT8 *nvram;
 static size_t nvram_size;
+static UINT8* sfbonus_1800_regs;
+static UINT8* sfbonus_3800_regs;
+static UINT8* sfbonus_3000_regs;
+static UINT8* sfbonus_2801_regs;
+static UINT8* sfbonus_2c01_regs;
+
+
+/* 8-liners input define */
+static INPUT_PORTS_START( amcoebase )
+	PORT_START("KEY1")
+	PORT_DIPNAME( 0x01, 0x01, "Key1-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Key1-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Key1-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Key1-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Key1-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Key1-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key1-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Key1-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("KEY2")
+	PORT_DIPNAME( 0x01, 0x01, "Key2-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Key2-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Key2-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Key2-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Key2-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Key2-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key2-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Key2-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("KEY3")
+	PORT_DIPNAME( 0x01, 0x01, "Key3-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Key3-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Key3-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Key3-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Key3-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Key3-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Key3-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Key3-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	/* the dipswitches are probably for debugging the games only, all settings are in NVRAM */
+	PORT_START("SWITCH1")
+	PORT_DIPNAME( 0x01, 0x01, "Switch1-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch1-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch1-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch1-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch1-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch1-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch1-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch1-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWITCH2")
+	PORT_DIPNAME( 0x01, 0x01, "Switch2-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch2-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch2-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch2-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch2-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch2-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch2-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch2-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWITCH3")
+	PORT_DIPNAME( 0x01, 0x01, "Switch3-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch3-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch3-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch3-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch3-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch3-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch3-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch3-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWITCH4")
+	PORT_DIPNAME( 0x01, 0x01, "Switch4-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch4-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch4-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch4-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch4-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch4-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch4-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch4-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SWITCH5")
+	PORT_DIPNAME( 0x01, 0x01, "Switch5-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Switch5-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Switch5-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Switch5-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Switch5-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Switch5-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Switch5-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Switch5-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( amcoecommon )
+	PORT_INCLUDE(amcoebase)
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON9)  PORT_NAME("Payout?") PORT_CODE(KEYCODE_Y) // causes hopper error
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10) PORT_NAME("Clear SW.") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11) PORT_NAME("Account") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12) PORT_NAME("Confirm / Port Test") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2)    PORT_IMPULSE(2) // causes coin jam if held
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3)    // 'key in'
+
+	PORT_MODIFY("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( amcoetype1 )
+	PORT_INCLUDE(amcoecommon)
+
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1)  PORT_IMPULSE(2) // causes service jam if held
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1)     PORT_IMPULSE(2) // causes coin jam if held
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("All Stop / Left") PORT_CODE(KEYCODE_Z)
+	/*        0x08 ? */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 1 / Select Letter / Double / Hold Help") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Stop 3 / Erase / Take") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Play / Bet") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 2 / Right") PORT_CODE(KEYCODE_C)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( amcoetype2 )
+	PORT_INCLUDE(amcoecommon)
+
+	PORT_MODIFY("KEY2") // reverse order
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Small / Right") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Play / Bet") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Take") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Double / Select") PORT_CODE(KEYCODE_X)
+	/*        0x10 ? */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Big / Left") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)     PORT_IMPULSE(2) // causes coin jam if held
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1)  PORT_IMPULSE(2) // causes service jam if held
+INPUT_PORTS_END
+
+
 
 static TILE_GET_INFO( get_sfbonus_tile_info )
 {
@@ -390,9 +655,80 @@ static VIDEO_UPDATE(sfbonus)
 			}
 		}
 	}
+	/*
+	popmessage("%02x %02x %02x %02x %02x %02x %02x %02x -- %02x -- %02x %02x -- %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
+	sfbonus_3800_regs[0],
+	sfbonus_3800_regs[1],
+	sfbonus_3800_regs[2],
+	sfbonus_3800_regs[3],
+	sfbonus_3800_regs[4],
+	sfbonus_3800_regs[5],
+	sfbonus_3800_regs[6],
+	sfbonus_3800_regs[7],
+	sfbonus_3000_regs[0],
+	sfbonus_2801_regs[0],
+	sfbonus_2c01_regs[0],
+	sfbonus_vregs[8],
+	sfbonus_vregs[0],
+	sfbonus_vregs[10],
+	sfbonus_vregs[11],
+	sfbonus_vregs[12],
+	sfbonus_vregs[13],
+	sfbonus_vregs[14],
+	sfbonus_vregs[15],
+	sfbonus_vregs[16],
+	sfbonus_vregs[17],
+	sfbonus_vregs[18],
+	sfbonus_vregs[19],
+	sfbonus_vregs[20],
+	sfbonus_vregs[21],
+	sfbonus_vregs[22],
+	sfbonus_vregs[23],
+	sfbonus_vregs[24],
+	sfbonus_vregs[25],
+	sfbonus_vregs[26],
+	sfbonus_vregs[27],
+	sfbonus_vregs[28],
+	sfbonus_vregs[29],
+	sfbonus_vregs[30],
+	sfbonus_vregs[31]	
+	);
+	*/
 
-	/* High Priority Reels */
-//  sfbonus_draw_reel_layer(screen->machine,bitmap,cliprect, screen, 1);
+	/*
+	popmessage("-- %02x %02x %02x %02x %02x %02x %02x %02x",
+	sfbonus_1800_regs[0],
+	sfbonus_1800_regs[1],
+	sfbonus_1800_regs[2],
+	sfbonus_1800_regs[3],
+	sfbonus_1800_regs[4],
+	sfbonus_1800_regs[5],
+	sfbonus_1800_regs[6],
+	sfbonus_1800_regs[7]);
+	*/
+	
+	if (screen->machine->gamedrv->ipt==ipt_amcoetype2)
+	{
+		// based on pirpok2
+		output_set_lamp_value(0, (sfbonus_1800_regs[6]&0x1)>>0);
+		output_set_lamp_value(1, (sfbonus_1800_regs[6]&0x4)>>2);
+		output_set_lamp_value(2, (sfbonus_1800_regs[5]&0x4)>>2);
+		output_set_lamp_value(3, (sfbonus_1800_regs[5]&0x1)>>0);
+		output_set_lamp_value(4, (sfbonus_1800_regs[4]&0x4)>>2);
+		output_set_lamp_value(5, (sfbonus_1800_regs[4]&0x1)>>0);
+	}
+	else if (screen->machine->gamedrv->ipt==ipt_amcoetype1)
+	{
+		output_set_lamp_value(0, (sfbonus_1800_regs[0]&0x2)>>1);
+		output_set_lamp_value(1, (sfbonus_1800_regs[4]&0x2)>>1);
+		output_set_lamp_value(2, (sfbonus_1800_regs[3]&0x2)>>1);
+		output_set_lamp_value(3, (sfbonus_1800_regs[6]&0x4)>>2);
+		output_set_lamp_value(4, (sfbonus_1800_regs[4]&0x4)>>2);
+		output_set_lamp_value(5, (sfbonus_1800_regs[3]&0x4)>>2);	
+	}
+	
+
+	
 
 	return 0;
 }
@@ -478,6 +814,33 @@ static READ8_HANDLER( sfbonus_3800_r )
 }
 
 
+// lamps and coin counters
+static WRITE8_HANDLER( sfbonus_1800_w )
+{
+	sfbonus_1800_regs[offset] = data;
+}
+
+static WRITE8_HANDLER( sfbonus_3800_w )
+{
+	sfbonus_3800_regs[offset] = data;
+}
+
+static WRITE8_HANDLER( sfbonus_3000_w )
+{
+	sfbonus_3000_regs[offset] = data;
+}
+
+static WRITE8_HANDLER( sfbonus_2801_w )
+{
+	sfbonus_2801_regs[offset] = data;
+}
+
+static WRITE8_HANDLER( sfbonus_2c01_w )
+{
+	sfbonus_2c01_regs[offset] = data;
+}
+
+
 static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("KEY1")
 	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("KEY2")
@@ -493,286 +856,22 @@ static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE( paletteram_io_w )
 
+	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_BASE(&sfbonus_1800_regs) // lamps and coin counters
+	
 	AM_RANGE(0x2400, 0x241f) AM_RAM AM_BASE(&sfbonus_vregs)
 
 	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_2800_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_BASE(&sfbonus_2801_regs)
 
 	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_2c00_r)
-	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_BASE(&sfbonus_2c01_regs)
 
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_BASE(&sfbonus_3000_regs)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
-	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_3800_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_3800_r)
 
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x1801, 0x1801) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x1803, 0x1803) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x1804, 0x1804) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x1806, 0x1806) AM_WRITE(SMH_NOP)
-
-	AM_RANGE(0x3801, 0x3801) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x3802, 0x3802) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x3803, 0x3803) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x3806, 0x3806) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x3807, 0x3807) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_BASE(&sfbonus_3800_regs)
 ADDRESS_MAP_END
-
-/* 8-liners input define */
-static INPUT_PORTS_START( amcoebase )
-	PORT_START("KEY1")
-	PORT_DIPNAME( 0x01, 0x01, "Key1-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Key1-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Key1-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Key1-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Key1-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Key1-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Key1-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Key1-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("KEY2")
-	PORT_DIPNAME( 0x01, 0x01, "Key2-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Key2-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Key2-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Key2-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Key2-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Key2-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Key2-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Key2-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("KEY3")
-	PORT_DIPNAME( 0x01, 0x01, "Key3-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Key3-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Key3-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Key3-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Key3-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Key3-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Key3-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Key3-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	/* the dipswitches are probably for debugging the games only, all settings are in NVRAM */
-	PORT_START("SWITCH1")
-	PORT_DIPNAME( 0x01, 0x01, "Switch1-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Switch1-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Switch1-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Switch1-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Switch1-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Switch1-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Switch1-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Switch1-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("SWITCH2")
-	PORT_DIPNAME( 0x01, 0x01, "Switch2-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Switch2-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Switch2-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Switch2-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Switch2-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Switch2-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Switch2-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Switch2-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("SWITCH3")
-	PORT_DIPNAME( 0x01, 0x01, "Switch3-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Switch3-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Switch3-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Switch3-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Switch3-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Switch3-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Switch3-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Switch3-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("SWITCH4")
-	PORT_DIPNAME( 0x01, 0x01, "Switch4-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Switch4-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Switch4-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Switch4-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Switch4-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Switch4-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Switch4-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Switch4-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("SWITCH5")
-	PORT_DIPNAME( 0x01, 0x01, "Switch5-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Switch5-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Switch5-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Switch5-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Switch5-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Switch5-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Switch5-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Switch5-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( amcoecommon )
-	PORT_INCLUDE(amcoebase)
-	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON9)  PORT_NAME("Payout?") PORT_CODE(KEYCODE_Y) // causes hopper error
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10) PORT_NAME("Clear SW.") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11) PORT_NAME("Account") PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12) PORT_NAME("Confirm / Port Test") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2)    PORT_IMPULSE(2) // causes coin jam if held
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3)    // 'key in'
-
-	PORT_MODIFY("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( amcoetype1 )
-	PORT_INCLUDE(amcoecommon)
-
-	PORT_MODIFY("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1)  PORT_IMPULSE(2) // causes service jam if held
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1)     PORT_IMPULSE(2) // causes coin jam if held
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("All Stop / Left") PORT_CODE(KEYCODE_Z)
-	/*        0x08 ? */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 1 / Select Letter / Double / Hold Help") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Stop 3 / Erase / Take") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Play / Bet") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 2 / Right") PORT_CODE(KEYCODE_C)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( amcoetype2 )
-	PORT_INCLUDE(amcoecommon)
-
-	PORT_MODIFY("KEY2") // reverse order
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Small / Right") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Play / Bet") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Take") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Double / Select") PORT_CODE(KEYCODE_X)
-	/*        0x10 ? */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Big / Left") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)     PORT_IMPULSE(2) // causes coin jam if held
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1)  PORT_IMPULSE(2) // causes service jam if held
-INPUT_PORTS_END
 
 
 static const gfx_layout sfbonus_layout =
@@ -5224,13 +5323,13 @@ GAME( 2004, sfbonusb,    sfbonus,  sfbonus,    amcoetype2,    sfbonus, ROT0,  "A
 GAME( 2004, sfbonusd,    sfbonus,  sfbonus,    amcoetype1,    sfbonusd,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", 0)
 GAME( 2004, sfbonusv,    sfbonus,  sfbonus,    amcoetype1,    sfbonusv,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R Dual)", 0)
 
-GAME( 2004, parrot3,     0,        sfbonus,    amcoetype2,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", 0)
+GAMEL( 2004, parrot3,     0,        sfbonus,    amcoetype2,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", 0, layout_pirpok2)
 
-GAME( 2004, parrot3b,    parrot3,  sfbonus,    amcoetype2,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", 0)
-GAME( 2004, parrot3d,    parrot3,  sfbonus,    amcoetype1,    parrot3d, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", 0)
-GAME( 2004, parrot3v2,   parrot3,  sfbonus,    amcoetype1,    parrot3v2,ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R Dual)", 0)
+GAMEL( 2004, parrot3b,    parrot3,  sfbonus,    amcoetype2,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", 0, layout_pirpok2)
+GAMEL( 2004, parrot3d,    parrot3,  sfbonus,    amcoetype1,    parrot3d, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", 0, layout_pirpok2)
+GAMEL( 2004, parrot3v2,   parrot3,  sfbonus,    amcoetype1,    parrot3v2,ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R Dual)", 0, layout_pirpok2)
 
-GAME( 2004, parrot3v,    parrot3,  sfbonus,    amcoetype1,    parrot3v, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6E Dual)", 0)
+GAMEL( 2004, parrot3v,    parrot3,  sfbonus,    amcoetype1,    parrot3v, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6E Dual)", 0, layout_pirpok2)
 
 GAME( 2000, hldspin1,    0,        sfbonus,    amcoetype2,    hldspin1, ROT0,  "Amcoe", "Hold & Spin I (Version 2.5T)", 0)
 
@@ -5302,13 +5401,13 @@ GAME( 2004, robadv2v1,   robadv2,  sfbonus,    amcoetype1,    robadv2v1,ROT0,  "
 
 GAME( 2004, robadv2v4,   robadv2,  sfbonus,    amcoetype1,    robadv2v4,ROT0,  "Amcoe", "Robin Adventure 2 (Version 1.7E Dual)", 0)
 
-GAME( 2003, pirpok2,     0,        sfbonus,    amcoetype2,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", 0)
+GAMEL( 2003, pirpok2,     0,        sfbonus,    amcoetype2,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.0)", 0, layout_pirpok2)
 
-GAME( 2003, pirpok2b,    pirpok2,  sfbonus,    amcoetype2,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 1)", 0)
-GAME( 2003, pirpok2d,    pirpok2,  sfbonus,    amcoetype1,    pirpok2d,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 2)", 0)
-GAME( 2003, pirpok2v,    pirpok2,  sfbonus,    amcoetype1,    pirpok2v,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R Dual)", 0)
+GAMEL( 2003, pirpok2b,    pirpok2,  sfbonus,    amcoetype2,    pirpok2, ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 1)", 0, layout_pirpok2)
+GAMEL( 2003, pirpok2d,    pirpok2,  sfbonus,    amcoetype1,    pirpok2d,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R, set 2)", 0, layout_pirpok2)
+GAMEL( 2003, pirpok2v,    pirpok2,  sfbonus,    amcoetype1,    pirpok2v,ROT0,  "Amcoe", "Pirate Poker II (Version 2.2R Dual)", 0, layout_pirpok2)
 
-GAME( 2003, pirpok2v2,   pirpok2,  sfbonus,    amcoetype1,   pirpok2v2,ROT0,  "Amcoe", "Pirate Poker II (Version 2.4E Dual)", 0)
+GAMEL( 2003, pirpok2v2,   pirpok2,  sfbonus,    amcoetype1,   pirpok2v2,ROT0,  "Amcoe", "Pirate Poker II (Version 2.4E Dual)", 0, layout_pirpok2)
 
 GAME( 2003, anibonus,    0,        sfbonus,    amcoetype2,    anibonus, ROT0,  "Amcoe", "Animal Bonus (Version 1.50XT)", 0)
 

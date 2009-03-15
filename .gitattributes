@@ -2601,6 +2601,7 @@ src/mame/layout/pe_poker.lay svneol=native#text/plain
 src/mame/layout/pe_schip.lay svneol=native#text/plain
 src/mame/layout/pe_slots.lay svneol=native#text/plain
 src/mame/layout/peplus.lay svneol=native#text/plain
+src/mame/layout/pirpok2.lay svneol=native#text/plain
 src/mame/layout/pmpoker.lay svneol=native#text/plain
 src/mame/layout/pmroulet.lay -text svneol=native#plain/text
 src/mame/layout/poker41.lay svneol=native#text/plain
