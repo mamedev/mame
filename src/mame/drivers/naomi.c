@@ -3086,8 +3086,8 @@ ROM_START( vtennis2 )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0015a", 0, SHA1(c6e9c9901bd4f075454b7f18baf08df81bc2f1ad) )
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // key is bad, typo, or wrong revision? (my best guess is it's for the non 'a' revision)
-	ROM_LOAD("317-0318-exp.data", 0x00, 0x50, BAD_DUMP CRC(bad19daf) SHA1(22ec96a7d524bbbb96df3f849800b51927e9a14f) )
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0318-exp.data", 0x00, 0x50, CRC(7758ade6) SHA1(c62f35810bce466bfb0f55fd555066efd53e9bb6) )
 ROM_END
 
 /*
