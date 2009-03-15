@@ -18,7 +18,7 @@
   Press 'F2' (Turn Service Mode ON)
   Press 'F3' (Reset)
   Use 'C' (3 Lines) to move pointer to INIT
-  press 'M' (Start) to enter INIT menu
+  press '1' (Start) to enter INIT menu
   hold 'Z' (Bet/Double) for 5 seconds while counter counts down
   press 'F2' (Turn Service Mode OFF)
   Press 'F3' (Reset)
@@ -244,7 +244,7 @@ static INPUT_PORTS_START( multfish )
 	PORT_DIPNAME(     0x04, 0x04, "P Reserve (13 A)" )
 	PORT_DIPSETTING(  0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Start") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN8 ) // BILL 4 (07 A)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED ) // unused?
 
@@ -1186,6 +1186,24 @@ ROM_START( rollfr_2 ) // 040318
 	ROM_LOAD( "8", 0x380000, 0x80000, MD5(532c2ac982cebd221430cd62f84a9534) SHA1(8ec808069053f0c07d81c45090b2ba22ef8e9c32) )
 ROM_END
 
+/*********************************************************
+   Island
+**********************************************************/
+
+ROM_START( island ) // 050713
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "is050713.rom", 0x00000, 0x40000, CRC(26c7013e) SHA1(5d604f5b4859e9e82830424a1e21f32a9e49bf34) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1a", 0x000000, 0x80000, CRC(dbe8cdda) SHA1(4747cf0d85afdef22d3ba9fa5e75b39548725745) )
+	ROM_LOAD( "2a", 0x100000, 0x80000, CRC(64064745) SHA1(91a7bc7204a8f7a7512eeaf4906da20a9f587565) )
+	ROM_LOAD( "3a", 0x200000, 0x80000, CRC(1d993f68) SHA1(b0459d3941d50668f7533909e3f3da91453d3efd) )
+	ROM_LOAD( "4a", 0x300000, 0x80000, CRC(a4739404) SHA1(8f7ffcc13dcb35adfa8060ab1930d07195b6110c) )
+	ROM_LOAD( "5a", 0x080000, 0x80000, CRC(d016eb31) SHA1(a84f18af470f72730b241b9031cd6131c8a03db2) )
+	ROM_LOAD( "6a", 0x180000, 0x80000, CRC(0faaa968) SHA1(0f05546e6e0559e24c6afdde65b3feeb66b6adff) )
+	ROM_LOAD( "7a", 0x280000, 0x80000, CRC(d7277a6c) SHA1(d96a0befc965ad22087381982305d68208978a7e) )
+	ROM_LOAD( "8a", 0x380000, 0x80000, CRC(ac6fba48) SHA1(64dd03d624f16da52bc7fa0702246e91ae39a806) )
+ROM_END
 
 
 #if ALL_REVISIONS /* Multifish sets verified against dat */
@@ -1281,3 +1299,6 @@ GAME(   2003, rollfr_2,  rollfr, multfish, multfish,  0, ROT0, "Igrosoft", "Roll
 #else
 // ... none
 #endif
+
+GAME(   2005, island,    0,    multfish, multfish,  0, ROT0, "Igrosoft", "Island (050713)",  0 )
+

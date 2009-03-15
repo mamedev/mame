@@ -9083,8 +9083,8 @@ Other Sun games
 	//DRIVER( rollfr )
 	//DRIVER( rollfr_2 )
 
-	
-	
+	/* Island */
+	DRIVER( island )
 
 	
 	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
