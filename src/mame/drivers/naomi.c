@@ -2700,8 +2700,6 @@ void naomi_write_keyfile(void)
 }
 #endif
 
-extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
-
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
   JAPAN
@@ -3056,6 +3054,157 @@ ROM_START( vathlete )
 	ROM_LOAD("317-0330-com.data", 0x00, 0x50, CRC(f5e7f7d4) SHA1(3903337e82011d132993e4366475586866bd39b1) )
 ROM_END
 
+/*
+
+Title	VIRTUA TENNIS 2 (POWER SMASH 2)
+Media ID	D72C
+Media Config	GD-ROM1/1
+Regions	J
+Peripheral String	0000000
+Product Number	GDS-0015A
+Version	V2.000
+Release Date	20010827
+Manufacturer ID	
+TOC	DISC
+Track	Start Sector	End Sector	Track Size
+track01.bin	150	449	705600
+track02.raw	600	2732	5016816
+track03.bin	45150	549299	1185760800
+
+
+PIC
+
+253-5508-0318
+317-0318-EXP
+*/
+
+ROM_START( vtennis2 )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0015a", 0, SHA1(c6e9c9901bd4f075454b7f18baf08df81bc2f1ad) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // key is bad, typo, or wrong revision? (my best guess is it's for the non 'a' revision)
+	ROM_LOAD("317-0318-exp.data", 0x00, 0x50, BAD_DUMP CRC(bad19daf) SHA1(22ec96a7d524bbbb96df3f849800b51927e9a14f) )
+ROM_END
+
+/*
+Title	MONKEY_BALL
+Media ID	43EB
+Media Config	GD-ROM1/1
+Regions	J
+Peripheral String	0000000
+Product Number	GDS-0008
+Version	V1.008
+Release Date	20010425
+Manufacturer ID	
+Track	Start Sector	End Sector	Track Size
+track01.bin	150	449	705600
+track02.raw	600	2732	5016816
+track03.bin	45150	549299	1185760800
+
+
+PIC
+
+253-5508-0307
+317-0307-COM
+*/
+
+ROM_START( monkeyba )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0008", 0, SHA1(2fadcd141bdbde77b2b335b270959a516af44d99) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0307-com.data", 0x00, 0x50, CRC(448bedc7) SHA1(092dbe5e28890d3ee40d62ca8cbf225c3ce90304) )
+ROM_END
+
+/*
+Title	THE_MAZE_OF_THE_KINGS
+Media ID	E3D0
+Media Config	GD-ROM1/1
+Regions	J
+Peripheral String	0000000
+Product Number	GDS-0022
+Version	V1.001
+Release Date	20020306
+Manufacturer ID	
+TOC	DISC
+Track	Start Sector	End Sector	Track Size
+track01.bin	150	449	705600
+track02.raw	600	2732	5016816
+track03.bin	45150	549299	1185760800
+
+
+PIC
+317-0333-COM
+253-5508-0333
+
+*/
+ROM_START( mok )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0022", 0, SHA1(70b41745225006e7876176cbd239edecd4c3f8b6) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0333-com.data", 0x00, 0x50, CRC(0c07970f) SHA1(8882dd2f8ed522790ea78eed80cfa9442f88f67b) )
+ROM_END
+
+ROM_START( lupinsho )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0018", 0, SHA1(0633a99a666f363ab30450a76b9753685d6b1f57) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0332-j.data", 0x00, 0x50, CRC(31f2b632) SHA1(bbf253bfe831308a7e7fde3a4a28e5bcd2fbb273) )
+ROM_END
+
+/*
+Title	CONFIDENTIAL MISSION
+Media ID	FFCA
+Media Config	GD-ROM1/1
+Regions	J
+Peripheral String	0000000
+Product Number	GDS-0001
+Version	V1.050
+Release Date	20001011
+Manufacturer ID	SEGA ENTERPRISES
+TOC	DISC
+Track	Start Sector	End Sector	Track Size
+track01.bin	150	3788	8558928
+track02.raw	3939	6071	5016816
+track03.bin	45150	549299	1185760800
+
+
+PIC
+317-0298-COM
+*/
+
+ROM_START( confmiss )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0001", 0, SHA1(bd05f197ba8643577883dd25d9d5a74c91b27ca9) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0298-com.data", 0x00, 0x50, CRC(c989b336) SHA1(40075500888626cc2261133eec496b3e753631e5) )
+ROM_END
+
+
+
 /* Naomi GD-Rom Sets */
 GAME( 2001, naomigd,   0,        naomi,    naomi,    0,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -3082,6 +3231,11 @@ GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          
 GAME( 2001, dygolf,    naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vathlete,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Tennis 2 (GDS-0015a)", GAME_NO_SOUND|GAME_NOT_WORKING ) // bad key
+GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, mok,       naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, confmiss,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
 
@@ -3152,8 +3306,22 @@ ROM_END
 	//ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
 
 
+ROM_START( beachspi )
+	NAOMI2_BIOS
+//	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0014", 0, SHA1(1) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) ) // old dump, not checked
+ROM_END
+	
 ROM_START( initd )
 	NAOMI2_BIOS
+//	NAOMIGD_BIOS
 
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -3166,6 +3334,19 @@ ROM_START( initd )
 	ROM_LOAD("317-0331-jpn.data", 0x00, 0x50, CRC(bb39742e) SHA1(b3100b18aeb80ebfd5312ba5c320e7e647710b55) )
 ROM_END
 
+ROM_START( initdexp )
+	NAOMI2_BIOS
+//	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0025", 0, SHA1(8ea92cf6b493f21b9453832edad7cbc5e5b350c1) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)  // key supplied was bad
+	ROM_LOAD("317-0343-com.data", 0x00, 0x50, CRC(e9d8fac0) SHA1(85f5bbffbd9d1f7162bae46ddd49e7870fe93662) )
+ROM_END
+
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 //Naomi 2 Cart Games
@@ -3174,11 +3355,190 @@ GAME( 2001, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0, "Sega",          "V
 // GDS-xxxx (first party games?)
 GAME( 2001, vstrik3, naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, vf4,     naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 (GDS-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, initd,   naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (GDS-0020b)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, initd,   naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (Japan) (GDS-0020b)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, beachspi,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Beach Spikers (GDS-0014)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, initdexp,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D Arcade Stage (Export) (GDS-0025)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /* Atomiswave */
 GAME( 2001, awbios,   0,        naomi,    naomi,    0, ROT0, "Sammy",           "Atomiswave Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns, ROT0, "Arc System Works",           "Fist Of The North Star", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, demofist, awbios,   naomi,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_NO_SOUND|GAME_NOT_WORKING )
+
+/*********************************************************************************************************************
+**********************************************************************************************************************
+*********************************************************************************************************************/
+
+// Triforce -- this is GameCube based, not Dreamcast/Naomi based, move out of here
+// (currently here for testing the gd-rom stuff only)
+#define TRIFORCE_BIOS \
+	ROM_REGION( 0x200000, "maincpu", 0) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Triforce Bios" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "triforce_bootrom.bin", 0x000000, 0x200000, CRC(d1883221) SHA1(c3cb7227e4dbc2af861e76d00cb59726105a2e4c) ) \
+
+ROM_START( triforce )
+	TRIFORCE_BIOS
+
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
+ROM_END
+
+/*
+
+Title	VIRTUA STRIKER 4
+Media ID	93B2
+Media Config	GD-ROM1/1
+Regions	J
+Peripheral String	0000000
+Product Number	GDT-0015
+Version	V1.001
+Release Date	20041202
+Manufacturer ID	
+TOC	DISC
+Track	Start Sector	End Sector	Track Size
+track01.bin	150	449	705600
+track02.raw	600	1951	3179904
+track03.bin	45150	549299	1185760800
+
+
+PIC
+255-5508-393E
+317-0393-EXP
+
+*/
+
+ROM_START( vs4 )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(6dbc70c97c5f48e982a1292eb19045591d0e48b7) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0393-exp.data", 0x00, 0x50, CRC(2dcfecd7) SHA1(d805168e1564051ae5c47876ade2c9843253c6b4) )
+ROM_END
+
+/*
+Title	VIRTUA_STRIKER_2002
+Media ID	0DD8
+Media Config	GD-ROM1/1
+Regions	J
+Peripheral String	0000000
+Product Number	GDT-0002
+Version	V1.005
+Release Date	20020730
+
+
+PIC
+
+253-5508-337E
+317-0337-EXP
+*/
+
+ROM_START( vs2002ex )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0002", 0, SHA1(a3d2da69edf878ad9bf5e05a80a020d8aa0bacfb) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0337-exp.data", 0x00, 0x50, CRC(aa6be604) SHA1(fabc43ecfb7ddf1d5a87f10884852027d6f4773b) )
+ROM_END
+
+GAME( 200?, triforce, 0,        naomigd,    naomi,    0, ROT0, "Sega",           "Triforce Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 200?, vs4,      triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, vs2002ex, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
+
+/*********************************************************************************************************************
+**********************************************************************************************************************
+*********************************************************************************************************************/
+
+// Chihiro -- this is XBox based, not Dreamcast/Naomi based, move out of here
+// (currently here for testing the gd-rom stuff only)
+#define CHIHIRO_BIOS \
+	ROM_REGION( 0x200000, "maincpu", 0) \
+	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "chihiro_bios.bin", 0x000000, 0x200000, NO_DUMP ) \
+
+ROM_START( chihiro )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
+ROM_END
+
+/*
+
+Title	GHOST SQUAD
+Media ID	004F
+Media Config	GD-ROM1/1
+Regions	J
+Peripheral String	0000000
+Product Number	GDX-0012A
+Version	V2.000
+Release Date	20041209
+Manufacturer ID	
+
+PIC
+253-5508-0398
+317-0398-COM
+
+*/
+
+ROM_START( ghostsqu )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0012a", 0,  SHA1(d7d78ce4992cb16ee5b4ac6ca7a37c46b07e8c14) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
+ROM_END
+
+/*
+
+Title	VIRTUA COP 3
+Media ID	C4AD
+Media Config	GD-ROM1/1
+Regions	J
+Peripheral String	0000000
+Product Number	GDX-0003A
+Version	V2.004
+Release Date	20030226
+Manufacturer ID	
+TOC	DISC
+Track	Start Sector	End Sector	Track Size
+track01.bin	150	599	1058400
+track02.raw	750	2101	3179904
+track03.bin	45150	549299	1185760800
+
+
+PIC
+255-5508-354
+317-054-COM
+
+*/
+
+ROM_START( vcop3 )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0003a", 0,  SHA1(cdfec1d2ef02ae9e29cb1462f08904177bc4c9ea) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0354-com.data", 0x00, 0x50,  CRC(df7e3217) SHA1(9f0f4bf6b15f3b6eeea81eaa27b3d25bd94110da) )
+ROM_END
+
+
+GAME( 200?, chihiro,  0,       naomigd,    naomi,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2005, ghostsqu, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012a)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, vcop3,    chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003a)", GAME_NO_SOUND|GAME_NOT_WORKING )
 

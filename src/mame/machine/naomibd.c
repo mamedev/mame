@@ -59,7 +59,7 @@
  *
  *************************************/
 
-extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
+extern void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int length);
 
 
 /*************************************
@@ -320,7 +320,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
  *
  *************************************/
 
-static void load_rom_gdrom(naomibd_state *v)
+static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 {
 	UINT32 result;
 	cdrom_file *gdromfile;
@@ -473,7 +473,7 @@ static void load_rom_gdrom(naomibd_state *v)
 	printf("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
 
 	// decrypt loaded data
-	naomi_game_decrypt(key, v->memory, size);
+	naomi_game_decrypt(machine, key, v->memory, size);
 	cdrom_close(gdromfile);
 }
 
@@ -515,7 +515,7 @@ static DEVICE_START( naomibd )
 			v->memory = (UINT8 *)memory_region(device->machine, config->regiontag);
 			v->gdromchd = get_disk_handle(config->gdromregiontag);
 			v->picdata = (UINT8 *)memory_region(device->machine, config->picregiontag);
-			load_rom_gdrom(v);
+			load_rom_gdrom(device->machine, v);
 			break;
 
 		default:

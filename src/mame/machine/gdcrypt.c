@@ -333,12 +333,25 @@ static void write_from_qword(UINT8* region, UINT64 qword)
 	}
 }
 
-void naomi_game_decrypt(UINT64 key, UINT8* region, int length)
+void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int length)
 {
 	int i;
 
 	des_generate_subkeys (rev64(key), des_subkeys);
-
+	
+	/* save the original file */
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"encrypted %s", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(region, length, 1, fp);
+			fclose(fp);
+		}
+	}
+	
 	for(i=0;i<length;i+=8)
 	{
 		UINT64 ret;
@@ -348,5 +361,19 @@ void naomi_game_decrypt(UINT64 key, UINT8* region, int length)
 		ret = rev64(ret);
 	 	write_from_qword(region+i, ret);
 	}
+	
+	/* save the decrypted file */
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted %s", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(region, length, 1, fp);
+			fclose(fp);
+		}
+	}
+	
 }
 

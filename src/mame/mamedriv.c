@@ -4237,7 +4237,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.10 Death Crimson OX */
 						/* 2000.11 WWF Royal Rumble */
 						/* 2000.11 Ninja Assault */
-						/* 2000.11 Confidential Mission */
+	DRIVER( confmiss )	/* 2000.11 Confidential Mission */											/* First GD-ROM game? */
 						/* 2000.11 Shakatto Tambourine */
 						/* 2000.12 Samba de Amigo ver.2000 */
 						/* 2000.12 Derby Owners Club 2000 ver.2 */
@@ -4254,34 +4254,34 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika */
 	DRIVER( dygolf )	/* 2001.04 Dynamic Golf */
 						/* 2001.05 Wild Riders */
-						/* 2001.05 Monkey Ball */
+	DRIVER( monkeyba )	/* 2001.05 Monkey Ball */
 						/* 2001.06 Club Cart */
 	DRIVER( cvsgd )		/* 2001.06 Capcom vs. SNK Pro */
 						/* 2001.06 Crackin' DJ Part2 */
 	DRIVER( wsbbgd )	/* 2001.06 Super Major League */
-						/* 2001.07 Beach Spikers */
+	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 	DRIVER( spkrbtl )	/* 2001.07 Spikers Battle */
 						/* 2001.07 Dokidoki Idol Star Seeker */
 						/* 2001.08 Wave Runner GP */
-	DRIVER( vf4 )		/* 2001.08 Virtua Fighter 4 */
+	DRIVER( vf4 )		/* 2001.08 Virtua Fighter 4 (Naomi 2) */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
 	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
 						/* 2001.09 Alien Front */
 	DRIVER( gundmxgd )	/* 2001.09 Kidou Senshi Gundam Renpou vs. Zeon DX */
 						/* 2001.10 Derby Owners Club 2 */
 						/* 2001.10 Inu no Osanpo */
-						/* 2001.10 Power Smash 2 */
+	DRIVER( vtennis2 )  /* 2001.10 Power Smash 2 / Virtua Tennis 2 */
 						/* 2001.11 La Keyboardu */
 						/* 2001.11 Shakatto Tambourine Cho Powerup Chu */
 	DRIVER( ikaruga )	/* 2001.12 Ikaruga */
-						/* 2001.12 Lupin the Third the Shooting */
+	DRIVER( lupinsho)	/* 2001.12 Lupin the Third the Shooting */
 						/* 2002.02 The King of Route 66 */
-	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
+	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage (Naomi 2) */
 	DRIVER( vathlete )	/* 2002.03 Virtua Athlete */
 						/* 2002.04 Lupin the Third the Typing */
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
 						/* 2002.05 Cleopatra Fortune + */
-						/* 2002.05 The Maze of the Kings */
+	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
 						/* 2002.06 World Club Champion Football */
 	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
 						/* 2002.07 Mazan */
@@ -4313,7 +4313,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.07 WCCF 2004-2005 */
 						/* 2005.09 Kodai Ouja Kyouryuu King */
 						/* 2005.10 Under Defeat */
-
+	
+	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
+						
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
 	DRIVER( fotns )
@@ -4325,6 +4327,16 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pharrier )	/* (c) 2001 */
 	DRIVER( podrace )	/* (c) 2001 */
 
+	/* Triforce (GameCube based) */
+	DRIVER( triforce )
+	DRIVER( vs4 )
+	DRIVER( vs2002ex )
+	
+	/* Chihiro (X-Box based) */
+	DRIVER( chihiro )
+	DRIVER( ghostsqu )
+	DRIVER( vcop3 )
+	
 	DRIVER( hshavoc )	/* (c) 1993 Data East */
 
 	/* Data East "Burger Time hardware" games */
