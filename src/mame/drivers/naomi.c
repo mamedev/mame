@@ -2972,7 +2972,7 @@ ROM_START( sprtjam )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0003", 0, SHA1(bfabb0da1d4f0422e0b62d8a7bb67dbcdb0d5954) MD5(3a8d3cbc4067f9b5f50be9b9abdc689b) )
+	DISK_IMAGE_READONLY( "gds-0003", 0, SHA1(caaba214c1faca78b3370bcd4190eb2853d7f825) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0300-COM)
@@ -2987,7 +2987,7 @@ ROM_START( slashout )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0004", 0, SHA1(ec1758f5ae359bcb3c66c7ce9ebcb7443c4fd967) MD5(f5228f26e661ab0cb67414f51fe1a5bc) )
+	DISK_IMAGE_READONLY( "gds-0004", 0, SHA1(3cce788393ed194ba9b603f9896ff893691d6b00) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0302-COM)
@@ -3002,7 +3002,7 @@ ROM_START( spkrbtl )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0005", 0, SHA1(ca6e7ed2e161acad8600898e1b83aded9bb31d3b) MD5(a8a05ce6ab7d9ea67e015cd4853a5b80) )
+	DISK_IMAGE_READONLY( "gds-0005", 0, SHA1(d1c3fb2350e4a89372373e7f629c42b741af29b3) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0303-COM)
@@ -3017,7 +3017,7 @@ ROM_START( dygolf )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0009", 0, SHA1(d58a42586c65dcb44282bf930631ea8b663c6aa7) MD5(e553e1811f28b67fd57fa8e34d978d87) )
+	DISK_IMAGE_READONLY( "gds-0009", 0, SHA1(d502155ddaf881c2c9505528004b9904aa32a59c) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0308-COM)
@@ -3031,7 +3031,7 @@ ROM_START( wsbbgd )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0010", 0,  SHA1(8ce36c9710a8d55e8c19d7f218500b7074b66dec) MD5(bfb8c5ead5ac9e2a82bca9114390a99f) )
+	DISK_IMAGE_READONLY( "gds-0010", 0,  SHA1(c3135ede3a8bdadab91aed49abacbfbde8037069) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0309-COM)
@@ -3046,7 +3046,7 @@ ROM_START( vathlete )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0019", 0, SHA1(2167bbdde987c16949c5814ab7cff6eefd9f9326) MD5(67499591f2c61cda14fa581db9294315) )
+	DISK_IMAGE_READONLY( "gds-0019", 0, SHA1(955d3c0cb991be3057138c562cff69c5ef887787) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0330-COM)
@@ -3300,11 +3300,29 @@ ROM_START( vf4 )
 	ROM_LOAD("317-0314-com.data", 0x00, 0x50, CRC(91a97eb4) SHA1(059342368bc5d25b494ed3c729870695f9584fc7) )
 ROM_END
 
-	// this is actually Beach Spikers...
-	//PIC16C622A (317-0317-COM)
-	//(sticker 253-5508-0317)
-	//ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
+/*
 
+Title	BEACH SPIKERS
+Media ID	0897
+Media Config	GD-ROM1/1
+Regions	J
+Peripheral String	0000000
+Product Number	GDS-0014
+Version	V1.001
+Release Date	20010613
+Manufacturer ID	
+TOC	DISC
+Track	Start Sector	End Sector	Track Size
+track01.bin	150	449	705600
+track02.raw	600	2746	5049744
+track03.bin	45150	549299	1185760800
+
+PIC
+
+253-5508-0317
+317-0317-COM
+
+*/
 
 ROM_START( beachspi )
 	NAOMI2_BIOS
@@ -3313,10 +3331,12 @@ ROM_START( beachspi )
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0014", 0, SHA1(1) )
+	DISK_IMAGE_READONLY( "gds-0014", 0, SHA1(1ebb3695196c11a86276e034df2e1c8d7fa6b96f) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) ) // old dump, not checked
+	//PIC16C622A (317-0317-COM)
+	//(sticker 253-5508-0317)	
+	ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
 ROM_END
 	
 ROM_START( initd )
@@ -3413,7 +3433,7 @@ ROM_START( vs4 )
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(6dbc70c97c5f48e982a1292eb19045591d0e48b7) )
+	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(1f83712b2b170d6edf4a27c15b6f763cc3cc4b71) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	ROM_LOAD("317-0393-exp.data", 0x00, 0x50, CRC(2dcfecd7) SHA1(d805168e1564051ae5c47876ade2c9843253c6b4) )
@@ -3443,7 +3463,7 @@ ROM_START( vs2002ex )
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0002", 0, SHA1(a3d2da69edf878ad9bf5e05a80a020d8aa0bacfb) )
+	DISK_IMAGE_READONLY( "gdt-0002", 0, SHA1(471e896d43167c93cc229cfc94ff7ac6de7cf9a4) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	ROM_LOAD("317-0337-exp.data", 0x00, 0x50, CRC(aa6be604) SHA1(fabc43ecfb7ddf1d5a87f10884852027d6f4773b) )
