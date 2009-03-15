@@ -19,6 +19,7 @@
 #define __I860_H__
 
 #include "cpuintrf.h"
+#include "debugger.h"
 
 /***************************************************************************
     REGISTER ENUMERATION
