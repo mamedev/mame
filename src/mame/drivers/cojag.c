@@ -1178,7 +1178,7 @@ ROM_START( area51t ) /* 68020 based, Area51 Time Warner License  Date: Nov 15, 1
 	ROM_LOAD32_BYTE( "3k.bin", 0x00003, 0x80000, CRC(94f50c14) SHA1(a54552e3ac5c4f481ba4f2fc7d724534576fe76c) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "area51t", 0, MD5(60d051da941d76aafd47c862e3b6e209) SHA1(fee528eef8a256f87af299499ecf5817218f5202) )
+	DISK_IMAGE( "area51t", 0, SHA1(d2865cc7b1bb08a4393a72013a90e18d8a8f9860) )
 ROM_END
 
 ROM_START( area51a ) /* 68020 based, Area51 Atari Games License  Date: Oct 25, 1995 */
@@ -1223,7 +1223,7 @@ ROM_START( maxf_102 ) /* R3000 based, labeled as "Maximum Force 2-27-97 v1.02" *
 	ROM_LOAD32_BYTE( "maxf_102.ll", 0x00003, 0x80000, CRC(e491be7f) SHA1(cbe281c099a4aa87067752d68cf2bb0ab3900531) )
 
 	DISK_REGION( "ide" )
-	DISK_IMAGE( "maxforce", 0, MD5(b0a214c7b3f8ba9d592396332fc974c9) SHA1(59d77280afdb2d1f801ee81786aa7d3166ec2695) )
+	DISK_IMAGE( "maxforce", 0, SHA1(d54e7a8f3866bb2a1d28ae637e7c92ffa4dbe558) )
 ROM_END
 
 

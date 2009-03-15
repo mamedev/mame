@@ -2729,7 +2729,7 @@ ROM_START( carnevil )
 	ROM_LOAD( "carnevil1_9.u32", 0x000000, 0x80000, CRC(82c07f2e) SHA1(fa51c58022ce251c53bad12fc6ffadb35adb8162) )
 
 	DISK_REGION( "ide" )	/* Hard Drive v1.0.3  Diagnostics v3.4 / Feb 1 1999 16:00:07 */
-	DISK_IMAGE( "carnevil", 0, MD5(cba5ecd6c59b6fb56f574558f4f2b509) SHA1(ba32b7ef9721d730ce58bd753d47fb947b6ae9b6) )
+	DISK_IMAGE( "carnevil", 0, SHA1(5cffb0de63ad36eb01c5951bab04d3f8a9e23e16) )
 ROM_END
 
 
