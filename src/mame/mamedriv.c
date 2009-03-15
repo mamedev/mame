@@ -7895,7 +7895,8 @@ Other Sun games
 	DRIVER( lsrquiz2 )	/* (c) 1995 */
 	DRIVER( mgprem11 )	/* (c) 1995 */
 	DRIVER( lasstixx )	/* (c) 1995 */
-
+	DRIVER( mgnumber )	/* (c) 1995 */
+	
 	/* American Laser Games */
 	DRIVER( alg_bios )
 	DRIVER( maddoga )	/* (c) 1990 */
