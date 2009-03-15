@@ -1,5 +1,18 @@
+/*******************************************************************************************
+
+Notes:
+-To init chsuper3, just soft-reset and keep pressed both service keys (9 & 0)
+
+TODO:
+-sound;
+-inputs are grossly mapped;
+-lamps;
+
+*******************************************************************************************/
+
 #include "driver.h"
 #include "cpu/z180/z180.h"
+#include "sound/dac.h"
 
 static int chsuper_tilexor;
 
@@ -19,7 +32,7 @@ static VIDEO_UPDATE(chsuper)
 		for (x=0;x<128;x++)
 		{
 			int tile = ((vram[count+1]<<8) | vram[count]) & 0xffff;
-			
+
 			tile ^=chsuper_tilexor;
 			//int colour = tile>>12;
 
@@ -85,19 +98,77 @@ static ADDRESS_MAP_START( chsuper_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfb000, 0xfbfff) AM_RAM
 ADDRESS_MAP_END
 
+//	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
+
 static ADDRESS_MAP_START( chsuper_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
-	AM_RANGE( 0x00e8, 0x00e8 ) AM_READ( ff_r )
-	AM_RANGE( 0x00e9, 0x00e9 ) AM_READ( ff_r )
-	AM_RANGE( 0x00ea, 0x00ea ) AM_READ( ff_r )
+	AM_RANGE( 0x00e8, 0x00e8 ) AM_READ_PORT("IN0")
+	AM_RANGE( 0x00e9, 0x00e9 ) AM_READ_PORT("IN1")
+	AM_RANGE( 0x00ea, 0x00ea ) AM_READ_PORT("DSW0")
+	AM_RANGE( 0x00ed, 0x00ef ) AM_WRITENOP //lamps
 	AM_RANGE( 0x00fc, 0x00fe ) AM_WRITE( paletteram_io_w )
-	AM_RANGE( 0x8300, 0x8300 ) AM_READ( ff_r )	
-	AM_RANGE( 0xff00, 0xffff ) AM_RAM // unk writes
+	AM_RANGE( 0x8300, 0x8300 ) AM_READ( ff_r ) //probably data for the dac
+	AM_RANGE( 0xff20, 0xff3f ) AM_DEVWRITE("dac", dac_w) // unk writes
 ADDRESS_MAP_END
 
-
-
 static INPUT_PORTS_START( chsuper )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet / Cancel All") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Analyzer")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Credit clear" ) //hopper?
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, "2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -137,14 +208,16 @@ static MACHINE_DRIVER_START( chsuper )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
 
 	MDRV_GFXDECODE(chsuper)
-	MDRV_PALETTE_LENGTH(2048)
+	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(chsuper)
 	MDRV_VIDEO_UPDATE(chsuper)
 
 	/* sound hardware */
-//	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -160,6 +233,9 @@ ROM_START( chsuper3 )
 	ROM_LOAD( "b.bin",  0x80000, 0x80000, CRC(5f58c722) SHA1(d339ae27af010b058eae9084fba85fb2fbed3952) )
 
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x80000, "adpcm", 0 )
+	ROM_COPY( "maincpu", 0x10000, 0x00000, 0x70000 )
 ROM_END
 
 ROM_START( chsuper2 )
@@ -171,6 +247,9 @@ ROM_START( chsuper2 )
 	ROM_LOAD( "b.bin",  0x80000, 0x80000, CRC(7bb463d7) SHA1(fb3842ba53e545fa47574c91df7281a9cb417395) )
 
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x80000, "adpcm", 0 )
+	ROM_COPY( "maincpu", 0x10000, 0x00000, 0x70000 )
 ROM_END
 
 static DRIVER_INIT( chsuper2 )
@@ -184,5 +263,5 @@ static DRIVER_INIT( chsuper3 )
 }
 
 
-GAME( 1999, chsuper3, 0,        chsuper, chsuper,  chsuper3, ROT0, "unknown",    "Champion Super 3", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, chsuper2, chsuper3, chsuper, chsuper,  chsuper2, ROT0, "unknown",    "Champion Super 2", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, chsuper3, 0,        chsuper, chsuper,  chsuper3, ROT0, "unknown",    "Champion Super 3 (V0.35)", GAME_NO_SOUND ) //24/02/99
+GAME( 1999, chsuper2, chsuper3, chsuper, chsuper,  chsuper2, ROT0, "unknown",    "Champion Super 2 (V0.13)", GAME_NO_SOUND ) //26/01/99
