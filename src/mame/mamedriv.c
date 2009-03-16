@@ -4298,8 +4298,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( shikgam2 )	/* 2003.04 Shikigami no Shiro 2 */
 	DRIVER( bdrdown )	/* 2003.04 Border Down */
 						/* 2003.09 WCCF 2002-2003 */
-						/* 2003.11 Psyvariar 2 */
-						/* 2003.11 Puyopuyo Fever */
+	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
+	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
 						/* 2004.01 Initial D Arcade Stage ver.3 */
 						/* 2004.06 WCCF 2002-2003 ver.2.0 */
 						/* 2004.07 Virtua Fighter 4 Final Tuned */

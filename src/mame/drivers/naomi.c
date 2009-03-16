@@ -2930,6 +2930,20 @@ ROM_START( bdrdown )
 	ROM_LOAD("gdl-0023a.bin", 0x00, 0x50, CRC(e689d047) SHA1(7e3e298d9a8076af0254faeb0eb89fbfce94718d) )
 ROM_END
 
+ROM_START( psyvar2 )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0024", 0,  SHA1(d346762036fb1c40a261a434b50e63459f306f14) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-5100-JPN)
+	//(sticker 253-5509-5100J)
+	ROM_LOAD("gdl-0024.bin", 0x00, 0x50, CRC(94316f0f) SHA1(e1ec2b4225105dbaa1e59e8a05027e73f7b725a9) )
+ROM_END
+
 
 ROM_START( meltybld )
 	NAOMIGD_BIOS
@@ -3231,7 +3245,19 @@ ROM_START( confmiss )
 	ROM_LOAD("317-0298-com.data", 0x00, 0x50, CRC(c989b336) SHA1(40075500888626cc2261133eec496b3e753631e5) )
 ROM_END
 
+ROM_START( puyofev )
+	NAOMIGD_BIOS
 
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0031", 0, SHA1(da2d421da9472b149619b6931bb2fe624be75fa2) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-0375-COM)
+	//(sticker 253-5508-0375) 
+	ROM_LOAD("gds-0031.bin", 0x00, 0x50, CRC(32bf1825) SHA1(42dfbc6777c154d8de6c6f7350da9ea737380220) )
+ROM_END
 
 /* Naomi GD-Rom Sets */
 GAME( 2001, naomigd,   0,        naomi,    naomi,    0,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
@@ -3249,6 +3275,7 @@ GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Amedio",     
 GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Alpha System", "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi,    0,   ROT0,   "G-Rev",        "Border Down (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi,    0,   ROT0,   "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, meltybld,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole",        "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, senko,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ss2005,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -3266,6 +3293,7 @@ GAME( 2002, luptype,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          
 GAME( 2002, mok,       naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, confmiss,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, puyofev,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
 
