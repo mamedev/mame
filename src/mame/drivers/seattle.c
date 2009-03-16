@@ -2654,7 +2654,7 @@ ROM_START( vaportrp )
 	ROM_LOAD( "vtrxboot.bin", 0x000000, 0x80000, CRC(ee487a6c) SHA1(fb9efda85047cf615f24f7276a9af9fd542f3354) )
 
 	DISK_REGION( "ide" ) /* Guts: Apr 10 1998 11:03:14  Main: Apr 10 1998 11:27:44 */
-	DISK_IMAGE( "vaportrp", 0, MD5(fac4d37e049bc649696f4834044860e6) SHA1(75e2eaf81c69d2a337736dbead804ac339fd0675) )
+	DISK_IMAGE( "vaportrp", 0, SHA1(6c86637c442ebd6994eee8c0ae0dce343c35dbe9) )
 
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* ADSP-2115 data Version 1.02 */
 	ROM_LOAD16_BYTE( "vaportrx.snd", 0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
