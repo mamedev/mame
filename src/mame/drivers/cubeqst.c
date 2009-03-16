@@ -665,7 +665,7 @@ ROM_START( cubeqst )
 	ROM_LOAD( "fill_board_82s129.14p", 0x400, 0x100, CRC(6b572b73) SHA1(4a065cb05c12ce34e5598341e0de0cc571b2d387) )
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY_OPTIONAL( "cubeqst", 0, SHA1(5266a0a43963628464fac1719e1cefec627042a4) MD5(d2e6010f9b9d36ba50664096ec331f8d) )
+	DISK_IMAGE_READONLY_OPTIONAL( "cubeqst", 0, SHA1(d0e24bb5d0ae424e0816110ec7d6b21189044d57) )
 ROM_END
 
 /*************************************
