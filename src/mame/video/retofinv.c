@@ -90,7 +90,6 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 static TILE_GET_INFO( fg_get_tile_info )
 {
-	/* not sure about the transparency thing, but it makes sense */
 	int color = retofinv_fg_videoram[0x400 + tile_index];
 
 	tileinfo->group = color;
@@ -99,7 +98,7 @@ static TILE_GET_INFO( fg_get_tile_info )
 			0,
 			retofinv_fg_videoram[tile_index] + 256 * fg_bank,
 			color,
-			(tile_index < 0x40 || tile_index >= 0x3c0) ? TILE_FORCE_LAYER0 : 0);
+			0);
 }
 
 
