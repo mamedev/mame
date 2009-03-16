@@ -2927,7 +2927,7 @@ ROM_START( bdrdown )
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5097-JPN)
 	//(sticker 253-5509-5097J)
-	ROM_LOAD("gdl-0023a.bin", 0x00, 0x50, CRC(e689d047) SHA1(7e3e298d9a8076af0254faeb0eb89fbfce94718d) )
+	ROM_LOAD("317-5097-jpn.data", 0x00, 0x50, CRC(e689d047) SHA1(7e3e298d9a8076af0254faeb0eb89fbfce94718d) )
 ROM_END
 
 ROM_START( psyvar2 )
@@ -2941,7 +2941,7 @@ ROM_START( psyvar2 )
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C621A (317-5100-JPN)
 	//(sticker 253-5509-5100J)
-	ROM_LOAD("gdl-0024.bin", 0x00, 0x50, CRC(94316f0f) SHA1(e1ec2b4225105dbaa1e59e8a05027e73f7b725a9) )
+	ROM_LOAD("317-5100-jpn.data", 0x00, 0x50, CRC(94316f0f) SHA1(e1ec2b4225105dbaa1e59e8a05027e73f7b725a9) )
 ROM_END
 
 
@@ -2975,6 +2975,19 @@ ROM_START( senko )
 	ROM_LOAD("317-5107-jpn.data", 0x00, 0x50, CRC(7b607409) SHA1(a9946a0637453e4813bef18060d4420355cff800) )
 ROM_END
 
+ROM_START( senkoo )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0030", 0,  SHA1(c7f25c05f47a490c5da9369c588b6136e93c280e) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-5107-JPN)
+	//(sticker 253-5509-5107J)
+	ROM_LOAD("317-5107-jpn.data", 0x00, 0x50, CRC(7b607409) SHA1(a9946a0637453e4813bef18060d4420355cff800) )
+ROM_END
 
 
 ROM_START( ss2005 )
@@ -2991,6 +3004,23 @@ ROM_START( ss2005 )
 	//(sticker 253-5509-5108J)
 	ROM_LOAD("317-5108-jpn.data", 0x00, 0x50, CRC(6a2eb334) SHA1(cab407d2e994f33aa921d50f399b17e6fbf98eb0) )
 ROM_END
+
+ROM_START( trgheart )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0036a", 0, SHA1(91f1e19136997cb1e2edfb1ad342b9427d1d3bfb) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5121-JPN)
+	//(sticker 253-5509-5121J)
+	ROM_LOAD("317-5121-jpn.data", 0x00, 0x50, CRC(a417b20f) SHA1(af6ed7ebf95948bff3e8df915b229189b8de1e46) )
+ROM_END
+
+
 
 
 
@@ -3163,7 +3193,7 @@ ROM_START( luptype )
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0332-JPN)
 	//(sticker 253-5508-0332J)
-	ROM_LOAD("gds-0021a.bin", 0x00, 0x50, CRC(ab302661) SHA1(65164cf76d78b281772bfcbf5a733b0200e86e09) )
+	ROM_LOAD("317-0332-jpn.data", 0x00, 0x50, CRC(ab302661) SHA1(65164cf76d78b281772bfcbf5a733b0200e86e09) )
 ROM_END
 
 /*
@@ -3256,7 +3286,7 @@ ROM_START( puyofev )
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C621A (317-0375-COM)
 	//(sticker 253-5508-0375) 
-	ROM_LOAD("gds-0031.bin", 0x00, 0x50, CRC(32bf1825) SHA1(42dfbc6777c154d8de6c6f7350da9ea737380220) )
+	ROM_LOAD("317-0375-com.data", 0x00, 0x50, CRC(32bf1825) SHA1(42dfbc6777c154d8de6c6f7350da9ea737380220) )
 ROM_END
 
 /* Naomi GD-Rom Sets */
@@ -3277,8 +3307,11 @@ GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Alpha System"
 GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi,    0,   ROT0,   "G-Rev",        "Border Down (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi,    0,   ROT0,   "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, meltybld,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole",        "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, senko,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senko,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (Rev. A)(GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senkoo,    senko,    naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ss2005,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, trgheart,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Warashi",      "Trigger Heart Exelica (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
 
 // GDS-xxxx (first party games?)
 GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )

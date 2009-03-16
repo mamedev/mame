@@ -4310,9 +4310,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.04 Menkyo no Tetsujin */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
 	DRIVER( senko )		/* 2005.04 Senkou no Rondo */
+	DRIVER( senkoo )	/*          ^^ */
 						/* 2005.07 WCCF 2004-2005 */
 						/* 2005.09 Kodai Ouja Kyouryuu King */
 						/* 2005.10 Under Defeat */
+	DRIVER( trgheart )	/* 200?.?? Trigger Heart Exelica */
 	
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
 						
