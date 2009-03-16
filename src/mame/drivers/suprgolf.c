@@ -48,6 +48,8 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 	suprgolf_rom_bank = data;
 
+	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
+
 	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 	memory_set_bankptr(space->machine, 2, region_base + (data&0x3f ) * 0x4000);
 }
@@ -57,7 +59,7 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 	UINT8 *region_base = memory_region(space->machine, "user2");
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 //	if(data == 0) data = 1; //test hack
-	memory_set_bankptr(space->machine, 1, region_base + (data&0x3f ) * 0x4000);
+	memory_set_bankptr(space->machine, 1, region_base + (data&0x0f ) * 0x4000);
 }
 
 static MACHINE_RESET( suprgolf )
@@ -82,7 +84,7 @@ static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle 
 	UINT32 count;
 
 	count = starting_offs<<16;
-	trans = starting_offs; //helper
+	trans = starting_offs;
 
 	for(y=0;y<256;y++)
 	{
@@ -90,10 +92,8 @@ static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		{
 			UINT16 color;
 
-			//color = ((suprgolf_bg_vram[count] & 0xf0)<<4);
-			color = (suprgolf_bg_pen[count] & 0xff);
-			color|= 0x100; //temp
-
+			color = ((suprgolf_bg_pen[count] & 0xff)<<4) | ((suprgolf_bg_vram[count] & 0xf0)>>4);
+			//color+= ((suprgolf_bg_pen[count+0x10000])<<4);
 			//if((x)<video_screen_get_visible_area(machine)->max_x && ((y)+0)<video_screen_get_visible_area(machine)->max_y)
 			if(x+1 < 256)
 			{
@@ -106,12 +106,11 @@ static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle 
 					*BITMAP_ADDR32(bitmap, y, x+1) = machine->pens[(color & 0x7ff)];
 			}
 
-			//color = ((suprgolf_bg_vram[count] & 0x0f)<<8);
-			color = (suprgolf_bg_pen[count] & 0xff);
-			color|= 0x100; //temp
+			color = ((suprgolf_bg_pen[count] & 0xff)<<4) | (suprgolf_bg_vram[count] & 0x0f);
+			//color+= ((suprgolf_bg_pen[count+0x10000])<<4);
 
 			//if((x+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-			if(x+1 < 256)
+			if(x < 256)
 			{
 				if(trans)
 				{
@@ -130,8 +129,8 @@ static void bg_draw(running_machine *machine, bitmap_t *bitmap, const rectangle 
 static VIDEO_UPDATE( suprgolf )
 {
 	bg_draw(screen->machine,bitmap,cliprect,0);
-	bg_draw(screen->machine,bitmap,cliprect,1);
-	bg_draw(screen->machine,bitmap,cliprect,2);
+	//bg_draw(screen->machine,bitmap,cliprect,1);
+	bg_draw(screen->machine,bitmap,cliprect,2); //this probably should be putted over the fg tilemap too.
 
 	tilemap_draw(bitmap,cliprect,suprgolf_tilemap,0,0);
 	return 0;
@@ -156,9 +155,9 @@ static WRITE8_HANDLER( suprgolf_videoram_w )
 		offset>>=1;
 		datax=paletteram[offset*2]+256*paletteram[offset*2+1];
 
-		b=((datax)&0x001f)>>0;
-		g=((datax)&0x03e0)>>5;
-		r=((datax)&0x7c00)>>10;
+		b=(datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
+		g=(datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
+		r=(datax & 0x8000) ? 0 : ((datax)&0x7c00)>>10;
 
 		palette_set_color_rgb(space->machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
@@ -195,7 +194,7 @@ static READ8_HANDLER( suprgolf_bg_vram_r )
 static WRITE8_HANDLER( suprgolf_bg_vram_w )
 {
 	suprgolf_bg_vram[offset+suprgolf_bg_bank*0x2000] = data;
-	suprgolf_bg_pen[offset+suprgolf_bg_bank*0x2000] = pen;
+	suprgolf_bg_pen[offset+suprgolf_bg_bank*0x2000] = data ? pen : 0;
 }
 
 static WRITE8_HANDLER( suprgolf_pen_w )
@@ -322,30 +321,28 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x01, 0x01, "DSW0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Tutorial" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Number of Balls" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
@@ -404,10 +401,10 @@ static const gfx_layout gfxlayout =
    8,8,
    RGN_FRAC(1,1),
    4,
- { 0, 1, 2, 3 },
-	{ 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*8*4
+   { 0, 1, 2, 3 },
+   { 1*4, 0*4, 3*4, 2*4, 5*4, 4*4, 7*4, 6*4 },
+   { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+   8*8*4
 };
 
 static GFXDECODE_START( suprgolf )
@@ -508,5 +505,5 @@ ROM_START( suprgolf )
 	ROM_LOAD( "cg12.6k",0x00000, 0x10000, CRC(5707b3d5) SHA1(9102a40fefb6426f2cd9d92d66fdc77e078e3f4c) )
 ROM_END
 
-GAME( 19??, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING )
+GAME( 1989?, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING )
 
