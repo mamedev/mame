@@ -2945,6 +2945,22 @@ ROM_START( psyvar2 )
 ROM_END
 
 
+
+ROM_START( trizeal )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0026", 0, SHA1(e4c1e51292a7923b25bfc61d38fe386bf596002a) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-5103-JPN)
+	//(sticker 253-5509-5103J)
+	ROM_LOAD("317-5103-jpn.data", 0x00, 0x50,  CRC(3affbf82) SHA1(268746e86e7546f4bab54bdd268f7b58f10c1aaf) )
+ROM_END
+
 ROM_START( meltybld )
 	NAOMIGD_BIOS
 
@@ -3004,6 +3020,26 @@ ROM_START( ss2005 )
 	//(sticker 253-5509-5108J)
 	ROM_LOAD("317-5108-jpn.data", 0x00, 0x50, CRC(6a2eb334) SHA1(cab407d2e994f33aa921d50f399b17e6fbf98eb0) )
 ROM_END
+
+
+
+
+ROM_START( undefeat )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0035", 0, SHA1(91da482a6a082e48bee5b3bd20d9c92d23936965) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5117-JPN)
+	//(sticker 253-5509-5117J)
+	ROM_LOAD("317-5117-jpn.data", 0x00, 0x50,  CRC(f90f6d3b) SHA1(a18f803a8e951c375a3a55e4b0e74b698ae93f92) )
+ROM_END
+
+
 
 ROM_START( trgheart )
 	NAOMIGD_BIOS
@@ -3306,10 +3342,12 @@ GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Arc System Wo
 GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Alpha System", "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi,    0,   ROT0,   "G-Rev",        "Border Down (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi,    0,   ROT0,   "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, trizeal,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Taito",        "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, meltybld,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole",        "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, senko,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (Rev. A)(GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, senkoo,    senko,    naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ss2005,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, undefeat,  naomigd,  naomigd,  naomi,    0,   ROT0,   "GRev",         "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, trgheart,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Warashi",      "Trigger Heart Exelica (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 

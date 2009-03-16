@@ -4303,7 +4303,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2004.01 Initial D Arcade Stage ver.3 */
 						/* 2004.06 WCCF 2002-2003 ver.2.0 */
 						/* 2004.07 Virtua Fighter 4 Final Tuned */
-						/* 2004.09 Trizeal */
+	DRIVER( trizeal )	/* 2004.09 Trizeal */
 						/* 2004.10 Oshare Majo Love & Berry */
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */
 	DRIVER( meltybld )	/* 2005.03 Melty Blood Act Cadenza */
@@ -4313,7 +4313,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( senkoo )	/*          ^^ */
 						/* 2005.07 WCCF 2004-2005 */
 						/* 2005.09 Kodai Ouja Kyouryuu King */
-						/* 2005.10 Under Defeat */
+	DRIVER( undefeat )	/* 2005.10 Under Defeat */
 	DRIVER( trgheart )	/* 200?.?? Trigger Heart Exelica */
 	
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
