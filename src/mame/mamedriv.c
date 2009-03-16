@@ -4217,7 +4217,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.02 Touch de UNO! 2 */
 	DRIVER( virnba )	/* 2000.02 Virtua NBA */
 	DRIVER( smarinef )	/* 2000.03 Sega Marine Fishing */
-						/* 2000.03 Marble vs. Capcom 2 */
+						/* 2000.03 Marvel vs. Capcom 2 */
 						/* 2000.03 World Kicks */
 	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
 						/* 2000.04 Shin Nippon Pro-wres Toukon Retsuden 4 */
@@ -4278,7 +4278,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2002.02 The King of Route 66 */
 	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage (Naomi 2) */
 	DRIVER( vathlete )	/* 2002.03 Virtua Athlete */
-						/* 2002.04 Lupin the Third the Typing */
+	DRIVER( luptype )	/* 2002.04 Lupin the Third the Typing */
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
 						/* 2002.05 Cleopatra Fortune + */
 	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
@@ -4296,7 +4296,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.03 WCCF 2001-2002 ver.2.0 */
 	DRIVER( ggxxrl )	/* 2003.03 Guilty Gear XX # Reload */
 	DRIVER( shikgam2 )	/* 2003.04 Shikigami no Shiro 2 */
-						/* 2003.04 Border Down */
+	DRIVER( bdrdown )	/* 2003.04 Border Down */
 						/* 2003.09 WCCF 2002-2003 */
 						/* 2003.11 Psyvariar 2 */
 						/* 2003.11 Puyopuyo Fever */
