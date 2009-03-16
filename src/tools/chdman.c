@@ -1323,6 +1323,7 @@ static int do_extract(int argc, char *argv[], int param)
 			err = CHDERR_WRITE_ERROR;
 			goto cleanup;
 		}
+		bytesremaining -= byteswritten;
 	}
 	progress(TRUE, "Extraction complete!                    \n");
 
