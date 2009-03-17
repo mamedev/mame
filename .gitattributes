@@ -1323,6 +1323,7 @@ src/mame/drivers/bwing.c svneol=native#text/plain
 src/mame/drivers/bzone.c svneol=native#text/plain
 src/mame/drivers/cabal.c svneol=native#text/plain
 src/mame/drivers/cabaret.c svneol=native#text/plain
+src/mame/drivers/calchase.c svneol=native#text/plain
 src/mame/drivers/calomega.c svneol=native#text/plain
 src/mame/drivers/calorie.c svneol=native#text/plain
 src/mame/drivers/canyon.c svneol=native#text/plain

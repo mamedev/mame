@@ -4384,9 +4384,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2009.?? Project Cerberus */
 						/* 2009.?? Radirgy Noah */
 	DRIVER( ggxxsla  )	/* 200?.?? Guilty Gear XX Slash */
-	
+
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
-						
+
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
 						/* 2002.12 Maximum Speed */
@@ -4435,7 +4435,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vs4 )		/* GDT-0015 2004.10 Virtua Striker 4 */
 						/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
 						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
-	
+
 	/* Chihiro (X-Box based) */
 	DRIVER( chihiro )
 						/* 2002.12 The House of the Dead III */
@@ -4463,7 +4463,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2006.05 Sangokushi Taisen 2 */
 						/* 2007.03 Kidou Senshi Gundam 0083 Card Builder */
 						/* 2007.10 Kidou Senshi Gundam 0083 Card Builder Ryouyuu Gekitotsu */
-	
+
 	DRIVER( hshavoc )	/* (c) 1993 Data East */
 
 	/* Data East "Burger Time hardware" games */
@@ -7107,7 +7107,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
     2001: Smashing Drive
     2002: ATV Track
     */
-	
+
 	/* Galeco PC based games */
 	DRIVER( tokyocop )
 
@@ -8023,7 +8023,7 @@ Other Sun games
 	DRIVER( mgprem11 )	/* (c) 1995 */
 	DRIVER( lasstixx )	/* (c) 1995 */
 	DRIVER( mgnumber )	/* (c) 1995 */
-	
+
 	/* American Laser Games */
 	DRIVER( alg_bios )
 	DRIVER( maddoga )	/* (c) 1990 */
@@ -8310,6 +8310,7 @@ Other Sun games
 	DRIVER( eggvent7 )	/* (c) 1997 The Game Room */
 	DRIVER( eggventa )	/* (c) 1997 The Game Room (Allied Leisure license) */
 	DRIVER( eggvntdx )	/* (c) 1997 The Game Room */
+	DRIVER( calchase )  /* (c) 1999 The Game Room */
 	DRIVER( ripribit )	/* (c) 1997 LAI Games */
 	DRIVER( cfarm )		/* (c) 1999 LAI Games */
 	DRIVER( cclownz )	/* (c) 1999 LAI Games */
@@ -9147,7 +9148,7 @@ Other Sun games
 	DRIVER( pachifev )	/* (c) 1983? */
 
 	/* Igrosoft - SHA1 information is not available for commented out sets, only MD5/CRC32 */
-	
+
 	/* Multifish */
 	//DRIVER( mfish )
 	//DRIVER( mfish_2 )
@@ -9162,7 +9163,7 @@ Other Sun games
 	//DRIVER( mfish_11 )
 	DRIVER( mfish_12 )
 	DRIVER( mfish_12a )
-	
+
 	/* Crazy Monkey */
 	//DRIVER( crzmon )
 	//DRIVER( crzmon_2 )
@@ -9171,15 +9172,15 @@ Other Sun games
 	//DRIVER( crzmon_5 )
 	//DRIVER( crzmon_6 )
 	DRIVER( crzmon_7 )
-	
+
 	/* Fruit Cocktail */
 	//DRIVER( fcock )
 	//DRIVER( fcock_2 )
 	//DRIVER( fcock_3 )
 	//DRIVER( fcock_4 )
-	//DRIVER( fcock_5 )	
+	//DRIVER( fcock_5 )
 	DRIVER( fcock_6 )
-	
+
 	/* Lucky Haunter */
 	//DRIVER( lhaunt )
 	//DRIVER( lhaunt_2 )
@@ -9187,7 +9188,7 @@ Other Sun games
 	DRIVER( lhaunt_4 )
 	DRIVER( lhaunt_5 )
 	DRIVER( lhaunt_6 )
-	
+
 	/* Garage */
 	//DRIVER( garage )
 	//DRIVER( garage_2 )
@@ -9198,14 +9199,14 @@ Other Sun games
 	//DRIVER( rclimb )
 	//DRIVER( rclimb_2 )
 	DRIVER( rclimb_3 )
-	
+
 	/* Sweet Life */
 	DRIVER( sweetl )
-	
+
 	/* Resident */
 	//DRIVER( resdnt )
 	DRIVER( resdnt_2 )
-	
+
 	/* Rollfruit */
 	//DRIVER( rollfr )
 	//DRIVER( rollfr_2 )
@@ -9213,7 +9214,7 @@ Other Sun games
 	/* Island */
 	DRIVER( island )
 
-	
+
 	/* Drivers below are mechanical games, usually with no video display, requiring external artwork to function.
        These are currently mostly 'fruit machine' style games, although this may later be extended to system logic
        emulation for pinball machiens.

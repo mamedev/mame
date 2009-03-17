@@ -1558,6 +1558,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/big10.o \
 	$(DRIVERS)/blackt96.o \
 	$(DRIVERS)/buster.o \
+	$(DRIVERS)/calchase.o \
 	$(DRIVERS)/calomega.o $(VIDEO)/calomega.o \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
