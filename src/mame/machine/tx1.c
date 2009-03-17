@@ -3,9 +3,9 @@
     Tatsumi TX-1/Buggy Boy machine hardware
 
 ***************************************************************************/
+
 #include "driver.h"
 #include "debugger.h"
-#include "machine/8255ppi.h"
 #include "tx1.h"
 
 

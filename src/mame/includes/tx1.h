@@ -3,7 +3,6 @@
     TX-1/Buggy Boy hardware
 
 *************************************************************************/
-#include "machine/8255ppi.h"
 
 #define TX1_PIXEL_CLOCK		(XTAL_18MHz / 3)
 #define TX1_HBSTART			256
@@ -13,13 +12,18 @@
 #define TX1_VBEND			0
 #define TX1_VTOTAL			264
 
+/*
+ * HACK! Increased VTOTAL to 'fix' a timing issue
+ * that prevents one of the start countdown tones
+ * from playing.
+ */
 #define BB_PIXEL_CLOCK		(XTAL_18MHz / 3)
 #define BB_HBSTART			256
 #define BB_HBEND			0
 #define BB_HTOTAL			384
 #define BB_VBSTART			240
 #define BB_VBEND			0
-#define BB_VTOTAL			288
+#define BB_VTOTAL			288 + 1
 
 #define CPU_MASTER_CLOCK	(XTAL_15MHz)
 #define BUGGYBOY_ZCLK		(CPU_MASTER_CLOCK / 2)

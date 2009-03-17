@@ -41,6 +41,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i86/i86.h"
+#include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "rendlay.h"
 #include "tx1.h"
@@ -825,14 +826,8 @@ static MACHINE_DRIVER_START( buggybjr )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-#if 0
+
 	MDRV_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
-#else
-	MDRV_SCREEN_REFRESH_RATE(54.10)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3072))
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-#endif
 
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(buggyboy)
