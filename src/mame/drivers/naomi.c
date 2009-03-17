@@ -896,7 +896,7 @@ static MACHINE_DRIVER_START( naomi_base )
 	MDRV_SOUND_ADD("aica", AICA, 0)
 	MDRV_SOUND_CONFIG(aica_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 2.0)
 MACHINE_DRIVER_END
 
 /*
@@ -3170,7 +3170,7 @@ ROM_START( vtennisg )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C621A (317-0312-COM)
-	//(sticker 253-5508-0312) 
+	//(sticker 253-5508-0312)
 	ROM_LOAD("317-0312-com.data", 0x00, 0x50, CRC(6b24f78f) SHA1(43f89815ec46cf014d941b4b9238da044b338b4c) )
 ROM_END
 
@@ -3199,7 +3199,7 @@ Peripheral String	0000000
 Product Number	GDS-0015A
 Version	V2.000
 Release Date	20010827
-Manufacturer ID	
+Manufacturer ID
 TOC	DISC
 Track	Start Sector	End Sector	Track Size
 track01.bin	150	449	705600
@@ -3234,7 +3234,7 @@ Peripheral String	0000000
 Product Number	GDS-0008
 Version	V1.008
 Release Date	20010425
-Manufacturer ID	
+Manufacturer ID
 Track	Start Sector	End Sector	Track Size
 track01.bin	150	449	705600
 track02.raw	600	2732	5016816
@@ -3282,7 +3282,7 @@ Peripheral String	0000000
 Product Number	GDS-0022
 Version	V1.001
 Release Date	20020306
-Manufacturer ID	
+Manufacturer ID
 TOC	DISC
 Track	Start Sector	End Sector	Track Size
 track01.bin	150	449	705600
@@ -3362,19 +3362,19 @@ ROM_START( puyofev )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C621A (317-0375-COM)
-	//(sticker 253-5508-0375) 
+	//(sticker 253-5508-0375)
 	ROM_LOAD("317-0375-com.data", 0x00, 0x50, CRC(32bf1825) SHA1(42dfbc6777c154d8de6c6f7350da9ea737380220) )
 ROM_END
 
 static READ64_HANDLER( naomigd_bios_idle_skip_r )
 {
-	
+
 	if (cpu_get_pc(space->cpu)==0xc04173c)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
 		//cpu_spinuntil_int(space->cpu);
 //	else
 //		printf("%08x\n", cpu_get_pc(space->cpu));
-	
+
 	return naomi_ram64[0x2ad238/8];
 }
 static DRIVER_INIT(naomigd)
@@ -3384,14 +3384,14 @@ static DRIVER_INIT(naomigd)
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
-	
+
 	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
 //	else
 //		printf("%08x\n", cpu_get_pc(space->cpu));
-	
-	
-	
+
+
+
 	return naomi_ram64[0x1aae18/8];
 }
 
@@ -3532,7 +3532,7 @@ ROM_START( initdv2j )
 	DISK_IMAGE_READONLY( "gds-0026", 0, SHA1(253acede106b7fbf49e24458e7fda868720e9549) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gds-0026.rom", 0x00, 0x50, NO_DUMP) // file on GD-ROM is BFK.BIN , _NOT_ BEM.BIN which is for Initial D : Arcade Stage (Japan) 
+	ROM_LOAD("gds-0026.rom", 0x00, 0x50, NO_DUMP) // file on GD-ROM is BFK.BIN , _NOT_ BEM.BIN which is for Initial D : Arcade Stage (Japan)
 ROM_END
 
 ROM_START( vf4tuned ) // are there multiple files on this GD-ROM? it only compresses to 500 meg when the rom file is closer to half tha
@@ -3545,7 +3545,7 @@ ROM_START( vf4tuned ) // are there multiple files on this GD-ROM? it only compre
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0387-COM)
-	//(sticker 253-5508-0387) 
+	//(sticker 253-5508-0387)
 	ROM_LOAD("317-0387-com.data", 0x00, 0x50, CRC(ab9f3851) SHA1(8b64dc6df176eb7adb48267709a27db221d5e3c3) )
 ROM_END
 
@@ -3559,7 +3559,7 @@ Peripheral String	0000000
 Product Number	GDS-0014
 Version	V1.001
 Release Date	20010613
-Manufacturer ID	
+Manufacturer ID
 TOC	DISC
 Track	Start Sector	End Sector	Track Size
 track01.bin	150	449	705600
@@ -3584,10 +3584,10 @@ ROM_START( beachspi )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-0317-COM)
-	//(sticker 253-5508-0317)	
+	//(sticker 253-5508-0317)
 	ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
 ROM_END
-	
+
 ROM_START( initd )
 	NAOMI2_BIOS
 //	NAOMIGD_BIOS
@@ -3664,7 +3664,7 @@ Peripheral String	0000000
 Product Number	GDT-0015
 Version	V1.001
 Release Date	20041202
-Manufacturer ID	
+Manufacturer ID
 TOC	DISC
 Track	Start Sector	End Sector	Track Size
 track01.bin	150	449	705600
@@ -3753,7 +3753,7 @@ Peripheral String	0000000
 Product Number	GDX-0012A
 Version	V2.000
 Release Date	20041209
-Manufacturer ID	
+Manufacturer ID
 
 PIC
 253-5508-0398
@@ -3783,7 +3783,7 @@ Peripheral String	0000000
 Product Number	GDX-0003A
 Version	V2.004
 Release Date	20030226
-Manufacturer ID	
+Manufacturer ID
 TOC	DISC
 Track	Start Sector	End Sector	Track Size
 track01.bin	150	599	1058400
