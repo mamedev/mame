@@ -2952,22 +2952,30 @@ V-V                           TP-027
 
 	/* Taito GNET */
 	DRIVER( taitogn )
-	DRIVER( raycris )   /* Ray Crisis (V2.03J) */
-	DRIVER( gobyrc )    /* Go By RC (V2.03O) */
-	DRIVER( rcdego )    /* RC De Go (V2.03J) */
-	DRIVER( chaoshea )  /* Chaos Heat (V2.08J) */
-	DRIVER( flipmaze )  /* Flip Maze (V2.04J) */
-	DRIVER( spuzbobl )  /* Super Puzzle Bobble (V2.05O) */
-	DRIVER( soutenry )  /* Soutenryu (V2.07J) */
-	DRIVER( shanghss )  /* Shanghai Shoryu Sairin (V2.03J) */
-	DRIVER( sianniv )   /* Space Invaders Anniversary (V2.02J) */
-	DRIVER( psyvaria )  /* Psyvariar -Medium Unit- (V2.04J) */
-	DRIVER( psyvarrv )  /* Psyvariar -Revision- (V2.04J) */
-	DRIVER( zokuoten )  /* Zoku Otenamihaiken (V2.03J) */
-	DRIVER( usagi )     /* Usagi (V2.02J) */
-	DRIVER( mahjngoh )  /* Mahjong Oh (V2.06J) */
-	DRIVER( nightrai )  /* Night Raid (V2.03J) */
-	DRIVER( xiistag )   /* XII Stag (V2.01J) */
+	DRIVER( chaoshea )  /* 1998.10 Chaos Heat (V2.08J) */
+	DRIVER( raycris )   /* 1998.12 Ray Crisis (V2.03J) */
+						/* 1999.02 Otenami Haiken (Success) */
+						/* 1999.03 Super Puzzle Bobble (Japan) */
+	DRIVER( spuzbobl )  /* 1999.?? Super Puzzle Bobble (V2.05O) */
+	DRIVER( gobyrc )    /* 1999.?? Go By RC (V2.03O) */
+	DRIVER( rcdego )    /* 1999.06 RC De Go (V2.03J) */
+	DRIVER( flipmaze )  /* 1999.09 Flip Maze (V2.04J) */
+	DRIVER( mahjngoh )  /* 1999.12 Mahjong Oh (V2.06J) */
+	DRIVER( psyvaria )  /* 2000.03 Psyvariar -Medium Unit- (V2.04J) */
+	DRIVER( shanghss )  /* 2000.07 Shanghai Shoryu Sairin (V2.03J) */
+	DRIVER( psyvarrv )  /* 2000.09 Psyvariar -Revision- (V2.04J) */
+	DRIVER( zokuoten )  /* 2000.12 Zoku Otenamihaiken (V2.03J) */
+						/* 2000.?? Taito Classic (Success, not released?) */
+	DRIVER( soutenry )  /* 2001.02 Soutenryu (V2.07J) */
+	DRIVER( nightrai )  /* 2001.05 Night Raid (V2.03J) */
+						/* 2001.09 Shikigami no Shiro */
+						/* 2001.10 Otenki Kororin */
+	DRIVER( usagi )     /* 2001.12 Usagi (V2.02J) */
+						/* 2002.02 Shanghai Sangokuhaitougi */
+	DRIVER( xiistag )   /* 2002.07 XII Stag (V2.01J) */
+	DRIVER( sianniv )   /* 2003.10 Space Invaders Anniversary (V2.02J) */
+						/* 2003.11 Kollon */
+						/* 2004.05 Zooo */
 
 	/* Namco System 11 */
 	DRIVER( tekken )	/* Tekken (TE4/VER.C) */
