@@ -3384,13 +3384,8 @@ static DRIVER_INIT(naomigd)
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
-
 	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
-//	else
-//		printf("%08x\n", cpu_get_pc(space->cpu));
-
-
 
 	return naomi_ram64[0x1aae18/8];
 }
@@ -3401,6 +3396,39 @@ static DRIVER_INIT( ggxxsla )
 	DRIVER_INIT_CALL(naomigd);
 }
 
+static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
+{
+	if (cpu_get_pc(space->cpu)==0xc0b5c3c) // or 0xc0bab0c
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+
+	return naomi_ram64[0x1837b8/8];
+}
+
+
+static DRIVER_INIT( ggxx )
+{
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1837b8, 0xc1837bf, 0, 0, naomigd_ggxx_idle_skip_r);
+	DRIVER_INIT_CALL(naomigd);
+}
+
+static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
+{
+	if (cpu_get_pc(space->cpu)==0xc0b84bc) // or 0xc0bab0c
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+
+	//printf("%08x\n", cpu_get_pc(space->cpu));	
+		
+	return naomi_ram64[0x18d6c8/8];
+}
+
+
+static DRIVER_INIT( ggxxrl )
+{
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
+	DRIVER_INIT_CALL(naomigd);
+}
+
+
 /* Naomi GD-Rom Sets */
 GAME( 2001, naomigd,   0,        naomi,    naomi, naomigd,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -3409,12 +3437,12 @@ GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",  
 GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi, naomigd,	  ROT0,   "Capcom",       "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi, naomigd,	 ROT0,   "Capcom",       "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, ggxx,      naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Arc System Works",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, ggxx,      naomigd,  naomigd,  naomi, ggxx,      ROT0,   "Arc System Works",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software Corporation", "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Amedio",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Alpha System", "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",        "Border Down (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
