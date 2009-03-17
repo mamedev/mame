@@ -1,5 +1,16 @@
 /************************************************************************************
 
+California Chase (c) 1999 The Game Room
+
+preliminary driver by Angelo Salese
+
+TODO:
+- currently calls int 13h with ah=0 -> "Reset Disk Drives" and returns an error code
+for whatever reason;
+- video emulation not even started (it currently fills vram with 0x0720, hence it's
+unneeded for now...)
+- clean-ups;
+
 I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
 46E8	----	8514/A and compatible video cards (e.g. ATI Graphics Ultra)
 46E8	w	ROM page select
@@ -8,6 +19,11 @@ I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
 83C6-83C9 ----	Compaq Qvision EISA - DAC color registers
 
 43c4 is a 83c4 mirror?
+
+04D0-04D1 ---- EISA IRQ control
+00F0-00F5 ----	PCjr Disk Controller
+(or)
+00F0-00FF ----	coprocessor (8087..80387)
 
 =====================================================================================
 
@@ -80,6 +96,10 @@ all files across to new HDD, boots up fine.
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+
+static void ide_interrupt(const device_config *device, int state);
+
+static UINT32 *bios_ram;
 
 static struct {
 	const device_config	*pit8254;
@@ -246,15 +266,169 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 	ide_controller32_w(device, 0x3f0/4 + offset, data, mem_mask);
 }
 
+// Intel 82439TX System Controller (MXTC)
+static UINT8 mxtc_config_reg[256];
+
+static UINT8 mxtc_config_r(const device_config *busdevice, const device_config *device, int function, int reg)
+{
+//  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
+
+	return mxtc_config_reg[reg];
+}
+
+static void mxtc_config_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT8 data)
+{
+//  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", cpuexec_describe_context(machine), function, reg, data);
+
+	switch(reg)
+	{
+		case 0x59:		// PAM0
+		{
+			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
+			{
+				memory_set_bankptr(busdevice->machine, 1, bios_ram);
+			}
+			else					// disable RAM access (reads go to BIOS ROM)
+			{
+				memory_set_bankptr(busdevice->machine, 1, memory_region(busdevice->machine, "bios") + 0x10000);
+			}
+			break;
+		}
+	}
+
+	mxtc_config_reg[reg] = data;
+}
+
+static void intel82439tx_init(void)
+{
+	mxtc_config_reg[0x60] = 0x02;
+	mxtc_config_reg[0x61] = 0x02;
+	mxtc_config_reg[0x62] = 0x02;
+	mxtc_config_reg[0x63] = 0x02;
+	mxtc_config_reg[0x64] = 0x02;
+	mxtc_config_reg[0x65] = 0x02;
+}
+
+static UINT32 intel82439tx_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
+{
+	UINT32 r = 0;
+	if (ACCESSING_BITS_24_31)
+	{
+		r |= mxtc_config_r(busdevice, device, function, reg + 3) << 24;
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		r |= mxtc_config_r(busdevice, device, function, reg + 2) << 16;
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		r |= mxtc_config_r(busdevice, device, function, reg + 1) << 8;
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		r |= mxtc_config_r(busdevice, device, function, reg + 0) << 0;
+	}
+	return r;
+}
+
+static void intel82439tx_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+	if (ACCESSING_BITS_24_31)
+	{
+		mxtc_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		mxtc_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		mxtc_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		mxtc_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+	}
+}
+
+// Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
+static UINT8 piix4_config_reg[4][256];
+
+static UINT8 piix4_config_r(const device_config *busdevice, const device_config *device, int function, int reg)
+{
+//  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
+	return piix4_config_reg[function][reg];
+}
+
+static void piix4_config_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT8 data)
+{
+//  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", cpuexec_describe_context(machine), function, reg, data);
+	piix4_config_reg[function][reg] = data;
+}
+
+static UINT32 intel82371ab_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
+{
+	UINT32 r = 0;
+	if (ACCESSING_BITS_24_31)
+	{
+		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		r |= piix4_config_r(busdevice, device, function, reg + 2) << 16;
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		r |= piix4_config_r(busdevice, device, function, reg + 1) << 8;
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		r |= piix4_config_r(busdevice, device, function, reg + 0) << 0;
+	}
+	return r;
+}
+
+static void intel82371ab_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+	if (ACCESSING_BITS_24_31)
+	{
+		piix4_config_w(busdevice, device, function, reg + 3, (data >> 24) & 0xff);
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		piix4_config_w(busdevice, device, function, reg + 2, (data >> 16) & 0xff);
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		piix4_config_w(busdevice, device, function, reg + 1, (data >> 8) & 0xff);
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		piix4_config_w(busdevice, device, function, reg + 0, (data >> 0) & 0xff);
+	}
+}
+
+static WRITE32_HANDLER(bios_ram_w)
+{
+	if (mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(bios_ram + offset);
+	}
+}
 
 static ADDRESS_MAP_START( calchase_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0) AM_WRITENOP
+	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
+	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK(1)
+	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
+	AM_RANGE(0x04000000, 0x040001ff) AM_RAM
 	AM_RANGE(0x08000000, 0x080001ff) AM_RAM
+	AM_RANGE(0x0c000000, 0x0c0001ff) AM_RAM
 	AM_RANGE(0x10000000, 0x100001ff) AM_RAM
+	AM_RANGE(0x14000000, 0x140001ff) AM_RAM
 	AM_RANGE(0x18000000, 0x180001ff) AM_RAM
 	AM_RANGE(0x20000000, 0x200001ff) AM_RAM
 	AM_RANGE(0x28000000, 0x280001ff) AM_RAM
@@ -277,7 +451,7 @@ static ADDRESS_MAP_START( calchase_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE(pnp_config_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_RAM//AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
 	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
@@ -410,7 +584,7 @@ static const struct pit8253_config calchase_pit8254_config =
 
 static MACHINE_RESET(calchase)
 {
-//	memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "bios") + 0x10000);
 }
 
 static void set_gate_a20(running_machine *machine, int a20)
@@ -457,6 +631,9 @@ static MACHINE_DRIVER_START( calchase )
 	MDRV_PIC8259_ADD( "pic8259_2", calchase_pic8259_2_config )
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_PCI_BUS_ADD("pcibus", 0)
+	MDRV_PCI_BUS_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
+	MDRV_PCI_BUS_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MDRV_PALETTE_LENGTH(0x200)
 	MDRV_GFXDECODE( CGA )
@@ -468,21 +645,18 @@ static MACHINE_DRIVER_START( calchase )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 
-
 	MDRV_VIDEO_START(calchase)
 	MDRV_VIDEO_UPDATE(calchase)
-
-
 MACHINE_DRIVER_END
 
 static DRIVER_INIT( calchase )
 {
-	//bios_ram = auto_malloc(0x10000);
+	bios_ram = auto_malloc(0x10000);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, calchase_set_keyb_int);
 	mc146818_init(machine, MC146818_STANDARD);
 
-	//intel82439tx_init();
+	intel82439tx_init();
 
 	kbdc8042_init(machine, &at8042);
 }
