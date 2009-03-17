@@ -1,5 +1,14 @@
 /************************************************************************************
 
+I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
+46E8	----	8514/A and compatible video cards (e.g. ATI Graphics Ultra)
+46E8	w	ROM page select
+83C0-83CF ----	Compaq QVision - Line Draw Engine
+83C4	  ----	Compaq Qvision EISA - Virtual Controller Select
+83C6-83C9 ----	Compaq Qvision EISA - DAC color registers
+
+43c4 is a 83c4 mirror?
+
 =====================================================================================
 
 California Chase
@@ -60,6 +69,26 @@ all files across to new HDD, boots up fine.
 
 #include "driver.h"
 #include "cpu/i386/i386.h"
+#include "memconv.h"
+#include "devconv.h"
+#include "machine/8237dma.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/mc146818.h"
+#include "machine/pcshare.h"
+#include "machine/pci.h"
+#include "machine/8042kbdc.h"
+#include "machine/pckeybrd.h"
+#include "machine/idectrl.h"
+
+static struct {
+	const device_config	*pit8254;
+	const device_config	*pic8259_1;
+	const device_config	*pic8259_2;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
+} calchase_devices;
+
 
 static VIDEO_START(calchase)
 {
@@ -71,9 +100,157 @@ static VIDEO_UPDATE(calchase)
 	return 0;
 }
 
+static READ8_DEVICE_HANDLER(at_dma8237_2_r)
+{
+	return dma8237_r(device, offset / 2);
+}
+
+static WRITE8_DEVICE_HANDLER(at_dma8237_2_w)
+{
+	dma8237_w(device, offset / 2, data);
+}
+
+static READ32_DEVICE_HANDLER(at32_dma8237_2_r)
+{
+	return read32le_with_read8_device_handler(at_dma8237_2_r, device, offset, mem_mask);
+}
+
+static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
+{
+	write32le_with_write8_device_handler(at_dma8237_2_w, device, offset, data, mem_mask);
+}
+
+static UINT8 dma_offset[2][4];
+static UINT8 at_pages[0x10];
+
+
+static READ8_HANDLER(at_page8_r)
+{
+	UINT8 data = at_pages[offset % 0x10];
+
+	switch(offset % 8) {
+	case 1:
+		data = dma_offset[(offset / 8) & 1][2];
+		break;
+	case 2:
+		data = dma_offset[(offset / 8) & 1][3];
+		break;
+	case 3:
+		data = dma_offset[(offset / 8) & 1][1];
+		break;
+	case 7:
+		data = dma_offset[(offset / 8) & 1][0];
+		break;
+	}
+	return data;
+}
+
+
+static WRITE8_HANDLER(at_page8_w)
+{
+	at_pages[offset % 0x10] = data;
+
+	switch(offset % 8) {
+	case 1:
+		dma_offset[(offset / 8) & 1][2] = data;
+		break;
+	case 2:
+		dma_offset[(offset / 8) & 1][3] = data;
+		break;
+	case 3:
+		dma_offset[(offset / 8) & 1][1] = data;
+		break;
+	case 7:
+		dma_offset[(offset / 8) & 1][0] = data;
+		break;
+	}
+}
+
+
+static DMA8237_MEM_READ( pc_dma_read_byte )
+{
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0xFF0000;
+
+	return memory_read_byte(space, page_offset + offset);
+}
+
+
+static DMA8237_MEM_WRITE( pc_dma_write_byte )
+{
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0xFF0000;
+
+	memory_write_byte(space, page_offset + offset, data);
+}
+
+
+static const struct dma8237_interface dma8237_1_config =
+{
+	"maincpu",
+	1.0e-6, // 1us
+
+	pc_dma_read_byte,
+	pc_dma_write_byte,
+
+	{ 0, 0, NULL, NULL },
+	{ 0, 0, NULL, NULL },
+	NULL
+};
+
+
+static const struct dma8237_interface dma8237_2_config =
+{
+	"maincpu",
+	1.0e-6, // 1us
+
+	NULL,
+	NULL,
+
+	{ NULL, NULL, NULL, NULL },
+	{ NULL, NULL, NULL, NULL },
+	NULL
+};
+
+static READ32_HANDLER(at_page32_r)
+{
+	return read32le_with_read8_handler(at_page8_r, space, offset, mem_mask);
+}
+
+
+static WRITE32_HANDLER(at_page32_w)
+{
+	write32le_with_write8_handler(at_page8_w, space, offset, data, mem_mask);
+}
+
+static READ32_DEVICE_HANDLER( ide_r )
+{
+	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
+}
+
+static WRITE32_DEVICE_HANDLER( ide_w )
+{
+	ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
+}
+
+static READ32_DEVICE_HANDLER( fdc_r )
+{
+	return ide_controller32_r(device, 0x3f0/4 + offset, mem_mask);
+}
+
+static WRITE32_DEVICE_HANDLER( fdc_w )
+{
+	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
+	ide_controller32_w(device, 0x3f0/4 + offset, data, mem_mask);
+}
+
+
 static ADDRESS_MAP_START( calchase_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0) AM_WRITENOP
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
 	AM_RANGE(0x08000000, 0x080001ff) AM_RAM
@@ -84,34 +261,205 @@ static ADDRESS_MAP_START( calchase_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(calchase_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_RAM//AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_RAM//AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_RAM//AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_RAM//AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_RAM//AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
-	AM_RANGE(0x0080, 0x009f) AM_RAM//AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_RAM//AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_RAM//AM_DEVREADWRITE("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
+static ADDRESS_MAP_START( calchase_io, ADDRESS_SPACE_IO, 32)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x01f0, 0x01f7) AM_RAM//AM_DEVREADWRITE("ide", ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE(pnp_config_w)
-	AM_RANGE(0x03f0, 0x03ff) AM_RAM//AM_DEVREADWRITE("ide", fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_RAM//AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
+	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x83c0, 0x83cf) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
 
 
+static const gfx_layout CGA_charlayout =
+{
+	8,8,
+    256,
+    1,
+    { 0 },
+    { 0,1,2,3,4,5,6,7 },
+	{ 0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8 },
+    8*8
+};
+
+static GFXDECODE_START( CGA )
+	GFXDECODE_ENTRY( "video_bios", 0x5182, CGA_charlayout,              0, 256 )
+	//there's also a 8x16 entry (just after the 8x8)
+GFXDECODE_END
+
+#define AT_KEYB_HELPER(bit, text, key1) \
+	PORT_BIT( bit, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(text) PORT_CODE(key1)
+
 static INPUT_PORTS_START( calchase )
+	PORT_START("pc_keyboard_0")
+	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED ) 	/* unused scancode 0 */
+	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
+
+	PORT_START("pc_keyboard_1")
+	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
+	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
+
+	PORT_START("pc_keyboard_2")
+
+	PORT_START("pc_keyboard_3")
+	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
+	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
+
+	PORT_START("pc_keyboard_4")
+
+	PORT_START("pc_keyboard_5")
+
+	PORT_START("pc_keyboard_6")
+	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",		KEYCODE_UP          ) /* Up                          67  e7 */
+	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",			KEYCODE_PGUP        ) /* Page Up                     68  e8 */
+	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",		KEYCODE_LEFT        ) /* Left                        69  e9 */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",	KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",		KEYCODE_DOWN        ) /* Down                        6c  ec */
+	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",		KEYCODE_PGDN        ) /* Page Down                   6d  ed */
+	AT_KEYB_HELPER( 0x4000, "Del",       		    KEYCODE_A           ) /* Delete                      6f  ef */
+
+	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
+
+static IRQ_CALLBACK(irq_callback)
+{
+	int r = 0;
+	r = pic8259_acknowledge( calchase_devices.pic8259_2);
+	if (r==0)
+	{
+		r = pic8259_acknowledge( calchase_devices.pic8259_1);
+	}
+	return r;
+}
+
+static MACHINE_START(calchase)
+{
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+
+	calchase_devices.pit8254 = devtag_get_device( machine, "pit8254" );
+	calchase_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
+	calchase_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
+	calchase_devices.dma8237_1 = devtag_get_device( machine, "dma8237_1" );
+	calchase_devices.dma8237_2 = devtag_get_device( machine, "dma8237_2" );
+}
+
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+
+static PIC8259_SET_INT_LINE( calchase_pic8259_1_set_int_line ) {
+	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static PIC8259_SET_INT_LINE( calchase_pic8259_2_set_int_line ) {
+	pic8259_set_irq_line( calchase_devices.pic8259_1, 2, interrupt);
+}
+
+
+static const struct pic8259_interface calchase_pic8259_1_config = {
+	calchase_pic8259_1_set_int_line
+};
+
+
+static const struct pic8259_interface calchase_pic8259_2_config = {
+	calchase_pic8259_2_set_int_line
+};
+
+
+/*************************************************************
+ *
+ * pit8254 configuration
+ *
+ *************************************************************/
+
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+{
+	pic8259_set_irq_line(calchase_devices.pic8259_1, 0, state);
+}
+
+static const struct pit8253_config calchase_pit8254_config =
+{
+	{
+		{
+			4772720/4,				/* heartbeat IRQ */
+			pc_timer0_w
+		}, {
+			4772720/4,				/* dram refresh */
+			NULL
+		}, {
+			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			NULL
+		}
+	}
+};
+
+static MACHINE_RESET(calchase)
+{
+//	memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
+}
+
+static void set_gate_a20(running_machine *machine, int a20)
+{
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_A20, a20);
+}
+
+static void keyboard_interrupt(running_machine *machine, int state)
+{
+	pic8259_set_irq_line(calchase_devices.pic8259_1, 1, state);
+}
+
+static void ide_interrupt(const device_config *device, int state)
+{
+	pic8259_set_irq_line(calchase_devices.pic8259_2, 6, state);
+}
+
+static int calchase_get_out2(running_machine *machine) {
+	return pit8253_get_output(calchase_devices.pit8254, 2 );
+}
+
+static const struct kbdc8042_interface at8042 =
+{
+	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, calchase_get_out2
+};
+
+static void calchase_set_keyb_int(running_machine *machine, int state) {
+	pic8259_set_irq_line(calchase_devices.pic8259_1, 1, state);
+}
 
 
 static MACHINE_DRIVER_START( calchase )
 	MDRV_CPU_ADD("maincpu", PENTIUM, 200000000) // Cyrix 686MX-PR200 CPU
 	MDRV_CPU_PROGRAM_MAP(calchase_map, 0)
 	MDRV_CPU_IO_MAP(calchase_io, 0)
+
+	MDRV_MACHINE_START(calchase)
+	MDRV_MACHINE_RESET(calchase)
+
+	MDRV_PIT8254_ADD( "pit8254", calchase_pit8254_config )
+	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
+	MDRV_DMA8237_ADD( "dma8237_2", dma8237_2_config )
+	MDRV_PIC8259_ADD( "pic8259_1", calchase_pic8259_1_config )
+	MDRV_PIC8259_ADD( "pic8259_2", calchase_pic8259_2_config )
+	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MDRV_NVRAM_HANDLER( mc146818 )
+
+	MDRV_PALETTE_LENGTH(0x200)
+	MDRV_GFXDECODE( CGA )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -120,13 +468,24 @@ static MACHINE_DRIVER_START( calchase )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(0x200)
 
 	MDRV_VIDEO_START(calchase)
 	MDRV_VIDEO_UPDATE(calchase)
+
+
 MACHINE_DRIVER_END
 
+static DRIVER_INIT( calchase )
+{
+	//bios_ram = auto_malloc(0x10000);
 
+	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, calchase_set_keyb_int);
+	mc146818_init(machine, MC146818_STANDARD);
+
+	//intel82439tx_init();
+
+	kbdc8042_init(machine, &at8042);
+}
 
 
 ROM_START( calchase )
@@ -134,7 +493,8 @@ ROM_START( calchase )
 	ROM_LOAD( "mb_bios.bin", 0x00000, 0x20000, CRC(dea7a51b) SHA1(e2028c00bfa6d12959fc88866baca8b06a1eab68) )
 
 	ROM_REGION( 0x8000, "video_bios", 0 )
-	ROM_LOAD( "trident_tgui9680_bios.bin", 0x0000, 0x8000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
+	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION( 0x800, "nvram", 0 )
 	ROM_LOAD( "ds1220y_nv.bin", 0x000, 0x800, CRC(7912c070) SHA1(b4c55c7ca76bcd8dad1c4b50297233349ae02ed3) )
@@ -144,4 +504,4 @@ ROM_START( calchase )
 ROM_END
 
 
-GAME( 1999, calchase,  0,    calchase, calchase,  0, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, calchase,  0,    calchase, calchase,  calchase, ROT0, "The Game Room", "California Chase", GAME_NOT_WORKING|GAME_NO_SOUND )
