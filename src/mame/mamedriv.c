@@ -4381,8 +4381,28 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
-	DRIVER( fotns )
-	DRIVER( demofist )
+						/* 2002.12 Maximum Speed */
+						/* 2003.03 Guilty Gear X ver.1.5 */
+	DRIVER( demofist )	/* 2003.06 Demolish Fist */
+						/* 2003.08 Dolphin Blue */
+						/* 2003.12 Guilty Gear Isuka */
+						/* 2003.?? Sangoku Senki Shichisei Tensei (IGS) */
+						/* 2004.03 The Rumble Fish */
+						/* 2004.03 Ranger Mission */
+						/* 2004.06 Salary Man Kintarou Net Select */
+						/* 2004.07 The King of Fighters Neo Wave */
+						/* 2004.09 Extreme Hunting */
+						/* 2004.09 Dirty Pig Skin Football */
+						/* 2004.09 Faster than Speed */
+						/* 2005.03 The Rumble Fish 2 */
+						/* 2005.03 Net Select Keiba Victory Furlong */
+						/* 2005.07 NeoGeo Battle Colloseum */
+						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
+						/* 2005.10 The King of Fighters XI */
+	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
+						/* 2006.02 Metal Slug 6 */
+						/* 2006.09 Extreme Hunting 2 Tournament Edition */
+						/* 2008.?? Sega Cray challenge */
 
 	/* Hikaru */
 	DRIVER( hikaru ) 	/* BIOS (c)2000 */
