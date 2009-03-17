@@ -4375,6 +4375,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2008.?? Melty Blood Actress Again */
 						/* 2009.?? Project Cerberus */
 						/* 2009.?? Radirgy Noah */
+	DRIVER( ggxxsla  )	/* 200?.?? Guilty Gear XX Slash */
 	
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
 						

@@ -30,6 +30,7 @@ size_t generic_nvram_size;
 UINT8 *generic_nvram;
 UINT16 *generic_nvram16;
 UINT32 *generic_nvram32;
+UINT64 *generic_nvram64;
 
 /* memory card status */
 static int memcard_inserted;
@@ -80,7 +81,8 @@ void generic_machine_init(running_machine *machine)
 	generic_nvram = NULL;
 	generic_nvram16 = NULL;
 	generic_nvram32 = NULL;
-
+	generic_nvram64 = NULL;
+	
 	/* reset memory card info */
 	memcard_inserted = -1;
 
@@ -241,6 +243,8 @@ INLINE void *nvram_select(void)
 		return generic_nvram16;
 	if (generic_nvram32)
 		return generic_nvram32;
+	if (generic_nvram64)
+		return generic_nvram64;		
 	fatalerror("generic nvram handler called without nvram in the memory map");
 	return 0;
 }

@@ -3022,6 +3022,19 @@ ROM_START( ss2005 )
 ROM_END
 
 
+ROM_START( ggxxsla )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0033a", 0, SHA1(29de69ae97a9099b1bbe936dfa965bb4a3195f68) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C621A (317-5111-JPN)
+	//(sticker 253-5509-5111J)
+	ROM_LOAD("317-5111-jpn.data", 0x00, 0x50, CRC(a517c70d) SHA1(5f9798941355fb9abce511508c860653d6369e72) )
+ROM_END
 
 
 ROM_START( undefeat )
@@ -3347,6 +3360,7 @@ GAME( 2004, meltybld,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole",      
 GAME( 2005, senko,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (Rev. A)(GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, senkoo,    senko,    naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ss2005,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Arc System Works",       "Guilty Gear XX Slash (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, undefeat,  naomigd,  naomigd,  naomi,    0,   ROT0,   "GRev",         "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, trgheart,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Warashi",      "Trigger Heart Exelica (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 

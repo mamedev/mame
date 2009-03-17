@@ -44,7 +44,7 @@ extern size_t generic_nvram_size;
 extern UINT8 *generic_nvram;
 extern UINT16 *generic_nvram16;
 extern UINT32 *generic_nvram32;
-
+extern UINT64 *generic_nvram64;
 
 
 /***************************************************************************
