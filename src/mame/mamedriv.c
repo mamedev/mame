@@ -4350,8 +4350,31 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( senkoo )	/*          ^^ */
 						/* 2005.07 WCCF 2004-2005 */
 						/* 2005.09 Kodai Ouja Kyouryuu King */
+						/* 2005.10 Radirgy */
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
-	DRIVER( trgheart )	/* 200?.?? Trigger Heart Exelica */
+						/* 2006.03 Kurukuru Chameleon */
+	DRIVER( trgheart )	/* 2006.05 Trigger Heart Exelica */
+						/* 2006.07 Touch de Zunou */
+						/* 2006.08 Senkou no Rondo SP */
+						/* 2006.09 Jingi Storm */
+						/* 2006.11 Karous */
+						/* 2006.12 Guilty Gear XX Accent Core */
+						/* 2006.12 Melty Blood Act Cadenza ver.B */
+						/* 2007.02 Noukone Puzzle Takoron */
+						/* 2007.07 Shooting Love */
+						/* 2007.07 Dynamite Deka EX - Asian dynamite */
+						/* 2007.09 Rhythm Tengoku */
+						/* 2007.?? Issyo ni Wanwan */
+						/* 2007.?? Konchuu Dash!! */
+						/* 2007.?? Pokasuka Ghost! */
+						/* 2007.?? Magical Dance on Dream Stage */
+						/* 2007.?? Marine Marine */
+						/* 2008.?? Akatsuki Denkou Senki Ausf.Achse */
+						/* 2008.?? Illvelo */
+						/* 2008.?? Mamoru Kun wa Norowarete Shimatta! */
+						/* 2008.?? Melty Blood Actress Again */
+						/* 2009.?? Project Cerberus */
+						/* 2009.?? Radirgy Noah */
 	
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
 						
