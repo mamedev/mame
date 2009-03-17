@@ -664,7 +664,7 @@ Notes:
 
 #define CPU_CLOCK (200000000)
 static UINT32 *dc_sound_ram;
-
+static UINT64 *naomi_ram64;
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
@@ -751,7 +751,7 @@ static ADDRESS_MAP_START( naomi_base_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64)
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
@@ -779,7 +779,7 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64)
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
@@ -3366,50 +3366,70 @@ ROM_START( puyofev )
 	ROM_LOAD("317-0375-com.data", 0x00, 0x50, CRC(32bf1825) SHA1(42dfbc6777c154d8de6c6f7350da9ea737380220) )
 ROM_END
 
+static READ64_HANDLER( naomigd_bios_idle_skip_r )
+{
+	
+	if (cpu_get_pc(space->cpu)==0xc04173c)
+		cpu_spinuntil_int(space->cpu);
+//	else
+//		printf("%08x\n", cpu_get_pc(space->cpu));
+	
+	return naomi_ram64[0x2ad238/8];
+}
+static DRIVER_INIT(naomigd)
+{
+
+
+
+
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomigd_bios_idle_skip_r);
+
+}
+
 /* Naomi GD-Rom Sets */
-GAME( 2001, naomigd,   0,        naomi,    naomi,    0,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, naomigd,   0,        naomi,    naomi, naomigd,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 // GDL-xxxx (licensed games?)
-GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",       "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi,    0,	  ROT0,   "Capcom",       "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi,    0,   ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, ggxx,      naomigd,  naomigd,  naomi,    0,   ROT0,   "Arc System Works",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, chocomk,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole Software Corporation", "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Amedio",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Alpha System", "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi,    0,   ROT0,   "G-Rev",        "Border Down (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi,    0,   ROT0,   "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, trizeal,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Taito",        "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, meltybld,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole",        "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, senko,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (Rev. A)(GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, senkoo,    senko,    naomigd,  naomi,    0,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, ss2005,    naomigd,  naomigd,  naomi,    0,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Arc System Works",       "Guilty Gear XX Slash (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, undefeat,  naomigd,  naomigd,  naomi,    0,   ROT0,   "GRev",         "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, trgheart,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Warashi",      "Trigger Heart Exelica (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, jingystm,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Yuki Enterprise",      "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi, naomigd,	  ROT0,   "Capcom",       "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, ggxx,      naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Arc System Works",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software Corporation", "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Amedio",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Alpha System", "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",        "Border Down (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, trizeal,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Taito",        "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, meltybld,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole",        "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (Rev. A)(GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senkoo,    senko,    naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ss2005,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Arc System Works",       "Guilty Gear XX Slash (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, undefeat,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "GRev",         "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, trgheart,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Warashi",      "Trigger Heart Exelica (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, jingystm,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Yuki Enterprise",      "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 
 // GDS-xxxx (first party games?)
-GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, slashout,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, dygolf,    naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Tennis (GDS-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, vathlete,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Tennis 2 (GDS-0015a)", GAME_NO_SOUND|GAME_NOT_WORKING ) // bad key
-GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, luptype,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Lupin The Third - The Typing (GDS-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, mok,       naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, confmiss,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, puyofev,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, slashout,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, dygolf,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis (GDS-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, vathlete,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis 2 (GDS-0015a)", GAME_NO_SOUND|GAME_NOT_WORKING ) // bad key
+GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, luptype,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Typing (GDS-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, mok,       naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, confmiss,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
 
