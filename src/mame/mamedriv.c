@@ -3865,7 +3865,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( orunneru )	/* 1993.06 Outrunners (US) */
 	DRIVER( harddunj )	/* 1994.04 Hard Dunk 3on3 (Japan) */
 	DRIVER( harddunk )	/* 1994.?? Hard Dunk 3on3 (World) */
-						/* 1993.03 Title Fight (Japan)
+						/* 1993.03 Title Fight (Japan) */
 	DRIVER( titlef )	/* 1993.?? Title Fight (World) */
 	DRIVER( titlefu )	/* 1993.04 Title Fight (US) */
 						/* 1992.07 Stadium Cross (Japan) */
