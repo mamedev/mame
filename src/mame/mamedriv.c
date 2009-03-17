@@ -4252,7 +4252,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( dybb99 )	/* 1999.11 Dynamite Baseball '99 */
 	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
 	DRIVER( samba )		/* 1999.12 Samba de Amigo */
-	DRIVER( vtennis )	/* 1999.12 Power Smash */
+	DRIVER( vtennis )	/* 1999.12 Virtua Tennis / Power Smash (ROM) */
+	DRIVER( vtennisg )	/* 1999.12 Virtua Tennis / Power Smash (GD-ROM) */
 						/* 1999.12 Puyopuyo DA! */
 						/* 1999.12 Mars TV */
 						/* 2000.01 18 Wheeler */
@@ -4331,9 +4332,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
 						/* 2002.07 Mazan */
 						/* 2002.07 Soul Surfer */
-						/* 2002.08 Virtua Fighter 4 Evolution */
+	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution (Naomi 2) */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
-						/* 2002.12 Initial D Arcade Stage ver.2 */
+	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
 						/* 2002.12 Moeru Casinyo */
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
 						/* 2003.02 Kouchuu Ouja Mushiking */
@@ -4347,7 +4348,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
 						/* 2004.01 Initial D Arcade Stage ver.3 */
 						/* 2004.06 WCCF 2002-2003 ver.2.0 */
-						/* 2004.07 Virtua Fighter 4 Final Tuned */
+	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned (Naomi 2) */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
 						/* 2004.10 Oshare Majo Love & Berry */
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */
@@ -4364,7 +4365,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( trgheart )	/* 2006.05 Trigger Heart Exelica */
 						/* 2006.07 Touch de Zunou */
 						/* 2006.08 Senkou no Rondo SP */
-						/* 2006.09 Jingi Storm */
+	DRIVER( jingystm )	/* 2006.09 Jingi Storm */
 						/* 2006.11 Karous */
 						/* 2006.12 Guilty Gear XX Accent Core */
 						/* 2006.12 Melty Blood Act Cadenza ver.B */
