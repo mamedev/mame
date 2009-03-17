@@ -3922,107 +3922,116 @@ Sep.1994 Quiz Ghost Hunter
 	/* Sega Model 2 Games */
 
 	/* Model 2 (TGPs, Model 1 sound board) */
-	DRIVER( daytona )	/* 1993 */
-	DRIVER( dayton93 )	/* 1993 */
-	DRIVER( daytonas )	/* 1993 */
+	DRIVER( daytona )	/* 1994.03 Daytona USA */
+	DRIVER( dayton93 )
+	DRIVER( daytonas )
 	DRIVER( daytonat )	/* 1993, hack */
 	DRIVER( daytonam )	/* 1993, hack */
-	DRIVER( desert )	/* 1994 */
-	DRIVER( vcop )		/* 1994 */
+	DRIVER( desert )	/* 1994.07 Desert Tank */
+	DRIVER( vcop )		/* 1994.09 Virtua Cop */
 
 	/* Model 2A-CRX (TGPs, SCSP sound board) */
-	DRIVER( manxtt )	/* 1995 */
-	DRIVER( motoraid )	/* 1995 */
-	DRIVER( srallyc )	/* 1995 */
-	DRIVER( vf2 )		/* 1995 */
-	DRIVER( vf2b )		/* 1995 */
-	DRIVER( vf2a )		/* 1995 */
-	DRIVER( vf2o )		/* 1995 */
-	DRIVER( vcop2 )		/* 1995 */
-	DRIVER( doaa )		/* 1996 */
-	DRIVER( zeroguna )	/* 1997 */
-	DRIVER( dynamcop )	/* 1998 */
-	DRIVER( dyndeka2 )	/* 1998 */
-	DRIVER( pltkidsa )	/* 1998 */
+	DRIVER( vf2o )		/* 1994.11 Virtua Fighter 2 */
+	DRIVER( vf2a )		/* 1995.?? */
+	DRIVER( vf2b )		/* 1995.?? */
+	DRIVER( srallyc )	/* 1995.02 Sega Rally Championship */
+	DRIVER( vcop2 )		/* 1995.09 Virtua Cop 2 */
+	DRIVER( vf2 )		/* 1995.09 Virtua Fighter 2.1*/
+						/* 1995.10 Sky Target */
+	DRIVER( manxtt )	/* 1995.11 Manx T.T. */
+						/* 1996.08 Dynamite Baseball */
+	DRIVER( doaa )		/* 1996.11 Dead or Alive */
+						/* 1997.04 Dynamite Baseball '97 */
+	DRIVER( motoraid )	/* 1997.10 Motor Raid */
+	DRIVER( zeroguna )	/* 1997.12 Zero Gunner */
+	DRIVER( dyndeka2 )	/* 1998.05 Dynamite Deka 2 */
+	DRIVER( dynamcop )	/* 1998.09 Dynamic Cop */
+	DRIVER( pltkidsa )	/* 1999.03 Pilot Kids */
 
 	/* Model 2B-CRX (SHARC, SCSP sound board) */
-	DRIVER( vstriker )	/* 1994 */
-	DRIVER( vstrikro )	/* 1994 */
-	DRIVER( fvipers )	/* 1995 */
-	DRIVER( gunblade )	/* 1995 */
-	DRIVER( indy500 )	/* 1995 */
-	DRIVER( indy500d )	/* 1995 */
-	DRIVER( skytargt )	/* 1995 */
-	DRIVER( schamp )	/* 1996 */
-	DRIVER( lastbrnx )	/* 1996 */
-	DRIVER( lastbrnj )	/* 1996 */
-	DRIVER( doa )		/* 1996 */
-	DRIVER( sgt24h )	/* 1996 */
-	DRIVER( von )		/* 1996 */
-	DRIVER( vonj )		/* 1996 */
-	DRIVER( dynabb )	/* 1996 */
-	DRIVER( zerogun )	/* 1997 */
-	DRIVER( zerogunj )	/* 1997 */
-	DRIVER( dynmcopb )	/* 1998 */
-	DRIVER( dyndek2b )	/* 1998 */
-	DRIVER( pltkids )	/* 1998 */
-	DRIVER( rchase2 )	/* 199? */
+	DRIVER( vstriker )	/* 1995.05 virtua Striker */
+	DRIVER( vstrikro )
+	DRIVER( rchase2 )	/* 1995.06 Rail Chase 2 */
+	DRIVER( indy500 )	/* 1995.07 Indy 500 */
+	DRIVER( indy500d )
+	DRIVER( skytargt )	/* 1995.10 Sky Target */
+	DRIVER( fvipers )	/* 1995.11 Fighting Vipers */
+	DRIVER( von )		/* 1996.01 Dennou Senki Virtual-On */
+	DRIVER( vonj )
+	DRIVER( gunblade )	/* 1996.04 Gunblade N.Y. */
+	DRIVER( schamp )	/* 1996.05 Sonic the Fighters */
+	DRIVER( lastbrnx )	/* 1996.06 Last Bronx */
+	DRIVER( lastbrnj )
+	DRIVER( sgt24h )	/* 1996.07 Super GT 24h */
+	DRIVER( dynabb )	/* 1996.08 Dynamite Baseball */
+	DRIVER( doa )		/* 1996.11 Dead or Alive */
+						/* 1997.04 Dynamite Baseball '97 */
+	DRIVER( zerogun )	/* 1997.12 Zero Gunner */
+	DRIVER( zerogunj )
+	DRIVER( dyndek2b )	/* 1998.05 Dynamite Deka 2 */
+	DRIVER( dynmcopb )	/* 1998.09 Dynamite Cop */
+	DRIVER( pltkids )	/* 1999.03 Pilot Kids */
 
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
-	DRIVER( skisuprg )	/* 1996 */
-	DRIVER( stcc )		/* 1996 */
-	DRIVER( waverunr )	/* 1996 */
-	DRIVER( hotd )		/* 1997 */
-	DRIVER( overrev )	/* 1997 */
-	DRIVER( segawski )	/* 1997 */
-	DRIVER( topskatr )	/* 1997 */
-	DRIVER( topskatu )	/* 1997 */
-	DRIVER( bel )		/* 1998 */
-	DRIVER( dynmcopc )	/* 1998 */
+	DRIVER( skisuprg )	/* 1996.12 Sega Ski Super G */
+	DRIVER( stcc )		/* 1996.09 Sega Touring Car Championship */
+	DRIVER( waverunr )	/* 1996.10 Wave Runner */
+	DRIVER( hotd )		/* 1997.03 The House of the Dead */
+	DRIVER( topskatr )	/* 1997.05 Top Skater */
+	DRIVER( topskatu )
+	DRIVER( overrev )	/* 1997.09 Overrev */
+	DRIVER( segawski )	/* 1997.09 Sega Water Ski */
+	DRIVER( dynmcopc )	/* 1998.09 Dynamite Cop */
+	DRIVER( bel )		/* 1998.12 Behind Enemy Lines */
 
 	/* Sega Model 3 Games */
 
 	/* Step 1.0 */
-	DRIVER( vf3 )		/* 1996 */
-	DRIVER( vf3a )		/* 1996 */
-	DRIVER( vf3tb )		/* 1996 */
-	DRIVER( bass )		/* 1997 */
-	DRIVER( getbass )	/* 1997 */
+	DRIVER( vf3 )		/* 1996.09 Virtua Fighter 3 */
+	DRIVER( vf3a )
+	DRIVER( vf3tb )		/* 1997.10 Virtua Fighter 3tb */
+	DRIVER( bass )		/* 1997.12 Get Bass */
+	DRIVER( getbass )
+						/* 1998.03 Get Bass Brast */
 
 	/* Step 1.5 */
-	DRIVER( scud )		/* 1996 */
-	DRIVER( scudj )		/* 1996 */
-	DRIVER( scuda )		/* 1996 */
-	DRIVER( scudp )		/* 1997 */
-	DRIVER( lostwsga )	/* 1997 */
-	DRIVER( vs215 )		/* 1997 */
-	DRIVER( lemans24 )	/* 1997 */
-	DRIVER( vs29815 )	/* 1998 */
+	DRIVER( scud )		/* 1996.12 Scud Race */
+	DRIVER( scudj )
+	DRIVER( scuda )
+	DRIVER( vs215 )		/* 1997.06 Virtua Striker 2 */
+	DRIVER( lostwsga )	/* 1997.07 Lost World Jurassic Park */
+	DRIVER( scudp )		/* 1997.09 Scud Race Plus */
+	DRIVER( lemans24 )	/* 1997.09 Le Mans 24 */
+	DRIVER( vs29815 )	/* 1998.05 Virtua Striker 2 ver.98 */
 
 	/* Step 2.0 */
-	DRIVER( vs2 )		/* 1997 */
-	DRIVER( harley )	/* 1997 */
-	DRIVER( skichamp )	/* 1998 */
-	DRIVER( srally2 )	/* 1998 */
-	DRIVER( sraly2dx )	/* 1998 */
-	DRIVER( von2 )		/* 1998 */
-	DRIVER( von254g )	/* 1998 */
-	DRIVER( fvipers2 )	/* 1998 */
-	DRIVER( vs298 )		/* 1998 */
-	DRIVER( vs2v991 )	/* 1999 */
-	DRIVER( vs299 )		/* 1999 */
+	DRIVER( vs2 )		/* 1997.06 Virtua Striker 2 */
+	DRIVER( harley )	/* 1997.12 Harley Davidson & L.A.Riders */
+	DRIVER( skichamp )	/* 1998.01 Ski Champ */
+	DRIVER( srally2 )	/* 1998.02 Sega Rally 2 Championship */
+	DRIVER( sraly2dx )
+	DRIVER( von2 )		/* 1998.03 Dennou Senki Virtual-On Oratorio Tangram */
+	DRIVER( fvipers2 )	/* 1998.04 Fighting Vipers 2 */
+	DRIVER( vs298 )		/* 1998.05 Virtua Striker 2 ver.98*/
+	DRIVER( vs299 )		/* 1998.12 Virtual Striker 2 ver.99 */
+	DRIVER( vs2v991 )	/* 1999.?? Virtual Striker 2 ver.99.1 */
+	DRIVER( von254g )	/* 1999.05 Dennou Senki Virtual-On Oratorio Tangram ver.5.4 */
 
 	/* Step 2.1 */
-	DRIVER( daytona2 )	/* 1998 */
-	DRIVER( dayto2pe )	/* 1998 */
-	DRIVER( dirtdvls )	/* 1998 */
-	DRIVER( dirtdvla )	/* 1998 */
-	DRIVER( swtrilgy )	/* 1998 */
-	DRIVER( swtrilga )	/* 1998 */
-	DRIVER( spikeout )	/* 1998 */
-	DRIVER( spikeofe )	/* 1998 */
-	DRIVER( eca )		/* 1999 */
-	DRIVER( ecax )		/* 1999 */
+	DRIVER( daytona2 )	/* 1998.06 Daytona USA 2 */
+						/* 1998.09 Ocean Hunter */
+	DRIVER( spikeout )	/* 1998.09 Spikeout */
+	DRIVER( dirtdvls )	/* 1998.10 Dirt Devils */
+	DRIVER( dirtdvla )
+	DRIVER( swtrilgy )	/* 1998.11 Star Wars Trilogy Arcade */
+	DRIVER( swtrilga )
+						/* 1998.11 Magical Trocco Adventure */
+						/* 1998.12 L.A. Machine Guns */
+	DRIVER( dayto2pe )	/* 1998.12 Daytone USA 2 Power Edition */
+						/* 1998.12 Virtua Striker 2 ver.99 */
+	DRIVER( spikeofe )	/* 1999.01 Spikeout Final Edition */
+	DRIVER( eca )		/* 1999.10 Kyukyuusya Emergency Call Ambulance */
+	DRIVER( ecax )
 
 
 	/* Deniam games */
@@ -4325,19 +4334,55 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Hikaru */
 	DRIVER( hikaru ) 	/* BIOS (c)2000 */
-	DRIVER( airtrix )	/* (c) 2000 */
-	DRIVER( pharrier )	/* (c) 2001 */
-	DRIVER( podrace )	/* (c) 2001 */
+						/* 1999.06 Syouboushi Brave Fire Fighters */
+	DRIVER( podrace )	/* 2000.06 Star Wars: Racer Arcade */
+						/* 2000.09 Nascar Arcade */
+	DRIVER( pharrier )	/* 2000.12 Planet Harriers */
+	DRIVER( airtrix )	/* 2001.02 Air Trix */
+						/* 2001.10 Dennou Senki Virtual-On Force */
+						/* 2002.04 Dennou Senki Virtual-On Force ver.7.7 */
 
 	/* Triforce (GameCube based) */
 	DRIVER( triforce )
-	DRIVER( vs4 )
-	DRIVER( vs2002ex )
+	DRIVER( vs2002ex )	/* GDT-0002 2002.10 Virtua Striker 2002 */
+						/* 2003.06 F-ZERO AX */
+						/* 2003.07 Avalon no Kagi */
+						/* 2003.10 Avalon no Kagi ver.1.01 */
+						/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
+						/* 2003.12 Avalon no Kagi ver.1.10 */
+						/* 2004.04 Avalon no Kagi ver.1.20 Aratanaru Syoukan */
+						/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
+	DRIVER( vs4 )		/* GDT-0015 2004.10 Virtua Striker 4 */
+						/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
+						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
 	
 	/* Chihiro (X-Box based) */
 	DRIVER( chihiro )
-	DRIVER( ghostsqu )
-	DRIVER( vcop3 )
+						/* 2002.12 The House of the Dead III */
+						/* 2003.03 Crazy Taxi High Roller */
+	DRIVER( vcop3 )		/* 2003.04 Virtua Cop 3 */
+						/* 2003.12 Outrun 2 */
+						/* 2004.03 Ollie King */
+						/* 2004.07 Wangan Midnight Maximum Tune */
+						/* 2004.09 Quest of D */
+						/* 2004.11 Sega Golf Club Network Pro Tour */
+						/* 2004.12 Outrun 2 Special Tours */
+						/* 2004.12 Quest of D ver.1.10 */
+	DRIVER( ghostsqu )	/* 2004.12 Ghost Squad */
+						/* 2005.03 Kidou Senshi Gundam Battle Operating Simulator */
+						/* 2005.03 Sangokushi Taisen */
+						/* 2005.04 Wangan Midnight Maximum Tune 2 */
+						/* 2005.05 Quest of D ver.1.20 */
+						/* 2005.06 Sega Golf Club Network Pro Tour 2005 */
+						/* 2005.09 Quest of D ver.1.21 */
+						/* 2005.10 Sangokushi Taisen Ranse no Gunrou ver.1.100 */
+						/* 2005.10 Wangan Midnight Maximum Tune 2 ver.B */
+						/* 2005.12 Kidou Senshi Gundam 0079 Card Builder */
+						/* 2005.12 Quest of D ver.2.01 Gofu no Keisyousya */
+						/* 2005.12 Sega Golf Club 2006 Next Tours */
+						/* 2006.05 Sangokushi Taisen 2 */
+						/* 2007.03 Kidou Senshi Gundam 0083 Card Builder */
+						/* 2007.10 Kidou Senshi Gundam 0083 Card Builder Ryouyuu Gekitotsu */
 	
 	DRIVER( hshavoc )	/* (c) 1993 Data East */
 
