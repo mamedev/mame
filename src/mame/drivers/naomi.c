@@ -3370,7 +3370,8 @@ static READ64_HANDLER( naomigd_bios_idle_skip_r )
 {
 	
 	if (cpu_get_pc(space->cpu)==0xc04173c)
-		cpu_spinuntil_int(space->cpu);
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+		//cpu_spinuntil_int(space->cpu);
 //	else
 //		printf("%08x\n", cpu_get_pc(space->cpu));
 	
@@ -3378,12 +3379,26 @@ static READ64_HANDLER( naomigd_bios_idle_skip_r )
 }
 static DRIVER_INIT(naomigd)
 {
-
-
-
-
 	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomigd_bios_idle_skip_r);
+}
 
+static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
+{
+	
+	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+//	else
+//		printf("%08x\n", cpu_get_pc(space->cpu));
+	
+	
+	
+	return naomi_ram64[0x1aae18/8];
+}
+
+static DRIVER_INIT( ggxxsla )
+{
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1aae18, 0xc1aae1f, 0, 0, naomigd_ggxxsla_idle_skip_r);
+	DRIVER_INIT_CALL(naomigd);
 }
 
 /* Naomi GD-Rom Sets */
@@ -3408,7 +3423,7 @@ GAME( 2004, meltybld,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole",   
 GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (Rev. A)(GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, senkoo,    senko,    naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ss2005,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Arc System Works",       "Guilty Gear XX Slash (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi, ggxxsla,   ROT0,   "Arc System Works",       "Guilty Gear XX Slash (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, undefeat,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "GRev",         "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, trgheart,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Warashi",      "Trigger Heart Exelica (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, jingystm,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Yuki Enterprise",      "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
