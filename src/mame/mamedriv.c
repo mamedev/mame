@@ -2983,71 +2983,103 @@ V-V                           TP-027
 						/* 2004.05 Zooo */
 
 	/* Namco System 11 */
-	DRIVER( tekken )	/* Tekken (TE4/VER.C) */
-	DRIVER( tekkena )	/* Tekken (TE2/VER.C) */
-	DRIVER( tekkenb )	/* Tekken (TE2/VER.B) */
-	DRIVER( tekkenc )	/* Tekken (TE1/VER.B) */
-	DRIVER( tekken2 )	/* Tekken 2 Ver.B (TES3/VER.B) */
-	DRIVER( tekken2a )	/* Tekken 2 Ver.B (TES2/VER.B) */
-	DRIVER( tekken2b )	/* Tekken 2 (TES2/VER.A) */
-	DRIVER( souledge )	/* Soul Edge Ver. II (SO4/VER.C) */
-	DRIVER( souledga )	/* Soul Edge Ver. II (SO3/VER.C) */
-	DRIVER( souledgb )	/* Soul Edge (SO3/VER.A) */
-	DRIVER( souledgc )	/* Soul Edge (SO1/VER.A) */
-	DRIVER( dunkmnia )	/* Dunk Mania (DM1/VER.C) */
-	DRIVER( dunkmnic )	/* Dunk Mania (DM1/VER.C) */
-	DRIVER( xevi3dg )	/* Xevious 3D/G (XV31/VER.A) */
-	DRIVER( primglex )	/* Prime Goal EX (PG1/VER.A) */
-	DRIVER( danceyes )	/* Dancing Eyes (DC1/VER.A) */
-	DRIVER( pocketrc )	/* Pocket Racer (PKR1/VER.B) */
-	DRIVER( starswep )	/* Star Sweep (STP1/VER.A) */
-	DRIVER( myangel3 )	/* Kosodate Quiz My Angel 3 (KQT1/VER.A) */
-	DRIVER( ptblnk2a )	/* Point Blank 2 (GNB3/VER.A) */
+	DRIVER( tekken )	/* 1994.?? Tekken (TE4/VER.C) */
+	DRIVER( tekkena )	/* 1994.?? Tekken (TE2/VER.C) */
+	DRIVER( tekkenb )	/* 1994.?? Tekken (TE2/VER.B) */
+	DRIVER( tekkenc )	/* 1994.12 Tekken (TE1/VER.B, Japan) */
+	DRIVER( tekken2 )	/* 1995.?? Tekken 2 Ver.B (TES3/VER.B) */
+	DRIVER( tekken2a )	/* 1995.?? Tekken 2 Ver.B (TES2/VER.B) */
+						/* 1995.10 Tekken 2 Ver.B (TES1/VER.B, Japan) */
+	DRIVER( tekken2b )	/* 1995.?? Tekken 2 (TES2/VER.A) */
+						/* 1995.08 Tekken 2 (TES1, Japan) */
+	DRIVER( souledgb )	/* 1996.?? Soul Edge (SO3/VER.A) */
+	DRIVER( souledgc )	/* 1996.02 Soul Edge (SO1/VER.A, Japan) */
+	DRIVER( primglex )	/* 1996.03 Prime Goal EX (PG1/VER.A, Japan) */
+	DRIVER( xevi3dg )	/* 1996.05 Xevious 3D/G (XV31/VER.A, Japan) */
+	DRIVER( souledge )	/* 1996.?? Soul Edge Ver. II (SO4/VER.C) */
+	DRIVER( souledga )	/* 1996.?? Soul Edge Ver. II (SO3/VER.C) */
+						/* 1996.05 Soul Edge Ver. II (SO1, Japan) */
+	DRIVER( dunkmnia )	/* 1996.?? Dunk Mania (DM1/VER.C) */
+	DRIVER( dunkmnic )	/* 1996.05 Dunk Mania (DM1/VER.C, Japan) */
+	DRIVER( danceyes )	/* 1996.09 Dancing Eyes (DC1/VER.A, Japan) */
+	DRIVER( pocketrc )	/* 1997.03 Pocket Racer (PKR1/VER.B, Japan) */
+	DRIVER( starswep )	/* 1997.07 Star Sweep (STP1/VER.A, Japan) */
+	DRIVER( myangel3 )	/* 1998.03 Kosodate Quiz My Angel 3 (KQT1/VER.A, Japan) */
+	DRIVER( ptblnk2a )	/* 1999.?? Point Blank 2 (GNB3/VER.A) */
+						/* 1999.02 Gunbaarl (GNB1, Japan) */
 
 	/* Namco System 12 */
-	DRIVER( tekken3 )	/* Tekken 3 (TET1/VER.E1) */
-	DRIVER( tekken3a )	/* Tekken 3 (TET2/VER.B) */
-	DRIVER( tekken3b )	/* Tekken 3 (TET3/VER.A) */
-	DRIVER( tekken3c )	/* Tekken 3 (TET2/VER.A) */
-	DRIVER( lbgrande )	/* Libero Grande (LG2/VER.A) */
-	DRIVER( toukon3 )	/* Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (TR1/VER.A) */
-	DRIVER( soulclbr )	/* Soul Calibur (SOC14/VER.C) */
-	DRIVER( soulclba )	/* Soul Calibur (SOC11/VER.C) */
-	DRIVER( soulclbb )	/* Soul Calibur (SOC13/VER.B) */
-	DRIVER( soulclbc )	/* Soul Calibur (SOC11/VER.B) */
-	DRIVER( soulclbd )	/* Soul Calibur (SOC11/VER.A2) */
-	DRIVER( ehrgeiz )	/* Ehrgeiz (EG3/VER.A) */
-	DRIVER( ehrgeiza )	/* Ehrgeiz (EG2/VER.A) */
-	DRIVER( kaiunqz )	/* Kaiun Quiz (KW1/VER.A) */
-	DRIVER( mdhorse )	/* Derby Quiz My Dream Horse (MDH1/VER.A2) */
-	DRIVER( sws98 )		/* Super World Stadium '98 (SS81/VER.A) */
-	DRIVER( tenkomor )	/* Tenkomori Shooting (TKM2/VER.A1) */
-	DRIVER( tenkomoj )	/* Tenkomori Shooting (TKM1/VER.A1) */
-	DRIVER( fgtlayer )	/* Fighting Layer (FTL0/VER.A) */
-	DRIVER( pacapp )	/* Paca Paca Passion (PPP1/VER.A2) */
-	DRIVER( ptblank2 )	/* Point Blank 2 (GNB5/VER.A) */
-	DRIVER( sws99 )		/* Super World Stadium '99 (SS91/VER.A3) */
-	DRIVER( tektagt )	/* Tekken Tag Tournament (TEG3/VER.C1) */
-	DRIVER( tektagta )	/* Tekken Tag Tournament (TEG3/VER.B) */
-	DRIVER( tektagtb )	/* Tekken Tag Tournament (TEG1/VER.B) */
-	DRIVER( tektagtc )	/* Tekken Tag Tournament (TEG1/VER.A) */
-	DRIVER( ghlpanic )	/* Ghoul Panic (OB2/VER.A) */
-	DRIVER( pacapp2 )	/* Paca Paca Passion 2 (PKS1/VER.A) */
-	DRIVER( mrdrillr )	/* Mr Driller (DRI1/VER.A2) */
-	DRIVER( aquarush )	/* Aqua Rush (AQ1/VER.A1) */
-	DRIVER( pacappsp )	/* Paca Paca Passion Special (PSP1/VER.A) */
-	DRIVER( golgo13 )	/* Golgo 13 (GLG1/VER.A) */
-	DRIVER( g13knd )	/* Golgo 13 Kiseki no Dandou (GLS1/VER.A) */
-	DRIVER( sws2000 )	/* Super World Stadium 2000 (SS01/VER.A) */
-	DRIVER( sws2001 )	/* Super World Stadium 2001 (SS11/VER.A) */
+	DRIVER( tekken3 )	/* 1997.03 Tekken 3 (TET1/VER.E1, Japan) */
+	DRIVER( tekken3a )	/* 1997.?? Tekken 3 (TET2/VER.B) */
+	DRIVER( tekken3b )	/* 1997.?? Tekken 3 (TET3/VER.A) */
+	DRIVER( tekken3c )	/* 1997.?? Tekken 3 (TET2/VER.A) */
+	DRIVER( lbgrande )	/* 1997.?? Libero Grande (LG2/VER.A) */
+						/* 1997.12 Libero Grande (LG1, Japan) */
+	DRIVER( toukon3 )	/* 1997.12 Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (TR1/VER.A, Japan) */
+	DRIVER( ehrgeiz )	/* 1998.?? Ehrgeiz (EG3/VER.A) */
+	DRIVER( ehrgeiza )	/* 1998.?? Ehrgeiz (EG2/VER.A) */
+						/* 1998.05 Ehrgeiz (EG1, Japan) */
+	DRIVER( sws98 )		/* 1998.06 Super World Stadium '98 (SS81/VER.A, Japan) */
+	DRIVER( soulclbr )	/* 1998.?? Soul Calibur (SOC14/VER.C) */
+	DRIVER( soulclba )	/* 1998.07 Soul Calibur (SOC11/VER.C, Japan) */
+	DRIVER( soulclbb )	/* 1998.?? Soul Calibur (SOC13/VER.B) */
+	DRIVER( soulclbc )	/* 1998.?? Soul Calibur (SOC11/VER.B, Japan) */
+	DRIVER( soulclbd )	/* 1998.?? Soul Calibur (SOC11/VER.A2, Japan) */
+						/* 1998.07 Techno Drive */
+	DRIVER( mdhorse )	/* 1998.11 Derby Quiz My Dream Horse (MDH1/VER.A2, Japan) */
+						/* 1998.12 Attack Pla Rail */
+	DRIVER( tenkomor )	/* 1998.?? Tenkomori Shooting (TKM2/VER.A1) */
+	DRIVER( tenkomoj )	/* 1998.12 Tenkomori Shooting (TKM1/VER.A1, Japan) */
+	DRIVER( pacapp )	/* 1998.12 Paca Paca Passion (PPP1/VER.A2, Japan) */
+	DRIVER( fgtlayer )	/* 1998.12 Fighting Layer (FTL0/VER.A, Japan) */
+						/* 1999.01 Bust A Move (Metro) */
+	DRIVER( ptblank2 )	/* 1999.?? Point Blank 2 (GNB5/VER.A) */
+	DRIVER( sws99 )		/* 1999.05 Super World Stadium '99 (SS91/VER.A3, Japan) */
+	DRIVER( ghlpanic )	/* 1999.?? Ghoul Panic (OB2/VER.A) */
+						/* 1999.07 Oh Bakyuun (OB1, Japan) */
+	DRIVER( pacapp2 )	/* 1999.07 Paca Paca Passion 2 (PKS1/VER.A, Japan) */
+						/* 1999.07 Bust A Move 2 (Metro) */
+	DRIVER( tektagt )	/* 1999.?? Tekken Tag Tournament (TEG3/VER.C1) */
+	DRIVER( tektagta )	/* 1999.?? Tekken Tag Tournament (TEG3/VER.B) */
+	DRIVER( tektagtb )	/* 1999.07 Tekken Tag Tournament (TEG1/VER.B, Japan) */
+	DRIVER( tektagtc )	/* 1999.07 Tekken Tag Tournament (TEG1/VER.A, Japan) */
+	DRIVER( mrdrillr )	/* 1999.11 Mr Driller (DRI1/VER.A2, Japan) */
+						/* 1999.12 UmJammer Lammy NOW! (Japan) */
+						/* 1999.12 Quest for Fame (Japan) */
+	DRIVER( pacappsp )	/* 1999.12 Paca Paca Passion Special (PSP1/VER.A, Japan) */
+	DRIVER( kaiunqz )	/* 1999.12 Kaiun Quiz (KW1/VER.A, Japan) */
+	DRIVER( aquarush )	/* 2000.02 Aqua Rush (AQ1/VER.A1, Japan) */
+	DRIVER( golgo13 )	/* 2000.03 Golgo 13 (GLG1/VER.A, Japan) */
+	DRIVER( sws2000 )	/* 2000.03 Super World Stadium 2000 (SS01/VER.A, Japan) */
+						/* 2000.06 Truck Kyousoukyoku (Metro) */
+						/* 2000.07 Kart Duel */
+						/* 2000.08 Teknowerk */
+	DRIVER( g13knd )	/* 2000.10 Golgo 13 Kiseki no Dandou (GLS1/VER.A, Japan) */
+	DRIVER( sws2001 )	/* 2001.04 Super World Stadium 2001 (SS11/VER.A, Japan) */
 
 	/* Namco System 10 */
-	DRIVER( mrdrilr2 )	/* Mr Driller 2 (DR21 Ver.A) */
-	DRIVER( gjspace )	/* Gekitoride-Jong Space (10011 Ver.A) */
-	DRIVER( mrdrilrg )	/* Mr. Driller G (DRG1 Ver.A) */
-	DRIVER( knpuzzle )	/* Kotoba no Puzzle Mojipittan (KPM1 Ver.A) */
-	DRIVER( startrgn )	/* Star Trigon (STT1 Ver.A) */
-	DRIVER( gamshara )	/* Gamshara (10021 Ver.A) */
+	DRIVER( mrdrilr2 )	/* 2000.07 Mr Driller 2 (DR21 Ver.A) */
+						/* 2000.12 Gunbarina */
+						/* 2001.02 Photo Battole */
+						/* 2001.02 Taiko no Tatsujin */
+						/* 2001.03 Gahaha Ippatsudou */
+	DRIVER( mrdrilrg )	/* 2001.03 Mr. Driller G (DRG1 Ver.A) */
+						/* 2001.07 Golgo 13 Juusei no Requiem */
+						/* 2001.08 Taiko no Tatsujin 2 */
+						/* 2001.09 Gahaha Ippatsudou 2 */
+						/* 2001.11 Knock Down 2001 */
+	DRIVER( knpuzzle )	/* 2001.12 Kotoba no Puzzle Mojipittan (KPM1 Ver.A) */
+	DRIVER( gjspace )	/* 2001.12 Gekitoride-Jong Space (10011 Ver.A) */
+						/* 2002.03 Panicuru Panekuru */
+						/* 2002.03 Taiko no Tatsujin 3 */
+	DRIVER( startrgn )	/* 2002.07 Star Trigon (STT1 Ver.A) */
+						/* 2002.07 Tsukkomi Yousei Gips Nice Tsukkomi */
+	DRIVER( gamshara )	/* 2002.08 Gamshara (10021 Ver.A) */
+						/* 2002.10 Uchuu Daisakusen : Chocovader Contactee */
+						/* 2002.12 Taiko no Tatsujin 4 */
+						/* 2003.04 Seisyun Quiz Colorful High School */
+						/* 2003.10 Taiko no Tatsujin 5 */
+						/* 2004.07 Taiko no Tatsujin 6 */
 
 	/* Konami GQ */
 	DRIVER( cryptklr )	/* Crypt Killer (GQ420 UAA) */
