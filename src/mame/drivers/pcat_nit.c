@@ -1,6 +1,84 @@
-/*
+/********************************************************************************************************************
 
-*/
+Street Games (c) 1993 New Image Technologies
+
+A modified 386 PC-AT HW
+
+preliminary driver by Angelo Salese
+
+=====================================================================================================================
+
+These games were made by New Image Technologies. They are touch screen multi games from around 1993.
+Guru dumped one of their games a year ago but the pcb was rusted out and I think the roms might
+be bad, not sure.
+
+nvram is a potential problem. I have them separated into their own folder for now. I'm not really s
+ure if they are needed, but I found this inside a Bonanza rom so they may hold a key:
+
+-------------------------------------------
+INVALID KEY
+_
+Programming DS1204
+_
+Successfully Programmed DS1204
+_
+Failed Programming DS1204
+_
+Verifying DS1204
+_
+Failed to read secure data
+_
+Failed to read ID DS1204
+_
+Verified DS1204
+-------------------------------------------
+
+I have them (the real chips) for my Bonanza rom boards, but they are missing on my Street Games boards.
+However, the back of one of the manuals mentions game swapping on these boards, and it doesn't mention
+this chip as needing to be changed. I included the nvram dump from Guru's Street Games II dump, so maybe
+that will work on all the Street Games sets? I don't know. My Dallas chip read good as 2764 and verified
+ok. The other one (bq4010yma-150) reads the same crc most reads but won't pass the verify function.
+It may still be good. Those are for the Bonanza sets as you'll see in the pics.
+
+I made copies of the manuals for Street Games and Bonanza and included lots of pics.
+
+From the looks of the boards I got, Street Games II looks like it uses the 3 original Street Games roms
+and just builds on them. You'll see what I mean in the pics.
+
+I don't know if all 3 vga bioses are needed or not, one is soldered and not dumped, I dumped the other two.
+I can get the soldered one dumped in the future if it turns out we need it. When these games got upgraded,
+they sometimes came with a new video board. Switching from Street Games to Street Games II probably didn't need
+it but switching to Bonanza did. The vga bioses I dumped came off of the 2 different video boards for Bonanza.
+I dumped them as 27c256. The one on the Street Games video board is the surface mounted one.
+
+The end numbers on the rom stickers give away the version info. For example, it looks like Guru's old dump
+of Street Games II is revision 7C.
+
+The system bios roms I dumped give an error in romcmp but they seem to verify ok so I think they are good.
+
+My 2 rom boards for Bonanza were fortunately 2 different revisions. I ended up with 2 sets of Street Games,
+1 set of Street Games II, and 2 different sets of Bonanza. A second set of Street Games II might be able to be
+"created" if his dump is good because you will notice in the pics, it looks like Street Games II used 3 roms
+from Street Games I. That or one of my rom boards came populated incorrectly.
+
+The ATI keyboard bios is an HT6542. The Jet one I'm not sure. I don't think they can be read. Same for the M5818's.
+
+My set naming logic...
+
+bonanza = Bonanza (Rev 3)
+bonanza2 = Bonanza (Rev 2)
+
+streetg = Street Games (Rev 4)
+streetg2 = Street Games (Rev 2)
+
+streetgii = Street Games II (Rev 5)
+
+Anything else need to be dumped? More pics needed, etc.? Contact me.
+
+
+Smitdogg
+
+********************************************************************************************************************/
 
 #include "driver.h"
 #include "cpu/i386/i386.h"
@@ -439,7 +517,7 @@ static MACHINE_START( streetg2 )
 static const gfx_layout CGA_charlayout =
 {
 	8,8,
-    256,
+    RGN_FRAC(1,1),
     1,
     { 0 },
     { 0,1,2,3,4,5,6,7 },
@@ -447,8 +525,13 @@ static const gfx_layout CGA_charlayout =
     8*8
 };
 
-static GFXDECODE_START( CGA )
+static GFXDECODE_START( streetg2 )
 	GFXDECODE_ENTRY( "video_bios", 0x2da2, CGA_charlayout,              0, 256 )
+	//there's also a 8x16 entry (just after the 8x8)
+GFXDECODE_END
+
+static GFXDECODE_START( bonanza )
+	GFXDECODE_ENTRY( "video_bios", 0x56f3, CGA_charlayout,              0, 256 )
 	//there's also a 8x16 entry (just after the 8x8)
 GFXDECODE_END
 
@@ -465,7 +548,7 @@ static MACHINE_DRIVER_START( pcat_nit )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE( CGA )
+	MDRV_GFXDECODE( streetg2 )
 
 	MDRV_MACHINE_START(streetg2)
 	MDRV_NVRAM_HANDLER( mc146818 )
@@ -485,6 +568,103 @@ static MACHINE_DRIVER_START( pcat_nit )
 	MDRV_VIDEO_UPDATE(streetg2)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( pcat_nitB )
+	MDRV_IMPORT_FROM( pcat_nit )
+	MDRV_GFXDECODE( bonanza )
+MACHINE_DRIVER_END
+
+/***************************************
+*
+* ROM definitions
+*
+***************************************/
+
+ROM_START(streetg)
+	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_LOAD("system-bios-10-0004-01.u6", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
+
+	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
+	ROM_CONTINUE(                                     0x00001, 0x04000 )
+
+	ROM_REGION(0x180000, "game_prg", 0)	/* proper game */
+	ROM_LOAD("10-0003-04.u11", 0x000000,0x80000, CRC(1471a728) SHA1(5e12a9230f8130282a1be9a10118a3556bafbc37) )
+	ROM_LOAD("10-0003-04.u12", 0x080000,0x80000, CRC(5a50f519) SHA1(c07a583b4220d4d5506824def91774fede760e65) )
+	ROM_LOAD("10-0003-04.u13", 0x100000,0x80000, CRC(8a609145) SHA1(18fcb58b461aa9149a163b85dd8267dec90da3cd) )
+
+	ROM_REGION(0x10000, "disk_bios", 0) //TODO: should be half size
+	ROM_LOAD("disk-bios-10-0001-04.u10",     0x00000, 0x10000, CRC(f2b50115) SHA1(b329f798ade8d891614e1af78e3d91f5c82af73d))
+
+	ROM_REGION(0x08000, "nvram_data", 0)
+	ROM_LOAD("8k_nvram.u9",     0x00000, 0x02000, CRC(44be0b89) SHA1(81666dd369d1d85269833293136d61ffe80e940a))
+ROM_END
+
+ROM_START(streetgr3)
+	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_LOAD("system-bios-10-0004-01.u6", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
+
+	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
+	ROM_CONTINUE(                                     0x00001, 0x04000 )
+
+	ROM_REGION(0x180000, "game_prg", 0)	/* proper game */
+	ROM_LOAD("10-00003-03.u11", 0x000000,0x80000, CRC(2fbcb12b) SHA1(f6413565fc1289ba32b411de877cdf6526f1fa9d) )
+	ROM_LOAD("10-00003-03.u12", 0x080000,0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
+	ROM_LOAD("10-00003-03.u13", 0x100000,0x80000, CRC(6a9d0771) SHA1(6cd9a56a2413416d0928e5cf9340c94bc0c87c46) )
+
+	ROM_REGION(0x10000, "disk_bios", 0) //TODO: should be half size
+	ROM_LOAD("disk-bios-10-0001-04.u10",     0x00000, 0x10000, CRC(f2b50115) SHA1(b329f798ade8d891614e1af78e3d91f5c82af73d))
+
+	ROM_REGION(0x08000, "nvram_data", 0)
+	ROM_LOAD("8k_nvram.u9",     0x00000, 0x02000, CRC(44be0b89) SHA1(81666dd369d1d85269833293136d61ffe80e940a))
+ROM_END
+
+ROM_START(bonanza)
+	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_LOAD("system-bios-sx-10-0004-02.u6", 0x00000, 0x10000, CRC(fa545ba8) SHA1(db64548bd87262cd2e82175a1b66f168b5ae072d) )
+
+	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_LOAD16_BYTE("techyosd-isa-bios-v1.2.u8",     0x00000, 0x04000, BAD_DUMP CRC(1446cc86) SHA1(b51ba8dde59b3cd5bbd92e15903187a9a06d4018) )
+	ROM_CONTINUE(                                    0x00001, 0x04000 ) //FIXED BITS (xxxx0xxx)
+
+	ROM_REGION(0x300000, "game_prg", 0)	/* proper game */
+	ROM_LOAD("10-0018-03-090894.u11", 0x000000,0x80000, BAD_DUMP CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) ) //BLANK!
+	ROM_LOAD("10-0018-03-090894.u12", 0x080000,0x80000, CRC(d7cb191d) SHA1(2047f3668b0e41ad5347107f4e3446c0374c5bb7) )
+	ROM_LOAD("10-0018-03-090894.u13", 0x100000,0x80000, CRC(1d3ddeaa) SHA1(8e73fe535882f6d634668733e550281e727fbdbc) )
+	ROM_LOAD("10-0018-03-090894.u15", 0x180000,0x80000, CRC(b9b3f442) SHA1(6ea5ce3eb007b95ad3350fdb634625b151ae7bdb) )
+	ROM_LOAD("10-0018-03-090894.u16", 0x200000,0x80000, CRC(5b0dd6f5) SHA1(8172118185179ecb7d3f958480186bf9c906785f) )
+	ROM_LOAD("10-0018-03-090894.u17", 0x280000,0x80000, CRC(b637eb58) SHA1(7c4615f58118d9b82575d816ef916fccbb1be0f9) )
+
+	ROM_REGION(0x10000, "disk_bios", 0) //TODO: should be half size
+	ROM_LOAD("disk-bios-10-0001-04.u10",     0x00000, 0x10000, CRC(f2b50115) SHA1(b329f798ade8d891614e1af78e3d91f5c82af73d))
+
+	ROM_REGION(0x08000, "nvram_data", 0)
+	ROM_LOAD("bq4010yma-150.u9",     0x00000, 0x02000, CRC(f4ca28ee) SHA1(17b852028568fb814df62f5870b91a8303302b55))
+ROM_END
+
+ROM_START(bonanzar2)
+	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_LOAD("system-bios-sx-10-0004-02.u6", 0x00000, 0x10000, CRC(fa545ba8) SHA1(db64548bd87262cd2e82175a1b66f168b5ae072d) )
+
+	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_LOAD16_BYTE("techyosd-isa-bios-v1.2.u8",     0x00000, 0x04000, BAD_DUMP CRC(1446cc86) SHA1(b51ba8dde59b3cd5bbd92e15903187a9a06d4018) )
+	ROM_CONTINUE(                                    0x00001, 0x04000 ) //FIXED BITS (xxxx0xxx)
+
+	ROM_REGION(0x300000, "game_prg", 0)	/* proper game */
+	ROM_LOAD("10-0018-02-081794.u11", 0x000000,0x80000, CRC(f87fa935) SHA1(b06144496406231aa63149ae12a048ffab8f77d0) )
+	ROM_LOAD("10-0018-02-081794.u12", 0x080000,0x80000, CRC(bd892e3e) SHA1(1b9174fe2a6eaa7687b543798099b86b9039c049) )
+	ROM_LOAD("10-0018-02-081794.u13", 0x100000,0x80000, CRC(626d999e) SHA1(5c27e3b064b0235c0d6e0be8d8f78538a11647a2) )
+	ROM_LOAD("10-0018-02-081794.u15", 0x180000,0x80000, CRC(3b28f582) SHA1(3da61fbd92e6cc60e00eaa21d8fb04aa78cce663) )
+	ROM_LOAD("10-0018-02-081794.u16", 0x200000,0x80000, CRC(fe29ad76) SHA1(64aaae639f024c50c09fe920bc92e6d45ced5648) )
+	ROM_LOAD("10-0018-02-081794.u17", 0x280000,0x80000, CRC(066108fe) SHA1(ef837422a2a81f5ac3375b6ed68f20143ac6caec) )
+
+	ROM_REGION(0x10000, "disk_bios", 0) //TODO: should be half size
+	ROM_LOAD("disk-bios-10-0001-04.u10",     0x00000, 0x10000, CRC(f2b50115) SHA1(b329f798ade8d891614e1af78e3d91f5c82af73d))
+
+	ROM_REGION(0x08000, "nvram_data", 0)
+	ROM_LOAD("bq4010yma-150.u9",     0x00000, 0x02000, CRC(f4ca28ee) SHA1(17b852028568fb814df62f5870b91a8303302b55))
+ROM_END
+
 ROM_START(streetg2)
 	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
 	ROM_LOAD("10-0004-01_mb-bios.bin", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
@@ -493,7 +673,7 @@ ROM_START(streetg2)
 	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
 	ROM_CONTINUE(                                     0x00001, 0x04000 )
 
-	ROM_REGION32_LE(0x180000, "game_prg", 0)	/* proper game */
+	ROM_REGION(0x180000, "game_prg", 0)	/* proper game */
 	ROM_LOAD("10-0007-07c_083194_rom4.u11", 0x000000,0x80000, CRC(244c2bfa) SHA1(4f2f0fb6923b4e3f1ab4e607e29a27fb15b39fac) )
 	ROM_LOAD("10-0007-07c_083194_rom5.u12", 0x080000,0x80000, CRC(c89d5dca) SHA1(212bcbf7a39243f4524b4a855fbedabd387d17f2) )
 	ROM_LOAD("10-0007-07c_083194_rom6.u13", 0x100000,0x80000, CRC(6264f65f) SHA1(919a8e5d9861dc642ac0f0885faed544bbafa321) )
@@ -501,9 +681,33 @@ ROM_START(streetg2)
 	ROM_REGION(0x08000, "disk_bios", 0)
 	ROM_LOAD("10-0001-03_disk_bios.u10",     0x00000, 0x08000, CRC(d6ba8b37) SHA1(1d1d984bc15fd154fc07dcfa2132bd44636d7bf1))
 
-	ROM_REGION(0x08000, "user2", 0)
+	ROM_REGION(0x08000, "nvram_data", 0)
 	ROM_LOAD("8k_nvram.u9",     0x00000, 0x02000, CRC(44be0b89) SHA1(81666dd369d1d85269833293136d61ffe80e940a))
 ROM_END
 
+ROM_START(streetg2r5)
+	ROM_REGION32_LE(0x10000, "bios", 0)	/* motherboard bios */
+	ROM_LOAD("10-0004-01_mb-bios.bin", 0x00000, 0x10000, CRC(e4d6511f) SHA1(d432743f549fa6ecc04bc5bf94999253f86af08c) )
 
-GAME( 1993, streetg2,  0,		   pcat_nit, pcat_nit, 0, ROT0, "New Image Technologies",  "Street Games II", GAME_NOT_WORKING|GAME_NO_SOUND )
+	ROM_REGION(0x08000, "video_bios", 0)
+	ROM_LOAD16_BYTE("vga1-bios-ver-b-1.00-07.u8",     0x00000, 0x04000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6))
+	ROM_CONTINUE(                                     0x00001, 0x04000 )
+
+	ROM_REGION(0x180000, "game_prg", 0)	/* proper game */
+	ROM_LOAD("10-00007-05-032194.u15", 0x000000,0x80000, CRC(cefa230f) SHA1(91fd30a3def381974fae0edb4d42d452acda19bb) )
+	ROM_LOAD("10-00007-05-032194.u16", 0x080000,0x80000, CRC(0be5dd19) SHA1(d0474ff5156e1fa8b4edb502c49b7e1a2b3f6169) )
+	ROM_LOAD("10-00007-05-032194.u17", 0x100000,0x80000, CRC(f6c996b9) SHA1(871a8d093b856511a0e2b03334ef5c66a2482622) )
+
+	ROM_REGION(0x08000, "disk_bios", 0)
+	ROM_LOAD("10-0001-03_disk_bios.u10",     0x00000, 0x08000, CRC(d6ba8b37) SHA1(1d1d984bc15fd154fc07dcfa2132bd44636d7bf1))
+
+	ROM_REGION(0x08000, "nvram_data", 0)
+	ROM_LOAD("8k_nvram.u9",     0x00000, 0x02000, CRC(44be0b89) SHA1(81666dd369d1d85269833293136d61ffe80e940a))
+ROM_END
+
+GAME( 1993, bonanza,    0,		   pcat_nitB, pcat_nit, 0, ROT0, "New Image Technologies",  "Bonanza (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, bonanzar2,  bonanza,   pcat_nitB, pcat_nit, 0, ROT0, "New Image Technologies",  "Bonanza (Revision 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, streetg,    0,		   pcat_nit,  pcat_nit, 0, ROT0, "New Image Technologies",  "Street Games (Revision 4)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, streetgr3,  streetg,   pcat_nit,  pcat_nit, 0, ROT0, "New Image Technologies",  "Street Games (Revision 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, streetg2,   0,		   pcat_nit,  pcat_nit, 0, ROT0, "New Image Technologies",  "Street Games II (Revision 7C)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, streetg2r5, streetg2,  pcat_nit,  pcat_nit, 0, ROT0, "New Image Technologies",  "Street Games II (Revision 5)", GAME_NOT_WORKING|GAME_NO_SOUND )

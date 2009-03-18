@@ -9183,7 +9183,12 @@ Other Sun games
 	DRIVER( pachifev )	/* (c) 1983? */
 
 	/* New Image Technologies */
-	DRIVER( streetg2 )
+	DRIVER( bonanza )     /* (c) 1993 */
+	DRIVER( bonanzar2 )   /* (c) 1993 */
+	DRIVER( streetg )     /* (c) 1993 */
+	DRIVER( streetgr3 )   /* (c) 1993 */
+	DRIVER( streetg2 )    /* (c) 1993 */
+	DRIVER( streetg2r5 )  /* (c) 1993 */
 
 	/* Igrosoft - SHA1 information is not available for commented out sets, only MD5/CRC32 */
 
