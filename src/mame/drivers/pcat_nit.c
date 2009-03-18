@@ -517,7 +517,7 @@ static MACHINE_START( streetg2 )
 static const gfx_layout CGA_charlayout =
 {
 	8,8,
-    RGN_FRAC(1,1),
+    256,
     1,
     { 0 },
     { 0,1,2,3,4,5,6,7 },
