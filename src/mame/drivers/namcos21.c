@@ -2595,8 +2595,8 @@ GAME( 1993, cybsled,  0,       poly_c140_typeA,   cybsled,      cybsled,  ROT0, 
 GAME( 1993, cybsledj, cybsled, poly_c140_typeA,   cybsled,      cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",            GAME_IMPERFECT_GRAPHICS )
 /* 1992, ShimDrive */
 GAME( 1991, solvalou, 0,       poly_c140_typeA,   s21default,   solvalou, ROT0,    "Namco", "Solvalou (Japan)",              GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, starblad, 0,       poly_c140_typeA,   s21default,   starblad, ROT0,    "Namco", "Starblade",                     GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, winrun91, 0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run 91",                GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, winrun,   0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, starblad, 0,       poly_c140_typeA,   s21default,   starblad, ROT0,    "Namco", "Starblade (Japan)",                     GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, winrun91, 0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run 91 (Japan)",                GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, winrun,   0,       winrun_c140_typeB, winrun,       winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 /* 1988, Winning Run */
-GAME( 1991, driveyes, 0,       driveyes,          winrun,       driveyes, ROT0,    "Namco", "Driver's Eyes",                 GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, driveyes, 0,       driveyes,          winrun,       driveyes, ROT0,    "Namco", "Driver's Eyes (US)",                 GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )

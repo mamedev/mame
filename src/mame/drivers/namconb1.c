@@ -2004,7 +2004,7 @@ GAME( 1994, gslgr94j, gslgr94u, namconb1, nbsports, gslgr94j, ROT0,  "Namco", "G
 GAME( 1995, sws95,    0,        namconb1, nbsports, sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1996, sws96,    0,        namconb1, nbsports, sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1997, sws97,    0,        namconb1, nbsports, sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1994, vshoot,   0,        namconb1, namconb1, vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot", GAME_IMPERFECT_SOUND )
+GAME( 1994, vshoot,   0,        namconb1, namconb1, vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", GAME_IMPERFECT_SOUND )
 
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,   FLAGS */
 GAME( 1994, outfxies, 0,		namconb2, outfxies, outfxies, ROT0, "Namco", "Outfoxies", GAME_IMPERFECT_SOUND )

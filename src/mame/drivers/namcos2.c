@@ -4903,7 +4903,7 @@ GAME( 1991, sgunner2, 0,        sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "
 GAME( 1991, sgunnr2j, sgunner2, sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (Japan)", 0 )
 GAME( 1991, cosmogng, 0,        default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
 GAME( 1991, cosmognj, cosmogng, default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )
-GAME( 1992, bubbletr, 0,        gollygho, bubbletr, bubbletr, ROT180, "Namco", "Bubble Trouble",GAME_NOT_WORKING ) // incomplete dump
+GAME( 1992, bubbletr, 0,        gollygho, bubbletr, bubbletr, ROT180, "Namco", "Bubble Trouble (Japan)",GAME_NOT_WORKING ) // incomplete dump
 GAMEL(1992, finalap3, 0,        finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (World)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS, layout_finallap  )
 GAMEL(1992, finalp3j, finalap3, finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS, layout_finallap  )
 GAME( 1992, luckywld, 0,        luckywld, luckywld, luckywld, ROT0,   "Namco", "Lucky & Wild", 0 )
