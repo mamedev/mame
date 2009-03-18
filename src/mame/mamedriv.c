@@ -9182,6 +9182,9 @@ Other Sun games
 	/* Sanki Denshi Kogyo */
 	DRIVER( pachifev )	/* (c) 1983? */
 
+	/* New Image Technologies */
+	DRIVER( streetg2 )
+
 	/* Igrosoft - SHA1 information is not available for commented out sets, only MD5/CRC32 */
 
 	/* Multifish */

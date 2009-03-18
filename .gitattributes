@@ -1849,6 +1849,7 @@ src/mame/drivers/pasha2.c svneol=native#text/plain
 src/mame/drivers/pass.c svneol=native#text/plain
 src/mame/drivers/pastelg.c svneol=native#text/plain
 src/mame/drivers/pbaction.c svneol=native#text/plain
+src/mame/drivers/pcat_nit.c svneol=native#text/plain
 src/mame/drivers/pcktgal.c svneol=native#text/plain
 src/mame/drivers/pcxt.c svneol=native#text/plain
 src/mame/drivers/pengo.c svneol=native#text/plain
