@@ -2069,7 +2069,7 @@ const game_driver * const drivers[] =
 
 	/* Taito JC System */
 	DRIVER( dangcurv )	/* 1995.?? E09 (c) 1995 Taito Corporation */
-						/* 1995.07 (Japan)
+						/* 1995.07 (Japan) */
 						/* 1995.10 (US) */
 	DRIVER( landgear )	/* 1996.?? E17 (c) 1995 Taito Corporation Japan (World) */
 						/* 1996.03 (Japan) */
