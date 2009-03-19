@@ -287,7 +287,8 @@ static const ay_ym_param ay8910_param =
 
 /*
  * RL = 2000, Based on Matthew Westcott's measurements from Dec 2001.
- *
+ * -------------------------------------------------------------------
+ * 
  * http://groups.google.com/group/comp.sys.sinclair/browse_thread/thread/fb3091da4c4caf26/d5959a800cda0b5e?lnk=gst&q=Matthew+Westcott#d5959a800cda0b5e
  * After what Russell mentioned a couple of weeks back about the lack of
  * publicised measurements of AY chip volumes - I've finally got round to
@@ -316,14 +317,19 @@ static const ay_ym_param ay8910_param =
  * 13     2.06
  * 14     2.32
  * 15     2.58
+ * -------------------------------------------------------------------
+ * 
+ * The ZX spectrum output circuit was modelled in SwitcherCAD and
+ * the resistor values below create the voltage levels above.
+ * RD was measured on a real chip to be 8m Ohm, RU was 0.8m Ohm.
  */
 
 static const ay_ym_param ay8910_param =
 {
-	1030, 357,
+	800000, 8000000,
 	16,
-	{ 81509, 34403, 26998, 21248, 15890, 11495, 8625, 5314,
-	   4287,  2583,  1836,  1350,   978,   745,  530,  392 }
+	{ 15950, 15350, 15090, 14760, 14275, 13620, 12890, 11370,
+      10600,  8590,  7190,  5985,  4820,  3945,  3017,  2345 }
 };
 
 /*************************************
@@ -869,8 +875,10 @@ int ay8910_read_ym(void *chip)
 
 	if (r > 15) return 0;
 
+	/* FIXME: calling stream_update here makes gyruss sound awfull.
+	 *        For the time being, no idea why this is the case */
 	/* update the output buffer before returning the register */
-	stream_update(psg->channel);
+	/* stream_update(psg->channel); */
 
 	switch (r)
 	{
