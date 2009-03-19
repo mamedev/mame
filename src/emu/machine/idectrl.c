@@ -1722,7 +1722,7 @@ READ16_DEVICE_HANDLER( ide_controller16_r )
 {
 	int size;
 
-	offset *= 4;
+	offset *= 2;
 	size = convert_to_offset_and_size16(&offset, mem_mask);
 
 	return ide_controller_r(device, offset, size) << ((offset & 1) * 8);
