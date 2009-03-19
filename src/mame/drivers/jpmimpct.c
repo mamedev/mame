@@ -1059,3 +1059,299 @@ GAME( 1996, trivialp, 0,      jpmimpct, trivialp, 0, ROT0, "JPM", "Trivial Pursu
 GAME( 1997, scrabble, 0,      jpmimpct, scrabble, 0, ROT0, "JPM", "Scrabble (rev. F)",           GAME_SUPPORTS_SAVE )
 GAME( 1998, hngmnjpm, 0,      jpmimpct, hngmnjpm, 0, ROT0, "JPM", "Hangman (JPM)",               GAME_SUPPORTS_SAVE )
 GAME( 1999, coronatn, 0,      jpmimpct, coronatn, 0, ROT0, "JPM", "Coronation Street Quiz Game", GAME_SUPPORTS_SAVE )
+
+/**************************************************************************
+
+    Mechanical IMPACT Games
+        AGEMAME driver
+
+    This is mostly based on old documentation, and needs a proper look.
+***************************************************************************/
+
+#include "video/awpvid.h"
+#include "machine/steppers.h"
+#include "machine/roc10937.h"
+#include "machine/8255ppi.h"
+
+/*************************************
+ *
+ *  Statics
+ *
+ *************************************/
+
+static int optic_pattern;
+static int payen;
+
+/*************************************
+ *
+ *  Initialisation
+ *
+ *************************************/
+
+static READ8_DEVICE_HANDLER( hopper_b_r )
+{
+	//?
+	return 0;
+}
+
+static READ8_DEVICE_HANDLER( hopper_c_r )
+{
+	//?
+	return 0;
+}
+
+static WRITE8_DEVICE_HANDLER( payen_a_w )
+{
+	if ( data )
+	{
+		if ( data & 0x10 )
+		payen = 1;
+		else
+		payen = 0;
+    }
+}
+
+static WRITE8_DEVICE_HANDLER( display_c_w )
+{
+	//?
+}
+
+static const ppi8255_interface ppi8255_intf[1] =
+{
+	{
+		DEVCB_NULL,
+		DEVCB_HANDLER(hopper_b_r),
+		DEVCB_HANDLER(hopper_c_r),
+		DEVCB_HANDLER(payen_a_w),
+		DEVCB_NULL,
+		DEVCB_HANDLER(display_c_w)
+	}
+};
+
+static MACHINE_RESET( impctawp )
+{
+	memset(&duart_1, 0, sizeof(duart_1));
+
+	duart_1_timer = timer_alloc(machine, duart_1_timer_event, NULL);
+
+	/* Reset states */
+	duart_1_irq = 0;
+
+	state_save_register_global(machine, duart_1_irq);
+	state_save_register_global(machine, touch_cnt);
+	state_save_register_global_array(machine, touch_data);
+
+	/* TODO! */
+	state_save_register_global(machine, duart_1.ISR);
+	state_save_register_global(machine, duart_1.IMR);
+	state_save_register_global(machine, duart_1.CT);
+
+	ROC10937_init(0, MSC1937,0);
+	ROC10937_reset(0);	/* reset display1 */
+	stepper_config(machine, 0, &starpoint_interface_48step);
+	stepper_config(machine, 1, &starpoint_interface_48step);
+	stepper_config(machine, 2, &starpoint_interface_48step);
+	stepper_config(machine, 3, &starpoint_interface_48step);
+	stepper_config(machine, 4, &starpoint_interface_48step);
+	stepper_config(machine, 5, &starpoint_interface_48step);
+	stepper_config(machine, 6, &starpoint_interface_48step);
+}
+/*************************************
+ *
+ *  I/O handlers
+ *
+ *************************************/
+
+/*
+ *  0: DIP switches
+ *  1: Percentage key
+ *  2: Lamps + switches (J10)
+ *  3: Lamps + switches (J10)
+ *  4: Lamps + switches (J10)
+ *      ---- ---x   Back door
+ *      ---- --x-   Cash door
+ *      ---- -x--   Refill key
+ *  5: Lamps + switches (J9)
+ *  6: Lamps + switches (J9)
+ *  7: Lamps + switches (J9)
+ *  8: Payslides
+ *  9: Coin mechanism
+ */
+static READ16_HANDLER( optos_r )
+{
+	int i;
+
+	for (i=0; i<6; i++)
+	{
+		if ( stepper_optic_state(i) ) optic_pattern |= (1 << i);
+		else                          optic_pattern &= ~(1 << i);
+	}
+	return optic_pattern;
+}
+
+/*************************************
+ *
+ *  Mysterious stuff
+ *
+ *************************************/
+
+static WRITE16_HANDLER( jpmioawp_w )
+{
+	int i;
+	UINT64 cycles  = cpu_get_total_cycles(space->cpu);
+	switch (offset)
+	{
+		case 0x00:
+		{
+			output_set_value("PWRLED",!(data&0x100));
+			output_set_value("STATLED",!(data&0x200));
+			break;
+		}
+
+
+		case 0x02:
+		{
+			for (i=0; i<4; i++) 
+			{
+				stepper_update(i, (data >> i)& 0x0F );
+			}
+			break;
+		}
+		case 0x04:
+		{
+			for (i=0; i<2; i++) 
+			{
+				stepper_update(i, (data >> (i + 4)& 0x0F ));
+			}
+			break;
+		}
+		case 0x06:
+		{
+			if ( data & 0x10 )
+			{   // PAYEN ?
+				if ( data & 0xf )
+				{
+			//      slide = 1;
+				}
+				else
+				{
+				//  slide = 0;
+				}
+			}
+			else
+//          slide = 0;
+			Mechmtr_update(0, cycles, data >> 10);
+			if ( data )
+			{
+				duart_1.IP &= ~0x10;
+			}
+			else
+			{
+				duart_1.IP |= 0x10;
+			}
+			break;
+		}
+
+		case 0x08:
+		{
+			jpm_draw_lamps(data, lamp_strobe);
+			break;
+		}
+
+		case 0x0b:
+		{
+			output_set_digit_value(lamp_strobe,data);
+			break;
+		}
+		case 0x0f:
+		{
+			if (data & 0x10)
+			{
+				lamp_strobe = (data & 0x0f);
+			}
+			break;
+		}
+	}
+}
+
+static READ16_HANDLER( ump_r )
+{
+	return 0xffff;
+}
+
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
+static ADDRESS_MAP_START( awp68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
+	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
+	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
+	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1_r)
+	AM_RANGE(0x00480034, 0x00480035) AM_READ(ump_r)
+	AM_RANGE(0x00480040, 0x00480041) AM_READ(optos_r)
+	AM_RANGE(0x00480060, 0x00480067) AM_DEVREADWRITE8("ppi8255_0", ppi8255_r, ppi8255_w, 0xff00)
+	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmioawp_w)
+	AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
+	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
+	AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
+	AM_RANGE(0x00480080, 0x00480081) AM_DEVWRITE("upd", upd7759_w)
+	AM_RANGE(0x00480082, 0x00480083) AM_DEVWRITE("upd",volume_w)
+	AM_RANGE(0x00480084, 0x00480085) AM_DEVREAD("upd", upd7759_r)
+//	AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
+//	AM_RANGE(0x00800000, 0x00800007) AM_READWRITE(m68k_tms_r, m68k_tms_w)
+	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
+	AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
+	AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
+	AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
+ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( impctawp )
+	MDRV_CPU_ADD("maincpu",M68000, 8000000)
+	MDRV_CPU_PROGRAM_MAP(awp68k_program_map, 0)
+
+	MDRV_QUANTUM_TIME(HZ(30000))
+
+	MDRV_MACHINE_RESET(impctawp)
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_DEFAULT_LAYOUT(layout_awpvid16)
+MACHINE_DRIVER_END
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
+
+ROM_START( m_tbirds )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "thbi-3_1.bin", 0x000000, 0x020000, CRC(ecbdd85c) SHA1(626306a72d658af6ecfa4b65212cf8aa35630539) )
+	ROM_LOAD16_BYTE( "thbi-3_2.bin", 0x000001, 0x020000, CRC(61e98f71) SHA1(315044637bde8ab862af08bf9825917c87fcc77d) )
+
+	ROM_FILL(						 0x040000, 0x100000, 0xff )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "tbcl-snd.bin", 0x000000, 0x80000, CRC(1cc197be) SHA1(2247aa1a0e6aab7389b3222f373890f54e907361) )
+ROM_END
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 199?, m_tbirds, 0,      impctawp, trivialp, 0, ROT0, "JPM", "Thunderbirds", GAME_NOT_WORKING )

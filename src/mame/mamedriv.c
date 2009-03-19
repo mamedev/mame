@@ -9294,6 +9294,9 @@ Other Sun games
 	/* System85 games */
 	DRIVER( m_supcrd )	/* (c) 198? BFM */
 
+	/* JPM Impact games */
+	DRIVER( m_tbirds )
+	
 	/* Scorpion1 games */
 	DRIVER( m_lotsse )	/* (c) 198? BFM Dutch ROMS, prelim*/
 	DRIVER( m_roulet )	/* (c) 198? BFM Dutch ROMS, prelim*/
