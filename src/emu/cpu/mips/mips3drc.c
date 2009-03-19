@@ -1697,13 +1697,13 @@ static void generate_delay_slot_and_branch(mips3_state *mips3, drcuml_block *blo
 	if (desc->targetpc == BRANCH_TARGET_DYNAMIC)
 		UML_MOV(block, MEM(&mips3->impstate->jmpdest), R32(RSREG));					// mov     [jmpdest],<rsreg>
 
+	/* set the link if needed -- before the delay slot */
+	if (linkreg != 0)
+		UML_DMOV(block, R64(linkreg), IMM((INT32)(desc->pc + 8)));					// dmov    <linkreg>,desc->pc + 8
+
 	/* compile the delay slot using temporary compiler state */
 	assert(desc->delay != NULL);
 	generate_sequence_instruction(mips3, block, &compiler_temp, desc->delay);		// <next instruction>
-
-	/* set the link if needed -- after the delay slot */
-	if (linkreg != 0)
-		UML_DMOV(block, R64(linkreg), IMM((INT32)(desc->pc + 8)));					// dmov    <linkreg>,desc->pc + 8
 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
