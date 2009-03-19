@@ -1676,6 +1676,6 @@ ROM_END
 
 GAME( 1983, mazerbla, 0,        mazerbla,  mazerbla, 0, ROT0, "Stern", "Mazer Blazer (set 1)", GAME_IMPERFECT_GRAPHICS |GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 1983, mzrblzra, mazerbla, mazerbla,  mazerbla, 0, ROT0, "Stern", "Mazer Blazer (set 2)", GAME_IMPERFECT_GRAPHICS |GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1983, greatgun, 0,        greatgun,  greatgun, 0, ROT0, "Stern", "Great Guns", GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, greatgun, 0,        greatgun,  greatgun, 0, ROT0, "Stern", "Great Guns", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 

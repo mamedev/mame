@@ -12,6 +12,8 @@ Notes:
   version;
 
 TODO:
+- 02851: tetriskr: Corrupt game graphics after some time of gameplay, caused by a wrong
+  reading of the i/o $3c8 bit 1.
 - EGA/CGA/VGA emulation uses the bare minimum for these games,there are still a lot of
   features that needs to be added;
 - Filetto: Add a proper FDC device,if you enable it will give a boot error,probably because it
@@ -1069,5 +1071,5 @@ static DRIVER_INIT( tetriskr )
 	}
 }
 
-GAME( 1990, filetto,  0, filetto,  filetto,  filetto,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS)
-GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, tetriskr, ROT0,  "bootleg",    "Tetris  (bootleg of Mirrorsoft PC-XT Tetris version)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS)
+GAME( 1990, filetto,  0, filetto,  filetto,  filetto,  ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, tetriskr, ROT0,  "bootleg",    "Tetris (bootleg of Mirrorsoft PC-XT Tetris version)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
