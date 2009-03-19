@@ -416,7 +416,7 @@ static const discrete_mixer_desc konami_right_mixer_desc =
 		{0,0,0,0,0,0},  /* no node capacitors      */
 		0, 200,
 		CAP_U(0.1),
-		0,
+		CAP_U(1), 		/* DC - Removal, not in schematics */
 		0, 1};
 
 static const discrete_mixer_desc konami_left_mixer_desc =
@@ -426,7 +426,7 @@ static const discrete_mixer_desc konami_left_mixer_desc =
 	{0,0,0,0,0,0},  /* no node capacitors      */
 	0, 200,
 	CAP_U(0.1),
-	0,
+	CAP_U(1), 		/* DC - Removal, not in schematics */
 	0, 1};
 
 static DISCRETE_SOUND_START( gyruss_sound )
@@ -496,8 +496,8 @@ static DISCRETE_SOUND_START( gyruss_sound )
 	/* left channel */
 	DISCRETE_MIXER5(NODE_51, 1, NODE_34, NODE_35, NODE_36, NODE_42, NODE_16, &konami_left_mixer_desc)
 
-	DISCRETE_OUTPUT(NODE_50, 8.0)
-	DISCRETE_OUTPUT(NODE_51, 8.0)
+	DISCRETE_OUTPUT(NODE_50, 11.0)
+	DISCRETE_OUTPUT(NODE_51, 11.0)
 
 DISCRETE_SOUND_END
 
