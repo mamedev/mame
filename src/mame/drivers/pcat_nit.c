@@ -95,6 +95,7 @@ Smitdogg
 #include "machine/idectrl.h"
 
 static UINT32 *vga_vram;
+static UINT8 vga_regs[0x19];
 
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
@@ -148,7 +149,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 					color,
 					0,0,
 					(x+1)*8,y*8,
-					cliprect,((color & 0xf0) != 0) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_NONE,0);
 
 
 			tile =  (vga_vram[offs] & 0x000000ff);
@@ -159,7 +160,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 					color,
 					0,0,
 					(x+0)*8,y*8,
-					cliprect,((color & 0xf0) != 0) ? TRANSPARENCY_NONE : TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_NONE,0);
 
 			offs++;
 		}
@@ -168,6 +169,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 static VIDEO_UPDATE(streetg2)
 {
 	cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_640x200,0x18000/4,0);
+
 	return 0;
 }
 
@@ -336,13 +338,14 @@ const struct pit8253_config at_pit8254_config =
 	}
 };
 
+//ce9b8
 /* TODO: understand the proper ROM loading.*/
 static ADDRESS_MAP_START( pcat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE(&vga_vram)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM
 	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
+	AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM AM_REGION("disk_bios", 0)
 	AM_RANGE(0x000d8000, 0x000dffff) AM_RAM AM_REGION("disk_bios", 0)
 	AM_RANGE(0x000e0000, 0x000effff) AM_ROM AM_REGION("game_prg", 0)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
@@ -357,7 +360,7 @@ static READ32_HANDLER( kludge_r )
 }
 
 /* 3c8-3c9 -> ramdac*/
-static WRITE32_HANDLER( pc_ramdac_w )
+static WRITE32_HANDLER( vga_ramdac_w )
 {
 	static int pal_offs,r,g,b,internal_pal_offs;
 
@@ -390,6 +393,24 @@ static WRITE32_HANDLER( pc_ramdac_w )
 	}
 }
 
+static WRITE32_HANDLER( vga_regs_w )
+{
+	static UINT8 vga_address;
+
+	if (ACCESSING_BITS_0_7)
+		vga_address = data;
+	if (ACCESSING_BITS_8_15)
+	{
+		if(vga_address < 0x19)
+		{
+			vga_regs[vga_address] = data>>8;
+			logerror("VGA reg %02x with data %02x\n",vga_address,vga_regs[vga_address]);
+		}
+		else
+			logerror("Warning: used undefined VGA reg %02x with data %02x\n",vga_address,data>>8);
+	}
+}
+
 static ADDRESS_MAP_START( pcat_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
@@ -403,12 +424,12 @@ static ADDRESS_MAP_START( pcat_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	AM_RANGE(0x03c0, 0x03c3) AM_RAM
 	AM_RANGE(0x03cc, 0x03cf) AM_RAM
-	AM_RANGE(0x03b4, 0x03b7) AM_RAM //vga regs
+	AM_RANGE(0x03b4, 0x03b7) AM_WRITE(vga_regs_w)
 	AM_RANGE(0x03c4, 0x03c7) AM_RAM //vga regs
-	AM_RANGE(0x03c8, 0x03cb) AM_WRITE(pc_ramdac_w)
+	AM_RANGE(0x03c8, 0x03cb) AM_WRITE(vga_ramdac_w)
 	AM_RANGE(0x03b8, 0x03bb) AM_READ(kludge_r) //hv_retrace
 	AM_RANGE(0x03c8, 0x03cb) AM_READ(kludge_r) //hv_retrace
-	AM_RANGE(0x03d4, 0x03d7) AM_RAM
+	AM_RANGE(0x03d4, 0x03d7) AM_WRITE(vga_regs_w)
 	AM_RANGE(0x03d8, 0x03db) AM_RAM
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //parallel port 3
 ADDRESS_MAP_END
