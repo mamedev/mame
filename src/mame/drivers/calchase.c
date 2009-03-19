@@ -100,6 +100,7 @@ all files across to new HDD, boots up fine.
 static void ide_interrupt(const device_config *device, int state);
 
 static UINT32 *bios_ram;
+static UINT32 *vga_vram;
 
 static struct {
 	const device_config	*pit8254;
@@ -117,6 +118,31 @@ static VIDEO_START(calchase)
 
 static VIDEO_UPDATE(calchase)
 {
+	int x,y,count,i;
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+
+	count = (0);
+
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<320;x+=32)
+		{
+			for (i=0;i<32;i++)
+			{
+				UINT32 color;
+
+				color = (vga_vram[count])>>(32-i) & 0x1;
+
+				if((x+i)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, x+(32-i)) = screen->machine->pens[color];
+
+			}
+
+			count++;
+		}
+	}
+
 	return 0;
 }
 
@@ -418,8 +444,8 @@ static WRITE32_HANDLER(bios_ram_w)
 
 static ADDRESS_MAP_START( calchase_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE(&vga_vram)
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK(1)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
@@ -641,7 +667,7 @@ static MACHINE_DRIVER_START( calchase )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 
