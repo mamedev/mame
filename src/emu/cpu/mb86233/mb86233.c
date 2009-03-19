@@ -1618,7 +1618,7 @@ static CPU_SET_INFO( mb86233 )
 
 CPU_GET_INFO( mb86233 )
 {
-	mb86233_state *cpustate = (device != NULL && device != NULL) ? get_safe_token(device) : NULL;
+	mb86233_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
