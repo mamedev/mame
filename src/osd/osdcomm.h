@@ -49,7 +49,7 @@
 #define ATTR_PURE				__attribute__((pure))
 #define ATTR_CONST				__attribute__((const))
 #define ATTR_FORCE_INLINE		__attribute__((always_inline))
-#define ATTR_NONNULL			__attribute__((nonnull(1)))
+#define ATTR_NONNULL(...)		__attribute__((nonnull(__VA_ARGS__)))
 #define UNEXPECTED(exp)			__builtin_expect((exp), 0)
 #define RESTRICT				__restrict__
 #define SETJMP_GNUC_PROTECT()	(void)__builtin_return_address(1)
@@ -64,7 +64,7 @@
 #define ATTR_PURE
 #define ATTR_CONST
 #define ATTR_FORCE_INLINE
-#define ATTR_NONNULL
+#define ATTR_NONNULL(...)
 #define UNEXPECTED(exp)			(exp)
 #define RESTRICT
 #define SETJMP_GNUC_PROTECT()	do {} while (0)

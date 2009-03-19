@@ -402,11 +402,6 @@ ifdef MAP
 LDFLAGSEMULATOR += -Wl,-Map,$(FULLNAME).map
 endif
 
-# any reason why this doesn't work for all cases?
-ifeq ($(TARGETOS),macosx)
-LDFLAGSEMULATOR += -Xlinker -all_load
-endif
-
 
 
 #-------------------------------------------------

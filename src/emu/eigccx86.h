@@ -504,7 +504,7 @@ _count_leading_ones(UINT32 value)
 -------------------------------------------------*/
 
 #define compare_exchange32 _compare_exchange32
-INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
+INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 {
 	register INT32 result;
@@ -531,7 +531,7 @@ _compare_exchange32(INT32 volatile *ptr, INT32 compare, INT32 exchange)
 
 #ifdef __x86_64__
 #define compare_exchange64 _compare_exchange64
-INLINE INT64 ATTR_NONNULL ATTR_FORCE_INLINE
+INLINE INT64 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 {
 	register INT64 result;
@@ -557,7 +557,7 @@ _compare_exchange64(INT64 volatile *ptr, INT64 compare, INT64 exchange)
 -------------------------------------------------*/
 
 #define atomic_exchange32 _atomic_exchange32
-INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
+INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 {
 	register INT32 result;
@@ -580,7 +580,7 @@ _atomic_exchange32(INT32 volatile *ptr, INT32 exchange)
 -------------------------------------------------*/
 
 #define atomic_add32 _atomic_add32
-INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
+INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _atomic_add32(INT32 volatile *ptr, INT32 delta)
 {
 	register INT32 result = delta;
@@ -604,7 +604,7 @@ _atomic_add32(INT32 volatile *ptr, INT32 delta)
 -------------------------------------------------*/
 
 #define atomic_increment32 _atomic_increment32
-INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
+INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _atomic_increment32(INT32 volatile *ptr)
 {
 	register INT32 result = 1;
@@ -628,7 +628,7 @@ _atomic_increment32(INT32 volatile *ptr)
 -------------------------------------------------*/
 
 #define atomic_decrement32 _atomic_decrement32
-INLINE INT32 ATTR_NONNULL ATTR_FORCE_INLINE
+INLINE INT32 ATTR_NONNULL(1) ATTR_FORCE_INLINE
 _atomic_decrement32(INT32 volatile *ptr)
 {
 	register INT32 result = -1;
