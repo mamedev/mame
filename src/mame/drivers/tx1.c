@@ -756,7 +756,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( buggyboy )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_main, 0)
-//	MDRV_WATCHDOG_TIME_INIT(5)
+//  MDRV_WATCHDOG_TIME_INIT(5)
 
 	MDRV_CPU_ADD("math_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_math, 0)
@@ -1137,10 +1137,10 @@ ROM_START( buggyboy )
 ROM_END
 
 /*
-	The game is comprised of three boards:
-	- Sound Board (labeled TC043-1, top small board)
-	- CPU Board (labeled TC041, middle board, uses 15.000 MHz xtal)
-	- Video Board (labeled TC042, bottom board, uses 18.000 MHz xtal)
+    The game is comprised of three boards:
+    - Sound Board (labeled TC043-1, top small board)
+    - CPU Board (labeled TC041, middle board, uses 15.000 MHz xtal)
+    - Video Board (labeled TC042, bottom board, uses 18.000 MHz xtal)
 */
 ROM_START( buggybjr )
 	ROM_REGION( 0x100000, "main_cpu", 0 )

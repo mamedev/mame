@@ -5,12 +5,12 @@
 
     driver by Angelo Salese and Pierpaolo Prazzoli
     dump and info provided by Yoshi
-	
-	To initialize the eeprom, keep Service button pressed at boot.
-	
-	Notes:
+
+    To initialize the eeprom, keep Service button pressed at boot.
+
+    Notes:
     - Text tilemap flickering could be a bit slower / faster
-	- Brightness effect could be a bit darker / lighter
+    - Brightness effect could be a bit darker / lighter
 
 *****************************************************************************************/
 
@@ -40,9 +40,9 @@ static TILE_GET_INFO( get_txt_tile_info )
 	tileno = txt_videoram[tile_index] & 0x0fff;
 	colour = txt_videoram[tile_index] & 0xf000;
 	colour = colour >> 12;
-	
+
 	SET_TILE_INFO(0,tileno,colour,0);
-	
+
 	tileinfo->category = (colour & 8) ? 1 : 0;
 }
 

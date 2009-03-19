@@ -1962,7 +1962,7 @@ static WRITE16_HANDLER( olds_w16 )
 						UINT16 cmd0 = olds_sharedprotram[0x3082/2];
 						UINT16 val0 = olds_sharedprotram[0x3050/2];	//CMD_FORMAT
 						{
-							if((cmd0&0xff)==0x2) 
+							if((cmd0&0xff)==0x2)
 								olds_write_reg(val0,olds_read_reg(val0)+0x10000);
 						}
 						break;
@@ -3402,7 +3402,7 @@ ROM_START( kov2p205 )
 	/* not correct for this set, needs dumping from internal rom */
 	//ROM_LOAD( "kov2p.asic", 0x000000, 0x04000, BAD_DUMP CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) ) // NOT for this version, works with a hack
 	ROM_LOAD( "kov2p205.asic", 0x000000, 0x04000, NO_DUMP )
-	
+
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200-16.rom", 0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )

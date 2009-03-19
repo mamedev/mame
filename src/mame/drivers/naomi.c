@@ -3191,20 +3191,20 @@ ROM_END
 
 /*
 
-Title	VIRTUA TENNIS 2 (POWER SMASH 2)
-Media ID	D72C
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDS-0015A
-Version	V2.000
-Release Date	20010827
+Title   VIRTUA TENNIS 2 (POWER SMASH 2)
+Media ID    D72C
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0015A
+Version V2.000
+Release Date    20010827
 Manufacturer ID
-TOC	DISC
-Track	Start Sector	End Sector	Track Size
-track01.bin	150	449	705600
-track02.raw	600	2732	5016816
-track03.bin	45150	549299	1185760800
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 2732    5016816
+track03.bin 45150   549299  1185760800
 
 
 PIC
@@ -3226,19 +3226,19 @@ ROM_START( vtennis2 )
 ROM_END
 
 /*
-Title	MONKEY_BALL
-Media ID	43EB
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDS-0008
-Version	V1.008
-Release Date	20010425
+Title   MONKEY_BALL
+Media ID    43EB
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0008
+Version V1.008
+Release Date    20010425
 Manufacturer ID
-Track	Start Sector	End Sector	Track Size
-track01.bin	150	449	705600
-track02.raw	600	2732	5016816
-track03.bin	45150	549299	1185760800
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 2732    5016816
+track03.bin 45150   549299  1185760800
 
 
 PIC
@@ -3274,20 +3274,20 @@ ROM_START( luptype )
 ROM_END
 
 /*
-Title	THE_MAZE_OF_THE_KINGS
-Media ID	E3D0
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDS-0022
-Version	V1.001
-Release Date	20020306
+Title   THE_MAZE_OF_THE_KINGS
+Media ID    E3D0
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0022
+Version V1.001
+Release Date    20020306
 Manufacturer ID
-TOC	DISC
-Track	Start Sector	End Sector	Track Size
-track01.bin	150	449	705600
-track02.raw	600	2732	5016816
-track03.bin	45150	549299	1185760800
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 2732    5016816
+track03.bin 45150   549299  1185760800
 
 
 PIC
@@ -3320,20 +3320,20 @@ ROM_START( lupinsho )
 ROM_END
 
 /*
-Title	CONFIDENTIAL MISSION
-Media ID	FFCA
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDS-0001
-Version	V1.050
-Release Date	20001011
-Manufacturer ID	SEGA ENTERPRISES
-TOC	DISC
-Track	Start Sector	End Sector	Track Size
-track01.bin	150	3788	8558928
-track02.raw	3939	6071	5016816
-track03.bin	45150	549299	1185760800
+Title   CONFIDENTIAL MISSION
+Media ID    FFCA
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0001
+Version V1.050
+Release Date    20001011
+Manufacturer ID SEGA ENTERPRISES
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 3788    8558928
+track02.raw 3939    6071    5016816
+track03.bin 45150   549299  1185760800
 
 
 PIC
@@ -3372,8 +3372,8 @@ static READ64_HANDLER( naomigd_bios_idle_skip_r )
 	if (cpu_get_pc(space->cpu)==0xc04173c)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
 		//cpu_spinuntil_int(space->cpu);
-//	else
-//		printf("%08x\n", cpu_get_pc(space->cpu));
+//  else
+//      printf("%08x\n", cpu_get_pc(space->cpu));
 
 	return naomi_ram64[0x2ad238/8];
 }
@@ -3416,8 +3416,8 @@ static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 	if (cpu_get_pc(space->cpu)==0xc0b84bc) // or 0xc0bab0c
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
 
-	//printf("%08x\n", cpu_get_pc(space->cpu));	
-		
+	//printf("%08x\n", cpu_get_pc(space->cpu));
+
 	return naomi_ram64[0x18d6c8/8];
 }
 
@@ -3579,20 +3579,20 @@ ROM_END
 
 /*
 
-Title	BEACH SPIKERS
-Media ID	0897
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDS-0014
-Version	V1.001
-Release Date	20010613
+Title   BEACH SPIKERS
+Media ID    0897
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDS-0014
+Version V1.001
+Release Date    20010613
 Manufacturer ID
-TOC	DISC
-Track	Start Sector	End Sector	Track Size
-track01.bin	150	449	705600
-track02.raw	600	2746	5049744
-track03.bin	45150	549299	1185760800
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 2746    5049744
+track03.bin 45150   549299  1185760800
 
 PIC
 
@@ -3603,7 +3603,7 @@ PIC
 
 ROM_START( beachspi )
 	NAOMI2_BIOS
-//	NAOMIGD_BIOS
+//  NAOMIGD_BIOS
 
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -3618,7 +3618,7 @@ ROM_END
 
 ROM_START( initd )
 	NAOMI2_BIOS
-//	NAOMIGD_BIOS
+//  NAOMIGD_BIOS
 
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -3633,7 +3633,7 @@ ROM_END
 
 ROM_START( initdexp )
 	NAOMI2_BIOS
-//	NAOMIGD_BIOS
+//  NAOMIGD_BIOS
 
 	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -3684,20 +3684,20 @@ ROM_END
 
 /*
 
-Title	VIRTUA STRIKER 4
-Media ID	93B2
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDT-0015
-Version	V1.001
-Release Date	20041202
+Title   VIRTUA STRIKER 4
+Media ID    93B2
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0015
+Version V1.001
+Release Date    20041202
 Manufacturer ID
-TOC	DISC
-Track	Start Sector	End Sector	Track Size
-track01.bin	150	449	705600
-track02.raw	600	1951	3179904
-track03.bin	45150	549299	1185760800
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 1951    3179904
+track03.bin 45150   549299  1185760800
 
 
 PIC
@@ -3720,14 +3720,14 @@ ROM_START( vs4 )
 ROM_END
 
 /*
-Title	VIRTUA_STRIKER_2002
-Media ID	0DD8
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDT-0002
-Version	V1.005
-Release Date	20020730
+Title   VIRTUA_STRIKER_2002
+Media ID    0DD8
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0002
+Version V1.005
+Release Date    20020730
 
 
 PIC
@@ -3773,14 +3773,14 @@ ROM_END
 
 /*
 
-Title	GHOST SQUAD
-Media ID	004F
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDX-0012A
-Version	V2.000
-Release Date	20041209
+Title   GHOST SQUAD
+Media ID    004F
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDX-0012A
+Version V2.000
+Release Date    20041209
 Manufacturer ID
 
 PIC
@@ -3803,20 +3803,20 @@ ROM_END
 
 /*
 
-Title	VIRTUA COP 3
-Media ID	C4AD
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDX-0003A
-Version	V2.004
-Release Date	20030226
+Title   VIRTUA COP 3
+Media ID    C4AD
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDX-0003A
+Version V2.004
+Release Date    20030226
 Manufacturer ID
-TOC	DISC
-Track	Start Sector	End Sector	Track Size
-track01.bin	150	599	1058400
-track02.raw	750	2101	3179904
-track03.bin	45150	549299	1185760800
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 599 1058400
+track02.raw 750 2101    3179904
+track03.bin 45150   549299  1185760800
 
 
 PIC

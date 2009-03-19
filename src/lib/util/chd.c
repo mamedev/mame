@@ -1305,7 +1305,7 @@ chd_error chd_clone_metadata(chd_file *source, chd_file *dest)
 				err = CHDERR_NONE;
 			break;
 		}
-		
+
 		/* if that fit, just write it back from the temporary buffer */
 		if (metasize <= sizeof(metabuffer))
 		{
@@ -2513,14 +2513,14 @@ static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT
 	UINT32 hashindex = 0;
 	UINT32 hashalloc = 0;
 	UINT64 offset, next;
-	
+
 	/* only works for V4 and above */
 	if (chd->header.version < 4)
 	{
 		memcpy(finalsha1, rawsha1, SHA1_DIGEST_SIZE);
 		return CHDERR_NONE;
 	}
-	
+
 	/* loop until we run out of data */
 	for (offset = chd->header.metaoffset; offset != 0; offset = next)
 	{
@@ -2528,7 +2528,7 @@ static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT
 		UINT32 count, metalength, metatag;
 		UINT8 *tempbuffer;
 		UINT8 metaflags;
-		
+
 		/* read the raw header */
 		core_fseek(chd->file, offset, SEEK_SET);
 		count = core_fread(chd->file, raw_meta_header, sizeof(raw_meta_header));
@@ -2543,11 +2543,11 @@ static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT
 		/* flags are encoded in the high byte of length */
 		metaflags = metalength >> 24;
 		metalength &= 0x00ffffff;
-		
+
 		/* if not checksumming, continue */
 		if (!(metaflags & CHD_MDFLAGS_CHECKSUM))
 			continue;
-		
+
 		/* allocate memory */
 		tempbuffer = (UINT8 *)malloc(metalength);
 		if (tempbuffer == NULL)
@@ -2565,13 +2565,13 @@ static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT
 			err = CHDERR_READ_ERROR;
 			goto cleanup;
 		}
-		
+
 		/* compute this entry's hash */
 		sha1_init(&sha1);
 		sha1_update(&sha1, metalength, tempbuffer);
 		sha1_final(&sha1);
 		free(tempbuffer);
-		
+
 		/* expand the hasharray if necessary */
 		if (hashindex >= hashalloc)
 		{
@@ -2583,16 +2583,16 @@ static chd_error metadata_compute_hash(chd_file *chd, const UINT8 *rawsha1, UINT
 				goto cleanup;
 			}
 		}
-		
+
 		/* fill in the entry */
 		put_bigendian_uint32(hasharray[hashindex].tag, metatag);
 		sha1_digest(&sha1, SHA1_DIGEST_SIZE, hasharray[hashindex].sha1);
 		hashindex++;
 	}
-	
+
 	/* sort the array */
 	qsort(hasharray, hashindex, sizeof(hasharray[0]), metadata_hash_compare);
-	
+
 	/* compute the SHA1 of the raw plus the various metadata */
 	sha1_init(&sha1);
 	sha1_update(&sha1, CHD_SHA1_BYTES, rawsha1);

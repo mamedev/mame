@@ -1343,8 +1343,8 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
 
 /* R49 has 4.7k in schematics, but listed as 47k in bill of material
  * 47k gives proper low pass filtering
- * 
- * Anoid measured R49 to R52 on a Burger Time pcb. These are 
+ *
+ * Anoid measured R49 to R52 on a Burger Time pcb. These are
  * listed below
  */
 #define BTIME_R49	RES_K(47)	/* pcb: 47.4k */

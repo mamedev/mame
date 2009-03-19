@@ -148,12 +148,12 @@ static unsigned char rf5c296_reg = 0;
 
 static void rf5c296_reg_w(ATTR_UNUSED running_machine *machine, UINT8 reg, UINT8 data)
 {
-	//	fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, cpuexec_describe_context(machine));
+	//  fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, cpuexec_describe_context(machine));
 }
 
 static UINT8 rf5c296_reg_r(ATTR_UNUSED running_machine *machine, UINT8 reg)
 {
-	//	fprintf(stderr, "rf5c296_reg_r %02x (%s)\n", reg, cpuexec_describe_context(machine));
+	//  fprintf(stderr, "rf5c296_reg_r %02x (%s)\n", reg, cpuexec_describe_context(machine));
 	return 0x00;
 }
 

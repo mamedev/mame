@@ -314,9 +314,9 @@ INPUT_PORTS_END
   -- some may be missing, there have been multiple CRCs reported for the same
      revision in some cases
 
- The 'japan-hotel' BIOS is a dump of an MVS which could be found in some japanese 
- hotels. it is a custom MVS mobo which uses MVS carts but it hasn't jamma 
- connector and it's similar to a console with a coin mechanism, so it's a sort 
+ The 'japan-hotel' BIOS is a dump of an MVS which could be found in some japanese
+ hotels. it is a custom MVS mobo which uses MVS carts but it hasn't jamma
+ connector and it's similar to a console with a coin mechanism, so it's a sort
  of little coin op console installed in hotels.
 
  ****/

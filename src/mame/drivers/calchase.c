@@ -12,18 +12,18 @@ unneeded for now...)
 - clean-ups;
 
 I/O Memo (http://bochs.sourceforge.net/techspec/PORTS.LST):
-46E8	----	8514/A and compatible video cards (e.g. ATI Graphics Ultra)
-46E8	w	ROM page select
-83C0-83CF ----	Compaq QVision - Line Draw Engine
-83C4	  ----	Compaq Qvision EISA - Virtual Controller Select
-83C6-83C9 ----	Compaq Qvision EISA - DAC color registers
+46E8    ----    8514/A and compatible video cards (e.g. ATI Graphics Ultra)
+46E8    w   ROM page select
+83C0-83CF ----  Compaq QVision - Line Draw Engine
+83C4      ----  Compaq Qvision EISA - Virtual Controller Select
+83C6-83C9 ----  Compaq Qvision EISA - DAC color registers
 
 43c4 is a 83c4 mirror?
 
 04D0-04D1 ---- EISA IRQ control
-00F0-00F5 ----	PCjr Disk Controller
+00F0-00F5 ----  PCjr Disk Controller
 (or)
-00F0-00FF ----	coprocessor (8087..80387)
+00F0-00FF ----  coprocessor (8087..80387)
 
 =====================================================================================
 

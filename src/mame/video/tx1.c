@@ -1523,9 +1523,9 @@ void buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld, UINT32
 	else
 	{
 		/*
-			TODO: When ROM is not enabled, data = 0xff
-			But does anybody care?
-		*/
+            TODO: When ROM is not enabled, data = 0xff
+            But does anybody care?
+        */
 		*rc0 = *rc1 = *rc2 = *rc3 = 0;
 	}
 
@@ -1832,11 +1832,11 @@ static void buggyboy_draw_road(running_machine *machine, UINT8 *bitmap)
 			px3[2] = BIT(rc3[2], pix);
 
 			/*
-				Now evaluate the pixel logic for each of the three screens
+                Now evaluate the pixel logic for each of the three screens
 
-				TODO: A lot of this could be macrofied to avoid repetition.
-				Shuffling the equations around would squeeze out some extra speed.
-			*/
+                TODO: A lot of this could be macrofied to avoid repetition.
+                Shuffling the equations around would squeeze out some extra speed.
+            */
 
 			/* Left */
 			ic96_o14 =
@@ -1943,7 +1943,7 @@ static void buggyboy_draw_road(running_machine *machine, UINT8 *bitmap)
 			ic79_o17 = (!px2[0] && _rorevls && ic78_o15) || (tnlf && !ic97_o19) || (tnlf && ic79_p19 && px2[0] && ic78_o15);
 			ic79_o16 = (!px2[1] && _rorevcs && ic80_o15) || (tnlf && !ic97_o18) || (tnlf && ic79_p19 && px2[1] && ic80_o15);
 			ic79_o15 = (!px2[2] && _rorevrs && ic82_o15) || (tnlf && !ic97_o17) || (tnlf && ic79_p19 && px2[2] && ic82_o15);
-	
+
 
 			/* Left */
 			{
@@ -2020,7 +2020,7 @@ static void buggyboy_draw_road(running_machine *machine, UINT8 *bitmap)
 			if (ic50_o19)
 			{
 				if (ic80_o14)
-					ic50_o12 = 
+					ic50_o12 =
 					(px2[1] && px1[1] && px0[1] && rm1 && !rm0)
 					|| (!px2[1] && px1[1] && px0[1] && !P8 && rm0)
 					|| (px2[1] && px0[1] && !P7 && !rm1 && !rm0)
@@ -2747,11 +2747,11 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 						UINT32	low_addr = ((x_acc >> (FRAC + 3)) & x_mask);
 
 						/*
-							Objects are grouped by width (either 16, 8 or 4 tiles) in
-							the LUT ROMs. The ROM address lines therefore indicate
-							width and are used to determine the correct scan order
-							when x-flip is set.
-						*/
+                            Objects are grouped by width (either 16, 8 or 4 tiles) in
+                            the LUT ROMs. The ROM address lines therefore indicate
+                            width and are used to determine the correct scan order
+                            when x-flip is set.
+                        */
 						if (gxflip)
 						{
 							UINT32	xor_mask;

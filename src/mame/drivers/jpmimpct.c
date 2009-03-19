@@ -1211,7 +1211,7 @@ static WRITE16_HANDLER( jpmioawp_w )
 
 		case 0x02:
 		{
-			for (i=0; i<4; i++) 
+			for (i=0; i<4; i++)
 			{
 				stepper_update(i, (data >> i)& 0x0F );
 			}
@@ -1219,7 +1219,7 @@ static WRITE16_HANDLER( jpmioawp_w )
 		}
 		case 0x04:
 		{
-			for (i=0; i<2; i++) 
+			for (i=0; i<2; i++)
 			{
 				stepper_update(i, (data >> (i + 4)& 0x0F ));
 			}
@@ -1300,8 +1300,8 @@ static ADDRESS_MAP_START( awp68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00480080, 0x00480081) AM_DEVWRITE("upd", upd7759_w)
 	AM_RANGE(0x00480082, 0x00480083) AM_DEVWRITE("upd",volume_w)
 	AM_RANGE(0x00480084, 0x00480085) AM_DEVREAD("upd", upd7759_r)
-//	AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
-//	AM_RANGE(0x00800000, 0x00800007) AM_READWRITE(m68k_tms_r, m68k_tms_w)
+//  AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
+//  AM_RANGE(0x00800000, 0x00800007) AM_READWRITE(m68k_tms_r, m68k_tms_w)
 	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
 	AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
 	AM_RANGE(0x00e00000, 0x00efffff) AM_ROM

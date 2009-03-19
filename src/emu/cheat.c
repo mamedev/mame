@@ -53,23 +53,23 @@
 
 **********************************************************************
 
-	Cheats are generally broken down into categories based on
-	which actions are defined and whether or not there is a 
-	parameter present:
-	
-	---- Actions -----
-	On   Off  Run  Chg  Param?  Type
-	===  ===  ===  ===  ======  =================================
-	 N    N    N    ?    None   Text-only (displays text in menu)
-	 Y    N    N    ?    None   Oneshot (select to activate)
-	 Y    Y    N    ?    None   On/Off (select to toggle)
-	 ?    ?    Y    ?    None   On/Off (select to toggle)
+    Cheats are generally broken down into categories based on
+    which actions are defined and whether or not there is a
+    parameter present:
 
-	 ?    N    N    Y    Any    Oneshot parameter (select to alter)
-	 ?    Y    ?    ?    Value  Value parameter (off or a live value)
-	 ?    ?    Y    ?    Value  Value parameter (off or a live value)
-	 ?    Y    ?    ?    List   Item list parameter (off or a live value)
-	 ?    ?    Y    ?    List   Item list parameter (off or a live value)
+    ---- Actions -----
+    On   Off  Run  Chg  Param?  Type
+    ===  ===  ===  ===  ======  =================================
+     N    N    N    ?    None   Text-only (displays text in menu)
+     Y    N    N    ?    None   Oneshot (select to activate)
+     Y    Y    N    ?    None   On/Off (select to toggle)
+     ?    ?    Y    ?    None   On/Off (select to toggle)
+
+     ?    N    N    Y    Any    Oneshot parameter (select to alter)
+     ?    Y    ?    ?    Value  Value parameter (off or a live value)
+     ?    ?    Y    ?    Value  Value parameter (off or a live value)
+     ?    Y    ?    ?    List   Item list parameter (off or a live value)
+     ?    ?    Y    ?    List   Item list parameter (off or a live value)
 
 *********************************************************************/
 
@@ -245,9 +245,9 @@ static UINT64 execute_tobcd(void *globalref, void *ref, UINT32 params, const UIN
 
 INLINE int is_text_only_cheat(const cheat_entry *cheat)
 {
-	return (cheat->parameter == NULL && 
-			cheat->script[SCRIPT_STATE_RUN] == NULL && 
-			cheat->script[SCRIPT_STATE_OFF] == NULL && 
+	return (cheat->parameter == NULL &&
+			cheat->script[SCRIPT_STATE_RUN] == NULL &&
+			cheat->script[SCRIPT_STATE_OFF] == NULL &&
 			cheat->script[SCRIPT_STATE_ON] == NULL);
 }
 
@@ -260,8 +260,8 @@ INLINE int is_text_only_cheat(const cheat_entry *cheat)
 
 INLINE int is_oneshot_cheat(const cheat_entry *cheat)
 {
-	return (cheat->parameter == NULL && 
-			cheat->script[SCRIPT_STATE_RUN] == NULL && 
+	return (cheat->parameter == NULL &&
+			cheat->script[SCRIPT_STATE_RUN] == NULL &&
 			cheat->script[SCRIPT_STATE_OFF] == NULL &&
 			cheat->script[SCRIPT_STATE_ON] != NULL);
 }
@@ -275,7 +275,7 @@ INLINE int is_oneshot_cheat(const cheat_entry *cheat)
 
 INLINE int is_onoff_cheat(const cheat_entry *cheat)
 {
-	return (cheat->parameter == NULL && 
+	return (cheat->parameter == NULL &&
 			(cheat->script[SCRIPT_STATE_RUN] != NULL ||
 			 (cheat->script[SCRIPT_STATE_OFF] != NULL &&
 			  cheat->script[SCRIPT_STATE_ON] != NULL)));
@@ -283,7 +283,7 @@ INLINE int is_onoff_cheat(const cheat_entry *cheat)
 
 
 /*-------------------------------------------------
-    is_value_parameter_cheat - return TRUE if this 
+    is_value_parameter_cheat - return TRUE if this
     cheat entry has a parameter represented by an
     integer value
 -------------------------------------------------*/
@@ -295,7 +295,7 @@ INLINE int is_value_parameter_cheat(const cheat_entry *cheat)
 
 
 /*-------------------------------------------------
-    is_itemlist_parameter_cheat - return TRUE if 
+    is_itemlist_parameter_cheat - return TRUE if
     this cheat entry has a parameter represented
     by an item list
 -------------------------------------------------*/
@@ -307,17 +307,17 @@ INLINE int is_itemlist_parameter_cheat(const cheat_entry *cheat)
 
 
 /*-------------------------------------------------
-    is_oneshot_parameter_cheat - return TRUE if 
-    this cheat entry is a one-shot cheat with a 
-    parameter (no "run" or "off" actions, but a 
+    is_oneshot_parameter_cheat - return TRUE if
+    this cheat entry is a one-shot cheat with a
+    parameter (no "run" or "off" actions, but a
     valid "change" action)
 -------------------------------------------------*/
 
 INLINE int is_oneshot_parameter_cheat(const cheat_entry *cheat)
 {
-	return (cheat->parameter != NULL && 
-			cheat->script[SCRIPT_STATE_RUN] == NULL && 
-			cheat->script[SCRIPT_STATE_OFF] == NULL && 
+	return (cheat->parameter != NULL &&
+			cheat->script[SCRIPT_STATE_RUN] == NULL &&
+			cheat->script[SCRIPT_STATE_OFF] == NULL &&
 			cheat->script[SCRIPT_STATE_CHANGE] != NULL);
 }
 
@@ -652,7 +652,7 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 				cheat->parameter->value = cheat->parameter->minval;
 			else
 				cheat->parameter->value -= cheat->parameter->stepval;
-			if (!is_oneshot_parameter_cheat(cheat))	
+			if (!is_oneshot_parameter_cheat(cheat))
 				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
@@ -680,7 +680,7 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 				cheat->state = SCRIPT_STATE_RUN;
 			}
 			cheat->parameter->value = prev->value;
-			if (!is_oneshot_parameter_cheat(cheat))	
+			if (!is_oneshot_parameter_cheat(cheat))
 				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
@@ -729,7 +729,7 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
 			cheat->state = SCRIPT_STATE_RUN;
 			cheat->parameter->value = cheat->parameter->minval;
-			if (!is_oneshot_parameter_cheat(cheat))	
+			if (!is_oneshot_parameter_cheat(cheat))
 				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
@@ -739,7 +739,7 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 				cheat->parameter->value = cheat->parameter->maxval;
 			else
 				cheat->parameter->value += cheat->parameter->stepval;
-			if (!is_oneshot_parameter_cheat(cheat))	
+			if (!is_oneshot_parameter_cheat(cheat))
 				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
@@ -755,7 +755,7 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
 			cheat->state = SCRIPT_STATE_RUN;
 			cheat->parameter->value = cheat->parameter->itemlist->value;
-			if (!is_oneshot_parameter_cheat(cheat))	
+			if (!is_oneshot_parameter_cheat(cheat))
 				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
@@ -767,7 +767,7 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 			if (item->next != NULL)
 			{
 				cheat->parameter->value = item->next->value;
-				if (!is_oneshot_parameter_cheat(cheat))	
+				if (!is_oneshot_parameter_cheat(cheat))
 					cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 				changed = TRUE;
 			}

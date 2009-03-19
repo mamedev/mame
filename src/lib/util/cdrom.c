@@ -527,7 +527,7 @@ static chd_error read_sector_into_cache(cdrom_file *file, UINT32 lbasector, UINT
 
 
 /*-------------------------------------------------
-    cdrom_parse_metadata - parse metadata into the 
+    cdrom_parse_metadata - parse metadata into the
     TOC structure
 -------------------------------------------------*/
 
@@ -628,7 +628,7 @@ chd_error cdrom_write_metadata(chd_file *chd, const cdrom_toc *toc)
 {
 	chd_error err;
 	int i;
-	
+
 	/* write the metadata */
 	for (i = 0; i < toc->numtrks; i++)
 	{

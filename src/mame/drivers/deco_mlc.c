@@ -404,7 +404,7 @@ static NVRAM_HANDLER( mlc )
 		else
 		{
 			UINT8* defaultram = memory_region(machine, "defaults");
-				
+
 			if (defaultram)
 				eeprom_set_data(defaultram, memory_region_length(machine, "defaults"));
 		}
@@ -696,7 +696,7 @@ ROM_START( skullfnj )
 	ROM_REGION( 0x800000, "ymz", ROMREGION_ERASE00 )
 	ROM_LOAD( "mch-06.6a",  0x200000, 0x200000, CRC(b2efe4ae) SHA1(5a9dab74c2ba73a65e8f1419b897467804734fa2) )
 	ROM_LOAD( "mch-07.11j", 0x400000, 0x200000, CRC(bc1a50a1) SHA1(3de191fbc92d2ae84e54263f1c70afec6ff7cc3c) )
-	
+
 	ROM_REGION( 0x80, "defaults", ROMREGION_ERASE00 )
 	ROM_LOAD_OPTIONAL( "skullfng.eeprom",  0x00, 0x80, CRC(240d882e) SHA1(3c1a15ccac91d95b02a8c54b051aa64ff28ce2ab) )
 ROM_END

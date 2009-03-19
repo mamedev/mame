@@ -245,8 +245,8 @@ static void kick_sn74s516(running_machine *machine, UINT16 *data, const int ins)
 #define CLEAR_SEQUENCE	(SN74S516.code = 0)
 
 	/*
-		Remember to change the Z/W flag.
-	*/
+        Remember to change the Z/W flag.
+    */
 	switch (SN74S516.state)
 	{
 		case 0:
@@ -462,11 +462,11 @@ static void tx1_update_state(running_machine *machine)
 		if (!GO_EN(math.inslatch) && GO_EN(prom[math.promaddr]))
 			go = 1;
 		/*
-			Example:
-			120 /GO /LHIEN
-			121 /GO        /LLOEN
-			Both 120 and 121 are used.
-		*/
+            Example:
+            120 /GO /LHIEN
+            121 /GO        /LLOEN
+            Both 120 and 121 are used.
+        */
 		else if ((GO_EN(math.inslatch) && GO_EN(prom[math.promaddr])) && (LHIEN(math.inslatch) && LLOEN(prom[math.promaddr])))
 			go = 1;
 
@@ -523,15 +523,15 @@ static void tx1_update_state(running_machine *machine)
 				kick_sn74s516(machine, &data, ins);
 			}
 			/*
-				TODO: Changed ppshift to muxlatch for TX-1
+                TODO: Changed ppshift to muxlatch for TX-1
 
-				/TMPLD1: /LHIEN
-				/TMPLD2: /LLOEN.!O4 + (/LHIEN.O4)
-				/TMPLD3: /LLOEN
-					 O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
-						 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
-						 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
-			*/
+                /TMPLD1: /LHIEN
+                /TMPLD2: /LLOEN.!O4 + (/LHIEN.O4)
+                /TMPLD3: /LLOEN
+                     O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+                         !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+                         /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+            */
 			else if (LHIEN(math.inslatch) || LLOEN(math.inslatch))
 			{
 				UINT16 data;
@@ -561,13 +561,13 @@ static void tx1_update_state(running_machine *machine)
 				else
 				{
 					/*
-						/TMPLD1: /LHIEN
-						/TMPLD2: /LLOEN.!O4 + /LHIEN.O4
-						/TMPLD3: /LLOEN
-						 O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
-							 !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
-							 /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
-					*/
+                        /TMPLD1: /LHIEN
+                        /TMPLD2: /LLOEN.!O4 + /LHIEN.O4
+                        /TMPLD3: /LLOEN
+                         O4: !SD9.!SD10./LMSEL + SD7.SD10./LMSEL +
+                             !SD8.SD9./LMSEL + !SD7.SD8./LMSEL +
+                             /LMSEL./DSEL1 + /LMSEL.TFAD13 + /LMSEL.TFAD12 + /LMSEL.TFAD11
+                    */
 					int		dsel = (math.inslatch >> 8) & TX1_DSEL;
 					int		tfad = (math.inslatch & 0x1c00) << 1;
 					int		sd   = math.ppshift;
@@ -684,9 +684,9 @@ READ16_HANDLER( tx1_math_r )
 		else if (dsel == 1 )
 		{
 			/*
-				TODO make this constant somewhere
-				e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
-			*/
+                TODO make this constant somewhere
+                e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
+            */
 			UINT16 *romdata = (UINT16*)memory_region(space->machine, "au_data");
 			UINT16 addr = get_tx1_datarom_addr();
 			math.retval = romdata[addr];
@@ -812,10 +812,10 @@ WRITE16_HANDLER( tx1_math_w )
 	{
 
 		/*
-			/TMPLD1: 0
-			/TMPLD2: 0
-			/TMPLD3: 0
-		*/
+            /TMPLD1: 0
+            /TMPLD2: 0
+            /TMPLD3: 0
+        */
 		math.muxlatch = math.cpulatch;
 	}
 
@@ -1285,7 +1285,7 @@ WRITE16_HANDLER( buggyboy_math_w )
 }
 
 /*
-	This is for ROM range 0x5000-0x7fff
+    This is for ROM range 0x5000-0x7fff
 */
 READ16_HANDLER( buggyboy_spcs_rom_r )
 {

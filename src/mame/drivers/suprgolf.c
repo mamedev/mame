@@ -58,7 +58,7 @@ static WRITE8_HANDLER( rom2_bank_select_w )
 {
 	UINT8 *region_base = memory_region(space->machine, "user2");
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
-//	if(data == 0) data = 1; //test hack
+//  if(data == 0) data = 1; //test hack
 	memory_set_bankptr(space->machine, 1, region_base + (data&0x0f ) * 0x4000);
 }
 

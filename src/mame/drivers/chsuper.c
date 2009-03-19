@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( chsuper_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
-//	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
+//  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
 
 static ADDRESS_MAP_START( chsuper_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
@@ -208,7 +208,7 @@ static MACHINE_DRIVER_START( chsuper )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
-	
+
 	MDRV_GFXDECODE(chsuper)
 	MDRV_PALETTE_LENGTH(0x100)
 

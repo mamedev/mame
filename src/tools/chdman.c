@@ -247,7 +247,7 @@ static chd_error guess_chs(const char *filename, int offset, int sectorsize, UIN
     get_chs_from_ident - extract chs from an ident
     information, validate it with the file size
 
-	Note: limited to IDE for now
+    Note: limited to IDE for now
 -------------------------------------------------*/
 
 static chd_error get_chs_from_ident(const char *filename, int offset, const UINT8 *ident, UINT32 identsize, UINT32 *cylinders, UINT32 *heads, UINT32 *sectors, UINT32 *bps)
@@ -305,12 +305,12 @@ static int do_createhd(int argc, char *argv[], int param)
 	UINT8 *identdata = NULL;
 	chd_file *chd = NULL;
 	char metadata[256];
-	
+
 	/* if a file is provided for argument 4 (ident filename), then shift the remaining arguments down */
 	if (argc >= 5)
 	{
 		char *scan;
-		
+
 		/* if there are any non-digits in the 'offset', then treat it as a ident file */
 		for (scan = argv[4]; *scan != 0; scan++)
 			if (!isdigit(*scan))
@@ -324,7 +324,7 @@ static int do_createhd(int argc, char *argv[], int param)
 				fprintf(stderr, "Error opening ident file '%s'\n", argv[4]);
 				return 1;
 			}
-			
+
 			/* shift the remaining arguments down */
 			if (argc > 5)
 				memmove(&argv[4], &argv[5], (argc - 5) * sizeof(argv[0]));
@@ -396,7 +396,7 @@ static int do_createhd(int argc, char *argv[], int param)
 		fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
-	
+
 	/* write the ident if present */
 	if (identdata != NULL)
 	{
@@ -2664,7 +2664,7 @@ cleanup:
 
 
 /*-------------------------------------------------
-    do_addmeta - add metadata to a CHD from a 
+    do_addmeta - add metadata to a CHD from a
     file
 -------------------------------------------------*/
 
@@ -2698,7 +2698,7 @@ static int do_addmeta(int argc, char *argv[], int param)
 		metaindex = atoi(argv[4]);
 		srcfile = argv[5];
 	}
-	
+
 	/* verify the tag */
 	if (strlen(tagstring) > 4)
 	{
@@ -2749,7 +2749,7 @@ static int do_addmeta(int argc, char *argv[], int param)
 		fprintf(stderr, "Error opening CHD file '%s' read/write: %s\n", inoutfile, chd_error_string(err));
 		goto cleanup;
 	}
-	
+
 	/* attempt to open the source file */
 	filerr = core_fload(srcfile, (void **)&metadata, &metalength);
 	if (filerr != FILERR_NONE)
@@ -2758,7 +2758,7 @@ static int do_addmeta(int argc, char *argv[], int param)
 		err = CHDERR_FILE_NOT_FOUND;
 		goto cleanup;
 	}
-	
+
 	/* if it's text, strip any trailing Ctrl-Z and CR/LF and add a trailing NULL */
 	if (param)
 	{
@@ -3071,17 +3071,17 @@ static chd_error chdman_clone_metadata(chd_file *source, chd_file *dest)
 				err = CHDERR_NONE;
 			break;
 		}
-		
+
 		/* promote certain bits of metadata to checksummed for older CHDs */
 		if (header->version <= 3)
 		{
-			if (metatag == HARD_DISK_METADATA_TAG || metatag == CDROM_OLD_METADATA_TAG || 
-			    metatag == CDROM_TRACK_METADATA_TAG || metatag == AV_METADATA_TAG || 
+			if (metatag == HARD_DISK_METADATA_TAG || metatag == CDROM_OLD_METADATA_TAG ||
+			    metatag == CDROM_TRACK_METADATA_TAG || metatag == AV_METADATA_TAG ||
 			    metatag == AV_LD_METADATA_TAG)
 			{
 				metaflags |= CHD_MDFLAGS_CHECKSUM;
 			}
-			
+
 			/* convert old-style CD-ROM data to newer */
 			if (metatag == CDROM_OLD_METADATA_TAG)
 			{

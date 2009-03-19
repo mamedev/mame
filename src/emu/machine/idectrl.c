@@ -1322,7 +1322,7 @@ static void ide_controller_write(const device_config *device, int bank, offs_t o
 	/* logit */
 	if (BANK(bank, offset) != IDE_BANK0_DATA)
 		LOG(("%s:IDE write to %d:%X = %08X, size=%d\n", cpuexec_describe_context(device->machine), bank, offset, data, size));
-	//	fprintf(stderr, "ide write %03x %02x size=%d\n", offset, data, size);
+	//  fprintf(stderr, "ide write %03x %02x size=%d\n", offset, data, size);
 	switch (BANK(bank, offset))
 	{
 		/* unknown config register */

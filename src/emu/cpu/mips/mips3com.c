@@ -726,16 +726,16 @@ static UINT32 compute_config_register(const mips3_state *mips)
 	if (mips->flavor == MIPS3_TYPE_VR4300)
 	{
 		/*
-		    For VR43xx, Config is as follows:
-		    bit 31 = always 0
-		    bits 28-30 = EC
-		    bits 24-27 = EP
-		    bits 16-23 = always b0000010
-		    bit 15 = endian indicator as standard MIPS III
-		    bits 4-14 = always b11001000110
-		    bit 3 = CU
-		    bits 0-2 = K0 ("Coherency algorithm of kseg0")
-		*/
+            For VR43xx, Config is as follows:
+            bit 31 = always 0
+            bits 28-30 = EC
+            bits 24-27 = EP
+            bits 16-23 = always b0000010
+            bit 15 = endian indicator as standard MIPS III
+            bits 4-14 = always b11001000110
+            bit 3 = CU
+            bits 0-2 = K0 ("Coherency algorithm of kseg0")
+        */
 
 		configreg = 0x6460;
 	}
@@ -750,7 +750,7 @@ static UINT32 compute_config_register(const mips3_state *mips)
 		else if (mips->icache_size <= 0x20000) configreg |= 5 << 6;
 		else if (mips->icache_size <= 0x40000) configreg |= 6 << 6;
 		else                                   configreg |= 7 << 6;
-	
+
 		/* set the instruction cache size */
 			 if (mips->icache_size <= 0x01000) configreg |= 0 << 9;
 		else if (mips->icache_size <= 0x02000) configreg |= 1 << 9;
@@ -863,7 +863,7 @@ static void tlb_map_entry(mips3_state *mips, int tlbindex)
 		}
 		else
 		{
-			pfn = (lo >> 6) & 0x00ffffff; 
+			pfn = (lo >> 6) & 0x00ffffff;
 		}
 
 		/* valid? */

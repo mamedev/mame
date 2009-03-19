@@ -79,7 +79,7 @@ static WRITE16_HANDLER( eeprom_w )
 		eeprom_write_bit(data & 0x01);
 		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
 		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
-		
+
 		// data & 8?
 	}
 }
@@ -1737,7 +1737,7 @@ static DRIVER_INIT( jmpbreak )
 {
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00906fc, 0x00906ff, 0, 0, jmpbreak_speedup_r );
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe0000000, 0xe0000003, 0, 0, jmpbreak_flipscreen_w );
-	
+
 	palshift = 0;
 }
 

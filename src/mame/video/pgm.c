@@ -93,7 +93,7 @@ static void draw_sprite_line(int wide, UINT32* dest, int xzoom, int xgrow, int y
 				if ((xdrawpos >= 0) && (xdrawpos < 448))
 				{
 					if (pri) dest[xdrawpos] = srcdat | 0x8000 | 0x10000;
-					else dest[xdrawpos] = srcdat | 0x10000;				
+					else dest[xdrawpos] = srcdat | 0x10000;
 				}
 			}
 			xcntdraw++;
@@ -318,7 +318,7 @@ static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 VIDEO_START( pgm )
 {
 	int i;
-	
+
 	pgm_tx_tilemap= tilemap_create(machine, get_pgm_tx_tilemap_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	tilemap_set_transparent_pen(pgm_tx_tilemap,15);
 
@@ -327,10 +327,10 @@ VIDEO_START( pgm )
 	tilemap_set_scroll_rows(pgm_bg_tilemap,64*32);
 
 	tmppgmbitmap = auto_bitmap_alloc(448,224,BITMAP_FORMAT_RGB32);
-	
+
 	for (i=0; i < 0x1200/2; i++)
-		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));	
-	
+		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
+
 	pgm_spritebufferram = auto_malloc (0xa00);
 
 	/* we render each sprite to a bitmap then copy the bitmap to screen bitmap with zooming */
@@ -345,7 +345,7 @@ VIDEO_UPDATE( pgm )
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	bitmap_fill(tmppgmbitmap, cliprect, 0x00000000);
 
-	
+
 	pgm_sprite_source = pgm_spritebufferram;
 	draw_sprites(screen->machine, tmppgmbitmap);
 
@@ -364,14 +364,14 @@ VIDEO_UPDATE( pgm )
 
 			for (x=0;x<448;x++)
 			{
-				if (src[x]&0x10000)		
+				if (src[x]&0x10000)
 					if ((src[x]&0x8000)==0x8000)
 						dst[x] = src[x]&0x7fff;
 			}
 		}
 	}
-		
-		
+
+
 	tilemap_draw(bitmap,cliprect,pgm_bg_tilemap,0,0);
 
 	{
@@ -384,13 +384,13 @@ VIDEO_UPDATE( pgm )
 
 			for (x=0;x<448;x++)
 			{
-				if (src[x]&0x10000)	
+				if (src[x]&0x10000)
 					if ((src[x]&0x8000)==0x0000)
 						dst[x] = src[x];
 			}
 		}
-	}	
-	
+	}
+
 	tilemap_set_scrolly(pgm_tx_tilemap,0, pgm_videoregs[0x5000/2]);
 	tilemap_set_scrollx(pgm_tx_tilemap,0, pgm_videoregs[0x6000/2]); // Check
 	tilemap_draw(bitmap,cliprect,pgm_tx_tilemap,0,0);

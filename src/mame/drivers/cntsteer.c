@@ -88,7 +88,7 @@ static VIDEO_START( cntsteer )
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
-//	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+//  tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 static VIDEO_START( zerotrgt )
@@ -98,7 +98,7 @@ static VIDEO_START( zerotrgt )
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
-//	tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
+//  tilemap_set_flip(bg_tilemap, TILEMAP_FLIPX | TILEMAP_FLIPY);
 }
 
 /*
@@ -226,22 +226,22 @@ static VIDEO_UPDATE( zerotrgt )
 
 		rot_val = rotation_sign ? (-rotation_x) : (rotation_x);
 
-//		popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
+//      popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
 
 		if(rot_val > 90) { rot_val = 90; }
 		if(rot_val < -90) { rot_val = -90; }
 
 		/*
-		(u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
-		*/
+        (u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
+        */
 		/*
-		     1
-		0----|----0
-		    -1
-		     0
-		0----|----1
-		     0
-		*/
+             1
+        0----|----0
+            -1
+             0
+        0----|----1
+             0
+        */
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
 		p1 = -65536*1*cos(2*M_PI*(rot_val)/1024);
 		p2 = -65536*1*sin(2*M_PI*(rot_val)/1024);
@@ -278,19 +278,19 @@ static VIDEO_UPDATE( cntsteer )
 
 		rot_val = (rotation_sign & 4) ? (rotation_x) : (-rotation_x);
 
-//		popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
+//      popmessage("%d %02x %02x",rot_val,rotation_sign,rotation_x);
 
 		/*
-		(u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
-		*/
+        (u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
+        */
 		/*
-		     1
-		0----|----0
-		    -1
-		     0
-		0----|----1
-		     0
-		*/
+             1
+        0----|----0
+            -1
+             0
+        0----|----1
+             0
+        */
 		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
 		p1 = -65536*1*cos(2*M_PI*(rot_val)/1024);
 		p2 = -65536*1*sin(2*M_PI*(rot_val)/1024);
@@ -409,14 +409,14 @@ static WRITE8_HANDLER( zerotrgt_ctrl_w )
 static WRITE8_HANDLER( cntsteer_sub_irq_w )
 {
 	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
-//	printf("%02x IRQ\n",data);
+//  printf("%02x IRQ\n",data);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_nmi_w )
 {
-//	if(data)
-//	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
-//	popmessage("%02x",data);
+//  if(data)
+//  cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+//  popmessage("%02x",data);
 }
 
 static WRITE8_HANDLER( cntsteer_main_irq_w )

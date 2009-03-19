@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( pcat_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_RAM//READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_RAM//READWRITE(mc146818_port32le_r,     mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", dma8237_r, dma8237_w, 0xffff)
@@ -521,9 +521,9 @@ static void streetg2_set_keyb_int(running_machine *machine, int state) {
 
 static MACHINE_START( streetg2 )
 {
-//	bank = -1;
-//	lastvalue = -1;
-//	hv_blank = 0;
+//  bank = -1;
+//  lastvalue = -1;
+//  hv_blank = 0;
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 	streetg2_devices.pit8253 = devtag_get_device( machine, "pit8254" );
 	streetg2_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
@@ -574,7 +574,7 @@ static MACHINE_DRIVER_START( pcat_nit )
 	MDRV_MACHINE_START(streetg2)
 	MDRV_NVRAM_HANDLER( mc146818 )
 
-//	MDRV_IMPORT_FROM( at_kbdc8042 )
+//  MDRV_IMPORT_FROM( at_kbdc8042 )
 	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
 	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
 	MDRV_DMA8237_ADD( "dma8237_1", dma8237_1_config )
