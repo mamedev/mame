@@ -1430,6 +1430,13 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 			curarg->count = xml_get_attribute_int(argnode, "count", 1);
 			totalargs += curarg->count;
 
+			/* max out on arguments */
+			if (totalargs > MAX_ARGUMENTS)
+			{
+				mame_printf_error("%s.xml(%d): too many arguments (found %d, max is %d)\n", filename, argnode->line, totalargs, MAX_ARGUMENTS);
+				goto error;
+			}
+
 			/* read the expression */
 			expression = argnode->value;
 			if (expression == NULL || expression[0] == 0)
@@ -1447,13 +1454,6 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 			/* add to the end of the list */
 			*argtailptr = curarg;
 			argtailptr = &curarg->next;
-		}
-
-		/* max out on arguments */
-		if (totalargs > MAX_ARGUMENTS)
-		{
-			mame_printf_error("%s.xml(%d): too many arguments (found %d, max is %d)\n", filename, argnode->line, totalargs, MAX_ARGUMENTS);
-			goto error;
 		}
 
 		/* validate the format against the arguments */
