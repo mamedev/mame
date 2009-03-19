@@ -270,7 +270,12 @@ WRITE8_DEVICE_HANDLER( z80pio_d_w )
 
 	z80pio->out[offset] = data;	/* latch out data */
 	if(z80pio->port_write[offset])
-		z80pio->port_write[offset](device, 0, data);
+	{
+		if (z80pio->mode[offset] == PIO_MODE3)
+			z80pio->port_write[offset](device, 0, data & ~z80pio->dir[offset]);
+		else
+			z80pio->port_write[offset](device, 0, data);
+	}
 
 	switch (z80pio->mode[offset])
 	{
