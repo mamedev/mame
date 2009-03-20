@@ -76,7 +76,7 @@
     [100] UINT8  parentsha1[20];// SHA1 checksum of parent file
     [120] (V3 header length)
 
-    Proposed V4 header:
+    V4 header:
 
     [  0] char   tag[8];        // 'MComprHD'
     [  8] UINT32 length;        // length of header (including tag and length fields)
