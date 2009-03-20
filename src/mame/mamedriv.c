@@ -4374,7 +4374,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
 						/* 2002.12 Moeru Casinyo */
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
-						/* 2003.02 Kouchuu Ouja Mushiking */
 						/* 2003.03 Yonin Uchi Mahjong MJ Network Taisen ver. */
 						/* 2003.03 WCCF 2001-2002 ver.2.0 */
 	DRIVER( ggxxrl )	/* 2003.03 Guilty Gear XX # Reload */
@@ -4387,7 +4386,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2004.06 WCCF 2002-2003 ver.2.0 */
 	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned (Naomi 2) */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
-						/* 2004.10 Oshare Majo Love & Berry */
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */
 	DRIVER( meltybld )	/* 2005.03 Melty Blood Act Cadenza */
 						/* 2005.04 Menkyo no Tetsujin */
@@ -4395,7 +4393,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( senko )		/* 2005.04 Senkou no Rondo */
 	DRIVER( senkoo )	/*          ^^ */
 						/* 2005.07 WCCF 2004-2005 */
-						/* 2005.09 Kodai Ouja Kyouryuu King */
 						/* 2005.10 Radirgy */
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
 						/* 2006.03 Kurukuru Chameleon */
@@ -4409,21 +4406,29 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2007.02 Noukone Puzzle Takoron */
 						/* 2007.07 Shooting Love */
 						/* 2007.07 Dynamite Deka EX - Asian dynamite */
+						/* 2007.07 Pokasuka Ghost! */
 						/* 2007.09 Rhythm Tengoku */
-						/* 2007.?? Issyo ni Wanwan */
-						/* 2007.?? Konchuu Dash!! */
-						/* 2007.?? Pokasuka Ghost! */
-						/* 2007.?? Magical Dance on Dream Stage */
-						/* 2007.?? Marine Marine */
-						/* 2008.?? Akatsuki Denkou Senki Ausf.Achse */
-						/* 2008.?? Illvelo */
-						/* 2008.?? Mamoru Kun wa Norowarete Shimatta! */
-						/* 2008.?? Melty Blood Actress Again */
-						/* 2009.?? Project Cerberus */
-						/* 2009.?? Radirgy Noah */
-	DRIVER( ggxxsla  )	/* 200?.?? Guilty Gear XX Slash */
+						/* 2008.02 Akatsuki Denkou Senki Ausf.Achse */
+						/* 2008.06 Illvelo (Illmatic Envelope) */
+						/* 2008.07 Mamoru Kun wa Norowarete Shimatta! */
+						/* 2008.09 Melty Blood Actress Again */
+						/* 2009.?? Project Cerberus (planned to be released in 2009 spring) */
+						/* 2009.?? Radirgy Noah (planned to be released in 2009.06) */
+	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */
 
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
+
+	/* NAOMI based (System SP) */
+						/* 2003.02 Kouchuu Ouja Mushiking */
+						/* 2004.10 Oshare Majo Love & Berry */
+						/* 2005.09 Kodai Ouja Kyouryuu King */
+						/* 2007.06 Issyo ni Wanwan */
+						/* 2007.06 Konchuu Dash!! */
+						/* 2007.07 Marine Marine */
+						/* 2007.11 Magical Dance on Dream Stage */
+						/* 2008.02 Marine Marine ver.2 */
+						/* 2008.04 Issyo ni Wanwan Waiwai Puppy */
+						/* 2008.07 Issyo ni Turbo Drive
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
@@ -4448,7 +4453,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
 						/* 2006.02 Metal Slug 6 */
 						/* 2006.09 Extreme Hunting 2 Tournament Edition */
-						/* 2008.?? Sega Cray challenge */
+						/* 2008.?? Sega Clay Challenge */
 
 	/* Hikaru */
 	DRIVER( hikaru ) 	/* BIOS (c)2000 */
