@@ -427,7 +427,7 @@ static TIMER_CALLBACK( equites_frq_adjuster_callback )
 	cymvol *= 0.94f;
 	hihatvol *= 0.94f;
 
-	sound_set_output_gain(msm, 0, hihatvol + cymvol * (ay_port_b & 3) * 0.33);	/* NO from msm5232 */
+	sound_set_output_gain(msm, 10, hihatvol + cymvol * (ay_port_b & 3) * 0.33);	/* NO from msm5232 */
 }
 
 static SOUND_START(equites)
