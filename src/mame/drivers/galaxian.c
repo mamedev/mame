@@ -252,6 +252,7 @@ static UINT8 zigzag_ay8910_latch;
 static UINT8 kingball_speech_dip;
 static UINT8 kingball_sound;
 static UINT8 mshuttle_ay8910_cs;
+static UINT8 *frogg_ram;
 
 static UINT16 protection_state;
 static UINT8 protection_result;
@@ -2418,7 +2419,10 @@ static DRIVER_INIT( frogg )
 
 	/* ...but needs a full 2k of RAM */
 	memory_install_readwrite8_handler(space, 0x4000, 0x47ff, 0, 0, SMH_BANK1, SMH_BANK1);
-	memory_set_bankptr(machine, 1, auto_malloc(0x800));
+	frogg_ram = auto_malloc(0x800);
+	memory_set_bankptr(machine, 1, frogg_ram);
+
+	state_save_register_global_pointer(machine, frogg_ram, 0x800);
 }
 
 
@@ -2810,7 +2814,10 @@ static DRIVER_INIT( froggrmc )
 
 	/* actually needs 2k of RAM */
 	memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK1, SMH_BANK1);
-	memory_set_bankptr(machine, 1, auto_malloc(0x800));
+	frogg_ram = auto_malloc(0x800);
+	memory_set_bankptr(machine, 1, frogg_ram);
+
+	state_save_register_global_pointer(machine, frogg_ram, 0x800);
 
 	/* decrypt */
 	decode_frogger_sound(machine);
