@@ -4390,10 +4390,12 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( meltybld )	/* 2005.03 Melty Blood Act Cadenza */
 						/* 2005.04 Menkyo no Tetsujin */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
-	DRIVER( senko )		/* 2005.04 Senkou no Rondo */
+	DRIVER( senko )		/* 2005.04 Senkou no Rondo (Rev A) */
 	DRIVER( senkoo )	/*          ^^ */
 						/* 2005.07 WCCF 2004-2005 */
+	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */					
 						/* 2005.10 Radirgy */
+						/* 2005.?? Radirgy (Rev. A) */
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
 						/* 2006.03 Kurukuru Chameleon */
 	DRIVER( trgheart )	/* 2006.05 Trigger Heart Exelica */
@@ -4403,7 +4405,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2006.11 Karous */
 						/* 2006.12 Guilty Gear XX Accent Core */
 						/* 2006.12 Melty Blood Act Cadenza ver.B */
-						/* 2007.02 Noukone Puzzle Takoron */
+						/* 2007.02 Noukone Puzzle Takoron */ 
+	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
+		
+						/* Releases below use FlashROM / Network Delivery Systems, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
+						
 						/* 2007.07 Shooting Love */
 						/* 2007.07 Dynamite Deka EX - Asian dynamite */
 						/* 2007.07 Pokasuka Ghost! */
@@ -4414,9 +4420,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2008.09 Melty Blood Actress Again */
 						/* 2009.?? Project Cerberus (planned to be released in 2009 spring) */
 						/* 2009.?? Radirgy Noah (planned to be released in 2009.06) */
-	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */
 
-	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
+
 
 	/* NAOMI based (System SP) */
 						/* 2003.02 Kouchuu Ouja Mushiking */
@@ -4428,7 +4433,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2007.11 Magical Dance on Dream Stage */
 						/* 2008.02 Marine Marine ver.2 */
 						/* 2008.04 Issyo ni Wanwan Waiwai Puppy */
-						/* 2008.07 Issyo ni Turbo Drive
+						/* 2008.07 Issyo ni Turbo Drive */
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
