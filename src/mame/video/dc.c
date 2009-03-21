@@ -15,6 +15,7 @@
 #define DEBUG_PVRTA_REGS (0)
 #define DEBUG_PVRDLIST	(0)
 #define DEBUG_VERTICES	(1)
+#define DEBUG_PALRAM (1)
 
 static UINT32 pvrctrl_regs[0x100/4];
 static UINT32 pvrta_regs[0x2000/4];
@@ -990,6 +991,63 @@ static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect
 		}
 	}
 }
+
+#if DEBUG_PALRAM
+static void debug_paletteram(running_machine *machine)
+{
+	UINT64 pal;
+	UINT32 r,g,b;
+	int i;
+
+	//popmessage("%02x",pvrta_regs[PAL_RAM_CTRL]);
+
+	for(i=0;i<0x400;i++)
+	{
+		pal = pvrta_regs[((0x005F9000-0x005F8000)/4)+i];
+		switch(pvrta_regs[PAL_RAM_CTRL])
+		{
+			case 0: //argb1555 <- guilty gear uses this mode
+			{
+				//a = (pal & 0x8000)>>15;
+				r = (pal & 0x7c00)>>10;
+				g = (pal & 0x03e0)>>5;
+				b = (pal & 0x001f)>>0;
+				//a = a ? 0xff : 0x00;
+				palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal5bit(b));
+			}
+			break;
+			case 1: //rgb565
+			{
+				//a = 0xff;
+				r = (pal & 0xf800)>>11;
+				g = (pal & 0x07e0)>>5;
+				b = (pal & 0x001f)>>0;
+				palette_set_color_rgb(machine, i, pal5bit(r), pal6bit(g), pal5bit(b));
+			}
+			break;
+			case 2: //argb4444
+			{
+				//a = (pal & 0xf000)>>12;
+				r = (pal & 0x0f00)>>8;
+				g = (pal & 0x00f0)>>4;
+				b = (pal & 0x000f)>>0;
+				palette_set_color_rgb(machine, i, pal4bit(r), pal4bit(g), pal4bit(b));
+			}
+			break;
+			case 3: //argb8888
+			{
+				//a = (pal & 0xff000000)>>20;
+				r = (pal & 0x00ff0000)>>16;
+				g = (pal & 0x0000ff00)>>8;
+				b = (pal & 0x000000ff)>>0;
+				palette_set_color_rgb(machine, i, r, g, b);
+			}
+			break;
+		}
+	}
+}
+#endif
+
 /* test video end */
 
 static void pvr_build_parameterconfig(void)
@@ -1061,7 +1119,11 @@ VIDEO_START(dc)
 
 VIDEO_UPDATE(dc)
 {
-static int useframebuffer=1;
+	static int useframebuffer=1;
+
+	#if DEBUG_PALRAM
+	debug_paletteram(screen->machine);
+	#endif
 
 	if ((useframebuffer) && !state_ta.start_render_received)
 	{
