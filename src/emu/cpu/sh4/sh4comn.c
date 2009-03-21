@@ -641,6 +641,12 @@ WRITE32_HANDLER( sh4_internal_w )
 
 	switch( offset )
 	{
+	case MMUCR: // MMU Control
+		if (data & 1)
+			fatalerror("SH4: MMUCR write enables MMU\n");
+	
+		break;
+	
 		// Memory refresh
 	case RTCSR:
 		sh4->m[RTCSR] &= 255;
