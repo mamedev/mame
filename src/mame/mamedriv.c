@@ -4331,21 +4331,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( csmasho )
 	DRIVER( sfz3ugd )	/* 2001.02 Street Fighter ZERO3 Upper */
 	DRIVER( gundmgd )	/* 2001.03 Kidou Senshi Gundam Renpou vs. Zeon */
-	DRIVER( vstrik3c )	/* 2001.04 Virtua Striker 3 */
-	DRIVER( vstrik3 )
 						/* 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika */
 	DRIVER( dygolf )	/* 2001.04 Dynamic Golf */
-						/* 2001.05 Wild Riders */
 	DRIVER( monkeyba )	/* 2001.05 Monkey Ball */
-						/* 2001.06 Club Cart */
 	DRIVER( cvsgd )		/* 2001.06 Capcom vs. SNK Pro */
 						/* 2001.06 Crackin' DJ Part2 */
 	DRIVER( wsbbgd )	/* 2001.06 Super Major League */
-	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 	DRIVER( spkrbtl )	/* 2001.07 Spikers Battle */
 						/* 2001.07 Dokidoki Idol Star Seeker */
-						/* 2001.08 Wave Runner GP */
-	DRIVER( vf4 )		/* 2001.08 Virtua Fighter 4 (Naomi 2) */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
 	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
 						/* 2001.09 Alien Front */
@@ -4356,44 +4349,30 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.11 La Keyboardu */
 						/* 2001.11 Shakatto Tambourine Cho Powerup Chu */
 	DRIVER( ikaruga )	/* 2001.12 Ikaruga */
-	DRIVER( lupinsho)	/* 2001.12 Lupin the Third the Shooting */
-						/* 2002.02 The King of Route 66 */
-	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage (Naomi 2) */
+	DRIVER( lupinsho )	/* 2001.12 Lupin the Third the Shooting */
 	DRIVER( vathlete )	/* 2002.03 Virtua Athlete */
 	DRIVER( luptype )	/* 2002.04 Lupin the Third the Typing */
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
 						/* 2002.05 Cleopatra Fortune + */
 	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
-						/* 2002.06 World Club Champion Football */
 	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
 						/* 2002.07 Mazan */
-						/* 2002.07 Soul Surfer */
-	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution (Naomi 2) */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
 						/* 2002.12 Azumanga Daiou Puzzle Bobble */
-	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
 						/* 2002.12 Moeru Casinyo */
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
 						/* 2003.03 Yonin Uchi Mahjong MJ Network Taisen ver. */
-						/* 2003.03 WCCF 2001-2002 ver.2.0 */
 	DRIVER( ggxxrl )	/* 2003.03 Guilty Gear XX # Reload */
 	DRIVER( shikgam2 )	/* 2003.04 Shikigami no Shiro 2 */
 	DRIVER( bdrdown )	/* 2003.04 Border Down */
-						/* 2003.09 WCCF 2002-2003 */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
-						/* 2004.01 Initial D Arcade Stage ver.3 */
-						/* 2004.06 WCCF 2002-2003 ver.2.0 */
-	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned (Naomi 2) */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
-						/* 2004.12 WCCF 2002-2003 ver.2.1 */
 	DRIVER( meltybld )	/* 2005.03 Melty Blood Act Cadenza */
-						/* 2005.04 Menkyo no Tetsujin */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
 	DRIVER( senko )		/* 2005.04 Senkou no Rondo (Rev A) */
 	DRIVER( senkoo )	/*          ^^ */
-						/* 2005.07 WCCF 2004-2005 */
-	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */					
+	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */
 						/* 2005.10 Radirgy */
 						/* 2005.?? Radirgy (Rev. A) */
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
@@ -4406,10 +4385,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2006.12 Guilty Gear XX Accent Core */
 						/* 2006.12 Melty Blood Act Cadenza ver.B */
 						/* 2007.02 Noukone Puzzle Takoron */ 
-	DRIVER( initdexp )	/* 200?.?? Initial D Export Version (Naomi 2) */
-		
-						/* Releases below use FlashROM / Network Delivery Systems, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
-						
+
+						/* Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
+
 						/* 2007.07 Shooting Love */
 						/* 2007.07 Dynamite Deka EX - Asian dynamite */
 						/* 2007.07 Pokasuka Ghost! */
@@ -4434,6 +4412,32 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2008.02 Marine Marine ver.2 */
 						/* 2008.04 Issyo ni Wanwan Waiwai Puppy */
 						/* 2008.07 Issyo ni Turbo Drive */
+
+	/* NAOMI 2 */
+	DRIVER( vstrik3c )	/* 2001.04 Virtua Striker 3 */
+	DRIVER( vstrik3 )
+						/* 2001.05 Wild Riders */
+						/* 2001.06 Club Cart */
+	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
+						/* 2001.08 Wave Runner GP */
+	DRIVER( vf4 )		/* 2001.08 Virtua Fighter 4 */
+						/* 2002.02 The King of Route 66 */
+	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
+	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
+						/* 2002.06 World Club Champion Football */
+						/* 2002.07 Soul Surfer */
+	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution */
+	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
+						/* 2003.03 WCCF 2001-2002 ver.2.0 */
+						/* 2003.09 WCCF 2002-2003 */
+						/* 2004.01 Initial D Arcade Stage ver.3 */
+						/* 2004.06 WCCF 2002-2003 ver.2.0 */
+	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned */
+						/* 2004.12 WCCF 2002-2003 ver.2.1 */
+						/* 2005.04 Menkyo no Tetsujin */
+						/* 2005.07 WCCF 2004-2005 */
+						/* 2006.08 WCCF European Clubs 2005-2006 */
+
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
