@@ -42,7 +42,6 @@
  - Ribbon (Step1. Mild Mind) (c) 1999
 
  TODO:
- - emulate Hidden Catch 3 touch screen (which has force feedback as well)
  - sound & sound cpu
 
  Original Bugs:
@@ -121,9 +120,23 @@ static WRITE32_HANDLER( systemcontrol_w )
 	// bit 0x100 and 0x040 ?
 }
 
+static READ32_HANDLER( hidctch3_pen1_r )
+{	
+	//320 x 240
+	int xpos = input_port_read(space->machine, "PEN_X_P1");
+	int ypos = input_port_read(space->machine, "PEN_Y_P1");
+	
+	return xpos + (ypos*168*2);
+}
 
-
-
+static READ32_HANDLER( hidctch3_pen2_r )
+{	
+	//320 x 240
+	int xpos = input_port_read(space->machine, "PEN_X_P2");
+	int ypos = input_port_read(space->machine, "PEN_Y_P2");
+	
+	return xpos + (ypos*168*2);
+}
 
 static ADDRESS_MAP_START( eolith_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
@@ -134,13 +147,6 @@ static ADDRESS_MAP_START( eolith_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITENOP // sound latch
 	AM_RANGE(0xfca00000, 0xfca00003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfcc00000, 0xfcc0005b) AM_WRITENOP // crt registers ?
-
-	// hidden catch 3 touch screen inputs
-	AM_RANGE(0xfce00000, 0xfce00003) AM_READNOP
-	AM_RANGE(0xfce80000, 0xfce80003) AM_READNOP
-	AM_RANGE(0xfcf00000, 0xfcf00003) AM_READNOP
-	AM_RANGE(0xfcf80000, 0xfcf80003) AM_READNOP
-
 	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("cpu", 0)
 ADDRESS_MAP_END
@@ -207,7 +213,17 @@ static INPUT_PORTS_START( hidctch3 )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0xfffffffe, IP_ACTIVE_LOW, IPT_UNUSED	)
 
-	// missing touch screen / pen inputs
+	PORT_START("PEN_X_P1")
+	PORT_BIT( 0xffff, 0, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0,159) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
+
+	PORT_START("PEN_Y_P1")
+	PORT_BIT( 0xffff, 0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0,119) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
+	
+	PORT_START("PEN_X_P2")
+	PORT_BIT( 0xffff, 0, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0,159) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(2)
+
+	PORT_START("PEN_Y_P2")
+	PORT_BIT( 0xffff, 0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0,119) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raccoon )
@@ -871,6 +887,21 @@ static DRIVER_INIT( hidctch2 )
 	init_eolith_speedup(machine);
 }
 
+static DRIVER_INIT( hidctch3 )
+{	
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfc200000, 0xfc200003, 0, 0, SMH_NOP); // this generates pens vibration
+	
+	// It is not clear why the first reads are needed too
+	
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfce00000, 0xfce00003, 0, 0, hidctch3_pen1_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfce80000, 0xfce80003, 0, 0, hidctch3_pen1_r);
+	
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfcf00000, 0xfcf00003, 0, 0, hidctch3_pen2_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfcf80000, 0xfcf80003, 0, 0, hidctch3_pen2_r);
+	
+	init_eolith_speedup(machine);
+}
+
 GAME( 1998, hidnctch, 0,       eolith45, hidnctch, eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, raccoon,  0,       eolith45, raccoon,  eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
 GAME( 1998, puzzlekg, 0,       eolith45, puzzlekg, eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
@@ -878,6 +909,6 @@ GAME( 1999, hidctch2, 0,       eolith50, hidnctch, hidctch2, ROT0, "Eolith", "Hi
 GAME( 1999, landbrk,  0,       eolith45, landbrk,  landbrk,  ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.02)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
 GAME( 1999, landbrka, landbrk, eolith45, landbrk,  landbrka, ROT0, "Eolith", "Land Breaker (World) / Miss Tang Ja Ru Gi (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Miss Ttang Jjareugi
 GAME( 1999, nhidctch, 0,       eolith45, hidnctch, eolith,   ROT0, "Eolith", "New Hidden Catch (World) / New Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.02)", GAME_NO_SOUND ) // or New Teurrin Geurim Chajgi '98
-GAME( 2000, hidctch3, 0,       eolith50, hidctch3, eolith,   ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000, hidctch3, 0,       eolith50, hidctch3, hidctch3, ROT0, "Eolith", "Hidden Catch 3 (ver 1.00 / pcb ver 3.05)", GAME_NO_SOUND )
 GAME( 2001, fort2b,   0,       eolith50, common,   eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.01 / pcb ver 3.05)",  GAME_NO_SOUND )
 GAME( 2001, fort2ba,  fort2b,  eolith50, common,   eolith,   ROT0, "Eolith", "Fortress 2 Blue Arcade (ver 1.00 / pcb ver 3.05)",  GAME_NO_SOUND )
