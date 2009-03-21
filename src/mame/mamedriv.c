@@ -3544,7 +3544,6 @@ V-V                           TP-027
 other System 1 / System 2 games:
 
 WarBall
-Sanrin Sanchan
 DokiDoki Penguin Land *not confirmed
 */
 
@@ -3757,7 +3756,7 @@ DokiDoki Penguin Land *not confirmed
 	/* Outrun Hardware */
 						/* 1986.09 Outrun (Japan) */
 						/* 1986.11 Outrun (US) */
-						/* 1986.?? outrun (World) */
+						/* 1986.?? Outrun (World) */
 	DRIVER( outrun )
 	DRIVER( outrun2 )
 	DRIVER( outrun1 )
@@ -4371,6 +4370,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2002.07 Soul Surfer */
 	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution (Naomi 2) */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
+						/* 2002.12 Azumanga Daiou Puzzle Bobble */
 	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
 						/* 2002.12 Moeru Casinyo */
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
