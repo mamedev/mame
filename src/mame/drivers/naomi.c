@@ -731,6 +731,49 @@ static WRITE64_HANDLER( eeprom_93c46a_w )
 	eeprom_set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+/* Dreamcast MAP
+
+0 0x00000000 - 0x001FFFFF MPX System/Boot ROM
+0 0x00200000 - 0x0021FFFF Flash Memory
+0 0x00400000 - 0x005F67FF Unassigned
+0 0x005F6800 - 0x005F69FF System Control Reg.
+0 0x005F6C00 - 0x005F6CFF Maple i/f Control Reg.
+0 0x005F7000 - 0x005F70FF GD-ROM
+0 0x005F7400 - 0x005F74FF G1 i/f Control Reg.
+0 0x005F7800 - 0x005F78FF G2 i/f Control Reg.
+0 0x005F7C00 - 0x005F7CFF PVR i/f Control Reg.
+0 0x005F8000 - 0x005F9FFF TA / PVR Core Reg.
+0 0x00600000 - 0x006007FF MODEM
+0 0x00600800 - 0x006FFFFF G2 (Reserved)
+0 0x00700000 - 0x00707FFF AICA- Sound Cntr. Reg.
+0 0x00710000 - 0x0071000B AICA- RTC Cntr. Reg.
+0 0x00800000 - 0x00FFFFFF AICA- Wave Memory
+0 0x01000000 - 0x01FFFFFF Ext. Device
+0 0x02000000 - 0x03FFFFFF Image Area (Mirror Area)
+
+1 0x04000000 - 0x04FFFFFF MPX Tex.Mem. 64bit Acc.
+1 0x05000000 - 0x05FFFFFF Tex.Mem. 32bit Acc.
+1 0x06000000 - 0x07FFFFFF Image Area*
+
+2 0x08000000 - 0x0BFFFFFF Unassigned
+
+3 0x0C000000 - 0x0CFFFFFF System Memory
+3 0x0D000000 - 0x0DFFFFFF (Mirror on DC, Extra RAM on Naomi)
+3 0x0E000000 - 0x0FFFFFFF Image Area (Mirror Area)
+
+4 0x10000000 - 0x107FFFFF MPX TA FIFO Polygon Cnv.
+4 0x10800000 - 0x10FFFFFF TA FIFO YUV Conv.
+4 0x11000000 - 0x11FFFFFF Tex.Mem. 32/64bit Acc.
+4 0x12000000 - 0x13FFFFFF Image Area (Mirror Area)
+
+5 0x14000000 - 0x17FFFFFF MPX Ext.
+
+6 0x18000000 - 0x1BFFFFFF Unassigned
+
+7 0x1C000000 - 0x1FFFFFFF(SH4 Internal area)
+
+*/
+
 /*
  * Common address map for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
@@ -764,10 +807,14 @@ ADDRESS_MAP_END
  */
 
 static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_ROM                                             // BIOS
+	/* Area 0 */
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE(3) AM_REGION("maincpu", 0) // BIOS
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_SHARE(3)  // non cachable access to  0x00000000 - 0x001fffff
+	
 	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_DEVREADWRITE("rom_board", naomibd_r, naomibd_w)
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE( dc_g1_ctrl_r, dc_g1_ctrl_w )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
@@ -777,16 +824,40 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	
+	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
 	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64)
+
+	/* Area 2*/
+	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
+	           
+	/* Area 3 */
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE(4)
+	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE(5)// extra ram on Naomi (mirror on DC)
+	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE(4)// mirror
+	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE(5)// mirror
+	
+	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE(4) // RAM access through cache
+
+	
+	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)
+	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
+	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE( ta_fifo_poly_w )
+	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
+	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)
+	
+	/* Area 5 */
+	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
 
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_DEVREADWRITE("rom_board", naomibd_r, naomibd_w)
+	/* Area 6 */
+	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+	
+	/* Area 7 */
+	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
 ADDRESS_MAP_END
 
 
