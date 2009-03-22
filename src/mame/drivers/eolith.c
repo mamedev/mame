@@ -345,7 +345,7 @@ PCB Layout
 |       12MHz                                     |
 |                                                 |
 |             U108    U41*  U39   U36*  U34       |
-|        U111      U42*  U40   U37*  U35*   U43   |
+|        U111      U42*  U40   U37*  U35    U43   |
 |                                                 |
 |-------------------------------------------------|
 Notes:
@@ -365,7 +365,7 @@ Notes:
       U107, U97, U111, U108 & U43 are populated with EPROMs and are not labeled in any way
       U34 - U42 are C32000 MASK roms read as 27C322 those marked with '*' are unpopulated
 
-      qs1001a.u96 was not dumped from this PCB, but is standard sample rom found on many Eolith gradation PCBs
+      qs1001a.u96 was not dumped from this PCB, but is a standard sample rom found on many Eolith gradation PCBs
 */
 
 ROM_START( ironfort )
