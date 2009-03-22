@@ -141,6 +141,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BPLCON0		(0x100/2)	/* W  A D    Bit plane control register (misc. control bits) */
 #define REG_BPLCON1		(0x102/2)	/* W    D    Bit plane control reg. (scroll value PF1, PF2) */
 #define REG_BPLCON2		(0x104/2)	/* W    D    Bit plane control reg. (priority control) */
+#define REG_BPLCON3		(0x106/2)	/* W    D    Bit plane control reg (enhanced features) */
 #define REG_BPL1MOD		(0x108/2)	/* W  A      Bit plane modulo (odd planes) */
 #define REG_BPL2MOD		(0x10A/2)	/* W  A      Bit Plane modulo (even planes) */
 #define REG_BPL1DAT		(0x110/2)	/* W    D    Bit plane 1 data (parallel-to-serial convert) */
@@ -149,6 +150,8 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BPL4DAT		(0x116/2)	/* W    D    Bit plane 4 data (parallel-to-serial convert) */
 #define REG_BPL5DAT		(0x118/2)	/* W    D    Bit plane 5 data (parallel-to-serial convert) */
 #define REG_BPL6DAT		(0x11A/2)	/* W    D    Bit plane 6 data (parallel-to-serial convert) */
+#define REG_BPL7DAT		(0x11C/2)	/* W    D    Bit plane 7 data (parallel-to-serial convert) */
+#define REG_BPL8DAT		(0x11E/2)	/* W    D    Bit plane 8 data (parallel-to-serial convert) */
 #define REG_SPR0PTH		(0x120/2)	/* W  A      Sprite 0 pointer (high 3 bits) */
 #define REG_SPR0PTL		(0x122/2)	/* W  A      Sprite 0 pointer (low 15 bits) */
 #define REG_SPR1PTH		(0x124/2)	/* W  A      Sprite 1 pointer (high 3 bits) */
@@ -229,6 +232,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_COLOR29		(0x1BA/2)	/* W    D    Color table 29 */
 #define REG_COLOR30		(0x1BC/2)	/* W    D    Color table 30 */
 #define REG_COLOR31		(0x1BE/2)	/* W    D    Color table 31 */
+#define REG_FMODE		(0x1FC/2)	/* W  A D    Fetch mode */
 
 /* DMACON bit layout */
 #define DMACON_AUD0EN	0x0001
@@ -253,7 +257,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define BPLCON0_ERSY	0x0002
 #define BPLCON0_LACE	0x0004
 #define BPLCON0_LPEN	0x0008
-#define BPLCON0_RSVED2	0x0010
+#define BPLCON0_BPU3	0x0010
 #define BPLCON0_RSVED3	0x0020
 #define BPLCON0_RSVED4	0x0040
 #define BPLCON0_RSVED5	0x0080
@@ -408,5 +412,19 @@ void amiga_set_genlock_color(UINT16 color);
 void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);
 void amiga_sprite_dma_reset(int which);
 void amiga_sprite_enable_comparitor(int which, int enable);
+
+/*----------- defined in video/amigaaga.c -----------*/
+
+PALETTE_INIT( amiga_aga );
+VIDEO_START( amiga_aga );
+VIDEO_UPDATE( amiga_aga );
+
+UINT32 amiga_aga_gethvpos(const device_config *screen);
+void aga_copper_setpc(UINT32 pc);
+void amiga_aga_set_genlock_color(UINT16 color);
+void amiga_aga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);
+void amiga_aga_sprite_dma_reset(int which);
+void amiga_aga_sprite_enable_comparitor(int which, int enable);
+void aga_palette_write(int color_reg, UINT16 data);
 
 #endif /* __AMIGA_H__ */

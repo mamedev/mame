@@ -98,7 +98,7 @@ const char *const amiga_custom_names[0x100] =
 	"BLTCMOD", 		"BLTBMOD", 		"BLTAMOD", 		"BLTDMOD",
 	"UNK068",		"UNK06A",		"UNK06C",		"UNK06E",
 	"BLTCDAT", 		"BLTBDAT", 		"BLTADAT", 		"UNK076",
-	"UNK078",		"UNK07A",		"UNK07C",		"DSRSYNC",
+	"SPRHDAT",		"BPLHDAT",		"LISAID",		"DSRSYNC",
 	/* 0x080 */
 	"COP1LCH", 		"COP1LCL", 		"COP2LCH", 		"COP2LCL",
 	"COPJMP1", 		"COPJMP2", 		"COPINS", 		"DIWSTRT",
@@ -118,12 +118,12 @@ const char *const amiga_custom_names[0x100] =
 	"BPL1PTH", 		"BPL1PTL", 		"BPL2PTH", 		"BPL2PTL",
 	"BPL3PTH", 		"BPL3PTL", 		"BPL4PTH", 		"BPL4PTL",
 	"BPL5PTH", 		"BPL5PTL", 		"BPL6PTH", 		"BPL6PTL",
-	"UNK0F8",		"UNK0FA",		"UNK0FC",		"UNK0FE",
+	"BPL7PTH",		"BPL7PTL",		"BPL8PTH",		"BPL8PTL",
 	/* 0x100 */
-	"BPLCON0", 		"BPLCON1", 		"BPLCON2", 		"UNK106",
-	"BPL1MOD", 		"BPL2MOD", 		"UNK10C",		"UNK10E",
+	"BPLCON0", 		"BPLCON1", 		"BPLCON2", 		"BPLCON3",
+	"BPL1MOD", 		"BPL2MOD", 		"BPLCON4",		"CLXCON2",
 	"BPL1DAT", 		"BPL2DAT", 		"BPL3DAT", 		"BPL4DAT",
-	"BPL5DAT", 		"BPL6DAT", 		"UNK11C",		"UNK11E",
+	"BPL5DAT", 		"BPL6DAT", 		"BPL7DAT",		"BPL8DAT",
 	/* 0x120 */
 	"SPR0PTH", 		"SPR0PTL", 		"SPR1PTH", 		"SPR1PTL",
 	"SPR2PTH", 		"SPR2PTL", 		"SPR3PTH", 		"SPR3PTL",
@@ -150,15 +150,15 @@ const char *const amiga_custom_names[0x100] =
 	"COLOR24", 		"COLOR25", 		"COLOR26", 		"COLOR27",
 	"COLOR28", 		"COLOR29", 		"COLOR30", 		"COLOR31",
 	/* 0x1C0 */
-	"UNK1C0",		"UNK1C2",		"UNK1C4",		"UNK1C6",
-	"UNK1C8",		"UNK1CA",		"UNK1CC",		"UNK1CE",
-	"UNK1D0",		"UNK1D2",		"UNK1D4",		"UNK1D6",
-	"UNK1D8",		"UNK1DA",		"UNK1DC",		"UNK1DE",
+	"HTOTAL",		"HSSTOP",		"HBSTRT",		"HBSTOP",
+	"VTOTAL",		"VSSTOP",		"VBSTRT",		"VBSTOP",
+	"SPRHSTRT",		"SPRHSTOP",		"BPLHSTRT",		"BPLHSTOP",
+	"HHPOSW",		"HHPOSR",		"BEAMCON0",		"HSSTRT",
 	/* 0x1E0 */
-	"UNK1E0",		"UNK1E2",		"UNK1E4",		"UNK1E6",
-	"UNK1E8",		"UNK1EA",		"UNK1EC",		"UNK1EE",
+	"VSSTRT",		"HCENTER",		"DIWHIGH",		"BPLHMOD",
+	"SPRHPTH",		"SPRHPTL",		"BPLHPTH",		"BPLHPTL",
 	"UNK1F0",		"UNK1F2",		"UNK1F4",		"UNK1F6",
-	"UNK1F8",		"UNK1FA",		"UNK1FC",		"UNK1FE"
+	"UNK1F8",		"UNK1FA",		"FMODE",		"UNK1FE"
 };
 
 
@@ -348,7 +348,12 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* render up to this scanline */
 	if (!video_screen_update_partial(machine->primary_screen, scanline))
-		amiga_render_scanline(machine, NULL, scanline);
+	{
+		if (IS_AGA(amiga_intf))
+			amiga_aga_render_scanline(machine, NULL, scanline);
+		else
+			amiga_render_scanline(machine, NULL, scanline);
+	}
 
 	/* force a sound update */
 	amiga_audio_update();
@@ -1162,11 +1167,17 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_VPOSR:
 			CUSTOM_REG(REG_VPOSR) &= 0xff00;
-			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(space->machine->primary_screen) >> 16;
+			if (IS_AGA(amiga_intf))
+				CUSTOM_REG(REG_VPOSR) |= amiga_aga_gethvpos(space->machine->primary_screen) >> 16;
+			else
+				CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(space->machine->primary_screen) >> 16;
 			return CUSTOM_REG(REG_VPOSR);
 
 		case REG_VHPOSR:
-			return amiga_gethvpos(space->machine->primary_screen) & 0xffff;
+			if (IS_AGA(amiga_intf))
+				return amiga_aga_gethvpos(space->machine->primary_screen) & 0xffff;
+			else
+				return amiga_gethvpos(space->machine->primary_screen) & 0xffff;
 
 		case REG_SERDATR:
 			CUSTOM_REG(REG_SERDATR) &= ~0x4000;
@@ -1207,11 +1218,17 @@ READ16_HANDLER( amiga_custom_r )
 			return CUSTOM_REG(REG_INTREQ);
 
 		case REG_COPJMP1:
-			copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
+			if (IS_AGA(amiga_intf))
+				aga_copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
+			else
+				copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
 			break;
 
 		case REG_COPJMP2:
-			copper_setpc(CUSTOM_REG_LONG(REG_COP2LCH));
+			if (IS_AGA(amiga_intf))
+				aga_copper_setpc(CUSTOM_REG_LONG(REG_COP2LCH));
+			else
+				copper_setpc(CUSTOM_REG_LONG(REG_COP2LCH));
 			break;
 
 		case REG_CLXDAT:
@@ -1324,19 +1341,28 @@ WRITE16_HANDLER( amiga_custom_w )
 
 		case REG_SPR0PTL:	case REG_SPR1PTL:	case REG_SPR2PTL:	case REG_SPR3PTL:
 		case REG_SPR4PTL:	case REG_SPR5PTL:	case REG_SPR6PTL:	case REG_SPR7PTL:
-			amiga_sprite_dma_reset((offset - REG_SPR0PTL) / 2);
+			if (IS_AGA(amiga_intf))
+				amiga_aga_sprite_dma_reset((offset - REG_SPR0PTL) / 2);
+			else
+				amiga_sprite_dma_reset((offset - REG_SPR0PTL) / 2);
 			break;
 
 		case REG_SPR0CTL:	case REG_SPR1CTL:	case REG_SPR2CTL:	case REG_SPR3CTL:
 		case REG_SPR4CTL:	case REG_SPR5CTL:	case REG_SPR6CTL:	case REG_SPR7CTL:
 			/* disable comparitor on writes here */
-			amiga_sprite_enable_comparitor((offset - REG_SPR0CTL) / 4, FALSE);
+			if (IS_AGA(amiga_intf))
+				amiga_aga_sprite_enable_comparitor((offset - REG_SPR0CTL) / 4, FALSE);
+			else
+				amiga_sprite_enable_comparitor((offset - REG_SPR0CTL) / 4, FALSE);
 			break;
 
 		case REG_SPR0DATA:	case REG_SPR1DATA:	case REG_SPR2DATA:	case REG_SPR3DATA:
 		case REG_SPR4DATA:	case REG_SPR5DATA:	case REG_SPR6DATA:	case REG_SPR7DATA:
 			/* enable comparitor on writes here */
-			amiga_sprite_enable_comparitor((offset - REG_SPR0DATA) / 4, TRUE);
+			if (IS_AGA(amiga_intf))
+				amiga_aga_sprite_enable_comparitor((offset - REG_SPR0DATA) / 4, TRUE);
+			else
+				amiga_sprite_enable_comparitor((offset - REG_SPR0DATA) / 4, TRUE);
 			break;
 
 		case REG_COP1LCH:	case REG_COP2LCH:
@@ -1344,11 +1370,17 @@ WRITE16_HANDLER( amiga_custom_w )
 			break;
 
 		case REG_COPJMP1:
-			copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
+			if (IS_AGA(amiga_intf))
+				aga_copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
+			else
+				copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
 			break;
 
 		case REG_COPJMP2:
-			copper_setpc(CUSTOM_REG_LONG(REG_COP2LCH));
+			if (IS_AGA(amiga_intf))
+				aga_copper_setpc(CUSTOM_REG_LONG(REG_COP2LCH));
+			else
+				copper_setpc(CUSTOM_REG_LONG(REG_COP2LCH));
 			break;
 
 		case REG_DDFSTRT:
@@ -1447,16 +1479,26 @@ WRITE16_HANDLER( amiga_custom_w )
 		case REG_COLOR20:	case REG_COLOR21:	case REG_COLOR22:	case REG_COLOR23:
 		case REG_COLOR24:	case REG_COLOR25:	case REG_COLOR26:	case REG_COLOR27:
 		case REG_COLOR28:	case REG_COLOR29:	case REG_COLOR30:	case REG_COLOR31:
-			data &= 0xfff;
-			CUSTOM_REG(offset + 32) = (data >> 1) & 0x777;
+			if ( IS_AGA(amiga_intf))
+			{
+				aga_palette_write(offset - REG_COLOR00, data);
+			}
+			else
+			{
+				data &= 0xfff;
+				CUSTOM_REG(offset + 32) = (data >> 1) & 0x777;
+			}
 			break;
 
 		default:
 			break;
 	}
 
-	if (offset <= REG_COLOR31)
+	if (IS_AGA(amiga_intf))
 		CUSTOM_REG(offset) = data;
+	else
+		if (offset <= REG_COLOR31)
+			CUSTOM_REG(offset) = data;
 }
 
 

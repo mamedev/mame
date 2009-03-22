@@ -2856,6 +2856,7 @@ src/mame/video/aliens.c svneol=native#text/plain
 src/mame/video/alpha68k.c svneol=native#text/plain
 src/mame/video/ambush.c svneol=native#text/plain
 src/mame/video/amiga.c svneol=native#text/plain
+src/mame/video/amigaaga.c svneol=native#text/plain
 src/mame/video/ampoker2.c svneol=native#text/plain
 src/mame/video/amspdwy.c svneol=native#text/plain
 src/mame/video/angelkds.c svneol=native#text/plain

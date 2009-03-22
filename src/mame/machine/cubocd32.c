@@ -408,52 +408,32 @@ static TIMER_CALLBACK(akiko_dma_proc)
 		UINT32	track = cdrom_get_track( akiko.cdrom, akiko.cdrom_lba_cur );
 		UINT32	datasize = cdrom_get_toc( akiko.cdrom )->tracks[track].datasize;
 		UINT32	subsize = cdrom_get_toc( akiko.cdrom )->tracks[track].subsize;
-		UINT32	secsize = datasize + subsize;
 		int		i;
 
-		if ( secsize <= (2352-16) )
+		UINT32	curmsf = lba_to_msf( akiko.cdrom_lba_cur );
+		memset( buf, 0, 16 );
+
+		buf[3] = akiko.cdrom_lba_cur - akiko.cdrom_lba_start;
+		memset( &buf[4], 0xff, 8 );
+
+		buf[12] = (curmsf >> 16) & 0xff;
+		buf[13] = (curmsf >> 8) & 0xff;
+		buf[14] = curmsf & 0xff;
+		buf[15] = 0x01; /* mode1 */
+
+		datasize = 2048;
+		if ( !cdrom_read_data( akiko.cdrom, akiko.cdrom_lba_cur, &buf[16], CD_TRACK_MODE1 ) )
 		{
-			UINT32	curmsf = lba_to_msf( akiko.cdrom_lba_cur );
-			memset( buf, 0, 16 );
-
-			buf[3] = akiko.cdrom_lba_cur - akiko.cdrom_lba_start;
-			memset( &buf[4], 0xff, 8 );
-
-			buf[12] = (curmsf >> 16) & 0xff;
-			buf[13] = (curmsf >> 8) & 0xff;
-			buf[14] = curmsf & 0xff;
-			buf[15] = 0x01; /* mode1 */
-
-			if ( !cdrom_read_data( akiko.cdrom, akiko.cdrom_lba_cur, &buf[16], CD_TRACK_RAW_DONTCARE ) )
-			{
-				logerror( "AKIKO: Read error trying to read sector %08x!\n", akiko.cdrom_lba_cur );
-				return;
-			}
-
-			if ( subsize )
-			{
-				if ( !cdrom_read_subcode( akiko.cdrom, akiko.cdrom_lba_cur, &buf[16+datasize] ) )
-				{
-					logerror( "AKIKO: Read error trying to read subcode for sector %08x!\n", akiko.cdrom_lba_cur );
-					return;
-				}
-			}
+			logerror( "AKIKO: Read error trying to read sector %08x!\n", akiko.cdrom_lba_cur );
+			return;
 		}
-		else
-		{
-			if ( !cdrom_read_data( akiko.cdrom, akiko.cdrom_lba_cur, buf, CD_TRACK_RAW_DONTCARE) )
-			{
-				logerror( "AKIKO: Read error trying to read sector %08x!\n", akiko.cdrom_lba_cur );
-				return;
-			}
 
-			if ( subsize )
+		if ( subsize )
+		{
+			if ( !cdrom_read_subcode( akiko.cdrom, akiko.cdrom_lba_cur, &buf[16+datasize] ) )
 			{
-				if ( !cdrom_read_subcode( akiko.cdrom, akiko.cdrom_lba_cur, &buf[datasize] ) )
-				{
-					logerror( "AKIKO: Read error trying to read subcode for sector %08x!\n", akiko.cdrom_lba_cur );
-					return;
-				}
+				logerror( "AKIKO: Read error trying to read subcode for sector %08x!\n", akiko.cdrom_lba_cur );
+				return;
 			}
 		}
 
