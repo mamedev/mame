@@ -283,7 +283,7 @@ WRITE64_HANDLER( pvr_ta_w )
 				// we've got a request to draw, so, draw to the fake fraembuffer!
 				testdrawscreen(space->machine,fakeframebuffer_bitmap,&clip);			
 				
-				timer_adjust_oneshot(endofrender_timer, ATTOTIME_IN_USEC(10) , 0); // hack, make sure render takes some amount of time
+				timer_adjust_oneshot(endofrender_timer, ATTOTIME_IN_USEC(1000) , 0); // hack, make sure render takes some amount of time
 				
 				break;
 			}
