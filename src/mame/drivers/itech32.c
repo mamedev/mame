@@ -117,6 +117,58 @@
 
 ****************************************************************************
 
+Golden Tee 3D / World Class Bowling / Suffleshot hardware (aka P/N 1083 PCB)
+Incredible Technologies, 1996-2002
+
+This covers all the Incredible Technologies games on the single large PCB
+
+PCB Layout
+----------
+
+P/N 1083 REV 2
+|----------------------------------------------------------------------|
+|SROM2 SROM1 SROM0 U88 LH5164                 XC7336(2)          GRM2_0|
+|                                  HM538123       8MHz       GRM1_0    |
+|SROM4 SROM3                       HM538123              GRM0_0        |
+|       68B09           CY7C199    HM538123   |------|           GRM2_1|
+|            PAL1 PAL2             HM538123   | IT42 |       GRM1_1    |
+|                       CY7C199    HM538123   |      |   GRM0_1        |
+|           16MHz                  HM538123   |------|           GRM2_3|
+|   ES5506              CY7C199                              GRM1_2    |
+|                       PROM1 PROM0   CY7C185            GRM0_2        |
+|   TDA1543 LED                       CY7C185    68EC020         GRM2_3|
+|   X9312WS X9312WS                   CY7C185          25MHz GRM1_3    |
+|    3403             TC551001        CY7C185            GRM0_3        |
+|TICKETS     BATTERY    PROM2 PROM3              XC7336(1)      PLAYER1|
+|                   LTC691                           DSW(4)            |
+|VOLUME                LT723                                    PLAYER2|
+|  TDA7240A             DSW(4)                 4MHz       PAL3         |
+|                                              PIC16C54 LED            |
+|------------------------------JAMMA-----------------------------------|
+Notes:
+      68EC020   - clock 25.000MHz
+      ES5506    - clock 16.000MHz
+      68B09     - clock 2.000MHz [16/8]
+      CY7C185   - 8k x8 SRAM
+      CY7C199   - 32k x8 SRAM
+      HM528123  - Hitachi HM538123 128k x8 VRAM
+      TC551001  - Toshiba TC551001 128k x8 SRAM
+      LH5164    - Sharp LH5164 8k x8 SRAM
+      XC7336(1) - XILINX XC7336 CPLD labelled 'ITMP3-15'
+      XC7336(2) - XILINX XC7336 CPLD labelled 'ITVR-1'
+      IT42      - Custom Incredible Technologies Graphics Generator (QFP208)
+
+      Measurements
+      ------------
+      X1    - 8.00006MHz
+      X2    - 25.00002MHz
+      X3    - 4.00000MHz
+      X5    - 15.99984MHz
+      VSync - 59.7612Hz
+      HSync - 15.6570kHz
+
+****************************************************************************
+
 Hot Memory (German V1.2)
 Tuning/Strata/Incredible Technologies, 1994
 
