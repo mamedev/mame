@@ -35,6 +35,7 @@
  - Fortress 2 Blue Arcade (v. 1.01 / pcb ver 3.05)
  - Fortress 2 Blue Arcade (v. 1.00 / pcb ver 3.05)
  - Puzzle King (Dance & Puzzle)
+ - Iron Fortress
 
  Known games not dumped
  - Hidden Catch (pcb ver 3.02)
@@ -43,6 +44,7 @@
 
  TODO:
  - sound & sound cpu
+ - add proper dipswicthes for Iron Fortress
 
  Original Bugs:
  - Hidden Catch 3: the text shown when you start a game is flipped or
@@ -302,6 +304,95 @@ static MACHINE_DRIVER_START( eolith50 )
 	MDRV_IMPORT_FROM(eolith45)
 	MDRV_CPU_REPLACE("cpu", E132N, 50000000)		 /* 50 MHz */
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( ironfort )
+	MDRV_IMPORT_FROM(eolith45)
+	MDRV_CPU_REPLACE("cpu", E132N, 44900000) /* Normaly 45MHz??? but PCB actually had a 44.9MHz OSC, so it's value is used */
+MACHINE_DRIVER_END
+
+
+
+/* 
+
+Iron Fortress 
+Eolith, 1998
+
+This game runs on hardware that looks exactly like the Gradation 2D PCB
+but there's no text or labelling on the PCB to say that. However, it is
+an original Eolith PCB.
+
+Printed on the back of the pcb is "9752 12-133"
+
+PCB Layout
+----------
+
+(No PCB number)
+|-------------------------------------------------|
+|            VOL    KM6161002 KM6161002  IS61C1024|
+|            VOL                                  |
+|                   KM6161002 KM6161002  IS61C1024|
+|     24MHz       QS1001A  DSW4 DSW3              |
+|          QS1000                        IS61C1024|
+|            U107   U97  EV0514-001               |
+|J                                       IC61C1024|
+|A                     14.31818MHz                |
+|M                                    E1-32N      |
+|M                                                |
+|A     93C66                        44.9MHz       |
+|                                                 |
+|                                                 |
+|            GMS80C301                            |
+|       12MHz                                     |
+|                                                 |
+|             U108    U41*  U39   U36*  U34       |
+|        U111      U42*  U40   U37*  U35*   U43   |
+|                                                 |
+|-------------------------------------------------|
+Notes:
+      E1-32N       - Hyperstone E1-32N CPU, clock 44.900MHz (QFP160)
+      80C301 clock - 12.000MHz
+      IS61C1024    - ISSI 128k x4 High Speed CMOS Static RAM (SOJ32)
+      KM6161002    - Samsung 64k x4 Ultra High Speed CMOS Video Static RAM (SOJ44)
+      QS1000       - QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
+                     see http://www.hwass.co.kr/product.htm for more info on QS100x chips.
+      QS1001A      - QDSP QS1001A 512k x8 MaskROM (SOP32)
+      EV0514-001   - Custom Eolith IC (QFP100)
+      VSync        - 60Hz
+      HSync        - 15.64kHz
+
+      DSW4 & DSW3 are 4 switch dipswitches
+
+      U107, U97, U111, U108 & U43 are populated with EPROMs and are not labeled in any way
+      U34 - U42 are C32000 MASK roms read as 27C322 those marked with '*' are unpopulated
+
+      qs1001a.u96 was not dumped from this PCB, but is standard sample rom found on many Eolith gradation PCBs
+*/
+
+ROM_START( ironfort )
+	ROM_REGION( 0x80000, "cpu", 0 ) /* Hyperstone CPU Code */
+	ROM_LOAD( "u43", 0x00000, 0x80000, CRC(29f55825) SHA1(e048ec0f5d83d4b64aa48d706fa0947afcdc1a3d) ) /* 27C040 eprom with no label */
+
+	ROM_REGION32_BE( 0x2000000, "user1", ROMREGION_ERASE00 ) /* Game Data - banked ROM, swapping necessary */
+	ROM_LOAD32_WORD_SWAP( "if00-00.u39", 0x0000000, 0x400000, CRC(63b74601) SHA1(c111ecf55359e9005a3ec1fe1202a34624f8b242) )
+	ROM_LOAD32_WORD_SWAP( "if00-01.u34", 0x0000002, 0x400000, CRC(890470b3) SHA1(57df122ab01744b47ebd38554eb6a7d780977be2) )
+	ROM_LOAD32_WORD_SWAP( "if00-02.u40", 0x0800000, 0x400000, CRC(63b5cca5) SHA1(4ec8b813c7e465f659a4a2361ddfbad763bf6e6a) )
+	ROM_LOAD32_WORD_SWAP( "if00-03.u35", 0x0800002, 0x400000, CRC(54a76cb5) SHA1(21fb3bedf065079d59f642b19487f76590f97558) )
+
+	ROM_REGION( 0x008000, "cpu1", 0 ) /* QDSP ('51) Code */
+	ROM_LOAD( "u107", 0x0000, 0x8000, CRC(89450a2f) SHA1(d58efa805f497bec179fdbfb8c5860ac5438b4ec) ) /* 27C256 eprom with no label */
+
+	ROM_REGION( 0x08000, "cpu2", 0 ) /* Sound (80c301) CPU Code */
+	ROM_LOAD( "u111", 0x0000, 0x8000, CRC(5d1d1387) SHA1(91c8aa4c7472b91c149bef9da64569a97df35298) ) /* 27C256 eprom with no label */
+
+	ROM_REGION( 0x080000, "music", 0 ) /* Music data */
+	ROM_LOAD( "u108", 0x00000, 0x80000, CRC(89233144) SHA1(74e87679a7559450934b80fcfcb667d9845977a7) ) /* 27C040 eprom with no label */
+
+	ROM_REGION( 0x080000, "sfx", 0 ) /* QDSP samples (SFX) */
+	ROM_LOAD( "u97", 0x00000, 0x80000, CRC(47b9d43a) SHA1(e0bc42892480cb563dc694fcefa8ca0b984749dd) ) /* 27C040 eprom with no label */
+
+	ROM_REGION( 0x080000, "wavetable", 0 ) /* QDSP wavetable rom */
+	ROM_LOAD( "qs1001a.u96",  0x000000, 0x80000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) )
+ROM_END
 
 /* Hidden Catch */
 
@@ -902,6 +993,7 @@ static DRIVER_INIT( hidctch3 )
 	init_eolith_speedup(machine);
 }
 
+GAME( 1998, ironfort, 0,       ironfort, common,   eolith,   ROT0, "Eolith", "Iron Fortress", GAME_NO_SOUND ) /* actual DIPs need to be added */
 GAME( 1998, hidnctch, 0,       eolith45, hidnctch, eolith,   ROT0, "Eolith", "Hidden Catch (World) / Tul Lin Gu Lim Chat Ki '98 (Korea) (pcb ver 3.03)",  GAME_NO_SOUND ) // or Teurrin Geurim Chajgi '98
 GAME( 1998, raccoon,  0,       eolith45, raccoon,  eolith,   ROT0, "Eolith", "Raccoon World", GAME_NO_SOUND )
 GAME( 1998, puzzlekg, 0,       eolith45, puzzlekg, eolith,   ROT0, "Eolith", "Puzzle King (Dance & Puzzle)",  GAME_NO_SOUND )
