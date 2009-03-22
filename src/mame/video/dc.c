@@ -17,6 +17,8 @@
 #define DEBUG_VERTICES	(1)
 #define DEBUG_PALRAM (1)
 
+#define NUM_BUFFERS 4
+
 static UINT32 pvrctrl_regs[0x100/4];
 static UINT32 pvrta_regs[0x2000/4];
 static const int pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13,14,15,16,17,16,17,0,0,0,0,0,18,19,20,19,20,21,22,23,22,23};
@@ -31,6 +33,9 @@ UINT64 *dc_texture_ram;
 static UINT32 tafifo_buff[32];
 
 static emu_timer *vbout_timer;
+static emu_timer *endofrender_timer;
+static bitmap_t *fakeframebuffer_bitmap;
+static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect);
 
 typedef struct
 {
@@ -72,7 +77,7 @@ typedef struct {
 	int renderselect;
 	int listtype_used;
 	int alloc_ctrl_OPB_Mode, alloc_ctrl_PT_OPB, alloc_ctrl_TM_OPB, alloc_ctrl_T_OPB, alloc_ctrl_OM_OPB, alloc_ctrl_O_OPB;
-	receiveddata grab[4];
+	receiveddata grab[NUM_BUFFERS];
 	int grabsel;
 	int grabsellast;
 	UINT32 paracontrol,paratype,endofstrip,listtype,global_paratype,parameterconfig;
@@ -190,16 +195,17 @@ WRITE64_HANDLER( pvr_ta_w )
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  TA soft reset\n");
 			#endif
-			state_ta.listtype_used=0;
+			state_ta.listtype_used=0;			
 		}
 		if (dat & 2)
 		{
+			
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  Core Pipeline soft reset\n");
 			#endif
 			if (state_ta.start_render_received == 1)
 			{
-				for (a=0;a < 4;a++)
+				for (a=0;a < NUM_BUFFERS;a++)
 					if (state_ta.grab[a].busy == 1)
 						state_ta.grab[a].busy = 0;
 				state_ta.start_render_received = 0;
@@ -255,21 +261,36 @@ WRITE64_HANDLER( pvr_ta_w )
 		}
 		#endif
 		// select buffer to draw using PARAM_BASE
-		for (a=0;a < 4;a++)
+		for (a=0;a < NUM_BUFFERS;a++)
 		{
 			if ((state_ta.grab[a].ispbase == pvrta_regs[PARAM_BASE]) && (state_ta.grab[a].valid == 1) && (state_ta.grab[a].busy == 0))
 			{
+				rectangle clip;
+					
 				state_ta.grab[a].busy = 1;
 				state_ta.renderselect = a;
 				state_ta.start_render_received=1;
+
+
 				state_ta.grab[a].fbwsof1=pvrta_regs[FB_W_SOF1];
 				state_ta.grab[a].fbwsof2=pvrta_regs[FB_W_SOF2];
+				
+				clip.min_x = 0;
+				clip.max_x = 1023;
+				clip.min_y = 0;
+				clip.max_y = 1023;	
+				
+				// we've got a request to draw, so, draw to the fake fraembuffer!
+				testdrawscreen(space->machine,fakeframebuffer_bitmap,&clip);			
+				
+				timer_adjust_oneshot(endofrender_timer, ATTOTIME_IN_USEC(10) , 0); // hack, make sure render takes some amount of time
+				
 				break;
 			}
 		}
-		if (a != 4)
+		if (a != NUM_BUFFERS)
 			break;
-		assert_always(0, "TA grabber error!\n");
+		assert_always(0, "TA grabber error A!\n");
 		break;
 	case TA_LIST_INIT:
 		state_ta.tafifo_pos=0;
@@ -294,7 +315,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		// use TA_ISP_BASE and select buffer for grab data
 		state_ta.grabsel = -1;
 		// try to find already used buffer but not busy
-		for (a=0;a < 4;a++)
+		for (a=0;a < NUM_BUFFERS;a++)
 		{
 			if ((state_ta.grab[a].ispbase == pvrta_regs[TA_ISP_BASE]) && (state_ta.grab[a].busy == 0) && (state_ta.grab[a].valid == 1))
 			{
@@ -305,7 +326,7 @@ WRITE64_HANDLER( pvr_ta_w )
 		// try a buffer not used yet
 		if (state_ta.grabsel < 0)
 		{
-			for (a=0;a < 4;a++)
+			for (a=0;a < NUM_BUFFERS;a++)
 			{
 				if (state_ta.grab[a].valid == 0)
 				{
@@ -327,7 +348,7 @@ WRITE64_HANDLER( pvr_ta_w )
 			}
 		}
 		if (state_ta.grabsel < 0)
-			assert_always(0, "TA grabber error!\n");
+			assert_always(0, "TA grabber error B!\n");
 		state_ta.grabsellast=state_ta.grabsel;
 		state_ta.grab[state_ta.grabsel].ispbase=pvrta_regs[TA_ISP_BASE];
 		state_ta.grab[state_ta.grabsel].busy=0;
@@ -771,8 +792,11 @@ INLINE UINT32 alpha_blend_r16_565(UINT32 d, UINT32 s, UINT8 level)
 }
 #endif
 
+/// !! 
+
 static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
-{
+{	
+	
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int cs,x,y,dx,dy,xi,yi,a,rs,ns;
 	float iu,iv,u,v;
@@ -786,8 +810,12 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 	UINT32 k;
 #endif
 
+
 	if (state_ta.renderselect < 0)
 		return;
+
+	//printf("drawtest!\n");
+	
 	rs=state_ta.renderselect;
 	c=pvrta_regs[ISP_BACKGND_T];
 	c=memory_read_dword(space,0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
@@ -995,6 +1023,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 #endif
 }
 
+#if 0
 static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int x,y,dy,xi;
@@ -1017,6 +1046,7 @@ static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect
 		}
 	}
 }
+#endif
 
 #if DEBUG_PALRAM
 static void debug_paletteram(running_machine *machine)
@@ -1108,7 +1138,9 @@ static void pvr_build_parameterconfig(void)
 
 static TIMER_CALLBACK(vbout)
 {
-UINT32 a;
+
+	UINT32 a;
+	//printf("vbout\n");
 
 	a=dc_sysctrl_regs[SB_ISTNRM] | IST_VBL_OUT;
 	dc_sysctrl_regs[SB_ISTNRM] = a; // V Blank-out interrupt
@@ -1116,6 +1148,33 @@ UINT32 a;
 
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 }
+
+// moved, interrupts should never be changed in a VIDEO_UDPATE call!!
+static TIMER_CALLBACK(endofrender)
+{
+	UINT32 a;
+	
+	//printf("endofrender\n");
+
+	// don't know if this is right.. but we get asserts otherwise, timing error?
+	if (state_ta.start_render_received == 1)
+	{
+		for (a=0;a < NUM_BUFFERS;a++)
+			if (state_ta.grab[a].busy == 1)
+				state_ta.grab[a].busy = 0;
+		state_ta.start_render_received = 0;
+	}		
+	
+	state_ta.start_render_received=0;
+	state_ta.renderselect= -1;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
+	dc_update_interrupt_status(machine);
+		
+	timer_adjust_oneshot(endofrender_timer, attotime_never, 0);
+	
+
+}
+
 
 VIDEO_START(dc)
 {
@@ -1141,43 +1200,59 @@ VIDEO_START(dc)
 
 	vbout_timer = timer_alloc(machine, vbout, 0);
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
+	
+	endofrender_timer = timer_alloc(machine, endofrender, 0);
+	timer_adjust_oneshot(endofrender_timer, attotime_never, 0);
+	
+	fakeframebuffer_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_RGB32);
+
+
 }
 
 VIDEO_UPDATE(dc)
 {
-	static int useframebuffer=1;
+	/******************
+	  MAME note
+	*******************
+	  
+	The video update function should NOT be generating interrupts, setting timers or doing _anything_ the game might be able to detect
+	as it will be called at different times depending on frameskip etc.
+	
+	Rendering should happen when the hardware requests it, to the framebuffer(s)
+	
+	Everything else should depend on timers.
+	
+	******************/
 
-	#if DEBUG_PALRAM
+//	static int useframebuffer=1;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	int y,x;	
+	//printf("videoupdate\n");
+
+#if DEBUG_PALRAM
 	debug_paletteram(screen->machine);
-	#endif
-
-	if ((useframebuffer) && !state_ta.start_render_received)
+#endif
+	
+	// copy our fake framebuffer bitmap (where things have been rendered) to the screen
+	for (y = visarea->min_y ; y < visarea->max_y ; y++)
 	{
-		if (pvrta_regs[VO_CONTROL] & (1 << 3))
-			bitmap_fill(bitmap,cliprect,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF);
-		else
-			testdrawscreenframebuffer(bitmap,cliprect);
-		return 0;
+		for (x = visarea->min_x ; x < visarea->max_x ; x++)
+		{
+			UINT32* src = BITMAP_ADDR32(fakeframebuffer_bitmap, y, x);
+			UINT32* dst = BITMAP_ADDR32(bitmap, y, x);
+			dst[0] = src[0];
+		}
 	}
+		
 
-	if (state_ta.start_render_received)
-	{
-		useframebuffer=0;
-		testdrawscreen(screen->machine,bitmap,cliprect);
-		if (pvrta_regs[VO_CONTROL] & (1 << 3))
-			bitmap_fill(bitmap,cliprect,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF);
-		state_ta.start_render_received=0;
-		state_ta.renderselect= -1;
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
-		dc_update_interrupt_status(screen->machine);
-		return 0;
-	}
-	else
-		return 1;
+
+	return 1;
 }
 
 void dc_vblank(running_machine *machine)
 {
+	//printf("vblankin\n");
+
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
 	dc_update_interrupt_status(machine);
 
