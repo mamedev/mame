@@ -4373,6 +4373,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
 	DRIVER( senko )		/* 2005.04 Senkou no Rondo (Rev A) */
 	DRIVER( senkoo )	/*          ^^ */
+						/* 2005.08 Melty Blood Act Cadenza ver.A */
 	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */
 						/* 2005.10 Radirgy */
 						/* 2005.?? Radirgy (Rev. A) */
@@ -4386,6 +4387,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2006.12 Guilty Gear XX Accent Core */
 						/* 2006.12 Melty Blood Act Cadenza ver.B */
 						/* 2007.02 Noukone Puzzle Takoron */
+						/* 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2) */
 
 						/* Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
 
