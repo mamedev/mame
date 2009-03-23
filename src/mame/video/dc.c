@@ -1244,9 +1244,7 @@ VIDEO_UPDATE(dc)
 		}
 	}
 		
-
-
-	return 1;
+	return 0;
 }
 
 void dc_vblank(running_machine *machine)
