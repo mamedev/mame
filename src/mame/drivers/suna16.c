@@ -1035,7 +1035,7 @@ static MACHINE_DRIVER_START( bestbest )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.1734)    // measured on pcb (15.6218kHz HSync)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(256, 256)
@@ -1269,11 +1269,14 @@ Notes:
       6116     - 2kx8 SRAM
       62256    - 32kx8 SRAM
       CN1      - Connector for extra controls
-      VSync    - 60Hz
-      HSync    - 15.68kHz
-
       ROMs 7-18 located on a plug-in daughterboard
       Both PROMs are identical
+
+      Measurements
+      ------------
+      XTAL  - 23.99463MHz
+      VSync - 59.1734Hz
+      HSync - 15.6218kHz
 
 ***************************************************************************/
 
