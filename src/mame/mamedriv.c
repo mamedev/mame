@@ -4425,6 +4425,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.08 Wave Runner GP */
 	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 */
 						/* 2001.08.20 Virtua Fighter 4 ver.B */
+						/* 2002.01.31 Virtua Fighter 4 ver.C */
 						/* 2002.02 The King of Route 66 */
 	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
@@ -4432,12 +4433,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2002.07 Soul Surfer */
 	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution */
 	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
+						/* 2002.12 Virtua Fighter 4 Evolution ver.B */
 						/* 2003.03 WCCF 2001-2002 ver.2.0 */
 						/* 2003.09 WCCF 2002-2003 */
 						/* 2004.01 Initial D Arcade Stage ver.3 */
 						/* 2004.06 WCCF 2002-2003 ver.2.0 */
 	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned */
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */
+						/* 2005.01 Virtua Fighter 4 final Tuned ver.B */
 						/* 2005.04 Menkyo no Tetsujin */
 						/* 2005.07 WCCF 2004-2005 */
 						/* 2006.08 WCCF European Clubs 2005-2006 */
