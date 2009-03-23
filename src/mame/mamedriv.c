@@ -4346,7 +4346,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.10 Derby Owners Club 2 */
 						/* 2001.10 Inu no Osanpo */
 	DRIVER( vtennis2 )  /* 2001.10 Power Smash 2 / Virtua Tennis 2 */
-	DRIVER( keyboard )	/* 2001.11 La Keyboardu */
+	DRIVER( keyboard )	/* 2001.11 La Keyboardxyu */
 						/* 2001.11 Shakatto Tambourine Cho Powerup Chu */
 	DRIVER( ikaruga )	/* 2001.12 Ikaruga */
 	DRIVER( lupinsho )	/* 2001.12 Lupin the Third the Shooting */
@@ -4367,6 +4367,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bdrdown )	/* 2003.04 Border Down */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
+	DRIVER( cfield )	/* 2004.06 Chaos Field */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
 	DRIVER( meltybld )	/* 2005.03 Melty Blood Act Cadenza */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
@@ -4385,7 +4386,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2006.12 Guilty Gear XX Accent Core */
 						/* 2006.12 Melty Blood Act Cadenza ver.B */
 						/* 2007.02 Noukone Puzzle Takoron */
-	DRIVER( cfield )	/* 200?.?? Chaos Field */
 
 						/* Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
 
