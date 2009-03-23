@@ -3696,8 +3696,8 @@ GAME( 2001, keyboard,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",       
 GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, luptype,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Typing (Rev A) (GDS-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, mok,       naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, ngdup23a,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Compile",         "Naomi GD-ROM Firmware Updater (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, ngdup23c,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Compile",         "Naomi GD-ROM Firmware Updater (GDL-0023C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ngdup23a,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",         "Naomi GD-ROM Firmware Updater (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ngdup23c,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",         "Naomi GD-ROM Firmware Updater (GDL-0023C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
