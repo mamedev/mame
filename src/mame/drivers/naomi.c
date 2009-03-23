@@ -750,7 +750,7 @@ static WRITE64_HANDLER( eeprom_93c46a_w )
 0 0x00800000 - 0x00FFFFFF AICA- Wave Memory
 0 0x01000000 - 0x01FFFFFF Ext. Device
 0 0x02000000 - 0x03FFFFFF Image Area (Mirror Area)
-
+     
 1 0x04000000 - 0x04FFFFFF MPX Tex.Mem. 64bit Acc.
 1 0x05000000 - 0x05FFFFFF Tex.Mem. 32bit Acc.
 1 0x06000000 - 0x07FFFFFF Image Area*
@@ -759,6 +759,7 @@ static WRITE64_HANDLER( eeprom_93c46a_w )
 
 3 0x0C000000 - 0x0CFFFFFF System Memory
 3 0x0D000000 - 0x0DFFFFFF (Mirror on DC, Extra RAM on Naomi)
+     
 3 0x0E000000 - 0x0FFFFFFF Image Area (Mirror Area)
 
 4 0x10000000 - 0x107FFFFF MPX TA FIFO Polygon Cnv.
@@ -823,6 +824,8 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE( "aica", dc_aica_reg_r, dc_aica_reg_w )
 	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
 	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+	            
+	
 	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 	
 	/* Area 1 */
@@ -3016,6 +3019,19 @@ ROM_START( psyvar2 )
 ROM_END
 
 
+ROM_START( cfield )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0025", 0, SHA1(be0d88eb4f48403a2ceaa7ef588ed60b96ba93bf) )
+
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdl-0025.data", 0x00, 0x50, CRC(32adf2eb) SHA1(d86752e6fe9ccac093c512828fca5b7ae62a3ff2) )
+ROM_END
+
 
 ROM_START( trizeal )
 	NAOMIGD_BIOS
@@ -3245,6 +3261,17 @@ ROM_START( vtennisg )
 	ROM_LOAD("317-0312-com.data", 0x00, 0x50, CRC(6b24f78f) SHA1(43f89815ec46cf014d941b4b9238da044b338b4c) )
 ROM_END
 
+ROM_START( keyboard )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0017", 0, SHA1(57567ab8aef727a014671f53c20b27fa8458c031) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gds-0017.data", 0x00, 0x50, CRC(c1277eb3) SHA1(529ed5a133550e2854f8656cd377706060a7befa) )
+ROM_END
 
 ROM_START( vathlete )
 	NAOMIGD_BIOS
@@ -3526,23 +3553,27 @@ GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi, ggxxsla,   ROT0,   "Arc System
 GAME( 2005, undefeat,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "GRev",         "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, trgheart,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Warashi",      "Trigger Heart Exelica (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, jingystm,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Yuki Enterprise",      "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, cfield,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Able",      "Chaos Field (GDL-0025)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
+
 
 
 
 // GDS-xxxx (first party games?)
+GAME( 2001, confmiss,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, slashout,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, dygolf,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis (GDS-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vathlete,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis 2 (GDS-0015a)", GAME_NO_SOUND|GAME_NOT_WORKING ) // bad key
-GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis 2 (GDS-0015a)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, keyboard,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "La Keyboard XYZ (GDS-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, luptype,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Typing (GDS-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, mok,       naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, confmiss,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
