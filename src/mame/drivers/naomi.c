@@ -3546,7 +3546,7 @@ GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",   
 GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",        "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, trizeal,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Taito",        "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, meltybld,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole",        "Melty Blood Act Cadenza ver.A (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (Rev. A)(GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde NEW ver. (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, senkoo,    senko,    naomigd,  naomi, naomigd,   ROT0,   "Grev",         "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ss2005,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi, ggxxsla,   ROT0,   "Arc System Works",       "Guilty Gear XX Slash (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )

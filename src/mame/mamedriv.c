@@ -4371,8 +4371,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
 						/* 2005.03 Melty Blood Act Cadenza */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
-	DRIVER( senko )		/* 2005.04 Senkou no Rondo (Rev A) */
-	DRIVER( senkoo )	/*          ^^ */
+	DRIVER( senkoo )	/* 2005.04 Senkou no Rondo */
+	DRIVER( senko )		/* 2005.08 Senkou no Rondo NEW ver. */
 	DRIVER( meltybld )	/* 2005.08 Melty Blood Act Cadenza ver.A */
 	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */
 						/* 2005.10 Radirgy */
