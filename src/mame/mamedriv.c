@@ -4355,6 +4355,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
 						/* 2002.05 Cleopatra Fortune + */
 	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
+	DRIVER( ngdup23a )	/* GD-ROM Firmware Updater */
+	DRIVER( ngdup23c )
 	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
 						/* 2002.07 Mazan */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
@@ -4362,6 +4364,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2002.12 Moeru Casinyo */
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
 						/* 2003.03 Yonin Uchi Mahjong MJ Network Taisen ver. */
+	DRIVER( usagui )
+	DRIVER( tetkiwam )
 	DRIVER( ggxxrl )	/* 2003.03 Guilty Gear XX # Reload */
 	DRIVER( shikgam2 )	/* 2003.04 Shikigami no Shiro 2 */
 	DRIVER( bdrdown )	/* 2003.04 Border Down */
@@ -4375,7 +4379,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( senko )		/* 2005.08 Senkou no Rondo NEW ver. */
 	DRIVER( meltybld )	/* 2005.08 Melty Blood Act Cadenza ver.A */
 	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */
-						/* 2005.10 Radirgy */
+	DRIVER( radirgy )	/* 2005.10 Radirgy */
 						/* 2005.?? Radirgy (Rev. A) */
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
 						/* 2006.03 Kurukuru Chameleon */
@@ -4385,10 +4389,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jingystm )	/* 2006.09 Jingi Storm */
 						/* 2006.11 Karous */
 						/* 2006.12 Guilty Gear XX Accent Core */
-						/* 2006.12 Melty Blood Act Cadenza ver.B */
-						/* 2007.02 Noukone Puzzle Takoron */
-						/* 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2) */
-
+	DRIVER( meltyb )	/* 2006.12 Melty Blood Act Cadenza ver.B */
+	DRIVER( takoron )	/* 2006.12.16 Noukone Puzzle Takoron */
+	DRIVER( meltyba )	/* 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2) */
+	
 						/* Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
 
 						/* 2007.07 Shooting Love */
@@ -4424,8 +4428,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 						/* 2001.08 Wave Runner GP */
 	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 */
-						/* 2001.08.20 Virtua Fighter 4 ver.B */
-						/* 2002.01.31 Virtua Fighter 4 ver.C */
+	DRIVER( vf4b )		/* 2001.08.20 Virtua Fighter 4 ver.B */
+	DRIVER( vf4c )		/* 2002.01.31 Virtua Fighter 4 ver.C */
 						/* 2002.02 The King of Route 66 */
 	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
