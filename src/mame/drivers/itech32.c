@@ -117,7 +117,7 @@
 
 ****************************************************************************
 
-Golden Tee 3D / World Class Bowling / Suffleshot hardware (aka P/N 1083 PCB)
+Golden Tee 3D / World Class Bowling / Shuffleshot hardware (aka P/N 1083 PCB)
 Incredible Technologies, 1996-2002
 
 This covers all the Incredible Technologies games on the single large PCB
