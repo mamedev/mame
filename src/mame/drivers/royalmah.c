@@ -28,7 +28,7 @@ Year + Game               Board(s)             CPU      Company            Notes
 89  Mahjong Shinkirou     D210301BL2 + FRM-00? TLCS-90  Dynax
 89  Mahjong Derringer     D2203018L            Z80      Dynax              Larger palette
 90  Mahjong If..?         D2909278L            TLCS-90  Dynax              Larger palette
-91  Mahjong Vegas         D5011308L1 + FRM-00  TLCS-90
+91  Mahjong Vegas         D5011308L1 + FRM-00  TLCS-90  Dynax              Undumped internal rom (mjvegas set)
 92  Mahjong Cafe Time     D6310128L1-1         TLCS-90  Dynax              Larger palette, RTC
 93  Mahjong Cafe Doll     D76052208L-2         TLCS-90  Dynax              Larger palette, RTC, Undumped internal rom
 95  Mahjong Tensinhai     D10010318L1          TLCS-90  Dynax              Larger palette, RTC
@@ -1056,6 +1056,140 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cafetime_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( T90_P3, T90_P3 ) AM_WRITE( cafetime_p3_w )
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE( cafetime_p4_w )
+ADDRESS_MAP_END
+
+
+/****************************************************************************
+                               Mahjong Vegas
+****************************************************************************/
+
+static WRITE8_HANDLER( mjvegasa_p4_w )
+{
+	rombank = (rombank & 0xf8) | ((data & 0x0e) >> 1);
+}
+static WRITE8_HANDLER( mjvegasa_p3_w )
+{
+	rombank = (rombank & 0xf7) | ((data & 0x04) << 1);
+}
+static WRITE8_HANDLER( mjvegasa_rombank_w )
+{
+	rombank = (rombank & 0x0f) | ((data & 0x0f) << 4);
+}
+
+static READ8_HANDLER( mjvegasa_rom_io_r )
+{
+	if ((rombank & 0x70) != 0x70)
+		return memory_region(space->machine, "maincpu")[0x10000 + rombank * 0x8000 + offset];
+
+	offset += 0x8000;
+
+	switch(offset)
+	{
+		case 0x8000:
+		case 0x8001:
+		case 0x8002:
+		case 0x8003:
+		case 0x8004:
+		case 0x8005:
+		case 0x8006:
+		case 0x8007:
+		case 0x8008:
+		case 0x8009:
+		case 0x800a:
+		case 0x800b:
+		case 0x800c:
+		case 0x800d:
+		case 0x800e:
+		case 0x800f:
+		{
+			const device_config *rtc = devtag_get_device(space->machine, "rtc");
+			return msm6242_r(rtc, offset-0x8000);
+		}
+	}
+	logerror("%04X: unmapped IO read at %04X\n", cpu_get_pc(space->cpu), offset);
+	return 0xff;
+}
+
+static WRITE8_HANDLER( mjvegasa_rom_io_w )
+{
+	if ((rombank & 0x70) != 0x70)
+	{
+		videoram[offset] = data;
+		return;
+	}
+
+	offset += 0x8000;
+
+	switch(offset)
+	{
+		case 0x8000:
+		case 0x8001:
+		case 0x8002:
+		case 0x8003:
+		case 0x8004:
+		case 0x8005:
+		case 0x8006:
+		case 0x8007:
+		case 0x8008:
+		case 0x8009:
+		case 0x800a:
+		case 0x800b:
+		case 0x800c:
+		case 0x800d:
+		case 0x800e:
+		case 0x800f:
+		{
+			const device_config *rtc = devtag_get_device(space->machine, "rtc");
+			msm6242_w(rtc, offset-0x8000, data);
+			return;
+		}
+	}
+	logerror("%04X: unmapped IO write at %04X = %02X\n", cpu_get_pc(space->cpu), offset,data);
+}
+
+static WRITE8_HANDLER( mjvegasa_coin_counter_w )
+{
+	flip_screen_set(space->machine,  data & 4);
+	coin_counter_w(0,data & 2);	// in
+	coin_counter_w(1,data & 1);	// out
+}
+
+// hopper?
+static WRITE8_HANDLER( mjvegasa_12400_w )
+{
+	// bits 0 & 1
+//	popmessage("UNK: %02x",data);
+}
+static READ8_HANDLER( mjvegasa_12500_r )
+{
+	// bits 0 & 2
+	return 0xff;
+}
+
+static ADDRESS_MAP_START( mjvegasa_map, ADDRESS_SPACE_PROGRAM, 8 )
+
+	AM_RANGE( 0x00000, 0x05fff ) AM_ROM
+	AM_RANGE( 0x06000, 0x07fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE( 0x08000, 0x0ffff ) AM_READWRITE(mjvegasa_rom_io_r, mjvegasa_rom_io_w) AM_BASE(&videoram)
+
+	AM_RANGE( 0x10001, 0x10001 ) AM_DEVREAD( "ay", ay8910_r )
+	AM_RANGE( 0x10002, 0x10003 ) AM_DEVWRITE( "ay", ay8910_data_address_w )
+	AM_RANGE( 0x10010, 0x10010 ) AM_WRITE( mjvegasa_coin_counter_w )
+	AM_RANGE( 0x10011, 0x10011 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
+	AM_RANGE( 0x10013, 0x10013 ) AM_WRITE( input_port_select_w )
+
+	AM_RANGE( 0x12000, 0x12000 ) AM_WRITE( mjvegasa_rombank_w )
+	AM_RANGE( 0x12100, 0x12100 ) AM_READ( cafetime_dsw_r )
+	AM_RANGE( 0x12200, 0x12200 ) AM_WRITE( cafetime_dsw_w )
+	AM_RANGE( 0x12300, 0x12300 ) AM_WRITE( mjderngr_palbank_w )
+	AM_RANGE( 0x12400, 0x12400 ) AM_WRITE( mjvegasa_12400_w )
+	AM_RANGE( 0x12500, 0x12500 ) AM_READ ( mjvegasa_12500_r )
+
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mjvegasa_iomap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE( mjtensin_p3_r, mjvegasa_p3_w )
+	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE( mjvegasa_p4_w )
 ADDRESS_MAP_END
 
 
@@ -2816,6 +2950,141 @@ static INPUT_PORTS_START( jansou )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mjvegasa )
+	PORT_INCLUDE( mjctrl2 )
+
+	PORT_START("DSW1")	// 6810
+	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
+	PORT_DIPSETTING(    0x0f, "96%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPNAME( 0x30, 0x30, "Odds Rate" )
+	PORT_DIPSETTING(    0x30, "32 24 16 12 8 4 2 1" )
+	PORT_DIPSETTING(    0x00, "50 30 15 8 5 3 2 1" )
+	PORT_DIPSETTING(    0x10, "100 50 25 10 5 3 2 1" )
+	PORT_DIPSETTING(    0x20, "200 100 50 10 5 3 2 1" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" )
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+
+	PORT_START("DSW2")	// 6811
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x0c, 0x0c, "YAKUMAN Times" )
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
+	PORT_DIPSETTING(    0x70, "Cut" )
+	PORT_DIPSETTING(    0x60, "300" )
+	PORT_DIPSETTING(    0x50, "500" )
+	PORT_DIPSETTING(    0x40, "700" )
+	PORT_DIPSETTING(    0x30, "1000" )
+	PORT_DIPSETTING(    0x20, "1000?" )
+	PORT_DIPSETTING(    0x10, "1000?" )
+	PORT_DIPSETTING(    0x00, "1000?" )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+
+	PORT_START("DSW3")	// 6812
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 3-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 3-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "3 BAI In YAKUMAN Bonus Chance" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 3-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 3-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 3-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 3-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 3-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")	// 6813
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 4-0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 4-1" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Girls" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Background" )
+	PORT_DIPSETTING(    0x08, "Black" )
+	PORT_DIPSETTING(    0x00, "Green" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 4-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWTOP")	// 6814
+	PORT_DIPNAME( 0x01, 0x01, "Credits Per Note" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-8" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-9" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Flip-Flop Key" )
+	PORT_DIPSETTING(    0x10, "Flip-Flop" )
+	PORT_DIPSETTING(    0x00, "Start" )
+	PORT_DIPNAME( 0x20, 0x20, "Don Den Times" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-8" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Debug Mode" )	// e.g. press start in bet screen
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static const ay8910_interface ay8910_config =
 {
@@ -3047,6 +3316,21 @@ static MACHINE_DRIVER_START( cafetime )
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( mjvegasa )
+	MDRV_IMPORT_FROM(mjderngr)
+	MDRV_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz)	/* ? */
+	MDRV_CPU_PROGRAM_MAP(mjvegasa_map,0)
+	MDRV_CPU_IO_MAP(mjvegasa_iomap,0)
+	MDRV_CPU_VBLANK_INT_HACK(mjtensin_interrupt,2)
+
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+
+	/* devices */
+	MDRV_MSM6242_ADD("rtc")
+MACHINE_DRIVER_END
+
 
 /***************************************************************************
 
@@ -3818,6 +4102,19 @@ ROM_START( mjvegas )
 	ROM_LOAD( "d50-1_82s147.4g", 0x200, 0x200, CRC(50c0d0ec) SHA1(222899456cd2e15391d8d0f771bbd5e5333d6ba3) )
 ROM_END
 
+ROM_START( mjvegasa )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )	// 100 banks
+	ROM_LOAD( "5040.1b", 0x00000, 0x20000, CRC(c4f03128) SHA1(758567f74de333207dfe6c1cb72b2afffb0c8f4b) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(           0x070000, 0x20000 )	// 0c-0f
+	ROM_LOAD( "5002.1d",  0x210000, 0x80000, CRC(016c0a32) SHA1(5c5fdd631eacb36a0ee7dba9e070c2d3d3d8fd5b) )	// 40-4f
+	ROM_LOAD( "5003.1e",  0x2f0000, 0x20000, CRC(5323cc85) SHA1(58b75ba560f05a0568024f52ee89f54713219452) )	// 5c-5f
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "d50-2_82s147.4h", 0x000, 0x200, CRC(3c960ea2) SHA1(65e05e3f129e9e6fcb14b7d44a75a76919c54d52) )
+	ROM_LOAD( "d50-1_82s147.4g", 0x200, 0x200, CRC(50c0d0ec) SHA1(222899456cd2e15391d8d0f771bbd5e5333d6ba3) )
+ROM_END
+
 /***************************************************************************
 
 Mahjong Shinkirou Deja Vu (+ some roms from Jan Oh (Toapan) !?)
@@ -4338,7 +4635,8 @@ GAME( 1989,  daisyari, 0,        daisyari, daisyari, 0,        ROT0,   "Best Sys
 GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    0,        ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )
 GAME( 1990,  mjifb2,   mjifb,    mjifb,    mjifb,    0,        ROT0,   "Dynax",                      "Mahjong If...? [BET](2921)",            0 )
 GAME( 1990,  mjifb3,   mjifb,    mjifb,    mjifb,    0,        ROT0,   "Dynax",                      "Mahjong If...? [BET](2931)",            0 )
-GAME( 1991,  mjvegas,  0,        mjifb,    mjifb,    0,        ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 GAME_NOT_WORKING )
+GAME( 1991,  mjvegasa, 0,        mjvegasa, mjvegasa, 0,        ROT0,   "Dynax",                      "Mahjong Vegas (Japan, unprotected)",    0 )
+GAME( 1991,  mjvegas,  mjvegasa, mjvegasa, mjvegasa, 0,        ROT0,   "Dynax",                      "Mahjong Vegas (Japan)",                 GAME_NOT_WORKING )
 GAME( 1992,  cafetime, 0,        cafetime, cafetime, 0,        ROT0,   "Dynax",                      "Mahjong Cafe Time",                     0 )
 GAME( 1993,  cafedoll, 0,        mjifb,    mjifb,    0,        ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan)",             GAME_NOT_WORKING )
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, 0,        ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             GAME_NOT_WORKING )

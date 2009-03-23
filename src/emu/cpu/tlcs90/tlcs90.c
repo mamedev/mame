@@ -1316,8 +1316,13 @@ static void check_interrupts(t90_Regs *cpustate)
 		return;
 
 	for (irq = INT0; irq < INTMAX; irq++)
+	{
 		if ( cpustate->irq_state & cpustate->irq_mask & (1 << irq) )
+		{
 			take_interrupt( cpustate, irq );
+			return;
+		}
+	}
 }
 
 static void set_irq_line(t90_Regs *cpustate, int irq, int state)

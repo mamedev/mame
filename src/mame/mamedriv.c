@@ -7719,6 +7719,7 @@ Other Sun games
 	DRIVER( mjifb2 )	/* "29" 1990 Dynax */
 	DRIVER( mjifb3 )	/* "29" 1990 Dynax */
 	DRIVER( mjvegas )	/* 1991 Dynax */
+	DRIVER( mjvegasa )	/* 1991 Dynax */
 	DRIVER( cafetime )	/* 1992 Dynax */
 	DRIVER( cafedoll )	/* 1993 Dynax */
 	DRIVER( janptr96 )	/* 1996 Dynax */
