@@ -142,7 +142,7 @@ static const struct
 	{ "shiryu2",  cp10, cp13 }, /* OK ( random crashes on bosses ) */
 	{ "beastrzr", et01, et02 }, /* OK */
 	{ "beastrzb", et01, et02 }, /* OK */
-	{ "bldyror2", et01, et03 }, /* OK ( bad dump? ) */
+	{ "bldyror2", et01, et03 }, /* OK */
 	{ "bam2",     et01, et05 },
 	{ "glpracr2", mg01, mg02 }, /* locks up when starting a game/entering test mode */
 	{ "glprac2j", mg01, mg02 }, /* locks up when starting a game/entering test mode */
@@ -173,7 +173,6 @@ static const struct
 	{ "gdarius",  tt01, tt07 }, /* OK */
 	{ "gdariusb", tt01, tt07 }, /* OK */
 	{ "gdarius2", tt01, tt07 }, /* OK */
-	{ "taitogn",  tt10, tt16 }, /* shows gnet logo */
 	{ "aerofgts", kn01, kn02 }, /* OK */
 	{ "sncwgltd", kn01, kn02 }, /* OK */
 	{ NULL, NULL, NULL }
