@@ -4369,11 +4369,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
 	DRIVER( cfield )	/* 2004.06 Chaos Field */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
-	DRIVER( meltybld )	/* 2005.03 Melty Blood Act Cadenza */
+						/* 2005.03 Melty Blood Act Cadenza */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
 	DRIVER( senko )		/* 2005.04 Senkou no Rondo (Rev A) */
 	DRIVER( senkoo )	/*          ^^ */
-						/* 2005.08 Melty Blood Act Cadenza ver.A */
+	DRIVER( meltybld )	/* 2005.08 Melty Blood Act Cadenza ver.A */
 	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */
 						/* 2005.10 Radirgy */
 						/* 2005.?? Radirgy (Rev. A) */
