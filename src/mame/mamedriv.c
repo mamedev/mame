@@ -4423,7 +4423,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.06 Club Cart */
 	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 						/* 2001.08 Wave Runner GP */
-	DRIVER( vf4 )		/* 2001.08 Virtua Fighter 4 */
+	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 */
+						/* 2001.08.20 Virtua Fighter 4 ver.B */
 						/* 2002.02 The King of Route 66 */
 	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
