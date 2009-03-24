@@ -4355,7 +4355,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
 						/* 2002.05 Cleopatra Fortune + */
 	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
-	DRIVER( ngdup23a )	/* GD-ROM Firmware Updater */
+	DRIVER( ngdup23a )	/* DIMM Firmware Updater */
 	DRIVER( ngdup23c )
 	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
 						/* 2002.07 Mazan */
@@ -4365,13 +4365,13 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
 						/* 2003.03 Yonin Uchi Mahjong MJ Network Taisen ver. */
 	DRIVER( usagui )
-	DRIVER( tetkiwam )
 	DRIVER( ggxxrl )	/* 2003.03 Guilty Gear XX # Reload */
 	DRIVER( shikgam2 )	/* 2003.04 Shikigami no Shiro 2 */
 	DRIVER( bdrdown )	/* 2003.04 Border Down */
 	DRIVER( psyvar2 )	/* 2003.11 Psyvariar 2 */
 	DRIVER( puyofev	)	/* 2003.11 Puyopuyo Fever */
 	DRIVER( cfield )	/* 2004.06 Chaos Field */
+	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi */
 	DRIVER( trizeal )	/* 2004.09 Trizeal */
 						/* 2005.03 Melty Blood Act Cadenza */
 	DRIVER( ss2005 )	/* 2005.04 Super Shanghai 2005 */
@@ -4380,8 +4380,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( meltybld )	/* 2005.08 Melty Blood Act Cadenza ver.A */
 	DRIVER( ggxxsla  )	/* 2005.09 Guilty Gear XX Slash */
 	DRIVER( radirgy )	/* 2005.10 Radirgy */
-						/* 2005.?? Radirgy (Rev. A) */
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
+						/* 2005.12 Radirgy (Rev. A) */
 						/* 2006.03 Kurukuru Chameleon */
 	DRIVER( trgheart )	/* 2006.05 Trigger Heart Exelica */
 						/* 2006.07 Touch de Zunou */

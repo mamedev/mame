@@ -30,6 +30,9 @@ extern UINT32 *spi_scrollram;
 VIDEO_START( spi );
 VIDEO_UPDATE( spi );
 
+VIDEO_START( sys386f2 );
+VIDEO_UPDATE( sys386f2 );
+
 READ32_HANDLER( spi_layer_bank_r );
 WRITE32_HANDLER( spi_layer_bank_w );
 WRITE32_HANDLER( spi_layer_enable_w );

@@ -24,7 +24,8 @@ static int text_layer_offset;
 
 static UINT32 bg_fore_layer_position;
 
-static UINT8 alpha_table[6144];
+static UINT8 alpha_table[8192];
+static UINT8 sprite_bpp;
 
 READ32_HANDLER( spi_layer_bank_r )
 {
@@ -320,15 +321,16 @@ static void draw_blend_gfx(running_machine *machine, bitmap_t *bitmap, const rec
 	for (j=y1; j <= y2; j++)
 	{
 		UINT32 *p = BITMAP_ADDR32(bitmap, j, 0);
+		UINT8 trans_pen = (1 << sprite_bpp) - 1;
 		int dp_i = (py * width) + px;
 		py += yd;
 
 		for (i=x1; i <= x2; i++)
 		{
 			UINT8 pen = dp[dp_i];
-			if (pen != 0x3f)
+			if (pen != trans_pen)
 			{
-				int global_pen = pen + color*64;
+				int global_pen = pen + (color << sprite_bpp);
 				UINT8 alpha = alpha_table[global_pen];
 				if (alpha)
 				{
@@ -482,6 +484,7 @@ VIDEO_START( spi )
 	int i;
 	int region_length;
 
+	sprite_bpp = 6;
 	text_layer	= tilemap_create( machine, get_text_tile_info, tilemap_scan_rows,  8,8,64,32 );
 	back_layer	= tilemap_create( machine, get_back_tile_info, tilemap_scan_cols,  16,16,32,32 );
 	mid_layer	= tilemap_create( machine, get_mid_tile_info, tilemap_scan_cols,  16,16,32,32 );
@@ -650,5 +653,34 @@ VIDEO_UPDATE( spi )
 	draw_sprites(screen->machine, bitmap, cliprect, 3);
 
 	combine_tilemap(screen->machine, bitmap, cliprect, text_layer, 0, 0, 0, NULL);
+	return 0;
+}
+
+VIDEO_START( sys386f2 )
+{
+	int i;
+
+	palette_ram = auto_malloc(0x4000);
+	sprite_ram = auto_malloc(0x1000);
+
+	sprite_bpp = 8;
+
+	memset(palette_ram, 0, 0x4000);
+	memset(sprite_ram, 0, 0x1000);
+
+	for (i=0; i < 8192; i++) {
+		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
+	}
+
+	memset(alpha_table, 0, 8192 * sizeof(UINT8));
+}
+
+VIDEO_UPDATE( sys386f2 )
+{
+	bitmap_fill(bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine, bitmap, cliprect, 2);
+	draw_sprites(screen->machine, bitmap, cliprect, 3);
 	return 0;
 }
