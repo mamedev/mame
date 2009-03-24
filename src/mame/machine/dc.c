@@ -796,17 +796,57 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
+	static UINT32 wave_dma_aica_addr,wave_dma_root_addr,wave_dma_size,wave_dma_dir,wave_dma_flag;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	switch (reg)
 	{
-	case SB_ADTSEL:
-		mame_printf_verbose("G2CTRL: initiation mode %d\n",dat);
-		break;
-	case SB_ADST:
-		mame_printf_verbose("G2CTRL: AICA:G2-DMA start\n");
-		break;
+		/*AICA Address register*/
+		case SB_ADSTAG:
+			//printf("SB_ADSTAG data %08x\n",dat);
+			wave_dma_aica_addr = dat;
+			break;
+		/*Root address (work ram)*/
+		case SB_ADSTAR:
+			//printf("SB_ADSTAR data %08x\n",dat);
+			wave_dma_root_addr = dat;
+			break;
+		/*DMA size (in dword units, bit 31 is "set dma initiation enable setting to 0"*/
+		case SB_ADLEN:
+			//printf("SB_ADLEN data %08x\n",dat);
+			wave_dma_size = dat & 0x7fffffff;
+			break;
+		/*0 = root memory to aica / 1 = aica to root memory*/
+		case SB_ADDIR:
+			//printf("SB_ADDIR data %08x\n",dat);
+			wave_dma_dir = 1 ^ (dat & 1);
+			break;
+		/*dma flag (active HIGH, bug in docs)*/
+		case SB_ADEN:
+			//printf("SB_ADEN data %08x\n",dat);
+			wave_dma_flag = (dat & 1);
+			break;
+		case SB_ADTSEL:
+			mame_printf_verbose("G2CTRL: initiation mode %d\n",dat);
+			//printf("SB_ADTSEL data %08x\n",dat);
+			break;
+		/*ready for dma'ing*/
+		case SB_ADST:
+			mame_printf_verbose("G2CTRL: AICA:G2-DMA start\n");
+			//printf("SB_ADST data %08x\n",dat);
+			if(wave_dma_flag)
+			{
+				UINT32 src,dst,size;
+				src = wave_dma_aica_addr;
+				dst = wave_dma_root_addr;
+				//size = wave_dma_size;
+				size = 0;
+				/* TODO: use the ddt function. */
+				for(size=0;size<wave_dma_size;size++)
+					memory_write_dword_64le(space,wave_dma_aica_addr+size*4,memory_read_dword(space,wave_dma_root_addr+size*4));
+			}
+			break;
 	}
 	mame_printf_verbose("G2CTRL: [%08x=%x] write %llx to %x, mask %llx\n", 0x5f7800+reg*4, dat, data, offset, mem_mask);
 }
