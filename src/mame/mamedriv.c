@@ -4491,7 +4491,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.06 F-ZERO AX */
 						/* 2003.07 Avalon no Kagi */
 						/* 2003.10 Avalon no Kagi ver.1.01 */
-						/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
+	DRIVER( gekpurya )	/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
 						/* 2003.12 Avalon no Kagi ver.1.10 */
 						/* 2004.04 Avalon no Kagi ver.1.20 Aratanaru Syoukan */
 						/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
