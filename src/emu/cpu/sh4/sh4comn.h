@@ -68,6 +68,8 @@ typedef struct
 	UINT32	*m;
 	INT8	nmi_line_state;
 
+	UINT8 sleep_mode;
+
 	int		frt_input;
 	int		irln;
 	int 	internal_irq_level;

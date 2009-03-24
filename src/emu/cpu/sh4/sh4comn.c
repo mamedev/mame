@@ -212,6 +212,8 @@ void sh4_exception(SH4 *sh4, const char *message, int exception) // handle excep
 
 	/* fetch PC */
 	sh4->pc = sh4->vbr + vector;
+	/* wake up if a sleep opcode is triggered */
+	if(sh4->sleep_mode == 1) { sh4->sleep_mode = 2; }
 }
 
 static UINT32 compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor)
@@ -644,9 +646,9 @@ WRITE32_HANDLER( sh4_internal_w )
 	case MMUCR: // MMU Control
 		if (data & 1)
 			fatalerror("SH4: MMUCR write enables MMU\n");
-	
+
 		break;
-	
+
 		// Memory refresh
 	case RTCSR:
 		sh4->m[RTCSR] &= 255;

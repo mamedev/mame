@@ -1546,9 +1546,17 @@ INLINE void SHLR16(SH4 *sh4, UINT32 n)
 /*  SLEEP */
 INLINE void SLEEP(SH4 *sh4)
 {
-	sh4->pc -= 2;
+	/* 0 = normal mode */
+	/* 1 = enters into power-down mode */
+	/* 2 = go out the power-down mode after an exception */
+	if(sh4->sleep_mode != 2)
+		sh4->pc -= 2;
 	sh4->sh4_icount -= 2;
 	/* Wait_for_exception; */
+	if(sh4->sleep_mode == 0)
+		sh4->sleep_mode = 1;
+	else if(sh4->sleep_mode == 2)
+		sh4->sleep_mode = 0;
 }
 
 /*  STC     SR,Rn */
@@ -3317,6 +3325,7 @@ static CPU_RESET( sh4 )
 
 	sh4->internal_irq_level = -1;
 	sh4->irln = 15;
+	sh4->sleep_mode = 0;
 }
 
 /* Execute cycles - returns number of cycles actually run */
