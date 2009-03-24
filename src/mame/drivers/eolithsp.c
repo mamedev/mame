@@ -39,6 +39,7 @@ static const struct
 } eolith_speedup_table[] =
 {
 	/* eolith.c */
+	{ "ironfort", 0x40020854, 239 },
 	{ "hidnctch", 0x4000bba0, 239 },
 	{ "raccoon",  0x40008204, 239 },
 	{ "puzzlekg", 0x40029458, 239 },
