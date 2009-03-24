@@ -44,7 +44,6 @@
 
  TODO:
  - sound & sound cpu
- - add proper dipswicthes for Iron Fortress
 
  Original Bugs:
  - Hidden Catch 3: the text shown when you start a game is flipped or
