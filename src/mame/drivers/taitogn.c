@@ -917,6 +917,12 @@ ROM_START(spuzbobl)
 	DISK_IMAGE( "spuzbobl", 0, SHA1(1b1c72fb7e5656021485fefaef8f2ba48e2b4ea8))
 ROM_END
 
+ROM_START(spuzbobj)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "spuzbobj", 0, SHA1(dac433cf88543d2499bf797d7406b82ae4338726))
+ROM_END
 
 ROM_START(soutenry)
 	TAITOGNET_BIOS
@@ -939,6 +945,19 @@ ROM_START(sianniv)
 	DISK_IMAGE( "sianniv", 0, SHA1(1e08b813190a9e1baf29bc16884172d6c8da7ae3))
 ROM_END
 
+ROM_START(kollon)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "kollon", 0, SHA1(d8ea5b5b0ee99004b16ef89883e23de6c7ddd7ce))
+ROM_END
+
+ROM_START(shikigam)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "shikigam", 0, SHA1(fa49a0bc47f5cb7c30d7e49e2c3696b21bafb840))
+ROM_END
 
 /* Success */
 
@@ -956,6 +975,12 @@ ROM_START(psyvarrv)
 	DISK_IMAGE( "psyvarrv", 0, SHA1(c12f0d5cbb6ec7f906e3dcdc3047c22de36457a5))
 ROM_END
 
+ROM_START(zooo)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "zooo", 0, SHA1(e275b3141b2bc49142990e6b497a5394a314a30b))
+ROM_END
 
 ROM_START(zokuoten)
 	TAITOGNET_BIOS
@@ -971,6 +996,13 @@ ROM_START(nightrai)
 
 	DISK_REGION( "card" )
 	DISK_IMAGE( "nightrai", 0, SHA1(7a4d62018fd19ccbdec12b6d24052d49f8a8359e))
+ROM_END
+
+ROM_START(otenki)
+	TAITOGNET_BIOS
+
+	DISK_REGION( "card" )
+	DISK_IMAGE( "otenki", 0, SHA1(7e745ca4c4570215f452fd09cdd56a42c39caeba))
 ROM_END
 
 /* Warashi */
@@ -1004,23 +1036,28 @@ ROM_END
 /* it in every zip file */
 GAME( 1997, taitogn,  0, coh3002t, coh3002t, coh3002t, ROT0, "Sony/Taito", "Taito GNET", GAME_IS_BIOS_ROOT )
 
-GAME( 1998, raycris,  taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Ray Crisis (V2.03J)", 0 )
-GAME( 199?, gobyrc, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING ) // custom inputs need calibrating
-GAME( 199?, rcdego, gobyrc,  coh3002t, coh3002t, coh3002t, ROT0, "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING ) // custom inputs need calibrating
-GAME( 1998, chaoshea, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Chaos Heat (V2.08J)", 0 )
-GAME( 1998, flipmaze, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito/Moss", "Flip Maze (V2.04J)", 0 )
-GAME( 1999, spuzbobl, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Super Puzzle Bobble (V2.05O)", 0 )
-GAME( 2000, soutenry, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Soutenryu (V2.07J)", 0 )
-GAME( 2000, shanghss, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Taito", "Shanghai Shoryu Sairin (V2.03J)", 0 )
-GAME( 2003, sianniv,  taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING ) // IRQ at the wrong time
+GAME( 1998, chaoshea, taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Chaos Heat (V2.08J)", 0 )
+GAME( 1998, raycris,  taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Ray Crisis (V2.03J)", 0 )
+GAME( 1999, spuzbobl, taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Super Puzzle Bobble (V2.05O)", 0 )
+GAME( 1999, spuzbobj, spuzbobl, coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Super Puzzle Bobble (V2.04J)", 0 )
+GAME( 1999, gobyrc,   taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Go By RC (V2.03O)", GAME_NOT_WORKING ) // custom inputs need calibrating
+GAME( 1999, rcdego,   gobyrc,   coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "RC De Go (V2.03J)", GAME_NOT_WORKING ) // custom inputs need calibrating
+GAME( 1999, flipmaze, taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito/Moss", "Flip Maze (V2.04J)", 0 )
+GAME( 2001, shikigam, taitogn,  coh3002t, coh3002t, coh3002t, ROT270, "Taito/Alfa System", "Shikigami no Shiro (V2.03J)", 0 )
+GAME( 2003, sianniv,  taitogn,  coh3002t, coh3002t, coh3002t, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING ) // IRQ at the wrong time
+GAME( 2003, kollon,   taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Kollon (V2.04J)", GAME_NOT_WORKING ) // IRQ at the wrong time
 
 GAME( 2000, psyvaria, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J)", 0 )
 GAME( 2000, psyvarrv, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", 0 )
 GAME( 2000, zokuoten, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", 0 )
+GAME( 2004, zooo,     taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zooo (V2.01J)", 0 )
 
-GAME( 199?, usagi,    taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Usagi (V2.02J)", 0 )
 GAME( 1999, mahjngoh, taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Mahjong Oh (V2.06J)", 0 )
+GAME( 2001, usagi,    taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Usagi (V2.02J)", 0 )
+GAME( 2000, soutenry, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Warashi", "Soutenryu (V2.07J)", 0 )
+GAME( 2000, shanghss, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Warashi", "Shanghai Shoryu Sairin (V2.03J)", 0 )
 
 GAME( 2001, nightrai, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Night Raid (V2.03J)", GAME_NOT_WORKING ) // no background / enemy sprites
+GAME( 2001, otenki,   taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Otenki Kororin (V2.01J)", GAME_NOT_WORKING ) // no background / enemy sprites
 
 GAME( 2002, xiistag,  taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Triangle Service", "XII Stag (V2.01J)", 0 )
