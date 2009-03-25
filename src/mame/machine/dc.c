@@ -843,8 +843,16 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				//size = wave_dma_size;
 				size = 0;
 				/* TODO: use the ddt function. */
-				for(size=0;size<wave_dma_size;size++)
-					memory_write_dword_64le(space,wave_dma_aica_addr+size*4,memory_read_dword(space,wave_dma_root_addr+size*4));
+				if(wave_dma_dir == 1)
+				{
+					for(;size<wave_dma_size;size++)
+						memory_write_dword_64le(space,wave_dma_aica_addr+size*4,memory_read_dword(space,wave_dma_root_addr+size*4));
+				}
+				else
+				{
+					for(;size<wave_dma_size;size++)
+						memory_write_dword_64le(space,wave_dma_root_addr+size*4,memory_read_dword(space,wave_dma_aica_addr+size*4));
+				}
 			}
 			break;
 	}
@@ -981,7 +989,7 @@ WRITE64_DEVICE_HANDLER( dc_aica_reg_w )
 			/* it's alive ! */
 			cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 		}
-        }
+    }
 
 	aica_w(device, offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
 
