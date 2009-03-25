@@ -2134,7 +2134,6 @@ static CPU_GET_INFO( mips3 )
     R4600 VARIANTS
 ***************************************************************************/
 
-#if (HAS_R4600)
 static CPU_INIT( r4600be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, device, index, clock, irqcallback, NULL);
@@ -2184,7 +2183,6 @@ CPU_GET_INFO( r4600le )
 		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
-#endif
 
 
 
@@ -2192,7 +2190,6 @@ CPU_GET_INFO( r4600le )
     R4650 VARIANTS
 ***************************************************************************/
 
-#if (HAS_R4650)
 static CPU_INIT( r4650be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, device, index, clock, irqcallback, NULL);
@@ -2242,7 +2239,6 @@ CPU_GET_INFO( r4650le )
 		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
-#endif
 
 
 
@@ -2250,7 +2246,6 @@ CPU_GET_INFO( r4650le )
     R4700 VARIANTS
 ***************************************************************************/
 
-#if (HAS_R4700)
 static CPU_INIT( r4700be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, device, index, clock, irqcallback, NULL);
@@ -2301,7 +2296,6 @@ CPU_GET_INFO( r4700le )
 		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
-#endif
 
 
 
@@ -2309,7 +2303,6 @@ CPU_GET_INFO( r4700le )
     R5000 VARIANTS
 ***************************************************************************/
 
-#if (HAS_R5000)
 static CPU_INIT( r5000be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, device, index, clock, irqcallback, NULL);
@@ -2359,7 +2352,6 @@ CPU_GET_INFO( r5000le )
 		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
-#endif
 
 
 
@@ -2367,7 +2359,6 @@ CPU_GET_INFO( r5000le )
     QED5271 VARIANTS
 ***************************************************************************/
 
-#if (HAS_QED5271)
 static CPU_INIT( qed5271be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, device, index, clock, irqcallback, NULL);
@@ -2417,7 +2408,6 @@ CPU_GET_INFO( qed5271le )
 		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
-#endif
 
 
 
@@ -2425,7 +2415,6 @@ CPU_GET_INFO( qed5271le )
     RM7000 VARIANTS
 ***************************************************************************/
 
-#if (HAS_RM7000)
 static CPU_INIT( rm7000be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, device, index, clock, irqcallback, NULL);
@@ -2475,4 +2464,3 @@ CPU_GET_INFO( rm7000le )
 		default:										CPU_GET_INFO_CALL(mips3);			break;
 	}
 }
-#endif

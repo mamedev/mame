@@ -188,9 +188,7 @@ INLINE void sbcb_ix(m6800_state *cpustate);
 INLINE void sec(m6800_state *cpustate);
 INLINE void sei(m6800_state *cpustate);
 INLINE void sev(m6800_state *cpustate);
-#if (HAS_HD63701)
 INLINE void slp(m6800_state *cpustate);
-#endif
 INLINE void sta_di(m6800_state *cpustate);
 INLINE void sta_ex(m6800_state *cpustate);
 INLINE void sta_im(m6800_state *cpustate);
@@ -245,9 +243,7 @@ INLINE void cpx_di(m6800_state *cpustate);
 INLINE void cpx_ex(m6800_state *cpustate);
 INLINE void cpx_im(m6800_state *cpustate);
 INLINE void cpx_ix(m6800_state *cpustate);
-#if (HAS_HD63701)
 INLINE void trap(m6800_state *cpustate);
-#endif
 
 static void (*const m6800_insn[0x100])(m6800_state *cpustate) = {
 illegal,nop,	illegal,illegal,illegal,illegal,tap,	tpa,
@@ -284,7 +280,6 @@ subb_ex,cmpb_ex,sbcb_ex,illegal,andb_ex,bitb_ex,ldb_ex, stb_ex,
 eorb_ex,adcb_ex,orb_ex, addb_ex,illegal,illegal,ldx_ex, stx_ex
 };
 
-#if (HAS_M6801||HAS_M6803)
 static void (*const m6803_insn[0x100])(m6800_state *cpustate) = {
 illegal,nop,	illegal,illegal,lsrd,	asld,	tap,	tpa,
 inx,	dex,	clv,	sev,	clc,	sec,	cli,	sei,
@@ -319,9 +314,7 @@ eorb_ix,adcb_ix,orb_ix, addb_ix,ldd_ix, std_ix, ldx_ix, stx_ix,
 subb_ex,cmpb_ex,sbcb_ex,addd_ex,andb_ex,bitb_ex,ldb_ex, stb_ex,
 eorb_ex,adcb_ex,orb_ex, addb_ex,ldd_ex, std_ex, ldx_ex, stx_ex
 };
-#endif
 
-#if (HAS_HD63701)
 static void (*const hd63701_insn[0x100])(m6800_state *cpustate) = {
 trap	,nop,	trap	,trap	,lsrd,	asld,	tap,	tpa,
 inx,	dex,	clv,	sev,	clc,	sec,	cli,	sei,
@@ -356,9 +349,7 @@ eorb_ix,adcb_ix,orb_ix, addb_ix,ldd_ix, std_ix, ldx_ix, stx_ix,
 subb_ex,cmpb_ex,sbcb_ex,addd_ex,andb_ex,bitb_ex,ldb_ex, stb_ex,
 eorb_ex,adcb_ex,orb_ex, addb_ex,ldd_ex, std_ex, ldx_ex, stx_ex
 };
-#endif
 
-#if (HAS_NSC8105)
 static void (*const nsc8105_insn[0x100])(m6800_state *cpustate) = {
 illegal,illegal,nop,	illegal,illegal,tap,	illegal,tpa,
 inx,	clv,	dex,	sev,	clc,	cli,	sec,	sei,
@@ -393,4 +384,3 @@ eorb_ix,orb_ix, adcb_ix,addb_ix,adcx_im,ldx_ix, illegal,stx_ix,
 subb_ex,sbcb_ex,cmpb_ex,illegal,andb_ex,ldb_ex, bitb_ex,stb_ex,
 eorb_ex,orb_ex, adcb_ex,addb_ex,addx_ex,ldx_ex, illegal,stx_ex
 };
-#endif

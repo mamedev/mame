@@ -1062,7 +1062,6 @@ CPU_GET_INFO( i386 )
 /*****************************************************************************/
 /* Intel 486 */
 
-#if (HAS_I486)
 
 static CPU_INIT( i486 )
 {
@@ -1170,12 +1169,10 @@ CPU_GET_INFO( i486 )
 		default: 										CPU_GET_INFO_CALL(i386); 				break;
 	}
 }
-#endif
 
 /*****************************************************************************/
 /* Pentium */
 
-#if (HAS_PENTIUM)
 
 static CPU_INIT( pentium )
 {
@@ -1303,12 +1300,10 @@ CPU_GET_INFO( pentium )
 		default: 										CPU_GET_INFO_CALL(i386); 				break;
 	}
 }
-#endif
 
 /*****************************************************************************/
 /* Cyrix MediaGX */
 
-#if (HAS_MEDIAGX)
 
 static CPU_INIT( mediagx )
 {
@@ -1436,4 +1431,3 @@ CPU_GET_INFO( mediagx )
 		default: 										CPU_GET_INFO_CALL(i386); 				break;
 	}
 }
-#endif

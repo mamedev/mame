@@ -17,7 +17,6 @@ extern CPU_GET_INFO( m6805 );
 /****************************************************************************
  * 68705 section
  ****************************************************************************/
-#if (HAS_M68705)
 #define M68705_A					M6805_A
 #define M68705_PC					M6805_PC
 #define M68705_S					M6805_S
@@ -31,12 +30,10 @@ extern CPU_GET_INFO( m6805 );
 
 extern CPU_GET_INFO( m68705 );
 #define CPU_M68705 CPU_GET_INFO_NAME( m68705 )
-#endif
 
 /****************************************************************************
  * HD63705 section
  ****************************************************************************/
-#if (HAS_HD63705)
 #define HD63705_A					M6805_A
 #define HD63705_PC					M6805_PC
 #define HD63705_S					M6805_S
@@ -61,7 +58,6 @@ extern CPU_GET_INFO( m68705 );
 
 extern CPU_GET_INFO( hd63705 );
 #define CPU_HD63705 CPU_GET_INFO_NAME( hd63705 )
-#endif
 
 CPU_DISASSEMBLE( m6805 );
 

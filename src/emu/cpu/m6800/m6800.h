@@ -23,7 +23,6 @@ enum
 									/* it is usuali to use PULSE_LINE state         */
 };
 
-#if (HAS_M6801||HAS_M6803||HAS_HD63701)
 /* By default, on a port write port bits which are not set as output in the DDR */
 /* are set to the value returned by a read from the same port. If you need to */
 /* know the DDR for e.g. port 1, do m6803_internal_registers_r(M6801_DDR1) */
@@ -43,32 +42,22 @@ enum
 	M6803_PORT3,
 	M6803_PORT4
 };
-#endif
 
 CPU_GET_INFO( m6800 );
 #define CPU_M6800 CPU_GET_INFO_NAME( m6800 )
 
-#if (HAS_M6801)
 CPU_GET_INFO( m6801 );
 #define CPU_M6801 CPU_GET_INFO_NAME( m6801 )
-#endif
 
-#if (HAS_M6802)
 CPU_GET_INFO( m6802 );
 #define CPU_M6802 CPU_GET_INFO_NAME( m6802 )
-#endif
 
-#if (HAS_M6803)
 CPU_GET_INFO( m6803 );
 #define CPU_M6803 CPU_GET_INFO_NAME( m6803 )
-#endif
 
-#if (HAS_M6808)
 CPU_GET_INFO( m6808 );
 #define CPU_M6808 CPU_GET_INFO_NAME( m6808 )
-#endif
 
-#if (HAS_HD63701)
 CPU_GET_INFO( hd63701 );
 #define CPU_HD63701 CPU_GET_INFO_NAME( hd63701 )
 
@@ -86,12 +75,9 @@ CPU_GET_INFO( hd63701 );
 READ8_HANDLER( hd63701_internal_registers_r );
 WRITE8_HANDLER( hd63701_internal_registers_w );
 
-#endif
 
-#if (HAS_NSC8105)
 CPU_GET_INFO( nsc8105 );
 #define CPU_NSC8105 CPU_GET_INFO_NAME( nsc8105 )
-#endif
 
 
 CPU_DISASSEMBLE( m6800 );
@@ -108,7 +94,6 @@ CPU_DISASSEMBLE( nsc8105 );
 /****************************************************************************
  * For now make the 6801 using the m6800 variables and functions
  ****************************************************************************/
-#if (HAS_M6801)
 #define M6801_A 					M6800_A
 #define M6801_B 					M6800_B
 #define M6801_PC					M6800_PC
@@ -123,12 +108,10 @@ CPU_DISASSEMBLE( nsc8105 );
 #define M6801_IRQ_LINE				M6800_IRQ_LINE
 
 extern CPU_GET_INFO( m6801 );
-#endif
 
 /****************************************************************************
  * For now make the 6802 using the m6800 variables and functions
  ****************************************************************************/
-#if (HAS_M6802)
 #define M6802_A 					M6800_A
 #define M6802_B 					M6800_B
 #define M6802_PC					M6800_PC
@@ -143,12 +126,10 @@ extern CPU_GET_INFO( m6801 );
 #define M6802_IRQ_LINE				M6800_IRQ_LINE
 
 extern CPU_GET_INFO( m6802 );
-#endif
 
 /****************************************************************************
  * For now make the 6803 using the m6800 variables and functions
  ****************************************************************************/
-#if (HAS_M6803)
 #define M6803_A 					M6800_A
 #define M6803_B 					M6800_B
 #define M6803_PC					M6800_PC
@@ -164,9 +145,7 @@ extern CPU_GET_INFO( m6802 );
 #define M6803_TIN_LINE				M6800_TIN_LINE
 
 extern CPU_GET_INFO( m6803 );
-#endif
 
-#if (HAS_M6801||HAS_M6803||HAS_HD63701)
 /* By default, on a port write port bits which are not set as output in the DDR */
 /* are set to the value returned by a read from the same port. If you need to */
 /* know the DDR for e.g. port 1, do m6803_internal_registers_r(M6801_DDR1) */
@@ -180,12 +159,10 @@ extern CPU_GET_INFO( m6803 );
 #define M6803_PORT2 0x101
 #define M6803_PORT3 0x102
 #define M6803_PORT4 0x103
-#endif
 
 /****************************************************************************
  * For now make the 6808 using the m6800 variables and functions
  ****************************************************************************/
-#if (HAS_M6808)
 #define M6808_A 					M6800_A
 #define M6808_B 					M6800_B
 #define M6808_PC					M6800_PC
@@ -200,12 +177,10 @@ extern CPU_GET_INFO( m6803 );
 #define M6808_IRQ_LINE              M6800_IRQ_LINE
 
 extern CPU_GET_INFO( m6808 );
-#endif
 
 /****************************************************************************
  * For now make the HD63701 using the m6800 variables and functions
  ****************************************************************************/
-#if (HAS_HD63701)
 #define HD63701_A					 M6800_A
 #define HD63701_B					 M6800_B
 #define HD63701_PC					 M6800_PC
@@ -236,12 +211,10 @@ extern CPU_GET_INFO( hd63701 );
 READ8_HANDLER( hd63701_internal_registers_r );
 WRITE8_HANDLER( hd63701_internal_registers_w );
 
-#endif
 
 /****************************************************************************
  * For now make the NSC8105 using the m6800 variables and functions
  ****************************************************************************/
-#if (HAS_NSC8105)
 #define NSC8105_A					 M6800_A
 #define NSC8105_B					 M6800_B
 #define NSC8105_PC					 M6800_PC
@@ -257,7 +230,6 @@ WRITE8_HANDLER( hd63701_internal_registers_w );
 #define NSC8105_TIN_LINE			 M6800_TIN_LINE
 
 extern CPU_GET_INFO( nsc8105 );
-#endif
 
 #endif
 #endif /* __M6800_H__ */

@@ -377,57 +377,45 @@ static void check_interrupts(hyperstone_state *cpustate);
 #define SAME_SRCF_DST  (decode)->same_srcf_dst
 
 // 4Kb IRAM (On-Chip Memory)
-#if (HAS_E116T || HAS_GMS30C2116)
 
 static ADDRESS_MAP_START( e116_4k_iram_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_MIRROR(0x1ffff000)
 ADDRESS_MAP_END
 
-#endif
 
-#if (HAS_E132N || HAS_E132T || HAS_GMS30C2132)
 
 static ADDRESS_MAP_START( e132_4k_iram_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_MIRROR(0x1ffff000)
 ADDRESS_MAP_END
 
-#endif
 
 // 8Kb IRAM (On-Chip Memory)
 
-#if (HAS_E116XT || HAS_GMS30C2216)
 
 static ADDRESS_MAP_START( e116_8k_iram_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000000, 0xc0001fff) AM_RAM AM_MIRROR(0x1fffe000)
 ADDRESS_MAP_END
 
-#endif
 
-#if (HAS_E132XN || HAS_E132XT || HAS_GMS30C2232)
 
 static ADDRESS_MAP_START( e132_8k_iram_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc0000000, 0xc0001fff) AM_RAM AM_MIRROR(0x1fffe000)
 ADDRESS_MAP_END
 
-#endif
 
 // 16Kb IRAM (On-Chip Memory)
 
-#if (HAS_E116XS || HAS_E116XSR)
 
 static ADDRESS_MAP_START( e116_16k_iram_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000000, 0xc0003fff) AM_RAM AM_MIRROR(0x1fffc000)
 ADDRESS_MAP_END
 
-#endif
 
-#if (HAS_E132XS || HAS_E132XSR)
 
 static ADDRESS_MAP_START( e132_16k_iram_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc0000000, 0xc0003fff) AM_RAM AM_MIRROR(0x1fffc000)
 ADDRESS_MAP_END
 
-#endif
 
 INLINE hyperstone_state *get_safe_token(const device_config *device)
 {
@@ -1565,121 +1553,89 @@ static void hyperstone_init(const device_config *device, cpu_irq_callback irqcal
 	cpustate->clock_scale_mask = scale_mask;
 }
 
-#if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
 static void e116_init(const device_config *device, cpu_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
 	cpustate->opcodexor = 0;
 }
-#endif
 
-#if (HAS_E116T)
 static CPU_INIT( e116t )
 {
 	e116_init(device, irqcallback, 0);
 }
-#endif
 
-#if (HAS_E116XT)
 static CPU_INIT( e116xt )
 {
 	e116_init(device, irqcallback, 3);
 }
-#endif
 
-#if (HAS_E116XS)
 static CPU_INIT( e116xs )
 {
 	e116_init(device, irqcallback, 7);
 }
-#endif
 
-#if (HAS_E116XSR)
 static CPU_INIT( e116xsr )
 {
 	e116_init(device, irqcallback, 7);
 }
-#endif
 
-#if (HAS_GMS30C2116)
 static CPU_INIT( gms30c2116 )
 {
 	e116_init(device, irqcallback, 0);
 }
-#endif
 
-#if (HAS_GMS30C2216)
 static CPU_INIT( gms30c2216 )
 {
 	e116_init(device, irqcallback, 0);
 }
-#endif
 
-#if (HAS_E132N || HAS_E132T || HAS_E132XN || HAS_E132XT || HAS_E132XS || HAS_E132XSR || HAS_GMS30C2132 || HAS_GMS30C2232)
 static void e132_init(const device_config *device, cpu_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
 	cpustate->opcodexor = WORD_XOR_BE(0);
 }
-#endif
 
-#if (HAS_E132N)
 static CPU_INIT( e132n )
 {
 	e132_init(device, irqcallback, 0);
 }
-#endif
 
-#if (HAS_E132T)
 static CPU_INIT( e132t )
 {
 	e132_init(device, irqcallback, 0);
 }
-#endif
 
-#if (HAS_E132XN)
 static CPU_INIT( e132xn )
 {
 	e132_init(device, irqcallback, 3);
 }
-#endif
 
-#if (HAS_E132XT)
 static CPU_INIT( e132xt )
 {
 	e132_init(device, irqcallback, 3);
 }
-#endif
 
-#if (HAS_E132XS)
 static CPU_INIT( e132xs )
 {
 	e132_init(device, irqcallback, 7);
 }
-#endif
 
-#if (HAS_E132XSR)
 static CPU_INIT( e132xsr )
 {
 	e132_init(device, irqcallback, 7);
 }
-#endif
 
-#if (HAS_GMS30C2132)
 static CPU_INIT( gms30c2132 )
 {
 	e132_init(device, irqcallback, 0);
 }
-#endif
 
-#if (HAS_GMS30C2232)
 static CPU_INIT( gms30c2232 )
 {
 	e132_init(device, irqcallback, 0);
 }
-#endif
 
 static CPU_RESET( hyperstone )
 {
@@ -5190,7 +5146,6 @@ static CPU_GET_INFO( hyperstone )
 }
 
 
-#if (HAS_E116T)
 CPU_GET_INFO( e116t )
 {
 	switch (state)
@@ -5211,9 +5166,7 @@ CPU_GET_INFO( e116t )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_E116XT)
 CPU_GET_INFO( e116xt )
 {
 	switch (state)
@@ -5234,9 +5187,7 @@ CPU_GET_INFO( e116xt )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_E116XS)
 CPU_GET_INFO( e116xs )
 {
 	switch (state)
@@ -5257,9 +5208,7 @@ CPU_GET_INFO( e116xs )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_E116XSR)
 CPU_GET_INFO( e116xsr )
 {
 	switch (state)
@@ -5280,9 +5229,7 @@ CPU_GET_INFO( e116xsr )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_E132N)
 CPU_GET_INFO( e132n )
 {
 	switch (state)
@@ -5303,9 +5250,7 @@ CPU_GET_INFO( e132n )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_E132T)
 CPU_GET_INFO( e132t )
 {
 	switch (state)
@@ -5326,9 +5271,7 @@ CPU_GET_INFO( e132t )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_E132XN)
 CPU_GET_INFO( e132xn )
 {
 	switch (state)
@@ -5349,9 +5292,7 @@ CPU_GET_INFO( e132xn )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_E132XT)
 CPU_GET_INFO( e132xt )
 {
 	switch (state)
@@ -5372,9 +5313,7 @@ CPU_GET_INFO( e132xt )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_E132XS)
 CPU_GET_INFO( e132xs )
 {
 	switch (state)
@@ -5395,9 +5334,7 @@ CPU_GET_INFO( e132xs )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_E132XSR)
 CPU_GET_INFO( e132xsr )
 {
 	switch (state)
@@ -5418,9 +5355,7 @@ CPU_GET_INFO( e132xsr )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_GMS30C2116)
 CPU_GET_INFO( gms30c2116 )
 {
 	switch (state)
@@ -5441,9 +5376,7 @@ CPU_GET_INFO( gms30c2116 )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_GMS30C2132)
 CPU_GET_INFO( gms30c2132 )
 {
 	switch (state)
@@ -5464,9 +5397,7 @@ CPU_GET_INFO( gms30c2132 )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_GMS30C2216)
 CPU_GET_INFO( gms30c2216 )
 {
 	switch (state)
@@ -5487,9 +5418,7 @@ CPU_GET_INFO( gms30c2216 )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif
 
-#if (HAS_GMS30C2232)
 CPU_GET_INFO( gms30c2232 )
 {
 	switch (state)
@@ -5510,4 +5439,3 @@ CPU_GET_INFO( gms30c2232 )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
-#endif

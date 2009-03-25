@@ -310,7 +310,6 @@ INLINE void WM16( m6805_Regs *cpustate, UINT32 Addr, PAIR *p )
 }
 #endif
 
-#if (HAS_M68705)
 
 /* Generate interrupt - m68705 version */
 static void m68705_Interrupt( m6805_Regs *cpustate )
@@ -341,7 +340,6 @@ static void m68705_Interrupt( m6805_Regs *cpustate )
 		cpustate->iCount -= 11;
 	}
 }
-#endif
 
 /* Generate interrupts */
 static void Interrupt( m6805_Regs *cpustate )
@@ -350,7 +348,6 @@ static void Interrupt( m6805_Regs *cpustate )
 	/* pending_interrupts until the interrupt is taken, no matter what the */
 	/* external IRQ pin does. */
 
-#if (HAS_HD63705)
 	if( (cpustate->pending_interrupts & (1<<HD63705_INT_NMI)) != 0)
 	{
 		PUSHWORD(cpustate->pc);
@@ -370,10 +367,6 @@ static void Interrupt( m6805_Regs *cpustate )
 	}
 	else if( (cpustate->pending_interrupts & ((1<<M6805_IRQ_LINE)|HD63705_INT_MASK)) != 0 ) {
 		if ( (CC & IFLAG) == 0 ) {
-#else
-	if( (cpustate->pending_interrupts & (1<<M6805_IRQ_LINE)) != 0 ) {
-		if ( (CC & IFLAG) == 0 ) {
-#endif
 	{
         /* standard IRQ */
 //#if (HAS_HD63705)
@@ -390,7 +383,6 @@ static void Interrupt( m6805_Regs *cpustate )
 			(*cpustate->irq_callback)(cpustate->device, 0);
 
 
-#if (HAS_HD63705)
 		if(SUBTYPE==SUBTYPE_HD63705)
 		{
 			/* Need to add emulation of other interrupt sources here KW-2/4/99 */
@@ -438,7 +430,6 @@ static void Interrupt( m6805_Regs *cpustate )
 			}
 		}
 		else
-#endif
 		{
 			RM16( cpustate, 0xffff - 5, &pPC );
 		}
@@ -529,13 +520,11 @@ static CPU_EXECUTE( m6805 )
 	{
 		if (cpustate->pending_interrupts != 0)
 		{
-#if (HAS_M68705)
 			if (SUBTYPE==SUBTYPE_M68705)
 			{
 				m68705_Interrupt(cpustate);
 			}
 			else
-#endif
 			{
 				Interrupt(cpustate);
 			}
@@ -817,7 +806,6 @@ static CPU_EXECUTE( m6805 )
 /****************************************************************************
  * M68705 section
  ****************************************************************************/
-#if (HAS_M68705)
 static CPU_INIT( m68705 )
 {
 	m6805_Regs *cpustate = get_safe_token(device);
@@ -843,12 +831,10 @@ static void m68705_set_irq_line(m6805_Regs *cpustate, int irqline, int state)
 	if (state != CLEAR_LINE) cpustate->pending_interrupts |= 1<<irqline;
 }
 
-#endif
 
 /****************************************************************************
  * HD63705 section
  ****************************************************************************/
-#if (HAS_HD63705)
 static CPU_INIT( hd63705 )
 {
 	m6805_Regs *cpustate = get_safe_token(device);
@@ -887,7 +873,6 @@ static void hd63705_set_irq_line(m6805_Regs *cpustate, int irqline, int state)
 		if (state != CLEAR_LINE) cpustate->pending_interrupts |= 1<<irqline;
 	}
 }
-#endif
 
 
 
@@ -998,7 +983,6 @@ CPU_GET_INFO( m6805 )
 }
 
 
-#if (HAS_M68705)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -1035,10 +1019,8 @@ CPU_GET_INFO( m68705 )
 		default:											CPU_GET_INFO_CALL(m6805);	break;
 	}
 }
-#endif
 
 
-#if (HAS_HD63705)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -1096,4 +1078,3 @@ CPU_GET_INFO( hd63705 )
 		default:										CPU_GET_INFO_CALL(m6805);	break;
 	}
 }
-#endif

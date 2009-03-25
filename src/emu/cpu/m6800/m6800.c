@@ -657,7 +657,6 @@ INLINE void increment_counter(m6800_state *cpustate, int amount)
 /* include the opcode functions */
 #include "6800ops.c"
 
-#if (HAS_M6801||HAS_M6803||HAS_HD63701)
 static void m6800_tx(m6800_state *cpustate, int value)
 {
 	cpustate->port2_data = (cpustate->port2_data & 0xef) | (value << 4);
@@ -844,7 +843,6 @@ static TIMER_CALLBACK(m6800_rx_tick)
 		}
 	}
 }
-#endif
 
 /****************************************************************************
  * Reset registers to their initial values
@@ -1286,7 +1284,6 @@ static CPU_EXECUTE( m6800 )
 /****************************************************************************
  * M6801 almost (fully?) equal to the M6803
  ****************************************************************************/
-#if (HAS_M6801)
 static CPU_INIT( m6801 )
 {
 	m6800_state *cpustate = get_safe_token(device);
@@ -1306,12 +1303,10 @@ static CPU_INIT( m6801 )
 
 	state_register(cpustate, "m6801");
 }
-#endif
 
 /****************************************************************************
  * M6802 almost (fully?) equal to the M6800
  ****************************************************************************/
-#if (HAS_M6802)
 static CPU_INIT( m6802 )
 {
 	m6800_state *cpustate = get_safe_token(device);
@@ -1327,12 +1322,10 @@ static CPU_INIT( m6802 )
 
 	state_register(cpustate, "m6802");
 }
-#endif
 
 /****************************************************************************
  * M6803 almost (fully?) equal to the M6801
  ****************************************************************************/
-#if (HAS_M6803)
 static CPU_INIT( m6803 )
 {
 	m6800_state *cpustate = get_safe_token(device);
@@ -1352,7 +1345,6 @@ static CPU_INIT( m6803 )
 
 	state_register(cpustate, "m6803");
 }
-#endif
 
 /****************************************************************************
  * Execute one instruction
@@ -1624,7 +1616,6 @@ INLINE void m6803_execute_one(m6800_state *cpustate, UINT8 ireg)
 /****************************************************************************
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
-#if (HAS_M6803||HAS_M6801)
 static CPU_EXECUTE( m6803 )
 {
 	m6800_state *cpustate = get_safe_token(device);
@@ -1654,9 +1645,7 @@ static CPU_EXECUTE( m6803 )
 
 	return cycles - cpustate->icount;
 }
-#endif
 
-#if (HAS_M6803)
 
 static READ8_HANDLER( m6803_internal_registers_r );
 static WRITE8_HANDLER( m6803_internal_registers_w );
@@ -1667,12 +1656,10 @@ static ADDRESS_MAP_START(m6803_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM        /* 6803 internal RAM */
 ADDRESS_MAP_END
 
-#endif
 
 /****************************************************************************
  * M6808 almost (fully?) equal to the M6800
  ****************************************************************************/
-#if (HAS_M6808)
 static CPU_INIT( m6808 )
 {
 	m6800_state *cpustate = get_safe_token(device);
@@ -1688,12 +1675,10 @@ static CPU_INIT( m6808 )
 
 	state_register(cpustate, "m6808");
 }
-#endif
 
 /****************************************************************************
  * HD63701 similiar to the M6800
  ****************************************************************************/
-#if (HAS_HD63701)
 
 static CPU_INIT( hd63701 )
 {
@@ -2041,13 +2026,11 @@ WRITE8_HANDLER( hd63701_internal_registers_w )
 {
 	m6803_internal_registers_w(space, offset,data);
 }
-#endif
 
 /****************************************************************************
  * NSC-8105 similiar to the M6800, but the opcodes are scrambled and there
  * is at least one new opcode ($fc)
  ****************************************************************************/
-#if (HAS_NSC8105)
 static CPU_INIT( nsc8105 )
 {
 	m6800_state *cpustate = get_safe_token(device);
@@ -2362,10 +2345,8 @@ static CPU_EXECUTE( nsc8105 )
 
 	return cycles - cpustate->icount;
 }
-#endif
 
 
-#if (HAS_M6803||HAS_HD63701)
 
 static READ8_HANDLER( m6803_internal_registers_r )
 {
@@ -2654,7 +2635,6 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			break;
 	}
 }
-#endif
 
 
 /**************************************************************************
@@ -2772,7 +2752,6 @@ CPU_GET_INFO( m6800 )
 }
 
 
-#if (HAS_M6801)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -2797,10 +2776,8 @@ CPU_GET_INFO( m6801 )
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
-#endif
 
 
-#if (HAS_M6802)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -2822,10 +2799,8 @@ CPU_GET_INFO( m6802 )
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
-#endif
 
 
-#if (HAS_M6803)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -2852,10 +2827,8 @@ CPU_GET_INFO( m6803 )
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
-#endif
 
 
-#if (HAS_M6808)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -2877,10 +2850,8 @@ CPU_GET_INFO( m6808 )
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
-#endif
 
 
-#if (HAS_HD63701)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -2905,10 +2876,8 @@ CPU_GET_INFO( hd63701 )
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
-#endif
 
 
-#if (HAS_NSC8105)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -2931,4 +2900,3 @@ CPU_GET_INFO( nsc8105 )
 		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
-#endif

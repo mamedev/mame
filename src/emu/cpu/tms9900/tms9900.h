@@ -52,7 +52,6 @@ typedef void (*ti99xx_lrex_func)(const device_config *device);
 typedef void (*ti99xx_ckon_ckof_func)(const device_config *device, int state);
 typedef void (*ti99xx_error_interrupt_func)(const device_config *device, int state);
 
-#if (HAS_TI990_10)
 
 extern CPU_GET_INFO( ti990_10 );
 #define CPU_TI990_10 CPU_GET_INFO_NAME( ti990_10 )
@@ -80,9 +79,7 @@ extern WRITE8_HANDLER(ti990_10_mapper_cru_w);
 extern READ8_HANDLER(ti990_10_eir_cru_r);
 extern WRITE8_HANDLER(ti990_10_eir_cru_w);
 
-#endif
 
-#if (HAS_TMS9900)
 
 extern CPU_GET_INFO( tms9900 );
 #define CPU_TMS9900 CPU_GET_INFO_NAME( tms9900 )
@@ -95,9 +92,7 @@ typedef struct tms9900reset_param
 	ti99xx_idle_func	idle_callback;
 } tms9900reset_param;
 
-#endif
 
-#if (HAS_TMS9940)
 
 extern CPU_GET_INFO( tms9940 );
 #define CPU_TMS9940 CPU_GET_INFO_NAME( tms9940 )
@@ -110,9 +105,7 @@ typedef struct tms9940reset_param
 	ti99xx_idle_func	idle_callback;
 } tms9940reset_param;
 
-#endif
 
-#if (HAS_TMS9980)
 
 extern CPU_GET_INFO( tms9980a );
 #define CPU_TMS9980 CPU_GET_INFO_NAME( tms9980a )
@@ -125,9 +118,7 @@ typedef struct tms9980areset_param
 	ti99xx_idle_func	idle_callback;
 } tms9980areset_param;
 
-#endif
 
-#if (HAS_TMS9985)
 
 extern CPU_GET_INFO( tms9985 );
 #define CPU_TMS9986 CPU_GET_INFO_NAME( tms9985 )
@@ -140,9 +131,7 @@ typedef struct tms9985reset_param
 	ti99xx_idle_func	idle_callback;
 } tms9985reset_param;
 
-#endif
 
-#if (HAS_TMS9989)
 
 extern CPU_GET_INFO( tms9989 );
 #define CPU_TMS9989 CPU_GET_INFO_NAME( tms9989 )
@@ -155,9 +144,7 @@ typedef struct tms9989reset_param
 	ti99xx_idle_func	idle_callback;
 } tms9989reset_param;
 
-#endif
 
-#if (HAS_TMS9995)
 
 extern CPU_GET_INFO( tms9995 );
 #define CPU_TMS9995 CPU_GET_INFO_NAME( tms9995 )
@@ -186,9 +173,7 @@ extern WRITE8_HANDLER(tms9995_internal1_w);
 extern READ8_HANDLER(tms9995_internal2_r);
 extern WRITE8_HANDLER(tms9995_internal2_w);
 
-#endif
 
-#if (HAS_TMS99000)
 
 extern CPU_GET_INFO( tms99000 );
 #define CPU_TMS99000 CPU_GET_INFO_NAME( tms99000 )
@@ -201,9 +186,7 @@ typedef struct tms99000reset_param
 	ti99xx_idle_func	idle_callback;
 } tms99000reset_param;
 
-#endif
 
-#if (HAS_TMS99105A)
 
 extern CPU_GET_INFO( tms99105a );
 #define CPU_TMS99105A CPU_GET_INFO_NAME( tms99105a )
@@ -216,9 +199,7 @@ typedef struct tms99105areset_param
 	ti99xx_idle_func	idle_callback;
 } tms99105areset_param;
 
-#endif
 
-#if (HAS_TMS99110A)
 
 extern CPU_GET_INFO( tms99110a );
 #define CPU_TMS99110A CPU_GET_INFO_NAME( tms99110a )
@@ -231,7 +212,6 @@ typedef struct tms99110areset_param
 	ti99xx_idle_func	idle_callback;
 } tms99110areset_param;
 
-#endif
 
 unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, const UINT8 *opram);
 

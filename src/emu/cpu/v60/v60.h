@@ -81,14 +81,10 @@ enum
 extern const char *const v60_reg_names[];
 void v60_stall(const device_config *device);
 
-#if HAS_V60
 CPU_GET_INFO( v60 );
 #define CPU_V60 CPU_GET_INFO_NAME( v60 )
-#endif /* HAS_V60 */
 
-#if HAS_V70
 CPU_GET_INFO( v70 );
 #define CPU_V70 CPU_GET_INFO_NAME( v70 )
-#endif /* HAS_V70 */
 
 #endif /* __V60_H__ */

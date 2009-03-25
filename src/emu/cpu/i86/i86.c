@@ -226,14 +226,12 @@ static CPU_INIT( i8086 )
 	configure_memory_16bit(cpustate);
 }
 
-#if (HAS_I8088||HAS_I80188)
 static CPU_INIT( i8088 )
 {
 	i8086_state *cpustate = get_safe_token(device);
 	CPU_INIT_CALL(i8086);
 	configure_memory_8bit(cpustate);
 }
-#endif
 
 static CPU_RESET( i8086 )
 {
@@ -334,7 +332,6 @@ static CPU_DISASSEMBLE( i8086 )
 }
 
 
-#if (HAS_I80186 || HAS_I80188)
 
 #include "i86.h"
 
@@ -382,7 +379,6 @@ static CPU_EXECUTE( i80186 )
 	return cycles - cpustate->icount;
 }
 
-#endif
 
 
 
@@ -593,7 +589,6 @@ CPU_GET_INFO( i8086 )
 }
 
 
-#if (HAS_I8088)
 /**************************************************************************
  * CPU-specific get_info/set_info
  **************************************************************************/
@@ -615,10 +610,8 @@ CPU_GET_INFO( i8088 )
 		default:										CPU_GET_INFO_CALL(i8086);				break;
 	}
 }
-#endif
 
 
-#if (HAS_I80186)
 /**************************************************************************
  * CPU-specific get_info/set_info
  **************************************************************************/
@@ -640,10 +633,8 @@ CPU_GET_INFO( i80186 )
 		default:										CPU_GET_INFO_CALL(i8086);				break;
 	}
 }
-#endif
 
 
-#if (HAS_I80188)
 /**************************************************************************
  * CPU-specific get_info/set_info
  **************************************************************************/
@@ -666,4 +657,3 @@ CPU_GET_INFO( i80188 )
 		default:										CPU_GET_INFO_CALL(i8086);				break;
 	}
 }
-#endif

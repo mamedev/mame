@@ -229,7 +229,6 @@ void mips3drc_set_options(const device_config *device, UINT32 options);
 void mips3drc_add_fastram(const device_config *device, offs_t start, offs_t end, UINT8 readonly, void *base);
 void mips3drc_add_hotspot(const device_config *device, offs_t pc, UINT32 opcode, UINT32 cycles);
 
-#if (HAS_VR4300)
 CPU_GET_INFO( vr4300be );
 CPU_GET_INFO( vr4300le );
 #define CPU_VR4300BE CPU_GET_INFO_NAME( vr4300be )
@@ -238,49 +237,36 @@ CPU_GET_INFO( vr4310be );
 CPU_GET_INFO( vr4310le );
 #define CPU_VR4310BE CPU_GET_INFO_NAME( vr4310be )
 #define CPU_VR4310LE CPU_GET_INFO_NAME( vr4310le )
-#endif
 
-#if (HAS_R4600)
 CPU_GET_INFO( r4600be );
 #define CPU_R4600BE CPU_GET_INFO_NAME( r4600be )
 CPU_GET_INFO( r4600le );
 #define CPU_R4600LE CPU_GET_INFO_NAME( r4600le )
-#endif
 
-#if (HAS_R4650)
 CPU_GET_INFO( r4650be);
 #define CPU_R4650BE CPU_GET_INFO_NAME( r4650be )
 CPU_GET_INFO( r4650le);
 #define CPU_R4650LE CPU_GET_INFO_NAME( r4650le )
-#endif
 
-#if (HAS_R4700)
 CPU_GET_INFO( r4700be );
 #define CPU_R4700BE CPU_GET_INFO_NAME( r4700be )
 CPU_GET_INFO( r4700le );
 #define CPU_R4700LE CPU_GET_INFO_NAME( r4700le )
-#endif
 
-#if (HAS_R5000)
 CPU_GET_INFO( r5000be );
 #define CPU_R5000BE CPU_GET_INFO_NAME( r5000be )
 CPU_GET_INFO( r5000le );
 #define CPU_R5000LE CPU_GET_INFO_NAME( r5000le )
-#endif
 
-#if (HAS_QED5271)
 CPU_GET_INFO( qed5271be );
 #define CPU_QED5271BE CPU_GET_INFO_NAME( qed5271be )
 CPU_GET_INFO( qed5271le );
 #define CPU_QED5271LE CPU_GET_INFO_NAME( qed5271le )
-#endif
 
-#if (HAS_RM7000)
 CPU_GET_INFO( rm7000be );
 #define CPU_RM7000BE CPU_GET_INFO_NAME( rm7000be )
 CPU_GET_INFO( rm7000le );
 #define CPU_RM7000LE CPU_GET_INFO_NAME( rm7000le )
-#endif
 
 
 

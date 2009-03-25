@@ -1139,7 +1139,6 @@ static void nec_init(const device_config *device, cpu_irq_callback irqcallback, 
     8-bit memory accessors
  *****************************************************************************/
 
-#if (HAS_V20||HAS_V25)
 static void configure_memory_8bit(nec_state_t *nec_state)
 {
 	nec_state->mem.fetch_xor = 0;
@@ -1149,14 +1148,12 @@ static void configure_memory_8bit(nec_state_t *nec_state)
 	nec_state->mem.wbyte = memory_write_byte_8le;
 	nec_state->mem.wword = memory_write_word_8le;
 }
-#endif
 
 
 /*****************************************************************************
     16-bit memory accessors
  *****************************************************************************/
 
-#if (HAS_V30||HAS_V33||HAS_V35)
 static UINT16 read_word_16le(const address_space *space, offs_t addr)
 {
 	if (!(addr & 1))
@@ -1188,7 +1185,6 @@ static void configure_memory_16bit(nec_state_t *nec_state)
 	nec_state->mem.wbyte = memory_write_byte_16le;
 	nec_state->mem.wword = write_word_16le;
 }
-#endif
 
 static CPU_EXECUTE( necv )
 {
@@ -1220,7 +1216,6 @@ static CPU_EXECUTE( necv )
 }
 
 /* Wrappers for the different CPU types */
-#if (HAS_V20||HAS_V25)
 static CPU_INIT( v20 )
 {
 	nec_state_t *nec_state = get_safe_token(device);
@@ -1231,9 +1226,7 @@ static CPU_INIT( v20 )
 	nec_state->prefetch_size = 4;		/* 3 words */
 	nec_state->prefetch_cycles = 4;		/* four cycles per byte */
 }
-#endif
 
-#if (HAS_V30||HAS_V35)
 static CPU_INIT( v30 )
 {
 	nec_state_t *nec_state = get_safe_token(device);
@@ -1245,9 +1238,7 @@ static CPU_INIT( v30 )
 	nec_state->prefetch_cycles = 2;		/* two cycles per byte / four per word */
 
 }
-#endif
 
-#if (HAS_V33)
 static CPU_INIT( v33 )
 {
 	nec_state_t *nec_state = get_safe_token(device);
@@ -1262,7 +1253,6 @@ static CPU_INIT( v33 )
 
 	configure_memory_16bit(nec_state);
 }
-#endif
 
 
 
@@ -1441,7 +1431,6 @@ static CPU_GET_INFO( nec )
 }
 
 
-#if (HAS_V20)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -1463,10 +1452,8 @@ CPU_GET_INFO( v20 )
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
-#endif
 
 
-#if (HAS_V25)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -1488,10 +1475,8 @@ CPU_GET_INFO( v25 )
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
-#endif
 
 
-#if (HAS_V30)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -1509,10 +1494,8 @@ CPU_GET_INFO( v30 )
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
-#endif
 
 
-#if (HAS_V33)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -1530,10 +1513,8 @@ CPU_GET_INFO( v33 )
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
-#endif
 
 
-#if (HAS_V35)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -1551,4 +1532,3 @@ CPU_GET_INFO( v35 )
 		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
-#endif

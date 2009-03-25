@@ -23,75 +23,47 @@
 
 /* Functions */
 
-#if (HAS_E116T)
 CPU_GET_INFO( e116t );
 #define CPU_E116T CPU_GET_INFO_NAME( e116t )
-#endif
 
-#if (HAS_E116XT)
 CPU_GET_INFO( e116xt );
 #define CPU_E116XT CPU_GET_INFO_NAME( e116xt )
-#endif
 
-#if (HAS_E116XS)
 CPU_GET_INFO( e116xs );
 #define CPU_E116XS CPU_GET_INFO_NAME( e116xs )
-#endif
 
-#if (HAS_E116XSR)
 CPU_GET_INFO( e116xsr );
 #define CPU_E116XSR CPU_GET_INFO_NAME( e116xsr )
-#endif
 
-#if (HAS_E132N)
 CPU_GET_INFO( e132n );
 #define CPU_E132N CPU_GET_INFO_NAME( e132n )
-#endif
 
-#if (HAS_E132T)
 CPU_GET_INFO( e132t );
 #define CPU_E132T CPU_GET_INFO_NAME( e132t )
-#endif
 
-#if (HAS_E132XN)
 CPU_GET_INFO( e132xn );
 #define CPU_E132XN CPU_GET_INFO_NAME( e132xn )
-#endif
 
-#if (HAS_E132XT)
 CPU_GET_INFO( e132xt );
 #define CPU_E132XT CPU_GET_INFO_NAME( e132xt )
-#endif
 
-#if (HAS_E132XS)
 CPU_GET_INFO( e132xs );
 #define CPU_E132XS CPU_GET_INFO_NAME( e132xs )
-#endif
 
-#if (HAS_E132XSR)
 CPU_GET_INFO( e132xsr );
 #define CPU_E132XSR CPU_GET_INFO_NAME( e132xsr )
-#endif
 
-#if (HAS_GMS30C2116)
 CPU_GET_INFO( gms30c2116 );
 #define CPU_GMS30C2116 CPU_GET_INFO_NAME( gms30c2116 )
-#endif
 
-#if (HAS_GMS30C2132)
 CPU_GET_INFO( gms30c2132 );
 #define CPU_GMS30C2132 CPU_GET_INFO_NAME( gms30c2132 )
-#endif
 
-#if (HAS_GMS30C2216)
 CPU_GET_INFO( gms30c2216 );
 #define CPU_GMS30C2216 CPU_GET_INFO_NAME( gms30c2216 )
-#endif
 
-#if (HAS_GMS30C2232)
 CPU_GET_INFO( gms30c2232 );
 #define CPU_GMS30C2232 CPU_GET_INFO_NAME( gms30c2232 )
-#endif
 
 extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned h_flag, int private_fp);
 

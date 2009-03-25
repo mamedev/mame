@@ -33,21 +33,11 @@
 #define FAST_MEMORY 0
 
 #define SUBTYPE_6502	0
-#if (HAS_M65C02)
 #define SUBTYPE_65C02	1
-#endif
-#if (HAS_M6510)
 #define SUBTYPE_6510	2
-#endif
-#if (HAS_N2A03)
 #define SUBTYPE_2A03	3
-#endif
-#if (HAS_M65SC02)
 #define SUBTYPE_65SC02	4
-#endif
-#if (HAS_DECO16)
 #define SUBTYPE_DECO16	5
-#endif
 
 enum
 {
@@ -86,7 +76,6 @@ extern CPU_DISASSEMBLE( m6502 );
 /****************************************************************************
  * The 6510
  ****************************************************************************/
-#if (HAS_M6510)
 #define M6510_A 						M6502_A
 #define M6510_X 						M6502_X
 #define M6510_Y 						M6502_Y
@@ -105,9 +94,7 @@ extern CPU_GET_INFO( m6510 );
 
 extern CPU_DISASSEMBLE( m6510 );
 
-#endif
 
-#if (HAS_M6510T)
 #define M6510T_A						M6502_A
 #define M6510T_X						M6502_X
 #define M6510T_Y						M6502_Y
@@ -124,9 +111,7 @@ extern CPU_DISASSEMBLE( m6510 );
 extern CPU_GET_INFO( m6510t );
 #define CPU_M6510T CPU_GET_INFO_NAME( m6510t )
 
-#endif
 
-#if (HAS_M7501)
 #define M7501_A 						M6502_A
 #define M7501_X 						M6502_X
 #define M7501_Y 						M6502_Y
@@ -142,9 +127,7 @@ extern CPU_GET_INFO( m6510t );
 
 extern CPU_GET_INFO( m7501 );
 #define CPU_M7501 CPU_GET_INFO_NAME( m7501 )
-#endif
 
-#if (HAS_M8502)
 #define M8502_A 						M6502_A
 #define M8502_X 						M6502_X
 #define M8502_Y 						M6502_Y
@@ -160,13 +143,11 @@ extern CPU_GET_INFO( m7501 );
 
 extern CPU_GET_INFO( m8502 );
 #define CPU_M8502 CPU_GET_INFO_NAME( m8502 )
-#endif
 
 
 /****************************************************************************
  * The 2A03 (NES 6502 without decimal mode ADC/SBC)
  ****************************************************************************/
-#if (HAS_N2A03)
 #define N2A03_A 						M6502_A
 #define N2A03_X 						M6502_X
 #define N2A03_Y 						M6502_Y
@@ -190,13 +171,11 @@ extern CPU_GET_INFO( n2a03 );
    causes an IRQ to be generated.  This function allows the IRQ to be called
    from the PSG core when such an occasion arises. */
 extern void n2a03_irq(const device_config *device);
-#endif
 
 
 /****************************************************************************
  * The 65C02
  ****************************************************************************/
-#if (HAS_M65C02)
 #define M65C02_A						M6502_A
 #define M65C02_X						M6502_X
 #define M65C02_Y						M6502_Y
@@ -215,12 +194,10 @@ extern CPU_GET_INFO( m65c02 );
 
 extern CPU_DISASSEMBLE( m65c02 );
 
-#endif
 
 /****************************************************************************
  * The 65SC02
  ****************************************************************************/
-#if (HAS_M65SC02)
 #define M65SC02_A						M6502_A
 #define M65SC02_X						M6502_X
 #define M65SC02_Y						M6502_Y
@@ -238,12 +215,10 @@ extern CPU_GET_INFO( m65sc02 );
 #define CPU_M65SC02 CPU_GET_INFO_NAME( m65sc02 )
 
 extern CPU_DISASSEMBLE( m65sc02 );
-#endif
 
 /****************************************************************************
  * The DECO CPU16
  ****************************************************************************/
-#if (HAS_DECO16)
 #define DECO16_A						M6502_A
 #define DECO16_X						M6502_X
 #define DECO16_Y						M6502_Y
@@ -259,7 +234,6 @@ extern CPU_DISASSEMBLE( m65sc02 );
 
 extern CPU_GET_INFO( deco16 );
 #define CPU_DECO16 CPU_GET_INFO_NAME( deco16 )
-#endif
 
 extern CPU_DISASSEMBLE( deco16 );
 

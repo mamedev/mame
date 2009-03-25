@@ -3,7 +3,6 @@
  *****************************************************************************/
 
 #ifdef I8086
-#if (HAS_I8088||HAS_I80188)
 static void configure_memory_8bit(i8086_state *cpustate)
 {
 	cpustate->mem.fetch_xor = 0;
@@ -13,7 +12,6 @@ static void configure_memory_8bit(i8086_state *cpustate)
 	cpustate->mem.wbyte = memory_write_byte_8le;
 	cpustate->mem.wword = memory_write_word_8le;
 }
-#endif
 #endif
 
 

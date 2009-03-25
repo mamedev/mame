@@ -679,7 +679,6 @@ static CPU_GET_INFO( tms )
 	}
 }
 
-#if (HAS_TMS32051)
 static CPU_SET_INFO( tms32051 )
 {
 	tms32051_state *cpustate = get_safe_token(device);
@@ -732,4 +731,3 @@ CPU_GET_INFO( tms32051 )
 		default:										CPU_GET_INFO_CALL(tms);				break;
 	}
 }
-#endif

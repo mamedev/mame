@@ -771,7 +771,6 @@ static CPU_DISASSEMBLE( ssp1601 )
 	return dasm_ssp1601(buffer, pc, oprom);
 }
 
-#if (HAS_SSP1601)
 
 static CPU_SET_INFO( ssp1601 )
 {
@@ -919,7 +918,6 @@ CPU_GET_INFO( ssp1601 )
 		case CPUINFO_STR_REGISTER + SSP_PR7:		sprintf(info->s, "R7  :%02X", ssp1601_state->r[7]);				break;
 	}
 }
-#endif
 
 // vim:ts=4
 

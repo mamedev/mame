@@ -22,14 +22,12 @@ OP_HANDLER( illegal )
 }
 
 /* HD63701 only */
-#if (HAS_HD63701)
 //OP_HANDLER( trap )
 OP_HANDLER( trap )
 {
 	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC,(int) M_RDOP_ARG(PC)&0xFF);
 	TAKE_TRAP;
 }
-#endif
 
 /* $00 ILLEGAL */
 
@@ -201,7 +199,6 @@ OP_HANDLER( daa )
 
 /* $1a ILLEGAL */
 
-#if (HAS_HD63701)
 /* $1a SLP */ /* HD63701YO only */
 OP_HANDLER( slp )
 {
@@ -209,7 +206,6 @@ OP_HANDLER( slp )
 	cpustate->wai_state |= M6800_SLP;
 	EAT_CYCLES;
 }
-#endif
 
 /* $1b ABA inherent ***** */
 OP_HANDLER( aba )

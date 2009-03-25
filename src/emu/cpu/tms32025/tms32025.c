@@ -1796,7 +1796,6 @@ static CPU_RESET( tms32025 )
 	cpustate->datamap[7] = &cpustate->intRAM[0x380];			/* B1 */
 }
 
-#if (HAS_TMS32026)
 static CPU_RESET( tms32026 )
 {
 	tms32025_state *cpustate = get_safe_token(device);
@@ -1821,7 +1820,6 @@ static CPU_RESET( tms32026 )
 	cpustate->datamap[14] = &cpustate->intRAM[0x700];			/* B3 */
 	cpustate->datamap[15] = &cpustate->intRAM[0x780];			/* B3 */
 }
-#endif
 
 
 /****************************************************************************
@@ -2436,7 +2434,6 @@ CPU_GET_INFO( tms32025 )
 }
 
 
-#if (HAS_TMS32026)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -2454,4 +2451,3 @@ CPU_GET_INFO( tms32026 )
 		default:										CPU_GET_INFO_CALL(tms32025);			break;
 	}
 }
-#endif

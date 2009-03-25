@@ -24,11 +24,6 @@
 /* 10.March   2000 PeT added 6502 set overflow input line */
 /* 13.September 2000 PeT N2A03 jmp indirect */
 
-#if ((HAS_M65SC02 || HAS_DECO16) && !HAS_M65C02)
-#undef HAS_M65C02
-#define HAS_M65C02 1
-#endif
-
 #include "debugger.h"
 #include "m6502.h"
 #include "ops02.h"
@@ -82,13 +77,10 @@ struct _m6502_Regs
 	m6502_read_indexed_func rdmem_id;					/* readmem callback for indexed instructions */
 	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
 
-#if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
 	UINT8    ddr;
 	UINT8    port;
 	m6510_port_read_func port_read;
 	m6510_port_write_func port_write;
-#endif
-
 };
 
 INLINE m6502_Regs *get_safe_token(const device_config *device)
@@ -116,29 +108,19 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
  ***************************************************************/
 #include "t6502.c"
 
-#if (HAS_M6510)
 #include "t6510.c"
-#endif
 
 #include "opsn2a03.h"
 
-#if (HAS_N2A03)
 #include "tn2a03.c"
-#endif
 
 #include "opsc02.h"
 
-#if (HAS_M65C02)
 #include "t65c02.c"
-#endif
 
-#if (HAS_M65SC02)
 #include "t65sc02.c"
-#endif
 
-#if (HAS_DECO16)
 #include "tdeco16.c"
-#endif
 
 /*****************************************************************************
  *
@@ -170,13 +152,11 @@ static void m6502_common_init(const device_config *device, cpu_irq_callback irqc
 	state_save_register_device_item(device, 0, cpustate->irq_state);
 	state_save_register_device_item(device, 0, cpustate->so_state);
 
-#if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
 	if (subtype == SUBTYPE_6510)
 	{
 		state_save_register_device_item(device, 0, cpustate->port);
 		state_save_register_device_item(device, 0, cpustate->ddr);
 	}
-#endif
 }
 
 static CPU_INIT( m6502 )
@@ -325,7 +305,6 @@ static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 /****************************************************************************
  * 2A03 section
  ****************************************************************************/
-#if (HAS_N2A03)
 
 static CPU_INIT( n2a03 )
 {
@@ -342,13 +321,11 @@ void n2a03_irq(const device_config *device)
 
 	m6502_take_irq(cpustate);
 }
-#endif
 
 
 /****************************************************************************
  * 6510 section
  ****************************************************************************/
-#if (HAS_M6510)
 
 static CPU_INIT( m6510 )
 {
@@ -410,13 +387,11 @@ static ADDRESS_MAP_START(m6510_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(m6510_read_0000, m6510_write_0000)
 ADDRESS_MAP_END
 
-#endif
 
 
 /****************************************************************************
  * 65C02 section
  ****************************************************************************/
-#if (HAS_M65C02)
 
 static CPU_INIT( m65c02 )
 {
@@ -518,22 +493,18 @@ static void m65c02_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
 	else
 		m6502_set_irq_line(cpustate, irqline,state);
 }
-#endif
 
 /****************************************************************************
  * 65SC02 section
  ****************************************************************************/
-#if (HAS_M65SC02)
 static CPU_INIT( m65sc02 )
 {
 	m6502_common_init(device, irqcallback, SUBTYPE_65SC02, insn65sc02, "m65sc02");
 }
-#endif
 
 /****************************************************************************
  * DECO16 section
  ****************************************************************************/
-#if (HAS_DECO16)
 
 static CPU_INIT( deco16 )
 {
@@ -665,7 +636,6 @@ static CPU_EXECUTE( deco16 )
 	return cycles - cpustate->icount;
 }
 
-#endif
 
 
 
@@ -796,7 +766,6 @@ CPU_GET_INFO( m6502 )
 }
 
 
-#if (HAS_N2A03)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -814,10 +783,8 @@ CPU_GET_INFO( n2a03 )
 		default:										CPU_GET_INFO_CALL(m6502);			break;
 	}
 }
-#endif
 
 
-#if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -860,10 +827,8 @@ CPU_GET_INFO( m6510 )
 		default:										CPU_GET_INFO_CALL(m6502);			break;
 	}
 }
-#endif
 
 
-#if (HAS_M6510T)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -878,10 +843,8 @@ CPU_GET_INFO( m6510t )
 		default:										CPU_GET_INFO_CALL(m6510);			break;
 	}
 }
-#endif
 
 
-#if (HAS_M7501)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -896,10 +859,8 @@ CPU_GET_INFO( m7501 )
 		default:										CPU_GET_INFO_CALL(m6510);			break;
 	}
 }
-#endif
 
 
-#if (HAS_M8502)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -914,10 +875,8 @@ CPU_GET_INFO( m8502 )
 		default:										CPU_GET_INFO_CALL(m6510);			break;
 	}
 }
-#endif
 
 
-#if (HAS_M65C02)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -952,10 +911,8 @@ CPU_GET_INFO( m65c02 )
 		default:										CPU_GET_INFO_CALL(m6502);			break;
 	}
 }
-#endif
 
 
-#if (HAS_M65SC02)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -978,10 +935,8 @@ CPU_GET_INFO( m65sc02 )
 		default:										CPU_GET_INFO_CALL(m65c02);			break;
 	}
 }
-#endif
 
 
-#if (HAS_DECO16)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
@@ -1026,4 +981,3 @@ CPU_GET_INFO( deco16 )
 		default:										CPU_GET_INFO_CALL(m6502);			break;
 	}
 }
-#endif

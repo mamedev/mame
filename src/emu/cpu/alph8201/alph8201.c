@@ -525,7 +525,6 @@ static void jz(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate); if
 static void jc(alpha8201_state *cpustate)	{ UINT8 i=M_RDMEM_OPCODE(cpustate); if ( cpustate->cf) M_JMP(cpustate, i);}
 static void jmp(alpha8201_state *cpustate)	{ M_JMP(cpustate,  M_RDMEM_OPCODE(cpustate) ); }
 
-#if (HAS_ALPHA8201)
 static const s_opcode opcode_8201[256]=
 {
 	{C1, nop        },{C1,rora      },{C1, rola      },{C1,inc_b     },{C1,dec_b     },{C1, inc_a    },{C1, dec_a    },{C1, cpl      },
@@ -566,9 +565,7 @@ static const s_opcode opcode_8201[256]=
 	{C1, undefined	},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},
 	{C1, undefined	},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined},{C1, undefined }
 };
-#endif
 
-#if (HAS_ALPHA8301)
 
 /* ALPHA 8301 : added instruction */
 static void exg_a_ix0(alpha8201_state *cpustate)  { UINT8 t=cpustate->A; cpustate->A = cpustate->IX0; cpustate->IX0 = t; }
@@ -663,7 +660,6 @@ static const s_opcode opcode_8301[256]=
 	{C1,exg_ix0_ix1},{C1,exg_ix0_ix2},{C1,op_rep_ld_ix2_b},{C1, op_rep_ld_b_ix0},{C1, save_zc},{C1, rest_zc},{C1, ld_rxb_a },{C1, ld_a_rxb },
 	{C1, cmp_a_rxb },{C1, xor_a_rxb},{C1, add_a_cf },{C1, sub_a_cf },{C1, tst_a    },{C1, clr_a    },{C1, ld_a_ix0_a},{C1, ret     }
 };
-#endif
 
 /****************************************************************************
  * Initialize emulation
@@ -814,13 +810,9 @@ mame_printf_debug("alpha8201:  cpustate->PC = %03x,  opcode = %02x\n", cpustate-
 	return cycles - cpustate->icount;
 }
 
-#if (HAS_ALPHA8201)
 static CPU_EXECUTE( alpha8201 ) { return alpha8xxx_execute(device,opcode_8201,cycles); }
-#endif
 
-#if (HAS_ALPHA8301)
 static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(device,opcode_8301,cycles); }
-#endif
 
 /****************************************************************************
  * Set IRQ line state
@@ -980,7 +972,6 @@ static CPU_GET_INFO( alpha8xxx )
 		case CPUINFO_STR_REGISTER + ALPHA8201_R7:		sprintf(info->s, "R7:%02X", RD_REG(7));		break;
 	}
 }
-#if (HAS_ALPHA8201)
 CPU_GET_INFO( alpha8201 )
 {
 	switch (state)
@@ -992,9 +983,7 @@ CPU_GET_INFO( alpha8201 )
 		CPU_GET_INFO_CALL(alpha8xxx);
 	}
 }
-#endif
 
-#if (HAS_ALPHA8301)
 CPU_GET_INFO( alpha8301 )
 {
 	switch (state)
@@ -1006,4 +995,3 @@ CPU_GET_INFO( alpha8301 )
 		CPU_GET_INFO_CALL(alpha8xxx);
 	}
 }
-#endif

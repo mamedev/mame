@@ -958,7 +958,6 @@ static CPU_SET_INFO( sharc )
 	}
 }
 
-#if (HAS_ADSP21062)
 static CPU_SET_INFO( adsp21062 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 2)
@@ -976,7 +975,6 @@ static CPU_SET_INFO( adsp21062 )
 		default:	CPU_SET_INFO_CALL(sharc);		break;
 	}
 }
-#endif
 
 
 static CPU_READ( sharc )
@@ -1327,7 +1325,6 @@ static CPU_GET_INFO( sharc )
 	}
 }
 
-#if (HAS_ADSP21062)
 CPU_GET_INFO( adsp21062 )
 {
 	switch(state)
@@ -1341,4 +1338,3 @@ CPU_GET_INFO( adsp21062 )
 		default:										CPU_GET_INFO_CALL(sharc);				break;
 	}
 }
-#endif

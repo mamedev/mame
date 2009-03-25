@@ -29,15 +29,9 @@
 
 #include "debugger.h"
 #include "m6502.h"
-#if (HAS_M65CE02)
 #include "m65ce02.h"
-#endif
-#if (HAS_M6509)
 #include "m6509.h"
-#endif
-#if (HAS_M4510)
 #include "m4510.h"
-#endif
 
 enum addr_mode {
 	non,	/* no additional arguments */
@@ -341,7 +335,6 @@ static const struct op6502_info op65sc02[256] = {
 	{ill,non},{sbc,abx},{inc,abx},{bbs,zpb}
 };
 
-#if (HAS_M65CE02)
 static const struct op6502_info op65ce02[256] = {
 	{m6502_brk,imm},{ora,idx},{cle,imp},{see,imp},/* 00 */
 	{tsb,zpg},{ora,zpg},{asl,zpg},{rmb,zpg},
@@ -408,9 +401,7 @@ static const struct op6502_info op65ce02[256] = {
 	{sed,imp},{sbc,aby},{plx,imp},{plz,imp},
 	{phw,aba},{sbc,abx},{inc,abx},{bbs,zpb}
 };
-#endif
 
-#if (HAS_M4510)
 // only map instead of aug and 20 bit memory management
 static const struct op6502_info op4510[256] = {
 	{m6502_brk,imm},{ora,idx},{cle,imp},{see,imp},/* 00 */
@@ -478,9 +469,7 @@ static const struct op6502_info op4510[256] = {
 	{sed,imp},{sbc,aby},{plx,imp},{plz,imp},
 	{phw,aba},{sbc,abx},{inc,abx},{bbs,zpb}
 };
-#endif
 
-#if (HAS_DECO16)
 static const struct op6502_info opdeco16[256] =
 {
 	{m6502_brk,imp},{ora,idx},{ill,non},{ill,non},/* 00 */
@@ -548,7 +537,6 @@ static const struct op6502_info opdeco16[256] =
 	{sed,imp},{sbc,aby},{ill,non},{ill,non},
 	{ill,non},{sbc,abx},{inc,abx},{ill,non}
 };
-#endif
 
 /*****************************************************************************
  * Disassemble a single opcode starting at pc
@@ -747,44 +735,32 @@ CPU_DISASSEMBLE( m6502 )
 	return internal_m6502_dasm(op6502, buffer, pc, oprom, opram);
 }
 
-#if (HAS_M65SC02)
 CPU_DISASSEMBLE( m65sc02 )
 {
 	return internal_m6502_dasm(op65sc02, buffer, pc, oprom, opram);
 }
-#endif
 
-#if (HAS_M65C02||HAS_M65SC02||HAS_DECO16)
 CPU_DISASSEMBLE( m65c02 )
 {
 	return internal_m6502_dasm(op65c02, buffer, pc, oprom, opram);
 }
-#endif
 
-#if (HAS_M65CE02)
 CPU_DISASSEMBLE( m65ce02 )
 {
 	return internal_m6502_dasm(op65ce02, buffer, pc, oprom, opram);
 }
-#endif
 
-#if (HAS_M6510)
 CPU_DISASSEMBLE( m6510 )
 {
 	return internal_m6502_dasm(op6502, buffer, pc, oprom, opram);
 }
-#endif
 
-#if (HAS_DECO16)
 CPU_DISASSEMBLE( deco16 )
 {
 	return internal_m6502_dasm(opdeco16, buffer, pc, oprom, opram);
 }
-#endif
 
-#if (HAS_M4510)
 CPU_DISASSEMBLE( m4510 )
 {
 	return internal_m6502_dasm(op4510, buffer, pc, oprom, opram);
 }
-#endif

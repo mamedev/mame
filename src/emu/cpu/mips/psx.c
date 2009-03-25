@@ -6415,7 +6415,6 @@ CPU_GET_INFO( psxcpu )
 }
 
 
-#if (HAS_CXD8661R)
 
 CPU_GET_INFO( cxd8661r )
 {
@@ -6432,4 +6431,3 @@ CPU_GET_INFO( cxd8661r )
 	}
 }
 
-#endif
