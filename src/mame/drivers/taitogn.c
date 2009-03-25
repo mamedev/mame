@@ -1045,12 +1045,12 @@ GAME( 1999, rcdego,   gobyrc,   coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "
 GAME( 1999, flipmaze, taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito/Moss", "Flip Maze (V2.04J)", 0 )
 GAME( 2001, shikigam, taitogn,  coh3002t, coh3002t, coh3002t, ROT270, "Taito/Alfa System", "Shikigami no Shiro (V2.03J)", 0 )
 GAME( 2003, sianniv,  taitogn,  coh3002t, coh3002t, coh3002t, ROT270, "Taito", "Space Invaders Anniversary (V2.02J)", GAME_NOT_WORKING ) // IRQ at the wrong time
-GAME( 2003, kollon,   taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Kollon (V2.04J)", GAME_NOT_WORKING ) // IRQ at the wrong time
+GAME( 2003, kollon,   taitogn,  coh3002t, coh3002t, coh3002t, ROT0,   "Taito", "Kollon (V2.04J)", 0 )
 
 GAME( 2000, psyvaria, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J)", 0 )
 GAME( 2000, psyvarrv, taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", 0 )
 GAME( 2000, zokuoten, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", 0 )
-GAME( 2004, zooo,     taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zooo (V2.01J)", 0 )
+GAME( 2004, zooo,     taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Success", "Zooo (V2.01J)", GAME_NOT_WORKING ) // missing most of the playfield
 
 GAME( 1999, mahjngoh, taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Mahjong Oh (V2.06J)", 0 )
 GAME( 2001, usagi,    taitogn, coh3002t, coh3002t_mp, coh3002t_mp, ROT0, "Warashi/Mahjong Kobo/Taito", "Usagi (V2.02J)", 0 )
@@ -1058,6 +1058,6 @@ GAME( 2000, soutenry, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Warashi", 
 GAME( 2000, shanghss, taitogn, coh3002t, coh3002t, coh3002t, ROT0,   "Warashi", "Shanghai Shoryu Sairin (V2.03J)", 0 )
 
 GAME( 2001, nightrai, taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Night Raid (V2.03J)", GAME_NOT_WORKING ) // no background / enemy sprites
-GAME( 2001, otenki,   taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Otenki Kororin (V2.01J)", GAME_NOT_WORKING ) // no background / enemy sprites
+GAME( 2001, otenki,   taitogn, coh3002t, coh3002t, coh3002t, ROT0, "Takumi", "Otenki Kororin (V2.01J)", 0 )
 
 GAME( 2002, xiistag,  taitogn, coh3002t, coh3002t, coh3002t, ROT270, "Triangle Service", "XII Stag (V2.01J)", 0 )
