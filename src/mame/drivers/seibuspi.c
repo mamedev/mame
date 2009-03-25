@@ -1132,15 +1132,16 @@ static WRITE32_HANDLER(input_select_w)
 static ADDRESS_MAP_START( sys386f2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0000000f) AM_RAM
 	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r)				/* Unknown */
-//	AM_RANGE(0x00000090, 0x00000097) AM_RAM /* Unknown */
+	AM_RANGE(0x00000090, 0x00000097) AM_RAM /* Unknown */
 	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE(input_select_w)
 	AM_RANGE(0x00000404, 0x00000407) AM_WRITE(sys386f2_eeprom_w)
 	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8("ymz", ymz280b_w, 0x000000ff)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
 	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
-	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
-//	AM_RANGE(0x00000600, 0x00000607) AM_READNOP /* Unknown */
+	AM_RANGE(0x00000500, 0x0000054f) AM_RAM /* Unknown */
+	AM_RANGE(0x00000560, 0x00000563) AM_WRITE(sprite_dma_start_w)
+	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_r, 0x000000ff)
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls1_r)	/* Player controls */
 	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE(&spimainram)
@@ -2201,23 +2202,18 @@ MACHINE_DRIVER_END
 /* SYS386-F V2.0 */
 static DRIVER_INIT( sys386f2 )
 {
-	//init_rf2(machine);
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
+	int i, j;
+	UINT16 *src = (UINT16 *)memory_region(machine, "gfx3");
+	UINT16 tmp[0x40 / 2], Offset;
 	
+	for(i = 0; i < memory_region_length(machine, "gfx3") / 0x40; i++)
 	{
-		int i, j;
-		UINT16 *src = (UINT16 *)memory_region(machine, "gfx3");
-		UINT16 tmp[0x40 / 2], Offset;
+		memcpy(tmp, src, 0x40);
 		
-		for(i = 0; i < memory_region_length(machine, "gfx3") / 0x40; i++)
+		for(j = 0; j < 0x40 / 2; j++)
 		{
-			memcpy(tmp, src, 0x40);
-			
-			for(j = 0; j < 0x40 / 2; j++)
-			{
-				Offset = (j >> 1) | (j << 4 & 0x10);
-				*src++ = tmp[Offset];
-			}
+			Offset = (j >> 1) | (j << 4 & 0x10);
+			*src++ = tmp[Offset];
 		}
 	}
 }
@@ -3398,7 +3394,7 @@ ROM_START(ejsakura) /* SYS386F V2.0 */
 	ROM_LOAD16_WORD_SWAP("chr3.444", 0x800000, 0x400000, CRC(638dc9ae) SHA1(0c11b1e688733fbaeabf83b33410714c22ae53cd) )
 	ROM_LOAD16_WORD_SWAP("chr4.445", 0xc00000, 0x400000, CRC(177e3139) SHA1(0385a831c141d59ec4e9c6d6fae9436dca123764) )
 
-	ROM_REGION(0x1000000, "ymz", ROMREGION_ERASE00)
+	ROM_REGION(0x1000000, "ymz", 0)
 	ROM_LOAD("sound1.83",  0x000000, 0x800000, CRC(98783cfc) SHA1(f142429e0658a36e908cc135fe0e01ce853d071d) )
 	ROM_LOAD("sound2.84",  0x800000, 0x800000, CRC(ff37e769) SHA1(eb6d260cbc4e4a925a5d8f604ec695e567ac6bb5) )
 ROM_END
