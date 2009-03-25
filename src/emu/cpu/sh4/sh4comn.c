@@ -645,7 +645,27 @@ WRITE32_HANDLER( sh4_internal_w )
 	{
 	case MMUCR: // MMU Control
 		if (data & 1)
-			fatalerror("SH4: MMUCR write enables MMU\n");
+		{
+			printf("SH4 MMU Enabled\n");
+			printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
+			printf("The MMU emulation is a hack specific to that system\n");
+			sh4->sh4_mmu_enabled = 1;
+			
+			// should be a different bit!
+			{
+				int i;
+				for (i=0;i<64;i++)
+				{
+					sh4->sh4_tlb_address[i] = 0;
+					sh4->sh4_tlb_data[i] = 0;
+				}
+			
+			}
+		}
+		else
+		{
+			sh4->sh4_mmu_enabled = 0;
+		}
 
 		break;
 

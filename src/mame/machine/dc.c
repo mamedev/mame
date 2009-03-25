@@ -124,7 +124,7 @@ UINT32 dc_coin_counts[2];
 static UINT32 maple_regs[0x100/4];
 static UINT32 dc_rtcregister[4];
 static UINT32 g1bus_regs[0x100/4];
-static UINT8 maple0x86data1[0x80];
+UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
 static emu_timer *dc_rtc_timer;
 
@@ -934,8 +934,6 @@ MACHINE_START( dc )
 
 MACHINE_RESET( dc )
 {
-	int a;
-
 	/* halt the ARM7 */
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -948,14 +946,6 @@ MACHINE_RESET( dc )
 	timer_adjust_periodic(dc_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
-	for (a=0;a < 0x80;a++)
-		maple0x86data1[a]=0x11+a;
-
-	// checksums
-	maple0x86data1[0]=0xb9;
-	maple0x86data1[1]=0xb1;
-	maple0x86data1[18]=0xb8;
-	maple0x86data1[19]=0x8a;
 }
 
 READ64_DEVICE_HANDLER( dc_aica_reg_r )

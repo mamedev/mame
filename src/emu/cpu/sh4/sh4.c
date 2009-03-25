@@ -2078,24 +2078,56 @@ INLINE void LDCSPC(SH4 *sh4, UINT32 m)
 	sh4->spc = sh4->r[m];
 }
 
+UINT32 sh4_getsqremap(SH4 *sh4, UINT32 address)
+{
+	if (!sh4->sh4_mmu_enabled)
+		return address;
+	else
+	{
+		int i;
+		UINT32 topaddr = address&0xfff00000;
+	
+		for (i=0;i<64;i++)
+		{
+			UINT32 topcmp = sh4->sh4_tlb_address[i]&0xfff00000;
+			if (topcmp==topaddr)
+				return (address&0x000fffff) | ((sh4->sh4_tlb_data[i])&0xfff00000);
+		}
+	
+	}
+	
+	return address;
+}
+
 /*  PREF     @Rn */
 INLINE void PREFM(SH4 *sh4, UINT32 n)
 {
-int a;
-UINT32 addr,dest,sq;
+	int a;
+	UINT32 addr,dest,sq;
 
 	addr = sh4->r[n]; // address
 	if ((addr >= 0xE0000000) && (addr <= 0xE3FFFFFF))
 	{
-		sq = (addr & 0x20) >> 5;
-		dest = addr & 0x03FFFFE0;
-		if (sq == 0)
-			dest |= (sh4->m[QACR0] & 0x1C) << 24;
+		if (sh4->sh4_mmu_enabled)
+		{
+			addr = addr & 0xFFFFFFE0;
+			dest = sh4_getsqremap(sh4, addr); // good enough for naomi-gd rom, probably not much else
+	
+		}
 		else
-			dest |= (sh4->m[QACR1] & 0x1C) << 24;
-		addr = addr & 0xFFFFFFE0;
+		{	
+			sq = (addr & 0x20) >> 5;
+			dest = addr & 0x03FFFFE0;
+			if (sq == 0)
+				dest |= (sh4->m[QACR0] & 0x1C) << 24;
+			else
+				dest |= (sh4->m[QACR1] & 0x1C) << 24;
+			addr = addr & 0xFFFFFFE0;
+		}
+		
 		for (a = 0;a < 4;a++)
 		{
+			// shouldn't be causing a memory read, should store sq writes in registers.
 			memory_write_qword_64le(sh4->program, dest, memory_read_qword_64le(sh4->program, addr));
 			addr += 8;
 			dest += 8;
@@ -3326,6 +3358,8 @@ static CPU_RESET( sh4 )
 	sh4->internal_irq_level = -1;
 	sh4->irln = 15;
 	sh4->sleep_mode = 0;
+	
+	sh4->sh4_mmu_enabled = 0;
 }
 
 /* Execute cycles - returns number of cycles actually run */
@@ -3631,11 +3665,49 @@ static ADDRESS_MAP_START( sh4_internal_map, ADDRESS_SPACE_PROGRAM, 64 )
 ADDRESS_MAP_END
 #endif
 
+
+READ64_HANDLER( sh4_tlb_r )
+{
+	SH4 *sh4 = get_safe_token(space->cpu);
+
+	int offs = offset*8;
+
+	if (offs >= 0x01000000)
+	{
+		UINT8 i = (offs>>8)&63;
+		return sh4->sh4_tlb_data[i];
+	}
+	else
+	{
+		UINT8 i = (offs>>8)&63;
+		return sh4->sh4_tlb_address[i];	
+	}
+}
+
+WRITE64_HANDLER( sh4_tlb_w )
+{
+	SH4 *sh4 = get_safe_token(space->cpu);
+
+	int offs = offset*8;
+
+	if (offs >= 0x01000000)
+	{
+		UINT8 i = (offs>>8)&63;
+		sh4->sh4_tlb_data[i]  = data&0xffffffff;
+	}
+	else
+	{
+		UINT8 i = (offs>>8)&63;
+		sh4->sh4_tlb_address[i] = data&0xffffffff;	
+	}
+}
+
 /*When OC index mode is on (CCR.OIX = 1)*/
 static ADDRESS_MAP_START( sh4_internal_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0x1E000000, 0x1E000FFF) AM_RAM AM_MIRROR(0x01FFF000)
-	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0)
+	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0) // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
+	AM_RANGE(0xF6000000, 0xF7FFFFFF) AM_READWRITE(sh4_tlb_r,sh4_tlb_w)
 ADDRESS_MAP_END
 
 
