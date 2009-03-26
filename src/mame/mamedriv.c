@@ -4382,7 +4382,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( radirgy )	/* 2005.10 Radirgy */
 	DRIVER( undefeat )	/* 2005.10 Under Defeat */
 						/* 2005.12 Radirgy (Rev. A) */
-						/* 2006.03 Kurukuru Chameleon */
+	DRIVER( kurucham )	/* 2006.03 Kurukuru Chameleon */
 	DRIVER( trgheart )	/* 2006.05 Trigger Heart Exelica */
 						/* 2006.07 Touch de Zunou */
 						/* 2006.08 Senkou no Rondo SP */
