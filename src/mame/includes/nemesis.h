@@ -1,6 +1,8 @@
 /*----------- defined in drivers/nemesis.c -----------*/
 
 extern int nemesis_irq_on;
+extern int nemesis_irq2_on;
+extern UINT16 hcrash_selected_ip;
 
 /*----------- defined in video/nemesis.c -----------*/
 
@@ -21,8 +23,8 @@ WRITE16_HANDLER( nemesis_characterram_word_w );
 VIDEO_START( nemesis );
 VIDEO_UPDATE( nemesis );
 
-WRITE16_HANDLER( nemesis_gfx_flipx_w );
-WRITE16_HANDLER( nemesis_gfx_flipy_w );
-WRITE16_HANDLER( salamand_irq_enable_word_w );
+WRITE16_HANDLER( nemesis_gfx_flipx_word_w );
+WRITE16_HANDLER( nemesis_gfx_flipy_word_w );
+WRITE16_HANDLER( salamand_control_port_word_w );
 WRITE16_HANDLER( salamander_palette_word_w );
 WRITE16_HANDLER( nemesis_palette_word_w );

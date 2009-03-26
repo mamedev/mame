@@ -94,7 +94,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 }
 
 
-WRITE16_HANDLER( nemesis_gfx_flipx_w )
+WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -115,7 +115,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_w )
 	}
 }
 
-WRITE16_HANDLER( nemesis_gfx_flipy_w )
+WRITE16_HANDLER( nemesis_gfx_flipy_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -129,13 +129,14 @@ WRITE16_HANDLER( nemesis_gfx_flipy_w )
 }
 
 
-WRITE16_HANDLER( salamand_irq_enable_word_w )
+WRITE16_HANDLER( salamand_control_port_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 accessing_bits = data ^ irq_port_last;
 
 		nemesis_irq_on = data & 0x01;
+		nemesis_irq2_on = data & 0x02;
 		flipscreen = data & 0x04;
 
 		if (data & 0x04)
@@ -156,8 +157,13 @@ WRITE16_HANDLER( salamand_irq_enable_word_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
+		coin_lockout_w(0, data & 0x0200);
+		coin_lockout_w(1, data & 0x0400);
+
 		if (data & 0x0800)
 			cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+
+		hcrash_selected_ip = (~data & 0x1000) >> 12;		/* citybomb steering & accel */
 	}
 }
 
@@ -424,23 +430,28 @@ VIDEO_UPDATE( nemesis )
 
 	for (offs = 0; offs < 64; offs++)
 	{
-		tilemap_set_scrolly( background, offs, nemesis_yscroll1[offs] );
-		tilemap_set_scrolly( foreground, offs, nemesis_yscroll2[offs] );
+		int offset_x = offs;
+
+		if (flipscreen)
+			offset_x = (offs + 0x20) & 0x3f;
+
+		tilemap_set_scrolly( background, offs, nemesis_yscroll1[offset_x] );
+		tilemap_set_scrolly( foreground, offs, nemesis_yscroll2[offset_x] );
 	}
 
 	for (offs = cliprect->min_y; offs <= cliprect->max_y; offs++)
 	{
 		int i;
-		int offset_x = offs;
+		int offset_y = offs;
 
 		clip.min_y = offs;
 		clip.max_y = offs;
 
 		if (flipscreen)
-			offset_x = 255 - offs;
+			offset_y = 255 - offs;
 
-		tilemap_set_scrollx( background, 0, (nemesis_xscroll2[offset_x] & 0xff) + ((nemesis_xscroll2[0x100 + offset_x] & 0x01) << 8) - (flipscreen ? 0x107 : 0) );
-		tilemap_set_scrollx( foreground, 0, (nemesis_xscroll1[offset_x] & 0xff) + ((nemesis_xscroll1[0x100 + offset_x] & 0x01) << 8) - (flipscreen ? 0x107 : 0) );
+		tilemap_set_scrollx( background, 0, (nemesis_xscroll2[offset_y] & 0xff) + ((nemesis_xscroll2[0x100 + offset_y] & 0x01) << 8) - (flipscreen ? 0x107 : 0) );
+		tilemap_set_scrollx( foreground, 0, (nemesis_xscroll1[offset_y] & 0xff) + ((nemesis_xscroll1[0x100 + offset_y] & 0x01) << 8) - (flipscreen ? 0x107 : 0) );
 
 		for (i=0; i<4; i+=2)
 		{
