@@ -58,7 +58,7 @@
  #  Support for the built in Serial Port
  #  Support for the Global memory register
  #  Support for the switch for RAM block 0 banking between RAM and ROM space
- #  Correct the mulit-cycle instruction cycle counts
+ #  Correct the multi-cycle instruction cycle counts
  #  Add support to set ROM & RAM as Internal/External in order to correctly
     compute cycle timings
  #  Check (read) Hold signal level during execution loop ?
@@ -170,6 +170,7 @@ struct _tms32025_state
 	UINT32	memaccess;
 	int		icount;
 	int		mHackIgnoreARP;			 /* special handling for lst, lst1 instructions */
+	int		waiting_for_serial_frame;
 
 	const device_config *device;
 	const address_space *program;
@@ -350,7 +351,15 @@ INLINE void M_WRTRAM(tms32025_state *cpustate, offs_t addr, UINT16 data)
 	UINT16 *ram;
 	addr &= 0xffff;
 	ram = cpustate->datamap[addr >> 7];
-	if (ram) { ram[addr & 0x7f] = data; }
+	if (ram) {
+		ram[addr & 0x7f] = data;
+		if(addr == 1 && ram == cpustate->intRAM && TXM) {
+			if(FSM)
+				cpustate->waiting_for_serial_frame = 1;
+			else
+				cpustate->IFR |= 0x20;
+		}
+	}
 	else memory_write_word_16be(cpustate->data, addr << 1, data);
 }
 
@@ -1906,6 +1915,15 @@ static int process_IRQs(tms32025_state *cpustate)
 	return cpustate->tms32025_irq_cycles;
 }
 
+void set_fsx_line(tms32025_state *cpustate, int state)
+{
+	if (state != CLEAR_LINE && cpustate->waiting_for_serial_frame)
+	{
+		cpustate->waiting_for_serial_frame = 0;
+		cpustate->IFR = 0x20;
+	}
+}
+
 INLINE void process_timer(tms32025_state *cpustate, int clocks)
 {
 	int preclocks, ticks;
@@ -1975,7 +1993,10 @@ static CPU_EXECUTE( tms32025 )
 		cpustate->hold = 0;
 	}
 
-	/**** If idling, update timer and/or exit execution */
+	/**** If idling, update timer and/or exit execution, but test for irqs first */
+	if (cpustate->idle && cpustate->IFR && cpustate->icount > 0)
+		cpustate->icount += process_IRQs(cpustate);
+
 	while (cpustate->idle && cpustate->icount > 0)
 		process_timer(cpustate, cpustate->icount);
 
@@ -1999,17 +2020,17 @@ static CPU_EXECUTE( tms32025 )
 
 		if (cpustate->opcode.b.h == 0xCE)	/* Opcode 0xCExx has many sub-opcodes in its minor byte */
 		{
-			cpustate->tms32025_dec_cycles = opcode_CE_subset[cpustate->opcode.b.l].cycles;
+			cpustate->tms32025_dec_cycles += opcode_CE_subset[cpustate->opcode.b.l].cycles;
 			(*opcode_CE_subset[cpustate->opcode.b.l].function)(cpustate);
 		}
 		else if ((cpustate->opcode.w.l & 0xf0f8) == 0xd000)	/* Opcode 0xDxxx has many sub-opcodes in its minor byte */
 		{
-			cpustate->tms32025_dec_cycles = opcode_Dx_subset[cpustate->opcode.b.l].cycles;
+			cpustate->tms32025_dec_cycles += opcode_Dx_subset[cpustate->opcode.b.l].cycles;
 			(*opcode_Dx_subset[cpustate->opcode.b.l].function)(cpustate);
 		}
 		else			/* Do all opcodes except the CExx and Dxxx ones */
 		{
-			cpustate->tms32025_dec_cycles = opcode_main[cpustate->opcode.b.h].cycles;
+			cpustate->tms32025_dec_cycles += opcode_main[cpustate->opcode.b.h].cycles;
 			(*opcode_main[cpustate->opcode.b.h].function)(cpustate);
 		}
 
@@ -2221,6 +2242,7 @@ static CPU_WRITE( tms32025 )
 			CPU_WRITE_NAME(tms32025)(device, space, offset + 4, 4, value);
 			break;
 	}
+
 	return 1;
 }
 
@@ -2242,6 +2264,7 @@ static CPU_SET_INFO( tms32025 )
 		case CPUINFO_INT_INPUT_STATE + TMS32025_TINT:		set_irq_line(cpustate, TMS32025_TINT, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + TMS32025_RINT:		set_irq_line(cpustate, TMS32025_RINT, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + TMS32025_XINT:		set_irq_line(cpustate, TMS32025_XINT, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + TMS32025_FSX:		set_fsx_line(cpustate, info->i); break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + TMS32025_PC:		cpustate->PC = info->i;							break;

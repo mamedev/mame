@@ -31,10 +31,6 @@
 #define TMS32025_XF			0x10002		/* XF output  */
 #define TMS32025_DR			0x10003		/* Serial Data  Receive  input  */
 #define TMS32025_DX			0x10003		/* Serial Data  Transmit output */
-#define TMS32025_CLKR		0x10004		/* Serial Clock Receive  input  */
-#define TMS32025_CLKX		0x10004		/* Serial Clock Transmit output */
-#define TMS32025_FSR		0x10005		/* Serial Frame Receive  pulse input  */
-#define TMS32025_FSX		0x10005		/* Serial Frame Transmit pulse output */
 
 
 
@@ -51,6 +47,8 @@
 #define TMS32025_TRAP			  6			/* Trap instruction */
 #define TMS32025_INT_NONE		  -1
 
+/* Non-irq line */
+#define TMS32025_FSX			  7			/* Frame synchronisation */
 
 enum
 {
