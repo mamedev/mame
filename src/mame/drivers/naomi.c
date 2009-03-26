@@ -1553,6 +1553,51 @@ ROM_START( csmasho )
 	ROM_LOAD("mpr23427.8", 0x4000000, 0x0800000, CRC(5851d525) SHA1(1cb1073542d75a3bcc0d363ed31d49bcaf1fd494) )
 ROM_END
 
+
+/*
+
+SYSTEMID: NAOMI
+JAP:  POWER SMASH --------------
+USA:  VIRTUA TENNIS IN USA -----
+EXP:  VIRTUA TENNIS IN EXPORT --
+
+NO. Type    Byte    Word
+IC22    32M 0000    1111
+IC1 64M 7422    83DD
+IC2 64M 7F26    A93D
+IC3 64M 8E02    D3FC
+IC4 64M 2545    F734
+IC5 64M E197    B75D
+IC6 64M 9453    CF75
+IC7 64M 29AC    2FEB
+IC8 64M 0434    2E9E
+IC9 64M C86E    79E6
+IC10    64M C67A    BF14
+IC11    64M F590    D280
+
+*/
+
+ROM_START( vtennis )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x6000000, "user1", 0)
+	ROM_LOAD("epr22927.22", 0x0000000, 0x0400000,  CRC(89781723) SHA1(cf644aa66abcec6964d77485a0292f11ba80dd0d) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD("ic1.bin", 0x0800000, 0x0800000, CRC(903873e5) SHA1(09af791bc02cca0e2dc72187679830ed9f4fc772) )
+	ROM_LOAD("ic2.bin", 0x1000000, 0x0800000, CRC(5f020fa6) SHA1(bd2519be8c88ff34cf2fd2b17271d2b41b64ce9f) )
+	ROM_LOAD("ic3.bin", 0x1800000, 0x0800000, CRC(3c3bf533) SHA1(db43ca9332e76b968b9b388b4824b768f82b9859) )
+	ROM_LOAD("ic4.bin", 0x2000000, 0x0800000, CRC(3d8dd003) SHA1(91f494b06b9977215ab726a2499b5855d4d49e81) )
+	ROM_LOAD("ic5.bin", 0x2800000, 0x0800000, CRC(efd781d4) SHA1(ced5a8dc8ff7677b3cac2a4fae04670c46cc96af) )
+	ROM_LOAD("ic6.bin", 0x3000000, 0x0800000, CRC(79e75be1) SHA1(82318613c947907e01bbe50569b05ef24789d7c9) )
+	ROM_LOAD("ic7.bin", 0x3800000, 0x0800000, CRC(44bd3883) SHA1(5c595d903d8865bf8bf3aafb1f527bff232718ed) )
+	ROM_LOAD("ic8.bin", 0x4000000, 0x0800000, CRC(9ebdf0f8) SHA1(f1b688bda387fc00c70cb6a0c374c6c13926c138) )
+	ROM_LOAD("ic9.bin", 0x4800000, 0x0800000, CRC(ecde9d57) SHA1(1fbe7fdf66a56f4f1765baf113dff95142bfd114) )
+	ROM_LOAD("ic10.bin",0x5000000, 0x0800000, CRC(81057e42) SHA1(d41137ae28c64dbdb50150db8cf25851bc0709c4) )
+	ROM_LOAD("ic11.bin",0x5800000, 0x0800000, CRC(57eec89d) SHA1(dd8f9a9155e51ee5260f559449fb0ea245077952) )
+ROM_END
+
+
 /*
 
 SYSTEMID: NAOMI
@@ -2416,50 +2461,6 @@ ROM_END
 /*
 
 SYSTEMID: NAOMI
-JAP:  POWER SMASH --------------
-USA:  VIRTUA TENNIS IN USA -----
-EXP:  VIRTUA TENNIS IN EXPORT --
-
-NO. Type    Byte    Word
-IC22    32M 0000    1111
-IC1 64M 7422    83DD
-IC2 64M 7F26    A93D
-IC3 64M 8E02    D3FC
-IC4 64M 2545    F734
-IC5 64M E197    B75D
-IC6 64M 9453    CF75
-IC7 64M 29AC    2FEB
-IC8 64M 0434    2E9E
-IC9 64M C86E    79E6
-IC10    64M C67A    BF14
-IC11    64M F590    D280
-
-*/
-
-ROM_START( vtennis )
-	ROM_REGION( 0x200000, "maincpu", 0)
-	NAOMI_BIOS
-
-	ROM_REGION( 0x400000, "user1", 0)
-	ROM_LOAD("epr22927.22", 0x0000000, 0x0400000,  CRC(89781723) SHA1(cf644aa66abcec6964d77485a0292f11ba80dd0d) )
-
-	ROM_REGION( 0x5800000, "user2", 0)
-	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic4", 0x1800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic5", 0x2000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic6", 0x2800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic7", 0x3000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic8", 0x3800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic9", 0x4000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic10",0x4800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic11",0x5000000, 0x0800000, NO_DUMP )
-ROM_END
-
-/*
-
-SYSTEMID: NAOMI
 JAP: ZOMBIE REVENGE IN JAPAN
 USA: ZOMBIE REVENGE IN USA
 EXP: ZOMBIE REVENGE IN EXPORT
@@ -2850,6 +2851,10 @@ GAME( 1999, suchie3,  naomi,    naomi,    naomi,    0, ROT0, "Jaleco",          
 GAME( 1999, vs2_2k,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, smarinef, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Sega Marine Fishing", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, toyfight, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Toy Fighter", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, doa2,     naomi,    naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, doa2m,    doa2,     naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, vtennis,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Power Smash (JPN) / Virtua Tennis (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
 
 /* Incomplete Dumps (just the program rom IC22) */
 GAME( 2000, cspike,   naomi,    naomi,    naomi,    0, ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -2868,10 +2873,7 @@ GAME( 1999, samba,    naomi,    naomi,    naomi,    0, ROT0, "Sega",            
 GAME( 2000, slasho,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, spawn,    naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Spawn (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, virnba,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, vtennis,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Power Smash (JPN) / Virtua Tennis (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, zombrvn,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Zombie Revenge (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, doa2,     naomi,    naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, doa2m,    doa2,     naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1998, dybbnao,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Dynamite Baseball NAOMI (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Games with game specific bios sets */
