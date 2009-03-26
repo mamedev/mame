@@ -12,6 +12,7 @@ static UINT32 layer_bank;
 static UINT32 layer_enable;
 static UINT32 video_dma_length;
 static UINT32 video_dma_address;
+static UINT32 sprite_dma_length;
 
 static int rf2_layer_bank[3];
 static UINT32 *tilemap_ram;
@@ -219,7 +220,7 @@ WRITE32_HANDLER( sprite_dma_start_w )
 {
 	if (video_dma_address != 0)
 	{
-		memcpy( sprite_ram, &spimainram[(video_dma_address / 4) - 0x200], 0x1000);
+		memcpy( sprite_ram, &spimainram[(video_dma_address / 4) - 0x200], sprite_dma_length);
 	}
 }
 
@@ -371,7 +372,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	if( layer_enable & 0x10 )
 		return;
 
-	for( a = 0x400 - 2; a >= 0; a -= 2 ) {
+	for( a = (sprite_dma_length / 4) - 2; a >= 0; a -= 2 ) {
 		tile_num = (sprite_ram[a + 0] >> 16) & 0xffff;
 		if( sprite_ram[a + 1] & 0x1000 )
 			tile_num |= 0x10000;
@@ -484,7 +485,6 @@ VIDEO_START( spi )
 	int i;
 	int region_length;
 
-	sprite_bpp = 6;
 	text_layer	= tilemap_create( machine, get_text_tile_info, tilemap_scan_rows,  8,8,64,32 );
 	back_layer	= tilemap_create( machine, get_back_tile_info, tilemap_scan_cols,  16,16,32,32 );
 	mid_layer	= tilemap_create( machine, get_mid_tile_info, tilemap_scan_cols,  16,16,32,32 );
@@ -500,6 +500,9 @@ VIDEO_START( spi )
 	memset(tilemap_ram, 0, 0x4000);
 	memset(palette_ram, 0, 0x3000);
 	memset(sprite_ram, 0, 0x1000);
+
+	sprite_bpp = 6;
+	sprite_dma_length = 0x1000;
 
 	for (i=0; i < 6144; i++) {
 		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
@@ -661,12 +664,13 @@ VIDEO_START( sys386f2 )
 	int i;
 
 	palette_ram = auto_malloc(0x4000);
-	sprite_ram = auto_malloc(0x1000);
+	sprite_ram = auto_malloc(0x2000);
+	memset(palette_ram, 0, 0x4000);
+	memset(sprite_ram, 0, 0x2000);
 
 	sprite_bpp = 8;
-
-	memset(palette_ram, 0, 0x4000);
-	memset(sprite_ram, 0, 0x1000);
+	sprite_dma_length = 0x2000;
+	layer_enable = 0;
 
 	for (i=0; i < 8192; i++) {
 		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
