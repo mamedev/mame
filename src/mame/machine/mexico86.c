@@ -132,19 +132,23 @@ logerror("initialising MCU\n");
 		// The following is missing from Knight Boy
 		// this should be equivalent to the obfuscated kiki_clogic() below
 		{
-			static const int db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
-			int sy = mexico86_protection_ram[0xa0] + ((0x18)>>1);
-			int sx = mexico86_protection_ram[0xa1] + ((0x18)>>1);
+			static const UINT8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
+			UINT16 sy = mexico86_protection_ram[0xa0] + ((0x18)>>1);
+			UINT16 sx = mexico86_protection_ram[0xa1] + ((0x18)>>1);
 
 			for (i = 0; i < 0x38; i += 8)
 			{
-				int hw = db[mexico86_protection_ram[0x20 + i] & 0xf];
+				UINT8 hw = db[mexico86_protection_ram[0x20 + i] & 0xf];
 
 				if (hw)
 				{
-					if (abs(sx - (mexico86_protection_ram[0x20 + i+6] * 256 + mexico86_protection_ram[0x20 + i+7])) < hw &&
-							abs(sy - (mexico86_protection_ram[0x20 + i+4] * 256 + mexico86_protection_ram[0x20 + i+5])) < hw)
-						mexico86_protection_ram[0xa2] = 1; // we have a collision
+					UINT16 xdiff = sx - ((UINT16)mexico86_protection_ram[0x20 + i+6] << 8 | mexico86_protection_ram[0x20 + i+7]);
+					if (xdiff < hw)
+					{
+						UINT16 ydiff = sy - ((UINT16)mexico86_protection_ram[0x20 + i+4] << 8 | mexico86_protection_ram[0x20 + i+5]);
+						if (ydiff < hw)
+							mexico86_protection_ram[0xa2] = 1; // we have a collision
+					}
 				}
 			}
 		}
