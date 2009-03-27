@@ -4507,7 +4507,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vcop3 )		/* 2003.04 Virtua Cop 3 */
 						/* 2003.12 Outrun 2 */
 						/* 2004.03 Ollie King */
-						/* 2004.07 Wangan Midnight Maximum Tune */
+	DRIVER( wangmid )	/* 2004.07 Wangan Midnight Maximum Tune */
 						/* 2004.09 Quest of D */
 						/* 2004.11 Sega Golf Club Network Pro Tour */
 						/* 2004.12 Outrun 2 Special Tours */
