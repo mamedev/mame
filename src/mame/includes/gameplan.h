@@ -15,6 +15,10 @@ driver by Chris Moore
 #define GAMEPLAN_AY8910_CLOCK			(GAMEPLAN_AUDIO_MASTER_CLOCK / 2)
 #define GAMEPLAN_PIXEL_CLOCK			(XTAL_11_6688MHz / 2)
 
+/* Used Leprechaun/Pot of Gold (and Pirate Treasure) - as stated in manual for Pot Of Gold */
+
+#define LEPRECHAUN_MAIN_MASTER_CLOCK		(XTAL_4MHz)
+#define LEPRECHAUN_MAIN_CPU_CLOCK		(LEPRECHAUN_MAIN_MASTER_CLOCK / 4)
 
 typedef struct _gameplan_state gameplan_state;
 struct _gameplan_state
