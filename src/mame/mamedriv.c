@@ -4387,7 +4387,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2006.07 Touch de Zunou */
 						/* 2006.08 Senkou no Rondo SP */
 	DRIVER( jingystm )	/* 2006.09 Jingi Storm */
-						/* 2006.11 Karous */
+	DRIVER( karous )	/* 2006.11 Karous */
 						/* 2006.12 Guilty Gear XX Accent Core */
 	DRIVER( meltyb )	/* 2006.12 Melty Blood Act Cadenza ver.B */
 	DRIVER( takoron )	/* 2006.12.16 Noukone Puzzle Takoron */
