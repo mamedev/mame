@@ -435,8 +435,8 @@ VIDEO_UPDATE( nemesis )
 		if (flipscreen)
 			offset_x = (offs + 0x20) & 0x3f;
 
-		tilemap_set_scrolly( background, offs, nemesis_yscroll1[offset_x] );
-		tilemap_set_scrolly( foreground, offs, nemesis_yscroll2[offset_x] );
+		tilemap_set_scrolly( background, offs, nemesis_yscroll2[offset_x] );
+		tilemap_set_scrolly( foreground, offs, nemesis_yscroll1[offset_x] );
 	}
 
 	for (offs = cliprect->min_y; offs <= cliprect->max_y; offs++)

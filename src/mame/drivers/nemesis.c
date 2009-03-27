@@ -23,7 +23,7 @@
 driver by Bryan McPhail
 
 modified by Hau
-03/26/2009
+03/27/2009
  spthx to Unagi,rassy,hina,nori,Tobikage,Tommy,Crimson,yasuken,cupmen,zoo
 
 Notes:
@@ -51,8 +51,6 @@ So this is the correct behavior of real hardware, not an emulation bug.
 #include "sound/k051649.h"
 #include "includes/nemesis.h"
 
-static UINT16 *ram;
-static UINT16 *ram2;
 
 int nemesis_irq_on = 0;
 int nemesis_irq2_on = 0;
@@ -286,12 +284,11 @@ static WRITE8_DEVICE_HANDLER( city_sound_bank_w )
 static ADDRESS_MAP_START( nemesis_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM_WRITE(nemesis_characterram_word_w) AM_BASE(&nemesis_characterram) AM_SIZE(&nemesis_characterram_size)
-	AM_RANGE(0x050000, 0x050fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_BASE(&nemesis_xscroll1)
-	AM_RANGE(0x050400, 0x0507ff) AM_RAM AM_BASE(&nemesis_xscroll2)
-	AM_RANGE(0x050f00, 0x050f7f) AM_RAM AM_BASE(&nemesis_yscroll1)
-	AM_RANGE(0x050f80, 0x050fff) AM_RAM AM_BASE(&nemesis_yscroll2)
-	AM_RANGE(0x051000, 0x051fff) AM_WRITENOP		/* used, but written to with 0's */
+	AM_RANGE(0x050000, 0x051fff) AM_RAM
+	AM_RANGE(0x050000, 0x0503ff) AM_BASE(&nemesis_xscroll1)
+	AM_RANGE(0x050400, 0x0507ff) AM_BASE(&nemesis_xscroll2)
+	AM_RANGE(0x050f00, 0x050f7f) AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x050f80, 0x050fff) AM_BASE(&nemesis_yscroll1)
 	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_BASE(&nemesis_videoram1)		/* VRAM */
 	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_BASE(&nemesis_videoram2)
 	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_BASE(&nemesis_colorram1)
@@ -312,20 +309,19 @@ static ADDRESS_MAP_START( nemesis_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
 	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP		/* not used irq */
 	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITENOP		/* not used irq */
-	AM_RANGE(0x060000, 0x067fff) AM_RAM AM_BASE(&ram)	/* WORK RAM */
+	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx400_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM		/* ROM BIOS */
-	AM_RANGE(0x010000, 0x01ffff) AM_RAM AM_BASE(&ram)
+	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE(nemesis_characterram_word_w) AM_BASE(&nemesis_characterram) AM_SIZE(&nemesis_characterram_size)
-	AM_RANGE(0x050000, 0x050fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_BASE(&nemesis_xscroll1)
-	AM_RANGE(0x050400, 0x0507ff) AM_RAM AM_BASE(&nemesis_xscroll2)
-	AM_RANGE(0x050f00, 0x050f7f) AM_RAM AM_BASE(&nemesis_yscroll1)
-	AM_RANGE(0x050f80, 0x050fff) AM_RAM AM_BASE(&nemesis_yscroll2)
-	AM_RANGE(0x051000, 0x051fff) AM_WRITENOP		/* used, but written to with 0's */
+	AM_RANGE(0x050000, 0x051fff) AM_RAM
+	AM_RANGE(0x050000, 0x0503ff) AM_BASE(&nemesis_xscroll1)
+	AM_RANGE(0x050400, 0x0507ff) AM_BASE(&nemesis_xscroll2)
+	AM_RANGE(0x050f00, 0x050f7f) AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x050f80, 0x050fff) AM_BASE(&nemesis_yscroll1)
 	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_BASE(&nemesis_videoram1)		/* VRAM */
 	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_BASE(&nemesis_videoram2)
 	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_BASE(&nemesis_colorram1)
@@ -347,19 +343,18 @@ static ADDRESS_MAP_START( gx400_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
 	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP		/* IRQ acknowledge??? */
 	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(&gx400_irq4_enable_word_w)	/* ?? */
-	AM_RANGE(0x060000, 0x07ffff) AM_RAM AM_BASE(&ram2)
+	AM_RANGE(0x060000, 0x07ffff) AM_RAM			/* WORK RAM */
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( konamigt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM_WRITE(nemesis_characterram_word_w) AM_BASE(&nemesis_characterram) AM_SIZE(&nemesis_characterram_size)
-	AM_RANGE(0x050000, 0x050fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_BASE(&nemesis_xscroll1)
-	AM_RANGE(0x050400, 0x0507ff) AM_RAM AM_BASE(&nemesis_xscroll2)
-	AM_RANGE(0x050f00, 0x050f7f) AM_RAM AM_BASE(&nemesis_yscroll1)
-	AM_RANGE(0x050f80, 0x050fff) AM_RAM AM_BASE(&nemesis_yscroll2)
-	AM_RANGE(0x051000, 0x051fff) AM_WRITENOP		/* used, but written to with 0's */
+	AM_RANGE(0x050000, 0x051fff) AM_RAM
+	AM_RANGE(0x050000, 0x0503ff) AM_BASE(&nemesis_xscroll1)
+	AM_RANGE(0x050400, 0x0507ff) AM_BASE(&nemesis_xscroll2)
+	AM_RANGE(0x050f00, 0x050f7f) AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x050f80, 0x050fff) AM_BASE(&nemesis_yscroll1)
 	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_BASE(&nemesis_videoram1)		/* VRAM */
 	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_BASE(&nemesis_videoram2)
 	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_BASE(&nemesis_colorram1)
@@ -380,21 +375,20 @@ static ADDRESS_MAP_START( konamigt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
 	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP		/* not used irq */
 	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITENOP		/* not used irq */
-	AM_RANGE(0x060000, 0x067fff) AM_RAM AM_BASE(&ram)	/* WORK RAM */
+	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
 	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rf2_gx400_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM		/* ROM BIOS */
-	AM_RANGE(0x010000, 0x01ffff) AM_RAM AM_BASE(&ram2)
+	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE(nemesis_characterram_word_w) AM_BASE(&nemesis_characterram) AM_SIZE(&nemesis_characterram_size)
-	AM_RANGE(0x050000, 0x050fff) AM_RAM
-	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_BASE(&nemesis_xscroll1)
-	AM_RANGE(0x050400, 0x0507ff) AM_RAM AM_BASE(&nemesis_xscroll2)
-	AM_RANGE(0x050f00, 0x050f7f) AM_RAM AM_BASE(&nemesis_yscroll1)
-	AM_RANGE(0x050f80, 0x050fff) AM_RAM AM_BASE(&nemesis_yscroll2)
-	AM_RANGE(0x051000, 0x051fff) AM_WRITENOP	/* used, but written to with 0's */
+	AM_RANGE(0x050000, 0x051fff) AM_RAM
+	AM_RANGE(0x050000, 0x0503ff) AM_BASE(&nemesis_xscroll1)
+	AM_RANGE(0x050400, 0x0507ff) AM_BASE(&nemesis_xscroll2)
+	AM_RANGE(0x050f00, 0x050f7f) AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x050f80, 0x050fff) AM_BASE(&nemesis_yscroll1)
 	AM_RANGE(0x052000, 0x052fff) AM_RAM_WRITE(nemesis_videoram1_word_w) AM_BASE(&nemesis_videoram1)		/* VRAM */
 	AM_RANGE(0x053000, 0x053fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_BASE(&nemesis_videoram2)
 	AM_RANGE(0x054000, 0x054fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_BASE(&nemesis_colorram1)
@@ -415,7 +409,7 @@ static ADDRESS_MAP_START( rf2_gx400_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
 	AM_RANGE(0x05e008, 0x05e009) AM_WRITE(SMH_NOP)	/* IRQ acknowledge??? */
 	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(&gx400_irq4_enable_word_w)	/* ?? */
-	AM_RANGE(0x060000, 0x067fff) AM_RAM AM_BASE(&ram)	/* WORK RAM */
+	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
 	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
@@ -459,7 +453,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( salamand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_RAM AM_BASE(&ram)
+	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
@@ -476,16 +470,16 @@ static ADDRESS_MAP_START( salamand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM_WRITE(nemesis_characterram_word_w) AM_BASE(&nemesis_characterram) AM_SIZE(&nemesis_characterram_size)
 	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		/* more sprite ram ??? */
 	AM_RANGE(0x190000, 0x191fff) AM_RAM
-	AM_RANGE(0x190000, 0x1903ff) AM_RAM AM_BASE(&nemesis_xscroll2)
-	AM_RANGE(0x190400, 0x1907ff) AM_RAM AM_BASE(&nemesis_xscroll1)
-	AM_RANGE(0x190f00, 0x190f7f) AM_RAM AM_BASE(&nemesis_yscroll2)
-	AM_RANGE(0x190f80, 0x190fff) AM_RAM AM_BASE(&nemesis_yscroll1)
+	AM_RANGE(0x190000, 0x1903ff) AM_BASE(&nemesis_xscroll2)
+	AM_RANGE(0x190400, 0x1907ff) AM_BASE(&nemesis_xscroll1)
+	AM_RANGE(0x190f00, 0x190f7f) AM_BASE(&nemesis_yscroll1)
+	AM_RANGE(0x190f80, 0x190fff) AM_BASE(&nemesis_yscroll2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blkpnthr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x081fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_BASE(&ram)
+	AM_RANGE(0x090000, 0x097fff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a0001) AM_RAM AM_WRITE(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
@@ -500,16 +494,16 @@ static ADDRESS_MAP_START( blkpnthr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(nemesis_videoram2_word_w) AM_BASE(&nemesis_videoram2)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM_WRITE(nemesis_characterram_word_w) AM_BASE(&nemesis_characterram) AM_SIZE(&nemesis_characterram_size)
 	AM_RANGE(0x180000, 0x181fff) AM_RAM
-	AM_RANGE(0x180000, 0x1803ff) AM_RAM AM_BASE(&nemesis_xscroll1)
-	AM_RANGE(0x180400, 0x1807ff) AM_RAM AM_BASE(&nemesis_xscroll2)
-	AM_RANGE(0x180f00, 0x180f7f) AM_RAM AM_BASE(&nemesis_yscroll1)
-	AM_RANGE(0x180f80, 0x180fff) AM_RAM AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x180000, 0x1803ff) AM_BASE(&nemesis_xscroll1)
+	AM_RANGE(0x180400, 0x1807ff) AM_BASE(&nemesis_xscroll2)
+	AM_RANGE(0x180f00, 0x180f7f) AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x180f80, 0x180fff) AM_BASE(&nemesis_yscroll1)
 	AM_RANGE(0x190000, 0x190fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		/* more sprite ram ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( citybomb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x080000, 0x087fff) AM_RAM AM_BASE(&ram)
+	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x0e0000, 0x0e1fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0002, 0x0f0003) AM_READ_PORT("IN2")
@@ -527,16 +521,16 @@ static ADDRESS_MAP_START( citybomb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x212000, 0x212fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_BASE(&nemesis_colorram1)
 	AM_RANGE(0x213000, 0x213fff) AM_RAM_WRITE(nemesis_colorram2_word_w) AM_BASE(&nemesis_colorram2)
 	AM_RANGE(0x300000, 0x301fff) AM_RAM
-	AM_RANGE(0x300000, 0x3003ff) AM_RAM AM_BASE(&nemesis_xscroll1)
-	AM_RANGE(0x300400, 0x3007ff) AM_RAM AM_BASE(&nemesis_xscroll2)
-	AM_RANGE(0x300f00, 0x300f7f) AM_RAM AM_BASE(&nemesis_yscroll1)
-	AM_RANGE(0x300f80, 0x300fff) AM_RAM AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x300000, 0x3003ff) AM_BASE(&nemesis_xscroll1)
+	AM_RANGE(0x300400, 0x3007ff) AM_BASE(&nemesis_xscroll2)
+	AM_RANGE(0x300f00, 0x300f7f) AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x300f80, 0x300fff) AM_BASE(&nemesis_yscroll1)
 	AM_RANGE(0x310000, 0x310fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		/* more sprite ram ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nyanpani_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x047fff) AM_RAM AM_BASE(&ram)
+	AM_RANGE(0x040000, 0x047fff) AM_RAM
 	AM_RANGE(0x060000, 0x061fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x100000, 0x13ffff) AM_ROM
 	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("DSW1")
@@ -554,10 +548,10 @@ static ADDRESS_MAP_START( nyanpani_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM_WRITE(nemesis_characterram_word_w) AM_BASE(&nemesis_characterram) AM_SIZE(&nemesis_characterram_size)
 	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		/* more sprite ram ??? */
 	AM_RANGE(0x310000, 0x311fff) AM_RAM
-	AM_RANGE(0x310000, 0x3103ff) AM_RAM AM_BASE(&nemesis_xscroll1)
-	AM_RANGE(0x310400, 0x3107ff) AM_RAM AM_BASE(&nemesis_xscroll2)
-	AM_RANGE(0x310f00, 0x310f7f) AM_RAM AM_BASE(&nemesis_yscroll1)
-	AM_RANGE(0x310f80, 0x310fff) AM_RAM AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x310000, 0x3103ff) AM_BASE(&nemesis_xscroll1)
+	AM_RANGE(0x310400, 0x3107ff) AM_BASE(&nemesis_xscroll2)
+	AM_RANGE(0x310f00, 0x310f7f) AM_BASE(&nemesis_yscroll2)
+	AM_RANGE(0x310f80, 0x310fff) AM_BASE(&nemesis_yscroll1)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( wd_r )
@@ -625,12 +619,11 @@ static ADDRESS_MAP_START( hcrash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(nemesis_colorram1_word_w) AM_BASE(&nemesis_colorram1)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM_WRITE(nemesis_characterram_word_w) AM_BASE(&nemesis_characterram) AM_SIZE(&nemesis_characterram_size)
 	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x190000, 0x1903ff) AM_RAM AM_BASE(&nemesis_xscroll2)
-	AM_RANGE(0x190400, 0x1907ff) AM_RAM AM_BASE(&nemesis_xscroll1)
-	AM_RANGE(0x190800, 0x190eff) AM_RAM			/* not used */
-	AM_RANGE(0x190f00, 0x190f7f) AM_RAM AM_BASE(&nemesis_yscroll2)
-	AM_RANGE(0x190f80, 0x190fff) AM_RAM AM_BASE(&nemesis_yscroll1)
-	AM_RANGE(0x191000, 0x191fff) AM_RAM			/* not used */
+	AM_RANGE(0x190000, 0x191fff) AM_RAM
+	AM_RANGE(0x190000, 0x1903ff) AM_BASE(&nemesis_xscroll2)
+	AM_RANGE(0x190400, 0x1907ff) AM_BASE(&nemesis_xscroll1)
+	AM_RANGE(0x190f00, 0x190f7f) AM_BASE(&nemesis_yscroll1)
+	AM_RANGE(0x190f80, 0x190fff) AM_BASE(&nemesis_yscroll2)
 ADDRESS_MAP_END
 
 /******************************************************************************/

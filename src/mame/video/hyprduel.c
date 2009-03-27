@@ -1,6 +1,6 @@
 
 /* based on driver from video/metro.c by Luca Elia */
-/* modified by Eisuke Watanabe */
+/* modified by Hau */
 
 /***************************************************************************
 
@@ -55,13 +55,10 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/hyprduel.h"
 
-#define RASTER_LINES 262
-#define FIRST_VISIBLE_LINE 0
-#define LAST_VISIBLE_LINE 223
 
 /* Variables that driver has access to: */
-
 UINT16 *hyprduel_videoregs;
 UINT16 *hyprduel_screenctrl;
 UINT16 *hyprduel_tiletable;
@@ -69,12 +66,14 @@ size_t hyprduel_tiletable_size;
 UINT16 *hyprduel_vram_0,*hyprduel_vram_1,*hyprduel_vram_2;
 UINT16 *hyprduel_window;
 
-UINT16 hyprduel_scrollx[3][RASTER_LINES+1];
-UINT16 hyprduel_scrolly[3][RASTER_LINES+1];
-
+static UINT16 hyprduel_scrollx[3][RASTER_LINES+1];
+static UINT16 hyprduel_scrolly[3][RASTER_LINES+1];
 static UINT16 *hypr_tiletable_old;
 static UINT8 *dirtyindex;
 
+static int hyprduel_sprite_xoffs;
+static int hyprduel_sprite_yoffs;
+static int hyprduel_sprite_yoffs_magerror;
 
 /***************************************************************************
                             Palette GGGGGRRRRRBBBBBx
@@ -299,9 +298,6 @@ WRITE16_HANDLER( hyprduel_window_w )
  the tile's sizes to be known at startup - which we don't!
 */
 
-static int hyprduel_sprite_xoffs, hyprduel_sprite_yoffs;
-
-
 static void alloc_empty_tiles(void)
 {
 	int code,i;
@@ -330,6 +326,22 @@ VIDEO_START( hyprduel_14220 )
 	tilemap_set_scrolldx(bg_tilemap[0], 0, 0);
 	tilemap_set_scrolldx(bg_tilemap[1], 0, 0);
 	tilemap_set_scrolldx(bg_tilemap[2], 0, 0);
+
+	if (!strcmp(machine->gamedrv->name, "magerror"))
+		hyprduel_sprite_yoffs_magerror = 2;
+	else
+		hyprduel_sprite_yoffs_magerror = 0;
+
+	/* Set up save state */
+	state_save_register_global_array(machine, hyprduel_scrollx[0]);
+	state_save_register_global_array(machine, hyprduel_scrollx[1]);
+	state_save_register_global_array(machine, hyprduel_scrollx[2]);
+	state_save_register_global_array(machine, hyprduel_scrolly[0]);
+	state_save_register_global_array(machine, hyprduel_scrolly[1]);
+	state_save_register_global_array(machine, hyprduel_scrolly[2]);
+	state_save_register_global(machine, hyprduel_sprite_xoffs);
+	state_save_register_global(machine, hyprduel_sprite_yoffs);
+	state_save_register_global(machine, hyprduel_sprite_yoffs_magerror);
 }
 
 /***************************************************************************
@@ -361,7 +373,34 @@ VIDEO_START( hyprduel_14220 )
 
 ***************************************************************************/
 
+WRITE16_HANDLER( hypr_scrollreg_w )
+{
+	int i;
 
+	if (offset & 0x01)
+	{
+		for (i = rastersplit; i < RASTER_LINES; i++)
+			hyprduel_scrollx[offset>>1][i] = data;
+	} else {
+		for (i = rastersplit; i < RASTER_LINES; i++)
+			hyprduel_scrolly[offset>>1][i] = data;
+	}
+}
+
+WRITE16_HANDLER( hypr_scrollreg_init_w )
+{
+	int i;
+
+	for (i = 0; i < RASTER_LINES; i++)
+	{
+		hyprduel_scrollx[0][i] = data;
+		hyprduel_scrollx[1][i] = data;
+		hyprduel_scrollx[2][i] = data;
+		hyprduel_scrolly[0][i] = data;
+		hyprduel_scrolly[1][i] = data;
+		hyprduel_scrolly[2][i] = data;
+	}
+}
 
 /***************************************************************************
 
@@ -607,7 +646,7 @@ VIDEO_UPDATE( hyprduel )
 	}
 
 	hyprduel_sprite_xoffs	=	hyprduel_videoregs[0x06/2] - video_screen_get_width(screen)  / 2;
-	hyprduel_sprite_yoffs	=	hyprduel_videoregs[0x04/2] - video_screen_get_height(screen) / 2;
+	hyprduel_sprite_yoffs	=	hyprduel_videoregs[0x04/2] - video_screen_get_height(screen) / 2 + hyprduel_sprite_yoffs_magerror;
 
 	/* The background color is selected by a register */
 	bitmap_fill(priority_bitmap,cliprect,0);
