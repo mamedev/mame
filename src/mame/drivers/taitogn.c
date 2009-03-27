@@ -127,6 +127,176 @@ Notes:
       CD PCB          - A PCMCIA cart slot connector mounted onto a small daughterboard
       *               - These parts located under the PCB
 
+
+Taito G-Net card info
+---------------------
+
+The G-Net system uses a custom PCMCIA card for game software storage. The card is 
+locked with a password and can't be read by conventional means.
+Some of the cards are made in separate pieces and can be opened. However some
+are encased in a single-piece steel shell and opening it up destroys the card.
+Some of the later games came packaged as a Compact Flash card and a PCMCIA to CF 
+adapter, however these cards were also locked the same as the older type.
+The game uses an analog wheel (5k potentiometer) in the shape of a hand-held
+control unit and a trigger (another 5k potentiometer) used for acceleration 
+and brake. The trigger and wheel are self centering. If the trigger is pulled back 
+(like firing a gun) the car goes faster. If the trigger is pushed forward the car 
+slows down. The controller looks a lot like the old Scalextric controllers (remember those?  :-)
+
+
+Card PCB Layouts
+----------------
+
+Type 1 (standard 'Taito' type, as found on most G-Net games)
+------ (This type has separate top and bottom pieces which are glued together and
+       (can be opened if done 'carefully'. But be careful the edges of the top lid are SHARP!)
+       
+Top
+---
+
+RO-055A AI AM-1
+|-|-------------------------------------|
+| |        |---------|     |--------|   |
+| |        |S2812A150|     |CXK58257|   |
+| |        |---------|     |--------|   |
+| |                                     |
+| |        |-------|     |-----------|  |
+| |        |       |     |           |  |
+| |        |ML-101 |     |           |  |
+| |        |       |     |  F1PACK   |  |
+| |        |-------|     |           |  |
+| |                      |           |  |
+| |        |-----|       |-----------|  |
+| |        |ROM1 |                      |
+| |        |-----|                      |
+| |                                     |
+|-|-------------------------------------|
+Notes:
+      F1PACK    - TEL F1PACK(tm) TE6350B 9744 E0B (TQFP176)
+      S2812A150 - Seiko Instruments 2k x8 parallel EEPROM (TSOP28)
+      ML-101    - ML-101 24942-6420 9833 Z03 JAPAN (TQFP100, NOTE! This chip looks like it is Fujitsu-manufactured)
+      CXK58257  - SONY CXK58257 32k x8 SRAM (TSOP28)
+      ROM1      - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
+                  The ROMs use a non-standard format and can not be read by conventional methods.
+
+Bottom
+------
+
+|-|-------------------------------------|
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |ROM2 |      |ROM3 |     |ROM4 |   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |ROM5 |      |ROM6 |     |ROM7 |   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |ROM8 |      |ROM9 |     |ROM10|   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+|-|-------------------------------------|
+Notes:
+      ROM2-10   - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
+                  The ROMs use a non-standard format and can not be read by conventional methods.
+      
+      Note: All ROMs have no markings (except part number) and no labels. There are also
+      no PCB location marks. The numbers I've assigned to the ROMs are made up for 
+      simplicity. The actual cards have been dumped as a single storage device.
+
+      Confirmed usage on.... (not all games listed)
+      Chaos Heat
+      Flip Maze
+      Kollon
+      Mahjong OH
+      Nightraid
+      Otenki Kororin / Weather Tales
+      Psyvariar Medium Unit
+      Psyvariar Revision
+      Ray Crisis
+      RC de Go
+      Shanghai Shoryu Sairin
+      Shikigami no Shiro
+      Souten Ryu
+      Space Invaders Anniversary
+      Super Puzzle Bobble (English)
+      XIIStag
+      Zoku Otenami Haiken
+      Zooo
+
+
+Type 2 (3rd party type 'sealed' cards)
+------ 
+
+Note only 1 card was sacrificed and opened.
+
+Top
+---
+
+|-|-------------------------------------|
+| |             18.00         |-----|   |
+| |                           |U15  |   |
+| |        |---------|        |-----|   |
+| |        |20H2877  |                  |
+| |        |IBM0398  |        |-----|   |
+| |        |1B37001TQ|        |U13  |   |
+| |        |KOREA    |        |-----|   |
+| |        |---------|                  |
+| |                                     |
+| |                                     |
+| |   |-----|     |-------|             |
+| |   |U10  |     |D431000|             |
+| |   |-----|     |-------|             |
+| |                                     |
+|-|-------------------------------------|
+Notes:
+      IBM0398 - Custom IC marked 20H2877 IBM0398 1B37001TQ KOREA (TQFP176)
+      D431000 - NEC D431000 128k x8 SRAM (TSOP32)
+      18.00   - Small square white 'thing', may be an oscillator at 18MHz?
+      U*      - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
+                The ROMs use a non-standard format and can not be read by conventional methods.
+
+Bottom
+------
+
+|-|-------------------------------------|
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |U1   |      |U2   |     |U3   |   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+| |                                     |
+| |  |-----|      |-----|     |-----|   |
+| |  |U4   |      |U5   |     |U6   |   |
+| |  |-----|      |-----|     |-----|   |
+| |                                     |
+| |                                     |
+| |               |-----|     |-----|   |
+| |               |U7   |     |U7   |   |
+| |               |-----|     |-----|   |
+| |                                     |
+|-|-------------------------------------|
+Notes:
+      U*  - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
+            The ROMs use a non-standard format and can not be read by conventional methods.
+            U7 not populated in Nightraid card, but may be populated in other cards.
+                  
+      Note: All ROMs have no markings (except part number) and no labels. There are PCB
+            location marks. The actual cards have been dumped as a single storage device.
+
+      Confirmed usage on.... (not all games listed)
+      Nightraid (another one, not the same as listed above)
+      
+      Based on card type (made with single sealed steel shell) these are also using the same PCB...
+      XIIStag (another one, not the same as listed above)
+      Go By RC
+      Space Invaders Anniversary (another one, not the same as listed above)
+      Super Puzzle Bobble (Japan)
+      Usagi
+
 */
 
 #include "driver.h"
