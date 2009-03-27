@@ -131,17 +131,26 @@ Notes:
 Taito G-Net card info
 ---------------------
 
-The G-Net system uses a custom PCMCIA card for game software storage. The card is 
+The G-Net system uses a custom PCMCIA card for game software storage. The card is
 locked with a password and can't be read by conventional means.
 Some of the cards are made in separate pieces and can be opened. However some
 are encased in a single-piece steel shell and opening it up destroys the card.
-Some of the later games came packaged as a Compact Flash card and a PCMCIA to CF 
+Some of the later games came packaged as a Compact Flash card and a PCMCIA to CF
 adapter, however these cards were also locked the same as the older type.
 The game uses an analog wheel (5k potentiometer) in the shape of a hand-held
-control unit and a trigger (another 5k potentiometer) used for acceleration 
-and brake. The trigger and wheel are self centering. If the trigger is pulled back 
-(like firing a gun) the car goes faster. If the trigger is pushed forward the car 
+control unit and a trigger (another 5k potentiometer) used for acceleration
+and brake. The trigger and wheel are self centering. If the trigger is pulled back
+(like firing a gun) the car goes faster. If the trigger is pushed forward the car
 slows down. The controller looks a lot like the old Scalextric controllers (remember those?  :-)
+
+The controller is connected to the ZN2 main board to the 10 pin connector labelled
+'ANALOG'. Using two 5k-Ohm potentiometers, power (+5V) and ground are taken from the JAMMA
+edge connector or directly from the power supply. The output of the steering pot is
+connected to pin 2 and the output of the acceleration pot is connected to pin 3.
+The ANALOG connector output pins are tied directly to a chip next to the connector marked
+'NEC 78081G503 9810KX189'. This is a NEC 8-bit 78K0-family microcontroller with on-chip 8k ROM,
+256 bytes RAM, 33 I/O ports, 8-bit resolution 8-channel A/D converter, 3-channel timer, 1-channel
+3-wire serial interface interrupt control (USART) and other peripheral hardware.
 
 
 Card PCB Layouts
@@ -150,7 +159,7 @@ Card PCB Layouts
 Type 1 (standard 'Taito' type, as found on most G-Net games)
 ------ (This type has separate top and bottom pieces which are glued together and
        (can be opened if done 'carefully'. But be careful the edges of the top lid are SHARP!)
-       
+
 Top
 ---
 
@@ -202,9 +211,9 @@ Bottom
 Notes:
       ROM2-10   - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
                   The ROMs use a non-standard format and can not be read by conventional methods.
-      
+
       Note: All ROMs have no markings (except part number) and no labels. There are also
-      no PCB location marks. The numbers I've assigned to the ROMs are made up for 
+      no PCB location marks. The numbers I've assigned to the ROMs are made up for
       simplicity. The actual cards have been dumped as a single storage device.
 
       Confirmed usage on.... (not all games listed)
@@ -229,7 +238,7 @@ Notes:
 
 
 Type 2 (3rd party type 'sealed' cards)
------- 
+------
 
 Note only 1 card was sacrificed and opened.
 
@@ -275,21 +284,21 @@ Bottom
 | |                                     |
 | |                                     |
 | |               |-----|     |-----|   |
-| |               |U7   |     |U7   |   |
+| |               |U7   |     |U8   |   |
 | |               |-----|     |-----|   |
 | |                                     |
 |-|-------------------------------------|
 Notes:
       U*  - TOSHIBA TC58V32FT 4M x8 (32MBit) CMOS NAND Flash EEPROM 3.3Volt (TSOP44)
             The ROMs use a non-standard format and can not be read by conventional methods.
-            U7 not populated in Nightraid card, but may be populated in other cards.
-                  
+            U8 not populated in Nightraid card, but may be populated in other cards.
+
       Note: All ROMs have no markings (except part number) and no labels. There are PCB
             location marks. The actual cards have been dumped as a single storage device.
 
       Confirmed usage on.... (not all games listed)
       Nightraid (another one, not the same as listed above)
-      
+
       Based on card type (made with single sealed steel shell) these are also using the same PCB...
       XIIStag (another one, not the same as listed above)
       Go By RC
