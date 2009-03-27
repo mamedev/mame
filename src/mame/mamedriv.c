@@ -7244,6 +7244,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ryouran )	/* 1998.07 (c) 1998 Electro Design Co. (Japan) */
 	DRIVER( puzzloop )	/* 1998.?? (c) 1998 Mitchell (Europe) */
 	DRIVER( puzzloopj )	/* 1998.12 (c) 1998 Mitchell (Japan) */
+	DRIVER( puzzloopa )	/* 1998.?? (c) 1998 Mitchell (Asia) */
 	DRIVER( puzzloopk )	/* 1998.?? (c) 1998 Mitchell (Korea) */
 	DRIVER( puzzloopu )	/* 1999.05 (c) 1998 Mitchell (USA) */
 	DRIVER( galpans2 )	/* 1999.02 (c) 1999 Kaneko (Japan) */
