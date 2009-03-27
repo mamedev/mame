@@ -520,7 +520,7 @@ WRITE8_DEVICE_HANDLER( okim6295_w )
 		stream_update(info->stream);
 
 		/* determine which voice(s) (voice is set by a 1 bit in bits 3-6 of the command */
-		for (i = 0; i < 4; i++, temp >>= 1)
+		for (i = 0; i < OKIM6295_VOICES; i++, temp >>= 1)
 		{
 			if (temp & 1)
 			{
