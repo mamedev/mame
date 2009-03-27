@@ -297,10 +297,33 @@ static INPUT_PORTS_START( pleiads )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
+
+	/* Based on various sources, no Button 2 was present in Pleiads */
+	PORT_MODIFY("CTRL")		/* fake port for multiplexed controls */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL					PORT_CONDITION("CAB",0x01,PORTCOND_EQUALS,0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL PORT_CONDITION("CAB",0x01,PORTCOND_EQUALS,0x01)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_2WAY PORT_COCKTAIL	PORT_CONDITION("CAB",0x01,PORTCOND_EQUALS,0x01)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )									PORT_CONDITION("CAB",0x01,PORTCOND_EQUALS,0x01)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pleiadbl )
+	PORT_INCLUDE( phoenix )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(pleiads_protection_r, NULL)     /* Protection. See 0x0552 */
+
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
+	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pleiadce )
-	PORT_INCLUDE( pleiads )
+	PORT_INCLUDE( pleiadbl )
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION( "SW1:3,4" )
@@ -311,12 +334,11 @@ static INPUT_PORTS_START( pleiadce )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( capitol )
-	PORT_INCLUDE( phoenix )
+	PORT_INCLUDE( pleiads )
 
-	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( On ) )
+	/* Capitol has no Button 2 as Pleiads, but there is no protection */
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1061,7 +1083,7 @@ GAME( 1980, griffon,  phoenix,  condor,   condor,   condor,   ROT90, "Videotron 
 GAME( 1981, nextfase, phoenix,  phoenix,  nextfase, 0,        ROT90, "Petaco S.A. (bootleg)", "Next Fase (bootleg of Phoenix)", GAME_SUPPORTS_SAVE )
 
 GAME( 1981, pleiads,  0,        pleiads,  pleiads,  0,        ROT90, "Tehkan", "Pleiads (Tehkan)", GAME_IMPERFECT_COLORS )
-GAME( 1981, pleiadbl, pleiads,  pleiads,  pleiads,  0,        ROT90, "bootleg", "Pleiads (bootleg)", GAME_IMPERFECT_COLORS )
+GAME( 1981, pleiadbl, pleiads,  pleiads,  pleiadbl, 0,        ROT90, "bootleg", "Pleiads (bootleg)", GAME_IMPERFECT_COLORS )
 GAME( 1981, pleiadce, pleiads,  pleiads,  pleiadce, 0,        ROT90, "Tehkan (Centuri license)", "Pleiads (Centuri)", GAME_IMPERFECT_COLORS )
 GAME( 1981, capitol,  pleiads,  phoenix,  capitol,  0,        ROT90, "Universal Video Spiel", "Capitol", GAME_IMPERFECT_COLORS )
 

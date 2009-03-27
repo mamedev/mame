@@ -1003,6 +1003,9 @@ static INPUT_PORTS_START( kazan )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Cocktail ) )
 
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, "Freeze Screen (Cheat)")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1044,6 +1047,10 @@ static INPUT_PORTS_START( jitsupro )
 	PORT_DIPNAME( 0x0040, 0x0040, "Scroll Is Based On" )
 	PORT_DIPSETTING(      0x0040, "Shadow of Baseball" )
 	PORT_DIPSETTING(      0x0000, "The Baseball Itself" )
+
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kickoff )
@@ -1155,6 +1162,10 @@ static INPUT_PORTS_START( p47 )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Hardest ) )
 	PORT_DIPUNUSED( 0x0040, 0x0040 ) /* Manual states this dip is "Unused" */
+
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( plusalph )
@@ -1204,6 +1215,9 @@ static INPUT_PORTS_START( rodland )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Hardest ) )
 
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -1216,6 +1230,10 @@ static INPUT_PORTS_START( stdragon )
 	PORT_DIPSETTING(      0x0003, "3" )
 	PORT_DIPSETTING(      0x0001, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
+
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x8000, 0x8000 )	// used?
 INPUT_PORTS_END
 
@@ -1242,6 +1260,10 @@ static INPUT_PORTS_START( soldam )
 	PORT_DIPNAME( 0x0040, 0x0040, "Credits To Continue (Vs)" )
 	PORT_DIPSETTING(      0x0040, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
+
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
