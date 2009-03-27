@@ -1699,6 +1699,7 @@ const game_driver * const drivers[] =
 	DRIVER( fullthrl )	/* B14 (c) 1987 Taito Corporation (Japan) */
 	DRIVER( opwolf )	/* B20 (c) 1987 Taito Corporation Japan (World) */
 	DRIVER( opwolfa )	/* B20 (c) 1987 Taito Corporation Japan (World) */
+	DRIVER( opwolfj )	/* B20 (c) 1987 Taito Corporation (Japan) */
 	DRIVER( opwolfu )	/* B20 (c) 1987 Taito America Corporation (US) */
 	DRIVER( opwolfb )	/* bootleg */
 	DRIVER( othunder )	/* B67 (c) 1988 Taito Corporation Japan (World) */
