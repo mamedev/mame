@@ -5315,15 +5315,15 @@ static DRIVER_INIT(funriverv) { sfbonus_bitswap(machine,  0x39, 1,2,7,6,5,4,3,0,
 
 */
 
-GAME( 2004, sfbonus,     0,        sfbonus,    amcoetype2,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.6)", 0)
+GAME( 2003, sfbonus,     0,        sfbonus,    amcoetype2,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.6)", 0)
 
-GAME( 2004, sfbonusa,    sfbonus,  sfbonus,    amcoetype2,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.7)", 0)
+GAME( 2003, sfbonusa,    sfbonus,  sfbonus,    amcoetype2,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.7)", 0)
 
-GAME( 2004, sfbonusb,    sfbonus,  sfbonus,    amcoetype2,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 1)", 0)
-GAME( 2004, sfbonusd,    sfbonus,  sfbonus,    amcoetype1,    sfbonusd,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", 0)
-GAME( 2004, sfbonusv,    sfbonus,  sfbonus,    amcoetype1,    sfbonusv,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R Dual)", 0)
+GAME( 2003, sfbonusb,    sfbonus,  sfbonus,    amcoetype2,    sfbonus, ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 1)", 0)
+GAME( 2003, sfbonusd,    sfbonus,  sfbonus,    amcoetype1,    sfbonusd,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R, set 2)", 0)
+GAME( 2003, sfbonusv,    sfbonus,  sfbonus,    amcoetype1,    sfbonusv,ROT0,  "Amcoe", "Skill Fruit Bonus (Version 1.9R Dual)", 0)
 
-GAMEL( 2004, parrot3,     0,        sfbonus,    amcoetype2,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", 0, layout_pirpok2)
+GAMEL( 2003, parrot3,     0,        sfbonus,    amcoetype2,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.4)", 0, layout_pirpok2)
 
 GAMEL( 2004, parrot3b,    parrot3,  sfbonus,    amcoetype2,    pirpok2,  ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 1)", 0, layout_pirpok2)
 GAMEL( 2004, parrot3d,    parrot3,  sfbonus,    amcoetype1,    parrot3d, ROT0,  "Amcoe", "Parrot Poker III (Version 2.6R, set 2)", 0, layout_pirpok2)

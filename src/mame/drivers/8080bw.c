@@ -2594,4 +2594,4 @@ GAME( 1979, solfight, ozmawars, invaders, ozmawars, 0, ROT270, "bootleg", "Solar
 GAME( 1979, spaceph,  ozmawars, invaders, spaceph,  0, ROT270, "Zilec Games", "Space Phantoms", GAME_SUPPORTS_SAVE )
 GAME( 1979, yosakdon, 0,        yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* bootleg? */
 GAME( 1979, yosakdoa, yosakdon, yosakdon, yosakdon, 0, ROT270, "Wing", "Yosaku To Donbei (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* bootleg? */
-GAMEL(197?, shuttlei, 0,        shuttlei, shuttlei, 0, ROT270, "Omori", "Shuttle Invader", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL, layout_shuttlei )
+GAMEL(1979, shuttlei, 0,        shuttlei, shuttlei, 0, ROT270, "Omori", "Shuttle Invader", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL, layout_shuttlei )

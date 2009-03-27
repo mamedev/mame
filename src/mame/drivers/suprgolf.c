@@ -505,5 +505,4 @@ ROM_START( suprgolf )
 	ROM_LOAD( "cg12.6k",0x00000, 0x10000, CRC(5707b3d5) SHA1(9102a40fefb6426f2cd9d92d66fdc77e078e3f4c) )
 ROM_END
 
-GAME( 1989?, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING )
-
+GAME( 1989, suprgolf, 0, suprgolf,  suprgolf,  0, ROT0, "Nasco", "Super Crowns Golf (Japan)", GAME_NOT_WORKING )
