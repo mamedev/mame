@@ -2205,12 +2205,12 @@ static DRIVER_INIT( sys386f2 )
 	int i, j;
 	UINT16 *src = (UINT16 *)memory_region(machine, "gfx3");
 	UINT16 tmp[0x40 / 2], Offset;
-	
+
 	// sprite_reorder() only
 	for(i = 0; i < memory_region_length(machine, "gfx3") / 0x40; i++)
 	{
 		memcpy(tmp, src, 0x40);
-		
+
 		for(j = 0; j < 0x40 / 2; j++)
 		{
 			Offset = (j >> 1) | (j << 4 & 0x10);

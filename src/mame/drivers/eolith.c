@@ -122,20 +122,20 @@ static WRITE32_HANDLER( systemcontrol_w )
 }
 
 static READ32_HANDLER( hidctch3_pen1_r )
-{	
+{
 	//320 x 240
 	int xpos = input_port_read(space->machine, "PEN_X_P1");
 	int ypos = input_port_read(space->machine, "PEN_Y_P1");
-	
+
 	return xpos + (ypos*168*2);
 }
 
 static READ32_HANDLER( hidctch3_pen2_r )
-{	
+{
 	//320 x 240
 	int xpos = input_port_read(space->machine, "PEN_X_P2");
 	int ypos = input_port_read(space->machine, "PEN_Y_P2");
-	
+
 	return xpos + (ypos*168*2);
 }
 
@@ -273,7 +273,7 @@ static INPUT_PORTS_START( hidctch3 )
 
 	PORT_START("PEN_Y_P1")
 	PORT_BIT( 0xffff, 0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0,119) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(1)
-	
+
 	PORT_START("PEN_X_P2")
 	PORT_BIT( 0xffff, 0, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0,159) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_PLAYER(2)
 
@@ -365,9 +365,9 @@ MACHINE_DRIVER_END
 
 
 
-/* 
+/*
 
-Iron Fortress 
+Iron Fortress
 Eolith, 1998
 
 This game runs on hardware that looks exactly like the Gradation 2D PCB
@@ -1032,17 +1032,17 @@ static DRIVER_INIT( hidctch2 )
 }
 
 static DRIVER_INIT( hidctch3 )
-{	
+{
 	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfc200000, 0xfc200003, 0, 0, SMH_NOP); // this generates pens vibration
-	
+
 	// It is not clear why the first reads are needed too
-	
+
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfce00000, 0xfce00003, 0, 0, hidctch3_pen1_r);
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfce80000, 0xfce80003, 0, 0, hidctch3_pen1_r);
-	
+
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfcf00000, 0xfcf00003, 0, 0, hidctch3_pen2_r);
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfcf80000, 0xfcf80003, 0, 0, hidctch3_pen2_r);
-	
+
 	init_eolith_speedup(machine);
 }
 

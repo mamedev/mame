@@ -134,7 +134,7 @@ static void galpani2_mcu_nmi(running_machine *machine)
 			break;
 
 		//case 0x02: //?, gp2se is the only one to use it, often!
-		//	break;
+		//  break;
 
 		case 0x0a:	// Copy N bytes from RAM1 to RAM2
 			mcu_src		=	(memory_read_byte(srcspace, mcu_address + 2)<<8) +

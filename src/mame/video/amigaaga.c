@@ -5,14 +5,14 @@
     Driver by: Ernesto Corvi, Mariusz Wojcieszek, Aaron Giles
 
 Done:
-	- palette
-	- bitplane data fetching
-	- support for up to 8 standard bitplanes
-	- HAM8 mode
+    - palette
+    - bitplane data fetching
+    - support for up to 8 standard bitplanes
+    - HAM8 mode
 
 To do:
-	- sprites (current implementation is incomplete - see CD32 logo)
-	- incorrect hstart/hstop values in CD32 logo, lsrquiz & lsrquiz2
+    - sprites (current implementation is incomplete - see CD32 logo)
+    - incorrect hstart/hstop values in CD32 logo, lsrquiz & lsrquiz2
 
 ***************************************************************************/
 

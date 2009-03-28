@@ -819,7 +819,7 @@ static NVRAM_HANDLER( naomi_eeproms )
 		}
         else
 		{
-		//	int a;
+		//  int a;
 
 			UINT32 length, size;
 			UINT8 *dat;

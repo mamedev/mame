@@ -91,7 +91,7 @@ typedef struct
 	int		ioport4_pullup, ioport4_direction;
 
 	void	(*ftcsr_read_callback)(UINT32 data);
-	
+
 
 	/* This MMU simulation is good for the simple remap used on Naomi GD-ROM SQ access *ONLY* */
 	UINT32 sh4_tlb_address[64];

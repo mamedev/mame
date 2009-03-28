@@ -297,7 +297,7 @@ static MACHINE_DRIVER_START( mnchmobl )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-        
+
         /* AY clock speeds confirmed to match known recording */
 	MDRV_SOUND_ADD("ay1", AY8910, XTAL_15MHz/4/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

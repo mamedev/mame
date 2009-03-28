@@ -406,7 +406,7 @@ static WRITE32_HANDLER( pal32_w )
 
 static WRITE32_HANDLER( ctrl0_w )
 {
-	if(ACCESSING_BITS_0_7) 
+	if(ACCESSING_BITS_0_7)
 	{
 		model2_ctrlmode = data & 0x01;
 		eeprom_write_bit(data & 0x20);

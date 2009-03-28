@@ -166,8 +166,8 @@ ASIC 25 + ASIC 28
 ASIC 27 (5585E):
     performs a variety of calculations, quite complex, different per region, supplies region code
     used by:
-    Knights of Valour 1 / Plus 
-    Photo Y2k / Real and Fake 
+    Knights of Valour 1 / Plus
+    Photo Y2k / Real and Fake
 
 ASIC 27A(5585F/5585G):
     arm7 cpu with 16kb internal rom (different per game / region) + optional external data rom
@@ -899,8 +899,8 @@ static ADDRESS_MAP_START( svg_68k_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
 	AM_RANGE(0x500000, 0x51ffff) AM_READWRITE(svg_m68k_ram_r, svg_m68k_ram_w)    /* ARM7 Shared RAM */
-	AM_RANGE(0x5c0000, 0x5c0001) AM_READWRITE(svg_68k_nmi_r, svg_68k_nmi_w)      /* ARM7 FIQ */	
-	AM_RANGE(0x5c0300, 0x5c0301) AM_READWRITE(arm7_latch_68k_r, svg_latch_68k_w) /* ARM7 Latch */	
+	AM_RANGE(0x5c0000, 0x5c0001) AM_READWRITE(svg_68k_nmi_r, svg_68k_nmi_w)      /* ARM7 FIQ */
+	AM_RANGE(0x5c0300, 0x5c0301) AM_READWRITE(arm7_latch_68k_r, svg_latch_68k_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svg_arm7_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -2035,7 +2035,7 @@ static READ16_HANDLER( olds_prot_swap_r16 )
 		return pgm_mainram[0x178F4/2];
 	else						//game
 		return pgm_mainram[0x178D8/2];
-		
+
 }
 
 static DRIVER_INIT( olds )
@@ -3626,7 +3626,7 @@ ROM_START( puzzli2 )
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
 	/* not on this PCB */
-	
+
 	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0900.u9",    0x400000, 0x200000, CRC(70615611) SHA1(a46d4aa71396947b427f9ba4ba0e636876c09d6b) )
@@ -4007,7 +4007,7 @@ ROM_START( killbldp )
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "kbex_027a.rom", 0x000000, 0x04000, NO_DUMP ) 
+	ROM_LOAD( "kbex_027a.rom", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "kbex_v300x.u26", 0x000000, 0x200000,  CRC(144388c8) )

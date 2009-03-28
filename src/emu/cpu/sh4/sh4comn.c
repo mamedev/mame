@@ -650,7 +650,7 @@ WRITE32_HANDLER( sh4_internal_w )
 			printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
 			printf("The MMU emulation is a hack specific to that system\n");
 			sh4->sh4_mmu_enabled = 1;
-			
+
 			// should be a different bit!
 			{
 				int i;
@@ -659,7 +659,7 @@ WRITE32_HANDLER( sh4_internal_w )
 					sh4->sh4_tlb_address[i] = 0;
 					sh4->sh4_tlb_data[i] = 0;
 				}
-			
+
 			}
 		}
 		else

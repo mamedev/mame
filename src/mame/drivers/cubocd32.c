@@ -150,24 +150,24 @@ static void cubocd32_potgo_w(running_machine *machine, UINT16 data)
 	potgo_value = potgo_value & 0x5500;
 	potgo_value |= data & 0xaa00;
 
-    for (i = 0; i < 8; i += 2) 
+    for (i = 0; i < 8; i += 2)
 	{
 		UINT16 dir = 0x0200 << i;
-		if (data & dir) 
+		if (data & dir)
 		{
 			UINT16 d = 0x0100 << i;
 			potgo_value &= ~d;
 			potgo_value |= data & d;
 		}
     }
-    for (i = 0; i < 2; i++) 
+    for (i = 0; i < 2; i++)
 	{
 	    UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
 	    UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
 	    if ((potgo_value & p5dir) && (potgo_value & p5dat))
 		cd32_shifter[i] = 8;
     }
-	
+
 }
 
 static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra)
@@ -175,16 +175,16 @@ static void handle_cd32_joystick_cia(UINT8 pra, UINT8 dra)
     static int oldstate[2];
     int i;
 
-    for (i = 0; i < 2; i++) 
+    for (i = 0; i < 2; i++)
 	{
 		UINT8 but = 0x40 << i;
 		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
 		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
-		if (!(potgo_value & p5dir) || !(potgo_value & p5dat)) 
+		if (!(potgo_value & p5dir) || !(potgo_value & p5dat))
 		{
-			if ((dra & but) && (pra & but) != oldstate[i]) 
+			if ((dra & but) && (pra & but) != oldstate[i])
 			{
-				if (!(pra & but)) 
+				if (!(pra & but))
 				{
 					cd32_shifter[i]--;
 					if (cd32_shifter[i] < 0)
@@ -200,7 +200,7 @@ static UINT16 handle_joystick_potgor (running_machine *machine, UINT16 potgor)
 {
     int i;
 
-    for (i = 0; i < 2; i++) 
+    for (i = 0; i < 2; i++)
 	{
 		UINT16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
 		UINT16 p9dat = 0x0400 << (i * 4); /* data P9 */

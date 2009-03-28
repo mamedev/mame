@@ -4393,7 +4393,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( meltyb )	/* 2006.12 Melty Blood Act Cadenza ver.B */
 	DRIVER( takoron )	/* 2006.12.16 Noukone Puzzle Takoron */
 	DRIVER( meltyba )	/* 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2) */
-	
+
 						/* Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
 
 						/* 2007.07 Shooting Love */

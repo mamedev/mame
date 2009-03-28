@@ -84,7 +84,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   hidden options. (thanks bnathan)
 
 2009-03-25 FP: fixed verified DSW and default settings for mjclub (thanks to
-	translation from manual by Yasu)
+    translation from manual by Yasu)
 
 ****************************************************************************/
 
@@ -1161,7 +1161,7 @@ static WRITE8_HANDLER( mjvegasa_coin_counter_w )
 static WRITE8_HANDLER( mjvegasa_12400_w )
 {
 	// bits 0 & 1
-//	popmessage("UNK: %02x",data);
+//  popmessage("UNK: %02x",data);
 }
 static READ8_HANDLER( mjvegasa_12500_r )
 {

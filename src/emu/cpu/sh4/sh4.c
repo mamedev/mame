@@ -2086,16 +2086,16 @@ UINT32 sh4_getsqremap(SH4 *sh4, UINT32 address)
 	{
 		int i;
 		UINT32 topaddr = address&0xfff00000;
-	
+
 		for (i=0;i<64;i++)
 		{
 			UINT32 topcmp = sh4->sh4_tlb_address[i]&0xfff00000;
 			if (topcmp==topaddr)
 				return (address&0x000fffff) | ((sh4->sh4_tlb_data[i])&0xfff00000);
 		}
-	
+
 	}
-	
+
 	return address;
 }
 
@@ -2112,10 +2112,10 @@ INLINE void PREFM(SH4 *sh4, UINT32 n)
 		{
 			addr = addr & 0xFFFFFFE0;
 			dest = sh4_getsqremap(sh4, addr); // good enough for naomi-gd rom, probably not much else
-	
+
 		}
 		else
-		{	
+		{
 			sq = (addr & 0x20) >> 5;
 			dest = addr & 0x03FFFFE0;
 			if (sq == 0)
@@ -2124,7 +2124,7 @@ INLINE void PREFM(SH4 *sh4, UINT32 n)
 				dest |= (sh4->m[QACR1] & 0x1C) << 24;
 			addr = addr & 0xFFFFFFE0;
 		}
-		
+
 		for (a = 0;a < 4;a++)
 		{
 			// shouldn't be causing a memory read, should store sq writes in registers.
@@ -3358,7 +3358,7 @@ static CPU_RESET( sh4 )
 	sh4->internal_irq_level = -1;
 	sh4->irln = 15;
 	sh4->sleep_mode = 0;
-	
+
 	sh4->sh4_mmu_enabled = 0;
 }
 
@@ -3680,7 +3680,7 @@ READ64_HANDLER( sh4_tlb_r )
 	else
 	{
 		UINT8 i = (offs>>8)&63;
-		return sh4->sh4_tlb_address[i];	
+		return sh4->sh4_tlb_address[i];
 	}
 }
 
@@ -3698,7 +3698,7 @@ WRITE64_HANDLER( sh4_tlb_w )
 	else
 	{
 		UINT8 i = (offs>>8)&63;
-		sh4->sh4_tlb_address[i] = data&0xffffffff;	
+		sh4->sh4_tlb_address[i] = data&0xffffffff;
 	}
 }
 

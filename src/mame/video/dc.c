@@ -54,18 +54,18 @@ typedef struct
 	float u, v, du, dv;
 	int texturemode;
 	int texturesizex, texturesizey, texturesizes, texturepf, texturepalette;
-	
+
 	vert a,b,c,d;
-	
+
 } testsprites;
 
 #if DEBUG_VERTICES
-typedef	struct 
+typedef	struct
 {
 	int x;
 	int y;
 	int endofstrip;
-} testvertices; 
+} testvertices;
 #endif
 
 typedef struct {
@@ -74,7 +74,7 @@ typedef struct {
 	#if DEBUG_VERTICES
 	testvertices showvertices[65536];
 	#endif
-	
+
 	int testsprites_size, testsprites_toerase, testvertices_size;
 	UINT32 ispbase;
 	UINT32 fbwsof1;
@@ -207,11 +207,11 @@ WRITE64_HANDLER( pvr_ta_w )
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  TA soft reset\n");
 			#endif
-			state_ta.listtype_used=0;			
+			state_ta.listtype_used=0;
 		}
 		if (dat & 2)
 		{
-			
+
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  Core Pipeline soft reset\n");
 			#endif
@@ -278,7 +278,7 @@ WRITE64_HANDLER( pvr_ta_w )
 			if ((state_ta.grab[a].ispbase == pvrta_regs[PARAM_BASE]) && (state_ta.grab[a].valid == 1) && (state_ta.grab[a].busy == 0))
 			{
 				rectangle clip;
-					
+
 				state_ta.grab[a].busy = 1;
 				state_ta.renderselect = a;
 				state_ta.start_render_received=1;
@@ -286,17 +286,17 @@ WRITE64_HANDLER( pvr_ta_w )
 
 				state_ta.grab[a].fbwsof1=pvrta_regs[FB_W_SOF1];
 				state_ta.grab[a].fbwsof2=pvrta_regs[FB_W_SOF2];
-				
+
 				clip.min_x = 0;
 				clip.max_x = 1023;
 				clip.min_y = 0;
-				clip.max_y = 1023;	
-				
+				clip.max_y = 1023;
+
 				// we've got a request to draw, so, draw to the fake fraembuffer!
-				testdrawscreen(space->machine,fakeframebuffer_bitmap,&clip);			
-				
+				testdrawscreen(space->machine,fakeframebuffer_bitmap,&clip);
+
 				timer_adjust_oneshot(endofrender_timer, ATTOTIME_IN_USEC(1000) , 0); // hack, make sure render takes some amount of time
-				
+
 				break;
 			}
 		}
@@ -387,15 +387,15 @@ void process_ta_fifo(running_machine* machine)
 	UINT32 a;
 
 	/* first byte in the buffer is the Parameter Control Word
-	
-	 pppp pppp gggg gggg oooo oooo oooo oooo
-	 
-	 p = para control
-	 g = group control
-	 o = object control
-	 
-	*/
-	
+
+     pppp pppp gggg gggg oooo oooo oooo oooo
+
+     p = para control
+     g = group control
+     o = object control
+
+    */
+
 	// Para Control
 	state_ta.paracontrol=(tafifo_buff[0] >> 24) & 0xff;
 	// 0 end of list
@@ -483,7 +483,7 @@ void process_ta_fifo(running_machine* machine)
 			a = 1 << 21;
 			break;
 		}
-		
+
 		dc_sysctrl_regs[SB_ISTNRM] |= a;
 		dc_update_interrupt_status(machine);
 		state_ta.tafifo_listtype= -1; // no list being received
@@ -622,28 +622,28 @@ void process_ta_fifo(running_machine* machine)
 					/* sprites are used for the Naomi Bios logo + text for example */
 					/* -- this is wildly inaccurate! */
 					testsprites* testsprite = &state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size];
-					
+
 					/* Sprite Type 1 (for Sprite)
-					 0x00 Parameter Control Word (see above)
-					 0x04 A.X
-					 0x08 A.Y
-					 0x0C A.Z
-					 0x10 B.X
-					 0x14 B.Y
-					 0x18 B.Z
-					 0x1C C.X
-					 0x20 C.Y
-					 0x24 C.Z
-					 0x28 D.X
-					 0x2C D.Y
-					 0x30 (ignored) D.Z is calculated from the Plane Equation
-					 0x34 AU/AV (16-bits each)
-					 0x38 BU/BV (16-bits each)
-					 0x3C CU/CV  (16-bits each)
-					 
-					 note: DU/DV is calculated, not specified
-					*/
-					
+                     0x00 Parameter Control Word (see above)
+                     0x04 A.X
+                     0x08 A.Y
+                     0x0C A.Z
+                     0x10 B.X
+                     0x14 B.Y
+                     0x18 B.Z
+                     0x1C C.X
+                     0x20 C.Y
+                     0x24 C.Z
+                     0x28 D.X
+                     0x2C D.Y
+                     0x30 (ignored) D.Z is calculated from the Plane Equation
+                     0x34 AU/AV (16-bits each)
+                     0x38 BU/BV (16-bits each)
+                     0x3C CU/CV  (16-bits each)
+
+                     note: DU/DV is calculated, not specified
+                    */
+
 					testsprite->a.x = u2f(tafifo_buff[0x04/4]);
 					testsprite->a.y = u2f(tafifo_buff[0x08/4]);
 					testsprite->a.z = u2f(tafifo_buff[0x0c/4]);
@@ -653,7 +653,7 @@ void process_ta_fifo(running_machine* machine)
 					testsprite->c.x = u2f(tafifo_buff[0x1c/4]);
 					testsprite->c.y = u2f(tafifo_buff[0x20/4]);
 					testsprite->c.z = u2f(tafifo_buff[0x24/4]);
-					
+
 					testsprite->d.x = u2f(tafifo_buff[0x28/4]);
 					testsprite->d.y = u2f(tafifo_buff[0x2c/4]);
 					testsprite->d.z = 0.0f;// calculated
@@ -666,32 +666,32 @@ void process_ta_fifo(running_machine* machine)
 					testsprite->c.v = u2f( (tafifo_buff[0x3c/4]&0x0000ffff)<<16);
 					testsprite->d.u = 0.0f;// calculated
 					testsprite->d.v = 0.0f;// calculated
-				
+
 					/*
-					printf("Sending a sprite with\n%f %f %f - %f %f\n %f %f %f - %f %f\n%f %f %f - %f %f\n%f %f %f - %f %f\n", 
-					testsprite->a.x, testsprite->a.y, testsprite->a.z, testsprite->a.u, testsprite->a.v,
-					testsprite->b.x, testsprite->b.y, testsprite->b.z, testsprite->b.u, testsprite->b.v,
-					testsprite->c.x, testsprite->c.y, testsprite->c.z, testsprite->c.u, testsprite->c.v,
-					testsprite->d.x, testsprite->d.y, testsprite->d.z, testsprite->d.u, testsprite->d.v);
-					*/
-					
+                    printf("Sending a sprite with\n%f %f %f - %f %f\n %f %f %f - %f %f\n%f %f %f - %f %f\n%f %f %f - %f %f\n",
+                    testsprite->a.x, testsprite->a.y, testsprite->a.z, testsprite->a.u, testsprite->a.v,
+                    testsprite->b.x, testsprite->b.y, testsprite->b.z, testsprite->b.u, testsprite->b.v,
+                    testsprite->c.x, testsprite->c.y, testsprite->c.z, testsprite->c.u, testsprite->c.v,
+                    testsprite->d.x, testsprite->d.y, testsprite->d.z, testsprite->d.u, testsprite->d.v);
+                    */
+
 					/*
-					horizontal test mode
-					224.000000 224.000000 999.999939 - 0.000000 0.609375
-					232.000000 224.000000 999.999939 - 1.000000 0.609375
-					232.000000 232.000000 999.999939 - 1.000000 0.617188
-					224.000000 232.000000
-					should calculate 	  999.999939 - 0.000000 0.617188
+                    horizontal test mode
+                    224.000000 224.000000 999.999939 - 0.000000 0.609375
+                    232.000000 224.000000 999.999939 - 1.000000 0.609375
+                    232.000000 232.000000 999.999939 - 1.000000 0.617188
+                    224.000000 232.000000
+                    should calculate      999.999939 - 0.000000 0.617188
 
 
-					vertical test mode
-					  8.000000 184.000000 999.999939 - 0.000000 0.617188
-					 16.000000 184.000000 999.999939 - 0.000000 0.609375
-					 16.000000 192.000000 999.999939 - 1.000000 0.609375
-					  8.000000 192.000000
-					should calculate 	  999.999939 - 1.000000 0.617188
-					*/				
-					
+                    vertical test mode
+                      8.000000 184.000000 999.999939 - 0.000000 0.617188
+                     16.000000 184.000000 999.999939 - 0.000000 0.609375
+                     16.000000 192.000000 999.999939 - 1.000000 0.609375
+                      8.000000 192.000000
+                    should calculate      999.999939 - 1.000000 0.617188
+                    */
+
 					// old code, used for the test drawing
 					testsprite->positionx=testsprite->a.x;
 					testsprite->positiony=testsprite->a.y;
@@ -708,7 +708,7 @@ void process_ta_fifo(running_machine* machine)
 					testsprite->texturesizes=state_ta.texturesizes;
 					testsprite->texturepf=state_ta.pixelformat;
 					testsprite->texturepalette=state_ta.paletteselector;
-					
+
 					state_ta.grab[state_ta.grabsel].testsprites_size++;
 				}
 			}
@@ -724,7 +724,7 @@ void process_ta_fifo(running_machine* machine)
 				{
 					/* add a vertex to our 'testverticies' list */
 					/* this is used for 3d stuff, ie most of the graphics (see guilty gear, confidential mission, maze of the kings etc.) */
-					/* -- this is also wildly inaccurate! */				
+					/* -- this is also wildly inaccurate! */
 					testvertices* testvertex = &state_ta.grab[state_ta.grabsel].showvertices[state_ta.grab[state_ta.grabsel].testvertices_size];
 
 					testvertex->x=u2f(tafifo_buff[1]);
@@ -883,11 +883,11 @@ INLINE UINT32 alpha_blend_r16_565(UINT32 d, UINT32 s, UINT8 level)
 }
 #endif
 
-/// !! 
+/// !!
 
 static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
-{	
-	
+{
+
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int cs,x,y,dx,dy,xi,yi,a,rs,ns;
 	float iu,iv,u,v;
@@ -906,7 +906,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 		return;
 
 	//printf("drawtest!\n");
-	
+
 	rs=state_ta.renderselect;
 	c=pvrta_regs[ISP_BACKGND_T];
 	c=memory_read_dword(space,0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
@@ -1244,7 +1244,7 @@ static TIMER_CALLBACK(vbout)
 static TIMER_CALLBACK(endofrender)
 {
 	UINT32 a;
-	
+
 	//printf("endofrender\n");
 
 	// don't know if this is right.. but we get asserts otherwise, timing error?
@@ -1254,15 +1254,15 @@ static TIMER_CALLBACK(endofrender)
 			if (state_ta.grab[a].busy == 1)
 				state_ta.grab[a].busy = 0;
 		state_ta.start_render_received = 0;
-	}		
-	
+	}
+
 	state_ta.start_render_received=0;
 	state_ta.renderselect= -1;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 	dc_update_interrupt_status(machine);
-		
+
 	timer_adjust_oneshot(endofrender_timer, attotime_never, 0);
-	
+
 
 }
 
@@ -1291,10 +1291,10 @@ VIDEO_START(dc)
 
 	vbout_timer = timer_alloc(machine, vbout, 0);
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
-	
+
 	endofrender_timer = timer_alloc(machine, endofrender, 0);
 	timer_adjust_oneshot(endofrender_timer, attotime_never, 0);
-	
+
 	fakeframebuffer_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_RGB32);
 
 
@@ -1303,27 +1303,27 @@ VIDEO_START(dc)
 VIDEO_UPDATE(dc)
 {
 	/******************
-	  MAME note
-	*******************
-	  
-	The video update function should NOT be generating interrupts, setting timers or doing _anything_ the game might be able to detect
-	as it will be called at different times depending on frameskip etc.
-	
-	Rendering should happen when the hardware requests it, to the framebuffer(s)
-	
-	Everything else should depend on timers.
-	
-	******************/
+      MAME note
+    *******************
 
-//	static int useframebuffer=1;
+    The video update function should NOT be generating interrupts, setting timers or doing _anything_ the game might be able to detect
+    as it will be called at different times depending on frameskip etc.
+
+    Rendering should happen when the hardware requests it, to the framebuffer(s)
+
+    Everything else should depend on timers.
+
+    ******************/
+
+//  static int useframebuffer=1;
 	const rectangle *visarea = video_screen_get_visible_area(screen);
-	int y,x;	
+	int y,x;
 	//printf("videoupdate\n");
 
 #if DEBUG_PALRAM
 	debug_paletteram(screen->machine);
 #endif
-	
+
 	// copy our fake framebuffer bitmap (where things have been rendered) to the screen
 	for (y = visarea->min_y ; y < visarea->max_y ; y++)
 	{
@@ -1334,7 +1334,7 @@ VIDEO_UPDATE(dc)
 			dst[0] = src[0];
 		}
 	}
-		
+
 	return 0;
 }
 
