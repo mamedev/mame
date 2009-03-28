@@ -370,11 +370,20 @@ WRITE64_HANDLER( pvr_ta_w )
 		mame_printf_verbose("PVRTA: [%08x=%x] write %llx to %x (reg %x %x), mask %llx\n", 0x5f8000+reg*4, dat, data>>shift, offset, reg, (reg*4)+0x8000, mem_mask);
 	#endif
 }
-
 void process_ta_fifo(running_machine* machine)
 {
 	UINT32 a;
 
+	/* first byte in the buffer is the Parameter Control Word
+	
+	 pppp pppp gggg gggg oooo oooo oooo oooo
+	 
+	 p = para control
+	 g = group control
+	 o = object control
+	 
+	*/
+	
 	// Para Control
 	state_ta.paracontrol=(tafifo_buff[0] >> 24) & 0xff;
 	// 0 end of list
@@ -601,6 +610,27 @@ void process_ta_fifo(running_machine* machine)
 					/* sprites are used for the Naomi Bios logo + text for example */
 					/* -- this is wildly inaccurate! */
 					testsprites* testsprite = &state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size];
+					
+					/* Sprite Type 1 (for Sprite)
+					 0x00 Parameter Control Word (see above)
+					 0x04 A.X
+					 0x08 A.Y
+					 0x0C A.Z
+					 0x10 B.X
+					 0x14 B.Y
+					 0x18 B.Z
+					 0x1C C.X
+					 0x20 C.Y
+					 0x24 C.Z
+					 0x28 D.X
+					 0x2C D.Y
+					 0x30 (ignored) D.Z is calculated from the Plane Equation
+					 0x34 AU/AV (16-bits each)
+					 0x38 BU/BV (16-bits each)
+					 0x3C CU/CV  (16-bits each)
+					 
+					 note: DU/DV is calculated, not specified
+					*/
 					
 					testsprite->positionx=u2f(tafifo_buff[1]);
 					testsprite->positiony=u2f(tafifo_buff[2]);
