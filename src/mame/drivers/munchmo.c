@@ -1,4 +1,4 @@
-	/***************************************************************************
+/***************************************************************************
   Munch Mobile
   (C) 1983 SNK
 
@@ -12,7 +12,6 @@
     - several unmapped registers
     - sustained sounds (when there should be silence)
 
-
 Stephh's notes (based on the game Z80 code and some tests) :
 
   - The "Continue after Game Over" Dip Switch (DSW1:1) allows the player
@@ -22,13 +21,14 @@ Stephh's notes (based on the game Z80 code and some tests) :
     See code at 0x013a ('joyfulr') or 0x013e ('mnchmobl') for more infos.
   - There is extra code at 0x1de2 in 'mnchmobl' but it doesn't seem to be used.
 
+- DIPs are now verified from Munch Mobile manual and playtesting.
+
 ***************************************************************************/
 
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
 
 extern UINT8 *mnchmobl_vreg;
 extern UINT8 *mnchmobl_status_vram;
@@ -69,25 +69,6 @@ static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-static CUSTOM_INPUT( mnchmobl_bonus_r )
-{
-	int bit_mask = (FPTR)param;
-
-	switch (bit_mask)
-	{
-		case 0x03:  /* 2nd Bonus Life" Dip Switches (DSW2:1,2) */
-			return ((input_port_read(field->port->machine, "BONUS") & bit_mask) >> 0);
-		case 0x10:  /* "Occurence" Dip Switch (DSW2:7) */
-			return ((input_port_read(field->port->machine, "BONUS") & bit_mask) >> 4);
-		case 0xe0:  /* "1st Bonus Life" Dip Switches (DSW1:6,7,8) */
-			return ((input_port_read(field->port->machine, "BONUS") & bit_mask) >> 5);
-
-		default:
-			logerror("mnchmobl_bonus_r : invalid %02X bit_mask\n",bit_mask);
-			return 0;
-	}
 }
 
 
@@ -159,18 +140,16 @@ static INPUT_PORTS_START( mnchmobl )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "Continue after Game Over (Cheat)" )    /* see notes */
+        /* See notes about this DIP */
+	PORT_DIPNAME( 0x01, 0x00, "Continue after Game Over (Cheat)" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1e, 0x00, DEF_STR( Coinage ) )
+
+	PORT_DIPNAME( 0x1e, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,3,4,5")
 	PORT_DIPSETTING(    0x14, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x16, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x1a, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x12, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
@@ -179,92 +158,46 @@ static INPUT_PORTS_START( mnchmobl )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_8C ) )
-	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mnchmobl_bonus_r, (void *)0xe0)
+
+// Duplicate Settings
+// PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
+// PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+// PORT_DIPSETTING(    0x1a, DEF_STR( 1C_1C ) )
+// PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+
+	PORT_DIPNAME( 0xe0, 0x00, "1st Bonus" ) PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x20, "20000" )
+	PORT_DIPSETTING(    0x40, "30000" )
+	PORT_DIPSETTING(    0x60, "40000" )
+	PORT_DIPSETTING(    0x80, "50000" )
+	PORT_DIPSETTING(    0xa0, "60000" )
+	PORT_DIPSETTING(    0xc0, "70000" )
+	PORT_DIPSETTING(    0xe0, "No Bonus" )
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mnchmobl_bonus_r, (void *)0x03)
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, "2nd Bonus (1st+)" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, "30000" )
+	PORT_DIPSETTING(    0x01, "40000" )
+	PORT_DIPSETTING(    0x02, "100000" )
+	PORT_DIPSETTING(    0x03, "No Bonus" )
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x10, 0x00, "Freeze" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x10, 0x00, "Freeze" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mnchmobl_bonus_r, (void *)0x10)  /* must use unused mask */
-
-	PORT_START("BONUS")  /* fake port to handle bonus lives settings via multiple input ports */
-	PORT_DIPNAME( 0xf3, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x10, "10k 40k 30k+" )
-	PORT_DIPSETTING(    0x30, "20k 50k 30k+" )
-	PORT_DIPSETTING(    0x50, "30k 60k 30k+" )
-	PORT_DIPSETTING(    0x70, "40k 70k 30k+" )
-	PORT_DIPSETTING(    0x90, "50k 80k 30k+" )
-	PORT_DIPSETTING(    0xb0, "60k 90k 30k+" )
-	PORT_DIPSETTING(    0xd0, "70k 100k 30k+" )
-	PORT_DIPSETTING(    0x11, "10k 50k 40k+" )
-	PORT_DIPSETTING(    0x31, "20k 60k 40k+" )
-	PORT_DIPSETTING(    0x51, "30k 70k 40k+" )
-	PORT_DIPSETTING(    0x71, "40k 80k 40k+" )
-	PORT_DIPSETTING(    0x91, "50k 80k 40k+" )
-	PORT_DIPSETTING(    0xb1, "60k 100k 40k+" )
-	PORT_DIPSETTING(    0xd1, "70k 100k 40k+" )
-	PORT_DIPSETTING(    0x12, "10k 110k 100k+" )
-	PORT_DIPSETTING(    0x32, "20k 120k 100k+" )
-	PORT_DIPSETTING(    0x52, "30k 130k 100k+" )
-	PORT_DIPSETTING(    0x72, "40k 140k 100k+" )
-	PORT_DIPSETTING(    0x92, "50k 150k 100k+" )
-	PORT_DIPSETTING(    0xb2, "60k 160k 100k+" )
-	PORT_DIPSETTING(    0xd2, "70k 170k 100k+" )
-	PORT_DIPSETTING(    0x00, "10k 40k" )
-	PORT_DIPSETTING(    0x20, "20k 50k" )
-	PORT_DIPSETTING(    0x40, "30k 60k" )
-	PORT_DIPSETTING(    0x60, "40k 70k" )
-	PORT_DIPSETTING(    0x80, "50k 80k" )
-	PORT_DIPSETTING(    0xa0, "60k 90k" )
-	PORT_DIPSETTING(    0xc0, "70k 100k" )
-	PORT_DIPSETTING(    0x01, "10k 50k" )
-	PORT_DIPSETTING(    0x21, "20k 60k" )
-	PORT_DIPSETTING(    0x41, "30k 70k" )
-	PORT_DIPSETTING(    0x61, "40k 80k" )
-	PORT_DIPSETTING(    0x81, "50k 80k" )
-	PORT_DIPSETTING(    0xa1, "60k 100k" )
-	PORT_DIPSETTING(    0xc1, "70k 100k" )
-	PORT_DIPSETTING(    0x02, "10k 110k" )
-	PORT_DIPSETTING(    0x22, "20k 120k" )
-	PORT_DIPSETTING(    0x42, "30k 130k" )
-	PORT_DIPSETTING(    0x62, "40k 140k" )
-	PORT_DIPSETTING(    0x82, "50k 150k" )
-	PORT_DIPSETTING(    0xa2, "60k 160k" )
-	PORT_DIPSETTING(    0xc2, "70k 170k" )
-//  PORT_DIPSETTING(    0x13, "10k" )                       /* duplicated setting */
-//  PORT_DIPSETTING(    0x33, "20k" )                       /* duplicated setting */
-//  PORT_DIPSETTING(    0x53, "30k" )                       /* duplicated setting */
-//  PORT_DIPSETTING(    0x73, "40k" )                       /* duplicated setting */
-//  PORT_DIPSETTING(    0x93, "50k" )                       /* duplicated setting */
-//  PORT_DIPSETTING(    0xb3, "60k" )                       /* duplicated setting */
-//  PORT_DIPSETTING(    0xd3, "70k" )                       /* duplicated setting */
-	PORT_DIPSETTING(    0x03, "10k" )
-	PORT_DIPSETTING(    0x23, "20k" )
-	PORT_DIPSETTING(    0x43, "30k" )
-	PORT_DIPSETTING(    0x63, "40k" )
-	PORT_DIPSETTING(    0x83, "50k" )
-	PORT_DIPSETTING(    0xa3, "60k" )
-	PORT_DIPSETTING(    0xc3, "70k" )
-//  PORT_DIPSETTING(    0xf0, DEF_STR( None ) )             /* duplicated setting */
-//  PORT_DIPSETTING(    0xf1, DEF_STR( None ) )             /* duplicated setting */
-//  PORT_DIPSETTING(    0xf2, DEF_STR( None ) )             /* duplicated setting */
-//  PORT_DIPSETTING(    0xf3, DEF_STR( None ) )             /* duplicated setting */
-//  PORT_DIPSETTING(    0xe1, DEF_STR( None ) )             /* duplicated setting */
-//  PORT_DIPSETTING(    0xe2, DEF_STR( None ) )             /* duplicated setting */
-//  PORT_DIPSETTING(    0xe3, DEF_STR( None ) )             /* duplicated setting */
-	PORT_DIPSETTING(    0xe0, DEF_STR( None ) )
+	PORT_DIPNAME( 0x80, 0x00, "Additional Bonus (2nd Bonus Value)" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static const gfx_layout char_layout =
@@ -339,11 +272,11 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mnchmobl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3750000) /* ? */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) /* ? */
 	MDRV_CPU_PROGRAM_MAP(mnchmobl_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(mnchmobl_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3750000) /* ? */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_15MHz/4) /* ? */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_assert)
 
@@ -364,11 +297,12 @@ static MACHINE_DRIVER_START( mnchmobl )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+        
+        /* AY clock speeds confirmed to match known recording */
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_15MHz/4/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_15MHz/4/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
