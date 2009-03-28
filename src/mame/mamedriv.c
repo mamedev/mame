@@ -7904,12 +7904,17 @@ Other Sun games
   	DRIVER( kov2p )		/* (c) 2000 */
   	DRIVER( kov2p205 )	/* (c) 2000 */
 	DRIVER( ddp2 )		/* (c) 2001 */
+	DRIVER( ddp2a )		/* (c) 2001 */
 	DRIVER( puzzli2 )	/* (c) 2001 */
 	DRIVER( martmast )	/* (c) 2001 */
 	DRIVER( martmasc )	/* (c) 2001 */
 	DRIVER( theglad )	/* (c) 2001 */
 	DRIVER( dmnfrnt )	/* (c) 2002 */
 	DRIVER( dmnfrnta )	/* (c) 2002 */
+	DRIVER( kovh )
+	DRIVER( oldss )
+	DRIVER( killbldp )
+	DRIVER( svg )
 
 	/* RamTek games */
 	DRIVER( hitme )		/* (c) 1976 Ramtek */
