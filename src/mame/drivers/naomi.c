@@ -50,8 +50,8 @@ Current Compatibility notes (GD-rom games only)
 |slashout  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | Needs to map the extra button                       |
 |spkrbtl   |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons        | Crashes when loading the gameplay                   |
 |monkeyba  |   1   |  H  | Yes  | Yes  | No   | ad stick                       | Crashes when loading the gameplay                   |
-|dygolf    |   2   |  H  | No   | No   | No   | ad stick + ? buttons           | Moans about the ad stick                            |
-|wsbbgd    |   2   |  H  | No   | No   | No   | ad stick + ? buttons           | Moans about the ad stick                            |
+|dygolf    |   2   |  H  | No   | No   | No   | trackball + 4 buttons          | Moans about the jvs settings                        |
+|wsbbgd    |   2   |  H  | No   | No   | No   | ad stick + 2 buttons           | Moans about the jvs settings                        |
 |vtennisg  |   2   |  H  | Yes  | Yes  | No   | joystick with 2 buttons        | Broken gfxs, crashes after a while                  |
 |vathlete  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |vtennis2  |   2   |  H  | No   | No   | No   | joystick with 3 buttons        |                                                     |
