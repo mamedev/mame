@@ -65,15 +65,14 @@ UINT16 *hyprduel_tiletable;
 size_t hyprduel_tiletable_size;
 UINT16 *hyprduel_vram_0,*hyprduel_vram_1,*hyprduel_vram_2;
 UINT16 *hyprduel_window;
+UINT16 *hyprduel_scroll;
 
-static UINT16 hyprduel_scrollx[3][RASTER_LINES+1];
-static UINT16 hyprduel_scrolly[3][RASTER_LINES+1];
-static UINT16 *hypr_tiletable_old;
+static UINT16 *hyprduel_tiletable_old;
 static UINT8 *dirtyindex;
 
 static int hyprduel_sprite_xoffs;
 static int hyprduel_sprite_yoffs;
-static int hyprduel_sprite_yoffs_magerror;
+static int hyprduel_sprite_yoffs_sub;
 
 /***************************************************************************
                             Palette GGGGGRRRRRBBBBBx
@@ -82,8 +81,7 @@ static int hyprduel_sprite_yoffs_magerror;
 WRITE16_HANDLER( hyprduel_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
-	/* We need the ^0xff because we had to invert the pens in the gfx */
-	palette_set_color_rgb(space->machine,offset^0xff,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	palette_set_color_rgb(space->machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 
@@ -125,7 +123,6 @@ static UINT8 *empty_tiles;
 
 
 /* 8x8x4 tiles only */
-#ifdef UNUSED_FUNCTION
 INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
 {
 	UINT16 code;
@@ -148,17 +145,20 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 	{
 		int _code = code & 0x000f;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->palette_base = ((code & 0x0ff0) ^ 0x0f0) + 0x1000;
+		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo->flags = 0;
+		tileinfo->group = 0;
 	}
 	else
+	{
+		tileinfo->group = 0;
 		SET_TILE_INFO(
 				0,
 				(tile & 0xfffff) + (code & 0xf),
-				(((tile & 0x0ff00000) >> 20) ^ 0x0f) + 0x100,
+				(((tile & 0x0ff00000) >> 20)) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+	}
 }
-#endif
 
 /* 8x8x4 or 8x8x8 tiles. It's the tile's color that decides: if its low 4
    bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
@@ -184,26 +184,32 @@ INLINE void get_tile_info_8bit(running_machine *machine,tile_data *tileinfo,int 
 	{
 		int _code = code & 0x000f;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->palette_base = ((code & 0x0ff0) ^ 0x0f0) + 0x1000;
+		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo->flags = 0;
+		tileinfo->group = 0;
 	}
 	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
+	{
+		tileinfo->group = 1;
 		SET_TILE_INFO(
 				1,
 				(tile & 0xfffff) + 2*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+	}
 	else
+	{
+		tileinfo->group = 0;
 		SET_TILE_INFO(
 				0,
 				(tile & 0xfffff) + (code & 0xf),
-				(((tile & 0x0ff00000) >> 20) ^ 0x0f) + 0x100,
+				(((tile & 0x0ff00000) >> 20)) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+	}
 }
 
 /* 16x16x4 or 16x16x8 tiles. It's the tile's color that decides: if its low 4
    bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-#ifdef UNUSED_FUNCTION
 INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
 {
 	UINT16 code;
@@ -226,28 +232,34 @@ INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinf
 	{
 		int _code = code & 0x000f;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->palette_base = ((code & 0x0ff0) ^ 0x0f0) + 0x1000;
+		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo->flags = 0;
+		tileinfo->group = 0;
 	}
 	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
+	{
+		tileinfo->group = 1;
 		SET_TILE_INFO(
 				3,
 				(tile & 0xfffff) + 8*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+	}
 	else
+	{
+		tileinfo->group = 0;
 		SET_TILE_INFO(
 				2,
 				(tile & 0xfffff) + 4*(code & 0xf),
-				(((tile & 0x0ff00000) >> 20) ^ 0x0f) + 0x100,
+				(((tile & 0x0ff00000) >> 20)) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+
+	}
 }
-#endif
 
 INLINE void hyprduel_vram_w(offs_t offset,UINT16 data,UINT16 mem_mask,int layer,UINT16 *vram)
 {
 	COMBINE_DATA(&vram[offset]);
-
 	{
 		/* Account for the window */
 		int col		=	(offset % BIG_NX) - ((hyprduel_window[layer * 2 + 1] / 8) % BIG_NX);
@@ -285,7 +297,6 @@ WRITE16_HANDLER( hyprduel_window_w )
 	}
 }
 
-
 /***************************************************************************
                             Video Init Routines
 ***************************************************************************/
@@ -306,42 +317,60 @@ static void alloc_empty_tiles(void)
 
 	for (code = 0;code < 0x10;code++)
 		for (i = 0;i < 16*16;i++)
-			empty_tiles[16*16*code + i] = code ^ 0x0f;
+			empty_tiles[16*16*code + i] = code;
 }
+
+
+static STATE_POSTLOAD( hyprduel_postload )
+{
+	int i;
+
+	for (i=0; i<3; i++)
+	{
+		UINT16 wx = hyprduel_window[i * 2 + 1];
+		UINT16 wy = hyprduel_window[i * 2 + 0];
+
+		tilemap_set_scrollx(bg_tilemap[i], 0, hyprduel_scroll[i * 2 + 1] - wx - (wx & 7));
+		tilemap_set_scrolly(bg_tilemap[i], 0, hyprduel_scroll[i * 2 + 0] - wy - (wy & 7));
+
+		tilemap_mark_all_tiles_dirty(bg_tilemap[i]);
+	}
+}
+
 
 VIDEO_START( hyprduel_14220 )
 {
 	alloc_empty_tiles();
-	hypr_tiletable_old = auto_malloc(hyprduel_tiletable_size);
+	hyprduel_tiletable_old = auto_malloc(hyprduel_tiletable_size);
 	dirtyindex = auto_malloc(hyprduel_tiletable_size/4);
 
 	bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
 	bg_tilemap[2] = tilemap_create(machine, get_tile_info_2_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
 
-	tilemap_set_transparent_pen(bg_tilemap[0],0);
-	tilemap_set_transparent_pen(bg_tilemap[1],0);
-	tilemap_set_transparent_pen(bg_tilemap[2],0);
+    tilemap_map_pen_to_layer(bg_tilemap[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(bg_tilemap[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(bg_tilemap[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
 	tilemap_set_scrolldx(bg_tilemap[0], 0, 0);
 	tilemap_set_scrolldx(bg_tilemap[1], 0, 0);
 	tilemap_set_scrolldx(bg_tilemap[2], 0, 0);
 
 	if (!strcmp(machine->gamedrv->name, "magerror"))
-		hyprduel_sprite_yoffs_magerror = 2;
+		hyprduel_sprite_yoffs_sub = 0;
 	else
-		hyprduel_sprite_yoffs_magerror = 0;
+		hyprduel_sprite_yoffs_sub = 2;
 
 	/* Set up save state */
-	state_save_register_global_array(machine, hyprduel_scrollx[0]);
-	state_save_register_global_array(machine, hyprduel_scrollx[1]);
-	state_save_register_global_array(machine, hyprduel_scrollx[2]);
-	state_save_register_global_array(machine, hyprduel_scrolly[0]);
-	state_save_register_global_array(machine, hyprduel_scrolly[1]);
-	state_save_register_global_array(machine, hyprduel_scrolly[2]);
 	state_save_register_global(machine, hyprduel_sprite_xoffs);
 	state_save_register_global(machine, hyprduel_sprite_yoffs);
-	state_save_register_global(machine, hyprduel_sprite_yoffs_magerror);
+	state_save_register_global(machine, hyprduel_sprite_yoffs_sub);
+	state_save_register_postload(machine, hyprduel_postload, NULL);
 }
 
 /***************************************************************************
@@ -373,35 +402,6 @@ VIDEO_START( hyprduel_14220 )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( hypr_scrollreg_w )
-{
-	int i;
-
-	if (offset & 0x01)
-	{
-		for (i = rastersplit; i < RASTER_LINES; i++)
-			hyprduel_scrollx[offset>>1][i] = data;
-	} else {
-		for (i = rastersplit; i < RASTER_LINES; i++)
-			hyprduel_scrolly[offset>>1][i] = data;
-	}
-}
-
-WRITE16_HANDLER( hypr_scrollreg_init_w )
-{
-	int i;
-
-	for (i = 0; i < RASTER_LINES; i++)
-	{
-		hyprduel_scrollx[0][i] = data;
-		hyprduel_scrollx[1][i] = data;
-		hyprduel_scrollx[2][i] = data;
-		hyprduel_scrolly[0][i] = data;
-		hyprduel_scrolly[1][i] = data;
-		hyprduel_scrolly[2][i] = data;
-	}
-}
-
 /***************************************************************************
 
                                 Sprites Drawing
@@ -430,12 +430,10 @@ WRITE16_HANDLER( hypr_scrollreg_init_w )
 
 /* Draw sprites */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const char * region		=	"gfx1";
-
-	UINT8 *base_gfx	=	memory_region(machine, region);
-	UINT8 *gfx_max	=	base_gfx + memory_region_length(machine, region);
+	UINT8 *base_gfx	=	memory_region(machine, "gfx1");
+	UINT8 *gfx_max	=	base_gfx + memory_region_length(machine, "gfx1");
 
 	int max_x = video_screen_get_width(machine->primary_screen);
 	int max_y = video_screen_get_height(machine->primary_screen);
@@ -445,18 +443,31 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	int color_start			=	((hyprduel_videoregs[0x08/2] & 0xf) << 4 ) + 0x100;
 
-	int i, pri;
+	int i, j, pri;
 	static const int primask[4] = { 0x0000, 0xff00, 0xff00|0xf0f0, 0xff00|0xf0f0|0xcccc };
+
+	UINT16 *src;
+	int inc;
+
+	if (sprites == 0)
+		return;
 
 	for (i=0; i<0x20; i++)
 	{
-		UINT16 *src			=	spriteram16 + (sprites - 1) * (8/2);
-		UINT16 *end			=	spriteram16;
+		gfx_element gfx;
 
-		for ( ; src >= end; src -= 8/2 )
+		if (!(hyprduel_videoregs[0x02/2] & 0x8000))
+		{
+			src = spriteram16 + (sprites - 1) * (8/2);
+			inc = -(8/2);
+		} else {
+			src = spriteram16;
+			inc = (8/2);
+		}
+
+		for (j=0; j<sprites; j++)
 		{
 			int x,y, attr,code,color,flipx,flipy, zoom, curr_pri,width,height;
-			gfx_element gfx;
 			UINT8 *gfxdata;
 
 			/* Exponential zoom table extracted from daitoride */
@@ -472,7 +483,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			x					=	src[ 0 ];
 			curr_pri			=	(x & 0xf800) >> 11;
-			if ((curr_pri == 0x1f) || (curr_pri != i)) continue;
+
+			if ((curr_pri == 0x1f) || (curr_pri != i))
+			{
+				src += inc;
+				continue;
+			}
 
 			pri = (hyprduel_videoregs[0x02/2] & 0x0300) >> 8;
 
@@ -493,7 +509,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			zoom				=	zoomtable[(y & 0xfc00) >> 10] << (16-8);
 
 			x					=	(x & 0x07ff) - hyprduel_sprite_xoffs;
-			y					=	(y & 0x03ff) - hyprduel_sprite_yoffs +2;
+			y					=	(y & 0x03ff) - hyprduel_sprite_yoffs;
 
 			width				= (( (attr >> 11) & 0x7 ) + 1 ) * 8;
 			height				= (( (attr >>  8) & 0x7 ) + 1 ) * 8;
@@ -519,7 +535,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 								color_start >> 4,
 								flipx, flipy,
 								x, y,
-								cliprect, TRANSPARENCY_PEN, 0,
+								cliprect, TRANSPARENCY_PEN, 255,
 								zoom, zoom,
 								primask[pri]);
 			}
@@ -533,10 +549,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				pdrawgfxzoom(	bitmap,&gfx,
 								0,
-								(color ^ 0x0f) + color_start,
+								color + color_start,
 								flipx, flipy,
 								x, y,
-								cliprect, TRANSPARENCY_PEN, 0,
+								cliprect, TRANSPARENCY_PEN, 15,
 								zoom, zoom,
 								primask[pri]);
 			}
@@ -547,53 +563,60 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	ui_draw_text(buf, x, y);
 }
 #endif
+			src += inc;
 		}
 	}
 }
-
 
 /***************************************************************************
                                 Screen Drawing
 ***************************************************************************/
 
-/* Draw all the layers that match the given priority */
+WRITE16_HANDLER( hyprduel_scrollreg_w )
+{
+	UINT16 window = hyprduel_window[offset];
+
+	COMBINE_DATA(&hyprduel_scroll[offset]);
+
+	if (offset & 0x01)
+		tilemap_set_scrollx(bg_tilemap[offset / 2], 0, hyprduel_scroll[offset] - window - (window & 7));
+	else
+		tilemap_set_scrolly(bg_tilemap[offset / 2], 0, hyprduel_scroll[offset] - window - (window & 7));
+}
+
+WRITE16_HANDLER( hyprduel_scrollreg_init_w )
+{
+	int i;
+
+	for (i=0; i<3; i++)
+	{
+		UINT16 wx = hyprduel_window[i * 2 + 1];
+		UINT16 wy = hyprduel_window[i * 2 + 0];
+
+		hyprduel_scroll[i * 2 + 1] = data;
+		hyprduel_scroll[i * 2 + 0] = data;
+
+		tilemap_set_scrollx(bg_tilemap[i], 0, data - wx - (wx & 7));
+		tilemap_set_scrolly(bg_tilemap[i], 0, data - wy - (wy & 7));
+	}
+}
+
+
 static void draw_layers(bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
 {
 	UINT16 layers_pri = hyprduel_videoregs[0x10/2];
 	int layer;
-	int offs;
-	rectangle clip;
-
-	clip.min_x = 0;
-	clip.max_x = 319;
 
 	/* Draw all the layers with priority == pri */
 	for (layer = 2; layer >= 0; layer--)	// tilemap[2] below?
 	{
 		if ( pri == ((layers_pri >> (layer*2)) & 3) )
 		{
-			/* Scroll and Window values */
-			UINT16 wx = hyprduel_window[layer * 2 + 1];
-			UINT16 wy = hyprduel_window[layer * 2 + 0];
-			wx = wx - (wx & 7);
-			wy = wy - (wy & 7);
-
-			if (layers_ctrl & (1<<layer))
-			{
-				for (offs = cliprect->min_y; offs <= cliprect->max_y; offs++)
-				{
-					clip.min_y = offs;
-					clip.max_y = offs;
-
-					tilemap_set_scrollx(bg_tilemap[layer], 0, hyprduel_scrollx[layer][offs+RASTER_LINES-(LAST_VISIBLE_LINE+1)] - wx);
-					tilemap_set_scrolly(bg_tilemap[layer], 0, hyprduel_scrolly[layer][offs+RASTER_LINES-(LAST_VISIBLE_LINE+1)] - wy);
-					tilemap_draw(bitmap,&clip,bg_tilemap[layer], 0, 1<<(3-pri));
-				}
-			}
+			if (layers_ctrl & (1<<layer))	// for debug
+				tilemap_draw(bitmap,cliprect,bg_tilemap[layer], 0, 1<<(3-pri));
 		}
 	}
 }
-
 
 /* Dirty tilemaps when the tiles set changes */
 static void dirty_tiles(int layer,UINT16 *vram)
@@ -627,7 +650,7 @@ VIDEO_UPDATE( hyprduel )
 		for (i = 0;i < hyprduel_tiletable_size/4;i++)
 		{
 			UINT32 tile_new = (hyprduel_tiletable[2*i + 0] << 16 ) + hyprduel_tiletable[2*i + 1];
-			UINT32 tile_old = (hypr_tiletable_old[2*i + 0] << 16 ) + hypr_tiletable_old[2*i + 1];
+			UINT32 tile_old = (hyprduel_tiletable_old[2*i + 0] << 16 ) + hyprduel_tiletable_old[2*i + 1];
 
 			if ((tile_new ^ tile_old) & 0x0fffffff)
 			{
@@ -635,7 +658,7 @@ VIDEO_UPDATE( hyprduel )
 				dirty = 1;
 			}
 		}
-		memcpy(hypr_tiletable_old,hyprduel_tiletable,hyprduel_tiletable_size);
+		memcpy(hyprduel_tiletable_old,hyprduel_tiletable,hyprduel_tiletable_size);
 
 		if (dirty)
 		{
@@ -646,11 +669,11 @@ VIDEO_UPDATE( hyprduel )
 	}
 
 	hyprduel_sprite_xoffs	=	hyprduel_videoregs[0x06/2] - video_screen_get_width(screen)  / 2;
-	hyprduel_sprite_yoffs	=	hyprduel_videoregs[0x04/2] - video_screen_get_height(screen) / 2 + hyprduel_sprite_yoffs_magerror;
+	hyprduel_sprite_yoffs	=	hyprduel_videoregs[0x04/2] - video_screen_get_height(screen) / 2 - hyprduel_sprite_yoffs_sub;
 
 	/* The background color is selected by a register */
 	bitmap_fill(priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,((hyprduel_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000);
+	bitmap_fill(bitmap,cliprect,((hyprduel_videoregs[0x12/2] & 0x0fff)) + 0x1000);
 
 	/*  Screen Control Register:
 
@@ -665,10 +688,6 @@ VIDEO_UPDATE( hyprduel )
         ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)	return 0;
 	flip_screen_set(screen->machine, screenctrl & 1);
-
-	/* If the game supports 16x16 tiles, make sure that the
-       16x16 and 8x8 tilemaps of a given layer are not simultaneously
-       enabled! */
 
 #if 0
 if (input_code_pressed(KEYCODE_Z))
@@ -692,5 +711,6 @@ if (input_code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl & 0x08)
 		draw_sprites(screen->machine,bitmap,cliprect);
+
 	return 0;
 }

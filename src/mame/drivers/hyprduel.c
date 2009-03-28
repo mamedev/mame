@@ -23,7 +23,7 @@ Imagetek Inc 14220 071
 
 --
 Written by Hau
-03/27/2009
+03/28/2009
 based on driver from drivers/metro.c by Luca Elia
 spthx to kikur,Cha,teioh,kokkyu,teruchu,aya,sgo
 ---
@@ -43,7 +43,6 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
 #include "includes/hyprduel.h"
 
 
-int rastersplit;
 static int blitter_bit;
 static int requested_int;
 static UINT16 *hypr_irq_enable;
@@ -81,10 +80,8 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 		cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
 		/* the duration is a guess */
 		timer_set(device->machine, ATTOTIME_IN_USEC(2500), NULL, 0x20, vblank_end_callback);
-		rastersplit = 0;
 	} else {
 		requested_int |= 0x12;		/* hsync */
-		rastersplit = line + 1;
 	}
 
 	update_irq_state(device->machine);
@@ -165,14 +162,12 @@ static UINT16 *hyprduel_rombank;
 
 static READ16_HANDLER( hyprduel_bankedrom_r )
 {
-	const char *region = "gfx1";
-
-	UINT8 *ROM = memory_region( space->machine, region );
-	size_t  len  = memory_region_length( space->machine, region );
+	UINT8 *ROM = memory_region( space->machine, "gfx1" );
+	size_t  len  = memory_region_length( space->machine, "gfx1" );
 
 	offset = offset * 2 + 0x10000 * (*hyprduel_rombank);
 
-	if ( offset < len )	return ((ROM[offset+0]<<8)+ROM[offset+1])^0xffff;
+	if ( offset < len )	return ((ROM[offset+0]<<8)+ROM[offset+1]);
 	else				return 0xffff;
 }
 
@@ -230,7 +225,7 @@ static TIMER_CALLBACK( hyprduel_blit_done )
 
 INLINE int blt_read(const UINT8 *ROM, const int offs)
 {
-	return ROM[offs] ^ 0xff;
+	return ROM[offs];
 }
 
 INLINE void blt_write(const address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
@@ -251,10 +246,8 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 	if (offset == 0xC/2)
 	{
-		const char *region = "gfx1";
-
-		UINT8 *src	=	memory_region(space->machine, region);
-		size_t  src_len	=	memory_region_length(space->machine, region);
+		UINT8 *src	=	memory_region(space->machine, "gfx1");
+		size_t  src_len	=	memory_region_length(space->machine, "gfx1");
 
 		UINT32 tmap		=	(hyprduel_blitter_regs[ 0x00 / 2 ] << 16 ) +
 							 hyprduel_blitter_regs[ 0x02 / 2 ];
@@ -264,7 +257,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 							 hyprduel_blitter_regs[ 0x0a / 2 ];
 
 		int shift			=	(dst_offs & 0x80) ? 0 : 8;
-		UINT16 mask		=	(dst_offs & 0x80) ? 0xff00 : 0x00ff;
+		UINT16 mask		=	(dst_offs & 0x80) ? 0x00ff : 0xff00;
 
 //      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",cpu_get_pc(space->cpu),tmap,src_offs,dst_offs);
 
@@ -395,8 +388,8 @@ static ADDRESS_MAP_START( hyprduel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_BASE(&hyprduel_tiletable) AM_SIZE(&hyprduel_tiletable_size)	/* Tiles Set */
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(hyprduel_blitter_w) AM_BASE(&hyprduel_blitter_regs)	/* Tiles Blitter */
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(hyprduel_window_w) AM_BASE(&hyprduel_window)			/* Tilemap Window */
-	AM_RANGE(0x478870, 0x47887b) AM_WRITE(hypr_scrollreg_w)			/* Scroll Regs */
-	AM_RANGE(0x47887c, 0x47887d) AM_WRITE(hypr_scrollreg_init_w)
+	AM_RANGE(0x478870, 0x47887b) AM_RAM_WRITE(hyprduel_scrollreg_w) AM_BASE(&hyprduel_scroll)		/* Scroll Regs */
+	AM_RANGE(0x47887c, 0x47887d) AM_WRITE(hyprduel_scrollreg_init_w)
 	AM_RANGE(0x478880, 0x478881) AM_WRITENOP
 	AM_RANGE(0x478890, 0x478891) AM_WRITENOP
 	AM_RANGE(0x4788a0, 0x4788a1) AM_WRITENOP
@@ -442,8 +435,8 @@ static ADDRESS_MAP_START( magerror_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_BASE(&hyprduel_tiletable) AM_SIZE(&hyprduel_tiletable_size)	/* Tiles Set */
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(hyprduel_blitter_w) AM_BASE(&hyprduel_blitter_regs)	/* Tiles Blitter */
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(hyprduel_window_w) AM_BASE(&hyprduel_window)			/* Tilemap Window */
-	AM_RANGE(0x878870, 0x87887b) AM_WRITE(hypr_scrollreg_w)		/* Scroll Regs */
-	AM_RANGE(0x87887c, 0x87887d) AM_WRITE(hypr_scrollreg_init_w)
+	AM_RANGE(0x878870, 0x87887b) AM_RAM_WRITE(hyprduel_scrollreg_w) AM_BASE(&hyprduel_scroll)		/* Scroll Regs */
+	AM_RANGE(0x87887c, 0x87887d) AM_WRITE(hyprduel_scrollreg_init_w)
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP
 	AM_RANGE(0x8788a0, 0x8788a1) AM_WRITENOP
@@ -598,11 +591,15 @@ static MACHINE_RESET( hyprduel )
 	/* start with cpu2 halted */
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	subcpu_resetline = 1;
+
+	requested_int = 0x00;
+	blitter_bit = 2;
+	*hypr_irq_enable = 0xff;
 }
 
 static MACHINE_START( magerror )
 {
-	timer_adjust_periodic(magerror_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(896));		/* ? */
+	timer_adjust_periodic(magerror_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(968));		/* ? */
 }
 
 static MACHINE_DRIVER_START( hyprduel )
@@ -618,6 +615,8 @@ static MACHINE_DRIVER_START( hyprduel )
 	MDRV_MACHINE_RESET(hyprduel)
 
 	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -660,6 +659,8 @@ static MACHINE_DRIVER_START( magerror )
 	MDRV_MACHINE_RESET(hyprduel)
 
 	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -738,28 +739,11 @@ ROM_END
 
 static DRIVER_INIT( hyprduel )
 {
-	int i, len = memory_region_length(machine, "gfx1");
-	UINT8 *ROM = memory_region(machine, "gfx1");
-
-	/*
-      Tiles can be either 4-bit or 8-bit, and both depths can be used at the same
-      time. The transparent pen is the last one, that is 15 or 255. To make
-      tilemap.c handle that, we invert gfx data so the transparent pen becomes 0
-      for both tile depths.
-    */
-	for (i=0; i<len; i++)
-		ROM[i] ^= 0xff;
-
-	requested_int = 0x00;
-	blitter_bit = 2;
-	*hypr_irq_enable = 0xff;
-
 	int_num = 0x02;
 
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc0040b, 0, 0, hypr_cpusync_r);
 
 	/* Set up save state */
-	state_save_register_global(machine, rastersplit);
 	state_save_register_global(machine, blitter_bit);
 	state_save_register_global(machine, requested_int);
 	state_save_register_global(machine, subcpu_resetline);
