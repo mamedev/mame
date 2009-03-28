@@ -85,6 +85,12 @@ enum
 	VIDEO_ITEM_VIEW
 };
 
+enum
+{
+	CROSSHAIR_ITEM_VIS = 0,
+	CROSSHAIR_ITEM_PIC,
+	CROSSHAIR_ITEM_AUTO_TIME
+};
 
 
 /***************************************************************************
@@ -203,6 +209,20 @@ struct _select_game_state
 };
 
 
+/* internal crosshair menu item data */
+typedef struct _crosshair_item_data crosshair_item_data;
+struct _crosshair_item_data
+{
+	UINT8				type;
+	UINT8				player;
+	UINT8				min, max;
+	UINT8				cur;
+	UINT8				defvalue;
+	char				last_name[CROSSHAIR_PIC_NAME_LENGTH + 1];
+	char				next_name[CROSSHAIR_PIC_NAME_LENGTH + 1];
+};
+
+
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -281,6 +301,8 @@ static void menu_video_targets(running_machine *machine, ui_menu *menu, void *pa
 static void menu_video_targets_populate(running_machine *machine, ui_menu *menu);
 static void menu_video_options(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 static void menu_video_options_populate(running_machine *machine, ui_menu *menu, render_target *target);
+static void menu_crosshair(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+static void menu_crosshair_populate(running_machine *machine, ui_menu *menu);
 static void menu_quit_game(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 static void menu_select_game(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 static void menu_select_game_populate(running_machine *machine, ui_menu *menu, select_game_state *menustate);
@@ -1488,6 +1510,10 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 
 	/* add video options menu */
 	ui_menu_item_append(menu, "Video Options", NULL, 0, (render_target_get_indexed(1) != NULL) ? (void *)menu_video_targets : (void *)menu_video_options);
+
+	/* add crosshair options menu */
+	if (crosshair_get_usage(machine))
+		ui_menu_item_append(menu, "Crosshair Options", NULL, 0, menu_crosshair);
 
 	/* add cheat menu */
 	if (options_get_bool(mame_options(), OPTION_CHEAT) && cheat_get_next_menu_entry(machine, NULL, NULL, NULL, NULL) != NULL)
@@ -3026,6 +3052,271 @@ static void menu_video_options_populate(running_machine *machine, ui_menu *menu,
 	ui_menu_item_append(menu, "View", enabled ? "Cropped" : "Full", enabled ? MENU_FLAG_RIGHT_ARROW : MENU_FLAG_LEFT_ARROW, (void *)LAYER_CONFIG_ZOOM_TO_SCREEN);
 
 	astring_free(tempstring);
+}
+
+
+/*-------------------------------------------------
+    menu_crosshair - handle the crosshair settings
+    menu
+-------------------------------------------------*/
+
+static void menu_crosshair(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+{
+	const ui_menu_event *event;
+
+	/* if the menu isn't built, populate now */
+	if (!ui_menu_populated(menu))
+		menu_crosshair_populate(machine, menu);
+
+	/* process the menu */
+	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
+
+	/* handle events */
+	if (event != NULL && event->itemref != NULL)
+	{
+		crosshair_user_settings settings;
+		crosshair_item_data *data = event->itemref;
+		int changed = FALSE;
+		int set_def = FALSE;
+		int newval = data->cur;
+
+		/* retreive the user settings */
+		crosshair_get_user_settings(machine, data->player, &settings);
+
+		switch (event->iptkey)
+		{
+			/* if selected, reset to default value */
+			case IPT_UI_SELECT:
+				newval = data->defvalue;
+				set_def = TRUE;
+				break;
+
+			/* left decrements */
+			case IPT_UI_LEFT:
+				newval -= input_code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+				break;
+
+			/* right increments */
+			case IPT_UI_RIGHT:
+				newval += input_code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+				break;
+		}
+
+		/* clamp to range */
+		if (newval < data->min)
+			newval = data->min;
+		if (newval > data->max)
+			newval = data->max;
+
+		/* if things changed, update */
+		if (newval != data->cur)
+		{
+			switch (data->type)
+			{
+				/* visibility state */
+				case CROSSHAIR_ITEM_VIS:
+					settings.mode = newval;
+					changed = TRUE;
+					break;
+
+				/* auto time */
+				case CROSSHAIR_ITEM_AUTO_TIME:
+					settings.auto_time = newval;
+					changed = TRUE;
+					break;
+			}
+		}
+
+		/* crosshair graphic name */
+		if (data->type == CROSSHAIR_ITEM_PIC)
+		{
+			if (event->iptkey == IPT_UI_SELECT)
+			{
+				/* clear the name string to reset to default crosshair */
+				settings.name[0] = 0;
+				changed = TRUE;
+			}
+			else if (event->iptkey == IPT_UI_LEFT)
+			{
+				strcpy(settings.name, data->last_name);
+				changed = TRUE;
+			}
+			else if (event->iptkey == IPT_UI_RIGHT)
+			{
+				strcpy(settings.name, data->next_name);
+				changed = TRUE;
+			}
+		}
+
+		if (changed)
+		{
+			/* save the user settings */
+			crosshair_set_user_settings(machine, data->player, &settings);
+
+			/* rebuild the menu */
+			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    menu_crosshair_populate - populate the
+    crosshair settings menu
+-------------------------------------------------*/
+
+static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
+{
+	crosshair_user_settings settings;
+	crosshair_item_data *data;
+	char temp_text[16];
+	int player;
+	UINT8 use_auto = FALSE;
+	UINT32 flags = 0;
+	mame_path *path;
+
+	/* loop over player and add the manual items */
+	for (player = 0; player < MAX_PLAYERS; player++)
+	{
+		/* get the user settings */
+		crosshair_get_user_settings(machine, player, &settings);
+
+		/* add menu items for usable crosshairs */
+		if (settings.used)
+		{
+			/* Make sure to keep these matched to the CROSSHAIR_VISIBILITY_xxx types */
+			static const char *const vis_text[] = { "Off", "On", "Auto" };
+
+			/* track if we need the auto time menu */
+			if (settings.mode == CROSSHAIR_VISIBILITY_AUTO) use_auto = TRUE;
+
+			/* CROSSHAIR_ITEM_VIS - allocate a data item and fill it */
+			data = ui_menu_pool_alloc(menu, sizeof(*data));
+			data->type = CROSSHAIR_ITEM_VIS;
+			data->player = player;
+			data->min = CROSSHAIR_VISIBILITY_OFF;
+			data->max = CROSSHAIR_VISIBILITY_AUTO;
+			data->defvalue = CROSSHAIR_VISIBILITY_DEFAULT;
+			data->cur = settings.mode;
+
+			/* put on arrows */
+			if (data->cur > data->min)
+				flags |= MENU_FLAG_LEFT_ARROW;
+			if (data->cur < data->max)
+				flags |= MENU_FLAG_RIGHT_ARROW;
+
+			/* add CROSSHAIR_ITEM_VIS menu */
+			sprintf(temp_text, "P%d Visibility", player + 1);
+			ui_menu_item_append(menu, temp_text, vis_text[settings.mode], flags, data);
+
+			/* CROSSHAIR_ITEM_PIC - allocate a data item and fill it */
+			data = ui_menu_pool_alloc(menu, sizeof(*data));
+			data->type = CROSSHAIR_ITEM_PIC;
+			data->player = player;
+			data->last_name[0] = 0;
+			/* other data item not used by this menu */
+
+			/* search for crosshair graphics */
+
+			/* open a path to the crosshairs */
+			path = mame_openpath(mame_options(), OPTION_CRSSHAIRPATH);
+			if (path != NULL)
+			{
+				const osd_directory_entry *dir;
+
+				/* reset search flags */
+				int using_default = FALSE;
+				int finished = FALSE;
+				int found = FALSE;
+
+				/* if we are using the default, then we just need to find the first in the list */
+				if (strlen(settings.name) == 0)
+					using_default = TRUE;
+
+				/* look for the current name, then remember the name before */
+				/* and find the next name */
+				while (((dir = mame_readpath(path)) != NULL) && !finished)
+				{
+					int length = strlen(dir->name);
+
+					/* look for files ending in .png with a name not larger then 9 chars*/
+					if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) &&
+						tolower(dir->name[length - 4] == '.') &&
+						tolower(dir->name[length - 3] == 'p') &&
+						tolower(dir->name[length - 2] == 'n') &&
+						tolower(dir->name[length - 1] == 'g'))
+
+					{
+						/* remove .png from length */
+						length -= 4;
+
+						if (found || using_default)
+						{
+							/* get the next name */
+							strncpy(data->next_name, dir->name, length);
+							data->next_name[length] = 0;
+							finished = TRUE;
+						}
+						else if (!strncmp(dir->name, settings.name, length))
+						{
+							/* we found the current name */
+							/* so loop once more to find the next name */
+							found = TRUE;
+						}
+						else
+							/* remember last name */
+							/* we will do it here in case files get added to the directory */
+						{
+							strncpy(data->last_name, dir->name, length);
+							data->last_name[length] = 0;
+						}
+					}
+				}
+				/* if name not found then next item is DEFAULT */
+				if (!found && !using_default)
+				{
+					data->next_name[0] = 0;
+					finished = TRUE;
+				}
+				/* setup the selection flags */
+				flags = 0;
+				if (finished)
+					flags |= MENU_FLAG_RIGHT_ARROW;
+				if (found)
+					flags |= MENU_FLAG_LEFT_ARROW;
+
+				/* add CROSSHAIR_ITEM_PIC menu */
+				sprintf(temp_text, "P%d Crosshair", player + 1);
+				ui_menu_item_append(menu, temp_text, using_default ? "DEFAULT" : settings.name, flags, data);
+			}
+		}
+	}
+	if (use_auto)
+	{
+		/* any player can be used to get the autotime */
+		crosshair_get_user_settings(machine, 0, &settings);
+
+		/* CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it */
+		data = ui_menu_pool_alloc(menu, sizeof(*data));
+		data->type = CROSSHAIR_ITEM_AUTO_TIME;
+		data->min = CROSSHAIR_VISIBILITY_AUTOTIME_MIN;
+		data->max = CROSSHAIR_VISIBILITY_AUTOTIME_MAX;
+		data->defvalue = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
+		data->cur = settings.auto_time;
+
+		/* put on arrows in visible menu */
+		if (data->cur > data->min)
+			flags |= MENU_FLAG_LEFT_ARROW;
+		if (data->cur < data->max)
+			flags |= MENU_FLAG_RIGHT_ARROW;
+
+		/* add CROSSHAIR_ITEM_AUTO_TIME menu */
+		sprintf(temp_text, "%d", settings.auto_time);
+		ui_menu_item_append(menu, "Visible Delay", temp_text, flags, data);
+	}
+//	else
+//		/* leave a blank filler line when not in auto time so size does not rescale */
+//		ui_menu_item_append(menu, "", "", NULL, NULL);
 }
 
 

@@ -43,6 +43,7 @@ const options_entry mame_core_options[] =
 	{ "inipath",                     ".;ini",     0,                 "path to ini files" },
 	{ "fontpath",                    ".",         0,                 "path to font files" },
 	{ "cheatpath",                   "cheat",     0,                 "path to cheat files" },
+	{ "crsshairpath",                "crsshair",  0,                 "path to crosshair files" },
 
 	/* output directory options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE OUTPUT DIRECTORY OPTIONS" },

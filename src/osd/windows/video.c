@@ -450,7 +450,7 @@ static void load_effect_overlay(running_machine *machine, const char *filename)
 	strcpy(dest, ".png");
 
 	// load the file
-	effect_bitmap = render_load_png(NULL, tempstr, NULL, NULL);
+	effect_bitmap = render_load_png(OPTION_ARTPATH, NULL, tempstr, NULL, NULL);
 	if (effect_bitmap == NULL)
 	{
 		mame_printf_error("Unable to load PNG file '%s'\n", tempstr);

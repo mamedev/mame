@@ -38,23 +38,6 @@
 
 enum
 {
-	INPUT_TYPE_DIGITAL = 0,
-	INPUT_TYPE_ANALOG = 1,
-	INPUT_TYPE_ANALOG_DEC = 2,
-	INPUT_TYPE_ANALOG_INC = 3
-};
-
-enum
-{
-	ANALOG_ITEM_KEYSPEED = 0,
-	ANALOG_ITEM_CENTERSPEED,
-	ANALOG_ITEM_REVERSE,
-	ANALOG_ITEM_SENSITIVITY,
-	ANALOG_ITEM_COUNT
-};
-
-enum
-{
 	LOADSAVE_NONE,
 	LOADSAVE_LOAD,
 	LOADSAVE_SAVE
@@ -1275,10 +1258,6 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* toggle FPS display */
 	if (ui_input_pressed(machine, IPT_UI_SHOW_FPS))
 		ui_set_show_fps(!ui_get_show_fps());
-
-	/* toggle crosshair display */
-	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CROSSHAIR))
-		crosshair_toggle(machine);
 
 	/* increment frameskip? */
 	if (ui_input_pressed(machine, IPT_UI_FRAMESKIP_INC))

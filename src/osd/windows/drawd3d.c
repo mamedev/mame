@@ -506,11 +506,11 @@ static int drawd3d_window_init(win_window_info *window)
 
 	// experimental: load a PNG to use for vector rendering; it is treated
 	// as a brightness map
-	d3d->vector_bitmap = render_load_png(NULL, "vector.png", NULL, NULL);
+	d3d->vector_bitmap = render_load_png(OPTION_ARTPATH, NULL, "vector.png", NULL, NULL);
 	if (d3d->vector_bitmap != NULL)
 	{
 		bitmap_fill(d3d->vector_bitmap, NULL, MAKE_ARGB(0xff,0xff,0xff,0xff));
-		d3d->vector_bitmap = render_load_png(NULL, "vector.png", d3d->vector_bitmap, NULL);
+		d3d->vector_bitmap = render_load_png(OPTION_ARTPATH, NULL, "vector.png", d3d->vector_bitmap, NULL);
 	}
 
 	// configure the adapter for the mode we want

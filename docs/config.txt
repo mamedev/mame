@@ -64,9 +64,6 @@ P         Pauses the game.
 
 Shift+P   While paused, advances to next frame.
 
-F1        Toggle crosshairs for games that use them. Each subsequent
-          press will enable crosshairs for one more player.
-
 F2        Service Mode for games that support it.
 
 F3        Resets the game.
@@ -332,6 +329,15 @@ Core search path options
 	paths can be specified by separating them with semicolons. The default
 	is '.' (that is, search in the same directory as the MAME executable).
 
+-crsshairpath <path>
+
+	Specifies a list of paths within which to find crosshair files. Multiple
+	paths can be specified by separating them with semicolons. The default
+	is 'crsshair' (that is, a directory "crsshair" in the same directory as
+	the MAME executable).  If the Crosshair is set to default in the menu,
+	MAME will look for gamename\cross#.png and then cross#.png in the
+	specified crsshairpath, where # is the player number.  Failing that,
+	MAME will use built-in default crosshairs.
 
 
 Core Output Directory Options
@@ -467,17 +473,17 @@ Core state/playback options
 	and names the snapshots under it starting with 0000 and increasing
 	from there.
 
--snapsize <width>x<height> 
+-snapsize <width>x<height>
 
 	Hard-codes the size for snapshots and movie recording. By default,
 	MAME will create snapshots at the game's current resolution in raw
 	pixels, and will create movies at the game's starting resolution in
 	raw pixels. If you specify this option, then MAME will create both
 	snapshots and movies at the size specified, and will bilinear filter
-	the result. Note that this size does not automatically rotate if the 
+	the result. Note that this size does not automatically rotate if the
 	game is vertically oriented. The default is 'auto'.
 
--snapview <viewname> 
+-snapview <viewname>
 
 	Specifies the view to use when rendering snapshots and movies. By
 	default, both use a special 'internal' view, which renders a separate
@@ -486,8 +492,8 @@ Core state/playback options
 	select a single view that will apply to all snapshots and movies.
 	Note that <viewname> does not need to be a perfect match; rather, it
 	will select the first view whose name matches all the characters
-	specified by <viewname>. For example, -snapview native will match the 
-	"Native (15:14)" view even though it is not a perfect match. 
+	specified by <viewname>. For example, -snapview native will match the
+	"Native (15:14)" view even though it is not a perfect match.
 	<viewname> can also be 'auto', which selects the first view with all
 	screens present. The default value is 'internal'.
 
@@ -940,8 +946,8 @@ Debugging options
 
 -[no]debug
 
-	Activates the integrated debugger. By default, the debugger is entered 
-	by pressing the tilde (~) key during emulation. It is also entered 
+	Activates the integrated debugger. By default, the debugger is entered
+	by pressing the tilde (~) key during emulation. It is also entered
 	immediately at startup. The default is OFF (-nodebug).
 
 -debugscript <filename>

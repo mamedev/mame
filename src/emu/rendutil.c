@@ -559,7 +559,7 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
     bitmap_t
 -------------------------------------------------*/
 
-bitmap_t *render_load_png(const char *dirname, const char *filename, bitmap_t *alphadest, int *hasalpha)
+bitmap_t *render_load_png(const char *path, const char *dirname, const char *filename, bitmap_t *alphadest, int *hasalpha)
 {
 	bitmap_t *bitmap = NULL;
 	file_error filerr;
@@ -573,7 +573,7 @@ bitmap_t *render_load_png(const char *dirname, const char *filename, bitmap_t *a
 		fname = astring_dupc(filename);
 	else
 		fname = astring_assemble_3(astring_alloc(), dirname, PATH_SEPARATOR, filename);
-	filerr = mame_fopen(SEARCHPATH_ARTWORK, astring_c(fname), OPEN_FLAG_READ, &file);
+	filerr = mame_fopen(path, astring_c(fname), OPEN_FLAG_READ, &file);
 	astring_free(fname);
 	if (filerr != FILERR_NONE)
 		return NULL;

@@ -1882,11 +1882,11 @@ static bitmap_t *load_component_bitmap(const char *dirname, const char *file, co
 	bitmap_t *bitmap;
 
 	/* load the basic bitmap */
-	bitmap = render_load_png(dirname, file, NULL, hasalpha);
+	bitmap = render_load_png(OPTION_ARTPATH, dirname, file, NULL, hasalpha);
 	if (bitmap != NULL && alphafile != NULL)
 
 		/* load the alpha bitmap if specified */
-		if (render_load_png(dirname, alphafile, bitmap, hasalpha) == NULL)
+		if (render_load_png(OPTION_ARTPATH, dirname, alphafile, bitmap, hasalpha) == NULL)
 		{
 			bitmap_free(bitmap);
 			bitmap = NULL;

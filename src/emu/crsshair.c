@@ -11,6 +11,8 @@
 
 #include "driver.h"
 #include "rendutil.h"
+#include "config.h"
+#include "xmlfile.h"
 
 
 
@@ -29,15 +31,22 @@
 typedef struct _crosshair_global crosshair_global;
 struct _crosshair_global
 {
+	UINT8				usage;					/* true if any crosshairs are used */
 	UINT8 				used[MAX_PLAYERS];		/* usage per player */
+	UINT8 				mode[MAX_PLAYERS];		/* visibility mode per player */
 	UINT8 				visible[MAX_PLAYERS];	/* visibility per player */
 	bitmap_t *			bitmap[MAX_PLAYERS];	/* bitmap per player */
 	render_texture *	texture[MAX_PLAYERS];	/* texture per player */
 	const device_config *screen[MAX_PLAYERS];	/* the screen on which this player's crosshair is drawn */
 	float 				x[MAX_PLAYERS];			/* current X position */
 	float				y[MAX_PLAYERS];			/* current Y position */
+	float 				last_x[MAX_PLAYERS];	/* last X position */
+	float				last_y[MAX_PLAYERS];	/* last Y position */
 	UINT8				fade;					/* color fading factor */
 	UINT8 				animation_counter;		/* animation frame index */
+	UINT16				auto_time;				/* time in seconds to turn invisible */
+	UINT16				time[MAX_PLAYERS];		/* time since last movement */
+	char				name[MAX_PLAYERS][CROSSHAIR_PIC_NAME_LENGTH + 1];	/* name of crosshair png file */
 };
 
 
@@ -121,6 +130,9 @@ static const rgb_t crosshair_colors[] =
 ***************************************************************************/
 
 static void crosshair_exit(running_machine *machine);
+static void crosshair_load(running_machine *machine, int config_type, xml_data_node *parentnode);
+static void crosshair_save(running_machine *machine, int config_type, xml_data_node *parentnode);
+
 static void animate(const device_config *device, void *param, int vblank_state);
 
 
@@ -134,44 +146,57 @@ static void animate(const device_config *device, void *param, int vblank_state);
     structures for the given player
 -------------------------------------------------*/
 
-static void create_bitmap(int player)
+static void create_bitmap(running_machine *machine, int player)
 {
-	/* if we don't have a bitmap for this player yet */
+	int x, y;
+	char filename[20];
+	rgb_t color = crosshair_colors[player];
+
+	/* if we have a bitmap for this player, kill it */
+	if (global.bitmap[player] != NULL)
+		free(global.bitmap[player]);
+
+	if (global.name[player][0] != 0)
+	{
+		/* look for user specified file */
+		sprintf(filename, "%s.png", global.name[player]);
+		global.bitmap[player] = render_load_png(OPTION_CRSSHAIRPATH, NULL, filename, NULL, NULL);
+	}
+	else
+	{
+		/* look for default cross?.png in crsshair\game dir */
+		sprintf(filename, "cross%d.png", player + 1);
+		global.bitmap[player] = render_load_png(OPTION_CRSSHAIRPATH, machine->gamedrv->name, filename, NULL, NULL);
+
+		/* look for default cross?.png in crsshair dir */
+		if (global.bitmap[player] == NULL)
+			global.bitmap[player] = render_load_png(OPTION_CRSSHAIRPATH, NULL, filename, NULL, NULL);
+	}
+
+	/* if that didn't work, use the built-in one */
 	if (global.bitmap[player] == NULL)
 	{
-		int x, y;
-		char filename[20];
-		rgb_t color = crosshair_colors[player];
+		/* allocate a blank bitmap to start with */
+		global.bitmap[player] = bitmap_alloc(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32);
+		bitmap_fill(global.bitmap[player], NULL, MAKE_ARGB(0x00,0xff,0xff,0xff));
 
-		/* first try to load a bitmap for the crosshair */
-		sprintf(filename, "cross%d.png", player);
-		global.bitmap[player] = render_load_png(NULL, filename, NULL, NULL);
-
-		/* if that didn't work, use the built-in one */
-		if (global.bitmap[player] == NULL)
+		/* extract the raw source data to it */
+		for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
 		{
-			/* allocate a blank bitmap to start with */
-			global.bitmap[player] = bitmap_alloc(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32);
-			bitmap_fill(global.bitmap[player], NULL, MAKE_ARGB(0x00,0xff,0xff,0xff));
+			/* assume it is mirrored vertically */
+			UINT32 *dest0 = BITMAP_ADDR32(global.bitmap[player], y, 0);
+			UINT32 *dest1 = BITMAP_ADDR32(global.bitmap[player], CROSSHAIR_RAW_SIZE - 1 - y, 0);
 
-			/* extract the raw source data to it */
-			for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
-			{
-				/* assume it is mirrored vertically */
-				UINT32 *dest0 = BITMAP_ADDR32(global.bitmap[player], y, 0);
-				UINT32 *dest1 = BITMAP_ADDR32(global.bitmap[player], CROSSHAIR_RAW_SIZE - 1 - y, 0);
-
-				/* extract to two rows simultaneously */
-				for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)
-					if ((crosshair_raw_top[y * CROSSHAIR_RAW_ROWBYTES + x / 8] << (x % 8)) & 0x80)
-						dest0[x] = dest1[x] = MAKE_ARGB(0xff,0x00,0x00,0x00) | color;
-			}
+			/* extract to two rows simultaneously */
+			for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)
+				if ((crosshair_raw_top[y * CROSSHAIR_RAW_ROWBYTES + x / 8] << (x % 8)) & 0x80)
+					dest0[x] = dest1[x] = MAKE_ARGB(0xff,0x00,0x00,0x00) | color;
 		}
-
-		/* create a texture to reference the bitmap */
-		global.texture[player] = render_texture_alloc(render_texture_hq_scale, NULL);
-		render_texture_set_bitmap(global.texture[player], global.bitmap[player], NULL, TEXFORMAT_ARGB32, NULL);
 	}
+
+	/* create a texture to reference the bitmap */
+	global.texture[player] = render_texture_alloc(render_texture_hq_scale, NULL);
+	render_texture_set_bitmap(global.texture[player], global.bitmap[player], NULL, TEXFORMAT_ARGB32, NULL);
 }
 
 
@@ -191,6 +216,9 @@ void crosshair_init(running_machine *machine)
 	/* clear all the globals */
 	memset(&global, 0, sizeof(global));
 
+	/* setup the default auto visibility time */
+	global.auto_time = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
+
 	/* determine who needs crosshairs */
 	for (port = machine->portconfig; port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
@@ -200,15 +228,21 @@ void crosshair_init(running_machine *machine)
 
 				assert(player < MAX_PLAYERS);
 
-				/* mark as used and visible */
+				/* mark as used and set the default visibility and mode */
+				global.usage = TRUE;
 				global.used[player] = TRUE;
-				global.visible[player] = TRUE;
+				global.mode[player] = CROSSHAIR_VISIBILITY_DEFAULT;
+				global.visible[player] = (CROSSHAIR_VISIBILITY_DEFAULT == CROSSHAIR_VISIBILITY_OFF) ? FALSE : TRUE;
 
 				/* for now, use the main screen */
 				global.screen[player] = machine->primary_screen;
 
-				create_bitmap(player);
+				create_bitmap(machine, player);
 			}
+
+	/* register callbacks for when we load/save configurations */
+	if (global.usage)
+		config_register(machine, "crosshairs", crosshair_load, crosshair_save);
 
 	/* register the animation callback */
 	if (machine->primary_screen != NULL)
@@ -240,31 +274,54 @@ static void crosshair_exit(running_machine *machine)
 
 
 /*-------------------------------------------------
-    crosshair_toggle - toggle crosshair
-    visibility
+    crosshair_get_usage - return TRUE
+    if any crosshairs are used
 -------------------------------------------------*/
 
-void crosshair_toggle(running_machine *machine)
+int crosshair_get_usage(running_machine *machine)
 {
-	int player;
-	int first_hidden_player = -1;
+	return global.usage;
+}
 
-	/* find the first invisible crosshair */
-	for (player = 0; player < MAX_PLAYERS; player++)
-		if (global.used[player] && !global.visible[player])
-		{
-			first_hidden_player = player;
-			break;
-		}
 
-	/* if all visible, turn all off */
-	if (first_hidden_player == -1)
-		for (player = 0; player < MAX_PLAYERS; player++)
-			global.visible[player] = FALSE;
+/*-------------------------------------------------
+    crosshair_get_user_settings - return the
+    current crosshair settings for a player
+    Note: auto_time is common for all players
+-------------------------------------------------*/
 
-	/* otherwise, turn on the first one that isn't currently on */
-	else
-		global.visible[first_hidden_player] = TRUE;
+void crosshair_get_user_settings(running_machine *machine, UINT8 player, crosshair_user_settings *settings)
+{
+	settings->auto_time = global.auto_time;
+	settings->used = global.used[player];
+	settings->mode = global.mode[player];
+	strcpy(settings->name, global.name[player]);
+}
+
+
+/*-------------------------------------------------
+    crosshair_set_user_settings - modify the
+    current crosshair settings for a player
+    Note: auto_time is common for all players
+-------------------------------------------------*/
+
+void crosshair_set_user_settings(running_machine *machine, UINT8 player, crosshair_user_settings *settings)
+{
+	int changed = FALSE;
+
+	global.auto_time = settings->auto_time;
+	global.used[player] = settings->used;
+	global.mode[player] = settings->mode;
+
+	/* set visibility as specified by mode */
+	/* auto mode starts with visibility off */
+	global.visible[player] = (settings->mode == CROSSHAIR_VISIBILITY_ON) ? TRUE : FALSE;
+
+	/* update bitmap if name has changed */
+	changed = strcmp(settings->name, global.name[player]);
+	strcpy(global.name[player], settings->name);
+	if (changed)
+		create_bitmap(machine, player);
 }
 
 
@@ -285,10 +342,39 @@ static void animate(const device_config *device, void *param, int vblank_state)
 	else
 		global.fade = 0xa0 + (0x60 * (~global.animation_counter & 0x7f) / 0x80);
 
-	/* read all the lightgun values */
 	for (player = 0; player < MAX_PLAYERS; player++)
+	{
+		/* read all the lightgun values */
 		if (global.used[player])
 			input_port_get_crosshair_position(device->machine, player, &global.x[player], &global.y[player]);
+
+		/* auto visibility */
+		if (global.mode[player] == CROSSHAIR_VISIBILITY_AUTO)
+		{
+			if ((global.x[player] != global.last_x[player]) || (global.y[player] != global.last_y[player]))
+			{
+				/* crosshair has moved, keep crosshair visible */
+				global.visible[player] = TRUE;
+				global.last_x[player] = global.x[player];
+				global.last_y[player] = global.y[player];
+				global.time[player] = 0;
+			}
+			else
+			{
+				/* see if the player has been motionless for time specified */
+				/* note that the animate() routine is called twice per frame */
+				/* slightly confusing formula, but the effect is: */
+				/* auto_time = 1 makes the crosshair barely visible while moved */
+				/* every increment in auto_time is about .2s at 60Hz */
+				if (global.time[player] > global.auto_time * 24 - 20)
+					/* time exceeded so turn crosshair invisible */
+					global.visible[player] = FALSE;
+
+				/* increment player visibility time */
+				global.time[player]++;
+			}
+		}
+	}
 }
 
 
@@ -324,4 +410,125 @@ void crosshair_render(const device_config *screen)
 void crosshair_set_screen(running_machine *machine, int player, const device_config *screen)
 {
 	global.screen[player] = screen;
+}
+
+
+/*-------------------------------------------------
+    crosshair_load - read and apply data from the
+    configuration file
+-------------------------------------------------*/
+
+static void crosshair_load(running_machine *machine, int config_type, xml_data_node *parentnode)
+{
+	/* Note: crosshair_load() is only registered if croshairs are used */
+
+	xml_data_node *crosshairnode;
+	int auto_time;
+
+	/* we only care about game files */
+	if (config_type != CONFIG_TYPE_GAME)
+		return;
+
+	/* might not have any data */
+	if (parentnode == NULL)
+		return;
+
+	/* loop and get player crosshair info */
+	for (crosshairnode = xml_get_sibling(parentnode->child, "crosshair"); crosshairnode; crosshairnode = xml_get_sibling(crosshairnode->next, "crosshair"))
+	{
+		int  player, mode;
+
+		player = xml_get_attribute_int(crosshairnode, "player", -1);
+
+		/* check to make sure we have a valid player */
+		/* also check if the player really uses a crosshair */
+		if (player >=0 && player < MAX_PLAYERS && global.used[player])
+		{
+			/* get, check, and store visibility mode */
+			mode = xml_get_attribute_int(crosshairnode, "mode", CROSSHAIR_VISIBILITY_DEFAULT);
+			if (mode >= CROSSHAIR_VISIBILITY_OFF && mode <= CROSSHAIR_VISIBILITY_AUTO)
+			{
+				global.mode[player] = (UINT8)mode;
+				/* set visibility as specified by mode */
+				/* auto mode starts with visibility off */
+				global.visible[player] = (mode == CROSSHAIR_VISIBILITY_ON) ? TRUE : FALSE;
+			}
+
+			/* get and store crosshair pic name, truncate name to max length */
+			strncpy(global.name[player], xml_get_attribute_string(crosshairnode, "pic", ""), CROSSHAIR_PIC_NAME_LENGTH);
+			/* update bitmap */
+			create_bitmap(machine, player);
+		}
+	}
+
+	/* get, check, and store auto visibility time */
+	crosshairnode = xml_get_sibling(parentnode->child, "autotime");
+	if (crosshairnode != NULL)
+	{
+		auto_time = xml_get_attribute_int(crosshairnode, "val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
+		if ((auto_time >= CROSSHAIR_VISIBILITY_AUTOTIME_MIN) && (auto_time <= CROSSHAIR_VISIBILITY_AUTOTIME_MAX))
+				global.auto_time = (UINT8)auto_time;
+	}
+}
+
+
+/*-------------------------------------------------
+    crosshair_save -  save data to the
+    configuration file
+-------------------------------------------------*/
+
+static void crosshair_save(running_machine *machine, int config_type, xml_data_node *parentnode)
+{
+	/* Note: crosshair_save() is only registered if crosshairs are used */
+
+	xml_data_node *crosshairnode;
+	int player;
+
+	/* we only care about game files */
+	if (config_type != CONFIG_TYPE_GAME)
+		return;
+
+	for (player = 0; player < MAX_PLAYERS; player++)
+	{
+		if (global.used[player])
+		{
+			/* create a node */
+			crosshairnode = xml_add_child(parentnode, "crosshair", NULL);
+
+			if (crosshairnode != NULL)
+			{
+				int changed = FALSE;
+
+				xml_set_attribute_int(crosshairnode, "player", player);
+
+				if (global.visible[player] != CROSSHAIR_VISIBILITY_DEFAULT)
+				{
+					xml_set_attribute_int(crosshairnode, "mode", global.mode[player]);
+					changed = TRUE;
+				}
+
+				/* the default graphic name is "", so only save if not */
+				if (strlen(global.name[player]) > 0)
+				{
+					xml_set_attribute(crosshairnode, "pic", global.name[player]);
+					changed = TRUE;
+				}
+
+				/* if nothing changed, kill the node */
+				if (!changed)
+					xml_delete_node(crosshairnode);
+			}
+		}
+	}
+
+	/* always store autotime so that it stays at the user value if it is needed */
+	if (global.auto_time != CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
+	{
+		/* create a node */
+		crosshairnode = xml_add_child(parentnode, "autotime", NULL);
+
+		if (crosshairnode != NULL)
+			xml_set_attribute_int(crosshairnode, "val", global.auto_time);
+	}
+
 }
