@@ -8,7 +8,7 @@
 
 Sega Naomi is Dreamcast based Arcade hardware.
 
-Current Compatibility notes 
+Current Compatibility notes (GD-rom games only)
 |----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
 |romname   | Pl(s) | Rot | Test | Boot | Game | Control Type                   | Notes                                               |
 |----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
@@ -19,6 +19,7 @@ Current Compatibility notes
 |cvs2gd    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 6 buttons        |                                                     |
 |ikaruga   |   2   |  V  | Yes  | Yes  | No   | joystick with 2 buttons?       | Broken i/o / timings                                |
 |ggxx      |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
+|moeru     |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       | Broken i/o, stuck at the "now loading" msg          |
 |chocomk   |   2   |  H  | No?  | Yes  | Yes? | joystick with 3 buttons?       | Broken i/o?                                         |
 |quizqgd   |   2   |  V  | Yes  | Yes  | Yes  | joystick(?) with 4 buttons     |                                                     |
 |ggxxrl    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
@@ -35,11 +36,13 @@ Current Compatibility notes
 |ss2005    |   1   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |radirgy   |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |ggxxsla   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
+|kurucham  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o, crashes in attract with wrong mask      |
 |undefeat  |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       | Stuck at the "now loading" msg                      |
 |trgheart  |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |jingystm  |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons?       | Broken i/o                                          |
 |meltyb    |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
 |meltyba   |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
+|karous    |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |takoron   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
 --------------------------------------------------------------------------------------------------------------------------------------
 |confmiss  |   2   |  H  | Yes  | Yes  | No   | lightgun                       |                                                     |
@@ -47,17 +50,17 @@ Current Compatibility notes
 |slashout  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | Needs to map the extra button                       |
 |spkrbtl   |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons        | Crashes when loading the gameplay                   |
 |monkeyba  |   1   |  H  | Yes  | Yes  | No   | ad stick                       | Crashes when loading the gameplay                   |
-|dygolf    |   2   |  H  | No   | No   | No   | ?                              | Special unknown input needed                        |
-|wsbbgd    |   2   |  H  | No   | No   | No   | ?                              | Special unknown input needed                        |
+|dygolf    |   2   |  H  | No   | No   | No   | ad stick + ? buttons           | Moans about the ad stick                            |
+|wsbbgd    |   2   |  H  | No   | No   | No   | ad stick + ? buttons           | Moans about the ad stick                            |
 |vtennisg  |   2   |  H  | Yes  | Yes  | No   | joystick with 2 buttons        | Broken gfxs, crashes after a while                  |
-|vathlete  |   2   |  H  |                    | joystick with 3 buttons?       |                                                     |
+|vathlete  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |vtennis2  |   2   |  H  | No   | No   | No   | joystick with 3 buttons        |                                                     |
 |keyboard  |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, crashes after a while                   |
 |lupinsho  |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o, crashes after a while                   |
 |luptype   |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, crashes after a while                   |
 |mok       |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o                                          |
-|ngdup23a  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |              
-|ngdup23c  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |       
+|ngdup23a  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
+|ngdup23c  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
 |puyofev   |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 --------------------------------------------------------------------------------------------------------------------------------------
 
@@ -789,8 +792,8 @@ static NVRAM_HANDLER( naomi_eeproms )
 {
 	if (read_or_write)
 	{
-		/* JVS 'eeprom' */			
-		mame_fwrite(file,maple0x86data1,0x80);			
+		/* JVS 'eeprom' */
+		mame_fwrite(file,maple0x86data1,0x80);
 
 
 		// mainboard eeprom?
@@ -803,31 +806,31 @@ static NVRAM_HANDLER( naomi_eeproms )
 		if (file)
 		{
 			UINT8 tmp[0x80];
-	
-			/* JVS 'eeprom' */			
-			mame_fread(file,maple0x86data1,0x80);				
 
-			mame_fread(file,&tmp,0x80);			
+			/* JVS 'eeprom' */
+			mame_fread(file,maple0x86data1,0x80);
+
+			mame_fread(file,&tmp,0x80);
 			eeprom_set_data((UINT8 *)tmp, 0x80);
-			
+
 			// mainboard eeprom?
             eeprom_load(file);
-			
+
 		}
         else
 		{
 		//	int a;
-			
+
 			UINT32 length, size;
 			UINT8 *dat;
 			UINT8* jvseeprom_default = NULL;
 
 			dat = eeprom_get_data_pointer(&length, &size);
-			memset(dat, 0, length * size);			
-			
+			memset(dat, 0, length * size);
+
 			// mainboard eeprom?
 			eeprom_set_data((UINT8 *)"\011\241                              0000000000000000", 48);  // 2*checksum 30*unknown 16*serial
-		
+
 			// some games require defaults to boot (vertical, 1 player etc.)
 			if (!strcmp(machine->gamedrv->name,"karous"))  jvseeprom_default = jvseeprom_default_karous;
 			if (!strcmp(machine->gamedrv->name,"sfz3ugd")) jvseeprom_default = jvseeprom_default_sfz3ugd;
@@ -850,10 +853,10 @@ static NVRAM_HANDLER( naomi_eeproms )
 			if (!strcmp(machine->gamedrv->name,"moeru")) jvseeprom_default = jvseeprom_default_moeru;
 			if (!strcmp(machine->gamedrv->name,"tetkiwam")) jvseeprom_default = jvseeprom_default_tetkiwam;
 			if (!strcmp(machine->gamedrv->name,"keyboard")) jvseeprom_default = jvseeprom_default_keyboard;
-			
+
 			if (jvseeprom_default)
 				memcpy(maple0x86data1, jvseeprom_default, 0x80);
-				
+
 		#if 0
 			/* JVS 'eeprom' */
 			for (a=0;a < 0x80;a++)
