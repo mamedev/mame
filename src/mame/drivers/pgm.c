@@ -163,23 +163,26 @@ ASIC 22 + ASIC 25
 ASIC 25 + ASIC 28
     Oriental Legend Super
 
-ASIC 28:
+ASIC 27 (5585E):
     performs a variety of calculations, quite complex, different per region, supplies region code
     used by:
-    Knights of Valour 1 / Plus / Superheroes (plus & superheroes seems to use extra functions, emulation issues reported in places in plus)
-    Photo Y2k / Real and Fake (maybe..)
-    This could be an ARM chip like the 27A below, but without the support for an external ROM (or nothing uses it..)
+    Knights of Valour 1 / Plus 
+    Photo Y2k / Real and Fake 
 
-ASIC 27A:
-    arm9? cpu with (max?) 64kb internal rom (different per game / revision) + optional external data rom
+ASIC 27A(5585F/5585G):
+    arm7 cpu with 16kb internal rom (different per game / region) + optional external data rom
     probably used to give extra power to the system, lots of calculations are offloaded to it
     used by:
-    DoDonPachi II
-    Knights of Valor 2 / 2 Plus
-    Martial Masters
-    Demon Front
+    Knights of Valour Superheros / Hero
     Puzzli II
+    Oriental Legend Ex
+    Knights of Valor 2 / 2 Plus
+    DoDonPachi II
+    Martial Masters
     The Gladiator
+    Demon Front
+    Killing Blade Plus
+    Spectral VS Generation
 
 there are probably more...
 
@@ -261,12 +264,12 @@ Notes:
       OTHER
       -----
          3.6V_BATT - 3.6V NICad battery, connected to the V3021 RTC
-         IDC34     - IDC34 way flat cable plug, doesn't appear to be used for any games. Might be for
-                     re-programming some of the custom IC's or on-board surface mounted ROMs?
+         IDC34     - IDC34 way flat cable plug, PGM can support 4 players max in two cabs,
+                     this is jamma connecter for another cab and the P3&P4
          PAL       - Atmel ATF16V8B PAL (DIP20)
          SW1       - Push button switch to enter Test Mode
          SW2       - 8 position DIP Switch (for configuration of PCB/game options)
-         SW3       - SPDT switch (purpose unknown)
+         SW3       - SPDT switch , to clear the NVRAM and reset the whole system
          TD62064   - Toshiba NPN 50V 1.5A Quad Darlinton Switch; for driving coin meters (DIP16)
          TDA1519A  - Philips 2x 6W Stereo Power AMP (SIL9)
          uPD6379   - NEC 2-channel 16-bit D/A converter 10mW typ. (SOIC8)
@@ -278,7 +281,6 @@ Notes:
 
 #define PGMLOGERROR 0
 #define PGMARM7LOGERROR 1
-#define PGMARM7SPEEDHACK 1
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
@@ -293,7 +295,9 @@ Notes:
 UINT16 *pgm_mainram, *pgm_bg_videoram, *pgm_tx_videoram, *pgm_videoregs, *pgm_rowscrollram;
 static UINT8 *z80_mainram;
 static UINT32 *arm7_shareram;
-static UINT32 arm7_latch;
+static UINT32 *svg_shareram[2];	//for 5585G MACHINE
+static UINT32 kov2_latchdata_68k_w;
+static UINT32 kov2_latchdata_arm_w;
 
 
 static READ16_HANDLER ( z80_ram_r )
@@ -303,32 +307,14 @@ static READ16_HANDLER ( z80_ram_r )
 
 static READ32_HANDLER( arm7_latch_arm_r )
 {
-	if (PGMARM7LOGERROR) logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", arm7_latch, mem_mask, cpu_get_pc(space->cpu) );
-	return arm7_latch;
+	if (PGMARM7LOGERROR) logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", kov2_latchdata_68k_w, mem_mask, cpu_get_pc(space->cpu) );
+	return kov2_latchdata_68k_w;
 }
 
-
-#ifdef PGMARM7SPEEDHACK
-static TIMER_CALLBACK( arm_irq )
-{
-	generic_pulse_irq_line(machine->cpu[2], ARM7_FIRQ_LINE);
-}
-#endif
-
-//static emu_timer *   arm_comms_timer;
 static WRITE32_HANDLER( arm7_latch_arm_w )
 {
 	if (PGMARM7LOGERROR) logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu) );
-	COMBINE_DATA(&arm7_latch);
-
-#ifdef PGMARM7SPEEDHACK
-//  cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
-	if (data!=0xaa) cpu_spinuntil_trigger(space->cpu, 1000);
-	cpuexec_trigger(space->machine, 1002);
-#else
-	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
-	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->cpu, 100));
-#endif
+	COMBINE_DATA(&kov2_latchdata_arm_w);
 }
 
 static READ32_HANDLER( arm7_shareram_r )
@@ -345,24 +331,18 @@ static WRITE32_HANDLER( arm7_shareram_w )
 
 static READ16_HANDLER( arm7_latch_68k_r )
 {
-	if (PGMARM7LOGERROR) logerror("M68K: Latch read: %04x (%04x) (%06x)\n", arm7_latch & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu) );
-	return arm7_latch;
+	if (PGMARM7LOGERROR) logerror("M68K: Latch read: %04x (%04x) (%06x)\n", kov2_latchdata_arm_w & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu) );
+	return kov2_latchdata_arm_w;
 }
 
 static WRITE16_HANDLER( arm7_latch_68k_w )
 {
 	if (PGMARM7LOGERROR) logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu) );
-	COMBINE_DATA(&arm7_latch);
+	COMBINE_DATA(&kov2_latchdata_68k_w);
 
-#ifdef PGMARM7SPEEDHACK
-	cpuexec_trigger(space->machine, 1000);
-	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, arm_irq); // i don't know how long..
-	cpu_spinuntil_trigger(space->cpu, 1002);
-#else
 	generic_pulse_irq_line(space->machine->cpu[2], ARM7_FIRQ_LINE);
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
 	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[2], 200)); // give the arm time to respond (just boosting the interleave doesn't help
-#endif
 }
 
 static READ16_HANDLER( arm7_ram_r )
@@ -607,7 +587,7 @@ static UINT16 *olds_sharedprotram;
 static ADDRESS_MAP_START( olds_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
 	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK(1) /* Game ROM */
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&olds_sharedprotram) // Shared with protection device
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&olds_sharedprotram) // Shared with protection device
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
@@ -721,25 +701,25 @@ ADDRESS_MAP_END
 
 /* Kov Superheroes */
 
-static UINT16 kovsh_highlatch, kovsh_lowlatch;
+static UINT16 kovsh_highlatch_arm_w, kovsh_lowlatch_arm_w;
+static UINT16 kovsh_highlatch_68k_w, kovsh_lowlatch_68k_w;
 
 static READ32_HANDLER( kovsh_arm7_protlatch_r )
 {
-//  return 0x00880000;
-//  return 0x0088ff66;
-
-	return (kovsh_highlatch << 16) | (kovsh_lowlatch);
+	return (kovsh_highlatch_68k_w << 16) | (kovsh_lowlatch_68k_w);
 }
 
 static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		kovsh_highlatch = data>>16;
+		kovsh_highlatch_arm_w = data>>16;
+		kovsh_highlatch_68k_w = 0;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		kovsh_lowlatch = data;
+		kovsh_lowlatch_arm_w = data;
+		kovsh_lowlatch_68k_w = 0;
 	}
 
 //  cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
@@ -749,12 +729,12 @@ static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 static READ16_HANDLER( kovsh_68k_protlatch_r )
 {
 	//cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[0], 600));
+	//cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[0], 600));
 
 	switch (offset)
 	{
-		case 1: return kovsh_highlatch;
-		case 0: return kovsh_lowlatch;
+		case 1: return kovsh_highlatch_arm_w;
+		case 0: return kovsh_lowlatch_arm_w;
 	}
 	return -1;
 }
@@ -763,14 +743,29 @@ static WRITE16_HANDLER( kovsh_68k_protlatch_w )
 {
 	switch (offset)
 	{
-		case 1: kovsh_highlatch = data; break;
-		case 0: kovsh_lowlatch = data; break;
+		case 1: kovsh_highlatch_68k_w = data; break;
+		case 0: kovsh_lowlatch_68k_w = data; break;
 	}
+}
+
+static READ16_HANDLER( kovsh_arm7_ram_r )
+{
+	UINT16 *share16 = (UINT16 *)arm7_shareram;
+	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu) );
+	return share16[BYTE_XOR_LE(offset<<1)];
+}
+
+static WRITE16_HANDLER( kovsh_arm7_ram_w )
+{
+	UINT16 *share16 = (UINT16 *)arm7_shareram;
+	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu) );
+
+	COMBINE_DATA(&share16[BYTE_XOR_LE(offset<<1)]);
 }
 
 static ADDRESS_MAP_START( kovsh_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
-	AM_RANGE(0x100000, 0x37ffff) AM_ROMBANK(1) /* Game ROM */
+	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK(1) /* Game ROM */
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
@@ -795,25 +790,128 @@ static ADDRESS_MAP_START( kovsh_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xc08006, 0xc08007) AM_READ_PORT("DSW")
 
 	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
-	AM_RANGE(0x4f0000, 0x4f003f) AM_READWRITE(arm7_ram_r, arm7_ram_w) /* ARM7 Shared RAM */
-	AM_RANGE(0x500000, 0x500003) AM_READWRITE(kovsh_68k_protlatch_r, kovsh_68k_protlatch_w) /* ARM7 Latch */
+	AM_RANGE(0x4f0000, 0x4f003f) AM_READWRITE(kovsh_arm7_ram_r, kovsh_arm7_ram_w) /* ARM7 Shared RAM */
+	AM_RANGE(0x500000, 0x500005) AM_READWRITE(kovsh_68k_protlatch_r, kovsh_68k_protlatch_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
+static UINT32 kovsh_counter=1;
+
 static READ32_HANDLER( kovsh_arm7_unk_r )
+{
+	return kovsh_counter++;
+}
+
+static READ32_HANDLER( kovsh_exrom_r )
 {
 	return 0x00000000;
 }
 
 static ADDRESS_MAP_START( kovsh_arm7_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-	AM_RANGE(0x08100000, 0x081fffff) AM_ROM AM_REGION("user1", 0) // unpopulated, returns 0 to keep checksum happy
-	AM_RANGE(0x10000000, 0x100003ff) AM_RAM // main ram for asic?
-
+	AM_RANGE(0x08100000, 0x083fffff) AM_READ(kovsh_exrom_r) // unpopulated, returns 0 to keep checksum happy
+	AM_RANGE(0x10000000, 0x100003ff) AM_RAM // internal ram for asic
 	AM_RANGE(0x40000000, 0x40000003) AM_READ(kovsh_arm7_protlatch_r) AM_WRITE(kovsh_arm7_protlatch_w)
 	AM_RANGE(0x40000008, 0x4000000b) AM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0x4000000c, 0x4000000f) AM_READ(kovsh_arm7_unk_r)
 	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE(arm7_shareram_r, arm7_shareram_w) AM_BASE(&arm7_shareram)
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM // uploads xor table to decrypt 68k rom here
+ADDRESS_MAP_END
+
+
+//5585G
+unsigned char svg_ram_sel;
+
+static WRITE32_HANDLER( svg_arm7_ram_sel_w )
+{
+	svg_ram_sel=data&1;
+}
+
+static READ32_HANDLER( svg_arm7_shareram_r )
+{
+	unsigned char ram_sel=svg_ram_sel&1;
+
+	return svg_shareram[ram_sel][offset];
+}
+
+static WRITE32_HANDLER( svg_arm7_shareram_w )
+{
+	unsigned char ram_sel=svg_ram_sel&1;
+	COMBINE_DATA(&svg_shareram[ram_sel][offset]);
+}
+
+static READ16_HANDLER( svg_m68k_ram_r )
+{
+	unsigned char ram_sel=(svg_ram_sel&1)^1;
+	UINT16 *share16 = (UINT16 *)(svg_shareram[ram_sel]);
+	return share16[BYTE_XOR_LE(offset)];
+}
+
+static WRITE16_HANDLER( svg_m68k_ram_w )
+{
+	unsigned char ram_sel=(svg_ram_sel&1)^1;
+	UINT16 *share16 = (UINT16 *)(svg_shareram[ram_sel]);
+	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
+}
+
+static READ16_HANDLER( svg_68k_nmi_r )
+{
+	return 0;
+}
+
+static WRITE16_HANDLER( svg_68k_nmi_w )
+{
+	generic_pulse_irq_line(space->machine->cpu[2], ARM7_FIRQ_LINE);
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
+	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[2], 200)); // give the arm time to respond (just boosting the interleave doesn't help
+}
+
+static WRITE16_HANDLER( svg_latch_68k_w )
+{
+	if (PGMARM7LOGERROR) logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu) );
+	COMBINE_DATA(&kov2_latchdata_68k_w);
+}
+
+static ADDRESS_MAP_START( svg_68k_mem, ADDRESS_SPACE_PROGRAM, 16)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM         /* BIOS ROM */
+	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK(1)  /* Game ROM */
+
+	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
+
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) /* Main Ram */
+
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE(&pgm_bg_videoram) /* Backgrounds */
+	AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE(&pgm_tx_videoram) /* Text Layer */
+	AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE(&pgm_rowscrollram)
+	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&pgm_videoregs) /* Video Regs inc. Zoom Table */
+
+	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE(soundlatch_word_r, m68k_l1_w)
+	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
+	AM_RANGE(0xc00006, 0xc00007) AM_READWRITE(pgm_calendar_r, pgm_calendar_w)
+	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
+	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
+	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE(soundlatch3_word_r, soundlatch3_word_w)
+
+	AM_RANGE(0xc08000, 0xc08001) AM_READ_PORT("P1P2")
+	AM_RANGE(0xc08002, 0xc08003) AM_READ_PORT("P3P4")
+	AM_RANGE(0xc08004, 0xc08005) AM_READ_PORT("Service")
+	AM_RANGE(0xc08006, 0xc08007) AM_READ_PORT("DSW")
+
+	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
+	AM_RANGE(0x500000, 0x51ffff) AM_READWRITE(svg_m68k_ram_r, svg_m68k_ram_w)    /* ARM7 Shared RAM */
+	AM_RANGE(0x5c0000, 0x5c0001) AM_READWRITE(svg_68k_nmi_r, svg_68k_nmi_w)      /* ARM7 FIQ */	
+	AM_RANGE(0x5c0300, 0x5c0301) AM_READWRITE(arm7_latch_68k_r, svg_latch_68k_w) /* ARM7 Latch */	
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( svg_arm7_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
+	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
+	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM
+	AM_RANGE(0x38000000, 0x3801ffff) AM_READWRITE(svg_arm7_shareram_r, svg_arm7_shareram_w)
+	AM_RANGE(0x48000000, 0x48000003) AM_READWRITE(arm7_latch_arm_r, arm7_latch_arm_w) /* 68k Latch */
+	AM_RANGE(0x40000018, 0x4000001b) AM_WRITE(svg_arm7_ram_sel_w) /* RAM SEL */
+	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
 ADDRESS_MAP_END
 
 /*** Input Ports *************************************************************/
@@ -1212,6 +1310,16 @@ static MACHINE_DRIVER_START( olds )
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( kov )
+	MDRV_IMPORT_FROM(pgm)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(kovsh_mem,0)
+
+	/* protection CPU */
+	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 5585E/F/G
+	MDRV_CPU_PROGRAM_MAP(kovsh_arm7_map, 0)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kov2 )
 	MDRV_IMPORT_FROM(pgm)
@@ -1220,19 +1328,19 @@ static MACHINE_DRIVER_START( kov2 )
 	MDRV_CPU_PROGRAM_MAP(kov2_mem,0)
 
 	/* protection CPU */
-	MDRV_CPU_ADD("prot", ARM7, 20000000)	// ???
+	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 5585F
 	MDRV_CPU_PROGRAM_MAP(arm7_map, 0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( kovsh )
+static MACHINE_DRIVER_START( svg )
 	MDRV_IMPORT_FROM(pgm)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kovsh_mem,0)
+	MDRV_CPU_PROGRAM_MAP(svg_68k_mem,0)
 
 	/* protection CPU */
-	MDRV_CPU_ADD("prot", ARM7, 20000000)	// ???
-	MDRV_CPU_PROGRAM_MAP(kovsh_arm7_map, 0)
+	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 5585G
+	MDRV_CPU_PROGRAM_MAP(svg_arm7_map, 0)
 MACHINE_DRIVER_END
 
 #if 0
@@ -1383,14 +1491,37 @@ static DRIVER_INIT( drgw2j )
 static DRIVER_INIT( kov )
 {
 	pgm_basic_init(machine);
-
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
-
-	/* 0x4f0000 - ? is actually ram shared with the protection device,
-      the protection device provides the region code */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
-
  	pgm_kov_decrypt(machine);
+}
+
+static DRIVER_INIT( pstar )
+{
+	pgm_basic_init(machine);
+	pgm_pstar_decrypt(machine);
+}
+
+static DRIVER_INIT( djlzz )
+{
+	pgm_basic_init(machine);
+	pgm_djlzz_decrypt(machine);
+}
+
+static DRIVER_INIT( kovsh )
+{
+	pgm_basic_init(machine);
+	pgm_kovsh_decrypt(machine);
+}
+
+static DRIVER_INIT( kovh )
+{
+	pgm_basic_init(machine);
+	pgm_kovh_decrypt(machine);
+}
+
+static DRIVER_INIT( oldss )
+{
+	pgm_basic_init(machine);
+	pgm_oldss_decrypt(machine);
 }
 
 static DRIVER_INIT( kov2 )
@@ -1401,32 +1532,8 @@ static DRIVER_INIT( kov2 )
 
 static DRIVER_INIT( kov2p )
 {
-// this hacks the identification of the kov2 rom to return the string required for kov2p
-// this is _NOT_ appropriate for use in MAME, the internal rom should be dumped.
-#if 0
-	UINT8 *mem8 = (UINT8 *)memory_region(machine, "user1");
 	pgm_basic_init(machine);
 	pgm_kov2p_decrypt(machine);
-
-	mem8[0xDE] = 0xC0;
-	mem8[0xDF] = 0x46;
-	mem8[0x4ED8] = 0xA8;// B0
-	mem8[0x4EDC] = 0x9C;// A4
-	mem8[0x4EE0] = 0x5C;// 64
-	mem8[0x4EE4] = 0x94;// 9C
-	mem8[0x4EE8] = 0xE8;// F0
-	mem8[0x4EEC] = 0x6C;// 74
-	mem8[0x4EF0] = 0xD4;// DC
-	mem8[0x4EF4] = 0x50;// 58
-	mem8[0x4EF8] = 0x80;// 88
-	mem8[0x4EFC] = 0x9C;// A4
-	mem8[0x4F00] = 0x28;// 30
-	mem8[0x4F04] = 0x30;// 38
-	mem8[0x4F08] = 0x34;// 3C
-	mem8[0x4F0C] = 0x1C;// 24
-	mem8[0x1FFFFC] = 0x33;
-	mem8[0x1FFFFD] = 0x99;
-#endif
 }
 
 static DRIVER_INIT( martmast )
@@ -1435,43 +1542,42 @@ static DRIVER_INIT( martmast )
 	pgm_mm_decrypt(machine);
 }
 
-
-static DRIVER_INIT( pstar )
+static DRIVER_INIT( ddp2 )
 {
 	pgm_basic_init(machine);
- 	pgm_pstar_decrypt(machine);
-
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4f0000, 0x4f0025, 0, 0, PSTARS_protram_r);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500000, 0x500003, 0, 0, PSTARS_r16);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500000, 0x500005, 0, 0, PSTARS_w16);
+	pgm_ddp2_decrypt(machine);
 }
 
-
-
-static DRIVER_INIT( kovsh )
+static void svg_basic_init(running_machine *machine)
 {
 	pgm_basic_init(machine);
-
-//  memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
-
-	/* 0x4f0000 - ? is actually ram shared with the protection device,
-      the protection device provides the region code */
-//  memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
-
- 	pgm_kovsh_decrypt(machine);
+	svg_shareram[0]=auto_malloc(0x10000);
+	svg_shareram[1]=auto_malloc(0x10000);
+	svg_ram_sel=0;
 }
 
-static DRIVER_INIT( djlzz )
+static DRIVER_INIT( theglad )
 {
-	pgm_basic_init(machine);
+	svg_basic_init(machine);
+	pgm_theglad_decrypt(machine);
+}
 
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
+static DRIVER_INIT( svg )
+{
+	svg_basic_init(machine);
+	pgm_svg_decrypt(machine);
+}
 
-	/* 0x4f0000 - ? is actually ram shared with the protection device,
-      the protection device provides the region code */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
+static DRIVER_INIT( killbldp )
+{
+	svg_basic_init(machine);
+	pgm_killbldp_decrypt(machine);
+}
 
- 	pgm_djlzz_decrypt(machine);
+static DRIVER_INIT( dmnfrnt )
+{
+	svg_basic_init(machine);
+	pgm_dfront_decrypt(machine);
 }
 
 static DRIVER_INIT( dw3 )
@@ -1483,7 +1589,6 @@ static DRIVER_INIT( dw3 )
  	pgm_dw3_decrypt(machine);
 }
 
-
 /* Killing Blade uses some kind of DMA protection device which can copy data from a data rom.  The
    MCU appears to have an internal ROM as if you remove the data ROM then the shared ram is filled
    with a constant value.
@@ -1494,7 +1599,7 @@ static DRIVER_INIT( dw3 )
 
 static int kb_cmd;
 static int reg;
-static int ptr;
+static int ptr=0;
 
 static WRITE16_HANDLER( killbld_prot_w )
 {
@@ -1676,7 +1781,6 @@ static READ16_HANDLER( killbld_prot_r )
 			UINT32 protvalue;
 			protvalue = 0x89911400|input_port_read(space->machine, "Region");
 			res=(protvalue>>(8*(ptr-1)))&0xff;
-
 		}
 	}
 	logerror("%06X: ASIC25 R CMD %X  VAL %X",cpu_get_pc(space->cpu),kb_cmd,res);
@@ -1692,7 +1796,6 @@ static MACHINE_RESET( killbld )
 	/* fill the protection ram with a5 */
 	for (i = 0;i < 0x4000/2;i++)
 		killbld_sharedprotram[i] = 0xa5a5;
-
 }
 
 
@@ -1702,8 +1805,6 @@ static DRIVER_INIT( killbld )
 
 	pgm_basic_init(machine);
  	pgm_killbld_decrypt(machine);
-
-
 
 	/* this isn't a hack.. doing a rom dump while the game is running shows the
        rom space to look like this.. there may be more overlays / enables tho */
@@ -1727,59 +1828,6 @@ static DRIVER_INIT( killbld )
 	mem16[0x108a44/2]=0x0c02;
 
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_prot_r, killbld_prot_w);
-}
-
-/* ddp2 rubbish */
-
-static UINT16 *ddp2_protram;
-static int ddp2_asic27_0xd10000 = 0;
-
-static WRITE16_HANDLER ( ddp2_asic27_0xd10000_w )
-{
-	ddp2_asic27_0xd10000=data;
-}
-
-static READ16_HANDLER ( ddp2_asic27_0xd10000_r )
-{
-	if (PGMLOGERROR) logerror("d100000_prot_r %04x, %04x\n", offset,ddp2_asic27_0xd10000);
-	ddp2_asic27_0xd10000++;
-	ddp2_asic27_0xd10000&=0x7f;
-	return ddp2_asic27_0xd10000;
-}
-
-
-static READ16_HANDLER(ddp2_protram_r)
-{
-	if (PGMLOGERROR) logerror("prot_r %04x, %04x\n", offset,ddp2_protram[offset]);
-
-	if (offset == 0x02/2) return input_port_read(space->machine, "Region");
-
-	if (offset == 0x1f00/2) return 0;
-
-	return ddp2_protram[offset];
-}
-
-static WRITE16_HANDLER(ddp2_protram_w)
-{
-	if (PGMLOGERROR) logerror("prot_w %04x, %02x\n", offset,data);
-	COMBINE_DATA(&ddp2_protram[offset]);
-
-	ddp2_protram[0x10/2] = 0;
-	ddp2_protram[0x20/2] = 1;
-}
-
-static DRIVER_INIT( ddp2 )
-{
-	pgm_basic_init(machine);
-
-	/* some kind of busy / counter */
-	/* the actual protection is an arm cpu with internal rom */
-
-	ddp2_protram = auto_malloc(0x2000);
-
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd10000, 0xd10001, 0, 0, ddp2_asic27_0xd10000_r, ddp2_asic27_0xd10000_w);
-
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd00000, 0xd01fff, 0, 0, ddp2_protram_r, ddp2_protram_w);
 }
 
 static DRIVER_INIT( puzzli2 )
@@ -1890,13 +1938,13 @@ static MACHINE_RESET( olds )
 
 	/* populate shared protection ram with data read from pcb .. */
 
-	for(i=0;i<0x40000/2;i++)
+	for(i=0;i<0x4000/2;i++)
 	{
 		olds_sharedprotram[i] = mem16[i];
 	}
 
 	//ROM:004008B4                 .word 0xFBA5
-	for(i=0;i<0x20000/2;i++)
+	for(i=0;i<0x4000/2;i++)
 	{
 		if(olds_sharedprotram[i]==(0xffff-i))
 			olds_sharedprotram[i]=0x4e75;
@@ -1987,7 +2035,7 @@ static READ16_HANDLER( olds_prot_swap_r16 )
 		return pgm_mainram[0x178F4/2];
 	else						//game
 		return pgm_mainram[0x178D8/2];
-
+		
 }
 
 static DRIVER_INIT( olds )
@@ -2010,7 +2058,7 @@ ROM_START( pgm )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) /* 8x8 Text Layer Tiles */
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Layer Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) )
 
 	ROM_REGION( 0x200000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
@@ -2428,7 +2476,7 @@ ROM_START( drgw3 )
 	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data */
 	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "dw3t0400.u18",   0x400000, 0x400000, CRC(b70f3357) SHA1(8733969d7d21f540f295a9f747a4bb8f0d325cf0) )
 
@@ -2474,7 +2522,7 @@ ROM_START( drgw3k )
 	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data - is it correct for this set? */
 	ROM_LOAD( "dw3_v100.u15", 0x000000, 0x010000, CRC(03dc4fdf) SHA1(b329b04325d4f725231b1bb7862eedef2319b652) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "dw3t0400.u18",   0x400000, 0x400000, CRC(b70f3357) SHA1(8733969d7d21f540f295a9f747a4bb8f0d325cf0) )
 
@@ -2500,7 +2548,10 @@ ROM_START( kov )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0600.rom",    0x400000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
@@ -2529,7 +2580,10 @@ ROM_START( kov115 )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0600.rom",    0x400000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
@@ -2593,7 +2647,10 @@ ROM_START( kovj )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0600.rom",    0x400000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
@@ -2622,7 +2679,10 @@ ROM_START( kovplus )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0600.rom",    0x400000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
@@ -2686,7 +2746,10 @@ ROM_START( kovplusa )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kov_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0600.rom",    0x400000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
@@ -2708,7 +2771,6 @@ ROM_START( kovplusa )
 	ROM_LOAD( "m0600.rom",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
 ROM_END
 
-/* is this loading the right roms? */
 ROM_START( kovsh )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
@@ -2719,26 +2781,25 @@ ROM_START( kovsh )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "kovsh_v100_china.asic", 0x000000, 0x04000,  CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) )
 
-	ROM_REGION( 0x400000, "user1", ROMREGION_ERASE00 )
-	/* unpopulated (needs to return 0) */
-
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
-	ROM_LOAD( "t0600.320",    0x400000, 0x400000, CRC(164b3c94) SHA1(f00ea66886ca6bff74bbeaa49e7f5c75c275d5d7) ) // bad? its half the size of the kov one
+	ROM_LOAD( "t0600.rom",    0x400000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
 
 	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
 	/* 32x32 Tile Data is put here for easier Decoding */
 
 	/* all roms below need checking to see if they're the same on this board */
-	ROM_REGION( 0x1c00000, "gfx3", ROMREGION_DISPOSE ) /* Sprite Colour Data */
+	ROM_REGION( 0x1e00000, "gfx3", ROMREGION_DISPOSE ) /* Sprite Colour Data */
 	ROM_LOAD( "a0600.rom",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "a0601.rom",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "a0602.rom",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
 	ROM_LOAD( "a0603.rom",    0x1800000, 0x0400000, CRC(ec31abda) SHA1(ee526655369bae63b0ef0730e9768b765c9950fc) )
+	ROM_LOAD( "a0604.rom",    0x1a00000, 0x0400000, CRC(26b59fd3) SHA1(53219376056f4766dc5236735599d982ceb56b84) )
 
 	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b0600.rom",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
 	ROM_LOAD( "b0601.rom",    0x0800000, 0x0400000, CRC(a0bb1c2f) SHA1(0542348c6e27779e0a98de16f04f9c18158f2b28) )
+	ROM_LOAD( "b0602.rom",    0x0c00000, 0x0100000, CRC(9df77934) SHA1(99a3fe337c13702c9aa2373bcd1bb1befd0e2a13) )
 
 	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
@@ -2752,11 +2813,10 @@ ROM_START( photoy2k )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x4000, "cpu2", 0 ) /* ARM protection ASIC - internal rom, supplies region code etc. */
-	/* not hooked up yet (simulation code used instead for now) */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "photoy2k_v100_china.asic", 0x000000, 0x04000,  CRC(6dd7f257) SHA1(1984f98a282d8b3264674f231c3b7def1757cf72) )
 
-	ROM_REGION( 0x480000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x480000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0700.rom",    0x400000, 0x080000, CRC(93943b4d) SHA1(3b439903853727d45d62c781af6073024eb3c5a3) )
 
@@ -2821,7 +2881,10 @@ ROM_START( raf102j )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x480000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "photoy2k_v100_china.asic", 0x000000, 0x04000,  CRC(6dd7f257) SHA1(1984f98a282d8b3264674f231c3b7def1757cf72) )
+
+	ROM_REGION( 0x480000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0700.rom",    0x400000, 0x080000, CRC(93943b4d) SHA1(3b439903853727d45d62c781af6073024eb3c5a3) )
 
@@ -2930,7 +2993,7 @@ ROM_START( killbld )
 	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data */
 	ROM_LOAD16_WORD_SWAP( "kb_u2_v104.u2", 0x000000, 0x010000,  CRC(c970f6d5) SHA1(399fc6f80262784c566363c847dc3fdc4fb37494) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0300.u14",    0x400000, 0x400000, CRC(0922f7d9) SHA1(4302b4b7369e13f315fad14f7d6cad1321101d24) )
 
@@ -2971,7 +3034,7 @@ ROM_START( killbldt )
 	ROM_REGION( 0x010000, "user1", 0 ) /* Protection Data */
 	ROM_LOAD16_WORD_SWAP( "kb_u2.rom", 0x000000, 0x010000,  CRC(de3eae63) SHA1(03af767ef764055bda528b5cc6a24b9e1218cca8) )
 
-	ROM_REGION( 0x800000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0300.u14",    0x400000, 0x400000, CRC(0922f7d9) SHA1(4302b4b7369e13f315fad14f7d6cad1321101d24) )
 
@@ -3059,11 +3122,10 @@ ROM_START( puzlstar )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x4000, "cpu2", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
-	/* this has no external rom so the internal rom probably can't be dumped */
-//  ROM_LOAD( "puzlstar_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "puzlstar_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0800.u5",    0x400000, 0x200000, CRC(f9d84e59) SHA1(80ec77025ac5bf355b1a60f2a678dd4c56071f6b) )
 
@@ -3151,10 +3213,9 @@ ROM_START( olds )
 	ROM_REGION( 0x010000, "user1", 0 ) /* ASIC25? Protection Data */
 	ROM_LOAD( "sp_v101.u6", 0x000000, 0x010000,  CRC(097046bc) SHA1(6d75db85cf4c79b63e837897785c253014b2126d) )
 
-	ROM_REGION( 0x200000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
+	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
 	// clearly not for this revision
-	//ROM_LOAD16_WORD_SWAP( "ram_dump", 0x000000, 0x200000, CRC(e7b26aea) SHA1(17d101f760d790619ce4858984787b494bdbbc8a) )
-
+	ROM_LOAD( "ram_dump", 0x000000, 0x04000, CRC(280cfb4e) SHA1(cd2bdcaa21347952c2bf38b105a204d327fde39e) )
 
 	ROM_REGION( 0xc00000, "gfx1",  ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
@@ -3192,15 +3253,13 @@ ROM_START( olds100 )
 	ROM_LOAD16_BYTE( "v100-u3.040",      0x100000, 0x080000,  CRC(d0e2b741) SHA1(2e671dbb4320d1f0c059b35efd33cdea26f12131) )
 	ROM_LOAD16_BYTE( "v100-u4.040",      0x200001, 0x080000,  CRC(32a6bdbd) SHA1(a93d7f4eae722a58eca9ec351ad5890cefda56f0) )
 	ROM_LOAD16_BYTE( "v100-u5.040",      0x200000, 0x080000,  CRC(b4a1cafb) SHA1(b2fccd480ede93f58ad043387b18b898152f06ef) )
-	/* u1 is missing from this set? - the parent has v101 rom for u1 so it probably doesn't go with v100 main program roms */
-//  ROM_LOAD16_WORD_SWAP( "v100-u1.040",0x300000, 0x080000,    CRC(1) SHA1(1) )
+	ROM_LOAD16_WORD_SWAP( "v100-u1.040", 0x300000, 0x080000,  CRC(37ea4e75) SHA1(a94fcb89da3394a43d360f885419677f511d2580) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x200000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
+	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
 	// used to simulate encrypted DMA protection device for now ..
-	//ROM_LOAD16_WORD_SWAP( "ram_dump", 0x000000, 0x200000, CRC(e7b26aea) SHA1(17d101f760d790619ce4858984787b494bdbbc8a) )
-
+	ROM_LOAD( "ram_dump", 0x000000, 0x04000, CRC(280cfb4e) SHA1(cd2bdcaa21347952c2bf38b105a204d327fde39e) )
 
 	ROM_REGION( 0x010000, "user1", 0 ) /* ASIC25? Protection Data */
 	ROM_LOAD( "kd-u6.512", 0x000000, 0x010000,  CRC(e7613dda) SHA1(0d7c043b90e2f9a36a45066f22e3e305dc716676) )
@@ -3245,9 +3304,9 @@ ROM_START( olds100a )
 	ROM_REGION( 0x010000, "user1", ROMREGION_ERASEFF ) /* ASIC25? Protection Data */
 	/* missing from this set .. */
 
-	ROM_REGION( 0x40000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
+	ROM_REGION( 0x4000, "user2", ROMREGION_ERASEFF ) /* its a dump of the shared protection rom/ram from pcb. */
 	// used to simulate encrypted DMA protection device for now ..
-	ROM_LOAD16_WORD_SWAP( "ram_dump", 0x000000, 0x40000, CRC(619cc52d) SHA1(f249a0b58c8790a42d042ad09eb28d8d4eeb20eb) )
+	ROM_LOAD( "ram_dump", 0x000000, 0x04000, CRC(280cfb4e) SHA1(cd2bdcaa21347952c2bf38b105a204d327fde39e) )
 
 	ROM_REGION( 0xc00000, "gfx1",  ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
@@ -3277,7 +3336,6 @@ ROM_START( olds100a )
 	ROM_LOAD( "m0500.rom",    0x400000, 0x200000, CRC(37928cdd) SHA1(e80498cabc2a6a54d4f3ebcb097d4b3fad96fe55) )
 ROM_END
 
-
 ROM_START( kov2 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
@@ -3291,7 +3349,7 @@ ROM_START( kov2 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "igs_u19.rom", 0x000000, 0x200000,   CRC(edd59922) SHA1(09b14f20f685944a93292c83e5830849aade42c9) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t1200.rom",    0x400000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
@@ -3313,7 +3371,6 @@ ROM_START( kov2 )
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
 	ROM_LOAD( "m1200.rom",    0x800000, 0x800000, CRC(b0d88720) SHA1(44ab137e3f8e15b7cb5697ffbd9b1143d8210c4f) )
 ROM_END
-
 
 ROM_START( kov2106 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
@@ -3328,7 +3385,7 @@ ROM_START( kov2106 )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "u19.102", 0x000000, 0x200000,   CRC(462e2980) SHA1(3da7c3d2c65b59f50c78be1c25922b71d40f6080) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t1200.rom",    0x400000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
@@ -3351,7 +3408,6 @@ ROM_START( kov2106 )
 	ROM_LOAD( "m1200.rom",    0x800000, 0x800000, CRC(b0d88720) SHA1(44ab137e3f8e15b7cb5697ffbd9b1143d8210c4f) )
 ROM_END
 
-
 ROM_START( kov2p )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
@@ -3360,14 +3416,12 @@ ROM_START( kov2p )
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	/* not correct for this set, needs dumping from internal rom */
-	//ROM_LOAD( "kov2p.asic", 0x000000, 0x04000, BAD_DUMP CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) ) // NOT for this version, works with a hack
-	ROM_LOAD( "kov2p.asic", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "kov2p_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200-16.rom", 0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t1200.rom",    0x400000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
@@ -3390,7 +3444,6 @@ ROM_START( kov2p )
 	ROM_LOAD( "m1200.rom",    0x800000, 0x800000, CRC(b0d88720) SHA1(44ab137e3f8e15b7cb5697ffbd9b1143d8210c4f) )
 ROM_END
 
-
 ROM_START( kov2p205 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
@@ -3399,15 +3452,12 @@ ROM_START( kov2p205 )
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	/* not correct for this set, needs dumping from internal rom */
-	//ROM_LOAD( "kov2p.asic", 0x000000, 0x04000, BAD_DUMP CRC(e0d7679f) SHA1(e1c2d127eba4ddbeb8ad173c55b90ac1467e1ca8) ) // NOT for this version, works with a hack
-	ROM_LOAD( "kov2p205.asic", 0x000000, 0x04000, NO_DUMP )
-
+	ROM_LOAD( "kov2p_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v200-16.rom", 0x000000, 0x200000,  CRC(16a0c11f) SHA1(ce449cef76ebd5657d49b57951e2eb0f132e203e) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t1200.rom",    0x400000, 0x800000, CRC(d7e26609) SHA1(bdad810f82fcf1d50a8791bdc495374ec5a309c6) )
 
@@ -3448,17 +3498,18 @@ Some logic IC's, resistors, caps etc.
 ROM_START( ddp2 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
-	ROM_LOAD16_WORD_SWAP( "v100.u8",    0x100000, 0x200000, CRC(0c8aa8ea) SHA1(57e33224622607a1df8daabf26ba063cf8a6d3fc) )
+//  ROM_LOAD16_WORD_SWAP( "v100.u8",    0x100000, 0x200000, CRC(0c8aa8ea) SHA1(57e33224622607a1df8daabf26ba063cf8a6d3fc) )
+	ROM_LOAD16_WORD_SWAP( "ddp2_v102.u8", 0x100000, 0x200000, CRC(5a9ea040) SHA1(51eaec46c368f7cfc5245e64896092f52b1193e0) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x4000, "cpu2", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION32_LE( 0x20000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t1300.u21",    0x400000, 0x800000, CRC(e748f0cb) SHA1(5843bee3a17c33648ce904af2b98c6a90aff7393) )
 
@@ -3476,6 +3527,39 @@ ROM_START( ddp2 )
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
 	ROM_LOAD( "m1300.u5",    0x400000, 0x400000, CRC(82d4015d) SHA1(d4cdc1aec1c97cf23ff7a20ccaad822962e66ffa) )
 ROM_END
+
+ROM_START( ddp2a )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
+	ROM_LOAD16_WORD_SWAP( "v100.u8",    0x100000, 0x200000, CRC(0c8aa8ea) SHA1(57e33224622607a1df8daabf26ba063cf8a6d3fc) )
+
+	/* CPU2 = Z80, romless, code uploaded by 68k */
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "ddp2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
+	ROM_LOAD( "t1300.u21",    0x400000, 0x800000, CRC(e748f0cb) SHA1(5843bee3a17c33648ce904af2b98c6a90aff7393) )
+
+	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
+	/* 32x32 Tile Data is put here for easier Decoding */
+
+	ROM_REGION( 0x1000000, "gfx3", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a1300.u1",    0x0000000, 0x0800000, CRC(fc87a405) SHA1(115c21ecc56997652e527c92654076870bc9fa51) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a1301.u2",    0x0800000, 0x0800000, CRC(0c8520da) SHA1(390317857ae5baa94a4cc042874b00a811f06a63) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+
+	ROM_REGION( 0x0800000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b1300.u7",    0x0000000, 0x0800000,  CRC(ef646604) SHA1(d737ff513792962f18df88c2caa9dd71de449079) )
+
+	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
+	ROM_LOAD( "m1300.u5",    0x400000, 0x400000, CRC(82d4015d) SHA1(d4cdc1aec1c97cf23ff7a20ccaad822962e66ffa) )
+ROM_END
+
 
 /*
 
@@ -3538,12 +3622,13 @@ ROM_START( puzzli2 )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x4000, "cpu2", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
-	/* this has no external rom so the internal rom probably can't be dumped */
-//  ROM_LOAD( "puzzli2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "puzzli2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-
-	ROM_REGION( 0x600000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
+	/* not on this PCB */
+	
+	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t0900.u9",    0x400000, 0x200000, CRC(70615611) SHA1(a46d4aa71396947b427f9ba4ba0e636876c09d6b) )
 
@@ -3634,7 +3719,7 @@ ROM_START( martmast )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102_16m.u10", 0x000000, 0x200000,  CRC(18b745e6) SHA1(7bcb58dd3a2d6072f492cf0dd7181cb061c1f49d) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t1000.u3",    0x400000, 0x800000, CRC(bbf879b5) SHA1(bd9a6aea34ad4001e89e62ff4b7a2292eb833c00) )
 
@@ -3671,7 +3756,7 @@ ROM_START( martmasc )
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v102_16m.u10", 0x000000, 0x200000,  CRC(18b745e6) SHA1(7bcb58dd3a2d6072f492cf0dd7181cb061c1f49d) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t1000.u3",    0x400000, 0x800000, CRC(bbf879b5) SHA1(bd9a6aea34ad4001e89e62ff4b7a2292eb833c00) )
 
@@ -3752,13 +3837,13 @@ ROM_START( dmnfrnt )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x4000, "cpu2", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dmnfrnt_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v101_32m.u26", 0x000000, 0x400000,  CRC(93965281) SHA1(89da198aaa7ca759cb96b5f18859a477e55fd590) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t04501.u29",    0x400000, 0x800000, CRC(900eaaac) SHA1(4033cb7b28fcadb92d5af3ea7fdd1c22747618fd) )
 
@@ -3786,13 +3871,13 @@ ROM_START( dmnfrnta )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x4000, "cpu2", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "dmnfrnt_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v105_32m.u26", 0x000000, 0x400000,  CRC(d200ee63) SHA1(3128c27c5f5a4361d31e7b4bb006de631b3a228c) )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
 	ROM_LOAD( "t04501.u29",    0x400000, 0x800000, CRC(900eaaac) SHA1(4033cb7b28fcadb92d5af3ea7fdd1c22747618fd) )
 
@@ -3816,16 +3901,21 @@ ROM_END
 ROM_START( theglad )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
-	ROM_LOAD16_WORD_SWAP( "u6.rom",    0x100000, 0x080000, CRC(14c85212) SHA1(8d2489708e176a2c460498a13173be01f645b79e) )
+//  ROM_LOAD16_WORD_SWAP( "u6.rom",    0x100000, 0x080000, CRC(14c85212) SHA1(8d2489708e176a2c460498a13173be01f645b79e) )
+	ROM_LOAD16_WORD_SWAP( "sjfy_v101.u6", 0x100000, 0x080000, CRC(f799e866) SHA1(dccc3c903357c40c3cf85ac0ae8fc12fb0f853a6) )
 
 	/* CPU2 = Z80, romless, code uploaded by 68k */
 
-	ROM_REGION( 0x200000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
-	ROM_LOAD( "u2.rom", 0x000000, 0x200000,  CRC(c7bcf2ae) SHA1(10bc012c83987f594d5375a51bc4be2e17568a81) )
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "sjfy_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION( 0xc00000, "gfx1", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+//  ROM_LOAD( "u2.rom", 0x000000, 0x200000,  CRC(c7bcf2ae) SHA1(10bc012c83987f594d5375a51bc4be2e17568a81) )
+	ROM_LOAD( "sjfy_v107.u26", 0x000000, 0x200000,  CRC(f7c61357) SHA1(52d31c464dfc83c5371b078cb6b73c0d0e0d57e3) )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
-	ROM_LOAD( "t04601.u33",    0x400000, 0x800000, BAD_DUMP CRC(2da3be8e) SHA1(704be0efc09bc931c71efd0b3e9f1bc4bfcdd3c1) )
+	ROM_LOAD( "t04601.u33",   0x400000, 0x800000, CRC(e5dab371) SHA1(2e3c93958eb0326b6b84b95c2168626f26bbac76) )
 
 	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
 	/* 32x32 Tile Data is put here for easier Decoding */
@@ -3836,12 +3926,149 @@ ROM_START( theglad )
 	ROM_LOAD( "a04603.u6",    0x1000000, 0x0800000,  CRC(8f621e17) SHA1(b0f87f378e0115d0c95017ca0f1b0d508827a7c6) )
 
 	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04601.u11",    0x0000000, 0x0800000, CRC(ee72bccf) SHA1(73c25fe659f6c903447066e4ef83d2f580449d76) )
-	ROM_LOAD( "b04602.u12",    0x0800000, 0x0400000, CRC(7dba9c38) SHA1(a03d509274e8f6a500a7ebe2da5aab8bed4e7f2f) )
+	ROM_LOAD( "b04601.u11",   0x0000000, 0x0800000, CRC(ee72bccf) SHA1(73c25fe659f6c903447066e4ef83d2f580449d76) )
+	ROM_LOAD( "b04602.u12",   0x0800000, 0x0400000, CRC(7dba9c38) SHA1(a03d509274e8f6a500a7ebe2da5aab8bed4e7f2f) )
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
 	ROM_LOAD( "w04601.u1",    0x400000, 0x800000, CRC(5f15ddb3) SHA1(c38dcef8e06802a84e42a7fc9fa505475fc3ac65) )
+ROM_END
+
+ROM_START( oldss )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
+	ROM_LOAD16_WORD_SWAP( "p05301.rom",   0x100000, 0x400000, CRC(923f7246) SHA1(818ade79e9724f5a2b0cc5a647ae5d4ee0374799) )
+
+	/* CPU2 = Z80, romless, code uploaded by 68k */
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "oldss_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
+	ROM_LOAD( "t05301.rom",   0x400000, 0x800000, CRC(8257bbb0) SHA1(b48067b7e7081a15fddf21739b641d677c2df3d9) )
+
+	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
+	/* 32x32 Tile Data is put here for easier Decoding */
+
+	/* all roms below need checking to see if they're the same on this board */
+	ROM_REGION( 0x2000000, "gfx3", ROMREGION_DISPOSE ) /* Sprite Colour Data */
+	ROM_LOAD( "a05301.rom",   0x0000000, 0x0800000, CRC(57946fd2) SHA1(5d79bc71a1881f3099821a9b255a5f271e0eeff6) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a05302.rom",   0x0800000, 0x0800000, CRC(3459a0b8) SHA1(94ab6f980b5582f1db9bb12019d03f0b6e0a06df) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a05303.rom",   0x1000000, 0x0800000, CRC(13475d85) SHA1(4683a3bf304fdc15ffb1c61b7957ad68b023fa33) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a05304.rom",   0x1800000, 0x0800000, CRC(f03ef7a6) SHA1(c18b1b622b430d5e031e65daa6819b84c3e12ef5) )
+
+	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b05301.rom",   0x0000000, 0x0800000, CRC(fd98f503) SHA1(02046ab1aa89f63bff149003d9d61776e025a92a) )
+	ROM_LOAD( "b05302.rom",   0x0800000, 0x0800000, CRC(9f6094a8) SHA1(69f6f2003ab975eae13ea6b5c2ffa40df6e6bdf6) )
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
+	ROM_LOAD( "m05301.rom",   0x400000, 0x400000, CRC(86ec83bc) SHA1(067cb7ec449eacd1f49298f45a364368934db5dd) )
+ROM_END
+
+ROM_START( kovh )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
+	ROM_LOAD16_WORD_SWAP( "p0600h.rom",   0x100000, 0x400000, CRC(e251e8e4) SHA1(af5b7c81632a39e1450d932951bed634c76b84e8) )
+
+	/* CPU2 = Z80, romless, code uploaded by 68k */
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kovh_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
+	ROM_LOAD( "t0600.rom",    0x400000, 0x800000, CRC(4acc1ad6) SHA1(0668dbd5e856c2406910c6b7382548b37c631780) )
+
+	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
+	/* 32x32 Tile Data is put here for easier Decoding */
+
+	/* all roms below need checking to see if they're the same on this board */
+	ROM_REGION( 0x2000000, "gfx3", ROMREGION_DISPOSE ) /* Sprite Colour Data */
+	ROM_LOAD( "a0600.rom",    0x0000000, 0x0800000, CRC(d8167834) SHA1(fa55a99629d03b2ea253392352f70d2c8639a991) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a0601.rom",    0x0800000, 0x0800000, CRC(ff7a4373) SHA1(7def9fca7513ad5a117da230bebd2e3c78679041) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a0602.rom",    0x1000000, 0x0800000, CRC(e7a32959) SHA1(3d0ed684dc5b269238890836b2ce7ef46aa5265b) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a0540.rom",    0x1800000, 0x0800000, CRC(4fd3413e) SHA1(5e8f3e421342bf558c77e59635f9b5d713e825c2) )
+
+	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b0600.rom",    0x0000000, 0x0800000, CRC(7d3cd059) SHA1(00cf994b63337e0e4ebe96453daf45f24192af1c) )
+	ROM_LOAD( "b0540.rom",    0x0800000, 0x0800000, CRC(60999757) SHA1(118cf058e67858958bcb931e14f5d160c7de87cc) )
+
+	ROM_REGION( 0x800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
+	ROM_LOAD( "m0600.rom",    0x400000, 0x400000, CRC(3ada4fd6) SHA1(4c87adb25d31cbd41f04fbffe31f7bc37173da76) )
+ROM_END
+
+ROM_START( killbldp )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
+	ROM_LOAD16_WORD_SWAP( "kbex_v300x.u6",0x100000, 0x080000, CRC(b7fb8ec9) )
+
+	/* CPU2 = Z80, romless, code uploaded by 68k */
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "kbex_027a.rom", 0x000000, 0x04000, NO_DUMP ) 
+
+	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
+	ROM_LOAD( "kbex_v300x.u26", 0x000000, 0x200000,  CRC(144388c8) )
+
+	ROM_REGION( 0xC00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom",  0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
+	ROM_LOAD( "t05701w032.bin",0x400000, 0x800000, CRC(bb8cc6c9) )
+
+	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
+	/* 32x32 Tile Data is put here for easier Decoding */
+
+	ROM_REGION( 0x2000000, "gfx3", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a05701w064.bin",   0x0000000, 0x0800000, CRC(8c0c992c) )
+	ROM_LOAD( "a05702w064.bin",   0x0800000, 0x0800000, CRC(7e5b0f27) )
+	ROM_LOAD( "a05703w064.bin",   0x1000000, 0x0800000, CRC(accbdb44) )
+
+	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b05701w064.bin",   0x0000000, 0x0800000, CRC(a20cdcef) )
+	ROM_LOAD( "b05702w016.bin",   0x0800000, 0x0800000, CRC(3447be95) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom",     0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
+	ROM_LOAD( "w05701b032.bin",   0x400000, 0x800000, CRC(4f139b7a) )
+ROM_END
+
+ROM_START( svg )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) )  // (BIOS)
+	ROM_LOAD16_WORD_SWAP( "svg.u30.bin",  0x100000, 0x080000, CRC(34c18f3f) SHA1(42d1edd0dcfaa5e44861c6a1d4cb24f51ba23de8) )
+
+	/* CPU2 = Z80, romless, code uploaded by 68k */
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "svg_027a.rom", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
+	ROM_LOAD( "svg.u26.bin", 0x000000, 0x400000, CRC(46826ec8) SHA1(ad1daf6f615fb8d748ce7f98f19dd3bf22f79fba) )
+	ROM_LOAD( "svg.u29.bin", 0x400000, 0x400000, CRC(fa5f3901) SHA1(8ab7c6763df4f752b50ed2197063f58046b32ddb) )
+
+	ROM_REGION( 0xc00000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom",  0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // (BIOS)
+	ROM_LOAD( "t05601w016.bin",0x400000, 0x200000, CRC(03e110dc) SHA1(41c8f286e9303b24ba6235b341371c298226fb6a) )
+
+	ROM_REGION( 0xc00000/5*8, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF ) /* Region for 32x32 BG Tiles */
+	/* 32x32 Tile Data is put here for easier Decoding */
+
+	ROM_REGION( 0x1C00000, "gfx3", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a05601w064.bin",  0x0000000, 0x0800000, CRC(ea6453e4) SHA1(b5c82edafa8008ad59b5f2219511947d078d446e) )
+	ROM_LOAD( "a05602w064.bin",  0x0800000, 0x0800000, CRC(6d00621b) SHA1(55a4bc357e14b975b0234a9cd49e2224f509dad9) )
+	ROM_LOAD( "a05603w064.bin",  0x1000000, 0x0800000, CRC(7b71c64f) SHA1(bec7c7edf0634cf8351a54abb867c56af08ad2c3) )
+	ROM_LOAD( "a05604w032.bin",  0x1800000, 0x0400000, CRC(9452a567) SHA1(01fdb8e1f131603843ef4c49ab76d7a56b2d6414) )
+
+	ROM_REGION( 0x1000000, "gfx4", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b05601w064.bin",  0x0000000, 0x0800000, CRC(35c0a489) SHA1(a7d5527da01f8eaa7499fb6785b57094521bce97) )
+	ROM_LOAD( "b05602w064.bin",  0x0800000, 0x0800000, CRC(8aad3f85) SHA1(da6996d901d42b3a2ba7019ad014bb938a5e328b) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom",    0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // (BIOS)
+	ROM_LOAD( "w05601b064.bin",  0x400000, 0x800000, CRC(bfe61a71) SHA1(e682ca8d57ca51c4d72f64fc091161f3dbdce871) )
+	ROM_LOAD( "w05602b032.bin",  0xc00000, 0x400000, CRC(0685166d) SHA1(64dac49abd2a46d5fb58c678027aa5e23d672dc4) )
 ROM_END
 
 
@@ -3849,43 +4076,47 @@ ROM_END
 
 GAME( 1997, pgm,      0,          pgm, pgm,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", GAME_IS_BIOS_ROOT )
 
-GAME( 1997, orlegend, pgm,        pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi Yo Gi Shi Re Zuang (ver. 126)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, orlegnde, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi Yo Gi Shi Re Zuang (ver. 112)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, orlegndc, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi Yo Gi Shi Re Zuang (ver. 112, Chinese Board)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, orld111c, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi Yo Gi Shi Re Zuang (ver. 111, Chinese Board)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, orld105k, orlegend,   pgm, orld105k, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi Yo Gi Shi Re Zuang (ver. 105, Korean Board)", GAME_IMPERFECT_SOUND  )
-GAME( 1997, drgw2c,   drgw2,      drgw2, pgm,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", GAME_IMPERFECT_SOUND )
-GAME( 1999, kov,      pgm,        pgm, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND ) /* ver # provided by protection? */
-GAME( 1999, kov115,   kov,        pgm, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND ) /* ver # provided by protection? */
-GAME( 1999, kovj,     kov,        pgm, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Japanese Board)", GAME_IMPERFECT_SOUND ) /* ver # provided by protection? */
-GAME( 1999, kovplus,  kov,        pgm, sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119)", GAME_IMPERFECT_SOUND )
-GAME( 1999, kovplusa, kov,        pgm, sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (alt ver. 119)", GAME_IMPERFECT_SOUND )
-GAME( 1999, photoy2k, pgm,        pgm, photoy2k,    djlzz,      ROT0,   "IGS", "Photo Y2K", GAME_IMPERFECT_SOUND ) /* region provided by protection device */
-GAME( 1999, raf102j,  photoy2k,   pgm, photoy2k,    djlzz,      ROT0,   "IGS", "Real and Fake / Photo Y2K (ver. 102, Japanese Board)", GAME_IMPERFECT_SOUND ) /* region provided by protection device */
+GAME( 1997, orlegend, pgm,        pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Ji Shi E Zhuan (ver. 126)", GAME_IMPERFECT_SOUND  )
+GAME( 1997, orlegnde, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Ji Shi E Zhuan (ver. 112)", GAME_IMPERFECT_SOUND  )
+GAME( 1997, orlegndc, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Ji Shi E Zhuan (ver. 112, Chinese Board)", GAME_IMPERFECT_SOUND  )
+GAME( 1997, orld111c, orlegend,   pgm, pgm,      orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Ji Shi E Zhuan (ver. 111, Chinese Board)", GAME_IMPERFECT_SOUND  )
+GAME( 1997, orld105k, orlegend,   pgm, orld105k, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Ji Shi E Zhuan (ver. 105, Korean Board)", GAME_IMPERFECT_SOUND  )
+GAME( 1997, drgw2c,   drgw2,    drgw2, pgm,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", GAME_IMPERFECT_SOUND )
+GAME( 1999, photoy2k, pgm,        kov, photoy2k, djlzz,      ROT0,   "IGS", "Photo Y2K", GAME_IMPERFECT_SOUND ) /* region provided by protection device */
+GAME( 1999, raf102j,  photoy2k,   kov, photoy2k, djlzz,      ROT0,   "IGS", "Real and Fake / Photo Y2K (ver. 102, Japanese Board)", GAME_IMPERFECT_SOUND ) /* region provided by protection device */
+GAME( 1999, kovsh,    kov,        kov, sango,    kovsh,      ROT0,   "IGS", "Knights of Valour Superheroes / Sangoku Senki Superheroes (ver. 104)", GAME_IMPERFECT_SOUND )
 GAME( 2000, kov2,     pgm,       kov2, sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 (ver. 100)", GAME_IMPERFECT_SOUND )
 GAME( 2000, kov2106,  kov2,      kov2, sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 (ver. 106)", GAME_IMPERFECT_SOUND )
 GAME( 2001, martmast, pgm,       kov2, sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 102)", GAME_IMPERFECT_SOUND )
 GAME( 2001, martmasc, martmast,  kov2, sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 101, Chinese Board)", GAME_IMPERFECT_SOUND )
 
 /* Playable but maybe imperfect protection emulation */
-GAME( 1997, drgw2,    pgm,        drgw2, pgm,      drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1997, drgw2j,   drgw2,      drgw2, pgm,      drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, killbldt, killbld, killbld,killbld,    killbld,    ROT0,   "IGS", "The Killing Blade (Chinese Board)", GAME_IMPERFECT_SOUND ) // it's playable, but there are some things unclear about the protection
-GAME( 1999, puzlstar, pgm,        pgm, sango,    pstar,      ROT0,   "IGS", "Puzzle Star", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )  // not playable past first few rounds
-GAME( 1999, olds100a, olds,       olds, olds,    olds,   ROT0,   "IGS", "Oriental Legend Super / Special (alt ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  ) // grashes on some bosses, high score table etc.
-
+GAME( 1997, drgw2,    pgm,       drgw2, pgm,     drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1997, drgw2j,   drgw2,     drgw2, pgm,     drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1998, killbldt, killbld, killbld, killbld, killbld,    ROT0,   "IGS", "The Killing Blade (Chinese Board)", GAME_IMPERFECT_SOUND ) // it's playable, but there are some things unclear about the protection
+GAME( 1998, olds,     pgm,       olds, olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Ji Shi E Zhuan Super (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1998, olds100,  olds,      olds, olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Ji Shi E Zhuan Super (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1998, olds100a, olds,      olds, olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Ji Shi E Zhuan Super (alt ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING  ) // grashes on some bosses, high score table etc.
 
 /* not working */
 GAME( 1998, drgw3,    pgm,        pgm, sango,    dw3,        ROT0,   "IGS", "Dragon World 3", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1998, drgw3k,   drgw3,      pgm, sango,    dw3,        ROT0,   "IGS", "Dragon World 3 (Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1999, kovsh,    kov,      kovsh, sango,    kovsh,      ROT0,   "IGS", "Knights of Valour Superheroes / Sangoku Senki Superheroes (ver. 104)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, killbld,  pgm,     killbld,killbld,  killbld,    ROT0,   "IGS", "The Killing Blade", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1999, olds,     pgm,        olds, olds,    olds,   ROT0,   "IGS", "Oriental Legend Super / Special (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1999, olds100,  olds,       olds, olds,    olds,   ROT0,   "IGS", "Oriental Legend Super / Special (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 2001, ddp2,     pgm,        pgm, ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 2001, puzzli2,  pgm,        pgm, sango,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 2001, theglad,  pgm,        pgm, sango,    pgm,        ROT0,   "IGS", "The Gladiator", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 2002, dmnfrnt,  pgm,        pgm, sango,    pgm,        ROT0,   "IGS", "Demon Front (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 2002, dmnfrnta, dmnfrnt,    pgm, sango,    pgm,        ROT0,   "IGS", "Demon Front (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 2000, kov2p,    kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons (ver. M204XX)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_SOUND ) // works if you hack the kov2 ARM rom
-GAME( 2000, kov2p205, kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons (ver. M205XX)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_SOUND ) // works if you hack the kov2 ARM rom
+GAME( 1998, killbld,  pgm,    killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1999, kov,      pgm,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 1999, kov115,   kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 1999, kovj,     kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 1999, kovplus,  kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 1999, kovplusa, kov,        kov, sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (alt ver. 119)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 1999, puzlstar, pgm,        kov, sango,    pstar,      ROT0,   "IGS", "Puzzle Star", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 2001, kov2p,    kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 2001, kov2p205, kov2,      kov2, sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 2001, ddp2,     pgm,       kov2, ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 2001, ddp2a,    pgm,       kov2, ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 2001, puzzli2,  pgm,        svg, sango,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 2001, theglad,  pgm,        svg, sango,    theglad,    ROT0,   "IGS", "The Gladiator", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 2002, dmnfrnt,  pgm,        svg, sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 2002, dmnfrnta, dmnfrnt,    svg, sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 2004, kovh,     kov,        kov, sango,    kovh,       ROT0,   "IGS", "Knights of Valour Hero (ver. 101)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 2004, oldss,    pgm,        kov, sango,    oldss,      ROT0,   "IGS", "Oriental Legend Super Super", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) /* need internal rom of IGS027A */
+GAME( 2005, killbldp, pgm,        svg, sango,    killbldp,   ROT0,   "IGS", "The Killing Blade Ex / Plus", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 2005, svg,      pgm,        svg, sango,    svg,        ROT0,   "IGS", "Spectral VS Generation", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

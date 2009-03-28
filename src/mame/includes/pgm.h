@@ -20,7 +20,13 @@ void pgm_dw3_decrypt(running_machine *machine);
 void pgm_killbld_decrypt(running_machine *machine);
 void pgm_pstar_decrypt(running_machine *machine);
 void pgm_puzzli2_decrypt(running_machine *machine);
-
+void pgm_theglad_decrypt(running_machine *machine);
+void pgm_ddp2_decrypt(running_machine *machine);
+void pgm_dfront_decrypt(running_machine *machine);
+void pgm_svg_decrypt(running_machine *machine);
+void pgm_killbldp_decrypt(running_machine *machine);
+void pgm_kovh_decrypt(running_machine *machine);
+void pgm_oldss_decrypt(running_machine *machine);
 
 /*----------- defined in machine/pgmprot.c -----------*/
 
