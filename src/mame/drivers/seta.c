@@ -2914,7 +2914,7 @@ static ADDRESS_MAP_START( tndrcade_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w	)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_w	)
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ym2", ym3812_w	)
+	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE("ym2", ym3812_w	)
 	AM_RANGE(0x5000, 0x57ff) AM_WRITE(SMH_RAM) AM_BASE(&sharedram		)	// Shared RAM
 	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM					)	// ROM
 ADDRESS_MAP_END
