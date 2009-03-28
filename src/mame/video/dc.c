@@ -39,12 +39,24 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 
 typedef struct
 {
+	float x;
+	float y;
+	float z;
+	float u;
+	float v;
+} vert;
+
+typedef struct
+{
 	int positionx, positiony;
 	int sizex, sizey;
 	UINT32 textureaddress;
 	float u, v, du, dv;
 	int texturemode;
 	int texturesizex, texturesizey, texturesizes, texturepf, texturepalette;
+	
+	vert a,b,c,d;
+	
 } testsprites;
 
 #if DEBUG_VERTICES
@@ -632,8 +644,57 @@ void process_ta_fifo(running_machine* machine)
 					 note: DU/DV is calculated, not specified
 					*/
 					
-					testsprite->positionx=u2f(tafifo_buff[1]);
-					testsprite->positiony=u2f(tafifo_buff[2]);
+					testsprite->a.x = u2f(tafifo_buff[0x04/4]);
+					testsprite->a.y = u2f(tafifo_buff[0x08/4]);
+					testsprite->a.z = u2f(tafifo_buff[0x0c/4]);
+					testsprite->b.x = u2f(tafifo_buff[0x10/4]);
+					testsprite->b.y = u2f(tafifo_buff[0x14/4]);
+					testsprite->b.z = u2f(tafifo_buff[0x18/4]);
+					testsprite->c.x = u2f(tafifo_buff[0x1c/4]);
+					testsprite->c.y = u2f(tafifo_buff[0x20/4]);
+					testsprite->c.z = u2f(tafifo_buff[0x24/4]);
+					
+					testsprite->d.x = u2f(tafifo_buff[0x28/4]);
+					testsprite->d.y = u2f(tafifo_buff[0x2c/4]);
+					testsprite->d.z = 0.0f;// calculated
+
+					testsprite->a.u = u2f( (tafifo_buff[0x34/4]&0xffff0000) );
+					testsprite->a.v = u2f( (tafifo_buff[0x34/4]&0x0000ffff)<<16);
+					testsprite->b.u = u2f( (tafifo_buff[0x38/4]&0xffff0000) );
+					testsprite->b.v = u2f( (tafifo_buff[0x38/4]&0x0000ffff)<<16);
+					testsprite->c.u = u2f( (tafifo_buff[0x3c/4]&0xffff0000) );
+					testsprite->c.v = u2f( (tafifo_buff[0x3c/4]&0x0000ffff)<<16);
+					testsprite->d.u = 0.0f;// calculated
+					testsprite->d.v = 0.0f;// calculated
+				
+					/*
+					printf("Sending a sprite with\n%f %f %f - %f %f\n %f %f %f - %f %f\n%f %f %f - %f %f\n%f %f %f - %f %f\n", 
+					testsprite->a.x, testsprite->a.y, testsprite->a.z, testsprite->a.u, testsprite->a.v,
+					testsprite->b.x, testsprite->b.y, testsprite->b.z, testsprite->b.u, testsprite->b.v,
+					testsprite->c.x, testsprite->c.y, testsprite->c.z, testsprite->c.u, testsprite->c.v,
+					testsprite->d.x, testsprite->d.y, testsprite->d.z, testsprite->d.u, testsprite->d.v);
+					*/
+					
+					/*
+					horizontal test mode
+					224.000000 224.000000 999.999939 - 0.000000 0.609375
+					232.000000 224.000000 999.999939 - 1.000000 0.609375
+					232.000000 232.000000 999.999939 - 1.000000 0.617188
+					224.000000 232.000000
+					should calculate 	  999.999939 - 0.000000 0.617188
+
+
+					vertical test mode
+					  8.000000 184.000000 999.999939 - 0.000000 0.617188
+					 16.000000 184.000000 999.999939 - 0.000000 0.609375
+					 16.000000 192.000000 999.999939 - 1.000000 0.609375
+					  8.000000 192.000000
+					should calculate 	  999.999939 - 1.000000 0.617188
+					*/				
+					
+					// old code, used for the test drawing
+					testsprite->positionx=testsprite->a.x;
+					testsprite->positiony=testsprite->a.y;
 					testsprite->sizex=u2f(tafifo_buff[4])-u2f(tafifo_buff[1]);
 					testsprite->sizey=u2f(tafifo_buff[8])-u2f(tafifo_buff[2]);
 					testsprite->u=u2f(tafifo_buff[13] & 0xffff0000);
