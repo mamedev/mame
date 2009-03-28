@@ -2773,7 +2773,6 @@ src/mame/machine/pckeybrd.c svneol=native#text/plain
 src/mame/machine/pcshare.c svneol=native#text/plain
 src/mame/machine/pgmcrypt.c svneol=native#text/plain
 src/mame/machine/pgmprot.c svneol=native#text/plain
-src/mame/machine/pgmy2ks.c svneol=native#text/plain
 src/mame/machine/pitnrun.c svneol=native#text/plain
 src/mame/machine/playch10.c svneol=native#text/plain
 src/mame/machine/psx.c svneol=native#text/plain

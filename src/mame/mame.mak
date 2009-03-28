@@ -687,7 +687,6 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/tarzan.o \
 	$(MACHINE)/pgmcrypt.o \
 	$(MACHINE)/pgmprot.o \
-	$(MACHINE)/pgmy2ks.o \
 
 $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/m10.o $(VIDEO)/m10.o \

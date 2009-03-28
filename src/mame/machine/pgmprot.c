@@ -1,6 +1,8 @@
 #include "driver.h"
 #include "includes/pgm.h"
 
+
+
 /*** ASIC27a (Puzzle Star) -- ARM but with no external rom? behaves a bit like KOV ***/
 
 
@@ -471,9 +473,6 @@ READ16_HANDLER (sango_protram_r)
 	return 0x0000;
 }
 
-static UINT32 photoy2k_seqpos;
-static UINT32 photoy2k_trf[3], photoy2k_soff;
-
 #define BITSWAP10(val,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
                 ((BIT(val, B9) <<  9) | \
                  (BIT(val, B8) <<  8) | \
@@ -486,39 +485,6 @@ static UINT32 photoy2k_trf[3], photoy2k_soff;
                  (BIT(val, B1) <<  1) | \
                  (BIT(val, B0) <<  0))
 
-static UINT32 photoy2k_spritenum(void)
-{
-	UINT32 base = photoy2k_seqpos & 0xffc00;
-	UINT32 low  = photoy2k_seqpos & 0x003ff;
-
-	switch((photoy2k_seqpos >> 10) & 0xf) {
-	case 0x0:
-	case 0xa:
-		return base | (BITSWAP10(low, 0,8,3,1,5,9,4,2,6,7) ^ 0x124);
-	case 0x1:
-	case 0xb:
-		return base | (BITSWAP10(low, 5,1,7,4,0,8,3,6,9,2) ^ 0x088);
-	case 0x2:
-	case 0x8:
-		return base | (BITSWAP10(low, 3,5,9,7,6,4,1,8,2,0) ^ 0x011);
-	case 0x3:
-	case 0x9:
-		return base | (BITSWAP10(low, 1,8,3,6,0,4,5,2,9,7) ^ 0x154);
-	case 0x4:
-	case 0xe:
-		return base | (BITSWAP10(low, 2,1,7,4,5,8,3,6,9,0) ^ 0x0a9);
-	case 0x5:
-	case 0xf:
-		return base | (BITSWAP10(low, 9,4,6,8,2,1,7,5,3,0) ^ 0x201);
-	case 0x6:
-	case 0xd:
-		return base | (BITSWAP10(low, 4,6,0,8,9,7,3,5,1,2) ^ 0x008);
-	case 0x7:
-	case 0xc:
-		return base | (BITSWAP10(low, 8,9,3,2,0,1,6,7,5,4) ^ 0x000);
-	}
-	return 0;
-}
 
 READ16_HANDLER (ASIC28_r16)
 //UINT16 ASIC28_r16(UINT32 addr)
@@ -529,68 +495,12 @@ READ16_HANDLER (ASIC28_r16)
 
 	switch(ASIC28REGS[1]&0xff)
 	{
-
-		case 0x20: // PhotoY2k spritenum conversion 4/4
-			if(!ASIC28RCNT)
-				logerror("ASIC28: PhotoY2K spr4 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[2], cpu_get_pc(space->cpu));
-			val = photoy2k_soff >> 16;
-			break;
-
-		case 0x21: // PhotoY2k spritenum conversion 3/4
-			if(!ASIC28RCNT) {
-				photoy2k_trf[2] = val & 0xffff;
-				logerror("ASIC28: PhotoY2K spr3 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[1], cpu_get_pc(space->cpu));
-				if(photoy2k_trf[0] < 0x3c00)
-					photoy2k_soff = pgmy2ks[photoy2k_trf[0]];
-				else
-					photoy2k_soff = 0;
-				logerror("ASIC28: spriteval %04x, %06x -> %06x\n", photoy2k_trf[0], (photoy2k_trf[2]<<16)|photoy2k_trf[1], photoy2k_soff);
-			}
-			val = photoy2k_soff & 0xffff;
-			break;
-
-		case 0x22: // PhotoY2k spritenum conversion 2/4
-			if(!ASIC28RCNT) {
-				photoy2k_trf[1] = val & 0xffff;
-				logerror("ASIC28: PhotoY2K spr2 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[0], cpu_get_pc(space->cpu));
-			}
-			val = photoy2k_trf[0] | 0x880000;
-			break;
-
-		case 0x23: // PhotoY2k spritenum conversion 1/4
-			if(!ASIC28RCNT) {
-				photoy2k_trf[0] = val & 0xffff;
-				logerror("ASIC28: PhotoY2K spr1 %04x (%06x)\n", val & 0xffff, cpu_get_pc(space->cpu));
-			}
-			val = 0x880000;
-			break;
-
-		case 0x30: // PhotoY2k next element
-			if(!ASIC28RCNT)
-				photoy2k_seqpos++;
-			val = photoy2k_spritenum();
-			if(!ASIC28RCNT)
-				logerror("ASIC28: PhotoY2K seq_next  %05x -> %06x (%06x)\n", photoy2k_seqpos, val, cpu_get_pc(space->cpu));
-			break;
-
-		case 0x32: // PhotoY2k start of sequence
-			if(!ASIC28RCNT)
-				photoy2k_seqpos = (val & 0xffff) << 4;
-			val = photoy2k_spritenum();
-			if(!ASIC28RCNT)
-				logerror("ASIC28: PhotoY2K seq_start %05x -> %06x (%06x)\n", photoy2k_seqpos, val, cpu_get_pc(space->cpu));
-			break;
-
 		case 0x99:
 			val=0x880000;
 			break;
 
 		case 0x9d:	// spr palette
 			val=0xa00000+((ASIC28REGS[0]&0x1f)<<6);
-			break;
-
-		case 0xae:  //Photo Y2k Bonus stage
-			val=AETABLE[ASIC28REGS[0]&0xf];
 			break;
 
 		case 0xb0:
@@ -884,6 +794,5 @@ void dw3_w32(UINT32 addr,UINT32 val)
 
 }
 #endif
-
 
 
