@@ -90,7 +90,7 @@ READ8_HANDLER( tokiob_mcu_r )
 
 
 
-static int sound_nmi_enable,pending_nmi;
+static int sound_nmi_enable,pending_nmi,sound_status;
 
 static TIMER_CALLBACK( nmi_callback )
 {
@@ -119,7 +119,20 @@ WRITE8_HANDLER( bublbobl_sh_nmi_enable_w )
 	}
 }
 
+WRITE8_HANDLER(soundcpu_reset_w)
+{
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
+}
 
+READ8_HANDLER( sound_status_r )
+{
+	return sound_status;
+}
+
+WRITE8_HANDLER( sound_status_w )
+{
+	sound_status = data;
+}
 
 
 

@@ -3,6 +3,7 @@
 /*----------- defined in audio/suna8.c -----------*/
 
 WRITE8_DEVICE_HANDLER( suna8_play_samples_w );
+WRITE8_DEVICE_HANDLER( rranger_play_samples_w );
 WRITE8_DEVICE_HANDLER( suna8_samples_number_w );
 SAMPLES_START( suna8_sh_start );
 

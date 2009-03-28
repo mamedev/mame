@@ -406,6 +406,8 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub[offset] = data;
 				break;
 			case 4:
+				if (strcmp(space->machine->gamedrv->name, "sdgndmps") == 0)
+					update_irq_lines(space->machine, RST10_ASSERT);
 				update_irq_lines(space->machine, RST18_ASSERT);
 				break;
 			case 6:

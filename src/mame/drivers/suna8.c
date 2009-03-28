@@ -23,7 +23,7 @@ Year + Game         Game     PCB         Epoxy CPU    Notes
 
 To Do:
 
-- Samples playing in rranger, starfigh, sparkman (AY8910 ports A&B)
+- Samples playing in starfigh, sparkman (AY8910 ports A&B)
 
 Notes:
 
@@ -576,6 +576,7 @@ static WRITE8_HANDLER( rranger_bankswitch_w )
 */
 static READ8_HANDLER( rranger_soundstatus_r )
 {
+	soundlatch2_r(space, offset);
 	return 0x02;
 }
 
@@ -996,9 +997,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rranger_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM					)	// RAM
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	//
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym1", ym2203_w )
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ym2", ym2203_w	)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	// To Sound CPU
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym1", ym2203_w			)	// Samples + Music
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ym2", ym2203_w			)	// Music + FX
 ADDRESS_MAP_END
 
 
@@ -1530,6 +1531,18 @@ MACHINE_DRIVER_END
 
 /* 1 x 24 MHz crystal */
 
+static const ym2203_interface rranger_ym2203_interface =
+{
+	{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("samples", rranger_play_samples_w),
+	DEVCB_DEVICE_HANDLER("samples", suna8_samples_number_w),
+	}
+};
+
 /* 2203 + 8910 */
 static MACHINE_DRIVER_START( rranger )
 
@@ -1561,10 +1574,16 @@ static MACHINE_DRIVER_START( rranger )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MDRV_SOUND_CONFIG(rranger_ym2203_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
 	MDRV_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 6)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
+	MDRV_SOUND_CONFIG(suna8_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_DRIVER_END
@@ -2323,18 +2342,18 @@ static DRIVER_INIT( suna8 )
 }
 
 /* Working Games */
-GAME( 1988, rranger,  0,        rranger,  rranger,  suna8,    ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)", GAME_IMPERFECT_SOUND )
-GAME( 1988, hardhead, 0,        hardhead, hardhead, hardhead, ROT0,  "SunA",                       "Hard Head"									, 0)
-GAME( 1988, hardhedb, hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg",                    "Hard Head (bootleg)"						, 0)
-GAME( 1988, pop_hh,   hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg",                    "Popper (Hard Head bootleg)"				, 0)
-GAME( 1991, hardhea2, 0,        hardhea2, hardhea2, hardhea2, ROT0,  "SunA",                       "Hard Head 2 (v2.0)"                       , 0 )
+GAME( 1988, rranger,  0,        rranger,  rranger,  suna8,    ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0)", 0)
+GAME( 1988, hardhead, 0,        hardhead, hardhead, hardhead, ROT0,  "SunA", "Hard Head" , 0)
+GAME( 1988, hardhedb, hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", "Hard Head (bootleg)" , 0)
+GAME( 1988, pop_hh,   hardhead, hardhead, hardhead, hardhedb, ROT0,  "bootleg", "Popper (Hard Head bootleg)" , 0)
+GAME( 1991, hardhea2, 0,        hardhea2, hardhea2, hardhea2, ROT0,  "SunA", "Hard Head 2 (v2.0)" , 0 )
 
 /* Non Working Games */
-GAME( 1988, sranger,  rranger, rranger,  rranger,	suna8,        ROT0,  "SunA",    "Super Ranger (v2.0)",           GAME_NOT_WORKING )
-GAME( 1988, srangerb, rranger, rranger,  rranger,	suna8,        ROT0,  "bootleg", "Super Ranger (bootleg)",        GAME_NOT_WORKING )
-GAME( 1988, srangerw, rranger, rranger,  rranger,	suna8,        ROT0,  "SunA (WDK license)", "Super Ranger (WDK)", GAME_NOT_WORKING )
-GAME( 1989, sparkman, 0,       sparkman, sparkman, sparkman, ROT0,  "SunA",    "Spark Man (v 2.0)",             GAME_NOT_WORKING )
-GAME( 1990, starfigh, 0,       starfigh, hardhea2, starfigh, ROT90, "SunA",    "Star Fighter (v1)",             GAME_NOT_WORKING )
-GAME( 1992, brickzn,  0,       brickzn,  brickzn,  brickzn,  ROT90, "SunA",    "Brick Zone (v5.0)",             GAME_NOT_WORKING )
-GAME( 1992, brickzn3, brickzn, brickzn,  brickzn,  brickzn3, ROT90, "SunA",    "Brick Zone (v4.0)",             GAME_NOT_WORKING )
+GAME( 1988, sranger,  rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA", "Super Ranger (v2.0)", GAME_NOT_WORKING )
+GAME( 1988, srangerb, rranger,  rranger,  rranger,  suna8,    ROT0,  "bootleg", "Super Ranger (bootleg)", GAME_NOT_WORKING )
+GAME( 1988, srangerw, rranger,  rranger,  rranger,  suna8,    ROT0,  "SunA (WDK license)", "Super Ranger (WDK)", GAME_NOT_WORKING )
+GAME( 1989, sparkman, 0,        sparkman, sparkman, sparkman, ROT0,  "SunA", "Spark Man (v 2.0)", GAME_NOT_WORKING )
+GAME( 1990, starfigh, 0,        starfigh, hardhea2, starfigh, ROT90, "SunA", "Star Fighter (v1)", GAME_NOT_WORKING )
+GAME( 1992, brickzn,  0,        brickzn,  brickzn,  brickzn,  ROT90, "SunA", "Brick Zone (v5.0)", GAME_NOT_WORKING )
+GAME( 1992, brickzn3, brickzn,  brickzn,  brickzn,  brickzn3, ROT90, "SunA", "Brick Zone (v4.0)", GAME_NOT_WORKING )
 

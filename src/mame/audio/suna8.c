@@ -29,6 +29,17 @@ WRITE8_DEVICE_HANDLER( suna8_play_samples_w )
 	}
 }
 
+WRITE8_DEVICE_HANDLER( rranger_play_samples_w )
+{
+	if( data )
+	{
+		if(( sample != 0 ) && ( ~data & 0x30 ))	// don't play sample zero when the bit is active
+		{
+			sample_start_raw(device, 0, &samplebuf[0x800*sample], 0x0800, 4000, 0);
+		}
+	}
+}
+
 WRITE8_DEVICE_HANDLER( suna8_samples_number_w )
 {
 	sample = data & 0xf;
