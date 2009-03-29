@@ -779,21 +779,28 @@ static int toaplan2_videoram16_r(offs_t offset, int controller)
 
 	switch (toaplan2_voffs[controller] & 0xfc00)
 	{
+		case 0x8400:
+		case 0x8000:
 		case 0x0400:
 		case 0x0000:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_BG_VRAM_SIZE/2)-1);
 				video_data = bgvideoram16[controller][vram_offset];
 				break;
+		case 0x8c00:
+		case 0x8800:
 		case 0x0c00:
 		case 0x0800:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_FG_VRAM_SIZE/2)-1);
 				video_data = fgvideoram16[controller][vram_offset];
 				break;
+		case 0x9400:
+		case 0x9000:
 		case 0x1400:
 		case 0x1000:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_TOP_VRAM_SIZE/2)-1);
 				video_data = topvideoram16[controller][vram_offset];
 				break;
+		case 0x9800:
 		case 0x1800:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_SPRITERAM_SIZE/2)-1);
 				video_data = spriteram16_new[controller][vram_offset];
@@ -823,24 +830,31 @@ static void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT16 mem_mask, i
 
 	switch (toaplan2_voffs[controller] & 0xfc00)
 	{
+		case 0x8400:
+		case 0x8000:
 		case 0x0400:
 		case 0x0000:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_BG_VRAM_SIZE/2)-1);
 				COMBINE_DATA(&bgvideoram16[controller][vram_offset]);
 				tilemap_mark_tile_dirty(bg_tilemap[controller],vram_offset/2);
 				break;
+		case 0x8c00:
+		case 0x8800:
 		case 0x0c00:
 		case 0x0800:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_FG_VRAM_SIZE/2)-1);
 				COMBINE_DATA(&fgvideoram16[controller][vram_offset]);
 				tilemap_mark_tile_dirty(fg_tilemap[controller],vram_offset/2);
 				break;
+		case 0x9400:
+		case 0x9000:
 		case 0x1400:
 		case 0x1000:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_TOP_VRAM_SIZE/2)-1);
 				COMBINE_DATA(&topvideoram16[controller][vram_offset]);
 				tilemap_mark_tile_dirty(top_tilemap[controller],vram_offset/2);
 				break;
+		case 0x9800:
 		case 0x1800:
 				vram_offset = toaplan2_voffs[controller] & ((TOAPLAN2_SPRITERAM_SIZE/2)-1);
 				COMBINE_DATA(&spriteram16_new[controller][vram_offset]);
