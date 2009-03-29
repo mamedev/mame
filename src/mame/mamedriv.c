@@ -4515,7 +4515,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ghostsqu )	/* 2004.12 Ghost Squad */
 						/* 2005.03 Kidou Senshi Gundam Battle Operating Simulator */
 						/* 2005.03 Sangokushi Taisen */
-						/* 2005.04 Wangan Midnight Maximum Tune 2 */
+	DRIVER( wangmid2 )	/* 2005.04 Wangan Midnight Maximum Tune 2 */
 						/* 2005.05 Quest of D ver.1.20 */
 						/* 2005.06 Sega Golf Club Network Pro Tour 2005 */
 						/* 2005.09 Quest of D ver.1.21 */
