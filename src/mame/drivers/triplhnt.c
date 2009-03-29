@@ -134,8 +134,14 @@ static READ8_HANDLER( triplhnt_da_latch_r )
 }
 
 
-static ADDRESS_MAP_START( triplhnt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READ(SMH_RAM) AM_MIRROR(0x300)
+static ADDRESS_MAP_START( triplhnt_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
+	AM_RANGE(0x0400, 0x04ff) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_playfield_ram)
+	AM_RANGE(0x0800, 0x080f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_vpos_ram)
+	AM_RANGE(0x0810, 0x081f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_hpos_ram)
+	AM_RANGE(0x0820, 0x082f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_orga_ram)
+	AM_RANGE(0x0830, 0x083f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_code_ram)
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("0C00")
 	AM_RANGE(0x0c08, 0x0c08) AM_READ_PORT("0C08")
 	AM_RANGE(0x0c09, 0x0c09) AM_READ_PORT("0C09")
@@ -143,23 +149,10 @@ static ADDRESS_MAP_START( triplhnt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c0b, 0x0c0b) AM_READ(triplhnt_input_port_4_r)
 	AM_RANGE(0x0c10, 0x0c1f) AM_READ(triplhnt_da_latch_r)
 	AM_RANGE(0x0c20, 0x0c2f) AM_READ(triplhnt_cmos_r)
-	AM_RANGE(0x0c30, 0x0c3f) AM_READ(triplhnt_misc_r)
+	AM_RANGE(0x0c30, 0x0c3f) AM_READWRITE(triplhnt_misc_r, triplhnt_misc_w)
 	AM_RANGE(0x0c40, 0x0c40) AM_READ_PORT("0C40")
 	AM_RANGE(0x0c48, 0x0c48) AM_READ_PORT("0C48")
-	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM) /* program */
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_ROM) /* program mirror */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( triplhnt_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE(SMH_RAM) AM_MIRROR(0x300)
-	AM_RANGE(0x0400, 0x04ff) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_playfield_ram)
-	AM_RANGE(0x0800, 0x080f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_vpos_ram)
-	AM_RANGE(0x0810, 0x081f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_hpos_ram)
-	AM_RANGE(0x0820, 0x082f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_orga_ram)
-	AM_RANGE(0x0830, 0x083f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_code_ram)
-	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(triplhnt_misc_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(SMH_ROM) /* program */
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_ROM) /* program mirror */
+	AM_RANGE(0x7000, 0x7fff) AM_ROM /* program */
 ADDRESS_MAP_END
 
 
@@ -320,7 +313,7 @@ static MACHINE_DRIVER_START( triplhnt )
 
 /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 800000)
-	MDRV_CPU_PROGRAM_MAP(triplhnt_readmem, triplhnt_writemem)
+	MDRV_CPU_PROGRAM_MAP(triplhnt_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -352,7 +345,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( triplhnt )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD_NIB_HIGH( "8404.f1", 0x7000, 0x400, CRC(abc8acd5) SHA1(bcef2abc5829829a01aa21776c3deb2e1bf1d4ac) )
 	ROM_LOAD_NIB_LOW ( "8408.f2", 0x7000, 0x400, CRC(77fcdd3f) SHA1(ce0196abb8d6510aa9a5308f8efd6442e94272c4) )
 	ROM_LOAD_NIB_HIGH( "8403.e1", 0x7400, 0x400, CRC(8d756fa1) SHA1(48a74f710b130d9af0c866483d6fc4ecce4a3ac5) )
@@ -360,9 +353,7 @@ ROM_START( triplhnt )
 	ROM_LOAD_NIB_HIGH( "8402.d1", 0x7800, 0x400, CRC(eb75c936) SHA1(48f9d4113a7ab8413a5aacd44b3506afc99d26ce) )
 	ROM_LOAD_NIB_LOW ( "8406.d2", 0x7800, 0x400, CRC(e7ab1186) SHA1(7185fb837966bfb4aa70be3dd948d44f356b0452) )
 	ROM_LOAD_NIB_HIGH( "8401.c1", 0x7C00, 0x400, CRC(7461b05e) SHA1(16573ae655c306a38ff0f29a3c3285d636907f38) )
-	ROM_RELOAD(                   0xFC00, 0x400 )
 	ROM_LOAD_NIB_LOW ( "8405.c2", 0x7C00, 0x400, CRC(ba370b97) SHA1(5d799ce6ae56c315ff0abedea7ad9204bacc266b) )
-	ROM_RELOAD(                   0xFC00, 0x400 )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )  /* sprites */
 	ROM_LOAD( "8423.n1", 0x0000, 0x800, CRC(9937d0da) SHA1(abb906c2d9869b09be5172cc7639bb9cda38831b) )
