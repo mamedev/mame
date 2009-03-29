@@ -64,7 +64,7 @@
 
     Later versions of games (Golden Tee Golf, Shuffle Shot & World Class
     Bowling) converged to a single platform, the large single PCB
-    (P/N 1082 Rev 2).  With the correct jumpers setting (surface mounted)
+    (P/N 1083 Rev 2).  With the correct jumpers setting (surface mounted)
     and chipset this board can run any of the 3 listed programs.
 
     Starting with GT Fore!, I.T. moved to a redesigned hardware platform known as the Eagle platform.
@@ -2179,7 +2179,7 @@ ROM_START( hotmemry )	/* Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N ????
 	ROM_LOAD16_BYTE( "hotmem.srom0", 0x000000, 0x80000, CRC(c1103224) SHA1(52cf341ff9092ecb8cb94f66a96ee0c726bf1412) )
 ROM_END
 
-ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1082 Rev 2), This version is derived from the Tournament version, but tournament features have be removed/disabled */
+ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1083 Rev 2), This version is derived from the Tournament version, but tournament features have be removed/disabled */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcbdprm0.200", 0x00000, 0x20000, CRC(280df7f0) SHA1(dacffe8fc21263093b0f4a4fbf444abd49afbff1) )
 	ROM_LOAD32_BYTE( "wcbdprm1.200", 0x00001, 0x20000, CRC(526eded0) SHA1(106d5503ed4db2411e1f3446d613eac525a8a9cc) )
@@ -2215,7 +2215,7 @@ ROM_START( wcbowldx )	/* Deluxe version 2.00 (PCB P/N 1082 Rev 2), This version 
 ROM_END
 
 
-ROM_START( wcbwl140 )	/* Version 1.40 Tournament (PCB P/N 1082 Rev 2) */
+ROM_START( wcbwl140 )	/* Version 1.40 Tournament (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcbfprm0.140", 0x00000, 0x20000, CRC(9d31ceb1) SHA1(d147976a763ba1e18d861351b12c5d275b94a562) ) /* Labeled "WCBF PROM0 1.40" ect */
 	ROM_LOAD32_BYTE( "wcbfprm1.140", 0x00001, 0x20000, CRC(c6669452) SHA1(ba58da7bee5120682e2306454da287c969014899) )
@@ -2251,7 +2251,7 @@ ROM_START( wcbwl140 )	/* Version 1.40 Tournament (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1082 Rev 2) */
+ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcb_prm0.166", 0x00000, 0x20000, CRC(f6774112) SHA1(cb09bb3e40490b3cdc3a5f7d18168384b5b29d85) )
 	ROM_LOAD32_BYTE( "wcb_prm1.166", 0x00001, 0x20000, CRC(931821ae) SHA1(328cd78ba70fe3cb0bdbc53833fe6fb153aceaea) )
@@ -2283,7 +2283,7 @@ ROM_START( wcbowl )	/* Version 1.66 (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( wcbwl165 )	/* Version 1.65 (PCB P/N 1082 Rev 2) */
+ROM_START( wcbwl165 )	/* Version 1.65 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcb_prm0.165", 0x00000, 0x20000, CRC(cf0f6c25) SHA1(90685288994dce73d5b1070a55fca3f1713c5bb6) )
 	ROM_LOAD32_BYTE( "wcb_prm1.165", 0x00001, 0x20000, CRC(076ab158) SHA1(e6d8a6726e27ba6916d4711dff88f26f1dc162e1) )
@@ -2315,7 +2315,7 @@ ROM_START( wcbwl165 )	/* Version 1.65 (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( wcbwl161 )	/* Version 1.61 (PCB P/N 1082 Rev 2) */
+ROM_START( wcbwl161 )	/* Version 1.61 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcb_prm0.161", 0x00000, 0x20000, CRC(b879d4a7) SHA1(8b5af3f4d3522bdb8e1d6092b2e311fbfaec2bd0) )
 	ROM_LOAD32_BYTE( "wcb_prm1.161", 0x00001, 0x20000, CRC(49f3ed6a) SHA1(6c6857bd3fbfe0cfeaf0e512bbbd795376a21472) )
@@ -2347,7 +2347,7 @@ ROM_START( wcbwl161 )	/* Version 1.61 (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( wcbwl16 )	/* Version 1.6 (PCB P/N 1082 Rev 2), This is the first set to move to the single board platform */
+ROM_START( wcbwl16 )	/* Version 1.6 (PCB P/N 1083 Rev 2), This is the first set to move to the single board platform */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "wcb_prm0.16n", 0x00000, 0x20000, CRC(332c558f) SHA1(179b763e2189c11cf6751eb6c419fe4417b288a8) ) /* Program roms labeled as "WCB PROM0 V1.6N" ect */
 	ROM_LOAD32_BYTE( "wcb_prm1.16n", 0x00001, 0x20000, CRC(c5750857) SHA1(8121b56d304ab405b06d4aa4c7d2db2f912f0bf2) )
@@ -2659,7 +2659,7 @@ ROM_START( sftmj )	/* Version 1.12N (Japan) */
 ROM_END
 
 
-ROM_START( shufshot )	/* Version 1.40 (PCB P/N 1082 Rev 2) */
+ROM_START( shufshot )	/* Version 1.40 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shotprm0.140", 0x00000, 0x20000, CRC(33c0c98b) SHA1(9960a1e8131e5dde33450560665f315e5a97dc05) )
 	ROM_LOAD32_BYTE( "shotprm1.140", 0x00001, 0x20000, CRC(d30a8831) SHA1(3a7937b542f703dfc2ae74b6fdb2ac6a8e22bdbd) )
@@ -2694,7 +2694,7 @@ ROM_START( shufshot )	/* Version 1.40 (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( sshot139 )	/* Version 1.39 (PCB P/N 1082 Rev 2) */
+ROM_START( sshot139 )	/* Version 1.39 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shotprm0.139", 0x00000, 0x20000, CRC(e811fc4a) SHA1(9e1d8f64ac89ac865929f6a23f66d95eeeda3ac9) )
 	ROM_LOAD32_BYTE( "shotprm1.139", 0x00001, 0x20000, CRC(f9d120c5) SHA1(f94216f1fb6d810ddee98479e83f0719b30b768f) )
@@ -2729,7 +2729,7 @@ ROM_START( sshot139 )	/* Version 1.39 (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( sshot137 )	/* Version 1.37 (PCB P/N 1082 Rev 2) */
+ROM_START( sshot137 )	/* Version 1.37 (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "shotprm0.137", 0x00000, 0x20000, CRC(6499c76f) SHA1(60fdaefb09088ac609addd40569bd7fab12593bc) )
 	ROM_LOAD32_BYTE( "shotprm1.137", 0x00001, 0x20000, CRC(64fb47a4) SHA1(32ce9d91b16b8aaf545c0a22842ad8d806727a17) )
@@ -2764,7 +2764,7 @@ ROM_START( sshot137 )	/* Version 1.37 (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( gt3d )	/* Version 1.93N for the single large type PCB P/N 1082 Rev 2 */
+ROM_START( gt3d )	/* Version 1.93N for the single large type PCB P/N 1083 Rev 2 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gtg3prm0.93n", 0x00000, 0x80000, CRC(cacacb44) SHA1(747f48a52e140ab3e321b8f6a96f06bc70dc7cfa) )
 	ROM_LOAD32_BYTE( "gtg3prm1.93n", 0x00001, 0x80000, CRC(4c172d7f) SHA1(d4217d5d4d561e46e0213e6f8dc8d9a874f86877) )
@@ -3091,7 +3091,7 @@ ROM_START( gt3dv14 ) /* Version 1.4 for the 3 tier type PCB with short ROM board
 ROM_END
 
 
-ROM_START( gt3dt231 ) /* Version 2.31 Tournament Edition (PCB P/N 1082 Rev 2) */
+ROM_START( gt3dt231 ) /* Version 2.31 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gtg3prm0.231", 0x00000, 0x100000, CRC(92a5c3e9) SHA1(a20c9ffb9b08eff1d59b77d08e6411275c58d932) )
 	ROM_LOAD32_BYTE( "gtg3prm1.231", 0x00001, 0x100000, CRC(a3b60226) SHA1(2b78fb2917ad66883d2353d82f48b5aeb599d444) )
@@ -3122,7 +3122,7 @@ ROM_START( gt3dt231 ) /* Version 2.31 Tournament Edition (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( gt3dt211 ) /* Version 2.11 Tournament Edition (PCB P/N 1082 Rev 2) */
+ROM_START( gt3dt211 ) /* Version 2.11 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gtg3prm0.211", 0x00000, 0x100000, CRC(54360fdf) SHA1(05687f7f41f719458ee72b4517c7be3e33ee80cf) )
 	ROM_LOAD32_BYTE( "gtg3prm1.211", 0x00001, 0x100000, CRC(9142ebb7) SHA1(ae3c9bf1a954c2f790cdb7953a6fea3d1d277aa9) )
@@ -3308,7 +3308,7 @@ ROM_START( gt97v120 ) /* Version 1.20 */
 ROM_END
 
 
-ROM_START( gt97t243 ) /* Version 2.43 Tournament Edition (PCB P/N 1082 Rev 2) */
+ROM_START( gt97t243 ) /* Version 2.43 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt97prm0.243", 0x00000, 0x100000, CRC(b8de60f1) SHA1(06b1f8b9d0b878d5a19e6756957e2df19e013ad6) )
 	ROM_LOAD32_BYTE( "gt97prm1.243", 0x00001, 0x100000, CRC(8152e5d3) SHA1(2a4f8acc6a4e33864c97d5974e2230b1cf3632ea) )
@@ -3339,7 +3339,7 @@ ROM_START( gt97t243 ) /* Version 2.43 Tournament Edition (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( gt97t240 ) /* Version 2.40 Tournament Edition (PCB P/N 1082 Rev 2) */
+ROM_START( gt97t240 ) /* Version 2.40 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt97prm0.240", 0x00000, 0x100000, CRC(88a386d0) SHA1(003dbf784125b1a442f85e18f8161695dcacc3a8) )
 	ROM_LOAD32_BYTE( "gt97prm1.240", 0x00001, 0x100000, CRC(b0d751aa) SHA1(7e6ab9c2bb0bd4f50360655c59f48c44f6135f4f) )
@@ -3463,7 +3463,7 @@ ROM_START( gt98s100 ) /* Version 1.00S for the 3 tier type PCB with short ROM bo
 ROM_END
 
 
-ROM_START( gt98t303 )	/* Version 3.03 Tournament Edition (PCB P/N 1082 Rev 2) */
+ROM_START( gt98t303 )	/* Version 3.03 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt98prm0.303", 0x00000, 0x100000, CRC(e3879c30) SHA1(fa9dd2df8969a98a3c87c6a96594e1f49ca7ec91) )
 	ROM_LOAD32_BYTE( "gt98prm1.303", 0x00001, 0x100000, CRC(6a42ab1e) SHA1(9d8c5a48f0b91dcc8898913eec3d09ddded0f43d) )
@@ -3562,7 +3562,7 @@ ROM_START( gt99s100 )	/* Version 1.00S for the 3 tier type PCB with short ROM bo
 ROM_END
 
 
-ROM_START( gt99t400 )	/* Version 4.00 Tournament Edition (PCB P/N 1082 Rev 2) */
+ROM_START( gt99t400 )	/* Version 4.00 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt99prm0.400", 0x00000, 0x100000, CRC(bc58e0a2) SHA1(9e207acb860d532238f6105fd5b0d283056e016f) )
 	ROM_LOAD32_BYTE( "gt99prm1.400", 0x00001, 0x100000, CRC(89d8cc6b) SHA1(ff2a5452c1c3a14c22abe380cb1ce263c23cc071) )
@@ -3596,7 +3596,7 @@ ROM_START( gt99t400 )	/* Version 4.00 Tournament Edition (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( gtroyal )	/* Version 4.02T EDM (Tournament Edition, PCB P/N 1082 Rev 2) */
+ROM_START( gtroyal )	/* Version 4.02T EDM (Tournament Edition, PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gtr_prm0.402", 0x00000, 0x100000, CRC(ae499ea3) SHA1(0de651900fd92b2de3fcbc092c1292d546f12819) )
 	ROM_LOAD32_BYTE( "gtr_prm1.402", 0x00001, 0x100000, CRC(87ee04b5) SHA1(2c4c4a80073bfd28066bef371fbd1008149cc56c) )
@@ -3698,7 +3698,7 @@ ROM_START( gt2ks100 )	/* Version 1.00S for the 3 tier type PCB with short ROM bo
 ROM_END
 
 
-ROM_START( gt2kt500 ) /* Version 5.00 Tournament Edition (PCB P/N 1082 Rev 2) */
+ROM_START( gt2kt500 ) /* Version 5.00 Tournament Edition (PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt2kprm0.500", 0x00000, 0x100000, CRC(8f20f9eb) SHA1(e7b19c34fff39040b8849483146303d4eb394da6) )
 	ROM_LOAD32_BYTE( "gt2kprm1.500", 0x00001, 0x100000, CRC(bdecc1f5) SHA1(f97edb54cffdba68d46dfb86d884192ffaa0d204) )
@@ -3732,7 +3732,7 @@ ROM_START( gt2kt500 ) /* Version 5.00 Tournament Edition (PCB P/N 1082 Rev 2) */
 ROM_END
 
 
-ROM_START( gtsuprem ) /* Version 5.10T ELC S (Tournament Edition, PCB P/N 1082 Rev 2) */
+ROM_START( gtsuprem ) /* Version 5.10T ELC S (Tournament Edition, PCB P/N 1083 Rev 2) */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gts_prm0.510", 0x00000, 0x100000, CRC(a14f7e2b) SHA1(fa913452701e580a9242994020a42e0be7d41a60) ) /* chips labeled as "GTG SUP ELC PROM0 5.10T" ect */
 	ROM_LOAD32_BYTE( "gts_prm1.510", 0x00001, 0x100000, CRC(772f4dc9) SHA1(c44c1893f28386b6457bffd0a85b361c1033a805) )
@@ -3972,7 +3972,7 @@ static void init_shuffle_bowl_common(running_machine *machine, int prot_addr)
 	/*
         The newest versions of World Class Bowling are on the same exact
         platform as Shuffle Shot. So We'll use the same general INIT
-        routine for these two programs.  IE: PCB P/N 1082 Rev 2
+        routine for these two programs.  IE: PCB P/N 1083 Rev 2
     */
 	init_program_rom(machine);
 	itech32_vram_height = 1024;
@@ -4155,7 +4155,7 @@ GAME( 1999, wcbowldx, 0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible 
       ^^ ^ ^^^
     Game | Version
          |
-    v = Version (AAMA 676266+ PCB P/N 1082 Rev 2)
+    v = Version (AAMA 676266+ PCB P/N 1083 Rev 2)
     l = Long ROM board:
         Main  P/N 1064 Rev 1
         ROM   P/N 1080 Rev 5
@@ -4164,8 +4164,8 @@ GAME( 1999, wcbowldx, 0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible 
         Main  P/N 1064 Rev 1
         ROM   P/N 1069 Rev 2 or P/N 1088 Rev 0 (1 Trackball Connector)
         Sound P/N 1078 Rev 1 or P/N 1066 Rev 2
-    n = Non-tournament (AAMA 676266+) PCB P/N 1082 Rev 2 - Applies only for GT3D
-    t = Tournament PCB P/N 1082 Rev 2, with necessary chips on board:
+    n = Non-tournament (AAMA 676266+) PCB P/N 1083 Rev 2 - Applies only for GT3D
+    t = Tournament PCB P/N 1083 Rev 2, with necessary chips on board:
         Philips SCN68681 (DUART) & ST Timekeeper (M48T02-120PC1) with an additional 3.6864MHz OSC
 
     NOTE: Due to various different upgrade packages from IT, the 3 tier boards can end up with any combination
@@ -4181,7 +4181,7 @@ GAME( 1999, wcbowldx, 0,        sftm,     wcbowldx, shufshot, ROT0, "Incredible 
   GT Diamond Edition Tournament is a Euro GT Classic (Not currently dumped)
      This would be the only known tournament version of Classic
 
-NOTE: There is an "8 Meg board" version of the P/N 1082 Rev 2 PCB, so GROM0_0 through GROM0_3 are 8 meg roms and labeled "GTxx GROM0_0 **" ect
+NOTE: There is an "8 Meg board" version of the P/N 1083 Rev 2 PCB, so GROM0_0 through GROM0_3 are 8 meg roms and labeled "GTxx GROM0_0 **" ect
       while GROM1_0 through GROM1_3 are 4 meg roms matching "4 Meg board" GROM2_0 through GROM2_3 and are labeled "GTxx GROM1_0 *" ect
       It is possible to find these rom combinations on any given GT board set.  There is only 1 known GT set which specificly checks for 8 meg
       roms under the GROM Checksum test.
