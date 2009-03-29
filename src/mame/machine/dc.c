@@ -625,6 +625,59 @@ WRITE64_HANDLER( dc_maple_w )
 									jvs_command=0;
 									ddtdata.length = (tocopy+7)/4;
 								}
+								else if (subcommand == 0x33) // "direct mode" input port reading
+								{
+									int tocopy;
+
+									maple0x86data2[0] = 0xa0;
+									for (a=1;a < 32;a++)
+										maple0x86data2[a] = maple0x86data2[a-1] + 1;
+									maple0x86data2[3] = maple0x86data2[3] | 0x0c;
+									maple0x86data2[6] = maple0x86data2[6] & 0xcf;
+
+									a = input_port_read(space->machine, "IN0"); // put keys here
+									maple0x86data2[6] = maple0x86data2[6] | (a << 4);
+
+									tocopy = 8+0x11+16;
+									/* valid data check*/
+									maple0x86data2[0x11] = 0x00;
+									maple0x86data2[0x12] = 0x8e;
+									maple0x86data2[0x13] = 0x01;
+									maple0x86data2[0x14] = 0x00;
+									maple0x86data2[0x15] = 0xff;
+									maple0x86data2[0x16] = 0xe0;
+									maple0x86data2[0x19] = 0x01;
+
+									/* read the inputs */
+									maple0x86data2[0x1a]=1;
+									maple0x86data2[0x1b]=2; //number of players
+									maple0x86data2[0x1c]=input_port_read(space->machine, "IN1");
+									maple0x86data2[0x1d]=input_port_read(space->machine, "IN2");
+									maple0x86data2[0x1e]=input_port_read(space->machine, "IN3");
+									maple0x86data2[0x1f]=input_port_read(space->machine, "IN4");
+									maple0x86data2[0x20]=1;
+									maple0x86data2[0x21]=(dc_coin_counts[0] >> 8) & 0xff; //coin counter read-back hi byte
+									maple0x86data2[0x22]=dc_coin_counts[0] & 0xff; //coin counter read-back lo byte
+									maple0x86data2[0x23]=(dc_coin_counts[1] >> 8) & 0xff;
+									maple0x86data2[0x24]=dc_coin_counts[1] & 0xff;
+									maple0x86data2[0x25]=1;
+									maple0x86data2[0x26]=1;
+									maple0x86data2[0x27]=0;
+									maple0x86data2[0x28]=0;
+									maple0x86data2[0x29]=0;
+									maple0x86data2[0x2a]=0;
+									/*0x2b-0x2f rotary inputs */
+									//...
+
+									// command end flag
+									maple0x86data2[0x18]=17;
+									maple0x86data2[0x15]=16;
+
+									for (a=0;a < tocopy;a=a+4)
+										buff[1+a/4] = maple0x86data2[a] | (maple0x86data2[a+1] << 8) | (maple0x86data2[a+2] << 16) | (maple0x86data2[a+3] << 24);
+									jvs_command=0;
+									ddtdata.length = (tocopy+7)/4;
+								}
 								else if (subcommand == 0x21)
 								{
 									// 21,*c295407 (77),*c295404,*c295405,*c295406,0,1,0
