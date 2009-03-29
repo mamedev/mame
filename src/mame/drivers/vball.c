@@ -204,8 +204,10 @@ static WRITE8_HANDLER(vb_scrollx_lo_w)
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
+//Cheaters note: Scores are stored in ram @ 0x57-0x58 (though the space is used for other things between matches)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("SYSTEM")
@@ -213,27 +215,6 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("P3")
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P4")
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( vball2pj_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1005, 0x1005) AM_READ(SMH_RAM)		//Strange, that these are read!
-	AM_RANGE(0x1006, 0x1006) AM_READ(SMH_RAM)		//Strange, that these are read!
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-//Cheaters note: Scores are stored in ram @ 0x57-0x58 (though the space is used for other things between matches)
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x08ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1008, 0x1008) AM_WRITE(vb_scrollx_hi_w)
 	AM_RANGE(0x1009, 0x1009) AM_WRITE(vb_bankswitch_w)
 	AM_RANGE(0x100a, 0x100b) AM_WRITE(vball_irq_ack_w)	/* is there a scanline counter here? */
@@ -242,22 +223,16 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x100e, 0x100e) AM_WRITE(SMH_RAM) AM_BASE(&vb_scrolly_lo)
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(vb_videoram_w) AM_BASE(&vb_videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(vb_attrib_w) AM_BASE(&vb_attribram)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8800, 0x8801) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("oki", okim6295_r)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8800, 0x8801) AM_DEVWRITE("ym", ym2151_w)
-	AM_RANGE(0x9800, 0x9803) AM_DEVWRITE("oki", okim6295_w)
 ADDRESS_MAP_END
 
 
@@ -317,6 +292,12 @@ static INPUT_PORTS_START( common )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	
+	PORT_START("P3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_START("P4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vball )
@@ -349,7 +330,7 @@ static INPUT_PORTS_START( vball )
 	PORT_DIPSETTING(    0x80, "2")
 	PORT_DIPSETTING(    0x00, "4")
 
-	PORT_START("P3")
+	PORT_MODIFY("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
@@ -359,7 +340,7 @@ static INPUT_PORTS_START( vball )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )
 
-	PORT_START("P4")
+	PORT_MODIFY("P4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
@@ -437,11 +418,11 @@ static MACHINE_DRIVER_START( vball )
 
 	/* basic machine hardware */
  	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* 2 MHz - measured by guru but it makes the game far far too slow ?! */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_TIMER_ADD_SCANLINE("scantimer", vball_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -467,13 +448,6 @@ static MACHINE_DRIVER_START( vball )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( vball2pj )
-	MDRV_IMPORT_FROM(vball)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vball2pj_readmem,writemem)
 MACHINE_DRIVER_END
 
 
@@ -573,5 +547,5 @@ ROM_END
 
 
 GAME( 1988, vball,    0,     vball,    vball,    0, ROT0, "Technos", "U.S. Championship V'ball (US)", 0 )
-GAME( 1988, vball2pj, vball, vball2pj, vball2pj, 0, ROT0, "Technos", "U.S. Championship V'ball (Japan)", 0 )
+GAME( 1988, vball2pj, vball, vball,    vball2pj, 0, ROT0, "Technos", "U.S. Championship V'ball (Japan)", 0 )
 GAME( 1988, vballb,   vball, vball,    vball,    0, ROT0, "Technos", "U.S. Championship V'ball (bootleg)", 0 )
