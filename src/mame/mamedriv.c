@@ -4442,7 +4442,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2002.12 Virtua Fighter 4 Evolution ver.B */
 						/* 2003.03 WCCF 2001-2002 ver.2.0 */
 						/* 2003.09 WCCF 2002-2003 */
-						/* 2004.01 Initial D Arcade Stage ver.3 */
+	DRIVER( initdv3j )	/* 2004.01 Initial D Arcade Stage ver.3 */
 						/* 2004.06 WCCF 2002-2003 ver.2.0 */
 	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned */
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */

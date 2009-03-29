@@ -4112,9 +4112,23 @@ ROM_START( initdexp )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0025", 0, SHA1(8ea92cf6b493f21b9453832edad7cbc5e5b350c1) )
 
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)  // key supplied was bad
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	ROM_LOAD("317-0343-com.data", 0x00, 0x50, CRC(e9d8fac0) SHA1(85f5bbffbd9d1f7162bae46ddd49e7870fe93662) )
 ROM_END
+
+ROM_START( initdv3j )
+	NAOMI2_BIOS
+//  NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0032b", 0, SHA1(568411aa72ca308a03a6b5b61c79833464b88bc6) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gds-0032_pic", 0x00, 0x50, NO_DUMP ) // PIC was missing
+ROM_END
+
 
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -4132,6 +4146,7 @@ GAME( 2002, initdexp,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "
 GAME( 2002, vf4evo,  naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Evolution (Rev B) (GDS-0024B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vf4evoa, vf4evo,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Evolution (Rev A) (GDS-0024A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, initdv2j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, initdv3j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 3 (Japan) (Rev B) (GDS-0032B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vf4tuned,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev F) (GDS-0036F)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
@@ -4237,7 +4252,6 @@ ROM_START( gekpurya )
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	ROM_LOAD("gdt-0008c.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )
 ROM_END
-
 
 
 GAME( 200?, triforce, 0,        naomigd,    naomi,    0, ROT0, "Sega",           "Triforce Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
