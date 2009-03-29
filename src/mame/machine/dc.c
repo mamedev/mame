@@ -670,12 +670,13 @@ WRITE64_HANDLER( dc_maple_w )
 									//...
 
 									// command end flag
-									maple0x86data2[0x18]=17;
-									maple0x86data2[0x15]=16;
+									maple0x86data2[0x18]= (jvs_command == -1) ? 19 : 17;
+									maple0x86data2[0x15]= (jvs_command == -1) ? 24 : 16;
 
 									for (a=0;a < tocopy;a=a+4)
 										buff[1+a/4] = maple0x86data2[a] | (maple0x86data2[a+1] << 8) | (maple0x86data2[a+2] << 16) | (maple0x86data2[a+3] << 24);
-									jvs_command=0;
+
+									//jvs_command=0;
 									ddtdata.length = (tocopy+7)/4;
 								}
 								else if (subcommand == 0x21)
