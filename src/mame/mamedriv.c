@@ -4436,7 +4436,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
 						/* 2002.06 World Club Champion Football */
 						/* 2002.07 Soul Surfer */
-	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution */
+	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution (revision B) */
+	DRIVER( vf4evoa )
 	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
 						/* 2002.12 Virtua Fighter 4 Evolution ver.B */
 						/* 2003.03 WCCF 2001-2002 ver.2.0 */
