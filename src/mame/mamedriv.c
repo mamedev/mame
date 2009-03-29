@@ -5103,11 +5103,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( esckids )	/* GX975 (c) 1991 (Asia) */
 	DRIVER( esckidsj )	/* GX975 (c) 1991 (Japan) */
 	DRIVER( vendetta )	/* GX081 (c) 1991 (World) */
-	DRIVER( vendetao )	/* GX081 (c) 1991 (World) */
-	DRIVER( vendet2p )	/* GX081 (c) 1991 (World) */
-	DRIVER( vendetas )	/* GX081 (c) 1991 (Asia) */
-	DRIVER( vendtaso )	/* GX081 (c) 1991 (Asia) */
-	DRIVER( vendettj )	/* GX081 (c) 1991 (Japan) */
+	DRIVER( vendettar )	/* GX081 (c) 1991 (World) */
+	DRIVER( vendetta2p )	/* GX081 (c) 1991 (World) */
+	DRIVER( vendetta2pu )	/* GX081 (c) 1991 (Asia) */
+	DRIVER( vendetta2pd )	/* GX081 (c) 1991 (Asia) */
+	DRIVER( vendettaj )	/* GX081 (c) 1991 (Japan) */
 	DRIVER( mogura )	/* GX141 (c) 1991 */
 	DRIVER( wecleman )	/* GX602 (c) 1986 */
 	DRIVER( hotchase )	/* GX763 (c) 1988 */

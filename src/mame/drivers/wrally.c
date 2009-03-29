@@ -102,7 +102,7 @@ produces a high clock frequency, slow movements a low freq.
 
 static UINT16 *wrally_shareram;
 
-static ADDRESS_MAP_START( wrally_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( wrally_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
 	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(SMH_RAM, wrally_vram_w) AM_BASE(&wrally_videoram)	/* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE(&wrally_vregs)									/* Video Registers */
@@ -248,7 +248,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( wrally )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(wrally_readmem, 0)
+	MDRV_CPU_PROGRAM_MAP(wrally_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2)	/* verified on pcb */

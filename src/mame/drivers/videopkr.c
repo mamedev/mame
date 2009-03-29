@@ -873,7 +873,7 @@ static TIMER_CALLBACK(sound_t1_callback)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( i8039_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1159,7 +1159,7 @@ static MACHINE_DRIVER_START( videopkr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8039, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(i8039_readmem, 0)
+	MDRV_CPU_PROGRAM_MAP(i8039_map, 0)
 	MDRV_CPU_IO_MAP(i8039_io_port, 0)
 
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
