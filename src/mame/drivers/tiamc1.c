@@ -131,14 +131,10 @@ static WRITE8_HANDLER( tiamc1_control_w )
 }
 
 
-static ADDRESS_MAP_START( tiamc1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tiamc1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tiamc1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(tiamc1_videoram_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tiamc1_io_map, ADDRESS_SPACE_IO, 8 )
@@ -225,7 +221,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( tiamc1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080,16000000/9)		 /* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(tiamc1_readmem,tiamc1_writemem)
+	MDRV_CPU_PROGRAM_MAP(tiamc1_map,0)
 	MDRV_CPU_IO_MAP(tiamc1_io_map,0)
 
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -319,4 +315,3 @@ ROM_END
 GAME( 1988, konek, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "Konek-Gorbunok", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1988, sosterm, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "S.O.S.", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1988, koroleva, 0, tiamc1, tiamc1, 0, ROT0, "Terminal", "Snezhnaja Koroleva", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-

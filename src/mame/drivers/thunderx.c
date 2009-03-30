@@ -370,90 +370,60 @@ static WRITE8_DEVICE_HANDLER( scontra_snd_bankswitch_w )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( scontra_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
-	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
-	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
-	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-
-	AM_RANGE(0x0000, 0x3fff) AM_READ(K052109_051960_r)
-	AM_RANGE(0x4000, 0x57ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5800, 0x5fff) AM_READ(scontra_bankedram_r)			/* palette + work RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( thunderx_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
-	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
-	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
-	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1f98, 0x1f98) AM_READ(thunderx_1f98_r) /* registers */
-
-	AM_RANGE(0x0000, 0x3fff) AM_READ(K052109_051960_r)
-	AM_RANGE(0x4000, 0x57ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5800, 0x5fff) AM_READ(thunderx_bankedram_r)			/* palette + work RAM + unknown RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scontra_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( scontra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(scontra_bankswitch_w)	/* bankswitch control + coin counters */
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(thunderx_sh_irqtrigger_w)		/* cause interrupt on audio CPU */
 	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
+	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
+	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
+	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(thunderx_1f98_w)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)		/* video RAM + sprite RAM */
 
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(K052109_051960_w)		/* video RAM + sprite RAM */
-	AM_RANGE(0x4000, 0x57ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(scontra_bankedram_w) AM_BASE(&ram)			/* palette + work RAM */
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x57ff) AM_RAM
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(scontra_bankedram_r, scontra_bankedram_w) AM_BASE(&ram)			/* palette + work RAM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thunderx_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( thunderx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(thunderx_videobank_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(thunderx_sh_irqtrigger_w)		/* cause interrupt on audio CPU */
 	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(thunderx_1f98_w)
+	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
+	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
+	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
+	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
+	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(thunderx_1f98_r, thunderx_1f98_w) /* registers */
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)
 
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(K052109_051960_w)
-	AM_RANGE(0x4000, 0x57ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(thunderx_bankedram_w) AM_BASE(&ram)			/* palette + work RAM + unknown RAM */
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x57ff) AM_RAM
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(thunderx_bankedram_r, thunderx_bankedram_w) AM_BASE(&ram)			/* palette + work RAM + unknown RAM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scontra_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
+static ADDRESS_MAP_START( scontra_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM					/* ROM */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM					/* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami", k007232_r)	/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r)	/* YM2151 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scontra_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami", k007232_w)		/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)		/* YM2151 */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)		/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)		/* YM2151 */
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("konami", scontra_snd_bankswitch_w)	/* 007232 bank select */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thunderx_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( thunderx_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( thunderx_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -695,11 +665,11 @@ static MACHINE_DRIVER_START( scontra )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* 052001 */
-	MDRV_CPU_PROGRAM_MAP(scontra_readmem,scontra_writemem)
+	MDRV_CPU_PROGRAM_MAP(scontra_map,0)
 	MDRV_CPU_VBLANK_INT("screen", scontra_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(scontra_readmem_sound,scontra_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(scontra_sound_map,0)
 
 	MDRV_MACHINE_RESET(scontra)
 
@@ -736,11 +706,11 @@ static MACHINE_DRIVER_START( thunderx )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(thunderx_readmem,thunderx_writemem)
+	MDRV_CPU_PROGRAM_MAP(thunderx_map,0)
 	MDRV_CPU_VBLANK_INT("screen", scontra_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(thunderx_readmem_sound,thunderx_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(thunderx_sound_map,0)
 
 	MDRV_MACHINE_RESET(thunderx)
 

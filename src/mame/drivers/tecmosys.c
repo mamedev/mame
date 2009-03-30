@@ -367,27 +367,6 @@ static READ16_HANDLER( eeprom_r )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM) // work ram
-	AM_RANGE(0x210000, 0x210001) AM_READNOP // single byte overflow on stack defined as 0x210000
-	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM) // bg0 ram
-	AM_RANGE(0x400000, 0x4013ff) AM_READ(SMH_RAM) // bg1 ram
-	AM_RANGE(0x500000, 0x5013ff) AM_READ(SMH_RAM) // bg2 ram
-	AM_RANGE(0x700000, 0x703fff) AM_READ(SMH_RAM) // fix ram   (all these names from test screen)
-	AM_RANGE(0x800000, 0x80ffff) AM_READ(SMH_RAM) // obj ram
-	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
-	AM_RANGE(0x900000, 0x907fff) AM_READ(SMH_RAM) // obj pal
-	AM_RANGE(0x980000, 0x9807ff) AM_READ(SMH_RAM) // bg pal
-	AM_RANGE(0x980800, 0x980fff) AM_READ(SMH_RAM) // fix pal
-	AM_RANGE(0xb80000, 0xb80001) AM_READ(prot_status_r)
-	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
-	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
-	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
-	AM_RANGE(0xf00000, 0xf00001) AM_READ(sound_r)
-	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
-ADDRESS_MAP_END
-
 static WRITE16_HANDLER( eeprom_w )
 {
 	if ( ACCESSING_BITS_8_15 )
@@ -430,36 +409,43 @@ static WRITE16_HANDLER( bg2_tilemap_lineram_w )
 }
 
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) // work ram
-	AM_RANGE(0x300000, 0x300fff) AM_WRITE(bg0_tilemap_w) AM_BASE(&bg0tilemap_ram) // bg0 ram
-	AM_RANGE(0x301000, 0x3013ff) AM_WRITE(bg0_tilemap_lineram_w) AM_BASE(&bg0tilemap_lineram)// bg0 linescroll? (guess)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM // work ram
+	AM_RANGE(0x210000, 0x210001) AM_READNOP // single byte overflow on stack defined as 0x210000
+	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(bg0_tilemap_w) AM_BASE(&bg0tilemap_ram) // bg0 ram
+	AM_RANGE(0x301000, 0x3013ff) AM_RAM_WRITE(bg0_tilemap_lineram_w) AM_BASE(&bg0tilemap_lineram)// bg0 linescroll? (guess)
 
-	AM_RANGE(0x400000, 0x400fff) AM_WRITE(bg1_tilemap_w) AM_BASE(&bg1tilemap_ram) // bg1 ram
-	AM_RANGE(0x401000, 0x4013ff) AM_WRITE(bg1_tilemap_lineram_w) AM_BASE(&bg1tilemap_lineram)// bg1 linescroll? (guess)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(bg1_tilemap_w) AM_BASE(&bg1tilemap_ram) // bg1 ram
+	AM_RANGE(0x401000, 0x4013ff) AM_RAM_WRITE(bg1_tilemap_lineram_w) AM_BASE(&bg1tilemap_lineram)// bg1 linescroll? (guess)
 
-	AM_RANGE(0x500000, 0x500fff) AM_WRITE(bg2_tilemap_w) AM_BASE(&bg2tilemap_ram) // bg2 ram
-	AM_RANGE(0x501000, 0x5013ff) AM_WRITE(bg2_tilemap_lineram_w) AM_BASE(&bg2tilemap_lineram) // bg2 linescroll? (guess)
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(bg2_tilemap_w) AM_BASE(&bg2tilemap_ram) // bg2 ram
+	AM_RANGE(0x501000, 0x5013ff) AM_RAM_WRITE(bg2_tilemap_lineram_w) AM_BASE(&bg2tilemap_lineram) // bg2 linescroll? (guess)
 
-	AM_RANGE(0x700000, 0x703fff) AM_WRITE(fg_tilemap_w) AM_BASE(&fgtilemap_ram) // fix ram
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_RAM) AM_BASE(&tecmosys_spriteram) // obj ram
-	AM_RANGE(0x900000, 0x907fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // AM_WRITE(SMH_RAM) // obj pal
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_BASE(&fgtilemap_ram) // fix ram
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&tecmosys_spriteram) // obj ram
+	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // AM_WRITE(SMH_RAM) // obj pal
 
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITE(SMH_RAM) // bg pal
 	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
-	AM_RANGE(0x980000, 0x980fff) AM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&tilemap_paletteram16)
+	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&tilemap_paletteram16)
 
 	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w ) AM_BASE(&tecmosys_880000regs)	// 10 byte dta@88000c, 880022=watchdog?
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w	)
 	AM_RANGE(0xa80000, 0xa80005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_a80000regs)	// a80000-3 scroll? a80004 inverted ? 3 : 0
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_b00000regs)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
-	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(prot_status_w)
+	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(prot_status_r, prot_status_w)
 	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_c00000regs)	// c00000-3 scroll? c00004 inverted ? 13 : 10
 	AM_RANGE(0xc80000, 0xc80005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_c80000regs)	// c80000-3 scrool? c80004 inverted ? 3 : 0
+	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
+	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
+	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE( sound_w )
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
+	AM_RANGE(0xf00000, 0xf00001) AM_READ(sound_r)
+	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
 ADDRESS_MAP_END
 
 
@@ -553,15 +539,10 @@ static WRITE8_HANDLER( tecmosys_oki_bank_w )
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
 }
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xe000, 0xf7ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xf7ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -899,12 +880,12 @@ static const ymf262_interface tecmosys_ymf262_interface =
 
 static MACHINE_DRIVER_START( deroon )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(400) // guess
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/2 )	/* 8 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 
 	MDRV_GFXDECODE(tecmosys)

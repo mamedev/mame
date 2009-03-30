@@ -207,23 +207,16 @@ static MACHINE_START( amazon )
 	state_save_register_global_array(machine, mAmazonProtReg);
 }
 
-static ADDRESS_MAP_START( terracre_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x020000, 0x0201ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x020200, 0x021fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x023000, 0x023fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( terracre_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x020200, 0x021fff) AM_RAM
+	AM_RANGE(0x022000, 0x022fff) AM_WRITE(amazon_background_w) AM_BASE(&amazon_videoram)
+	AM_RANGE(0x023000, 0x023fff) AM_RAM
 	AM_RANGE(0x024000, 0x024001) AM_READ_PORT("P1")
 	AM_RANGE(0x024002, 0x024003) AM_READ_PORT("P2")
 	AM_RANGE(0x024004, 0x024005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x024006, 0x024007) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( terracre_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x020000, 0x0201ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
-	AM_RANGE(0x020200, 0x021fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x022000, 0x022fff) AM_WRITE(amazon_background_w) AM_BASE(&amazon_videoram)
-	AM_RANGE(0x023000, 0x023fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x026000, 0x026001) AM_WRITE(amazon_flipscreen_w)	/* flip screen & coin counters */
 	AM_RANGE(0x026002, 0x026003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x026004, 0x026005) AM_WRITE(amazon_scrolly_w)
@@ -231,37 +224,26 @@ static ADDRESS_MAP_START( terracre_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_BASE(&videoram16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amazon_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x040000, 0x040fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( amazon_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x040200, 0x040fff) AM_RAM
+	AM_RANGE(0x042000, 0x042fff) AM_WRITE(amazon_background_w) AM_BASE(&amazon_videoram)
 	AM_RANGE(0x044000, 0x044001) AM_READ_PORT("IN0")
 	AM_RANGE(0x044002, 0x044003) AM_READ_PORT("IN1")
 	AM_RANGE(0x044004, 0x044005) AM_READ_PORT("IN2")
 	AM_RANGE(0x044006, 0x044007) AM_READ_PORT("IN3")
-	AM_RANGE(0x070000, 0x070001) AM_READ(amazon_protection_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( amazon_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x040000, 0x0401ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
-	AM_RANGE(0x040200, 0x040fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x042000, 0x042fff) AM_WRITE(amazon_background_w) AM_BASE(&amazon_videoram)
 	AM_RANGE(0x046000, 0x046001) AM_WRITE(amazon_flipscreen_w)	/* flip screen & coin counters */
 	AM_RANGE(0x046002, 0x046003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x046004, 0x046005) AM_WRITE(amazon_scrolly_w)
 	AM_RANGE(0x04600c, 0x04600d) AM_WRITE(amazon_sound_w)
 	AM_RANGE(0x050000, 0x050fff) AM_WRITE(amazon_foreground_w) AM_BASE(&videoram16)
-	AM_RANGE(0x070000, 0x070003) AM_WRITE(amazon_protection_w)
+	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_3526_io_map, ADDRESS_SPACE_IO, 8 )
@@ -559,11 +541,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( amazon )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
-	MDRV_CPU_PROGRAM_MAP(amazon_readmem,amazon_writemem)
+	MDRV_CPU_PROGRAM_MAP(amazon_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz???? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_3526_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
 
@@ -598,11 +580,11 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ym3526 )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
-	MDRV_CPU_PROGRAM_MAP(terracre_readmem,terracre_writemem)
+	MDRV_CPU_PROGRAM_MAP(terracre_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz???? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_3526_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
 
@@ -635,11 +617,11 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ym2203 )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
-	MDRV_CPU_PROGRAM_MAP(terracre_readmem,terracre_writemem)
+	MDRV_CPU_PROGRAM_MAP(terracre_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz???? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_2203_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
 
