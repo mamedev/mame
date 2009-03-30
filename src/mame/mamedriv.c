@@ -4356,8 +4356,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ggxx )		/* 2002.05 Guilty Gear XX */
 						/* 2002.05 Cleopatra Fortune + */
 	DRIVER( mok )		/* 2002.05 The Maze of the Kings */
-	DRIVER( ngdup23a )	/* DIMM Firmware Updater */
-	DRIVER( ngdup23c )
 	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
 						/* 2002.07 Mazan */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
@@ -4393,6 +4391,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( meltyb )	/* 2006.12 Melty Blood Act Cadenza ver.B */
 	DRIVER( takoron )	/* 2006.12.16 Noukone Puzzle Takoron */
 	DRIVER( meltyba )	/* 2007.03 Melty Blood Act Cadenza ver.B Syuuseiban(ver.B2) */
+
+	DRIVER( ngdup23a )	/* DIMM Firmware Updater */
+	DRIVER( ngdup23c )
 
 						/* Releases below use flash/mask ROMs like older NAOMI titles, not GD-ROM as GD-ROM Hardware (Drives and Discs) were no longer being produced */
 
@@ -4443,15 +4444,16 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.03 WCCF 2001-2002 ver.2.0 */
 						/* 2003.09 WCCF 2002-2003 */
 	DRIVER( initdv3j )	/* 2004.01 Initial D Arcade Stage ver.3 */
+						/* 2004.?? Initial D Arcade Stage ver.3 for CYCRAFT */
 						/* 2004.06 WCCF 2002-2003 ver.2.0 */
-	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned */
-	DRIVER( vf4tuneda )
+						/* 2004.07 Virtua Fighter 4 Final Tuned */
+	DRIVER( vf4tuneda )	/* 2004.09 Virtua Fighter 4 Final Tuned ver.A */
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */
 						/* 2005.01 Virtua Fighter 4 final Tuned ver.B */
 						/* 2005.04 Menkyo no Tetsujin */
 						/* 2005.07 WCCF 2004-2005 */
 						/* 2006.08 WCCF European Clubs 2005-2006 */
-
+	DRIVER( vf4tuned )	/* 200?.?? Virtual fighter 4 Final Tuned ver.F */
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
@@ -4490,7 +4492,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Triforce (GameCube based) */
 	DRIVER( triforce )
-	DRIVER( vs2002ex )	/* GDT-0002 2002.10 Virtua Striker 2002 */
+	DRIVER( vs2002ex )	/* 2002.10 Virtua Striker 2002 */
 						/* 2003.06 F-ZERO AX */
 						/* 2003.07 Avalon no Kagi */
 						/* 2003.10 Avalon no Kagi ver.1.01 */
@@ -4498,9 +4500,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.12 Avalon no Kagi ver.1.10 */
 						/* 2004.04 Avalon no Kagi ver.1.20 Aratanaru Syoukan */
 						/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
-	DRIVER( vs4 )		/* GDT-0015 2004.10 Virtua Striker 4 */
+	DRIVER( vs4 )		/* 2004.10 Virtua Striker 4 */
 						/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
 						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
+
+						/* Triforce GDROM Boot Update (GDT-0011) */
 
 	/* Chihiro (X-Box based) */
 	DRIVER( chihiro )
@@ -4509,9 +4513,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vcop3 )		/* 2003.04 Virtua Cop 3 */
 						/* 2003.12 Outrun 2 */
 						/* 2004.03 Ollie King */
+						/* 2004.03 Sega Network Taisen Mahjong MJ 2 */
 	DRIVER( wangmid )	/* 2004.07 Wangan Midnight Maximum Tune */
 						/* 2004.09 Quest of D */
 						/* 2004.11 Sega Golf Club Network Pro Tour */
+						/* 2004.?? Sega Network Taisen Mahjong MJ 2 ver.A */
+						/* 2004.?? Sega Network Taisen Mahjong MJ 2 ver.B */
+						/* 2004.?? Sega Network Taisen Mahjong MJ 2 ver.C */
+						/* 2004.11 Sega Network Taisen Mahjong MJ 2 ver.D */
+						/* 2004.?? Sega Network Taisen Mahjong MJ 2 ver.E */
 						/* 2004.12 Outrun 2 Special Tours */
 						/* 2004.12 Quest of D ver.1.10 */
 	DRIVER( ghostsqu )	/* 2004.12 Ghost Squad */
@@ -4526,8 +4536,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.12 Kidou Senshi Gundam 0079 Card Builder */
 						/* 2005.12 Quest of D ver.2.01 Gofu no Keisyousya */
 						/* 2005.12 Sega Golf Club 2006 Next Tours */
+						/* 2005.12 Sega Network Taisen Mahjong MJ 3 */
 						/* 2006.05 Sangokushi Taisen 2 */
+						/* 2006.09 Sega Network Taisen Mahjong MJ 3 ver.B */
 						/* 2007.03 Kidou Senshi Gundam 0083 Card Builder */
+						/* 2007.03 Sega Network Taisen Mahjong MJ 3 Evolution */
 						/* 2007.10 Kidou Senshi Gundam 0083 Card Builder Ryouyuu Gekitotsu */
 
 	DRIVER( hshavoc )	/* (c) 1993 Data East */
