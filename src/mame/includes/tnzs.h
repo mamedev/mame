@@ -1,6 +1,6 @@
 /*----------- defined in drivers/tnzs.c -----------*/
 
-extern UINT8 *tnzs_objram, *tnzs_sharedram;
+extern UINT8 *tnzs_objram;
 extern UINT8 *tnzs_vdcram, *tnzs_scrollram, *tnzs_objctrl, *tnzs_bg_flag;
 
 
@@ -26,7 +26,6 @@ READ8_HANDLER( tnzs_mcu_r );
 WRITE8_HANDLER( tnzs_mcu_w );
 INTERRUPT_GEN( arknoid2_interrupt );
 MACHINE_RESET( tnzs );
-READ8_HANDLER( tnzs_sharedram_r );
 WRITE8_HANDLER( tnzs_sharedram_w );
 WRITE8_HANDLER( tnzs_bankswitch_w );
 WRITE8_HANDLER( tnzs_bankswitch1_w );

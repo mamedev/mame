@@ -487,6 +487,7 @@ interleave.
 
 *********************************/
 
+/*
 static TIMER_CALLBACK( kludge_callback )
 {
 	tnzs_sharedram[0x0f10] = param;
@@ -496,7 +497,7 @@ static WRITE8_HANDLER( tnzs_sync_kludge_w )
 {
 	timer_call_after_resynch(space->machine, NULL, data,kludge_callback);
 }
-
+*/
 
 
 
@@ -532,7 +533,7 @@ DRIVER_INIT( tnzs )
 {
 	mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+//	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
 }
 
 DRIVER_INIT( tnzsb )
@@ -540,7 +541,7 @@ DRIVER_INIT( tnzsb )
 	mcu_type = MCU_NONE_TNZSB;
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+//	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
 }
 
 DRIVER_INIT( kabukiz )
@@ -652,17 +653,6 @@ MACHINE_RESET( tnzs )
 		RAM = memory_region(machine, "sub");
 		memory_set_bankptr(machine, 2,&RAM[0x10000]);
 	}
-}
-
-
-READ8_HANDLER( tnzs_sharedram_r )
-{
-	return tnzs_sharedram[offset];
-}
-
-WRITE8_HANDLER( tnzs_sharedram_w )
-{
-	tnzs_sharedram[offset] = data;
 }
 
 

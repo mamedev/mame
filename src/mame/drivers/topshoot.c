@@ -191,49 +191,27 @@ static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( topshoot_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)					/* Cartridge Program Rom */
-//  AM_RANGE(0x200000, 0x20007f) AM_READ(SMH_RAM)
-//  AM_RANGE(0x200040, 0x200041) AM_READ_PORT("IN0")        // ??
-//  AM_RANGE(0x200050, 0x200051) AM_READ_PORT("IN0")        // ??
-	AM_RANGE(0x202000, 0x2023ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( topshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM					/* Cartridge Program Rom */
+//  AM_RANGE(0x200000, 0x20007f) AM_RAM
+	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("IN0")		// ??
-	AM_RANGE(0xa10000, 0xa1001f) AM_READ_PORT("IN0")
-	AM_RANGE(0xa11100, 0xa11101) AM_READ_PORT("IN0")		// ??
-
-
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(genesis_68k_to_z80_r)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READ(genesis_vdp_r)				/* VDP Access */
-	AM_RANGE(0xe00000, 0xe1ffff) AM_READ(SMH_BANK3)
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_BANK4)
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)					/* Main Ram */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( topshoot_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)					/* Cartridge Program Rom */
-//  AM_RANGE(0x200000, 0x20007f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x200000, 0x2023ff) AM_WRITE(SMH_RAM) // tested
 	AM_RANGE(0xa10000, 0xa1001f) AM_WRITE(genesis_io_w) AM_BASE(&genesis_io_ram)				/* Genesis Input */
 	AM_RANGE(0xa11000, 0xa11203) AM_WRITE(genesis_ctrl_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(genesis_68k_to_z80_w)
-	AM_RANGE(0xc00000, 0xc0001f) AM_WRITE(genesis_vdp_w)				/* VDP Access */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_BANK4)
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&genesis_68k_ram)/* Main Ram */
+	AM_RANGE(0xa10000, 0xa1001f) AM_READ_PORT("IN0")
+	AM_RANGE(0xa11100, 0xa11101) AM_READ_PORT("IN0")		// ??
+	AM_RANGE(0xa00000, 0xa0ffff) AM_READWRITE(genesis_68k_to_z80_r, genesis_68k_to_z80_w)
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(genesis_vdp_r, genesis_vdp_w)				/* VDP Access */
+	AM_RANGE(0xe00000, 0xe1ffff) AM_ROMBANK(3)
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAMBANK(4)
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_BASE(&genesis_68k_ram)/* Main Ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( genesis_z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_BANK1)
- 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_BANK2) /* mirror */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(genesis_z80_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(genesis_z80_bank_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( genesis_z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_BANK1) AM_BASE(&genesis_z80_ram)
- 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_BANK2) /* mirror */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(genesis_z80_w)
- // AM_RANGE(0x8000, 0xffff) AM_WRITE(genesis_z80_bank_w)
+static ADDRESS_MAP_START( genesis_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK(1) AM_BASE(&genesis_z80_ram)
+ 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK(2) /* mirror */
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(genesis_z80_r, genesis_z80_w)
+	AM_RANGE(0x8000, 0xffff) AM_READ(genesis_z80_bank_r) //AM_WRITE(genesis_z80_bank_w)
 ADDRESS_MAP_END
 
 
@@ -243,7 +221,7 @@ static MACHINE_DRIVER_START( genesis_base )
 	MDRV_CPU_VBLANK_INT("screen", genesis_vblank_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK / 15)
-	MDRV_CPU_PROGRAM_MAP(genesis_z80_readmem, genesis_z80_writemem)
+	MDRV_CPU_PROGRAM_MAP(genesis_z80_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* from vdp at scanline 0xe0 */
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -278,7 +256,7 @@ static MACHINE_DRIVER_START( topshoot )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM( genesis_base )
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(topshoot_readmem,topshoot_writemem)
+	MDRV_CPU_PROGRAM_MAP(topshoot_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_START(genesis)
