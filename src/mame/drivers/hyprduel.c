@@ -23,7 +23,7 @@ Imagetek Inc 14220 071
 
 --
 Written by Hau
-03/28/2009
+03/29/2009
 based on driver from drivers/metro.c by Luca Elia
 spthx to kikur,Cha,teioh,kokkyu,teruchu,aya,sgo
 ---
@@ -45,11 +45,13 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
 
 static int blitter_bit;
 static int requested_int;
-static UINT16 *hypr_irq_enable;
+static UINT16 *hyprduel_irq_enable;
 static int subcpu_resetline;
+static int cpu_trigger;
 static int int_num;
 
-static UINT16 *sharedram;
+static UINT16 *sharedram1;
+static UINT16 *sharedram3;
 
 /***************************************************************************
                                 Interrupts
@@ -57,7 +59,7 @@ static UINT16 *sharedram;
 
 static void update_irq_state(running_machine *machine)
 {
-	int irq = requested_int & ~*hypr_irq_enable;
+	int irq = requested_int & ~*hyprduel_irq_enable;
 
 	cpu_set_input_line(machine->cpu[0], 3, (irq & int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -65,7 +67,6 @@ static void update_irq_state(running_machine *machine)
 static TIMER_CALLBACK( vblank_end_callback )
 {
 	requested_int &= ~param;
-	cpu_set_input_line(machine->cpu[1], 2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( hyprduel_interrupt )
@@ -77,7 +78,6 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 		requested_int |= 0x01;		/* vblank */
 		requested_int |= 0x20;
 		cpu_set_input_line(device, 2, HOLD_LINE);
-		cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
 		/* the duration is a guess */
 		timer_set(device->machine, ATTOTIME_IN_USEC(2500), NULL, 0x20, vblank_end_callback);
 	} else {
@@ -97,45 +97,95 @@ static WRITE16_HANDLER( hyprduel_irq_cause_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data == int_num)
-			requested_int &= ~(int_num & ~*hypr_irq_enable);
+			requested_int &= ~(int_num & ~*hyprduel_irq_enable);
 		else
-			requested_int &= ~(data & *hypr_irq_enable);
+			requested_int &= ~(data & *hyprduel_irq_enable);
 
 		update_irq_state(space->machine);
 	}
 }
 
 
-static WRITE16_HANDLER( hypr_subcpu_control_w )
+static WRITE16_HANDLER( hyprduel_subcpu_control_w )
 {
-	if (data & 0x01)
+	switch (data)
 	{
-		if (!subcpu_resetline)
-		{
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-			subcpu_resetline = 1;
-		}
-	}
-	else
-	{
-		if ((subcpu_resetline == 1) && (data != 0x0c))
-		{
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
-			subcpu_resetline = 0;
+		case 0x0d:
+		case 0x0f:
+		case 0x01:
+			if (!subcpu_resetline)
+			{
+				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+				subcpu_resetline = 1;
+			}
+			break;
 
-			if ((int_num == 0x02) && (cpu_get_pc(space->cpu) == 0x000bb0))
-				cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(8000));
-			else
-				cpu_spinuntil_int(space->cpu);
+		case 0x00:
+			if (subcpu_resetline)
+			{
+				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+				subcpu_resetline = 0;
+			}
+			cpu_spinuntil_int(space->cpu);
+			break;
+
+		case 0x0c:
+		case 0x80:
+			cpu_set_input_line(space->machine->cpu[1], 2, HOLD_LINE);
+			break;
+	}
+}
+
+
+static READ16_HANDLER( hyprduel_cpusync_trigger1_r )
+{
+	if (cpu_trigger == 1001)
+	{
+		cpuexec_trigger(space->machine, 1001);
+		cpu_trigger = 0;
+	}
+
+	return sharedram1[0x000408/2 + offset];
+}
+
+static WRITE16_HANDLER( hyprduel_cpusync_trigger1_w )
+{
+	COMBINE_DATA(&sharedram1[0x00040e/2 + offset]);
+
+	if (((sharedram1[0x00040e/2]<<16) + sharedram1[0x000410/2]) != 0x00)
+	{
+		if (!cpu_trigger && !subcpu_resetline)
+		{
+			cpu_spinuntil_trigger(space->cpu, 1001);
+			cpu_trigger = 1001;
 		}
 	}
 }
 
-static READ16_HANDLER( hypr_cpusync_r )
-{
-	cpu_spin(space->cpu);
 
-	return sharedram[0x408/2 + offset];
+static READ16_HANDLER( hyprduel_cpusync_trigger2_r )
+{
+	if (cpu_trigger == 1002)
+	{
+		cpuexec_trigger(space->machine, 1002);
+		cpu_trigger = 0;
+	}
+
+	return sharedram3[(0xfff34c - 0xfe4000)/2 + offset];
+}
+
+static WRITE16_HANDLER( hyprduel_cpusync_trigger2_w )
+{
+	COMBINE_DATA(&sharedram1[0x000408/2 + offset]);
+
+	if (ACCESSING_BITS_8_15)
+	{
+		if (!cpu_trigger && !subcpu_resetline)
+		{
+			cpu_spinuntil_trigger(space->cpu, 1002);
+			cpu_trigger = 1002;
+		}
+	}
 }
 
 
@@ -394,18 +444,18 @@ static ADDRESS_MAP_START( hyprduel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478890, 0x478891) AM_WRITENOP
 	AM_RANGE(0x4788a0, 0x4788a1) AM_WRITENOP
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(hyprduel_irq_cause_r, hyprduel_irq_cause_w)	/* IRQ Cause,Acknowledge */
-	AM_RANGE(0x4788a4, 0x4788a5) AM_RAM AM_BASE(&hypr_irq_enable)		/* IRQ Enable */
+	AM_RANGE(0x4788a4, 0x4788a5) AM_RAM AM_BASE(&hyprduel_irq_enable)		/* IRQ Enable */
 	AM_RANGE(0x4788aa, 0x4788ab) AM_RAM AM_BASE(&hyprduel_rombank)		/* Rom Bank */
 	AM_RANGE(0x4788ac, 0x4788ad) AM_RAM AM_BASE(&hyprduel_screenctrl)	/* Screen Control */
 	AM_RANGE(0x479700, 0x479713) AM_RAM AM_BASE(&hyprduel_videoregs)	/* Video Registers */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(hypr_subcpu_control_w)
-	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE(1) AM_BASE(&sharedram)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(hyprduel_subcpu_control_w)
+	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE(1) AM_BASE(&sharedram1)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
 	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE(3) AM_BASE(&sharedram3)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyprduel_map2, ADDRESS_SPACE_PROGRAM, 16 )
@@ -424,7 +474,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magerror_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(hypr_subcpu_control_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(hyprduel_subcpu_control_w)
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(hyprduel_vram_0_w) AM_BASE(&hyprduel_vram_0)		/* Layer 0 */
 	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_BASE(&hyprduel_vram_1)		/* Layer 1 */
 	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(hyprduel_vram_2_w) AM_BASE(&hyprduel_vram_2)		/* Layer 2 */
@@ -441,17 +491,17 @@ static ADDRESS_MAP_START( magerror_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP
 	AM_RANGE(0x8788a0, 0x8788a1) AM_WRITENOP
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(hyprduel_irq_cause_r, hyprduel_irq_cause_w)	/* IRQ Cause, Acknowledge */
-	AM_RANGE(0x8788a4, 0x8788a5) AM_RAM AM_BASE(&hypr_irq_enable)		/* IRQ Enable */
+	AM_RANGE(0x8788a4, 0x8788a5) AM_RAM AM_BASE(&hyprduel_irq_enable)		/* IRQ Enable */
 	AM_RANGE(0x8788aa, 0x8788ab) AM_RAM AM_BASE(&hyprduel_rombank)		/* Rom Bank */
 	AM_RANGE(0x8788ac, 0x8788ad) AM_RAM AM_BASE(&hyprduel_screenctrl)	/* Screen Control */
 	AM_RANGE(0x879700, 0x879713) AM_RAM AM_BASE(&hyprduel_videoregs)	/* Video Registers */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE(1) AM_BASE(&sharedram)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE(1) AM_BASE(&sharedram1)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
 	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE(3) AM_BASE(&sharedram3)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magerror_map2, ADDRESS_SPACE_PROGRAM, 16 )
@@ -521,8 +571,8 @@ static INPUT_PORTS_START( hyprduel )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, "Start Up Mode" )
-	PORT_DIPSETTING(      0x0080, "Game Mode" )
-	PORT_DIPSETTING(      0x0000, "Test Mode" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -551,6 +601,51 @@ static INPUT_PORTS_START( hyprduel )
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_START1   )
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_START2   )
 	PORT_BIT(  0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magerror )
+	PORT_INCLUDE( hyprduel )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Start Up Mode" )
+	PORT_DIPSETTING(      0x0080, "Game Mode" )
+	PORT_DIPSETTING(      0x0000, "Test Mode" )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT(     0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x2000, "2" )
+	PORT_DIPSETTING(      0x3000, "3" )
+	PORT_DIPSETTING(      0x1000, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_BIT(     0xc000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -591,15 +686,16 @@ static MACHINE_RESET( hyprduel )
 	/* start with cpu2 halted */
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	subcpu_resetline = 1;
+	cpu_trigger = 0;
 
 	requested_int = 0x00;
 	blitter_bit = 2;
-	*hypr_irq_enable = 0xff;
+	*hyprduel_irq_enable = 0xff;
 }
 
 static MACHINE_START( magerror )
 {
-	timer_adjust_periodic(magerror_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(968));		/* ? */
+	timer_adjust_periodic(magerror_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(968));		/* tempo? */
 }
 
 static MACHINE_DRIVER_START( hyprduel )
@@ -737,28 +833,37 @@ ROM_START( magerror )
 ROM_END
 
 
-static DRIVER_INIT( hyprduel )
+static void savestate(running_machine *machine)
 {
-	int_num = 0x02;
-
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc0040b, 0, 0, hypr_cpusync_r);
-
 	/* Set up save state */
 	state_save_register_global(machine, blitter_bit);
 	state_save_register_global(machine, requested_int);
 	state_save_register_global(machine, subcpu_resetline);
+	state_save_register_global(machine, cpu_trigger);
 	state_save_register_global(machine, int_num);
+}
+
+static DRIVER_INIT( hyprduel )
+{
+	int_num = 0x02;
+	savestate(machine);
+
+	/* cpu synchronization (severe timings) */
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc0040e, 0xc00411, 0, 0, hyprduel_cpusync_trigger1_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger1_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger2_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfff34c, 0xfff34d, 0, 0, hyprduel_cpusync_trigger2_r);
 }
 
 static DRIVER_INIT( magerror )
 {
-	DRIVER_INIT_CALL(hyprduel);
-
 	int_num = 0x01;
+	savestate(machine);
+
 	magerror_irq_timer = timer_alloc(machine, magerror_irq_callback, NULL);
 }
 
 
 GAME( 1993, hyprduel, 0,        hyprduel, hyprduel, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1993, hyprdelj, hyprduel, hyprduel, hyprduel, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1994, magerror, 0,        magerror, hyprduel, magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", GAME_SUPPORTS_SAVE )
+GAME( 1994, magerror, 0,        magerror, magerror, magerror, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", GAME_SUPPORTS_SAVE )
