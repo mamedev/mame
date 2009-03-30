@@ -1238,7 +1238,7 @@ int main(int argc, char *argv[])
 	int ophandler_body_read = 0;
 
 	printf("\n\tMusashi v%s 68000, 68008, 68010, 68EC020, 68020, 68040 emulator\n", g_version);
-	printf("\tCopyright Karl Stenerud (karl@mame.net)\n\n");
+	printf("\tCopyright Karl Stenerud\n\n");
 
 	/* Check if output path and source for the input file are given */
     if(argc > 1)
