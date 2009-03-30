@@ -7,6 +7,7 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 ***************************************************************************/
 
 #include "driver.h"
+#include "trackfld.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
@@ -26,14 +27,6 @@ extern VIDEO_START( hyperspt );
 extern VIDEO_UPDATE( hyperspt );
 extern VIDEO_START( roadf );
 extern VIDEO_UPDATE( roadf );
-
-extern WRITE8_HANDLER( konami_sh_irqtrigger_w );
-extern READ8_HANDLER( hyperspt_sh_timer_r );
-extern WRITE8_DEVICE_HANDLER( hyperspt_sound_w );
-
-/* these routines lurk in audio/trackfld.c */
-extern WRITE8_HANDLER( konami_SN76496_latch_w );
-extern WRITE8_DEVICE_HANDLER( konami_SN76496_w );
 
 
 static WRITE8_HANDLER( hyperspt_coin_counter_w )

@@ -39,6 +39,7 @@ CPU/Video Board Parts:
 ***************************************************************************/
 
 #include "driver.h"
+#include "trackfld.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
@@ -59,11 +60,6 @@ WRITE8_HANDLER( sbasketb_scroll_w );
 PALETTE_INIT( sbasketb );
 VIDEO_START( sbasketb );
 VIDEO_UPDATE( sbasketb );
-
-WRITE8_HANDLER( konami_SN76496_latch_w );
-WRITE8_DEVICE_HANDLER( konami_SN76496_w );
-WRITE8_DEVICE_HANDLER( hyperspt_sound_w );
-READ8_HANDLER( hyperspt_sh_timer_r );
 
 
 static WRITE8_HANDLER( sbasketb_sh_irqtrigger_w )

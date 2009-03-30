@@ -48,6 +48,7 @@ The 6809 NMI is used for sound timing.
 ***************************************************************************/
 
 #include "driver.h"
+#include "trackfld.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
@@ -60,10 +61,6 @@ extern WRITE8_HANDLER( yiear_control_w );
 extern PALETTE_INIT( yiear );
 extern VIDEO_START( yiear );
 extern VIDEO_UPDATE( yiear );
-
-/* in audio/trackfld.c */
-extern WRITE8_HANDLER( konami_SN76496_latch_w );
-extern WRITE8_DEVICE_HANDLER( konami_SN76496_w );
 
 
 static READ8_DEVICE_HANDLER( yiear_speech_r )

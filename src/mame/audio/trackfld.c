@@ -36,20 +36,17 @@ static int last_addr = 0;
 
 WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 {
-    if( (offset & 0x07) == 0x03 )
-    {
-        int changes = offset^last_addr;
-        /* A7 = data enable for VLM5030 (don't care )          */
-        /* A8 = STA pin (1->0 data data  , 0->1 start speech   */
-        /* A9 = RST pin 1=reset                                */
+   int changes = offset^last_addr;
+   /* A7 = data enable for VLM5030 (don't care )          */
+   /* A8 = STA pin (1->0 data data  , 0->1 start speech   */
+   /* A9 = RST pin 1=reset                                */
 
-        /* A8 VLM5030 ST pin */
-        if( changes & 0x100 )
-            vlm5030_st( device, offset&0x100 );
-        /* A9 VLM5030 RST pin */
-        if( changes & 0x200 )
-            vlm5030_rst( device, offset&0x200 );
-    }
+   /* A8 VLM5030 ST pin */
+   if( changes & 0x100 )
+       vlm5030_st( device, offset&0x100 );
+   /* A9 VLM5030 RST pin */
+   if( changes & 0x200 )
+       vlm5030_rst( device, offset&0x200 );
     last_addr = offset;
 }
 
@@ -105,27 +102,4 @@ WRITE8_HANDLER( konami_SN76496_latch_w )
 WRITE8_DEVICE_HANDLER( konami_SN76496_w )
 {
     sn76496_w(device, offset, SN76496_latch);
-}
-
-
-
-
-READ8_HANDLER( hyprolyb_speech_r )
-{
-	return 0x00;
-//    return ADPCM_playing(0) ? 0x10 : 0x00;
-}
-
-WRITE8_HANDLER( hyprolyb_ADPCM_data_w )
-{
-    int cmd,start,end;
-    UINT8 *RAM = memory_region(space->machine, "adpcm");
-
-
-    /* simulate the operation of the 6802 */
-    cmd = RAM[0xfe01 + data] + 256 * RAM[0xfe00 + data];
-    start = RAM[cmd + 1] + 256 * RAM[cmd];
-    end = RAM[cmd + 3] + 256 * RAM[cmd + 2];
-//    if (end > start)
-  //      ADPCM_play(0,start,(end - start)*2);
 }

@@ -18,6 +18,7 @@ MAIN BOARD:
 ***************************************************************************/
 
 #include "driver.h"
+#include "trackfld.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/konami1.h"
@@ -27,50 +28,15 @@ MAIN BOARD:
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 
+#define MASTER_CLOCK		XTAL_18_432MHz
+#define SOUND_CLOCK			XTAL_14_31818MHz
+#define VLM_CLOCK			XTAL_3_579545MHz
 
-extern UINT8 *trackfld_scroll;
-extern UINT8 *trackfld_scroll2;
 
-WRITE8_HANDLER( trackfld_videoram_w );
-WRITE8_HANDLER( trackfld_colorram_w );
-WRITE8_HANDLER( trackfld_flipscreen_w );
-WRITE8_HANDLER( atlantol_gfxbank_w );
+static UINT8 hyprolyb_adpcm_ready;
+static UINT8 hyprolyb_adpcm_busy;
+static UINT8 hyprolyb_vck_ready;
 
-PALETTE_INIT( trackfld );
-VIDEO_START( trackfld );
-VIDEO_UPDATE( trackfld );
-
-WRITE8_HANDLER( konami_sh_irqtrigger_w );
-READ8_HANDLER( trackfld_sh_timer_r );
-READ8_DEVICE_HANDLER( trackfld_speech_r );
-WRITE8_DEVICE_HANDLER( trackfld_sound_w );
-READ8_HANDLER( hyprolyb_speech_r );
-WRITE8_HANDLER( hyprolyb_ADPCM_data_w );
-
-/*
- Track'n'Field has 1k of battery backed RAM which can be erased by setting a dipswitch
-*/
-static UINT8 *nvram;
-static size_t nvram_size;
-
-static NVRAM_HANDLER( trackfld )
-{
-	if (read_or_write)
-		mame_fwrite(file,nvram,nvram_size);
-	else if (file)
-		mame_fread(file,nvram,nvram_size);
-}
-
-static NVRAM_HANDLER( mastkin )
-{
-	if (read_or_write)
-		mame_fwrite(file,nvram,nvram_size);
-	else
-	{
-		if (file)
-			mame_fread(file,nvram,nvram_size);
-	}
-}
 
 static WRITE8_HANDLER( coin_w )
 {
@@ -79,92 +45,91 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( questions_bank_w )
 {
-	if( data != 0xff )
-	{
-		UINT8 *questions = memory_region(space->machine, "user1");
-		int bankaddr = 0;
+	if (!(data & 0x01))
+		memory_set_bank(space->machine, 1, 0);
+	else if (!(data & 0x02))
+		memory_set_bank(space->machine, 1, 1);
+	else if (!(data & 0x04))
+		memory_set_bank(space->machine, 1, 2);
+	else if (!(data & 0x08))
+		memory_set_bank(space->machine, 1, 3);
+	else if (!(data & 0x10))
+		memory_set_bank(space->machine, 1, 4);
+	else if (!(data & 0x20))
+		memory_set_bank(space->machine, 1, 5);
+	else if (!(data & 0x40))
+		memory_set_bank(space->machine, 1, 6);
+	else if (!(data & 0x80))
+		memory_set_bank(space->machine, 1, 7);
+}
 
-		switch( ~data & 0xff )
-		{
-		case 0x01:
-			bankaddr = 0;
-			break;
-		case 0x02:
-			bankaddr = 0x8000;
-			break;
-		case 0x04:
-			bankaddr = 0x10000;
-			break;
-		case 0x08:
-			bankaddr = 0x18000;
-			break;
-		case 0x10:
-			bankaddr = 0x20000;
-			break;
-		case 0x20:
-			bankaddr = 0x28000;
-			break;
-		case 0x40:
-			bankaddr = 0x30000;
-			break;
-		case 0x80:
-			bankaddr = 0x38000;
-			break;
-		}
+static WRITE8_HANDLER( hyprolyb_adpcm_w )
+{
+	soundlatch2_w(space, offset, data);
+	hyprolyb_adpcm_ready = 0x80;
+}
 
-		memory_set_bankptr(space->machine, 1,&questions[bankaddr]);
-	}
+static READ8_HANDLER( hyprolyb_adpcm_busy_r )
+{
+	return hyprolyb_adpcm_busy ? 0x10 : 0x00;
+}
+
+static WRITE8_DEVICE_HANDLER( hyprolyb_msm_data_w )
+{
+	msm5205_data_w(device, data);
+	hyprolyb_adpcm_busy = ~data & 0x80;
+}
+
+static READ8_DEVICE_HANDLER( hyprolyb_msm_vck_r )
+{
+	UINT8 old = hyprolyb_vck_ready;
+	hyprolyb_vck_ready = 0x00;
+	return old;
+}
+
+static READ8_HANDLER( hyprolyb_adpcm_ready_r )
+{
+	return hyprolyb_adpcm_ready;
+}
+
+static READ8_HANDLER( hyprolyb_adpcm_data_r )
+{
+	hyprolyb_adpcm_ready = 0x00;
+	return soundlatch2_r(space, offset);
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1281, 0x1281) AM_READ_PORT("IN0")
-	AM_RANGE(0x1282, 0x1282) AM_READ_PORT("IN1")
-	AM_RANGE(0x1283, 0x1283) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
 
-	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)       /* for atlantol (everything not mapped is read from rom) */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)		/* AFE */
+	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)	/* FLIP */
+	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_WRITE(konami_sh_irqtrigger_w)	/* 26 */ /* cause interrupt on audio CPU */
+	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITENOP 						/* 25 */
+	AM_RANGE(0x1083, 0x1084) AM_MIRROR(0x0078) AM_WRITE(coin_w)					/* 24, 23 */
+	AM_RANGE(0x1085, 0x1085) AM_MIRROR(0x0078) AM_WRITENOP 						/* CN3.2 */
+	AM_RANGE(0x1086, 0x1086) AM_MIRROR(0x0078) AM_WRITENOP 						/* CN3.4 */
+	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(interrupt_enable_w)		/* INT */
+	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_WRITE(soundlatch_w)			/* 32 */
+	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
+	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1281, 0x1281) AM_MIRROR(0x007c) AM_READ_PORT("IN0")
+	AM_RANGE(0x1282, 0x1282) AM_MIRROR(0x007c) AM_READ_PORT("IN1")
+	AM_RANGE(0x1283, 0x1283) AM_MIRROR(0x007c) AM_READ_PORT("DSW1")
+	/* not used according to schems: AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x007f) AM_READ_PORT("DSW3") */
+	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE(&trackfld_scroll)
+	AM_RANGE(0x1860, 0x1bff) AM_RAM
+	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE(&trackfld_scroll2)
+	AM_RANGE(0x1c60, 0x1fff) AM_RAM
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(atlantol_gfxbank_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1080, 0x1080) AM_WRITE(trackfld_flipscreen_w)
-	AM_RANGE(0x1081, 0x1081) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
-	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
-	AM_RANGE(0x1087, 0x1087) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x1100, 0x1100) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1800, 0x183f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x1840, 0x185f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll)
-	AM_RANGE(0x1860, 0x1bff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1c00, 0x1c3f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1c40, 0x1c5f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll2)
-	AM_RANGE(0x1c60, 0x1fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( reaktor_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	/* all usual addresses +0x8000 */
-	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9280, 0x9280) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x9281, 0x9281) AM_READ_PORT("IN0")
-	AM_RANGE(0x9282, 0x9282) AM_READ_PORT("IN1")
-	AM_RANGE(0x9283, 0x9283) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9800, 0x9fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa800, 0xbfff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( reaktor_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( reaktor_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	/* all usual addresses +0x8000 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x9080, 0x9080) AM_WRITE(trackfld_flipscreen_w)
@@ -172,56 +137,55 @@ static ADDRESS_MAP_START( reaktor_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9083, 0x9084) AM_WRITE(coin_w)
 	AM_RANGE(0x9087, 0x9087) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x9100, 0x9100) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x9800, 0x983f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x9840, 0x985f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll)
-	AM_RANGE(0x9860, 0x9bff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9c00, 0x9c3f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9c40, 0x9c5f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll2)
-	AM_RANGE(0x9c60, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa800, 0xabff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xac00, 0xafff) AM_WRITE(SMH_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb800, 0xbfff) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("DSW2")
+	AM_RANGE(0x9280, 0x9280) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x9281, 0x9281) AM_READ_PORT("IN0")
+	AM_RANGE(0x9282, 0x9282) AM_READ_PORT("IN1")
+	AM_RANGE(0x9283, 0x9283) AM_READ_PORT("DSW1")
+	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&trackfld_scroll)
+	AM_RANGE(0x9860, 0x9bff) AM_RAM
+	AM_RANGE(0x9c00, 0x9c3f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9c40, 0x9c5f) AM_RAM AM_BASE(&trackfld_scroll2)
+	AM_RANGE(0x9c60, 0x9fff) AM_RAM
+	AM_RANGE(0xa800, 0xabff) AM_RAM
+	AM_RANGE(0xac00, 0xafff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
 static ADDRESS_MAP_START( reaktor_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(SMH_NOP, SMH_NOP)
-	AM_RANGE(0x02, 0x02) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x03, 0x03) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x00, 0x00) AM_WRITENOP
+	AM_RANGE(0x01, 0x01) AM_NOP
+	AM_RANGE(0x02, 0x02) AM_WRITENOP
+	AM_RANGE(0x03, 0x03) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mastkin_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1281, 0x1281) AM_READ_PORT("IN0")
-//  AM_RANGE(0x1282, 0x1282) AM_READ_PORT("IN1") /* unused */
-	AM_RANGE(0x1283, 0x1283) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mastkin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mastkin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x10b1, 0x10b1) AM_WRITE(konami_sh_irqtrigger_w)
 	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
 	AM_RANGE(0x1087, 0x1087) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1800, 0x183f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x1840, 0x185f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll)
-	AM_RANGE(0x1860, 0x1bff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1c00, 0x1c3f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1c40, 0x1c5f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll2)
-	AM_RANGE(0x1c60, 0x1fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("DSW2")
+	AM_RANGE(0x1280, 0x1280) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1281, 0x1281) AM_READ_PORT("IN0")
+//  AM_RANGE(0x1282, 0x1282) AM_READ_PORT("IN1") /* unused */
+	AM_RANGE(0x1283, 0x1283) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE(&trackfld_scroll)
+	AM_RANGE(0x1860, 0x1bff) AM_RAM
+	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE(&trackfld_scroll2)
+	AM_RANGE(0x1c60, 0x1fff) AM_RAM
+	AM_RANGE(0x2800, 0x2bff) AM_RAM
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wizzquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -252,54 +216,54 @@ static ADDRESS_MAP_START( wizzquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(trackfld_sh_timer_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ(SMH_NOP) // reaktor reads here
-	AM_RANGE(0xe001, 0xe001) AM_READ(SMH_NOP) // reaktor reads here
-	AM_RANGE(0xe002, 0xe002) AM_DEVREAD("vlm", trackfld_speech_r)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(trackfld_sh_timer_r)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn", konami_SN76496_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_w)
+	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP			/* watch dog ?; reaktor reads here */
+	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("vlm", trackfld_speech_r)
+	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_MASK(0x0380) AM_DEVWRITE("vlm", trackfld_sound_w)
+	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("vlm", vlm5030_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn", sn76496_w)	/* Loads the snd command into the snd latch */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_NOP)		/* This address triggers the SN chip to read the data port. */
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_w)
-/* There are lots more addresses which are used for setting a two bit volume
-    controls for speech and music
-
-    Currently these are un-supported by Mame
-*/
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(SMH_NOP) /* watch dog ? */
-	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("vlm", vlm5030_data_w)
-	AM_RANGE(0xe000, 0xefff) AM_DEVWRITE("vlm", trackfld_sound_w) /* e003 speech control */
+static ADDRESS_MAP_START( hyprolyb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(trackfld_sh_timer_r)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(konami_SN76496_latch_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn", konami_SN76496_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_w)
+	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP			/* watch dog ?; reaktor reads here */
+	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_READ(hyprolyb_adpcm_busy_r)
+	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_WRITENOP
+	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_WRITE(hyprolyb_adpcm_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyprolyb_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(trackfld_sh_timer_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(hyprolyb_speech_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hyprolyb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn", sn76496_w)	/* Loads the snd command into the snd latch */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_NOP)		/* This address triggers the SN chip to read the data port. */
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_w)
-/* There are lots more addresses which are used for setting a two bit volume
-    controls for speech and music
-
-    Currently these are un-supported by Mame
-*/
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(SMH_NOP) /* watch dog ? */
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(hyprolyb_ADPCM_data_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_NOP)
+static ADDRESS_MAP_START( hyprolyb_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x1000, 0x1000) AM_READ(hyprolyb_adpcm_data_r)
+	AM_RANGE(0x1001, 0x1001) AM_READ(hyprolyb_adpcm_ready_r)
+	AM_RANGE(0x1002, 0x1002) AM_DEVWRITE("msm", hyprolyb_msm_data_w)
+	AM_RANGE(0x1003, 0x1003) AM_DEVREAD("msm", hyprolyb_msm_vck_r)
+		// on init:
+		//    $1003 = $00
+		//    $1002 = $FF
+		//    $1003 = $34
+		//    $1001 = $36
+		//    $1002 = $80
+		// loops while ($1003) & 0x80 == 0
+		// 1002 = ADPCM data written (low 4 bits)
+		//
+		// $1003 & $80 (in) = 5205 DRQ
+		// $1002 & $0f (out) = 5205 data
+		// $1001 & $80 (in) = sound latch request
+		// $1000 (in) = sound latch data
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -780,10 +744,15 @@ static GFXDECODE_START( trackfld )
 GFXDECODE_END
 
 
+static void adpcm_vck_callback(const device_config *device)
+{
+	hyprolyb_vck_ready = 0x80;
+}
+
 static const msm5205_interface msm5205_config =
 {
-	NULL,				/* VCK function */
-	MSM5205_S48_4B		/* 8 kHz */
+	adpcm_vck_callback,	/* VCK function */
+	MSM5205_S96_4B		/* 4 kHz */
 };
 
 
@@ -791,14 +760,14 @@ static const msm5205_interface msm5205_config =
 static MACHINE_DRIVER_START( trackfld )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 1.400 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)	/* Z80 Clock is derived from a 14.31818 MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
-	MDRV_NVRAM_HANDLER(trackfld)
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -821,51 +790,27 @@ static MACHINE_DRIVER_START( trackfld )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("sn", SN76496, 14318180/8)
+	MDRV_SOUND_ADD("sn", SN76496, SOUND_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("vlm", VLM5030, 3580000)
+	MDRV_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */
 static MACHINE_DRIVER_START( hyprolyb )
+	MDRV_IMPORT_FROM(trackfld)
 
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 1.400 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-
-	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)	/* Z80 Clock is derived from a 14.31818 MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_readmem,hyprolyb_sound_writemem)
-
-	MDRV_NVRAM_HANDLER(trackfld)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-
-	MDRV_GFXDECODE(trackfld)
-	MDRV_PALETTE_LENGTH(16*16+16*16)
-
-	MDRV_PALETTE_INIT(trackfld)
-	MDRV_VIDEO_START(trackfld)
-	MDRV_VIDEO_UPDATE(trackfld)
+	MDRV_CPU_MODIFY("audiocpu")
+	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_map,0)
+	
+	MDRV_CPU_ADD("adpcm", M6802, SOUND_CLOCK/8)	/* unknown clock */
+	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map,0)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-
-	MDRV_SOUND_ADD("sn", SN76496, 14318180/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
+	MDRV_SOUND_REMOVE("vlm")
+	
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -877,9 +822,7 @@ static MACHINE_DRIVER_START( mastkin )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(trackfld)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mastkin_readmem,mastkin_writemem)
-
-	MDRV_NVRAM_HANDLER(mastkin)
+	MDRV_CPU_PROGRAM_MAP(mastkin_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wizzquiz )
@@ -890,16 +833,14 @@ static MACHINE_DRIVER_START( wizzquiz )
 	MDRV_CPU_REPLACE("maincpu",M6800,2048000)		/* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wizzquiz_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-
-	MDRV_NVRAM_HANDLER(generic_0fill)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( reaktor )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(trackfld)
-	MDRV_CPU_REPLACE("maincpu",Z80,18432000/6)
-	MDRV_CPU_PROGRAM_MAP(reaktor_readmem,reaktor_writemem)
+	MDRV_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)
+	MDRV_CPU_PROGRAM_MAP(reaktor_map,0)
 	MDRV_CPU_IO_MAP(reaktor_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_DRIVER_END
@@ -1019,8 +960,6 @@ ROM_START( hyprolyb )
 
     /* These ROM's are located on the Sound Board */
 	ROM_REGION( 0x10000, "adpcm", 0 )	/*  64k for the 6802 which plays ADPCM samples */
-	/* this bootleg uses a 6802 to "emulate" the VLM5030 speech chip */
-	/* I didn't bother to emulate the 6802, I just play the samples. */
 	ROM_LOAD( "2764.1",       0x8000, 0x2000, CRC(a4cddeb8) SHA1(057981ad3b04239662bb19342e9ec14b0dab2351) )
 	ROM_LOAD( "2764.2",       0xa000, 0x2000, CRC(e9919365) SHA1(bd11d6e3ee2c6e698159c2768e315389d666107f) )
 	ROM_LOAD( "2764.3",       0xc000, 0x2000, CRC(c3ec42e1) SHA1(048a95726c4f031552e629c3788952c1bc5e7251) )
@@ -1061,8 +1000,6 @@ ROM_START( atlantol )
 	ROM_CONTINUE(      0x00000, 0x10000 )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )	/*  64k for the 6802 which plays ADPCM samples */
-	/* this bootleg uses a 6802 to "emulate" the VLM5030 speech chip */
-	/* I didn't bother to emulate the 6802, I just play the samples. */
 	ROM_LOAD( "atl36", 0x00000, 0x10000, CRC(0bae8489) SHA1(fbaeac99733f9c46b0b8d9a601c57df4004e2044) )
 	ROM_CONTINUE(      0x00000, 0x10000 )
 
@@ -1255,7 +1192,18 @@ static DRIVER_INIT( atlantol )
 
 	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
 
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x1000, 0, 0, SMH_NOP );
+	memory_install_write8_handler(space, 0x0800, 0x0800, 0, 0, atlantol_gfxbank_w);
+	memory_install_write8_handler(space, 0x1000, 0x1000, 0, 0, SMH_NOP);
+
+	/* unmapped areas read as ROM */
+	memory_install_read8_handler(space, 0x0000, 0x11ff, 0, 0, SMH_BANK10);
+	memory_install_read8_handler(space, 0x1380, 0x17ff, 0, 0, SMH_BANK11);
+	memory_install_read8_handler(space, 0x2000, 0x27ff, 0, 0, SMH_BANK12);
+	memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK13);
+	memory_set_bankptr(machine, 10, &rom[0x0000]);
+	memory_set_bankptr(machine, 11, &rom[0x1380]);
+	memory_set_bankptr(machine, 12, &rom[0x2000]);
+	memory_set_bankptr(machine, 13, &rom[0x4000]);
 }
 
 static DRIVER_INIT( mastkin )
@@ -1293,6 +1241,8 @@ static DRIVER_INIT( wizzquiz )
 	/* decrypt questions roms */
 	for( i = 0; i < 0x40000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+	
+	memory_configure_bank(machine, 1, 0, 8, ROM, 0x8000);
 }
 
 
@@ -1305,4 +1255,3 @@ GAME( 1988, mastkin,  0,        mastkin,  mastkin,  mastkin,  ROT0,  "Du Tech", 
 GAME( 1985, wizzquiz, 0,        wizzquiz, wizzquiz, wizzquiz, ROT0,  "Konami", "Wizz Quiz (Konami version)", 0 )
 GAME( 1985, wizzquza, wizzquiz, wizzquiz, wizzquiz, wizzquiz, ROT0,  "Zilec - Zenitone", "Wizz Quiz (version 4)", 0 )
 GAME( 1987, reaktor,  0,        reaktor,  reaktor,  0,        ROT90, "Zilec", "Reaktor (Track & Field conversion)", 0 )
-

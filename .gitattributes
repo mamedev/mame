@@ -2508,6 +2508,7 @@ src/mame/includes/tnzs.h svneol=native#text/plain
 src/mame/includes/toaplan1.h svneol=native#text/plain
 src/mame/includes/toaplan2.h svneol=native#text/plain
 src/mame/includes/toobin.h svneol=native#text/plain
+src/mame/includes/trackfld.h svneol=native#text/plain
 src/mame/includes/triplhnt.h svneol=native#text/plain
 src/mame/includes/tubep.h svneol=native#text/plain
 src/mame/includes/tumbleb.h svneol=native#text/plain
