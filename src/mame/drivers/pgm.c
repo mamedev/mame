@@ -706,11 +706,15 @@ static UINT16 kovsh_highlatch_68k_w, kovsh_lowlatch_68k_w;
 
 static READ32_HANDLER( kovsh_arm7_protlatch_r )
 {
+	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
+
 	return (kovsh_highlatch_68k_w << 16) | (kovsh_lowlatch_68k_w);
 }
 
 static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 {
+	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
+
 	if (ACCESSING_BITS_16_31)
 	{
 		kovsh_highlatch_arm_w = data>>16;
@@ -721,15 +725,11 @@ static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 		kovsh_lowlatch_arm_w = data;
 		kovsh_lowlatch_68k_w = 0;
 	}
-
-//  cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
-//  cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[0], 100));
 }
 
 static READ16_HANDLER( kovsh_68k_protlatch_r )
 {
-	//cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	//cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[0], 600));
+	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
 
 	switch (offset)
 	{
@@ -741,6 +741,8 @@ static READ16_HANDLER( kovsh_68k_protlatch_r )
 
 static WRITE16_HANDLER( kovsh_68k_protlatch_w )
 {
+	timer_call_after_resynch(space->machine, NULL, 0, 0); // force resync
+
 	switch (offset)
 	{
 		case 1: kovsh_highlatch_68k_w = data; break;
