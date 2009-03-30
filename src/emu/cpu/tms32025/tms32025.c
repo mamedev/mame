@@ -1995,7 +1995,7 @@ static CPU_EXECUTE( tms32025 )
 
 	/**** If idling, update timer and/or exit execution, but test for irqs first */
 	if (cpustate->idle && cpustate->IFR && cpustate->icount > 0)
-		cpustate->icount += process_IRQs(cpustate);
+		cpustate->icount -= process_IRQs(cpustate);
 
 	while (cpustate->idle && cpustate->icount > 0)
 		process_timer(cpustate, cpustate->icount);
@@ -2005,7 +2005,7 @@ static CPU_EXECUTE( tms32025 )
 
 	while (cpustate->icount > 0)
 	{
-		cpustate->tms32025_dec_cycles = (1*CLK);
+	  cpustate->tms32025_dec_cycles = 0;
 
 		if (cpustate->IFR) {	/* Check IRQ Flag Register for pending IRQs */
 			cpustate->tms32025_dec_cycles += process_IRQs(cpustate);
