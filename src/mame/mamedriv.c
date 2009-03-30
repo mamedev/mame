@@ -4522,7 +4522,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2004.03 Sega Network Taisen Mahjong MJ 2 */
 						/* 2004.04 Sega Network Taisen Mahjong MJ 2 ver.B */
 	DRIVER( wangmid )	/* 2004.07 Wangan Midnight Maximum Tune */
-						/* 2004.07 Sega Network Taisen Mahjong MJ 2 ver.C */
+	DRIVER( mj2 )		/* 2004.07 Sega Network Taisen Mahjong MJ 2 ver.C */
 						/* 2004.09 Quest of D */
 						/* 2004.11 Sega Golf Club Network Pro Tour */
 						/* 2004.12 Sega Network Taisen Mahjong MJ 2 ver.D */

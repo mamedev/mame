@@ -4391,6 +4391,19 @@ ROM_START( vcop3 )
 	ROM_LOAD("317-0354-com.data", 0x00, 0x50,  CRC(df7e3217) SHA1(9f0f4bf6b15f3b6eeea81eaa27b3d25bd94110da) )
 ROM_END
 
+ROM_START( mj2 )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0006c", 0, SHA1(505653117a73ed8b256ccf19450e7573a4dc57e9) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // key was missing
+	ROM_LOAD("gdx-0006c.pic_data", 0x00, 0x50, NO_DUMP )
+ROM_END
+
+
 ROM_START( wangmid )
 	CHIHIRO_BIOS
 
@@ -4429,6 +4442,7 @@ ROM_END
 
 
 GAME( 200?, chihiro,  0,       naomigd,    naomi,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2005, mj2,      chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 2 (Rev C) [GDX-0006C]", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid,  chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune (Rev. B) (Export) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid2, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 (Japan?) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ghostsqu, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
