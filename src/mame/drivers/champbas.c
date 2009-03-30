@@ -634,11 +634,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( exctsccr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4.0 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
 	MDRV_CPU_PROGRAM_MAP(exctsccr_main_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4123456)	/* ??? with 4 MHz, nested NMIs might happen */
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
 	MDRV_CPU_PROGRAM_MAP(exctsccr_sub_map,0)
 	MDRV_CPU_IO_MAP(exctsccr_sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000) /* 4 kHz, updates the dac */
@@ -667,7 +667,7 @@ static MACHINE_DRIVER_START( exctsccr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, 1500000) /* AY clock is specified by VR (0.9 - 3.9 MHz) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
@@ -931,6 +931,35 @@ ROM_START( exctscca )
 	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
 ROM_END
 
+ROM_START( exctsccj )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.10g",    0x0000, 0x2000, CRC(d1bfdf75) SHA1(a4a9bb340712401b1d24705c26d996a798776d4f) )
+	ROM_LOAD( "2.10h",    0x2000, 0x2000, CRC(5c61f0fe) SHA1(8c6751b80f89d8744d3eaa2a6da2cafdde968ed2) )
+	ROM_LOAD( "3.10j",    0x4000, 0x2000, CRC(8f213b10) SHA1(5bffaee2725fe34b0614fcf1b4dc1c9a2f2df36c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "0.6h",     0x0000, 0x2000, CRC(548b08a2) SHA1(4cdcc67e34e56cbac5d07e9603650073de0bb5d1) )
+	ROM_LOAD( "9_f6.bin", 0x2000, 0x2000, CRC(639998f5) SHA1(c4ff5e5e75d53dea38449f323186d08d5b57bf90) )
+	ROM_LOAD( "8.6d",     0x4000, 0x2000, CRC(b6b209a5) SHA1(e49a0db65b29337ac6b919237067b1990f2233ab) )
+	ROM_LOAD( "7.6c",     0x6000, 0x2000, CRC(8856452a) SHA1(4494c225c9df97da09c180caadb4dda49d0d5392) )
+
+	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_LOAD( "4.5a",     0x0000, 0x2000, CRC(c4259307) SHA1(7bd4e229a5e1a5136826a57aa61810fcdf9c5027) ) /* planes 0,1 */
+	ROM_LOAD( "6.5c",     0x2000, 0x2000, CRC(cca53367) SHA1(f06ebf2ab8f8f10cfe118af490017972990e3073) ) /* plane 3 */
+
+	ROM_REGION( 0x04000, "gfx2", ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_LOAD( "5.5b",     0x0000, 0x2000, CRC(851d1a18) SHA1(2cfad530c8f9d95094fd0aacd2e0965b0300898c) ) /* planes 0,1 */
+
+	ROM_REGION( 0x02000, "gfx3", ROMREGION_DISPOSE )	// 4bpp sprites
+	ROM_LOAD( "2.5k",     0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
+	ROM_LOAD( "3.5l",     0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "prom1.e1",     0x0000, 0x0020, CRC(d9b10bf0) SHA1(bc1263331968f4bf37eb70ec4f56a8cb763c29d2) ) /* palette */
+	ROM_LOAD( "prom3.k5",     0x0020, 0x0100, CRC(b5db1c2c) SHA1(900aaaac6b674a9c5c7b7804a4b0c3d5cce761aa) ) /* lookup table */
+	ROM_LOAD( "prom2.8r",     0x0120, 0x0100, CRC(8a9c0edf) SHA1(8aad387e9409cff0eeb42eeb57e9ea88770a8c9a) ) /* lookup table */
+ROM_END
+
 /*
 The Kazutomi bootleg board is a conversion from Champion Baseball:
 Alpha denshi co. LTD made in Japan
@@ -1069,5 +1098,6 @@ GAME( 1983, champb2a, champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Den
 
 GAME( 1983, exctsccr, 0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", 0 )
 GAME( 1983, exctscca, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", 0 )
+GAME( 1983, exctsccj, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", 0 )
 GAME( 1983, exctsccb, exctsccr, exctsccb, exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", 0 )
 GAME( 1984, exctscc2, 0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", 0 )

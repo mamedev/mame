@@ -4516,20 +4516,19 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2003.12 Outrun 2 */
 						/* 2004.03 Ollie King */
 						/* 2004.03 Sega Network Taisen Mahjong MJ 2 */
+						/* 2004.04 Sega Network Taisen Mahjong MJ 2 ver.B */
 	DRIVER( wangmid )	/* 2004.07 Wangan Midnight Maximum Tune */
+						/* 2004.07 Sega Network Taisen Mahjong MJ 2 ver.C */
 						/* 2004.09 Quest of D */
 						/* 2004.11 Sega Golf Club Network Pro Tour */
-						/* 2004.?? Sega Network Taisen Mahjong MJ 2 ver.A */
-						/* 2004.?? Sega Network Taisen Mahjong MJ 2 ver.B */
-						/* 2004.?? Sega Network Taisen Mahjong MJ 2 ver.C */
-						/* 2004.11 Sega Network Taisen Mahjong MJ 2 ver.D */
-						/* 2004.?? Sega Network Taisen Mahjong MJ 2 ver.E */
+						/* 2004.12 Sega Network Taisen Mahjong MJ 2 ver.D */
 						/* 2004.12 Outrun 2 Special Tours */
 						/* 2004.12 Quest of D ver.1.10 */
 	DRIVER( ghostsqu )	/* 2004.12 Ghost Squad */
 						/* 2005.03 Kidou Senshi Gundam Battle Operating Simulator */
 						/* 2005.03 Sangokushi Taisen */
 	DRIVER( wangmid2 )	/* 2005.04 Wangan Midnight Maximum Tune 2 */
+						/* 2005.04 Sega Network Taisen Mahjong MJ 2 ver.E */
 						/* 2005.05 Quest of D ver.1.20 */
 						/* 2005.06 Sega Golf Club Network Pro Tour 2005 */
 						/* 2005.09 Quest of D ver.1.21 */
@@ -6295,6 +6294,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( champb2a )	/* (c) 1983 ? */
 	DRIVER( exctsccr )	/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctscca )	/* (c) 1983 Alpha Denshi Co. */
+	DRIVER( exctsccj )	/* (c) 1983 Alpha Denshi Co. */
 	DRIVER( exctsccb )	/* bootleg */
 	DRIVER( exctscc2 )	/* (c) 1984 Alpha Denshi Co. */
 	DRIVER( talbot )	/* Volt Electronics */
