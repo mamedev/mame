@@ -4445,6 +4445,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( initdv3j )	/* 2004.01 Initial D Arcade Stage ver.3 */
 						/* 2004.06 WCCF 2002-2003 ver.2.0 */
 	DRIVER( vf4tuned )	/* 2004.07 Virtua Fighter 4 Final Tuned */
+	DRIVER( vf4tuneda )
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */
 						/* 2005.01 Virtua Fighter 4 final Tuned ver.B */
 						/* 2005.04 Menkyo no Tetsujin */

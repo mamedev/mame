@@ -4049,6 +4049,22 @@ ROM_START( vf4tuned ) // are there multiple files on this GD-ROM? it only compre
 	ROM_LOAD("317-0387-com.data", 0x00, 0x50, CRC(ab9f3851) SHA1(8b64dc6df176eb7adb48267709a27db221d5e3c3) )
 ROM_END
 
+
+ROM_START( vf4tuneda )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0036a", 0, SHA1(cd630fc4e8f7ed5641b85c609584d7efe0eac137) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0387-COM)
+	//(sticker 253-5508-0387)
+	ROM_LOAD("317-0387-com.data", 0x00, 0x50, CRC(ab9f3851) SHA1(8b64dc6df176eb7adb48267709a27db221d5e3c3) )
+ROM_END
+
+
 /*
 
 Title   BEACH SPIKERS
@@ -4148,6 +4164,7 @@ GAME( 2002, vf4evoa, vf4evo,  naomigd,    naomi,    0,  ROT0, "Sega",          "
 GAME( 2002, initdv2j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, initdv3j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 3 (Japan) (Rev B) (GDS-0032B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vf4tuned,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev F) (GDS-0036F)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, vf4tuneda,vf4tuned,naomigd,   naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev A) (GDS-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /* Atomiswave */
