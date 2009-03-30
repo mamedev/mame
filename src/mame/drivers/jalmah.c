@@ -4,7 +4,7 @@ MJ-8956 HW games (c) 1989 Jaleco / NMK / UPL
 
 driver by Angelo Salese, based on early work by David Haywood
 
-Similar to the NMK16 board but without sprites.
+Similar to the NMK16 / Jaleco Mega System 1 boards but without sprites.
 
 Notes(general):
 -I think that the 0xf0000-0xfffff area is shared with the MCU because:
@@ -19,18 +19,17 @@ Notes(general):
 
 TODO:
 -Fully understand priorities,chances are that it just uses a mix between the priority
- number,1+ prom(s) and the color number inside the video ram.Might need a test with the proper hardware;
--In all the games there are square gaps during gameplay,caused by the imperfect priority system (see above);
+ number,1+ prom(s) and the color number inside the video ram. Might need a test with the real hardware;
 -Check if urashima has a "mode 3" for the layer 0 tilemap;
--Complete the dip-switches in the first version of this board;
+-Complete the dip-switches for all the games;
 -There could be timing issues caused by MCU simulation at $80004;
--Fix the sound banking in the first version of the MCU.Protection-related (should be somewhere on the work ram/shared ram)
--Fix kakumei2 GFX3 rom region,maybe it's a bad dump (half length)?
+-Fix the sound banking, protection-related for the first version of the MCU
+ (should be somewhere on the work ram/shared ram)
+-Fix kakumei2 GFX3 rom region, likely to be a bad dump (half length)
 -urashima: might use three/four layers instead of two.It can be checked when you win
  a match in particular circumstances because there's a write in the 94000-9bfff region;
 -kakumei: inserting two credits will give an "informaion" with A-E button choices and nothing appears
  to work,protection?
--Fix the sound banking in urashima/mjzoomin/daireika;
 -Massive clean-ups needed for the MCU snippet programs and the input-ports;
 
 Notes (1st MCU ver.):
@@ -279,7 +278,7 @@ static void jalmah_priority_system(void)
              card table       = 1/013 (2 unused)
              character screen = 4/0213
              victory screen   = 6/0123 also 6/1023
-             gameplay         = d/0123
+             gameplay         = d/0123 (trusted)
     mjzoomin doesn't seem to use the priority number (0/0123)
     daireika/urashima uses priority number with the protection device
     daireika: gameplay        = x/103 (2 unused),might be 6
@@ -299,7 +298,6 @@ static void jalmah_priority_system(void)
 	sc2_prin = (pri_scheme[pri] & 0x00f0) >> 4;
 	sc3_prin = (pri_scheme[pri] & 0x000f) >> 0;
 
-//  popmessage("%04x",pri);
 	/*
     popmessage("%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x %02x"
     ,prinum[0x00],prinum[0x01],prinum[0x02],prinum[0x03]
@@ -309,47 +307,47 @@ static void jalmah_priority_system(void)
     */
 }
 
-static void draw_sc0_layer(bitmap_t *bitmap, const rectangle *cliprect,int trans)
+static void draw_sc0_layer(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	switch(jm_vregs[0] & 3)
 	{
-		case 0: tilemap_draw(bitmap,cliprect,sc0_tilemap_0,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 1: tilemap_draw(bitmap,cliprect,sc0_tilemap_1,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 2: tilemap_draw(bitmap,cliprect,sc0_tilemap_2,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 3: tilemap_draw(bitmap,cliprect,sc0_tilemap_3,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
+		case 0: tilemap_draw(bitmap,cliprect,sc0_tilemap_0,0,0); break;
+		case 1: tilemap_draw(bitmap,cliprect,sc0_tilemap_1,0,0); break;
+		case 2: tilemap_draw(bitmap,cliprect,sc0_tilemap_2,0,0); break;
+		case 3: tilemap_draw(bitmap,cliprect,sc0_tilemap_3,0,0); break;
 	}
 }
 
-static void draw_sc1_layer(bitmap_t *bitmap, const rectangle *cliprect,int trans)
+static void draw_sc1_layer(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	switch(jm_vregs[1] & 3)
 	{
-		case 0: tilemap_draw(bitmap,cliprect,sc1_tilemap_0,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 1: tilemap_draw(bitmap,cliprect,sc1_tilemap_1,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 2: tilemap_draw(bitmap,cliprect,sc1_tilemap_2,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 3: tilemap_draw(bitmap,cliprect,sc1_tilemap_3,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
+		case 0: tilemap_draw(bitmap,cliprect,sc1_tilemap_0,0,0); break;
+		case 1: tilemap_draw(bitmap,cliprect,sc1_tilemap_1,0,0); break;
+		case 2: tilemap_draw(bitmap,cliprect,sc1_tilemap_2,0,0); break;
+		case 3: tilemap_draw(bitmap,cliprect,sc1_tilemap_3,0,0); break;
 	}
 }
 
-static void draw_sc2_layer(bitmap_t *bitmap, const rectangle *cliprect,int trans)
+static void draw_sc2_layer(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	switch(jm_vregs[2] & 3)
 	{
-		case 0: tilemap_draw(bitmap,cliprect,sc2_tilemap_0,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 1: tilemap_draw(bitmap,cliprect,sc2_tilemap_1,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 2: tilemap_draw(bitmap,cliprect,sc2_tilemap_2,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 3: tilemap_draw(bitmap,cliprect,sc2_tilemap_3,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
+		case 0: tilemap_draw(bitmap,cliprect,sc2_tilemap_0,0,0); break;
+		case 1: tilemap_draw(bitmap,cliprect,sc2_tilemap_1,0,0); break;
+		case 2: tilemap_draw(bitmap,cliprect,sc2_tilemap_2,0,0); break;
+		case 3: tilemap_draw(bitmap,cliprect,sc2_tilemap_3,0,0); break;
 	}
 }
 
-static void draw_sc3_layer(bitmap_t *bitmap, const rectangle *cliprect,int trans)
+static void draw_sc3_layer(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	switch(jm_vregs[3] & 3)
 	{
 		case 0:
-		case 1: tilemap_draw(bitmap,cliprect,sc3_tilemap_0,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 2: tilemap_draw(bitmap,cliprect,sc3_tilemap_2,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
-		case 3: tilemap_draw(bitmap,cliprect,sc3_tilemap_3,(trans > 0) ? 0 : TILEMAP_DRAW_OPAQUE,0); break;
+		case 1: tilemap_draw(bitmap,cliprect,sc3_tilemap_0,0,0); break;
+		case 2: tilemap_draw(bitmap,cliprect,sc3_tilemap_2,0,0); break;
+		case 3: tilemap_draw(bitmap,cliprect,sc3_tilemap_3,0,0); break;
 	}
 }
 
@@ -399,14 +397,14 @@ static VIDEO_UPDATE( jalmah )
 	tilemap_set_scrolly( sc3_tilemap_2, 0, jm_scrollram[7] & 0x1ff);
 	tilemap_set_scrolly( sc3_tilemap_3, 0, jm_scrollram[7] & 0x3ff);
 
-    bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10f]);//selectable by a ram address?
+    bitmap_fill(bitmap, cliprect, screen->machine->pens[0xff]);//selectable by a ram address?
 
 	for(cur_prin=0;cur_prin<4;cur_prin++)
 	{
-		if(cur_prin==sc0_prin) { draw_sc0_layer(bitmap,cliprect,sc0_prin); }
-		if(cur_prin==sc1_prin) { draw_sc1_layer(bitmap,cliprect,sc1_prin); }
-		if(cur_prin==sc2_prin) { draw_sc2_layer(bitmap,cliprect,sc2_prin); }
-		if(cur_prin==sc3_prin) { draw_sc3_layer(bitmap,cliprect,sc3_prin); }
+		if(cur_prin==sc0_prin) { draw_sc0_layer(bitmap,cliprect); }
+		if(cur_prin==sc1_prin) { draw_sc1_layer(bitmap,cliprect); }
+		if(cur_prin==sc2_prin) { draw_sc2_layer(bitmap,cliprect); }
+		if(cur_prin==sc3_prin) { draw_sc3_layer(bitmap,cliprect); }
 	}
 
 	return 0;
@@ -2280,4 +2278,4 @@ GAME( 1990, mjzoomin, 0, jalmah,	jalmah,  	mjzoomin, ROT0, "Jaleco",       "Mahj
 /*Second version of the MCU*/
 GAME( 1990, kakumei,  0, jalmah,	jalmah2, 	kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei",						GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, kakumei2, 0, jalmah,	jalmah2a,	kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League",	GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, suchipi,  0, jalmah,	jalmah2a,	suchipi,  ROT0, "Jaleco",       "Idol Janshi Su-Chi-Pie Special",		GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, suchipi,  0, jalmah,	jalmah2a,	suchipi,  ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special",		GAME_IMPERFECT_GRAPHICS )
