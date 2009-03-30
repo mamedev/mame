@@ -4453,7 +4453,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.04 Menkyo no Tetsujin */
 						/* 2005.07 WCCF 2004-2005 */
 						/* 2006.08 WCCF European Clubs 2005-2006 */
+	DRIVER( vf4tunedd )
 	DRIVER( vf4tuned )	/* 200?.?? Virtual fighter 4 Final Tuned ver.F */
+
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
@@ -4504,7 +4506,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
 						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
 
-						/* Triforce GDROM Boot Update (GDT-0011) */
+	DRIVER( tfupdate )	/* Triforce GDROM Boot Update (GDT-0011) */
 
 	/* Chihiro (X-Box based) */
 	DRIVER( chihiro )
@@ -4536,7 +4538,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.12 Kidou Senshi Gundam 0079 Card Builder */
 						/* 2005.12 Quest of D ver.2.01 Gofu no Keisyousya */
 						/* 2005.12 Sega Golf Club 2006 Next Tours */
-						/* 2005.12 Sega Network Taisen Mahjong MJ 3 */
+	DRIVER( netwaak3)	/* 2005.12 Sega Network Taisen Mahjong MJ 3 */
 						/* 2006.05 Sangokushi Taisen 2 */
 						/* 2006.09 Sega Network Taisen Mahjong MJ 3 ver.B */
 						/* 2007.03 Kidou Senshi Gundam 0083 Card Builder */

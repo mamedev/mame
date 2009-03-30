@@ -4049,6 +4049,20 @@ ROM_START( vf4tuned ) // are there multiple files on this GD-ROM? it only compre
 	ROM_LOAD("317-0387-com.data", 0x00, 0x50, CRC(ab9f3851) SHA1(8b64dc6df176eb7adb48267709a27db221d5e3c3) )
 ROM_END
 
+ROM_START( vf4tunedd )
+	NAOMI2_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0036d", 0, SHA1(2f7654307a4c978c5af6c8238c44e70275dd34f9) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0387-COM)
+	//(sticker 253-5508-0387)
+	ROM_LOAD("317-0387-com.data", 0x00, 0x50, CRC(ab9f3851) SHA1(8b64dc6df176eb7adb48267709a27db221d5e3c3) )
+ROM_END
+
 
 ROM_START( vf4tuneda )
 	NAOMI2_BIOS
@@ -4164,6 +4178,7 @@ GAME( 2002, vf4evoa, vf4evo,  naomigd,    naomi,    0,  ROT0, "Sega",          "
 GAME( 2002, initdv2j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 2 (Japan) (GDS-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, initdv3j,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D : Arcade Stage Ver. 3 (Japan) (Rev B) (GDS-0032B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vf4tuned,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev F) (GDS-0036F)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, vf4tunedd,vf4tuned,naomigd,   naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev D) (GDS-0036D)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vf4tuneda,vf4tuned,naomigd,   naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev A) (GDS-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
@@ -4187,43 +4202,6 @@ ROM_START( triforce )
 	TRIFORCE_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
-ROM_END
-
-/*
-
-Title   VIRTUA STRIKER 4
-Media ID    93B2
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDT-0015
-Version V1.001
-Release Date    20041202
-Manufacturer ID
-TOC DISC
-Track   Start Sector    End Sector  Track Size
-track01.bin 150 449 705600
-track02.raw 600 1951    3179904
-track03.bin 45150   549299  1185760800
-
-
-PIC
-255-5508-393E
-317-0393-EXP
-
-*/
-
-ROM_START( vs4 )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(1f83712b2b170d6edf4a27c15b6f763cc3cc4b71) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0393-exp.data", 0x00, 0x50, CRC(2dcfecd7) SHA1(d805168e1564051ae5c47876ade2c9843253c6b4) )
 ROM_END
 
 /*
@@ -4270,10 +4248,63 @@ ROM_START( gekpurya )
 	ROM_LOAD("gdt-0008c.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )
 ROM_END
 
+ROM_START( tfupdate )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0011", 0, SHA1(71bfa8f53d211085c020d54f55eeeabf85212a0b) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdt-0011.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )
+ROM_END
+
+
+/*
+
+Title   VIRTUA STRIKER 4
+Media ID    93B2
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0015
+Version V1.001
+Release Date    20041202
+Manufacturer ID
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 449 705600
+track02.raw 600 1951    3179904
+track03.bin 45150   549299  1185760800
+
+
+PIC
+255-5508-393E
+317-0393-EXP
+
+*/
+
+ROM_START( vs4 )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(1f83712b2b170d6edf4a27c15b6f763cc3cc4b71) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0393-exp.data", 0x00, 0x50, CRC(2dcfecd7) SHA1(d805168e1564051ae5c47876ade2c9843253c6b4) )
+ROM_END
+
+
 
 GAME( 200?, triforce, 0,        naomigd,    naomi,    0, ROT0, "Sega",           "Triforce Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 2002, vs2002ex, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, gekpurya, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, tfupdate, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Triforce DIMM Updater (GDT-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, vs4,      triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
@@ -4384,6 +4415,17 @@ ROM_START( wangmid2 )
 	ROM_LOAD("gdx-0015.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
 ROM_END
 
+ROM_START( netwaak3 )
+	CHIHIRO_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0017d", 0, SHA1(cfbbd452c8f4efe0e99f398f5521fc3574b913bb) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // key was missing
+	ROM_LOAD("gdx-0017d.pic_data", 0x00, 0x50, NO_DUMP )
+ROM_END
 
 
 GAME( 200?, chihiro,  0,       naomigd,    naomi,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
@@ -4391,5 +4433,6 @@ GAME( 2005, wangmid,  chihiro, naomigd,    naomi,    0, ROT0, "Sega",           
 GAME( 2005, wangmid2, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 (Japan?) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ghostsqu, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, vcop3,    chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, netwaak3, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Sega Netto Waaku Taisen Maajan MJ 3 (Rev D) [GDX-0017D]", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
