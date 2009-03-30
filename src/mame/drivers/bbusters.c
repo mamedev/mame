@@ -391,7 +391,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( bbusters )
-	PORT_START("IN0")	/* Player controls */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	PORT_NAME("P1 Fire")	// "Fire"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	PORT_NAME("P1 Grenade")	// "Grenade"
@@ -401,7 +401,7 @@ static INPUT_PORTS_START( bbusters )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	PORT_NAME("P2 Grenade")	// "Grenade"
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")	/* Player controls */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)	PORT_NAME("P3 Fire")	// "Fire"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)	PORT_NAME("P3 Grenade")	// "Grenade"
@@ -421,7 +421,7 @@ static INPUT_PORTS_START( bbusters )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )		// See notes
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")	/* Dip switch bank 1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
@@ -457,7 +457,7 @@ static INPUT_PORTS_START( bbusters )
 	PORT_DIPSETTING(    0x80, "Common" )
 	PORT_DIPSETTING(    0x00, "Individual" )
 
-	PORT_START("DSW2")	/* Dip switch bank 2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
@@ -508,7 +508,7 @@ static INPUT_PORTS_START( mechatt )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Grenade")	// "Grenade"
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")	/* Dip switch bank 1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, "Coin Slots" )				PORT_DIPLOCATION("SW1:1") // Listed as "Unused" (manual from different revision/region?), See notes
 	PORT_DIPSETTING(      0x0001, "Common" )
 	PORT_DIPSETTING(      0x0000, "Individual" )
@@ -555,6 +555,20 @@ static INPUT_PORTS_START( mechatt )
 	PORT_START("GUNY2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( mechattu )
+	PORT_INCLUDE( mechatt )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW1:1" )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(      0x0010, "1 Coin/2 Credits first, then 1 Coin/1 Credit" )
+	PORT_DIPSETTING(      0x0020, "2 Coins/1 Credit first, then 1 Coin/1 Credit" )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x00c0, 0x00c0, "SW1:7,8" )
+INPUT_PORTS_END
+
 
 /******************************************************************************/
 
@@ -940,4 +954,4 @@ GAME( 1989, bbusters, 0,        bbusters, bbusters, 0, ROT0,  "SNK", "Beast Bust
 GAME( 1989, bbusteru, bbusters, bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1989, mechatt,  0,        mechatt,  mechatt,  0, ROT0,  "SNK", "Mechanized Attack (World)", 0 )
-GAME( 1989, mechattu, mechatt,  mechatt,  mechatt,  0, ROT0,  "SNK", "Mechanized Attack (US)", 0 )
+GAME( 1989, mechattu, mechatt,  mechatt,  mechattu, 0, ROT0,  "SNK", "Mechanized Attack (US)", 0 )
