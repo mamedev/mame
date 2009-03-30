@@ -181,12 +181,12 @@ static ADDRESS_MAP_START( m6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_BASE(&tceptor_tile_attr)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(tceptor_bg_ram_w) AM_BASE(&tceptor_bg_ram)	// background (VIEW RAM)
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(SMH_NOP)				// 3D scope left/right?
-	AM_RANGE(0x4f00, 0x4f00) AM_READ(SMH_NOP)				// unknown
+	AM_RANGE(0x4800, 0x4800) AM_WRITENOP				// 3D scope left/right?
+	AM_RANGE(0x4f00, 0x4f00) AM_READNOP				// unknown
 	AM_RANGE(0x4f01, 0x4f01) AM_READ_PORT("PEDAL")			// analog input (accel)
 	AM_RANGE(0x4f02, 0x4f02) AM_READ_PORT("STICKX")			// analog input (left/right)
 	AM_RANGE(0x4f03, 0x4f03) AM_READ_PORT("STICKY")			// analog input (up/down)
-	AM_RANGE(0x4f00, 0x4f03) AM_WRITE(SMH_NOP)				// analog input control?
+	AM_RANGE(0x4f00, 0x4f03) AM_WRITENOP				// analog input control?
 	AM_RANGE(0x5000, 0x5006) AM_WRITE(tceptor_bg_scroll_w)	// bg scroll
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE(1) AM_BASE(&m68k_shared_ram) // COM RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(m6809_irq_disable_w)

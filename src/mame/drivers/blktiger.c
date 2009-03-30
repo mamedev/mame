@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	AM_WRITE(blktiger_video_control_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x07, 0x07) AM_READ(blktiger_protection_r)	AM_WRITE(SMH_NOP) /* Software protection (7) */
+	AM_RANGE(0x07, 0x07) AM_READ(blktiger_protection_r)	AM_WRITENOP /* Software protection (7) */
 	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(blktiger_video_enable_w)

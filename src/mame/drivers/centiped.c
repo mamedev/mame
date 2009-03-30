@@ -805,7 +805,7 @@ static ADDRESS_MAP_START( mazeinv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2500, 0x2502) AM_WRITE(coin_count_w)
 	AM_RANGE(0x2503, 0x2504) AM_WRITE(led_w)
 	AM_RANGE(0x2505, 0x2505) AM_WRITE(input_select_w)
-//  AM_RANGE(0x2506, 0x2507) AM_WRITE(SMH_NOP) /* ? */
+//  AM_RANGE(0x2506, 0x2507) AM_WRITENOP /* ? */
 	AM_RANGE(0x2580, 0x2583) AM_WRITE(mazeinv_input_select_w)
 	AM_RANGE(0x2600, 0x2600) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x2680, 0x2680) AM_WRITE(watchdog_reset_w)

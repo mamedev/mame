@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( shangha3_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x100fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
-	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(SMH_NOP)	/* irq ack? */
+	AM_RANGE(0x20000a, 0x20000b) AM_WRITENOP	/* irq ack? */
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(shangha3_coinctrl_w)
 	AM_RANGE(0x20002e, 0x20002f) AM_DEVWRITE8("ay", ay8910_data_w, 0x00ff)
 	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8("ay", ay8910_address_w, 0x00ff)
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( heberpop_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x100fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
-	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(SMH_NOP)	/* irq ack? */
+	AM_RANGE(0x20000a, 0x20000b) AM_WRITENOP	/* irq ack? */
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(heberpop_coinctrl_w)
 	AM_RANGE(0x20000e, 0x20000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(SMH_RAM) AM_BASE(&shangha3_ram) AM_SIZE(&shangha3_ram_size)	/* gfx & work ram */
@@ -188,7 +188,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blocken_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100008, 0x100009) AM_WRITE(shangha3_blitter_go_w)
-	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(SMH_NOP)	/* irq ack? */
+	AM_RANGE(0x10000a, 0x10000b) AM_WRITENOP	/* irq ack? */
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)

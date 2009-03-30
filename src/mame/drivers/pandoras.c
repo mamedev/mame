@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( pandoras_readmem_b, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a02, 0x1a02) AM_READ_PORT("P2")
 	AM_RANGE(0x1a03, 0x1a03) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2")
-//  AM_RANGE(0x1e00, 0x1e00) AM_READ(SMH_NOP)              /* ??? seems to be important */
+//  AM_RANGE(0x1e00, 0x1e00) AM_READNOP              /* ??? seems to be important */
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM) AM_SHARE(4)	/* Shared RAM with the CPU A */
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END

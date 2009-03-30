@@ -573,7 +573,7 @@ static ADDRESS_MAP_START( perfrman_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_address_w)
 	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_data_w)
 	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
-//  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )

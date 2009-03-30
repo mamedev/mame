@@ -719,10 +719,10 @@ static WRITE32_HANDLER( rabbit_eeprom_write )
 }
 
 static ADDRESS_MAP_START( rabbit_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x000003) AM_WRITE(SMH_NOP) // bug in code / emulation?
-	AM_RANGE(0x000010, 0x000013) AM_WRITE(SMH_NOP) // bug in code / emulation?
-	AM_RANGE(0x000024, 0x000027) AM_WRITE(SMH_NOP) // bug in code / emulation?
-	AM_RANGE(0x00719C, 0x00719F) AM_WRITE(SMH_NOP) // bug in code / emulation?
+	AM_RANGE(0x000000, 0x000003) AM_WRITENOP // bug in code / emulation?
+	AM_RANGE(0x000010, 0x000013) AM_WRITENOP // bug in code / emulation?
+	AM_RANGE(0x000024, 0x000027) AM_WRITENOP // bug in code / emulation?
+	AM_RANGE(0x00719C, 0x00719F) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x200000, 0x200003) AM_WRITE(rabbit_eeprom_write)
 	/* this lot are probably gfxchip/blitter etc. related */

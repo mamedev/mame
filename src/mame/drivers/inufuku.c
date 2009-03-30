@@ -190,7 +190,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( inufuku_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)				// main rom
 
-	AM_RANGE(0x100000, 0x100007) AM_WRITE(SMH_NOP)				// ?
+	AM_RANGE(0x100000, 0x100007) AM_WRITENOP				// ?
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(inufuku_eeprom_w)		// eeprom
 	AM_RANGE(0x280000, 0x280001) AM_WRITE(inufuku_soundcommand_w)	// sound command
 
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( inufuku_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w)	// bg & text palettebank register
 	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE(inufuku_scrollreg_w)	// bg & text scroll register
-	AM_RANGE(0x7e0000, 0x7e0001) AM_WRITE(SMH_NOP)				// ?
+	AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP				// ?
 
 	AM_RANGE(0x800000, 0xbfffff) AM_WRITE(SMH_ROM)				// data rom
 	AM_RANGE(0xfd0000, 0xfdffff) AM_WRITE(SMH_RAM)				// work ram

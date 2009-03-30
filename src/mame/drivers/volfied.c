@@ -79,8 +79,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(volfied_video_mask_w)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(volfied_sprite_ctrl_w)
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(volfied_video_ctrl_r, volfied_video_ctrl_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(taitosound_port16_lsb_w)
-	AM_RANGE(0xe00002, 0xe00003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0xe00002, 0xe00003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0xf00000, 0xf007ff) AM_READWRITE(volfied_cchip_ram_r, volfied_cchip_ram_w)
 	AM_RANGE(0xf00802, 0xf00803) AM_READWRITE(volfied_cchip_ctrl_r, volfied_cchip_ctrl_w)
 	AM_RANGE(0xf00c00, 0xf00c01) AM_WRITE(volfied_cchip_bank_w)
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0x8801, 0x8801) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(SMH_NOP)    /* ? */
+	AM_RANGE(0x9800, 0x9800) AM_WRITENOP    /* ? */
 ADDRESS_MAP_END
 
 

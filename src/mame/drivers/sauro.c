@@ -162,18 +162,18 @@ static ADDRESS_MAP_START( sauro_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(tecfri_scroll_bg_w)
 	AM_RANGE(0xa1, 0xa1) AM_WRITE(sauro_scroll_fg_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITE(SMH_NOP)		/* coin reset */
+	AM_RANGE(0xc2, 0xc2) AM_WRITENOP		/* coin reset */
 	AM_RANGE(0xc3, 0xc3) AM_WRITE(sauro_coin1_w)
-	AM_RANGE(0xc4, 0xc4) AM_WRITE(SMH_NOP)		/* coin reset */
+	AM_RANGE(0xc4, 0xc4) AM_WRITENOP		/* coin reset */
 	AM_RANGE(0xc5, 0xc5) AM_WRITE(sauro_coin2_w)
-	AM_RANGE(0xc6, 0xc7) AM_WRITE(SMH_NOP)		/* same as 0x80 - verified with debugger */
-	AM_RANGE(0xc8, 0xc8) AM_WRITE(SMH_NOP)		/* written every int: 0 written at end   of isr */
-	AM_RANGE(0xc9, 0xc9) AM_WRITE(SMH_NOP)		/* written every int: 1 written at start of isr */
+	AM_RANGE(0xc6, 0xc7) AM_WRITENOP		/* same as 0x80 - verified with debugger */
+	AM_RANGE(0xc8, 0xc8) AM_WRITENOP		/* written every int: 0 written at end   of isr */
+	AM_RANGE(0xc9, 0xc9) AM_WRITENOP		/* written every int: 1 written at start of isr */
 	AM_RANGE(0xca, 0xcb) AM_WRITE(sauro_palette_bank_w)	/* 1 written upon death, cleared 2 vblanks later */
 														/* Sequence 3,2,1 written during intro screen */
-	AM_RANGE(0xcc, 0xcc) AM_WRITE(SMH_NOP)		/* same as 0xca */
-	AM_RANGE(0xcd, 0xcd) AM_WRITE(SMH_NOP)		/* same as 0xcb */
-	AM_RANGE(0xce, 0xce) AM_WRITE(SMH_NOP)		/* only written at startup */
+	AM_RANGE(0xcc, 0xcc) AM_WRITENOP		/* same as 0xca */
+	AM_RANGE(0xcd, 0xcd) AM_WRITENOP		/* same as 0xcb */
+	AM_RANGE(0xce, 0xce) AM_WRITENOP		/* only written at startup */
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -187,8 +187,8 @@ static ADDRESS_MAP_START( sauro_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym3812_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", adpcm_w)
-	AM_RANGE(0xe000, 0xe006) AM_WRITE(SMH_NOP)	/* echo from write to e0000 */
-	AM_RANGE(0xe00e, 0xe00f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe000, 0xe006) AM_WRITENOP	/* echo from write to e0000 */
+	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trckydoc_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -210,12 +210,12 @@ static ADDRESS_MAP_START( trckydoc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(tecfri_colorram_w) AM_BASE(&tecfri_colorram)
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ym", ym3812_w)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE(tecfri_scroll_bg_w)
-	AM_RANGE(0xf838, 0xf838) AM_WRITE(SMH_NOP)				/* only written at startup */
+	AM_RANGE(0xf838, 0xf838) AM_WRITENOP				/* only written at startup */
 	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(sauro_coin1_w)
 	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(sauro_coin2_w)
 	AM_RANGE(0xf83c, 0xf83c) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xf83f, 0xf83f) AM_WRITE(SMH_NOP)				/* only written at startup */
+	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP				/* only written at startup */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tecfri )

@@ -279,8 +279,8 @@ static ADDRESS_MAP_START( rainbow_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x201000, 0x203fff) AM_READ(SMH_RAM)	/* read in initial checks */
 	AM_RANGE(0x390000, 0x390003) AM_READ_PORT("DSWA")
 	AM_RANGE(0x3b0000, 0x3b0003) AM_READ_PORT("DSWB")
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READ(SMH_NOP)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_READ(taitosound_comm16_lsb_r)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP
+	AM_RANGE(0x3e0002, 0x3e0003) AM_READ8(taitosound_comm_r, 0x00ff)
 	AM_RANGE(0x800000, 0x8007ff) AM_READ(rainbow_cchip_ram_r)
 	AM_RANGE(0x800802, 0x800803) AM_READ(rainbow_cchip_ctrl_r)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(PC080SN_word_0_r)
@@ -293,9 +293,9 @@ static ADDRESS_MAP_START( rainbow_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x201000, 0x203fff) AM_WRITE(SMH_RAM)	/* written in initial checks */
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(rainbow_spritectrl_w)
-	AM_RANGE(0x3c0000, 0x3c0003) AM_WRITE(SMH_NOP)	/* written very often, watchdog? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_WRITE(taitosound_port16_lsb_w)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_WRITE(taitosound_comm16_lsb_w)
+	AM_RANGE(0x3c0000, 0x3c0003) AM_WRITENOP	/* written very often, watchdog? */
+	AM_RANGE(0x3e0000, 0x3e0001) AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_WRITE8(taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8007ff) AM_WRITE(rainbow_cchip_ram_w)
 	AM_RANGE(0x800802, 0x800803) AM_WRITE(rainbow_cchip_ctrl_w)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(rainbow_cchip_bank_w)
@@ -316,7 +316,7 @@ static ADDRESS_MAP_START( jumping_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x401000, 0x401001) AM_READ_PORT("401001")
 	AM_RANGE(0x401002, 0x401003) AM_READ_PORT("401003")
-	AM_RANGE(0x420000, 0x420001) AM_READ(SMH_NOP)	/* read, but result not used */
+	AM_RANGE(0x420000, 0x420001) AM_READNOP	/* read, but result not used */
 	AM_RANGE(0x440000, 0x4407ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(PC080SN_word_0_r)
 	AM_RANGE(0xd00000, 0xd01fff) AM_READ(SMH_RAM)	/* original spriteram location, needed for Attract Mode */
@@ -328,13 +328,13 @@ static ADDRESS_MAP_START( jumping_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x201000, 0x203fff) AM_WRITE(SMH_RAM)	/* written in initial checks */
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(jumping_spritectrl_w)
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(SMH_NOP)	/* watchdog? */
+	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP	/* watchdog? */
 	AM_RANGE(0x400006, 0x400007) AM_WRITE(jumping_sound_w)
 	AM_RANGE(0x430000, 0x430003) AM_WRITE(PC080SN_yscroll_word_0_w)
 	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_NOP)	/* original c-chip location (not used) */
+	AM_RANGE(0x800000, 0x80ffff) AM_WRITENOP	/* original c-chip location (not used) */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(PC080SN_word_0_w)
-	AM_RANGE(0xc20000, 0xc20003) AM_WRITE(SMH_NOP)	/* seems it is a leftover from rainbow: scroll y written here too */
+	AM_RANGE(0xc20000, 0xc20003) AM_WRITENOP	/* seems it is a leftover from rainbow: scroll y written here too */
 	AM_RANGE(0xc40000, 0xc40003) AM_WRITE(PC080SN_xscroll_word_0_w)
 	AM_RANGE(0xd00000, 0xd01fff) AM_WRITE(SMH_RAM) 	/* original spriteram location, needed for Attract Mode */
 ADDRESS_MAP_END
@@ -389,7 +389,7 @@ static ADDRESS_MAP_START( jumping_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xb000, 0xb001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0xb400, 0xb401) AM_DEVWRITE("ym2", ym2203_w)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)	/* looks like a bankswitch, but sound works with or without it */
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	/* looks like a bankswitch, but sound works with or without it */
 ADDRESS_MAP_END
 
 

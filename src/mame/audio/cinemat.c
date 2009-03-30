@@ -1555,7 +1555,7 @@ static ADDRESS_MAP_START( demon_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5002, 0x5003) AM_DEVWRITE("ay2", ay8910_data_address_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVREAD("ay3", ay8910_r)
 	AM_RANGE(0x6002, 0x6003) AM_DEVWRITE("ay3", ay8910_data_address_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(SMH_NOP)  /* watchdog? */
+	AM_RANGE(0x7000, 0x7000) AM_WRITENOP  /* watchdog? */
 ADDRESS_MAP_END
 
 

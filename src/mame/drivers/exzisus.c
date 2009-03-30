@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( cpub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc5ff) AM_READ(exzisus_objectram_0_r)
 	AM_RANGE(0xc600, 0xdfff) AM_READ(exzisus_videoram_0_r)
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_READ(SMH_NOP)
+	AM_RANGE(0xf000, 0xf000) AM_READNOP
 	AM_RANGE(0xf001, 0xf001) AM_READ(taitosound_comm_r)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("P1")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P2")
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( cpub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(taitosound_comm_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(exzisus_cpub_bankswitch_w)
 	AM_RANGE(0xf402, 0xf402) AM_WRITE(exzisus_coincounter_w)
-	AM_RANGE(0xf404, 0xf404) AM_WRITE(SMH_NOP) // ??
+	AM_RANGE(0xf404, 0xf404) AM_WRITENOP // ??
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(exzisus_sharedram_ab_w)
 ADDRESS_MAP_END
 
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(SMH_NOP)
+	AM_RANGE(0xa000, 0xa000) AM_READNOP
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 

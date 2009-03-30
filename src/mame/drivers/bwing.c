@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( bwp1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1c07) AM_WRITE(bwp1_ctrl_w)
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(bwing_scrollram_w)
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(SMH_RAM) // falls through
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_NOP) // "B-Wings US" writes to 9631-9632(debug?)
+	AM_RANGE(0x4000, 0xffff) AM_WRITENOP // "B-Wings US" writes to 9631-9632(debug?)
 ADDRESS_MAP_END
 
 

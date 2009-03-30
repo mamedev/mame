@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(firetrap_bg2videoram_w) AM_BASE(&firetrap_bg2videoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(firetrap_fgvideoram_w) AM_BASE(&firetrap_fgvideoram)
 	AM_RANGE(0xe800, 0xe97f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)	/* IRQ acknowledge */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(flip_screen_w)
@@ -295,12 +295,12 @@ static ADDRESS_MAP_START( writemem_bootleg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(firetrap_bg2videoram_w) AM_BASE(&firetrap_bg2videoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(firetrap_fgvideoram_w) AM_BASE(&firetrap_fgvideoram)
 	AM_RANGE(0xe800, 0xe97f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)	/* IRQ acknowledge */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(firetrap_nmi_disable_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xf005, 0xf005) AM_WRITENOP
 	AM_RANGE(0xf008, 0xf009) AM_WRITE(firetrap_bg1_scrollx_w)
 	AM_RANGE(0xf00a, 0xf00b) AM_WRITE(firetrap_bg1_scrolly_w)
 	AM_RANGE(0xf00c, 0xf00d) AM_WRITE(firetrap_bg2_scrollx_w)

@@ -174,9 +174,9 @@ static ADDRESS_MAP_START( skyarmy_writemem, ADDRESS_SPACE_PROGRAM, 8 )
         AM_RANGE(0x9800, 0x983F) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* Sprites */
         AM_RANGE(0x9840, 0x985F) AM_WRITE(skyarmy_scrollram_w) AM_BASE(&skyarmy_scrollram) /* Sprites */
         AM_RANGE(0xa004, 0xa004) AM_WRITE(nmi_enable_w) // ???
-        AM_RANGE(0xa005, 0xa005) AM_WRITE(SMH_NOP)
-        AM_RANGE(0xa006, 0xa006) AM_WRITE(SMH_NOP)
-        AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)
+        AM_RANGE(0xa005, 0xa005) AM_WRITENOP
+        AM_RANGE(0xa006, 0xa006) AM_WRITENOP
+        AM_RANGE(0xa007, 0xa007) AM_WRITENOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( skyarmy )

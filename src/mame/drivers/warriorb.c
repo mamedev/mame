@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( darius2d_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* main ram */
 	AM_RANGE(0x200000, 0x213fff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_dual_screen_w)	/* tilemaps (all screens) */
-	AM_RANGE(0x214000, 0x2141ff) AM_WRITE(SMH_NOP)											/* error in screen clearing code ? */
+	AM_RANGE(0x214000, 0x2141ff) AM_WRITENOP											/* error in screen clearing code ? */
 	AM_RANGE(0x220000, 0x22000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r, TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0x240000, 0x253fff) AM_READWRITE(TC0100SCN_word_1_r, TC0100SCN_word_1_w)		/* tilemaps (2nd screen) */
 	AM_RANGE(0x260000, 0x26000f) AM_READWRITE(TC0100SCN_ctrl_word_1_r, TC0100SCN_ctrl_word_1_w)
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( darius2d_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x420000, 0x420007) AM_READWRITE(TC0110PCR_word_1_r, TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
-//  AM_RANGE(0x820000, 0x820001) AM_WRITE(SMH_NOP)    // ???
+//  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ???
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
 ADDRESS_MAP_END
 
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( warriorb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x420000, 0x420007) AM_READWRITE(TC0110PCR_word_1_r, TC0110PCR_step1_word_1_w)	/* palette (2nd screen) */
 	AM_RANGE(0x600000, 0x6013ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(TC0510NIO_halfword_r, TC0510NIO_halfword_w)
-//  AM_RANGE(0x820000, 0x820001) AM_WRITE(SMH_NOP)    // ? uses bits 0,2,3
+//  AM_RANGE(0x820000, 0x820001) AM_WRITENOP    // ? uses bits 0,2,3
 	AM_RANGE(0x830000, 0x830003) AM_READWRITE(warriorb_sound_r, warriorb_sound_w)
 ADDRESS_MAP_END
 
@@ -255,9 +255,9 @@ static ADDRESS_MAP_START( z80_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(warriorb_pancontrol) /* pan */
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xea00, 0xea00) AM_READNOP
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 

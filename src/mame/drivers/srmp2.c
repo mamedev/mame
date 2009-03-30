@@ -404,15 +404,15 @@ static ADDRESS_MAP_START( srmp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x140000, 0x143fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2)	/* Sprites Code + X + Attr */
 	AM_RANGE(0x180000, 0x180609) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)	/* Sprites Y */
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(SMH_NOP)					/* ??? */
+	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP					/* ??? */
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)				/* ADPCM bank, Color bank, etc. */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP)					/* ??? */
+	AM_RANGE(0x900000, 0x900001) AM_WRITENOP					/* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(srmp2_input_1_w)			/* I/O ??? */
 	AM_RANGE(0xa00002, 0xa00003) AM_WRITE(srmp2_input_2_w)			/* I/O ??? */
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(SMH_NOP)					/* ??? */
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(SMH_NOP)					/* ??? */
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP)					/* ??? */
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP					/* ??? */
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP					/* ??? */
 	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
 ADDRESS_MAP_END
 
@@ -420,13 +420,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mjyuugi_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")			/* Coinage */
-	AM_RANGE(0x100010, 0x100011) AM_READ(SMH_NOP)				/* ??? */
-	AM_RANGE(0x200000, 0x200001) AM_READ(SMH_NOP)				/* ??? */
-	AM_RANGE(0x300000, 0x300001) AM_READ(SMH_NOP)				/* ??? */
+	AM_RANGE(0x100010, 0x100011) AM_READNOP				/* ??? */
+	AM_RANGE(0x200000, 0x200001) AM_READNOP				/* ??? */
+	AM_RANGE(0x300000, 0x300001) AM_READNOP				/* ??? */
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")			/* DSW 3-1 */
 	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")			/* DSW 3-2 */
 	AM_RANGE(0x700000, 0x7003ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x800000, 0x800001) AM_READ(SMH_NOP)				/* ??? */
+	AM_RANGE(0x800000, 0x800001) AM_READNOP				/* ??? */
 	AM_RANGE(0x900000, 0x900001) AM_READ(srmp2_input_1_r)		/* I/O port 1 */
 	AM_RANGE(0x900002, 0x900003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(srmp2_cchip_status_0_r)	/* custom chip status ??? */
@@ -447,7 +447,7 @@ static ADDRESS_MAP_START( mjyuugi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900002, 0x900003) AM_WRITE(srmp2_input_2_w)			/* I/O ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(SMH_NOP)					/* ??? */
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
 	AM_RANGE(0xd00000, 0xd00609) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)	/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_WRITE(SMH_RAM)					/* ??? only writes $00fa */
 	AM_RANGE(0xe00000, 0xe03fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2)	/* Sprites Code + X + Attr */
@@ -575,16 +575,16 @@ static ADDRESS_MAP_START( srmp3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_ROM)						/* rom bank */
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* work ram */
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(SMH_NOP)						/* flag ? */
+	AM_RANGE(0xa800, 0xa800) AM_WRITENOP						/* flag ? */
 	AM_RANGE(0xb000, 0xb303) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)			/* Sprites Y */
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(SMH_NOP)						/* flag ? */
+	AM_RANGE(0xb800, 0xb800) AM_WRITENOP						/* flag ? */
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)			/* Sprites Code + X + Attr */
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_3)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_WRITE(SMH_NOP)								/* elapsed interrupt signal */
+	AM_RANGE(0x20, 0x20) AM_WRITENOP								/* elapsed interrupt signal */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE(srmp3_flags_w)	/* coin, service | GFX bank, counter, lockout */
 	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)						/* ROM bank select */
 	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("msm", srmp3_adpcm_code_w)					/* ADPCM number */

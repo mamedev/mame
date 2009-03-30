@@ -183,8 +183,8 @@ static ADDRESS_MAP_START( silkworm_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf806, 0xf806) AM_WRITE(tecmo_sound_command_w)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(tecmo_flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(tecmo_bankswitch_w)
-	AM_RANGE(0xf809, 0xf809) AM_WRITE(SMH_NOP)	/* ? */
-	AM_RANGE(0xf80b, 0xf80b) AM_WRITE(SMH_NOP)	/* ? if mapped to watchdog like in the others, causes reset */
+	AM_RANGE(0xf809, 0xf809) AM_WRITENOP	/* ? */
+	AM_RANGE(0xf80b, 0xf80b) AM_WRITENOP	/* ? if mapped to watchdog like in the others, causes reset */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rygar_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( rygar_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", tecmo_adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", tecmo_adpcm_vol_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)	/* NMI acknowledge */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* NMI acknowledge */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tecmo_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( tecmo_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", tecmo_adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("msm", tecmo_adpcm_vol_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(SMH_NOP)	/* NMI acknowledge */
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP	/* NMI acknowledge */
 ADDRESS_MAP_END
 
 

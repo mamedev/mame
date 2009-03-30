@@ -169,11 +169,11 @@ static READ8_HANDLER( mrflea_interrupt_type_r ){
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) /* watchdog? */
+	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog? */
 	AM_RANGE(0x40, 0x40) AM_WRITE(mrflea_io_w)
 	AM_RANGE(0x41, 0x41) AM_READ(mrflea_main_r)
 	AM_RANGE(0x42, 0x42) AM_READ(mrflea_main_status_r)
-	AM_RANGE(0x43, 0x43) AM_WRITE(SMH_NOP) /* 0xa6,0x0d,0x05 */
+	AM_RANGE(0x43, 0x43) AM_WRITENOP /* 0xa6,0x0d,0x05 */
 	AM_RANGE(0x60, 0x60) AM_WRITE(mrflea_gfx_bank_w)
 ADDRESS_MAP_END
 
@@ -193,13 +193,13 @@ static WRITE8_HANDLER( mrflea_data1_w ){
 
 static ADDRESS_MAP_START( inout_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) /* watchdog */
+	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x10, 0x10) AM_READWRITE(mrflea_interrupt_type_r, SMH_NOP) /* ? / irq ACK */
-	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP) /* 0x83,0x00,0xfc */
+	AM_RANGE(0x11, 0x11) AM_WRITENOP /* 0x83,0x00,0xfc */
 	AM_RANGE(0x20, 0x20) AM_READ(mrflea_io_r)
 	AM_RANGE(0x21, 0x21) AM_WRITE(mrflea_main_w)
 	AM_RANGE(0x22, 0x22) AM_READ(mrflea_io_status_r)
-	AM_RANGE(0x23, 0x23) AM_WRITE(SMH_NOP) /* 0xb4,0x09,0x05 */
+	AM_RANGE(0x23, 0x23) AM_WRITENOP /* 0xb4,0x09,0x05 */
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x42, 0x42) AM_READWRITE(mrflea_input1_r, mrflea_data1_w)

@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE(ms_unknown_w)			//???? written in interrupt routine
 
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(sound_command_w)		//sound command
-	AM_RANGE(0xf061, 0xf061) AM_WRITE(SMH_NOP) /*sound_reset*/	//????
+	AM_RANGE(0xf061, 0xf061) AM_WRITENOP /*sound_reset*/	//????
 
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(SMH_RAM) 			//???
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_NOP) /*space for diagnostic ROM (not dumped, not reachable) */
+	AM_RANGE(0xe000, 0xffff) AM_READNOP /*space for diagnostic ROM (not dumped, not reachable) */
 ADDRESS_MAP_END
 
 
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(SMH_NOP) /*???*/ /* this is NOT mixer_enable */
+	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /*???*/ /* this is NOT mixer_enable */
 
 ADDRESS_MAP_END
 

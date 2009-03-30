@@ -1793,16 +1793,16 @@ static ADDRESS_MAP_START( master_dsp_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x1,0x1) AM_WRITE(point_ram_hiword_w) AM_READ(point_ram_hiword_ir)
 	AM_RANGE(0x2,0x2) AM_WRITE(dsp_unk2_w) AM_READ(pdp_begin_r)
 	AM_RANGE(0x3,0x3) AM_WRITE(point_ram_idx_w) AM_READ(dsp_unk_port3_r)
-	AM_RANGE(0x4,0x4) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0x4,0x4) AM_WRITENOP /* unknown */
 	AM_RANGE(0x7,0x7) AM_WRITE(upload_code_to_slave_dsp_w)
 	AM_RANGE(0x8,0x8) AM_WRITE(dsp_unk8_w) AM_READ(dsp_unk8_r)         /* trigger irq? */
-	AM_RANGE(0x9,0x9) AM_WRITE(SMH_NOP) AM_READ(custom_ic_status_r) /* trigger irq? */
+	AM_RANGE(0x9,0x9) AM_WRITENOP AM_READ(custom_ic_status_r) /* trigger irq? */
 	AM_RANGE(0xa,0xa) AM_WRITE(dsp_unk_porta_w)
-	AM_RANGE(0xb,0xb) AM_WRITE(SMH_NOP) /* RINT-related? */
+	AM_RANGE(0xb,0xb) AM_WRITENOP /* RINT-related? */
 	AM_RANGE(0xc,0xc) AM_WRITE(master_render_device_w)
 	AM_RANGE(0xd,0xd) AM_WRITE(namcos22_dspram16_bank_w)
 	AM_RANGE(0xe,0xe) AM_WRITE(dsp_led_w)
-	AM_RANGE(0xf,0xf) AM_WRITE(SMH_NOP) AM_READ(dsp_upload_status_r)
+	AM_RANGE(0xf,0xf) AM_WRITENOP AM_READ(dsp_upload_status_r)
 	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ(dsp_HOLD_signal_r)
 	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLD_ACK_w)
 	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE(dsp_XF_output_w)
@@ -1885,10 +1885,10 @@ static ADDRESS_MAP_START( slave_dsp_io, ADDRESS_SPACE_IO, 16 )
 
 	AM_RANGE(0x4,0x4) AM_READ(dsp_slave_port4_r)
 	AM_RANGE(0x5,0x5) AM_READ(dsp_slave_port5_r)
-	AM_RANGE(0x6,0x6) AM_WRITE(SMH_NOP) AM_READ(dsp_slave_port6_r)
+	AM_RANGE(0x6,0x6) AM_WRITENOP AM_READ(dsp_slave_port6_r)
 
 	/* render device state */
-	AM_RANGE(0x8,0x8) AM_WRITE(SMH_NOP) AM_READ(dsp_slave_port8_r)
+	AM_RANGE(0x8,0x8) AM_WRITENOP AM_READ(dsp_slave_port8_r)
 
 	/* render device */
 	AM_RANGE(0xb,0xb) AM_WRITE(dsp_slave_portb_w) AM_READ(dsp_slave_portb_r)
@@ -2402,10 +2402,10 @@ static ADDRESS_MAP_START( namcos22s_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x200000, 0x200003) AM_READ(alpinesa_prot_r)
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(alpinesa_prot_w)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40001f) AM_READ(namcos22_keycus_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x400000, 0x40001f) AM_READ(namcos22_keycus_r) AM_WRITENOP
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
-	AM_RANGE(0x420000, 0x42000f) AM_READ(SMH_NOP) AM_WRITE(SMH_NOP) /* C139 SCI registers */
-	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r) AM_WRITE(SMH_NOP) /* LEDs? */
+	AM_RANGE(0x420000, 0x42000f) AM_READNOP AM_WRITENOP /* C139 SCI registers */
+	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r) AM_WRITENOP /* LEDs? */
 	AM_RANGE(0x440000, 0x440003) AM_READ(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READ(namcos22_portbit_r) AM_WRITE(namcos22_portbit_w)
 	AM_RANGE(0x460000, 0x463fff) AM_RAM AM_BASE(&namcos22_nvmem) AM_SIZE(&namcos22_nvmem_size)
@@ -2827,7 +2827,7 @@ static ADDRESS_MAP_START( namcos22_am, ADDRESS_SPACE_PROGRAM, 32 )
      *     C389? (Cyber Cycles)
      *     C392? (Ace Driver Victory Lap)
      */
-	AM_RANGE(0x20000000, 0x2000000f) AM_READ(namcos22_keycus_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x20000000, 0x2000000f) AM_READ(namcos22_keycus_r) AM_WRITENOP
 
 	/**
      * C139 SCI Buffer
@@ -2923,14 +2923,14 @@ static ADDRESS_MAP_START( namcos22_am, ADDRESS_SPACE_PROGRAM, 32 )
      * zero means not-connected.
      * may be related to device at 0x94000000
      */
-	AM_RANGE(0x48000000, 0x4800003f) AM_READ(SMH_NOP) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x48000000, 0x4800003f) AM_READNOP AM_WRITENOP
 
 	/**
      * DIPSW
      *     0x50000000 - DIPSW3
      *     0x50000001 - DIPSW2
      */
-	AM_RANGE(0x50000000, 0x50000003) AM_READ(namcos22_dipswitch_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x50000000, 0x50000003) AM_READ(namcos22_dipswitch_r) AM_WRITENOP
 	AM_RANGE(0x50000008, 0x5000000b) AM_READ(namcos22_portbit_r) AM_WRITE(namcos22_portbit_w)
 
 	/**
@@ -2979,7 +2979,7 @@ static ADDRESS_MAP_START( namcos22_am, ADDRESS_SPACE_PROGRAM, 32 )
      * +0x0100 - 0x02ff Parameter RAM from Main MPU (for SEs)
      * +0x0300 - 0x03ff?    Song Title (put messages here from Sound CPU)
      */
-	AM_RANGE(0x60000000, 0x60003fff) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x60000000, 0x60003fff) AM_WRITENOP
 	AM_RANGE(0x60004000, 0x6000bfff) AM_READ(namcos22_mcuram_r) AM_WRITE(namcos22_mcuram_w) AM_BASE(&namcos22_shareram)
 
 	/**

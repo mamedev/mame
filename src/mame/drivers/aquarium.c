@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd80014, 0xd8001f) AM_WRITE(SMH_RAM) AM_BASE(&aquarium_scroll)
 	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP		/* probably not used */
 	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
-	AM_RANGE(0xd80082, 0xd80083) AM_READ(SMH_NOP)	/* stored but not read back ? check code at 0x01f440 */
+	AM_RANGE(0xd80082, 0xd80083) AM_READNOP	/* stored but not read back ? check code at 0x01f440 */
 	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd80086, 0xd80087) AM_READ(aquarium_coins_r)
 	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP		/* ?? video related */

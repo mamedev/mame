@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( quizdna_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
-	AM_RANGE(0x05, 0x06) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0x05, 0x06) AM_WRITENOP /* unknown */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( gakupara_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(quizdna_bg_yscroll_w)
-	AM_RANGE(0x03, 0x04) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0x03, 0x04) AM_WRITENOP /* unknown */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( gekiretu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
-	AM_RANGE(0x05, 0x06) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0x05, 0x06) AM_WRITENOP /* unknown */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")

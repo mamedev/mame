@@ -272,7 +272,7 @@ support for them bad tiles appear in the bg.
 static ADDRESS_MAP_START( ms32_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0xfc000000, 0xfc007fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfc800000, 0xfc800003) AM_READ(SMH_NOP)	/* sound? */
+	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP	/* sound? */
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("DSW")
 /**/AM_RANGE(0xfce00600, 0xfce0065f) AM_READ(SMH_RAM)	/* roz control registers */
@@ -319,9 +319,9 @@ static ADDRESS_MAP_START( ms32_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfc000000, 0xfc007fff) AM_WRITE(SMH_RAM) AM_BASE(&ms32_fc000000)	// NVRAM?
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w) /* sound? */
 	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
-	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITE(SMH_NOP) // irq ack?
+	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP // irq ack?
 	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
-	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITE(SMH_NOP)	// watchdog? I haven't investigated
+	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITENOP	// watchdog? I haven't investigated
 //  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITE(SMH_RAM) AM_BASE(&ms32_fce00000) /* registers not ram? */
 	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE(ms32_brightness_w)	// global brightness control
 	AM_RANGE(0xfce00600, 0xfce0065f) AM_WRITE(SMH_RAM) AM_BASE(&ms32_roz_ctrl)	/* roz control registers */
@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( ms32_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0xfe000000, 0xfe01ffff) AM_WRITE(ms32_rozram_w) AM_BASE(&ms32_rozram)	/* roz layer */
 	AM_RANGE(0xfe020000, 0xfe03ffff) AM_WRITE(ms32_rozram_w)		/* mirror only used by memory test in service mode */
-	AM_RANGE(0xfe1ffc88, 0xfe1fffff) AM_WRITE(SMH_NOP)	/* gratia writes here before falling into lineram, could be a mirror */
+	AM_RANGE(0xfe1ffc88, 0xfe1fffff) AM_WRITENOP	/* gratia writes here before falling into lineram, could be a mirror */
 	AM_RANGE(0xfe200000, 0xfe201fff) AM_WRITE(ms32_lineram_w) AM_BASE(&ms32_lineram) /* line ram for roz layer */
 ///**/AM_RANGE(0xfe202000, 0xfe2fffff) AM_WRITE(SMH_RAM) /* f1superb vram */
 ///**/AM_RANGE(0xfe100000, 0xfe1fffff) AM_WRITE(SMH_RAM) /* gratia writes here ?! */
@@ -1176,7 +1176,7 @@ static ADDRESS_MAP_START( ms32_snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3eff) AM_READ(SMH_ROM)
 	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREAD("ymf", ymf271_r)
 	AM_RANGE(0x3f10, 0x3f10) AM_READ(latch_r)
-	AM_RANGE(0x3f20, 0x3f20) AM_READ(SMH_NOP) /* 2nd latch ? */
+	AM_RANGE(0x3f20, 0x3f20) AM_READNOP /* 2nd latch ? */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK4)
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK5)
@@ -1186,9 +1186,9 @@ static ADDRESS_MAP_START( ms32_snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3eff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x3f00, 0x3f0f) AM_DEVWRITE("ymf", ymf271_w)
 	AM_RANGE(0x3f10, 0x3f10) AM_WRITE(to_main_w)
-	AM_RANGE(0x3f20, 0x3f20) AM_WRITE(SMH_NOP) /* to_main2_w  ? */
-	AM_RANGE(0x3f40, 0x3f40) AM_WRITE(SMH_NOP)   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
-	AM_RANGE(0x3f70, 0x3f70) AM_WRITE(SMH_NOP)   // watchdog? banking? very noisy
+	AM_RANGE(0x3f20, 0x3f20) AM_WRITENOP /* to_main2_w  ? */
+	AM_RANGE(0x3f40, 0x3f40) AM_WRITENOP   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
+	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)

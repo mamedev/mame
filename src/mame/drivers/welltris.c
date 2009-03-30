@@ -383,9 +383,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("EXTRA")				/* P3+P4 Coin + Start Buttons */
 	AM_RANGE(0xfff00c, 0xfff00d) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(SMH_NOP)					/* ?? */
+	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITENOP					/* ?? */
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITE(SMH_NOP)					/* ?? */
+	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITENOP					/* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )

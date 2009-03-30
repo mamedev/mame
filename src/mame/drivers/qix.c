@@ -240,7 +240,7 @@ Interrupts:
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_READ(SMH_NOP)   /* 6850 ACIA */
+	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
 	AM_RANGE(0x8c00, 0x8c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
 	AM_RANGE(0x9000, 0x93ff) AM_DEVREADWRITE("sndpia0", pia6821_r, pia6821_w)
@@ -254,7 +254,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( zoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_READ(SMH_NOP)   /* ACIA */
+	AM_RANGE(0x0800, 0x0bff) AM_READNOP   /* ACIA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x3fe) AM_READWRITE(qix_video_firq_r, qix_video_firq_w)
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x3fe) AM_READWRITE(qix_data_firq_ack_r, qix_data_firq_ack_w)
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("sndpia0", pia6821_r, pia6821_w)

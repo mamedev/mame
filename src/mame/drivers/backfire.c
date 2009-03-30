@@ -332,7 +332,7 @@ static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_BASE(&backfire_left_priority)
 	AM_RANGE(0x1ac000, 0x1ac003) AM_RAM AM_BASE(&backfire_right_priority)
-//  AM_RANGE(0x1b0000, 0x1b0003) AM_WRITE(SMH_NOP) // always 1b0000
+//  AM_RANGE(0x1b0000, 0x1b0003) AM_WRITENOP // always 1b0000
 
 	/* when set to pentometer in test mode */
 //  AM_RANGE(0x1e4000, 0x1e4003) AM_READ(backfire_unknown_wheel_r)

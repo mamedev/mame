@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE(&tsamurai_videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE(&spriteram)
 
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xf400, 0xf400) AM_WRITENOP
 	AM_RANGE(0xf401, 0xf401) AM_WRITE(sound_command1_w)
 	AM_RANGE(0xf402, 0xf402) AM_WRITE(sound_command2_w)
 
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( m660_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(tsamurai_bg_videoram_w) AM_BASE(&tsamurai_videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_BASE(&spriteram)
 
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_NOP)/* This is always written with F401, F402 & F403 data */
+	AM_RANGE(0xf400, 0xf400) AM_WRITENOP/* This is always written with F401, F402 & F403 data */
 	AM_RANGE(0xf401, 0xf401) AM_WRITE(sound_command3_w)
 	AM_RANGE(0xf402, 0xf402) AM_WRITE(sound_command2_w)
 	AM_RANGE(0xf403, 0xf403) AM_WRITE(sound_command1_w)
@@ -205,9 +205,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_m660_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)		/* ? */
-	AM_RANGE(0x01, 0x01) AM_WRITE(SMH_NOP)		/* Written continuously. Increments with level. */
-	AM_RANGE(0x02, 0x02) AM_WRITE(SMH_NOP)		/* Always follows above with 0x01 data */
+	AM_RANGE(0x00, 0x00) AM_WRITENOP		/* ? */
+	AM_RANGE(0x01, 0x01) AM_WRITENOP		/* Written continuously. Increments with level. */
+	AM_RANGE(0x02, 0x02) AM_WRITENOP		/* Always follows above with 0x01 data */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vsgongf_audio_io_map, ADDRESS_SPACE_IO, 8 )

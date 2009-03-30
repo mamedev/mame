@@ -200,8 +200,8 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1105, 0x1105) AM_READ(soundkludge_r)				/* cures speech */
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r,namcos1_cus30_w) AM_BASE(&namco_wavedata)/* PSG device, shared RAM */
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_ROM)					/* MCU external ROM */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP)					/* watchdog reset? */
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(SMH_NOP)					/* irq acknoledge? */
+	AM_RANGE(0x8000, 0x8000) AM_WRITENOP					/* watchdog reset? */
+	AM_RANGE(0x8800, 0x8800) AM_WRITENOP					/* irq acknoledge? */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM								/* RAM */
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)					/* MCU internal ROM */
 ADDRESS_MAP_END

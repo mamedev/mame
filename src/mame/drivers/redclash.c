@@ -73,9 +73,9 @@ static ADDRESS_MAP_START( zero_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x3800, 0x3bff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(redclash_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x5000, 0x5007) AM_WRITE(SMH_NOP)	/* to sound board */
+	AM_RANGE(0x5000, 0x5007) AM_WRITENOP	/* to sound board */
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star0_w)
-	AM_RANGE(0x5801, 0x5804) AM_WRITE(SMH_NOP)	/* to sound board */
+	AM_RANGE(0x5801, 0x5804) AM_WRITENOP	/* to sound board */
 	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star1_w)
 	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star2_w)
 	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
@@ -95,10 +95,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
-//  AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP)
-//  AM_RANGE(0x3800, 0x3800) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
+//  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(redclash_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x5000, 0x5007) AM_WRITE(SMH_NOP)	/* to sound board */
+	AM_RANGE(0x5000, 0x5007) AM_WRITENOP	/* to sound board */
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star0_w)
 	AM_RANGE(0x5801, 0x5801) AM_WRITE(redclash_gfxbank_w)
 	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star1_w)

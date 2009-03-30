@@ -121,8 +121,8 @@ static ADDRESS_MAP_START( hnayayoi_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x03) AM_DEVREAD("ym", ym2203_r)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW3")
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("msm", adpcm_data_w)
-//  AM_RANGE(0x08, 0x08) AM_WRITE(SMH_NOP) // CRT Controller
-//  AM_RANGE(0x09, 0x09) AM_WRITE(SMH_NOP) // CRT Controller
+//  AM_RANGE(0x08, 0x08) AM_WRITENOP // CRT Controller
+//  AM_RANGE(0x09, 0x09) AM_WRITENOP // CRT Controller
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(dynax_blitter_rev1_start_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(dynax_blitter_rev1_clear_w)
 	AM_RANGE(0x23, 0x23) AM_DEVWRITE("msm", adpcm_vclk_w)
@@ -152,8 +152,8 @@ static ADDRESS_MAP_START( hnfubuki_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xfeff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("ym", ym2203_w)
 	AM_RANGE(0xff06, 0xff06) AM_DEVWRITE("msm", adpcm_data_w)
-//  AM_RANGE(0xff08, 0xff08) AM_WRITE(SMH_NOP) // CRT Controller
-//  AM_RANGE(0xff09, 0xff09) AM_WRITE(SMH_NOP) // CRT Controller
+//  AM_RANGE(0xff08, 0xff08) AM_WRITENOP // CRT Controller
+//  AM_RANGE(0xff09, 0xff09) AM_WRITENOP // CRT Controller
 	AM_RANGE(0xff0a, 0xff0a) AM_WRITE(dynax_blitter_rev1_start_w)
 	AM_RANGE(0xff0c, 0xff0c) AM_WRITE(dynax_blitter_rev1_clear_w)
 	AM_RANGE(0xff23, 0xff23) AM_DEVWRITE("msm", adpcm_vclk_w)
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( untoucha_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ym", ym2203_control_port_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREAD("ym", ym2203_status_port_r)
-//  AM_RANGE(0x12, 0x12) AM_WRITE(SMH_NOP) // CRT Controller
+//  AM_RANGE(0x12, 0x12) AM_WRITENOP // CRT Controller
 	AM_RANGE(0x13, 0x13) AM_DEVWRITE("msm", adpcm_data_w)
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("COIN")
 	AM_RANGE(0x15, 0x15) AM_READ(keyboard_1_r)
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( untoucha_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x32, 0x32) AM_DEVWRITE("msm", adpcm_reset_inv_w)
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("ym", ym2203_write_port_w)
 	AM_RANGE(0x51, 0x51) AM_DEVREAD("ym", ym2203_read_port_r)
-//  AM_RANGE(0x52, 0x52) AM_WRITE(SMH_NOP) // CRT Controller
+//  AM_RANGE(0x52, 0x52) AM_WRITENOP // CRT Controller
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mj_keyboard )

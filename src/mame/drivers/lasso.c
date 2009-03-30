@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( pinbo_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay2", ay8910_r)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(soundlatch_r, SMH_NOP) /* ??? */
-	AM_RANGE(0x14, 0x14) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0x14, 0x14) AM_WRITENOP	/* ??? */
 ADDRESS_MAP_END
 
 

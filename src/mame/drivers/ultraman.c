@@ -136,14 +136,14 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)	/* Sound latch read */
-//  AM_RANGE(0xd000, 0xd000) AM_WRITE(SMH_NOP)      /* ??? */
+//  AM_RANGE(0xd000, 0xd000) AM_WRITENOP      /* ??? */
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)		/* M6295 */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)	/* YM2151 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)                     /* ??? */
+//  AM_RANGE(0x00, 0x00) AM_WRITENOP                     /* ??? */
 ADDRESS_MAP_END
 
 

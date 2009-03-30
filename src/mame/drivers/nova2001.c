@@ -270,18 +270,18 @@ static ADDRESS_MAP_START( raiders5_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0x9000, 0x9000) AM_READ(SMH_NOP) /* unknown */
+	AM_RANGE(0x9000, 0x9000) AM_READNOP /* unknown */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xc000, 0xc000) AM_READ(SMH_NOP) /* unknown */
-	AM_RANGE(0xc800, 0xc800) AM_READ(SMH_NOP) /* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_READ(SMH_NOP) /* unknown */
+	AM_RANGE(0xc000, 0xc000) AM_READNOP /* unknown */
+	AM_RANGE(0xc800, 0xc800) AM_READNOP /* unknown */
+	AM_RANGE(0xd000, 0xd000) AM_READNOP /* unknown */
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(nova2001_scroll_x_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(nova2001_scroll_y_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(pkunwar_flipscreen_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raiders5_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(SMH_NOP) /* unknown */
+	AM_RANGE(0x00, 0x00) AM_READNOP /* unknown */
 ADDRESS_MAP_END
 
 

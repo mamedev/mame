@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( nsc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(3) AM_BASE(&tubep_sprite_colorsharedram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0x2000, 0x2009) AM_WRITE(tubep_sprite_control_w)
-	AM_RANGE(0x200a, 0x200b) AM_WRITE(SMH_NOP) /* not used by the games - perhaps designed for debugging */
+	AM_RANGE(0x200a, 0x200b) AM_WRITENOP /* not used by the games - perhaps designed for debugging */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

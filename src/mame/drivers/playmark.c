@@ -234,9 +234,9 @@ static ADDRESS_MAP_START( bigtwin_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x304000, 0x304001) AM_NOP				/* watchdog? irq ack? */
 	AM_RANGE(0x440000, 0x4403ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x500000, 0x500fff) AM_WRITE(wbeachvl_fgvideoram_w) AM_BASE(&wbeachvl_videoram2)
-	AM_RANGE(0x501000, 0x501fff) AM_WRITE(SMH_NOP)	/* unused RAM? */
+	AM_RANGE(0x501000, 0x501fff) AM_WRITENOP	/* unused RAM? */
 	AM_RANGE(0x502000, 0x503fff) AM_WRITE(wbeachvl_txvideoram_w) AM_BASE(&wbeachvl_videoram1)
-	AM_RANGE(0x504000, 0x50ffff) AM_WRITE(SMH_NOP)	/* unused RAM? */
+	AM_RANGE(0x504000, 0x50ffff) AM_WRITENOP	/* unused RAM? */
 	AM_RANGE(0x510000, 0x51000b) AM_WRITE(bigtwin_scroll_w)
 	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP	/* always 3? */
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_BASE(&bigtwin_bgvideoram)
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( wbeachvl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x710018, 0x710019) AM_READ_PORT("P3")
 	AM_RANGE(0x71001a, 0x71001b) AM_READ_PORT("P4")
 //  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
-//  AM_RANGE(0x71001e, 0x71001f) AM_WRITE(SMH_NOP)//playmark_snd_command_w },
+//  AM_RANGE(0x71001e, 0x71001f) AM_WRITENOP//playmark_snd_command_w },
 	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)			/* Trackballs */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(bladestl_bankswitch_w)	/* bankswitch control */
 	AM_RANGE(0x2f80, 0x2f9f) AM_READWRITE(K051733_r, K051733_w)	/* Protection: 051733 */
-	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITE(SMH_NOP)				/* ??? */
+	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITENOP				/* ??? */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM							/* Work RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_RAM)	/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)		/* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("upd", bladestl_speech_ctrl_w)	/* UPD7759 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("upd", bladestl_speech_busy_r)			/* UPD7759 */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_NOP)					/* ??? */
+	AM_RANGE(0x5000, 0x5000) AM_WRITENOP					/* ??? */
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)				/* soundlatch_r */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

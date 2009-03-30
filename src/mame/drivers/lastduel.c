@@ -65,7 +65,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastduel_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xfc0000, 0xfc0003) AM_WRITE(SMH_NOP) /* Written rarely */
+	AM_RANGE(0xfc0000, 0xfc0003) AM_WRITENOP /* Written rarely */
 	AM_RANGE(0xfc0800, 0xfc0fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xfc4000, 0xfc4001) AM_WRITE(lastduel_flip_w)
 	AM_RANGE(0xfc4002, 0xfc4003) AM_WRITE(lastduel_sound_w)

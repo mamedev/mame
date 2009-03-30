@@ -527,7 +527,7 @@ static ADDRESS_MAP_START( scramblb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5040, 0x505f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x5060, 0x507f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0x5080, 0x50ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6000, 0x6001) AM_WRITE(SMH_NOP)  /* sound triggers */
+	AM_RANGE(0x6000, 0x6001) AM_WRITENOP  /* sound triggers */
 	AM_RANGE(0x6003, 0x6003) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x6004, 0x6007) AM_WRITE(galaxian_lfo_freq_w)
 	AM_RANGE(0x6800, 0x6802) AM_WRITE(galaxian_background_enable_w)
@@ -575,8 +575,8 @@ static ADDRESS_MAP_START( scramb2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6804, 0x6804) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7006, 0x7006) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x7007, 0x7007) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x7006, 0x7006) AM_WRITENOP
+	AM_RANGE(0x7007, 0x7007) AM_WRITENOP
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(galaxian_pitch_w)
 ADDRESS_MAP_END
 
@@ -703,11 +703,11 @@ static ADDRESS_MAP_START( ozon1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(galaxold_videoram_w)
 	AM_RANGE(0x5000, 0x503f) AM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
 	AM_RANGE(0x5040, 0x505f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(SMH_NOP) //continuosly 0 and 1
+	AM_RANGE(0x6801, 0x6801) AM_WRITENOP //continuosly 0 and 1
 	AM_RANGE(0x6802, 0x6802) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0x6806, 0x6806) AM_WRITE(SMH_NOP) //only one 0 at reset
-	AM_RANGE(0x6807, 0x6807) AM_WRITE(SMH_NOP) //only one 0 at reset
-	AM_RANGE(0x8103, 0x8103) AM_WRITE(SMH_NOP) //only one 9b at reset
+	AM_RANGE(0x6806, 0x6806) AM_WRITENOP //only one 0 at reset
+	AM_RANGE(0x6807, 0x6807) AM_WRITENOP //only one 0 at reset
+	AM_RANGE(0x8103, 0x8103) AM_WRITENOP //only one 9b at reset
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ozon1_io_map, ADDRESS_SPACE_IO, 8 )
@@ -723,12 +723,12 @@ static ADDRESS_MAP_START( drivfrcg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1503, 0x1503) AM_MIRROR(0x6000) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1580, 0x1582) AM_MIRROR(0x6000) AM_WRITE(galaxian_background_enable_w)
-	AM_RANGE(0x1583, 0x1583) AM_MIRROR(0x6000) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x1585, 0x1585) AM_MIRROR(0x6000) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1583, 0x1583) AM_MIRROR(0x6000) AM_WRITENOP
+	AM_RANGE(0x1585, 0x1585) AM_MIRROR(0x6000) AM_WRITENOP
 	AM_RANGE(0x1586, 0x1587) AM_MIRROR(0x6000) AM_WRITE(galaxian_lfo_freq_w)
 	AM_RANGE(0x1600, 0x1600) AM_MIRROR(0x6000) AM_READ_PORT("DSW0") AM_WRITE(galaxian_pitch_w)
 	AM_RANGE(0x1700, 0x1700) AM_MIRROR(0x6000) AM_READ_PORT("DSW1") AM_WRITENOP
-	AM_RANGE(0x1701, 0x1701) AM_MIRROR(0x6000) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1701, 0x1701) AM_MIRROR(0x6000) AM_WRITENOP
 	AM_RANGE(0x1704, 0x1707) AM_MIRROR(0x6000) AM_WRITE(galaxian_vol_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
@@ -745,9 +745,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bongo, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(SMH_NOP) // not used
+	AM_RANGE(0x8400, 0x87ff) AM_WRITENOP // not used
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_WRITE(SMH_NOP) // not used
+	AM_RANGE(0x9400, 0x97ff) AM_WRITENOP // not used
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
@@ -776,11 +776,11 @@ static ADDRESS_MAP_START( hunchbkg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1503, 0x1503) AM_MIRROR(0x6000) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1580, 0x1582) AM_MIRROR(0x6000) AM_WRITE(galaxian_background_enable_w)
-	AM_RANGE(0x1583, 0x1583) AM_MIRROR(0x6000) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1583, 0x1583) AM_MIRROR(0x6000) AM_WRITENOP
 	AM_RANGE(0x1584, 0x1587) AM_MIRROR(0x6000) AM_WRITE(galaxian_lfo_freq_w)
 	AM_RANGE(0x1600, 0x1600) AM_MIRROR(0x6000) AM_READ_PORT("DSW0")
-	AM_RANGE(0x1600, 0x1601) AM_MIRROR(0x6000) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x1604, 0x1604) AM_MIRROR(0x6000) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1600, 0x1601) AM_MIRROR(0x6000) AM_WRITENOP
+	AM_RANGE(0x1604, 0x1604) AM_MIRROR(0x6000) AM_WRITENOP
 	AM_RANGE(0x1606, 0x1606) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x1607, 0x1607) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_READWRITE(SMH_NOP, galaxian_pitch_w)
@@ -792,7 +792,7 @@ static ADDRESS_MAP_START( hunchbkg, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hunchbkg_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READ(SMH_NOP) // not used
+	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READNOP // not used
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
@@ -910,7 +910,7 @@ static ADDRESS_MAP_START( ckongg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc405, 0xc405) AM_WRITE(galaxian_shoot_enable_w)
 	AM_RANGE(0xc406, 0xc407) AM_WRITE(galaxian_vol_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(SMH_NOP) // link cut
+	AM_RANGE(0xc804, 0xc804) AM_WRITENOP // link cut
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(galaxian_pitch_w)
@@ -928,7 +928,7 @@ static ADDRESS_MAP_START( kkgalax_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kkgalax_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0000, 0x5fff) AM_WRITENOP
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x93ff) AM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x9800, 0x983f) AM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
@@ -944,7 +944,7 @@ static ADDRESS_MAP_START( kkgalax_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xc405, 0xc405) AM_WRITE(galaxian)
 //  AM_RANGE(0xc406, 0xc407) AM_WRITE(galaxian_vol_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(galaxold_nmi_enable_w)
-//  AM_RANGE(0xc804, 0xc804) AM_WRITE(SMH_NOP) // link cut
+//  AM_RANGE(0xc804, 0xc804) AM_WRITENOP // link cut
 //  AM_RANGE(0xc806, 0xc806) AM_WRITE(galaxold_flip_screen_x_w)
 //  AM_RANGE(0xc807, 0xc807) AM_WRITE(galaxold_flip_screen_y_w)
 //  AM_RANGE(0xcc00, 0xcc00) AM_WRITE(galaxian_pitch_w)

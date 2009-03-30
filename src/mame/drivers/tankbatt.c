@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c0d, 0x0c0d) AM_WRITE(tankbatt_sh_expl_w)
 	AM_RANGE(0x0c0f, 0x0c0f) AM_WRITE(tankbatt_demo_interrupt_enable_w)
 	AM_RANGE(0x0c18, 0x0c1f) AM_READ(tankbatt_dsw_r)
-	AM_RANGE(0x0c18, 0x0c18) AM_WRITE(SMH_NOP)	/* watchdog ?? */
+	AM_RANGE(0x0c18, 0x0c18) AM_WRITENOP	/* watchdog ?? */
 	AM_RANGE(0x0200, 0x0bff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0200, 0x07ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)

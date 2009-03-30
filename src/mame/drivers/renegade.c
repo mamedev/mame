@@ -560,7 +560,7 @@ static ADDRESS_MAP_START( main_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3803, 0x3803) AM_WRITE(renegade_flipscreen_w)
 	AM_RANGE(0x3804, 0x3804) AM_WRITE(mcu_w)
 	AM_RANGE(0x3805, 0x3805) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x3806, 0x3806) AM_WRITE(SMH_NOP) // ?? watchdog
+	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
 	AM_RANGE(0x3807, 0x3807) AM_WRITE(renegade_coin_counter_w)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
@@ -575,10 +575,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(SMH_NOP) // this gets written the same values as 0x2000
+	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // this gets written the same values as 0x2000
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_play_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ym", ym3526_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP) /* adpcm related? stereo pan? */
+	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* adpcm related? stereo pan? */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 

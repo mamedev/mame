@@ -486,7 +486,7 @@ static ADDRESS_MAP_START( ps3v1_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03004000, 0x0300ffff) AM_READ(SMH_RAM)
 	AM_RANGE(0x03040000, 0x03044fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x03050000, 0x030501ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READ(SMH_NOP) // also writes to this address - might be vblank reads?
+	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_READ(SMH_RAM) //  video registers
 	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
@@ -523,7 +523,7 @@ static ADDRESS_MAP_START( ps5_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04004000, 0x0400ffff) AM_READ(SMH_RAM)
 	AM_RANGE(0x04040000, 0x04044fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x04050000, 0x040501ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READ(SMH_NOP) // also writes to this address - might be vblank reads?
+	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_READ(SMH_RAM) // video registers
 	AM_RANGE(0x05000000, 0x0507ffff) AM_READ(SMH_BANK1) // data ROM
 	AM_RANGE(0x06000000, 0x060fffff) AM_READ(SMH_RAM)

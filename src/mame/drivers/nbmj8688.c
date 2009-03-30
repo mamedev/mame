@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( writeport_crystalg, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj8688_clut_w)
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(crystalg_romsel_w)
-//  AM_RANGE(0xf0, 0xf0) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
 ADDRESS_MAP_END
 
 

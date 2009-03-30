@@ -1176,7 +1176,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xe06000, 0xe06003) AM_WRITE(atarigen_sound_upper32_w)
 	AM_RANGE(0xe08000, 0xe08003) AM_WRITE(latch_w)
 	AM_RANGE(0xe0c000, 0xe0c003) AM_WRITE(atarigen_video_int_ack32_w)
-	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITE(SMH_NOP)//watchdog_reset_w },
+	AM_RANGE(0xe0e000, 0xe0e003) AM_WRITENOP//watchdog_reset_w },
 	AM_RANGE(0xe80000, 0xe80003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xe82000, 0xe82003) AM_READ(special_port2_r)
 	AM_RANGE(0xe82004, 0xe82007) AM_READ(special_port3_r)

@@ -120,9 +120,9 @@ static ADDRESS_MAP_START( lkage, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0xf000, 0xf003) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&lkage_vreg) /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
-	AM_RANGE(0xf061, 0xf061) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xf061, 0xf061) AM_WRITENOP
 	AM_RANGE(0xf062, 0xf062) AM_READ(lkage_mcu_r) AM_WRITE(lkage_mcu_w)
-	AM_RANGE(0xf063, 0xf063) AM_WRITE(SMH_NOP) /* pulsed; nmi on sound cpu? */
+	AM_RANGE(0xf063, 0xf063) AM_WRITENOP /* pulsed; nmi on sound cpu? */
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf082, 0xf082) AM_READ_PORT("DSW3")
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( lkage, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf087, 0xf087) AM_READ(lkage_mcu_status_r)
 	AM_RANGE(0xf0a0, 0xf0a3) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* unknown */
 	AM_RANGE(0xf0c0, 0xf0c5) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&lkage_scroll)
-	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITE(SMH_NOP) /* pulsed */
+	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
 	AM_RANGE(0xf100, 0xf15f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
 	AM_RANGE(0xf400, 0xffff) AM_READ(SMH_RAM) AM_WRITE(lkage_videoram_w) AM_BASE(&videoram) /* videoram */
 ADDRESS_MAP_END
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym1", ym2203_r)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym2", ym2203_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb001, 0xb001) AM_READ(SMH_NOP)	/* ??? */
+	AM_RANGE(0xb001, 0xb001) AM_READNOP	/* ??? */
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym2", ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(lkage_sh_nmi_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_ROM)	/* space for diagnostic ROM? */

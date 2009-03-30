@@ -201,9 +201,9 @@ static ADDRESS_MAP_START( whizz_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(whizz_bankswitch_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xc803, 0xc803) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xc803, 0xc803) AM_WRITENOP /* ? */
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(sidearms_c804_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xc805, 0xc805) AM_WRITENOP /* ? */
 	AM_RANGE(0xe805, 0xe805) AM_WRITE(sidearms_star_scrollx_w)
 	AM_RANGE(0xe806, 0xe806) AM_WRITE(sidearms_star_scrolly_w)
 	AM_RANGE(0xc808, 0xc809) AM_WRITE(SMH_RAM) AM_BASE(&sidearms_bg_scrollx)
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( whizz_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x40, 0x40) AM_WRITENOP
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

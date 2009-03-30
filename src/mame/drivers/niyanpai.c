@@ -304,9 +304,9 @@ static ADDRESS_MAP_START( niyanpai_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
-	AM_RANGE(0x200200, 0x200201) AM_WRITE(SMH_NOP)			// unknown
-	AM_RANGE(0x240000, 0x240009) AM_WRITE(SMH_NOP)			// unknown
-	AM_RANGE(0x240200, 0x2403ff) AM_WRITE(SMH_NOP)			// unknown
+	AM_RANGE(0x200200, 0x200201) AM_WRITENOP			// unknown
+	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
+	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
 	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
@@ -366,8 +366,8 @@ static ADDRESS_MAP_START( musobana_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
-	AM_RANGE(0x240000, 0x240009) AM_WRITE(SMH_NOP)			// unknown
-	AM_RANGE(0x240200, 0x2403ff) AM_WRITE(SMH_NOP)			// unknown
+	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
+	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
 	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
@@ -429,8 +429,8 @@ static ADDRESS_MAP_START( mhhonban_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
-	AM_RANGE(0x240000, 0x240009) AM_WRITE(SMH_NOP)			// unknown
-	AM_RANGE(0x240200, 0x2403ff) AM_WRITE(SMH_NOP)			// unknown
+	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
+	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
 	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
 	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)

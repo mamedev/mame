@@ -332,8 +332,8 @@ static ADDRESS_MAP_START( bonzeadv_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x3b0000, 0x3b0001) AM_READ_PORT("DSWB")
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3d0000, 0x3d0001) AM_READNOP
-	AM_RANGE(0x3e0000, 0x3e0001) AM_WRITE(taitosound_port16_lsb_w)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(bonzeadv_cchip_ram_r, bonzeadv_cchip_ram_w)
 	AM_RANGE(0x800802, 0x800803) AM_READWRITE(bonzeadv_cchip_ctrl_r, bonzeadv_cchip_ctrl_w)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(bonzeadv_cchip_bank_w)
@@ -348,8 +348,8 @@ static ADDRESS_MAP_START( asuka_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1076f0, 0x1076f1) AM_READNOP	/* Mofflott init does dummy reads here */
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)
 	AM_RANGE(0x3a0000, 0x3a0003) AM_WRITE(asuka_spritectrl_w)
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READWRITE(SMH_NOP, taitosound_port16_lsb_w)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x40000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0xc10000, 0xc103ff) AM_WRITENOP	/* error in Asuka init code */
@@ -360,8 +360,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cadash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080003) AM_WRITE(asuka_spritectrl_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READWRITE(SMH_NOP, taitosound_port16_lsb_w)
-	AM_RANGE(0x0c0002, 0x0c0003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x0c0002, 0x0c0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM	/* network ram */
 	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
@@ -378,8 +378,8 @@ static ADDRESS_MAP_START( eto_map, ADDRESS_SPACE_PROGRAM, 16 )	/* N.B. tc100scn 
 	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
 	AM_RANGE(0x400000, 0x40000f) AM_READ(TC0220IOC_halfword_r)	/* service mode mirror */
 	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(asuka_spritectrl_w)
-	AM_RANGE(0x4e0000, 0x4e0001) AM_READWRITE(SMH_NOP, taitosound_port16_lsb_w)
-	AM_RANGE(0x4e0002, 0x4e0003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
+	AM_RANGE(0x4e0000, 0x4e0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x4e0002, 0x4e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(PC090OJ_word_0_r, PC090OJ_word_0_w)	/* sprite ram */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(TC0100SCN_word_0_w)	/* service mode mirror */
 	AM_RANGE(0xd00000, 0xd0ffff) AM_READWRITE(TC0100SCN_word_0_r, TC0100SCN_word_0_w)	/* tilemaps */

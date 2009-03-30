@@ -238,15 +238,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) // 00 on start-up, not again
+	AM_RANGE(0x00, 0x00) AM_WRITENOP // 00 on start-up, not again
 	AM_RANGE(0x42, 0x42) AM_WRITE(angelkds_cpu_bank_write)
-	AM_RANGE(0x43, 0x43) AM_WRITE(SMH_NOP) // 9a on start-up, not again
+	AM_RANGE(0x43, 0x43) AM_WRITENOP // 9a on start-up, not again
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("I40")	/* "Coinage" Dip Switches */
 	AM_RANGE(0x41, 0x41) AM_READ_PORT("I41")	/* Other Dip Switches */
 	AM_RANGE(0x42, 0x42) AM_READ_PORT("I42")	/* Players inputs (not needed ?) */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("I80")	/* System inputs */
 	AM_RANGE(0x81, 0x82) AM_READ(angelkds_input_r)	/* Players inputs */
-	AM_RANGE(0x83, 0x83) AM_WRITE(SMH_NOP) // 9b on start-up, not again
+	AM_RANGE(0x83, 0x83) AM_WRITENOP // 9b on start-up, not again
 	AM_RANGE(0xc0, 0xc3) AM_READWRITE(angelkds_main_sound_r, angelkds_main_sound_w) // 02 various points
 ADDRESS_MAP_END
 

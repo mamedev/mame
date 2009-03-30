@@ -414,8 +414,8 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static ADDRESS_MAP_START( superman_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x500000, 0x500007) AM_READ(superman_dsw_input_r)
-	AM_RANGE(0x800000, 0x800001) AM_READ(SMH_NOP)
-	AM_RANGE(0x800002, 0x800003) AM_READ(taitosound_comm16_lsb_r)
+	AM_RANGE(0x800000, 0x800001) AM_READNOP
+	AM_RANGE(0x800002, 0x800003) AM_READ8(taitosound_comm_r, 0x00ff)
 	AM_RANGE(0x900000, 0x9007ff) AM_READ(cchip1_ram_r)
 	AM_RANGE(0x900802, 0x900803) AM_READ(cchip1_ctrl_r)
 	AM_RANGE(0xb00000, 0xb00fff) AM_READ(SMH_RAM)
@@ -426,11 +426,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superman_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(SMH_NOP)	/* written each frame at $3a9c, mostly 0x10 */
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP)	/* written each frame at $3aa2, mostly 0x10 */
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_NOP)	/* written each frame at $3ab0, mostly 0x10 */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(taitosound_port16_lsb_w)
-	AM_RANGE(0x800002, 0x800003) AM_WRITE(taitosound_comm16_lsb_w)
+	AM_RANGE(0x300000, 0x300001) AM_WRITENOP	/* written each frame at $3a9c, mostly 0x10 */
+	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* written each frame at $3aa2, mostly 0x10 */
+	AM_RANGE(0x600000, 0x600001) AM_WRITENOP	/* written each frame at $3ab0, mostly 0x10 */
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x800002, 0x800003) AM_WRITE8(taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9007ff) AM_WRITE(cchip1_ram_w)
 	AM_RANGE(0x900802, 0x900803) AM_WRITE(cchip1_ctrl_w)
 	AM_RANGE(0x900c00, 0x900c01) AM_WRITE(cchip1_bank_w)
@@ -443,8 +443,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( daisenpu_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x500000, 0x50000f) AM_READ(superman_dsw_input_r)
-	AM_RANGE(0x800000, 0x800001) AM_READ(SMH_NOP)
-	AM_RANGE(0x800002, 0x800003) AM_READ(taitosound_comm16_lsb_r)
+	AM_RANGE(0x800000, 0x800001) AM_READNOP
+	AM_RANGE(0x800002, 0x800003) AM_READ8(taitosound_comm_r, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READ(daisenpu_input_r)
 	AM_RANGE(0xb00000, 0xb00fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd00000, 0xd00fff) AM_READ(SMH_RAM)	/* video attribute ram */
@@ -454,10 +454,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daisenpu_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-//  AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP)    /* written each frame at $2ac, values change */
-//  AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_NOP)    /* written each frame at $2a2, values change */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(taitosound_port16_lsb_w)
-	AM_RANGE(0x800002, 0x800003) AM_WRITE(taitosound_comm16_lsb_w)
+//  AM_RANGE(0x400000, 0x400001) AM_WRITENOP    /* written each frame at $2ac, values change */
+//  AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* written each frame at $2a2, values change */
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x800002, 0x800003) AM_WRITE8(taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_WRITE(daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xd00000, 0xd007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16	)	// Sprites Y
@@ -468,8 +468,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gigandes_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x500000, 0x500007) AM_READ(superman_dsw_input_r)
-	AM_RANGE(0x800000, 0x800001) AM_READ(SMH_NOP)
-	AM_RANGE(0x800002, 0x800003) AM_READ(taitosound_comm16_lsb_r)
+	AM_RANGE(0x800000, 0x800001) AM_READNOP
+	AM_RANGE(0x800002, 0x800003) AM_READ8(taitosound_comm_r, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READ(daisenpu_input_r)
 	AM_RANGE(0xb00000, 0xb00fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd00000, 0xd007ff) AM_READ(SMH_RAM)	/* video attribute ram */
@@ -479,10 +479,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gigandes_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP)	/* 0x1 written each frame at $d42, watchdog? */
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_NOP)	/* 0x1 written each frame at $d3c, watchdog? */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(taitosound_port16_lsb_w)
-	AM_RANGE(0x800002, 0x800003) AM_WRITE(taitosound_comm16_lsb_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* 0x1 written each frame at $d42, watchdog? */
+	AM_RANGE(0x600000, 0x600001) AM_WRITENOP	/* 0x1 written each frame at $d3c, watchdog? */
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x800002, 0x800003) AM_WRITE8(taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_WRITE(daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xd00000, 0xd007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16	)	// Sprites Y
@@ -493,8 +493,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ballbros_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x500000, 0x50000f) AM_READ(superman_dsw_input_r)
-	AM_RANGE(0x800000, 0x800001) AM_READ(SMH_NOP)
-	AM_RANGE(0x800002, 0x800003) AM_READ(taitosound_comm16_lsb_r)
+	AM_RANGE(0x800000, 0x800001) AM_READNOP
+	AM_RANGE(0x800002, 0x800003) AM_READ8(taitosound_comm_r, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READ(daisenpu_input_r)
 	AM_RANGE(0xb00000, 0xb00fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd00000, 0xd007ff) AM_READ(SMH_RAM)	/* video attribute ram */
@@ -504,10 +504,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ballbros_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP)	/* 0x1 written each frame at $c56, watchdog? */
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_NOP)	/* 0x1 written each frame at $c4e, watchdog? */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(taitosound_port16_lsb_w)
-	AM_RANGE(0x800002, 0x800003) AM_WRITE(taitosound_comm16_lsb_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* 0x1 written each frame at $c56, watchdog? */
+	AM_RANGE(0x600000, 0x600001) AM_WRITENOP	/* 0x1 written each frame at $c4e, watchdog? */
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x800002, 0x800003) AM_WRITE8(taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_WRITE(daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xd00000, 0xd007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16	)	// Sprites Y
@@ -523,9 +523,9 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
+	AM_RANGE(0xea00, 0xea00) AM_READNOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -534,9 +534,9 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w) /* bankswitch ? */
 ADDRESS_MAP_END
 
@@ -545,9 +545,9 @@ static ADDRESS_MAP_START( daisenpu_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
+	AM_RANGE(0xea00, 0xea00) AM_READNOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daisenpu_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -556,9 +556,9 @@ static ADDRESS_MAP_START( daisenpu_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym", ym2151_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -567,10 +567,10 @@ static ADDRESS_MAP_START( ballbros_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP
+	AM_RANGE(0xe200, 0xe200) AM_READNOP
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
+	AM_RANGE(0xea00, 0xea00) AM_READNOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ballbros_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -579,9 +579,9 @@ static ADDRESS_MAP_START( ballbros_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w) /* bankswitch ? */
 ADDRESS_MAP_END
 

@@ -301,13 +301,13 @@ static ADDRESS_MAP_START( esckids_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f93, 0x3f93) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x3fa0, 0x3fa7) AM_WRITE(K053246_w)			// 053246 (Sprite)
 	AM_RANGE(0x3fb0, 0x3fbf) AM_WRITE(K053251_w)			// 053251 (Priority Encoder)
-	AM_RANGE(0x3fc0, 0x3fcf) AM_WRITE(SMH_NOP)				// Not Emulated (053252 ???)
+	AM_RANGE(0x3fc0, 0x3fcf) AM_WRITENOP				// Not Emulated (053252 ???)
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)		// Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)	// EEPROM, Video banking
 	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)			// Sound
 	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE("konami", vendetta_sound_r, k053260_w)		// Sound
 	AM_RANGE(0x3fd8, 0x3fd9) AM_READ(K053246_r)				// 053246 (Sprite)
-	AM_RANGE(0x3fda, 0x3fda) AM_WRITE(SMH_NOP)				// Not Emulated (Watchdog ???)
+	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP				// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK(3)					// 052109 (Tilemap) 0x0000-0x0fff
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK(2)					// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)

@@ -424,7 +424,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x48a000, 0x48a01f) AM_WRITE(K054338_word_w)
 	AM_RANGE(0x48c000, 0x48c03f) AM_WRITE(K056832_word_w)
 	AM_RANGE(0x490000, 0x490001) AM_WRITE(mweeprom_w)
-	AM_RANGE(0x492000, 0x492001) AM_WRITE(SMH_NOP)	// watchdog
+	AM_RANGE(0x492000, 0x492001) AM_WRITENOP	// watchdog
 	AM_RANGE(0x49800c, 0x49800d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x49800e, 0x49800f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x498000, 0x49801f) AM_WRITE(SMH_RAM)
@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( mmreadmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x274002, 0x274003) AM_READ(mmplayer2_r)
 	AM_RANGE(0x278000, 0x278001) AM_READ(mmcoins_r)
 	AM_RANGE(0x278002, 0x278003) AM_READ(vseeprom_r)
-	AM_RANGE(0x27c000, 0x27c001) AM_READ(SMH_NOP)	// watchdog lives here
+	AM_RANGE(0x27c000, 0x27c001) AM_READNOP	// watchdog lives here
 	AM_RANGE(0x300000, 0x301fff) AM_READ(K056832_ram_word_r)
 	AM_RANGE(0x302000, 0x303fff) AM_READ(K056832_ram_word_r)	// tilemap RAM mirror read(essential)
 	AM_RANGE(0x310000, 0x311fff) AM_READ(K056832_mw_rom_word_r)
@@ -507,7 +507,7 @@ static ADDRESS_MAP_START( vsreadmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x274002, 0x274003) AM_READ(mmplayer2_r)
 	AM_RANGE(0x278000, 0x278001) AM_READ(mmcoins_r)
 	AM_RANGE(0x278002, 0x278003) AM_READ(vseeprom_r)
-	AM_RANGE(0x27c000, 0x27c001) AM_READ(SMH_NOP)		// watchdog lives here
+	AM_RANGE(0x27c000, 0x27c001) AM_READNOP		// watchdog lives here
 	AM_RANGE(0x300000, 0x301fff) AM_READ(K056832_ram_word_r)
 	AM_RANGE(0x302000, 0x303fff) AM_READ(K056832_ram_word_r) // tilemap RAM mirror read(essential)
 	AM_RANGE(0x304000, 0x3041ff) AM_READ(SMH_RAM)
@@ -703,7 +703,7 @@ static ADDRESS_MAP_START( dddwritemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
 	AM_RANGE(0x6e0000, 0x6e0001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP)	// watchdog
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP	// watchdog
 ADDRESS_MAP_END
 
 /* Gaiapolis */
@@ -763,7 +763,7 @@ static ADDRESS_MAP_START( gaiawritemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE(ddd_053936_enable_w)
 	AM_RANGE(0x6e0000, 0x6e0001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP) 	// watchdog
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP 	// watchdog
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -802,7 +802,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITENOP
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe22f) AM_DEVWRITE("konami1", k054539_w)
 	AM_RANGE(0xe230, 0xe3ff) AM_WRITE(SMH_RAM)
@@ -810,7 +810,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe630, 0xe7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0xfff0, 0xfff3) AM_WRITE(SMH_NOP)	// unknown write
+	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP	// unknown write
 ADDRESS_MAP_END
 
 static const k054539_interface k054539_config =

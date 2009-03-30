@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb800, 0xb800) AM_READ(SMH_NOP)		/* NMI ack? */
+	AM_RANGE(0xb800, 0xb800) AM_READNOP		/* NMI ack? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -79,8 +79,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(timelimt_scroll_x_lsb_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(timelimt_scroll_x_msb_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITE(timelimt_scroll_y_w)
-	AM_RANGE(0xc803, 0xc803) AM_WRITE(SMH_NOP)		/* ???? bit 0 used only */
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(SMH_NOP)		/* ???? not used */
+	AM_RANGE(0xc803, 0xc803) AM_WRITENOP		/* ???? bit 0 used only */
+	AM_RANGE(0xc804, 0xc804) AM_WRITENOP		/* ???? not used */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )

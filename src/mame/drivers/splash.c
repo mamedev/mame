@@ -153,7 +153,7 @@ static void splash_msm5205_int(const device_config *device)
 static ADDRESS_MAP_START( splash_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_WRITE(SMH_ROM)					/* ROM */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)		/* ADPCM data for the MSM5205 chip */
-//  AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_NOP)                 /* ??? */
+//  AM_RANGE(0xe000, 0xe000) AM_WRITENOP                 /* ??? */
 	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE("ym", ym3812_w)	/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)					/* RAM */
 ADDRESS_MAP_END

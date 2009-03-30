@@ -113,9 +113,9 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(funybubl_cpurombank_w)		// rom bank?
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(funybubl_soundcommand_w)
-	AM_RANGE(0x06, 0x06) AM_READ(SMH_NOP)		/* Nothing is done with the data read */
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)		/* Written directly after IO port 0 */
-	AM_RANGE(0x07, 0x07) AM_WRITE(SMH_NOP)		/* Reset something on startup - Sound CPU ?? */
+	AM_RANGE(0x06, 0x06) AM_READNOP		/* Nothing is done with the data read */
+	AM_RANGE(0x06, 0x06) AM_WRITENOP		/* Written directly after IO port 0 */
+	AM_RANGE(0x07, 0x07) AM_WRITENOP		/* Reset something on startup - Sound CPU ?? */
 ADDRESS_MAP_END
 
 /* Sound CPU */

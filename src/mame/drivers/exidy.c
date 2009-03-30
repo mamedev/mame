@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( fax_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(fax_bank_select_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
-	AM_RANGE(0x5213, 0x5217) AM_WRITE(SMH_NOP)		/* empty control lines on color/sound board */
+	AM_RANGE(0x5213, 0x5217) AM_WRITENOP		/* empty control lines on color/sound board */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

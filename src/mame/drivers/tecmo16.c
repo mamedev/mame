@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( fstarfrc_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x141fff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(tecmo16_flipscreen_w)
 	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
-	AM_RANGE(0x150030, 0x150031) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0x150030, 0x150031) AM_WRITENOP	/* ??? */
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(tecmo16_scroll_char_x_w)
 	AM_RANGE(0x16000c, 0x16000d) AM_WRITE(tecmo16_scroll_x_w)
 	AM_RANGE(0x160012, 0x160013) AM_WRITE(tecmo16_scroll_y_w)
@@ -135,8 +135,8 @@ static ADDRESS_MAP_START( ginkun_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x141fff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(tecmo16_flipscreen_w)
 	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
-	AM_RANGE(0x150020, 0x150021) AM_WRITE(SMH_NOP)	/* ??? */
-	AM_RANGE(0x150030, 0x150031) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0x150020, 0x150021) AM_WRITENOP	/* ??? */
+	AM_RANGE(0x150030, 0x150031) AM_WRITENOP	/* ??? */
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(tecmo16_scroll_char_x_w)
 	AM_RANGE(0x160006, 0x160007) AM_WRITE(tecmo16_scroll_char_y_w)
 	AM_RANGE(0x16000c, 0x16000d) AM_WRITE(tecmo16_scroll_x_w)
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVREAD("oki", okim6295_r)
 	AM_RANGE(0xfc04, 0xfc05) AM_DEVREAD("ym", ym2151_r)
 	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_r)
-	AM_RANGE(0xfc0c, 0xfc0c) AM_READ(SMH_NOP)
+	AM_RANGE(0xfc0c, 0xfc0c) AM_READNOP
 	AM_RANGE(0xfffe, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xfbff) AM_WRITE(SMH_RAM)	/* Sound RAM */
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("oki", okim6295_w)
 	AM_RANGE(0xfc04, 0xfc05) AM_DEVWRITE("ym", ym2151_w)
-	AM_RANGE(0xfc0c, 0xfc0c) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xfc0c, 0xfc0c) AM_WRITENOP
 	AM_RANGE(0xfffe, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 

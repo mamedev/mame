@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( galastrm_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x200000, 0x21ffff) AM_WRITE(SMH_RAM) AM_BASE(&galastrm_ram)
 	AM_RANGE(0x300000, 0x303fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(galastrm_input_w)	/* eerom etc. */
-	AM_RANGE(0x40fff0, 0x40fff3) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x40fff0, 0x40fff3) AM_WRITENOP
 	AM_RANGE(0x500000, 0x500007) AM_WRITE(galastrm_adstick_ctrl_w)
 	AM_RANGE(0x600000, 0x6007ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(TC0480SCP_long_w)

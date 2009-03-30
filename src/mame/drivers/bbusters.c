@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( bbuster_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0018, 0x0e0019) AM_READ(sound_status_r)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(kludge_r, gun_select_w)
 	AM_RANGE(0x0e8002, 0x0e8003) AM_READ(control_3_r)
-	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP
 	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE(sound_cpu_w)
 	AM_RANGE(0x0f8000, 0x0f80ff) AM_READWRITE(eprom_r, SMH_RAM) AM_BASE(&eprom_data) /* Eeprom */
 ADDRESS_MAP_END
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( mechatt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e0004, 0x0e0007) AM_READ(mechatt_gun_r)
-	AM_RANGE(0x0e4002, 0x0e4003) AM_WRITE(SMH_NOP) /* Gun force feedback? */
+	AM_RANGE(0x0e4002, 0x0e4003) AM_WRITENOP /* Gun force feedback? */
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(sound_status_r, sound_cpu_w)
 ADDRESS_MAP_END
 
@@ -379,13 +379,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(SMH_NOP) /* -> Main CPU */
+	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sounda_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ym", ym2608_r, ym2608_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(SMH_NOP) /* -> Main CPU */
+	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 
 /******************************************************************************/

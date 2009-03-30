@@ -226,13 +226,13 @@ static ADDRESS_MAP_START( 20pacgal_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x82, 0x82) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(SMH_NOP)				/* ??? pulsed by the timer irq */
+	AM_RANGE(0x81, 0x81) AM_WRITENOP				/* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
-	AM_RANGE(0x85, 0x86) AM_WRITE(SMH_NOP)				/* stars: rng seed (lo/hi) */
+	AM_RANGE(0x85, 0x86) AM_WRITENOP				/* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READWRITE(eeprom_r, eeprom_w)
 	AM_RANGE(0x88, 0x88) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x89, 0x89) AM_DEVWRITE("dac", dac_signed_w)
-	AM_RANGE(0x8a, 0x8a) AM_WRITE(SMH_NOP)				/* stars: bits 3-4 = active set; bit 5 = enable */
+	AM_RANGE(0x8a, 0x8a) AM_WRITENOP				/* stars: bits 3-4 = active set; bit 5 = enable */
 	AM_RANGE(0x8b, 0x8b) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(_20pacgal_state, flip)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(_20pacgal_coin_counter_w)
 ADDRESS_MAP_END

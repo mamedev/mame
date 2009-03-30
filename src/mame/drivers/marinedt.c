@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( marinedt_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tx_tileram_w) AM_BASE(&tx_tileram)
-	AM_RANGE(0x4c00, 0x4c00) AM_WRITE(SMH_NOP)	//?? maybe off by one error
+	AM_RANGE(0x4c00, 0x4c00) AM_WRITENOP	//?? maybe off by one error
 ADDRESS_MAP_END
 
 static READ8_HANDLER( marinedt_port1_r )

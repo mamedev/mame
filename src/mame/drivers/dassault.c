@@ -226,7 +226,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dassault_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x103fff) AM_WRITE(deco16_nonbuffered_palette_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x140004, 0x140007) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(dassault_sound_w)
 	AM_RANGE(0x1c000a, 0x1c000b) AM_WRITE(deco16_priority_w)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(buffer_spriteram16_2_w)
@@ -260,7 +260,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dassault_sub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(buffer_spriteram16_w)
-	AM_RANGE(0x100002, 0x100007) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0x100002, 0x100007) AM_WRITENOP /* ? */
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_WRITE(SMH_RAM) AM_BASE(&dassault_ram2)
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3feffc, 0x3fefff) AM_WRITE(dassault_irq_w)

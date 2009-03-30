@@ -369,20 +369,20 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x01) AM_WRITE(SMH_NOP)	/* the 2A03 #1 is not present */
+	AM_RANGE(0x00, 0x01) AM_WRITENOP	/* the 2A03 #1 is not present */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_data_w)	/* VLM5030 */
-//  AM_RANGE(0x05, 0x05) AM_WRITE(SMH_NOP)  /* unused */
-//  AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0x05, 0x05) AM_WRITENOP  /* unused */
+//  AM_RANGE(0x06, 0x06) AM_WRITENOP
 	AM_RANGE(0x08, 0x08) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(SMH_NOP)	/* watchdog reset, seldom used because 08 clears the watchdog as well */
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(SMH_NOP)	/* ?? */
+	AM_RANGE(0x09, 0x09) AM_WRITENOP	/* watchdog reset, seldom used because 08 clears the watchdog as well */
+	AM_RANGE(0x0a, 0x0a) AM_WRITENOP	/* ?? */
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(punchout_2a03_reset_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("vlm", punchout_speech_reset_w)	/* VLM5030 */
 	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE("vlm", punchout_speech_st_w)	/* VLM5030 */
 	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("vlm", punchout_speech_vcu_w)	/* VLM5030 */
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(SMH_NOP)	/* enable NVRAM ? */
+	AM_RANGE(0x0f, 0x0f) AM_WRITENOP	/* enable NVRAM ? */
 
 	/* protection ports - Super Punchout only (move to install handler?) */
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w)

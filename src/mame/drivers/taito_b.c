@@ -493,8 +493,8 @@ static ADDRESS_MAP_START( rastsag2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xa00000, 0xa0000f) AM_READ(TC0220IOC_halfword_byteswap_r)
 
-	AM_RANGE(0x800000, 0x800001) AM_READ(SMH_NOP)
-	AM_RANGE(0x800002, 0x800003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x800000, 0x800001) AM_READNOP
+	AM_RANGE(0x800002, 0x800003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rastsag2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -507,8 +507,8 @@ static ADDRESS_MAP_START( rastsag2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xa00000, 0xa0000f) AM_WRITE(TC0220IOC_halfword_byteswap_w)
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x800002, 0x800003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x800002, 0x800003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -522,8 +522,8 @@ static ADDRESS_MAP_START( crimec_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x200000, 0x20000f) AM_READ(TC0220IOC_halfword_byteswap_r)
 
-	AM_RANGE(0x600000, 0x600001) AM_READ(SMH_NOP)
-	AM_RANGE(0x600002, 0x600003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x600000, 0x600001) AM_READNOP
+	AM_RANGE(0x600002, 0x600003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crimec_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -536,8 +536,8 @@ static ADDRESS_MAP_START( crimec_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x200000, 0x20000f) AM_WRITE(TC0220IOC_halfword_byteswap_w)
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x600002, 0x600003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -551,8 +551,8 @@ static ADDRESS_MAP_START( tetrist_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x600000, 0x60000f) AM_READ(TC0220IOC_halfword_byteswap_r)
 
-	AM_RANGE(0x200000, 0x200001) AM_READ(SMH_NOP)
-	AM_RANGE(0x200002, 0x200003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x200000, 0x200001) AM_READNOP
+	AM_RANGE(0x200002, 0x200003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetrist_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -565,8 +565,8 @@ static ADDRESS_MAP_START( tetrist_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x600000, 0x60000f) AM_WRITE(TC0220IOC_halfword_byteswap_w)
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x200002, 0x200003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x200002, 0x200003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetrista_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -580,8 +580,8 @@ static ADDRESS_MAP_START( tetrista_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600001) AM_READ(TC0220IOC_halfword_byteswap_portreg_r)	/* DSW A/B, player inputs*/
 	AM_RANGE(0x600002, 0x600003) AM_READ(TC0220IOC_halfword_byteswap_port_r /*watchdog_reset16_r*/ )
 
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(SMH_NOP)
-	AM_RANGE(0xa00002, 0xa00003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0xa00000, 0xa00001) AM_READNOP
+	AM_RANGE(0xa00002, 0xa00003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetrista_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -595,8 +595,8 @@ static ADDRESS_MAP_START( tetrista_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(TC0220IOC_halfword_byteswap_portreg_w)
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(TC0220IOC_halfword_byteswap_port_w)
 
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0xa00002, 0xa00003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0xa00002, 0xa00003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hitice_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -610,8 +610,8 @@ static ADDRESS_MAP_START( hitice_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x60000f) AM_READ(TC0220IOC_halfword_byteswap_r)
 	AM_RANGE(0x610000, 0x610001) AM_READ_PORT("P3_P4")
 
-	AM_RANGE(0x700000, 0x700001) AM_READ(SMH_NOP)
-	AM_RANGE(0x700002, 0x700003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x700000, 0x700001) AM_READNOP
+	AM_RANGE(0x700002, 0x700003) AM_READ8(taitosound_comm_r, 0xff00)
 
 	AM_RANGE(0xb00000, 0xb7ffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -626,8 +626,8 @@ static ADDRESS_MAP_START( hitice_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x600000, 0x60000f) AM_WRITE(TC0220IOC_halfword_byteswap_w)
 
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x700002, 0x700003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x700002, 0x700003) AM_WRITE8(taitosound_comm_w, 0xff00)
 
 	AM_RANGE(0xb00000, 0xb7ffff) AM_WRITE(hitice_pixelram_w) AM_BASE(&taitob_pixelram)
 //  { 0xbffff0, 0xbffff1, ???
@@ -654,8 +654,8 @@ static ADDRESS_MAP_START( rambo3_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x60001c, 0x60001d) AM_READ(trackx2_lo_r)
 	AM_RANGE(0x60001e, 0x60001f) AM_READ(trackx2_hi_r)
 
-	AM_RANGE(0x200000, 0x200001) AM_READ(SMH_NOP)
-	AM_RANGE(0x200002, 0x200003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x200000, 0x200001) AM_READNOP
+	AM_RANGE(0x200002, 0x200003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rambo3_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -668,8 +668,8 @@ static ADDRESS_MAP_START( rambo3_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x600000, 0x60000f) AM_WRITE(TC0220IOC_halfword_byteswap_w)
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x200002, 0x200003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x200002, 0x200003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -686,8 +686,8 @@ static ADDRESS_MAP_START( pbobble_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500026, 0x500027) AM_READ(eep_latch_r)	/* not read by this game */
 	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("IN4")		/* shown in service mode, game omits to read it */
 
-	AM_RANGE(0x700000, 0x700001) AM_READ(SMH_NOP)
-	AM_RANGE(0x700002, 0x700003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x700000, 0x700001) AM_READNOP
+	AM_RANGE(0x700002, 0x700003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbobble_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -702,8 +702,8 @@ static ADDRESS_MAP_START( pbobble_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500026, 0x500027) AM_WRITE(eeprom_w)
 	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)	/* simply locks coins 3&4 out */
 
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x700002, 0x700003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x700002, 0x700003) AM_WRITE8(taitosound_comm_w, 0xff00)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
 ADDRESS_MAP_END
 
@@ -720,8 +720,8 @@ static ADDRESS_MAP_START( spacedx_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500026, 0x500027) AM_READ(eep_latch_r)
 	AM_RANGE(0x50002e, 0x50002f) AM_READ_PORT("IN4")
 
-	AM_RANGE(0x700000, 0x700001) AM_READ(SMH_NOP)
-	AM_RANGE(0x700002, 0x700003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x700000, 0x700001) AM_READNOP
+	AM_RANGE(0x700002, 0x700003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spacedx_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -736,8 +736,8 @@ static ADDRESS_MAP_START( spacedx_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500026, 0x500027) AM_WRITE(eeprom_w)
 	AM_RANGE(0x500028, 0x500029) AM_WRITE(player_34_coin_ctrl_w)	/* simply locks coins 3&4 out */
 
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x700002, 0x700003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x700002, 0x700003) AM_WRITE8(taitosound_comm_w, 0xff00)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
 ADDRESS_MAP_END
 
@@ -754,8 +754,8 @@ static ADDRESS_MAP_START( spacedxo_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
 
-	AM_RANGE(0x100000, 0x100001) AM_READ(SMH_NOP)
-	AM_RANGE(0x100002, 0x100003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x100000, 0x100001) AM_READNOP
+	AM_RANGE(0x100002, 0x100003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spacedxo_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -768,8 +768,8 @@ static ADDRESS_MAP_START( spacedxo_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x200000, 0x20000f) AM_WRITE(TC0220IOC_halfword_w)
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x100000, 0x100001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x100002, 0x100003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qzshowby_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -785,8 +785,8 @@ static ADDRESS_MAP_START( qzshowby_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200028, 0x200029) AM_READ(player_34_coin_ctrl_r)
 	AM_RANGE(0x20002e, 0x20002f) AM_READ_PORT("IN4")	/* player 3,4 buttons */
 
-	AM_RANGE(0x600000, 0x600001) AM_READ(SMH_NOP)
-	AM_RANGE(0x600002, 0x600003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x600000, 0x600001) AM_READNOP
+	AM_RANGE(0x600002, 0x600003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qzshowby_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -801,8 +801,8 @@ static ADDRESS_MAP_START( qzshowby_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200026, 0x200027) AM_WRITE(eeprom_w)
 	AM_RANGE(0x200028, 0x200029) AM_WRITE(player_34_coin_ctrl_w)
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x600002, 0x600003) AM_WRITE8(taitosound_comm_w, 0xff00)
 	AM_RANGE(0x700000, 0x700003) AM_WRITE(gain_control_w)
 ADDRESS_MAP_END
 
@@ -817,8 +817,8 @@ static ADDRESS_MAP_START( viofight_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x80000f) AM_READ(TC0220IOC_halfword_byteswap_r)
 
-	AM_RANGE(0x200000, 0x200001) AM_READ(SMH_NOP)
-	AM_RANGE(0x200002, 0x200003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x200000, 0x200001) AM_READNOP
+	AM_RANGE(0x200002, 0x200003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( viofight_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -831,8 +831,8 @@ static ADDRESS_MAP_START( viofight_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x80000f) AM_WRITE(TC0220IOC_halfword_byteswap_w)
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x200002, 0x200003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x200002, 0x200003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -847,8 +847,8 @@ static ADDRESS_MAP_START( masterw_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_READ(TC0220IOC_halfword_byteswap_portreg_r)	/* DSW A/B, player inputs*/
 	AM_RANGE(0x800002, 0x800003) AM_READ(TC0220IOC_halfword_byteswap_port_r /*watchdog_reset16_r*/ )
 
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(SMH_NOP)
-	AM_RANGE(0xa00002, 0xa00003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0xa00000, 0xa00001) AM_READNOP
+	AM_RANGE(0xa00002, 0xa00003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masterw_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -862,8 +862,8 @@ static ADDRESS_MAP_START( masterw_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(TC0220IOC_halfword_byteswap_portreg_w)
 	AM_RANGE(0x800002, 0x800003) AM_WRITE(TC0220IOC_halfword_byteswap_port_w)
 
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0xa00002, 0xa00003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0xa00002, 0xa00003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -879,12 +879,12 @@ static ADDRESS_MAP_START( silentd_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
-//  AM_RANGE(0x240000, 0x240001) AM_READ(SMH_NOP) /* read 4 times at init */
+//  AM_RANGE(0x240000, 0x240001) AM_READNOP /* read 4 times at init */
 
-	AM_RANGE(0x100000, 0x100001) AM_READ(SMH_NOP)
-	AM_RANGE(0x100002, 0x100003) AM_READ(taitosound_comm16_msb_r)
-//  AM_RANGE(0x10001a, 0x10001b) AM_READ(SMH_NOP) // ??? read at $1e344
-//  AM_RANGE(0x10001c, 0x10001d) AM_READ(SMH_NOP) // ??? read at $1e356
+	AM_RANGE(0x100000, 0x100001) AM_READNOP
+	AM_RANGE(0x100002, 0x100003) AM_READ8(taitosound_comm_r, 0xff00)
+//  AM_RANGE(0x10001a, 0x10001b) AM_READNOP // ??? read at $1e344
+//  AM_RANGE(0x10001c, 0x10001d) AM_READNOP // ??? read at $1e356
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( silentd_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -896,10 +896,10 @@ static ADDRESS_MAP_START( silentd_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	TC0180VCU_MEMW( 0x500000 )
 
 	AM_RANGE(0x200000, 0x20000f) AM_WRITE(TC0220IOC_halfword_w)
-	AM_RANGE(0x240000, 0x240001) AM_WRITE(SMH_NOP) // ???
+	AM_RANGE(0x240000, 0x240001) AM_WRITENOP // ???
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x100000, 0x100001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x100002, 0x100003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -914,8 +914,8 @@ static ADDRESS_MAP_START( selfeena_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x40000f) AM_READ(TC0220IOC_halfword_byteswap_r)
 	AM_RANGE(0x410000, 0x41000f) AM_READ(TC0220IOC_halfword_byteswap_r) /* mirror address - seems to be only used for coin control */
 
-	AM_RANGE(0x500000, 0x500001) AM_READ(SMH_NOP)
-	AM_RANGE(0x500002, 0x500003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x500000, 0x500001) AM_READNOP
+	AM_RANGE(0x500002, 0x500003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( selfeena_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -929,8 +929,8 @@ static ADDRESS_MAP_START( selfeena_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x40000f) AM_WRITE(TC0220IOC_halfword_byteswap_w)
 	AM_RANGE(0x410000, 0x41000f) AM_WRITE(TC0220IOC_halfword_byteswap_w) /* mirror address - seems to be only used for coin control */
 
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x500002, 0x500003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x500002, 0x500003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -944,8 +944,8 @@ static ADDRESS_MAP_START( sbm_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x300000, 0x30000f) AM_READ(TC0510NIO_halfword_wordswap_r)
 
-	AM_RANGE(0x320000, 0x320001) AM_READ(SMH_NOP)
-	AM_RANGE(0x320002, 0x320003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x320000, 0x320001) AM_READNOP
+	AM_RANGE(0x320002, 0x320003) AM_READ8(taitosound_comm_r, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sbm_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -958,8 +958,8 @@ static ADDRESS_MAP_START( sbm_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(TC0510NIO_halfword_wordswap_w)
 
-	AM_RANGE(0x320000, 0x320001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x320002, 0x320003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x320000, 0x320001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x320002, 0x320003) AM_WRITE8(taitosound_comm_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -985,9 +985,9 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
+	AM_RANGE(0xea00, 0xea00) AM_READNOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -996,10 +996,10 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
-	AM_RANGE(0xe600, 0xe600) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
+	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 

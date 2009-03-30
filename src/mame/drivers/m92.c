@@ -403,7 +403,7 @@ static ADDRESS_MAP_START( m92_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(m92_soundlatch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m92_coincounter_w)
 	AM_RANGE(0x20, 0x21) AM_WRITE(m92_bankswitch_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x87) AM_WRITE(m92_pf1_control_w)
 	AM_RANGE(0x88, 0x8f) AM_WRITE(m92_pf2_control_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(m92_pf3_control_w)
@@ -415,7 +415,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITE(SMH_NOP) /* Irq controller? */
+	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITENOP /* Irq controller? */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", irem_ga20_r, irem_ga20_w, 0x00ff)
 	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ym", ym2151_r, ym2151_w, 0x00ff)

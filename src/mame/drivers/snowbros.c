@@ -180,9 +180,9 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE(0x600000, 0x6001ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x700000, 0x701fff) AM_WRITE(pandora_spriteram_LSB_w)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP)	/* IRQ 4 acknowledge? */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP)	/* IRQ 3 acknowledge? */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_NOP)	/* IRQ 2 acknowledge? */
+	AM_RANGE(0x800000, 0x800001) AM_WRITENOP	/* IRQ 4 acknowledge? */
+	AM_RANGE(0x900000, 0x900001) AM_WRITENOP	/* IRQ 3 acknowledge? */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* IRQ 2 acknowledge? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -222,9 +222,9 @@ static ADDRESS_MAP_START( wintbob_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE(0x600000, 0x6001ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x700000, 0x701fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP)	/* IRQ 4 acknowledge? */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP)	/* IRQ 3 acknowledge? */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_NOP)	/* IRQ 2 acknowledge? */
+	AM_RANGE(0x800000, 0x800001) AM_WRITENOP	/* IRQ 4 acknowledge? */
+	AM_RANGE(0x900000, 0x900001) AM_WRITENOP	/* IRQ 3 acknowledge? */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* IRQ 2 acknowledge? */
 ADDRESS_MAP_END
 
 /* Honey Dolls */
@@ -242,14 +242,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( honeydol_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM) AM_BASE(&hyperpac_ram)
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(SMH_NOP)	/* ?*/
+	AM_RANGE(0x200000, 0x200001) AM_WRITENOP	/* ?*/
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(snowbros_68000_sound_w)	/* ?*/
 	AM_RANGE(0xa00000, 0xa007ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xb00000, 0xb01fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP)	/* IRQ 4 acknowledge? */
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(SMH_NOP)	/* IRQ 3 acknowledge? */
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_NOP)	/* IRQ 2 acknowledge? */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP)	/* ?*/
+	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* IRQ 4 acknowledge? */
+	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	/* IRQ 3 acknowledge? */
+	AM_RANGE(0x600000, 0x600001) AM_WRITENOP	/* IRQ 2 acknowledge? */
+	AM_RANGE(0x800000, 0x800001) AM_WRITENOP	/* ?*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -300,9 +300,9 @@ static ADDRESS_MAP_START( twinadv_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE(0x600000, 0x6001ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x700000, 0x701fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP)	/* IRQ 4 acknowledge? */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP)	/* IRQ 3 acknowledge? */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_NOP)	/* IRQ 2 acknowledge? */
+	AM_RANGE(0x800000, 0x800001) AM_WRITENOP	/* IRQ 4 acknowledge? */
+	AM_RANGE(0x900000, 0x900001) AM_WRITENOP	/* IRQ 3 acknowledge? */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* IRQ 2 acknowledge? */
 ADDRESS_MAP_END
 
 
@@ -362,9 +362,9 @@ static ADDRESS_MAP_START( hyperpac_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x6001ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x700000, 0x701fff) AM_WRITE(pandora_spriteram_LSB_w)
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP)	/* IRQ 4 acknowledge? */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP)	/* IRQ 3 acknowledge? */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_NOP)	/* IRQ 2 acknowledge? */
+	AM_RANGE(0x800000, 0x800001) AM_WRITENOP	/* IRQ 4 acknowledge? */
+	AM_RANGE(0x900000, 0x900001) AM_WRITENOP	/* IRQ 3 acknowledge? */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* IRQ 2 acknowledge? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyperpac_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -508,9 +508,9 @@ static ADDRESS_MAP_START( writemem3, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE( 0x600000, 0x6003ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE (&paletteram16)
 	AM_RANGE( 0x700000, 0x7021ff) AM_WRITE(SMH_RAM) AM_BASE( &spriteram16) AM_SIZE( &spriteram_size )
-	AM_RANGE( 0x800000, 0x800001) AM_WRITE(SMH_NOP) 	/* IRQ 4 acknowledge? */
-	AM_RANGE( 0x900000, 0x900001) AM_WRITE(SMH_NOP) 	/* IRQ 3 acknowledge? */
-	AM_RANGE( 0xa00000, 0xa00001) AM_WRITE(SMH_NOP) 	/* IRQ 2 acknowledge? */
+	AM_RANGE( 0x800000, 0x800001) AM_WRITENOP 	/* IRQ 4 acknowledge? */
+	AM_RANGE( 0x900000, 0x900001) AM_WRITENOP 	/* IRQ 3 acknowledge? */
+	AM_RANGE( 0xa00000, 0xa00001) AM_WRITENOP 	/* IRQ 2 acknowledge? */
 ADDRESS_MAP_END
 
 /* Final Tetris */
@@ -534,9 +534,9 @@ static ADDRESS_MAP_START( finalttr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x6001ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x700000, 0x701fff) AM_WRITE(pandora_spriteram_LSB_w)
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP)	/* IRQ 4 acknowledge? */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP)	/* IRQ 3 acknowledge? */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_NOP)	/* IRQ 2 acknowledge? */
+	AM_RANGE(0x800000, 0x800001) AM_WRITENOP	/* IRQ 4 acknowledge? */
+	AM_RANGE(0x900000, 0x900001) AM_WRITENOP	/* IRQ 3 acknowledge? */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* IRQ 2 acknowledge? */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( snowbros )

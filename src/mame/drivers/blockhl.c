@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
-	AM_RANGE(0xe00c, 0xe00d) AM_WRITE(SMH_NOP)		/* leftover from missing 007232? */
+	AM_RANGE(0xe00c, 0xe00d) AM_WRITENOP		/* leftover from missing 007232? */
 ADDRESS_MAP_END
 
 

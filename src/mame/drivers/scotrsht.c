@@ -74,14 +74,14 @@ static ADDRESS_MAP_START( scotrsht_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprites */
 	AM_RANGE(0x10c0, 0x1fff) AM_RAM /* work ram */
     AM_RANGE(0x2000, 0x201f) AM_RAM AM_BASE(&scotrsht_scroll) /* scroll registers */
-	AM_RANGE(0x2040, 0x2040) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x2041, 0x2041) AM_WRITE(SMH_NOP)
-    AM_RANGE(0x2042, 0x2042) AM_WRITE(SMH_NOP)  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */
+	AM_RANGE(0x2040, 0x2040) AM_WRITENOP
+	AM_RANGE(0x2041, 0x2041) AM_WRITENOP
+    AM_RANGE(0x2042, 0x2042) AM_WRITENOP  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */
 	AM_RANGE(0x2043, 0x2043) AM_WRITE(scotrsht_charbank_w)
     AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(scotrsht_palettebank_w)
 	AM_RANGE(0x3100, 0x3100) AM_WRITE(scotrsht_soundlatch_w)
-	AM_RANGE(0x3200, 0x3200) AM_WRITE(SMH_NOP) /* it writes 0, 1 */
+	AM_RANGE(0x3200, 0x3200) AM_WRITENOP /* it writes 0, 1 */
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3")
 	AM_RANGE(0x3300, 0x3300) AM_READ_PORT("SYSTEM")

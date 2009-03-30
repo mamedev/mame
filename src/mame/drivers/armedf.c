@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( terraf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c006, 0x07c007) AM_WRITE(terraf_fg_scrollx_w)			/* not use in terrafu, 0x07c008 neither */
 	AM_RANGE(0x07c008, 0x07c009) AM_WRITE(terraf_fg_scrolly_w)			/* written twice, lsb and msb */
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(SMH_NOP)					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)				/* MCU Command ? */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(terraf_fg_scroll_msb_arm_w)	/* written between two consecutive writes to 7c008 */
 ADDRESS_MAP_END
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( terrafb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c006, 0x07c007) AM_WRITE(terraf_fg_scrollx_w)			/* not use in terrafu, 0x07c008 neither */
 	AM_RANGE(0x07c008, 0x07c009) AM_WRITE(terraf_fg_scrolly_w)			/* written twice, lsb and msb */
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(SMH_NOP)					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)				/* MCU Command ? */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(terraf_fg_scroll_msb_arm_w)	/* written between two consecutive writes to 7c008 */
 ADDRESS_MAP_END
@@ -301,8 +301,8 @@ static ADDRESS_MAP_START( kodure_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(SMH_NOP) /* watchdog? */
-	AM_RANGE(0xffd000, 0xffd001) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITENOP /* watchdog? */
+	AM_RANGE(0xffd000, 0xffd001) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cclimbr2_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -324,8 +324,8 @@ static ADDRESS_MAP_START( cclimbr2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(SMH_NOP) /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITENOP /* ? */
+	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( legion_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( legion_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd)	/* MCU Command ? */
-	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(SMH_NOP)		/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP		/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( legiono_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( legiono_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
 	//AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(armedf_mcu_cmd) /* MCU Command ? */
-	//AM_RANGE(0x07c00c, 0x07c00d) AM_WRITE(SMH_NOP)      /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	//AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP      /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( armedf_map, ADDRESS_SPACE_PROGRAM, 16 )

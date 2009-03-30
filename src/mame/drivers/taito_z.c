@@ -1702,8 +1702,8 @@ static ADDRESS_MAP_START( bshark_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x113fff) AM_READ(sharedram_r)
 //  AM_RANGE(0x40000a, 0x40000b) AM_READ(taitoz_unknown_r)  // ???
 	AM_RANGE(0x600000, 0x600007) AM_DEVREAD8("ym", ym2610_r, 0x00ff)
-	AM_RANGE(0x60000c, 0x60000d) AM_READ(SMH_NOP)
-	AM_RANGE(0x60000e, 0x60000f) AM_READ(SMH_NOP)
+	AM_RANGE(0x60000c, 0x60000d) AM_READNOP
+	AM_RANGE(0x60000e, 0x60000f) AM_READNOP
 	AM_RANGE(0x800000, 0x801fff) AM_READ(TC0150ROD_word_r)	/* "root ram" */
 ADDRESS_MAP_END
 
@@ -1713,8 +1713,8 @@ static ADDRESS_MAP_START( bshark_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x113fff) AM_WRITE(sharedram_w)
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(spacegun_pancontrol)  /* pan */
 	AM_RANGE(0x600000, 0x600007) AM_DEVWRITE8("ym", ym2610_w, 0x00ff)
-	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(SMH_NOP)	// interrupt controller?
-	AM_RANGE(0x60000e, 0x60000f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x60000c, 0x60000d) AM_WRITENOP	// interrupt controller?
+	AM_RANGE(0x60000e, 0x60000f) AM_WRITENOP
 	AM_RANGE(0x800000, 0x801fff) AM_WRITE(TC0150ROD_word_w)	/* "root ram" */
 ADDRESS_MAP_END
 
@@ -1788,9 +1788,9 @@ static ADDRESS_MAP_START( nightstr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0xc20000, 0xc2000f) AM_WRITE(TC0100SCN_ctrl_word_0_w)
 	AM_RANGE(0xd00000, 0xd007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-//  AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP)    /* ??? */
-//  AM_RANGE(0xe00008, 0xe00009) AM_WRITE(SMH_NOP)    /* ??? */
-//  AM_RANGE(0xe00010, 0xe00011) AM_WRITE(SMH_NOP)    /* ??? */
+//  AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    /* ??? */
+//  AM_RANGE(0xe00008, 0xe00009) AM_WRITENOP    /* ??? */
+//  AM_RANGE(0xe00010, 0xe00011) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xe40000, 0xe40007) AM_WRITE(bshark_stick_w)
 ADDRESS_MAP_END
 
@@ -1879,8 +1879,8 @@ static ADDRESS_MAP_START( spacegun_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x21ffff) AM_READ(sharedram_r)
 	AM_RANGE(0x800000, 0x80000f) AM_READ(spacegun_input_bypass_r)
 	AM_RANGE(0xc00000, 0xc00007) AM_DEVREAD8("ym", ym2610_r, 0x00ff)
-	AM_RANGE(0xc0000c, 0xc0000d) AM_READ(SMH_NOP)
-	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(SMH_NOP)
+	AM_RANGE(0xc0000c, 0xc0000d) AM_READNOP
+	AM_RANGE(0xc0000e, 0xc0000f) AM_READNOP
 	AM_RANGE(0xf00000, 0xf00007) AM_READ(spacegun_lightgun_r)
 ADDRESS_MAP_END
 
@@ -1890,10 +1890,10 @@ static ADDRESS_MAP_START( spacegun_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x21ffff) AM_WRITE(sharedram_w)
 	AM_RANGE(0x800000, 0x80000f) AM_WRITE(spacegun_output_bypass_w)
 	AM_RANGE(0xc00000, 0xc00007) AM_DEVWRITE8("ym", ym2610_w, 0x00ff)
-	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITE(SMH_NOP)	// interrupt controller?
-	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITENOP	// interrupt controller?
+	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITENOP
 	AM_RANGE(0xc20000, 0xc20007) AM_WRITE(spacegun_pancontrol)  /* pan */
-//  AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP)    /* ??? */
+//  AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xf00000, 0xf00007) AM_WRITE(spacegun_lightgun_w)
 ADDRESS_MAP_END
 
@@ -1996,9 +1996,9 @@ static ADDRESS_MAP_START( z80_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
+	AM_RANGE(0xea00, 0xea00) AM_READNOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2008,8 +2008,8 @@ static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(taitoz_pancontrol) /* pan */
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 

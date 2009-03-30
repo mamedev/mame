@@ -544,10 +544,10 @@ static ADDRESS_MAP_START( pbillian_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0408, 0x0408) AM_READ(pbillian_from_mcu_r)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(pbillian_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w)
-	AM_RANGE(0x0418, 0x0418) AM_READ(SMH_NOP)  //?
-	AM_RANGE(0x0419, 0x0419) AM_WRITE(SMH_NOP)  //? watchdog ?
+	AM_RANGE(0x0418, 0x0418) AM_READNOP  //?
+	AM_RANGE(0x0419, 0x0419) AM_WRITENOP  //? watchdog ?
 	AM_RANGE(0x041a, 0x041a) AM_WRITE(pbillian_sample_trigger_w)
-	AM_RANGE(0x041b, 0x041b) AM_READ(SMH_NOP)  // input related? but probably not used
+	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
@@ -557,10 +557,10 @@ static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0408, 0x0408) AM_READ(hotsmash_from_mcu_r)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(hotsmash_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w)
-	AM_RANGE(0x0418, 0x0418) AM_READ(SMH_NOP)  //?
-	AM_RANGE(0x0419, 0x0419) AM_WRITE(SMH_NOP)  //? watchdog ?
+	AM_RANGE(0x0418, 0x0418) AM_READNOP  //?
+	AM_RANGE(0x0419, 0x0419) AM_WRITENOP  //? watchdog ?
 	AM_RANGE(0x041a, 0x041a) AM_WRITE(pbillian_sample_trigger_w)
-	AM_RANGE(0x041b, 0x041b) AM_READ(SMH_NOP)  // input related? but probably not used
+	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, ADDRESS_SPACE_IO, 8 )

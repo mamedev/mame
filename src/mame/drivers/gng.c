@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3c00, 0x3c00) AM_READ(SMH_NOP)	/* watchdog? */
+	AM_RANGE(0x3c00, 0x3c00) AM_READNOP	/* watchdog? */
 	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3b08, 0x3b09) AM_WRITE(gng_bgscrollx_w)
 	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE(gng_bgscrolly_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(SMH_NOP)   /* watchdog? */
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITENOP   /* watchdog? */
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(gng_flipscreen_w)
 //  { 0x3d01, 0x3d01, reset sound cpu?
 	AM_RANGE(0x3d02, 0x3d03) AM_WRITE(gng_coin_counter_w)

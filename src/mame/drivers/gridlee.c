@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9070, 0x9070) AM_WRITE(gridlee_cocktail_flip_w)
 	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
 	AM_RANGE(0x9380, 0x9380) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x9700, 0x9700) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x9700, 0x9700) AM_WRITENOP
 	AM_RANGE(0x9828, 0x993f) AM_WRITE(gridlee_sound_w)
 	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)

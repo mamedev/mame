@@ -342,7 +342,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(gaplus_videoram_w)		/* tilemap RAM (shared with CPU #1) */
 	AM_RANGE(0x0800, 0x1fff) AM_WRITE(gaplus_spriteram_w)		/* shared RAM with CPU #1 */
-//  AM_RANGE(0x500f, 0x500f) AM_WRITE(SMH_NOP)             /* ??? written 256 times on startup */
+//  AM_RANGE(0x500f, 0x500f) AM_WRITENOP             /* ??? written 256 times on startup */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(gaplus_irq_2_ctrl_w)	/* IRQ 2 control */
 	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END

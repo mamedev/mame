@@ -106,8 +106,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1400, 0x143F) AM_DEVWRITE("earom", atari_vg_earom_w)
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_WRITE(runaway_paletteram_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(SMH_NOP) /* coin counter? */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(SMH_NOP) /* coin counter? */
+	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* coin counter? */
+	AM_RANGE(0x2001, 0x2001) AM_WRITENOP /* coin counter? */
 	AM_RANGE(0x2003, 0x2004) AM_WRITE(runaway_led_w)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(runaway_tile_bank_w)
 	AM_RANGE(0x6000, 0x600f) AM_DEVWRITE("pokey1", pokey_w)

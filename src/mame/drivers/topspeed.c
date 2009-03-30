@@ -455,8 +455,8 @@ static ADDRESS_MAP_START( topspeed_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(sharedram_r)	// all shared ??
 	AM_RANGE(0x500000, 0x503fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(SMH_NOP)
-	AM_RANGE(0x7e0002, 0x7e0003) AM_READ(taitosound_comm16_lsb_r)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP
+	AM_RANGE(0x7e0002, 0x7e0003) AM_READ8(taitosound_comm_r, 0x00ff)
 	AM_RANGE(0x800000, 0x8003ff) AM_READ(SMH_RAM)	/* raster line color control */
 	AM_RANGE(0x800400, 0x80ffff) AM_READ(SMH_RAM)	/* unknown or unused */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(PC080SN_word_0_r)	/* tilemaps */
@@ -470,8 +470,8 @@ static ADDRESS_MAP_START( topspeed_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(sharedram_w) AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
 	AM_RANGE(0x500000, 0x503fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x7e0000, 0x7e0001) AM_WRITE(taitosound_port16_lsb_w)
-	AM_RANGE(0x7e0002, 0x7e0003) AM_WRITE(taitosound_comm16_lsb_w)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x7e0002, 0x7e0003) AM_WRITE8(taitosound_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8003ff) AM_WRITE(SMH_RAM) AM_BASE(&topspeed_raster_ctrl)
 	AM_RANGE(0x800400, 0x80ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(PC080SN_word_0_w)

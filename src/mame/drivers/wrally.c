@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( wrally_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
 	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(SMH_RAM, wrally_vram_w) AM_BASE(&wrally_videoram)	/* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE(&wrally_vregs)									/* Video Registers */
-	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(SMH_NOP)												/* CLR INT Video */
+	AM_RANGE(0x10800c, 0x10800d) AM_WRITENOP												/* CLR INT Video */
 	AM_RANGE(0x200000, 0x203fff) AM_READWRITE(SMH_RAM, paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE(&paletteram16)	/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&wrally_spriteram)								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW")
@@ -117,9 +117,9 @@ static ADDRESS_MAP_START( wrally_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	/* OKI6295 status/data register */
 	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(wrally_coin_lockout_w)								/* Coin lockouts */
 	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(wrally_coin_counter_w)								/* Coin counters */
-	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(SMH_NOP)												/* Sound muting */
+	AM_RANGE(0x70004a, 0x70004b) AM_WRITENOP												/* Sound muting */
 	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(wrally_flipscreen_w)									/* Flip screen */
-	AM_RANGE(0x70006a, 0x70007b) AM_WRITE(SMH_NOP)												/* ??? */
+	AM_RANGE(0x70006a, 0x70007b) AM_WRITENOP												/* ??? */
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_BASE(&wrally_shareram)										/* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
 

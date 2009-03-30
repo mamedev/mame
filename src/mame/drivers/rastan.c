@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( rastan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x350008, 0x350009) AM_WRITE(SMH_NOP)	/* 0 only (often) ? */
+	AM_RANGE(0x350008, 0x350009) AM_WRITENOP	/* 0 only (often) ? */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(rastan_spritectrl_w)	/* sprite palette bank, coin counters & lockout */
 	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("P1")
 	AM_RANGE(0x390002, 0x390003) AM_READ_PORT("P2")
@@ -234,8 +234,8 @@ static ADDRESS_MAP_START( rastan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x390008, 0x390009) AM_READ_PORT("DSWA")
 	AM_RANGE(0x39000a, 0x39000b) AM_READ_PORT("DSWB")
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READWRITE(SMH_NOP, taitosound_port16_lsb_w)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READWRITE(PC080SN_word_0_r, PC080SN_word_0_w)
 	AM_RANGE(0xc20000, 0xc20003) AM_WRITE(PC080SN_yscroll_word_0_w)
 	AM_RANGE(0xc40000, 0xc40003) AM_WRITE(PC080SN_xscroll_word_0_w)

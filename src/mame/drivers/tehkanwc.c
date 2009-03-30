@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( main_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")
 	AM_RANGE(0xf820, 0xf820) AM_READWRITE(soundlatch2_r, sound_command_w)	/* answer from the sound CPU */
 	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)
-	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITE(SMH_NOP)			/* ?? writes 0x00 or 0xff */
+	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITENOP			/* ?? writes 0x00 or 0xff */
 	AM_RANGE(0xf860, 0xf860) AM_READWRITE(watchdog_reset_r, tehkanwc_flipscreen_x_w)
 	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(tehkanwc_flipscreen_y_w)
 ADDRESS_MAP_END
@@ -273,8 +273,8 @@ static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8001, 0x8001) AM_DEVWRITE("msm", msm_reset_w)/* MSM51xx reset */
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(SMH_NOP)	/* ?? written in the IRQ handler */
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(SMH_NOP)	/* ?? written in the NMI handler */
+	AM_RANGE(0x8002, 0x8002) AM_WRITENOP	/* ?? written in the IRQ handler */
+	AM_RANGE(0x8003, 0x8003) AM_WRITENOP	/* ?? written in the NMI handler */
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(soundlatch_r, sound_answer_w)
 ADDRESS_MAP_END
 

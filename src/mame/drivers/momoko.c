@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xd064, 0xd0ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(SMH_NOP) /* interrupt ack? */
+	AM_RANGE(0xd400, 0xd400) AM_WRITENOP /* interrupt ack? */
 	AM_RANGE(0xd402, 0xd402) AM_WRITE(momoko_flipscreen_w)
 	AM_RANGE(0xd404, 0xd404) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd406, 0xd406) AM_WRITE(soundlatch_w)
@@ -126,9 +126,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0x9000, 0x9000) AM_WRITENOP /* unknown */
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP /* unknown */
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym2", ym2203_w)
 ADDRESS_MAP_END
 

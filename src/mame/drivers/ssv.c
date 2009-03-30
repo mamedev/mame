@@ -447,7 +447,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x160000, 0x17ffff) AM_WRITE(SMH_RAM)                                                        \
 	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_BASE(&ssv_scroll )                 /*Scroll */   \
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_w)                                      /*Lockout */  \
-	AM_RANGE(0x210010, 0x210011) AM_WRITE(SMH_NOP)                                                        \
+	AM_RANGE(0x210010, 0x210011) AM_WRITENOP                                                        \
 	AM_RANGE(0x230000, 0x230071) AM_WRITE(SMH_RAM) AM_BASE(&ssv_irq_vectors)	          /* IRQ Vectors */ \
 	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                                 /* IRQ Ack */     \
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                               /* IRQ Enable */  \

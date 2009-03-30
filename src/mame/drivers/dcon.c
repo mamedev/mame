@@ -62,8 +62,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0000, 0xa000d) AM_WRITE(seibu_main_word_w)
 	AM_RANGE(0xc001c, 0xc001d) AM_WRITE(dcon_control_w)
 	AM_RANGE(0xc0020, 0xc002f) AM_WRITE(SMH_RAM) AM_BASE(&dcon_scroll_ram)
-	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc00c0, 0xc00c1) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc0080, 0xc0081) AM_WRITENOP
+	AM_RANGE(0xc00c0, 0xc00c1) AM_WRITENOP
 ADDRESS_MAP_END
 
 /******************************************************************************/

@@ -407,7 +407,7 @@ static ADDRESS_MAP_START( rf2_gx400_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(&gx400_irq1_enable_word_w)	/* ?? */
 	AM_RANGE(0x05e004, 0x05e005) AM_WRITE(nemesis_gfx_flipx_word_w)
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE(nemesis_gfx_flipy_word_w)
-	AM_RANGE(0x05e008, 0x05e009) AM_WRITE(SMH_NOP)	/* IRQ acknowledge??? */
+	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP	/* IRQ acknowledge??? */
 	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(&gx400_irq4_enable_word_w)	/* ?? */
 	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
 	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)

@@ -148,8 +148,8 @@ static ADDRESS_MAP_START( dbz_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x508000, 0x509fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x510000, 0x513fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x518000, 0x51bfff) AM_READ(SMH_RAM)
-	AM_RANGE(0x600000, 0x6fffff) AM_READ(SMH_NOP) 			// PSAC 1 ROM readback window
-	AM_RANGE(0x700000, 0x7fffff) AM_READ(SMH_NOP) 			// PSAC 2 ROM readback window
+	AM_RANGE(0x600000, 0x6fffff) AM_READNOP 			// PSAC 1 ROM readback window
+	AM_RANGE(0x700000, 0x7fffff) AM_READNOP 			// PSAC 2 ROM readback window
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -166,10 +166,10 @@ static ADDRESS_MAP_START( dbz_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x4ec000, 0x4ec001) AM_WRITE(dbzcontrol_w)
 	AM_RANGE(0x4d0000, 0x4d001f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
 	AM_RANGE(0x4d4000, 0x4d401f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_1_ctrl)
-	AM_RANGE(0x4e8000, 0x4e8001) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x4e8000, 0x4e8001) AM_WRITENOP
 	AM_RANGE(0x4f0000, 0x4f0001) AM_WRITE(dbz_sound_command_w)
 	AM_RANGE(0x4f4000, 0x4f4001) AM_WRITE(dbz_sound_cause_nmi)
-	AM_RANGE(0x4f8000, 0x4f801f) AM_WRITE(SMH_NOP)		// 251 #1
+	AM_RANGE(0x4f8000, 0x4f801f) AM_WRITENOP		// 251 #1
 	AM_RANGE(0x4fc000, 0x4fc01f) AM_WRITE(K053251_lsb_w)	// 251 #2
 	AM_RANGE(0x500000, 0x501fff) AM_WRITE(dbz_bg2_videoram_w) AM_BASE(&dbz_bg2_videoram)
 	AM_RANGE(0x508000, 0x509fff) AM_WRITE(dbz_bg1_videoram_w) AM_BASE(&dbz_bg1_videoram)
@@ -197,7 +197,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x00, 0x00) AM_WRITENOP
 ADDRESS_MAP_END
 
 /**********************************************************************************/

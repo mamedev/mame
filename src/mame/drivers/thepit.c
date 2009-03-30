@@ -175,10 +175,10 @@ static ADDRESS_MAP_START( thepit_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(thepit_input_port_0_r, SMH_NOP) // Not hooked up according to the schematics
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(SMH_NOP) // Unused, but initialized
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(SMH_NOP) // coin_lockout_w
+	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
+	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
-	AM_RANGE(0xb004, 0xb005) AM_WRITE(SMH_NOP) // Unused, but initialized
+	AM_RANGE(0xb004, 0xb005) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
 	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_w)
@@ -196,10 +196,10 @@ static ADDRESS_MAP_START( intrepid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(SMH_NOP) // Unused, but initialized
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(SMH_NOP) // coin_lockout_w
+	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
+	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(SMH_NOP) // Unused, but initialized
+	AM_RANGE(0xb004, 0xb004) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(intrepid_graphics_bank_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)

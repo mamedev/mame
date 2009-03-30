@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(pushman_flipscreen_w)
 	AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(pushman_control_w)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(pushman_scroll_w)
-	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP /* ? */
 	AM_RANGE(0xfec000, 0xfec7ff) AM_WRITE(pushman_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0xff8000, 0xff87ff) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SMH_RAM)
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( bballs_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe4000, 0xe4001) AM_WRITE(pushman_flipscreen_w)
 	AM_RANGE(0xe4002, 0xe4003) AM_WRITE(pushman_control_w)
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(pushman_scroll_w)
-	AM_RANGE(0xe800e, 0xe800f) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */
 	AM_RANGE(0xec000, 0xec7ff) AM_WRITE(pushman_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0xf8000, 0xf87ff) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xfc000, 0xfffff) AM_WRITE(SMH_RAM)

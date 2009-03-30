@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( strnskil_writemem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(strnskil_videoram_w) AM_BASE(&videoram)
 
 	AM_RANGE(0xd808, 0xd808) AM_WRITE(strnskil_scrl_ctrl_w)
-	AM_RANGE(0xd809, 0xd809) AM_WRITE(SMH_NOP) /* coin counter? */
+	AM_RANGE(0xd809, 0xd809) AM_WRITENOP /* coin counter? */
 	AM_RANGE(0xd80a, 0xd80b) AM_WRITE(SMH_RAM) AM_BASE(&strnskil_xscroll)
 ADDRESS_MAP_END
 
@@ -513,7 +513,7 @@ ROM_END
 
 static DRIVER_INIT( pettanp )
 {
-//  AM_RANGE(0xd80c, 0xd80c) AM_WRITE(SMH_NOP)     /* protection reset? */
+//  AM_RANGE(0xd80c, 0xd80c) AM_WRITENOP     /* protection reset? */
 //  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
 //  AM_RANGE(0xd806, 0xd806) AM_READ(protection_r) /* protection data read (pettanp) */
 

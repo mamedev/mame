@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x074000, 0x075fff) AM_READ(gaiden_videoram3_r)
 	AM_RANGE(0x076000, 0x077fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x078000, 0x0787ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x078800, 0x079fff) AM_READ(SMH_NOP)   /* extra portion of palette RAM, not really used */
+	AM_RANGE(0x078800, 0x079fff) AM_READNOP   /* extra portion of palette RAM, not really used */
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x07a802, 0x07a803) AM_WRITE(gaiden_sound_command_w)
-	AM_RANGE(0x07a806, 0x07a807) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM) 	/* raiga only */
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("oki", okim6295_r)
-	AM_RANGE(0xfc00, 0xfc00) AM_READ(SMH_NOP)	/* ?? */
+	AM_RANGE(0xfc00, 0xfc00) AM_READNOP	/* ?? */
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("oki", okim6295_w)
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ym2", ym2203_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(SMH_NOP)	/* ?? */
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP	/* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnbowl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )

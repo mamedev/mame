@@ -450,7 +450,7 @@ static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE( &tmaster_regs )
 	AM_RANGE( 0x500010, 0x500011 ) AM_READ ( tmaster_blitter_r )
 
-	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(SMH_NOP) // often
+	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
 
 	AM_RANGE( 0x600000, 0x600fff ) AM_READWRITE( SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_BASE(&paletteram16) // looks like palettes, maybe
 

@@ -627,7 +627,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gg_cpu3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x00, 0x00) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
 	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
@@ -1080,8 +1080,8 @@ static ADDRESS_MAP_START( gg_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x4c, 0x4c) AM_WRITE(main_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
 	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
-	AM_RANGE(0x66, 0x66) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x68, 0x68) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x66, 0x66) AM_WRITENOP
+	AM_RANGE(0x68, 0x68) AM_WRITENOP
 	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
 

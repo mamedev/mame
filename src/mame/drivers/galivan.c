@@ -136,8 +136,8 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x41, 0x42) AM_WRITE(galivan_scrollx_w)
 	AM_RANGE(0x43, 0x44) AM_WRITE(galivan_scrolly_w)
 	AM_RANGE(0x45, 0x45) AM_WRITE(galivan_sound_command_w)
-/*  AM_RANGE(0x46, 0x46) AM_WRITE(SMH_NOP) */
-/*  AM_RANGE(0x47, 0x47) AM_WRITE(SMH_NOP) */
+/*  AM_RANGE(0x46, 0x46) AM_WRITENOP */
+/*  AM_RANGE(0x47, 0x47) AM_WRITENOP */
 	AM_RANGE(0xc0, 0xc0) AM_READ(IO_port_c0_r) /* dangar needs to return 0x58 */
 ADDRESS_MAP_END
 
@@ -149,8 +149,8 @@ static ADDRESS_MAP_START( ninjemak_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x83, 0x83) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x84, 0x84) AM_READ_PORT("DSW1")
 	AM_RANGE(0x85, 0x85) AM_READ_PORT("DSW2") AM_WRITE(galivan_sound_command_w)
-//  AM_RANGE(0x86, 0x86) AM_WRITE(SMH_NOP)         // ??
-//  AM_RANGE(0x87, 0x87) AM_WRITE(SMH_NOP)         // ??
+//  AM_RANGE(0x86, 0x86) AM_WRITENOP         // ??
+//  AM_RANGE(0x87, 0x87) AM_WRITENOP         // ??
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_w)
-/*  AM_RANGE(0x04, 0x04) AM_READ(SMH_NOP)    value read and *discarded*    */
+/*  AM_RANGE(0x04, 0x04) AM_READNOP    value read and *discarded*    */
 	AM_RANGE(0x06, 0x06) AM_READ(galivan_sound_command_r)
 ADDRESS_MAP_END
 

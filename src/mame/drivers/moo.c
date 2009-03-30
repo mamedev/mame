@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmembl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0c2f00, 0x0c2f01) AM_READ(SMH_NOP)              /* heck if I know, but it's polled constantly */
+	AM_RANGE(0x0c2f00, 0x0c2f01) AM_READNOP              /* heck if I know, but it's polled constantly */
 	AM_RANGE(0x0c4000, 0x0c4001) AM_READ(K053246_word_r)
 	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_DEVREAD8("oki", okim6295_r, 0x00ff)
 	AM_RANGE(0x0da000, 0x0da001) AM_READ(player1_r)

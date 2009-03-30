@@ -394,7 +394,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ym", ym2413_data_port_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ym", ym2413_register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)				/* watchdog? irq ack? */
+	AM_RANGE(0x06, 0x06) AM_WRITENOP				/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
 	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( spangb_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ym", ym2413_data_port_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ym", ym2413_register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r)
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)	/* watchdog? irq ack? */
+	AM_RANGE(0x06, 0x06) AM_WRITENOP	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
 	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
@@ -488,7 +488,7 @@ static ADDRESS_MAP_START( mstworld_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")	/* dips? */
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW0")	/* special? */
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW3")	/* dips? */
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)		/* watchdog? irq ack? */
+	AM_RANGE(0x06, 0x06) AM_WRITENOP		/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(mstworld_video_bank_w)	/* Video RAM bank register */
 ADDRESS_MAP_END
 

@@ -585,7 +585,7 @@ static ADDRESS_MAP_START( srdarwin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1400, 0x17ff) AM_WRITE(dec8_pf0_data_w) AM_BASE(&dec8_pf0_data)
 	AM_RANGE(0x1800, 0x1801) AM_WRITE(srdarwin_i8751_w)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(i8751_reset_w)		/* Maybe.. */
-	AM_RANGE(0x1803, 0x1803) AM_WRITE(SMH_NOP)            /* NMI ack */
+	AM_RANGE(0x1803, 0x1803) AM_WRITENOP            /* NMI ack */
 	AM_RANGE(0x1804, 0x1804) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1805, 0x1806) AM_WRITE(srdarwin_control_w) /* Scroll & Bank */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(dec8_sound_w)       /* Sound */
@@ -657,7 +657,7 @@ static ADDRESS_MAP_START( oscar_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(buffer_spriteram_w)	/* DMA */
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)   		/* BNKS */
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(oscar_sound_w) 		/* SOUN */
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(SMH_NOP)       		/* COINCL */
+	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP       		/* COINCL */
 	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -891,7 +891,7 @@ static ADDRESS_MAP_START( garyoret_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)		/* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x3808, 0x3808) AM_READ(SMH_NOP)		/* ? */
+	AM_RANGE(0x3808, 0x3808) AM_READNOP		/* ? */
 	AM_RANGE(0x380a, 0x380a) AM_READ_PORT("IN1")	/* Player 2 + VBL */
 	AM_RANGE(0x380b, 0x380b) AM_READ_PORT("IN0")	/* Player 1 */
 	AM_RANGE(0x383a, 0x383a) AM_READ(i8751_h_r)

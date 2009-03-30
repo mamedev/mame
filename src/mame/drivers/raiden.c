@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x02800, 0x02fff) AM_RAM_WRITE(raiden_foreground_w) AM_BASE(&raiden_fore_data)
 	AM_RANGE(0x03000, 0x03fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x07ffe, 0x0afff) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x07ffe, 0x0afff) AM_WRITENOP
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

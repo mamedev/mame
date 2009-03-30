@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( groundfx_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x920000, 0x92000f) AM_READ(TC0100SCN_ctrl_long_r)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(SMH_RAM) /* palette ram */
 	AM_RANGE(0xb00000, 0xb003ff) AM_READ(SMH_RAM)	// ?? single bytes
-	AM_RANGE(0xc00000, 0xc00007) AM_READ(SMH_NOP) /* Network? */
+	AM_RANGE(0xc00000, 0xc00007) AM_READNOP /* Network? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( groundfx_writemem, ADDRESS_SPACE_PROGRAM, 32 )

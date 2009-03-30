@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( rngreadmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x2fffff) AM_READ(SMH_ROM)		// main program + data
 	AM_RANGE(0x300000, 0x3007ff) AM_READ(SMH_RAM)		// palette RAM
 	AM_RANGE(0x380000, 0x39ffff) AM_READ(SMH_RAM)		// work RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_READ(SMH_NOP)		// K053936_0_rom_r }, // '936 ROM readback window
+	AM_RANGE(0x400000, 0x43ffff) AM_READNOP		// K053936_0_rom_r }, // '936 ROM readback window
 	AM_RANGE(0x480000, 0x48001f) AM_READ(rng_sysregs_r)
 	AM_RANGE(0x4c0000, 0x4c001f) AM_READ(K053252_word_r)	// CCU (for scanline and vblank polling)
 	AM_RANGE(0x580014, 0x580015) AM_READ(sound_status_msb_r)
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( rngwritemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x6c0000, 0x6cffff) AM_WRITE(rng_936_videoram_w) AM_BASE(&rng_936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
 	AM_RANGE(0x700000, 0x7007ff) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_linectrl)			// "Line RAM"
 	AM_RANGE(0x740000, 0x741fff) AM_WRITE(rng_ttl_ram_w)		// text plane RAM
-	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITE(SMH_NOP)		// watchdog
+	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP		// watchdog
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -294,7 +294,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe630, 0xe7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(z80ctrl_w)
-	AM_RANGE(0xfff0, 0xfff3) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
 
 static const k054539_interface k054539_config =

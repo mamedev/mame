@@ -258,7 +258,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0x0fff) AM_READ(sprint2_sync_r)
 	AM_RANGE(0x1000, 0x13ff) AM_READ(sprint2_collision1_r)
 	AM_RANGE(0x1400, 0x17ff) AM_READ(sprint2_collision2_r)
-	AM_RANGE(0x1800, 0x1800) AM_READ(SMH_NOP)  /* debugger ROM location? */
+	AM_RANGE(0x1800, 0x1800) AM_READNOP  /* debugger ROM location? */
 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c20, 0x0c2f) AM_DEVWRITE("discrete", sprint2_skid2_w)
 	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
 	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
-	AM_RANGE(0x0c60, 0x0c6f) AM_WRITE(SMH_NOP) /* SPARE */
+	AM_RANGE(0x0c60, 0x0c6f) AM_WRITENOP /* SPARE */
 	AM_RANGE(0x0c80, 0x0cff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0d00, 0x0d7f) AM_WRITE(sprint2_collision_reset1_w)
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE(sprint2_collision_reset2_w)

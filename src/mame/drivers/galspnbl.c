@@ -51,15 +51,15 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM		/* hotpinbl work RAM */
 	AM_RANGE(0x808000, 0x80ffff) AM_RAM		/* hotpinbl work RAM, bitmaps are decompressed here */
 	AM_RANGE(0x880000, 0x880fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x8ff400, 0x8fffff) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0x8ff400, 0x8fffff) AM_WRITENOP	/* ??? */
 	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE(&galspnbl_colorram)
-	AM_RANGE(0x901000, 0x903fff) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0x901000, 0x903fff) AM_WRITENOP	/* ??? */
 	AM_RANGE(0x904000, 0x904fff) AM_RAM AM_BASE(&galspnbl_videoram)
-	AM_RANGE(0x905000, 0x907fff) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP	/* ??? */
 	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE(&galspnbl_bgvideoram)
-	AM_RANGE(0xa00000, 0xa00fff) AM_WRITE(SMH_NOP)	/* more palette ? */
+	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP	/* more palette ? */
 	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xa01800, 0xa027ff) AM_WRITE(SMH_NOP)	/* more palette ? */
+	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP	/* more palette ? */
 	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
 	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
 	AM_RANGE(0xa80020, 0xa80021) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* w - could be watchdog, but causes resets when picture is shown */

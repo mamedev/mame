@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ym", ym2608_r, ym2608_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_READ(SMH_NOP) /* ??? adpcm ??? */
+	AM_RANGE(0xfc00, 0xfc00) AM_READNOP /* ??? adpcm ??? */
 	AM_RANGE(0xfc10, 0xfc10) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

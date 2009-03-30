@@ -404,9 +404,9 @@ static ADDRESS_MAP_START( cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("ay2", ay8910_r,        ay8910_data_w)
 //
-	AM_RANGE(0xe0, 0xe0) AM_READ(SMH_NOP) /* ?? */
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(SMH_NOP) /* watch dog ?*/
+	AM_RANGE(0xe0, 0xe0) AM_READNOP /* ?? */
+	AM_RANGE(0xa0, 0xa0) AM_WRITENOP /* ?? */
+	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* watch dog ?*/
 ADDRESS_MAP_END
 
 //

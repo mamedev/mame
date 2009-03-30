@@ -296,8 +296,8 @@ static ADDRESS_MAP_START( fuuki32_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x600000, 0x601fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size	)	// Sprites
 	AM_RANGE(0x700000, 0x703fff) AM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE(&paletteram32) // Palette
 
-	AM_RANGE(0x800000, 0x800003) AM_WRITE(SMH_NOP) // Clear buffered inputs
-	AM_RANGE(0x810000, 0x810003) AM_WRITE(SMH_NOP) // Clear buffered inputs
+	AM_RANGE(0x800000, 0x800003) AM_WRITENOP // Clear buffered inputs
+	AM_RANGE(0x810000, 0x810003) AM_WRITENOP // Clear buffered inputs
 
 	AM_RANGE(0x8c0000, 0x8c001f) AM_WRITE(fuuki32_vregs_w) AM_BASE(&fuuki32_vregs)	// Video Registers
 
@@ -351,7 +351,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fuuki32_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x30, 0x30) AM_WRITENOP
 	AM_RANGE(0x40, 0x45) AM_DEVREADWRITE("ymf", ymf278b_r, ymf278b_w)
 ADDRESS_MAP_END
 

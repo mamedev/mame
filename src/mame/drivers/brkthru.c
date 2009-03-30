@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( darwin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1400, 0x1bff) AM_RAM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0100, 0x01ff) AM_WRITE(SMH_NOP) /*tidyup, nothing realy here?*/
+	AM_RANGE(0x0100, 0x01ff) AM_WRITENOP /*tidyup, nothing realy here?*/
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("P1")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
 	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("DSW1")

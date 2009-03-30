@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( main_writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0xe800, 0xefff) AM_WRITE(video_shared_w) /* shared with video cpu */
     AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM) /* ???? */
     AM_RANGE(0xf800, 0xf800) AM_WRITE(kingofb_f800_w)	/* NMI enable, palette bank */
-    AM_RANGE(0xf801, 0xf801) AM_WRITE(SMH_NOP) /* ???? */
+    AM_RANGE(0xf801, 0xf801) AM_WRITENOP /* ???? */
     AM_RANGE(0xf802, 0xf802) AM_WRITE(SMH_RAM) AM_BASE(&kingofb_scroll_y)
     AM_RANGE(0xf803, 0xf803) AM_WRITE(scroll_interrupt_w)
     AM_RANGE(0xf804, 0xf804) AM_WRITE(video_interrupt_w)
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP) /* ??? */
+    AM_RANGE(0x8000, 0x8000) AM_WRITENOP /* ??? */
     AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
     AM_RANGE(0xc000, 0xc3ff) AM_WRITE(SMH_RAM) /* work ram */
 ADDRESS_MAP_END

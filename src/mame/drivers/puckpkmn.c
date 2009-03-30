@@ -141,9 +141,9 @@ static ADDRESS_MAP_START( puckpkmn_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)					/* Main Ram */
 
 	/* Unknown reads: */
-//  AM_RANGE(0xa10000, 0xa10001) AM_READ(SMH_NOP)                   /* ? once */
-	AM_RANGE(0xa10002, 0xa10005) AM_READ(SMH_NOP)					/* ? alternative way of reading inputs ? */
-	AM_RANGE(0xa11100, 0xa11101) AM_READ(SMH_NOP)					/* ? */
+//  AM_RANGE(0xa10000, 0xa10001) AM_READNOP                   /* ? once */
+	AM_RANGE(0xa10002, 0xa10005) AM_READNOP					/* ? alternative way of reading inputs ? */
+	AM_RANGE(0xa11100, 0xa11101) AM_READNOP					/* ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( puckpkmn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -155,11 +155,11 @@ static ADDRESS_MAP_START( puckpkmn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	/* Unknown writes: */
 	AM_RANGE(0xa00000, 0xa00551) AM_WRITE(SMH_RAM)					/* ? */
-	AM_RANGE(0xa10002, 0xa10005) AM_WRITE(SMH_NOP)					/* ? alternative way of reading inputs ? */
-//  AM_RANGE(0xa10008, 0xa1000d) AM_WRITE(SMH_NOP)                    /* ? once */
-//  AM_RANGE(0xa14000, 0xa14003) AM_WRITE(SMH_NOP)                    /* ? once */
-	AM_RANGE(0xa11100, 0xa11101) AM_WRITE(SMH_NOP)					/* ? */
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(SMH_NOP)					/* ? */
+	AM_RANGE(0xa10002, 0xa10005) AM_WRITENOP					/* ? alternative way of reading inputs ? */
+//  AM_RANGE(0xa10008, 0xa1000d) AM_WRITENOP                    /* ? once */
+//  AM_RANGE(0xa14000, 0xa14003) AM_WRITENOP                    /* ? once */
+	AM_RANGE(0xa11100, 0xa11101) AM_WRITENOP					/* ? */
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITENOP					/* ? */
 ADDRESS_MAP_END
 
 

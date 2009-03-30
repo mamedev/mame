@@ -76,13 +76,13 @@ static ADDRESS_MAP_START( crospang_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crospang_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_NOP) // writes to rom quite often
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITENOP // writes to rom quite often
+	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(crospang_fg_scrolly_w)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(crospang_bg_scrollx_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(crospang_bg_scrolly_w)
 	AM_RANGE(0x100008, 0x100009) AM_WRITE(crospang_fg_scrollx_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x10000e, 0x10000f) AM_WRITENOP
 	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(crospang_fg_videoram_w) AM_BASE(&crospang_fg_videoram)
 	AM_RANGE(0x122000, 0x1227ff) AM_WRITE(crospang_bg_videoram_w) AM_BASE(&crospang_bg_videoram)
 	AM_RANGE(0x200000, 0x2005ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( bestri_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestri_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_NOP) // writes to rom quite often
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITENOP // writes to rom quite often
 
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(bestri_fg_scrollx_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrolly_w)
@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( bestri_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x2005ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x210000, 0x2107ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
-	AM_RANGE(0x270004, 0x270005) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x270004, 0x270005) AM_WRITENOP
 
 
 

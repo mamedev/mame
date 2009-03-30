@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
-	AM_RANGE(0x100016, 0x100017) AM_WRITE(SMH_NOP)	/* don't know, maybe reset sound CPU */
+	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE(&blockout_videoram)
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM	/* work RAM */

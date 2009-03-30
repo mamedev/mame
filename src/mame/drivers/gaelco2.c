@@ -74,7 +74,7 @@ static ADDRESS_MAP_START( maniacsq_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(gaelco2_vram_w) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* Video RAM */
 	AM_RANGE(0x210000, 0x211fff) AM_WRITE(gaelco2_palette_w) AM_BASE(&paletteram16)	/* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_WRITE(SMH_RAM) AM_BASE(&gaelco2_vregs)			/* Video Registers */
-	AM_RANGE(0x30004a, 0x30004b) AM_WRITE(SMH_NOP)							/* Sound muting? */
+	AM_RANGE(0x30004a, 0x30004b) AM_WRITENOP							/* Sound muting? */
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)						/* Coin lockout + counters */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_RAM)							/* Work RAM */
 ADDRESS_MAP_END
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( bang_readmem, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0x210000, 0x211fff) AM_READ(SMH_RAM) /* Palette */
     AM_RANGE(0x218004, 0x218009) AM_READ(SMH_RAM) /* Video Registers */
     AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
-    AM_RANGE(0x300002, 0x300003) AM_READ(SMH_NOP) /* Random number generator? */
+    AM_RANGE(0x300002, 0x300003) AM_READNOP /* Random number generator? */
     AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
     AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
     AM_RANGE(0x310000, 0x310001) AM_READ(p1_gun_x)/* Gun 1P X */
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( bang_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(gaelco2_vram_w) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* Video RAM */
 	AM_RANGE(0x210000, 0x211fff) AM_WRITE(gaelco2_palette_w) AM_BASE(&paletteram16)	/* Palette */
 	AM_RANGE(0x218004, 0x218007) AM_WRITE(SMH_RAM) AM_BASE(&gaelco2_vregs)	/* Video Registers */
-	AM_RANGE(0x218008, 0x218009) AM_WRITE(SMH_NOP)							/* CLR INT Video */
+	AM_RANGE(0x218008, 0x218009) AM_WRITENOP							/* CLR INT Video */
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)					/* Coin Counters */
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)			/* EEPROM data */
 	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)				/* EEPROM serial clock */
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START( alighunt_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x211fff) AM_WRITE(gaelco2_palette_w) AM_BASE(&paletteram16)	/* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_WRITE(SMH_RAM) AM_BASE(&gaelco2_vregs)			/* Video Registers */
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)						/* Coin lockout + counters */
-	AM_RANGE(0x500006, 0x500007) AM_WRITE(SMH_NOP)							/* ??? */
+	AM_RANGE(0x500006, 0x500007) AM_WRITENOP							/* ??? */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_RAM)							/* Work RAM */
 ADDRESS_MAP_END
 

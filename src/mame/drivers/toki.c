@@ -129,9 +129,9 @@ static ADDRESS_MAP_START( tokib_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_BASE(&videoram16)
-	AM_RANGE(0x071000, 0x071001) AM_WRITE(SMH_NOP)	/* sprite related? seems another scroll register */
+	AM_RANGE(0x071000, 0x071001) AM_WRITENOP	/* sprite related? seems another scroll register */
 				/* gets written the same value as 75000a (bg2 scrollx) */
-	AM_RANGE(0x071804, 0x071807) AM_WRITE(SMH_NOP)	/* sprite related, always 01be0100 */
+	AM_RANGE(0x071804, 0x071807) AM_WRITENOP	/* sprite related, always 01be0100 */
 	AM_RANGE(0x07180e, 0x071e45) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x072000, 0x072001) AM_READ(watchdog_reset16_r)   /* probably */
 	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand16_w)

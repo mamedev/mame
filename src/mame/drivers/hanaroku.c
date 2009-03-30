@@ -137,11 +137,11 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM) AM_BASE(&hanaroku_spriteram1)
 	AM_RANGE(0x9000, 0x97ff) AM_WRITE(SMH_RAM) AM_BASE(&hanaroku_spriteram2)
 	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(SMH_RAM) AM_BASE(&hanaroku_spriteram3)
-	AM_RANGE(0xa200, 0xa2ff) AM_WRITE(SMH_NOP)	// ??? written once during P.O.S.T.
-	AM_RANGE(0xa300, 0xa304) AM_WRITE(SMH_NOP)	// ???
+	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
+	AM_RANGE(0xa300, 0xa304) AM_WRITENOP	// ???
 	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(SMH_RAM)				// main ram
 	AM_RANGE(0xc400, 0xc4ff) AM_WRITE(SMH_RAM)	// ???
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	// ??? always 0x40
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(hanaroku_out_0_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(hanaroku_out_1_w)

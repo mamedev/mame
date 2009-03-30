@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( mars_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4c00, 0x4fff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0x5000, 0x50ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x7000, 0x7000) AM_READ(SMH_NOP)
+	AM_RANGE(0x7000, 0x7000) AM_READNOP
 	AM_RANGE(0x8100, 0x810f) AM_DEVREAD("ppi8255_0", mars_ppi8255_r)
 	AM_RANGE(0x8200, 0x820f) AM_DEVREAD("ppi8255_1", mars_ppi8255_r)
 ADDRESS_MAP_END
@@ -1298,7 +1298,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( scramble_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(scramble_soundram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_NOP) AM_BASE(&scramble_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE(&scramble_soundram)  /* only here to initialize pointer */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 

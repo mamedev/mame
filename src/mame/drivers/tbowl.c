@@ -153,10 +153,10 @@ static ADDRESS_MAP_START( 6206C_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, SMH_ROM)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlc_bankswitch_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xfc01, 0xfc01) AM_WRITENOP /* ? */
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(tbowl_trigger_nmi) /* ? */
-	AM_RANGE(0xfc03, 0xfc03) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xfc03, 0xfc03) AM_WRITENOP /* ? */
+	AM_RANGE(0xfc06, 0xfc06) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
 
 /* Board A */
@@ -207,8 +207,8 @@ static ADDRESS_MAP_START( 6206A_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(tbowl_adpcm_end_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(tbowl_adpcm_start_w)
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(tbowl_adpcm_vol_w)
-	AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xe007, 0xe007) AM_WRITE(SMH_NOP)	/* NMI acknowledge */
+	AM_RANGE(0xe006, 0xe006) AM_WRITENOP
+	AM_RANGE(0xe007, 0xe007) AM_WRITENOP	/* NMI acknowledge */
 	AM_RANGE(0xe010, 0xe010) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

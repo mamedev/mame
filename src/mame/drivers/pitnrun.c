@@ -111,16 +111,16 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8fff) AM_WRITE(pitnrun_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(pitnrun_videoram2_w) AM_BASE(&pitnrun_videoram2)
 	AM_RANGE(0xa000, 0xa0ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xa800, 0xa807) AM_WRITE(SMH_NOP) /* Analog Sound */
+	AM_RANGE(0xa800, 0xa807) AM_WRITENOP /* Analog Sound */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(pitnrun_color_select_w)
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(SMH_NOP)/* COLOR SEL 2 - not used ?*/
+	AM_RANGE(0xb004, 0xb004) AM_WRITENOP/* COLOR SEL 2 - not used ?*/
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(pitnrun_char_bank_select)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(pitnrun_hflip_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(pitnrun_vflip_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(pitnrun_scroll_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE(SMH_NOP)/* VP(VF?)MCV - not used ?*/
+	AM_RANGE(0xc802, 0xc802) AM_WRITENOP/* VP(VF?)MCV - not used ?*/
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(pitnrun_mcu_data_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(pitnrun_h_heed_w)
  	AM_RANGE(0xc806, 0xc806) AM_WRITE(pitnrun_v_heed_w)
@@ -134,9 +134,9 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x90, 0x96) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x97, 0x97) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x98, 0x98) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x90, 0x96) AM_WRITENOP
+	AM_RANGE(0x97, 0x97) AM_WRITENOP
+	AM_RANGE(0x98, 0x98) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )

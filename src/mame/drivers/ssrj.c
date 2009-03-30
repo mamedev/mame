@@ -85,10 +85,10 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(ssrj_vram4_w) AM_BASE(&ssrj_vram4)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(SMH_RAM) AM_BASE(&ssrj_scrollram)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0xf003, 0xf003) AM_WRITENOP /* unknown */
 	AM_RANGE(0xf400, 0xf401) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(SMH_NOP) /* unknown */
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(SMH_NOP) /* wheel ? */
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP /* unknown */
+	AM_RANGE(0xf800, 0xf800) AM_WRITENOP /* wheel ? */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssrj )

@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( rallyx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE("namco", pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)
-	AM_RANGE(0xa170, 0xa170) AM_WRITE(SMH_NOP)			/* ? */
+	AM_RANGE(0xa170, 0xa170) AM_WRITENOP			/* ? */
 	AM_RANGE(0xa180, 0xa187) AM_WRITE(rallyx_latch_w)
 ADDRESS_MAP_END
 

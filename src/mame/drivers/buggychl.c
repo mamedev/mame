@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd500, 0xd57f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
 //  AM_RANGE(0xd613, 0xd613) // reset sound cpu & sound chips
-	AM_RANGE(0xd618, 0xd618) AM_WRITE(SMH_NOP)	/* accelerator clear */
+	AM_RANGE(0xd618, 0xd618) AM_WRITENOP	/* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xd840, 0xd85f) AM_WRITE(SMH_RAM) AM_BASE(&buggychl_scrollv)
 	AM_RANGE(0xdb00, 0xdbff) AM_WRITE(SMH_RAM) AM_BASE(&buggychl_scrollh)

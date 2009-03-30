@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_NOP)		/* coin out */
+	AM_RANGE(0x1000, 0x1000) AM_WRITENOP		/* coin out */
 	AM_RANGE(0x1200, 0x1200) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1600, 0x1600) AM_WRITE(avgdvg_reset_w)
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1804, 0x1804) AM_DEVREAD("mathbox", mathbox_lo_r)
 	AM_RANGE(0x1806, 0x1806) AM_DEVREAD("mathbox", mathbox_hi_r)
 	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_sounds_w)	/* and select joystick pot also */
-	AM_RANGE(0x180a, 0x180a) AM_WRITE(SMH_NOP)				/* sound reset, yet todo */
+	AM_RANGE(0x180a, 0x180a) AM_WRITENOP				/* sound reset, yet todo */
 	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE("earom", atari_vg_earom_r, atari_vg_earom_w)

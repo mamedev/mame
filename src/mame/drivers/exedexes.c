@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(exedexes_c804_w)	/* coin counters + text layer enable */
-	AM_RANGE(0xc806, 0xc806) AM_WRITE(SMH_NOP) /* Watchdog ?? */
+	AM_RANGE(0xc806, 0xc806) AM_WRITENOP /* Watchdog ?? */
 	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(exedexes_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(exedexes_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xd800, 0xd801) AM_WRITE(SMH_RAM) AM_BASE(&exedexes_nbg_yscroll)

@@ -762,10 +762,10 @@ static ADDRESS_MAP_START( namcona2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&namcona1_workram)
 	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(SMH_NOP) /* xday: serial out? */
-	AM_RANGE(0xd40000, 0xd40001) AM_WRITE(SMH_NOP) /* xday: serial out? */
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(SMH_NOP) /* xday: serial out? */
-	AM_RANGE(0xdc0000, 0xdc001f) AM_WRITE(SMH_NOP) /* xday: serial config? */
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP /* xday: serial out? */
+	AM_RANGE(0xd40000, 0xd40001) AM_WRITENOP /* xday: serial out? */
+	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP /* xday: serial out? */
+	AM_RANGE(0xdc0000, 0xdc001f) AM_WRITENOP /* xday: serial config? */
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)	/* code */
 	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
 	/* xday: additional battery-backed ram at 00E024FA? */

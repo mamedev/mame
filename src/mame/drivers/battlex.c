@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 
 	/* 0x30 looks like scroll, but can't be ? changes (increases or decreases)
         depending on the direction your ship is facing on lev 2. at least */
-	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x30, 0x30) AM_WRITENOP
 
 	AM_RANGE(0x32, 0x32) AM_WRITE(battlex_scroll_x_lsb_w)
 	AM_RANGE(0x33, 0x33) AM_WRITE(battlex_scroll_x_msb_w)

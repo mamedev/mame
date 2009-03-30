@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( cninja_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1a4000, 0x1a47ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1b4000, 0x1b4001) AM_WRITE(buffer_spriteram16_w) /* DMA flag */
 	AM_RANGE(0x1bc000, 0x1bc0ff) AM_WRITE(deco16_104_cninja_prot_w) AM_BASE(&deco16_prot_ram) /* Protection writes */
-	AM_RANGE(0x308000, 0x308fff) AM_WRITE(SMH_NOP) /* Bootleg only */
+	AM_RANGE(0x308000, 0x308fff) AM_WRITENOP /* Bootleg only */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( edrandy_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -229,13 +229,13 @@ static ADDRESS_MAP_START( edrandy_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x188000, 0x189fff) AM_WRITE(deco16_nonbuffered_palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x194000, 0x197fff) AM_WRITE(SMH_RAM) AM_BASE(&cninja_ram) /* Main ram */
 	AM_RANGE(0x198000, 0x1987ff) AM_WRITE(deco16_60_prot_w) AM_BASE(&deco16_prot_ram) /* Protection writes */
-	AM_RANGE(0x199550, 0x199551) AM_WRITE(SMH_NOP) /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
-	AM_RANGE(0x199750, 0x199751) AM_WRITE(SMH_NOP) /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
+	AM_RANGE(0x199550, 0x199551) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
+	AM_RANGE(0x199750, 0x199751) AM_WRITENOP /* Looks like a bug in game code, a protection write is referenced off a5 instead of a6 and ends up here */
 
 	AM_RANGE(0x1a4000, 0x1a4007) AM_WRITE(cninja_irq_w)
 	AM_RANGE(0x1ac000, 0x1ac001) AM_WRITE(buffer_spriteram16_w) /* DMA flag */
 	AM_RANGE(0x1bc000, 0x1bc7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1bc800, 0x1bcfff) AM_WRITE(SMH_NOP) /* Another bug in game code?  Sprite list can overrun.  Doesn't seem to mirror */
+	AM_RANGE(0x1bc800, 0x1bcfff) AM_WRITENOP /* Another bug in game code?  Sprite list can overrun.  Doesn't seem to mirror */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( robocop2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -297,7 +297,7 @@ static ADDRESS_MAP_START( mutantf_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x316000, 0x317fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x318000, 0x3187ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x31a000, 0x31a7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xad00ac, 0xad00ff) AM_READ(SMH_NOP) /* Reads from here seem to be a game code bug */
+	AM_RANGE(0xad00ac, 0xad00ff) AM_READNOP /* Reads from here seem to be a game code bug */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mutantf_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( mutantf_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
 	AM_RANGE(0x160000, 0x161fff) AM_WRITE(deco16_nonbuffered_palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(deco16_priority_w)
-	AM_RANGE(0x180002, 0x180003) AM_WRITE(SMH_NOP) /* VBL irq ack */
+	AM_RANGE(0x180002, 0x180003) AM_WRITENOP /* VBL irq ack */
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_WRITE(deco16_66_prot_w) AM_BASE(&deco16_prot_ram) /* Protection writes */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(buffer_spriteram16_w)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_WRITE(buffer_spriteram16_2_w)
@@ -350,7 +350,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem_mutantf, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_READ(SMH_NOP)
+	AM_RANGE(0x100000, 0x100001) AM_READNOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREAD("ym", ym2151_r)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("oki1", okim6295_r)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREAD("oki2", okim6295_r)
@@ -360,7 +360,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem_mutantf, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVWRITE("ym", ym2151_w)
 	AM_RANGE(0x120000, 0x120001) AM_DEVWRITE("oki1", okim6295_w)
 	AM_RANGE(0x130000, 0x130001) AM_DEVWRITE("oki2", okim6295_w)

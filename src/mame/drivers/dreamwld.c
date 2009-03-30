@@ -286,7 +286,7 @@ static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
 }
 
 static ADDRESS_MAP_START( dreamwld_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITE(SMH_NOP)
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE( &spriteram32 )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(dreamwld_palette_w) AM_BASE(&paletteram32)  // real palette?

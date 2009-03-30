@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)	/* from the 68705 */
 	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(xain_scrollxP0_w)
 	AM_RANGE(0x3a05, 0x3a05) AM_READ_PORT("VBLANK")
-//  AM_RANGE(0x3a06, 0x3a06) AM_READ(SMH_NOP)  /* ?? read (and discarded) on startup. Maybe reset the 68705 */
+//  AM_RANGE(0x3a06, 0x3a06) AM_READNOP  /* ?? read (and discarded) on startup. Maybe reset the 68705 */
 	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(xain_scrollyP0_w)
 	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(xain_sound_command_w)
 	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(xain_main_irq_w)

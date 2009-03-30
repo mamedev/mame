@@ -306,7 +306,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigevglf_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) 	/* video ram enable ???*/
+	AM_RANGE(0x00, 0x00) AM_WRITENOP 	/* video ram enable ???*/
 	AM_RANGE(0x01, 0x01) AM_WRITE(bigevglf_gfxcontrol_w)  /* plane select */
 	AM_RANGE(0x02, 0x02) AM_WRITE(beg_banking_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(beg13A_set_w)
@@ -342,17 +342,17 @@ static READ8_HANDLER( sub_cpu_mcu_coin_port_r )
 static ADDRESS_MAP_START( bigevglf_sub_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("PORT00")
-	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP)
+	AM_RANGE(0x01, 0x01) AM_READNOP
 	AM_RANGE(0x02, 0x02) AM_READ(beg_trackball_x_r)
 	AM_RANGE(0x03, 0x03) AM_READ(beg_trackball_y_r)
 	AM_RANGE(0x04, 0x04) AM_READ(sub_cpu_mcu_coin_port_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW1")
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07, 0x07) AM_READ(SMH_NOP)
+	AM_RANGE(0x07, 0x07) AM_READNOP
 	AM_RANGE(0x08, 0x08) AM_WRITE(beg_port08_w) /* muxed port select + other unknown stuff */
 	AM_RANGE(0x0b, 0x0b) AM_READ(bigevglf_mcu_r)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(bigevglf_mcu_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(SMH_NOP) /* 0-enable MCU, 1-keep reset line ASSERTED; D0 goes to the input of ls74 and the /Q of this ls74 goes to reset line on 68705 */
+	AM_RANGE(0x0e, 0x0e) AM_WRITENOP /* 0-enable MCU, 1-keep reset line ASSERTED; D0 goes to the input of ls74 and the /Q of this ls74 goes to reset line on 68705 */
 	AM_RANGE(0x10, 0x17) AM_WRITE(beg13A_clr_w)
 	AM_RANGE(0x18, 0x1f) AM_WRITE(beg13B_set_w)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(beg_fromsound_r, sound_command_w)
@@ -370,8 +370,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xce00, 0xce00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
+	AM_RANGE(0xce00, 0xce00) AM_WRITENOP
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(sound_command_r, beg_fromsound_w)	/* write to D800 sets bit 1 in status */
 	AM_RANGE(0xda00, 0xda00) AM_READWRITE(soundstate_r, nmi_enable_w)
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)

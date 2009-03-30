@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( chqflag_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami2", k007232_r)	/* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r)	/* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	//AM_RANGE(0xe000, 0xe000) AM_READ(SMH_NOP)                /* ??? */
+	//AM_RANGE(0xe000, 0xe000) AM_READNOP                /* ??? */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( k007232_bankswitch_w )
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( chqflag_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 											/* selecting a different latch for the external port */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami2", k007232_w)		/* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)		/* YM2151 */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)					/* ??? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP					/* ??? */
 ADDRESS_MAP_END
 
 

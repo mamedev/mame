@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( popbingo_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04e000, 0x04ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0c0012, 0x0c0013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(rshark_ctrl_w)
-	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITENOP // ?
 	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE(dooyong_bgscroll16_w)
 	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE(dooyong_bg2scroll16_w) // not used atm
 	AM_RANGE(0x0c8000, 0x0c8fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)

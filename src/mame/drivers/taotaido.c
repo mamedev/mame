@@ -107,8 +107,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffffa0, 0xffffa1) AM_READ_PORT("P3")						// used only by taotaida
 	AM_RANGE(0xffffa2, 0xffffa3) AM_READ_PORT("P4")						// used only by taotaida
 	AM_RANGE(0xffff00, 0xffff0f) AM_WRITE(taotaido_tileregs_w)
-	AM_RANGE(0xffff10, 0xffff11) AM_WRITE(SMH_NOP)						// unknown
-	AM_RANGE(0xffff20, 0xffff21) AM_WRITE(SMH_NOP)						// unknown - flip screen related
+	AM_RANGE(0xffff10, 0xffff11) AM_WRITENOP						// unknown
+	AM_RANGE(0xffff20, 0xffff21) AM_WRITENOP						// unknown - flip screen related
 	AM_RANGE(0xffff40, 0xffff47) AM_WRITE(taotaido_sprite_character_bank_select_w)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE(sound_command_w)				// seems right
 	AM_RANGE(0xffffe0, 0xffffe1) AM_READ(pending_command_r)	// guess - seems to be needed for all the sounds to work

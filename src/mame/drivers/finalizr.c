@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0818, 0x0818) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
 	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("sn", sn76496_w)	/* This address triggers the SN chip to read the data port. */
-	AM_RANGE(0x081b, 0x081b) AM_WRITE(SMH_NOP)		/* Loads the snd command into the snd latch */
+	AM_RANGE(0x081b, 0x081b) AM_WRITENOP		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
 	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_w)			/* custom sound chip */
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&colorram)

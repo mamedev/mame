@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( hustler_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xa80e, 0xa80e) AM_WRITE(SMH_NOP)	/* coin counters */
+	AM_RANGE(0xa80e, 0xa80e) AM_WRITENOP	/* coin counters */
 	AM_RANGE(0xd000, 0xd01f) AM_DEVWRITE("ppi8255_0", hustler_ppi8255_w)
 	AM_RANGE(0xe000, 0xe01f) AM_DEVWRITE("ppi8255_1", hustler_ppi8255_w)
 ADDRESS_MAP_END
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( hustlerb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9060, 0x907f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0x9080, 0x90ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xa802, 0xa802) AM_WRITE(SMH_NOP)	/* coin counters */
+	AM_RANGE(0xa802, 0xa802) AM_WRITENOP	/* coin counters */
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xc100, 0xc103) AM_DEVWRITE("ppi8255_0", ppi8255_w)
@@ -391,7 +391,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( scobra_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(scobra_soundram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_NOP) AM_BASE(&scobra_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE(&scobra_soundram)  /* only here to initialize pointer */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 
@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( hustlerb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_NOP) AM_BASE(&scobra_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE(&scobra_soundram)  /* only here to initialize pointer */
 ADDRESS_MAP_END
 
 

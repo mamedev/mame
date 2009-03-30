@@ -940,8 +940,8 @@ static ADDRESS_MAP_START( slave_dsp_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x02,0x02) AM_READ(slave_port2_r)
 	AM_RANGE(0x03,0x03) AM_READ(slave_port3_r) AM_WRITE(slave_port3_w)
 	AM_RANGE(0x0f,0x0f) AM_READ(slave_portf_r)
-	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ(SMH_NOP)
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(SMH_NOP)
+	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READNOP
+	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITENOP
 	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE(slave_XF_output_w)
 ADDRESS_MAP_END
 
@@ -1120,10 +1120,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namcos21_68k_common, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_READ(dspram16_r) AM_WRITE(dspram16_w) AM_BASE(&namcos21_dspram16)
-	AM_RANGE(0x280000, 0x280001) AM_WRITE(SMH_NOP) /* written once on startup */
+	AM_RANGE(0x280000, 0x280001) AM_WRITENOP /* written once on startup */
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w)
 	AM_RANGE(0x440000, 0x440001) AM_READ(pointram_data_r) AM_WRITE(pointram_data_w)
-	AM_RANGE(0x440002, 0x47ffff) AM_WRITE(SMH_NOP) /* (?) Air Combat */
+	AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (?) Air Combat */
 	AM_RANGE(0x480000, 0x4807ff) AM_WRITE(namcos21_depthcue_w) AM_READ(namcos21_depthcue_r) /* Air Combat */
 	AM_RANGE(0x700000, 0x71ffff) AM_READ(namco_obj16_r) AM_WRITE(namco_obj16_w)
 	AM_RANGE(0x720000, 0x720007) AM_READ(namco_spritepos16_r) AM_WRITE(namco_spritepos16_w)
@@ -1288,7 +1288,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( winrun_dsp_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x08,0x09) AM_WRITE(winrun_dsp_pointrom_addr_w) AM_READ(winrun_dsp_pointrom_data_r)
 	AM_RANGE(0x0a,0x0a) AM_WRITE(winrun_dsp_render_w)
-	AM_RANGE(0x0b,0x0b) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0b,0x0b) AM_WRITENOP
 	AM_RANGE(0x0c,0x0c) AM_WRITE(winrun_dsp_complete_w)
 	AM_RANGE(TMS32025_BIO,   TMS32025_BIO)   AM_READ( winrun_poly_reset_r )
 	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ( SMH_NOP )
@@ -1411,17 +1411,17 @@ static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x3000, 0x3003) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0x3000, 0x3003) AM_WRITENOP /* ? */
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym", ym2151_w)
 	AM_RANGE(0x5000, 0x6fff) AM_DEVWRITE("c140", c140_w)
 	AM_RANGE(0x7000, 0x77ff) AM_WRITE(namcos2_dualportram_byte_w) AM_BASE(&mpDualPortRAM)
 	AM_RANGE(0x7800, 0x7fff) AM_WRITE(namcos2_dualportram_byte_w) /* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_NOP) /* amplifier enable on 1st write */
+	AM_RANGE(0xa000, 0xbfff) AM_WRITENOP /* amplifier enable on 1st write */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos2_sound_bankselect_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(SMH_NOP) /* watchdog */
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_NOP) /* avoid debug log noise; games write frequently to 0xe000 */
+	AM_RANGE(0xd001, 0xd001) AM_WRITENOP /* watchdog */
+	AM_RANGE(0xc000, 0xffff) AM_WRITENOP /* avoid debug log noise; games write frequently to 0xe000 */
 ADDRESS_MAP_END
 
 /*************************************************************/
@@ -1429,7 +1429,7 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( readmem_mcu, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_READ(SMH_NOP)
+	AM_RANGE(0x0000, 0x0000) AM_READNOP
 	AM_RANGE(0x0001, 0x0001) AM_READ_PORT("PORTB")			/* p1,p2 start */
 	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("PORTC")			/* coins */
 	AM_RANGE(0x0003, 0x0003) AM_READ(namcos2_mcu_port_d_r)
@@ -1445,7 +1445,7 @@ static ADDRESS_MAP_START( readmem_mcu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DIAL2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DIAL3")
 	AM_RANGE(0x5000, 0x57ff) AM_READ(namcos2_dualportram_byte_r)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_NOP)				/* watchdog */
+	AM_RANGE(0x6000, 0x6fff) AM_READNOP				/* watchdog */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 

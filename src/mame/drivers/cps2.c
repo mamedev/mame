@@ -877,7 +877,7 @@ static ADDRESS_MAP_START( cps2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE(&cps1_cps_a_regs)	/* mirror (sfa) */
 	AM_RANGE(0x800140, 0x80017f) AM_WRITE(cps1_cps_b_w) AM_BASE(&cps1_cps_b_regs)	/* mirror (sfa) */
 	AM_RANGE(0x804040, 0x804041) AM_WRITE(cps2_eeprom_port_w)         /* EEPROM */
-	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITE(SMH_NOP)                  /* Unknown (reset once on startup) */
+	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP                  /* Unknown (reset once on startup) */
 	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)         /* bit 0 = Object ram bank swap */
 	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_BASE(&cps1_cps_a_regs)	/* CPS-A custom */
 	AM_RANGE(0x804140, 0x80417f) AM_WRITE(cps1_cps_b_w) AM_BASE(&cps1_cps_b_regs)	/* CPS-B custom */
@@ -902,7 +902,7 @@ static ADDRESS_MAP_START( dead_cps2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE(&cps1_cps_a_regs)	/* mirror (sfa) */
 	AM_RANGE(0x800140, 0x80017f) AM_WRITE(cps1_cps_b_w) AM_BASE(&cps1_cps_b_regs)	/* mirror (sfa) */
 	AM_RANGE(0x804040, 0x804041) AM_WRITE(cps2_eeprom_port_w)		/* EEPROM */
-	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITE(SMH_NOP)				/* Unknown (reset once on startup) */
+	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP				/* Unknown (reset once on startup) */
 	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)		/* bit 0 = Object ram bank swap */
 	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_BASE(&cps1_cps_a_regs)	/* CPS-A custom */
 	AM_RANGE(0x804140, 0x80417f) AM_WRITE(cps1_cps_b_w) AM_BASE(&cps1_cps_b_regs)	/* CPS-B custom */

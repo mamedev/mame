@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(tagteam_control_w)
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_WRITE(sound_command_w)
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW2")
-//  AM_RANGE(0x2003, 0x2003) AM_WRITE(SMH_NOP) /* Appears to increment when you're out of the ring */
+//  AM_RANGE(0x2003, 0x2003) AM_WRITENOP /* Appears to increment when you're out of the ring */
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(tagteam_mirrorvideoram_r, tagteam_mirrorvideoram_w)
 	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(tagteam_mirrorcolorram_r, tagteam_mirrorcolorram_w)
 	AM_RANGE(0x4800, 0x4fff) AM_READ(SMH_RAM)

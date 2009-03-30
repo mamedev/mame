@@ -342,7 +342,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x41000700, 0x41000703) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x42000000, 0x4201ffff) AM_RAM_WRITE(beathead_palette_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x43000000, 0x43000007) AM_READWRITE(beathead_hsync_ram_r, beathead_hsync_ram_w)
-	AM_RANGE(0x8df80000, 0x8df80003) AM_READ(SMH_NOP)	/* noisy x4 during scanline int */
+	AM_RANGE(0x8df80000, 0x8df80003) AM_READNOP	/* noisy x4 during scanline int */
 	AM_RANGE(0x8f380000, 0x8f3fffff) AM_WRITE(beathead_vram_latch_w)
 	AM_RANGE(0x8f900000, 0x8f97ffff) AM_WRITE(beathead_vram_transparent_w)
 	AM_RANGE(0x8f980000, 0x8f9fffff) AM_RAM AM_BASE(&videoram32)

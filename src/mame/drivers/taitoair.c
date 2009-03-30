@@ -388,8 +388,8 @@ static ADDRESS_MAP_START( airsys_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
 	AM_RANGE(0xa00100, 0xa00107) AM_READ(stick2_input_r)
 	AM_RANGE(0xa00200, 0xa0020f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)	/* other I/O */
-	AM_RANGE(0xa80000, 0xa80001) AM_READWRITE(SMH_NOP, taitosound_port16_lsb_w)
-	AM_RANGE(0xa80002, 0xa80003) AM_READWRITE(taitosound_comm16_lsb_r, taitosound_comm16_lsb_w)
+	AM_RANGE(0xa80000, 0xa80001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
+	AM_RANGE(0xa80002, 0xa80003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM						/* "power common ram" (mecha drive) */
 ADDRESS_MAP_END
 
@@ -402,10 +402,10 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP)		/* pan control */
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) 		/* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) 		/* ? */
+	AM_RANGE(0xe400, 0xe403) AM_WRITENOP		/* pan control */
+	AM_RANGE(0xea00, 0xea00) AM_READNOP
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP 		/* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP 		/* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 

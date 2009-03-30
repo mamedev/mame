@@ -179,19 +179,19 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x08, 0x09) AM_READ(m107_sound_status_r)	/* answer from sound CPU */
 	AM_RANGE(0x00, 0x01) AM_WRITE(m107_soundlatch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m107_coincounter_w)
-	AM_RANGE(0x04, 0x05) AM_WRITE(SMH_NOP) /* ??? 0008 */
+	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
 	AM_RANGE(0x06, 0x07) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x80, 0x9f) AM_WRITE(m107_control_w)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(SMH_NOP) /* Written with 0's in interrupt */
+	AM_RANGE(0xa0, 0xaf) AM_WRITENOP /* Written with 0's in interrupt */
 	AM_RANGE(0xb0, 0xb1) AM_WRITE(m107_spritebuffer_w)
-	AM_RANGE(0xc0, 0xc3) AM_READ(SMH_NOP) /* Only wpksoc: ticket related? */
+	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITE(SMH_NOP) /* Irq controller? */
+	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITENOP /* Irq controller? */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", irem_ga20_r, irem_ga20_w, 0x00ff)
 	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ym", ym2151_r, ym2151_w, 0x00ff)

@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( jumpcoas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("JOYS")
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) // Unused, but initialized
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
@@ -240,7 +240,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_RAM)  // Reset PSG's
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay8910.1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay8910.2", ay8910_address_data_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ(SMH_NOP) // only for Imago, read but not used
+	AM_RANGE(0x7000, 0x7000) AM_READNOP // only for Imago, read but not used
 ADDRESS_MAP_END
 
 

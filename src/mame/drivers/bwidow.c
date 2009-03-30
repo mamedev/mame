@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( bwidow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x88c0, 0x88c0) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
 	AM_RANGE(0x8900, 0x8900) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
 	AM_RANGE(0x8940, 0x897f) AM_DEVWRITE("earom", atari_vg_earom_w)
-	AM_RANGE(0x8980, 0x89ed) AM_WRITE(SMH_NOP) /* watchdog clear */
+	AM_RANGE(0x8980, 0x89ed) AM_WRITENOP /* watchdog clear */
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -376,11 +376,11 @@ static ADDRESS_MAP_START( spacduel_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0900, 0x0907) AM_READ(spacduel_IN3_r)	/* IN1 */
-	AM_RANGE(0x0905, 0x0906) AM_WRITE(SMH_NOP) /* ignore? */
+	AM_RANGE(0x0905, 0x0906) AM_WRITENOP /* ignore? */
 	AM_RANGE(0x0a00, 0x0a00) AM_DEVREAD("earom", atari_vg_earom_r)
 //  AM_RANGE(0x0c00, 0x0c00) AM_WRITE(coin_counter_w) /* coin out */
 	AM_RANGE(0x0c80, 0x0c80) AM_WRITE(avgdvg_go_w)
-	AM_RANGE(0x0d00, 0x0d00) AM_WRITE(SMH_NOP) /* watchdog clear */
+	AM_RANGE(0x0d00, 0x0d00) AM_WRITENOP /* watchdog clear */
 	AM_RANGE(0x0d80, 0x0d80) AM_WRITE(avgdvg_reset_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
 	AM_RANGE(0x0e80, 0x0e80) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)

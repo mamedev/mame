@@ -865,7 +865,7 @@ static ADDRESS_MAP_START( namconb1_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE(namco_tilemapvideoram32_r,namco_tilemapvideoram32_w )
 	AM_RANGE(0x660000, 0x66003f) AM_READWRITE(namco_tilemapcontrol32_r,namco_tilemapcontrol32_w)
 	AM_RANGE(0x680000, 0x68000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&namconb1_spritebank32)
-	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITENOP
 	AM_RANGE(0x700000, 0x707fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&paletteram32)
 ADDRESS_MAP_END
 
@@ -888,7 +888,7 @@ static ADDRESS_MAP_START( namconb2_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x940000, 0x94000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&namconb1_tilebank32)
 	AM_RANGE(0x980000, 0x98000f) AM_READ(namco_rozbank32_r) AM_WRITE(namco_rozbank32_w)
 	AM_RANGE(0xa00000, 0xa007ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&nvmem32)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
 	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE(namconb_cpureg_r, namconb2_cpureg_w)
 ADDRESS_MAP_END /* namconb2_readmem */
 

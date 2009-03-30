@@ -56,9 +56,9 @@ static ADDRESS_MAP_START( writemem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(markham_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM) AM_SHARE(1)
 
-	AM_RANGE(0xe008, 0xe008) AM_WRITE(SMH_NOP) /* coin counter? */
+	AM_RANGE(0xe008, 0xe008) AM_WRITENOP /* coin counter? */
 
-	AM_RANGE(0xe009, 0xe009) AM_WRITE(SMH_NOP) /* to CPU2 busreq */
+	AM_RANGE(0xe009, 0xe009) AM_WRITENOP /* to CPU2 busreq */
 
 	AM_RANGE(0xe00c, 0xe00d) AM_WRITE(SMH_RAM) AM_BASE(&markham_xscroll)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(markham_flipscreen_w)
@@ -76,8 +76,8 @@ static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE("sn2", sn76496_w)
 
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(SMH_NOP) /* unknown */
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0xc002, 0xc002) AM_WRITENOP /* unknown */
+	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /* unknown */
 ADDRESS_MAP_END
 
 

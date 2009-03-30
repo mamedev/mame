@@ -673,15 +673,15 @@ static ADDRESS_MAP_START( tumblepopb_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITE(SMH_RAM) /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
 	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
 	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
-	AM_RANGE(0x340000, 0x3401ff) AM_WRITE(SMH_NOP) /* Unused row scroll */
-	AM_RANGE(0x340400, 0x34047f) AM_WRITE(SMH_NOP) /* Unused col scroll */
-	AM_RANGE(0x342000, 0x3421ff) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x342400, 0x34247f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
+	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
+	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
+	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fncywld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -697,15 +697,15 @@ static ADDRESS_MAP_START( fncywld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* sprites */
 	AM_RANGE(0x160800, 0x16080f) AM_WRITE(SMH_RAM) /* goes slightly past the end of spriteram? */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
 	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(fncywld_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
 	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fncywld_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
-	AM_RANGE(0x340000, 0x3401ff) AM_WRITE(SMH_NOP) /* Unused row scroll */
-	AM_RANGE(0x340400, 0x34047f) AM_WRITE(SMH_NOP) /* Unused col scroll */
-	AM_RANGE(0x342000, 0x3421ff) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x342400, 0x34247f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
+	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
+	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
+	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -723,7 +723,7 @@ static ADDRESS_MAP_START( htchctch_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
 	AM_RANGE(0x320000, 0x321fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
@@ -859,15 +859,15 @@ static ADDRESS_MAP_START( jumpkids_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITE(SMH_RAM) /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepopb_controls_r)
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE(tumblepb_control_0_w)
 	AM_RANGE(0x320000, 0x320fff) AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
 	AM_RANGE(0x322000, 0x322fff) AM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
-	AM_RANGE(0x340000, 0x3401ff) AM_WRITE(SMH_NOP) /* Unused row scroll */
-	AM_RANGE(0x340400, 0x34047f) AM_WRITE(SMH_NOP) /* Unused col scroll */
-	AM_RANGE(0x342000, 0x3421ff) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x342400, 0x34247f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
+	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
+	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
+	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( jumpkids_oki_bank_w )

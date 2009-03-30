@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
-	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
 	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_mode)
 	AM_RANGE(0xd700, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE(taitosj_bankswitch_w)
-	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
 	AM_RANGE(0xd600, 0xd600) AM_MIRROR(0x00ff) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_video_mode)
 	AM_RANGE(0xd700, 0xdfff) AM_NOP
 	AM_RANGE(0xe000, 0xffff) AM_ROM

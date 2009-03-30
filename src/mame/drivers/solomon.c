@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
-	AM_RANGE(0xffff, 0xffff) AM_WRITE(SMH_NOP)	/* watchdog? */
+	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	/* watchdog? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )

@@ -130,8 +130,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-//  AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_NOP) // ? written only once ?
-//  AM_RANGE(0xe001, 0xe001) AM_WRITE(SMH_NOP) // ?
+//  AM_RANGE(0xe000, 0xe000) AM_WRITENOP // ? written only once ?
+//  AM_RANGE(0xe001, 0xe001) AM_WRITENOP // ?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerins_io_snd, ADDRESS_SPACE_IO, 8 )

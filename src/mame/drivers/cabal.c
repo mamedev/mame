@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0008, 0xa000f) AM_READ(track_r)
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(track_reset_w)
-	AM_RANGE(0xc0040, 0xc0041) AM_WRITE(SMH_NOP) /* ??? */
+	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabal_sound_irq_trigger_word_w)	// fix coin insertion
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( cabalbl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa0009) AM_READ_PORT("JOY")
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc0040, 0xc0041) AM_WRITE(SMH_NOP) /* ??? */
+	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(cabalbl_sndcmd_w)
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( cabalbl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
 	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x400e, 0x400f) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(SMH_NOP)  /* ??? */
+	AM_RANGE(0x6000, 0x6000) AM_WRITENOP  /* ??? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

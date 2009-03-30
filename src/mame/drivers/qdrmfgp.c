@@ -351,10 +351,10 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280000, 0x280fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x300000, 0x30003f) AM_WRITE(K056832_word_w)		/* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_WRITE(K053252_word_w)		/* ccu */
-	AM_RANGE(0x350000, 0x350001) AM_WRITE(SMH_NOP)			/* unknown */
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(SMH_NOP)			/* unknown */
+	AM_RANGE(0x350000, 0x350001) AM_WRITENOP			/* unknown */
+	AM_RANGE(0x360000, 0x360001) AM_WRITENOP			/* unknown */
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp_control_w)			/* control reg */
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(SMH_NOP)			/* Watchdog */
+	AM_RANGE(0x380000, 0x380001) AM_WRITENOP			/* Watchdog */
 	AM_RANGE(0x800000, 0x80045f) AM_DEVWRITE8("konami", k054539_w, 0x00ff)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_WRITE(K056832_ram_word_w)	/* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_WRITE(K056832_ram_word_w)	/* vram (mirror) */
@@ -388,10 +388,10 @@ static ADDRESS_MAP_START( gp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280000, 0x280fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x300000, 0x30003f) AM_WRITE(K056832_word_w)		/* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_WRITE(K053252_word_w)		/* ccu */
-	AM_RANGE(0x350000, 0x350001) AM_WRITE(SMH_NOP)			/* unknown */
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(SMH_NOP)			/* unknown */
+	AM_RANGE(0x350000, 0x350001) AM_WRITENOP			/* unknown */
+	AM_RANGE(0x360000, 0x360001) AM_WRITENOP			/* unknown */
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp2_control_w)		/* control reg */
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(SMH_NOP)			/* Watchdog */
+	AM_RANGE(0x380000, 0x380001) AM_WRITENOP			/* Watchdog */
 	AM_RANGE(0x800000, 0x80045f) AM_DEVWRITE8("konami", k054539_w, 0x00ff)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_WRITE(gp2_vram_w)			/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_WRITE(gp2_vram_mirror_w)	/* vram (mirror) */

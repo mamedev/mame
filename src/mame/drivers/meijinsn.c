@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( meijinsn_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x06, 0x06) AM_WRITENOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( meijinsn )

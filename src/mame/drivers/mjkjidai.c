@@ -191,7 +191,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(keyboard_r)
-	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP)	// ???
+	AM_RANGE(0x01, 0x01) AM_READNOP	// ???
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x01, 0x02) AM_WRITE(keyboard_select_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc

@@ -57,8 +57,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0300, 0x0300) AM_DEVWRITE("sn1", sn76496_w) 	/* trigger chip to read from latch. The program always */
 	AM_RANGE(0x0400, 0x0400) AM_DEVWRITE("sn2", sn76496_w) 	/* writes the same number as the latch, so we don't */
 										/* bother emulating them. */
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(SMH_NOP)	/* latch for 76496 #0 */
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_NOP)	/* latch for 76496 #1 */
+	AM_RANGE(0x0800, 0x0800) AM_WRITENOP	/* latch for 76496 #0 */
+	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* latch for 76496 #1 */
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(shaolins_palettebank_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(shaolins_scroll_w)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(SMH_RAM)	/* RAM BANK 2 */

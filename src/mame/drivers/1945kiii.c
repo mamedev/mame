@@ -131,8 +131,8 @@ static WRITE16_HANDLER( k3_soundbanks_w )
 
 
 static ADDRESS_MAP_START( k3_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITE(SMH_NOP)	// bug in code? (clean up log)
-	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITE(SMH_NOP)	// bug in code? (clean up log)
+	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP	// bug in code? (clean up log)
+	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITENOP	// bug in code? (clean up log)
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// Main Ram

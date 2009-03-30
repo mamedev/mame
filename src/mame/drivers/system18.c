@@ -229,26 +229,26 @@ static ADDRESS_MAP_START( shdancbl_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xc400) AM_READ(soundlatch_r)
 	AM_RANGE(0xcc00, 0xcc03) AM_DEVREAD("3438.0", ym3438_r)
 	AM_RANGE(0xd000, 0xd003) AM_DEVREAD("3438.1", ym3438_r)
-	AM_RANGE(0xdf00, 0xdfff) AM_READ(SMH_NOP)
+	AM_RANGE(0xdf00, 0xdfff) AM_READNOP
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(shdancbl_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_NOP) /* ROM bank */
-	AM_RANGE(0xc000, 0xc00f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITENOP /* ROM bank */
+	AM_RANGE(0xc000, 0xc00f) AM_WRITENOP
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(shdancbl_msm5205_data_w)
 	AM_RANGE(0xcc00, 0xcc03) AM_DEVWRITE("3438.0", ym3438_w)
 	AM_RANGE(0xd000, 0xd003) AM_DEVWRITE("3438.1", ym3438_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(shdancbl_bankctrl_w)
-	AM_RANGE(0xdf00, 0xdfff) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xdf00, 0xdfff) AM_WRITENOP
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shdancbl_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xa0, 0xbf) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc0, 0xdf) AM_READ(SMH_NOP)
+	AM_RANGE(0xa0, 0xbf) AM_WRITENOP
+	AM_RANGE(0xc0, 0xdf) AM_READNOP
 ADDRESS_MAP_END
 
 /***************************************************************************/
@@ -672,12 +672,12 @@ static ADDRESS_MAP_START( shdancbl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x440000, 0x440fff) AM_WRITE(SYS16_MWA16_SPRITERAM) AM_BASE(&sys16_spriteram)
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE(SYS16_MWA16_PALETTERAM) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(vdp_w)
-	AM_RANGE(0xe4001c, 0xe4001d) AM_WRITE(SMH_NOP) // to prevent access to screen blanking control below
+	AM_RANGE(0xe4001c, 0xe4001d) AM_WRITENOP // to prevent access to screen blanking control below
 	AM_RANGE(0xe40000, 0xe4ffff) AM_WRITE(sys18_io_w)
 	AM_RANGE(0xc40006, 0xc40007) AM_WRITE(sound_command_irq_w)
-	AM_RANGE(0xc44000, 0xc44001) AM_WRITE(SMH_NOP) // only used via clr.w after tilebank set
-	AM_RANGE(0xc46000, 0xc46fff) AM_WRITE(SMH_NOP) // bootleg specific video hardware
-	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITE(SMH_NOP) // config regs
+	AM_RANGE(0xc44000, 0xc44001) AM_WRITENOP // only used via clr.w after tilebank set
+	AM_RANGE(0xc46000, 0xc46fff) AM_WRITENOP // bootleg specific video hardware
+	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITENOP // config regs
 	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SYS16_MWA16_WORKINGRAM) AM_BASE(&sys16_workingram)
 ADDRESS_MAP_END
 
@@ -767,7 +767,7 @@ static ADDRESS_MAP_START( mwalkbl_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc41002, 0xc41003) AM_READ_PORT("P1")
 	AM_RANGE(0xc41004, 0xc41005) AM_READ_PORT("P2")
 	AM_RANGE(0xc41006, 0xc41007) AM_READ_PORT("P3")
-	AM_RANGE(0xc41008, 0xc41009) AM_READ(SMH_NOP) // figure this out, extra input for 3p?
+	AM_RANGE(0xc41008, 0xc41009) AM_READNOP // figure this out, extra input for 3p?
 	AM_RANGE(0xc41000, 0xc41001) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xe40000, 0xe4ffff) AM_READ(SYS16_MRA16_EXTRAM2)
 	AM_RANGE(0xffe02c, 0xffe02d) AM_READ(mwalkbl_skip_r)
@@ -785,7 +785,7 @@ static ADDRESS_MAP_START( mwalkbl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc46600, 0xc46601) AM_WRITE(sys18_refreshenable_w)
 	AM_RANGE(0xc46800, 0xc46801) AM_WRITE(sys18_tilebank_w)
 	AM_RANGE(0xe40000, 0xe4ffff) AM_WRITE(SYS16_MWA16_EXTRAM2) AM_BASE(&sys16_extraram2)
-	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITE(SMH_NOP) // config regs
+	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITENOP // config regs
 	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SYS16_MWA16_WORKINGRAM) AM_BASE(&sys16_workingram)
 ADDRESS_MAP_END
 
@@ -916,7 +916,7 @@ static ADDRESS_MAP_START( astormbl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0000e, 0xa0000f) AM_WRITE(sys18_tilebank_w)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(vdp_w)
 	AM_RANGE(0xc46600, 0xc46601) AM_WRITE(sys18_refreshenable_w)
-	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xfe0020, 0xfe003f) AM_WRITENOP
 	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SYS16_MWA16_WORKINGRAM) AM_BASE(&sys16_workingram)
 ADDRESS_MAP_END
 

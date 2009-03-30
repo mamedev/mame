@@ -928,7 +928,7 @@ static ADDRESS_MAP_START( kengo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0xb4000, 0xb4001) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
@@ -945,7 +945,7 @@ static ADDRESS_MAP_START( m72_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w)	/* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
-	//AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
+	//AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -959,7 +959,7 @@ static ADDRESS_MAP_START( rtype2_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -972,7 +972,7 @@ static ADDRESS_MAP_START( poundfor_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -985,7 +985,7 @@ static ADDRESS_MAP_START( majtitle_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -1001,7 +1001,7 @@ static ADDRESS_MAP_START( hharry_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)	/* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -1018,7 +1018,7 @@ static ADDRESS_MAP_START( kengo_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
-//AM_RANGE(0x8c, 0x8f) AM_WRITE(SMH_NOP)   /* ??? */
+//AM_RANGE(0x8c, 0x8f) AM_WRITENOP   /* ??? */
 ADDRESS_MAP_END
 
 

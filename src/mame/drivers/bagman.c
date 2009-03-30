@@ -192,9 +192,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM		/* Super Bagman only */
 
 #if 0
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)	/* ???? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	/* ???? */
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(SMH_NOP)	/* ???? */
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* ???? */
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	/* ???? */
+	AM_RANGE(0xb800, 0xb800) AM_WRITENOP	/* ???? */
 #endif
 ADDRESS_MAP_END
 
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x981f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
-	AM_RANGE(0x9c00, 0x9fff) AM_WRITE(SMH_NOP)	/* written to, but unused */
+	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(SMH_RAM) AM_BASE(&bagman_video_enable)
@@ -216,9 +216,9 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW")
 
 
-	AM_RANGE(0xa005, 0xa005) AM_WRITE(SMH_NOP)	/* ???? */
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(SMH_NOP)	/* ???? */
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)	/* ???? */
+	AM_RANGE(0xa005, 0xa005) AM_WRITENOP	/* ???? */
+	AM_RANGE(0xa006, 0xa006) AM_WRITENOP	/* ???? */
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* ???? */
 
 	/* guess */
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("ay2", ay8910_address_w)
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("ay", ay8910_r)
-	//AM_RANGE(0x56, 0x56) AM_WRITE(SMH_NOP)
+	//AM_RANGE(0x56, 0x56) AM_WRITENOP
 ADDRESS_MAP_END
 
 

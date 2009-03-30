@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( freekckb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf003) AM_DEVREAD("ppi8255_1", ppi8255_r)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
-	AM_RANGE(0xf802, 0xf802) AM_READ(SMH_NOP)	//MUST return bit 0 = 0, otherwise game resets
+	AM_RANGE(0xf802, 0xf802) AM_READNOP	//MUST return bit 0 = 0, otherwise game resets
 	AM_RANGE(0xf803, 0xf803) AM_READ(spinner_r)
 ADDRESS_MAP_END
 
@@ -247,11 +247,11 @@ static ADDRESS_MAP_START( gigas_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(freek_videoram_w) AM_BASE(&freek_videoram)
 	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe001) AM_WRITE(SMH_NOP)// probably not flipscreen
+	AM_RANGE(0xe000, 0xe001) AM_WRITENOP// probably not flipscreen
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xe005, 0xe005) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) //bankswitch ?
+	AM_RANGE(0xe005, 0xe005) AM_WRITENOP
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP //bankswitch ?
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("sn2", sn76496_w)
 	AM_RANGE(0xfc02, 0xfc02) AM_DEVWRITE("sn3", sn76496_w)
@@ -261,13 +261,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gigas_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, spinner_select_w)
-	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP) //unused dip 3
+	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oigas_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, spinner_select_w)
-	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP) //unused dip 3
+	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
 	AM_RANGE(0x02, 0x02) AM_READ(oigas_2_r)
 	AM_RANGE(0x03, 0x03) AM_READ(oigas_3_r)
 	AM_RANGE(0x05, 0x05) AM_WRITE(oigas_5_w)

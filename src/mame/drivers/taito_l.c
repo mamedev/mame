@@ -689,7 +689,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fhawk_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK6)
-	AM_RANGE(0xc800, 0xc800) AM_READ(SMH_NOP)
+	AM_RANGE(0xc800, 0xc800) AM_READNOP
 	AM_RANGE(0xc801, 0xc801) AM_READ(taitosound_comm_r)
 	AM_RANGE(0xe000, 0xffff) AM_READ(shared_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
@@ -704,9 +704,9 @@ static ADDRESS_MAP_START( fhawk_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(taitosound_port_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(taitosound_comm_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(SMH_NOP)	// Direct copy of input port 0
+	AM_RANGE(0xd000, 0xd000) AM_WRITENOP	// Direct copy of input port 0
 	AM_RANGE(0xd004, 0xd004) AM_WRITE(control2_w)
-	AM_RANGE(0xd005, 0xd006) AM_WRITE(SMH_NOP)	// Always 0
+	AM_RANGE(0xd005, 0xd006) AM_WRITENOP	// Always 0
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(shared_w)
 ADDRESS_MAP_END
 
@@ -714,7 +714,7 @@ static ADDRESS_MAP_START( fhawk_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(SMH_NOP)
+	AM_RANGE(0xe000, 0xe000) AM_READNOP
 	AM_RANGE(0xe001, 0xe001) AM_READ(taitosound_slave_comm_r)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREAD("ym", ym2203_r)
 ADDRESS_MAP_END
@@ -731,8 +731,8 @@ static ADDRESS_MAP_START( raimais_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_BANKS_READ
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8800, 0x8800) AM_READ(mux_r)
-	AM_RANGE(0x8801, 0x8801) AM_READ(SMH_NOP)	// Watchdog or interrupt ack (value ignored)
-	AM_RANGE(0x8c00, 0x8c00) AM_READ(SMH_NOP)
+	AM_RANGE(0x8801, 0x8801) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0x8c00, 0x8c00) AM_READNOP
 	AM_RANGE(0x8c01, 0x8c01) AM_READ(taitosound_comm_r)
 	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -764,7 +764,7 @@ static ADDRESS_MAP_START( raimais_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
@@ -782,10 +782,10 @@ static ADDRESS_MAP_START( raimais_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
-	AM_RANGE(0xe600, 0xe600) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
+	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
+	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -812,8 +812,8 @@ static ADDRESS_MAP_START( champwr_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN0")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("IN1")
 	AM_RANGE(0xe007, 0xe007) AM_READ_PORT("IN2")
-	AM_RANGE(0xe008, 0xe00f) AM_READ(SMH_NOP)
-	AM_RANGE(0xe800, 0xe800) AM_READ(SMH_NOP)
+	AM_RANGE(0xe008, 0xe00f) AM_READNOP
+	AM_RANGE(0xe800, 0xe800) AM_READNOP
 	AM_RANGE(0xe801, 0xe801) AM_READ(taitosound_comm_r)
 	AM_RANGE(0xf000, 0xf000) AM_READ(rombank2switch_r)
 ADDRESS_MAP_END
@@ -821,7 +821,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champwr_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(shared_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_NOP)	// Watchdog
+	AM_RANGE(0xe000, 0xe000) AM_WRITENOP	// Watchdog
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(control2_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(taitosound_port_w)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(taitosound_comm_w)
@@ -833,7 +833,7 @@ static ADDRESS_MAP_START( champwr_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2203_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(SMH_NOP)
+	AM_RANGE(0xa000, 0xa000) AM_READNOP
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
@@ -856,7 +856,7 @@ static ADDRESS_MAP_START( kurikint_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa800, 0xa800) AM_READ(mux_r)
-	AM_RANGE(0xa801, 0xa801) AM_READ(SMH_NOP)	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0xa801, 0xa801) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurikint_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -896,7 +896,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( puzznic_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_BANKS_READ
 	COMMON_SINGLE_READ
-	AM_RANGE(0xa800, 0xa800) AM_READ(SMH_NOP)	// Watchdog
+	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(SMH_RAM)	// Wrong, used to overcome protection
 	AM_RANGE(0xb800, 0xb800) AM_READ(mcu_data_r)
 	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
@@ -908,14 +908,14 @@ static ADDRESS_MAP_START( puzznic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(SMH_RAM)	// Wrong, used to overcome protection
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(mcu_data_w)
 	AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)	// Control register, function unknown
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
 /* bootleg, doesn't have the MCU */
 static ADDRESS_MAP_START( puzznici_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_BANKS_READ
 	COMMON_SINGLE_READ
-	AM_RANGE(0xa800, 0xa800) AM_READ(SMH_NOP)	// Watchdog
+	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(SMH_RAM)	// Wrong, used to overcome protection
 //  AM_RANGE(0xb800, 0xb800) AM_READ(mcu_data_r)
 	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
@@ -927,7 +927,7 @@ static ADDRESS_MAP_START( puzznici_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(SMH_RAM)	// Wrong, used to overcome protection
 //  AM_RANGE(0xb800, 0xb800) AM_WRITE(mcu_data_w)
 //  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)	// Control register, function unknown
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
 
@@ -939,8 +939,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( plotting_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_BANKS_WRITE
 	COMMON_SINGLE_WRITE
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(SMH_NOP)	// Watchdog or interrupt ack
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(SMH_NOP)	// Control register, function unknown
+	AM_RANGE(0xa800, 0xa800) AM_WRITENOP	// Watchdog or interrupt ack
+	AM_RANGE(0xb800, 0xb800) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
 
@@ -950,14 +950,14 @@ static ADDRESS_MAP_START( palamed_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xb001, 0xb001) AM_READ(SMH_NOP)	// Watchdog or interrupt ack
+	AM_RANGE(0xb001, 0xb001) AM_READNOP	// Watchdog or interrupt ack
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( palamed_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_BANKS_WRITE
 	COMMON_SINGLE_WRITE
-	AM_RANGE(0xa803, 0xa803) AM_WRITE(SMH_NOP)	// Control register, function unknown
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	// Control register, function unknown (copy of 8822)
+	AM_RANGE(0xa803, 0xa803) AM_WRITENOP	// Control register, function unknown
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// Control register, function unknown (copy of 8822)
 ADDRESS_MAP_END
 
 
@@ -967,15 +967,15 @@ static ADDRESS_MAP_START( cachat_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xb001, 0xb001) AM_READ(SMH_NOP)	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0xb001, 0xb001) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0xfff8, 0xfff8) AM_READ(rombankswitch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cachat_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_BANKS_WRITE
 	COMMON_SINGLE_WRITE
-	AM_RANGE(0xa803, 0xa803) AM_WRITE(SMH_NOP)	// Control register, function unknown
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	// Control register, function unknown
+	AM_RANGE(0xa803, 0xa803) AM_WRITENOP	// Control register, function unknown
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// Control register, function unknown
 	AM_RANGE(0xfff8, 0xfff8) AM_WRITE(rombankswitch_w)
 ADDRESS_MAP_END
 
@@ -989,14 +989,14 @@ static ADDRESS_MAP_START( horshoes_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa804, 0xa804) AM_READ(horshoes_tracky_hi_r)
 	AM_RANGE(0xa808, 0xa808) AM_READ(horshoes_trackx_lo_r)
 	AM_RANGE(0xa80c, 0xa80c) AM_READ(horshoes_trackx_hi_r)
-	AM_RANGE(0xb801, 0xb801) AM_READ(SMH_NOP)	// Watchdog or interrupt ack
+	AM_RANGE(0xb801, 0xb801) AM_READNOP	// Watchdog or interrupt ack
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( horshoes_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_BANKS_WRITE
 	COMMON_SINGLE_WRITE
 	AM_RANGE(0xb802, 0xb802) AM_WRITE(horshoes_bankg_w)
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( evilston_readmem, ADDRESS_SPACE_PROGRAM, 8 )

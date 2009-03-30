@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260030, 0x260031) AM_READ(atarigen_sound_r)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(atarigen_scanline_int_ack_w)
-	AM_RANGE(0x360010, 0x360011) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x360010, 0x360011) AM_WRITENOP
 	AM_RANGE(0x360020, 0x360021) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(vindictr_paletteram_w) AM_BASE(&paletteram16)

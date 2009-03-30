@@ -389,7 +389,7 @@ static ADDRESS_MAP_START( nndmseal_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xb40000, 0xb4000b) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_scroll_fg	)	// Foreground Scrolling
 	AM_RANGE(0xb40010, 0xb4001b) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_scroll_bg	)	// Background Scrolling
-	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITE(SMH_NOP)	// scr_size
+	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP	// scr_size
 
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_rotregs)	// Rotation Registers
 

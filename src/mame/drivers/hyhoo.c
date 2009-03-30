@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( hyhoo_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
 	AM_RANGE(0xe0, 0xe1) AM_READ(nb1413m3_gfxrom_r)
 	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r)
-//  AM_RANGE(0xf0, 0xf0) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
 	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 

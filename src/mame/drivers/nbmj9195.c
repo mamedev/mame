@@ -659,8 +659,8 @@ static ADDRESS_MAP_START( writeport_mjuraden, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
 
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xb2, 0xb2) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xb4, 0xb4) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xb2, 0xb2) AM_WRITENOP
+	AM_RANGE(0xb4, 0xb4) AM_WRITENOP
 	AM_RANGE(0xb6, 0xb6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -704,10 +704,10 @@ static ADDRESS_MAP_START( writeport_koinomp, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xc4, 0xc4) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc2, 0xc2) AM_WRITENOP
+	AM_RANGE(0xc4, 0xc4) AM_WRITENOP
 	AM_RANGE(0xc6, 0xc6) AM_WRITE(nbmj9195_inputportsel_w)
-	AM_RANGE(0xcf, 0xcf) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xcf, 0xcf) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -750,8 +750,8 @@ static ADDRESS_MAP_START( writeport_patimono, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb8) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -792,8 +792,8 @@ static ADDRESS_MAP_START( writeport_mmehyou, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -837,8 +837,8 @@ static ADDRESS_MAP_START( writeport_gal10ren, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xc8, 0xc8) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc8, 0xc8) AM_WRITENOP
+	AM_RANGE(0xd0, 0xd0) AM_WRITENOP
 	AM_RANGE(0xd8, 0xd8) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -882,8 +882,8 @@ static ADDRESS_MAP_START( writeport_renaiclb, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_0_w)
 
 	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0x24, 0x24) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x28, 0x28) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x24, 0x24) AM_WRITENOP
+	AM_RANGE(0x28, 0x28) AM_WRITENOP
 	AM_RANGE(0x2c, 0x2c) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -927,8 +927,8 @@ static ADDRESS_MAP_START( writeport_mjlaman, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0x20, 0x20) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0x22, 0x22) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x24, 0x24) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x22, 0x22) AM_WRITENOP
+	AM_RANGE(0x24, 0x24) AM_WRITENOP
 	AM_RANGE(0x26, 0x26) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -972,8 +972,8 @@ static ADDRESS_MAP_START( writeport_mkeibaou, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xd8, 0xd8) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xda, 0xda) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xdc, 0xdc) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xda, 0xda) AM_WRITENOP
+	AM_RANGE(0xdc, 0xdc) AM_WRITENOP
 	AM_RANGE(0xde, 0xde) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1017,8 +1017,8 @@ static ADDRESS_MAP_START( writeport_pachiten, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xe2, 0xe2) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xe4, 0xe4) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
+	AM_RANGE(0xe4, 0xe4) AM_WRITENOP
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1062,8 +1062,8 @@ static ADDRESS_MAP_START( writeport_sailorws, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
+	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1107,8 +1107,8 @@ static ADDRESS_MAP_START( writeport_sailorwr, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xfa, 0xfa) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xfa, 0xfa) AM_WRITENOP
+	AM_RANGE(0xfc, 0xfc) AM_WRITENOP
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1152,8 +1152,8 @@ static ADDRESS_MAP_START( writeport_psailor1, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
+	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1197,8 +1197,8 @@ static ADDRESS_MAP_START( writeport_psailor2, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xe2, 0xe2) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xe4, 0xe4) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
+	AM_RANGE(0xe4, 0xe4) AM_WRITENOP
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1242,8 +1242,8 @@ static ADDRESS_MAP_START( writeport_otatidai, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_WRITENOP
 	AM_RANGE(0xb8, 0xb8) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1287,8 +1287,8 @@ static ADDRESS_MAP_START( writeport_yosimoto, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0x90, 0x90) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x98, 0x98) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x94, 0x94) AM_WRITENOP
+	AM_RANGE(0x98, 0x98) AM_WRITENOP
 	AM_RANGE(0x9c, 0x9c) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1332,8 +1332,8 @@ static ADDRESS_MAP_START( writeport_jituroku, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)
 
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
+	AM_RANGE(0xf0, 0xf0) AM_WRITENOP
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1374,8 +1374,8 @@ static ADDRESS_MAP_START( writeport_ngpgal, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1416,8 +1416,8 @@ static ADDRESS_MAP_START( writeport_mjgottsu, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1458,9 +1458,9 @@ static ADDRESS_MAP_START( writeport_cmehyou, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
-	AM_RANGE(0xb4, 0xb4) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xb4, 0xb4) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -1500,8 +1500,8 @@ static ADDRESS_MAP_START( writeport_mjkoiura, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(nbmj9195_blitter_0_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1542,8 +1542,8 @@ static ADDRESS_MAP_START( writeport_mkoiuraa, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nbmj9195_sound_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
@@ -1586,7 +1586,7 @@ static ADDRESS_MAP_START( writeport_mscoutm, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
 	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
 
-	AM_RANGE(0xa0, 0xa6) AM_WRITE(SMH_NOP)			// nb22090 param ?
+	AM_RANGE(0xa0, 0xa6) AM_WRITENOP			// nb22090 param ?
 
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
 	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_1_w)
@@ -1633,7 +1633,7 @@ static ADDRESS_MAP_START( writeport_imekura, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
 	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
 
-	AM_RANGE(0xb0, 0xb6) AM_WRITE(SMH_NOP)			// nb22090 param ?
+	AM_RANGE(0xb0, 0xb6) AM_WRITENOP			// nb22090 param ?
 
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_0_w)
 	AM_RANGE(0xe0, 0xef) AM_WRITE(nbmj9195_blitter_1_w)
@@ -1680,7 +1680,7 @@ static ADDRESS_MAP_START( writeport_mjegolf, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xb0, 0xbf) AM_WRITE(nbmj9195_clut_0_w)
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
 
-	AM_RANGE(0x80, 0x86) AM_WRITE(SMH_NOP)			// nb22090 param ?
+	AM_RANGE(0x80, 0x86) AM_WRITENOP			// nb22090 param ?
 
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(nbmj9195_blitter_0_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(nbmj9195_blitter_1_w)

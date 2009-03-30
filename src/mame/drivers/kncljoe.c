@@ -66,8 +66,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd801, 0xd801) AM_WRITE(kncljoe_control_w)
 	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0xd803, 0xd803) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0xd807, 0xd807) AM_READ(SMH_NOP)		/* unknown read */
-	AM_RANGE(0xd817, 0xd817) AM_READ(SMH_NOP)		/* unknown read */
+	AM_RANGE(0xd807, 0xd807) AM_READNOP		/* unknown read */
+	AM_RANGE(0xd817, 0xd817) AM_READNOP		/* unknown read */
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END

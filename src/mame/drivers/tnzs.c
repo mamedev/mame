@@ -757,7 +757,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_READ(tnzs_sharedram_r)	/* WORK RAM (shared by the 2 z80's) */
 	AM_RANGE(0xf000, 0xf1ff) AM_READ(SMH_RAM)	/* VDC RAM */
-	AM_RANGE(0xf600, 0xf600) AM_READ(SMH_NOP)	/* ? */
+	AM_RANGE(0xf600, 0xf600) AM_READNOP	/* ? */
 	AM_RANGE(0xf800, 0xfbff) AM_READ(SMH_RAM)	/* not in extrmatn and arknoid2 (PROMs instead) */
 ADDRESS_MAP_END
 

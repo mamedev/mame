@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe900, 0xefff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)  /* program and gfx ROM banks */
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)    /* cpu reset lines + other unknown stuff */
-	AM_RANGE(0xf018, 0xf018) AM_WRITE(SMH_NOP)    // watchdog_reset_w },
+	AM_RANGE(0xf018, 0xf018) AM_WRITENOP    // watchdog_reset_w },
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)    /* communication ram */
 ADDRESS_MAP_END
 
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( m68705_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(mexico86_68705_portB_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(mexico86_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(mexico86_68705_ddrB_w)
-	AM_RANGE(0x000a, 0x000a) AM_WRITE(SMH_NOP)    /* looks like a bug in the code, writes to */
+	AM_RANGE(0x000a, 0x000a) AM_WRITENOP    /* looks like a bug in the code, writes to */
 									/* 0x0a (=10dec) instead of 0x10 */
 	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)

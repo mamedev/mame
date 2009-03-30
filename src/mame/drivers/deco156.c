@@ -197,9 +197,9 @@ static ADDRESS_MAP_START( hvysmsh_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x120000, 0x120003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x120000, 0x120003) AM_WRITE(SMH_NOP) // Volume control in low byte
+	AM_RANGE(0x120000, 0x120003) AM_WRITENOP // Volume control in low byte
 	AM_RANGE(0x120004, 0x120007) AM_WRITE(hvysmsh_eeprom_w)
-	AM_RANGE(0x120008, 0x12000b) AM_WRITE(SMH_NOP) // IRQ ack?
+	AM_RANGE(0x120008, 0x12000b) AM_WRITENOP // IRQ ack?
 	AM_RANGE(0x12000c, 0x12000f) AM_DEVWRITE("oki1", hvysmsh_oki_0_bank_w)
 	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x000000ff)
 	AM_RANGE(0x160000, 0x160003) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x000000ff)
@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( hvysmsh_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE( wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w )
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE( wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w )
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_READ(SMH_RAM) AM_WRITE(deco32_nonbuffered_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x1d0010, 0x1d002f) AM_READ(SMH_NOP) // Check for DMA complete?
+	AM_RANGE(0x1d0010, 0x1d002f) AM_READNOP // Check for DMA complete?
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 

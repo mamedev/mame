@@ -198,9 +198,9 @@ static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM_WRITE(apache3_palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE(&videoram16)
-	AM_RANGE(0x0e800, 0x0e803) AM_WRITE(SMH_NOP) // CRT
+	AM_RANGE(0x0e800, 0x0e803) AM_WRITENOP // CRT
 	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0f000, 0x0f001) AM_WRITE(SMH_NOP) // todo
+	AM_RANGE(0x0f000, 0x0f001) AM_WRITENOP // todo
 	AM_RANGE(0x0f800, 0x0f801) AM_READWRITE(apache3_bank_r, apache3_bank_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(apache3_v30_v20_r, apache3_v30_v20_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
@@ -272,8 +272,8 @@ static ADDRESS_MAP_START( roundup5_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff8, 0xfff8) AM_READ_PORT("IN0")
 	AM_RANGE(0xfff9, 0xfff9) AM_READ_PORT("IN1")
 	AM_RANGE(0xfffc, 0xfffc) AM_READ_PORT("STICKX")
-	AM_RANGE(0xfff9, 0xfff9) AM_WRITE(SMH_NOP) //irq ack?
-	AM_RANGE(0xfffa, 0xfffa) AM_WRITE(SMH_NOP) //irq ack?
+	AM_RANGE(0xfff9, 0xfff9) AM_WRITENOP //irq ack?
+	AM_RANGE(0xfffa, 0xfffa) AM_WRITENOP //irq ack?
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -327,7 +327,7 @@ static ADDRESS_MAP_START( cyclwarr_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff0, 0xfff1) AM_DEVREADWRITE("ym", tatsumi_hack_ym2151_r, ym2151_w)
 	AM_RANGE(0xfff4, 0xfff4) AM_DEVREADWRITE("oki", tatsumi_hack_oki_r, okim6295_w)
 	AM_RANGE(0xfffc, 0xfffc) AM_READ(soundlatch_r)
-	AM_RANGE(0xfffe, 0xfffe) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xfffe, 0xfffe) AM_WRITENOP
 ADDRESS_MAP_END
 
 /******************************************************************************/

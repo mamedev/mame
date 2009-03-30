@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1d05, 0x1d05) AM_WRITE(SMH_RAM) AM_BASE(&sprint8_team)
 	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(sprint8_attract_w)
 	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(sprint8_motor_w)
-	AM_RANGE(0x1f00, 0x1f00) AM_WRITE(SMH_NOP) /* probably a watchdog, disabled in service mode */
+	AM_RANGE(0x1f00, 0x1f00) AM_WRITENOP /* probably a watchdog, disabled in service mode */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END

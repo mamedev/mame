@@ -422,8 +422,8 @@ static ADDRESS_MAP_START( NAME##_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )					\
 	AM_RANGE(ADDR_LOWROM, ADDR_LOWROM+0x3fff) AM_ROM									\
 	AM_RANGE(0x8000, 0xbfff) AM_ROM														\
 	AM_RANGE(0xf000, 0xffff) AM_ROM														\
-	AM_RANGE(ADDR_UNK1, ADDR_UNK1) AM_WRITE(SMH_NOP) /* ??? written (not always) at end of interrupt */	\
-	AM_RANGE(ADDR_UNK2, ADDR_UNK2) AM_WRITE(SMH_NOP) /* ??? written (not always) at end of interrupt */	\
+	AM_RANGE(ADDR_UNK1, ADDR_UNK1) AM_WRITENOP /* ??? written (not always) at end of interrupt */	\
+	AM_RANGE(ADDR_UNK2, ADDR_UNK2) AM_WRITENOP /* ??? written (not always) at end of interrupt */	\
 ADDRESS_MAP_END
 
 #define UNUSED 0x4000

@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( turbofrc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0ff006, 0x0ff007) AM_READWRITE(pending_command_r, aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0ff008, 0x0ff009) AM_READ_PORT("IN2")
 	AM_RANGE(0x0ff008, 0x0ff00b) AM_WRITE(turbofrc_gfxbank_w)
-	AM_RANGE(0x0ff00c, 0x0ff00d) AM_WRITE(SMH_NOP)	/* related to bg2 (written together with the scroll registers) */
+	AM_RANGE(0x0ff00c, 0x0ff00d) AM_WRITENOP	/* related to bg2 (written together with the scroll registers) */
 	AM_RANGE(0x0ff00e, 0x0ff00f) AM_WRITE(turbofrc_sound_command_w)
 ADDRESS_MAP_END
 

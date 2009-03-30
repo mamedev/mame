@@ -491,7 +491,7 @@ static ADDRESS_MAP_START( darius_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym1", ym2203_r)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym2", ym2203_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(SMH_NOP)
+	AM_RANGE(0xb000, 0xb000) AM_READNOP
 	AM_RANGE(0xb001, 0xb001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
@@ -518,7 +518,7 @@ static ADDRESS_MAP_START( darius_sound2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_NOP)	/* writes rom whenever interrupt occurs - as no stack */
+	AM_RANGE(0x0000, 0xffff) AM_WRITENOP	/* writes rom whenever interrupt occurs - as no stack */
 	/* yes, no RAM */
 ADDRESS_MAP_END
 

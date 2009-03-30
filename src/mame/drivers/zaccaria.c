@@ -342,7 +342,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6881, 0x68bc) AM_RAM AM_BASE(&spriteram_2) AM_SIZE(&spriteram_2_size)
 	AM_RANGE(0x6c00, 0x6c00) AM_WRITE(zaccaria_flip_screen_x_w)
 	AM_RANGE(0x6c01, 0x6c01) AM_WRITE(zaccaria_flip_screen_y_w)
-	AM_RANGE(0x6c02, 0x6c02) AM_WRITE(SMH_NOP)    /* sound reset */
+	AM_RANGE(0x6c02, 0x6c02) AM_WRITENOP    /* sound reset */
 	AM_RANGE(0x6c06, 0x6c06) AM_WRITE(coin_w)
 	AM_RANGE(0x6c07, 0x6c07) AM_WRITE(nmienable_w)
 	AM_RANGE(0x6c00, 0x6c07) AM_READ(zaccaria_prot2_r)

@@ -491,14 +491,14 @@ static ADDRESS_MAP_START( midvunit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x980040, 0x980040) AM_READWRITE(midvunit_page_control_r, midvunit_page_control_w)
 	AM_RANGE(0x980080, 0x980080) AM_NOP
 	AM_RANGE(0x980082, 0x980083) AM_READ(midvunit_dma_trigger_r)
-	AM_RANGE(0x990000, 0x990000) AM_READ(SMH_NOP)	// link PAL (low 4 bits must == 4)
+	AM_RANGE(0x990000, 0x990000) AM_READNOP	// link PAL (low 4 bits must == 4)
 	AM_RANGE(0x991030, 0x991030) AM_READ_PORT("991030")
 //  AM_RANGE(0x991050, 0x991050) AM_READ(SMH_RAM) // seems to be another port
 	AM_RANGE(0x991060, 0x991060) AM_READ(port0_r)
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
 	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
-	AM_RANGE(0x995000, 0x995000) AM_WRITE(SMH_NOP)	// force feedback?
+	AM_RANGE(0x995000, 0x995000) AM_WRITENOP	// force feedback?
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x997000, 0x997000) AM_NOP	// communications
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)

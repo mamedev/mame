@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE("konami", k051649_frequency_w)
 	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("konami", k051649_volume_w)
 	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE("konami", k051649_keyonoff_w)
-	AM_RANGE(0xf000, 0xf00f) AM_WRITE(SMH_NOP)	/* 053252? f00e = IRQ ack, f00f = NMI ack */
+	AM_RANGE(0xf000, 0xf00f) AM_WRITENOP	/* 053252? f00e = IRQ ack, f00f = NMI ack */
 	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_w)
 	AM_RANGE(0xf480, 0xf480) AM_WRITE(hexion_bankswitch_w)
 	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)

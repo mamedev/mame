@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb802) AM_WRITE(retofinv_gfx_ctrl_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
-	AM_RANGE(0xc002, 0xc002) AM_READ(SMH_NOP)	/* bit 7 must be 0, otherwise game resets */
+	AM_RANGE(0xc002, 0xc002) AM_READNOP	/* bit 7 must be 0, otherwise game resets */
 	AM_RANGE(0xc003, 0xc003) AM_READ(retofinv_mcu_status_r)
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("DSW1")

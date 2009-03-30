@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)				/* probably */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)	/* probably */
-	AM_RANGE(0x1f8c, 0x1f8d) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0x1f8c, 0x1f8d) AM_WRITENOP	/* ??? */
 	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(mainevt_coin_w)	/* coin counters + lamps */
 
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(K052109_051960_w)

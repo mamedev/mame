@@ -193,8 +193,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa800, 0xafff) AM_WRITE(rmhaihai_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(rmhaihai_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb83c, 0xb83c) AM_WRITE(SMH_NOP)	// ??
-	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)	// ??
+	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP	// ??
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// ??
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)	/* rmhaisei only */
 ADDRESS_MAP_END
@@ -207,9 +207,9 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE("msm", adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITE(SMH_NOP)	// ??
-	AM_RANGE(0xbc04, 0xbc04) AM_WRITE(SMH_NOP)	// ??
-	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITE(SMH_NOP)	// ??
+	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
+	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
+	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP	// ??
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( themj_io_map, ADDRESS_SPACE_IO, 8 )
@@ -220,10 +220,10 @@ static ADDRESS_MAP_START( themj_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE("msm", adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITE(SMH_NOP)	// ??
+	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
 	AM_RANGE(0x80a0, 0x80a0) AM_WRITE(themj_rombank_w)
-	AM_RANGE(0xbc04, 0xbc04) AM_WRITE(SMH_NOP)	// ??
-	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITE(SMH_NOP)	// ??
+	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
+	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP	// ??
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mjctrl )

@@ -293,7 +293,7 @@ static ADDRESS_MAP_START( avengers_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf802, 0xf803) AM_WRITE(lwings_bg1_scrolly_w)
 	AM_RANGE(0xf804, 0xf804) AM_WRITE(trojan_bg2_scrollx_w)
 	AM_RANGE(0xf805, 0xf805) AM_WRITE(trojan_bg2_image_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xf808, 0xf808) AM_WRITENOP /* ? */
 	AM_RANGE(0xf809, 0xf809) AM_WRITE(avengers_protection_w)
 	AM_RANGE(0xf80c, 0xf80c) AM_WRITE(avengers_prot_bank_w)
 	AM_RANGE(0xf80d, 0xf80d) AM_WRITE(avengers_adpcm_w)
@@ -366,7 +366,7 @@ ADDRESS_MAP_END
 /* Yes, _no_ ram */
 static ADDRESS_MAP_START( adpcm_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 /*  AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM) avoid cluttering up error.log */
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x0000, 0xffff) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avengers_adpcm_io_map, ADDRESS_SPACE_IO, 8 )

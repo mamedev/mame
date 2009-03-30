@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( writeport_galkoku, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(nb1413m3_nmi_clock_w)
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", DAC_WRITE)
-//  AM_RANGE(0xe0, 0xe0) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(nb1413m3_outcoin_w)
 ADDRESS_MAP_END
 
@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( writeport_hyouban, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(nb1413m3_nmi_clock_w)
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", DAC_WRITE)
-//  AM_RANGE(0xe0, 0xe0) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(nb1413m3_outcoin_w)
 ADDRESS_MAP_END
 
@@ -379,8 +379,8 @@ static ADDRESS_MAP_START( writeport_pstadium, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x7f) AM_WRITE(nbmj8991_blitter_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(nbmj8991_sound_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
-//  AM_RANGE(0xb0, 0xb0) AM_WRITE(SMH_NOP)
-//  AM_RANGE(0xd0, 0xd0) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0xb0, 0xb0) AM_WRITENOP
+//  AM_RANGE(0xd0, 0xd0) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(nb1413m3_outcoin_w)
 ADDRESS_MAP_END
 
@@ -391,8 +391,8 @@ static ADDRESS_MAP_START( writeport_av2mj1bb, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_WRITE(nbmj8991_sound_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_vcrctrl_w)
-//  AM_RANGE(0xd0, 0xd0) AM_WRITE(SMH_NOP)
-//  AM_RANGE(0xf0, 0xf0) AM_WRITE(SMH_NOP)
+//  AM_RANGE(0xd0, 0xd0) AM_WRITENOP
+//  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( sound_writeport_nbmj8991, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", DAC_WRITE)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac2", DAC_WRITE)
 	AM_RANGE(0x04, 0x04) AM_WRITE(nbmj8991_soundbank_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x06, 0x06) AM_WRITENOP
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fm", ym3812_w)
 ADDRESS_MAP_END
 

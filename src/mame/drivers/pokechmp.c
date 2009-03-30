@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0fff) AM_WRITE(pokechmp_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1000, 0x11ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(pokechmp_flipscreen_w)
-	AM_RANGE(0x1802, 0x181f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x1802, 0x181f) AM_WRITENOP
 /* 1800 - 0x181f are unused BAC-06 registers, see video/dec0.c */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(pokechmp_sound_w)
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pokechmp_bank_w)
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(SMH_NOP)	/* MSM5205 chip on Pocket Gal, not connected here? */
+	AM_RANGE(0x1800, 0x1800) AM_WRITENOP	/* MSM5205 chip on Pocket Gal, not connected here? */
 //  AM_RANGE(0x2000, 0x2000) AM_WRITE(pokechmp_sound_bank_w)/ * might still be sound bank */
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("oki", okim6295_w) // extra
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)

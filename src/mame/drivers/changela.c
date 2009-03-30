@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(changela_mem_device_w)			/* River-Tree RAMs, slope ROM, tree ROM */
 
 	/* LS138 - U16 */
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(SMH_NOP)				/* not connected */
+	AM_RANGE(0xc800, 0xc800) AM_WRITENOP				/* not connected */
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(changela_mem_device_select_w)	/* selects the memory device to be accessible at 0xc000-0xc7ff */
 	AM_RANGE(0xca00, 0xca00) AM_WRITE(changela_slope_rom_addr_hi_w)
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(changela_slope_rom_addr_lo_w)
@@ -296,10 +296,10 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	/* LS259 - U44 */
 	AM_RANGE(0xd020, 0xd020) AM_WRITE(changela_collision_reset_0)
 	AM_RANGE(0xd021, 0xd022) AM_WRITE(changela_coin_counter_w)
-//AM_RANGE(0xd023, 0xd023) AM_WRITE(SMH_NOP)
+//AM_RANGE(0xd023, 0xd023) AM_WRITENOP
 	AM_RANGE(0xd024, 0xd024) AM_WRITE(mcu_PC0_w)
 	AM_RANGE(0xd025, 0xd025) AM_WRITE(changela_collision_reset_1)
-	AM_RANGE(0xd026, 0xd026) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xd026, 0xd026) AM_WRITENOP
 
 	AM_RANGE(0xd030, 0xd030) AM_WRITE(mcu_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(watchdog_reset_w)		/* Watchdog */

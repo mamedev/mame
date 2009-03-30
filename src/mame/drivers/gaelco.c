@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bigkarnk_writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)				/* RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("oki", okim6295_w)		/* OKI6295 */
-//  AM_RANGE(0x0900, 0x0900) AM_WRITE(SMH_NOP)             /* enable sound output? */
+//  AM_RANGE(0x0900, 0x0900) AM_WRITENOP             /* enable sound output? */
 	AM_RANGE(0x0a00, 0x0a01) AM_DEVWRITE("ym", ym3812_w)	/* YM3812 */
 	AM_RANGE(0x0c00, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END

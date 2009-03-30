@@ -257,14 +257,14 @@ static ADDRESS_MAP_START( slyspy_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(SMH_ROM)
 
 	/* These locations aren't real!  They are just there so memory is allocated */
-	AM_RANGE(0x232000, 0x23207f) AM_WRITE(SMH_NOP) AM_BASE(&dec0_pf2_colscroll)
-	AM_RANGE(0x232400, 0x2327ff) AM_WRITE(SMH_NOP) AM_BASE(&dec0_pf2_rowscroll)
-	AM_RANGE(0x23c000, 0x23c07f) AM_WRITE(SMH_NOP) AM_BASE(&dec0_pf1_colscroll)
-	AM_RANGE(0x23c400, 0x23c7ff) AM_WRITE(SMH_NOP) AM_BASE(&dec0_pf1_rowscroll)
-	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(SMH_NOP) AM_BASE(&dec0_pf2_data)
-	AM_RANGE(0x202000, 0x203fff) AM_WRITE(SMH_NOP) AM_BASE(&dec0_pf1_data)
+	AM_RANGE(0x232000, 0x23207f) AM_WRITENOP AM_BASE(&dec0_pf2_colscroll)
+	AM_RANGE(0x232400, 0x2327ff) AM_WRITENOP AM_BASE(&dec0_pf2_rowscroll)
+	AM_RANGE(0x23c000, 0x23c07f) AM_WRITENOP AM_BASE(&dec0_pf1_colscroll)
+	AM_RANGE(0x23c400, 0x23c7ff) AM_WRITENOP AM_BASE(&dec0_pf1_rowscroll)
+	AM_RANGE(0x200000, 0x2007ff) AM_WRITENOP AM_BASE(&dec0_pf2_data)
+	AM_RANGE(0x202000, 0x203fff) AM_WRITENOP AM_BASE(&dec0_pf1_data)
 
-	AM_RANGE(0x244000, 0x244001) AM_WRITE(SMH_NOP) /* Extra protection? */
+	AM_RANGE(0x244000, 0x244001) AM_WRITENOP /* Extra protection? */
 
 	/* The location of p1 & pf2 can change between these according to protection */
 	AM_RANGE(0x240000, 0x241fff) AM_WRITE(slyspy_240000_w)
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( slyspy_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x308000, 0x3087ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
 	AM_RANGE(0x310000, 0x3107ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
-	AM_RANGE(0x31c000, 0x31c00f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x31c000, 0x31c00f) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( midres_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( midres_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(dec0_priority_w)
-	AM_RANGE(0x180008, 0x18000f) AM_WRITE(SMH_NOP) /* ?? watchdog ?? */
+	AM_RANGE(0x180008, 0x18000f) AM_WRITENOP /* ?? watchdog ?? */
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(midres_sound_w)
 
 	AM_RANGE(0x200000, 0x200007) AM_WRITE(dec0_pf2_control_0_w)
@@ -353,7 +353,7 @@ ADDRESS_MAP_END
 /* Physical memory map (21 bits) */
 static ADDRESS_MAP_START( slyspy_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(SMH_NOP) /* Protection counter */
+	AM_RANGE(0x0a0000, 0x0a0001) AM_READNOP /* Protection counter */
 	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREAD("oki", okim6295_r)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)

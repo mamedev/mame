@@ -80,9 +80,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_READ(bsktball_in0_r)
 	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("IN1")
 	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("DSW")
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_NOP) /* Timer Reset */
+	AM_RANGE(0x1000, 0x1000) AM_WRITENOP /* Timer Reset */
 	AM_RANGE(0x1010, 0x1010) AM_DEVWRITE("discrete", bsktball_bounce_w) /* Crowd Amp / Bounce */
-	AM_RANGE(0x1022, 0x1023) AM_WRITE(SMH_NOP) /* Coin Counter */
+	AM_RANGE(0x1022, 0x1023) AM_WRITENOP /* Coin Counter */
 	AM_RANGE(0x1024, 0x1025) AM_WRITE(bsktball_led1_w) /* LED 1 */
 	AM_RANGE(0x1026, 0x1027) AM_WRITE(bsktball_led2_w) /* LED 2 */
 	AM_RANGE(0x1028, 0x1029) AM_WRITE(bsktball_ld1_w) /* LD 1 */

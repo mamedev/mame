@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xec20, 0xec20) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0xec21, 0xec21) AM_READ_PORT("BUTTONS") //ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
-	AM_RANGE(0xec3e, 0xec3e) AM_READ(SMH_NOP) //not used
+	AM_RANGE(0xec3e, 0xec3e) AM_READNOP //not used
 
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END

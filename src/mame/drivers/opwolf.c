@@ -209,8 +209,8 @@ static ADDRESS_MAP_START( opwolf_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)	/* dip switches */
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)	/* lightgun, read at $11e0/6 */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READ(SMH_NOP)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP
+	AM_RANGE(0x3e0002, 0x3e0003) AM_READ8(taitosound_comm_r, 0xff00)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(PC080SN_word_0_r)
 	AM_RANGE(0xd00000, 0xd03fff) AM_READ(PC090OJ_word_0_r)	/* sprite ram */
 ADDRESS_MAP_END
@@ -223,9 +223,9 @@ static ADDRESS_MAP_START( opwolf_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(rainbow_spritectrl_w)	// usually 0x4, changes when you fire
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(SMH_NOP)	/* watchdog ?? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP	/* watchdog ?? */
+	AM_RANGE(0x3e0000, 0x3e0001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_WRITE8(taitosound_comm_w, 0xff00)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(PC080SN_word_0_w)
 	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITE(SMH_RAM)	/* error in init code (?) */
 	AM_RANGE(0xc20000, 0xc20003) AM_WRITE(PC080SN_yscroll_word_0_w)
@@ -243,8 +243,8 @@ static ADDRESS_MAP_START( opwolfb_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)	/* dip switches */
 	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)	/* lightgun, read at $11e0/6 */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_READ(SMH_NOP)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_READ(taitosound_comm16_msb_r)
+	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP
+	AM_RANGE(0x3e0002, 0x3e0003) AM_READ8(taitosound_comm_r, 0xff00)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(PC080SN_word_0_r)
 	AM_RANGE(0xd00000, 0xd03fff) AM_READ(PC090OJ_word_0_r)	/* sprite ram */
 ADDRESS_MAP_END
@@ -255,9 +255,9 @@ static ADDRESS_MAP_START( opwolfb_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(rainbow_spritectrl_w)	// usually 0x4, changes when you fire
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(SMH_NOP)	/* watchdog ?? */
-	AM_RANGE(0x3e0000, 0x3e0001) AM_WRITE(taitosound_port16_msb_w)
-	AM_RANGE(0x3e0002, 0x3e0003) AM_WRITE(taitosound_comm16_msb_w)
+	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP	/* watchdog ?? */
+	AM_RANGE(0x3e0000, 0x3e0001) AM_WRITE8(taitosound_port_w, 0xff00)
+	AM_RANGE(0x3e0002, 0x3e0003) AM_WRITE8(taitosound_comm_w, 0xff00)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(PC080SN_word_0_w)
 	AM_RANGE(0xc10000, 0xc1ffff) AM_WRITE(SMH_RAM)	/* error in init code (?) */
 	AM_RANGE(0xc20000, 0xc20003) AM_WRITE(PC080SN_yscroll_word_0_w)
@@ -279,8 +279,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(SMH_NOP)	/* unknown write, 0 then 1 each interrupt */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_NOP)	/* IRQ acknowledge (unimplemented) */
+	AM_RANGE(0x9000, 0x9000) AM_WRITENOP	/* unknown write, 0 then 1 each interrupt */
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP	/* IRQ acknowledge (unimplemented) */
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM) AM_BASE(&cchip_ram)
 ADDRESS_MAP_END
 

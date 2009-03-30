@@ -575,7 +575,7 @@ static ADDRESS_MAP_START( mrokumei_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("IN0")			// coin, service
 	AM_RANGE(0x7804, 0x7804) AM_READ_PORT("DSW1")			// DSW1
 	AM_RANGE(0x7805, 0x7805) AM_READ_PORT("DSW2")			// DSW2
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READ(SMH_NOP)	// ??? read every vblank, value discarded
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READNOP	// ??? read every vblank, value discarded
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -601,7 +601,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrokumei_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xfffc, 0xfffd) AM_WRITE(SMH_NOP)	/* stack writes happen here, but there's no RAM */
+	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP	/* stack writes happen here, but there's no RAM */
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
 ADDRESS_MAP_END
 

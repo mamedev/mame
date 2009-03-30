@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( ps4_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x02000000, 0x021fffff) AM_READ(SMH_BANK1) // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READ(ps4_eeprom_r)
-	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READ(SMH_NOP) // also writes to this address - might be vblank?
+	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe8, 0x03003fef) AM_READ(SMH_RAM) // vid regs?
 	AM_RANGE(0x03004000, 0x03005fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
@@ -414,7 +414,7 @@ static ADDRESS_MAP_START( ps4_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_WRITE(SMH_ROM)	// program ROM (1 meg)
 	AM_RANGE(0x03000000, 0x030037ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_WRITE(ps4_eeprom_w)
-//  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITE(SMH_NOP) // might be vblank?
+//  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
 	AM_RANGE(0x03003fe4, 0x03003fef) AM_WRITE(ps4_vidregs_w) AM_BASE(&psikyo4_vidregs) // vid regs?
 	AM_RANGE(0x03003ff0, 0x03003ff3) AM_WRITE(ps4_screen1_brt_w) // screen 1 brightness
 	AM_RANGE(0x03003ff4, 0x03003ff7) AM_WRITE(ps4_bgpen_1_dword_w) AM_BASE(&bgpen_1) // screen 1 clear colour

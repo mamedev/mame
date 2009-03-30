@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( malzak_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)  // possibly sound codes for dual SN76477s
 	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)  // possibly playfield scroll X offset
     AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")  //controls
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(SMH_NOP)  // echoes I/O port read from port 0x80
+	AM_RANGE(0xa0, 0xa0) AM_WRITENOP  // echoes I/O port read from port 0x80
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(portc0_w)  // possibly playfield row selection for writing and/or collisions
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(s2650_data_r)  // read upon death
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")

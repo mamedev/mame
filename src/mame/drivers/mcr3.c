@@ -506,7 +506,7 @@ static ADDRESS_MAP_START( spyhunt_portmap, ADDRESS_SPACE_IO, 8 )
 	SSIO_INPUT_PORTS
 	AM_RANGE(0x84, 0x86) AM_WRITE(mcr_scroll_value_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 

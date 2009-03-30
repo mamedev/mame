@@ -550,14 +550,14 @@ static ADDRESS_MAP_START( wecleman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(wecleman_soundlatch_w)	// To sound CPU
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel / ..
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)	// Main CPU controls the other CPUs
-	AM_RANGE(0x140006, 0x140007) AM_WRITE(SMH_NOP)	// Watchdog reset
+	AM_RANGE(0x140006, 0x140007) AM_WRITENOP	// Watchdog reset
 	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")	// Coins + brake + gear
 	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ??
 	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSWA")	// DSW 2
 	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSWB")	// DSW 1
 	AM_RANGE(0x140020, 0x140021) AM_WRITE(SMH_RAM)	// Paired with writes to $140003
 	AM_RANGE(0x140020, 0x140021) AM_READ(selected_ip_r)	// Accelerator or Wheel or ..
-	AM_RANGE(0x140030, 0x140031) AM_WRITE(SMH_NOP)	// toggles between 0 & 1 on hitting bumps and crashes (vibration?)
+	AM_RANGE(0x140030, 0x140031) AM_WRITENOP	// toggles between 0 & 1 on hitting bumps and crashes (vibration?)
 ADDRESS_MAP_END
 
 
@@ -612,14 +612,14 @@ static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(hotchase_soundlatch_w)	// To sound CPU
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel /
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)	// Main CPU controls the other CPUs
-	AM_RANGE(0x140006, 0x140007) AM_READ(SMH_NOP)	// Watchdog reset
+	AM_RANGE(0x140006, 0x140007) AM_READNOP	// Watchdog reset
 	AM_RANGE(0x140010, 0x140011) AM_READ_PORT("IN0")	// Coins + brake + gear
 	AM_RANGE(0x140012, 0x140013) AM_READ_PORT("IN1")	// ?? bit 4 from sound cpu
 	AM_RANGE(0x140014, 0x140015) AM_READ_PORT("DSW2")	// DSW 2
 	AM_RANGE(0x140016, 0x140017) AM_READ_PORT("DSW1")	// DSW 1
 	AM_RANGE(0x140020, 0x140021) AM_READWRITE(selected_ip_r, SMH_NOP)	// Paired with writes to $140003
-	AM_RANGE(0x140022, 0x140023) AM_READ(SMH_NOP)	// ??
-	AM_RANGE(0x140030, 0x140031) AM_WRITE(SMH_NOP)	// signal to cabinet vibration motors?
+	AM_RANGE(0x140022, 0x140023) AM_READNOP	// ??
+	AM_RANGE(0x140030, 0x140031) AM_WRITENOP	// signal to cabinet vibration motors?
 ADDRESS_MAP_END
 
 
@@ -695,10 +695,10 @@ static WRITE8_DEVICE_HANDLER( wecleman_K00723216_bank_w )
 static ADDRESS_MAP_START( wecleman_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8500, 0x8500) AM_WRITE(SMH_NOP)	// incresed with speed (global volume)?
+	AM_RANGE(0x8500, 0x8500) AM_WRITENOP	// incresed with speed (global volume)?
 	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)	// Protection
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)	// Protection
-	AM_RANGE(0x9006, 0x9006) AM_WRITE(SMH_NOP)	// ?
+	AM_RANGE(0x9006, 0x9006) AM_WRITENOP	// ?
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)	// From main CPU
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)	// K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
@@ -791,9 +791,9 @@ static ADDRESS_MAP_START( hotchase_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x200d) AM_DEVREADWRITE("konami2", hotchase_k007232_r, hotchase_k007232_w)
 	AM_RANGE(0x3000, 0x300d) AM_DEVREADWRITE("konami3", hotchase_k007232_r, hotchase_k007232_w)
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w)	// Sound volume, banking, etc.
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_NOP)	// ? (written with 0 on IRQ, 1 on FIRQ)
+	AM_RANGE(0x5000, 0x5000) AM_WRITENOP	// ? (written with 0 on IRQ, 1 on FIRQ)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)	// From main CPU (Read on IRQ)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(SMH_NOP)	// Command acknowledge ?
+	AM_RANGE(0x7000, 0x7000) AM_WRITENOP	// Command acknowledge ?
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

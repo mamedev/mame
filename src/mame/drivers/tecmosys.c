@@ -370,7 +370,7 @@ static READ16_HANDLER( eeprom_r )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM) // work ram
-	AM_RANGE(0x210000, 0x210001) AM_READ(SMH_NOP) // single byte overflow on stack defined as 0x210000
+	AM_RANGE(0x210000, 0x210001) AM_READNOP // single byte overflow on stack defined as 0x210000
 	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM) // bg0 ram
 	AM_RANGE(0x400000, 0x4013ff) AM_READ(SMH_RAM) // bg1 ram
 	AM_RANGE(0x500000, 0x5013ff) AM_READ(SMH_RAM) // bg2 ram

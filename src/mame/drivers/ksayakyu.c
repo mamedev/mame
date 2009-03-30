@@ -113,11 +113,11 @@ static ADDRESS_MAP_START( maincpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("P2")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("DSW")
-	AM_RANGE(0xa803, 0xa803) AM_READ(SMH_NOP) /* watchdog ? */
+	AM_RANGE(0xa803, 0xa803) AM_READNOP /* watchdog ? */
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(ksayakyu_videoctrl_w)
 	AM_RANGE(0xa805, 0xa805) AM_WRITE(latch_w)
 	AM_RANGE(0xa806, 0xa806) AM_READ(sound_status_r)
-	AM_RANGE(0xa807, 0xa807) AM_READ(SMH_NOP) /* watchdog ? */
+	AM_RANGE(0xa807, 0xa807) AM_READNOP /* watchdog ? */
 	AM_RANGE(0xa808, 0xa808) AM_WRITE(bank_select_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(ksayakyu_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -129,9 +129,9 @@ static ADDRESS_MAP_START( soundcpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0xa006, 0xa006) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa008, 0xa008) AM_WRITENOP
 	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
-	AM_RANGE(0xa010, 0xa010) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xa010, 0xa010) AM_WRITENOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ksayakyu )

@@ -616,7 +616,7 @@ static ADDRESS_MAP_START( common_finallap_am, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80ffff) AM_READ(namcos2_sprite_ram_r) AM_WRITE(namcos2_sprite_ram_w) AM_BASE(&namcos2_sprite_ram)
 	AM_RANGE(0x840000, 0x840001) AM_READ(namcos2_gfx_ctrl_r) AM_WRITE(namcos2_gfx_ctrl_w)
 	AM_RANGE(0x880000, 0x89ffff) AM_READ(namco_road16_r) AM_WRITE(namco_road16_w)
-	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_finallap_am, ADDRESS_SPACE_PROGRAM, 16 )
@@ -637,7 +637,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( common_sgunner_am, ADDRESS_SPACE_PROGRAM, 16 )
 	NAMCOS2_68K_DEFAULT_CPU_BOARD_AM
 	AM_RANGE(0x800000, 0x8141ff) AM_READ(namco_obj16_r) AM_WRITE(namco_obj16_w)
-	AM_RANGE(0x818000, 0x818001) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x818000, 0x818001) AM_WRITENOP
 	AM_RANGE(0xa00000, 0xa0000f) AM_READ(namcos2_68k_key_r) AM_WRITE(namcos2_68k_key_w)
 ADDRESS_MAP_END
 
@@ -682,8 +682,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( common_luckywld_am, ADDRESS_SPACE_PROGRAM, 16 )
 	NAMCOS2_68K_DEFAULT_CPU_BOARD_AM
 	AM_RANGE(0x800000, 0x8141ff) AM_READ(namco_obj16_r) AM_WRITE(namco_obj16_w)
-	AM_RANGE(0x818000, 0x818001) AM_READ(SMH_RAM) AM_WRITE(SMH_NOP) /* enable? */
-	AM_RANGE(0x81a000, 0x81a001) AM_WRITE(SMH_NOP) /* enable? */
+	AM_RANGE(0x818000, 0x818001) AM_READ(SMH_RAM) AM_WRITENOP /* enable? */
+	AM_RANGE(0x81a000, 0x81a001) AM_WRITENOP /* enable? */
 	AM_RANGE(0x840000, 0x840001) AM_READ(SMH_RAM)
 	AM_RANGE(0x900000, 0x900007) AM_READ(namco_spritepos16_r) AM_WRITE(namco_spritepos16_w)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_READ(namco_road16_r) AM_WRITE(namco_road16_w)
@@ -726,10 +726,10 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x77ff) AM_WRITE(namcos2_dpram_byte_w) AM_BASE(&namcos2_dpram)
 	AM_RANGE(0x7800, 0x7fff) AM_WRITE(namcos2_dpram_byte_w)	/* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_NOP) /* Amplifier enable on 1st write */
+	AM_RANGE(0xa000, 0xbfff) AM_WRITENOP /* Amplifier enable on 1st write */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos2_sound_bankselect_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(SMH_NOP) /* Watchdog */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xd001, 0xd001) AM_WRITENOP /* Watchdog */
+	AM_RANGE(0xe000, 0xe000) AM_WRITENOP
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -739,7 +739,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_mcu, ADDRESS_SPACE_PROGRAM, 8 )
 	/* input ports and dips are mapped here */
-	AM_RANGE(0x0000, 0x0000) AM_READ(SMH_NOP) /* Keep logging quiet */
+	AM_RANGE(0x0000, 0x0000) AM_READNOP /* Keep logging quiet */
 	AM_RANGE(0x0001, 0x0001) AM_READ(namcos2_input_port_0_r)
 	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("MCUC")
 	AM_RANGE(0x0003, 0x0003) AM_READ(namcos2_mcu_port_d_r)
@@ -755,7 +755,7 @@ static ADDRESS_MAP_START( readmem_mcu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("MCUDI2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("MCUDI3")
 	AM_RANGE(0x5000, 0x57ff) AM_READ(namcos2_dpram_byte_r)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_NOP) /* watchdog */
+	AM_RANGE(0x6000, 0x6fff) AM_READNOP /* watchdog */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 

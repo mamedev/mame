@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf006, 0xf006) AM_WRITE(wiz_flipx_w)
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(wiz_flipy_w)
 	AM_RANGE(0xf008, 0xf008) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf008, 0xf00f) AM_WRITE(SMH_NOP)			/* initialized by Stinger/Scion */
+	AM_RANGE(0xf008, 0xf00f) AM_WRITENOP			/* initialized by Stinger/Scion */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
 	AM_RANGE(0xf018, 0xf018) AM_READ_PORT("IN1")
 	AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)

@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( nekkyoku_writemem_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(fromance_portselect_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xf001, 0xf001) AM_WRITENOP
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(fromance_coinctr_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(fromance_commanddata_w)
 ADDRESS_MAP_END
@@ -260,7 +260,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fromance_readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9e89, 0x9e89) AM_READ(SMH_NOP)			// unknown (idolmj)
+	AM_RANGE(0x9e89, 0x9e89) AM_READNOP			// unknown (idolmj)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xe001, 0xe001) AM_READ(fromance_keymatrix_r)
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("COIN")
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( nekkyoku_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
-	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
+	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0xe1, 0xe1) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0xe2, 0xe5) AM_WRITE(fromance_scroll_w)
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
-	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
+	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( fromance_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
-	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
+	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
 	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)

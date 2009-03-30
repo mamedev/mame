@@ -245,13 +245,13 @@ GFXDECODE_END
 
 static ADDRESS_MAP_START( chinhero_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(SMH_NOP)		/* main CPU interrupt-related */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(SMH_NOP)		/* BBX interrupt-related */
+	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
+	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(SMH_NOP)		/* coin counter */
+	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
@@ -265,13 +265,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(SMH_NOP)		/* main CPU interrupt-related */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(SMH_NOP)		/* BBX interrupt-related */
+	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
+	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(SMH_NOP)		/* coin counter */
+	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(shangkid_maincpu_bank_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
@@ -287,13 +287,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinhero_bbx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(SMH_NOP)		/* main CPU interrupt-related */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(SMH_NOP)		/* BBX interrupt-related */
+	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
+	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(SMH_NOP)		/* coin counter */
+	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
@@ -305,13 +305,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_bbx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(SMH_NOP)		/* main CPU interrupt-related */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(SMH_NOP)		/* BBX interrupt-related */
+	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
+	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(SMH_NOP)		/* coin counter */
+	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(shangkid_maincpu_bank_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")

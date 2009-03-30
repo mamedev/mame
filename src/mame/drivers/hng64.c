@@ -905,17 +905,17 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	// Ports
 	AM_RANGE(0x1F700000, 0x1F702fff) AM_READ(hng64_port_read)
 
-//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITE(SMH_NOP)        // ?? often
-//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITE(SMH_NOP)        // ?? often
-//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITE(SMH_NOP)        // fatfur,strange
+//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITENOP        // ?? often
+//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITENOP        // ?? often
+//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITENOP        // fatfur,strange
 //  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
-//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITE(SMH_NOP)        // irq ack
+//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITENOP        // irq ack
 	AM_RANGE(0x1F701204, 0x1F701207) AM_WRITE(hng_dma_start_w)
 	AM_RANGE(0x1F701214, 0x1F701217) AM_WRITE(hng_dma_dst_w)
 	AM_RANGE(0x1F701224, 0x1F701227) AM_WRITE(hng_dma_len_w)
-//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITE(SMH_NOP)        // dma related?
-//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITE(SMH_NOP)        // dma related?
-//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITE(SMH_NOP)        // ?? often
+//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITENOP        // dma related?
+//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITENOP        // dma related?
+//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITENOP        // ?? often
 
 	// SRAM.  Coin data, Player Statistics, etc.
 	AM_RANGE(0x1F800000, 0x1F803fff) AM_READWRITE(hng64_sram_r, hng64_sram_w) AM_BASE(&hng64_sram)
@@ -945,9 +945,9 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)					// uploads the v53 sound program here, elsewhere on ss64-2 */
 
 	// ?
-//  AM_RANGE(0x68000000, 0x68000003) AM_WRITE(SMH_NOP)                                                // ??
-//  AM_RANGE(0x68000004, 0x68000007) AM_READ(SMH_NOP)                                                 // ??
-//  AM_RANGE(0x68000008, 0x6800000b) AM_WRITE(SMH_NOP)                                                // ??
+//  AM_RANGE(0x68000000, 0x68000003) AM_WRITENOP                                                // ??
+//  AM_RANGE(0x68000004, 0x68000007) AM_READNOP                                                 // ??
+//  AM_RANGE(0x68000008, 0x6800000b) AM_WRITENOP                                                // ??
 
 	// Communications
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_BASE(&hng64_com_ram)
