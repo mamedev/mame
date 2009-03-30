@@ -4504,7 +4504,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
 	DRIVER( vs4 )		/* 2004.10 Virtua Striker 4 */
 						/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
+						/* 2005.04 Virtua Striker 4 ver.A */
 						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
+						/* 2005.12 Mario Kart Arcade Grand Prix */
+						/* 2006.05 Virtua Striker 4 ver.2006 */
+						/* 2007.03 Mario Kart Arcade Grand Prix 2 */
 
 	DRIVER( tfupdate )	/* Triforce GDROM Boot Update (GDT-0011) */
 
@@ -4523,26 +4527,38 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2004.11 Sega Golf Club Network Pro Tour */
 						/* 2004.12 Sega Network Taisen Mahjong MJ 2 ver.D */
 						/* 2004.12 Outrun 2 Special Tours */
+						/* 2004.12 Quest of D ver.1.02 */
 						/* 2004.12 Quest of D ver.1.10 */
 	DRIVER( ghostsqu )	/* 2004.12 Ghost Squad */
 						/* 2005.03 Kidou Senshi Gundam Battle Operating Simulator */
 						/* 2005.03 Sangokushi Taisen */
 	DRIVER( wangmid2 )	/* 2005.04 Wangan Midnight Maximum Tune 2 */
 						/* 2005.04 Sega Network Taisen Mahjong MJ 2 ver.E */
-						/* 2005.05 Quest of D ver.1.20 */
+						/* 2005.04 Quest of D ver.1.20 */
+						/* 2005.04 Quest of D ver.1.20a */
 						/* 2005.06 Sega Golf Club Network Pro Tour 2005 */
+						/* 2005.06 Sangokushi Taisen ver.1.003 */
 						/* 2005.09 Quest of D ver.1.21 */
 						/* 2005.10 Sangokushi Taisen Ranse no Gunrou ver.1.100 */
 						/* 2005.10 Wangan Midnight Maximum Tune 2 ver.B */
 						/* 2005.12 Kidou Senshi Gundam 0079 Card Builder */
+						/* 2005.12 Quest of D ver.2.00 Gofu no Keisyousya */
 						/* 2005.12 Quest of D ver.2.01 Gofu no Keisyousya */
 						/* 2005.12 Sega Golf Club 2006 Next Tours */
-	DRIVER( netwaak3)	/* 2005.12 Sega Network Taisen Mahjong MJ 3 */
+	DRIVER( mj3 )		/* 2005.12 Sega Network Taisen Mahjong MJ 3 */
+						/* 2006.02 Sangokushi Taisen Ranse no Gunrou ver.1.12 */
+						/* 2006.03 Quest of D ver.2.01 Gofu no Keisyousya ver.2.02b */
 						/* 2006.05 Sangokushi Taisen 2 */
 						/* 2006.09 Sega Network Taisen Mahjong MJ 3 ver.B */
+						/* 2006.10 Quest of D ver.3.00 Oukoku no Syugosya */
+						/* 2006.11 Quest of D ver.3.01 Oukoku no Syugosya */
 						/* 2007.03 Kidou Senshi Gundam 0083 Card Builder */
 						/* 2007.03 Sega Network Taisen Mahjong MJ 3 Evolution */
 						/* 2007.10 Kidou Senshi Gundam 0083 Card Builder Ryouyuu Gekitotsu */
+						/* 2007.11 Quest of D The Battle Kingdom ver.4.00 */
+						/* 2008.01 Quest of D The Battle Kingdom ver.4.00b */
+						/* 2008.02 Quest of D The Battle Kingdom ver.4.00c */
+						/* 2008.06 Quest of D The Battle Kingdom ver.4.01 */
 
 	DRIVER( hshavoc )	/* (c) 1993 Data East */
 

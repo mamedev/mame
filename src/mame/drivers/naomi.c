@@ -4415,7 +4415,7 @@ ROM_START( wangmid2 )
 	ROM_LOAD("gdx-0015.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
 ROM_END
 
-ROM_START( netwaak3 )
+ROM_START( mj3 )
 	CHIHIRO_BIOS
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
@@ -4433,6 +4433,6 @@ GAME( 2005, wangmid,  chihiro, naomigd,    naomi,    0, ROT0, "Sega",           
 GAME( 2005, wangmid2, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 (Japan?) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ghostsqu, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, vcop3,    chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, netwaak3, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Sega Netto Waaku Taisen Maajan MJ 3 (Rev D) [GDX-0017D]", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, mj3,      chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 3 (Rev D) [GDX-0017D]", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
