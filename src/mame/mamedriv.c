@@ -4503,7 +4503,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2004.04 Avalon no Kagi ver.1.20 Aratanaru Syoukan */
 						/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
 	DRIVER( vs4 )		/* 2004.10 Virtua Striker 4 */
-						/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
+	DRIVER( avalon20 )	/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
 						/* 2005.04 Virtua Striker 4 ver.A */
 						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
 						/* 2005.12 Mario Kart Arcade Grand Prix */
