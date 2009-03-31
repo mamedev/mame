@@ -99,7 +99,12 @@ extern UINT32 dc_coin_counts[2];
 #define SB_ADST		((0x005F7818-0x005F7800)/4)
 #define SB_ADSUSP	((0x005F781c-0x005F7800)/4)
 
-
+#define SB_PDSTAP   ((0x005F7c00-0x005F7c00)/4)
+#define SB_PDSTAR   ((0x005F7c04-0x005F7c00)/4)
+#define SB_PDLEN    ((0x005F7c08-0x005F7c00)/4)
+#define SB_PDDIR    ((0x005F7c0c-0x005F7c00)/4)
+#define SB_PDTSEL   ((0x005F7c10-0x005F7c00)/4)
+#define SB_PDEN     ((0x005F7c14-0x005F7c00)/4)
 #define SB_PDST		((0x005F7c18-0x005F7c00)/4)
 
 #define RTC1		((0x00710000-0x00710000)/4)

@@ -893,12 +893,14 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				UINT32 src,dst,size;
 				dst = wave_dma.aica_addr;
 				src = wave_dma.root_addr;
-				//size = wave_dma_size;
 				size = 0;
+				/* 0 rounding size = 32 Mbytes */
+				if(wave_dma.size == 0) { wave_dma.size = 0x2000000; }
+
 				/* TODO: use the ddt function. */
 				if(wave_dma.dir == 1)
 				{
-					for(;size<wave_dma.size;size++)
+					for(;size<wave_dma.size;size+=4)
 					{
 						memory_write_dword_64le(space,dst,memory_read_dword(space,src));
 						src+=4;
@@ -907,7 +909,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				}
 				else
 				{
-					for(;size<wave_dma.size;size++)
+					for(;size<wave_dma.size;size+=4)
 					{
 						memory_write_dword_64le(space,src,memory_read_dword(space,dst));
 						src+=4;
