@@ -823,7 +823,9 @@ static void computedilated(void)
 }
 
 #if DEBUG_VERTICES
-static void testdrawline(bitmap_t *bitmap, int index, int from, int to)
+
+
+INLINE void testdrawline(bitmap_t *bitmap, testvertices* from, testvertices* to)
 {
 UINT32 *bmpaddr;
 int ix, iy, i, inc, x, y, dx, dy, plotx, ploty;
@@ -834,10 +836,10 @@ render_bounds line, clip;
 	clip.y0=0;
 	clip.x1=639;
 	clip.y1=479;
-	line.x0=state_ta.grab[index].showvertices[from].x;
-	line.y0=state_ta.grab[index].showvertices[from].y;
-	line.x1=state_ta.grab[index].showvertices[to].x;
-	line.y1=state_ta.grab[index].showvertices[to].y;
+	line.x0=from->x;
+	line.y0=from->y;
+	line.x1=to->x;
+	line.y1=to->y;
 	if (render_clip_line(&line, &clip))
 		return;
 	dx=line.x1-line.x0;
@@ -871,6 +873,15 @@ render_bounds line, clip;
 		}
 	}
 }
+
+INLINE void testdrawpoly(bitmap_t *bitmap, testvertices **v)
+{
+	testdrawline(bitmap,v[0],v[1]);
+	testdrawline(bitmap,v[1],v[2]);
+	testdrawline(bitmap,v[2],v[0]);
+}
+
+
 #endif
 
 #if 0
@@ -1103,13 +1114,23 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 	a = state_ta.grab[rs].testvertices_size;
 	if (a > 65530)
 		a = 65530;
-	for (cs=1;cs < a;cs++)
+		
+	cs = 0;
+	
+	while (cs<a)
 	{
-		testdrawline(bitmap,rs,cs-1,cs);  // draw a segment from vertex xi to vertex yi
-		if ((cs > 1) && (state_ta.grab[rs].showvertices[cs-2].endofstrip == 0))
-			testdrawline(bitmap,rs,cs-2,cs);
-		if (state_ta.grab[rs].showvertices[cs].endofstrip == 1)
-			cs++;
+		testvertices *v[3];
+				
+		v[0] = &state_ta.grab[rs].showvertices[cs]; cs++;
+		v[1] = &state_ta.grab[rs].showvertices[cs]; cs++;
+		v[2] = &state_ta.grab[rs].showvertices[cs]; cs++;
+
+		testdrawpoly(bitmap,v);
+
+		if (v[2]->endofstrip==0)
+		{
+			cs-=2;		
+		}
 	}
 #endif
 }

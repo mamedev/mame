@@ -333,7 +333,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 	char name[128];
 	UINT64 key;
 
-	memset(name, '\0',128);
+	memset(name,'\0',128);
 	memcpy(name, v->picdata+33, 7);
 	memcpy(name+7, v->picdata+25, 7);
 	gdromfile = cdrom_open(v->gdromchd);
@@ -393,6 +393,8 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 				   (buffer[pos+11] << 8) |
 				   (buffer[pos+12] << 16) |
 				   (buffer[pos+13] << 24));
+				  
+			printf("start %08x size %08x\n", start,size);	  
 			break;
 		}
 		if (buffer[pos] == 0)
@@ -450,6 +452,8 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 					   (buffer[pos+11] << 8) |
 					   (buffer[pos+12] << 16) |
 					   (buffer[pos+13] << 24));
+					   
+				printf("start %08x size %08x\n", start,size);   
 				break;
 			}
 			if (buffer[pos] == 0)
