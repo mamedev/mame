@@ -4501,7 +4501,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gekpurya )	/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
 						/* 2003.12 Avalon no Kagi ver.1.10 */
 						/* 2004.04 Avalon no Kagi ver.1.20 Aratanaru Syoukan */
-						/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
+	DRIVER( avalon13 )	/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
 	DRIVER( vs4 )		/* 2004.10 Virtua Striker 4 */
 	DRIVER( avalon20 )	/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
 						/* 2005.04 Virtua Striker 4 ver.A */
