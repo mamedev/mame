@@ -320,6 +320,8 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
  *
  *************************************/
 
+#define FILENAME_LENGTH 16
+ 
 static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 {
 	UINT32 result;
@@ -328,10 +330,10 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 	UINT8 *ptr;
 	UINT32 start,size,sectors,dir;
 	int pos,len,a;
-	char name[15];
+	char name[128];
 	UINT64 key;
 
-	memset(name, 15, 0);
+	memset(name, '\0',128);
 	memcpy(name, v->picdata+33, 7);
 	memcpy(name+7, v->picdata+25, 7);
 	gdromfile = cdrom_open(v->gdromchd);
@@ -355,17 +357,18 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 	// find data of file
 	start = 0;
 	size = 0;
+	printf("Looking for file %s\n", name);	
 	for (pos = 0;pos < 2048;pos += buffer[pos])
 	{
 		a=0;
 		if (!(buffer[pos+25] & 2))
 		{
 			len=buffer[pos+32];
-			for (a=0;a < 15;a++)
+			for (a=0;a < FILENAME_LENGTH;a++)
 			{
 				if ((buffer[pos+33+a] == ';') && (name[a] == 0))
 				{
-					a=16;
+					a=FILENAME_LENGTH+1;
 					break;
 				}
 				if (buffer[pos+33+a] != name[a])
@@ -373,13 +376,13 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 				if (a == len)
 				{
 					if (name[a] == 0)
-						a = 16;
+						a = FILENAME_LENGTH+1;
 					else
-						a = 15;
+						a = FILENAME_LENGTH;
 				}
 			}
 		}
-		if (a == 16)
+		if (a == FILENAME_LENGTH+1)
 		{
 			// start sector and size of file
 			start=((buffer[pos+2] << 0) |
@@ -395,28 +398,34 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 		if (buffer[pos] == 0)
 			break;
 	}
+	
 	if ((start != 0) && (size == 0x100))
 	{
 		// read file
 		result = cdrom_read_data(gdromfile, start, buffer, CD_TRACK_MODE1);
 		// get "rom" file name
-		memcpy(name, buffer+0xc0, 14);
+		memset(name,'\0', 128);
+		memcpy(name, buffer+0xc0, FILENAME_LENGTH-1);
+		
+		
 		// directory
 		result = cdrom_read_data(gdromfile, dir, buffer, CD_TRACK_MODE1);
 		// find data of "rom" file
 		start = 0;
 		size = 0;
+		
+		printf("Looking for file %s\n", name);
 		for (pos = 0;pos < 2048;pos += buffer[pos])
 		{
 			a = 0;
 			if (!(buffer[pos+25] & 2))
 			{
 				len = buffer[pos+32];
-				for (a=0;a < 15;a++)
+				for (a=0;a < FILENAME_LENGTH;a++)
 				{
 					if ((buffer[pos+33+a] == ';') && (name[a] == 0))
 					{
-						a=16;
+						a=FILENAME_LENGTH+1;
 						break;
 					}
 					if (buffer[pos+33+a] != name[a])
@@ -424,13 +433,13 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 					if (a == len)
 					{
 						if (name[a] == 0)
-							a = 16;
+							a = (FILENAME_LENGTH+1);
 						else
-							a = 15;
+							a = FILENAME_LENGTH;
 					}
 				}
 			}
-			if (a == 16)
+			if (a == (FILENAME_LENGTH+1))
 			{
 				// start sector and size of file
 				start=((buffer[pos+2] << 0) |
