@@ -1456,12 +1456,7 @@ ROM_START( kakumei2 )
 	ROM_LOAD( "mj-8956.13", 0x00000, 0x20000, CRC(afe93cf4) SHA1(1973dc5821c6df68e20f8a84b5c9ae281dd3f85f) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 ) /* BG2 */
-	ROM_LOAD( "mj-8956.12", 0x00000, 0x20000, BAD_DUMP CRC(43f7853d) SHA1(54fb523b27e79aa295900c478f09cc080fea0adf) )
-	/*0x20000-0x40000 used,above rom is likely to be bad (half length) */
-	ROM_COPY( "gfx3", 	  	0x00000, 0x20000, 0x08000 )/*mj-8956.12*/
-	ROM_COPY( "gfx3", 	  	0x08000, 0x28000, 0x08000 )/*mj-8956.12*/
-	ROM_COPY( "gfx3", 	  	0x10000, 0x30000, 0x08000 )/*mj-8956.12*/
-	ROM_COPY( "gfx3", 	  	0x18000, 0x38000, 0x08000 )/*mj-8956.12*/
+	ROM_LOAD( "mj-8956.12", 0x00000, 0x40000, CRC(4a088f69) SHA1(468c446d1f345dfd628cdd66ca71cf82e02abe6f) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 ) /* BG3 */
 	ROM_LOAD( "92000-02.10", 0x00000, 0x80000, CRC(338fa9b2) SHA1(05ba4b3c44249cf92be238bf53d6345dc49b0881) )
