@@ -1108,6 +1108,32 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 #endif
 			}
 		}
+		
+		
+		// test--draw the verts fore each quad as polys too
+		{
+			testvertices vv[4];
+			testvertices* v[3];
+	
+			vv[0].x = state_ta.grab[rs].showsprites[cs].a.x;
+			vv[0].y = state_ta.grab[rs].showsprites[cs].a.y;
+			vv[1].x = state_ta.grab[rs].showsprites[cs].b.x;
+			vv[1].y = state_ta.grab[rs].showsprites[cs].b.y;
+			vv[2].x = state_ta.grab[rs].showsprites[cs].c.x;
+			vv[2].y = state_ta.grab[rs].showsprites[cs].c.y;
+			vv[3].x = state_ta.grab[rs].showsprites[cs].d.x;
+			vv[3].y = state_ta.grab[rs].showsprites[cs].d.y;
+			
+			v[0] = &vv[0];
+			v[1] = &vv[1];
+			v[2] = &vv[2];
+			testdrawpoly(bitmap,v);
+			v[0] = &vv[0];
+			v[1] = &vv[2];
+			v[2] = &vv[3];	
+			testdrawpoly(bitmap,v);
+		}
+		
 	}
 	state_ta.grab[rs].busy=0;
 #if DEBUG_VERTICES
