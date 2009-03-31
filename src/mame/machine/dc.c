@@ -850,37 +850,33 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
-	static UINT32 wave_dma_aica_addr,wave_dma_root_addr,wave_dma_size,wave_dma_dir,wave_dma_flag;
+	static struct {
+		UINT32 aica_addr;
+		UINT32 root_addr;
+		UINT32 size;
+		UINT8 dir;
+		UINT8 flag;
+		UINT8 indirect;
+		UINT8 start;
+	}wave_dma;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	switch (reg)
 	{
 		/*AICA Address register*/
-		case SB_ADSTAG:
-			//printf("SB_ADSTAG data %08x\n",dat);
-			wave_dma_aica_addr = dat;
-			break;
+		case SB_ADSTAG: wave_dma.aica_addr = dat; break;
 		/*Root address (work ram)*/
-		case SB_ADSTAR:
-			//printf("SB_ADSTAR data %08x\n",dat);
-			wave_dma_root_addr = dat;
-			break;
+		case SB_ADSTAR:	wave_dma.root_addr = dat; break;
 		/*DMA size (in dword units, bit 31 is "set dma initiation enable setting to 0"*/
 		case SB_ADLEN:
-			//printf("SB_ADLEN data %08x\n",dat);
-			wave_dma_size = dat & 0x7fffffff;
+			wave_dma.size = dat & 0x7fffffff;
+			wave_dma.indirect = (dat & 0x80000000)>>31;
 			break;
 		/*0 = root memory to aica / 1 = aica to root memory*/
-		case SB_ADDIR:
-			//printf("SB_ADDIR data %08x\n",dat);
-			wave_dma_dir = 1 ^ (dat & 1);
-			break;
+		case SB_ADDIR: wave_dma.dir = 1 ^ (dat & 1); break;
 		/*dma flag (active HIGH, bug in docs)*/
-		case SB_ADEN:
-			//printf("SB_ADEN data %08x\n",dat);
-			wave_dma_flag = (dat & 1);
-			break;
+		case SB_ADEN: wave_dma.flag = (dat & 1); break;
 		case SB_ADTSEL:
 			mame_printf_verbose("G2CTRL: initiation mode %d\n",dat);
 			//printf("SB_ADTSEL data %08x\n",dat);
@@ -888,25 +884,44 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 		/*ready for dma'ing*/
 		case SB_ADST:
 			mame_printf_verbose("G2CTRL: AICA:G2-DMA start\n");
+			//printf("AICA: G2-DMA start\n");
+			//printf("%08x %08x %08x %02x\n",wave_dma.aica_addr,wave_dma.root_addr,wave_dma.size,wave_dma.indirect);
+			wave_dma.start = dat & 1;
 			//printf("SB_ADST data %08x\n",dat);
-			if(wave_dma_flag)
+			if(wave_dma.flag && wave_dma.start)
 			{
 				UINT32 src,dst,size;
-				src = wave_dma_aica_addr;
-				dst = wave_dma_root_addr;
+				dst = wave_dma.aica_addr;
+				src = wave_dma.root_addr;
 				//size = wave_dma_size;
 				size = 0;
 				/* TODO: use the ddt function. */
-				if(wave_dma_dir == 1)
+				if(wave_dma.dir == 1)
 				{
-					for(;size<wave_dma_size;size++)
-						memory_write_dword_64le(space,wave_dma_aica_addr+size*4,memory_read_dword(space,wave_dma_root_addr+size*4));
+					for(;size<wave_dma.size;size++)
+					{
+						memory_write_dword_64le(space,dst,memory_read_dword(space,src));
+						src+=4;
+						dst+=4;
+					}
 				}
 				else
 				{
-					for(;size<wave_dma_size;size++)
-						memory_write_dword_64le(space,wave_dma_root_addr+size*4,memory_read_dword(space,wave_dma_aica_addr+size*4));
+					for(;size<wave_dma.size;size++)
+					{
+						memory_write_dword_64le(space,src,memory_read_dword(space,dst));
+						src+=4;
+						dst+=4;
+					}
 				}
+				/* update the params*/
+				wave_dma.aica_addr = dst;
+				wave_dma.root_addr = src;
+				wave_dma.size = 0;
+				wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
+				wave_dma.start = 0;
+
+				//TODO: signal irq there
 			}
 			break;
 	}
