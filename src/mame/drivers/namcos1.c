@@ -499,6 +499,7 @@ static ADDRESS_MAP_START( mcu_port_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+// #define PRIORITY_EASINESS_TO_PLAY
 
 /* Standard Namco System 1 input port definition */
 static INPUT_PORTS_START( ns1 )
@@ -523,28 +524,14 @@ static INPUT_PORTS_START( ns1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START( "DIPSW" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW:8" )
 
 	PORT_START( "COIN" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* OUT:coin lockout */
@@ -563,10 +550,10 @@ static INPUT_PORTS_START( shadowld )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x40, 0x40, "Freeze" )
+	PORT_DIPNAME( 0x40, 0x40, "Freeze" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Alternate sound effects" )	// e.g. the red bird
+	PORT_DIPNAME( 0x20, 0x20, "Alternate sound effects" ) PORT_DIPLOCATION("SW:3")	// e.g. the red bird
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -576,9 +563,35 @@ static INPUT_PORTS_START( dspirit )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x7f, 0x7f, "Life" )
-	PORT_DIPSETTING(    0x7f, "2" )
-	PORT_DIPSETTING(    0x16, "3" )
+	#ifdef PRIORITY_EASINESS_TO_PLAY
+	  PORT_DIPNAME( 0x7f, 0x7f, "Life" ) PORT_DIPLOCATION("SW:8,7,6,5,4,3,2")
+	  PORT_DIPSETTING(    0x7f, "2" )
+	  PORT_DIPSETTING(    0x16, "3" )
+	#else
+	  PORT_DIPNAME( 0x40, 0x40, "Open 3rd Life (step1of7)" ) PORT_DIPLOCATION("SW:2")
+	  PORT_DIPSETTING(    0x40, "No (off)" )
+	  PORT_DIPSETTING(    0x00, "Yes (on)" )
+	  PORT_DIPNAME( 0x20, 0x20, "Open 3rd Life (step2of7)" ) PORT_DIPLOCATION("SW:3")
+	  PORT_DIPSETTING(    0x20, "No (off)" )
+	  PORT_DIPSETTING(    0x00, "Yes (on)" )
+	  PORT_DIPNAME( 0x10, 0x10, "Open 3rd Life (step3of7)" ) PORT_DIPLOCATION("SW:4")
+	  PORT_DIPSETTING(    0x10, "Yes (off)" )
+	  PORT_DIPSETTING(    0x00, "No (on)" )
+	  PORT_DIPNAME( 0x08, 0x08, "Open 3rd Life (step4of7)" ) PORT_DIPLOCATION("SW:5")
+	  PORT_DIPSETTING(    0x08, "No (off)" )
+	  PORT_DIPSETTING(    0x00, "Yes (on)" )
+	  PORT_DIPNAME( 0x04, 0x04, "Open 3rd Life (step5of7)" ) PORT_DIPLOCATION("SW:6")
+	  PORT_DIPSETTING(    0x04, "Yes (off)" )
+	  PORT_DIPSETTING(    0x00, "No (on)" )
+	  PORT_DIPNAME( 0x02, 0x02, "Open 3rd Life (step6of7)" ) PORT_DIPLOCATION("SW:7")
+	  PORT_DIPSETTING(    0x02, "Yes (off)" )
+	  PORT_DIPSETTING(    0x00, "No (on)" )
+	  PORT_DIPNAME( 0x01, 0x01, "Open 3rd Life (step7of7)" ) PORT_DIPLOCATION("SW:8")
+	  PORT_DIPSETTING(    0x01, "No (off)" )
+	  PORT_DIPSETTING(    0x00, "Yes (on)" )
+	  //  Allow "Open 3rd Life" = _ooxoxxo
+	  //                          12345678
+	#endif
 INPUT_PORTS_END
 
 
@@ -600,16 +613,16 @@ static INPUT_PORTS_START( quester )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x40, 0x40, "Unk 1" )	// read @ fac7
+	PORT_DIPNAME( 0x40, 0x40, "Unk 1" ) PORT_DIPLOCATION("SW:2")	// read @ fac7
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze" )
+	PORT_DIPNAME( 0x10, 0x10, "Freeze" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Brightness" )
+	PORT_DIPNAME( 0x04, 0x00, "Brightness" ) PORT_DIPLOCATION("SW:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Level_Select ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Level_Select ) ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -644,15 +657,15 @@ static INPUT_PORTS_START( pacmania )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x40, 0x40, "Freeze" )
+	PORT_DIPNAME( 0x40, 0x40, "Freeze" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* this doesn't seem to have much use... */
-	PORT_DIPNAME( 0x20, 0x20, "Kick Watchdog in IRQ" )
+	PORT_DIPNAME( 0x20, 0x20, "Kick Watchdog in IRQ" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	/* to enter the A.D.S. menu, set the dip switch and reset with service coin pressed */
-	PORT_DIPNAME( 0x08, 0x08, "Auto Data Sampling" )
+	PORT_DIPNAME( 0x08, 0x08, "Auto Data Sampling" ) PORT_DIPLOCATION("SW:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -662,9 +675,20 @@ static INPUT_PORTS_START( galaga88 )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x7f, 0x7f, "Auto Data Sampling" )
-	PORT_DIPSETTING(    0x7f, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x57, DEF_STR( On ) )
+	#ifdef PRIORITY_EASINESS_TO_PLAY
+	  PORT_DIPNAME( 0x28, 0x28, "Auto Data Sampling" ) PORT_DIPLOCATION("SW:5,3")
+	  PORT_DIPSETTING(    0x28, DEF_STR( Off ) )
+	  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	#else
+	  PORT_DIPNAME( 0x20, 0x20, "Auto Data Sampling (step1of2)" ) PORT_DIPLOCATION("SW:3")
+	  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	  PORT_DIPNAME( 0x08, 0x08, "Auto Data Sampling (step2of2)" ) PORT_DIPLOCATION("SW:5")
+	  PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	  //  Allow "Auto Data Sampling" = __o_o___
+	  //                               12345678
+	#endif
 INPUT_PORTS_END
 
 
@@ -678,10 +702,10 @@ static INPUT_PORTS_START( berabohm )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL )    /* timing from the buttons interface */
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x20, 0x20, "Invulnerability" )
+	PORT_DIPNAME( 0x20, 0x20, "Invulnerability" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
+	PORT_DIPNAME( 0x01, 0x01, "Freeze" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -743,10 +767,10 @@ static INPUT_PORTS_START( mmaze )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x10, 0x10, "Freeze" )
+	PORT_DIPNAME( 0x10, 0x10, "Freeze" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Level_Select ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Level_Select ) ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -756,16 +780,16 @@ static INPUT_PORTS_START( bakutotu )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x20, 0x20, "Show Coordinates" )
+	PORT_DIPNAME( 0x20, 0x20, "Show Coordinates" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Sprite Viewer" )
+	PORT_DIPNAME( 0x08, 0x08, "Sprite Viewer" ) PORT_DIPLOCATION("SW:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Invincibility (Cheat)")
+	PORT_DIPNAME( 0x04, 0x04, "Invincibility (Cheat)") PORT_DIPLOCATION("SW:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
+	PORT_DIPNAME( 0x01, 0x01, "Freeze" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -775,11 +799,34 @@ static INPUT_PORTS_START( wldcourt )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	/* see code @ e331. The lines this draws can't even be seen because they are erased afterwards */
-	PORT_DIPNAME( 0x7e, 0x7e, "Draw Debug Lines" )
-	PORT_DIPSETTING(    0x7e, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x5c, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
+	#ifdef PRIORITY_EASINESS_TO_PLAY
+	  /* see code @ e331. The lines this draws can't even be seen because they are erased afterwards */
+	  PORT_DIPNAME( 0x7e, 0x7e, "Draw Debug Lines" ) PORT_DIPLOCATION("SW:7,6,5,4,3,2")
+	  PORT_DIPSETTING(    0x7e, DEF_STR( Off ) )
+	  PORT_DIPSETTING(    0x5c, DEF_STR( On ) )
+	#else
+	  PORT_DIPNAME( 0x40, 0x40, "Draw Debug Lines (step1of6)" ) PORT_DIPLOCATION("SW:2")
+	  PORT_DIPSETTING(    0x40, "Yes (off)" )
+	  PORT_DIPSETTING(    0x00, "No (on)" )
+	  PORT_DIPNAME( 0x20, 0x20, "Draw Debug Lines (step2of6)" ) PORT_DIPLOCATION("SW:3")
+	  PORT_DIPSETTING(    0x20, "No (off)" )
+	  PORT_DIPSETTING(    0x00, "Yes (on)" )
+	  PORT_DIPNAME( 0x10, 0x10, "Draw Debug Lines (step3of6)" ) PORT_DIPLOCATION("SW:4")
+	  PORT_DIPSETTING(    0x10, "Yes (off)" )
+	  PORT_DIPSETTING(    0x00, "No (on)" )
+	  PORT_DIPNAME( 0x08, 0x08, "Draw Debug Lines (step4of6)" ) PORT_DIPLOCATION("SW:5")
+	  PORT_DIPSETTING(    0x08, "Yes (off)" )
+	  PORT_DIPSETTING(    0x00, "No (on)" )
+	  PORT_DIPNAME( 0x04, 0x04, "Draw Debug Lines (step5of6)" ) PORT_DIPLOCATION("SW:6")
+	  PORT_DIPSETTING(    0x04, "Yes (off)" )
+	  PORT_DIPSETTING(    0x00, "No (on)" )
+	  PORT_DIPNAME( 0x02, 0x02, "Draw Debug Lines (step6of6)" ) PORT_DIPLOCATION("SW:7")
+	  PORT_DIPSETTING(    0x02, "No (off)" )
+	  PORT_DIPSETTING(    0x00, "Yes (on)" )
+	  //  Allow "Draw Debug Lines" = _xxoxxo_
+	  //                             12345678
+	#endif
+	PORT_DIPNAME( 0x01, 0x01, "Freeze" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -790,12 +837,34 @@ static INPUT_PORTS_START( splatter )
 
 	PORT_MODIFY( "DIPSW" )
 	/* these two don't seem to have much use... */
-	PORT_DIPNAME( 0x11, 0x11, "CPU #0 Kick Watchdog in IRQ" )
-	PORT_DIPSETTING(    0x11, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x06, 0x06, "CPU #0&1 Kick Watchdog in IRQ" )
-	PORT_DIPSETTING(    0x06, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	#ifdef PRIORITY_EASINESS_TO_PLAY
+	  PORT_DIPNAME( 0x11, 0x11, "CPU #0 Kick Watchdog in IRQ" ) PORT_DIPLOCATION("SW:8,4")
+	  PORT_DIPSETTING(    0x11, DEF_STR( No ) )
+	  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	#else
+	  PORT_DIPNAME( 0x10, 0x10, "CPU #0 Kick Watchdog in IRQ (step1of2)" ) PORT_DIPLOCATION("SW:4")
+	  PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	  PORT_DIPNAME( 0x01, 0x01, "CPU #0 Kick Watchdog in IRQ (step2of2)" ) PORT_DIPLOCATION("SW:8")
+	  PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	  //  Allow "CPU #0 Kick Watchdog in IRQ" = ___o___o
+	  //                                        12345678
+	#endif
+	#ifdef PRIORITY_EASINESS_TO_PLAY
+	  PORT_DIPNAME( 0x06, 0x06, "CPU #0&1 Kick Watchdog in IRQ" ) PORT_DIPLOCATION("SW:7,6")
+	  PORT_DIPSETTING(    0x06, DEF_STR( No ) )
+	  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	#else
+	  PORT_DIPNAME( 0x04, 0x04, "CPU #0&1 Kick Watchdog in IRQ (step1of2)" ) PORT_DIPLOCATION("SW:6")
+	  PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	  PORT_DIPNAME( 0x02, 0x02, "CPU #0&1 Kick Watchdog in IRQ (step2of2)" ) PORT_DIPLOCATION("SW:7")
+	  PORT_DIPSETTING(    0x02, DEF_STR( No ) )
+	  PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	  //  Allow "CPU #0&1 Kick Watchdog in IRQ" = _____oo_
+	  //                                          12345678
+	#endif
 	PORT_DIPNAME( 0x20, 0x20, "Stage Select (ver. SH3 only)" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -852,10 +921,10 @@ static INPUT_PORTS_START( ws89 )
 
 	PORT_MODIFY( "DIPSW" )
 	/* see code @ e90c. The lines this draws can't even be seen because they are erased afterwards */
-	PORT_DIPNAME( 0x02, 0x02, "Draw Debug Lines" )
+	PORT_DIPNAME( 0x02, 0x02, "Draw Debug Lines" ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
+	PORT_DIPNAME( 0x01, 0x01, "Freeze" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -865,15 +934,15 @@ static INPUT_PORTS_START( dangseed )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x40, 0x40, "Freeze" )
+	PORT_DIPNAME( 0x40, 0x40, "Freeze" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	/* this doesn't seem to have much use... */
-	PORT_DIPNAME( 0x20, 0x20, "Kick Watchdog in IRQ" )
+	PORT_DIPNAME( 0x20, 0x20, "Kick Watchdog in IRQ" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	/* to enter the A.D.S. menu, set the dip switch, keep 1p start pressed and press service coin */
-	PORT_DIPNAME( 0x04, 0x04, "Auto Data Sampling" )
+	PORT_DIPNAME( 0x04, 0x04, "Auto Data Sampling" ) PORT_DIPLOCATION("SW:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -884,10 +953,10 @@ static INPUT_PORTS_START( ws90 )
 
 	PORT_MODIFY( "DIPSW" )
 	/* see code @ e8ff. The lines this draws can't even be seen because they are erased afterwards */
-	PORT_DIPNAME( 0x02, 0x02, "Draw Debug Lines" )
+	PORT_DIPNAME( 0x02, 0x02, "Draw Debug Lines" ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
+	PORT_DIPNAME( 0x01, 0x01, "Freeze" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -897,7 +966,7 @@ static INPUT_PORTS_START( boxyboy )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x40, 0x40, "Freeze" )
+	PORT_DIPNAME( 0x40, 0x40, "Freeze" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -907,7 +976,7 @@ static INPUT_PORTS_START( puzlclub )
 	PORT_INCLUDE( ns1 )
 
 	PORT_MODIFY( "DIPSW" )
-	PORT_DIPNAME( 0x40, 0x40, "Auto Data Sampling" )
+	PORT_DIPNAME( 0x40, 0x40, "Auto Data Sampling" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END

@@ -277,6 +277,8 @@ static const UPD7810_CONFIG sound_cpu_config =
 };
 
 
+// #define PRIORITY_EASINESS_TO_PLAY
+
 /* I've put the inputs the same way they can be read in the "test mode" */
 
 static INPUT_PORTS_START( fitfight )
@@ -313,7 +315,7 @@ static INPUT_PORTS_START( fitfight )
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Fault" (= "Tilt" ?)
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* MSB : SW2 -> 0xe04c26.b (cpl) */
-	PORT_DIPNAME( 0xf800, 0xf800, "Time" )
+	PORT_DIPNAME( 0xf800, 0xf800, "Time" ) PORT_DIPLOCATION("SW2:5,4,3,2,1")
 	PORT_DIPSETTING(      0xf000, "02" )
 	PORT_DIPSETTING(      0xe800, "05" )
 	PORT_DIPSETTING(      0xe000, "08" )
@@ -346,7 +348,7 @@ static INPUT_PORTS_START( fitfight )
 	PORT_DIPSETTING(      0x0800, "89" )
 	PORT_DIPSETTING(      0x0000, "92" )
 	PORT_DIPSETTING(      0xf800, "99" )
-	PORT_DIPNAME( 0x0700, 0x0700, "First Credit" )
+	PORT_DIPNAME( 0x0700, 0x0700, "First Credit" ) PORT_DIPLOCATION("SW2:8,7,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 6C_1C ) )
@@ -358,7 +360,7 @@ static INPUT_PORTS_START( fitfight )
 
 	PORT_START("DSW3_DSW1")	// 0x500000.w
 	/* MSB : SW3 -> 0xe04c24.b (cpl) */
-	PORT_DIPNAME( 0xe000, 0xe000, "Next Credit" )
+	PORT_DIPNAME( 0xe000, 0xe000, "Next Credit" ) PORT_DIPLOCATION("SW3:3,2,1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 3C_2C ) )
@@ -367,7 +369,7 @@ static INPUT_PORTS_START( fitfight )
 	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x1c00, 0x1000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x1c00, 0x1000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:6,5,4")
 	PORT_DIPSETTING(      0x1c00, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( Easier ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( Easy ) )
@@ -376,16 +378,16 @@ static INPUT_PORTS_START( fitfight )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
 	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	/* LSB : SW1 -> 0xe04c25.b (cpl) */
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) )	// To be confirmed
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")	// To be confirmed
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0070, 0x0060, "Needed Points/Maximum Rounds" )	// see notes
-//  PORT_DIPSETTING(      0x0070, "Endless" )
+	PORT_DIPNAME( 0x0070, 0x0060, "Needed Points/Maximum Rounds" ) PORT_DIPLOCATION("SW1:4,3,2")	// see notes
+	PORT_DIPSETTING(      0x0070, "Endless" )
 	PORT_DIPSETTING(      0x0060, "1/2" )
 	PORT_DIPSETTING(      0x0050, "2/3" )
 	PORT_DIPSETTING(      0x0040, "2/4" )
@@ -393,18 +395,12 @@ static INPUT_PORTS_START( fitfight )
 	PORT_DIPSETTING(      0x0020, "3/6" )
 	PORT_DIPSETTING(      0x0010, "4/7" )
 	PORT_DIPSETTING(      0x0000, "4/8" )
-	PORT_DIPNAME( 0x0008, 0x0000, "Select All Players" )		// in a 1 player game
+	PORT_DIPNAME( 0x0008, 0x0000, "Select All Players" ) PORT_DIPLOCATION("SW1:5")		// in a 1 player game
 	PORT_DIPSETTING(      0x0008, DEF_STR( No ) )			// only Ryo and Robert available
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )		// must be Off during P.O.S.T. !
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:7" )		// must be Off during P.O.S.T. !
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW1:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( histryma )
@@ -451,10 +447,12 @@ static INPUT_PORTS_START( histryma )
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Fault" (= "Tilt" ?)
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Test" (duplicated)
 	/* MSB : SW2 -> 0xe05874.b (cpl) */
-	PORT_DIPNAME( 0xf800, 0x0000, "Time" )
-//  PORT_DIPSETTING(      0xf800, "15" )                // duplicated setting
-//  PORT_DIPSETTING(      0xf000, "15" )                // duplicated setting
-//  PORT_DIPSETTING(      0xe800, "15" )                // duplicated setting
+	PORT_DIPNAME( 0xf800, 0x0000, "Time" ) PORT_DIPLOCATION("SW2:5,4,3,2,1")
+	#ifndef PRIORITY_EASINESS_TO_PLAY
+	  PORT_DIPSETTING(      0xf800, "15" )                // duplicated setting
+	  PORT_DIPSETTING(      0xf000, "15" )                // duplicated setting
+	  PORT_DIPSETTING(      0xe800, "15" )                // duplicated setting
+	#endif
 	PORT_DIPSETTING(      0xe000, "15" )
 	PORT_DIPSETTING(      0xd800, "18" )
 	PORT_DIPSETTING(      0xd000, "21" )
@@ -484,7 +482,7 @@ static INPUT_PORTS_START( histryma )
 	PORT_DIPSETTING(      0x1000, "93" )
 	PORT_DIPSETTING(      0x0800, "96" )
 	PORT_DIPSETTING(      0x0000, "99" )
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:8,7,6")
 	PORT_DIPSETTING(      0x0200, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 4C_1C ) )
@@ -496,7 +494,7 @@ static INPUT_PORTS_START( histryma )
 
 	PORT_START("DSW3_DSW1")	// 0x500000.w
 	/* MSB : SW3 -> 0xe05872.b (cpl) */
-	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW3:3,2,1")
 	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_3C ) )
@@ -505,25 +503,25 @@ static INPUT_PORTS_START( histryma )
 	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x1c00, 0x1000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x1c00, 0x1000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:6,5,4")
 	PORT_DIPSETTING(      0x1c00, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( Easier ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Medium ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Harder ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
-	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW3:8" )
 	/* LSB : SW1 -> 0xe05873.b (cpl) */
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) )	// To be confirmed
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")	// To be confirmed
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0070, 0x0060, "Needed Points/Maximum Points" )	// see notes
-//  PORT_DIPSETTING(      0x0070, "Endless" )               // ends on a draw
+	PORT_DIPNAME( 0x0070, 0x0060, "Needed Points/Maximum Points" ) PORT_DIPLOCATION("SW1:4,3,2")	// see notes
+	PORT_DIPSETTING(      0x0070, "Endless" )               // ends on a draw
 	PORT_DIPSETTING(      0x0060, "1/2" )
 	PORT_DIPSETTING(      0x0050, "2/3" )
 	PORT_DIPSETTING(      0x0040, "2/4" )
@@ -531,18 +529,12 @@ static INPUT_PORTS_START( histryma )
 	PORT_DIPSETTING(      0x0020, "3/6" )
 	PORT_DIPSETTING(      0x0010, "4/7" )
 	PORT_DIPSETTING(      0x0000, "4/8" )
-	PORT_DIPNAME( 0x0008, 0x0000, "Buttons" )				// 3 or 6 buttons as default ?
+	PORT_DIPNAME( 0x0008, 0x0000, "Buttons" ) PORT_DIPLOCATION("SW1:5")	// 3 or 6 buttons as default ?
 	PORT_DIPSETTING(      0x0008, "3" )
 	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )		// must be Off during P.O.S.T. !
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:7" )		// must be Off during P.O.S.T. !
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW1:8" )
 INPUT_PORTS_END
 
 /* Check inputs again when video emulation is better */
@@ -593,10 +585,12 @@ static INPUT_PORTS_START( bbprot )
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Fault" (= "Tilt" ?)
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )			// "Test" (duplicated)
 	/* MSB : SW2 -> 0xe07e84.b (cpl) */
-	PORT_DIPNAME( 0xf800, 0x0000, "Time" )
-//  PORT_DIPSETTING(      0xf800, "15" )                // duplicated setting
-//  PORT_DIPSETTING(      0xf000, "15" )                // duplicated setting
-//  PORT_DIPSETTING(      0xe800, "15" )                // duplicated setting
+	PORT_DIPNAME( 0xf800, 0x0000, "Time" ) PORT_DIPLOCATION("SW2:5,4,3,2,1")
+	#ifndef PRIORITY_EASINESS_TO_PLAY
+	  PORT_DIPSETTING(      0xf800, "15" )                // duplicated setting
+	  PORT_DIPSETTING(      0xf000, "15" )                // duplicated setting
+	  PORT_DIPSETTING(      0xe800, "15" )                // duplicated setting
+	#endif
 	PORT_DIPSETTING(      0xe000, "15" )
 	PORT_DIPSETTING(      0xd800, "18" )
 	PORT_DIPSETTING(      0xd000, "21" )
@@ -626,7 +620,7 @@ static INPUT_PORTS_START( bbprot )
 	PORT_DIPSETTING(      0x1000, "93" )
 	PORT_DIPSETTING(      0x0800, "96" )
 	PORT_DIPSETTING(      0x0000, "99" )
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:8,7,6")
 	PORT_DIPSETTING(      0x0200, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 4C_1C ) )
@@ -638,7 +632,7 @@ static INPUT_PORTS_START( bbprot )
 
 	PORT_START("DSW3_DSW1")	// 0x480000.w
 	/* MSB : SW3 -> 0xe07e82.b (cpl) */
-	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW3:3,2,1")
 	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_3C ) )
@@ -647,7 +641,7 @@ static INPUT_PORTS_START( bbprot )
 	PORT_DIPSETTING(      0x8000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x1c00, 0x1000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x1c00, 0x1000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:6,5,4")
 	PORT_DIPSETTING(      0x1c00, DEF_STR( Easiest ) )
 	PORT_DIPSETTING(      0x1800, DEF_STR( Easier ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( Easy ) )
@@ -656,35 +650,23 @@ static INPUT_PORTS_START( bbprot )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
-	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC( 0x0100, IP_ACTIVE_LOW, "SW3:8" )
 	/* LSB : SW1 -> 0xe07e83.b (cpl) */
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) )	// To be confirmed
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")	// To be confirmed
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, "Buttons" )				// 3 or 6 buttons as default ?
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW1:4" )
+	PORT_DIPNAME( 0x0008, 0x0000, "Buttons" ) PORT_DIPLOCATION("SW1:5")	// 3 or 6 buttons as default ?
 	PORT_DIPSETTING(      0x0008, "3" )
 	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unused ) )		// must be Off during P.O.S.T. !
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:7" )		// must be Off during P.O.S.T. !
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW1:8" )
 INPUT_PORTS_END
 
 
