@@ -7944,8 +7944,8 @@ Other Sun games
 	DRIVER( theglad )	/* (c) 2001 */
 	DRIVER( dmnfrnt )	/* (c) 2002 */
 	DRIVER( dmnfrnta )	/* (c) 2002 */
-	DRIVER( kovh )
-	DRIVER( oldss )
+	DRIVER( kovshp )
+	DRIVER( oldsplus )
 	DRIVER( killbldp )
 	DRIVER( svg )
 

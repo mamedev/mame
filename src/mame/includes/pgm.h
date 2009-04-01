@@ -23,10 +23,11 @@ void pgm_puzzli2_decrypt(running_machine *machine);
 void pgm_theglad_decrypt(running_machine *machine);
 void pgm_ddp2_decrypt(running_machine *machine);
 void pgm_dfront_decrypt(running_machine *machine);
-void pgm_svg_decrypt(running_machine *machine);
+void pgm_oldsplus_decrypt(running_machine *machine);
+void pgm_kovshp_decrypt(running_machine *machine);
 void pgm_killbldp_decrypt(running_machine *machine);
-void pgm_kovh_decrypt(running_machine *machine);
-void pgm_oldss_decrypt(running_machine *machine);
+void pgm_svg_decrypt(running_machine *machine);
+
 
 /*----------- defined in machine/pgmprot.c -----------*/
 
@@ -43,11 +44,6 @@ READ16_HANDLER (ASIC28_r16);
 WRITE16_HANDLER (ASIC28_w16);
 
 READ16_HANDLER (dw2_d80000_r );
-
-
-/*----------- defined in machine/pgmy2ks.c -----------*/
-
-extern const UINT32 pgmy2ks[0x3c00];
 
 
 /*----------- defined in video/pgm.c -----------*/
