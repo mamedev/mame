@@ -65,6 +65,8 @@ struct psxinfo
 	UINT16 m_p_n_volumeright[ MAX_CHANNEL ];
 	UINT16 m_p_n_pitch[ MAX_CHANNEL ];
 	UINT16 m_p_n_address[ MAX_CHANNEL ];
+	UINT16 m_p_n_envelopestate[ MAX_CHANNEL ];
+	enum envstate { e_attack = 0, e_decay, e_sustain, e_sustainEnd, e_release, e_releaseend } m_envstate;
 	UINT16 m_p_n_attackdecaysustain[ MAX_CHANNEL ];
 	UINT16 m_p_n_sustainrelease[ MAX_CHANNEL ];
 	UINT16 m_p_n_adsrvolume[ MAX_CHANNEL ];
@@ -152,8 +154,19 @@ static STREAM_UPDATE( PSXSPU_update )
 
 	for( n_channel = 0; n_channel < MAX_CHANNEL; n_channel++ )
 	{
-		voll = volume( chip->m_p_n_volumeleft[ n_channel ] );
-		volr = volume( chip->m_p_n_volumeright[ n_channel ] );
+		// hack, if the envelope is in release state, silence it
+		// - the envelopes aren't currently emulated!
+		// - and this prevents audiable sounds looping forever
+		if (chip->m_p_n_envelopestate[ n_channel ] == e_release )
+		{
+			voll = 0;
+			volr = 0;
+		}
+		else
+		{
+			voll = volume( chip->m_p_n_volumeleft[ n_channel ] );
+			volr = volume( chip->m_p_n_volumeright[ n_channel ] );
+		}
 
 		for( n_sample = 0; n_sample < samples; n_sample++ )
 		{
@@ -342,6 +355,7 @@ static DEVICE_START( psxspu )
 	state_save_register_device_item_array( device, 0, chip->m_p_n_volumeright );
 	state_save_register_device_item_array( device, 0, chip->m_p_n_pitch );
 	state_save_register_device_item_array( device, 0, chip->m_p_n_address );
+	state_save_register_device_item_array( device, 0, chip->m_p_n_envelopestate );
 	state_save_register_device_item_array( device, 0, chip->m_p_n_attackdecaysustain );
 	state_save_register_device_item_array( device, 0, chip->m_p_n_sustainrelease );
 	state_save_register_device_item_array( device, 0, chip->m_p_n_adsrvolume );
@@ -559,6 +573,8 @@ WRITE32_DEVICE_HANDLER( psx_spu_w )
 					chip->m_p_n_s1[ n_channel ] = 0;
 					chip->m_p_n_s2[ n_channel ] = 0;
 					chip->m_p_n_blockstatus[ n_channel ] = 1;
+					
+					chip->m_p_n_envelopestate[ n_channel ] = e_attack;
 				}
 			}
 			break;
@@ -566,6 +582,17 @@ WRITE32_DEVICE_HANDLER( psx_spu_w )
 			chip->m_n_voiceoff = 0;
 			COMBINE_DATA( &chip->m_n_voiceoff );
 			verboselog( machine, 1, "psx_spu_w() voice off = %08x\n", chip->m_n_voiceoff );
+	
+			for( n_channel = 0; n_channel < 32; n_channel++ )
+			{
+				if( ( chip->m_n_voiceoff & ( 1 << n_channel ) ) != 0 )
+				{
+					// keyoff advances the envelope to release state
+					if (chip->m_p_n_envelopestate[ n_channel ] < e_release)
+						chip->m_p_n_envelopestate[ n_channel ] = e_release;
+				}
+			}			
+			
 			break;
 		case SPU_REG( 0xd90 ):
 			COMBINE_DATA( &chip->m_n_modulationmode );
