@@ -364,9 +364,9 @@ static void animate(const device_config *device, void *param, int vblank_state)
 				/* see if the player has been motionless for time specified */
 				/* note that the animate() routine is called twice per frame */
 				/* slightly confusing formula, but the effect is: */
-				/* auto_time = 1 makes the crosshair barely visible while moved */
+				/* auto_time = 0 makes the crosshair barely visible while moved */
 				/* every increment in auto_time is about .2s at 60Hz */
-				if (global.time[player] > global.auto_time * 24 - 20)
+				if (global.time[player] > global.auto_time * 24 + 4)
 					/* time exceeded so turn crosshair invisible */
 					global.visible[player] = FALSE;
 
