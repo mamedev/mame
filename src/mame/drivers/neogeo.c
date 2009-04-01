@@ -171,6 +171,24 @@ NOTE: On CTRG2-B, The "A" lines start at "A1". If you trace this on an
         * Distorted jumping sound in Nightmare in the Dark
         * Ninja Combat sometimes glitches
 
+
+    Mahjong Panel notes (2009-03 FP):
+    =================================
+	
+	* In Service Mode menu with mahjong panel active, controls are as 
+	  follows:
+
+		A = select / up (for options)
+		B = down (for options)
+		C = go to previous menu
+		E = up (for menu entries)
+		F = down (for menu entries)
+		G = left (for options)
+		H = right (for options)
+
+	* These only work with Japanese BIOS, but I think it's not a bug: I
+	  doubt other bios were programmed to be compatible with mahjong panels
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -413,11 +431,14 @@ static void select_controller(UINT8 data)
 
 static CUSTOM_INPUT( multiplexed_controller_r )
 {
-	char tag[40];
+	int port = (FPTR)param;
+	
+	static const char *const cntrl[2][2] =
+		{
+			{ "IN0-0", "IN0-1" }, { "IN1-0", "IN1-1" }
+		};
 
-	sprintf(tag, "IN%s-%d", (const char *)param, controller_select & 0x01);
-
-	return input_port_read(field->port->machine, tag);
+	return input_port_read_safe(field->port->machine, cntrl[port][controller_select & 0x01], 0x00);
 }
 
 
