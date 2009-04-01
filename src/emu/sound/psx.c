@@ -564,7 +564,7 @@ WRITE32_DEVICE_HANDLER( psx_spu_w )
 			chip->m_n_voiceon = 0;
 			COMBINE_DATA( &chip->m_n_voiceon );
 			verboselog( machine, 1, "psx_spu_w() voice on = %08x\n", chip->m_n_voiceon );
-			for( n_channel = 0; n_channel < 32; n_channel++ )
+			for( n_channel = 0; n_channel < MAX_CHANNEL; n_channel++ )
 			{
 				if( ( chip->m_n_voiceon & ( 1 << n_channel ) ) != 0 )
 				{
@@ -583,7 +583,7 @@ WRITE32_DEVICE_HANDLER( psx_spu_w )
 			COMBINE_DATA( &chip->m_n_voiceoff );
 			verboselog( machine, 1, "psx_spu_w() voice off = %08x\n", chip->m_n_voiceoff );
 	
-			for( n_channel = 0; n_channel < 32; n_channel++ )
+			for( n_channel = 0; n_channel < MAX_CHANNEL; n_channel++ )
 			{
 				if( ( chip->m_n_voiceoff & ( 1 << n_channel ) ) != 0 )
 				{
