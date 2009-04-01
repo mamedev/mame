@@ -2361,6 +2361,7 @@ src/mame/includes/jpmimpct.h svneol=native#text/plain
 src/mame/includes/kaneko16.h svneol=native#text/plain
 src/mame/includes/kangaroo.h svneol=native#text/plain
 src/mame/includes/klax.h svneol=native#text/plain
+src/mame/includes/konamipt.h svneol=native#text/plain
 src/mame/includes/kyugo.h svneol=native#text/plain
 src/mame/includes/lasso.h svneol=native#text/plain
 src/mame/includes/lazercmd.h svneol=native#text/plain
