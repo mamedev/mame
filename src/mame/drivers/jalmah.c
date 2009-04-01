@@ -21,7 +21,8 @@ Notes(general):
 TODO:
 -Back layer pens looks ugly in some circumstances (i.e. suchipi when you win, mjzoomin when coined up),
  static or controlled by something else?
--daireika attract mode positioning looks wrong when the screen scrolls vertically, protection issue?
+-daireika attract mode positioning looks wrong when the screen scrolls vertically, likely that it
+ disables/enables the wrap-around for the tilemaps in some way;
 -Check if urashima has a "mode 3" for the layer 0 tilemap;
 -Complete the dip-switches for all the games;
 -There could be timing issues caused by MCU simulation at $80004;
