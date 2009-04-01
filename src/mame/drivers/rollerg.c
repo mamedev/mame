@@ -186,7 +186,8 @@ static INPUT_PORTS_START( rollerg )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-//  PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPSETTING(    0x00, "No Credits" )
+	/* No Credits = both coin slots open, but no effect on coin counters */
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )

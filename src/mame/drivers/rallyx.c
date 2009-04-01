@@ -607,7 +607,8 @@ static INPUT_PORTS_START( locomotn )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPSETTING(    0x00, "No Coin B" )
+	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 INPUT_PORTS_END
 
 

@@ -422,7 +422,8 @@ static INPUT_PORTS_START( dips )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, "coin 2 invalidity" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	/* None = coin slot B disabled */
 
 	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )	/* Not Used according to the manual */

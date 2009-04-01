@@ -258,7 +258,8 @@ static INPUT_PORTS_START( chqflag )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-//  PORT_DIPSETTING(    0x00, "Coin Slot 2 Invalidity" )
+	PORT_DIPSETTING(    0x00, "Invalid" )
+	/* Invalid = both coin slots disabled */
 
 	PORT_START("DSW2")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )	/* Manual says it's not used */

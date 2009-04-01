@@ -1460,7 +1460,8 @@ static INPUT_PORTS_START( amidar )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, "Disable All Coins" )
+	PORT_DIPSETTING(    0x00, "Invalid" )
+	/* Invalid = both coin slots disabled */
 INPUT_PORTS_END
 
 

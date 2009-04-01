@@ -289,7 +289,8 @@ static INPUT_PORTS_START( dbz )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-//  PORT_DIPSETTING(    0x00, "Disabled" )
+	PORT_DIPSETTING(    0x00, "No Coin B" )
+	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dbz2 )
