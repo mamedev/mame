@@ -803,7 +803,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( wecleman )
-	PORT_START("IN0")	/* IN0 - Controls and Coins - $140011.b */
+	PORT_START("IN0")	/* $140011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_HIGH )
@@ -813,14 +813,14 @@ static INPUT_PORTS_START( wecleman )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Brake")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("IN1")	/* IN1 - Motor? - $140013.b */
+	PORT_START("IN1")	/* Motor? - $140013.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )	// right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )	// thermo
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSWA")	/* IN2 - DSW A (Coinage) - $140015.b */
+	PORT_START("DSWA")	/* $140015.b */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -854,8 +854,10 @@ static INPUT_PORTS_START( wecleman )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x00, "No Coin B" )
+	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
-	PORT_START("DSWB")	/* IN3 - DSW B (options) - $140017.b */
+	PORT_START("DSWB")	/* $140017.b */
 	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
 	PORT_DIPSETTING(    0x01, "km/h" )
 	PORT_DIPSETTING(    0x00, "mph" )
@@ -880,10 +882,10 @@ static INPUT_PORTS_START( wecleman )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("ACCEL")	/* IN4 - Accelerator - $140021.b (0) */
+	PORT_START("ACCEL")	/* Accelerator - $140021.b (0) */
 	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_MINMAX(0,0x80) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("STEER")	/* IN5 - Steering Wheel - $140021.b (2) */
+	PORT_START("STEER")	/* Steering Wheel - $140021.b (2) */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
@@ -893,7 +895,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( hotchase )
-	PORT_START("IN0")	/* IN0 - Controls and Coins - $140011.b */
+	PORT_START("IN0")	/* $140011.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
@@ -903,14 +905,14 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN1")	/* IN1 - Motor? - $140013.b */
+	PORT_START("IN1")	/* Motor? - $140013.b */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 )	// right sw
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )	// left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 )	// thermo
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )	// from sound cpu ?
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW2")	/* IN2 - DSW 2 (options) - $140015.b */
+	PORT_START("DSW2")	/* $140015.b */
 	PORT_DIPNAME( 0x01, 0x01, "Speed Unit" )
 	PORT_DIPSETTING(    0x01, "KM" )
 	PORT_DIPSETTING(    0x00, "M.P.H." )
@@ -936,7 +938,7 @@ static INPUT_PORTS_START( hotchase )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")	/* IN3 - DSW 1 (Coinage) - $140017.b */
+	PORT_START("DSW1")	/* $140017.b */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
@@ -971,10 +973,10 @@ static INPUT_PORTS_START( hotchase )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/99 Credits" )
 
-	PORT_START("ACCEL")	/* IN4 - Accelerator - $140021.b (0) */
+	PORT_START("ACCEL")	/* Accelerator - $140021.b (0) */
 	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_MINMAX(0,0x80) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START("STEER")	/* IN5 - Steering Wheel - $140021.b (2) */
+	PORT_START("STEER")	/* Steering Wheel - $140021.b (2) */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 INPUT_PORTS_END
 
