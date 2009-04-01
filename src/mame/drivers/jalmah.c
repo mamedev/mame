@@ -3,6 +3,7 @@
 MJ-8956 HW games (c) 1989 Jaleco / NMK / UPL
 
 driver by Angelo Salese, based on early work by David Haywood
+Special thanks to Uki and Yasu for the priority system explaination.
 
 Similar to the NMK16 / Jaleco Mega System 1 boards but without sprites.
 
@@ -18,18 +19,18 @@ Notes(general):
   adding a value to these RAM areas according to what button is pressed.
 
 TODO:
--Fully understand priorities,chances are that it just uses a mix between the priority
- number,1+ prom(s) and the color number inside the video ram. Might need a test with the real hardware;
+-Back layer pens looks ugly in some circumstances (i.e. suchipi when you win, mjzoomin when coined up),
+ static or controlled by something else?
+-daireika attract mode positioning looks wrong when the screen scrolls vertically, protection issue?
 -Check if urashima has a "mode 3" for the layer 0 tilemap;
 -Complete the dip-switches for all the games;
 -There could be timing issues caused by MCU simulation at $80004;
 -Fix the sound banking, protection-related for the first version of the MCU
  (should be somewhere on the work ram/shared ram)
--Fix kakumei2 GFX3 rom region, likely to be a bad dump (half length)
 -urashima: might use three/four layers instead of two.It can be checked when you win
  a match in particular circumstances because there's a write in the 94000-9bfff region;
 -kakumei: inserting two credits will give an "informaion" with A-E button choices and nothing appears
- to work,protection?
+ to work, protection?
 -Massive clean-ups needed for the MCU snippet programs and the input-ports;
 
 Notes (1st MCU ver.):
@@ -61,6 +62,8 @@ $f06a6-$f06c0: Your tiles
 $f06c6-$f06e0: COM tiles
 ---- ---- --xx ----: Defines kind
 ---- ---- ---- xxxx: Defines number
+*
+$f0434: priority number
 
 ============================================================================================
 daireika 68k irq table vectors
@@ -258,53 +261,37 @@ static VIDEO_START( urashima )
 
 static UINT8 sc0_prin,sc1_prin,sc2_prin,sc3_prin;
 
-static void jalmah_priority_system(void)
+/***************************************************************************************
+The priority system is a combination between one prom and the priority number.
+The priority number is a pointer to an array of 16 bytes of the prom ( addresses bits 4-7
+0x*0-0x*f). These 16 bytes are read and added and every number is directly hooked up
+to the equivalent layer (i.e. read 0 == +1 for the layer 0, read 1 == +1 for the layer 1
+etc.)
+In the end the final results always are one bit assigned to each priority (i.e. most
+priority = 8, then 4, 2 and finally 1).
+***************************************************************************************/
+static void jalmah_priority_system(running_machine *machine)
 {
-//  UINT8 *pri_rom = memory_region(Machine, "user1");
-	/*
-    Case by case priorities:
-    kakumei: title screen     = 0/23  (0-1 unused)
-             attract mode     = 0/0123 (?)
-             card table       = 0/013 (2 unused)
-             gameplay         = 0/0123
-    kakumei2:title screen     = 0/0123
-             attract mode     = 4/013 (2 unused) also 4/0213
-             card table       = 9/013 (2 unused)
-             character screen = 9/013 (2 unused)
-             gameplay         = 2/03  (1-2 unused) also 2/013 (2 unused)
-             continue screen  = 9/013 (2 unused)
-    suchipi: title screen     = 0/03  (1-2 unused)
-             attract mode     = 6/103 (2 unused) also 6/1023
-             card table       = 1/013 (2 unused)
-             character screen = 4/0213
-             victory screen   = 6/0123 also 6/1023
-             gameplay         = d/0123 (trusted)
-    mjzoomin doesn't seem to use the priority number (0/0123)
-    daireika/urashima uses priority number with the protection device
-    daireika: gameplay        = x/103 (2 unused),might be 6
-    good results:
-    0/0123
-    4/0213
-    6/1023
-    */
-	static const UINT16 pri_scheme[0x10] = { 0x0123, 0x0123, 0x0123, 0x0123, 0x0213, 0x0123, 0x1023, 0x0123,
-											 0x0123, 0x1203, 0x0123, 0x0123, 0x0123, 0x0123, 0x0123, 0x0123    };
-//  UINT8 prinum[0x10];
+    UINT8 *pri_rom = memory_region(machine, "user1");
+    UINT8 i;
+    UINT8 prinum[0x10];
 
-//  for(i=0;i<0x10;i++)
-//      prinum[i] = pri_rom[i+pri*0x10];
-	sc0_prin = (pri_scheme[pri] & 0xf000) >> 12;
-	sc1_prin = (pri_scheme[pri] & 0x0f00) >> 8;
-	sc2_prin = (pri_scheme[pri] & 0x00f0) >> 4;
-	sc3_prin = (pri_scheme[pri] & 0x000f) >> 0;
+	sc0_prin = 0;
+	sc1_prin = 0;
+	sc2_prin = 0;
+	sc3_prin = 0;
 
-	/*
-    popmessage("%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x %02x"
-    ,prinum[0x00],prinum[0x01],prinum[0x02],prinum[0x03]
-    ,prinum[0x04],prinum[0x05],prinum[0x06],prinum[0x07]
-    ,prinum[0x08],prinum[0x09],prinum[0x0a],prinum[0x0b]
-    ,prinum[0x0c],prinum[0x0d],prinum[0x0e],prinum[0x0f],pri);
-    */
+    for(i=0;i<0x10;i++)
+    {
+        prinum[i] = pri_rom[i+pri*0x10];
+
+        if(prinum[i] == 0) { sc0_prin++; }
+        if(prinum[i] == 1) { sc1_prin++; }
+        if(prinum[i] == 2) { sc2_prin++; }
+        if(prinum[i] == 3) { sc3_prin++; }
+	}
+
+	//popmessage("%02x %02x %02x %02x",sc0_prin,sc1_prin,sc2_prin,sc3_prin);
 }
 
 static void draw_sc0_layer(bitmap_t *bitmap, const rectangle *cliprect)
@@ -354,7 +341,7 @@ static void draw_sc3_layer(bitmap_t *bitmap, const rectangle *cliprect)
 static VIDEO_UPDATE( jalmah )
 {
 	static UINT8 cur_prin;
-	jalmah_priority_system();
+	jalmah_priority_system(screen->machine);
 
 	tilemap_set_scrollx( sc0_tilemap_0, 0, jm_scrollram[0] & 0xfff);
 	tilemap_set_scrollx( sc0_tilemap_1, 0, jm_scrollram[0] & 0x7ff);
@@ -397,9 +384,9 @@ static VIDEO_UPDATE( jalmah )
 	tilemap_set_scrolly( sc3_tilemap_2, 0, jm_scrollram[7] & 0x1ff);
 	tilemap_set_scrolly( sc3_tilemap_3, 0, jm_scrollram[7] & 0x3ff);
 
-    bitmap_fill(bitmap, cliprect, screen->machine->pens[0xff]);//selectable by a ram address?
+    bitmap_fill(bitmap, cliprect, screen->machine->pens[0xff]); //selectable by a ram address?
 
-	for(cur_prin=0;cur_prin<4;cur_prin++)
+	for(cur_prin=1;cur_prin<=0x8;cur_prin<<=1)
 	{
 		if(cur_prin==sc0_prin) { draw_sc0_layer(bitmap,cliprect); }
 		if(cur_prin==sc1_prin) { draw_sc1_layer(bitmap,cliprect); }
@@ -503,7 +490,7 @@ static WRITE16_HANDLER( jalmah_scroll_w )
 	{
 		/*These 4 are just video regs,see mjzoomin test*/
 		/*
-            ---x ---- Always on,8x8 tiles switch?
+            ---x ---- Always on with layer 3, 8x8 tiles switch?
             ---- --xx RANGE registers
         */
 		case (0x24/2): jm_vregs[0] = data; break;
@@ -903,10 +890,10 @@ static ADDRESS_MAP_START( jalmah, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080010, 0x080011) AM_WRITE(jalmah_flip_screen_w)
 	//       0x080012, 0x080013  MCU write related,same for each game
 	//       0x080014, 0x080015  MCU write related,same for each game
-/**/AM_RANGE(0x080016, 0x080017) AM_READ(SMH_RAM) AM_WRITE(jalmah_tilebank_w)
+/**/AM_RANGE(0x080016, 0x080017) AM_RAM_WRITE(jalmah_tilebank_w)
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(jalmah_okibank_w)
 	AM_RANGE(0x08001a, 0x08001b) AM_WRITE(jalmah_okirom_w)
-/**/AM_RANGE(0x080020, 0x08003f) AM_READ(SMH_RAM) AM_WRITE(jalmah_scroll_w)
+/**/AM_RANGE(0x080020, 0x08003f) AM_RAM_WRITE(jalmah_scroll_w)
 	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	//       0x084000, 0x084001  ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) /* Palette RAM */
