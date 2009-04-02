@@ -337,5 +337,5 @@ ROM_END
 
 
 
-GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, 0, ROT0, "Technos", "Acrobatic Dog-Fight", 0 )
-GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, 0, ROT0, "Technos", "Dog-Fight (Japan)", 0 )
+GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, 0, ROT0, "Technos Japan", "Acrobatic Dog-Fight", 0 )
+GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, 0, ROT0, "Technos Japan", "Dog-Fight (Japan)", 0 )

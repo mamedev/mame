@@ -891,7 +891,7 @@ static DRIVER_INIT( chinagat )
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT    MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1988, chinagat, 0,        chinagat, chinagat, chinagat, ROT0, "[Technos] (Taito Romstar license)", "China Gate (US)", 0 )
-GAME( 1988, saiyugou, chinagat, chinagat, chinagat, chinagat, ROT0, "Technos", "Sai Yu Gou Ma Roku (Japan)", 0 )
+GAME( 1988, chinagat, 0,        chinagat, chinagat, chinagat, ROT0, "[Technos Japan] (Taito Romstar license)", "China Gate (US)", 0 )
+GAME( 1988, saiyugou, chinagat, chinagat, chinagat, chinagat, ROT0, "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", 0 )
 GAME( 1988, saiyugb1, chinagat, saiyugb1, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", GAME_IMPERFECT_SOUND )
 GAME( 1988, saiyugb2, chinagat, saiyugb2, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", 0 )

@@ -376,6 +376,6 @@ ROM_START( battlan3 )
 ROM_END
 
 
-GAME( 1986, battlane, 0,        battlane, battlane, 0, ROT90, "Technos (Taito license)", "Battle Lane! Vol. 5 (set 1)", 0 )
-GAME( 1986, battlan2, battlane, battlane, battlane, 0, ROT90, "Technos (Taito license)", "Battle Lane! Vol. 5 (set 2)", 0 )
-GAME( 1986, battlan3, battlane, battlane, battlane, 0, ROT90, "Technos (Taito license)", "Battle Lane! Vol. 5 (set 3)", 0 )
+GAME( 1986, battlane, 0,        battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 1)", 0 )
+GAME( 1986, battlan2, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 2)", 0 )
+GAME( 1986, battlan3, battlane, battlane, battlane, 0, ROT90, "Technos Japan (Taito license)", "Battle Lane! Vol. 5 (set 3)", 0 )

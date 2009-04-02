@@ -990,11 +990,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1990, ddragon3, 0,        ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddrago3j, ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ddrago3p, ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos", "Double Dragon 3 - The Rosetta Stone (prototype)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddragon3, 0,        ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddrago3j, ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ddrago3p, ddragon3, ddragon3, ddragon3, 0, ROT0, "Technos Japan", "Double Dragon 3 - The Rosetta Stone (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ddrago3b, ddragon3, ddrago3b, ddrago3b, 0, ROT0, "bootleg", "Double Dragon 3 - The Rosetta Stone (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribe,   0,        ctribe,   ctribe,   0, ROT0, "Technos", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos", "The Combatribes (US Set 1?)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribe,   0,        ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ctribe1,  ctribe,   ctribe,   ctribe,   0, ROT0, "Technos Japan", "The Combatribes (US Set 1?)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribeb,  ctribe,   ctribe,   ctribeb,  0, ROT0, "bootleg", "The Combatribes (bootleg Set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ctribb2,  ctribe,   ctribe,   ctribeb,  0, ROT0, "bootleg", "The Combatribes (bootleg Set 2)", GAME_SUPPORTS_SAVE )

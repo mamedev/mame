@@ -7848,10 +7848,10 @@ GAME( 2003, pnyaa,    neogeo,   neogeo,   neogeo,   pnyaa,    ROT0, "Aiky / Tait
 /* Takara */
 GAME( 1995, marukodq, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Takara", "Chibi Marukochan Deluxe Quiz", 0 )
 
-/* Technos */
-GAME( 1995, doubledr, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Technos", "Double Dragon (Neo-Geo)", 0 )
-GAME( 1995, gowcaizr, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Technos", "Voltage Fighter - Gowcaizer / Choujin Gakuen Gowcaizer", 0 )
-GAME( 1996, sdodgeb,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Technos", "Super Dodge Ball / Kunio no Nekketsu Toukyuu Densetsu", 0 )
+/* Technos Japan */
+GAME( 1995, doubledr, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Technos Japan", "Double Dragon (Neo-Geo)", 0 )
+GAME( 1995, gowcaizr, neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Technos Japan", "Voltage Fighter - Gowcaizer / Choujin Gakuen Gowcaizer", 0 )
+GAME( 1996, sdodgeb,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Technos Japan", "Super Dodge Ball / Kunio no Nekketsu Toukyuu Densetsu", 0 )
 
 /* Tecmo */
 GAME( 1996, tws96,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Tecmo", "Tecmo World Soccer '96", 0 )

@@ -1659,7 +1659,7 @@ GAME( 1988, pc_cntra, playch10, playch10, playch10, pcbboard, ROT0, "Konami (Nin
 GAME( 1986, pc_goons, playch10, playch10, playch10, pccboard, ROT0, "Konami",									"The Goonies (PlayChoice-10)", 0 )
 
 /* D-Board Games */
-GAME( 1986, pc_mtoid, playch10, playch10, playch10, pcdboard_2, ROT0, "Nintendo",									"Metroid (PlayChoice-10)", 0 )
+GAME( 1986, pc_mtoid, playch10, playch10, playch10, pcdboard_2, ROT0, "Nintendo",								"Metroid (PlayChoice-10)", 0 )
 GAME( 1987, pc_radrc, playch10, playch10, playch10, pcdboard, ROT0, "Square",									"Rad Racer (PlayChoice-10)", 0 )
 
 /* E-Board Games */
@@ -1668,7 +1668,7 @@ GAME( 1987, pc_miket, playch10, playchnv, playch10, pceboard, ROT0, "Nintendo",	
 /* F-Board Games */
 GAME( 1987, pc_rcpam, playch10, playch10, playch10, pcfboard, ROT0, "Rare",										"R.C. Pro-Am (PlayChoice-10)", 0 )
 GAME( 1987, pc_rrngr, playch10, playch10, playch10, pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Chip'n Dale: Rescue Rangers (PlayChoice-10)", 0 )
-GAME( 1988, pc_ddrgn, playch10, playch10, playch10, pcfboard, ROT0, "Technos",									"Double Dragon (PlayChoice-10)", 0 )
+GAME( 1988, pc_ddrgn, playch10, playch10, playch10, pcfboard, ROT0, "Technos Japan",							"Double Dragon (PlayChoice-10)", 0 )
 GAME( 1989, pc_ngaid, playch10, playch10, playch10, pcfboard, ROT0, "Tecmo (Nintendo of America license)",		"Ninja Gaiden (PlayChoice-10)", 0 )
 GAME( 1989, pc_tmnt,  playch10, playch10, playch10, pcfboard, ROT0, "Konami (Nintendo of America license)",		"Teenage Mutant Ninja Turtles (PlayChoice-10)", 0 )
 GAME( 1989, pc_ftqst, playch10, playch10, playch10, pcfboard, ROT0, "Sunsoft (Nintendo of America license)",	"Uncle Fester's Quest: The Addams Family (PlayChoice-10)", 0 )
@@ -1683,7 +1683,7 @@ GAME( 1988, pc_smb3,  playch10, playch10, playch10, pcgboard, ROT0, "Nintendo",	
 GAME( 1990, pc_mman3, playch10, playch10, playch10, pcgboard, ROT0, "Capcom USA (Nintendo of America license)",	"Mega Man III (PlayChoice-10)", 0 )
 GAME( 1990, pc_suprc, playch10, playch10, playch10, pcgboard, ROT0, "Konami (Nintendo of America license)",		"Super C (PlayChoice-10)", 0 )
 GAME( 1990, pc_tmnt2, playch10, playch10, playch10, pcgboard, ROT0, "Konami (Nintendo of America license)",		"Teenage Mutant Ninja Turtles II: The Arcade Game (PlayChoice-10)", 0 )
-GAME( 1990, pc_wcup,  playch10, playch10, playch10, pcgboard, ROT0, "Technos (Nintendo license)",				"Nintendo World Cup (PlayChoice-10)", 0 )
+GAME( 1990, pc_wcup,  playch10, playch10, playch10, pcgboard, ROT0, "Technos Japan (Nintendo license)",			"Nintendo World Cup (PlayChoice-10)", 0 )
 GAME( 1990, pc_ngai2, playch10, playch10, playch10, pcgboard, ROT0, "Tecmo (Nintendo of America license)",		"Ninja Gaiden Episode II: The Dark Sword of Chaos (PlayChoice-10)", 0 )
 GAME( 1991, pc_ngai3, playch10, playch10, playch10, pcgboard, ROT0, "Tecmo (Nintendo of America license)",		"Ninja Gaiden Episode III: The Ancient Ship of Doom (PlayChoice-10)", 0 )
 GAME( 1991, pc_pwbld, playch10, playch10, playch10, pcgboard, ROT0, "Taito (Nintendo of America license)",		"Power Blade (PlayChoice-10)", 0 )

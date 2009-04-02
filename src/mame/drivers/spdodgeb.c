@@ -615,6 +615,6 @@ ROM_END
 
 
 
-GAME( 1987, spdodgeb, 0,        spdodgeb, spdodgeb, 0, ROT0, "Technos", "Super Dodge Ball (US)", 0 )
-GAME( 1987, nkdodge,  spdodgeb, spdodgeb, spdodgeb, 0, ROT0, "Technos", "Nekketsu Koukou Dodgeball Bu (Japan)", 0 )
-GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, 0, ROT0, "Technos", "Nekketsu Koukou Dodgeball Bu (Japan, bootleg)", 0 )
+GAME( 1987, spdodgeb, 0,        spdodgeb, spdodgeb, 0, ROT0, "Technos Japan", "Super Dodge Ball (US)", 0 )
+GAME( 1987, nkdodge,  spdodgeb, spdodgeb, spdodgeb, 0, ROT0, "Technos Japan", "Nekketsu Koukou Dodgeball Bu (Japan)", 0 )
+GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, 0, ROT0, "Technos Japan", "Nekketsu Koukou Dodgeball Bu (Japan, bootleg)", 0 )

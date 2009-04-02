@@ -2025,18 +2025,18 @@ static DRIVER_INIT( ddgn6809 )
  *
  *************************************/
 
-GAME( 1987, ddragon,  0,        ddragon,  ddragon,  ddragon,  ROT0, "Technos", "Double Dragon (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonw, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos] (Taito license)", "Double Dragon (World Set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragnw1, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos] (Taito license)", "Double Dragon (World Set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragonu, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos] (Taito America license)", "Double Dragon (US Set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, ddragoua, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos] (Taito America license)", "Double Dragon (US Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragon,  0,        ddragon,  ddragon,  ddragon,  ROT0, "Technos Japan", "Double Dragon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonw, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito license)", "Double Dragon (World Set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragnw1, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito license)", "Double Dragon (World Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragonu, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragoua, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos Japan] (Taito America license)", "Double Dragon (US Set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragob2, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragonb, ddragon,  ddragonb, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with HD6309)", GAME_SUPPORTS_SAVE ) // according to dump notes
 GAME( 1987, ddragnba, ddragon,  ddragnba, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddgn6809, ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 1)", GAME_NOT_WORKING )
 GAME( 1987, dd6809a,  ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 2)", GAME_NOT_WORKING )
-GAME( 1988, ddragon2, 0,        ddragon2, ddragon2, ddragon2, ROT0, "Technos", "Double Dragon II - The Revenge (World)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ddragn2u, ddragon2, ddragon2, ddragon2, ddragon2, ROT0, "Technos", "Double Dragon II - The Revenge (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ddragon2, 0,        ddragon2, ddragon2, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ddragn2u, ddragon2, ddragon2, ddragon2, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", GAME_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,  0,        darktowr, tstrike,  darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Newer)", GAME_SUPPORTS_SAVE )
