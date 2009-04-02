@@ -30,8 +30,6 @@ TODO:
  (should be somewhere on the work ram/shared ram)
 -urashima: might use three/four layers instead of two.It can be checked when you win
  a match in particular circumstances because there's a write in the 94000-9bfff region;
--kakumei: inserting two credits will give an "informaion" with A-E button choices and nothing appears
- to work, protection?
 -Massive clean-ups needed for the MCU snippet programs and the input-ports;
 
 Notes (1st MCU ver.):
