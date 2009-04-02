@@ -1790,10 +1790,10 @@ static DEVICE_START( ide_controller )
 			ide->num_heads = hdinfo->heads;
 			if (PRINTF_IDE_COMMANDS) mame_printf_debug("CHS: %d %d %d\n", ide->num_cylinders, ide->num_heads, ide->num_sectors);
 		}
-	}
 
-	/* build the features page */
-	ide_build_features(ide);
+		/* build the features page */
+		ide_build_features(ide);
+	}
 
 	/* create a timer for timing status */
 	ide->last_status_timer = timer_alloc(device->machine, NULL, NULL);
