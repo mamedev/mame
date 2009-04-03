@@ -6,7 +6,7 @@ driver by Nicola Salmoria
 
 2009-03:
 Added dsw locations and verified factory setting based on Guru's notes
-(actualy for finalizr only, finalizb locations assumed to be the same)
+(actually for finalizr only, finalizb locations assumed to be the same)
 
 ***************************************************************************/
 
