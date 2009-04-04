@@ -120,22 +120,28 @@
 typedef struct _z80_state z80_state;
 struct _z80_state
 {
-	PAIR	prvpc,pc,sp,af,bc,de,hl,ix,iy,memptr;
-	PAIR	af2,bc2,de2,hl2;
-	UINT8	r,r2,iff1,iff2,halt,im,i;
-	UINT8	nmi_state;			/* nmi line state */
-	UINT8	nmi_pending;		/* nmi pending */
-	UINT8	irq_state;			/* irq line state */
-	UINT8	after_ei;			/* are we in the EI shadow? */
-	UINT32	ea;
+	PAIR			prvpc,pc,sp,af,bc,de,hl,ix,iy,memptr;
+	PAIR			af2,bc2,de2,hl2;
+	UINT8			r,r2,iff1,iff2,halt,im,i;
+	UINT8			nmi_state;			/* nmi line state */
+	UINT8			nmi_pending;		/* nmi pending */
+	UINT8			irq_state;			/* irq line state */
+	UINT8			after_ei;			/* are we in the EI shadow? */
+	UINT32			ea;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
-	int		icount;
+	int				icount;
 	z80_daisy_state *daisy;
 	cpu_state_table state;
-	UINT8 rtemp;
+	UINT8 			rtemp;
+	const UINT8 *	cc_op;
+	const UINT8 *	cc_cb;
+	const UINT8 *	cc_ed;
+	const UINT8 *	cc_xy;
+	const UINT8 *	cc_xycb;
+	const UINT8 *	cc_ex;
 };
 
 INLINE z80_state *get_safe_token(const device_config *device)
@@ -376,9 +382,8 @@ static const UINT8 cc_ex[0x100] = {
  6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2,
  6, 0, 0, 0, 7, 0, 0, 2, 6, 0, 0, 0, 7, 0, 0, 2};
 
-static const UINT8 *cc[6];
-#define Z80_TABLE_dd	Z80_TABLE_xy
-#define Z80_TABLE_fd	Z80_TABLE_xy
+#define cc_dd	cc_xy
+#define cc_fd	cc_xy
 
 static void take_interrupt(z80_state *z80);
 static CPU_BURN( z80 );
@@ -513,7 +518,7 @@ INLINE void BURNODD(z80_state *z80, int cycles, int opcodes, int cyclesum)
 /***************************************************************
  * adjust cycle count by n T-states
  ***************************************************************/
-#define CC(Z,prefix,opcode)	do { (Z)->icount -= cc[Z80_TABLE_##prefix][opcode]; } while (0)
+#define CC(Z,prefix,opcode)	do { (Z)->icount -= z80->cc_##prefix[opcode]; } while (0)
 
 /***************************************************************
  * execute an opcode
@@ -3284,7 +3289,7 @@ static void take_interrupt(z80_state *z80)
 		RM16(z80, irq_vector, &z80->pc);
 		LOG(("Z80 '%s' IM2 [$%04x] = $%04x\n", z80->device->tag, irq_vector, z80->PCD));
 		/* CALL opcode timing */
-		z80->icount -= cc[Z80_TABLE_op][0xcd];
+		z80->icount -= z80->cc_op[0xcd];
 	}
 	else
 	/* Interrupt mode 1. RST 38h */
@@ -3294,7 +3299,7 @@ static void take_interrupt(z80_state *z80)
 		PUSH(z80, pc);
 		z80->PCD = 0x0038;
 		/* RST $38 + 'interrupt latency' cycles */
-		z80->icount -= cc[Z80_TABLE_op][0xff] + cc[Z80_TABLE_ex][0xff];
+		z80->icount -= z80->cc_op[0xff] + cc_ex[0xff];
 	}
 	else
 	{
@@ -3308,18 +3313,18 @@ static void take_interrupt(z80_state *z80)
 				PUSH(z80, pc);
 				z80->PCD = irq_vector & 0xffff;
 				 /* CALL $xxxx + 'interrupt latency' cycles */
-				z80->icount -= cc[Z80_TABLE_op][0xcd] + cc[Z80_TABLE_ex][0xff];
+				z80->icount -= z80->cc_op[0xcd] + z80->cc_ex[0xff];
 				break;
 			case 0xc30000:	/* jump */
 				z80->PCD = irq_vector & 0xffff;
 				/* JP $xxxx + 2 cycles */
-				z80->icount -= cc[Z80_TABLE_op][0xc3] + cc[Z80_TABLE_ex][0xff];
+				z80->icount -= z80->cc_op[0xc3] + z80->cc_ex[0xff];
 				break;
 			default:		/* rst (or other opcodes?) */
 				PUSH(z80, pc);
 				z80->PCD = irq_vector & 0x0038;
 				/* RST $xx + 2 cycles */
-				z80->icount -= cc[Z80_TABLE_op][z80->PCD] + cc[Z80_TABLE_ex][z80->PCD];
+				z80->icount -= z80->cc_op[z80->PCD] + z80->cc_ex[z80->PCD];
 				break;
 		}
 	}
@@ -3333,14 +3338,6 @@ static CPU_INIT( z80 )
 {
 	z80_state *z80 = get_safe_token(device);
 	int i, p;
-
-	/* setup cycle tables */
-	cc[Z80_TABLE_op] = cc_op;
-	cc[Z80_TABLE_cb] = cc_cb;
-	cc[Z80_TABLE_ed] = cc_ed;
-	cc[Z80_TABLE_xy] = cc_xy;
-	cc[Z80_TABLE_xycb] = cc_xycb;
-	cc[Z80_TABLE_ex] = cc_ex;
 
 	if( !SZHVC_add || !SZHVC_sub )
 	{
@@ -3465,6 +3462,14 @@ static CPU_INIT( z80 )
 	z80->state = state_table_template;
 	z80->state.baseptr = z80;
 	z80->state.subtypemask = 1;
+
+	/* setup cycle tables */
+	z80->cc_op = cc_op;
+	z80->cc_cb = cc_cb;
+	z80->cc_ed = cc_ed;
+	z80->cc_xy = cc_xy;
+	z80->cc_xycb = cc_xycb;
+	z80->cc_ex = cc_ex;
 }
 
 /****************************************************************************
@@ -3630,18 +3635,21 @@ static CPU_SET_INFO( z80 )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line(z80, INPUT_LINE_NMI, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line(z80, 0, info->i);		break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_op:	cc[Z80_TABLE_op] = (const UINT8 *)info->p;			break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_cb:	cc[Z80_TABLE_cb] = (const UINT8 *)info->p;			break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ed:	cc[Z80_TABLE_ed] = (const UINT8 *)info->p;			break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_xy:	cc[Z80_TABLE_xy] = (const UINT8 *)info->p;			break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_xycb:	cc[Z80_TABLE_xycb] = (const UINT8 *)info->p;		break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ex:	cc[Z80_TABLE_ex] = (const UINT8 *)info->p;			break;
+		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line(z80, 0, info->i);				break;
 	}
 }
 
+void z80_set_cycle_tables(const device_config *device, const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex)
+{
+	z80_state *z80 = get_safe_token(device);
+
+	z80->cc_op = (op != NULL) ? op : cc_op;
+	z80->cc_cb = (cb != NULL) ? cb : cc_cb;
+	z80->cc_ed = (ed != NULL) ? ed : cc_ed;
+	z80->cc_xy = (xy != NULL) ? xy : cc_xy;
+	z80->cc_xycb = (xycb != NULL) ? xycb : cc_xycb;
+	z80->cc_ex = (ex != NULL) ? ex : cc_ex;
+}
 
 
 /**************************************************************************
@@ -3688,13 +3696,6 @@ CPU_GET_INFO( z80 )
 		/* --- the following bits of info are returned as pointers --- */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z80->icount;			break;
 		case CPUINFO_PTR_STATE_TABLE:					info->state_table = &z80->state;		break;
-
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_op:	info->p = (void *)cc[Z80_TABLE_op];		break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_cb:	info->p = (void *)cc[Z80_TABLE_cb];		break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ed:	info->p = (void *)cc[Z80_TABLE_ed];		break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_xy:	info->p = (void *)cc[Z80_TABLE_xy];		break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_xycb:	info->p = (void *)cc[Z80_TABLE_xycb]; 	break;
-		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ex:	info->p = (void *)cc[Z80_TABLE_ex];		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "Z80");					break;

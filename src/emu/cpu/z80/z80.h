@@ -19,25 +19,11 @@ enum
 	Z80_GENPCBASE = REG_GENPCBASE
 };
 
-enum
-{
-	Z80_TABLE_op,
-	Z80_TABLE_cb,
-	Z80_TABLE_ed,
-	Z80_TABLE_xy,
-	Z80_TABLE_xycb,
-	Z80_TABLE_ex	/* cycles counts for taken jr/jp/call and interrupt latency (rst opcodes) */
-};
-
-enum
-{
-	CPUINFO_PTR_Z80_CYCLE_TABLE = CPUINFO_PTR_CPU_SPECIFIC,
-	CPUINFO_PTR_Z80_CYCLE_TABLE_LAST = CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ex
-};
-
-extern CPU_GET_INFO( z80 );
+CPU_GET_INFO( z80 );
 #define CPU_Z80 CPU_GET_INFO_NAME( z80 )
 
-extern CPU_DISASSEMBLE( z80 );
+CPU_DISASSEMBLE( z80 );
+
+void z80_set_cycle_tables(const device_config *device, const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex);
 
 #endif /* __Z80_H__ */
