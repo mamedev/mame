@@ -12,25 +12,25 @@ Current Compatibility notes (GD-rom games only)
 |----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
 |romname   | Pl(s) | Rot | Test | Boot | Game | Control Type                   | Notes                                               |
 |----------|-------|-----|------|------|------|--------------------------------|-----------------------------------------------------|
-|gundmgd   |   1   |  H  | Yes  | Yes  | Yes  | twin-joystick with 4+6 buttons |                                                     |
-|sfz3ugd   |   2   |  H  | Yes  | Yes  | No   | joystick with 6 buttons        | Spurious irq on ARM7 prg / broken timings           |
+|gundmgd   |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        |                                                     |
+|sfz3ugd   |   2   |  H  | Yes  | Yes  | No   | joystick with 6 buttons        | Hangs after pressing start                          |
 |cvsgd     |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | 2 + 2 extra buttons                                 |
-|gundmxgd  |   1   |  H  | Yes  | Yes  | Yes  | twin-joystick with 4+6 buttons |                                                     |
+|gundmxgd  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4+6 buttons      |                                                     |
 |cvs2gd    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 6 buttons        |                                                     |
-|ikaruga   |   2   |  V  | Yes  | Yes  | No   | joystick with 2 buttons?       | Broken i/o / timings                                |
+|ikaruga   |   2   |  V  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
 |ggxx      |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
 |moeru     |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       | Broken i/o, stuck at the "now loading" msg          |
-|chocomk   |   2   |  H  | No?  | Yes  | Yes? | joystick with 3 buttons?       | Broken i/o?                                         |
+|chocomk   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
 |quizqgd   |   2   |  V  | Yes  | Yes  | Yes  | joystick(?) with 4 buttons     |                                                     |
 |ggxxrl    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
-|tetkiwam  |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
-|shikgam2  |   2   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|tetkiwam  |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       | Black screen, tests the SCIF (UART) regs?           |
+|shikgam2  |   2   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o, crashes on the proper gameplay          |
 |usagui    |   1   |  H  | Yes  | Yes  | No   | mahjong panel                  |                                                     |
-|bdrdown   |   2   |  H  | Yes  | Yes  | No?  | joystick with 3 buttons?       | Broken i/o in test mode                             |
+|bdrdown   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
 |psyvar2   |   1   |  V  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
 |cfield    |   1?  |  H  | No?  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |trizeal   |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
-|meltybld  |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
+|meltybld  |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract/gameplay with wrong mask         |
 |senko     |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |senkoo    |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |ss2005    |   1   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
@@ -40,14 +40,14 @@ Current Compatibility notes (GD-rom games only)
 |undefeat  |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       | Stuck at the "now loading" msg                      |
 |trgheart  |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |jingystm  |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons?       | Broken i/o                                          |
-|meltyb    |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
-|meltyba   |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract with wrong mask                  |
+|meltyb    |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract/gameplay with wrong mask         |
+|meltyba   |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract/gameplay with wrong mask         |
 |karous    |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |takoron   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
 --------------------------------------------------------------------------------------------------------------------------------------
 |confmiss  |   2   |  H  | Yes  | Yes  | No   | lightgun                       |                                                     |
 |sprtjam   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 2 buttons        |                                                     |
-|slashout  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | Needs to map the extra button                       |
+|slashout  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        |                                                     |
 |spkrbtl   |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons        | Crashes when loading the gameplay                   |
 |monkeyba  |   1   |  H  | Yes  | Yes  | No   | ad stick                       | Crashes when loading the gameplay                   |
 |dygolf    |   2   |  H  | No   | No   | No   | trackball + 4 buttons          | Moans about the jvs settings                        |
@@ -1057,6 +1057,7 @@ ADDRESS_MAP_END
 * Input ports
 */
 
+/* for now we hardwire a joystick + 6 buttons for every game.*/
 static INPUT_PORTS_START( naomi )
 	PORT_START("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")
@@ -1070,6 +1071,9 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_START("IN2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_START("IN3")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
@@ -1080,6 +1084,9 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_START("IN4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_START("COINS")
@@ -4310,7 +4317,7 @@ Peripheral String	0000000
 Product Number	GDT-0010C
 Version	V4.000
 Release Date	20040608
-Manufacturer ID	
+Manufacturer ID
 
 TOC	DISC
 Track	Start Sector	End Sector	Track Size
@@ -4343,7 +4350,7 @@ Peripheral String	0000000
 Product Number	GDT-0017B
 Version	V3.001
 Release Date	20041102
-Manufacturer ID	
+Manufacturer ID
 
 TOC	DISC
 Track	Start Sector	End Sector	Track Size

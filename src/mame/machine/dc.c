@@ -124,6 +124,7 @@ UINT32 dc_coin_counts[2];
 static UINT32 maple_regs[0x100/4];
 static UINT32 dc_rtcregister[4];
 static UINT32 g1bus_regs[0x100/4];
+static UINT32 g2bus_regs[0x100/4];
 UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
 static emu_timer *dc_rtc_timer;
@@ -805,14 +806,14 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 	dat = (UINT32)(data >> shift);
 	old = g1bus_regs[reg];
 
-	g1bus_regs[reg] = dat; // 5f6c00+reg*4=dat
+	g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
 	mame_printf_verbose("G1CTRL: [%08x=%x] write %llx to %x, mask %llx\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
 	switch (reg)
 	{
 	case SB_GDST:
-		if (!(old & 1) && (dat & 1)) // 0 -> 1
+		if (dat & 1 && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
 		{
-			if ((g1bus_regs[SB_GDEN] == 0) || (g1bus_regs[SB_GDDIR] == 0))
+			if (g1bus_regs[SB_GDDIR] == 0)
 			{
 				mame_printf_verbose("G1CTRL: unsupported transfer\n");
 				return;
@@ -842,14 +843,14 @@ READ64_HANDLER( dc_g2_ctrl_r )
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	mame_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
-	return 0;
+	return (UINT64)g2bus_regs[reg] << shift;
 }
 
 WRITE64_HANDLER( dc_g2_ctrl_w )
 {
 	int reg;
 	UINT64 shift;
-	UINT32 dat;
+	UINT32 dat,old;
 	static struct {
 		UINT32 aica_addr;
 		UINT32 root_addr;
@@ -862,6 +863,10 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
+	old = g2bus_regs[reg];
+
+	g2bus_regs[reg] = dat; // 5f7800+reg*4=dat
+
 	switch (reg)
 	{
 		/*AICA Address register*/
@@ -921,9 +926,8 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				wave_dma.root_addr = src;
 				wave_dma.size = 0;
 				wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
-				wave_dma.start = 0;
-
-				//TODO: signal irq there
+				wave_dma.start = g2bus_regs[SB_ADST] = 0;
+				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
 			}
 			break;
 	}
