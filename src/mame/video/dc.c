@@ -1230,7 +1230,7 @@ static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect
 			b = (c & 0x001f) << 3;
 			g = (c & 0x07e0) >> 3;
 			r = (c & 0xf800) >> 8;
-			*fbaddr = b | (g<<8) | (r<<16);;
+			*fbaddr = b | (g<<8) | (r<<16);
 			addrp+=2;
 		}
 	}
