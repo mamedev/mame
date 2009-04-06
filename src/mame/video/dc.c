@@ -144,17 +144,64 @@ WRITE64_HANDLER( pvr_ctrl_w )
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
+	static struct {
+		UINT32 pvr_addr;
+		UINT32 sys_addr;
+		UINT32 size;
+		UINT8 dir;
+		UINT8 flag;
+		UINT8 start;
+	}pvr_dma;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
 	switch (reg)
 	{
-	case SB_PDST:
-		#if DEBUG_PVRCTRL
-		mame_printf_verbose("PVRCTRL: PVR-DMA start\n");
-		#endif
-		break;
+		case SB_PDSTAP: pvr_dma.pvr_addr = dat; break;
+		case SB_PDSTAR: pvr_dma.sys_addr = dat; break;
+		case SB_PDLEN: pvr_dma.size = dat; break;
+		case SB_PDDIR: pvr_dma.dir = dat & 1; break;
+		case SB_PDTSEL: mame_printf_verbose("PVRCTRL: initiation mode %x\n",dat); break;
+		case SB_PDEN: pvr_dma.flag = dat & 1; break;
+		case SB_PDST:
+			pvr_dma.start = dat & 1;
+			/*We need to know where this is actually used on Naomi, for testing purpose.*/
+			if(pvr_dma.start) { printf("Warning: PVR-DMA start\n"); }
+
+			/*TODO: use the ddt function.*/
+			if(pvr_dma.flag && pvr_dma.start)
+			{
+				UINT32 src,dst,size;
+				dst = pvr_dma.pvr_addr;
+				src = pvr_dma.sys_addr;
+				size = 0;
+				/* 0 rounding size = 16 Mbytes */
+				if(pvr_dma.size == 0) { pvr_dma.size = 0x100000; }
+
+				if(pvr_dma.dir == 0)
+				{
+					for(;size<pvr_dma.size;size+=4)
+					{
+						memory_write_dword_64le(space,dst,memory_read_dword(space,src));
+						src+=4;
+						dst+=4;
+					}
+				}
+				else
+				{
+					for(;size<pvr_dma.size;size+=4)
+					{
+						memory_write_dword_64le(space,src,memory_read_dword(space,dst));
+						src+=4;
+						dst+=4;
+					}
+				}
+				/*Note: do not update the params, since this DMA type doesn't support it. */
+
+				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
+			}
+			break;
 	}
 
 	#if DEBUG_PVRCTRL
@@ -1108,13 +1155,13 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 #endif
 			}
 		}
-		
-		
+
+
 		// test--draw the verts fore each quad as polys too
 		{
 			testvertices vv[4];
 			testvertices* v[3];
-	
+
 			vv[0].x = state_ta.grab[rs].showsprites[cs].a.x;
 			vv[0].y = state_ta.grab[rs].showsprites[cs].a.y;
 			vv[1].x = state_ta.grab[rs].showsprites[cs].b.x;
@@ -1123,30 +1170,30 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 			vv[2].y = state_ta.grab[rs].showsprites[cs].c.y;
 			vv[3].x = state_ta.grab[rs].showsprites[cs].d.x;
 			vv[3].y = state_ta.grab[rs].showsprites[cs].d.y;
-			
+
 			v[0] = &vv[0];
 			v[1] = &vv[1];
 			v[2] = &vv[2];
 			testdrawpoly(bitmap,v);
 			v[0] = &vv[0];
 			v[1] = &vv[2];
-			v[2] = &vv[3];	
+			v[2] = &vv[3];
 			testdrawpoly(bitmap,v);
 		}
-		
+
 	}
 	state_ta.grab[rs].busy=0;
 #if DEBUG_VERTICES
 	a = state_ta.grab[rs].testvertices_size;
 	if (a > 65530)
 		a = 65530;
-		
+
 	cs = 0;
-	
+
 	while (cs<a)
 	{
 		testvertices *v[3];
-				
+
 		v[0] = &state_ta.grab[rs].showvertices[cs]; cs++;
 		v[1] = &state_ta.grab[rs].showvertices[cs]; cs++;
 		v[2] = &state_ta.grab[rs].showvertices[cs]; cs++;
@@ -1155,7 +1202,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 
 		if (v[2]->endofstrip==0)
 		{
-			cs-=2;		
+			cs-=2;
 		}
 	}
 #endif

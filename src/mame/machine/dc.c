@@ -879,7 +879,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 			wave_dma.indirect = (dat & 0x80000000)>>31;
 			break;
 		/*0 = root memory to aica / 1 = aica to root memory*/
-		case SB_ADDIR: wave_dma.dir = 1 ^ (dat & 1); break;
+		case SB_ADDIR: wave_dma.dir = (dat & 1); break;
 		/*dma flag (active HIGH, bug in docs)*/
 		case SB_ADEN: wave_dma.flag = (dat & 1); break;
 		case SB_ADTSEL:
@@ -900,10 +900,10 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				src = wave_dma.root_addr;
 				size = 0;
 				/* 0 rounding size = 32 Mbytes */
-				if(wave_dma.size == 0) { wave_dma.size = 0x2000000; }
+				if(wave_dma.size == 0) { wave_dma.size = 0x200000; }
 
 				/* TODO: use the ddt function. */
-				if(wave_dma.dir == 1)
+				if(wave_dma.dir == 0)
 				{
 					for(;size<wave_dma.size;size+=4)
 					{
@@ -922,9 +922,9 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 					}
 				}
 				/* update the params*/
-				wave_dma.aica_addr = dst;
-				wave_dma.root_addr = src;
-				wave_dma.size = 0;
+				wave_dma.aica_addr = g2bus_regs[SB_ADSTAG] = dst;
+				wave_dma.root_addr = g2bus_regs[SB_ADSTAR] = src;
+				wave_dma.size = g2bus_regs[SB_ADLEN] = 0;
 				wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
 				wave_dma.start = g2bus_regs[SB_ADST] = 0;
 				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
