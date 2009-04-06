@@ -196,7 +196,7 @@ PALETTE_INIT( mazinger )
        colors are actually addressable */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x40; pen++)
-			palette_map[0x4400 | (color << 6) | pen] = 0x400 | ((color & 0x0f) << 6) | pen;
+			palette_map[0x4400 + ((color << 6) | pen)] = 0x400 | ((color & 0x0f) << 6) | pen;
 }
 
 PALETTE_INIT( sailormn )
