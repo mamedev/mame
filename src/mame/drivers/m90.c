@@ -736,11 +736,11 @@ static MACHINE_DRIVER_START( m90 )
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.90)
-	MDRV_SOUND_ROUTE(1, "mono", 0.90)
+	MDRV_SOUND_ROUTE(0, "mono", 0.15)
+	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 
 
@@ -1301,8 +1301,8 @@ GAME( 1992, bbmanwj,  bbmanw,   bbmanwj,  bbmanwj,  0,        ROT0, "Irem", "Bom
 GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, quizf1,   0,        quizf1,   quizf1,   quizf1,   ROT0, "Irem", "Quiz F-1 1,2finish", GAME_NO_COCKTAIL )
-GAME( 1993, riskchal, 0,        riskchal, riskchal, 0,        ROT0, "Irem", "Risky Challenge", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, gussun,   riskchal, riskchal, riskchal, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, riskchal, 0,        riskchal, riskchal, 0,        ROT0, "Irem", "Risky Challenge", GAME_NO_COCKTAIL )
+GAME( 1993, gussun,   riskchal, riskchal, riskchal, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NO_COCKTAIL )
 GAME( 1993, matchit2, 0,        matchit2, matchit2, 0,        ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL )
 GAME( 1993, shisen2,  matchit2, matchit2, shisen2,  0,        ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL )
 
