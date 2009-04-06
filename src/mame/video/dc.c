@@ -1213,8 +1213,9 @@ static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect
 {
 	int x,y,dy,xi;
 	UINT32 addrp;
-	UINT16 *fbaddr;
+	UINT32 *fbaddr;
 	UINT32 c;
+	UINT32 r,g,b;
 
 	// only for rgb565 framebuffer
 	xi=((pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
@@ -1224,9 +1225,12 @@ static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect
 		addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
 		for (x=0;x < xi;x++)
 		{
-			fbaddr=BITMAP_ADDR16(bitmap,y,x);
+			fbaddr=BITMAP_ADDR32(bitmap,y,x);
 			c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
-			*fbaddr = (UINT16)c;
+			b = (c & 0x001f) << 3;
+			g = (c & 0x07e0) >> 3;
+			r = (c & 0xf800) >> 8;
+			*fbaddr = b | (g<<8) | (r<<16);;
 			addrp+=2;
 		}
 	}
