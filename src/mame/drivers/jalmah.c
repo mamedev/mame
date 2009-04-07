@@ -1785,6 +1785,7 @@ static const UINT16 dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f
 static WRITE16_HANDLER( daireika_mcu_w )
 {
 	static UINT16 i;
+
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/*******************************************************
@@ -1863,7 +1864,7 @@ static WRITE16_HANDLER( daireika_mcu_w )
 		jm_mcu_code[0x8806/2] = 0x323c;
 		jm_mcu_code[0x8808/2] = 0x1fff; //move.w #$1fff,D1
 		jm_mcu_code[0x880a/2] = 0x3cbc;
-		jm_mcu_code[0x880c/2] = 0x0000; //move.w #$0000,(A6)
+		jm_mcu_code[0x880c/2] = 0x00ff; //move.w #$0000,(A6)
 		jm_mcu_code[0x880e/2] = 0xdcfc;
 		jm_mcu_code[0x8810/2] = 0x0002; //adda.w #$0002,A6
 		jm_mcu_code[0x8812/2] = 0x51c9;
@@ -1886,7 +1887,7 @@ static WRITE16_HANDLER( daireika_mcu_w )
 		jm_mcu_code[0x8886/2] = 0x323c;
 		jm_mcu_code[0x8888/2] = 0x1fff; //move.w #$1fff,D1
 		jm_mcu_code[0x888a/2] = 0x3cbc;
-		jm_mcu_code[0x888c/2] = 0x0000; //move.w #$0000,(A6)
+		jm_mcu_code[0x888c/2] = 0x00ff; //move.w #$0000,(A6)
 		jm_mcu_code[0x888e/2] = 0xdcfc;
 		jm_mcu_code[0x8890/2] = 0x0002; //adda.w #$0002,A6
 		jm_mcu_code[0x8892/2] = 0x51c9;
