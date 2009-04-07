@@ -9232,7 +9232,7 @@ Other Sun games
 	DRIVER( atworld )
 	DRIVER( atworlda )
 
-DRIVER ( unkpoker )
+	DRIVER( unkpoker )	/* unknown */
 	DRIVER( chsuper3 )	/* unknown */
 	DRIVER( chsuper2 )	/* unknown */
 	DRIVER( 3super8 )	/* unknown */
