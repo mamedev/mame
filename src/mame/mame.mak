@@ -1609,6 +1609,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/cb2001.o \
 	$(DRIVERS)/sfbonus.o \
 	$(DRIVERS)/multfish.o \
+	$(DRIVERS)/unkpoker.o \
 
 #-------------------------------------------------
 # layout dependencies

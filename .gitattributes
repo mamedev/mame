@@ -2161,6 +2161,7 @@ src/mame/drivers/ultratnk.c svneol=native#text/plain
 src/mame/drivers/ultrsprt.c svneol=native#text/plain
 src/mame/drivers/undrfire.c svneol=native#text/plain
 src/mame/drivers/unico.c svneol=native#text/plain
+src/mame/drivers/unkpoker.c svneol=native#text/plain
 src/mame/drivers/upscope.c svneol=native#text/plain
 src/mame/drivers/usgames.c svneol=native#text/plain
 src/mame/drivers/vamphalf.c svneol=native#text/plain
