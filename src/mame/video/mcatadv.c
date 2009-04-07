@@ -137,7 +137,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 							pix &= 0x0f;
 
 							if ((drawxpos >= cliprect->min_x) && (drawxpos <= cliprect->max_x) && pix)
-								destline[drawxpos] = (pix + pen);
+								destline[drawxpos] = (pix + (pen << 4));
 						}
 						offset++;
 					}
