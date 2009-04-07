@@ -35,13 +35,13 @@ static UINT8* unkpoker_video;
 static READ8_HANDLER(test1_r)
 {
 if (input_code_pressed(KEYCODE_Q)) return 0x01; // unselect cards
-if (input_code_pressed(KEYCODE_W)) return 0x02; // deal
-if (input_code_pressed(KEYCODE_E)) return 0x04; // replay
+if (input_code_pressed(KEYCODE_W)) return 0x02; // replay
+if (input_code_pressed(KEYCODE_E)) return 0x04; // deal
 if (input_code_pressed(KEYCODE_R)) return 0x08; // select card #5
-if (input_code_pressed(KEYCODE_T)) return 0x10;
-if (input_code_pressed(KEYCODE_Y)) return 0x20;
+if (input_code_pressed(KEYCODE_T)) return 0x10; //
+if (input_code_pressed(KEYCODE_Y)) return 0x20; //
 if (input_code_pressed(KEYCODE_U)) return 0x40; // 1 credit
-if (input_code_pressed(KEYCODE_I)) return 0x80; // 5/10 credits
+if (input_code_pressed(KEYCODE_I)) return 0x80; // 5 credits
 return 0;
 }
 
@@ -51,8 +51,8 @@ if (input_code_pressed(KEYCODE_A)) return 0x01; //
 if (input_code_pressed(KEYCODE_S)) return 0x02; // 
 if (input_code_pressed(KEYCODE_D)) return 0x04; // 
 if (input_code_pressed(KEYCODE_F)) return 0x08; // 
-if (input_code_pressed(KEYCODE_G)) return 0x10;
-if (input_code_pressed(KEYCODE_H)) return 0x20;
+if (input_code_pressed(KEYCODE_G)) return 0x10; //
+if (input_code_pressed(KEYCODE_H)) return 0x20; //
 if (input_code_pressed(KEYCODE_J)) return 0x40; // 
 if (input_code_pressed(KEYCODE_K)) return 0x80; // 
 return 0;
@@ -64,8 +64,8 @@ if (input_code_pressed(KEYCODE_1)) return 0x01; // select card #1
 if (input_code_pressed(KEYCODE_2)) return 0x02; // select card #2
 if (input_code_pressed(KEYCODE_3)) return 0x04; // select card #3
 if (input_code_pressed(KEYCODE_4)) return 0x08; // select card #4
-if (input_code_pressed(KEYCODE_5)) return 0x10;
-if (input_code_pressed(KEYCODE_6)) return 0x20;
+if (input_code_pressed(KEYCODE_5)) return 0x10; //
+if (input_code_pressed(KEYCODE_6)) return 0x20; //
 if (input_code_pressed(KEYCODE_7)) return 0x40; // 
 if (input_code_pressed(KEYCODE_8)) return 0x80; // 
 return 0;
@@ -77,8 +77,8 @@ if (input_code_pressed(KEYCODE_Z)) return 0x01; //
 if (input_code_pressed(KEYCODE_X)) return 0x02; // 
 if (input_code_pressed(KEYCODE_C)) return 0x04; // 
 if (input_code_pressed(KEYCODE_V)) return 0x08; // 
-if (input_code_pressed(KEYCODE_B)) return 0x10;
-if (input_code_pressed(KEYCODE_N)) return 0x20;
+if (input_code_pressed(KEYCODE_B)) return 0x10; //
+if (input_code_pressed(KEYCODE_N)) return 0x20; //
 if (input_code_pressed(KEYCODE_M)) return 0x40; // 
 if (input_code_pressed(KEYCODE_L)) return 0x80; // 
 return 0;
