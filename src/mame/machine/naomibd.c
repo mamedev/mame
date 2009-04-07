@@ -240,75 +240,95 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
 {
 	naomibd_state *v = get_safe_token(device);
 
-	if ((offset == 1) && (ACCESSING_BITS_32_47 || ACCESSING_BITS_32_63))
+	switch(offset)
 	{
-		// DMA_OFFSETH
-		v->dma_offset &= 0xffff;
-		v->dma_offset |= (data >> 16) & 0x1fff0000;
-	}
-	else if ((offset == 2) && ACCESSING_BITS_0_15)
-	{
-		// DMA_OFFSETL
-		v->dma_offset &= 0xffff0000;
-		v->dma_offset |= (data & 0xffff);
-	}
-	else if ((offset == 0) && ACCESSING_BITS_0_15)
-	{
-		// ROM_OFFSETH
-		v->rom_offset &= 0xffff;
-		v->rom_offset |= (data & 0x1fff)<<16;
-		v->rom_offset_flags = data >> 13;
-	}
-	else if ((offset == 0) && ACCESSING_BITS_32_47)
-	{
-		// ROM_OFFSETL
-		v->rom_offset &= 0xffff0000;
-		v->rom_offset |= ((data >> 32) & 0xffff);
-	}
-	else if ((offset == 1) && ACCESSING_BITS_0_15)
-	{
-		// ROM_DATA
-		// Doa2 writes here (16 bit decryption key ?)
-		//mame_printf_verbose("%s:ROM: write %llx to 5f7008\n", cpuexec_describe_context(machine), data);
-	}
-	else if ((offset == 15) && ACCESSING_BITS_0_15)
-	{
-		running_machine *machine = device->machine;
+		case 0:
+		{
+			if(ACCESSING_BITS_0_15)
+			{
+				// ROM_OFFSETH
+				v->rom_offset &= 0xffff;
+				v->rom_offset |= (data & 0x1fff)<<16;
+				v->rom_offset_flags = data >> 13;
+			}
+			if(ACCESSING_BITS_32_47)
+			{
+				// ROM_OFFSETL
+				v->rom_offset &= 0xffff0000;
+				v->rom_offset |= ((data >> 32) & 0xffff);
+			}
+		}
+		break;
+		case 1:
+		{
+			if(ACCESSING_BITS_32_47 || ACCESSING_BITS_32_63)
+			{
+				// DMA_OFFSETH
+				v->dma_offset &= 0xffff;
+				v->dma_offset |= (data >> 16) & 0x1fff0000;
+			}
+			if(ACCESSING_BITS_0_15)
+			{
+				// ROM_DATA
+				// Doa2 writes here (16 bit decryption key ?)
+				//mame_printf_verbose("%s:ROM: write %llx to 5f7008\n", cpuexec_describe_context(machine), data);
+			}
+		}
+		break;
+		case 2:
+		{
+			if(ACCESSING_BITS_0_15)
+			{
+				// DMA_OFFSETL
+				v->dma_offset &= 0xffff0000;
+				v->dma_offset |= (data & 0xffff);
+			}
+			if(ACCESSING_BITS_32_63)
+			{
+				// NAOMI_DMA_COUNT
+				v->dma_count = data >> 32;
+			}
+		}
+		break;
+		case 7:
+		{
+			if(ACCESSING_BITS_32_47)
+				mame_printf_verbose("ROM: write 5f703c\n");
+		}
+		break;
+		case 8:
+		{
+			if(ACCESSING_BITS_0_15)
+				mame_printf_verbose("ROM: write 5f7040\n");
+			if(ACCESSING_BITS_32_47)
+				mame_printf_verbose("ROM: write 5f7044\n");
+		}
+		break;
+		case 9:
+		{
+			if(ACCESSING_BITS_0_15)
+				mame_printf_verbose("ROM: write 5f7048\n");
+			if(ACCESSING_BITS_32_47)
+				mame_printf_verbose("ROM: write 5f704c\n");
+		}
+		break;
+		case 15:
+		{
+			if(ACCESSING_BITS_0_15)
+			{
+				running_machine *machine = device->machine;
 
-		// NAOMI_BOARDID_WRITE
-		x76f100_cs_write(machine, 0, (data >> 2) & 1 );
-		x76f100_rst_write(machine, 0, (data >> 3) & 1 );
-		x76f100_scl_write(machine, 0, (data >> 1) & 1 );
-		x76f100_sda_write(machine, 0, (data >> 0) & 1 );
-	}
-	else if ((offset == 2) && ACCESSING_BITS_32_63)
-	{
-		// NAOMI_DMA_COUNT
-		v->dma_count = data >> 32;
-	}
-	else if ((offset == 7) && ACCESSING_BITS_32_47)
-	{
-		mame_printf_verbose("ROM: write 5f703c\n");
-	}
-	else if ((offset == 8) && ACCESSING_BITS_0_15)
-	{
-		mame_printf_verbose("ROM: write 5f7040\n");
-	}
-	else if ((offset == 8) && ACCESSING_BITS_32_47)
-	{
-		mame_printf_verbose("ROM: write 5f7044\n");
-	}
-	else if ((offset == 9) && ACCESSING_BITS_0_15)
-	{
-		mame_printf_verbose("ROM: write 5f7048\n");
-	}
-	else if ((offset == 9) && ACCESSING_BITS_32_47)
-	{
-		mame_printf_verbose("ROM: write 5f704c\n");
-	}
-	else
-	{
-		//mame_printf_verbose("%s: ROM: write %llx to %x, mask %llx\n", cpuexec_describe_context(machine), data, offset, mem_mask);
+				// NAOMI_BOARDID_WRITE
+				x76f100_cs_write(machine, 0, (data >> 2) & 1 );
+				x76f100_rst_write(machine, 0, (data >> 3) & 1 );
+				x76f100_scl_write(machine, 0, (data >> 1) & 1 );
+				x76f100_sda_write(machine, 0, (data >> 0) & 1 );
+			}
+		}
+		break;
+		default:
+			//mame_printf_verbose("%s: ROM: write %llx to %x, mask %llx\n", cpuexec_describe_context(machine), data, offset, mem_mask);
+			break;
 	}
 }
 
@@ -321,7 +341,7 @@ WRITE64_DEVICE_HANDLER( naomibd_w )
  *************************************/
 
 #define FILENAME_LENGTH 16
- 
+
 static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 {
 	UINT32 result;
@@ -357,7 +377,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 	// find data of file
 	start = 0;
 	size = 0;
-	printf("Looking for file %s\n", name);	
+	printf("Looking for file %s\n", name);
 	for (pos = 0;pos < 2048;pos += buffer[pos])
 	{
 		a=0;
@@ -393,14 +413,14 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 				   (buffer[pos+11] << 8) |
 				   (buffer[pos+12] << 16) |
 				   (buffer[pos+13] << 24));
-				  
-			printf("start %08x size %08x\n", start,size);	  
+
+			printf("start %08x size %08x\n", start,size);
 			break;
 		}
 		if (buffer[pos] == 0)
 			break;
 	}
-	
+
 	if ((start != 0) && (size == 0x100))
 	{
 		// read file
@@ -408,14 +428,14 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 		// get "rom" file name
 		memset(name,'\0', 128);
 		memcpy(name, buffer+0xc0, FILENAME_LENGTH-1);
-		
-		
+
+
 		// directory
 		result = cdrom_read_data(gdromfile, dir, buffer, CD_TRACK_MODE1);
 		// find data of "rom" file
 		start = 0;
 		size = 0;
-		
+
 		printf("Looking for file %s\n", name);
 		for (pos = 0;pos < 2048;pos += buffer[pos])
 		{
@@ -452,8 +472,8 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 					   (buffer[pos+11] << 8) |
 					   (buffer[pos+12] << 16) |
 					   (buffer[pos+13] << 24));
-					   
-				printf("start %08x size %08x\n", start,size);   
+
+				printf("start %08x size %08x\n", start,size);
 				break;
 			}
 			if (buffer[pos] == 0)

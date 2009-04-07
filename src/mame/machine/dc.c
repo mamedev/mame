@@ -275,6 +275,8 @@ WRITE64_HANDLER( dc_sysctrl_w )
 		case SB_C2DST:
 			address=dc_sysctrl_regs[SB_C2DSTAT];
 			ddtdata.destination=address;
+			/* 0 rounding size = 16 Mbytes */
+			if(dc_sysctrl_regs[SB_C2DLEN] == 0) { dc_sysctrl_regs[SB_C2DLEN] = 0x1000000; }
 			ddtdata.length=dc_sysctrl_regs[SB_C2DLEN];
 			ddtdata.size=1;
 			ddtdata.direction=0;
@@ -884,15 +886,15 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 		case SB_ADEN: wave_dma.flag = (dat & 1); break;
 		case SB_ADTSEL:
 			mame_printf_verbose("G2CTRL: initiation mode %d\n",dat);
-			//printf("SB_ADTSEL data %08x\n",dat);
+			//mame_printf_verbose("SB_ADTSEL data %08x\n",dat);
 			break;
 		/*ready for dma'ing*/
 		case SB_ADST:
 			mame_printf_verbose("G2CTRL: AICA:G2-DMA start\n");
-			//printf("AICA: G2-DMA start\n");
-			//printf("%08x %08x %08x %02x\n",wave_dma.aica_addr,wave_dma.root_addr,wave_dma.size,wave_dma.indirect);
+			//mame_printf_verbose("AICA: G2-DMA start\n");
+			//mame_printf_verbose("%08x %08x %08x %02x\n",wave_dma.aica_addr,wave_dma.root_addr,wave_dma.size,wave_dma.indirect);
 			wave_dma.start = dat & 1;
-			//printf("SB_ADST data %08x\n",dat);
+			//mame_printf_verbose("SB_ADST data %08x\n",dat);
 			if(wave_dma.flag && wave_dma.start)
 			{
 				UINT32 src,dst,size;

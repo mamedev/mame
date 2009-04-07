@@ -113,7 +113,8 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		assert_always(0, "Wrong mask!\n");
+		/*assume to return the lower 32-bits ONLY*/
+		return reg & 0xffffffff;
 	}
 
 	if (mem_mask == U64(0xffffffff00000000))
@@ -1083,6 +1084,38 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 				case 4: // bumpmap
 					break;
 				case 5: // 4 bpp palette
+					if (state_ta.grab[rs].showsprites[cs].texturemode & 2) // vq-compressed
+					{
+						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 2]);
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.grab[rs].showsprites[cs].textureaddress+c));
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 3]);
+					}
+					else
+					{
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt]);
+					}
+					c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(addrp));
+					c=((state_ta.grab[rs].showsprites[cs].texturepalette & 0x3f) << 4) + (c & 0xf);
+					c=pvrta_regs[0x1000/4+c];
+					switch (pvrta_regs[PAL_RAM_CTRL])
+					{
+					case 0: // argb1555
+						a=(((c & 0x8000) >> 8)*255)/0x80;
+						c=MAKE_RGB((c&0x7c00) >> 7, (c&0x3e0) >> 2, (c&0x1f) << 3);
+						break;
+					case 1: // rgb565
+						a=255;
+						c=MAKE_RGB((c&0xf800) >> 8, (c&0x7e0) >> 3, (c&0x1f) << 3);
+						break;
+					case 2: // argb4444
+						a=(((c & 0xf000) >> 8)*255)/0xf0;
+						c=MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4);
+						break;
+					case 3: // argb8888
+						a=(c & 0xff000000) >> 24;
+						c=MAKE_RGB((c&0xff0000) >> 16, (c&0xff00) >> 8, c&0xff);
+						break;
+					}
 					break;
 				case 6: // 8 bpp palette
 					if (state_ta.grab[rs].showsprites[cs].texturemode & 2) // vq-compressed
