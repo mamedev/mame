@@ -171,7 +171,7 @@ void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 	}
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
 	if (rbank2 == SMH_BANK2)
-		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu")+0x5000);
+		memory_set_bankptr(machine, 2, memory_region(machine, "maincpu") + 0x5000);
 }
 
 void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
@@ -186,20 +186,20 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		logerror("%s MMU BIOS ROM\n", machine->gamedrv->name);
 		rbank3 = SMH_BANK3;
 		wbank3 = SMH_UNMAP;
-		base3 = memory_region(machine, "maincpu")+0x14000;  /* 8K lo BIOS */
+		base3 = memory_region(machine, "maincpu") + 0x14000;  /* 8K lo BIOS */
 		rbank4 = SMH_BANK4;
 		wbank4 = SMH_UNMAP;
-		base4 = memory_region(machine, "maincpu")+0x15800;  /* 4K FP ROM + 8K hi BIOS */
+		base4 = memory_region(machine, "maincpu") + 0x15800;  /* 4K FP ROM + 8K hi BIOS */
 	}
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", machine->gamedrv->name);
 		rbank3 = SMH_BANK3;
 		wbank3 = SMH_BANK3;
-		base3 = memory_region(machine, "maincpu")+0x0c000;  /* 8K RAM */
+		base3 = memory_region(machine, "maincpu") + 0x0c000;  /* 8K RAM */
 		rbank4 = SMH_BANK4;
 		wbank4 = SMH_BANK4;
-		base4 = memory_region(machine, "maincpu")+0x0d800;  /* 4K RAM + 8K RAM */
+		base4 = memory_region(machine, "maincpu") + 0x0d800;  /* 4K RAM + 8K RAM */
 	}
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, rbank3, wbank3);
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd800, 0xffff, 0, 0, rbank4, wbank4);
@@ -212,14 +212,14 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		logerror("%s MMU BASIC RAM\n", machine->gamedrv->name);
 		rbank1 = SMH_BANK1;
 		wbank1 = SMH_BANK1;
-		base1 = memory_region(machine, "maincpu")+0x0a000;  /* 8K RAM */
+		base1 = memory_region(machine, "maincpu") + 0x0a000;  /* 8K RAM */
 	}
 	else
 	{
 		logerror("%s MMU BASIC ROM\n", machine->gamedrv->name);
 		rbank1 = SMH_BANK1;
 		wbank1 = SMH_UNMAP;
-		base1 = memory_region(machine, "maincpu")+0x10000;  /* 8K BASIC */
+		base1 = memory_region(machine, "maincpu") + 0x10000;  /* 8K BASIC */
 	}
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xbfff, 0, 0, rbank1, wbank1);
 	memory_set_bankptr(machine, 1, base1);
@@ -230,14 +230,14 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
 		rbank2 = SMH_BANK2;
 		wbank2 = SMH_BANK2;
-		base2 = memory_region(machine, "maincpu")+0x05000;  /* 0x0800 bytes */
+		base2 = memory_region(machine, "maincpu") + 0x05000;  /* 0x0800 bytes */
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
 		rbank2 = SMH_BANK2;
 		wbank2 = SMH_UNMAP;
-		base2 = memory_region(machine, "maincpu")+0x15000;  /* 0x0800 bytes */
+		base2 = memory_region(machine, "maincpu") + 0x15000;  /* 0x0800 bytes */
 	}
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
 	memory_set_bankptr(machine, 2, base2);
@@ -251,390 +251,175 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
  *
  **************************************************************/
 
-#define AKEY_L			0x00
-#define AKEY_J			0x01
-#define AKEY_SEMICOLON	0x02
 #define AKEY_BREAK		0x03	/* this not really a scancode */
-#define AKEY_K			0x05
-#define AKEY_PLUS		0x06
-#define AKEY_ASTERISK	0x07
-#define AKEY_O			0x08
 #define AKEY_NONE		0x09
-#define AKEY_P			0x0a
-#define AKEY_U			0x0b
-#define AKEY_ENTER		0x0c
-#define AKEY_I			0x0d
-#define AKEY_MINUS		0x0e
-#define AKEY_EQUALS 	0x0f
-#define AKEY_V			0x10
-#define AKEY_C			0x12
-#define AKEY_B			0x15
-#define AKEY_X			0x16
-#define AKEY_Z			0x17
-#define AKEY_4			0x18
-#define AKEY_3			0x1a
-#define AKEY_6			0x1b
-#define AKEY_ESC		0x1c
-#define AKEY_5			0x1d
-#define AKEY_2			0x1e
-#define AKEY_1			0x1f
-#define AKEY_COMMA		0x20
-#define AKEY_SPACE		0x21
-#define AKEY_STOP		0x22
-#define AKEY_N			0x23
-#define AKEY_M			0x25
-#define AKEY_SLASH		0x26
-#define AKEY_ATARI		0x27
-#define AKEY_R			0x28
-#define AKEY_E			0x2a
-#define AKEY_Y			0x2b
-#define AKEY_TAB		0x2c
-#define AKEY_T			0x2d
-#define AKEY_W			0x2e
-#define AKEY_Q			0x2f
-#define AKEY_9			0x30
-#define AKEY_0			0x32
-#define AKEY_7			0x33
-#define AKEY_BSP		0x34
-#define AKEY_8			0x35
-#define AKEY_LESSER 	0x36
-#define AKEY_GREATER	0x37
-#define AKEY_F			0x38
-#define AKEY_H			0x39
-#define AKEY_D			0x3a
-#define AKEY_CAPS		0x3c
-#define AKEY_G			0x3d
-#define AKEY_S			0x3e
-#define AKEY_A			0x3f
-#define ASHF_L			0x40
-#define ASHF_J			0x41
-#define ASHF_COLON		0x42
-#define ASHF_BREAK		0x43	/* this not really a scancode */
-#define ASHF_K			0x45
-#define ASHF_BACKSLASH	0x46
-#define ASHF_TILDE		0x47
-#define ASHF_O			0x48
-#define ASHF_SHIFT		0x49
-#define ASHF_P			0x4a
-#define ASHF_U			0x4b
-#define ASHF_ENTER		0x4c
-#define ASHF_I			0x4d
-#define ASHF_UNDERSCORE 0x4e
-#define ASHF_BAR		0x4f
-#define ASHF_V			0x50
-#define ASHF_C			0x52
-#define ASHF_B			0x55
-#define ASHF_X			0x56
-#define ASHF_Z			0x57
-#define ASHF_DOLLAR 	0x58
-#define ASHF_HASH		0x5a
-#define ASHF_AMPERSAND	0x5b
-#define ASHF_ESC		0x5c
-#define ASHF_PERCENT	0x5d
-#define ASHF_DQUOTE 	0x5e
-#define ASHF_EXCLAM 	0x5f
-#define ASHF_LBRACE 	0x60
-#define ASHF_SPACE		0x61
-#define ASHF_RBRACE 	0x62
-#define ASHF_N			0x63
-#define ASHF_M			0x65
-#define ASHF_QUESTION	0x66
-#define ASHF_ATARI		0x67
-#define ASHF_R			0x68
-#define ASHF_E			0x6a
-#define ASHF_Y			0x6b
-#define ASHF_TAB		0x6c
-#define ASHF_T			0x6d
-#define ASHF_W			0x6e
-#define ASHF_Q			0x6f
-#define ASHF_LPAREN 	0x70
-#define ASHF_RPAREN 	0x72
-#define ASHF_QUOTE		0x73
-#define ASHF_BSP		0x74
-#define ASHF_AT 		0x75
-#define ASHF_CLEAR		0x76
-#define ASHF_INSERT 	0x77
-#define ASHF_F			0x78
-#define ASHF_H			0x79
-#define ASHF_D			0x7a
-#define ASHF_CAPS		0x7c
-#define ASHF_G			0x7d
-#define ASHF_S			0x7e
-#define ASHF_A			0x7f
-#define ACTL_L			0x80
-#define ACTL_J			0x81
-#define ACTL_SEMICOLON	0x82
-#define ACTL_BREAK		0x83	/* this not really a scancode */
-#define ACTL_K			0x85
-#define ACTL_PLUS		0x86
-#define ACTL_ASTERISK	0x87
-#define ACTL_O			0x88
-#define ACTL_CONTROL	0x89
-#define ACTL_P			0x8a
-#define ACTL_U			0x8b
-#define ACTL_ENTER		0x8c
-#define ACTL_I			0x8d
-#define ACTL_MINUS		0x8e
-#define ACTL_EQUALS 	0x8f
-#define ACTL_V			0x90
-#define ACTL_C			0x92
-#define ACTL_B			0x95
-#define ACTL_X			0x96
-#define ACTL_Z			0x97
-#define ACTL_4			0x98
-#define ACTL_3			0x9a
-#define ACTL_6			0x9b
-#define ACTL_ESC		0x9c
-#define ACTL_5			0x9d
-#define ACTL_2			0x9e
-#define ACTL_1			0x9f
-#define ACTL_COMMA		0xa0
-#define ACTL_SPACE		0xa1
-#define ACTL_STOP		0xa2
-#define ACTL_N			0xa3
-#define ACTL_M			0xa5
-#define ACTL_SLASH		0xa6
-#define ACTL_ATARI		0xa7
-#define ACTL_R			0xa8
-#define ACTL_E			0xaa
-#define ACTL_Y			0xab
-#define ACTL_TAB		0xac
-#define ACTL_T			0xad
-#define ACTL_W			0xae
-#define ACTL_Q			0xaf
-#define ACTL_9			0xb0
-#define ACTL_0			0xb2
-#define ACTL_7			0xb3
-#define ACTL_BSP		0xb4
-#define ACTL_8			0xb5
-#define ACTL_LESSER 	0xb6
-#define ACTL_GREATER	0xb7
-#define ACTL_F			0xb8
-#define ACTL_H			0xb9
-#define ACTL_D			0xba
-#define ACTL_CAPS		0xbc
-#define ACTL_G			0xbd
-#define ACTL_S			0xbe
-#define ACTL_A			0xbf
-#define ACSH_L			0xc0
-#define ACSH_J			0xc1
-#define ACSH_COLON		0xc2
-#define ACSH_BREAK		0xc3	/* this not really a scancode */
-#define ACSH_K			0xc5
-#define ACSH_BACKSLASH	0xc6
-#define ACSH_TILDE		0xc7
-#define ACSH_O			0xc8
-#define ACSH_CTRLSHIFT	0xc9
-#define ACSH_P			0xca
-#define ACSH_U			0xcb
-#define ACSH_ENTER		0xcc
-#define ACSH_I			0xcd
-#define ACSH_UNDERSCORE 0xce
-#define ACSH_BAR		0xcf
-#define ACSH_V			0xd0
-#define ACSH_C			0xd2
-#define ACSH_B			0xd5
-#define ACSH_X			0xd6
-#define ACSH_Z			0xd7
-#define ACSH_DOLLAR 	0xd8
-#define ACSH_HASH		0xda
-#define ACSH_AMPERSAND	0xdb
-#define ACSH_ESC		0xdc
-#define ACSH_PERCENT	0xdd
-#define ACSH_DQUOTE 	0xde
-#define ACSH_EXCLAM 	0xdf
-#define ACSH_LBRACE 	0xe0
-#define ACSH_SPACE		0xe1
-#define ACSH_RBRACE 	0xe2
-#define ACSH_N			0xe3
-#define ACSH_M			0xe5
-#define ACSH_QUESTION	0xe6
-#define ACSH_ATARI		0xe7
-#define ACSH_R			0xe8
-#define ACSH_E			0xea
-#define ACSH_Y			0xeb
-#define ACSH_TAB		0xec
-#define ACSH_T			0xed
-#define ACSH_W			0xee
-#define ACSH_Q			0xef
-#define ACSH_LPAREN 	0xf0
-#define ACSH_RPAREN 	0xf2
-#define ACSH_QUOTE		0xf3
-#define ACSH_BSP		0xf4
-#define ACSH_AT 		0xf5
-#define ACSH_CLEAR		0xf6
-#define ACSH_INSERT 	0xf7
-#define ACSH_F			0xf8
-#define ACSH_H			0xf9
-#define ACSH_D			0xfa
-#define ACSH_CAPS		0xfc
-#define ACSH_G			0xfd
-#define ACSH_S			0xfe
-#define ACSH_A			0xff
 
-static const UINT8 keys[64][4] = {
-{AKEY_NONE		 ,AKEY_NONE 	  ,AKEY_NONE	   ,AKEY_NONE		}, /* ""       CODE_NONE             */
-{AKEY_ESC		 ,ASHF_ESC		  ,ACTL_ESC 	   ,ACSH_ESC		}, /*"Escape" KEYCODE_ESC              */
-{AKEY_1 		 ,ASHF_EXCLAM	  ,ACTL_1		   ,ACSH_EXCLAM 	}, /* "1 !"    KEYCODE_1               */
-{AKEY_2 		 ,ASHF_DQUOTE	  ,ACTL_2		   ,ACSH_DQUOTE 	}, /* "2 \""   KEYCODE_2               */
-{AKEY_3 		 ,ASHF_HASH 	  ,ACTL_3		   ,ACSH_HASH		}, /* "3 #"    KEYCODE_3               */
-{AKEY_4 		 ,ASHF_DOLLAR	  ,ACTL_4		   ,ACSH_DOLLAR 	}, /* "4 $"    KEYCODE_4               */
-{AKEY_5 		 ,ASHF_PERCENT	  ,ACTL_5		   ,ACSH_PERCENT	}, /* "5 %"    KEYCODE_5               */
-{AKEY_6 		 ,ASHF_TILDE	  ,ACTL_6		   ,ACSH_AMPERSAND	}, /* "6 ^"    KEYCODE_6               */
-{AKEY_7 		 ,ASHF_AMPERSAND  ,ACTL_7		   ,ACSH_N			}, /* "7 &"    KEYCODE_7               */
-{AKEY_8 		 ,AKEY_ASTERISK   ,ACTL_8		   ,ACSH_M			}, /* "8 *"    KEYCODE_8               */
-{AKEY_9 		 ,ASHF_LPAREN	  ,ACTL_9		   ,ACSH_LBRACE 	}, /* "9 ("    KEYCODE_9               */
-{AKEY_0 		 ,ASHF_RPAREN	  ,ACTL_0		   ,ACSH_RBRACE 	}, /* "0 )"    KEYCODE_0               */
-{AKEY_MINUS 	 ,ASHF_UNDERSCORE ,ACTL_MINUS	   ,ACSH_UNDERSCORE }, /* "- _"    KEYCODE_MINUS           */
-{AKEY_EQUALS	 ,AKEY_PLUS 	  ,ACTL_EQUALS	   ,ACTL_PLUS		}, /* "= +"    KEYCODE_EQUALS          */
-{AKEY_BSP		 ,ASHF_BSP		  ,ACTL_BSP 	   ,ACSH_BSP		}, /* "Backsp" KEYCODE_BACKSPACE       */
-{AKEY_TAB		 ,ASHF_TAB		  ,ACTL_TAB 	   ,ACSH_TAB		}, /* "Tab"    KEYCODE_TAB             */
-{AKEY_Q 		 ,ASHF_Q		  ,ACTL_Q		   ,ACSH_Q			}, /* "q Q"    KEYCODE_Q               */
-{AKEY_W 		 ,ASHF_W		  ,ACTL_W		   ,ACSH_W			}, /* "w W"    KEYCODE_W               */
-{AKEY_E 		 ,ASHF_E		  ,ACTL_E		   ,ACSH_E			}, /* "e E"    KEYCODE_E               */
-{AKEY_R 		 ,ASHF_R		  ,ACTL_R		   ,ACSH_R			}, /* "r R"    KEYCODE_R               */
-{AKEY_T 		 ,ASHF_T		  ,ACTL_T		   ,ACSH_T			}, /* "t T"    KEYCODE_T               */
-{AKEY_Y 		 ,ASHF_Y		  ,ACTL_Y		   ,ACSH_Y			}, /* "y Y"    KEYCODE_Y               */
-{AKEY_U 		 ,ASHF_U		  ,ACTL_U		   ,ACTL_U			}, /* "u U"    KEYCODE_U               */
-{AKEY_I 		 ,ASHF_I		  ,ACTL_I		   ,ACTL_I			}, /* "i I"    KEYCODE_I               */
-{AKEY_O 		 ,ASHF_O		  ,ACTL_O		   ,ACTL_O			}, /* "o O"    KEYCODE_O               */
-{AKEY_P 		 ,ASHF_P		  ,ACTL_P		   ,ACTL_P			}, /* "p P"    KEYCODE_P               */
-{ASHF_LBRACE	 ,ACTL_COMMA	  ,ACTL_COMMA	   ,ACSH_LBRACE 	}, /* "[ {"    KEYCODE_LBRACE          */
-{ASHF_RBRACE	 ,ACTL_STOP 	  ,ACTL_STOP	   ,ACSH_RBRACE 	}, /* "] }"    KEYCODE_RBRACE          */
-{AKEY_ENTER 	 ,ASHF_ENTER	  ,ACTL_ENTER	   ,ACSH_ENTER		}, /* "Enter"  KEYCODE_ENTER           */
-{AKEY_A 		 ,ASHF_A		  ,ACTL_A		   ,ACSH_A			}, /* "a A"    KEYCODE_A               */
-{AKEY_S 		 ,ASHF_S		  ,ACTL_S		   ,ACSH_S			}, /* "s S"    KEYCODE_S               */
-{AKEY_D 		 ,ASHF_D		  ,ACTL_D		   ,ACSH_D			}, /* "d D"    KEYCODE_D               */
-{AKEY_F 		 ,ASHF_F		  ,ACTL_F		   ,ACSH_F			}, /* "f F"    KEYCODE_F               */
-{AKEY_G 		 ,ASHF_G		  ,ACTL_G		   ,ACSH_G			}, /* "g G"    KEYCODE_G               */
-{AKEY_H 		 ,ASHF_H		  ,ACTL_H		   ,ACSH_H			}, /* "h H"    KEYCODE_H               */
-{AKEY_J 		 ,ASHF_J		  ,ACTL_J		   ,ACSH_J			}, /* "j J"    KEYCODE_J               */
-{AKEY_K 		 ,ASHF_K		  ,ACTL_K		   ,ACSH_K			}, /* "k K"    KEYCODE_K               */
-{AKEY_L 		 ,ASHF_L		  ,ACTL_L		   ,ACSH_L			}, /* "l L"    KEYCODE_L               */
-{AKEY_SEMICOLON  ,ASHF_COLON	  ,ACTL_SEMICOLON  ,ACSH_COLON		}, /* "; :"    KEYCODE_COLON           */
-{ASHF_QUOTE 	 ,ACSH_QUOTE	  ,ASHF_DQUOTE	   ,ACSH_DQUOTE 	}, /* "+ \\"   KEYCODE_QUOTE           */
-{ASHF_QUOTE 	 ,ACSH_QUOTE	  ,ACTL_ASTERISK   ,ACSH_TILDE		}, /* "* ^"    KEYCODE_TILDE           */
-{ASHF_BACKSLASH  ,ASHF_BAR		  ,ACSH_BACKSLASH  ,ACSH_BAR		}, /* "\ |"    KEYCODE_BACKSLASH       */
-{AKEY_Z 		 ,ASHF_Z		  ,ACTL_Z		   ,ACSH_Z			}, /* "z Z"    KEYCODE_Z               */
-{AKEY_X 		 ,ASHF_X		  ,ACTL_X		   ,ACTL_X			}, /* "x X"    KEYCODE_X               */
-{AKEY_C 		 ,ASHF_C		  ,ACTL_C		   ,ACTL_C			}, /* "c C"    KEYCODE_C               */
-{AKEY_V 		 ,ASHF_V		  ,ACTL_V		   ,ACTL_V			}, /* "v V"    KEYCODE_V               */
-{AKEY_B 		 ,ASHF_B		  ,ACTL_B		   ,ACTL_B			}, /* "b B"    KEYCODE_B               */
-{AKEY_N 		 ,ASHF_N		  ,ACTL_N		   ,ACTL_N			}, /* "n N"    KEYCODE_N               */
-{AKEY_M 		 ,ASHF_M		  ,ACTL_M		   ,ACTL_M			}, /* "m M"    KEYCODE_M               */
-{AKEY_COMMA 	 ,AKEY_LESSER	  ,ACTL_COMMA	   ,ACTL_LESSER 	}, /* ", ["    KEYCODE_COMMA           */
-{AKEY_STOP		 ,AKEY_GREATER	  ,ACTL_STOP	   ,ACTL_GREATER	}, /* ". ]"    KEYCODE_STOP            */
-{AKEY_SLASH 	 ,ASHF_QUESTION   ,ACTL_SLASH	   ,ACSH_QUESTION	}, /* "/ ?"    KEYCODE_SLASH           */
-{ASHF_BACKSLASH  ,ASHF_BAR		  ,ACSH_BACKSLASH  ,ACSH_BAR		}, /* "\ |"    KEYCODE_BACKSLASH2      */
-{AKEY_ATARI 	 ,ASHF_ATARI	  ,ACTL_ATARI	   ,ACSH_ATARI		}, /* "Atari"  KEYCODE_LALT            */
-{AKEY_SPACE 	 ,ASHF_SPACE	  ,ACTL_SPACE	   ,ACSH_SPACE		}, /* "Space"  KEYCODE_SPACE           */
-{AKEY_CAPS		 ,ASHF_CAPS 	  ,ACTL_CAPS	   ,ACSH_CAPS		}, /* "Caps"   KEYCODE_CAPSLOCK        */
-{ASHF_CLEAR 	 ,ASHF_CLEAR	  ,ACSH_CLEAR	   ,ACSH_CLEAR		}, /* "Clear"  KEYCODE_HOME            */
-{ASHF_INSERT	 ,ASHF_INSERT	  ,ASHF_INSERT	   ,ASHF_INSERT 	}, /* "Insert" KEYCODE_INSERT          */
-{AKEY_BSP		 ,AKEY_BSP		  ,AKEY_BSP 	   ,AKEY_BSP		}, /* "Delete" KEYCODE_DEL             */
-{AKEY_BREAK 	 ,ASHF_BREAK	  ,ACTL_BREAK	   ,ACSH_BREAK		}, /* "Break"  KEYCODE_PGUP            */
-{ACTL_PLUS		 ,ACTL_PLUS 	  ,ACTL_PLUS	   ,ACTL_PLUS		}, /* "(Left)" KEYCODE_LEFT            */
-{ACTL_ASTERISK	 ,ACTL_ASTERISK   ,ACTL_ASTERISK   ,ACTL_ASTERISK	}, /* "(Right)"KEYCODE_RIGHT           */
-{ACTL_MINUS 	 ,ACTL_MINUS	  ,ACTL_MINUS	   ,ACTL_MINUS		}, /* "(Up)"   KEYCODE_UP              */
-{ACTL_EQUALS	 ,ACTL_EQUALS	  ,ACTL_EQUALS	   ,ACTL_EQUALS 	}  /* "(Down)" KEYCODE_DOWN            */
-};
+/**************************************************************
 
+	Keyboard inputs use 6bits to read the 64keys in the key matrix.
+	We currently read the key matrix by lines and convert the input
+	to the value expected by the POKEY (see the code below to 
+	determine atari_code values).
+
+	K2,K1,K0 | 000 | 001 | 010 | 011 | 100 | 101 | 110 | 111 |
+	K5,K4,K3
+	----------------------------------------------------------
+		000	 |  L  |  J  |  ;  | (*) |     |  K  |  +  |  *  |
+		001	 |  O  |     |  P  |  U  | Ret |  I  |  -  |  =  |
+		010	 |  V  |     |  C  |     |     |  B  |  X  |  Z  |
+		011	 |  4  |     |  3  |  6  | Esc |  5  |  2  |  1  |
+		100	 |  ,  | Spc |  .  |  N  |     |  M  |  /  |Atari|
+		101	 |  R  |     |  E  |  Y  | Tab |  T  |  W  |  Q  |
+		110	 |  9  |     |  0  |  7  |Bkspc|  8  |  <  |  >  |
+		111	 |  F  |  H  |  D  |     | Caps|  G  |  S  |  A  |
+
+	(*) We use this value to read Break, but in fact it would be read
+	    in KR2 bit. This has to be properly implemented for later
+		Atari systems because here we would have F1.
+
+	To Do: investigate implementation of KR2 to read accurately Break, 
+	Shift and Control keys.
+
+ **************************************************************/
 
 void a800_handle_keyboard(running_machine *machine)
 {
 	const device_config *pokey = devtag_get_device(machine, "pokey");
 	static int atari_last = 0xff;
-	int i, modifiers, atari_code;
-	char tag[64];
+	int atari_code, count, ipt, i;
+	static const char *const tag[] = { "keyboard_0", "keyboard_1", "keyboard_2", "keyboard_3",
+										"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7" };
 
-    modifiers = 0;
-
-    /* with shift ? */
-	if( input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT) )
-		modifiers |= 1;
-
-    /* with control ? */
-	if( input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL) )
-		modifiers |= 2;
-
-	for( i = 0; i < 64; i++ )
+	/* check keyboard */
+	for( i = 0; i < 8; i++ )
 	{
-		sprintf(tag, "keyboard_%d", i / 16);
-		if( input_port_read_safe(machine, tag, 0) & (1 << (i&15)) )
+		ipt = input_port_read_safe(machine, tag[i], 0);
+
+		if( ipt )
 		{
-			atari_code = keys[i][modifiers];
+			count = 0;
+			while(ipt / 2)
+			{
+				ipt = ipt/2;
+				count++;
+			}
+
+			atari_code = i*8 + count;
+
+			/* SHIFT */
+			if(input_port_read_safe(machine, "fake", 0) & 0x01)
+				atari_code |= 0x40;
+
+			/* CTRL */
+			if(input_port_read_safe(machine, "fake", 0) & 0x02)
+				atari_code |= 0x80;
+
 			if( atari_code != AKEY_NONE )
 			{
 				if( atari_code == atari_last )
 					return;
 				atari_last = atari_code;
+
 				if( (atari_code & 0x3f) == AKEY_BREAK )
 				{
 					pokey_break_w(pokey, atari_code & 0x40);
 					return;
 				}
+
 				pokey_kbcode_w(pokey, atari_code, 1);
 				return;
 			}
 		}
+
 	}
 	/* remove key pressed status bit from skstat */
 	pokey_kbcode_w(pokey, AKEY_NONE, 0);
 	atari_last = AKEY_NONE;
 }
 
-#define VKEY_BREAK		0x10
+/**************************************************************
+ *
+ * Keypad
+ *
+ **************************************************************/
 
-/* absolutely no clue what to do here :((( */
+/**************************************************************
+
+	A5200 keypad inputs use 4bits to read the 16keys in the key 
+	matrix. We currently read the key matrix by lines and convert 
+	the input to the value expected by the POKEY (see the code 
+	below to determine atari_code values).
+
+	K2,K1,K0 | 00x | 01x | 10x | 11x |
+	K5,K4,K3
+	----------------------------------
+		x00	 |     |  #  |  0  |  *  |
+		x01	 |Reset|  9  |  8  |  7  |
+		x10	 |Pause|  6  |  5  |  4  |
+		x11	 |Start|  3  |  2  |  1  |
+
+	K0 & K5 are ignored (we send them as 1, see the code below where
+	we pass "(atari_code << 1) | 0x21" )
+
+	To Do: investigate implementation of KR2 to read accurately the 
+	secondary Fire button (primary read through GTIA).
+
+ **************************************************************/
+
 void a5200_handle_keypads(running_machine *machine)
 {
 	const device_config *pokey = devtag_get_device(machine, "pokey");
-	int i, modifiers;
 	static int atari_last = 0xff;
-
-    modifiers = 0;
-
-    /* with shift ? */
-	if (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
-		modifiers |= 1;
-
-    /* with control ? */
-	if (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
-		modifiers |= 2;
+	int atari_code, count, ipt, i;
+	static const char *const tag[] = { "keypad_0", "keypad_1", "keypad_2", "keypad_3" };
 
 	/* check keypad */
-	for (i = 0; i < 16; i++)
+	for( i = 0; i < 4; i++ )
 	{
-		if( input_port_read(machine, "keypad") & (1 << i) )
+		ipt = input_port_read_safe(machine, tag[i], 0);
+
+		if( ipt )
 		{
-			if( i == atari_last )
-				return;
-			atari_last = i;
-			if( i == 0 )
+			count = 0;
+			while(ipt / 2)
 			{
-				pokey_break_w(pokey, i & 0x40);
+				ipt = ipt/2;
+				count++;
+			}
+
+			atari_code = i*4 + count;
+
+			if( atari_code == atari_last )
+				return;
+			atari_last = atari_code;
+
+			if( atari_code == 0 )
+			{
+				pokey_break_w(pokey, atari_code & 0x40);
 				return;
 			}
-			pokey_kbcode_w(pokey, (i << 1) | 0x21, 1);
+
+			pokey_kbcode_w(pokey, (atari_code << 1) | 0x21, 1);
 			return;
 		}
+
 	}
 
 	/* check top button */
 	if ((input_port_read(machine, "djoy_b") & 0x10) == 0)
 	{
-		if (atari_last == 0xFE)
+		if (atari_last == 0xfe)
 			return;
 		pokey_kbcode_w(pokey, 0x61, 1);
 		//pokey_break_w(pokey, 0x40);
-		atari_last = 0xFE;
+		atari_last = 0xfe;
 		return;
 	}
-	else if (atari_last == 0xFE)
+	else if (atari_last == 0xfe)
 		pokey_kbcode_w(pokey, 0x21, 1);
 
 	/* remove key pressed status bit from skstat */
-	pokey_kbcode_w(pokey, 0xFF, 0);
+	pokey_kbcode_w(pokey, 0xff, 0);
 	atari_last = 0xff;
 }
 
