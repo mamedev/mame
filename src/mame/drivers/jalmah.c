@@ -21,8 +21,9 @@ Notes(general):
 TODO:
 -Back layer pens looks ugly in some circumstances (i.e. suchipi when you win, mjzoomin when coined up),
  static or controlled by something else?
--daireika attract mode positioning looks wrong when the screen scrolls vertically, likely that it
- disables/enables the wrap-around for the tilemaps in some way;
+-daireika: the ranking screen on the original pcb shows some hearts instead of the "0".
+ Some investigation indicates that the game reads area "fe100" onwards for these to be filled.
+ These are likely to be provided by one of the mcu snippets...
 -Check if urashima has a "mode 3" for the layer 0 tilemap;
 -Complete the dip-switches for all the games;
 -There could be timing issues caused by MCU simulation at $80004;
@@ -30,7 +31,8 @@ TODO:
  (should be somewhere on the work ram/shared ram)
 -urashima: might use three/four layers instead of two.It can be checked when you win
  a match in particular circumstances because there's a write in the 94000-9bfff region;
--Massive clean-ups needed for the MCU snippet programs and the input-ports;
+-Massive clean-ups needed for the MCU snippet programs and the input-ports, also check if
+ the programs are actually into the m68k program itself (like hachamf/tdragon/ddealer);
 
 Notes (1st MCU ver.):
 -$f000e is bogus,maybe the program snippets can modify this value,or the MCU itself can
