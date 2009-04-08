@@ -32,17 +32,29 @@ Dumped: 06/04/2009 f205v
 
 static UINT8* unkpoker_video;
 
-static READ8_HANDLER(test1_r)
+static PALETTE_INIT( unkpoker )
 {
-if (input_code_pressed(KEYCODE_Q)) return 0x01; // unselect cards
-if (input_code_pressed(KEYCODE_W)) return 0x02; // replay
-if (input_code_pressed(KEYCODE_E)) return 0x04; // deal
-if (input_code_pressed(KEYCODE_R)) return 0x08; // select card #5
-if (input_code_pressed(KEYCODE_T)) return 0x10; //
-if (input_code_pressed(KEYCODE_Y)) return 0x20; //
-if (input_code_pressed(KEYCODE_U)) return 0x40; // 1 credit
-if (input_code_pressed(KEYCODE_I)) return 0x80; // 5 credits
-return 0;
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x20; ++i)
+	{
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
 }
 
 static READ8_HANDLER(test2_r)
@@ -55,19 +67,6 @@ if (input_code_pressed(KEYCODE_G)) return 0x10; //
 if (input_code_pressed(KEYCODE_H)) return 0x20; //
 if (input_code_pressed(KEYCODE_J)) return 0x40; // 
 if (input_code_pressed(KEYCODE_K)) return 0x80; // 
-return 0;
-}
-
-static READ8_HANDLER(test3_r)
-{
-if (input_code_pressed(KEYCODE_1)) return 0x01; // select card #1
-if (input_code_pressed(KEYCODE_2)) return 0x02; // select card #2
-if (input_code_pressed(KEYCODE_3)) return 0x04; // select card #3
-if (input_code_pressed(KEYCODE_4)) return 0x08; // select card #4
-if (input_code_pressed(KEYCODE_5)) return 0x10; //
-if (input_code_pressed(KEYCODE_6)) return 0x20; //
-if (input_code_pressed(KEYCODE_7)) return 0x40; // 
-if (input_code_pressed(KEYCODE_8)) return 0x80; // 
 return 0;
 }
 
@@ -95,9 +94,9 @@ static ADDRESS_MAP_START( unkpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4bff) AM_RAM
 	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE(&unkpoker_video)
 	AM_RANGE(0x5c00, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(test1_r,test_w)
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6800, 0x6800) AM_READWRITE(test2_r,test_w)
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE(test3_r,test_w)
+	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN1")
 	AM_RANGE(0x7800, 0x7800) AM_READWRITE(test4_r,test_w)
 ADDRESS_MAP_END
 
@@ -127,6 +126,25 @@ static VIDEO_UPDATE(unkpoker)
 }
 
 static INPUT_PORTS_START( unkpoker )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Clear")  PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Replay") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1  ) PORT_NAME("Deal")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1   ) PORT_NAME("Coin 1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2   ) PORT_NAME("Coin 2")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout layout8x8x2 =
@@ -152,6 +170,8 @@ static MACHINE_DRIVER_START( unkpoker )
 	MDRV_CPU_PROGRAM_MAP(unkpoker_map, 0)
 
 	MDRV_GFXDECODE(unkpoker)
+
+	MDRV_PALETTE_INIT(unkpoker)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
