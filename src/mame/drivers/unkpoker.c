@@ -1,5 +1,10 @@
 /* Unknown - Poker
 
+driver by Roberto Zandona' and Angelo Salese
+
+TO DO:
+- check sound
+
 Anno: 1982
 Produttore:
 N.revisione:
@@ -29,6 +34,7 @@ Dumped: 06/04/2009 f205v
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
+#include "sound/dac.h"
 
 static UINT8* unkpoker_video;
 
@@ -70,19 +76,6 @@ if (input_code_pressed(KEYCODE_K)) return 0x80; //
 return 0;
 }
 
-static READ8_HANDLER(test4_r)
-{
-if (input_code_pressed(KEYCODE_Z)) return 0x01; // 
-if (input_code_pressed(KEYCODE_X)) return 0x02; // 
-if (input_code_pressed(KEYCODE_C)) return 0x04; // 
-if (input_code_pressed(KEYCODE_V)) return 0x08; // 
-if (input_code_pressed(KEYCODE_B)) return 0x10; //
-if (input_code_pressed(KEYCODE_N)) return 0x20; //
-if (input_code_pressed(KEYCODE_M)) return 0x40; // 
-if (input_code_pressed(KEYCODE_L)) return 0x80; // 
-return 0;
-}
-
 static WRITE8_HANDLER(test_w)
 {
 
@@ -97,7 +90,7 @@ static ADDRESS_MAP_START( unkpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6800, 0x6800) AM_READWRITE(test2_r,test_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN1")
-	AM_RANGE(0x7800, 0x7800) AM_READWRITE(test4_r,test_w)
+	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE("dac1", dac_w)
 ADDRESS_MAP_END
 
 static VIDEO_START(unkpoker)
@@ -128,7 +121,7 @@ static VIDEO_UPDATE(unkpoker)
 static INPUT_PORTS_START( unkpoker )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Clear")  PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Replay") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Replay") PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1  ) PORT_NAME("Deal")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -185,6 +178,10 @@ static MACHINE_DRIVER_START( unkpoker )
 
 	MDRV_VIDEO_START(unkpoker)
 	MDRV_VIDEO_UPDATE(unkpoker)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("dac1", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
