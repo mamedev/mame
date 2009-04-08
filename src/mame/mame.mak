@@ -1547,6 +1547,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mosaic.o $(VIDEO)/mosaic.o \
 	$(DRIVERS)/mrjong.o $(VIDEO)/mrjong.o \
 	$(DRIVERS)/murogem.o \
+	$(DRIVERS)/murogmbl.o \
 	$(DRIVERS)/news.o $(VIDEO)/news.o \
 	$(DRIVERS)/norautp.o \
 	$(DRIVERS)/oneshot.o $(VIDEO)/oneshot.o \
@@ -1609,7 +1610,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/cb2001.o \
 	$(DRIVERS)/sfbonus.o \
 	$(DRIVERS)/multfish.o \
-	$(DRIVERS)/unkpoker.o \
 
 #-------------------------------------------------
 # layout dependencies
@@ -1802,7 +1802,6 @@ $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
-
 
 
 #-------------------------------------------------

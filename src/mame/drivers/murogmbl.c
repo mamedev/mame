@@ -1,6 +1,7 @@
-/* Unknown - Poker
+/* Unknown - Poker (morugem 
 
-driver by Roberto Zandona' and Angelo Salese
+driver by Roberto Zandona'
+thanks to Angelo Salese for some precious advice
 
 TO DO:
 - check sound
@@ -28,7 +29,7 @@ Note:
 1x empty DIP14 socket (close to sound)
 
 Funzionamento: Non Funzionante
-In vendita: No
+
 Dumped: 06/04/2009 f205v
 */
 
@@ -36,9 +37,9 @@ Dumped: 06/04/2009 f205v
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 
-static UINT8* unkpoker_video;
+static UINT8* murogmbl_video;
 
-static PALETTE_INIT( unkpoker )
+static PALETTE_INIT( murogmbl )
 {
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
@@ -63,42 +64,24 @@ static PALETTE_INIT( unkpoker )
 	}
 }
 
-static READ8_HANDLER(test2_r)
-{
-if (input_code_pressed(KEYCODE_A)) return 0x01; // 
-if (input_code_pressed(KEYCODE_S)) return 0x02; // 
-if (input_code_pressed(KEYCODE_D)) return 0x04; // 
-if (input_code_pressed(KEYCODE_F)) return 0x08; // 
-if (input_code_pressed(KEYCODE_G)) return 0x10; //
-if (input_code_pressed(KEYCODE_H)) return 0x20; //
-if (input_code_pressed(KEYCODE_J)) return 0x40; // 
-if (input_code_pressed(KEYCODE_K)) return 0x80; // 
-return 0;
-}
-
-static WRITE8_HANDLER(test_w)
-{
-
-}
-
-static ADDRESS_MAP_START( unkpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( murogmbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fFf) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM
-	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE(&unkpoker_video)
+	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE(&murogmbl_video)
 	AM_RANGE(0x5c00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
-	AM_RANGE(0x6800, 0x6800) AM_READWRITE(test2_r,test_w)
+	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("DSW")
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN1")
-	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE("dac1", dac_w)
+	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE("dac1", dac_w) /* read is always discarded */
 ADDRESS_MAP_END
 
-static VIDEO_START(unkpoker)
+static VIDEO_START(murogmbl)
 {
 
 }
 
-static VIDEO_UPDATE(unkpoker)
+static VIDEO_UPDATE(murogmbl)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0;
@@ -109,7 +92,7 @@ static VIDEO_UPDATE(unkpoker)
 	{
 		for (x = 0; x < 32; x++)
 		{
-			int tile = unkpoker_video[count];
+			int tile = murogmbl_video[count];
 			drawgfx(bitmap, gfx, tile, 0, 0, 0, x * 8, y * 8, cliprect, TRANSPARENCY_NONE, 0);
 
 			count++;
@@ -118,26 +101,52 @@ static VIDEO_UPDATE(unkpoker)
 	return 0;
 }
 
-static INPUT_PORTS_START( unkpoker )
+static INPUT_PORTS_START( murogmbl )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Clear")  PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Replay") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Clear")		PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Replay")		PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1  ) PORT_NAME("Deal")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold 5")		PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Coin clear")	PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1   ) PORT_NAME("Coin 1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2   ) PORT_NAME("Coin 2")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Hold 1")		PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hold 2")		PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Hold 3")		PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 4")		PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Coin 2" )
+	PORT_DIPSETTING(    0x08, "10 credits" )
+	PORT_DIPSETTING(    0x00, "5 credits" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout layout8x8x2 =
@@ -153,18 +162,18 @@ static const gfx_layout layout8x8x2 =
  	8*8
 };
 
-static GFXDECODE_START( unkpoker )
+static GFXDECODE_START( murogmbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( unkpoker )
+static MACHINE_DRIVER_START( murogmbl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
-	MDRV_CPU_PROGRAM_MAP(unkpoker_map, 0)
+	MDRV_CPU_PROGRAM_MAP(murogmbl_map, 0)
 
-	MDRV_GFXDECODE(unkpoker)
+	MDRV_GFXDECODE(murogmbl)
 
-	MDRV_PALETTE_INIT(unkpoker)
+	MDRV_PALETTE_INIT(murogmbl)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -176,8 +185,8 @@ static MACHINE_DRIVER_START( unkpoker )
 
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_START(unkpoker)
-	MDRV_VIDEO_UPDATE(unkpoker)
+	MDRV_VIDEO_START(murogmbl)
+	MDRV_VIDEO_UPDATE(murogmbl)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac1", DAC, 0)
@@ -186,7 +195,7 @@ MACHINE_DRIVER_END
 
 
 
-ROM_START(unkpoker)
+ROM_START(murogmbl)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("2532.5e",	0x0000, 0x1000, CRC(093d4560) SHA1(d5401b5f7a2ebe5099fefc5b09f8710886e243b2) )
 
@@ -199,4 +208,4 @@ ROM_START(unkpoker)
 	ROM_LOAD( "74s288.a8",	0x0000, 0x0020, CRC(fc35201c) SHA1(4549e228c48992e0d10957f029b89a547392e72b) )
 ROM_END
 
-GAME( 1982, unkpoker,  0,   unkpoker, unkpoker, 0, ROT0, "???", "Unkwnown poker", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1982, murogmbl,  murogem,   murogmbl, murogmbl, 0, ROT0, "bootleg", "Murogem Monaco (bootleg)?", GAME_NO_SOUND )

@@ -8656,8 +8656,9 @@ Other Sun games
 	DRIVER( attckufo )	/* (c) 1980 Ryoto Electric Co. */
 	DRIVER( fortecar )
 	DRIVER( jackpool )	/* (c) 1997 Electronic Projects */
-	DRIVER( murogem )	/* ??? */
+	DRIVER( murogem )		/* ??? */
 	DRIVER( murogema )	/* ??? */
+	DRIVER( murogmbl )	/* ??? */
 	DRIVER( lasvegas )	/* hack */
 	DRIVER( quizmstr )	/* (c) 1985 Coinmaster */
 	DRIVER( trailblz )	/* (c) 1987 Coinmaster */
@@ -9233,7 +9234,7 @@ Other Sun games
 	DRIVER( atworld )
 	DRIVER( atworlda )
 
-	DRIVER( unkpoker )	/* unknown */
+
 	DRIVER( chsuper3 )	/* unknown */
 	DRIVER( chsuper2 )	/* unknown */
 	DRIVER( 3super8 )	/* unknown */
