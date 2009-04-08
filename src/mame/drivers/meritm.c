@@ -751,13 +751,13 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static void meritm_audio_pio_interrupt(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( meritm_audio_pio_interrupt )
 {
 	//logerror( "PIO(0) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
 	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
-static void meritm_io_pio_interrupt(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( meritm_io_pio_interrupt  )
 {
 	//logerror( "PIO(1) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
 	cpu_set_input_line(device->machine->cpu[0], 0, state);
@@ -785,16 +785,6 @@ static WRITE8_DEVICE_HANDLER(meritm_audio_pio_port_b_w)
 	ds1204_w((data & 0x4) >> 2, (data & 0x2) >> 1, data & 0x01);
 };
 
-static READ8_DEVICE_HANDLER(meritm_io_pio_port_a_r)
-{
-	return input_port_read(device->machine, "PIO1_PORTA");
-};
-
-static READ8_DEVICE_HANDLER(meritm_io_pio_port_b_r)
-{
-	return input_port_read(device->machine, "PIO1_PORTB");
-};
-
 static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_a_w)
 {
 };
@@ -805,24 +795,24 @@ static WRITE8_DEVICE_HANDLER(meritm_io_pio_port_b_w)
 
 static const z80pio_interface meritm_audio_pio_intf =
 {
-	meritm_audio_pio_interrupt,
-	meritm_audio_pio_port_a_r,
-	meritm_audio_pio_port_b_r,
-	meritm_audio_pio_port_a_w,
-	meritm_audio_pio_port_b_w,
-	0,
-	0
+	DEVCB_LINE(meritm_audio_pio_interrupt),
+	DEVCB_HANDLER(meritm_audio_pio_port_a_r),
+	DEVCB_HANDLER(meritm_audio_pio_port_b_r),
+	DEVCB_HANDLER(meritm_audio_pio_port_a_w),
+	DEVCB_HANDLER(meritm_audio_pio_port_b_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const z80pio_interface meritm_io_pio_intf =
 {
-	meritm_io_pio_interrupt,
-	meritm_io_pio_port_a_r,
-	meritm_io_pio_port_b_r,
-	meritm_io_pio_port_a_w,
-	meritm_io_pio_port_b_w,
-	0,
-	0
+	DEVCB_LINE(meritm_io_pio_interrupt),
+	DEVCB_INPUT_PORT("PIO1_PORTA"),
+	DEVCB_INPUT_PORT("PIO1_PORTB"),
+	DEVCB_HANDLER(meritm_io_pio_port_a_w),
+	DEVCB_HANDLER(meritm_io_pio_port_b_w),
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const z80_daisy_chain meritm_daisy_chain[] =
@@ -1457,7 +1447,7 @@ GAME( 1996, megat4,    0,      meritm_crt260, meritm_crt260, megat4,   ROT0, "Me
 GAME( 1996, megat4a,   megat4, meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Megatouch IV (9255-40-01 ROD, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4sn,  megat4, meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Super Megatouch IV (9255-41-07 ROG, New Jersey version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4te,  megat4, meritm_crt260, meritm_crt260, megat4te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROD, Standard version)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4st,  megat4, meritm_crt260, meritm_crt260, megat4st, ROT0, "Merit", "Super Megatouch IV Tournament Edition (9255-51-01 ROB, Standard version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4st,  megat4, meritm_crt260, meritm_crt260, megat4te, ROT0, "Merit", "Super Megatouch IV Tournament Edition (9255-51-01 ROB, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-01 ROC, Standard version)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
 GAME( 1998, megat5nj,  megat5, meritm_crt260, meritm_crt260, megat5,   ROT0, "Merit", "Megatouch 5 (9255-60-07 RON, New Jersey version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, megat6,   ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA, Standard version)", GAME_IMPERFECT_GRAPHICS )

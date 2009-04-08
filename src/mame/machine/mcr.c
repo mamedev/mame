@@ -222,7 +222,7 @@ static void ctc_interrupt(const device_config *device, int state)
 }
 
 
-static void ipu_ctc_interrupt(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( ipu_ctc_interrupt )
 {
 	cputag_set_input_line(device->machine, "ipu", 0, state);
 }
@@ -267,13 +267,13 @@ const z80ctc_interface nflfoot_ctc_intf =
 
 const z80pio_interface nflfoot_pio_intf =
 {
-	ipu_ctc_interrupt,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_LINE(ipu_ctc_interrupt),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 

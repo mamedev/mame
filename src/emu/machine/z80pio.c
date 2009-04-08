@@ -56,10 +56,10 @@ typedef struct _z80pio z80pio_t;
 struct _z80pio
 {
 	UINT8 vector[2];                      /* interrupt vector               */
-	void (*intr)(const device_config *, int which);            /* interrupt callbacks            */
-	void (*rdyr[2])(const device_config *, int data);          /* RDY active callback            */
-	read8_device_func  port_read[2];     /* port read callbacks            */
-	write8_device_func port_write[2];    /* port write callbacks           */
+	devcb_resolved_write_line intr;       /* interrupt callbacks            */
+	devcb_resolved_write_line rdyr[2];    /* RDY active callback            */
+	devcb_resolved_read8  port_read[2];   /* port read callbacks            */
+	devcb_resolved_write8 port_write[2];  /* port write callbacks           */
 	UINT8 mode[2];                        /* mode 00=in,01=out,02=i/o,03=bit*/
 	UINT8 enable[2];                      /* interrupt enable               */
 	UINT8 mask[2];                        /* mask folowers                  */
@@ -107,8 +107,7 @@ INLINE void set_rdy(const device_config *device, int ch, int state)
 	z80pio->rdy[ch] = state;
 
 	/* call callback with state */
-	if (z80pio->rdyr[ch])
-		z80pio->rdyr[ch](device, z80pio->rdy[ch]);
+	devcb_call_write_line(&z80pio->rdyr[ch], z80pio->rdy[ch]);
 }
 
 
@@ -117,8 +116,7 @@ INLINE void interrupt_check(const device_config *device)
 	z80pio_t *z80pio = get_safe_token( device );
 
 	/* if we have a callback, update it with the current state */
-	if (z80pio->intr)
-		z80pio->intr(device, (z80pio_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+	devcb_call_write_line(&z80pio->intr, (z80pio_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -269,13 +267,10 @@ WRITE8_DEVICE_HANDLER( z80pio_d_w )
 	offset &= 0x01;
 
 	z80pio->out[offset] = data;	/* latch out data */
-	if(z80pio->port_write[offset])
-	{
-		if (z80pio->mode[offset] == PIO_MODE3)
-			z80pio->port_write[offset](device, 0, data & ~z80pio->dir[offset]);
-		else
-			z80pio->port_write[offset](device, 0, data);
-	}
+	if (z80pio->mode[offset] == PIO_MODE3)
+		devcb_call_write8(&z80pio->port_write[offset], 0, data & ~z80pio->dir[offset]);
+	else
+		devcb_call_write8(&z80pio->port_write[offset], 0, data);
 
 	switch (z80pio->mode[offset])
 	{
@@ -309,22 +304,22 @@ READ8_DEVICE_HANDLER( z80pio_d_r )
 
 		case PIO_MODE1:			/* mode 1 input */
 			set_rdy(device, offset, 1);	/* ready = H */
-			if(z80pio->port_read[offset])
-				z80pio->in[offset] = z80pio->port_read[offset](device, 0);
+			if(z80pio->port_read[offset].read != NULL)
+				z80pio->in[offset] = devcb_call_read8(&z80pio->port_read[offset], 0);
 			update_irq_state(device, offset);
 			return z80pio->in[offset];
 
 		case PIO_MODE2:			/* mode 2 i/o */
 			if (offset) VPRINTF(("PIO-B mode 2 \n"));
 			set_rdy(device, 1, 1); /* brdy = H */
-			if(z80pio->port_read[offset])
-				z80pio->in[offset] = z80pio->port_read[offset](device, 0);
+			if(z80pio->port_read[offset].read != NULL)
+				z80pio->in[offset] = devcb_call_read8(&z80pio->port_read[offset], 0);
 			update_irq_state(device, offset);
 			return z80pio->in[offset];
 
 		case PIO_MODE3:			/* mode 3 bit */
-			if(z80pio->port_read[offset])
-				z80pio->in[offset] = z80pio->port_read[offset](device, 0);
+			if(z80pio->port_read[offset].read != NULL)
+				z80pio->in[offset] = devcb_call_read8(&z80pio->port_read[offset], 0);
 			return (z80pio->in[offset] & z80pio->dir[offset]) | (z80pio->out[offset] & ~z80pio->dir[offset]);
 	}
 	VPRINTF(("PIO-%c data read,bad mode\n",'A'+offset ));
@@ -543,13 +538,13 @@ static DEVICE_START( z80pio )
 	const z80pio_interface *intf = (const z80pio_interface *)device->static_config;
 	z80pio_t *z80pio = get_safe_token( device );
 
-	z80pio->intr = intf->intr;
-	z80pio->port_read[0] = intf->portAread;
-	z80pio->port_read[1] = intf->portBread;
-	z80pio->port_write[0] = intf->portAwrite;
-	z80pio->port_write[1] = intf->portBwrite;
-	z80pio->rdyr[0] = intf->rdyA;
-	z80pio->rdyr[1] = intf->rdyB;
+	devcb_resolve_write_line(&z80pio->intr, &intf->intr, device);
+	devcb_resolve_read8(&z80pio->port_read[0], &intf->portAread, device);
+	devcb_resolve_read8(&z80pio->port_read[1], &intf->portBread, device);
+	devcb_resolve_write8(&z80pio->port_write[0], &intf->portAwrite, device);
+	devcb_resolve_write8(&z80pio->port_write[1], &intf->portBwrite, device);
+	devcb_resolve_write_line(&z80pio->rdyr[0], &intf->rdyA, device);
+	devcb_resolve_write_line(&z80pio->rdyr[1], &intf->rdyB, device);
 
 	/* register for save states */
 	state_save_register_device_item_array(device, 0, z80pio->vector);

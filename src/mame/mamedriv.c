@@ -3472,34 +3472,34 @@ V-V                           TP-027
 
 	/* Sega System 1 / System 2 games */
 	DRIVER( starjack )	/* 834-5191 (c) 1983 (S1) */
-	DRIVER( starjacs )	/* (c) 1983 Stern (S1) */
+	DRIVER( starjacks )	/* (c) 1983 Stern (S1) */
 	DRIVER( regulus )	/* 834-5328?(c) 1983 (S1) */
 	DRIVER( reguluso )	/* 834-5328?(c) 1983 (S1) */
 	DRIVER( regulusu )	/* 834-5328?(c) 1983 (S1) */
 	DRIVER( upndown )	/* (c) 1983 (S1) */
 	DRIVER( upndownu )	/* (c) 1983 (S1) */
 	DRIVER( mrviking )	/* 834-5383 (c) 1984 (S1) */
-	DRIVER( mrvikngj )	/* 834-5383 (c) 1984 (S1) */
+	DRIVER( mrvikingj )	/* 834-5383 (c) 1984 (S1) */
 	DRIVER( swat )		/* 834-5388 (c) 1984 Coreland / Sega (S1) */
 	DRIVER( flicky )	/* (c) 1984 (S1) */
-	DRIVER( flicks2 )	/* (c) 1984 (S1) */
+	DRIVER( flickys2 )	/* (c) 1984 (S1) */
 	DRIVER( flickyo )	/* (c) 1984 (S1) */
-	DRIVER( flicks1 )	/* (c) 1984 (S1) */
+	DRIVER( flickys1 )	/* (c) 1984 (S1) */
 	DRIVER( wmatch )	/* (c) 1984 (S1) */
 	DRIVER( bullfgt )	/* 834-5478 (c) 1984 Sega / Coreland (S1) */
 	DRIVER( thetogyu )	/* 834-5478 (c) 1984 Sega / Coreland (S1) */
 	DRIVER( spatter )	/* 834-5583 (c) 1984 (S1) */
 	DRIVER( ssanchan )	/* 834-5583 (c) 1984 (S1) */
 	DRIVER( pitfall2 )	/* 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1) */
-	DRIVER( pitfalla )	/* 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1) */
-	DRIVER( pitfallu )	/* 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1) */
+	DRIVER( pitfall2a )	/* 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1) */
+	DRIVER( pitfall2u )	/* 834-5627 [1985?] reprogrammed, (c) 1984 Activision (S1) */
 	DRIVER( seganinj )	/* 834-5677 (c) 1985 (S1) */
-	DRIVER( seganinu )	/* 834-5677 (c) 1985 (S1) */
+	DRIVER( seganinju )	/* 834-5677 (c) 1985 (S1) */
 	DRIVER( ninja )		/* 834-5677 (c) 1985 (S1) */
 	DRIVER( nprinces )	/* 834-5677 (c) 1985 (S1) */
-	DRIVER( nprincso )	/* 834-5677 (c) 1985 (S1) */
-	DRIVER( nprincsu )	/* 834-5677 (c) 1985 (S1) */
-	DRIVER( nprincsb )	/* bootleg? (S1) */
+	DRIVER( nprinceso )	/* 834-5677 (c) 1985 (S1) */
+	DRIVER( nprincesu )	/* 834-5677 (c) 1985 (S1) */
+	DRIVER( nprincesb )	/* bootleg? (S1) */
 	DRIVER( imsorry )	/* 834-5707 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( imsorryj )	/* 834-5707 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( teddybb )	/* 834-5712 (c) 1985 (S1) */
@@ -3509,11 +3509,11 @@ V-V                           TP-027
 	DRIVER( sscandal )	/* 834-5755 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( myherok )	/* 834-5755 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( shtngmst )	/* 834-5719/5720 (c) 1985 (S2) */
-	DRIVER( shtngms1 )	/* 834-5719/5720 (c) 1985 (S2) */
- 	DRIVER( shtngmsa )	/* 834-5719/5720 (c) 1985 (S2) */
-	DRIVER( chplft )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
-	DRIVER( chplftb )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
-	DRIVER( chplftbl )	/* bootleg (S2) */
+	DRIVER( shtngmst1 )	/* 834-5719/5720 (c) 1985 (S2) */
+ 	DRIVER( shtngmsta )	/* 834-5719/5720 (c) 1985 (S2) */
+	DRIVER( choplift )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
+	DRIVER( chopliftu )	/* 834-5795 (c) 1985, (c) 1982 Dan Gorlin (S2) */
+	DRIVER( chopliftbl )/* bootleg (S2) */
 	DRIVER( 4dwarrio )	/* 834-5918 (c) 1985 Coreland / Sega (S1) */
 	DRIVER( brain )		/* (c) 1986 Coreland / Sega (S2?) */
 	DRIVER( raflesia )	/* 834-5753 (c) 1985 Coreland / Sega (S1) */
@@ -3531,7 +3531,7 @@ V-V                           TP-027
 	DRIVER( nob )		/* (c) Data East */
 	DRIVER( nobb )		/* bootleg */
 	DRIVER( blockgal )	/* 834-6303 (S1) */
-	DRIVER( blckgalb )	/* bootleg */
+	DRIVER( blockgalb )	/* bootleg */
 	DRIVER( tokisens )	/* (c) 1987 (from a bootleg board) (S2) */
 	DRIVER( wbml )		/* bootleg (S2) */
 	DRIVER( wbmljo )	/* (c) 1987 Sega/Westone (S2) */
@@ -3540,7 +3540,7 @@ V-V                           TP-027
 	DRIVER( wbmlbg )	/* bootleg (Galaxy Electronics) */
 	DRIVER( dakkochn )	/* 836-6483? (S2) */
 	DRIVER( ufosensi )	/* 834-6659 (S2) */
-	DRIVER( ufosensb )	/* bootleg */
+	DRIVER( ufosensib )	/* bootleg */
 /*
 other System 1 / System 2 games:
 

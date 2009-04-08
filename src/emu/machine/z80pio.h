@@ -33,6 +33,8 @@
 #ifndef __Z80PIO_H__
 #define __Z80PIO_H__
 
+#include "devcb.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -41,13 +43,13 @@
 typedef struct _z80pio_interface z80pio_interface;
 struct _z80pio_interface
 {
-	void (*intr)(const device_config *device, int which);    /* callback when change interrupt status */
-	read8_device_func portAread;    /* port A read callback */
-	read8_device_func portBread;    /* port B read callback */
-	write8_device_func portAwrite;  /* port A write callback */
-	write8_device_func portBwrite;  /* port B write callback */
-	void (*rdyA)(const device_config *device, int data);     /* portA ready active callback (do not support yet)*/
-	void (*rdyB)(const device_config *device, int data);     /* portB ready active callback (do not support yet)*/
+	devcb_write_line intr;    /* callback when change interrupt status */
+	devcb_read8 portAread;    /* port A read callback */
+	devcb_read8 portBread;    /* port B read callback */
+	devcb_write8 portAwrite;  /* port A write callback */
+	devcb_write8 portBwrite;  /* port B write callback */
+	devcb_write_line rdyA;    /* portA ready active callback */
+	devcb_write_line rdyB;    /* portB ready active callback */
 };
 
 

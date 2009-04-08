@@ -21,20 +21,20 @@ const z80_daisy_chain senjyo_daisy_chain[] =
 
 
 /* z80 pio */
-static void daisy_interrupt(const device_config *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( daisy_interrupt )
 {
 	cputag_set_input_line(device->machine, "sub", 0, state);
 }
 
 const z80pio_interface senjyo_pio_intf =
 {
-	daisy_interrupt,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_LINE(daisy_interrupt),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* z80 ctc */

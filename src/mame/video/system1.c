@@ -1,42 +1,164 @@
 /*************************************************************************
 
-  System1 / System 2.   By Jarek Parchanski & Mirko Buffoni.
+	System1 / System 2
+	original driver by Jarek Parchanski & Mirko Buffoni
 
-  Many thanks to Roberto Ventura, for precious information about
-  System 1 hardware.
+	Many thanks to Roberto Ventura, for precious information about
+	System 1 hardware.
+
+**************************************************************************
+
+	The System 1/System 2 video hardware is composed of two tilemap
+	layers and a sprite layer.
+	
+	The tilemap layers are built up out of "pages" of 32x32 tilemaps.
+	Each tile is described by two bytes, meaning each page is 2k bytes
+	in size. One of the tilemaps is fixed in position, while the other
+	has registers for scrolling that vary between board variants.
+	
+	The original System 1 hardware simply had two fixed pages. Page 0
+	was the scrolling tilemap, and page 1 was the fixed tilemap.
+	
+	With later boards and the introduction of System 2, this was 
+	expanded to support up to 8 pages. The fixed tilemap was hard-
+	coded to page 0, but the scrolling tilemap was extended. Instead
+	of a single page, the scrolling tilemap consisted of 4 pages glued
+	together to form an effective large 64x64 tilemap. Further, each
+	of the 4 pages that made up the scrolling tilemap could be
+	independently selected from one of the 8 available pages. This
+	unique paged tilemap system would continue on to form the basis of
+	Sega's tilemap systems for their 16-bit era.
+	
+	Up to 32 sprites can be displayed. They are rendered one scanline
+	ahead of the beam into 12-bit line buffers which store the sprite
+	pixel data and sprite index. During rendering, collisions are 
+	checked between sprites and if one is found a bit is set in a 
+	special 32x32x1 collision RAM indiciating which pair of sprites 
+	collided. Note that the sprite color is not stored in the line
+	buffer, but it retrieved when the line buffer is read out on the
+	following scanline using the stored sprite index.
+	
+	The 11-bit output from the two tilemaps (3 bits of pixel data,
+	6 bits of color, 2 bits of priority), plus the 9-bit output from 
+	the sprite line buffer (4 bits of pixel data, 5 bits of color) 
+	are combined in a final step to produce the final pixel value. To 
+	do this, a lookup PROM is used which accepts as input the priority
+	bits from the two tilemaps and the whether each of the incoming
+	pixel values is transparent (color 0).
+	
+	The output of the lookup PROM is a 4-bit value. The lower 2 bits
+	select sprite data (0), fixed tilemap (1) or scrolling tilemap (2).
+	9 bits of data from the appropriate source are used as a lookup
+	into a palette RAM, and the lookup PROM's low 2 bits are used as
+	the upper 2 bits of the palette RAM address, providing 512 
+	independent colors for each souce.
+	
+	The upper 2 bits of the lookup PROM are used for an additional
+	mixer collision detection. Bit 2 indicates that a collision 
+	should be recorded, and bit 3 indicates which of two banks of 
+	collision flags should be set. Each bank is 32 entries long, and 
+	the sprite index is used to select which bit within the bank to 
+	set.
+	
+	On the original System 1 hardware, the palette RAM value was used
+	directly as RGB, with 3 bits each of red and green, and 2 bits of
+	blue. Later hardware added an extra indirection layer, where the
+	8-bit palette RAM value passed into 3 256x4 palette PROMs, one for
+	each color.
+	
+	Collision data is accessed via a 4k window that is broken into
+	4 equal-sized sections. The first section returns data from the
+	2x32x1 mixer collision; the data for the collision is returned in
+	D0, and a summary bit indicating that some sort of collision has
+	occurred is returned in D7. The specific collision bit is cleared
+	by writing to the equivalent address in the same region. The 
+	collision summary bit is cleared by writing to the second region.
+	
+	The third and fourth collision regions operate similarly, but
+	return data for the 32x32x1 sprite collisions.
 
 *************************************************************************/
 
 #include "driver.h"
 #include "system1.h"
 
-UINT8 *system1_scroll_y;
-UINT8 *system1_scroll_x;
-UINT8 *system1_videoram;
-UINT8 *system1_backgroundram;
-UINT8 *system1_sprites_collisionram;
-UINT8 *system1_background_collisionram;
-UINT8 *system1_scrollx_ram;
-size_t system1_videoram_size;
-size_t system1_backgroundram_size;
+static UINT8 *mix_collide;
+static UINT8 mix_collide_summary;
+static UINT8 *sprite_collide;
+static UINT8 sprite_collide_summary;
 
-static UINT8 *sprite_onscreen_map;
-static int background_scrollx=0,background_scrolly=0;
-static UINT8 *bg_dirtybuffer;
+static bitmap_t *sprite_bitmap;
 
-static int scrollx_row[32];
-static bitmap_t *tmp_bitmap;
+static UINT8 system1_video_mode;
 
-//static int system1_pixel_mode = 0
-static UINT8 system1_background_memory,system1_video_mode=0;
+static UINT8 wbml_videoram_bank;
 
-static const UINT8 *system1_color_prom;
+static int system1_sprite_xoffset;
 
-static UINT8 *wbml_paged_videoram;
-static UINT8 wbml_videoram_bank=0,wbml_videoram_bank_latch=0;
+static tilemap *tilemap_page[8];
+static UINT8 tilemap_pages;
 
-static int blockgal_kludgeoffset;
-static int system1_sprite_xoffset = 0;
+
+READ8_HANDLER( system1_mixer_collision_r )
+{
+	video_screen_update_now(space->machine->primary_screen);
+	return mix_collide[offset & 0x3f] | 0x7e | (mix_collide_summary << 7);
+}
+
+WRITE8_HANDLER( system1_mixer_collision_w )
+{
+	video_screen_update_now(space->machine->primary_screen);
+	mix_collide[offset & 0x3f] = 0;
+}
+
+WRITE8_HANDLER( system1_mixer_collision_reset_w )
+{
+	video_screen_update_now(space->machine->primary_screen);
+	mix_collide_summary = 0;
+}
+
+READ8_HANDLER( system1_sprite_collision_r )
+{
+	video_screen_update_now(space->machine->primary_screen);
+	return sprite_collide[offset & 0x3ff] | 0x7e | (sprite_collide_summary << 7);
+}
+
+WRITE8_HANDLER( system1_sprite_collision_w )
+{
+	video_screen_update_now(space->machine->primary_screen);
+	sprite_collide[offset & 0x3ff] = 0;
+}
+
+WRITE8_HANDLER( system1_sprite_collision_reset_w )
+{
+	video_screen_update_now(space->machine->primary_screen);
+	sprite_collide_summary = 0;
+}
+
+
+READ8_HANDLER( system1_videoram_r )
+{
+	offset |= 0x1000 * ((wbml_videoram_bank >> 1) % (tilemap_pages / 2));
+	return videoram[offset];
+}
+
+WRITE8_HANDLER( system1_videoram_w )
+{
+	offset |= 0x1000 * ((wbml_videoram_bank >> 1) % (tilemap_pages / 2));
+	videoram[offset] = data;
+
+	tilemap_mark_tile_dirty(tilemap_page[offset / 0x800], (offset % 0x800) / 2);
+
+	/* force a partial update if the page is changing */
+	if (tilemap_pages > 2 && offset >= 0x740 && offset < 0x748 && offset % 2 == 0)
+		video_screen_update_now(space->machine->primary_screen);
+}
+
+WRITE8_DEVICE_HANDLER( system1_videoram_bank_w )
+{
+	wbml_videoram_bank = data;
+}
+
 
 /***************************************************************************
 
@@ -60,37 +182,33 @@ static int system1_sprite_xoffset = 0;
   accurate to +/- .003K ohms.
 
 ***************************************************************************/
-PALETTE_INIT( system1 )
-{
-	system1_color_prom = color_prom;
-}
 
 WRITE8_HANDLER( system1_paletteram_w )
 {
+	const UINT8 *color_prom = memory_region(space->machine, "palette");
 	int val,r,g,b;
-
 
 	paletteram[offset] = data;
 
-	if (system1_color_prom)
+	if (color_prom != NULL)
 	{
 		int bit0,bit1,bit2,bit3;
 
-		val = system1_color_prom[data+0*256];
+		val = color_prom[data+0*256];
 		bit0 = (val >> 0) & 0x01;
 		bit1 = (val >> 1) & 0x01;
 		bit2 = (val >> 2) & 0x01;
 		bit3 = (val >> 3) & 0x01;
 		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		val = system1_color_prom[data+1*256];
+		val = color_prom[data+1*256];
 		bit0 = (val >> 0) & 0x01;
 		bit1 = (val >> 1) & 0x01;
 		bit2 = (val >> 2) & 0x01;
 		bit3 = (val >> 3) & 0x01;
 		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		val = system1_color_prom[data+2*256];
+		val = color_prom[data+2*256];
 		bit0 = (val >> 0) & 0x01;
 		bit1 = (val >> 1) & 0x01;
 		bit2 = (val >> 2) & 0x01;
@@ -107,50 +225,56 @@ WRITE8_HANDLER( system1_paletteram_w )
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
-static STATE_POSTLOAD( system1_postload )
+static TILE_GET_INFO( tile_get_info )
 {
-	memset(sprite_onscreen_map, 255, 256*256);
-	memset(bg_dirtybuffer, 1, 1024);
+	UINT8 *rambase = param;
+	UINT32 tiledata = rambase[tile_index*2+0] | (rambase[tile_index*2+1] << 8);
+	UINT32 code = ((tiledata >> 4) & 0x800) | (tiledata & 0x7ff);	/* Heavy Metal only */
+	UINT32 color = (tiledata >> 5) & 0xff;
+
+	SET_TILE_INFO(0, code, color, 0);
+}
+
+static void video_start_common(running_machine *machine, int pagecount)
+{
+	int pagenum;
+	
+	/* allocate memory for the collision arrays */
+	mix_collide = auto_malloc(64);
+	memset(mix_collide, 0, 64);
+	sprite_collide = auto_malloc(1024);
+	memset(sprite_collide, 0, 1024);
+	
+	/* allocate memory for videoram */
+	tilemap_pages = pagecount;
+	videoram = auto_malloc(0x800 * pagecount);
+	memset(videoram, 0, 0x800 * pagecount);
+
+	/* create the tilemap pages */
+	for (pagenum = 0; pagenum < pagecount; pagenum++)
+	{
+		tilemap_page[pagenum] = tilemap_create(machine, tile_get_info, tilemap_scan_rows, 8,8, 32,32);
+		tilemap_set_transparent_pen(tilemap_page[pagenum], 0);
+		tilemap_set_user_data(tilemap_page[pagenum], videoram + 0x800 * pagenum);
+	}
+
+	/* allocate a temporary bitmap for sprite rendering */
+	sprite_bitmap = auto_bitmap_alloc(256, 256, BITMAP_FORMAT_INDEXED16);
+
+	state_save_register_global(machine, system1_video_mode);
+	state_save_register_global_pointer(machine, videoram, 0x800 * pagecount);
 }
 
 VIDEO_START( system1 )
 {
-	sprite_onscreen_map = auto_malloc(256*256);
-	memset(sprite_onscreen_map,255,256*256);
-
-	bg_dirtybuffer = auto_malloc(1024);
-	memset(bg_dirtybuffer,1,1024);
-
-	tmp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-
-	state_save_register_postload(machine, system1_postload, NULL);
-	state_save_register_global(machine, system1_background_memory);
-	state_save_register_global(machine, system1_video_mode);
-
+	video_start_common(machine, 2);
 	system1_sprite_xoffset = 1;
 }
 
-VIDEO_START( wbml )
+VIDEO_START( system2 )
 {
-	sprite_onscreen_map = auto_malloc(256*256);
-	memset(sprite_onscreen_map,255,256*256);
-
-	bg_dirtybuffer = auto_malloc(1024);
-	memset(bg_dirtybuffer,1,1024);
-	wbml_paged_videoram = auto_malloc(0x4000);	/* Allocate 16k for background banked ram */
-	memset(wbml_paged_videoram,0,0x4000);
-
-	tmp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-
+	video_start_common(machine, 8);
 	system1_sprite_xoffset = 1+7*2;
-
-	state_save_register_postload(machine, system1_postload, NULL);
-	state_save_register_global(machine, system1_background_memory);
-	state_save_register_global(machine, system1_video_mode);
-
-	state_save_register_global_pointer(machine, wbml_paged_videoram, 0x4000);
-	state_save_register_global(machine, wbml_videoram_bank);
-	state_save_register_global(machine, wbml_videoram_bank_latch);
 }
 
 WRITE8_HANDLER( system1_videomode_w )
@@ -167,94 +291,21 @@ if (data & 0x6e) logerror("videomode = %02x\n",data);
 	flip_screen_set(space->machine, data & 0x80);
 }
 
-READ8_HANDLER( system1_videomode_r )
+
+INLINE void draw_sprite_pixel(bitmap_t *bitmap, int x, int y, int spr_number, int color)
 {
-	return system1_video_mode;
+	UINT16 *destpix = BITMAP_ADDR16(bitmap, y, x);
+	int prevpix = *destpix;
+	
+	if ((prevpix & 0x0f) != 0)
+		sprite_collide[(prevpix >> 11) + 32 * spr_number] = sprite_collide_summary = 1;
+
+	*destpix = color | (spr_number << 11);
 }
 
-void system1_define_background_memory(int mode)
+static void draw_sprite(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int spr_number)
 {
-	system1_background_memory = mode;
-}
-
-
-#ifdef UNUSED_FUNCTION
-INLINE int get_sprite_bottom_y(int spr_number)
-{
-	return  spriteram[0x10 * spr_number + SPR_Y_BOTTOM];
-}
-#endif
-
-INLINE void draw_pixel(running_machine *machine, bitmap_t *bitmap,
-				  	   int x,int y,int x_flipped,int y_flipped,
-				  	   int spr_number,int color)
-{
-	int xr,yr;
-	int sprite_onscreen;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-
-	if (x < 0 || x >= video_screen_get_width(machine->primary_screen) ||
-		y < 0 || y >= video_screen_get_height(machine->primary_screen))
-		return;
-
-	if (sprite_onscreen_map[256*y+x] != 255)
-	{
-		sprite_onscreen = sprite_onscreen_map[256*y+x];
-		system1_sprites_collisionram[sprite_onscreen + 32 * spr_number] = 0xff;
-	}
-
-	sprite_onscreen_map[256*y+x] = spr_number;
-
-	if (x_flipped >= visarea->min_x ||
-		x_flipped <= visarea->max_x ||
-		y_flipped >= visarea->min_y ||
-		y_flipped <= visarea->max_y)
-	{
-		*BITMAP_ADDR16(bitmap, y_flipped, x_flipped) = color;
-	}
-
-	xr = ((x - background_scrollx) & 0xff) / 8;
-	yr = ((y - background_scrolly) & 0xff) / 8;
-
-	/* TODO: bits 5 and 6 of backgroundram are also used (e.g. Pitfall2, Mr. Viking) */
-	/* what's the difference? Bit 7 is used in Choplifter/WBML for extra char bank */
-	/* selection, but it is also set in Pitfall2 */
-
-	if (system1_background_memory == system1_BACKGROUND_MEMORY_SINGLE)
-	{
-		if (system1_backgroundram[2 * (32 * yr + xr) + 1] & 0x10)
-			system1_background_collisionram[0x20 + spr_number] = 0xff;
-	}
-	else
-	{
-		/* TODO: I should handle the paged background memory here. */
-		/* maybe collision detection is not used by the paged games */
-		/* (wbml and tokisens), though tokisens doesn't play very well */
-		/* (you can't seem to fit in gaps where you should fit) */
-	}
-
-	/* TODO: collision should probably be checked with the foreground as well */
-	/* (TeddyBoy Blues, head of the tiger in girl bonus round) */
-}
-
-WRITE8_HANDLER( system1_background_collisionram_w )
-{
-	/* to do the RAM check, Mister Viking writes 0xff and immediately */
-	/* reads it back, expecting bit 0 to be NOT set. */
-	system1_background_collisionram[offset] = 0x7e;
-}
-
-WRITE8_HANDLER( system1_sprites_collisionram_w )
-{
-	/* to do the RAM check, Mister Viking write 0xff and immediately */
-	/* reads it back, expecting bit 0 to be NOT set. */
-	/* Up'n Down expects to find 0x7e at f800 before doing the whole */
-	/* collision test */
-	system1_sprites_collisionram[offset] = 0x7e;
-}
-
-static void draw_sprite(running_machine *machine, bitmap_t *bitmap,int spr_number)
-{
+	int flipscreen = flip_screen_get(machine);
 	int sy,row,height,src,bank;
 	UINT8 *sprite_base;
 	int sprite_palette_base;
@@ -265,8 +316,8 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,int spr_numbe
 	sprite_base	= spriteram + 0x10 * spr_number;
 
 	src = sprite_base[SPR_GFXOFS_LO] + (sprite_base[SPR_GFXOFS_HI] << 8);
-	bank = 0x8000 * (((sprite_base[SPR_X_HI] & 0x80) >> 7) + ((sprite_base[SPR_X_HI] & 0x40) >> 5));
-	bank &= (memory_region_length(machine, "gfx2")-1);	/* limit to the range of available ROMs */
+	bank = 0x8000 * (((sprite_base[SPR_X_HI] & 0x80) >> 7) + ((sprite_base[SPR_X_HI] & 0x40) >> 5) + ((sprite_base[SPR_X_HI] & 0x20) >> 3));
+	bank &= (memory_region_length(machine, "sprites")-1);	/* limit to the range of available ROMs */
 	skip = sprite_base[SPR_SKIP_LO] + (sprite_base[SPR_SKIP_HI] << 8);
 
 	height = sprite_base[SPR_Y_BOTTOM] - sprite_base[SPR_Y_TOP];
@@ -275,8 +326,8 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,int spr_numbe
 	sy = sprite_base[SPR_Y_TOP] + 1;
 
 	/* graphics region #2 contains the packed sprite data */
-	gfx = &memory_region(machine, "gfx2")[bank];
-
+	gfx = &memory_region(machine, "sprites")[bank];
+	
 	for (row = 0;row < height;row++)
 	{
 		int x,x_flipped;
@@ -289,12 +340,12 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,int spr_numbe
 		x_flipped = x;
 		y = y_flipped = sy+row;
 
-		if (flip_screen_get(machine))
+		if (flipscreen)
 		{
 			y_flipped = 258 - sy - height + row;
 			x_flipped = (252*2) - x;
 		}
-
+		
 		x /= 2;	/* the hardware has sub-pixel placement, it seems */
 		x_flipped /= 2;
 
@@ -320,28 +371,25 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,int spr_numbe
 			}
 
 			if (color1 == 15) break;
-			if (color1)
-				draw_pixel(machine,bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color1);
+			if (color1 != 0 && x_flipped >= cliprect->min_x && x_flipped <= cliprect->max_x && y_flipped >= cliprect->min_y && y_flipped <= cliprect->max_y)
+				draw_sprite_pixel(bitmap,x_flipped,y_flipped,spr_number,sprite_palette_base+color1);
 			x++;
-			x_flipped += flip_screen_get(machine) ? -1 : 1;
+			x_flipped += flipscreen ? -1 : 1;
 
 			if (color2 == 15) break;
-			if (color2)
-				draw_pixel(machine,bitmap,x,y,x_flipped,y_flipped,spr_number,sprite_palette_base+color2);
+			if (color2 != 0 && x_flipped >= cliprect->min_x && x_flipped <= cliprect->max_x && y_flipped >= cliprect->min_y && y_flipped <= cliprect->max_y)
+				draw_sprite_pixel(bitmap,x_flipped,y_flipped,spr_number,sprite_palette_base+color2);
 			x++;
-			x_flipped += flip_screen_get(machine) ? -1 : 1;
+			x_flipped += flipscreen ? -1 : 1;
 		}
 	}
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int spr_number,sprite_bottom_y,sprite_top_y;
 	UINT8 *sprite_base;
-
-
-	memset(sprite_onscreen_map,255,256*256);
 
 	for (spr_number = 0;spr_number < 32;spr_number++)
 	{
@@ -349,538 +397,123 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 		sprite_top_y = sprite_base[SPR_Y_TOP];
 		sprite_bottom_y = sprite_base[SPR_Y_BOTTOM];
 		if (sprite_bottom_y && (sprite_bottom_y-sprite_top_y > 0))
-			draw_sprite(machine, bitmap,spr_number);
+			draw_sprite(machine, bitmap, cliprect, spr_number);
 	}
 }
 
 
-
-WRITE8_HANDLER( system1_backgroundram_w )
+static void video_update_common(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *fgpixmap, bitmap_t **bgpixmaps, const int *bgrowscroll, int bgyscroll)
 {
-	system1_backgroundram[offset] = data;
-	bg_dirtybuffer[offset>>1] = 1;
-}
+	const UINT8 *lookup = memory_region(screen->machine, "proms");
+	int x, y;
 
-
-static void system1_draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
-{
-	int sx,sy,offs;
-
-	priority <<= 3;
-
-	for (offs = 0;offs < system1_videoram_size;offs += 2)
+	/* first clear the sprite bitmap and draw sprites within this area */
+	bitmap_fill(sprite_bitmap, cliprect, 0);
+	draw_sprites(screen->machine, sprite_bitmap, cliprect);
+	
+	/* iterate over rows */
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		if ((system1_videoram[offs+1] & 0x08) == priority)
+		UINT16 *fgbase = BITMAP_ADDR16(fgpixmap, y, 0);
+		UINT16 *sprbase = BITMAP_ADDR16(sprite_bitmap, y, 0);
+		UINT16 *dstbase = BITMAP_ADDR16(bitmap, y, 0);
+		int bgy = (y + bgyscroll) & 0x1ff;
+		int bgxscroll = bgrowscroll[y / 8];
+		UINT16 *bgbase[2];
+
+		/* get the base of the left and right pixmaps for the effective background Y */
+		bgbase[0] = BITMAP_ADDR16(bgpixmaps[(bgy >> 8) * 2 + 0], bgy & 0xff, 0);
+		bgbase[1] = BITMAP_ADDR16(bgpixmaps[(bgy >> 8) * 2 + 1], bgy & 0xff, 0);
+
+		/* iterate over pixels */		
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			int code,color;
+			int bgx = (x - bgxscroll) & 0x1ff;
+			UINT16 fgpix = fgbase[x];
+			UINT16 bgpix = bgbase[bgx >> 8][bgx & 0xff];
+			UINT16 sprpix = sprbase[x];
+			UINT8 lookup_index;
+			UINT8 lookup_value;
+			
+			/* using the sprite, background, and foreground pixels, look up the color behavior */
+			lookup_index = 	(((sprpix & 0xf) == 0) << 0) |
+							(((fgpix & 7) == 0) << 1) |
+							(((fgpix >> 9) & 3) << 2) |
+							(((bgpix & 7) == 0) << 4) |
+							(((bgpix >> 9) & 3) << 5);
+			lookup_value = lookup[lookup_index];
 
+			/* compute collisions based on two of the PROM bits */			
+			if (!(lookup_value & 4))
+				mix_collide[((lookup_value & 8) << 2) | (sprpix >> 11)] = mix_collide_summary = 1;
 
-			code = (system1_videoram[offs] | (system1_videoram[offs+1] << 8));
-			code = ((code >> 4) & 0x800) | (code & 0x7ff);	/* Heavy Metal only */
-			color = ((code >> 5) & 0x3f);
-			sx = (offs/2) % 32;
-			sy = (offs/2) / 32;
-
-			if (flip_screen_get(machine))
-			{
-				sx = 31 - sx;
-				sy = 31 - sy;
-			}
-
-			code %= machine->gfx[0]->total_elements;
-
-			drawgfx(bitmap,machine->gfx[0],
-					code,
-					color,
-					flip_screen_get(machine),flip_screen_get(machine),
-					8*sx + blockgal_kludgeoffset,8*sy,
-					cliprect,TRANSPARENCY_PEN,0);
+			/* the lower 2 PROM bits select the palette and which pixels */
+			lookup_value &= 3;
+			if (system1_video_mode & 0x10)
+				dstbase[x] = 0;
+			else if (lookup_value == 0)
+				dstbase[x] = 0x000 | (sprpix & 0x1ff);
+			else if (lookup_value == 1)
+				dstbase[x] = 0x200 | (fgpix & 0x1ff);
+			else
+				dstbase[x] = 0x400 | (bgpix & 0x1ff);
 		}
 	}
 }
 
-static void system1_draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
-{
-	int sx,sy,offs;
-	int background_scrollx_flip, background_scrolly_flip;
-
-
-	background_scrollx = ((system1_scroll_x[0] >> 1) + ((system1_scroll_x[1] & 1) << 7) + 14 + 2*blockgal_kludgeoffset) & 0xff;
-	background_scrolly = (-*system1_scroll_y) & 0xff;
-
-	background_scrollx_flip = (275 - background_scrollx) & 0xff;
-	background_scrolly_flip = (256 - background_scrolly) & 0xff;
-
-	if (priority == -1)
-	{
-		/* optimized far background */
-
-		/* for every character in the background video RAM, check if it has
-         * been modified since last time and update it accordingly.
-         */
-
-		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
-		{
-			if (bg_dirtybuffer[offs / 2])
-			{
-				int code,color;
-
-
-				bg_dirtybuffer[offs / 2] = 0;
-
-				code = (system1_backgroundram[offs] | (system1_backgroundram[offs+1] << 8));
-				code = ((code >> 4) & 0x800) | (code & 0x7ff);	/* Heavy Metal only */
-				color = ((code >> 5) & 0x3f) + 0x40;
-				sx = (offs/2) % 32;
-				sy = (offs/2) / 32;
-
-				if (flip_screen_get(machine))
-				{
-					sx = 31 - sx;
-					sy = 31 - sy;
-				}
-
-				drawgfx(tmp_bitmap,machine->gfx[0],
-						code,
-						color,
-						flip_screen_get(machine),flip_screen_get(machine),
-						8*sx,8*sy,
-						0,TRANSPARENCY_NONE,0);
-			}
-		}
-
-		/* copy the temporary bitmap to the screen */
-		if (flip_screen_get(machine))
-			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx_flip,1,&background_scrolly_flip,cliprect);
-		else
-			copyscrollbitmap(bitmap,tmp_bitmap,1,&background_scrollx,1,&background_scrolly,cliprect);
-	}
-	else
-	{
-		priority <<= 3;
-
-		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
-		{
-			if ((system1_backgroundram[offs+1] & 0x08) == priority)
-			{
-				int code,color;
-
-
-				code = (system1_backgroundram[offs] | (system1_backgroundram[offs+1] << 8));
-				code = ((code >> 4) & 0x800) | (code & 0x7ff);	/* Heavy Metal only */
-				color = ((code >> 5) & 0x3f) + 0x40;
-				sx = (offs/2) % 32;
-				sy = (offs/2) / 32;
-
-				if (flip_screen_get(machine))
-				{
-					sx = 8*(31-sx) + background_scrollx_flip;
-					sy = 8*(31-sy) + background_scrolly_flip;
-				}
-				else
-				{
-					sx = 8*sx + background_scrollx;
-					sy = 8*sy + background_scrolly;
-				}
-
-				/* draw it 4 times because of possible wrap around */
-				drawgfx(bitmap,machine->gfx[0],
-						code,
-						color,
-						flip_screen_get(machine),flip_screen_get(machine),
-						sx,sy,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,machine->gfx[0],
-						code,
-						color,
-						flip_screen_get(machine),flip_screen_get(machine),
-						sx-256,sy,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,machine->gfx[0],
-						code,
-						color,
-						flip_screen_get(machine),flip_screen_get(machine),
-						sx,sy-256,
-						cliprect,TRANSPARENCY_PEN,0);
-				drawgfx(bitmap,machine->gfx[0],
-						code,
-						color,
-						flip_screen_get(machine),flip_screen_get(machine),
-						sx-256,sy-256,
-						cliprect,TRANSPARENCY_PEN,0);
-			}
-		}
-	}
-}
 
 VIDEO_UPDATE( system1 )
 {
-	system1_draw_bg(screen->machine, bitmap, cliprect, -1);
-	system1_draw_fg(screen->machine, bitmap, cliprect, 0);
-	system1_draw_bg(screen->machine, bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap);
-	system1_draw_bg(screen->machine, bitmap, cliprect, 1);
-	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
+	bitmap_t *bgpixmaps[4], *fgpixmap;
+	int bgrowscroll[32];
+	int y;
 
-	/* even if screen is off, sprites must still be drawn to update the collision table */
-	if (system1_video_mode & 0x10)  /* screen off */
-		bitmap_fill(bitmap,cliprect,0);
+	bgpixmaps[0] = bgpixmaps[1] = bgpixmaps[2] = bgpixmaps[3] = tilemap_get_pixmap(tilemap_page[0]);
+	fgpixmap = tilemap_get_pixmap(tilemap_page[1]);
+	for (y = 0; y < 32; y++)
+		bgrowscroll[y] = (videoram[0xffc] | (videoram[0xffd] << 8)) / 2 + 14;
+	
+	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, bgrowscroll, videoram[0xfbd]);
 	return 0;
 }
 
 
-
-
-
-
-
-
-
-WRITE8_HANDLER( choplifter_scroll_x_w )
+VIDEO_UPDATE( system2 )
 {
-	system1_scrollx_ram[offset] = data;
+	int flip = flip_screen_get(screen->machine);
+	int xscrolloffs = flip ? 0x7f6 : 0x7c0;
+	int yscrolloffs = flip ? 0x784 : 0x7ba;
+	bitmap_t *bgpixmaps[4], *fgpixmap;
+	int rowscroll[32];
+	int y;
+	
+	bgpixmaps[0] = tilemap_get_pixmap(tilemap_page[videoram[0x740] & 7]);
+	bgpixmaps[1] = tilemap_get_pixmap(tilemap_page[videoram[0x742] & 7]);
+	bgpixmaps[2] = tilemap_get_pixmap(tilemap_page[videoram[0x744] & 7]);
+	bgpixmaps[3] = tilemap_get_pixmap(tilemap_page[videoram[0x746] & 7]);
+	fgpixmap = tilemap_get_pixmap(tilemap_page[0]);
+	for (y = 0; y < 32; y++)
+		rowscroll[y] = (((videoram[xscrolloffs + 0] | (videoram[xscrolloffs + 1] << 8)) / 2) & 0xff) - 256 + 5;
 
-	scrollx_row[offset/2] = (system1_scrollx_ram[offset & ~1] >> 1) + ((system1_scrollx_ram[offset | 1] & 1) << 7);
-}
-
-static void chplft_draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
-{
-	int sx,sy,offs;
-	int choplifter_scroll_x_on = (system1_scrollx_ram[0] == 0xe5 && system1_scrollx_ram[1] == 0xff) ? 0 : 1;
-
-
-	if (priority == -1)
-	{
-		/* optimized far background */
-
-		/* for every character in the background video RAM, check if it has
-         * been modified since last time and update it accordingly.
-         */
-
-		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
-		{
-			if (bg_dirtybuffer[offs / 2])
-			{
-				int code,color;
-
-
-				bg_dirtybuffer[offs / 2] = 0;
-
-				code = (system1_backgroundram[offs] | (system1_backgroundram[offs+1] << 8));
-				code = ((code >> 4) & 0x800) | (code & 0x7ff);	/* Heavy Metal only */
-				color = ((code >> 5) & 0x3f) + 0x40;
-				sx = (offs/2) % 32;
-				sy = (offs/2) / 32;
-
-				if (flip_screen_get(machine))
-				{
-					sx = 31 - sx;
-					sy = 31 - sy;
-				}
-
-				drawgfx(tmp_bitmap,machine->gfx[0],
-						code,
-						color,
-						flip_screen_get(machine),flip_screen_get(machine),
-						8*sx,8*sy,
-						0,TRANSPARENCY_NONE,0);
-			}
-		}
-
-		/* copy the temporary bitmap to the screen */
-		if (choplifter_scroll_x_on)
-		{
-			if (flip_screen_get(machine))
-			{
-				int scrollx_row_flip[32],i;
-
-				for (i = 0; i < 32; i++)
-					scrollx_row_flip[31-i] = (256-scrollx_row[i]) & 0xff;
-
-				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row_flip,0,0,cliprect);
-			}
-			else
-				copyscrollbitmap(bitmap,tmp_bitmap,32,scrollx_row,0,0,cliprect);
-		}
-		else
-			copybitmap(bitmap,tmp_bitmap,0,0,0,0,cliprect);
-	}
-	else
-	{
-		priority <<= 3;
-
-		for (offs = 0;offs < system1_backgroundram_size;offs += 2)
-		{
-			if ((system1_backgroundram[offs+1] & 0x08) == priority)
-			{
-				int code,color;
-
-
-				code = (system1_backgroundram[offs] | (system1_backgroundram[offs+1] << 8));
-				code = ((code >> 4) & 0x800) | (code & 0x7ff);	/* Heavy Metal only */
-				color = ((code >> 5) & 0x3f) + 0x40;
-				sx = (offs/2) % 32;
-				sy = (offs/2) / 32;
-
-				if (flip_screen_get(machine))
-				{
-					sx = 8*(31-sx);
-
-					if (choplifter_scroll_x_on)
-						sx = (sx - scrollx_row[sy]) & 0xff;
-
-					sy = 31 - sy;
-				}
-				else
-				{
-					sx = 8*sx;
-
-					if (choplifter_scroll_x_on)
-						sx = (sx + scrollx_row[sy]) & 0xff;
-				}
-
-				drawgfx(bitmap,machine->gfx[0],
-						code,
-						color,
-						flip_screen_get(machine),flip_screen_get(machine),
-						sx,8*sy,
-						cliprect,TRANSPARENCY_PEN,0);
-			}
-		}
-	}
-}
-
-VIDEO_UPDATE( choplifter )
-{
-	chplft_draw_bg(screen->machine, bitmap, cliprect, -1);
-	system1_draw_fg(screen->machine, bitmap, cliprect, 0);
-	chplft_draw_bg(screen->machine, bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap);
-	chplft_draw_bg(screen->machine, bitmap, cliprect, 1);
-	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
-
-	/* even if screen is off, sprites must still be drawn to update the collision table */
-	if (system1_video_mode & 0x10)  /* screen off */
-		bitmap_fill(bitmap,cliprect,0);
-
-
-#ifdef MAME_DEBUG
-	if (input_code_pressed(KEYCODE_SPACE))		// goto next level
-	{
-		memory_region(screen->machine, "maincpu")[0xC085]=33;
-	}
-#endif
+	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, videoram[yscrolloffs]);
 	return 0;
 }
 
 
-
-READ8_HANDLER( wbml_videoram_bank_latch_r )
+VIDEO_UPDATE( system2_rowscroll )
 {
-	return wbml_videoram_bank_latch;
-}
+	bitmap_t *bgpixmaps[4], *fgpixmap;
+	int rowscroll[32];
+	int y;
+	
+	bgpixmaps[0] = tilemap_get_pixmap(tilemap_page[videoram[0x740] & 7]);
+	bgpixmaps[1] = tilemap_get_pixmap(tilemap_page[videoram[0x742] & 7]);
+	bgpixmaps[2] = tilemap_get_pixmap(tilemap_page[videoram[0x744] & 7]);
+	bgpixmaps[3] = tilemap_get_pixmap(tilemap_page[videoram[0x746] & 7]);
+	fgpixmap = tilemap_get_pixmap(tilemap_page[0]);
+	for (y = 0; y < 32; y++)
+		rowscroll[y] = (((videoram[0x7c0 + y * 2] | (videoram[0x7c1 + y * 2] << 8)) / 2) & 0xff) - 256 + 5;
 
-WRITE8_HANDLER( wbml_videoram_bank_latch_w )
-{
-	wbml_videoram_bank_latch = data;
-	wbml_videoram_bank = (data >> 1) & 0x03;	/* Select 4 banks of 4k, bit 2,1 */
-}
-
-READ8_HANDLER( wbml_paged_videoram_r )
-{
-	return wbml_paged_videoram[0x1000*wbml_videoram_bank + offset];
-}
-
-WRITE8_HANDLER( wbml_paged_videoram_w )
-{
-	wbml_paged_videoram[0x1000*wbml_videoram_bank + offset] = data;
-}
-
-static void wbml_draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int trasp)
-{
-	int page;
-
-	int xscroll = (wbml_paged_videoram[0x7c0] >> 1) + ((wbml_paged_videoram[0x7c1] & 1) << 7) - 256 + 5;
-	int yscroll = -wbml_paged_videoram[0x7ba];
-
-	for (page=0; page < 4; page++)
-	{
-		const UINT8 *source = wbml_paged_videoram + (wbml_paged_videoram[0x0740 + page*2] & 0x07)*0x800;
-		int startx = (page&1)*256+xscroll;
-		int starty = (page>>1)*256+yscroll;
-		int row,col;
-
-
-		for( row=0; row<32*8; row+=8 )
-		{
-			for( col=0; col<32*8; col+=8 )
-			{
-				int code,priority;
-				int x = (startx+col) & 0x1ff;
-				int y = (starty+row) & 0x1ff;
-				if (x > 256) x -= 512;
-				if (y > 224) y -= 512;
-
-				if (flip_screen_get(machine))
-				{
-					x = 248 - x;
-					y = 248 - y;
-				}
-
-				code = source[0] + (source[1] << 8);
-				priority = code & 0x800;
-				code = ((code >> 4) & 0x800) | (code & 0x7ff);
-
-				if (!trasp)
-					drawgfx(bitmap,machine->gfx[0],
-							code,
-							((code >> 5) & 0x3f) + 64,
-							flip_screen_get(machine),flip_screen_get(machine),
-							x,y,
-							cliprect, TRANSPARENCY_NONE, 0);
-				else if (priority)
-					drawgfx(bitmap,machine->gfx[0],
-							code,
-							((code >> 5) & 0x3f) + 64,
-							flip_screen_get(machine),flip_screen_get(machine),
-							x,y,
-							cliprect, TRANSPARENCY_PEN, 0);
-
-				source+=2;
-			}
-		}
-	} /* next page */
-}
-
-static void wbml_draw_fg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int offs;
-
-
-	for (offs = 0;offs < 0x700;offs += 2)
-	{
-		int sx,sy,code;
-
-
-		sx = (offs/2) % 32;
-		sy = (offs/2) / 32;
-		code = wbml_paged_videoram[offs] | (wbml_paged_videoram[offs+1] << 8);
-		code = ((code >> 4) & 0x800) | (code & 0x7ff);
-
-		if (flip_screen_get(machine))
-		{
-			sx = 31 - sx;
-			sy = 31 - sy;
-		}
-
-		drawgfx(bitmap,machine->gfx[0],
-				code,
-				(code >> 5) & 0x3f,
-				flip_screen_get(machine),flip_screen_get(machine),
-				8*sx,8*sy,
-				cliprect,TRANSPARENCY_PEN,0);
-	}
-}
-
-
-VIDEO_UPDATE( wbml )
-{
-	wbml_draw_bg(screen->machine, bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap);
-	wbml_draw_bg(screen->machine, bitmap, cliprect, 1);
-	wbml_draw_fg(screen->machine, bitmap, cliprect);
-
-	/* even if screen is off, sprites must still be drawn to update the collision table */
-	if (system1_video_mode & 0x10)  /* screen off */
-		bitmap_fill(bitmap,cliprect,0);
-	return 0;
-}
-
-/* same as wbml but with rows scroll */
-static void ufosensi_draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int trasp)
-{
-	int page;
-
-	int yscroll = -wbml_paged_videoram[0x7ba];
-
-	for (page=0; page < 4; page++)
-	{
-		const UINT8 *source = wbml_paged_videoram + (wbml_paged_videoram[0x0740 + page*2] & 0x07)*0x800;
-		int starty = (page>>1)*256+yscroll;
-		int row,col;
-
-
-		for( row=0; row<32*8; row+=8 )
-		{
-			for( col=0; col<32*8; col+=8 )
-			{
-				int code,priority;
-				int xscroll = (wbml_paged_videoram[0x7c0 + row/4] >> 1) + ((wbml_paged_videoram[0x7c1 + row/4] & 1) << 7) - 256 + 5;
-				int startx = (page&1)*256+xscroll;
-				int x = (startx+col) & 0x1ff;
-				int y = (starty+row) & 0x1ff;
-				if (x > 256) x -= 512;
-				if (y > 224) y -= 512;
-
-				if (flip_screen_get(machine))
-				{
-					x = 248 - x;
-					y = 248 - y;
-				}
-
-				code = source[0] + (source[1] << 8);
-				priority = code & 0x800;
-				code = ((code >> 4) & 0x800) | (code & 0x7ff);
-
-				if (!trasp)
-					drawgfx(bitmap,machine->gfx[0],
-							code,
-							((code >> 5) & 0x3f) + 64,
-							flip_screen_get(machine),flip_screen_get(machine),
-							x,y,
-							cliprect, TRANSPARENCY_NONE, 0);
-				else if (priority)
-					drawgfx(bitmap,machine->gfx[0],
-							code,
-							((code >> 5) & 0x3f) + 64,
-							flip_screen_get(machine),flip_screen_get(machine),
-							x,y,
-							cliprect, TRANSPARENCY_PEN, 0);
-
-				source+=2;
-			}
-		}
-	} /* next page */
-}
-
-VIDEO_UPDATE( ufosensi )
-{
-	ufosensi_draw_bg(screen->machine, bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap);
-	ufosensi_draw_bg(screen->machine, bitmap, cliprect, 1);
-	wbml_draw_fg(screen->machine, bitmap, cliprect);
-
-	/* even if screen is off, sprites must still be drawn to update the collision table */
-	if (system1_video_mode & 0x10)  /* screen off */
-		bitmap_fill(bitmap,cliprect,0);
-	return 0;
-}
-
-VIDEO_UPDATE( blockgal )
-{
-	blockgal_kludgeoffset = -8;
-
-	system1_draw_bg(screen->machine, bitmap, cliprect, -1);
-	system1_draw_fg(screen->machine, bitmap, cliprect, 0);
-	system1_draw_bg(screen->machine, bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap);
-	system1_draw_bg(screen->machine, bitmap, cliprect, 1);
-	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
-
-	/* even if screen is off, sprites must still be drawn to update the collision table */
-	if (system1_video_mode & 0x10)  /* screen off */
-		bitmap_fill(bitmap,cliprect,0);
-
-	blockgal_kludgeoffset = 0;
+	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, videoram[0x7ba]);
 	return 0;
 }
