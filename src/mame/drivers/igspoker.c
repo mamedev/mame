@@ -2242,8 +2242,8 @@ GAMEL( 198?,  csk234it, csk227it, csk234it, csk234,  cska,    ROT0, "IGS",    "C
 GAMEL( 2000, number10,  0,        number10, number10, number10, ROT0, "PlayMark Srl",   "Number Dieci (Poker)",            0,	layout_igspoker )
 GAMEL( 2000, numbr10l,  number10, number10, number10, number10, ROT0, "PlayMark Srl",   "Number Dieci (Lattine)",          0,	layout_igspoker )
 GAMEL( 198?,  igs_ncs,  0,        igs_ncs,  igs_ncs, igs_ncs, ROT0, "IGS",    "New Champion Skill (v100n)",                0,	layout_igspoker ) /* SU 062 */
-GAMEL( 199?, cpokerpk,  0,        cpokerpk, cpokerpk,  cpokerpk,  ROT0, "SGS",    "Champion Poker PK (bootleg, blue board)",   0,	layout_igspoker )
-GAMEL( 199?, cpokerpkg, cpokerpk, cpokerpk, cpokerpk,  cpokerpk,  ROT0, "SGS",    "Champion Poker PK (bootleg, green board)",  0, layout_igspoker )
+GAMEL( 199?, cpokerpk,  0,        cpokerpk, cpokerpk,  cpokerpk,  ROT0, "SGS",    "Champion Italian PK (bootleg, blue board)",   0,	layout_igspoker )
+GAMEL( 199?, cpokerpkg, cpokerpk, cpokerpk, cpokerpk,  cpokerpk,  ROT0, "SGS",    "Champion Italian PK (bootleg, green board)",  0, layout_igspoker )
 GAMEL( 199?, citalcup,  cpokerpk, cpokerpk, cpokerpk,  cpokerpk,  ROT0, "SGS",    "Champion Italian Cup (bootleg V220IT)",     0, layout_igspoker )
 
 GAMEL( 2000, igs_ncs2,  0,        igs_ncs,  igs_ncs, igs_ncs2, ROT0, "IGS",   "New Champion Skill (v100n 2000)",           GAME_IMPERFECT_GRAPHICS, layout_igspoker )
