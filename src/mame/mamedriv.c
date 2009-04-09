@@ -4296,7 +4296,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 1999.12 Puyopuyo DA! */
 						/* 1999.12 Mars TV */
 						/* 2000.01 18 Wheeler */
-						/* 2000.01 The Typing of the Dead */
+	DRIVER( totd )		/* 2000.01 The Typing of the Dead */
 	DRIVER( spawn )		/* 2000.01 Spawn */
 	DRIVER( doa2m )		/* 2000.01 Dead or Alive 2 Millenium */
 						/* 2000.02 Touch de UNO! 2 */
