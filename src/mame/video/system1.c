@@ -1,80 +1,80 @@
 /*************************************************************************
 
-	System1 / System 2
-	original driver by Jarek Parchanski & Mirko Buffoni
+    System1 / System 2
+    original driver by Jarek Parchanski & Mirko Buffoni
 
-	Many thanks to Roberto Ventura, for precious information about
-	System 1 hardware.
+    Many thanks to Roberto Ventura, for precious information about
+    System 1 hardware.
 
 **************************************************************************
 
-	The System 1/System 2 video hardware is composed of two tilemap
-	layers and a sprite layer.
-	
-	The tilemap layers are built up out of "pages" of 32x32 tilemaps.
-	Each tile is described by two bytes, meaning each page is 2k bytes
-	in size. One of the tilemaps is fixed in position, while the other
-	has registers for scrolling that vary between board variants.
-	
-	The original System 1 hardware simply had two fixed pages. Page 0
-	was the scrolling tilemap, and page 1 was the fixed tilemap.
-	
-	With later boards and the introduction of System 2, this was 
-	expanded to support up to 8 pages. The fixed tilemap was hard-
-	coded to page 0, but the scrolling tilemap was extended. Instead
-	of a single page, the scrolling tilemap consisted of 4 pages glued
-	together to form an effective large 64x64 tilemap. Further, each
-	of the 4 pages that made up the scrolling tilemap could be
-	independently selected from one of the 8 available pages. This
-	unique paged tilemap system would continue on to form the basis of
-	Sega's tilemap systems for their 16-bit era.
-	
-	Up to 32 sprites can be displayed. They are rendered one scanline
-	ahead of the beam into 12-bit line buffers which store the sprite
-	pixel data and sprite index. During rendering, collisions are 
-	checked between sprites and if one is found a bit is set in a 
-	special 32x32x1 collision RAM indiciating which pair of sprites 
-	collided. Note that the sprite color is derived directly from the
-	sprite index, giving each sprite its own set of 16 colors.
-	
-	The 11-bit output from the two tilemaps (3 bits of pixel data,
-	6 bits of color, 2 bits of priority), plus the 9-bit output from 
-	the sprite line buffer (4 bits of pixel data, 5 bits of color) 
-	are combined in a final step to produce the final pixel value. To 
-	do this, a lookup PROM is used which accepts as input the priority
-	bits from the two tilemaps and the whether each of the incoming
-	pixel values is transparent (color 0).
-	
-	The output of the lookup PROM is a 4-bit value. The lower 2 bits
-	select sprite data (0), fixed tilemap (1) or scrolling tilemap (2).
-	9 bits of data from the appropriate source are used as a lookup
-	into a palette RAM, and the lookup PROM's low 2 bits are used as
-	the upper 2 bits of the palette RAM address, providing 512 
-	independent colors for each source.
-	
-	The upper 2 bits of the lookup PROM are used for an additional
-	mixer collision detection. Bit 2 indicates that a collision 
-	should be recorded, and bit 3 indicates which of two banks of 
-	collision flags should be set. Each bank is 32 entries long, and 
-	the sprite index is used to select which bit within the bank to 
-	set.
-	
-	On the original System 1 hardware, the palette RAM value was used
-	directly as RGB, with 3 bits each of red and green, and 2 bits of
-	blue. Later hardware added an extra indirection layer, where the
-	8-bit palette RAM value passed into 3 256x4 palette PROMs, one for
-	each color.
-	
-	Collision data is accessed via a 4k window that is broken into
-	4 equal-sized sections. The first section returns data from the
-	2x32x1 mixer collision; the data for the collision is returned in
-	D0, and a summary bit indicating that some sort of collision has
-	occurred is returned in D7. The specific collision bit is cleared
-	by writing to the equivalent address in the same region. The 
-	collision summary bit is cleared by writing to the second region.
-	
-	The third and fourth collision regions operate similarly, but
-	return data for the 32x32x1 sprite collisions.
+    The System 1/System 2 video hardware is composed of two tilemap
+    layers and a sprite layer.
+
+    The tilemap layers are built up out of "pages" of 32x32 tilemaps.
+    Each tile is described by two bytes, meaning each page is 2k bytes
+    in size. One of the tilemaps is fixed in position, while the other
+    has registers for scrolling that vary between board variants.
+
+    The original System 1 hardware simply had two fixed pages. Page 0
+    was the scrolling tilemap, and page 1 was the fixed tilemap.
+
+    With later boards and the introduction of System 2, this was
+    expanded to support up to 8 pages. The fixed tilemap was hard-
+    coded to page 0, but the scrolling tilemap was extended. Instead
+    of a single page, the scrolling tilemap consisted of 4 pages glued
+    together to form an effective large 64x64 tilemap. Further, each
+    of the 4 pages that made up the scrolling tilemap could be
+    independently selected from one of the 8 available pages. This
+    unique paged tilemap system would continue on to form the basis of
+    Sega's tilemap systems for their 16-bit era.
+
+    Up to 32 sprites can be displayed. They are rendered one scanline
+    ahead of the beam into 12-bit line buffers which store the sprite
+    pixel data and sprite index. During rendering, collisions are
+    checked between sprites and if one is found a bit is set in a
+    special 32x32x1 collision RAM indiciating which pair of sprites
+    collided. Note that the sprite color is derived directly from the
+    sprite index, giving each sprite its own set of 16 colors.
+
+    The 11-bit output from the two tilemaps (3 bits of pixel data,
+    6 bits of color, 2 bits of priority), plus the 9-bit output from
+    the sprite line buffer (4 bits of pixel data, 5 bits of color)
+    are combined in a final step to produce the final pixel value. To
+    do this, a lookup PROM is used which accepts as input the priority
+    bits from the two tilemaps and the whether each of the incoming
+    pixel values is transparent (color 0).
+
+    The output of the lookup PROM is a 4-bit value. The lower 2 bits
+    select sprite data (0), fixed tilemap (1) or scrolling tilemap (2).
+    9 bits of data from the appropriate source are used as a lookup
+    into a palette RAM, and the lookup PROM's low 2 bits are used as
+    the upper 2 bits of the palette RAM address, providing 512
+    independent colors for each source.
+
+    The upper 2 bits of the lookup PROM are used for an additional
+    mixer collision detection. Bit 2 indicates that a collision
+    should be recorded, and bit 3 indicates which of two banks of
+    collision flags should be set. Each bank is 32 entries long, and
+    the sprite index is used to select which bit within the bank to
+    set.
+
+    On the original System 1 hardware, the palette RAM value was used
+    directly as RGB, with 3 bits each of red and green, and 2 bits of
+    blue. Later hardware added an extra indirection layer, where the
+    8-bit palette RAM value passed into 3 256x4 palette PROMs, one for
+    each color.
+
+    Collision data is accessed via a 4k window that is broken into
+    4 equal-sized sections. The first section returns data from the
+    2x32x1 mixer collision; the data for the collision is returned in
+    D0, and a summary bit indicating that some sort of collision has
+    occurred is returned in D7. The specific collision bit is cleared
+    by writing to the equivalent address in the same region. The
+    collision summary bit is cleared by writing to the second region.
+
+    The third and fourth collision regions operate similarly, but
+    return data for the 32x32x1 sprite collisions.
 
 *************************************************************************/
 
@@ -124,13 +124,13 @@ static TILE_GET_INFO( tile_get_info )
 static void video_start_common(running_machine *machine, int pagecount)
 {
 	int pagenum;
-	
+
 	/* allocate memory for the collision arrays */
 	mix_collide = auto_malloc(64);
 	memset(mix_collide, 0, 64);
 	sprite_collide = auto_malloc(1024);
 	memset(sprite_collide, 0, 1024);
-	
+
 	/* allocate memory for videoram */
 	tilemap_pages = pagecount;
 	videoram = auto_malloc(0x800 * pagecount);
@@ -284,25 +284,25 @@ WRITE8_HANDLER( system1_paletteram_w )
 	int val,r,g,b;
 
 	/*
-	  There are two kind of color handling: in the System 1 games, values in the
-	  palette RAM are directly mapped to colors with the usual BBGGGRRR format;
-	  in the System 2 ones (Choplifter, WBML, etc.), the value in the palette RAM
-	  is a lookup offset for three palette PROMs in RRRRGGGGBBBB format.
+      There are two kind of color handling: in the System 1 games, values in the
+      palette RAM are directly mapped to colors with the usual BBGGGRRR format;
+      in the System 2 ones (Choplifter, WBML, etc.), the value in the palette RAM
+      is a lookup offset for three palette PROMs in RRRRGGGGBBBB format.
 
-	  It's hard to tell for sure because they use resistor packs, but here's
-	  what I think the values are from measurment with a volt meter:
+      It's hard to tell for sure because they use resistor packs, but here's
+      what I think the values are from measurment with a volt meter:
 
-	  Blue: .250K ohms
-	  Blue: .495K ohms
-	  Green:.250K ohms
-	  Green:.495K ohms
-	  Green:.995K ohms
-	  Red:  .495K ohms
-	  Red:  .250K ohms
-	  Red:  .995K ohms
+      Blue: .250K ohms
+      Blue: .495K ohms
+      Green:.250K ohms
+      Green:.495K ohms
+      Green:.995K ohms
+      Red:  .495K ohms
+      Red:  .250K ohms
+      Red:  .995K ohms
 
-	  accurate to +/- .003K ohms.
-	*/
+      accurate to +/- .003K ohms.
+    */
 
 	paletteram[offset] = data;
 
@@ -369,14 +369,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		UINT16 palettebase = spritenum * 0x10;
 		const UINT8 *gfxbankbase;
 		int x, y;
-	
+
 		/* writing an 0xff into the first byte of sprite RAM seems to disable all sprites;
-		   not sure if this applies to each sprite or only to the first one; see pitfall2
-		   and wmatch for examples where this is done */
+           not sure if this applies to each sprite or only to the first one; see pitfall2
+           and wmatch for examples where this is done */
 		if (spritedata[0] == 0xff)
 			return;
 
-		/* clamp the bank to the size of the sprite ROMs */	
+		/* clamp the bank to the size of the sprite ROMs */
 		bank %= gfxbanks;
 		gfxbankbase = gfxbase + bank * 0x8000;
 
@@ -388,29 +388,29 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			bottom = 256 - temp;
 		}
 
-		/* iterate over all rows of the sprite */	
+		/* iterate over all rows of the sprite */
 		for (y = top; y < bottom; y++)
 		{
 			UINT16 *destbase = BITMAP_ADDR16(bitmap, y, 0);
 			UINT16 curaddr;
 			int addrdelta;
-			
+
 			/* advance by the row counter */
 			srcaddr += stride;
-			
+
 			/* skip if outside of our clipping area */
 			if (y < cliprect->min_y || y > cliprect->max_y)
 				continue;
-			
+
 			/* iterate over X */
 			addrdelta = (srcaddr & 0x8000) ? -1 : 1;
 			for (x = xstart, curaddr = srcaddr; ; x += 2, curaddr += addrdelta)
 			{
 				UINT8 color1, color2;
 				UINT8 data;
-				
+
 				data = gfxbankbase[curaddr & 0x7fff];
-				
+
 				/* non-flipped case */
 				if (!(curaddr & 0x8000))
 				{
@@ -422,11 +422,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					color1 = data & 0x0f;
 					color2 = data >> 4;
 				}
-				
+
 				/* stop when we see color 0x0f */
 				if (color1 == 0x0f)
 					break;
-					
+
 				/* draw if non-transparent */
 				if (color1 != 0)
 				{
@@ -434,17 +434,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					if (effx >= cliprect->min_x && effx <= cliprect->max_x)
 					{
 						int prevpix = destbase[effx];
-	
+
 						if ((prevpix & 0x0f) != 0)
 							sprite_collide[((prevpix >> 4) & 0x1f) + 32 * spritenum] = sprite_collide_summary = 1;
 						destbase[effx] = color1 | palettebase;
 					}
 				}
-				
+
 				/* stop when we see color 0x0f */
 				if (color2 == 0x0f)
 					break;
-					
+
 				/* draw if non-transparent */
 				if (color2 != 0)
 				{
@@ -452,7 +452,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					if (effx >= cliprect->min_x && effx <= cliprect->max_x)
 					{
 						int prevpix = destbase[effx];
-	
+
 						if ((prevpix & 0x0f) != 0)
 							sprite_collide[((prevpix >> 4) & 0x1f) + 32 * spritenum] = sprite_collide_summary = 1;
 						destbase[effx] = color2 | palettebase;
@@ -479,7 +479,7 @@ static void video_update_common(const device_config *screen, bitmap_t *bitmap, c
 	/* first clear the sprite bitmap and draw sprites within this area */
 	bitmap_fill(sprite_bitmap, cliprect, 0);
 	draw_sprites(screen->machine, sprite_bitmap, cliprect, spritexoffs);
-		
+
 	/* iterate over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
@@ -489,12 +489,12 @@ static void video_update_common(const device_config *screen, bitmap_t *bitmap, c
 		int bgy = (y + bgyscroll) & 0x1ff;
 		int bgxscroll = bgrowscroll[y / 8];
 		UINT16 *bgbase[2];
-		
+
 		/* get the base of the left and right pixmaps for the effective background Y */
 		bgbase[0] = BITMAP_ADDR16(bgpixmaps[(bgy >> 8) * 2 + 0], bgy & 0xff, 0);
 		bgbase[1] = BITMAP_ADDR16(bgpixmaps[(bgy >> 8) * 2 + 1], bgy & 0xff, 0);
 
-		/* iterate over pixels */		
+		/* iterate over pixels */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
 			int bgx = (x - bgxscroll) & 0x1ff;
@@ -503,7 +503,7 @@ static void video_update_common(const device_config *screen, bitmap_t *bitmap, c
 			UINT16 sprpix = sprbase[x];
 			UINT8 lookup_index;
 			UINT8 lookup_value;
-			
+
 			/* using the sprite, background, and foreground pixels, look up the color behavior */
 			lookup_index = 	(((sprpix & 0xf) == 0) << 0) |
 							(((fgpix & 7) == 0) << 1) |
@@ -512,7 +512,7 @@ static void video_update_common(const device_config *screen, bitmap_t *bitmap, c
 							(((bgpix >> 9) & 3) << 5);
 			lookup_value = lookup[lookup_index];
 
-			/* compute collisions based on two of the PROM bits */			
+			/* compute collisions based on two of the PROM bits */
 			if (!(lookup_value & 4))
 				mix_collide[((lookup_value & 8) << 2) | ((sprpix >> 4) & 0x1f)] = mix_collide_summary = 1;
 
@@ -565,7 +565,7 @@ VIDEO_UPDATE( system1 )
 	/* fill in the row scroll table */
 	for (y = 0; y < 32; y++)
 		bgrowscroll[y] = xscroll;
-	
+
 	/* common update */
 	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, bgrowscroll, yscroll, 0);
 	return 0;
@@ -579,7 +579,7 @@ VIDEO_UPDATE( system2 )
 	int xscroll, yscroll;
 	int sprxoffset;
 	int y;
-	
+
 	/* 4 independent background pages */
 	bgpixmaps[0] = tilemap_get_pixmap(tilemap_page[videoram[0x740] & 7]);
 	bgpixmaps[1] = tilemap_get_pixmap(tilemap_page[videoram[0x742] & 7]);
@@ -606,7 +606,7 @@ VIDEO_UPDATE( system2 )
 	/* fill in the row scroll table */
 	for (y = 0; y < 32; y++)
 		rowscroll[y] = xscroll;
-	
+
 	/* common update */
 	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, yscroll, sprxoffset);
 	return 0;
@@ -619,7 +619,7 @@ VIDEO_UPDATE( system2_rowscroll )
 	int rowscroll[32];
 	int yscroll;
 	int y;
-	
+
 	/* 4 independent background pages */
 	bgpixmaps[0] = tilemap_get_pixmap(tilemap_page[videoram[0x740] & 7]);
 	bgpixmaps[1] = tilemap_get_pixmap(tilemap_page[videoram[0x742] & 7]);
@@ -642,7 +642,7 @@ VIDEO_UPDATE( system2_rowscroll )
 			rowscroll[y] = 262+256 - ((((videoram[0x7fe - y * 2] | (videoram[0x7ff - y * 2] << 8)) / 2) & 0xff) - 256 + 5);
 		yscroll = 256+256 - videoram[0x784];
 	}
-	
+
 	/* common update */
 	video_update_common(screen, bitmap, cliprect, fgpixmap, bgpixmaps, rowscroll, yscroll, 7);
 	return 0;

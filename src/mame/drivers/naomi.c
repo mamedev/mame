@@ -4309,21 +4309,21 @@ ROM_END
 
 /*
 
-Title	TRF GDROM TBA EX SATL
-Media ID	92C5
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDT-0010C
-Version	V4.000
-Release Date	20040608
+Title   TRF GDROM TBA EX SATL
+Media ID    92C5
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0010C
+Version V4.000
+Release Date    20040608
 Manufacturer ID
 
-TOC	DISC
-Track	Start Sector	End Sector	Track Size
-track01.bin	150	599	1058400
-track02.raw	750	2101	3179904
-track03.bin	45150	549299	1185760800
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 599 1058400
+track02.raw 750 2101    3179904
+track03.bin 45150   549299  1185760800
 */
 
 ROM_START( avalon13 )
@@ -4342,21 +4342,21 @@ ROM_END
 
 /*
 
-Title	TRF GDROM TBT SATL
-Media ID	1348
-Media Config	GD-ROM1/1
-Regions	J
-Peripheral String	0000000
-Product Number	GDT-0017B
-Version	V3.001
-Release Date	20041102
+Title   TRF GDROM TBT SATL
+Media ID    1348
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0017B
+Version V3.001
+Release Date    20041102
 Manufacturer ID
 
-TOC	DISC
-Track	Start Sector	End Sector	Track Size
-track01.bin	150	599	1058400
-track02.raw	750	2101	3179904
-track03.bin	45150	549299	1185760800
+TOC DISC
+Track   Start Sector    End Sector  Track Size
+track01.bin 150 599 1058400
+track02.raw 750 2101    3179904
+track03.bin 45150   549299  1185760800
 
 */
 

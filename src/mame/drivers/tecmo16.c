@@ -440,7 +440,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ginkun )
 	MDRV_IMPORT_FROM(fstarfrc)
-	
+
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ginkun_map,0)
 

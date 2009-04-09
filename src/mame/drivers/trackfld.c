@@ -743,13 +743,13 @@ static MACHINE_DRIVER_START( hyprolyb )
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_map,0)
-	
+
 	MDRV_CPU_ADD("adpcm", M6802, SOUND_CLOCK/8)	/* unknown clock */
 	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map,0)
 
 	/* sound hardware */
 	MDRV_SOUND_REMOVE("vlm")
-	
+
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -1180,7 +1180,7 @@ static DRIVER_INIT( wizzquiz )
 	/* decrypt questions roms */
 	for( i = 0; i < 0x40000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
-	
+
 	memory_configure_bank(machine, 1, 0, 8, ROM, 0x8000);
 }
 

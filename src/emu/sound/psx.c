@@ -573,7 +573,7 @@ WRITE32_DEVICE_HANDLER( psx_spu_w )
 					chip->m_p_n_s1[ n_channel ] = 0;
 					chip->m_p_n_s2[ n_channel ] = 0;
 					chip->m_p_n_blockstatus[ n_channel ] = 1;
-					
+
 					chip->m_p_n_envelopestate[ n_channel ] = e_attack;
 				}
 			}
@@ -582,7 +582,7 @@ WRITE32_DEVICE_HANDLER( psx_spu_w )
 			chip->m_n_voiceoff = 0;
 			COMBINE_DATA( &chip->m_n_voiceoff );
 			verboselog( machine, 1, "psx_spu_w() voice off = %08x\n", chip->m_n_voiceoff );
-	
+
 			for( n_channel = 0; n_channel < MAX_CHANNEL; n_channel++ )
 			{
 				if( ( chip->m_n_voiceoff & ( 1 << n_channel ) ) != 0 )
@@ -591,8 +591,8 @@ WRITE32_DEVICE_HANDLER( psx_spu_w )
 					if (chip->m_p_n_envelopestate[ n_channel ] < e_release)
 						chip->m_p_n_envelopestate[ n_channel ] = e_release;
 				}
-			}			
-			
+			}
+
 			break;
 		case SPU_REG( 0xd90 ):
 			COMBINE_DATA( &chip->m_n_modulationmode );

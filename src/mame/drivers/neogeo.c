@@ -174,20 +174,20 @@ NOTE: On CTRG2-B, The "A" lines start at "A1". If you trace this on an
 
     Mahjong Panel notes (2009-03 FP):
     =================================
-	
-	* In Service Mode menu with mahjong panel active, controls are as 
-	  follows:
 
-		A = select / up (for options)
-		B = down (for options)
-		C = go to previous menu
-		E = up (for menu entries)
-		F = down (for menu entries)
-		G = left (for options)
-		H = right (for options)
+    * In Service Mode menu with mahjong panel active, controls are as
+      follows:
 
-	* These only work with Japanese BIOS, but I think it's not a bug: I
-	  doubt other bios were programmed to be compatible with mahjong panels
+        A = select / up (for options)
+        B = down (for options)
+        C = go to previous menu
+        E = up (for menu entries)
+        F = down (for menu entries)
+        G = left (for options)
+        H = right (for options)
+
+    * These only work with Japanese BIOS, but I think it's not a bug: I
+      doubt other bios were programmed to be compatible with mahjong panels
 
 ****************************************************************************/
 
@@ -432,7 +432,7 @@ static void select_controller(UINT8 data)
 static CUSTOM_INPUT( multiplexed_controller_r )
 {
 	int port = (FPTR)param;
-	
+
 	static const char *const cntrl[2][2] =
 		{
 			{ "IN0-0", "IN0-1" }, { "IN1-0", "IN1-1" }

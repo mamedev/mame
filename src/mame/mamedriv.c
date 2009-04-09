@@ -7945,6 +7945,7 @@ Other Sun games
 	DRIVER( martmast )	/* (c) 2001 */
 	DRIVER( martmasc )	/* (c) 2001 */
 	DRIVER( theglad )	/* (c) 2001 */
+	DRIVER( theglada )	/* (c) 2001 */
 	DRIVER( dmnfrnt )	/* (c) 2002 */
 	DRIVER( dmnfrnta )	/* (c) 2002 */
 	DRIVER( kovshp )

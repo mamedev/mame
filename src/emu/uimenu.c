@@ -3314,9 +3314,9 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 		sprintf(temp_text, "%d", settings.auto_time);
 		ui_menu_item_append(menu, "Visible Delay", temp_text, flags, data);
 	}
-//	else
-//		/* leave a blank filler line when not in auto time so size does not rescale */
-//		ui_menu_item_append(menu, "", "", NULL, NULL);
+//  else
+//      /* leave a blank filler line when not in auto time so size does not rescale */
+//      ui_menu_item_append(menu, "", "", NULL, NULL);
 }
 
 

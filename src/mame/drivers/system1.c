@@ -21,106 +21,106 @@ TODO: - remove patch in nobb if possible and fully understand the
 
 *******************************************************************************
 
-			Main  Snd   Gfx1  Gfx2            Max     Min
-Game		ROMs  ROMs  ROMs  ROMs  Pal? Intf EPR#    EPR#
------------	----- ----- ----- ----- ---- ---- ----    ----
-starjack	6x8k  1x8k  6x8k  2x16k  no  ppi  5325(b) 5318
-starjacks	6x8k  1x8k  6x8k  2x16k  no  ppi  license
+            Main  Snd   Gfx1  Gfx2            Max     Min
+Game        ROMs  ROMs  ROMs  ROMs  Pal? Intf EPR#    EPR#
+----------- ----- ----- ----- ----- ---- ---- ----    ----
+starjack    6x8k  1x8k  6x8k  2x16k  no  ppi  5325(b) 5318
+starjacks   6x8k  1x8k  6x8k  2x16k  no  ppi  license
 
-upndown		6x8k  1x8k  6x8k  2x16k  no  ppi  5521    5514
-upndownu	6x8k  1x8k  6x8k  2x16k  no  ppi  5684
+upndown     6x8k  1x8k  6x8k  2x16k  no  ppi  5521    5514
+upndownu    6x8k  1x8k  6x8k  2x16k  no  ppi  5684
 
-regulus		6x8k  1x8k  6x8k  2x16k  no  ppi  5645(a) 5638
-reguluso	6x8k  1x8k  6x8k  2x16k  no  ppi  5645
-regulusu	6x8k  1x8k  6x8k  2x16k  no  ppi  5955
+regulus     6x8k  1x8k  6x8k  2x16k  no  ppi  5645(a) 5638
+reguluso    6x8k  1x8k  6x8k  2x16k  no  ppi  5645
+regulusu    6x8k  1x8k  6x8k  2x16k  no  ppi  5955
 
-mrviking	6x8k  1x8k  6x8k  2x16k  no  ppi  5876    5749
-mrvikingj	6x8k  1x8k  6x8k  2x16k  no  ppi  5756
+mrviking    6x8k  1x8k  6x8k  2x16k  no  ppi  5876    5749
+mrvikingj   6x8k  1x8k  6x8k  2x16k  no  ppi  5756
 
-swat		6x8k  1x8k  6x8k  2x16k  no  ppi  5812    5805
+swat        6x8k  1x8k  6x8k  2x16k  no  ppi  5812    5805
 
-flickys1	4x8k  1x8k  6x8k  2x16k  no  ppi  ????    5855
-flickyo		4x8k  1x8k  6x8k  2x16k  no  ppi  5860(a)
-flicky		2x16k 1x8k  6x8k  2x16k  no  pio  5979(a)
-flickys2	2x16k 1x8k  6x8k  2x16k  no  pio  6622
+flickys1    4x8k  1x8k  6x8k  2x16k  no  ppi  ????    5855
+flickyo     4x8k  1x8k  6x8k  2x16k  no  ppi  5860(a)
+flicky      2x16k 1x8k  6x8k  2x16k  no  pio  5979(a)
+flickys2    2x16k 1x8k  6x8k  2x16k  no  pio  6622
 
-wmatch		6x8k  1x8k  6x8k  2x16k  no  ppi  ????    ????
+wmatch      6x8k  1x8k  6x8k  2x16k  no  ppi  ????    ????
 
-bullfgt		6x8k  1x8k  6x8k  2x16k  no  ppi  ????    6069
-thetogyu	3x16k 1x8k  6x8k  2x16k  no  pio  6073
+bullfgt     6x8k  1x8k  6x8k  2x16k  no  ppi  ????    6069
+thetogyu    3x16k 1x8k  6x8k  2x16k  no  pio  6073
 
-spatter		3x16k 1x8k  6x8k  4x16k  no  pio  6394    6306
-ssanchan	3x16k 1x8k  6x8k  4x16k  no  pio  6312
+spatter     3x16k 1x8k  6x8k  4x16k  no  pio  6394    6306
+ssanchan    3x16k 1x8k  6x8k  4x16k  no  pio  6312
 
-pitfall2	3x16k 1x8k  6x8k  2x16k  no  pio  6458(a) 6454
-pitfall2a	3x16k 1x8k  6x8k  2x16k  no  pio  6506
-pitfall2u	3x16k 1x8k  6x8k  2x16k  no  pio  6625(a)
+pitfall2    3x16k 1x8k  6x8k  2x16k  no  pio  6458(a) 6454
+pitfall2a   3x16k 1x8k  6x8k  2x16k  no  pio  6506
+pitfall2u   3x16k 1x8k  6x8k  2x16k  no  pio  6625(a)
 
-seganinj	3x16k 1x8k  6x8k  4x16k  no  pio  ????    6546
-seganinju	3x16k 1x8k  6x8k  4x16k  no  pio  7150
-nprinceso	3x16k 1x8k  6x8k  4x16k  no  pio  6552
-nprincesb	3x16k 1x8k  6x8k  4x16k  no  pio  bootleg
-ninja		3x16k 1x8k  6x8k  4x16k  no  pio  6595
-nprinces	6x8k  1x8k  6x8k  4x16k  no  ppi  6617
-nprincesu	6x8k  1x8k  6x8k  4x16k  no  ppi  6578
+seganinj    3x16k 1x8k  6x8k  4x16k  no  pio  ????    6546
+seganinju   3x16k 1x8k  6x8k  4x16k  no  pio  7150
+nprinceso   3x16k 1x8k  6x8k  4x16k  no  pio  6552
+nprincesb   3x16k 1x8k  6x8k  4x16k  no  pio  bootleg
+ninja       3x16k 1x8k  6x8k  4x16k  no  pio  6595
+nprinces    6x8k  1x8k  6x8k  4x16k  no  ppi  6617
+nprincesu   6x8k  1x8k  6x8k  4x16k  no  ppi  6578
 
-imsorry		3x16k 1x8k  6x8k  2x16k  no  pio  6678    6645
-imsorryj	3x16k 1x8k  6x8k  2x16k  no  pio  6649
+imsorry     3x16k 1x8k  6x8k  2x16k  no  pio  6678    6645
+imsorryj    3x16k 1x8k  6x8k  2x16k  no  pio  6649
 
-teddybb		3x16k 1x8k  6x8k  4x16k  no  pio  6770    6735
-teddybbo	3x16k 1x8k  6x8k  4x16k  no  pio  6741
+teddybb     3x16k 1x8k  6x8k  4x16k  no  pio  6770    6735
+teddybbo    3x16k 1x8k  6x8k  4x16k  no  pio  6741
 
-hvymetal	3x32k 1x32k 6x16k 4x32k  yes      6790    6778
+hvymetal    3x32k 1x32k 6x16k 4x32k  yes      6790    6778
 
-myhero		3x16k 1x8k  6x8k  4x16k  no  pio  6964    6921
-sscandal	3x16k 1x8k  6x8k  4x16k  no  pio  6927
-myherok		3x16k 1x8k  6x8k  4x16k  no  pio  bootleg?
+myhero      3x16k 1x8k  6x8k  4x16k  no  pio  6964    6921
+sscandal    3x16k 1x8k  6x8k  4x16k  no  pio  6927
+myherok     3x16k 1x8k  6x8k  4x16k  no  pio  bootleg?
 
-4dwarrio	3x16k 1x8k  6x8k  4x16k  no  pio  ????    ????
+4dwarrio    3x16k 1x8k  6x8k  4x16k  no  pio  ????    ????
 
-shtngmst	3x32k 1x32k 3x32k 7x32k  yes      7102(a) 7104
-shtngmst1	3x32k 1x32k 3x32k 7x32k  yes      7102
-shtngmsta	3x32k 1x32k 3x32k 7x32k  yes      license
+shtngmst    3x32k 1x32k 3x32k 7x32k  yes      7102(a) 7104
+shtngmst1   3x32k 1x32k 3x32k 7x32k  yes      7102
+shtngmsta   3x32k 1x32k 3x32k 7x32k  yes      license
 
-choplift	3x32k 1x32k 3x32k 4x32k  yes      7126    7120
-chopliftu	3x32k 1x32k 3x32k 4x32k  yes      7154
-chopliftbl	3x32k 1x32k 3x32k 4x32k  yes      bootleg
+choplift    3x32k 1x32k 3x32k 4x32k  yes      7126    7120
+chopliftu   3x32k 1x32k 3x32k 4x32k  yes      7154
+chopliftbl  3x32k 1x32k 3x32k 4x32k  yes      bootleg
 
-raflesia	3x16k 1x8k  6x8k  4x16k  no  pio  7413    7408
+raflesia    3x16k 1x8k  6x8k  4x16k  no  pio  7413    7408
 
-wboy2		6x8k  1x8k  6x8k  4x16k  no  ppi  7592    7485
-wboy2u		6x8k  1x8k  6x8k  4x16k  no  ppi  ????
-wbdeluxe	6x8k  1x8k  6x8k  4x16k  no  ppi  ????
-wboy		3x16k 1x8k  6x8k  4x16k  no  pio  7491
-wboyo		3x16k 1x8k  6x8k  4x16k  no  pio  ????
-wboy3		3x16k 1x8k  6x8k  4x16k  no  pio  ????
-wboyu		3x16k 1x8k  6x8k  4x16k  no  pio  ????
-wboy4		2x32k 1x32k 3x16k 2x32k  no       ????
-wboysys2	2x32k 1x32k 3x32k 2x32k  yes      7580
+wboy2       6x8k  1x8k  6x8k  4x16k  no  ppi  7592    7485
+wboy2u      6x8k  1x8k  6x8k  4x16k  no  ppi  ????
+wbdeluxe    6x8k  1x8k  6x8k  4x16k  no  ppi  ????
+wboy        3x16k 1x8k  6x8k  4x16k  no  pio  7491
+wboyo       3x16k 1x8k  6x8k  4x16k  no  pio  ????
+wboy3       3x16k 1x8k  6x8k  4x16k  no  pio  ????
+wboyu       3x16k 1x8k  6x8k  4x16k  no  pio  ????
+wboy4       2x32k 1x32k 3x16k 2x32k  no       ????
+wboysys2    2x32k 1x32k 3x32k 2x32k  yes      7580
 
-gardia		3x32k 1x16k 3x16k 4x32k  yes      10255   10233
-gardiab		3x32k 1x16k 3x16k 4x32k  yes      bootleg
+gardia      3x32k 1x16k 3x16k 4x32k  yes      10255   10233
+gardiab     3x32k 1x16k 3x16k 4x32k  yes      bootleg
 
-brain		3x32k 1x32k 3x16k 3x32k  yes      ????    ????
+brain       3x32k 1x32k 3x16k 3x32k  yes      ????    ????
 
-tokisens	3x32k 1x32k 3x32k 4x32k  yes      10963   10957
+tokisens    3x32k 1x32k 3x32k 4x32k  yes      10963   10957
 
-wbml		3x32k 1x32k 3x32k 4x32k  yes      11033(a) 11027
-wbmljo		3x32k 1x32k 3x32k 4x32k  yes      11033
-wbmljb		3x64k 1x32k 3x32k 4x32k  yes      bootleg
-wbmlb		3x64k 1x32k 3x32k 4x32k  yes      bootleg
-wbmlg		3x64k 1x32k 3x32k 4x32k  yes      bootleg
+wbml        3x32k 1x32k 3x32k 4x32k  yes      11033(a) 11027
+wbmljo      3x32k 1x32k 3x32k 4x32k  yes      11033
+wbmljb      3x64k 1x32k 3x32k 4x32k  yes      bootleg
+wbmlb       3x64k 1x32k 3x32k 4x32k  yes      bootleg
+wbmlg       3x64k 1x32k 3x32k 4x32k  yes      bootleg
 
-dakkochn	2x32k 1x32k 3x32k 4x32k  yes      11225   11220
+dakkochn    2x32k 1x32k 3x32k 4x32k  yes      11225   11220
 
-ufosensi	3x32k 1x32k 3x32k 4x32k  yes      11663   11657
-ufosensib	3x64k 1x32k 3x32k 4x32k  yes      bootleg
+ufosensi    3x32k 1x32k 3x32k 4x32k  yes      11663   11657
+ufosensib   3x64k 1x32k 3x32k 4x32k  yes      bootleg
 
-blockgal	2x16k 1x8k  6x8k  4x16k  no               ????
-blockgalb	1x64k 1x8k  6x8k  4x16k  no       bootleg
+blockgal    2x16k 1x8k  6x8k  4x16k  no               ????
+blockgalb   1x64k 1x8k  6x8k  4x16k  no       bootleg
 
-nob			3x32k 1x16k 3x32k 4x32k  yes      
-nobb		3x32k 1x16k 3x32k 4x32k  yes
+nob         3x32k 1x16k 3x32k 4x32k  yes
+nobb        3x32k 1x16k 3x32k 4x32k  yes
 
 *******************************************************************************
 
@@ -223,18 +223,18 @@ static UINT8 i8751_active;
  *
  *************************************/
 
-/* 
-	About main CPU clocking:
-	
-	A 20MHz crystal clocks an LS161 which counts up from either 10 or 11 to 16 before
-	carrying out and forcing a reload. The low bit of the reload value comes from the
-	Z80's /M1 signal. When /M1 is low (an opcode is being fetched), the reload count
-	is 10, which means the 20MHz clock is divided by 6. When /M1 is high, the reload
-	count is 11, which means the clock is divided by 5.
+/*
+    About main CPU clocking:
 
-	To account for this, we install custom cycle tables for the Z80. We clock the Z80
-	at 20MHz and count 5 cycles for each original Z80 cycle, plus an extra cycle for
-	each opcode fetch.
+    A 20MHz crystal clocks an LS161 which counts up from either 10 or 11 to 16 before
+    carrying out and forcing a reload. The low bit of the reload value comes from the
+    Z80's /M1 signal. When /M1 is low (an opcode is being fetched), the reload count
+    is 10, which means the 20MHz clock is divided by 6. When /M1 is high, the reload
+    count is 11, which means the clock is divided by 5.
+
+    To account for this, we install custom cycle tables for the Z80. We clock the Z80
+    at 20MHz and count 5 cycles for each original Z80 cycle, plus an extra cycle for
+    each opcode fetch.
 */
 
 static const UINT8 cc_op[0x100] = {
@@ -350,7 +350,7 @@ static const UINT8 cc_ex[0x100] = {
 static MACHINE_START( system1 )
 {
 	UINT32 numbanks = (memory_region_length(machine, "maincpu") - 0x10000) / 0x4000;
-	
+
 	if (numbanks > 0)
 		memory_configure_bank(machine, 1, 0, numbanks, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 	else
@@ -486,7 +486,7 @@ static WRITE8_HANDLER( videomode_w )
 
 	/* bit 0 is for the coin counters */
 	coin_counter_w(0, data & 1);
-	
+
 	/* remaining signals are video-related */
 	system1_videomode_w(space, 0, data);
 }
@@ -518,7 +518,7 @@ static void dakkochn_custom_w(running_machine *machine, UINT8 data, UINT8 prevda
 	/* bit 1 toggling on clocks the mux; we store the previous state in the high bit of dakkochn_mux_data */
 	if ((data & 0x02) && !(prevdata & 0x02))
 		dakkochn_mux_data = (dakkochn_mux_data + 1) % 7;
-	
+
 	/* remaining stuff acts like bank0c */
 	bank0c_custom_w(machine, data, prevdata);
 }
@@ -535,9 +535,9 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 	/* bit 0 = MUTE */
 	sound_global_enable(~(data & 1));
-	
+
 	/* bit 6 = feedback from sound board that read occurrred */
-	
+
 	/* bit 7 controls the sound CPU's NMI line */
 	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -550,7 +550,7 @@ static READ8_HANDLER( sound_data_r )
 {
 	const device_config *ppi = devtag_get_device(space->machine, "ppi");
 	const device_config *pio = devtag_get_device(space->machine, "pio");
-	
+
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
 	if (ppi != NULL)
 	{
@@ -559,7 +559,7 @@ static READ8_HANDLER( sound_data_r )
 		ppi8255_set_port_c(ppi, initial_value |  0x40);
 		return soundlatch_r(space, offset);
 	}
-	
+
 	/* if we have a Z80 PIO, just do a port read which will auto-ack */
 	else if (pio != NULL)
 		return z80pio_p_r(pio, 0);
@@ -2015,7 +2015,7 @@ static MACHINE_DRIVER_START( sys1ppi )
 
 	MDRV_MACHINE_START(system1)
 	MDRV_MACHINE_RESET(system1)
-	
+
 	MDRV_PPI8255_ADD("ppi", ppi_interface)
 
 	/* video hardware */
@@ -2058,10 +2058,10 @@ MACHINE_DRIVER_END
 /* revised board with 128kbit ROMs and a Z80 PIO for outputs */
 static MACHINE_DRIVER_START( sys1pio )
 	MDRV_IMPORT_FROM( sys1ppi )
-	
+
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(system1_pio_io_map,0)
-	
+
 	MDRV_PPI8255_REMOVE("ppi")
 	MDRV_Z80PIO_ADD("pio", pio_interface)
 MACHINE_DRIVER_END
@@ -4514,11 +4514,11 @@ static DRIVER_INIT( dakkochn )
 
 	mc8123_decrypt_rom(machine, "maincpu", "key", 1, 4);
 
-//	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
-//	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
-//	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
+//  memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
+//  memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
+//  memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
 
-//	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
+//  memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
 }
 
 
@@ -4526,7 +4526,7 @@ static DRIVER_INIT( myherok )
 {
 	int A;
 	UINT8 *rom;
-	
+
 	DRIVER_INIT_CALL(bank00);
 
 	/* additionally to the usual protection, all the program ROMs have data lines */

@@ -628,8 +628,8 @@ ROM_START( hydrap2 )
 ROM_END
 
 
-/* 
-This (rev 7) is the most recent Pit Fighter pcb that we have documented. 
+/*
+This (rev 7) is the most recent Pit Fighter pcb that we have documented.
 It has printed Atari stickers that show the following:
 
 2 main board stickers:

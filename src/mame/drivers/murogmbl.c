@@ -1,4 +1,4 @@
-/* Unknown - Poker (morugem 
+/* Unknown - Poker (morugem
 
 driver by Roberto Zandona'
 thanks to Angelo Salese for some precious advice
@@ -13,14 +13,14 @@ N.revisione:
 CPU:
 1x unknown DIP40 (1ef)(missing)
 1x TBA820 (14e)(sound)
-1x oscillator 12.000 (2f) 
+1x oscillator 12.000 (2f)
 
 ROMs:
 2x TMS2532 (5b,5e)
 1x TMS2516 (8b)
 1x PROM SN74S288N (8a)
 1x RAM MWS5101AEL2 (11e)
-4x RAM AM9114EPC (2b,3b,8e,9e) 
+4x RAM AM9114EPC (2b,3b,8e,9e)
 
 Note:
 1x 22x2 edge connector

@@ -180,7 +180,7 @@
 	KONAMI8_LR_40( player, IPT_BUTTON3, IPT_BUTTON2, IPT_BUTTON1 )
 
 
-/* vendetta.c uses inputs with switched Left/Right directions. We add these inputs here as well 
+/* vendetta.c uses inputs with switched Left/Right directions. We add these inputs here as well
 because they just need a few lines of code */
 #define KONAMI8_RL_B12_COIN( player )	\
 	KONAMI8_RL_40( player, IPT_BUTTON1, IPT_BUTTON2, IPT_UNKNOWN )	\
@@ -227,7 +227,7 @@ because they just need a few lines of code */
 	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(player) \
 	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(player) \
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, button3            ) PORT_PLAYER(player)
-	
+
 #define KONAMI16_LSB( player, button3, start )	\
 	KONAMI16_LSB_40( player, button3 )			\
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, start )
@@ -255,18 +255,18 @@ because they just need a few lines of code */
 /**************************** Coinage Dip Swicthes ****************************/
 
 /* Konami games from 80s-90s basically use only two kind of coinage dips. The only
-difference is in the settings corresponding to 0x00, which could be either 4C_5C 
-or a "Free_Play"-related option. Actually, in the latter case the behavior may change 
-depending on the game code: 
+difference is in the settings corresponding to 0x00, which could be either 4C_5C
+or a "Free_Play"-related option. Actually, in the latter case the behavior may change
+depending on the game code:
 Coin A - 0x00 could produce the following effects
-	Free_Play = nomen omen (for both players)
-	Invalid = both coin slots disabled
+    Free_Play = nomen omen (for both players)
+    Invalid = both coin slots disabled
 Coin B - 0x00 could produce the following effects
-	Free_Play = nomen omen (for both players)
-	No Coin B = coin slot B open (coins produce sound), but no effect on coin counter
-	None = coin slot B disabled
-	No Credits = both coin slots open, but no effect on coin counters
-	Invalid = both coin slots disabled
+    Free_Play = nomen omen (for both players)
+    No Coin B = coin slot B open (coins produce sound), but no effect on coin counter
+    None = coin slot B disabled
+    No Credits = both coin slots open, but no effect on coin counters
+    Invalid = both coin slots disabled
 Accordingly, we pass below different strings for different games */
 
 #define KONAMI_COINAGE_LOC( STRING_A, STRING_B, DIPBANK )	\

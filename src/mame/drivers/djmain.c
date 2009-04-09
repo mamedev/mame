@@ -478,8 +478,8 @@ static ADDRESS_MAP_START( memory_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)					// ??
 	AM_RANGE(0x5a0000, 0x5a005f) AM_WRITE(K055555_long_w)					// 055555: priority encoder
 	AM_RANGE(0x5b0000, 0x5b04ff) AM_READWRITE16(dual539_r, dual539_w, 0xffffffff)				// SOUND regs
-	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1	// input port control (buttons and DIP switches)
-	AM_RANGE(0x5c8000, 0x5c8003) AM_READ8(inp2_r, 0xffffffff)  //  DSW1,DSW2,UNK2,UNK1	// input port control (DIP switches)
+	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
+	AM_RANGE(0x5c8000, 0x5c8003) AM_READ8(inp2_r, 0xffffffff)  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
 	AM_RANGE(0x5d0000, 0x5d0003) AM_WRITE(light_ctrl_1_w)					// light/coin blocker control
 	AM_RANGE(0x5d2000, 0x5d2003) AM_WRITE(light_ctrl_2_w)					// light/coin blocker control
 	AM_RANGE(0x5d4000, 0x5d4003) AM_WRITE(v_ctrl_w)						// VIDEO control
@@ -1109,9 +1109,9 @@ static INPUT_PORTS_START( popnmusic_btn )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("UNK2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_START("TT1")		/* turn table 1P */
+	//PORT_START("TT1")     /* turn table 1P */
 	//PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(1)
-	//PORT_START("TT2")		/* turn table 2P */
+	//PORT_START("TT2")     /* turn table 2P */
 	//PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 #endif
@@ -1306,9 +1306,9 @@ static INPUT_PORTS_START( popnstage )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("UNK2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	//PORT_START("TT1")		/* turn table 1P */
+	//PORT_START("TT1")     /* turn table 1P */
 	//PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(1)
-	//PORT_START("TT2")		/* turn table 2P */
+	//PORT_START("TT2")     /* turn table 2P */
 	//PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
 	PORT_START("DSW1")

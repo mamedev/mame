@@ -256,29 +256,29 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 
 /**************************************************************
 
-	Keyboard inputs use 6bits to read the 64keys in the key matrix.
-	We currently read the key matrix by lines and convert the input
-	to the value expected by the POKEY (see the code below to 
-	determine atari_code values).
+    Keyboard inputs use 6bits to read the 64keys in the key matrix.
+    We currently read the key matrix by lines and convert the input
+    to the value expected by the POKEY (see the code below to
+    determine atari_code values).
 
-	K2,K1,K0 | 000 | 001 | 010 | 011 | 100 | 101 | 110 | 111 |
-	K5,K4,K3
-	----------------------------------------------------------
-		000	 |  L  |  J  |  ;  | (*) |     |  K  |  +  |  *  |
-		001	 |  O  |     |  P  |  U  | Ret |  I  |  -  |  =  |
-		010	 |  V  |     |  C  |     |     |  B  |  X  |  Z  |
-		011	 |  4  |     |  3  |  6  | Esc |  5  |  2  |  1  |
-		100	 |  ,  | Spc |  .  |  N  |     |  M  |  /  |Atari|
-		101	 |  R  |     |  E  |  Y  | Tab |  T  |  W  |  Q  |
-		110	 |  9  |     |  0  |  7  |Bkspc|  8  |  <  |  >  |
-		111	 |  F  |  H  |  D  |     | Caps|  G  |  S  |  A  |
+    K2,K1,K0 | 000 | 001 | 010 | 011 | 100 | 101 | 110 | 111 |
+    K5,K4,K3
+    ----------------------------------------------------------
+        000  |  L  |  J  |  ;  | (*) |     |  K  |  +  |  *  |
+        001  |  O  |     |  P  |  U  | Ret |  I  |  -  |  =  |
+        010  |  V  |     |  C  |     |     |  B  |  X  |  Z  |
+        011  |  4  |     |  3  |  6  | Esc |  5  |  2  |  1  |
+        100  |  ,  | Spc |  .  |  N  |     |  M  |  /  |Atari|
+        101  |  R  |     |  E  |  Y  | Tab |  T  |  W  |  Q  |
+        110  |  9  |     |  0  |  7  |Bkspc|  8  |  <  |  >  |
+        111  |  F  |  H  |  D  |     | Caps|  G  |  S  |  A  |
 
-	(*) We use this value to read Break, but in fact it would be read
-	    in KR2 bit. This has to be properly implemented for later
-		Atari systems because here we would have F1.
+    (*) We use this value to read Break, but in fact it would be read
+        in KR2 bit. This has to be properly implemented for later
+        Atari systems because here we would have F1.
 
-	To Do: investigate implementation of KR2 to read accurately Break, 
-	Shift and Control keys.
+    To Do: investigate implementation of KR2 to read accurately Break,
+    Shift and Control keys.
 
  **************************************************************/
 
@@ -345,24 +345,24 @@ void a800_handle_keyboard(running_machine *machine)
 
 /**************************************************************
 
-	A5200 keypad inputs use 4bits to read the 16keys in the key 
-	matrix. We currently read the key matrix by lines and convert 
-	the input to the value expected by the POKEY (see the code 
-	below to determine atari_code values).
+    A5200 keypad inputs use 4bits to read the 16keys in the key
+    matrix. We currently read the key matrix by lines and convert
+    the input to the value expected by the POKEY (see the code
+    below to determine atari_code values).
 
-	K2,K1,K0 | 00x | 01x | 10x | 11x |
-	K5,K4,K3
-	----------------------------------
-		x00	 |     |  #  |  0  |  *  |
-		x01	 |Reset|  9  |  8  |  7  |
-		x10	 |Pause|  6  |  5  |  4  |
-		x11	 |Start|  3  |  2  |  1  |
+    K2,K1,K0 | 00x | 01x | 10x | 11x |
+    K5,K4,K3
+    ----------------------------------
+        x00  |     |  #  |  0  |  *  |
+        x01  |Reset|  9  |  8  |  7  |
+        x10  |Pause|  6  |  5  |  4  |
+        x11  |Start|  3  |  2  |  1  |
 
-	K0 & K5 are ignored (we send them as 1, see the code below where
-	we pass "(atari_code << 1) | 0x21" )
+    K0 & K5 are ignored (we send them as 1, see the code below where
+    we pass "(atari_code << 1) | 0x21" )
 
-	To Do: investigate implementation of KR2 to read accurately the 
-	secondary Fire button (primary read through GTIA).
+    To Do: investigate implementation of KR2 to read accurately the
+    secondary Fire button (primary read through GTIA).
 
  **************************************************************/
 

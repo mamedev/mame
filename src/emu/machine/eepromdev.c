@@ -278,7 +278,7 @@ int eepromdev_read_bit(const device_config *device)
 
 /*CUSTOM_INPUT( eeprom_bit_r )
 {
-	return eeprom_read_bit();
+    return eeprom_read_bit();
 }*/
 
 void eepromdev_set_cs_line(const device_config *device, int state)
@@ -366,7 +366,7 @@ static DEVICE_NVRAM( eeprom )
 	if (read_or_write)
 		eepromdev_save(device, file);
 	else
-		if (file)	
+		if (file)
 			eepromdev_load(device, file);
 		else
 			if ((config->default_data != NULL) && (config->default_data_size != 0))
