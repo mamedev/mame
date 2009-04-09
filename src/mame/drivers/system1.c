@@ -7,8 +7,6 @@ driver by Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
 
 Issues:
  * pitfall2 - missing title
- * wmatch   - stuck sprites
- * what is P-0??
 
 
 Up'n Down, Mister Viking, Flicky, SWAT, Water Match and Bull Fight are known
@@ -18,9 +16,7 @@ DIP locations verified from manual for:
       - wboy
       - choplift
 
-TODO: - background is misplaced in wbmlju
-      - sprites stick in Pitfall II
-      - remove patch in nobb if possible and fully understand the
+TODO: - remove patch in nobb if possible and fully understand the
         ports involved in the protection
 
 *******************************************************************************
@@ -211,12 +207,13 @@ Notes:
 #define SOUND_CLOCK		XTAL_8MHz
 
 
-static void (*i8751_reset)(running_machine *machine);
+static void (*i8751_run)(running_machine *machine, int init);
+static void (*videomode_custom)(running_machine *machine, UINT8 data, UINT8 prevdata);
 
 static UINT8 *system1_ram;
 static UINT8 dakkochn_mux_data;
-
-static UINT8 bank_bits;
+static UINT8 videomode_prev;
+static UINT8 i8751_active;
 
 
 
@@ -361,14 +358,27 @@ static MACHINE_START( system1 )
 	memory_set_bank(machine, 1, 0);
 
 	z80_set_cycle_tables(cputag_get_cpu(machine, "maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
+
+	state_save_register_global(machine, dakkochn_mux_data);
+	state_save_register_global(machine, videomode_prev);
 }
 
 
 static MACHINE_RESET( system1 )
 {
 	dakkochn_mux_data = 0;
-	if (i8751_reset != NULL)
-		(*i8751_reset)(machine);
+	i8751_active = FALSE;
+	if (i8751_run != NULL)
+		(*i8751_run)(machine, TRUE);
+}
+
+
+static INTERRUPT_GEN( vblank_irq )
+{
+	irq0_line_hold(device);
+
+	if (i8751_run != NULL && i8751_active)
+		(*i8751_run)(device->machine, FALSE);
 }
 
 
@@ -379,13 +389,27 @@ static MACHINE_RESET( system1 )
  *
  *************************************/
 
-static void choplift_i8751_reset(running_machine *machine)
+static void choplift_i8751_run(running_machine *machine, int init)
 {
-	const device_config *ppi = devtag_get_device(machine, "ppi");
+	if (init)
+	{
+		const device_config *ppi = devtag_get_device(machine, "ppi");
 
-	/* the 8751 seems to do the 8255 initialization among other things */
-	ppi8255_w(ppi, 3, 0xc0);
-	ppi8255_w(ppi, 2, 0x00);
+		/* the 8751 seems to do the 8255 initialization among other things */
+		ppi8255_w(ppi, 3, 0xc0);
+		ppi8255_w(ppi, 2, 0x00);
+	}
+	else
+	{
+		const UINT8 *rom = memory_region(machine, "maincpu");
+		system1_ram[0x88] = 0x01;
+		system1_ram[0x89] = 0xff;
+		memcpy(&system1_ram[0x90], &rom[0x1f8e], 16);
+		videoram[0x740] = 0x01;
+		videoram[0x742] = 0x01;
+		videoram[0x744] = 0x01;
+		videoram[0x746] = 0x01;
+	}
 }
 
 
@@ -436,19 +460,67 @@ static WRITE8_HANDLER(mcuenable_hack_w)
  *
  *************************************/
 
+static void bank44_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata)
+{
+	/* bank bits are bits 6 and 2 */
+	memory_set_bank(machine, 1, ((data & 0x40) >> 5) | ((data & 0x04) >> 2));
+}
+
+
+static void bank0c_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata)
+{
+	/* bank bits are bits 3 and 2 */
+	memory_set_bank(machine, 1, (data & 0x0c) >> 2);
+}
+
+
 static WRITE8_HANDLER( videomode_w )
 {
-	int curbit, accum;
-	
-	/* find the appropriate bits in the data and update the bank */
-	accum = 0;
-	for (curbit = 7; curbit >= 0; curbit--)
-		if (bank_bits & (1 << curbit))
-			accum = (accum << 1) | ((data >> curbit) & 1);
-	memory_set_bank(space->machine, 1, accum);
+	if ((data & 0x40) && !(videomode_prev & 0x40))
+		i8751_active = TRUE;
 
+	/* handle any custom banking or other stuff */
+	if (videomode_custom != NULL)
+		(*videomode_custom)(space->machine, data, videomode_prev);
+	videomode_prev = data;
+
+	/* bit 0 is for the coin counters */
+	coin_counter_w(0, data & 1);
+	
 	/* remaining signals are video-related */
 	system1_videomode_w(space, 0, data);
+}
+
+
+
+/*************************************
+ *
+ *  DakkoChan House custom inputs
+ *
+ *************************************/
+
+static CUSTOM_INPUT( dakkochn_mux_data_r )
+{
+	static const char *ports[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
+	return input_port_read(field->port->machine, ports[dakkochn_mux_data]);
+}
+
+
+static CUSTOM_INPUT( dakkochn_mux_status_r )
+{
+	/* reads from here indicate which mux port is selected */
+	return 1 << (dakkochn_mux_data);
+}
+
+
+static void dakkochn_custom_w(running_machine *machine, UINT8 data, UINT8 prevdata)
+{
+	/* bit 1 toggling on clocks the mux; we store the previous state in the high bit of dakkochn_mux_data */
+	if ((data & 0x02) && !(prevdata & 0x02))
+		dakkochn_mux_data = (dakkochn_mux_data + 1) % 7;
+	
+	/* remaining stuff acts like bank0c */
+	bank0c_custom_w(machine, data, prevdata);
 }
 
 
@@ -462,8 +534,9 @@ static WRITE8_HANDLER( videomode_w )
 static WRITE8_DEVICE_HANDLER( sound_control_w )
 {
 	/* bit 0 = MUTE */
+	sound_global_enable(~(data & 1));
 	
-	/* bit 6 = /P-0??? */
+	/* bit 6 = feedback from sound board that read occurrred */
 	
 	/* bit 7 controls the sound CPU's NMI line */
 	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
@@ -621,8 +694,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE("sn1", sn76496_w)    /* Choplifter writes to the four addresses */
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_DEVWRITE("sn2", sn76496_w)    /* in sequence */
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76496_w)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
@@ -1750,13 +1823,13 @@ static INPUT_PORTS_START( dakkochn )
 	PORT_INCLUDE( choplift )
 
 	PORT_MODIFY("P1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dakkochn_mux_data_r, NULL)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(dakkochn_mux_status_r, NULL)
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) //start 1 & 2 not connected.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) 	/* start 1 & 2 not connected. */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/*TODO: Dip-Switches */
@@ -1783,9 +1856,6 @@ static INPUT_PORTS_START( dakkochn )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("KEY0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_C )
@@ -1793,21 +1863,21 @@ static INPUT_PORTS_START( dakkochn )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY2")
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY3")
+	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY4")
+	PORT_START("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
@@ -1815,16 +1885,19 @@ static INPUT_PORTS_START( dakkochn )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY5")
+	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("KEY6")
+	PORT_START("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /*
@@ -1934,7 +2007,7 @@ static MACHINE_DRIVER_START( sys1ppi )
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* not really, see notes above */
 	MDRV_CPU_PROGRAM_MAP(system1_map,0)
 	MDRV_CPU_IO_MAP(system1_ppi_io_map,0)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
 	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
@@ -1946,7 +2019,7 @@ static MACHINE_DRIVER_START( sys1ppi )
 	MDRV_PPI8255_ADD("ppi", ppi_interface)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)// hw collisions
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)	/* needed for proper hardware collisions */
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -2007,31 +2080,25 @@ MACHINE_DRIVER_END
 
 /* main CPU hacked speed */
 static MACHINE_DRIVER_START( pitfall2 )
+	MDRV_IMPORT_FROM( sys1pio )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( sys1pio )
 	MDRV_CPU_REPLACE( "maincpu", Z80, 3600000 )/* should be 4 MHz but that value makes the title screen disappear */
 MACHINE_DRIVER_END
 
 /* alternate program map with RAM/collision swapped */
 static MACHINE_DRIVER_START( nob )
+	MDRV_IMPORT_FROM( sys1ppis )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( sys1ppi )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nobo_map,0)
-
-	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0*8, 28*8-1)
 MACHINE_DRIVER_END
 
 
 
 /* system2 video */
 static MACHINE_DRIVER_START( sys2 )
-
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM( sys1ppi )
 
 	/* video hardware */
@@ -2039,9 +2106,8 @@ static MACHINE_DRIVER_START( sys2 )
 	MDRV_VIDEO_UPDATE(system2)
 MACHINE_DRIVER_END
 
+/* system 2 with small screen */
 static MACHINE_DRIVER_START( sys2s )
-
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM( sys2 )
 
 	/* video hardware */
@@ -2051,8 +2117,6 @@ MACHINE_DRIVER_END
 
 /* system2 with rowscroll */
 static MACHINE_DRIVER_START( sys2row )
-
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM( sys2 )
 
 	/* video hardware */
@@ -2061,8 +2125,6 @@ MACHINE_DRIVER_END
 
 /* rowscroll with small screen */
 static MACHINE_DRIVER_START( sys2rows )
-
-	/* basic machine hardware */
 	MDRV_IMPORT_FROM( sys2row )
 
 	/* video hardware */
@@ -4413,9 +4475,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( bank00 )	{ i8751_reset = NULL; bank_bits = 0x00; }
-static DRIVER_INIT( bank44 )	{ i8751_reset = NULL; bank_bits = 0x44; }
-static DRIVER_INIT( bank0c )	{ i8751_reset = NULL; bank_bits = 0x0c; }
+static DRIVER_INIT( bank00 )	{ i8751_run = NULL; videomode_custom = NULL; }
+static DRIVER_INIT( bank44 )	{ i8751_run = NULL; videomode_custom = bank44_custom_w; }
+static DRIVER_INIT( bank0c )	{ i8751_run = NULL; videomode_custom = bank0c_custom_w; }
 
 static DRIVER_INIT( regulus )	{ DRIVER_INIT_CALL(bank00); regulus_decode(machine, "maincpu"); }
 static DRIVER_INIT( mrviking )	{ DRIVER_INIT_CALL(bank00); mrviking_decode(machine, "maincpu"); }
@@ -4444,70 +4506,19 @@ static DRIVER_INIT( wbml )		{ DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machi
 static DRIVER_INIT( ufosensi )  { DRIVER_INIT_CALL(bank0c); mc8123_decrypt_rom(machine, "maincpu", "key", 1, 4); }
 static DRIVER_INIT( wboysys2 )	{ DRIVER_INIT_CALL(bank0c); astrofl_decode(machine, "maincpu"); }
 
-static UINT8 dakkochn_control;
-
-/*
-This game doesn't seem to have any mux writes, so I'm assuming that the mux does HW auto-incrementing.
-I need schematics to understand how it's properly mapped anyway, because it could be for example tied
-with vblank/video bits.
-The program flow is:
-I/O $00 R
-I/O $15 W 0xe
-I/O $15 W 0xc
-I/O $00 R
-I/O $15 W 0xe
-(and so on)
-
-*/
-static READ8_HANDLER( dakkochn_port_00_r )
-{
-	static UINT8 res;
-
-	switch(dakkochn_mux_data)
-	{
-		case 0: res = input_port_read(space->machine, "KEY0"); break;
-		case 1: res = input_port_read(space->machine, "KEY1"); break;
-		case 2: res = input_port_read(space->machine, "KEY2"); break;
-		case 3: res = input_port_read(space->machine, "KEY3"); break;
-		case 4: res = input_port_read(space->machine, "KEY4"); break;
-		case 5: res = input_port_read(space->machine, "KEY5"); break;
-		case 6: res = input_port_read(space->machine, "KEY6"); break;
-	}
-
-	dakkochn_mux_data++;
-	if(dakkochn_mux_data >= 7)
-		dakkochn_mux_data = 0;
-
-	return res;
-}
-
-static READ8_HANDLER( dakkochn_port_03_r )
-{
-	return 0;
-}
-
-static READ8_HANDLER( dakkochn_port_04_r )
-{
-	return 0;
-}
-
-static WRITE8_HANDLER( dakkochn_port_15_w )
-{
-	dakkochn_control = data; // check if any control multiplex bits are in here!
-	videomode_w(space,offset,data);
-}
 
 static DRIVER_INIT( dakkochn )
 {
 	DRIVER_INIT_CALL(bank0c);
+	videomode_custom = dakkochn_custom_w;
 
-	mc8123_decrypt_rom(machine, "maincpu", "proms", 1, 4);
+	mc8123_decrypt_rom(machine, "maincpu", "key", 1, 4);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
+//	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
+//	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
+//	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
 
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
+//	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
 }
 
 
@@ -4607,7 +4618,7 @@ static DRIVER_INIT( bootlegb )
 static DRIVER_INIT( choplift )
 {
 	DRIVER_INIT_CALL(bank0c);
-	i8751_reset = choplift_i8751_reset;
+	i8751_run = choplift_i8751_run;
 }
 
 static DRIVER_INIT( shtngmst )
@@ -4680,7 +4691,7 @@ GAME( 1986, wboyo,      wboy,     sys1pio,  wboy,      wboyo,    ROT0,   "Sega (
 GAME( 1986, wboy3,      wboy,     sys1pio,  wboy3,     wboyo,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 3, 315-5135)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy4,      wboy,     sys1pio,  wboy,      4dwarrio, ROT0,   "Sega (Escape license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboyu,      wboy,     sys1pio,  wboyu,     bank00,   ROT0,   "Sega (Escape license)", "Wonder Boy (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1987, blockgal,   0,        sys1pio,  blockgal,  blockgal, ROT90,  "Sega / Vic Tokai", "Block Gal (MC-8123B, 317-0029)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
+GAME( 1987, blockgal,   0,        sys1pio,  blockgal,  blockgal, ROT90,  "Sega / Vic Tokai", "Block Gal (MC-8123B, 317-0029)", GAME_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */
 GAME( 1985, hvymetal,   0,        sys1pio,  hvymetal,  hvymetal, ROT0,   "Sega",            "Heavy Metal (315-5135)", GAME_SUPPORTS_SAVE )
@@ -4691,18 +4702,18 @@ GAME( 1986, brain,      0,        sys1pio,  brain,     bank44,   ROT0,   "Corela
 GAME( 1985, choplift,   0,        sys2row,  choplift,  choplift, ROT0,   "Sega",            "Choplifter (8751 315-5151)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1985, chopliftu,  choplift, sys2row,  choplift,  bank0c,   ROT0,   "Sega",            "Choplifter (unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1985, chopliftbl, choplift, sys2row,  choplift,  bank0c,   ROT0,   "bootleg",         "Choplifter (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1985, shtngmst,   0,        sys2s,    shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (Rev A, 8751 315-5159a)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1985, shtngmst1,  shtngmst, sys2s,    shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (8751 315-5159)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1985, shtngmsta,  shtngmst, sys2s,    shtngmst,  shtngmst, ROT0,   "Sega [EVG]",      "Shooting Master (EVG, 8751 315-5159)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1986, gardiab,    gardia,   sys2,     gardia,    gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1985, shtngmst,   0,        sys2s,    shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (Rev A, 8751 315-5159a)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngmst1,  shtngmst, sys2s,    shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngmsta,  shtngmst, sys2s,    shtngmst,  shtngmst, ROT0,   "Sega [EVG]",      "Shooting Master (EVG, 8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1986, gardiab,    gardia,   sys2,     gardia,    gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1986, wboysys2,   wboy,     sys2,     wboysys2,  wboysys2, ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
-GAME( 1987, tokisens,   0,        sys2,     tokisens,  bank0c,   ROT90,  "Sega",            "Toki no Senshi - Chrono Soldier", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbml,       0,        sys2,     wbml,      wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbmljo,     wbml,     sys2,     wbml,      wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbmljb,     wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Japan not encrypted)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1987, wbmlb,      wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1987, wbmlbg,     wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1987, dakkochn,   0,        sys2,     dakkochn,  dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, blockgalb,  blockgal, sys2,     blockgal,  bootleg,  ROT90,  "bootleg",         "Block Gal (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, tokisens,   0,        sys2,     tokisens,  bank0c,   ROT90,  "Sega",            "Toki no Senshi - Chrono Soldier", GAME_SUPPORTS_SAVE )
+GAME( 1987, wbml,       0,        sys2,     wbml,      wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan New Ver., MC-8123, 317-0043)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wbmljo,     wbml,     sys2,     wbml,      wbml,     ROT0,   "Sega / Westone",  "Wonder Boy in Monster Land (Japan Old Ver., MC-8123, 317-0043)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wbmljb,     wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Japan not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1987, wbmlb,      wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (English bootleg)", GAME_SUPPORTS_SAVE)
+GAME( 1987, wbmlbg,     wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_SUPPORTS_SAVE)
+GAME( 1987, dakkochn,   0,        sys2,     dakkochn,  dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_SUPPORTS_SAVE )
+GAME( 1987, blockgalb,  blockgal, sys2,     blockgal,  bootleg,  ROT90,  "bootleg",         "Block Gal (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ufosensi,   0,        sys2rows, ufosensi,  ufosensi, ROT0,   "Sega",            "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ufosensib,  ufosensi, sys2rows, ufosensi,  bootlegb, ROT0,   "bootleg",         "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )
