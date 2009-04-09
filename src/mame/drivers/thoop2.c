@@ -4,8 +4,12 @@ Thunder Hoop II: Strikes Back (c) 1994 Gaelco
 
 Driver by Manuel Abadia <manu@teleline.es>
 
+updated by Peter Ferrie <peter.ferrie@gmail.com>
+
 Very similar to maniacsq and biomtoy but protected :_(
 The DS5002FP has up to 128 KB undumped gameplay code
+pf: its presence might be a distraction, since the game runs at least partially without it
+pf: but some gameplay bugs - sprite positioning is incorrect, no enemies, jump animation never completes
 
 ***************************************************************************/
 
@@ -82,6 +86,13 @@ static WRITE16_HANDLER( thoop2_coin_w )
 	/* 05b unknown */
 }
 
+/* pretend that it's there */
+
+static READ16_HANDLER( DS5002FP_R )
+{
+    return 0x55aa;
+}
+
 static ADDRESS_MAP_START( thoop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM													/* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop2_vram_w) AM_BASE(&thoop2_videoram)	/* Video RAM */
@@ -97,6 +108,8 @@ static ADDRESS_MAP_START( thoop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)						/* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)					/* OKI6295 data register */
 	AM_RANGE(0x70000a, 0x70005b) AM_WRITE(thoop2_coin_w)								/* Coin Counters + Coin Lockout */
+	AM_RANGE(0xfeff00, 0xfeff01) AM_READ(DS5002FP_R)
+	AM_RANGE(0xfeff02, 0xfeff03) AM_WRITENOP  /* pf: 0xfeff02 and 0xfeff03 need to remain zero always */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM													/* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END
 
