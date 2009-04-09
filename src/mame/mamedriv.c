@@ -1891,6 +1891,7 @@ const game_driver * const drivers[] =
 	DRIVER( contcrua )	/* B33 (c) 1987 Taito America Corporation (US) */
 	DRIVER( chasehq )	/* B52 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( chasehqj )	/* B52 (c) 1988 Taito Corporation (Japan) */
+	DRIVER( chasehqu )	/* B52 (c) 1988 Taito America Corporation (US) */
 	DRIVER( enforce )	/* B58 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( nightstr )	/* B91 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( nghtstrj )	/* B91 (c) 1989 Taito Corporation (Japan) */
