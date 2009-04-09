@@ -56,6 +56,7 @@ const game_driver * const drivers[] =
 	DRIVER( abscam )	/* hack */
 	DRIVER( crush )		/* (c) 1981 Kural Samno Electric Ltd */
 	DRIVER( crushbl )	/* bootleg */
+	DRIVER( crushbl2 )	/* bootleg 2*/
 	DRIVER( crush2 )	/* (c) 1981 Kural Esco Electric Ltd - bootleg? */
 	DRIVER( crush3 )	/* Kural Electric Ltd - bootleg? */
 	DRIVER( crush4 )	/* Kural TWT */

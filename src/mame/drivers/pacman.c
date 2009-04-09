@@ -4148,6 +4148,28 @@ ROM_START( crushbl )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
 ROM_END
 
+ROM_START( crushbl2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cr5.7d",       0x0000, 0x1000, CRC(4954d51d) SHA1(ff973ed961a531f7fc6f45b2c27af317f4cc6a4d) )
+	ROM_LOAD( "cr6.7e",       0x1000, 0x1000, CRC(27eb4299) SHA1(af2d7fdedcea766045fc2f20ae383024d1c35731) )
+	ROM_LOAD( "cr7.7h",       0x2000, 0x1000, CRC(d297108e) SHA1(a5bd11f26ba82b66a93d07e8cbc838ad9bd01413) )
+	ROM_LOAD( "cr8.7j",       0x3000, 0x1000, CRC(bcc40eaf) SHA1(50ffb3cf5cffd7618ceac207f60ca052fc13e38c) )
+
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "cr1.5e",       0x0000, 0x0800, CRC(c7617198) SHA1(95b204af0345163f93811cc770ee0ca2851a39c1) )
+	ROM_LOAD( "cr3.5h",       0x0800, 0x0800, CRC(c15b6967) SHA1(d8f16e2d6af5bf0f610d1e23614c531f67490da9) )
+	ROM_LOAD( "cr2.5f",       0x1000, 0x0800, CRC(d5bc5cb8) SHA1(269b82ae2b838c72ae06bff77412f22bb779ad2e) )  /* copyright sign was removed */
+	ROM_LOAD( "cr4.5j",       0x1800, 0x0800, CRC(d35d1caf) SHA1(65dd7861e05651485626465dc97215fed58db551) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "74s288.8a",    0x0000, 0x0020, CRC(ff344446) SHA1(45eb37533da8912645a089b014f3b3384702114a) )
+	ROM_LOAD( "2s140.4a",     0x0020, 0x0100, CRC(63efb927) SHA1(5c144a613fc4960a1dfd7ead89e7fee258a63171) )
+
+	ROM_REGION( 0x0200, "namco", 0 )	/* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )	/* timing - not used */
+ROM_END
+
 ROM_START( crush2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tp1",          0x0000, 0x0800, CRC(f276592e) SHA1(68ebb7d9f70af868d99ec42c26bc55a54ba1f22c) )
@@ -5703,6 +5725,7 @@ GAME( 1981, hangly3,  puckman,  pacman,   pacman,   0,        ROT90,  "hack", "H
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, 0,        ROT90,  "hack", "Piranha (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush,    0,        pacman,   maketrax, maketrax, ROT90,  "Kural Samno Electric", "Crush Roller (Kural Samno)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crushbl,  crush,    pacman,   maketrax, 0,        ROT90,  "bootleg", "Crush Roller (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, crushbl2, crush,    pacman,   mbrush,   maketrax, ROT90,  "bootleg", "Crush Roller (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush2,   crush,    pacman,   maketrax, 0,        ROT90,  "Kural Esco Electric", "Crush Roller (Kural Esco - bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush3,   crush,    pacman,   maketrax, eyes,     ROT90,  "Kural Electric", "Crush Roller (Kural - bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 19??, crush4,   crush,    crush4,   crush4,   0,        ROT90,  "Kural TWT", "Crush Roller (Kural TWT)", GAME_SUPPORTS_SAVE )
