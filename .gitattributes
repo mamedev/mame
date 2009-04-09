@@ -969,6 +969,7 @@ src/emu/video/resnet.c svneol=native#text/plain
 src/emu/video/resnet.h svneol=native#text/plain
 src/emu/video/rgbgen.h svneol=native#text/plain
 src/emu/video/rgbsse.h svneol=native#text/plain
+src/emu/video/rgbutil.c svneol=native#text/plain
 src/emu/video/rgbutil.h svneol=native#text/plain
 src/emu/video/rgbvmx.h svneol=native#text/plain
 src/emu/video/s2636.c svneol=native#text/plain
