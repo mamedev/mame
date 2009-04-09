@@ -5867,6 +5867,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hydrap )	/* (proto)          (c) 1990 */
 	DRIVER( hydrap2 )	/* (proto)          (c) 1990 */
 	DRIVER( pitfight )	/* 136081           (c) 1990 */
+	DRIVER( pitfigh6 )	/* 136081           (c) 1990 */
 	DRIVER( pitfigh4 )	/* 136081           (c) 1990 */
 	DRIVER( pitfigh3 )	/* 136081           (c) 1990 */
 	DRIVER( pitfighj )	/* Japan */
