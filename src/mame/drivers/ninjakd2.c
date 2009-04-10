@@ -76,6 +76,13 @@ Notes:
   ROM is replaced with a double-sized decrypted version. They are presumably
   bootlegs but this isn't known for sure.
 
+- For Ninja Kid II: On Nov 15, 2008 a fully decrypted sound rom was created by
+  www.segaresurrection.com It allows you to replace the NEC MC8123 and encrypted
+  sound rom with a standard Z80B and the newly decrypted sound without any other
+  mods to the Z80 & sound rom as required by the other "double-sized" version.
+  The CRCs are listed here so it doesn't show up as a newly "found" bootleg version:
+  nk2_06.rom   CRC32: 73b1b0d2  SHA1: 56add8c5f959a86b98aa4870b32aa23455be21ef
+
 - The Ninja Kid II sound program writes to unmapped locations 0xeff5, 0xeff6, and
   0xefee due to a bug. This happens in both the encrypted and decrypted versions,
   so it appears to be a genuine bug with no ill effect.
@@ -117,6 +124,7 @@ Notes:
 TODO:
 -----
 - What does the "credit service" dip switch do in Ninja Kid II?
+
 
 ******************************************************************************/
 
