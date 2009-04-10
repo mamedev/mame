@@ -2793,6 +2793,7 @@ V-V                           TP-027
 	DRIVER( 1944 )		/* 20/06/2000 (c) 2000 Eighting/Raizing (US) */
 	DRIVER( 1944j )		/* 20/06/2000 (c) 2000 Eighting/Raizing (Japan) */
 	DRIVER( mpang )		/* 10/10/2000 (c) 2000 Mitchell (Euro) */
+	DRIVER( mpangr1 )	/* 25/09/2000 (c) 2000 Mitchell (Euro) */
 	DRIVER( mpangu )	/* 10/10/2000 (c) 2000 Mitchell (US) */
 	DRIVER( mpangj )	/* 11/10/2000 (c) 2000 Mitchell (Japan) */
 	DRIVER( progear )	/* 17/01/2001 (c) 2001 Cave (US) */
