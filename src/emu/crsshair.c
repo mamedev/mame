@@ -467,7 +467,7 @@ static void crosshair_load(running_machine *machine, int config_type, xml_data_n
 	{
 		auto_time = xml_get_attribute_int(crosshairnode, "val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
 		if ((auto_time >= CROSSHAIR_VISIBILITY_AUTOTIME_MIN) && (auto_time <= CROSSHAIR_VISIBILITY_AUTOTIME_MAX))
-				global.auto_time = (UINT8)auto_time;
+			global.auto_time = (UINT8)auto_time;
 	}
 }
 

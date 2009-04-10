@@ -106,10 +106,10 @@ static chd_file *get_disc(const device_config *device)
 
 			/* look for files ending in .chd */
 			if (length > 4 &&
-				tolower(dir->name[length - 4] == '.') &&
-				tolower(dir->name[length - 3] == 'c') &&
-				tolower(dir->name[length - 2] == 'h') &&
-				tolower(dir->name[length - 1] == 'd'))
+				dir->name[length - 4] == '.' &&
+				tolower(dir->name[length - 3]) == 'c' &&
+				tolower(dir->name[length - 2]) == 'h' &&
+				tolower(dir->name[length - 1]) == 'd')
 			{
 				file_error filerr;
 				chd_error chderr;

@@ -163,6 +163,7 @@ struct _analog_item_data
 	int					type;
 	int					min, max;
 	int					cur;
+	int 				defvalue;
 };
 
 
@@ -2222,7 +2223,7 @@ static void menu_analog(running_machine *machine, ui_menu *menu, void *parameter
 		{
 			/* if selected, reset to default value */
 			case IPT_UI_SELECT:
-				newval = data->field->defvalue;
+				newval = data->defvalue;
 				break;
 
 			/* left decrements */
@@ -2331,6 +2332,7 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.delta;
+								data->defvalue = field->delta;
 								break;
 
 							case ANALOG_ITEM_CENTERSPEED:
@@ -2339,6 +2341,7 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.centerdelta;
+								data->defvalue = field->centerdelta;
 								break;
 
 							case ANALOG_ITEM_REVERSE:
@@ -2347,6 +2350,7 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								data->min = 0;
 								data->max = 1;
 								data->cur = settings.reverse;
+								data->defvalue = ((field->flags & ANALOG_FLAG_REVERSE) != 0);
 								break;
 
 							case ANALOG_ITEM_SENSITIVITY:
@@ -2355,6 +2359,7 @@ static void menu_analog_populate(running_machine *machine, ui_menu *menu)
 								data->min = 1;
 								data->max = 255;
 								data->cur = settings.sensitivity;
+								data->defvalue = field->sensitivity;
 								break;
 						}
 
@@ -3241,10 +3246,10 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 
 					/* look for files ending in .png with a name not larger then 9 chars*/
 					if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) &&
-						tolower(dir->name[length - 4] == '.') &&
-						tolower(dir->name[length - 3] == 'p') &&
-						tolower(dir->name[length - 2] == 'n') &&
-						tolower(dir->name[length - 1] == 'g'))
+						dir->name[length - 4] == '.' &&
+						tolower(dir->name[length - 3]) == 'p' &&
+						tolower(dir->name[length - 2]) == 'n' &&
+						tolower(dir->name[length - 1]) == 'g')
 
 					{
 						/* remove .png from length */
