@@ -79,22 +79,26 @@ static WRITE8_HANDLER( i8751_reset_w )
 
 static READ8_HANDLER( gondo_player_1_r )
 {
+	int val = 1 << input_port_read(space->machine, "AN0");
+
 	switch (offset) {
 		case 0: /* Rotary low byte */
-			return ~((1 << (input_port_read(space->machine, "AN0") * 12 / 256))&0xff);
+			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~((1 << (input_port_read(space->machine, "AN0") * 12 / 256))>>4))&0xf0) | (input_port_read(space->machine, "IN0") & 0xf);
+			return ((~val >> 4) & 0xf0) | (input_port_read(space->machine, "IN0") & 0xf);
 	}
 	return 0xff;
 }
 
 static READ8_HANDLER( gondo_player_2_r )
 {
+	int val = 1 << input_port_read(space->machine, "AN1");
+
 	switch (offset) {
 		case 0: /* Rotary low byte */
-			return ~((1 << (input_port_read(space->machine, "AN1") * 12 / 256))&0xff);
+			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~((1 << (input_port_read(space->machine, "AN1") * 12 / 256))>>4))&0xf0) | (input_port_read(space->machine, "IN1") & 0xf);
+			return ((~val >> 4) & 0xf0) | (input_port_read(space->machine, "IN1") & 0xf);
 	}
 	return 0xff;
 }
@@ -1253,10 +1257,10 @@ static INPUT_PORTS_START( gondo )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("AN0")	/* player 1 12-way rotary control */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("AN1")	/* player 2 12-way rotary control */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )

@@ -1659,8 +1659,8 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER ( calibr50_ip_r )
 {
-	int dir1 = input_port_read(space->machine, "ROT1") & 0xfff;	// analog port
-	int dir2 = input_port_read(space->machine, "ROT2") & 0xfff;	// analog port
+	int dir1 = input_port_read(space->machine, "ROT1");	// analog port
+	int dir2 = input_port_read(space->machine, "ROT2");	// analog port
 
 	switch (offset)
 	{
@@ -1669,10 +1669,10 @@ static READ16_HANDLER ( calibr50_ip_r )
 
 		case 0x08/2:	return input_port_read(space->machine, "COINS");	// Coins
 
-		case 0x10/2:	return (dir1&0xff);			// lower 8 bits of p1 rotation
-		case 0x12/2:	return (dir1>>8);			// upper 4 bits of p1 rotation
-		case 0x14/2:	return (dir2&0xff);			// lower 8 bits of p2 rotation
-		case 0x16/2:	return (dir2>>8);			// upper 4 bits of p2 rotation
+		case 0x10/2:	return (dir1 & 0xff);		// lower 8 bits of p1 rotation
+		case 0x12/2:	return (dir1 >> 8);			// upper 4 bits of p1 rotation
+		case 0x14/2:	return (dir2 & 0xff);		// lower 8 bits of p2 rotation
+		case 0x16/2:	return (dir2 >> 8);			// upper 4 bits of p2 rotation
 		case 0x18/2:	return 0xffff;				// ? (value's read but not used)
 		default:
 			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(space->cpu), offset*2);
@@ -2954,8 +2954,8 @@ static READ8_HANDLER( downtown_ip_r )
 	int dir1 = input_port_read(space->machine, "ROT1");	// analog port
 	int dir2 = input_port_read(space->machine, "ROT2");	// analog port
 
-	dir1 = (~ (0x800 >> ((dir1 * 12)/0x100)) ) & 0xfff;
-	dir2 = (~ (0x800 >> ((dir2 * 12)/0x100)) ) & 0xfff;
+	dir1 = (~ (0x800 >> dir1)) & 0xfff;
+	dir2 = (~ (0x800 >> dir2)) & 0xfff;
 
 	switch (offset)
 	{
@@ -3644,10 +3644,10 @@ static INPUT_PORTS_START( calibr50 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("ROT1")	// Rotation Player 1
-	JOY_ROTATION(1, Z, X)
+	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
 	PORT_START("ROT2")	// Rotation Player 2
-	JOY_ROTATION(2, N, M)
+	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_PLAYER(2) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -3887,10 +3887,10 @@ static INPUT_PORTS_START( downtown )
 	PORT_DIPSETTING(      0x0000, "2" )
 
 	PORT_START("ROT1")	//Rotation Player 1
-	JOY_ROTATION(1, Z, X)
+	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("ROT2")	//Rotation Player 2
-	JOY_ROTATION(2, N, M)
+	PORT_BIT( 0xff, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_FULL_TURN_COUNT(12)
 INPUT_PORTS_END
 
 

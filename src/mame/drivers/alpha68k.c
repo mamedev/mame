@@ -289,10 +289,10 @@ static READ16_HANDLER( control_1_r )
 static READ16_HANDLER( control_2_r )
 {
 	if (invert_controls)
-		return ~(input_port_read(space->machine, "IN3") + ((~(1 << (input_port_read(space->machine, "IN5") * 12 / 256))) << 8));
+		return ~(input_port_read(space->machine, "IN3") + ((~(1 << input_port_read(space->machine, "IN5"))) << 8));
 
 	return input_port_read(space->machine, "IN3") + /* Low byte of CN1 */
-		((~(1 << (input_port_read(space->machine, "IN5") * 12 / 256))) << 8);
+		((~(1 << input_port_read(space->machine, "IN5"))) << 8);
 }
 
 static READ16_HANDLER( control_2_V_r )
@@ -303,20 +303,20 @@ static READ16_HANDLER( control_2_V_r )
 static READ16_HANDLER( control_3_r )
 {
 	if (invert_controls)
-		return ~((( ~(1 << (input_port_read(space->machine, "IN6") * 12 / 256)) )<<8) & 0xff00);
+		return ~((( ~(1 << input_port_read(space->machine, "IN6")) )<<8) & 0xff00);
 
-	return (( ~(1 << (input_port_read(space->machine, "IN6") * 12 / 256)) )<<8) & 0xff00;
+	return (( ~(1 << input_port_read(space->machine, "IN6")) )<<8) & 0xff00;
 }
 
 /* High 4 bits of CN1 & CN2 */
 static READ16_HANDLER( control_4_r )
 {
 	if (invert_controls)
-		return ~(((( ~(1 << (input_port_read(space->machine, "IN6") * 12 / 256))  ) <<4) & 0xf000)
-		 + ((( ~(1 << (input_port_read(space->machine, "IN5") * 12 / 256))  )    ) & 0x0f00));
+		return ~(((( ~(1 << input_port_read(space->machine, "IN6"))  ) <<4) & 0xf000)
+		 + ((( ~(1 << input_port_read(space->machine, "IN5"))  )    ) & 0x0f00));
 
-	return ((( ~(1 << (input_port_read(space->machine, "IN6") * 12 / 256))  ) <<4) & 0xf000)
-		 + ((( ~(1 << (input_port_read(space->machine, "IN5") * 12 / 256))  )    ) & 0x0f00);
+	return ((( ~(1 << input_port_read(space->machine, "IN6"))  ) <<4) & 0xf000)
+		 + ((( ~(1 << input_port_read(space->machine, "IN5"))  )    ) & 0x0f00);
 }
 
 static READ16_HANDLER( jongbou_inputs_r )
@@ -1175,10 +1175,10 @@ static INPUT_PORTS_START( timesold )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN5")  /* player 1 12-way rotary control - converted in controls_r() */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(8) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN6")  /* player 2 12-way rotary control - converted in controls_r() */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(8) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 INPUT_PORTS_END
 
 /* Same as 'timesold' but different default settings for the "Language" Dip Switch */

@@ -43,10 +43,10 @@ READ16_HANDLER( dec0_rotary_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 rotary */
-			return ~(1 << (input_port_read(space->machine, "AN0") * 12 / 256));
+			return ~(1 << input_port_read(space->machine, "AN0"));
 
 		case 8: /* Player 2 rotary */
-			return ~(1 << (input_port_read(space->machine, "AN1") * 12 / 256));
+			return ~(1 << input_port_read(space->machine, "AN1"));
 
 		default:
 			logerror("Unknown rotary read at 300000 %02x\n", offset);
@@ -68,10 +68,10 @@ READ16_HANDLER( midres_controls_r )
 			return input_port_read(space->machine, "DSW");
 
 		case 4: /* Player 1 rotary */
-			return ~(1 << (input_port_read(space->machine, "AN0") * 12 / 256));
+			return ~(1 << input_port_read(space->machine, "AN0"));
 
 		case 6: /* Player 2 rotary */
-			return ~(1 << (input_port_read(space->machine, "AN1") * 12 / 256));
+			return ~(1 << input_port_read(space->machine, "AN1"));
 
 		case 8: /* Credits, start buttons */
 			return input_port_read(space->machine, "SYSTEM");
