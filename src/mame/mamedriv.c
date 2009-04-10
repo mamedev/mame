@@ -2657,6 +2657,7 @@ V-V                           TP-027
 	DRIVER( nwarru )	/* 06/04/1995 (c) 1995 (US) */
 	DRIVER( nwarrh )	/* 03/04/1995 (c) 1995 (Hispanic) */
 	DRIVER( nwarrb )	/* 03/04/1995 (c) 1995 (Brazil) */
+	DRIVER( nwarra )	/* 02/03/1995 (c) 1995 (Asia) */
 	DRIVER( vhuntj )	/* 02/03/1995 (c) 1995 (Japan) */
 	DRIVER( vhuntjr1 )	/* 07/03/1995 (c) 1995 (Japan) */
 	DRIVER( vhuntjr2 )	/* 02/03/1995 (c) 1995 (Japan) */

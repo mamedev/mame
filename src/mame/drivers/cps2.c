@@ -2903,8 +2903,8 @@ ROM_END
 ROM_START( vampj )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "vamj.03a", 0x000000, 0x80000, CRC(f55d3722) SHA1(e26bbcc47a2485914d567a6cf1cddd0f668689a1) )
-	ROM_LOAD16_WORD_SWAP( "vamj.04b", 0x080000, 0x80000, CRC(4d9c43c4) SHA1(2087090306646fed959d503ee75e24996ad95b88) )
-	ROM_LOAD16_WORD_SWAP( "vamj.05a", 0x100000, 0x80000, CRC(6c497e92) SHA1(7c1ccdfd77fb50afe024c8402376daaeab641a24) )
+	ROM_LOAD16_WORD_SWAP( "vamj.04b", 0x080000, 0x80000, CRC(4d9c43c4) SHA1(2087090306646fed959d503ee75e24996ad95b88) ) /* incomplete updated set, all */
+	ROM_LOAD16_WORD_SWAP( "vamj.05a", 0x100000, 0x80000, CRC(6c497e92) SHA1(7c1ccdfd77fb50afe024c8402376daaeab641a24) ) /* roms should be "B" revision */
 	ROM_LOAD16_WORD_SWAP( "vamj.06a", 0x180000, 0x80000, CRC(f1bbecb6) SHA1(6adba89393e05f16f70b57085cabd6b4c20f53e8) )
 	ROM_LOAD16_WORD_SWAP( "vamj.07a", 0x200000, 0x80000, CRC(1067ad84) SHA1(5e4cc75cfdfd512b6230c656e7304262b5143aee) )
 	ROM_LOAD16_WORD_SWAP( "vamj.08a", 0x280000, 0x80000, CRC(4b89f41f) SHA1(bd78f33a6d448655eecf7448921d282b302fa4cb) )
@@ -4506,6 +4506,37 @@ ROM_START( nwarrb )
 	ROM_LOAD16_WORD_SWAP( "vphb.08",  0x280000, 0x80000, CRC(42220f84) SHA1(f6ef52b1dff86c25852aa05be4a5b39995c26dd7) )
 	ROM_LOAD16_WORD_SWAP( "vphb.09",  0x300000, 0x80000, CRC(029e015d) SHA1(441d0ea36484cbffe783cb0a1133537c09783022) )
 	ROM_LOAD16_WORD_SWAP( "vphb.10",  0x380000, 0x80000, CRC(37b3ce37) SHA1(5919b44415e4d5b242fcdd69efd0ab1722e4da8c) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROMX_LOAD( "vph.13m",   0x0000000, 0x400000, CRC(c51baf99) SHA1(2fb6642908e542e404391eb17392f8270e87bf48) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.15m",   0x0000002, 0x400000, CRC(3ce83c77) SHA1(93369b23c6d7d834297434691bb047ee3dd9539c) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.17m",   0x0000004, 0x400000, CRC(4f2408e0) SHA1(cd49c6b3c7e6470c6058f98ccc5210b052bb13e2) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.19m",   0x0000006, 0x400000, CRC(9ff60250) SHA1(d69ba4dc6bd37d003245f0cf3211d6e2623005b8) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.14m",   0x1000000, 0x400000, CRC(7a0e1add) SHA1(6b28a91bd59bba97886fdea30116a5b1071109ed) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.16m",   0x1000002, 0x400000, CRC(2f41ca75) SHA1(f4a67e60b62001e6fe75cb05b9c81040a8a09f54) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.18m",   0x1000004, 0x400000, CRC(64498eed) SHA1(d64e54a9ad1cbb927b7bac2eb16e1487834c5706) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "vph.20m",   0x1000006, 0x400000, CRC(17f2433f) SHA1(0cbf8c96f92016fefb4a9c668ce5fd260342d712) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "vph.01",   0x00000, 0x08000, CRC(5045dcac) SHA1(fd1a6586fbdd48a707df1fa52309b4cf50e3cc4c) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "vph.02",   0x28000, 0x20000, CRC(86b60e59) SHA1(197d07ced8b9850729c83fa59b7afc283500bdee) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "vph.11m",   0x000000, 0x200000, CRC(e1837d33) SHA1(e3cb69f64767bacbec7286d0b4cd0ce7a0ba13d8) )
+	ROM_LOAD16_WORD_SWAP( "vph.12m",   0x200000, 0x200000, CRC(fbd3cd90) SHA1(4813c25802ad71b77ca04fd8f3a86344f99f0d6a) )
+ROM_END
+
+ROM_START( nwarra )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "vpha.03b", 0x000000, 0x80000, CRC(0a70cdd6) SHA1(08d3f3892bfc8e741c59071150e6c3a8bf5ffbef) )
+	ROM_LOAD16_WORD_SWAP( "vpha.04b", 0x080000, 0x80000, CRC(70ce62e4) SHA1(8bc9066071585805b6420bcc40eb03e641e3f027) )
+	ROM_LOAD16_WORD_SWAP( "vpha.05b", 0x100000, 0x80000, CRC(5692a03f) SHA1(7c2ba1022ee4045d985477a6c9026140b7809234) )
+	ROM_LOAD16_WORD_SWAP( "vpha.06b", 0x180000, 0x80000, CRC(b810fe66) SHA1(787198f546a0d3dbf0f2d54a4328aaaf4e3cdcae) )
+	ROM_LOAD16_WORD_SWAP( "vpha.07b", 0x200000, 0x80000, CRC(1be264f3) SHA1(b08d0771963e6b8c1a2d32e6db3edd9bffea39e1) )
+	ROM_LOAD16_WORD_SWAP( "vpha.08b", 0x280000, 0x80000, CRC(86f1ed52) SHA1(95095ef7037cf5f90f00b15f224e4b35e3ea675e) )
+	ROM_LOAD16_WORD_SWAP( "vpha.09b", 0x300000, 0x80000, CRC(7e96bd0a) SHA1(f7750209b157a405710c0797e9eb30f980db582d) )
+	ROM_LOAD16_WORD_SWAP( "vpha.10b", 0x380000, 0x80000, CRC(58bce2fd) SHA1(2df1460cb349d64ca84fd3372a9a64b6cdbe078f) )
 
 	ROM_REGION( 0x2000000, "gfx", 0 )
 	ROMX_LOAD( "vph.13m",   0x0000000, 0x400000, CRC(c51baf99) SHA1(2fb6642908e542e404391eb17392f8270e87bf48) , ROM_GROUPWORD | ROM_SKIP(6) )
@@ -7467,7 +7498,7 @@ GAME( 1994, dstlk,    0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Da
 GAME( 1994, dstlku,   dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (USA 940818)", 0 )
 GAME( 1994, dstlkur1, dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (USA 940705)", 0 )
 GAME( 1994, dstlka,   dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Asia 940705)", 0 )
-GAME( 1994, vampj,    dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705)", 0 )	// one of these two must be a bad dump
+GAME( 1994, vampj,    dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705)", 0 )	// partial update set? Only rom 04 is "B" revision
 GAME( 1994, vampja,   dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705 alt)", 0 )
 GAME( 1994, vampjr1,  dstlk,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940630)", 0 )
 GAME( 1994, ringdest, 0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Ring of Destruction: Slammasters II (Euro 940902)", 0 )
@@ -7492,6 +7523,7 @@ GAME( 1995, nwarr,    0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Ni
 GAME( 1995, nwarru,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (USA 950406)", 0 )
 GAME( 1995, nwarrh,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Hispanic 950403)", 0 )
 GAME( 1995, nwarrb,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Brazil 950403)", 0 )
+GAME( 1995, nwarra,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Asia 950302?)", GAME_NOT_WORKING ) /* Needs correct decrypt key */
 GAME( 1995, vhuntj,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950316)", 0 )
 GAME( 1995, vhuntjr1, nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950307)", 0 )
 GAME( 1995, vhuntjr2, nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950302)", 0 )
