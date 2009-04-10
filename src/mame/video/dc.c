@@ -33,7 +33,9 @@ UINT64 *dc_texture_ram;
 static UINT32 tafifo_buff[32];
 
 static emu_timer *vbout_timer;
+static emu_timer *hbin_timer;
 static emu_timer *endofrender_timer;
+static int scanline;
 static bitmap_t *fakeframebuffer_bitmap;
 static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect);
 
@@ -1189,7 +1191,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 			}
 		}
 
-
+		#if 1
 		// test--draw the verts fore each quad as polys too
 		{
 			testvertices vv[4];
@@ -1213,7 +1215,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 			v[2] = &vv[3];
 			testdrawpoly(bitmap,v);
 		}
-
+		#endif
 	}
 	state_ta.grab[rs].busy=0;
 #if DEBUG_VERTICES
@@ -1360,7 +1362,6 @@ static void pvr_build_parameterconfig(void)
 
 static TIMER_CALLBACK(vbout)
 {
-
 	UINT32 a;
 	//printf("vbout\n");
 
@@ -1368,7 +1369,19 @@ static TIMER_CALLBACK(vbout)
 	dc_sysctrl_regs[SB_ISTNRM] = a; // V Blank-out interrupt
 	dc_update_interrupt_status(machine);
 
+	scanline = 0;
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
+	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 640), 0);
+}
+
+static TIMER_CALLBACK(hbin)
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
+	dc_update_interrupt_status(machine);
+
+	scanline++;
+
+	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 640), 0);
 }
 
 // moved, interrupts should never be changed in a VIDEO_UDPATE call!!
@@ -1423,11 +1436,14 @@ VIDEO_START(dc)
 	vbout_timer = timer_alloc(machine, vbout, 0);
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 
+	hbin_timer = timer_alloc(machine, hbin, 0);
+	timer_adjust_oneshot(hbin_timer, attotime_never, 0);
+	scanline = 0;
+
 	endofrender_timer = timer_alloc(machine, endofrender, 0);
 	timer_adjust_oneshot(endofrender_timer, attotime_never, 0);
 
 	fakeframebuffer_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_RGB32);
-
 
 }
 
@@ -1478,4 +1494,3 @@ void dc_vblank(running_machine *machine)
 
 	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
-
