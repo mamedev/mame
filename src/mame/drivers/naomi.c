@@ -27,21 +27,21 @@ Current Compatibility notes (GD-rom games only)
 |shikgam2  |   2   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o, crashes on the proper gameplay          |
 |usagui    |   1   |  H  | Yes  | Yes  | No   | mahjong panel                  |                                                     |
 |bdrdown   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
-|psyvar2   |   1   |  V  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
-|cfield    |   1?  |  H  | No?  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|psyvar2   |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o? Hangs after pressing start              |
+|cfield    |   1?  |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
 |trizeal   |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
-|meltybld  |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract/gameplay with wrong mask         |
-|senko     |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
-|senkoo    |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
-|ss2005    |   1   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
-|radirgy   |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|meltybld  |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons?       | Crashes in attract mode                             |
+|senko     |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       |                                                     |
+|senkoo    |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       |                                                     |
+|ss2005    |   1   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Calls a YUV FMV, crashes due of that                |
+|radirgy   |   1   |  V  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
 |ggxxsla   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
 |kurucham  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o, crashes in attract with wrong mask      |
 |undefeat  |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       | Stuck at the "now loading" msg                      |
 |trgheart  |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |jingystm  |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons?       | Broken i/o                                          |
-|meltyb    |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract/gameplay with wrong mask         |
-|meltyba   |   2   |  H  | No?  | Yes  | No?  | joystick with 4 buttons?       | Crashes in attract/gameplay with wrong mask         |
+|meltyb    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons?       | Crashes in attract mode                             |
+|meltyba   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons?       | Crashes in attract mode                             |
 |karous    |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
 |takoron   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -57,11 +57,11 @@ Current Compatibility notes (GD-rom games only)
 |vtennis2  |   2   |  H  | No   | No   | No   | joystick with 3 buttons        |                                                     |
 |keyboard  |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, crashes after a while                   |
 |lupinsho  |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o, crashes after a while                   |
-|luptype   |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, crashes after a while                   |
+|luptype   |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, ARM cpu crashes when inserting a coin   |
 |mok       |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o                                          |
 |ngdup23a  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
 |ngdup23c  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
-|puyofev   |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|puyofev   |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o? Hangs after pressing start              |
 --------------------------------------------------------------------------------------------------------------------------------------
 
 Test: If it enters into test mode (not actually working test mode, i.e. if inputs doesn't work)
@@ -2318,29 +2318,28 @@ ROM_START( otrigger )
 	ROM_REGION( 0x200000, "maincpu", 0)
 	NAOMI_BIOS
 
-	ROM_REGION( 0x400000, "user1", 0)
-	ROM_LOAD("epr22163.22", 0x0000000, 0x0400000, CRC(3bdafb6a) SHA1(c4c5a4ba94d85c4353df22d70bb08be67e9c22c3) )
-
-	ROM_REGION( 0x9800000, "user2", 0)
-	ROM_LOAD("ic1", 0x0000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic2", 0x0800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic3", 0x1000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic4", 0x1800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic5", 0x2000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic6", 0x2800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic7", 0x3000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic8", 0x3800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic9", 0x4000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic10",0x4800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic11",0x5000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic12",0x5800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic13",0x6000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic14",0x6800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic15",0x7000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic16",0x7800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic17",0x8000000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic18",0x8800000, 0x0800000, NO_DUMP )
-	ROM_LOAD("ic19",0x9000000, 0x0800000, NO_DUMP )
+	ROM_REGION( 0xa000000, "user1", 0)
+	ROM_LOAD("epr-22163.ic22", 0x0000000, 0x0400000, CRC(3bdafb6a) SHA1(c4c5a4ba94d85c4353df22d70bb08be67e9c22c3) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD("mpr-22142.ic1", 0x0800000, 0x0800000, CRC(5b45fa35) SHA1(7d3fbecc6f0dce2b13bfb21ed68f44632b91b94b) )
+	ROM_LOAD("mpr-22143.ic2", 0x1000000, 0x0800000, CRC(b43c4d6d) SHA1(77e0b37ca3ee94b7f77d88ccb14bd0469a76aac0) )
+	ROM_LOAD("mpr-22144.ic3", 0x1800000, 0x0800000, CRC(e78581af) SHA1(d1fe4da3f16dd5ebc7d9eaa092de1e16ec9c3321) )
+	ROM_LOAD("mpr-22145.ic4", 0x2000000, 0x0800000, CRC(2b6274ea) SHA1(89165cf84ebb02e99163624c6d31da38aeec000e) )
+	ROM_LOAD("mpr-22146.ic5", 0x2800000, 0x0800000, CRC(c24eb03f) SHA1(2f4b720b4ab106f891f4469b6e93a9979b1c1061) )
+	ROM_LOAD("mpr-22147.ic6", 0x3000000, 0x0800000, CRC(578e36fd) SHA1(f39f74b046efbff7e7baf70effdd368605da496f) )
+	ROM_LOAD("mpr-22148.ic7", 0x3800000, 0x0800000, CRC(e6053373) SHA1(e7bafaffeac9b6851a3fce060be21e8be8eaa71e) )
+	ROM_LOAD("mpr-22149.ic8", 0x4000000, 0x0800000, CRC(cc86691b) SHA1(624958bc07eef5fac98642e9acd460cd5fe0c815) )
+	ROM_LOAD("mpr-22150.ic9", 0x4800000, 0x0800000, CRC(f585d41d) SHA1(335df3d3f2631e5c03c39465cd702b77ce3f9717) )
+	ROM_LOAD("mpr-22151.ic10",0x5000000, 0x0800000, CRC(aae31a4b) SHA1(1472e477c2c6b89ca03824838757bdf20efbdf45) )
+	ROM_LOAD("mpr-22152.ic11",0x5800000, 0x0800000, CRC(5ed2c5ea) SHA1(2b9237eda566ccb87b4914db61a03e2c9035a280) )
+	ROM_LOAD("mpr-22153.ic12s",0x6000000, 0x0800000, CRC(16630b85) SHA1(10e926c0d13270b5bf99d7456fe63baafc2df56a) )
+	ROM_LOAD("mpr-22154.ic13s",0x6800000, 0x0800000, CRC(30a2d60b) SHA1(6431b2d4e5106e25e5517707c9667bcd714f43ac) )
+	ROM_LOAD("mpr-22155.ic14s",0x7000000, 0x0800000, CRC(163993a5) SHA1(351a626a0dc9a3030b10fc0b822075f3010fdc05) )
+	ROM_LOAD("mpr-22156.ic15s",0x7800000, 0x0800000, CRC(37720b4f) SHA1(bd60beadb0081ed20610c3988577bbf37bfdab07) )
+	ROM_LOAD("mpr-22157.ic16s",0x8000000, 0x0800000, CRC(dfd6fa83) SHA1(e0dc9606f5521af16c29a30378e81843c8dbc188) )
+	ROM_LOAD("mpr-22158.ic17s",0x8800000, 0x0800000, CRC(f5d96fe9) SHA1(d5d0ac3d6b7c9b851a18b22d5fb599710c684a76) )
+	ROM_LOAD("mpr-22159.ic18s",0x9000000, 0x0800000, CRC(f8b5e99d) SHA1(bb174a6a80967d0ff05c3a7512e4f0f9c921d130) )
+	ROM_LOAD("mpr-22160.ic19s",0x9800000, 0x0800000, CRC(579eef4e) SHA1(bfcabd57f623647053afcedcabfbc74e5736819f) )
 ROM_END
 
 /*
@@ -3015,7 +3014,7 @@ GAME( 2000, doa2m,    doa2,     naomi,    naomi,    0, ROT0, "Tecmo",           
 GAME( 1999, vtennis,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Power Smash (JPN) / Virtua Tennis (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, slasho,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, totd,     naomi,    naomi,    naomi,    0, ROT0, "Sega",            "The Typing of the Dead (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-
+GAME( 1999, otrigger, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "OutTrigger (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Incomplete Dumps (just the program rom IC22) */
 GAME( 2000, cspike,   naomi,    naomi,    naomi,    0, ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -3029,7 +3028,6 @@ GAME( 2000, gwing2,   naomi,    naomi,    naomi,    0, ROT0, "Takumi / Capcom", 
 GAME( 2000, pjustic,  naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Moero Justice Gakuen (JPN) / Project Justice (USA, EXP, KOR, AUS) ", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, pstone,   naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, pstone2,  naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Power Stone 2 (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, otrigger, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "OutTrigger (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, samba,    naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Samba De Amigo (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, spawn,    naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Spawn (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, virnba,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -3914,7 +3912,7 @@ GAME( 2002, moeru,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Altron",  
 GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0015
 //GDL-0016
-GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Amedio",           "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Amedio (Taito license)", "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0018
 //GDL-0019 Guilty Gear XX #Reload
 GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works", "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
