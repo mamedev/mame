@@ -16,47 +16,18 @@
 
 /*----------- defined in machine/atari.c -----------*/
 
-typedef struct {
-	int  serout_count;
-	int  serout_offs;
-	UINT8 serout_buff[512];
-	UINT8 serout_chksum;
-	int  serout_delay;
-
-	int  serin_count;
-	int  serin_offs;
-	UINT8 serin_buff[512];
-	UINT8 serin_chksum;
-	int  serin_delay;
-}	ATARI_FDC;
-extern ATARI_FDC atari_fdc;
-
 extern const pia6821_interface atari_pia_interface;
 extern const pia6821_interface a600xl_pia_interface;
 extern const pia6821_interface a800xl_pia_interface;
 
-MACHINE_START( a400 );
-MACHINE_START( a800 );
+
+void atari_machine_start(running_machine *machine);	// this is needed in MESS as well for other Atari 8bits systems
+
 MACHINE_START( a600xl );
-MACHINE_START( a800xl );
-MACHINE_START( a5200 );
 
 WRITE_LINE_DEVICE_HANDLER(atari_pia_cb2_w);
 
-#ifdef MESS
-DEVICE_IMAGE_LOAD( a800_floppy );
-
-DEVICE_IMAGE_LOAD( a800_cart );
-DEVICE_IMAGE_UNLOAD( a800_cart );
-
-DEVICE_IMAGE_LOAD( a800xl_cart );
-DEVICE_IMAGE_UNLOAD( a800xl_cart );
-
-DEVICE_IMAGE_LOAD( a5200_cart );
-DEVICE_IMAGE_UNLOAD( a5200_cart );
-#endif
-
- READ8_HANDLER ( atari_serin_r );
+READ8_HANDLER ( atari_serin_r );
 WRITE8_HANDLER ( atari_serout_w );
 void atari_interrupt_cb(const device_config *device, int mask);
 
