@@ -9,6 +9,9 @@ Notes:
 - Quite interestingly, Free Kick's sound ROM contains a Z80 program, but
   there isn't a sound CPU and that program isn't executed. Instead, the main
   CPU reads the sound program through an 8255 PPI and plays sounds directly.
+- Gigas: according to a photo of a genuine board:
+    Sega Game ID#: 834-6167
+    NEC MC-8123 with Sega security number 317-5002
 
 TODO:
 - Gigas cocktail mode / flipscreen
