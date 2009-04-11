@@ -443,7 +443,7 @@ static CPU_SET_INFO( m4510 )
 
 CPU_GET_INFO( m4510 )
 {
-	m4510_Regs *cpustate = (device != NULL && device != NULL) ? get_safe_token(device) : NULL;
+	m4510_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

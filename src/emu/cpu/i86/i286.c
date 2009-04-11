@@ -377,7 +377,7 @@ static CPU_SET_INFO( i80286 )
 
 CPU_GET_INFO( i80286 )
 {
-	i80286_state *cpustate = (device != NULL) ? get_safe_token(device) : NULL;
+	i80286_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

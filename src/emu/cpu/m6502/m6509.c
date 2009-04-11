@@ -324,7 +324,7 @@ static CPU_SET_INFO( m6509 )
 
 CPU_GET_INFO( m6509 )
 {
-	m6509_Regs *cpustate = (device != NULL && device != NULL) ? get_safe_token(device) : NULL;
+	m6509_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

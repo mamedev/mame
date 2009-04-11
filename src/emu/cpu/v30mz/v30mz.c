@@ -1042,7 +1042,7 @@ static CPU_SET_INFO( nec )
 
 CPU_GET_INFO( v30mz )
 {
-	v30mz_state *cpustate = (device != NULL && device != NULL) ? get_safe_token(device) : NULL;
+	v30mz_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
 	int flags;
 
 	switch (state)
