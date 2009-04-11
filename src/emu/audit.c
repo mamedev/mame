@@ -454,8 +454,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD);
 	}
 
-	/* return TRUE if we found anything at all */
-	return( record->status != AUDIT_STATUS_NOT_FOUND || record->substatus == SUBSTATUS_NOT_FOUND_NODUMP || record->substatus == SUBSTATUS_NOT_FOUND_OPTIONAL );
+	return (record->status != AUDIT_STATUS_NOT_FOUND || record->substatus == SUBSTATUS_NOT_FOUND_NODUMP || record->substatus == SUBSTATUS_NOT_FOUND_OPTIONAL);
 }
 
 
@@ -473,6 +472,7 @@ static int audit_one_disk(core_options *options, const rom_entry *rom, const gam
 	record->type = AUDIT_FILE_DISK;
 	record->name = ROM_GETNAME(rom);
 	record->exphash = ROM_GETHASHDATA(rom);
+	record->used_by_parent = rom_used_by_parent(gamedrv, rom, NULL);
 
 	/* open the disk */
 	err = open_disk_image_options(options, gamedrv, rom, &source_file, &source);
@@ -529,8 +529,7 @@ static int audit_one_disk(core_options *options, const rom_entry *rom, const gam
 		mame_fclose(source_file);
 	}
 
-	/* return TRUE if we found anything at all */
-	return (source != NULL);
+	return (record->status != AUDIT_STATUS_NOT_FOUND || record->substatus == SUBSTATUS_NOT_FOUND_NODUMP || record->substatus == SUBSTATUS_NOT_FOUND_OPTIONAL);
 }
 
 
