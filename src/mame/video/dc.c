@@ -34,7 +34,10 @@ static UINT32 tafifo_buff[32];
 
 static emu_timer *vbout_timer;
 static emu_timer *hbin_timer;
-static emu_timer *endofrender_timer;
+static emu_timer *endofrender_timer_isp;
+static emu_timer *endofrender_timer_tsp;
+static emu_timer *endofrender_timer_video;
+
 static int scanline;
 static bitmap_t *fakeframebuffer_bitmap;
 static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect);
@@ -345,7 +348,7 @@ WRITE64_HANDLER( pvr_ta_w )
 				// we've got a request to draw, so, draw to the fake fraembuffer!
 				testdrawscreen(space->machine,fakeframebuffer_bitmap,&clip);
 
-				timer_adjust_oneshot(endofrender_timer, ATTOTIME_IN_USEC(1000) , 0); // hack, make sure render takes some amount of time
+				timer_adjust_oneshot(endofrender_timer_isp, ATTOTIME_IN_USEC(4000) , 0); // hack, make sure render takes some amount of time
 
 				break;
 			}
@@ -1379,35 +1382,38 @@ static TIMER_CALLBACK(hbin)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
 	dc_update_interrupt_status(machine);
 
+//	printf("hbin on scanline %d\n",scanline);
+	
 	scanline++;
 
 	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 640), 0);
 }
 
-// moved, interrupts should never be changed in a VIDEO_UDPATE call!!
-static TIMER_CALLBACK(endofrender)
+
+
+static TIMER_CALLBACK(endofrender_video)
 {
-	UINT32 a;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
+	dc_update_interrupt_status(machine);	
+	timer_adjust_oneshot(endofrender_timer_video, attotime_never, 0);
+}
 
-	//printf("endofrender\n");
-
-	// don't know if this is right.. but we get asserts otherwise, timing error?
-	if (state_ta.start_render_received == 1)
-	{
-		for (a=0;a < NUM_BUFFERS;a++)
-			if (state_ta.grab[a].busy == 1)
-				state_ta.grab[a].busy = 0;
-		state_ta.start_render_received = 0;
-	}
-
-	state_ta.start_render_received=0;
-	state_ta.renderselect= -1;
+static TIMER_CALLBACK(endofrender_tsp)
+{
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 	dc_update_interrupt_status(machine);
 
-	timer_adjust_oneshot(endofrender_timer, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_tsp, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_video, ATTOTIME_IN_USEC(500) , 0); 
+}
 
+static TIMER_CALLBACK(endofrender_isp)
+{
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;	// ISP end of render
+	dc_update_interrupt_status(machine);
 
+	timer_adjust_oneshot(endofrender_timer_isp, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_tsp, ATTOTIME_IN_USEC(500) , 0); 
 }
 
 
@@ -1440,8 +1446,13 @@ VIDEO_START(dc)
 	timer_adjust_oneshot(hbin_timer, attotime_never, 0);
 	scanline = 0;
 
-	endofrender_timer = timer_alloc(machine, endofrender, 0);
-	timer_adjust_oneshot(endofrender_timer, attotime_never, 0);
+	endofrender_timer_isp = timer_alloc(machine, endofrender_isp, 0);
+	endofrender_timer_tsp = timer_alloc(machine, endofrender_tsp, 0);
+	endofrender_timer_video = timer_alloc(machine, endofrender_video, 0);
+
+	timer_adjust_oneshot(endofrender_timer_isp, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_tsp, attotime_never, 0);
+	timer_adjust_oneshot(endofrender_timer_video, attotime_never, 0);
 
 	fakeframebuffer_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_RGB32);
 
