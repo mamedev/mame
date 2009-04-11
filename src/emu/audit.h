@@ -86,7 +86,6 @@ struct _audit_record
 	UINT32			length;					/* actual length of item */
 	const char * 	exphash;        		/* expected hash data */
 	char 			hash[HASH_BUF_SIZE];	/* actual hash information */
-	UINT8			used_by_parent;			/* is the rom from a parent */
 };
 
 

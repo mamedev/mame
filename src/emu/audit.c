@@ -22,8 +22,8 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record);
-static int audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record);
+static void audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record);
+static void audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record);
 static int rom_used_by_parent(const game_driver *gamedrv, const rom_entry *romentry, const game_driver **parent);
 
 
@@ -60,7 +60,8 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 	const rom_entry *region, *rom;
 	const rom_source *source;
 	audit_record *record;
-	int foundany = FALSE;
+	int anyfound = FALSE;
+	int anyrequired = FALSE;
 	int allshared = TRUE;
 	int records;
 
@@ -100,28 +101,40 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 					/* audit a file */
 					if (ROMREGION_ISROMDATA(region))
 					{
-						if (audit_one_rom(options, rom, regiontag, gamedrv, validation, record++) && source_is_gamedrv && (!shared || allshared))
-							foundany = TRUE;
+						audit_one_rom(options, rom, regiontag, gamedrv, validation, record);
 					}
 
 					/* audit a disk */
 					else if (ROMREGION_ISDISKDATA(region))
 					{
-						if (audit_one_disk(options, rom, gamedrv, validation, record++) && source_is_gamedrv && (!shared || allshared))
-							foundany = TRUE;
+						audit_one_disk(options, rom, gamedrv, validation, record);
 					}
+					
+					else
+					{
+						continue;
+					}
+
+					if (record->status != AUDIT_STATUS_NOT_FOUND)
+					{
+						if (source_is_gamedrv && (!shared || allshared))
+							anyfound = TRUE;
+					}
+					else if (record->substatus != SUBSTATUS_NOT_FOUND_NODUMP && record->substatus != SUBSTATUS_NOT_FOUND_OPTIONAL)
+						anyrequired = TRUE;
+
+					record++;
 				}
 			}
-
-			/* if we found nothing, we don't have the set at all */
-			if (rom_source_is_gamedrv(gamedrv, source) && !foundany)
-			{
-				free(*audit);
-				*audit = NULL;
-				records = 0;
-				break;
-			}
 		}
+	}
+
+	/* if we found nothing, we don't have the set at all */
+	if (!anyfound && anyrequired)
+	{
+		free(*audit);
+		*audit = NULL;
+		records = 0;
 	}
 
 	machine_config_free(config);
@@ -228,27 +241,9 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 {
 	int overall_status = CORRECT;
 	int recnum;
-	int anyfound = 0;
-	int required = 0;
 
 	/* no count AND no records means not found */
 	if (count == 0 && records == NULL)
-		return NOTFOUND;
-
-	for (recnum = 0; recnum < count; recnum++)
-	{
-		const audit_record *record = &records[recnum];
-
-		if (record->status != AUDIT_STATUS_NOT_FOUND)
-		{
-			if (!record->used_by_parent)
-				anyfound = 1;
-		}
-		else if (record->substatus != SUBSTATUS_NOT_FOUND_NODUMP && record->substatus != SUBSTATUS_NOT_FOUND_OPTIONAL)
-			required = 1;
-	}
-
-	if (!anyfound && required)
 		return NOTFOUND;
 
 	/* loop over records */
@@ -340,10 +335,9 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
     audit_one_rom - validate a single ROM entry
 -------------------------------------------------*/
 
-static int audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record)
+static void audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record)
 {
 	const game_driver *drv;
-	const game_driver *parent;
 	UINT32 crc = 0;
 	UINT8 crcs[4];
 	int has_crc;
@@ -354,7 +348,6 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 	record->exphash = ROM_GETHASHDATA(rom);
 	record->length = 0;
 	record->explength = rom_file_size(rom);
-	record->used_by_parent = rom_used_by_parent(gamedrv, rom, &parent);
 
 	/* see if we have a CRC and extract it if so */
 	has_crc = hash_data_extract_binary_checksum(record->exphash, HASH_CRC, crcs);
@@ -413,6 +406,8 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 	/* if we failed to find the file, set the appropriate status */
 	if (record->length == 0)
 	{
+		const game_driver *parent;
+
 		/* no good dump */
 		if (hash_data_has_info(record->exphash, HASH_INFO_NO_DUMP))
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_NODUMP);
@@ -422,7 +417,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_OPTIONAL);
 
 		/* not found and used by parent */
-		else if (record->used_by_parent)
+		else if (rom_used_by_parent(gamedrv, rom, &parent))
 			set_status(record, AUDIT_STATUS_NOT_FOUND, (parent->flags & GAME_IS_BIOS_ROOT) ? SUBSTATUS_NOT_FOUND_BIOS : SUBSTATUS_NOT_FOUND_PARENT);
 
 		/* just plain old not found */
@@ -453,8 +448,6 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 		else
 			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD);
 	}
-
-	return (record->status != AUDIT_STATUS_NOT_FOUND || record->substatus == SUBSTATUS_NOT_FOUND_NODUMP || record->substatus == SUBSTATUS_NOT_FOUND_OPTIONAL);
 }
 
 
@@ -462,7 +455,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
     audit_one_disk - validate a single disk entry
 -------------------------------------------------*/
 
-static int audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record)
+static void audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record)
 {
 	mame_file *source_file;
 	chd_file *source;
@@ -472,7 +465,6 @@ static int audit_one_disk(core_options *options, const rom_entry *rom, const gam
 	record->type = AUDIT_FILE_DISK;
 	record->name = ROM_GETNAME(rom);
 	record->exphash = ROM_GETHASHDATA(rom);
-	record->used_by_parent = rom_used_by_parent(gamedrv, rom, NULL);
 
 	/* open the disk */
 	err = open_disk_image_options(options, gamedrv, rom, &source_file, &source);
@@ -528,8 +520,6 @@ static int audit_one_disk(core_options *options, const rom_entry *rom, const gam
 		chd_close(source);
 		mame_fclose(source_file);
 	}
-
-	return (record->status != AUDIT_STATUS_NOT_FOUND || record->substatus == SUBSTATUS_NOT_FOUND_NODUMP || record->substatus == SUBSTATUS_NOT_FOUND_OPTIONAL);
 }
 
 
