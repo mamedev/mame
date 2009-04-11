@@ -4,8 +4,8 @@
 UINT8* ninjakd2_bg_videoram;
 UINT8* ninjakd2_fg_videoram;
 
-static int sprite_overdraw_enabled;
 static int next_sprite_overdraw_enabled;
+static int stencil_palette;
 static int sprites_updated;
 static bitmap_t *sp_bitmap;
 // in robokid and omegaf big sprites are laid out differently in ROM
@@ -154,6 +154,7 @@ VIDEO_START( ninjakd2 )
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
 	robokid_sprites = 0;
+	stencil_palette = 0xf0;  // stencil palette when overdraw mode = 0xf (watched bit 7-4)
 }
 
 VIDEO_START( mnight )
@@ -166,6 +167,7 @@ VIDEO_START( mnight )
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
 	robokid_sprites = 0;
+	stencil_palette = 0xf0;  // stencil palette when overdraw mode = 0xf (watched bit 7-4)
 }
 
 VIDEO_START( robokid )
@@ -184,6 +186,7 @@ VIDEO_START( robokid )
 	tilemap_set_transparent_pen(bg2_tilemap, 15);
 
 	robokid_sprites = 1;
+	stencil_palette = 0xf0;  // stencil palette when overdraw mode = 0xf (watched bit 7-4)
 }
 
 VIDEO_START( omegaf )
@@ -203,6 +206,7 @@ VIDEO_START( omegaf )
 	tilemap_set_transparent_pen(bg2_tilemap, 15);
 
 	robokid_sprites = 1;
+	stencil_palette = 0xf0;  // stencil palette when overdraw mode = 0xf (watched bit 7-4)
 }
 
 
@@ -366,7 +370,6 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap)
 			int const color = sprptr[4] & 0x0f;
 			// Ninja Kid II doesn't use the 'big' feature so it might not be available on the board
 			int const big = (sprptr[2] & 0x04) >> 2;
-			int x,y;
 
 			if (flip_screen_get(machine))
 			{
@@ -383,22 +386,26 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap)
 				code ^= flipy << big_yshift;
 			}
 
-			for (y = 0; y <= big; ++y)
 			{
-				for (x = 0; x <= big; ++x)
+				int y;
+				for (y = 0; y <= big; ++y)
 				{
-					int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
-
-					drawgfx(bitmap, gfx,
-							tile,
-							color,
-							flipx,flipy,
-							sx + 16*x, sy + 16*y,
-							0, TRANSPARENCY_PEN, 15);
-
-					++sprites_drawn;
-					if (sprites_drawn >= 96)
-						return;
+					int x;
+					for (x = 0; x <= big; ++x)
+					{
+						int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
+	
+						drawgfx(bitmap, gfx,
+								tile,
+								color,
+								flipx,flipy,
+								sx + 16*x, sy + 16*y,
+								0, TRANSPARENCY_PEN, 15);
+	
+						++sprites_drawn;
+						if (sprites_drawn >= 96)
+							return;
+					}
 				}
 			}
 		}
@@ -417,23 +424,25 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap)
 static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap, const rectangle* const cliprect)
 {
 	// if sprite overdraw is disabled, clear the sprite framebuffer
-	// if sprite overdraw is enabled, only clear palettes 0-B and F, and leave C-E on screen
-	if (!sprite_overdraw_enabled)
+	// if sprite overdraw is enabled, leave palette "0-E" on screen, and stencil only "F".
+	if (!next_sprite_overdraw_enabled)
 		bitmap_fill(sp_bitmap, cliprect, 15);
 	else
 	{
-		int x,y;
-
+		int y;
 		for (y = 0; y < sp_bitmap->height; ++y)
 		{
+			int x;
 			for (x = 0; x < sp_bitmap->width; ++x)
 			{
 				UINT16* const ptr = BITMAP_ADDR16(sp_bitmap, y, x);
-
-				int pal = (*ptr & 0xf0) >> 4;
-
-				if (pal < 0xc || pal == 0xf)
-					*ptr = 15;
+				
+				if ( (*ptr & 0xf0) == stencil_palette ) { *ptr = 15; }
+				////// Before modified, clears palettes 0-B and F, and leaves C-E on screen
+				////// But I'm sure "Ninja Kid II" clears F, and leaves 0-E
+				//////  (apply this to other games when verified)
+				//////  Now, I use variable "stencil_palette".
+				//////  But, I think that it may be "F", because I don't know why 0-B was cleared.
 			}
 		}
 	}
@@ -443,14 +452,13 @@ static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap
 static void update_sprites(running_machine* const machine)
 {
 	erase_sprites(machine, sp_bitmap, 0);
-
-	// we want to erase the sprites with the old setting and draw them with the
-	// new one. Not doing this causes a glitch in Ninja Kid II when taking the top
-	// exit from stage 3.
-	sprite_overdraw_enabled = next_sprite_overdraw_enabled;
-
 	draw_sprites(machine, sp_bitmap);
 }
+	////// Before modified, this was written.
+		// we want to erase the sprites with the old setting and draw them with the
+		// new one. Not doing this causes a glitch in Ninja Kid II when taking the top
+		// exit from stage 3.
+	////// The glitch is correct behavior.
 
 
 VIDEO_UPDATE( ninjakd2 )
