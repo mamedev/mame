@@ -7523,7 +7523,7 @@ GAME( 1995, nwarr,    0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Ni
 GAME( 1995, nwarru,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (USA 950406)", 0 )
 GAME( 1995, nwarrh,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Hispanic 950403)", 0 )
 GAME( 1995, nwarrb,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Brazil 950403)", 0 )
-GAME( 1995, nwarra,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Asia 950302?)", GAME_NOT_WORKING ) /* Needs correct decrypt key */
+GAME( 1995, nwarra,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Asia 950302)", 0 )
 GAME( 1995, vhuntj,   nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950316)", 0 )
 GAME( 1995, vhuntjr1, nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950307)", 0 )
 GAME( 1995, vhuntjr2, nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Vampire Hunter: Darkstalkers' Revenge (Japan 950302)", 0 )

@@ -823,7 +823,7 @@ static const struct game_keys keys_table[] =
 	{ "nwarru",   { 0x104a7d0c,0x3f1b7a1e }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "nwarrh",   { 0xc4961b01,0x2a946020 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "nwarrb",   { 0x17c67109,0xb7362a20 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
-	{ "nwarra",   { 0xffffffff,0xffffffff }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160 /* need correct decrypt key */
+	{ "nwarra",   { 0x4e940d0c,0x39b861a4 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "vhuntj",   { 0x1135b2c3,0xa4e9d7f2 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "vhuntjr1", { 0x1135b2c3,0xa4e9d7f2 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
 	{ "vhuntjr2", { 0x1135b2c3,0xa4e9d7f2 }, 0x180000 },	// 0838 0000 6160  btst    #0,$6160
