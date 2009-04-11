@@ -198,7 +198,8 @@ INLINE psxcpu_state *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert(cpu_get_type(device) == CPU_PSXCPU);
+	assert(cpu_get_type(device) == CPU_PSXCPU ||
+		   cpu_get_type(device) == CPU_CXD8661R);
 	return (psxcpu_state *)device->token;
 }
 

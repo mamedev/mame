@@ -127,7 +127,8 @@ INLINE tms32031_state *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert(cpu_get_type(device) == CPU_TMS32031);
+	assert(cpu_get_type(device) == CPU_TMS32031 ||
+		   cpu_get_type(device) == CPU_TMS32032);
 	return (tms32031_state *)device->token;
 }
 
