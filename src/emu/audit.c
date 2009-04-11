@@ -227,14 +227,11 @@ skip:
 int audit_summary(const game_driver *gamedrv, int count, const audit_record *records, int output)
 {
 	int overall_status = CORRECT;
-	int notfound = 0;
 	int recnum;
 
 	/* no count AND no records means not found, no count only means no ROMs required (= correct) */
 	if (count == 0 && records == NULL)
 		return NOTFOUND;
-        else if (count == 0)
-		return CORRECT;
 
 	/* loop over records */
 	for (recnum = 0; recnum < count; recnum++)
@@ -245,10 +242,6 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 		/* skip anything that's fine */
 		if (record->substatus == SUBSTATUS_GOOD)
 			continue;
-
-		/* count the number of missing items */
-		if (record->status == AUDIT_STATUS_NOT_FOUND)
-			notfound++;
 
 		/* output the game name, file name, and length (if applicable) */
 		if (output)
@@ -316,7 +309,7 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 		overall_status = MAX(overall_status, best_new_status);
 	}
 
-	return (notfound == count) ? NOTFOUND : overall_status;
+	return overall_status;
 }
 
 
@@ -444,7 +437,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 	}
 
 	/* return TRUE if we found anything at all */
-	return (drv != NULL);
+	return( record->status != AUDIT_STATUS_NOT_FOUND || record->substatus == SUBSTATUS_NOT_FOUND_NODUMP || record->substatus == SUBSTATUS_NOT_FOUND_OPTIONAL );
 }
 
 
