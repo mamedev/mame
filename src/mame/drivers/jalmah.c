@@ -101,6 +101,10 @@ CPU:    68000-8
 Sound:  M6295
 OSC:    12.000MHz
         4.000MHz
+
+
+2009-04: Verified DipLocations and Default settings with manual (thanks to Uki)
+
 *******************************************************************************************/
 
 #include "driver.h"
@@ -980,57 +984,9 @@ static INPUT_PORTS_START( common )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
 
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )    // Coin2 is always 1C/1C.
-	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
+static INPUT_PORTS_START( ctrl_mj1 )
 	PORT_START("KEY0")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
@@ -1062,12 +1018,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0xe1e1, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( jalmah )
-	PORT_INCLUDE( common )
-
-	PORT_MODIFY("SYSTEM")
-	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
-
+static INPUT_PORTS_START( ctrl_mj2 )
 	PORT_START("KEY3")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
@@ -1099,68 +1050,225 @@ static INPUT_PORTS_START( jalmah )
 	PORT_BIT( 0xe1e1, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( jalmah2 )
+static INPUT_PORTS_START( urashima )
 	PORT_INCLUDE( common )
+	PORT_INCLUDE( ctrl_mj1 )
+	PORT_INCLUDE( ctrl_mj2 )
 
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_MODIFY("SYSTEM")
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:8,7,6")
+	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,4")
+	PORT_DIPSETTING(      0x0018, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Harder ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Display Tenpai/Noten" ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0020, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Pinfu with Tsumo" ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )
-
-	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop?")	PORT_CODE(KEYCODE_2) //? seems a button,affects continue countdown
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( jalmah2a )
-	PORT_INCLUDE( common )
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0300, 0x0300, "Number of Chips (Start - Continue)" ) PORT_DIPLOCATION("SW1:8,7")
+	PORT_DIPSETTING(      0x0300, "1 - 1" )
+	PORT_DIPSETTING(      0x0200, "1 - 2" )
+	PORT_DIPSETTING(      0x0100, "2 - 1" )
+	PORT_DIPSETTING(      0x0000, "2 - 2" )
+	PORT_DIPNAME( 0x0c00, 0x0c00, "Number of Players" ) PORT_DIPLOCATION("SW1:6,5")
+	PORT_DIPSETTING(      0x0800, "0" )
+	PORT_DIPSETTING(      0x0c00, "1" )
+	PORT_DIPSETTING(      0x0400, "2" )
+	PORT_DIPSETTING(      0x0000, "4" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Chip Added After Win" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(      0x1000, "Less" )
+	PORT_DIPSETTING(      0x0000, "More" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:3" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:2" )	// Unused according to the manual
+	/* SW1:1 should be Service Mode, but it does not work */
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( daireika )
+	PORT_INCLUDE( common )
+	PORT_INCLUDE( ctrl_mj1 )
+	PORT_INCLUDE( ctrl_mj2 )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(      0x0018, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Harder ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )	// Unused according to the manual
+	PORT_DIPNAME( 0x0040, 0x0040, "Pinfu with Tsumo" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Yes ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )	// Unused according to the manual
+	PORT_DIPNAME( 0x0300, 0x0300, "Number of Chips (Start - Continue)" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(      0x0300, "1 - 1" )
+	PORT_DIPSETTING(      0x0200, "1 - 2" )
+	PORT_DIPSETTING(      0x0100, "2 - 1" )
+	PORT_DIPSETTING(      0x0000, "2 - 2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW1:4" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )	// Unused according to the manual
+	/* SW1:8 should be "Switch Control Panel" off: no - on : yes
+	but I see no effect on the controls */
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mjzoomin )
+	PORT_INCLUDE( daireika )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPSETTING(      0x0010, "0 (Easy)" )
+	PORT_DIPSETTING(      0x0008, "1 (Easier)" )
+	PORT_DIPSETTING(      0x0000, "2 (Easiest)" )
+	PORT_DIPSETTING(      0x0038, "3 (Normal)" )
+	PORT_DIPSETTING(      0x0030, "4 (Little Hard)" )
+	PORT_DIPSETTING(      0x0028, "5 (Hard)" )
+	PORT_DIPSETTING(      0x0020, "6 (Harder)" )
+	PORT_DIPSETTING(      0x0018, "7 (Hardest)" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0300, 0x0300, "Start Score Type" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(      0x0300, "1" )
+	PORT_DIPSETTING(      0x0200, "2" )
+	PORT_DIPSETTING(      0x0100, "3" )
+	PORT_DIPSETTING(      0x0000, "4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW1:4" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )	// Unused according to the manual
+	PORT_DIPNAME( 0x2000, 0x2000, "Item Availability" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( High ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )	// Unused according to the manual
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( kakumei )
+	PORT_INCLUDE( common )
+	PORT_INCLUDE( ctrl_mj1 )
 
 	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop?")	PORT_CODE(KEYCODE_2) //? seems a button,affects continue countdown
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )	// Unused according to the manual
+	PORT_SERVICE_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW2:5" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )	// Unused according to the manual
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )	// Free Play according to the manual
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(      0x1800, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW1:8" )	// Unused according to the manual
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( kakumei2 )
+	PORT_INCLUDE( common )
+	PORT_INCLUDE( ctrl_mj1 )
+
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop?")	PORT_CODE(KEYCODE_2) //? seems a button,affects continue countdown
+
+	PORT_START("DSW")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW2:2" )	// Unused according to the manual
+	PORT_SERVICE_DIPLOC( 0x0004, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW2:4" )	// Unused according to the manual
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")	// Should default to OFF according to manual
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW2:6" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW2:7" )	// Unused according to the manual
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW2:8" )	// Unused according to the manual
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, "1 Coin / 99 Credits" )	// Free Play according to the manual
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )	// Unused according to the manual
+	PORT_DIPNAME( 0x4000, 0x4000, "Pinfu with Tsumo" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( suchipi )
+	PORT_INCLUDE( kakumei2 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(      0x1800, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Campaign Mode" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -2256,10 +2364,10 @@ static DRIVER_INIT( suchipi )
 }
 
 /*First version of the MCU*/
-GAME( 1989, urashima, 0, urashima,	jalmah,  	urashima, ROT0, "UPL",	      	"Otogizoushi Urashima Mahjong",			GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1989, daireika, 0, jalmah,	jalmah,  	daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai",					GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1990, mjzoomin, 0, jalmah,	jalmah,  	mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In",				GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, urashima, 0, urashima,  urashima,   urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong",         GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, daireika, 0, jalmah,    daireika,   daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai",                    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1990, mjzoomin, 0, jalmah,    mjzoomin,   mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In",              GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 /*Second version of the MCU*/
-GAME( 1990, kakumei,  0, jalmah,	jalmah2, 	kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei",						GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, kakumei2, 0, jalmah,	jalmah2a,	kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League",	GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, suchipi,  0, jalmah,	jalmah2a,	suchipi,  ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special",		GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, kakumei,  0, jalmah,    kakumei,    kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei",                      GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, kakumei2, 0, jalmah,    kakumei2,   kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League",  GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, suchipi,  0, jalmah,    suchipi,    suchipi,  ROT0, "Jaleco",       "Idol Janshi Suchie-Pai Special",       GAME_IMPERFECT_GRAPHICS )
