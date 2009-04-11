@@ -24,6 +24,8 @@ TODO:
 -daireika: the ranking screen on the original pcb shows some hearts instead of the "0".
  Some investigation indicates that the game reads area "fe100" onwards for these to be filled.
  These are likely to be provided by one of the mcu snippets...
+-kakumei/kakumei2:has weird text layer strings in test mode (like "#p control panel"),
+ unsure if this one is somehow related to the above daireika bug, it's a BTANB or something else.
 -Check if urashima has a "mode 3" for the layer 0 tilemap;
 -Complete the dip-switches for all the games;
 -There could be timing issues caused by MCU simulation at $80004;
@@ -611,6 +613,7 @@ static UINT8 mcu_prg;
 #define SUCHIPI_MCU  (0x23)
 
 static int respcount;
+static UINT8 test_mode;
 
 #define MCU_READ(tag, _bit_, _offset_, _retval_) \
 if((0xffff - input_port_read(machine, tag)) & _bit_) { jm_shared_ram[_offset_] = _retval_; }
@@ -660,7 +663,7 @@ static void daireika_mcu_run(running_machine *machine)
 		daireika_palette_dma(machine,((jm_shared_ram[0x540/2] & 0x0f00) >> 8));
 	}
 
-	if((0xffff - input_port_read(machine, "SYSTEM")) & 0x0008)	//service_mode
+	if(test_mode)	//service_mode
 	{
 		jm_shared_ram[0x000/2] = input_port_read(machine, "KEY0");
 		jm_shared_ram[0x002/2] = input_port_read(machine, "KEY1");
@@ -703,7 +706,7 @@ static void mjzoomin_mcu_run(running_machine *machine)
 {
 	static UINT16 prg_prot;
 
-	if((0xffff - input_port_read(machine, "SYSTEM")) & 0x0008)	//service_mode
+	if(test_mode)	//service_mode
 	{
 		jm_shared_ram[0x000/2] = input_port_read(machine, "KEY0");
 		jm_shared_ram[0x002/2] = input_port_read(machine, "KEY1");
@@ -747,7 +750,7 @@ static void urashima_mcu_run(running_machine *machine)
 {
 	static UINT16 prg_prot;
 
-	if((0xffff - input_port_read(machine, "SYSTEM")) & 0x0008)	//service_mode
+	if(test_mode)	//service_mode
 	{
 		jm_shared_ram[0x300/2] = input_port_read(machine, "KEY0");
 		jm_shared_ram[0x302/2] = input_port_read(machine, "KEY1");
@@ -789,7 +792,7 @@ static void urashima_mcu_run(running_machine *machine)
 
 static void second_mcu_run(running_machine *machine)
 {
-	if((0xffff - input_port_read(machine, "DSW")) & 0x0004)	//service_mode
+	if(test_mode)	//service_mode
 	{
 		jm_shared_ram[0x200/2] = input_port_read(machine, "KEY0");
 		jm_shared_ram[0x202/2] = input_port_read(machine, "KEY1");
@@ -942,48 +945,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
 	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ctrl_mj1 )
@@ -1097,8 +1063,7 @@ static INPUT_PORTS_START( urashima )
 	PORT_DIPSETTING(      0x0000, "More" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:3" )	// Unused according to the manual
 	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:2" )	// Unused according to the manual
-	/* SW1:1 should be Service Mode, but it does not work */
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1141,8 +1106,7 @@ static INPUT_PORTS_START( daireika )
 	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )	// Unused according to the manual
 	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW1:6" )	// Unused according to the manual
 	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )	// Unused according to the manual
-	/* SW1:8 should be "Switch Control Panel" off: no - on : yes
-	but I see no effect on the controls */
+	/* SW1:8 should be "Switch Control Panel" off: no - on : yes -> likely to be controlled by the MCU. */
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -1184,7 +1148,7 @@ static INPUT_PORTS_START( kakumei )
 	PORT_INCLUDE( ctrl_mj1 )
 
 	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop?")	PORT_CODE(KEYCODE_2) //? seems a button,affects continue countdown
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop")	PORT_CODE(KEYCODE_2)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:1")
@@ -1221,7 +1185,7 @@ static INPUT_PORTS_START( kakumei2 )
 	PORT_INCLUDE( ctrl_mj1 )
 
 	PORT_MODIFY("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop?")	PORT_CODE(KEYCODE_2) //? seems a button,affects continue countdown
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_NAME("P1 Mahjong Flip Flop")	PORT_CODE(KEYCODE_2)
 
 	PORT_START("DSW")
 	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW2:1" )	// Unused according to the manual
@@ -1313,6 +1277,22 @@ GFXDECODE_END
 static MACHINE_RESET ( jalmah )
 {
 	respcount = 0;
+	/*check if we are into service or normal mode*/
+	switch(mcu_prg)
+	{
+		case MJZOOMIN_MCU:
+		case DAIREIKA_MCU:
+			test_mode = (~(input_port_read(machine, "SYSTEM")) & 0x0008) ? (1) : (0);
+			break;
+		case URASHIMA_MCU:
+			test_mode = ((~(input_port_read(machine, "SYSTEM")) & 0x0008) || (~(input_port_read(machine, "DSW")) & 0x8000)) ? (1) : (0);
+			break;
+		case KAKUMEI_MCU:
+		case KAKUMEI2_MCU:
+		case SUCHIPI_MCU:
+			test_mode = (~(input_port_read(machine, "DSW")) & 0x0004) ? (1) : (0);
+			break;
+	}
 }
 
 static MACHINE_DRIVER_START( jalmah )
