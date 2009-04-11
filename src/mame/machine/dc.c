@@ -833,6 +833,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			device_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
 			g1bus_regs[SB_GDST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
+			dc_update_interrupt_status(space->machine);
 		}
 		break;
 	}
@@ -930,6 +931,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				wave_dma.flag = (wave_dma.indirect & 1) ? 1 : 0;
 				wave_dma.start = g2bus_regs[SB_ADST] = 0;
 				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
+				dc_update_interrupt_status(space->machine);
 			}
 			break;
 	}

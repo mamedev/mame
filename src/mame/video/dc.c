@@ -175,7 +175,6 @@ WRITE64_HANDLER( pvr_ctrl_w )
 			/*We need to know where this is actually used on Naomi, for testing purpose.*/
 			if(pvr_dma.start) { printf("Warning: PVR-DMA start\n"); }
 
-			/*TODO: use the ddt function.*/
 			if(pvr_dma.flag && pvr_dma.start)
 			{
 				UINT32 src,dst,size;
@@ -206,6 +205,7 @@ WRITE64_HANDLER( pvr_ctrl_w )
 				/*Note: do not update the params, since this DMA type doesn't support it. */
 
 				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
+				dc_update_interrupt_status(space->machine);
 			}
 			break;
 	}
@@ -1383,7 +1383,7 @@ static TIMER_CALLBACK(hbin)
 	dc_update_interrupt_status(machine);
 
 //	printf("hbin on scanline %d\n",scanline);
-	
+
 	scanline++;
 
 	timer_adjust_oneshot(hbin_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 640), 0);
@@ -1394,7 +1394,7 @@ static TIMER_CALLBACK(hbin)
 static TIMER_CALLBACK(endofrender_video)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
-	dc_update_interrupt_status(machine);	
+	dc_update_interrupt_status(machine);
 	timer_adjust_oneshot(endofrender_timer_video, attotime_never, 0);
 }
 
@@ -1404,7 +1404,7 @@ static TIMER_CALLBACK(endofrender_tsp)
 	dc_update_interrupt_status(machine);
 
 	timer_adjust_oneshot(endofrender_timer_tsp, attotime_never, 0);
-	timer_adjust_oneshot(endofrender_timer_video, ATTOTIME_IN_USEC(500) , 0); 
+	timer_adjust_oneshot(endofrender_timer_video, ATTOTIME_IN_USEC(500) , 0);
 }
 
 static TIMER_CALLBACK(endofrender_isp)
@@ -1413,7 +1413,7 @@ static TIMER_CALLBACK(endofrender_isp)
 	dc_update_interrupt_status(machine);
 
 	timer_adjust_oneshot(endofrender_timer_isp, attotime_never, 0);
-	timer_adjust_oneshot(endofrender_timer_tsp, ATTOTIME_IN_USEC(500) , 0); 
+	timer_adjust_oneshot(endofrender_timer_tsp, ATTOTIME_IN_USEC(500) , 0);
 }
 
 
