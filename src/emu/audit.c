@@ -240,7 +240,10 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 		const audit_record *record = &records[recnum];
 
 		if (record->status != AUDIT_STATUS_NOT_FOUND)
-			anyfound = 1;
+		{
+			if (!record->used_by_parent)
+				anyfound = 1;
+		}
 		else if (record->substatus != SUBSTATUS_NOT_FOUND_NODUMP && record->substatus != SUBSTATUS_NOT_FOUND_OPTIONAL)
 			required = 1;
 	}
@@ -340,6 +343,7 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 static int audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record)
 {
 	const game_driver *drv;
+	const game_driver *parent;
 	UINT32 crc = 0;
 	UINT8 crcs[4];
 	int has_crc;
@@ -350,6 +354,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 	record->exphash = ROM_GETHASHDATA(rom);
 	record->length = 0;
 	record->explength = rom_file_size(rom);
+	record->used_by_parent = rom_used_by_parent(gamedrv, rom, &parent);
 
 	/* see if we have a CRC and extract it if so */
 	has_crc = hash_data_extract_binary_checksum(record->exphash, HASH_CRC, crcs);
@@ -408,8 +413,6 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 	/* if we failed to find the file, set the appropriate status */
 	if (record->length == 0)
 	{
-		const game_driver *parent;
-
 		/* no good dump */
 		if (hash_data_has_info(record->exphash, HASH_INFO_NO_DUMP))
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_NODUMP);
@@ -419,7 +422,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_OPTIONAL);
 
 		/* not found and used by parent */
-		else if (rom_used_by_parent(gamedrv, rom, &parent))
+		else if (record->used_by_parent)
 			set_status(record, AUDIT_STATUS_NOT_FOUND, (parent->flags & GAME_IS_BIOS_ROOT) ? SUBSTATUS_NOT_FOUND_BIOS : SUBSTATUS_NOT_FOUND_PARENT);
 
 		/* just plain old not found */
