@@ -1235,10 +1235,22 @@ static void registers_view_recompute(debug_view *view)
 	maxvallen = MAX(maxvallen, regdata->reg[view->total.y].vallen);
 	view->total.y++;
 
-	/* add a flags entry: flags:xxxxxxxx */
+	/* add a beam entry: frame:123456 */
 	regdata->reg[view->total.y].lastval  =
 	regdata->reg[view->total.y].currval  = 0;
 	regdata->reg[view->total.y].regnum   = MAX_REGS + 4;
+	regdata->reg[view->total.y].tagstart = 0;
+	regdata->reg[view->total.y].taglen   = 5;
+	regdata->reg[view->total.y].valstart = 6;
+	regdata->reg[view->total.y].vallen   = 6;
+	maxtaglen = MAX(maxtaglen, regdata->reg[view->total.y].taglen);
+	maxvallen = MAX(maxvallen, regdata->reg[view->total.y].vallen);
+	view->total.y++;
+
+	/* add a flags entry: flags:xxxxxxxx */
+	regdata->reg[view->total.y].lastval  =
+	regdata->reg[view->total.y].currval  = 0;
+	regdata->reg[view->total.y].regnum   = MAX_REGS + 5;
 	regdata->reg[view->total.y].tagstart = 0;
 	regdata->reg[view->total.y].taglen   = 5;
 	regdata->reg[view->total.y].valstart = 6;
@@ -1355,6 +1367,10 @@ static void registers_view_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 4:
+						sprintf(dummy, "frame:%-6d", (UINT32)video_screen_get_frame_number(screen));
+						break;
+
+					case MAX_REGS + 5:
 						sprintf(dummy, "flags:%s", cpu_get_flags_string(regdata->device));
 						break;
 				}
