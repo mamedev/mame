@@ -228,9 +228,24 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
 {
 	int overall_status = CORRECT;
 	int recnum;
+	int anyfound = 0;
+	int required = 0;
 
-	/* no count AND no records means not found, no count only means no ROMs required (= correct) */
+	/* no count AND no records means not found */
 	if (count == 0 && records == NULL)
+		return NOTFOUND;
+
+	for (recnum = 0; recnum < count; recnum++)
+	{
+		const audit_record *record = &records[recnum];
+
+		if (record->status != AUDIT_STATUS_NOT_FOUND)
+			anyfound = 1;
+		else if (record->substatus != SUBSTATUS_NOT_FOUND_NODUMP && record->substatus != SUBSTATUS_NOT_FOUND_OPTIONAL)
+			required = 1;
+	}
+
+	if (!anyfound && required)
 		return NOTFOUND;
 
 	/* loop over records */
