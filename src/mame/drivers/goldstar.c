@@ -4686,6 +4686,7 @@ static MACHINE_DRIVER_START( kkojnoli )
 	//MDRV_CPU_IO_MAP(goldstar_readport,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
+
 	/* 3x 8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", kkojnoli_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", kkojnoli_ppi8255_intf[1] )
@@ -5696,6 +5697,36 @@ ROM_START( ladylinr )
 	ROM_REGION( 0x40, "unkprom2", 0 )
 	ROM_LOAD( "am27s19pc.73",	0x0000, 0x0020, CRC(b48d0b41) SHA1(01d2d0fd5e79c17043e97146001150b4b32ac86c) )
 ROM_END
+
+ROM_START( wcat3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wcat3.u5",	0x0000, 0x10000, CRC(bf21cde5) SHA1(b501ba8ea815e3b19b26196f6fd48243892278eb) )
+
+	ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "wcat3.h7",	0x10000, 0x8000, CRC(065cb575) SHA1(4dd49773c4caeaa489342e61f26c8eaaae876edc) )
+	ROM_LOAD( "wcat3.h8",	0x08000, 0x8000, CRC(60463213) SHA1(b0937b4a55f74831ce9a06f3df0af504845f908d) )
+	ROM_LOAD( "wcat3.h10",	0x00000, 0x8000, CRC(dda38c26) SHA1(4b9292911133dd6067a1c61a44845e824e88a52d) )
+
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "wcat3.h1",	0x6000, 0x2000, CRC(0509d556) SHA1(c2f46d279f45b544c67b0c966659cc6d5d53c22f) )
+	ROM_LOAD( "wcat3.h2",	0x4000, 0x2000, CRC(d50f3d62) SHA1(8500c7f3a2f51ea0ed7e142ecdc4e669ba3e7065) )
+	ROM_LOAD( "wcat3.h4",	0x2000, 0x2000, CRC(373d9949) SHA1(ff483505fb9e86411acad7059bf5434dde290946) )
+	ROM_LOAD( "wcat3.h5",	0x0000, 0x2000, CRC(50febe3b) SHA1(0479bcee53b174aa0413951e283e446b09a6f156) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "wcat3.g13",	0x0000, 0x0100, CRC(c29a36f2) SHA1(936b07a195f6e7f6a884bd35f442003cf67aa447) )
+	ROM_LOAD( "wcat3.g14",	0x0100, 0x0100, CRC(dcd53d2c) SHA1(bbcb4266117c3cd1c8ef0e5046d3558c8293313a) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "wcat3.d12",	0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "wcat3.f3",	0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x40, "unkprom2", 0 )
+	ROM_LOAD( "wcat3.d13",	0x0000, 0x0020, CRC(eab832ed) SHA1(0fbc8914ba1805cfc6698fe7f137a934e63a4f89) )
+ROM_END
+
 
 /*
 
@@ -7508,6 +7539,7 @@ GAME( 1989, lucky8,    0,        lucky8,   lucky8,   0,         ROT0, "Wing Co.L
 GAME( 1989, lucky8a,   lucky8,   lucky8,   lucky8a,  lucky8a,   ROT0, "Wing Co.Ltd / GEI", "New Lucky 8 Lines (set 2)",                   0 )
 GAME( 198?, ladylinr,  0,        ladylinr, ladylinr, 0,         ROT0, "TAB Austria",       "Lady Liner",                                  0 )
 GAME( 198?, kkojnoli,  0,        kkojnoli, kkojnoli, 0,         ROT0, "south korean hack", "Kkoj Noli (Kill the Bees)",                   GAME_IMPERFECT_COLORS )
+GAME( 198?, wcat3,     0,        kkojnoli, kkojnoli, 0,         ROT0, "bootleg?", "Wild Cat 3",GAME_NOT_WORKING )
 
 GAME( 198?, mtonic,    0,        ncb3,     cmv801,   mtonic,         ROT0, "Tonic",             "Magical Tonic?",                              GAME_WRONG_COLORS | GAME_NOT_WORKING )
 

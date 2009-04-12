@@ -9019,6 +9019,7 @@ Other Sun games
 
 	DRIVER( ladylinr )	/* (c) 198? TAB Austria */
 	DRIVER( kkojnoli )	/* 198? south korean hack */
+	DRIVER( wcat3 )
 	DRIVER( mtonic )	/* 198? (c) Tonic */
 
 	DRIVER( sfbonus )	/* (c) 199? Amcoe */
