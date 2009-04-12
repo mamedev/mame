@@ -65,10 +65,6 @@ static ADDRESS_MAP_START( roul_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xff) AM_WRITE(testfx_w)
@@ -76,6 +72,11 @@ static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf8, 0xf8) AM_READ(testf8_r)
 	AM_RANGE(0xfa, 0xfa) AM_READ(testfa_r)
 	AM_RANGE(0xfd, 0xfd) AM_READ(testfd_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
 static VIDEO_START(roul)
@@ -93,10 +94,12 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( roul )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
+	MDRV_CPU_ADD("maincpu", Z80, 1000000)
 	MDRV_CPU_PROGRAM_MAP(roul_map, 0)
 	MDRV_CPU_IO_MAP(roul_cpu_io_map,0)
-	MDRV_CPU_ADD("soundcpu", Z80, 1000000) /* Z80? */
+	MDRV_CPU_VBLANK_INT("screen",nmi_line_pulse)
+
+	MDRV_CPU_ADD("soundcpu", Z80, 1000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
  	/* video hardware */
@@ -117,8 +120,9 @@ ROM_START(roul)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("roul.u19",	0x0000, 0x8000, CRC(1ec37876) SHA1(c2877646dad9daebc55db57d513ad448b1f4c923) )
 
-	ROM_REGION( 0x2000, "soundcpu", 0 )
-	ROM_LOAD("roul.u12",	0x0000, 0x2000, CRC(356fe025) SHA1(bca69e090a852454e921130afbdd28021b62c44e) )
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD("roul.u12",	0x0000, 0x1000, CRC(356fe025) SHA1(bca69e090a852454e921130afbdd28021b62c44e) )
+	ROM_CONTINUE(0x0000,0x1000)
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "roul.u38",	0x0000, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
