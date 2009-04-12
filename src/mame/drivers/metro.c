@@ -2028,7 +2028,7 @@ ADDRESS_MAP_END
 static WRITE16_DEVICE_HANDLER( mouja_sound_rombank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		okim6295_set_bank_base(device, ((data >> 3) & 0x07) * 0x40000);
+		okim6295_set_bank_base(devtag_get_device(device->machine, "oki"), ((data >> 3) & 0x07) * 0x40000);
 }
 
 static ADDRESS_MAP_START( mouja_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2072,9 +2072,8 @@ static ADDRESS_MAP_START( mouja_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478888, 0x478889) AM_WRITENOP								// ??
 	AM_RANGE(0x479700, 0x479713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ym", ym2413_w, 0x00ff)
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("oki", mouja_sound_rombank_w			)
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff  		)
-
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("oki", mouja_sound_rombank_w)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
 #if 0
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs	)	// Tiles Blitter
 	AM_RANGE(0x47883a, 0x47883b) AM_WRITE(SMH_RAM) AM_BASE(&metro_rombank		)	// Rom Bank
