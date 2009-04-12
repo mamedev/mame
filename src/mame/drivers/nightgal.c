@@ -20,6 +20,7 @@ TODO:
 #include "sound/2203intf.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
+#include "video/resnet.h"
 
 #define MASTER_CLOCK	XTAL_19_968MHz
 
@@ -90,7 +91,7 @@ static void plot_nightgal_gfx_pixel(UINT8 pix, int x, int y)
 	}
 }
 
-static WRITE8_HANDLER(nsc_true_blitter_w )
+static WRITE8_HANDLER( nsc_true_blitter_w )
 {
 	static UINT8 true_blit[7];
 
@@ -142,6 +143,7 @@ static WRITE8_HANDLER(nsc_true_blitter_w )
 	}
 }
 
+/* different register writes (probably a PAL line swapping).*/
 static WRITE8_HANDLER( sexygal_nsc_true_blitter_w )
 {
 	static UINT8 true_blit[7];
@@ -196,28 +198,43 @@ static WRITE8_HANDLER( sexygal_nsc_true_blitter_w )
 	}
 }
 
+/* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 static PALETTE_INIT( nightgal )
 {
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double weights_rg[3], weights_b[2];
+	int i;
 
-	for (i = 0; i < 0x10; ++i)
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0,	255, -1.0,
+			3, resistances_rg, weights_rg, 0, 0,
+			2, resistances_b,  weights_b,  0, 0,
+			0, 0, 0, 0, 0);
+
+	for (i = 0;i < machine->config->total_colors; i++)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		int bit0, bit1, bit2;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
-		color_prom++;
 	}
 }
 
@@ -1016,4 +1033,4 @@ GAME( 1984, royalngt, ngtbunny,nightgal, sexygal,  0, ROT0,"Royal Denshi", "Roya
 GAME( 1985, sexygal,  0,       sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Sexy Gal (Japan 850501 SXG 1-00)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 GAME( 1985, sweetgal, sexygal, sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Sweet Gal (Japan 850510 SWG 1-02)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 /* Type 3 HW*/
-GAME( 1985, ngalsumr, 0,       sexygal,  sexygal,  0, ROT0,"Nichibutsu", "Night Gal Summer", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 1985, ngalsumr, 0,       nightgal, sexygal,  0, ROT0,"Nichibutsu", "Night Gal Summer", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
