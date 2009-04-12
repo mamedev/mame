@@ -1931,6 +1931,7 @@ src/mame/drivers/rohga.c svneol=native#text/plain
 src/mame/drivers/rollerg.c svneol=native#text/plain
 src/mame/drivers/rollrace.c svneol=native#text/plain
 src/mame/drivers/rotaryf.c svneol=native#text/plain
+src/mame/drivers/roul.c svneol=native#text/plain
 src/mame/drivers/route16.c svneol=native#text/plain
 src/mame/drivers/royalmah.c svneol=native#text/plain
 src/mame/drivers/rpunch.c svneol=native#text/plain

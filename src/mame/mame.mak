@@ -1610,6 +1610,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/cb2001.o \
 	$(DRIVERS)/sfbonus.o \
 	$(DRIVERS)/multfish.o \
+	$(DRIVERS)/roul.o \
 
 #-------------------------------------------------
 # layout dependencies

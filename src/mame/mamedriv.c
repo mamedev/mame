@@ -9394,4 +9394,6 @@ Other Sun games
 	/* MPU5 */
 	DRIVER( m_honmon )
 
+	DRIVER( roul )	
+
 #endif	/* DRIVER_RECURSIVE */
