@@ -122,31 +122,60 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int scroll = mnchmobl_vreg[6];
-	int flags = mnchmobl_vreg[7];					/*   XB?????? */
-	int xadjust = - 128-16 - ((flags&0x80)?1:0);
-	int bank = (flags&0x40)?1:0;
-	const gfx_element *gfx = machine->gfx[2+bank];
-	int color_base = mnchmobl_palette_bank*4+3;
-	int i;
-	for( i=0; i<0x200; i++ )
+	int flags = mnchmobl_vreg[7];							/*   XB?????? */
+	int xadjust = - 128 - 16 - ((flags & 0x80) ? 1 : 0);
+	int bank = (flags & 0x40) ? 1 : 0;
+	const gfx_element *gfx = machine->gfx[2 + bank];
+	int color_base = mnchmobl_palette_bank * 4 + 3;
+	int i, j;
+	int firstsprite = mnchmobl_vreg[4] & 0x3f;
+	for( i = firstsprite; i < 0x40; i++ )
 	{
-		int tile_number = mnchmobl_sprite_tile[i];	/*   ETTTTTTT */
-		int attributes = mnchmobl_sprite_attr[i];	/*   XYYYYYCC */
-		int sx = mnchmobl_sprite_xpos[i];			/*   XXXXXXX? */
-		int sy = (i/0x40)*0x20;						/* Y YY------ */
-		sy += (attributes>>2)&0x1f;
-		if( tile_number != 0xff && (attributes&0x80) )
+		for( j = 0; j < 8; j++ )
 		{
-			sx = (sx>>1) | (tile_number&0x80);
-			sx = 2*((-32-scroll - sx)&0xff)+xadjust;
-			drawgfx( bitmap, gfx,
-				0x7f - (tile_number&0x7f),
-				color_base-(attributes&0x03),
-				0,0, /* no flip */
-				sx,sy,
-				cliprect, TRANSPARENCY_PEN, 7 );
+			int ii = (j << 6) | i;
+			int tile_number = mnchmobl_sprite_tile[ii];		/*   ETTTTTTT */
+			int attributes = mnchmobl_sprite_attr[ii];		/*   XYYYYYCC */
+			int sx = mnchmobl_sprite_xpos[ii];				/*   XXXXXXX? */
+			int sy = (ii >> 6) << 5;					/* Y YY------ */
+			sy += (attributes >> 2) & 0x1f;
+			if( tile_number != 0xff && (attributes & 0x80) )
+			{
+				sx = (sx >> 1) | (tile_number & 0x80);
+				sx = 2 * ((- 32 - scroll - sx) & 0xff) + xadjust;
+				drawgfx( bitmap, gfx,
+					0x7f - (tile_number & 0x7f),
+					color_base - (attributes & 0x03),
+					0,0, 							/* no flip */
+					sx,sy,
+					cliprect, TRANSPARENCY_PEN, 7 );
+			}
 		}
 	}
+	if (firstsprite != 0)
+		for( i = 0; i < firstsprite; i++ )
+		{
+			for( j = 0; j < 8; j++ )
+			{
+				int ii = (j << 6) | i;
+				int tile_number = mnchmobl_sprite_tile[ii];	/*   ETTTTTTT */
+				int attributes = mnchmobl_sprite_attr[ii];	/*   XYYYYYCC */
+				int sx = mnchmobl_sprite_xpos[ii];			/*   XXXXXXX? */
+				int sy = (ii >> 6) << 5;				/* Y YY------ */
+				sy += (attributes >> 2) & 0x1f;
+				if( tile_number != 0xff && (attributes & 0x80) )
+				{
+					sx = (sx >> 1) | (tile_number & 0x80);
+					sx = 2 * ((- 32 - scroll - sx) & 0xff) + xadjust;
+					drawgfx( bitmap, gfx,
+						0x7f - (tile_number & 0x7f),
+						color_base - (attributes & 0x03),
+						0,0, 						/* no flip */
+						sx,sy,
+						cliprect, TRANSPARENCY_PEN, 7 );
+				}
+			}
+		}
 }
 
 VIDEO_UPDATE( mnchmobl )
