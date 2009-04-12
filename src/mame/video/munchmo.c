@@ -139,7 +139,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			int sx = mnchmobl_sprite_xpos[ii];				/*   XXXXXXX? */
 			int sy = (ii >> 6) << 5;					/* Y YY------ */
 			sy += (attributes >> 2) & 0x1f;
-			if( tile_number != 0xff && (attributes & 0x80) )
+			if( attributes & 0x80 )
 			{
 				sx = (sx >> 1) | (tile_number & 0x80);
 				sx = 2 * ((- 32 - scroll - sx) & 0xff) + xadjust;
@@ -163,7 +163,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				int sx = mnchmobl_sprite_xpos[ii];			/*   XXXXXXX? */
 				int sy = (ii >> 6) << 5;				/* Y YY------ */
 				sy += (attributes >> 2) & 0x1f;
-				if( tile_number != 0xff && (attributes & 0x80) )
+				if( attributes & 0x80 )
 				{
 					sx = (sx >> 1) | (tile_number & 0x80);
 					sx = 2 * ((- 32 - scroll - sx) & 0xff) + xadjust;

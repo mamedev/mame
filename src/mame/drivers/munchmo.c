@@ -7,7 +7,6 @@
   15 MHz crystal
 
   Known Issues:
-    - sprite priority problems
     - it's unclear if mirroring the videoram chunks is correct behavior
     - several unmapped registers
     - sustained sounds (when there should be silence)
