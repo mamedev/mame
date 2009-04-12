@@ -3892,22 +3892,22 @@ GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",  
 GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",           "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0003
 GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom / SNK",     "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0005
+//GDL-0005 Doki Doki Idol Star Seeker
 GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",           "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0007 Capcom vs. SNK 2
+//GDL-0007 Capcom vs SNK 2
 GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi, naomigd,	 ROT0,   "Capcom / SNK",     "Capcom vs SNK 2 Millionaire Fighting 2001 (Rev A) (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0008
+//GDL-0008 Capcom vs SNK 2 Mark Of The Millenium 2001 (Export)
 //GDL-0009
 GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Treasure",         "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, ggxx,      naomigd,  naomigd,  naomi, ggxx,      ROT0,   "Arc System Works", "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0012
+//GDL-0012 Cleopatra Fortune Plus
 GAME( 2002, moeru,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Altron",   		 "Moeru Casinyo (GDL-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0014
 GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0015
 //GDL-0016
 GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Amedio (Taito license)", "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0018
+//GDL-0018 Azumanga Daioh Puzzle Bobble
 //GDL-0019 Guilty Gear XX #Reload
 GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works", "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, tetkiwam,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Success",          "Tetris Kiwamemichi (GDL-0020)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -3936,11 +3936,11 @@ GAME( 2005, undefeat,  naomigd,  naomigd,  naomi, naomigd,   ROT270, "G-Rev",   
 //GDL-0036 Trigger Heart Exelica
 GAME( 2005, trgheart,  naomigd,  naomigd,  naomi, naomigd,   ROT270, "Warashi",          "Trigger Heart Exelica (Rev A) (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, jingystm,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Atrativa Japan",   "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0038
+//GDL-0038 Senko No Ronde Special
 GAME( 2006, meltyb,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver B (GDL-0039)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2006, meltyba,   meltyb,   naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver B (Rev A) (GDL-0039A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2006, karous,    naomigd,  naomigd,  naomi, naomigd,   ROT270, "Milestone",        "Karous (GDL-0040)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0041
+//GDL-0041 Guilty Gear XX Accent Core
 GAME( 2006, takoron,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Compile",          "Noukone Puzzle Takoron (GDL-0042)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
@@ -3959,9 +3959,9 @@ GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",       
 //GDS-0012 Virtua Fighter 4 (NAOMI 2)
 //GDS-0013
 //GDS-0014 Beach Spikers (NAOMI 2)
-//GDS-0015 Virtua Tennis 2 / Power Smash 2
+//GDS-0015 Virtua Tennis 2 (Export)
 GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis 2 (Rev A) (GDS-0015A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDS-0016
+//GDS-0016 Shakka to Tambourine 2001 Power Up!
 GAME( 2001, keyboard,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "La Keyboardxyu (GDS-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vathlete,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -3976,13 +3976,13 @@ GAME( 2001, ngdup23c,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",       
 //GDS-0024 Virtua Fighter 4 Evolution (NAOMI 2)
 //GDS-0025 Initial D Arcade Stage (Export) (NAOMI 2)
 //GDS-0026 Initial D Arcade Stage Ver. 2 (Japan) (NAOMI 2)
-//GDS-0027
+//GDS-0027 Initial D Arcade Stage Ver. 2 (Export) (NAOMI 2)
 //GDS-0028
 //GDS-0029
 //GDS-0030
 GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0032 Initial D Arcade Stage Ver. 3 (Japan)
-//GDS-0033
+//GDS-0033 Initial D Arcade Stage Ver. 3 (Export)
 //GDS-0034
 //GDS-0035
 //GDS-0036 Virtua Fighter 4 Final Tuned
