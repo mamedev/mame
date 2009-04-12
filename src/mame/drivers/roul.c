@@ -65,6 +65,10 @@ static ADDRESS_MAP_START( roul_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xff) AM_WRITE(testfx_w)
@@ -92,6 +96,8 @@ static MACHINE_DRIVER_START( roul )
 	MDRV_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MDRV_CPU_PROGRAM_MAP(roul_map, 0)
 	MDRV_CPU_IO_MAP(roul_cpu_io_map,0)
+	MDRV_CPU_ADD("soundcpu", Z80, 1000000) /* Z80? */
+	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -110,6 +116,13 @@ MACHINE_DRIVER_END
 ROM_START(roul)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("roul.u19",	0x0000, 0x8000, CRC(1ec37876) SHA1(c2877646dad9daebc55db57d513ad448b1f4c923) )
+
+	ROM_REGION( 0x2000, "soundcpu", 0 )
+	ROM_LOAD("roul.u12",	0x0000, 0x2000, CRC(356fe025) SHA1(bca69e090a852454e921130afbdd28021b62c44e) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "roul.u38",	0x0000, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
+	ROM_LOAD( "roul.u53",	0x0020, 0x0020, CRC(1965dfaa) SHA1(114eccd3e478902ac7dbb10b9425784231ff581e) )
 ROM_END
 
 GAME( 1982, roul,  0,   roul, roul, 0, ROT0, "bootleg", "Super Lucky Roulette?", GAME_NOT_WORKING | GAME_NO_SOUND )
