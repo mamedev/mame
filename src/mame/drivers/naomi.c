@@ -3902,10 +3902,10 @@ GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Treasure",
 GAME( 2002, ggxx,      naomigd,  naomigd,  naomi, ggxx,      ROT0,   "Arc System Works", "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0012 Cleopatra Fortune Plus
 GAME( 2002, moeru,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Altron",   		 "Moeru Casinyo (GDL-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0014
+//GDL-0014 Musapey's Choco Marker
 GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0015
-//GDL-0016
+//GDL-0015 Mazan
+//GDL-0016 Yonin Uchi Mahjong MJ
 GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Amedio (Taito license)", "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0018 Azumanga Daioh Puzzle Bobble
 //GDL-0019 Guilty Gear XX #Reload
@@ -3918,11 +3918,11 @@ GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",   
 GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "G-Rev",            "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, cfield,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Able",             "Chaos Field (GDL-0025)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, trizeal,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Taito",            "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0027
-//GDL-0028  Melty Blood Act Cadenza
-//GDL-0028A Melty Blood Act Cadenza (Rev A)
-//GDL-0028B Melty Blood Act Cadenza (Rev B)
-GAME( 2005, meltybld,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza (Rev C) (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+//GDL-0027 Melty Blood Act Cadenza?
+//GDL-0028  Melty Blood Act Cadenza Ver A
+//GDL-0028A Melty Blood Act Cadenza Ver A (Rev A)
+//GDL-0028B Melty Blood Act Cadenza Ver A (Rev B)
+GAME( 2005, meltybld,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver A (Rev C) (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0029
 GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",            "Senko No Ronde NEW ver. (Rev A) (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, senkoo,    senko,    naomigd,  naomi, naomigd,   ROT0,   "G-Rev",            "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -3946,12 +3946,12 @@ GAME( 2006, takoron,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Compile", 
 
 /* GDS-xxxx (Sega first party games) */
 GAME( 2001, confmiss,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDS-0002
+//GDS-0002 Shakatto Tambourine
 GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, slashout,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0006 Virtua Striker 3 (NAOMI 2)
-//GDS-0007
+//GDS-0007 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
 GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, dygolf,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
@@ -3959,9 +3959,9 @@ GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",       
 //GDS-0012 Virtua Fighter 4 (NAOMI 2)
 //GDS-0013
 //GDS-0014 Beach Spikers (NAOMI 2)
-//GDS-0015 Virtua Tennis 2 (Export)
+//GDS-0015 Virtua Tennis 2 / Power Smash 2
 GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis 2 (Rev A) (GDS-0015A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDS-0016 Shakka to Tambourine 2001 Power Up!
+//GDS-0016 Shakatto Tambourine Cho Powerup Chu
 GAME( 2001, keyboard,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "La Keyboardxyu (GDS-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vathlete,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
