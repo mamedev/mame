@@ -413,7 +413,7 @@ WRITE64_HANDLER( dc_maple_w )
 							case 3:
 								ddtdata.length=1;
 								#if DEBUG_MAPLE
-								mame_printf_verbose("MAPLE: transfer command %d port %d\n", command, port);
+								printf("MAPLE: transfer command %x port %x\n", command, port);
 								#endif
 								break;
 							case 0x80: // get data and compute checksum
@@ -453,7 +453,7 @@ WRITE64_HANDLER( dc_maple_w )
 
 								subcommand = buff[0] & 0xff;
 								#if DEBUG_MAPLE
-								mame_printf_verbose("MAPLE: transfer command %d port %d subcommand %d\n", command, port, subcommand);
+								printf("MAPLE: transfer command %x port %x subcommand %x\n", command, port, subcommand);
 								#endif
 								if (subcommand == 3) // read data
 								{
@@ -485,7 +485,7 @@ WRITE64_HANDLER( dc_maple_w )
 									jvs_address = (buff[1] >> 16) & 0xff; // slave address
 									jvs_command = buff[2] & 0xff; // jvs command
 									#if DEBUG_MAPLE
-									mame_printf_verbose("MAPLE: sent jvs command %d\n", jvs_command);
+									printf("MAPLE: sent jvs command %x\n", jvs_command);
 									#endif
 									buff[1] = 0xe4e3e2e1;
 									ddtdata.length = 2;
@@ -703,7 +703,7 @@ WRITE64_HANDLER( dc_maple_w )
 								break;
 							default:
 								#if DEBUG_MAPLE
-								mame_printf_verbose("MAPLE: unknown transfer command %d port %d\n", command, port);
+								printf("MAPLE: unknown transfer command %x port %x\n", command, port);
 								#endif
 								ddtdata.length=1;
 								buff[0]=0xffffffff;
@@ -729,7 +729,7 @@ WRITE64_HANDLER( dc_maple_w )
 			else
 			{
 				#if DEBUG_MAPLE
-				mame_printf_verbose("MAPLE: hardware trigger not supported yet\n");
+				printf("MAPLE: hardware trigger not supported yet\n");
 				#endif
 			}
 		}
@@ -905,7 +905,6 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 				/* 0 rounding size = 32 Mbytes */
 				if(wave_dma.size == 0) { wave_dma.size = 0x200000; }
 
-				/* TODO: use the ddt function. */
 				if(wave_dma.dir == 0)
 				{
 					for(;size<wave_dma.size;size+=4)
