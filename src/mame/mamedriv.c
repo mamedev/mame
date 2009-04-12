@@ -590,7 +590,8 @@ const game_driver * const drivers[] =
 	DRIVER( trvmstr )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvmstra )	/* (c) 1985 Enerdyne Technologies Inc. */
 	DRIVER( trvmstrb )	/* (c) 1985 Enerdyne Technologies Inc. */
-	DRIVER( trvgns )	/* (c) 198? Enerdyne Technologies Inc. */
+	DRIVER( trvmstrc )	/* (c) 1985 Enerdyne Technologies Inc. */
+	DRIVER( trvgns )	/* bootleg */
 
 
 
@@ -9395,6 +9396,6 @@ Other Sun games
 	/* MPU5 */
 	DRIVER( m_honmon )
 
-	DRIVER( roul )	
+	DRIVER( roul )
 
 #endif	/* DRIVER_RECURSIVE */

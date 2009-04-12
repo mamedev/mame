@@ -721,6 +721,35 @@ ROM_START( trvmstrb )
 	ROM_LOAD( "lifesci_hi.u7", 0x1c000, 0x4000, CRC(e03dfa12) SHA1(e668ea5bccc95d8a53a1de1d96583beef6636edb) )
 ROM_END
 
+ROM_START( trvmstrc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jaleco.30",   0x0000, 0x1000, CRC(9a80c5a7) SHA1(d8094572b946527a652f9b978a17f0a8a7acbddb) )
+	ROM_LOAD( "jaleco.28",   0x1000, 0x1000, CRC(70322d65) SHA1(498102236390f2e15444943e0fff8a53f37db083) )
+	ROM_LOAD( "jaleco.26",   0x2000, 0x1000, CRC(3431a2ba) SHA1(d704d5420e232e9d0ea65142aab063dbc20da8c5) )
+
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "jaleco.44",     0x0000, 0x1000, CRC(dac8cff7) SHA1(21da2b2ceb4a726d03b2e49a2df75ca66b89a197) )
+	ROM_LOAD( "jaleco.46",     0x1000, 0x1000, CRC(a97ab879) SHA1(67b86d056896f10e0c055fb58c97341cf75c3d17) )
+
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "jaleco.48",     0x0000, 0x1000, CRC(79952015) SHA1(8407c2bab476a60d945d82201f01bf59ae9e0dad) )
+	ROM_LOAD( "jaleco.50",     0x1000, 0x1000, CRC(f09da428) SHA1(092d0eea41c8bbd48d7a3aff54c15f85262b21ff) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "jaleco.64",     0x0000, 0x0100, CRC(e9915da8) SHA1(7c64ea76e39eaff724179d52ff5482df363fcf56) )  /* palette low & high bits */
+	ROM_RELOAD(				  0x0100, 0x0100 )
+
+	ROM_REGION( 0x20000, "user1", 0 )	/* Questions roms */
+	ROM_LOAD( "jaleco.2", 0x00000, 0x4000, CRC(1ad4c446) SHA1(daef6e4bea69002a52bca016cf33d2726eac4e66) ) //car boats and planes
+	ROM_LOAD( "jaleco.1", 0x04000, 0x4000, CRC(9c308849) SHA1(b40a5c238c0116ac92f3076fbec02b3d7d209883) )
+	ROM_LOAD( "jaleco.4", 0x08000, 0x4000, CRC(38dd45cd) SHA1(e701de1509a898fe400a6284794ead6bee8ccba3) ) //movies
+	ROM_LOAD( "jaleco.3", 0x0c000, 0x4000, CRC(83b5465b) SHA1(828500a008926057f10d40ac9aaaa14d2890181e) )
+	ROM_LOAD( "jaleco.6", 0x10000, 0x4000, CRC(4a2263a7) SHA1(63f2f79261d508c9bba3d73d78f7dce5d348b6d4) ) //sports II
+	ROM_LOAD( "jaleco.5", 0x14000, 0x4000, CRC(bd31f382) SHA1(ec04a5d4a5fc8be059abf3c21c65cd970e569d44) )
+	ROM_LOAD( "jaleco.8", 0x18000, 0x4000, CRC(b73f2e31) SHA1(4390152e053118c31ed74fe850ea7124c0e7b731) ) //sex II
+	ROM_LOAD( "jaleco.7", 0x1c000, 0x4000, CRC(bf654110) SHA1(5229f5e6973a04c53572ea94c14d79a238c0e90f) )
+ROM_END
+
 /* These 'Trivia Genius' roms were found on a Naughty Boy pcb, factory?-retooled somewhat to use 8 2732s instead of 16 2716s. The pcb is a real Naughty Boy PCB, with Jaleco markings. Latest chip datecodes on the PCB are from 85 (on the two proms) but the other chips are dated 81 and 82 (which makes sense if they're formerly naughty boy pcbs).
 This may be a hacked/bootlegged version of trivia master, hacked to run on a naughty boy pcb, or (if ALL versions of trivia master ran on naughty boy pcbs) may be a 'second source bootleg', a bootleg of the trivia master naughty boy conversion.
 */
@@ -801,4 +830,5 @@ GAME( 1982, popflamn, popflame, naughtyb, naughtyb, 0,        ROT90, "Jaleco", "
 GAME( 1985, trvmstr,  0,		naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 1)", 0 )
 GAME( 1985, trvmstra, trvmstr,  naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 2)", 0 )
 GAME( 1985, trvmstrb, trvmstr,  naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 3)", 0 )
-GAME( 1985, trvgns,   0,		naughtyb, trvmstr,  trvmstr,  ROT90, "bootleg?", "Trivia Genius", 0 )
+GAME( 1985, trvmstrc, trvmstr,  naughtyb, trvmstr,  trvmstr,  ROT90, "Enerdyne Technologies Inc.", "Trivia Master (set 4)", 0 )
+GAME( 1985, trvgns,   trvmstr,	naughtyb, trvmstr,  trvmstr,  ROT90, "bootleg", "Trivia Genius", 0 )
