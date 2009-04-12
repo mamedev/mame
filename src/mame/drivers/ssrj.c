@@ -63,32 +63,22 @@ static READ8_HANDLER(ssrj_wheel_r)
 	return retval;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(ssrj_vram1_r)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(ssrj_vram2_r)
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd800, 0xdfff) AM_READ(ssrj_vram4_r)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe800, 0xefff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( ssrj_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_BASE(&ssrj_vram1)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_BASE(&ssrj_vram2)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&ssrj_vram3)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_BASE(&ssrj_vram4)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&ssrj_scrollram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
 	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
-	AM_RANGE(0xf401, 0xf401) AM_DEVREAD("ay", ay8910_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(ssrj_vram1_w) AM_BASE(&ssrj_vram1)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(ssrj_vram2_w) AM_BASE(&ssrj_vram2)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM) AM_BASE(&ssrj_vram3)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(ssrj_vram4_w) AM_BASE(&ssrj_vram4)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(SMH_RAM) AM_BASE(&ssrj_scrollram)
 	AM_RANGE(0xf003, 0xf003) AM_WRITENOP /* unknown */
+	AM_RANGE(0xf401, 0xf401) AM_DEVREAD("ay", ay8910_r)
 	AM_RANGE(0xf400, 0xf401) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP /* unknown */
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP /* wheel ? */
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP /* unknown */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssrj )
@@ -165,7 +155,7 @@ static MACHINE_DRIVER_START( ssrj )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(ssrj_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

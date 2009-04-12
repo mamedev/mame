@@ -11,18 +11,13 @@ WRITE8_HANDLER(ssrj_vram1_w)
 	tilemap_mark_tile_dirty(tilemap1,offset>>1);
 }
 
-READ8_HANDLER(ssrj_vram1_r)
-{
-	return ssrj_vram1[offset];
-}
-
 static TILE_GET_INFO( get_tile_info1 )
 {
 	int code;
 	code=ssrj_vram1[tile_index<<1]+(ssrj_vram1[(tile_index<<1)+1]<<8);
 	SET_TILE_INFO(
 		0,
-		code&1023,
+		code&0x3ff,
 		(code>>12)&0x3,
 	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	);
 }
@@ -35,18 +30,13 @@ WRITE8_HANDLER(ssrj_vram2_w)
 	tilemap_mark_tile_dirty(tilemap2,offset>>1);
 }
 
-READ8_HANDLER(ssrj_vram2_r)
-{
-	return ssrj_vram2[offset];
-}
-
 static TILE_GET_INFO( get_tile_info2 )
 {
 	int code;
 	code=ssrj_vram2[tile_index<<1]+(ssrj_vram2[(tile_index<<1)+1]<<8);
 	SET_TILE_INFO(
 		0,
-		code&1023,
+		code&0x3ff,
 		((code>>12)&0x3)+4,
 	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	);
 }
@@ -59,18 +49,13 @@ WRITE8_HANDLER(ssrj_vram4_w)
 	tilemap_mark_tile_dirty(tilemap4,offset>>1);
 }
 
-READ8_HANDLER(ssrj_vram4_r)
-{
-	return ssrj_vram4[offset];
-}
-
 static TILE_GET_INFO( get_tile_info4 )
 {
 	int code;
 	code=ssrj_vram4[tile_index<<1]+(ssrj_vram4[(tile_index<<1)+1]<<8);
 	SET_TILE_INFO(
 		0,
-		code&1023,
+		code&0x3ff,
 		((code>>12)&0x3)+12,
 	  ((code & 0x8000) ? TILE_FLIPX:0) |( (code & 0x4000) ? TILE_FLIPY:0)	);
 }
