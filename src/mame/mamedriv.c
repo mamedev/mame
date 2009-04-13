@@ -1780,12 +1780,12 @@ const game_driver * const drivers[] =
 
 	/* Taito "X"-system games */
 	DRIVER( superman )	/* B61 (c) 1988 Taito Corporation */
-	DRIVER( suprmanj )	/* B61 (c) 1988 Taito Corporation */
+	DRIVER( supermanj )	/* B61 (c) 1988 Taito Corporation */
 	DRIVER( twinhawk )	/* B87 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( twinhwku )	/* B87 (c) 1989 Taito America Corporation (US) */
+	DRIVER( twinhawku )	/* B87 (c) 1989 Taito America Corporation (US) */
 	DRIVER( daisenpu )	/* B87 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( gigandes )	/* (c) 1989 East Technology */
-	DRIVER( gigandsj )	/* (c) 1989 East Technology */
+	DRIVER( gigandesj )	/* (c) 1989 East Technology */
 	DRIVER( kyustrkr )	/* (c) 1989 East Technology */
 	DRIVER( ballbros )	/* no copyright notice */
 
@@ -1821,18 +1821,18 @@ const game_driver * const drivers[] =
 	/* Taito L-System games */
 	DRIVER( raimais )	/* B36 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( raimaisj )	/* B36 (c) 1988 Taito Corporation */
-	DRIVER( raimaijo )	/* B36 (c) 1988 Taito Corporation */
+	DRIVER( raimaisjo )	/* B36 (c) 1988 Taito Corporation */
 	DRIVER( kurikint )	/* B42 (c) 1988 Taito Corporation Japan (World) */
-	DRIVER( kurikinu )	/* B42 (c) 1988 Taito America Corporation (US) */
-	DRIVER( kurikinj )	/* B42 (c) 1988 Taito Corporation (Japan) */
-	DRIVER( kurikina )	/* B42 (c) 1988 Taito Corporation Japan (World) */
+	DRIVER( kurikintu )	/* B42 (c) 1988 Taito America Corporation (US) */
+	DRIVER( kurikintj )	/* B42 (c) 1988 Taito Corporation (Japan) */
+	DRIVER( kurikinta )	/* B42 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( evilston )	/* C67 (c) 1990 Spacy Industrial, Ltd */
 	DRIVER( fhawk )		/* B70 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( fhawkj )	/* B70 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( plotting )	/* B96 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( plottinu )	/* B96 (c) 1989 Taito Corporation Japan (US) */
-	DRIVER( plottina )	/* B96 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( plottinb )	/* B96 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( plottingu )	/* B96 (c) 1989 Taito Corporation Japan (US) */
+	DRIVER( plottinga )	/* B96 (c) 1989 Taito Corporation Japan (World) */
+	DRIVER( plottingb )	/* B96 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( flipull )	/* B96 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( champwr )	/* C01 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( champwru )	/* C01 (c) 1989 Taito America Corporation (US) */

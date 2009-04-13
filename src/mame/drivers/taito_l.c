@@ -23,7 +23,7 @@
 Notes:
 - the system uses RAM based characters, which aren't really supported by the
   TileMap system, so we have to tilemap_mark_all_tiles_dirty() to compensate
-- kurikina has some debug dip switches (invulnerability, slow motion) so might
+- kurikinta has some debug dip switches (invulnerability, slow motion) so might
   be a prototype. It also doesn't have service mode (or has it disabled).
 
 TODO:
@@ -637,136 +637,74 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 
 
 
-#define COMMON_BANKS_READ \
-	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)			\
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)			\
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_BANK2)			\
-	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_BANK3)			\
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_BANK4)			\
-	AM_RANGE(0xf000, 0xfdff) AM_READ(SMH_BANK5)			\
-	AM_RANGE(0xfe00, 0xfe03) AM_READ(taitol_bankc_r)		\
-	AM_RANGE(0xfe04, 0xfe04) AM_READ(taitol_control_r)	\
-	AM_RANGE(0xff00, 0xff02) AM_READ(irq_adr_r)			\
-	AM_RANGE(0xff03, 0xff03) AM_READ(irq_enable_r)		\
-	AM_RANGE(0xff04, 0xff07) AM_READ(rambankswitch_r)	\
-	AM_RANGE(0xff08, 0xff08) AM_READ(rombankswitch_r)
+#define COMMON_BANKS_MAP \
+	AM_RANGE(0x0000, 0x5fff) AM_ROM			\
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1) 			\
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK(2) AM_WRITE(bank0_w) \
+	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK(3) AM_WRITE(bank1_w) \
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(4) AM_WRITE(bank2_w) \
+	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK(5) AM_WRITE(bank3_w) \
+	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)		\
+	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)	\
+	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)			\
+	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)		\
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w)	\
+	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
 
-#define COMMON_BANKS_WRITE \
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)			\
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(bank0_w)			\
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(bank1_w)			\
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(bank2_w)			\
-	AM_RANGE(0xf000, 0xfdff) AM_WRITE(bank3_w)			\
-	AM_RANGE(0xfe00, 0xfe03) AM_WRITE(taitol_bankc_w)		\
-	AM_RANGE(0xfe04, 0xfe04) AM_WRITE(taitol_control_w)	\
-	AM_RANGE(0xff00, 0xff02) AM_WRITE(irq_adr_w)			\
-	AM_RANGE(0xff03, 0xff03) AM_WRITE(irq_enable_w)		\
-	AM_RANGE(0xff04, 0xff07) AM_WRITE(rambankswitch_w)	\
-	AM_RANGE(0xff08, 0xff08) AM_WRITE(rombankswitch_w)
-
-#define COMMON_SINGLE_READ \
-	AM_RANGE(0xa000, 0xa003) AM_DEVREAD("ym", extport_select_and_ym2203_r)	\
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
-
-#define COMMON_SINGLE_WRITE \
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym", ym2203_w)		\
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
+#define COMMON_SINGLE_MAP \
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ym", extport_select_and_ym2203_r, ym2203_w)	\
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
 
 
-static ADDRESS_MAP_START( fhawk_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( fhawk_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(&shared_ram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fhawk_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM) AM_BASE(&shared_ram)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fhawk_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK6)
-	AM_RANGE(0xc800, 0xc800) AM_READNOP
-	AM_RANGE(0xc801, 0xc801) AM_READ(taitosound_comm_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(shared_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
+static ADDRESS_MAP_START( fhawk_2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(6)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
+	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(taitosound_port_w)
+	AM_RANGE(0xc801, 0xc801) AM_READWRITE(taitosound_comm_r, taitosound_comm_w)
+	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA") AM_WRITENOP	// Direct copy of input port 0
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
 	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")
-	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fhawk_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(taitosound_port_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(taitosound_comm_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITENOP	// Direct copy of input port 0
 	AM_RANGE(0xd004, 0xd004) AM_WRITE(control2_w)
 	AM_RANGE(0xd005, 0xd006) AM_WRITENOP	// Always 0
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(shared_w)
+	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(shared_r, shared_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fhawk_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READNOP
-	AM_RANGE(0xe001, 0xe001) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREAD("ym", ym2203_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fhawk_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xf000, 0xf001) AM_DEVWRITE("ym", ym2203_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( raimais_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8800, 0x8800) AM_READ(mux_r)
-	AM_RANGE(0x8801, 0x8801) AM_READNOP	// Watchdog or interrupt ack (value ignored)
-	AM_RANGE(0x8c00, 0x8c00) AM_READNOP
-	AM_RANGE(0x8c01, 0x8c01) AM_READ(taitosound_comm_r)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-static ADDRESS_MAP_START( raimais_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM) AM_BASE(&shared_ram)
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(mux_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w)
-	AM_RANGE(0x8c00, 0x8c00) AM_WRITE(taitosound_port_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_WRITE(taitosound_comm_w)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( raimais_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(shared_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( raimais_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shared_w)
+static ADDRESS_MAP_START( fhawk_3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(7)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( raimais_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP
-	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
+static ADDRESS_MAP_START( raimais_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&shared_ram)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
+	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_WRITE(taitosound_port_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_READWRITE(taitosound_comm_r, taitosound_comm_w)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( raimais_2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(shared_r, shared_w)
+ADDRESS_MAP_END
+
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
@@ -776,12 +714,13 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	memory_set_bankptr (space->machine, 7, &RAM [0x10000 + (banknum * 0x4000)]);
 }
 
-static ADDRESS_MAP_START( raimais_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
-	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
+static ADDRESS_MAP_START( raimais_3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(7)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
 	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
@@ -790,59 +729,35 @@ static ADDRESS_MAP_START( raimais_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( champwr_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( champwr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&shared_ram)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( champwr_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_RAM) AM_BASE(&shared_ram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( champwr_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK6)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(shared_r)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA")
+static ADDRESS_MAP_START( champwr_2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(6)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSWA") AM_WRITENOP	// Watchdog
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN0")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("IN1")
+	AM_RANGE(0xe004, 0xe004) AM_WRITE(control2_w)
 	AM_RANGE(0xe007, 0xe007) AM_READ_PORT("IN2")
 	AM_RANGE(0xe008, 0xe00f) AM_READNOP
-	AM_RANGE(0xe800, 0xe800) AM_READNOP
-	AM_RANGE(0xe801, 0xe801) AM_READ(taitosound_comm_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(rombank2switch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_WRITE(taitosound_port_w)
+	AM_RANGE(0xe801, 0xe801) AM_READWRITE(taitosound_comm_r, taitosound_comm_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(rombank2switch_r, rombank2switch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( champwr_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(shared_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITENOP	// Watchdog
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(control2_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(taitosound_port_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE(taitosound_comm_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(rombank2switch_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( champwr_3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK7)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2203_r)
-	AM_RANGE(0xa000, 0xa000) AM_READNOP
-	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( champwr_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym", ym2203_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
+static ADDRESS_MAP_START( champwr_3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(7)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_WRITE(taitosound_slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(champwr_msm5205_hi_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(champwr_msm5205_lo_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("msm", champwr_msm5205_start_w)
@@ -851,28 +766,21 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( kurikint_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa800, 0xa800) AM_READ(mux_r)
-	AM_RANGE(0xa801, 0xa801) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+static ADDRESS_MAP_START( kurikint_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(&shared_ram)
+	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
+	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kurikint_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(SMH_RAM) AM_BASE(&shared_ram)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(mux_w)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( kurikint_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(shared_r)
-	AM_RANGE(0xe800, 0xe801) AM_DEVREAD("ym", ym2203_r)
+static ADDRESS_MAP_START( kurikint_2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 #if 0
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
@@ -881,108 +789,67 @@ static ADDRESS_MAP_START( kurikint_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kurikint_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ym", ym2203_w)
-#if 0
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
-#endif
-ADDRESS_MAP_END
 
 
-
-static ADDRESS_MAP_START( puzznic_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	COMMON_SINGLE_READ
+static ADDRESS_MAP_START( puzznic_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
-	AM_RANGE(0xb000, 0xb7ff) AM_READ(SMH_RAM)	// Wrong, used to overcome protection
-	AM_RANGE(0xb800, 0xb800) AM_READ(mcu_data_r)
-	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( puzznic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	COMMON_SINGLE_WRITE
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(SMH_RAM)	// Wrong, used to overcome protection
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(mcu_data_w)
-	AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM		// Wrong, used to overcome protection
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
+	AM_RANGE(0xb801, 0xb801) AM_READWRITE(mcu_control_r, mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
 /* bootleg, doesn't have the MCU */
-static ADDRESS_MAP_START( puzznici_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	COMMON_SINGLE_READ
+static ADDRESS_MAP_START( puzznici_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
-	AM_RANGE(0xb000, 0xb7ff) AM_READ(SMH_RAM)	// Wrong, used to overcome protection
-//  AM_RANGE(0xb800, 0xb800) AM_READ(mcu_data_r)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM		// Wrong, used to overcome protection
+//  AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
 	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( puzznici_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	COMMON_SINGLE_WRITE
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(SMH_RAM)	// Wrong, used to overcome protection
-//  AM_RANGE(0xb800, 0xb800) AM_WRITE(mcu_data_w)
 //  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( plotting_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	COMMON_SINGLE_READ
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( plotting_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	COMMON_SINGLE_WRITE
+static ADDRESS_MAP_START( plotting_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_WRITENOP	// Watchdog or interrupt ack
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( palamed_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	COMMON_SINGLE_READ
+static ADDRESS_MAP_START( palamed_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
+	AM_RANGE(0xa803, 0xa803) AM_WRITENOP	// Control register, function unknown
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// Control register, function unknown (copy of 8822)
 	AM_RANGE(0xb001, 0xb001) AM_READNOP	// Watchdog or interrupt ack
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( palamed_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	COMMON_SINGLE_WRITE
-	AM_RANGE(0xa803, 0xa803) AM_WRITENOP	// Control register, function unknown
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// Control register, function unknown (copy of 8822)
-ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( cachat_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	COMMON_SINGLE_READ
+static ADDRESS_MAP_START( cachat_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN0")
 	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("IN1")
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN2")
-	AM_RANGE(0xb001, 0xb001) AM_READNOP	// Watchdog or interrupt ack (value ignored)
-	AM_RANGE(0xfff8, 0xfff8) AM_READ(rombankswitch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cachat_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	COMMON_SINGLE_WRITE
 	AM_RANGE(0xa803, 0xa803) AM_WRITENOP	// Control register, function unknown
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// Control register, function unknown
-	AM_RANGE(0xfff8, 0xfff8) AM_WRITE(rombankswitch_w)
+	AM_RANGE(0xb001, 0xb001) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE(rombankswitch_r, rombankswitch_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( horshoes_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	COMMON_SINGLE_READ
+static ADDRESS_MAP_START( horshoes_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READ(horshoes_tracky_lo_r)
 	AM_RANGE(0xa802, 0xa802) AM_READ(horshoes_tracky_reset_r)
 	AM_RANGE(0xa803, 0xa803) AM_READ(horshoes_trackx_reset_r)
@@ -990,25 +857,10 @@ static ADDRESS_MAP_START( horshoes_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa808, 0xa808) AM_READ(horshoes_trackx_lo_r)
 	AM_RANGE(0xa80c, 0xa80c) AM_READ(horshoes_trackx_hi_r)
 	AM_RANGE(0xb801, 0xb801) AM_READNOP	// Watchdog or interrupt ack
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( horshoes_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	COMMON_SINGLE_WRITE
 	AM_RANGE(0xb802, 0xb802) AM_WRITE(horshoes_bankg_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( evilston_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_READ
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSWA")
-	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("DSWB")
-	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN0")
-	AM_RANGE(0xa803, 0xa803) AM_READ_PORT("IN1")
-	AM_RANGE(0xa807, 0xa807) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
 
 
 
@@ -1018,31 +870,24 @@ static WRITE8_HANDLER (evilston_snd_w)
 	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
-
-
-
-static ADDRESS_MAP_START( evilston_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	COMMON_BANKS_WRITE
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(SMH_RAM) AM_BASE(&shared_ram)//shared2_w },
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(SMH_RAM)//watchdog ?
-	AM_RANGE(0xa804, 0xa804) AM_WRITE(SMH_RAM) //coin couters/locks ?
-
+static ADDRESS_MAP_START( evilston_map, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_MAP
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(&shared_ram)//shared2_w },
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSWA") AM_WRITENOP	//watchdog ?
+	AM_RANGE(0xa801, 0xa801) AM_READ_PORT("DSWB")
+	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("IN0")
+	AM_RANGE(0xa803, 0xa803) AM_READ_PORT("IN1")
+	AM_RANGE(0xa804, 0xa804) AM_WRITENOP	//coin couters/locks ?
+	AM_RANGE(0xa807, 0xa807) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( evilston_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(shared_r)//shared_r },
-	AM_RANGE(0xe800, 0xe801) AM_DEVREAD("ym", ym2203_r)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK7)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( evilston_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ym", ym2203_w)
+static ADDRESS_MAP_START( evilston_2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(7)
 ADDRESS_MAP_END
 
 
@@ -1248,14 +1093,14 @@ static INPUT_PORTS_START( kurikint )
 	TAITO_L_SYSTEM_INPUT( IP_ACTIVE_HIGH, 4 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kurikinj )
+static INPUT_PORTS_START( kurikintj )
 	PORT_INCLUDE( kurikint )
 
 	PORT_MODIFY("DSWA")
 	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kurikina )
+static INPUT_PORTS_START( kurikinta )
 	PORT_INCLUDE( kurikint )
 
 	PORT_MODIFY("DSWA")
@@ -2105,14 +1950,14 @@ static MACHINE_DRIVER_START( fhawk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
-	MDRV_CPU_PROGRAM_MAP(fhawk_readmem,fhawk_writemem)
+	MDRV_CPU_PROGRAM_MAP(fhawk_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(fhawk_3_readmem,fhawk_3_writemem)
+	MDRV_CPU_PROGRAM_MAP(fhawk_3_map,0)
 
 	MDRV_CPU_ADD("slave", Z80, 12000000/3) 	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(fhawk_2_readmem,fhawk_2_writemem)
+	MDRV_CPU_PROGRAM_MAP(fhawk_2_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -2151,13 +1996,13 @@ static MACHINE_DRIVER_START( champwr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fhawk)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(champwr_readmem,champwr_writemem)
+	MDRV_CPU_PROGRAM_MAP(champwr_map,0)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(champwr_3_readmem,champwr_3_writemem)
+	MDRV_CPU_PROGRAM_MAP(champwr_3_map,0)
 
 	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(champwr_2_readmem,champwr_2_writemem)
+	MDRV_CPU_PROGRAM_MAP(champwr_2_map,0)
 
 	MDRV_MACHINE_RESET(champwr)
 
@@ -2181,13 +2026,13 @@ static MACHINE_DRIVER_START( raimais )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(fhawk)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(raimais_readmem,raimais_writemem)
+	MDRV_CPU_PROGRAM_MAP(raimais_map,0)
 
 	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(raimais_3_readmem,raimais_3_writemem)
+	MDRV_CPU_PROGRAM_MAP(raimais_3_map,0)
 
 	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(raimais_2_readmem,raimais_2_writemem)
+	MDRV_CPU_PROGRAM_MAP(raimais_2_map,0)
 
 	MDRV_MACHINE_RESET(raimais)
 
@@ -2204,11 +2049,11 @@ static MACHINE_DRIVER_START( kurikint )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
-	MDRV_CPU_PROGRAM_MAP(kurikint_readmem,kurikint_writemem)
+	MDRV_CPU_PROGRAM_MAP(kurikint_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_CPU_ADD("audiocpu",  Z80, 12000000/3) 	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(kurikint_2_readmem,kurikint_2_writemem)
+	MDRV_CPU_PROGRAM_MAP(kurikint_2_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -2241,7 +2086,7 @@ static MACHINE_DRIVER_START( kurikint )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( kurikina )
+static MACHINE_DRIVER_START( kurikinta )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(kurikint)
@@ -2255,7 +2100,7 @@ static MACHINE_DRIVER_START( plotting )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* verified freq on pin122 of TC0090LVC cpu */
-	MDRV_CPU_PROGRAM_MAP(plotting_readmem,plotting_writemem)
+	MDRV_CPU_PROGRAM_MAP(plotting_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_MACHINE_RESET(plotting)
@@ -2292,7 +2137,7 @@ static MACHINE_DRIVER_START( puzznic )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(puzznic_readmem,puzznic_writemem)
+	MDRV_CPU_PROGRAM_MAP(puzznic_map,0)
 
 	MDRV_MACHINE_RESET(puzznic)
 MACHINE_DRIVER_END
@@ -2302,7 +2147,7 @@ static MACHINE_DRIVER_START( puzznici )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(puzznici_readmem,puzznici_writemem)
+	MDRV_CPU_PROGRAM_MAP(puzznici_map,0)
 
 	MDRV_MACHINE_RESET(puzznic)
 MACHINE_DRIVER_END
@@ -2313,7 +2158,7 @@ static MACHINE_DRIVER_START( horshoes )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(horshoes_readmem,horshoes_writemem)
+	MDRV_CPU_PROGRAM_MAP(horshoes_map,0)
 
 	MDRV_MACHINE_RESET(horshoes)
 MACHINE_DRIVER_END
@@ -2324,7 +2169,7 @@ static MACHINE_DRIVER_START( palamed )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(palamed_readmem,palamed_writemem)
+	MDRV_CPU_PROGRAM_MAP(palamed_map,0)
 
 	MDRV_MACHINE_RESET(palamed)
 MACHINE_DRIVER_END
@@ -2335,7 +2180,7 @@ static MACHINE_DRIVER_START( cachat )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cachat_readmem,cachat_writemem)
+	MDRV_CPU_PROGRAM_MAP(cachat_map,0)
 
 	MDRV_MACHINE_RESET(cachat)
 MACHINE_DRIVER_END
@@ -2344,11 +2189,11 @@ static MACHINE_DRIVER_START( evilston )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 13330560/2) 	/* not verfied */
-	MDRV_CPU_PROGRAM_MAP(evilston_readmem,evilston_writemem)
+	MDRV_CPU_PROGRAM_MAP(evilston_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 12000000/3) 	/* not verified */
-	MDRV_CPU_PROGRAM_MAP(evilston_2_readmem,evilston_2_writemem)
+	MDRV_CPU_PROGRAM_MAP(evilston_2_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
@@ -2425,7 +2270,7 @@ ROM_START( raimaisj )
 	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
 ROM_END
 
-ROM_START( raimaijo )
+ROM_START( raimaisjo )
 	ROM_REGION( 0xb0000, "maincpu", 0 )
 	ROM_LOAD( "b36-08.bin", 0x00000, 0x20000, CRC(f40b9178) SHA1(ccf5afcf08cac0d5b2d6ba74abd62d35412f0265) )
 	ROM_RELOAD(               0x10000, 0x20000 )
@@ -2568,7 +2413,7 @@ ROM_START( kurikint )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
 ROM_END
 
-ROM_START( kurikinu )
+ROM_START( kurikintu )
 	ROM_REGION( 0xb0000, "maincpu", 0 )
 	ROM_LOAD( "b42-08.ic2",  0x00000, 0x20000, CRC(7075122e) SHA1(55f5f0cf3b91b7b408f9c05c91f9839c43b49c5f) )
 	ROM_RELOAD(              0x10000, 0x20000 )
@@ -2582,7 +2427,7 @@ ROM_START( kurikinu )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
 ROM_END
 
-ROM_START( kurikinj )
+ROM_START( kurikintj )
 	ROM_REGION( 0xb0000, "maincpu", 0 )
 	ROM_LOAD( "b42-05.ic2",  0x00000, 0x20000, CRC(077222b8) SHA1(953fb3444f6bb0dbe0323a0fd8fc3067b106a4f6) )
 	ROM_RELOAD(              0x10000, 0x20000 )
@@ -2596,7 +2441,7 @@ ROM_START( kurikinj )
 	ROM_LOAD( "b42-02.ic5",  0x80000, 0x80000, CRC(1a52e65c) SHA1(20a1fc4d02b5928fb01444079692e23d178c6297) )
 ROM_END
 
-ROM_START( kurikina )
+ROM_START( kurikinta )
 	ROM_REGION( 0xb0000, "maincpu", 0 )
 	ROM_LOAD( "kk_ic2.ic2",  0x00000, 0x20000, CRC(908603f2) SHA1(f810f2501458224e9264a984f22547cc8ccc2b0e) )
 	ROM_RELOAD(              0x10000, 0x20000 )
@@ -2678,7 +2523,7 @@ ROM_START( plotting ) /* Likely B96-10 or higher by Taito's rom numbering system
 ROM_END
 
 
-ROM_START( plottina ) /* B96-09 or higher by Taito's rom numbering system, demo mode is 2 players */
+ROM_START( plottinga ) /* B96-09 or higher by Taito's rom numbering system, demo mode is 2 players */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "plot01.ic10", 0x00000, 0x10000, CRC(5b30bc25) SHA1(df8839a90da9e5122d75b6faaf97f59499dbd316) )
 	ROM_RELOAD(              0x10000, 0x10000 )
@@ -2691,7 +2536,7 @@ ROM_START( plottina ) /* B96-09 or higher by Taito's rom numbering system, demo 
 	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
-ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom numbering system, demo mode is 2 players */
+ROM_START( plottingb ) /* The first (earliest) "World" version by Taito's rom numbering system, demo mode is 2 players */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b96-06.ic10",0x00000, 0x10000, CRC(f89a54b1) SHA1(19757b5fb61acdd6f5ae8e32a38ae54bfda0c522) )
 	ROM_RELOAD(             0x10000, 0x10000 )
@@ -2704,7 +2549,7 @@ ROM_START( plottinb ) /* The first (earliest) "World" version by Taito's rom num
 	ROM_LOAD( "gal16v8-b86-04.bin", 0x0000, 0x0117, CRC(bf8c0ea0) SHA1(e0a00f1f6363fb79650202f90a56329990876d49) )	/* derived, but verified  Pal Stamped B86-04 */
 ROM_END
 
-ROM_START( plottinu ) /* The demo mode is 2 players */
+ROM_START( plottingu ) /* The demo mode is 2 players */
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b96-05.ic10",0x00000, 0x10000, CRC(afb99d1f) SHA1(a5cabc182d4f1d5709e6835d8b0a481dd0f9a563) )
 	ROM_RELOAD(             0x10000, 0x10000 )
@@ -2890,7 +2735,7 @@ ROM_END
 
 
 // bits 7..0 => bits 0..7
-static DRIVER_INIT( plottina )
+static DRIVER_INIT( plottinga )
 {
 	UINT8 tab[256];
 	UINT8 *p;
@@ -2920,33 +2765,33 @@ static DRIVER_INIT( evilston )
 }
 
 
-GAME( 1988, raimais,  0,        raimais,  raimais,  0,        ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
-GAME( 1988, raimaisj, raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
-GAME( 1988, raimaijo, raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan / First Revision)", 0 )
-GAME( 1988, fhawk,    0,        fhawk,    fhawk,    0,        ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
-GAME( 1988, fhawkj,   fhawk,    fhawk,    fhawkj,   0,        ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
-GAME( 1989, champwr,  0,        champwr,  champwr,  0,        ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", GAME_IMPERFECT_SOUND )
-GAME( 1989, champwru, champwr,  champwr,  champwru, 0,        ROT0,   "Taito America Corporation", "Champion Wrestler (US)", GAME_IMPERFECT_SOUND )
-GAME( 1989, champwrj, champwr,  champwr,  champwrj, 0,        ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1988, kurikint, 0,        kurikint, kurikint, 0,        ROT0,   "Taito Corporation Japan", "Kuri Kinton (World)", 0 )
-GAME( 1988, kurikinu, kurikint, kurikint, kurikinj, 0,        ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
-GAME( 1988, kurikinj, kurikint, kurikint, kurikinj, 0,        ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
-GAME( 1988, kurikina, kurikint, kurikina, kurikina, 0,        ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
-GAME( 1989, plotting, 0,        plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
-GAME( 1989, plottina, plotting, plotting, plotting, plottina, ROT0,   "Taito Corporation Japan", "Plotting (World set 2, Protected)", 0 )
-GAME( 1989, plottinb, plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 3, Earliest Version)", 0 )
-GAME( 1989, plottinu, plotting, plotting, plotting, 0,        ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
-GAME( 1989, flipull,  plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
-GAME( 1989, puzznic,  0,        puzznic,  puzznic,  0,        ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
-GAME( 1989, puzznicj, puzznic,  puzznic,  puzznic,  0,        ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
-GAME( 1989, puzznici, puzznic,  puzznici, puzznic,  0,        ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
-GAME( 1990, horshoes, 0,        horshoes, horshoes, 0,        ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
-GAME( 1990, palamed,  0,        palamed,  palamed,  0,        ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
-GAME( 1993, cachat,   0,        cachat,   cachat,   0,        ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
-GAME( 1993, tubeit,   cachat,   cachat,   tubeit,   0,        ROT0,   "Taito Corporation", "Tube-It", 0 )  // No (c) message
-GAME( 199?, cubybop,  0,        cachat,   cubybop,  0,        ROT0,   "Taito Corporation", "Cuby Bop (Location Test)", 0 ) // No (c) message
+GAME( 1988, raimais,   0,        raimais,  raimais,  0,        ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
+GAME( 1988, raimaisj,  raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
+GAME( 1988, raimaisjo, raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan / First Revision)", 0 )
+GAME( 1988, fhawk,     0,        fhawk,    fhawk,    0,        ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
+GAME( 1988, fhawkj,    fhawk,    fhawk,    fhawkj,   0,        ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
+GAME( 1989, champwr,   0,        champwr,  champwr,  0,        ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", GAME_IMPERFECT_SOUND )
+GAME( 1989, champwru,  champwr,  champwr,  champwru, 0,        ROT0,   "Taito America Corporation", "Champion Wrestler (US)", GAME_IMPERFECT_SOUND )
+GAME( 1989, champwrj,  champwr,  champwr,  champwrj, 0,        ROT0,   "Taito Corporation", "Champion Wrestler (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1988, kurikint,  0,        kurikint, kurikint, 0,        ROT0,   "Taito Corporation Japan", "Kuri Kinton (World)", 0 )
+GAME( 1988, kurikintu, kurikint, kurikint, kurikintj,0,        ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
+GAME( 1988, kurikintj, kurikint, kurikint, kurikintj,0,        ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
+GAME( 1988, kurikinta, kurikint, kurikinta,kurikinta,0,        ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
+GAME( 1989, plotting,  0,        plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
+GAME( 1989, plottinga, plotting, plotting, plotting, plottinga,ROT0,   "Taito Corporation Japan", "Plotting (World set 2, Protected)", 0 )
+GAME( 1989, plottingb, plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 3, Earliest Version)", 0 )
+GAME( 1989, plottingu, plotting, plotting, plotting, 0,        ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
+GAME( 1989, flipull,   plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
+GAME( 1989, puzznic,   0,        puzznic,  puzznic,  0,        ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
+GAME( 1989, puzznicj,  puzznic,  puzznic,  puzznic,  0,        ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
+GAME( 1989, puzznici,  puzznic,  puzznici, puzznic,  0,        ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
+GAME( 1990, horshoes,  0,        horshoes, horshoes, 0,        ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
+GAME( 1990, palamed,   0,        palamed,  palamed,  0,        ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
+GAME( 1993, cachat,    0,        cachat,   cachat,   0,        ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
+GAME( 1993, tubeit,    cachat,   cachat,   tubeit,   0,        ROT0,   "Taito Corporation", "Tube-It", 0 )  // No (c) message
+GAME( 199?, cubybop,   0,        cachat,   cubybop,  0,        ROT0,   "Taito Corporation", "Cuby Bop (Location Test)", 0 ) // No (c) message
 
-GAME( 1992, plgirls,  0,        cachat,   plgirls,  0,        ROT270, "Hot-B.", "Play Girls", 0 )
-GAME( 1993, plgirls2, 0,        cachat,   plgirls2, 0,        ROT270, "Hot-B.", "Play Girls 2", 0 )
+GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B.", "Play Girls", 0 )
+GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B.", "Play Girls 2", 0 )
 
-GAME( 1990, evilston, 0,        evilston, evilston, evilston, ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )
+GAME( 1990, evilston,  0,        evilston, evilston, evilston, ROT270, "Spacy Industrial, Ltd.", "Evil Stone", 0 )
