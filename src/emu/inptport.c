@@ -2225,7 +2225,7 @@ static void frame_update_analog_field(analog_field_state *analog)
 	if (analog->autocenter)
 	{
 		INT32 center = APPLY_INVERSE_SENSITIVITY(analog->center, analog->sensitivity);
-		if (!analog->lastdigital && !keypressed)
+		if (analog->lastdigital && !keypressed)
 		{
 			/* autocenter from positive values */
 			if (analog->accum >= center)
@@ -2250,8 +2250,7 @@ static void frame_update_analog_field(analog_field_state *analog)
 			}
 		}
 	}
-
-	if (!keypressed)
+	else if (!keypressed)
 		analog->lastdigital = FALSE;
 }
 
