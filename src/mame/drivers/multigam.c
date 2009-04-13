@@ -54,7 +54,7 @@
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, 0, source );
+	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu"), source );
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -151,8 +151,9 @@ static WRITE8_HANDLER(multigam_switch_prg_rom)
 
 static WRITE8_HANDLER(multigam_switch_gfx_rom)
 {
-	ppu2c0x_set_videorom_bank( 0, 0, 8, data /*& 0x3f*/, 512 );
-	ppu2c0x_set_mirroring( 0, data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	const device_config *ppu = devtag_get_device(space->machine, "ppu");
+	ppu2c0x_set_videorom_bank( ppu, 0, 8, data /*& 0x3f*/, 512 );
+	ppu2c0x_set_mirroring( ppu, data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 	multigam_game_gfx_bank = data;
 };
 
@@ -161,7 +162,8 @@ static WRITE8_HANDLER(multigam_mapper2_w)
 {
 	if ( multigam_game_gfx_bank & 0x80 )
 	{
-		ppu2c0x_set_videorom_bank( 0, 0, 8, multigam_game_gfx_bank + (data & 0xf), 512 );
+		const device_config *ppu = devtag_get_device(space->machine, "ppu");
+		ppu2c0x_set_videorom_bank( ppu, 0, 8, multigam_game_gfx_bank + (data & 0xf), 512 );
 	}
 	else
 	{
@@ -178,7 +180,7 @@ static WRITE8_HANDLER(multigam_mapper2_w)
 static ADDRESS_MAP_START( multigam_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
@@ -206,20 +208,22 @@ static int multigam3_mmc3_4screen;
 static int multigam3_mmc3_last_bank;
 static UINT8* multigmc_mmc3_6000_ram;
 
-static void multigam3_mmc3_scanline_cb( running_machine *machine, int num, int scanline, int vblank, int blanked )
+static void multigam3_mmc3_scanline_cb( const device_config *device, int scanline, int vblank, int blanked )
 {
 	if ( !vblank && !blanked )
 	{
 		if ( --multigam3_mmc3_scanline_counter == -1 )
 		{
 			multigam3_mmc3_scanline_counter = multigam3_mmc3_scanline_latch;
-			generic_pulse_irq_line(machine->cpu[0], 0);
+			generic_pulse_irq_line(device->machine->cpu[0], 0);
 		}
 	}
 }
 
 static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 {
+	const device_config *ppu = devtag_get_device(space->machine, "ppu");
+
 	/* basically, a MMC3 mapper from the nes */
 	static int multigam3_mmc3_command;
 
@@ -271,7 +275,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 1: /* char banking */
 						data &= 0xfe;
 						page ^= ( cmd << 1 );
-						ppu2c0x_set_videorom_bank( 0, page, 2, 0x100 + data, 64 );
+						ppu2c0x_set_videorom_bank( ppu, page, 2, 0x100 + data, 64 );
 					break;
 
 					case 2: /* char banking */
@@ -279,7 +283,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 4: /* char banking */
 					case 5: /* char banking */
 						page ^= cmd + 2;
-						ppu2c0x_set_videorom_bank( 0, page, 1, 0x100 + data, 64 );
+						ppu2c0x_set_videorom_bank( ppu, page, 1, 0x100 + data, 64 );
 					break;
 
 					case 6: /* program banking */
@@ -324,9 +328,9 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 			if( !multigam3_mmc3_4screen )
 			{
 				if ( data & 0x40 )
-					ppu2c0x_set_mirroring( 0, PPU_MIRROR_HIGH );
+					ppu2c0x_set_mirroring( ppu, PPU_MIRROR_HIGH );
 				else
-					ppu2c0x_set_mirroring( 0, ( data & 1 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+					ppu2c0x_set_mirroring( ppu, ( data & 1 ) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 			}
 		break;
 
@@ -343,11 +347,11 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 		break;
 
 		case 0x6000: /* disable irqs */
-			ppu2c0x_set_scanline_callback( 0, 0 );
+			ppu2c0x_set_scanline_callback( ppu, 0 );
 		break;
 
 		case 0x6001: /* enable irqs */
-			ppu2c0x_set_scanline_callback( 0, multigam3_mmc3_scanline_cb );
+			ppu2c0x_set_scanline_callback( ppu, multigam3_mmc3_scanline_cb );
 		break;
 	}
 }
@@ -377,7 +381,8 @@ static WRITE8_HANDLER(multigm3_mapper2_w)
 {
 	if ( multigam_game_gfx_bank & 0x80 )
 	{
-		ppu2c0x_set_videorom_bank( 0, 0, 8, (multigam_game_gfx_bank & 0xfc)  + (data & 0x3), 512 );
+		const device_config *ppu = devtag_get_device(space->machine, "ppu");
+		ppu2c0x_set_videorom_bank( ppu, 0, 8, (multigam_game_gfx_bank & 0xfc)  + (data & 0x3), 512 );
 	}
 	else
 	{
@@ -426,7 +431,7 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 static ADDRESS_MAP_START( multigm3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
@@ -513,32 +518,29 @@ static PALETTE_INIT( multigam )
 	ppu2c0x_init_palette(machine, 0 );
 }
 
-static void ppu_irq( running_machine *machine, int num, int *ppu_regs )
+static void ppu_irq( const device_config *device, int *ppu_regs )
 {
-	cpu_set_input_line(machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */
 static const ppu2c0x_interface ppu_interface =
 {
-	PPU_2C04,				/* type */
-	1,						/* num */
-	{ "gfx1" },				/* vrom gfx region */
-	{ 0 },					/* gfxlayout num */
-	{ 0 },					/* color base */
-	{ PPU_MIRROR_NONE },	/* mirroring */
-	{ ppu_irq }				/* irq */
+	"gfx1",				/* vrom gfx region */
+	0,					/* gfxlayout num */
+	0,					/* color base */
+	PPU_MIRROR_NONE,	/* mirroring */
+	ppu_irq				/* irq */
 };
 
 static VIDEO_START( multigam )
 {
-	ppu2c0x_init(machine, &ppu_interface );
 }
 
 static VIDEO_UPDATE( multigam )
 {
 	/* render the ppu */
-	ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render( devtag_get_device(screen->machine, "ppu"), bitmap, 0, 0, 0, 0 );
 	return 0;
 }
 
@@ -554,15 +556,12 @@ GFXDECODE_END
 
 static MACHINE_RESET( multigam )
 {
-	/* reset the ppu */
-	ppu2c0x_reset( machine, 0, 1 );
 }
 
 static MACHINE_RESET( multigm3 )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* reset the ppu */
-	ppu2c0x_reset( machine, 0, 1 );
 	multigm3_switch_prg_rom(space, 0, 0x01 );
 };
 
@@ -587,6 +586,8 @@ static MACHINE_DRIVER_START( multigam )
 	MDRV_PALETTE_INIT(multigam)
 	MDRV_VIDEO_START(multigam)
 	MDRV_VIDEO_UPDATE(multigam)
+
+	MDRV_PPU2C04_ADD("ppu", ppu_interface)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

@@ -57,9 +57,9 @@ PALETTE_INIT( playch10 )
 	ppu2c0x_init_palette(machine, 256 );
 }
 
-static void ppu_irq( running_machine *machine, int num, int *ppu_regs )
+static void ppu_irq( const device_config *device, int *ppu_regs )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 	pc10_int_detect = 1;
 }
 
@@ -67,28 +67,24 @@ static void ppu_irq( running_machine *machine, int num, int *ppu_regs )
 /* things like mirroring and whether to use vrom or vram       */
 /* can be set by calling 'ppu2c0x_override_hardware_options'   */
 
-static const ppu2c0x_interface ppu_interface =
+const ppu2c0x_interface playch10_ppu_interface =
 {
-	PPU_2C03B,				/* type */
-	1,						/* num */
-	{ "gfx2" },				/* vrom gfx region */
-	{ 1 },					/* gfxlayout num */
-	{ 256 },				/* color base */
-	{ PPU_MIRROR_NONE },	/* mirroring */
-	{ ppu_irq },			/* irq */
-	{ 0 }					/* vram */
+	"gfx2",				/* vrom gfx region */
+	1,					/* gfxlayout num */
+	256,				/* color base */
+	PPU_MIRROR_NONE,	/* mirroring */
+	ppu_irq,			/* irq */
+	0					/* vram */
 };
 
-static const ppu2c0x_interface ppu_interface_hboard =
+const ppu2c0x_interface playch10_ppu_interface_hboard =
 {
-	PPU_2C03B,				/* type */
-	1,						/* num */
-	{ "gfx2" },				/* vrom gfx region */
-	{ 1 },					/* gfxlayout num */
-	{ 256 },				/* color base */
-	{ PPU_MIRROR_NONE },	/* mirroring */
-	{ ppu_irq },			/* irq */
-	{ 1 }					/* vram */
+	"gfx2",				/* vrom gfx region */
+	1,					/* gfxlayout num */
+	256,				/* color base */
+	PPU_MIRROR_NONE,	/* mirroring */
+	ppu_irq,			/* irq */
+	1					/* vram */
 };
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -107,8 +103,6 @@ VIDEO_START( playch10 )
 
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
-
-	ppu2c0x_init(machine, &ppu_interface );
 }
 
 VIDEO_START( playch10_hboard )
@@ -118,8 +112,6 @@ VIDEO_START( playch10_hboard )
 
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
-
-	ppu2c0x_init(machine, &ppu_interface_hboard );
 }
 
 /***************************************************************************
@@ -130,6 +122,8 @@ VIDEO_START( playch10_hboard )
 
 VIDEO_UPDATE( playch10 )
 {
+	const device_config *ppu = devtag_get_device(screen->machine, "ppu");
+
 	/* Dual monitor version */
 	if (pc10_bios == 1)
 	{
@@ -145,7 +139,7 @@ VIDEO_UPDATE( playch10 )
 		{
 			if ( !pc10_dispmask )
 				/* render the ppu */
-				ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
+				ppu2c0x_render( ppu, bitmap, 0, 0, 0, 0 );
 			else
 				bitmap_fill(bitmap, cliprect, 0);
 		}
@@ -175,7 +169,7 @@ VIDEO_UPDATE( playch10 )
 
 		if ( pc10_game_mode )
 			/* render the ppu */
-			ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
+			ppu2c0x_render( ppu, bitmap, 0, 0, 0, 0 );
 		else
 		{
 			/* When the bios is accessing vram, the video circuitry can't access it */

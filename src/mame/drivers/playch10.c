@@ -333,7 +333,7 @@ static WRITE8_HANDLER( ram_8w_w )
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, 0, source );
+	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu"), source );
 }
 
 static NVRAM_HANDLER( playch10 )
@@ -407,7 +407,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cart_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_BASE(&work_ram)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
@@ -717,6 +717,8 @@ static MACHINE_DRIVER_START( playch10 )
 	MDRV_VIDEO_START(playch10)
 	MDRV_VIDEO_UPDATE(playch10)
 
+	MDRV_PPU2C03B_ADD("ppu", playch10_ppu_interface)
+
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("nes", NES, N2A03_DEFAULTCLOCK)
@@ -735,6 +737,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( playch10_hboard )
 	MDRV_IMPORT_FROM(playch10)
 	MDRV_VIDEO_START(playch10_hboard)
+
+	MDRV_DEVICE_REMOVE("ppu")
+	MDRV_PPU2C03B_ADD("ppu", playch10_ppu_interface)
 MACHINE_DRIVER_END
 
 /***************************************************************************

@@ -28,6 +28,11 @@ NES-specific:
 #include "profiler.h"
 #include "video/ppu2c0x.h"
 
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH	(32*8)	/* Visible screen width */
 #define VISIBLE_SCREEN_HEIGHT	(30*8)	/* Visible screen height */
@@ -36,6 +41,11 @@ NES-specific:
 #define SPRITERAM_SIZE			0x100	/* spriteram size */
 #define SPRITERAM_MASK			(0x100-1)	/* spriteram size */
 #define CHARGEN_NUM_CHARS		512		/* max number of characters handled by the chargen */
+
+enum
+{
+	PPU2C0XINFO_INT_SCANLINES_PER_FRAME = DEVINFO_INT_DEVICE_SPECIFIC
+};
 
 /* default monochromatic colortable */
 static const pen_t default_colortable_mono[] =
@@ -63,9 +73,14 @@ static const pen_t default_colortable[] =
 	0,29,30,31,
 };
 
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
 /* our chip state */
-typedef struct {
-	running_machine 		*machine;				/* execution context */
+typedef struct
+{
 	bitmap_t				*bitmap;				/* target bitmap */
 	UINT8					*videomem;				/* video mem */
 	UINT8					*videoram;				/* video ram */
@@ -104,20 +119,48 @@ typedef struct {
 	rgb_t					palette[64*4];			/* palette for this chip */
 } ppu2c0x_chip;
 
-/* our local copy of the interface */
-static ppu2c0x_interface *intf;
 
-/* chips state - allocated at init time */
-static ppu2c0x_chip *chips = 0;
 
-static void update_scanline(running_machine *machine, int num );
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+static void update_scanline(const device_config *device);
 
 static TIMER_CALLBACK( scanline_callback );
 static TIMER_CALLBACK( hblank_callback );
 static TIMER_CALLBACK( nmi_callback );
 
-void (*ppu_latch)( offs_t offset );
+void (*ppu_latch)( const device_config *device, offs_t offset );
 
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE ppu2c0x_chip *get_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == PPU_2C02) || (device->type == PPU_2C03B)
+		 || (device->type == PPU_2C04) || (device->type == PPU_2C05)
+		 || (device->type == PPU_2C07));
+	return (ppu2c0x_chip *) device->token;
+}
+
+
+INLINE const ppu2c0x_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert((device->type == PPU_2C02) || (device->type == PPU_2C03B)
+		 || (device->type == PPU_2C04) || (device->type == PPU_2C05)
+		 || (device->type == PPU_2C07));
+	return (const ppu2c0x_interface *) device->static_config;
+}
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
 /*************************************
  *
@@ -254,159 +297,131 @@ static const gfx_layout ppu_charlayout =
  *  PPU Initialization and Disposal
  *
  *************************************/
-void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
+
+static DEVICE_START( ppu2c0x )
 {
-	int i;
 	UINT32 total;
+	ppu2c0x_chip *chip = get_token(device);
+	const ppu2c0x_interface *intf = get_interface(device);
 
-	/* keep a local copy of the interface */
-	intf = auto_malloc(sizeof(*interface));
-	memcpy(intf, interface, sizeof(*interface));
+	memset(chip, 0, sizeof(*chip));
+	chip->scanlines_per_frame = (int) device_get_info_int(device, PPU2C0XINFO_INT_SCANLINES_PER_FRAME);
 
-	/* safety check */
-	assert_always ( intf->num > 0, "Invalid intf->num" );
+	/* initialize the scanline handling portion */
+	chip->scanline_timer = timer_alloc(device->machine, scanline_callback, (void *) device);
+	chip->hblank_timer = timer_alloc(device->machine, hblank_callback, (void *) device);
+	chip->nmi_timer = timer_alloc(device->machine, nmi_callback, (void *) device);
+	chip->scanline = 0;
+	chip->scan_scale = 1;
 
-	chips = auto_malloc( intf->num * sizeof( ppu2c0x_chip ) );
-	memset(chips, 0, intf->num * sizeof( ppu2c0x_chip ));
+	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
+	chip->bitmap = auto_bitmap_alloc( VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, video_screen_get_format(device->machine->primary_screen));
+	chip->videomem = auto_malloc( VIDEOMEM_SIZE );
+	chip->videoram = auto_malloc( VIDEOMEM_SIZE );
+	chip->spriteram = auto_malloc( SPRITERAM_SIZE );
+	chip->colortable = auto_malloc( sizeof( default_colortable ) );
+	chip->colortable_mono = auto_malloc( sizeof( default_colortable_mono ) );
 
-	/* intialize our virtual chips */
-	for( i = 0; i < intf->num; i++ )
+	/* clear videomem & spriteram */
+	memset( chip->videomem, 0, VIDEOMEM_SIZE );
+	memset( chip->videoram, 0, VIDEOMEM_SIZE );
+	memset( chip->spriteram, 0, SPRITERAM_SIZE );
+	memset( chip->videoram_banks_indices, 0xff, sizeof(chip->videoram_banks_indices) );
+
+	if ( intf->vram_enabled )
 	{
-		chips[i].machine = machine;
+		chip->has_videoram = 1;
+	}
 
-		switch (intf->type)
+	/* initialize the video ROM portion, if available */
+	if ( ( intf->vrom_region != NULL ) && ( memory_region( device->machine, intf->vrom_region ) != 0 ) )
+	{
+		/* mark that we have a videorom */
+		chip->has_videorom = 1;
+
+		/* find out how many banks */
+		chip->videorom_banks = memory_region_length( device->machine, intf->vrom_region ) / 0x2000;
+
+		/* tweak the layout accordingly */
+		if ( chip->has_videoram )
 		{
-			case PPU_2C02:
-				chips[i].scanlines_per_frame = PPU_NTSC_SCANLINES_PER_FRAME;
-				break;
-			case PPU_2C03B:
-				chips[i].scanlines_per_frame = PPU_NTSC_SCANLINES_PER_FRAME;
-				break;
-			case PPU_2C04:
-				chips[i].scanlines_per_frame = PPU_NTSC_SCANLINES_PER_FRAME;
-				break;
-			case PPU_2C05:
-				chips[i].scanlines_per_frame = PPU_NTSC_SCANLINES_PER_FRAME;
-				break;
-			case PPU_2C07:
-				chips[i].scanlines_per_frame = PPU_PAL_SCANLINES_PER_FRAME;
-				break;
-			default:
-				chips[i].scanlines_per_frame = PPU_NTSC_SCANLINES_PER_FRAME;
-				break;
-		}
-
-		/* initialize the scanline handling portion */
-		chips[i].scanline_timer = timer_alloc(machine, scanline_callback, NULL);
-		chips[i].hblank_timer = timer_alloc(machine, hblank_callback, NULL);
-		chips[i].nmi_timer = timer_alloc(machine, nmi_callback, NULL);
-		chips[i].scanline = 0;
-		chips[i].scan_scale = 1;
-
-		/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-		chips[i].bitmap = auto_bitmap_alloc( VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
-		chips[i].videomem = auto_malloc( VIDEOMEM_SIZE );
-		chips[i].videoram = auto_malloc( VIDEOMEM_SIZE );
-		chips[i].spriteram = auto_malloc( SPRITERAM_SIZE );
-		chips[i].colortable = auto_malloc( sizeof( default_colortable ) );
-		chips[i].colortable_mono = auto_malloc( sizeof( default_colortable_mono ) );
-
-		/* clear videomem & spriteram */
-		memset( chips[i].videomem, 0, VIDEOMEM_SIZE );
-		memset( chips[i].videoram, 0, VIDEOMEM_SIZE );
-		memset( chips[i].spriteram, 0, SPRITERAM_SIZE );
-		memset( chips[i].videoram_banks_indices, 0xff, sizeof(chips[i].videoram_banks_indices) );
-
-		if ( intf->vram_enabled[i] )
-		{
-			chips[i].has_videoram = 1;
-		}
-
-		/* initialize the video ROM portion, if available */
-		if ( ( intf->vrom_region[i] != NULL ) && ( memory_region( machine, intf->vrom_region[i] ) != 0 ) )
-		{
-			/* mark that we have a videorom */
-			chips[i].has_videorom = 1;
-
-			/* find out how many banks */
-			chips[i].videorom_banks = memory_region_length( machine, intf->vrom_region[i] ) / 0x2000;
-
-			/* tweak the layout accordingly */
-			if ( chips[i].has_videoram )
-			{
-				total = CHARGEN_NUM_CHARS;
-			}
-			else
-			{
-				total = chips[i].videorom_banks * CHARGEN_NUM_CHARS;
-			}
+			total = CHARGEN_NUM_CHARS;
 		}
 		else
 		{
-			chips[i].has_videorom = chips[i].videorom_banks = 0;
-
-			/* we need to reset this in case of mame running multisession */
-			total = CHARGEN_NUM_CHARS;
+			total = chip->videorom_banks * CHARGEN_NUM_CHARS;
 		}
-
-		/* now create the gfx region */
-		{
-			gfx_layout gl;
-			UINT8 *src = (chips[i].has_videorom && !chips[i].has_videoram) ? memory_region( machine, intf->vrom_region[i] ) : chips[i].videomem;
-
-			memcpy(&gl, &ppu_charlayout, sizeof(gl));
-			gl.total = total;
-			machine->gfx[intf->gfx_layout_number[i]] = gfx_element_alloc( machine, &gl, src, 8, 0 );
-		}
-
-		/* setup our videomem handlers based on mirroring */
-		ppu2c0x_set_mirroring( i, intf->mirroring[i] );
 	}
+	else
+	{
+		chip->has_videorom = chip->videorom_banks = 0;
+
+		/* we need to reset this in case of mame running multisession */
+		total = CHARGEN_NUM_CHARS;
+	}
+
+	/* now create the gfx region */
+	{
+		gfx_layout gl;
+		UINT8 *src = (chip->has_videorom && !chip->has_videoram) ? memory_region( device->machine, intf->vrom_region ) : chip->videomem;
+
+		memcpy(&gl, &ppu_charlayout, sizeof(gl));
+		gl.total = total;
+		device->machine->gfx[intf->gfx_layout_number] = gfx_element_alloc( device->machine, &gl, src, 8, 0 );
+	}
+
+	/* setup our videomem handlers based on mirroring */
+	ppu2c0x_set_mirroring( device, intf->mirroring );
 }
 
 static TIMER_CALLBACK( hblank_callback )
 {
-	int num = param;
-	ppu2c0x_chip* this_ppu = &chips[num];
-	int *ppu_regs = &chips[num].regs[0];
+	const device_config *device = ptr;
+	ppu2c0x_chip *this_ppu = get_token(device);
+	int *ppu_regs = &this_ppu->regs[0];
 
 	int blanked = ( ppu_regs[PPU_CONTROL1] & ( PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES ) ) == 0;
 	int vblank = ((this_ppu->scanline >= PPU_VBLANK_FIRST_SCANLINE-1) && (this_ppu->scanline < this_ppu->scanlines_per_frame-1)) ? 1 : 0;
 
-//  update_scanline (machine, num);
+//  update_scanline (device);
 
 	if (this_ppu->hblank_callback_proc)
-		(*this_ppu->hblank_callback_proc) (machine, num, this_ppu->scanline, vblank, blanked);
+		(*this_ppu->hblank_callback_proc) (device, this_ppu->scanline, vblank, blanked);
 
-	timer_adjust_oneshot(chips[num].hblank_timer, attotime_never, num);
+	timer_adjust_oneshot(this_ppu->hblank_timer, attotime_never, 0);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	int num = param;
-	int *ppu_regs = &chips[num].regs[0];
+	const device_config *device = ptr;
+	ppu2c0x_chip *this_ppu = get_token(device);
+	const ppu2c0x_interface *intf = get_interface(device);
+	int *ppu_regs = &this_ppu->regs[0];
 
 	// Actually fire the VMI
-	if (intf->nmi_handler[num])
-		(*intf->nmi_handler[num]) (machine, num, ppu_regs);
+	if (intf->nmi_handler != NULL)
+		(*intf->nmi_handler) (device, ppu_regs);
 
-	timer_adjust_oneshot(chips[num].nmi_timer, attotime_never, num);
+	timer_adjust_oneshot(this_ppu->nmi_timer, attotime_never, 0);
 }
 
-static void draw_background(running_machine *machine, int num, UINT8 *line_priority )
+static void draw_background(const device_config *device, UINT8 *line_priority )
 {
+	const ppu2c0x_interface *intf = get_interface(device);
+	ppu2c0x_chip *this_ppu = get_token(device);
+
 	/* cache some values locally */
-	bitmap_t *bitmap = chips[num].bitmap;
-	const int *ppu_regs = &chips[num].regs[0];
-	const int scanline = chips[num].scanline;
-	const int refresh_data = chips[num].refresh_data;
-	const int gfx_bank = intf->gfx_layout_number[num];
-	const int total_elements = chips[num].machine->gfx[gfx_bank]->total_elements;
-	const int *nes_vram = &chips[num].nes_vram[0];
-	const int tile_page = chips[num].tile_page;
-	const int line_modulo = chips[num].machine->gfx[gfx_bank]->line_modulo;
-	UINT8 **ppu_page = chips[num].ppu_page;
-	int	start_x = ( chips[num].x_fine ^ 0x07 ) - 7;
+	bitmap_t *bitmap = this_ppu->bitmap;
+	const int *ppu_regs = &this_ppu->regs[0];
+	const int scanline = this_ppu->scanline;
+	const int refresh_data = this_ppu->refresh_data;
+	const int gfx_bank = intf->gfx_layout_number;
+	const int total_elements = device->machine->gfx[gfx_bank]->total_elements;
+	const int *nes_vram = &this_ppu->nes_vram[0];
+	const int tile_page = this_ppu->tile_page;
+	const int line_modulo = device->machine->gfx[gfx_bank]->line_modulo;
+	UINT8 **ppu_page = this_ppu->ppu_page;
+	int	start_x = ( this_ppu->x_fine ^ 0x07 ) - 7;
 	UINT16 back_pen;
 	UINT16 *dest;
 
@@ -423,16 +438,16 @@ static void draw_background(running_machine *machine, int num, UINT8 *line_prior
 	if ( ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO )
 	{
 		color_mask = 0xf0;
-		color_table = chips[num].colortable_mono;
+		color_table = this_ppu->colortable_mono;
 	}
 	else
 	{
 		color_mask = 0xff;
-		color_table = chips[num].colortable;
+		color_table = this_ppu->colortable;
 	}
 
 	/* cache the background pen */
-	back_pen = (chips[num].back_color & color_mask)+intf->color_base[num];
+	back_pen = (this_ppu->back_color & color_mask)+intf->color_base;
 
 	/* determine where in the nametable to start drawing from */
 	/* based on the current scanline and scroll regs */
@@ -477,14 +492,14 @@ static void draw_background(running_machine *machine, int num, UINT8 *line_prior
 		//27/12/2002
 		if( ppu_latch )
 		{
-			(*ppu_latch)(( tile_page << 10 ) | ( page2 << 4 ));
+			(*ppu_latch)(device, ( tile_page << 10 ) | ( page2 << 4 ));
 		}
 
 		if(start_x < VISIBLE_SCREEN_WIDTH )
 		{
 			paldata = &color_table[ 4 * ( ( ( color_byte >> color_bits ) & 0x03 ) ) ];
 			start = scroll_y_fine * line_modulo;
-			sd = gfx_element_get_data(chips[num].machine->gfx[gfx_bank], index2 % total_elements) + start;
+			sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index2 % total_elements) + start;
 
 			/* render the pixel */
 			for( i = 0; i < 8; i++ )
@@ -530,18 +545,21 @@ static void draw_background(running_machine *machine, int num, UINT8 *line_prior
 	}
 }
 
-static void draw_sprites(running_machine *machine, int num, UINT8 *line_priority )
+static void draw_sprites(const device_config *device, UINT8 *line_priority )
 {
+	const ppu2c0x_interface *intf = get_interface(device);
+	ppu2c0x_chip *this_ppu = get_token(device);
+
 	/* cache some values locally */
-	bitmap_t *bitmap = chips[num].bitmap;
-	const int scanline = chips[num].scanline;
-	const int gfx_bank = intf->gfx_layout_number[num];
-	const int total_elements = chips[num].machine->gfx[gfx_bank]->total_elements;
-	const int sprite_page = chips[num].sprite_page;
-	const int line_modulo = chips[num].machine->gfx[gfx_bank]->line_modulo;
-	const UINT8 *sprite_ram = chips[num].spriteram;
-	pen_t *color_table = chips[num].colortable;
-	int *ppu_regs = &chips[num].regs[0];
+	bitmap_t *bitmap = this_ppu->bitmap;
+	const int scanline = this_ppu->scanline;
+	const int gfx_bank = intf->gfx_layout_number;
+	const int total_elements = device->machine->gfx[gfx_bank]->total_elements;
+	const int sprite_page = this_ppu->sprite_page;
+	const int line_modulo = device->machine->gfx[gfx_bank]->line_modulo;
+	const UINT8 *sprite_ram = this_ppu->spriteram;
+	pen_t *color_table = this_ppu->colortable;
+	int *ppu_regs = &this_ppu->regs[0];
 
 	int spriteXPos, spriteYPos, spriteIndex;
 	int tile, index1, page;
@@ -613,10 +631,10 @@ static void draw_sprites(running_machine *machine, int num, UINT8 *line_priority
 			page = ( tile >> 6 ) | sprite_page;
 
 
-		index1 = chips[num].nes_vram[page] + ( tile & 0x3f );
+		index1 = this_ppu->nes_vram[page] + ( tile & 0x3f );
 
 		if ( ppu_latch )
-			(*ppu_latch)(( sprite_page << 10 ) | ( (tile & 0xff) << 4 ));
+			(*ppu_latch)(device, ( sprite_page << 10 ) | ( (tile & 0xff) << 4 ));
 
 		/* compute the character's line to draw */
 		sprite_line = scanline - spriteYPos;
@@ -626,9 +644,9 @@ static void draw_sprites(running_machine *machine, int num, UINT8 *line_priority
 
 		paldata = &color_table[4 * color];
 		start = sprite_line * line_modulo;
-		sd = gfx_element_get_data(chips[num].machine->gfx[gfx_bank], index1 % total_elements) + start;
+		sd = gfx_element_get_data(device->machine->gfx[gfx_bank], index1 % total_elements) + start;
 		if (size > 8)
-			gfx_element_get_data(chips[num].machine->gfx[gfx_bank], (index1 + 1) % total_elements);
+			gfx_element_get_data(device->machine->gfx[gfx_bank], (index1 + 1) % total_elements);
 
 		if ( pri )
 		{
@@ -716,13 +734,15 @@ static void draw_sprites(running_machine *machine, int num, UINT8 *line_priority
  *  Scanline Rendering and Update
  *
  *************************************/
-static void render_scanline(running_machine *machine, int num)
+static void render_scanline(const device_config *device)
 {
+	ppu2c0x_chip *this_ppu = get_token(device);
+	const ppu2c0x_interface *intf = get_interface(device);
 	UINT8	line_priority[VISIBLE_SCREEN_WIDTH];
-	int		*ppu_regs = &chips[num].regs[0];
+	int		*ppu_regs = &this_ppu->regs[0];
 
 	/* lets see how long it takes */
-	profiler_mark(PROFILER_USER1+num);
+	profiler_mark(PROFILER_USER1);
 
 	/* clear the line priority for this scanline */
 	memset( line_priority, 0, VISIBLE_SCREEN_WIDTH );
@@ -732,11 +752,11 @@ static void render_scanline(running_machine *machine, int num)
 
 	/* see if we need to render the background */
 	if ( ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_BACKGROUND )
-		draw_background(machine, num, line_priority );
+		draw_background(device, line_priority );
 	else
 	{
-		bitmap_t *bitmap = chips[num].bitmap;
-		const int scanline = chips[num].scanline;
+		bitmap_t *bitmap = this_ppu->bitmap;
+		const int scanline = this_ppu->scanline;
 		UINT8 color_mask;
 		UINT16 back_pen;
 		int i;
@@ -748,7 +768,7 @@ static void render_scanline(running_machine *machine, int num)
 			color_mask = 0xff;
 
 		/* cache the background pen */
-		back_pen = (chips[num].back_color & color_mask)+intf->color_base[num];
+		back_pen = (this_ppu->back_color & color_mask)+intf->color_base;
 
 		// Fill this scanline with the background pen.
 		for (i = 0; i < bitmap->width; i ++)
@@ -757,19 +777,18 @@ static void render_scanline(running_machine *machine, int num)
 
 	/* if sprites are on, draw them */
 	if ( ppu_regs[PPU_CONTROL1] & PPU_CONTROL1_SPRITES )
-		draw_sprites( machine, num, line_priority );
+		draw_sprites( device, line_priority );
 
  	/* done updating, whew */
 	profiler_mark(PROFILER_END);
 }
 
-static void update_scanline(running_machine *machine, int num )
+static void update_scanline(const device_config *device)
 {
-	ppu2c0x_chip* this_ppu;
-	int scanline = chips[num].scanline;
-	int *ppu_regs = &chips[num].regs[0];
-
-	this_ppu = &chips[num];
+	ppu2c0x_chip *this_ppu = get_token(device);
+	const ppu2c0x_interface *intf = get_interface(device);
+	int scanline = this_ppu->scanline;
+	int *ppu_regs = &this_ppu->regs[0];
 
 	if ( scanline <= PPU_BOTTOM_VISIBLE_SCANLINE )
 	{
@@ -782,7 +801,7 @@ static void update_scanline(running_machine *machine, int num )
 			this_ppu->refresh_data |= ( this_ppu->refresh_latch & 0x041f );
 
 //logerror("   updating refresh_data: %04x (scanline: %d)\n", this_ppu->refresh_data, this_ppu->scanline);
-			render_scanline( machine, num );
+			render_scanline( device );
 		}
 		else
 		{
@@ -812,10 +831,10 @@ static void update_scanline(running_machine *machine, int num )
 				else
 					penNum = this_ppu->videomem[this_ppu->videomem_addr & 0x3f00] & 0x3f;
 
-				back_pen = penNum + intf->color_base[num];
+				back_pen = penNum + intf->color_base;
 			}
 			else
-				back_pen = (this_ppu->back_color & color_mask)+intf->color_base[num];
+				back_pen = (this_ppu->back_color & color_mask)+intf->color_base;
 
 			// Fill this scanline with the background pen.
 			for (i = 0; i < bitmap->width; i ++)
@@ -846,24 +865,24 @@ static void update_scanline(running_machine *machine, int num )
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	int num = param;
-	ppu2c0x_chip* this_ppu = &chips[num];
-	int *ppu_regs = &chips[num].regs[0];
+	const device_config *device = ptr;
+	ppu2c0x_chip *this_ppu = get_token(device);
+	int *ppu_regs = &this_ppu->regs[0];
 	int blanked = ( ppu_regs[PPU_CONTROL1] & ( PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES ) ) == 0;
 	int vblank = ((this_ppu->scanline >= PPU_VBLANK_FIRST_SCANLINE-1) && (this_ppu->scanline < this_ppu->scanlines_per_frame-1)) ? 1 : 0;
 	int next_scanline;
 
 	/* if a callback is available, call it */
-	if ( this_ppu->scanline_callback_proc )
-		(*this_ppu->scanline_callback_proc)( machine, num, this_ppu->scanline, vblank, blanked );
+	if ( this_ppu->scanline_callback_proc != NULL )
+		(*this_ppu->scanline_callback_proc)( device, this_ppu->scanline, vblank, blanked );
 
 	/* update the scanline that just went by */
-	update_scanline( machine, num );
+	update_scanline( device );
 
 	/* increment our scanline count */
 	this_ppu->scanline++;
 
-//logerror("starting scanline %d (MAME %d, beam %d)\n", this_ppu->scanline, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
+//logerror("starting scanline %d (MAME %d, beam %d)\n", this_ppu->scanline, video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen));
 
 	/* Note: this is called at the _end_ of each scanline */
 	if (this_ppu->scanline == PPU_VBLANK_FIRST_SCANLINE)
@@ -879,7 +898,7 @@ logerror("vlbank starting\n");
 			// a game can read the high bit of $2002 before the NMI is called (potentially resetting the bit
 			// via a read from $2002 in the NMI handler).
 			// B-Wings is an example game that needs this.
-			timer_adjust_oneshot(this_ppu->nmi_timer, cpu_clocks_to_attotime(machine->cpu[0], 4), num);
+			timer_adjust_oneshot(this_ppu->nmi_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 4), 0);
 		}
 	}
 
@@ -907,10 +926,10 @@ logerror("vlbank ending\n");
 		next_scanline = 0;
 
 	// Call us back when the hblank starts for this scanline
-	timer_adjust_oneshot(this_ppu->hblank_timer, cpu_clocks_to_attotime(machine->cpu[0], 86.67), num); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust_oneshot(this_ppu->hblank_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// trigger again at the start of the next scanline
-	timer_adjust_oneshot(this_ppu->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, next_scanline * this_ppu->scan_scale, 0), num);
+	timer_adjust_oneshot(this_ppu->scanline_timer, video_screen_get_time_until_pos(device->machine->primary_screen, next_scanline * this_ppu->scan_scale, 0), 0);
 }
 
 /*************************************
@@ -918,71 +937,68 @@ logerror("vlbank ending\n");
  *  PPU Reset
  *
  *************************************/
-void ppu2c0x_reset(running_machine *machine, int num, int scan_scale)
+
+static DEVICE_RESET( ppu2c0x )
 {
+	ppu2c0x_chip *this_ppu = get_token(device);
+	const ppu2c0x_interface *intf = get_interface(device);
+	int scan_scale = 1;
 	int i;
 
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU(reset): Attempting to access an unmapped chip\n" );
-		return;
-	}
-
 	/* reset the scanline count */
-	chips[num].scanline = 0;
+	this_ppu->scanline = 0;
 
 	/* set the scan scale (this is for dual monitor vertical setups) */
-	chips[num].scan_scale = scan_scale;
+	this_ppu->scan_scale = scan_scale;
 
-	timer_adjust_oneshot(chips[num].nmi_timer, attotime_never, num);
+	timer_adjust_oneshot(this_ppu->nmi_timer, attotime_never, 0);
 
 	// Call us back when the hblank starts for this scanline
-	timer_adjust_oneshot(chips[num].hblank_timer, cpu_clocks_to_attotime(machine->cpu[0], 86.67), num); // ??? FIXME - hardcoding NTSC, need better calculation
+	timer_adjust_oneshot(this_ppu->hblank_timer, cpu_clocks_to_attotime(device->machine->cpu[0], 86.67), 0); // ??? FIXME - hardcoding NTSC, need better calculation
 
 	// Call us back at the start of the next scanline
-	timer_adjust_oneshot(chips[num].scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), num);
+	timer_adjust_oneshot(this_ppu->scanline_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 1, 0), 0);
 
 	/* reset the callbacks */
-	chips[num].scanline_callback_proc = 0;
-	chips[num].vidaccess_callback_proc = 0;
+	this_ppu->scanline_callback_proc = 0;
+	this_ppu->vidaccess_callback_proc = 0;
 
 	for( i = 0; i < PPU_MAX_REG; i++ )
-		chips[num].regs[i] = 0;
+		this_ppu->regs[i] = 0;
 
 	/* initialize the rest of the members */
-	chips[num].refresh_data = 0;
-	chips[num].refresh_latch = 0;
-	chips[num].x_fine = 0;
-	chips[num].toggle = 0;
-	chips[num].add = 1;
-	chips[num].videomem_addr = 0;
-	chips[num].addr_latch = 0;
-	chips[num].data_latch = 0;
-	chips[num].tile_page = 0;
-	chips[num].sprite_page = 0;
-	chips[num].back_color = 0;
+	this_ppu->refresh_data = 0;
+	this_ppu->refresh_latch = 0;
+	this_ppu->x_fine = 0;
+	this_ppu->toggle = 0;
+	this_ppu->add = 1;
+	this_ppu->videomem_addr = 0;
+	this_ppu->addr_latch = 0;
+	this_ppu->data_latch = 0;
+	this_ppu->tile_page = 0;
+	this_ppu->sprite_page = 0;
+	this_ppu->back_color = 0;
 
 	/* initialize the color tables */
 	{
-		int color_base = intf->color_base[num];
+		int color_base = intf->color_base;
 
 		for( i = 0; i < ARRAY_LENGTH( default_colortable_mono ); i++ )
 		{
 			/* monochromatic table */
-			chips[num].colortable_mono[i] = default_colortable_mono[i] + color_base;
+			this_ppu->colortable_mono[i] = default_colortable_mono[i] + color_base;
 
 			/* color table */
-			chips[num].colortable[i] = default_colortable[i] + color_base;
+			this_ppu->colortable[i] = default_colortable[i] + color_base;
 		}
 	}
 
 	/* set the vram bank-switch values to the default */
 	for( i = 0; i < 8; i++ )
-		chips[num].nes_vram[i] = i * 64;
+		this_ppu->nes_vram[i] = i * 64;
 
-	if ( chips[num].has_videorom )
-		ppu2c0x_set_videorom_bank( num, 0, 8, 0, 512 );
+	if ( this_ppu->has_videorom )
+		ppu2c0x_set_videorom_bank( device, 0, 8, 0, 512 );
 }
 
 
@@ -991,22 +1007,14 @@ void ppu2c0x_reset(running_machine *machine, int num, int scan_scale)
  *  PPU Registers Read
  *
  *************************************/
-int ppu2c0x_r( const address_space *space, offs_t offset, int num )
+
+READ8_DEVICE_HANDLER( ppu2c0x_r )
 {
-	ppu2c0x_chip* this_ppu;
-
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU %d(r): Attempting to access an unmapped chip\n", num );
-		return 0;
-	}
-
-	this_ppu = &chips[num];
+	ppu2c0x_chip *this_ppu = get_token(device);
 
 	if ( offset >= PPU_MAX_REG )
 	{
-		logerror( "PPU %d(r): Attempting to read past the chip\n", num );
+		logerror( "PPU %s(r): Attempting to read past the chip\n", device->tag );
 		offset &= PPU_MAX_REG - 1;
 	}
 
@@ -1041,7 +1049,7 @@ int ppu2c0x_r( const address_space *space, offs_t offset, int num )
 				this_ppu->data_latch = this_ppu->buffered_data;
 
 			if ( ppu_latch )
-				(*ppu_latch)( this_ppu->videomem_addr & 0x3fff );
+				(*ppu_latch)( device, this_ppu->videomem_addr & 0x3fff );
 
 			if ( ( this_ppu->videomem_addr >= 0x2000 ) && ( this_ppu->videomem_addr <= 0x3fff ) )
 				this_ppu->buffered_data = this_ppu->ppu_page[ ( this_ppu->videomem_addr & 0xc00) >> 10][ this_ppu->videomem_addr & 0x3ff ];
@@ -1064,20 +1072,14 @@ int ppu2c0x_r( const address_space *space, offs_t offset, int num )
  *  PPU Registers Write
  *
  *************************************/
-void ppu2c0x_w( const address_space *space, offs_t offset, UINT8 data, int num )
+
+WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 {
-	ppu2c0x_chip* this_ppu;
+	ppu2c0x_chip *this_ppu = get_token(device);
+	const ppu2c0x_interface *intf = get_interface(device);
 	int color_base;
 
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU(w): Attempting to access an unmapped chip\n" );
-		return;
-	}
-
-	this_ppu = &chips[num];
-	color_base = intf->color_base[num];
+	color_base = intf->color_base;
 
 	if ( offset >= PPU_MAX_REG )
 	{
@@ -1188,11 +1190,11 @@ void ppu2c0x_w( const address_space *space, offs_t offset, UINT8 data, int num )
 				int tempAddr = this_ppu->videomem_addr & 0x3fff;
 
 				if ( ppu_latch )
-					(*ppu_latch)( tempAddr );
+					(*ppu_latch)( device, tempAddr );
 
 				/* if there's a callback, call it now */
 				if ( this_ppu->vidaccess_callback_proc )
-					data = (*this_ppu->vidaccess_callback_proc)( space->machine, num, tempAddr, data );
+					data = (*this_ppu->vidaccess_callback_proc)( device, tempAddr, data );
 
 				/* see if it's on the chargen portion */
 				if ( tempAddr < 0x2000 )
@@ -1210,7 +1212,7 @@ void ppu2c0x_w( const address_space *space, offs_t offset, UINT8 data, int num )
 						this_ppu->videomem[tempAddr] = data;
 
 						/* mark the char dirty */
-						gfx_element_mark_dirty(this_ppu->machine->gfx[intf->gfx_layout_number[num]], tempAddr >> 4);
+						gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], tempAddr >> 4);
 					}
 				}
 
@@ -1277,23 +1279,16 @@ void ppu2c0x_w( const address_space *space, offs_t offset, UINT8 data, int num )
  *  Sprite DMA
  *
  *************************************/
-void ppu2c0x_spriteram_dma (const address_space *space, int num, const UINT8 page)
+void ppu2c0x_spriteram_dma (const address_space *space, const device_config *device, const UINT8 page)
 {
 	int i;
 	int address = page << 8;
 
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU(w): Attempting to access an unmapped chip\n" );
-		return;
-	}
-
-//logerror("   sprite DMA: %d (scanline: %d)\n", page, chips[num].scanline);
+//logerror("   sprite DMA: %d (scanline: %d)\n", page, this_ppu->scanline);
 	for (i = 0; i < SPRITERAM_SIZE; i++)
 	{
 		UINT8 spriteData = memory_read_byte(space, address + i);
-		ppu2c0x_w (space, PPU_SPRITE_DATA, spriteData, num);
+		ppu2c0x_w (device, PPU_SPRITE_DATA, spriteData);
 	}
 
 	// should last 513 CPU cycles.
@@ -1304,12 +1299,10 @@ void ppu2c0x_spriteram_dma (const address_space *space, int num, const UINT8 pag
 	// the scanline timers should catch us up before drawing actually happens.
 #if 0
 {
-	ppu2c0x_chip* this_ppu = &chips[num];
-
-	scanline_callback(this_ppu->machine, num);
-	scanline_callback(this_ppu->machine, num);
-	scanline_callback(this_ppu->machine, num);
-	scanline_callback(this_ppu->machine, num);
+	scanline_callback(device);
+	scanline_callback(device);
+	scanline_callback(device);
+	scanline_callback(device);
 }
 #endif
 }
@@ -1319,16 +1312,11 @@ void ppu2c0x_spriteram_dma (const address_space *space, int num, const UINT8 pag
  *  PPU Rendering
  *
  *************************************/
-void ppu2c0x_render( int num, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy )
-{
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU(render): Attempting to access an unmapped chip\n" );
-		return;
-	}
 
-	copybitmap( bitmap, chips[num].bitmap, flipx, flipy, sx, sy, 0 );
+void ppu2c0x_render( const device_config *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy )
+{
+	ppu2c0x_chip *this_ppu = get_token(device);
+	copybitmap( bitmap, this_ppu->bitmap, flipx, flipy, sx, sy, 0 );
 }
 
 /*************************************
@@ -1336,44 +1324,39 @@ void ppu2c0x_render( int num, bitmap_t *bitmap, int flipx, int flipy, int sx, in
  *  PPU VideoROM banking
  *
  *************************************/
-void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank, int bank_size )
+void ppu2c0x_set_videorom_bank( const device_config *device, int start_page, int num_pages, int bank, int bank_size )
 {
+	ppu2c0x_chip *this_ppu = get_token(device);
+	const ppu2c0x_interface *intf = get_interface(device);
 	int i;
 
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU(set vrom bank): Attempting to access an unmapped chip\n" );
-		return;
-	}
-
-	if ( !chips[num].has_videorom )
+	if ( !this_ppu->has_videorom )
 	{
 		logerror( "PPU(set vrom bank): Attempting to switch videorom banks and no rom is mapped\n" );
 		return;
 	}
 
-	bank &= ( chips[num].videorom_banks * ( CHARGEN_NUM_CHARS / bank_size ) ) - 1;
+	bank &= ( this_ppu->videorom_banks * ( CHARGEN_NUM_CHARS / bank_size ) ) - 1;
 
-	if (chips[num].has_videoram)
+	if (this_ppu->has_videoram)
 	{
 		for ( i = start_page; i < start_page + num_pages; i++ )
 		{
 			int elemnum;
 
-			if ( chips[num].videoram_banks_indices[i] != -1 )
+			if ( this_ppu->videoram_banks_indices[i] != -1 )
 			{
-				memcpy( &chips[num].videoram[chips[num].videoram_banks_indices[i]*0x400], &chips[num].videomem[i*0x400], 0x400);
+				memcpy( &this_ppu->videoram[this_ppu->videoram_banks_indices[i]*0x400], &this_ppu->videomem[i*0x400], 0x400);
 			}
-			chips[num].videoram_banks_indices[i] = -1;
+			this_ppu->videoram_banks_indices[i] = -1;
 			for (elemnum = 0; elemnum < (num_pages*0x400 >> 4); elemnum++)
-				gfx_element_mark_dirty(chips[num].machine->gfx[intf->gfx_layout_number[num]], (start_page*0x400 >> 4) + elemnum);
+				gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], (start_page*0x400 >> 4) + elemnum);
 		}
 	}
 	else
 	{
 		for( i = start_page; i < ( start_page + num_pages ); i++ )
-			chips[num].nes_vram[i] = bank * bank_size + 64 * ( i - start_page );
+			this_ppu->nes_vram[i] = bank * bank_size + 64 * ( i - start_page );
 	}
 
 	{
@@ -1381,7 +1364,7 @@ void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank
 		int count = num_pages * 0x400;
 		int rom_start = bank * bank_size * 16;
 
-		memcpy( &chips[num].videomem[vram_start], &memory_region( chips[num].machine, intf->vrom_region[num] )[rom_start], count );
+		memcpy( &this_ppu->videomem[vram_start], &memory_region( device->machine, intf->vrom_region )[rom_start], count );
 	}
 }
 
@@ -1390,18 +1373,14 @@ void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank
  *  PPU VideoRAM banking
  *
  *************************************/
-void ppu2c0x_set_videoram_bank( int num, int start_page, int num_pages, int bank, int bank_size )
+
+void ppu2c0x_set_videoram_bank( const device_config *device, int start_page, int num_pages, int bank, int bank_size )
 {
+	ppu2c0x_chip *this_ppu = get_token(device);
+	const ppu2c0x_interface *intf = get_interface(device);
 	int i;
 
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU(set vrom bank): Attempting to access an unmapped chip\n" );
-		return;
-	}
-
-	if ( !chips[num].has_videoram )
+	if ( !this_ppu->has_videoram )
 	{
 		logerror( "PPU(set vram bank): Attempting to switch videoram banks and no ram is mapped\n" );
 		return;
@@ -1412,13 +1391,13 @@ void ppu2c0x_set_videoram_bank( int num, int start_page, int num_pages, int bank
 	for ( i = start_page; i < start_page + num_pages; i++ )
 	{
 		int elemnum;
-		if ( chips[num].videoram_banks_indices[i] != -1 )
+		if ( this_ppu->videoram_banks_indices[i] != -1 )
 		{
-			memcpy( &chips[num].videoram[chips[num].videoram_banks_indices[i]*0x400], &chips[num].videomem[i*0x400], 0x400);
+			memcpy( &this_ppu->videoram[this_ppu->videoram_banks_indices[i]*0x400], &this_ppu->videomem[i*0x400], 0x400);
 		}
-		chips[num].videoram_banks_indices[i] = (bank * bank_size * 16)/0x400 + (i - start_page);
+		this_ppu->videoram_banks_indices[i] = (bank * bank_size * 16)/0x400 + (i - start_page);
 		for (elemnum = 0; elemnum < (num_pages*0x400 >> 4); elemnum++)
-			gfx_element_mark_dirty(chips[num].machine->gfx[intf->gfx_layout_number[num]], (start_page*0x400 >> 4) + elemnum);
+			gfx_element_mark_dirty(device->machine->gfx[intf->gfx_layout_number], (start_page*0x400 >> 4) + elemnum);
 	}
 
 	{
@@ -1427,7 +1406,7 @@ void ppu2c0x_set_videoram_bank( int num, int start_page, int num_pages, int bank
 		int ram_start = bank * bank_size * 16;
 
 		logerror( "ppu2c0x_set_videoram_bank: vram_start = %04x, count = %04x, ram_start = %04x\n", vram_start, count, ram_start );
-		memcpy( &chips[num].videomem[vram_start], &chips[num].videoram[ram_start], count );
+		memcpy( &this_ppu->videomem[vram_start], &this_ppu->videoram[ram_start], count );
 	}
 }
 
@@ -1436,14 +1415,10 @@ void ppu2c0x_set_videoram_bank( int num, int start_page, int num_pages, int bank
  *  Utility functions
  *
  *************************************/
-int ppu2c0x_get_pixel( int num, int x, int y )
+
+int ppu2c0x_get_pixel( const device_config *device, int x, int y )
 {
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU(get_pixel): Attempting to access an unmapped chip\n" );
-		return 0;
-	}
+	ppu2c0x_chip *this_ppu = get_token(device);
 
 	if ( x >= VISIBLE_SCREEN_WIDTH )
 		x = VISIBLE_SCREEN_WIDTH - 1;
@@ -1451,45 +1426,24 @@ int ppu2c0x_get_pixel( int num, int x, int y )
 	if ( y >= VISIBLE_SCREEN_HEIGHT )
 		y = VISIBLE_SCREEN_HEIGHT - 1;
 
-	return *BITMAP_ADDR16(chips[num].bitmap, y, x);
+	return *BITMAP_ADDR16(this_ppu->bitmap, y, x);
 }
 
-int ppu2c0x_get_colorbase( int num )
+int ppu2c0x_get_colorbase( const device_config *device )
 {
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU(get_colorbase): Attempting to access an unmapped chip\n" );
-		return 0;
-	}
-
-	return intf->color_base[num];
+	const ppu2c0x_interface *intf = get_interface(device);
+	return intf->color_base;
 }
 
-int ppu2c0x_get_current_scanline( int num )
+int ppu2c0x_get_current_scanline( const device_config *device )
 {
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU(get_colorbase): Attempting to access an unmapped chip\n" );
-		return 0;
-	}
-
-	return chips[num].scanline;
+	ppu2c0x_chip *this_ppu = get_token(device);
+	return this_ppu->scanline;
 }
 
-void ppu2c0x_set_mirroring( int num, int mirroring )
+void ppu2c0x_set_mirroring( const device_config *device, int mirroring )
 {
-	ppu2c0x_chip* this_ppu;
-
-	/* check bounds */
-	if ( num >= intf->num )
-	{
-		logerror( "PPU %d: Attempting to access an unmapped chip\n", num );
-		return;
-	}
-
-	this_ppu = &chips[num];
+	ppu2c0x_chip *this_ppu = get_token(device);
 
 	// Once we've set 4-screen mirroring, do not change. Some games
 	// (notably Gauntlet) use mappers that can change the mirroring
@@ -1541,90 +1495,96 @@ void ppu2c0x_set_mirroring( int num, int mirroring )
 	this_ppu->mirror_state = mirroring;
 }
 
-#ifdef UNUSED_FUNCTION
-void ppu2c0x_set_nmi_callback( int num, ppu2c0x_nmi_cb cb )
+void ppu2c0x_set_scanline_callback( const device_config *device, ppu2c0x_scanline_cb cb )
 {
-	/* check bounds */
-	if ( num >= intf->num )
+	ppu2c0x_chip *this_ppu = get_token(device);
+	this_ppu->scanline_callback_proc = cb;
+}
+
+void ppu2c0x_set_hblank_callback( const device_config *device, ppu2c0x_hblank_cb cb )
+{
+	ppu2c0x_chip *this_ppu = get_token(device);
+	this_ppu->hblank_callback_proc = cb;
+}
+
+void ppu2c0x_set_vidaccess_callback( const device_config *device, ppu2c0x_vidaccess_cb cb )
+{
+	ppu2c0x_chip *this_ppu = get_token(device);
+	this_ppu->vidaccess_callback_proc = cb;
+}
+
+void ppu2c0x_set_scanlines_per_frame( const device_config *device, int scanlines )
+{
+	ppu2c0x_chip *this_ppu = get_token(device);
+	this_ppu->scanlines_per_frame = scanlines;
+}
+
+
+/***************************************************************************
+    GET INFO FUNCTIONS
+***************************************************************************/
+
+DEVICE_GET_INFO(ppu2c02)
+{
+	switch (state)
 	{
-		logerror( "PPU(set_nmi_callback): Attempting to access an unmapped chip\n" );
-		return;
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ppu2c0x_chip);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
+		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						/* Nothing */								break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ppu2c0x);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(ppu2c0x);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							strcpy(info->s, "2C02 PPU");				break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "2C0X PPU");				break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
-
-	intf->nmi_handler[num] = cb;
 }
-#endif
 
-void ppu2c0x_set_scanline_callback( int num, ppu2c0x_scanline_cb cb )
+DEVICE_GET_INFO(ppu2c03b)
 {
-	/* check bounds */
-	if ( num >= intf->num )
+	switch (state)
 	{
-		logerror( "PPU(set_scanline_callback): Attempting to access an unmapped chip\n" );
-		return;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "2C02B PPU");				break;
+		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
+		default: 										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
-
-	chips[num].scanline_callback_proc = cb;
 }
 
-void ppu2c0x_set_hblank_callback( int num, ppu2c0x_hblank_cb cb )
+DEVICE_GET_INFO(ppu2c04)
 {
-	/* check bounds */
-	if ( num >= intf->num )
+	switch (state)
 	{
-		logerror( "PPU(set_scanline_callback): Attempting to access an unmapped chip\n" );
-		return;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "2C04 PPU");				break;
+		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
+		default: 										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
-
-	chips[num].hblank_callback_proc = cb;
 }
 
-void ppu2c0x_set_vidaccess_callback( int num, ppu2c0x_vidaccess_cb cb )
+DEVICE_GET_INFO(ppu2c05)
 {
-	/* check bounds */
-	if ( num >= intf->num )
+	switch (state)
 	{
-		logerror( "PPU(set_vidaccess_callback): Attempting to access an unmapped chip\n" );
-		return;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "2C05 PPU");				break;
+		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
+		default: 										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
-
-	chips[num].vidaccess_callback_proc = cb;
 }
 
-void ppu2c0x_set_scanlines_per_frame( int num, int scanlines )
+DEVICE_GET_INFO(ppu2c07)
 {
-	/* check bounds */
-	if ( num >= intf->num )
+	switch (state)
 	{
-		logerror( "PPU(set_scanlines_per_frame): Attempting to access an unmapped chip\n" );
-		return;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "2C07 PPU");				break;
+		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_PAL_SCANLINES_PER_FRAME;		break;
+		default: 										DEVICE_GET_INFO_CALL(ppu2c02);				break;
 	}
-
-	chips[num].scanlines_per_frame = scanlines;
-}
-
-/*************************************
- *
- *  Accesors
- *
- *************************************/
-
-READ8_HANDLER( ppu2c0x_0_r )
-{
-	return ppu2c0x_r( space, offset, 0 );
-}
-
-READ8_HANDLER( ppu2c0x_1_r )
-{
-	return ppu2c0x_r( space, offset, 1 );
-}
-
-WRITE8_HANDLER( ppu2c0x_0_w )
-{
-	ppu2c0x_w( space, offset, data, 0 );
-}
-
-WRITE8_HANDLER( ppu2c0x_1_w )
-{
-	ppu2c0x_w( space, offset, data, 1 );
 }

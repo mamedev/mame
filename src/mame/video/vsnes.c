@@ -14,43 +14,42 @@ PALETTE_INIT( vsdual )
 	ppu2c0x_init_palette(machine, 8*4*16 );
 }
 
-static void ppu_irq( running_machine *machine, int num, int *ppu_regs )
+static void ppu_irq_1( const device_config *device, int *ppu_regs )
 {
-	cpu_set_input_line(machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+}
+
+static void ppu_irq_2( const device_config *device, int *ppu_regs )
+{
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */
-static const ppu2c0x_interface ppu_interface =
+const ppu2c0x_interface vsnes_ppu_interface_1 =
 {
-	PPU_2C04,				/* type */
-	1,						/* num */
-	{ "gfx1" },				/* vrom gfx region */
-	{ 0 },					/* gfxlayout num */
-	{ 0 },					/* color base */
-	{ PPU_MIRROR_NONE },	/* mirroring */
-	{ ppu_irq }				/* irq */
+	"gfx1",				/* vrom gfx region */
+	0,					/* gfxlayout num */
+	0,					/* color base */
+	PPU_MIRROR_NONE,	/* mirroring */
+	ppu_irq_1			/* irq */
 };
 
 /* our ppu interface for dual games                             */
-static const ppu2c0x_interface ppu_dual_interface =
+const ppu2c0x_interface vsnes_ppu_interface_2 =
 {
-	PPU_2C04,								/* type */
-	2,										/* num */
-	{ "gfx1", "gfx2" },						/* vrom gfx region */
-	{ 0, 1 },								/* gfxlayout num */
-	{ 0, 64 },								/* color base */
-	{ PPU_MIRROR_NONE, PPU_MIRROR_NONE },	/* mirroring */
-	{ ppu_irq, ppu_irq }					/* irq */
+	"gfx2",				/* vrom gfx region */
+	1,					/* gfxlayout num */
+	64,					/* color base */
+	PPU_MIRROR_NONE,	/* mirroring */
+	ppu_irq_2			/* irq */
 };
 
 VIDEO_START( vsnes )
 {
-	ppu2c0x_init(machine, &ppu_interface );
 }
 
 VIDEO_START( vsdual )
 {
-	ppu2c0x_init(machine, &ppu_dual_interface );
 }
 
 /***************************************************************************
@@ -61,7 +60,7 @@ VIDEO_START( vsdual )
 VIDEO_UPDATE( vsnes )
 {
 	/* render the ppu */
-	ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render( devtag_get_device(screen->machine, "ppu1"), bitmap, 0, 0, 0, 0 );
 	return 0;
 }
 
@@ -73,9 +72,9 @@ VIDEO_UPDATE( vsdual )
 
 	/* render the ppu's */
 	if (screen == top_screen)
-		ppu2c0x_render(0, bitmap, 0, 0, 0, 0);
+		ppu2c0x_render(devtag_get_device(screen->machine, "ppu1"), bitmap, 0, 0, 0, 0);
 	else if (screen == bottom_screen)
-		ppu2c0x_render(1, bitmap, 0, 0, 0, 0);
+		ppu2c0x_render(devtag_get_device(screen->machine, "ppu2"), bitmap, 0, 0, 0, 0);
 
 	return 0;
 }

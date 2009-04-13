@@ -63,7 +63,7 @@ Notes:
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( space, 0, source );
+	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu"), source );
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -123,15 +123,16 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	UINT32 prg_bank = (offset >> 7) & 0x1f;
 	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
 	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
+	const device_config *ppu = devtag_get_device(space->machine, "ppu");
 
 	UINT8* dst = memory_region( space->machine, "maincpu" );
 	UINT8* src = memory_region( space->machine, "user1" );
 
 	// switch PPU VROM bank
-	ppu2c0x_set_videorom_bank( 0, 0, 8, gfx_bank, 512 );
+	ppu2c0x_set_videorom_bank( ppu, 0, 8, gfx_bank, 512 );
 
 	// set gfx mirroring
-	ppu2c0x_set_mirroring( 0, gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
+	ppu2c0x_set_mirroring( ppu, gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT );
 
 	// switch PRG bank
 	if ( prg_bank_page_size == 0 )
@@ -158,7 +159,7 @@ static WRITE8_HANDLER( cham24_mapper_w )
 
 static ADDRESS_MAP_START( cham24_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
@@ -203,10 +204,6 @@ static MACHINE_RESET( cham24 )
 
 	memcpy( &dst[0x8000], &src[0x0f8000], 0x4000 );
 	memcpy( &dst[0xc000], &src[0x0f8000], 0x4000 );
-	device_reset(machine->cpu[0]);
-
-	/* reset the ppu */
-	ppu2c0x_reset( machine, 0, 1 );
 }
 
 static PALETTE_INIT( cham24 )
@@ -214,32 +211,29 @@ static PALETTE_INIT( cham24 )
 	ppu2c0x_init_palette(machine, 0 );
 }
 
-static void ppu_irq( running_machine *machine, int num, int *ppu_regs )
+static void ppu_irq( const device_config *device, int *ppu_regs )
 {
-	cpu_set_input_line(machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */
 static const ppu2c0x_interface ppu_interface =
 {
-	PPU_2C04,				/* type */
-	1,						/* num */
-	{ "gfx1" },				/* vrom gfx region */
-	{ 0 },					/* gfxlayout num */
-	{ 0 },					/* color base */
-	{ PPU_MIRROR_NONE },	/* mirroring */
-	{ ppu_irq }				/* irq */
+	"gfx1",				/* vrom gfx region */
+	0,					/* gfxlayout num */
+	0,					/* color base */
+	PPU_MIRROR_NONE,	/* mirroring */
+	ppu_irq				/* irq */
 };
 
 static VIDEO_START( cham24 )
 {
-	ppu2c0x_init(machine, &ppu_interface );
 }
 
 static VIDEO_UPDATE( cham24 )
 {
 	/* render the ppu */
-	ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render( devtag_get_device(screen->machine, "ppu"), bitmap, 0, 0, 0, 0 );
 	return 0;
 }
 
@@ -271,6 +265,8 @@ static MACHINE_DRIVER_START( cham24 )
 	MDRV_PALETTE_INIT(cham24)
 	MDRV_VIDEO_START(cham24)
 	MDRV_VIDEO_UPDATE(cham24)
+
+	MDRV_PPU2C04_ADD("ppu", ppu_interface)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

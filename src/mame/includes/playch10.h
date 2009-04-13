@@ -46,6 +46,9 @@ extern int pc10_dispmask_old;
 
 /*----------- defined in video/playch10.c -----------*/
 
+extern const ppu2c0x_interface playch10_ppu_interface;
+extern const ppu2c0x_interface playch10_ppu_interface_hboard;
+
 WRITE8_HANDLER( playch10_videoram_w );
 PALETTE_INIT( playch10 );
 VIDEO_START( playch10 );

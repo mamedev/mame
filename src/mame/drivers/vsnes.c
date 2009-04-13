@@ -148,14 +148,14 @@ static int coin;
 
 static WRITE8_HANDLER( sprite_dma_0_w )
 {
-    int source = ( data & 7 );
-     ppu2c0x_spriteram_dma( space, 0, source );
+	int source = ( data & 7 );
+	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu1"), source );
 }
 
 static WRITE8_HANDLER( sprite_dma_1_w )
 {
-    int source = ( data & 7 );
-    ppu2c0x_spriteram_dma( space, 1, source );
+	int source = ( data & 7 );
+	ppu2c0x_spriteram_dma( space, devtag_get_device(space->machine, "ppu2"), source );
 }
 
 static WRITE8_HANDLER( vsnes_coin_counter_w )
@@ -203,7 +203,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 
 static ADDRESS_MAP_START( vsnes_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(&work_ram)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac1", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes1", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
@@ -216,7 +216,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vsnes_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(&work_ram_1)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_1_r, ppu2c0x_1_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu2", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac2", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes2", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_1_w)
@@ -1782,6 +1782,8 @@ static MACHINE_DRIVER_START( vsnes )
 	MDRV_VIDEO_START(vsnes)
 	MDRV_VIDEO_UPDATE(vsnes)
 
+	MDRV_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -1824,6 +1826,9 @@ static MACHINE_DRIVER_START( vsdual )
 	MDRV_PALETTE_INIT(vsdual)
 	MDRV_VIDEO_START(vsdual)
 	MDRV_VIDEO_UPDATE(vsdual)
+
+	MDRV_PPU2C04_ADD("ppu1", vsnes_ppu_interface_1)
+	MDRV_PPU2C04_ADD("ppu2", vsnes_ppu_interface_2)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
