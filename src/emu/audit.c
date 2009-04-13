@@ -74,8 +74,13 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 				if (ROMREGION_ISROMDATA(region) || ROMREGION_ISDISKDATA(region))
 				{
-					if (source_is_gamedrv && allshared && !rom_used_by_parent(gamedrv, rom, NULL))
-						allshared = FALSE;
+					if (source_is_gamedrv && !ROM_ISOPTIONAL(rom) && !ROM_NOGOODDUMP(rom))
+					{
+						anyrequired = TRUE;
+
+						if (allshared && !rom_used_by_parent(gamedrv, rom, NULL))
+							allshared = FALSE;
+					}
 					records++;
 				}
 	}
@@ -96,8 +101,6 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 				const char *regiontag = ROMREGION_ISLOADBYNAME(region) ? ROM_GETNAME(region) : NULL;
 				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
-					int shared = rom_used_by_parent(gamedrv, rom, NULL);
-
 					/* audit a file */
 					if (ROMREGION_ISROMDATA(region))
 					{
@@ -109,19 +112,14 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 					{
 						audit_one_disk(options, rom, gamedrv, validation, record);
 					}
-					
+
 					else
 					{
 						continue;
 					}
 
-					if (record->status != AUDIT_STATUS_NOT_FOUND)
-					{
-						if (source_is_gamedrv && (!shared || allshared))
-							anyfound = TRUE;
-					}
-					else if (record->substatus != SUBSTATUS_NOT_FOUND_NODUMP && record->substatus != SUBSTATUS_NOT_FOUND_OPTIONAL)
-						anyrequired = TRUE;
+					if (source_is_gamedrv && record->status != AUDIT_STATUS_NOT_FOUND && (allshared || !rom_used_by_parent(gamedrv, rom, NULL)))
+						anyfound = TRUE;
 
 					record++;
 				}
