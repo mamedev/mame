@@ -190,7 +190,7 @@ struct _settings_menu_state
 typedef struct _input_menu_state input_menu_state;
 struct _input_menu_state
 {
-	const void *		lastref;
+	UINT16 				last_sortorder;
 	const void *		pollingref;
 	input_item_data *	pollingitem;
 	UINT8				record_next;
@@ -1779,7 +1779,7 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 			/* an item was selected: begin polling */
 			case IPT_UI_SELECT:
 				menustate->pollingitem = item;
-				menustate->lastref = item->ref;
+				menustate->last_sortorder = item->sortorder;
 				menustate->starting_seq = item->seq;
 				input_seq_poll_start((item->type == INPUT_TYPE_ANALOG) ? ITEM_CLASS_ABSOLUTE : ITEM_CLASS_SWITCH, menustate->record_next ? &item->seq : NULL);
 				invalidate = TRUE;
@@ -1794,9 +1794,9 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 		}
 
 		/* if the selection changed, reset the "record next" flag */
-		if (item->ref != menustate->lastref)
+		if (item->sortorder != menustate->last_sortorder)
 			menustate->record_next = FALSE;
-		menustate->lastref = item->ref;
+		menustate->last_sortorder = item->sortorder;
 	}
 
 	/* if the sequence changed, update it */
