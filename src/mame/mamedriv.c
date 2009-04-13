@@ -4805,6 +4805,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rohga2 )	/* MAM (c) 1991 Data East Corporation (Asia/Euro) */
 	DRIVER( rohgah )	/* MAM (c) 1991 Data East Corporation (Hong Kong) */
 	DRIVER( rohgau )	/* MAM (c) 1991 Data East Corporation (US) */
+	DRIVER( wolffang )	/* MAM (c) 1991 Data East Corporation (Japan) */
 	DRIVER( schmeisr )	/*     (c) 1993 Hot B */
 	DRIVER( captaven )	/* MAN (c) 1991 Data East Corporation (Asia) */
 	DRIVER( captavna )	/* MAN (c) 1991 Data East Corporation (Asia) */
