@@ -246,15 +246,31 @@ WRITE8_HANDLER( system1_sprite_collision_reset_w )
  *  Video RAM access
  *
  *************************************/
+ 
+INLINE void videoram_wait_states(const device_config *cpu)
+{
+	/* The main Z80's CPU clock is halted whenever an access to VRAM happens,
+	   and is only restarted by the FIXST signal, which occurs once every
+	   'n' pixel clocks. 'n' is determined by the horizontal control PAL. */
+
+	/* this assumes 4 5MHz pixel clocks per FIXST, or 4*4 20MHz CPU clocks */
+	/* this is just a guess until we get a good dump of the PAL */
+	const UINT32 cpu_cycles_per_fixst = 4 * 4;
+	UINT32 cycles_until_next_fixst = cpu_cycles_per_fixst - (cpu_get_total_cycles(cpu) % cpu_cycles_per_fixst);
+	
+	cpu_adjust_icount(cpu, -cycles_until_next_fixst);
+}
 
 READ8_HANDLER( system1_videoram_r )
 {
+	videoram_wait_states(space->cpu);
 	offset |= 0x1000 * ((videoram_bank >> 1) % (tilemap_pages / 2));
 	return videoram[offset];
 }
 
 WRITE8_HANDLER( system1_videoram_w )
 {
+	videoram_wait_states(space->cpu);
 	offset |= 0x1000 * ((videoram_bank >> 1) % (tilemap_pages / 2));
 	videoram[offset] = data;
 
