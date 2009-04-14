@@ -19,6 +19,8 @@
 #define DEBUG_MAPLE	(0)
 #define DEBUG_MAPLE_REGS	(0)
 
+#define ENABLE_MAPLE_IRQ (0)
+
 #if DEBUG_SYSCTRL
 static const char *const sysctrl_names[] =
 {
@@ -719,6 +721,11 @@ WRITE64_HANDLER( dc_maple_w )
 
 					if (endflag)
 					{
+						#if ENABLE_MAPLE_IRQ
+						/*TODO: this fixes moeru but breaks other games, understand why.*/
+						dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
+						dc_update_interrupt_status(space->machine);
+						#endif
 						break;
 					}
 					// skip fixed packet header
@@ -727,8 +734,6 @@ WRITE64_HANDLER( dc_maple_w )
 					dat += (length + 1) * 4;
 				} // do transfers
 				maple_regs[reg] = 0;
-				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
-				dc_update_interrupt_status(space->machine);
 			}
 			else
 			{
