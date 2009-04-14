@@ -129,15 +129,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int color_base = mnchmobl_palette_bank * 4 + 3;
 	int i, j;
 	int firstsprite = mnchmobl_vreg[4] & 0x3f;
-	for( i = firstsprite; i < 0x40; i++ )
+	for( i = firstsprite; i < firstsprite + 0x40; i++ )
 	{
 		for( j = 0; j < 8; j++ )
 		{
-			int ii = (j << 6) | i;
-			int tile_number = mnchmobl_sprite_tile[ii];		/*   ETTTTTTT */
-			int attributes = mnchmobl_sprite_attr[ii];		/*   XYYYYYCC */
-			int sx = mnchmobl_sprite_xpos[ii];				/*   XXXXXXX? */
-			int sy = (ii >> 6) << 5;					/* Y YY------ */
+			int offs = (j << 6) | ( i & 0x3f );
+			int tile_number = mnchmobl_sprite_tile[offs];		/*   ETTTTTTT */
+			int attributes = mnchmobl_sprite_attr[offs];		/*   XYYYYYCC */
+			int sx = mnchmobl_sprite_xpos[offs];			/*   XXXXXXX? */
+			int sy = (offs >> 6) << 5;					/* Y YY------ */
 			sy += (attributes >> 2) & 0x1f;
 			if( attributes & 0x80 )
 			{
@@ -152,30 +152,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			}
 		}
 	}
-	if (firstsprite != 0)
-		for( i = 0; i < firstsprite; i++ )
-		{
-			for( j = 0; j < 8; j++ )
-			{
-				int ii = (j << 6) | i;
-				int tile_number = mnchmobl_sprite_tile[ii];	/*   ETTTTTTT */
-				int attributes = mnchmobl_sprite_attr[ii];	/*   XYYYYYCC */
-				int sx = mnchmobl_sprite_xpos[ii];			/*   XXXXXXX? */
-				int sy = (ii >> 6) << 5;				/* Y YY------ */
-				sy += (attributes >> 2) & 0x1f;
-				if( attributes & 0x80 )
-				{
-					sx = (sx >> 1) | (tile_number & 0x80);
-					sx = 2 * ((- 32 - scroll - sx) & 0xff) + xadjust;
-					drawgfx( bitmap, gfx,
-						0x7f - (tile_number & 0x7f),
-						color_base - (attributes & 0x03),
-						0,0, 						/* no flip */
-						sx,sy,
-						cliprect, TRANSPARENCY_PEN, 7 );
-				}
-			}
-		}
 }
 
 VIDEO_UPDATE( mnchmobl )
