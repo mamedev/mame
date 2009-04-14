@@ -17,32 +17,32 @@ Current Compatibility notes (GD-rom games only)
 |cvsgd     |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | 2 + 2 extra buttons                                 |
 |gundmxgd  |   1   |  H  | Yes  | Yes  | Yes  | joystick with 4+6 buttons      |                                                     |
 |cvs2gd    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 6 buttons        |                                                     |
-|ikaruga   |   2   |  V  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
+|ikaruga   |   2   |  V  | Yes  | Yes  | Yes  | joystick with 2 buttons        |                                                     |
 |ggxx      |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
-|moeru     |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       | Broken i/o, stuck at the "now loading" msg          |
-|chocomk   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
+|moeru     |   2   |  H  | No   | No   | No   | joystick with 3 buttons        | Broken i/o, stuck at the "now loading" msg          |
+|chocomk   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 2 buttons        |                                                     |
 |quizqgd   |   2   |  V  | Yes  | Yes  | Yes  | joystick(?) with 4 buttons     |                                                     |
 |ggxxrl    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
-|tetkiwam  |   2   |  H  | No   | No   | No   | joystick with 3 buttons?       | Black screen, tests the SCIF (UART) regs?           |
-|shikgam2  |   2   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o, crashes on the proper gameplay          |
+|tetkiwam  |   2   |  H  | No   | No   | No   | joystick with 3 buttons        | Black screen, tests the SCIF (UART) regs?           |
+|shikgam2  |   2   |  V  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o, crashes on the proper gameplay          |
 |usagui    |   1   |  H  | Yes  | Yes  | No   | mahjong panel                  |                                                     |
-|bdrdown   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
-|psyvar2   |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o? Hangs after pressing start              |
-|cfield    |   1?  |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
-|trizeal   |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       |                                                     |
-|meltybld  |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons?       | Crashes in attract mode                             |
-|senko     |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       |                                                     |
-|senkoo    |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       |                                                     |
-|ss2005    |   1   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Calls a YUV FMV, crashes due of that                |
-|radirgy   |   1   |  V  | Yes  | Yes  | Yes  | joystick with 3 buttons?       |                                                     |
+|bdrdown   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
+|psyvar2   |   1   |  V  | Yes  | Yes  | No   | joystick with 2 buttons        | Broken i/o? Hangs after pressing start              |
+|cfield    |   1   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
+|trizeal   |   2   |  V  | No   | No   | No   | joystick with 3 buttons        |                                                     |
+|meltybld  |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons        | Crashes in attract mode                             |
+|senko     |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Senko no Londe SP (undumped) uses 5 buttons         |
+|senkoo    |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        |                                                     |
+|ss2005    |   1   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Calls a YUV FMV, crashes due of that                |
+|radirgy   |   1   |  V  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
 |ggxxsla   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        |                                                     |
-|kurucham  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o, crashes in attract with wrong mask      |
-|undefeat  |   2   |  V  | No   | No   | No   | joystick with 3 buttons?       | Stuck at the "now loading" msg                      |
-|trgheart  |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
-|jingystm  |   2   |  H  | Yes  | Yes  | No   | joystick with 4 buttons?       | Broken i/o                                          |
-|meltyb    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons?       | Crashes in attract mode                             |
-|meltyba   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 4 buttons?       | Crashes in attract mode                             |
-|karous    |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|kurucham  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o, crashes in attract with wrong mask      |
+|undefeat  |   2   |  V  | No   | No   | No   | joystick with 2 buttons        | Stuck at the "now loading" msg                      |
+|trgheart  |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o                                          |
+|jingystm  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o                                          |
+|meltyb    |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        | Crashes in attract mode                             |
+|meltyba   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 5 buttons        | Crashes in attract mode                             |
+|karous    |   1   |  V  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o                                          |
 |takoron   |   2   |  H  | Yes  | Yes  | Yes  | joystick with 3 buttons        |                                                     |
 --------------------------------------------------------------------------------------------------------------------------------------
 |confmiss  |   2   |  H  | Yes  | Yes  | No   | lightgun                       |                                                     |
@@ -53,7 +53,7 @@ Current Compatibility notes (GD-rom games only)
 |dygolf    |   2   |  H  | No   | No   | No   | trackball + 4 buttons          | Moans about the jvs settings                        |
 |wsbbgd    |   2   |  H  | No   | No   | No   | ad stick + 2 buttons           | Moans about the jvs settings                        |
 |vtennisg  |   2   |  H  | Yes  | Yes  | No   | joystick with 2 buttons        | Broken gfxs, crashes after a while                  |
-|vathlete  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o                                          |
+|vathlete  |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons        | Broken i/o                                          |
 |vtennis2  |   2   |  H  | No   | No   | No   | joystick with 3 buttons        |                                                     |
 |keyboard  |   2   |  H  | Yes  | Yes  | No   | keyboard                       | Broken i/o, crashes after a while                   |
 |lupinsho  |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o, crashes after a while                   |
@@ -61,7 +61,7 @@ Current Compatibility notes (GD-rom games only)
 |mok       |   2   |  H  | Yes  | Yes  | No   | lightgun                       | Broken i/o                                          |
 |ngdup23a  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
 |ngdup23c  |   2   |  H  | Yes  | Yes  | Yes  | n/a                            | Missing DIMM emulation                              |
-|puyofev   |   2   |  H  | Yes  | Yes  | No   | joystick with 3 buttons?       | Broken i/o? Hangs after pressing start              |
+|puyofev   |   2   |  H  | Yes  | Yes  | No   | joystick with 2 buttons        | Broken i/o? Hangs after pressing start              |
 --------------------------------------------------------------------------------------------------------------------------------------
 
 Test: If it enters into test mode (not actually working test mode, i.e. if inputs doesn't work)
