@@ -374,12 +374,14 @@ WRITE64_HANDLER( dc_maple_w )
 	{
 	case SB_MDST:
 		maple_regs[reg] = old;
-		if (!(old & 1) && (dat & 1)) // 0 -> 1
+		if (!(old & 1) && (dat & 1) && maple_regs[SB_MDEN] & 1) // 0 -> 1
 		{
 			if (!(maple_regs[SB_MDTSEL] & 1))
 			{
 				maple_regs[reg] = 1;
 				dat=maple_regs[SB_MDSTAR];
+				//printf("Maple DMA: %08x %08x %08x %08x\n",maple_regs[SB_MDSTAR],maple_regs[SB_MDTSEL],maple_regs[SB_MDEN],maple_regs[SB_MDST]);
+				//printf("           %08x %08x %08x %08x\n",maple_regs[SB_MSYS],maple_regs[SB_MST],maple_regs[SB_MSHTCL],maple_regs[SB_MMSEL]);
 				while (1) // do transfers
 				{
 					ddtdata.source=dat;		// source address
@@ -725,6 +727,8 @@ WRITE64_HANDLER( dc_maple_w )
 					dat += (length + 1) * 4;
 				} // do transfers
 				maple_regs[reg] = 0;
+				dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
+				dc_update_interrupt_status(space->machine);
 			}
 			else
 			{
