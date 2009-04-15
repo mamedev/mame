@@ -32,35 +32,42 @@ ROM text showed SUPER LUCKY ROULETTE LEISURE ENT
 
 static READ8_HANDLER( testf5_r )
 {
-logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
+//logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
 return mame_rand(space->machine) & 0x00ff;
 	return 0xc0;
 }
 
 static READ8_HANDLER( testf8_r )
 {
-logerror("Read unknown port $f8 at %04x\n",cpu_get_pc(space->cpu));
+//logerror("Read unknown port $f8 at %04x\n",cpu_get_pc(space->cpu));
 return mame_rand(space->machine) & 0x00ff;
 	return 0xc0;
 }
 
 static READ8_HANDLER( testfa_r )
 {
-logerror("Read unknown port $fa at %04x\n",cpu_get_pc(space->cpu));
+//logerror("Read unknown port $fa at %04x\n",cpu_get_pc(space->cpu));
 return mame_rand(space->machine) & 0x00ff;
 	return 0xc0;
 }
 
 static READ8_HANDLER( testfd_r )
 {
-logerror("Read unknown port $fd at %04x\n",cpu_get_pc(space->cpu));
+//logerror("Read unknown port $fd at %04x\n",cpu_get_pc(space->cpu));
 return mame_rand(space->machine) & 0x00ff;
 	return 0xc0;
 }
 
 static WRITE8_HANDLER( testfx_w )
 {
-	logerror("Write [%02x] -> %02x\n",offset,data);
+//	logerror("Write [%02x] -> %02x\n",offset,data);
+}
+
+static READ8_HANDLER( test_r )
+{
+logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
+return mame_rand(space->machine) & 0x00ff;
+	return 0xc0;
 }
 
 static ADDRESS_MAP_START( roul_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -84,7 +91,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(test_r) // AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static VIDEO_START(roul)
