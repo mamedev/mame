@@ -1211,6 +1211,9 @@ static READ32_HANDLER( tektagt_protection_2_r )
 	if(((ttt_val[1] >> 16) & 0xff) == 0x78)
 		data |= 0x3c7d0000;
 
+	if(((ttt_val[1] >> 16) & 0xff) == 0xa9)
+		data |= 0x552e0000;
+
 	return data;
 }
 
