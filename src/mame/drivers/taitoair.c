@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( airsys_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE(&dsp_ram)	/* "dsp common ram" (TMS320C25) */
 	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
 	AM_RANGE(0xa00100, 0xa00107) AM_READ(stick2_input_r)
-	AM_RANGE(0xa00200, 0xa0020f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)	/* other I/O */
+	AM_RANGE(0xa00200, 0xa0020f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)	/* other I/O */
 	AM_RANGE(0xa80000, 0xa80001) AM_READNOP AM_WRITE8(taitosound_port_w, 0x00ff)
 	AM_RANGE(0xa80002, 0xa80003) AM_READWRITE8(taitosound_comm_r, taitosound_comm_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM						/* "power common ram" (mecha drive) */

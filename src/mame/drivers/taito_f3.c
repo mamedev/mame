@@ -153,35 +153,21 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( f3_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)
-  	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_READ(SMH_RAM)
-	AM_RANGE(0x440000, 0x447fff) AM_READ(SMH_RAM) /* Palette ram */
-	AM_RANGE(0x4a0000, 0x4a0017) AM_READ(f3_control_r)
-	AM_RANGE(0x600000, 0x60ffff) AM_READ(SMH_RAM) /* Object data */
-	AM_RANGE(0x610000, 0x61bfff) AM_READ(SMH_RAM) /* Playfield data */
-	AM_RANGE(0x61c000, 0x61dfff) AM_READ(SMH_RAM) /* Text layer */
-	AM_RANGE(0x61e000, 0x61ffff) AM_READ(SMH_RAM) /* Vram */
-	AM_RANGE(0x620000, 0x62ffff) AM_READ(SMH_RAM) /* Line ram */
-	AM_RANGE(0x630000, 0x63ffff) AM_READ(SMH_RAM) /* Pivot ram */
-	AM_RANGE(0xc00000, 0xc007ff) AM_READ(SMH_RAM) /* Sound CPU shared ram */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( f3_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( f3_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_WRITE(SMH_RAM) AM_BASE(&f3_ram)
-	AM_RANGE(0x440000, 0x447fff) AM_WRITE(f3_palette_24bit_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x4a0000, 0x4a001f) AM_WRITE(f3_control_w)
-	AM_RANGE(0x600000, 0x60ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x610000, 0x61bfff) AM_WRITE(f3_pf_data_w) AM_BASE(&f3_pf_data)
-	AM_RANGE(0x61c000, 0x61dfff) AM_WRITE(f3_videoram_w) AM_BASE(&videoram32)
-	AM_RANGE(0x61e000, 0x61ffff) AM_WRITE(f3_vram_w) AM_BASE(&f3_vram)
-	AM_RANGE(0x620000, 0x62ffff) AM_WRITE(f3_lineram_w) AM_BASE(&f3_line_ram)
-	AM_RANGE(0x630000, 0x63ffff) AM_WRITE(f3_pivot_w) AM_BASE(&f3_pivot_ram)
+	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_BASE(&f3_ram)
+	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE(f3_palette_24bit_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x610000, 0x61bfff) AM_RAM_WRITE(f3_pf_data_w) AM_BASE(&f3_pf_data)
+	AM_RANGE(0x61c000, 0x61dfff) AM_RAM_WRITE(f3_videoram_w) AM_BASE(&videoram32)
+	AM_RANGE(0x61e000, 0x61ffff) AM_RAM_WRITE(f3_vram_w) AM_BASE(&f3_vram)
+	AM_RANGE(0x620000, 0x62ffff) AM_RAM_WRITE(f3_lineram_w) AM_BASE(&f3_line_ram)
+	AM_RANGE(0x630000, 0x63ffff) AM_RAM_WRITE(f3_pivot_w) AM_BASE(&f3_pivot_ram)
 	AM_RANGE(0x660000, 0x66000f) AM_WRITE(f3_control_0_w)
 	AM_RANGE(0x660010, 0x66001f) AM_WRITE(f3_control_1_w)
-	AM_RANGE(0xc00000, 0xc007ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_BASE(&f3_shared_ram)
 	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
 	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
 ADDRESS_MAP_END
@@ -431,7 +417,7 @@ static MACHINE_DRIVER_START( f3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(f3_readmem,f3_writemem)
+	MDRV_CPU_PROGRAM_MAP(f3_map,0)
 	MDRV_CPU_VBLANK_INT("screen", f3_interrupt2)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
@@ -516,7 +502,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( bubsympb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(f3_readmem,f3_writemem)
+	MDRV_CPU_PROGRAM_MAP(f3_map,0)
 	MDRV_CPU_VBLANK_INT("screen", f3_interrupt2)
 
 	MDRV_MACHINE_START(f3)

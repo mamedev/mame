@@ -334,7 +334,7 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
 #define STEER_PORT_TAG   "STEER"
 #define FAKE_PORT_TAG    "FAKE"
 
-static READ16_HANDLER( topspeed_input_bypass_r )
+static READ8_HANDLER( topspeed_input_bypass_r )
 {
 	UINT8 port = TC0220IOC_port_r(space,0);	/* read port number */
 	int steer = 0;
@@ -475,8 +475,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( topspeed_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)
-	AM_RANGE(0x880000, 0x880001) AM_READWRITE(topspeed_input_bypass_r, TC0220IOC_halfword_portreg_w)
-	AM_RANGE(0x880002, 0x880003) AM_READWRITE(TC0220IOC_halfword_port_r, TC0220IOC_halfword_port_w)
+	AM_RANGE(0x880000, 0x880001) AM_READWRITE8(topspeed_input_bypass_r, TC0220IOC_portreg_w, 0x00ff)
+	AM_RANGE(0x880002, 0x880003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(topspeed_motor_r, topspeed_motor_w)	/* motor CPU */
 ADDRESS_MAP_END
 

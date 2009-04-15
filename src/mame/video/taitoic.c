@@ -578,6 +578,22 @@ INLINE void taitoic_drawscanline(
 /* Note: various assumptions are made in these routines, typically that
    only CPU#0 is of interest. If in doubt, check the routine. */
 
+static int has_write_handler8(const device_config *cpu, write8_space_func handler)
+{
+	if (cpu != NULL)
+	{
+		const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+		const address_map_entry *entry;
+
+		if (space != NULL && space->map != NULL)
+			for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+				if (entry->write.shandler8 == handler)
+					return 1;
+	}
+
+	return 0;
+}
+
 static int has_write_handler(const device_config *cpu, write16_space_func handler)
 {
 	if (cpu != NULL)
@@ -636,8 +652,7 @@ int has_TC0280GRD(running_machine *machine)
 
 int has_TC0360PRI(running_machine *machine)
 {
-	return	has_write_handler(machine->cpu[0], TC0360PRI_halfword_w) ||
-			has_write_handler(machine->cpu[0], TC0360PRI_halfword_swap_w);
+	return	has_write_handler8(machine->cpu[0], TC0360PRI_w);
 }
 
 
@@ -2832,34 +2847,6 @@ if (offset >= 0x0a)
 #endif
 }
 
-WRITE16_HANDLER( TC0360PRI_halfword_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		TC0360PRI_w(space,offset,data & 0xff);
-#if 0
-if (data & 0xff00)
-{ logerror("CPU #0 PC %06x: warning - write %02x to MSB of TC0360PRI address %02x\n",cpu_get_pc(space->cpu),data,offset); }
-	else
-{ logerror("CPU #0 PC %06x: warning - write %02x to MSB of TC0360PRI address %02x\n",cpu_get_pc(space->cpu),data,offset); }
-#endif
-	}
-}
-
-WRITE16_HANDLER( TC0360PRI_halfword_swap_w )
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		TC0360PRI_w(space,offset,(data >> 8) & 0xff);
-#if 0
-if (data & 0xff)
-{ logerror("CPU #0 PC %06x: warning - write %02x to LSB of TC0360PRI address %02x\n",cpu_get_pc(space->cpu),data,offset); }
-	else
-{ logerror("CPU #0 PC %06x: warning - write %02x to LSB of TC0360PRI address %02x\n",cpu_get_pc(space->cpu),data,offset); }
-#endif
-	}
-}
-
 
 /***************************************************************************/
 
@@ -4896,86 +4883,6 @@ READ8_HANDLER( TC0220IOC_portreg_r )
 WRITE8_HANDLER( TC0220IOC_portreg_w )
 {
 	TC0220IOC_w(space, TC0220IOC_port, data);
-}
-
-READ16_HANDLER( TC0220IOC_halfword_port_r )
-{
-	return TC0220IOC_port_r( space, offset );
-}
-
-WRITE16_HANDLER( TC0220IOC_halfword_port_w )
-{
-	if (ACCESSING_BITS_0_7)
-		TC0220IOC_port_w( space, offset, data & 0xff );
-}
-
-READ16_HANDLER( TC0220IOC_halfword_portreg_r )
-{
-	return TC0220IOC_portreg_r( space, offset );
-}
-
-WRITE16_HANDLER( TC0220IOC_halfword_portreg_w )
-{
-	if (ACCESSING_BITS_0_7)
-		TC0220IOC_portreg_w( space, offset, data & 0xff );
-}
-
-READ16_HANDLER( TC0220IOC_halfword_byteswap_port_r )
-{
-	return TC0220IOC_port_r( space, offset ) << 8;
-}
-
-WRITE16_HANDLER( TC0220IOC_halfword_byteswap_port_w )
-{
-	if (ACCESSING_BITS_8_15)
-		TC0220IOC_port_w( space, offset, (data>>8) & 0xff );
-}
-
-READ16_HANDLER( TC0220IOC_halfword_byteswap_portreg_r )
-{
-	return TC0220IOC_portreg_r( space, offset )<<8;
-}
-
-WRITE16_HANDLER( TC0220IOC_halfword_byteswap_portreg_w )
-{
-	if (ACCESSING_BITS_8_15)
-		TC0220IOC_portreg_w( space, offset, (data>>8) & 0xff );
-}
-
-READ16_HANDLER( TC0220IOC_halfword_r )
-{
-	return TC0220IOC_r(space,offset);
-}
-
-WRITE16_HANDLER( TC0220IOC_halfword_w )
-{
-	if (ACCESSING_BITS_0_7)
-		TC0220IOC_w(space,offset,data & 0xff);
-	else
-	{
-		/* qtorimon writes here the coin counters - bug? */
-		TC0220IOC_w(space,offset,(data >> 8) & 0xff);
-
-		if (offset)		/* ainferno writes watchdog in msb */
-logerror("CPU #0 PC %06x: warning - write to MSB of TC0220IOC address %02x\n",cpu_get_pc(space->cpu),offset);
-	}
-}
-
-READ16_HANDLER( TC0220IOC_halfword_byteswap_r )
-{
-	return TC0220IOC_halfword_r(space,offset,mem_mask) << 8;
-}
-
-WRITE16_HANDLER( TC0220IOC_halfword_byteswap_w )
-{
-	if (ACCESSING_BITS_8_15)
-		TC0220IOC_w(space,offset,(data >> 8) & 0xff);
-	else
-	{
-		TC0220IOC_w(space,offset,data & 0xff);
-
-logerror("CPU #0 PC %06x: warning - write to LSB of TC0220IOC address %02x\n",cpu_get_pc(space->cpu),offset);
-	}
 }
 
 

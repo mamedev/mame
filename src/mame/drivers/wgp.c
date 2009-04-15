@@ -657,7 +657,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* main CPUA ram */
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(TC0220IOC_halfword_byteswap_r,TC0220IOC_halfword_byteswap_w)
+	AM_RANGE(0x180000, 0x18000f) AM_READWRITE8(TC0220IOC_r,TC0220IOC_w, 0xff00)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(wgp_adinput_r,wgp_adinput_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_word_0_w)			/* tilemaps */

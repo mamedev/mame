@@ -1103,7 +1103,7 @@ static WRITE16_HANDLER( spacegun_output_bypass_w )
                        GAME INPUTS
 **********************************************************/
 
-static READ16_HANDLER( contcirc_input_bypass_r )
+static READ8_HANDLER( contcirc_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
@@ -1143,7 +1143,7 @@ static READ16_HANDLER( contcirc_input_bypass_r )
 }
 
 
-static READ16_HANDLER( chasehq_input_bypass_r )
+static READ8_HANDLER( chasehq_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
@@ -1544,8 +1544,8 @@ static ADDRESS_MAP_START( contcirc_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x084000, 0x087fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(contcirc_input_bypass_r, TC0220IOC_halfword_portreg_w)
-	AM_RANGE(0x100002, 0x100003) AM_READWRITE(TC0220IOC_halfword_port_r, TC0220IOC_halfword_port_w) /* (actually game uses TC040IOC) */
+	AM_RANGE(0x100000, 0x100001) AM_READWRITE8(contcirc_input_bypass_r, TC0220IOC_portreg_w, 0x00ff)
+	AM_RANGE(0x100002, 0x100003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff) /* (actually game uses TC040IOC) */
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 ADDRESS_MAP_END
 
@@ -1555,8 +1555,8 @@ static ADDRESS_MAP_START( chasehq_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400001) AM_READWRITE(chasehq_input_bypass_r, TC0220IOC_halfword_portreg_w)
-	AM_RANGE(0x400002, 0x400003) AM_READWRITE(TC0220IOC_halfword_port_r, TC0220IOC_halfword_port_w)
+	AM_RANGE(0x400000, 0x400001) AM_READWRITE8(chasehq_input_bypass_r, TC0220IOC_portreg_w, 0x00ff)
+	AM_RANGE(0x400002, 0x400003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0xa00000, 0xa00007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)	/* palette */
@@ -1591,8 +1591,8 @@ static ADDRESS_MAP_START( enforce_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x300000, 0x300001) AM_READWRITE(TC0220IOC_halfword_portreg_r, TC0220IOC_halfword_portreg_w)
-	AM_RANGE(0x300002, 0x300003) AM_READWRITE(TC0220IOC_halfword_port_r, TC0220IOC_halfword_port_w)
+	AM_RANGE(0x300000, 0x300001) AM_READWRITE8(TC0220IOC_portreg_r, TC0220IOC_portreg_w, 0x00ff)
+	AM_RANGE(0x300002, 0x300003) AM_READWRITE8(TC0220IOC_port_r, TC0220IOC_port_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1600,7 +1600,7 @@ static ADDRESS_MAP_START( bshark_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x400000, 0x40000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
+	AM_RANGE(0x400000, 0x40000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_noz80_ctrl_w)
 	AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w)
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
@@ -1627,7 +1627,7 @@ static ADDRESS_MAP_START( sci_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
 	AM_RANGE(0x200010, 0x20001f) AM_READ(sci_steer_input_r)
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(cpua_ctrl_w)  // ?? doesn't seem to fit what's written
 	AM_RANGE(0x420000, 0x420003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
@@ -1650,7 +1650,7 @@ static ADDRESS_MAP_START( nightstr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x400000, 0x40000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
+	AM_RANGE(0x400000, 0x40000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0xa00000, 0xa00007) AM_READWRITE(TC0110PCR_word_r, TC0110PCR_step1_word_w)	/* palette */
@@ -1687,7 +1687,7 @@ static ADDRESS_MAP_START( aquajack_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(TC0220IOC_halfword_r, TC0220IOC_halfword_w)
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE8(TC0220IOC_r, TC0220IOC_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0x800800, 0x80083f) AM_READ(aquajack_unknown_r) // Read regularly after write to 800800...
 //  AM_RANGE(0x800800, 0x800801) AM_WRITE(taitoz_unknown_w)

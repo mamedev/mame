@@ -193,8 +193,6 @@ WRITE16_HANDLER( TC0110PCR_step1_4bpg_word_w );	/* only 4 bits per color gun */
 
 void TC0360PRI_vh_start(running_machine *machine);	/* must be called to ensure regs saved in state.c */
 WRITE8_HANDLER( TC0360PRI_w );
-WRITE16_HANDLER( TC0360PRI_halfword_w );
-WRITE16_HANDLER( TC0360PRI_halfword_swap_w );
 
 
 /***************************************************************************/
@@ -208,19 +206,6 @@ READ8_HANDLER ( TC0220IOC_port_r );
 WRITE8_HANDLER( TC0220IOC_port_w );
 READ8_HANDLER ( TC0220IOC_portreg_r );
 WRITE8_HANDLER( TC0220IOC_portreg_w );
-
-READ16_HANDLER ( TC0220IOC_halfword_port_r );
-WRITE16_HANDLER( TC0220IOC_halfword_port_w );
-READ16_HANDLER ( TC0220IOC_halfword_portreg_r );
-WRITE16_HANDLER( TC0220IOC_halfword_portreg_w );
-READ16_HANDLER ( TC0220IOC_halfword_byteswap_port_r );
-WRITE16_HANDLER( TC0220IOC_halfword_byteswap_port_w );
-READ16_HANDLER ( TC0220IOC_halfword_byteswap_portreg_r );
-WRITE16_HANDLER( TC0220IOC_halfword_byteswap_portreg_w );
-READ16_HANDLER ( TC0220IOC_halfword_r );
-WRITE16_HANDLER( TC0220IOC_halfword_w );
-READ16_HANDLER ( TC0220IOC_halfword_byteswap_r );
-WRITE16_HANDLER( TC0220IOC_halfword_byteswap_w );
 
 READ8_HANDLER ( TC0510NIO_r );
 WRITE8_HANDLER( TC0510NIO_w );
