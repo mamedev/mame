@@ -61,10 +61,14 @@ static READ8_HANDLER( testfd_r )
 
 static WRITE8_HANDLER( testfx_w )
 {
+	reg[offset] = data;
 	if (offset==2)
-		videobuf[reg[0]*256+reg[1]] = 1;
-	else
-		reg[offset] = data;
+	{
+		int y = reg[0];
+		int x = reg[1];
+		int color = reg[3];
+		videobuf[y * 256 + x] = color;
+	}
 	logerror("Write [%02x] -> %02x\n",offset,data);
 }
 
