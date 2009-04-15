@@ -4588,43 +4588,62 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 		/* cassette system, parent is decocass */
 	DRIVER( decocass )
 	DRIVER( ctsttape )	/* ? */
-	DRIVER( cterrani )	/* 04 (c) 1981 */
-	DRIVER( castfant )	/* 07 (c) 1981 */
-	DRIVER( csuperas )	/* 09 (c) 1981 */
-	DRIVER( clocknch )	/* 11 (c) 1981 */
-	DRIVER( cprogolf )	/* 13 (c) 1981 */
-	DRIVER( cluckypo )	/* 15 (c) 1981 */
-	DRIVER( ctisland )	/* 16 (c) 1981 */
-	DRIVER( ctislnd2 )	/* 16 (c) 1981 */
-	DRIVER( ctislnd3 )	/* 16? (c) 1981 */
-	DRIVER( cdiscon1 )	/* 19 (c) 1982 */
-	DRIVER( csweetht )	/* ?? (c) 1982, clone of disco no 1 */
-	DRIVER( ctornado )	/* 20 (c) 1982 */
-	DRIVER( cmissnx )	/* 21 (c) 1982 */
-	DRIVER( cptennis )	/* 22 (c) 1982 */
-	DRIVER( cexplore )	/* ?? (c) 1982 */
-	DRIVER( cbtime )	/* 26 (c) 1982 */
-	DRIVER( cburnrub )	/* ?? (c) 1982 */
-	DRIVER( cburnrb2 )	/* ?? (c) 1982 */
-	DRIVER( cbnj )		/* 27 (c) 1982 */
-	DRIVER( cgraplop )	/* 28 (c) 1983 */
-	DRIVER( cgraplp2 )	/* 28? (c) 1983 */
-	DRIVER( clapapa )	/* 29 (c) 1983 */
-	DRIVER( clapapa2 )	/* 29 (c) 1983 */ /* this one doesn't display lapapa anyehere */
-	DRIVER( cnightst )	/* 32 (c) 1983 */
-	DRIVER( cnights2 )	/* 32 (c) 1983 */
-	DRIVER( cprosocc )	/* 33 (c) 1983 */
-	DRIVER( cprobowl )	/* ?? (c) 1983 */
-	DRIVER( cscrtry )	/* 38 (c) 1984 */
-	DRIVER( cscrtry2 )	/* 38 (c) 1984 */
-	DRIVER( cppicf )	/* 39 (c) 1984 */
-	DRIVER( cppicf2 )	/* 39 (c) 1984 */
-	DRIVER( cfghtice )	/* 40 (c) 1984 */
-	DRIVER( cbdash )	/* 44 (c) 1985 */
-		/* the following don't work at all */
-	DRIVER( chwy )		/* ?? (c) 198? */
-	DRIVER( cflyball )	/* ?? (c) 198? */
-	DRIVER( czeroize )	/* ?? (c) 198? */
+	DRIVER( chwy )		/* 01 1980.12 Highway Chase */
+						/* 02 1980.12 Sengoku Ninjatai */
+						/* 03 1981.01 Manhattan */
+	DRIVER( cterrani )	/* 04 1981.02 Terranian */
+						/* 05 1981.?? Missile Sprinter */
+						/* 06 1980.12 Nebbler */
+	DRIVER( castfant )	/* 07 1981.02 Astro Fantasia */
+						/* 08 1981.03 The Tower */
+	DRIVER( csuperas )	/* 09 1981.05 Super Astro Fighter */
+						/* 10 1981.?? Ocean to Ocean (medal) */
+	DRIVER( clocknch )	/* 11 1981.04 Rock'n Chase */
+						/* 12 1981.08 Flash Boy/DECO Kid */
+	DRIVER( cprogolf )	/* 13 1981.08 Pro Golf */
+						/* 14 1981.06 DS Telejan */
+	DRIVER( cluckypo )	/* 15 1981.?? Lucky Poker */
+	DRIVER( ctisland )	/* 16 1982.02 Treasure Island */
+	DRIVER( ctislnd2 )	/* 16 */
+	DRIVER( ctislnd3 )	/* 16 */
+						/* 17 1981.10 Bobbit */
+	DRIVER( cexplore )	/* 18 1982.02 Explorer */
+	DRIVER( cdiscon1 )	/* 19 1982.04 Disco No.1 */
+	DRIVER( csweetht )	/* 19 */
+	DRIVER( ctornado )	/* 20 1982.05 Tornado */
+	DRIVER( cmissnx )	/* 21 1982.04 Mission X/Zoar */
+	DRIVER( cptennis )	/* 22 1982.06 Pro Tennis */
+						/* 23 1982.?? 18 Hole Pro Golf */
+						/* 24 1982.07 Tsumego Kaisyou */
+						/* 25 1982.10 Fishing */
+	DRIVER( cbtime )	/* 26 1982.08 Hamburger/Burger Time */
+	DRIVER( cburnrub )	/* 27 1982.11 Burnin' Rubber/Bump'n Jump */
+	DRIVER( cburnrb2 )	/* 27 */
+	DRIVER( cbnj )		/* 27 */
+	DRIVER( cgraplop )	/* 28 1982.11 Grapelop */
+	DRIVER( cgraplp2 )	/* 28 */
+	DRIVER( clapapa )	/* 29 1982.11 Lapapa/Rootin' Tootin' */
+	DRIVER( clapapa2 )	/* 29 */ /* this one doesn't display lapapa anyehere */
+						/* 30 1983.03 Skater */
+	DRIVER( cprobowl )	/* 31 1983.03 Pro Bowling */
+	DRIVER( cnightst )	/* 32 1983.04 Night Star */
+	DRIVER( cnights2 )	/* 32 */
+	DRIVER( cprosocc )	/* 33 1982.08 Pro Soccer */
+						/* 34 1983.09 Super Doubles Tennis */
+	DRIVER( cflyball )	/* 35 1983.?? Bampoline/Flying Ball */
+						/* 36 1984.04 Genesis/Boomer Rang'r */
+	DRIVER( czeroize )	/* 37 1983.10 Zeroize */ /* doesn't work at all */
+	DRIVER( cscrtry )	/* 38 1984.03 Scrum Try */
+	DRIVER( cscrtry2 )	/* 38 */
+	DRIVER( cppicf )	/* 39 1984.02 Peter Pepper's Ice Cream Factory */
+	DRIVER( cppicf2 )	/* 39 */
+	DRIVER( cfghtice )	/* 40 1984.04 Fighting Ice Hockey */
+						/* 41 1984.05 Oozumou */
+						/* 42 1984.08 Hellow Gateball */ /* not a typo, this is official spelling */
+						/* 43 1984.08 Yellow Cab */
+	DRIVER( cbdash )	/* 44 1985.08 Boulder Dash */
+						/* UX7 1984.12 Tokyo Mie Shinryoujo /
+						/* UX9 1985.05 Geinoujin Shikaku Shiken */
 
 	/* other Data East games */
 	DRIVER( madalien )	/* (c) 1980 */
