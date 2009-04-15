@@ -4642,8 +4642,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 42 1984.08 Hellow Gateball */ /* not a typo, this is official spelling */
 						/* 43 1984.08 Yellow Cab */
 	DRIVER( cbdash )	/* 44 1985.08 Boulder Dash */
-						/* UX7 1984.12 Tokyo Mie Shinryoujo /
-						/* UX8 1985.01 Tokyo Mie Shinryoujo Part 2 /
+						/* UX7 1984.12 Tokyo Mie Shinryoujo */
+						/* UX8 1985.01 Tokyo Mie Shinryoujo Part 2 */
 						/* UX9 1985.05 Geinoujin Shikaku Shiken */
 
 	/* other Data East games */
