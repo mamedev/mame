@@ -25,7 +25,7 @@ VIDEO_START( taitof2_metalb );
 VIDEO_START( taitof2_qzchikyu );
 VIDEO_START( taitof2_yesnoj );
 VIDEO_START( taitof2_deadconx );
-VIDEO_START( taitof2_deadconj );
+VIDEO_START( taitof2_deadconxj );
 VIDEO_START( taitof2_dinorex );
 VIDEO_EOF( taitof2_no_buffer );
 VIDEO_EOF( taitof2_full_buffer_delayed );

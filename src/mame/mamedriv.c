@@ -1931,17 +1931,17 @@ const game_driver * const drivers[] =
 	DRIVER( finalbj )	/* 1989.04 B82 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( finalbu )	/* 1989.06 B82 (c) 1988 Taito America Corporation (US) */
 	DRIVER( dondokod )	/* 1989.?? B95 (c) 1989 Taito Corporation Japan (World) */
-	DRIVER( dondokdu )	/* 1989.?? B95 (c) 1989 Taito America Corporation (US) */
-	DRIVER( dondokdj )	/* 1989.07 B95 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( dondokodu )	/* 1989.?? B95 (c) 1989 Taito America Corporation (US) */
+	DRIVER( dondokodj )	/* 1989.07 B95 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( megab )		/* 1989.?? C11 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( megabj )	/* 1989.11 C11 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( thundfox )	/* 1990.?? C28 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( thndfoxu )	/* 1990.06 C28 (c) 1990 Taito America Corporation (US) */
-	DRIVER( thndfoxj )	/* 1990.07 C28 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( thundfoxu )	/* 1990.06 C28 (c) 1990 Taito America Corporation (US) */
+	DRIVER( thundfoxj )	/* 1990.07 C28 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( cameltry )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( camltrya )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( camltrua )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
-	DRIVER( cameltrj )	/* 1990.04 C38 (c) 1989 Taito Corporation (Japan) */
+	DRIVER( cameltrya )	/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( cameltryua )/* 1990.?? C38 (c) 1989 Taito America Corporation (US) */
+	DRIVER( cameltryj )	/* 1990.04 C38 (c) 1989 Taito Corporation (Japan) */
 	DRIVER( qtorimon )	/* 1990.02 C41 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( liquidk )	/* 1990.?? C49 (c) 1990 Taito Corporation Japan (World) */
 	DRIVER( liquidku )	/* 1990.?? C49 (c) 1990 Taito America Corporation (US) */
@@ -1951,12 +1951,12 @@ const game_driver * const drivers[] =
 	DRIVER( majest12 )	/* 1990.11 C64 (c) 1990 Taito Corporation (Japan) */
 						/* 1990.12 C64 (US) */
 	DRIVER( gunfront )	/* 1991.?? C71 (c) 1990 Taito Corporation Japan (World) */
-	DRIVER( gunfronj )	/* 1991.01 C71 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( gunfrontj )	/* 1991.01 C71 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( growl )		/* 1991.?? C74 (c) 1990 Taito Corporation Japan (World) */
 	DRIVER( growlu )	/* 1991.02 C74 (c) 1990 Taito America Corporation (US) */
 	DRIVER( runark )	/* 1991.02 C74 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( mjnquest )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
-	DRIVER( mjnquesb )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( mjnquestb )	/* 1991.05 C77 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( footchmp )	/* 1991.?? C80 (c) 1990 Taito Corporation Japan (World) */
 	DRIVER( hthero )	/* 1991.03 C80 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( euroch92 )	/* 1991.??     (c) 1992 Taito Corporation Japan (World) */
@@ -1968,13 +1968,13 @@ const game_driver * const drivers[] =
 	DRIVER( solfigtr )	/* 1991.?? C91 (c) 1991 Taito Corporation Japan (World) */
 	DRIVER( qzquest )	/* 1991.07 C92 (c) 1991 Taito Corporation (Japan) */
 	DRIVER( pulirula )	/* 1991.?? C98 (c) 1991 Taito Corporation Japan (World) */
-	DRIVER( pulirulj )	/* 1991.11 C98 (c) 1991 Taito Corporation (Japan) */
+	DRIVER( pulirulaj )	/* 1991.11 C98 (c) 1991 Taito Corporation (Japan) */
 	DRIVER( metalb )	/* 1991.?? D16? (c) 1991 Taito Corporation Japan (World) */
 	DRIVER( metalbj )	/* 1991.11 D12 (c) 1991 Taito Corporation (Japan) */
 	DRIVER( qzchikyu )	/* 1992.02 D19 (c) 1991 Taito Corporation (Japan) */
 	DRIVER( yesnoj )	/* 1992.03 D20 (c) 1992 Taito Corporation (Japan) */
 	DRIVER( deadconx )	/* 1992.?? D28 (c) 1992 Taito Corporation Japan (World) */
-	DRIVER( deadconj )	/* 1992.08 D28 (c) 1992 Taito Corporation (Japan) */
+	DRIVER( deadconxj )	/* 1992.08 D28 (c) 1992 Taito Corporation (Japan) */
 	DRIVER( dinorex )	/* 1992.?? D39 (c) 1992 Taito Corporation Japan (World) */
 	DRIVER( dinorexj )	/* 1992.11 D39 (c) 1992 Taito Corporation (Japan) */
 	DRIVER( dinorexu )	/* 1992.?? D39 (c) 1992 Taito America Corporation (US) */

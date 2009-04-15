@@ -243,7 +243,7 @@ VIDEO_START( taitof2_deadconx )
 	taitof2_core_vh_start(machine, 0,3,3,0,0,0,0,0,0);
 }
 
-VIDEO_START( taitof2_deadconj )
+VIDEO_START( taitof2_deadconxj )
 {
 	f2_tilemap_xoffs = 0x34;
 	f2_tilemap_yoffs = - 0x05;
