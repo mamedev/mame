@@ -8,22 +8,22 @@ TO DO:
 - sound
 - input
 
-Has 36 pin Cherry master looking edge connector 
+Has 36 pin Cherry master looking edge connector
 
-.u12 2764 stickered 1 
-.u19 27256 stickered 2 
-.u15 tibpal16l8-25 (checksum was 0) 
-.u56 tibpal16l8-25 (checksum was 0) 
-.u38 82s123 
-.u53 82s123 
+.u12 2764 stickered 1
+.u19 27256 stickered 2
+.u15 tibpal16l8-25 (checksum was 0)
+.u56 tibpal16l8-25 (checksum was 0)
+.u38 82s123
+.u53 82s123
 
-Z80 x2 
-Altera Ep1810LC-45 
+Z80 x2
+Altera Ep1810LC-45
 20.000 MHz crystal
-video 464p10 x4 (board silcksreeend 4416) 
+video 464p10 x4 (board silcksreeend 4416)
 AY-3-8912A
 
-ROM text showed SUPER LUCKY ROULETTE LEISURE ENT 
+ROM text showed SUPER LUCKY ROULETTE LEISURE ENT
 */
 
 #include "driver.h"
@@ -75,8 +75,8 @@ static WRITE8_HANDLER( testfx_w )
 /*
 static READ8_HANDLER( test_r )
 {
-	logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
-	return mame_rand(space->machine) & 0x00ff;
+    logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
+    return mame_rand(space->machine) & 0x00ff;
 }
 */
 

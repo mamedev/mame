@@ -394,14 +394,14 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap)
 					for (x = 0; x <= big; ++x)
 					{
 						int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
-	
+
 						drawgfx(bitmap, gfx,
 								tile,
 								color,
 								flipx,flipy,
 								sx + 16*x, sy + 16*y,
 								0, TRANSPARENCY_PEN, 15);
-	
+
 						++sprites_drawn;
 						if (sprites_drawn >= 96)
 							return;
@@ -436,7 +436,7 @@ static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap
 			for (x = 0; x < sp_bitmap->width; ++x)
 			{
 				UINT16* const ptr = BITMAP_ADDR16(sp_bitmap, y, x);
-				
+
 				if ( (*ptr & 0xf0) == stencil_palette ) { *ptr = 15; }
 				////// Before modified, clears palettes 0-B and F, and leaves C-E on screen
 				////// But I'm sure "Ninja Kid II" clears F, and leaves 0-E

@@ -1382,7 +1382,7 @@ static TIMER_CALLBACK(hbin)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
 	dc_update_interrupt_status(machine);
 
-//	printf("hbin on scanline %d\n",scanline);
+//  printf("hbin on scanline %d\n",scanline);
 
 	scanline++;
 
