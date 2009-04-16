@@ -2017,10 +2017,8 @@ static MACHINE_DRIVER_START( sys1ppi )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)	/* needed for proper hardware collisions */
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 320, 0, 256, 260, 0, 224)
 
 	MDRV_GFXDECODE(system1)
 	MDRV_PALETTE_LENGTH(2048)
@@ -2074,7 +2072,7 @@ MACHINE_DRIVER_END
 
 /* alternate program map with RAM/collision swapped */
 static MACHINE_DRIVER_START( nob )
-	MDRV_IMPORT_FROM( sys1ppis )
+	MDRV_IMPORT_FROM( sys1ppi )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2092,30 +2090,12 @@ static MACHINE_DRIVER_START( sys2 )
 	MDRV_VIDEO_UPDATE(system2)
 MACHINE_DRIVER_END
 
-/* system 2 with small screen */
-static MACHINE_DRIVER_START( sys2s )
-	MDRV_IMPORT_FROM( sys2 )
-
-	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 27*8-1)
-MACHINE_DRIVER_END
-
 /* system2 with rowscroll */
 static MACHINE_DRIVER_START( sys2row )
 	MDRV_IMPORT_FROM( sys2 )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(system2_rowscroll)
-MACHINE_DRIVER_END
-
-/* rowscroll with small screen */
-static MACHINE_DRIVER_START( sys2rows )
-	MDRV_IMPORT_FROM( sys2row )
-
-	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 27*8-1)
 MACHINE_DRIVER_END
 
 
@@ -2153,7 +2133,7 @@ ROM_START( starjack )
 	ROM_LOAD( "epr-5319.93",	0x4000, 0x4000, CRC(ebee4999) SHA1(bb331be270dc1da63699533d9f02d73ce28f1bc5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( starjacks )
@@ -2181,7 +2161,7 @@ ROM_START( starjacks )
 	ROM_LOAD( "a1_ic93.93",   0x4000, 0x4000, CRC(07987244) SHA1(8468b95684b1f62c6de6af1b1d405bfb333e4e26) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2210,7 +2190,7 @@ ROM_START( upndown )
 	ROM_LOAD( "epr-5515.93",	0x4000, 0x4000, CRC(60908838) SHA1(aedff8ce07ab16942037e5aff212652e51c19e71) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( upndownu )
@@ -2238,7 +2218,7 @@ ROM_START( upndownu )
 	ROM_LOAD( "epr-5515.93",	0x4000, 0x4000, CRC(60908838) SHA1(aedff8ce07ab16942037e5aff212652e51c19e71) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2267,7 +2247,7 @@ ROM_START( regulus )
 	ROM_LOAD( "epr-5639.93",	0x4000, 0x4000, CRC(a4ec5131) SHA1(033bf46d2625f99544a784fe3fa299cc1b1b48e1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( reguluso )
@@ -2295,7 +2275,7 @@ ROM_START( reguluso )
 	ROM_LOAD( "epr-5639.93",	0x4000, 0x4000, CRC(a4ec5131) SHA1(033bf46d2625f99544a784fe3fa299cc1b1b48e1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( regulusu )
@@ -2323,7 +2303,7 @@ ROM_START( regulusu )
 	ROM_LOAD( "epr-5639.93",	0x4000, 0x4000, CRC(a4ec5131) SHA1(033bf46d2625f99544a784fe3fa299cc1b1b48e1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2352,7 +2332,7 @@ ROM_START( mrviking )
 	ROM_LOAD( "epr-5750.93",	0x4000, 0x4000, CRC(6564d1ad) SHA1(f246afee7e73bc30054b0e5dcb83fa0edd2d2164) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( mrvikingj )
@@ -2380,7 +2360,7 @@ ROM_START( mrvikingj )
 	ROM_LOAD( "epr-5750.93",	0x4000, 0x4000, CRC(6564d1ad) SHA1(f246afee7e73bc30054b0e5dcb83fa0edd2d2164) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2409,7 +2389,7 @@ ROM_START( swat )
 	ROM_LOAD( "epr-5806.93",	0x4000, 0x4000, CRC(26ac258c) SHA1(e4e9f929ab8ae7da74f885481cf94335d7553a1c) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2434,7 +2414,7 @@ ROM_START( flicky )
 	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( flickys2 )
@@ -2458,7 +2438,7 @@ ROM_START( flickys2 )
 	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( flickys1 )
@@ -2484,7 +2464,7 @@ ROM_START( flickys1 )
 	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( flickyo )
@@ -2510,7 +2490,7 @@ ROM_START( flickyo )
 	ROM_LOAD( "epr-5856.110",	0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2539,7 +2519,7 @@ ROM_START( wmatch )
 	ROM_LOAD( "wm.93",			0x4000, 0x4000, CRC(a2f19170) SHA1(47dacc380b09c6365c737d320145cedad54ecedb) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.106",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2568,7 +2548,7 @@ ROM_START( bullfgt )
 	ROM_LOAD( "epr-6070.93",	0x4000, 0x4000, CRC(34f080df) SHA1(0e7d28e3325c8c3f06438fde29ea0ffe57fc325f) ) /* epr-6070.93 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 															 /* pr-5317.106 */
 ROM_END
 
@@ -2594,7 +2574,7 @@ ROM_START( thetogyu )
 	ROM_LOAD( "epr-6070.110",	0x4000, 0x4000, CRC(34f080df) SHA1(0e7d28e3325c8c3f06438fde29ea0ffe57fc325f) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2622,7 +2602,7 @@ ROM_START( spatter )
 	ROM_LOAD( "epr-6309.110",	0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 															 /* pr-5317.106 */
 ROM_END
 
@@ -2650,7 +2630,7 @@ ROM_START( ssanchan )
 	ROM_LOAD( "epr-6309.110",	0xc000, 0x4000, CRC(7423ad98) SHA1(e19b4c64795f30e1491520160d315e4148d58df2) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 															 /* pr-5317.106 */
 ROM_END
 
@@ -2677,7 +2657,7 @@ ROM_START( pitfall2 )
 	ROM_LOAD( "epr-6455.05",	0x4000, 0x4000, CRC(32ee64a1) SHA1(21743f78735fc9105fbbfac420bdaa2965b4b56f) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( pitfall2a )
@@ -2702,7 +2682,7 @@ ROM_START( pitfall2a )
 	ROM_LOAD( "epr-6455.05",	0x4000, 0x4000, CRC(32ee64a1) SHA1(21743f78735fc9105fbbfac420bdaa2965b4b56f) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( pitfall2u )
@@ -2727,7 +2707,7 @@ ROM_START( pitfall2u )
 	ROM_LOAD( "epr-6455.05",	0x4000, 0x4000, CRC(32ee64a1) SHA1(21743f78735fc9105fbbfac420bdaa2965b4b56f) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2755,7 +2735,7 @@ ROM_START( seganinj )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( seganinju )
@@ -2782,7 +2762,7 @@ ROM_START( seganinju )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( nprinces )
@@ -2812,7 +2792,7 @@ ROM_START( nprinces )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) ) /* epr-6549.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 															 /* pr-5317.106 */
 ROM_END
 
@@ -2840,7 +2820,7 @@ ROM_START( nprinceso )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( nprincesu )
@@ -2870,7 +2850,7 @@ ROM_START( nprincesu )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) ) /* epr-6549.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( nprincesb )
@@ -2897,7 +2877,7 @@ ROM_START( nprincesb )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
 	ROM_REGION( 0x0220, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 	ROM_LOAD( "nprinces.129",	0x0100, 0x0100, CRC(ae765f62) SHA1(9434b5a23d118a9c62015b479719826b38269cd4) ) /* decryption table (not used) */
 	ROM_LOAD( "nprinces.123",	0x0200, 0x0020, CRC(ed5146e9) SHA1(7044035c07636e4029f4b746c1a92e15173869e9) ) /* decryption table (not used) */
 ROM_END
@@ -2926,7 +2906,7 @@ ROM_START( ninja )
 	ROM_LOAD( "epr-6549.05",	0xc000, 0x4000, CRC(d2057668) SHA1(ded2a04f7555eb3b1e4da57901ca00635de2c043) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -2952,7 +2932,7 @@ ROM_START( imsorry )
 	ROM_LOAD( "epr-6646.04",	0x4000, 0x4000, CRC(edda7ad6) SHA1(eef7dcde632787283c4cb522380b138060018204) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( imsorryj )
@@ -2977,7 +2957,7 @@ ROM_START( imsorryj )
 	ROM_LOAD( "epr-6646.04",	0x4000, 0x4000, CRC(edda7ad6) SHA1(eef7dcde632787283c4cb522380b138060018204) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -3005,7 +2985,7 @@ ROM_START( teddybb )
 	ROM_LOAD( "epr-6738.05",	0xc000, 0x4000, CRC(e116285f) SHA1(b6fb50b02a981b3b23385200045ae537092d26d6) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( teddybbo )
@@ -3032,7 +3012,7 @@ ROM_START( teddybbo )
 	ROM_LOAD( "epr-6738.05",	0xc000, 0x4000, CRC(e116285f) SHA1(b6fb50b02a981b3b23385200045ae537092d26d6) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -3065,7 +3045,7 @@ ROM_START( hvymetal )
 	ROM_LOAD( "pr7034.1",     0x0200, 0x0100, CRC(dfb5f139) SHA1(56cba261819fd5f2beab56ffd80bb3fd328efe3e) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317p.4",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317p.4",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -3093,7 +3073,7 @@ ROM_START( myhero )
 	ROM_LOAD( "epr-6924.05",	0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( sscandal )
@@ -3120,7 +3100,7 @@ ROM_START( sscandal )
 	ROM_LOAD( "epr-6924.05",	0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( myherok )
@@ -3148,7 +3128,7 @@ ROM_START( myherok )
 	ROM_LOAD( "epr-6924.05",	0xc000, 0x4000, CRC(42bdc8f6) SHA1(f31d82641187a7cc77a4a19189b5a15d5168cbd7) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -3176,7 +3156,7 @@ ROM_START( 4dwarrio )
 	ROM_LOAD( "4d.05",        0xc000, 0x4000, CRC(f31a1e6a) SHA1(f49dbc4b381e7096d5ffe3c16660dd63121dabf7) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -3227,7 +3207,7 @@ ROM_START( shtngmst )
 	ROM_LOAD( "epr7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "epr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) - N82S129AN */
+	ROM_LOAD( "epr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* N82S129AN */
 
     /* These pld's are located on the main board. */
 	ROM_REGION( 0x0618, "plds", 0 )
@@ -3286,7 +3266,7 @@ ROM_START( shtngmst1 )
 	ROM_LOAD( "epr7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "epr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) - N82S129AN */
+	ROM_LOAD( "epr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* N82S129AN */
 
     /* These pld's are located on the main board. */
 	ROM_REGION( 0x0618, "plds", 0 )
@@ -3376,7 +3356,7 @@ ROM_START( shtngmsta )
 	ROM_LOAD( "epr7111.ic8",    0x00200, 0x0100, CRC(8123b6b9) SHA1(fb2c5498f0603b5cd270402a738c891a85453666) ) /* palette blue component - N82S129AN */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "epr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) - N82S129AN */
+	ROM_LOAD( "epr5317.ic37",   0x00000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* N82S129AN */
 
 	ROM_REGION( 0x0400, "plds", 0 )
 	ROM_LOAD( "315-5137.bin",   0x00000, 0x0104, CRC(6ffd9e6f) SHA1(a60a3a2ec5bc256b18bfff0fec0172ee2e4fd955) ) /* TI PAL16R4A-2CN Located at IC10 */
@@ -3420,7 +3400,7 @@ ROM_START( choplift )
 	ROM_LOAD( "pr7117.ic8",		0x0200, 0x0100, CRC(4124307e) SHA1(cee28d891e6ce732c43a61acb5beeafd2200cf37) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.ic28",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.ic28",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 
 	ROM_REGION( 0x0618, "plds", 0 )
 	ROM_LOAD( "315-5152.bin",   0x00000, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) ) /* PAL16R4A located at IC10. */
@@ -3464,7 +3444,7 @@ ROM_START( chopliftu )
 	ROM_LOAD( "pr7117.ic8",		0x0200, 0x0100, CRC(4124307e) SHA1(cee28d891e6ce732c43a61acb5beeafd2200cf37) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.ic28",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.ic28",	0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 
 	ROM_REGION( 0x0618, "plds", 0 )
 	ROM_LOAD( "315-5152.bin",   0x00000, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) ) /* PAL16R4A located at IC10. */
@@ -3545,7 +3525,7 @@ ROM_START( chopliftbl )
 	ROM_LOAD( "pr7117.8",		0x0200, 0x0100, CRC(4124307e) SHA1(cee28d891e6ce732c43a61acb5beeafd2200cf37) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.28",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.28",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 
 	ROM_REGION( 0x0003, "plds_main", 0 )
     ROM_LOAD( "pal16r4.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16R4 located at IC13. */
@@ -3596,7 +3576,7 @@ ROM_START( raflesia )
 	ROM_LOAD( "epr-7410.05",	0xc000, 0x4000, CRC(ced74789) SHA1(d0ad845bfe83412ac8d43125e1c50d0581a5b47e) ) /* epr-7410.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 															 /* pr-5317.106 */
 ROM_END
 
@@ -3625,7 +3605,7 @@ ROM_START( wboy )
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wboyo )
@@ -3652,7 +3632,7 @@ ROM_START( wboyo )
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wboy2 )
@@ -3682,7 +3662,7 @@ ROM_START( wboy2 )
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 															 /* pr-5317.106 */
 ROM_END
 
@@ -3713,7 +3693,7 @@ ROM_START( wboy2u )
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 															 /* pr-5317.106 */
 ROM_END
 
@@ -3741,7 +3721,7 @@ ROM_START( wboy3 )
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 /*
@@ -3775,7 +3755,7 @@ ROM_START( wboy4 )
 	ROM_LOAD( "7577.86",  0x08000, 0x8000, CRC(58b3705e) SHA1(1a8ff3f1765a3b21145bd1a6c85441f806f7b17d) )	// epr7576.ic117
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wboyu )
@@ -3802,7 +3782,7 @@ ROM_START( wboyu )
 	ROM_LOAD( "ic005_88.bin",	0xc000, 0x4000, CRC(2602e519) SHA1(00e94ec7ae37b5063137d4d49af7806fb0357c4b) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wboysys2 )
@@ -3828,7 +3808,7 @@ ROM_START( wboysys2 )
 	ROM_LOAD( "pr-7343.8",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.28",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wbdeluxe )
@@ -3858,7 +3838,7 @@ ROM_START( wbdeluxe )
 	ROM_LOAD( "epr-7488.05",	0xc000, 0x4000, CRC(007c2f1b) SHA1(c2f1376144a49d20cb35384648e06d06978474c1) ) /* epr-7488.2 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 															 /* pr-5317.106 */
 ROM_END
 
@@ -3889,7 +3869,7 @@ ROM_START( gardia )
 	ROM_LOAD( "bprom.1",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.4",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.4",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( gardiab )
@@ -3918,7 +3898,7 @@ ROM_START( gardiab )
 	ROM_LOAD( "bprom.1",      0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.4",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.4",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -3950,7 +3930,7 @@ ROM_START( brain )
 	ROM_LOAD( "bprom.1",      0x0200, 0x0100, BAD_DUMP CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d)  ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -3980,7 +3960,7 @@ ROM_START( tokisens )
 	ROM_LOAD( "bprom.8",       0x0200, 0x0100, CRC(371c44a6) SHA1(ac37458d1feb6566b09a795b20c21953d4ab109d) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "bprom.28",      0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "bprom.28",      0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -4013,7 +3993,7 @@ ROM_START( wbml )
 	ROM_LOAD( "pr11024.8",    0x0200, 0x0100, CRC(08d71954) SHA1(df045dbfb3d669e4d42fbdba1e7191cd046f7b47) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wbmljo )
@@ -4045,7 +4025,7 @@ ROM_START( wbmljo )
 	ROM_LOAD( "pr11024.8",    0x0200, 0x0100, CRC(08d71954) SHA1(df045dbfb3d669e4d42fbdba1e7191cd046f7b47) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wbmljb )
@@ -4077,7 +4057,7 @@ ROM_START( wbmljb )
 	ROM_LOAD( "pr11024.8",    0x0200, 0x0100, CRC(08d71954) SHA1(df045dbfb3d669e4d42fbdba1e7191cd046f7b47) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wbmlb )
@@ -4109,7 +4089,7 @@ ROM_START( wbmlb )
 	ROM_LOAD( "pr11024.8",    0x0200, 0x0100, CRC(08d71954) SHA1(df045dbfb3d669e4d42fbdba1e7191cd046f7b47) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( wbmlbg )
@@ -4141,7 +4121,7 @@ ROM_START( wbmlbg )
 	ROM_LOAD( "pr11024.8",    0x0200, 0x0100, CRC(08d71954) SHA1(df045dbfb3d669e4d42fbdba1e7191cd046f7b47) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -4174,7 +4154,7 @@ ROM_START( dakkochn )
 	ROM_LOAD( "pr11217.8",    0x0200, 0x0100, CRC(49dbde88) SHA1(7057da5617de7e4775adf092cce1709135066129) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.37",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -4207,7 +4187,7 @@ ROM_START( ufosensi )
 	ROM_LOAD( "pr11654.8",    0x0200, 0x0100, CRC(ba624305) SHA1(eb1d0dde60f81ff510ac8c1212e0ed5703febaf3) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.28",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.28",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( ufosensib )
@@ -4239,7 +4219,7 @@ ROM_START( ufosensib )
 	ROM_LOAD( "pr11654.8",    0x0200, 0x0100, CRC(ba624305) SHA1(eb1d0dde60f81ff510ac8c1212e0ed5703febaf3) ) /* palette blue component - label on chip is "74s287.ic132.9d" */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.28",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) - label on chip is "74s287.ic115.8j" */
+	ROM_LOAD( "pr5317.28",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* label on chip is "74s287.ic115.8j" */
 
 	ROM_REGION( 0x2000, "plds", 0 )
 	ROM_LOAD( "pal6l8.ic3.1c",   0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -4281,7 +4261,7 @@ ROM_START( blockgal )
 	ROM_LOAD( "bg.05",        0xc000, 0x4000, CRC(02e0b040) SHA1(fb626fc31dfe25bf9fac0c8d76d5041609b06e82) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 ROM_START( blockgalb )
@@ -4307,7 +4287,7 @@ ROM_START( blockgalb )
 	ROM_LOAD( "bg.05",        0xc000, 0x4000, CRC(02e0b040) SHA1(fb626fc31dfe25bf9fac0c8d76d5041609b06e82) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "pr5317.76",    0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -4420,7 +4400,7 @@ ROM_START( nob )
 	ROM_LOAD( "dm-12.ic3", 0x0200, 0x0100, CRC(de394cee) SHA1(511c53f22459e5e238b48685f85b10f5e15f2ac1) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "dc-11.6a", 0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "dc-11.6a", 0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 /* the bootleg has different protection.. */
@@ -4450,7 +4430,7 @@ ROM_END
 	ROM_LOAD( "nobo_pr.14d", 0x0200, 0x0100, CRC(de394cee) SHA1(511c53f22459e5e238b48685f85b10f5e15f2ac1) ) /* palette blue component */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "nobo_pr.13a", 0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+	ROM_LOAD( "nobo_pr.13a", 0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
 
@@ -4631,9 +4611,9 @@ GAME( 1983, starjack,   0,        sys1ppis, starjack,  bank00,   ROT270, "Sega",
 GAME( 1983, starjacks,  starjack, sys1ppis, starjacks, bank00,   ROT270, "Stern",           "Star Jacker (Stern)", GAME_SUPPORTS_SAVE )
 GAME( 1983, upndown,    0,        sys1ppi,  upndown,   nprinces, ROT270, "Sega",            "Up'n Down (315-5030)", GAME_SUPPORTS_SAVE )
 GAME( 1983, upndownu,   upndown,  sys1ppi,  upndown,   bank00,   ROT270, "Sega",            "Up'n Down (not encrypted)", GAME_SUPPORTS_SAVE )
-GAME( 1983, regulus,    0,        sys1ppis, regulus,   regulus,  ROT270, "Sega",            "Regulus (315-5033, Rev A.)", GAME_SUPPORTS_SAVE )
-GAME( 1983, reguluso,   regulus,  sys1ppis, reguluso,  regulus,  ROT270, "Sega",            "Regulus (315-5033)", GAME_SUPPORTS_SAVE )
-GAME( 1983, regulusu,   regulus,  sys1ppis, regulus,   bank00,   ROT270, "Sega",            "Regulus (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1983, regulus,    0,        sys1ppi,  regulus,   regulus,  ROT270, "Sega",            "Regulus (315-5033, Rev A.)", GAME_SUPPORTS_SAVE )
+GAME( 1983, reguluso,   regulus,  sys1ppi,  reguluso,  regulus,  ROT270, "Sega",            "Regulus (315-5033)", GAME_SUPPORTS_SAVE )
+GAME( 1983, regulusu,   regulus,  sys1ppi,  regulus,   bank00,   ROT270, "Sega",            "Regulus (not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1984, mrviking,   0,        sys1ppis, mrviking,  mrviking, ROT270, "Sega",            "Mister Viking (315-5041)", GAME_SUPPORTS_SAVE )
 GAME( 1984, mrvikingj,  mrviking, sys1ppis, mrvikingj, mrviking, ROT270, "Sega",            "Mister Viking (315-5041, Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, swat,       0,        sys1ppi,  swat,      swat,     ROT270, "Coreland / Sega", "SWAT (315-5048)", GAME_SUPPORTS_SAVE )
@@ -4688,9 +4668,9 @@ GAME( 1986, brain,      0,        sys1pio,  brain,     bank44,   ROT0,   "Corela
 GAME( 1985, choplift,   0,        sys2row,  choplift,  choplift, ROT0,   "Sega",            "Choplifter (8751 315-5151)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1985, chopliftu,  choplift, sys2row,  choplift,  bank0c,   ROT0,   "Sega",            "Choplifter (unprotected)", GAME_SUPPORTS_SAVE )
 GAME( 1985, chopliftbl, choplift, sys2row,  choplift,  bank0c,   ROT0,   "bootleg",         "Choplifter (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1985, shtngmst,   0,        sys2s,    shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (Rev A, 8751 315-5159a)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1985, shtngmst1,  shtngmst, sys2s,    shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1985, shtngmsta,  shtngmst, sys2s,    shtngmst,  shtngmst, ROT0,   "Sega [EVG]",      "Shooting Master (EVG, 8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngmst,   0,        sys2,     shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (Rev A, 8751 315-5159a)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngmst1,  shtngmst, sys2,     shtngmst,  shtngmst, ROT0,   "Sega",            "Shooting Master (8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1985, shtngmsta,  shtngmst, sys2,     shtngmst,  shtngmst, ROT0,   "Sega [EVG]",      "Shooting Master (EVG, 8751 315-5159)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1986, gardiab,    gardia,   sys2,     gardia,    gardiab,  ROT270, "bootleg",         "Gardia (317-0007?, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1986, wboysys2,   wboy,     sys2,     wboysys2,  wboysys2, ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, tokisens,   0,        sys2,     tokisens,  bank0c,   ROT90,  "Sega",            "Toki no Senshi - Chrono Soldier", GAME_SUPPORTS_SAVE )
@@ -4701,5 +4681,5 @@ GAME( 1987, wbmlb,      wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootle
 GAME( 1987, wbmlbg,     wbml,     sys2,     wbml,      bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_SUPPORTS_SAVE)
 GAME( 1987, dakkochn,   0,        sys2,     dakkochn,  dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_SUPPORTS_SAVE )
 GAME( 1987, blockgalb,  blockgal, sys2,     blockgal,  bootleg,  ROT90,  "bootleg",         "Block Gal (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ufosensi,   0,        sys2rows, ufosensi,  ufosensi, ROT0,   "Sega",            "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
-GAME( 1988, ufosensib,  ufosensi, sys2rows, ufosensi,  bootlegb, ROT0,   "bootleg",         "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ufosensi,   0,        sys2row,  ufosensi,  ufosensi, ROT0,   "Sega",            "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
+GAME( 1988, ufosensib,  ufosensi, sys2row,  ufosensi,  bootlegb, ROT0,   "bootleg",         "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )
