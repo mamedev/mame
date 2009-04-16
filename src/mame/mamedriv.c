@@ -5287,6 +5287,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gaiapolj )	/* GX123 (c) 1993 (Japan) */
 	DRIVER( mystwarr )	/* GX128 (c) 1993 (World) */
 	DRIVER( mystwaru )	/* GX128 (c) 1993 (US) */
+	DRIVER( mystwarj )	/* GX128 (c) 1993 (Japan) */
 	DRIVER( viostorm )	/* GX168 (c) 1993 (Europe) */
 	DRIVER( viostrmu )	/* GX168 (c) 1993 (US) */
 	DRIVER( viostmub )	/* GX168 (c) 1993 (US) */
