@@ -856,10 +856,10 @@ static INPUT_PORTS_START( steeltal )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)	/* up/down */
 
 	PORT_START("12BADC2")		/* b80000 - 12 bit ADC 2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)	/* collective */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Collective") PORT_REVERSE	/* collective */
 
 	PORT_START("12BADC3")		/* b80000 - 12 bit ADC 3 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(2)	/* rudder */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_NAME("Rudder")	/* rudder */
 
 	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
 	/* steeltal has its own coins */
