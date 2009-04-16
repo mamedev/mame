@@ -1090,7 +1090,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 #ifdef MAME_DEBUG
 	if (this_ppu->scanline <= PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		const device_config *screen = space->machine->primary_screen;
+		const device_config *screen = device->machine->primary_screen;
 		logerror("  PPU register %d write %02x during non-vblank scanline %d (MAME %d, beam pos: %d)\n", offset, data, this_ppu->scanline, video_screen_get_vpos(screen), video_screen_get_hpos(screen));
 	}
 #endif
