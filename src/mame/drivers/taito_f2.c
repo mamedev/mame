@@ -628,7 +628,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	memory_set_bank(space->machine, 2, (data - 1) & 7);
 
 #ifdef MAME_DEBUG
-	if (((data - 1) & 7)>2) logerror("CPU #1 switch to ROM bank %06x: should only happen if Z80 prg rom is 128K!\n",banknum);
+	if (((data - 1) & 7)>2) logerror("CPU #1 switch to ROM bank %06x: should only happen if Z80 prg rom is 128K!\n",(data - 1) & 7);
 #endif
 }
 
