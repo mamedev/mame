@@ -46,21 +46,14 @@ static PALETTE_INIT( subs )
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0007) AM_READ(subs_control_r)
-	AM_RANGE(0x0020, 0x0027) AM_READ(subs_coin_r)
-	AM_RANGE(0x0060, 0x0063) AM_READ(subs_options_r)
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0800, 0x0bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM) /* A14/A15 unused, so mirror ROM */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("discrete", subs_noise_reset_w)
+	AM_RANGE(0x0000, 0x0007) AM_READ(subs_control_r)
 	AM_RANGE(0x0020, 0x0020) AM_WRITE(subs_steer_reset_w)
+	AM_RANGE(0x0020, 0x0027) AM_READ(subs_coin_r)
 //  AM_RANGE(0x0040, 0x0040) AM_WRITE(subs_timer_reset_w)
+	AM_RANGE(0x0060, 0x0063) AM_READ(subs_options_r)
 	AM_RANGE(0x0060, 0x0061) AM_WRITE(subs_lamp1_w)
 	AM_RANGE(0x0062, 0x0063) AM_WRITE(subs_lamp2_w)
 	AM_RANGE(0x0064, 0x0065) AM_DEVWRITE("discrete", subs_sonar2_w)
@@ -70,10 +63,10 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x006a, 0x006b) AM_DEVWRITE("discrete", subs_crash_w)
 	AM_RANGE(0x006c, 0x006d) AM_WRITE(subs_invert1_w)
 	AM_RANGE(0x006e, 0x006f) AM_WRITE(subs_invert2_w)
-	AM_RANGE(0x0090, 0x009f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0090, 0x009f) AM_BASE(&spriteram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -186,7 +179,7 @@ static MACHINE_DRIVER_START( subs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,12096000/16)		/* clock input is the "4H" signal */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(subs_interrupt,4)
 
 	MDRV_MACHINE_RESET(subs)
@@ -210,12 +203,8 @@ static MACHINE_DRIVER_START( subs )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
-
-
 	MDRV_PALETTE_INIT(subs)
 	MDRV_VIDEO_UPDATE(subs)
-
-
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -236,16 +225,11 @@ MACHINE_DRIVER_END
 
 ROM_START( subs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD_NIB_HIGH( "34196.e2",     0x2000, 0x0100, CRC(7c7a04c3) SHA1(269d9f7573cc5da4412f53d647127c4884435353) )	/* ROM 0 D4-D7 */
+	ROM_LOAD_NIB_LOW ( "34194.e1",     0x2000, 0x0100, CRC(6b1c4acc) SHA1(3a743b721d9e7e9bdc4533aeeab294eb0ea27500) )	/* ROM 0 D0-D3 */
 	ROM_LOAD( "34190.p1",     0x2800, 0x0800, CRC(a88aef21) SHA1(3811c137041ca43a6e49fbaf7d9d8ef37ba190a2) )
 	ROM_LOAD( "34191.p2",     0x3000, 0x0800, CRC(2c652e72) SHA1(097b665e803cbc57b5a828403a8d9a258c19e97f) )
 	ROM_LOAD( "34192.n2",     0x3800, 0x0800, CRC(3ce63d33) SHA1(a413cb3e0d03dc40a50f5b03b76a4edbe7906f3e) )
-	ROM_RELOAD(               0xf800, 0x0800 )
-	/* Note: These are being loaded into a bogus location, */
-	/*       They are nibble wide rom images which will be */
-	/*       merged and loaded into the proper place by    */
-	/*       subs_rom_init()                               */
-	ROM_LOAD( "34196.e2",     0x8000, 0x0100, CRC(7c7a04c3) SHA1(269d9f7573cc5da4412f53d647127c4884435353) )	/* ROM 0 D4-D7 */
-	ROM_LOAD( "34194.e1",     0x9000, 0x0100, CRC(6b1c4acc) SHA1(3a743b721d9e7e9bdc4533aeeab294eb0ea27500) )	/* ROM 0 D0-D3 */
 
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "34211.m4",     0x0000, 0x0800, CRC(fa8d4409) SHA1(a83b7a835212d31fe421d537fa0d78f234c26f5b) )	/* Playfield */
@@ -261,28 +245,8 @@ ROM_END
 
 /*************************************
  *
- *  Driver initialization
- *
- *************************************/
-
-static DRIVER_INIT( subs )
-{
-	UINT8 *rom = memory_region(machine, "maincpu");
-	int i;
-
-	/* Merge nibble-wide roms together,
-       and load them into 0x2000-0x20ff */
-
-	for(i=0;i<0x100;i++)
-		rom[0x2000+i] = (rom[0x8000+i]<<4)+rom[0x9000+i];
-}
-
-
-
-/*************************************
- *
  *  Game drivers
  *
  *************************************/
 
-GAME( 1977, subs, 0, subs, subs, subs, ROT0, "Atari", "Subs", GAME_IMPERFECT_SOUND )
+GAME( 1977, subs, 0, subs, subs, 0, ROT0, "Atari", "Subs", GAME_IMPERFECT_SOUND )
