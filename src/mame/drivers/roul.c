@@ -41,21 +41,6 @@ static READ8_HANDLER( testf5_r )
 	return mame_rand(space->machine) & 0x00ff;
 }
 
-static READ8_HANDLER( testfd_r )
-{
-	logerror("Read unknown port $fd at %04x\n",cpu_get_pc(space->cpu));
-if (input_code_pressed(KEYCODE_A)) return 0xff ^ 0x01;
-if (input_code_pressed(KEYCODE_S)) return 0xff ^ 0x02;
-if (input_code_pressed(KEYCODE_D)) return 0xff ^ 0x04;
-if (input_code_pressed(KEYCODE_F)) return 0xff ^ 0x08;
-if (input_code_pressed(KEYCODE_G)) return 0xff ^ 0x10;
-if (input_code_pressed(KEYCODE_H)) return 0xff ^ 0x20;
-if (input_code_pressed(KEYCODE_J)) return 0xff ^ 0x40;
-if (input_code_pressed(KEYCODE_K)) return 0xff ^ 0x80;
-	return 0xff;
-	return mame_rand(space->machine) & 0x00ff;
-}
-
 static WRITE8_HANDLER( testfx_w )
 {
 	reg[offset] = data;
@@ -66,16 +51,16 @@ static WRITE8_HANDLER( testfx_w )
 		int y = reg[0];
 		int x = reg[1];
 		int color = reg[3] & 0x0f;
-		int k = 1;
-		if (reg[3] & 0x20) k = -1;
+		int direction = 1;
+		if (reg[3] & 0x20) direction = -1;
 		if (reg[3] & 0x40)
 			for (i = 0; i < width; i++ )
-				videobuf[(y + i * k) * 256 + x] = color;
+				videobuf[(y + i * direction) * 256 + x] = color;
 		else
 			for (i = 0; i < width; i++ )
-				videobuf[y * 256 + x + i * k] = color;
+				videobuf[y * 256 + x + i * direction] = color;
 	}
-	logerror("Write [%02x] -> %02x\n",offset,data);
+//	logerror("Write [%02x] -> %02x\n",offset,data);
 }
 
 /*
@@ -97,7 +82,7 @@ static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf5, 0xf5) AM_READ(testf5_r)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
-	AM_RANGE(0xfd, 0xfd) AM_READ(testfd_r)
+	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -120,22 +105,32 @@ static VIDEO_START(roul)
 static VIDEO_UPDATE(roul)
 {
 	int i,j;
-	for (i=0; i<256; i++)
-		for (j=0; j<256; j++)
-			*BITMAP_ADDR16(bitmap, i, j    ) = videobuf[j*256+i];
+	for (i = 0; i < 256; i++)
+		for (j = 0; j < 256; j++)
+			*BITMAP_ADDR16(bitmap, j, i) = videobuf[j * 256 + 255 - i];
 	return 0;
 }
 
 static INPUT_PORTS_START( roul )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_NAME("Coin 1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1  )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_Q)
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_T)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Bet") 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CODE(KEYCODE_D)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -207,4 +202,4 @@ ROM_START(roul)
 	ROM_LOAD( "roul.u53",	0x0020, 0x0020, CRC(1965dfaa) SHA1(114eccd3e478902ac7dbb10b9425784231ff581e) )
 ROM_END
 
-GAME( 1982, roul,  0,   roul, roul, 0, ROT0, "bootleg", "Super Lucky Roulette?", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1990, roul,  0,   roul, roul, 0, ROT0, "bootleg", "Super Lucky Roulette", GAME_NOT_WORKING | GAME_NO_SOUND )
