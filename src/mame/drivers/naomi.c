@@ -1921,6 +1921,36 @@ ROM_START( ggram2 )
 ROM_END
 
 /*
+SYSTEMID: NAOMI
+JAP: GUILTY GEAR X
+USA: DISABLE
+EXP: DISABLE
+
+*/
+
+ROM_START( ggx )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x7800000, "user1", 0)
+	ROM_LOAD("epr-23356.ic22", 0x0000000, 0x0400000, CRC(ed2d289f) SHA1(d4f73c6cd25f320616e21f1ff0cdc0a566185dcb) )
+	ROM_LOAD("mpr-23342.ic1",  0x0800000, 0x0800000, CRC(4fd89557) SHA1(3a687393d38e890acb0d1b0edc3ea585773c0222) )
+	ROM_LOAD("mpr-23343.ic2",  0x1000000, 0x0800000, CRC(2e4417b6) SHA1(0f87fa92f01116b0acfae5f1b5a148c1a12a487f) )
+	ROM_LOAD("mpr-23344.ic3",  0x1800000, 0x0800000, CRC(968eea3b) SHA1(a3bb7233b9a950f00b4dcd7bb055dbdba2b29860) )
+	ROM_LOAD("mpr-23345.ic4",  0x2000000, 0x0800000, CRC(30efe1ec) SHA1(be28243ab84acb41229d42056ba051a839e7af65) )
+	ROM_LOAD("mpr-23346.ic5",  0x2800000, 0x0800000, CRC(b34d9461) SHA1(44bd132189c5487fef559883300993393f9f29c6) )
+	ROM_LOAD("mpr-23347.ic6",  0x3000000, 0x0800000, CRC(5a254cd1) SHA1(5ca00400c9e7f6c2565b1ff2d2552a90faadf6dd) )
+	ROM_LOAD("mpr-23348.ic7",  0x3800000, 0x0800000, CRC(aff43142) SHA1(c23bbfceb47885164250ca4800a52b9e9e9e80bc) )
+	ROM_LOAD("mpr-23349.ic8",  0x4000000, 0x0800000, CRC(e83871c7) SHA1(49a8140f38d896e8645fbc838f22af561bd2aa7d) )
+	ROM_LOAD("mpr-23350.ic9",  0x4800000, 0x0800000, CRC(4237010b) SHA1(e757dff4c353416f99eaf3cb1945b94d2768fc4f) )
+	ROM_LOAD("mpr-23351.ic10", 0x5000000, 0x0800000, CRC(b096f712) SHA1(f8e2322ba83224029cd4b91cf4d51a9376923b45) )
+	ROM_LOAD("mpr-23352.ic11", 0x5800000, 0x0800000, CRC(1a01ab38) SHA1(c161d5f0d60849f4e2b51ac00ca877e1c5624bff) )
+	ROM_LOAD("mpr-23353.ic12", 0x6000000, 0x0800000, CRC(daa0ca24) SHA1(afce14e213e79add7fded838e71bb4447425906a) )
+	ROM_LOAD("mpr-23354.ic13", 0x6800000, 0x0800000, CRC(cea127f7) SHA1(11f12472ebfc93eb72b764c780e30afd4812dbe9) )
+	ROM_LOAD("mpr-23355.ic14", 0x7000000, 0x0800000, CRC(e809685f) SHA1(dc052b4eb4fdcfdc22c4807316ce34ee7a0d58a6) )
+ROM_END
+
+/*
 
 SYSTEMID: NAOMI
 JAP: HEAVY METAL JAPAN
@@ -3071,6 +3101,7 @@ GAME( 2001, hmgeo,    naomi,    naomi,    naomi,    0, ROT0, "Capcom",          
 GAME( 2000, cspike,   naomi,    naomi,    naomi,    0, ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, mvsc2,    naomi,    naomi,    naomi,    0, ROT0, "Capcom", 			"Marvel vs. Capcom 2 (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, zombrvn,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Zombie Revenge (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, ggx,      naomi,    naomi,    naomi,    0, ROT0, "Arc System Works","Guilty Gear X (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Incomplete Dumps (just the program rom IC22) */
 GAME( 2000, capsnk,   naomi,    naomi,    naomi,    0, ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )

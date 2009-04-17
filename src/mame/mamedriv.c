@@ -4312,7 +4312,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.05 Quiz Ah Megamisama */
 						/* 2000.06 Derby Owners Club 2000 */
 						/* 2000.06 Virtual-on Oratorio Tangram M.S.B.S. ver.5.66 2000 edition */
-						/* 2000.07 Guilty Gear X */
+	DRIVER( ggx )		/* 2000.07 Guilty Gear X */
 	DRIVER( slasho )	/* 2000.07 Slashout */
 	DRIVER( slashout )
 	DRIVER( capsnk )	/* 2000.08 Capcom vs. SNK Millenium Fight 2000 */
