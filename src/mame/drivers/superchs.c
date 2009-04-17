@@ -230,46 +230,26 @@ static WRITE32_HANDLER( superchs_stick_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( superchs_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x11ffff) AM_READ(SMH_RAM)	/* main CPUA ram */
-	AM_RANGE(0x140000, 0x141fff) AM_READ(SMH_RAM)	/* Sprite ram */
-	AM_RANGE(0x180000, 0x18ffff) AM_READ(TC0480SCP_long_r)
-	AM_RANGE(0x1b0000, 0x1b002f) AM_READ(TC0480SCP_ctrl_long_r)
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM)	/* Shared ram */
-	AM_RANGE(0x280000, 0x287fff) AM_READ(SMH_RAM)	/* Palette ram */
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_READ(SMH_RAM)	/* Sound shared ram */
-	AM_RANGE(0x300000, 0x300007) AM_READ(superchs_input_r)
-	AM_RANGE(0x340000, 0x340003) AM_READ(superchs_stick_r)	/* stick coord read */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( superchs_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x11ffff) AM_WRITE(SMH_RAM) AM_BASE(&superchs_ram)
-	AM_RANGE(0x140000, 0x141fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x180000, 0x18ffff) AM_WRITE(TC0480SCP_long_w)
-	AM_RANGE(0x1b0000, 0x1b002f) AM_WRITE(TC0480SCP_ctrl_long_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) AM_BASE(&shared_ram)
+static ADDRESS_MAP_START( superchs_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE(&superchs_ram)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)
+	AM_RANGE(0x1b0000, 0x1b002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&shared_ram)
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x280000, 0x287fff) AM_WRITE(superchs_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
-	AM_RANGE(0x300000, 0x300007) AM_WRITE(superchs_input_w)	/* eerom etc. */
-	AM_RANGE(0x340000, 0x340003) AM_WRITE(superchs_stick_w)	/* stick int request */
+	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(superchs_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM AM_BASE(&f3_shared_ram)
+	AM_RANGE(0x300000, 0x300007) AM_READWRITE(superchs_input_r, superchs_input_w)	/* eerom etc. */
+	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)	/* stick int request */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superchs_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM)	/* local ram */
-	AM_RANGE(0x800000, 0x80ffff) AM_READ(shared_ram_r)
-	AM_RANGE(0xa00000, 0xa001ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( superchs_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( superchs_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_WRITE(TC0480SCP_word_w) /* Only written upon errors */
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(shared_ram_w)
-	AM_RANGE(0xa00000, 0xa001ff) AM_WRITE(SMH_RAM)	/* Extra road control?? */
+	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	AM_RANGE(0xa00000, 0xa001ff) AM_RAM	/* Extra road control?? */
 ADDRESS_MAP_END
 
 /***********************************************************/
@@ -416,13 +396,13 @@ static MACHINE_DRIVER_START( superchs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_readmem,superchs_writemem)
+	MDRV_CPU_PROGRAM_MAP(superchs_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)/* VBL */
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_cpub_readmem,superchs_cpub_writemem)
+	MDRV_CPU_PROGRAM_MAP(superchs_cpub_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
 	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */

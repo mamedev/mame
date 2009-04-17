@@ -135,15 +135,19 @@ static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
 
 /*** MEMORY MAPS *************************************************************/
 
-static ADDRESS_MAP_START( suprslam_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0xfb0000, 0xfb1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfc0000, 0xfcffff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfd0000, 0xfdffff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xff0000, 0xff1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xff8000, 0xff8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xffa000, 0xffafff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( suprslam_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_BASE(&suprslam_spriteram)
+	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_BASE(&suprslam_sp_videoram)
+	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM
+	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_BASE(&suprslam_screen_videoram)
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_BASE(&suprslam_bg_videoram)
+//  AM_RANGE(0xff2000, 0xff203f) AM_RAM /* ?? */
+	AM_RANGE(0xff8000, 0xff8fff) AM_RAM AM_BASE(&K053936_0_linectrl)
+	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
+	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffd000, 0xffd01f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("SYSTEM")
@@ -151,34 +155,13 @@ static ADDRESS_MAP_START( suprslam_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suprslam_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xfb0000, 0xfb1fff) AM_WRITE(SMH_RAM) AM_BASE(&suprslam_spriteram)
-	AM_RANGE(0xfc0000, 0xfcffff) AM_WRITE(SMH_RAM) AM_BASE(&suprslam_sp_videoram)
-	AM_RANGE(0xfd0000, 0xfdffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_WRITE(suprslam_screen_videoram_w) AM_BASE(&suprslam_screen_videoram)
-	AM_RANGE(0xff0000, 0xff1fff) AM_WRITE(suprslam_bg_videoram_w) AM_BASE(&suprslam_bg_videoram)
-//  AM_RANGE(0xff2000, 0xff203f) AM_WRITE(SMH_RAM) /* ?? */
-	AM_RANGE(0xff8000, 0xff8fff) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_linectrl)
-	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
-	AM_RANGE(0xffa000, 0xffafff) AM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xffd000, 0xffd01f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
-	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( suprslam_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, pending_command_clear_w)
@@ -316,12 +299,12 @@ static const ym2610_interface ym2610_config =
 
 static MACHINE_DRIVER_START( suprslam )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(suprslam_readmem,suprslam_writemem)
+	MDRV_CPU_PROGRAM_MAP(suprslam_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(suprslam_sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_GFXDECODE(suprslam)
 
