@@ -4,7 +4,7 @@ driver by Roberto Zandona'
 thanks to Angelo Salese for some precious advice
 
 TO DO:
-- sound
+- palette
 
 Has 36 pin Cherry master looking edge connector
 
@@ -99,6 +99,12 @@ static READ8_HANDLER( test_r )
 }
 */
 
+static WRITE8_HANDLER( sound_latch_w )
+{
+ 	soundlatch_w(space, 0, data & 0xff);
+ 	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+}
+
 static ADDRESS_MAP_START( roul_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -110,8 +116,8 @@ static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf5, 0xf5) AM_READ(testf5_r)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN1")
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -198,7 +204,6 @@ static MACHINE_DRIVER_START( roul )
 	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_IO_MAP(sound_cpu_io_map,0)
-	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
 
 	MDRV_PALETTE_INIT(roul)
 
