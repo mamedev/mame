@@ -4,9 +4,7 @@ driver by Roberto Zandona'
 thanks to Angelo Salese for some precious advice
 
 TO DO:
-- blitter
 - sound
-- input
 
 Has 36 pin Cherry master looking edge connector
 
@@ -35,6 +33,31 @@ ROM text showed SUPER LUCKY ROULETTE LEISURE ENT
 UINT8 reg[0x10];
 UINT8 *videobuf;
 
+static PALETTE_INIT( roul )
+{
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for (i = 0; i < 0x40; ++i)
+	{
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		bit2 = (color_prom[0] >> 2) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 3) & 0x01;
+		bit1 = (color_prom[0] >> 4) & 0x01;
+		bit2 = (color_prom[0] >> 5) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
+}
+
 static READ8_HANDLER( testf5_r )
 {
 	logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
@@ -47,20 +70,25 @@ static WRITE8_HANDLER( testfx_w )
 	if (offset==2)
 	{
 		int i;
-		int width = reg[2];
-		int y = reg[0];
-		int x = reg[1];
-		int color = reg[3] & 0x0f;
-		int direction = 1;
-		if (reg[3] & 0x20) direction = -1;
+		int width	= reg[2];
+		int y		= reg[0];
+		int x		= reg[1];
+		int color	= reg[3] & 0x0f;
+		int xdirection = 1, ydirection = 1;
+
+		if (reg[3] & 0x10) ydirection = -1;
+		if (reg[3] & 0x20) xdirection = -1;
+
 		if (reg[3] & 0x40)
 			for (i = 0; i < width; i++ )
-				videobuf[(y + i * direction) * 256 + x] = color;
-		else
+				videobuf[(y + i * ydirection) * 256 + x] = color;
+		else if (reg[3] & 0x80)
 			for (i = 0; i < width; i++ )
-				videobuf[y * 256 + x + i * direction] = color;
+				videobuf[y * 256 + x + i * xdirection] = color;
+		else
+			logerror("Write [%02x] -> %02x\n",offset,data);
 	}
-//	logerror("Write [%02x] -> %02x\n",offset,data);
+if (offset > 3) logerror("Write [%02x] -> %02x\n",offset,data);
 }
 
 /*
@@ -78,10 +106,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(testfx_w)
+	AM_RANGE(0xf0, 0xf4) AM_WRITE(testfx_w)
 	AM_RANGE(0xf5, 0xf5) AM_READ(testf5_r)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
@@ -161,15 +190,17 @@ INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( roul )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 1000000)
+	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(roul_map, 0)
 	MDRV_CPU_IO_MAP(roul_cpu_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen",nmi_line_pulse)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 1000000)
+	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_IO_MAP(sound_cpu_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
+
+	MDRV_PALETTE_INIT(roul)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -198,8 +229,8 @@ ROM_START(roul)
 	ROM_CONTINUE(0x0000,0x1000)
 
 	ROM_REGION( 0x0040, "proms", 0 )
-	ROM_LOAD( "roul.u38",	0x0000, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
-	ROM_LOAD( "roul.u53",	0x0020, 0x0020, CRC(1965dfaa) SHA1(114eccd3e478902ac7dbb10b9425784231ff581e) )
+	ROM_LOAD( "roul.u53",	0x0000, 0x0020, CRC(1965dfaa) SHA1(114eccd3e478902ac7dbb10b9425784231ff581e) )
+	ROM_LOAD( "roul.u38",	0x0020, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
 ROM_END
 
 GAME( 1990, roul,  0,   roul, roul, 0, ROT0, "bootleg", "Super Lucky Roulette", GAME_NOT_WORKING | GAME_NO_SOUND )
