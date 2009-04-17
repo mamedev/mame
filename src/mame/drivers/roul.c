@@ -41,21 +41,18 @@ static READ8_HANDLER( testf5_r )
 	return mame_rand(space->machine) & 0x00ff;
 }
 
-static READ8_HANDLER( testf8_r )
-{
-	logerror("Read unknown port $f8 at %04x\n",cpu_get_pc(space->cpu));
-	return mame_rand(space->machine) & 0x00ff;
-}
-
-static READ8_HANDLER( testfa_r )
-{
-	logerror("Read unknown port $fa at %04x\n",cpu_get_pc(space->cpu));
-	return mame_rand(space->machine) & 0x00ff;
-}
-
 static READ8_HANDLER( testfd_r )
 {
 	logerror("Read unknown port $fd at %04x\n",cpu_get_pc(space->cpu));
+if (input_code_pressed(KEYCODE_A)) return 0xff ^ 0x01;
+if (input_code_pressed(KEYCODE_S)) return 0xff ^ 0x02;
+if (input_code_pressed(KEYCODE_D)) return 0xff ^ 0x04;
+if (input_code_pressed(KEYCODE_F)) return 0xff ^ 0x08;
+if (input_code_pressed(KEYCODE_G)) return 0xff ^ 0x10;
+if (input_code_pressed(KEYCODE_H)) return 0xff ^ 0x20;
+if (input_code_pressed(KEYCODE_J)) return 0xff ^ 0x40;
+if (input_code_pressed(KEYCODE_K)) return 0xff ^ 0x80;
+	return 0xff;
 	return mame_rand(space->machine) & 0x00ff;
 }
 
@@ -64,10 +61,19 @@ static WRITE8_HANDLER( testfx_w )
 	reg[offset] = data;
 	if (offset==2)
 	{
+		int i;
+		int width = reg[2];
 		int y = reg[0];
 		int x = reg[1];
-		int color = reg[3];
-		videobuf[y * 256 + x] = color;
+		int color = reg[3] & 0x0f;
+		int k = 1;
+		if (reg[3] & 0x20) k = -1;
+		if (reg[3] & 0x40)
+			for (i = 0; i < width; i++ )
+				videobuf[(y + i * k) * 256 + x] = color;
+		else
+			for (i = 0; i < width; i++ )
+				videobuf[y * 256 + x + i * k] = color;
 	}
 	logerror("Write [%02x] -> %02x\n",offset,data);
 }
@@ -89,8 +95,8 @@ static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xff) AM_WRITE(testfx_w)
 	AM_RANGE(0xf5, 0xf5) AM_READ(testf5_r)
-	AM_RANGE(0xf8, 0xf8) AM_READ(testf8_r)
-	AM_RANGE(0xfa, 0xfa) AM_READ(testfa_r)
+	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
+	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
 	AM_RANGE(0xfd, 0xfd) AM_READ(testfd_r)
 ADDRESS_MAP_END
 
@@ -121,6 +127,41 @@ static VIDEO_UPDATE(roul)
 }
 
 static INPUT_PORTS_START( roul )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_NAME("Coin 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( roul )
