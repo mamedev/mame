@@ -4305,7 +4305,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.02 Touch de UNO! 2 */
 	DRIVER( virnba )	/* 2000.02 Virtua NBA */
 	DRIVER( smarinef )	/* 2000.03 Sega Marine Fishing */
-						/* 2000.03 Marvel vs. Capcom 2 */
+	DRIVER( mvsc2 )		/* 2000.03 Marvel vs. Capcom 2 */
 						/* 2000.03 World Kicks */
 	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
 						/* 2000.04 Shin Nippon Pro-wres Toukon Retsuden 4 */

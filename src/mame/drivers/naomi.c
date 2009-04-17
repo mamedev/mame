@@ -2053,6 +2053,41 @@ ROM_START( suchie3 )
 	ROM_LOAD("mpr-21993.ic14",0x7000000, 0x0400000, CRC(fb28cf0a) SHA1(d51b1d4514a93074d1f77bd1bc5995739604cf56) )
 ROM_END
 
+/*
+SYSTEMID: NAOMI
+JAP: MARVEL VS. CAPCOM 2
+USA: MARVEL VS. CAPCOM 2
+EXP: MARVEL VS. CAPCOM 2
+
+Note: the following game is the only known regular Naomi game to have a rom test item in its specific test mode menu.
+So the Naomi regular board test item is unreliable in this circumstance.
+*/
+
+
+ROM_START( mvsc2 )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x9000000, "user1", 0)
+	ROM_LOAD("epr-23085a.ic11", 0x0000000, 0x0400000, CRC(5d5b7ad1) SHA1(f58c31b245fc33fa541f9f074548402a63f7c3d3) )
+	ROM_RELOAD( 0x400000, 0x400000)
+	ROM_LOAD("mpr-23048.ic17",  0x0800000, 0x0800000, CRC(93d7a63a) SHA1(c50d10b4a3f9db51eae5749f5b665d7c8ab6c898) ) //ic 1
+	ROM_LOAD("mpr-23049.ic18",  0x1000000, 0x0800000, CRC(003dcce0) SHA1(fb71c8ca9271d2155878c72d8fe2df3031e6c014) ) //ic 2
+	ROM_LOAD("mpr-23050.ic19",  0x1800000, 0x0800000, CRC(1d6b88a7) SHA1(ba42e9d1d912d88a7ad839b878975ba590634320) ) //ic 3
+	ROM_LOAD("mpr-23051.ic20",  0x2000000, 0x0800000, CRC(01226aaa) SHA1(a4c6a0eda05e53d0e51b92a4317a86a708a7efdb) ) //ic 4
+	ROM_LOAD("mpr-23052.ic21",  0x2800000, 0x0800000, CRC(74bee120) SHA1(5a0fb48fa758a2be2e08e3b1298103c5aa748835) ) //ic 5
+	ROM_LOAD("mpr-23053.ic22",  0x3000000, 0x0800000, CRC(d92d4401) SHA1(a868780f8d2e176ff10781e1c08bf932f34ac504) ) //ic 6
+	ROM_LOAD("mpr-23054.ic23",  0x3800000, 0x0800000, CRC(78ba02e8) SHA1(0f696a33e1e6671001efc309ed62f084a246ad24) ) //ic 7
+	ROM_LOAD("mpr-23055.ic24",  0x4000000, 0x0800000, CRC(84319604) SHA1(c3dde162e043a54e1325202b46191b32e8784a1c) ) //ic 8
+	ROM_LOAD("mpr-23056.ic25",  0x4800000, 0x0800000, CRC(d7386034) SHA1(be1f3ca5f283e428dc59dc072de3e7d36e122d53) ) //ic 9
+	ROM_LOAD("mpr-23057.ic26",  0x5000000, 0x0800000, CRC(a3f087db) SHA1(b52d7c072cb5c2fdd10d0ac0b62cebe48b229ae3) ) //ic 10
+	ROM_LOAD("mpr-23058.ic27",  0x5800000, 0x0800000, CRC(61a6cc5d) SHA1(34e52cb076888313a80f2b87876b8d37b91d85a0) ) //ic 11
+	ROM_LOAD("mpr-23059.ic28",  0x6000000, 0x0800000, CRC(64808024) SHA1(1a6c60c330642b273978d3dd02d95d17d36ee3f2) ) //ic 12
+	ROM_LOAD("mpr-23060.ic29",  0x6800000, 0x0800000, CRC(67519942) SHA1(fc758d9075625f8140d5d828c8f6b7a91bcc9119) ) //ic 13
+	ROM_LOAD("mpr-23061.ic30",  0x7000000, 0x0800000, CRC(fb1844c4) SHA1(1d1571516a6dbed0c4ded3b80efde9cc9281f66f) ) //ic 14
+	ROM_LOAD32_WORD("mpr-23083.ic31",  0x8000000, 0x0400000, CRC(c61d2dfe) SHA1(a05fb979ed7c8040de91716fc8814e6bd995efa2) ) //ic 15
+	ROM_LOAD32_WORD("mpr-23084.ic32",  0x8000002, 0x0400000, CRC(4ebbbdd9) SHA1(9ad8c1a644850de6e35705318cd1991e1d6e60a8) ) //ic 16
+ROM_END
 
 /* toy fighter - 1999 sega */
 
@@ -2780,14 +2815,14 @@ ROM_START( totd )
 	ROM_LOAD("mpr-23003.ic3", 0x1800000, 0x0800000, CRC(37d6d9f8) SHA1(3ad3fa65f33d250eb8a620e7dc7c6b1209794a80) )
 	ROM_LOAD("mpr-23004.ic4", 0x2000000, 0x0800000, CRC(e41186f2) SHA1(2f4b26d8dba1629db539736cf88ec85c21820aeb) )
 	ROM_LOAD("mpr-23005.ic5", 0x2800000, 0x0800000, CRC(2b8e1fc6) SHA1(a5cd8c5840dd316dd1ad9500804b459476ca8ba0) )
-	ROM_LOAD("mpr-23006.ic6", 0x3000000, 0x0800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) //not populated
+	ROM_LOAD("mpr-23006.ic6", 0x3000000, 0x0800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) //on board but actually 0xff filled
 	ROM_LOAD("mpr-23007.ic7", 0x3800000, 0x0800000, CRC(ca16cfdf) SHA1(6279bc9bd661bde2d3e36ca52625f9b91867c4b4) )
 	ROM_LOAD("mpr-23008.ic8", 0x4000000, 0x0800000, CRC(8c33191c) SHA1(6227fbb3d51c4301dd1fc60ec43df7c18eef06fa) )
 	ROM_LOAD("mpr-23009.ic9", 0x4800000, 0x0800000, CRC(c982d24d) SHA1(d5a15d04f19f5569709b0b1cde64814230f4f0bb) )
 	ROM_LOAD("mpr-23010.ic10",0x5000000, 0x0800000, CRC(c6e129b4) SHA1(642a9e1052efcb43d2b809f13d10617b43bd38f3) )
 	ROM_LOAD("mpr-23011.ic11",0x5800000, 0x0800000, CRC(9e6942ff) SHA1(8c657d7d74c4c9106756a9934bc3c850f5069e29) )
 	ROM_LOAD("mpr-23012.ic12s",0x6000000, 0x0800000, CRC(20e1ebe8) SHA1(e24cb5f48101e665c90af9be333e54ec274004fb) )
-	ROM_LOAD("mpr-23013.ic13s",0x6800000, 0x0800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) //not populated
+	ROM_LOAD("mpr-23013.ic13s",0x6800000, 0x0800000, CRC(3de23e27) SHA1(d3aae2a7e5c78fc3bf8e296392d8f893961d946f) ) //on board but actually 0xff filled
 	ROM_LOAD("mpr-23014.ic14s",0x7000000, 0x0800000, CRC(c4f95fdb) SHA1(8c0e806e27d7bed274dcb20b932897ea8b8bbf86) )
 	ROM_LOAD("mpr-23015.ic15s",0x7800000, 0x0800000, CRC(5360c49d) SHA1(dbdf955d9bb9a387ded8ada18d26d222d73514d7) )
 	ROM_LOAD("mpr-23016.ic16s",0x8000000, 0x0800000, CRC(fae2958b) SHA1(2bfe164723b7b2f57ae0c6e2fe348459f00dc460) )
@@ -3015,6 +3050,7 @@ GAME( 1999, pstone,   naomi,    naomi,    naomi,    0, ROT0, "Capcom",          
 GAME( 2000, pstone2,  naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Power Stone 2 (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, hmgeo,    naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Heavy Metal Geomatrix (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, cspike,   naomi,    naomi,    naomi,    0, ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, mvsc2,    naomi,    naomi,    naomi,    0, ROT0, "Capcom", 			"Marvel vs. Capcom 2 (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Incomplete Dumps (just the program rom IC22) */
 GAME( 2000, capsnk,   naomi,    naomi,    naomi,    0, ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
