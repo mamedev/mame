@@ -192,37 +192,26 @@ static WRITE8_HANDLER( signature_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4800, 0x4803) AM_DEVREAD("ppi8255_0", ppi8255_r)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREAD("ppi8255_1", ppi8255_r)
-	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x4800, 0x4803) AM_DEVWRITE("ppi8255_0", ppi8255_w)
-	AM_RANGE(0x5000, 0x5003) AM_DEVWRITE("ppi8255_1", ppi8255_w)
+static ADDRESS_MAP_START( findout_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r,ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r,ppi8255_w)
 	/* banked ROMs are enabled by low 6 bits of the address */
-	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_1_w)
-	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_2_w)
-	AM_RANGE(0x603b, 0x603b) AM_WRITE(banksel_3_w)
-	AM_RANGE(0x6037, 0x6037) AM_WRITE(banksel_4_w)
-	AM_RANGE(0x602f, 0x602f) AM_WRITE(banksel_5_w)
 	AM_RANGE(0x601f, 0x601f) AM_WRITE(banksel_main_w)
+	AM_RANGE(0x602f, 0x602f) AM_WRITE(banksel_5_w)
+	AM_RANGE(0x6037, 0x6037) AM_WRITE(banksel_4_w)
+	AM_RANGE(0x603b, 0x603b) AM_WRITE(banksel_3_w)
+	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_2_w)
+	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_1_w)
 	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature_w)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_ROM)	/* space for diagnostic ROM? */
+	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
+	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(findout_drawctrl_w)
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(findout_bitmap_w)  AM_BASE(&videoram)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)	/* overlapped by the above */
+	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
 ADDRESS_MAP_END
-
-
 
 #define REELFUN_STANDARD_INPUT \
 	PORT_START("IN0") \
@@ -457,7 +446,7 @@ static MACHINE_DRIVER_START( findout )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(findout_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(findout)
