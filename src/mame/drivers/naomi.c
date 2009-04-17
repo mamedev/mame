@@ -2059,7 +2059,7 @@ JAP: MARVEL VS. CAPCOM 2
 USA: MARVEL VS. CAPCOM 2
 EXP: MARVEL VS. CAPCOM 2
 
-Note: the following game is the only known regular Naomi game to have a rom test item in its specific test mode menu.
+Note: the following game is one of the few known regular Naomi game to have a rom test item in its specific test mode menu.
 So the Naomi regular board test item is unreliable in this circumstance.
 
 protection notes:
@@ -2643,6 +2643,16 @@ IC17    64M DFB4    58F7
 IC18    64M C453    B313
 IC19    64M 04B8    49FB
 
+Protection notes:
+0C0E6758: 013C   MOV.B   @(R0,R3),R1 ;checks $c7a45b8+94, natively it's 0xbb, it should be 0 or 1
+0C0E675A: 611C   EXTU.B  R1,R1
+0C0E675C: 31C7   CMP/GT  R12,R1
+0C0E675E: 1F11   MOV.L   R1,@($04,R15)
+0C0E6760: 8F04   BFS     $0C0E676C ;if R12 > R1 go ahead, otherwise kill yourself
+0C0E6762: E500   MOV     #$00,R5
+0C0E6764: D023   MOV.L   @($008C,PC),R0 [0C0E67F4]
+0C0E6766: 2052   MOV.L   R5,@R0
+0C0E6768: AFFE   BRA     $0C0E6768
 */
 
 ROM_START( zombrvn )
