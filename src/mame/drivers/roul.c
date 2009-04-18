@@ -4,7 +4,7 @@ driver by Roberto Zandona'
 thanks to Angelo Salese for some precious advice
 
 TO DO:
-- palette
+- check palette
 
 Has 36 pin Cherry master looking edge connector
 
@@ -22,36 +22,62 @@ video 464p10 x4 (board silcksreeend 4416)
 AY-3-8912A
 
 ROM text showed SUPER LUCKY ROULETTE LEISURE ENT
+
+
+
+
+
+blitter:
+there are 4 registers:
+
+reg[0] -> y
+reg[1] -> x
+reg[3] & 0x0f -> color
+reg[3] & 0x10 -> y direction (to the up or to the down)
+reg[3] & 0x20 -> x direction (to the right or to the left)
+reg[3] & 0x40 -> width used in y direction
+reg[3] & 0x80 -> width used in x direction
+reg[2] -> width (number of pixel to draw)
+
+with a write in reg[2] the command is executed
+
+not handled commands with reg[3] & 0xc0 == 0x00
+handled wrongly commands with reg[3] & 0xc0 == 0xc0 (handled like reg[3] & 0x40)
 */
 
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "roul.lh"
 
 #define VIDEOBUF_SIZE 256*256
 
 UINT8 reg[0x10];
 UINT8 *videobuf;
 
+static UINT8 lamp_old = 0;
+
 static PALETTE_INIT( roul )
 {
-	int	bit0, bit1, bit2 , r, g, b;
-	int	i;
+	int bit0, bit1, bit2 , r, g, b;
+	int brightness;
+	int i;
 
-	for (i = 0; i < 0x40; ++i)
+	for (i = 0; i < 0x20; ++i)
 	{
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = (color_prom[0] >> 3) & 0x01;
-		bit1 = (color_prom[0] >> 4) & 0x01;
-		bit2 = (color_prom[0] >> 5) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = 0;
-		bit1 = (color_prom[0] >> 6) & 0x01;
-		bit2 = (color_prom[0] >> 7) & 0x01;
+		brightness = (color_prom[0] >> 7) & 0x01;
+		bit0 = brightness;
+		bit1 = ((color_prom[0] >> 0) & 0x01) * brightness;
+		bit2 = ((color_prom[0] >> 1) & 0x01) * brightness;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = brightness;
+		bit1 = ((color_prom[0] >> 2) & 0x01) * brightness;
+		bit2 = ((color_prom[0] >> 3) & 0x01) * brightness;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = brightness;
+		bit1 = ((color_prom[0] >> 4) & 0x01) * brightness;
+		bit2 = ((color_prom[0] >> 5) & 0x01) * brightness;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
@@ -91,18 +117,19 @@ static WRITE8_HANDLER( testfx_w )
 if (offset > 3) logerror("Write [%02x] -> %02x\n",offset,data);
 }
 
-/*
-static READ8_HANDLER( test_r )
-{
-    logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
-    return mame_rand(space->machine) & 0x00ff;
-}
-*/
-
 static WRITE8_HANDLER( sound_latch_w )
 {
  	soundlatch_w(space, 0, data & 0xff);
  	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+}
+
+static WRITE8_HANDLER( ball_w )
+{
+	int lamp = data;
+
+	output_set_lamp_value(data, 1);
+	output_set_lamp_value(lamp_old, 0);
+	lamp_old = lamp;
 }
 
 static ADDRESS_MAP_START( roul_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -115,6 +142,7 @@ static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf0, 0xf4) AM_WRITE(testfx_w)
 	AM_RANGE(0xf5, 0xf5) AM_READ(testf5_r)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
+	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
 	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN1")
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
@@ -238,4 +266,4 @@ ROM_START(roul)
 	ROM_LOAD( "roul.u38",	0x0020, 0x0020, CRC(23ae22c1) SHA1(bf0383462976ec6341ffa8a173264ce820bc654a) )
 ROM_END
 
-GAME( 1990, roul,  0,   roul, roul, 0, ROT0, "bootleg", "Super Lucky Roulette", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAMEL( 1990, roul,  0,   roul, roul, 0, ROT0, "bootleg", "Super Lucky Roulette", GAME_IMPERFECT_GRAPHICS, layout_roul )

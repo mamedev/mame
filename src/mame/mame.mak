@@ -1737,7 +1737,9 @@ $(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh
 
 $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 
-$(DRIVERS)/re900.o:		$(LAYOUT)/re900.lh
+$(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh
+
+$(DRIVERS)/roul.o:	$(LAYOUT)/roul.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
