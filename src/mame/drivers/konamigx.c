@@ -760,7 +760,7 @@ static READ32_HANDLER( sound020_r )
 	if (ACCESSING_BITS_24_31)
 	{
 		MSW = sndto020[reg];
-		if (reg == 2) MSW &= ~3; // supress VOLWR busy flags
+		if (reg == 2) MSW &= ~3; // suppress VOLWR busy flags
 		rv |= MSW<<24;
 	}
 
@@ -3372,7 +3372,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "le2",      13, 1, 1, BPP4 },
 	{ "le2u",     13, 1, 1, BPP4 },
 	{ "gokuparo",  7, 0, 0, BPP5 },
-	{ "fantjour",  7, 0, 0, BPP5 },
+	{ "fantjour",  7, 0, 9, BPP5 },
 	{ "puzldama",  7, 0, 0, BPP5 },
 	{ "tbyahhoo",  7, 0, 8, BPP5 },
 	{ "tkmmpzdm",  7, 0, 2, BPP6 },
@@ -3473,6 +3473,11 @@ static DRIVER_INIT(konamigx)
 				case 8: // tbyahhoo
 					esc_cb = tbyahhoo_esc;
 					break;
+
+				case 9: // fantjour
+		fantjour_dma_install(machine);
+					break;
+
 	}
 	}
 
@@ -3521,6 +3526,7 @@ GAME( 1994, le2,      konamigx, le2,      le2,      konamigx, ROT0, "Konami", "L
 GAME( 1994, le2u,     le2,      le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, le2j,     le2,      le2,      le2,      konamigx, ROT0, "Konami", "Lethal Enforcers II: Gun Fighters (ver JAA)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING)
 GAME( 1994, gokuparo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Gokujyou Parodius (ver JAD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjour, gokuparo, konamigx, gokuparo, konamigx, ROT0, "Konami", "Fantastic Journey", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, puzldama, konamigx, konamigx, puzldama, konamigx, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, tbyahhoo, konamigx, konamigx, gokuparo, konamigx, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, tkmmpzdm, konamigx, konamigx_6bpp, puzldama, konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", GAME_IMPERFECT_GRAPHICS )
@@ -3535,9 +3541,6 @@ GAME( 1996, salmnd2a, salmndr2, konamigx_6bpp_2, gokuparo, konamigx, ROT0, "Kona
 /* bad sprite colours, part of tilemap gets blanked out when a game starts (might be more protection) */
 GAME( 1997, winspike, konamigx, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, winspikj, winspike, winspike, konamigx, konamigx, ROT0, "Konami", "Winning Spike (ver JAA)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
-
-/* this game is unplayable due to protection */
-GAME( 1994, fantjour, gokuparo, konamigx, gokuparo, konamigx, ROT0, "Konami", "Fantastic Journey", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
 
 /* Type 3: dual monitor output and 53936 on the ROM board, external palette RAM */
 GAME( 1994, soccerss, konamigx, gxtype3,  type3, konamigx, ROT0, "Konami", "Soccer Superstars (ver EAA)", GAME_NOT_WORKING )

@@ -2102,3 +2102,47 @@ if((data1=obj[0])&0x80000000)\
 #undef EXTRACT_ODD
 #undef EXTRACT_EVEN
 }
+
+static UINT32 fantjour_dma[8];
+
+void fantjour_dma_install(running_machine *machine)
+{
+	state_save_register_global_array(machine, fantjour_dma);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xdb0000, 0xdb001f, 0, 0, fantjour_dma_w);
+	memset(fantjour_dma, 0, sizeof(fantjour_dma));
+}
+
+WRITE32_HANDLER(fantjour_dma_w)
+{
+	COMBINE_DATA(fantjour_dma + offset);
+	if(!offset && ACCESSING_BITS_24_31) {
+		UINT32 sa = fantjour_dma[1];
+		//		UINT16 ss = (fantjour_dma[2] & 0xffff0000) >> 16;
+		//		UINT32 sb = ((fantjour_dma[2] & 0xffff) << 16) | ((fantjour_dma[3] & 0xffff0000) >> 16);
+
+		UINT32 da = ((fantjour_dma[3] & 0xffff) << 16) | ((fantjour_dma[4] & 0xffff0000) >> 16);
+		//		UINT16 ds = fantjour_dma[4] & 0xffff;
+		UINT32 db = fantjour_dma[5];
+
+		//		UINT8 sz1 = fantjour_dma[0] >> 8;
+		UINT8 sz2 = fantjour_dma[0] >> 16;
+		UINT8 mode = fantjour_dma[0] >> 24;
+
+		UINT32 x   = fantjour_dma[6];
+		UINT32 i1, i2;
+
+		if(mode == 0x93)
+			for(i1=0; i1 <= sz2; i1++)
+				for(i2=0; i2 < db; i2+=4) {
+					memory_write_dword(space, da, memory_read_dword(space, sa) ^ x);
+					da += 4;
+					sa += 4;
+				}
+		else if(mode == 0x8f)
+			for(i1=0; i1 <= sz2; i1++)
+				for(i2=0; i2 < db; i2+=4) {
+					memory_write_dword(space, da, x);
+					da += 4;
+				}
+	}
+}
