@@ -4283,7 +4283,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 1999.07 F355 Challenge */
 	DRIVER( vs2_2k )	/* 1999.08 Virtua Striker 2 version 2000 */
 						/* 1999.08 Unou Nouryoku Check Machine Touch de UNO! */
-						/* 1999.08 Dengen Tenshi Taisen Janshi Shangrilla */
+	DRIVER( shangril )	/* 1999.08 Dengen Tenshi Taisen Janshi Shangri-la */
 	DRIVER( suchie3 )	/* 1999.09 Idol Janshi Su-Chi-Pi 3 */
 						/* 1999.09 Jumbo! Safari */
 						/* 1999.09 Super Major League 99 */
@@ -4304,6 +4304,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( doa2m )		/* 2000.01 Dead or Alive 2 Millenium */
 						/* 2000.02 Touch de UNO! 2 */
 	DRIVER( virnba )	/* 2000.02 Virtua NBA */
+	DRIVER( virnbao )
 	DRIVER( smarinef )	/* 2000.03 Sega Marine Fishing */
 	DRIVER( mvsc2 )		/* 2000.03 Marvel vs. Capcom 2 */
 						/* 2000.03 World Kicks */
