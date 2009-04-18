@@ -4472,6 +4472,38 @@ ROM_END
 
 /*
 
+Title   VIRTUA STRIKER 4
+Media ID    7BC9
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String   0000000
+Product Number  GDT-0013E
+Version V6.000
+Release Date    20050217
+
+
+PIC
+255-5508-391J
+317-0391-JPN
+
+*/
+
+ROM_START( vs4j )
+	TRIFORCE_BIOS
+	//NAOMIGD_BIOS
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0013e", 0, SHA1(b69cc5cab889114eda5c6e9ddcca42de9bc235b3) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-0391-jpn.data", 0x00, 0x50, CRC(0f2dbb73) SHA1(7b9d66abe85303b3e26b442a3a63feca1a0edbdb) )
+ROM_END
+
+
+/*
+
 Title   TRF GDROM TBA EX SATL
 Media ID    92C5
 Media Config    GD-ROM1/1
@@ -4543,6 +4575,7 @@ GAME( 2002, vs2002ex, triforce, naomigd,    naomi,    0, ROT0, "Sega",          
 GAME( 2003, gekpurya, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, tfupdate, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Triforce DIMM Updater (GDT-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vs4,      triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, vs4j,     triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (GDT-0013E)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, avalon13, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "The Key Of Avalon 1.3 - Chaotic Sabbat - Client (GDT-0010C) (V4.000)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, avalon20, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "The Key Of Avalon 2.0 - Eutaxy and Commandment - Client (GDT-0017B) (V3.001)", GAME_NO_SOUND|GAME_NOT_WORKING )
 

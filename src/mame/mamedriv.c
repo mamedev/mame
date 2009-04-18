@@ -4431,7 +4431,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vstrik3c )	/* 2001.04 Virtua Striker 3 */
 	DRIVER( vstrik3 )
 						/* 2001.05 Wild Riders */
-						/* 2001.06 Club Cart */
+						/* 2001.06 Club Kart */
 	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 						/* 2001.08 Wave Runner GP */
 	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 */
@@ -4440,24 +4440,28 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2002.02 The King of Route 66 */
 	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
-						/* 2002.06 World Club Champion Football */
+						/* 2002.06 WCCF SERIE A 2001-2002 */
 						/* 2002.07 Soul Surfer */
-	DRIVER( vf4evo )	/* 2002.08 Virtua Fighter 4 Evolution (revision B) */
-	DRIVER( vf4evoa )
+	DRIVER( vf4evoa )	/* 2002.08 Virtua Fighter 4 Evolution */
+						/* 2002.11 WCCF SERIE A 2001-2002 ver.1.2 */
 	DRIVER( initdv2j )	/* 2002.12 Initial D Arcade Stage ver.2 */
-						/* 2002.12 Virtua Fighter 4 Evolution ver.B */
-						/* 2003.03 WCCF 2001-2002 ver.2.0 */
-						/* 2003.09 WCCF 2002-2003 */
+	DRIVER( vf4evo )	/* 2002.12 Virtua Fighter 4 Evolution ver.B */
+						/* 2003.03 WCCF SERIE A 2001-2002 ver.2.0 */
+						/* 2003.09 WCCF 2002-2003 SERIE A */
+						/* 2003.?? CYCRAFT Club Kart ver. */
 	DRIVER( initdv3j )	/* 2004.01 Initial D Arcade Stage ver.3 */
 						/* 2004.?? Initial D Arcade Stage ver.3 for CYCRAFT */
-						/* 2004.06 WCCF 2002-2003 ver.2.0 */
+						/* 2004.06 WCCF 2002-2003 SERIE A ver.2.0 */
 						/* 2004.07 Virtua Fighter 4 Final Tuned */
 	DRIVER( vf4tuneda )	/* 2004.09 Virtua Fighter 4 Final Tuned ver.A */
 						/* 2004.12 WCCF 2002-2003 ver.2.1 */
 						/* 2005.01 Virtua Fighter 4 final Tuned ver.B */
 						/* 2005.04 Menkyo no Tetsujin */
-						/* 2005.07 WCCF 2004-2005 */
+						/* 2005.06 WCCF European Clubs 2004-2005 */
+						/* 2006.01 WCCF European Clubs 2004-2005 ver.1.1 */
+						/* 2006.03 WCCF European Clubs 2004-2005 ver.1.2 */
 						/* 2006.08 WCCF European Clubs 2005-2006 */
+						/* 2006.10 WCCF European Clubs 2005-2006 bugfix ver. */
 	DRIVER( vf4tunedd )
 	DRIVER( vf4tuned )	/* 200?.?? Virtual fighter 4 Final Tuned ver.F */
 
@@ -4502,12 +4506,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vs2002ex )	/* 2002.10 Virtua Striker 2002 */
 						/* 2003.06 F-ZERO AX */
 						/* 2003.07 Avalon no Kagi */
+						/* 2003.08 Avalon no Kagi ver.1.00 */
 						/* 2003.10 Avalon no Kagi ver.1.01 */
 	DRIVER( gekpurya )	/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
 						/* 2003.12 Avalon no Kagi ver.1.10 */
 						/* 2004.04 Avalon no Kagi ver.1.20 Aratanaru Syoukan */
 	DRIVER( avalon13 )	/* 2004.07 Avalon no Kagi ver.1.30 Konton no Utage */
 	DRIVER( vs4 )		/* 2004.10 Virtua Striker 4 */
+	DRIVER( vs4j )		/* 2004.10 Virtua Striker 4 */
 	DRIVER( avalon20 )	/* 2004.11 Avalon no Kagi ver.2.0 Chitsujo to Kairitsu */
 						/* 2005.04 Virtua Striker 4 ver.A */
 						/* 2005.08 Avalon no Kagi ver.2.5 Kagi Seisen */
