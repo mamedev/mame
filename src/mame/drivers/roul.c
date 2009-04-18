@@ -58,38 +58,42 @@ static UINT8 lamp_old = 0;
 
 static PALETTE_INIT( roul )
 {
-	int bit0, bit1, bit2 , r, g, b;
-	int brightness;
+	int bit6, bit7, bit0, bit1, r, g, b;
 	int i;
 
 	for (i = 0; i < 0x20; ++i)
 	{
-		brightness = (color_prom[0] >> 7) & 0x01;
-		bit0 = brightness;
-		bit1 = ((color_prom[0] >> 0) & 0x01) * brightness;
-		bit2 = ((color_prom[0] >> 1) & 0x01) * brightness;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = brightness;
-		bit1 = ((color_prom[0] >> 2) & 0x01) * brightness;
-		bit2 = ((color_prom[0] >> 3) & 0x01) * brightness;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		bit0 = brightness;
-		bit1 = ((color_prom[0] >> 4) & 0x01) * brightness;
-		bit2 = ((color_prom[0] >> 5) & 0x01) * brightness;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit7 = (color_prom[0] >> 7) & 0x01;
+		bit6 = (color_prom[0] >> 6) & 0x01;
+
+		bit0 = (color_prom[0] >> 0) & 0x01;
+		bit1 = (color_prom[0] >> 1) & 0x01;
+		b = 0x0e * bit6 + 0x1f * bit0 + 0x43 * bit7 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 2) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		g = 0x0e * bit6 + 0x1f * bit0 + 0x43 * bit7 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 4) & 0x01;
+		bit1 = (color_prom[0] >> 5) & 0x01;
+		r = 0x0e * bit6 + 0x1f * bit0 + 0x43 * bit7 + 0x8f * bit1;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
 	}
 }
 
-static READ8_HANDLER( testf5_r )
+static READ8_HANDLER( blitter_status_r )
 {
-	logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
-	return mame_rand(space->machine) & 0x00ff;
+/*
+code check bit 6 and bit 7
+bit 7 -> blitter ready
+bit 6 -> ??? (after unknown blitter command : [80][80][08][02])
+*/
+	return 0xc0; // blitter ready
+//	logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
+//	return mame_rand(space->machine) & 0x00ff;
 }
 
-static WRITE8_HANDLER( testfx_w )
+static WRITE8_HANDLER( blitter_cmd_w )
 {
 	reg[offset] = data;
 	if (offset==2)
@@ -104,16 +108,24 @@ static WRITE8_HANDLER( testfx_w )
 		if (reg[3] & 0x10) ydirection = -1;
 		if (reg[3] & 0x20) xdirection = -1;
 
-		if (reg[3] & 0x40)
-			for (i = 0; i < width; i++ )
-				videobuf[(y + i * ydirection) * 256 + x] = color;
-		else if (reg[3] & 0x80)
-			for (i = 0; i < width; i++ )
-				videobuf[y * 256 + x + i * xdirection] = color;
-		else
-			logerror("Write [%02x] -> %02x\n",offset,data);
+		switch(reg[3] & 0xc0)
+		{
+			case 0x00: // reg[4] used
+				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
+				break;
+			case 0x40: // reg[4] not used
+				for (i = 0; i < width; i++ )
+					videobuf[(y + i * ydirection) * 256 + x] = color;
+				break;
+			case 0x80: // reg[4] not used
+				for (i = 0; i < width; i++ )
+					videobuf[y * 256 + x + i * xdirection] = color;
+				break;
+			case 0xc0:
+				logerror("Blitter command c : [%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
+		}
 	}
-if (offset > 3) logerror("Write [%02x] -> %02x\n",offset,data);
+
 }
 
 static WRITE8_HANDLER( sound_latch_w )
@@ -138,8 +150,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf4) AM_WRITE(testfx_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(testf5_r)
+	AM_RANGE(0xf0, 0xf4) AM_WRITE(blitter_cmd_w)
+	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
