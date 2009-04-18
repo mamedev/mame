@@ -234,54 +234,35 @@ DONE? (check on real board)
 #include "sound/msm5205.h"
 #include "includes/stfight.h"
 
-static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)			/* sf02.bin */
-	AM_RANGE(0xc000, 0xc1ff) AM_READ(SMH_RAM)			/* palette ram */
+static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)                  /* sf02.bin */
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(&paletteram)
+	AM_RANGE(0xc100, 0xc1ff) AM_RAM AM_BASE(&paletteram_2)
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")			/* IN1 */
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("P2")			/* IN2 */
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("START")		/* IN3 */
 	AM_RANGE(0xc203, 0xc204) AM_READ(stfight_dsw_r)		/* DS0,1 */
 	AM_RANGE(0xc205, 0xc205) AM_READ(stfight_coin_r)	/* coin mech */
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)			/* video */
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_BANK1)                  /* sf02.bin */
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
-	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram_2)
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(stfight_fm_w)               /* play fm sound */
 	AM_RANGE(0xc600, 0xc600) AM_DEVWRITE("msm", stfight_adpcm_control_w)    /* voice control */
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)             /* coin mech */
 	AM_RANGE(0xc804, 0xc806) AM_WRITENOP                    /* TBD */
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(stfight_sprite_bank_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(stfight_text_char_w) AM_BASE(&stfight_text_char_ram)
-	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(stfight_text_attr_w) AM_BASE(&stfight_text_attr_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stfight_text_char_w) AM_BASE(&stfight_text_char_ram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(stfight_text_attr_w) AM_BASE(&stfight_text_attr_ram)
 	AM_RANGE(0xd800, 0xd808) AM_WRITE(stfight_vh_latch_w) AM_BASE(&stfight_vh_latch_ram)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&stfight_sprite_ram)
-
+	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&stfight_sprite_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym1", ym2203_r)
-	AM_RANGE(0xc800, 0xc801) AM_DEVREAD("ym2", ym2203_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_w)
+static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(stfight_e800_w)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
-
+	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -454,11 +435,11 @@ static MACHINE_DRIVER_START( stfight )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("screen", stfight_vb_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,120)
 
 	MDRV_QUANTUM_TIME(HZ(600))
