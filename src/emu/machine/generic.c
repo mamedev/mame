@@ -339,8 +339,10 @@ NVRAM_HANDLER( generic_0fill )
 {
 	if (read_or_write)
 		mame_fwrite(file, nvram_select(), generic_nvram_size);
-	else if (file)
+	else if (file != NULL)
 		mame_fread(file, nvram_select(), generic_nvram_size);
+	else if (memory_region_length(machine, "nvram") == generic_nvram_size)
+		memcpy(generic_nvram, memory_region(machine, "nvram"), generic_nvram_size);
 	else
 		memset(nvram_select(), 0, generic_nvram_size);
 }
@@ -355,8 +357,10 @@ NVRAM_HANDLER( generic_1fill )
 {
 	if (read_or_write)
 		mame_fwrite(file, nvram_select(), generic_nvram_size);
-	else if (file)
+	else if (file != NULL)
 		mame_fread(file, nvram_select(), generic_nvram_size);
+	else if (memory_region_length(machine, "nvram") == generic_nvram_size)
+		memcpy(generic_nvram, memory_region(machine, "nvram"), generic_nvram_size);
 	else
 		memset(nvram_select(), 0xff, generic_nvram_size);
 }
@@ -373,8 +377,10 @@ NVRAM_HANDLER( generic_randfill )
 
 	if (read_or_write)
 		mame_fwrite(file, nvram_select(), generic_nvram_size);
-	else if (file)
+	else if (file != NULL)
 		mame_fread(file, nvram_select(), generic_nvram_size);
+	else if (memory_region_length(machine, "nvram") == generic_nvram_size)
+		memcpy(generic_nvram, memory_region(machine, "nvram"), generic_nvram_size);
 	else
 	{
 		UINT8 *nvram = (UINT8 *)nvram_select();
