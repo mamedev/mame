@@ -111,7 +111,7 @@ static WRITE8_HANDLER( blitter_cmd_w )
 		switch(reg[3] & 0xc0)
 		{
 			case 0x00: // reg[4] used
-				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
+				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
 				break;
 			case 0x40: // reg[4] not used
 				for (i = 0; i < width; i++ )
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( blitter_cmd_w )
 					videobuf[y * 256 + x + i * xdirection] = color;
 				break;
 			case 0xc0:
-				logerror("Blitter command c : [%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
+				logerror("Blitter command c : [%02x][%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
 		}
 	}
 
@@ -197,12 +197,12 @@ static INPUT_PORTS_START( roul )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Z)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Bet") 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Bet")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
