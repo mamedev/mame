@@ -178,245 +178,81 @@ static NVRAM_HANDLER (quaquiz2)
 		memcpy ( generic_nvram, quaquiz2_default_eeprom, 0x100 );
 }
 
-static UINT8  question_offset_low;
-static UINT8  question_offset_med;
-static UINT8  question_offset_high;
+static UINT8 *question_offset;
 
-static WRITE8_HANDLER ( question_offset_low_w )
+/* question address is stored as L/H/X (low/high/don't care) */
+static READ8_HANDLER( question_lhx_r )
 {
-	question_offset_low = data;
+	UINT32 address;
+	
+	question_offset[0]++;
+	address = question_offset[0] | (question_offset[1] << 8);
+	return memory_region(space->machine, "questions")[address];
 }
 
-static WRITE8_HANDLER ( question_offset_med_w )
+/* question address is stored as X/L/H (don't care/low/high) */
+static READ8_HANDLER( question_xlh_r )
 {
-	question_offset_med = data;
+	UINT32 address;
+	
+	question_offset[1]++;
+	address = question_offset[1] | (question_offset[2] << 8);
+	return memory_region(space->machine, "questions")[address];
 }
 
-static WRITE8_HANDLER ( question_offset_high_w )
+/* question address is stored as X/H/L (don't care/high/low) */
+static READ8_HANDLER( question_xhl_r )
 {
-	question_offset_high = data;
+	UINT32 address;
+	
+	question_offset[2]++;
+	address = question_offset[2] | (question_offset[1] << 8);
+	return memory_region(space->machine, "questions")[address];
 }
 
-static READ8_HANDLER (statriv2_questions_read)
+/* question address is stored as L/M/H (low/mid/high) */
+static READ8_HANDLER( question_lmh_r )
 {
-	UINT8 *question_data    = memory_region       ( space->machine, "user1" );
-	int offs;
-
-	question_offset_low++;
-	offs = (question_offset_high << 8) | question_offset_low;
-	return question_data[offs];
+	UINT32 address = (question_offset[2] << 16) | (question_offset[1] << 8) | question_offset[0];
+	return memory_region(space->machine, "questions")[address];
 }
 
-/***************************************************\
-*                                                   *
-* Super Trivia has some really weird protection on  *
-* its question data. For some odd reason, the data  *
-* itself is stored normally. Just load the ROMs up  *
-* in a hex editor and OR everything with 0x40 to    *
-* get normal text. However, the game itself expects *
-* different data than what the question ROMs        *
-* contain. Here is some pseudocode for what the     *
-* game does for each character:                     *
-*                                                   *
-*     GetCharacter:                                 *
-*     In A,($28)             // Read character in   *
-*     Invert A               // Invert the bits     *
-*     AND A,$1F              // Put low 5 bits of   *
-*     B = Low 8 bits of addy // addy into high 8    *
-*     C = 0                  // bits of BC pair     *
-*     Call ArcaneFormula(BC) // Get XOR value       *
-*     XOR A,C                // Apply it            *
-*     Return                                        *
-*                                                   *
-*     ArcaneFormula(BC):                            *
-*     ShiftR BC,1                                   *
-*     DblShiftR BC,1                                *
-*     DblShiftR BC,1                                *
-*     DblShiftR BC,1                                *
-*     ShiftR BC,1                                   *
-*     Return                                        *
-*                                                   *
-* Essentially what ArcaneFormula does is to "fill   *
-* out" an entire 8 bit number from only five bits.  *
-* The way it does this is by putting bit 0 of the 5 *
-* bits into bit 0 of the 8 bits, putting bit 1 into *
-* bits 1 and 2, bit 2 into bits 3 and 4, bit 3 into *
-* bits 5 and 6, and finally, bit 4 into bit         *
-* position 7 of the 8-bit number. For example, for  *
-* a value of FA, these would be the steps to get    *
-* the XOR value:                                    *
-*                                                   *
-*                                 Address  XOR val  *
-*     1: Take original number     11111010 00000000 *
-*     2: XOR with 0x1F            00011010 00000000 *
-*     3: Put bit 0 in bit 0       0001101- 00000000 *
-*     4: Double bit 1 in bits 1,2 000110-0 00000110 *
-*     5: Double bit 2 in bits 3,4 00011-10 00000110 *
-*     6: Double bit 3 in bits 5,6 0001-010 01100110 *
-*     7: Put bit 4 in bit 7       000-1010 11100110 *
-*                                                   *
-* Since XOR operations are symmetrical, to make the *
-* game end up receiving the correct value one only  *
-* needs to invert the value and XOR it with the     *
-* value derived from its address. The game will     *
-* then de-invert the value when it tries to invert  *
-* it, re-OR the value when it tries to XOR it, and  *
-* we wind up with nice, working questions. If       *
-* anyone can figure out a way to simplify the       *
-* formula I'm using, PLEASE DO SO!                  *
-*                                                   *
-*                                       - MooglyGuy *
-*                                                   *
-\***************************************************/
-
-static READ8_HANDLER (supertr2_questions_read)
+static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w )
 {
-	UINT8 *question_data = memory_region( space->machine, "user1" );
-	int offs;
-	int XORval;
-
-	XORval = question_offset_low & 0x01;
-	XORval |= (question_offset_low & 0x02) * 3;
-	XORval |= ((question_offset_low & 0x04) * 3) << 1;
-	XORval |= ((question_offset_low & 0x08) * 3) << 2;
-	XORval |= (question_offset_low & 0x10) << 3;
-
-	offs = (question_offset_high << 16) | (question_offset_med << 8) | question_offset_low;
-
-	return (question_data[offs] ^ 0xFF) ^ XORval;
+	data &= 0x0f;
+	if (data != 0 && data != 0xf)
+		popmessage("PPI port C out: %02X", data);
 }
 
-static READ8_HANDLER (supertr3_questions_read)
+static const ppi8255_interface ppi8255_intf =
 {
-	UINT8 *question_data = memory_region( space->machine, "user1" );
-	int offs;
+/* PPI 8255 group A & B set to Mode 0.
+   Port A, B and lower 4 bits of C set as Input.
+   High 4 bits of C set as Output
+*/
+	DEVCB_INPUT_PORT("IN0"),		/* Port A read */
+	DEVCB_INPUT_PORT("IN1"),		/* Port B read */
+	DEVCB_INPUT_PORT("IN2"),		/* Port C read (Lower Nibble as Input) */
+	DEVCB_NULL,   					/* Port A write */
+	DEVCB_NULL,  		 			/* Port B write */
+	DEVCB_HANDLER(ppi_portc_hi_w)	/* Port C write (High nibble as Output) */
+};
 
-	offs = (question_offset_high << 16) | (question_offset_med << 8) | question_offset_low;
 
-	return question_data[offs] ^ 0xFF;
-}
-
-static READ8_HANDLER (hangman_questions_read)
-{
-	UINT8 *question_data = memory_region( space->machine, "user1" );
-	int offs;
-
-	offs = (question_offset_high << 16) | (question_offset_med << 8) | question_offset_low;
-
-	return question_data[offs];
-}
-
-static ADDRESS_MAP_START( statriv2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4800, 0x48ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( statriv2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM
+	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    // backup ram?
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE(&statriv2_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( statriv2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4800, 0x48ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    // backup ram?
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(statriv2_videoram_w) AM_BASE(&statriv2_videoram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( supertr2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4800, 0x48ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( supertr2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4800, 0x48ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    // backup ram?
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(statriv2_videoram_w) AM_BASE(&statriv2_videoram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( statriv2_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
-	AM_RANGE(0x2b, 0x2b) AM_READ(statriv2_questions_read)		// question data
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("ay", ay8910_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READNOP				// ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( statriv2_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x22, 0x22) AM_WRITENOP				// ???
-	AM_RANGE(0x23, 0x23) AM_WRITENOP				// ???
-	AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_low_w)
-	AM_RANGE(0x2a, 0x2a) AM_WRITE(question_offset_high_w)
+static ADDRESS_MAP_START( statriv2_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x28, 0x2b) AM_WRITEONLY AM_BASE(&question_offset)
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITENOP				// ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( statriv4_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
-	AM_RANGE(0x28, 0x28) AM_READ(statriv2_questions_read)		// question data
 	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("ay", ay8910_r)		// ???
+	AM_RANGE(0xc0, 0xcf) AM_WRITENOP				// ???
 	AM_RANGE(0xce, 0xce) AM_READNOP				// ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( statriv4_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x22, 0x22) AM_WRITENOP				// ???
-	AM_RANGE(0x23, 0x23) AM_WRITENOP				// ???
-	AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_high_w)
-	AM_RANGE(0x2a, 0x2a) AM_WRITE(question_offset_low_w)
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITENOP				// ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( supertr2_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
-	AM_RANGE(0x28, 0x28) AM_READ(supertr2_questions_read)                // question data
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("ay", ay8910_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READNOP			// ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( supertr2_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x22, 0x22) AM_WRITENOP				// ???
-	AM_RANGE(0x23, 0x23) AM_WRITENOP			// ???
-	AM_RANGE(0x28, 0x28) AM_WRITE(question_offset_low_w)
-	AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_med_w)
-	AM_RANGE(0x2a, 0x2a) AM_WRITE(question_offset_high_w)
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITENOP				// ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( trivquiz_writeport, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(0x22, 0x22) AM_WRITENOP                               // ???
-    AM_RANGE(0x23, 0x23) AM_WRITENOP                               // ???
-    AM_RANGE(0x28, 0x28) AM_WRITE(question_offset_low_w)
-    AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_high_w)
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITENOP				// ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( trivquiz_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
-	AM_RANGE(0x2a, 0x2a) AM_READ(statriv2_questions_read)                // question data
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("ay", ay8910_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READNOP				// ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( supertr3_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
-	AM_RANGE(0x28, 0x28) AM_READ(supertr3_questions_read)                // question data
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("ay", ay8910_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READNOP				// ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hangman_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN0")
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN1")
-	AM_RANGE(0x28, 0x28) AM_READ(hangman_questions_read)                // question data
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("ay", ay8910_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READNOP			// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statusbj_io, ADDRESS_SPACE_IO, 8 )
@@ -440,13 +276,7 @@ static READ8_DEVICE_HANDLER( prot_r )
 }
 
 
-//static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w );
-//{
-//  popmessage("PPI port C out: %02X", data);
-//}
-
-
-static const ppi8255_interface ppi8255_intf[1] =
+static const ppi8255_interface statusbj_ppi8255_intf[1] =
 {
 /* PPI 8255 group A & B set to Mode 0.
    Port A, B and lower 4 bits of C set as Input.
@@ -488,28 +318,18 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_DIPNAME( 0x80, 0x00, "Freeze" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( statriv4 )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Play All")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Play 10000")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button A")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button B")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button C")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button D")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(statriv2)
 
- 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x20, 0x20, "Show Correct Answer" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+ 	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
@@ -517,20 +337,9 @@ static INPUT_PORTS_START( statriv4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supertr2 )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Play All")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Play 10000")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button A")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button B")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button C")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button D")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_INCLUDE(statriv2)
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -539,10 +348,9 @@ static INPUT_PORTS_START( supertr2 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( quaquiz2 )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Play All")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Play 10000")
+	PORT_INCLUDE(supertr2)
+
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(1) PORT_NAME("Button A")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_IMPULSE(1) PORT_NAME("Button B")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_IMPULSE(1) PORT_NAME("Button C")
@@ -551,14 +359,10 @@ static INPUT_PORTS_START( quaquiz2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
+	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x02, 0x00, "Port $21 bit 1" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x20, 0x20, "Company Logo" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -598,28 +402,18 @@ static INPUT_PORTS_START( hangman )
 	PORT_DIPNAME( 0x80, 0x00, "Keep High Scores" )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sextriv )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Play All")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Play 10000")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button A")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button B")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button C")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button D")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
- 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x20, 0x20, "Show Correct Answer" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_INCLUDE(statriv2)
+	
+ 	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -654,7 +448,6 @@ static INPUT_PORTS_START( statusbj )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )	/* only lower nibble is used */
 INPUT_PORTS_END
 
 static const gfx_layout statriv2_tiles8x16_layout =
@@ -689,13 +482,6 @@ static GFXDECODE_START( statriv2v )
 	GFXDECODE_ENTRY( "gfx1", 0, statriv2_tiles16x8_layout, 0, 64 )
 GFXDECODE_END
 
-static MACHINE_START( statriv2 )
-{
-    state_save_register_global(machine, question_offset_low);
-    state_save_register_global(machine, question_offset_med);
-    state_save_register_global(machine, question_offset_high);
-}
-
 static INTERRUPT_GEN( statriv2_interrupt )
 {
 	cpu_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
@@ -706,11 +492,14 @@ static MACHINE_DRIVER_START( statriv2 )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
     MDRV_CPU_ADD("maincpu", 8085A, 13684000) /* 12.44MHz * 1.1, ugh, glargh, hack, but it makes one in-game second roughly one real-life second */
-	MDRV_CPU_PROGRAM_MAP(statriv2_readmem, statriv2_writemem)
-	MDRV_CPU_IO_MAP(statriv2_readport, statriv2_writeport)
+	MDRV_CPU_PROGRAM_MAP(statriv2_map,0)
+	MDRV_CPU_IO_MAP(statriv2_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", statriv2_interrupt)
 
 	MDRV_NVRAM_HANDLER(statriv2)
+
+	/* 1x 8255 */
+	MDRV_PPI8255_ADD("ppi8255_0", ppi8255_intf)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -726,8 +515,6 @@ static MACHINE_DRIVER_START( statriv2 )
 	MDRV_PALETTE_INIT(statriv2)
 	MDRV_VIDEO_START(statriv2)
 	MDRV_VIDEO_UPDATE(statriv2)
-
-    MDRV_MACHINE_START(statriv2)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -755,28 +542,6 @@ static MACHINE_DRIVER_START( statriv4 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(statriv4_readport,statriv4_writeport)
-
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( trivquiz )
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(statriv2)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(trivquiz_readport,trivquiz_writeport)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( sextriv )
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(statriv2)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(trivquiz_readport,trivquiz_writeport)
-
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(2*8, 36*8-1, 0, 32*8-1)
 MACHINE_DRIVER_END
@@ -784,10 +549,6 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( supertr2 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(supertr2_readmem,supertr2_writemem)
-	MDRV_CPU_IO_MAP(supertr2_readport,supertr2_writeport)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -798,10 +559,6 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( supertr3 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(statriv2)
-
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(supertr2_readmem,supertr2_writemem)
-	MDRV_CPU_IO_MAP(supertr3_readport,supertr2_writeport)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -824,7 +581,6 @@ static MACHINE_DRIVER_START( hangman )
 	MDRV_IMPORT_FROM(statriv2)
 
 	MDRV_CPU_REPLACE("maincpu",8085A,12400000/4)
-	MDRV_CPU_IO_MAP(hangman_readport,supertr2_writeport)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 35*8-1, 0, 32*8-1)
@@ -838,7 +594,7 @@ static MACHINE_DRIVER_START( statusbj )
 	MDRV_CPU_IO_MAP(statusbj_io,0)
 
 	/* 1x 8255 */
-	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_RECONFIG( "ppi8255_0", statusbj_ppi8255_intf[0] )
 MACHINE_DRIVER_END
 
 /*
@@ -876,7 +632,7 @@ ROM_START( statriv2 )
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "trivii0c.u36", 0x00000, 0x01000, CRC(af5f434a) SHA1(1e7ae7ad7ea697007a30f5ba89127802a835eddc) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
 	ROM_LOAD( "statuspb.u1", 0x00000, 0x02000, CRC(a50c0313) SHA1(f9bf84613e2ebb952a81a10ee1da49a37423b717) )
 	ROM_LOAD( "statuspb.u2", 0x02000, 0x02000, CRC(0bc03294) SHA1(c4873cd065c9eb237b03a4195332b7629abac327) )
 	ROM_LOAD( "statuspb.u3", 0x04000, 0x02000, CRC(d1732f3b) SHA1(c4e862bd98f237e1d2ecad430226cba6aba4ebb8) )
@@ -905,7 +661,7 @@ ROM_START( statrv2v )
 	/* other roms were not from this set, missing sub-board?, but as the game is 'triv two' like the parent
        it seems compatible with the same question board */
 
-	ROM_REGION( 0x10000, "user1", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
 	ROM_LOAD( "statuspb.u1", 0x00000, 0x02000, CRC(a50c0313) SHA1(f9bf84613e2ebb952a81a10ee1da49a37423b717) )
 	ROM_LOAD( "statuspb.u2", 0x02000, 0x02000, CRC(0bc03294) SHA1(c4873cd065c9eb237b03a4195332b7629abac327) )
 	ROM_LOAD( "statuspb.u3", 0x04000, 0x02000, CRC(d1732f3b) SHA1(c4e862bd98f237e1d2ecad430226cba6aba4ebb8) )
@@ -930,7 +686,7 @@ ROM_START( statriv4 )
 	ROM_REGION( 0x1000,  "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "triv4.u36",    0x00000, 0x01000, CRC(af5f434a) SHA1(1e7ae7ad7ea697007a30f5ba89127802a835eddc) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
 	ROM_LOAD( "triv4.u41",    0x00000, 0x02000, CRC(aed8eead) SHA1(a615786d11c879875e9b7d3c3593fe0334e79178) )
 	ROM_LOAD( "triv4.u42",    0x02000, 0x02000, CRC(3354d389) SHA1(527e46e9276f4dfaad57a77f0b549d9d26c59226) )
 	ROM_LOAD( "triv4.u43",    0x04000, 0x02000, CRC(de7513e8) SHA1(c2e38cb39aacf57edb27cf5ee0b0fd49a44befa3) )
@@ -955,7 +711,7 @@ ROM_START( trivquiz )
 	ROM_REGION( 0x1000,  "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "triv1-0f.u7",  0x00000, 0x01000, CRC(af5f434a) SHA1(1e7ae7ad7ea697007a30f5ba89127802a835eddc) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
 	ROM_LOAD( "qmt11.rom",    0x00000, 0x02000, CRC(82107565) SHA1(28d71340873330df7d15f1bc55cee78a9c7c31a6) )
 	ROM_LOAD( "qmt12.rom",    0x02000, 0x02000, CRC(68667637) SHA1(df6ad3e624dcad57ce176912931660c6c1780369) )
 	ROM_LOAD( "qmt13.rom",    0x04000, 0x02000, CRC(e0d01a68) SHA1(22bb2a8628a3764d733748e4f5f3bad881371a29) )
@@ -981,7 +737,7 @@ ROM_START( supertr2 )
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "ast2-0d.rom", 0x00000, 0x01000, CRC(a40f9201) SHA1(a87cfc3dbe5cff82926f5f8486c37fd3f4449135) )
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* question data */
+	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT ) /* question data - inverted */
 	ROM_LOAD( "astq2-1.rom", 0x00000, 0x08000, CRC(4af390cb) SHA1(563c6210f2fcc8ee9b5112e2d6f522ddfca2ddea) )
 	ROM_LOAD( "astq2-2.rom", 0x08000, 0x08000, CRC(91a7b4f6) SHA1(c8ff2e8475ae889be14086a04275df94efd66156) )
 	ROM_LOAD( "astq2-3.rom", 0x10000, 0x08000, CRC(e6a50944) SHA1(e3fad344d4bedfd14f307445334903c35e745d9b) )
@@ -1007,7 +763,7 @@ ROM_START( supertr3 )
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "triv3.u36",    0x00000, 0x01000, CRC(79277b08) SHA1(e8de06809853e030d1ee29a788f9bc8ff7175af0) )
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* question data */
+	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT ) /* question data - inverted */
 	ROM_LOAD( "triv3.u41",    0x00000, 0x08000, CRC(d62960c4) SHA1(d6f7dbdb016c14ca1cab5a0e965c9ae40dcbbc28) )
 	ROM_LOAD( "triv3.u42",    0x08000, 0x08000, CRC(6d50fec9) SHA1(6edb3ed92781e8961eacc342c0bceeb052b81a3e) )
 	ROM_LOAD( "triv3.u43",    0x10000, 0x08000, CRC(8c0a73de) SHA1(2a7175b7845b26b8d0d53279cd8793edee95d3a1) )
@@ -1033,7 +789,7 @@ ROM_START( quaquiz2 )
 	ROM_REGION( 0x1000,  "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "qquiz.u36", 0x00000, 0x01000, CRC(468dca15) SHA1(4ace7b3cd233f826949b65e2ab71e94ac6a293a0) )
 
-	ROM_REGION( 0x40000, "user1", 0 ) /* question data */
+	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT ) /* question data - inverted */
 	ROM_LOAD( "gst.01",    0x00000, 0x08000, CRC(c0d83049) SHA1(94c750068e550cdaf4f6f5416bc7c160a759dd5a) )
 	ROM_LOAD( "gst.02",    0x08000, 0x08000, CRC(b844743e) SHA1(4a75e4956c568bad70130a326c0fc691a11ff04c) )
 	ROM_LOAD( "gst.03",    0x10000, 0x08000, CRC(4c734bc5) SHA1(48171494f183dec01732b2d6a0f2af0c1b173dba) )
@@ -1058,7 +814,7 @@ ROM_START( hangman )
 	ROM_REGION( 0x1000,  "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "main_hang_0b_2732.u36", 0x0000, 0x1000, CRC(e031dbf8) SHA1(ae6d34ad02b2d7deb1665d2420f8399a3ca88585) )
 
-	ROM_REGION( 0x16000, "user1", 0 ) /* question data */
+	ROM_REGION( 0x16000, "questions", 0 ) /* question data */
 	ROM_LOAD( "aux_27c256.8", 0x00000, 0x8000, CRC(c7d76338) SHA1(40e88efd7e250ad867772258eb6dc3b225de781f) )
 	ROM_LOAD( "aux_2764.1",   0x08000, 0x2000, CRC(a88563c8) SHA1(23cb169268ded6c81494197cfb9b34180667fc8c) )
 	ROM_LOAD( "aux_2764.2",   0x0a000, 0x2000, CRC(4bddbe3c) SHA1(391012de04e8a3638fac6f173a81cf1f86d8f751) )
@@ -1083,7 +839,7 @@ ROM_START( sextriv )
 	ROM_REGION( 0x1000,  "gfx1", ROMREGION_INVERT )
 	ROM_LOAD( "sex.u36",      0x00000, 0x1000, CRC(fe3fa087) SHA1(356b3fe62b4c600ff5a625bc3e1c53d8143f55df) )
 
-	ROM_REGION( 0x10000, "user1", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
 	ROM_LOAD( "sex1.bin",     0x00000, 0x2000, CRC(7b55360b) SHA1(c38b1be8cb7c6c40e167c449c75b9ca0596affe9) )
 	ROM_LOAD( "sex2.bin",     0x02000, 0x2000, CRC(a88563c8) SHA1(23cb169268ded6c81494197cfb9b34180667fc8c) )
 	ROM_LOAD( "sex3.bin",     0x04000, 0x2000, CRC(da1e00a5) SHA1(d70b0a1ecaf7913cfbf3d218ff05e8511be6ab26) )
@@ -1099,13 +855,112 @@ ROM_START( sextriv )
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
-GAME( 1981, statusbj, 0,        statusbj,  statusbj, 0, ROT0, "Status Games", "Status Black Jack (V1.0c)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1984, hangman,  0,        hangman,   hangman,  0, ROT0, "Status Games", "Hangman", GAME_SUPPORTS_SAVE )
-GAME( 1984, trivquiz, 0,        trivquiz,  statriv2, 0, ROT0, "Status Games", "Triv Quiz", GAME_SUPPORTS_SAVE )
-GAME( 1984, statriv2, 0,        statriv2,  statriv2, 0, ROT0, "Status Games", "Triv Two", GAME_SUPPORTS_SAVE )
-GAME( 1985, statrv2v, statriv2, statriv2v, statriv2, 0, ROT90,"Status Games", "Triv Two (Vertical)", GAME_SUPPORTS_SAVE )
-GAME( 1985, statriv4, 0,        statriv4,  statriv4, 0, ROT0, "Status Games", "Triv Four", GAME_SUPPORTS_SAVE )
-GAME( 1985, sextriv,  0,        sextriv,   sextriv,  0, ROT0, "Status Games", "Sex Triv", GAME_SUPPORTS_SAVE )
-GAME( 1985, quaquiz2, 0,        quaquiz2,  quaquiz2, 0, ROT0, "Status Games", "Quadro Quiz II", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1986, supertr2, 0,        supertr2,  supertr2, 0, ROT0, "Status Games", "Super Triv II", GAME_SUPPORTS_SAVE )
-GAME( 1988, supertr3, 0,        supertr3,  supertr2, 0, ROT0, "Status Games", "Super Triv III", GAME_SUPPORTS_SAVE )
+
+/* question address is stored as L/H/X (low/high/don't care) */
+static DRIVER_INIT( addr_lhx )
+{
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x28, 0x2b, 0, 0, question_lhx_r);
+}
+
+/* question address is stored as X/L/H (don't care/low/high) */
+static DRIVER_INIT( addr_xlh )
+{
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x28, 0x2b, 0, 0, question_xlh_r);
+}
+
+/* question address is stored as X/H/L (don't care/high/low) */
+static DRIVER_INIT( addr_xhl )
+{
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x28, 0x2b, 0, 0, question_xhl_r);
+}
+
+/* question address is stored as L/M/H (low/mid/high) */
+static DRIVER_INIT( addr_lmh )
+{
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x28, 0x2b, 0, 0, question_lmh_r);
+}
+
+static DRIVER_INIT( addr_lmhe )
+{
+	/***************************************************\
+	*                                                   *
+	* Super Trivia has some really weird protection on  *
+	* its question data. For some odd reason, the data  *
+	* itself is stored normally. Just load the ROMs up  *
+	* in a hex editor and OR everything with 0x40 to    *
+	* get normal text. However, the game itself expects *
+	* different data than what the question ROMs        *
+	* contain. Here is some pseudocode for what the     *
+	* game does for each character:                     *
+	*                                                   *
+	*     GetCharacter:                                 *
+	*     In A,($28)             // Read character in   *
+	*     Invert A               // Invert the bits     *
+	*     AND A,$1F              // Put low 5 bits of   *
+	*     B = Low 8 bits of addy // addy into high 8    *
+	*     C = 0                  // bits of BC pair     *
+	*     Call ArcaneFormula(BC) // Get XOR value       *
+	*     XOR A,C                // Apply it            *
+	*     Return                                        *
+	*                                                   *
+	*     ArcaneFormula(BC):                            *
+	*     ShiftR BC,1                                   *
+	*     DblShiftR BC,1                                *
+	*     DblShiftR BC,1                                *
+	*     DblShiftR BC,1                                *
+	*     ShiftR BC,1                                   *
+	*     Return                                        *
+	*                                                   *
+	* Essentially what ArcaneFormula does is to "fill   *
+	* out" an entire 8 bit number from only five bits.  *
+	* The way it does this is by putting bit 0 of the 5 *
+	* bits into bit 0 of the 8 bits, putting bit 1 into *
+	* bits 1 and 2, bit 2 into bits 3 and 4, bit 3 into *
+	* bits 5 and 6, and finally, bit 4 into bit         *
+	* position 7 of the 8-bit number. For example, for  *
+	* a value of FA, these would be the steps to get    *
+	* the XOR value:                                    *
+	*                                                   *
+	*                                 Address  XOR val  *
+	*     1: Take original number     11111010 00000000 *
+	*     2: AND with 0x1F            00011010 00000000 *
+	*     3: Put bit 0 in bit 0       0001101- 00000000 *
+	*     4: Double bit 1 in bits 1,2 000110-0 00000110 *
+	*     5: Double bit 2 in bits 3,4 00011-10 00000110 *
+	*     6: Double bit 3 in bits 5,6 0001-010 01100110 *
+	*     7: Put bit 4 in bit 7       000-1010 11100110 *
+	*                                                   *
+	* Since XOR operations are symmetrical, to make the *
+	* game end up receiving the correct value one only  *
+	* needs to invert the value and XOR it with the     *
+	* value derived from its address. The game will     *
+	* then de-invert the value when it tries to invert  *
+	* it, re-OR the value when it tries to XOR it, and  *
+	* we wind up with nice, working questions. If       *
+	* anyone can figure out a way to simplify the       *
+	* formula I'm using, PLEASE DO SO!                  *
+	*                                                   *
+	*                                       - MooglyGuy *
+	*                                                   *
+	\***************************************************/
+
+	UINT8 *qrom = memory_region(machine, "questions");
+	UINT32 length = memory_region_length(machine, "questions");
+	UINT32 address;
+	
+	for (address = 0; address < length; address++)
+		qrom[address] ^= BITSWAP8(address, 4,3,3,2,2,1,1,0);
+
+	DRIVER_INIT_CALL(addr_lmh);
+}
+
+GAME( 1981, statusbj, 0,        statusbj,  statusbj, addr_xlh,  ROT0, "Status Games", "Status Black Jack (V1.0c)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1984, hangman,  0,        hangman,   hangman,  addr_lmh,  ROT0, "Status Games", "Hangman", GAME_SUPPORTS_SAVE )
+GAME( 1984, trivquiz, 0,        statriv2,  statriv2, addr_lhx,  ROT0, "Status Games", "Triv Quiz", GAME_SUPPORTS_SAVE )
+GAME( 1984, statriv2, 0,        statriv2,  statriv2, addr_xlh,  ROT0, "Status Games", "Triv Two", GAME_SUPPORTS_SAVE )
+GAME( 1985, statrv2v, statriv2, statriv2v, statriv2, addr_xlh,  ROT90,"Status Games", "Triv Two (Vertical)", GAME_SUPPORTS_SAVE )
+GAME( 1985, statriv4, 0,        statriv4,  statriv4, addr_xhl,  ROT0, "Status Games", "Triv Four", GAME_SUPPORTS_SAVE )
+GAME( 1985, sextriv,  0,        statriv4,  sextriv,  addr_lhx,  ROT0, "Status Games", "Sex Triv", GAME_SUPPORTS_SAVE )
+GAME( 1985, quaquiz2, 0,        quaquiz2,  quaquiz2, addr_lmh,  ROT0, "Status Games", "Quadro Quiz II", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1986, supertr2, 0,        supertr2,  supertr2, addr_lmhe, ROT0, "Status Games", "Super Triv II", GAME_SUPPORTS_SAVE )
+GAME( 1988, supertr3, 0,        supertr3,  supertr2, addr_lmh,  ROT0, "Status Games", "Super Triv III", GAME_SUPPORTS_SAVE )
