@@ -397,7 +397,7 @@ static void ymf278b_timer_b_reset(YMF278BChip *chip)
 		if (chip->clock != YMF278B_STD_CLOCK)
 			period = attotime_div(attotime_mul(period, chip->clock), YMF278B_STD_CLOCK);
 
-		timer_adjust_periodic(chip->timer_a, period, 0, period);
+		timer_adjust_periodic(chip->timer_b, period, 0, period);
 	}
 	else
 		timer_adjust_oneshot(chip->timer_b, attotime_never, 0);
