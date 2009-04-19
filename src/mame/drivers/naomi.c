@@ -3346,21 +3346,6 @@ ROM_START( quizqgd )
 ROM_END
 
 
-ROM_START( azumanga )
-	NAOMIGD_BIOS
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0018", 0, NO_DUMP )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	//PIC16C622A (317-5091-JPN)
-	//(sticker 253-5509-5091J)
-	ROM_LOAD("317-5091-jpn.data", 0x00, 0x50, CRC(ca589c79) SHA1(ac44bfdfc8db2f9dbe4d563205719524bf43a674) )
-ROM_END
-
-
 ROM_START( ggxxrl )
 	NAOMIGD_BIOS
 
