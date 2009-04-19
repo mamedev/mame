@@ -37,6 +37,10 @@ Emulation Notes:
  Corrupt Tile on the first R in Carrera? (unlikely to be a bug, HW is very simple..)
  There is also a 'Bomberman' title in the GFX roms, unused from what I can see.
 
+TODO:
+- Needs a reference for the colors.
+- There are reel gfxs on the roms (near the end), left-over or there's a way to enable it?
+
 */
 
 #define MASTER_CLOCK	XTAL_22_1184MHz
@@ -50,20 +54,13 @@ static UINT8* carrera_tileram;
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( carrera_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x4fff) AM_ROM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&carrera_tileram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&carrera_tileram)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -236,7 +233,7 @@ static const gfx_layout tiles8x8_layout =
 };
 
 static GFXDECODE_START( carrera )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
 static VIDEO_UPDATE(carrera)
@@ -276,11 +273,27 @@ static const ay8910_interface ay8910_config =
 
 static PALETTE_INIT(carrera)
 {
-	int x;
-	UINT8 *src = memory_region ( machine, "proms" );
+	int br_bit0, br_bit1, bit0, bit1, r, g, b;
+	int i;
 
-	for (x=0;x<32;x++)
-		palette_set_color_rgb(machine, x, pal3bit(src[x] >> 0), pal3bit(src[x] >> 3), pal2bit(src[x] >> 6));
+	for (i = 0; i < 0x20; ++i)
+	{
+		br_bit0 = (color_prom[0] >> 0) & 0x01;
+		br_bit1 = (color_prom[0] >> 1) & 0x01;
+
+		bit0 = (color_prom[0] >> 2) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		b = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 4) & 0x01;
+		bit1 = (color_prom[0] >> 5) & 0x01;
+		g = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = (color_prom[0] >> 6) & 0x01;
+		bit1 = (color_prom[0] >> 7) & 0x01;
+		r = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		color_prom++;
+	}
 }
 
 
@@ -300,7 +313,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( carrera )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
+	MDRV_CPU_PROGRAM_MAP(carrera_map, 0)
 	MDRV_CPU_IO_MAP(io_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
