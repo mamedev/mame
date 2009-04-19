@@ -3346,6 +3346,21 @@ ROM_START( quizqgd )
 ROM_END
 
 
+ROM_START( azumanga )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0018", 0, SHA1(3e40ca7d43173fe7048d199fdc127b9411e10360) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5091-JPN)
+	//(sticker 253-5509-5091J)
+	ROM_LOAD("317-5091-jpn.data", 0x00, 0x50, CRC(ca589c79) SHA1(ac44bfdfc8db2f9dbe4d563205719524bf43a674) )
+ROM_END
+
+
 ROM_START( ggxxrl )
 	NAOMIGD_BIOS
 
@@ -4077,7 +4092,7 @@ GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomi,   ROT0,   "Ecole Softwa
 //GDL-0015 Mazan
 //GDL-0016 Yonin Uchi Mahjong MJ
 GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomi,   ROT270, "Amedio (Taito license)", "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0018 Azumanga Daiou Puzzle Bobble (GDL-0018)
+GAME( 2002, azumanga,  naomigd,  naomigd,  naomi, naomi,   ROT0, "Moss (Taito license)", "Azumanga Daioh Puzzle Bobble (GDL-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0019 Guilty Gear XX #Reload
 GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works", "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, tetkiwam,  naomigd,  naomigd,  naomi, naomi,   ROT0,   "Success",          "Tetris Kiwamemichi (GDL-0020)", GAME_NO_SOUND|GAME_NOT_WORKING )
