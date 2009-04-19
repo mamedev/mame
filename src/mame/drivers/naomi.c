@@ -3310,8 +3310,11 @@ ROM_START( moeru )
 	DISK_IMAGE_READONLY( "gdl-0013", 0, SHA1(c8869069c28bc8eec96d820886bc388d69d46143) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdl-0013.data", 0x00, 0x50, CRC(56de2066) SHA1(a16a6d9f7272d3f8d322c85222a0487a87811910) )
+	//PIC16C622A (317-5084-JPN)
+	//(sticker 253-5509-5084J)
+	ROM_LOAD("317-5084-jpn.data", 0x00, 0x50, CRC(56de2066) SHA1(a16a6d9f7272d3f8d322c85222a0487a87811910) )
 ROM_END
+
 
 ROM_START( chocomk )
 	NAOMIGD_BIOS
@@ -3343,6 +3346,20 @@ ROM_START( quizqgd )
 ROM_END
 
 
+ROM_START( azumanga )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0018", 0, NO_DUMP )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-5091-JPN)
+	//(sticker 253-5509-5091J)
+	ROM_LOAD("317-5091-jpn.data", 0x00, 0x50, CRC(ca589c79) SHA1(ac44bfdfc8db2f9dbe4d563205719524bf43a674) )
+ROM_END
+
 
 ROM_START( ggxxrl )
 	NAOMIGD_BIOS
@@ -3358,6 +3375,7 @@ ROM_START( ggxxrl )
 	ROM_LOAD("317-5092-jpn.data", 0x00, 0x50, CRC(7c8cca4b) SHA1(92c5a0fd8916744eefc023e64daea69803573928) )
 ROM_END
 
+
 ROM_START( tetkiwam )
 	NAOMIGD_BIOS
 
@@ -3367,9 +3385,9 @@ ROM_START( tetkiwam )
 	DISK_IMAGE_READONLY( "gdl-0020", 0, SHA1(7b2ef47ca2038d6a93615b760b03e8f7cb1b83c2) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	//PIC16C622A (317-5095-JPN)
-	//(sticker 253-5509-5095J)
-	ROM_LOAD("gdl-0020.data", 0x00, 0x50, CRC(06bc5013) SHA1(f7a46b7e34b20409ce2fdae80e5cdfff7adb9c64) )
+	//PIC16C622A (317-5093-JPN)
+	//(sticker 253-5509-5093J)
+	ROM_LOAD("317-5093-jpn.data", 0x00, 0x50, CRC(06bc5013) SHA1(f7a46b7e34b20409ce2fdae80e5cdfff7adb9c64) )
 ROM_END
 
 
@@ -3387,6 +3405,7 @@ ROM_START( shikgam2 )
 	ROM_LOAD("317-5095-jpn.data", 0x00, 0x50, CRC(6033ec89) SHA1(9e99a8ad43fa29296dbf2e13b3a3d4552130b4e8) )
 ROM_END
 
+
 ROM_START( usagui )
 	NAOMIGD_BIOS
 
@@ -3396,9 +3415,9 @@ ROM_START( usagui )
 	DISK_IMAGE_READONLY( "gdl-0022", 0, SHA1(45deba05a12abbf6390c0fc0e4cdeaedfa7d2ca5) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	//PIC16C622A (317-5095-JPN)
-	//(sticker 253-5509-5095J)
-	ROM_LOAD("gdl-0022.data", 0x00, 0x50, CRC(621e827a) SHA1(cdc7580f5d1dfe85d2806233f22bc4f13fd62946) )
+	//PIC16C622A (317-5096-JPN)
+	//(sticker 253-5509-5096J)
+	ROM_LOAD("317-5096-jpn.data", 0x00, 0x50, CRC(621e827a) SHA1(cdc7580f5d1dfe85d2806233f22bc4f13fd62946) )
 ROM_END
 
 
@@ -3415,6 +3434,7 @@ ROM_START( bdrdown )
 	//(sticker 253-5509-5097J)
 	ROM_LOAD("317-5097-jpn.data", 0x00, 0x50, CRC(e689d047) SHA1(7e3e298d9a8076af0254faeb0eb89fbfce94718d) )
 ROM_END
+
 
 ROM_START( psyvar2 )
 	NAOMIGD_BIOS
@@ -3441,7 +3461,9 @@ ROM_START( cfield )
 
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdl-0025.data", 0x00, 0x50, CRC(32adf2eb) SHA1(d86752e6fe9ccac093c512828fca5b7ae62a3ff2) )
+	//PIC16C621A (317-5102-COM)
+	//(sticker 253-5509-5102)
+	ROM_LOAD("317-5102-com.data", 0x00, 0x50, CRC(32adf2eb) SHA1(d86752e6fe9ccac093c512828fca5b7ae62a3ff2) )
 ROM_END
 
 
@@ -3460,6 +3482,7 @@ ROM_START( trizeal )
 	ROM_LOAD("317-5103-jpn.data", 0x00, 0x50,  CRC(3affbf82) SHA1(268746e86e7546f4bab54bdd268f7b58f10c1aaf) )
 ROM_END
 
+
 ROM_START( meltybld )
 	NAOMIGD_BIOS
 
@@ -3473,7 +3496,6 @@ ROM_START( meltybld )
 	//(sticker 253-5509-5104J)
 	ROM_LOAD("317-5104-jpn.data", 0x00, 0x50, CRC(fedc8305) SHA1(c535545937213f726f25e6aa8eb3746a794e9100) )
 ROM_END
-
 
 
 ROM_START( senko )
@@ -3513,12 +3535,12 @@ ROM_START( ss2005 )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0031a", 0, SHA1(6091525845fc2042ed43cae5a1b60c603e16cf97) )
 
-
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5108-JPN)
 	//(sticker 253-5509-5108J)
 	ROM_LOAD("317-5108-jpn.data", 0x00, 0x50, CRC(6a2eb334) SHA1(cab407d2e994f33aa921d50f399b17e6fbf98eb0) )
 ROM_END
+
 
 ROM_START( radirgy )
 	NAOMIGD_BIOS
@@ -3528,11 +3550,11 @@ ROM_START( radirgy )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0032", 0, SHA1(ebd7a40e59082e660ebf9a2d4ae7cb64371dae8d) )
 
-
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdl-0032.data", 0x00, 0x50, CRC(04e4ac45) SHA1(4102a4d68f20a7e78f6c7e3494e7229018e30e39) )
+	//PIC16C621A (317-5110-JPN)
+	//(sticker 253-5509-5110J)
+	ROM_LOAD("317-5110-jpn.data", 0x00, 0x50, CRC(04e4ac45) SHA1(4102a4d68f20a7e78f6c7e3494e7229018e30e39) )
 ROM_END
-
 
 
 ROM_START( ggxxsla )
@@ -3558,10 +3580,12 @@ ROM_START( kurucham )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0034", 0, SHA1(10fd7edb0b620133c003d686e5af2ed27004fa09) )
 
-
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdl-0034.data", 0x00, 0x50,  CRC(f40072a8) SHA1(366df2079a4d2ff7a93082c9bf849aad40ab079d) )
+	//PIC16C621A (317-5115-JPN)
+	//(sticker 253-5509-5115J)
+	ROM_LOAD("317-5115-jpn.data", 0x00, 0x50,  CRC(f40072a8) SHA1(366df2079a4d2ff7a93082c9bf849aad40ab079d) )
 ROM_END
+
 
 ROM_START( undefeat )
 	NAOMIGD_BIOS
@@ -3570,7 +3594,6 @@ ROM_START( undefeat )
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0035", 0, SHA1(91da482a6a082e48bee5b3bd20d9c92d23936965) )
-
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5117-JPN)
@@ -3588,9 +3611,9 @@ ROM_START( meltyb )
 	DISK_IMAGE_READONLY( "gdl-0039", 0, SHA1(ffc7f6e113ad69422a4f22f318bdf9b1dc5c25db) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	//PIC16C622A (317-5104-JPN)
-	//(sticker 253-5509-5104J)
-	ROM_LOAD("gdl-0039.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
+	//PIC16C622A (317-5124-JPN)
+	//(sticker 253-5509-5124J)
+	ROM_LOAD("317-5124-jpn.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
 ROM_END
 
 ROM_START( meltyba )
@@ -3602,9 +3625,9 @@ ROM_START( meltyba )
 	DISK_IMAGE_READONLY( "gdl-0039a", 0, SHA1(e6aa3d65b43a20606e6754bcb8665438770a1f8c) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	//PIC16C622A (317-5104-JPN)
-	//(sticker 253-5509-5104J)
-	ROM_LOAD("gdl-0039.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
+	//PIC16C622A (317-5124-JPN)
+	//(sticker 253-5509-5124J)
+	ROM_LOAD("317-5124-jpn.data", 0x00, 0x50, CRC(4d6e2c77) SHA1(3bed734c291140d0a61afa40f221395369a251a9) )
 ROM_END
 
 
@@ -3615,13 +3638,13 @@ ROM_START( trgheart )
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0036a", 0, SHA1(91f1e19136997cb1e2edfb1ad342b9427d1d3bfb) )
-
-
+\
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//PIC16C622A (317-5121-JPN)
 	//(sticker 253-5509-5121J)
 	ROM_LOAD("317-5121-jpn.data", 0x00, 0x50, CRC(a417b20f) SHA1(af6ed7ebf95948bff3e8df915b229189b8de1e46) )
 ROM_END
+
 
 ROM_START( jingystm )
 	NAOMIGD_BIOS
@@ -3638,6 +3661,7 @@ ROM_START( jingystm )
 	ROM_LOAD("317-5122-jpn.data", 0x00, 0x50, CRC(0b85b7e4) SHA1(f4e419682ddc4b98a330e5ae543f9276c9bde030) )
 ROM_END
 
+
 ROM_START( karous )
 	NAOMIGD_BIOS
 
@@ -3647,7 +3671,9 @@ ROM_START( karous )
 	DISK_IMAGE_READONLY( "gdl-0040", 0, SHA1(a62c8d4b6c5be44a4aeeea1a1a94f3d0fe542593) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdl-0040.data", 0x00, 0x50, CRC(9d37b5e3) SHA1(e1d3cdc2ed82c864c9ff54d9399a80b70ba150c5) )
+	//PIC16C621A (317-5125-COM)
+	//(sticker 253-5509-5125)
+	ROM_LOAD("317-5125-com.data", 0x00, 0x50, CRC(9d37b5e3) SHA1(e1d3cdc2ed82c864c9ff54d9399a80b70ba150c5) )
 ROM_END
 
 
@@ -3660,7 +3686,9 @@ ROM_START( takoron )
 	DISK_IMAGE_READONLY( "gdl-0042", 0, SHA1(984a4fa012d83dd8c748304958c847c9867f4125) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdl-0042.data", 0x00, 0x50, CRC(e1a6dbe4) SHA1(61b458937acca55e4010f86b684aaa86b8c10eac) )
+	//PIC16C621A (317-5127-JPN)
+	//(sticker 253-5509-5127J)
+	ROM_LOAD("317-5127-jpn.data", 0x00, 0x50, CRC(e1a6dbe4) SHA1(61b458937acca55e4010f86b684aaa86b8c10eac) )
 ROM_END
 
 /* -------------------------------- 1st party -------------- */
@@ -3793,6 +3821,7 @@ ROM_START( dygolf )
 	ROM_LOAD("317-0308-com.data", 0x00, 0x50,  CRC(56f63af0) SHA1(3c453226fc53d2f700b3634db3ef8ce206d94392) )
 ROM_END
 
+
 ROM_START( wsbbgd )
 	NAOMIGD_BIOS
 
@@ -3806,6 +3835,7 @@ ROM_START( wsbbgd )
 	//(sticker 253-5508-0309)
 	ROM_LOAD("317-0309-com.data", 0x00, 0x50, CRC(8792c550) SHA1(e8d6d91583d1673d8d3fa9ccb0ab1097c5c5ad08) )
 ROM_END
+
 
 ROM_START( vtennisg )
 	NAOMIGD_BIOS
@@ -3830,8 +3860,9 @@ ROM_START( keyboard )
 	DISK_IMAGE_READONLY( "gds-0017", 0, SHA1(fb86eff3ef38de7fd78cfde897d5332d2092c172) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gds-0017.data", 0x00, 0x50, CRC(c1277eb3) SHA1(529ed5a133550e2854f8656cd377706060a7befa) )
+	ROM_LOAD("317-0323-com.data", 0x00, 0x50, CRC(c1277eb3) SHA1(529ed5a133550e2854f8656cd377706060a7befa) )
 ROM_END
+
 
 ROM_START( vathlete )
 	NAOMIGD_BIOS
@@ -3883,6 +3914,7 @@ ROM_START( vtennis2 )
 	ROM_LOAD("317-0318-exp.data", 0x00, 0x50, CRC(7758ade6) SHA1(c62f35810bce466bfb0f55fd555066efd53e9bb6) )
 ROM_END
 
+
 ROM_START( lupinsho )
 	NAOMIGD_BIOS
 
@@ -3894,6 +3926,7 @@ ROM_START( lupinsho )
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	ROM_LOAD("317-0332-j.data", 0x00, 0x50, CRC(31f2b632) SHA1(bbf253bfe831308a7e7fde3a4a28e5bcd2fbb273) )
 ROM_END
+
 
 ROM_START( luptype )
 	NAOMIGD_BIOS
@@ -3943,6 +3976,7 @@ ROM_START( mok )
 	ROM_LOAD("317-0333-com.data", 0x00, 0x50, CRC(0c07970f) SHA1(8882dd2f8ed522790ea78eed80cfa9442f88f67b) )
 ROM_END
 
+
 ROM_START( ngdup23a )
 	NAOMIGD_BIOS
 
@@ -3970,6 +4004,7 @@ ROM_START( ngdup23c )
 	//(sticker 253-5508-0338J)
 	ROM_LOAD("317-0338-jpn.data", 0x00, 0x50, CRC(eeb2c9e9) SHA1(d30b5914c603219daea9923e1cf8da2be6096742) )
 ROM_END
+
 
 ROM_START( puyofev )
 	NAOMIGD_BIOS
@@ -4057,7 +4092,7 @@ GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomi,   ROT0,   "Ecole Softwa
 //GDL-0015 Mazan
 //GDL-0016 Yonin Uchi Mahjong MJ
 GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomi,   ROT270, "Amedio (Taito license)", "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GDL-0018 Azumanga Daioh Puzzle Bobble
+GAME( 2002, azumanga,  naomigd,  naomigd,  naomi, naomi,   ROT270, "Moss (Taito license)", "Azumanga Daiou Puzzle Bobble (GDL-0018)", GAME_NO_SOUND|GAME_NOT_WORKING ) // only key is dumped and available
 //GDL-0019 Guilty Gear XX #Reload
 GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works", "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, tetkiwam,  naomigd,  naomigd,  naomi, naomi,   ROT0,   "Success",          "Tetris Kiwamemichi (GDL-0020)", GAME_NO_SOUND|GAME_NOT_WORKING )

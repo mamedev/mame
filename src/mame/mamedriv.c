@@ -4365,7 +4365,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( chocomk )	/* 2002.06 Musapy no Choco Marker */
 						/* 2002.07 Mazan */
 						/* 2002.09 Yonin Uchi Mahjong MJ */
-						/* 2002.12 Azumanga Daiou Puzzle Bobble */
+	DRIVER( azumanga )	/* 2002.12 Azumanga Daiou Puzzle Bobble */
 	DRIVER( moeru )		/* 2002.12 Moeru Casinyo */
 	DRIVER( quizqgd )	/* 2003.01 Quiz Keitai Q mode */
 						/* 2003.03 Yonin Uchi Mahjong MJ Network Taisen ver. */
