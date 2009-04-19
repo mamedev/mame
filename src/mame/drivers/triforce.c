@@ -91,7 +91,7 @@ PIC
 
 ROM_START( vs2002ex )
 	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
+	
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -102,10 +102,23 @@ ROM_START( vs2002ex )
 	ROM_LOAD("317-0337-exp.data", 0x00, 0x50, CRC(aa6be604) SHA1(fabc43ecfb7ddf1d5a87f10884852027d6f4773b) )
 ROM_END
 
+ROM_START( avalons )
+	TRIFORCE_BIOS
+	
+
+	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdt-0005c", 0, SHA1(9edb3d9ff492d2207d57bfdb6859e796f76c5e0c) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("gdt-0005.data", 0x00, 0x50, CRC(6c51e5d6) SHA1(84afef983f1f855fe8722f55baa8ea5121da9369) )
+ROM_END
+
 
 ROM_START( gekpurya )
 	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
+	
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -118,7 +131,7 @@ ROM_END
 
 ROM_START( tfupdate )
 	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
+	
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -156,7 +169,7 @@ PIC
 
 ROM_START( vs4 )
 	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
+	
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -188,7 +201,7 @@ PIC
 
 ROM_START( vs4j )
 	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
+	
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -221,7 +234,7 @@ track03.bin 45150   549299  1185760800
 
 ROM_START( avalon13 )
 	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
+	
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -255,7 +268,7 @@ track03.bin 45150   549299  1185760800
 
 ROM_START( avalon20 )
 	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
+	
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -269,7 +282,7 @@ ROM_END
 
 ROM_START( vs42006 )
 	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
+	
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -284,6 +297,7 @@ ROM_END
 
 GAME( 2002, triforce, 0,        triforcegd,    triforce,    0, ROT0, "Sega",           "Triforce Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 2002, vs2002ex, triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, avalons,  triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "The Key Of Avalon - The Wizard Master - Server (GDT-0005C) (V4.001)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, gekpurya, triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, tfupdate, triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Triforce DIMM Updater (GDT-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vs4j,     triforce, triforcegd,    triforce,    0, ROT0, "Sega",           "Virtua Striker 4 (Japan) (GDT-0013E)", GAME_NO_SOUND|GAME_NOT_WORKING )

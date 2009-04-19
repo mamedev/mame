@@ -4506,7 +4506,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( triforce )
 	DRIVER( vs2002ex )	/* 2002.10 Virtua Striker 2002 */
 						/* 2003.06 F-ZERO AX */
-						/* 2003.07 Avalon no Kagi */
+	DRIVER( avalons )	/* 2003.07 Avalon no Kagi */
 						/* 2003.08 Avalon no Kagi ver.1.00 */
 						/* 2003.10 Avalon no Kagi ver.1.01 */
 	DRIVER( gekpurya )	/* 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu */
