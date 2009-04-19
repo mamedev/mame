@@ -4327,7 +4327,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.11 Ninja Assault */
 	DRIVER( confmiss )	/* 2000.11 Confidential Mission */											/* First GD-ROM game? */
 						/* 2000.11 Shakatto Tambourine */
-						/* 2000.11 WWF Royal Rumble */
+	DRIVER( wwfroyal )	/* 2000.11 WWF Royal Rumble */
 	DRIVER( pjustic )	/* 2000.12 Moero Justice Gakuen */
 						/* 2000.12 Samba de Amigo ver.2000 */
 	DRIVER( sprtjam )	/* 2000.12 Sports Jam */
@@ -4354,7 +4354,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2001.09 Alien Front */
 	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
 						/* 2001.10 Inu no Osanpo */
-						/* 2001.10 Derby Owners Club 2 */
+	DRIVER( derbyoc2 )	/* 2001.10 Derby Owners Club 2 */
 	DRIVER( vtennis2 )  /* 2001.10 Power Smash 2 / Virtua Tennis 2 */
 						/* 2001.11 Shakatto Tambourine Cho Powerup Chu */
 	DRIVER( keyboard )	/* 2001.11 La Keyboardxyu */
@@ -4436,7 +4436,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* NAOMI 2 */
 	DRIVER( vstrik3c )	/* 2001.04 Virtua Striker 3 */
 	DRIVER( vstrik3 )
-						/* 2001.05 Wild Riders */
+	DRIVER( wldrider )	/* 2001.05 Wild Riders */
 						/* 2001.06 Club Kart */
 	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
 						/* 2001.08 Wave Runner GP */

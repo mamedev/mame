@@ -1,7 +1,7 @@
 /*
 
   Sega Naomi / Naomi 2 / Atomiswave
- 
+
   Driver by Samuele Zannoli, R. Belmont, and ElSemi,
             David Haywood & Angelo Salese
 
@@ -11,12 +11,12 @@
   Several early Naomi games are running on an earlier revision mainboard (HOTD2 etc.) which appears to have an earlier
    revision of the graphic chip.  Attempting to run these games on the later board results in graphical glitches and/or
    other problems.
-   
+
   Naomi 2 is backwards compatible with Naomi 1
-  
+
   The later revision games (released after GD-ROM had been discontinued) require the 'h' revision bios, which appears to
   have additional hardware checks.
-			
+
 Sega Naomi is Dreamcast based Arcade hardware.
 
 Current Compatibility notes (GD-rom games only)
@@ -1776,6 +1776,43 @@ ROM_START( derbyoc )
 ROM_END
 
 /*
+SYSTEMID: NAOMI
+JAP: DERBY OWNERS CLUB II-----------
+USA: DERBY OWNERS CLUB II-----------
+EXP: DERBY OWNERS CLUB II-IN EXPORT
+*/
+
+ROM_START( derbyoc2 )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
+	ROM_LOAD("epr-22306.ic22", 0x0000000, 0x0400000, CRC(fcac20eb) SHA1(26cec9f615cd18ce7fccfc5e273e42c58dea1995) )
+	ROM_LOAD("ic1", 0x0800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic2", 0x1000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic3", 0x1800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic4", 0x2000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic5", 0x2800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic6", 0x3000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic7", 0x3800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic8", 0x4000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic9", 0x4800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic10",0x5000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic11",0x5800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic12",0x6000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic13",0x6800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic14",0x7000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic15",0x7800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic16",0x8000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic17",0x8800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic18",0x9000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic19",0x9800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic20",0xa000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic21",0xa800000, 0x0800000, NO_DUMP )
+ROM_END
+
+
+/*
 
 SYSTEMID: NAOMI
 JAP: DYNAMITE BASEBALL '99
@@ -3006,6 +3043,35 @@ ROM_START( dybbnao )
 	ROM_LOAD("ic21",0xa800000, 0x0800000, NO_DUMP )
 ROM_END
 
+/*
+SYSTEMID: NAOMI
+JAP: ROYAL RUMBLE
+USA: ROYAL RUMBLE
+EXP: ROYAL RUMBLE
+*/
+
+ROM_START( wwfroyal )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASEFF)
+	ROM_LOAD("epr-22261.ic22", 0x0000000, 0x0400000, CRC(60e5a6cd) SHA1(d74ee8318e40190231b94030176223da8305c053) )
+	ROM_LOAD("ic1", 0x0800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic2", 0x1000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic3", 0x1800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic4", 0x2000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic5", 0x2800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic6", 0x3000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic7", 0x3800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic8", 0x4000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic9", 0x4800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic10",0x5000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic11",0x5800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic12",0x6000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic13",0x6800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic14",0x7000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic15",0x7800000, 0x0800000, NO_DUMP )
+ROM_END
 
 /* GD-ROM titles - a PIC supplies a decryption key
 
@@ -3186,11 +3252,13 @@ GAME( 1999, shangril, naomi,    naomi,    naomi,    naomi, ROT0, "Marvelous Ent.
 /* Incomplete Dumps (just the program rom IC22) */
 GAME( 2000, capsnk,   naomi,    naomi,    naomi,    naomi, ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1999, derbyoc,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Derby Owners Club (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, derbyoc2, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Derby Owners Club II (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1998, dybb99,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Dynamite Baseball '99 (JPN) / World Series '99 (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, gram2000, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, gwing2,   naomi,    naomi,    naomi,    naomi, ROT0, "Takumi / Capcom", "Giga Wing 2 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2000, pjustic,  naomi,    naomi,    naomi,    naomi, ROT0, "Capcom",          "Moero Justice Gakuen (JPN) / Project Justice (USA, EXP, KOR, AUS) ", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 1998, dybbnao,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Dynamite Baseball NAOMI (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, wwfroyal, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "WWF Royal Rumble (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Games with game specific bios sets */
 GAME( 1998, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi House of the Dead 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
@@ -4162,11 +4230,10 @@ GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",         
 /* Naomi 2 & Naomi 2 GD-ROM */
 
 ROM_START( vstrik3c )
-
 	NAOMI2_BIOS
 
-	ROM_REGION( 0xb000000, "user1", 0)
-	ROM_LOAD("epr23663.22", 0x0000000, 0x0400000, CRC(7007fec7) SHA1(523168f0b218d0bd5c815d65bf0caba2c8468c9d) )
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
+	ROM_LOAD("epr-23663.ic22", 0x0000000, 0x0400000, CRC(7007fec7) SHA1(523168f0b218d0bd5c815d65bf0caba2c8468c9d) )
 	ROM_LOAD("ic.1", 0x0800000, 0x0800000, CRC(db8bf632) SHA1(cd0c5c385dc33778eb6477f48a33d31f8461b810) )
 	ROM_LOAD("ic.2", 0x1000000, 0x0800000, CRC(f5889f8b) SHA1(540aa6a9adf10d5426ac4962afdc300cc9c5c6ba) )
 	ROM_LOAD("ic.3", 0x1800000, 0x0800000, CRC(74e7ef35) SHA1(6b63910fa05f98b31689882d3f7f32ea84fb11e5) )
@@ -4190,7 +4257,32 @@ ROM_START( vstrik3c )
 	ROM_LOAD("ic.21",0xa800000, 0x0800000, CRC(d6ef7d68) SHA1(4ee396af6c5caf4c5af6e9ad0e03a7ac2c5039f4) )
 ROM_END
 
+ROM_START( wldrider )
+	NAOMI2_BIOS
 
+	ROM_REGION( 0xa800000, "user1", ROMREGION_ERASEFF)
+	ROM_LOAD("epr-23622.ic22", 0x0000000, 0x0400000, CRC(8acafa5b) SHA1(c92bcd40bad6ba8efd1edbfd7e439fb2b3c67fb0) )
+	ROM_LOAD("ic.1", 0x0800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.2", 0x1000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.3", 0x1800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.4", 0x2000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.5", 0x2800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.6", 0x3000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.7", 0x3800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.8", 0x4000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.9", 0x4800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.10",0x5000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.11",0x5800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.12",0x6000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.13",0x6800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.14",0x7000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.15",0x7800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.16",0x8000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.17",0x8800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.18",0x9000000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.19",0x9800000, 0x0800000, NO_DUMP )
+	ROM_LOAD("ic.20",0xa000000, 0x0800000, NO_DUMP )
+ROM_END
 
 ROM_START( vstrik3 )
 	NAOMI2_BIOS
@@ -4417,7 +4509,11 @@ ROM_END
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 //Naomi 2 Cart Games
-GAME( 2001, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0, "Sega",          "Virtua Striker 3 (Cart) (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+/* Complete Dumps */
+GAME( 2001, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Virtua Striker 3 (Cart) (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
+/* Incomplete Dumps (just the program rom IC22) */
+GAME( 2001, wldrider, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 // GDS-xxxx (first party games?)
 GAME( 2001, vstrik3, naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
