@@ -36,12 +36,12 @@ reg[3] & 0x10 -> y direction (to the up or to the down)
 reg[3] & 0x20 -> x direction (to the right or to the left)
 reg[3] & 0x40 -> width used in y direction
 reg[3] & 0x80 -> width used in x direction
+reg[3] & 0xc0 -> width used in both directions
 reg[2] -> width (number of pixel to draw)
 
 with a write in reg[2] the command is executed
 
 not handled commands with reg[3] & 0xc0 == 0x00
-handled wrongly commands with reg[3] & 0xc0 == 0xc0 (handled like reg[3] & 0x40)
 */
 
 #include "driver.h"
@@ -88,7 +88,7 @@ code check bit 6 and bit 7
 bit 7 -> blitter ready
 bit 6 -> ??? (after unknown blitter command : [80][80][08][02])
 */
-	return 0xc0; // blitter ready
+	return 0x80; // blitter ready
 //	logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
 //	return mame_rand(space->machine) & 0x00ff;
 }
@@ -113,16 +113,17 @@ static WRITE8_HANDLER( blitter_cmd_w )
 			case 0x00: // reg[4] used
 				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
 				break;
-			case 0x40: // reg[4] not used
+			case 0x40: // vertical line - reg[4] not used
 				for (i = 0; i < width; i++ )
 					videobuf[(y + i * ydirection) * 256 + x] = color;
 				break;
-			case 0x80: // reg[4] not used
+			case 0x80: // horizontal line - reg[4] not used
 				for (i = 0; i < width; i++ )
 					videobuf[y * 256 + x + i * xdirection] = color;
 				break;
-			case 0xc0:
-				logerror("Blitter command c : [%02x][%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
+			case 0xc0: // diagonal line - reg[4] not used
+				for (i = 0; i < width; i++ )
+					videobuf[(y + i * ydirection) * 256 + x + i * xdirection] = color;
 		}
 	}
 
@@ -189,7 +190,7 @@ static INPUT_PORTS_START( roul )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_NAME("Coin 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_NAME("Service") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Service") PORT_CODE(KEYCODE_X)
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -210,21 +211,21 @@ static INPUT_PORTS_START( roul )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0e, 0x0e, "Percentage Payout" )
+	PORT_DIPSETTING(    0x00, "94%" )
+	PORT_DIPSETTING(    0x02, "88%" )
+	PORT_DIPSETTING(    0x04, "82%" )
+	PORT_DIPSETTING(    0x06, "75%" )
+	PORT_DIPSETTING(    0x08, "68%" )
+	PORT_DIPSETTING(    0x0a, "62%" )
+	PORT_DIPSETTING(    0x0c, "56%" )
+	PORT_DIPSETTING(    0x0e, "50%" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Doubble Odds" )
+	PORT_DIPSETTING(    0x20, "With" )
+	PORT_DIPSETTING(    0x00, "Without" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
