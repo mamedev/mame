@@ -4504,6 +4504,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Triforce (GameCube based) */
 	DRIVER( triforce )
+	DRIVER( vs2002j )
 	DRIVER( vs2002ex )	/* 2002.10 Virtua Striker 2002 */
 						/* 2003.06 F-ZERO AX */
 	DRIVER( avalons )	/* 2003.07 Avalon no Kagi */
