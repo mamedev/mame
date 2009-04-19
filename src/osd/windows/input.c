@@ -1770,7 +1770,7 @@ static void rawinput_device_release(device_info *devinfo)
 
 
 //============================================================
-//  rawinput_device_name
+//  rawinput_device_improve_name
 //============================================================
 
 static TCHAR *rawinput_device_improve_name(TCHAR *name)
@@ -1786,8 +1786,13 @@ static TCHAR *rawinput_device_improve_name(TCHAR *name)
 	TCHAR *chdst;
 	LONG result;
 
+	// The RAW name received is formatted as:
+	//   \??\type-id#hardware-id#instance-id#{DeviceClasses-id}
+	// XP starts with \??\
+	// Vista64 starts with \\?\
+
 	// ensure the name is something we can handle
-	if (_tcsncmp(name, TEXT("\\\\?\\"), 4) != 0)
+	if (_tcsncmp(name, TEXT("\\\\?\\"), 4) != 0 && _tcsncmp(name, TEXT("\\??\\"), 4) != 0)
 		return name;
 
 	// allocate a temporary string and concatenate the base path plus the name
