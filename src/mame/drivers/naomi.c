@@ -4092,7 +4092,7 @@ GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomi,   ROT0,   "Ecole Softwa
 //GDL-0015 Mazan
 //GDL-0016 Yonin Uchi Mahjong MJ
 GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomi,   ROT270, "Amedio (Taito license)", "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, azumanga,  naomigd,  naomigd,  naomi, naomi,   ROT270, "Moss (Taito license)", "Azumanga Daiou Puzzle Bobble (GDL-0018)", GAME_NO_SOUND|GAME_NOT_WORKING ) // only key is dumped and available
+//GDL-0018 Azumanga Daiou Puzzle Bobble (GDL-0018)
 //GDL-0019 Guilty Gear XX #Reload
 GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works", "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, tetkiwam,  naomigd,  naomigd,  naomi, naomi,   ROT0,   "Success",          "Tetris Kiwamemichi (GDL-0020)", GAME_NO_SOUND|GAME_NOT_WORKING )
