@@ -1,11 +1,22 @@
 /*
 
-  Sega Naomi
- + Related Systems (possibly to be split at a later date)
-
+  Sega Naomi / Naomi 2 / Atomiswave
+ 
   Driver by Samuele Zannoli, R. Belmont, and ElSemi,
             David Haywood & Angelo Salese
 
+ Notes:
+  NAMCO Naomi games require a Namco specific BIOS
+
+  Several early Naomi games are running on an earlier revision mainboard (HOTD2 etc.) which appears to have an earlier
+   revision of the graphic chip.  Attempting to run these games on the later board results in graphical glitches and/or
+   other problems.
+   
+  Naomi 2 is backwards compatible with Naomi 1
+  
+  The later revision games (released after GD-ROM had been discontinued) require the 'h' revision bios, which appears to
+  have additional hardware checks.
+			
 Sega Naomi is Dreamcast based Arcade hardware.
 
 Current Compatibility notes (GD-rom games only)
@@ -3109,6 +3120,23 @@ void naomi_write_keyfile(void)
 }
 #endif
 
+static READ64_HANDLER( naomi_bios_idle_skip_r )
+{
+
+	if (cpu_get_pc(space->cpu)==0xc04173c)
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
+		//cpu_spinuntil_int(space->cpu);
+//  else
+//      printf("%08x\n", cpu_get_pc(space->cpu));
+
+	return naomi_ram64[0x2ad238/8];
+}
+static DRIVER_INIT(naomi)
+{
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
+}
+
+
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
   JAPAN
@@ -3126,43 +3154,43 @@ void naomi_write_keyfile(void)
 */
 
 /* Naomi & Naomi GD-ROM */
-GAME( 1998, naomi,    0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",            "Naomi Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 /* Complete Dumps */
-GAME( 2001, csmash,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (rev. A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, csmasho,  csmash,   naomi,    naomi,    0, ROT0, "Sega",            "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (original)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, suchie3,  naomi,    naomi,    naomi,    0, ROT0, "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, vs2_2k,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, smarinef, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Sega Marine Fishing", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, toyfight, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Toy Fighter", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, doa2,     naomi,    naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, doa2m,    doa2,     naomi,    naomi,    0, ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, vtennis,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Power Smash (JPN) / Virtua Tennis (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, slasho,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, totd,     naomi,    naomi,    naomi,    0, ROT0, "Sega",            "The Typing of the Dead (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, otrigger, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "OutTrigger (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, spawn,    naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Spawn (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, samba,    naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Samba De Amigo (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, pstone,   naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, pstone2,  naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Power Stone 2 (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, hmgeo,    naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Heavy Metal Geomatrix (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, cspike,   naomi,    naomi,    naomi,    0, ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, mvsc2,    naomi,    naomi,    naomi,    0, ROT0, "Capcom", 			"Marvel vs. Capcom 2 (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, zombrvn,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Zombie Revenge (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, ggx,      naomi,    naomi,    naomi,    0, ROT0, "Arc System Works","Guilty Gear X (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, virnba,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, virnbao,  virnba,   naomi,    naomi,    0, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS) (original)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, ggram2,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Giant Gram (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING ) // strings in rom don't contain '2'
-GAME( 1999, shangril, naomi,    naomi,    naomi,    0, ROT0, "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, csmash,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (rev. A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, csmasho,  csmash,   naomi,    naomi,    naomi, ROT0, "Sega",            "Cosmic Smash (JPN, USA, EXP, KOR, AUS) (original)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, suchie3,  naomi,    naomi,    naomi,    naomi, ROT0, "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, vs2_2k,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Virtua Striker 2 Ver. 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, smarinef, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Sega Marine Fishing", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, toyfight, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Toy Fighter", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, doa2,     naomi,    naomi,    naomi,    naomi, ROT0, "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, doa2m,    doa2,     naomi,    naomi,    naomi, ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, vtennis,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Power Smash (JPN) / Virtua Tennis (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, slasho,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Slashout (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, totd,     naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "The Typing of the Dead (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, otrigger, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "OutTrigger (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, spawn,    naomi,    naomi,    naomi,    naomi, ROT0, "Capcom",          "Spawn (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, samba,    naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Samba De Amigo (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, pstone,   naomi,    naomi,    naomi,    naomi, ROT0, "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, pstone2,  naomi,    naomi,    naomi,    naomi, ROT0, "Capcom",          "Power Stone 2 (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, hmgeo,    naomi,    naomi,    naomi,    naomi, ROT0, "Capcom",          "Heavy Metal Geomatrix (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, cspike,   naomi,    naomi,    naomi,    naomi, ROT0, "Psikyo / Capcom", "Gun Spike (JPN) / Cannon Spike (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, mvsc2,    naomi,    naomi,    naomi,    naomi, ROT0, "Capcom", 			"Marvel vs. Capcom 2 (JPN, USA, EUR, ASI, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, zombrvn,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Zombie Revenge (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, ggx,      naomi,    naomi,    naomi,    naomi, ROT0, "Arc System Works","Guilty Gear X (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, virnba,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, virnbao,  virnba,   naomi,    naomi,    naomi, ROT0, "Sega",            "Virtua NBA (JPN, USA, EXP, KOR, AUS) (original)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, ggram2,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Giant Gram (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING ) // strings in rom don't contain '2'
+GAME( 1999, shangril, naomi,    naomi,    naomi,    naomi, ROT0, "Marvelous Ent.",  "Dengen Tenshi Taisen Janshi Shangri-la (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Incomplete Dumps (just the program rom IC22) */
-GAME( 2000, capsnk,   naomi,    naomi,    naomi,    0, ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1999, derbyoc,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Derby Owners Club (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1998, dybb99,   naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Dynamite Baseball '99 (JPN) / World Series '99 (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, gram2000, naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, gwing2,   naomi,    naomi,    naomi,    0, ROT0, "Takumi / Capcom", "Giga Wing 2 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, pjustic,  naomi,    naomi,    naomi,    0, ROT0, "Capcom",          "Moero Justice Gakuen (JPN) / Project Justice (USA, EXP, KOR, AUS) ", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 1998, dybbnao,  naomi,    naomi,    naomi,    0, ROT0, "Sega",            "Dynamite Baseball NAOMI (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, capsnk,   naomi,    naomi,    naomi,    naomi, ROT0, "Capcom / SNK",    "Capcom Vs. SNK Millennium Fight 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1999, derbyoc,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Derby Owners Club (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1998, dybb99,   naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Dynamite Baseball '99 (JPN) / World Series '99 (USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, gram2000, naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, gwing2,   naomi,    naomi,    naomi,    naomi, ROT0, "Takumi / Capcom", "Giga Wing 2 (JPN, USA, EXP, KOR, AUS)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, pjustic,  naomi,    naomi,    naomi,    naomi, ROT0, "Capcom",          "Moero Justice Gakuen (JPN) / Project Justice (USA, EXP, KOR, AUS) ", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 1998, dybbnao,  naomi,    naomi,    naomi,    naomi, ROT0, "Sega",            "Dynamite Baseball NAOMI (JPN)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Games with game specific bios sets */
 GAME( 1998, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi House of the Dead 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
@@ -3957,21 +3985,7 @@ ROM_START( puyofev )
 	ROM_LOAD("317-0375-com.data", 0x00, 0x50, CRC(32bf1825) SHA1(42dfbc6777c154d8de6c6f7350da9ea737380220) )
 ROM_END
 
-static READ64_HANDLER( naomigd_bios_idle_skip_r )
-{
 
-	if (cpu_get_pc(space->cpu)==0xc04173c)
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
-		//cpu_spinuntil_int(space->cpu);
-//  else
-//      printf("%08x\n", cpu_get_pc(space->cpu));
-
-	return naomi_ram64[0x2ad238/8];
-}
-static DRIVER_INIT(naomigd)
-{
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomigd_bios_idle_skip_r);
-}
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
@@ -3984,7 +3998,7 @@ static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 static DRIVER_INIT( ggxxsla )
 {
 	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1aae18, 0xc1aae1f, 0, 0, naomigd_ggxxsla_idle_skip_r);
-	DRIVER_INIT_CALL(naomigd);
+	DRIVER_INIT_CALL(naomi);
 }
 
 static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
@@ -3999,7 +4013,7 @@ static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 static DRIVER_INIT( ggxx )
 {
 	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1837b8, 0xc1837bf, 0, 0, naomigd_ggxx_idle_skip_r);
-	DRIVER_INIT_CALL(naomigd);
+	DRIVER_INIT_CALL(naomi);
 }
 
 static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
@@ -4016,99 +4030,99 @@ static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 static DRIVER_INIT( ggxxrl )
 {
 	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
-	DRIVER_INIT_CALL(naomigd);
+	DRIVER_INIT_CALL(naomi);
 }
 
 
 /* Naomi GD-Rom Sets */
-GAME( 2001, naomigd,   0,        naomi,    naomi, naomigd,   ROT0,   "Sega",             "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, naomigd,   0,        naomi,    naomi, naomi,   ROT0,   "Sega",             "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 /* GDL-xxxx ("licensed by Sega" games) */
-GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",           "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",           "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi, naomi,   ROT0,   "Capcom",           "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi, naomi,   ROT0,   "Capcom",           "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0003
-GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom / SNK",     "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi, naomi,   ROT0,   "Capcom / SNK",     "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0005 Doki Doki Idol Star Seeker
-GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Capcom",           "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi, naomi,   ROT0,   "Capcom",           "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0007 Capcom vs SNK 2
-GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi, naomigd,	 ROT0,   "Capcom / SNK",     "Capcom vs SNK 2 Millionaire Fighting 2001 (Rev A) (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi, naomi,	 ROT0,   "Capcom / SNK",     "Capcom vs SNK 2 Millionaire Fighting 2001 (Rev A) (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0008 Capcom vs SNK 2 Mark Of The Millenium 2001 (Export)
 //GDL-0009
-GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Treasure",         "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi, naomi,   ROT270, "Treasure",         "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2002, ggxx,      naomigd,  naomigd,  naomi, ggxx,      ROT0,   "Arc System Works", "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0012 Cleopatra Fortune Plus
-GAME( 2002, moeru,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Altron",   		 "Moeru Casinyo (GDL-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, moeru,     naomigd,  naomigd,  naomi, naomi,   ROT0,   "Altron",   		 "Moeru Casinyo (GDL-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0014 Musapey's Choco Marker
-GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, chocomk,   naomigd,  naomigd,  naomi, naomi,   ROT0,   "Ecole Software",   "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0015 Mazan
 //GDL-0016 Yonin Uchi Mahjong MJ
-GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Amedio (Taito license)", "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, quizqgd,   naomigd,  naomigd,  naomi, naomi,   ROT270, "Amedio (Taito license)", "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0018 Azumanga Daioh Puzzle Bobble
 //GDL-0019 Guilty Gear XX #Reload
 GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi, ggxxrl,    ROT0,   "Arc System Works", "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, tetkiwam,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Success",          "Tetris Kiwamemichi (GDL-0020)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi, naomigd,   ROT270, "Alpha System",     "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, usagui,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Warashi",          "Usagui - Yamashiro Mahjong Hen (GDL-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, tetkiwam,  naomigd,  naomigd,  naomi, naomi,   ROT0,   "Success",          "Tetris Kiwamemichi (GDL-0020)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi, naomi,   ROT270, "Alpha System",     "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, usagui,    naomigd,  naomigd,  naomi, naomi,   ROT0,   "Warashi",          "Usagui - Yamashiro Mahjong Hen (GDL-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0023 Border Down
-GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",            "Border Down (Rev A) (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "G-Rev",            "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, cfield,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Able",             "Chaos Field (GDL-0025)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, trizeal,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Taito",            "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi, naomi,   ROT0,   "G-Rev",            "Border Down (Rev A) (GDL-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi, naomi,   ROT270, "G-Rev",            "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, cfield,    naomigd,  naomigd,  naomi, naomi,   ROT0,   "Able",             "Chaos Field (GDL-0025)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, trizeal,   naomigd,  naomigd,  naomi, naomi,   ROT270, "Taito",            "Trizeal (GDL-0026)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0027 Melty Blood Act Cadenza?
 //GDL-0028  Melty Blood Act Cadenza Ver A
 //GDL-0028A Melty Blood Act Cadenza Ver A (Rev A)
 //GDL-0028B Melty Blood Act Cadenza Ver A (Rev B)
-GAME( 2005, meltybld,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver A (Rev C) (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, meltybld,  naomigd,  naomigd,  naomi, naomi,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver A (Rev C) (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0029
-GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomigd,   ROT0,   "G-Rev",            "Senko No Ronde NEW ver. (Rev A) (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, senkoo,    senko,    naomigd,  naomi, naomigd,   ROT0,   "G-Rev",            "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senko,     naomigd,  naomigd,  naomi, naomi,   ROT0,   "G-Rev",            "Senko No Ronde NEW ver. (Rev A) (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, senkoo,    senko,    naomigd,  naomi, naomi,   ROT0,   "G-Rev",            "Senko No Ronde (GDL-0030)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0031 Super Shanghai 2005
-GAME( 2005, ss2005,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Starfish",         "Super Shanghai 2005 (Rev A) (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, radirgy,   naomigd,  naomigd,  naomi, naomigd,   ROT270, "Milestone",        "Radirgy (GDL-0032)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ss2005,    naomigd,  naomigd,  naomi, naomi,   ROT0,   "Starfish",         "Super Shanghai 2005 (Rev A) (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, radirgy,   naomigd,  naomigd,  naomi, naomi,   ROT270, "Milestone",        "Radirgy (GDL-0032)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0033 Guilty Gear XX Slash
 GAME( 2005, ggxxsla,   naomigd,  naomigd,  naomi, ggxxsla,   ROT0,   "Arc System Works", "Guilty Gear XX Slash (Rev A) (GDL-0033A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2006, kurucham,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Able",             "Kurukuru Chameleon (GDL-0034)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, undefeat,  naomigd,  naomigd,  naomi, naomigd,   ROT270, "G-Rev",            "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, kurucham,  naomigd,  naomigd,  naomi, naomi,   ROT0,   "Able",             "Kurukuru Chameleon (GDL-0034)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, undefeat,  naomigd,  naomigd,  naomi, naomi,   ROT270, "G-Rev",            "Under Defeat (GDL-0035)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0036 Trigger Heart Exelica
-GAME( 2005, trgheart,  naomigd,  naomigd,  naomi, naomigd,   ROT270, "Warashi",          "Trigger Heart Exelica (Rev A) (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, jingystm,  naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Atrativa Japan",   "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, trgheart,  naomigd,  naomigd,  naomi, naomi,   ROT270, "Warashi",          "Trigger Heart Exelica (Rev A) (GDL-0036A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, jingystm,  naomigd,  naomigd,  naomi, naomi,   ROT0,   "Atrativa Japan",   "Jingi Storm - The Arcade (GDL-0037)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0038 Senko No Ronde Special
-GAME( 2006, meltyb,    naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver B (GDL-0039)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2006, meltyba,   meltyb,   naomigd,  naomi, naomigd,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver B (Rev A) (GDL-0039A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2006, karous,    naomigd,  naomigd,  naomi, naomigd,   ROT270, "Milestone",        "Karous (GDL-0040)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, meltyb,    naomigd,  naomigd,  naomi, naomi,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver B (GDL-0039)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, meltyba,   meltyb,   naomigd,  naomi, naomi,   ROT0,   "Ecole Software",   "Melty Blood Act Cadenza Ver B (Rev A) (GDL-0039A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, karous,    naomigd,  naomigd,  naomi, naomi,   ROT270, "Milestone",        "Karous (GDL-0040)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDL-0041 Guilty Gear XX Accent Core
-GAME( 2006, takoron,   naomigd,  naomigd,  naomi, naomigd,   ROT0,   "Compile",          "Noukone Puzzle Takoron (GDL-0042)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2006, takoron,   naomigd,  naomigd,  naomi, naomi,   ROT0,   "Compile",          "Noukone Puzzle Takoron (GDL-0042)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /* GDS-xxxx (Sega first party games) */
-GAME( 2001, confmiss,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, confmiss,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Confidential Mission (GDS-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0002 Shakatto Tambourine
-GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2000, slashout,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, sprtjam,   naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2000, slashout,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0006 Virtua Striker 3 (NAOMI 2)
 //GDS-0007 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
-GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, dygolf,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis (GDS-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, dygolf,    naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Virtua Tennis (GDS-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0012 Virtua Fighter 4 (NAOMI 2)
 //GDS-0013
 //GDS-0014 Beach Spikers (NAOMI 2)
 //GDS-0015 Virtua Tennis 2 / Power Smash 2
-GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Tennis 2 (Rev A) (GDS-0015A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Virtua Tennis 2 (Rev A) (GDS-0015A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0016 Shakatto Tambourine Cho Powerup Chu
-GAME( 2001, keyboard,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "La Keyboardxyu (GDS-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, vathlete,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, keyboard,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "La Keyboardxyu (GDS-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, vathlete,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0020 Initial D Arcade Stage (Japan) (NAOMI 2)
 //GDS-0021 Lupin The Third - The Typing
-GAME( 2002, luptype,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Lupin The Third - The Typing (Rev A) (GDS-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2002, mok,       naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, luptype,   naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Lupin The Third - The Typing (Rev A) (GDS-0021A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2002, mok,       naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "The Maze of the Kings (GDS-0022)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0023 Naomi DIMM Firmware Updater
-GAME( 2001, ngdup23a,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Naomi DIMM Firmware Updater (GDS-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ngdup23a,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Naomi DIMM Firmware Updater (GDS-0023A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0023B Naomi DIMM Firmware Updater
-GAME( 2001, ngdup23c,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Naomi DIMM Firmware Updater (GDS-0023C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ngdup23c,  naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Naomi DIMM Firmware Updater (GDS-0023C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0024 Virtua Fighter 4 Evolution (NAOMI 2)
 //GDS-0025 Initial D Arcade Stage (Export) (NAOMI 2)
 //GDS-0026 Initial D Arcade Stage Ver. 2 (Japan) (NAOMI 2)
@@ -4116,7 +4130,7 @@ GAME( 2001, ngdup23c,  naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",       
 //GDS-0028
 //GDS-0029
 //GDS-0030
-GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomigd,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",          "Puyo Puyo Fever (GDS-0031)", GAME_NO_SOUND|GAME_NOT_WORKING )
 //GDS-0032 Initial D Arcade Stage Ver. 3 (Japan)
 //GDS-0033 Initial D Arcade Stage Ver. 3 (Export)
 //GDS-0034
@@ -4406,384 +4420,3 @@ GAME( 2004, vf4tuneda,vf4tuned,naomigd,   naomi,    0,  ROT0, "Sega",          "
 GAME( 2001, awbios,   0,        naomi,    naomi,    0, ROT0, "Sammy",           "Atomiswave Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns, ROT0, "Arc System Works",           "Fist Of The North Star", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2003, demofist, awbios,   naomi,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_NO_SOUND|GAME_NOT_WORKING )
-
-/*********************************************************************************************************************
-**********************************************************************************************************************
-*********************************************************************************************************************/
-
-// Triforce -- this is GameCube based, not Dreamcast/Naomi based, move out of here
-// (currently here for testing the gd-rom stuff only)
-#define TRIFORCE_BIOS \
-	ROM_REGION( 0x200000, "maincpu", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "Triforce Bios" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "triforce_bootrom.bin", 0x000000, 0x200000, CRC(d1883221) SHA1(c3cb7227e4dbc2af861e76d00cb59726105a2e4c) ) \
-
-ROM_START( triforce )
-	TRIFORCE_BIOS
-
-	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
-ROM_END
-
-/*
-Title   VIRTUA_STRIKER_2002
-Media ID    0DD8
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDT-0002
-Version V1.005
-Release Date    20020730
-
-
-PIC
-
-253-5508-337E
-317-0337-EXP
-*/
-
-ROM_START( vs2002ex )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0002", 0, SHA1(471e896d43167c93cc229cfc94ff7ac6de7cf9a4) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0337-exp.data", 0x00, 0x50, CRC(aa6be604) SHA1(fabc43ecfb7ddf1d5a87f10884852027d6f4773b) )
-ROM_END
-
-
-ROM_START( gekpurya )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0008c", 0, SHA1(2c1bdb8324efc216edd771fe45c680ac726111a0) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdt-0008c.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )
-ROM_END
-
-ROM_START( tfupdate )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0011", 0, SHA1(71bfa8f53d211085c020d54f55eeeabf85212a0b) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdt-0011.data", 0x00, 0x50, CRC(08434e5e) SHA1(2121999e851f6f62ab845e6de40849d850ac9d1c) )
-ROM_END
-
-
-/*
-
-Title   VIRTUA STRIKER 4
-Media ID    93B2
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDT-0015
-Version V1.001
-Release Date    20041202
-Manufacturer ID
-TOC DISC
-Track   Start Sector    End Sector  Track Size
-track01.bin 150 449 705600
-track02.raw 600 1951    3179904
-track03.bin 45150   549299  1185760800
-
-
-PIC
-255-5508-393E
-317-0393-EXP
-
-*/
-
-ROM_START( vs4 )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0015", 0, SHA1(1f83712b2b170d6edf4a27c15b6f763cc3cc4b71) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0393-exp.data", 0x00, 0x50, CRC(2dcfecd7) SHA1(d805168e1564051ae5c47876ade2c9843253c6b4) )
-ROM_END
-
-
-/*
-
-Title   VIRTUA STRIKER 4
-Media ID    7BC9
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDT-0013E
-Version V6.000
-Release Date    20050217
-
-
-PIC
-255-5508-391J
-317-0391-JPN
-
-*/
-
-ROM_START( vs4j )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0013e", 0, SHA1(b69cc5cab889114eda5c6e9ddcca42de9bc235b3) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0391-jpn.data", 0x00, 0x50, CRC(0f2dbb73) SHA1(7b9d66abe85303b3e26b442a3a63feca1a0edbdb) )
-ROM_END
-
-
-/*
-
-Title   TRF GDROM TBA EX SATL
-Media ID    92C5
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDT-0010C
-Version V4.000
-Release Date    20040608
-Manufacturer ID
-
-TOC DISC
-Track   Start Sector    End Sector  Track Size
-track01.bin 150 599 1058400
-track02.raw 750 2101    3179904
-track03.bin 45150   549299  1185760800
-*/
-
-ROM_START( avalon13 )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0010c", 0, SHA1(716c441d8dc9036a13c66ef0048cd6d32ac63c4e) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdt-0010c.data", 0x00, 0x50, CRC(6c51e5d6) SHA1(84afef983f1f855fe8722f55baa8ea5121da9369) )
-ROM_END
-
-
-/*
-
-Title   TRF GDROM TBT SATL
-Media ID    1348
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDT-0017B
-Version V3.001
-Release Date    20041102
-Manufacturer ID
-
-TOC DISC
-Track   Start Sector    End Sector  Track Size
-track01.bin 150 599 1058400
-track02.raw 750 2101    3179904
-track03.bin 45150   549299  1185760800
-
-*/
-
-ROM_START( avalon20 )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0017b", 0, SHA1(e2dd32c322ffcaf38b82275d2721b71bb3dfc1f2) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdt-0017b.data", 0x00, 0x50, CRC(32cb46d4) SHA1(a58b9e03d57b317133d9b6c29e42852af8e77559) )
-ROM_END
-
-
-ROM_START( vs42006 )
-	TRIFORCE_BIOS
-	//NAOMIGD_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdt-0020d", 0, SHA1(db256d094b9754d452d7a2b8a370699d21141c1f) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdt-0020.data", 0x00, 0x50, CRC(e3d13191) SHA1(4255c09aad06eb38c16bdec881897404a3a68b37) )
-ROM_END
-
-
-
-GAME( 2002, triforce, 0,        naomigd,    naomi,    0, ROT0, "Sega",           "Triforce Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2002, vs2002ex, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 2002 (GDT-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, gekpurya, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro Yakyuu (Rev C) (GDT-0008C)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, tfupdate, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Triforce DIMM Updater (GDT-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, vs4j,     triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (Japan) (GDT-0013E)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, vs4,      triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 (Export) (GDT-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, avalon13, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "The Key Of Avalon 1.3 - Chaotic Sabbat - Client (GDT-0010C) (V4.000)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, avalon20, triforce, naomigd,    naomi,    0, ROT0, "Sega",           "The Key Of Avalon 2.0 - Eutaxy and Commandment - Client (GDT-0017B) (V3.001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2006, vs42006,  triforce, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Striker 4 ver. 2006 (Rev D) (Japan) (GDT-0020D)", GAME_NO_SOUND|GAME_NOT_WORKING )
-
-
-/*********************************************************************************************************************
-**********************************************************************************************************************
-*********************************************************************************************************************/
-
-// Chihiro -- this is XBox based, not Dreamcast/Naomi based, move out of here
-// (currently here for testing the gd-rom stuff only)
-#define CHIHIRO_BIOS \
-	ROM_REGION( 0x200000, "maincpu", 0) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "chihiro_bios.bin", 0x000000, 0x200000, NO_DUMP ) \
-
-ROM_START( chihiro )
-	CHIHIRO_BIOS
-
-	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
-ROM_END
-
-/*
-
-Title   GHOST SQUAD
-Media ID    004F
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDX-0012A
-Version V2.000
-Release Date    20041209
-Manufacturer ID
-
-PIC
-253-5508-0398
-317-0398-COM
-
-*/
-
-ROM_START( ghostsqu )
-	CHIHIRO_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0012a", 0,  SHA1(d7d78ce4992cb16ee5b4ac6ca7a37c46b07e8c14) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0398-com.data", 0x00, 0x50, CRC(8c5391a2) SHA1(e64cadeb30c94c3cd4002630cd79cc76c7bde2ed) )
-ROM_END
-
-/*
-
-Title   VIRTUA COP 3
-Media ID    C4AD
-Media Config    GD-ROM1/1
-Regions J
-Peripheral String   0000000
-Product Number  GDX-0003A
-Version V2.004
-Release Date    20030226
-Manufacturer ID
-TOC DISC
-Track   Start Sector    End Sector  Track Size
-track01.bin 150 599 1058400
-track02.raw 750 2101    3179904
-track03.bin 45150   549299  1185760800
-
-
-PIC
-255-5508-354
-317-054-COM
-
-*/
-
-ROM_START( vcop3 )
-	CHIHIRO_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0003a", 0,  SHA1(cdfec1d2ef02ae9e29cb1462f08904177bc4c9ea) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("317-0354-com.data", 0x00, 0x50,  CRC(df7e3217) SHA1(9f0f4bf6b15f3b6eeea81eaa27b3d25bd94110da) )
-ROM_END
-
-ROM_START( mj2 )
-	CHIHIRO_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0006c", 0, SHA1(505653117a73ed8b256ccf19450e7573a4dc57e9) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("gdx-0006c.pic_data", 0x00, 0x50, NO_DUMP )
-ROM_END
-
-
-ROM_START( wangmid )
-	CHIHIRO_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0009b", 0, SHA1(e032b9fd8d5d09255592f02f7531a608e8179c9c) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdx-0009b.data", 0x00, 0x50, CRC(3af801f3) SHA1(e9a2558930f3f1f55d5b3c2cadad69329d931f26) )
-ROM_END
-
-ROM_START( wangmid2 )
-	CHIHIRO_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0015", 0, SHA1(259483fd211a70c23205ffd852316d616c5a2740) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
-	ROM_LOAD("gdx-0015.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
-ROM_END
-
-ROM_START( mj3 )
-	CHIHIRO_BIOS
-
-	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
-	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdx-0017d", 0, SHA1(cfbbd452c8f4efe0e99f398f5521fc3574b913bb) )
-
-	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE) // key was missing
-	ROM_LOAD("gdx-0017d.pic_data", 0x00, 0x50, NO_DUMP )
-ROM_END
-
-
-GAME( 200?, chihiro,  0,       naomigd,    naomi,    0, ROT0, "Sega",           "Chihiro Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2005, mj2,      chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 2 (Rev C) [GDX-0006C]", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, wangmid,  chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune (Rev. B) (Export) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, wangmid2, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 (Japan?) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, ghostsqu, chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2003, vcop3,    chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Virtua Cop 3 (GDX-0003A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, mj3,      chihiro, naomigd,    naomi,    0, ROT0, "Sega",           "Sega Network Taisen Mahjong MJ 3 (Rev D) [GDX-0017D]", GAME_NO_SOUND|GAME_NOT_WORKING )
-
-

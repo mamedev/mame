@@ -1100,6 +1100,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/model2.o $(VIDEO)/model2.o \
 	$(DRIVERS)/model3.o $(VIDEO)/model3.o $(MACHINE)/model3.o \
 	$(DRIVERS)/naomi.o $(MACHINE)/dc.o $(VIDEO)/dc.o $(MACHINE)/gdcrypt.o $(MACHINE)/naomibd.o \
+	$(DRIVERS)/triforce.o $(DRIVERS)/chihiro.o \
 	$(DRIVERS)/puckpkmn.o \
 	$(DRIVERS)/segac2.o \
 	$(DRIVERS)/segag80r.o $(MACHINE)/segag80.o $(AUDIO)/segag80r.o $(VIDEO)/segag80r.o \
