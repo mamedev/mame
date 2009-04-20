@@ -2,54 +2,6 @@
 
     DECO Cassette System driver
 
-(01) Highway Chase (12/80)
-(02) Sengoku Ninja tai (12/80)
-(03) Manhattan (1/81)
-(04) Terranean (81)
-(??) Missile Sprinter (81)
-(06) Nebula (3/81)
-(07) Astro Fantasia (3/81)
-(08) The Tower (2/81)
-(09) Super Astro Fighter (5/81)
-(??) Buramzon (81)
-(11) Lock N Chase (4/81)
-(12) The DECO BOY (Flash Boy) (8/81)
-(13) Pro Golf (9/81)
-(14) DS TeleJang (6/81)
-(15) Lucky Poker (2/81)
-(16) Treasure Island (1/82)
-(18) Explorer (11/82)
-(19) Disco No. 1 (3/82)
-(20) Tornado (82)
-(21) Mission X (3/82)
-(22) Pro Tennis (5/82)
-(??) Fishing (7/82)
-(25) Angler Dandler
-(26) Burger Time (6/83)
-(27) Burnin' Rubber (11/82)
-(27) Bump N Jump (4/83)
-(28) Graplop (11/82)
-(28) Cluster Buster (9/83)
-(29) La-pa-pa (11/82)
-(30) Skater (3/83)
-(31) Pro Bowling (10/83)
-(32) Night Star (4/83)
-(33) Pro Soccer (11/83)
-(34) Super Doubles Tennis
-(??) Genesis (11/83) <I think this may be Boomer Rangr'>
-(??) Bambolin (83)
-(37) Zeroize (10/83)
-(38) Scrum Try (3/84)
-(39) Peter Pepper's Ice Cream Factory (2/84)
-(40) Fighting Ice Hockey (4/84)
-(41) Oh Zumou (5/84)
-(42) Hello Gate Ball (8/84)
-(??) Yellow Cab (84)
-(44) Boulder Dash (8/85)
-(??) Tokyo Mie Sinryohjyo (10/84)
-(??) Tokyo Mie Sinryohyo2 (1/85)
-(??) Geinohijin Sikaku Siken (5/85)
-
  ***********************************************************************/
 
 #include "driver.h"
