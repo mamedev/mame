@@ -483,7 +483,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->BC.w.l++;
 			if (IS_8085(cpustate))
 			{
-				if (cpustate->BC.b.l == 0x00) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
+				if (cpustate->BC.w.l == 0x0000) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
 		case 0x04: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  B */
@@ -517,7 +517,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->BC.w.l--;
 			if (IS_8085(cpustate))
 			{
-				if (cpustate->BC.b.l == 0xff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
+				if (cpustate->BC.w.l == 0xffff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
 		case 0x0c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  C */
@@ -552,7 +552,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->DE.w.l++;
 			if (IS_8085(cpustate))
 			{
-				if (cpustate->DE.b.l == 0x00) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
+				if (cpustate->DE.w.l == 0x0000) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
 		case 0x14: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  D */
@@ -589,7 +589,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->DE.w.l--;
 			if (IS_8085(cpustate))
 			{
-				if (cpustate->DE.b.l == 0xff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
+				if (cpustate->DE.w.l == 0xffff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
 		case 0x1c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  E */
@@ -631,7 +631,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->HL.w.l++;
 			if (IS_8085(cpustate))
 			{
-				if (cpustate->HL.b.l == 0x00) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
+				if (cpustate->HL.w.l == 0x0000) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
 		case 0x24: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  H */
@@ -677,7 +677,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->HL.w.l--;
 			if (IS_8085(cpustate))
 			{
-				if (cpustate->HL.b.l == 0xff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
+				if (cpustate->HL.w.l == 0xffff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
 		case 0x2c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  L */
@@ -745,7 +745,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->SP.w.l++;
 			if (IS_8085(cpustate))
 			{
-				if (cpustate->SP.b.l == 0x00) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
+				if (cpustate->SP.w.l == 0x0000) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
 		case 0x34: cpustate->icount -= 10;	/* INR  M */
@@ -786,7 +786,7 @@ static void execute_one(i8085_state *cpustate, int opcode)
 			cpustate->SP.w.l--;
 			if (IS_8085(cpustate))
 			{
-				if (cpustate->SP.b.l == 0xff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
+				if (cpustate->SP.w.l == 0xffff) cpustate->AF.b.l |= XF; else cpustate->AF.b.l &= ~XF;
 			}
 			break;
 		case 0x3c: cpustate->icount -= IS_8085(cpustate) ? 4 : 5;	/* INR  A */
