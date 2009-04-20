@@ -283,214 +283,6 @@ or I/O, one for a communication module, one for a cooling fan and one for the se
 
 
 
-Most of the information below is taken from other sites and has no yet been verified to be correct
-
-
-Known Games on this Hardware
-
-System
-    Title                                                    Notes
----------------------------------------------------------------------------------------------------------------------------------------------------
-Naomi                                                      |
-                                                           |
-    18 Wheeler                                             |
-    Airline Pilot                                          |
-    Cannon Spike                                           |
-    Capcom vs SNK : Millenium Fight 2000                   |
-    Charge N' Blast                                        |
-    Cosmic Smash                                           |
-    Crackin' DJ                                            |
-    Crackin' DJ Part 2                                     |
-    Crazy Taxi                                             |
-    Dead or Alive 2                                        |
-    Dead or Alive 2 Version 2000                           |
-    Death Crimson OX                                       |
-    Derby Owners Club                                      |
-    Dynamite Baseball                                      |
-    Dynamite Baseball '99                                  |
-    F1 World Grand Prix                                    |
-    F335 Challenge                                         |
-    F355 Challenge Twin                                    |
-    F355 2 - International Course Edition                  |
-    F355 2 - International Course Edition Twin             |
-    Fish Live                                              |
-    Formation Battle In May                                |
-    Giant Gram 2                                           |
-    Giant Gram 2000                                        |
-    Gigawing 2                                             |
-    Guilty Gear X                                          |
-    Gun Beat                                               |
-    Gun Spike                                              |
-    Gun Survivor 2 Biohazard - Code Veronica               |
-    Heavy Metal : Geomatrix                                |
-    Idol Janshi Suchie-Pai 3                               |
-    Jambo! Safari                                          |
-    Marvel vs Capcom 2                                     |
-    Mazan : Flash Of The Blade                             |
-    Mobile Suit Gundam : Federation VS Zeon                |  GDL-0001 253-5509-5069
-    Ninja Assault                                          |
-    OutTrigger                                             |
-    Power Stone                                            |
-    Power Stone 2                                          |
-    Project Justice: Rival Schools 2/Moero! Justice Gakuen |
-    Puyo Puyo Da!                                          |
-    Puyo Puyo Fever                                        |
-    Quiz Ah My Goddess                                     |
-    Ring Out 4x4                                           |
-    Samba de Amigo                                         |
-    Sambo de Amigo ver.2000                                |
-    Sega Marine Fishing                                    |
-    Sega Srike Fighter                                     |
-    Sega Tetris                                            |
-    Shangri-La                                             |
-    Shootout Pool                                          |
-    Slashout                                               |
-    Spawn                                                  |
-    The House of the Dead II                               |
-    The Typing of the Dead                                 |
-    Tokyo Bus Tour                                         |
-    Touch de Uno!                                          |
-    Touch de Uno! 2                                        |
-    Toukon Retsuden 4/New Japan Pro Wrestling              |
-    Toy Fighters/Waffupu                                   |
-    Virtua NBA                                             |
-    Virtua Striker 2 ver.2000                              |
-    Virtua Tennis / Power Smash                            |
-    Virtua Tennis 2 / Power Smash 2                        |
-    Virtual-On Oratorio Tangram MSBS Version 5.66          |
-    Wave Runner GP                                         |
-    World Kicks                                            |
-    World Series '99                                       |
-    WWF Royal Rumble                                       |
-    Zero Gunner 2                                          |
-    Zombie Revenge                                         |
-                                                           |
----------------------------------------------------------------------------------------------------------------------------------------------------
-Naomi GD-Rom                                               |
-                                                           |
-    Alienfront Online                                      |
-    Azumanga Daioh Puzzle Bobble                           |
-    Border Down                                            |
-    Capcom vs SNK : Millenium Fight 2000 Pro               |
-    Capcom vs SNK 2 : Millionare Fighting 2001             |
-    Chaos Breaker                                          |
-    Chaos Field                                            |
-    Cleopatra Fortune Plus                                 |
-    Confidential Mission                                   |
-    Dimm Firm Update                                       |
-    Dog Walking / InuNoOsanpo                              |
-    Dragon Treasure                                        |
-    Dragon Treasure II                                     |
-    Dragon Treasure III                                    |
-    Get Bass 2                                             |
-    Guilty Gear XX : The Midnight Carnival                 |
-    Guilty Gear XX #Reload                                 |
-    Guilty Gear XX Slash                                   |
-    Guilty Gear XX Accent Core                             |
-    Ikaruga                                                |
-    Jingi Storm                                            |
-    Karous                                                 |
-    Kuru Kuru Chameleon                                    |
-    La keyboard                                            |
-    Lupin 3 : The Shooting                                 |
-    Lupin : The Typing                                     |
-    Melty Blood - Act Cadenza                              |
-    Mobile Suit Gundam: Federation VS Zeon                 |
-    Mobile Suit Gundam: Federation VS Zeon DX              |
-    Moeru Kajinyo                                          |
-    Monkey Ball                                            |
-    Musapey's Choco Marker                                 |
-    Pochinya                                               |
-    Psyvariar 2 - The Will To Fabricate                    |
-    Quiz k tie Q mode                                      |
-    Radilgy                                                |
-    Senko No Ronde                                         |
-    Shikigami No Shiro II / The Castle of Shikigami II     |
-    Shakka to Tambourine                                   |
-    Shakka to Tambourine 2001                              |
-    Shakka to Tambourine 2001 Power Up!                    |
-    Slashout                                               |
-    Spikers Battle                                         |
-    Sports Jam                                             |
-    Street Fighter Zero 3 Upper                            |  GDL-0002 253-5509-5072
-    Super Major League / World Series Baseball             |
-    Super Shanghai 2005                                    |
-    Tetris Kiwamemichi                                     |
-    The Maze Of Kings                                      |
-    Trigger Heart Exelica                                  |
-    TriZeal                                                |
-    Under Defeat                                           |
-    Usagi Yasei no Topai - Yamashiro Mahjongg Compilation  |
-    Virtua Athletics                                       |
-    Virtua Golf / Dynamic Golf                             |
-    Virtua Tennis / Power Smash                            |
-    Virtua Tennis 2 / Power Smash 2                        |
-    Wild Riders                                            |
-    Zooo                                                   |
-                                                           |
----------------------------------------------------------------------------------------------------------------------------------------------------
-Naomi 2                                                    |
-                                                           |
-    Club Kart                                              |
-    Club Kart : European Session                           |
-    Club Kart Prize                                        |
-    King Of Route 66                                       |
-    Quest Of D                                             |
-    Sega Driving Simulator                                 |
-    Soul Surfer                                            |
-    Virtua Fighter 4                                       |
-    Virtua Fighter 4 Evolution                             |
-    Virtua Striker III                                     |
-    Wild Riders                                            |
-                                                           |
----------------------------------------------------------------------------------------------------------------------------------------------------
-Naomi 2 GD-ROM                                             |
-                                                           |
-    Beach Spikers                                          |
-    Club Kart Cycraft edition                              |
-    Initial D : Arcade Stage                               |
-    Initial D : Arcade Stage 2                             | GDS-0026 253-5508-0345J (Japan),  GDS-0027 253-5508-0357 (Export)
-    Initial D : Arcade Stage 3                             |
-    Initial D3 Cycraft Edition                             |
-    Virtua Fighter 4                                       |
-    Virtua Fighter 4 Evolution                             |
-    Virtua Fighter 4 Final Tuned                           |
-    Virtua Striker III                                     |
-    Wild Riders                                            |
-                                                           |
----------------------------------------------------------------------------------------------------------------------------------------------------
-Sammy Atomiswave                                           |
-                                                           |
-    Chase 1929                                             | prototype
-    Demolish Fist                                          |
-    Dirty Pigskin Football                                 |
-    Dolphin Blue                                           |
-    Extreme Hunting                                        |
-    Faster Than Speed                                      |
-    Force Five                                             |
-    Guilty Gear Isuka                                      |
-    Guilty Gear X Ver. 1.5                                 |
-    Hokuto No Ken / Fist Of The Northstar                  |
-    Horse Racing                                           |
-    Kenju                                                  |
-    Knights Of Valour : The Seven Spirits                  |
-    Maximum Speed                                          |
-    Metal Slug 6                                           |
-    Neogeo Battle Coliseum                                 |
-    Premier Eleven                                         |
-    Ranger Mission                                         |
-    Rumble Fish                                            |
-    Rumble Fish 2                                          |
-    Salaried Worker Golden Taro                            |
-    Sammy Vs. Capcom                                       | development cancelled pre-prototype
-    Samurai Spirits Tenkaichi Kenkakuden                   |
-    Sports Shooting USA                                    |
-    Sushi Bar                                              |
-    The King Of Fighters Neowave                           |
-    The King Of Fighters XI                                |
-                                                           |
----------------------------------------------------------------------------------------------------------------------------------------------------
-
 
 
 ---------------------------------------------------------
@@ -556,24 +348,24 @@ Games known to use this PCB include....
 Game                       on cart    IC22#        MASKROMs   IC41#      IC42#          Notes
 --------------------------------------------------------------------------------------------------------------
 Cosmic Smash               840-0044C  23428A       8          315-6213   317-0289-COM
-*Dead Or Alive 2           841-0003C  22121        21         315-6213   317-5048-COM
-*Dead Or Alive 2 Millenium 841-0003C  DOA2 Ver.M   21         315-6213   317-5048-COM
+Dead Or Alive 2            841-0003C  22121        21         315-6213   317-5048-COM
+Dead Or Alive 2 Millenium  841-0003C  DOA2 Ver.M   21         315-6213   317-5048-COM
 *Derby Owners Club         840-0016C  22099B       14         315-6213   317-0262-JPN
 *Dynamite Baseball '99     840-0019C  22141B       19         315-6213   317-0269-JPN
 *Dynamite Baseball Naomi   840-0001C  21575        21         315-6213   317-0246-JPN
-*Giant Gram Pro Wrestle 2  840-0007C  21820        9          315-6213   317-0253-JPN
-*Heavy Metal Geo Matrix    HMG016007  23716A       11         315-6213   317-5071-COM
+Giant Gram Pro Wrestle 2   840-0007C  21820        9          315-6213   317-0253-JPN
+Heavy Metal Geo Matrix     HMG016007  23716A       11         315-6213   317-5071-COM
 Idol Janshi Suchie-Pai 3   841-0002C  21979        14         315-6213   317-5047-JPN   requires special I/O board and mahjong panel
-*Out Trigger               840-0017C  22163        19         315-6213   317-0266-COM   requires analog controllers/special panel
-*Power Stone               841-0001C  21597        8          315-6213   317-5046-COM
-*Power Stone 2             841-0008C  23127        9          315-6213   317-5054-COM
-*Samba de Amigo            840-0020C  22966B       16         315-6213   317-0270-COM   will boot but requires special controller to play it
+Out Trigger                840-0017C  22163        19         315-6213   317-0266-COM   requires analog controllers/special panel
+Power Stone                841-0001C  21597        8          315-6213   317-5046-COM
+Power Stone 2              841-0008C  23127        9          315-6213   317-5054-COM
+Samba de Amigo             840-0020C  22966B       16         315-6213   317-0270-COM   will boot but requires special controller to play it
 Sega Marine Fishing        840-0027C  22221        10         315-6213   not populated  ROM 3&4 not populated. Requires special I/O board and fishing controller
-*Slash Out                 840-0041C  23341        17         315-6213   317-0286-COM
-*Spawn                     841-0005C  22977B       10         315-6213   317-5051-COM
+Slash Out                  840-0041C  23341        17         315-6213   317-0286-COM
+Spawn                      841-0005C  22977B       10         315-6213   317-5051-COM
 Toy Fighter                840-0011C  22035        10         315-6212   317-0257-COM
 Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-0258-COM
-*Zombie Revenge            840-0003C  21707        19         315-6213   317-0249-COM
+Zombie Revenge             840-0003C  21707        19         315-6213   317-0249-COM
 
 * denotes not dumped yet
 
