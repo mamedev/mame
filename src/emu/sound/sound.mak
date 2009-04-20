@@ -505,6 +505,18 @@ endif
 
 
 #-------------------------------------------------
+# SNK(?) custom stereo sn76489a clone
+#-------------------------------------------------
+
+SOUNDDEFS += -DHAS_T6W28=$(if $(filter T6W28,$(SOUNDS)),1,0)
+
+ifneq ($(filter T6W28,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/t6w28.o
+endif
+
+
+
+#-------------------------------------------------
 # SNK custom wave generator
 #-------------------------------------------------
 
