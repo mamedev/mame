@@ -1425,10 +1425,9 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 		const char *name = dinput_device_item_name(devinfo, offset, default_button_name(butnum), NULL);
 
 		// add to the mouse device and optionally to the gun device as well
-		// note that the gun device points to the mouse buttons rather than its own
 		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
 		if (guninfo != NULL)
-			input_device_item_add(guninfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
+			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
 
 		free((void *)name);
 	}
@@ -1788,8 +1787,8 @@ static TCHAR *rawinput_device_improve_name(TCHAR *name)
 
 	// The RAW name received is formatted as:
 	//   \??\type-id#hardware-id#instance-id#{DeviceClasses-id}
-	// XP starts with \??\
-	// Vista64 starts with \\?\
+	// XP starts with "\??\"
+	// Vista64 starts with "\\?\"
 
 	// ensure the name is something we can handle
 	if (_tcsncmp(name, TEXT("\\\\?\\"), 4) != 0 && _tcsncmp(name, TEXT("\\??\\"), 4) != 0)
@@ -2015,7 +2014,7 @@ static void rawinput_mouse_enum(running_machine *machine, PRAWINPUTDEVICELIST de
 	if (guninfo != NULL)
 	{
 		guninfo->device = input_device_add(machine, DEVICE_CLASS_LIGHTGUN, guninfo->name, guninfo);
-		guninfo->poll = (guninfo == lightgun_list) ? win32_lightgun_poll : NULL;
+		guninfo->poll = NULL;
 	}
 
 	// populate the axes
@@ -2075,9 +2074,6 @@ static void rawinput_mouse_update(HANDLE device, RAWMOUSE *data)
 			{
 				devinfo->mouse.state.lX = normalize_absolute_axis(data->lLastX, 0, 0xffff);
 				devinfo->mouse.state.lY = normalize_absolute_axis(data->lLastY, 0, 0xffff);
-
-				// also clear the polling function so win32_lightgun_poll isn't called
-				devinfo->poll = NULL;
 			}
 
 			// update the button states; always update the corresponding mouse buttons
