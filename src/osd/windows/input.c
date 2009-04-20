@@ -1425,9 +1425,10 @@ static BOOL CALLBACK dinput_mouse_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 		const char *name = dinput_device_item_name(devinfo, offset, default_button_name(butnum), NULL);
 
 		// add to the mouse device and optionally to the gun device as well
+		// note that the gun device points to the mouse buttons rather than its own
 		input_device_item_add(devinfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
 		if (guninfo != NULL)
-			input_device_item_add(guninfo->device, name, &guninfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
+			input_device_item_add(guninfo->device, name, &devinfo->mouse.state.rgbButtons[butnum], (input_item_id)(ITEM_ID_BUTTON1 + butnum), generic_button_get_state);
 
 		free((void *)name);
 	}
