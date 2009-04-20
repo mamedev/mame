@@ -4310,7 +4310,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.03 World Kicks */
 						/* 2000.04 Shin Nippon Pro-wres Toukon Retsuden 4 */
 	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
-						/* 2000.05 Quiz Ah Megamisama */
+	DRIVER( qmegamis )	/* 2000.05 Quiz Ah Megamisama */
 						/* 2000.06 Virtual-on Oratorio Tangram M.S.B.S. ver.5.66 2000 edition */
 						/* 2000.06 Derby Owners Club 2000 */
 	DRIVER( ggx )		/* 2000.07 Guilty Gear X */
