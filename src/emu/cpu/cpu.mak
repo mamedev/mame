@@ -1421,6 +1421,24 @@ $(CPUOBJ)/tlcs90/tlcs90.o:	$(CPUSRC)/tlcs90/tlcs90.c \
 
 
 #-------------------------------------------------
+# Toshiba TLCS-900 Series
+#-------------------------------------------------
+
+ifneq ($(filter TLCS900,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/tlcs900
+CPUOBJS += $(CPUOBJ)/tlcs900/tlcs900.o
+DBGOBJS += $(CPUOBJ)/tlcs900/dasm900.o
+endif
+
+$(CPUOBJ)/tlcs900/tlcs900.o:	$(CPUSRC)/tlcs900/tlcs900.c \
+								$(CPUSRC)/tlcs900/900tbl.c \
+								$(CPUSRC)/tlcs900/tlcs900.h
+
+$(CPUOBJ)/tlcs900/dasm900.o:	$(CPUSRC)/tlcs900/dasm900.c
+
+
+
+#-------------------------------------------------
 # Zilog Z80
 #-------------------------------------------------
 
