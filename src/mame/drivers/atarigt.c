@@ -278,6 +278,14 @@ static void tmek_update_mode(offs_t offset)
 
 static void tmek_protection_w(const address_space *space, offs_t offset, UINT16 data)
 {
+/*
+	T-Mek init:
+		($387C0) = $0001
+		Read ($38010), add to memory
+		Write $3C0 bytes to low half of words from $38000-$3877E
+		Read ($38488)
+*/
+
 	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", cpu_get_previouspc(space->cpu), offset, data);
 
 	/* track accesses */

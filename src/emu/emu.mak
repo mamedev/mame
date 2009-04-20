@@ -185,6 +185,7 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/s2636.o \
 	$(EMUVIDEO)/tlc34076.o \
 	$(EMUVIDEO)/tms34061.o \
+ 	$(EMUVIDEO)/tms9927.o \
  	$(EMUVIDEO)/tms9928a.o \
 	$(EMUVIDEO)/v9938.o \
  	$(EMUVIDEO)/vector.o \

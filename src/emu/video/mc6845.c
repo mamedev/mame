@@ -51,9 +51,6 @@ enum
 #define MODE_TRANSPARENT_BLANK(d)		(((d)->mode_control & 0x88) == 0x08)
 #define MODE_UPDATE_STROBE(d)			(((d)->mode_control & 0x40) != 0)
 
-/* tags for state saving */
-static const char * const device_tags[NUM_TYPES] = {     "mc6845", "mc6845-1", "c6545-1", "r6545-1", "h46505", "hd6845", "sy6545-1" };
-
 /* capabilities */
 static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE,       TRUE,     FALSE,     FALSE,    FALSE,    FALSE,      FALSE };
 static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,       TRUE,      TRUE,      TRUE,    FALSE,     TRUE,       TRUE };

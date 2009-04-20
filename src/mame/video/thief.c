@@ -3,6 +3,7 @@
 */
 
 #include "driver.h"
+#include "video/tms9927.h"
 
 static UINT8 thief_read_mask, thief_write_mask;
 static UINT8 thief_video_control;
@@ -113,6 +114,12 @@ VIDEO_UPDATE( thief ){
 	UINT32 offs;
 	int flipscreen = thief_video_control&1;
 	const UINT8 *source = videoram;
+
+	if (tms9927_screen_reset(devtag_get_device(screen->machine, "tms")))
+	{
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+		return 0;
+	}
 
 	if( thief_video_control&4 ) /* visible page */
 		source += 0x2000*4;
