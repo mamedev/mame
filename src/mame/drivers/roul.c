@@ -5,6 +5,7 @@ thanks to Angelo Salese for some precious advice
 
 TO DO:
 - check palette
+- check blitter command 0x00
 
 Has 36 pin Cherry master looking edge connector
 
@@ -34,9 +35,10 @@ reg[1] -> x
 reg[3] & 0x0f -> color
 reg[3] & 0x10 -> y direction (to the up or to the down)
 reg[3] & 0x20 -> x direction (to the right or to the left)
-reg[3] & 0x40 -> width used in y direction
-reg[3] & 0x80 -> width used in x direction
-reg[3] & 0xc0 -> width used in both directions
+reg[3] & 0xc0 == 0x00 -> filled rectangle
+reg[3] & 0xc0 == 0x40 -> width used in y direction
+reg[3] & 0xc0 == 0x80 -> width used in x direction
+reg[3] & 0xc0 == 0xc0 -> width used in both directions
 reg[2] -> width (number of pixel to draw)
 
 with a write in reg[2] the command is executed
@@ -88,9 +90,9 @@ code check bit 6 and bit 7
 bit 7 -> blitter ready
 bit 6 -> ??? (after unknown blitter command : [80][80][08][02])
 */
-	return 0x80; // blitter ready
+//	return 0x80; // blitter ready
 //	logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(space->cpu));
-//	return mame_rand(space->machine) & 0x00ff;
+	return mame_rand(space->machine) & 0x00c0;
 }
 
 static WRITE8_HANDLER( blitter_cmd_w )
@@ -98,7 +100,7 @@ static WRITE8_HANDLER( blitter_cmd_w )
 	reg[offset] = data;
 	if (offset==2)
 	{
-		int i;
+		int i,j;
 		int width	= reg[2];
 		int y		= reg[0];
 		int x		= reg[1];
@@ -108,10 +110,15 @@ static WRITE8_HANDLER( blitter_cmd_w )
 		if (reg[3] & 0x10) ydirection = -1;
 		if (reg[3] & 0x20) xdirection = -1;
 
+		if (width == 0x00) width = 0x100;
+
 		switch(reg[3] & 0xc0)
 		{
-			case 0x00: // reg[4] used
-				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
+			case 0x00: // reg[4] used?
+				for (i = - width / 2; i < width / 2; i++)
+					for (j = - width / 2; j < width / 2; j++)
+						videobuf[(y + j) * 256 + x + i] = color;
+				//logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
 				break;
 			case 0x40: // vertical line - reg[4] not used
 				for (i = 0; i < width; i++ )
