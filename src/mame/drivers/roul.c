@@ -35,7 +35,7 @@ reg[1] -> x
 reg[3] & 0x0f -> color
 reg[3] & 0x10 -> y direction (to the up or to the down)
 reg[3] & 0x20 -> x direction (to the right or to the left)
-reg[3] & 0xc0 == 0x00 -> filled rectangle
+reg[3] & 0xc0 == 0x00 -> filled square
 reg[3] & 0xc0 == 0x40 -> width used in y direction
 reg[3] & 0xc0 == 0x80 -> width used in x direction
 reg[3] & 0xc0 == 0xc0 -> width used in both directions
@@ -70,13 +70,13 @@ static PALETTE_INIT( roul )
 
 		bit0 = (color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 1) & 0x01;
-		b = 0x0e * bit6 + 0x1f * bit0 + 0x43 * bit7 + 0x8f * bit1;
+		b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 		bit0 = (color_prom[0] >> 2) & 0x01;
 		bit1 = (color_prom[0] >> 3) & 0x01;
-		g = 0x0e * bit6 + 0x1f * bit0 + 0x43 * bit7 + 0x8f * bit1;
+		g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 		bit0 = (color_prom[0] >> 4) & 0x01;
 		bit1 = (color_prom[0] >> 5) & 0x01;
-		r = 0x0e * bit6 + 0x1f * bit0 + 0x43 * bit7 + 0x8f * bit1;
+		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 		color_prom++;
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( blitter_cmd_w )
 				for (i = - width / 2; i < width / 2; i++)
 					for (j = - width / 2; j < width / 2; j++)
 						videobuf[(y + j) * 256 + x + i] = color;
-				//logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
+				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
 				break;
 			case 0x40: // vertical line - reg[4] not used
 				for (i = 0; i < width; i++ )
