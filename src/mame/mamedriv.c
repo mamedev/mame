@@ -4323,7 +4323,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.10 Crackin' DJ */
 	DRIVER( cspike )	/* 2000.10 Gun Spike */
 						/* 2000.10 Sega Strike Fighter */
-						/* 2000.10 Death Crimson OX */
+	DRIVER( deathcox )	/* 2000.10 Death Crimson OX */
 						/* 2000.11 Ninja Assault */
 	DRIVER( confmiss )	/* 2000.11 Confidential Mission */											/* First GD-ROM game? */
 						/* 2000.11 Shakatto Tambourine */
