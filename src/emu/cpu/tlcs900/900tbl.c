@@ -5320,8 +5320,8 @@ static void _80(tlcs900_state *cpustate)
 	const tlcs900inst *inst;
 
 	/* For CPI/CPIR/CPD/CPDR/LDI/LDD/LDIR/LDDR operations */
-	cpustate->p1_reg32 = get_reg32_current( cpustate, ( cpustate->op & 4 ) ? 4 : 2 );
-	cpustate->p2_reg32 = get_reg32_current( cpustate, ( cpustate->op & 4 ) ? 5 : 3 );
+	cpustate->p1_reg32 = get_reg32_current( cpustate, cpustate->op - 1 );
+	cpustate->p2_reg32 = get_reg32_current( cpustate, cpustate->op );
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
 	cpustate->op = RDOP();
@@ -5338,8 +5338,8 @@ static void _88(tlcs900_state *cpustate)
 	const tlcs900inst *inst;
 
 	/* For CPI/CPIR/CPD/CPDR/LDI/LDD/LDIR/LDDR operations */
-	cpustate->p1_reg32 = get_reg32_current( cpustate, ( cpustate->op & 4 ) ? 4 : 2 );
-	cpustate->p2_reg32 = get_reg32_current( cpustate, ( cpustate->op & 4 ) ? 5 : 3 );
+	cpustate->p1_reg32 = get_reg32_current( cpustate, cpustate->op - 1 );
+	cpustate->p2_reg32 = get_reg32_current( cpustate, cpustate->op );
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
 	cpustate->op = RDOP();
@@ -5359,8 +5359,8 @@ static void _90(tlcs900_state *cpustate)
 	const tlcs900inst *inst;
 
 	/* For CPI/CPIR/CPD/CPDR/LDI/LDD/LDIR/LDDR operations */
-	cpustate->p1_reg32 = get_reg32_current( cpustate, ( cpustate->op & 4 ) ? 4 : 2 );
-	cpustate->p2_reg32 = get_reg32_current( cpustate, ( cpustate->op & 4 ) ? 5 : 3 );
+	cpustate->p1_reg32 = get_reg32_current( cpustate, cpustate->op - 1 );
+	cpustate->p2_reg32 = get_reg32_current( cpustate, cpustate->op );
 
 	cpustate->ea2.d = *get_reg32_current( cpustate, cpustate->op );
 	cpustate->op = RDOP();
