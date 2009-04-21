@@ -41,7 +41,6 @@ Known Issues
 #include "video/konamiic.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
-#include "sound/2151intf.h"
 #include "sound/k054539.h"
 #include "konamipt.h"
 
@@ -337,10 +336,6 @@ static MACHINE_DRIVER_START( gijoe )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MDRV_SOUND_ADD("konami", K054539, 48000)
 	MDRV_SOUND_CONFIG(k054539_config)
