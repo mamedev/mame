@@ -153,7 +153,7 @@ static WRITE8_HANDLER( ball_w )
 
 static ADDRESS_MAP_START( roul_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
@@ -251,6 +251,8 @@ static MACHINE_DRIVER_START( roul )
 	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map, 0)
 	MDRV_CPU_IO_MAP(sound_cpu_io_map,0)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_PALETTE_INIT(roul)
 
