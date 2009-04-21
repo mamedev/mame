@@ -1724,10 +1724,10 @@ static void _CPLRR(tlcs900_state *cpustate)
 
 static void _CPD(tlcs900_state *cpustate)
 {
-	UINT8	result = *get_reg8_current( cpustate, 1 ) - RDMEM( *cpustate->p1_reg32 );
+	UINT8	result = *get_reg8_current( cpustate, 1 ) - RDMEM( *cpustate->p2_reg32 );
 	UINT16	*bc = get_reg16_current( cpustate, 1 );
 
-	*cpustate->p1_reg32 -= 1;
+	*cpustate->p2_reg32 -= 1;
 	*bc -= 1;
 	cpustate->sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF );
 	cpustate->sr.b.l |= ( result & FLAG_SF ) | ( result ? FLAG_NF : FLAG_NF | FLAG_ZF ) |
@@ -1749,10 +1749,10 @@ static void _CPDR(tlcs900_state *cpustate)
 
 static void _CPDW(tlcs900_state *cpustate)
 {
-	UINT16	result = *get_reg16_current( cpustate, 0 ) - RDMEMW( *cpustate->p1_reg32 );
+	UINT16	result = *get_reg16_current( cpustate, 0 ) - RDMEMW( *cpustate->p2_reg32 );
 	UINT16	*bc = get_reg16_current( cpustate, 1 );
 
-	*cpustate->p1_reg32 -= 2;
+	*cpustate->p2_reg32 -= 2;
 	*bc -= 1;
 	cpustate->sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF );
 	cpustate->sr.b.l |= ( ( result >> 8 ) & FLAG_SF ) | ( result ? FLAG_NF : FLAG_NF | FLAG_ZF ) |
@@ -1774,10 +1774,10 @@ static void _CPDRW(tlcs900_state *cpustate)
 
 static void _CPI(tlcs900_state *cpustate)
 {
-	UINT8	result = *get_reg8_current( cpustate, 1 ) - RDMEM( *cpustate->p1_reg32 );
+	UINT8	result = *get_reg8_current( cpustate, 1 ) - RDMEM( *cpustate->p2_reg32 );
 	UINT16	*bc = get_reg16_current( cpustate, 1 );
 
-	*cpustate->p1_reg32 += 1;
+	*cpustate->p2_reg32 += 1;
 	*bc -= 1;
 	cpustate->sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF );
 	cpustate->sr.b.l |= ( result & FLAG_SF ) | ( result ? FLAG_NF : FLAG_NF | FLAG_ZF ) |
@@ -1799,10 +1799,10 @@ static void _CPIR(tlcs900_state *cpustate)
 
 static void _CPIW(tlcs900_state *cpustate)
 {
-	UINT16	result = *get_reg16_current( cpustate, 0 ) - RDMEMW( *cpustate->p1_reg32 );
+	UINT16	result = *get_reg16_current( cpustate, 0 ) - RDMEMW( *cpustate->p2_reg32 );
 	UINT16	*bc = get_reg16_current( cpustate, 1 );
 
-	*cpustate->p1_reg32 += 2;
+	*cpustate->p2_reg32 += 2;
 	*bc -= 1;
 	cpustate->sr.b.l &= ~ ( FLAG_SF | FLAG_ZF | FLAG_HF | FLAG_VF );
 	cpustate->sr.b.l |= ( ( result >> 8 ) & FLAG_SF ) | ( result ? FLAG_NF : FLAG_NF | FLAG_ZF ) |
