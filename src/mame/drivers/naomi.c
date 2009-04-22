@@ -179,6 +179,160 @@ Notes:
       CN11      - RGB connector (not populated)
       CN12      - 5 volt output connector
 
+
+
+---------------------------------------------------------
+Bios Version Information                                |
+---------------------------------------------------------
+    Bios                     |   Support | Support      |
+    Label                    |   GD-ROM  | Cabinet Link |
+---------------------------------------------------------
+Naomi / GD-ROM               |           |              |
+    EPR-21576D (and earlier) |   No      |    No        |
+    EPR-21576E               |   Yes     |    No        |
+    EPR-21576F               |   Yes     |    Yes       |
+    EPR-21576G (and newer)   |   Yes     |    Yes       |
+---------------------------------------------------------
+Naomi 2 / GD-ROM             |           |              |
+    EPR-23605                |   Yes     |    No        |
+    EPR-23605A               |   Yes     |    Yes       |
+    EPR-23605B (and newer)   |   Yes     |    Yes       |
+---------------------------------------------------------
+
+
+
+Sega NAOMI ROM cart usage
+-------------------------
+
+837-13668  171-7919A (C) Sega 1998
+|----------------------------------------------------------|
+|IC1   IC2   IC3   IC4   IC5   IC6         CN2             |
+|ROM1  ROM2  ROM3  ROM4  ROM5  ROM6                     JP1|
+|                                              IC42        |
+|                                       71256              |
+|                                       71256         IC22 |
+|            IC7  IC8  IC9  IC10  IC11                     |
+|            ROM7 ROM8 ROM9 ROM10 ROM11        IC41        |
+|                                                          |
+|                                              28MHz       |
+|                                                          |
+|    CN3              X76F100               CN1            |
+|----------------------------------------------------------|
+Notes:
+      Not all MASKROM positions are populated.
+      All MASKROMs (IC1 to IC21) are SOP44, either 32M or 64M
+      The other side of the cart PCB just has more locations for
+      SOP44 MASKROMs... IC12 to IC21 (ROM12 to ROM21)
+
+      IC22    - DIP42 EPROM, either 27C160 or 27C322
+      JP1     - Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
+      IC41    - Xilinx XC9536 (PLCC44)
+      IC42    - SEGA 315-5881 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game.
+                On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
+      X76F100 - Xicor X76F100 secured EEPROM (SOIC8)
+      71256   - IDT 71256 32kx8 SRAM (SOJ28)
+      CN1/2/3 - connectors joining to main board
+
+      Note! Generally, games that require a special I/O board or controller will not boot at all with a
+            standard NAOMI I/O board. Usually they display a message saying the I/O board is not acceptable
+            or not connected properly.
+
+
+Games known to use this PCB include....
+
+                           Sticker    EPROM        # of SOP44
+Game                       on cart    IC22#        MASKROMs   IC41#      IC42#          Notes
+--------------------------------------------------------------------------------------------------------------
+Cosmic Smash               840-0044C  23428A       8          315-6213   317-0289-COM   joystick + 2 buttons
+Dead Or Alive 2            841-0003C  22121        21         315-6213   317-5048-COM   joystick + 3 buttons
+Dead Or Alive 2 Millenium  841-0003C  DOA2 Ver.M   21         315-6213   317-5048-COM   joystick + 3 buttons
+Derby Owners Club          840-0016C  22099B       14         315-6213   317-0262-JPN   touch panel + 2 buttons + card reader
+Dynamite Baseball '99      840-0019C  22141B       19         315-6213   317-0269-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
+Dynamite Baseball Naomi    840-0001C  21575        21         315-6213   317-0246-JPN   requires special panel (joystick + 2 buttons + bat controller for each player)
+Giant Gram Pro Wrestle 2   840-0007C  21820        9          315-6213   317-0253-JPN   joystick + 3 buttons
+Heavy Metal Geo Matrix     HMG016007  23716A       11         315-6213   317-5071-COM   joystick + 2 buttons
+Idol Janshi Suchie-Pai 3   841-0002C  21979        14         315-6213   317-5047-JPN   requires special I/O board and mahjong panel
+Out Trigger                840-0017C  22163        19         315-6213   317-0266-COM   requires analog controllers/special panel
+Power Stone                841-0001C  21597        8          315-6213   317-5046-COM   joystick + 3 buttons
+Power Stone 2              841-0008C  23127        9          315-6213   317-5054-COM   joystick + 3 buttons
+Samba de Amigo             840-0020C  22966B       16         315-6213   317-0270-COM   will boot but requires special controller to play it
+Sega Marine Fishing        840-0027C  22221        10         315-6213   not populated  ROM 3&4 not populated. Requires special I/O board and fishing controller
+Slash Out                  840-0041C  23341        17         315-6213   317-0286-COM   joystick + 4 buttons
+Spawn                      841-0005C  22977B       10         315-6213   317-5051-COM   joystick + 4 buttons
+Toy Fighter                840-0011C  22035        10         315-6212   317-0257-COM   joystick + 3 buttons
+Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-0258-COM   joystick + 3 buttons
+Zombie Revenge             840-0003C  21707        19         315-6213   317-0249-COM   joystick + 3 buttons
+
+
+Sega's I/O board has:
+- spare output of 5V, 12V, and GND (from JAMMA power input via noise filter)
+- analog input
+- USB input (connect to NAOMI motherboard)
+- USB output (not used)
+- shrinked D-sub 15pin connector (connect JVS video output, the signal is routed to JAMMA connector, signal is amplified to 3Vp-p and H/V sync signal is mixed (composite))
+- external I/O connector (JST 12pin)
+- switch to select function of external I/O connector (extra button input or 7-seg LED(x2) output of total wins for 'Versus City' cabinet)
+- spare audio input (the signal goes to JAMMA speaker output)
+- JAMMA connector
+
+external I/O connector
+
+old version
+ 1 +5V
+ 2 +5V
+ 3 +5V
+ 4 1P PUSH 4
+ 5 1P PUSH 5
+ 6 1P PUSH 6
+ 7 1P PUSH 7
+ 8 2P PUSH 4
+ 9 2P PUSH 5
+10 2P PUSH 6
+11 2P PUSH 7
+12 GND
+13 GND
+14 GND
+(PUSH4 and 5 are common to JAMMA)
+
+new version
+ 1 +5V
+ 2 +5V
+ 3 +5V
+ 4 1P PUSH 6
+ 5 1P PUSH 7
+ 6 1P PUSH 8
+ 7 1P PUSH 9
+ 8 2P PUSH 6
+ 9 2P PUSH 7
+10 2P PUSH 8
+11 2P PUSH 9
+12 GND
+13 GND
+14 GND
+
+mahjong panel uses ext. I/O 4-8 (regardless of I/O board version)
+key matrix is shown in below
+
+  +------------------------------------ ext. I/O 8
+  |     +------------------------------ ext. I/O 7
+  |     |     +------------------------ ext. I/O 6
+  |     |     |     +------------------ ext. I/O 5
+  |     |     |     |     +------------ ext. I/O 4
+(LST)-( D )-( C )-( B )-( A )---------- JAMMA 17 (1p start)
+  |     |     |     |     |
+  |   ( H )-( G )-( F )-( E )---------- JAMMA 18 (1p up)
+  |     |     |     |     |
+  |   ( L )-( K )-( J )-( I )---------- JAMMA 19 (1p down)
+  |     |     |     |     |
+(F/F)-(PON)-(CHI)-( N )-( M )---------- JAMMA 20 (1p left)
+        |     |     |     |
+        +---(RON)-(RCH)-(KAN)---------- JAMMA 21 (1p right)
+              |     |     |
+              +---(BET)-(STR)---------- JAMMA 22 (1p push1)
+
+* LST = Last chance, F/F = Flip flop, STR = Start
+
+
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 Guru's Readme
@@ -280,102 +434,6 @@ The bottom of the PCB contains nothing significant except some connectors. One f
 or I/O, one for a communication module, one for a cooling fan and one for the serial connection daughterboard.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
----------------------------------------------------------
-Bios Version Information                                |
----------------------------------------------------------
-    Bios                     |   Support | Support      |
-    Label                    |   GD-ROM  | Cabinet Link |
----------------------------------------------------------
-Naomi / GD-ROM               |           |              |
-    EPR-21576D (and earlier) |   No      |    No        |
-    EPR-21576E               |   Yes     |    No        |
-    EPR-21576F               |   Yes     |    Yes       |
-    EPR-21576G (and newer)   |   Yes     |    Yes       |
----------------------------------------------------------
-Naomi 2 / GD-ROM             |           |              |
-    EPR-23605                |   Yes     |    No        |
-    EPR-23605A               |   Yes     |    Yes       |
-    EPR-23605B (and newer)   |   Yes     |    Yes       |
----------------------------------------------------------
-
-
-
-Sega NAOMI ROM cart usage
--------------------------
-
-837-13668  171-7919A (C) Sega 1998
-|----------------------------------------------------------|
-|IC1   IC2   IC3   IC4   IC5   IC6         CN2             |
-|ROM1  ROM2  ROM3  ROM4  ROM5  ROM6                     JP1|
-|                                              IC42        |
-|                                       71256              |
-|                                       71256         IC22 |
-|            IC7  IC8  IC9  IC10  IC11                     |
-|            ROM7 ROM8 ROM9 ROM10 ROM11        IC41        |
-|                                                          |
-|                                              28MHz       |
-|                                                          |
-|    CN3              X76F100               CN1            |
-|----------------------------------------------------------|
-Notes:
-      Not all MASKROM positions are populated.
-      All MASKROMs (IC1 to IC21) are SOP44, either 32M or 64M
-      The other side of the cart PCB just has more locations for
-      SOP44 MASKROMs... IC12 to IC21 (ROM12 to ROM21)
-
-      IC22    - DIP42 EPROM, either 27C160 or 27C322
-      JP1     - Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
-      IC41    - Xilinx XC9536 (PLCC44)
-      IC42    - SEGA 315-5881 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game.
-                On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
-      X76F100 - Xicor X76F100 secured EEPROM (SOIC8)
-      71256   - IDT 71256 32kx8 SRAM (SOJ28)
-      CN1/2/3 - connectors joining to main board
-
-      Note! Generally, games that require a special I/O board or controller will not boot at all with a
-            standard NAOMI I/O board. Usually they display a message saying the I/O board is not acceptable
-            or not connected properly.
-
-
-Games known to use this PCB include....
-
-                           Sticker    EPROM        # of SOP44
-Game                       on cart    IC22#        MASKROMs   IC41#      IC42#          Notes
---------------------------------------------------------------------------------------------------------------
-Cosmic Smash               840-0044C  23428A       8          315-6213   317-0289-COM
-Dead Or Alive 2            841-0003C  22121        21         315-6213   317-5048-COM
-Dead Or Alive 2 Millenium  841-0003C  DOA2 Ver.M   21         315-6213   317-5048-COM
-*Derby Owners Club         840-0016C  22099B       14         315-6213   317-0262-JPN
-*Dynamite Baseball '99     840-0019C  22141B       19         315-6213   317-0269-JPN
-*Dynamite Baseball Naomi   840-0001C  21575        21         315-6213   317-0246-JPN
-Giant Gram Pro Wrestle 2   840-0007C  21820        9          315-6213   317-0253-JPN
-Heavy Metal Geo Matrix     HMG016007  23716A       11         315-6213   317-5071-COM
-Idol Janshi Suchie-Pai 3   841-0002C  21979        14         315-6213   317-5047-JPN   requires special I/O board and mahjong panel
-Out Trigger                840-0017C  22163        19         315-6213   317-0266-COM   requires analog controllers/special panel
-Power Stone                841-0001C  21597        8          315-6213   317-5046-COM
-Power Stone 2              841-0008C  23127        9          315-6213   317-5054-COM
-Samba de Amigo             840-0020C  22966B       16         315-6213   317-0270-COM   will boot but requires special controller to play it
-Sega Marine Fishing        840-0027C  22221        10         315-6213   not populated  ROM 3&4 not populated. Requires special I/O board and fishing controller
-Slash Out                  840-0041C  23341        17         315-6213   317-0286-COM
-Spawn                      841-0005C  22977B       10         315-6213   317-5051-COM
-Toy Fighter                840-0011C  22035        10         315-6212   317-0257-COM
-Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-0258-COM
-Zombie Revenge             840-0003C  21707        19         315-6213   317-0249-COM
-
-* denotes not dumped yet
-
-
-
-
-
-
-
-
 
 
 
