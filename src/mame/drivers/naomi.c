@@ -581,6 +581,7 @@ Notes:
 #include "video/generic.h"
 #include "machine/eeprom.h"
 #include "naomibd.h"
+#include "naomi.h"
 #include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
@@ -588,7 +589,7 @@ Notes:
 
 #define CPU_CLOCK (200000000)
 static UINT32 *dc_sound_ram;
-static UINT64 *naomi_ram64;
+extern UINT64 *naomi_ram64;
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
@@ -3123,23 +3124,6 @@ void naomi_write_keyfile(void)
 }
 #endif
 
-static READ64_HANDLER( naomi_bios_idle_skip_r )
-{
-
-	if (cpu_get_pc(space->cpu)==0xc04173c)
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
-		//cpu_spinuntil_int(space->cpu);
-//  else
-//      printf("%08x\n", cpu_get_pc(space->cpu));
-
-	return naomi_ram64[0x2ad238/8];
-}
-static DRIVER_INIT(naomi)
-{
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
-}
-
-
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
   JAPAN
@@ -3183,7 +3167,6 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 
 /* 841-xxxxx ("Licensed by Sega" games)*/
 /* 0001C */ GAME( 1999, pstone,   naomi,    naomi,    naomi,    naomi, ROT0, "Capcom",          "Power Stone (JPN, USA, EUR, ASI, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-
 /* 0002C */ GAME( 1999, suchie3,  naomi,    naomi,    naomi,    naomi, ROT0, "Jaleco",          "Idol Janshi Suchie-Pai 3 (JPN)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0003C */ GAME( 1999, doa2,     naomi,    naomi,    naomi,    naomi, ROT0, "Tecmo",           "Dead or Alive 2 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0003C */ GAME( 2000, doa2m,    doa2,     naomi,    naomi,    naomi, ROT0, "Tecmo",           "Dead or Alive 2 Millennium (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -4016,54 +3999,6 @@ ROM_START( puyofev )
 	//(sticker 253-5508-0375)
 	ROM_LOAD("317-0375-com.data", 0x00, 0x50, CRC(32bf1825) SHA1(42dfbc6777c154d8de6c6f7350da9ea737380220) )
 ROM_END
-
-
-
-static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
-{
-	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
-
-	return naomi_ram64[0x1aae18/8];
-}
-
-static DRIVER_INIT( ggxxsla )
-{
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1aae18, 0xc1aae1f, 0, 0, naomigd_ggxxsla_idle_skip_r);
-	DRIVER_INIT_CALL(naomi);
-}
-
-static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
-{
-	if (cpu_get_pc(space->cpu)==0xc0b5c3c) // or 0xc0bab0c
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
-
-	return naomi_ram64[0x1837b8/8];
-}
-
-
-static DRIVER_INIT( ggxx )
-{
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc1837b8, 0xc1837bf, 0, 0, naomigd_ggxx_idle_skip_r);
-	DRIVER_INIT_CALL(naomi);
-}
-
-static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
-{
-	if (cpu_get_pc(space->cpu)==0xc0b84bc) // or 0xc0bab0c
-		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(500));
-
-	//printf("%08x\n", cpu_get_pc(space->cpu));
-
-	return naomi_ram64[0x18d6c8/8];
-}
-
-
-static DRIVER_INIT( ggxxrl )
-{
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
-	DRIVER_INIT_CALL(naomi);
-}
 
 
 /* Naomi GD-Rom Sets */
