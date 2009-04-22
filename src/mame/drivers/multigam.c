@@ -35,7 +35,7 @@
          - ROM at 0x80000:  Several things patched and/or relocated.
                             Most original NOPs were replaced by proper code.
 
-    Multi Game III: 21 games included, hardware features MMC3 NES mapper and additional
+    Multi Game 2 & III: 21 games included, hardware features MMC3 NES mapper and additional
     RAM used by Super Mario Bros 3.
 */
 
@@ -236,6 +236,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 			{
 				int bank;
 				UINT8 *prg = memory_region( space->machine, "maincpu" );
+				UINT8 *src = memory_region( space->machine, "user1" );
 
 				/* reset the banks */
 				if ( multigam3_mmc3_command & 0x40 )
@@ -243,21 +244,21 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					/* high bank */
 					bank = multigam3_mmc3_banks[0] * 0x2000 + 0xa0000;
 
-					memcpy( &prg[0x0c000], &prg[bank], 0x2000 );
-					memcpy( &prg[0x08000], &prg[0xa0000 + 0x3c000], 0x2000 );
+					memcpy( &prg[0x0c000], &src[bank], 0x2000 );
+					memcpy( &prg[0x08000], &src[0xa0000 + 0x3c000], 0x2000 );
 				}
 				else
 				{
 					/* low bank */
 					bank = multigam3_mmc3_banks[0] * 0x2000 + 0xa0000;
 
-					memcpy( &prg[0x08000], &prg[bank], 0x2000 );
-					memcpy( &prg[0x0c000], &prg[0xa0000 + 0x3c000], 0x2000 );
+					memcpy( &prg[0x08000], &src[bank], 0x2000 );
+					memcpy( &prg[0x0c000], &src[0xa0000 + 0x3c000], 0x2000 );
 				}
 
 				/* mid bank */
 				bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
-				memcpy( &prg[0x0a000], &prg[bank], 0x2000 );
+				memcpy( &prg[0x0a000], &src[bank], 0x2000 );
 
 				multigam3_mmc3_last_bank = data & 0xc0;
 			}
@@ -275,7 +276,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 1: /* char banking */
 						data &= 0xfe;
 						page ^= ( cmd << 1 );
-						ppu2c0x_set_videorom_bank( ppu, page, 2, 0x100 + data, 64 );
+						ppu2c0x_set_videorom_bank( ppu, page, 2, 0x180 + data, 64 );
 					break;
 
 					case 2: /* char banking */
@@ -283,20 +284,21 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 4: /* char banking */
 					case 5: /* char banking */
 						page ^= cmd + 2;
-						ppu2c0x_set_videorom_bank( ppu, page, 1, 0x100 + data, 64 );
+						ppu2c0x_set_videorom_bank( ppu, page, 1, 0x180 + data, 64 );
 					break;
 
 					case 6: /* program banking */
 					{
 						UINT8 *prg = memory_region( space->machine, "maincpu" );
+						UINT8 *src = memory_region( space->machine, "user1" );
 						if ( multigam3_mmc3_command & 0x40 )
 						{
 							/* high bank */
 							multigam3_mmc3_banks[0] = data & 0x1f;
 							bank = ( multigam3_mmc3_banks[0] ) * 0x2000 + 0xa0000;
 
-							memcpy( &prg[0x0c000], &prg[bank], 0x2000 );
-							memcpy( &prg[0x08000], &prg[0xa0000 + 0x3c000], 0x2000 );
+							memcpy( &prg[0x0c000], &src[bank], 0x2000 );
+							memcpy( &prg[0x08000], &src[0xa0000 + 0x3c000], 0x2000 );
 						}
 						else
 						{
@@ -304,8 +306,8 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 							multigam3_mmc3_banks[0] = data & 0x1f;
 							bank = ( multigam3_mmc3_banks[0] ) * 0x2000 + 0xa0000;
 
-							memcpy( &prg[0x08000], &prg[bank], 0x2000 );
-							memcpy( &prg[0x0c000], &prg[0xa0000 + 0x3c000], 0x2000 );
+							memcpy( &prg[0x08000], &src[bank], 0x2000 );
+							memcpy( &prg[0x0c000], &src[0xa0000 + 0x3c000], 0x2000 );
 						}
 					}
 					break;
@@ -314,10 +316,12 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 						{
 							/* mid bank */
 							UINT8 *prg = memory_region( space->machine, "maincpu" );
+							UINT8 *src = memory_region( space->machine, "user1" );
+
 							multigam3_mmc3_banks[1] = data & 0x1f;
 							bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
 
-							memcpy( &prg[0x0a000], &prg[bank], 0x2000 );
+							memcpy( &prg[0x0a000], &src[bank], 0x2000 );
 						}
 					break;
 				}
@@ -490,6 +494,17 @@ static INPUT_PORTS_START( multigam )
 	PORT_DIPSETTING(    0x06, "10 min" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( multigm2 )
+	PORT_INCLUDE( multigam_common )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x06, 0x00, "Coin/Time" )
+	PORT_DIPSETTING(    0x00, "5 min" )
+	PORT_DIPSETTING(    0x04, "8 min" )
+	PORT_DIPSETTING(    0x02, "11 min" )
+	PORT_DIPSETTING(    0x06, "15 min" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( multigm3 )
 	PORT_INCLUDE( multigam_common )
 
@@ -646,6 +661,27 @@ ROM_START( multigmb )
 	ROM_FILL( 0x60000, 0x20000, 0x00 )
 ROM_END
 
+ROM_START( multigm2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mg2-8u21.bin", 0x0000, 0x8000, CRC(e0588e11) SHA1(43b5f6bad7828b372c6b4251e9e24c748793bb2d) )
+
+	ROM_REGION( 0x100000, "user1", 0 )
+	ROM_LOAD( "mg2-4u10.bin", 0x00000, 0x20000, CRC(fc7b2461) SHA1(60cf296ba531495d577eac73220a7ae1dc897237) )
+	ROM_LOAD( "mg2-6-u4.bin", 0x20000, 0x20000, CRC(f1ced4a6) SHA1(d94d7c9fc9270d0e5eaecf819e4048c20866ba2d) )
+	ROM_LOAD( "mg2-3u15.bin", 0x40000, 0x20000, CRC(a1f84c4f) SHA1(c191677170c7d8907bbaee599a988c9adcc17449) )
+	ROM_LOAD( "mg2-2u20.bin", 0x60000, 0x10000, CRC(8413c2bd) SHA1(54e9a8c2ccfcb1a70ea7aa6125116829e4c72855) )
+	ROM_LOAD( "mg2-1u24.bin", 0x70000, 0x10000, CRC(53fd3238) SHA1(01095e6b853fa55783e9ac635fbf7c1450dc3eb1) )
+	ROM_LOAD( "mg2-5-u6.bin", 0x80000, 0x20000, CRC(0b95a92d) SHA1(df2e30d537a6703cc614ecc4b93b828f1339807b) )
+	ROM_LOAD( "mg2-7-u1.bin", 0xa0000, 0x40000, CRC(240ebac1) SHA1(83a8264d5efa261580c45112d718f6cd55957aa0) )
+
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "mg2-9u27.bin", 0x00000, 0x20000, CRC(01ec6b04) SHA1(2e0e8b0ae8403070cae198555f66c044f48d19f4) )
+	ROM_LOAD( "mg210u23.bin", 0x20000, 0x20000, CRC(a85f1104) SHA1(a447f265a683d471dba2f0ef88ca9260089274bf) )
+	ROM_LOAD( "mg211u19.bin", 0x40000, 0x20000, CRC(44f21e4d) SHA1(e002004da5dd74ef30dc7ce95f426dd9a47fede5) )
+	ROM_LOAD( "mg212u14.bin", 0x60000, 0x20000, CRC(a0ae2b4b) SHA1(5e026ad8a6b2a8120e386471d5178625bda04525) )
+ROM_END
+
 ROM_START( multigm3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mg3-6.bin", 0x0000, 0x8000, CRC(3c1e53f1) SHA1(2eaf84e592db58cd268738da2642c716895e4eaa) )
@@ -661,8 +697,8 @@ ROM_START( multigm3 )
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "mg3-7.bin", 0x00000, 0x20000, CRC(d8308cdb) SHA1(7bfb864611c32cf3740cfd650bfe275513d511d7) )
 	ROM_LOAD( "mg3-8.bin", 0x20000, 0x20000, CRC(b4a53b9d) SHA1(63d8901149d0d9b69f28bfc096f7932448542032) )
-	ROM_LOAD( "mg3-9.bin", 0x40000, 0x20000, CRC(a0ae2b4b) SHA1(5e026ad8a6b2a8120e386471d5178625bda04525) )
-	ROM_FILL( 0x60000, 0x20000, 0x00 )
+	ROM_FILL( 0x40000, 0x20000, 0x00 )
+	ROM_LOAD( "mg3-9.bin", 0x60000, 0x20000, CRC(a0ae2b4b) SHA1(5e026ad8a6b2a8120e386471d5178625bda04525) )
 ROM_END
 
 static DRIVER_INIT( multigam )
@@ -682,14 +718,19 @@ static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble
 
 static DRIVER_INIT(multigm3)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 
 	multigm3_decrypt(memory_region(machine, "maincpu"), memory_region_length(machine, "maincpu"), decode );
 	multigm3_decrypt(memory_region(machine, "user1"), memory_region_length(machine, "user1"), decode );
 
 	multigmc_mmc3_6000_ram = auto_malloc(0x2000);
+
+	multigam_switch_prg_rom( space, 0x0, 0x01 );
 }
 
 GAME( 1992, multigam, 0,        multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 1)", 0 )
 GAME( 1992, multigmb, multigam, multigam, multigam, multigam, ROT0, "unknown", "Multi Game (set 2)", 0 )
-GAME( 19??, multigm3, 0,        multigm3, multigm3, multigm3, ROT0, "Seo Jin", "Multi Game III", 0 )
+GAME( 1992, multigm2, 0,        multigm3, multigm2, multigm3, ROT0, "Seo Jin", "Multi Game 2", 0 )
+GAME( 1992, multigm3, 0,        multigm3, multigm3, multigm3, ROT0, "Seo Jin", "Multi Game III", 0 )
