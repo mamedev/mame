@@ -663,7 +663,7 @@ static void snes_update_line_2(UINT8 screen, UINT8 layer, UINT16 curline )
 	/* Remember this position */
 	basevmap = tmap;
 	/* Offset horizontally */
-	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size & 3][(hscroll >> 5) & 3];
 	/* Scroll horizontally */
 	tmap += (hscroll & 0x1f) << 1;
 
@@ -672,7 +672,7 @@ static void snes_update_line_2(UINT8 screen, UINT8 layer, UINT16 curline )
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size & 3][((hscroll >> 5) + 1) & 3];
 			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
@@ -791,7 +791,7 @@ static void snes_update_line_2_hi(UINT8 screen, UINT8 layer, UINT16 curline )
 	/* Remember this position */
 	basevmap = tmap;
 	/* Offset horizontally */
-	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size & 3][(hscroll >> 5) & 3];
 	/* Scroll horizontally */
 	tmap += (hscroll & 0x1f) << 1;
 
@@ -800,7 +800,7 @@ static void snes_update_line_2_hi(UINT8 screen, UINT8 layer, UINT16 curline )
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size & 3][((hscroll >> 5) + 1) & 3];
 			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
@@ -923,7 +923,7 @@ static void snes_update_line_4(UINT8 screen, UINT8 layer, UINT16 curline )
 	/* Remember this position */
 	basevmap = tmap;
 	/* Offset horizontally */
-	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size & 3][(hscroll >> 5) & 3];
 	/* Scroll horizontally */
 	tmap += (hscroll & 0x1f) << 1;
 
@@ -932,7 +932,7 @@ static void snes_update_line_4(UINT8 screen, UINT8 layer, UINT16 curline )
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size & 3][((hscroll >> 5) + 1) & 3];
 			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
@@ -1036,7 +1036,7 @@ static void snes_update_line_4_hi(UINT8 screen, UINT8 layer, UINT16 curline )
 	/* Remember this position */
 	basevmap = tmap;
 	/* Offset horizontally */
-	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size & 3][(hscroll >> 5) & 3];
 	/* Scroll horizontally */
 	tmap += (hscroll & 0x1f) << 1;
 
@@ -1045,7 +1045,7 @@ static void snes_update_line_4_hi(UINT8 screen, UINT8 layer, UINT16 curline )
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size & 3][((hscroll >> 5) + 1) & 3];
 			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
@@ -1159,7 +1159,7 @@ static void snes_update_line_8(UINT8 screen, UINT8 layer, UINT16 curline )
 	/* Remember this position */
 	basevmap = tmap;
 	/* Offset horizontally */
-	tmap += table_hscroll[snes_ppu.layer[layer].map_size][hscroll >> 5];
+	tmap += table_hscroll[snes_ppu.layer[layer].map_size & 3][(hscroll >> 5) & 3];
 	/* Scroll horizontally */
 	tmap += (hscroll & 0x1f) << 1;
 
@@ -1168,7 +1168,7 @@ static void snes_update_line_8(UINT8 screen, UINT8 layer, UINT16 curline )
 		/* Have we scrolled into the next map? */
 		if( hscroll && ((ii >> 1) >= 32 - (hscroll & 0x1f)) )
 		{
-			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size][(hscroll >> 5) + 1];
+			tmap = basevmap + table_hscroll[snes_ppu.layer[layer].map_size & 3][((hscroll >> 5) + 1) & 3];
 			tmap -= ii;
 			hscroll = 0;	/* Make sure we don't do this again */
 		}
