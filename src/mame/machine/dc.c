@@ -10,6 +10,7 @@
 #include "cpu/sh4/sh4.h"
 #include "sound/aica.h"
 #include "naomibd.h"
+#include "naomi.h"
 
 #define DEBUG_REGISTERS	(1)
 
@@ -130,6 +131,7 @@ static UINT32 g2bus_regs[0x100/4];
 UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
 static emu_timer *dc_rtc_timer;
+extern int jvsboard_type;
 
 static const UINT32 maple0x82answer[]=
 {
@@ -241,6 +243,89 @@ int level;
 
 	level=dc_compute_interrupt_level(machine);
 	device_set_info_int(machine->cpu[0], CPUINFO_INT_SH4_IRLn_INPUT, 15-level);
+}
+
+static int jvsboard_init(int pos)
+{
+	// four bytes for every available function
+	// first function
+	maple0x86data2[pos+10]=1;
+	maple0x86data2[pos+11]=2; // number of players
+	maple0x86data2[pos+12]=9+4; // switches per player (27 = mahjong)
+	maple0x86data2[pos+13]=0;
+	// second function
+	maple0x86data2[pos+14]=2;
+	maple0x86data2[pos+15]=2; // number of coin slots
+	maple0x86data2[pos+16]=0;
+	maple0x86data2[pos+17]=0;
+	// third function
+	maple0x86data2[pos+18]=3;
+	maple0x86data2[pos+19]=2; // analog channels
+	maple0x86data2[pos+20]=8; // bits per channel
+	maple0x86data2[pos+21]=0;
+	// no more functions
+	maple0x86data2[pos+22]=0;
+	maple0x86data2[pos+7]=13+2;
+	return 13;
+}
+
+static void jvsboard_indirect_read(running_machine *machine, int pos)
+{
+	// report1,jvsbytes repeated for each function
+	// first function
+	maple0x86data2[pos+ 9]=1; // report
+	maple0x86data2[pos+10]=0; // bits TEST TILT1 TILT2 TILT3 ? ? ? ?
+	maple0x86data2[pos+11]=input_port_read(machine, "IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
+	maple0x86data2[pos+12]=input_port_read(machine, "IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
+	maple0x86data2[pos+13]=input_port_read(machine, "IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
+	maple0x86data2[pos+14]=input_port_read(machine, "IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
+	// second function
+	maple0x86data2[pos+15]=1; // report
+	maple0x86data2[pos+16]=(dc_coin_counts[0] >> 8) & 0xff; // 1CONDITION, 1SLOT COIN(bit13-8)
+	maple0x86data2[pos+17]=dc_coin_counts[0] & 0xff; // 1SLOT COIN(bit7-0)
+	maple0x86data2[pos+18]=(dc_coin_counts[1] >> 8) & 0xff; // 2CONDITION, 2SLOT COIN(bit13-8)
+	maple0x86data2[pos+19]=dc_coin_counts[1] & 0xff; // 2SLOT COIN(bit7-0)
+	// third function
+	maple0x86data2[pos+20]=1; // report
+	maple0x86data2[pos+21]=0xff; // channel 1 bits 7-0
+	maple0x86data2[pos+22]=0; // channel 1
+	maple0x86data2[pos+23]=0; // channel 2 bits 7-0
+	maple0x86data2[pos+24]=0xff; // channel 2
+}
+
+static int jvsboard_direct_read(running_machine *machine)
+{
+	/* valid data check*/
+	maple0x86data2[0x11] = 0x00;
+	maple0x86data2[0x12] = 0x8e;
+	maple0x86data2[0x13] = 0x01;
+	maple0x86data2[0x14] = 0x00;
+	maple0x86data2[0x15] = 0xff;
+	maple0x86data2[0x16] = 0xe0;
+	maple0x86data2[0x19] = 0x01;
+
+	/* read the inputs */
+	maple0x86data2[0x1a]=1;
+	maple0x86data2[0x1b]=2; //number of players
+	maple0x86data2[0x1c]=input_port_read(machine, "IN1");
+	maple0x86data2[0x1d]=input_port_read(machine, "IN2");
+	maple0x86data2[0x1e]=input_port_read(machine, "IN3");
+	maple0x86data2[0x1f]=input_port_read(machine, "IN4");
+	maple0x86data2[0x20]=1;
+	maple0x86data2[0x21]=(dc_coin_counts[0] >> 8) & 0xff; //coin counter read-back hi byte
+	maple0x86data2[0x22]=dc_coin_counts[0] & 0xff; //coin counter read-back lo byte
+	maple0x86data2[0x23]=(dc_coin_counts[1] >> 8) & 0xff;
+	maple0x86data2[0x24]=dc_coin_counts[1] & 0xff;
+	maple0x86data2[0x25]=1;
+	maple0x86data2[0x26]=1;
+	maple0x86data2[0x27]=0;
+	maple0x86data2[0x28]=0;
+	maple0x86data2[0x29]=0;
+	maple0x86data2[0x2a]=0;
+	/*0x2b-0x2f rotary inputs */
+	//...
+
+	return 8+0x11+16;
 }
 
 READ64_HANDLER( dc_sysctrl_r )
@@ -548,57 +633,23 @@ WRITE64_HANDLER( dc_maple_w )
 												tocopy += 1;
 												break;
 											case 0x14:
-												// four bytes for every available function
-												// first function
-												maple0x86data2[pos+10]=1;
-												maple0x86data2[pos+11]=2; // number of players
-												maple0x86data2[pos+12]=9+4; // switches per player (27 = mahjong)
-												maple0x86data2[pos+13]=0;
-												// second function
-												maple0x86data2[pos+14]=2;
-												maple0x86data2[pos+15]=2; // number of coin slots
-												maple0x86data2[pos+16]=0;
-												maple0x86data2[pos+17]=0;
-												// third function
-												maple0x86data2[pos+18]=3;
-												maple0x86data2[pos+19]=2; // analog channels
-												maple0x86data2[pos+20]=8; // bits per channel
-												maple0x86data2[pos+21]=0;
-												// no more functions
-												maple0x86data2[pos+22]=0;
-												maple0x86data2[pos+7]=13+2;
-												tocopy += 13;
+												{
+													static int dma_bytes;
+													dma_bytes = jvsboard_init(pos);
+													tocopy += dma_bytes;
+												}
 												break;
 											case 0x21:
-												maple0x86data2[pos+10]=0; // bits 7-6 status bits 5-0 higer bits of coin count
-												maple0x86data2[pos+11]=0; // lower bits of coin count
-												maple0x86data2[pos+12]=0; // like previuos two but for second coin slot
-												maple0x86data2[pos+13]=0;
+												maple0x86data2[pos+10]=(dc_coin_counts[0] >> 8) & 0xff; // bits 7-6 status bits 5-0 higer bits of coin count
+												maple0x86data2[pos+11]=dc_coin_counts[0] & 0xff; // lower bits of coin count
+												maple0x86data2[pos+12]=(dc_coin_counts[1] >> 8) & 0xff; // like previuos two but for second coin slot
+												maple0x86data2[pos+13]=dc_coin_counts[1] & 0xff;
 												maple0x86data2[pos+7]=4+2;
 												tocopy += 4;
 												break;
 											case -1: // special case to read controls
 											case -2:
-												// report1,jvsbytes repeated for each function
-												// first function
-												maple0x86data2[pos+ 9]=1; // report
-												maple0x86data2[pos+10]=0; // bits TEST TILT1 TILT2 TILT3 ? ? ? ?
-												maple0x86data2[pos+11]=input_port_read(space->machine, "IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
-												maple0x86data2[pos+12]=input_port_read(space->machine, "IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
-												maple0x86data2[pos+13]=input_port_read(space->machine, "IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
-												maple0x86data2[pos+14]=input_port_read(space->machine, "IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
-												// second function
-												maple0x86data2[pos+15]=1; // report
-												maple0x86data2[pos+16]=(dc_coin_counts[0] >> 8) & 0xff; // 1CONDITION, 1SLOT COIN(bit13-8)
-												maple0x86data2[pos+17]=dc_coin_counts[0] & 0xff; // 1SLOT COIN(bit7-0)
-												maple0x86data2[pos+18]=(dc_coin_counts[1] >> 8) & 0xff; // 2CONDITION, 2SLOT COIN(bit13-8)
-												maple0x86data2[pos+19]=dc_coin_counts[1] & 0xff; // 2SLOT COIN(bit7-0)
-												// third function
-												maple0x86data2[pos+20]=1; // report
-												maple0x86data2[pos+21]=0xff; // channel 1 bits 7-0
-												maple0x86data2[pos+22]=0; // channel 1
-												maple0x86data2[pos+23]=0; // channel 2 bits 7-0
-												maple0x86data2[pos+24]=0xff; // channel 2
+												jvsboard_indirect_read(space->machine,pos);
 												if (jvs_command == -1)
 												{
 													// ?
@@ -645,40 +696,11 @@ WRITE64_HANDLER( dc_maple_w )
 									a = input_port_read(space->machine, "IN0"); // put keys here
 									maple0x86data2[6] = maple0x86data2[6] | (a << 4);
 
-									tocopy = 8+0x11+16;
-									/* valid data check*/
-									maple0x86data2[0x11] = 0x00;
-									maple0x86data2[0x12] = 0x8e;
-									maple0x86data2[0x13] = 0x01;
-									maple0x86data2[0x14] = 0x00;
-									maple0x86data2[0x15] = 0xff;
-									maple0x86data2[0x16] = 0xe0;
-									maple0x86data2[0x19] = 0x01;
-
-									/* read the inputs */
-									maple0x86data2[0x1a]=1;
-									maple0x86data2[0x1b]=2; //number of players
-									maple0x86data2[0x1c]=input_port_read(space->machine, "IN1");
-									maple0x86data2[0x1d]=input_port_read(space->machine, "IN2");
-									maple0x86data2[0x1e]=input_port_read(space->machine, "IN3");
-									maple0x86data2[0x1f]=input_port_read(space->machine, "IN4");
-									maple0x86data2[0x20]=1;
-									maple0x86data2[0x21]=(dc_coin_counts[0] >> 8) & 0xff; //coin counter read-back hi byte
-									maple0x86data2[0x22]=dc_coin_counts[0] & 0xff; //coin counter read-back lo byte
-									maple0x86data2[0x23]=(dc_coin_counts[1] >> 8) & 0xff;
-									maple0x86data2[0x24]=dc_coin_counts[1] & 0xff;
-									maple0x86data2[0x25]=1;
-									maple0x86data2[0x26]=1;
-									maple0x86data2[0x27]=0;
-									maple0x86data2[0x28]=0;
-									maple0x86data2[0x29]=0;
-									maple0x86data2[0x2a]=0;
-									/*0x2b-0x2f rotary inputs */
-									//...
+									tocopy = jvsboard_direct_read(space->machine);
 
 									// command end flag
-									maple0x86data2[0x18]= (jvs_command == -1) ? 19 : 17;
-									maple0x86data2[0x15]= (jvs_command == -1) ? 24 : 16;
+									maple0x86data2[0x18] = (jvs_command == -1) ? 19 : 17;
+									maple0x86data2[0x15] = (jvs_command == -1) ? 24 : 16;
 
 									for (a=0;a < tocopy;a=a+4)
 										buff[1+a/4] = maple0x86data2[a] | (maple0x86data2[a+1] << 8) | (maple0x86data2[a+2] << 16) | (maple0x86data2[a+3] << 24);

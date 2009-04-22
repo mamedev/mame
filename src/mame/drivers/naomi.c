@@ -2,8 +2,8 @@
 
   Sega Naomi / Naomi 2 / Atomiswave
 
-  Driver by Samuele Zannoli, R. Belmont, and ElSemi,
-            David Haywood & Angelo Salese
+  Driver by Samuele Zannoli, R. Belmont, ElSemi,
+            David Haywood and Angelo Salese
 
  Notes:
   NAMCO Naomi games require a Namco specific BIOS
@@ -864,7 +864,7 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE(5)// mirror
 
 	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE(4) // RAM access through cache
-
+	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE(5) // RAM access through cache
 
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )

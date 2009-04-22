@@ -8,6 +8,7 @@ Per-game specific JVS settings / idle loop skips for the MAME Naomi driver.
 #include "includes/naomi.h"
 
 UINT64 *naomi_ram64;
+int jvsboard_type;
 
 static READ64_HANDLER( naomi_bios_idle_skip_r )
 {
@@ -23,6 +24,7 @@ static READ64_HANDLER( naomi_bios_idle_skip_r )
 DRIVER_INIT(naomi)
 {
 	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
+	jvsboard_type = JVSBD_DEFAULT;
 }
 
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
