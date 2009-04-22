@@ -888,6 +888,7 @@ static READ32_HANDLER( le2_gun_V_r )
 
 	// make "off the bottom" reload too
 	if (p1y >= 0xdf) p1y = 0;
+	if (p2y >= 0xdf) p2y = 0;
 
 	return (p1y<<16)|p2y;
 }
