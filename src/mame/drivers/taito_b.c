@@ -1010,6 +1010,39 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ashura )
 	PORT_START("DSWA")
 	TAITO_MACHINE_COCKTAIL
+	TAITO_COINAGE_WORLD
+
+	PORT_START("DSWB")
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x08, "every 100k" )
+	PORT_DIPSETTING(    0x0c, "every 150k" )
+	PORT_DIPSETTING(    0x04, "every 200k" )
+	PORT_DIPSETTING(    0x00, "every 250k" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN0")
+	TAITO_JOY_UDLR_2_BUTTONS( 1 )
+
+	PORT_START("IN1")
+	TAITO_JOY_UDLR_2_BUTTONS( 2 )
+
+	TAITO_B_SYSTEM_INPUT
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ashuraj )
+	PORT_START("DSWA")
+	TAITO_MACHINE_COCKTAIL
 	TAITO_COINAGE_JAPAN_OLD
 
 	PORT_START("DSWB")
@@ -2958,6 +2991,25 @@ ROM_END
 
 ROM_START( ashura )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "c43-15.50", 0x00000, 0x20000, CRC(5d05d6c6) SHA1(43bcf6dbfa982595154ebb2b478415b63dfcb7aa) )
+	ROM_LOAD16_BYTE( "c43-13.31", 0x00001, 0x20000, CRC(75b7d877) SHA1(54ffb35fdc84c86a3187291e2f1862a1a9152812) )
+	ROM_LOAD16_BYTE( "c43-14.49", 0x40000, 0x20000, CRC(ede7f37d) SHA1(3ed744885f2aaba5c4e6f4d77ed33d12f0290968) )
+	ROM_LOAD16_BYTE( "c43-12.30", 0x40001, 0x20000, CRC(b08a4ba0) SHA1(dad644bcaa240bf0d7393153ab0d0e9bf1d620b2) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "c43-16",  0x00000, 0x4000, CRC(cb26fce1) SHA1(7cc60326455c7bb2ca543ddfd4002462cc079837) )
+	ROM_CONTINUE(        0x10000, 0xc000 ) /* banked stuff */
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "c43-02",  0x00000, 0x80000, CRC(105722ae) SHA1(1de5d396d2a4d5948544082c471a15ca1b8e756c) )
+	ROM_LOAD( "c43-03",  0x80000, 0x80000, CRC(426606ba) SHA1(961ec0a9dc18044adae433337bfa89d951c5207c) )
+
+	ROM_REGION( 0x80000, "ym", 0 )
+	ROM_LOAD( "c43-01",  0x00000, 0x80000, CRC(db953f37) SHA1(252591b676366d4828acb20c77aa9960ad9b367e) )
+ROM_END
+
+ROM_START( ashuraj )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c43-07-1.50", 0x00000, 0x20000, CRC(d5ceb20f) SHA1(59bc9468d7f43d3b1388c2915fafeba7e2cf13a5) )
 	ROM_LOAD16_BYTE( "c43-05-1.31", 0x00001, 0x20000, CRC(a6f3bb37) SHA1(6959f3bcbcd2d5b13c95dcfd7a536541dcab49f8) )
 	ROM_LOAD16_BYTE( "c43-06-1.49", 0x40000, 0x20000, CRC(0f331802) SHA1(e7ed01b0d664c4db6ea9acc54b57e674e10685aa) )
@@ -3554,7 +3606,8 @@ GAME( 1989, tetrista, tetris,  tetrista, tetrist,  taito_b, ROT0,   "Sega", "Tet
 GAME( 1989, viofight, 0,       viofight, viofight, taito_b, ROT0,   "Taito Corporation Japan", "Violence Fight (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, viofightu,viofight,viofight, viofight, taito_b, ROT0,   "Taito America Corporation", "Violence Fight (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, viofightj,viofight,viofight, viofight, taito_b, ROT0,   "Taito Corporation", "Violence Fight (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ashura,   0,       ashura,   ashura,   taito_b, ROT270, "Taito Corporation", "Ashura Blaster (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ashura,   0,       ashura,   ashura,   taito_b, ROT270, "Taito Corporation Japan", "Ashura Blaster (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj,  taito_b, ROT270, "Taito Corporation", "Ashura Blaster (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, ashurau,  ashura,  ashura,   ashurau,  taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, hitice,   0,       hitice,   hitice,   taito_b, ROT0,   "Williams", "Hit the Ice (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1990, hiticej,  hitice,  hitice,   hitice,   taito_b, ROT0,   "Midway/Taito Corporation", "Hit the Ice (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

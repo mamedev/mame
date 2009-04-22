@@ -1871,7 +1871,8 @@ const game_driver * const drivers[] =
 	DRIVER( viofight )	/* C16 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( viofightu )	/* C16 (c) 1989 Taito America Corporation (US) */
 	DRIVER( viofightj )	/* C16 (c) 1989 Taito Corporation (Japan) */
-	DRIVER( ashura )	/* C43 (c) 1990 Taito Corporation (Japan) */
+	DRIVER( ashura )	/* C43 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( ashuraj )	/* C43 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( ashurau )	/* C43 (c) 1990 Taito America Corporation (US) */
 	DRIVER( hitice )	/* C59 (c) 1990 Williams (US) */
 	DRIVER( hiticej )	/* C59 (c) 1990 Midway/Taito Corporation (Japan) */
