@@ -4281,7 +4281,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ggram2 )	/* 1999.04 Giant Gram Zen Nippon Pro-wres 2 */
 						/* 1999.05 Taisen Puzzle Kurutto Stone */
 						/* 1999.06 Ringout 4x4 */
-						/* 1999.07 F355 Challenge */
+	DRIVER( f355bios )	/* 1999.07 F355 Challenge */
 	DRIVER( shangril )	/* 1999.08 Dengen Tenshi Taisen Janshi Shangri-la */
 						/* 1999.08 Unou Nouryoku Check Machine Touch de UNO! */
 	DRIVER( vs2_2k )	/* 1999.08 Virtua Striker 2 version 2000 */
