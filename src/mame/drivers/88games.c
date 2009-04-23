@@ -71,42 +71,6 @@ static WRITE8_HANDLER( k88games_sh_irqtrigger_w )
 	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
 }
 
-/* handle fake button for speed cheat for players 1 and 2 */
-static READ8_HANDLER( cheat1_r )
-{
-	int res;
-	static int cheat = 0;
-	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
-
-	res = input_port_read(space->machine, "IN1");
-
-	if ((input_port_read(space->machine, "IN0") & 0x08) == 0)
-	{
-		res |= 0x55;
-		res &= bits[cheat];
-		cheat = (cheat+1)%4;
-	}
-	return res;
-}
-
-/* handle fake button for speed cheat for players 3 and 4 */
-static READ8_HANDLER( cheat2_r )
-{
-	int res;
-	static int cheat = 0;
-	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
-
-	res = input_port_read(space->machine, "IN2");
-
-	if ((input_port_read(space->machine, "IN0") & 0x08) == 0)
-	{
-		res |= 0x55;
-		res &= bits[cheat];
-		cheat = (cheat+1)%4;
-	}
-	return res;
-}
-
 static UINT8 speech_chip[8];
 static WRITE8_HANDLER( speech_control_w )
 {
@@ -135,10 +99,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x5f90, 0x5f90) AM_WRITE(k88games_sh_irqtrigger_w)
 	AM_RANGE(0x5f94, 0x5f94) AM_READ_PORT("IN0")
-//  AM_RANGE(0x5f95, 0x5f95) AM_READ_PORT("IN1")
-//  AM_RANGE(0x5f96, 0x5f96) AM_READ_PORT("IN2")
-	AM_RANGE(0x5f95, 0x5f95) AM_READ(cheat1_r)	/* P1 and P2 IO and handle fake button for cheating */
-	AM_RANGE(0x5f96, 0x5f96) AM_READ(cheat2_r)	/* P3 and P4 IO and handle fake button for cheating */
+	AM_RANGE(0x5f95, 0x5f95) AM_READ_PORT("IN1")
+	AM_RANGE(0x5f96, 0x5f96) AM_READ_PORT("IN2")
 	AM_RANGE(0x5f97, 0x5f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f9b, 0x5f9b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x5fc0, 0x5fcf) AM_WRITE(K051316_ctrl_0_w)
@@ -168,9 +130,7 @@ static INPUT_PORTS_START( 88games )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/* Fake button to press buttons 1 and 3 impossibly fast. Handle via cheat?_r */
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Run Like Hell (Cheat)") PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
