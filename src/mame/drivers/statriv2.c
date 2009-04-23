@@ -59,7 +59,7 @@ PROM use is unknown
 Issues:
  * statusbj - very glitchy, bad video, seems to spin
  * hangman - keys are weird, spinner is busted
- * 
+ *
 quaquiz2 - no inputs, needs NVRAM
 
 */
@@ -178,7 +178,7 @@ static VIDEO_UPDATE( statriv2 )
 static INTERRUPT_GEN( statriv2_interrupt )
 {
 	UINT8 new_coin = input_port_read(device->machine, "COIN");
-	
+
 	/* check the coin inputs once per frame */
 	latched_coin |= new_coin & (new_coin ^ last_coin);
 	last_coin = new_coin;
@@ -200,7 +200,7 @@ static READ8_HANDLER( question_data_r )
 	const UINT8 *qrom = memory_region(space->machine, "questions");
 	UINT32 qromsize = memory_region_length(space->machine, "questions");
 	UINT32 address;
-	
+
 	if (question_offset_high == 0xff)
 		question_offset[question_offset_low]++;
 
@@ -315,7 +315,7 @@ static INPUT_PORTS_START( statusbj )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
-//	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
+//  PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
 	PORT_DIPNAME( 0x40, 0x40, "DIP switch?" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -323,7 +323,7 @@ static INPUT_PORTS_START( statusbj )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
@@ -359,7 +359,7 @@ static INPUT_PORTS_START( funcsino )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
@@ -398,7 +398,7 @@ static INPUT_PORTS_START( hangman )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
@@ -435,7 +435,7 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
@@ -465,10 +465,10 @@ static INPUT_PORTS_START( quaquiz2 )
 	PORT_INCLUDE(supertr2)
 
 	PORT_MODIFY("IN0")
-//	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(1) PORT_NAME("Button A")
-//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_IMPULSE(1) PORT_NAME("Button B")
-//	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_IMPULSE(1) PORT_NAME("Button C")
-//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_IMPULSE(1) PORT_NAME("Button D")
+//  PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(1) PORT_NAME("Button A")
+//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_IMPULSE(1) PORT_NAME("Button B")
+//  PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_IMPULSE(1) PORT_NAME("Button C")
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_IMPULSE(1) PORT_NAME("Button D")
 	PORT_DIPNAME( 0x80, 0x00, "Port $20 bit 7" ) // coin3? if off it doesn't boot
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -490,7 +490,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sextriv )
 	PORT_INCLUDE(statriv2)
-	
+
  	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -982,71 +982,71 @@ static DRIVER_INIT( addr_lmh )
 static DRIVER_INIT( addr_lmhe )
 {
 	/***************************************************\
-	*                                                   *
-	* Super Trivia has some really weird protection on  *
-	* its question data. For some odd reason, the data  *
-	* itself is stored normally. Just load the ROMs up  *
-	* in a hex editor and OR everything with 0x40 to    *
-	* get normal text. However, the game itself expects *
-	* different data than what the question ROMs        *
-	* contain. Here is some pseudocode for what the     *
-	* game does for each character:                     *
-	*                                                   *
-	*     GetCharacter:                                 *
-	*     In A,($28)             // Read character in   *
-	*     Invert A               // Invert the bits     *
-	*     AND A,$1F              // Put low 5 bits of   *
-	*     B = Low 8 bits of addy // addy into high 8    *
-	*     C = 0                  // bits of BC pair     *
-	*     Call ArcaneFormula(BC) // Get XOR value       *
-	*     XOR A,C                // Apply it            *
-	*     Return                                        *
-	*                                                   *
-	*     ArcaneFormula(BC):                            *
-	*     ShiftR BC,1                                   *
-	*     DblShiftR BC,1                                *
-	*     DblShiftR BC,1                                *
-	*     DblShiftR BC,1                                *
-	*     ShiftR BC,1                                   *
-	*     Return                                        *
-	*                                                   *
-	* Essentially what ArcaneFormula does is to "fill   *
-	* out" an entire 8 bit number from only five bits.  *
-	* The way it does this is by putting bit 0 of the 5 *
-	* bits into bit 0 of the 8 bits, putting bit 1 into *
-	* bits 1 and 2, bit 2 into bits 3 and 4, bit 3 into *
-	* bits 5 and 6, and finally, bit 4 into bit         *
-	* position 7 of the 8-bit number. For example, for  *
-	* a value of FA, these would be the steps to get    *
-	* the XOR value:                                    *
-	*                                                   *
-	*                                 Address  XOR val  *
-	*     1: Take original number     11111010 00000000 *
-	*     2: AND with 0x1F            00011010 00000000 *
-	*     3: Put bit 0 in bit 0       0001101- 00000000 *
-	*     4: Double bit 1 in bits 1,2 000110-0 00000110 *
-	*     5: Double bit 2 in bits 3,4 00011-10 00000110 *
-	*     6: Double bit 3 in bits 5,6 0001-010 01100110 *
-	*     7: Put bit 4 in bit 7       000-1010 11100110 *
-	*                                                   *
-	* Since XOR operations are symmetrical, to make the *
-	* game end up receiving the correct value one only  *
-	* needs to invert the value and XOR it with the     *
-	* value derived from its address. The game will     *
-	* then de-invert the value when it tries to invert  *
-	* it, re-OR the value when it tries to XOR it, and  *
-	* we wind up with nice, working questions. If       *
-	* anyone can figure out a way to simplify the       *
-	* formula I'm using, PLEASE DO SO!                  *
-	*                                                   *
-	*                                       - MooglyGuy *
-	*                                                   *
-	\***************************************************/
+    *                                                   *
+    * Super Trivia has some really weird protection on  *
+    * its question data. For some odd reason, the data  *
+    * itself is stored normally. Just load the ROMs up  *
+    * in a hex editor and OR everything with 0x40 to    *
+    * get normal text. However, the game itself expects *
+    * different data than what the question ROMs        *
+    * contain. Here is some pseudocode for what the     *
+    * game does for each character:                     *
+    *                                                   *
+    *     GetCharacter:                                 *
+    *     In A,($28)             // Read character in   *
+    *     Invert A               // Invert the bits     *
+    *     AND A,$1F              // Put low 5 bits of   *
+    *     B = Low 8 bits of addy // addy into high 8    *
+    *     C = 0                  // bits of BC pair     *
+    *     Call ArcaneFormula(BC) // Get XOR value       *
+    *     XOR A,C                // Apply it            *
+    *     Return                                        *
+    *                                                   *
+    *     ArcaneFormula(BC):                            *
+    *     ShiftR BC,1                                   *
+    *     DblShiftR BC,1                                *
+    *     DblShiftR BC,1                                *
+    *     DblShiftR BC,1                                *
+    *     ShiftR BC,1                                   *
+    *     Return                                        *
+    *                                                   *
+    * Essentially what ArcaneFormula does is to "fill   *
+    * out" an entire 8 bit number from only five bits.  *
+    * The way it does this is by putting bit 0 of the 5 *
+    * bits into bit 0 of the 8 bits, putting bit 1 into *
+    * bits 1 and 2, bit 2 into bits 3 and 4, bit 3 into *
+    * bits 5 and 6, and finally, bit 4 into bit         *
+    * position 7 of the 8-bit number. For example, for  *
+    * a value of FA, these would be the steps to get    *
+    * the XOR value:                                    *
+    *                                                   *
+    *                                 Address  XOR val  *
+    *     1: Take original number     11111010 00000000 *
+    *     2: AND with 0x1F            00011010 00000000 *
+    *     3: Put bit 0 in bit 0       0001101- 00000000 *
+    *     4: Double bit 1 in bits 1,2 000110-0 00000110 *
+    *     5: Double bit 2 in bits 3,4 00011-10 00000110 *
+    *     6: Double bit 3 in bits 5,6 0001-010 01100110 *
+    *     7: Put bit 4 in bit 7       000-1010 11100110 *
+    *                                                   *
+    * Since XOR operations are symmetrical, to make the *
+    * game end up receiving the correct value one only  *
+    * needs to invert the value and XOR it with the     *
+    * value derived from its address. The game will     *
+    * then de-invert the value when it tries to invert  *
+    * it, re-OR the value when it tries to XOR it, and  *
+    * we wind up with nice, working questions. If       *
+    * anyone can figure out a way to simplify the       *
+    * formula I'm using, PLEASE DO SO!                  *
+    *                                                   *
+    *                                       - MooglyGuy *
+    *                                                   *
+    \***************************************************/
 
 	UINT8 *qrom = memory_region(machine, "questions");
 	UINT32 length = memory_region_length(machine, "questions");
 	UINT32 address;
-	
+
 	for (address = 0; address < length; address++)
 		qrom[address] ^= BITSWAP8(address, 4,3,3,2,2,1,1,0);
 

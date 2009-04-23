@@ -88,7 +88,7 @@ enum e_operand
 };
 
 
-typedef struct 
+typedef struct
 {
 	int		mnemonic;
 	int		operand1;
@@ -119,7 +119,7 @@ static const tlcs900inst mnemonic_80[256] =
 	{ _AND, _M, _I8 }, { _XOR, _M, _I8 }, { _OR, _M, _I8 }, { _CP, _M, _I8 },
 
 	/* 40 - 5F */
-	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, 
+	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
 	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
 	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
 	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
@@ -203,7 +203,7 @@ static const tlcs900inst mnemonic_88[256] =
 	{ _AND, _M, _I8 }, { _XOR, _M, _I8 }, { _OR, _M, _I8 }, { _CP, _M, _I8 },
 
 	/* 40 - 5F */
-	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, 
+	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
 	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
 	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
 	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
@@ -287,7 +287,7 @@ static const tlcs900inst mnemonic_90[256] =
 	{ _AND, _M, _I16 }, { _XOR, _M, _I16 }, { _OR, _M, _I16 }, { _CP, _M, _I16 },
 
 	/* 40 - 5F */
-	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, 
+	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
 	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
 	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
 	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
@@ -371,7 +371,7 @@ static const tlcs900inst mnemonic_98[256] =
 	{ _AND, _M, _I16 }, { _XOR, _M, _I16 }, { _OR, _M, _I16 }, { _CP, _M, _I16 },
 
 	/* 40 - 5F */
-	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, 
+	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
 	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
 	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
 	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
@@ -581,7 +581,7 @@ static const tlcs900inst mnemonic_b0[256] =
 	/* C0 - DF */
 	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
 	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
-	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, 
+	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
 	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
 	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
 	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
@@ -665,7 +665,7 @@ static const tlcs900inst mnemonic_b8[256] =
 	/* C0 - DF */
 	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
 	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
-	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, 
+	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
 	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
 	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
 	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
@@ -707,7 +707,7 @@ static const tlcs900inst mnemonic_c0[256] =
 	{ _AND, _M, _I8 }, { _XOR, _M, _I8 }, { _OR, _M, _I8 }, { _CP, _M, _I8 },
 
 	/* 40 - 5F */
-	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, 
+	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
 	{ _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M }, { _MUL, _MC16, _M },
 	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
 	{ _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M }, { _MULS, _MC16, _M },
@@ -817,7 +817,7 @@ static const tlcs900inst mnemonic_c8[256] =
 	{ _LD, _C8, _R }, { _LD, _C8, _R }, { _LD, _C8, _R }, { _LD, _C8, _R },
 	{ _LD, _C8, _R }, { _LD, _C8, _R }, { _LD, _C8, _R }, { _LD, _C8, _R },
 	{ _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R },
-	{ _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R }, 
+	{ _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R }, { _ADC, _C8, _R },
 	{ _LD, _R, _C8 }, { _LD, _R, _C8 }, { _LD, _R, _C8 }, { _LD, _R, _C8 },
 	{ _LD, _R, _C8 }, { _LD, _R, _C8 }, { _LD, _R, _C8 }, { _LD, _R, _C8 },
 
@@ -876,7 +876,7 @@ static const tlcs900inst mnemonic_d0[256] =
 	{ _AND, _M, _I16 }, { _XOR, _M, _I16 }, { _OR, _M, _I16 }, { _CP, _M, _I16 },
 
 	/* 40 - 5F */
-	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, 
+	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
 	{ _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M }, { _MUL, _C32, _M },
 	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
 	{ _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M }, { _MULS, _C32, _M },
@@ -985,7 +985,7 @@ static const tlcs900inst mnemonic_d8[256] =
 	{ _LD, _C16, _R }, { _LD, _C16, _R }, { _LD, _C16, _R }, { _LD, _C16, _R },
 	{ _LD, _C16, _R }, { _LD, _C16, _R }, { _LD, _C16, _R }, { _LD, _C16, _R },
 	{ _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R },
-	{ _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R }, 
+	{ _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R }, { _ADC, _C16, _R },
 	{ _LD, _R, _C16 }, { _LD, _R, _C16 }, { _LD, _R, _C16 }, { _LD, _R, _C16 },
 	{ _LD, _R, _C16 }, { _LD, _R, _C16 }, { _LD, _R, _C16 }, { _LD, _R, _C16 },
 
@@ -1153,7 +1153,7 @@ static const tlcs900inst mnemonic_e8[256] =
 	{ _LD, _C32, _R }, { _LD, _C32, _R }, { _LD, _C32, _R }, { _LD, _C32, _R },
 	{ _LD, _C32, _R }, { _LD, _C32, _R }, { _LD, _C32, _R }, { _LD, _C32, _R },
 	{ _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R },
-	{ _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R }, 
+	{ _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R }, { _ADC, _C32, _R },
 	{ _LD, _R, _C32 }, { _LD, _R, _C32 }, { _LD, _R, _C32 }, { _LD, _R, _C32 },
 	{ _LD, _R, _C32 }, { _LD, _R, _C32 }, { _LD, _R, _C32 }, { _LD, _R, _C32 },
 
@@ -1254,7 +1254,7 @@ static const tlcs900inst mnemonic_f0[256] =
 	/* C0 - DF */
 	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
 	{ _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M }, { _CHG, _I3, _M },
-	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, 
+	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
 	{ _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M }, { _BIT, _I3, _M },
 	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
 	{ _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M }, { _JP, _CC, _M },
@@ -1948,7 +1948,7 @@ CPU_DISASSEMBLE( tlcs900 )
 	case _CR32:
 		imm = oprom[ pos++ ];
 		switch( imm )
-		{   
+		{
 		case 0x00:
 			dst += sprintf( dst, " DMAS0" );
 			break;
@@ -1965,7 +1965,7 @@ CPU_DISASSEMBLE( tlcs900 )
 			dst += sprintf( dst, " DMAD0" );
 			break;
 		case 0x14:
-			dst += sprintf( dst, " DMAD1" );  
+			dst += sprintf( dst, " DMAD1" );
 			break;
 		case 0x18:
 			dst += sprintf( dst, " DMAD2" );
@@ -1976,7 +1976,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		default:
 			dst += sprintf( dst, " unknown" );
 			break;
-		}   
+		}
 		break;
 
 	case _D8:
@@ -2148,7 +2148,7 @@ CPU_DISASSEMBLE( tlcs900 )
 			dst += sprintf( dst, ",DMAD0" );
 			break;
 		case 0x14:
-			dst += sprintf( dst, ",DMAD1" ); 
+			dst += sprintf( dst, ",DMAD1" );
 			break;
 		case 0x18:
 			dst += sprintf( dst, ",DMAD2" );

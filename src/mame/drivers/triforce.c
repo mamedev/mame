@@ -74,7 +74,7 @@ ROM_END
 
 ROM_START( vs2002j )
 	TRIFORCE_BIOS
-	
+
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
@@ -103,7 +103,7 @@ PIC
 
 ROM_START( vs2002ex )
 	TRIFORCE_BIOS
-	
+
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -117,7 +117,7 @@ ROM_END
 
 ROM_START( avalons )
 	TRIFORCE_BIOS
-	
+
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -131,7 +131,7 @@ ROM_END
 
 ROM_START( gekpurya )
 	TRIFORCE_BIOS
-	
+
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -145,7 +145,7 @@ ROM_END
 
 ROM_START( tfupdate )
 	TRIFORCE_BIOS
-	
+
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -183,7 +183,7 @@ PIC
 
 ROM_START( vs4 )
 	TRIFORCE_BIOS
-	
+
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -215,7 +215,7 @@ PIC
 
 ROM_START( vs4j )
 	TRIFORCE_BIOS
-	
+
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -248,7 +248,7 @@ track03.bin 45150   549299  1185760800
 
 ROM_START( avalon13 )
 	TRIFORCE_BIOS
-	
+
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -282,7 +282,7 @@ track03.bin 45150   549299  1185760800
 
 ROM_START( avalon20 )
 	TRIFORCE_BIOS
-	
+
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
@@ -296,7 +296,7 @@ ROM_END
 
 ROM_START( vs42006 )
 	TRIFORCE_BIOS
-	
+
 
 	ROM_REGION( 0x20000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 

@@ -86,7 +86,7 @@ static void generic_access(const device_config *device, offs_t offset)
 			if (tms->selfload != NULL)
 			{
 				int cur;
-				
+
 				for (cur = 0; cur < 7; cur++)
 					tms9927_w(device, cur, tms->selfload[cur]);
 				for (cur = 0; cur < 1; cur++)
@@ -94,12 +94,12 @@ static void generic_access(const device_config *device, offs_t offset)
 			}
 			else
 				popmessage("tms9927: self-load initiated with no PROM!");
-			
+
 			/* processor self-load waits with reset enabled;
-			   non-processor just goes ahead */
+               non-processor just goes ahead */
 			tms->reset = (offset == 0x07);
 			break;
-		
+
 		case 0x0a:	/* Reset */
 			if (!tms->reset)
 			{
@@ -107,13 +107,13 @@ static void generic_access(const device_config *device, offs_t offset)
 				tms->reset = TRUE;
 			}
 			break;
-		
+
 		case 0x0b:	/* Up scroll */
 mame_printf_debug("Up scroll\n");
 			video_screen_update_now(tms->screen);
 			tms->start_datarow = (tms->start_datarow + 1) % DATA_ROWS_PER_FRAME(tms);
 			break;
-		
+
 		case 0x0e:	/* Start timing chain */
 			if (tms->reset)
 			{
@@ -129,7 +129,7 @@ mame_printf_debug("Up scroll\n");
 WRITE8_DEVICE_HANDLER( tms9927_w )
 {
 	tms9927_state *tms = get_safe_token(device);
-	
+
 	switch (offset)
 	{
 		case 0x00:	/* HORIZONTAL CHARACTER COUNT */
@@ -142,7 +142,7 @@ WRITE8_DEVICE_HANDLER( tms9927_w )
 			tms->reg[offset] = data;
 			recompute_parameters(tms, FALSE);
 			break;
-		
+
 		case 0x0c:	/* LOAD CURSOR CHARACTER ADDRESS */
 		case 0x0d:	/* LOAD CURSOR ROW ADDRESS */
 mame_printf_debug("Cursor address changed\n");
@@ -160,13 +160,13 @@ mame_printf_debug("Cursor address changed\n");
 READ8_DEVICE_HANDLER( tms9927_r )
 {
 	tms9927_state *tms = get_safe_token(device);
-	
+
 	switch (offset)
 	{
 		case 0x08:	/* READ CURSOR CHARACTER ADDRESS */
 		case 0x09:	/* READ CURSOR ROW ADDRESS */
 			return tms->reg[offset - 0x08 + 7];
-		
+
 		default:
 			generic_access(device, offset);
 			break;
@@ -194,7 +194,7 @@ int tms9927_cursor_bounds(const device_config *device, rectangle *bounds)
 	tms9927_state *tms = get_safe_token(device);
 	int cursorx = CURSOR_CHAR_ADDRESS(tms);
 	int cursory = CURSOR_ROW_ADDRESS(tms);
-	
+
 	bounds->min_x = cursorx * tms->hpixels_per_column;
 	bounds->max_x = bounds->min_x + tms->hpixels_per_column - 1;
 	bounds->min_y = cursory * SCANS_PER_DATA_ROW(tms);
@@ -209,24 +209,24 @@ static void recompute_parameters(tms9927_state *tms, int postload)
 	UINT16 offset_hpix, offset_vpix;
 	attoseconds_t refresh;
 	rectangle visarea;
-	
+
 	if (tms->intf == NULL || tms->reset)
 		return;
 
 	/* compute the screen sizes */
 	tms->total_hpix = HCOUNT(tms) * tms->hpixels_per_column;
 	tms->total_vpix = SCAN_LINES_PER_FRAME(tms);
-	
+
 	/* determine the visible area, avoid division by 0 */
 	tms->visible_hpix = CHARS_PER_DATA_ROW(tms) * tms->hpixels_per_column;
 	tms->visible_vpix = (LAST_DISP_DATA_ROW(tms) + 1) * SCANS_PER_DATA_ROW(tms);
-	
+
 	/* determine the horizontal/vertical offsets */
 	offset_hpix = HSYNC_DELAY(tms) * tms->hpixels_per_column;
 	offset_vpix = VERTICAL_DATA_START(tms);
 
 	mame_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d\n", tms->total_hpix, tms->total_vpix, tms->visible_hpix, tms->visible_vpix, offset_hpix, offset_vpix, SKEW_BITS(tms));
-	
+
 	/* see if it all makes sense */
 	tms->valid_config = TRUE;
 	if (tms->visible_hpix > tms->total_hpix || tms->visible_vpix > tms->total_vpix)
@@ -234,11 +234,11 @@ static void recompute_parameters(tms9927_state *tms, int postload)
 		tms->valid_config = FALSE;
 		logerror("tms9927: invalid visible size (%dx%d) versus total size (%dx%d)\n", tms->visible_hpix, tms->visible_vpix, tms->total_hpix, tms->total_vpix);
 	}
-	
+
 	/* update */
 	if (!tms->valid_config)
 		return;
-	
+
 	/* create a visible area */
 	/* fix me: how do the offsets fit in here? */
 	visarea.min_x = 0;
@@ -247,7 +247,7 @@ static void recompute_parameters(tms9927_state *tms, int postload)
 	visarea.max_y = tms->visible_vpix - 1;
 
 	refresh = HZ_TO_ATTOSECONDS(tms->clock) * tms->total_hpix * tms->total_vpix;
-	
+
 	video_screen_configure(tms->screen, tms->total_hpix, tms->total_vpix, &visarea, refresh);
 }
 
@@ -260,7 +260,7 @@ static DEVICE_START( tms9927 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	
+
 	tms->intf = (const tms9927_interface *)device->static_config;
 
 	if (tms->intf != NULL)
@@ -275,7 +275,7 @@ static DEVICE_START( tms9927 )
 		/* get the screen device */
 		tms->screen = devtag_get_device(device->machine, tms->intf->screen_tag);
 		assert(tms->screen != NULL);
-		
+
 		/* get the self-load PROM */
 		if (tms->intf->selfload_region != NULL)
 		{

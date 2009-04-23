@@ -226,7 +226,7 @@ INLINE UINT32 *get_reg32_current( tlcs900_state *cpustate, UINT8 reg )
 		return &cpustate->xiz.d;
 
 	/* XSP */
-	case 7: 
+	case 7:
 		/* TODO: Add selector for user/system stack pointer */
 		return &cpustate->xssp.d;
 	}
@@ -1165,18 +1165,18 @@ INLINE UINT32 div16( tlcs900_state *cpustate, UINT32 a, UINT16 b )
 		return ( a << 16 ) | ( ( a >> 16 ) ^ 0xffff );
 	}
 
-//	if ( a >= ( 0x02000000 * b ) ) {
-//		UINT32 diff = a - ( 0x02000000 * b );
-//		UINT32 range = 0x1000000 - b;
+//  if ( a >= ( 0x02000000 * b ) ) {
+//      UINT32 diff = a - ( 0x02000000 * b );
+//      UINT32 range = 0x1000000 - b;
 //
-//		result = ldiv( diff, range );
-//		result.quot = 0x1ffffff - result.quot;
-//		result.rem = result.rem + b;
-//	}
-//	else
-//	{
+//      result = ldiv( diff, range );
+//      result.quot = 0x1ffffff - result.quot;
+//      result.rem = result.rem + b;
+//  }
+//  else
+//  {
 		result = ldiv( a, b );
-//	}
+//  }
 
 	if ( result.quot > 0xffff )
 		cpustate->sr.b.l |= FLAG_VF;
@@ -3851,7 +3851,7 @@ static void _ZCF(tlcs900_state *cpustate)
 }
 
 
-typedef struct 
+typedef struct
 {
 	void (*opfunc)(tlcs900_state *cpustate);
 	int		operand1;
@@ -4161,7 +4161,7 @@ static const tlcs900inst mnemonic_80[256] =
 	{ _ANDBMI, _M, _I8, 7 }, { _XORBMI, _M, _I8, 7 }, { _ORBMI, _M, _I8, 7 }, { _CPBMI, _M, _I8, 6 },
 
 	/* 40 - 5F */
-	{ _MULBRM, _MC16, _M, 18}, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, 
+	{ _MULBRM, _MC16, _M, 18}, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 },
 	{ _MULBRM, _MC16, _M, 18}, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 },
 	{ _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 },
 	{ _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 },
@@ -4245,7 +4245,7 @@ static const tlcs900inst mnemonic_88[256] =
 	{ _ANDBMI, _M, _I8, 7 }, { _XORBMI, _M, _I8, 7 }, { _ORBMI, _M, _I8, 7 }, { _CPBMI, _M, _I8, 6 },
 
 	/* 40 - 5F */
-	{ _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, 
+	{ _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 },
 	{ _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 },
 	{ _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 },
 	{ _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 },
@@ -4329,7 +4329,7 @@ static const tlcs900inst mnemonic_90[256] =
 	{ _ANDWMI, _M, _I16, 8 }, { _XORWMI, _M, _I16, 8 }, { _ORWMI, _M, _I16, 8 }, { _CPWMI, _M, _I16, 6 },
 
 	/* 40 - 5F */
-	{ _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, 
+	{ _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 },
 	{ _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 },
 	{ _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 },
 	{ _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 },
@@ -4413,7 +4413,7 @@ static const tlcs900inst mnemonic_98[256] =
 	{ _ANDWMI, _M, _I16, 8 }, { _XORWMI, _M, _I16, 8 }, { _ORWMI, _M, _I16, 8 }, { _CPWMI, _M, _I16, 6 },
 
 	/* 40 - 5F */
-	{ _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, 
+	{ _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 },
 	{ _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 },
 	{ _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 },
 	{ _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 },
@@ -4623,7 +4623,7 @@ static const tlcs900inst mnemonic_b0[256] =
 	/* C0 - DF */
 	{ _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 },
 	{ _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 },
-	{ _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, 
+	{ _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 },
 	{ _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 },
 	{ _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 },
 	{ _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 },
@@ -4707,7 +4707,7 @@ static const tlcs900inst mnemonic_b8[256] =
 	/* C0 - DF */
 	{ _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 },
 	{ _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 },
-	{ _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, 
+	{ _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 },
 	{ _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 }, { _BITBIM, _I3, _M, 8 },
 	{ _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 },
 	{ _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 },
@@ -4749,7 +4749,7 @@ static const tlcs900inst mnemonic_c0[256] =
 	{ _ANDBMI, _M, _I8, 7 }, { _XORBMI, _M, _I8, 7 }, { _ORBMI, _M, _I8, 7 }, { _CPBMI, _M, _I8, 6 },
 
 	/* 40 - 5F */
-	{ _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, 
+	{ _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 },
 	{ _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 }, { _MULBRM, _MC16, _M, 18 },
 	{ _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 },
 	{ _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 }, { _MULSBRM, _MC16, _M, 18 },
@@ -4858,7 +4858,7 @@ static const tlcs900inst mnemonic_c8[256] =
 	{ _LDBRR, _C8, _R, 4 }, { _LDBRR, _C8, _R, 4 }, { _LDBRR, _C8, _R, 4 }, { _LDBRR, _C8, _R, 4 },
 	{ _LDBRR, _C8, _R, 4 }, { _LDBRR, _C8, _R, 4 }, { _LDBRR, _C8, _R, 4 }, { _LDBRR, _C8, _R, 4 },
 	{ _ADCBRR, _C8, _R, 4 }, { _ADCBRR, _C8, _R, 4 }, { _ADCBRR, _C8, _R, 4 }, { _ADCBRR, _C8, _R, 4 },
-	{ _ADCBRR, _C8, _R, 4 }, { _ADCBRR, _C8, _R, 4 }, { _ADCBRR, _C8, _R, 4 }, { _ADCBRR, _C8, _R, 4 }, 
+	{ _ADCBRR, _C8, _R, 4 }, { _ADCBRR, _C8, _R, 4 }, { _ADCBRR, _C8, _R, 4 }, { _ADCBRR, _C8, _R, 4 },
 	{ _LDBRR, _R, _C8, 4 }, { _LDBRR, _R, _C8, 4 }, { _LDBRR, _R, _C8, 4 }, { _LDBRR, _R, _C8, 4 },
 	{ _LDBRR, _R, _C8, 4 }, { _LDBRR, _R, _C8, 4 }, { _LDBRR, _R, _C8, 4 }, { _LDBRR, _R, _C8, 4 },
 
@@ -4917,7 +4917,7 @@ static const tlcs900inst mnemonic_d0[256] =
 	{ _ANDWMI, _M, _I16, 8 }, { _XORWMI, _M, _I16, 8 }, { _ORWMI, _M, _I16, 8 }, { _CPWMI, _M, _I16, 6 },
 
 	/* 40 - 5F */
-	{ _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, 
+	{ _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 },
 	{ _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 }, { _MULWRM, _C32, _M, 26 },
 	{ _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 },
 	{ _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 }, { _MULSWRM, _C32, _M, 26 },
@@ -5026,7 +5026,7 @@ static const tlcs900inst mnemonic_d8[256] =
 	{ _LDWRR, _C16, _R, 4 }, { _LDWRR, _C16, _R, 4 }, { _LDWRR, _C16, _R, 4 }, { _LDWRR, _C16, _R, 4 },
 	{ _LDWRR, _C16, _R, 4 }, { _LDWRR, _C16, _R, 4 }, { _LDWRR, _C16, _R, 4 }, { _LDWRR, _C16, _R, 4 },
 	{ _ADCWRR, _C16, _R, 4 }, { _ADCWRR, _C16, _R, 4 }, { _ADCWRR, _C16, _R, 4 }, { _ADCWRR, _C16, _R, 4 },
-	{ _ADCWRR, _C16, _R, 4 }, { _ADCWRR, _C16, _R, 4 }, { _ADCWRR, _C16, _R, 4 }, { _ADCWRR, _C16, _R, 4 }, 
+	{ _ADCWRR, _C16, _R, 4 }, { _ADCWRR, _C16, _R, 4 }, { _ADCWRR, _C16, _R, 4 }, { _ADCWRR, _C16, _R, 4 },
 	{ _LDWRR, _R, _C16, 4 }, { _LDWRR, _R, _C16, 4 }, { _LDWRR, _R, _C16, 4 }, { _LDWRR, _R, _C16, 4 },
 	{ _LDWRR, _R, _C16, 4 }, { _LDWRR, _R, _C16, 4 }, { _LDWRR, _R, _C16, 4 }, { _LDWRR, _R, _C16, 4 },
 
@@ -5194,7 +5194,7 @@ static const tlcs900inst mnemonic_e8[256] =
 	{ _LDLRR, _C32, _R, 4 }, { _LDLRR, _C32, _R, 4 }, { _LDLRR, _C32, _R, 4 }, { _LDLRR, _C32, _R, 4 },
 	{ _LDLRR, _C32, _R, 4 }, { _LDLRR, _C32, _R, 4 }, { _LDLRR, _C32, _R, 4 }, { _LDLRR, _C32, _R, 4 },
 	{ _ADCLRR, _C32, _R, 7 }, { _ADCLRR, _C32, _R, 7 }, { _ADCLRR, _C32, _R, 7 }, { _ADCLRR, _C32, _R, 7 },
-	{ _ADCLRR, _C32, _R, 7 }, { _ADCLRR, _C32, _R, 7 }, { _ADCLRR, _C32, _R, 7 }, { _ADCLRR, _C32, _R, 7 }, 
+	{ _ADCLRR, _C32, _R, 7 }, { _ADCLRR, _C32, _R, 7 }, { _ADCLRR, _C32, _R, 7 }, { _ADCLRR, _C32, _R, 7 },
 	{ _LDLRR, _R, _C32, 4 }, { _LDLRR, _R, _C32, 4 }, { _LDLRR, _R, _C32, 4 }, { _LDLRR, _R, _C32, 4 },
 	{ _LDLRR, _R, _C32, 4 }, { _LDLRR, _R, _C32, 4 }, { _LDLRR, _R, _C32, 4 }, { _LDLRR, _R, _C32, 4 },
 
@@ -5295,7 +5295,7 @@ static const tlcs900inst mnemonic_f0[256] =
 	/* C0 - DF */
 	{ _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 },
 	{ _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 }, { _CHGBIM, _I3, _M, 8 },
-	{ _BITBIM, _I3, _M, 4 }, { _BITBIM, _I3, _M, 4 }, { _BITBIM, _I3, _M, 4 }, { _BITBIM, _I3, _M, 4 }, 
+	{ _BITBIM, _I3, _M, 4 }, { _BITBIM, _I3, _M, 4 }, { _BITBIM, _I3, _M, 4 }, { _BITBIM, _I3, _M, 4 },
 	{ _BITBIM, _I3, _M, 4 }, { _BITBIM, _I3, _M, 4 }, { _BITBIM, _I3, _M, 4 }, { _BITBIM, _I3, _M, 4 },
 	{ _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 },
 	{ _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 }, { _JPM, _CC, _M, 4 },

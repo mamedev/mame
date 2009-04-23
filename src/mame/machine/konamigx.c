@@ -2117,14 +2117,14 @@ WRITE32_HANDLER(fantjour_dma_w)
 	COMBINE_DATA(fantjour_dma + offset);
 	if(!offset && ACCESSING_BITS_24_31) {
 		UINT32 sa = fantjour_dma[1];
-		//		UINT16 ss = (fantjour_dma[2] & 0xffff0000) >> 16;
-		//		UINT32 sb = ((fantjour_dma[2] & 0xffff) << 16) | ((fantjour_dma[3] & 0xffff0000) >> 16);
+		//      UINT16 ss = (fantjour_dma[2] & 0xffff0000) >> 16;
+		//      UINT32 sb = ((fantjour_dma[2] & 0xffff) << 16) | ((fantjour_dma[3] & 0xffff0000) >> 16);
 
 		UINT32 da = ((fantjour_dma[3] & 0xffff) << 16) | ((fantjour_dma[4] & 0xffff0000) >> 16);
-		//		UINT16 ds = fantjour_dma[4] & 0xffff;
+		//      UINT16 ds = fantjour_dma[4] & 0xffff;
 		UINT32 db = fantjour_dma[5];
 
-		//		UINT8 sz1 = fantjour_dma[0] >> 8;
+		//      UINT8 sz1 = fantjour_dma[0] >> 8;
 		UINT8 sz2 = fantjour_dma[0] >> 16;
 		UINT8 mode = fantjour_dma[0] >> 24;
 
