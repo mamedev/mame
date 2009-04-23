@@ -1367,7 +1367,8 @@ static void registers_view_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 4:
-						sprintf(dummy, "frame:%-6d", (UINT32)video_screen_get_frame_number(screen));
+						if (screen != NULL)
+							sprintf(dummy, "frame:%-6d", (UINT32)video_screen_get_frame_number(screen));
 						break;
 
 					case MAX_REGS + 5:
