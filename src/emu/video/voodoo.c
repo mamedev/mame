@@ -4643,19 +4643,6 @@ static DEVICE_RESET( voodoo )
 
 
 /*-------------------------------------------------
-    device set info callback
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( voodoo )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
     device get info callback
 -------------------------------------------------*/
 
@@ -4670,7 +4657,6 @@ DEVICE_GET_INFO( voodoo )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(voodoo); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(voodoo); break;
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(voodoo); break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(voodoo);break;

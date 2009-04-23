@@ -491,15 +491,6 @@ static DEVICE_RESET( riot6532 )
 }
 
 
-static DEVICE_SET_INFO( riot6532 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
 DEVICE_GET_INFO( riot6532 )
 {
 	switch (state)
@@ -510,7 +501,6 @@ DEVICE_GET_INFO( riot6532 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(riot6532); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(riot6532);break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(riot6532);break;

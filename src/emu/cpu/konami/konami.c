@@ -504,6 +504,13 @@ static CPU_EXECUTE( konami )
 }
 
 
+void konami_configure_set_lines(const device_config *device, konami_set_lines_func func)
+{
+	konami_state *cpustate = get_safe_token(device);
+	cpustate->setlines_callback = func;
+}
+
+
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
@@ -529,9 +536,6 @@ static CPU_SET_INFO( konami )
 		case CPUINFO_INT_REGISTER + KONAMI_X:			X = info->i;							break;
 		case CPUINFO_INT_REGISTER + KONAMI_Y:			Y = info->i;							break;
 		case CPUINFO_INT_REGISTER + KONAMI_DP:			DP = info->i;							break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_KONAMI_SETLINES_CALLBACK:		cpustate->setlines_callback = (konami_set_lines_func)info->f; break;
 	}
 }
 
@@ -595,7 +599,6 @@ CPU_GET_INFO( konami )
 		case CPUINFO_FCT_BURN:							info->burn = NULL;								break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(konami);break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
-		case CPUINFO_FCT_KONAMI_SETLINES_CALLBACK:		info->f = (genf *)cpustate->setlines_callback;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "KONAMI");				break;

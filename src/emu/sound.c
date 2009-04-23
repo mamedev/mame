@@ -387,7 +387,6 @@ DEVICE_GET_INFO( sound )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(sound); 	break;
-		case DEVINFO_FCT_SET_INFO:				info->set_info = NULL;						break;
 		case DEVINFO_FCT_CUSTOM_CONFIG:			info->custom_config = DEVICE_CUSTOM_CONFIG_NAME(sound);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

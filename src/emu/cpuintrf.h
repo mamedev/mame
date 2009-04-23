@@ -349,7 +349,8 @@ enum
 #define cpu_get_flags_string(cpu)			device_get_info_string(cpu, CPUINFO_STR_FLAGS)
 #define cpu_get_irq_string(cpu, irq)		device_get_info_string(cpu, CPUINFO_STR_IRQ_STATE + (irq))
 #define cpu_get_reg_string(cpu, reg)		device_get_info_string(cpu, CPUINFO_STR_REGISTER + (reg))
-#define cpu_set_reg(cpu, reg, val)			device_set_info_int(cpu, CPUINFO_INT_REGISTER + (reg), (val))
+
+#define cpu_set_reg(cpu, reg, val)			cpu_set_info(cpu, CPUINFO_INT_REGISTER + (reg), (val))
 
 
 
@@ -448,5 +449,6 @@ union _cpuinfo
 };
 
 
+void cpu_set_info(const device_config *device, UINT32 state, UINT64 value);
 
 #endif	/* __CPUINTRF_H__ */

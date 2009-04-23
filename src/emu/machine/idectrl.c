@@ -1880,19 +1880,6 @@ static DEVICE_RESET( ide_controller )
 
 
 /*-------------------------------------------------
-    device set info callback
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( ide_controller )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
     device get info callback
 -------------------------------------------------*/
 
@@ -1906,7 +1893,6 @@ DEVICE_GET_INFO( ide_controller )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(ide_controller); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ide_controller); break;
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(ide_controller); break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ide_controller);break;

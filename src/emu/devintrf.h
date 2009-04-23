@@ -68,8 +68,7 @@ enum
 	/* --- the following bits of info are returned as pointers to functions --- */
 	DEVINFO_FCT_FIRST = 0x20000,
 
-		DEVINFO_FCT_SET_INFO = DEVINFO_FCT_FIRST,		/* R/O: device_set_info_func */
-		DEVINFO_FCT_START,								/* R/O: device_start_func */
+		DEVINFO_FCT_START = DEVINFO_FCT_FIRST,			/* R/O: device_start_func */
 		DEVINFO_FCT_STOP,								/* R/O: device_stop_func */
 		DEVINFO_FCT_RESET,								/* R/O: device_reset_func */
 		DEVINFO_FCT_EXECUTE,							/* R/O: device_execute_func */
@@ -104,10 +103,6 @@ enum
 #define DEVICE_GET_INFO_NAME(name)	device_get_info_##name
 #define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(const device_config *device, UINT32 state, deviceinfo *info)
 #define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(device, state, info)
-
-#define DEVICE_SET_INFO_NAME(name)	device_set_info_##name
-#define DEVICE_SET_INFO(name)		void DEVICE_SET_INFO_NAME(name)(const device_config *device, UINT32 state, const deviceinfo *info)
-#define DEVICE_SET_INFO_CALL(name)	DEVICE_SET_INFO_NAME(name)(device, state, info)
 
 #define DEVICE_START_NAME(name)		device_start_##name
 #define DEVICE_START(name)			void DEVICE_START_NAME(name)(const device_config *device)
@@ -148,10 +143,6 @@ enum
 #define devtag_get_info_fct(mach,tag,state)					device_get_info_fct(devtag_get_device(mach, tag), state)
 #define devtag_get_info_string(mach,tag,state)				device_get_info_string(devtag_get_device(mach, tag), state)
 
-#define devtag_set_info_int(mach,tag,state,data)			device_set_info_int(devtag_get_device(mach, tag), state, data)
-#define devtag_set_info_ptr(mach,tag,state,data)			device_set_info_ptr(devtag_get_device(mach, tag), state, data)
-#define devtag_set_info_fct(mach,tag,state,data)			device_set_info_fct(devtag_get_device(mach, tag), state, data)
-
 
 /* shorthand for getting standard data about device types */
 #define devtype_get_name(type)								devtype_get_info_string(type, DEVINFO_STR_NAME)
@@ -189,7 +180,6 @@ typedef struct _device_config device_config;
 
 /* device interface function types */
 typedef void (*device_get_info_func)(const device_config *device, UINT32 state, deviceinfo *info);
-typedef void (*device_set_info_func)(const device_config *device, UINT32 state, const deviceinfo *info);
 typedef void (*device_start_func)(const device_config *device);
 typedef void (*device_stop_func)(const device_config *device);
 typedef INT32 (*device_execute_func)(const device_config *device, INT32 clocks);
@@ -211,7 +201,6 @@ union _deviceinfo
 	genf *  				f;						/* generic function pointers */
 	char *					s;						/* generic strings */
 
-	device_set_info_func 	set_info;				/* DEVINFO_FCT_SET_INFO */
 	device_start_func		start;					/* DEVINFO_FCT_START */
 	device_stop_func		stop;					/* DEVINFO_FCT_STOP */
 	device_reset_func		reset;					/* DEVINFO_FCT_RESET */
@@ -236,7 +225,6 @@ struct _device_config
 	/* device properties (always valid) */
 	device_type				type;					/* device type */
 	device_class			devclass;				/* device class */
-	device_set_info_func 	set_info;				/* quick pointer to set_info callback */
 
 	/* device configuration (always valid) */
 	UINT32					clock;					/* device clock */
@@ -367,19 +355,6 @@ genf *devtype_get_info_fct(device_type type, UINT32 state);
 
 /* return a string value from a device type (does not need to be allocated) */
 const char *devtype_get_info_string(device_type type, UINT32 state);
-
-
-
-/* ----- device information setters ----- */
-
-/* set an integer state value for an allocated device */
-void device_set_info_int(const device_config *device, UINT32 state, INT64 data);
-
-/* set a pointer state value for an allocated device */
-void device_set_info_ptr(const device_config *device, UINT32 state, void *data);
-
-/* set a function pointer state value for an allocated device */
-void device_set_info_fct(const device_config *device, UINT32 state, genf *data);
 
 
 #endif	/* __DEVINTRF_H__ */

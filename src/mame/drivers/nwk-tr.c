@@ -1093,9 +1093,6 @@ static DRIVER_INIT(nwktr)
 	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
 
-//  device_set_info_fct(machine->cpu[0], CPUINFO_FCT_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
-//  device_set_info_fct(machine->cpu[0], CPUINFO_FCT_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
-
 	adc1213x_init(0, adc12138_input_callback);
 	lanc2_init();
 }

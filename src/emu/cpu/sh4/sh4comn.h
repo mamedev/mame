@@ -144,10 +144,7 @@ void sh4_syncronize_register_bank(SH4 *sh4, int to);
 void sh4_swap_fp_registers(SH4 *sh4);
 void sh4_default_exception_priorities(SH4 *sh4); // setup default priorities for exceptions
 void sh4_parse_configuration(SH4 *sh4, const struct sh4_config *conf);
-void sh4_dma_ddt(SH4 *sh4, struct sh4_ddt_dma *s);
 void sh4_set_irq_line(SH4 *sh4, int irqline, int state); // set state of external interrupt line
-void sh4_set_frt_input(const device_config *device, int state);
-void sh4_set_irln_input(const device_config *device, int value);
 #ifdef LSB_FIRST
 void sh4_swap_fp_couples(SH4 *sh4);
 #endif

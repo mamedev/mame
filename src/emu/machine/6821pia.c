@@ -1319,18 +1319,6 @@ int pia6821_get_irq_b(const device_config *device)
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( pia )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( pia )
-{
-	switch(state)
-	{
-	}
-}
-
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( pia6821 )
 -------------------------------------------------*/
 
@@ -1344,7 +1332,6 @@ DEVICE_GET_INFO(pia6821)
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(pia); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(pia);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(pia);		break;

@@ -885,15 +885,6 @@ static DEVICE_VALIDITY_CHECK( mc6845 )
 }
 
 
-static DEVICE_SET_INFO( mc6845 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
 DEVICE_GET_INFO( mc6845 )
 {
 	switch (state)
@@ -904,7 +895,6 @@ DEVICE_GET_INFO( mc6845 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(mc6845); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(mc6845);	break;

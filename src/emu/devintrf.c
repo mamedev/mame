@@ -122,7 +122,6 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	/* populate device properties */
 	device->type = type;
 	device->devclass = (device_class)(INT32)devtype_get_info_int(type, DEVINFO_INT_CLASS);
-	device->set_info = (device_set_info_func)devtype_get_info_fct(type, DEVINFO_FCT_SET_INFO);
 	device->execute = NULL;
 
 	/* populate device configuration */
@@ -856,72 +855,7 @@ const char *devtype_get_info_string(device_type type, UINT32 state)
 
 
 /***************************************************************************
-    DEVICE INFORMATION SETTERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    device_set_info_int - set an integer state
-    value for an allocated device
--------------------------------------------------*/
-
-void device_set_info_int(const device_config *device, UINT32 state, INT64 data)
-{
-	deviceinfo info;
-
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type != NULL);
-	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
-
-	/* set the value */
-	info.i = data;
-	(*device->set_info)(device, state, &info);
-}
-
-
-/*-------------------------------------------------
-    device_set_info_ptr - set a pointer state
-    value for an allocated device
--------------------------------------------------*/
-
-void device_set_info_ptr(const device_config *device, UINT32 state, void *data)
-{
-	deviceinfo info;
-
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type != NULL);
-	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
-
-	/* set the value */
-	info.p = data;
-	(*device->set_info)(device, state, &info);
-}
-
-
-/*-------------------------------------------------
-    device_set_info_fct - set a function pointer
-    state value for an allocated device
--------------------------------------------------*/
-
-void device_set_info_fct(const device_config *device, UINT32 state, genf *data)
-{
-	deviceinfo info;
-
-	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type != NULL);
-	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
-
-	/* set the value */
-	info.f = data;
-	(*device->set_info)(device, state, &info);
-}
-
-
-
-/***************************************************************************
-    DEVICE INFORMATION SETTERS
+    DEFAULT HANDLERS
 ***************************************************************************/
 
 /*-------------------------------------------------

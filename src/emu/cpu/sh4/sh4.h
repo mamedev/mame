@@ -56,18 +56,6 @@ enum
 
 enum
 {
-	CPUINFO_INT_SH4_IRLn_INPUT = CPUINFO_INT_CPU_SPECIFIC,
-	CPUINFO_INT_SH4_FRT_INPUT
-};
-
-enum
-{
-	CPUINFO_FCT_SH4_FTCSR_READ_CALLBACK = CPUINFO_FCT_CPU_SPECIFIC,
-	CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA = CPUINFO_PTR_CPU_SPECIFIC,
-};
-
-enum
-{
 	SH4_IOPORT_16=8*0,
 	SH4_IOPORT_4=8*1,
 	// future use
@@ -101,6 +89,8 @@ struct sh4_ddt_dma
 	int mode;
 };
 
+typedef void (*sh4_ftcsr_callback)(UINT32);
+
 extern CPU_GET_INFO( sh4 );
 #define CPU_SH4 CPU_GET_INFO_NAME( sh4 )
 
@@ -108,6 +98,11 @@ WRITE32_HANDLER( sh4_internal_w );
 READ32_HANDLER( sh4_internal_r );
 
 extern unsigned DasmSH4( char *dst, unsigned pc, UINT16 opcode );
+
+void sh4_set_frt_input(const device_config *device, int state);
+void sh4_set_irln_input(const device_config *device, int value);
+void sh4_set_ftcsr_callback(const device_config *device, sh4_ftcsr_callback callback);
+void sh4_dma_ddt(const device_config *device, struct sh4_ddt_dma *s);
 
 #endif /* __SH4_H__ */
 

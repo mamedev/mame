@@ -6446,7 +6446,7 @@ static void megadriv_init_common(running_machine *machine)
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 
-	device_set_info_fct(machine->cpu[0], CPUINFO_FCT_M68K_TAS_CALLBACK, (void *)megadriv_tas_callback);
+	m68k_set_tas_callback(machine->cpu[0], megadriv_tas_callback);
 
 	if ((machine->gamedrv->ipt==ipt_megadri6) || (machine->gamedrv->ipt==ipt_ssf2ghw))
 	{

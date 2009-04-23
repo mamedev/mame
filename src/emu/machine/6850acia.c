@@ -819,19 +819,6 @@ void acia6850_set_tx_clock(const device_config *device, int clock)
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( acia6850 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( acia6850 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( acia6850 )
 -------------------------------------------------*/
 
@@ -845,7 +832,6 @@ DEVICE_GET_INFO( acia6850 )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(acia6850); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(acia6850);		break;
 		case DEVINFO_FCT_STOP:							/* Nothing */									break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(acia6850);		break;

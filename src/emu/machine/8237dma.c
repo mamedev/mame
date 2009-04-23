@@ -417,13 +417,6 @@ static DEVICE_RESET( dma8237 ) {
 }
 
 
-static DEVICE_SET_INFO( dma8237 ) {
-	switch ( state ) {
-		/* no parameters to set */
-	}
-}
-
-
 DEVICE_GET_INFO( dma8237 ) {
 	switch ( state ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -432,7 +425,6 @@ DEVICE_GET_INFO( dma8237 ) {
 		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:					info->set_info = DEVICE_SET_INFO_NAME(dma8237);	break;
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(dma8237);	break;
 		case DEVINFO_FCT_STOP:						/* nothing */								break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(dma8237);	break;

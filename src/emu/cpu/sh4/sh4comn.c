@@ -1185,12 +1185,13 @@ void sh4_common_init(const device_config *device)
 	sh4->m = (UINT32 *)auto_malloc(16384*4);
 }
 
-void sh4_dma_ddt(SH4 *sh4, struct sh4_ddt_dma *s)
+void sh4_dma_ddt(const device_config *device, struct sh4_ddt_dma *s)
 {
-UINT32 chcr;
-UINT32 *p32bits;
-UINT64 *p32bytes;
-UINT32 pos,len,siz;
+	SH4 *sh4 = get_safe_token(device);
+	UINT32 chcr;
+	UINT32 *p32bits;
+	UINT64 *p32bytes;
+	UINT32 pos,len,siz;
 
 	if (sh4->dma_timer_active[s->channel])
 		return;

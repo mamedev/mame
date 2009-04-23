@@ -1273,19 +1273,6 @@ static DEVICE_START( timer )
 
 
 /*-------------------------------------------------
-    timer_set_info - device set info callback
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( timer )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
     timer_get_info - device get info callback
 -------------------------------------------------*/
 
@@ -1299,7 +1286,6 @@ DEVICE_GET_INFO( timer )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_TIMER;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(timer); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(timer); break;
 		case DEVINFO_FCT_STOP:					/* Nothing */							break;
 		case DEVINFO_FCT_RESET:					/* Nothing */							break;

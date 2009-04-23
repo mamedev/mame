@@ -627,7 +627,7 @@ static DEVICE_STOP( cpu )
     cpu_set_info - device set info callback
 -------------------------------------------------*/
 
-static DEVICE_SET_INFO( cpu )
+void cpu_set_info(const device_config *device, UINT32 state, UINT64 value)
 {
 	cpu_class_header *header = cpu_get_class_header(device);
 	cpu_set_info_func set_info;
@@ -652,25 +652,17 @@ static DEVICE_SET_INFO( cpu )
 				{
 					if (state >= CPUINFO_INT_REGISTER && state <= CPUINFO_INT_REGISTER_LAST)
 					{
-						set_register_value(device, classdata->state->baseptr, classdata->regstate[state - CPUINFO_INT_REGISTER], info->i);
+						set_register_value(device, classdata->state->baseptr, classdata->regstate[state - CPUINFO_INT_REGISTER], value);
 						return;
 					}
 				}
 			}
 
 			/* integer data */
+			assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
 			if (state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST)
 			{
-				cinfo.i = info->i;
-				(*set_info)(device, state, &cinfo);
-			}
-
-			/* pointer data */
-			else if ((state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST) ||
-					 (state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST) ||
-					 (state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST))
-			{
-				cinfo.p = info->p;
+				cinfo.i = value;
 				(*set_info)(device, state, &cinfo);
 			}
 			break;
@@ -701,7 +693,6 @@ DEVICE_GET_INFO( cpu )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_CPU_CHIP;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(cpu); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(cpu); 		break;
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(cpu); 		break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(cpu); 		break;
@@ -1515,17 +1506,17 @@ static TIMER_CALLBACK( empty_event_queue )
 			switch (state)
 			{
 				case PULSE_LINE:
-					device_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
-					device_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
+					cpu_set_info(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
+					cpu_set_info(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
 					break;
 
 				case HOLD_LINE:
 				case ASSERT_LINE:
-					device_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
+					cpu_set_info(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
 					break;
 
 				case CLEAR_LINE:
-					device_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
+					cpu_set_info(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
 					break;
 
 				default:
@@ -1562,7 +1553,7 @@ static IRQ_CALLBACK( standard_irq_callback )
 	if (inputline->curstate == HOLD_LINE)
 	{
 		LOG(("->set_irq_line('%s',%d,%d)\n", device->tag, irqline, CLEAR_LINE));
-		device_set_info_int(device, CPUINFO_INT_INPUT_STATE + irqline, CLEAR_LINE);
+		cpu_set_info(device, CPUINFO_INT_INPUT_STATE + irqline, CLEAR_LINE);
 		inputline->curstate = CLEAR_LINE;
 	}
 

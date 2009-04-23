@@ -61,14 +61,6 @@ enum
 	M68K_GENPCBASE = REG_GENPCBASE
 };
 
-enum
-{
-	CPUINFO_FCT_M68K_RESET_CALLBACK = CPUINFO_FCT_CPU_SPECIFIC,
-	CPUINFO_FCT_M68K_CMPILD_CALLBACK,
-	CPUINFO_FCT_M68K_RTE_CALLBACK,
-	CPUINFO_FCT_M68K_TAS_CALLBACK
-};
-
 typedef void (*m68k_bkpt_ack_func)(const device_config *device, UINT32 data);
 typedef void (*m68k_reset_func)(const device_config *device);
 typedef void (*m68k_cmpild_func)(const device_config *device, UINT32 data, UINT8 reg);
@@ -93,5 +85,10 @@ CPU_GET_INFO( m68040 );
 void m68k_set_encrypted_opcode_range(const device_config *device, offs_t start, offs_t end);
 
 unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
+
+void m68k_set_reset_callback(const device_config *device, m68k_reset_func callback);
+void m68k_set_cmpild_callback(const device_config *device, m68k_cmpild_func callback);
+void m68k_set_rte_callback(const device_config *device, m68k_rte_func callback);
+void m68k_set_tas_callback(const device_config *device, m68k_tas_func callback);
 
 #endif /* __M68000_H__ */

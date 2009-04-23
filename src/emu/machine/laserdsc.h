@@ -25,6 +25,7 @@
 /* types of players supported */
 enum
 {
+	LASERDISC_TYPE_UNKNOWN,
 	LASERDISC_TYPE_PIONEER_PR7820,			/* Pioneer PR-7820 */
 	LASERDISC_TYPE_PIONEER_PR8210,			/* Pioneer PR-8210 / LD-V1100 */
 	LASERDISC_TYPE_SIMUTREK_SPECIAL,		/* Pioneer PR-8210 with mods */
@@ -53,12 +54,6 @@ enum
 #define LASERDISC_CODE_LINE17		17			/* 24-bit line 17 code */
 #define LASERDISC_CODE_LINE18		18			/* 24-bit line 18 code */
 #define LASERDISC_CODE_LINE1718		1718		/* 24-bit best of line 17/18 code */
-
-/* device configuration */
-enum
-{
-	LDINFO_INT_TYPE = DEVINFO_INT_DEVICE_SPECIFIC
-};
 
 
 
@@ -227,6 +222,10 @@ DEVICE_GET_INFO( laserdisc );
 /* audio get info callback */
 #define SOUND_LASERDISC DEVICE_GET_INFO_NAME(laserdisc_sound)
 DEVICE_GET_INFO( laserdisc_sound );
+
+/* type setter */
+int laserdisc_get_type(const device_config *device);
+void laserdisc_set_type(const device_config *device, int type);
 
 
 #endif 	/* __LASERDSC_H__ */

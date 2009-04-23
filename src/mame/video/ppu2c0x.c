@@ -1535,7 +1535,6 @@ DEVICE_GET_INFO(ppu2c02)
 		case PPU2C0XINFO_INT_SCANLINES_PER_FRAME:		info->i = PPU_NTSC_SCANLINES_PER_FRAME;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						/* Nothing */								break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ppu2c0x);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(ppu2c0x);	break;

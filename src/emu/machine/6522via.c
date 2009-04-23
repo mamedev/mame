@@ -1133,19 +1133,6 @@ WRITE8_DEVICE_HANDLER(via_cb2_w)
 
 
 /*-------------------------------------------------
-    DEVICE_SET_INFO( via6522 )
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( via6522 )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
     DEVICE_GET_INFO( via6522 )
 -------------------------------------------------*/
 
@@ -1159,7 +1146,6 @@ DEVICE_GET_INFO(via6522)
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(via6522); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(via6522);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(via6522);	break;

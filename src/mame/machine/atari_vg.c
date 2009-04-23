@@ -129,15 +129,6 @@ static DEVICE_RESET( atari_vg_earom )
 }
 
 
-static DEVICE_SET_INFO( atari_vg_earom )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
 DEVICE_GET_INFO( atari_vg_earom )
 {
 	switch (state)
@@ -148,7 +139,6 @@ DEVICE_GET_INFO( atari_vg_earom )
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(atari_vg_earom); break;
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(atari_vg_earom);break;
 		case DEVINFO_FCT_NVRAM:							info->nvram = DEVICE_NVRAM_NAME(atari_vg_earom); break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;

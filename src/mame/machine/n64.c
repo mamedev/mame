@@ -458,13 +458,13 @@ WRITE32_HANDLER( n64_sp_reg_w )
         {
             case 0x00/4:        // SP_PC_REG
                 //printf( "Setting PC to: %08x\n", 0x04001000 | (data & 0xfff ) );
-                if( device_get_info_int(space->machine->cpu[1], CPUINFO_INT_REGISTER + RSP_NEXTPC) != 0xffffffff )
+                if( cpu_get_reg(space->machine->cpu[1], RSP_NEXTPC) != 0xffffffff )
                 {
-                    device_set_info_int(space->machine->cpu[1], CPUINFO_INT_REGISTER + RSP_NEXTPC, 0x04001000 | (data & 0xfff));
+                    cpu_set_reg(space->machine->cpu[1], RSP_NEXTPC, 0x04001000 | (data & 0xfff));
                 }
                 else
                 {
-                    device_set_info_int(space->machine->cpu[1], CPUINFO_INT_REGISTER + RSP_PC, 0x04001000 | (data & 0xfff));
+                    cpu_set_reg(space->machine->cpu[1], RSP_PC, 0x04001000 | (data & 0xfff));
                 }
                 break;
 

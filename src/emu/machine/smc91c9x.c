@@ -590,19 +590,6 @@ static DEVICE_RESET( smc91c9x )
 
 
 /*-------------------------------------------------
-    device set info callback
--------------------------------------------------*/
-
-static DEVICE_SET_INFO( smc91c9x )
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-
-/*-------------------------------------------------
     device get info callback
 -------------------------------------------------*/
 
@@ -616,7 +603,6 @@ static DEVICE_GET_INFO( smc91c9x )
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(smc91c9x); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(smc91c9x); break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(smc91c9x);break;
 

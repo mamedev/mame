@@ -144,18 +144,6 @@ static DEVICE_NVRAM(x2212)
 }
 
 /*-------------------------------------------------
-    device set info callback
--------------------------------------------------*/
-
-static DEVICE_SET_INFO(x2212)
-{
-	switch (state)
-	{
-		/* no parameters to set */
-	}
-}
-
-/*-------------------------------------------------
     device get info callback
 -------------------------------------------------*/
 
@@ -169,7 +157,6 @@ DEVICE_GET_INFO(x2212)
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(x2212); break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(x2212); break;
 		case DEVINFO_FCT_STOP:					/* nothing */ break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(x2212); break;

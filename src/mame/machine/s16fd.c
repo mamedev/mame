@@ -109,7 +109,7 @@ static void fd1094_setstate_and_decrypt(running_machine *machine, int state)
 }
 
 /* Callback for CMP.L instructions (state change) */
-static void fd1094_cmp_callback(const device_config *device, UINT32 val, int reg)
+static void fd1094_cmp_callback(const device_config *device, UINT32 val, UINT8 reg)
 {
 	if (reg == 0 && (val & 0x0000ffff) == 0x0000ffff) // ?
 	{
@@ -150,8 +150,8 @@ void fd1094_machine_init(const device_config *device)
 	fd1094_setstate_and_decrypt(device->machine, FD1094_STATE_RESET);
 	fd1094_kludge_reset_values();
 
-	device_set_info_fct(device, CPUINFO_FCT_M68K_CMPILD_CALLBACK, (genf *)fd1094_cmp_callback);
-	device_set_info_fct(device, CPUINFO_FCT_M68K_RTE_CALLBACK, (genf *)fd1094_rte_callback);
+	m68k_set_cmpild_callback(device, fd1094_cmp_callback);
+	m68k_set_rte_callback(device, fd1094_rte_callback);
 	cpu_set_irq_callback(device, fd1094_int_callback);
 
 	device_reset(device);

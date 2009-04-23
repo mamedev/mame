@@ -15,11 +15,6 @@ enum
 	KONAMI_DP
 };
 
-enum
-{
-	CPUINFO_FCT_KONAMI_SETLINES_CALLBACK = CPUINFO_FCT_CPU_SPECIFIC
-};
-
 #define KONAMI_SETLINES_CALLBACK(name) void name(const device_config *device, int lines)
 
 #define KONAMI_IRQ_LINE	0	/* IRQ line number */
@@ -31,10 +26,7 @@ CPU_GET_INFO( konami );
 
 CPU_DISASSEMBLE( konami );
 
+void konami_configure_set_lines(const device_config *device, konami_set_lines_func func);
 
-INLINE void konami_configure_set_lines(const device_config *device, konami_set_lines_func func)
-{
-	device_set_info_fct(device, CPUINFO_FCT_KONAMI_SETLINES_CALLBACK, (genf *)func);
-}
 
 #endif /* __KONAMI_H__ */

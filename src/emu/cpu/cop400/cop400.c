@@ -897,10 +897,6 @@ static void cop400_init(const device_config *device, UINT8 g_mask, UINT8 d_mask,
 	cpustate->d_mask = d_mask;
 	cpustate->in_mask = in_mask;
 
-	/* set clock divider */
-
-	device_set_info_int(device, CPUINFO_INT_CLOCK_DIVIDER, cpustate->intf->cki);
-
 	/* allocate serial timer */
 
 	cpustate->serial_timer = timer_alloc(device->machine, serial_tick, cpustate);
@@ -1360,6 +1356,7 @@ static CPU_SET_INFO( cop400 )
 static CPU_GET_INFO( cop400 )
 {
 	cop400_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	cop400_interface *intf = (device != NULL && device->static_config != NULL) ? (cop400_interface *)device->static_config : NULL;
 
 	switch (state)
 	{
@@ -1369,7 +1366,7 @@ static CPU_GET_INFO( cop400 )
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;											break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;											break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 16;											break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = (intf != NULL) ? intf->cki : 16;				break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;											break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;											break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;											break;

@@ -1578,19 +1578,21 @@ static DEVICE_RESET( laserdisc )
     device set info callback
 -------------------------------------------------*/
 
-static DEVICE_SET_INFO( laserdisc )
+int laserdisc_get_type(const device_config *device)
 {
 	laserdisc_state *ld = get_safe_token(device);
-	switch (state)
+	if (ld->core != NULL)
+		return ld->core->config.type;
+	return LASERDISC_TYPE_UNKNOWN;
+}
+
+void laserdisc_set_type(const device_config *device, int type)
+{
+	laserdisc_state *ld = get_safe_token(device);
+	if (ld->core != NULL && ld->core->config.type != type)
 	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case LDINFO_INT_TYPE:
-			if (ld != NULL && ld->core != NULL && ld->core->config.type != info->i)
-			{
-				ld->core->config.type = info->i;
-				device_reset(device);
-			}
-			break;
+		ld->core->config.type = type;
+		device_reset(device);
 	}
 }
 
@@ -1632,14 +1634,12 @@ DEVICE_GET_INFO( laserdisc )
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(laserdisc_state);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(laserdisc_config);					break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;						break;
-		case LDINFO_INT_TYPE:					info->i = config->type;								break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = (intf != NULL) ? intf->romregion : NULL; break;
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = (intf != NULL) ? intf->machine_config : NULL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(laserdisc); 	break;
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(laserdisc); 		break;
 		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(laserdisc); 			break;
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(laserdisc);			break;

@@ -852,7 +852,7 @@ static MACHINE_RESET( apache3 )
 	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE); // TODO
 
 	/* Hook the RESET line, which resets the Z80 */
-	device_set_info_fct(machine->cpu[1], CPUINFO_FCT_M68K_RESET_CALLBACK, (genf *)apache3_68000_reset);
+	m68k_set_reset_callback(machine->cpu[1], apache3_68000_reset);
 }
 
 

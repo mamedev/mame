@@ -757,12 +757,6 @@ static CPU_SET_INFO( m68k )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:
 			set_irq_line(m68k, state - CPUINFO_INT_INPUT_STATE, info->i);
 			break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_FCT_M68K_RESET_CALLBACK:		m68k->reset_instr_callback = (m68k_reset_func)info->f; break;
-		case CPUINFO_FCT_M68K_CMPILD_CALLBACK:		m68k->cmpild_instr_callback = (m68k_cmpild_func)info->f; break;
-		case CPUINFO_FCT_M68K_RTE_CALLBACK:			m68k->rte_instr_callback = (m68k_rte_func)info->f; break;
-		case CPUINFO_FCT_M68K_TAS_CALLBACK:			m68k->tas_instr_callback = (m68k_tas_func)info->f; break;
 	}
 }
 
@@ -978,6 +972,32 @@ static const m68k_memory_interface interface_d32 =
 	writelong_d32
 };
 
+
+
+
+void m68k_set_reset_callback(const device_config *device, m68k_reset_func callback)
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68k->reset_instr_callback = callback;
+}
+
+void m68k_set_cmpild_callback(const device_config *device, m68k_cmpild_func callback)
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68k->cmpild_instr_callback = callback;
+}
+
+void m68k_set_rte_callback(const device_config *device, m68k_rte_func callback)
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68k->rte_instr_callback = callback;
+}
+
+void m68k_set_tas_callback(const device_config *device, m68k_tas_func callback)
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68k->tas_instr_callback = callback;
+}
 
 
 /****************************************************************************

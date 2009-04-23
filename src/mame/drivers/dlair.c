@@ -194,7 +194,7 @@ static MACHINE_RESET( dlair )
 	if (laserdisc_type == LASERDISC_TYPE_VARIABLE)
 	{
 		int newtype = (input_port_read(machine, "DSW2") & 0x08) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
-		device_set_info_int(laserdisc, LDINFO_INT_TYPE, newtype);
+		laserdisc_set_type(laserdisc, newtype);
 	}
 }
 
@@ -297,7 +297,7 @@ static WRITE8_HANDLER( led_den2_w )
 
 static CUSTOM_INPUT( laserdisc_status_r )
 {
-	switch (device_get_info_int(laserdisc, LDINFO_INT_TYPE))
+	switch (laserdisc_get_type(laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
 			return 0;
@@ -314,7 +314,7 @@ static CUSTOM_INPUT( laserdisc_status_r )
 
 static CUSTOM_INPUT( laserdisc_command_r )
 {
-	switch (device_get_info_int(laserdisc, LDINFO_INT_TYPE))
+	switch (laserdisc_get_type(laserdisc))
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
 			return (laserdisc_line_r(laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
