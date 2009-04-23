@@ -423,7 +423,7 @@ const char *cpuexec_describe_context(running_machine *machine)
 
 	/* if we have an executing CPU, output data */
 	if (executingcpu != NULL)
-		sprintf(global->statebuf, "'%s'(%08X)", executingcpu->tag, cpu_get_pc(executingcpu));
+		sprintf(global->statebuf, "'%s' (%08X)", executingcpu->tag, cpu_get_pc(executingcpu));
 	else
 		strcpy(global->statebuf, "(no context)");
 

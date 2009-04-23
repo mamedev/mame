@@ -26,6 +26,8 @@ static const UINT8 skew_bits_value[4] = { 0, 1, 2, 2 };
 #define SCAN_LINES_PER_FRAME(t)	(((t)->reg[4] * 2) + 256)
 #define VERTICAL_DATA_START(t)	((t)->reg[5])
 #define LAST_DISP_DATA_ROW(t)	((t)->reg[6] & 0x3f)
+#define CURSOR_CHAR_ADDRESS(t)	((t)->reg[7])
+#define CURSOR_ROW_ADDRESS(t)	((t)->reg[8] & 0x3f)
 
 
 typedef struct _tms9927_state tms9927_state;
@@ -143,6 +145,7 @@ WRITE8_DEVICE_HANDLER( tms9927_w )
 		
 		case 0x0c:	/* LOAD CURSOR CHARACTER ADDRESS */
 		case 0x0d:	/* LOAD CURSOR ROW ADDRESS */
+mame_printf_debug("Cursor address changed\n");
 			tms->reg[offset - 0x0c + 7] = data;
 			recompute_parameters(tms, FALSE);
 			break;
@@ -183,6 +186,21 @@ int tms9927_upscroll_offset(const device_config *device)
 {
 	tms9927_state *tms = get_safe_token(device);
 	return tms->start_datarow;
+}
+
+
+int tms9927_cursor_bounds(const device_config *device, rectangle *bounds)
+{
+	tms9927_state *tms = get_safe_token(device);
+	int cursorx = CURSOR_CHAR_ADDRESS(tms);
+	int cursory = CURSOR_ROW_ADDRESS(tms);
+	
+	bounds->min_x = cursorx * tms->hpixels_per_column;
+	bounds->max_x = bounds->min_x + tms->hpixels_per_column - 1;
+	bounds->min_y = cursory * SCANS_PER_DATA_ROW(tms);
+	bounds->max_y = bounds->min_y + SCANS_PER_DATA_ROW(tms) - 1;
+
+	return (cursorx < HCOUNT(tms) && cursory <= LAST_DISP_DATA_ROW(tms));
 }
 
 
@@ -242,7 +260,7 @@ static DEVICE_START( tms9927 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-
+	
 	tms->intf = (const tms9927_interface *)device->static_config;
 
 	if (tms->intf != NULL)
@@ -315,5 +333,32 @@ DEVICE_GET_INFO( tms9927 )
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
+	}
+}
+
+DEVICE_GET_INFO( crt5027 )
+{
+	switch (state)
+	{
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CRT5027");					break;
+		default:										DEVICE_GET_INFO_CALL(tms9927);				break;
+	}
+}
+
+DEVICE_GET_INFO( crt5037 )
+{
+	switch (state)
+	{
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CRT5037");					break;
+		default:										DEVICE_GET_INFO_CALL(tms9927);				break;
+	}
+}
+
+DEVICE_GET_INFO( crt5057 )
+{
+	switch (state)
+	{
+		case DEVINFO_STR_NAME:							strcpy(info->s, "CRT5057");					break;
+		default:										DEVICE_GET_INFO_CALL(tms9927);				break;
 	}
 }

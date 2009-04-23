@@ -12,6 +12,9 @@
 
 
 #define TMS9927		DEVICE_GET_INFO_NAME(tms9927)
+#define CRT5027		DEVICE_GET_INFO_NAME(crt5027)
+#define CRT5037		DEVICE_GET_INFO_NAME(crt5037)
+#define CRT5057		DEVICE_GET_INFO_NAME(crt5057)
 
 
 #define MDRV_TMS9927_ADD(_tag, _clock, _config) \
@@ -42,6 +45,9 @@ extern tms9927_interface tms9927_null_interface;
 
 /* device interface */
 DEVICE_GET_INFO( tms9927 );
+DEVICE_GET_INFO( crt5027 );
+DEVICE_GET_INFO( crt5037 );
+DEVICE_GET_INFO( crt5057 );
 
 /* basic read/write handlers */
 WRITE8_DEVICE_HANDLER( tms9927_w );
@@ -50,6 +56,7 @@ READ8_DEVICE_HANDLER( tms9927_r );
 /* other queries */
 int tms9927_screen_reset(const device_config *device);
 int tms9927_upscroll_offset(const device_config *device);
+int tms9927_cursor_bounds(const device_config *device, rectangle *bounds);
 
 
 

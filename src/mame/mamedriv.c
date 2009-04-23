@@ -8434,6 +8434,7 @@ Other Sun games
 	DRIVER( dblpoint )	/* (c) 1995 Min Corp. */
 	DRIVER( dblpoind )	/* (c) 1995 Dong Bang Electron */
 	DRIVER( statusbj )	/* (c) 1981 Status Games */
+	DRIVER( tripdraw )	/* (c) 1981 Status Games */
 	DRIVER( funcsino )	/* (c) 1981 Status Games */
 	DRIVER( hangman )	/* (c) 1984 Status Games */
 	DRIVER( trivquiz )	/* (c) 1984 Status Games */
@@ -8444,6 +8445,7 @@ Other Sun games
 	DRIVER( quaquiz2 )	/* (c) 1985 Status Games */
 	DRIVER( supertr2 )	/* (c) 1986 Status Games */
 	DRIVER( supertr3 )	/* (c) 1986 Status Games */
+	DRIVER( cstripxi )	/* (c) 1981 Status Games */
 	DRIVER( tickee )	/* (c) 1994 Raster Elite */
 	DRIVER( ghoshunt )	/* (c) 1995? Hanaho Games */
 	DRIVER( tutstomb )	/* (c) 199?? Island Design */

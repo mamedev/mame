@@ -188,12 +188,6 @@ static INTERRUPT_GEN( statriv2_interrupt )
 }
 
 
-static CUSTOM_INPUT( latched_coin_r )
-{
-	return latched_coin;
-}
-
-
 
 /*************************************
  *
@@ -222,9 +216,15 @@ static READ8_HANDLER( question_data_r )
 
 /*************************************
  *
- *  8255 PPI interfaces
+ *  Coin input
  *
  *************************************/
+
+static CUSTOM_INPUT( latched_coin_r )
+{
+	return latched_coin;
+}
+
 
 static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w )
 {
@@ -232,6 +232,15 @@ static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w )
 	if (data != 0x0f)
 		latched_coin = 0;
 }
+
+
+
+
+/*************************************
+ *
+ *  8255 PPI interfaces
+ *
+ *************************************/
 
 static const ppi8255_interface ppi8255_intf =
 {
@@ -633,6 +642,20 @@ ROM_START( statusbj )
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
 ROM_END
 
+ROM_START( tripdraw )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u7_td1.bin", 0x0000, 0x0800, CRC(7128ce7c) SHA1(3d46239456969c3af1817ef917e328c2819d6625) )
+	ROM_LOAD( "u8_td2.bin", 0x0800, 0x0800, CRC(637f5f69) SHA1(97d30eaa65a4b44c28b2b5e5eed8aa9966c2bbb7) )
+
+	ROM_REGION( 0x800, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "u36_td0.bin", 0x0000, 0x0800, CRC(2faa1942) SHA1(0205bf9eb86ef1c32f1ae959d0e02001393db3af) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketted */
+	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) /* Soldered in (Color?) */
+	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
+ROM_END
+
 ROM_START( funcsino )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u7", 0x0000, 0x1000, CRC(e7380a81) SHA1(dbc9646a33bd61cdfab9f8a5ac7db996cfc0eaf9) )
@@ -901,6 +924,21 @@ ROM_START( supertr3 )
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
+ROM_START( cstripxi )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "csxirom1.bin", 0x0000, 0x1000, CRC(7821c604) SHA1(12217bcbbe534187b941ce74c10b57679d8d922c) )
+	ROM_LOAD( "csxirom2.bin", 0x1000, 0x1000, CRC(67d8ee9b) SHA1(f13f4a55ecaa5d7b08c7ec3bad7e43379a9ca7db) )
+	ROM_LOAD( "csxirom3.bin", 0x2000, 0x1000, CRC(97d81042) SHA1(fdc5519cb1891b3aff9d4c1ce9b41b29500e416c) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "csxirom0.bin", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketted */
+	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) /* Soldered in (Color?) */
+	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
+ROM_END
+
 
 
 /*************************************
@@ -1016,6 +1054,27 @@ static DRIVER_INIT( addr_lmhe )
 }
 
 
+static READ8_HANDLER( laserdisc_io_r )
+{
+	UINT8 result = 0x00;
+	if (offset == 1)
+		result = 0x18;
+	mame_printf_debug("%s:ld read ($%02X) = %02X\n", cpuexec_describe_context(space->machine), 0x28 + offset, result);
+	return result;
+}
+
+static WRITE8_HANDLER( laserdisc_io_w )
+{
+	mame_printf_debug("%s:ld write ($%02X) = %02X\n", cpuexec_describe_context(space->machine), 0x28 + offset, data);
+}
+
+static DRIVER_INIT( laserdisc )
+{
+	const address_space *iospace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	memory_install_readwrite8_handler(iospace, 0x28, 0x2b, 0, 0, laserdisc_io_r, laserdisc_io_w);
+}
+
+
 
 /*************************************
  *
@@ -1024,7 +1083,8 @@ static DRIVER_INIT( addr_lmhe )
  *************************************/
 
 GAME( 1981, statusbj, 0,        statriv2,  statusbj, 0,         ROT0, "Status Games", "Status Black Jack (V1.0c)", GAME_SUPPORTS_SAVE )
-GAME( 1981, funcsino, 0,        statriv2,  funcsino, 0,         ROT0, "Status Games", "Status Fun Casino", GAME_SUPPORTS_SAVE )
+GAME( 1981, funcsino, 0,        statriv2,  funcsino, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", GAME_SUPPORTS_SAVE )
+GAME( 1981, tripdraw, 0,        statriv2,  funcsino, 0,         ROT0, "Status Games", "Tripple Draw (V3.1 s)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1984, hangman,  0,        statriv2,  hangman,  addr_lmh,  ROT0, "Status Games", "Hangman", GAME_SUPPORTS_SAVE )
 GAME( 1984, trivquiz, 0,        statriv2,  statriv2, addr_lhx,  ROT0, "Status Games", "Triv Quiz", GAME_SUPPORTS_SAVE )
 GAME( 1984, statriv2, 0,        statriv2,  statriv2, addr_xlh,  ROT0, "Status Games", "Triv Two", GAME_SUPPORTS_SAVE )
@@ -1034,3 +1094,4 @@ GAME( 1985, sextriv,  0,        statriv2,  sextriv,  addr_lhx,  ROT0, "Status Ga
 GAME( 1985, quaquiz2, 0,        statriv2,  quaquiz2, addr_lmh,  ROT0, "Status Games", "Quadro Quiz II", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 GAME( 1986, supertr2, 0,        statriv2,  supertr2, addr_lmhe, ROT0, "Status Games", "Super Triv II", GAME_SUPPORTS_SAVE )
 GAME( 1988, supertr3, 0,        statriv2,  supertr2, addr_lmh,  ROT0, "Status Games", "Super Triv III", GAME_SUPPORTS_SAVE )
+GAME( 1990, cstripxi, 0,        statriv2,  funcsino, laserdisc, ROT0, "Status Games", "Casino Strip XI", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
