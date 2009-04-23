@@ -194,6 +194,7 @@ TODO:
 #include "sound/namco.h"
 #include "sound/samples.h"
 
+#define MASTER_CLOCK	XTAL_18_432MHz
 
 extern UINT8 *rallyx_videoram,*rallyx_radarattr;
 WRITE8_HANDLER( rallyx_videoram_w );
@@ -855,7 +856,7 @@ static const samples_interface rallyx_samples_interface =
 static MACHINE_DRIVER_START( rallyx )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(rallyx_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
@@ -880,7 +881,7 @@ static MACHINE_DRIVER_START( rallyx )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
+	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32) /* 96 KHz */
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -893,7 +894,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jungler )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(jungler_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 

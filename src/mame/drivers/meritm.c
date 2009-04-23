@@ -70,6 +70,7 @@ PROGRAM#    Program Version      Program Differences
   - finish inputs, dsw, outputs (lamps)
   - problem with registering touches on the bottom of the screen (currently hacked to work)
   - megat5: has jmp $0000 in the initialization code causing infinite loop, is rom bad?
+  - megat4st doesn't boot, protection problem?
  */
 
 #include "driver.h"

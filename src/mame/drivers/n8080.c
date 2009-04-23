@@ -14,6 +14,8 @@
 #include "cpu/i8085/i8085.h"
 #include "includes/n8080.h"
 
+#define MASTER_CLOCK	XTAL_20_16MHz
+
 static unsigned shift_data;
 static unsigned shift_bits;
 static int inte;
@@ -104,7 +106,7 @@ static const i8085_config n8080_cpu_config =
 static MACHINE_DRIVER_START( spacefev )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, 20160000 / 10)
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
@@ -132,7 +134,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sheriff )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, 20160000 / 10)
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)
@@ -160,7 +162,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( helifire )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, 20160000 / 10)
+	MDRV_CPU_ADD("maincpu", 8080, MASTER_CLOCK / 10)
 	MDRV_CPU_CONFIG(n8080_cpu_config)
 	MDRV_CPU_PROGRAM_MAP(helifire_main_cpu_map, 0)
 	MDRV_CPU_IO_MAP(main_io_map, 0)

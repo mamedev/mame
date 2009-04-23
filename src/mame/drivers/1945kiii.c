@@ -57,6 +57,8 @@ There are no static local variables.
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
+#define MASTER_CLOCK	XTAL_16MHz
+
 static UINT16* k3_spriteram_1;
 static UINT16* k3_spriteram_2;
 static UINT16* k3_bgram;
@@ -233,7 +235,7 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( k3 )
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(k3_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
@@ -253,11 +255,11 @@ static MACHINE_DRIVER_START( k3 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, MASTER_CLOCK/16) /* dividers? */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)
+	MDRV_SOUND_ADD("oki2", OKIM6295, MASTER_CLOCK/16) /* dividers? */
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END

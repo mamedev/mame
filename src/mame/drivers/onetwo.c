@@ -47,6 +47,8 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 static tilemap *fg_tilemap;
 static UINT8 *fgram;
 
+#define MASTER_CLOCK	(XTAL_4MHz)
+
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = (fgram[tile_index*2+1]<<8) | fgram[tile_index*2];
@@ -276,12 +278,12 @@ static const ym3812_interface ym3812_config =
 
 static MACHINE_DRIVER_START( onetwo )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80,MASTER_CLOCK)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
 	MDRV_CPU_IO_MAP(sound_cpu_io,0)
 
@@ -302,7 +304,7 @@ static MACHINE_DRIVER_START( onetwo )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 4000000)
+	MDRV_SOUND_ADD("ym", YM3812, MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

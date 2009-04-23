@@ -141,8 +141,10 @@ Find lamps/reels after UPD changes.
  *
  *************************************/
 
-#define DUART_CLOCK 	3686400
+#define DUART_CLOCK 	XTAL_3_6864MHz
 #define PIXEL_CLOCK		0
+#define MASTER_CLOCK	XTAL_16MHz
+#define SOUND_CLOCK		XTAL_11_0592MHz
 
 /*************************************
  *
@@ -988,11 +990,11 @@ static INTERRUPT_GEN( vsync_interrupt )
 
 
 static MACHINE_DRIVER_START( maygayv1 )
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", vsync_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", I8052, XTAL_11_0592MHz)
+	MDRV_CPU_ADD("soundcpu", I8052, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_prg, 0)
 	MDRV_CPU_DATA_MAP(sound_data, 0)
 	MDRV_CPU_IO_MAP(sound_io, 0)
@@ -1022,7 +1024,7 @@ static MACHINE_DRIVER_START( maygayv1 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym",YM2413, XTAL_16MHz / 4)
+	MDRV_SOUND_ADD("ym",YM2413, MASTER_CLOCK / 4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
 
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)

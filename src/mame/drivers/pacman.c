@@ -352,7 +352,7 @@ Boards:
  *
  *************************************/
 
-#define MASTER_CLOCK		(18432000)
+#define MASTER_CLOCK		(XTAL_18_432MHz)
 
 #define PIXEL_CLOCK			(MASTER_CLOCK/3)
 

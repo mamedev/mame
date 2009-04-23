@@ -65,6 +65,10 @@ D.9B         [f99cac4b] /
 #include "deprecat.h"
 #include "audio/t5182.h"
 
+#define MASTER_CLOCK	XTAL_16MHz
+#define SOUND_CLOCK		XTAL_14_31818MHz
+#define TC15_CLOCK		XTAL_12MHz
+
 static tilemap *bgtilemap, *txttilemap;
 static UINT8 *scrollram;
 static UINT8 *mainram;
@@ -358,11 +362,11 @@ static GFXDECODE_START( panicr )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( panicr )
-	MDRV_CPU_ADD("maincpu", V20,16000000/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
+	MDRV_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MDRV_CPU_PROGRAM_MAP(panicr_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(panicr_interrupt,2)
 
-	MDRV_CPU_ADD(CPUTAG_T5182,Z80,14318180/4)	/* 3.579545 MHz */
+	MDRV_CPU_ADD(CPUTAG_T5182,Z80,SOUND_CLOCK/4)	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(t5182_map, 0)
 	MDRV_CPU_IO_MAP(t5182_io, 0)
 
@@ -383,7 +387,7 @@ static MACHINE_DRIVER_START( panicr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 14318180/4)	/* 3.579545 MHz */
+	MDRV_SOUND_ADD("ym", YM2151, SOUND_CLOCK/4)	/* 3.579545 MHz */
 	MDRV_SOUND_CONFIG(t5182_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)

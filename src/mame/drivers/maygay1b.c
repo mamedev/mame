@@ -26,8 +26,8 @@
 #define VERBOSE 1
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-#define M1_MASTER_CLOCK (8000000)
-#define M1_DUART_CLOCK  (3680000)
+#define M1_MASTER_CLOCK (XTAL_8MHz)
+#define M1_DUART_CLOCK  (XTAL_3_6864MHz)
 
 static struct
 {

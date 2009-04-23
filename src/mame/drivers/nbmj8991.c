@@ -1615,7 +1615,7 @@ static MACHINE_DRIVER_START( nbmjdrv2 )	// pstadium
 	MDRV_CPU_IO_MAP(readport_pstadium, writeport_pstadium)
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3900000)					/* 4.00 MHz */
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)					/* 4.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_nbmj8991, sound_writemem_nbmj8991)
 	MDRV_CPU_IO_MAP(sound_readport_nbmj8991, sound_writeport_nbmj8991)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 128)

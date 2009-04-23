@@ -42,6 +42,9 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
+#define MASTER_CLOCK	XTAL_12MHz
+#define SOUND_CLOCK		XTAL_45MHz
+
 static tilemap *bg_tilemap, *mlow_tilemap, *mhigh_tilemap, *tx_tilemap;
 static UINT16 *bg_videoram, *mlow_videoram, *mhigh_videoram, *tx_videoram, *sprites_buffer;
 static UINT16 *bg_scrollram, *mlow_scrollram, *mhigh_scrollram, *vidattrram;
@@ -451,7 +454,7 @@ static VIDEO_UPDATE( mwarr )
 }
 
 static MACHINE_DRIVER_START( mwarr )
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
+	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mwarr_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
@@ -472,11 +475,11 @@ static MACHINE_DRIVER_START( mwarr )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 937500 )
+	MDRV_SOUND_ADD("oki1", OKIM6295, SOUND_CLOCK/48 )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 937500 )
+	MDRV_SOUND_ADD("oki2", OKIM6295, SOUND_CLOCK/48 )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
