@@ -16,6 +16,11 @@
     Known bugs:
         * none at this time
 
+    Clock Crystals:
+        * Xenophobe
+            - CPU/Video Board: XTAL 16.000MHz at 1D, XTAL 20.000MHz at 1F
+            - Sound Board:     XTAL 16.000MHz
+
 ****************************************************************************
 
     Memory map
@@ -1059,6 +1064,12 @@ ROM_START( zwackery )
 	ROM_LOAD( "pal20.u15", 0x000c, 0x00001, NO_DUMP ) /* marked CSD002R0 in manual, pal type not specified */
 ROM_END
 
+/*
+    Xenophobe
+
+    CPU/Video Board: A080-91871-E000
+    Sound Board:     A080-91863-B000
+*/
 
 ROM_START( xenophob )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -1083,15 +1094,24 @@ ROM_START( xenophob )
 	ROM_LOAD( "xeno_fg.9j",   0x20000, 0x10000, CRC(82fb3e09) SHA1(f06e9df20044244a6c174f4876e615ccc18e1cba) )
 	ROM_LOAD( "xeno_fg.10j",  0x30000, 0x10000, CRC(6a7a3516) SHA1(1def9c134220eac9ba5e46d38282ff18f51b6398) )
 
-	ROM_REGION( 0x0006, "plds", ROMREGION_DISPOSE )
-    /* According to the manual these pal's are located on the Video Game board */
-	ROM_LOAD( "pal20l8.9b",   0x00000, 0x00001, NO_DUMP ) /* marked COLARB in manual */
-	ROM_LOAD( "pal16l8.1j",   0x00001, 0x00001, NO_DUMP ) /* marked IODCD in manual */
-	ROM_LOAD( "pal16l8.2j",   0x00002, 0x00001, NO_DUMP ) /* marked MEMDCD in manual */
-	ROM_LOAD( "pal16r4.2k",   0x00003, 0x00001, NO_DUMP ) /* marked DTACK in manual */
-	ROM_LOAD( "pal16r4.14k",  0x00004, 0x00001, NO_DUMP ) /* marked HSYNC in manual*/
-    /* According to the manual this pal is located on the "Sounds Good" board */
-	ROM_LOAD( "pal20.u15",    0x00005, 0x00001, NO_DUMP ) /* marked SG01R0 in manual, pal type not specified */
+    /* PLD's located on the cpu/video board */
+	ROM_REGION( 0x000C, "cpu_plds", 0 )
+	ROM_LOAD( "b61a-49aaj-axad.bin", 0x00000, 0x00001, NO_DUMP ) /* PAL20L8 at 9B */
+	ROM_LOAD( "b75a-50aaj-bxad.bin", 0x00001, 0x00001, NO_DUMP ) /* PAL16L8 at 1J */
+	ROM_LOAD( "b75a-50aaj-axad.bin", 0x00002, 0x00001, NO_DUMP ) /* PAL16L8 at 2J */
+	ROM_LOAD( "b75a-41aaj-axad.bin", 0x00003, 0x00001, NO_DUMP ) /* PAL16R4 at 2K */
+	ROM_LOAD( "b75a-41aaj-bxab.bin", 0x00004, 0x00001, NO_DUMP ) /* PAL16R4 at 14K */
+    ROM_LOAD( "a59a26axlaxhd.bin",   0x00005, 0x00001, NO_DUMP ) /* PLS153 at 11J */
+    ROM_LOAD( "a59a26axlbxhd.bin",   0x00006, 0x00001, NO_DUMP ) /* PLS153 at 12J */
+    ROM_LOAD( "a59a26axlcxhd.bin",   0x00007, 0x00001, NO_DUMP ) /* PLS153 at 14H */
+    ROM_LOAD( "0066-316bx-xxqx.bin", 0x00008, 0x00001, NO_DUMP ) /* 20 Pin PLD? at 14E */
+    ROM_LOAD( "0066-314bx-xxqx.bin", 0x00009, 0x00001, NO_DUMP ) /* 24 Pin PLD? at 14F */
+    ROM_LOAD( "0066-315bx-xxqx.bin", 0x0000A, 0x00001, NO_DUMP ) /* 20 Pin PLD? at 15E */
+    ROM_LOAD( "0066-313bx-xxqx.bin", 0x0000B, 0x00001, NO_DUMP ) /* 24 Pin PLD? at 15F */
+
+    /* PLD located on the "Sounds Good" board */
+	ROM_REGION( 0x0001, "snd_pld", 0 )
+	ROM_LOAD( "e36a31axnax00.bin",   0x00000, 0x00001, NO_DUMP ) /* PAL20L10 at U15 */
 ROM_END
 
 
