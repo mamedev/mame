@@ -1412,6 +1412,31 @@ static const gfx_layout hng64_16_layout =
 };
 
 
+static const UINT32 texlayout_xoffset[1024] =
+{
+	STEP1024(0,8),
+
+};
+
+static const UINT32 texlayout_yoffset[512] =
+{
+	STEP512(0,8192),
+};
+
+static const gfx_layout hng64_texlayout =
+{
+	1024, 512,
+	RGN_FRAC(1,1),
+	8, 
+	{ 0,1,2,3,4,5,6,7 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	1024*512*8,
+	texlayout_xoffset,
+	texlayout_yoffset
+};
+
+
 static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( "gfx1", 0, hng64_4_even_layout, 0x0, 0x100 ) /* scrolltiles */
 	GFXDECODE_ENTRY( "gfx1", 0, hng64_4_odd_layout,  0x0, 0x100 ) /* scrolltiles */
@@ -1419,6 +1444,7 @@ static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( "gfx1", 0, hng64_16_layout,     0x0, 0x10 )  /* scroll tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, hng64_4_16_layout,   0x0, 0x100 ) /* sprite tiles */
 	GFXDECODE_ENTRY( "gfx2", 0, hng64_16_layout,     0x0, 0x10 )  /* sprite tiles */
+	GFXDECODE_ENTRY( "gfx3", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */	
 GFXDECODE_END
 
 static DRIVER_INIT( hng64 )
