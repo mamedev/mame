@@ -224,38 +224,16 @@ VIDEO_START( bjtwin )
 
 ***************************************************************************/
 
-READ16_HANDLER( nmk_bgvideoram_r )
-{
-	return nmk_bgvideoram[offset];
-}
-
 WRITE16_HANDLER( nmk_bgvideoram_w )
 {
 	COMBINE_DATA(&nmk_bgvideoram[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
-READ16_HANDLER( nmk_fgvideoram_r )
-{
-	return nmk_fgvideoram[offset];
-}
-
 WRITE16_HANDLER( nmk_fgvideoram_w )
 {
-	int oldword = nmk_fgvideoram[offset];
-	int newword = oldword;
-	COMBINE_DATA(&newword);
-
-	if (oldword != newword)
-	{
-		nmk_fgvideoram[offset] = newword;
-		tilemap_mark_tile_dirty(fg_tilemap,offset);
-	}
-}
-
-READ16_HANDLER( nmk_txvideoram_r )
-{
-	return nmk_txvideoram[offset];
+	COMBINE_DATA(&nmk_fgvideoram[offset]);
+	tilemap_mark_tile_dirty(fg_tilemap,offset);
 }
 
 WRITE16_HANDLER( nmk_txvideoram_w )

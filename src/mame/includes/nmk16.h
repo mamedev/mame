@@ -6,11 +6,8 @@ extern UINT16 *afega_vram_0, *afega_scroll_0;
 extern UINT16 *afega_vram_1, *afega_scroll_1;
 
 
-READ16_HANDLER( nmk_bgvideoram_r );
 WRITE16_HANDLER( nmk_bgvideoram_w );
-READ16_HANDLER( nmk_fgvideoram_r );
 WRITE16_HANDLER( nmk_fgvideoram_w );
-READ16_HANDLER( nmk_txvideoram_r );
 WRITE16_HANDLER( nmk_txvideoram_w );
 WRITE16_HANDLER( nmk_scroll_w );
 WRITE16_HANDLER( nmk_scroll_2_w );
