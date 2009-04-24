@@ -5256,12 +5256,18 @@ READ32_HANDLER ( stv_vdp2_cram_r )
 WRITE32_HANDLER ( stv_vdp2_regs_w )
 {
 	static UINT8 old_crmd;
+	static UINT16 old_tvmd;
 	COMBINE_DATA(&stv_vdp2_regs[offset]);
 
 	if(old_crmd != STV_VDP2_CRMD)
 	{
 		old_crmd = STV_VDP2_CRMD;
 		refresh_palette_data(space->machine);
+	}
+	if(old_tvmd != STV_VDP2_TVMD)
+	{
+		old_tvmd = STV_VDP2_TVMD;
+		stv_vdp2_dynamic_res_change(space->machine);
 	}
 }
 
@@ -6208,8 +6214,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( stv_vdp2 )
 {
 	static UINT8 pri;
-	stv_vdp2_dynamic_res_change(screen->machine);
-
 	video_update_vdp1(screen->machine);
 
 	stv_vdp2_fade_effects(screen->machine);
