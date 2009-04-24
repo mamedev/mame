@@ -3,6 +3,7 @@
 Driver by David Haywood, ElSemi, and Andrew Gardner.
 Rasterizing code provided in part by Andrew Zaferakis.
 
+
 Notes:
   * The top board is likely identical for all revisions and all "versions" of the hardware.
     It contains the main MIPS CPU and a secondary communications KL5C80.
@@ -44,7 +45,8 @@ ToDo:
   * upgrade to modern video timing.
 
   3d:
-  * Find where the remainder of the 3d display list information is 'hiding' (FIFO?)
+  * Find where the remainder of the 3d display list information is 'hiding'
+    -- should the 3d 'ram' be treated like a fifo, instead of like RAM (see Dreamcast etc.)
   * Remaining 3d bits - glowing, etc.
   * Populate the display buffers
   * Does the hng64 do perspective-correct texture mapping?  Doesn't look like it...
@@ -463,6 +465,7 @@ or Fatal Fury for example).
 #include "deprecat.h"
 #include "cpu/mips/mips3.h"
 
+static int hng64_boothack = 0;
 static UINT32 *rombase;
 static UINT32 *hng_mainram;
 static UINT32 *hng_cart;
@@ -627,7 +630,9 @@ static WRITE32_HANDLER( hng64_pal_w )
 	//if (a != 0)
 	//  popmessage("Alpha is not zero!") ;
 
-	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	// sams64 / sams64_2 never write a palette, why not?
+	if (hng64_boothack!=1)
+		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( hng64_port_read )
@@ -720,20 +725,36 @@ static WRITE32_HANDLER( hng64_dualport_w )
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
+
 static READ32_HANDLER( hng64_dualport_r )
 {
-	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	static int toggle = 0;
 
+	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	
 	// These hacks create some red marks for the boot-up sequence
 	switch (offset*4)
 	{
 		//SamSho64
-//      case 0x00:  toggi^=1; if (toggi==1) {return 0x00000400;} else {return 0x00000300;};
+        case 0x00:
+		{
+		
+			if (hng64_boothack == 1) // ss64
+			{
+				toggle^=1; if (toggle==1) {return 0x00000400;} else {return 0x00000300;};
+			}
+			else if (hng64_boothack == 2) // ffwa
+			{
+				return 0x00000400;
+			}
+			
+			return mame_rand(space->machine);
+		}
+			
 		//RoadsEdge
 //      case 0x00:  return input_port_read(space->machine, "IPT_TEST");
 
-		//Fatfurwa
-		case 0x00:  return 0x00000400;
+  
 		case 0x04:  return input_port_read(space->machine, "SYSTEM");
 		case 0x08:  return input_port_read(space->machine, "P1_P2");
 
@@ -1411,6 +1432,19 @@ static DRIVER_INIT(hng64_fght)
 	DRIVER_INIT_CALL(hng64);
 }
 
+static DRIVER_INIT( fatfurwa )
+{
+	DRIVER_INIT_CALL(hng64_fght);
+	hng64_boothack = 2;
+}
+
+static DRIVER_INIT( ss64 )
+{
+	DRIVER_INIT_CALL(hng64_fght);
+	hng64_boothack = 1;
+}
+
+
 static DRIVER_INIT(hng64_race)
 {
 	no_machine_error_code=0x02020202;
@@ -1611,7 +1645,6 @@ ROM_END
 
 
 ROM_START( sams64_2 )
-
 	/* BIOS */
 	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
 	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
@@ -1686,6 +1719,68 @@ ROM_START( sams64_2 )
 	ROM_LOAD( "005sd02a.78", 0x0400000, 0x400000, CRC(6b4da6a0) SHA1(8606c413c129635bdaaa37254edbfd19b10426bb) )
 	ROM_LOAD( "005sd03a.79", 0x0800000, 0x400000, CRC(a529fab3) SHA1(8559d402c8f66f638590b8b57ec9efa775010c96) )
 	ROM_LOAD( "005sd04a.80", 0x0800000, 0x400000, CRC(dca95ead) SHA1(39afdfba0e5262b524f25706a96be00e5d14548e) )
+ROM_END
+
+
+ROM_START( sams64 )
+	/* BIOS */
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
+	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
+	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
+	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	/* END BIOS */
+	
+	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_LOAD32_WORD( "002-pro1a.81", 0x0000000, 0x400000, CRC(e5b907c5) SHA1(83637ffaa9031d41a5bed3397a519d1dfa8052cb) )
+	ROM_LOAD32_WORD( "002-pro2a.82", 0x0000002, 0x400000, CRC(803ed2eb) SHA1(666db47886a316e68b911311e5db3bc0f5b8a34d) )
+	ROM_LOAD32_WORD( "002-pro3a.83", 0x0800000, 0x400000, CRC(582156a7) SHA1(a7bbbd472a53072cbfaed5d41d4265123c9e3f3d) )
+	ROM_LOAD32_WORD( "002-pro4a.84", 0x0800002, 0x400000, CRC(5a8291e9) SHA1(ec1e5a5a0ba37393e8b93d78b4ac855109d45ec9) )
+
+	/* Scroll Characters 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x4000000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "002-sc01a.41", 0x0000000, 0x400000, CRC(77c3df69) SHA1(813d57814acccd2c04c951e58ac87cf7413bdf58) )
+	ROM_LOAD32_BYTE( "002-sc02a.42", 0x0000001, 0x400000, CRC(60065174) SHA1(624c2e20abb53b2466df4ce2ffa9e20273798e92) )
+	ROM_LOAD32_BYTE( "002-sc03a.43", 0x0000002, 0x400000, CRC(5d4a5289) SHA1(7a1576fdd344825cb05866c156d17b18f562a336) )
+	ROM_LOAD32_BYTE( "002-sc04a.44", 0x0000003, 0x400000, CRC(aa5536fa) SHA1(09a50a29561ac97c564243da879bd7c4cf8c3cee) )
+	ROM_LOAD32_BYTE( "002-sc05a.45", 0x1000000, 0x400000, CRC(fd242bee) SHA1(b1fad97987da21c77d6c460bbed6f0dd18905ed4) )
+	ROM_LOAD32_BYTE( "002-sc06a.46", 0x1000001, 0x400000, CRC(87afc297) SHA1(47d5eaae88ce501fbbd5a2d7305c1d6acadfb13e) )
+	ROM_LOAD32_BYTE( "002-sc07a.47", 0x1000002, 0x400000, CRC(e01e8a95) SHA1(b132214ef2b33a46cb605ea8f2193e77d9464881) )
+	ROM_LOAD32_BYTE( "002-sc08a.48", 0x1000003, 0x400000, CRC(a17464d0) SHA1(2e6b73b1e0983b2b01455b0f4d6dc7c3845adb69) )
+
+	/* Sprite Characters - 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x4000000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "002-sp01a.53",0x0000000, 0x400000, CRC(c73cf9b4) SHA1(7c34fa1bc03cd366d473dbf3e316a6434ee5ec60) )
+	ROM_LOAD32_BYTE( "002-sp02a.54",0x0000001, 0x400000, CRC(04b0ecc8) SHA1(893e522324dd41dfcd2217974a6740e6bc3ea1d3) )
+	ROM_LOAD32_BYTE( "002-sp03a.55",0x0000002, 0x400000, CRC(13c80b74) SHA1(ad6c1690ebcde0d8237201ea43eb162cd5308ccb) )
+	ROM_LOAD32_BYTE( "002-sp04a.56",0x0000003, 0x400000, CRC(b1a6a06d) SHA1(1b11ee7cec46d0c99dc6310ee8221fa2de33c359) )
+	ROM_LOAD32_BYTE( "002-sp05a.57",0x1000000, 0x400000, CRC(fa71e825) SHA1(adfa8b5a8ec703d4f04285c47f2618a294c90ec5) )
+	ROM_LOAD32_BYTE( "002-sp06a.58",0x1000001, 0x400000, CRC(1bcfe48e) SHA1(8d85b1eb33fea48e5c6597d2fcbec903ecdad9d9) )
+	ROM_LOAD32_BYTE( "002-sp07a.59",0x1000002, 0x400000, CRC(a5049bd7) SHA1(123e32c22f53d6e55ee1d1deb4ab40891004c6fd) )
+	ROM_LOAD32_BYTE( "002-sp08a.60",0x1000003, 0x400000, CRC(c2e57813) SHA1(e7a21df1f94ed959a53da9dc4667863ee77bf676) )
+
+	/* Textures - 1024x1024x8 pages */
+	ROM_REGION( 0x1000000, "gfx3", 0 )
+	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	ROM_LOAD( "002-tx01a.13", 0x0000000, 0x400000, CRC(233749b5) SHA1(7c93681bbd5f4246e0dc50d26108f04e9b248d0d) )
+	ROM_LOAD( "002-tx02a.14", 0x0400000, 0x400000, CRC(d5074be2) SHA1(c33e9b9f0d21ad5ad31d8f988b3c7378d374fc1b) )
+	ROM_LOAD( "002-tx03a.15", 0x0800000, 0x400000, CRC(68c313f7) SHA1(90ce8d0d19a994647c7167e3b256ff31647e575a) )
+	ROM_LOAD( "002-tx04a.16", 0x0c00000, 0x400000, CRC(f7dac24f) SHA1(1215354f28cbeb9fc38f6a7acae450ad5f34bb6a) )
+	
+
+	/* X,Y,Z Vertex ROMs */
+	ROM_REGION( 0x1800000, "gfx4", ROMREGION_NODISPOSE )
+	ROMX_LOAD( "002-vt01a.17", 0x0000000, 0x400000, CRC(403fd7fd) SHA1(9bdadbeb4cd13c4c4e89a1c233af9eaaa46f8fdf), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt02a.18", 0x0000002, 0x400000, CRC(e1885905) SHA1(6b16083c50e887aebe2baf95bf56697c239970f2), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt03a.19", 0x0000004, 0x400000, CRC(2074a6a6) SHA1(9a5e8259d1e19d2b43878c24ca06afba5ee5e316), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt04a.20", 0x0400000, 0x400000, CRC(aefc4d94) SHA1(f9d8222d4320ccf9f3c7c0ef307e03c8f34ea530), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt05a.21", 0x0400002, 0x400000, CRC(d32ee9cb) SHA1(a768dfc15899924eb05eccbf8e85cb29c7b60396), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "002-vt06a.22", 0x0400004, 0x400000, CRC(13bf3636) SHA1(7c704bf66b571350207bccc7a2d6ed1ec9de4cd5), ROM_GROUPWORD | ROM_SKIP(4) )
+
+	ROM_REGION( 0x1000000, "samples", ROMREGION_DISPOSE ) /* Sound Samples? */
+	ROM_LOAD( "002-sd01a.77", 0x0000000, 0x400000, CRC(6215036b) SHA1(ded71dce98b7f7ef78ef32d966a292bbf0d15332) )
+	ROM_LOAD( "002-sd02a.78", 0x0400000, 0x400000, CRC(32b28310) SHA1(5b80750a66c12b035b493d06e3842741a3334d0f) )
+	ROM_LOAD( "002-sd03a.79", 0x0800000, 0x400000, CRC(53591413) SHA1(36c7efa1aced0ca38b3ce7b95af28755973698f3) )
 ROM_END
 
 
@@ -1838,10 +1933,10 @@ GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoG
 
 /* Games */
 GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 001 */
-/* Samurai Shodown 64           002 */
+GAME( 1998, sams64,   hng64,  hng64, hng64, ss64, ROT0, "SNK", "Samurai Shodown 64",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 002 */
 /* Xtreme Rally / Offbeat Racer 003 */
 /* Beast Busters 2nd Nightmare  004 */
-GAME( 1998, sams64_2, hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Samurai Shodown: Warrior's Rage",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
-GAME( 1998, fatfurwa, hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64, hng64_fght, ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
+GAME( 1998, sams64_2, hng64,  hng64, hng64, ss64, ROT0, "SNK", "Samurai Shodown: Warrior's Rage",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
+GAME( 1998, fatfurwa, hng64,  hng64, hng64, fatfurwa, ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
+GAME( 1999, buriki,   hng64,  hng64, hng64, fatfurwa, ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
 

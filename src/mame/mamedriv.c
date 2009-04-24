@@ -6348,7 +6348,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
  	DRIVER( hng64 )
 	DRIVER( roadedge ) 	/* 001? Roads Edge / Round Trip RV */
-				/* 002? Samurai Shodown 64 / Samurai Spirits 64 */
+	DRIVER( sams64 )	/* 002? Samurai Shodown 64 / Samurai Spirits 64 */
 				/* 003? Xtreme Rally / Off Beat Racer! */
 				/* 004? Beast Busters: Second Nightmare */
 	DRIVER( sams64_2 )	/* 005? Samurai Shodown: Warrior's Rage / Samurai Spirits: Asura Zanmaden */
