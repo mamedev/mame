@@ -3167,6 +3167,7 @@ V-V                           TP-027
 	DRIVER( ddr4mj )	/* 2000 - Dance Dance Revolution 4th Mix (G*A33 VER. JAA) */
 	DRIVER( ddr4ms )	/* 2000 - Dance Dance Revolution Solo 4th Mix (G*A33 VER. ABA) */
 	DRIVER( ddr4msj )	/* 2000 - Dance Dance Revolution Solo 4th Mix (G*A33 VER. JBA) */
+	DRIVER( dsfdr )		/* 2000 - Dancing Stage Featuring Disney's Rave (GCA37JAA) */
 	DRIVER( ddrusa )	/* 2000 - Dance Dance Revolution USA (G*A44 VER. UAA) */
 	DRIVER( ddr4mp )	/* 2000 - Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA) */
 	DRIVER( ddr4mps )	/* 2000 - Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA) */
