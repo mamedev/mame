@@ -423,6 +423,7 @@ static INT32 apply_deadzone_and_saturation(input_code code, INT32 result);
 static int joystick_map_parse(const char *mapstring, joystick_map *map);
 static void joystick_map_print(const char *header, const char *origstring, const joystick_map *map);
 static void input_code_reset_axes(void);
+static int input_code_check_axis(input_device_item *item, input_code code);
 
 
 
@@ -999,7 +1000,6 @@ input_code input_code_poll_switches(int reset)
 				if (item != NULL)
 				{
 					input_code code = device_item_to_code(device, itemid);
-					INT32 curval, diff;
 
 					/* if the item is natively a switch, poll it */
 					if (item->itemclass == ITEM_CLASS_SWITCH)
@@ -1010,35 +1010,9 @@ input_code input_code_poll_switches(int reset)
 						    continue;
 					}
 
-					/* poll the current value */
-					curval = input_code_value(code);
-
-					/* if we've already reported this one, don't bother */
-					if (item->memory == INVALID_AXIS_VALUE)
+					/* skip if there is not enough axis movement */
+					if (!input_code_check_axis(item, code))
 						continue;
-
-					/* compute the diff against memory */
-					diff = curval - item->memory;
-					if (diff < 0)
-						diff = -diff;
-
-					/* for absolute axes, look for 25% of maximum */
-					if (item->itemclass == ITEM_CLASS_ABSOLUTE)
-					{
-					    if (diff > (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4)
-    						item->memory = INVALID_AXIS_VALUE;
-    					else
-    					    continue;
-					}
-
-					/* for relative axes, look for ~20 pixels movement */
-					else if (item->itemclass == ITEM_CLASS_RELATIVE)
-					{
-					    if (diff > 20 * INPUT_RELATIVE_PER_PIXEL)
-						    item->memory = INVALID_AXIS_VALUE;
-						else
-						    continue;
-					}
 
 					/* otherwise, poll axes digitally */
 					code = INPUT_CODE_SET_ITEMCLASS(code, ITEM_CLASS_SWITCH);
@@ -1124,6 +1098,52 @@ input_code input_code_poll_keyboard_switches(int reset)
 
 
 /*-------------------------------------------------
+    input_code_check_axis - see if axis has
+    move far enough
+-------------------------------------------------*/
+
+static int input_code_check_axis(input_device_item *item, input_code code)
+{
+	INT32 curval, diff;
+
+	/* poll the current value */
+	curval = input_code_value(code);
+
+	/* if we've already reported this one, don't bother */
+	if (item->memory == INVALID_AXIS_VALUE)
+		return FALSE;
+
+    /* ignore min/max for lightguns */
+    /* so the selection will not be affected by a gun going out of range */
+    if ((INPUT_CODE_DEVCLASS(code) == DEVICE_CLASS_LIGHTGUN)
+        && (INPUT_CODE_ITEMID(code) == ITEM_ID_XAXIS || INPUT_CODE_ITEMID(code) == ITEM_ID_YAXIS)
+        && (curval == INPUT_ABSOLUTE_MAX || curval == INPUT_ABSOLUTE_MIN))
+        return FALSE;
+
+	/* compute the diff against memory */
+	diff = curval - item->memory;
+	if (diff < 0)
+		diff = -diff;
+
+	/* for absolute axes, look for 25% of maximum */
+	if (item->itemclass == ITEM_CLASS_ABSOLUTE && diff > (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4)
+	{
+		item->memory = INVALID_AXIS_VALUE;
+		return TRUE;
+	}
+
+	/* for relative axes, look for ~20 pixels movement */
+	if (item->itemclass == ITEM_CLASS_RELATIVE && diff > 20 * INPUT_RELATIVE_PER_PIXEL)
+	{
+		item->memory = INVALID_AXIS_VALUE;
+		return TRUE;
+	}
+
+    return FALSE;
+}
+
+
+/*-------------------------------------------------
     input_code_reset_axes - reset axes memory
 -------------------------------------------------*/
 
@@ -1195,37 +1215,14 @@ input_code input_code_poll_axes(int reset)
 				if (item != NULL)
 				{
 					input_code code = device_item_to_code(device, itemid);
-					INT32 curval, diff;
 
-					/* skip any switches or already-reported axes */
+					/* skip any switches */
 					if (item->itemclass == ITEM_CLASS_SWITCH)
 						continue;
 
-					/* poll the current value */
-					curval = input_code_value(code);
-
-					/* if we've already reported this one, don't bother */
-					if (item->memory == INVALID_AXIS_VALUE)
-						continue;
-
-					/* compute the diff against memory */
-					diff = curval - item->memory;
-					if (diff < 0)
-						diff = -diff;
-
-					/* for absolute axes, look for 25% of maximum */
-					if (item->itemclass == ITEM_CLASS_ABSOLUTE && diff > (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN) / 4)
-					{
-						item->memory = INVALID_AXIS_VALUE;
+					/* check if there is enough axis movement */
+					if (input_code_check_axis(item, code))
 						return code;
-					}
-
-					/* for relative axes, look for ~20 pixels movement */
-					if (item->itemclass == ITEM_CLASS_RELATIVE && diff > 20 * INPUT_RELATIVE_PER_PIXEL)
-					{
-						item->memory = INVALID_AXIS_VALUE;
-						return code;
-					}
 				}
 			}
 		}
