@@ -71,7 +71,7 @@ out of the sprite list at that point.. (verify on real hw)
 #include "sound/okim6295.h"
 #include "video/kan_pand.h" // for the original pandora
 #include "video/kan_panb.h" // for bootlegs / non-original hw
-
+#include "cpu/mcs51/mcs51.h" // for semicom mcu
 
 static WRITE16_HANDLER( snowbros_flipscreen_w )
 {
@@ -199,6 +199,60 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
+ADDRESS_MAP_END
+
+
+
+static READ8_HANDLER( prot_io_r )
+{
+	// never read?
+	return 0x00;
+}
+
+static UINT8 semicom_prot_offset = 0x00;
+
+// probably not endian safe
+static WRITE8_HANDLER( prot_io_w )
+{
+	switch (offset)
+	{
+		case 0x00:
+		{
+			UINT16 word = hyperpac_ram[(0xe000/2)+semicom_prot_offset];
+			word = (word & 0xff00) | (data << 0);
+			hyperpac_ram[(0xe000/2)+semicom_prot_offset] = word;
+			break;
+		}
+		
+		case 0x01:
+		{
+			UINT16 word = hyperpac_ram[(0xe000/2)+semicom_prot_offset];
+			word = (word & 0x00ff) | (data << 8);
+			hyperpac_ram[(0xe000/2)+semicom_prot_offset] = word;
+			break;
+		}
+		
+		case 0x02: // offset
+		{
+			semicom_prot_offset = data;
+			break;
+		}
+			
+		case 0x03: // ?? 
+		{
+			//logerror("offset %02x data %02x\n",offset,data);
+			break;
+		}
+	}
+}
+
+/* Semicom AT89C52 MCU */
+static ADDRESS_MAP_START( protection_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( protection_iomap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(prot_io_r,prot_io_w)
 ADDRESS_MAP_END
 
 /* Winter Bobble - bootleg GFX chip */
@@ -1601,6 +1655,19 @@ static MACHINE_DRIVER_START( semicom )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
+
+static MACHINE_DRIVER_START( semicom_mcu )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(semicom)
+	
+	MDRV_CPU_ADD("protection", I8052, 16000000)  // AT89C52
+	MDRV_CPU_PROGRAM_MAP(protection_map,0)
+	MDRV_CPU_IO_MAP(protection_iomap,0)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( semiprot )
 	MDRV_IMPORT_FROM(semicom)
 	MDRV_MACHINE_RESET ( semiprot )
@@ -2002,8 +2069,8 @@ ROM_START( hyperpac )
 	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "hyperpac.u1", 0x00000, 0x10000 , CRC(03faf88e) SHA1(a8da883d4b765b809452bbffca37ff224edbe86d) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x10000, "protection", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "at89c52.bin", 0x00000, 0x2000 , CRC(291f9326) SHA1(e440ce7d92188faa86e02e7f9db4ec6bce21efd3) ) /* decapped */
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "hyperpac.j15", 0x00000, 0x40000, CRC(fb9f468d) SHA1(52857b1a04c64ac853340ebb8e92d98eabea8bc1) )
@@ -2647,7 +2714,8 @@ static DRIVER_INIT( cookbib2 )
 #endif
 }
 
-
+// protection simulation no longer used
+#if 0
 static DRIVER_INIT( hyperpac )
 {
 	/* simulate RAM initialization done by the protection MCU */
@@ -2661,6 +2729,7 @@ static DRIVER_INIT( hyperpac )
 	hyperpac_ram[0xe084/2] = 0x7654;
 	hyperpac_ram[0xe086/2] = 0x3210;
 }
+#endif
 
 static READ16_HANDLER ( _4in1_02_read )
 {
@@ -2749,7 +2818,7 @@ GAME( 1990, wintbob,  snowbros, wintbob,  snowbros, 0, ROT0, "[Toaplan] (Sakowa 
 GAME( 1995, honeydol, 0,        honeydol, honeydol, 0, ROT0, "Barko Corp.", "Honey Dolls", 0 ) // based on snowbros code..
 GAME( 1995, twinadv,  0,        twinadv,  twinadv,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", 0 )
 GAME( 1995, twinadvk, twinadv,  twinadv,  twinadv,  0, ROT0, "Barko Corp.", "Twin Adventure (Korea)", 0 )
-GAME( 1995, hyperpac, 0,        semicom,  hyperpac, hyperpac, ROT0, "SemiCom", "Hyper Pacman", 0 )
+GAME( 1995, hyperpac, 0,        semicom_mcu,  hyperpac, 0, ROT0, "SemiCom", "Hyper Pacman", 0 )
 GAME( 1995, hyperpcb, hyperpac, semicom,  hyperpac, 0,        ROT0, "bootleg", "Hyper Pacman (bootleg)", 0 )
 GAME( 1996, cookbib2, 0,        semiprot, cookbib2, cookbib2, ROT0, "SemiCom", "Cookie & Bibi 2", 0 )
 GAME( 1996, toppyrap, 0,        semiprot, toppyrap, 0,        ROT0, "SemiCom", "Toppy & Rappy", 0 )
