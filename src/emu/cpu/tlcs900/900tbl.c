@@ -1900,6 +1900,7 @@ static void _DAABR(tlcs900_state *cpustate)
 
 static void _DB(tlcs900_state *cpustate)
 {
+	logerror("%08x: invalid or illegal instruction\n", cpustate->pc.d );
 }
 
 
@@ -2055,8 +2056,8 @@ static void _EXBMR(tlcs900_state *cpustate)
 {
 	UINT8	i = RDMEM( cpustate->ea1.d );
 
-	WRMEM( cpustate->ea1.d, *cpustate->p1_reg8 );
-	*cpustate->p1_reg8 = i;
+	WRMEM( cpustate->ea1.d, *cpustate->p2_reg8 );
+	*cpustate->p2_reg8 = i;
 }
 
 
@@ -2073,8 +2074,8 @@ static void _EXWMR(tlcs900_state *cpustate)
 {
 	UINT16	i = RDMEMW( cpustate->ea1.d );
 
-	WRMEMW( cpustate->ea1.d, *cpustate->p1_reg16 );
-	*cpustate->p1_reg16 = i;
+	WRMEMW( cpustate->ea1.d, *cpustate->p2_reg16 );
+	*cpustate->p2_reg16 = i;
 }
 
 
@@ -2885,7 +2886,7 @@ static void _POPWR(tlcs900_state *cpustate)
 static void _POPWSR(tlcs900_state *cpustate)
 {
 	_POPWR( cpustate );
-	cpustate->regbank = cpustate->sr.b.h & 0x07;
+	cpustate->regbank = cpustate->sr.b.h & 0x03;
 	cpustate->check_irqs = 1;
 }
 

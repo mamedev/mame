@@ -352,109 +352,179 @@ static CPU_EXIT( tlcs900 )
 #include "900tbl.c"
 
 
-INLINE void tlcs900_process_hdma( tlcs900_state *cpustate, int channel, int vector )
+#define NUM_MASKABLE_IRQS	22
+static const struct {
+	UINT8 reg;
+	UINT8 iff;
+	UINT8 vector;
+} irq_vector_map[NUM_MASKABLE_IRQS] =
 {
-	if ( vector == ( cpustate->reg[0x7c + channel] & 0x1f ) )
+	{ INTETC32, 0x80, 0x80 },	/* INTTC3 */
+	{ INTETC32, 0x08, 0x7c },	/* INTTC2 */
+	{ INTETC10, 0x80, 0x78 },	/* INTTC1 */
+	{ INTETC10, 0x08, 0x74 },	/* INTTC0 */
+	{ INTE0AD, 0x80, 0x70 },	/* INTAD */
+	{ INTES1, 0x80, 0x6c },		/* INTTX1 */
+	{ INTES1, 0x08, 0x68 },		/* INTRX1 */
+	{ INTES0, 0x80, 0x64 },		/* INTTX0 */
+	{ INTES0, 0x08, 0x60 },		/* INTRX0 */
+	{ INTET76, 0x80, 0x5c },	/* INTTR7 */
+	{ INTET76, 0x08, 0x58 },	/* INTTR6 */
+	{ INTET54, 0x80, 0x54 },	/* INTTR5 */
+	{ INTET54, 0x08, 0x50 },	/* INTTR4 */
+	{ INTET32, 0x80, 0x4c },	/* INTT3 */
+	{ INTET32, 0x08, 0x48 },	/* INTT2 */
+	{ INTET10, 0x80, 0x44 },	/* INTT1 */
+	{ INTET10, 0x08, 0x40 },	/* INTT0 */
+								/* 0x3c - reserved */
+	{ INTE67, 0x80, 0x38 },		/* INT7 */
+	{ INTE67, 0x08, 0x34 },		/* INT6 */
+	{ INTE45, 0x80, 0x30 },		/* INT5 */
+	{ INTE45, 0x08, 0x2c },		/* INT4 */
+	{ INTE0AD, 0x08, 0x28 }		/* INT0 */
+};
+
+
+INLINE int tlcs900_process_hdma( tlcs900_state *cpustate, int channel )
+{
+	UINT8 vector = ( cpustate->reg[0x7c + channel] & 0x1f ) << 2;
+
+	/* Check if any HDMA actions should be performed */
+	if ( vector >= 0x28 && vector != 0x3C && vector < 0x74 )
 	{
-		switch( cpustate->dmam[channel].b.l & 0x1f )
-		{
-		case 0x00:
-			WRMEM( cpustate->dmad[channel].d, RDMEM( cpustate->dmas[channel].d ) );
-			cpustate->dmad[channel].d += 1;
-			cpustate->cycles += 8;
-			break;
-		case 0x01:
-			WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
-			cpustate->dmad[channel].d += 2;
-			cpustate->cycles += 8;
-			break;
-		case 0x02:
-			WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
-			cpustate->dmad[channel].d += 4;
-			cpustate->cycles += 12;
-			break;
-		case 0x04:
-			WRMEM( cpustate->dmad[channel].d, RDMEM( cpustate->dmas[channel].d ) );
-			cpustate->dmad[channel].d -= 1;
-			cpustate->cycles += 8;
-			break;
-		case 0x05:
-			WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
-			cpustate->dmad[channel].d -= 2;
-			cpustate->cycles += 8;
-			break;
-		case 0x06:
-			WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
-			cpustate->dmad[channel].d -= 4;
-			cpustate->cycles += 12;
-			break;
-		case 0x08:
-			WRMEM( cpustate->dmad[channel].d, RDMEM( cpustate->dmas[channel].d ) );
-			cpustate->dmas[channel].d += 1;
-			cpustate->cycles += 8;
-			break;
-		case 0x09:
-			WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
-			cpustate->dmas[channel].d += 2;
-			cpustate->cycles += 8;
-			break;
-		case 0x0a:
-			WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
-			cpustate->dmas[channel].d += 4;
-			cpustate->cycles += 12;
-			break;
-		case 0x0c:
-			WRMEM( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
-			cpustate->dmas[channel].d -= 1;
-			cpustate->cycles += 8;
-			break;
-		case 0x0d:
-			WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
-			cpustate->dmas[channel].d -= 2;
-			cpustate->cycles += 8;
-			break;
-		case 0x0e:
-			WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
-			cpustate->dmas[channel].d -= 4;
-			cpustate->cycles += 12;
-			break;
-		case 0x10:
-			WRMEM( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
-			cpustate->cycles += 8;
-			break;
-		case 0x11:
-			WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
-			cpustate->cycles += 8;
-			break;
-		case 0x12:
-			WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
-			cpustate->cycles += 12;
-			break;
-		case 0x14:
-			cpustate->dmas[channel].d += 1;
-			cpustate->cycles += 5;
-			break;
-		}
+		int irq = 0;
 
-		cpustate->dmac[channel].w.l -= 1;
+		while( irq < NUM_MASKABLE_IRQS && irq_vector_map[irq].vector != vector )
+			irq++;
 
-		if ( cpustate->dmac[channel].w.l == 0 )
+		/* Check if our interrupt flip-flop is set */
+		if ( irq < NUM_MASKABLE_IRQS && cpustate->reg[irq_vector_map[irq].reg] & irq_vector_map[irq].iff )
 		{
-			cpustate->reg[0x7c + channel] = 0;
-			switch( channel )
+			switch( cpustate->dmam[channel].b.l & 0x1f )
 			{
-			case 0:
-				cpustate->reg[INTETC10] |= 0x08;
+			case 0x00:
+				WRMEM( cpustate->dmad[channel].d, RDMEM( cpustate->dmas[channel].d ) );
+				cpustate->dmad[channel].d += 1;
+				cpustate->cycles += 8;
 				break;
-			case 1:
-				cpustate->reg[INTETC10] |= 0x80;
+			case 0x01:
+				WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
+				cpustate->dmad[channel].d += 2;
+				cpustate->cycles += 8;
 				break;
-			case 2:
-				cpustate->reg[INTETC32] |= 0x08;
+			case 0x02:
+				WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
+				cpustate->dmad[channel].d += 4;
+				cpustate->cycles += 12;
 				break;
-			case 3:
-				cpustate->reg[INTETC32] |= 0x80;
+			case 0x04:
+				WRMEM( cpustate->dmad[channel].d, RDMEM( cpustate->dmas[channel].d ) );
+				cpustate->dmad[channel].d -= 1;
+				cpustate->cycles += 8;
 				break;
+			case 0x05:
+				WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
+				cpustate->dmad[channel].d -= 2;
+				cpustate->cycles += 8;
+				break;
+			case 0x06:
+				WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
+				cpustate->dmad[channel].d -= 4;
+				cpustate->cycles += 12;
+				break;
+			case 0x08:
+				WRMEM( cpustate->dmad[channel].d, RDMEM( cpustate->dmas[channel].d ) );
+				cpustate->dmas[channel].d += 1;
+				cpustate->cycles += 8;
+				break;
+			case 0x09:
+				WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
+				cpustate->dmas[channel].d += 2;
+				cpustate->cycles += 8;
+				break;
+			case 0x0a:
+				WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
+				cpustate->dmas[channel].d += 4;
+				cpustate->cycles += 12;
+				break;
+			case 0x0c:
+				WRMEM( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
+				cpustate->dmas[channel].d -= 1;
+				cpustate->cycles += 8;
+				break;
+			case 0x0d:
+				WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
+				cpustate->dmas[channel].d -= 2;
+				cpustate->cycles += 8;
+				break;
+			case 0x0e:
+				WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
+				cpustate->dmas[channel].d -= 4;
+				cpustate->cycles += 12;
+				break;
+			case 0x10:
+				WRMEM( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
+				cpustate->cycles += 8;
+				break;
+			case 0x11:
+				WRMEMW( cpustate->dmad[channel].d, RDMEMW( cpustate->dmas[channel].d ) );
+				cpustate->cycles += 8;
+				break;
+			case 0x12:
+				WRMEML( cpustate->dmad[channel].d, RDMEML( cpustate->dmas[channel].d ) );
+				cpustate->cycles += 12;
+				break;
+			case 0x14:
+				cpustate->dmas[channel].d += 1;
+				cpustate->cycles += 5;
+				break;
+			}
+
+			cpustate->dmac[channel].w.l -= 1;
+
+			if ( cpustate->dmac[channel].w.l == 0 )
+			{
+				cpustate->reg[0x7c + channel] = 0;
+				switch( channel )
+				{
+				case 0:
+					cpustate->reg[INTETC10] |= 0x08;
+					break;
+				case 1:
+					cpustate->reg[INTETC10] |= 0x80;
+					break;
+				case 2:
+					cpustate->reg[INTETC32] |= 0x08;
+					break;
+				case 3:
+					cpustate->reg[INTETC32] |= 0x80;
+					break;
+				}
+			}
+
+			/* Clear the interrupt flip-flop */
+			cpustate->reg[irq_vector_map[irq].reg] &= ~irq_vector_map[irq].iff;
+
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
+INLINE void tlcs900_check_hdma( tlcs900_state *cpustate )
+{
+	/* HDMA can only be performed if interrupts are allowed */
+	if ( ( cpustate->sr.b.h & 0x70 ) != 0x70 )
+	{
+		if ( ! tlcs900_process_hdma( cpustate, 0 ) )
+		{
+			if ( ! tlcs900_process_hdma( cpustate, 1 ) )
+			{
+				if ( ! tlcs900_process_hdma( cpustate, 2 ) )
+				{
+					tlcs900_process_hdma( cpustate, 3 );
+				}
 			}
 		}
 	}
@@ -463,38 +533,8 @@ INLINE void tlcs900_process_hdma( tlcs900_state *cpustate, int channel, int vect
 
 INLINE void tlcs900_check_irqs( tlcs900_state *cpustate )
 {
-#define NUM_MASKABLE_IRQS	22
-	static const struct {
-		UINT8 reg;
-		UINT8 iff;
-		UINT8 vector;
-	} irq_vector_map[NUM_MASKABLE_IRQS] =
-	{
-		{ INTETC32, 0x80, 0x80 },	/* INTTC3 */
-		{ INTETC32, 0x08, 0x7c },	/* INTTC2 */
-		{ INTETC10, 0x80, 0x78 },	/* INTTC1 */
-		{ INTETC10, 0x08, 0x74 },	/* INTTC0 */
-		{ INTE0AD, 0x80, 0x70 },	/* INTAD */
-		{ INTES1, 0x80, 0x6c },		/* INTTX1 */
-		{ INTES1, 0x08, 0x68 },		/* INTRX1 */
-		{ INTES0, 0x80, 0x64 },		/* INTTX0 */
-		{ INTES0, 0x08, 0x60 },		/* INTRX0 */
-		{ INTET76, 0x80, 0x5c },	/* INTTR7 */
-		{ INTET76, 0x08, 0x58 },	/* INTTR6 */
-		{ INTET54, 0x80, 0x54 },	/* INTTR5 */
-		{ INTET54, 0x08, 0x50 },	/* INTTR4 */
-		{ INTET32, 0x80, 0x4c },	/* INTT3 */
-		{ INTET32, 0x08, 0x48 },	/* INTT2 */
-		{ INTET10, 0x80, 0x44 },	/* INTT1 */
-		{ INTET10, 0x08, 0x40 },	/* INTT0 */
-									/* 0x3c - reserved */
-		{ INTE67, 0x80, 0x38 },		/* INT7 */
-		{ INTE67, 0x08, 0x34 },		/* INT6 */
-		{ INTE45, 0x80, 0x30 },		/* INT5 */
-		{ INTE45, 0x08, 0x2c },		/* INT4 */
-		{ INTE0AD, 0x08, 0x28 }		/* INT0 */
-	};
 	int irq_vectors[9] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+	int level = 0;
 	int irq = -1;
 	int i;
 
@@ -538,6 +578,7 @@ INLINE void tlcs900_check_irqs( tlcs900_state *cpustate )
 		if ( irq_vectors[i] >= 0 )
 		{
 			irq = irq_vectors[i];
+			level = i + 1;
 		}
 	}
 
@@ -550,6 +591,10 @@ INLINE void tlcs900_check_irqs( tlcs900_state *cpustate )
 		WRMEML( cpustate->xssp.d, cpustate->pc.d );
 		cpustate->xssp.d -= 2;
 		WRMEMW( cpustate->xssp.d, cpustate->sr.w.l );
+
+		/* Mask off any lower priority interrupts  */
+		cpustate->sr.b.h = ( cpustate->sr.b.h & 0x8f ) | ( level << 4 );
+
 		cpustate->pc.d = RDMEML( 0xffff00 + vector );
 		cpustate->cycles += 18;
 
@@ -557,15 +602,6 @@ INLINE void tlcs900_check_irqs( tlcs900_state *cpustate )
 
 		/* Clear taken IRQ */
 		cpustate->reg[ irq_vector_map[irq].reg ] &= ~ irq_vector_map[irq].iff;
-
-		/* Check if any HDMA actions should be performed */
-		if ( vector >= 0x28 && vector != 0x3C && vector < 0x74 )
-		{
-			tlcs900_process_hdma( cpustate, 0, vector >> 2 );
-			tlcs900_process_hdma( cpustate, 1, vector >> 2 );
-			tlcs900_process_hdma( cpustate, 2, vector >> 2 );
-			tlcs900_process_hdma( cpustate, 3, vector >> 2 );
-		}
 	}
 }
 
@@ -678,6 +714,7 @@ INLINE void tlcs900_handle_timers( tlcs900_state *cpustate )
 
 		for( ; cpustate->timer_change[0] > 0; cpustate->timer_change[0]-- )
 		{
+//printf("timer0 = %02x, TREG0 = %02x\n", cpustate->timer[0], cpustate->reg[TREG0] );
 			cpustate->timer[0] += 1;
 			if ( cpustate->timer[0] == cpustate->reg[TREG0] )
 			{
@@ -855,6 +892,8 @@ static CPU_EXECUTE( tlcs900 )
 		tlcs900_handle_ad( cpustate );
 
 		tlcs900_handle_timers( cpustate );
+
+		tlcs900_check_hdma( cpustate );
 
 		cpustate->icount -= cpustate->cycles;
 	} while ( cpustate->icount > 0 );
