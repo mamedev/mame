@@ -4399,7 +4399,7 @@ ROM_START( bubbletr )
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_DISPOSE ) /* Sprites */
 	ROM_LOAD( "bt1-obj0.bin",  0x000000, 0x80000, CRC(16b5dc04) SHA1(57cc4b7907442f922102fbd61e470c149f0379ac) )
 	ROM_LOAD( "bt1-obj1.bin",  0x080000, 0x80000, CRC(ae37a969) SHA1(524a8ef68a62f9168d356e6cd37a72a888ced202) )
-	ROM_LOAD( "bt1-obj2.bin",  0x100000, 0x80000, NO_DUMP ) // missing?
+	ROM_LOAD( "bt1-obj2.bin",  0x100000, 0x80000, CRC(75f74871) SHA1(75c47a2132e21a2d82000bca137929bffecc96ef) )
 	ROM_LOAD( "bt1-obj3.bin",  0x180000, 0x80000, CRC(7fb23c05) SHA1(da97c595a3338021c1bc46f9668e1ec6c7985cea) )
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE ) /* Tiles */
@@ -4903,7 +4903,7 @@ GAME( 1991, sgunner2, 0,        sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "
 GAME( 1991, sgunnr2j, sgunner2, sgunner,  sgunner,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (Japan)", 0 )
 GAME( 1991, cosmogng, 0,        default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
 GAME( 1991, cosmognj, cosmogng, default,  default,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )
-GAME( 1992, bubbletr, 0,        gollygho, bubbletr, bubbletr, ROT180, "Namco", "Bubble Trouble (Japan)",GAME_NOT_WORKING ) // incomplete dump
+GAME( 1992, bubbletr, 0,        gollygho, bubbletr, bubbletr, ROT180, "Namco", "Bubble Trouble (Japan)",GAME_NOT_WORKING )
 GAMEL(1992, finalap3, 0,        finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (World)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS, layout_finallap  )
 GAMEL(1992, finalp3j, finalap3, finallap, finalap3, finalap3, ROT0,   "Namco", "Final Lap 3 (Japan)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS, layout_finallap  )
 GAME( 1992, luckywld, 0,        luckywld, luckywld, luckywld, ROT0,   "Namco", "Lucky & Wild", 0 )

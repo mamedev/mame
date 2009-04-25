@@ -1618,6 +1618,7 @@ const game_driver * const drivers[] =
 	DRIVER( pitnruna )	/* PR  (c) 1984 Taito Corporation */
 	DRIVER( lkage )		/* A54 (c) 1984 Taito Corporation */
 	DRIVER( lkageo )	/* A54 (c) 1984 Taito Corporation */
+	DRIVER( lkageoo )	/* A54 (c) 1984 Taito Corporation */
 	DRIVER( lkageb )	/* bootleg */
 	DRIVER( lkageb2 )	/* bootleg */
 	DRIVER( lkageb3 )	/* bootleg */
@@ -4697,6 +4698,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( boomrang )	/* (c) 1983 */
 	DRIVER( boomrana )	/* (c) 1983 */
 	DRIVER( kamikcab )	/* (c) 1984 */
+	DRIVER( yellowcj )	/* (c) 1984 */
 	DRIVER( yellowcb )	/* bootleg */
 	DRIVER( liberate )	/* (c) 1984  Data East Corporation */
 	DRIVER( dualaslt )	/* (c) 1984  Data East USA (US) */
@@ -5018,6 +5020,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( spbactn )	/* 9002 - (c) 1991 Tecmo */
 	DRIVER( spbactnj )	/* 9002 - (c) 1991 Tecmo */
 	DRIVER( fstarfrc )	/* (c) 1992 Tecmo */
+	DRIVER( fstarfrcj )	/* (c) 1992 Tecmo */
 	DRIVER( ginkun )	/* (c) 1995 Tecmo */
 	DRIVER( deroon )	/* (c) 1996 Tecmo */
 	DRIVER( tkdensho )	/* (c) 1996 Tecmo */
@@ -6883,6 +6886,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( zeroteam )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zeroteaa )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zeroteab )	/* (c) 1993 Seibu Kaihatsu */
+	DRIVER( zeroteac )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( zerotsel )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( nzerotea )	/* (c) 1993 Seibu Kaihatsu */
 	DRIVER( xsedae )	/* (c) 1995 Dream Island */

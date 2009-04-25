@@ -478,6 +478,29 @@ ROM_START( fstarfrc )
 	ROM_LOAD( "fstarf08.rom", 0x00000, 0x20000, CRC(f0ad5693) SHA1(a0202801bb9f9c86175ca7989fbc9efa47183188) )
 ROM_END
 
+ROM_START( fstarfrcj )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1.bin", 0x00000, 0x40000, CRC(1905d85d) SHA1(83d244f13064b826ccf86b5a8158478452efbf7f) )
+	ROM_LOAD16_BYTE( "2.bin", 0x00001, 0x40000, CRC(de9cfc39) SHA1(bd7943f366a3161222848c5f9b687a6ba8c1d43a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "fstarf07.rom", 0x00000, 0x10000, CRC(e0ad5de1) SHA1(677237341e837061b6cc02200c0752964caed907) )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "fstarf03.rom", 0x00000, 0x20000, CRC(54375335) SHA1(d1af56a7c7fff877066dad3144d0b5147da28c6a) )
+
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "fstarf05.rom", 0x00000, 0x80000, CRC(77a281e7) SHA1(a87a90c2c856d45785cb56185b1a7dff3404b5cb) )
+	ROM_LOAD16_BYTE( "fstarf04.rom", 0x00001, 0x80000, CRC(398a920d) SHA1(eecc167803f48517348d68ce70f15e87eac204bb) )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "fstarf09.rom", 0x00000, 0x80000, CRC(d51341d2) SHA1(e46c319158046d407d4387cb2d8f0b6cfd7be576) )
+	ROM_LOAD16_BYTE( "fstarf06.rom", 0x00001, 0x80000, CRC(07e40e87) SHA1(22867e52a8267ae8ae0ff0dba6bb846cb3e1b63d) )
+
+	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_LOAD( "fstarf08.rom", 0x00000, 0x20000, CRC(f0ad5693) SHA1(a0202801bb9f9c86175ca7989fbc9efa47183188) )
+ROM_END
+
 ROM_START( ginkun )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ginkun01.i01", 0x00000, 0x40000, CRC(98946fd5) SHA1(e0b496d1fa5201d94a2a22243fe4b37d9ff7bc90) )
@@ -633,6 +656,7 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1992, fstarfrc, 0, fstarfrc, fstarfrc, 0, ROT90, "Tecmo", "Final Star Force (US)", 0 )
-GAME( 1992, riot,     0, riot,     riot,     0, ROT0,  "NMK",   "Riot", 0 )
-GAME( 1995, ginkun,   0, ginkun,   ginkun,   0, ROT0,  "Tecmo", "Ganbare Ginkun", 0 )
+GAME( 1992, fstarfrc,  0,        fstarfrc, fstarfrc, 0, ROT90, "Tecmo", "Final Star Force (US)", 0 )
+GAME( 1992, fstarfrcj, fstarfrc, fstarfrc, fstarfrc, 0, ROT90, "Tecmo", "Final Star Force (Japan)", 0 )
+GAME( 1992, riot,      0,        riot,     riot,     0, ROT0,  "NMK",   "Riot", 0 )
+GAME( 1995, ginkun,    0,        ginkun,   ginkun,   0, ROT0,  "Tecmo", "Ganbare Ginkun", 0 )

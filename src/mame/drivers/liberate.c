@@ -771,6 +771,36 @@ ROM_START( kamikcab )
 	ROM_LOAD( "bp15", 0, 32,  CRC(30d3acce) SHA1(be88d74250edc2920fc0f95cfdd93468ac9c640e) )
 ROM_END
 
+ROM_START( yellowcj )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "bp11.bin", 0xc000, 0x2000, CRC(63cdee83) SHA1(c4a5c3d7761336f4fc3fe83490b69812d70b2cde) )
+	ROM_RELOAD(            0x0000, 0x2000 )
+	ROM_LOAD( "bp10.bin", 0xe000, 0x2000, CRC(1024f2f1) SHA1(a3804df3c9ecfde9318ed121327ef095d7a9e1f0) )
+	ROM_RELOAD(            0x2000, 0x2000 )
+
+	ROM_REGION(0x10000, "audiocpu", 0)	/* 64K for CPU 2 */
+	ROM_LOAD( "bp09", 0x0e000, 0x2000, CRC(16b13676) SHA1(f3cad959cbcde243db3ebc77a3692302a44beb09) )
+
+	ROM_REGION(0xc000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "bp03.bin", 0x0000, 0x2000, CRC(6761d767) SHA1(f5180cc31d3b4103c78b74e5de311565581d6db7) )
+	ROM_LOAD( "bp04.bin", 0x2000, 0x2000, CRC(55517196) SHA1(f46899751e614aa35ec316caacb84e25193a56d6) )
+	ROM_LOAD( "bp05.rom", 0x4000, 0x2000, CRC(33658fd9) SHA1(16c1d211b8fb46467906cd2cd32bcc9eac464573) )
+	ROM_LOAD( "bp06.rom", 0x6000, 0x2000, CRC(fbc20f07) SHA1(7f7028638038f61dae6aca09d393adeea3ab1b2d) )
+	ROM_LOAD( "bp07.rom", 0x8000, 0x2000, CRC(061f9e54) SHA1(2e7b7c98892702513e53b8dd2a2a0dc152d52016) )
+	ROM_LOAD( "bp08.rom", 0xa000, 0x2000, CRC(2ace626d) SHA1(6f12eb2d6a01ac1285d15d15948124b85c6964b7) )
+
+	ROM_REGION(0x8000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "bp01.bin", 0x0000, 0x2000, CRC(8e92a253) SHA1(94063c5aae9ce36b47e51f55e7502d1b6c4334be) )
+	ROM_LOAD( "bp02.bin", 0x2000, 0x2000, CRC(47ada1bb) SHA1(cc0a38d0cc220382c36e6268f47db332bdbb07a2) )
+	ROM_LOAD( "bp00.bin", 0x4000, 0x2000, CRC(9ead0da1) SHA1(5e46527fa38d75efd266ca982c7cb6d88bb3ea49) )
+
+	ROM_REGION(0x4000, "user1", 0 )
+	ROM_LOAD( "bp12", 0x00000, 0x4000, CRC(8c8f5d35) SHA1(5b908d92786dae76aaf84de14f8847ee8ee350a1) )
+
+	ROM_REGION(32, "proms", 0 )
+	ROM_LOAD( "bp15", 0, 32,  CRC(30d3acce) SHA1(be88d74250edc2920fc0f95cfdd93468ac9c640e) )
+ROM_END
+
 ROM_START( yellowcb )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "rom11.rom", 0xc000, 0x2000, CRC(af97d530) SHA1(b8b9bfcb2e9164daa115b91a533418a39c40c31d) )
@@ -962,6 +992,7 @@ GAME( 1983, prosport, 0,        prosport,  liberate, prosport, ROT270, "Data Eas
 GAME( 1983, boomrang, 0,        boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 1)", 0 )
 GAME( 1983, boomrana, boomrang, boomrang,  boomrang, prosport, ROT270, "Data East Corporation", "Boomer Rang'r / Genesis (set 2)", 0 )
 GAME( 1984, kamikcab, 0,        boomrang,  kamikcab, prosport, ROT270, "Data East Corporation", "Kamikaze Cabbie", 0 )
+GAME( 1984, yellowcj, kamikcab, boomrang,  yellowcb, yellowcb, ROT270, "Data East Corporation", "Yellow Cab (Japan)", GAME_NOT_WORKING )
 GAME( 1984, yellowcb, kamikcab, boomrang,  yellowcb, yellowcb, ROT270, "bootleg",               "Yellow Cab (bootleg)", 0 )
 GAME( 1984, liberate, 0,        liberate,  liberate, liberate, ROT270, "Data East Corporation", "Liberation", 0 )
 GAME( 1984, dualaslt, liberate, liberate,  dualaslt, liberate, ROT270, "Data East USA",         "Dual Assault", 0 )
