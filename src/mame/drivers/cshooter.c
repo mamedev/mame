@@ -258,9 +258,9 @@ static READ8_HANDLER(pal_r)
 	return paletteram[offset];
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xafff) AM_READ(SMH_BANK1)
+static ADDRESS_MAP_START( cshooter_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xafff) AM_READWRITE(SMH_BANK1, SMH_RAM)
 	AM_RANGE(0xb000, 0xb0ff) AM_READ(SMH_RAM)			// sound related ?
 	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_BASE(&paletteram)
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
@@ -269,25 +269,17 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc205, 0xc205) AM_READ(cshooter_coin_r)	// hack until I understand
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xafff) AM_WRITE(SMH_RAM)			// to be confirmed
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_c500_w)
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(cshooter_txram_w) AM_BASE(&cshooter_txram)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(&cshooter_txram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( arreadmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( airraid_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xb000, 0xb0ff) AM_RAM			// sound related ?
 	AM_RANGE(0xb100, 0xb1ff) AM_RAM//READ(SMH_BANK1)           // sound related ?
@@ -296,7 +288,11 @@ static ADDRESS_MAP_START( arreadmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_c500_w)
+	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
+	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(&cshooter_txram)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_BASE(&paletteram)
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
 	AM_RANGE(0xdc00, 0xddff) AM_RAM
@@ -305,38 +301,21 @@ static ADDRESS_MAP_START( arreadmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( arwritemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_c500_w)
-	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
-	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(cshooter_txram_w) AM_BASE(&cshooter_txram)
-ADDRESS_MAP_END
-
 
 /* Sound CPU */
 
-static ADDRESS_MAP_START( s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_WRITENOP // AM_DEVWRITE("ym1", ym2203_w) ?
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP // AM_DEVWRITE("ym2", ym2203_w) ?
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( s2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4001) AM_WRITENOP // AM_DEVWRITE("ym1", ym2203_w) ?
 	AM_RANGE(0x4008, 0x4009) AM_WRITENOP // AM_DEVWRITE("ym2", ym2203_w) ?
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -442,11 +421,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( cshooter )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(cshooter_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(s_readmem,s_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_RESET(cshooter)
 
@@ -471,11 +450,11 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( airraid )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(arreadmem,arwritemem)
+	MDRV_CPU_PROGRAM_MAP(airraid_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(s2_readmem,s2_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map2,0)
 
 	MDRV_MACHINE_RESET(cshooter)
 

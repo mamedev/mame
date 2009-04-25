@@ -63,48 +63,27 @@ static WRITE16_HANDLER ( crospang_soundlatch_w )
 
 /* main cpu */
 
-static ADDRESS_MAP_START( crospang_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x120000, 0x1207ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x122000, 0x1227ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x2005ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x210000, 0x2107ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
-	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
-	AM_RANGE(0x320000, 0x32ffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( crospang_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITENOP // writes to rom quite often
+static ADDRESS_MAP_START( crospang_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITENOP // writes to rom quite often
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(crospang_fg_scrolly_w)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(crospang_bg_scrollx_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(crospang_bg_scrolly_w)
 	AM_RANGE(0x100008, 0x100009) AM_WRITE(crospang_fg_scrollx_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITENOP
-	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(crospang_fg_videoram_w) AM_BASE(&crospang_fg_videoram)
-	AM_RANGE(0x122000, 0x1227ff) AM_WRITE(crospang_bg_videoram_w) AM_BASE(&crospang_bg_videoram)
-	AM_RANGE(0x200000, 0x2005ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x210000, 0x2107ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE(&crospang_fg_videoram)
+	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE(&crospang_bg_videoram)
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
-	AM_RANGE(0x320000, 0x32ffff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bestri_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x120000, 0x1207ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x122000, 0x1227ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x2005ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x210000, 0x2107ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
-	AM_RANGE(0x3a0000, 0x3affff) AM_READ(SMH_RAM)
+	AM_RANGE(0x320000, 0x32ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bestri_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITENOP // writes to rom quite often
+static ADDRESS_MAP_START( bestri_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITENOP // writes to rom quite often
 
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(bestri_fg_scrollx_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrolly_w)
@@ -112,28 +91,24 @@ static ADDRESS_MAP_START( bestri_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(bestri_bg_scrollx_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(bestri_tilebank_w)
 
-	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(crospang_fg_videoram_w) AM_BASE(&crospang_fg_videoram)
-	AM_RANGE(0x122000, 0x1227ff) AM_WRITE(crospang_bg_videoram_w) AM_BASE(&crospang_bg_videoram)
-	AM_RANGE(0x200000, 0x2005ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x210000, 0x2107ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE(&crospang_fg_videoram)
+	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE(&crospang_bg_videoram)
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x270004, 0x270005) AM_WRITENOP
+	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
+	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
 
-
-
-	AM_RANGE(0x3a0000, 0x3affff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x3a0000, 0x3affff) AM_RAM
 ADDRESS_MAP_END
 
 /* sound cpu */
 
-static ADDRESS_MAP_START( crospang_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( crospang_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( crospang_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crospang_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -329,11 +304,11 @@ static MACHINE_DRIVER_START( crospang )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)
-	MDRV_CPU_PROGRAM_MAP(crospang_readmem,crospang_writemem)
+	MDRV_CPU_PROGRAM_MAP(crospang_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(crospang_sound_map,0)
 	MDRV_CPU_IO_MAP(crospang_sound_io_map,0)
 
 	/* video hardware */
@@ -366,11 +341,11 @@ static MACHINE_DRIVER_START( bestri )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)
-	MDRV_CPU_PROGRAM_MAP(bestri_readmem,bestri_writemem)
+	MDRV_CPU_PROGRAM_MAP(bestri_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(crospang_sound_map,0)
 	MDRV_CPU_IO_MAP(crospang_sound_io_map,0)
 
 	/* video hardware */

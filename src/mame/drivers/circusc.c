@@ -154,23 +154,7 @@ static WRITE8_HANDLER(circusc_sound_w)
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03fc) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x03fc) AM_READ_PORT("P1")
-	AM_RANGE(0x1002, 0x1002) AM_MIRROR(0x03fc) AM_READ_PORT("P2")
-	AM_RANGE(0x1003, 0x1003) AM_MIRROR(0x03fc) AM_READNOP              /* unpopulated DIPSW 3*/
-	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x03ff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x33ff) AM_READ(SMH_RAM) /* colorram */
-	AM_RANGE(0x3400, 0x37ff) AM_READ(SMH_RAM) /* videoram */
-	AM_RANGE(0x3800, 0x38ff) AM_READ(SMH_RAM) /* spriteram2 */
-	AM_RANGE(0x3900, 0x39ff) AM_READ(SMH_RAM) /* spriteram */
-	AM_RANGE(0x3a00, 0x3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( circusc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x03f8) AM_WRITE(circusc_flipscreen_w)		/* FLIP */
 	AM_RANGE(0x0001, 0x0001) AM_MIRROR(0x03f8) AM_WRITE(interrupt_enable_w)			/* INTST */
 //  AM_RANGE(0x0002, 0x0002) AM_MIRROR(0x03f8) AM_WRITENOP                          /* MUT - not used /*
@@ -179,26 +163,27 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x0400) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)			/* WDOG */
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x03ff) AM_WRITE(soundlatch_w)				/* SOUND DATA */
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_WRITE(circusc_sh_irqtrigger_w)	/* SOUND-ON causes interrupt on audio CPU */
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03fc) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x03fc) AM_READ_PORT("P1")
+	AM_RANGE(0x1002, 0x1002) AM_MIRROR(0x03fc) AM_READ_PORT("P2")
+	AM_RANGE(0x1003, 0x1003) AM_MIRROR(0x03fc) AM_READNOP              /* unpopulated DIPSW 3*/
+	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x03ff) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x03ff) AM_WRITE(SMH_RAM) AM_BASE(&circusc_scroll) /* VGAP */
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(circusc_colorram_w) AM_BASE(&circusc_colorram)
-	AM_RANGE(0x3400, 0x37ff) AM_WRITE(circusc_videoram_w) AM_BASE(&circusc_videoram)
-	AM_RANGE(0x3800, 0x38ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x3900, 0x39ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3a00, 0x3fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(circusc_colorram_w) AM_BASE(&circusc_colorram) /* colorram */
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(circusc_videoram_w) AM_BASE(&circusc_videoram) /* videoram */
+	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE(&spriteram_2) /* spriteram2 */
+	AM_RANGE(0x3900, 0x39ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* spriteram */
+	AM_RANGE(0x3a00, 0x3fff) AM_RAM
+	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)		/* CS0 */
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_READ(circusc_sh_timer_r)	/* CS1 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa07f) AM_MIRROR(0x1f80) AM_WRITE(circusc_sound_w)	/* CS2 - CS6 */
 ADDRESS_MAP_END
 
@@ -359,12 +344,12 @@ static MACHINE_DRIVER_START( circusc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(circusc_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 
 	MDRV_CPU_ADD("audiocpu", Z80,14318180/4)     /* Z80 Clock is derived from a 14.31818 MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_START(circusc)
 	MDRV_MACHINE_RESET(circusc)

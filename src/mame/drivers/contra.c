@@ -69,7 +69,8 @@ static WRITE8_HANDLER( cpu_sound_command_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( contra_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0007) AM_WRITE(contra_K007121_ctrl_0_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("P1")
 	AM_RANGE(0x0012, 0x0012) AM_READ_PORT("P2")
@@ -78,21 +79,17 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0015, 0x0015) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0016, 0x0016) AM_READ_PORT("DSW3")
 
-	AM_RANGE(0x0c00, 0x0cff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0007) AM_WRITE(contra_K007121_ctrl_0_w)
 	AM_RANGE(0x0018, 0x0018) AM_WRITE(contra_coin_counter_w)
 	AM_RANGE(0x001a, 0x001a) AM_WRITE(contra_sh_irqtrigger_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(cpu_sound_command_w)
 	AM_RANGE(0x001e, 0x001e) AM_WRITENOP	/* ? */
 	AM_RANGE(0x0060, 0x0067) AM_WRITE(contra_K007121_ctrl_1_w)
-	AM_RANGE(0x0c00, 0x0cff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(SMH_RAM)
+
+	AM_RANGE(0x0c00, 0x0cff) AM_RAM AM_BASE(&paletteram)
+
+	AM_RANGE(0x1000, 0x1fff) AM_RAM
+
+	AM_RANGE(0x2000, 0x5fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x2000, 0x23ff) AM_WRITE(contra_fg_cram_w) AM_BASE(&contra_fg_cram)
 	AM_RANGE(0x2400, 0x27ff) AM_WRITE(contra_fg_vram_w) AM_BASE(&contra_fg_vram)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(contra_text_cram_w) AM_BASE(&contra_text_cram)
@@ -102,23 +99,21 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(contra_bg_cram_w) AM_BASE(&contra_bg_cram)
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(contra_bg_vram_w) AM_BASE(&contra_bg_vram)
 	AM_RANGE(0x4800, 0x5fff) AM_WRITE(SMH_RAM)
+
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_ROM)
  	AM_RANGE(0x7000, 0x7000) AM_WRITE(contra_bankswitch_w)
 	AM_RANGE(0x7001, 0xffff) AM_WRITE(SMH_ROM)
+
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(soundlatch_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym", ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP /* read triggers irq reset and latch read (in the hardware only). */
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -197,11 +192,11 @@ static MACHINE_DRIVER_START( contra )
 
 	/* basic machine hardware */
  	MDRV_CPU_ADD("maincpu", M6809, 1500000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(contra_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
  	MDRV_CPU_ADD("audiocpu", M6809, 2000000)
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 

@@ -101,16 +101,10 @@ static CUSTOM_INPUT( mightguy_area_r )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM)	/* c000-c7ff in cop01 */
-	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)	/* c000-c7ff in cop01 */
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(cop01_background_w) AM_BASE(&cop01_bgvideoram)
+static ADDRESS_MAP_START( cop01_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE(&cop01_bgvideoram)
 	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE(&cop01_fgvideoram)
 ADDRESS_MAP_END
@@ -139,15 +133,10 @@ static ADDRESS_MAP_START( mightguy_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x45, 0x45) AM_WRITE(watchdog_reset_w) /* ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READNOP	/* irq ack? */
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
@@ -401,12 +390,12 @@ static MACHINE_DRIVER_START( cop01 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(cop01_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(audio_io_map,0)
 
 	/* video hardware */
@@ -441,12 +430,12 @@ static MACHINE_DRIVER_START( mightguy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(cop01_map,0)
 	MDRV_CPU_IO_MAP(mightguy_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ???? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(mightguy_audio_io_map,0)
 
 	/* video hardware */

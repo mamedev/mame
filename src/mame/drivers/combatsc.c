@@ -268,98 +268,67 @@ static READ8_DEVICE_HANDLER ( combasc_ym2203_r )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( combasc_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0020, 0x005f) AM_READ(combasc_scrollram_r)
-	AM_RANGE(0x0200, 0x0201) AM_READ(protection_r)
+static ADDRESS_MAP_START( combasc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0007) AM_WRITE(combasc_pf_control_w)
+	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combasc_scrollram_r, combasc_scrollram_w)
+//  AM_RANGE(0x0060, 0x00ff) AM_WRITE(SMH_RAM)                 /* RAM */
+
+	AM_RANGE(0x0200, 0x0201) AM_READWRITE(protection_r, protection_w)
+	AM_RANGE(0x0206, 0x0206) AM_WRITE(protection_clock_w)
+
 	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("IN0")
 	AM_RANGE(0x0401, 0x0401) AM_READ_PORT("DSW3")			/* DSW #3 */
 	AM_RANGE(0x0402, 0x0402) AM_READ_PORT("DSW1")			/* DSW #1 */
 	AM_RANGE(0x0403, 0x0403) AM_READ_PORT("DSW2")			/* DSW #2 */
 	AM_RANGE(0x0404, 0x0407) AM_READ(trackball_r)			/* 1P & 2P controls / trackball */
-	AM_RANGE(0x0600, 0x06ff) AM_READ(SMH_RAM)				/* palette */
-	AM_RANGE(0x0800, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(combasc_video_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)				/* banked ROM area */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( combasc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0007) AM_WRITE(combasc_pf_control_w)
-	AM_RANGE(0x0020, 0x005f) AM_WRITE(combasc_scrollram_w)
-//  AM_RANGE(0x0060, 0x00ff) AM_WRITE(SMH_RAM)                 /* RAM */
-	AM_RANGE(0x0200, 0x0201) AM_WRITE(protection_w)
-	AM_RANGE(0x0206, 0x0206) AM_WRITE(protection_clock_w)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(combasc_coin_counter_w)	/* coin counters */
 	AM_RANGE(0x040c, 0x040c) AM_WRITE(combasc_vreg_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(combasc_bankselect_w)
 	AM_RANGE(0x0414, 0x0414) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x0418, 0x0418) AM_WRITE(combasc_sh_irqtrigger_w)
 	AM_RANGE(0x041c, 0x041c) AM_WRITE(watchdog_reset_w)			/* watchdog reset? */
-	AM_RANGE(0x0600, 0x06ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
-	AM_RANGE(0x0800, 0x1fff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(combasc_video_w)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_ROM)					/* banked ROM area */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
+
+	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(&paletteram)		/* palette */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM								/* RAM */
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combasc_video_r, combasc_video_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)	/* banked ROM area */
+	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( combascb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x04ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0600, 0x06ff) AM_READ(SMH_RAM)	/* palette */
-	AM_RANGE(0x0800, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(combasc_video_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)				/* banked ROM/RAM area */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( combascb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x04ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( combascb_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x04ff) AM_RAM
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(combascb_bankselect_w)
-	AM_RANGE(0x0600, 0x06ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
-	AM_RANGE(0x0800, 0x1fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(combasc_video_w)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_BANK1) /* banked ROM/RAM area */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
+	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(&paletteram)		/* palette */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combasc_video_r, combasc_video_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)	/* banked ROM/RAM area */
+	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)					/* ROM */
-	AM_RANGE(0x8000, 0x87ef) AM_READ(SMH_RAM)					/* RAM */
-	AM_RANGE(0x87f0, 0x87ff) AM_READ(SMH_RAM)					/* ??? */
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym", ym2203_r)	/* YM 2203 */
-	AM_RANGE(0x9008, 0x9009) AM_DEVREAD("ym", ym2203_r)	/* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)				/* soundlatch_r? */
-	AM_RANGE(0x8800, 0xfffb) AM_READ(SMH_ROM)					/* ROM? */
-	AM_RANGE(0xfffc, 0xffff) AM_READ(SMH_RAM)					/* ??? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)				/* ROM */
-	AM_RANGE(0x8000, 0x87ef) AM_WRITE(SMH_RAM)				/* RAM */
-	AM_RANGE(0x87f0, 0x87ff) AM_WRITE(SMH_RAM)				/* ??? */
- 	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym", ym2203_w)	/* YM 2203 */
-	//AM_RANGE(0x9800, 0x9800) AM_WRITE(combasc_unknown_w_1)    /* OKIM5205? */
-	//AM_RANGE(0xa800, 0xa800) AM_WRITE(combasc_unknown_w_2)    /* OKIM5205? */
-	AM_RANGE(0x8800, 0xfffb) AM_WRITE(SMH_ROM)				/* ROM */
-	AM_RANGE(0xfffc, 0xffff) AM_WRITE(SMH_RAM)				/* ??? */
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM										/* ROM */
+	AM_RANGE(0x8000, 0x87ef) AM_RAM										/* RAM */
+	AM_RANGE(0x87f0, 0x87ff) AM_RAM										/* ??? */
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)	/* YM 2203 */
+	AM_RANGE(0x9008, 0x9009) AM_DEVREAD("ym", ym2203_r)					/* ??? */
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)						/* soundlatch_r? */
+	AM_RANGE(0x8800, 0xfffb) AM_ROM										/* ROM? */
+	AM_RANGE(0xfffc, 0xffff) AM_RAM										/* ??? */
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( combasc_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)					/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)					/* RAM */
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("upd", combasc_busy_r)	/* upd7759 busy? */
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)				/* soundlatch_r? */
-	AM_RANGE(0xe000, 0xe001) AM_DEVREAD("ym", combasc_ym2203_r)	/* YM 2203 intercepted */
-ADDRESS_MAP_END
+static ADDRESS_MAP_START( combasc_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
 
-static ADDRESS_MAP_START( combasc_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)				/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)				/* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", combasc_play_w)			/* upd7759 play voice */
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("upd", upd7759_port_w)			/* upd7759 voice select */
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("upd", combasc_voice_reset_w)	/* upd7759 reset? */
- 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym", ym2203_w)	/* YM 2203 */
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", combasc_play_w)					/* upd7759 play voice */
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("upd", upd7759_port_w)					/* upd7759 voice select */
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("upd", combasc_busy_r)					/* upd7759 busy? */
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("upd", combasc_voice_reset_w)			/* upd7759 reset? */
+
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)								/* soundlatch_r? */
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym", combasc_ym2203_r, ym2203_w)	/* YM 2203 intercepted */
 ADDRESS_MAP_END
 
 
@@ -581,11 +550,11 @@ static MACHINE_DRIVER_START( combasc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* 3 MHz? */
-	MDRV_CPU_PROGRAM_MAP(combasc_readmem,combasc_writemem)
+	MDRV_CPU_PROGRAM_MAP(combasc_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(combasc_readmem_sound,combasc_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(combasc_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 
@@ -622,11 +591,11 @@ static MACHINE_DRIVER_START( combascb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* 3 MHz? */
-	MDRV_CPU_PROGRAM_MAP(combascb_readmem,combascb_writemem)
+	MDRV_CPU_PROGRAM_MAP(combascb_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(combasc_readmem_sound,combasc_writemem_sound) /* FAKE */
+	MDRV_CPU_PROGRAM_MAP(combasc_sound_map,0) /* FAKE */
 
 	MDRV_QUANTUM_TIME(HZ(1200))
 

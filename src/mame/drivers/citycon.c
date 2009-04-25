@@ -30,40 +30,26 @@ static READ8_HANDLER( citycon_in_r )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_READ(citycon_in_r)	/* player 1 & 2 inputs multiplexed */
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3007, 0x3007) AM_READ(watchdog_reset_r)	/* ? */
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(citycon_videoram_w) AM_BASE(&citycon_videoram)
+static ADDRESS_MAP_START( citycon_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(citycon_videoram_w) AM_BASE(&citycon_videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_WRITE(citycon_linecolor_w) AM_BASE(&citycon_linecolor)
 	AM_RANGE(0x2800, 0x28ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(citycon_background_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x3002, 0x3002) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(citycon_in_r, citycon_background_w)	/* player 1 & 2 inputs multiplexed */
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_w)
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x3004, 0x3005) AM_WRITE(SMH_RAM) AM_BASE(&citycon_scroll)
+	AM_RANGE(0x3007, 0x3007) AM_READ(watchdog_reset_r)	/* ? */
 	AM_RANGE(0x3800, 0x3cff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("ay", ay8910_r)  /* ?? */
-	AM_RANGE(0x6000, 0x6001) AM_DEVREAD("ym", ym2203_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ym", ym2203_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("ay", ay8910_r)  /* ?? */
+	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -207,11 +193,11 @@ static MACHINE_DRIVER_START( citycon )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 2.048 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(citycon_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 640000)       /* 0.640 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

@@ -52,9 +52,9 @@ static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
 
 /********************************************/
 
-static ADDRESS_MAP_START( crimfght_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_BANK1)			/* banked RAM */
-	AM_RANGE(0x0400, 0x1fff) AM_READ(SMH_RAM)			/* RAM */
+static ADDRESS_MAP_START( crimfght_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(SMH_BANK1, SMH_BANK1)					/* banked RAM */
+	AM_RANGE(0x0400, 0x1fff) AM_RAM												/* RAM */
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P1")
 	AM_RANGE(0x3f82, 0x3f82) AM_READ_PORT("P2")
@@ -63,35 +63,19 @@ static ADDRESS_MAP_START( crimfght_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f85, 0x3f85) AM_READ_PORT("P3")
 	AM_RANGE(0x3f86, 0x3f86) AM_READ_PORT("P4")
 	AM_RANGE(0x3f87, 0x3f87) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f88, 0x3f88) AM_READ(watchdog_reset_r)	/* watchdog reset */
-	AM_RANGE(0x2000, 0x5fff) AM_READ(K052109_051960_r)	/* video RAM + sprite RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK2)			/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( crimfght_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(SMH_BANK1)					/* banked RAM */
-	AM_RANGE(0x0400, 0x1fff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0x3f88, 0x3f88) AM_WRITE(crimfght_coin_w)			/* coin counters */
+	AM_RANGE(0x3f88, 0x3f88) AM_READWRITE(watchdog_reset_r, crimfght_coin_w)	/* watchdog reset */
 	AM_RANGE(0x3f8c, 0x3f8c) AM_WRITE(crimfght_sh_irqtrigger_w)	/* cause interrupt on audio CPU? */
-	AM_RANGE(0x2000, 0x5fff) AM_WRITE(K052109_051960_w)			/* video RAM + sprite RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_ROM)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
+	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(K052109_051960_r, K052109_051960_w)	/* video RAM + sprite RAM */
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(SMH_BANK2, SMH_ROM)					/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crimfght_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM 821l01.h4 */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym", ym2151_r)	/* YM2151 */
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xe000, 0xe00d) AM_DEVREAD("konami", k007232_r)	/* 007232 registers */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( crimfght_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM 821l01.h4 */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym", ym2151_w)	/* YM2151 */
-	AM_RANGE(0xe000, 0xe00d) AM_DEVWRITE("konami", k007232_w)		/* 007232 registers */
+static ADDRESS_MAP_START( crimfght_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM 821l01.h4 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)			/* YM2151 */
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)								/* soundlatch_r */
+	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)	/* 007232 registers */
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -232,11 +216,11 @@ static MACHINE_DRIVER_START( crimfght )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(crimfght_readmem,crimfght_writemem)
+	MDRV_CPU_PROGRAM_MAP(crimfght_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* verified with PCB */
-	MDRV_CPU_PROGRAM_MAP(crimfght_readmem_sound,crimfght_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(crimfght_sound_map,0)
 
 	MDRV_MACHINE_RESET(crimfght)
 
