@@ -117,41 +117,22 @@ WRITE16_HANDLER( pass_bg_videoram_w );
 
 /* end in video */
 
-static WRITE16_HANDLER ( pass_soundwrite )
-{
-	soundlatch_w(space,0,data & 0xff);
-}
-
 /* todo: check all memory regions actually readable / read from */
-static ADDRESS_MAP_START( pass_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x200fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x210000, 0x213fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x220000, 0x2203ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( pass_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x080000, 0x083fff) AM_RAM
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(pass_bg_videoram_w) AM_BASE(&pass_bg_videoram) // Background
+	AM_RANGE(0x210000, 0x213fff) AM_RAM_WRITE(pass_fg_videoram_w) AM_BASE(&pass_fg_videoram) // Foreground
+	AM_RANGE(0x220000, 0x2203ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x230000, 0x230001) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x230100, 0x230101) AM_READ_PORT("DSW")
 	AM_RANGE(0x230200, 0x230201) AM_READ_PORT("INPUTS")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pass_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x200000, 0x200fff) AM_WRITE(pass_bg_videoram_w) AM_BASE(&pass_bg_videoram) // Background
-	AM_RANGE(0x210000, 0x213fff) AM_WRITE(pass_fg_videoram_w) AM_BASE(&pass_fg_videoram) // Foreground
-	AM_RANGE(0x220000, 0x2203ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x230000, 0x230001) AM_WRITE(pass_soundwrite)
-ADDRESS_MAP_END
-
 /* sound cpu */
-
-static ADDRESS_MAP_START( pass_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pass_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( pass_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pass_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -260,19 +241,16 @@ static GFXDECODE_START( pass )
 GFXDECODE_END
 
 /* todo : is this correct? */
-
-
-
 static MACHINE_DRIVER_START( pass )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2 )
-	MDRV_CPU_PROGRAM_MAP(pass_readmem,pass_writemem)
+	MDRV_CPU_PROGRAM_MAP(pass_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) /* all the same */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 14318180/4 )
-	MDRV_CPU_PROGRAM_MAP(pass_sound_readmem,pass_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(pass_sound_map,0)
 	MDRV_CPU_IO_MAP(pass_sound_io_map,0)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,60) /* probably not accurate, unknown timing and generation (ym2203 sound chip?). */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
