@@ -245,26 +245,43 @@ int level;
 	sh4_set_irln_input(machine->cpu[0], 15-level);
 }
 
+/******************************************************
+JVS init packets
+The function packets goes like this:
+[0] Function number
+[1] Number of "devices"
+[2] Parameter of the device
+[3] End flag (always zero)
+******************************************************/
 static int jvsboard_init(int pos)
 {
 	// four bytes for every available function
-	// first function
+	//1 digital inputs
 	maple0x86data2[pos+10]=1;
 	maple0x86data2[pos+11]=2; // number of players
 	maple0x86data2[pos+12]=9+4; // switches per player (27 = mahjong)
 	maple0x86data2[pos+13]=0;
-	// second function
+	//2 coin slots
 	maple0x86data2[pos+14]=2;
 	maple0x86data2[pos+15]=2; // number of coin slots
 	maple0x86data2[pos+16]=0;
 	maple0x86data2[pos+17]=0;
-	// third function
+	//3 ad stick
 	maple0x86data2[pos+18]=3;
 	maple0x86data2[pos+19]=2; // analog channels
 	maple0x86data2[pos+20]=8; // bits per channel
 	maple0x86data2[pos+21]=0;
-	// no more functions
+	//4 rotary
 	maple0x86data2[pos+22]=0;
+	//5 keyboard
+	//6 (touch?) screen
+	//7 card reader
+	//8 hopper out
+	//9 driver out
+	//10 analog out
+	//11 character
+	//12 backup
+
 	maple0x86data2[pos+7]=13+2;
 	return 13;
 }
@@ -272,25 +289,34 @@ static int jvsboard_init(int pos)
 static void jvsboard_indirect_read(running_machine *machine, int pos)
 {
 	// report1,jvsbytes repeated for each function
-	// first function
+	//1 digital inputs
 	maple0x86data2[pos+ 9]=1; // report
 	maple0x86data2[pos+10]=0; // bits TEST TILT1 TILT2 TILT3 ? ? ? ?
 	maple0x86data2[pos+11]=input_port_read(machine, "IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
 	maple0x86data2[pos+12]=input_port_read(machine, "IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
 	maple0x86data2[pos+13]=input_port_read(machine, "IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
 	maple0x86data2[pos+14]=input_port_read(machine, "IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
-	// second function
+	//2 coin slots
 	maple0x86data2[pos+15]=1; // report
 	maple0x86data2[pos+16]=(dc_coin_counts[0] >> 8) & 0xff; // 1CONDITION, 1SLOT COIN(bit13-8)
 	maple0x86data2[pos+17]=dc_coin_counts[0] & 0xff; // 1SLOT COIN(bit7-0)
 	maple0x86data2[pos+18]=(dc_coin_counts[1] >> 8) & 0xff; // 2CONDITION, 2SLOT COIN(bit13-8)
 	maple0x86data2[pos+19]=dc_coin_counts[1] & 0xff; // 2SLOT COIN(bit7-0)
-	// third function
+	//3 ad stick
 	maple0x86data2[pos+20]=1; // report
 	maple0x86data2[pos+21]=0xff; // channel 1 bits 7-0
 	maple0x86data2[pos+22]=0; // channel 1
 	maple0x86data2[pos+23]=0; // channel 2 bits 7-0
 	maple0x86data2[pos+24]=0xff; // channel 2
+	//4 rotary
+	//5 keyboard
+	//6 (touch?) screen
+	//7 card reader
+	//8 hopper out
+	//9 driver out
+	//10 analog out
+	//11 character
+	//12 backup
 }
 
 static int jvsboard_direct_read(running_machine *machine)
@@ -305,22 +331,34 @@ static int jvsboard_direct_read(running_machine *machine)
 	maple0x86data2[0x19] = 0x01;
 
 	/* read the inputs */
+	//1 digital inputs
 	maple0x86data2[0x1a]=1;
 	maple0x86data2[0x1b]=2; //number of players
 	maple0x86data2[0x1c]=input_port_read(machine, "IN1");
 	maple0x86data2[0x1d]=input_port_read(machine, "IN2");
 	maple0x86data2[0x1e]=input_port_read(machine, "IN3");
 	maple0x86data2[0x1f]=input_port_read(machine, "IN4");
+	//2 coin slots
 	maple0x86data2[0x20]=1;
 	maple0x86data2[0x21]=(dc_coin_counts[0] >> 8) & 0xff; //coin counter read-back hi byte
 	maple0x86data2[0x22]=dc_coin_counts[0] & 0xff; //coin counter read-back lo byte
 	maple0x86data2[0x23]=(dc_coin_counts[1] >> 8) & 0xff;
 	maple0x86data2[0x24]=dc_coin_counts[1] & 0xff;
+	//3 ad stick
 	maple0x86data2[0x25]=1;
 	maple0x86data2[0x26]=1;
 	maple0x86data2[0x27]=0;
 	maple0x86data2[0x28]=0;
 	maple0x86data2[0x29]=0;
+	//4 rotary
+	//5 keyboard
+	//6 (touch?) screen
+	//7 card reader
+	//8 hopper out
+	//9 driver out
+	//10 analog out
+	//11 character
+	//12 backup
 	maple0x86data2[0x2a]=0;
 	/*0x2b-0x2f rotary inputs */
 	//...
