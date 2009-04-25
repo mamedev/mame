@@ -132,15 +132,21 @@ static WRITE8_HANDLER( sound_enable_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)		/* A22-04 (23) */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_ROM)		/* A22-05 (22) */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)		/* 6116 SRAM (36) */
-	AM_RANGE(0x8800, 0x8fff) AM_READ(SMH_RAM)		/* 6116 SRAM (35) */
-	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd400, 0xd400) AM_READ(buggychl_mcu_r)
+static ADDRESS_MAP_START( buggychl_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM /* A22-04 (23) */
+	AM_RANGE(0x4000, 0x7fff) AM_ROM /* A22-05 (22) */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM /* 6116 SRAM (36) */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM /* 6116 SRAM (35) */
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK1, buggychl_chargen_w) AM_BASE(&buggychl_character_ram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
+	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
+	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE(buggychl_mcu_r, buggychl_mcu_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(buggychl_mcu_status_r)
+	AM_RANGE(0xd500, 0xd57f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd602, 0xd602) AM_READ_PORT("DSW3")
@@ -149,28 +155,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd609, 0xd609) AM_READ_PORT("IN1")	/* coin + accelerator */
 //  AM_RANGE(0xd60a, 0xd60a) // other inputs, not used?
 //  AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM) /* A22-04 (23) */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_ROM) /* A22-05 (22) */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM) /* 6116 SRAM (36) */
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(SMH_RAM) /* 6116 SRAM (35) */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(buggychl_sprite_lookup_w)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(buggychl_chargen_w) AM_BASE(&buggychl_character_ram)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-//  AM_RANGE(0xd000, 0xd000) // horizon
-	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
-	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
-//  AM_RANGE(0xd301, 0xd301)
-//  AM_RANGE(0xd302, 0xd302) // reset mcu
-	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
-//  AM_RANGE(0xd304, 0xd307) // sccon 1-4
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(buggychl_mcu_w)
-	AM_RANGE(0xd500, 0xd57f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
-//  AM_RANGE(0xd613, 0xd613) // reset sound cpu & sound chips
 	AM_RANGE(0xd618, 0xd618) AM_WRITENOP	/* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xd840, 0xd85f) AM_WRITE(SMH_RAM) AM_BASE(&buggychl_scrollv)
@@ -179,48 +164,32 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdc06, 0xdc06) AM_WRITE(buggychl_bg_scrollx_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
-//  AM_RANGE(0x5001, 0x5001) AM_READ(SMH_RAM)   /* is command pending? */
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostics ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE("msm", msm5232_w)
-	AM_RANGE(0x4820, 0x4820) AM_WRITE(SMH_RAM)	/* VOL/BAL   for the 7630 on the MSM5232 output */
-	AM_RANGE(0x4830, 0x4830) AM_WRITE(SMH_RAM)	/* TRBL/BASS for the 7630 on the MSM5232 output  */
-//  AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_RAM)  /* to main cpu */
+	AM_RANGE(0x4820, 0x4820) AM_RAM	/* VOL/BAL   for the 7630 on the MSM5232 output */
+	AM_RANGE(0x4830, 0x4830) AM_RAM	/* TRBL/BASS for the 7630 on the MSM5232 output  */
+	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
+//  AM_RANGE(0x5001, 0x5001) AM_READ(SMH_RAM)   /* is command pending? */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostics ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ(buggychl_68705_portA_r)
-	AM_RANGE(0x0001, 0x0001) AM_READ(buggychl_68705_portB_r)
-	AM_RANGE(0x0002, 0x0002) AM_READ(buggychl_68705_portC_r)
-	AM_RANGE(0x0010, 0x007f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(buggychl_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(buggychl_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(buggychl_68705_portC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_portA_r, buggychl_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_portB_r, buggychl_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_portC_r, buggychl_68705_portC_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddrB_w)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -406,16 +375,16 @@ static MACHINE_DRIVER_START( buggychl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(buggychl_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,60)	/* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
 
 	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
+	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

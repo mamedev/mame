@@ -59,20 +59,12 @@ extern VIDEO_UPDATE( battlex );
 
 /*** MEMORY & PORT READ / WRITE **********************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM) /* not read? */
-	AM_RANGE(0x9000, 0x91ff) AM_READ(SMH_RAM) /* not read? */
-	AM_RANGE(0xa000, 0xa3ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe03f) AM_READ(SMH_RAM) /* not read? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(battlex_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9000, 0x91ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(SMH_RAM) /* main */
-	AM_RANGE(0xe000, 0xe03f) AM_WRITE(battlex_palette_w) /* probably palette */
+static ADDRESS_MAP_START( battlex_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(battlex_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM
+	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(battlex_palette_w)
 ADDRESS_MAP_END
 
 
@@ -206,7 +198,7 @@ static MACHINE_DRIVER_START( battlex )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(battlex_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8) /* controls game speed? */
 

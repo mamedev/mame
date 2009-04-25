@@ -82,7 +82,7 @@ static WRITE8_HANDLER(lions_via_w)
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lions_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&lions_vram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -323,7 +323,7 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_DRIVER_START( lions )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/4)		 /* 3 MHz.(guess) */
-	MDRV_CPU_PROGRAM_MAP(readmem,0)
+	MDRV_CPU_PROGRAM_MAP(lions_map,0)
 	MDRV_CPU_VBLANK_INT("screen", lions_irq )
 
 	/* video hardware */

@@ -53,43 +53,31 @@ VIDEO_START( carjmbre );
 VIDEO_UPDATE( carjmbre );
 
 
-static ADDRESS_MAP_START( carjmbre_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( carjmbre_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_READNOP			//?? possibly watchdog
-	AM_RANGE(0x9000, 0x97ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( carjmbre_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8803, 0x8803) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x8805, 0x8806) AM_WRITE(carjmbre_bgcolor_w)	//guess
 	AM_RANGE(0x8807, 0x8807) AM_WRITE(carjmbre_flipscreen_w)
 	AM_RANGE(0x8fc1, 0x8fc1) AM_WRITENOP			//overrun during initial screen clear
 	AM_RANGE(0x8fe1, 0x8fe1) AM_WRITENOP			//overrun during initial screen clear
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(carjmbre_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(carjmbre_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x9800, 0x985f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9880, 0x98df) AM_WRITE(SMH_RAM)			//spriteram mirror
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2")
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( carjmbre_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( carjmbre_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_READNOP			//look to be stray reads from 10/12/14/16/18xx
 	AM_RANGE(0x1200, 0x12ff) AM_READNOP
 	AM_RANGE(0x1400, 0x14ff) AM_READNOP
 	AM_RANGE(0x1600, 0x16ff) AM_READNOP
 	AM_RANGE(0x1800, 0x18ff) AM_READNOP
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( carjmbre_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -181,11 +169,11 @@ static MACHINE_DRIVER_START( carjmbre )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)
-	MDRV_CPU_PROGRAM_MAP(carjmbre_readmem,carjmbre_writemem)
+	MDRV_CPU_PROGRAM_MAP(carjmbre_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 1500000)
-	MDRV_CPU_PROGRAM_MAP(carjmbre_sound_readmem,carjmbre_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(carjmbre_sound_map,0)
 	MDRV_CPU_IO_MAP(carjmbre_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 

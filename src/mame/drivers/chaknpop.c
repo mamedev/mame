@@ -39,41 +39,25 @@ static WRITE8_HANDLER ( coinlock_w )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8800, 0x8800) AM_READ(chaknpop_mcu_portA_r)
-	AM_RANGE(0x8801, 0x8801) AM_READ(chaknpop_mcu_portB_r)
-	AM_RANGE(0x8802, 0x8802) AM_READ(chaknpop_mcu_portC_r)
-	AM_RANGE(0x8805, 0x8805) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x8807, 0x8807) AM_DEVREAD("ay2", ay8910_r)
+static ADDRESS_MAP_START( chaknpop_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&chaknpop_ram)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE(chaknpop_mcu_portA_r, chaknpop_mcu_portA_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(chaknpop_mcu_portB_r, chaknpop_mcu_portB_w)
+	AM_RANGE(0x8802, 0x8802) AM_READWRITE(chaknpop_mcu_portC_r, chaknpop_mcu_portC_w)
+	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x8806, 0x8807) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_address_data_w)
 	AM_RANGE(0x8808, 0x8808) AM_READ_PORT("DSWC")
 	AM_RANGE(0x8809, 0x8809) AM_READ_PORT("P1")
 	AM_RANGE(0x880a, 0x880a) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x880b, 0x880b) AM_READ_PORT("P2")
-	AM_RANGE(0x880c, 0x880c) AM_READ(chaknpop_gfxmode_r)
-	AM_RANGE(0x9000, 0x93ff) AM_READ(SMH_RAM)			// TX tilemap
-	AM_RANGE(0x9800, 0x983f) AM_READ(SMH_RAM)			// Color attribute
-	AM_RANGE(0x9840, 0x98ff) AM_READ(SMH_RAM)			// sprite
-	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK1)			// bitmap plane 1-4
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM) AM_BASE(&chaknpop_ram)
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(chaknpop_mcu_portA_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(chaknpop_mcu_portB_w)
-	AM_RANGE(0x8802, 0x8802) AM_WRITE(chaknpop_mcu_portC_w)
-	AM_RANGE(0x8804, 0x8805) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8806, 0x8807) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x880c, 0x880c) AM_WRITE(chaknpop_gfxmode_w)
-	AM_RANGE(0x880D, 0x880D) AM_WRITE(coinlock_w)			// coin lock out
-	AM_RANGE(0x9000, 0x93ff) AM_WRITE(chaknpop_txram_w) AM_BASE(&chaknpop_txram)
-	AM_RANGE(0x9800, 0x983f) AM_WRITE(chaknpop_attrram_w) AM_BASE(&chaknpop_attrram)
-	AM_RANGE(0x9840, 0x98ff) AM_WRITE(SMH_RAM) AM_BASE(&chaknpop_sprram) AM_SIZE(&chaknpop_sprram_size)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_BANK1)			// bitmap plane 1-4
+	AM_RANGE(0x880c, 0x880c) AM_READWRITE(chaknpop_gfxmode_r, chaknpop_gfxmode_w)
+	AM_RANGE(0x880d, 0x880d) AM_WRITE(coinlock_w)												// coin lock out
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(chaknpop_txram_w) AM_BASE(&chaknpop_txram) 			// TX tilemap
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(chaknpop_attrram_w) AM_BASE(&chaknpop_attrram) 		// Color attribute
+	AM_RANGE(0x9840, 0x98ff) AM_RAM AM_BASE(&chaknpop_sprram) AM_SIZE(&chaknpop_sprram_size)	// sprite
+	AM_RANGE(0xa000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK1, SMH_BANK1)									// bitmap plane 1-4
 ADDRESS_MAP_END
 
 static const ay8910_interface ay8910_interface_1 =
@@ -264,7 +248,7 @@ static MACHINE_DRIVER_START( chaknpop )
 	//MDRV_CPU_ADD("maincpu", Z80, 18432000 / 6)   /* 3.072 MHz */
 	MDRV_CPU_ADD("maincpu", Z80, 2350000)
 	//MDRV_CPU_ADD("maincpu", Z80, 2760000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(chaknpop_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(chaknpop)

@@ -110,70 +110,39 @@ static READ16_HANDLER( twocrude_control_r )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( twocrude_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( twocrude_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE(&twocrude_ram)
 
-	AM_RANGE(0x0a0000, 0x0a1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0a2000, 0x0a2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0a4000, 0x0a47ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0a6000, 0x0a67ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0a0000, 0x0a1fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
+	AM_RANGE(0x0a2000, 0x0a2fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
+	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
+	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0aa000, 0x0aafff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0ac000, 0x0ac7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0ae000, 0x0ae7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
+	AM_RANGE(0x0aa000, 0x0aafff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
+	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
+	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_BASE(&deco16_pf4_rowscroll)
 
-	AM_RANGE(0x0b0000, 0x0b07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0b8000, 0x0b8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0b9000, 0x0b9fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0bc000, 0x0bc00f) AM_READ(twocrude_control_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( twocrude_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_WRITE(SMH_RAM) AM_BASE(&twocrude_ram)
-
-	AM_RANGE(0x0a0000, 0x0a1fff) AM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x0a2000, 0x0a2fff) AM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x0a4000, 0x0a47ff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x0a6000, 0x0a67ff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf2_rowscroll)
-
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
-	AM_RANGE(0x0aa000, 0x0aafff) AM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
-	AM_RANGE(0x0ac000, 0x0ac7ff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf3_rowscroll)
-	AM_RANGE(0x0ae000, 0x0ae7ff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf4_rowscroll)
-
-	AM_RANGE(0x0b0000, 0x0b07ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
-
 	AM_RANGE(0x0b5000, 0x0b500f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x0b6000, 0x0b600f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf34_control)
-
-	AM_RANGE(0x0b8000, 0x0b8fff) AM_WRITE(twocrude_palette_24bit_rg_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0b9000, 0x0b9fff) AM_WRITE(twocrude_palette_24bit_b_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0x0bc000, 0x0bc00f) AM_WRITE(twocrude_control_w)
+	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE(twocrude_palette_24bit_rg_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE(twocrude_palette_24bit_b_w) AM_BASE(&paletteram16_2)
+	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_DEVREAD("ym1", ym2203_r)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREAD("ym2", ym2151_r)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("oki1", okim6295_r)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREAD("oki2", okim6295_r)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r, ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x110000, 0x110001) AM_DEVWRITE("ym2", ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVWRITE("oki1", okim6295_w)
-	AM_RANGE(0x130000, 0x130001) AM_DEVWRITE("oki2", okim6295_w)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_READWRITE(SMH_BANK8, SMH_BANK8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
@@ -315,11 +284,11 @@ static MACHINE_DRIVER_START( twocrude )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59 */
-	MDRV_CPU_PROGRAM_MAP(twocrude_readmem,twocrude_writemem)
+	MDRV_CPU_PROGRAM_MAP(twocrude_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
