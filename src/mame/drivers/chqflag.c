@@ -146,53 +146,30 @@ static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( chqflag_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)					/* RAM */
-	AM_RANGE(0x1000, 0x17ff) AM_READ(SMH_BANK1)					/* banked RAM (RAM/051316 (chip 1)) */
-	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_BANK2)					/* palette + RAM */
-	AM_RANGE(0x2000, 0x2007) AM_READ(K051937_r)					/* Sprite control registers */
-	AM_RANGE(0x2400, 0x27ff) AM_READ(K051960_r)					/* Sprite RAM */
-	AM_RANGE(0x2800, 0x2fff) AM_READ(SMH_BANK3)					/* 051316 zoom/rotation (chip 2) */
-	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW1")				/* DIPSW #1  */
-	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("IN1")				/* COINSW, STARTSW, test mode */
-	AM_RANGE(0x3201, 0x3201) AM_READ_PORT("IN0")				/* DIPSW #3, SW 4 */
-	AM_RANGE(0x3203, 0x3203) AM_READ_PORT("DSW2")				/* DIPSW #2 */
-	AM_RANGE(0x3400, 0x341f) AM_READ(K051733_r)					/* 051733 (protection) */
-	AM_RANGE(0x3701, 0x3701) AM_READ_PORT("IN2")				/* Brake + Shift + ? */
-	AM_RANGE(0x3702, 0x3702) AM_READ(analog_read_r)				/* accelerator/wheel */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK4)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( chqflag_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(SMH_BANK1)				/* banked RAM (RAM/051316 (chip 1)) */
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(SMH_BANK2)					/* palette + RAM */
-	AM_RANGE(0x2000, 0x2007) AM_WRITE(K051937_w)					/* Sprite control registers */
-	AM_RANGE(0x2400, 0x27ff) AM_WRITE(K051960_w)					/* Sprite RAM */
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(K051316_1_w)				/* 051316 zoom/rotation (chip 2) */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(soundlatch_w)				/* sound code # */
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(chqflag_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
-	AM_RANGE(0x3002, 0x3002) AM_WRITE(chqflag_bankswitch_w)		/* bankswitch control */
-	AM_RANGE(0x3003, 0x3003) AM_WRITE(chqflag_vreg_w)				/* enable K051316 ROM reading */
-	AM_RANGE(0x3300, 0x3300) AM_WRITE(watchdog_reset_w)			/* watchdog timer */
-	AM_RANGE(0x3400, 0x341f) AM_WRITE(K051733_w)					/* 051733 (protection) */
-	AM_RANGE(0x3500, 0x350f) AM_WRITE(K051316_ctrl_0_w)			/* 051316 control registers (chip 1) */
-	AM_RANGE(0x3600, 0x360f) AM_WRITE(K051316_ctrl_1_w)			/* 051316 control registers (chip 2) */
-	AM_RANGE(0x3700, 0x3700) AM_WRITE(select_analog_ctrl_w)		/* select accelerator/wheel */
-	AM_RANGE(0x3702, 0x3702) AM_WRITE(select_analog_ctrl_w)		/* select accelerator/wheel (mirror?) */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_ROM)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( chqflag_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREAD("konami1", k007232_r)	/* 007232 (chip 1) */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami2", k007232_r)	/* 007232 (chip 2) */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r)	/* YM2151 */
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	//AM_RANGE(0xe000, 0xe000) AM_READNOP                /* ??? */
+static ADDRESS_MAP_START( chqflag_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM												/* RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(SMH_BANK1, SMH_BANK1)					/* banked RAM (RAM/051316 (chip 1)) */
+	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(SMH_BANK2, SMH_BANK2)					/* palette + RAM */
+	AM_RANGE(0x2000, 0x2007) AM_READWRITE(K051937_r, K051937_w)					/* Sprite control registers */
+	AM_RANGE(0x2400, 0x27ff) AM_READWRITE(K051960_r, K051960_w)					/* Sprite RAM */
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(SMH_BANK3, K051316_1_w)				/* 051316 zoom/rotation (chip 2) */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(soundlatch_w)								/* sound code # */
+	AM_RANGE(0x3001, 0x3001) AM_WRITE(chqflag_sh_irqtrigger_w)					/* cause interrupt on audio CPU */
+	AM_RANGE(0x3002, 0x3002) AM_WRITE(chqflag_bankswitch_w)						/* bankswitch control */
+	AM_RANGE(0x3003, 0x3003) AM_WRITE(chqflag_vreg_w)							/* enable K051316 ROM reading */
+	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW1")								/* DIPSW #1  */
+	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("IN1")								/* COINSW, STARTSW, test mode */
+	AM_RANGE(0x3201, 0x3201) AM_READ_PORT("IN0")								/* DIPSW #3, SW 4 */
+	AM_RANGE(0x3203, 0x3203) AM_READ_PORT("DSW2")								/* DIPSW #2 */
+	AM_RANGE(0x3300, 0x3300) AM_WRITE(watchdog_reset_w)							/* watchdog timer */
+	AM_RANGE(0x3400, 0x341f) AM_READWRITE(K051733_r, K051733_w)					/* 051733 (protection) */
+	AM_RANGE(0x3500, 0x350f) AM_WRITE(K051316_ctrl_0_w)							/* 051316 control registers (chip 1) */
+	AM_RANGE(0x3600, 0x360f) AM_WRITE(K051316_ctrl_1_w)							/* 051316 control registers (chip 2) */
+	AM_RANGE(0x3700, 0x3700) AM_WRITE(select_analog_ctrl_w)						/* select accelerator/wheel */
+	AM_RANGE(0x3701, 0x3701) AM_READ_PORT("IN2")								/* Brake + Shift + ? */
+	AM_RANGE(0x3702, 0x3702) AM_READWRITE(analog_read_r, select_analog_ctrl_w)	/* accelerator/wheel */
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK4)									/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)									/* ROM */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( k007232_bankswitch_w )
@@ -210,15 +187,16 @@ static WRITE8_HANDLER( k007232_bankswitch_w )
 	k007232_set_bank( devtag_get_device(space->machine, "konami2"), bank_A, bank_B );
 }
 
-static ADDRESS_MAP_START( chqflag_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w)		/* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_DEVWRITE("konami1", k007232_w)		/* 007232 (chip 1) */
-	AM_RANGE(0xa01c, 0xa01c) AM_DEVWRITE("konami2", k007232_extvolume_w)/* extra volume, goes to the 007232 w/ A11 */
-											/* selecting a different latch for the external port */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami2", k007232_w)		/* 007232 (chip 2) */
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)		/* YM2151 */
+static ADDRESS_MAP_START( chqflag_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM /* RAM */
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w)	/* 007232 bankswitch */
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("konami1", k007232_r, k007232_w)	/* 007232 (chip 1) */
+	AM_RANGE(0xa01c, 0xa01c) AM_DEVWRITE("konami2", k007232_extvolume_w)	/* extra volume, goes to the 007232 w/ A11 */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami2", k007232_r, k007232_w)	/* 007232 (chip 2) */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)	/* YM2151 */
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
+	//AM_RANGE(0xe000, 0xe000) AM_READNOP                /* ??? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP					/* ??? */
 ADDRESS_MAP_END
 
@@ -350,11 +328,11 @@ static MACHINE_DRIVER_START( chqflag )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
-	MDRV_CPU_PROGRAM_MAP(chqflag_readmem,chqflag_writemem)
+	MDRV_CPU_PROGRAM_MAP(chqflag_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(chqflag_interrupt,16)	/* ? */
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(chqflag_readmem_sound,chqflag_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(chqflag_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

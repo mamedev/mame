@@ -55,26 +55,18 @@ static READ8_HANDLER( ripcord_IN2_r )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( circus_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x1000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(circus_clown_x_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(circus_clown_y_w)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(circus_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x8000) AM_RAM_WRITE(circus_clown_z_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("PADDLE")
 //  AM_RANGE(0xd000, 0xd000) AM_READ(ripcord_IN2_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(circus_clown_x_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(circus_clown_y_w)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(circus_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(circus_clown_z_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -277,7 +269,7 @@ static MACHINE_DRIVER_START( circus )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(circus_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -312,7 +304,7 @@ static MACHINE_DRIVER_START( robotbwl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(circus_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -346,7 +338,7 @@ static MACHINE_DRIVER_START( crash )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(circus_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	/* video hardware */
@@ -380,7 +372,7 @@ static MACHINE_DRIVER_START( ripcord )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(circus_map,0)
 	//MDRV_CPU_VBLANK_INT("screen", ripcord_interrupt) //AT
 
 	/* video hardware */

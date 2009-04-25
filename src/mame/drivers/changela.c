@@ -130,27 +130,18 @@ static WRITE8_HANDLER( changela_68705_ddrC_w )
 }
 
 
-static ADDRESS_MAP_START( mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ(changela_68705_portA_r)
-	AM_RANGE(0x0001, 0x0001) AM_READ(changela_68705_portB_r)
-	AM_RANGE(0x0002, 0x0002) AM_READ(changela_68705_portC_r)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(changela_68705_portA_r, changela_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(changela_68705_portB_r, changela_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(changela_68705_portC_r, changela_68705_portC_w)
 
-	AM_RANGE(0x0000, 0x007f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(changela_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(changela_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_WRITE(changela_68705_portC_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(changela_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(changela_68705_ddrB_w)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(changela_68705_ddrC_w)
 
-	AM_RANGE(0x0000, 0x007f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0000, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -250,39 +241,14 @@ static WRITE8_HANDLER( changela_coin_counter_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)				/* OBJ0 RAM */
-	AM_RANGE(0x9000, 0x97ff) AM_READ(SMH_RAM)				/* OBJ1 RAM */
-	AM_RANGE(0xb000, 0xbfff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( changela_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&spriteram) /* OBJ0 RAM */
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(&videoram)	/* OBJ1 RAM */
+	AM_RANGE(0xa000, 0xa07f) AM_WRITE(changela_colors_w) AM_BASE(&colorram)	/* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
+	AM_RANGE(0xb000, 0xbfff) AM_ROM
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(changela_mem_device_r)			/* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
-
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xd010, 0xd010) AM_DEVREAD("ay2", ay8910_r)
-
-	/* LS139 - U24 */
-	AM_RANGE(0xd024, 0xd024) AM_READ(changela_24_r)
-	AM_RANGE(0xd025, 0xd025) AM_READ(changela_25_r)
-	AM_RANGE(0xd028, 0xd028) AM_READ(mcu_r)
-	AM_RANGE(0xd02c, 0xd02c) AM_READ(changela_2c_r)
-	AM_RANGE(0xd02d, 0xd02d) AM_READ(changela_2d_r)
-
-	AM_RANGE(0xd030, 0xd030) AM_READ(changela_30_r)
-	AM_RANGE(0xd031, 0xd031) AM_READ(changela_31_r)
-
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)	/* RAM2 (Processor RAM) */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM) 				/* Processor ROM */
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) 	/* OBJ0 RAM (A10 = GND )*/
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram)		/* OBJ1 RAM */
-	AM_RANGE(0xa000, 0xa07f) AM_WRITE(changela_colors_w) AM_BASE(&colorram)		/* Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8-th bit data input (d0-d7->normal, a0->d8) */
-	AM_RANGE(0xb000, 0xbfff) AM_WRITE(SMH_ROM)				/* Processor ROM */
-
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(changela_mem_device_w)			/* River-Tree RAMs, slope ROM, tree ROM */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(changela_mem_device_r, changela_mem_device_w)	/* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
 
 	/* LS138 - U16 */
 	AM_RANGE(0xc800, 0xc800) AM_WRITENOP				/* not connected */
@@ -290,20 +256,28 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xca00) AM_WRITE(changela_slope_rom_addr_hi_w)
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(changela_slope_rom_addr_lo_w)
 
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0xd010, 0xd011) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0xd010, 0xd011) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_address_data_w)
 
 	/* LS259 - U44 */
 	AM_RANGE(0xd020, 0xd020) AM_WRITE(changela_collision_reset_0)
 	AM_RANGE(0xd021, 0xd022) AM_WRITE(changela_coin_counter_w)
 //AM_RANGE(0xd023, 0xd023) AM_WRITENOP
-	AM_RANGE(0xd024, 0xd024) AM_WRITE(mcu_PC0_w)
-	AM_RANGE(0xd025, 0xd025) AM_WRITE(changela_collision_reset_1)
-	AM_RANGE(0xd026, 0xd026) AM_WRITENOP
 
-	AM_RANGE(0xd030, 0xd030) AM_WRITE(mcu_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(watchdog_reset_w)		/* Watchdog */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)				/* Processor RAM */
+	/* LS139 - U24 */
+	AM_RANGE(0xd024, 0xd024) AM_READWRITE(changela_24_r, mcu_PC0_w)
+	AM_RANGE(0xd025, 0xd025) AM_READWRITE(changela_25_r, changela_collision_reset_1)
+	AM_RANGE(0xd026, 0xd026) AM_WRITENOP
+	AM_RANGE(0xd028, 0xd028) AM_READ(mcu_r)
+	AM_RANGE(0xd02c, 0xd02c) AM_READ(changela_2c_r)
+	AM_RANGE(0xd02d, 0xd02d) AM_READ(changela_2d_r)
+
+	AM_RANGE(0xd030, 0xd030) AM_READWRITE(changela_30_r, mcu_w)
+	AM_RANGE(0xd031, 0xd031) AM_READ(changela_31_r)
+
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(watchdog_reset_w)	/* Watchdog */
+
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM	/* RAM2 (Processor RAM) */
 ADDRESS_MAP_END
 
 
@@ -487,11 +461,11 @@ static INTERRUPT_GEN( chl_interrupt )
 static MACHINE_DRIVER_START( changela )
 
 	MDRV_CPU_ADD("maincpu", Z80,5000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(changela_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(chl_interrupt,4)
 
 	MDRV_CPU_ADD("mcu", M68705,2500000)
-	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
+	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_MACHINE_RESET(changela)
 
