@@ -65,8 +65,7 @@ VIDEO_UPDATE( sshangha );
 WRITE16_HANDLER( sshangha_pf2_data_w );
 WRITE16_HANDLER( sshangha_pf1_data_w );
 WRITE16_HANDLER( sshangha_control_0_w );
-WRITE16_HANDLER( sshangha_palette_24bit_w );
-WRITE16_HANDLER (sshangha_video_w);
+WRITE16_HANDLER( sshangha_video_w );
 
 extern UINT16 *sshangha_pf1_data;
 extern UINT16 *sshangha_pf2_data;
@@ -171,7 +170,7 @@ static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x360fff) AM_RAM AM_BASE(&spriteram16_2)
 	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
 	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
-	AM_RANGE(0x380000, 0x383fff) AM_RAM_WRITE(sshangha_palette_24bit_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x380000, 0x383fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM	/* Sprite ram buffer on bootleg only?? */
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
 	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_BASE(&sshangha_prot_data)
