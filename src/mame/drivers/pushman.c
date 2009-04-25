@@ -145,52 +145,30 @@ static MACHINE_RESET( bballs )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x060000, 0x060007) AM_READ(pushman_68705_r)
-	AM_RANGE(0xfe0800, 0xfe17ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
+static ADDRESS_MAP_START( pushman_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+	AM_RANGE(0x060000, 0x060007) AM_READWRITE(pushman_68705_r,pushman_68705_w)
+	AM_RANGE(0xfe0800, 0xfe17ff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("INPUTS") AM_WRITE(pushman_flipscreen_w)
+	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM") AM_WRITE(pushman_control_w)
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfec000, 0xfec7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xff8000, 0xff87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xffc000, 0xffffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x060000, 0x060007) AM_WRITE(pushman_68705_w)
-	AM_RANGE(0xfe0800, 0xfe17ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
-	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(pushman_flipscreen_w)
-	AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(pushman_control_w)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP /* ? */
-	AM_RANGE(0xfec000, 0xfec7ff) AM_WRITE(pushman_videoram_w) AM_BASE(&videoram16)
-	AM_RANGE(0xff8000, 0xff87ff) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_BASE(&videoram16)
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0007) AM_READ(pushman_68000_r)
-	AM_RANGE(0x0010, 0x007f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0080, 0x0fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0007) AM_READWRITE(pushman_68000_r,pushman_68000_w)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0007) AM_WRITE(pushman_68000_w)
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0080, 0x0fff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -199,31 +177,19 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bballs_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bballs_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x60000, 0x60007) AM_READ(bballs_68705_r)
-	AM_RANGE(0xe0800, 0xe17ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe4000, 0xe4001) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xe4002, 0xe4003) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x60000, 0x60007) AM_READWRITE(bballs_68705_r,bballs_68705_w)
+	AM_RANGE(0xe0800, 0xe17ff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0xe4000, 0xe4001) AM_READ_PORT("INPUTS") AM_WRITE(pushman_flipscreen_w)
+	AM_RANGE(0xe4002, 0xe4003) AM_READ_PORT("SYSTEM") AM_WRITE(pushman_control_w)
 	AM_RANGE(0xe4004, 0xe4005) AM_READ_PORT("DSW")
-	AM_RANGE(0xec000, 0xec7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf8000, 0xf87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfc000, 0xfffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bballs_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x60000, 0x60007) AM_WRITE(bballs_68705_w)
-	AM_RANGE(0xe0800, 0xe17ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
-	AM_RANGE(0xe4000, 0xe4001) AM_WRITE(pushman_flipscreen_w)
-	AM_RANGE(0xe4002, 0xe4003) AM_WRITE(pushman_control_w)
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(pushman_scroll_w)
 	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */
-	AM_RANGE(0xec000, 0xec7ff) AM_WRITE(pushman_videoram_w) AM_BASE(&videoram16)
-	AM_RANGE(0xf8000, 0xf87ff) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xfc000, 0xfffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xec000, 0xec7ff) AM_RAM_WRITE(pushman_videoram_w) AM_BASE(&videoram16)
+	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfc000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -451,16 +417,16 @@ static MACHINE_DRIVER_START( pushman )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(pushman_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* ElSemi. Reversed the CPU order so the sound callback works with bballs */
 	MDRV_CPU_ADD("mcu", M68705, 4000000)	/* No idea */
-	MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
+	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(3600))
 
@@ -493,11 +459,11 @@ static MACHINE_DRIVER_START( bballs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(bballs_readmem,bballs_writemem)
+	MDRV_CPU_PROGRAM_MAP(bballs_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(3600))
