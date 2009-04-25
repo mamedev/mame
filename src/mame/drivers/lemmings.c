@@ -86,50 +86,32 @@ static WRITE8_HANDLER( lemmings_sound_ack_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( lemmings_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x120000, 0x1207ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x140000, 0x1407ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x160000, 0x160fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_READ(lemmings_prot_r)
+static ADDRESS_MAP_START( lemmings_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(lemmings_palette_24bit_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE(lemmings_control_w) AM_BASE(&lemmings_control_data)
 	AM_RANGE(0x190000, 0x19000f) AM_READ(lemmings_trackball_r)
-	AM_RANGE(0x200000, 0x202fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x300000, 0x37ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x380000, 0x39ffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( lemmings_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
-	AM_RANGE(0x160000, 0x160fff) AM_WRITE(lemmings_palette_24bit_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x170000, 0x17000f) AM_WRITE(lemmings_control_w) AM_BASE(&lemmings_control_data)
+	AM_RANGE(0x1a0000, 0x1a07ff) AM_READ(lemmings_prot_r)
 	AM_RANGE(0x1a0064, 0x1a0065) AM_WRITE(lemmings_sound_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(buffer_spriteram16_w) /* 1 written once a frame */
 	AM_RANGE(0x1e0000, 0x1e0001) AM_WRITE(buffer_spriteram16_2_w) /* 1 written once a frame */
-	AM_RANGE(0x200000, 0x201fff) AM_WRITE(lemmings_vram_w) AM_BASE(&lemmings_vram_data)
-	AM_RANGE(0x300000, 0x37ffff) AM_WRITE(lemmings_pixel_0_w) AM_BASE(&lemmings_pixel_0_data)
-	AM_RANGE(0x380000, 0x39ffff) AM_WRITE(lemmings_pixel_1_w) AM_BASE(&lemmings_pixel_1_data)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(lemmings_vram_w) AM_BASE(&lemmings_vram_data)
+	AM_RANGE(0x202000, 0x202fff) AM_RAM
+	AM_RANGE(0x300000, 0x37ffff) AM_RAM_WRITE(lemmings_pixel_0_w) AM_BASE(&lemmings_pixel_0_data)
+	AM_RANGE(0x380000, 0x39ffff) AM_RAM_WRITE(lemmings_pixel_1_w) AM_BASE(&lemmings_pixel_1_data)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0800, 0x0801) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("oki", okim6295_r)
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym", ym2151_w)
-	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("oki", okim6295_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(lemmings_sound_ack_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)
+	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
+	AM_RANGE(0x1800, 0x1800) AM_READWRITE(soundlatch_r,lemmings_sound_ack_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -269,11 +251,11 @@ static MACHINE_DRIVER_START( lemmings )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
-	MDRV_CPU_PROGRAM_MAP(lemmings_readmem,lemmings_writemem)
+	MDRV_CPU_PROGRAM_MAP(lemmings_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", M6809,32220000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
