@@ -29,6 +29,12 @@ MACHINE_RESET( espial )
 	sound_nmi_enabled = FALSE;
 }
 
+MACHINE_START( espial )
+{
+    //state_save_register_global_array(machine, mcu_out[1]);
+    state_save_register_global(machine, sound_nmi_enabled);
+}
+
 
 WRITE8_HANDLER( zodiac_master_interrupt_enable_w )
 {
@@ -322,6 +328,7 @@ static MACHINE_DRIVER_START( espial )
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,4)
 
 	MDRV_MACHINE_RESET(espial)
+	MDRV_MACHINE_START(espial)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -439,6 +446,6 @@ ROM_END
 
 
 
-GAME( 1983, espial,  0,      espial,  espial,  0, ROT0,  "[Orca] Thunderbolt", "Espial (Europe)", 0 )
-GAME( 1983, espialu, espial, espial,  espial,  0, ROT0,  "[Orca] Thunderbolt", "Espial (US?)", 0 )
-GAME( 1983, netwars, 0,      netwars, netwars, 0, ROT90, "Orca (Esco Trading Co license)", "Net Wars", 0 )
+GAME( 1983, espial,  0,      espial,  espial,  0, ROT0,  "[Orca] Thunderbolt", "Espial (Europe)", GAME_SUPPORTS_SAVE )
+GAME( 1983, espialu, espial, espial,  espial,  0, ROT0,  "[Orca] Thunderbolt", "Espial (US?)", GAME_SUPPORTS_SAVE )
+GAME( 1983, netwars, 0,      netwars, netwars, 0, ROT90, "Orca (Esco Trading Co license)", "Net Wars", GAME_SUPPORTS_SAVE )

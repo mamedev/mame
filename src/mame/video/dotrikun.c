@@ -21,6 +21,11 @@ WRITE8_HANDLER( dotrikun_color_w )
 }
 
 
+VIDEO_START( dotrikun )
+{
+	state_save_register_global(machine, color);
+}
+
 VIDEO_UPDATE( dotrikun )
 {
 	int offs;

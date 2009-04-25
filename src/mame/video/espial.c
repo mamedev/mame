@@ -103,6 +103,8 @@ VIDEO_START( espial )
 	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
+
+	state_save_register_global(machine, flipscreen);
 }
 
 VIDEO_START( netwars )
@@ -112,6 +114,8 @@ VIDEO_START( netwars )
 
 	tilemap_set_scroll_cols(bg_tilemap, 32);
 	tilemap_set_scrolldy(bg_tilemap, 0, 0x100);
+
+	state_save_register_global(machine, flipscreen);
 }
 
 

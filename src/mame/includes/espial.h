@@ -7,6 +7,7 @@
 /*----------- defined in drivers/espial.c -----------*/
 
 MACHINE_RESET( espial );
+MACHINE_START( espial );
 
 WRITE8_HANDLER( zodiac_master_interrupt_enable_w );
 INTERRUPT_GEN( zodiac_master_interrupt );
