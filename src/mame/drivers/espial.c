@@ -71,83 +71,57 @@ WRITE8_HANDLER( zodiac_master_soundlatch_w )
 }
 
 
-
 static ADDRESS_MAP_START( espial_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x5800, 0x5fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0000, 0x4fff) AM_ROM
+	AM_RANGE(0x5800, 0x5fff) AM_RAM
 	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("IN0")
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_READ(soundlatch_r)	/* the main CPU reads the command back from the slave */
-	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8000, 0x803f) AM_READ(SMH_RAM)
-	AM_RANGE(0x8400, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8c00, 0x903f) AM_READ(SMH_RAM)
-	AM_RANGE(0x9400, 0x97ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( espial_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6090, 0x6090) AM_WRITE(zodiac_master_soundlatch_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, zodiac_master_soundlatch_w)	/* the main CPU reads the command back from the slave */
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
-	AM_RANGE(0x8000, 0x801f) AM_WRITE(SMH_RAM) AM_BASE(&espial_spriteram_1)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(espial_videoram_w) AM_BASE(&espial_videoram)
+	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE(&espial_spriteram_1)
+	AM_RANGE(0x8020, 0x803f) AM_READ(SMH_RAM)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_BASE(&espial_videoram)
 	AM_RANGE(0x8800, 0x880f) AM_WRITE(SMH_RAM) AM_BASE(&espial_spriteram_3)
-	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(espial_attributeram_w) AM_BASE(&espial_attributeram)
-	AM_RANGE(0x9000, 0x901f) AM_WRITE(SMH_RAM) AM_BASE(&espial_spriteram_2)
-	AM_RANGE(0x9020, 0x903f) AM_WRITE(espial_scrollram_w) AM_BASE(&espial_scrollram)
-	AM_RANGE(0x9400, 0x97ff) AM_WRITE(espial_colorram_w) AM_BASE(&espial_colorram)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_BASE(&espial_attributeram)
+	AM_RANGE(0x9000, 0x901f) AM_RAM AM_BASE(&espial_spriteram_2)
+	AM_RANGE(0x9020, 0x903f) AM_RAM_WRITE(espial_scrollram_w) AM_BASE(&espial_scrollram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_BASE(&espial_colorram)
+	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 
 
 /* there are a lot of unmapped reads from all over memory as the
    code uses POP instructions in a delay loop */
-static ADDRESS_MAP_START( netwars_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x5800, 0x5fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( netwars_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x5800, 0x5fff) AM_RAM
 	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("IN0")
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_READ(soundlatch_r)	/* the main CPU reads the command back from the slave */
-	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8000, 0x97ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( netwars_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6090, 0x6090) AM_WRITE(zodiac_master_soundlatch_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, zodiac_master_soundlatch_w)	/* the main CPU reads the command back from the slave */
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(espial_flipscreen_w)
-	AM_RANGE(0x8000, 0x801f) AM_WRITE(SMH_RAM) AM_BASE(&espial_spriteram_1)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(espial_videoram_w) AM_BASE(&espial_videoram)
-	AM_RANGE(0x8800, 0x880f) AM_WRITE(SMH_RAM) AM_BASE(&espial_spriteram_3)
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(espial_attributeram_w) AM_BASE(&espial_attributeram)
-	AM_RANGE(0x9000, 0x901f) AM_WRITE(SMH_RAM) AM_BASE(&espial_spriteram_2)
-	AM_RANGE(0x9020, 0x903f) AM_WRITE(espial_scrollram_w) AM_BASE(&espial_scrollram)
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(espial_colorram_w) AM_BASE(&espial_colorram)
+	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE(&espial_spriteram_1)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(espial_videoram_w) AM_BASE(&espial_videoram)
+	AM_RANGE(0x8800, 0x880f) AM_RAM AM_BASE(&espial_spriteram_3)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(espial_attributeram_w) AM_BASE(&espial_attributeram)
+	AM_RANGE(0x9000, 0x901f) AM_RAM AM_BASE(&espial_spriteram_2)
+	AM_RANGE(0x9020, 0x903f) AM_RAM_WRITE(espial_scrollram_w) AM_BASE(&espial_scrollram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(espial_colorram_w) AM_BASE(&espial_colorram)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_enable_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -319,11 +293,11 @@ static MACHINE_DRIVER_START( espial )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(espial_readmem,espial_writemem)
+	MDRV_CPU_PROGRAM_MAP(espial_readmem,0)
 	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3072000)	/* 2 MHz?????? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,4)
 
@@ -357,7 +331,7 @@ static MACHINE_DRIVER_START( netwars )
 	MDRV_IMPORT_FROM(espial)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(netwars_readmem,netwars_writemem)
+	MDRV_CPU_PROGRAM_MAP(netwars_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

@@ -95,39 +95,26 @@ static WRITE16_HANDLER( esd16_sound_command_w )
  AFAIK)
 */
 
-static ADDRESS_MAP_START( multchmp_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0x200000, 0x2005ff) AM_READ(SMH_RAM				)	// Palette
-/**/AM_RANGE(0x300000, 0x3007ff) AM_READ(SMH_RAM				)	// Sprites
-/**/AM_RANGE(0x400000, 0x403fff) AM_READ(SMH_RAM				)	// Layers
-/**/AM_RANGE(0x420000, 0x423fff) AM_READ(SMH_RAM				)	//
-/**/AM_RANGE(0x500000, 0x500003) AM_READ(SMH_RAM				)	// Scroll
-/**/AM_RANGE(0x500004, 0x500007) AM_READ(SMH_RAM				)	//
-/**/AM_RANGE(0x500008, 0x50000b) AM_READ(SMH_RAM				)	//
-/**/AM_RANGE(0x50000c, 0x50000f) AM_READ(SMH_RAM				)	//
+static ADDRESS_MAP_START( multchmp_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+/**/AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)						// Sprites
+	AM_RANGE(0x300800, 0x300807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
+/**/AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0)						// Layers
+/**/AM_RANGE(0x420000, 0x423fff) AM_RAM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)						//
+/**/AM_RANGE(0x500000, 0x500003) AM_RAM AM_BASE(&esd16_scroll_0)											// Scroll
+/**/AM_RANGE(0x500004, 0x500007) AM_RAM AM_BASE(&esd16_scroll_1)											//
+/**/AM_RANGE(0x500008, 0x50000b) AM_RAM																		//
+/**/AM_RANGE(0x50000c, 0x50000f) AM_RAM																		//
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_NOP)															// IRQ Ack
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("DSW")
-	AM_RANGE(0x700008, 0x70000b) AM_READ(SMH_NOP				)	// ? Only read once
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( multchmp_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM						)	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM						)	// RAM
-	AM_RANGE(0x200000, 0x2005ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x300000, 0x3007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x300800, 0x300807) AM_WRITE(esd16_spriteram_w				)	// Sprites (Mirrored)
-	AM_RANGE(0x400000, 0x403fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0	)	// Layers
-	AM_RANGE(0x420000, 0x423fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1	)	// Scroll
-	AM_RANGE(0x500000, 0x500003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0	)	//
-	AM_RANGE(0x500004, 0x500007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1	)	//
-	AM_RANGE(0x500008, 0x50000b) AM_WRITE(SMH_RAM						)	// ? 0
-	AM_RANGE(0x50000c, 0x50000f) AM_WRITE(SMH_RAM						)	// ? 0
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_NOP						)	// IRQ Ack
-	AM_RANGE(0x600008, 0x600009) AM_WRITE(esd16_tilemap0_color_w		)	// Flip Screen + Tileamp0 palette banking
-	AM_RANGE(0x60000a, 0x60000b) AM_WRITE(SMH_NOP						)	// ? 2
-	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(esd16_sound_command_w			)	// To Sound CPU
+	AM_RANGE(0x600008, 0x600009) AM_WRITE(esd16_tilemap0_color_w)											// Flip Screen + Tileamp0 palette banking
+	AM_RANGE(0x60000a, 0x60000b) AM_WRITE(SMH_NOP)															// ? 2
+	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(esd16_sound_command_w)											// To Sound CPU
+	AM_RANGE(0x700008, 0x70000b) AM_READ(SMH_NOP)															// ? Only read once
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER(hedpanic_platform_w)
@@ -168,31 +155,25 @@ static WRITE16_HANDLER( esd_eeprom_w )
 //  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 }
 
-static ADDRESS_MAP_START( hedpanic_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x800000, 0x800fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( hedpanic_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x900000, 0x9007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Sprites
+	AM_RANGE(0x900800, 0x900807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
+	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0)							// Layers
+	AM_RANGE(0xa20000, 0xa23fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							//
+	AM_RANGE(0xa24000, 0xa27fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							// mirror?
+	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0)									// Scroll
+	AM_RANGE(0xb00004, 0xb00007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1)									//
+	AM_RANGE(0xb00008, 0xb00009) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_x)
+	AM_RANGE(0xb0000a, 0xb0000b) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_y)
+	AM_RANGE(0xb0000c, 0xb0000d) AM_WRITENOP 																// ??
+	AM_RANGE(0xb0000e, 0xb0000f) AM_WRITE(SMH_RAM) AM_BASE(&head_layersize) 								// ??
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP // IRQ Ack
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc00006, 0xc00007) AM_READ(esd_eeprom_r	)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hedpanic_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM						)	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x800000, 0x800fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x900000, 0x9007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x900800, 0x900807) AM_WRITE(esd16_spriteram_w				)	// Sprites (Mirrored)
-	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0	)	// Layers
-	AM_RANGE(0xa20000, 0xa23fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1	)	//
-	AM_RANGE(0xa24000, 0xa27fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1	)	// mirror?
-	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0	)	// Scroll
-	AM_RANGE(0xb00004, 0xb00007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1	)	//
-	AM_RANGE(0xb00008, 0xb00009) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_x)
-	AM_RANGE(0xb0000a, 0xb0000b) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_y)
-	AM_RANGE(0xb0000c, 0xb0000d) AM_WRITENOP // ??
-	AM_RANGE(0xb0000e, 0xb0000f) AM_WRITE(SMH_RAM) AM_BASE(&head_layersize) // ??
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP // IRQ Ack
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(esd16_tilemap0_color_w)	// Flip Screen + Tileamp0 palette banking
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITENOP	// ? 2 not checked
 	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITE(esd16_sound_command_w			)	// To Sound CPU // ok
@@ -202,70 +183,58 @@ ADDRESS_MAP_END
 
 /* Multi Champ Deluxe, like Head Panic but different addresses */
 
-static ADDRESS_MAP_START( mchampdx_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x400000, 0x400fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( mchampdx_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM																		// RAM
+	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0)							// Layers
+	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							//
+	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							// mirror?
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+    AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x500006, 0x500007) AM_READ(esd_eeprom_r	)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mchampdx_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM						)	// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0	)	// Layers
-	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1	)	//
-	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1	)	// mirror?
-	AM_RANGE(0x400000, 0x400fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-    AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
-	AM_RANGE(0x500008, 0x500009) AM_WRITE(esd16_tilemap0_color_w)   // Flip Screen + Tileamp0 palette banking
-	AM_RANGE(0x50000a, 0x50000b) AM_WRITENOP	// ? 2 not checked
-	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(esd16_sound_command_w			)	// To Sound CPU // ok
+	AM_RANGE(0x500006, 0x500007) AM_READ(esd_eeprom_r)
+	AM_RANGE(0x500008, 0x500009) AM_WRITE(esd16_tilemap0_color_w)											// Flip Screen + Tileamp0 palette banking
+	AM_RANGE(0x50000a, 0x50000b) AM_WRITENOP																// ? 2 not checked
+	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(esd16_sound_command_w)											// To Sound CPU // ok
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITE(esd_eeprom_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x600800, 0x600807) AM_WRITE(esd16_spriteram_w				)	// Sprites (Mirrored)
-	AM_RANGE(0x700000, 0x700003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0	)	// Scroll
-	AM_RANGE(0x700004, 0x700007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1	)	//
-	AM_RANGE(0x700008, 0x700009) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_x) // not used in mchampdx?
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_y) // not used in mchampdx?
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITENOP // ??
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(SMH_RAM) AM_BASE(&head_layersize) // ??
-	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w) // not used in mchampdx?
+	AM_RANGE(0x600000, 0x6007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Sprites
+	AM_RANGE(0x600800, 0x600807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
+	AM_RANGE(0x700000, 0x700003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0)									// Scroll
+	AM_RANGE(0x700004, 0x700007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1)									//
+	AM_RANGE(0x700008, 0x700009) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_x) 							// not used in mchampdx?
+	AM_RANGE(0x70000a, 0x70000b) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_y) 							// not used in mchampdx?
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITENOP 																// ??
+	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(SMH_RAM) AM_BASE(&head_layersize) 								// ??
+	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w) 												// not used in mchampdx?
 ADDRESS_MAP_END
 
 /* Tang Tang - like the others but again with different addresses */
 
-static ADDRESS_MAP_START( tangtang_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x100000, 0x100fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( tangtang_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// RAM
+	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			// Sprites
+	AM_RANGE(0x200800, 0x200807) AM_WRITE(esd16_spriteram_w)												// Sprites (Mirrored)
+	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0)							// Layers
+	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							//
+	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1)							// mirror?
+	AM_RANGE(0x400000, 0x400003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0)									// Scroll
+	AM_RANGE(0x400004, 0x400007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1)									//
+	AM_RANGE(0x400008, 0x400009) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_x) 							// not used in mchampdx?
+	AM_RANGE(0x40000a, 0x40000b) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_y) 							// not used in mchampdx?
+	AM_RANGE(0x40000c, 0x40000d) AM_WRITENOP 																// ??
+	AM_RANGE(0x40000e, 0x40000f) AM_WRITE(SMH_RAM) AM_BASE(&head_layersize)									// ??
+	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x500006, 0x500007) AM_READ(esd_eeprom_r	)
-	AM_RANGE(0x700000, 0x70ffff) AM_READ(SMH_RAM) // main ram
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tangtang_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM						)	// ROM
-	AM_RANGE(0x100000, 0x100fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x200000, 0x2007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0x200800, 0x200807) AM_WRITE(esd16_spriteram_w				)	// Sprites (Mirrored)
-	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE(&esd16_vram_0	)	// Layers
-	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1	)	//
-	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_BASE(&esd16_vram_1	)	// mirror?
-	AM_RANGE(0x400000, 0x400003) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_0	)	// Scroll
-	AM_RANGE(0x400004, 0x400007) AM_WRITE(SMH_RAM) AM_BASE(&esd16_scroll_1	)	//
-	AM_RANGE(0x400008, 0x400009) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_x) // not used in mchampdx?
-	AM_RANGE(0x40000a, 0x40000b) AM_WRITE(SMH_RAM) AM_BASE(&headpanic_platform_y) // not used in mchampdx?
-	AM_RANGE(0x40000c, 0x40000d) AM_WRITENOP // ??
-	AM_RANGE(0x40000e, 0x40000f) AM_WRITE(SMH_RAM) AM_BASE(&head_layersize) // ??
-	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	// IRQ Ack
-	AM_RANGE(0x500008, 0x500009) AM_WRITE(esd16_tilemap0_color_w)   // Flip Screen + Tileamp0 palette banking
-	AM_RANGE(0x50000a, 0x50000b) AM_WRITENOP	// ? 2 not checked
-	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(esd16_sound_command_w			)	// To Sound CPU // ok
+	AM_RANGE(0x500006, 0x500007) AM_READ(esd_eeprom_r)
+	AM_RANGE(0x500008, 0x500009) AM_WRITE(esd16_tilemap0_color_w)   										// Flip Screen + Tileamp0 palette banking
+	AM_RANGE(0x50000a, 0x50000b) AM_WRITENOP																// ? 2 not checked
+	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(esd16_sound_command_w)											// To Sound CPU // ok
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITE(esd_eeprom_w)
 	AM_RANGE(0x600008, 0x600009) AM_WRITE(hedpanic_platform_w)
-	AM_RANGE(0x700000, 0x70ffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM																		// main ram
 ADDRESS_MAP_END
 
 
@@ -285,16 +254,10 @@ static WRITE8_HANDLER( esd16_sound_rombank_w )
 	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audiocpu") + 0x4000 * bank);
 }
 
-static ADDRESS_MAP_START( multchmp_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM		)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1		)	// Banked ROM
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM		)	// RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( multchmp_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM		)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM		)	// Banked ROM
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM		)	// RAM
+static ADDRESS_MAP_START( multchmp_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)	// Banked ROM
+	AM_RANGE(0xf800, 0xffff) AM_RAM								// RAM
 ADDRESS_MAP_END
 
 static READ8_HANDLER( esd16_sound_command_r )
@@ -566,11 +529,11 @@ static MACHINE_DRIVER_START( multchmp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(multchmp_readmem,multchmp_writemem)
+	MDRV_CPU_PROGRAM_MAP(multchmp_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(multchmp_sound_readmem,multchmp_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(multchmp_sound_map,0)
 	MDRV_CPU_IO_MAP(multchmp_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)	/* IRQ By Main CPU */
 
@@ -605,7 +568,7 @@ static MACHINE_DRIVER_START( hedpanic )
 	MDRV_IMPORT_FROM(multchmp)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hedpanic_readmem,hedpanic_writemem)
+	MDRV_CPU_PROGRAM_MAP(hedpanic_map,0)
 
 	MDRV_NVRAM_HANDLER(93C46)
 
@@ -622,7 +585,7 @@ static MACHINE_DRIVER_START( mchampdx )
 	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mchampdx_readmem,mchampdx_writemem)
+	MDRV_CPU_PROGRAM_MAP(mchampdx_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tangtang )
@@ -631,7 +594,7 @@ static MACHINE_DRIVER_START( tangtang )
 	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tangtang_readmem,tangtang_writemem)
+	MDRV_CPU_PROGRAM_MAP(tangtang_map,0)
 
 	MDRV_GFXDECODE(tangtang)
 MACHINE_DRIVER_END
