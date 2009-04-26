@@ -76,7 +76,7 @@ SAMPLES_START( senjyo_sh_start )
 	running_machine *machine = device->machine;
 	int i;
 
-	_single = (INT16 *)auto_malloc(SINGLE_LENGTH*2);
+	_single = auto_alloc_array(machine, INT16, SINGLE_LENGTH);
 
 	for (i = 0;i < SINGLE_LENGTH;i++)		/* freq = ctc2 zco / 8 */
 		_single[i] = ((i/SINGLE_DIVIDER)&0x01)*127*256;

@@ -422,7 +422,7 @@ static TIMER_CALLBACK( amiga_irq_proc )
 
 CUSTOM_INPUT( amiga_joystick_convert )
 {
-	UINT8 bits = input_port_read(field->port->machine, param);
+	UINT8 bits = input_port_read(field->port->machine, (const char *)param);
 	int up = (bits >> 0) & 1;
 	int down = (bits >> 1) & 1;
 	int left = (bits >> 2) & 1;
@@ -1553,7 +1553,7 @@ void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_devic
 	assert_always((device->size & (device->size - 1)) == 0, "device->size must be power of 2!");
 
 	/* allocate memory and link it in at the end of the list */
-	dev = auto_malloc(sizeof(*dev));
+	dev = auto_alloc(machine, autoconfig_device);
 	dev->next = NULL;
 	for (d = &autoconfig_list; *d; d = &(*d)->next) ;
 	*d = dev;

@@ -743,10 +743,8 @@ void *ay8910_start_ym(void *infoptr, sound_type chip_type, const device_config *
 	ay8910_context *info = (ay8910_context *)infoptr;
 
 	if (info == NULL)
-	{
-		info = (ay8910_context *)auto_malloc(sizeof(*info));
-		memset(info, 0, sizeof(*info));
-	}
+		info = auto_alloc_clear(device->machine, ay8910_context);
+
 	info->device = device;
 	info->intf = intf;
 	devcb_resolve_read8(&info->portAread, &intf->portAread, device);

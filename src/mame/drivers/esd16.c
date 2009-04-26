@@ -256,7 +256,7 @@ static WRITE8_HANDLER( esd16_sound_rombank_w )
 
 static ADDRESS_MAP_START( multchmp_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						// Banked ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM								// RAM
 ADDRESS_MAP_END
 

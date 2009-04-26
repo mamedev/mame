@@ -1733,7 +1733,7 @@ static DRIVER_INIT( endurobl )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-	UINT16 *decrypt = (UINT16 *)auto_malloc(0x40000);
+	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	hangon_generic_init();
 	memory_set_decrypted_region(space, 0x000000, 0x03ffff, decrypt);
@@ -1747,7 +1747,7 @@ static DRIVER_INIT( endurob2 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-	UINT16 *decrypt = (UINT16 *)auto_malloc(0x40000);
+	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	hangon_generic_init();
 	memory_set_decrypted_region(space, 0x000000, 0x03ffff, decrypt);

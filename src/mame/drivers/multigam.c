@@ -725,7 +725,7 @@ static DRIVER_INIT(multigm3)
 	multigm3_decrypt(memory_region(machine, "maincpu"), memory_region_length(machine, "maincpu"), decode );
 	multigm3_decrypt(memory_region(machine, "user1"), memory_region_length(machine, "user1"), decode );
 
-	multigmc_mmc3_6000_ram = auto_malloc(0x2000);
+	multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
 
 	multigam_switch_prg_rom( space, 0x0, 0x01 );
 }

@@ -91,8 +91,7 @@ x86log_context *x86log_create_context(const char *filename)
 	x86log_context *log;
 
 	/* allocate the log */
-	log = (x86log_context *)malloc_or_die(sizeof(*log));
-	memset(log, 0, sizeof(*log));
+	log = alloc_clear_or_die(x86log_context);
 
 	/* allocate the filename */
 	log->filename = astring_dupc(filename);

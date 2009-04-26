@@ -25,7 +25,7 @@ static VIDEO_START( ninjaw_core )
 	int chips;
 	int mask;
 
-	spritelist = auto_malloc(0x1000 * sizeof(*spritelist));
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x1000);
 
 	chips = TC0100SCN_count(machine);
 

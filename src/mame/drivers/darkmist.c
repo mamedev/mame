@@ -60,7 +60,7 @@ static WRITE8_HANDLER(t5182shared_w)
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1")
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2")
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("START")
@@ -336,7 +336,7 @@ ROM_END
 
 static void decrypt_gfx(running_machine *machine)
 {
-	UINT8 *buf = malloc_or_die(0x40000);
+	UINT8 *buf = alloc_array_or_die(UINT8, 0x40000);
 	UINT8 *rom;
 	int size;
 	int i;
@@ -426,8 +426,8 @@ static DRIVER_INIT(darkmist)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i, len;
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *buffer = malloc_or_die(0x10000);
-	UINT8 *decrypt = auto_malloc(0x8000);
+	UINT8 *buffer = alloc_array_or_die(UINT8, 0x10000);
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	decrypt_gfx(machine);
 

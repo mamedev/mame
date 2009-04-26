@@ -648,10 +648,8 @@ static void SCSP_Init(const device_config *device, struct _SCSP *SCSP, const scs
 	}
 
 	LFO_Init(device->machine);
-	SCSP->buffertmpl=(signed int*) auto_malloc(44100*sizeof(signed int));
-	SCSP->buffertmpr=(signed int*) auto_malloc(44100*sizeof(signed int));
-	memset(SCSP->buffertmpl,0,44100*sizeof(signed int));
-	memset(SCSP->buffertmpr,0,44100*sizeof(signed int));
+	SCSP->buffertmpl=auto_alloc_array_clear(device->machine, signed int, 44100);
+	SCSP->buffertmpr=auto_alloc_array_clear(device->machine, signed int, 44100);
 
 	// no "pend"
 	SCSP[0].udata.data[0x20/2] = 0;

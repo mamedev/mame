@@ -394,7 +394,7 @@ VIDEO_UPDATE( finallap )
 VIDEO_START( luckywld )
 {
 	namco_tilemap_init(machine,2,memory_region(machine, "gfx4"),TilemapCB);
-	namco_obj_init( 0, 0x0, NULL );
+	namco_obj_init( machine, 0, 0x0, NULL );
 	if( namcos2_gametype==NAMCOS2_LUCKY_AND_WILD )
 	{
 		namco_roz_init( machine, 1, "gfx5" );
@@ -435,7 +435,7 @@ VIDEO_UPDATE( luckywld )
 VIDEO_START( sgunner )
 {
 	namco_tilemap_init(machine,2,memory_region(machine, "gfx4"),TilemapCB);
-	namco_obj_init( 0, 0x0, NULL );
+	namco_obj_init( machine, 0, 0x0, NULL );
 }
 
 VIDEO_UPDATE( sgunner )

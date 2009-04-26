@@ -354,8 +354,8 @@ VIDEO_START( pce )
 	memset(&vpc, 0, sizeof(vpc));
 
 	/* allocate VRAM */
-	vdc[0].vram = auto_malloc(0x10000);
-	vdc[1].vram = auto_malloc(0x10000);
+	vdc[0].vram = auto_alloc_array(machine, UINT8, 0x10000);
+	vdc[1].vram = auto_alloc_array(machine, UINT8, 0x10000);
 	memset(vdc[0].vram, 0, 0x10000);
 	memset(vdc[1].vram, 0, 0x10000);
 

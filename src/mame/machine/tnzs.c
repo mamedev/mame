@@ -521,7 +521,7 @@ DRIVER_INIT( drtoppel )
 	mcu_type = MCU_DRTOPPEL;
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf800, 0xfbff, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf800, 0xfbff, 0, 0, (write8_space_func)SMH_NOP);
 }
 
 DRIVER_INIT( chukatai )

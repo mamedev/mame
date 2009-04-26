@@ -70,9 +70,9 @@ static MACHINE_RESET( suprgolf )
 static VIDEO_START( suprgolf )
 {
 	suprgolf_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
-	paletteram = auto_malloc(0x1000);
-	suprgolf_bg_vram = auto_malloc(0x2000*0x20);
-	suprgolf_bg_pen = auto_malloc(0x2000*0x20);
+	paletteram = auto_alloc_array(machine, UINT8, 0x1000);
+	suprgolf_bg_vram = auto_alloc_array(machine, UINT8, 0x2000*0x20);
+	suprgolf_bg_pen = auto_alloc_array(machine, UINT8, 0x2000*0x20);
 
 	tilemap_set_transparent_pen(suprgolf_tilemap,15);
 }

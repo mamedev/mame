@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)	/* foreground */
 	AM_RANGE(0x2800, 0x2fff) AM_READ(SMH_RAM)	/* background */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( readmem_alt, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2801) AM_DEVREAD("ym", ym2203_r)
 	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)	/* foreground */
 	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM)	/* background */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -459,7 +459,7 @@ static DRIVER_INIT( shootout )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int length = memory_region_length(machine, "maincpu");
-	UINT8 *decrypt = auto_malloc(length - 0x8000);
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length - 0x8000);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 

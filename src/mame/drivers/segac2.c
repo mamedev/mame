@@ -1341,10 +1341,10 @@ static VIDEO_START(segac2_new)
 	VIDEO_START_CALL(megadriv);
 
 
-	megadrive_vdp_palette_lookup = auto_malloc(0x1000);
-	megadrive_vdp_palette_lookup_sprite = auto_malloc(0x1000);
-	megadrive_vdp_palette_lookup_shadow = auto_malloc(0x1000);
-	megadrive_vdp_palette_lookup_highlight = auto_malloc(0x1000);
+	megadrive_vdp_palette_lookup = auto_alloc_array(machine, UINT16, 0x1000/2);
+	megadrive_vdp_palette_lookup_sprite = auto_alloc_array(machine, UINT16, 0x1000/2);
+	megadrive_vdp_palette_lookup_shadow = auto_alloc_array(machine, UINT16, 0x1000/2);
+	megadrive_vdp_palette_lookup_highlight = auto_alloc_array(machine, UINT16, 0x1000/2);
 }
 
 static VIDEO_UPDATE(segac2_new)
@@ -2088,7 +2088,7 @@ static DRIVER_INIT( tfrceacb )
 {
 	/* disable the palette bank switching from the protection chip */
 	segac2_common_init(machine, NULL);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800000, 0x800001, 0, 0, SMH_NOP);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800000, 0x800001, 0, 0, (write16_space_func)SMH_NOP);
 }
 
 static DRIVER_INIT( borench )

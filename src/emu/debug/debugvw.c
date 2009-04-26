@@ -342,8 +342,7 @@ void debug_view_init(running_machine *machine)
 	debugvw_private *global;
 
 	/* allocate memory for our globals */
-	global = machine->debugvw_data = (debugvw_private *)auto_malloc(sizeof(*machine->debugvw_data));
-	memset(global, 0, sizeof(*global));
+	global = machine->debugvw_data = auto_alloc_clear(machine, debugvw_private);
 
 	/* register for some manual cleanup */
 	add_exit_callback(machine, debug_view_exit);
@@ -1053,8 +1052,7 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 
 		/* determine the string and allocate a subview large enough */
 		astring_printf(tempstring, "CPU '%s' (%s)", cpu->tag, cpu_get_name(cpu));
-		subview = (registers_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
-		memset(subview, 0, sizeof(*subview));
+		subview = (registers_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + astring_len(tempstring));
 
 		/* populate the subview */
 		subview->next = NULL;
@@ -1523,8 +1521,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "CPU '%s' (%s)", cpu->tag, cpu_get_name(cpu));
-			subview = (disasm_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
-			memset(subview, 0, sizeof(*subview));
+			subview = (disasm_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + astring_len(tempstring));
 
 			/* populate the subview */
 			subview->next = NULL;
@@ -1881,12 +1878,12 @@ static int disasm_view_recompute(debug_view *view, offs_t pc, int startline, int
 		/* allocate address array */
 		if (dasmdata->byteaddress != NULL)
 			free(dasmdata->byteaddress);
-		dasmdata->byteaddress = (offs_t *)malloc_or_die(sizeof(dasmdata->byteaddress[0]) * dasmdata->allocated.y);
+		dasmdata->byteaddress = alloc_array_or_die(offs_t, dasmdata->allocated.y);
 
 		/* allocate disassembly buffer */
 		if (dasmdata->dasm != NULL)
 			free(dasmdata->dasm);
-		dasmdata->dasm = (char *)malloc_or_die(sizeof(dasmdata->dasm[0]) * dasmdata->allocated.x * dasmdata->allocated.y);
+		dasmdata->dasm = alloc_array_or_die(char, dasmdata->allocated.x * dasmdata->allocated.y);
 	}
 
 	/* iterate over lines */
@@ -2446,8 +2443,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 
 				/* determine the string and allocate a subview large enough */
 				astring_printf(tempstring, "CPU '%s' (%s) %s memory", cpu->tag, cpu_get_name(cpu), space->name);
-				subview = (memory_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
-				memset(subview, 0, sizeof(*subview));
+				subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + astring_len(tempstring));
 
 				/* populate the subview */
 				subview->next = NULL;
@@ -2476,8 +2472,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "Region '%s'", rgntag);
-			subview = (memory_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
-			memset(subview, 0, sizeof(*subview));
+			subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + astring_len(tempstring));
 
 			/* populate the subview */
 			subview->next = NULL;
@@ -2514,8 +2509,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "%s", strrchr(name, '/') + 1);
-			subview = (memory_subview_item *)auto_malloc(sizeof(*subview) + astring_len(tempstring));
-			memset(subview, 0, sizeof(*subview));
+			subview = (memory_subview_item *)auto_alloc_array_clear(machine, UINT8, sizeof(*subview) + astring_len(tempstring));
 
 			/* populate the subview */
 			subview->next = NULL;

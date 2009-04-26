@@ -189,22 +189,19 @@ VIDEO_START( taitojc )
 
 	tilemap_set_transparent_pen(taitojc_tilemap, 0);
 
-	taitojc_char_ram = auto_malloc(0x4000);
-	taitojc_tile_ram = auto_malloc(0x4000);
-
-	memset(taitojc_char_ram, 0, 0x4000);
-	memset(taitojc_tile_ram, 0, 0x4000);
+	taitojc_char_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
+	taitojc_tile_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[taitojc_gfx_index] = gfx_element_alloc(machine, &taitojc_char_layout, (UINT8 *)taitojc_char_ram, machine->config->total_colors / 16, 0);
 
-	taitojc_texture = auto_malloc(0x400000);
+	taitojc_texture = auto_alloc_array(machine, UINT8, 0x400000);
 
 	framebuffer = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
-	zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 //static int tick = 0;

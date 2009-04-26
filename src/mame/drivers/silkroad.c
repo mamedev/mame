@@ -345,7 +345,7 @@ static DRIVER_INIT( silkroad )
 
 	src += tileoffset; len -=tileoffset;
 
-	buffer = malloc_or_die(len);
+	buffer = alloc_array_or_die(UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)

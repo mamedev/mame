@@ -164,7 +164,7 @@ static VIDEO_START( madalien )
 		tilemap_set_scrolldy(tilemap_edge2[i], 0, video_screen_get_height(machine->primary_screen) - 256);
 	}
 
-	headlight_bitmap = auto_bitmap_alloc(128, 128, BITMAP_FORMAT_INDEXED16);
+	headlight_bitmap = auto_bitmap_alloc(machine, 128, 128, BITMAP_FORMAT_INDEXED16);
 
 	gfx_element_set_source(machine->gfx[0], madalien_charram);
 

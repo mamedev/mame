@@ -391,13 +391,13 @@ INLINE void CYCLES_RM(i386_state *cpustate,int modrm, int r, int m)
 	}
 }
 
-static void build_cycle_table(void)
+static void build_cycle_table(running_machine *machine)
 {
 	int i, j;
 	for (j=0; j < X86_NUM_CPUS; j++)
 	{
-		cycle_table_rm[j] = (UINT8 *)auto_malloc(sizeof(UINT8) * CYCLES_NUM_OPCODES);
-		cycle_table_pm[j] = (UINT8 *)auto_malloc(sizeof(UINT8) * CYCLES_NUM_OPCODES);
+		cycle_table_rm[j] = auto_alloc_array(machine, UINT8, CYCLES_NUM_OPCODES);
+		cycle_table_pm[j] = auto_alloc_array(machine, UINT8, CYCLES_NUM_OPCODES);
 
 		for (i=0; i < sizeof(x86_cycle_table)/sizeof(X86_CYCLE_TABLE); i++)
 		{
@@ -507,7 +507,7 @@ static CPU_INIT( i386 )
 	static const int regs32[8] = {EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI};
 	i386_state *cpustate = get_safe_token(device);
 
-	build_cycle_table();
+	build_cycle_table(device->machine);
 
 	for( i=0; i < 256; i++ ) {
 		int c=0;

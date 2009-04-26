@@ -70,7 +70,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( nycaptor )
 {
-  nycaptor_spriteram = auto_malloc (160);
+  nycaptor_spriteram = auto_alloc_array(machine, UINT8, 160);
   bg_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 
   tilemap_set_transmask(bg_tilemap,0,0xf800,0x7ff); //split 0
@@ -78,8 +78,8 @@ VIDEO_START( nycaptor )
   tilemap_set_transmask(bg_tilemap,2,0xfffc,0x0003);//split 2
   tilemap_set_transmask(bg_tilemap,3,0xfff0,0x000f);//split 3
 
-	paletteram = auto_malloc(0x200);
-	paletteram_2 = auto_malloc(0x200);
+	paletteram = auto_alloc_array(machine, UINT8, 0x200);
+	paletteram_2 = auto_alloc_array(machine, UINT8, 0x200);
 	tilemap_set_scroll_cols(bg_tilemap,32);
 }
 

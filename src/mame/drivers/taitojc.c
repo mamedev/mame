@@ -1333,9 +1333,9 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( taitojc )
 {
-	f3_shared_ram = auto_malloc(0x800);
+	f3_shared_ram = auto_alloc_array(machine, UINT32, 0x800/4);
 
-	polygon_fifo = auto_malloc(POLYGON_FIFO_SIZE * sizeof(UINT16));
+	polygon_fifo = auto_alloc_array(machine, UINT16, POLYGON_FIFO_SIZE);
 }
 
 ROM_START( sidebs )

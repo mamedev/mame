@@ -2148,30 +2148,30 @@ static void init_common(running_machine *machine)
 
 
 	// allocate memory for unpacked graphics
-	buf = auto_malloc(0x100000);
+	buf = auto_alloc_array(machine, UINT8, 0x100000);
 	gfx_plane02 = buf;
 	gfx_plane13 = buf + 0x80000;
 
 
 	// allocate memory for render layers
-	buf = auto_malloc(SCREEN_BYTESIZE * MAX_LAYERS);
+	buf = auto_alloc_array(machine, UINT8, SCREEN_BYTESIZE * MAX_LAYERS);
 	for (i=0; i<MAX_LAYERS; buf+=SCREEN_BYTESIZE, i++) render_layer[i] = (UINT16*)buf;
 
 
 	// allocate memory for pre-processed ROMs
-	gfx1_base = auto_malloc(0x20000);
+	gfx1_base = auto_alloc_array(machine, UINT8, 0x20000);
 
 
 	// allocate memory for alpha table
-	alpha_table = auto_malloc(sizeof(UINT32) * 0x10000);
+	alpha_table = auto_alloc_array(machine, UINT32, 0x10000);
 
 
 	// allocate memory for internal palette
-	internal_palette = auto_malloc(sizeof(UINT32) * PALETTE_SIZE);
+	internal_palette = auto_alloc_array(machine, UINT32, PALETTE_SIZE);
 
 
 	// allocate memory for hardware collision list
-	collision_list = auto_malloc(MAX_SPRITES);
+	collision_list = auto_alloc_array(machine, UINT8, MAX_SPRITES);
 
 
 	// decrypt main program ROM

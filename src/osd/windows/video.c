@@ -255,8 +255,7 @@ static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect,
 	assert(result);
 
 	// allocate a new monitor info
-	monitor = (win_monitor_info *)malloc_or_die(sizeof(*monitor));
-	memset(monitor, 0, sizeof(*monitor));
+	monitor = alloc_clear_or_die(win_monitor_info);
 
 	// copy in the data
 	monitor->handle = handle;
@@ -439,7 +438,7 @@ static void extract_video_config(running_machine *machine)
 static void load_effect_overlay(running_machine *machine, const char *filename)
 {
 	const device_config *screen;
-	char *tempstr = (char *)malloc_or_die(strlen(filename) + 5);
+	char *tempstr = alloc_array_or_die(char, strlen(filename) + 5);
 	char *dest;
 
 	// append a .PNG extension

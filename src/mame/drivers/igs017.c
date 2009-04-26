@@ -124,7 +124,7 @@ static void expand_sprites(running_machine *machine)
 	int i;
 
 	sprites_gfx_size	=	size / 2 * 3;
-	sprites_gfx			=	auto_malloc(sprites_gfx_size);
+	sprites_gfx			=	auto_alloc_array(machine, UINT8, sprites_gfx_size);
 
 	for (i = 0; i < size / 2 ; i++)
 	{
@@ -296,7 +296,7 @@ static void decrypt_program_rom(running_machine *machine, int mask, int a7, int 
 {
 	int length = memory_region_length(machine, "maincpu");
 	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *tmp = auto_malloc(length);
+	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
 	// decrypt the program ROM
@@ -394,7 +394,7 @@ static void tjsb_decrypt_sprites(running_machine *machine)
 {
 	int length = memory_region_length(machine, "sprites");
 	UINT8 *rom = memory_region(machine, "sprites");
-	UINT8 *tmp = auto_malloc(length);
+	UINT8 *tmp = auto_alloc_array(machine, UINT8, length);
 	int i;
 
 	// address lines swap (to do: collapse into one bitswap)
@@ -491,7 +491,7 @@ static void mgcs_decrypt_tiles(running_machine *machine)
 {
 	int length = memory_region_length(machine, "tilemaps");
 	UINT8 *rom = memory_region(machine, "tilemaps");
-	UINT8 *tmp = malloc_or_die(length);
+	UINT8 *tmp = alloc_array_or_die(UINT8, length);
 	int i;
 
 	memcpy(tmp,rom,length);

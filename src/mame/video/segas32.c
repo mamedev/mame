@@ -290,13 +290,13 @@ static void common_start(running_machine *machine, int multi32)
 	is_multi32 = multi32;
 
 	/* allocate a copy of spriteram in 32-bit format */
-	spriteram_32bit = auto_malloc(0x20000);
+	spriteram_32bit = auto_alloc_array(machine, UINT32, 0x20000/4);
 
 	/* allocate the tilemap cache */
 	cache_head = NULL;
 	for (tmap = 0; tmap < TILEMAP_CACHE_SIZE; tmap++)
 	{
-		struct cache_entry *entry = auto_malloc(sizeof(struct cache_entry));
+		struct cache_entry *entry = auto_alloc(machine, struct cache_entry);
 
 		entry->tmap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  16,16, 32,16);
 		entry->page = 0xff;
@@ -310,15 +310,14 @@ static void common_start(running_machine *machine, int multi32)
 	/* allocate the bitmaps (a few extra for multi32) */
 	for (tmap = 0; tmap < 9 + 2 * multi32; tmap++)
 	{
-		layer_data[tmap].bitmap = auto_bitmap_alloc(416, 224, BITMAP_FORMAT_INDEXED16);
-		layer_data[tmap].transparent = auto_malloc(sizeof(layer_data[tmap].transparent[0]) * 256);
-		memset(layer_data[tmap].transparent, 0, sizeof(layer_data[tmap].transparent[0]) * 256);
+		layer_data[tmap].bitmap = auto_bitmap_alloc(machine, 416, 224, BITMAP_FORMAT_INDEXED16);
+		layer_data[tmap].transparent = auto_alloc_array_clear(machine, UINT8, 256);
 	}
 
 	/* allocate pre-rendered solid lines of 0's and ffff's */
-	solid_0000 = auto_malloc(sizeof(solid_0000[0]) * 512);
+	solid_0000 = auto_alloc_array(machine, UINT16, 512);
 	memset(solid_0000, 0x00, sizeof(solid_0000[0]) * 512);
-	solid_ffff = auto_malloc(sizeof(solid_ffff[0]) * 512);
+	solid_ffff = auto_alloc_array(machine, UINT16, 512);
 	memset(solid_ffff, 0xff, sizeof(solid_ffff[0]) * 512);
 
 	/* initialize videoram */

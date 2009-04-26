@@ -209,7 +209,7 @@ static pen_t *pen_table;
  *************************************/
 
 /* from jagobj.c */
-static void jagobj_init(void);
+static void jagobj_init(running_machine *machine);
 static void process_object_list(running_machine *machine, int vc, UINT16 *_scanline);
 
 /* from jagblit.c */
@@ -815,11 +815,11 @@ VIDEO_START( cojag )
 	object_timer = timer_alloc(machine, cojag_scanline_update, NULL);
 	adjust_object_timer(machine, 0);
 
-	screen_bitmap = auto_bitmap_alloc(720, 512, BITMAP_FORMAT_RGB32);
+	screen_bitmap = auto_bitmap_alloc(machine, 720, 512, BITMAP_FORMAT_RGB32);
 
-	jagobj_init();
+	jagobj_init(machine);
 
-	pen_table = auto_malloc(65536 * sizeof(pen_t));
+	pen_table = auto_alloc_array(machine, pen_t, 65536);
 
 	state_save_register_global_pointer(machine, pen_table, 65536);
 	state_save_register_global_array(machine, blitter_regs);

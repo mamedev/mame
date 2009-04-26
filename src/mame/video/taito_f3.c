@@ -664,19 +664,19 @@ VIDEO_START( f3 )
 		twidth_mask_bit=5;
 	}
 
-	spriteram32_buffered = (UINT32 *)auto_malloc(0x10000);
-	spritelist = auto_malloc(0x400 * sizeof(*spritelist));
+	spriteram32_buffered = auto_alloc_array(machine, UINT32, 0x10000/4);
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
 	sprite_end = spritelist;
 	vram_layer = tilemap_create(machine, get_tile_info_vram,tilemap_scan_rows,8,8,64,64);
 	pixel_layer = tilemap_create(machine, get_tile_info_pixel,tilemap_scan_cols,8,8,64,32);
-	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
-	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));
+	pf_line_inf = auto_alloc_array(machine, struct f3_playfield_line_inf, 5);
+	sa_line_inf = auto_alloc_array(machine, struct f3_spritealpha_line_inf, 1);
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
-	pri_alp_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED8 );
-	tile_opaque_sp = (UINT8 *)auto_malloc(machine->gfx[2]->total_elements);
+	pri_alp_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8 );
+	tile_opaque_sp = auto_alloc_array(machine, UINT8, machine->gfx[2]->total_elements);
 	for (i=0; i<4; i++)
-		tile_opaque_pf[i] = (UINT8 *)auto_malloc(machine->gfx[1]->total_elements);
+		tile_opaque_pf[i] = auto_alloc_array(machine, UINT8, machine->gfx[1]->total_elements);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);

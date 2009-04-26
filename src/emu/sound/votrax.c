@@ -30,7 +30,7 @@ struct _votrax_state
 	int 	volume;
 	sound_stream * 	channel;
 
-	struct loaded_sample *sample;
+	loaded_sample *sample;
 	UINT32		pos;
 	UINT32		frac;
 	UINT32		step;
@@ -116,7 +116,7 @@ static DEVICE_START( votrax )
 	votrax_state *votrax = get_safe_token(device);
 
 	votrax->device = device;
-	votrax->samples = readsamples(VotraxTable,"votrax");
+	votrax->samples = readsamples(device->machine,VotraxTable,"votrax");
 	votrax->frequency = 8000;
 	votrax->volume = 230;
 

@@ -164,7 +164,7 @@ static VIDEO_START( imolagp )
 	int i;
 	for( i=0; i<3; i++ )
 	{
-		imola_videoram[i] = auto_malloc(0x4000);
+		imola_videoram[i] = auto_alloc_array(machine, UINT8, 0x4000);
 		memset( imola_videoram[i], 0x00, 0x4000 );
 	}
 	InitializeColors(machine);

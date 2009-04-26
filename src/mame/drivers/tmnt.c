@@ -280,7 +280,7 @@ static SAMPLES_START( tmnt_decode_sample )
 	int i;
 	UINT8 *source = memory_region(machine, "title");
 
-	sampledata = auto_malloc(0x40000*sizeof(sampledata[0]));
+	sampledata = auto_alloc_array(machine, INT16, 0x40000);
 
 	/*  Sound sample for TMNT.D05 is stored in the following mode (ym3012 format):
      *
@@ -1229,7 +1229,7 @@ static WRITE8_DEVICE_HANDLER( k054539_ctrl_w )
 
 static ADDRESS_MAP_START( prmrsocr_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("konami", k054539_r, k054539_w)
 	AM_RANGE(0xe100, 0xe12f) AM_DEVREADWRITE("konami", k054539_ctrl_r, k054539_ctrl_w)
@@ -3749,7 +3749,7 @@ static DRIVER_INIT( mia )
 		}
 	}
 
-	temp = malloc_or_die(len);
+	temp = alloc_array_or_die(UINT8, len);
 	memcpy(temp,gfxdata,len);
 	for (A = 0;A < len/4;A++)
 	{
@@ -3845,7 +3845,7 @@ static DRIVER_INIT( tmnt )
 		}
 	}
 
-	temp = malloc_or_die(len);
+	temp = alloc_array_or_die(UINT8, len);
 	memcpy(temp,gfxdata,len);
 	code_conv_table = &memory_region(machine, "proms")[0x0000];
 	for (A = 0;A < len/4;A++)

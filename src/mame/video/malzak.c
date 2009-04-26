@@ -60,10 +60,10 @@ VIDEO_START( malzak )
 	int height = video_screen_get_height(machine->primary_screen);
 
 	/* configure the S2636 chips */
-//  s2636_0 = s2636_config(malzak_s2636_0_ram, height, width, -8, -16);
-//  s2636_1 = s2636_config(malzak_s2636_1_ram, height, width, -9, -16);
-	s2636_0 = s2636_config(malzak_s2636_0_ram, height, width,  0, -16);
-	s2636_1 = s2636_config(malzak_s2636_1_ram, height, width,  0, -16);
+//  s2636_0 = s2636_config(machine, malzak_s2636_0_ram, height, width, -8, -16);
+//  s2636_1 = s2636_config(machine, malzak_s2636_1_ram, height, width, -9, -16);
+	s2636_0 = s2636_config(machine, malzak_s2636_0_ram, height, width,  0, -16);
+	s2636_1 = s2636_config(machine, malzak_s2636_1_ram, height, width,  0, -16);
 }
 
 VIDEO_UPDATE( malzak )

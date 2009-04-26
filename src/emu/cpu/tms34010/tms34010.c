@@ -704,7 +704,7 @@ static CPU_INIT( tms34010 )
 	timer_adjust_oneshot(tms->scantimer, attotime_zero, 0);
 
 	/* allocate the shiftreg */
-	tms->shiftreg = (UINT16 *)auto_malloc(SHIFTREG_SIZE);
+	tms->shiftreg = auto_alloc_array(device->machine, UINT16, SHIFTREG_SIZE/2);
 
 	state_save_register_device_item(device, 0, tms->pc);
 	state_save_register_device_item(device, 0, tms->st);

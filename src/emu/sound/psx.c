@@ -329,7 +329,7 @@ static DEVICE_START( psxspu )
 		chip->m_p_n_effect[ n_effect ] = 0;
 	}
 
-	chip->m_p_n_spuram = (UINT16 *)auto_malloc( SPU_RAM_SIZE );
+	chip->m_p_n_spuram = auto_alloc_array( device->machine, UINT16, SPU_RAM_SIZE/2 );
 
 	state_save_register_device_item( device, 0, chip->m_n_mainvolumeleft );
 	state_save_register_device_item( device, 0, chip->m_n_mainvolumeright );

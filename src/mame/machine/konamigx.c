@@ -1047,15 +1047,15 @@ void konamigx_mixer_init(running_machine *machine, int objdma)
 	gx_primode = 0;
 
 	gx_objzbuf = (UINT8 *)priority_bitmap->base;
-	gx_shdzbuf = auto_malloc(GX_ZBUFSIZE);
-	gx_objpool = auto_malloc(sizeof(struct GX_OBJ) * (GX_MAX_OBJECTS));
+	gx_shdzbuf = auto_alloc_array(machine, UINT8, GX_ZBUFSIZE);
+	gx_objpool = auto_alloc_array(machine, struct GX_OBJ, GX_MAX_OBJECTS);
 
 	K053247_export_config(&K053247_ram, &K053247_gfx, &K053247_callback, &K053247_dx, &K053247_dy);
 	K054338_export_config(&K054338_shdRGB);
 
 	if (objdma)
 	{
-		gx_spriteram = auto_malloc(0x1000);
+		gx_spriteram = auto_alloc_array(machine, UINT16, 0x1000/2);
 		gx_objdma = 1;
 	}
 	else

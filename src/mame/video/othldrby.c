@@ -63,8 +63,8 @@ VIDEO_START( othldrby )
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,16,16,32,32);
 	bg_tilemap[2] = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,16,16,32,32);
 
-	vram = auto_malloc(VIDEORAM_SIZE * sizeof(vram[0]));
-	buf_spriteram = auto_malloc(2*SPRITERAM_SIZE * sizeof(buf_spriteram[0]));
+	vram = auto_alloc_array(machine, UINT16, VIDEORAM_SIZE);
+	buf_spriteram = auto_alloc_array(machine, UINT16, 2*SPRITERAM_SIZE);
 
 	buf_spriteram2 = buf_spriteram + SPRITERAM_SIZE;
 

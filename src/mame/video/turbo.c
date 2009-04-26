@@ -190,7 +190,7 @@ VIDEO_START( buckrog )
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,  8,8, 32,32);
 
 	/* allocate the bitmap RAM */
-	state->buckrog_bitmap_ram = auto_malloc(0xe000);
+	state->buckrog_bitmap_ram = auto_alloc_array(machine, UINT8, 0xe000);
 	state_save_register_global_pointer(machine, state->buckrog_bitmap_ram, 0xe000);
 }
 

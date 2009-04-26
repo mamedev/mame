@@ -676,7 +676,7 @@ static void ymf278b_init(const device_config *device, YMF278BChip *chip, void (*
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = device->clock;
 
-	mix = (INT32 *)auto_malloc(44100*2*sizeof(*mix));
+	mix = auto_alloc_array(device->machine, INT32, 44100*2);
 }
 
 static DEVICE_START( ymf278b )

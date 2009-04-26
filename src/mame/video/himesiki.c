@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( himesiki )
 {
-	himesiki_bg_ram = auto_malloc(0x1000);
+	himesiki_bg_ram = auto_alloc_array(machine, UINT8, 0x1000);
 	himesiki_bg_tilemap = tilemap_create( machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32 );
 }
 

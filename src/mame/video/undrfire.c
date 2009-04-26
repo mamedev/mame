@@ -24,7 +24,7 @@ VIDEO_START( undrfire )
 {
 	int i;
 
-	spritelist = auto_malloc(0x4000 * sizeof(*spritelist));
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,50,8,0,0,0,0,0);
 	TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,0,0x24,0,-1,0,0,0,0);

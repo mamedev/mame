@@ -406,24 +406,21 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 	mo->slipram       = (map == 0) ? &atarimo_0_slipram : &atarimo_1_slipram;
 
 	/* allocate the temp bitmap */
-	mo->bitmap        = auto_bitmap_alloc(video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
+	mo->bitmap        = auto_bitmap_alloc(machine, video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
 	bitmap_fill(mo->bitmap, NULL, desc->transpen);
 
 	/* allocate the spriteram */
-	mo->spriteram = auto_malloc(sizeof(mo->spriteram[0]) * mo->spriteramsize);
-
-	/* clear it to zero */
-	memset(mo->spriteram, 0, sizeof(mo->spriteram[0]) * mo->spriteramsize);
+	mo->spriteram = auto_alloc_array_clear(machine, atarimo_entry, mo->spriteramsize);
 
 	/* allocate the code lookup */
-	mo->codelookup = auto_malloc(sizeof(mo->codelookup[0]) * round_to_powerof2(mo->codemask.mask));
+	mo->codelookup = auto_alloc_array(machine, UINT16, round_to_powerof2(mo->codemask.mask));
 
 	/* initialize it 1:1 */
 	for (i = 0; i < round_to_powerof2(mo->codemask.mask); i++)
 		mo->codelookup[i] = i;
 
 	/* allocate the color lookup */
-	mo->colorlookup = auto_malloc(sizeof(mo->colorlookup[0]) * round_to_powerof2(mo->colormask.mask));
+	mo->colorlookup = auto_alloc_array(machine, UINT8, round_to_powerof2(mo->colormask.mask));
 
 	/* initialize it 1:1 */
 	for (i = 0; i < round_to_powerof2(mo->colormask.mask); i++)
@@ -432,10 +429,10 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 	/* allocate dirty grid */
 	mo->dirtywidth = (video_screen_get_width(machine->primary_screen) >> mo->tilexshift) + 2;
 	mo->dirtyheight = (video_screen_get_height(machine->primary_screen) >> mo->tileyshift) + 2;
-	mo->dirtygrid = auto_malloc(mo->dirtywidth * mo->dirtyheight);
+	mo->dirtygrid = auto_alloc_array(machine, UINT8, mo->dirtywidth * mo->dirtyheight);
 
 	/* allocate the gfx lookup */
-	mo->gfxlookup = auto_malloc(sizeof(mo->gfxlookup[0]) * round_to_powerof2(mo->gfxmask.mask));
+	mo->gfxlookup = auto_alloc_array(machine, UINT8, round_to_powerof2(mo->gfxmask.mask));
 
 	/* initialize it with the gfxindex we were passed in */
 	for (i = 0; i < round_to_powerof2(mo->gfxmask.mask); i++)

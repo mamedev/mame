@@ -758,7 +758,7 @@ static MACHINE_RESET(model1_vr)
 {
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x1000000);
 	irq_init(machine);
-	model1_vr_tgp_reset();
+	model1_vr_tgp_reset(machine);
 	model1_sound_irq = 3;
 
 	// init the sound FIFO

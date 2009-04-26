@@ -1665,7 +1665,7 @@ static DRIVER_INIT( gauntlet2 )
 static DRIVER_INIT( vindctr2 )
 {
 	UINT8 *gfx2_base = memory_region(machine, "gfx2");
-	UINT8 *data = malloc_or_die(0x8000);
+	UINT8 *data = alloc_array_or_die(UINT8, 0x8000);
 	int i;
 
 	gauntlet_common_init(machine, 118, 1);

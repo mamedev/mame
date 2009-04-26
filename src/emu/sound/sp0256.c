@@ -1201,7 +1201,7 @@ static DEVICE_START( sp0256 )
     /* -------------------------------------------------------------------- */
     /*  Allocate a scratch buffer for generating ~10kHz samples.             */
     /* -------------------------------------------------------------------- */
-    sp->scratch = (INT16 *)malloc_or_die(SCBUF_SIZE * sizeof(INT16));
+    sp->scratch = auto_alloc_array(device->machine, INT16, SCBUF_SIZE);
     sp->sc_head = sp->sc_tail = 0;
 
     /* -------------------------------------------------------------------- */
@@ -1218,12 +1218,6 @@ static DEVICE_START( sp0256 )
     /* -------------------------------------------------------------------- */
 	sp->rom = device->region;
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
-}
-
-static DEVICE_STOP( sp0256 )
-{
-	sp0256_state *sp = get_safe_token(device);
-	free( sp->scratch );
 }
 
 static void sp0256_reset(sp0256_state *sp)
@@ -1364,7 +1358,6 @@ DEVICE_GET_INFO( sp0256 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sp0256 );			break;
-		case DEVINFO_FCT_STOP:							info->stop = DEVICE_STOP_NAME( sp0256 );			break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME( sp0256 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

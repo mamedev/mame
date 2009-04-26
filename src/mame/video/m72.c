@@ -115,7 +115,7 @@ static void register_savestate(running_machine *machine)
 	state_save_register_global(machine, scrolly1);
 	state_save_register_global(machine, scrollx2);
 	state_save_register_global(machine, scrolly2);
-	state_save_register_global_pointer(machine, m72_spriteram, spriteram_size);
+	state_save_register_global_pointer(machine, m72_spriteram, spriteram_size/2);
 }
 
 
@@ -124,7 +124,7 @@ VIDEO_START( m72 )
 	bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_malloc(spriteram_size);
+	m72_spriteram = auto_alloc_array(machine, UINT16, spriteram_size/2);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
@@ -151,7 +151,7 @@ VIDEO_START( rtype2 )
 	bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_malloc(spriteram_size);
+	m72_spriteram = auto_alloc_array(machine, UINT16, spriteram_size/2);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
@@ -190,7 +190,7 @@ VIDEO_START( majtitle )
 	bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,majtitle_scan_rows,8,8,128,64);
 	fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_malloc(spriteram_size);
+	m72_spriteram = auto_alloc_array(machine, UINT16, spriteram_size/2);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);
@@ -216,7 +216,7 @@ VIDEO_START( hharry )
 	bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
 
-	m72_spriteram = auto_malloc(spriteram_size);
+	m72_spriteram = auto_alloc_array(machine, UINT16, spriteram_size/2);
 
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(fg_tilemap,1,0x00ff,0xff01);

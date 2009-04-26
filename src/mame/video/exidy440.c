@@ -66,11 +66,11 @@ static VIDEO_START( exidy440 )
 	exidy440_firq_beam = 0;
 
 	/* allocate a buffer for VRAM */
-	local_videoram = auto_malloc(256 * 256 * 2);
+	local_videoram = auto_alloc_array(machine, UINT8, 256 * 256 * 2);
 	memset(local_videoram, 0, 256 * 256 * 2);
 
 	/* allocate a buffer for palette RAM */
-	local_paletteram = auto_malloc(512 * 2);
+	local_paletteram = auto_alloc_array(machine, UINT8, 512 * 2);
 	memset(local_paletteram, 0, 512 * 2);
 }
 

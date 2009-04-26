@@ -481,7 +481,7 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 
 static ADDRESS_MAP_START( ps3v1_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_READ(SMH_ROM)	// program ROM (1 meg)
-	AM_RANGE(0x02000000, 0x021fffff) AM_READ(SMH_BANK1) // data ROM
+	AM_RANGE(0x02000000, 0x021fffff) AM_READ(SMH_BANK(1)) // data ROM
 	AM_RANGE(0x03000000, 0x03003fff) AM_READ(SMH_RAM)	// sprites
 	AM_RANGE(0x03004000, 0x0300ffff) AM_READ(SMH_RAM)
 	AM_RANGE(0x03040000, 0x03044fff) AM_READ(SMH_RAM)
@@ -495,8 +495,8 @@ static ADDRESS_MAP_START( ps3v1_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 
 #if ROMTEST
 	AM_RANGE(0x05000004, 0x05000007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x03060000, 0x0307ffff) AM_READ(SMH_BANK2) // data for rom tests (gfx), data is controlled by vidreg
-	AM_RANGE(0x04060000, 0x0407ffff) AM_READ(SMH_BANK2) // data for rom tests (gfx) (Mirrored?)
+	AM_RANGE(0x03060000, 0x0307ffff) AM_READ(SMH_BANK(2)) // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x04060000, 0x0407ffff) AM_READ(SMH_BANK(2)) // data for rom tests (gfx) (Mirrored?)
 #endif
 ADDRESS_MAP_END
 
@@ -525,12 +525,12 @@ static ADDRESS_MAP_START( ps5_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04050000, 0x040501ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP // also writes to this address - might be vblank reads?
 	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_READ(SMH_RAM) // video registers
-	AM_RANGE(0x05000000, 0x0507ffff) AM_READ(SMH_BANK1) // data ROM
+	AM_RANGE(0x05000000, 0x0507ffff) AM_READ(SMH_BANK(1)) // data ROM
 	AM_RANGE(0x06000000, 0x060fffff) AM_READ(SMH_RAM)
 
 #if ROMTEST
 	AM_RANGE(0x03100004, 0x03100007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x04060000, 0x0407ffff) AM_READ(SMH_BANK2) // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x04060000, 0x0407ffff) AM_READ(SMH_BANK(2)) // data for rom tests (gfx), data is controlled by vidreg
 #endif
 ADDRESS_MAP_END
 

@@ -42,7 +42,7 @@ VIDEO_START( darius )
 {
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
 
-	spritelist = auto_malloc(0x800 * sizeof(*spritelist));
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x800);
 
 	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
 	PC080SN_vh_start(machine,1,1,-16,8,0,1,1);

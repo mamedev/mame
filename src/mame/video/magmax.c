@@ -75,7 +75,7 @@ VIDEO_START( magmax )
 	/* Set up save state */
 	state_save_register_global(machine, flipscreen);
 
-	prom_tab = auto_malloc(256 * sizeof(UINT32));
+	prom_tab = auto_alloc_array(machine, UINT32, 256);
 
 	/* Allocate temporary bitmap */
  	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);

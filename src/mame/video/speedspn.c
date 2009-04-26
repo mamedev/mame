@@ -20,7 +20,7 @@ static TILE_GET_INFO( get_speedspn_tile_info )
 
 VIDEO_START(speedspn)
 {
-	speedspn_vidram = auto_malloc(0x1000 * 2);
+	speedspn_vidram = auto_alloc_array(machine, UINT8, 0x1000 * 2);
 	speedspn_tilemap = tilemap_create(machine, get_speedspn_tile_info,tilemap_scan_cols, 8, 8,64,32);
 }
 

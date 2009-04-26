@@ -24,7 +24,7 @@ VIDEO_START( othunder )
        Multiply this by 32 to give room for the number of small sprites,
        which are what actually get put in the structure. */
 
-	spritelist = auto_malloc(0x2000 * sizeof(*spritelist));
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x2000);
 
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,4,0,0,0,0,0,0);
 

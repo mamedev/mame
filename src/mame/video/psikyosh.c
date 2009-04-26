@@ -1081,10 +1081,10 @@ VIDEO_START( psikyosh )
 {
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
-	z_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	z_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	/* Need 16-bit z-buffer */
-	zoom_bitmap = auto_bitmap_alloc(16*16, 16*16, BITMAP_FORMAT_INDEXED8);
+	zoom_bitmap = auto_bitmap_alloc(machine, 16*16, 16*16, BITMAP_FORMAT_INDEXED8);
 
 	machine->gfx[1]->color_granularity=16; /* 256 colour sprites with palette selectable on 16 colour boundaries */
 

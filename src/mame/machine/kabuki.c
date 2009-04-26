@@ -163,7 +163,7 @@ static void mitchell_decode(running_machine *machine, int swap_key1,int swap_key
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *decrypt = auto_malloc(memory_region_length(machine, "maincpu"));
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, memory_region_length(machine, "maincpu"));
 	int numbanks = (memory_region_length(machine, "maincpu") - 0x10000) / 0x4000;
 	int i;
 
@@ -203,7 +203,7 @@ void block_decode(running_machine *machine)    { mitchell_decode(machine,0x02461
 static void cps1_decode(running_machine *machine,int swap_key1,int swap_key2,int addr_key,int xor_key)
 {
 	const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *decrypt = auto_malloc(0x8000);
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 	UINT8 *rom = memory_region(machine, "audiocpu");
 
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);

@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( combasc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(&paletteram)		/* palette */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM								/* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combasc_video_r, combasc_video_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)	/* banked ROM area */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* banked ROM area */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( combascb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(&paletteram)		/* palette */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(combasc_video_r, combasc_video_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)	/* banked ROM/RAM area */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)						/* banked ROM/RAM area */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 

@@ -116,7 +116,7 @@ VIDEO_START( atarisy2 )
 	};
 
 	/* allocate banked memory */
-	vram = auto_malloc(0x8000);
+	vram = auto_alloc_array(machine, UINT16, 0x8000/2);
 	memset(vram, 0, 0x8000);
 	atarigen_alpha = &vram[0x0000];
 	atarimo_0_spriteram = &vram[0x0c00];

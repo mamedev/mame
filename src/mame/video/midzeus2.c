@@ -264,8 +264,8 @@ static TIMER_CALLBACK( int_timer_callback )
 VIDEO_START( midzeus2 )
 {
 	/* allocate memory for "wave" RAM */
-	waveram[0] = auto_malloc(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8);
-	waveram[1] = auto_malloc(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12);
+	waveram[0] = auto_alloc_array(machine, UINT32, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
+	waveram[1] = auto_alloc_array(machine, UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12/4);
 
 	/* initialize polygon engine */
 	poly = poly_alloc(machine, 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
@@ -498,7 +498,7 @@ if (regdata_count[offset] < 256)
 			break;
 	if (*tailptr == NULL)
 	{
-		*tailptr = malloc_or_die(sizeof(reg_info));
+		*tailptr = alloc_or_die(reg_info);
 		(*tailptr)->next = NULL;
 		(*tailptr)->value = data;
 		regdata_count[offset]++;
@@ -742,7 +742,7 @@ if (subregdata_count[which] < 256)
 			break;
 	if (*tailptr == NULL)
 	{
-		*tailptr = malloc_or_die(sizeof(reg_info));
+		*tailptr = alloc_or_die(reg_info);
 		(*tailptr)->next = NULL;
 		(*tailptr)->value = value;
 		subregdata_count[which]++;

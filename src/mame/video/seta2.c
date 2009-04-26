@@ -359,7 +359,7 @@ VIDEO_START( seta2 )
 	machine->gfx[4]->color_granularity = 16;
 	machine->gfx[5]->color_granularity = 16;
 
-	buffered_spriteram16 = auto_malloc(spriteram_size);
+	buffered_spriteram16 = auto_alloc_array(machine, UINT16, spriteram_size/2);
 
 	yoffset = 0;
 }

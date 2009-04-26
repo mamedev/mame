@@ -135,7 +135,7 @@ static UINT16 *rle_table[8];
     STATIC FUNCTION DECLARATIONS
 ***************************************************************************/
 
-static void build_rle_tables(void);
+static void build_rle_tables(running_machine *machine);
 static int count_objects(const UINT16 *base, int length);
 static void prescan_rle(const atarirle_data *mo, int which);
 static void sort_and_render(running_machine *machine, atarirle_data *mo);
@@ -278,7 +278,7 @@ void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 	assert_always(map >= 0 && map < ATARIRLE_MAX, "Invalid map index");
 
 	/* build and allocate the generic tables */
-	build_rle_tables();
+	build_rle_tables(machine);
 
 	/* determine the masks first */
 	convert_mask(&desc->codemask,     &mo->codemask);
@@ -326,33 +326,29 @@ void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 	}
 
 	/* allocate the object info */
-	mo->info = auto_malloc(sizeof(mo->info[0]) * mo->objectcount);
+	mo->info = auto_alloc_array_clear(machine, atarirle_info, mo->objectcount);
 
 	/* fill in the data */
-	memset(mo->info, 0, sizeof(mo->info[0]) * mo->objectcount);
 	for (i = 0; i < mo->objectcount; i++)
 		prescan_rle(mo, i);
 
 	/* allocate the spriteram */
-	mo->spriteram = auto_malloc(sizeof(mo->spriteram[0]) * mo->spriteramsize);
-
-	/* clear it to zero */
-	memset(mo->spriteram, 0, sizeof(mo->spriteram[0]) * mo->spriteramsize);
+	mo->spriteram = auto_alloc_array_clear(machine, atarirle_entry, mo->spriteramsize);
 
 	/* allocate bitmaps */
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
 
-	mo->vram[0][0] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-	mo->vram[0][1] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	mo->vram[0][0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	mo->vram[0][1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	bitmap_fill(mo->vram[0][0], NULL, 0);
 	bitmap_fill(mo->vram[0][1], NULL, 0);
 
 	/* allocate alternate bitmaps if needed */
 	if (mo->vrammask.mask != 0)
 	{
-		mo->vram[1][0] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-		mo->vram[1][1] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+		mo->vram[1][0] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+		mo->vram[1][1] = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 		bitmap_fill(mo->vram[1][0], NULL, 0);
 		bitmap_fill(mo->vram[1][1], NULL, 0);
 	}
@@ -540,13 +536,13 @@ bitmap_t *atarirle_get_vram(int map, int idx)
     build_rle_tables: Builds internal table for RLE mapping.
 ---------------------------------------------------------------*/
 
-static void build_rle_tables(void)
+static void build_rle_tables(running_machine *machine)
 {
 	UINT16 *base;
 	int i;
 
 	/* allocate all 5 tables */
-	base = auto_malloc(0x500 * sizeof(UINT16));
+	base = auto_alloc_array(machine, UINT16, 0x500);
 
 	/* assign the tables */
 	rle_table[0] = &base[0x000];

@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( fastlane_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0f00, 0x0f1f) AM_READ(K051733_r)			/* 051733 (protection) */
 	AM_RANGE(0x1000, 0x1fff) AM_READ(SMH_RAM)			/* Palette RAM/Work RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)			/* Video RAM + Sprite RAM */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)			/* banked ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))			/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
 ADDRESS_MAP_END
 

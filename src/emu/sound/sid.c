@@ -166,8 +166,8 @@ static void filterTableInit(running_machine *machine)
 	float resDyMin;
 	float resDy;
 
-	filterTable = auto_malloc(sizeof(*filterTable) * 0x800);
-	bandPassParam = auto_malloc(sizeof(*bandPassParam) * 0x800);
+	filterTable = auto_alloc_array(machine, float, 0x800);
+	bandPassParam = auto_alloc_array(machine, float, 0x800);
 
 	uk = 0;
 	for ( rk = 0; rk < 0x800; rk++ )
@@ -233,7 +233,7 @@ void sid6581_init (SID6581 *This)
 
 	This->filter.Enabled = TRUE;
 
-	sidInitMixerEngine();
+	sidInitMixerEngine(This->device->machine);
 	filterTableInit(This->device->machine);
 
 	sidInitWaveformTables(This->type);

@@ -504,9 +504,9 @@ static WRITE8_HANDLER( audio_command_w )
 MACHINE_START( cvs )
 {
 	/* allocate memory */
-	cvs_color_ram = auto_malloc(0x400);
-	cvs_palette_ram = auto_malloc(0x10);
-	cvs_character_ram = auto_malloc(3 * 0x800);  /* only half is used, but
+	cvs_color_ram = auto_alloc_array(machine, UINT8, 0x400);
+	cvs_palette_ram = auto_alloc_array(machine, UINT8, 0x10);
+	cvs_character_ram = auto_alloc_array(machine, UINT8, 3 * 0x800);  /* only half is used, but
                                                     by allocating twice the amount,
                                                     we can use the same gfx_layout */
 

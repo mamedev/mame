@@ -105,8 +105,8 @@ VIDEO_START( namcos1 )
 	tilemap_maskdata = (UINT8 *)memory_region(machine, "gfx1");
 
 	/* allocate videoram */
-	namcos1_videoram = auto_malloc(0x8000);
-	namcos1_spriteram = auto_malloc(0x1000);
+	namcos1_videoram = auto_alloc_array(machine, UINT8, 0x8000);
+	namcos1_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
 
 	/* initialize playfields */
 	bg_tilemap[0] = tilemap_create(machine, bg_get_info0,tilemap_scan_rows,8,8,64,64);

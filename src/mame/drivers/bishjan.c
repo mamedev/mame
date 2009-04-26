@@ -213,21 +213,21 @@ static VIDEO_START(bishjan)
 	tilemap_set_scrolldy( tmap_1, -1, +1 );
 	tilemap_set_scrolldy( tmap_2, -1, +1 );
 
-	bishjan_videoram_1_lo = auto_malloc(0x80 * 0x40);
-	bishjan_videoram_1_hi = auto_malloc(0x80 * 0x40);
+	bishjan_videoram_1_lo = auto_alloc_array(machine, UINT8, 0x80 * 0x40);
+	bishjan_videoram_1_hi = auto_alloc_array(machine, UINT8, 0x80 * 0x40);
 
-	bishjan_videoram_2_lo = auto_malloc(0x80 * 0x40);
-	bishjan_videoram_2_hi = auto_malloc(0x80 * 0x40);
+	bishjan_videoram_2_lo = auto_alloc_array(machine, UINT8, 0x80 * 0x40);
+	bishjan_videoram_2_hi = auto_alloc_array(machine, UINT8, 0x80 * 0x40);
 
-	bishjan_scrollram_1_lo = auto_malloc(0x200);
-	bishjan_scrollram_1_hi = auto_malloc(0x200);
+	bishjan_scrollram_1_lo = auto_alloc_array(machine, UINT8, 0x200);
+	bishjan_scrollram_1_hi = auto_alloc_array(machine, UINT8, 0x200);
 
-	bishjan_scrollram_2_lo = auto_malloc(0x200);
-	bishjan_scrollram_2_hi = auto_malloc(0x200);
+	bishjan_scrollram_2_lo = auto_alloc_array(machine, UINT8, 0x200);
+	bishjan_scrollram_2_hi = auto_alloc_array(machine, UINT8, 0x200);
 
-	bishjan_videoram_2_hi = auto_malloc(0x80 * 0x40);
+	bishjan_videoram_2_hi = auto_alloc_array(machine, UINT8, 0x80 * 0x40);
 
-	colorram = auto_malloc(256*3);
+	colorram = auto_alloc_array(machine, UINT8, 256*3);
 }
 
 static VIDEO_UPDATE( bishjan )

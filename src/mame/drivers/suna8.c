@@ -98,7 +98,7 @@ static UINT8 *brickzn_decrypt(running_machine *machine)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
-	UINT8   *decrypt = auto_malloc(size);
+	UINT8   *decrypt = auto_alloc_array(machine, UINT8, size);
 	int i;
 
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
@@ -208,7 +208,7 @@ static DRIVER_INIT( hardhea2 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
-	UINT8   *decrypt = 	auto_malloc(size);
+	UINT8   *decrypt = 	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
 
@@ -282,7 +282,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 	}
 
 	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
-	memory_configure_bank(machine, 2, 0, 2, auto_malloc(0x2000 * 2), 0x2000);
+	memory_configure_bank(machine, 2, 0, 2, auto_alloc_array(machine, UINT8, 0x2000 * 2), 0x2000);
 }
 
 
@@ -295,7 +295,7 @@ static DRIVER_INIT( starfigh )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
-	UINT8   *decrypt = 	auto_malloc(size);
+	UINT8   *decrypt = 	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
 
@@ -363,7 +363,7 @@ static DRIVER_INIT( sparkman )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	memory_region(machine, "maincpu");
 	size_t	size	=	memory_region_length(machine, "maincpu");
-	UINT8   *decrypt = 	auto_malloc(size);
+	UINT8   *decrypt = 	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
 

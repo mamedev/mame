@@ -962,8 +962,8 @@ static const pia6821_interface pia_intf =
 
 static MACHINE_START( maygayv1 )
 {
-	i82716.dram = auto_malloc(0x80000);   // ???
-	i82716.line_buf = auto_malloc(512);
+	i82716.dram = auto_alloc_array(machine, UINT16, 0x80000/2);   // ???
+	i82716.line_buf = auto_alloc_array(machine, UINT8, 512);
 
 	state_save_register_global_pointer(machine, i82716.dram, 0x40000);
 

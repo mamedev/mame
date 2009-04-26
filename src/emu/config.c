@@ -92,7 +92,7 @@ void config_register(running_machine *machine, const char *nodename, config_call
 	config_type **ptype;
 
 	/* allocate a new type */
-	newtype = (config_type *)auto_malloc(sizeof(*newtype));
+	newtype = auto_alloc(machine, config_type);
 	newtype->next = NULL;
 	newtype->name = nodename;
 	newtype->load = load;

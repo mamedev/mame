@@ -97,7 +97,7 @@ static UINT8 *poly17 = NULL;
 static UINT8 *rand17 = NULL;
 
 /* local prototypes */
-static void poly17_init(void);
+static void poly17_init(running_machine *machine);
 
 /* local timers */
 static emu_timer *irq_off;
@@ -154,7 +154,7 @@ static TIMER_CALLBACK( firq_timer_tick )
 static MACHINE_START( gridlee )
 {
     /* create the polynomial tables */
-    poly17_init();
+    poly17_init(machine);
 
     state_save_register_global_array(machine, last_analog_input);
     state_save_register_global_array(machine, last_analog_output);
@@ -233,13 +233,13 @@ static READ8_HANDLER( analog_port_r )
 #define POLY17_SHR	10
 #define POLY17_ADD	0x18000
 
-static void poly17_init(void)
+static void poly17_init(running_machine *machine)
 {
 	UINT32 i, x = 0;
 	UINT8 *p, *r;
 
 	/* allocate memory */
-	p = poly17 = auto_malloc(2 * (POLY17_SIZE + 1));
+	p = poly17 = auto_alloc_array(machine, UINT8, 2 * (POLY17_SIZE + 1));
 	r = rand17 = poly17 + POLY17_SIZE + 1;
 
 	/* generate the polynomial */

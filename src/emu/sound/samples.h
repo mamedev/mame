@@ -3,17 +3,19 @@
 #ifndef __SAMPLES_H__
 #define __SAMPLES_H__
 
-struct loaded_sample
+typedef struct _loaded_sample loaded_sample;
+struct _loaded_sample
 {
     int         length;         /* length in samples */
     int         frequency;      /* frequency of the sample */
     INT16 *     data;           /* 16-bit signed data */
 };
 
-struct loaded_samples
+typedef struct _loaded_samples loaded_samples;
+struct _loaded_samples
 {
     int         total;          /* number of samples */
-    struct loaded_sample sample[1]; /* array of samples */
+    loaded_sample sample[1]; /* array of samples */
 };
 
 typedef struct _samples_interface samples_interface;
@@ -38,7 +40,7 @@ int sample_playing(const device_config *device,int channel);
 
 /* helper function that reads samples from disk - this can be used by other */
 /* drivers as well (e.g. a sound chip emulator needing drum samples) */
-struct loaded_samples *readsamples(const char *const *samplenames, const char *name);
+loaded_samples *readsamples(running_machine *machine, const char *const *samplenames, const char *name);
 
 DEVICE_GET_INFO( samples );
 #define SOUND_SAMPLES DEVICE_GET_INFO_NAME( samples )

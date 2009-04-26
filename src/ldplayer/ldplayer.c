@@ -122,7 +122,7 @@ static chd_file *get_disc(const device_config *device)
 					chderr = chd_open_file(mame_core_file(image_file), CHD_OPEN_READ, NULL, &image_chd);
 					if (chderr == CHDERR_NONE)
 					{
-						set_disk_handle("laserdisc", image_file, image_chd);
+						set_disk_handle(device->machine, "laserdisc", image_file, image_chd);
 						filename = astring_dupc(dir->name);
 						add_exit_callback(device->machine, free_string);
 						break;

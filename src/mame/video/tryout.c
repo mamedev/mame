@@ -175,8 +175,8 @@ VIDEO_START( tryout )
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info,get_fg_memory_offset,8,8,32,32);
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,get_bg_memory_offset,16,16,64,16);
 
-	tryout_vram=auto_malloc(8 * 0x800);
-	tryout_vram_gfx=auto_malloc(0x6000);
+	tryout_vram=auto_alloc_array(machine, UINT8, 8 * 0x800);
+	tryout_vram_gfx=auto_alloc_array(machine, UINT8, 0x6000);
 
 	gfx_element_set_source(machine->gfx[2], tryout_vram_gfx);
 

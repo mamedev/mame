@@ -167,7 +167,7 @@ void s24_fd1094_driver_init(running_machine *machine)
 
 	for (i=0;i<S16_NUMCACHE;i++)
 	{
-		s24_fd1094_cacheregion[i]=auto_malloc(s24_fd1094_cpuregionsize);
+		s24_fd1094_cacheregion[i]=auto_alloc_array(machine, UINT16, s24_fd1094_cpuregionsize/2);
 	}
 
 	/* flush the cached state array */

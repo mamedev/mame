@@ -952,7 +952,7 @@ static void atapi_init(running_machine *machine)
 {
 	int i;
 
-	atapi_regs = auto_malloc( ATAPI_REG_MAX );
+	atapi_regs = auto_alloc_array(machine, UINT8,  ATAPI_REG_MAX );
 	memset(atapi_regs, 0, sizeof(atapi_regs));
 
 	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
@@ -980,7 +980,7 @@ static void atapi_init(running_machine *machine)
 	}
 	add_exit_callback(machine, atapi_exit);
 
-	atapi_data = auto_malloc( ATAPI_DATA_SIZE );
+	atapi_data = auto_alloc_array(machine, UINT8,  ATAPI_DATA_SIZE );
 
 	state_save_register_global_pointer(machine,  atapi_regs, ATAPI_REG_MAX );
 	state_save_register_global_pointer(machine,  atapi_data, ATAPI_DATA_SIZE / 2 );
@@ -2388,7 +2388,7 @@ static void gx894pwbba_init( running_machine *machine, void (*output_callback_fu
 
 	gx894_ram_write_offset = 0;
 	gx894_ram_read_offset = 0;
-	gx894_ram = auto_malloc( gx894_ram_size );
+	gx894_ram = auto_alloc_array(machine, UINT16,  gx894_ram_size/2);
 
 	ds2401_init( machine, 2, ds2401_xid ); /* todo: load this from roms */
 

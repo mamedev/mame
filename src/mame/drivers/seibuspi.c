@@ -1824,7 +1824,7 @@ static MACHINE_RESET( spi )
 	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
 	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000068c, 0x0000068f, 0, 0, z80_enable_w);
 
-	z80_rom = auto_malloc(0x40000);
+	z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
 	memory_set_bankptr(machine, 4, z80_rom);
 	memory_set_bankptr(machine, 5, z80_rom);
 
@@ -1887,7 +1887,7 @@ static MACHINE_RESET( sxx2f )
 {
 	UINT8 *rom = memory_region(machine, "soundcpu");
 
-	z80_rom = auto_malloc(0x40000);
+	z80_rom = auto_alloc_array(machine, UINT8, 0x40000);
 	memory_set_bankptr(machine, 4, z80_rom);
 	memory_set_bankptr(machine, 5, z80_rom);
 

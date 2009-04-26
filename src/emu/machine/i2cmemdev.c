@@ -393,12 +393,11 @@ static DEVICE_START( i2cmem )
 
 	if( config != NULL )
 	{
-		c->data = auto_malloc( config->data_size );
-		if( config->data != NULL )
-			memcpy(c->data, config->data, config->data_size);
+		c->data = auto_alloc_array( device->machine, UINT8, config->data_size );
+		memcpy(c->data, config->data, config->data_size);
 
 		if( config->page_size > 0 )
-			page = auto_malloc( config->page_size );
+			page = auto_alloc_array( device->machine, UINT8, config->page_size );
 
 		c->slave_address = config->slave_address;
 		c->data_size = config->data_size;

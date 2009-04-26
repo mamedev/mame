@@ -117,19 +117,19 @@ struct _s2636_t
  *
  *************************************/
 
-s2636_t *s2636_config(UINT8 *work_ram, int screen_height, int screen_width, int y_offset, int x_offset)
+s2636_t *s2636_config(running_machine *machine, UINT8 *work_ram, int screen_height, int screen_width, int y_offset, int x_offset)
 {
 	s2636_t *s2636;
 
 	/* allocate the object that holds the state */
-	s2636 = (s2636_t *)auto_malloc(sizeof(*s2636));
+	s2636 = auto_alloc(machine, s2636_t);
 
 	s2636->work_ram = work_ram;
 	s2636->y_offset = y_offset;
 	s2636->x_offset = x_offset;
 
-	s2636->bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
-	s2636->collision_bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
+	s2636->bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
+	s2636->collision_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED16);
 
 	return s2636;
 }

@@ -166,7 +166,7 @@ void pandora_start(running_machine *machine, UINT8 region, int x, int y)
 	pandora_region = region;
 	pandora_xoffset = x;
 	pandora_yoffset = y;
-	pandora_spriteram = auto_malloc(0x1000);
+	pandora_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
 	memset(pandora_spriteram,0x00, 0x1000);
 
 	pandora_sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);

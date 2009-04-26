@@ -174,9 +174,9 @@ void starwars_mproc_init(running_machine *machine)
 	UINT8 *src = memory_region(machine, "user2");
 	int cnt, val;
 
-	PROM_STR = auto_malloc(1024 * sizeof(PROM_STR[0]));
-	PROM_MAS = auto_malloc(1024 * sizeof(PROM_MAS[0]));
-	PROM_AM = auto_malloc(1024 * sizeof(PROM_AM[0]));
+	PROM_STR = auto_alloc_array(machine, UINT8, 1024);
+	PROM_MAS = auto_alloc_array(machine, UINT8, 1024);
+	PROM_AM = auto_alloc_array(machine, UINT8, 1024);
 
 	for (cnt = 0; cnt < 1024; cnt++)
 	{

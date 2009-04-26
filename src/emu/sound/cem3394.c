@@ -344,8 +344,8 @@ static DEVICE_START( cem3394 )
 	chip->filter_zero_freq = intf->filter_zero_freq;
 
 	/* allocate memory for a mixer buffer and external buffer (1 second should do it!) */
-	chip->mixer_buffer = (INT16 *)auto_malloc(chip->sample_rate * sizeof(INT16));
-	chip->external_buffer = (INT16 *)auto_malloc(chip->sample_rate * sizeof(INT16));
+	chip->mixer_buffer = auto_alloc_array(device->machine, INT16, chip->sample_rate);
+	chip->external_buffer = auto_alloc_array(device->machine, INT16, chip->sample_rate);
 
 	state_save_register_device_item_array(device, 0, chip->values);
 	state_save_register_device_item(device, 0, chip->wave_select);

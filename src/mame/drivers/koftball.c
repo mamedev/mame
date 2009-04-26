@@ -271,7 +271,7 @@ static const UINT16 nvram[]=
 #endif
 static DRIVER_INIT(koftball)
 {
-	colorram=auto_malloc(768);
+	colorram=auto_alloc_array(machine, UINT8, 768);
 
 #if NVRAM_HACK
 	{

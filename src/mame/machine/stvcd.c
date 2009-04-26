@@ -1507,7 +1507,7 @@ static void make_dir_current(UINT32 fad)
 		free((void *)curdir);
 	}
 
-	curdir = (direntryT *)malloc_or_die(sizeof(direntryT)*numentries);
+	curdir = alloc_array_or_die(direntryT, numentries);
 	curentry = curdir;
 	numfiles = numentries;
 

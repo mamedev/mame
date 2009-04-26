@@ -123,7 +123,7 @@ VIDEO_START( exerion )
 	background_mixer = memory_region(machine, "proms") + 0x320;
 
 	/* allocate memory for the decoded background graphics */
-	background_gfx[0] = auto_malloc(2 * 256 * 256 * 4);
+	background_gfx[0] = auto_alloc_array(machine, UINT16, 256 * 256 * 4);
 	background_gfx[1] = background_gfx[0] + 256 * 256;
 	background_gfx[2] = background_gfx[1] + 256 * 256;
 	background_gfx[3] = background_gfx[2] + 256 * 256;

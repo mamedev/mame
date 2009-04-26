@@ -290,7 +290,7 @@ static TILE_GET_INFO( bg_get_tile_info );
 
 static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *spritebase);
 
-static void stars_init(void);
+static void stars_init(running_machine *machine);
 static void stars_update_origin(running_machine *machine);
 static void stars_draw_row(bitmap_t *bitmap, int maxx, int y, UINT32 star_offs, UINT8 starmask);
 
@@ -468,7 +468,7 @@ VIDEO_START( galaxian )
 	background_green = 0;
 
 	/* initialize stars */
-	stars_init();
+	stars_init(machine);
 
 	/* register for save states */
 	state_save_register(machine);
@@ -810,7 +810,7 @@ WRITE8_HANDLER( galaxian_gfxbank_w )
  *
  *************************************/
 
-static void stars_init(void)
+static void stars_init(running_machine *machine)
 {
 	UINT32 shiftreg;
 	int i;
@@ -820,7 +820,7 @@ static void stars_init(void)
 	stars_blink_state = 0;
 
 	/* precalculate the RNG */
-	stars = auto_malloc(STAR_RNG_PERIOD);
+	stars = auto_alloc_array(machine, UINT8, STAR_RNG_PERIOD);
 	shiftreg = 0;
 	for (i = 0; i < STAR_RNG_PERIOD; i++)
 	{

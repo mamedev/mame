@@ -458,29 +458,20 @@ static void batrider_create_tilemaps_0(running_machine *machine)
 }
 
 
-static void toaplan2_vram_alloc(int controller)
+static void toaplan2_vram_alloc(running_machine *machine, int controller)
 {
-	spriteram16_new[controller] = auto_malloc(TOAPLAN2_SPRITERAM_SIZE);
-	memset(spriteram16_new[controller],0,TOAPLAN2_SPRITERAM_SIZE);
-
-	spriteram16_now[controller] = auto_malloc(TOAPLAN2_SPRITERAM_SIZE);
-	memset(spriteram16_now[controller],0,TOAPLAN2_SPRITERAM_SIZE);
-
-	topvideoram16[controller] = auto_malloc(TOAPLAN2_TOP_VRAM_SIZE);
-	memset(topvideoram16[controller],0,TOAPLAN2_TOP_VRAM_SIZE);
-
-	fgvideoram16[controller] = auto_malloc(TOAPLAN2_FG_VRAM_SIZE);
-	memset(fgvideoram16[controller],0,TOAPLAN2_FG_VRAM_SIZE);
-
-	bgvideoram16[controller] = auto_malloc(TOAPLAN2_BG_VRAM_SIZE);
-	memset(bgvideoram16[controller],0,TOAPLAN2_BG_VRAM_SIZE);
+	spriteram16_new[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_SPRITERAM_SIZE/2);
+	spriteram16_now[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_SPRITERAM_SIZE/2);
+	topvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_TOP_VRAM_SIZE/2);
+	fgvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_FG_VRAM_SIZE/2);
+	bgvideoram16[controller] = auto_alloc_array_clear(machine, UINT16, TOAPLAN2_BG_VRAM_SIZE/2);
 
 	spriteram16_n[controller] = spriteram16_now[controller];
 }
 
 static void toaplan2_vh_start(running_machine *machine, int controller)
 {
-	toaplan2_vram_alloc(controller);
+	toaplan2_vram_alloc(machine, controller);
 
 	if (controller == 0)
 	{
@@ -556,7 +547,7 @@ VIDEO_START( toaplan2_1 )
 
 VIDEO_START( truxton2_0 )
 {
-	toaplan2_vram_alloc(0);
+	toaplan2_vram_alloc(machine, 0);
 	truxton2_create_tilemaps_0(machine);
 
 	if (machine->gfx[2]->srcdata == NULL)
@@ -586,7 +577,7 @@ VIDEO_START( truxton2_0 )
 
 VIDEO_START( bgaregga_0 )
 {
-	toaplan2_vram_alloc(0);
+	toaplan2_vram_alloc(machine, 0);
 	truxton2_create_tilemaps_0(machine);
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 	defaultOffsets();
@@ -595,13 +586,12 @@ VIDEO_START( bgaregga_0 )
 
 VIDEO_START( batrider_0 )
 {
-	raizing_tx_gfxram16 = auto_malloc(RAIZING_TX_GFXRAM_SIZE);
-	memset(raizing_tx_gfxram16,0,RAIZING_TX_GFXRAM_SIZE);
+	raizing_tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
 	state_save_register_global_pointer(machine, raizing_tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
 
 	gfx_element_set_source(machine->gfx[2], (UINT8 *)raizing_tx_gfxram16);
 
-	toaplan2_vram_alloc(0);
+	toaplan2_vram_alloc(machine, 0);
 	spriteram16_n[0] = spriteram16_new[0];
 
 	batrider_create_tilemaps_0(machine);

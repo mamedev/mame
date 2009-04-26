@@ -134,9 +134,9 @@ static void start_genesis_vdp(const device_config *screen)
 	genesis_screen = screen;
 
 	/* allocate memory for the VDP, the lookup table, and the buffer bitmap */
-	vdp_vram			= auto_malloc(VRAM_SIZE);
-	vdp_vsram			= auto_malloc(VSRAM_SIZE);
-	transparent_lookup	= auto_malloc(0x1000 * sizeof(UINT16));
+	vdp_vram			= auto_alloc_array(screen->machine, UINT8, VRAM_SIZE);
+	vdp_vsram			= auto_alloc_array(screen->machine, UINT8, VSRAM_SIZE);
+	transparent_lookup	= auto_alloc_array(screen->machine, UINT16, 0x1000);
 
 	/* clear the VDP memory, prevents corrupt tile in Puyo Puyo 2 */
 	memset(vdp_vram, 0, VRAM_SIZE);

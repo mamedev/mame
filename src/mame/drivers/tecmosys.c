@@ -559,11 +559,11 @@ ADDRESS_MAP_END
 
 static VIDEO_START(deroon)
 {
-	sprite_bitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
 	bitmap_fill(sprite_bitmap, NULL, 0x4000);
 
-	tmp_tilemap_composebitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
-	tmp_tilemap_renderbitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	tmp_tilemap_composebitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
+	tmp_tilemap_renderbitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
 
 	bitmap_fill(tmp_tilemap_composebitmap, NULL, 0x0000);
 	bitmap_fill(tmp_tilemap_renderbitmap, NULL, 0x0000);

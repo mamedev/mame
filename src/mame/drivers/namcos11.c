@@ -818,14 +818,14 @@ static DRIVER_INIT( namcos11 )
 				UINT32 len = memory_region_length( machine, "user2" );
 				UINT8 *rgn = memory_region( machine, "user2" );
 
-				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f0fffff, 0, 0, SMH_BANK1 );
-				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f100000, 0x1f1fffff, 0, 0, SMH_BANK2 );
-				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f200000, 0x1f2fffff, 0, 0, SMH_BANK3 );
-				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f300000, 0x1f3fffff, 0, 0, SMH_BANK4 );
-				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f4fffff, 0, 0, SMH_BANK5 );
-				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f500000, 0x1f5fffff, 0, 0, SMH_BANK6 );
-				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6fffff, 0, 0, SMH_BANK7 );
-				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f700000, 0x1f7fffff, 0, 0, SMH_BANK8 );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f0fffff, 0, 0, (read32_space_func)SMH_BANK(1) );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f100000, 0x1f1fffff, 0, 0, (read32_space_func)SMH_BANK(2) );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f200000, 0x1f2fffff, 0, 0, (read32_space_func)SMH_BANK(3) );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f300000, 0x1f3fffff, 0, 0, (read32_space_func)SMH_BANK(4) );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f4fffff, 0, 0, (read32_space_func)SMH_BANK(5) );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f500000, 0x1f5fffff, 0, 0, (read32_space_func)SMH_BANK(6) );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6fffff, 0, 0, (read32_space_func)SMH_BANK(7) );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f700000, 0x1f7fffff, 0, 0, (read32_space_func)SMH_BANK(8) );
 
 				for( bank = 0; bank < 8; bank++ )
 				{
@@ -841,13 +841,13 @@ static DRIVER_INIT( namcos11 )
 				{
 					m_n_bankoffset = 0;
 					memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f080000, 0x1f080003, 0, 0, bankswitch_rom64_upper_w );
-					memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, SMH_NOP, bankswitch_rom64_w );
+					memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, (read32_space_func)SMH_NOP, bankswitch_rom64_w );
 					state_save_register_global(machine,  m_n_bankoffset );
 				}
 			}
 			else
 			{
-				memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, SMH_NOP );
+				memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, (write32_space_func)SMH_NOP );
 			}
 			break;
 		}

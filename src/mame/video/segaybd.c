@@ -32,7 +32,7 @@ VIDEO_START( yboard )
 	segaic16_palette_init(0x2000);
 
 	/* allocate a bitmap for the yboard layer */
-	yboard_bitmap = auto_bitmap_alloc(512, 512, BITMAP_FORMAT_INDEXED16);
+	yboard_bitmap = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 
 	/* initialize the sprites */
 	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_YBOARD_16B, 0x800, 0);

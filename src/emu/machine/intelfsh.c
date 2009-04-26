@@ -125,7 +125,7 @@ void intelflash_init(running_machine *machine, int chip, int type, void *data)
 	}
 	if( data == NULL )
 	{
-		data = auto_malloc( c->size );
+		data = auto_alloc_array( machine, UINT8, c->size );
 		memset( data, 0xff, c->size );
 	}
 

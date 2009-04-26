@@ -205,8 +205,8 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static VIDEO_START( taitob_core )
 {
-	framebuffer[0] = auto_bitmap_alloc(512,256, video_screen_get_format(machine->primary_screen));
-	framebuffer[1] = auto_bitmap_alloc(512,256, video_screen_get_format(machine->primary_screen));
+	framebuffer[0] = auto_bitmap_alloc(machine,512,256, video_screen_get_format(machine->primary_screen));
+	framebuffer[1] = auto_bitmap_alloc(machine,512,256, video_screen_get_format(machine->primary_screen));
 	pixel_bitmap = NULL;  /* only hitice needs this */
 
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     16,16,64,64);
@@ -279,7 +279,7 @@ VIDEO_START( hitice )
 {
   VIDEO_START_CALL(taitob_color_order0);
 
-  pixel_bitmap = auto_bitmap_alloc(1024,512,video_screen_get_format(machine->primary_screen));
+  pixel_bitmap = auto_bitmap_alloc(machine,1024,512,video_screen_get_format(machine->primary_screen));
 
   state_save_register_global_bitmap(machine, pixel_bitmap);
 }

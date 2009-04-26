@@ -217,7 +217,7 @@ INLINE void reduce_fraction(int *num, int *den)
 
 INLINE const char *copy_string(const char *string)
 {
-	char *newstring = (char *)malloc_or_die(strlen(string) + 1);
+	char *newstring = alloc_array_or_die(char, strlen(string) + 1);
 	strcpy(newstring, string);
 	return newstring;
 }
@@ -1509,8 +1509,7 @@ layout_file *layout_file_load(const machine_config *config, const char *dirname,
 		return NULL;
 
 	/* allocate the layout group object first */
-	file = (layout_file *)malloc_or_die(sizeof(*file));
-	memset(file, 0, sizeof(*file));
+	file = alloc_clear_or_die(layout_file);
 
 	/* find the layout node */
 	mamelayoutnode = xml_get_sibling(rootnode->child, "mamelayout");
@@ -1579,8 +1578,7 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	int first;
 
 	/* allocate a new element */
-	element = (layout_element *)malloc_or_die(sizeof(*element));
-	memset(element, 0, sizeof(*element));
+	element = alloc_clear_or_die(layout_element);
 
 	/* extract the name */
 	name = xml_get_attribute_string_with_subst(config, elemnode, "name", NULL);
@@ -1642,7 +1640,7 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	}
 
 	/* allocate an array of element textures for the states */
-	element->elemtex = (element_texture *)malloc_or_die((element->maxstate + 1) * sizeof(element->elemtex[0]));
+	element->elemtex = alloc_array_or_die(element_texture, element->maxstate + 1);
 	for (state = 0; state <= element->maxstate; state++)
 	{
 		element->elemtex[state].element = element;
@@ -1668,8 +1666,7 @@ static element_component *load_element_component(const machine_config *config, x
 	element_component *component;
 
 	/* allocate memory for the component */
-	component = (element_component *)malloc_or_die(sizeof(*component));
-	memset(component, 0, sizeof(*component));
+	component = alloc_clear_or_die(element_component);
 
 	/* fetch common data */
 	component->state = xml_get_attribute_int_with_subst(config, compnode, "state", -1);
@@ -1699,7 +1696,7 @@ static element_component *load_element_component(const machine_config *config, x
 
 		/* allocate a copy of the string */
 		component->type = COMPONENT_TYPE_TEXT;
-		string = (char *)malloc_or_die(strlen(text) + 1);
+		string = alloc_array_or_die(char, strlen(text) + 1);
 		strcpy(string, text);
 		component->string = string;
 	}
@@ -1756,8 +1753,7 @@ static layout_view *load_layout_view(const machine_config *config, xml_data_node
 	int layer;
 
 	/* first allocate memory */
-	view = (layout_view *)malloc_or_die(sizeof(*view));
-	memset(view, 0, sizeof(*view));
+	view = alloc_clear_or_die(layout_view);
 
 	/* allocate a copy of the name */
 	view->name = copy_string(xml_get_attribute_string_with_subst(config, viewnode, "name", ""));
@@ -1810,8 +1806,7 @@ static view_item *load_view_item(const machine_config *config, xml_data_node *it
 	const char *name;
 
 	/* allocate a new item */
-	item = (view_item *)malloc_or_die(sizeof(*item));
-	memset(item, 0, sizeof(*item));
+	item = alloc_clear_or_die(view_item);
 
 	/* allocate a copy of the output name */
 	item->output_name = copy_string(xml_get_attribute_string_with_subst(config, itemnode, "name", ""));

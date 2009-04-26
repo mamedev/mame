@@ -328,7 +328,7 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 chd_file *get_disk_handle(const char *region);
 
 /* set a pointer to the CHD file associated with the given region */
-void set_disk_handle(const char *region, mame_file *file, chd_file *chd);
+void set_disk_handle(running_machine *machine, const char *region, mame_file *file, chd_file *chd);
 
 
 #endif	/* __ROMLOAD_H__ */

@@ -1434,7 +1434,7 @@ static void decode_mainrom(running_machine *machine, const char *rom_region)
 
 	rom = memory_region(machine, rom_region);
 
-	tmp = malloc_or_die(0x10000);
+	tmp = alloc_array_or_die(UINT8, 0x10000);
 	{
 		int i;
 		long address;
@@ -1556,7 +1556,7 @@ static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ(coin_input_r)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM							// 8k  fixed ROM
 	AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)			// contains unknown I/O registers
-	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1)			// 8k  paged ROM (4 pages)
+	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK(1))			// 8k  paged ROM (4 pages)
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM							// 32k ROM
 
 ADDRESS_MAP_END
@@ -2790,7 +2790,7 @@ static ADDRESS_MAP_START( sc2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM									/* 8k  fixed ROM */
-	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1)						/* 8k  paged ROM (4 pages) */
+	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK(1))						/* 8k  paged ROM (4 pages) */
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM									/* 32k ROM */
 ADDRESS_MAP_END
 
@@ -2839,7 +2839,7 @@ static ADDRESS_MAP_START( sc3_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM
 //  AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)
-	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1)
+	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
 ADDRESS_MAP_END
 
@@ -2889,7 +2889,7 @@ static ADDRESS_MAP_START( memmap_sc2_dm01, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM
 //  AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)
-	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1)
+	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
 ADDRESS_MAP_END
 

@@ -47,7 +47,7 @@ void init_konami_cgboard(running_machine *machine, int num_boards, int type)
 	for (i=0; i < num_boards; i++)
 	{
 		dsp_comm_ppc[i][0] = 0x00;
-		dsp_shared_ram[i] = auto_malloc(DSP_BANK_SIZE * 2);
+		dsp_shared_ram[i] = auto_alloc_array(machine, UINT32, DSP_BANK_SIZE * 2/4);
 		dsp_shared_ram_bank[i] = 0;
 
 		dsp_state[i] = 0x80;
@@ -58,8 +58,8 @@ void init_konami_cgboard(running_machine *machine, int num_boards, int type)
 		nwk_fifo_read_ptr[i] = 0;
 		nwk_fifo_write_ptr[i] = 0;
 
-		nwk_fifo[i] = auto_malloc(sizeof(UINT32) * 0x800);
-		nwk_ram[i] = auto_malloc(sizeof(UINT32) * 0x2000);
+		nwk_fifo[i] = auto_alloc_array(machine, UINT32, 0x800);
+		nwk_ram[i] = auto_alloc_array(machine, UINT32, 0x2000);
 
 		state_save_register_item_array(machine, "konppc", NULL, i, dsp_comm_ppc[i]);
 		state_save_register_item_array(machine, "konppc", NULL, i, dsp_comm_sharc[i]);
@@ -413,8 +413,8 @@ void K033906_init(running_machine *machine)
 	int i;
 	for (i=0; i < MAX_K033906_CHIPS; i++)
 	{
-		K033906_reg[i] = auto_malloc(sizeof(UINT32) * 256);
-		K033906_ram[i] = auto_malloc(sizeof(UINT32) * 32768);
+		K033906_reg[i] = auto_alloc_array(machine, UINT32, 256);
+		K033906_ram[i] = auto_alloc_array(machine, UINT32, 32768);
 		state_save_register_item_pointer(machine, "K033906", NULL, i, K033906_reg[i], 256);
 		state_save_register_item_pointer(machine, "K033906", NULL, i, K033906_ram[i], 32768);
 	}

@@ -459,7 +459,7 @@ static DEVICE_START( common_sh_start )
 	int i, j;
 	UINT32 shiftreg;
 
-	poly18 = (UINT32 *)auto_malloc((1ul << (18-5)) * sizeof(UINT32));
+	poly18 = auto_alloc_array(machine, UINT32, 1ul << (18-5));
 
 	shiftreg = 0;
 	for( i = 0; i < (1ul << (18-5)); i++ )

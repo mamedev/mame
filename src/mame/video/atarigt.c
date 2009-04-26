@@ -152,14 +152,14 @@ VIDEO_START( atarigt )
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
 
-	pf_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-	an_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	pf_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	an_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
 	/* allocate memory */
-	expanded_mram = auto_malloc(sizeof(*expanded_mram) * MRAM_ENTRIES * 3);
+	expanded_mram = auto_alloc_array(machine, UINT32, MRAM_ENTRIES * 3);
 
 	/* map pens 1:1 */
-	substitute_pens = auto_malloc(65536 * sizeof(*substitute_pens));
+	substitute_pens = auto_alloc_array(machine, pen_t, 65536);
 	for (i = 0; i < machine->config->total_colors; i++)
 		substitute_pens[i] = i;
 	machine->pens = substitute_pens;

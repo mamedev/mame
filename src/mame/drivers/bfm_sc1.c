@@ -662,7 +662,7 @@ static void decode_sc1(running_machine *machine,const char *rom_region)
 
 	rom = memory_region(machine,rom_region);
 
-	tmp = malloc_or_die(0x10000);
+	tmp = alloc_array_or_die(UINT8, 0x10000);
 
 	{
 		int i;
@@ -797,7 +797,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3800, 0x39FF) AM_WRITE(reel56_w)	 // reel 5+6 latch
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM				// 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1) // 8k  paged ROM (4 pages)
+	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK(1)) // 8k  paged ROM (4 pages)
 	AM_RANGE(0x8000, 0xFFFF) AM_READWRITE(SMH_ROM,watchdog_w)	 // 32k ROM
 
 ADDRESS_MAP_END
@@ -845,7 +845,7 @@ static ADDRESS_MAP_START( memmap_adder2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE(vid_uart_rx_r,vid_uart_tx_w)		// video uart receive  reg
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM				// 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1) // 8k  paged ROM (4 pages)
+	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK(1)) // 8k  paged ROM (4 pages)
 	AM_RANGE(0x8000, 0xFFFF) AM_READWRITE(SMH_ROM,watchdog_w)	 // 32k ROM
 
 ADDRESS_MAP_END
@@ -890,7 +890,7 @@ static ADDRESS_MAP_START( sc1_nec_uk, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE("upd", nec_latch_w)
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
-	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK1)				// 8k  paged ROM (4 pages)
+	AM_RANGE(0x6000, 0x7FFF) AM_READ(SMH_BANK(1))				// 8k  paged ROM (4 pages)
 	AM_RANGE(0x8000, 0xFFFF) AM_READWRITE(SMH_ROM,watchdog_w)	// 32k ROM
 
 ADDRESS_MAP_END

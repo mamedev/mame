@@ -583,7 +583,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( _4in1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_BANK1)	/* banked game code */
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_BANK(1))	/* banked game code */
 	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x5000, 0x53ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x5400, 0x57ff) AM_READ(galaxold_videoram_r)

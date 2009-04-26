@@ -1031,7 +1031,7 @@ UINT8 * rom = memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 
 static ADDRESS_MAP_START( readmem_cpu3, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_READ(SMH_ROM)
 	AM_RANGE(0x3800, 0x3fff) AM_READ(sharedram_CFB_ZPU_r)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK1)				/* GFX roms */
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK(1))				/* GFX roms */
 	AM_RANGE(0x6000, 0x67ff) AM_READ(cfb_ram_r)				/* RAM for VCU commands and parameters */
 
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(VCU_set_cmd_param_r)	/* VCU command and parameters LOAD */

@@ -676,9 +676,9 @@ static DRIVER_INIT( esripsys )
 {
 	UINT8 *rom = memory_region(machine, "sound_data");
 
-	fdt_a = auto_malloc(FDT_RAM_SIZE);
-	fdt_b = auto_malloc(FDT_RAM_SIZE);
-	cmos_ram = auto_malloc(CMOS_RAM_SIZE);
+	fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
+	fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
+	cmos_ram = auto_alloc_array(machine, UINT8, CMOS_RAM_SIZE);
 
 	ptm6840_config(machine, 0, &ptm_intf);
 

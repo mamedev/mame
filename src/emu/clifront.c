@@ -440,7 +440,7 @@ int cli_info_listclones(core_options *options, const char *gamename)
 
 int cli_info_listbrothers(core_options *options, const char *gamename)
 {
-	UINT8 *didit = (UINT8 *)malloc_or_die(driver_list_get_count(drivers));
+	UINT8 *didit = alloc_array_or_die(UINT8, driver_list_get_count(drivers));
 	astring *filename = astring_alloc();
 	int drvindex, count = 0;
 

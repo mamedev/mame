@@ -146,7 +146,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 
 		if (data)
 		{
-			memory_install_read8_handler(mainspace, 0x8000, 0xffff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(mainspace, 0x8000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(1));
 			switch (data)
 			{
 				case 2:  bankaddress = 0x10000; break;
@@ -163,9 +163,9 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		else
 		{
 			memory_install_read8_handler(mainspace, 0x8000, 0x8fff, 0, 0, wardner_sprite_r);
-			memory_install_read8_handler(mainspace, 0xa000, 0xadff, 0, 0, SMH_BANK4);
-			memory_install_read8_handler(mainspace, 0xae00, 0xafff, 0, 0, SMH_BANK2);
-			memory_install_read8_handler(mainspace, 0xc000, 0xc7ff, 0, 0, SMH_BANK3);
+			memory_install_read8_handler(mainspace, 0xa000, 0xadff, 0, 0, (read8_space_func)SMH_BANK(4));
+			memory_install_read8_handler(mainspace, 0xae00, 0xafff, 0, 0, (read8_space_func)SMH_BANK(2));
+			memory_install_read8_handler(mainspace, 0xc000, 0xc7ff, 0, 0, (read8_space_func)SMH_BANK(3));
 			memory_set_bankptr(space->machine, 1, &RAM[0x0000]);
 			memory_set_bankptr(space->machine, 2, rambase_ae00);
 			memory_set_bankptr(space->machine, 3, rambase_c000);
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1) /* Overlapped RAM/Banked ROM - See below */
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(1)) /* Overlapped RAM/Banked ROM - See below */
 
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w) AM_BASE((void *)&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9000, 0x9fff) AM_ROM

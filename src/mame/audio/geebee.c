@@ -116,7 +116,7 @@ static DEVICE_START( geebee_sound )
 	running_machine *machine = device->machine;
 	int i;
 
-	decay = (UINT16 *)auto_malloc(32768 * sizeof(INT16));
+	decay = auto_alloc_array(machine, UINT16, 32768);
 
     for( i = 0; i < 0x8000; i++ )
 		decay[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));

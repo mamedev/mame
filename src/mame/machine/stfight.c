@@ -53,7 +53,7 @@ DRIVER_INIT( empcity )
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 
-	decrypt = auto_malloc(0x8000);
+	decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	for (A = 0;A < 0x8000;A++)

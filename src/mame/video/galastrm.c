@@ -45,7 +45,7 @@ static void galastrm_exit(running_machine *machine)
 
 VIDEO_START( galastrm )
 {
-	spritelist = auto_malloc(0x4000 * sizeof(*spritelist));
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,48-X_OFFSET,4-Y_OFFSET,0,0,0,0,0);
 	TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,0,56-X_OFFSET,-63+Y_OFFSET,0,0,0,0,0);

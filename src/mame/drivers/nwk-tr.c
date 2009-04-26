@@ -417,11 +417,11 @@ int K001604_vh_start(running_machine *machine, int chip)
 		return 1;
 	}
 
-	K001604_char_ram[chip] = auto_malloc(0x200000);
+	K001604_char_ram[chip] = auto_alloc_array(machine, UINT32, 0x200000/4);
 
-	K001604_tile_ram[chip] = auto_malloc(0x20000);
+	K001604_tile_ram[chip] = auto_alloc_array(machine, UINT32, 0x20000/4);
 
-	K001604_reg[chip] = auto_malloc(0x400);
+	K001604_reg[chip] = auto_alloc_array(machine, UINT32, 0x400/4);
 
 	if (chip == 0)
 	{
@@ -770,12 +770,12 @@ static int lanc2_ram_r = 0;
 static int lanc2_ram_w = 0;
 static UINT8 *lanc2_ram;
 
-static void lanc2_init(void)
+static void lanc2_init(running_machine *machine)
 {
 	fpga_uploaded = 0;
 	lanc2_ram_r = 0;
 	lanc2_ram_w = 0;
-	lanc2_ram = auto_malloc(0x8000);
+	lanc2_ram = auto_alloc_array(machine, UINT8, 0x8000);
 }
 
 static READ32_HANDLER( lanc1_r )
@@ -1087,14 +1087,14 @@ static DRIVER_INIT(nwktr)
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
 	set_cgboard_texture_bank(machine, 0, 5, memory_region(machine, "user5"));
 
-	sharc_dataram = auto_malloc(0x100000);
+	sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	led_reg0 = led_reg1 = 0x7f;
 
 	K056800_init(machine, sound_irq_callback);
 	K033906_init(machine);
 
 	adc1213x_init(0, adc12138_input_callback);
-	lanc2_init();
+	lanc2_init(machine);
 }
 
 

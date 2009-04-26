@@ -659,9 +659,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 static VIDEO_START( peplus )
 {
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
-	palette_ram = auto_malloc(0x3000);
+	palette_ram = auto_alloc_array(machine, UINT8, 0x3000);
 	memset(palette_ram, 0, 0x3000);
-	palette_ram2 = auto_malloc(0x3000);
+	palette_ram2 = auto_alloc_array(machine, UINT8, 0x3000);
 	memset(palette_ram2, 0, 0x3000);
 }
 

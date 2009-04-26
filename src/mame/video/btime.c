@@ -152,7 +152,7 @@ VIDEO_START( bnj )
     int width = 256;
     int height = 256;
     bitmap_format format = video_screen_get_format(machine->primary_screen);
-    background_bitmap = auto_bitmap_alloc(2*width, height, format);
+    background_bitmap = auto_bitmap_alloc(machine, 2*width, height, format);
 
     VIDEO_START_CALL(btime);
 }

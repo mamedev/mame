@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(ddrible_bg_videoram_w) AM_BASE(&ddrible_bg_videoram)	/* Video RAM 2 */
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(&ddrible_spriteram_2)								/* Object RAM 2 */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(ddrible_bankswitch_w)										/* bankswitch control */
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK1)													/* banked ROM */
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)														/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)													/* ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM																/* ROM */
 ADDRESS_MAP_END

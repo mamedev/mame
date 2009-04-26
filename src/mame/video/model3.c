@@ -172,34 +172,25 @@ VIDEO_START( model3 )
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
 	bitmap3d = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
+	zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 
-	m3_char_ram = auto_malloc(0x100000);
-	m3_tile_ram = auto_malloc(0x8000);
+	m3_char_ram = auto_alloc_array_clear(machine, UINT64, 0x100000/8);
+	m3_tile_ram = auto_alloc_array_clear(machine, UINT64, 0x8000/8);
 
-	memset(m3_char_ram, 0, 0x100000);
-	memset(m3_tile_ram, 0, 0x8000);
+	pal_lookup = auto_alloc_array_clear(machine, UINT16, 65536);
 
-	pal_lookup = auto_malloc(65536*2);
-	memset(pal_lookup, 0, 65536*2);
-
-	texture_fifo = auto_malloc(0x100000);
+	texture_fifo = auto_alloc_array_clear(machine, UINT32, 0x100000/4);
 
 	/* 2x 4MB texture sheets */
-	texture_ram[0] = auto_malloc(0x400000);
-	texture_ram[1] = auto_malloc(0x400000);
+	texture_ram[0] = auto_alloc_array(machine, UINT16, 0x400000/2);
+	texture_ram[1] = auto_alloc_array(machine, UINT16, 0x400000/2);
 
 	/* 1MB Display List RAM */
-	display_list_ram = auto_malloc(0x100000);
+	display_list_ram = auto_alloc_array_clear(machine, UINT32, 0x100000/4);
 	/* 4MB for nodes (< Step 2.0 have only 2MB) */
-	culling_ram = auto_malloc(0x400000);
+	culling_ram = auto_alloc_array_clear(machine, UINT32, 0x400000/4);
 	/* 4MB Polygon RAM */
-	polygon_ram = auto_malloc(0x400000);
-
-	memset(display_list_ram, 0, 0x100000);
-	memset(culling_ram, 0, 0x400000);
-	memset(polygon_ram, 0, 0x400000);
-	memset(texture_fifo, 0, 0x100000);
+	polygon_ram = auto_alloc_array_clear(machine, UINT32, 0x400000/4);
 
 	tick = 0;
 	debug_layer_disable = 0;
@@ -583,7 +574,7 @@ static cached_texture *get_texture(int page, int texx, int texy, int texwidth, i
 			return tex;
 
 	/* create a new texture */
-	tex = malloc_or_die(sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t));
+	tex = (cached_texture *)alloc_array_or_die(UINT8, sizeof(cached_texture) + (2 * pixwidth * 2 * pixheight) * sizeof(rgb_t));
 	tex->width = texwidth;
 	tex->height = texheight;
 	tex->format = format;

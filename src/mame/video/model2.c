@@ -331,15 +331,15 @@ static raster_state raster;
  *
  *******************************************/
 
-static void model2_3d_init( UINT16 *texture_rom )
+static void model2_3d_init( running_machine *machine, UINT16 *texture_rom )
 {
 	memset( &raster, 0, sizeof( raster_state ) );
 
 	raster.texture_rom = texture_rom;
-	raster.texture_ram = auto_malloc(0x10000 * sizeof(UINT16));
-	raster.log_ram = auto_malloc(0x40000 * sizeof(UINT8));
-	raster.tri_list = auto_malloc(MAX_TRIANGLES * sizeof(triangle));
-	raster.tri_sorted_list = auto_malloc(0x10000 * sizeof( triangle * ));
+	raster.texture_ram = auto_alloc_array(machine, UINT16, 0x10000);
+	raster.log_ram = auto_alloc_array(machine, UINT8, 0x40000);
+	raster.tri_list = auto_alloc_array(machine, triangle, MAX_TRIANGLES);
+	raster.tri_sorted_list = auto_alloc_array(machine, triangle *, 0x10000);
 }
 
 /*******************************************
@@ -1312,13 +1312,13 @@ static geo_state geo;
  *
  *******************************************/
 
-static void geo_init( UINT32 *polygon_rom )
+static void geo_init( running_machine *machine, UINT32 *polygon_rom )
 {
 	memset( &geo, 0, sizeof( geo_state ) );
 
 	geo.polygon_rom = polygon_rom;
-	geo.polygon_ram0 = auto_malloc(0x8000 * sizeof(UINT32));
-	geo.polygon_ram1 = auto_malloc(0x8000 * sizeof(UINT32));
+	geo.polygon_ram0 = auto_alloc_array(machine, UINT32, 0x8000);
+	geo.polygon_ram1 = auto_alloc_array(machine, UINT32, 0x8000);
 }
 
 /*******************************************
@@ -2707,10 +2707,10 @@ VIDEO_START(model2)
 	add_exit_callback(machine, model2_exit);
 
 	/* initialize the geometry engine */
-	geo_init( (UINT32*)memory_region(machine, "user2") );
+	geo_init( machine, (UINT32*)memory_region(machine, "user2") );
 
 	/* initialize the hardware rasterizer */
-	model2_3d_init( (UINT16*)memory_region(machine, "user3") );
+	model2_3d_init( machine, (UINT16*)memory_region(machine, "user3") );
 }
 
 static void convert_bitmap( running_machine *machine, bitmap_t *dst, bitmap_t *src, const rectangle *rect )

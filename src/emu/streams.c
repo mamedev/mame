@@ -165,9 +165,9 @@ struct _streams_private
 ***************************************************************************/
 
 static STATE_POSTLOAD( stream_postload );
-static void allocate_resample_buffers(streams_private *strdata, sound_stream *stream);
-static void allocate_output_buffers(streams_private *strdata, sound_stream *stream);
-static void recompute_sample_rate_data(streams_private *strdata, sound_stream *stream);
+static void allocate_resample_buffers(running_machine *machine, sound_stream *stream);
+static void allocate_output_buffers(running_machine *machine, sound_stream *stream);
+static void recompute_sample_rate_data(running_machine *machine, sound_stream *stream);
 static void generate_samples(sound_stream *stream, int samples);
 static stream_sample_t *generate_resampled_data(stream_input *input, UINT32 numsamples);
 
@@ -218,8 +218,7 @@ void streams_init(running_machine *machine)
 	streams_private *strdata;
 
 	/* allocate memory for our private data */
-	strdata = (streams_private *)auto_malloc(sizeof(*strdata));
-	memset(strdata, 0, sizeof(*strdata));
+	strdata = auto_alloc_clear(machine, streams_private);
 
 	/* reset globals */
 	strdata->stream_tailptr = &strdata->stream_head;
@@ -311,7 +310,7 @@ void streams_update(running_machine *machine)
 			stream->new_sample_rate = 0;
 
 			/* recompute all the data */
-			recompute_sample_rate_data(strdata, stream);
+			recompute_sample_rate_data(machine, stream);
 
 			/* reset our sample indexes to the current time */
 			stream->output_sampindex = (INT64)stream->output_sampindex * (INT64)stream->sample_rate / old_rate;
@@ -343,8 +342,7 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 	char statetag[30];
 
 	/* allocate memory */
-	stream = (sound_stream *)auto_malloc(sizeof(*stream));
-	memset(stream, 0, sizeof(*stream));
+	stream = auto_alloc_clear(device->machine, sound_stream);
 
 	VPRINTF(("stream_create(%d, %d, %d) => %p\n", inputs, outputs, sample_rate, stream));
 
@@ -365,10 +363,8 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 	/* allocate space for the inputs */
 	if (inputs > 0)
 	{
-		stream->input = (stream_input *)auto_malloc(inputs * sizeof(*stream->input));
-		memset(stream->input, 0, inputs * sizeof(*stream->input));
-		stream->input_array = (stream_sample_t **)auto_malloc(inputs * sizeof(*stream->input_array));
-		memset(stream->input_array, 0, inputs * sizeof(*stream->input_array));
+		stream->input = auto_alloc_array_clear(device->machine, stream_input, inputs);
+		stream->input_array = auto_alloc_array_clear(device->machine, stream_sample_t *, inputs);
 	}
 
 	/* initialize the state of each input */
@@ -382,10 +378,8 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 	/* allocate space for the outputs */
 	if (outputs > 0)
 	{
-		stream->output = (stream_output *)auto_malloc(outputs * sizeof(*stream->output));
-		memset(stream->output, 0, outputs * sizeof(*stream->output));
-		stream->output_array = (stream_sample_t **)auto_malloc(outputs * sizeof(*stream->output_array));
-		memset(stream->output_array, 0, outputs * sizeof(*stream->output_array));
+		stream->output = auto_alloc_array_clear(device->machine, stream_output, outputs);
+		stream->output_array = auto_alloc_array_clear(device->machine, stream_sample_t *, outputs);
 	}
 
 	/* initialize the state of each output */
@@ -402,7 +396,7 @@ sound_stream *stream_create(const device_config *device, int inputs, int outputs
 
 	/* force an update to the sample rates; this will cause everything to be recomputed
        and will generate the initial resample buffers for our inputs */
-	recompute_sample_rate_data(strdata, stream);
+	recompute_sample_rate_data(device->machine, stream);
 
 	/* set up the initial output buffer positions now that we have data */
 	stream->output_base_sampindex = -stream->max_samples_per_update;
@@ -497,7 +491,7 @@ void stream_set_input(sound_stream *stream, int index, sound_stream *input_strea
 		input->source->dependents++;
 
 	/* update sample rates now that we know the input */
-	recompute_sample_rate_data(stream->device->machine->streams_data, stream);
+	recompute_sample_rate_data(stream->device->machine, stream);
 }
 
 
@@ -702,7 +696,7 @@ static STATE_POSTLOAD( stream_postload )
 	int outputnum;
 
 	/* recompute the same rate information */
-	recompute_sample_rate_data(strdata, stream);
+	recompute_sample_rate_data(machine, stream);
 
 	/* make sure our output buffers are fully cleared */
 	for (outputnum = 0; outputnum < stream->outputs; outputnum++)
@@ -720,7 +714,7 @@ static STATE_POSTLOAD( stream_postload )
     resample buffer sizes and expand if necessary
 -------------------------------------------------*/
 
-static void allocate_resample_buffers(streams_private *strdata, sound_stream *stream)
+static void allocate_resample_buffers(running_machine *machine, sound_stream *stream)
 {
 	/* compute the target number of samples */
 	INT32 bufsize = 2 * stream->max_samples_per_update;
@@ -737,7 +731,7 @@ static void allocate_resample_buffers(streams_private *strdata, sound_stream *st
 		for (inputnum = 0; inputnum < stream->inputs; inputnum++)
 		{
 			stream_input *input = &stream->input[inputnum];
-			input->resample = (stream_sample_t *)auto_realloc(input->resample, stream->resample_bufalloc * sizeof(input->resample[0]));
+			input->resample = auto_extend_array(machine, input->resample, stream_sample_t, stream->resample_bufalloc);
 		}
 	}
 }
@@ -748,7 +742,7 @@ static void allocate_resample_buffers(streams_private *strdata, sound_stream *st
     output buffer sizes and expand if necessary
 -------------------------------------------------*/
 
-static void allocate_output_buffers(streams_private *strdata, sound_stream *stream)
+static void allocate_output_buffers(running_machine *machine, sound_stream *stream)
 {
 	/* compute the target number of samples */
 	INT32 bufsize = OUTPUT_BUFFER_UPDATES * stream->max_samples_per_update;
@@ -767,7 +761,7 @@ static void allocate_output_buffers(streams_private *strdata, sound_stream *stre
 		for (outputnum = 0; outputnum < stream->outputs; outputnum++)
 		{
 			stream_output *output = &stream->output[outputnum];
-			output->buffer = (stream_sample_t *)auto_realloc(output->buffer, stream->output_bufalloc * sizeof(output->buffer[0]));
+			output->buffer = auto_extend_array(machine, output->buffer, stream_sample_t, stream->output_bufalloc);
 			memset(&output->buffer[oldsize], 0, (stream->output_bufalloc - oldsize) * sizeof(output->buffer[0]));
 		}
 	}
@@ -780,8 +774,9 @@ static void allocate_output_buffers(streams_private *strdata, sound_stream *stre
     by this stream
 -------------------------------------------------*/
 
-static void recompute_sample_rate_data(streams_private *strdata, sound_stream *stream)
+static void recompute_sample_rate_data(running_machine *machine, sound_stream *stream)
 {
+	streams_private *strdata = machine->streams_data;
 	int inputnum;
 
 	/* recompute the timing parameters */
@@ -789,8 +784,8 @@ static void recompute_sample_rate_data(streams_private *strdata, sound_stream *s
 	stream->max_samples_per_update = (strdata->update_attoseconds + stream->attoseconds_per_sample - 1) / stream->attoseconds_per_sample;
 
 	/* update resample and output buffer sizes */
-	allocate_resample_buffers(strdata, stream);
-	allocate_output_buffers(strdata, stream);
+	allocate_resample_buffers(machine, stream);
+	allocate_output_buffers(machine, stream);
 
 	/* iterate over each input */
 	for (inputnum = 0; inputnum < stream->inputs; inputnum++)

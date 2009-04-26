@@ -254,8 +254,8 @@ VIDEO_START( psychic5 )
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
-	ps5_pagedram[0] = auto_malloc(0x2000);
-	ps5_pagedram[1] = auto_malloc(0x2000);
+	ps5_pagedram[0] = auto_alloc_array(machine, UINT8, 0x2000);
+	ps5_pagedram[1] = auto_alloc_array(machine, UINT8, 0x2000);
 
 	psychic5_bg_videoram  = &ps5_pagedram[0][0x0000];
 	ps5_dummy_bg_ram      = &ps5_pagedram[0][0x1000];
@@ -263,7 +263,7 @@ VIDEO_START( psychic5 )
 	ps5_palette_ram       = &ps5_pagedram[1][0x0400];
 	psychic5_fg_videoram  = &ps5_pagedram[1][0x1000];
 
-	jal_blend_table = auto_malloc(0xc00);
+	jal_blend_table = auto_alloc_array(machine, UINT8, 0xc00);
 
 	bg_palette_ram_base = 0x400;
 	bg_palette_base = 0x100;
@@ -277,8 +277,8 @@ VIDEO_START( bombsa )
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
-	ps5_pagedram[0] = auto_malloc(0x2000);
-	ps5_pagedram[1] = auto_malloc(0x2000);
+	ps5_pagedram[0] = auto_alloc_array(machine, UINT8, 0x2000);
+	ps5_pagedram[1] = auto_alloc_array(machine, UINT8, 0x2000);
 
 	psychic5_bg_videoram  = &ps5_pagedram[0][0x0000];
 	ps5_dummy_bg_ram      = &ps5_pagedram[0][0x1000];
@@ -286,7 +286,7 @@ VIDEO_START( bombsa )
 	psychic5_fg_videoram  = &ps5_pagedram[1][0x0800];
 	ps5_palette_ram       = &ps5_pagedram[1][0x1000];
 
-	//jal_blend_table = auto_malloc(0xc00);
+	//jal_blend_table = auto_alloc_array(machine, UINT8, 0xc00);
 	jal_blend_table = NULL;
 
 	bg_palette_ram_base = 0x000;

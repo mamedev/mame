@@ -307,10 +307,8 @@ ROM_END
 
 static DRIVER_INIT(ssingles)
 {
-	ssingles_videoram=auto_malloc(VMEM_SIZE);
-	ssingles_colorram=auto_malloc(VMEM_SIZE);
-	memset(ssingles_videoram,0,VMEM_SIZE);
-	memset(ssingles_colorram,0,VMEM_SIZE);
+	ssingles_videoram=auto_alloc_array_clear(machine, UINT8, VMEM_SIZE);
+	ssingles_colorram=auto_alloc_array_clear(machine, UINT8, VMEM_SIZE);
 	state_save_register_global_pointer(machine, ssingles_videoram, VMEM_SIZE);
 	state_save_register_global_pointer(machine, ssingles_colorram, VMEM_SIZE);
 }

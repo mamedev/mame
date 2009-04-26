@@ -137,8 +137,8 @@ static DEVICE_START(at28c16)
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
-	c->data = (UINT8 *)auto_malloc( SIZE_DATA );
-	c->id = (UINT8 *)auto_malloc( SIZE_ID );
+	c->data = auto_alloc_array( device->machine, UINT8, SIZE_DATA );
+	c->id = auto_alloc_array( device->machine, UINT8, SIZE_ID );
 	c->a9_12v = 0;
 	c->oe_12v = 0;
 	c->last_write = -1;

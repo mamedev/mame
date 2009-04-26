@@ -5301,7 +5301,7 @@ ROM_END
 static void maketrax_rom_decode(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *decrypted = auto_malloc(0x4000);
+	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
@@ -5333,7 +5333,7 @@ static DRIVER_INIT( maketrax )
 static void korosuke_rom_decode(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *decrypted = auto_malloc(0x4000);
+	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
@@ -5692,8 +5692,8 @@ static READ8_HANDLER( cannonbp_protection_r )
 static DRIVER_INIT( cannonbp )
 {
 	/* extra memory */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, SMH_BANK5, SMH_BANK5);
-	memory_set_bankptr(machine, 5, auto_malloc(0x400));
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, (read8_space_func)SMH_BANK(5), (write8_space_func)SMH_BANK(5));
+	memory_set_bankptr(machine, 5, auto_alloc_array(machine, UINT8, 0x400));
 
 	/* protection? */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3000, 0x3fff, 0, 0, cannonbp_protection_r);

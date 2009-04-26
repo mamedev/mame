@@ -71,14 +71,14 @@ INLINE k005289_state *get_safe_token(const device_config *device)
 }
 
 /* build a table to divide by the number of voices */
-static void make_mixer_table(k005289_state *info, int voices)
+static void make_mixer_table(running_machine *machine, k005289_state *info, int voices)
 {
 	int count = voices * 128;
 	int i;
 	int gain = 16;
 
 	/* allocate memory */
-	info->mixer_table = (INT16 *)auto_malloc(256 * voices * sizeof(INT16));
+	info->mixer_table = auto_alloc_array(machine, INT16, 256 * voices);
 
 	/* find the middle of the table */
 	info->mixer_lookup = info->mixer_table + (128 * voices);
@@ -171,10 +171,10 @@ static DEVICE_START( k005289 )
 	info->mclock = device->clock;
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	info->mixer_buffer = (short *)auto_malloc(2 * sizeof(short) * info->rate);
+	info->mixer_buffer = auto_alloc_array(device->machine, short, 2 * info->rate);
 
 	/* build the mixer table */
-	make_mixer_table(info, 2);
+	make_mixer_table(device->machine, info, 2);
 
 	info->sound_prom = device->region;
 

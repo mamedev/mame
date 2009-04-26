@@ -292,16 +292,13 @@ static DEVICE_START( discrete )
 	discrete_log("discrete_start() - Sanity check counted %d nodes", info->node_count);
 
 	/* allocate memory for the array of actual nodes */
-	info->node_list = (node_description *)auto_malloc(info->node_count * sizeof(info->node_list[0]));
-	memset(info->node_list, 0, info->node_count * sizeof(info->node_list[0]));
+	info->node_list = auto_alloc_array_clear(device->machine, node_description, info->node_count);
 
 	/* allocate memory for the node execution order array */
-	info->running_order = (node_description **)auto_malloc(info->node_count * sizeof(info->running_order[0]));
-	memset(info->running_order, 0, info->node_count * sizeof(info->running_order[0]));
+	info->running_order = auto_alloc_array_clear(device->machine, node_description *, info->node_count);
 
 	/* allocate memory to hold pointers to nodes by index */
-	info->indexed_node = (node_description **)auto_malloc(DISCRETE_MAX_NODES * sizeof(info->indexed_node[0]));
-	memset(info->indexed_node, 0, DISCRETE_MAX_NODES * sizeof(info->indexed_node[0]));
+	info->indexed_node = auto_alloc_array_clear(device->machine, node_description *, DISCRETE_MAX_NODES);
 
 	/* initialize the node data */
 	init_nodes(info, intf, device);
@@ -605,10 +602,7 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list, co
 
 		/* allocate memory if necessary */
 		if (node->module.contextsize)
-		{
-			node->context = auto_malloc(node->module.contextsize);
-			memset(node->context, 0, node->module.contextsize);
-		}
+			node->context = auto_alloc_array_clear(device->machine, UINT8, node->module.contextsize);
 
 		/* if we are an stream input node, track that */
 		if (block->type == DSS_INPUT_STREAM)

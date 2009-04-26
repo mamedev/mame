@@ -422,7 +422,7 @@ static WRITE8_HANDLER ( mjclub_bank_w )
 static ADDRESS_MAP_START( royalmah_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK1 )	// banked ROMs not present in royalmah
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )	// banked ROMs not present in royalmah
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
@@ -432,7 +432,7 @@ static ADDRESS_MAP_START( mjapinky_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0x8000 ) AM_READ( mjapinky_dsw_r )
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK1 )
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
@@ -709,7 +709,7 @@ static ADDRESS_MAP_START( janptr96_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK(3)	// nvram
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK(2)	// banked nvram
-	AM_RANGE( 0x8000, 0xffff ) AM_READ(SMH_BANK1)
+	AM_RANGE( 0x8000, 0xffff ) AM_READ(SMH_BANK(1))
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE(SMH_RAM) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
@@ -981,7 +981,7 @@ static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6ff1, 0x6ff1 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x6ff3, 0x6ff3 ) AM_WRITE( mjtensin_6ff3_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK1 )
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
@@ -1051,7 +1051,7 @@ static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x7fe3, 0x7fe3 ) AM_WRITE( cafetime_7fe3_w )
 	AM_RANGE( 0x7fe4, 0x7fe4 ) AM_READ( cafetime_7fe4_r )
 	AM_RANGE( 0x7ff0, 0x7fff ) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK1 )
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK(1) )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
@@ -4602,7 +4602,7 @@ static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(mac
 static DRIVER_INIT( janptr96 )
 {
 	generic_nvram_size = 0x1000 * 9;
-	generic_nvram = auto_malloc( generic_nvram_size );
+	generic_nvram = auto_alloc_array(machine, UINT8,  generic_nvram_size );
 
 	memory_set_bankptr(machine, 3,generic_nvram);
 }

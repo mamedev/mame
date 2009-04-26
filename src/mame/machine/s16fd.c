@@ -210,7 +210,7 @@ void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_
 
 	for (i = 0; i < CACHE_ENTRIES; i++)
 	{
-		fd1094_cacheregion[i] = auto_malloc(fd1094_cpuregionsize);
+		fd1094_cacheregion[i] = auto_alloc_array(machine, UINT16, fd1094_cpuregionsize/2);
 		fd1094_cached_states[i] = -1;
 	}
   	fd1094_current_cacheposition = 0;

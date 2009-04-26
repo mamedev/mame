@@ -432,7 +432,7 @@ void adder2_decode_char_roms(running_machine *machine)
 	{
 		UINT8 *s;
 
-		s = malloc_or_die( 0x40000 );
+		s = alloc_array_or_die(UINT8,  0x40000 );
 		{
 			int x, y;
 
@@ -471,7 +471,7 @@ void adder2_decode_char_roms(running_machine *machine)
 ADDRESS_MAP_START( adder2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(adder2_screen_page_w)		// screen access/display select
-	AM_RANGE(0x0000, 0x7FFF) AM_READ(SMH_BANK2)				// 8k  paged ROM (4 pages)
+	AM_RANGE(0x0000, 0x7FFF) AM_READ(SMH_BANK(2))				// 8k  paged ROM (4 pages)
 	AM_RANGE(0x8000, 0x917F) AM_READWRITE(screen_ram_r, screen_ram_w)
 	AM_RANGE(0x9180, 0x9FFF) AM_READWRITE(normal_ram_r, normal_ram_w)
 

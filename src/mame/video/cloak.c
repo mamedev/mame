@@ -174,9 +174,9 @@ VIDEO_START( cloak )
 {
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	bitmap_videoram1 = auto_malloc(256*256);
-	bitmap_videoram2 = auto_malloc(256*256);
-	palette_ram = auto_malloc(NUM_PENS * sizeof(palette_ram[0]));
+	bitmap_videoram1 = auto_alloc_array(machine, UINT8, 256*256);
+	bitmap_videoram2 = auto_alloc_array(machine, UINT8, 256*256);
+	palette_ram = auto_alloc_array(machine, UINT16, NUM_PENS);
 
 	set_current_bitmap_videoram_pointer();
 

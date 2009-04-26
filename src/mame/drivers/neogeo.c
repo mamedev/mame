@@ -601,13 +601,6 @@ static WRITE16_HANDLER( save_ram_w )
 #define MEMCARD_SIZE	0x0800
 
 
-static void memcard_init(void)
-{
-	memcard_data = auto_malloc(MEMCARD_SIZE);
-	memset(memcard_data, 0, MEMCARD_SIZE);
-}
-
-
 static CUSTOM_INPUT( get_memcard_status )
 {
 	/* D0 and D1 are memcard presence indicators, D2 indicates memcard
@@ -1082,7 +1075,7 @@ static MACHINE_START( neogeo )
 	calendar_init(machine);
 
 	/* initialize the memcard data structure */
-	memcard_init();
+	memcard_data = auto_alloc_array_clear(machine, UINT8, MEMCARD_SIZE);
 
 	/* start with an IRQ3 - but NOT on a reset */
 	irq3_pending = 1;

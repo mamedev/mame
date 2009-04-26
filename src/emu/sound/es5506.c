@@ -194,7 +194,7 @@ static void compute_tables(es5506_state *chip)
 	int i;
 
 	/* allocate ulaw lookup table */
-	chip->ulaw_lookup = (INT16 *)auto_malloc(sizeof(chip->ulaw_lookup[0]) << ULAW_MAXBITS);
+	chip->ulaw_lookup = auto_alloc_array(chip->device->machine, INT16, 1 << ULAW_MAXBITS);
 
 	/* generate ulaw lookup table */
 	for (i = 0; i < (1 << ULAW_MAXBITS); i++)
@@ -213,7 +213,7 @@ static void compute_tables(es5506_state *chip)
 	}
 
 	/* allocate volume lookup table */
-	chip->volume_lookup = (UINT16 *)auto_malloc(sizeof(chip->volume_lookup[0]) * 4096);
+	chip->volume_lookup = auto_alloc_array(chip->device->machine, UINT16, 4096);
 
 	/* generate ulaw lookup table */
 	for (i = 0; i < 4096; i++)
@@ -842,9 +842,6 @@ static void es5506_start_common(const device_config *device, const void *config,
 	if (LOG_COMMANDS && !eslog)
 		eslog = fopen("es.log", "w");
 
-	/* compute the tables */
-	compute_tables(chip);
-
 	/* create the stream */
 	chip->stream = stream_create(device, 0, 2, device->clock / (16*32), chip, es5506_update);
 
@@ -860,6 +857,9 @@ static void es5506_start_common(const device_config *device, const void *config,
 	chip->irq_callback = intf->irq_callback;
 	chip->irqv = 0x80;
 
+	/* compute the tables */
+	compute_tables(chip);
+
 	/* init the voices */
 	accum_mask = (sndtype == SOUND_ES5506) ? 0xffffffff : 0x7fffffff;
 	for (j = 0; j < 32; j++)
@@ -873,7 +873,7 @@ static void es5506_start_common(const device_config *device, const void *config,
 	}
 
 	/* allocate memory */
-	chip->scratch = (INT32 *)auto_malloc(sizeof(chip->scratch[0]) * 2 * MAX_SAMPLE_CHUNK);
+	chip->scratch = auto_alloc_array(device->machine, INT32, 2 * MAX_SAMPLE_CHUNK);
 
 	/* success */
 }

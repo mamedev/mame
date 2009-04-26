@@ -2906,7 +2906,7 @@ static ADDRESS_MAP_START( tndrcade_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2001) AM_DEVREAD("ym1", ym2203_r )
 	AM_RANGE(0x5000, 0x57ff) AM_READ(SMH_RAM				)	// Shared RAM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1				)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)				)	// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM				)	// ROM
 ADDRESS_MAP_END
 
@@ -2932,7 +2932,7 @@ static ADDRESS_MAP_START( twineagl_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")			// Coins
 	AM_RANGE(0x5000, 0x57ff) AM_READ(SMH_RAM			)	// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM			)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1			)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)			)	// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM			)	// ROM
 ADDRESS_MAP_END
 
@@ -2979,7 +2979,7 @@ static ADDRESS_MAP_START( downtown_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1007) AM_READ(downtown_ip_r		)	// Input Ports
 	AM_RANGE(0x5000, 0x57ff) AM_READ(SMH_RAM			)	// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM			)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1			)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)			)	// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM			)	// ROM
 ADDRESS_MAP_END
 
@@ -3009,7 +3009,7 @@ static WRITE8_HANDLER( calibr50_soundlatch2_w )
 static ADDRESS_MAP_START( calibr50_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("x1", seta_sound_r		)	// Sound
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r		)	// From Main CPU
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1			)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)			)	// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM			)	// ROM
 ADDRESS_MAP_END
 
@@ -3035,7 +3035,7 @@ static ADDRESS_MAP_START( metafox_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P2")				// P2
 	AM_RANGE(0x5000, 0x57ff) AM_READ(SMH_RAM			)	// Shared RAM
 	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM			)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1			)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)			)	// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM			)	// ROM
 ADDRESS_MAP_END
 
@@ -9539,7 +9539,7 @@ static DRIVER_INIT( metafox )
 	UINT16 *RAM = (UINT16 *) memory_region(machine, "maincpu");
 
 	/* This game uses the 21c000-21ffff area for protection? */
-//  memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0, SMH_NOP, SMH_NOP);
+//  memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0, (read16_space_func)SMH_NOP, (write16_space_func)SMH_NOP);
 
 	RAM[0x8ab1c/2] = 0x4e71;	// patch protection test: "cp error"
 	RAM[0x8ab1e/2] = 0x4e71;
@@ -9557,7 +9557,7 @@ static DRIVER_INIT ( blandia )
 	int rpos;
 
 	rom_size = 0x80000;
-	buf = malloc_or_die(rom_size);
+	buf = alloc_array_or_die(UINT8, rom_size);
 
 	rom = memory_region(machine, "gfx2") + 0x40000;
 
@@ -9583,7 +9583,7 @@ static DRIVER_INIT ( blandia )
 
 static DRIVER_INIT( eightfrc )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0, SMH_NOP);	// watchdog??
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0, (read16_space_func)SMH_NOP);	// watchdog??
 }
 
 
@@ -9608,7 +9608,7 @@ static DRIVER_INIT( kiwame )
 
 static DRIVER_INIT( rezon )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0, SMH_NOP);	// irq ack?
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0, (read16_space_func)SMH_NOP);	// irq ack?
 }
 
 static DRIVER_INIT(wiggie)
@@ -9640,7 +9640,7 @@ static DRIVER_INIT(wiggie)
 	}
 
 	/* X1_010 is not used. */
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0, SMH_NOP, SMH_NOP);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0, (read16_space_func)SMH_NOP, (write16_space_func)SMH_NOP);
 
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
 
@@ -9653,7 +9653,7 @@ static DRIVER_INIT( crazyfgt )
 	RAM[0x1078/2] = 0x4e71;
 
 	// fixed priorities?
-	seta_vregs = (UINT16*)auto_malloc(sizeof(UINT16)*3);
+	seta_vregs = auto_alloc_array(machine, UINT16, 3);
 	seta_vregs[0] = seta_vregs[1] = seta_vregs[2] = 0;
 
 	DRIVER_INIT_CALL(blandia);

@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( chaknpop_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(chaknpop_attrram_w) AM_BASE(&chaknpop_attrram) 		// Color attribute
 	AM_RANGE(0x9840, 0x98ff) AM_RAM AM_BASE(&chaknpop_sprram) AM_SIZE(&chaknpop_sprram_size)	// sprite
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK1, SMH_BANK1)									// bitmap plane 1-4
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(1)														// bitmap plane 1-4
 ADDRESS_MAP_END
 
 static const ay8910_interface ay8910_interface_1 =

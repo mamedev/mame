@@ -247,8 +247,8 @@ VIDEO_START( midzeus )
 	int i;
 
 	/* allocate memory for "wave" RAM */
-	waveram[0] = auto_malloc(WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8);
-	waveram[1] = auto_malloc(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8);
+	waveram[0] = auto_alloc_array(machine, UINT32, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
+	waveram[1] = auto_alloc_array(machine, UINT32, WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8/4);
 
 	/* initialize a 5-5-5 palette */
 	for (i = 0; i < 32768; i++)

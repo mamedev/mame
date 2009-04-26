@@ -252,10 +252,8 @@ VIDEO_START( mcatadv )
 	mcatadv_tilemap2 = tilemap_create(machine, get_mcatadv_tile_info2,tilemap_scan_rows, 16, 16,32,32);
 	tilemap_set_transparent_pen(mcatadv_tilemap2,0);
 
-	spriteram_old = auto_malloc(spriteram_size);
-	vidregs_old = auto_malloc(0xf);
-
-	memset(spriteram_old,0,spriteram_size);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, spriteram_size/2);
+	vidregs_old = auto_alloc_array(machine, UINT16, 0xf/2);
 
 	palette_bank1 = 0;
 	palette_bank2 = 0;

@@ -331,7 +331,8 @@ static UINT16 pointram_control;
 
 
 #define DSP_BUF_MAX (4096*12)
-static struct
+typedef struct _dsp_state dsp_state;
+struct _dsp_state
 {
 	unsigned masterSourceAddr;
 	UINT16 slaveInputBuffer[DSP_BUF_MAX];
@@ -344,7 +345,8 @@ static struct
 	unsigned masterDirectDrawSize;
 	int masterFinished;
 	int slaveActive;
-} *mpDspState;
+};
+static dsp_state *mpDspState;
 
 static INT32
 ReadPointROMData( running_machine *machine, unsigned offset )
@@ -632,8 +634,7 @@ InitDSP( running_machine *machine )
 	pMem[0x8000] = 0xFF80;
 	pMem[0x8001] = 0x0000;
 
-	mpDspState = auto_malloc( sizeof(*mpDspState) );
-	memset( mpDspState, 0, sizeof(*mpDspState) );
+	mpDspState = auto_alloc_clear(machine, dsp_state);
 
 	return 0;
 }
@@ -2202,7 +2203,7 @@ ROM_END
 static void namcos21_init( running_machine *machine, int game_type )
 {
 	namcos2_gametype = game_type;
-	pointram = auto_malloc(PTRAM_SIZE);
+	pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	mpDataROM = (UINT16 *)memory_region( machine, "user1" );
 	InitDSP(machine);
 	mbNeedsKickstart = 20;
@@ -2219,11 +2220,11 @@ static DRIVER_INIT( winrun )
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
 
-	winrun_dspcomram = auto_malloc(sizeof(UINT16)*0x1000*2);
+	winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
 
 	namcos2_gametype = NAMCOS21_WINRUN91;
 	mpDataROM = (UINT16 *)memory_region( machine, "user1" );
-	pointram = auto_malloc(PTRAM_SIZE);
+	pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	pointram_idx = 0;
 	mbNeedsKickstart = 0;
 }
@@ -2261,10 +2262,10 @@ static DRIVER_INIT( driveyes )
 	int pc = 0;
 	pMem[pc++] = 0xff80; /* b */
 	pMem[pc++] = 0;
-	winrun_dspcomram = auto_malloc(sizeof(UINT16)*0x1000*2);
+	winrun_dspcomram = auto_alloc_array(machine, UINT16, 0x1000*2);
 	namcos2_gametype = NAMCOS21_DRIVERS_EYES;
 	mpDataROM = (UINT16 *)memory_region( machine, "user1" );
-	pointram = auto_malloc(PTRAM_SIZE);
+	pointram = auto_alloc_array(machine, UINT8, PTRAM_SIZE);
 	pointram_idx = 0;
 	mbNeedsKickstart = 0;
 }

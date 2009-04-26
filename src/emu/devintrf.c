@@ -111,7 +111,7 @@ device_config *device_list_add(device_config **listheadptr, const device_config 
 	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
 
 	/* allocate a new device */
-	device = (device_config *)malloc_or_die(sizeof(*device) + strlen(tag) + configlen);
+	device = (device_config *)alloc_array_or_die(UINT8, sizeof(*device) + strlen(tag) + configlen);
 
 	/* populate device relationships */
 	device->next = NULL;
@@ -554,8 +554,7 @@ void device_list_start(running_machine *machine)
 			fatalerror("Device %s specifies a 0 token length!\n", device_get_name(device));
 
 		/* allocate memory for the token */
-		device->token = malloc_or_die(device->tokenbytes);
-		memset(device->token, 0, device->tokenbytes);
+		device->token = alloc_array_clear_or_die(UINT8, device->tokenbytes);
 
 		/* fill in the remaining runtime fields */
 		device->execute = (device_execute_func)device_get_info_fct(device, DEVINFO_FCT_EXECUTE);

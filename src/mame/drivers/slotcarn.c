@@ -532,7 +532,7 @@ static VIDEO_UPDATE( slotcarn )
 
 static MACHINE_START(merit)
 {
-	ram_palette = auto_malloc(RAM_PALETTE_SIZE);
+	ram_palette = auto_alloc_array(machine, UINT8, RAM_PALETTE_SIZE);
 	state_save_register_global_pointer(machine, ram_palette, RAM_PALETTE_SIZE);
 }
 

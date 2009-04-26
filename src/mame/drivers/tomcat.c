@@ -331,7 +331,7 @@ static MACHINE_START(tomcat)
 	((UINT16*)tomcat_shared_ram)[0x0002] = 0xf600;
 	((UINT16*)tomcat_shared_ram)[0x0003] = 0x0000;
 
-	tomcat_nvram = auto_malloc(0x800);
+	tomcat_nvram = auto_alloc_array(machine, UINT8, 0x800);
 
 	state_save_register_global_pointer(machine, tomcat_nvram, 0x800);
 	state_save_register_global(machine, tomcat_control_num);

@@ -821,7 +821,7 @@ void rainbow_cchip_init(running_machine *machine, int version)
 
 	for (i = 0; i < 8; i++)
 	{
-		CRAM[i] = auto_malloc(0x400);
+		CRAM[i] = auto_alloc_array(machine, UINT8, 0x400);
 
 		state_save_register_item_pointer(machine, "cchip", NULL, i, CRAM[i], 0x400);
 	}

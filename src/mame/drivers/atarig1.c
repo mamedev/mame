@@ -196,7 +196,7 @@ static void pitfighb_cheap_slapstic_init(running_machine *machine)
 	bslapstic_base = memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x038000, 0x03ffff, 0, 0, pitfighb_cheap_slapstic_r);
 
 	/* allocate memory for a copy of bank 0 */
-	bslapstic_bank0 = auto_malloc(0x2000);
+	bslapstic_bank0 = auto_alloc_array(machine, UINT8, 0x2000);
 	memcpy(bslapstic_bank0, bslapstic_base, 0x2000);
 
 	/* not primed by default */

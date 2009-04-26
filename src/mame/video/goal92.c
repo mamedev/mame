@@ -139,7 +139,7 @@ VIDEO_START( goal92 )
 	foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
 	text_layer       = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 
-	buffered_spriteram16 = auto_malloc(0x400*2);
+	buffered_spriteram16 = auto_alloc_array(machine, UINT16, 0x400*2);
 
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(foreground_layer,15);

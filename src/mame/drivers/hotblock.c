@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 
 static VIDEO_START(hotblock)
 {
-	hotblock_pal=auto_malloc(0x10000);
+	hotblock_pal=auto_alloc_array(machine, UINT8, 0x10000);
 }
 
 static VIDEO_UPDATE(hotblock)

@@ -44,13 +44,11 @@ void K001006_init(running_machine *machine)
 	int i;
 	for (i=0; i<MAX_K001006_CHIPS; i++)
 	{
-		K001006_pal_ram[i] = auto_malloc(0x800*sizeof(UINT16));
-		memset(K001006_pal_ram[i], 0, 0x800*sizeof(UINT16));
-		K001006_unknown_ram[i] = auto_malloc(0x1000*sizeof(UINT16));
-		memset(K001006_unknown_ram[i], 0, 0x1000*sizeof(UINT16));
+		K001006_pal_ram[i] = auto_alloc_array_clear(machine, UINT16, 0x800);
+		K001006_unknown_ram[i] = auto_alloc_array_clear(machine, UINT16, 0x1000);
 		K001006_addr[i] = 0;
 		K001006_device_sel[i] = 0;
-		K001006_palette[i] = auto_malloc(0x800*sizeof(UINT32));
+		K001006_palette[i] = auto_alloc_array(machine, UINT32, 0x800);
 		memset(K001006_palette[i], 0, 0x800*sizeof(UINT32));
 	}
 }
@@ -208,21 +206,21 @@ void K001005_init(running_machine *machine)
 
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
-	K001005_zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
+	K001005_zbuffer = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED32);
 
 	gfxrom = memory_region(machine, "gfx1");
 
 	K001005_bitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	K001005_bitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	K001005_texture = auto_malloc(0x800000);
+	K001005_texture = auto_alloc_array(machine, UINT8, 0x800000);
 
-	K001005_ram[0] = auto_malloc(0x140000 * sizeof(UINT16));
-	K001005_ram[1] = auto_malloc(0x140000 * sizeof(UINT16));
+	K001005_ram[0] = auto_alloc_array(machine, UINT16, 0x140000);
+	K001005_ram[1] = auto_alloc_array(machine, UINT16, 0x140000);
 
-	K001005_fifo = auto_malloc(0x800 * sizeof(UINT32));
+	K001005_fifo = auto_alloc_array(machine, UINT32, 0x800);
 
-	K001005_3d_fifo = auto_malloc(0x10000 * sizeof(UINT32));
+	K001005_3d_fifo = auto_alloc_array(machine, UINT32, 0x10000);
 
 	poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, K001005_exit);

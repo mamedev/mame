@@ -102,7 +102,7 @@ INPUT_PORTS_END
 
 static VIDEO_START( eolith16 )
 {
-	vram = auto_malloc(0x10000*2);
+	vram = auto_alloc_array(machine, UINT16, 0x10000);
 }
 
 static VIDEO_UPDATE( eolith16 )

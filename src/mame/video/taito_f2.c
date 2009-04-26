@@ -89,9 +89,9 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 	f2_hide_pixels = hide;
 	f2_flip_hide_pixels = flip_hide;
 
-	spriteram_delayed = auto_malloc(spriteram_size);
-	spriteram_buffered = auto_malloc(spriteram_size);
-	spritelist = auto_malloc(0x400 * sizeof(*spritelist));
+	spriteram_delayed = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	spriteram_buffered = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
 
 	chips = TC0100SCN_count(machine);
 

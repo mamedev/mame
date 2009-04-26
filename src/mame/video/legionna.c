@@ -167,7 +167,7 @@ VIDEO_START( legionna )
 	text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 	legionna_layer_disable = 0x0000;
 
-	legionna_scrollram16 = auto_malloc(0x60);
+	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(midground_layer,15);
@@ -183,7 +183,7 @@ VIDEO_START( denjinmk )
 	text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 	legionna_layer_disable = 0x0000;
 
-	legionna_scrollram16 = auto_malloc(0x60);
+	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(midground_layer,15);
@@ -199,7 +199,7 @@ VIDEO_START( cupsoc )
 	text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
 	legionna_layer_disable = 0x0000;
 
-	legionna_scrollram16 = auto_malloc(0x60);
+	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 
 	tilemap_set_transparent_pen(background_layer,15);
 	tilemap_set_transparent_pen(midground_layer,15);

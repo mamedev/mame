@@ -130,8 +130,8 @@ VIDEO_START( matmania )
 	bitmap_format format = video_screen_get_format(machine->primary_screen);
 
 	/* Mat Mania has a virtual screen twice as large as the visible screen */
-	tmpbitmap  = auto_bitmap_alloc(width, 2*height, format);
-	tmpbitmap2 = auto_bitmap_alloc(width, 2*height, format);
+	tmpbitmap  = auto_bitmap_alloc(machine, width, 2*height, format);
+	tmpbitmap2 = auto_bitmap_alloc(machine, width, 2*height, format);
 }
 
 

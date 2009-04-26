@@ -664,7 +664,7 @@ static SAMPLES_START( kageki_init_samples )
 				size++;
 			}
 		}
-		sampledata[i] = auto_malloc(size * sizeof(sampledata[0]));
+		sampledata[i] = auto_alloc_array(machine, INT16, size);
 		samplesize[i] = size;
 
 		if (start < 0x100) start = size = 0;
@@ -890,7 +890,7 @@ static WRITE8_HANDLER( jpopnics_palette_w )
 
 static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&tnzs_objram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1) /* WORK RAM (shared by the 2 z80's) */
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE(&tnzs_vdcram) 	/* VDC RAM */
@@ -911,7 +911,7 @@ static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 
 static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK2, SMH_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK(2), SMH_ROM)
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(jpopnics_subbankswitch_w)
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)

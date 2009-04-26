@@ -219,7 +219,7 @@ static DEVICE_START( attckufo_sound )
 	noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
 	noisepos = 0;
 	noisesamples = 1;
-	noise = (INT8*) auto_malloc (noisesize * sizeof (noise[0]));
+	noise = auto_alloc_array(device->machine, INT8, noisesize);
 	{
 		int noiseshift = 0x7ffff8;
 		char data;
@@ -254,7 +254,7 @@ static DEVICE_START( attckufo_sound )
 	tone1pos = tone2pos = tone3pos = 0;
 	tone1samples = tone2samples = tone3samples = 1;
 
-	tone = (INT16*) auto_malloc (tonesize * sizeof (tone[0]));
+	tone = auto_alloc_array(device->machine, INT16, tonesize);
 
 	for (i = 0; i < tonesize; i++)
 	{

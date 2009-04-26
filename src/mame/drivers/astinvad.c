@@ -96,7 +96,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static VIDEO_START( spaceint )
 {
-	colorram = auto_malloc(videoram_size);
+	colorram = auto_alloc_array(machine, UINT8, videoram_size);
 }
 
 

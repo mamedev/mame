@@ -1182,7 +1182,7 @@ void sh4_common_init(const device_config *device)
 	sh4->rtc_timer = timer_alloc(device->machine, sh4_rtc_timer_callback, sh4);
 	timer_adjust_oneshot(sh4->rtc_timer, attotime_never, 0);
 
-	sh4->m = (UINT32 *)auto_malloc(16384*4);
+	sh4->m = auto_alloc_array(device->machine, UINT32, 16384);
 }
 
 void sh4_dma_ddt(const device_config *device, struct sh4_ddt_dma *s)

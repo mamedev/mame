@@ -211,7 +211,7 @@ VIDEO_START( segag80r )
 	gfx_element_set_source(machine->gfx[0], &videoram[0x800]);
 
 	/* allocate paletteram */
-	paletteram = auto_malloc(0x80);
+	paletteram = auto_alloc_array(machine, UINT8, 0x80);
 
 	/* initialize the particulars for each type of background PCB */
 	switch (segag80r_background_pcb)

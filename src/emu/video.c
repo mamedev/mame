@@ -434,7 +434,7 @@ static void init_buffered_spriteram(running_machine *machine)
 	assert_always(spriteram_size != 0, "Video buffers spriteram but spriteram_size is 0");
 
 	/* allocate memory for the back buffer */
-	buffered_spriteram = (UINT8 *)auto_malloc(spriteram_size);
+	buffered_spriteram = auto_alloc_array(machine, UINT8, spriteram_size);
 
 	/* register for saving it */
 	state_save_register_global_pointer(machine, buffered_spriteram, spriteram_size);
@@ -443,7 +443,7 @@ static void init_buffered_spriteram(running_machine *machine)
 	if (spriteram_2_size)
 	{
 		/* allocate memory */
-		buffered_spriteram_2 = (UINT8 *)auto_malloc(spriteram_2_size);
+		buffered_spriteram_2 = auto_alloc_array(machine, UINT8, spriteram_2_size);
 
 		/* register for saving it */
 		state_save_register_global_pointer(machine, buffered_spriteram_2, spriteram_2_size);

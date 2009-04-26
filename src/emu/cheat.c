@@ -371,8 +371,7 @@ void cheat_init(running_machine *machine)
 	add_exit_callback(machine, cheat_exit);
 
 	/* allocate memory */
-	cheatinfo = (cheat_private *)auto_malloc(sizeof(*cheatinfo));
-	memset(cheatinfo, 0, sizeof(*cheatinfo));
+	cheatinfo = auto_alloc_clear(machine, cheat_private);
 	machine->cheat_data = cheatinfo;
 
 	/* load the cheat file */
@@ -1061,8 +1060,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	}
 
 	/* allocate memory for the cheat */
-	cheat = (cheat_entry *)malloc_or_die(sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
-	memset(cheat, 0, sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
+	cheat = (cheat_entry *)alloc_array_clear_or_die(UINT8, sizeof(*cheat) + (tempcount - 1) * sizeof(cheat->tempvar));
 	cheat->numtemp = tempcount;
 
 	/* get the description */
@@ -1232,8 +1230,7 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 	cheat_parameter *param;
 
 	/* allocate memory for it */
-	param = (cheat_parameter *)malloc_or_die(sizeof(*param));
-	memset(param, 0, sizeof(*param));
+	param = alloc_clear_or_die(cheat_parameter);
 
 	/* read the core attributes */
 	param->minval = xml_get_attribute_int(paramnode, "min", 0);
@@ -1250,8 +1247,7 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 		parameter_item *curitem;
 
 		/* allocate memory for it */
-		curitem = (parameter_item *)malloc_or_die(sizeof(*curitem));
-		memset(curitem, 0, sizeof(*curitem));
+		curitem = alloc_clear_or_die(parameter_item);
 
 		/* check for NULL text */
 		if (itemnode->value == NULL || itemnode->value[0] == 0)
@@ -1361,8 +1357,7 @@ static cheat_script *cheat_script_load(running_machine *machine, const char *fil
 	const char *state;
 
 	/* allocate memory for it */
-	script = (cheat_script *)malloc_or_die(sizeof(*script));
-	memset(script, 0, sizeof(*script));
+	script = alloc_clear_or_die(cheat_script);
 
 	/* read the core attributes */
 	script->state = SCRIPT_STATE_RUN;
@@ -1476,8 +1471,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 	EXPRERR experr;
 
 	/* allocate memory for it */
-	entry = (script_entry *)malloc_or_die(sizeof(*entry));
-	memset(entry, 0, sizeof(*entry));
+	entry = alloc_clear_or_die(script_entry);
 
 	/* read the condition if present */
 	expression = xml_get_attribute_string(entrynode, "condition", NULL);
@@ -1546,8 +1540,7 @@ static script_entry *script_entry_load(running_machine *machine, const char *fil
 			output_argument *curarg;
 
 			/* allocate memory for it */
-			curarg = (output_argument *)malloc_or_die(sizeof(*curarg));
-			memset(curarg, 0, sizeof(*curarg));
+			curarg = alloc_clear_or_die(output_argument);
 
 			/* first extract attributes */
 			curarg->count = xml_get_attribute_int(argnode, "count", 1);

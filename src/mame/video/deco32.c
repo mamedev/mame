@@ -974,7 +974,7 @@ VIDEO_START( captaven )
 	pf1a_tilemap =tilemap_create(machine, get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
 	pf2_tilemap = tilemap_create(machine, get_pf2_tile_info,    deco16_scan_rows,16,16,64,32);
 	pf3_tilemap = tilemap_create(machine, get_ca_pf3_tile_info, tilemap_scan_rows,16,16,32,32);
-	deco32_raster_display_list=auto_malloc(10 * 256);
+	deco32_raster_display_list=auto_alloc_array(machine, UINT16, 10 * 256 / 2);
 	memset(deco32_raster_display_list, 0, 10 * 256);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
@@ -994,7 +994,7 @@ VIDEO_START( fghthist )
 	pf3_tilemap = tilemap_create(machine, get_pf3_tile_info, deco16_scan_rows, 16,16,64,32);
 	pf4_tilemap = tilemap_create(machine, get_pf4_tile_info, deco16_scan_rows, 16,16,64,32);
 	pf1a_tilemap =0;
-	dirty_palette = auto_malloc(4096);
+	dirty_palette = auto_alloc_array(machine, UINT8, 4096);
 
 	deco_allocate_sprite_bitmap(machine);
 
@@ -1014,8 +1014,8 @@ VIDEO_START( dragngun )
 	pf3_tilemap = tilemap_create(machine, get_ll_pf3_tile_info, deco16_scan_rows,16,16,64,32);
 	pf4_tilemap = tilemap_create(machine, get_ll_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
 	pf1a_tilemap =tilemap_create(machine, get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
-	dirty_palette = auto_malloc(4096);
-	deco32_raster_display_list = auto_malloc(10 * 256);
+	dirty_palette = auto_alloc_array(machine, UINT8, 4096);
+	deco32_raster_display_list = auto_alloc_array(machine, UINT16, 10 * 256 / 2);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);
@@ -1036,8 +1036,8 @@ VIDEO_START( lockload )
 	pf3_tilemap = tilemap_create(machine, get_ll_pf3_tile_info, deco16_scan_rows,16,16,32,32);
 	pf4_tilemap = tilemap_create(machine, get_ll_pf4_tile_info, deco16_scan_rows,     16,16,32,32);
 	pf1a_tilemap =tilemap_create(machine, get_pf1a_tile_info,   deco16_scan_rows,16,16,64,32);
-	dirty_palette = auto_malloc(4096);
-	deco32_raster_display_list = auto_malloc(10 * 256);
+	dirty_palette = auto_alloc_array(machine, UINT8, 4096);
+	deco32_raster_display_list = auto_alloc_array(machine, UINT16, 10 * 256 / 2);
 	memset(deco32_raster_display_list, 0, 10 * 256);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
@@ -1061,13 +1061,13 @@ VIDEO_START( nslasher )
 	pf3_tilemap = tilemap_create(machine, get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
 	pf4_tilemap = tilemap_create(machine, get_pf4_tile_info, deco16_scan_rows,     16,16,64,32);
 	pf1a_tilemap =0;
-	dirty_palette = auto_malloc(4096);
+	dirty_palette = auto_alloc_array(machine, UINT8, 4096);
 
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
-	sprite0_mix_bitmap=auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
-	sprite1_mix_bitmap=auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
-	tilemap_alpha_bitmap=auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	sprite0_mix_bitmap=auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
+	sprite1_mix_bitmap=auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
+	tilemap_alpha_bitmap=auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);

@@ -61,10 +61,10 @@ static WRITE8_HANDLER(sangho_ram_w)
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(sangho_ram_w)
-	AM_RANGE(0x0000, 0x3fff) AM_READ( SMH_BANK1 )
-	AM_RANGE(0x4000, 0x7fff) AM_READ( SMH_BANK2 )
-	AM_RANGE(0x8000, 0xbfff) AM_READ( SMH_BANK3 )
-	AM_RANGE(0xc000, 0xffff) AM_READ( SMH_BANK4 )
+	AM_RANGE(0x0000, 0x3fff) AM_READ( SMH_BANK(1) )
+	AM_RANGE(0x4000, 0x7fff) AM_READ( SMH_BANK(2) )
+	AM_RANGE(0x8000, 0xbfff) AM_READ( SMH_BANK(3) )
+	AM_RANGE(0xc000, 0xffff) AM_READ( SMH_BANK(4) )
 ADDRESS_MAP_END
 
 /* Wrong ! */
@@ -324,7 +324,7 @@ ROM_END
 
 static DRIVER_INIT(sangho)
 {
-	sangho_ram = auto_malloc(0x20000);
+	sangho_ram = auto_alloc_array(machine, UINT8, 0x20000);
 }
 
 GAME( 1991, pzlestar,  0,    pzlestar, sangho, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )

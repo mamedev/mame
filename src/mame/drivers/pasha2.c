@@ -315,8 +315,8 @@ INPUT_PORTS_END
 
 static VIDEO_START( pasha2 )
 {
-	bitmap0 = auto_malloc(0x40000);
-	bitmap1 = auto_malloc(0x40000);
+	bitmap0 = auto_alloc_array(machine, UINT16, 0x40000/2);
+	bitmap1 = auto_alloc_array(machine, UINT16, 0x40000/2);
 }
 
 static VIDEO_UPDATE( pasha2 )

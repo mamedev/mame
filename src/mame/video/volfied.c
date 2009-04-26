@@ -13,7 +13,7 @@ static UINT16 video_mask = 0;
 
 VIDEO_START( volfied )
 {
-	video_ram = auto_malloc(0x40000 * sizeof (UINT16));
+	video_ram = auto_alloc_array(machine, UINT16, 0x40000);
 
 	state_save_register_global_pointer(machine, video_ram, 0x40000);
 	state_save_register_global(machine, video_ctrl);

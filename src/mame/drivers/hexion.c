@@ -115,7 +115,7 @@ if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc000, 0xdffe) AM_READ(hexion_bankedram_r)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")

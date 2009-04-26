@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 
 static VIDEO_START(twins)
 {
-	twins_pal = auto_malloc(0x100*2);
+	twins_pal = auto_alloc_array(machine, UINT16, 0x100);
 }
 
 static VIDEO_UPDATE(twins)
@@ -199,7 +199,7 @@ MACHINE_DRIVER_END
 
 static VIDEO_START(twinsa)
 {
-	twins_pal = auto_malloc(0x1000*2);
+	twins_pal = auto_alloc_array(machine, UINT16, 0x1000);
 }
 
 static VIDEO_UPDATE(twinsa)

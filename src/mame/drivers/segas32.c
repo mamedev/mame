@@ -3789,7 +3789,7 @@ static DRIVER_INIT( arescue )
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00007, 0, 0, arescue_dsp_r, arescue_dsp_w);
 
-	dual_pcb_comms = auto_malloc(0x1000);
+	dual_pcb_comms = auto_alloc_array(machine, UINT16, 0x1000/2);
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
@@ -3813,7 +3813,7 @@ static DRIVER_INIT( brival )
 	segas32_common_init(extra_custom_io_r, NULL, NULL);
 
 	/* install protection handlers */
-	system32_protram = auto_malloc (0x1000);
+	system32_protram = auto_alloc_array(machine, UINT16, 0x1000/2);
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20ba00, 0x20ba07, 0, 0, brival_protection_r);
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, brival_protection_w);
 }
@@ -3847,7 +3847,7 @@ static DRIVER_INIT( f1en )
 {
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
 
-	dual_pcb_comms = auto_malloc(0x1000);
+	dual_pcb_comms = auto_alloc_array(machine, UINT16, 0x1000/2);
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 

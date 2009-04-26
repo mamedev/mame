@@ -120,14 +120,9 @@ VIDEO_START( toaplan0 )
 
 	twincobr_create_tilemaps(machine);
 
-	twincobr_txvideoram16 = auto_malloc(twincobr_txvideoram_size*2);
-	memset(twincobr_txvideoram16,0,twincobr_txvideoram_size*2);
-
-	twincobr_fgvideoram16 = auto_malloc(twincobr_fgvideoram_size*2);
-	memset(twincobr_fgvideoram16,0,twincobr_fgvideoram_size*2);
-
-	twincobr_bgvideoram16 = auto_malloc(twincobr_bgvideoram_size*2);
-	memset(twincobr_bgvideoram16,0,twincobr_bgvideoram_size*2);
+	twincobr_txvideoram16 = auto_alloc_array_clear(machine, UINT16, twincobr_txvideoram_size);
+	twincobr_fgvideoram16 = auto_alloc_array_clear(machine, UINT16, twincobr_fgvideoram_size);
+	twincobr_bgvideoram16 = auto_alloc_array_clear(machine, UINT16, twincobr_bgvideoram_size);
 
 	twincobr_display_on = 0;
 	twincobr_display(twincobr_display_on);

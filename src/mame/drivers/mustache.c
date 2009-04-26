@@ -265,7 +265,7 @@ static DRIVER_INIT( mustache )
 	int G2 = memory_region_length(machine, "gfx2")/2;
 	UINT8 *gfx1 = memory_region(machine, "gfx1");
 	UINT8 *gfx2 = memory_region(machine, "gfx2");
-	UINT8 *buf=malloc_or_die(G2*2);
+	UINT8 *buf=alloc_array_or_die(UINT8, G2*2);
 
 	/* BG data lines */
 	for (i=0;i<G1; i++)

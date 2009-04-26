@@ -1396,7 +1396,7 @@ static void monsterb_expand_gfx(running_machine *machine, const char *region)
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
 	dest = memory_region(machine, region);
-	temp = malloc_or_die(0x4000);
+	temp = alloc_array_or_die(UINT8, 0x4000);
 	memcpy(temp, dest, 0x4000);
 
 	/* 16 effective total banks */

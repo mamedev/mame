@@ -731,13 +731,13 @@ input_device *input_device_add(running_machine *machine, input_device_class devc
 	assert(devclass != DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM);
 
 	/* allocate a new device */
-	devlist->list = (input_device *)auto_realloc(devlist->list, (devlist->count + 1) * sizeof(devlist->list[0]));
+	devlist->list = auto_extend_array(machine, devlist->list, input_device, devlist->count + 1);
 	device = &devlist->list[devlist->count++];
 	memset(device, 0, sizeof(*device));
 
 	/* fill in the data */
 	device->machine = machine;
-	device->name = astring_cpyc(auto_astring_alloc(), name);
+	device->name = astring_cpyc(auto_astring_alloc(machine), name);
 	device->devclass = devclass;
 	device->devindex = devlist->count - 1;
 	device->internal = internal;
@@ -780,15 +780,14 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 	assert(device->item[itemid] == NULL);
 
 	/* allocate a new item and copy data into it */
-	item = (input_device_item *)auto_malloc(sizeof(*item));
-	memset(item, 0, sizeof(*item));
+	item = auto_alloc_clear(device->machine, input_device_item);
 	device->item[itemid] = item;
 	device->maxitem = MAX(device->maxitem, itemid);
 
 	/* copy in the data passed in from the item list */
 	item->devclass = device->devclass;
 	item->devindex = device->devindex;
-	item->name = astring_cpyc(auto_astring_alloc(), name);
+	item->name = astring_cpyc(auto_astring_alloc(device->machine), name);
 	item->token = NULL;
 	item->internal = internal;
 	item->itemclass = input_item_standard_class(device->devclass, itemid_std);
@@ -799,7 +798,7 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 	if (itemid > ITEM_ID_MAXIMUM)
 	{
 		/* copy the item name, removing spaces/underscores and making all caps */
-		item->token = astring_toupper(astring_cpyc(auto_astring_alloc(), name));
+		item->token = astring_toupper(astring_cpyc(auto_astring_alloc(device->machine), name));
 		astring_delchr(item->token, ' ');
 		astring_delchr(item->token, '_');
 	}

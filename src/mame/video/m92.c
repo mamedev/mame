@@ -279,7 +279,7 @@ VIDEO_START( m92 )
 		state_save_register_item_array(machine, "layer", NULL, laynum, layer->control);
 	}
 
-	paletteram16 = auto_malloc(0x1000);
+	paletteram16 = auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	memset(spriteram16,0,0x800);
 	memset(buffered_spriteram16,0,0x800);

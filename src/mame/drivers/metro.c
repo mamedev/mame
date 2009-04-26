@@ -810,14 +810,14 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 static ADDRESS_MAP_START( metro_snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)	/* External ROM */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)	/* External ROM (Banked) */
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))	/* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)	/* External RAM */
 	AM_RANGE(0xff00, 0xffff) AM_READ(SMH_RAM)	/* Internal RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( metro_snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)	/* External ROM */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_BANK1)	/* External ROM (Banked) */
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_BANK(1))	/* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)	/* External RAM */
 	AM_RANGE(0xff00, 0xffff) AM_WRITE(SMH_RAM)	/* Internal RAM */
 ADDRESS_MAP_END
@@ -836,14 +836,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daitorid_snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)	/* External ROM */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)	/* External ROM (Banked) */
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))	/* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)	/* External RAM */
 	AM_RANGE(0xff00, 0xffff) AM_READ(SMH_RAM)	/* Internal RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daitorid_snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)	/* External ROM */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_BANK1)	/* External ROM (Banked) */
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_BANK(1))	/* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)	/* External RAM */
 	AM_RANGE(0xff00, 0xffff) AM_WRITE(SMH_RAM)	/* Internal RAM */
 ADDRESS_MAP_END
@@ -1952,7 +1952,7 @@ static const ym2610_interface blzntrnd_ym2610_interface =
 
 static ADDRESS_MAP_START( blzntrnd_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -4730,7 +4730,7 @@ static DRIVER_INIT( metro )
 
 static DRIVER_INIT( karatour )
 {
-	UINT16 *RAM = (UINT16 *)auto_malloc(0x20000*3);
+	UINT16 *RAM = auto_alloc_array(machine, UINT16, 0x20000*3/2);
 int i;
 	metro_vram_0 = RAM + (0x20000/2) * 0;
 	metro_vram_1 = RAM + (0x20000/2) * 1;

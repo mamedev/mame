@@ -59,7 +59,7 @@ VIDEO_START( megaplay_normal )
 
 	vdp_start(machine, 0);
 
-	cache_bitmap = auto_malloc( (16+256+16) * 192); /* 16 pixels either side to simplify drawing */
+	cache_bitmap = auto_alloc_array(machine, UINT8, (16+256+16) * 192); /* 16 pixels either side to simplify drawing */
 }
 
 VIDEO_UPDATE( megaplay_normal )
@@ -101,16 +101,16 @@ static void vdp_start(running_machine *machine, UINT8 chip)
 
 	/*- VRAM -*/
 
-	segae_vdp_vram[chip] = auto_malloc(0x8000); /* 32kb (2 banks) */
+	segae_vdp_vram[chip] = auto_alloc_array(machine, UINT8, 0x8000); /* 32kb (2 banks) */
 	segae_vdp_vrambank[chip] = 0;
 
 	/*- CRAM -*/
 
-	vdp_cram[chip] = auto_malloc(0x20);
+	vdp_cram[chip] = auto_alloc_array(machine, UINT8, 0x20);
 
 	/*- VDP Registers -*/
 
-	segae_vdp_regs[chip] = auto_malloc(0x20);
+	segae_vdp_regs[chip] = auto_alloc_array(machine, UINT8, 0x20);
 
 	/*- Clear Memory -*/
 

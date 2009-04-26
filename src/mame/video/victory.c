@@ -71,13 +71,13 @@ static int command7(running_machine *machine);
 VIDEO_START( victory )
 {
 	/* allocate bitmapram */
-	rram = auto_malloc(0x4000);
-	gram = auto_malloc(0x4000);
-	bram = auto_malloc(0x4000);
+	rram = auto_alloc_array(machine, UINT8, 0x4000);
+	gram = auto_alloc_array(machine, UINT8, 0x4000);
+	bram = auto_alloc_array(machine, UINT8, 0x4000);
 
 	/* allocate bitmaps */
-	bgbitmap = auto_malloc(256 * 256);
-	fgbitmap = auto_malloc(256 * 256);
+	bgbitmap = auto_alloc_array(machine, UINT8, 256 * 256);
+	fgbitmap = auto_alloc_array(machine, UINT8, 256 * 256);
 
 	/* reset globals */
 	vblank_irq = 0;

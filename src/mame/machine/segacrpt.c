@@ -241,7 +241,7 @@ static void sega_decode(running_machine *machine, const char *cputag, const UINT
 	int length = memory_region_length(machine, cputag);
 	int cryptlen = MIN(length, 0x8000);
 	UINT8 *rom = memory_region(machine, cputag);
-	UINT8 *decrypted = auto_malloc(0xc000);
+	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0xc000);
 
 	memory_set_decrypted_region(space, 0x0000, cryptlen - 1, decrypted);
 
@@ -462,7 +462,7 @@ void toprollr_decode(running_machine *machine, const char *cputag, const char *r
 	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, regiontag);
 	int bankstart;
-	decrypted = auto_malloc(0x6000*3);
+	decrypted = auto_alloc_array(machine, UINT8, 0x6000*3);
 
 
 	for(bankstart=0;bankstart<0x6000*3;bankstart+=0x6000)
@@ -819,7 +819,7 @@ void jongkyo_decode(running_machine *machine, const char *cputag)
 
 	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, cputag);
-	decrypted = auto_malloc(0x9000);
+	decrypted = auto_alloc_array(machine, UINT8, 0x9000);
 
 	for (A = 0x0000;A < 0x9000;A++)
 	{
@@ -1119,7 +1119,7 @@ static void sega_decode_2(running_machine *machine,const char *cputag,
 
 	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, cputag);
-	UINT8 *decrypted = auto_malloc(0x8000);
+	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x8000);
 
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypted);
 

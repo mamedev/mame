@@ -333,8 +333,7 @@ poly_manager *poly_alloc(running_machine *machine, int max_polys, size_t extra_d
 	poly_manager *poly;
 
 	/* allocate the manager itself */
-	poly = (poly_manager *)malloc_or_die(sizeof(*poly));
-	memset(poly, 0, sizeof(*poly));
+	poly = alloc_clear_or_die(poly_manager);
 	poly->flags = flags;
 
 	/* allocate polygons */
@@ -1314,12 +1313,10 @@ static void **allocate_array(size_t *itemsize, UINT32 itemcount)
 	*itemsize = ((*itemsize + CACHE_LINE_SIZE - 1) / CACHE_LINE_SIZE) * CACHE_LINE_SIZE;
 
 	/* allocate the array */
-	ptrarray = (void **)malloc_or_die(sizeof(*ptrarray) * itemcount);
-	memset(ptrarray, 0, sizeof(*ptrarray) * itemcount);
+	ptrarray = alloc_array_clear_or_die(void *, itemcount);
 
 	/* allocate the actual items */
-	ptrarray[0] = malloc_or_die(*itemsize * itemcount);
-	memset(ptrarray[0], 0, *itemsize * itemcount);
+	ptrarray[0] = alloc_array_clear_or_die(UINT8, *itemsize * itemcount);
 
 	/* initialize the pointer array */
 	for (itemnum = 1; itemnum < itemcount; itemnum++)

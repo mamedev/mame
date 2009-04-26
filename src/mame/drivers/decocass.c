@@ -1048,7 +1048,7 @@ static DRIVER_INIT( decocass )
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
-	decrypted = auto_malloc(0x10000);
+	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	memory_set_decrypted_region(space, 0x0000, 0xc7ff, &decrypted[0x0000]);
 	memory_set_decrypted_region(space, 0xd000, 0xdbff, &decrypted[0xd000]);
 	memory_set_decrypted_region(space, 0xf000, 0xffff, &decrypted[0xf000]);
@@ -1067,7 +1067,7 @@ static DRIVER_INIT( decocrom )
 {
 	int romlength = memory_region_length(machine, "user3");
 	UINT8 *rom = memory_region(machine, "user3");
-	UINT8 *decrypted2 = auto_malloc(romlength);
+	UINT8 *decrypted2 = auto_alloc_array(machine, UINT8, romlength);
 	int i;
 
 	/* standard init */
@@ -1078,7 +1078,7 @@ static DRIVER_INIT( decocrom )
 		decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, SMH_BANK1, decocass_de0091_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, (read8_space_func)SMH_BANK(1), decocass_de0091_w);
 	memory_configure_bank(machine, 1, 0, 1, decocass_charram, 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user3"), 0);
 	memory_configure_bank_decrypted(machine, 1, 0, 1, &decrypted[0x6000], 0);

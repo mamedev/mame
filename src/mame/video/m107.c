@@ -147,8 +147,7 @@ VIDEO_START( m107 )
 			tilemap_set_transparent_pen(layer->tmap, 0);
 	}
 
-	m107_spriteram = auto_malloc(0x1000);
-	memset(m107_spriteram,0,0x1000);
+	m107_spriteram = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 }
 
 /*****************************************************************************/

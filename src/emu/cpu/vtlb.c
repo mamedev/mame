@@ -60,8 +60,7 @@ vtlb_state *vtlb_alloc(const device_config *cpu, int space, int fixed_entries, i
 	vtlb_state *vtlb;
 
 	/* allocate memory for the core structure */
-	vtlb = (vtlb_state *)malloc_or_die(sizeof(*vtlb));
-	memset(vtlb, 0, sizeof(*vtlb));
+	vtlb = alloc_clear_or_die(vtlb_state);
 
 	/* fill in CPU information */
 	vtlb->device = cpu;
@@ -78,20 +77,17 @@ vtlb_state *vtlb_alloc(const device_config *cpu, int space, int fixed_entries, i
 	assert(vtlb->addrwidth > vtlb->pageshift);
 
 	/* allocate the entry array */
-	vtlb->live = (offs_t *)malloc_or_die(sizeof(vtlb->live[0]) * (fixed_entries + dynamic_entries));
-	memset(vtlb->live, 0, sizeof(vtlb->live[0]) * (fixed_entries + dynamic_entries));
+	vtlb->live = alloc_array_clear_or_die(offs_t, fixed_entries + dynamic_entries);
 	state_save_register_device_item_pointer(cpu, space, vtlb->live, fixed_entries + dynamic_entries);
 
 	/* allocate the lookup table */
-	vtlb->table = (vtlb_entry *)malloc_or_die(sizeof(vtlb->table[0]) << (vtlb->addrwidth - vtlb->pageshift));
-	memset(vtlb->table, 0, sizeof(vtlb->table[0]) << (vtlb->addrwidth - vtlb->pageshift));
+	vtlb->table = alloc_array_clear_or_die(vtlb_entry, 1 << (vtlb->addrwidth - vtlb->pageshift));
 	state_save_register_device_item_pointer(cpu, space, vtlb->table, 1 << (vtlb->addrwidth - vtlb->pageshift));
 
 	/* allocate the fixed page count array */
 	if (fixed_entries > 0)
 	{
-		vtlb->fixedpages = (int *)malloc_or_die(sizeof(vtlb->fixedpages[0]) * fixed_entries);
-		memset(vtlb->fixedpages, 0, sizeof(vtlb->fixedpages[0]) * fixed_entries);
+		vtlb->fixedpages = alloc_array_clear_or_die(int, fixed_entries);
 		state_save_register_device_item_pointer(cpu, space, vtlb->fixedpages, fixed_entries);
 	}
 	return vtlb;

@@ -455,7 +455,7 @@ static void k054539_init_chip(const device_config *device, k054539_state *info)
 	info->k054539_flags |= K054539_UPDATE_AT_KEYON; //* make it default until proven otherwise
 
 	// Real size of 0x4000, the addon is to simplify the reverb buffer computations
-	info->ram = (unsigned char *)auto_malloc(0x4000*2+device->clock/50*2);
+	info->ram = auto_alloc_array(device->machine, unsigned char, 0x4000*2+device->clock/50*2);
 	info->reverb_pos = 0;
 	info->cur_ptr = 0;
 	memset(info->ram, 0, 0x4000*2+device->clock/50*2);

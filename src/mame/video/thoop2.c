@@ -95,7 +95,7 @@ VIDEO_START( thoop2 )
 	tilemap_set_transmask(pant[1],0,0xff01,0x00ff); /* pens 1-7 opaque, pens 0, 8-15 transparent */
 
 	for (i = 0; i < 5; i++){
-		sprite_table[i] = auto_malloc(512*sizeof(int));
+		sprite_table[i] = auto_alloc_array(machine, int, 512);
 	}
 }
 

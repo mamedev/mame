@@ -59,14 +59,12 @@ VIDEO_START( pang )
 	/*
         OBJ RAM
     */
-	pang_objram=auto_malloc(pang_videoram_size);
-	memset(pang_objram, 0, pang_videoram_size);
+	pang_objram=auto_alloc_array_clear(machine, UINT8, pang_videoram_size);
 
 	/*
         Palette RAM
     */
-	paletteram = auto_malloc(2*machine->config->total_colors);
-	memset(paletteram, 0, 2*machine->config->total_colors);
+	paletteram = auto_alloc_array_clear(machine, UINT8, 2*machine->config->total_colors);
 }
 
 

@@ -1122,13 +1122,13 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 VIDEO_START( tx1 )
 {
 	/* Allocate a large bitmap that covers the three screens */
-	tx1_bitmap = auto_bitmap_alloc(768, 256, BITMAP_FORMAT_INDEXED16);
+	tx1_bitmap = auto_bitmap_alloc(machine, 768, 256, BITMAP_FORMAT_INDEXED16);
 	tx1_texture = render_texture_alloc(NULL, NULL);
 
 	/* Allocate some bitmaps */
-	tx1_chr_bmp = auto_malloc(sizeof(UINT8) * 256 * 3 * 240);
-	tx1_obj_bmp = auto_malloc(sizeof(UINT8) * 256 * 3 * 240);
-	tx1_rod_bmp = auto_malloc(sizeof(UINT8) * 256 * 3 * 240);
+	tx1_chr_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
+	tx1_obj_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
+	tx1_rod_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);
 
 	/* Set a timer to run the interrupts */
 	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
@@ -3045,9 +3045,9 @@ static void bb_combine_layers(running_machine *machine, bitmap_t *bitmap, int sc
 VIDEO_START( buggyboy )
 {
 	/* Allocate some bitmaps */
-	bb_chr_bmp = auto_malloc(sizeof(UINT8) * 3 * 256 * 240);
-	bb_obj_bmp = auto_malloc(sizeof(UINT8) * 3 * 256 * 240);
-	bb_rod_bmp = auto_malloc(sizeof(UINT8) * 3 * 256 * 240);
+	bb_chr_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
+	bb_obj_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
+	bb_rod_bmp = auto_alloc_array(machine, UINT8, 3 * 256 * 240);
 
 	/* Set a timer to run the interrupts */
 	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
@@ -3059,9 +3059,9 @@ VIDEO_START( buggyboy )
 VIDEO_START( buggybjr )
 {
 	/* Allocate some bitmaps */
-	bb_chr_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
-	bb_obj_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
-	bb_rod_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
+	bb_chr_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
+	bb_obj_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
+	bb_rod_bmp = auto_alloc_array(machine, UINT8, 256 * 240);
 
 	/* Set a timer to run the interrupts */
 	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);

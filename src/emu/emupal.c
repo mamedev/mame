@@ -95,7 +95,7 @@ static void configure_rgb_shadows(running_machine *machine, int mode, float fact
 
 void palette_init(running_machine *machine)
 {
-	palette_private *palette = (palette_private *)auto_malloc(sizeof(*palette));
+	palette_private *palette = auto_alloc_clear(machine, palette_private);
 	const device_config *device = video_screen_first(machine->config);
 	bitmap_format format;
 
@@ -113,7 +113,6 @@ void palette_init(running_machine *machine)
 	add_exit_callback(machine, palette_exit);
 
 	/* reset all our data */
-	memset(palette, 0, sizeof(*palette));
 	palette->format = format;
 
 	/* determine the color mode */
@@ -146,8 +145,8 @@ void palette_init(running_machine *machine)
 
 		/* set up save/restore of the palette */
 		numcolors = palette_get_num_colors(machine->palette);
-		palette->save_pen = (pen_t *)auto_malloc(sizeof(*palette->save_pen) * numcolors);
-		palette->save_bright = (float *)auto_malloc(sizeof(*palette->save_bright) * numcolors);
+		palette->save_pen = auto_alloc_array(machine, pen_t, numcolors);
+		palette->save_bright = auto_alloc_array(machine, float, numcolors);
 		state_save_register_global_pointer(machine, palette->save_pen, numcolors);
 		state_save_register_global_pointer(machine, palette->save_bright, numcolors);
 		state_save_register_presave(machine, palette_presave, palette);
@@ -330,8 +329,7 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 	assert(palettesize > 0);
 
 	/* allocate the colortable */
-	ctable = (colortable_t *)auto_malloc(sizeof(*ctable));
-	memset(ctable, 0, sizeof(*ctable));
+	ctable = auto_alloc_clear(machine, colortable_t);
 
 	/* fill in the basics */
 	ctable->machine = machine;
@@ -339,13 +337,13 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 	ctable->palentries = palettesize;
 
 	/* allocate the raw colortable */
-	ctable->raw = (UINT16 *)auto_malloc(ctable->entries * sizeof(*ctable->raw));
+	ctable->raw = auto_alloc_array(machine, UINT16, ctable->entries);
 	for (index = 0; index < ctable->entries; index++)
 		ctable->raw[index] = index % ctable->palentries;
 	state_save_register_global_pointer(machine, ctable->raw, ctable->entries);
 
 	/* allocate the palette */
-	ctable->palette = (rgb_t *)auto_malloc(ctable->palentries * sizeof(*ctable->palette));
+	ctable->palette = auto_alloc_array(machine, rgb_t, ctable->palentries);
 	for (index = 0; index < ctable->palentries; index++)
 		ctable->palette[index] = MAKE_ARGB(0x80,0xff,0xff,0xff);
 	state_save_register_global_pointer(machine, ctable->palette, ctable->palentries);
@@ -660,7 +658,7 @@ static void allocate_color_tables(running_machine *machine, palette_private *pal
 	{
 		case BITMAP_FORMAT_INDEXED16:
 			/* create a dummy 1:1 mapping */
-			machine->pens = pentable = (pen_t *)auto_malloc((total_colors + 2) * sizeof(machine->pens[0]));
+			machine->pens = pentable = auto_alloc_array(machine, pen_t, total_colors + 2);
 			for (i = 0; i < total_colors + 2; i++)
 				pentable[i] = i;
 			break;
@@ -690,7 +688,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 	/* if we have shadows, allocate shadow tables */
 	if (machine->config->video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		pen_t *table = (pen_t *)auto_malloc(65536 * sizeof(*table));
+		pen_t *table = auto_alloc_array(machine, pen_t, 65536);
 		int i;
 
 		/* palettized mode gets a single 64k table in slots 0 and 2 */
@@ -713,7 +711,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 	/* if we have hilights, allocate shadow tables */
 	if (machine->config->video_attributes & VIDEO_HAS_HIGHLIGHTS)
 	{
-		pen_t *table = (pen_t *)auto_malloc(65536 * sizeof(*table));
+		pen_t *table = auto_alloc_array(machine, pen_t, 65536);
 		int i;
 
 		/* palettized mode gets a single 64k table in slots 1 and 3 */

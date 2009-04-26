@@ -206,21 +206,19 @@ static TILE_GET_INFO( get_tile_info_bigfight_1 )
 VIDEO_START( apache3 )
 {
 	tx_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,64,64);
-	shadow_pen_array = auto_malloc(8192);
-	temp_bitmap = auto_bitmap_alloc(512, 512, BITMAP_FORMAT_RGB32);
-	apache3_road_x_ram = auto_malloc(512 * sizeof(UINT16));
+	shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
+	temp_bitmap = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_RGB32);
+	apache3_road_x_ram = auto_alloc_array(machine, UINT8, 512);
 
-	memset(shadow_pen_array, 0, 8192);
 	tilemap_set_transparent_pen(tx_layer,0);
 }
 
 VIDEO_START( roundup5 )
 {
 	tx_layer = tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,8,8,128,64);
-	shadow_pen_array = auto_malloc(8192);
-	roundup5_vram = auto_malloc(0x48000 * 4);
+	shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
+	roundup5_vram = auto_alloc_array(machine, UINT16, (0x48000 * 4)/2);
 
-	memset(shadow_pen_array, 0, 8192);
 	tilemap_set_transparent_pen(tx_layer,0);
 
 	gfx_element_set_source(machine->gfx[1], (UINT8 *)roundup5_vram);
@@ -234,8 +232,7 @@ VIDEO_START( cyclwarr )
 	layer2 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,64,512);
 	layer3 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,64,512);
 
-	shadow_pen_array = auto_malloc(8192);
-	memset(shadow_pen_array, 0, 8192);
+	shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
 }
 
 VIDEO_START( bigfight )
@@ -245,8 +242,7 @@ VIDEO_START( bigfight )
 	layer2 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,128,256);
 	layer3 = tilemap_create(machine, get_tile_info_bigfight_1,tilemap_scan_rows,8,8,128,256);
 
-	shadow_pen_array = auto_malloc(8192);
-	memset(shadow_pen_array, 0, 8192);
+	shadow_pen_array = auto_alloc_array_clear(machine, UINT8, 8192);
 }
 
 /********************************************************************/

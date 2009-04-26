@@ -1454,7 +1454,7 @@ VIDEO_START(dc)
 	timer_adjust_oneshot(endofrender_timer_tsp, attotime_never, 0);
 	timer_adjust_oneshot(endofrender_timer_video, attotime_never, 0);
 
-	fakeframebuffer_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_RGB32);
+	fakeframebuffer_bitmap = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_RGB32);
 
 }
 

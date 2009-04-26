@@ -393,7 +393,7 @@ static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 
 static ADDRESS_MAP_START( ps4_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_READ(SMH_ROM)	// program ROM (1 meg)
-	AM_RANGE(0x02000000, 0x021fffff) AM_READ(SMH_BANK1) // data ROM
+	AM_RANGE(0x02000000, 0x021fffff) AM_READ(SMH_BANK(1)) // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_READ(ps4_eeprom_r)
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( ps4_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 
 #if ROMTEST
 	AM_RANGE(0x05000004, 0x05000007) AM_READ(ps4_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x03006000, 0x03007fff) AM_READ(SMH_BANK2) // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x03006000, 0x03007fff) AM_READ(SMH_BANK(2)) // data for rom tests (gfx), data is controlled by vidreg
 #endif
 ADDRESS_MAP_END
 

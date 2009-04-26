@@ -339,14 +339,10 @@ static VIDEO_START(rabbit)
 {
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
-	rabbit_tilemap_ram[0] = auto_malloc(0x20000);
-	rabbit_tilemap_ram[1] = auto_malloc(0x20000);
-	rabbit_tilemap_ram[2] = auto_malloc(0x20000);
-	rabbit_tilemap_ram[3] = auto_malloc(0x20000);
-	memset(rabbit_tilemap_ram[0], 0, 0x20000);
-	memset(rabbit_tilemap_ram[1], 0, 0x20000);
-	memset(rabbit_tilemap_ram[2], 0, 0x20000);
-	memset(rabbit_tilemap_ram[3], 0, 0x20000);
+	rabbit_tilemap_ram[0] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
+	rabbit_tilemap_ram[1] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
+	rabbit_tilemap_ram[2] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
+	rabbit_tilemap_ram[3] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
 
 	rabbit_tilemap[0] = tilemap_create(machine, get_rabbit_tilemap0_tile_info,tilemap_scan_rows,16, 16, 128,32);
 	rabbit_tilemap[1] = tilemap_create(machine, get_rabbit_tilemap1_tile_info,tilemap_scan_rows,16, 16, 128,32);
@@ -356,7 +352,7 @@ static VIDEO_START(rabbit)
 	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[3],0x0);
-	rabbit_sprite_bitmap = auto_bitmap_alloc(0x1000,0x1000,video_screen_get_format(machine->primary_screen));
+	rabbit_sprite_bitmap = auto_bitmap_alloc(machine,0x1000,0x1000,video_screen_get_format(machine->primary_screen));
 	rabbit_sprite_clip.min_x = 0;
 	rabbit_sprite_clip.max_x = 0x1000-1;
 	rabbit_sprite_clip.min_y = 0;
@@ -489,7 +485,7 @@ static ADDRESS_MAP_START( rabbit_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x400010, 0x400013) AM_READ(randomrabbits) // gfx chip status?
 	AM_RANGE(0x400980, 0x400983) AM_READ(randomrabbits) // sound chip status?
 	AM_RANGE(0x400984, 0x400987) AM_READ(randomrabbits) // sound chip status?
-	AM_RANGE(0x440000, 0x47ffff) AM_READ(SMH_BANK1) // roms read from here during testing
+	AM_RANGE(0x440000, 0x47ffff) AM_READ(SMH_BANK(1)) // roms read from here during testing
 	/* tilemaps */
 	AM_RANGE(0x480000, 0x483fff) AM_READ(rabbit_tilemap0_r)
 	AM_RANGE(0x484000, 0x487fff) AM_READ(rabbit_tilemap1_r)
@@ -1108,14 +1104,10 @@ static VIDEO_START(tmmjprd)
 
 	/* the tilemaps are bigger than the regions the cpu can see, need to allocate the ram here */
 	/* or maybe not for this game/hw .... */
-	rabbit_tilemap_ram[0] = auto_malloc(0x20000);
-	rabbit_tilemap_ram[1] = auto_malloc(0x20000);
-	rabbit_tilemap_ram[2] = auto_malloc(0x20000);
-	rabbit_tilemap_ram[3] = auto_malloc(0x20000);
-	memset(rabbit_tilemap_ram[0], 0, 0x20000);
-	memset(rabbit_tilemap_ram[1], 0, 0x20000);
-	memset(rabbit_tilemap_ram[2], 0, 0x20000);
-	memset(rabbit_tilemap_ram[3], 0, 0x20000);
+	rabbit_tilemap_ram[0] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
+	rabbit_tilemap_ram[1] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
+	rabbit_tilemap_ram[2] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
+	rabbit_tilemap_ram[3] = auto_alloc_array_clear(machine, UINT32, 0x20000/4);
 
 	rabbit_tilemap[0] = tilemap_create(machine, get_tmmjprd_tilemap0_tile_info,tilemap_scan_rows, 8, 8, 64, 64);
 	rabbit_tilemap[1] = tilemap_create(machine, get_tmmjprd_tilemap1_tile_info,tilemap_scan_rows,16, 16, 64, 64);
@@ -1125,7 +1117,7 @@ static VIDEO_START(tmmjprd)
 	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[3],0x0);
-	rabbit_sprite_bitmap = auto_bitmap_alloc(0x1000,0x1000,video_screen_get_format(machine->primary_screen));
+	rabbit_sprite_bitmap = auto_bitmap_alloc(machine,0x1000,0x1000,video_screen_get_format(machine->primary_screen));
 	rabbit_sprite_clip.min_x = 0;
 	rabbit_sprite_clip.max_x = 0x1000-1;
 	rabbit_sprite_clip.min_y = 0;

@@ -101,17 +101,14 @@ VIDEO_START( bioship )
 {
 	bg_tilemap = tilemap_create(machine, macross_get_bg_tile_info,bg_scan,16,16,256,32);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
-	background_bitmap = auto_bitmap_alloc(8192,512,video_screen_get_format(machine->primary_screen));
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	background_bitmap = auto_bitmap_alloc(machine,8192,512,video_screen_get_format(machine->primary_screen));
 
 	tilemap_set_transparent_pen(bg_tilemap,15);
 	tilemap_set_transparent_pen(tx_tilemap,15);
 	bioship_background_bank=0;
 	redraw_bitmap = 1;
-
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
 
 	videoshift =  0;	/* 256x224 screen, no shift */
 }
@@ -121,14 +118,11 @@ VIDEO_START( strahl )
 	bg_tilemap = tilemap_create(machine, macross_get_bg_tile_info,bg_scan,16,16,256,32);
 	fg_tilemap = tilemap_create(machine, strahl_get_fg_tile_info, bg_scan,16,16,256,32);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(fg_tilemap,15);
 	tilemap_set_transparent_pen(tx_tilemap,15);
-
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
 
 	videoshift =  0;	/* 256x224 screen, no shift */
 	background_bitmap = NULL;
@@ -138,13 +132,10 @@ VIDEO_START( macross )
 {
 	bg_tilemap = tilemap_create(machine, macross_get_bg_tile_info,bg_scan,16,16,256,32);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
-
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
 
 	videoshift =  0;	/* 256x224 screen, no shift */
 	background_bitmap = NULL;
@@ -154,14 +145,11 @@ VIDEO_START( gunnail )
 {
 	bg_tilemap = tilemap_create(machine, macross_get_bg_tile_info,bg_scan,16,16,256,32);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 	tilemap_set_scroll_rows(bg_tilemap,512);
-
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
 
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
@@ -172,13 +160,10 @@ VIDEO_START( macross2 )
 {
 	bg_tilemap = tilemap_create(machine, macross_get_bg_tile_info,bg_scan,16,16,1024,128);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
-
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
 
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
@@ -189,13 +174,10 @@ VIDEO_START( tdragon2 )
 {
 	bg_tilemap = tilemap_create(machine, macross_get_bg_tile_info,bg_scan_td2,16,16,1024,32);
 	tx_tilemap = tilemap_create(machine, macross_get_tx_tile_info,tilemap_scan_cols,8,8,64,32);
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
-
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
 
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
@@ -205,11 +187,8 @@ VIDEO_START( tdragon2 )
 VIDEO_START( bjtwin )
 {
 	bg_tilemap = tilemap_create(machine, bjtwin_get_bg_tile_info,tilemap_scan_cols,8,8,64,32);
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
-
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	videoshift = 64;	/* 384x224 screen, leftmost 64 pixels have to be retrieved */
 						/* from the other side of the tilemap (!) */
@@ -838,11 +817,8 @@ WRITE16_HANDLER( afega_vram_1_w )
 
 VIDEO_START( afega )
 {
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
-
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	tilemap_0 = tilemap_create(	machine, get_tile_info_0_4bit, afega_tilemap_scan_pages,
 
@@ -860,10 +836,8 @@ VIDEO_START( afega )
 
 VIDEO_START( grdnstrm )
 {
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 
 	tilemap_0 = tilemap_create(	machine, get_tile_info_0_8bit, afega_tilemap_scan_pages,
@@ -882,10 +856,8 @@ VIDEO_START( grdnstrm )
 
 VIDEO_START( firehawk )
 {
-	spriteram_old = auto_malloc(0x1000);
-	spriteram_old2 = auto_malloc(0x1000);
-	memset(spriteram_old,0,0x1000);
-	memset(spriteram_old2,0,0x1000);
+	spriteram_old = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 
 	tilemap_0 = tilemap_create(	machine, get_tile_info_0_8bit, firehawk_tilemap_scan_pages,

@@ -435,9 +435,9 @@ void st0016_save_init(running_machine *machine)
 VIDEO_START( st0016 )
 {
 	int gfx_index=0;
-	st0016_charram=auto_malloc(ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	st0016_spriteram=auto_malloc(ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
-	st0016_paletteram=auto_malloc(ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
+	st0016_charram=auto_alloc_array(machine, UINT8, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	st0016_spriteram=auto_alloc_array(machine, UINT8, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
+	st0016_paletteram=auto_alloc_array(machine, UINT8, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
@@ -468,7 +468,7 @@ VIDEO_START( st0016 )
 		break;
 
 		case 3: //super eagle shot
-			speglsht_bitmap = auto_bitmap_alloc( 512, 5122, BITMAP_FORMAT_INDEXED16 );
+			speglsht_bitmap = auto_bitmap_alloc(machine, 512, 5122, BITMAP_FORMAT_INDEXED16 );
 		break;
 
 		case 4: //mayjinsen 1&2

@@ -25,8 +25,8 @@ static int vrambank=0;
 
 static VIDEO_START(laserbas)
 {
-	vram1=auto_malloc(0x8000);
-	vram2=auto_malloc(0x8000);
+	vram1=auto_alloc_array(machine, UINT8, 0x8000);
+	vram2=auto_alloc_array(machine, UINT8, 0x8000);
 }
 
 static VIDEO_UPDATE(laserbas)

@@ -262,7 +262,7 @@ VIDEO_START(n64)
 	if (LOG_RDP_EXECUTION)
 		rdp_exec = fopen("rdp_execute.txt", "wt");
 
-	texture_cache = auto_malloc(0x100000);
+	texture_cache = auto_alloc_array(machine, UINT8, 0x100000);
 
 	combiner_rgbsub_a_r[0] = combiner_rgbsub_a_r[1] = &one_color.r;
 	combiner_rgbsub_a_g[0] = combiner_rgbsub_a_g[1] = &one_color.g;

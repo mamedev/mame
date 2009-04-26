@@ -4298,8 +4298,8 @@ static ADDRESS_MAP_START( model3_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model3snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("samples", 0)
-	AM_RANGE(0xa00000, 0xdfffff) AM_READ(SMH_BANK4)
-	AM_RANGE(0xe00000, 0xffffff) AM_READ(SMH_BANK5)
+	AM_RANGE(0xa00000, 0xdfffff) AM_READ(SMH_BANK(4))
+	AM_RANGE(0xe00000, 0xffffff) AM_READ(SMH_BANK(5))
 ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
@@ -4533,7 +4533,7 @@ static void interleave_vroms(running_machine *machine)
 	int vrom_length = memory_region_length(machine, "user3");
 	UINT16 *vrom;
 
-	model3_vrom = auto_malloc(0x4000000);
+	model3_vrom = auto_alloc_array(machine, UINT32, 0x4000000/4);
 	vrom = (UINT16 *)model3_vrom;
 
 	if( vrom_length <= 0x1000000 ) {
@@ -4560,7 +4560,7 @@ static DRIVER_INIT( model3_10 )
 
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc0000000, 0xc00000ff, 0, 0, scsi_r, scsi_w );
 
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
@@ -4570,7 +4570,7 @@ static DRIVER_INIT( model3_10 )
 static DRIVER_INIT( model3_15 )
 {
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
@@ -4580,7 +4580,7 @@ static DRIVER_INIT( model3_15 )
 static DRIVER_INIT( model3_20 )
 {
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc2000000, 0xc20000ff, 0, 0, real3d_dma_r, real3d_dma_w );
 
@@ -4665,7 +4665,7 @@ static DRIVER_INIT( vs215 )
 	rom[(0x70e710^4)/4] = 0x60000000;
 
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
 
@@ -4684,7 +4684,7 @@ static DRIVER_INIT( vs29815 )
 	rom[(0x60290c^4)/4] = 0x60000000;
 
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
 
@@ -4703,7 +4703,7 @@ static DRIVER_INIT( bass )
 	rom[(0x7999c8^4)/4] = 0x60000000;
 
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
 
@@ -4717,7 +4717,7 @@ static DRIVER_INIT( bass )
 static DRIVER_INIT( getbass )
 {
 	interleave_vroms(machine);
-	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
+	memory_install_read64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, (read64_space_func)SMH_BANK(1) );
 
 	memory_install_readwrite64_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
 

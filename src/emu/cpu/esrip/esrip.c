@@ -260,13 +260,13 @@ static CPU_INIT( esrip )
 	cpustate->draw = _config->draw;
 
 	/* Allocate image pointer table RAM */
-	cpustate->ipt_ram = (UINT16 *)auto_malloc(IPT_RAM_SIZE);
+	cpustate->ipt_ram = auto_alloc_array(device->machine, UINT16, IPT_RAM_SIZE/2);
 
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* Create the instruction decode lookup table */
-	cpustate->optable = (UINT8 *)auto_malloc(65536);
+	cpustate->optable = auto_alloc_array(device->machine, UINT8, 65536);
 	make_ops(cpustate);
 
 	/* Register stuff for state saving */

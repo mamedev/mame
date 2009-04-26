@@ -2095,20 +2095,17 @@ static STATE_POSTLOAD( stv_vdp1_state_save_postload )
 
 int stv_vdp1_start ( running_machine *machine )
 {
-	stv_vdp1_regs = auto_malloc ( 0x040000 );
-	stv_vdp1_vram = auto_malloc ( 0x100000 );
-	stv_vdp1_gfx_decode = auto_malloc( 0x100000 );
+	stv_vdp1_regs = auto_alloc_array_clear(machine, UINT32, 0x040000/4 );
+	stv_vdp1_vram = auto_alloc_array_clear(machine, UINT32, 0x100000/4 );
+	stv_vdp1_gfx_decode = auto_alloc_array(machine, UINT8, 0x100000 );
 
-	stv_vdp1_shading_data = auto_malloc( sizeof(struct stv_vdp1_poly_scanline_data) );
+	stv_vdp1_shading_data = auto_alloc(machine, struct stv_vdp1_poly_scanline_data);
 
-	memset(stv_vdp1_regs, 0, 0x040000);
-	memset(stv_vdp1_vram, 0, 0x100000);
+	stv_framebuffer[0] = auto_alloc_array(machine, UINT16, 1024 * 256 * 2 ); /* *2 is for double interlace */
+	stv_framebuffer[1] = auto_alloc_array(machine, UINT16, 1024 * 256 * 2 );
 
-	stv_framebuffer[0] = auto_malloc( 1024 * 256 * sizeof(UINT16) * 2 ); /* *2 is for double interlace */
-	stv_framebuffer[1] = auto_malloc( 1024 * 256 * sizeof(UINT16) * 2 );
-
-	stv_framebuffer_display_lines = auto_malloc( 512 * sizeof(UINT16*) );
-	stv_framebuffer_draw_lines = auto_malloc( 512 * sizeof(UINT16*) );
+	stv_framebuffer_display_lines = auto_alloc_array(machine, UINT16 *, 512);
+	stv_framebuffer_draw_lines = auto_alloc_array(machine, UINT16 *, 512);
 
 	stv_framebuffer_width = stv_framebuffer_height = 0;
 	stv_framebuffer_mode = -1;

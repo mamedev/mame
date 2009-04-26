@@ -1557,7 +1557,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < dynamic_count; addr++)
-		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, (read32_space_func)SMH_UNMAP, (write32_space_func)SMH_UNMAP);
 
 	/* the build the list of stuff */
 	dynamic_count = 0;
@@ -2469,7 +2469,7 @@ static void init_common(running_machine *machine, int ioasic, int serialnum)
 
 	/* allocate RAM for the timekeeper */
 	timekeeper_nvram_size = 0x8000;
-	timekeeper_nvram = auto_malloc(timekeeper_nvram_size);
+	timekeeper_nvram = auto_alloc_array(machine, UINT32, timekeeper_nvram_size/4);
 }
 
 

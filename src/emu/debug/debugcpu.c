@@ -158,8 +158,7 @@ void debug_cpu_init(running_machine *machine)
 	int regnum;
 
 	/* allocate and reset globals */
-	machine->debugcpu_data = global = (debugcpu_private *)auto_malloc(sizeof(*global));
-	memset(global, 0, sizeof(*global));
+	machine->debugcpu_data = global = auto_alloc_clear(machine, debugcpu_private);
 	global->execution_state = EXECUTION_STATE_STOPPED;
 	global->bpindex = 1;
 	global->wpindex = 1;
@@ -190,8 +189,7 @@ void debug_cpu_init(running_machine *machine)
 		cpu_debug_data *info;
 
 		/* allocate some information */
-		info = (cpu_debug_data *)auto_malloc(sizeof(*info));
-		memset(info, 0, sizeof(*info));
+		info = auto_alloc_clear(machine, cpu_debug_data);
 		classheader->debug = info;
 
 		/* reset the PC data */
@@ -983,7 +981,7 @@ int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed
 	assert_always(device != NULL, "debug_cpu_breakpoint_set() called with invalid cpu!");
 
 	/* allocate breakpoint */
-	bp = (debug_cpu_breakpoint *)malloc_or_die(sizeof(*bp));
+	bp = alloc_or_die(debug_cpu_breakpoint);
 	bp->index = global->bpindex++;
 	bp->enabled = TRUE;
 	bp->address = address;
@@ -991,7 +989,7 @@ int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed
 	bp->action = NULL;
 	if (action != NULL)
 	{
-		bp->action = (char *)malloc_or_die(strlen(action) + 1);
+		bp->action = alloc_array_or_die(char, strlen(action) + 1);
 		strcpy(bp->action, action);
 	}
 
@@ -1087,7 +1085,7 @@ int debug_cpu_watchpoint_set(const address_space *space, int type, offs_t addres
 {
 	debugcpu_private *global = space->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(space->cpu);
-	debug_cpu_watchpoint *wp = (debug_cpu_watchpoint *)malloc_or_die(sizeof(*wp));
+	debug_cpu_watchpoint *wp = alloc_or_die(debug_cpu_watchpoint);
 
 	/* fill in the structure */
 	wp->index = global->wpindex++;
@@ -1099,7 +1097,7 @@ int debug_cpu_watchpoint_set(const address_space *space, int type, offs_t addres
 	wp->action = NULL;
 	if (action != NULL)
 	{
-		wp->action = (char *)malloc_or_die(strlen(action) + 1);
+		wp->action = alloc_array_or_die(char, strlen(action) + 1);
 		strcpy(wp->action, action);
 	}
 
@@ -1245,7 +1243,7 @@ void debug_cpu_trace(const device_config *device, FILE *file, int trace_over, co
 	info->trace.trace_over_target = ~0;
 	if (action != NULL)
 	{
-		info->trace.action = (char *)malloc_or_die(strlen(action) + 1);
+		info->trace.action = alloc_array_or_die(char, strlen(action) + 1);
 		strcpy(info->trace.action, action);
 	}
 
@@ -1313,7 +1311,7 @@ int debug_cpu_hotspot_track(const device_config *device, int numspots, int thres
 	if (numspots > 0)
 	{
 		/* allocate memory for hotspots */
-		info->hotspots = (debug_hotspot_entry *)malloc_or_die(sizeof(*info->hotspots) * numspots);
+		info->hotspots = alloc_array_or_die(debug_hotspot_entry, numspots);
 		memset(info->hotspots, 0xff, sizeof(*info->hotspots) * numspots);
 
 		/* fill in the info */

@@ -659,7 +659,7 @@ static DEVICE_START( ymz280b )
 	chip->stream = stream_create(device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
 
 	/* allocate memory */
-	chip->scratch = (INT16 *)auto_malloc(sizeof(chip->scratch[0]) * MAX_SAMPLE_CHUNK);
+	chip->scratch = auto_alloc_array(device->machine, INT16, MAX_SAMPLE_CHUNK);
 
 	/* state save */
 	{

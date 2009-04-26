@@ -198,17 +198,19 @@ static CUSTOM_INPUT( lightgun_holster_r )
 
 static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 {
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	
 	/* switch banks as appropriate */
 	memory_set_bank(device->machine, 1, data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
+		memory_install_write16_handler(space, 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_BANK(1));
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
+		memory_install_write16_handler(space, 0x000000, 0x07ffff, 0, 0, (write16_space_func)SMH_UNMAP);
 }
 
 
@@ -683,7 +685,7 @@ static DRIVER_INIT( palr1 )
 {
 	UINT32 length = memory_region_length(machine, "user2");
 	UINT8 *rom = memory_region(machine, "user2");
-	UINT8 *original = malloc_or_die(length);
+	UINT8 *original = alloc_array_or_die(UINT8, length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -703,7 +705,7 @@ static DRIVER_INIT( palr3 )
 {
 	UINT32 length = memory_region_length(machine, "user2");
 	UINT8 *rom = memory_region(machine, "user2");
-	UINT8 *original = malloc_or_die(length);
+	UINT8 *original = alloc_array_or_die(UINT8, length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -722,7 +724,7 @@ static DRIVER_INIT( palr6 )
 {
 	UINT32 length = memory_region_length(machine, "user2");
 	UINT8 *rom = memory_region(machine, "user2");
-	UINT8 *original = malloc_or_die(length);
+	UINT8 *original = alloc_array_or_die(UINT8, length);
 	UINT32 srcaddr;
 
 	memcpy(original, rom, length);
@@ -743,7 +745,7 @@ static DRIVER_INIT( aplatoon )
 {
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
 	UINT8 *rom = memory_region(machine, "user2");
-	char *decrypted = auto_malloc(0x40000);
+	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x40000);
 	int i;
 
 	static const int shuffle[] =

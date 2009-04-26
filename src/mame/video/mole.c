@@ -29,7 +29,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( mole )
 {
-	tileram = (UINT16 *)auto_malloc(0x400 * sizeof(UINT16));
+	tileram = auto_alloc_array(machine, UINT16, 0x400);
 
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
 }

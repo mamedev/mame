@@ -180,8 +180,7 @@ ADDRESS_MAP_END
 
 static VIDEO_START(roul)
 {
-	videobuf = auto_malloc(VIDEOBUF_SIZE * sizeof(*videobuf));
-	memset(videobuf, 0, VIDEOBUF_SIZE * sizeof(*videobuf));
+	videobuf = auto_alloc_array_clear(machine, UINT8, VIDEOBUF_SIZE);
 }
 
 static VIDEO_UPDATE(roul)

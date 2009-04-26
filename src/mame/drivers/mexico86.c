@@ -77,7 +77,7 @@ static WRITE8_HANDLER( shared_w )
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)  /* banked roms */
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))  /* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_READ(shared_r)   /* shared with sound cpu */
 	AM_RANGE(0xe800, 0xe8ff) AM_READ(SMH_RAM)    /* protection ram */
 	AM_RANGE(0xe900, 0xefff) AM_READ(SMH_RAM)

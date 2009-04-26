@@ -240,7 +240,7 @@ INTERRUPT_GEN( bfm_dm01_vbl )
 
 VIDEO_START( bfm_dm01 )
 {
-	dm_bitmap = auto_bitmap_alloc(DM_BYTESPERROW*8, DM_MAXLINES,video_screen_get_format(machine->primary_screen));
+	dm_bitmap = auto_bitmap_alloc(machine, DM_BYTESPERROW*8, DM_MAXLINES,video_screen_get_format(machine->primary_screen));
 }
 
 ///////////////////////////////////////////////////////////////////////////

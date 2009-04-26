@@ -78,7 +78,7 @@ VIDEO_START( harddriv )
 	gfx_palettebank = 0;
 
 	/* allocate the mask table */
-	mask_table = auto_malloc(sizeof(UINT32) * 4 * 65536);
+	mask_table = auto_alloc_array(machine, UINT32, 4 * 65536);
 
 	/* fill in the mask table */
 	destmask = mask_table;

@@ -48,7 +48,7 @@ VIDEO_START( policetr )
 	srcbitmap_height_mask = (memory_region_length(machine, "gfx1") / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	dstbitmap = auto_malloc(DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
+	dstbitmap = auto_alloc_array(machine, UINT8, DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
 }
 
 

@@ -274,9 +274,9 @@ VIDEO_START( tia )
 	int cx = video_screen_get_width(machine->primary_screen);
 
 	screen_height = video_screen_get_height(machine->primary_screen);
-	helper[0] = auto_bitmap_alloc(cx, TIA_MAX_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
-	helper[1] = auto_bitmap_alloc(cx, TIA_MAX_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
-	helper[2] = auto_bitmap_alloc(cx, TIA_MAX_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
+	helper[0] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
+	helper[1] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
+	helper[2] = auto_bitmap_alloc(machine, cx, TIA_MAX_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
 }
 
 

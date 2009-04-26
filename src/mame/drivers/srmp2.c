@@ -564,7 +564,7 @@ static WRITE8_HANDLER( srmp3_flags_w )
 
 static ADDRESS_MAP_START( srmp3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK1)						/* rom bank */
+	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK(1))						/* rom bank */
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)						/* work ram */
 	AM_RANGE(0xb000, 0xb303) AM_READ(SMH_RAM)						/* Sprites Y */
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)						/* Sprites Code + X + Attr */

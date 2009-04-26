@@ -30,8 +30,8 @@ static TIMER_CALLBACK( changela_scanline_callback );
 
 VIDEO_START( changela )
 {
-	memory_devices = auto_malloc(4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
-	tree_ram = auto_malloc(2 * 0x20);
+	memory_devices = auto_alloc_array(machine, UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
+	tree_ram = auto_alloc_array(machine, UINT8, 2 * 0x20);
 
 	obj0_bitmap  = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	river_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);

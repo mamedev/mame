@@ -61,8 +61,8 @@ VIDEO_START( quizdna )
 	quizdna_bg_xscroll[0] = 0;
 	quizdna_bg_xscroll[1] = 0;
 
-	quizdna_bg_ram = auto_malloc(0x2000);
-	quizdna_fg_ram = auto_malloc(0x1000);
+	quizdna_bg_ram = auto_alloc_array(machine, UINT8, 0x2000);
+	quizdna_fg_ram = auto_alloc_array(machine, UINT8, 0x1000);
 
 	quizdna_bg_tilemap = tilemap_create( machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32 );
 	quizdna_fg_tilemap = tilemap_create( machine, get_fg_tile_info,tilemap_scan_rows,16,8,32,32 );

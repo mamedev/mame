@@ -581,7 +581,7 @@ static DRIVER_INIT(kinstb)
 		rom[i]=BITSWAP8(rom[i],5,0,6,1,7,4,3,2);
 	}
 
-	shared_ram=auto_malloc(0x100);
+	shared_ram=auto_alloc_array(machine, INT8, 0x100);
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
 
 	DRIVER_INIT_CALL(snes_hirom);

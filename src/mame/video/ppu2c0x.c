@@ -315,17 +315,13 @@ static DEVICE_START( ppu2c0x )
 	chip->scan_scale = 1;
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
-	chip->bitmap = auto_bitmap_alloc( VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, video_screen_get_format(device->machine->primary_screen));
-	chip->videomem = auto_malloc( VIDEOMEM_SIZE );
-	chip->videoram = auto_malloc( VIDEOMEM_SIZE );
-	chip->spriteram = auto_malloc( SPRITERAM_SIZE );
-	chip->colortable = auto_malloc( sizeof( default_colortable ) );
-	chip->colortable_mono = auto_malloc( sizeof( default_colortable_mono ) );
+	chip->bitmap = auto_bitmap_alloc(device->machine, VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, video_screen_get_format(device->machine->primary_screen));
+	chip->videomem = auto_alloc_array_clear(device->machine, UINT8, VIDEOMEM_SIZE );
+	chip->videoram = auto_alloc_array_clear(device->machine, UINT8, VIDEOMEM_SIZE );
+	chip->spriteram = auto_alloc_array_clear(device->machine, UINT8, SPRITERAM_SIZE );
+	chip->colortable = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH( default_colortable ) );
+	chip->colortable_mono = auto_alloc_array(device->machine, pen_t, ARRAY_LENGTH( default_colortable_mono ) );
 
-	/* clear videomem & spriteram */
-	memset( chip->videomem, 0, VIDEOMEM_SIZE );
-	memset( chip->videoram, 0, VIDEOMEM_SIZE );
-	memset( chip->spriteram, 0, SPRITERAM_SIZE );
 	memset( chip->videoram_banks_indices, 0xff, sizeof(chip->videoram_banks_indices) );
 
 	if ( intf->vram_enabled )

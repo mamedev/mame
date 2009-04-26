@@ -417,11 +417,11 @@ static int K037122_vh_start(running_machine *machine, int chip)
 	if(K037122_gfx_index[chip] == MAX_GFX_ELEMENTS)
 		return 1;
 
-	K037122_char_ram[chip] = auto_malloc(0x200000);
+	K037122_char_ram[chip] = auto_alloc_array(machine, UINT32, 0x200000/4);
 
-	K037122_tile_ram[chip] = auto_malloc(0x20000);
+	K037122_tile_ram[chip] = auto_alloc_array(machine, UINT32, 0x20000/4);
 
-	K037122_reg[chip] = auto_malloc(0x400);
+	K037122_reg[chip] = auto_alloc_array(machine, UINT32, 0x400/4);
 
 	if (chip == 0)
 	{
@@ -965,8 +965,7 @@ static const sharc_config sharc_cfg =
 static MACHINE_START( hornet )
 {
 	jvs_sdata_ptr = 0;
-	jvs_sdata = auto_malloc(1024);
-	memset(jvs_sdata, 0, 1024);
+	jvs_sdata = auto_alloc_array_clear(machine, UINT8, 1024);
 
 	/* set conservative DRC options */
 	ppcdrc_set_options(machine->cpu[0], PPCDRC_COMPATIBLE_OPTIONS);

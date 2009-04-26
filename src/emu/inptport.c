@@ -630,8 +630,7 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 	time_t basetime;
 
 	/* allocate memory for our data structure */
-	machine->input_port_data = (input_port_private *)auto_malloc(sizeof(*machine->input_port_data));
-	memset(machine->input_port_data, 0, sizeof(*machine->input_port_data));
+	machine->input_port_data = auto_alloc_clear(machine, input_port_private);
 	portdata = machine->input_port_data;
 
 	/* add an exit callback and a frame callback */
@@ -1506,8 +1505,7 @@ static void init_port_types(running_machine *machine)
 	for (typenum = 0; typenum < ARRAY_LENGTH(core_types); typenum++)
 	{
 		/* allocate memory for the state and link it to the end of the list */
-		*stateptr = (input_type_state *)auto_malloc(sizeof(**stateptr));
-		memset(*stateptr, 0, sizeof(**stateptr));
+		*stateptr = auto_alloc_clear(machine, input_type_state);
 
 		/* copy the type description and link the previous description to it */
 		(*stateptr)->typedesc = core_types[typenum];
@@ -1556,8 +1554,7 @@ static void init_port_state(running_machine *machine)
 		input_port_state *portstate;
 
 		/* allocate a new input_port_info structure */
-		portstate = (input_port_state *)auto_malloc(sizeof(*portstate));
-		memset(portstate, 0, sizeof(*portstate));
+		portstate = auto_alloc_clear(machine, input_port_state);
 		((input_port_config *)port)->state = portstate;
 		((input_port_config *)port)->machine = machine;
 
@@ -1573,8 +1570,7 @@ static void init_port_state(running_machine *machine)
 			int seqtype;
 
 			/* allocate a new input_field_info structure */
-			fieldstate = (input_field_state *)auto_malloc(sizeof(*fieldstate));
-			memset(fieldstate, 0, sizeof(*fieldstate));
+			fieldstate = auto_alloc_clear(machine, input_field_state);
 			((input_field_config *)field)->state = fieldstate;
 
 			/* fill in the basic values */
@@ -1619,7 +1615,7 @@ static void init_port_state(running_machine *machine)
 				astring *name = mess_get_keyboard_key_name(field);
 				if (name != NULL)
 				{
-					field->state->name = auto_strdup(astring_c(name));
+					field->state->name = auto_strdup(machine, astring_c(name));
 					astring_free(name);
 				}
 			}
@@ -1720,8 +1716,7 @@ static callback_field_info *init_field_callback_info(const input_field_config *f
 	input_port_value mask;
 
 	/* allocate memory */
-	info = (callback_field_info *)auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	info = auto_alloc_clear(field->port->machine, callback_field_info);
 
 	/* fill in the data */
 	info->field = field;
@@ -1743,8 +1738,7 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 	input_port_value mask;
 
 	/* allocate memory */
-	state = (analog_field_state *)auto_malloc(sizeof(*state));
-	memset(state, 0, sizeof(*state));
+	state = auto_alloc_clear(field->port->machine, analog_field_state);
 
 	/* compute the shift amount and number of bits */
 	for (mask = field->mask; !(mask & 1); mask >>= 1)
@@ -2958,8 +2952,7 @@ static input_port_config *port_config_alloc(const input_port_config **listhead)
 	input_port_config *config;
 
 	/* allocate memory */
-	config = (input_port_config *)malloc_or_die(sizeof(*config));
-	memset(config, 0, sizeof(*config));
+	config = alloc_clear_or_die(input_port_config);
 
 	/* add it to the tail */
 	for (tailptr = listhead; *tailptr != NULL; tailptr = &(*tailptr)->next) ;
@@ -3020,8 +3013,7 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 	int seqtype;
 
 	/* allocate memory */
-	config = (input_field_config *)malloc_or_die(sizeof(*config));
-	memset(config, 0, sizeof(*config));
+	config = alloc_clear_or_die(input_field_config);
 
 	/* fill in the basic field values */
 	config->port = port;
@@ -3128,8 +3120,7 @@ static input_setting_config *setting_config_alloc(input_field_config *field, inp
 	input_setting_config *config;
 
 	/* allocate memory */
-	config = (input_setting_config *)malloc_or_die(sizeof(*config));
-	memset(config, 0, sizeof(*config));
+	config = alloc_clear_or_die(input_setting_config);
 
 	/* fill in the basic setting values */
 	config->field = field;
@@ -3188,8 +3179,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		const char *comma, *colon, *number;
 
 		/* allocate a new entry */
-		*tailptr = (input_field_diplocation *)malloc_or_die(sizeof(**tailptr));
-		memset(*tailptr, 0, sizeof(**tailptr));
+		*tailptr = alloc_clear_or_die(input_field_diplocation);
 		entries++;
 
 		/* find the end of this entry */
@@ -3208,7 +3198,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		/* allocate and copy the name if it is present */
 		if (colon != NULL)
 		{
-			(*tailptr)->swname = lastname = (char *)malloc_or_die(colon - tempbuf + 1);
+			(*tailptr)->swname = lastname = alloc_array_or_die(char, colon - tempbuf + 1);
 			strncpy(lastname, tempbuf, colon - tempbuf);
 			lastname[colon - tempbuf] = 0;
 			number = colon + 1;
@@ -3223,7 +3213,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 				error_buf_append(errorbuf, errorbuflen, "Switch location '%s' missing switch name!\n", location);
 				lastname = (char *)"UNK";
 			}
-			(*tailptr)->swname = namecopy = (char *)malloc_or_die(strlen(lastname) + 1);
+			(*tailptr)->swname = namecopy = alloc_array_or_die(char, strlen(lastname) + 1);
 			strcpy(namecopy, lastname);
 		}
 
@@ -3455,8 +3445,8 @@ static void load_remap_table(running_machine *machine, xml_data_node *parentnode
 		int remapnum;
 
 		/* allocate tables */
-		oldtable = (input_code *)malloc_or_die(count * sizeof(*oldtable));
-		newtable = (input_code *)malloc_or_die(count * sizeof(*newtable));
+		oldtable = alloc_array_or_die(input_code, count);
+		newtable = alloc_array_or_die(input_code, count);
 
 		/* build up the remap table */
 		count = 0;

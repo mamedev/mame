@@ -343,7 +343,7 @@ INLINE container_item *alloc_container_item(void)
 	if (result != NULL)
 		container_item_free_list = result->next;
 	else
-		result = (container_item *)malloc_or_die(sizeof(*result));
+		result = alloc_or_die(container_item);
 
 	memset(result, 0, sizeof(*result));
 	return result;
@@ -375,7 +375,7 @@ INLINE render_primitive *alloc_render_primitive(int type)
 	if (result != NULL)
 		render_primitive_free_list = result->next;
 	else
-		result = (render_primitive *)malloc_or_die(sizeof(*result));
+		result = alloc_or_die(render_primitive);
 
 	/* clear to 0 */
 	memset(result, 0, sizeof(*result));
@@ -426,7 +426,7 @@ INLINE void add_render_ref(render_ref **list, void *refptr)
 	if (ref != NULL)
 		render_ref_free_list = ref->next;
 	else
-		ref = (render_ref *)malloc_or_die(sizeof(*ref));
+		ref = alloc_or_die(render_ref);
 
 	/* set the refptr and link us into the list */
 	ref->refptr = refptr;
@@ -1073,8 +1073,7 @@ render_target *render_target_alloc(running_machine *machine, const char *layoutf
 	int listnum;
 
 	/* allocate memory for the target */
-	target = (render_target *)malloc_or_die(sizeof(*target));
-	memset(target, 0, sizeof(*target));
+	target = alloc_clear_or_die(render_target);
 
 	/* add it to the end of the list */
 	for (nextptr = &targetlist; *nextptr != NULL; nextptr = &(*nextptr)->next) ;
@@ -2433,8 +2432,7 @@ render_texture *render_texture_alloc(texture_scaler_func scaler, void *param)
 		int texnum;
 
 		/* allocate a new group */
-		texture = (render_texture *)malloc_or_die(sizeof(*texture) * TEXTURE_GROUP_SIZE);
-		memset(texture, 0, sizeof(*texture) * TEXTURE_GROUP_SIZE);
+		texture = alloc_array_clear_or_die(render_texture, TEXTURE_GROUP_SIZE);
 
 		/* add them to the list */
 		for (texnum = 0; texnum < TEXTURE_GROUP_SIZE; texnum++)
@@ -2770,8 +2768,7 @@ static render_container *render_container_alloc(running_machine *machine)
 	int color;
 
 	/* allocate and clear memory */
-	container = (render_container *)malloc_or_die(sizeof(*container));
-	memset(container, 0, sizeof(*container));
+	container = alloc_clear_or_die(render_container);
 
 	/* default values */
 	container->brightness = 1.0f;

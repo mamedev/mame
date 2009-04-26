@@ -26,7 +26,7 @@ static int wizdfire_bank_callback(const int bank)
 
 VIDEO_START( rohga )
 {
-	rohga_spriteram = (UINT16*)auto_malloc(0x800);
+	rohga_spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
 
 	deco16_2_video_init(machine, 0);
 

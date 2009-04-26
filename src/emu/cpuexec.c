@@ -223,8 +223,7 @@ void cpuexec_init(running_machine *machine)
 	attotime min_quantum;
 
 	/* allocate global state */
-	machine->cpuexec_data = (cpuexec_private *)auto_malloc(sizeof(*machine->cpuexec_data));
-	memset(machine->cpuexec_data, 0, sizeof(*machine->cpuexec_data));
+	machine->cpuexec_data = auto_alloc_clear(machine, cpuexec_private);
 
 	/* set the core scheduling quantum */
 	min_quantum = machine->config->minimum_quantum;

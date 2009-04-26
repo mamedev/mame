@@ -217,7 +217,9 @@ static void jsr_c(asap_state *);
 static void jsr_c0(asap_state *);
 static void trapf(asap_state *);
 
-static void (*const opcodetable[32][4])(asap_state *) =
+typedef void (*asap_ophandler)(asap_state *);
+
+static const asap_ophandler opcodetable[32][4] =
 {
 	{	trap0,		trap0,		trap0,		trap0		},
 	{	NULL,		NULL,		NULL,		NULL		},
@@ -407,11 +409,11 @@ static void set_irq_line(asap_state *asap, int irqline, int state)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static void init_tables(void)
+static void init_tables(running_machine *machine)
 {
 	/* allocate opcode table */
 	if (!opcode)
-		opcode = (void (**)(asap_state *))auto_malloc(32 * 32 * 2 * sizeof(void *));
+		opcode = auto_alloc_array(machine, asap_ophandler, 32 * 32 * 2);
 
 	/* fill opcode table */
 	if (opcode)
@@ -439,7 +441,7 @@ static CPU_INIT( asap )
 	asap_state *asap = get_safe_token(device);
 	int i;
 
-	init_tables();
+	init_tables(device->machine);
 	for (i = 0; i < REGBASE; i++)
 		asap->src2val[i] = i;
 	asap->irq_callback = irqcallback;

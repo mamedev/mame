@@ -486,7 +486,7 @@ READ16_HANDLER( volfied_cchip_ram_r )
 
 void volfied_cchip_init(running_machine *machine)
 {
-	cchip_ram=auto_malloc(0x400 * 8);
+	cchip_ram=auto_alloc_array(machine, UINT8, 0x400 * 8);
 
 	state_save_register_global(machine, current_bank);
 	state_save_register_global(machine, current_cmd);

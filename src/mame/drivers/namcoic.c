@@ -59,7 +59,7 @@ namco_tilemap_init( running_machine *machine, int gfxbank, void *maskBaseAddr,
 	mTilemapInfo.gfxbank = gfxbank;
 	mTilemapInfo.maskBaseAddr = maskBaseAddr;
 	mTilemapInfo.cb = cb;
-	mTilemapInfo.videoram = auto_malloc( 0x10000*2 );
+	mTilemapInfo.videoram = auto_alloc_array(machine, UINT16,  0x10000 );
 
 		/* four scrolling tilemaps */
 		mTilemapInfo.tmap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,64);
@@ -910,7 +910,7 @@ static int DefaultCodeToTile( int code )
 }
 
 void
-namco_obj_init( int gfxbank, int palXOR, int (*codeToTile)( int code ) )
+namco_obj_init( running_machine *machine, int gfxbank, int palXOR, int (*codeToTile)( int code ) )
 {
 	mGfxC355 = gfxbank;
 	mPalXOR = palXOR;
@@ -922,7 +922,7 @@ namco_obj_init( int gfxbank, int palXOR, int (*codeToTile)( int code ) )
 	{
 		mpCodeToTile = DefaultCodeToTile;
 	}
-	spriteram16 = auto_malloc(0x20000);
+	spriteram16 = auto_alloc_array(machine, UINT16, 0x20000/2);
 	memset( spriteram16, 0, 0x20000 ); /* needed for Nebulas Ray */
 	memset( mSpritePos,0x00,sizeof(mSpritePos) );
 } /* namcosC355_init */
@@ -1130,9 +1130,9 @@ namco_roz_init( running_machine *machine, int gfxbank, const char * maskregion )
 	mRozGfxBank = gfxbank;
 	mRozMaskRegion = maskregion;
 
-	rozbank16 = auto_malloc(0x10);
-	rozvideoram16 = auto_malloc(0x20000);
-	rozcontrol16 = auto_malloc(0x20);
+	rozbank16 = auto_alloc_array(machine, UINT16, 0x10/2);
+	rozvideoram16 = auto_alloc_array(machine, UINT16, 0x20000/2);
+	rozcontrol16 = auto_alloc_array(machine, UINT16, 0x20/2);
 
 		for( i=0; i<ROZ_TILEMAP_COUNT; i++ )
 		{
@@ -1580,7 +1580,7 @@ namco_road_init(running_machine *machine, int gfxbank )
 	mbRoadNeedTransparent = 0;
 	mRoadGfxBank = gfxbank;
 
-	mpRoadRAM = auto_malloc(0x20000);
+	mpRoadRAM = auto_alloc_array(machine, UINT16, 0x20000/2);
 
 	pGfx = gfx_element_alloc( machine, &RoadTileLayout, 0x10000+(UINT8 *)mpRoadRAM, 0x3f, 0xf00);
 

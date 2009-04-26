@@ -228,7 +228,7 @@ static LRESULT register_client(HWND hwnd, LPARAM id)
 		}
 
 	// add us to the end
-	*client = (registered_client *)malloc_or_die(sizeof(**client));
+	*client = alloc_or_die(registered_client);
 	(*client)->next = NULL;
 	(*client)->id = id;
 	(*client)->hwnd = hwnd;
@@ -287,7 +287,7 @@ static LRESULT send_id_string(running_machine *machine, HWND hwnd, LPARAM id)
 
 	// allocate memory for the message
 	datalen = sizeof(*temp) + strlen(name);
-	temp = (copydata_id_string *)malloc_or_die(datalen);
+	temp = (copydata_id_string *)alloc_array_or_die(UINT8, datalen);
 	temp->id = id;
 	strcpy(temp->string, name);
 

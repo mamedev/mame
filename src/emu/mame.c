@@ -458,7 +458,7 @@ void add_frame_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_frame_callback at init time!");
 
 	/* allocate memory */
-	cb = (callback_item *)malloc_or_die(sizeof(*cb));
+	cb = alloc_or_die(callback_item);
 
 	/* add us to the end of the list */
 	cb->func.frame = callback;
@@ -481,7 +481,7 @@ void add_reset_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_reset_callback at init time!");
 
 	/* allocate memory */
-	cb = (callback_item *)malloc_or_die(sizeof(*cb));
+	cb = alloc_or_die(callback_item);
 
 	/* add us to the end of the list */
 	cb->func.reset = callback;
@@ -504,7 +504,7 @@ void add_pause_callback(running_machine *machine, void (*callback)(running_machi
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_pause_callback at init time!");
 
 	/* allocate memory */
-	cb = (callback_item *)malloc_or_die(sizeof(*cb));
+	cb = alloc_or_die(callback_item);
 
 	/* add us to the end of the list */
 	cb->func.pause = callback;
@@ -527,7 +527,7 @@ void add_exit_callback(running_machine *machine, void (*callback)(running_machin
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_exit_callback at init time!");
 
 	/* allocate memory */
-	cb = (callback_item *)malloc_or_die(sizeof(*cb));
+	cb = alloc_or_die(callback_item);
 
 	/* add us to the head of the list */
 	cb->func.exit = callback;
@@ -782,7 +782,7 @@ UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 le
     		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
 	/* allocate the region */
-	info = (region_info *)malloc_or_die(sizeof(*info) + length);
+	info = (region_info *)alloc_array_or_die(UINT8, sizeof(*info) + length);
 	info->next = NULL;
 	info->name = astring_dupc(name);
 	info->length = length;
@@ -1247,7 +1247,7 @@ void add_logerror_callback(running_machine *machine, void (*callback)(running_ma
 
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call add_logerror_callback at init time!");
 
-	cb = (callback_item *)auto_malloc(sizeof(*cb));
+	cb = auto_alloc(machine, callback_item);
 	cb->func.log = callback;
 	cb->next = NULL;
 

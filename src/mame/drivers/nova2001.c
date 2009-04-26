@@ -1009,7 +1009,7 @@ static void lineswap_gfx_roms(running_machine *machine, const char *region, cons
 
 	UINT8* const src = memory_region(machine, region);
 
-	UINT8* const temp = malloc_or_die(length);
+	UINT8* const temp = alloc_array_or_die(UINT8, length);
 
 	const int mask = (1 << (bit + 1)) - 1;
 

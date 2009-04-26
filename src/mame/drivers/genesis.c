@@ -470,7 +470,7 @@ static ADDRESS_MAP_START( genesis_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa10000, 0xa1001f) AM_READ(genesis_io_r)				/* Genesis Input */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(genesis_68k_to_z80_r)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(genesis_vdp_r)				/* VDP Access */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_BANK3)				/* Main Ram */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_BANK(3))				/* Main Ram */
 	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)					/* Main Ram */
 ADDRESS_MAP_END
 
@@ -481,7 +481,7 @@ static ADDRESS_MAP_START( genesis_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa11000, 0xa11203) AM_WRITE(genesis_ctrl_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(genesis_68k_to_z80_w)
 	AM_RANGE(0xc00000, 0xc0001f) AM_WRITE(genesis_vdp_w)				/* VDP Access */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_BANK3)				/* Main Ram */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_BANK(3))				/* Main Ram */
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&genesis_68k_ram)/* Main Ram */
 ADDRESS_MAP_END
 #endif
@@ -587,15 +587,15 @@ READ8_HANDLER ( genesis_z80_bank_r )
 
 #if 0
 static ADDRESS_MAP_START( genesis_z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_BANK1)
- 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_BANK2) /* mirror */
+ 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_BANK(1))
+ 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_BANK(2)) /* mirror */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(genesis_z80_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(genesis_z80_bank_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( genesis_z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_BANK1) AM_BASE(&genesis_z80_ram)
- 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_BANK2) /* mirror */
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_BANK(1)) AM_BASE(&genesis_z80_ram)
+ 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_BANK(2)) /* mirror */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(genesis_z80_w)
  // AM_RANGE(0x8000, 0xffff) AM_WRITE(genesis_z80_bank_w)
 ADDRESS_MAP_END

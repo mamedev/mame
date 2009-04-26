@@ -81,8 +81,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW")
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK2)
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(2))
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 	AM_RANGE(0x3400, 0x3400) AM_DEVREAD("msm", pcktgal_adpcm_reset_r)	/* ? not sure */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK3)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(3))
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -425,7 +425,7 @@ static DRIVER_INIT( deco222 )
 {
 	int A;
 	const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *decrypted = auto_malloc(0x10000);
+	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = memory_region(machine, "audiocpu");
 
 	memory_set_decrypted_region(space, 0x8000, 0xffff, decrypted);

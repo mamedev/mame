@@ -194,11 +194,11 @@ VIDEO_START(taotaido)
 {
 	bg_tilemap = tilemap_create(machine, taotaido_bg_tile_info,taotaido_tilemap_scan_rows,     16,16,128,64);
 
-	taotaido_spriteram_old = auto_malloc(0x2000);
-	taotaido_spriteram_older = auto_malloc(0x2000);
+	taotaido_spriteram_old = auto_alloc_array(machine, UINT16, 0x2000/2);
+	taotaido_spriteram_older = auto_alloc_array(machine, UINT16, 0x2000/2);
 
-	taotaido_spriteram2_old = auto_malloc(0x10000);
-	taotaido_spriteram2_older = auto_malloc(0x10000);
+	taotaido_spriteram2_old = auto_alloc_array(machine, UINT16, 0x10000/2);
+	taotaido_spriteram2_older = auto_alloc_array(machine, UINT16, 0x10000/2);
 }
 
 

@@ -309,11 +309,11 @@ WRITE16_HANDLER( hyprduel_window_w )
  the tile's sizes to be known at startup - which we don't!
 */
 
-static void alloc_empty_tiles(void)
+static void alloc_empty_tiles(running_machine *machine)
 {
 	int code,i;
 
-	empty_tiles = auto_malloc(16*16*16);
+	empty_tiles = auto_alloc_array(machine, UINT8, 16*16*16);
 
 	for (code = 0;code < 0x10;code++)
 		for (i = 0;i < 16*16;i++)
@@ -340,9 +340,9 @@ static STATE_POSTLOAD( hyprduel_postload )
 
 VIDEO_START( hyprduel_14220 )
 {
-	alloc_empty_tiles();
-	hyprduel_tiletable_old = auto_malloc(hyprduel_tiletable_size);
-	dirtyindex = auto_malloc(hyprduel_tiletable_size/4);
+	alloc_empty_tiles(machine);
+	hyprduel_tiletable_old = auto_alloc_array(machine, UINT16, hyprduel_tiletable_size/2);
+	dirtyindex = auto_alloc_array(machine, UINT8, hyprduel_tiletable_size/4);
 
 	bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);

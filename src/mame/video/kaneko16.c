@@ -125,7 +125,7 @@ KANEKO16_LAYER(3)
 VIDEO_START( kaneko16_sprites )
 {
 	/* 0x400 sprites max */
-	spritelist.first_sprite = (struct tempsprite *)auto_malloc(0x400 * sizeof(spritelist.first_sprite[0]));
+	spritelist.first_sprite = auto_alloc_array(machine, struct tempsprite, 0x400);
 }
 
 VIDEO_START( kaneko16_1xVIEW2_tilemaps )
@@ -256,7 +256,7 @@ VIDEO_START( berlwall )
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 
-	kaneko16_bg15_bitmap = auto_bitmap_alloc(256 * 32, 256 * 1, BITMAP_FORMAT_INDEXED16);
+	kaneko16_bg15_bitmap = auto_bitmap_alloc(machine, 256 * 32, 256 * 1, BITMAP_FORMAT_INDEXED16);
 
 /*
     8aba is used as background color

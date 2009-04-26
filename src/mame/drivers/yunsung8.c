@@ -56,7 +56,7 @@ VIDEO_UPDATE( yunsung8 );
 static MACHINE_RESET( yunsung8 )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT8* yunsung8_videoram = auto_malloc(0x4000);
+	UINT8* yunsung8_videoram = auto_alloc_array(machine, UINT8, 0x4000);
 
 	yunsung8_videoram_0 = yunsung8_videoram + 0x0000;	// Ram is banked
 	yunsung8_videoram_1 = yunsung8_videoram + 0x2000;
@@ -99,7 +99,7 @@ static WRITE8_HANDLER( yunsung8_bankswitch_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(yunsung8_bankswitch_w	)	// ROM Bank (again?)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1				)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)				)	// Banked ROM
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(yunsung8_videoram_r, yunsung8_videoram_w	)	// Video RAM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( yunsung8_adpcm_w )
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK2,SMH_ROM		)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(2),SMH_ROM		)	// Banked ROM
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", yunsung8_sound_bankswitch_w	)	// ROM Bank
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w				)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ym", ym3812_w		)

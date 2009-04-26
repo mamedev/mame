@@ -690,22 +690,22 @@ static DRIVER_INIT( cps3 )
 	cps3_user4region = memory_region(machine,"user4");
 	cps3_user5region = memory_region(machine,"user5");
 
-	if (!cps3_user4region) cps3_user4region = auto_malloc(USER4REGION_LENGTH);
-	if (!cps3_user5region) cps3_user5region = auto_malloc(USER5REGION_LENGTH);
+	if (!cps3_user4region) cps3_user4region = auto_alloc_array(machine, UINT8, USER4REGION_LENGTH);
+	if (!cps3_user5region) cps3_user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
 
 	// set strict verify
 	sh2drc_set_options(machine->cpu[0], SH2DRC_STRICT_VERIFY);
 
 	cps3_decrypt_bios(machine);
-	decrypted_gamerom = auto_malloc(0x1000000);
+	decrypted_gamerom = auto_alloc_array(machine, UINT32, 0x1000000/4);
 
 	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
      - this prevents MAME from crashing */
-	cps3_nops = auto_malloc(0x4);
+	cps3_nops = auto_alloc(machine, UINT32);
 	cps3_nops[0] = 0x00090009;
 
 
-	cps3_0xc0000000_ram_decrypted = auto_malloc(0x400);
+	cps3_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
 	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), cps3_direct_handler);
 
 	// flash roms
@@ -713,7 +713,7 @@ static DRIVER_INIT( cps3 )
 	for (i=0;i<48;i++)
 		intelflash_init( machine, i, FLASH_FUJITSU_29F016A, NULL );
 
-	cps3_eeprom = auto_malloc(0x400);
+	cps3_eeprom = auto_alloc_array(machine, UINT32, 0x400/4);
 }
 
 static DRIVER_INIT( jojo )    { cps3_key1 = 0x02203ee3; cps3_key2 = 0x01301972; cps3_altEncryption = 0; DRIVER_INIT_CALL(cps3); }
@@ -796,11 +796,11 @@ static void cps3_set_mame_colours(running_machine *machine, int colournum, UINT1
 
 static VIDEO_START(cps3)
 {
-	cps3_ss_ram       = auto_malloc(0x10000);
+	cps3_ss_ram       = auto_alloc_array(machine, UINT32, 0x10000/4);
 	memset(cps3_ss_ram, 0x00, 0x10000);
 	state_save_register_global_pointer(machine, cps3_ss_ram, 0x10000/4);
 
-	cps3_char_ram = auto_malloc(0x800000);
+	cps3_char_ram = auto_alloc_array(machine, UINT32, 0x800000/4);
 	memset(cps3_char_ram, 0x00, 0x800000);
 	state_save_register_global_pointer(machine, cps3_char_ram, 0x800000 /4);
 
@@ -815,14 +815,14 @@ static VIDEO_START(cps3)
 
 	//decode_charram();
 
-	cps3_mame_colours = auto_malloc(0x80000);
+	cps3_mame_colours = auto_alloc_array(machine, UINT32, 0x80000/4);
 	memset(cps3_mame_colours, 0x00, 0x80000);
 
 	cps3_screenwidth = 384;
 
 	// the renderbuffer can be twice the size of the screen, this allows us to handle framebuffer zoom values
 	// between 0x00 and 0x80 (0x40 is normal, 0x80 would be 'view twice as much', 0x20 is 'view half as much')
-	renderbuffer_bitmap = auto_bitmap_alloc(512*2,224*2,video_screen_get_format(machine->primary_screen));
+	renderbuffer_bitmap = auto_bitmap_alloc(machine,512*2,224*2,video_screen_get_format(machine->primary_screen));
 
 	renderbuffer_clip.min_x = 0;
 	renderbuffer_clip.max_x = cps3_screenwidth-1;

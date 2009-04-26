@@ -26,7 +26,7 @@ static INT8* ampMod1x8;
 
 static const UINT32 noiseSeed = 0x7ffff8;
 
-void sidInitMixerEngine(void)
+void sidInitMixerEngine(running_machine *machine)
 {
 	UINT16 uk;
 	INT32 si, sj    ;
@@ -34,7 +34,7 @@ void sidInitMixerEngine(void)
 	/* 8-bit volume modulation tables. */
 	float filterAmpl = 0.7f;
 
-	ampMod1x8=(INT8*) auto_malloc(256*256);
+	ampMod1x8=auto_alloc_array(machine, INT8, 256*256);
 
 	uk = 0;
 	for ( si = 0; si < 256; si++ )

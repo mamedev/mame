@@ -1250,8 +1250,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xe0000, 0xfffff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x00000, 0x3ffff) AM_READ(SMH_BANK(2))
+	AM_RANGE(0xe0000, 0xfffff) AM_READ(SMH_BANK(1))
 ADDRESS_MAP_END
 
 
@@ -1459,7 +1459,7 @@ static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
 	int i;
 	UINT8 tilesize = 4*8; // 4 bytes per line, 8 lines
 	
-	buffer = malloc_or_die(gfxregionsize);
+	buffer = alloc_array_or_die(UINT8, gfxregionsize);
 	
 	for (i=0;i<gfxregionsize/2;i+=tilesize)
 	{
@@ -1483,7 +1483,7 @@ static DRIVER_INIT( hng64_reorder_gfx )
 
 static DRIVER_INIT( hng64 )
 {
-	hng64_soundram=auto_malloc(0x200000);
+	hng64_soundram=auto_alloc_array(machine, UINT16, 0x200000/2);
 	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }
 
@@ -1582,8 +1582,8 @@ static MACHINE_RESET(hyperneo)
 	KL5C80_init();
 
 	/* 1 meg of virtual address space for the com cpu */
-	hng64_com_virtual_mem = auto_malloc(0x100000);
-	hng64_com_op_base     = auto_malloc(0x10000);
+	hng64_com_virtual_mem = auto_alloc_array(machine, UINT8, 0x100000);
+	hng64_com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
 
 	/* Fill up virtual memory with ROM */
 	for (i = 0x0; i < 0x100000; i++)

@@ -581,7 +581,7 @@ static INTERRUPT_GEN(audio_interrupt)
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))
 	AM_RANGE(0x0000, 0xbfff) AM_WRITENOP
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami1", k054539_r, k054539_w)
@@ -709,18 +709,11 @@ static DRIVER_INIT(polygonet)
 	reset_sound_region(machine);
 
 	/* Allocate space for the dsp56k banking */
-	dsp56k_bank00_ram    = auto_malloc(2 * 8 * dsp56k_bank00_size 		 * sizeof(UINT16));		/* 2 bank sets, 8 potential banks each */
-	dsp56k_bank01_ram    = auto_malloc(2 * 8 * dsp56k_bank01_size 		 * sizeof(UINT16));
-	dsp56k_bank02_ram    = auto_malloc(2 * 8 * dsp56k_bank02_size 		 * sizeof(UINT16));
-	dsp56k_shared_ram_16 = auto_malloc(2 * 8 * dsp56k_shared_ram_16_size * sizeof(UINT16));
-	dsp56k_bank04_ram    = auto_malloc(2 * 8 * dsp56k_bank04_size 		 * sizeof(UINT16));
-
-	/* Clear the newly-allocated memory */
-	memset(dsp56k_bank00_ram,    0, 2 * 8 * dsp56k_bank00_size		  * sizeof(UINT16));
-	memset(dsp56k_bank01_ram,    0, 2 * 8 * dsp56k_bank01_size		  * sizeof(UINT16));
-	memset(dsp56k_bank02_ram,    0, 2 * 8 * dsp56k_bank02_size		  * sizeof(UINT16));
-	memset(dsp56k_shared_ram_16, 0, 2 * 8 * dsp56k_shared_ram_16_size * sizeof(UINT16));
-	memset(dsp56k_bank04_ram,    0, 2 * 8 * dsp56k_bank04_size		  * sizeof(UINT16));
+	dsp56k_bank00_ram    = auto_alloc_array_clear(machine, UINT16, 2 * 8 * dsp56k_bank00_size);		/* 2 bank sets, 8 potential banks each */
+	dsp56k_bank01_ram    = auto_alloc_array_clear(machine, UINT16, 2 * 8 * dsp56k_bank01_size);
+	dsp56k_bank02_ram    = auto_alloc_array_clear(machine, UINT16, 2 * 8 * dsp56k_bank02_size);
+	dsp56k_shared_ram_16 = auto_alloc_array_clear(machine, UINT16, 2 * 8 * dsp56k_shared_ram_16_size);
+	dsp56k_bank04_ram    = auto_alloc_array_clear(machine, UINT16, 2 * 8 * dsp56k_bank04_size);
 
 	/* The dsp56k occasionally executes out of mapped memory */
 	dsp56k_update_handler = memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);

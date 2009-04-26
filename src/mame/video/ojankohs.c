@@ -279,24 +279,24 @@ WRITE8_HANDLER( ojankoc_videoram_w )
 VIDEO_START( ojankohs )
 {
 	ojankohs_tilemap = tilemap_create(machine, ojankohs_get_tile_info, tilemap_scan_rows,  8, 4, 64, 64);
-	ojankohs_videoram = auto_malloc(0x2000);
-	ojankohs_colorram = auto_malloc(0x1000);
-	ojankohs_paletteram = auto_malloc(0x800);
+	ojankohs_videoram = auto_alloc_array(machine, UINT8, 0x2000);
+	ojankohs_colorram = auto_alloc_array(machine, UINT8, 0x1000);
+	ojankohs_paletteram = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 VIDEO_START( ojankoy )
 {
 	ojankohs_tilemap = tilemap_create(machine, ojankoy_get_tile_info, tilemap_scan_rows,  8, 4, 64, 64);
-	ojankohs_videoram = auto_malloc(0x2000);
-	ojankohs_colorram = auto_malloc(0x1000);
-	ojankohs_paletteram = auto_malloc(0x800);
+	ojankohs_videoram = auto_alloc_array(machine, UINT8, 0x2000);
+	ojankohs_colorram = auto_alloc_array(machine, UINT8, 0x1000);
+	ojankohs_paletteram = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 VIDEO_START( ojankoc )
 {
 	ojankoc_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	ojankohs_videoram = auto_malloc(0x8000);
-	ojankohs_paletteram = auto_malloc(0x20);
+	ojankohs_videoram = auto_alloc_array(machine, UINT8, 0x8000);
+	ojankohs_paletteram = auto_alloc_array(machine, UINT8, 0x20);
 }
 
 

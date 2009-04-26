@@ -4471,7 +4471,7 @@ static DEVICE_START( voodoo )
 
 	/* create a multiprocessor work queue */
 	v->poly = poly_alloc(device->machine, 64, sizeof(poly_extra_data), 0);
-	v->thread_stats = (stats_block *)auto_malloc(sizeof(v->thread_stats[0]) * WORK_MAX_THREADS);
+	v->thread_stats = auto_alloc_array(device->machine, stats_block, WORK_MAX_THREADS);
 
 	/* create a table of precomputed 1/n and log2(n) values */
 	/* n ranges from 1.0000 to 2.0000 */
@@ -4565,14 +4565,14 @@ static DEVICE_START( voodoo )
 	if (config->type <= VOODOO_2)
 	{
 		/* separate FB/TMU memory */
-		fbmem = auto_malloc(config->fbmem << 20);
-		tmumem[0] = auto_malloc(config->tmumem0 << 20);
-		tmumem[1] = (config->tmumem1 != 0) ? auto_malloc(config->tmumem1 << 20) : NULL;
+		fbmem = auto_alloc_array(device->machine, UINT8, config->fbmem << 20);
+		tmumem[0] = auto_alloc_array(device->machine, UINT8, config->tmumem0 << 20);
+		tmumem[1] = (config->tmumem1 != 0) ? auto_alloc_array(device->machine, UINT8, config->tmumem1 << 20) : NULL;
 	}
 	else
 	{
 		/* shared memory */
-		tmumem[0] = tmumem[1] = fbmem = auto_malloc(config->fbmem << 20);
+		tmumem[0] = tmumem[1] = fbmem = auto_alloc_array(device->machine, UINT8, config->fbmem << 20);
 		tmumem0 = config->fbmem;
 	}
 

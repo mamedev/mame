@@ -404,8 +404,7 @@ void debug_console_register_command(running_machine *machine, const char *comman
 	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call debug_console_register_command() at init time!");
 	assert_always((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call debug_console_register_command() when debugger is not running");
 
-	cmd = (debug_command *)auto_malloc(sizeof(*cmd));
-	memset(cmd, 0, sizeof(*cmd));
+	cmd = auto_alloc_clear(machine, debug_command);
 
 	/* fill in the command */
 	strcpy(cmd->command, command);

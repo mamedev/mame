@@ -53,7 +53,7 @@ void hdsnd_init(running_machine *machine)
 {
 	rombase = (UINT8 *)memory_region(machine, "serialroms");
 	romsize = memory_region_length(machine, "serialroms");
-	comram = (UINT16 *)auto_malloc(0x400);
+	comram = auto_alloc_array(machine, UINT16, 0x400/2);
 	last_bio_cycles = 0;
 }
 

@@ -350,7 +350,7 @@ logerror("PC %04x: write %02x to port 01\n",cpu_get_pc(space->cpu),data);
 
 static ADDRESS_MAP_START( mgakuen_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(mgakuen_paletteram_r)	/* palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READ(pang_colorram_r)	/* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READ(mgakuen_videoram_r)	/* char RAM */
@@ -369,7 +369,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(pang_paletteram_r)	/* Banked palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READ(pang_colorram_r)	/* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READ(pang_videoram_r)	/* Banked char / OBJ RAM */
@@ -405,7 +405,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spangb_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_NOP)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(1), SMH_NOP)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE(&pang_colorram)/* Attribute RAM */
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE(&pang_videoram) AM_SIZE(&pang_videoram_size) /* Banked char / OBJ RAM */
@@ -2151,7 +2151,7 @@ static DRIVER_INIT( mstworld )
 {
 	/* descramble the program rom .. */
 	int len = memory_region_length(machine, "maincpu");
-	UINT8* source = malloc_or_die(len);
+	UINT8* source = alloc_array_or_die(UINT8, len);
 	UINT8* dst    = memory_region(machine, "maincpu") ;
 	int x;
 

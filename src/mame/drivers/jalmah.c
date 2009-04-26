@@ -231,8 +231,8 @@ static VIDEO_START( jalmah )
 	sc3_tilemap_2 = tilemap_create(machine, get_sc3_tile_info,range2_8x8,8,8,128,64);
 	sc3_tilemap_3 = tilemap_create(machine, get_sc3_tile_info,range3_8x8,8,8,64,128);
 
-	jm_scrollram = auto_malloc(0x80);
-	jm_vregs = auto_malloc(0x40);
+	jm_scrollram = auto_alloc_array(machine, UINT16, 0x80/2);
+	jm_vregs = auto_alloc_array(machine, UINT16, 0x40/2);
 
 	tilemap_set_transparent_pen(sc0_tilemap_0,15);
 	tilemap_set_transparent_pen(sc0_tilemap_1,15);
@@ -259,8 +259,8 @@ static VIDEO_START( urashima )
 	sc0_tilemap_0 = tilemap_create(machine, get_sc0_tile_info,range0_16x16,16,16,256,32);
 	sc3_tilemap_0 = tilemap_create(machine, get_sc3_tile_info,range2_8x8,8,8,128,64);
 
-	jm_scrollram = auto_malloc(0x80);
-	jm_vregs = auto_malloc(0x40);
+	jm_scrollram = auto_alloc_array(machine, UINT16, 0x80/2);
+	jm_vregs = auto_alloc_array(machine, UINT16, 0x40/2);
 
 	tilemap_set_transparent_pen(sc0_tilemap_0,15);
 	tilemap_set_transparent_pen(sc3_tilemap_0,15);

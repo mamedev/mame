@@ -130,7 +130,7 @@ INPUT_PORTS_END
 
 static VIDEO_START( vega )
 {
-	vega_vram = auto_malloc(0x14000*2);
+	vega_vram = auto_alloc_array(machine, UINT32, 0x14000*2/4);
 }
 
 static VIDEO_UPDATE( vega )

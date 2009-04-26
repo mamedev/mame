@@ -1055,7 +1055,7 @@ static WRITE8_HANDLER( raphero_sound_rombank_w )
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0x8000, 0xbfff ) AM_READ( SMH_BANK1 )
+	AM_RANGE( 0x8000, 0xbfff ) AM_READ( SMH_BANK(1) )
 	AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w )
 	AM_RANGE( 0xc800, 0xc800 ) AM_DEVREADWRITE( "oki1", okim6295_r, okim6295_w )
 	AM_RANGE( 0xc808, 0xc808 ) AM_DEVREADWRITE( "oki2", okim6295_r, okim6295_w )
@@ -4584,7 +4584,7 @@ static READ16_HANDLER( vandykeb_r ) { return 0x0000; }
 static DRIVER_INIT (vandykeb)
 {
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x08000e, 0x08000f, 0, 0, vandykeb_r );
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x08001e, 0x08001f, 0, 0, SMH_NOP );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x08001e, 0x08001f, 0, 0, (write16_space_func)SMH_NOP );
 }
 
 
@@ -4982,7 +4982,7 @@ static void decryptcode( running_machine *machine, int a23, int a22, int a21, in
 	int i;
 	UINT8 *RAM = memory_region( machine, "maincpu" );
 	size_t  size = memory_region_length( machine, "maincpu" );
-	UINT8 *buffer = malloc_or_die( size );
+	UINT8 *buffer = alloc_array_or_die(UINT8,  size );
 
 		memcpy( buffer, RAM, size );
 		for( i = 0; i < size; i++ )

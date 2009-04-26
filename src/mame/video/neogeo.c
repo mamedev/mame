@@ -708,8 +708,7 @@ static void optimize_sprite_data(running_machine *machine)
 		sprite_gfx_address_mask >>= 1;
 	}
 
-	sprite_gfx = auto_malloc(sprite_gfx_address_mask + 1);
-	memset(sprite_gfx, 0, sprite_gfx_address_mask + 1);
+	sprite_gfx = auto_alloc_array_clear(machine, UINT8, sprite_gfx_address_mask + 1);
 
 	src = memory_region(machine, "sprites");
 	dest = sprite_gfx;
@@ -858,10 +857,10 @@ WRITE16_HANDLER( neogeo_video_register_w )
 VIDEO_START( neogeo )
 {
 	/* allocate memory not directly mapped */
-	palettes[0] = auto_malloc(NUM_PENS * sizeof(UINT16));
-	palettes[1] = auto_malloc(NUM_PENS * sizeof(UINT16));
-	pens = auto_malloc(NUM_PENS * sizeof(pen_t));
-	neogeo_videoram = auto_malloc(0x20000);
+	palettes[0] = auto_alloc_array(machine, UINT16, NUM_PENS);
+	palettes[1] = auto_alloc_array(machine, UINT16, NUM_PENS);
+	pens = auto_alloc_array(machine, pen_t, NUM_PENS);
+	neogeo_videoram = auto_alloc_array(machine, UINT16, 0x20000/2);
 
 	/* clear allocated memory */
 	memset(palettes[0],0x00, NUM_PENS * sizeof(UINT16));

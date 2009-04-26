@@ -1349,7 +1349,7 @@ static void init_disc(const device_config *device)
 		ldcore->chdtracks = totalhunks / 2;
 
 		/* allocate memory for the precomputed per-frame metadata */
-		ldcore->vbidata = (UINT8 *)auto_malloc(totalhunks * VBI_PACKED_BYTES);
+		ldcore->vbidata = auto_alloc_array(device->machine, UINT8, totalhunks * VBI_PACKED_BYTES);
 		err = chd_get_metadata(ldcore->disc, AV_LD_METADATA_TAG, 0, ldcore->vbidata, totalhunks * VBI_PACKED_BYTES, &vbilength, NULL, NULL);
 		if (err != CHDERR_NONE || vbilength != totalhunks * VBI_PACKED_BYTES)
 			fatalerror("Precomputed VBI metadata missing or incorrect size");
@@ -1378,11 +1378,11 @@ static void init_video(const device_config *device)
 		frame_data *frame = &ldcore->frame[index];
 
 		/* first allocate a YUY16 bitmap at 2x the height */
-		frame->bitmap = auto_bitmap_alloc(ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
+		frame->bitmap = auto_bitmap_alloc(device->machine, ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
 		fillbitmap_yuy16(frame->bitmap, 40, 109, 240);
 
 		/* make a copy of the bitmap that clips out the VBI and horizontal blanking areas */
-		frame->visbitmap = (bitmap_t *)auto_malloc(sizeof(*frame->visbitmap));
+		frame->visbitmap = auto_alloc(device->machine, bitmap_t);
 		*frame->visbitmap = *frame->bitmap;
 		frame->visbitmap->base = BITMAP_ADDR16(frame->visbitmap, 44, frame->bitmap->width * 8 / 720);
 		frame->visbitmap->height -= 44;
@@ -1390,7 +1390,7 @@ static void init_video(const device_config *device)
 	}
 
 	/* allocate an empty frame of the same size */
-	ldcore->emptyframe = auto_bitmap_alloc(ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
+	ldcore->emptyframe = auto_bitmap_alloc(device->machine, ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
 	fillbitmap_yuy16(ldcore->emptyframe, 0, 128, 128);
 
 	/* allocate texture for rendering */
@@ -1410,8 +1410,8 @@ static void init_video(const device_config *device)
 	if (ldcore->config.overwidth > 0 && ldcore->config.overheight > 0 && ldcore->config.overupdate != NULL)
 	{
 		ldcore->overenable = TRUE;
-		ldcore->overbitmap[0] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, (bitmap_format)ldcore->config.overformat);
-		ldcore->overbitmap[1] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, (bitmap_format)ldcore->config.overformat);
+		ldcore->overbitmap[0] = auto_bitmap_alloc(device->machine, ldcore->config.overwidth, ldcore->config.overheight, (bitmap_format)ldcore->config.overformat);
+		ldcore->overbitmap[1] = auto_bitmap_alloc(device->machine, ldcore->config.overwidth, ldcore->config.overheight, (bitmap_format)ldcore->config.overformat);
 		ldcore->overtex = render_texture_alloc(NULL, NULL);
 		if (ldcore->overtex == NULL)
 			fatalerror("Out of memory allocating overlay texture");
@@ -1435,8 +1435,8 @@ static void init_audio(const device_config *device)
 	/* allocate audio buffers */
 	ldcore->audiomaxsamples = ((UINT64)ldcore->samplerate * 1000000 + ldcore->fps_times_1million - 1) / ldcore->fps_times_1million;
 	ldcore->audiobufsize = ldcore->audiomaxsamples * 4;
-	ldcore->audiobuffer[0] = (INT16 *)auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[0][0]));
-	ldcore->audiobuffer[1] = (INT16 *)auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[1][0]));
+	ldcore->audiobuffer[0] = auto_alloc_array(device->machine, INT16, ldcore->audiobufsize);
+	ldcore->audiobuffer[1] = auto_alloc_array(device->machine, INT16, ldcore->audiobufsize);
 }
 
 
@@ -1470,16 +1470,14 @@ static DEVICE_START( laserdisc )
 	ld->device = device;
 
 	/* allocate memory for the core state */
-	ld->core = (ldcore_data *)auto_malloc(sizeof(*ld->core));
-	memset(ld->core, 0, sizeof(*ld->core));
+	ld->core = auto_alloc_clear(device->machine, ldcore_data);
 	ldcore = ld->core;
 
 	/* determine the maximum player-specific state size and allocate it */
 	statesize = 0;
 	for (index = 0; index < ARRAY_LENGTH(player_interfaces); index++)
 		statesize = MAX(statesize, player_interfaces[index]->statesize);
-	ld->player = (ldplayer_data *)auto_malloc(statesize);
-	memset(ld->player, 0, statesize);
+	ld->player = (ldplayer_data *)auto_alloc_array_clear(device->machine, UINT8, statesize);
 
 	/* copy config data to the live state */
 	ldcore->config = *config;

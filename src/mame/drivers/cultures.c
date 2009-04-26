@@ -435,7 +435,7 @@ ROM_END
 
 static DRIVER_INIT( cultures )
 {
-	paletteram = auto_malloc(0x4000);
+	paletteram = auto_alloc_array(machine, UINT8, 0x4000);
 }
 
 GAME( 1994, cultures, 0, cultures, cultures, cultures, ROT0, "Face", "Jibun wo Migaku Culture School Mahjong Hen", 0 )

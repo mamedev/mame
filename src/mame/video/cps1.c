@@ -2055,13 +2055,11 @@ static VIDEO_START( cps )
 		palette_set_color(machine,i,MAKE_RGB(0,0,0));
 	}
 
-    cps1_buffered_obj = auto_malloc (cps1_obj_size);
-    memset(cps1_buffered_obj, 0x00, cps1_obj_size);
+    cps1_buffered_obj = auto_alloc_array_clear(machine, UINT16, cps1_obj_size/2);
 
 	if (cps_version==2)
 	{
-		cps2_buffered_obj = auto_malloc (cps2_obj_size);
-		memset(cps2_buffered_obj, 0x00, cps2_obj_size);
+		cps2_buffered_obj = auto_alloc_array_clear(machine, UINT16, cps2_obj_size/2);
 	}
 
 	memset(cps1_gfxram, 0, cps1_gfxram_size);   /* Clear GFX RAM */

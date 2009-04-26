@@ -375,7 +375,7 @@ static void load_oproms(running_machine *machine)
 	int i;
 
 	/* allocate RAM */
-	mbops = auto_malloc(sizeof(irmb_ops) * 1024);
+	mbops = auto_alloc_array(machine, irmb_ops, 1024);
 
 	for (i = 0; i < 1024; i++)
 	{

@@ -722,7 +722,7 @@ static void gamecstl_set_keyb_int(running_machine *machine, int state) {
 
 static DRIVER_INIT( gamecstl )
 {
-	bios_ram = auto_malloc(0x10000);
+	bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, gamecstl_set_keyb_int);
 	mc146818_init(machine, MC146818_STANDARD);

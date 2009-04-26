@@ -30,7 +30,7 @@ READ32_HANDLER( eolith_vram_r )
 
 VIDEO_START( eolith )
 {
-	vram = auto_malloc(0x40000*2);
+	vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
 }
 
 VIDEO_UPDATE( eolith )

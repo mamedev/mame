@@ -556,7 +556,7 @@ void atarigen_slapstic_init(const device_config *device, offs_t base, offs_t mir
 		atarigen_slapstic = memory_install_readwrite16_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
 
 		/* allocate memory for a copy of bank 0 */
-		atarigen_slapstic_bank0 = auto_malloc(0x2000);
+		atarigen_slapstic_bank0 = auto_alloc_array(device->machine, UINT8, 0x2000);
 		memcpy(atarigen_slapstic_bank0, atarigen_slapstic, 0x2000);
 
 		/* ensure we recopy memory for the bank */
@@ -1608,7 +1608,7 @@ void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0,
 	int c, x, y;
 
 	/* allocate memory for the assembled data */
-	srcdata = auto_malloc(gx0->total_elements * gx0->width * gx0->height);
+	srcdata = auto_alloc_array(machine, UINT8, gx0->total_elements * gx0->width * gx0->height);
 
 	/* loop over elements */
 	dest = srcdata;

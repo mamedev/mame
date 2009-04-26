@@ -181,8 +181,7 @@ void *tms5110_create(const device_config *device, int variant)
 {
 	struct tms5110 *tms;
 
-	tms = (struct tms5110 *)malloc_or_die(sizeof(*tms));
-	memset(tms, 0, sizeof(*tms));
+	tms = alloc_clear_or_die(struct tms5110);
 
 	tms->device = device;
 	tms5110_set_variant(tms, variant);

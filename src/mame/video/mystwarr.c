@@ -30,7 +30,7 @@ static void mystwarr_decode_tiles(running_machine *machine)
 			break;
 	assert(gfxnum != ARRAY_LENGTH(machine->gfx));
 
-	decoded = auto_malloc(len);
+	decoded = auto_alloc_array(machine, UINT8, len);
 	d = decoded;
 
 	// now convert the data into a drawable format so we can decode it

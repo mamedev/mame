@@ -157,7 +157,7 @@ MACHINE_START( harddriv )
 {
 	/* predetermine memory regions */
 	sim_memory = (UINT16 *)memory_region(machine, "user1");
-	som_memory = (UINT16 *)auto_malloc(0x8000);
+	som_memory = auto_alloc_array(machine, UINT16, 0x8000/2);
 	sim_memory_size = memory_region_length(machine, "user1") / 2;
 	adsp_pgm_memory_word = (UINT16 *)((UINT8 *)hdadsp_pgm_memory + 1);
 }

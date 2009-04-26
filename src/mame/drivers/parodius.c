@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( parodius_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREAD("konami", parodius_sound_r)	/* K053260 */
 	AM_RANGE(0x2000, 0x27ff) AM_READ(parodius_052109_053245_r)
 	AM_RANGE(0x2000, 0x5fff) AM_READ(K052109_r)
-	AM_RANGE(0x6000, 0x9fff) AM_READ(SMH_BANK1)			/* banked ROM */
+	AM_RANGE(0x6000, 0x9fff) AM_READ(SMH_BANK(1))			/* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
 ADDRESS_MAP_END
 

@@ -390,11 +390,11 @@ WRITE16_HANDLER( metro_window_w )
 static int metro_sprite_xoffs, metro_sprite_yoffs;
 
 
-static void alloc_empty_tiles(void)
+static void alloc_empty_tiles(running_machine *machine)
 {
 	int code,i;
 
-	empty_tiles = auto_malloc(16*16*16);
+	empty_tiles = auto_alloc_array(machine, UINT8, 16*16*16);
 
 	for (code = 0;code < 0x10;code++)
 		for (i = 0;i < 16*16;i++)
@@ -407,9 +407,9 @@ VIDEO_START( metro_14100 )
 	support_16x16 = 0;
 	has_zoom = 0;
 
-	alloc_empty_tiles();
-	metro_tiletable_old = auto_malloc(metro_tiletable_size);
-	dirtyindex = auto_malloc(metro_tiletable_size/4);
+	alloc_empty_tiles(machine);
+	metro_tiletable_old = auto_alloc_array(machine, UINT16, metro_tiletable_size/2);
+	dirtyindex = auto_alloc_array(machine, UINT8, metro_tiletable_size/4);
 
 	bg_tilemap[0] = tilemap_create(machine, get_tile_info_0,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info_1,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
@@ -436,9 +436,9 @@ VIDEO_START( metro_14220 )
 	support_16x16 = 0;
 	has_zoom = 0;
 
-	alloc_empty_tiles();
-	metro_tiletable_old = auto_malloc(metro_tiletable_size);
-	dirtyindex = auto_malloc(metro_tiletable_size/4);
+	alloc_empty_tiles(machine);
+	metro_tiletable_old = auto_alloc_array(machine, UINT16, metro_tiletable_size/2);
+	dirtyindex = auto_alloc_array(machine, UINT8, metro_tiletable_size/4);
 
 	bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
@@ -468,9 +468,9 @@ VIDEO_START( metro_14300 )
 	support_16x16 = 1;
 	has_zoom = 0;
 
-	alloc_empty_tiles();
-	metro_tiletable_old = auto_malloc(metro_tiletable_size);
-	dirtyindex = auto_malloc(metro_tiletable_size/4);
+	alloc_empty_tiles(machine);
+	metro_tiletable_old = auto_alloc_array(machine, UINT16, metro_tiletable_size/2);
+	dirtyindex = auto_alloc_array(machine, UINT8, metro_tiletable_size/4);
 
 	bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);

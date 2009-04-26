@@ -136,8 +136,8 @@ static ADDRESS_MAP_START( puckpkmn_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700022, 0x700023) AM_DEVREAD8("oki", okim6295_r, 0x00ff)	/* M6295 Sound Chip Status Register */
 	AM_RANGE(0xa04000, 0xa04003) AM_DEVREAD8("ym", ym3438_r, 0xffff)			/* Ym3438 Sound Chip Status Register */
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(genesis_vdp_r)				/* VDP Access */
-	AM_RANGE(0xe00000, 0xe1ffff) AM_READ(SMH_BANK1)					/* VDP sees the roms here */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_BANK2)					/* VDP sees the ram here */
+	AM_RANGE(0xe00000, 0xe1ffff) AM_READ(SMH_BANK(1))					/* VDP sees the roms here */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_BANK(2))					/* VDP sees the ram here */
 	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)					/* Main Ram */
 
 	/* Unknown reads: */

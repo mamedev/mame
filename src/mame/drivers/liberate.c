@@ -79,7 +79,7 @@ static WRITE8_HANDLER( deco16_bank_w )
 	if (deco16_bank)
 		memory_install_read8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
 	else
-		memory_install_read8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, SMH_BANK1);
+		memory_install_read8_handler(cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, (read8_space_func)SMH_BANK(1));
 }
 
 /*************************************
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( prosport_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_READ(SMH_RAM)
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x800f) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0x800f) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( liberate_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0x3fff) AM_READ(SMH_ROM) /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x8000, 0x800f) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0x800f) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x6200, 0x67ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -930,7 +930,7 @@ ROM_END
 static void sound_cpu_decrypt(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *decrypted = auto_malloc(0x4000);
+	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = memory_region(machine, "audiocpu");
 	int i;
 
@@ -964,7 +964,7 @@ static DRIVER_INIT( liberate )
 {
 	int A;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *decrypted = auto_malloc(0x10000);
+	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);

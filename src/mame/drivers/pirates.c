@@ -370,7 +370,7 @@ static void pirates_decrypt_68k(running_machine *machine)
 
     rom_size = memory_region_length(machine, "maincpu");
 
-    buf = malloc_or_die(rom_size);
+    buf = alloc_array_or_die(UINT16, rom_size/2);
 
     rom = (UINT16 *)memory_region(machine, "maincpu");
     memcpy (buf, rom, rom_size);
@@ -399,7 +399,7 @@ static void pirates_decrypt_p(running_machine *machine)
 
     rom_size = memory_region_length(machine, "gfx1");
 
-    buf = malloc_or_die(rom_size);
+    buf = alloc_array_or_die(UINT8, rom_size);
 
     rom = memory_region(machine, "gfx1");
     memcpy (buf, rom, rom_size);
@@ -423,7 +423,7 @@ static void pirates_decrypt_s(running_machine *machine)
 
     rom_size = memory_region_length(machine, "gfx2");
 
-    buf = malloc_or_die(rom_size);
+    buf = alloc_array_or_die(UINT8, rom_size);
 
     rom = memory_region(machine, "gfx2");
     memcpy (buf, rom, rom_size);
@@ -448,7 +448,7 @@ static void pirates_decrypt_oki(running_machine *machine)
 
     rom_size = memory_region_length(machine, "oki");
 
-    buf = malloc_or_die(rom_size);
+    buf = alloc_array_or_die(UINT8, rom_size);
 
     rom = memory_region(machine, "oki");
     memcpy (buf, rom, rom_size);

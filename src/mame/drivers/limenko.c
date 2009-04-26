@@ -432,8 +432,8 @@ static VIDEO_START( limenko )
 	tilemap_set_transparent_pen(md_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
-	sprites_bitmap     = auto_bitmap_alloc(384,240,BITMAP_FORMAT_INDEXED16);
-	sprites_bitmap_pri = auto_bitmap_alloc(384,240,BITMAP_FORMAT_INDEXED8);
+	sprites_bitmap     = auto_bitmap_alloc(machine,384,240,BITMAP_FORMAT_INDEXED16);
+	sprites_bitmap_pri = auto_bitmap_alloc(machine,384,240,BITMAP_FORMAT_INDEXED8);
 }
 
 static VIDEO_UPDATE( limenko )

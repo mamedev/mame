@@ -202,7 +202,7 @@ static MACHINE_START( cloud9 )
 	schedule_next_irq(machine, 0-64);
 
 	/* allocate backing memory for the NVRAM */
-	generic_nvram = auto_malloc(generic_nvram_size);
+	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
 
 	/* setup for save states */
 	state_save_register_global(machine, irq_state);
@@ -303,7 +303,7 @@ static READ8_HANDLER( nvram_r )
 static ADDRESS_MAP_START( cloud9_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(cloud9_bitmode_addr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(cloud9_bitmode_r, cloud9_bitmode_w)
-	AM_RANGE(0x0000, 0x4fff) AM_READWRITE(SMH_BANK1, cloud9_videoram_w)
+	AM_RANGE(0x0000, 0x4fff) AM_READWRITE(SMH_BANK(1), cloud9_videoram_w)
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x5400, 0x547f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5480, 0x54ff) AM_WRITE(irq_ack_w)

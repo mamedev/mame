@@ -511,7 +511,7 @@ astring *input_seq_to_tokens(astring *string, const input_seq *seq)
 
 int input_seq_from_tokens(const char *string, input_seq *seq)
 {
-	char *strcopy = (char *)malloc_or_die(strlen(string) + 1);
+	char *strcopy = alloc_array_or_die(char, strlen(string) + 1);
 	char *str = strcopy;
 	int result = FALSE;
 

@@ -81,7 +81,7 @@ void zs01_init( running_machine *machine, int chip, UINT8 *data, zs01_write_hand
 
 	if( data == NULL )
 	{
-		data = auto_malloc(
+		data = auto_alloc_array(machine, UINT8, 
 			SIZE_RESPONSE_TO_RESET +
 			SIZE_KEY +
 			SIZE_KEY +
@@ -90,7 +90,7 @@ void zs01_init( running_machine *machine, int chip, UINT8 *data, zs01_write_hand
 
 	if( ds2401 == NULL )
 	{
-		ds2401 = auto_malloc( SIZE_DATA_BUFFER );
+		ds2401 = auto_alloc_array(machine, UINT8,  SIZE_DATA_BUFFER );
 	}
 
 	c->cs = 0;

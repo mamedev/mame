@@ -144,7 +144,7 @@ PALETTE_INIT( cave )
 	int pen;
 
 	/* create a 1:1 palette map covering everything */
-	palette_map = auto_malloc(machine->config->total_colors * sizeof(palette_map[0]));
+	palette_map = auto_alloc_array(machine, UINT16, machine->config->total_colors);
 	for (pen = 0; pen < machine->config->total_colors; pen++)
 		palette_map[pen] = pen % maxpen;
 }
@@ -788,13 +788,12 @@ static void sprite_init_cave(running_machine *machine)
 		cave_spritetype2 = 0;
 	}
 
-	sprite_zbuf = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED16 );
+	sprite_zbuf = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED16 );
 	blit.baseaddr_zbuf = sprite_zbuf->base;
 	blit.line_offset_zbuf = sprite_zbuf->rowpixels * sprite_zbuf->bpp / 8;
 
 	num_sprites = spriteram_size / 0x10 / 2;
-	sprite_cave = auto_malloc( num_sprites * sizeof(struct sprite_cave) );
-	memset(sprite_cave, 0, num_sprites * sizeof(struct sprite_cave));
+	sprite_cave = auto_alloc_array_clear(machine, struct sprite_cave, num_sprites);
 
 	memset(sprite_table,0,sizeof(sprite_table));
 	cave_sprite_draw = sprite_draw_donpachi;

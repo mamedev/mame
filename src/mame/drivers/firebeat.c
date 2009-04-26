@@ -140,8 +140,8 @@ static GCU_REGS gcu[2];
 
 static VIDEO_START(firebeat)
 {
-	gcu[0].vram = auto_malloc(0x2000000);
-	gcu[1].vram = auto_malloc(0x2000000);
+	gcu[0].vram = auto_alloc_array(machine, UINT32, 0x2000000/4);
+	gcu[1].vram = auto_alloc_array(machine, UINT32, 0x2000000/4);
 	memset(gcu[0].vram, 0, 0x2000000);
 	memset(gcu[1].vram, 0, 0x2000000);
 }

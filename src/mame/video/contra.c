@@ -162,8 +162,8 @@ VIDEO_START( contra )
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
 	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,     8,8,32,32);
 
-	private_spriteram = auto_malloc(0x800);
-	private_spriteram_2 = auto_malloc(0x800);
+	private_spriteram = auto_alloc_array(machine, UINT8, 0x800);
+	private_spriteram_2 = auto_alloc_array(machine, UINT8, 0x800);
 
 	bg_clip = *video_screen_get_visible_area(machine->primary_screen);
 	bg_clip.min_x += 40;

@@ -67,8 +67,8 @@ VIDEO_START( xmen6p )
 	K053247_vh_start(machine,"gfx2",53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
 	K053247_export_config(&K053247_ram, NULL, NULL, NULL, NULL);
 
-	screen_left = auto_bitmap_alloc(64*8, 32*8, BITMAP_FORMAT_INDEXED16);
-	screen_right = auto_bitmap_alloc(64*8, 32*8, BITMAP_FORMAT_INDEXED16);
+	screen_left = auto_bitmap_alloc(machine, 64*8, 32*8, BITMAP_FORMAT_INDEXED16);
+	screen_right = auto_bitmap_alloc(machine, 64*8, 32*8, BITMAP_FORMAT_INDEXED16);
 }
 
 

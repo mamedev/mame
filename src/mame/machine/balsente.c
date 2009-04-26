@@ -16,7 +16,7 @@
 
 
 /* local prototypes */
-static void poly17_init(void);
+static void poly17_init(running_machine *machine);
 static void counter_set_out(running_machine *machine, int which, int gate);
 static TIMER_CALLBACK( counter_callback );
 static TIMER_CALLBACK( clock_counter_0_ff );
@@ -152,7 +152,7 @@ MACHINE_RESET( balsente )
 	int numbanks, i;
 
 	/* create the polynomial tables */
-	poly17_init();
+	poly17_init(machine);
 
 	/* reset counters; counter 2's gate is tied high */
 	memset(counter, 0, sizeof(counter));
@@ -267,14 +267,14 @@ MACHINE_RESET( balsente )
 #define POLY17_SHR	10
 #define POLY17_ADD	0x18000
 
-static void poly17_init(void)
+static void poly17_init(running_machine *machine)
 {
 	UINT32 i, x = 0;
 	UINT8 *p, *r;
 
 	/* allocate memory */
-	p = poly17 = auto_malloc(POLY17_SIZE + 1);
-	r = rand17 = auto_malloc(POLY17_SIZE + 1);
+	p = poly17 = auto_alloc_array(machine, UINT8, POLY17_SIZE + 1);
+	r = rand17 = auto_alloc_array(machine, UINT8, POLY17_SIZE + 1);
 
 	/* generate the polynomial */
 	for (i = 0; i < POLY17_SIZE; i++)

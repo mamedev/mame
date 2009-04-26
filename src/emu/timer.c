@@ -300,8 +300,7 @@ void timer_init(running_machine *machine)
 	int i;
 
 	/* allocate global data */
-	global = machine->timer_data = (timer_private *)auto_malloc(sizeof(*global));
-	memset(global, 0, sizeof(*global));
+	global = machine->timer_data = auto_alloc_clear(machine, timer_private);
 
 	/* we need to wait until the first call to timer_cyclestorun before using real CPU times */
 	global->exec.basetime = attotime_zero;

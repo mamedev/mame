@@ -556,7 +556,7 @@ static DRIVER_INIT( ddayjlc )
 	{
 		UINT32 oldaddr, newadr, length,j;
 		UINT8 *src, *dst, *temp;
-		temp = malloc_or_die(0x10000);
+		temp = alloc_array_or_die(UINT8, 0x10000);
 		src = temp;
 		dst = memory_region(machine, "gfx1");
 		length = memory_region_length(machine, "gfx1");

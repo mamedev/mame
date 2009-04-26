@@ -356,7 +356,7 @@ static CPU_INIT( hc11 )
 	}
 
 	cpustate->internal_ram_size = 1280;		/* FIXME: this is for MC68HC11M0 */
-	cpustate->internal_ram = (UINT8 *)auto_malloc(cpustate->internal_ram_size);
+	cpustate->internal_ram = auto_alloc_array(device->machine, UINT8, cpustate->internal_ram_size);
 
 	cpustate->reg_position = 0;
 	cpustate->ram_position = 0x100;

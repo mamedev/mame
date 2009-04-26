@@ -266,14 +266,14 @@ DRIVER_INIT( ckongs )
 DRIVER_INIT( mariner )
 {
 	/* extra ROM */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, SMH_BANK1, SMH_UNMAP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_UNMAP);
 	memory_set_bankptr(machine, 1, memory_region(machine, "maincpu") + 0x5800);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
 
 	/* ??? (it's NOT a background enable) */
-	/*memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, SMH_NOP);*/
+	/*memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6803, 0x6803, 0, 0, (write8_space_func)SMH_NOP);*/
 }
 
 DRIVER_INIT( frogger )
@@ -349,15 +349,15 @@ DRIVER_INIT( cavelon )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* banked ROM */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1));
 	memory_configure_bank(machine, 1, 0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw(machine);
 
 	/* A15 switches memory banks */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, cavelon_banksw_r, cavelon_banksw_w);
 
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, SMH_NOP);	/* ??? */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3800, 0x3801, 0, 0, SMH_NOP);  /* looks suspicously like
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, (write8_space_func)SMH_NOP);	/* ??? */
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3800, 0x3801, 0, 0, (write8_space_func)SMH_NOP);  /* looks suspicously like
                                                                an AY8910, but not sure */
 	state_save_register_global(machine, cavelon_bank);
 }
@@ -439,7 +439,7 @@ DRIVER_INIT( anteater )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = malloc_or_die(len);
+	scratch = alloc_array_or_die(UINT8, len);
 
 		memcpy(scratch, RAM, len);
 
@@ -476,7 +476,7 @@ DRIVER_INIT( rescue )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = malloc_or_die(len);
+	scratch = alloc_array_or_die(UINT8, len);
 
 		memcpy(scratch, RAM, len);
 
@@ -512,7 +512,7 @@ DRIVER_INIT( minefld )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = malloc_or_die(len);
+	scratch = alloc_array_or_die(UINT8, len);
 
 		memcpy(scratch, RAM, len);
 
@@ -550,7 +550,7 @@ DRIVER_INIT( losttomb )
 	RAM = memory_region(machine, "gfx1");
 	len = memory_region_length(machine, "gfx1");
 
-	scratch = malloc_or_die(len);
+	scratch = alloc_array_or_die(UINT8, len);
 
 		memcpy(scratch, RAM, len);
 

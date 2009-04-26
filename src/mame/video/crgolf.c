@@ -104,8 +104,8 @@ static void get_pens(running_machine *machine, pen_t *pens)
 static VIDEO_START( crgolf )
 {
 	/* allocate memory for the two bitmaps */
-	crgolf_videoram_a = auto_malloc(VIDEORAM_SIZE);
-	crgolf_videoram_b = auto_malloc(VIDEORAM_SIZE);
+	crgolf_videoram_a = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
+	crgolf_videoram_b = auto_alloc_array(machine, UINT8, VIDEORAM_SIZE);
 
 	/* register for save states */
 	state_save_register_global_pointer(machine, crgolf_videoram_a, VIDEORAM_SIZE);

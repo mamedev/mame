@@ -462,7 +462,7 @@ static DRIVER_INIT( motorace )
 {
 	int A,j;
 	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *buffer = malloc_or_die(0x2000);
+	UINT8 *buffer = alloc_array_or_die(UINT8, 0x2000);
 
 		memcpy(buffer,rom,0x2000);
 

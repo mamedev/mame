@@ -136,11 +136,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( ladyfrog )
 {
-  ladyfrog_spriteram = auto_malloc (160);
+  ladyfrog_spriteram = auto_alloc_array(machine, UINT8, 160);
   bg_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 
-  paletteram = auto_malloc(0x200);
-  paletteram_2 = auto_malloc(0x200);
+  paletteram = auto_alloc_array(machine, UINT8, 0x200);
+  paletteram_2 = auto_alloc_array(machine, UINT8, 0x200);
   tilemap_set_scroll_cols(bg_tilemap,32);
   tilemap_set_scrolldy( bg_tilemap,   15, 15 );
 }

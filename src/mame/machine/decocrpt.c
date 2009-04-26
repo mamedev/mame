@@ -602,7 +602,7 @@ static void deco_decrypt(running_machine *machine,const char *rgntag,const UINT8
 {
 	UINT16 *rom = (UINT16 *)memory_region(machine, rgntag);
 	int len = memory_region_length(machine, rgntag)/2;
-	UINT16 *buffer = malloc_or_die(len*2);
+	UINT16 *buffer = alloc_array_or_die(UINT16, len);
 	int i;
 
 	/* we work on 16-bit words but data is loaded as 8-bit, so swap bytes on LSB machines */

@@ -263,7 +263,7 @@ static void decode_bg(running_machine *machine, const char * region)
 	int len = 0x8000;
 	int i;
 
-	buffer = malloc_or_die(len);
+	buffer = alloc_array_or_die(UINT8, len);
 
 	/* expand rom tc2-19.10d */
 	for (i = 0; i < len / 2; i++)
@@ -310,7 +310,7 @@ static void decode_sprite16(running_machine *machine, const char * region)
 	UINT8 *dst;
 	int i, y;
 
-	dst = auto_malloc(len);
+	dst = auto_alloc_array(machine, UINT8, len);
 
 	for (i = 0; i < len / (4*4*16); i++)
 		for (y = 0; y < 16; y++)
@@ -363,7 +363,7 @@ static void decode_sprite32(running_machine *machine, const char * region)
 	UINT8 *dst;
 	int i;
 
-	dst = auto_malloc(len);
+	dst = auto_alloc_array(machine, UINT8, len);
 
 	memset(dst, 0, len);
 
@@ -385,8 +385,7 @@ VIDEO_START( tceptor )
 {
 	int gfx_index;
 
-	tceptor_sprite_ram_buffered = auto_malloc(0x200);
-	memset(tceptor_sprite_ram_buffered, 0, 0x200);
+	tceptor_sprite_ram_buffered = auto_alloc_array_clear(machine, UINT16, 0x200/2);
 
 	/* find first empty slot to decode gfx */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)

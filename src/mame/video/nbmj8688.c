@@ -561,10 +561,9 @@ static void mbmj8688_gfxdraw(running_machine *machine, int gfxtype)
 
 static void common_video_start(running_machine *machine)
 {
-	mjsikaku_tmpbitmap = auto_bitmap_alloc(512, 256, video_screen_get_format(machine->primary_screen));
-	mjsikaku_videoram = auto_malloc(512 * 256 * sizeof(UINT16));
-	nbmj8688_clut = auto_malloc(0x20 * sizeof(UINT8));
-	memset(mjsikaku_videoram, 0, (512 * 256 * sizeof(UINT16)));
+	mjsikaku_tmpbitmap = auto_bitmap_alloc(machine, 512, 256, video_screen_get_format(machine->primary_screen));
+	mjsikaku_videoram = auto_alloc_array_clear(machine, UINT16, 512 * 256);
+	nbmj8688_clut = auto_alloc_array(machine, UINT8, 0x20);
 
 	mjsikaku_scrolly = 0;	// reset because crystalg/crystal2 don't write to this register
 }
@@ -603,8 +602,8 @@ VIDEO_START( mbmj8688_pure_16bit_LCD )
 {
 	mjsikaku_gfxmode = GFXTYPE_PURE_16BIT;
 
-	HD61830B_ram[0] = auto_malloc(0x10000);
-	HD61830B_ram[1] = auto_malloc(0x10000);
+	HD61830B_ram[0] = auto_alloc_array(machine, UINT8, 0x10000);
+	HD61830B_ram[1] = auto_alloc_array(machine, UINT8, 0x10000);
 
 	common_video_start(machine);
 }

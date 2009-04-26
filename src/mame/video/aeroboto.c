@@ -58,7 +58,7 @@ VIDEO_START( aeroboto )
 
 		rom = memory_region(machine, "gfx2");
 		length = memory_region_length(machine, "gfx2");
-		temp = malloc_or_die(length);
+		temp = alloc_array_or_die(UINT8, length);
 		memcpy(temp, rom, length);
 
 		for (i=0; i<length; i++) rom[(i&~0xff)+(i<<5&0xe0)+(i>>3&0x1f)] = temp[i];

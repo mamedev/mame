@@ -87,7 +87,7 @@ static VIDEO_START(igs)
 
 	for (i = 0; i < 8; i++)
 	{
-		layer[i] = auto_malloc(512 * 256);
+		layer[i] = auto_alloc_array(machine, UINT8, 512 * 256);
 	}
 
 	chmplst2_pen_hi = 0;
@@ -503,7 +503,7 @@ static void chmplst2_decrypt(running_machine *machine)
 	int i,j;
 	int rom_size = 0x80000;
 	UINT16 *src = (UINT16 *) (memory_region(machine, "maincpu"));
-	UINT16 *result_data = malloc_or_die(rom_size);
+	UINT16 *result_data = alloc_array_or_die(UINT16, rom_size/2);
 
  	for (i=0; i<rom_size/2; i++)
 	{
@@ -625,7 +625,7 @@ static void chmplst2_decrypt_gfx(running_machine *machine)
 	int i;
 	unsigned rom_size = 0x200000;
 	UINT8 *src = (UINT8 *) (memory_region(machine, "gfx1"));
-	UINT8 *result_data = malloc_or_die(rom_size);
+	UINT8 *result_data = alloc_array_or_die(UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
     	result_data[i] = src[BITSWAP24(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
@@ -640,7 +640,7 @@ static void chindrag_gfx_decrypt(running_machine *machine)
 	int i;
 	unsigned rom_size = 0x400000;
 	UINT8 *src = (UINT8 *) (memory_region(machine, "gfx1"));
-	UINT8 *result_data = malloc_or_die(rom_size);
+	UINT8 *result_data = alloc_array_or_die(UINT8, rom_size);
 
  	for (i=0; i<rom_size; i++)
     	result_data[i] = src[BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];

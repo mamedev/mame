@@ -769,7 +769,7 @@ static DRIVER_INIT( pipedrm )
 	/* sprite RAM lives at the end of palette RAM */
 	spriteram = &paletteram[0xc00];
 	spriteram_size = 0x400;
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, SMH_BANK3, SMH_BANK3);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, (read8_space_func)SMH_BANK(3), (write8_space_func)SMH_BANK(3));
 	memory_set_bankptr(machine, 3, spriteram);
 }
 

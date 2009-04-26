@@ -51,7 +51,7 @@ SAMPLES_START( suna8_sh_start )
 	int i, len = memory_region_length(machine, "samples");
 	UINT8 *ROM = memory_region(machine, "samples");
 
-	samplebuf = auto_malloc(len * sizeof(samplebuf[0]));
+	samplebuf = auto_alloc_array(machine, INT16, len);
 
 	for(i=0;i<len;i++)
 		samplebuf[i] = (INT8)(ROM[i] ^ 0x80) * 256;

@@ -1719,7 +1719,7 @@ static CPU_INIT( tms32025 )
 {
 	tms32025_state *cpustate = get_safe_token(device);
 
-	cpustate->intRAM = (UINT16 *)auto_malloc(0x800*2);
+	cpustate->intRAM = auto_alloc_array(device->machine, UINT16, 0x800);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);

@@ -1923,7 +1923,7 @@ WRITE16_HANDLER( model1_tgp_copro_ram_w )
 void model1_tgp_reset(running_machine *machine, int swa)
 {
 	ram_adr = 0;
-	ram_data = auto_malloc(0x10000*4);
+	ram_data = auto_alloc_array(machine, UINT32, 0x10000);
 	memset(ram_data, 0, 0x10000*4);
 
 	fifoout_rpos = 0;
@@ -1969,10 +1969,10 @@ static int copro_fifoin_rpos, copro_fifoin_wpos;
 static UINT32 copro_fifoin_data[FIFO_SIZE];
 static int copro_fifoin_num;
 
-void model1_vr_tgp_reset( void )
+void model1_vr_tgp_reset( running_machine *machine )
 {
 	ram_adr = 0;
-	ram_data = auto_malloc(0x8000*4);
+	ram_data = auto_alloc_array(machine, UINT32, 0x8000);
 	memset(ram_data, 0, 0x8000*4);
 
 	copro_fifoout_rpos = 0;

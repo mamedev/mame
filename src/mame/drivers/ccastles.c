@@ -238,7 +238,7 @@ static MACHINE_START( ccastles )
 	schedule_next_irq(machine, 0);
 
 	/* allocate backing memory for the NVRAM */
-	generic_nvram = auto_malloc(generic_nvram_size);
+	generic_nvram = auto_alloc_array(machine, UINT8, generic_nvram_size);
 
 	/* setup for save states */
 	state_save_register_global(machine, irq_state);

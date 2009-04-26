@@ -122,7 +122,7 @@ void amiga_akiko_init(running_machine* machine)
 
 		akiko.cdrom_numtracks = cdrom_get_last_track(akiko.cdrom)+3;
 
-		akiko.cdrom_toc = (UINT8*)auto_malloc(13*akiko.cdrom_numtracks);
+		akiko.cdrom_toc = auto_alloc_array(machine, UINT8, 13*akiko.cdrom_numtracks);
 		memset( akiko.cdrom_toc, 0, 13*akiko.cdrom_numtracks);
 
 		p = akiko.cdrom_toc;

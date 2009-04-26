@@ -527,10 +527,10 @@ void defender_install_io_space(const address_space *space)
 	const device_config *pia_1 = devtag_get_device(space->machine, "pia_1");
 
 	/* this routine dynamically installs the memory mapped above from c000-cfff */
-	memory_install_write8_handler    (space, 0xc000, 0xc00f, 0, 0x03e0, SMH_BANK4);
+	memory_install_write8_handler    (space, 0xc000, 0xc00f, 0, 0x03e0, (write8_space_func)SMH_BANK(4));
 	memory_install_write8_handler    (space, 0xc010, 0xc01f, 0, 0x03e0, defender_video_control_w);
 	memory_install_write8_handler    (space, 0xc3ff, 0xc3ff, 0, 0,      williams_watchdog_reset_w);
-	memory_install_readwrite8_handler(space, 0xc400, 0xc4ff, 0, 0x0300, SMH_BANK3, williams_cmos_w);
+	memory_install_readwrite8_handler(space, 0xc400, 0xc4ff, 0, 0x0300, (read8_space_func)SMH_BANK(3), williams_cmos_w);
 	memory_install_read8_handler     (space, 0xc800, 0xcbff, 0, 0x03e0, williams_video_counter_r);
 	memory_install_readwrite8_device_handler(space, pia_1, 0xcc00, 0xcc03, 0, 0x03e0, pia6821_r, pia6821_w);
 	memory_install_readwrite8_device_handler(space, pia_0, 0xcc04, 0xcc07, 0, 0x03e0, pia6821_r, pia6821_w);
@@ -547,7 +547,7 @@ void defender_install_io_space(const address_space *space)
  *************************************/
 
 static ADDRESS_MAP_START( williams_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(SMH_BANK(1), SMH_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
@@ -562,7 +562,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( williams_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(SMH_BANK(1), SMH_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
@@ -585,8 +585,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( blaster_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
-	AM_RANGE(0x4000, 0x8fff) AM_READWRITE(SMH_BANK2, SMH_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK(1), SMH_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x4000, 0x8fff) AM_READWRITE(SMH_BANK(2), SMH_RAM)
 	AM_RANGE(0xbb00, 0xbbff) AM_WRITE(SMH_RAM) AM_BASE(&blaster_palette_0)
 	AM_RANGE(0xbc00, 0xbcff) AM_WRITE(SMH_RAM) AM_BASE(&blaster_scanline_control)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
@@ -613,7 +613,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( williams2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE(&williams2_tileram)
 	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
@@ -635,7 +635,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( williams2_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE(&williams2_tileram)
 	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
@@ -2811,14 +2811,14 @@ static DRIVER_INIT( spdball )
 static DRIVER_INIT( alienar )
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0, (write8_space_func)SMH_NOP);
 }
 
 
 static DRIVER_INIT( alienaru )
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0, (write8_space_func)SMH_NOP);
 }
 
 

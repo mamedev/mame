@@ -155,8 +155,7 @@ VIDEO_START( thepit )
 	tilemap_set_scroll_cols(thepit_solid_tilemap, 32);
 	tilemap_set_scroll_cols(thepit_tilemap, 32);
 
-	dummy_tile = auto_malloc(8*8);
-	memset(dummy_tile, 0, 8*8);
+	dummy_tile = auto_alloc_array_clear(machine, UINT8, 8*8);
 
 	graphics_bank = 0;	/* only used in intrepid */
 }

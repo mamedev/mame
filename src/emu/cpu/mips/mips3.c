@@ -2137,14 +2137,14 @@ static CPU_GET_INFO( mips3 )
 static CPU_INIT( r4600be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( r4600le )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, index, clock, irqcallback, memory);
 }
 
@@ -2193,14 +2193,14 @@ CPU_GET_INFO( r4600le )
 static CPU_INIT( r4650be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( r4650le )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, index, clock, irqcallback, memory);
 }
 
@@ -2249,14 +2249,14 @@ CPU_GET_INFO( r4650le )
 static CPU_INIT( r4700be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( r4700le )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, index, clock, irqcallback, memory);
 }
 
@@ -2306,14 +2306,14 @@ CPU_GET_INFO( r4700le )
 static CPU_INIT( r5000be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( r5000le )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, index, clock, irqcallback, memory);
 }
 
@@ -2362,14 +2362,14 @@ CPU_GET_INFO( r5000le )
 static CPU_INIT( qed5271be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( qed5271le )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, index, clock, irqcallback, memory);
 }
 
@@ -2418,14 +2418,14 @@ CPU_GET_INFO( qed5271le )
 static CPU_INIT( rm7000be )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, TRUE, index, clock, irqcallback, memory);
 }
 
 static CPU_INIT( rm7000le )
 {
 	size_t memsize = mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, device, index, clock, irqcallback, NULL);
-	void *memory = auto_malloc(memsize);
+	void *memory = auto_alloc_array(device->machine, UINT8, memsize);
 	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, index, clock, irqcallback, memory);
 }
 

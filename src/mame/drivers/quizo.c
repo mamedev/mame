@@ -244,7 +244,7 @@ ROM_END
 
 static DRIVER_INIT(quizo)
 {
-	videoram=auto_malloc(0x4000*2);
+	videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
 }
 
 GAME( 1985, quizo,  0,       quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )

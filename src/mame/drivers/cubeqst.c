@@ -72,7 +72,7 @@ static const rectangle overlay_clip = { 0, 320-1, 0, 256-8 };
 static VIDEO_START( cubeqst )
 {
 	video_field = 0;
-	depth_buffer = auto_malloc(512);
+	depth_buffer = auto_alloc_array(machine, UINT8, 512);
 }
 
 /* TODO: Use resistor values */
@@ -80,7 +80,7 @@ static PALETTE_INIT( cubeqst )
 {
 	int i;
 
-	colormap = auto_malloc(65536 * sizeof(colormap[0]));
+	colormap = auto_alloc_array(machine, rgb_t, 65536);
 	for (i = 0; i < 65536; ++i)
 	{
 		UINT8 a, r, g, b, y;

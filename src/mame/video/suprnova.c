@@ -912,13 +912,13 @@ VIDEO_START(skns)
 	skns_tilemap_B = tilemap_create(machine, get_tilemap_B_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_B,0);
 
-	sprite_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
 
-	tilemap_bitmap_lower = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
-	tilemap_bitmapflags_lower = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED8);
+	tilemap_bitmap_lower = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
+	tilemap_bitmapflags_lower = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED8);
 
-	tilemap_bitmap_higher = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
-	tilemap_bitmapflags_higher = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED8);
+	tilemap_bitmap_higher = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
+	tilemap_bitmapflags_higher = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED8);
 
 	machine->gfx[2]->color_granularity=256;
 	machine->gfx[3]->color_granularity=256;

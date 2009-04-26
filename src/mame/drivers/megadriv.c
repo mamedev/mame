@@ -2494,7 +2494,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 
-	AM_RANGE(0x0000 , 0x1fff) AM_READ(SMH_BANK1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
+	AM_RANGE(0x0000 , 0x1fff) AM_READ(SMH_BANK(1)) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
 	AM_RANGE(0x4000 , 0x4003) AM_DEVREAD("ym", ym2612_r)
 
 	AM_RANGE(0x6100 , 0x7eff) AM_READ(megadriv_z80_unmapped_read)
@@ -2505,7 +2505,7 @@ static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000 , 0x1fff) AM_WRITE(SMH_BANK1) AM_MIRROR(0x2000)
+	AM_RANGE(0x0000 , 0x1fff) AM_WRITE(SMH_BANK(1)) AM_MIRROR(0x2000)
 	AM_RANGE(0x4000 , 0x4003) AM_DEVWRITE("ym", ym2612_w)
 
 	AM_RANGE(0x7f00 , 0x7fff) AM_WRITE(megadriv_z80_vdp_write)
@@ -2698,13 +2698,13 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			_32x_adapter_enabled = 1;
-			memory_install_readwrite16_handler(space, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
+			memory_install_readwrite16_handler(space, 0x0880000, 0x08fffff, 0, 0, (read16_space_func)SMH_BANK(11), (write16_space_func)SMH_BANK(11)); // 'fixed' 512kb rom bank
 			memory_set_bankptr(space->machine,  11, memory_region(space->machine, "gamecart") );
 
-			memory_install_readwrite16_handler(space, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
+			memory_install_readwrite16_handler(space, 0x0900000, 0x09fffff, 0, 0, (read16_space_func)SMH_BANK(12), (write16_space_func)SMH_BANK(12)); // 'bankable' 1024kb rom bank
 			memory_set_bankptr(space->machine,  12, memory_region(space->machine, "gamecart") );
 
-			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, (read16_space_func)SMH_BANK(10), (write16_space_func)SMH_BANK(10));
 			memory_set_bankptr(space->machine,  10, memory_region(space->machine, "32x_68k_bios") );
 
 			memory_install_readwrite16_handler(space, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_a15180_r, _32x_68k_a15180_w); // mode control regs
@@ -2727,7 +2727,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		{
 			_32x_adapter_enabled = 0;
 
-			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, (read16_space_func)SMH_BANK(10), (write16_space_func)SMH_BANK(10));
 			memory_set_bankptr(space->machine,  10, memory_region(space->machine, "gamecart") );
 
 
@@ -3824,8 +3824,8 @@ static READ16_HANDLER( svp_68k_cell2_r )
 }
 
 static ADDRESS_MAP_START( svp_ssp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000 , 0x03ff) AM_READ(SMH_BANK3)
-	AM_RANGE(0x0400 , 0xffff) AM_READ(SMH_BANK4)
+	AM_RANGE(0x0000 , 0x03ff) AM_READ(SMH_BANK(3))
+	AM_RANGE(0x0400 , 0xffff) AM_READ(SMH_BANK(4))
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svp_ext_map, ADDRESS_SPACE_IO, 16 )
@@ -3892,8 +3892,8 @@ static void svp_init(running_machine *machine)
 	memset(&svp, 0, sizeof(svp));
 
 	/* SVP stuff */
-	svp.dram = auto_malloc(0x20000);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	svp.dram = auto_alloc_array(machine, UINT8, 0x20000);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, (read16_space_func)SMH_BANK(2), (write16_space_func)SMH_BANK(2));
 	memory_set_bankptr(machine,  2, svp.dram );
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
 	// "cell arrange" 1 and 2
@@ -3902,7 +3902,7 @@ static void svp_init(running_machine *machine)
 
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x438, 0x438, 0, 0, svp_speedup_r);
 
-	svp.iram = auto_malloc(0x800);
+	svp.iram = auto_alloc_array(machine, UINT8, 0x800);
 	memory_set_bankptr(machine,  3, svp.iram );
 	/* SVP ROM just shares m68k region.. */
 	ROM = memory_region(machine, "maincpu");
@@ -3953,10 +3953,10 @@ VIDEO_START(megadriv)
 
 	render_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	megadrive_vdp_vram  = auto_malloc(0x10000);
-	megadrive_vdp_cram  = auto_malloc(0x80);
-	megadrive_vdp_vsram = auto_malloc(0x80);
-	megadrive_vdp_internal_sprite_attribute_table = auto_malloc(0x400);
+	megadrive_vdp_vram  = auto_alloc_array(machine, UINT16, 0x10000/2);
+	megadrive_vdp_cram  = auto_alloc_array(machine, UINT16, 0x80/2);
+	megadrive_vdp_vsram = auto_alloc_array(machine, UINT16, 0x80/2);
+	megadrive_vdp_internal_sprite_attribute_table = auto_alloc_array(machine, UINT16, 0x400/2);
 
 	for (x=0;x<0x20;x++)
 		megadrive_vdp_register[x]=0;
@@ -3971,15 +3971,15 @@ VIDEO_START(megadriv)
 
 	megadrive_max_hposition = 480;
 
-	sprite_renderline = auto_malloc(1024);
-	highpri_renderline = auto_malloc(320);
-	video_renderline = auto_malloc(320*4);
+	sprite_renderline = auto_alloc_array(machine, UINT8, 1024);
+	highpri_renderline = auto_alloc_array(machine, UINT8, 320);
+	video_renderline = auto_alloc_array(machine, UINT32, 320);
 
-	megadrive_vdp_palette_lookup = auto_malloc(0x40*2);
-	megadrive_vdp_palette_lookup_sprite = auto_malloc(0x40*2);
+	megadrive_vdp_palette_lookup = auto_alloc_array(machine, UINT16, 0x40);
+	megadrive_vdp_palette_lookup_sprite = auto_alloc_array(machine, UINT16, 0x40);
 
-	megadrive_vdp_palette_lookup_shadow = auto_malloc(0x40*2);
-	megadrive_vdp_palette_lookup_highlight = auto_malloc(0x40*2);
+	megadrive_vdp_palette_lookup_shadow = auto_alloc_array(machine, UINT16, 0x40);
+	megadrive_vdp_palette_lookup_highlight = auto_alloc_array(machine, UINT16, 0x40);
 
 	memset(megadrive_vdp_palette_lookup,0x00,0x40*2);
 	memset(megadrive_vdp_palette_lookup_sprite,0x00,0x40*2);
@@ -6436,7 +6436,7 @@ static void megadriv_init_common(running_machine *machine)
 	if (genesis_has_z80)
 	{
 		genz80.z80_cpunum = 1;
-		genz80.z80_prgram = auto_malloc(0x2000);
+		genz80.z80_prgram = auto_alloc_array(machine, UINT8, 0x2000);
 		memory_set_bankptr(machine,  1, genz80.z80_prgram );
 	}
 
@@ -6576,15 +6576,15 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
 	memory_set_bankptr(machine,  1, genz80.z80_prgram );
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK6, SMH_BANK6);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(6), (write8_space_func)SMH_BANK(6));
 	memory_set_bankptr(machine,  6, genz80.z80_prgram );
 
 
 	// not allowed??
-//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
+//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));
 
 	memory_install_readwrite8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), ym, 0x4000, 0x4003, 0, 0, ym2612_r, ym2612_w);
 	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
@@ -6603,14 +6603,14 @@ DRIVER_INIT( _32x )
 {
 
 
-	_32x_dram0 = auto_malloc(0x40000);
-	_32x_dram1 = auto_malloc(0x40000);
+	_32x_dram0 = auto_alloc_array(machine, UINT16, 0x40000/2);
+	_32x_dram1 = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	memset(_32x_dram0, 0x00, 0x40000);
 	memset(_32x_dram1, 0x00, 0x40000);
 
-	_32x_palette = auto_malloc(0x200);
-	_32x_palette_lookup = auto_malloc(0x200);
+	_32x_palette = auto_alloc_array(machine, UINT16, 0x200/2);
+	_32x_palette_lookup = auto_alloc_array(machine, UINT16, 0x200/2);
 
 	memset(_32x_palette, 0x00, 0x200);
 	memset(_32x_palette_lookup, 0x00, 0x200);
@@ -6623,7 +6623,7 @@ DRIVER_INIT( _32x )
 
 	if (_32x_adapter_enabled == 0)
 	{
-		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, (read16_space_func)SMH_BANK(10), (write16_space_func)SMH_BANK(10));
 		memory_set_bankptr(machine,  10, memory_region(machine, "gamecart") );
 	};
 

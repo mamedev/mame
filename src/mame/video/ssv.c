@@ -202,7 +202,7 @@ VIDEO_START( eaglshot )
 {
 	VIDEO_START_CALL(ssv);
 
-	eaglshot_gfxram		=	(UINT16*)auto_malloc(16 * 0x40000);
+	eaglshot_gfxram		=	auto_alloc_array(machine, UINT16, 16 * 0x40000 / 2);
 
 	gfx_element_set_source(machine->gfx[0], (UINT8 *)eaglshot_gfxram);
 	gfx_element_set_source(machine->gfx[1], (UINT8 *)eaglshot_gfxram);
@@ -226,7 +226,7 @@ VIDEO_START( gdfs )
 {
 	VIDEO_START_CALL(ssv);
 
-	eaglshot_gfxram		=	(UINT16*)auto_malloc(4 * 0x100000);
+	eaglshot_gfxram		=	auto_alloc_array(machine, UINT16, 4 * 0x100000 / 2);
 
 	machine->gfx[2]->color_granularity = 64; /* 256 colour sprites with palette selectable on 64 colour boundaries */
 	gfx_element_set_source(machine->gfx[2], (UINT8 *)eaglshot_gfxram);

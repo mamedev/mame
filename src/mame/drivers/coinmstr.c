@@ -1194,7 +1194,7 @@ static DRIVER_INIT( coinmstr )
 {
 	UINT8 *rom = memory_region(machine, "user1");
 	int length = memory_region_length(machine, "user1");
-	UINT8 *buf = malloc_or_die(length);
+	UINT8 *buf = alloc_array_or_die(UINT8, length);
 	int i;
 
 		memcpy(buf,rom,length);

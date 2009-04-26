@@ -34,9 +34,9 @@ static VIDEO_START( slapshot_core )
 {
 	int i;
 
-	spriteram_delayed = auto_malloc(spriteram_size);
-	spriteram_buffered = auto_malloc(spriteram_size);
-	spritelist = auto_malloc(0x400 * sizeof(*spritelist));
+	spriteram_delayed = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	spriteram_buffered = auto_alloc_array(machine, UINT16, spriteram_size/2);
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x400);
 
 	if (has_TC0480SCP(machine))	/* it's a tc0480scp game */
 		TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,taito_hide_pixels,30,9,-1,1,0,2,256);

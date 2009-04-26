@@ -377,8 +377,8 @@ static UINT8 mc8123_decrypt(offs_t addr,UINT8 val,const UINT8 *key,int opcode)
 void mc8123_decrypt_rom(running_machine *machine, const char *cpu, const char *keyrgn, int banknum, int numbanks)
 {
 	const address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
-	UINT8 *decrypted1 = auto_malloc(numbanks == 1 ? 0xc000 : 0x8000);
-	UINT8 *decrypted2 = numbanks > 1 ? auto_malloc(0x4000 * numbanks) : decrypted1 + 0x8000;
+	UINT8 *decrypted1 = auto_alloc_array(machine, UINT8, numbanks == 1 ? 0xc000 : 0x8000);
+	UINT8 *decrypted2 = numbanks > 1 ? auto_alloc_array(machine, UINT8, 0x4000 * numbanks) : decrypted1 + 0x8000;
 	UINT8 *rom = memory_region(machine, cpu);
 	UINT8 *key = memory_region(machine, keyrgn);
 	int A, bank;

@@ -441,7 +441,7 @@ INLINE void add_bank_reference(bank_info *bank, const address_space *space)
 			return;
 
 	/* allocate a new entry and fill it */
-	(*refptr) = (bank_reference *)malloc_or_die(sizeof(**refptr));
+	(*refptr) = alloc_or_die(bank_reference);
 	(*refptr)->next = NULL;
 	(*refptr)->space = space;
 }
@@ -712,8 +712,7 @@ void memory_init(running_machine *machine)
 	add_exit_callback(machine, memory_exit);
 
 	/* allocate our private data */
-	memdata = machine->memory_data = (memory_private *)auto_malloc(sizeof(*machine->memory_data));
-	memset(memdata, 0, sizeof(*memdata));
+	memdata = machine->memory_data = auto_alloc_clear(machine, memory_private);
 
 	/* build up the cpudata array with info about all CPUs and address spaces */
 	memory_init_spaces(machine);
@@ -769,8 +768,7 @@ address_map *address_map_alloc(const device_config *device, const game_driver *d
 	const addrmap_token *internal_map;
 	address_map *map;
 
-	map = (address_map *)malloc_or_die(sizeof(*map));
-	memset(map, 0, sizeof(*map));
+	map = alloc_clear_or_die(address_map);
 
 	/* append the internal CPU map (first so it takes priority) */
 	internal_map = (const addrmap_token *)device_get_info_ptr(device, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
@@ -1494,7 +1492,7 @@ static void memory_init_spaces(running_machine *machine)
 	int spacenum;
 
 	/* create a global watchpoint-filled table */
-	memdata->wptable = (UINT8 *)auto_malloc(1 << LEVEL1_BITS);
+	memdata->wptable = auto_alloc_array(machine, UINT8, 1 << LEVEL1_BITS);
 	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
 	/* loop over CPUs */
@@ -1502,7 +1500,7 @@ static void memory_init_spaces(running_machine *machine)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (cpu_get_addrbus_width(device, spacenum) > 0)
 			{
-				address_space *space = (address_space *)malloc_or_die(sizeof(*space));
+				address_space *space = alloc_clear_or_die(address_space);
 				int logbits = cpu_get_logaddr_width(device, spacenum);
 				int ashift = cpu_get_addrbus_shift(device, spacenum);
 				int abits = cpu_get_addrbus_width(device, spacenum);
@@ -1516,7 +1514,6 @@ static void memory_init_spaces(running_machine *machine)
 					logbits = abits;
 
 				/* determine the address and data bits */
-				memset(space, 0, sizeof(*space));
 				space->machine = machine;
 				space->cpu = device;
 				space->name = address_space_names[spacenum];
@@ -1536,16 +1533,12 @@ static void memory_init_spaces(running_machine *machine)
 				space->log_unmap = TRUE;
 
 				/* allocate subtable information; we malloc this manually because it will be realloc'ed */
-				space->read.subtable = (subtable_data *)auto_malloc(sizeof(*space->read.subtable) * SUBTABLE_COUNT);
-				memset(space->read.subtable, 0, sizeof(*space->read.subtable) * SUBTABLE_COUNT);
-				space->write.subtable = (subtable_data *)auto_malloc(sizeof(*space->write.subtable) * SUBTABLE_COUNT);
-				memset(space->write.subtable, 0, sizeof(*space->write.subtable) * SUBTABLE_COUNT);
+				space->read.subtable = auto_alloc_array_clear(machine, subtable_data, SUBTABLE_COUNT);
+				space->write.subtable = auto_alloc_array_clear(machine, subtable_data, SUBTABLE_COUNT);
 
 				/* allocate the handler table */
-				space->read.handlers[0] = (handler_data *)auto_malloc(sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
-				memset(space->read.handlers[0], 0, sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
-				space->write.handlers[0] = (handler_data *)auto_malloc(sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
-				memset(space->write.handlers[0], 0, sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
+				space->read.handlers[0] = auto_alloc_array_clear(machine, handler_data, ARRAY_LENGTH(space->read.handlers));
+				space->write.handlers[0] = auto_alloc_array_clear(machine, handler_data, ARRAY_LENGTH(space->write.handlers));
 				for (entrynum = 1; entrynum < ARRAY_LENGTH(space->read.handlers); entrynum++)
 				{
 					space->read.handlers[entrynum] = space->read.handlers[0] + entrynum;
@@ -1568,8 +1561,8 @@ static void memory_init_spaces(running_machine *machine)
 				space->write.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
 
 				/* allocate memory; these aren't auto-malloc'ed as we need to expand them */
-				space->read.table = (UINT8 *)malloc_or_die(1 << LEVEL1_BITS);
-				space->write.table = (UINT8 *)malloc_or_die(1 << LEVEL1_BITS);
+				space->read.table = alloc_array_or_die(UINT8, 1 << LEVEL1_BITS);
+				space->write.table = alloc_array_or_die(UINT8, 1 << LEVEL1_BITS);
 
 				/* initialize everything to unmapped */
 				memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
@@ -2059,9 +2052,8 @@ static void map_detokenize(address_map *map, const game_driver *driver, const ch
 
 			/* start a new range */
 			case ADDRMAP_TOKEN_RANGE:
-				entry = *entryptr = (address_map_entry *)malloc_or_die(sizeof(**entryptr));
+				entry = *entryptr = alloc_clear_or_die(address_map_entry);
 				entryptr = &entry->next;
-				memset(entry, 0, sizeof(*entry));
 				TOKEN_GET_UINT64_UNPACK2(tokens, entry->addrstart, 32, entry->addrend, 32);
 				break;
 
@@ -3030,7 +3022,7 @@ static direct_range *direct_range_find(address_space *space, offs_t byteaddress,
 	if (range != NULL)
 		space->direct.freerangelist = range->next;
 	else
-		range = (direct_range *)malloc_or_die(sizeof(*range));
+		range = alloc_or_die(direct_range);
 
 	/* fill in the range */
 	table_derive_range(&space->read, byteaddress, &range->bytestart, &range->byteend);
@@ -3102,8 +3094,7 @@ static void *block_allocate(const address_space *space, offs_t bytestart, offs_t
 		bytestoalloc += byteend - bytestart + 1;
 
 	/* allocate and clear the memory */
-	block = (memory_block *)malloc_or_die(bytestoalloc);
-	memset(block, 0, bytestoalloc);
+	block = (memory_block *)alloc_array_clear_or_die(UINT8, bytestoalloc);
 	if (allocatemem)
 		memory = block + 1;
 

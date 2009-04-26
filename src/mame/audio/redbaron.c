@@ -172,7 +172,7 @@ static DEVICE_START( redbaron_sound )
 {
 	int i;
 
-	vol_lookup = (INT16 *)auto_malloc(32768 * sizeof(INT16));
+	vol_lookup = auto_alloc_array(device->machine, INT16, 32768);
 	for( i = 0; i < 0x8000; i++ )
 		vol_lookup[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 

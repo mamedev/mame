@@ -7067,7 +7067,7 @@ static DRIVER_INIT( chry10 )
 		ROM[i] = chry10_decrypt(ROM[i]);
 	}
 
-	buffer = malloc_or_die(size);
+	buffer = alloc_array_or_die(UINT8, size);
 	memcpy(buffer, ROM, size);
 
 	free(buffer);
@@ -7097,7 +7097,7 @@ static DRIVER_INIT( cb3 )
 		ROM[i] = decrypt(ROM[i], i);
 	}
 
-	buffer = malloc_or_die(size);
+	buffer = alloc_array_or_die(UINT8, size);
 	memcpy(buffer, ROM, size);
 
 	free(buffer);

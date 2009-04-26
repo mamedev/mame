@@ -126,12 +126,12 @@ static void update_palette(running_machine *machine)
 
 static VIDEO_START(srmp6)
 {
-	tileram = auto_malloc(0x100000*16);
+	tileram = auto_alloc_array(machine, UINT16, 0x100000*16/2);
 	memset(tileram,0x00,(0x100000*16));
 
-	dmaram = auto_malloc(0x100);
+	dmaram = auto_alloc_array(machine, UINT16, 0x100/2);
 
-	sprram_old = auto_malloc(0x80000);
+	sprram_old = auto_alloc_array(machine, UINT16, 0x80000/2);
 	memset(sprram_old, 0, 0x80000);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
@@ -513,7 +513,7 @@ static WRITE16_HANDLER(paletteram_w)
 static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM					// work RAM
-	AM_RANGE(0x600000, 0x7fffff) AM_READ(SMH_BANK1)		// banked ROM (used by ROM check)
+	AM_RANGE(0x600000, 0x7fffff) AM_READ(SMH_BANK(1))		// banked ROM (used by ROM check)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0)
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)		// inputs

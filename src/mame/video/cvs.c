@@ -186,9 +186,9 @@ VIDEO_START( cvs )
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
 
-	s2636_0 = s2636_config(cvs_s2636_0_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_1 = s2636_config(cvs_s2636_1_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_2 = s2636_config(cvs_s2636_2_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_0 = s2636_config(machine, cvs_s2636_0_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_1 = s2636_config(machine, cvs_s2636_1_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_2 = s2636_config(machine, cvs_s2636_2_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
 	/* create helper bitmaps */
 	background_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);

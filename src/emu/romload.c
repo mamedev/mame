@@ -115,7 +115,7 @@ chd_file *get_disk_handle(const char *region)
     file associated with the given region
 -------------------------------------------------*/
 
-void set_disk_handle(const char *region, mame_file *file, chd_file *chdfile)
+void set_disk_handle(running_machine *machine, const char *region, mame_file *file, chd_file *chdfile)
 {
 	open_chd chd = { 0 };
 
@@ -125,7 +125,7 @@ void set_disk_handle(const char *region, mame_file *file, chd_file *chdfile)
 	chd.origfile = file;
 
 	/* we're okay, add to the list of disks */
-	*chd_list_tailptr = (open_chd *)auto_malloc(sizeof(**chd_list_tailptr));
+	*chd_list_tailptr = auto_alloc(machine, open_chd);
 	**chd_list_tailptr = chd;
 	chd_list_tailptr = &(*chd_list_tailptr)->next;
 }
@@ -757,7 +757,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 
 	/* use a temporary buffer for complex loads */
 	tempbufsize = MIN(TEMPBUFFER_MAX_SIZE, numbytes);
-	tempbuf = (UINT8 *)malloc_or_die(tempbufsize);
+	tempbuf = alloc_array_or_die(UINT8, tempbufsize);
 
 	/* chunky reads for complex loads */
 	skip += groupsize;
@@ -1225,7 +1225,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 			/* we're okay, add to the list of disks */
 			LOG(("Assigning to handle %d\n", DISK_GETINDEX(romp)));
-			*chd_list_tailptr = (open_chd *)auto_malloc(sizeof(**chd_list_tailptr));
+			*chd_list_tailptr = auto_alloc(romdata->machine, open_chd);
 			**chd_list_tailptr = chd;
 			chd_list_tailptr = &(*chd_list_tailptr)->next;
 		}

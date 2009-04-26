@@ -2100,7 +2100,7 @@ static DRIVER_INIT( number10 )
 	/* Descramble graphic */
 	rom = memory_region(machine, "gfx1");
 	length = memory_region_length(machine, "gfx1");
-	tmp = malloc_or_die(length);
+	tmp = alloc_array_or_die(UINT8, length);
 	memcpy(tmp,rom,length);
 	for (A = 0;A < length;A++)
 	{

@@ -530,7 +530,7 @@ static DRIVER_INIT(simpl156)
 {
 	UINT8 *rom = memory_region(machine, "okimusic");
 	int length = memory_region_length(machine, "okimusic");
-	UINT8 *buf1 = malloc_or_die(length);
+	UINT8 *buf1 = alloc_array_or_die(UINT8, length);
 
 	UINT32 x;
 

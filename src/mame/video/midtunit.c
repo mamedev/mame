@@ -86,7 +86,7 @@ static struct
 VIDEO_START( midtunit )
 {
 	/* allocate memory */
-	local_videoram = auto_malloc(0x100000);
+	local_videoram = auto_alloc_array(machine, UINT16, 0x100000/2);
 
 	/* reset all the globals */
 	gfxbank_offset[0] = 0x000000;

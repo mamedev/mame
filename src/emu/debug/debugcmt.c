@@ -110,8 +110,7 @@ int debug_comment_init(running_machine *machine)
 	if (numcpu > 0)
 	{
 		/* allocate enough comment groups for the total # of cpu's */
-		debug_comments = (comment_group*) auto_malloc(numcpu * sizeof(comment_group));
-		memset(debug_comments, 0, numcpu * sizeof(comment_group));
+		debug_comments = auto_alloc_array_clear(machine, comment_group, numcpu);
 
 		/* automatically load em up */
 		debug_comment_load(machine);
@@ -137,7 +136,7 @@ int debug_comment_add(const device_config *device, offs_t addr, const char *comm
 	int match = 0;
 
 	/* Create a new item to insert into the list */
-	debug_comment *insert_me = (debug_comment*) malloc_or_die(sizeof(debug_comment));
+	debug_comment *insert_me = alloc_or_die(debug_comment);
 	insert_me->color = color;
 	insert_me->is_valid = 1;
 	insert_me->address = addr;

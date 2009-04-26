@@ -117,7 +117,7 @@ static void update_namco_waveform(namco_sound *chip, int offset, UINT8 data)
 
 
 /* build the decoded waveform table */
-static void build_decoded_waveform(namco_sound *chip, UINT8 *rgnbase)
+static void build_decoded_waveform(running_machine *machine, namco_sound *chip, UINT8 *rgnbase)
 {
 	INT16 *p;
 	int size;
@@ -139,7 +139,7 @@ static void build_decoded_waveform(namco_sound *chip, UINT8 *rgnbase)
 		size = 32 * 8;		/* 32 samples, 8 waveforms */
 	}
 
-	p = (INT16 *)auto_malloc(size * MAX_VOLUME * sizeof (INT16));
+	p = auto_alloc_array(machine, INT16, size * MAX_VOLUME);
 
 	for (v = 0; v < MAX_VOLUME; v++)
 	{
@@ -388,7 +388,7 @@ static DEVICE_START( namco )
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", chip->f_fracbits, chip->namco_clock, chip->sample_rate);
 
 	/* build the waveform table */
-	build_decoded_waveform(chip, device->region);
+	build_decoded_waveform(device->machine, chip, device->region);
 
 	/* get stream channels */
 	if (intf->stereo)

@@ -38,8 +38,8 @@ static void nec_v25_cpu_decrypt(running_machine *machine)
 	int i;
 	const address_space *space = cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "mcu");
-	UINT8* decrypted = auto_malloc(0x100000);
-	UINT8* temp = malloc_or_die(0x100000);
+	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x100000);
+	UINT8* temp = alloc_array_or_die(UINT8, 0x100000);
 
 	// set CPU3 opcode base
 	memory_set_decrypted_region(space, 0x00000, 0xfffff, decrypted);

@@ -1522,8 +1522,8 @@ void K007342_vh_start(running_machine *machine, int gfx_index, void (*callback)(
 	K007342_tilemap[0] = tilemap_create(machine, K007342_get_tile_info0,K007342_scan,8,8,64,32);
 	K007342_tilemap[1] = tilemap_create(machine, K007342_get_tile_info1,K007342_scan,8,8,64,32);
 
-	K007342_ram = auto_malloc(0x2000);
-	K007342_scroll_ram = auto_malloc(0x0200);
+	K007342_ram = auto_alloc_array(machine, UINT8, 0x2000);
+	K007342_scroll_ram = auto_alloc_array(machine, UINT8, 0x0200);
 
 	memset(K007342_ram,0,0x2000);
 
@@ -1697,9 +1697,7 @@ void K007420_vh_start(running_machine *machine, int gfxnum, void (*callback)(int
 {
 	K007420_gfx = machine->gfx[gfxnum];
 	K007420_callback = callback;
-	K007420_ram = auto_malloc(0x200);
-
-	memset(K007420_ram,0,0x200);
+	K007420_ram = auto_alloc_array_clear(machine, UINT8, 0x200);
 
 	K007420_banklimit = -1;
 
@@ -2041,7 +2039,7 @@ void K052109_vh_start(running_machine *machine,const char *gfx_memory_region,int
 	K052109_tilemap[1] = tilemap_create(machine, K052109_get_tile_info1,tilemap_scan_rows,8,8,64,32);
 	K052109_tilemap[2] = tilemap_create(machine, K052109_get_tile_info2,tilemap_scan_rows,8,8,64,32);
 
-	K052109_ram = auto_malloc(0x6000);
+	K052109_ram = auto_alloc_array(machine, UINT8, 0x6000);
 
 	memset(K052109_ram,0,0x6000);
 
@@ -2549,8 +2547,7 @@ void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int
 	K051960_memory_region = gfx_memory_region;
 	K051960_gfx = machine->gfx[gfx_index];
 	K051960_callback = callback;
-	K051960_ram = auto_malloc(0x400);
-	memset(K051960_ram,0,0x400);
+	K051960_ram = auto_alloc_array_clear(machine, UINT8, 0x400);
 
 	state_save_register_global(machine, K051960_romoffset);
 	state_save_register_global(machine, K051960_spriteflip);
@@ -3046,13 +3043,10 @@ void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_
 	K053245_callback[chip] = callback;
 	K053244_rombank[chip] = 0;
 	K053245_ramsize[chip] = 0x800;
-	K053245_ram[chip] = auto_malloc(K053245_ramsize[chip]);
+	K053245_ram[chip] = auto_alloc_array_clear(machine, UINT16, K053245_ramsize[chip]/2);
 	K053245_dx[chip] = K053245_dy[chip] = 0;
 
-	K053245_buffer[chip] = auto_malloc(K053245_ramsize[chip]);
-
-	memset(K053245_ram[chip],0,K053245_ramsize[chip]);
-	memset(K053245_buffer[chip],0,K053245_ramsize[chip]);
+	K053245_buffer[chip] = auto_alloc_array_clear(machine, UINT16, K053245_ramsize[chip]/2);
 
 	state_save_register_item_pointer(machine, "K053245", NULL, chip, K053245_ram[chip], K053245_ramsize[chip] / 2);
 	state_save_register_item_pointer(machine, "K053245", NULL, chip, K053245_buffer[chip], K053245_ramsize[chip] / 2);
@@ -3812,7 +3806,7 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	K053247_gfx = machine->gfx[gfx_index];
 	K053247_callback = callback;
 	K053246_OBJCHA_line = CLEAR_LINE;
-	K053247_ram = auto_malloc(0x1000);
+	K053247_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	memset(K053247_ram,  0, 0x1000);
 	memset(K053246_regs, 0, 8);
@@ -3893,7 +3887,7 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 		size4 = (memory_region_length(machine, gfx_memory_region)/(1024*1024))/5;
 		size4 *= 4*1024*1024;
 		/* set the # of tiles based on the 4bpp section */
-		K055673_rom = auto_malloc(size4 * 5);
+		K055673_rom = auto_alloc_array(machine, UINT16, size4 * 5 / 2);
 		d = (UINT8 *)K055673_rom;
 		// now combine the graphics together to form 5bpp
 		s1 = memory_region(machine, gfx_memory_region); // 4bpp area
@@ -3941,7 +3935,7 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	K053247_gfx = machine->gfx[gfx_index];
 	K053247_callback = callback;
 	K053246_OBJCHA_line = CLEAR_LINE;
-	K053247_ram = auto_malloc(0x1000);
+	K053247_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	memset(K053247_ram,  0, 0x1000);
 	memset(K053246_regs, 0, 8);
@@ -4698,7 +4692,7 @@ static void K051316_vh_start(running_machine *machine,int chip, const char *gfx_
 
 	K051316_tilemap[chip] = tilemap_create(machine, get_tile_info[chip],tilemap_scan_rows,16,16,32,32);
 
-	K051316_ram[chip] = auto_malloc(0x800);
+	K051316_ram[chip] = auto_alloc_array(machine, UINT8, 0x800);
 
 	if (!pen_is_mask)
 		tilemap_set_transparent_pen(K051316_tilemap[chip],transparent_pen);
@@ -5783,7 +5777,7 @@ void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, i
 		K056832_PageTileMode[i] = 1;
 	}
 
-	K056832_videoram = auto_malloc(0x2000 * (K056832_PAGE_COUNT+1));
+	K056832_videoram = auto_alloc_array(machine, UINT16, 0x2000 * (K056832_PAGE_COUNT+1) / 2);
 
 	K056832_tilemap[0x0] = tilemap_create(machine, K056832_get_tile_info0, tilemap_scan_rows,  8, 8, 64, 32);
 	K056832_tilemap[0x1] = tilemap_create(machine, K056832_get_tile_info1, tilemap_scan_rows,  8, 8, 64, 32);
@@ -7528,7 +7522,7 @@ void K053250_vh_start(running_machine *machine, int chips, const char **region)
 	for(chip=0; chip<chips; chip++)
 	{
 		K053250_info.chip[chip].base = memory_region(machine, region[chip]);
-		ram = auto_malloc(0x6000);
+		ram = auto_alloc_array(machine, UINT16, 0x6000/2);
 		K053250_info.chip[chip].ram = ram;
 		K053250_info.chip[chip].rammax = ram + 0x800;
 		K053250_info.chip[chip].buffer[0] = ram + 0x2000;

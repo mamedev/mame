@@ -281,9 +281,8 @@ VIDEO_START( pastelg )
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	pastelg_videoram = auto_malloc(width * height * sizeof(UINT8));
-	pastelg_clut = auto_malloc(0x10 * sizeof(UINT8));
-	memset(pastelg_videoram, 0x00, (width * height * sizeof(UINT8)));
+	pastelg_videoram = auto_alloc_array_clear(machine, UINT8, width * height);
+	pastelg_clut = auto_alloc_array(machine, UINT8, 0x10);
 }
 
 /******************************************************************************

@@ -91,7 +91,7 @@ READ16_HANDLER( lethalj_gun_r )
 VIDEO_START( lethalj )
 {
 	/* allocate video RAM for screen */
-	screenram = auto_malloc(BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT * sizeof(screenram[0]));
+	screenram = auto_alloc_array(machine, UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
 	blitter_base = (UINT16 *)memory_region(machine, "gfx1");

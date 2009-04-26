@@ -141,8 +141,7 @@ render_font *render_font_alloc(const char *filename)
 	render_font *font;
 
 	/* allocate and clear memory */
-	font = (render_font *)malloc_or_die(sizeof(*font));
-	memset(font, 0, sizeof(*font));
+	font = alloc_clear_or_die(render_font);
 
 	/* attempt to load the cached version of the font first */
 	if (filename != NULL && render_font_load_cached_bdf(font, filename) == 0)
@@ -150,8 +149,7 @@ render_font *render_font_alloc(const char *filename)
 
 	/* if we failed, clean up and realloc */
 	render_font_free(font);
-	font = (render_font *)malloc_or_die(sizeof(*font));
-	memset(font, 0, sizeof(*font));
+	font = alloc_clear_or_die(render_font);
 
 	/* load the raw data instead */
 	filerr = mame_fopen_ram(font_uismall, sizeof(font_uismall), OPEN_FLAG_READ, &ramfile);
@@ -434,7 +432,7 @@ static int render_font_load_cached_bdf(render_font *font, const char *filename)
 
 	/* determine the file size and allocate memory */
 	font->rawsize = mame_fsize(file);
-	data = (char *)malloc_or_die(font->rawsize + 1);
+	data = alloc_array_clear_or_die(char, font->rawsize + 1);
 
 	/* read and hash the first chunk */
 	bytes = mame_fread(file, data, MIN(CACHED_BDF_HASH_SIZE, font->rawsize));
@@ -583,10 +581,7 @@ static int render_font_load_bdf(render_font *font)
 
 				/* if we don't have a subtable yet, make one */
 				if (font->chars[charnum / 256] == NULL)
-				{
-					font->chars[charnum / 256] = (render_font_char *)malloc_or_die(256 * sizeof(font->chars[0][0]));
-					memset(font->chars[charnum / 256], 0, 256 * sizeof(font->chars[0][0]));
-				}
+					font->chars[charnum / 256] = alloc_array_clear_or_die(render_font_char, 256);
 
 				/* fill in the entry */
 				ch = &font->chars[charnum / 256][charnum % 256];
@@ -642,7 +637,7 @@ static int render_font_load_cached(render_font *font, mame_file *file, UINT32 ha
 		goto error;
 
 	/* now read the rest of the data */
-	data = (UINT8 *)malloc_or_die(filesize - CACHED_HEADER_SIZE);
+	data = alloc_array_or_die(UINT8, filesize - CACHED_HEADER_SIZE);
 	bytes_read = mame_fread(file, data, filesize - CACHED_HEADER_SIZE);
 	if (bytes_read != filesize - CACHED_HEADER_SIZE)
 		goto error;
@@ -657,10 +652,7 @@ static int render_font_load_cached(render_font *font, mame_file *file, UINT32 ha
 
 		/* if we don't have a subtable yet, make one */
 		if (font->chars[chnum / 256] == NULL)
-		{
-			font->chars[chnum / 256] = (render_font_char *)malloc_or_die(256 * sizeof(font->chars[0][0]));
-			memset(font->chars[chnum / 256], 0, 256 * sizeof(font->chars[0][0]));
-		}
+			font->chars[chnum / 256] = alloc_array_clear_or_die(render_font_char, 256);
 
 		/* fill in the entry */
 		ch = &font->chars[chnum / 256][chnum % 256];
@@ -728,11 +720,10 @@ static int render_font_save_cached(render_font *font, const char *filename, UINT
 	}
 
 	/* allocate an array to hold the character data */
-	chartable = (UINT8 *)malloc_or_die(numchars * CACHED_CHAR_SIZE);
-	memset(chartable, 0, numchars * CACHED_CHAR_SIZE);
+	chartable = alloc_array_clear_or_die(UINT8, numchars * CACHED_CHAR_SIZE);
 
 	/* allocate a temp buffer to compress into */
-	tempbuffer = (UINT8 *)malloc_or_die(65536);
+	tempbuffer = alloc_array_or_die(UINT8, 65536);
 
 	/* write the header */
 	dest = tempbuffer;

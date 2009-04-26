@@ -829,7 +829,7 @@ static WRITE8_HANDLER(jumppop_z80_bank_w)
 
 static ADDRESS_MAP_START( jumppop_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -3574,7 +3574,7 @@ static DRIVER_INIT( htchctch )
 
 	HCROM[0x1e228/2] = 0x4e75;
 
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x140000, 0x1407ff, 0, 0, SMH_NOP ); // kill palette writes as the interrupt code we don't have controls them
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x140000, 0x1407ff, 0, 0, (write16_space_func)SMH_NOP ); // kill palette writes as the interrupt code we don't have controls them
 
 
 	{
@@ -3595,7 +3595,7 @@ static DRIVER_INIT( htchctch )
 static void suprtrio_decrypt_code(running_machine *machine)
 {
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
-	UINT16 *buf = malloc_or_die(0x80000);
+	UINT16 *buf = alloc_array_or_die(UINT16, 0x80000/2);
 	int i;
 
 	/* decrypt main ROMs */
@@ -3615,7 +3615,7 @@ static void suprtrio_decrypt_code(running_machine *machine)
 static void suprtrio_decrypt_gfx(running_machine *machine)
 {
 	UINT16 *rom = (UINT16 *)memory_region(machine, "gfx1");
-	UINT16 *buf = malloc_or_die(0x100000);
+	UINT16 *buf = alloc_array_or_die(UINT16, 0x100000/2);
 	int i;
 
 	/* decrypt tiles */

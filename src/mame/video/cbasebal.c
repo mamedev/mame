@@ -45,8 +45,8 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( cbasebal )
 {
-	cbasebal_textram = auto_malloc(0x1000);
-	cbasebal_scrollram = auto_malloc(0x1000);
+	cbasebal_textram = auto_alloc_array(machine, UINT8, 0x1000);
+	cbasebal_scrollram = auto_alloc_array(machine, UINT8, 0x1000);
 
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,   16,16,64,32);
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);

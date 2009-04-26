@@ -52,13 +52,13 @@ static short *mixer_buffer_2;
 
 
 /* build a table to divide by the number of voices; gain is specified as gain*16 */
-static void make_mixer_table(int voices, int gain)
+static void make_mixer_table(running_machine *machine, int voices, int gain)
 {
 	int count = voices * 128;
 	int i;
 
 	/* allocate memory */
-	mixer_table = auto_malloc(256 * voices * sizeof(INT16));
+	mixer_table = auto_alloc_array(machine, INT16, 256 * voices);
 
 	/* find the middle of the table */
 	mixer_lookup = mixer_table + (128 * voices);
@@ -167,11 +167,11 @@ static DEVICE_START( wiping_sound )
 	stream = stream_create(device, 0, 1, samplerate, NULL, wiping_update_mono);
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	mixer_buffer = auto_malloc(2 * sizeof(short) * samplerate);
+	mixer_buffer = auto_alloc_array(machine, short, 2 * samplerate);
 	mixer_buffer_2 = mixer_buffer + samplerate;
 
 	/* build the mixer table */
-	make_mixer_table(8, defgain);
+	make_mixer_table(device->machine, 8, defgain);
 
 	/* extract globals from the interface */
 	num_voices = 8;

@@ -784,8 +784,8 @@ static DRIVER_INIT(dwarfd)
 	//      src[i] = src[i]&0xe0;
 	}
 
-	videobuf=auto_malloc(0x8000);
-	dwarfd_ram=auto_malloc(0x1000);
+	videobuf=auto_alloc_array(machine, UINT8, 0x8000);
+	dwarfd_ram=auto_alloc_array(machine, UINT8, 0x1000);
 	memset(videobuf,0,0x8000);
 	memset(dwarfd_ram,0,0x1000);
 

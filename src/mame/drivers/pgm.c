@@ -1427,7 +1427,7 @@ static void expand_colourdata(running_machine *machine)
 	while (pgm_sprite_a_region_allocate < needed)
 		pgm_sprite_a_region_allocate = pgm_sprite_a_region_allocate <<1;
 
-	pgm_sprite_a_region = auto_malloc (pgm_sprite_a_region_allocate);
+	pgm_sprite_a_region = auto_alloc_array(machine, UINT8, pgm_sprite_a_region_allocate);
 
 
 	for (cnt = 0 ; cnt < srcsize/2 ; cnt++)
@@ -1581,8 +1581,8 @@ static DRIVER_INIT( ddp2 )
 static void svg_basic_init(running_machine *machine)
 {
 	pgm_basic_init(machine);
-	svg_shareram[0]=auto_malloc(0x10000);
-	svg_shareram[1]=auto_malloc(0x10000);
+	svg_shareram[0]=auto_alloc_array(machine, UINT32, 0x10000/4);
+	svg_shareram[1]=auto_alloc_array(machine, UINT32, 0x10000/4);
 	svg_ram_sel=0;
 }
 

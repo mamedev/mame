@@ -330,7 +330,7 @@ ADDRESS_MAP_END
 /* we have to fill in the ROM addresses for systeme due to the encrypted games */
 static ADDRESS_MAP_START( systeme_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* Fixed ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)				/* Banked ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))				/* Banked ROM */
 
 //  AM_RANGE(0x0000 , 0xbfff) AM_READ(SMH_ROM)
 //  AM_RANGE(0xc000 , 0xdfff) AM_READ(SMH_RAM) AM_MIRROR(0x2000)
@@ -658,8 +658,7 @@ static void *start_vdp(running_machine *machine, int type)
 {
 	struct sms_vdp *chip;
 
-	chip = auto_malloc(sizeof(*chip));
-	memset(chip, 0, sizeof(*chip));
+	chip = auto_alloc_clear(machine, struct sms_vdp);
 
 	chip->vdp_type = type;
 
@@ -684,35 +683,30 @@ static void *start_vdp(running_machine *machine, int type)
 	chip->regs[0xa] = 0;
 	/* b-f don't matter */
 	chip->readbuf = 0;
-	chip->vram = auto_malloc(0x4000);
-	memset(chip->vram,0x00,0x4000);
+	chip->vram = auto_alloc_array_clear(machine, UINT8, 0x4000);
 
 	//printf("%d\n", (*chip->set_irq)(machine, 200));
 
 	if (chip->vdp_type==GG_VDP)
 	{
-		chip->cram = auto_malloc(0x0040);
-		memset(chip->cram,0x00,0x0040);
-		chip->cram_mamecolours = auto_malloc(0x0080);
-		memset(chip->cram_mamecolours,0x00,0x0080);
+		chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0040);
+		chip->cram_mamecolours = auto_alloc_array_clear(machine, UINT16, 0x0080/2);
 		chip->gg_cram_latch = 0;
 	}
 	else
 	{
-		chip->cram = auto_malloc(0x0020);
-		memset(chip->cram,0x00,0x0020);
-		chip->cram_mamecolours = auto_malloc(0x0040);
-		memset(chip->cram_mamecolours,0x00,0x0040);
+		chip->cram = auto_alloc_array_clear(machine, UINT8, 0x0020);
+		chip->cram_mamecolours = auto_alloc_array(machine, UINT16, 0x0040/2);
 	}
 
-	chip->tile_renderline = auto_malloc(256+8);
+	chip->tile_renderline = auto_alloc_array(machine, UINT8, 256+8);
 	memset(chip->tile_renderline,0x00,256+8);
 
-	chip->sprite_renderline = auto_malloc(256+32);
+	chip->sprite_renderline = auto_alloc_array(machine, UINT8, 256+32);
 	memset(chip->sprite_renderline,0x00,256+32);
 
 	chip->writemode = 0;
-	chip->r_bitmap = auto_bitmap_alloc(256, 256, BITMAP_FORMAT_RGB15);
+	chip->r_bitmap = auto_bitmap_alloc(machine, 256, 256, BITMAP_FORMAT_RGB15);
 
 	chip->sms_scanline_timer = timer_alloc(machine, sms_scanline_timer_callback, chip);
 
@@ -2189,8 +2183,8 @@ static void init_systeme_map(running_machine *machine)
 //  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* fixed rom bank area */
-//  sms_rom = auto_malloc(0xc000);
-//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+//  sms_rom = auto_alloc_array(machine, UINT8, 0xc000);
+//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_UNMAP);
 //  memory_set_bankptr(machine,  1, sms_rom );
 
 	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "z80") + 0x10000, 0x4000);
@@ -2202,8 +2196,8 @@ static void init_systeme_map(running_machine *machine)
 //  memcpy(sms_rom, memory_region(machine, "user1"), 0x8000);
 
 	/* main ram area */
-	sms_mainram = auto_malloc(0x4000);
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	sms_mainram = auto_alloc_array(machine, UINT8, 0x4000);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, (read8_space_func)SMH_BANK(2), (write8_space_func)SMH_BANK(2));
 	memory_set_bankptr(machine,  2, sms_mainram );
 	memset(sms_mainram,0x00,0x4000);
 
@@ -2234,7 +2228,7 @@ DRIVER_INIT( megatech_bios )
 	vdp1->chip_id = 1;
 
 	vdp1_vram_bank0 = vdp1->vram;
-	vdp1_vram_bank1 = auto_malloc(0x4000);
+	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 }
 
 static DRIVER_INIT( segasyse )
@@ -2249,7 +2243,7 @@ static DRIVER_INIT( segasyse )
 	vdp1->chip_id = 1;
 
 	vdp1_vram_bank0 = vdp1->vram;
-	vdp1_vram_bank1 = auto_malloc(0x4000);
+	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 
 
 	vdp2 = start_vdp(machine, SMS2_VDP);
@@ -2260,7 +2254,7 @@ static DRIVER_INIT( segasyse )
 	vdp2->chip_id = 2;
 
 	vdp2_vram_bank0 = vdp2->vram;
-	vdp2_vram_bank1 = auto_malloc(0x4000);
+	vdp2_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 }
 
 /*- Hang On Jr. Specific -*/

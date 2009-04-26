@@ -43,7 +43,7 @@ static UINT8 *				hsyncram;
 
 VIDEO_START( beathead )
 {
-	hsyncram = auto_malloc(0x800);
+	hsyncram = auto_alloc_array(machine, UINT8, 0x800);
 }
 
 

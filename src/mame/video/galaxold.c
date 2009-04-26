@@ -924,7 +924,7 @@ VIDEO_START( dambustr )
 	dambustr_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* make a copy of the tilemap to emulate background priority */
-	dambustr_videoram2 = auto_malloc(0x0400);
+	dambustr_videoram2 = auto_alloc_array(machine, UINT8, 0x0400);
 	dambustr_tilemap2 = tilemap_create(machine, dambustr_get_tile_info2,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(dambustr_tilemap2,0);

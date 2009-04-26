@@ -166,7 +166,7 @@ NB1objcode2tile( int code )
 VIDEO_START( namconb1 )
 {
 	namco_tilemap_init( machine, NAMCONB1_TILEGFX, memory_region(machine, NAMCONB1_TILEMASKREGION), NB1TilemapCB );
-	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,NB1objcode2tile);
+	namco_obj_init(machine,NAMCONB1_SPRITEGFX,0x0,NB1objcode2tile);
 } /* namconb1 */
 
 /****************************************************************************************************/
@@ -228,6 +228,6 @@ NB2objcode2tile( int code )
 VIDEO_START( namconb2 )
 {
 	namco_tilemap_init(machine, NAMCONB1_TILEGFX, memory_region(machine, NAMCONB1_TILEMASKREGION), NB2TilemapCB );
-	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,NB2objcode2tile);
+	namco_obj_init(machine,NAMCONB1_SPRITEGFX,0x0,NB2objcode2tile);
 	namco_roz_init(machine, NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
 } /* namconb2_vh_start */

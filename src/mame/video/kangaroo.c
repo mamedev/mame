@@ -24,7 +24,7 @@ static void blitter_execute(running_machine *machine);
 VIDEO_START( kangaroo )
 {
 	/* video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels) */
-	videoram32 = auto_malloc(256 * 64 * 4);
+	videoram32 = auto_alloc_array(machine, UINT32, 256 * 64);
 	state_save_register_global_pointer(machine, videoram32, 256 * 64);
 }
 

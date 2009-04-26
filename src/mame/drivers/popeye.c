@@ -668,7 +668,7 @@ static DRIVER_INIT( skyskipr )
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
-	buffer = malloc_or_die(len);
+	buffer = alloc_array_or_die(UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
@@ -689,7 +689,7 @@ static DRIVER_INIT( popeye )
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
-	buffer = malloc_or_die(len);
+	buffer = alloc_array_or_die(UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)

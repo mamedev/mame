@@ -94,17 +94,6 @@ static pen_t black_pen;
 
 ***************************************************************************/
 
-static struct sprite *sprite_list_create(int num_sprites)
-{
-	struct sprite *spr_list;
-
-	spr_list = auto_malloc(num_sprites * sizeof(struct sprite));
-
-	memset(spr_list, 0, num_sprites * sizeof(struct sprite));
-
-	return spr_list;
-}
-
 static void get_sprite_info(running_machine *machine)
 {
 	const pen_t *base_pal = machine->pens;
@@ -924,7 +913,7 @@ VIDEO_START( wecleman )
 	int i, j;
 
 	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
-	buffer = auto_malloc(0x12c00);	// working buffer for sprite operations
+	buffer = auto_alloc_array(machine, UINT8, 0x12c00);	// working buffer for sprite operations
 
 	gameid = 0;
 	wecleman_gfx_bank = bank;
@@ -955,7 +944,7 @@ VIDEO_START( wecleman )
 		}
 	}
 
-	sprite_list = sprite_list_create(NUM_SPRITES);
+	sprite_list = auto_alloc_array_clear(machine, struct sprite, NUM_SPRITES);
 
 	bg_tilemap = tilemap_create(machine, wecleman_get_bg_tile_info,
 								tilemap_scan_rows,
@@ -1026,7 +1015,7 @@ VIDEO_START( hotchase )
 
 	UINT8 *buffer;
 
-	buffer = auto_malloc(0x400);	// reserve 1k for sprite list
+	buffer = auto_alloc_array(machine, UINT8, 0x400);	// reserve 1k for sprite list
 
 	gameid = 1;
 	wecleman_gfx_bank = bank;
@@ -1036,7 +1025,7 @@ VIDEO_START( hotchase )
 
 	spr_ptr_list = (struct sprite **)buffer;
 
-	sprite_list = sprite_list_create(NUM_SPRITES);
+	sprite_list = auto_alloc_array_clear(machine, struct sprite, NUM_SPRITES);
 
 	K051316_vh_start_0(machine,ZOOMROM0_MEM_REGION,4,FALSE,0,zoom_callback_0);
 	K051316_vh_start_1(machine,ZOOMROM1_MEM_REGION,4,FALSE,0,zoom_callback_1);

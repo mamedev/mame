@@ -192,7 +192,7 @@ VIDEO_START( taitosj )
 {
 	int i;
 
-	sprite_layer_collbitmap1 = auto_bitmap_alloc(16,16,video_screen_get_format(machine->primary_screen));
+	sprite_layer_collbitmap1 = auto_bitmap_alloc(machine,16,16,video_screen_get_format(machine->primary_screen));
 
 	for (i = 0; i < 3; i++)
 	{
@@ -200,8 +200,8 @@ VIDEO_START( taitosj )
 		sprite_layer_collbitmap2[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	}
 
-	sprite_sprite_collbitmap1 = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
-	sprite_sprite_collbitmap2 = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
+	sprite_sprite_collbitmap1 = auto_bitmap_alloc(machine,32,32,video_screen_get_format(machine->primary_screen));
+	sprite_sprite_collbitmap2 = auto_bitmap_alloc(machine,32,32,video_screen_get_format(machine->primary_screen));
 
 	gfx_element_set_source(machine->gfx[0], taitosj_characterram);
 	gfx_element_set_source(machine->gfx[1], taitosj_characterram);

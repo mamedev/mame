@@ -142,8 +142,8 @@ static DEVICE_START( leland_sound )
 	dac_stream = stream_create(device, 0, 1, 256*60, NULL, leland_update);
 
 	/* allocate memory */
-	dac_buffer[0] = auto_malloc(DAC_BUFFER_SIZE);
-	dac_buffer[1] = auto_malloc(DAC_BUFFER_SIZE);
+	dac_buffer[0] = auto_alloc_array(device->machine, UINT8, DAC_BUFFER_SIZE);
+	dac_buffer[1] = auto_alloc_array(device->machine, UINT8, DAC_BUFFER_SIZE);
 }
 
 

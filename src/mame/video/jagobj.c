@@ -24,13 +24,13 @@ static UINT8 *blend_y, *blend_cc;
  *
  *************************************/
 
-void jagobj_init(void)
+void jagobj_init(running_machine *machine)
 {
 	int i;
 
 	/* allocate memory for tables */
-	blend_y = auto_malloc(256 * 256);
-	blend_cc = auto_malloc(256 * 256);
+	blend_y = auto_alloc_array(machine, UINT8, 256 * 256);
+	blend_cc = auto_alloc_array(machine, UINT8, 256 * 256);
 
 	/* fill tables */
 	for (i = 0; i < 256 * 256; i++)

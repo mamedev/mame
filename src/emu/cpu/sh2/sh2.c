@@ -2247,8 +2247,7 @@ static CPU_DISASSEMBLE( sh2 )
 static CPU_INIT( sh2 )
 {
 	/* allocate the core memory */
-	sh2 = auto_malloc(sizeof(SH2));
-	memset(sh2, 0, sizeof(SH2));
+	sh2 = auto_alloc_clear(device->machine, SH2);
 
 	/* initialize the common core parts */
 	sh2_common_init(sh2, device, irqcallback);

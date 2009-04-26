@@ -122,6 +122,6 @@ static int FLobjcode2tile( int code )
 VIDEO_START( namcofl )
 {
 	namco_tilemap_init( machine, NAMCONB1_TILEGFX, memory_region(machine, NAMCONB1_TILEMASKREGION), TilemapCB );
-	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);
+	namco_obj_init(machine,NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);
 	namco_roz_init(machine,NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
 }

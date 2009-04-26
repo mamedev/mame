@@ -712,7 +712,7 @@ void sh2_common_init(SH2 *sh2, const device_config *device, cpu_irq_callback irq
 	sh2->dma_timer[1] = timer_alloc(device->machine, sh2_dmac_callback, sh2);
 	timer_adjust_oneshot(sh2->dma_timer[1], attotime_never, 0);
 
-	sh2->m = (UINT32 *)auto_malloc(0x200);
+	sh2->m = auto_alloc_array(device->machine, UINT32, 0x200/4);
 
 	if(conf)
 	{

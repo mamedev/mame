@@ -59,7 +59,7 @@ static DEVICE_START( cdda )
 	cdda_info *info = get_safe_token(device);
 
 	/* allocate an audio cache */
-	info->audio_cache = (UINT8 *)auto_malloc( CD_MAX_SECTOR_DATA * MAX_SECTORS );
+	info->audio_cache = auto_alloc_array( device->machine, UINT8, CD_MAX_SECTOR_DATA * MAX_SECTORS );
 
 	intf = (const struct CDDAinterface *)device->static_config;
 

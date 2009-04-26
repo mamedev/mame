@@ -503,8 +503,7 @@ static debugwin_info *debugwin_window_create(running_machine *machine, LPCSTR ti
 	RECT work_bounds;
 
 	// allocate memory
-	info = (debugwin_info *)malloc_or_die(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	info = alloc_clear_or_die(debugwin_info);
 
 	// create the window
 	info->handler = handler;

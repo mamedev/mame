@@ -34,12 +34,12 @@ static int simpl156_bank_callback(const int bank)
 static VIDEO_START( wcvol95 )
 {
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
-	deco16_pf1_data = auto_malloc(0x2000);
-	deco16_pf2_data = auto_malloc(0x2000);
-	deco16_pf1_rowscroll = auto_malloc(0x800);
-	deco16_pf2_rowscroll = auto_malloc(0x800);
-	deco16_pf12_control = auto_malloc(0x10);
-	paletteram16 =  auto_malloc(0x1000);
+	deco16_pf1_data = auto_alloc_array(machine, UINT16, 0x2000/2);
+	deco16_pf2_data = auto_alloc_array(machine, UINT16, 0x2000/2);
+	deco16_pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
+	deco16_pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
+	deco16_pf12_control = auto_alloc_array(machine, UINT16, 0x10/2);
+	paletteram16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	/* and register the allocated ram so that save states still work */
 	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);
@@ -640,7 +640,7 @@ static void descramble_sound( running_machine *machine, const char *tag )
 {
 	UINT8 *rom = memory_region(machine, tag);
 	int length = memory_region_length(machine, tag);
-	UINT8 *buf1 = malloc_or_die(length);
+	UINT8 *buf1 = alloc_array_or_die(UINT8, length);
 	UINT32 x;
 
 	for (x=0;x<length;x++)

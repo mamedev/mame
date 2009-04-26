@@ -2141,7 +2141,7 @@ static DRIVER_INIT( grobda )
 static DRIVER_INIT( digdug2 )
 {
 	/* appears to not use the watchdog */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0, (write8_space_func)SMH_NOP);
 	DRIVER_INIT_CALL(58_56);
 }
 

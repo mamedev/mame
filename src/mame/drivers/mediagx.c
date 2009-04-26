@@ -960,8 +960,8 @@ static MACHINE_RESET(mediagx)
 	memcpy(bios_ram, rom, 0x40000);
 	device_reset(machine->cpu[0]);
 
-	dacl = auto_malloc(65536 * sizeof(INT16));
-	dacr = auto_malloc(65536 * sizeof(INT16));
+	dacl = auto_alloc_array(machine, INT16, 65536);
+	dacr = auto_alloc_array(machine, INT16, 65536);
 
 	sound_timer = timer_alloc(machine, sound_timer_callback, NULL);
 	timer_adjust_oneshot(sound_timer, ATTOTIME_IN_MSEC(10), 0);

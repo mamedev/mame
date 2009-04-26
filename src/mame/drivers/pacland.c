@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3800, 0x3801) AM_WRITE(pacland_scroll0_w)
 	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(pacland_scroll1_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(pacland_bankswitch_w)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w)		/* PSG device, shared RAM */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(pacland_irq_1_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)

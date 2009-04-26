@@ -819,7 +819,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 
 static void init_zr107(running_machine *machine)
 {
-	sharc_dataram = auto_malloc(0x100000);
+	sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	led_reg0 = led_reg1 = 0x7f;
 	ccu_vcth = ccu_vctl = 0;
 

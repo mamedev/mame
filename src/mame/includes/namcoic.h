@@ -121,7 +121,7 @@ void namcos2_draw_sprites_metalhawk(running_machine *machine, bitmap_t *bitmap, 
 /* C355 Motion Object Emulation */
 
 /* for palXOR, supply either 0x0 (normal) or 0xf (palette mapping reversed) */
-void namco_obj_init( int gfxbank, int palXOR, int (*code2tile)( int code ) );
+void namco_obj_init( running_machine *machine, int gfxbank, int palXOR, int (*code2tile)( int code ) );
 void namco_obj_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri );
 
 WRITE16_HANDLER( namco_obj16_w );

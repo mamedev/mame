@@ -97,7 +97,7 @@ INLINE opcode_desc *desc_alloc(drcfe_state *drcfe)
 	if (desc != NULL)
 		drcfe->desc_free_list = desc->next;
 	else
-		desc = (opcode_desc *)malloc_or_die(sizeof(*desc));
+		desc = alloc_or_die(opcode_desc);
 	return desc;
 }
 
@@ -128,12 +128,10 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 	drcfe_state *drcfe;
 
 	/* allocate some memory to hold the state */
-	drcfe = (drcfe_state *)malloc_or_die(sizeof(*drcfe));
-	memset(drcfe, 0, sizeof(*drcfe));
+	drcfe = alloc_clear_or_die(drcfe_state);
 
 	/* allocate the description array */
-	drcfe->desc_array = (opcode_desc **)malloc_or_die((config->window_end + config->window_start + 2) * sizeof(*drcfe->desc_array));
-	memset(drcfe->desc_array, 0, (config->window_end + config->window_start + 2) * sizeof(*drcfe->desc_array));
+	drcfe->desc_array = alloc_array_clear_or_die(opcode_desc *, config->window_end + config->window_start + 2);
 
 	/* copy in configuration information */
 	drcfe->window_start = config->window_start;

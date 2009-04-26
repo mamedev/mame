@@ -163,8 +163,8 @@ VIDEO_START(realbrk)
 	tilemap_set_transparent_pen(tilemap_1,0);
 	tilemap_set_transparent_pen(tilemap_2,0);
 
-	tmpbitmap0 = auto_bitmap_alloc(32,32, video_screen_get_format(machine->primary_screen));
-	tmpbitmap1 = auto_bitmap_alloc(32,32, video_screen_get_format(machine->primary_screen));
+	tmpbitmap0 = auto_bitmap_alloc(machine,32,32, video_screen_get_format(machine->primary_screen));
+	tmpbitmap1 = auto_bitmap_alloc(machine,32,32, video_screen_get_format(machine->primary_screen));
 }
 
 /***************************************************************************

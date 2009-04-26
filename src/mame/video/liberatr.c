@@ -227,7 +227,7 @@ static void liberatr_init_planet(running_machine *machine, planet *liberatr_plan
            many segments it will take to store the description, allocate the
            space for it and copy the data to it.
         */
-		buffer = auto_malloc(2*(128 + total_segment_count));
+		buffer = auto_alloc_array(machine, UINT8, 2*(128 + total_segment_count));
 
 		liberatr_planet->frames[longitude] = buffer;
 
@@ -267,11 +267,11 @@ static void liberatr_init_planet(running_machine *machine, planet *liberatr_plan
 
 VIDEO_START( liberatr )
 {
-	liberatr_videoram = auto_malloc(0x10000);
+	liberatr_videoram = auto_alloc_array(machine, UINT8, 0x10000);
 
 	/* allocate the planet descriptor structure */
-	liberatr_planets[0] = auto_malloc(sizeof(planet));
-	liberatr_planets[1] = auto_malloc(sizeof(planet));
+	liberatr_planets[0] = auto_alloc(machine, planet);
+	liberatr_planets[1] = auto_alloc(machine, planet);
 
 	/* for each planet in the planet ROMs */
 	liberatr_init_planet(machine, liberatr_planets[0], &memory_region(machine, "gfx1")[0x2000]);

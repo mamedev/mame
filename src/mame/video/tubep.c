@@ -367,7 +367,7 @@ PALETTE_INIT( tubep )
 
 VIDEO_START( tubep )
 {
-	spritemap = auto_malloc(256*256*2);
+	spritemap = auto_alloc_array(machine, UINT8, 256*256*2);
 
 	/* Set up save state */
 	state_save_register_global(machine, romD_addr);

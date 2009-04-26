@@ -100,8 +100,8 @@ VIDEO_START( irobot )
 {
 	/* Setup 2 bitmaps for the polygon generator */
 	int height = video_screen_get_height(machine->primary_screen);
-	polybitmap1 = auto_malloc(BITMAP_WIDTH * height);
-	polybitmap2 = auto_malloc(BITMAP_WIDTH * height);
+	polybitmap1 = auto_alloc_array(machine, UINT8, BITMAP_WIDTH * height);
+	polybitmap2 = auto_alloc_array(machine, UINT8, BITMAP_WIDTH * height);
 
 	/* clear the bitmaps so we start with valid palette look-up values for drawing */
 	_irobot_poly_clear(machine, polybitmap1);

@@ -312,7 +312,7 @@ void exidy440_bank_select(running_machine *machine, UINT8 bank)
 		if (bank == 0 && exidy440_bank != 0)
 			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, showdown_bank0_r);
 		else if (bank != 0 && exidy440_bank == 0)
-			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, SMH_BANK1);
+			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1));
 	}
 
 	/* select the bank and update the bank pointer */
@@ -485,7 +485,7 @@ static ADDRESS_MAP_START( exidy440_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2ea0, 0x2ebf) AM_READWRITE(sound_command_ack_r, SMH_NOP)
 	AM_RANGE(0x2ec0, 0x2eff) AM_NOP
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, bankram_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(1), bankram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

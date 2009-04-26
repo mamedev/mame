@@ -463,14 +463,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hnoridur_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK1, hnoridur_palette_w)
+	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK(1), hnoridur_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcnpshnt_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK1, hnoridur_palette_w)
+	AM_RANGE( 0x8000, 0xffff ) AM_READWRITE(SMH_BANK(1), hnoridur_palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nanajign_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4543,7 +4543,7 @@ static DRIVER_INIT( maya )
 	}
 
 	/* Address lines scrambling on the blitter data roms */
-	rom = malloc_or_die(0xc0000);
+	rom = alloc_array_or_die(UINT8, 0xc0000);
 	memcpy(rom, gfx, 0xc0000);
 	for (i = 0; i < 0xc0000; i++)
 		gfx[i] = rom[BITSWAP24(i,23,22,21,20,19,18,14,15, 16,17,13,12,11,10,9,8, 7,6,5,4,3,2,1,0)];
@@ -5250,7 +5250,7 @@ static DRIVER_INIT( mjelct3 )
 	int i;
 	UINT8	*rom = memory_region(machine, "maincpu");
 	size_t  size = memory_region_length(machine, "maincpu");
-	UINT8	*rom1 = malloc_or_die(size);
+	UINT8	*rom1 = alloc_array_or_die(UINT8, size);
 
 		memcpy(rom1,rom,size);
 		for (i = 0; i < size; i++)
@@ -5263,7 +5263,7 @@ static DRIVER_INIT( mjelct3a )
 	int i,j;
 	UINT8	*rom = memory_region(machine, "maincpu");
 	size_t  size = memory_region_length(machine, "maincpu");
-	UINT8	*rom1 = malloc_or_die(size);
+	UINT8	*rom1 = alloc_array_or_die(UINT8, size);
 
 		memcpy(rom1,rom,size);
 		for (i = 0; i < size; i++)

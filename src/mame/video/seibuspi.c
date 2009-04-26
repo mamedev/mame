@@ -494,12 +494,9 @@ VIDEO_START( spi )
 	tilemap_set_transparent_pen(mid_layer, 63);
 	tilemap_set_transparent_pen(fore_layer, 63);
 
-	tilemap_ram = auto_malloc(0x4000);
-	palette_ram = auto_malloc(0x3000);
-	sprite_ram = auto_malloc(0x1000);
-	memset(tilemap_ram, 0, 0x4000);
-	memset(palette_ram, 0, 0x3000);
-	memset(sprite_ram, 0, 0x1000);
+	tilemap_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
+	palette_ram = auto_alloc_array_clear(machine, UINT32, 0x3000/4);
+	sprite_ram = auto_alloc_array_clear(machine, UINT32, 0x1000/4);
 
 	sprite_bpp = 6;
 	sprite_dma_length = 0x1000;
@@ -663,10 +660,8 @@ VIDEO_START( sys386f2 )
 {
 	int i;
 
-	palette_ram = auto_malloc(0x4000);
-	sprite_ram = auto_malloc(0x2000);
-	memset(palette_ram, 0, 0x4000);
-	memset(sprite_ram, 0, 0x2000);
+	palette_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
+	sprite_ram = auto_alloc_array_clear(machine, UINT32, 0x2000/4);
 
 	sprite_bpp = 8;
 	sprite_dma_length = 0x2000;

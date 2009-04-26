@@ -346,15 +346,15 @@ static INTERRUPT_GEN( jchan_vblank )
 static VIDEO_START(jchan)
 {
 	/* so we can use suprnova.c */
-	jchan_sprite_ram32_1 = auto_malloc ( 0x4000 );
-	jchan_sprite_ram32_2 = auto_malloc ( 0x4000 );
+	jchan_sprite_ram32_1 = auto_alloc_array(machine, UINT32, 0x4000/4);
+	jchan_sprite_ram32_2 = auto_alloc_array(machine, UINT32, 0x4000/4);
 
 	spriteram_size = 0x4000;
-	jchan_sprite_regs32_1 = auto_malloc (0x40);
-	jchan_sprite_regs32_2 = auto_malloc (0x40);
+	jchan_sprite_regs32_1 = auto_alloc_array(machine, UINT32, 0x40/4);
+	jchan_sprite_regs32_2 = auto_alloc_array(machine, UINT32, 0x40/4);
 
-	sprite_bitmap_1 = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
-	sprite_bitmap_2 = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap_1 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap_2 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
 
 	suprnova_alt_enable_sprites = 1;
 

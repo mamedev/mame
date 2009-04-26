@@ -650,7 +650,7 @@ static DEVICE_START( usb_sound )
 	assert(usb.cpu != NULL);
 
 	/* allocate work RAM */
-	usb.work_ram = auto_malloc(0x400);
+	usb.work_ram = auto_alloc_array(machine, UINT8, 0x400);
 
 	/* create a sound stream */
 	usb.stream = stream_create(device, 0, 1, SAMPLE_RATE, NULL, usb_stream_update);

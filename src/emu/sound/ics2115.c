@@ -459,7 +459,7 @@ static DEVICE_START( ics2115 )
 	chip->rom = device->region;
 	chip->timer[0].timer = timer_alloc(device->machine, timer_cb_0, chip);
 	chip->timer[1].timer = timer_alloc(device->machine, timer_cb_1, chip);
-	chip->ulaw = (INT16 *)auto_malloc(256*sizeof(INT16));
+	chip->ulaw = auto_alloc_array(device->machine, INT16, 256);
 	chip->stream = stream_create(device, 0, 2, 33075, chip, update);
 
 	for(i=0; i<256; i++) {

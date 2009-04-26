@@ -52,7 +52,7 @@ enum
 #define video_screen_get_format(screen)	(((screen_config *)(screen)->inline_config)->format)
 
 /* allocates a bitmap that has the same dimensions and format as the passed in screen */
-#define video_screen_auto_bitmap_alloc(screen)	auto_bitmap_alloc(video_screen_get_width(screen), video_screen_get_height(screen), video_screen_get_format(screen))
+#define video_screen_auto_bitmap_alloc(screen)	auto_bitmap_alloc(screen->machine, video_screen_get_width(screen), video_screen_get_height(screen), video_screen_get_format(screen))
 
 
 

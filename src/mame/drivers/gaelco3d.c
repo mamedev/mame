@@ -1147,8 +1147,8 @@ static DRIVER_INIT( gaelco3d )
 	/* allocate memory */
 	gaelco3d_texture_size = memory_region_length(machine, "gfx1");
 	gaelco3d_texmask_size = memory_region_length(machine, "gfx2") * 8;
-	gaelco3d_texture = auto_malloc(gaelco3d_texture_size);
-	gaelco3d_texmask = auto_malloc(gaelco3d_texmask_size);
+	gaelco3d_texture = auto_alloc_array(machine, UINT8, gaelco3d_texture_size);
+	gaelco3d_texmask = auto_alloc_array(machine, UINT8, gaelco3d_texmask_size);
 
 	/* first expand the pixel data */
 	src = memory_region(machine, "gfx1");

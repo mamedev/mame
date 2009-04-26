@@ -520,7 +520,7 @@ static void deco16_video_init(running_machine *machine, int pf12_only, int split
 {
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
-	sprite_priority_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED8 );
+	sprite_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8 );
 
 	pf1_tilemap_16x16 =	tilemap_create(machine, get_pf1_tile_info,   deco16_scan_rows, 16,16,64,32);
 	pf1_tilemap_8x8 =	tilemap_create(machine, get_pf1_tile_info_b, tilemap_scan_rows,8,8,64,32);
@@ -531,8 +531,8 @@ static void deco16_video_init(running_machine *machine, int pf12_only, int split
 		pf2_tilemap_16x16 =	tilemap_create(machine, get_pf2_tile_info,   deco16_scan_rows, 16,16,full_width ? 64 : 32,32);
 	pf2_tilemap_8x8 =	tilemap_create(machine, get_pf2_tile_info_b, tilemap_scan_rows,8,8,full_width ? 64 : 32,32);
 
-	dirty_palette = auto_malloc(4096);
-	deco16_raster_display_list=auto_malloc(20 * 256);
+	dirty_palette = auto_alloc_array(machine, UINT8, 4096);
+	deco16_raster_display_list=auto_alloc_array(machine, UINT16, 20 * 256 / 2);
 
 	if (!pf12_only)
 	{
@@ -602,7 +602,7 @@ void deco_allocate_sprite_bitmap(running_machine *machine)
 	/* Allow sprite bitmap to be used by Deco32 games as well */
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
-	sprite_priority_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	sprite_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
 }
 
 /*****************************************************************************************/

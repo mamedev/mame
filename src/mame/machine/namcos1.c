@@ -66,18 +66,18 @@ static WRITE8_HANDLER( bank16_w ) { (*namcos1_active_bank[15].bank_handler_w)(sp
 
 static const read8_space_func ram_bank_handler_r[16] =
 {
-	SMH_BANK1 ,SMH_BANK2 ,SMH_BANK3 ,SMH_BANK4 ,
-	SMH_BANK5 ,SMH_BANK6 ,SMH_BANK7 ,SMH_BANK8 ,
-	SMH_BANK9 ,SMH_BANK10,SMH_BANK11,SMH_BANK12,
-	SMH_BANK13,SMH_BANK14,SMH_BANK15,SMH_BANK16
+	SMH_BANK(1) ,SMH_BANK(2) ,SMH_BANK(3) ,SMH_BANK(4) ,
+	SMH_BANK(5) ,SMH_BANK(6) ,SMH_BANK(7) ,SMH_BANK(8) ,
+	SMH_BANK(9) ,SMH_BANK(10),SMH_BANK(11),SMH_BANK(12),
+	SMH_BANK(13),SMH_BANK(14),SMH_BANK(15),SMH_BANK(16)
 };
 
 static const write8_space_func ram_bank_handler_w[16] =
 {
-	SMH_BANK1 ,SMH_BANK2 ,SMH_BANK3 ,SMH_BANK4 ,
-	SMH_BANK5 ,SMH_BANK6 ,SMH_BANK7 ,SMH_BANK8 ,
-	SMH_BANK9 ,SMH_BANK10,SMH_BANK11,SMH_BANK12,
-	SMH_BANK13,SMH_BANK14,SMH_BANK15,SMH_BANK16
+	SMH_BANK(1) ,SMH_BANK(2) ,SMH_BANK(3) ,SMH_BANK(4) ,
+	SMH_BANK(5) ,SMH_BANK(6) ,SMH_BANK(7) ,SMH_BANK(8) ,
+	SMH_BANK(9) ,SMH_BANK(10),SMH_BANK(11),SMH_BANK(12),
+	SMH_BANK(13),SMH_BANK(14),SMH_BANK(15),SMH_BANK(16)
 };
 
 static const read8_space_func io_bank_handler_r[16] =
@@ -789,7 +789,7 @@ static void namcos1_build_banks(running_machine *machine,read8_space_func key_r,
 	int i;
 
 	/**** kludge alert ****/
-	UINT8 *dummyrom = auto_malloc(0x2000);
+	UINT8 *dummyrom = auto_alloc_array(machine, UINT8, 0x2000);
 
 	/* when the games want to reset because the test switch has been flipped (or
        because the protection checks failed!) they just set the top bits of bank #7
@@ -988,9 +988,9 @@ static void namcos1_driver_init( running_machine *machine, const struct namcos1_
 	key_top4      = specific->key_reg6;
 
 	/* S1 RAM pointer set */
-	s1ram = auto_malloc(0x8000);
-	namcos1_triram = auto_malloc(0x800);
-	namcos1_paletteram = auto_malloc(0x8000);
+	s1ram = auto_alloc_array(machine, UINT8, 0x8000);
+	namcos1_triram = auto_alloc_array(machine, UINT8, 0x800);
+	namcos1_paletteram = auto_alloc_array(machine, UINT8, 0x8000);
 
 	/* Register volatile user memory for save state */
 	state_save_register_global_pointer(machine, s1ram, 0x8000);

@@ -123,7 +123,7 @@ VIDEO_START( wolfpack )
 
 	int i;
 
-	LFSR = auto_malloc(0x8000);
+	LFSR = auto_alloc_array(machine, UINT8, 0x8000);
 
 	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
 

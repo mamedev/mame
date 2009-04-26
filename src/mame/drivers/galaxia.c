@@ -41,9 +41,9 @@ static VIDEO_START( galaxia )
 	int height = video_screen_get_height(machine->primary_screen);
 
 	/* configure the S2636 chips */
-	s2636_0 = s2636_config(galaxia_s2636_0_ram, height, width,  3, -27);
-	s2636_1 = s2636_config(galaxia_s2636_1_ram, height, width,  3, -27);
-	s2636_2 = s2636_config(galaxia_s2636_2_ram, height, width,  3, -27);
+	s2636_0 = s2636_config(machine, galaxia_s2636_0_ram, height, width,  3, -27);
+	s2636_1 = s2636_config(machine, galaxia_s2636_1_ram, height, width,  3, -27);
+	s2636_2 = s2636_config(machine, galaxia_s2636_2_ram, height, width,  3, -27);
 }
 
 static VIDEO_UPDATE( galaxia )
@@ -318,7 +318,7 @@ ROM_END
 
 static DRIVER_INIT(galaxia)
 {
-	galaxia_color=auto_malloc(0x400);
+	galaxia_color=auto_alloc_array(machine, UINT8, 0x400);
 }
 
 GAME( 1979, galaxia, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING|GAME_NO_SOUND )

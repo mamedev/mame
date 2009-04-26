@@ -1981,7 +1981,7 @@ ROM_END
 static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 {
 	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
-	UINT8 *decrypt = auto_malloc(0x10000);
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = memory_region(machine, cputag);
 	offs_t addr;
 
@@ -2013,7 +2013,7 @@ static void init_rom1(running_machine *machine)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 
-	decrypted = auto_malloc(0x10000);
+	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
 
 	/* For now, just copy the RAM array over to ROM. Decryption will happen */
@@ -2078,7 +2078,7 @@ static DRIVER_INIT( cookrace )
 {
 	decrypt_C10707_cpu(machine, "maincpu");
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, SMH_BANK10);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(10));
 	memory_set_bankptr(machine, 10, memory_region(machine, "audiocpu") + 0xe200);
 	audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
@@ -2095,7 +2095,7 @@ static DRIVER_INIT( wtennis )
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, SMH_BANK10);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, (read8_space_func)SMH_BANK(10));
 	memory_set_bankptr(machine, 10, memory_region(machine, "audiocpu") + 0xe200);
 	audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }

@@ -260,7 +260,7 @@ static READ8_HANDLER(pal_r)
 
 static ADDRESS_MAP_START( cshooter_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xafff) AM_READWRITE(SMH_BANK1, SMH_RAM)
+	AM_RANGE(0x8000, 0xafff) AM_READWRITE(SMH_BANK(1), SMH_RAM)
 	AM_RANGE(0xb000, 0xb0ff) AM_READ(SMH_RAM)			// sound related ?
 	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_BASE(&paletteram)
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
@@ -280,9 +280,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( airraid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xb000, 0xb0ff) AM_RAM			// sound related ?
-	AM_RANGE(0xb100, 0xb1ff) AM_RAM//READ(SMH_BANK1)           // sound related ?
+	AM_RANGE(0xb100, 0xb1ff) AM_RAM//READ(SMH_BANK(1))           // sound related ?
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
@@ -666,7 +666,7 @@ static DRIVER_INIT( cshootre )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int A;
 	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *decrypt = auto_malloc(0x8000);
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 

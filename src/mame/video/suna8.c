@@ -171,13 +171,13 @@ WRITE8_HANDLER( brickzn_banked_paletteram_w )
 
 
 
-static void suna8_vh_start_common(int dim)
+static void suna8_vh_start_common(running_machine *machine, int dim)
 {
 	suna8_text_dim = dim;
 	if (!(suna8_text_dim > 0))
 	{
-		paletteram	=	auto_malloc(0x200 * 2);
-		spriteram	=	auto_malloc(0x2000 * 2);
+		paletteram	=	auto_alloc_array(machine, UINT8, 0x200 * 2);
+		spriteram	=	auto_alloc_array(machine, UINT8, 0x2000 * 2);
 		suna8_spritebank  = 0;
 		suna8_palettebank = 0;
 	}
@@ -191,9 +191,9 @@ static void suna8_vh_start_common(int dim)
 #endif
 }
 
-VIDEO_START( suna8_textdim0 )	{ suna8_vh_start_common(0);  }
-VIDEO_START( suna8_textdim8 )	{ suna8_vh_start_common(8);  }
-VIDEO_START( suna8_textdim12 )	{ suna8_vh_start_common(12); }
+VIDEO_START( suna8_textdim0 )	{ suna8_vh_start_common(machine, 0);  }
+VIDEO_START( suna8_textdim8 )	{ suna8_vh_start_common(machine, 8);  }
+VIDEO_START( suna8_textdim12 )	{ suna8_vh_start_common(machine, 12); }
 
 /***************************************************************************
 

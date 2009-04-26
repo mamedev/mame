@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w)
 
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 
 	/* ROM & Voice expansion board - only some games have it */
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( NAME##_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )							\
 	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w) AM_BASE(&rthunder_spriteram)	\
 	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w)	\
 	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w)	\
-	AM_RANGE(ADDR_ROM+0x0000, ADDR_ROM+0x1fff) AM_READ(SMH_BANK2)								\
+	AM_RANGE(ADDR_ROM+0x0000, ADDR_ROM+0x1fff) AM_READ(SMH_BANK(2))								\
 	AM_RANGE(0x8000, 0xffff) AM_ROM																\
 /*  { ADDR_BANK+0x00, ADDR_BANK+0x02 } layer 2 scroll registers would be here */				\
 	AM_RANGE(ADDR_BANK+0x03, ADDR_BANK+0x03) AM_WRITE(bankswitch2_w)							\
@@ -1506,7 +1506,7 @@ static DRIVER_INIT( namco86 )
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
 	gfx = memory_region(machine, "gfx1");
 	size = memory_region_length(machine, "gfx1") * 2 / 3;
-	buffer = malloc_or_die( size );
+	buffer = alloc_array_or_die(UINT8,  size );
 
 	{
 		UINT8 *dest1 = gfx;
@@ -1531,7 +1531,7 @@ static DRIVER_INIT( namco86 )
 
 	gfx = memory_region(machine, "gfx2");
 	size = memory_region_length(machine, "gfx2") * 2 / 3;
-	buffer = malloc_or_die( size );
+	buffer = alloc_array_or_die(UINT8,  size );
 
 	{
 		UINT8 *dest1 = gfx;

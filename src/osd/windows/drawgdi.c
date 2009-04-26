@@ -89,8 +89,7 @@ static int drawgdi_window_init(win_window_info *window)
 	int i;
 
 	// allocate memory for our structures
-	gdi = (gdi_info *)malloc_or_die(sizeof(*gdi));
-	memset(gdi, 0, sizeof(*gdi));
+	gdi = alloc_clear_or_die(gdi_info);
 	window->drawdata = gdi;
 
 	// fill in the bitmap info header

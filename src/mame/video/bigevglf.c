@@ -66,7 +66,7 @@ VIDEO_START( bigevglf )
 	tmp_bitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	tmp_bitmap[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	tmp_bitmap[3] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	vidram = auto_malloc(0x100*0x100 * 4);
+	vidram = auto_alloc_array(machine, UINT8, 0x100*0x100 * 4);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

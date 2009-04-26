@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( gbusters_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(K052109_051960_r)	/* tiles + sprites (RAM H21, G21 & H6) */
 	AM_RANGE(0x4000, 0x57ff) AM_READ(SMH_RAM)			/* RAM I12 */
 	AM_RANGE(0x5800, 0x5fff) AM_READ(bankedram_r)		/* palette + work RAM (RAM D16 & C16) */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)			/* banked ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(1))			/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM 878n02.rom */
 ADDRESS_MAP_END
 

@@ -65,7 +65,7 @@ VIDEO_START( system18 )
 	/* create a temp bitmap to draw the VDP data into */
 	width = video_screen_get_width(machine->primary_screen);
 	height = video_screen_get_height(machine->primary_screen);
-	tempbitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	tempbitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 

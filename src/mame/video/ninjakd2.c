@@ -126,19 +126,14 @@ static TILE_GET_INFO( robokid_get_bg2_tile_info )
  *
  *************************************/
 
-static void videoram_alloc(const running_machine* const machine, int const size)
+static void videoram_alloc(running_machine* const machine, int const size)
 {
 	if (size)
 	{
 		/* create video ram */
-		robokid_bg0_videoram = auto_malloc(size);
-		memset(robokid_bg0_videoram, 0x00, size);
-
-		robokid_bg1_videoram = auto_malloc(size);
-		memset(robokid_bg1_videoram, 0x00, size);
-
-		robokid_bg2_videoram = auto_malloc(size);
-		memset(robokid_bg2_videoram, 0x00, size);
+		robokid_bg0_videoram = auto_alloc_array_clear(machine, UINT8, size);
+		robokid_bg1_videoram = auto_alloc_array_clear(machine, UINT8, size);
+		robokid_bg2_videoram = auto_alloc_array_clear(machine, UINT8, size);
 	}
 
 	sp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);

@@ -2734,7 +2734,7 @@ void segaic16_sprites_init(running_machine *machine, int which, int type, int co
 
 	/* if the sprites need buffering, allocate memory for the buffer */
 	if (buffer)
-		info->buffer = auto_malloc(info->ramsize);
+		info->buffer = auto_alloc_array(machine, UINT16, info->ramsize/2);
 
 	state_save_register_item(machine, "segaic16_sp", NULL, which, info->flip);
 	state_save_register_item(machine, "segaic16_sp", NULL, which, info->shadow);
@@ -2911,7 +2911,7 @@ static void segaic16_road_hangon_decode(running_machine *machine, struct road_in
 	int len = memory_region_length(machine, "gfx3");
 
 	/* allocate memory for the unpacked road data */
-	info->gfx = auto_malloc(256 * 512);
+	info->gfx = auto_alloc_array(machine, UINT8, 256 * 512);
 
 	/* loop over rows */
 	for (y = 0; y < 256; y++)
@@ -3172,7 +3172,7 @@ static void segaic16_road_outrun_decode(running_machine *machine, struct road_in
 	int len = memory_region_length(machine, "gfx3");
 
 	/* allocate memory for the unpacked road data */
-	info->gfx = auto_malloc((256 * 2 + 1) * 512);
+	info->gfx = auto_alloc_array(machine, UINT8, (256 * 2 + 1) * 512);
 
 	/* loop over rows */
 	for (y = 0; y < 256 * 2; y++)
@@ -3404,7 +3404,7 @@ void segaic16_road_init(running_machine *machine, int which, int type, int color
 
 		case SEGAIC16_ROAD_OUTRUN:
 		case SEGAIC16_ROAD_XBOARD:
-			info->buffer = auto_malloc(0x1000);
+			info->buffer = auto_alloc_array(machine, UINT16, 0x1000/2);
 			info->draw = segaic16_road_outrun_draw;
 			segaic16_road_outrun_decode(machine, info);
 			break;
@@ -3508,7 +3508,7 @@ void segaic16_rotate_init(running_machine *machine, int which, int type, int col
 	}
 
 	/* allocate a buffer for swapping */
-	info->buffer = auto_malloc(info->ramsize);
+	info->buffer = auto_alloc_array(machine, UINT16, info->ramsize/2);
 
 	state_save_register_item(machine, "segaic16_rot", NULL, which, info->colorbase);
 	state_save_register_item_pointer(machine, "segaic16_rot", NULL, which, ((UINT8 *) info->buffer), info->ramsize);

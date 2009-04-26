@@ -287,7 +287,7 @@ static WRITE8_HANDLER( discoboy_ram_att_w )
 
 static ADDRESS_MAP_START( discoboy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(rambank_r, rambank_w)
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(discoboy_ram_att_r, discoboy_ram_att_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(rambank2_r, rambank2_w)
@@ -489,12 +489,12 @@ static DRIVER_INIT( discoboy )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
-	discoboy_ram_part1 = auto_malloc(0x800);
-	discoboy_ram_part2 = auto_malloc(0x800);
-	discoboy_ram_att = auto_malloc(0x800);
+	discoboy_ram_part1 = auto_alloc_array(machine, UINT8, 0x800);
+	discoboy_ram_part2 = auto_alloc_array(machine, UINT8, 0x800);
+	discoboy_ram_att = auto_alloc_array(machine, UINT8, 0x800);
 
-	discoboy_ram_part3 = auto_malloc(0x1000);
-	discoboy_ram_part4 = auto_malloc(0x1000);
+	discoboy_ram_part3 = auto_alloc_array(machine, UINT8, 0x1000);
+	discoboy_ram_part4 = auto_alloc_array(machine, UINT8, 0x1000);
 
 	memset(discoboy_ram_part1,0,0x800);
 	memset(discoboy_ram_part2,0,0x800);

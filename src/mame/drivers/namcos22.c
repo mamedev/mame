@@ -1772,7 +1772,7 @@ static WRITE16_HANDLER( master_render_device_w )
 		mRenderBufData[mRenderBufSize++] = data;
 		if( mRenderBufSize == MAX_RENDER_CMD_SEQ )
 		{
-			namcos22_draw_direct_poly( mRenderBufData );
+			namcos22_draw_direct_poly( space->machine, mRenderBufData );
 		}
 	}
 }
@@ -5086,21 +5086,21 @@ static void install_141_speedup(running_machine *machine)
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, mcu141_speedup_r, mcu_speedup_w);
 }
 
-static void namcos22_init( enum namcos22_gametype game_type )
+static void namcos22_init( running_machine *machine, enum namcos22_gametype game_type )
 {
 	namcos22_gametype = game_type;
-	mpPointRAM = auto_malloc(0x20000*sizeof(*mpPointRAM));
+	mpPointRAM = auto_alloc_array(machine, UINT32, 0x20000);
 }
 
-static void namcos22s_init( enum namcos22_gametype game_type )
+static void namcos22s_init( running_machine *machine, enum namcos22_gametype game_type )
 {
-	namcos22_init(game_type);
-	mSpotRAM.RAM = auto_malloc(SPOTRAM_SIZE*2);
+	namcos22_init(machine, game_type);
+	mSpotRAM.RAM = auto_alloc_array(machine, UINT16, SPOTRAM_SIZE);
 }
 
 static DRIVER_INIT( alpiner )
 {
-	namcos22s_init(NAMCOS22_ALPINE_RACER);
+	namcos22s_init(machine, NAMCOS22_ALPINE_RACER);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
@@ -5109,7 +5109,7 @@ static DRIVER_INIT( alpiner )
 
 static DRIVER_INIT( alpiner2 )
 {
-	namcos22s_init(NAMCOS22_ALPINE_RACER_2);
+	namcos22s_init(machine, NAMCOS22_ALPINE_RACER_2);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
@@ -5118,7 +5118,7 @@ static DRIVER_INIT( alpiner2 )
 
 static DRIVER_INIT( alpinesa )
 {
-	namcos22s_init(NAMCOS22_ALPINE_SURFER);
+	namcos22s_init(machine, NAMCOS22_ALPINE_SURFER);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
@@ -5127,7 +5127,7 @@ static DRIVER_INIT( alpinesa )
 
 static DRIVER_INIT( airco22 )
 {
-	namcos22s_init(NAMCOS22_AIR_COMBAT22);
+	namcos22s_init(machine, NAMCOS22_AIR_COMBAT22);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
 }
@@ -5151,7 +5151,7 @@ static DRIVER_INIT( propcycl )
 //   pROM[0x22296/4] &= 0xffff0000;
 //   pROM[0x22296/4] |= 0x00004e75;
 
-	namcos22s_init(NAMCOS22_PROP_CYCLE);
+	namcos22s_init(machine, NAMCOS22_PROP_CYCLE);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
 
@@ -5160,7 +5160,7 @@ static DRIVER_INIT( propcycl )
 
 static DRIVER_INIT( ridgeraj )
 {
-	namcos22_init(NAMCOS22_RIDGE_RACER);
+	namcos22_init(machine, NAMCOS22_RIDGE_RACER);
 
 	install_c74_speedup(machine);
 
@@ -5170,7 +5170,7 @@ static DRIVER_INIT( ridgeraj )
 
 static DRIVER_INIT( ridger2j )
 {
-	namcos22_init(NAMCOS22_RIDGE_RACER2);
+	namcos22_init(machine, NAMCOS22_RIDGE_RACER2);
 
 	install_c74_speedup(machine);
 
@@ -5180,7 +5180,7 @@ static DRIVER_INIT( ridger2j )
 
 static DRIVER_INIT( acedrvr )
 {
-	namcos22_init(NAMCOS22_ACE_DRIVER);
+	namcos22_init(machine, NAMCOS22_ACE_DRIVER);
 
 	install_c74_speedup(machine);
 
@@ -5190,7 +5190,7 @@ static DRIVER_INIT( acedrvr )
 
 static DRIVER_INIT( victlap )
 {
-	namcos22_init(NAMCOS22_VICTORY_LAP);
+	namcos22_init(machine, NAMCOS22_VICTORY_LAP);
 
 	install_c74_speedup(machine);
 
@@ -5200,7 +5200,7 @@ static DRIVER_INIT( victlap )
 
 static DRIVER_INIT( raveracw )
 {
-	namcos22_init(NAMCOS22_RAVE_RACER);
+	namcos22_init(machine, NAMCOS22_RAVE_RACER);
 
 	install_c74_speedup(machine);
 
@@ -5217,7 +5217,7 @@ static DRIVER_INIT( cybrcomm )
 	pROM[0x18aec8/4] = 0x4e714e71;
 	pROM[0x18aefc/4] = 0x4e714e71;
 
-	namcos22_init(NAMCOS22_CYBER_COMMANDO);
+	namcos22_init(machine, NAMCOS22_CYBER_COMMANDO);
 
 	install_c74_speedup(machine);
 
@@ -5232,7 +5232,7 @@ static DRIVER_INIT( cybrcyc )
 	pROM[0x355C/4] &= 0x0000ffff;
 	pROM[0x355C/4] |= 0x4e710000;
 
-	namcos22s_init(NAMCOS22_CYBER_CYCLES);
+	namcos22s_init(machine, NAMCOS22_CYBER_CYCLES);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
 
@@ -5241,7 +5241,7 @@ static DRIVER_INIT( cybrcyc )
 
 static DRIVER_INIT( timecris )
 {
-	namcos22s_init(NAMCOS22_TIME_CRISIS);
+	namcos22s_init(machine, NAMCOS22_TIME_CRISIS);
 
 	// install_130_speedup(machine); // with speed up the SUBCPU START WAIT test fails
 }

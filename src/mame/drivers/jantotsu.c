@@ -73,10 +73,10 @@ static UINT8 mux_data;
 
 static VIDEO_START(jantotsu)
 {
-	jan_bitmap_1 = auto_malloc(0x2000);
-	jan_bitmap_2 = auto_malloc(0x2000);
-	jan_bitmap_3 = auto_malloc(0x2000);
-	jan_bitmap_4 = auto_malloc(0x2000);
+	jan_bitmap_1 = auto_alloc_array(machine, UINT8, 0x2000);
+	jan_bitmap_2 = auto_alloc_array(machine, UINT8, 0x2000);
+	jan_bitmap_3 = auto_alloc_array(machine, UINT8, 0x2000);
+	jan_bitmap_4 = auto_alloc_array(machine, UINT8, 0x2000);
 	vram_bank = 0;
 }
 

@@ -154,7 +154,7 @@ static DRIVER_INIT(pesadelo)
 	}
 
 	// address line swap
-	buf = (UINT8*)malloc_or_die(memsize);
+	buf = alloc_array_or_die(UINT8, memsize);
 	memcpy(buf, mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{

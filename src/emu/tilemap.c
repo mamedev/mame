@@ -303,7 +303,7 @@ void tilemap_init(running_machine *machine)
 		tilemap_tailptr  = &tilemap_list;
 		tilemap_instance = 0;
 
-		priority_bitmap = auto_bitmap_alloc(screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
+		priority_bitmap = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED8);
 		add_exit_callback(machine, tilemap_exit);
 	}
 }
@@ -324,8 +324,7 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 	int group;
 
 	/* allocate the tilemap itself */
-	tmap = (tilemap *)malloc_or_die(sizeof(*tmap));
-	memset(tmap, 0, sizeof(*tmap));
+	tmap = alloc_clear_or_die(tilemap);
 
 	/* fill in the basic metrics */
 	tmap->machine = machine;
@@ -354,19 +353,16 @@ tilemap *tilemap_create(running_machine *machine, tile_get_info_func tile_get_in
 	/* initialize scroll information */
 	tmap->scrollrows = 1;
 	tmap->scrollcols = 1;
-	tmap->rowscroll = (INT32 *)malloc_or_die(tmap->height * sizeof(*tmap->rowscroll));
-	memset(tmap->rowscroll, 0, tmap->height * sizeof(*tmap->rowscroll));
-	tmap->colscroll = (INT32 *)malloc_or_die(tmap->width * sizeof(*tmap->colscroll));
-	memset(tmap->colscroll, 0, tmap->width * sizeof(*tmap->colscroll));
+	tmap->rowscroll = alloc_array_clear_or_die(INT32, tmap->height);
+	tmap->colscroll = alloc_array_clear_or_die(INT32, tmap->width);
 
 	/* allocate the pixel data cache */
 	tmap->pixmap = bitmap_alloc(tmap->width, tmap->height, BITMAP_FORMAT_INDEXED16);
 
 	/* allocate transparency mapping data */
-	tmap->tileflags = (UINT8 *)malloc_or_die(tmap->max_logical_index);
+	tmap->tileflags = alloc_array_or_die(UINT8, tmap->max_logical_index);
 	tmap->flagsmap = bitmap_alloc(tmap->width, tmap->height, BITMAP_FORMAT_INDEXED8);
-	tmap->pen_to_flags = (UINT8 *)malloc_or_die(sizeof(tmap->pen_to_flags[0]) * MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
-	memset(tmap->pen_to_flags, 0, sizeof(tmap->pen_to_flags[0]) * MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
+	tmap->pen_to_flags = alloc_array_clear_or_die(UINT8, MAX_PEN_TO_FLAGS * TILEMAP_NUM_GROUPS);
 	for (group = 0; group < TILEMAP_NUM_GROUPS; group++)
 		tilemap_map_pens_to_layer(tmap, group, 0, 0, TILEMAP_PIXEL_LAYER0);
 
@@ -1157,8 +1153,8 @@ static void mappings_create(tilemap *tmap)
 	tmap->max_memory_index++;
 
 	/* allocate the necessary mappings */
-	tmap->memory_to_logical = (tilemap_logical_index *)malloc_or_die(tmap->max_memory_index * sizeof(*tmap->memory_to_logical));
-	tmap->logical_to_memory = (tilemap_memory_index *)malloc_or_die(tmap->max_logical_index * sizeof(*tmap->logical_to_memory));
+	tmap->memory_to_logical = alloc_array_or_die(tilemap_logical_index, tmap->max_memory_index);
+	tmap->logical_to_memory = alloc_array_or_die(tilemap_memory_index, tmap->max_logical_index);
 
 	/* update the mappings */
 	mappings_update(tmap);

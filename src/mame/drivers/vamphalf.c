@@ -1707,7 +1707,7 @@ static DRIVER_INIT( wyvernwg )
 
 static DRIVER_INIT( finalgdr )
 {
-	finalgdr_backupram = auto_malloc(0x80*0x100);
+	finalgdr_backupram = auto_alloc_array(machine, UINT8, 0x80*0x100);
 	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x005e874, 0x005e877, 0, 0, finalgdr_speedup_r );
 
 	palshift = 0;

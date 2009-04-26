@@ -105,7 +105,7 @@ int SCSIBase( const SCSIClass *scsiClass, int operation, void *file, INT64 intpa
 
 SCSIInstance *SCSIMalloc( running_machine *machine, const SCSIClass *scsiClass )
 {
-	SCSIInstance *scsiInstance = (SCSIInstance *) malloc_or_die( SCSISizeof( scsiClass ) );
+	SCSIInstance *scsiInstance = alloc_or_die(SCSIInstance);
 	scsiInstance->scsiClass = scsiClass;
 	scsiInstance->machine = machine;
 	return scsiInstance;

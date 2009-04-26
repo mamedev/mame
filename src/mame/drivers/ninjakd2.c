@@ -214,7 +214,7 @@ static SAMPLES_START( ninjakd2_init_samples )
 	running_machine *machine = device->machine;
 	const UINT8* const rom = memory_region(machine, "pcm");
 	const int length = memory_region_length(machine, "pcm");
-	INT16* const sampledata = auto_malloc(length * sizeof(sampledata[0]));
+	INT16* sampledata = auto_alloc_array(machine, INT16, length);
 
 	int i;
 
@@ -1418,7 +1418,7 @@ static void lineswap_gfx_roms(running_machine *machine, const char *region, cons
 
 	UINT8* const src = memory_region(machine, region);
 
-	UINT8* const temp = malloc_or_die(length);
+	UINT8* const temp = alloc_array_or_die(UINT8, length);
 
 	const int mask = (1 << (bit + 1)) - 1;
 

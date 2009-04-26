@@ -1336,7 +1336,7 @@ static void treahunt_decode(running_machine *machine)
 	int A;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
-	UINT8 *decrypt = auto_malloc(0x4000);
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x4000);
 	int data;
 
 	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypt);
@@ -1439,7 +1439,7 @@ static DRIVER_INIT( striv )
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, striv_question_r);
 
 	// Nop out unused sprites writes
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xb0ff, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xb0ff, 0, 0, (write8_space_func)SMH_NOP);
 
 	timer_rate = 128;
 }

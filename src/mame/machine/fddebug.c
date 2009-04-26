@@ -286,7 +286,7 @@ static int find_constraint_sequence(UINT32 global, int quick);
 static int does_key_work_for_constraints(const UINT16 *base, UINT8 *key);
 static UINT32 reconstruct_base_seed(int keybaseaddr, UINT32 startseed);
 
-static void build_optable(void);
+static void build_optable(running_machine *machine);
 static int validate_ea(const address_space *space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
 static int validate_opcode(const address_space *space, UINT32 pc, const UINT8 *opdata, int maxwords);
 
@@ -490,18 +490,17 @@ void fd1094_init_debugging(running_machine *machine, const char *cpureg, const c
 	assert(coderegion_words == keystatus_words);
 
 	/* allocate memory for the ignore table */
-	ignorepc = auto_malloc(1 << 23);
-	memset(ignorepc, 0, 1 << 23);
+	ignorepc = auto_alloc_array_clear(machine, UINT8, 1 << 23);
 
 	/* allocate memory for the undo buffer */
-	undobuff = auto_malloc(keystatus_words * 2);
+	undobuff = auto_alloc_array(machine, UINT8, keystatus_words * 2);
 	memcpy(undobuff, keystatus, keystatus_words * 2);
 
 	/* allocate memory for the possible seeds array */
-	possible_seed = auto_malloc(65536 * sizeof(possible_seed[0]));
+	possible_seed = auto_alloc_array(machine, UINT32, 65536);
 
 	/* build the opcode table */
-	build_optable();
+	build_optable(machine);
 
 	/* set up default constraints */
 	constcount = 0;
@@ -2089,12 +2088,12 @@ static const struct
     build_optable - build up the opcode table
 -----------------------------------------------*/
 
-static void build_optable(void)
+static void build_optable(running_machine *machine)
 {
 	int opnum, inum;
 
 	/* allocate and initialize the opcode table */
-	optable = auto_malloc(65536 * sizeof(optable[0]));
+	optable = auto_alloc_array(machine, optable_entry, 65536);
 	for (opnum = 0; opnum < 65536; opnum++)
 	{
 		optable[opnum].flags = OF_INVALID;

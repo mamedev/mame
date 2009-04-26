@@ -590,19 +590,19 @@ static MACHINE_RESET(macs)
 
 static DRIVER_INIT(macs)
 {
-	macs_ram1=auto_malloc(0x20000);
+	macs_ram1=auto_alloc_array(machine, UINT8, 0x20000);
 	st0016_game=10|0x80;
 }
 
 static DRIVER_INIT(kisekaeh)
 {
-	macs_ram1=auto_malloc(0x20000);
+	macs_ram1=auto_alloc_array(machine, UINT8, 0x20000);
 	st0016_game=11|0x180;
 }
 
 static DRIVER_INIT(kisekaem)
 {
-	macs_ram1=auto_malloc(0x20000);
+	macs_ram1=auto_alloc_array(machine, UINT8, 0x20000);
 	st0016_game=10|0x180;
 }
 

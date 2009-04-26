@@ -110,7 +110,7 @@ VIDEO_START( naughtyb )
 	palreg = bankreg = 0;
 
 	/* Naughty Boy has a virtual screen twice as large as the visible screen */
-	tmpbitmap = auto_bitmap_alloc(68*8,28*8,video_screen_get_format(machine->primary_screen));
+	tmpbitmap = auto_bitmap_alloc(machine,68*8,28*8,video_screen_get_format(machine->primary_screen));
 }
 
 

@@ -103,7 +103,7 @@ PALETTE_INIT( tiamc1 )
 	int r, g, b, ir, ig, ib;
 	float tcol;
 
-	palette = auto_malloc(256 * sizeof(*palette));
+	palette = auto_alloc_array(machine, rgb_t, 256);
 
 	for (col = 0; col < 256; col++) {
 		ir = (col >> 3) & 7;
@@ -134,8 +134,7 @@ VIDEO_START( tiamc1 )
 {
 	UINT8 *video_ram;
 
-	video_ram = auto_malloc(0x3040);
-	memset(video_ram, 0, 0x3040);
+	video_ram = auto_alloc_array_clear(machine, UINT8, 0x3040);
 
         tiamc1_charram = video_ram + 0x0800;     /* Ram is banked */
         tiamc1_tileram = video_ram + 0x0000;

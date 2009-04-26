@@ -84,7 +84,7 @@ void x76f100_init( running_machine *machine, int chip, UINT8 *data )
 
 	if( data == NULL )
 	{
-		data = (UINT8 *)auto_malloc(
+		data = auto_alloc_array( machine, UINT8, 
 			SIZE_RESPONSE_TO_RESET +
 			SIZE_READ_PASSWORD +
 			SIZE_WRITE_PASSWORD +

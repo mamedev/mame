@@ -83,7 +83,7 @@ VIDEO_START( dogfgt )
 {
 	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,16,16,32,32);
 
-	bitmapram = auto_malloc(BITMAPRAM_SIZE);
+	bitmapram = auto_alloc_array(machine, UINT8, BITMAPRAM_SIZE);
 
 	pixbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }

@@ -7435,7 +7435,7 @@ static DRIVER_INIT( gigamn2 )
 
 	DRIVER_INIT_CALL(cps2);
 
-	gigamn2_dummyqsound_ram = auto_malloc(0x20000);
+	gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000/2);
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
 	memory_set_decrypted_region(space, 0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine->cpu[0],0,length);

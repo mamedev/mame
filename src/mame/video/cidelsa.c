@@ -192,9 +192,9 @@ static void video_start(running_machine *machine, UINT16 pageram_size)
 	cidelsa_state *state = machine->driver_data;
 
 	/* allocate memory */
-	state->pageram = auto_malloc(pageram_size);
-	state->pcbram = auto_malloc(CIDELSA_CHARRAM_SIZE);
-	state->charram = auto_malloc(CIDELSA_CHARRAM_SIZE);
+	state->pageram = auto_alloc_array(machine, UINT8, pageram_size);
+	state->pcbram = auto_alloc_array(machine, UINT8, CIDELSA_CHARRAM_SIZE);
+	state->charram = auto_alloc_array(machine, UINT8, CIDELSA_CHARRAM_SIZE);
 
 	/* find devices */
 	state->cdp1869 = devtag_get_device(machine, CDP1869_TAG);

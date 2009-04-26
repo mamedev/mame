@@ -142,7 +142,7 @@ WRITE8_HANDLER( metlclsh_fgram_w )
 
 VIDEO_START( metlclsh )
 {
-	metlclsh_otherram = auto_malloc(0x800);	// banked ram
+	metlclsh_otherram = auto_alloc_array(machine, UINT8, 0x800);	// banked ram
 
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,metlclsh_bgtilemap_scan,16,16,32,16);
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);

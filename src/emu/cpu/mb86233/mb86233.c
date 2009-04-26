@@ -118,7 +118,7 @@ static CPU_INIT( mb86233 )
 		cpustate->fifo_write_cb = _config->fifo_write_cb;
 	}
 
-	cpustate->RAM = (UINT32 *)auto_malloc(2 * 0x200 * sizeof(UINT32));		/* 2x 2KB */
+	cpustate->RAM = auto_alloc_array(device->machine, UINT32, 2 * 0x200);		/* 2x 2KB */
 	memset( cpustate->RAM, 0, 2 * 0x200 * sizeof(UINT32) );
 	cpustate->ARAM = &cpustate->RAM[0];
 	cpustate->BRAM = &cpustate->RAM[0x200];

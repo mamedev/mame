@@ -620,7 +620,7 @@ static ADDRESS_MAP_START( reikaids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7801, 0x7801) AM_READ_PORT("IN0")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("IN1")
 	AM_RANGE(0x7803, 0x7803) AM_READ(reikaids_io_r)	// coin, blitter, upd7807
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -640,7 +640,7 @@ static ADDRESS_MAP_START( reikaids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK2)	/* External ROM (Banked) */
+	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK(2))	/* External ROM (Banked) */
 	AM_RANGE(0xff00, 0xffff) AM_READ(SMH_RAM)	/* Internal RAM */
 ADDRESS_MAP_END
 
@@ -666,7 +666,7 @@ static ADDRESS_MAP_START( pteacher_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7800, 0x7800) AM_READ(SMH_RAM)
 	AM_RANGE(0x7801, 0x7801) AM_READ(pteacher_io_r)	// vblank, visible page
 	AM_RANGE(0x7ff2, 0x7ff2) AM_READ(pteacher_snd_r)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -687,7 +687,7 @@ static ADDRESS_MAP_START( pteacher_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK2)	/* External ROM (Banked) */
+	AM_RANGE(0x0000, 0xfeff) AM_READ(SMH_BANK(2))	/* External ROM (Banked) */
 	AM_RANGE(0xff00, 0xffff) AM_READ(SMH_RAM)	/* Internal RAM */
 ADDRESS_MAP_END
 

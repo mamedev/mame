@@ -178,8 +178,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( phoenix )
 {
-	videoram_pg[0] = auto_malloc(0x1000);
-	videoram_pg[1] = auto_malloc(0x1000);
+	videoram_pg[0] = auto_alloc_array(machine, UINT8, 0x1000);
+	videoram_pg[1] = auto_alloc_array(machine, UINT8, 0x1000);
 
 	memory_configure_bank(machine, 1, 0, 1, videoram_pg[0], 0);
 	memory_configure_bank(machine, 1, 1, 1, videoram_pg[1], 0);

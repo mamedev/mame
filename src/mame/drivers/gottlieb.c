@@ -266,7 +266,7 @@ static MACHINE_START( gottlieb )
 		laserdisc_philips_timer = timer_alloc(machine, laserdisc_philips_callback, NULL);
 
 		/* create some audio RAM */
-		laserdisc_audio_buffer = auto_malloc(AUDIORAM_SIZE);
+		laserdisc_audio_buffer = auto_alloc_array(machine, UINT8, AUDIORAM_SIZE);
 		laserdisc_status = 0x38;
 
 		/* more save state registration */

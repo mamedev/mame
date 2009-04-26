@@ -166,14 +166,14 @@ static DEVICE_START( exidy440_sound )
 
 	/* allocate the sample cache */
 	length = memory_region_length(machine, "cvsd") * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
-	sound_cache = auto_malloc(length);
+	sound_cache = (sound_cache_entry *)auto_alloc_array(machine, UINT8, length);
 
 	/* determine the hard end of the cache and reset */
 	sound_cache_max = (sound_cache_entry *)((UINT8 *)sound_cache + length);
 	reset_sound_cache();
 
 	/* allocate the mixer buffer */
-	mixer_buffer_left = auto_malloc(2 * device->clock * sizeof(INT32));
+	mixer_buffer_left = auto_alloc_array(machine, INT32, 2 * device->clock);
 	mixer_buffer_right = mixer_buffer_left + device->clock;
 
 	if (SOUND_LOG)

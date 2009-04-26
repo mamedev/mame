@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( flkatck_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_READ(SMH_RAM)		/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_READ(SMH_RAM)					/* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)		/* Video RAM (007121) */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK1)					/* banked ROM */
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK(1))					/* banked ROM */
 	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 
@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( flkatck_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(SMH_RAM)					/* RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(flkatck_k007121_w) AM_BASE(&k007121_ram)			/* Video RAM (007121) */
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_BANK1)					/* banked ROM */
+	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_BANK(1))					/* banked ROM */
 	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 

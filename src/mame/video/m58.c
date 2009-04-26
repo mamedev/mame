@@ -188,7 +188,7 @@ VIDEO_START( yard )
 	tilemap_set_scrolldx(bg_tilemap, visarea->min_x, width - (visarea->max_x + 1));
 	tilemap_set_scrolldy(bg_tilemap, visarea->min_y - 8, height + 16 - (visarea->max_y + 1));
 
-	scroll_panel_bitmap = auto_bitmap_alloc(SCROLL_PANEL_WIDTH, height, format);
+	scroll_panel_bitmap = auto_bitmap_alloc(machine, SCROLL_PANEL_WIDTH, height, format);
 }
 
 

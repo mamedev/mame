@@ -148,7 +148,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokib_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", toki_adpcm_control_w)	/* MSM5205 + ROM bank */
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
@@ -729,7 +729,7 @@ ROM_END
 static DRIVER_INIT( toki )
 {
 	UINT8 *ROM = memory_region(machine, "oki");
-	UINT8 *buffer = malloc_or_die(0x20000);
+	UINT8 *buffer = alloc_array_or_die(UINT8, 0x20000);
 	int i;
 
 	memcpy(buffer,ROM,0x20000);
@@ -746,7 +746,7 @@ static DRIVER_INIT( toki )
 
 static DRIVER_INIT( tokib )
 {
-	UINT8 *temp = malloc_or_die(65536 * 2);
+	UINT8 *temp = alloc_array_or_die(UINT8, 65536 * 2);
 	int i, offs, len;
 	UINT8 *rom;
 
@@ -808,7 +808,7 @@ static DRIVER_INIT(jujub)
 	/* Decrypt data for z80 program */
 	{
 		const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
-		UINT8 *decrypt = auto_malloc(0x20000);
+		UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x20000);
 		UINT8 *rom = memory_region(machine, "audiocpu");
 		int i;
 
@@ -825,7 +825,7 @@ static DRIVER_INIT(jujub)
 
 	{
 		UINT8 *ROM = memory_region(machine, "oki");
-		UINT8 *buffer = malloc_or_die(0x20000);
+		UINT8 *buffer = alloc_array_or_die(UINT8, 0x20000);
 		int i;
 
 		memcpy(buffer,ROM,0x20000);

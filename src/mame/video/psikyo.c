@@ -215,8 +215,8 @@ VIDEO_START( psikyo )
 									16,16,
 									0x100, 0x10 );
 
-	spritebuf1 = auto_malloc(0x2000);
-	spritebuf2 = auto_malloc(0x2000);
+	spritebuf1 = auto_alloc_array(machine, UINT32, 0x2000/4);
+	spritebuf2 = auto_alloc_array(machine, UINT32, 0x2000/4);
 
 		tilemap_set_scroll_rows(tilemap_0_size0,0x80*16);	// line scrolling
 		tilemap_set_scroll_cols(tilemap_0_size0,1);

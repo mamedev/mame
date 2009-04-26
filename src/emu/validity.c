@@ -233,7 +233,7 @@ static quark_table *quark_table_alloc(UINT32 entries, UINT32 hashsize)
 
 	/* determine how many total bytes we need */
 	total_bytes = sizeof(*table) + entries * sizeof(table->entry[0]) + hashsize * sizeof(table->hash[0]);
-	table = (quark_table *)auto_malloc(total_bytes);
+	table = (quark_table *)alloc_array_or_die(UINT8, total_bytes);
 
 	/* fill in the details */
 	table->entries = entries;
@@ -289,6 +289,34 @@ static void quark_tables_create(void)
 		if (string != NULL)
 			quark_add(defstr_table, strnum, quark_string_crc(string));
 	}
+}
+
+
+/*-------------------------------------------------
+    quark_tables_free - free allocated tables
+-------------------------------------------------*/
+
+static void quark_tables_free(void)
+{
+	if (source_table != NULL)
+		free(source_table);
+	source_table = NULL;
+	
+	if (name_table != NULL)
+		free(name_table);
+	name_table = NULL;
+	
+	if (description_table != NULL)
+		free(description_table);
+	description_table = NULL;
+	
+	if (roms_table != NULL)
+		free(roms_table);
+	roms_table = NULL;
+	
+	if (defstr_table != NULL)
+		free(defstr_table);
+	defstr_table = NULL;
 }
 
 
@@ -1718,6 +1746,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 	end_resource_tracking();
 	exit_resource_tracking();
+	quark_tables_free();
 
 	return error;
 }

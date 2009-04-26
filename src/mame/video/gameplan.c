@@ -303,7 +303,7 @@ static VIDEO_START( common )
 	gameplan_state *state = machine->driver_data;
 
 	state->videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
-	state->videoram = auto_malloc(state->videoram_size);
+	state->videoram = auto_alloc_array(machine, UINT8, state->videoram_size);
 
 	create_via_0_timer(machine, state);
 

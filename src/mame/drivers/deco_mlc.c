@@ -697,7 +697,7 @@ static void descramble_sound( running_machine *machine )
 	/* the same as simpl156 / heavy smash? */
 	UINT8 *rom = memory_region(machine, "ymz");
 	int length = memory_region_length(machine, "ymz");
-	UINT8 *buf1 = malloc_or_die(length);
+	UINT8 *buf1 = alloc_array_or_die(UINT8, length);
 
 	UINT32 x;
 

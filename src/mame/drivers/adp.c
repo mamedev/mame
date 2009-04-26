@@ -241,7 +241,7 @@ static VIDEO_START(adp)
 //  UINT32 i;
 //  UINT16 *prgrom = (UINT16*)memory_region(machine, "maincpu");
 
-	HD63484_start();
+	HD63484_start(machine);
 
 //  for (i = 0; i < 0x70000; i++)
 //      HD63484_ram[0x90000 + i] = prgrom[i];

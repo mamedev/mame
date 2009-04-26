@@ -367,7 +367,7 @@ static void init_tables(void)
 	}
 
 	/* fill in the mirror table */
-	mirror_table = (UINT16 *)malloc_or_die(65536 * sizeof(mirror_table[0]));
+	mirror_table = alloc_array_or_die(UINT16, 65536);
 	for (i = 0; i < 65536; i++)
 		mirror_table[i] = ((i >> 15) & 0x0001) | ((i >> 13) & 0x0002) |
 		                  ((i >> 11) & 0x0004) | ((i >> 9)  & 0x0008) |
@@ -379,7 +379,7 @@ static void init_tables(void)
 		                  ((i << 13) & 0x4000) | ((i << 15) & 0x8000);
 
 	/* fill in the condition table */
-	condition_table = (UINT8 *)malloc_or_die(32 * 8 * sizeof(condition_table[0]));
+	condition_table = alloc_array_or_die(UINT8, 32 * 8);
 	for (i = 0; i < 8; i++)
 		for (j = 0; j < 32; j++)
 		{

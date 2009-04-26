@@ -382,22 +382,16 @@ VIDEO_START( niyanpai )
 	niyanpai_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	niyanpai_tmpbitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	niyanpai_tmpbitmap[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	niyanpai_videoram[0] = auto_malloc(width * height * sizeof(short));
-	niyanpai_videoram[1] = auto_malloc(width * height * sizeof(short));
-	niyanpai_videoram[2] = auto_malloc(width * height * sizeof(short));
-	niyanpai_videoworkram[0] = auto_malloc(width * height * sizeof(short));
-	niyanpai_videoworkram[1] = auto_malloc(width * height * sizeof(short));
-	niyanpai_videoworkram[2] = auto_malloc(width * height * sizeof(short));
-	niyanpai_palette = auto_malloc(0x480 * sizeof(short));
-	niyanpai_clut[0] = auto_malloc(0x1000 * sizeof(char));
-	niyanpai_clut[1] = auto_malloc(0x1000 * sizeof(char));
-	niyanpai_clut[2] = auto_malloc(0x1000 * sizeof(char));
-	memset(niyanpai_videoram[0], 0x0000, (width * height * sizeof(short)));
-	memset(niyanpai_videoram[1], 0x0000, (width * height * sizeof(short)));
-	memset(niyanpai_videoram[2], 0x0000, (width * height * sizeof(short)));
-	memset(niyanpai_videoworkram[0], 0x0000, (width * height * sizeof(short)));
-	memset(niyanpai_videoworkram[1], 0x0000, (width * height * sizeof(short)));
-	memset(niyanpai_videoworkram[2], 0x0000, (width * height * sizeof(short)));
+	niyanpai_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
+	niyanpai_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
+	niyanpai_videoram[2] = auto_alloc_array_clear(machine, UINT16, width * height);
+	niyanpai_videoworkram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
+	niyanpai_videoworkram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
+	niyanpai_videoworkram[2] = auto_alloc_array_clear(machine, UINT16, width * height);
+	niyanpai_palette = auto_alloc_array(machine, UINT16, 0x480);
+	niyanpai_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
+	niyanpai_clut[1] = auto_alloc_array(machine, UINT8, 0x1000);
+	niyanpai_clut[2] = auto_alloc_array(machine, UINT8, 0x1000);
 	nb19010_busyflag = 1;
 }
 

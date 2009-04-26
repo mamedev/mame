@@ -22,7 +22,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( mayumi )
 {
-	mayumi_videoram = auto_malloc(0x1800);
+	mayumi_videoram = auto_alloc_array(machine, UINT8, 0x1800);
 
 	mayumi_tilemap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,64,32 );
 }

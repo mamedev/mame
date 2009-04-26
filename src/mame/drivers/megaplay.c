@@ -992,9 +992,9 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_extra_ram )
 static DRIVER_INIT (megaplay)
 {
 	/* to support the old code.. */
-	ic36_ram = auto_malloc(0x10000);
-	ic37_ram = auto_malloc(0x10000);
-	genesis_io_ram = auto_malloc(0x20);
+	ic36_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
+	ic37_ram = auto_alloc_array(machine, UINT8, 0x10000);
+	genesis_io_ram = auto_alloc_array(machine, UINT16, 0x20/2);
 
 	DRIVER_INIT_CALL(megadrij);
 	megplay_stat(machine);
@@ -1003,7 +1003,7 @@ static DRIVER_INIT (megaplay)
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa10000, 0xa1001f, 0, 0, OLD_megaplay_genesis_io_r, OLD_megaplay_genesis_io_w);
 
 	/* megaplay has ram shared with the bios cpu here */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, SMH_BANK7, SMH_BANK7);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(7), (write8_space_func)SMH_BANK(7));
 	memory_set_bankptr(machine, 7, &ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */

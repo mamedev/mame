@@ -83,7 +83,7 @@ static UINT8 *blit_buffer;
 
 static VIDEO_START(ilpag)
 {
-	blit_buffer = auto_malloc(512*512*4); //just to be sure,number is wrong
+	blit_buffer = auto_alloc_array(machine, UINT8, 512*512*4); //just to be sure,number is wrong
 }
 
 static VIDEO_UPDATE(ilpag)

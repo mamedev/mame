@@ -434,7 +434,7 @@ static WRITE8_HANDLER( sfbonus_videoram_w )
 
 static VIDEO_START(sfbonus)
 {
-	temp_reel_bitmap = auto_bitmap_alloc(1024,512,BITMAP_FORMAT_INDEXED16);
+	temp_reel_bitmap = auto_bitmap_alloc(machine,1024,512,BITMAP_FORMAT_INDEXED16);
 
 	sfbonus_tilemap = tilemap_create(machine,get_sfbonus_tile_info,tilemap_scan_rows,8,8, 128, 64);
 	sfbonus_reel_tilemap = tilemap_create(machine,get_sfbonus_reel_tile_info,tilemap_scan_rows,8,32, 64, 16);
@@ -5086,29 +5086,29 @@ ROM_END
 
 static DRIVER_INIT( sfbonus_common)
 {
-	sfbonus_tilemap_ram = auto_malloc(0x4000);
+	sfbonus_tilemap_ram = auto_alloc_array(machine, UINT8, 0x4000);
 	memset(sfbonus_tilemap_ram,0xff,0x4000);
 	state_save_register_global_pointer(machine, sfbonus_tilemap_ram , 0x4000);
 
-	sfbonus_reel_ram = auto_malloc(0x0800);
+	sfbonus_reel_ram = auto_alloc_array(machine, UINT8, 0x0800);
 	memset(sfbonus_reel_ram,0xff,0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel_ram , 0x0800);
 
-	sfbonus_reel2_ram = auto_malloc(0x0800);
+	sfbonus_reel2_ram = auto_alloc_array(machine, UINT8, 0x0800);
 	memset(sfbonus_reel2_ram,0xff,0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel2_ram , 0x0800);
 
-	sfbonus_reel3_ram = auto_malloc(0x0800);
+	sfbonus_reel3_ram = auto_alloc_array(machine, UINT8, 0x0800);
 	memset(sfbonus_reel3_ram,0xff,0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel3_ram , 0x0800);
 
-	sfbonus_reel4_ram = auto_malloc(0x0800);
+	sfbonus_reel4_ram = auto_alloc_array(machine, UINT8, 0x0800);
 	memset(sfbonus_reel4_ram,0xff,0x0800);
 	state_save_register_global_pointer(machine, sfbonus_reel4_ram , 0x0800);
 
 	// hack, because the debugger is broken
 	sfbonus_videoram = memory_region(machine,"debugram");
-	if (!sfbonus_videoram) sfbonus_videoram = auto_malloc(0x10000);
+	if (!sfbonus_videoram) sfbonus_videoram = auto_alloc_array(machine, UINT8, 0x10000);
 
 	memset(sfbonus_videoram,0xff,0x10000);
 

@@ -380,17 +380,17 @@ VIDEO_START( fromanc2 )
 	fromanc2_tilemap[1][2] = tilemap_create(machine, fromanc2_get_v1_l2_tile_info, tilemap_scan_rows,  8, 8, 64, 64);
 	fromanc2_tilemap[1][3] = tilemap_create(machine, fromanc2_get_v1_l3_tile_info, tilemap_scan_rows,  8, 8, 64, 64);
 
-	fromanc2_videoram[0][0] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[0][1] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[0][2] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[0][3] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][0] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][1] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][2] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][3] = auto_malloc((64 * 64) * sizeof(UINT16));
+	fromanc2_videoram[0][0] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[0][1] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[0][2] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[0][3] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[1][0] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[1][1] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[1][2] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[1][3] = auto_alloc_array(machine, UINT16, (64 * 64));
 
-	fromanc2_paletteram[0] = auto_malloc(0x800 * 2);
-	fromanc2_paletteram[1] = auto_malloc(0x800 * 2);
+	fromanc2_paletteram[0] = auto_alloc_array(machine, UINT16, 0x800);
+	fromanc2_paletteram[1] = auto_alloc_array(machine, UINT16, 0x800);
 
 	tilemap_set_transparent_pen(fromanc2_tilemap[0][1], 0x000);
 	tilemap_set_transparent_pen(fromanc2_tilemap[0][2], 0x000);
@@ -411,15 +411,15 @@ VIDEO_START( fromancr )
 	fromanc2_tilemap[1][2] = tilemap_create(machine, fromancr_get_v1_l2_tile_info, tilemap_scan_rows,  8, 8, 64, 64);
 	fromanc2_tilemap[1][3] = 0;
 
-	fromanc2_videoram[0][0] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[0][1] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[0][2] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][0] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][1] = auto_malloc((64 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][2] = auto_malloc((64 * 64) * sizeof(UINT16));
+	fromanc2_videoram[0][0] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[0][1] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[0][2] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[1][0] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[1][1] = auto_alloc_array(machine, UINT16, (64 * 64));
+	fromanc2_videoram[1][2] = auto_alloc_array(machine, UINT16, (64 * 64));
 
-	fromanc2_paletteram[0] = auto_malloc(0x800 * 2);
-	fromanc2_paletteram[1] = auto_malloc(0x800 * 2);
+	fromanc2_paletteram[0] = auto_alloc_array(machine, UINT16, 0x800);
+	fromanc2_paletteram[1] = auto_alloc_array(machine, UINT16, 0x800);
 
 	tilemap_set_transparent_pen(fromanc2_tilemap[0][1], 0x0ff);
 	tilemap_set_transparent_pen(fromanc2_tilemap[0][2], 0x0ff);
@@ -439,15 +439,15 @@ VIDEO_START( fromanc4 )
 	fromanc2_tilemap[1][2] = tilemap_create(machine, fromancr_get_v1_l2_tile_info, tilemap_scan_rows,  8, 8, 256, 64);
 	fromanc2_tilemap[1][3] = 0;
 
-	fromanc2_videoram[0][0] = auto_malloc((256 * 64) * sizeof(UINT16));
-	fromanc2_videoram[0][1] = auto_malloc((256 * 64) * sizeof(UINT16));
-	fromanc2_videoram[0][2] = auto_malloc((256 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][0] = auto_malloc((256 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][1] = auto_malloc((256 * 64) * sizeof(UINT16));
-	fromanc2_videoram[1][2] = auto_malloc((256 * 64) * sizeof(UINT16));
+	fromanc2_videoram[0][0] = auto_alloc_array(machine, UINT16, (256 * 64));
+	fromanc2_videoram[0][1] = auto_alloc_array(machine, UINT16, (256 * 64));
+	fromanc2_videoram[0][2] = auto_alloc_array(machine, UINT16, (256 * 64));
+	fromanc2_videoram[1][0] = auto_alloc_array(machine, UINT16, (256 * 64));
+	fromanc2_videoram[1][1] = auto_alloc_array(machine, UINT16, (256 * 64));
+	fromanc2_videoram[1][2] = auto_alloc_array(machine, UINT16, (256 * 64));
 
-	fromanc2_paletteram[0] = auto_malloc(0x800 * 2);
-	fromanc2_paletteram[1] = auto_malloc(0x800 * 2);
+	fromanc2_paletteram[0] = auto_alloc_array(machine, UINT16, 0x800);
+	fromanc2_paletteram[1] = auto_alloc_array(machine, UINT16, 0x800);
 
 	tilemap_set_transparent_pen(fromanc2_tilemap[0][1], 0x000);
 	tilemap_set_transparent_pen(fromanc2_tilemap[0][2], 0x000);

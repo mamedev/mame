@@ -73,7 +73,7 @@ static WRITE8_HANDLER( kikcubic_coin_w )
 
 
 static ADDRESS_MAP_START( vigilant_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)		/* Fallthrough */
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))		/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc020, 0xc0df) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE(&paletteram)
@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( vigilant_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kikcubic_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)		/* Fallthrough */
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))		/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE(&paletteram)

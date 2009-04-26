@@ -146,11 +146,8 @@ static TILE_GET_INFO( get_macrossp_text_tile_info )
 
 VIDEO_START(macrossp)
 {
-	spriteram_old = auto_malloc(spriteram_size);
-	spriteram_old2 = auto_malloc(spriteram_size);
-
-	memset(spriteram_old,0,spriteram_size);
-	memset(spriteram_old2,0,spriteram_size);
+	spriteram_old = auto_alloc_array_clear(machine, UINT32, spriteram_size/4);
+	spriteram_old2 = auto_alloc_array_clear(machine, UINT32, spriteram_size/4);
 
 	macrossp_text_tilemap = tilemap_create(machine, get_macrossp_text_tile_info,tilemap_scan_rows,16,16,64,64);
 	macrossp_scra_tilemap = tilemap_create(machine, get_macrossp_scra_tile_info,tilemap_scan_rows,16,16,64,64);

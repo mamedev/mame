@@ -92,7 +92,7 @@ WRITE16_HANDLER( bestbest_flipscreen_w )
 
 VIDEO_START( suna16 )
 {
-	paletteram16 = auto_malloc( machine->config->total_colors * sizeof(UINT16) );
+	paletteram16 = auto_alloc_array(machine, UINT16, machine->config->total_colors);
 }
 
 READ16_HANDLER( suna16_paletteram16_r )

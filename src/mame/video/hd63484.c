@@ -72,11 +72,10 @@ static const char *const instruction_name[64] =
 	"RGCPY","RGCPY","RGCPY","RGCPY" 	/* Fx */
 };
 
-void HD63484_start(void)
+void HD63484_start(running_machine *machine)
 {
 	fifo_counter = 0;
-	HD63484_ram = auto_malloc(HD63484_RAM_SIZE * sizeof(*HD63484_ram));
-	memset(HD63484_ram, 0, HD63484_RAM_SIZE * sizeof(*HD63484_ram));
+	HD63484_ram = auto_alloc_array_clear(machine, UINT16, HD63484_RAM_SIZE);
 }
 
 static void doclr16(int opcode,UINT16 fill,int *dst,INT16 _ax,INT16 _ay)

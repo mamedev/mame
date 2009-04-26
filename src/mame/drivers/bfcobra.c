@@ -1306,10 +1306,10 @@ static MACHINE_RESET( bfcobra )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( z80_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_BANK4)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_BANK1)
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK2, SMH_BANK2)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK3, SMH_BANK3)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_BANK(4))
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK(1), SMH_BANK(1))
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK(2), SMH_BANK(2))
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_BANK(3), SMH_BANK(3))
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1564,16 +1564,13 @@ INPUT_PORTS_END
 /*
     Allocate work RAM and video RAM shared by the Z80 and chipset.
 */
-static void init_ram(void)
+static void init_ram(running_machine *machine)
 {
 	/* 768kB work RAM */
-	work_ram = auto_malloc(0xC0000);
+	work_ram = auto_alloc_array_clear(machine, UINT8, 0xC0000);
 
 	/* 128kB video RAM */
-	video_ram = auto_malloc(0x20000);
-
-	memset(work_ram, 0, 0xc0000);
-	memset(video_ram, 0, 0x20000);
+	video_ram = auto_alloc_array_clear(machine, UINT8, 0x20000);
 }
 
 /*
@@ -1673,7 +1670,7 @@ static DRIVER_INIT( bfcobra )
 	UINT8 *rom;
 	UINT8 *tmp;
 
-	tmp = malloc_or_die(0x8000);
+	tmp = alloc_array_or_die(UINT8, 0x8000);
 	rom = memory_region(machine, "audiocpu") + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
@@ -1695,7 +1692,7 @@ static DRIVER_INIT( bfcobra )
 
 	free(tmp);
 
-	init_ram();
+	init_ram(machine);
 
 	bank[0] = 1;
 	bank[1] = 0;

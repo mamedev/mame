@@ -197,12 +197,12 @@ static SAMPLES_START( galaxian_sh_start )
 	sample_set_volume(device, CHANNEL_LFO+1, LFO_VOLUME);
 	sample_set_volume(device, CHANNEL_LFO+2, LFO_VOLUME);
 
-	noisewave = auto_malloc(NOISE_LENGTH * sizeof(INT16));
+	noisewave = auto_alloc_array(machine, INT16, NOISE_LENGTH);
 
 #define SHOOT_SEC 2
 	shoot_rate = machine->sample_rate;
 	shoot_length = SHOOT_SEC * shoot_rate;
-	shootwave = auto_malloc(shoot_length * sizeof(INT16));
+	shootwave = auto_alloc_array(machine, INT16, shoot_length);
 
 	/*
      * The RNG shifter is clocked with RNG_RATE, bit 17 is

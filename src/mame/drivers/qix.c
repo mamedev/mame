@@ -1258,7 +1258,7 @@ static DRIVER_INIT( kram3 )
 	i = 0;
 	patch = memory_region(machine, "user1");
 	rom = memory_region(machine, "maincpu");
-	decrypted = auto_malloc(0x6000);
+	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
 	memory_set_decrypted_region(mainspace, 0xa000, 0xffff, decrypted);
 
@@ -1272,7 +1272,7 @@ static DRIVER_INIT( kram3 )
 	patch = memory_region(machine, "user2");
 	size = memory_region_length(machine, "user2");
 	rom = memory_region(machine, "videocpu");
-	decrypted = auto_malloc(0x6000);
+	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
 	memory_set_decrypted_region(videospace, 0xa000, 0xffff, decrypted);
 

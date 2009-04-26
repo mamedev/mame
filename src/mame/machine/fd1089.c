@@ -403,7 +403,7 @@ static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	int size = memory_region_length(machine, "maincpu");
 	int A;
-	decrypted = (UINT16 *)auto_malloc(size);
+	decrypted = auto_alloc_array(machine, UINT16, size/2);
 
 	memory_set_decrypted_region(space, 0x000000, size - 1, decrypted);
 

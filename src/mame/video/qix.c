@@ -46,7 +46,7 @@ static VIDEO_START( qix )
 	qix_state *state = machine->driver_data;
 
 	/* allocate memory for the full video RAM */
-	state->videoram = auto_malloc(256 * 256);
+	state->videoram = auto_alloc_array(machine, UINT8, 256 * 256);
 
 	/* set up save states */
 	state_save_register_global_pointer(machine, state->videoram, 256 * 256);

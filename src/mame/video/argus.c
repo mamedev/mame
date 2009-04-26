@@ -321,9 +321,9 @@ VIDEO_START( argus )
 	tilemap_set_transparent_pen(tx_tilemap,  15);
 
 	/* dummy RAM for back ground */
-	argus_dummy_bg0ram = auto_malloc(0x800);
+	argus_dummy_bg0ram = auto_alloc_array(machine, UINT8, 0x800);
 
-	jal_blend_table = auto_malloc(0xc00);
+	jal_blend_table = auto_alloc_array(machine, UINT8, 0xc00);
 }
 
 VIDEO_RESET( argus )
@@ -346,7 +346,7 @@ VIDEO_START( valtric )
 
 	mosaicbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	jal_blend_table = auto_malloc(0xc00);
+	jal_blend_table = auto_alloc_array(machine, UINT8, 0xc00);
 }
 
 VIDEO_RESET( valtric )
@@ -365,15 +365,15 @@ VIDEO_START( butasan )
 	tilemap_set_transparent_pen(bg1_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap,  15);
 
-	butasan_pagedram[0] = auto_malloc(0x1000);
-	butasan_pagedram[1] = auto_malloc(0x1000);
+	butasan_pagedram[0] = auto_alloc_array(machine, UINT8, 0x1000);
+	butasan_pagedram[1] = auto_alloc_array(machine, UINT8, 0x1000);
 
 	butasan_bg0ram     = &butasan_pagedram[0][0x000];
 	butasan_bg0backram = &butasan_pagedram[0][0x800];
 	butasan_txram      = &butasan_pagedram[1][0x000];
 	butasan_txbackram  = &butasan_pagedram[1][0x800];
 
-	jal_blend_table = auto_malloc(0xc00);
+	jal_blend_table = auto_alloc_array(machine, UINT8, 0xc00);
 	//jal_blend_table = NULL;
 }
 

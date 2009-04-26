@@ -155,8 +155,8 @@ static UINT8 williams2_fg_color;
  *
  *************************************/
 
-static void blitter_init(int blitter_config, const UINT8 *remap_prom);
-static void create_palette_lookup(void);
+static void blitter_init(running_machine *machine, int blitter_config, const UINT8 *remap_prom);
+static void create_palette_lookup(running_machine *machine);
 static TILE_GET_INFO( get_tile_info );
 static int blitter_core(const address_space *space, int sstart, int dstart, int w, int h, int data);
 
@@ -183,26 +183,26 @@ static void state_save_register(running_machine *machine)
 
 VIDEO_START( williams )
 {
-	blitter_init(williams_blitter_config, NULL);
-	create_palette_lookup();
+	blitter_init(machine, williams_blitter_config, NULL);
+	create_palette_lookup(machine);
 	state_save_register(machine);
 }
 
 
 VIDEO_START( blaster )
 {
-	blitter_init(williams_blitter_config, memory_region(machine, "proms"));
-	create_palette_lookup();
+	blitter_init(machine, williams_blitter_config, memory_region(machine, "proms"));
+	create_palette_lookup(machine);
 	state_save_register(machine);
 }
 
 
 VIDEO_START( williams2 )
 {
-	blitter_init(williams_blitter_config, NULL);
+	blitter_init(machine, williams_blitter_config, NULL);
 
 	/* allocate paletteram */
-	paletteram = auto_malloc(0x400 * 2);
+	paletteram = auto_alloc_array(machine, UINT8, 0x400 * 2);
 	state_save_register_global_pointer(machine, paletteram, 0x400 * 2);
 
 	/* create the tilemap */
@@ -329,7 +329,7 @@ VIDEO_UPDATE( williams2 )
  *
  *************************************/
 
-static void create_palette_lookup(void)
+static void create_palette_lookup(running_machine *machine)
 {
 	static const int resistances_rg[3] = { 1200, 560, 330 };
 	static const int resistances_b[2]  = { 560, 330 };
@@ -345,7 +345,7 @@ static void create_palette_lookup(void)
 			2, resistances_b,  weights_b, 0, 0);
 
 	/* build a palette lookup */
-	palette_lookup = auto_malloc(256 * sizeof(*palette_lookup));
+	palette_lookup = auto_alloc_array(machine, rgb_t, 256);
 	for (i = 0; i < 256; i++)
 	{
 		int r = combine_3_weights(weights_r, BIT(i,0), BIT(i,1), BIT(i,2));
@@ -521,7 +521,7 @@ WRITE8_HANDLER( blaster_video_control_w )
  *
  *************************************/
 
-static void blitter_init(int blitter_config, const UINT8 *remap_prom)
+static void blitter_init(running_machine *machine, int blitter_config, const UINT8 *remap_prom)
 {
 	static const UINT8 dummy_table[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 	int i,j;
@@ -533,7 +533,7 @@ static void blitter_init(int blitter_config, const UINT8 *remap_prom)
 	blitter_xor = (blitter_config == WILLIAMS_BLITTER_SC01) ? 4 : 0;
 
 	/* create the remap table; if no PROM, make an identity remap table */
-	blitter_remap_lookup = auto_malloc(256 * 256);
+	blitter_remap_lookup = auto_alloc_array(machine, UINT8, 256 * 256);
 	blitter_remap_index = 0;
 	blitter_remap = blitter_remap_lookup;
 	for (i = 0; i < 256; i++)

@@ -100,7 +100,7 @@ ResetAllSubCPUs( running_machine *machine, int state )
 
 MACHINE_START( namcos2 )
 {
-	namcos2_eeprom = auto_malloc(namcos2_eeprom_size);
+	namcos2_eeprom = auto_alloc_array(machine, UINT8, namcos2_eeprom_size);
 }
 
 MACHINE_RESET( namcos2 )

@@ -204,7 +204,7 @@ VIDEO_START( itech32 )
 	int i;
 
 	/* allocate memory */
-	videoram16 = auto_malloc(VRAM_WIDTH * (itech32_vram_height + 16) * 2 * 2);
+	videoram16 = auto_alloc_array(machine, UINT16, VRAM_WIDTH * (itech32_vram_height + 16) * 2);
 	memset(videoram16, 0xff, VRAM_WIDTH * (itech32_vram_height + 16) * 2 * 2);
 
 	/* videoplane[0] is the foreground; videoplane[1] is the background */

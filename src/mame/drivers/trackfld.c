@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( wizzquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(questions_bank_w)
-	AM_RANGE(0x6000, 0xdfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x6000, 0xdfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1132,13 +1132,13 @@ static DRIVER_INIT( atlantol )
 	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
 
 	memory_install_write8_handler(space, 0x0800, 0x0800, 0, 0, atlantol_gfxbank_w);
-	memory_install_write8_handler(space, 0x1000, 0x1000, 0, 0, SMH_NOP);
+	memory_install_write8_handler(space, 0x1000, 0x1000, 0, 0, (write8_space_func)SMH_NOP);
 
 	/* unmapped areas read as ROM */
-	memory_install_read8_handler(space, 0x0000, 0x11ff, 0, 0, SMH_BANK10);
-	memory_install_read8_handler(space, 0x1380, 0x17ff, 0, 0, SMH_BANK11);
-	memory_install_read8_handler(space, 0x2000, 0x27ff, 0, 0, SMH_BANK12);
-	memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, SMH_BANK13);
+	memory_install_read8_handler(space, 0x0000, 0x11ff, 0, 0, (read8_space_func)SMH_BANK(10));
+	memory_install_read8_handler(space, 0x1380, 0x17ff, 0, 0, (read8_space_func)SMH_BANK(11));
+	memory_install_read8_handler(space, 0x2000, 0x27ff, 0, 0, (read8_space_func)SMH_BANK(12));
+	memory_install_read8_handler(space, 0x4000, 0x5fff, 0, 0, (read8_space_func)SMH_BANK(13));
 	memory_set_bankptr(machine, 10, &rom[0x0000]);
 	memory_set_bankptr(machine, 11, &rom[0x1380]);
 	memory_set_bankptr(machine, 12, &rom[0x2000]);

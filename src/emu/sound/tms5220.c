@@ -179,8 +179,7 @@ void *tms5220_create(const device_config *device)
 {
 	struct tms5220 *tms;
 
-	tms = (struct tms5220 *)malloc_or_die(sizeof(*tms));
-	memset(tms, 0, sizeof(*tms));
+	tms = alloc_clear_or_die(struct tms5220);
 
 	tms->device = device;
 	state_save_register_device_item_array(device, 0, tms->fifo);

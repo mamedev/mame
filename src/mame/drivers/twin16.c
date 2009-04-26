@@ -94,8 +94,8 @@ enum
 
 /******************************************************************************************/
 
-#define COMRAM_r					SMH_BANK1
-#define COMRAM_w					SMH_BANK1
+#define COMRAM_r					SMH_BANK(1)
+#define COMRAM_w					SMH_BANK(1)
 
 /* Read/Write Handlers */
 
@@ -1249,7 +1249,7 @@ static void gfx_untangle( running_machine *machine )
 	// sprite, tile data
 
 	int i;
-	UINT16 *temp = malloc_or_die(0x200000);
+	UINT16 *temp = alloc_array_or_die(UINT16, 0x200000/2);
 
 		twin16_gfx_rom = (UINT16 *)memory_region(machine, "gfx2");
 		memcpy( temp, twin16_gfx_rom, 0x200000 );

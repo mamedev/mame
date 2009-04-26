@@ -1631,9 +1631,9 @@ static DIRECT_UPDATE_HANDLER(snes_direct)
 
 MACHINE_START( snes )
 {
-	snes_vram = auto_malloc(SNES_VRAM_SIZE);
-	snes_cgram = auto_malloc(SNES_CGRAM_SIZE);
-	snes_oam = auto_malloc(SNES_OAM_SIZE);
+	snes_vram = auto_alloc_array(machine, UINT8, SNES_VRAM_SIZE);
+	snes_cgram = auto_alloc_array(machine, UINT16, SNES_CGRAM_SIZE/2);
+	snes_oam = auto_alloc_array(machine, UINT16, SNES_OAM_SIZE/2);
 	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), snes_direct);
 	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), spc_direct);
 
@@ -1673,7 +1673,7 @@ DRIVER_INIT( snes )
 	UINT8  *rom;
 
 	rom = memory_region(machine, "user3");
-	snes_ram = auto_malloc(0x1000000);
+	snes_ram = auto_alloc_array(machine, UINT8, 0x1000000);
 	memset(snes_ram, 0, 0x1000000);
 
 	/* all NSS games seem to use MODE 20 */
@@ -1739,7 +1739,7 @@ DRIVER_INIT( snes_hirom )
 	UINT8  *rom;
 
 	rom = memory_region(machine, "user3");
-	snes_ram = auto_malloc(0x1000000);
+	snes_ram = auto_alloc_array(machine, UINT8, 0x1000000);
 	memset(snes_ram, 0, 0x1000000);
 
 	snes_cart.mode = SNES_MODE_21;

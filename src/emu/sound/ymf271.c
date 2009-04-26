@@ -1568,13 +1568,13 @@ READ8_DEVICE_HANDLER( ymf271_r )
 	return 0;
 }
 
-static void init_tables(void)
+static void init_tables(running_machine *machine)
 {
 	int i,j;
 
 	for (i=0; i < ARRAY_LENGTH(wavetable); i++)
 	{
-		wavetable[i] = (INT16 *)auto_malloc(SIN_LEN * sizeof(INT16));
+		wavetable[i] = auto_alloc_array(machine, INT16, SIN_LEN);
 	}
 
 	for (i=0; i < SIN_LEN; i++)
@@ -1652,7 +1652,7 @@ static void init_tables(void)
 		alfo_table[3][i] = (i < (LFO_LENGTH/2)) ? ALFO_MAX-tri_wave : tri_wave;
 	}
 
-	mix = (INT32 *)auto_malloc(48000*2*sizeof(*mix));
+	mix = auto_alloc_array(machine, INT32, 48000*2);
 }
 
 static void init_state(YMF271Chip *chip, const device_config *device)
@@ -1741,7 +1741,7 @@ static void ymf271_init(const device_config *device, YMF271Chip *chip, UINT8 *ro
 	devcb_resolve_read8(&chip->ext_mem_read, ext_read, device);
 	devcb_resolve_write8(&chip->ext_mem_write, ext_write, device);
 
-	init_tables();
+	init_tables(device->machine);
 	init_state(chip, device);
 }
 

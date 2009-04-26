@@ -98,7 +98,7 @@ logerror("%04x: prot_fcb0_w(%02x)\n",cpu_get_pc(space->cpu),data);
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP	// watchdog?
 	AM_RANGE(0xd000, 0xefff) AM_READ(SMH_RAM)

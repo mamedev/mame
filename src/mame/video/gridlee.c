@@ -82,8 +82,7 @@ static STATE_POSTLOAD( expand_pixels )
 VIDEO_START( gridlee )
 {
 	/* allocate a local copy of video RAM */
-	local_videoram = auto_malloc(256 * 256);
-	memset(local_videoram, 0, 256 * 256);
+	local_videoram = auto_alloc_array_clear(machine, UINT8, 256 * 256);
 
 	/* reset the palette */
 	palettebank_vis = 0;

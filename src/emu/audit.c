@@ -88,8 +88,7 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 	if (records > 0)
 	{
 		/* allocate memory for the records */
-		*audit = (audit_record *)malloc_or_die(sizeof(**audit) * records);
-		memset(*audit, 0, sizeof(**audit) * records);
+		*audit = alloc_array_clear_or_die(audit_record, records);
 		record = *audit;
 
 		/* iterate over ROM sources and regions */
@@ -174,8 +173,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 		goto skip;
 
 	/* allocate memory for the records */
-	*audit = (audit_record *)malloc_or_die(sizeof(**audit) * records);
-	memset(*audit, 0, sizeof(**audit) * records);
+	*audit = alloc_array_clear_or_die(audit_record, records);
 	record = *audit;
 
 	/* now iterate over sample entries */

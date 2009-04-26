@@ -301,8 +301,8 @@ static CPU_INIT( r3000 )
 	r3000_state *r3000 = get_safe_token(device);
 
 	/* allocate memory */
-	r3000->icache = (UINT32 *)auto_malloc(configdata->icache);
-	r3000->dcache = (UINT32 *)auto_malloc(configdata->dcache);
+	r3000->icache = auto_alloc_array(device->machine, UINT32, configdata->icache/4);
+	r3000->dcache = auto_alloc_array(device->machine, UINT32, configdata->dcache/4);
 
 	r3000->icache_size = configdata->icache;
 	r3000->dcache_size = configdata->dcache;

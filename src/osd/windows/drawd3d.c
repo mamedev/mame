@@ -500,8 +500,7 @@ static int drawd3d_window_init(win_window_info *window)
 	d3d_info *d3d;
 
 	// allocate memory for our structures
-	d3d = (d3d_info *)malloc_or_die(sizeof(*d3d));
-	memset(d3d, 0, sizeof(*d3d));
+	d3d = alloc_clear_or_die(d3d_info);
 	window->drawdata = d3d;
 
 	// experimental: load a PNG to use for vector rendering; it is treated
@@ -1658,8 +1657,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 	HRESULT result;
 
 	// allocate a new texture
-	texture = (texture_info *)malloc_or_die(sizeof(*texture));
-	memset(texture, 0, sizeof(*texture));
+	texture = alloc_clear_or_die(texture_info);
 
 	// fill in the core data
 	texture->hash = texture_compute_hash(texsource, flags);

@@ -365,7 +365,7 @@ WRITE8_HANDLER( indyheat_analog_w )
 MACHINE_START( leland )
 {
 	/* allocate extra stuff */
-	battery_ram = auto_malloc(LELAND_BATTERY_RAM_SIZE);
+	battery_ram = auto_alloc_array(machine, UINT8, LELAND_BATTERY_RAM_SIZE);
 
 	/* start scanline interrupts going */
 	master_int_timer = timer_alloc(machine, leland_interrupt_callback, NULL);
@@ -417,8 +417,8 @@ MACHINE_RESET( leland )
 MACHINE_START( ataxx )
 {
 	/* set the odd data banks */
-	battery_ram = auto_malloc(LELAND_BATTERY_RAM_SIZE);
-	extra_tram = auto_malloc(ATAXX_EXTRA_TRAM_SIZE);
+	battery_ram = auto_alloc_array(machine, UINT8, LELAND_BATTERY_RAM_SIZE);
+	extra_tram = auto_alloc_array(machine, UINT8, ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
 	master_int_timer = timer_alloc(machine, ataxx_interrupt_callback, NULL);

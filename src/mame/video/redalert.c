@@ -138,7 +138,7 @@ static void get_pens(running_machine *machine, pen_t *pens)
 
 static VIDEO_START( redalert )
 {
-	redalert_bitmap_colorram = auto_malloc(0x0400);
+	redalert_bitmap_colorram = auto_alloc_array(machine, UINT8, 0x0400);
 
 	state_save_register_global_pointer(machine, redalert_bitmap_colorram, 0x0400);
 

@@ -25,7 +25,7 @@ struct _samples_info
 	const device_config *device;
 	int			numchannels;	/* how many channels */
 	sample_channel *channel;/* array of channels */
-	struct loaded_samples *samples;/* array of samples */
+	loaded_samples *samples;/* array of samples */
 };
 
 
@@ -50,7 +50,7 @@ INLINE samples_info *get_safe_token(const device_config *device)
     read_wav_sample - read a WAV file as a sample
 -------------------------------------------------*/
 
-static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
+static int read_wav_sample(running_machine *machine, mame_file *f, loaded_sample *sample)
 {
 	unsigned long offset = 0;
 	UINT32 length, rate, filesize;
@@ -153,7 +153,7 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 		unsigned char *tempptr;
 		int sindex;
 
-		sample->data = (INT16 *)auto_malloc(sizeof(*sample->data) * length);
+		sample->data = auto_alloc_array(machine, INT16, length);
 		mame_fread(f, sample->data, length);
 
 		/* convert 8-bit data to signed samples */
@@ -164,7 +164,7 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
 	else
 	{
 		/* 16-bit data is fine as-is */
-		sample->data = (INT16 *)auto_malloc(sizeof(*sample->data) * (length/2));
+		sample->data = auto_alloc_array(machine, INT16, length/2);
 		mame_fread(f, sample->data, length);
 		sample->length /= 2;
 		if (ENDIANNESS_NATIVE != ENDIANNESS_LITTLE)
@@ -179,9 +179,9 @@ static int read_wav_sample(mame_file *f, struct loaded_sample *sample)
     readsamples - load all samples
 -------------------------------------------------*/
 
-struct loaded_samples *readsamples(const char *const *samplenames, const char *basename)
+loaded_samples *readsamples(running_machine *machine, const char *const *samplenames, const char *basename)
 {
-	struct loaded_samples *samples;
+	loaded_samples *samples;
 	int skipfirst = 0;
 	int i;
 
@@ -201,8 +201,7 @@ struct loaded_samples *readsamples(const char *const *samplenames, const char *b
 		return NULL;
 
 	/* allocate the array */
-	samples = (struct loaded_samples *)auto_malloc(sizeof(struct loaded_samples) + (i-1) * sizeof(struct loaded_sample));
-	memset(samples, 0, sizeof(struct loaded_samples) + (i-1) * sizeof(struct loaded_sample));
+	samples = (loaded_samples *)auto_alloc_array_clear(machine, UINT8, sizeof(loaded_samples) + (i-1) * sizeof(loaded_sample));
 	samples->total = i;
 
 	/* load the samples */
@@ -223,7 +222,7 @@ struct loaded_samples *readsamples(const char *const *samplenames, const char *b
 			}
 			if (filerr == FILERR_NONE)
 			{
-				read_wav_sample(f, &samples->sample[i]);
+				read_wav_sample(machine, f, &samples->sample[i]);
 				mame_fclose(f);
 			}
 
@@ -243,7 +242,7 @@ void sample_start(const device_config *device,int channel,int samplenum,int loop
 {
     samples_info *info = get_safe_token(device);
     sample_channel *chan;
-    struct loaded_sample *sample;
+    loaded_sample *sample;
 
 	/* if samples are disabled, just return quietly */
 	if (info->samples == NULL)
@@ -450,7 +449,7 @@ static STATE_POSTLOAD( samples_postload )
 		/* attach any samples that were loaded and playing */
 		if (chan->source_num >= 0 && chan->source_num < info->samples->total)
 		{
-			struct loaded_sample *sample = &info->samples->sample[chan->source_num];
+			loaded_sample *sample = &info->samples->sample[chan->source_num];
 			chan->source = sample->data;
 			chan->source_length = sample->length;
 			if (!sample->data)
@@ -482,12 +481,12 @@ static DEVICE_START( samples )
 
 	/* read audio samples */
 	if (intf->samplenames)
-		info->samples = readsamples(intf->samplenames,device->machine->gamedrv->name);
+		info->samples = readsamples(device->machine, intf->samplenames,device->machine->gamedrv->name);
 
 	/* allocate channels */
 	info->numchannels = intf->channels;
 	assert(info->numchannels < MAX_CHANNELS);
-	info->channel = (sample_channel *)auto_malloc(sizeof(*info->channel) * info->numchannels);
+	info->channel = auto_alloc_array(device->machine, sample_channel, info->numchannels);
 	for (i = 0; i < info->numchannels; i++)
 	{
 	    info->channel[i].stream = stream_create(device, 0, 1, device->machine->sample_rate, &info->channel[i], sample_update_sound);

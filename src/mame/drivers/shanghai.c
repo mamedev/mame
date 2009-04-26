@@ -59,7 +59,7 @@ static PALETTE_INIT( shanghai )
 
 static VIDEO_START( shanghai )
 {
-	HD63484_start();
+	HD63484_start(machine);
 }
 
 static VIDEO_UPDATE( shanghai )

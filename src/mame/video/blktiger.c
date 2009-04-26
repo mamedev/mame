@@ -71,7 +71,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( blktiger )
 {
-	scroll_ram = auto_malloc(BGRAM_BANK_SIZE * BGRAM_BANKS);
+	scroll_ram = auto_alloc_array(machine, UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
 
 	tx_tilemap =    tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,32,32);
 	bg_tilemap8x4 = tilemap_create(machine, get_bg_tile_info,bg8x4_scan,          16,16,128,64);

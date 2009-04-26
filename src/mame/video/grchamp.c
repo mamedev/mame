@@ -107,7 +107,7 @@ VIDEO_START( grchamp )
 {
 	grchamp_state *state = machine->driver_data;
 
-	state->work_bitmap = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
+	state->work_bitmap = auto_bitmap_alloc(machine,32,32,video_screen_get_format(machine->primary_screen));
 
 	/* allocate tilemaps for each of the three sections */
 	state->text_tilemap = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8,8, 32,32);

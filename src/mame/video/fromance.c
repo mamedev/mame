@@ -78,11 +78,11 @@ static void init_common(running_machine *machine)
 	flipscreen_old = -1;
 
 	/* allocate local videoram */
-	local_videoram[0] = auto_malloc(0x1000 * 3);
-	local_videoram[1] = auto_malloc(0x1000 * 3);
+	local_videoram[0] = auto_alloc_array(machine, UINT8, 0x1000 * 3);
+	local_videoram[1] = auto_alloc_array(machine, UINT8, 0x1000 * 3);
 
 	/* allocate local palette RAM */
-	local_paletteram = auto_malloc(0x800 * 2);
+	local_paletteram = auto_alloc_array(machine, UINT8, 0x800 * 2);
 
 	/* configure tilemaps */
 	tilemap_set_transparent_pen(fg_tilemap,15);

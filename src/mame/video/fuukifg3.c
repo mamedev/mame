@@ -106,8 +106,8 @@ LAYER_4BPP( 3 )
 
 VIDEO_START( fuuki32 )
 {
-	buffered_spriteram32   = auto_malloc(spriteram_size);
-	buffered_spriteram32_2 = auto_malloc(spriteram_size);
+	buffered_spriteram32   = auto_alloc_array(machine, UINT32, spriteram_size/4);
+	buffered_spriteram32_2 = auto_alloc_array(machine, UINT32, spriteram_size/4);
 
 	tilemap_0 = tilemap_create(	machine, get_tile_info_0, tilemap_scan_rows,
 								 16, 16, 64,32);

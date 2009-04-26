@@ -88,8 +88,8 @@ static DEVICE_START(x2212)
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
-	c->sram = (UINT8 *)auto_malloc( SIZE_DATA );
-	c->e2prom = (UINT8 *)auto_malloc( SIZE_DATA );
+	c->sram = auto_alloc_array( device->machine, UINT8, SIZE_DATA );
+	c->e2prom = auto_alloc_array( device->machine, UINT8, SIZE_DATA );
 	c->store = 1;
 	c->array_recall = 1;
 

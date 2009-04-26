@@ -36,7 +36,7 @@ static READ8_HANDLER( blitter_status_r )
 
 static VIDEO_START( nightgal )
 {
-	blit_buffer = auto_malloc(256*256);
+	blit_buffer = auto_alloc_array(machine, UINT8, 256*256);
 }
 
 static VIDEO_UPDATE( nightgal )

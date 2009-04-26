@@ -39,7 +39,7 @@ VIDEO_START( balsente )
 	sprite_bank[1] = memory_region(machine, "gfx1") + 0x10000;
 
 	/* allocate a local copy of video RAM */
-	local_videoram = auto_malloc(256 * 256);
+	local_videoram = auto_alloc_array(machine, UINT8, 256 * 256);
 
 	/* determine sprite size */
 	sprite_data = memory_region(machine, "gfx1");

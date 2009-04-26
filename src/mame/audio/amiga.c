@@ -124,7 +124,7 @@ void amiga_audio_update(void)
 
 static STREAM_UPDATE( amiga_stream_update )
 {
-	amiga_audio *audio = param;
+	amiga_audio *audio = (amiga_audio *)param;
 	int channum, sampoffs = 0;
 
 	/* if all DMA off, disable all channels */
@@ -267,7 +267,7 @@ static DEVICE_START( amiga_sound )
 	int i;
 
 	/* allocate a new audio state */
-	audio_state = device->token;
+	audio_state = (amiga_audio *)device->token;
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;

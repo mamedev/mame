@@ -233,7 +233,7 @@ static DEVICE_START( k053260 )
 	for ( i = 0; i < 0x30; i++ )
 		ic->regs[i] = 0;
 
-	ic->delta_table = ( UINT32 * )auto_malloc( 0x1000 * sizeof( UINT32 ) );
+	ic->delta_table = auto_alloc_array( device->machine, UINT32, 0x1000 );
 
 	ic->channel = stream_create( device, 0, 2, rate, ic, k053260_update );
 

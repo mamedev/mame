@@ -186,8 +186,8 @@ static VIDEO_UPDATE( safarir )
 
 static MACHINE_START( safarir )
 {
-	ram_1 = auto_malloc(ram_size);
-	ram_2 = auto_malloc(ram_size);
+	ram_1 = auto_alloc_array(machine, UINT8, ram_size);
+	ram_2 = auto_alloc_array(machine, UINT8, ram_size);
 
 	/* setup for save states */
 	state_save_register_global_pointer(machine, ram_1, ram_size);

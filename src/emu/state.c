@@ -165,8 +165,7 @@ INLINE void flip_data(state_entry *entry)
 
 void state_init(running_machine *machine)
 {
-	machine->state_data = (state_private *)auto_malloc(sizeof(*machine->state_data));
-	memset(machine->state_data, 0, sizeof(*machine->state_data));
+	machine->state_data = auto_alloc_clear(machine, state_private);
 }
 
 
@@ -264,8 +263,7 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 
 	/* didn't find one; allocate a new one */
 	next = *entryptr;
-	*entryptr = (state_entry *)malloc_or_die(sizeof(**entryptr));
-	memset(*entryptr, 0, sizeof(**entryptr));
+	*entryptr = alloc_clear_or_die(state_entry);
 
 	/* fill in the rest */
 	(*entryptr)->next      = next;
@@ -314,7 +312,7 @@ void state_save_register_presave(running_machine *machine, state_presave_func fu
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	/* allocate a new entry */
-	*cbptr = (state_callback *)malloc_or_die(sizeof(state_callback));
+	*cbptr = alloc_or_die(state_callback);
 
 	/* fill it in */
 	(*cbptr)->next         = NULL;
@@ -345,7 +343,7 @@ void state_save_register_postload(running_machine *machine, state_postload_func 
 			fatalerror("Duplicate save state function (%p, %p)", param, func);
 
 	/* allocate a new entry */
-	*cbptr = (state_callback *)malloc_or_die(sizeof(state_callback));
+	*cbptr = alloc_or_die(state_callback);
 
 	/* fill it in */
 	(*cbptr)->next          = NULL;

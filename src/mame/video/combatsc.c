@@ -264,10 +264,8 @@ VIDEO_START( combasc )
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,32,32);
 	textlayer =  tilemap_create(machine, get_text_info, tilemap_scan_rows,     8,8,32,32);
 
-	private_spriteram[0] = auto_malloc(0x800);
-	private_spriteram[1] = auto_malloc(0x800);
-	memset(private_spriteram[0],0,0x800);
-	memset(private_spriteram[1],0,0x800);
+	private_spriteram[0] = auto_alloc_array_clear(machine, UINT8, 0x800);
+	private_spriteram[1] = auto_alloc_array_clear(machine, UINT8, 0x800);
 
 		tilemap_set_transparent_pen(bg_tilemap[0],0);
 		tilemap_set_transparent_pen(bg_tilemap[1],0);
@@ -284,10 +282,8 @@ VIDEO_START( combascb )
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info1_bootleg,tilemap_scan_rows,8,8,32,32);
 	textlayer =  tilemap_create(machine, get_text_info_bootleg, tilemap_scan_rows,8,8,32,32);
 
-	private_spriteram[0] = auto_malloc(0x800);
-	private_spriteram[1] = auto_malloc(0x800);
-	memset(private_spriteram[0],0,0x800);
-	memset(private_spriteram[1],0,0x800);
+	private_spriteram[0] = auto_alloc_array_clear(machine, UINT8, 0x800);
+	private_spriteram[1] = auto_alloc_array_clear(machine, UINT8, 0x800);
 
 		tilemap_set_transparent_pen(bg_tilemap[0],0);
 		tilemap_set_transparent_pen(bg_tilemap[1],0);
@@ -423,7 +419,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 		}
 		else
 		{
-			memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);	/* banked ROM */
+			memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_UNMAP);	/* banked ROM */
 		}
 	}
 }

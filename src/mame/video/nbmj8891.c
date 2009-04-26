@@ -501,9 +501,9 @@ VIDEO_START( nbmj8891_1layer )
 	int height = video_screen_get_height(machine->primary_screen);
 
 	nbmj8891_tmpbitmap0 = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj8891_videoram0 = auto_malloc(width * height * sizeof(char));
-	nbmj8891_palette = auto_malloc(0x200 * sizeof(char));
-	nbmj8891_clut = auto_malloc(0x800 * sizeof(char));
+	nbmj8891_videoram0 = auto_alloc_array(machine, UINT8, width * height);
+	nbmj8891_palette = auto_alloc_array(machine, UINT8, 0x200);
+	nbmj8891_clut = auto_alloc_array(machine, UINT8, 0x800);
 	memset(nbmj8891_videoram0, 0xff, (width * height * sizeof(char)));
 	gfxdraw_mode = 0;
 
@@ -518,10 +518,10 @@ VIDEO_START( nbmj8891_2layer )
 
 	nbmj8891_tmpbitmap0 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	nbmj8891_tmpbitmap1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj8891_videoram0 = auto_malloc(width * height * sizeof(UINT8));
-	nbmj8891_videoram1 = auto_malloc(width * height * sizeof(UINT8));
-	nbmj8891_palette = auto_malloc(0x200 * sizeof(UINT8));
-	nbmj8891_clut = auto_malloc(0x800 * sizeof(UINT8));
+	nbmj8891_videoram0 = auto_alloc_array(machine, UINT8, width * height);
+	nbmj8891_videoram1 = auto_alloc_array(machine, UINT8, width * height);
+	nbmj8891_palette = auto_alloc_array(machine, UINT8, 0x200);
+	nbmj8891_clut = auto_alloc_array(machine, UINT8, 0x800);
 	memset(nbmj8891_videoram0, 0xff, (width * height * sizeof(UINT8)));
 	memset(nbmj8891_videoram1, 0xff, (width * height * sizeof(UINT8)));
 	gfxdraw_mode = 1;

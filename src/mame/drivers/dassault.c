@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_READWRITE(SMH_BANK8, SMH_BANK8)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
@@ -807,7 +807,7 @@ static DRIVER_INIT( dassault )
 {
 	const UINT8 *src = memory_region(machine, "gfx1");
 	UINT8 *dst = memory_region(machine, "gfx2");
-	UINT8 *tmp = malloc_or_die(0x80000);
+	UINT8 *tmp = alloc_array_or_die(UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
     by just copying the chars to both banks (if I just used a different gfx
@@ -827,7 +827,7 @@ static DRIVER_INIT( thndzone )
 {
 	const UINT8 *src = memory_region(machine, "gfx1");
 	UINT8 *dst = memory_region(machine, "gfx2");
-	UINT8 *tmp = malloc_or_die(0x80000);
+	UINT8 *tmp = alloc_array_or_die(UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
     by just copying the chars to both banks (if I just used a different gfx

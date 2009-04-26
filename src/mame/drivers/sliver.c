@@ -590,7 +590,7 @@ ROM_END
 static DRIVER_INIT(sliver)
 {
 	jpeg_addr = -1;
-	colorram=auto_malloc(256*3);
+	colorram=auto_alloc_array(machine, UINT8, 256*3);
 }
 
 GAME( 1996, sliver, 0,        sliver, sliver, sliver, ROT0,  "Hollow Corp", "Sliver", GAME_IMPERFECT_GRAPHICS )

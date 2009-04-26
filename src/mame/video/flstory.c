@@ -53,8 +53,8 @@ VIDEO_START( flstory )
 	tilemap_set_transmask(bg_tilemap,1,0x8000,0x7fff); /* split type 1 has pen 15 transparent in front half */
 	tilemap_set_scroll_cols(bg_tilemap,32);
 
-	paletteram = auto_malloc(0x200);
-	paletteram_2 = auto_malloc(0x200);
+	paletteram = auto_alloc_array(machine, UINT8, 0x200);
+	paletteram_2 = auto_alloc_array(machine, UINT8, 0x200);
 }
 
 VIDEO_START( victnine )
@@ -62,8 +62,8 @@ VIDEO_START( victnine )
 	bg_tilemap = tilemap_create( machine, victnine_get_tile_info,tilemap_scan_rows,8,8,32,32 );
 	tilemap_set_scroll_cols(bg_tilemap,32);
 
-	paletteram = auto_malloc(0x200);
-	paletteram_2 = auto_malloc(0x200);
+	paletteram = auto_alloc_array(machine, UINT8, 0x200);
+	paletteram_2 = auto_alloc_array(machine, UINT8, 0x200);
 }
 
 WRITE8_HANDLER( flstory_videoram_w )

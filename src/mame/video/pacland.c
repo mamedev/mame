@@ -125,9 +125,9 @@ PALETTE_INIT( pacland )
 	switch_palette(machine);
 
 	/* precalculate transparency masks for sprites */
-	transmask[0] = auto_malloc(64 * sizeof(transmask[0][0]));
-	transmask[1] = auto_malloc(64 * sizeof(transmask[0][0]));
-	transmask[2] = auto_malloc(64 * sizeof(transmask[0][0]));
+	transmask[0] = auto_alloc_array(machine, UINT32, 64);
+	transmask[1] = auto_alloc_array(machine, UINT32, 64);
+	transmask[2] = auto_alloc_array(machine, UINT32, 64);
 	for (i = 0; i < 64; i++)
 	{
 		int palentry;

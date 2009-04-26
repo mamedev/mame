@@ -326,16 +326,16 @@ VIDEO_START( pgm )
 	tilemap_set_transparent_pen(pgm_bg_tilemap,31);
 	tilemap_set_scroll_rows(pgm_bg_tilemap,64*32);
 
-	tmppgmbitmap = auto_bitmap_alloc(448,224,BITMAP_FORMAT_RGB32);
+	tmppgmbitmap = auto_bitmap_alloc(machine,448,224,BITMAP_FORMAT_RGB32);
 
 	for (i=0; i < 0x1200/2; i++)
 		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
 
-	pgm_spritebufferram = auto_malloc (0xa00);
+	pgm_spritebufferram = auto_alloc_array(machine, UINT16, 0xa00/2);
 
 	/* we render each sprite to a bitmap then copy the bitmap to screen bitmap with zooming */
 	/* easier this way because of the funky sprite format */
-	sprite_temp_render = auto_malloc(0x400*0x200*2);
+	sprite_temp_render = auto_alloc_array(machine, UINT16, 0x400*0x200);
 }
 
 VIDEO_UPDATE( pgm )

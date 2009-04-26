@@ -27,14 +27,14 @@ static UINT8 blank_tile[32];
 
 VIDEO_START( battlera )
 {
-	HuC6270_vram=auto_malloc(0x20000);
-	vram_dirty=auto_malloc(0x1000);
+	HuC6270_vram=auto_alloc_array(machine, UINT8, 0x20000);
+	vram_dirty=auto_alloc_array(machine, UINT8, 0x1000);
 
 	memset(HuC6270_vram,0,0x20000);
 	memset(vram_dirty,1,0x1000);
 
-	tile_bitmap=auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
-	front_bitmap=auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
+	tile_bitmap=auto_bitmap_alloc(machine,512,512,video_screen_get_format(machine->primary_screen));
+	front_bitmap=auto_bitmap_alloc(machine,512,512,video_screen_get_format(machine->primary_screen));
 
 	vram_ptr=0;
 	inc_value=1;

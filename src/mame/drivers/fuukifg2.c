@@ -150,7 +150,7 @@ static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )
 static ADDRESS_MAP_START( fuuki16_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM		)	// ROM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_RAM		)	// RAM
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1		)	// Banked ROM
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(1)		)	// Banked ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki16_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )

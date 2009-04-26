@@ -957,7 +957,7 @@ static void descramble_legionnaire_gfx(UINT8* src)
 	int len = 0x10000;
 
 	/*  rearrange gfx */
-	buffer = malloc_or_die(len);
+	buffer = alloc_array_or_die(UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)

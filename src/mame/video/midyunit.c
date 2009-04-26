@@ -70,12 +70,9 @@ static struct
 static VIDEO_START( common )
 {
 	/* allocate memory */
-	midyunit_cmos_ram = auto_malloc(0x2000 * 4);
-	local_videoram = auto_malloc(0x80000);
-	pen_map = auto_malloc(65536 * sizeof(pen_map[0]));
-
-	/* we have to erase this since we rely on upper bits being 0 */
-	memset(local_videoram, 0, 0x80000);
+	midyunit_cmos_ram = auto_alloc_array(machine, UINT16, (0x2000 * 4)/2);
+	local_videoram = auto_alloc_array_clear(machine, UINT16, 0x80000/2);
+	pen_map = auto_alloc_array(machine, pen_t, 65536);
 
 	/* reset all the globals */
 	midyunit_cmos_page = 0;
@@ -88,8 +85,8 @@ static VIDEO_START( common )
 
 	/* register for state saving */
 	state_save_register_global(machine, autoerase_enable);
-	state_save_register_global_pointer(machine, local_videoram, 0x80000/sizeof(local_videoram[0]));
-	state_save_register_global_pointer(machine, midyunit_cmos_ram, (0x2000 * 4)/sizeof(midyunit_cmos_ram[0]));
+	state_save_register_global_pointer(machine, local_videoram, 0x80000/2);
+	state_save_register_global_pointer(machine, midyunit_cmos_ram, (0x2000 * 4)/2);
 	state_save_register_global(machine, videobank_select);
 	state_save_register_global_array(machine, dma_register);
 }

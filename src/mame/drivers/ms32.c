@@ -305,7 +305,7 @@ static ADDRESS_MAP_START( ms32_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfec10000, 0xfec17fff) AM_READ(ms32_txram_r)	/* mirror only used by memory test in service mode */
 	AM_RANGE(0xfec18000, 0xfec1ffff) AM_READ(ms32_bgram_r)
 	AM_RANGE(0xfee00000, 0xfee1ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0xffe00000, 0xffffffff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xffe00000, 0xffffffff) AM_READ(SMH_BANK(1))
 ADDRESS_MAP_END
 
 static WRITE32_HANDLER( pip_w )
@@ -1178,8 +1178,8 @@ static ADDRESS_MAP_START( ms32_snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f10, 0x3f10) AM_READ(latch_r)
 	AM_RANGE(0x3f20, 0x3f20) AM_READNOP /* 2nd latch ? */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK4)
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK5)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(4))
+	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK(5))
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ms32_snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2029,7 +2029,7 @@ void ms32_rearrange_sprites(running_machine *machine, const char *region)
 	source_data = memory_region       ( machine, region );
 	source_size = memory_region_length( machine, region );
 
-	result_data = malloc_or_die(source_size);
+	result_data = alloc_array_or_die(UINT8, source_size);
 
 	for(i=0; i<source_size; i++)
 	{
@@ -2054,7 +2054,7 @@ void decrypt_ms32_tx(running_machine *machine, int addr_xor,int data_xor, const 
 	source_data = memory_region       ( machine, region );
 	source_size = memory_region_length( machine, region );
 
-	result_data = malloc_or_die(source_size);
+	result_data = alloc_array_or_die(UINT8, source_size);
 
 	addr_xor ^= 0x1005d;
 
@@ -2108,7 +2108,7 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 	source_data = memory_region       ( machine, region );
 	source_size = memory_region_length( machine, region );
 
-	result_data = malloc_or_die(source_size);
+	result_data = alloc_array_or_die(UINT8, source_size);
 
 	addr_xor ^= 0xc1c5b;
 

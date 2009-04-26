@@ -439,7 +439,7 @@ ROM_END
 
 static DRIVER_INIT( panicr )
 {
-	UINT8 *buf = malloc_or_die(0x80000);
+	UINT8 *buf = alloc_array_or_die(UINT8, 0x80000);
 	UINT8 *rom;
 	int size;
 	int i;

@@ -647,10 +647,8 @@ static void AICA_Init(const device_config *device, aica_state *AICA, const aica_
 	}
 
 	AICALFO_Init(device->machine);
-	AICA->buffertmpl=(signed int*) auto_malloc(44100*sizeof(signed int));
-	AICA->buffertmpr=(signed int*) auto_malloc(44100*sizeof(signed int));
-	memset(AICA->buffertmpl,0,44100*sizeof(signed int));
-	memset(AICA->buffertmpr,0,44100*sizeof(signed int));
+	AICA->buffertmpl=auto_alloc_array_clear(device->machine, signed int, 44100);
+	AICA->buffertmpr=auto_alloc_array_clear(device->machine, signed int, 44100);
 
 	// no "pend"
 	AICA[0].udata.data[0xa0/2] = 0;

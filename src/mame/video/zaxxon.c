@@ -167,7 +167,7 @@ VIDEO_START( razmataz )
 VIDEO_START( congo )
 {
 	/* allocate our own spriteram since it is not accessible by the main CPU */
-	spriteram = auto_malloc(0x100);
+	spriteram = auto_alloc_array(machine, UINT8, 0x100);
 
 	/* register for save states */
 	state_save_register_global(machine, congo_fg_bank);

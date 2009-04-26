@@ -249,8 +249,7 @@ static int drawdd_window_init(win_window_info *window)
 	dd_info *dd;
 
 	// allocate memory for our structures
-	dd = (dd_info *)malloc_or_die(sizeof(*dd));
-	memset(dd, 0, sizeof(*dd));
+	dd = alloc_clear_or_die(dd_info);
 	window->drawdata = dd;
 
 	// configure the adapter for the mode we want

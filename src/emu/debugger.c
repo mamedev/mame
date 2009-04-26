@@ -75,7 +75,7 @@ void debugger_init(running_machine *machine)
 
 		/* allocate a new entry for our global list */
 		add_exit_callback(machine, debugger_exit);
-		entry = (machine_entry *)malloc_or_die(sizeof(*entry));
+		entry = alloc_or_die(machine_entry);
 		entry->next = machine_list;
 		entry->machine = machine;
 		machine_list = entry;

@@ -173,7 +173,7 @@ static CUSTOM_INPUT( tomahawk_controls_r )
 static VIDEO_START( astrof )
 {
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
-	astrof_colorram = auto_malloc(astrof_videoram_size / 2);
+	astrof_colorram = auto_alloc_array(machine, UINT8, astrof_videoram_size / 2);
 	state_save_register_global_pointer(machine, astrof_colorram, astrof_videoram_size / 2);
 }
 

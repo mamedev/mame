@@ -80,7 +80,7 @@ static VIDEO_START( lastfght )
 	for (i = 0; i < 2; i++)
 		lastfght_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	colorram = auto_malloc(256*3);
+	colorram = auto_alloc_array(machine, UINT8, 256*3);
 }
 
 

@@ -155,7 +155,7 @@ static VIDEO_START( acommand )
 	tx_tilemap = tilemap_create(machine, ac_get_tx_tile_info,tilemap_scan_cols,8,8,512,32);
 	bg_tilemap = tilemap_create(machine, ac_get_bg_tile_info,bg_scan,16,16,256,16);
 
-	ac_vregs = auto_malloc(0x80);
+	ac_vregs = auto_alloc_array(machine, UINT16, 0x80/2);
 
 	tilemap_set_transparent_pen(tx_tilemap,15);
 }

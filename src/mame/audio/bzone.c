@@ -274,7 +274,7 @@ static DEVICE_START( bzone_sound )
 {
 	int i;
 
-	discharge = (INT16 *)auto_malloc(32768 * sizeof(INT16));
+	discharge = auto_alloc_array(device->machine, INT16, 32768);
 	for( i = 0; i < 0x8000; i++ )
 		discharge[0x7fff-i] = (INT16) (0x7fff/exp(1.0*i/4096));
 

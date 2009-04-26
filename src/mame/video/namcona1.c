@@ -292,8 +292,8 @@ VIDEO_START( namcona1 )
 		tilemap_palette_bank[i] = -1;
 	}
 
-	shaperam		     = auto_malloc( 0x2000*4 );
-	cgram			     = auto_malloc( 0x1000*0x40 );
+	shaperam		     = auto_alloc_array(machine, UINT16, 0x2000*4/2 );
+	cgram			     = auto_alloc_array(machine, UINT16, 0x1000*0x40/2 );
 
 	machine->gfx[0] = gfx_element_alloc( machine, &cg_layout_8bpp, (UINT8 *)cgram, machine->config->total_colors/256, 0 );
 	machine->gfx[1] = gfx_element_alloc( machine, &cg_layout_4bpp, (UINT8 *)cgram, machine->config->total_colors/16, 0 );

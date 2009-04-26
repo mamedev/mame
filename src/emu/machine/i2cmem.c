@@ -53,9 +53,9 @@ struct i2cmem_chip
 	int shift;
 	int devsel;
 	int byteaddr;
-	unsigned char *data;
+	UINT8 *data;
 	int data_size;
-	unsigned char *page;
+	UINT8 *page;
 	int page_offset;
 	int page_size;
 };
@@ -71,10 +71,10 @@ struct i2cmem_chip
 
 static struct i2cmem_chip i2cmem[ I2CMEM_MAXCHIP ];
 
-void i2cmem_init( running_machine *machine, int chip, int slave_address, int page_size, int data_size, unsigned char *data )
+void i2cmem_init( running_machine *machine, int chip, int slave_address, int page_size, int data_size, UINT8 *data )
 {
 	struct i2cmem_chip *c;
-	unsigned char *page = NULL;
+	UINT8 *page = NULL;
 
 	if( chip >= I2CMEM_MAXCHIP )
 	{
@@ -86,12 +86,12 @@ void i2cmem_init( running_machine *machine, int chip, int slave_address, int pag
 
 	if( data == NULL )
 	{
-		data = (unsigned char *)auto_malloc( data_size );
+		data = auto_alloc_array( machine, UINT8, data_size );
 	}
 
 	if( page_size > 0 )
 	{
-		page = (unsigned char *)auto_malloc( page_size );
+		page = auto_alloc_array( machine, UINT8, page_size );
 	}
 
 	c->slave_address = slave_address;

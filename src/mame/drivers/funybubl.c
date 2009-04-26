@@ -92,10 +92,10 @@ static WRITE8_DEVICE_HANDLER( funybubl_oki_bank_sw )
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)	// banked port 1?
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))	// banked port 1?
 	AM_RANGE(0xc400, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_BANK1)	// banked port 0?
+	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_BANK(1))	// banked port 0?
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc400, 0xcfff) AM_WRITE(funybubl_paldatawrite) AM_BASE(&funybubl_paletteram) // palette
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_BANK1)	// banked port 0?
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_BANK(1))	// banked port 0?
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -228,7 +228,7 @@ GFXDECODE_END
 
 static DRIVER_INIT( funybubl )
 {
-	funybubl_banked_videoram = auto_malloc (0x2000);
+	funybubl_banked_videoram = auto_alloc_array(machine, UINT8, 0x2000);
 
 	memory_set_bankptr(machine, 1,&funybubl_banked_videoram[0x000000]);
 }

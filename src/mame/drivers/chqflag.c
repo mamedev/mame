@@ -56,7 +56,7 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	/* bit 5 = memory bank select */
 	if (data & 0x20)
 	{
-		memory_install_readwrite8_handler(space, 0x1800, 0x1fff, 0, 0, SMH_BANK5, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_install_readwrite8_handler(space, 0x1800, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(5), paletteram_xBBBBBGGGGGRRRRR_be_w);
 		memory_set_bankptr(space->machine, 5, paletteram);
 
 		if (K051316_readroms)
@@ -66,8 +66,8 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	}
 	else
 	{
-		memory_install_readwrite8_handler(space, 0x1000, 0x17ff, 0, 0, SMH_BANK1, SMH_BANK1);				/* RAM */
-		memory_install_readwrite8_handler(space, 0x1800, 0x1fff, 0, 0, SMH_BANK2, SMH_BANK2);				/* RAM */
+		memory_install_readwrite8_handler(space, 0x1000, 0x17ff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1));				/* RAM */
+		memory_install_readwrite8_handler(space, 0x1800, 0x1fff, 0, 0, (read8_space_func)SMH_BANK(2), (write8_space_func)SMH_BANK(2));				/* RAM */
 	}
 
 	/* other bits unknown/unused */
@@ -148,11 +148,11 @@ static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 
 static ADDRESS_MAP_START( chqflag_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM												/* RAM */
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(SMH_BANK1, SMH_BANK1)					/* banked RAM (RAM/051316 (chip 1)) */
-	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(SMH_BANK2, SMH_BANK2)					/* palette + RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_RAMBANK(1)										/* banked RAM (RAM/051316 (chip 1)) */
+	AM_RANGE(0x1800, 0x1fff) AM_RAMBANK(2)										/* palette + RAM */
 	AM_RANGE(0x2000, 0x2007) AM_READWRITE(K051937_r, K051937_w)					/* Sprite control registers */
 	AM_RANGE(0x2400, 0x27ff) AM_READWRITE(K051960_r, K051960_w)					/* Sprite RAM */
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(SMH_BANK3, K051316_1_w)				/* 051316 zoom/rotation (chip 2) */
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(SMH_BANK(3), K051316_1_w)				/* 051316 zoom/rotation (chip 2) */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(soundlatch_w)								/* sound code # */
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(chqflag_sh_irqtrigger_w)					/* cause interrupt on audio CPU */
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(chqflag_bankswitch_w)						/* bankswitch control */
@@ -168,8 +168,8 @@ static ADDRESS_MAP_START( chqflag_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3700, 0x3700) AM_WRITE(select_analog_ctrl_w)						/* select accelerator/wheel */
 	AM_RANGE(0x3701, 0x3701) AM_READ_PORT("IN2")								/* Brake + Shift + ? */
 	AM_RANGE(0x3702, 0x3702) AM_READWRITE(analog_read_r, select_analog_ctrl_w)	/* accelerator/wheel */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK4)									/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)									/* ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(4)										/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( k007232_bankswitch_w )

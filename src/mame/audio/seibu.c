@@ -105,7 +105,7 @@ static UINT8 decrypt_opcode(int a,int src)
 void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 {
 	const address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
-	UINT8 *decrypt = auto_malloc(length);
+	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
 	UINT8 *rom = memory_region(machine, cpu);
 	int i;
 

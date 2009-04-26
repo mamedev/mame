@@ -53,8 +53,8 @@ void deco102_decrypt_cpu(running_machine *machine, const char *cputag, int addre
 	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, cputag);
 	int size = memory_region_length(machine, cputag);
-	UINT16 *opcodes = auto_malloc(size);
-	UINT16 *buf = malloc_or_die(size);
+	UINT16 *opcodes = auto_alloc_array(machine, UINT16, size/2);
+	UINT16 *buf = alloc_array_or_die(UINT16, size/2);
 
 		memcpy(buf,rom,size);
 

@@ -93,7 +93,7 @@ static DEVICE_START( segapcm )
 	segapcm_state *spcm = get_safe_token(device);
 
 	spcm->rom = (const UINT8 *)device->region;
-	spcm->ram = (UINT8 *)auto_malloc(0x800);
+	spcm->ram = auto_alloc_array(device->machine, UINT8, 0x800);
 
 	memset(spcm->ram, 0xff, 0x800);
 

@@ -1018,7 +1018,7 @@ static VIDEO_START( mpu4_vid )
 	/* if anything uses tile sizes other than 8x8 we can't really do it this way.. we'll have to draw tiles by hand.
       maybe we will anyway, but for now we don't need to */
 
-	mpu4_vid_vidram = auto_malloc (0x20000);
+	mpu4_vid_vidram = auto_alloc_array(machine, UINT16, 0x20000/2);
 
 	memset(mpu4_vid_vidram,0,0x20000);
 

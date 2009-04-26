@@ -2673,7 +2673,7 @@ static DRIVER_INIT(4in1boot)
 	int len = memory_region_length(machine, "maincpu");
 
 	/* strange order */
-	buffer = malloc_or_die(len);
+	buffer = alloc_array_or_die(UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
@@ -2688,7 +2688,7 @@ static DRIVER_INIT(4in1boot)
 	len = memory_region_length(machine, "soundcpu");
 
 	/* strange order */
-	buffer = malloc_or_die(len);
+	buffer = alloc_array_or_die(UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
@@ -2706,7 +2706,7 @@ static DRIVER_INIT(snowbro3)
 	int len = memory_region_length(machine, "maincpu");
 
 	/* strange order */
-	buffer = malloc_or_die(len);
+	buffer = alloc_array_or_die(UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)

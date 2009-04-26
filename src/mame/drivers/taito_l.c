@@ -137,9 +137,9 @@ static void machine_init(running_machine *machine)
 {
 	int i;
 
-	taitol_rambanks = auto_malloc(0x1000*12);
-	palette_ram = auto_malloc(0x1000);
-	empty_ram = auto_malloc(0x1000);
+	taitol_rambanks = auto_alloc_array(machine, UINT8, 0x1000*12);
+	palette_ram = auto_alloc_array(machine, UINT8, 0x1000);
+	empty_ram = auto_alloc_array(machine, UINT8, 0x1000);
 
 	for(i=0;i<3;i++)
 		irq_adr_table[i] = 0;

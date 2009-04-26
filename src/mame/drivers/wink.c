@@ -394,7 +394,7 @@ static DRIVER_INIT( wink )
 {
 	UINT32 i;
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	UINT8 *buffer = malloc_or_die(0x8000);
+	UINT8 *buffer = alloc_array_or_die(UINT8, 0x8000);
 
 	// protection module reverse engineered by HIGHWAYMAN
 

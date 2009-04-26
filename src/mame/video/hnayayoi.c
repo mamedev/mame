@@ -17,7 +17,7 @@ static int palbank;
 static int total_pixmaps;
 
 
-static void common_vh_start(int num_pixmaps)
+static void common_vh_start(running_machine *machine, int num_pixmaps)
 {
 	int i;
 
@@ -27,7 +27,7 @@ static void common_vh_start(int num_pixmaps)
 	{
 		if (i < total_pixmaps)
 		{
-			pixmap[i] = auto_malloc(256*256);
+			pixmap[i] = auto_alloc_array(machine, UINT8, 256*256);
 		}
 		else
 			pixmap[i] = NULL;
@@ -36,12 +36,12 @@ static void common_vh_start(int num_pixmaps)
 
 VIDEO_START( hnayayoi )
 {
-	common_vh_start(4);	/* 4 bitmaps -> 2 layers */
+	common_vh_start(machine, 4);	/* 4 bitmaps -> 2 layers */
 }
 
 VIDEO_START( untoucha )
 {
-	common_vh_start(8);	/* 8 bitmaps -> 4 layers */
+	common_vh_start(machine, 8);	/* 8 bitmaps -> 4 layers */
 }
 
 

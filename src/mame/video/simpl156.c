@@ -135,12 +135,12 @@ static int simpl156_bank_callback(const int bank)
 VIDEO_START( simpl156 )
 {
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
-	deco16_pf1_data = auto_malloc(0x2000);
-	deco16_pf2_data = auto_malloc(0x2000);
-	deco16_pf1_rowscroll = auto_malloc(0x800);
-	deco16_pf2_rowscroll = auto_malloc(0x800);
-	deco16_pf12_control = auto_malloc(0x10);
-	paletteram16 =  auto_malloc(0x1000);
+	deco16_pf1_data = auto_alloc_array(machine, UINT16, 0x2000/2);
+	deco16_pf2_data = auto_alloc_array(machine, UINT16, 0x2000/2);
+	deco16_pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
+	deco16_pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
+	deco16_pf12_control = auto_alloc_array(machine, UINT16, 0x10/2);
+	paletteram16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
 
 	/* and register the allocated ram so that save states still work */
 	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);

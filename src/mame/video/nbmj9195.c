@@ -413,10 +413,9 @@ VIDEO_START( nbmj9195_1layer )
 	int height = video_screen_get_height(machine->primary_screen);
 
 	nbmj9195_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj9195_videoram[0] = auto_malloc(width * height * sizeof(UINT16));
-	nbmj9195_palette = auto_malloc(0x200 * sizeof(UINT8));
-	nbmj9195_clut[0] = auto_malloc(0x1000 * sizeof(UINT8));
-	memset(nbmj9195_videoram[0], 0x0000, (width * height * sizeof(UINT16)));
+	nbmj9195_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
+	nbmj9195_palette = auto_alloc_array(machine, UINT8, 0x200);
+	nbmj9195_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
 	nbmj9195_scanline[0] = nbmj9195_scanline[1] = SCANLINE_MIN;
 	nb19010_busyflag = 1;
 	gfxdraw_mode = 0;
@@ -429,13 +428,11 @@ VIDEO_START( nbmj9195_2layer )
 
 	nbmj9195_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	nbmj9195_tmpbitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj9195_videoram[0] = auto_malloc(width * height * sizeof(UINT16));
-	nbmj9195_videoram[1] = auto_malloc(width * height * sizeof(UINT16));
-	nbmj9195_palette = auto_malloc(0x200 * sizeof(UINT8));
-	nbmj9195_clut[0] = auto_malloc(0x1000 * sizeof(UINT8));
-	nbmj9195_clut[1] = auto_malloc(0x1000 * sizeof(UINT8));
-	memset(nbmj9195_videoram[0], 0x0000, (width * height * sizeof(UINT16)));
-	memset(nbmj9195_videoram[1], 0x0000, (width * height * sizeof(UINT16)));
+	nbmj9195_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
+	nbmj9195_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
+	nbmj9195_palette = auto_alloc_array(machine, UINT8, 0x200);
+	nbmj9195_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
+	nbmj9195_clut[1] = auto_alloc_array(machine, UINT8, 0x1000);
 	nbmj9195_scanline[0] = nbmj9195_scanline[1] = SCANLINE_MIN;
 	nb19010_busyflag = 1;
 	gfxdraw_mode = 1;
@@ -448,17 +445,13 @@ VIDEO_START( nbmj9195_nb22090 )
 
 	nbmj9195_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	nbmj9195_tmpbitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj9195_videoram[0] = auto_malloc(width * height * sizeof(UINT16));
-	nbmj9195_videoram[1] = auto_malloc(width * height * sizeof(UINT16));
-	nbmj9195_videoworkram[0] = auto_malloc(width * height * sizeof(UINT16));
-	nbmj9195_videoworkram[1] = auto_malloc(width * height * sizeof(UINT16));
-	nbmj9195_nb22090_palette = auto_malloc(0xc00 * sizeof(UINT8));
-	nbmj9195_clut[0] = auto_malloc(0x1000 * sizeof(UINT8));
-	nbmj9195_clut[1] = auto_malloc(0x1000 * sizeof(UINT8));
-	memset(nbmj9195_videoram[0], 0x0000, (width * height * sizeof(UINT16)));
-	memset(nbmj9195_videoram[1], 0x0000, (width * height * sizeof(UINT16)));
-	memset(nbmj9195_videoworkram[0], 0x0000, (width * height * sizeof(UINT16)));
-	memset(nbmj9195_videoworkram[1], 0x0000, (width * height * sizeof(UINT16)));
+	nbmj9195_videoram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
+	nbmj9195_videoram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
+	nbmj9195_videoworkram[0] = auto_alloc_array_clear(machine, UINT16, width * height);
+	nbmj9195_videoworkram[1] = auto_alloc_array_clear(machine, UINT16, width * height);
+	nbmj9195_nb22090_palette = auto_alloc_array(machine, UINT8, 0xc00);
+	nbmj9195_clut[0] = auto_alloc_array(machine, UINT8, 0x1000);
+	nbmj9195_clut[1] = auto_alloc_array(machine, UINT8, 0x1000);
 	nbmj9195_scanline[0] = nbmj9195_scanline[1] = SCANLINE_MIN;
 	nb19010_busyflag = 1;
 	gfxdraw_mode = 2;

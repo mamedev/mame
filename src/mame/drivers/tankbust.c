@@ -194,8 +194,8 @@ static READ8_HANDLER( some_changing_input )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x9fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK2, SMH_ROM)
+	AM_RANGE(0x6000, 0x9fff) AM_READWRITE(SMH_BANK(1), SMH_ROM)
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(SMH_BANK(2), SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(tankbust_background_videoram_r, tankbust_background_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tankbust_txtram_r, tankbust_txtram_w) AM_BASE(&tankbust_txtram)

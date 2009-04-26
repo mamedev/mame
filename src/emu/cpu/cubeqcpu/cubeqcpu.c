@@ -326,7 +326,7 @@ static CPU_INIT( cquestsnd )
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* Allocate RAM shared with 68000 */
-	cpustate->sram = (UINT16 *)auto_malloc(4096);
+	cpustate->sram = auto_alloc_array(device->machine, UINT16, 4096/2);
 
 	cquestsnd_state_register(device);
 }
@@ -392,8 +392,8 @@ static CPU_INIT( cquestrot )
 	memset(cpustate, 0, sizeof(*cpustate));
 
 	/* Allocate RAM */
-	cpustate->dram = (UINT16 *)auto_malloc(16384 * sizeof(UINT16));  /* Shared with 68000 */
-	cpustate->sram = (UINT16 *)auto_malloc(2048 * sizeof(UINT16));   /* Private */
+	cpustate->dram = auto_alloc_array(device->machine, UINT16, 16384);  /* Shared with 68000 */
+	cpustate->sram = auto_alloc_array(device->machine, UINT16, 2048);   /* Private */
 
 	cpustate->device = device;
 	cpustate->lindevice = cputag_get_cpu(device->machine, rotconfig->lin_cpu_tag);
@@ -475,10 +475,10 @@ static CPU_INIT( cquestlin )
 	memset(cpustate, 0, sizeof(*cpustate));
 
 	/* Allocate RAM */
-	cpustate->sram = (UINT16 *)auto_malloc(4096 * sizeof(UINT16));      /* Shared with rotate CPU */
-	cpustate->ptr_ram = (UINT8 *)auto_malloc(1024);                    /* Pointer RAM */
-	cpustate->e_stack = (UINT32 *)auto_malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
-	cpustate->o_stack = (UINT32 *)auto_malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
+	cpustate->sram = auto_alloc_array(device->machine, UINT16, 4096);      /* Shared with rotate CPU */
+	cpustate->ptr_ram = auto_alloc_array(device->machine, UINT8, 1024);                    /* Pointer RAM */
+	cpustate->e_stack = auto_alloc_array(device->machine, UINT32, 32768);  /* Stack DRAM: 32kx20 */
+	cpustate->o_stack = auto_alloc_array(device->machine, UINT32, 32768);  /* Stack DRAM: 32kx20 */
 
 	cpustate->device = device;
 	cpustate->rotdevice = cputag_get_cpu(device->machine, linconfig->rot_cpu_tag);

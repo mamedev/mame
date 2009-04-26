@@ -106,8 +106,7 @@ static DEVICE_START( dmadac )
 	dmadac_state *info = get_safe_token(device);
 
 	/* allocate a clear a buffer */
-	info->buffer = (INT16 *)auto_malloc(sizeof(info->buffer[0]) * BUFFER_SIZE);
-	memset(info->buffer, 0, sizeof(info->buffer[0]) * BUFFER_SIZE);
+	info->buffer = auto_alloc_array_clear(device->machine, INT16, BUFFER_SIZE);
 
 	/* reset the state */
 	info->volume = 0x100;

@@ -38,7 +38,7 @@ VIDEO_START( cloud9 )
 	static const int resistances[3] = { 22000, 10000, 4700 };
 
 	/* allocate second bank of videoram */
-	videoram = auto_malloc(0x8000);
+	videoram = auto_alloc_array(machine, UINT8, 0x8000);
 	memory_set_bankptr(machine, 1, videoram);
 
 	/* get pointers to our PROMs */

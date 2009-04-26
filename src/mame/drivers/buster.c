@@ -114,7 +114,7 @@ ROM_END
 static DRIVER_INIT( buster )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-//  vram = auto_malloc(0x2000);
+//  vram = auto_alloc_array(machine, UINT8, 0x2000);
 	memcpy(buster_rom, ROM, 0x4000);
 }
 

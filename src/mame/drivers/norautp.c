@@ -170,7 +170,7 @@ static UINT16 np_addr;
 
 static VIDEO_START( norautp )
 {
-	np_vram = auto_malloc(0x1000);
+	np_vram = auto_alloc_array(machine, UINT16, 0x1000/2);
 }
 
 

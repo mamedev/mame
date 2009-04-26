@@ -18,7 +18,7 @@ static SAMPLES_START( cclimber_sh_start )
 	running_machine *machine = device->machine;
 	samplebuf = 0;
 	if (memory_region(machine, "samples"))
-		samplebuf = auto_malloc(sizeof(*samplebuf)*2*memory_region_length(machine, "samples"));
+		samplebuf = auto_alloc_array(machine, INT16, 2 * memory_region_length(machine, "samples"));
 }
 
 

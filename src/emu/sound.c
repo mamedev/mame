@@ -202,9 +202,9 @@ void sound_init(running_machine *machine)
 	VPRINTF(("total speakers = %d\n", speaker_output_count(machine->config)));
 
 	/* allocate memory for mix buffers */
-	leftmix = (INT32 *)auto_malloc(machine->sample_rate * sizeof(*leftmix));
-	rightmix = (INT32 *)auto_malloc(machine->sample_rate * sizeof(*rightmix));
-	finalmix = (INT16 *)auto_malloc(machine->sample_rate * sizeof(*finalmix));
+	leftmix = auto_alloc_array(machine, INT32, machine->sample_rate);
+	rightmix = auto_alloc_array(machine, INT32, machine->sample_rate);
+	finalmix = auto_alloc_array(machine, INT16, machine->sample_rate);
 
 	/* allocate a global timer for sound timing */
 	sound_update_timer = timer_alloc(machine, sound_update, NULL);
@@ -341,7 +341,7 @@ static DEVICE_CUSTOM_CONFIG( sound )
 
 			/* allocate a new route */
 			for (routeptr = &config->routelist; *routeptr != NULL; routeptr = &(*routeptr)->next) ;
-			*routeptr = (sound_route *)malloc_or_die(sizeof(**routeptr));
+			*routeptr = alloc_or_die(sound_route);
 			(*routeptr)->next = NULL;
 			(*routeptr)->output = output;
 			(*routeptr)->input = input;
@@ -451,7 +451,7 @@ static void route_sound(running_machine *machine)
 		{
 			info->mixer_stream = stream_create(curspeak, info->inputs, 1, machine->sample_rate, info, mixer_update);
 			state_save_register_postload(machine, mixer_postload, info->mixer_stream);
-			info->input = (speaker_input *)auto_malloc(info->inputs * sizeof(*info->input));
+			info->input = auto_alloc_array(machine, speaker_input, info->inputs);
 			info->inputs = 0;
 		}
 		else
@@ -490,7 +490,7 @@ static void route_sound(running_machine *machine)
 						/* fill in the input data on this speaker */
 						speakerinfo->input[speakerinfo->inputs].gain = route->gain;
 						speakerinfo->input[speakerinfo->inputs].default_gain = route->gain;
-						speakerinfo->input[speakerinfo->inputs].name = auto_strdup(astring_c(tempstring));
+						speakerinfo->input[speakerinfo->inputs].name = auto_strdup(machine, astring_c(tempstring));
 
 						/* connect the output to the input */
 						if (stream_device_output_to_stream_output(sound, outputnum, &stream, &streamoutput))

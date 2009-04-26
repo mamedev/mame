@@ -412,7 +412,7 @@ static ADDRESS_MAP_START( perfrman_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8800, 0x880f) AM_READ(slapfight_dpram_r)
-	AM_RANGE(0x8810, 0x8fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8810, 0x8fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0x9000, 0x97ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9800, 0x9fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( perfrman_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8800, 0x880f) AM_WRITE(slapfight_dpram_w) AM_BASE(&slapfight_dpram) AM_SIZE(&slapfight_dpram_size)
-	AM_RANGE(0x8810, 0x8fff) AM_WRITE(SMH_BANK1)	/* Shared RAM with sound CPU */
+	AM_RANGE(0x8810, 0x8fff) AM_WRITE(SMH_BANK(1))	/* Shared RAM with sound CPU */
 	AM_RANGE(0x9000, 0x97ff) AM_WRITE(slapfight_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x9800, 0x9fff) AM_WRITE(slapfight_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -441,7 +441,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc800, 0xc80f) AM_READ(slapfight_dpram_r)
 	AM_RANGE(0xc810, 0xcfff) AM_READ(SMH_RAM)
@@ -470,7 +470,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapbtuk_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc800, 0xc80f) AM_READ(slapfight_dpram_r)
 	AM_RANGE(0xc810, 0xcfff) AM_READ(SMH_RAM)
@@ -559,7 +559,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( perfrman_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8800, 0x880f) AM_READ(slapfight_dpram_r)
-	AM_RANGE(0x8810, 0x8fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8810, 0x8fff) AM_READ(SMH_BANK(1))
 	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_r)
 ADDRESS_MAP_END
@@ -567,7 +567,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( perfrman_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8800, 0x880f) AM_WRITE(slapfight_dpram_w)
-	AM_RANGE(0x8810, 0x8fff) AM_WRITE(SMH_BANK1)	/* Shared RAM with main CPU */
+	AM_RANGE(0x8810, 0x8fff) AM_WRITE(SMH_BANK(1))	/* Shared RAM with main CPU */
 	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_address_w)

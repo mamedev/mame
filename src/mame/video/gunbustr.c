@@ -18,7 +18,7 @@ static struct tempsprite *spritelist;
 
 VIDEO_START( gunbustr )
 {
-	spritelist = auto_malloc(0x4000 * sizeof(*spritelist));
+	spritelist = auto_alloc_array(machine, struct tempsprite, 0x4000);
 
 	TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,0,0x20,0x07,-1,-1,-1,0,0);
 }

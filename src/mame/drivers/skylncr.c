@@ -824,8 +824,8 @@ ROM_END
 
 static DRIVER_INIT( skylncr )
 {
-	paletteram   = auto_malloc(0x100 * 3);
-	paletteram_2 = auto_malloc(0x100 * 3);
+	paletteram   = auto_alloc_array(machine, UINT8, 0x100 * 3);
+	paletteram_2 = auto_alloc_array(machine, UINT8, 0x100 * 3);
 }
 
 

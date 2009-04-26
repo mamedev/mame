@@ -200,14 +200,13 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
 
     /* Video RAM */
     tms.vramsize = intf->vram;
-    tms.vMem = (UINT8*) auto_malloc (intf->vram);
-    memset (tms.vMem, 0, intf->vram);
+    tms.vMem = auto_alloc_array_clear(machine, UINT8, intf->vram);
 
     /* Sprite back buffer */
-    tms.dBackMem = (UINT8*)auto_malloc (IMAGE_SIZE);
+    tms.dBackMem = auto_alloc_array(machine, UINT8, IMAGE_SIZE);
 
     /* back bitmap */
-    tms.tmpbmp = auto_bitmap_alloc (256, 192, video_screen_get_format(machine->primary_screen));
+    tms.tmpbmp = auto_bitmap_alloc (machine, 256, 192, video_screen_get_format(machine->primary_screen));
 
     TMS9928A_reset ();
     tms.LimitSprites = 1;

@@ -267,39 +267,25 @@ static void toaplan1_create_tilemaps(running_machine *machine)
 }
 
 
-static void toaplan1_paletteram_alloc(void)
+static void toaplan1_paletteram_alloc(running_machine *machine)
 {
-	paletteram16 = auto_malloc(toaplan1_colorram1_size + toaplan1_colorram2_size);
+	paletteram16 = auto_alloc_array(machine, UINT16, (toaplan1_colorram1_size + toaplan1_colorram2_size)/2);
 }
 
-static void toaplan1_vram_alloc(void)
+static void toaplan1_vram_alloc(running_machine *machine)
 {
-	pf1_tilevram16 = auto_malloc(TOAPLAN1_TILEVRAM_SIZE);
-	memset(pf1_tilevram16,0,TOAPLAN1_TILEVRAM_SIZE);
-
-	pf2_tilevram16 = auto_malloc(TOAPLAN1_TILEVRAM_SIZE);
-	memset(pf2_tilevram16,0,TOAPLAN1_TILEVRAM_SIZE);
-
-	pf3_tilevram16 = auto_malloc(TOAPLAN1_TILEVRAM_SIZE);
-	memset(pf3_tilevram16,0,TOAPLAN1_TILEVRAM_SIZE);
-
-	pf4_tilevram16 = auto_malloc(TOAPLAN1_TILEVRAM_SIZE);
-	memset(pf4_tilevram16,0,TOAPLAN1_TILEVRAM_SIZE);
+	pf1_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
+	pf2_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
+	pf3_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
+	pf4_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
 }
 
-static void toaplan1_spritevram_alloc(void)
+static void toaplan1_spritevram_alloc(running_machine *machine)
 {
-	spriteram16 = auto_malloc(TOAPLAN1_SPRITERAM_SIZE);
-	memset(spriteram16,0,TOAPLAN1_SPRITERAM_SIZE);
-
-	buffered_spriteram16 = auto_malloc(TOAPLAN1_SPRITERAM_SIZE);
-	memset(buffered_spriteram16,0,TOAPLAN1_SPRITERAM_SIZE);
-
-	toaplan1_spritesizeram16 = auto_malloc(TOAPLAN1_SPRITESIZERAM_SIZE);
-	memset(toaplan1_spritesizeram16,0,TOAPLAN1_SPRITESIZERAM_SIZE);
-
-	toaplan1_buffered_spritesizeram16 = auto_malloc(TOAPLAN1_SPRITESIZERAM_SIZE);
-	memset(toaplan1_buffered_spritesizeram16,0,TOAPLAN1_SPRITESIZERAM_SIZE);
+	spriteram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
+	buffered_spriteram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
+	toaplan1_spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	toaplan1_buffered_spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
 	spriteram_size = TOAPLAN1_SPRITERAM_SIZE;
 }
@@ -332,8 +318,8 @@ static STATE_POSTLOAD( toaplan1_flipscreen )
 VIDEO_START( rallybik )
 {
 	toaplan1_create_tilemaps(machine);
-	toaplan1_paletteram_alloc();
-	toaplan1_vram_alloc();
+	toaplan1_paletteram_alloc(machine);
+	toaplan1_vram_alloc(machine);
 
 	scrollx_offs1 = 0x0d + 6;
 	scrollx_offs2 = 0x0d + 4;
@@ -375,9 +361,9 @@ VIDEO_START( rallybik )
 VIDEO_START( toaplan1 )
 {
 	toaplan1_create_tilemaps(machine);
-	toaplan1_paletteram_alloc();
-	toaplan1_vram_alloc();
-	toaplan1_spritevram_alloc();
+	toaplan1_paletteram_alloc(machine);
+	toaplan1_vram_alloc(machine);
+	toaplan1_spritevram_alloc(machine);
 
 	scrollx_offs1 = 0x1ef + 6;
 	scrollx_offs2 = 0x1ef + 4;

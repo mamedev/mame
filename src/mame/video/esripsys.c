@@ -95,13 +95,13 @@ VIDEO_START( esripsys )
 	int i;
 
 	/* Allocate memory for the two 512-pixel line buffers */
-	line_buffer[0].colour_buf = auto_malloc(512);
-	line_buffer[0].intensity_buf = auto_malloc(512);
-	line_buffer[0].priority_buf = auto_malloc(512);
+	line_buffer[0].colour_buf = auto_alloc_array(machine, UINT8, 512);
+	line_buffer[0].intensity_buf = auto_alloc_array(machine, UINT8, 512);
+	line_buffer[0].priority_buf = auto_alloc_array(machine, UINT8, 512);
 
-	line_buffer[1].colour_buf = auto_malloc(512);
-	line_buffer[1].intensity_buf = auto_malloc(512);
-	line_buffer[1].priority_buf = auto_malloc(512);
+	line_buffer[1].colour_buf = auto_alloc_array(machine, UINT8, 512);
+	line_buffer[1].intensity_buf = auto_alloc_array(machine, UINT8, 512);
+	line_buffer[1].priority_buf = auto_alloc_array(machine, UINT8, 512);
 
 	/* Create and initialise the HBLANK timers */
 	hblank_start_timer = timer_alloc(machine, hblank_start_callback, NULL);
@@ -109,7 +109,7 @@ VIDEO_START( esripsys )
 	timer_adjust_oneshot(hblank_start_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, ESRIPSYS_HBLANK_START), 0);
 
 	/* Create the sprite scaling table */
-	scale_table = auto_malloc(64 * 64);
+	scale_table = auto_alloc_array(machine, UINT8, 64 * 64);
 
 	for (i = 0; i < 64; ++i)
 	{
@@ -142,7 +142,7 @@ VIDEO_START( esripsys )
 	}
 
 	/* Now create a lookup table for scaling the sprite 'fig' value */
-	fig_scale_table = auto_malloc(1024 * 64);
+	fig_scale_table = auto_alloc_array(machine, UINT8, 1024 * 64);
 
 	for (i = 0; i < 1024; ++i)
 	{

@@ -938,11 +938,11 @@ VIDEO_START( lockon )
 	tilemap_set_transparent_pen(lockon_tilemap, 0);
 
 	/* Allocate the two frame buffers for rotation */
-	back_buffer = auto_bitmap_alloc(512, 512, BITMAP_FORMAT_INDEXED16);
-	front_buffer = auto_bitmap_alloc(512, 512, BITMAP_FORMAT_INDEXED16);
+	back_buffer = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
+	front_buffer = auto_bitmap_alloc(machine, 512, 512, BITMAP_FORMAT_INDEXED16);
 
 	/* 2kB of object ASIC palette RAM */
-	obj_pal_ram = auto_malloc(2048);
+	obj_pal_ram = auto_alloc_array(machine, UINT8, 2048);
 
 	/* Timer for ground display list callback */
 	bufend_timer = timer_alloc(machine, bufend_callback, NULL);

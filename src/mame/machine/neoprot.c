@@ -521,7 +521,7 @@ static WRITE16_HANDLER( pvc_prot_w )
 
 void install_pvc_protection( running_machine *machine )
 {
-	pvc_cartridge_ram = auto_malloc(0x2000);
+	pvc_cartridge_ram = auto_alloc_array(machine, UINT16, 0x2000/2);
 	state_save_register_global_pointer(machine, pvc_cartridge_ram, 0x2000 / 2);
 
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fe000, 0x2fffff, 0, 0, pvc_prot_r, pvc_prot_w);

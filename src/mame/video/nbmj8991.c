@@ -307,8 +307,8 @@ VIDEO_START( nbmj8991 )
 	int height = video_screen_get_height(machine->primary_screen);
 
 	nbmj8991_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj8991_videoram = auto_malloc(width * height * sizeof(UINT8));
-	nbmj8991_clut = auto_malloc(0x800 * sizeof(UINT8));
+	nbmj8991_videoram = auto_alloc_array(machine, UINT8, width * height);
+	nbmj8991_clut = auto_alloc_array(machine, UINT8, 0x800);
 	memset(nbmj8991_videoram, 0x00, (width * height * sizeof(UINT8)));
 }
 

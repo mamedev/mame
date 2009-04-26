@@ -448,8 +448,7 @@ ui_menu *ui_menu_alloc(running_machine *machine, ui_menu_handler_func handler, v
 	ui_menu *menu;
 
 	/* allocate and clear memory for the menu and the state */
-	menu = (ui_menu *)malloc_or_die(sizeof(*menu));
-	memset(menu, 0, sizeof(*menu));
+	menu = alloc_clear_or_die(ui_menu);
 
 	/* initialize the state */
 	menu->machine = machine;
@@ -652,9 +651,8 @@ void *ui_menu_alloc_state(ui_menu *menu, size_t size, ui_menu_destroy_state_func
 			(*menu->destroy_state)(menu, menu->state);
 		free(menu->state);
 	}
-	menu->state = malloc_or_die(size);
+	menu->state = alloc_array_clear_or_die(UINT8, size);
 	menu->destroy_state = destroy_state;
-	memset(menu->state, 0, size);
 
 	return menu->state;
 }
@@ -681,8 +679,7 @@ void *ui_menu_pool_alloc(ui_menu *menu, size_t size)
 		}
 
 	/* allocate a new pool */
-	pool = (ui_menu_pool *)malloc_or_die(sizeof(*pool) + UI_MENU_POOL_SIZE);
-	memset(pool, 0, sizeof(*pool));
+	pool = (ui_menu_pool *)alloc_array_clear_or_die(UINT8, sizeof(*pool) + UI_MENU_POOL_SIZE);
 
 	/* wire it up */
 	pool->next = menu->pool;

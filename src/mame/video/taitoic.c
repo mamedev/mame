@@ -806,13 +806,12 @@ void PC080SN_vh_start(running_machine *machine,int chips,int gfxnum,int x_offset
 			PC080SN_tilemap[i][1] = tilemap_create(machine, PC080SN_get_tile_info[i][1],tilemap_scan_rows,8,8,128,64);
 		}
 
-		PC080SN_ram[i] = auto_malloc(PC080SN_RAM_SIZE);
+		PC080SN_ram[i] = auto_alloc_array_clear(machine, UINT16, PC080SN_RAM_SIZE/2);
 
 		PC080SN_bg_ram[i][0]       = PC080SN_ram[i] + 0x0000 /2;
 		PC080SN_bg_ram[i][1]       = PC080SN_ram[i] + 0x8000 /2;
 		PC080SN_bgscroll_ram[i][0] = PC080SN_ram[i] + 0x4000 /2;
 		PC080SN_bgscroll_ram[i][1] = PC080SN_ram[i] + 0xc000 /2;
-		memset(PC080SN_ram[i],0,PC080SN_RAM_SIZE);
 
 		state_save_register_item_pointer(machine, "PC080SN", NULL, i, PC080SN_ram[i], PC080SN_RAM_SIZE/2);
 		state_save_register_item_array(machine, "PC080SN", NULL, i, PC080SN_ctrl[i]);
@@ -1223,11 +1222,8 @@ void PC090OJ_vh_start(running_machine *machine,int gfxnum,int x_offset,int y_off
 
 	PC090OJ_buffer = use_buffer;
 
-	PC090OJ_ram = auto_malloc(PC090OJ_RAM_SIZE);
-	PC090OJ_ram_buffered = auto_malloc(PC090OJ_RAM_SIZE);
-
-	memset(PC090OJ_ram,0,PC090OJ_RAM_SIZE);
-	memset(PC090OJ_ram_buffered,0,PC090OJ_RAM_SIZE);
+	PC090OJ_ram = auto_alloc_array_clear(machine, UINT16, PC090OJ_RAM_SIZE/2);
+	PC090OJ_ram_buffered = auto_alloc_array_clear(machine, UINT16, PC090OJ_RAM_SIZE/2);
 
 	state_save_register_global_pointer(machine, PC090OJ_ram, PC090OJ_RAM_SIZE/2);
 	state_save_register_global_pointer(machine, PC090OJ_ram_buffered, PC090OJ_RAM_SIZE/2);
@@ -1525,9 +1521,8 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 
 	TC0080VCO_tilemap[0] = tilemap_create(machine, TC0080VCO_get_bg0_tile_info_0,tilemap_scan_rows,16,16,64,64);
 	TC0080VCO_tilemap[1] = tilemap_create(machine, TC0080VCO_get_bg1_tile_info_0,tilemap_scan_rows,16,16,64,64);
-	TC0080VCO_ram = auto_malloc(TC0080VCO_RAM_SIZE);
+	TC0080VCO_ram = auto_alloc_array_clear(machine, UINT16, TC0080VCO_RAM_SIZE/2);
 
-	memset( TC0080VCO_ram,0,TC0080VCO_RAM_SIZE );
 	TC0080VCO_set_layer_ptrs();
 
 	/* use the given gfx set for bg tiles*/
@@ -2283,10 +2278,9 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 
 		TC0100SCN_cliprect[i] = myclip;
 
-		TC0100SCN_ram[i] = auto_malloc(TC0100SCN_RAM_SIZE);
+		TC0100SCN_ram[i] = auto_alloc_array_clear(machine, UINT16, TC0100SCN_RAM_SIZE/2);
 
 		TC0100SCN_set_layer_ptrs(i);
-		memset(TC0100SCN_ram[i],0,TC0100SCN_RAM_SIZE);
 
 		{
 			state_save_register_item_pointer(machine, "TC0100SCN", NULL, i, TC0100SCN_ram[i], TC0100SCN_RAM_SIZE/2);
@@ -2724,7 +2718,7 @@ static TILE_GET_INFO( TC0280GRD_get_tile_info )
 
 void TC0280GRD_vh_start(running_machine *machine, int gfxnum)
 {
-	TC0280GRD_ram = auto_malloc(TC0280GRD_RAM_SIZE);
+	TC0280GRD_ram = auto_alloc_array(machine, UINT16, TC0280GRD_RAM_SIZE/2);
 	TC0280GRD_tilemap = tilemap_create(machine, TC0280GRD_get_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	state_save_register_global_pointer(machine, TC0280GRD_ram, TC0280GRD_RAM_SIZE/2);
@@ -3086,10 +3080,9 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 		TC0480SCP_tilemap[3][1] = tilemap_create(machine, tc480_get_tile_info[3],tilemap_scan_rows,16,16,64,32);
 		TC0480SCP_tilemap[4][1] = tilemap_create(machine, tc480_get_tile_info[4],tilemap_scan_rows,8,8,64,64);
 
-		TC0480SCP_ram = auto_malloc(TC0480SCP_RAM_SIZE);
+		TC0480SCP_ram = auto_alloc_array_clear(machine, UINT16, TC0480SCP_RAM_SIZE/2);
 
 		TC0480SCP_set_layer_ptrs();
-		memset(TC0480SCP_ram,0,TC0480SCP_RAM_SIZE);
 
 		state_save_register_global_pointer(machine, TC0480SCP_ram, TC0480SCP_RAM_SIZE/2);
 		state_save_register_global_array(machine, TC0480SCP_ctrl);
@@ -3805,7 +3798,7 @@ WRITE16_HANDLER( TC0150ROD_word_w )
 
 void TC0150ROD_vh_start(running_machine *machine)
 {
-	TC0150ROD_ram = auto_malloc(TC0150ROD_RAM_SIZE);
+	TC0150ROD_ram = auto_alloc_array(machine, UINT16, TC0150ROD_RAM_SIZE/2);
 
 	state_save_register_global_pointer(machine, TC0150ROD_ram, TC0150ROD_RAM_SIZE/2);
 }
@@ -4602,7 +4595,7 @@ static STATE_POSTLOAD( TC0110PCR_restore_colors )
 
 void TC0110PCR_vh_start(running_machine *machine)
 {
-	TC0110PCR_ram[0] = auto_malloc(TC0110PCR_RAM_SIZE * sizeof(*TC0110PCR_ram[0]));
+	TC0110PCR_ram[0] = auto_alloc_array(machine, UINT16, TC0110PCR_RAM_SIZE);
 
 	state_save_register_global_pointer(machine, TC0110PCR_ram[0], TC0110PCR_RAM_SIZE);
 	state_save_register_postload(machine, TC0110PCR_restore_colors, (void *)0);
@@ -4612,7 +4605,7 @@ void TC0110PCR_vh_start(running_machine *machine)
 
 void TC0110PCR_1_vh_start(running_machine *machine)
 {
-	TC0110PCR_ram[1] = auto_malloc(TC0110PCR_RAM_SIZE * sizeof(*TC0110PCR_ram[1]));
+	TC0110PCR_ram[1] = auto_alloc_array(machine, UINT16, TC0110PCR_RAM_SIZE);
 
 	state_save_register_global_pointer(machine, TC0110PCR_ram[1], TC0110PCR_RAM_SIZE);
 	state_save_register_postload(machine, TC0110PCR_restore_colors, (void *)1);
@@ -4620,7 +4613,7 @@ void TC0110PCR_1_vh_start(running_machine *machine)
 
 void TC0110PCR_2_vh_start(running_machine *machine)
 {
-	TC0110PCR_ram[2] = auto_malloc(TC0110PCR_RAM_SIZE * sizeof(*TC0110PCR_ram[2]));
+	TC0110PCR_ram[2] = auto_alloc_array(machine, UINT16, TC0110PCR_RAM_SIZE);
 
 	state_save_register_global_pointer(machine, TC0110PCR_ram[2], TC0110PCR_RAM_SIZE);
 	state_save_register_postload(machine, TC0110PCR_restore_colors, (void *)2);
