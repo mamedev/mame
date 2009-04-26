@@ -225,7 +225,7 @@ static READ16_HANDLER( sound_status_r )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(space->machine, 2, memory_region(space->machine, "soundcpu") + 0x10000 + (data&0xf)*0x4000);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "soundcpu") + 0x10000 + (data&0xf)*0x4000);
 }
 
 
@@ -296,167 +296,121 @@ static WRITE16_DEVICE_HANDLER( moobl_oki_bank_w )
 	okim6295_set_bank_base(device, (data & 0x0f)* 0x40000);
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( moo_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x0c0000, 0x0c003f) AM_WRITE(K056832_word_w)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_WRITE(K053246_word_w)
+
 	AM_RANGE(0x0c4000, 0x0c4001) AM_READ(K053246_word_r)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_WRITE(K054338_word_w)		/* K054338 alpha blending engine */
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
+	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITEONLY					/* CCU regs (ignored) */
+	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
+	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_READ(SMH_RAM)			/* sound regs fall through */
+	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM							/* sound regs fall through */
+	AM_RANGE(0x0d8000, 0x0d8007) AM_WRITE(K056832_b_word_w)		/* VSCCS regs */
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ(control1_r)
-	AM_RANGE(0x0de000, 0x0de001) AM_READ(control2_r)
-	AM_RANGE(0x100000, 0x17ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x180000, 0x18ffff) AM_READ(SMH_RAM)			/* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_READ(SMH_RAM)			/* Sprite RAM */
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_READ(K056832_ram_word_r)	/* Graphic planes */
-	AM_RANGE(0x1a2000, 0x1a3fff) AM_READ(K056832_ram_word_r)	/* Graphic planes mirror */
+	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r,control2_w)
+	AM_RANGE(0x100000, 0x17ffff) AM_ROM
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM	AM_BASE(&workram)		/* Work RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE(&spriteram16)	/* Sprite RAM */
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	/* Graphic planes */
+	AM_RANGE(0x1a2000, 0x1a3fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_READ(K056832_rom_word_r)	/* Passthrough to tile roms */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_READ(K056832_word_r)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_READ(K053246_reg_word_r)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_READ(K054338_word_r)
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_READ(K053251_lsb_r)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_READ(SMH_RAM)
+	AM_RANGE(0x0d0000, 0x0d001f) AM_RAM
 	AM_RANGE(0x0d8000, 0x0d8007) AM_READ(K056832_b_word_r)
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( moobl_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c003f) AM_WRITE(K056832_word_w)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_WRITE(K053246_word_w)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_WRITE(K054338_word_w)		/* K054338 alpha blending engine */
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_WRITE(K053251_lsb_w)
-	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITE(SMH_RAM)			/* CCU regs (ignored) */
-	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
-	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_WRITE(SMH_RAM)			/* sound regs fall through */
-	AM_RANGE(0x0d8000, 0x0d8007) AM_WRITE(K056832_b_word_w)	/* VSCCS regs */
-	AM_RANGE(0x0de000, 0x0de001) AM_WRITE(control2_w)
-	AM_RANGE(0x100000, 0x17ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x180000, 0x18ffff) AM_WRITE(SMH_RAM) AM_BASE(&workram)
-	AM_RANGE(0x190000, 0x19ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_WRITE(K056832_ram_word_w)	/* Graphic planes */
-	AM_RANGE(0x1a2000, 0x1a3fff) AM_WRITE(K056832_ram_word_w)	/* Graphic planes mirror */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmembl, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0c2f00, 0x0c2f01) AM_READNOP              /* heck if I know, but it's polled constantly */
+	AM_RANGE(0x0c2f00, 0x0c2f01) AM_READNOP						/* heck if I know, but it's polled constantly */
 	AM_RANGE(0x0c4000, 0x0c4001) AM_READ(K053246_word_r)
-	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_DEVREAD8("oki", okim6295_r, 0x00ff)
-	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
-	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
-	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
-	AM_RANGE(0x0dc002, 0x0dc003) AM_READ(control1_r)
-	AM_RANGE(0x0de000, 0x0de001) AM_READ(control2_r)
-	AM_RANGE(0x100000, 0x17ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x180000, 0x18ffff) AM_READ(SMH_RAM)              /* Work RAM */
-	AM_RANGE(0x190000, 0x19ffff) AM_READ(SMH_RAM)              /* Sprite RAM */
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_READ(K056832_ram_word_r)     /* Graphic planes */
-	AM_RANGE(0x1a2000, 0x1a3fff) AM_READ(K056832_ram_word_r)	/* Graphic planes mirror */
-	AM_RANGE(0x1b0000, 0x1b1fff) AM_READ(K056832_rom_word_r)	/* Passthrough to tile roms */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemembl, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x0c0000, 0x0c003f) AM_WRITE(K056832_word_w)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_WRITE(K053246_word_w)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_WRITE(K054338_word_w)         /* K054338 alpha blending engine */
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_WRITE(K054338_word_w)       /* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_WRITE(K053251_lsb_w)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITE(SMH_RAM)              /* CCU regs (ignored) */
+	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITEONLY		            /* CCU regs (ignored) */
 	AM_RANGE(0x0d6ffc, 0x0d6ffd) AM_DEVWRITE("oki", moobl_oki_bank_w)
-	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
-	AM_RANGE(0x0d8000, 0x0d8007) AM_WRITE(K056832_b_word_w)       /* VSCCS regs */
-	AM_RANGE(0x0de000, 0x0de001) AM_WRITE(control2_w)
-	AM_RANGE(0x100000, 0x17ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x180000, 0x18ffff) AM_WRITE(SMH_RAM) AM_BASE(&workram)
-	AM_RANGE(0x190000, 0x19ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_WRITE(K056832_ram_word_w)	/* Graphic planes */
-	AM_RANGE(0x1a2000, 0x1a3fff) AM_WRITE(K056832_ram_word_w)	/* Graphic planes mirror */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( buckyreadmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x090000, 0x09ffff) AM_READ(SMH_RAM)			/* Sprite RAM */
-	AM_RANGE(0x0a0000, 0x0affff) AM_READ(SMH_RAM)			/* extra sprite RAM? */
-	AM_RANGE(0x0c4000, 0x0c4001) AM_READ(K053246_word_r)
-	AM_RANGE(0x0d2000, 0x0d20ff) AM_READ(K054000_lsb_r)
-	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_READ(SMH_RAM)			/* sound regs fall through */
+	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
+	AM_RANGE(0x0d8000, 0x0d8007) AM_WRITE(K056832_b_word_w)     /* VSCCS regs */
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ(control1_r)
-	AM_RANGE(0x0de000, 0x0de001) AM_READ(control2_r)
-	AM_RANGE(0x180000, 0x181fff) AM_READ(K056832_ram_word_r)	/* Graphic planes */
-	AM_RANGE(0x182000, 0x183fff) AM_READ(K056832_ram_word_r)	/* Graphic planes mirror */
-	AM_RANGE(0x184000, 0x187fff) AM_READ(SMH_RAM)			/* extra tile RAM? */
+	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r,control2_w)
+	AM_RANGE(0x100000, 0x17ffff) AM_ROM
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&workram)		 /* Work RAM */
+	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE(&spriteram16) 	 /* Sprite RAM */
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w) /* Graphic planes */
+	AM_RANGE(0x1a2000, 0x1a3fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	/* Graphic planes mirror */
+	AM_RANGE(0x1b0000, 0x1b1fff) AM_READ(K056832_rom_word_r)	/* Passthrough to tile roms */
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bucky_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM
+	AM_RANGE(0x090000, 0x09ffff) AM_RAM AM_BASE(&spriteram16)	/* Sprite RAM */
+	AM_RANGE(0x0a0000, 0x0affff) AM_RAM							/* extra sprite RAM? */
+	AM_RANGE(0x0c0000, 0x0c003f) AM_WRITE(K056832_word_w)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_WRITE(K053246_word_w)
+	AM_RANGE(0x0c4000, 0x0c4001) AM_READ(K053246_word_r)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_WRITE(K054338_word_w)		/* K054338 alpha blending engine */
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_WRITE(K053251_lsb_w)
+	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
+	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITEONLY					/* CCU regs (ignored) */
+	AM_RANGE(0x0d2000, 0x0d20ff) AM_READWRITE(K054000_lsb_r,K054000_lsb_w)
+	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
+	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
+	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
+	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM							/* sound regs fall through */
+	AM_RANGE(0x0d8000, 0x0d8007) AM_WRITE(K056832_b_word_w)		/* VSCCS regs */
+	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
+	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
+	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
+	AM_RANGE(0x0dc002, 0x0dc003) AM_READ(control1_r)
+	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r,control2_w)
+	AM_RANGE(0x180000, 0x181fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	/* Graphic planes */
+	AM_RANGE(0x182000, 0x183fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	/* Graphic planes mirror */
+	AM_RANGE(0x184000, 0x187fff) AM_RAM							/* extra tile RAM? */
 	AM_RANGE(0x190000, 0x191fff) AM_READ(K056832_rom_word_r)	/* Passthrough to tile roms */
-	AM_RANGE(0x1b0000, 0x1b3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x23ffff) AM_READ(SMH_ROM)			/* data */
+	AM_RANGE(0x1b0000, 0x1b3fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x200000, 0x23ffff) AM_ROM							/* data */
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_READ(K056832_word_r)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_READ(K053246_reg_word_r)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_READ(K054338_word_r)
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_READ(K053251_lsb_r)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_READ(SMH_RAM)
+	AM_RANGE(0x0d0000, 0x0d001f) AM_RAM
 	AM_RANGE(0x0d8000, 0x0d8007) AM_READ(K056832_b_word_r)
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( buckywritemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x090000, 0x09ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)	/* Sprite RAM */
-	AM_RANGE(0x0a0000, 0x0affff) AM_WRITE(SMH_RAM)			/* extra sprite RAM? */
-	AM_RANGE(0x0c0000, 0x0c003f) AM_WRITE(K056832_word_w)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_WRITE(K053246_word_w)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_WRITE(K054338_word_w)		/* K054338 alpha blending engine */
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_WRITE(K053251_lsb_w)
-	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
-	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITE(SMH_RAM)			/* CCU regs (ignored) */
-	AM_RANGE(0x0d2000, 0x0d20ff) AM_WRITE(K054000_lsb_w)
-	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
-	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
-	AM_RANGE(0x0d6000, 0x0d601f) AM_WRITE(SMH_RAM)			/* sound regs fall through */
-	AM_RANGE(0x0d8000, 0x0d8007) AM_WRITE(K056832_b_word_w)	/* VSCCS regs */
-	AM_RANGE(0x0de000, 0x0de001) AM_WRITE(control2_w)
-	AM_RANGE(0x180000, 0x181fff) AM_WRITE(K056832_ram_word_w)	/* Graphic planes */
-	AM_RANGE(0x182000, 0x183fff) AM_WRITE(K056832_ram_word_w)	/* Graphic planes mirror */
-	AM_RANGE(0x184000, 0x187fff) AM_WRITE(SMH_RAM)			/* extra tile RAM? */
-	AM_RANGE(0x1b0000, 0x1b3fff) AM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x200000, 0x23ffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREAD("konami", k054539_r)
-	AM_RANGE(0xec00, 0xec01) AM_DEVREAD("ym", ym2151_r)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami", k054539_r,k054539_w)
+	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_DEVWRITE("konami", k054539_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ym", ym2151_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( moo )
 	PORT_START("IN0")
@@ -524,11 +478,11 @@ static MACHINE_DRIVER_START( moo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(moo_map,0)
 	MDRV_CPU_VBLANK_INT("screen", moo_interrupt)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_START(moo)
 	MDRV_MACHINE_RESET(moo)
@@ -566,7 +520,7 @@ static MACHINE_DRIVER_START( moobl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16100000)
-	MDRV_CPU_PROGRAM_MAP(readmembl,writemembl)
+	MDRV_CPU_PROGRAM_MAP(moobl_map,0)
 	MDRV_CPU_VBLANK_INT("screen", moobl_interrupt)
 
 	MDRV_MACHINE_START(moo)
@@ -601,7 +555,7 @@ static MACHINE_DRIVER_START( bucky )
 	MDRV_IMPORT_FROM(moo)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(buckyreadmem,buckywritemem)
+	MDRV_CPU_PROGRAM_MAP(bucky_map,0)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(4096)

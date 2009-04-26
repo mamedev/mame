@@ -404,65 +404,42 @@ static WRITE32_HANDLER( macrossp_palette_fade_w )
 
 /*** MEMORY MAPS *************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x3fffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( macrossp_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_BASE(&macrossp_spriteram) AM_SIZE(&spriteram_size)
+	/* SCR A Layer */
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(macrossp_scra_videoram_w) AM_BASE(&macrossp_scra_videoram)
+	AM_RANGE(0x904200, 0x9043ff) AM_WRITEONLY /* W/O? */
+	AM_RANGE(0x905000, 0x90500b) AM_WRITEONLY AM_BASE(&macrossp_scra_videoregs) /* W/O? */
+	/* SCR B Layer */
+	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(macrossp_scrb_videoram_w) AM_BASE(&macrossp_scrb_videoram)
+	AM_RANGE(0x90c200, 0x90c3ff) AM_WRITEONLY /* W/O? */
+	AM_RANGE(0x90d000, 0x90d00b) AM_WRITEONLY AM_BASE(&macrossp_scrb_videoregs) /* W/O? */
+	/* SCR C Layer */
+	AM_RANGE(0x910000, 0x913fff) AM_RAM_WRITE(macrossp_scrc_videoram_w) AM_BASE(&macrossp_scrc_videoram)
+	AM_RANGE(0x914200, 0x9143ff) AM_WRITEONLY /* W/O? */
+	AM_RANGE(0x915000, 0x91500b) AM_WRITEONLY AM_BASE(&macrossp_scrc_videoregs) /* W/O? */
+	/* Text Layer */
+	AM_RANGE(0x918000, 0x91bfff) AM_RAM_WRITE(macrossp_text_videoram_w) AM_BASE(&macrossp_text_videoram)
+	AM_RANGE(0x91c200, 0x91c3ff) AM_WRITEONLY /* W/O? */
+	AM_RANGE(0x91d000, 0x91d00b) AM_WRITEONLY AM_BASE(&macrossp_text_videoregs) /* W/O? */
 
-	AM_RANGE(0x800000, 0x802fff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0x900000, 0x903fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x908000, 0x90bfff) AM_READ(SMH_RAM)
-	AM_RANGE(0x910000, 0x913fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x918000, 0x91bfff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0xa00000, 0xa03fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(paletteram32_macrossp_w) AM_BASE(&paletteram32)
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r)
-	AM_RANGE(0xb0000c, 0xb0000f) AM_READ_PORT("DSW")
-
-	AM_RANGE(0xf00000, 0xf1ffff) AM_READ(SMH_RAM)
-
-//  AM_RANGE(0xfe0000, 0xfe0003) AM_READNOP
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x3fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x800000, 0x802fff) AM_WRITE(SMH_RAM) AM_BASE(&macrossp_spriteram) AM_SIZE(&spriteram_size)
-
-	/* SCR A Layer */
-	AM_RANGE(0x900000, 0x903fff) AM_WRITE(macrossp_scra_videoram_w) AM_BASE(&macrossp_scra_videoram)
-	AM_RANGE(0x904200, 0x9043ff) AM_WRITE(SMH_RAM) /* W/O? */
-	AM_RANGE(0x905000, 0x90500b) AM_WRITE(SMH_RAM) AM_BASE(&macrossp_scra_videoregs) /* W/O? */
-	/* SCR B Layer */
-	AM_RANGE(0x908000, 0x90bfff) AM_WRITE(macrossp_scrb_videoram_w) AM_BASE(&macrossp_scrb_videoram)
-	AM_RANGE(0x90c200, 0x90c3ff) AM_WRITE(SMH_RAM) /* W/O? */
-	AM_RANGE(0x90d000, 0x90d00b) AM_WRITE(SMH_RAM) AM_BASE(&macrossp_scrb_videoregs) /* W/O? */
-	/* SCR C Layer */
-	AM_RANGE(0x910000, 0x913fff) AM_WRITE(macrossp_scrc_videoram_w) AM_BASE(&macrossp_scrc_videoram)
-	AM_RANGE(0x914200, 0x9143ff) AM_WRITE(SMH_RAM) /* W/O? */
-	AM_RANGE(0x915000, 0x91500b) AM_WRITE(SMH_RAM) AM_BASE(&macrossp_scrc_videoregs) /* W/O? */
-	/* Text Layer */
-	AM_RANGE(0x918000, 0x91bfff) AM_WRITE(macrossp_text_videoram_w) AM_BASE(&macrossp_text_videoram)
-	AM_RANGE(0x91c200, 0x91c3ff) AM_WRITE(SMH_RAM) /* W/O? */
-	AM_RANGE(0x91d000, 0x91d00b) AM_WRITE(SMH_RAM) AM_BASE(&macrossp_text_videoregs) /* W/O? */
-
-	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(paletteram32_macrossp_w) AM_BASE(&paletteram32)
-
-	AM_RANGE(0xb00004, 0xb00007) AM_WRITENOP	// irq related?
+	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?
 	AM_RANGE(0xb00008, 0xb0000b) AM_WRITENOP	// irq related?
-	AM_RANGE(0xb0000c, 0xb0000f) AM_WRITENOP
+	AM_RANGE(0xb0000c, 0xb0000f) AM_READ_PORT("DSW") AM_WRITENOP
 	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(macrossp_palette_fade_w)	// macrossp palette fade
   	AM_RANGE(0xb00020, 0xb00023) AM_WRITENOP
 
 	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(macrossp_soundcmd_w)
 
-	AM_RANGE(0xf00000, 0xf1ffff) AM_WRITE(SMH_RAM) AM_BASE(&macrossp_mainram) /* Main Ram */
-
-//  AM_RANGE(0xfe0000, 0xfe0003) AM_WRITENOP
+	AM_RANGE(0xf00000, 0xf1ffff) AM_RAM AM_BASE(&macrossp_mainram) /* Main Ram */
+//  AM_RANGE(0xfe0000, 0xfe0003) AM_NOP
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( macrossp_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM
 	AM_RANGE(0x400000, 0x40007f) AM_DEVREADWRITE8("ensoniq", es5506_r, es5506_w, 0x00ff)
@@ -629,11 +606,11 @@ static const es5506_interface es5506_config =
 static MACHINE_DRIVER_START( macrossp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 50000000/2)	/* 25 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(macrossp_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold) // there are others ...
 
 	MDRV_CPU_ADD("audiocpu", M68000, 32000000/2)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(macrossp_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

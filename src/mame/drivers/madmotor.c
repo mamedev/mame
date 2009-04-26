@@ -22,20 +22,12 @@
 VIDEO_START( madmotor );
 VIDEO_UPDATE( madmotor );
 
-READ16_HANDLER( madmotor_pf1_rowscroll_r );
-WRITE16_HANDLER( madmotor_pf1_rowscroll_w );
-READ16_HANDLER( madmotor_pf1_data_r );
-READ16_HANDLER( madmotor_pf2_data_r );
-READ16_HANDLER( madmotor_pf3_data_r );
 WRITE16_HANDLER( madmotor_pf1_data_w );
 WRITE16_HANDLER( madmotor_pf2_data_w );
 WRITE16_HANDLER( madmotor_pf3_data_w );
-WRITE16_HANDLER( madmotor_pf1_control_w );
-WRITE16_HANDLER( madmotor_pf2_control_w );
-WRITE16_HANDLER( madmotor_pf3_control_w );
 extern UINT16 *madmotor_pf1_rowscroll;
 extern UINT16 *madmotor_pf1_data,*madmotor_pf2_data,*madmotor_pf3_data;
-
+extern UINT16 *madmotor_pf1_control,*madmotor_pf2_control,*madmotor_pf3_control;
 
 /******************************************************************************/
 
@@ -51,58 +43,37 @@ static WRITE16_HANDLER( madmotor_sound_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( madmotor_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x184000, 0x1847ff) AM_READ(madmotor_pf1_rowscroll_r)
-	AM_RANGE(0x188000, 0x189fff) AM_READ(madmotor_pf1_data_r)
-	AM_RANGE(0x198000, 0x1987ff) AM_READ(madmotor_pf2_data_r)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_READ(madmotor_pf3_data_r)
-	AM_RANGE(0x18c000, 0x18c001) AM_READNOP
+static ADDRESS_MAP_START( madmotor_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x180000, 0x18001f) AM_WRITEONLY AM_BASE(&madmotor_pf1_control)
+	AM_RANGE(0x184000, 0x1847ff) AM_RAM AM_BASE(&madmotor_pf1_rowscroll)
+	AM_RANGE(0x188000, 0x189fff) AM_RAM_WRITE(madmotor_pf1_data_w) AM_BASE(&madmotor_pf1_data)
+	AM_RANGE(0x18c000, 0x18c001) AM_NOP
+	AM_RANGE(0x190000, 0x19001f) AM_WRITEONLY AM_BASE(&madmotor_pf2_control)
+	AM_RANGE(0x198000, 0x1987ff) AM_RAM_WRITE(madmotor_pf2_data_w) AM_BASE(&madmotor_pf2_data)
 	AM_RANGE(0x19c000, 0x19c001) AM_READNOP
-	AM_RANGE(0x3e0000, 0x3e3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3e8000, 0x3e87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3f0000, 0x3f07ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITEONLY AM_BASE(&madmotor_pf3_control)
+	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM_WRITE(madmotor_pf3_data_w) AM_BASE(&madmotor_pf3_data)
+	AM_RANGE(0x3e0000, 0x3e3fff) AM_RAM
+	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x3f8002, 0x3f8003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3f8004, 0x3f8005) AM_READ_PORT("DSW")
 	AM_RANGE(0x3f8006, 0x3f8007) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( madmotor_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x180000, 0x18001f) AM_WRITE(madmotor_pf1_control_w)
-	AM_RANGE(0x184000, 0x1847ff) AM_WRITE(madmotor_pf1_rowscroll_w) AM_BASE(&madmotor_pf1_rowscroll)
-	AM_RANGE(0x188000, 0x189fff) AM_WRITE(madmotor_pf1_data_w) AM_BASE(&madmotor_pf1_data)
-	AM_RANGE(0x18c000, 0x18c001) AM_WRITENOP
-	AM_RANGE(0x190000, 0x19001f) AM_WRITE(madmotor_pf2_control_w)
-	AM_RANGE(0x198000, 0x1987ff) AM_WRITE(madmotor_pf2_data_w) AM_BASE(&madmotor_pf2_data)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITE(madmotor_pf3_control_w)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_WRITE(madmotor_pf3_data_w) AM_BASE(&madmotor_pf3_data)
-	AM_RANGE(0x3e0000, 0x3e3fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x3e8000, 0x3e87ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3f0000, 0x3f07ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x3fc004, 0x3fc005) AM_WRITE(madmotor_sound_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_DEVREAD("ym1", ym2203_r)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREAD("ym2", ym2151_r)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("oki1", okim6295_r)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREAD("oki2", okim6295_r)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r,ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_r,okim6295_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_r,okim6295_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x110000, 0x110001) AM_DEVWRITE("ym2", ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVWRITE("oki1", okim6295_w)
-	AM_RANGE(0x130000, 0x130001) AM_DEVWRITE("oki2", okim6295_w)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
@@ -262,11 +233,11 @@ static MACHINE_DRIVER_START( madmotor )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
-	MDRV_CPU_PROGRAM_MAP(madmotor_readmem,madmotor_writemem)
+	MDRV_CPU_PROGRAM_MAP(madmotor_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

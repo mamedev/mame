@@ -11,9 +11,9 @@
 UINT16 *madmotor_pf1_rowscroll;
 UINT16 *madmotor_pf1_data,*madmotor_pf2_data,*madmotor_pf3_data;
 
-static UINT16 madmotor_pf1_control[16];
-static UINT16 madmotor_pf2_control[16];
-static UINT16 madmotor_pf3_control[16];
+UINT16 *madmotor_pf1_control;
+UINT16 *madmotor_pf2_control;
+UINT16 *madmotor_pf3_control;
 
 static int flipscreen;
 static tilemap *madmotor_pf1_tilemap,*madmotor_pf2_tilemap,*madmotor_pf3_tilemap,*madmotor_pf3a_tilemap;
@@ -125,21 +125,6 @@ VIDEO_START( madmotor )
 
 /******************************************************************************/
 
-READ16_HANDLER( madmotor_pf1_data_r )
-{
-	return madmotor_pf1_data[offset];
-}
-
-READ16_HANDLER( madmotor_pf2_data_r )
-{
-	return madmotor_pf2_data[offset];
-}
-
-READ16_HANDLER( madmotor_pf3_data_r )
-{
-	return madmotor_pf3_data[offset];
-}
-
 WRITE16_HANDLER( madmotor_pf1_data_w )
 {
 	COMBINE_DATA(&madmotor_pf1_data[offset]);
@@ -161,31 +146,6 @@ WRITE16_HANDLER( madmotor_pf3_data_w )
 
 	/* Mark the dirty position on the 2048 x 256 version */
 	tilemap_mark_tile_dirty(madmotor_pf3a_tilemap,offset);
-}
-
-WRITE16_HANDLER( madmotor_pf1_control_w )
-{
-	COMBINE_DATA(&madmotor_pf1_control[offset]);
-}
-
-WRITE16_HANDLER( madmotor_pf2_control_w )
-{
-	COMBINE_DATA(&madmotor_pf2_control[offset]);
-}
-
-WRITE16_HANDLER( madmotor_pf3_control_w )
-{
-	COMBINE_DATA(&madmotor_pf3_control[offset]);
-}
-
-READ16_HANDLER( madmotor_pf1_rowscroll_r )
-{
-	return madmotor_pf1_rowscroll[offset];
-}
-
-WRITE16_HANDLER( madmotor_pf1_rowscroll_w )
-{
-	COMBINE_DATA(&madmotor_pf1_rowscroll[offset]);
 }
 
 /******************************************************************************/
