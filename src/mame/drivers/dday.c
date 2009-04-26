@@ -71,29 +71,21 @@ WRITE8_HANDLER( dday_sl_control_w );
 READ8_HANDLER( dday_countdown_timer_r );
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x5000, 0x5bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5c00, 0x5fff) AM_READ(dday_colorram_r)
-	AM_RANGE(0x6000, 0x63ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( dday_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(dday_sl_control_w)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(dday_textvideoram_w) AM_BASE(&dday_textvideoram)
+	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(dday_fgvideoram_w) AM_BASE(&dday_fgvideoram)
+	AM_RANGE(0x5800, 0x5bff) AM_RAM_WRITE(dday_bgvideoram_w) AM_BASE(&dday_bgvideoram)
+	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(dday_colorram_r, dday_colorram_w) AM_BASE(&dday_colorram)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM
+	AM_RANGE(0x6400, 0x6401) AM_MIRROR(0x000e) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x6800, 0x6801) AM_DEVWRITE("ay2", ay8910_address_data_w)
 	AM_RANGE(0x6c00, 0x6c00) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x7400, 0x7400) AM_READ_PORT("DSW1")
-	AM_RANGE(0x7800, 0x7800) AM_READ(dday_countdown_timer_r)
+	AM_RANGE(0x7800, 0x7800) AM_READWRITE(dday_countdown_timer_r, dday_control_w)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("PADDLE")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(dday_sl_control_w)
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(dday_textvideoram_w) AM_BASE(&dday_textvideoram)
-	AM_RANGE(0x5400, 0x57ff) AM_WRITE(dday_fgvideoram_w) AM_BASE(&dday_fgvideoram)
-	AM_RANGE(0x5800, 0x5bff) AM_WRITE(dday_bgvideoram_w) AM_BASE(&dday_bgvideoram)
-	AM_RANGE(0x5c00, 0x5fff) AM_WRITE(dday_colorram_w) AM_BASE(&dday_colorram)
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6400, 0x6401) AM_MIRROR(0x000e) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x6800, 0x6801) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(dday_control_w)
 ADDRESS_MAP_END
 
 
@@ -244,7 +236,7 @@ static MACHINE_DRIVER_START( dday )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(dday_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

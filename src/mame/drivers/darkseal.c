@@ -71,28 +71,17 @@ static READ16_HANDLER( darkseal_control_r )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( darkseal_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x103fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x120000, 0x1207ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x140000, 0x140fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x141000, 0x141fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x180000, 0x18000f) AM_READ(darkseal_control_r)
-	AM_RANGE(0x220000, 0x220fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x222000, 0x222fff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( darkseal_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM) AM_BASE(&darkseal_ram)
-	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x140000, 0x140fff) AM_WRITE(darkseal_palette_24bit_rg_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x141000, 0x141fff) AM_WRITE(darkseal_palette_24bit_b_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0x180000, 0x18000f) AM_WRITE(darkseal_control_w)
+static ADDRESS_MAP_START( darkseal_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&darkseal_ram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(darkseal_palette_24bit_rg_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(darkseal_palette_24bit_b_w) AM_BASE(&paletteram16_2)
+	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(darkseal_control_r, darkseal_control_w)
  	AM_RANGE(0x200000, 0x200fff) AM_WRITE(darkseal_pf3b_data_w) /* 2nd half of pf3, only used on last level */
 	AM_RANGE(0x202000, 0x203fff) AM_WRITE(darkseal_pf3_data_w) AM_BASE(&darkseal_pf3_data)
-	AM_RANGE(0x220000, 0x220fff) AM_WRITE(SMH_RAM) AM_BASE(&darkseal_pf12_row)
-	AM_RANGE(0x222000, 0x222fff) AM_WRITE(SMH_RAM) AM_BASE(&darkseal_pf34_row)
+	AM_RANGE(0x220000, 0x220fff) AM_RAM AM_BASE(&darkseal_pf12_row)
+	AM_RANGE(0x222000, 0x222fff) AM_RAM AM_BASE(&darkseal_pf34_row)
 	AM_RANGE(0x240000, 0x24000f) AM_WRITE(darkseal_control_0_w)
 	AM_RANGE(0x260000, 0x261fff) AM_WRITE(darkseal_pf2_data_w) AM_BASE(&darkseal_pf2_data)
 	AM_RANGE(0x262000, 0x263fff) AM_WRITE(darkseal_pf1_data_w) AM_BASE(&darkseal_pf1_data)
@@ -101,23 +90,14 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_DEVREAD("ym1", ym2203_r)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREAD("ym2", ym2151_r)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("oki1", okim6295_r)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREAD("oki2", okim6295_r)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r, ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x110000, 0x110001) AM_DEVWRITE("ym2", ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVWRITE("oki1", okim6295_w)
-	AM_RANGE(0x130000, 0x130001) AM_DEVWRITE("oki2", okim6295_w)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_READWRITE(SMH_BANK8, SMH_BANK8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
@@ -263,11 +243,11 @@ static MACHINE_DRIVER_START( darkseal )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000) /* Custom chip 59 */
-	MDRV_CPU_PROGRAM_MAP(darkseal_readmem,darkseal_writemem)
+	MDRV_CPU_PROGRAM_MAP(darkseal_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)/* VBL */
 
 	MDRV_CPU_ADD("audiocpu", H6280, 32220000/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)

@@ -131,68 +131,49 @@ static void dbz_sound_irq(const device_config *device, int irq)
 		cpu_set_input_line(device->machine->cpu[1], 0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( dbz_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x480000, 0x48ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x490000, 0x491fff) AM_READ(K056832_ram_word_r)	// '157 RAM is mirrored twice
-	AM_RANGE(0x492000, 0x493fff) AM_READ(K056832_ram_word_r)
+static ADDRESS_MAP_START( dbz_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x480000, 0x48ffff) AM_RAM
+	AM_RANGE(0x490000, 0x491fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)	// '157 RAM is mirrored twice
+	AM_RANGE(0x492000, 0x493fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)
 	AM_RANGE(0x498000, 0x49ffff) AM_READ(K056832_rom_word_8000_r)	// code near a60 in dbz2, subroutine at 730 in dbz
-	AM_RANGE(0x4a0000, 0x4a0fff) AM_READ(K053247_word_r)
-	AM_RANGE(0x4a1000, 0x4a3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4a8000, 0x4abfff) AM_READ(SMH_RAM)			// palette
+	AM_RANGE(0x4a0000, 0x4a0fff) AM_READWRITE(K053247_word_r, K053247_word_w)
+	AM_RANGE(0x4a1000, 0x4a3fff) AM_RAM
+	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16) // palette
 	AM_RANGE(0x4c0000, 0x4c0001) AM_READ(K053246_word_r)
-	AM_RANGE(0x4e0000, 0x4e0001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x4e0002, 0x4e0003) AM_READ_PORT("SYSTEM_DSW1")
-	AM_RANGE(0x4e4000, 0x4e4001) AM_READ_PORT("DSW2")
-	AM_RANGE(0x500000, 0x501fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x508000, 0x509fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x510000, 0x513fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x518000, 0x51bfff) AM_READ(SMH_RAM)
-	AM_RANGE(0x600000, 0x6fffff) AM_READNOP 			// PSAC 1 ROM readback window
-	AM_RANGE(0x700000, 0x7fffff) AM_READNOP 			// PSAC 2 ROM readback window
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dbz_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x480000, 0x48ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x490000, 0x491fff) AM_WRITE(K056832_ram_word_w)
-	AM_RANGE(0x492000, 0x493fff) AM_WRITE(K056832_ram_word_w)
-	AM_RANGE(0x4a0000, 0x4a0fff) AM_WRITE(K053247_word_w)
-	AM_RANGE(0x4a1000, 0x4a3fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4a8000, 0x4abfff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x4c0000, 0x4c0007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x4c4000, 0x4c4007) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x4c8000, 0x4c8007) AM_WRITE(K056832_b_word_w)
 	AM_RANGE(0x4cc000, 0x4cc03f) AM_WRITE(K056832_word_w)
-	AM_RANGE(0x4ec000, 0x4ec001) AM_WRITE(dbzcontrol_w)
 	AM_RANGE(0x4d0000, 0x4d001f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
 	AM_RANGE(0x4d4000, 0x4d401f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_1_ctrl)
+	AM_RANGE(0x4e0000, 0x4e0001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x4e0002, 0x4e0003) AM_READ_PORT("SYSTEM_DSW1")
+	AM_RANGE(0x4e4000, 0x4e4001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x4e8000, 0x4e8001) AM_WRITENOP
+	AM_RANGE(0x4ec000, 0x4ec001) AM_WRITE(dbzcontrol_w)
 	AM_RANGE(0x4f0000, 0x4f0001) AM_WRITE(dbz_sound_command_w)
 	AM_RANGE(0x4f4000, 0x4f4001) AM_WRITE(dbz_sound_cause_nmi)
 	AM_RANGE(0x4f8000, 0x4f801f) AM_WRITENOP		// 251 #1
 	AM_RANGE(0x4fc000, 0x4fc01f) AM_WRITE(K053251_lsb_w)	// 251 #2
-	AM_RANGE(0x500000, 0x501fff) AM_WRITE(dbz_bg2_videoram_w) AM_BASE(&dbz_bg2_videoram)
-	AM_RANGE(0x508000, 0x509fff) AM_WRITE(dbz_bg1_videoram_w) AM_BASE(&dbz_bg1_videoram)
-	AM_RANGE(0x510000, 0x513fff) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_linectrl) // ?? guess, it might not be
-	AM_RANGE(0x518000, 0x51bfff) AM_WRITE(SMH_RAM) AM_BASE(&K053936_1_linectrl) // ?? guess, it might not be
+
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(dbz_bg2_videoram_w) AM_BASE(&dbz_bg2_videoram)
+	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE(dbz_bg1_videoram_w) AM_BASE(&dbz_bg1_videoram)
+	AM_RANGE(0x510000, 0x513fff) AM_RAM AM_BASE(&K053936_0_linectrl) // ?? guess, it might not be
+	AM_RANGE(0x518000, 0x51bfff) AM_RAM AM_BASE(&K053936_1_linectrl) // ?? guess, it might not be
+	AM_RANGE(0x600000, 0x6fffff) AM_READNOP 			// PSAC 1 ROM readback window
+	AM_RANGE(0x700000, 0x7fffff) AM_READNOP 			// PSAC 2 ROM readback window
 ADDRESS_MAP_END
 
 /* dbz sound */
 /* IRQ: from YM2151.  NMI: from 68000.  Port 0: write to ack NMI */
 
-static ADDRESS_MAP_START( dbz_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0xd000, 0xd002) AM_DEVREAD("oki", okim6295_r)
+static ADDRESS_MAP_START( dbz_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0xd000, 0xd002) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dbz_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("oki", okim6295_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -341,11 +322,11 @@ static MACHINE_DRIVER_START( dbz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(dbz_readmem,dbz_writemem)
+	MDRV_CPU_PROGRAM_MAP(dbz_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(dbz_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(dbz_sound_readmem, dbz_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(dbz_sound_map, 0)
 	MDRV_CPU_IO_MAP(dbz_sound_io_map, 0)
 
 	MDRV_GFXDECODE(dbz)

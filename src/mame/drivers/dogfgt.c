@@ -66,42 +66,30 @@ static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 
 
 
-static ADDRESS_MAP_START( main_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(sharedram_r)
-	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1810, 0x1810) AM_READ_PORT("P2")
-	AM_RANGE(0x1820, 0x1820) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1830, 0x1830) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x3fff) AM_READ(dogfgt_bitmapram_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( main_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(sharedram_w) AM_BASE(&sharedram)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)
 	AM_RANGE(0x0f80, 0x0fdf) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE(dogfgt_bgvideoram_w) AM_BASE(&dogfgt_bgvideoram)
+	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(dogfgt_1800_w)	/* text color, flip screen & coin counters */
+	AM_RANGE(0x1810, 0x1810) AM_READ_PORT("P2")
 	AM_RANGE(0x1810, 0x1810) AM_WRITE(subirqtrigger_w)
+	AM_RANGE(0x1820, 0x1820) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1820, 0x1823) AM_WRITE(dogfgt_scroll_w)
 	AM_RANGE(0x1824, 0x1824) AM_WRITE(dogfgt_plane_select_w)
+	AM_RANGE(0x1830, 0x1830) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1830, 0x1830) AM_WRITE(dogfgt_soundlatch_w)
 	AM_RANGE(0x1840, 0x1840) AM_WRITE(dogfgt_soundcontrol_w)
 	AM_RANGE(0x1870, 0x187f) AM_WRITE(paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(dogfgt_bitmapram_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dogfgt_bitmapram_r, dogfgt_bitmapram_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(sharedram_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(sharedram_w)
+static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(sharedram_r, sharedram_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irqack_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -232,11 +220,11 @@ static MACHINE_DRIVER_START( dogfgt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)	/* ? controls music tempo */
 
 	MDRV_CPU_ADD("sub", M6502, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

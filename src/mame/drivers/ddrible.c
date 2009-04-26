@@ -125,60 +125,40 @@ static WRITE8_DEVICE_HANDLER( ddrible_vlm5030_ctrl_w )
 }
 
 
-static ADDRESS_MAP_START( readmem_cpu0, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1800, 0x187f) AM_READ(SMH_RAM)			/* palette */
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)			/* Video RAM 1 + Object RAM 1 */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)			/* shared RAM with CPU #1 */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_RAM)			/* Video RAM 2 + Object RAM 2 */
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK1)			/* banked ROM */
-	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
+static ADDRESS_MAP_START( cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0004) AM_WRITE(K005885_0_w)												/* video registers (005885 #1) */
+	AM_RANGE(0x0800, 0x0804) AM_WRITE(K005885_1_w)												/* video registers (005885 #2) */
+	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE(&paletteram)										/* palette */
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(ddrible_fg_videoram_w) AM_BASE(&ddrible_fg_videoram)	/* Video RAM 1 */
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(&ddrible_spriteram_1)								/* Object RAM 1 */
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&ddrible_sharedram)									/* shared RAM with CPU #1 */
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(ddrible_bg_videoram_w) AM_BASE(&ddrible_bg_videoram)	/* Video RAM 2 */
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(&ddrible_spriteram_2)								/* Object RAM 2 */
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(ddrible_bankswitch_w)										/* bankswitch control */
+	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK1)													/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)													/* ROM */
+	AM_RANGE(0xa000, 0xffff) AM_ROM																/* ROM */
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( writemem_cpu0, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0004) AM_WRITE(K005885_0_w)								/* video registers (005885 #1) */
-	AM_RANGE(0x0800, 0x0804) AM_WRITE(K005885_1_w)								/* video registers (005885 #2) */
-	AM_RANGE(0x1800, 0x187f) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(ddrible_fg_videoram_w) AM_BASE(&ddrible_fg_videoram)/* Video RAM 1 */
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(SMH_RAM) AM_BASE(&ddrible_spriteram_1)				/* Object RAM 1 */
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM) AM_BASE(&ddrible_sharedram)				/* shared RAM with CPU #1 */
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(ddrible_bg_videoram_w) AM_BASE(&ddrible_bg_videoram)/* Video RAM 2 */
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&ddrible_spriteram_2)				/* Object RAM 2 + Work RAM */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(ddrible_bankswitch_w)						/* bankswitch control */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)									/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(ddrible_sharedram_r)		/* shared RAM with CPU #0 */
-	AM_RANGE(0x2000, 0x27ff) AM_READ(ddrible_snd_sharedram_r)	/* shared RAM with CPU #2 */
+static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ddrible_sharedram_r, ddrible_sharedram_w)			/* shared RAM with CPU #0 */
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ddrible_snd_sharedram_r, ddrible_snd_sharedram_w)	/* shared RAM with CPU #2 */
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2801, 0x2801) AM_READ_PORT("P1")
 	AM_RANGE(0x2802, 0x2802) AM_READ_PORT("P2")
-	AM_RANGE(0x2803, 0x2803) AM_READ_PORT("SYSTEM")				/* coinsw & start */
+	AM_RANGE(0x2803, 0x2803) AM_READ_PORT("SYSTEM")											/* coinsw & start */
 	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW3")
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
+	AM_RANGE(0x3400, 0x3400) AM_WRITE(ddrible_coin_counter_w)								/* coin counters */
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)										/* watchdog reset */
+	AM_RANGE(0x8000, 0xffff) AM_ROM															/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(ddrible_sharedram_w)		/* shared RAM with CPU #0 */
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(ddrible_snd_sharedram_w)	/* shared RAM with CPU #2 */
-	AM_RANGE(0x3400, 0x3400) AM_WRITE(ddrible_coin_counter_w)		/* coin counters */
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)					/* shared RAM with CPU #1 */
-	AM_RANGE(0x1000, 0x1001) AM_DEVREAD("ym", ym2203_r)		/* YM2203 */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&ddrible_snd_sharedram)	/* shared RAM with CPU #1 */
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym", ym2203_w)				/* YM2203 */
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_data_w)						/* Speech data */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)							/* ROM */
+static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&ddrible_snd_sharedram)		/* shared RAM with CPU #1 */
+	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)	/* YM2203 */
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_data_w)			/* Speech data */
+	AM_RANGE(0x8000, 0xffff) AM_ROM										/* ROM */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ddribble )
@@ -283,15 +263,15 @@ static MACHINE_DRIVER_START( ddribble )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu0,writemem_cpu0)
+	MDRV_CPU_PROGRAM_MAP(cpu0_map,0)
 	MDRV_CPU_VBLANK_INT("screen", ddrible_interrupt_0)
 
 	MDRV_CPU_ADD("cpu1", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu1,writemem_cpu1)
+	MDRV_CPU_PROGRAM_MAP(cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("screen", ddrible_interrupt_1)
 
 	MDRV_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
 

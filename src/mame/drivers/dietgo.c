@@ -32,23 +32,14 @@ ADDRESS_MAP_END
 
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_READNOP
-	AM_RANGE(0x110000, 0x110001) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREAD("oki", okim6295_r)
-	AM_RANGE(0x130000, 0x130001) AM_READNOP /* This board only has 1 oki chip */
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100001) AM_NOP		/* YM2203 - this board doesn't have one */
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0x130000, 0x130001) AM_NOP		/* This board only has 1 oki chip */
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_WRITENOP /* YM2203 - this board doesn't have one */
-	AM_RANGE(0x110000, 0x110001) AM_DEVWRITE("ym", ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVWRITE("oki", okim6295_w)
-	AM_RANGE(0x130000, 0x130001) AM_WRITENOP
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_READWRITE(SMH_BANK8, SMH_BANK8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
@@ -188,7 +179,7 @@ static MACHINE_DRIVER_START( dietgo )
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)	/* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

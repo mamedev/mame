@@ -79,39 +79,25 @@ static MACHINE_RESET( deniam )
 }
 
 
-static ADDRESS_MAP_START( deniam16b_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x400000, 0x40ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x410000, 0x410fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(deniam_coinctrl_r)
-	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
-	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2")
-	AM_RANGE(0xc44006, 0xc44007) AM_READNOP	/* unused? */
-	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW")
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( deniam16b_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(deniam_videoram_w) AM_BASE(&deniam_videoram)
-	AM_RANGE(0x410000, 0x410fff) AM_WRITE(deniam_textram_w) AM_BASE(&deniam_textram)
+static ADDRESS_MAP_START( deniam16b_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE(&deniam_videoram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE(&deniam_textram)
 	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_WRITE(deniam_coinctrl_w)
-	AM_RANGE(0xc40004, 0xc40005) AM_WRITENOP	/* irq ack? */
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
+	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
+	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP /* irq ack? */
+	AM_RANGE(0xc44006, 0xc44007) AM_READNOP	/* unused? */
+	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW")
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xf7ff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xf7ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xf7ff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -123,32 +109,21 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 /* identical to 16b, but handles sound directly */
-static ADDRESS_MAP_START( deniam16c_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x400000, 0x40ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x410000, 0x410fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVREAD8("oki", okim6295_r, 0x00ff)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(deniam_coinctrl_r)
-	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
-	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2")
-	AM_RANGE(0xc44006, 0xc44007) AM_READNOP	/* unused? */
-	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW") /* probably YM3812 input port */
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( deniam16c_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(deniam_videoram_w) AM_BASE(&deniam_videoram)
-	AM_RANGE(0x410000, 0x410fff) AM_WRITE(deniam_textram_w) AM_BASE(&deniam_textram)
+static ADDRESS_MAP_START( deniam16c_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE(&deniam_videoram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE(&deniam_textram)
 	AM_RANGE(0x440000, 0x4407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
-	AM_RANGE(0xc40002, 0xc40003) AM_WRITE(deniam_coinctrl_w)
-	AM_RANGE(0xc40004, 0xc40005) AM_WRITENOP	/* irq ack? */
-	AM_RANGE(0xc40006, 0xc40007) AM_DEVWRITE("oki", deniam16c_oki_rom_bank_w)
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
+	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
+	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
+	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP /* irq ack? */
+	AM_RANGE(0xc44006, 0xc44007) AM_READNOP	AM_DEVWRITE("oki", deniam16c_oki_rom_bank_w) /* read unused? */
 	AM_RANGE(0xc40008, 0xc4000b) AM_DEVWRITE8("ym", ym3812_w, 0xff00)
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW") /* probably YM3812 input port */
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -263,11 +238,11 @@ static MACHINE_DRIVER_START( deniam16b )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,25000000/2)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(deniam16b_readmem,deniam16b_writemem)
+	MDRV_CPU_PROGRAM_MAP(deniam16b_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,25000000/4)	/* (makes logicpro music tempo correct) */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_MACHINE_RESET(deniam)
@@ -302,7 +277,7 @@ static MACHINE_DRIVER_START( deniam16c )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,25000000/2)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(deniam16c_readmem,deniam16c_writemem)
+	MDRV_CPU_PROGRAM_MAP(deniam16c_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_MACHINE_RESET(deniam)

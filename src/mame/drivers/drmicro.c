@@ -74,18 +74,11 @@ static WRITE8_HANDLER( pcm_set_w )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(drmicro_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( drmicro_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(SMH_RAM, drmicro_videoram_w)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -221,7 +214,7 @@ static MACHINE_DRIVER_START( drmicro )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MCLK/6)	/* 3.072MHz? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(drmicro_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", drmicro_interrupt)
 

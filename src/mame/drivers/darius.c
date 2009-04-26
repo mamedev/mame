@@ -247,45 +247,31 @@ logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",
                      MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( darius_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(SMH_RAM)		/* main RAM */
-	AM_RANGE(0xc00000, 0xc0001f) AM_READ(darius_ioc_r)	/* inputs, sound */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_READ(PC080SN_word_0_r)	/* tilemaps */
-	AM_RANGE(0xd80000, 0xd80fff) AM_READ(SMH_RAM)	/* palette */
-	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE(3) AM_BASE(&darius_fg_ram)
-	AM_RANGE(0xe10000, 0xe10fff) AM_READ(SMH_RAM)		/* ??? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( darius_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( darius_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x05ffff) AM_ROM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM												/* main RAM */
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(darius_watchdog_w)
-	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w)	/* coin ctr & lockout, sound */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_WRITE(PC080SN_word_0_w)
+	AM_RANGE(0xc00000, 0xc0007f) AM_READWRITE(darius_ioc_r, darius_ioc_w)			/* inputs, sound */
+	AM_RANGE(0xd00000, 0xd0ffff) AM_READWRITE(PC080SN_word_0_r, PC080SN_word_0_w)	/* tilemaps */
 	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(PC080SN_yscroll_word_0_w)
 	AM_RANGE(0xd40000, 0xd40003) AM_WRITE(PC080SN_xscroll_word_0_w)
 	AM_RANGE(0xd50000, 0xd50003) AM_WRITE(PC080SN_ctrl_word_0_w)
-	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xe10000, 0xe10fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)/* palette */
+	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE(3) AM_BASE(&darius_fg_ram)
+	AM_RANGE(0xe10000, 0xe10fff) AM_RAM												/* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darius_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x040000, 0x04ffff) AM_READ(SMH_RAM)	/* local RAM */
+static ADDRESS_MAP_START( darius_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x040000, 0x04ffff) AM_RAM				/* local RAM */
+	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w)	/* only writes $c00050 (?) */
+	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE(3)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( darius_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x040000, 0x04ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w)	/* only writes $c00050 (?) */
-	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
 ADDRESS_MAP_END
 
 
@@ -486,22 +472,13 @@ static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
            Sound memory structures / ADPCM
 *****************************************************/
 
-static ADDRESS_MAP_START( darius_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_BANK1)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVREAD("ym1", ym2203_r)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym2", ym2203_r)
-	AM_RANGE(0xb000, 0xb000) AM_READNOP
-	AM_RANGE(0xb001, 0xb001) AM_READ(taitosound_slave_comm_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( darius_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym2", ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(taitosound_slave_comm_w)
+static ADDRESS_MAP_START( darius_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0xb000, 0xb000) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
+	AM_RANGE(0xb001, 0xb001) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(darius_psg0_pan)
@@ -512,13 +489,8 @@ static ADDRESS_MAP_START( darius_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darius_sound2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READ(SMH_ROM)
-	/* yes, no RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( darius_sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITENOP	/* writes rom whenever interrupt occurs - as no stack */
+static ADDRESS_MAP_START( darius_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(SMH_ROM, SMH_NOP)
 	/* yes, no RAM */
 ADDRESS_MAP_END
 
@@ -840,18 +812,18 @@ static MACHINE_DRIVER_START( darius )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius_readmem,darius_writemem)
+	MDRV_CPU_PROGRAM_MAP(darius_map,0)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius_sound_readmem,darius_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(darius_sound_map,0)
 
 	MDRV_CPU_ADD("cpub", M68000,16000000/2)	/* 8 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(darius_cpub_readmem,darius_cpub_writemem)
+	MDRV_CPU_PROGRAM_MAP(darius_cpub_map,0)
 	MDRV_CPU_VBLANK_INT("lscreen", irq4_line_hold)
 
 	MDRV_CPU_ADD("adpcm", Z80,8000000/2) /* 4 MHz ? */	/* ADPCM player using MSM5205 */
-	MDRV_CPU_PROGRAM_MAP(darius_sound2_readmem,darius_sound2_writemem)
+	MDRV_CPU_PROGRAM_MAP(darius_sound2_map,0)
 	MDRV_CPU_IO_MAP(darius_sound2_io_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame ? */
