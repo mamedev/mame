@@ -393,7 +393,7 @@ static INTERRUPT_GEN( drill_interrupt )
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
 static void irqhandler(const device_config *device, int irq)
 {
-//  cpu_set_input_line(device->machine->cpu[0],5,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cputag_set_input_line(device->machine, "maincpu", 5, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

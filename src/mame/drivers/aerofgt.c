@@ -75,7 +75,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		pending_command = 1;
 		soundlatch_w(space,offset,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -85,7 +85,7 @@ static WRITE16_HANDLER( turbofrc_sound_command_w )
 	{
 		pending_command = 1;
 		soundlatch_w(space,offset,(data >> 8) & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -94,7 +94,7 @@ static WRITE16_HANDLER( aerfboot_soundlatch_w )
 	if(ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space,0,(data>>8) & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -122,7 +122,7 @@ static MACHINE_START( aerofgt )
 
 static MACHINE_RESET( aerofgt )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	aerofgt_sh_bankswitch_w(space,0,0);	/* needed by spinlbrk */
 }
@@ -1290,7 +1290,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

@@ -920,7 +920,7 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 
 static STATE_POSTLOAD( schaser_reinit_555_time_remain )
 {
-    const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
     schaser_effect_555_time_remain = double_to_attotime(schaser_effect_555_time_remain_savable);
     schaser_sh_port_2_w(space, 0, port_2_last_extra);
 }
@@ -943,7 +943,7 @@ MACHINE_START( schaser )
 
 MACHINE_RESET( schaser )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	schaser_effect_555_is_low = 0;
 	timer_adjust_oneshot(schaser_effect_555_timer, attotime_never, 0);
 	schaser_sh_port_1_w(space, 0, 0);

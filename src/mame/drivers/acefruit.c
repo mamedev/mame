@@ -26,7 +26,7 @@ static void acefruit_update_irq(running_machine *machine, int vpos )
 		switch( color )
 		{
 		case 0x0c:
-			cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE );
+			cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE );
 			break;
 		}
 	}

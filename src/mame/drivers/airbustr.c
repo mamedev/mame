@@ -277,7 +277,7 @@ static READ8_HANDLER( devram_r )
 
 static WRITE8_HANDLER( master_nmi_trigger_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void airbustr_bankswitch(running_machine *machine, const char *cpu, int bank, int data)
@@ -334,7 +334,7 @@ static WRITE8_HANDLER( soundcommand_w )
 {
 	soundlatch_w(space, 0, data);
 	soundlatch_status = 1;	// soundlatch has been written
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
 static WRITE8_HANDLER( soundcommand2_w )
@@ -598,7 +598,7 @@ static MACHINE_START( airbustr )
 
 static MACHINE_RESET( airbustr )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "master", ADDRESS_SPACE_PROGRAM);
 	soundlatch_status = soundlatch2_status = 0;
 	master_addr = 0xff;
 	slave_addr = 0xfd;
@@ -770,7 +770,7 @@ ROM_END
 
 static DRIVER_INIT( airbustr )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xefff, 0, 0, devram_r); // protection device lives here
+	memory_install_read8_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_PROGRAM), 0xe000, 0xefff, 0, 0, devram_r); // protection device lives here
 }
 
 

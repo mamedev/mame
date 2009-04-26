@@ -69,7 +69,7 @@ static READ8_HANDLER( triothep_control_r )
 static WRITE8_HANDLER( actfancr_sound_w )
 {
 	soundlatch_w(space,0,data & 0xff);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -276,7 +276,7 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate); /* IRQ */
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate); /* IRQ */
 }
 
 static const ym3812_interface ym3812_config =
@@ -583,12 +583,12 @@ static READ8_HANDLER( cyclej_r )
 
 static DRIVER_INIT( actfancr )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cycle_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cycle_r);
 }
 
 static DRIVER_INIT( actfancj )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
 }
 
 

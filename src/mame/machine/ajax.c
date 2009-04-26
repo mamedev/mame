@@ -142,11 +142,11 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 				watchdog_reset_w(space, 0, data);
 			else{
 				if (firq_enable)	/* Cause interrupt on slave CPU */
-					cpu_set_input_line(space->machine->cpu[1], M6809_FIRQ_LINE, HOLD_LINE);
+					cputag_set_input_line(space->machine, "sub", M6809_FIRQ_LINE, HOLD_LINE);
 			}
 			break;
 		case 0x01:	/* Cause interrupt on audio CPU */
-			cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
+			cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 			break;
 		case 0x02:	/* Sound command number */
 			soundlatch_w(space,offset,data);
@@ -204,7 +204,7 @@ MACHINE_START( ajax )
 
 MACHINE_RESET( ajax )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	ajax_bankswitch_w(space, 0, 0);
 	ajax_bankswitch_2_w(space, 0, 0);
 }
