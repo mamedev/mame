@@ -16,7 +16,6 @@ Notes:
     It probably has a lot to do with the network (Roads Edge network connectors are on this board).
     And since it can return any value at any time, it may be responsible for fatfurwa's missing palette.
   * The Toshiba CPU datasheet is here : http://www.semicon.toshiba.co.jp/openb2b/websearch/productDetails.jsp?partKey=TMP87CH40N
-  * The internal ROM needs dumping.  Rumor has it, it's the same MCU as in Naomi hardware...
 
   * From the Roads Edge manual : "The Network Check screen will be displayed for about 40 seconds whether
                                   the cabinet is connected for communication competition or not.  After this,
@@ -59,18 +58,6 @@ ToDo:
   * backup ram etc.
   * correct cpu speed and find idle skips
   * What is ROM1?  Data for the KL5C80?  There's plenty of physical space to map it to.
-*/
-
-/*
-Known games on this system
-
-Beast Busters 2nd Nightmare ( http://emustatus.rainemu.com/games/bbustr2nd.htm )
-Buriki One ( http://emustatus.rainemu.com/games/buriki1.htm )
-Fatal Fury: Wild Ambition ( http://emustatus.rainemu.com/games/ffurywa.htm )
-Roads Edge / Round Trip? ( http://emustatus.rainemu.com/games/redge.htm )
-Samurai Shodown 64 ( http://emustatus.rainemu.com/games/sams64.htm )
-Samurai Shodown: Warrior's Rage ( http://emustatus.rainemu.com/games/samswr.htm )
-Xtreme Rally / Offbeat Racer ( http://emustatus.rainemu.com/games/xrally.htm )
 */
 
 /*
@@ -1454,7 +1441,7 @@ static DRIVER_INIT( hng64 )
 
 static DRIVER_INIT(hng64_fght)
 {
-	no_machine_error_code=0x01010101;
+	no_machine_error_code=0x01000000;
 	DRIVER_INIT_CALL(hng64);
 }
 
@@ -1473,7 +1460,14 @@ static DRIVER_INIT( ss64 )
 
 static DRIVER_INIT(hng64_race)
 {
-	no_machine_error_code=0x02020202;
+	no_machine_error_code=0x02000000;
+	DRIVER_INIT_CALL(hng64);
+}
+
+static DRIVER_INIT(hng64_shoot)
+{
+	hng64_boothack = 2;
+	no_machine_error_code=0x03000000;
 	DRIVER_INIT_CALL(hng64);
 }
 
@@ -1601,7 +1595,7 @@ ROM_START( hng64 )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 
 	/* To placate MAME */
-	ROM_REGION32_LE( 0x2000000, "user3", ROMREGION_ERASEFF ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", ROMREGION_ERASEFF ) 
 	ROM_REGION( 0x4000, "gfx1", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "gfx3", ROMREGION_ERASEFF )
@@ -1620,7 +1614,7 @@ ROM_START( roadedge )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
 	ROM_LOAD32_WORD( "001pr01b.81", 0x0000000, 0x400000, CRC(effbac30) SHA1(c1bddf3e511a8950f65ac7e452f81dbc4b7fd977) )
 	ROM_LOAD32_WORD( "001pr02b.82", 0x0000002, 0x400000, CRC(b9aa4ad3) SHA1(9ab3c896dbdc45560b7127486e2db6ca3b15a057) )
 
@@ -1679,7 +1673,7 @@ ROM_START( sams64_2 )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
 	ROM_LOAD32_WORD( "005pr01a.81", 0x0000000, 0x400000, CRC(a69d7700) SHA1(a580783a109bc3e24248d70bcd67f62dd7d8a5dd) )
 	ROM_LOAD32_WORD( "005pr02a.82", 0x0000002, 0x400000, CRC(38b9e6b3) SHA1(d1dad8247d920cc66854a0096e1c7845842d2e1c) )
 	ROM_LOAD32_WORD( "005pr03a.83", 0x0800000, 0x400000, CRC(0bc738a8) SHA1(79893b0e1c4a31e02ab385c4382684245975ae8f) )
@@ -1757,7 +1751,7 @@ ROM_START( sams64 )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 	
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
 	ROM_LOAD32_WORD( "002-pro1a.81", 0x0000000, 0x400000, CRC(e5b907c5) SHA1(83637ffaa9031d41a5bed3397a519d1dfa8052cb) )
 	ROM_LOAD32_WORD( "002-pro2a.82", 0x0000002, 0x400000, CRC(803ed2eb) SHA1(666db47886a316e68b911311e5db3bc0f5b8a34d) )
 	ROM_LOAD32_WORD( "002-pro3a.83", 0x0800000, 0x400000, CRC(582156a7) SHA1(a7bbbd472a53072cbfaed5d41d4265123c9e3f3d) )
@@ -1810,6 +1804,109 @@ ROM_START( sams64 )
 ROM_END
 
 
+ROM_START( xrally )
+	/* BIOS */
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
+	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
+	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
+	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	/* END BIOS */
+	
+	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
+	ROM_LOAD32_WORD( "003-pr01a.81", 0x0000000, 0x400000, CRC(4e160388) SHA1(08fba66d0f0dab47f7db5bc7d411f4fc0e8219c8) )
+	ROM_LOAD32_WORD( "003-pr02a.82", 0x0000002, 0x400000, CRC(c4dd4f18) SHA1(4db0e6d5cabd9e4f82d5905556174b9eff8ad4d9) )
+
+	/* Scroll Characters 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x4000000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "003-sc01a.41", 0x0000000, 0x400000, CRC(bc608584) SHA1(fa4b618eb36f302f58cefea7c50618a8318927d6) )
+	ROM_LOAD32_BYTE( "003-sc02a.42", 0x0000001, 0x400000, CRC(c810e9e2) SHA1(4f0d35d9b0af2a4b66253e467c0d30a519c904b6) )
+	ROM_LOAD32_BYTE( "003-sc03a.43", 0x0000002, 0x400000, CRC(12724653) SHA1(5e40947086883d64db84ac51a1b29efa2f173f58) )
+	ROM_LOAD32_BYTE( "003-sc04a.44", 0x0000003, 0x400000, CRC(b0062c4d) SHA1(73c75b59dc1463ad80f805191f4605a6b4b1c321) )
+
+	/* Sprite Characters - 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x4000000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "003-sp01a.53",0x0000000, 0x400000, CRC(12a329dc) SHA1(00929f3c460cce5a3657dec73d467731e59de564) )
+	ROM_LOAD32_BYTE( "003-sp02a.54",0x0000001, 0x400000, CRC(ee9e5338) SHA1(681c2f34a2f292ce14fcbef4447ede7b949c7117) )
+	ROM_LOAD32_BYTE( "003-sp03a.55",0x0000002, 0x400000, CRC(6fa8dff9) SHA1(500bd128e6568e9491e52676775e9239adc332fe) )
+	ROM_LOAD32_BYTE( "003-sp04a.56",0x0000003, 0x400000, CRC(a98eec07) SHA1(de0c7db56b851daa369f37088bd536933372346f) )
+
+	/* Textures - 1024x1024x8 pages */
+	ROM_REGION( 0x1000000, "gfx3", 0 )
+	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	ROM_LOAD( "003-tx01a.13", 0x0000000, 0x400000, CRC(83ea2178) SHA1(931898f57564b8b9975e06df5ccfd8c84fc2fbe3) )
+	ROM_LOAD( "003-tx02a.14", 0x0400000, 0x400000, CRC(7912f4be) SHA1(bca44c1415a25f2349857b2246e3ee7abe709a84) )
+	ROM_LOAD( "003-tx03a.15", 0x0800000, 0x400000, CRC(a319c94e) SHA1(14d720cdd8b9411fd82a7b4b33ee5dbfdd01c9f8) )
+	ROM_LOAD( "003-tx04a.16", 0x0c00000, 0x400000, CRC(16d7805b) SHA1(4cc7b2375832c2f9f20fe882e604a2a52bf07f6f) )
+	
+	/* X,Y,Z Vertex ROMs */
+	ROM_REGION( 0x1800000, "gfx4", ROMREGION_NODISPOSE )
+	ROMX_LOAD( "003-vt01a.17", 0x0000000, 0x400000, CRC(3e5e275d) SHA1(74f5ec88c258bc224e271f7abeb02d6485e27d8c), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "003-vt02a.18", 0x0000002, 0x400000, CRC(da7b956e) SHA1(c57cbb8c51145ae224faba5b6a1a7e61cb2bee64), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "003-vt03a.19", 0x0000004, 0x400000, CRC(4fe72cb7) SHA1(9f8e662f0656f201924834d1ee78498d4223745e), ROM_GROUPWORD | ROM_SKIP(4) )
+
+	ROM_REGION( 0x1000000, "samples", ROMREGION_DISPOSE ) /* Sound Samples? */
+	ROM_LOAD( "003-sd01a.77", 0x0000000, 0x400000, CRC(c43898ff) SHA1(0e49b87181b56c62a674d255d326f761942b99b1) )
+	ROM_LOAD( "003-sd02a.78", 0x0400000, 0x400000, CRC(079a3d5a) SHA1(a97b052de69fee7d605cae30f5a228e6ffeabb26) )
+	ROM_LOAD( "003-sd03a.79", 0x0800000, 0x400000, CRC(96c0991a) SHA1(01be872b3e307258236fe96a544417dd8a0bc8bd) )
+ROM_END
+
+
+ROM_START( bbust2 )
+	/* BIOS */
+	ROM_REGION32_BE( 0x0100000, "user1", 0 ) /* 512k for R4300 BIOS code */
+	ROM_LOAD ( "brom1.bin", 0x000000, 0x080000,  CRC(a30dd3de) SHA1(3e2fd0a56214e6f5dcb93687e409af13d065ea30) )
+	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS and unknown ROM */
+	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
+	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	/* END BIOS */
+	
+	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
+	ROM_LOAD32_WORD( "004-pr01a.81", 0x0000000, 0x400000, CRC(7b836ece) SHA1(7a4a08251f1dd66c368ac203f5a006266e77f73d) )
+	ROM_LOAD32_WORD( "004-pr02a.82", 0x0000002, 0x400000, CRC(8c55a988) SHA1(d9a61ac3d8550ce0ee6aab374c9f024912163180) )
+	ROM_LOAD32_WORD( "004-pr03a.83", 0x0800000, 0x400000, CRC(f25a82dd) SHA1(74c0a03021ef424e0b9c3c818be297d2967b3012) )
+	ROM_LOAD32_WORD( "004-pr04a.84", 0x0800002, 0x400000, CRC(9258312b) SHA1(fabac42c8a033e85d503be56f266f9386adff10b) )
+
+	/* Scroll Characters 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x4000000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "004-sc01a.41", 0x0000000, 0x400000, CRC(0b52987e) SHA1(3c7b0ce9416dea8db4cf63431166fcfa7c3bb168) )
+	ROM_LOAD32_BYTE( "004-sc02a.42", 0x0000001, 0x400000, CRC(6b55309d) SHA1(87761deed6d842075bbe13abc444ac502274eeba) )
+	ROM_LOAD32_BYTE( "004-sc03a.43", 0x0000002, 0x400000, CRC(17302f01) SHA1(5b6a927c520e421aa31b9162d3e47b06069b4bd0) )
+	ROM_LOAD32_BYTE( "004-sc04a.44", 0x0000003, 0x400000, CRC(db31d73c) SHA1(8a6847e367e87a081cd1499294935c45f1fb4794) )
+
+	/* Sprite Characters - 8x8x8 / 16x16x8 */
+	ROM_REGION( 0x4000000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD32_BYTE( "004-sp01a.53",0x0000000, 0x400000, CRC(72fe73c3) SHA1(82825705076c40558d414653386e3bf1d0693008) )
+	ROM_LOAD32_BYTE( "004-sp02a.54",0x0000001, 0x400000, CRC(1ece1cff) SHA1(78d88e96df979a834b5af091d3feda8b9cd466e0) )
+	ROM_LOAD32_BYTE( "004-sp03a.55",0x0000002, 0x400000, CRC(9049ab14) SHA1(0a19ccbd82f000eba19a0b407fa5765db0464cca) )
+	ROM_LOAD32_BYTE( "004-sp04a.56",0x0000003, 0x400000, CRC(8f7fb914) SHA1(dd1709881bf1d9e233b4e794c0e2ce28d265f855) )
+	ROM_LOAD32_BYTE( "004-sp05a.57",0x1000000, 0x400000, CRC(440ce760) SHA1(f6f256334c32fe7d25448fba73f8966c4c5b1cba) )
+	ROM_LOAD32_BYTE( "004-sp06a.58",0x1000001, 0x400000, CRC(fc24d2e5) SHA1(073dcb21ec6cf9c6a81987a54c0e27a2db499341) )
+	ROM_LOAD32_BYTE( "004-sp07a.59",0x1000002, 0x400000, CRC(bc580b81) SHA1(c668d0524fdc53c6ba2f3e5120f2dee7ce4279bb) )
+	ROM_LOAD32_BYTE( "004-sp08a.60",0x1000003, 0x400000, CRC(d6c69bea) SHA1(24508c0ed0ca135316aec1c8239e8b755070384a) )
+
+	/* Textures - 1024x1024x8 pages */
+	ROM_REGION( 0x1000000, "gfx3", 0 )
+	/* note: same roms are at different positions on the board, repeated a total of 4 times*/
+	ROM_LOAD( "004-tx01a.13", 0x0000000, 0x400000, CRC(12a78a20) SHA1(a5c1c8841cd0cb5efbf7408d908fa10a743e5c6f) )
+	ROM_LOAD( "004-tx02a.14", 0x0400000, 0x400000, CRC(a36c6c34) SHA1(3e4ad293b064a7c05aa23447ff5f17010cae2863) )
+	ROM_LOAD( "004-tx03a.15", 0x0800000, 0x400000, CRC(f46377c0) SHA1(bfa6fc3ab89599a4443577d18578569ad55774bd) )
+	ROM_LOAD( "004-tx04a.16", 0x0c00000, 0x400000, CRC(b5f0ef01) SHA1(646bfb17b9e81aecf8db33d3a021f7769b262eda) )
+	
+	/* X,Y,Z Vertex ROMs */
+	ROM_REGION( 0x1800000, "gfx4", ROMREGION_NODISPOSE )
+	ROMX_LOAD( "004-vt01a.17", 0x0000000, 0x400000, CRC(25ebbf9b) SHA1(b7c3fb9ee9cf75824d908e7a94970282f1845d5d), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "004-vt02a.18", 0x0000002, 0x400000, CRC(279fc216) SHA1(eb90cc347745491c1d1b1fb611fd6e227310731c), ROM_GROUPWORD | ROM_SKIP(4) )
+	ROMX_LOAD( "004-vt03a.19", 0x0000004, 0x400000, CRC(e0cf6a42) SHA1(dd09b3d05739cf030c820cd7dbaea2e7262764ab), ROM_GROUPWORD | ROM_SKIP(4) )
+
+	ROM_REGION( 0x1000000, "samples", ROMREGION_DISPOSE ) /* Sound Samples? */
+	ROM_LOAD( "004-sd01a.77", 0x0000000, 0x400000, CRC(2ef868bd) SHA1(0a1ef002efe6738698ebe98a1c3695b151fdd282) )
+	ROM_LOAD( "004-sd02a.78", 0x0400000, 0x400000, CRC(07fb3135) SHA1(56cc8e29ba9b13f82a4c9248bff02e2b7a0c49b0) )
+	ROM_LOAD( "004-sd03a.79", 0x0800000, 0x400000, CRC(42571f1d) SHA1(425cbd3f7c8aea1c0f057ea8f186acffb0091dc0) )
+ROM_END
+
+
+
 ROM_START( fatfurwa )
 
 	/* BIOS */
@@ -1820,7 +1917,7 @@ ROM_START( fatfurwa )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
 	ROM_LOAD32_WORD( "006pr01a.81", 0x0000000, 0x400000, CRC(3830efa1) SHA1(9d8c941ccb6cbe8d138499cf9d335db4ac7a9ec0) )
 	ROM_LOAD32_WORD( "006pr02a.82", 0x0000002, 0x400000, CRC(8d5de84e) SHA1(e3ae014263f370c2836f62ab323f1560cb3a9cf0) )
 	ROM_LOAD32_WORD( "006pr03a.83", 0x0800000, 0x400000, CRC(c811b458) SHA1(7d94e0df501fb086b2e5cf08905d7a3adc2c6472) )
@@ -1891,7 +1988,7 @@ ROM_START( buriki )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) /* Program Code, mapped at ??? maybe banked?  LE? */
+	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
 	ROM_LOAD32_WORD( "007pr01b.81", 0x0000000, 0x400000, CRC(a31202f5) SHA1(c657729b292d394ced021a0201a1c5608a7118ba) )
 	ROM_LOAD32_WORD( "007pr02b.82", 0x0000002, 0x400000, CRC(a563fed6) SHA1(9af9a021beb814e35df968abe5a99225a124b5eb) )
 	ROM_LOAD32_WORD( "007pr03a.83", 0x0800000, 0x400000, CRC(da5f6105) SHA1(5424cf5289cef66e301e968b4394e551918fe99b) )
@@ -1959,10 +2056,10 @@ GAME( 1997, hng64,  0,        hng64, hng64, hng64,      ROT0, "SNK", "Hyper NeoG
 
 /* Games */
 GAME( 1997, roadedge, hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Roads Edge / Round Trip (rev.B)",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 001 */
-GAME( 1998, sams64,   hng64,  hng64, hng64, ss64, ROT0, "SNK", "Samurai Shodown 64",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 002 */
-/* Xtreme Rally / Offbeat Racer 003 */
-/* Beast Busters 2nd Nightmare  004 */
-GAME( 1998, sams64_2, hng64,  hng64, hng64, ss64, ROT0, "SNK", "Samurai Shodown: Warrior's Rage",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
-GAME( 1998, fatfurwa, hng64,  hng64, hng64, fatfurwa, ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
-GAME( 1999, buriki,   hng64,  hng64, hng64, fatfurwa, ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
+GAME( 1998, sams64,   hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 002 */
+GAME( 1998, xrally,   hng64,  hng64, hng64, hng64_race, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 003 */
+GAME( 1998, bbust2,   hng64,  hng64, hng64, hng64_shoot,ROT0, "SNK", "Beast Busters 2nd Nightmare",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 004 */
+GAME( 1998, sams64_2, hng64,  hng64, hng64, ss64,       ROT0, "SNK", "Samurai Shodown: Warrior's Rage / Samurai Spirits 2: Asura Zanmaden",	  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 005 */
+GAME( 1998, fatfurwa, hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Fatal Fury: Wild Ambition (rev.A)", GAME_NOT_WORKING|GAME_NO_SOUND )	/* 006 */
+GAME( 1999, buriki,   hng64,  hng64, hng64, fatfurwa,   ROT0, "SNK", "Buriki One (rev.B)",				  GAME_NOT_WORKING|GAME_NO_SOUND )	/* 007 */
 

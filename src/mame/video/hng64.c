@@ -103,7 +103,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int xpos, ypos, tileno,chainx,chainy,xflip;
 		int xdrw,ydrw,pal,xinc,yinc,yflip;
 		UINT32 zoomx,zoomy;
-		float foomX, foomY;
+		//float foomX, foomY;
 		source-=8;
 
 		ypos = (source[0]&0xffff0000)>>16;
@@ -129,6 +129,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		/* Calculate the zoom */
 		/* First, prevent any possible divide by zero errors */
+
+#if 0
 		if(!zoomx) zoomx=0x1000;
 		if(!zoomy) zoomy=0x1000;
 
@@ -140,7 +142,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		zoomx += (int)((foomX - floor(foomX)) * (float)0x10000) ;
 		zoomy += (int)((foomY - floor(foomY)) * (float)0x10000) ;
+#endif
 
+		zoomx = 0x10000;
+		zoomy = 0x10000;
 
 		if (source[3]&0x00800000) // maybe ..
 		{
@@ -160,22 +165,27 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		// Accomodate for chaining and flipping
 		if(xflip)
 		{
-			xinc=-(int)(16.0f*foomX);
+			//xinc=-(int)(16.0f*foomX);
+			
+			xinc=-16;
 			xpos-=xinc*chainx;
 		}
 		else
 		{
-			xinc=(int)(16.0f*foomX);
+			//xinc=(int)(16.0f*foomX);
+			xinc = 16;
 		}
 
 		if(yflip)
 		{
-			yinc=-(int)(16.0f*foomY);
+			//yinc=-(int)(16.0f*foomY);
+			yinc = -16;
 			ypos-=yinc*chainy;
 		}
 		else
 		{
-			yinc=(int)(16.0f*foomY);
+			yinc = 16;
+			//yinc=(int)(16.0f*foomY);
 		}
 
 
