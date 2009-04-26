@@ -26,6 +26,19 @@ static tilemap *goldstar_fg_tilemap;
 static UINT8 cmaster_girl_num;
 static UINT8 cmaster_girl_pal;
 static UINT8 cm_enable_reg;
+static UINT8 cm_girl_scroll;
+
+WRITE8_HANDLER( cm_girl_scroll_w )
+{
+	cm_girl_scroll = data;
+	/*
+	    xxxx ----  yscroll
+		---- xxxx  xscroll
+
+		this isn't very fine scrolling, but i see no other registers.
+		1000 1000 is the center of the screen.
+	*/
+}
 
 WRITE8_HANDLER( cm_outport0_w )
 {
@@ -213,7 +226,18 @@ WRITE8_HANDLER( cm_background_col_w )
 	cmaster_girl_num = (data >> 4)&0x7;
 	cmaster_girl_pal = (data >> 2)&0x3;
 
+	//bgcolor = (data & 0x03) >> 0;
+
+	// apparently some boards have this colour scheme?
+	// i'm not convinced it isn't just a different prom on them
+	#if 0
+	bgcolor = 0;
+	bgcolor |= (data & 0x01) << 1;
+	bgcolor |= (data & 0x02) >> 1;
+	#else
 	bgcolor = (data & 0x03) >> 0;
+	#endif
+
 	tilemap_mark_all_tiles_dirty (goldstar_reel1_tilemap);
 	tilemap_mark_all_tiles_dirty (goldstar_reel2_tilemap);
 	tilemap_mark_all_tiles_dirty (goldstar_reel3_tilemap);
@@ -262,7 +286,10 @@ VIDEO_UPDATE( goldstar )
 		if (memory_region(screen->machine,"user1"))
 		{
 			const gfx_element *gfx = screen->machine->gfx[2];
-			drawgfxzoom(bitmap,gfx,cmaster_girl_num,cmaster_girl_pal,0,0,32*8,16*8,cliprect,TRANSPARENCY_PEN,0, 0x20000, 0x10000);
+			int girlyscroll = (INT8)((cm_girl_scroll & 0xf0));
+			int girlxscroll = (INT8)((cm_girl_scroll & 0x0f)<<4);
+			
+			drawgfxzoom(bitmap,gfx,cmaster_girl_num,cmaster_girl_pal,0,0,-(girlxscroll*2),-(girlyscroll),cliprect,TRANSPARENCY_PEN,0, 0x20000, 0x10000);
 		}
 	}
 

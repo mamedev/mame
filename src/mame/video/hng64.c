@@ -528,7 +528,7 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 				// GEOMETRY
 				;
 
-				threeDRoms = memory_region(machine, "gfx4") ;
+				threeDRoms = memory_region(machine, "verts") ;
 
 				/////////////////////////
 				// GET THE HEADER INFO //
@@ -947,13 +947,24 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 }
 
 
-/* 8x8 tiles, 4bpp layer */
+/* 8x8x4bpp layer */
 static TILE_GET_INFO( get_hng64_tile0_info )
 {
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index];
 	pal = hng64_videoram[tile_index]>>24;
-	SET_TILE_INFO((tileno&1)?0:1,(tileno&0x3fffff)>>1,pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+
+	if (tileno&0x200000)
+	{
+		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
+	}
+	
+	tileno &= 0x1fffff;
+	
+	SET_TILE_INFO(0,tileno, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+
+	// beast busters requires this (8x8x8)
+//	SET_TILE_INFO(1,(tileno&0x3fffff)>>1,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
 }
 
 /* 16x16 tiles, 8bpp layer */
@@ -963,7 +974,17 @@ static TILE_GET_INFO( get_hng64_tile1_info )
 	tileno = hng64_videoram[tile_index+(0x10000/4)];
 	pal = hng64_videoram[tile_index+(0x10000/4)]>>24;
 
-	SET_TILE_INFO(3,(tileno&0x3fffff)>>3,pal>>4,  TILE_FLIPYX((tileno&0xc00000)>>22) );
+	if (tileno&0x200000)
+	{
+		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
+	}
+		
+	tileno &= 0x1fffff;
+	
+	SET_TILE_INFO(3,tileno>>3,pal>>4,  TILE_FLIPYX((tileno&0xc00000)>>22) );
+
+	// samurai shodown 64 requires this (16x16x4)
+	//SET_TILE_INFO(2,(tileno&0x3fffff)>>2,pal,  TILE_FLIPYX((tileno&0xc00000)>>22) );
 }
 
 /* 16x16 tiles, 8bpp layer */
@@ -972,7 +993,18 @@ static TILE_GET_INFO( get_hng64_tile2_info )
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index+(0x20000/4)];
 	pal = hng64_videoram[tile_index+(0x20000/4)]>>24;
-	SET_TILE_INFO(3,(tileno&0x3fffff)>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+
+	if (tileno&0x200000)
+	{
+		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
+	}
+		
+	tileno &= 0x1fffff;
+	
+	SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+	
+	// samurai shodown 64 2 japan warning reuqires this (16x16x4)
+	//SET_TILE_INFO(2,(tileno&0x3fffff)>>2,pal,  TILE_FLIPYX((tileno&0xc00000)>>22) );
 }
 
 /* 16x16 tiles, 8bpp layer */
@@ -981,238 +1013,40 @@ static TILE_GET_INFO( get_hng64_tile3_info )
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index+(0x30000/4)];
 	pal = hng64_videoram[tile_index+(0x30000/4)]>>24;
-	SET_TILE_INFO(3,(tileno&0x3fffff)>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+
+	if (tileno&0x200000)
+	{
+		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
+	}
+		
+	tileno &= 0x1fffff;	
+	
+	SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
 }
 
 
 
-/* Tilemaps zoom, and probably rotate.. they can have linescroll/lineselect,
-looks like the zoom center can move too..
-not sure how these features are enabled up yet */
-
-static int gatherPixelsForLine(bitmap_t *tilemapBitmap,
-							   INT32 startX, INT32 startY, INT32 endX, INT32 endY,
-							   UINT16 *penList)
+static void hng64_drawtilemap( bitmap_t *bitmap, const rectangle *cliprect, int scrollbase, tilemap* tilemap )
 {
-	int retVal = 0 ;
+	int xscroll,yscroll,xzoom,yzoom;
 
-	// !! BRESENHAM'S AGAIN - I REALLY SHOULD GENERALIZE THIS !!
-
-#define SWAP(a,b) tmpswap = a; a = b; b = tmpswap;
-
-	INT32 i;
-	INT32 steep = 1;
-	INT32 sx, sy;  /* step positive or negative (1 or -1) */
-	INT32 dx, dy;  /* delta (difference in X and Y between points) */
-	INT32 e;
-
-	/*
-    * inline swap. On some architectures, the XOR trick may be faster
-    */
-	INT32 tmpswap;
-
-	/*
-    * optimize for vertical and horizontal lines here
-    */
-
-	dx = abs(endX - startX);
-	sx = ((endX - startX) > 0) ? 1 : -1;
-	dy = abs(endY - startY);
-	sy = ((endY - startY) > 0) ? 1 : -1;
-
-	if (dy > dx)
-	{
-		steep = 0;
-		SWAP(startX, startY);
-		SWAP(dx, dy);
-		SWAP(sx, sy);
-	}
-
-	e = (dy << 1) - dx;
-
-	for (i = 0; i < dx; i++)
-	{
-		if (steep)
-		{
-			penList[retVal] = *BITMAP_ADDR16(tilemapBitmap, startY, startX);
-			retVal++ ;
-		}
-		else
-		{
-			penList[retVal] = *BITMAP_ADDR16(tilemapBitmap, startX, startY) ;
-			retVal++ ;
-		}
-		while (e >= 0)
-		{
-			startY += sy;
-			e -= (dx << 1);
-		}
-
-		startX += sx;
-		e += (dy << 1);
-	}
-#undef SWAP
-
-
-	return retVal ;
-}
-
-static void plotTilemap3Line(running_machine *machine,
-							 bitmap_t *tilemapBitmap,
-							 INT32 startX, INT32 startY, INT32 endX, INT32 endY,
-							 INT32 screenY, bitmap_t *bitmap)
-{
-	int i ;
-
-	int numPix ;
-	UINT16 penList[0x1000] ;			// 4k of pixels to be safe
-
-	float pixStride, pixOffset ;
-
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-
-//  mame_printf_debug("(%d,%d) (%d,%d)\n", startX, startY, endX, endY) ;
-
-	// CLAMP - BUT I'M PRETTY SURE THIS ISN'T QUITE RIGHT !!! ???
-	startX += 1024 ; if (startX < 0) startX = 0 ; else if (startX >= 2048) startX = 2048-1 ;
-	startY += 1024 ; if (startY < 0) startY = 0 ; else if (startY >= 2048) startY = 2048-1 ;
-	endX += 1024 ; if (endX < 0) endX = 0 ; else if (endX >= 2048) endX = 2048-1 ;
-	endY += 1024 ; if (endY < 0) endY = 0 ; else if (endY >= 2048) endY = 2048-1 ;
-
-	numPix = gatherPixelsForLine(tilemapBitmap, startX, startY, endX, endY, penList) ;
-
-	pixStride = (float)numPix / (float)(visarea->max_x-1) ;
-	pixOffset = 0 ;
-
-	if (numPix == 0)
-		penList[0] = *BITMAP_ADDR16(tilemapBitmap, 1024, 1024);
-
-//  mame_printf_debug("numpix %d ps %f po %f s(%d,%d) e(%d,%d)\n", numPix, pixStride, pixOffset, startX, startY, endX, endY) ;
-
-	// Draw out the screen's line...
-	for (i = visarea->min_x; i < visarea->max_x; i++)
-	{
-		// Nearest-neighbor interpolation for now (but i doubt it does linear)
-		UINT16 tmPen = penList[(int)pixOffset] ;
-
-		*BITMAP_ADDR32(bitmap, screenY, i) = palette_get_color(machine, tmPen) | 0xff000000;
-
-		pixOffset += pixStride ;
-	}
-}
-
-static void hng64_drawtilemap3(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
-{
-	int i ;
-
-	bitmap_t *srcbitmap = tilemap_get_pixmap( hng64_tilemap3 );
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-
-//  usrintf_showmessage("%d", hng64_hackTm3Count) ;
-
-	if (hng64_hackTm3Count/4 < visarea->max_y)
-	{
-		for (i = 0; i < hng64_hackTm3Count/4; i++)
-		{
-			UINT32 address = hng64_rowScrollOffset + 0xbf0 ;
-			address -= (i * 0x10) ;
-			address /= 4 ;
-			//mame_printf_debug("nums : %.4x %.4x %.4x %.4x\n", (INT16)((hng64_videoram[address+0x0]&0xffff0000) >> 16),
-			//                                     (INT16)((hng64_videoram[address+0x1]&0xffff0000) >> 16),
-			//                                     (INT16)((hng64_videoram[address+0x2]&0xffff0000) >> 16),
-			//                                     (INT16)((hng64_videoram[address+0x3]&0xffff0000) >> 16)) ;
-
-			plotTilemap3Line(machine, srcbitmap,
-							 (INT16)((hng64_videoram[address+0x0]&0xffff0000) >> 16),
-							 (INT16)((hng64_videoram[address+0x2]&0xffff0000) >> 16),
-							 (INT16)((hng64_videoram[address+0x1]&0xffff0000) >> 16),
-							 (INT16)((hng64_videoram[address+0x3]&0xffff0000) >> 16),
-							 (visarea->max_y-1)-i,
-							 bitmap) ;
-		}
-	}
-
-	// Maybe the scrollbase should be used instead of my hacky hng64_rowScrollOffset :)?
-//  scrollbase = (hng64_videoregs[0x05]&0x00003fff)>>0;
-
-//  xscroll = hng64_videoram[(0x40000+(scrollbase<<4))/4]>>16;
-//  yscroll = hng64_videoram[(0x40008+(scrollbase<<4))/4]>>16;
-//  xzoom   = hng64_videoram[(0x40010+(scrollbase<<4))/4]>>16;
-//  yzoom   = hng64_videoram[(0x4000c+(scrollbase<<4))/4]>>16;
-//  xzoom   = xzoom-xscroll;
-//  yzoom   = yzoom-yscroll;
-//  xzoom &=0xffff;
-//  yzoom &=0xffff;
-
-//  xscroll <<=16;
-//  yscroll <<=16;
-//  xzoom <<=8;
-//  yzoom <<=8;
-
-//  tilemap_set_scrollx(hng64_tilemap3,0, xscroll);
-//  tilemap_set_scrolly(hng64_tilemap3,0, yscroll);
-
-//  tilemap_draw(bitmap,cliprect,hng64_tilemap3,0,0);
-
-//  tilemap_draw_roz(bitmap,cliprect,hng64_tilemap3,xscroll,yscroll,
-//          xzoom,0,0,yzoom,
-//          1,
-//          0,0);
-}
-
-static void hng64_drawtilemap2( bitmap_t *bitmap, const rectangle *cliprect )
-{
-	int scrollbase,xscroll,yscroll,xzoom,yzoom;
-
-	scrollbase = (hng64_videoregs[0x05]&0x3fff0000)>>16;
 	xscroll = (INT16)(hng64_videoram[(0x40000+(scrollbase<<4))/4]>>16);
 	// ???  = (INT16)(hng64_videoram[(0x40004+(scrollbase<<4))/4]>>16);
 	yscroll = (INT16)(hng64_videoram[(0x40008+(scrollbase<<4))/4]>>16);
-	yzoom   = (INT16)(hng64_videoram[(0x4000c+(scrollbase<<4))/4]>>16);
-	xzoom   = (INT16)(hng64_videoram[(0x40010+(scrollbase<<4))/4]>>16);
+//	xzoom   = (INT16)(hng64_videoram[(0x40010+(scrollbase<<4))/4]>>16);
+//	yzoom   = (INT16)(hng64_videoram[(0x4000c+(scrollbase<<4))/4]>>16);
 	// ???  = (INT16)(hng64_videoram[(0x40014+(scrollbase<<4))/4]>>16);
 	// ???  = (INT16)(hng64_videoram[(0x40018+(scrollbase<<4))/4]>>16);
 	// ???  = (INT16)(hng64_videoram[(0x4001c+(scrollbase<<4))/4]>>16);
-	xzoom   = xzoom-xscroll;
-	yzoom   = yzoom-yscroll;
-	xzoom &=0xffff;
-	yzoom &=0xffff;
 
 	xscroll <<=16;
 	yscroll <<=16;
-	xzoom <<=8;
-	yzoom <<=8;
 
-	tilemap_draw_roz(bitmap,cliprect,hng64_tilemap2,xscroll,yscroll,
-			xzoom,0,0,yzoom,
-			1,
-			0,0);
-}
+	xzoom = 0x10000;
+	yzoom = 0x10000;
 
-static void hng64_drawtilemap1( bitmap_t *bitmap, const rectangle *cliprect )
-{
-	int scrollbase,xscroll,yscroll,xzoom,yzoom;
 
-	scrollbase = (hng64_videoregs[0x04]&0x00003fff)>>0;
-	xscroll = (INT16)(hng64_videoram[(0x40000+(scrollbase<<4))/4]>>16);
-	// ???  = (INT16)(hng64_videoram[(0x40004+(scrollbase<<4))/4]>>16);
-	yscroll = (INT16)(hng64_videoram[(0x40008+(scrollbase<<4))/4]>>16);
-	xzoom   = (INT16)(hng64_videoram[(0x40010+(scrollbase<<4))/4]>>16);
-	yzoom   = (INT16)(hng64_videoram[(0x4000c+(scrollbase<<4))/4]>>16);
-	// ???  = (INT16)(hng64_videoram[(0x40014+(scrollbase<<4))/4]>>16);
-	// ???  = (INT16)(hng64_videoram[(0x40018+(scrollbase<<4))/4]>>16);
-	// ???  = (INT16)(hng64_videoram[(0x4001c+(scrollbase<<4))/4]>>16);
-	xzoom   = xzoom-xscroll;
-	yzoom   = yzoom-yscroll;
-	xzoom &=0xffff;
-	yzoom &=0xffff;
-
-	xscroll <<=16;
-	yscroll <<=16;
-	xzoom <<=8;
-	yzoom <<=8;
-
-	tilemap_draw_roz(bitmap,cliprect,hng64_tilemap1,xscroll,yscroll,
+	tilemap_draw_roz(bitmap,cliprect,tilemap,xscroll,yscroll,
 			xzoom,0,0,yzoom,
 			1,
 			0,0);
@@ -1240,10 +1074,8 @@ static void hng64_drawtilemap1( bitmap_t *bitmap, const rectangle *cliprect )
  *   8    | oooooooo | unknown - always seems to be 80008000 (fatfurwa)
  *   9    | oooooooo | unknown - always seems to be 00000000 (fatfurwa)
  *   a    | oooooooo | unknown - always seems to be 00000000 (fatfurwa)
- *   b    | oooooooo | unknown - 00000000 in intro - 00007ff8 when fight is going on (looks like &'ing it with 0x3fff is a good thing to do - tilemap stuff?)
- *   c    | xxxxxxxx | I'm almost positive this is some form of offset to produce animations in Tilemap1 - or maybe all tilemaps?
- *                     - 00xxx000 are used in fatfurwa during fights
- *                     - 00000?xx are used in buriki during the intro
+ *   b    | mmmmmmmm | auto animation mask for tilemaps, - use these bits from the original tile number 
+ *   c    | xxxxxxxx | auto animation bits for tilemaps, - merge in these bits to auto animate the tilemap
  *   d    | oooooooo | not used ??
  *   e    | oooooooo | not used ??
  */
@@ -1253,58 +1085,47 @@ VIDEO_UPDATE( hng64 )
 {
 	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
 
-	// Debug
-//  for (int iii = 0; iii < 0x0f; iii++)
-//      mame_printf_debug("%.8x ", hng64_videoregs[iii]) ;
-//  mame_printf_debug("\n") ;
-//  usrintf_showmessage("%.8x %.8x %.8x %.8x", hng64_videoregs[0x1], hng64_videoregs[0x3], hng64_videoregs[0xb], hng64_videoregs[0xc]) ;
+	// the tilemap auto animation and moveable tilebases means that they end up
+	// dirty most frames anyway, even with manual tracking
+	tilemap_mark_all_tiles_dirty (hng64_tilemap3);
+	tilemap_mark_all_tiles_dirty (hng64_tilemap2);
+	tilemap_mark_all_tiles_dirty (hng64_tilemap1);
+	tilemap_mark_all_tiles_dirty (hng64_tilemap0);
 
-	// I think there's something to this, but I'm not doing it right...
-	// Interestingly enough, this turns the bootup screen blue :)
-	/*
-    if (hng64_videoregs[0xc] != tilemap2Offset)
-    {
-        tilemap2Offset = hng64_videoregs[0xc] ;
-
-        tilemap_dispose(hng64_tilemap1) ;
-        hng64_tilemap1 = tilemap_create(machine, get_hng64_tile2_info,tilemap_scan_rows, 16, 16, 128,128); // 128x128x4 = 0x10000
-    }
-    */
-
-	// Rowscroll variables...
-	// usrintf_showmessage("%.8x %.8x x %.8x %.8x", hng64_videoram[0x00057bf0/4], hng64_videoram[0x00057bf4/4], hng64_videoram[0x00057bf8/4], hng64_videoram[0x00057bfc/4]) ;
-
-	// All of this priority stuff is probably done with some funky layer mixing chip -
-	//   (there are neato alpha effects on a real board, etc)
-	hng64_drawtilemap2(bitmap,cliprect);
-	hng64_drawtilemap1(bitmap,cliprect);
-	hng64_drawtilemap3(screen->machine, bitmap,cliprect);						// Draw the ground last...
-
-	// !!! This tilemap has the same flags as the 'previous' three, but they're not used in fatfurwa !!!
-	//     (in other words, we should make a similar hng64_drawtilemap0() function for this tilemap)
-	tilemap_draw(bitmap,cliprect,hng64_tilemap0,0,0);
+	
+	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x05]&0x00003fff)>>0,  hng64_tilemap3);
+	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x05]&0x3fff0000)>>16, hng64_tilemap2);
+	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x04]&0x00003fff)>>0,  hng64_tilemap1);
+	hng64_drawtilemap(bitmap,cliprect, (hng64_videoregs[0x04]&0x3fff0000)>>16, hng64_tilemap0);
 
 	draw_sprites(screen->machine, bitmap,cliprect);
 
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites :)...
 	draw3d(screen->machine, bitmap, cliprect);
 
-	/* hack to enable 2nd cpu when key is pressed */
-//  if ( input_code_pressed_once(KEYCODE_L) )
-//  {
-//      cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-//      cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
-//  }
-
-	/* AJG */
-	// if(input_code_pressed(KEYCODE_D))
-
 	transition_control(bitmap, cliprect) ;
 
+	popmessage("%08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x", 
+	hng64_videoregs[0x00],
+	hng64_videoregs[0x01],
+	hng64_videoregs[0x02],
+	hng64_videoregs[0x03],
+	hng64_videoregs[0x04],
+	hng64_videoregs[0x05],
+	hng64_videoregs[0x06],
+	hng64_videoregs[0x07],
+	hng64_videoregs[0x08],
+	hng64_videoregs[0x09],
+	hng64_videoregs[0x0a],
+	hng64_videoregs[0x0b],
+	hng64_videoregs[0x0c],
+	hng64_videoregs[0x0d],
+	hng64_videoregs[0x0e]);
+	
+	
 //  mame_printf_debug("FRAME DONE %d\n", frameCount) ;
 	frameCount++ ;
 
-	hng64_hackTilemap3 = hng64_rowScrollOffset = hng64_hackTm3Count = 0 ;
 	return 0;
 }
 
@@ -1726,7 +1547,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine, bitmap_t *Co
 {
 	float *dp = &(depthBuffer[y*video_screen_get_visible_area(machine->primary_screen)->max_x+x_start]);
 
-	const UINT8 *gfx = memory_region(machine, "gfx3");
+	const UINT8 *gfx = memory_region(machine, "textures");
 	const UINT8 *textureOffset ;
 	UINT8 paletteEntry ;
 	float t_coord, s_coord ;
