@@ -94,6 +94,8 @@ static int key_id, key_reg, key_rng, key_swap4_arg, key_swap4, key_bottom4, key_
 static unsigned int key_quotient, key_reminder, key_numerator_high_word;
 static UINT8 key[8];
 
+// used by faceoff and tankforce 4 player (input multiplex)
+static READ8_HANDLER( faceoff_inputs_r );
 
 static READ8_HANDLER( no_key_r )
 {
@@ -1192,22 +1194,7 @@ DRIVER_INIT( tankfrce )
 	namcos1_driver_init(machine, &tankfrce_specific);
 }
 
-// Inputs are multiplexed, somehow
-static READ8_HANDLER( tankfrc4_input_r )
-{
 
-	switch (offset)
-	{
-		case 0:
-			return mame_rand(space->machine);
-
-		case 1:
-			return mame_rand(space->machine);
-
-	}
-	return 0x00;
-
-}
 
 DRIVER_INIT( tankfrc4 )
 {
@@ -1217,7 +1204,7 @@ DRIVER_INIT( tankfrc4 )
 	};
 	namcos1_driver_init(machine, &tankfrce_specific);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, tankfrc4_input_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[3], ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
 }
 
 /*******************************************************************************
