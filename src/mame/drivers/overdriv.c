@@ -7,7 +7,7 @@ driver by Nicola Salmoria
 Notes:
 - Missing road (two unemulated K053250)
 - Visible area and relative placement of sprites and tiles is most likely wrong.
-- Test mode doesn't work well with 3 IRQ5 per frame, the ROM check doens't work
+- Test mode doesn't work well with 3 IRQ5 per frame, the ROM check doesn't work
   and the coin A setting isn't shown. It's OK with 1 IRQ5 per frame.
 - Some flickering sprites, this might be an interrupt/timing issue
 - The screen is cluttered with sprites which aren't supposed to be visible,
@@ -26,14 +26,10 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/k053260.h"
-
 #include "overdriv.lh"
-
 
 VIDEO_START( overdriv );
 VIDEO_UPDATE( overdriv );
-
-
 
 
 static READ16_HANDLER( K051316_0_msb_r )
@@ -203,20 +199,6 @@ static WRITE16_HANDLER( cpuB_ctrl_w )
 }
 
 
-static UINT16 *sharedram;
-
-static READ16_HANDLER( sharedram_r )
-{
-	return sharedram[offset];
-}
-
-static WRITE16_HANDLER( sharedram_w )
-{
-	COMBINE_DATA(&sharedram[offset]);
-}
-
-
-
 static READ8_DEVICE_HANDLER( overdriv_sound_r )
 {
 	return k053260_r(device,2 + offset);
@@ -240,90 +222,57 @@ static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
 
 
 
-static ADDRESS_MAP_START( overdriv_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x040000, 0x043fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( overdriv_master_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x040000, 0x043fff) AM_RAM					/* work RAM */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
-	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVREAD8("konami1", overdriv_sound_r, 0x00ff)	/* K053260 */
-	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVREAD8("konami2", overdriv_sound_r, 0x00ff)	/* K053260 */
-	AM_RANGE(0x200000, 0x203fff) AM_READ(sharedram_r)
-	AM_RANGE(0x210000, 0x210fff) AM_READ(K051316_0_msb_r)
-	AM_RANGE(0x218000, 0x218fff) AM_READ(K051316_1_msb_r)
-	AM_RANGE(0x220000, 0x220fff) AM_READ(K051316_rom_0_msb_r)
-	AM_RANGE(0x228000, 0x228fff) AM_READ(K051316_rom_1_msb_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( overdriv_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x040000, 0x043fff) AM_WRITE(SMH_RAM)	/* work RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITENOP	/* unknown (always 0x30) */
-	AM_RANGE(0x100000, 0x10001f) AM_WRITENOP	/* 053252? (LSB) */
+	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITENOP			/* unknown (always 0x30) */
+	AM_RANGE(0x100000, 0x10001f) AM_WRITENOP			/* 053252? (LSB) */
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x1c0000, 0x1c001f) AM_WRITE(K051316_ctrl_0_msb_w)
 	AM_RANGE(0x1c8000, 0x1c801f) AM_WRITE(K051316_ctrl_1_msb_w)
 	AM_RANGE(0x1d0000, 0x1d001f) AM_WRITE(K053251_msb_w)
-	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVWRITE8("konami1", k053260_w, 0x00ff)
-	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVWRITE8("konami2", k053260_w, 0x00ff)
+	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVREADWRITE8("konami1", overdriv_sound_r, k053260_w, 0x00ff)	/* K053260 */
+	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVREADWRITE8("konami2", overdriv_sound_r, k053260_w, 0x00ff)	/* K053260 */
 	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(overdriv_soundirq_w)
 	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, coin counter, start lamp, other? */
 	AM_RANGE(0x1f8000, 0x1f8001) AM_WRITE(eeprom_w)
-	AM_RANGE(0x200000, 0x203fff) AM_WRITE(sharedram_w) AM_BASE(&sharedram)
-	AM_RANGE(0x210000, 0x210fff) AM_WRITE(K051316_0_msb_w)
-	AM_RANGE(0x218000, 0x218fff) AM_WRITE(K051316_1_msb_w)
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x210000, 0x210fff) AM_READWRITE(K051316_0_msb_r,K051316_0_msb_w)
+	AM_RANGE(0x218000, 0x218fff) AM_READWRITE(K051316_1_msb_r,K051316_1_msb_w)
+	AM_RANGE(0x220000, 0x220fff) AM_READ(K051316_rom_0_msb_r)
+	AM_RANGE(0x228000, 0x228fff) AM_READ(K051316_rom_1_msb_r)
 	AM_RANGE(0x230000, 0x230001) AM_WRITE(overdriv_cpuB_irq6_w)
 	AM_RANGE(0x238000, 0x238001) AM_WRITE(overdriv_cpuB_irq5_w)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( overdriv_readmem2, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x100000, 0x10000f) AM_READNOP	// K053250 #0
-	AM_RANGE(0x108000, 0x10800f) AM_READNOP	// K053250 #1
-	AM_RANGE(0x118000, 0x118fff) AM_READ(K053247_word_r)
+static ADDRESS_MAP_START( overdriv_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x080000, 0x083fff) AM_RAM /* work RAM */
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM
+	AM_RANGE(0x100000, 0x10000f) AM_NOP	// K053250 #0
+	AM_RANGE(0x108000, 0x10800f) AM_NOP	// K053250 #1
+	AM_RANGE(0x118000, 0x118fff) AM_READWRITE(K053247_word_r,K053247_word_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ(K053246_word_r)
-	AM_RANGE(0x128000, 0x128001) AM_READ(cpuB_ctrl_r)
-	AM_RANGE(0x200000, 0x203fff) AM_READ(sharedram_r)
-	AM_RANGE(0x208000, 0x20bfff) AM_READ(SMH_RAM)
-
+	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r,cpuB_ctrl_w) 	/* enable K053247 ROM reading, plus something else */
+	AM_RANGE(0x130000, 0x130007) AM_WRITE(K053246_word_w)
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x208000, 0x20bfff) AM_RAM
 	AM_RANGE(0x218000, 0x219fff) AM_READNOP	// K053250 #0 gfx ROM read (LSB)
 	AM_RANGE(0x220000, 0x221fff) AM_READNOP	// K053250 #1 gfx ROM read (LSB)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( overdriv_writemem2, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x083fff) AM_WRITE(SMH_RAM)	/* work RAM */
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x100000, 0x10000f) AM_WRITENOP	// K053250 #0
-	AM_RANGE(0x108000, 0x10800f) AM_WRITENOP	// K053250 #1
-	AM_RANGE(0x118000, 0x118fff) AM_WRITE(K053247_word_w)
-	AM_RANGE(0x128000, 0x128001) AM_WRITE(cpuB_ctrl_w)	/* enable K053247 ROM reading, plus something else */
-	AM_RANGE(0x130000, 0x130007) AM_WRITE(K053246_word_w)
-	AM_RANGE(0x200000, 0x203fff) AM_WRITE(sharedram_w)
-	AM_RANGE(0x208000, 0x20bfff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( overdriv_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0200, 0x0201) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)
+	AM_RANGE(0x0400, 0x042f) AM_DEVREADWRITE("konami1", k053260_r,k053260_w)
+	AM_RANGE(0x0600, 0x062f) AM_DEVREADWRITE("konami2", k053260_r,k053260_w)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( overdriv_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0200, 0x0201) AM_DEVREAD("ym", ym2151_r)
-	AM_RANGE(0x0400, 0x042f) AM_DEVREAD("konami1", k053260_r)
-	AM_RANGE(0x0600, 0x062f) AM_DEVREAD("konami2", k053260_r)
-	AM_RANGE(0x0800, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( overdriv_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0200, 0x0201) AM_DEVWRITE("ym", ym2151_w)
-	AM_RANGE(0x0400, 0x042f) AM_DEVWRITE("konami1", k053260_w)
-	AM_RANGE(0x0600, 0x062f) AM_DEVWRITE("konami2", k053260_w)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
 
 /* Both IPT_START1 assignments are needed. The game will reset during */
 /* the "continue" sequence if the assignment on the first port        */
@@ -385,18 +334,18 @@ static MACHINE_DRIVER_START( overdriv )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(overdriv_readmem,overdriv_writemem)
+	MDRV_CPU_PROGRAM_MAP(overdriv_master_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(cpuA_interrupt,4)	/* ??? IRQ 4 is vblank, IRQ 5 of unknown origin */
 
 	MDRV_CPU_ADD("sub", M68000,24000000/2)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(overdriv_readmem2,overdriv_writemem2)
+	MDRV_CPU_PROGRAM_MAP(overdriv_slave_map,0)
 	MDRV_CPU_VBLANK_INT("screen", cpuB_interrupt)	/* IRQ 5 and 6 are generated by the main CPU. */
 								/* IRQ 5 is used only in test mode, to request the checksums of the gfx ROMs. */
 	MDRV_CPU_ADD("audiocpu", M6809,3579545/2)	/* 1.789 MHz?? This might be the right speed, but ROM testing */
 						/* takes a little too much (the counter wraps from 0000 to 9999). */
 						/* This might just mean that the video refresh rate is less than */
 						/* 60 fps, that's how I fixed it for now. */
-	MDRV_CPU_PROGRAM_MAP(overdriv_s_readmem,overdriv_s_writemem)
+	MDRV_CPU_PROGRAM_MAP(overdriv_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 
@@ -423,18 +372,18 @@ static MACHINE_DRIVER_START( overdriv )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.5)
 
 	MDRV_SOUND_ADD("konami1", K053260, 3579545)
 	MDRV_SOUND_CONFIG(k053260_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
 
 	MDRV_SOUND_ADD("konami2", K053260, 3579545)
 	MDRV_SOUND_CONFIG(k053260_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_DRIVER_END
 
 
@@ -492,4 +441,4 @@ static DRIVER_INIT( overdriv )
 
 
 
-GAMEL( 1990, overdriv, 0, overdriv, overdriv, overdriv, ROT90, "Konami", "Over Drive", GAME_IMPERFECT_GRAPHICS, layout_overdriv )
+GAMEL( 1990, overdriv, 0, overdriv, overdriv, overdriv, ROT90, "Konami", "Over Drive", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING, layout_overdriv )
