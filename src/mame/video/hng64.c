@@ -951,9 +951,13 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 static TILE_GET_INFO( get_hng64_tile0_info )
 {
 	UINT16 tilemapinfo = (hng64_videoregs[0x02]&0xffff0000)>>16;
-	int tileno,pal;
-	tileno = hng64_videoram[tile_index];
-	pal = hng64_videoram[tile_index]>>24;
+	int tileno,pal, flip;
+	
+	tileno = hng64_videoram[tile_index+(0x00000/4)];
+	// pppppppp ff--atttt tttttttt tttttttt
+	
+	pal = (tileno&0xff000000)>>24;
+	flip =(tileno&0x00c00000)>>22;
 
 	if (tileno&0x200000)
 	{
@@ -964,11 +968,11 @@ static TILE_GET_INFO( get_hng64_tile0_info )
 	
 	if (tilemapinfo&0x400)
 	{
-		SET_TILE_INFO(1,tileno>>1,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+		SET_TILE_INFO(1,tileno>>1,pal>>4,TILE_FLIPYX(flip));
 	}
 	else
 	{
-		SET_TILE_INFO(0,tileno, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+		SET_TILE_INFO(0,tileno, pal,TILE_FLIPYX(flip));
 	}
 }
 
@@ -976,9 +980,13 @@ static TILE_GET_INFO( get_hng64_tile0_info )
 static TILE_GET_INFO( get_hng64_tile1_info )
 {
 	UINT16 tilemapinfo = (hng64_videoregs[0x02]&0x0000ffff)>>0;
-	int tileno,pal;
+	int tileno,pal, flip;
+	
 	tileno = hng64_videoram[tile_index+(0x10000/4)];
-	pal = hng64_videoram[tile_index+(0x10000/4)]>>24;
+	// pppppppp ff--atttt tttttttt tttttttt
+	
+	pal = (tileno&0xff000000)>>24;
+	flip =(tileno&0x00c00000)>>22;
 
 	if (tileno&0x200000)
 	{
@@ -989,11 +997,11 @@ static TILE_GET_INFO( get_hng64_tile1_info )
 	
 	if (tilemapinfo&0x400)
 	{
-		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));
 	}
 	else
 	{
-		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX(flip));
 	}
 }
 
@@ -1001,9 +1009,13 @@ static TILE_GET_INFO( get_hng64_tile1_info )
 static TILE_GET_INFO( get_hng64_tile2_info )
 {
 	UINT16 tilemapinfo = (hng64_videoregs[0x03]&0xffff0000)>>16;
-	int tileno,pal;
+	int tileno,pal, flip;
+	
 	tileno = hng64_videoram[tile_index+(0x20000/4)];
-	pal = hng64_videoram[tile_index+(0x20000/4)]>>24;
+	// pppppppp ff--atttt tttttttt tttttttt
+	
+	pal = (tileno&0xff000000)>>24;
+	flip =(tileno&0x00c00000)>>22;
 
 	if (tileno&0x200000)
 	{
@@ -1014,11 +1026,11 @@ static TILE_GET_INFO( get_hng64_tile2_info )
 		
 	if (tilemapinfo&0x400)
 	{
-		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));
 	}
 	else
 	{
-		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX(flip));
 	}
 }
 
@@ -1026,10 +1038,13 @@ static TILE_GET_INFO( get_hng64_tile2_info )
 static TILE_GET_INFO( get_hng64_tile3_info )
 {
 	UINT16 tilemapinfo = (hng64_videoregs[0x03]&0x0000ffff)>>0;
-
-	int tileno,pal;
+	int tileno,pal, flip;
+	
 	tileno = hng64_videoram[tile_index+(0x30000/4)];
-	pal = hng64_videoram[tile_index+(0x30000/4)]>>24;
+	// pppppppp ff--atttt tttttttt tttttttt
+	
+	pal = (tileno&0xff000000)>>24;
+	flip =(tileno&0x00c00000)>>22;
 
 	if (tileno&0x200000)
 	{
@@ -1040,11 +1055,11 @@ static TILE_GET_INFO( get_hng64_tile3_info )
 		
 	if (tilemapinfo&0x400)
 	{
-		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX(flip));
 	}
 	else
 	{
-		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX(flip));
 	}
 }
 
