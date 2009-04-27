@@ -950,6 +950,7 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 /* 8x8x4bpp layer */
 static TILE_GET_INFO( get_hng64_tile0_info )
 {
+	UINT16 tilemapinfo = (hng64_videoregs[0x02]&0xffff0000)>>16;
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index];
 	pal = hng64_videoram[tile_index]>>24;
@@ -958,18 +959,23 @@ static TILE_GET_INFO( get_hng64_tile0_info )
 	{
 		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
 	}
-	
+		
 	tileno &= 0x1fffff;
 	
-	SET_TILE_INFO(0,tileno, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
-
-	// beast busters requires this (8x8x8)
-//	SET_TILE_INFO(1,(tileno&0x3fffff)>>1,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+	if (tilemapinfo&0x400)
+	{
+		SET_TILE_INFO(1,tileno>>1,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+	}
+	else
+	{
+		SET_TILE_INFO(0,tileno, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+	}
 }
 
 /* 16x16 tiles, 8bpp layer */
 static TILE_GET_INFO( get_hng64_tile1_info )
 {
+	UINT16 tilemapinfo = (hng64_videoregs[0x02]&0x0000ffff)>>0;
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index+(0x10000/4)];
 	pal = hng64_videoram[tile_index+(0x10000/4)]>>24;
@@ -978,18 +984,23 @@ static TILE_GET_INFO( get_hng64_tile1_info )
 	{
 		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
 	}
-		
+
 	tileno &= 0x1fffff;
 	
-	SET_TILE_INFO(3,tileno>>3,pal>>4,  TILE_FLIPYX((tileno&0xc00000)>>22) );
-
-	// samurai shodown 64 requires this (16x16x4)
-	//SET_TILE_INFO(2,(tileno&0x3fffff)>>2,pal,  TILE_FLIPYX((tileno&0xc00000)>>22) );
+	if (tilemapinfo&0x400)
+	{
+		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+	}
+	else
+	{
+		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+	}
 }
 
 /* 16x16 tiles, 8bpp layer */
 static TILE_GET_INFO( get_hng64_tile2_info )
 {
+	UINT16 tilemapinfo = (hng64_videoregs[0x03]&0xffff0000)>>16;
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index+(0x20000/4)];
 	pal = hng64_videoram[tile_index+(0x20000/4)]>>24;
@@ -998,18 +1009,24 @@ static TILE_GET_INFO( get_hng64_tile2_info )
 	{
 		tileno = (tileno & hng64_videoregs[0x0b]) | hng64_videoregs[0x0c];         
 	}
-		
+	
 	tileno &= 0x1fffff;
-	
-	SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
-	
-	// samurai shodown 64 2 japan warning reuqires this (16x16x4)
-	//SET_TILE_INFO(2,(tileno&0x3fffff)>>2,pal,  TILE_FLIPYX((tileno&0xc00000)>>22) );
+		
+	if (tilemapinfo&0x400)
+	{
+		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+	}
+	else
+	{
+		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+	}
 }
 
 /* 16x16 tiles, 8bpp layer */
 static TILE_GET_INFO( get_hng64_tile3_info )
 {
+	UINT16 tilemapinfo = (hng64_videoregs[0x03]&0x0000ffff)>>0;
+
 	int tileno,pal;
 	tileno = hng64_videoram[tile_index+(0x30000/4)];
 	pal = hng64_videoram[tile_index+(0x30000/4)]>>24;
@@ -1020,8 +1037,15 @@ static TILE_GET_INFO( get_hng64_tile3_info )
 	}
 		
 	tileno &= 0x1fffff;	
-	
-	SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+		
+	if (tilemapinfo&0x400)
+	{
+		SET_TILE_INFO(3,tileno>>3,pal>>4,TILE_FLIPYX((tileno&0xc00000)>>22));
+	}
+	else
+	{
+		SET_TILE_INFO(2,tileno>>2, pal,TILE_FLIPYX((tileno&0xc00000)>>22));
+	}
 }
 
 
@@ -1063,8 +1087,10 @@ static void hng64_drawtilemap( bitmap_t *bitmap, const rectangle *cliprect, int 
  *   0    | oooooooo | unknown - always seems to be 04060000 (fatfurwa) and 00060000 (buriki)
  *   1    | xxxx---- | looks like it's 0001 most (all) of the time - turns off in buriki intro
  *   1    | ----oooo | unknown - always seems to be 0000 (fatfurwa)
- *   2    | oooooooo | unknown - likes to change sometimes though... (looks like bit-flags)
- *   3    | oooooooo | unknown - change a lot - maybe mixer flags?
+ *   2    | xxxx---- | tilemap0 per layer flags
+ *   2    | ----xxxx | tilemap1 per layer flags
+ *   3    | xxxx---- | tilemap2 per layer flags
+ *   3    | ----xxxx | tilemap3 per layer flags
  *   4    | xxxx---- | tilemap0 offset into tilemap RAM?
  *   4    | ----xxxx | tilemap1 offset into tilemap RAM
  *   5    | xxxx---- | tilemap3 offset into tilemap RAM
@@ -1105,6 +1131,7 @@ VIDEO_UPDATE( hng64 )
 
 	transition_control(bitmap, cliprect) ;
 
+	/*
 	popmessage("%08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x", 
 	hng64_videoregs[0x00],
 	hng64_videoregs[0x01],
@@ -1121,6 +1148,26 @@ VIDEO_UPDATE( hng64 )
 	hng64_videoregs[0x0c],
 	hng64_videoregs[0x0d],
 	hng64_videoregs[0x0e]);
+	*/
+	
+	// tilemap0 per layer flags
+	// 0840 - startup tests, 8x8x4 layer
+	// 0cc0 - beast busters 2, 8x8x8 layer
+	// 0860 - fatal fury wa
+	// 08e0 - fatal fury wa during transitions
+	// 0940 - samurai shodown 64
+	// 0880 - buriki
+	
+	// ---l rb?? ???? ????
+	// l = floor effects / linescroll enable  (buriki on tilemap1, fatal fury on tilemap3)
+	// r = tile size?
+	// b = 4bpp/8bpp ?  (beast busters, samsh64, sasm64 2 switch it for some screens)
+	
+	
+	
+	
+	popmessage("0: %04x  1: %04x   2: %04x  3: %04x\n", (hng64_videoregs[0x02]&0xffff0000)>>16, (hng64_videoregs[0x02]&0x0000ffff)>>0, (hng64_videoregs[0x03]&0xffff0000)>>16, (hng64_videoregs[0x03]&0x0000ffff)>>0);
+	
 	
 	
 //  mame_printf_debug("FRAME DONE %d\n", frameCount) ;
