@@ -151,16 +151,10 @@ static READ8_HANDLER( mjsister_keys_r )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( mjsister_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(1))
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjsister_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(mjsister_videoram_w)
+static ADDRESS_MAP_START( mjsister_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1) AM_WRITE(mjsister_videoram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjsister_io_map, ADDRESS_SPACE_IO, 8 )
@@ -178,6 +172,7 @@ static ADDRESS_MAP_START( mjsister_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x34, 0x34) AM_WRITE(mjsister_dac_adr_s_w)
 	AM_RANGE(0x35, 0x35) AM_WRITE(mjsister_dac_adr_e_w)
 ADDRESS_MAP_END
+
 
 /****************************************************************************/
 
@@ -309,7 +304,7 @@ static MACHINE_DRIVER_START( mjsister )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(mjsister_readmem,mjsister_writemem)
+	MDRV_CPU_PROGRAM_MAP(mjsister_map,0)
 	MDRV_CPU_IO_MAP(mjsister_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 

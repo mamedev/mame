@@ -57,11 +57,6 @@ VIDEO_UPDATE( metlclsh );
 
 ***************************************************************************/
 
-static UINT8 *sharedram;
-
-static READ8_HANDLER ( sharedram_r )	{ return sharedram[offset]; }
-static WRITE8_HANDLER( sharedram_w )	{ sharedram[offset] = data; }
-
 static WRITE8_HANDLER( metlclsh_cause_irq )
 {
 	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
@@ -72,36 +67,24 @@ static WRITE8_HANDLER( metlclsh_ack_nmi )
 	cpu_set_input_line(space->machine->cpu[0],INPUT_LINE_NMI,CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( metlclsh_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(sharedram_r				)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_ROM					)
+static ADDRESS_MAP_START( metlclsh_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
-//  AM_RANGE(0xc800, 0xc82f) AM_READ(SMH_RAM                   )   // not actually read
-//  AM_RANGE(0xcc00, 0xcc2f) AM_READ(SMH_RAM                   )   // ""
-	AM_RANGE(0xd000, 0xd001) AM_DEVREAD("ym1", ym2203_r	)
-//  AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM                   )   // not actually read
-	AM_RANGE(0xe800, 0xe9ff) AM_READ(SMH_RAM					)
-	AM_RANGE(0xfff0, 0xffff) AM_READ(SMH_ROM					)	// Reset/IRQ vectors
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( metlclsh_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(sharedram_w) AM_BASE(&sharedram	)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_ROM					)
-	AM_RANGE(0xc080, 0xc080) AM_WRITE(SMH_NOP					)	// ? 0
-	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE(metlclsh_cause_irq		)	// cause irq on cpu #2
-	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi			)	// nmi ack
-	AM_RANGE(0xc800, 0xc82f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram		)
-	AM_RANGE(0xcc00, 0xcc2f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2	)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ym1", ym2203_w	)
+	AM_RANGE(0xc080, 0xc080) AM_WRITENOP							// ? 0
+	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE(metlclsh_cause_irq)			// cause irq on cpu #2
+	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi)				// nmi ack
+/**/AM_RANGE(0xc800, 0xc82f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
+/**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
+/**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_BASE(&metlclsh_fgram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym2", ym3526_w	)
-	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(metlclsh_fgram_w) AM_BASE(&metlclsh_fgram		)
-	AM_RANGE(0xfff0, 0xffff) AM_WRITE(SMH_ROM					)
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)
+	AM_RANGE(0xfff0, 0xffff) AM_ROM									// Reset/IRQ vectors
 ADDRESS_MAP_END
 
 
@@ -131,31 +114,23 @@ static WRITE8_HANDLER( metlclsh_flipscreen_w )
 	flip_screen_set(space->machine, data & 1);
 }
 
-static ADDRESS_MAP_START( metlclsh_readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM			)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(sharedram_r		)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+static ADDRESS_MAP_START( metlclsh_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0") AM_WRITE(metlclsh_gfxbank_w)	// bg tiles bank
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_BANK(1)			)
-	AM_RANGE(0xfff0, 0xffff) AM_READ(SMH_ROM			)	// Reset/IRQ vectors
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( metlclsh_writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM						)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(sharedram_w					)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(metlclsh_gfxbank_w			)	// bg tiles bank
-	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2			)	// cause nmi on cpu #1
-	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE(metlclsh_ack_irq2				)	// irq ack
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(metlclsh_bgram_w) AM_BASE(&metlclsh_bgram	)	// this is banked
-	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2				)	// nmi ack
-	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w			)	// 0/1
-	AM_RANGE(0xe401, 0xe401) AM_WRITE(metlclsh_rambank_w			)
-	AM_RANGE(0xe402, 0xe403) AM_WRITE(SMH_RAM) AM_BASE(&metlclsh_scrollx	)
-//  AM_RANGE(0xe404, 0xe404) AM_WRITE(SMH_NOP                      )   // ? 0
-//  AM_RANGE(0xe410, 0xe410) AM_WRITE(SMH_NOP                      )   // ? 0 on startup only
-	AM_RANGE(0xfff0, 0xffff) AM_WRITE(SMH_ROM						)
+	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2)			// cause nmi on cpu #1
+	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE(metlclsh_ack_irq2)			// irq ack
+	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK(1) AM_WRITE(metlclsh_bgram_w) AM_BASE(&metlclsh_bgram) // this is banked
+	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w)		// 0/1
+	AM_RANGE(0xe401, 0xe401) AM_WRITE(metlclsh_rambank_w)
+	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_BASE(&metlclsh_scrollx)
+//  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                        	// ? 0
+//  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                        	// ? 0 on startup only
+	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2)			// nmi ack
+	AM_RANGE(0xfff0, 0xffff) AM_ROM									// Reset/IRQ vectors
 ADDRESS_MAP_END
 
 
@@ -313,11 +288,11 @@ static MACHINE_DRIVER_START( metlclsh )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)        // ?
-	MDRV_CPU_PROGRAM_MAP(metlclsh_readmem, metlclsh_writemem)
+	MDRV_CPU_PROGRAM_MAP(metlclsh_master_map, 0)
 	// IRQ by YM3526, NMI by cpu #2
 
 	MDRV_CPU_ADD("sub", M6809, 1500000)        // ?
-	MDRV_CPU_PROGRAM_MAP(metlclsh_readmem2, metlclsh_writemem2)
+	MDRV_CPU_PROGRAM_MAP(metlclsh_slave_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(metlclsh_interrupt2,2)
 	// IRQ by cpu #1, NMI by coins insertion
 

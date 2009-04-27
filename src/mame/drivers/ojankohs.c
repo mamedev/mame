@@ -41,12 +41,9 @@ VIDEO_UPDATE( ojankohs );
 PALETTE_INIT( ojankoy );
 VIDEO_START( ojankohs );
 VIDEO_START( ojankoy );
-READ8_HANDLER( ojankohs_palette_r );
 WRITE8_HANDLER( ojankohs_palette_w );
 WRITE8_HANDLER( ccasino_palette_w );
-READ8_HANDLER( ojankohs_videoram_r );
 WRITE8_HANDLER( ojankohs_videoram_w );
-READ8_HANDLER( ojankohs_colorram_r );
 WRITE8_HANDLER( ojankohs_colorram_w );
 WRITE8_HANDLER( ojankohs_gfxreg_w );
 WRITE8_HANDLER( ojankohs_flipscreen_w );
@@ -223,50 +220,29 @@ static WRITE8_HANDLER( ccasino_coinctr_w )
 }
 
 
-static ADDRESS_MAP_START( readmem_ojankohs, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(ojankohs_videoram_r)
-	AM_RANGE(0x9000, 0x9fff) AM_READ(ojankohs_colorram_r)
-	AM_RANGE(0xa000, 0xb7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xb800, 0xbfff) AM_READ(ojankohs_palette_r)
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK(1))
+static ADDRESS_MAP_START( ojankohs_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(ojankohs_videoram_w)
+	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w)
+	AM_RANGE(0xa000, 0xb7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(ojankohs_palette_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem_ojankohs, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(ojankohs_videoram_w)
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(ojankohs_colorram_w)
-	AM_RANGE(0xa000, 0xb7ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xb800, 0xbfff) AM_WRITE(ojankohs_palette_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
+
+static ADDRESS_MAP_START( ojankoy_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w)
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_ojankoy, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(ojankohs_videoram_r)
-	AM_RANGE(0xa000, 0xafff) AM_READ(ojankohs_colorram_r)
-	AM_RANGE(0xb000, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK(1))
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem_ojankoy, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(ojankohs_videoram_w)
-	AM_RANGE(0xa000, 0xafff) AM_WRITE(ojankohs_colorram_w)
-	AM_RANGE(0xb000, 0xbfff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_ojankoc, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(1))
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_ojankoc, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(ojankoc_videoram_w)
+static ADDRESS_MAP_START( ojankoc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1) AM_WRITE(ojankoc_videoram_w)
 ADDRESS_MAP_END
 
 
@@ -843,7 +819,7 @@ static MACHINE_DRIVER_START( ojankohs )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem_ojankohs,writemem_ojankohs)
+	MDRV_CPU_PROGRAM_MAP(ojankohs_map,0)
 	MDRV_CPU_IO_MAP(ojankohs_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -880,7 +856,7 @@ static MACHINE_DRIVER_START( ojankoy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem_ojankoy,writemem_ojankoy)
+	MDRV_CPU_PROGRAM_MAP(ojankoy_map,0)
 	MDRV_CPU_IO_MAP(ojankoy_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -918,7 +894,7 @@ static MACHINE_DRIVER_START( ccasino )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem_ojankoy,writemem_ojankoy)
+	MDRV_CPU_PROGRAM_MAP(ojankoy_map,0)
 	MDRV_CPU_IO_MAP(ccasino_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -955,7 +931,7 @@ static MACHINE_DRIVER_START( ojankoc )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)			/* 4.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem_ojankoc,writemem_ojankoc)
+	MDRV_CPU_PROGRAM_MAP(ojankoc_map,0)
 	MDRV_CPU_IO_MAP(ojankoc_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 

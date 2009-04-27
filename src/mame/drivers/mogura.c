@@ -95,17 +95,7 @@ static WRITE8_HANDLER(mogura_dac_w)
 	dac_data_w(devtag_get_device(space->machine, "dac2"), (data & 0x0f)<<4 );	/* right */
 }
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP	// ??
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("P1")
-	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("P2")
-	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("P3")
-	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("P4")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x14, 0x14) AM_WRITE(mogura_dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
-ADDRESS_MAP_END
+
 
 
 static WRITE8_HANDLER ( mogura_gfxram_w )
@@ -116,20 +106,24 @@ static WRITE8_HANDLER ( mogura_gfxram_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM) // main ram
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM) // tilemap
+static ADDRESS_MAP_START( mogura_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM // main ram
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_BASE(&mogura_gfxram) // ram based characters
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_BASE(&mogura_tileram) // tilemap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(mogura_gfxram_w) AM_BASE(&mogura_gfxram)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(mogura_tileram_w) AM_BASE(&mogura_tileram)
+static ADDRESS_MAP_START( mogura_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITENOP	// ??
+	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("P1")
+	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("P2")
+	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("P3")
+	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("P4")
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x14, 0x14) AM_WRITE(mogura_dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
 ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( mogura )
 	PORT_START("SYSTEM")
@@ -179,8 +173,8 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( mogura )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,3000000)		 /* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mogura_map,0)
+	MDRV_CPU_IO_MAP(mogura_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_GFXDECODE(mogura)
@@ -217,4 +211,4 @@ ROM_START( mogura )
 	ROM_LOAD( "gx141.7j", 0x00, 0x20,  CRC(b21c5d5f) SHA1(6913c840dd69a7d4687f4c4cbe3ff12300f62bc2) )
 ROM_END
 
-GAME( 1991, mogura, 0, mogura, mogura, 0, ROT0, "Konami", "Mogura Desse", 0 )
+GAME( 1991, mogura, 0, mogura, mogura, 0, ROT0, "Konami", "Mogura Desse (Japan)", 0 )

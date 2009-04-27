@@ -14,7 +14,7 @@ TODO:
 - Several imperfections with sprites rendering:
   - some sprites are misplaced by 1pixel vertically
   - during the tile distribution at the beginning of a match, there's something
-    wrong with the stacks moved around, they aremisaligned and something is
+    wrong with the stacks moved around, they are misaligned and something is
     missing.
 
 - unknown reads from port 01. Only the top two bits seem to be used.
@@ -171,24 +171,18 @@ static NVRAM_HANDLER( mjkjidai )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xf7ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( mjkjidai_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE(&nvram) AM_SIZE(&nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
+	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE(&spriteram)			// shared with tilemap ram
+	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE(&spriteram_2)		// shared with tilemap ram
+	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE(&spriteram_3)		// shared with tilemap ram
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_BASE(&mjkjidai_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
-	AM_RANGE(0xe000, 0xe01f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)	// shared with tilemap ram
-	AM_RANGE(0xe800, 0xe81f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)	// shared with tilemap ram
-	AM_RANGE(0xf000, 0xf01f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_3)	// shared with tilemap ram
-	AM_RANGE(0xe000, 0xf7ff) AM_WRITE(mjkjidai_videoram_w) AM_BASE(&mjkjidai_videoram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mjkjidai_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(keyboard_r)
 	AM_RANGE(0x01, 0x01) AM_READNOP	// ???
@@ -359,8 +353,8 @@ static MACHINE_DRIVER_START( mjkjidai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2)	/* 5 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mjkjidai_map,0)
+	MDRV_CPU_IO_MAP(mjkjidai_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(mjkjidai)

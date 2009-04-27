@@ -3,6 +3,7 @@
 TODO:
 -eeprom emulation? Software settings all changes if you toggle the "flip screen" dip-switch
 -priorities.
+-sound banking is known to be imperfect.
 
 Notes:To enter into Test Mode you need to keep pressed the Mahjong A button at start-up.
 */
@@ -174,62 +175,31 @@ static WRITE16_HANDLER( okim0_rombank_w )
 	}
 }
 
-static ADDRESS_MAP_START( mirage_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-
-	AM_RANGE(0x100000, 0x101fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x102000, 0x103fff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0x110000, 0x110bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x112000, 0x112bff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0x120000, 0x1207ff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0x130000, 0x1307ff) AM_READ(SMH_RAM)
-
-//  AM_RANGE(0x140006, 0x140007) AM_READ(random_readers)
-
-//  AM_RANGE(0x150006, 0x150007) AM_READNOP
-
-	AM_RANGE(0x16c006, 0x16c007) AM_READ(mirage_input_r)
-
-	AM_RANGE(0x16e002, 0x16e003) AM_READ_PORT("SYSTEM_IN")
-
-	AM_RANGE(0x170000, 0x173fff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mirage_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-
+static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	/* tilemaps */
-	AM_RANGE(0x100000, 0x101fff) AM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data) // 0x100000 - 0x101fff tested
-	AM_RANGE(0x102000, 0x103fff) AM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data) // 0x102000 - 0x102fff tested
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data) // 0x100000 - 0x101fff tested
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data) // 0x102000 - 0x102fff tested
 	/* linescroll */
-	AM_RANGE(0x110000, 0x110bff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x112000, 0x112bff) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf2_rowscroll)
-
-	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
-
-	AM_RANGE(0x130000, 0x1307ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-
+	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
+	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram16)
+	AM_RANGE(0x130000, 0x1307ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)
-
+//  AM_RANGE(0x140006, 0x140007) AM_READ(random_readers)
+//  AM_RANGE(0x150006, 0x150007) AM_READNOP
 	AM_RANGE(0x160000, 0x160001) AM_WRITENOP
-
-	AM_RANGE(0x168000, 0x16800f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
-
+	AM_RANGE(0x168000, 0x16800f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x16a000, 0x16a001) AM_WRITENOP
-
 	AM_RANGE(0x16c000, 0x16c001) AM_WRITE(okim1_rombank_w)
 	AM_RANGE(0x16c002, 0x16c003) AM_WRITE(okim0_rombank_w)
 	AM_RANGE(0x16c004, 0x16c005) AM_WRITE(mirage_mux_w)
-
+	AM_RANGE(0x16c006, 0x16c007) AM_READ(mirage_input_r)
 	AM_RANGE(0x16e000, 0x16e001) AM_WRITENOP
-
-	AM_RANGE(0x170000, 0x173fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x16e002, 0x16e003) AM_READ_PORT("SYSTEM_IN")
+	AM_RANGE(0x170000, 0x173fff) AM_RAM
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( mirage )
@@ -357,7 +327,7 @@ static MACHINE_DRIVER_START( mirage )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 28000000/2)
-	MDRV_CPU_PROGRAM_MAP(mirage_readmem,mirage_writemem)
+	MDRV_CPU_PROGRAM_MAP(mirage_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
@@ -413,4 +383,4 @@ static DRIVER_INIT( mirage )
 	deco56_decrypt_gfx(machine, "gfx1");
 }
 
-GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

@@ -60,11 +60,6 @@ PALETTE_INIT( ojankoy )
 	}
 }
 
-READ8_HANDLER( ojankohs_palette_r )
-{
-	return ojankohs_paletteram[offset];
-}
-
 WRITE8_HANDLER( ojankohs_palette_w )
 {
 	int r, g, b;
@@ -125,20 +120,10 @@ WRITE8_HANDLER( ojankoc_palette_w )
 
 ******************************************************************************/
 
-READ8_HANDLER( ojankohs_videoram_r )
-{
-	return ojankohs_videoram[offset];
-}
-
 WRITE8_HANDLER( ojankohs_videoram_w )
 {
 	ojankohs_videoram[offset] = data;
 	tilemap_mark_tile_dirty(ojankohs_tilemap, offset);
-}
-
-READ8_HANDLER( ojankohs_colorram_r )
-{
-	return ojankohs_colorram[offset];
 }
 
 WRITE8_HANDLER( ojankohs_colorram_w )

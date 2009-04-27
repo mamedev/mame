@@ -107,13 +107,18 @@ static WRITE16_DEVICE_HANDLER( soundbank_w )
 
 
 
-static ADDRESS_MAP_START( oneshot_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x080000, 0x087fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0c0000, 0x0c07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x120000, 0x120fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x180000, 0x182fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( oneshot_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x080000, 0x087fff) AM_RAM
+	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_BASE(&oneshot_sprites)
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(oneshot_mid_videoram_w) AM_BASE(&oneshot_mid_videoram) // some people , girl etc.
+	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_BASE(&oneshot_fg_videoram) // credits etc.
+	AM_RANGE(0x182000, 0x182fff) AM_RAM_WRITE(oneshot_bg_videoram_w) AM_BASE(&oneshot_bg_videoram) // credits etc.
+	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_BASE(&oneshot_scroll)	// scroll registers
 	AM_RANGE(0x190002, 0x190003) AM_READ(soundlatch_word_r)
+	AM_RANGE(0x190010, 0x190011) AM_WRITE(soundlatch_word_w)
+	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE("oki", soundbank_w)
 	AM_RANGE(0x190026, 0x190027) AM_READ(oneshot_gun_x_p1_r)
 	AM_RANGE(0x19002e, 0x19002f) AM_READ(oneshot_gun_x_p2_r)
 	AM_RANGE(0x190036, 0x190037) AM_READ(oneshot_gun_y_p1_r)
@@ -125,34 +130,14 @@ static ADDRESS_MAP_START( oneshot_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oneshot_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x080000, 0x087fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0c0000, 0x0c07ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x120000, 0x120fff) AM_WRITE(SMH_RAM) AM_BASE(&oneshot_sprites)
-	AM_RANGE(0x180000, 0x180fff) AM_WRITE(oneshot_mid_videoram_w) AM_BASE(&oneshot_mid_videoram) // some people , girl etc.
-	AM_RANGE(0x181000, 0x181fff) AM_WRITE(oneshot_fg_videoram_w) AM_BASE(&oneshot_fg_videoram) // credits etc.
-	AM_RANGE(0x182000, 0x182fff) AM_WRITE(oneshot_bg_videoram_w) AM_BASE(&oneshot_bg_videoram) // credits etc.
-	AM_RANGE(0x188000, 0x18800f) AM_WRITE(SMH_RAM) AM_BASE(&oneshot_scroll)	// scroll registers???
-	AM_RANGE(0x190010, 0x190011) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE("oki", soundbank_w)
+static ADDRESS_MAP_START( oneshot_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(soundlatch_r,soundlatch_w)
+	AM_RANGE(0x8001, 0x87ff) AM_RAM
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym", ym3812_r,ym3812_w)
+	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8001, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREAD("ym", ym3812_r)
-	AM_RANGE(0xe010, 0xe010) AM_DEVREAD("oki", okim6295_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x8001, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym", ym3812_w)
-	AM_RANGE(0xe010, 0xe010) AM_DEVWRITE("oki", okim6295_w)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( oneshot )
 	PORT_START("DSW1")	/* DSW 1    (0x19c020.l -> 0x08006c.l) */
@@ -364,11 +349,11 @@ static MACHINE_DRIVER_START( oneshot )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(oneshot_readmem,oneshot_writemem)
+	MDRV_CPU_PROGRAM_MAP(oneshot_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 5000000)
-	MDRV_CPU_PROGRAM_MAP(snd_readmem, snd_writemem)
+	MDRV_CPU_PROGRAM_MAP(oneshot_sound_map, 0)
 
 	MDRV_GFXDECODE(oneshot)
 

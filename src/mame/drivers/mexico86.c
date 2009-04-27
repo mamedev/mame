@@ -61,80 +61,50 @@ static READ8_DEVICE_HANDLER( kiki_ym2203_r )
 }
 //ZT
 
-static UINT8 *shared;
-
-static READ8_HANDLER( shared_r )
-{
-	return shared[offset];
-}
-
-static WRITE8_HANDLER( shared_w )
-{
-	shared[offset] = data;
-}
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))  /* banked roms */
-	AM_RANGE(0xc000, 0xe7ff) AM_READ(shared_r)   /* shared with sound cpu */
-	AM_RANGE(0xe800, 0xe8ff) AM_READ(SMH_RAM)    /* protection ram */
-	AM_RANGE(0xe900, 0xefff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( mexico86_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)  	 				/* banked roms */
+	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE(1)  				/* shared with sound cpu */
+	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE(&mexico86_objectram) AM_SIZE(&mexico86_objectram_size)
+	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE(&mexico86_protection_ram)  /* shared with mcu */
+	AM_RANGE(0xe900, 0xefff) AM_RAM
+	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_BASE(&mexico86_videoram) //AT: corrected size
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)  	/* program and gfx ROM banks */
+	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)    	  	/* cpu reset lines + other unknown stuff */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)    /* communication ram - to connect 4 players's subboard */
+	AM_RANGE(0xf018, 0xf018) AM_WRITENOP						/* watchdog? */
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(2)					/* communication ram - to connect 4 players's subboard */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xe7ff) AM_WRITE(shared_w) AM_BASE(&shared)  /* shared with sound cpu */
-	AM_RANGE(0xc000, 0xd4ff) AM_WRITE(SMH_RAM) AM_BASE(&mexico86_videoram) //AT: corrected size
-	AM_RANGE(0xd500, 0xd7ff) AM_WRITE(SMH_RAM) AM_BASE(&mexico86_objectram) AM_SIZE(&mexico86_objectram_size)
-	AM_RANGE(0xe800, 0xe8ff) AM_WRITE(SMH_RAM) AM_BASE(&mexico86_protection_ram)  /* shared with mcu */
-	AM_RANGE(0xe900, 0xefff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)  /* program and gfx ROM banks */
-	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)    /* cpu reset lines + other unknown stuff */
-	AM_RANGE(0xf018, 0xf018) AM_WRITENOP    // watchdog_reset_w },
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)    /* communication ram */
+static ADDRESS_MAP_START( mexico86_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xa800, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", kiki_ym2203_r,ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xa7ff) AM_READ(shared_r)
-	AM_RANGE(0xa800, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", kiki_ym2203_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xa7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xa800, 0xbfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2203_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( m68705_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ(mexico86_68705_portA_r)
-	AM_RANGE(0x0001, 0x0001) AM_READ(mexico86_68705_portB_r)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mexico86_68705_portA_r,mexico86_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mexico86_68705_portB_r,mexico86_68705_portB_w)
 	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("IN0") /* COIN */
-	AM_RANGE(0x0010, 0x007f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( m68705_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(mexico86_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(mexico86_68705_portB_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(mexico86_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(mexico86_68705_ddrB_w)
 	AM_RANGE(0x000a, 0x000a) AM_WRITENOP    /* looks like a bug in the code, writes to */
-									/* 0x0a (=10dec) instead of 0x10 */
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
+											/* 0x0a (=10dec) instead of 0x10 */
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_sub_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM //AM_SHARE(2)
+	AM_RANGE(0xc000, 0xc003) AM_NOP
+	AM_RANGE(0xc004, 0xc004) AM_WRITENOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mexico86 )
@@ -372,18 +342,18 @@ static MACHINE_DRIVER_START( mexico86 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(mexico86_map,0)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(mexico86_sound_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
-	MDRV_CPU_PROGRAM_MAP(m68705_readmem,m68705_writemem)
+	MDRV_CPU_PROGRAM_MAP(mexico86_m68705_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(mexico86_m68705_interrupt,2)
 
 	MDRV_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
-	MDRV_CPU_PROGRAM_MAP(sub_cpu_map,0)
+	MDRV_CPU_PROGRAM_MAP(mexico86_sub_cpu_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
