@@ -5,6 +5,7 @@ Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 Notes:
 - Position counter doesn't behave correctly because of the K051733 protection.
 - 007232 volume & panning control is almost certainly wrong.
+- Sound sometimes goes in a loop / crashes, likely to be irq related.
 
 2008-07
 Dip locations and recommended settings verified with manual
@@ -88,7 +89,7 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	else
 		memory_install_read8_handler(space, 0x2800, 0x2fff, 0, 0, K051316_1_r);		/* 051316 */
 
-	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Saunset Riders, */
+	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Sunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */
 	/* Bits 3 and 7 are set in night stages, where the background should get darker and */
 	/* the headlight (which have the shadow bit set) become highlights */
@@ -140,6 +141,7 @@ static READ8_HANDLER( analog_read_r )
 
 static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
+	soundlatch2_w(space, 0, data);
 	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
@@ -196,7 +198,7 @@ static ADDRESS_MAP_START( chqflag_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami2", k007232_r, k007232_w)	/* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)	/* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	//AM_RANGE(0xe000, 0xe000) AM_READNOP                /* ??? */
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch2_r)         /* engine sound volume */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP					/* ??? */
 ADDRESS_MAP_END
 
