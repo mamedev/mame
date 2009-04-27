@@ -5,7 +5,6 @@ Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 Notes:
 - Position counter doesn't behave correctly because of the K051733 protection.
 - 007232 volume & panning control is almost certainly wrong.
-- Sound sometimes goes in a loop / crashes, likely to be irq related.
 
 2008-07
 Dip locations and recommended settings verified with manual
@@ -291,7 +290,7 @@ INPUT_PORTS_END
 
 static void chqflag_ym2151_irq_w(const device_config *device, int data)
 {
-	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
