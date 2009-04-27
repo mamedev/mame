@@ -27,7 +27,7 @@ static TIMER_CALLBACK( pot_interrupt )
 	int mask = param;
 
 	if (pot_latch & mask)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 
 	pot_state |= mask;
 }
@@ -37,7 +37,7 @@ static TIMER_CALLBACK( periodic_callback )
 {
 	int scanline = param;
 
-	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (scanline == 0)
 	{
@@ -149,13 +149,13 @@ static WRITE8_HANDLER( boxer_pot_w )
 
 	pot_latch = data & 0x3f;
 
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( boxer_irq_reset_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 

@@ -68,7 +68,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 {
 	main_to_sound_data = param;
 	main_to_sound_ready = 1;
-	cpu_triggerint(machine->cpu[1]);
+	cpu_triggerint(cputag_get_cpu(machine, "audiocpu"));
 
 	/* use a timer to make long transfers faster */
 	timer_set(machine, ATTOTIME_IN_USEC(50), NULL, 0, 0);
@@ -149,7 +149,7 @@ static WRITE8_HANDLER( sound_int_state_w )
 		devtag_reset(space->machine, "bsmt");
 
 	/* also clears interrupts */
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 	sound_int_state = data;
 }
 

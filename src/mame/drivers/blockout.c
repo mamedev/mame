@@ -41,7 +41,7 @@ static WRITE16_HANDLER( blockout_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,offset,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -171,7 +171,7 @@ INPUT_PORTS_END
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
 static void blockout_irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line_and_vector(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE,0xff);
+	cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
 static const ym2151_interface ym2151_config =

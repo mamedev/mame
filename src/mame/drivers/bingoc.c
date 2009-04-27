@@ -77,7 +77,7 @@ static READ8_HANDLER( sound_test_r )
 static WRITE16_HANDLER( main_sound_latch_w )
 {
 	soundlatch_w(space,0,data&0xff);
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 #endif
 
@@ -180,4 +180,3 @@ ROM_START( bingoc )
 ROM_END
 
 GAME( 1989, bingoc,  0,    bingoc, bingoc,  0, ROT0, "Sega", "Bingo Circus (Rev. A 891001)", GAME_NOT_WORKING )
-

@@ -264,7 +264,7 @@ static WRITE16_HANDLER( sound_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data&0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -636,7 +636,7 @@ GFXDECODE_END
 
 static void sound_irq( const device_config *device, int irq )
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =
@@ -692,7 +692,7 @@ static NVRAM_HANDLER( bbusters )
 
 static VIDEO_EOF( bbuster )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram16_w(space,0,0,0xffff);
 	buffer_spriteram16_2_w(space,0,0,0xffff);
@@ -700,7 +700,7 @@ static VIDEO_EOF( bbuster )
 
 static VIDEO_EOF( mechatt )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 

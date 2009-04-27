@@ -160,7 +160,7 @@ static TIMER_CALLBACK( irq_callback )
 
 	/* set the IRQ line if enabled */
 	if (irq_enabled)
-		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, 0xfc);
+		cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, 0xfc);
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -237,7 +237,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 	/* pulse the NMI line if enabled */
 	if (nmi_enabled)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 	/* set up for next interrupt */
 	next_nmi_number = (nmi_number + 1) % NMIS_PER_FRAME;
@@ -533,7 +533,7 @@ static READ8_HANDLER( berzerk_audio_r )
 
 static SOUND_RESET(berzerk)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	/* clears the flip-flop controlling the volume and freq on the speech chip */
 	berzerk_audio_w(space, 4, 0x40);
 }

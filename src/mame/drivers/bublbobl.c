@@ -658,7 +658,7 @@ GFXDECODE_END
 // handler called by the 2203 emulator when the internal timers cause an IRQ
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1275,7 +1275,7 @@ static DRIVER_INIT( tokiob )
 {
 	DRIVER_INIT_CALL(tokio);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
 }
 
 

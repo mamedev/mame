@@ -212,30 +212,30 @@ WRITE8_HANDLER( bagman_pal16r6_w )
 {
 UINT8 line;
 
-	line = offset*4;
-	columnvalue[line  ] = data&1;
-	columnvalue[line+1] = 1-(data&1);
+	line = offset * 4;
+	columnvalue[line    ] = data & 1;
+	columnvalue[line + 1] = 1 - (data & 1);
 }
 
 MACHINE_RESET( bagman )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	bagman_pal16r6_w(space,0,1);	/*pin 2*/
-	bagman_pal16r6_w(space,1,1);	/*pin 3*/
-	bagman_pal16r6_w(space,2,1);	/*pin 4*/
-	bagman_pal16r6_w(space,3,1);	/*pin 5*/
-	bagman_pal16r6_w(space,4,1);	/*pin 6*/
-	bagman_pal16r6_w(space,5,1);	/*pin 7*/
-	bagman_pal16r6_w(space,6,1);	/*pin 8*/
-	bagman_pal16r6_w(space,7,1);	/*pin 9*/
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	bagman_pal16r6_w(space, 0, 1);	/*pin 2*/
+	bagman_pal16r6_w(space, 1, 1);	/*pin 3*/
+	bagman_pal16r6_w(space, 2, 1);	/*pin 4*/
+	bagman_pal16r6_w(space, 3, 1);	/*pin 5*/
+	bagman_pal16r6_w(space, 4, 1);	/*pin 6*/
+	bagman_pal16r6_w(space, 5, 1);	/*pin 7*/
+	bagman_pal16r6_w(space, 6, 1);	/*pin 8*/
+	bagman_pal16r6_w(space, 7, 1);	/*pin 9*/
 	update_pal();
 }
 
 READ8_HANDLER( bagman_pal16r6_r )
 {
 	update_pal();
-	return	(outvalue[6]) + (outvalue[5]<<1) + (outvalue[4]<<2) +
-		(outvalue[3]<<3) + (outvalue[2]<<4) + (outvalue[1]<<5);
+	return	(outvalue[6]) + (outvalue[5] << 1) + (outvalue[4] << 2) +
+		(outvalue[3] << 3) + (outvalue[2] << 4) + (outvalue[1] << 5);
 
 /* Bagman schematics show that this is right mapping order of PAL outputs to bits.
 ** This is the PAL 16R6 shown almost in the middle of the schematics.

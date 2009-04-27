@@ -72,29 +72,29 @@ VIDEO_UPDATE( brkthru );
 static WRITE8_HANDLER( brkthru_1803_w )
 {
 	/* bit 0 = NMI enable */
-	cpu_interrupt_enable(space->machine->cpu[0], ~data & 1);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), ~data & 1);
 
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 static WRITE8_HANDLER( darwin_0803_w )
 {
 	/* bit 0 = NMI enable */
-	/*cpu_interrupt_enable(space->machine->cpu[1], ~data & 1);*/
+	/*cpu_interrupt_enable(cputag_get_cpu(space->machine, "audiocpu"), ~data & 1);*/
 	logerror("0803 %02X\n",data);
-	cpu_interrupt_enable(space->machine->cpu[0], data & 1);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), data & 1);
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
 static WRITE8_HANDLER( brkthru_soundlatch_w )
 {
 	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an IRQ */
-	cpu_set_input_line(field->port->machine->cpu[0], 0, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine, "maincpu", 0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -324,7 +324,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],M6809_IRQ_LINE,linestate);
+	cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =

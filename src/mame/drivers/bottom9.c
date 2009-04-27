@@ -102,7 +102,7 @@ static WRITE8_HANDLER( bottom9_1f90_w )
 
 static WRITE8_HANDLER( bottom9_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static int nmienable;

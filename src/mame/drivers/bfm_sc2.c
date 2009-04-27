@@ -266,7 +266,7 @@ static void send_to_adder(running_machine *machine, int data)
 	adder2_sc2data       = data;
 
 	adder2_acia_triggered = 1;
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE );
+	cputag_set_input_line(machine, "adder2", M6809_IRQ_LINE, HOLD_LINE );
 
 	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }
@@ -614,7 +614,7 @@ static WRITE8_HANDLER( mmtr_w )
 			}
  		}
  	}
-	if ( data & 0x1F ) cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE );
+	if ( data & 0x1F ) cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////

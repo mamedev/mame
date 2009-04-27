@@ -62,7 +62,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( blockhl_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 
@@ -274,7 +274,7 @@ static MACHINE_RESET( blockhl )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	konami_configure_set_lines(machine->cpu[0], blockhl_banking);
+	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), blockhl_banking);
 
 	paletteram = &RAM[0x18000];
 }

@@ -98,7 +98,7 @@ VIDEO_START( blstroid )
 
 static TIMER_CALLBACK( irq_off )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* clear the interrupt */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
@@ -108,7 +108,7 @@ static TIMER_CALLBACK( irq_off )
 static TIMER_CALLBACK( irq_on )
 {
 	/* generate the interrupt */
-	atarigen_scanline_int_gen(machine->cpu[0]);
+	atarigen_scanline_int_gen(cputag_get_cpu(machine, "maincpu"));
 	atarigen_update_interrupts(machine);
 }
 

@@ -46,9 +46,10 @@ static int control_port_select;
 
 static WRITE8_HANDLER( battlera_sound_w )
 {
-	if (offset==0) {
+	if (offset == 0) 
+	{
 		soundlatch_w(space,0,data);
-		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 }
 
@@ -61,7 +62,8 @@ static WRITE8_HANDLER( control_data_w )
 
 static READ8_HANDLER( control_data_r )
 {
-	switch (control_port_select) {
+	switch (control_port_select) 
+	{
 		case 0xfe: return input_port_read(space->machine, "IN0"); /* Player 1 */
 		case 0xfd: return input_port_read(space->machine, "IN1"); /* Player 2 */
 		case 0xfb: return input_port_read(space->machine, "IN2"); /* Coins */
@@ -100,21 +102,21 @@ static void battlera_adpcm_int(const device_config *device)
 	static int toggle;
 
 	msm5205_data_w(device,msm5205next >> 4);
-	msm5205next<<=4;
+	msm5205next <<= 4;
 
 	toggle = 1 - toggle;
 	if (toggle)
-		cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlera_adpcm_data_w )
 {
-	msm5205next=data;
+	msm5205next = data;
 }
 
 static WRITE8_DEVICE_HANDLER( battlera_adpcm_reset_w )
 {
-	msm5205_reset_w(device,0);
+	msm5205_reset_w(device, 0);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -285,9 +285,9 @@ static MACHINE_RESET( bishi )
 static void sound_irq_gen(const device_config *device, int state)
 {
 	if (state)
-		cpu_set_input_line(device->machine->cpu[0], M68K_IRQ_1, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "maincpu", M68K_IRQ_1, ASSERT_LINE);
 	else
-		cpu_set_input_line(device->machine->cpu[0], M68K_IRQ_1, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", M68K_IRQ_1, CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =

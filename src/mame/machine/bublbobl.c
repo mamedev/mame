@@ -24,11 +24,11 @@ WRITE8_HANDLER( bublbobl_bankswitch_w )
 	/* bit 3 n.c. */
 
 	/* bit 4 resets second Z80 */
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "slave", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
-	if (space->machine->cpu[3] != NULL) // only if we have a MCU
-		cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	if (cputag_get_cpu(space->machine, "mcu") != NULL) // only if we have a MCU
+		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */
 	bublbobl_video_enable = data & 0x40;
@@ -55,7 +55,7 @@ WRITE8_HANDLER( tokio_videoctrl_w )
 
 WRITE8_HANDLER( bublbobl_nmitrigger_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -94,7 +94,7 @@ static int sound_nmi_enable,pending_nmi,sound_status;
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cpu_set_input_line(machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+	if (sound_nmi_enable) cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	else pending_nmi = 1;
 }
 
@@ -114,14 +114,14 @@ WRITE8_HANDLER( bublbobl_sh_nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
 
 WRITE8_HANDLER(soundcpu_reset_w)
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_HANDLER( sound_status_r )
@@ -207,8 +207,8 @@ WRITE8_HANDLER( bublbobl_mcu_port1_w )
 	if ((port1_out & 0x40) && (~data & 0x40))
 	{
 //      logerror("triggering IRQ on main CPU\n");
-		cpu_set_input_line_vector(space->machine->cpu[0],0,bublbobl_mcu_sharedram[0]);
-		cpu_set_input_line(space->machine->cpu[0],0,HOLD_LINE);
+		cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, bublbobl_mcu_sharedram[0]);
+		cputag_set_input_line(space->machine, "maincpu", 0, HOLD_LINE);
 	}
 
 	// bit 7: select read or write shared RAM
@@ -487,8 +487,8 @@ logerror("%04x: 68705 unknown write to address %04x\n",cpu_get_pc(space->cpu),ad
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		bublbobl_mcu_sharedram[0x7c] = mame_rand(space->machine)%6;
 
-		cpu_set_input_line_vector(space->machine->cpu[0],0,bublbobl_mcu_sharedram[0]);
-		cpu_set_input_line(space->machine->cpu[0],0,HOLD_LINE);
+		cpu_set_input_line_vector(cputag_get_cpu(space->machine, "maincpu"), 0, bublbobl_mcu_sharedram[0]);
+		cputag_set_input_line(space->machine, "maincpu", 0, HOLD_LINE);
 	}
 	if ((ddrB & 0x40) && (~data & 0x40) && (portB_out & 0x40))
 	{

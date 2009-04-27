@@ -180,7 +180,7 @@ static INTERRUPT_GEN( timer_irq )
 
 	    sc1_Inputs[2] = input_port_read(device->machine,"STROBE0");
 
-		generic_pulse_irq_line(device->machine->cpu[0], M6809_IRQ_LINE);
+		generic_pulse_irq_line(cputag_get_cpu(device->machine, "maincpu"), M6809_IRQ_LINE);
 	}
 }
 
@@ -277,7 +277,7 @@ static WRITE8_HANDLER( mmtr_w )
 			if ( changed & (1 << i) )
 			{
 				Mechmtr_update(i, cycles, data & (1 << i) );
-				generic_pulse_irq_line(space->machine->cpu[0], M6809_FIRQ_LINE);
+				generic_pulse_irq_line(cputag_get_cpu(space->machine, "maincpu"), M6809_FIRQ_LINE);
 			}
 		}
 	}
@@ -371,7 +371,7 @@ static void send_to_adder(running_machine *machine, int data)
 	adder2_sc2data       = data;	// store data
 
 	adder2_acia_triggered = 1;		// set flag, acia IRQ triggered
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE );//HOLD_LINE);// trigger IRQ
+	cputag_set_input_line(machine, "adder2", M6809_IRQ_LINE, ASSERT_LINE );//HOLD_LINE);// trigger IRQ
 }
 
 ///////////////////////////////////////////////////////////////////////////

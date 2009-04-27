@@ -651,7 +651,7 @@ static DRIVER_INIT( ataxx )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x03, 0, 0, ataxx_trackball_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x00, 0x03, 0, 0, ataxx_trackball_r);
 }
 
 
@@ -674,7 +674,7 @@ static DRIVER_INIT( ataxxj )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x03, 0, 0, ataxx_trackball_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x00, 0x03, 0, 0, ataxx_trackball_r);
 }
 
 
@@ -697,9 +697,9 @@ static DRIVER_INIT( wsf )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P1_P2");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0e, 0x0e, 0, 0, "P3_P4");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, "BUTTONS");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P1_P2");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0e, 0x0e, 0, 0, "P3_P4");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, "BUTTONS");
 }
 
 
@@ -722,14 +722,14 @@ static DRIVER_INIT( indyheat )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x02, 0, 0, indyheat_wheel_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x08, 0x0b, 0, 0, indyheat_analog_r);
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P1");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0e, 0x0e, 0, 0, "P2");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, "P3");
+	memory_install_read8_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x00, 0x02, 0, 0, indyheat_wheel_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x08, 0x0b, 0, 0, indyheat_analog_r);
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P1");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0e, 0x0e, 0, 0, "P2");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, "P3");
 
 	/* set up additional output ports */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x08, 0x0b, 0, 0, indyheat_analog_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x08, 0x0b, 0, 0, indyheat_analog_w);
 }
 
 
@@ -752,9 +752,9 @@ static DRIVER_INIT( brutforc )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P2");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0e, 0x0e, 0, 0, "P1");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, "P3");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P2");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0e, 0x0e, 0, 0, "P1");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, "P3");
 }
 
 
@@ -777,13 +777,13 @@ static DRIVER_INIT( asylum )
 	leland_rotate_memory(machine, "slave");
 
 	/* asylum appears to have some extra RAM for the slave CPU */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xf000, 0xfffb, 0, 0, (read8_space_func)SMH_BANK(4), (write8_space_func)SMH_BANK(4));
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "slave", ADDRESS_SPACE_PROGRAM), 0xf000, 0xfffb, 0, 0, (read8_space_func)SMH_BANK(4), (write8_space_func)SMH_BANK(4));
 	memory_set_bankptr(machine, 4, auto_alloc_array(machine, UINT8, 0x1000));
 
 	/* set up additional input ports */
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P2");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0e, 0x0e, 0, 0, "P1");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, "P3");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, "P2");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0e, 0x0e, 0, 0, "P1");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, "P3");
 }
 
 

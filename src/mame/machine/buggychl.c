@@ -10,7 +10,7 @@ MACHINE_RESET( buggychl )
 {
 	mcu_sent = 0;
 	main_sent = 0;
-	cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
+	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 }
 
 
@@ -70,18 +70,18 @@ READ8_HANDLER( buggychl_68705_portB_r )
 
 WRITE8_HANDLER( buggychl_68705_portB_w )
 {
-logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(space->cpu),data);
+logerror("%04x: 68705 port B write %02x\n", cpu_get_pc(space->cpu), data);
 
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
+		if (main_sent) cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 		main_sent = 0;
-logerror("read command %02x from main cpu\n",portA_in);
+logerror("read command %02x from main cpu\n", portA_in);
 	}
 	if ((ddrB & 0x04) && (data & 0x04) && (~portB_out & 0x04))
 	{
-logerror("send command %02x to main cpu\n",portA_out);
+logerror("send command %02x to main cpu\n", portA_out);
 		from_mcu = portA_out;
 		mcu_sent = 1;
 	}
@@ -111,13 +111,13 @@ READ8_HANDLER( buggychl_68705_portC_r )
 	portC_in = 0;
 	if (main_sent) portC_in |= 0x01;
 	if (!mcu_sent) portC_in |= 0x02;
-logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(space->cpu),portC_in);
+logerror("%04x: 68705 port C read %02x\n", cpu_get_pc(space->cpu), portC_in);
 	return (portC_out & ddrC) | (portC_in & ~ddrC);
 }
 
 WRITE8_HANDLER( buggychl_68705_portC_w )
 {
-logerror("%04x: 68705 port C write %02x\n",cpu_get_pc(space->cpu),data);
+logerror("%04x: 68705 port C write %02x\n", cpu_get_pc(space->cpu), data);
 	portC_out = data;
 }
 
@@ -129,15 +129,15 @@ WRITE8_HANDLER( buggychl_68705_ddrC_w )
 
 WRITE8_HANDLER( buggychl_mcu_w )
 {
-logerror("%04x: mcu_w %02x\n",cpu_get_pc(space->cpu),data);
+logerror("%04x: mcu_w %02x\n", cpu_get_pc(space->cpu), data);
 	from_main = data;
 	main_sent = 1;
-	cpu_set_input_line(space->machine->cpu[2],0,ASSERT_LINE);
+	cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( buggychl_mcu_r )
 {
-logerror("%04x: mcu_r %02x\n",cpu_get_pc(space->cpu),from_mcu);
+logerror("%04x: mcu_r %02x\n", cpu_get_pc(space->cpu), from_mcu);
 	mcu_sent = 0;
 	return from_mcu;
 }

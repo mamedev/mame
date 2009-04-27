@@ -144,7 +144,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 
 	/* wrap around at 262 */
 	scanline++;
@@ -204,7 +204,7 @@ static void update_interrupts(running_machine *machine)
 	{
 		irq_line_state = gen_int;
 //      if (irq_line_state != CLEAR_LINE)
-			cpu_set_input_line(machine->cpu[0], ASAP_IRQ0, irq_line_state);
+			cputag_set_input_line(machine, "maincpu", ASAP_IRQ0, irq_line_state);
 //      else
 //          asap_set_irq_line(ASAP_IRQ0, irq_line_state);
 	}
@@ -299,7 +299,7 @@ static WRITE32_HANDLER( sound_data_w )
 static WRITE32_HANDLER( sound_reset_w )
 {
 	logerror("Sound reset = %d\n", !offset);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "jsa", INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -514,8 +514,8 @@ static DRIVER_INIT( beathead )
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	/* prepare the speedups */
-	speedup_data = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000ae8, 0x00000aeb, 0, 0, speedup_r);
-	movie_speedup_data = memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x00000804, 0x00000807, 0, 0, movie_speedup_r);
+	speedup_data = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000ae8, 0x00000aeb, 0, 0, speedup_r);
+	movie_speedup_data = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000804, 0x00000807, 0, 0, movie_speedup_r);
 }
 
 

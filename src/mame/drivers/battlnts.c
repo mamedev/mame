@@ -30,7 +30,7 @@ static INTERRUPT_GEN( battlnts_interrupt )
 
 static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )

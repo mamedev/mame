@@ -131,7 +131,7 @@ static void update_irqs(running_machine *machine)
 	if (newstate != irq_state)
 	{
 		irq_state = newstate;
-		cpu_set_input_line(machine->cpu[0], 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1617,7 +1617,7 @@ static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_data_irq )
 {
-	cpu_set_input_line(device->machine->cpu[1], M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )
