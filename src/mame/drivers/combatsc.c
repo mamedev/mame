@@ -219,7 +219,7 @@ static WRITE8_HANDLER( protection_clock_w )
 
 static WRITE8_HANDLER( combasc_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static READ8_DEVICE_HANDLER( combasc_busy_r )
@@ -249,12 +249,12 @@ static READ8_DEVICE_HANDLER ( combasc_ym2203_r )
 	static int boost = 1;
 	int status = ym2203_r(device,offset);
 
-	if (cpu_get_pc(device->machine->cpu[1]) == 0x334)
+	if (cpu_get_pc(cputag_get_cpu(device->machine, "audiocpu")) == 0x334)
 	{
 		if (boost)
 		{
 			boost = 0;
-			timer_adjust_periodic(combasc_interleave_timer, attotime_zero, 0, cpu_clocks_to_attotime(device->machine->cpu[1],80));
+			timer_adjust_periodic(combasc_interleave_timer, attotime_zero, 0, cputag_clocks_to_attotime(device->machine, "audiocpu", 80));
 		}
 		else if (status & 2)
 		{
@@ -801,7 +801,7 @@ static DRIVER_INIT( combasct )
 static DRIVER_INIT( combasc )
 {
 	/* joystick instead of trackball */
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0404, 0x0404, 0, 0, "IN1");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0404, 0x0404, 0, 0, "IN1");
 
 	combasc_init_common(machine);
 }

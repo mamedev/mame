@@ -43,7 +43,7 @@ static VIDEO_START( cowrace )
 
 static VIDEO_UPDATE( cowrace )
 {
-	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
+	tilemap_draw(bitmap, cliprect, tmap, 0, 0);
 	return 0;
 }
 
@@ -51,7 +51,7 @@ static VIDEO_UPDATE( cowrace )
 static WRITE8_HANDLER( cowrace_soundlatch_w )
 {
 	soundlatch_w(0, data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 #endif
 

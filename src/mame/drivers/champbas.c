@@ -130,15 +130,15 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	int bit = data & 1;
 
-	cpu_interrupt_enable(space->machine->cpu[0],bit);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
 	if (!bit)
-		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
+	cputag_set_input_line_and_vector(machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static MACHINE_START( exctsccr )

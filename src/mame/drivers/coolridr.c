@@ -239,8 +239,8 @@ static INTERRUPT_GEN( system_h1_sub )
 static MACHINE_RESET ( coolridr )
 {
 
-//  cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+//  cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 
 }
 
@@ -322,7 +322,7 @@ static READ32_HANDLER( coolridr_hack_r )
 
 static DRIVER_INIT( coolridr )
 {
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack_r );
 }
 
 GAME( 1995, coolridr,    0, coolridr,    0,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND )

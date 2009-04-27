@@ -61,13 +61,13 @@ static UINT16 *cninja_ram;
 static WRITE16_HANDLER( cninja_sound_w )
 {
 	soundlatch_w(space,0,data&0xff);
-	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( stoneage_sound_w )
 {
 	soundlatch_w(space,0,data&0xff);
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static TIMER_CALLBACK( interrupt_gen )
@@ -75,18 +75,18 @@ static TIMER_CALLBACK( interrupt_gen )
 	int scanline = param;
 
 	/* Save state of scroll registers before the IRQ */
-	deco16_raster_display_list[deco16_raster_display_position++]=scanline;
-	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf12_control[1]&0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf12_control[2]&0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf12_control[3]&0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf12_control[4]&0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[1]&0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[2]&0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[3]&0xffff;
-	deco16_raster_display_list[deco16_raster_display_position++]=deco16_pf34_control[4]&0xffff;
+	deco16_raster_display_list[deco16_raster_display_position++] = scanline;
+	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[1] & 0xffff;
+	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[2] & 0xffff;
+	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[3] & 0xffff;
+	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf12_control[4] & 0xffff;
+	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[1] & 0xffff;
+	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[2] & 0xffff;
+	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[3] & 0xffff;
+	deco16_raster_display_list[deco16_raster_display_position++] = deco16_pf34_control[4] & 0xffff;
 
-	cpu_set_input_line(machine->cpu[0], (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
-	timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
+	cputag_set_input_line(machine, "maincpu", (cninja_irq_mask&0x10) ? 3 : 4, ASSERT_LINE);
+	timer_adjust_oneshot(raster_irq_timer, attotime_never, 0);
 }
 
 static READ16_HANDLER( cninja_irq_r )
@@ -97,8 +97,8 @@ static READ16_HANDLER( cninja_irq_r )
 		return cninja_scanline;
 
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cpu_set_input_line(space->machine->cpu[0], 3, CLEAR_LINE);
-		cpu_set_input_line(space->machine->cpu[0], 4, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 3, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 4, CLEAR_LINE);
 		return 0;
 	}
 
@@ -661,12 +661,12 @@ static MACHINE_RESET( cninja )
 
 static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1],1,state); /* IRQ 2 */
+	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
 }
 
 static void sound_irq2(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,state);
+	cputag_set_input_line(device->machine, "audiocpu", 0, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
@@ -1681,13 +1681,13 @@ static void cninja_patch(running_machine *machine)
 
 static DRIVER_INIT( cninja )
 {
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
 	cninja_patch(machine);
 }
 
 static DRIVER_INIT( stoneage )
 {
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, stoneage_sound_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, stoneage_sound_w);
 }
 
 static DRIVER_INIT( mutantf )

@@ -35,14 +35,6 @@
 #define CUBEQST_HBLANK		320
 #define CUBEQST_VCOUNT		280
 
-enum cpu_indices
-{
-	MAIN_CPU   = 0,
-	ROTATE_CPU = 1,
-	LINE_CPU   = 2,
-	SOUND_CPU  = 3,
-};
-
 
 /*************************************
  *
@@ -118,8 +110,8 @@ static VIDEO_UPDATE( cubeqst )
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
 		int i;
-		int num_entries = cubeqcpu_get_ptr_ram_val(screen->machine->cpu[LINE_CPU], y);
-		UINT32 *stk_ram = cubeqcpu_get_stack_ram(screen->machine->cpu[LINE_CPU]);
+		int num_entries = cubeqcpu_get_ptr_ram_val(cputag_get_cpu(screen->machine, "line_cpu"), y);
+		UINT32 *stk_ram = cubeqcpu_get_stack_ram(cputag_get_cpu(screen->machine, "line_cpu"));
 		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 		UINT32 pen;
 
@@ -248,10 +240,10 @@ static WRITE16_HANDLER( control_w )
 
 static TIMER_CALLBACK( delayed_bank_swap )
 {
-	cubeqcpu_swap_line_banks(machine->cpu[LINE_CPU]);
+	cubeqcpu_swap_line_banks(cputag_get_cpu(machine, "line_cpu"));
 
 	/* TODO: This is a little dubious */
-	cubeqcpu_clear_stack(machine->cpu[LINE_CPU]);
+	cubeqcpu_clear_stack(cputag_get_cpu(machine, "line_cpu"));
 }
 
 
@@ -383,22 +375,22 @@ INPUT_PORTS_END
 
 static READ16_HANDLER( read_rotram )
 {
-	return cubeqcpu_rotram_r(space->machine->cpu[ROTATE_CPU], offset, mem_mask);
+	return cubeqcpu_rotram_r(cputag_get_cpu(space->machine, "rotate_cpu"), offset, mem_mask);
 }
 
 static WRITE16_HANDLER( write_rotram )
 {
-	cubeqcpu_rotram_w(space->machine->cpu[ROTATE_CPU], offset, data, mem_mask);
+	cubeqcpu_rotram_w(cputag_get_cpu(space->machine, "rotate_cpu"), offset, data, mem_mask);
 }
 
 static READ16_HANDLER( read_sndram )
 {
-	return cubeqcpu_sndram_r(space->machine->cpu[SOUND_CPU], offset, mem_mask);
+	return cubeqcpu_sndram_r(cputag_get_cpu(space->machine, "sound_cpu"), offset, mem_mask);
 }
 
 static WRITE16_HANDLER( write_sndram )
 {
-	cubeqcpu_sndram_w(space->machine->cpu[SOUND_CPU], offset, data, mem_mask);
+	cubeqcpu_sndram_w(cputag_get_cpu(space->machine, "sound_cpu"), offset, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )

@@ -211,7 +211,7 @@ static UINT8 toprollr_rombank;
 static WRITE8_HANDLER( swimmer_sh_soundlatch_w )
 {
 	soundlatch_w(space,offset,data);
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 
@@ -248,7 +248,7 @@ static WRITE8_HANDLER(toprollr_rombank_w)
 
 static TIMER_CALLBACK( disable_interrupts )
 {
-	cpu_interrupt_enable(machine->cpu[0],0);
+	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
 }
 
 

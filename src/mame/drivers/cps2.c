@@ -753,7 +753,8 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	/* bit 7 - */
 
         /* Z80 Reset */
-	if (space->machine->cpu[1])	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+	if (cputag_get_cpu(space->machine, "audiocpu"))	
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 	coin_counter_w(0, data & 0x0001);
 	if( (strncmp(space->machine->gamedrv->name,"pzloop2",8)==0) ||
@@ -7403,7 +7404,7 @@ static DRIVER_INIT( cps2 )
 	DRIVER_INIT_CALL(cps2crpt);
 	cps2networkpresent = 0;
 
-	cpu_set_clockscale(machine->cpu[0], 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 static DRIVER_INIT( ssf2tb )
@@ -7420,7 +7421,7 @@ static DRIVER_INIT( ssf2tb )
 static DRIVER_INIT ( pzloop2 )
 {
 	DRIVER_INIT_CALL(cps2);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
 }
 
 static UINT16* gigamn2_dummyqsound_ram;
@@ -7436,9 +7437,9 @@ static DRIVER_INIT( gigamn2 )
 	DRIVER_INIT_CALL(cps2);
 
 	gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000/2);
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
 	memory_set_decrypted_region(space, 0x000000, (length) - 1, &rom[length/4]);
-	m68k_set_encrypted_opcode_range(machine->cpu[0],0,length);
+	m68k_set_encrypted_opcode_range(cputag_get_cpu(machine, "maincpu"), 0, length);
 }
 
 

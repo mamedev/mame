@@ -191,7 +191,7 @@ static WRITE8_HANDLER( track_reset_w )
 
 static WRITE8_HANDLER( capbowl_sndcmd_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 	soundlatch_w(space, offset, data);
 }
 
@@ -206,7 +206,7 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
 
 static void firqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

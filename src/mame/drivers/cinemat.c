@@ -280,7 +280,7 @@ static READ8_HANDLER( qb3_frame_r )
 
 static WRITE8_HANDLER( qb3_ram_bank_w )
 {
-	memory_set_bank(space->machine, 1, cpu_get_reg(space->machine->cpu[0], CCPU_P) & 3);
+	memory_set_bank(space->machine, 1, cpu_get_reg(cputag_get_cpu(space->machine, "maincpu"), CCPU_P) & 3);
 }
 
 
@@ -1437,34 +1437,34 @@ ROM_END
 
 static DRIVER_INIT( speedfrk )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x03, 0, 0, speedfrk_wheel_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x06, 0, 0, speedfrk_gear_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x03, 0, 0, speedfrk_wheel_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x06, 0, 0, speedfrk_gear_r);
 }
 
 
 static DRIVER_INIT( sundance )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x0f, 0, 0, sundance_inputs_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x0f, 0, 0, sundance_inputs_r);
 }
 
 
 static DRIVER_INIT( tailg )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, mux_select_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, mux_select_w);
 }
 
 
 static DRIVER_INIT( boxingb )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0c, 0x0f, 0, 0, boxingb_dial_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, mux_select_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x0c, 0x0f, 0, 0, boxingb_dial_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, mux_select_w);
 }
 
 
 static DRIVER_INIT( qb3 )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, qb3_frame_r);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, qb3_ram_bank_w);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x0f, 0x0f, 0, 0, qb3_frame_r);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, qb3_ram_bank_w);
 
 	memory_configure_bank(machine, 1, 0, 4, rambase, 0x100*2);
 }

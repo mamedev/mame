@@ -694,7 +694,7 @@ static DRIVER_INIT( cps3 )
 	if (!cps3_user5region) cps3_user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
 
 	// set strict verify
-	sh2drc_set_options(machine->cpu[0], SH2DRC_STRICT_VERIFY);
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_STRICT_VERIFY);
 
 	cps3_decrypt_bios(machine);
 	decrypted_gamerom = auto_alloc_array(machine, UINT32, 0x1000000/4);
@@ -706,7 +706,7 @@ static DRIVER_INIT( cps3 )
 
 
 	cps3_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), cps3_direct_handler);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), cps3_direct_handler);
 
 	// flash roms
 
@@ -1806,7 +1806,7 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 				}
 
 
-				cpu_set_input_line(space->machine->cpu[0],10, ASSERT_LINE);
+				cputag_set_input_line(space->machine, "maincpu", 10, ASSERT_LINE);
 
 
 			}
@@ -2002,43 +2002,43 @@ static void cps3_process_character_dma(running_machine *machine, UINT32 address)
 
 	//printf("charDMA start:\n");
 
-	for (i=0;i<0x1000;i+=3)
+	for (i = 0; i < 0x1000; i += 3)
 	{
-		UINT32 dat1 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i+0+(address)]);
-		UINT32 dat2 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i+1+(address)]);
-		UINT32 dat3 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i+2+(address)]);
-		UINT32 real_source      = (dat3<<1)-0x400000;
-		UINT32 real_destination =  dat2<<3;
-		UINT32 real_length      = (((dat1&0x001fffff)+1)<<3);
+		UINT32 dat1 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i + 0 + (address)]);
+		UINT32 dat2 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i + 1 + (address)]);
+		UINT32 dat3 = LITTLE_ENDIANIZE_INT32(cps3_char_ram[i + 2 + (address)]);
+		UINT32 real_source      = (dat3 << 1) - 0x400000;
+		UINT32 real_destination =  dat2 << 3;
+		UINT32 real_length      = (((dat1 & 0x001fffff) + 1) << 3);
 
 		/* 0x01000000 is the end of list marker, 0x13131313 is our default fill */
-		if ((dat1==0x01000000) || (dat1==0x13131313)) break;
+		if ((dat1 == 0x01000000) || (dat1 == 0x13131313)) break;
 
         //printf("%08x %08x %08x real_source %08x (rom %d offset %08x) real_destination %08x, real_length %08x\n", dat1, dat2, dat3, real_source, real_source/0x800000, real_source%0x800000, real_destination, real_length);
 
-		if  ( (dat1&0x00e00000) ==0x00800000 )
+		if  ((dat1 & 0x00e00000) == 0x00800000)
 		{
 			/* Sets a table used by the decompression routines */
 			{
 				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
 				current_table_address = real_source;
 			}
-			cpu_set_input_line(machine->cpu[0],10, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", 10, ASSERT_LINE);
 		}
-		else if  ( (dat1&0x00e00000) ==0x00400000 )
+		else if  ((dat1 & 0x00e00000) == 0x00400000)
 		{
 			/* 6bpp DMA decompression
               - this is used for the majority of sprites and backgrounds */
 			cps3_do_char_dma( machine, real_source, real_destination, real_length );
-			cpu_set_input_line(machine->cpu[0],10, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", 10, ASSERT_LINE);
 
 		}
-		else if  ( (dat1&0x00e00000) ==0x00600000 )
+		else if  ((dat1 & 0x00e00000) == 0x00600000)
 		{
 			/* 8bpp DMA decompression
               - this is used on SFIII NG Sean's Stage ONLY */
 			cps3_do_alt_char_dma( machine, real_source, real_destination, real_length);
-			cpu_set_input_line(machine->cpu[0],10, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", 10, ASSERT_LINE);
 		}
 		else
 		{
@@ -2095,12 +2095,12 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 
 static WRITE32_HANDLER( cps3_irq10_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0],10, CLEAR_LINE); return;
+	cputag_set_input_line(space->machine, "maincpu", 10, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_irq12_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0],12, CLEAR_LINE); return;
+	cputag_set_input_line(space->machine, "maincpu", 12, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_unk_vidregs_w )

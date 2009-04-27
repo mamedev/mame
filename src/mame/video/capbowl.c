@@ -23,7 +23,7 @@ static offs_t blitter_addr;
 
 static void generate_interrupt(running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, state);
+	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, state);
 }
 
 static const struct tms34061_interface tms34061intf =

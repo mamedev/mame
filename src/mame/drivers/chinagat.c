@@ -150,13 +150,13 @@ static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
 	{
-		cpu_set_input_line(timer->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		cpu_set_input_line(timer->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 	}
 
 	/* adjust for next scanline */
@@ -172,23 +172,23 @@ static WRITE8_HANDLER( chinagat_interrupt_w )
 	{
 		case 0: /* 3e00 - SND irq */
 			soundlatch_w( space, 0, data );
-			cpu_set_input_line(space->machine->cpu[2], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			cputag_set_input_line(space->machine, "audiocpu", sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 
 		case 1: /* 3e01 - NMI ack */
-			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 2: /* 3e02 - FIRQ ack */
-			cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 3e03 - IRQ ack */
-			cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 4: /* 3e04 - sub CPU IRQ ack */
-			cpu_set_input_line(space->machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			cputag_set_input_line(space->machine, "sub", sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 	}
 }
@@ -225,7 +225,7 @@ static READ8_HANDLER( saiyugb1_mcu_command_r )
 #if 0
 	if (saiyugb1_mcu_command == 0x78)
 	{
-		cpu_suspend(space->machine->cpu[3], SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
+		cputag_suspend(space->machine, "mcu", SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
 	}
 #endif
 	return saiyugb1_mcu_command;
@@ -237,7 +237,7 @@ static WRITE8_HANDLER( saiyugb1_mcu_command_w )
 #if 0
 	if (data != 0x78)
 	{
-		cpu_resume(space->machine->cpu[3], SUSPEND_REASON_HALT);	/* Wake up */
+		cputag_resume(space->machine, "mcu", SUSPEND_REASON_HALT);	/* Wake up */
 	}
 #endif
 }
@@ -520,7 +520,7 @@ GFXDECODE_END
 
 static void chinagat_irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

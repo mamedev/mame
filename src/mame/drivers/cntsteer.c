@@ -386,42 +386,42 @@ static WRITE8_HANDLER( cntsteer_background_w )
 
 static WRITE8_HANDLER( gekitsui_sub_irq_ack )
 {
-	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sound_w )
 {
  	soundlatch_w(space,0,data);
- 	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
+ 	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
 {
 	/*TODO: check this.*/
 	logerror("CTRL: %04x: %04x: %04x\n",cpu_get_pc(space->cpu),offset,data);
-//  if (offset==0) cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+//  if (offset==0) cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset==1) cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset==2) cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset==1) cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset==2) cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n",data);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_nmi_w )
 {
 //  if(data)
-//  cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+//  cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 //  popmessage("%02x",data);
 }
 
 static WRITE8_HANDLER( cntsteer_main_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
@@ -588,7 +588,7 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cpu_set_input_line(field->port->machine->cpu[1], INPUT_LINE_NMI, newval ? CLEAR_LINE : PULSE_LINE);
+	cputag_set_input_line(field->port->machine, "audiocpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : PULSE_LINE);
 }
 
 static INPUT_PORTS_START( cntsteer )

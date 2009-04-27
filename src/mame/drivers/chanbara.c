@@ -312,7 +312,7 @@ static WRITE8_DEVICE_HANDLER(chanbara_ay_out_1_w)
 
 static void sound_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[0],0,linestate);
+	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
 }
 
 

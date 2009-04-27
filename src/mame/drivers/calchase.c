@@ -215,7 +215,7 @@ static WRITE8_HANDLER(at_page8_w)
 
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
@@ -225,7 +225,7 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 
 static DMA8237_MEM_WRITE( pc_dma_write_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
@@ -546,7 +546,7 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(calchase)
 {
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 
 	calchase_devices.pit8254 = devtag_get_device( machine, "pit8254" );
 	calchase_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
@@ -562,7 +562,7 @@ static MACHINE_START(calchase)
  *************************************************************/
 
 static PIC8259_SET_INT_LINE( calchase_pic8259_1_set_int_line ) {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -615,7 +615,7 @@ static MACHINE_RESET(calchase)
 
 static void set_gate_a20(running_machine *machine, int a20)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_A20, a20);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(running_machine *machine, int state)

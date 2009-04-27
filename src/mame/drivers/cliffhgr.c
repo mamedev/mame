@@ -137,7 +137,7 @@ static WRITE8_HANDLER( cliff_coin_counter_w )
 static READ8_HANDLER( cliff_irq_ack_r )
 {
 	/* deassert IRQ on the CPU */
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 
 	return 0x00;
 }
@@ -197,14 +197,14 @@ static TIMER_CALLBACK( cliff_irq_callback )
 
 	/* if we have a valid code, trigger an IRQ */
 	if ( phillips_code & 0x800000 )
-		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 }
 
 static void vdp_interrupt (running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

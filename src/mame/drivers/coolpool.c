@@ -220,7 +220,7 @@ static WRITE16_HANDLER( amerdart_misc_w )
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
 
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bits 10-15 are counted down over time */
 	if (data & 0x0400) amerdart_iop_echo = 1;
@@ -233,7 +233,7 @@ static TIMER_CALLBACK( amerdart_iop_response )
 	iop_answer = iop_cmd;
 	if (amerdart_iop_echo && iop_cmd != 0x19)
 	{
-		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
 		return;
 	}
 	amerdart_iop_echo = 0;
@@ -271,7 +271,7 @@ static TIMER_CALLBACK( amerdart_iop_response )
 			break;
 	}
 
-	cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
 }
 
 
@@ -297,7 +297,7 @@ static WRITE16_HANDLER( coolpool_misc_w )
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
 
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -313,9 +313,9 @@ static TIMER_CALLBACK( deferred_iop_w )
 {
 	iop_cmd = param;
 	cmd_pending = 1;
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
-										/* the DSP polls the status bit so it isn't strictly */
-										/* necessary to also have an IRQ */
+	cputag_set_input_line(machine, "dsp", 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
+															/* the DSP polls the status bit so it isn't strictly */
+															/* necessary to also have an IRQ */
 	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
 }
 
@@ -330,7 +330,7 @@ static WRITE16_HANDLER( coolpool_iop_w )
 static READ16_HANDLER( coolpool_iop_r )
 {
 	logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),iop_answer);
-	cpu_set_input_line(space->machine->cpu[0], 1, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
 
 	return iop_answer;
 }
@@ -347,16 +347,16 @@ static READ16_HANDLER( coolpool_iop_r )
 static READ16_HANDLER( dsp_cmd_r )
 {
 	cmd_pending = 0;
-	logerror("%08x:IOP cmd_r %04x\n",cpu_get_pc(space->cpu),iop_cmd);
+	logerror("%08x:IOP cmd_r %04x\n", cpu_get_pc(space->cpu), iop_cmd);
 	return iop_cmd;
 }
 
 
 static WRITE16_HANDLER( dsp_answer_w )
 {
-	logerror("%08x:IOP answer %04x\n",cpu_get_pc(space->cpu),data);
+	logerror("%08x:IOP answer %04x\n", cpu_get_pc(space->cpu), data);
 	iop_answer = data;
-	cpu_set_input_line(space->machine->cpu[0], 1, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 1, ASSERT_LINE);
 }
 
 
@@ -955,7 +955,7 @@ ROM_END
 
 static DRIVER_INIT( coolpool )
 {
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, coolpool_input_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "dsp", ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, coolpool_input_r);
 }
 
 

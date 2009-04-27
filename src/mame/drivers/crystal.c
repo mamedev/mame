@@ -141,41 +141,41 @@ static UINT32 *ResetPatch;
 
 static void IntReq(running_machine *machine, int num)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 IntEn=memory_read_dword(space, 0x01800c08);
 	UINT32 IntPend=memory_read_dword(space, 0x01800c0c);
-	if(IntEn&(1<<num))
+	if(IntEn & (1 << num))
 	{
-		IntPend|=(1<<num);
-		memory_write_dword(space,0x01800c0c,IntPend);
-		cpu_set_input_line(machine->cpu[0],SE3208_INT,ASSERT_LINE);
+		IntPend |= (1 << num);
+		memory_write_dword(space, 0x01800c0c, IntPend);
+		cputag_set_input_line(machine, "maincpu", SE3208_INT, ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
-	FlipCntRead=0;
-	cpu_resume(machine->cpu[0],SUSPEND_REASON_SPIN);
+	FlipCntRead = 0;
+	cputag_resume(machine, "maincpu", SUSPEND_REASON_SPIN);
 #endif
 }
 
 static READ32_HANDLER(FlipCount_r)
 {
 #ifdef IDLE_LOOP_SPEEDUP
-	UINT32 IntPend=memory_read_dword(space, 0x01800c0c);
+	UINT32 IntPend = memory_read_dword(space, 0x01800c0c);
 	FlipCntRead++;
-	if(FlipCntRead>=16 && !IntPend && FlipCount!=0)
-		cpu_suspend(space->machine->cpu[0],SUSPEND_REASON_SPIN,1);
+	if(FlipCntRead >= 16 && !IntPend && FlipCount != 0)
+		cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_SPIN, 1);
 #endif
 	return ((UINT32) FlipCount)<<16;
 }
 
 static WRITE32_HANDLER(FlipCount_w)
 {
-	if(mem_mask&0x00ff0000)
+	if(mem_mask & 0x00ff0000)
 	{
-		int fc=(data>>16)&0xff;
-		if(fc==1)
+		int fc = (data >> 16) & 0xff;
+		if(fc == 1)
 			FlipCount++;
-		else if(fc==0)
-			FlipCount=0;
+		else if(fc == 0)
+			FlipCount = 0;
 	}
 }
 
@@ -193,36 +193,36 @@ static READ32_HANDLER(Input_r)
 		if(!(Port4 & 0x20) && ((OldPort4^Port4) & 0x20))
 			IntReq(space->machine, 19);
 		OldPort4 = Port4;
-		return /*dips*/input_port_read(space->machine, "DSW")|(Port4<<16);
+		return /*dips*/input_port_read(space->machine, "DSW") | (Port4 << 16);
 	}
 	return 0;
 }
 
 static WRITE32_HANDLER(IntAck_w)
 {
-	UINT32 IntPend=memory_read_dword(space, 0x01800c0c);
-	if(mem_mask&0xff)
+	UINT32 IntPend = memory_read_dword(space, 0x01800c0c);
+	if(mem_mask & 0xff)
 	{
-		IntPend&=~(1<<(data&0x1f));
-		memory_write_dword(space, 0x01800c0c,IntPend);
+		IntPend &= ~(1 << (data & 0x1f));
+		memory_write_dword(space, 0x01800c0c, IntPend);
 		if(!IntPend)
-			cpu_set_input_line(space->machine->cpu[0],SE3208_INT,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", SE3208_INT, CLEAR_LINE);
 	}
-	if(mem_mask&0xff00)
-		IntHigh=(data>>8)&7;
+	if(mem_mask & 0xff00)
+		IntHigh = (data >> 8) & 7;
 }
 
 static IRQ_CALLBACK(icallback)
 {
 	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	UINT32 IntPend=memory_read_dword(space, 0x01800c0c);
+	UINT32 IntPend = memory_read_dword(space, 0x01800c0c);
 	int i;
 
-	for(i=0;i<32;++i)
+	for(i = 0; i < 32; ++i)
 	{
-		if(IntPend&(1<<i))
+		if(IntPend & (1 << i))
 		{
-			return (IntHigh<<5)|i;
+			return (IntHigh << 5) | i;
 		}
 	}
 	return 0;		//This should never happen
@@ -501,8 +501,8 @@ static MACHINE_START(crystal)
 {
 	int i;
 
-	cpu_set_irq_callback(machine->cpu[0],icallback);
-	for (i=0; i<4; i++)
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), icallback);
+	for (i = 0; i < 4; i++)
 		Timer[i] = timer_alloc(machine, Timercb, (void*)(FPTR)i);
 
 	PatchReset();
@@ -512,28 +512,28 @@ static MACHINE_RESET(crystal)
 {
 	int i;
 
-	memset(sysregs,0,0x10000);
-	memset(vidregs,0,0x10000);
-	FlipCount=0;
-	IntHigh=0;
-	cpu_set_irq_callback(machine->cpu[0],icallback);
-	Bank=0;
-	memory_set_bankptr(machine, 1,memory_region(machine, "user1")+0);
-	FlashCmd=0xff;
-	OldPort4=0;
+	memset(sysregs, 0, 0x10000);
+	memset(vidregs, 0, 0x10000);
+	FlipCount = 0;
+	IntHigh = 0;
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), icallback);
+	Bank = 0;
+	memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0);
+	FlashCmd = 0xff;
+	OldPort4 = 0;
 
-	DMActrl[0]=0;
-	DMActrl[1]=0;
+	DMActrl[0] = 0;
+	DMActrl[1] = 0;
 
-	for (i=0; i<4; i++)
+	for (i = 0; i < 4; i++)
 	{
-		Timerctrl[i]=0;
-		timer_adjust_oneshot(Timer[i],attotime_never,0);
+		Timerctrl[i] = 0;
+		timer_adjust_oneshot(Timer[i], attotime_never, 0);
 	}
 
-	vr0_snd_set_areas(devtag_get_device(machine, "vrender"), textureram,frameram);
+	vr0_snd_set_areas(devtag_get_device(machine, "vrender"), textureram, frameram);
 #ifdef IDLE_LOOP_SPEEDUP
-	FlipCntRead=0;
+	FlipCntRead = 0;
 #endif
 
 	PatchReset();
@@ -545,95 +545,95 @@ static VIDEO_START(crystal)
 
 static UINT16 GetVidReg(const address_space *space, UINT16 reg)
 {
-	return memory_read_word(space,0x03000000+reg);
+	return memory_read_word(space, 0x03000000 + reg);
 }
 
-static void SetVidReg(const address_space *space, UINT16 reg,UINT16 val)
+static void SetVidReg(const address_space *space, UINT16 reg, UINT16 val)
 {
-	memory_write_word(space,0x03000000+reg,val);
+	memory_write_word(space, 0x03000000 + reg, val);
 }
 
 
 static VIDEO_UPDATE(crystal)
 {
-	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int DoFlip;
 
 
-	UINT32 B0=0x0;
-	UINT32 B1=(GetVidReg(space,0x90)&0x8000)?0x400000:0x100000;
-	UINT16 *Front,*Back;
-	UINT16 *Visible,*DrawDest;
+	UINT32 B0 = 0x0;
+	UINT32 B1 = (GetVidReg(space, 0x90) & 0x8000) ? 0x400000 : 0x100000;
+	UINT16 *Front, *Back;
+	UINT16 *Visible, *DrawDest;
 	UINT16 *srcline;
 	int y;
-	UINT16 head,tail;
-	UINT32 width=video_screen_get_width(screen);
+	UINT16 head, tail;
+	UINT32 width = video_screen_get_width(screen);
 
-	if(GetVidReg(space,0x8e)&1)
+	if(GetVidReg(space, 0x8e) & 1)
 	{
-		Front=(UINT16*) (frameram+B1/4);
-		Back=(UINT16*) (frameram+B0/4);
+		Front = (UINT16*) (frameram + B1 / 4);
+		Back  = (UINT16*) (frameram + B0 / 4);
 	}
 	else
 	{
-		Front=(UINT16*) (frameram+B0/4);
-		Back=(UINT16*) (frameram+B1/4);
+		Front = (UINT16*) (frameram + B0 / 4);
+		Back  = (UINT16*) (frameram + B1 / 4);
 	}
 
-	Visible=(UINT16*) Front;
-	DrawDest=(UINT16 *) frameram;
+	Visible  = (UINT16*) Front;
+	DrawDest = (UINT16 *) frameram;
 
 
-	if(GetVidReg(space,0x8c)&0x80)
-		DrawDest=Front;
+	if(GetVidReg(space, 0x8c) & 0x80)
+		DrawDest = Front;
 	else
-		DrawDest=Back;
+		DrawDest = Back;
 
-//  DrawDest=Visible;
+//  DrawDest = Visible;
 
-	srcline=(UINT16 *) DrawDest;
+	srcline = (UINT16 *) DrawDest;
 
-	DoFlip=0;
-	head=GetVidReg(space,0x82);
-	tail=GetVidReg(space,0x80);
-	while((head&0x7ff)!=(tail&0x7ff))
+	DoFlip = 0;
+	head = GetVidReg(space, 0x82);
+	tail = GetVidReg(space, 0x80);
+	while((head & 0x7ff) != (tail & 0x7ff))
 	{
-		DoFlip=vrender0_ProcessPacket(space,0x03800000+head*64,DrawDest,(UINT8*)textureram);
+		DoFlip = vrender0_ProcessPacket(space, 0x03800000 + head * 64, DrawDest, (UINT8*)textureram);
 		head++;
-		head&=0x7ff;
+		head &= 0x7ff;
 		if(DoFlip)
 			break;
 	}
 
 	if(DoFlip)
-		SetVidReg(space,0x8e,GetVidReg(space,0x8e)^1);
+		SetVidReg(space, 0x8e, GetVidReg(space, 0x8e) ^ 1);
 
 	srcline=(UINT16 *) Visible;
-	for(y=0;y<240;y++)
-		memcpy(BITMAP_ADDR16(bitmap, y, 0), &srcline[y*512], width*2);
+	for(y = 0; y < 240; y++)
+		memcpy(BITMAP_ADDR16(bitmap, y, 0), &srcline[y * 512], width * 2);
 
 	return 0;
 }
 
 static VIDEO_EOF(crystal)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	UINT16 head,tail;
-	int DoFlip=0;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT16 head, tail;
+	int DoFlip = 0;
 
-	head=GetVidReg(space,0x82);
-	tail=GetVidReg(space,0x80);
-	while((head&0x7ff)!=(tail&0x7ff))
+	head = GetVidReg(space, 0x82);
+	tail = GetVidReg(space, 0x80);
+	while((head & 0x7ff) != (tail & 0x7ff))
 	{
-		UINT16 Packet0=memory_read_word(space,0x03800000+head*64);
-		if(Packet0&0x81)
-			DoFlip=1;
+		UINT16 Packet0 = memory_read_word(space, 0x03800000 + head * 64);
+		if(Packet0 & 0x81)
+			DoFlip = 1;
 		head++;
-		head&=0x7ff;
+		head &= 0x7ff;
 		if(DoFlip)
 			break;
 	}
-	SetVidReg(space,0x82,head);
+	SetVidReg(space, 0x82, head);
 	if(DoFlip)
 	{
 		if(FlipCount)
@@ -914,4 +914,3 @@ GAME( 2001, crysking, crysbios, crystal, crystal, crysking, ROT0, "Brezzasoft", 
 GAME( 2001, evosocc,  crysbios, crystal, crystal,  evosocc, ROT0, "Evoga", "Evolution Soccer", 0 )
 GAME( 2003, topbladv, crysbios, topbladv,crystal, topbladv, ROT0, "SonoKong / Expotato", "Top Blade V", GAME_NOT_WORKING ) // protection
 GAME( 2001, officeye,        0, crystal, crystal, officeye, ROT0, "Danbi", "Office Yeo In Cheon Ha (version 1.2)", GAME_NOT_WORKING ) // protection
-

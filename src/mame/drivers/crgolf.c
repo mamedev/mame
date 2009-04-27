@@ -123,7 +123,7 @@ static WRITE8_HANDLER( unknown_w )
 
 static TIMER_CALLBACK( main_to_sound_callback )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 	main_to_sound_data = param;
 }
 
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( main_to_sound_w )
 
 static READ8_HANDLER( main_to_sound_r )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return main_to_sound_data;
 }
 
@@ -150,7 +150,7 @@ static READ8_HANDLER( main_to_sound_r )
 
 static TIMER_CALLBACK( sound_to_main_callback )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	sound_to_main_data = param;
 }
 
@@ -163,7 +163,7 @@ static WRITE8_HANDLER( sound_to_main_w )
 
 static READ8_HANDLER( sound_to_main_r )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return sound_to_main_data;
 }
 
@@ -581,7 +581,7 @@ ROM_END
 static DRIVER_INIT( crgolfhi )
 {
 	const device_config *msm = devtag_get_device(machine, "msm");
-	memory_install_write8_device_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
+	memory_install_write8_device_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 
 

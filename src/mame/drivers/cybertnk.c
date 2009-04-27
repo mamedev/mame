@@ -304,7 +304,7 @@ static WRITE16_HANDLER( io_w )
 		case 0:
 			// sound data
 			if (ACCESSING_BITS_0_7)
-				cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
+				cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 			else
 				LOG_UNKNOWN_WRITE
 			break;

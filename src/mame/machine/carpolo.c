@@ -89,7 +89,7 @@ static UINT8 last_wheel_value[4];
 
 static void TTL74148_3S_cb(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, TTL74148_output_valid_r(TTL74148_3S) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", M6502_IRQ_LINE, TTL74148_output_valid_r(TTL74148_3S) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

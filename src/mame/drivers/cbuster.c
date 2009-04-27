@@ -39,17 +39,18 @@ static UINT16 prot;
 
 static WRITE16_HANDLER( twocrude_control_w )
 {
-	switch (offset<<1) {
+	switch (offset << 1) 
+	{
 	case 0: /* DMA flag */
-		buffer_spriteram16_w(space,0,0,0xffff);
+		buffer_spriteram16_w(space, 0, 0, 0xffff);
 		return;
 
 	case 6: /* IRQ ack */
 		return;
 
     case 2: /* Sound CPU write */
-		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
     	return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
@@ -69,22 +70,22 @@ static WRITE16_HANDLER( twocrude_control_w )
             protection?!
 
         */
-		if ((data&0xffff)==0x9a00) prot=0;
-		if ((data&0xffff)==0xaa) prot=0x74;
-		if ((data&0xffff)==0x0200) prot=0x63<<8;
-		if ((data&0xffff)==0x9a) prot=0xe;
-		if ((data&0xffff)==0x55) prot=0x1e;
-		if ((data&0xffff)==0x0e) {prot=0x0e;twocrude_pri_w(0);} /* start */
-		if ((data&0xffff)==0x00) {prot=0x0e;twocrude_pri_w(0);} /* level 0 */
-		if ((data&0xffff)==0xf1) {prot=0x36;twocrude_pri_w(1);} /* level 1 */
-		if ((data&0xffff)==0x80) {prot=0x2e;twocrude_pri_w(1);} /* level 2 */
-		if ((data&0xffff)==0x40) {prot=0x1e;twocrude_pri_w(1);} /* level 3 */
-		if ((data&0xffff)==0xc0) {prot=0x3e;twocrude_pri_w(0);} /* level 4 */
-		if ((data&0xffff)==0xff) {prot=0x76;twocrude_pri_w(1);} /* level 5 */
+		if ((data & 0xffff) == 0x9a00) prot = 0;
+		if ((data & 0xffff) == 0xaa)   prot = 0x74;
+		if ((data & 0xffff) == 0x0200) prot = 0x63 << 8;
+		if ((data & 0xffff) == 0x9a)   prot = 0xe;
+		if ((data & 0xffff) == 0x55)   prot = 0x1e;
+		if ((data & 0xffff) == 0x0e)  {prot = 0x0e; twocrude_pri_w(0);} /* start */
+		if ((data & 0xffff) == 0x00)  {prot = 0x0e; twocrude_pri_w(0);} /* level 0 */
+		if ((data & 0xffff) == 0xf1)  {prot = 0x36; twocrude_pri_w(1);} /* level 1 */
+		if ((data & 0xffff) == 0x80)  {prot = 0x2e; twocrude_pri_w(1);} /* level 2 */
+		if ((data & 0xffff) == 0x40)  {prot = 0x1e; twocrude_pri_w(1);} /* level 3 */
+		if ((data & 0xffff) == 0xc0)  {prot = 0x3e; twocrude_pri_w(0);} /* level 4 */
+		if ((data & 0xffff) == 0xff)  {prot = 0x76; twocrude_pri_w(1);} /* level 5 */
 
 		break;
 	}
-	logerror("Warning %04x- %02x written to control %02x\n",cpu_get_pc(space->cpu),data,offset);
+	logerror("Warning %04x- %02x written to control %02x\n", cpu_get_pc(space->cpu), data, offset);
 }
 
 static READ16_HANDLER( twocrude_control_r )
@@ -272,7 +273,7 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1],1,state); /* IRQ 2 */
+	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

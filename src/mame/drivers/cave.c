@@ -99,9 +99,9 @@ static UINT8 agallet_vblank_irq;
 static void update_irq_state(running_machine *machine)
 {
 	if (vblank_irq || sound_irq || unknown_irq)
-		cpu_set_input_line(machine->cpu[0], irq_level, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", irq_level, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], irq_level, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", irq_level, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( cave_vblank_start )
@@ -223,7 +223,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 //  sound_flag1 = 1;
 //  sound_flag2 = 1;
 	soundlatch_word_w(space,offset,data,mem_mask);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
@@ -1681,7 +1681,7 @@ static const ymz280b_interface ymz280b_intf =
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -3828,7 +3828,7 @@ static DRIVER_INIT( agallet )
 	unpack_sprites(machine);
 
 //  Speed Hack
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb80000, 0xb80001, 0, 0, agallet_irq_cause_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb80000, 0xb80001, 0, 0, agallet_irq_cause_r);
 }
 
 static DRIVER_INIT( dfeveron )

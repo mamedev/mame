@@ -181,7 +181,7 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[0],0,linestate);
+	cputag_set_input_line(device->machine, "maincpu", 0, linestate);
 }
 
 static const ym2203_interface ym2203_config =

@@ -23,7 +23,7 @@ static int xcenter, ycenter;
 
 static TIMER_CALLBACK( cchasm_refresh_end )
 {
-    cpu_set_input_line (machine->cpu[0], 2, ASSERT_LINE);
+    cputag_set_input_line (machine, "maincpu", 2, ASSERT_LINE);
 }
 
 static void cchasm_refresh (running_machine *machine)
@@ -114,7 +114,7 @@ WRITE16_HANDLER( cchasm_refresh_control_w )
 			cchasm_refresh(space->machine);
 			break;
 		case 0xf7:
-			cpu_set_input_line (space->machine->cpu[0], 2, CLEAR_LINE);
+			cputag_set_input_line (space->machine, "maincpu", 2, CLEAR_LINE);
 			break;
 		}
 	}

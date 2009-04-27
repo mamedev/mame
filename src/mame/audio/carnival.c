@@ -44,7 +44,6 @@
 
 
 #define	PSG_CLOCK		(3579545 / 3)	/* Hz */
-#define CPU_MUSIC_ID    (1)       		/* music CPU id number */
 
 
 /* output port 0x01 definitions - sound effect drive outputs */
@@ -237,7 +236,7 @@ WRITE8_HANDLER( carnival_audio_2_w )
 
 	if ( bitsGoneHigh & OUT_PORT_2_MUSIC_RESET )
 		/* reset output is no longer asserted active low */
-		cpu_set_input_line(space->machine->cpu[CPU_MUSIC_ID], INPUT_LINE_RESET, PULSE_LINE );
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE );
 }
 
 

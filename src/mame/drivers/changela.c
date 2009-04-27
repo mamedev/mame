@@ -451,10 +451,10 @@ static INTERRUPT_GEN( chl_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
 
 	/* it seems the V8 == Vblank and it is connected to the INT on the 68705 */
-	//so we should cause an INT on the cpu 1 here, as well.
+	//so we should cause an INT on the MCU cpu here, as well.
 	//but only once per frame !
 	if (vector == 0xdf) /* only on vblank */
-		generic_pulse_irq_line(device->machine->cpu[1], 0);
+		generic_pulse_irq_line(cputag_get_cpu(device->machine, "mcu"), 0);
 
 }
 
