@@ -236,45 +236,27 @@ static WRITE8_HANDLER( fromance_coinctr_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xf001, 0xf001) AM_READ(fromance_keymatrix_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("COIN")
-	AM_RANGE(0xf003, 0xf003) AM_READ(fromance_busycheck_main_r)
+static ADDRESS_MAP_START( nekkyoku_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("SERVICE") AM_WRITE(fromance_portselect_w)
+	AM_RANGE(0xf001, 0xf001) AM_READ(fromance_keymatrix_r) AM_WRITENOP
+	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("COIN") AM_WRITE(fromance_coinctr_w)
+	AM_RANGE(0xf003, 0xf003) AM_READWRITE(fromance_busycheck_main_r, fromance_commanddata_w)
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nekkyoku_writemem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(fromance_portselect_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITENOP
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(fromance_coinctr_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(fromance_commanddata_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( fromance_readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( fromance_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0x9e89, 0x9e89) AM_READNOP			// unknown (idolmj)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("SERVICE") AM_WRITE(fromance_portselect_w)
 	AM_RANGE(0xe001, 0xe001) AM_READ(fromance_keymatrix_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("COIN")
-	AM_RANGE(0xe003, 0xe003) AM_READ(fromance_busycheck_main_r)
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("COIN") AM_WRITE(fromance_coinctr_w)
+	AM_RANGE(0xe003, 0xe003) AM_READWRITE(fromance_busycheck_main_r, fromance_commanddata_w)
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("DSW1")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fromance_writemem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(fromance_portselect_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(fromance_coinctr_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(fromance_commanddata_w)
 ADDRESS_MAP_END
 
 
@@ -285,37 +267,20 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_readmem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xefff) AM_READ(fromance_videoram_r)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(fromance_paletteram_r)
+static ADDRESS_MAP_START( nekkyoku_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xefff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nekkyoku_writemem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xefff) AM_WRITE(fromance_videoram_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(fromance_paletteram_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( fromance_readmem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(fromance_paletteram_r)
-	AM_RANGE(0xd000, 0xffff) AM_READ(fromance_videoram_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fromance_writemem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(fromance_paletteram_w)
-	AM_RANGE(0xd000, 0xffff) AM_WRITE(fromance_videoram_w)
+static ADDRESS_MAP_START( fromance_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
+	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
 ADDRESS_MAP_END
 
 
@@ -1012,11 +977,11 @@ static MACHINE_DRIVER_START( nekkyoku )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_main,nekkyoku_writemem_main)
+	MDRV_CPU_PROGRAM_MAP(nekkyoku_main_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_sub,nekkyoku_writemem_sub)
+	MDRV_CPU_PROGRAM_MAP(nekkyoku_sub_map,0)
 	MDRV_CPU_IO_MAP(nekkyoku_sub_io_map,0)
 
 	MDRV_MACHINE_RESET(fromance)
@@ -1050,11 +1015,11 @@ static MACHINE_DRIVER_START( idolmj )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
+	MDRV_CPU_PROGRAM_MAP(fromance_main_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
+	MDRV_CPU_PROGRAM_MAP(fromance_sub_map,0)
 	MDRV_CPU_IO_MAP(idolmj_sub_io_map,0)
 
 	MDRV_MACHINE_RESET(fromance)
@@ -1088,11 +1053,11 @@ static MACHINE_DRIVER_START( fromance )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(fromance_readmem_main,fromance_writemem_main)
+	MDRV_CPU_PROGRAM_MAP(fromance_main_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
-	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
+	MDRV_CPU_PROGRAM_MAP(fromance_sub_map,0)
 	MDRV_CPU_IO_MAP(fromance_sub_io_map,0)
 
 	MDRV_MACHINE_RESET(fromance)

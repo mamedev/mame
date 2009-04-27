@@ -106,46 +106,27 @@ static WRITE8_HANDLER( multiply_w )
 }
 
 
-static ADDRESS_MAP_START( flkatck_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0400, 0x041f) AM_READ(flkatck_ls138_r)			/* inputs + DIPS */
-	AM_RANGE(0x0800, 0x0bff) AM_READ(SMH_RAM)		/* palette */
-	AM_RANGE(0x1000, 0x1fff) AM_READ(SMH_RAM)					/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)		/* Video RAM (007121) */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK(1))					/* banked ROM */
-	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
+static ADDRESS_MAP_START( flkatck_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(flkatck_k007121_regs_w) 									/* 007121 registers */
+	AM_RANGE(0x0008, 0x03ff) AM_RAM																	/* RAM */
+	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)	/* palette */
+	AM_RANGE(0x1000, 0x1fff) AM_RAM																	/* RAM */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE(&k007121_ram)					/* Video RAM (007121) */
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)															/* banked ROM */
+	AM_RANGE(0x6000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flkatck_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0007) AM_WRITE(flkatck_k007121_regs_w) 	/* 007121 registers */
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0400, 0x041f) AM_WRITE(flkatck_ls138_w)			/* bankswitch + counters + sound command */
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE(&paletteram)/* palette */
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(flkatck_k007121_w) AM_BASE(&k007121_ram)			/* Video RAM (007121) */
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_BANK(1))					/* banked ROM */
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( flkatck_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)				/* ??? */
-//  AM_RANGE(0x9001, 0x9001) AM_READ(SMH_RAM)               /* ??? */
-	AM_RANGE(0x9004, 0x9004) AM_READ(SMH_RAM)				/* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami", k007232_r)	/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym2151_r) /* YM2151 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( flkatck_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)					/* ??? */
-//  AM_RANGE(0x9001, 0x9001) AM_WRITE(SMH_RAM)                  /* ??? */
-	AM_RANGE(0x9006, 0x9006) AM_WRITE(SMH_RAM)					/* ??? */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami", k007232_w) 	/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym2151_w)		/* YM2151 */
+static ADDRESS_MAP_START( flkatck_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(multiply_r, multiply_w)				/* ??? */
+//  AM_RANGE(0x9001, 0x9001) AM_RAM               								/* ??? */
+	AM_RANGE(0x9004, 0x9004) AM_READNOP											/* ??? */
+	AM_RANGE(0x9006, 0x9006) AM_WRITENOP										/* ??? */
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)								/* soundlatch_r */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)	/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym2151_r, ym2151_w)			/* YM2151 */
 ADDRESS_MAP_END
 
 
@@ -231,11 +212,11 @@ static MACHINE_DRIVER_START( flkatck )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
-	MDRV_CPU_PROGRAM_MAP(flkatck_readmem,flkatck_writemem)
+	MDRV_CPU_PROGRAM_MAP(flkatck_map,0)
 	MDRV_CPU_VBLANK_INT("screen", flkatck_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3579545)	/* NEC D780C-1, 3.579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(flkatck_readmem_sound,flkatck_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(flkatck_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

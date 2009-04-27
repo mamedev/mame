@@ -244,25 +244,14 @@ static WRITE8_HANDLER( flip_screen_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xe97f) AM_READ(SMH_RAM)
-	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
-	AM_RANGE(0xf011, 0xf011) AM_READ_PORT("IN1")
-	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
-	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
-	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(firetrap_bg1videoram_w) AM_BASE(&firetrap_bg1videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(firetrap_bg2videoram_w) AM_BASE(&firetrap_bg2videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(firetrap_fgvideoram_w) AM_BASE(&firetrap_fgvideoram)
-	AM_RANGE(0xe800, 0xe97f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+static ADDRESS_MAP_START( firetrap_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_BASE(&firetrap_bg1videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_BASE(&firetrap_bg2videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_BASE(&firetrap_fgvideoram)
+	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
@@ -273,28 +262,22 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf00a, 0xf00b) AM_WRITE(firetrap_bg1_scrolly_w)
 	AM_RANGE(0xf00c, 0xf00d) AM_WRITE(firetrap_bg2_scrollx_w)
 	AM_RANGE(0xf00e, 0xf00f) AM_WRITE(firetrap_bg2_scrolly_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_bootleg, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xe97f) AM_READ(SMH_RAM)
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
 	AM_RANGE(0xf011, 0xf011) AM_READ_PORT("IN1")
 	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
 	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
 	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_bootleg_r)
-	AM_RANGE(0xf800, 0xf8ff) AM_READ(SMH_ROM)	/* extra ROM in the bootleg with unprotection code */
+	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem_bootleg, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(firetrap_bg1videoram_w) AM_BASE(&firetrap_bg1videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(firetrap_bg2videoram_w) AM_BASE(&firetrap_bg2videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(firetrap_fgvideoram_w) AM_BASE(&firetrap_fgvideoram)
-	AM_RANGE(0xe800, 0xe97f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+static ADDRESS_MAP_START( firetrap_bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_BASE(&firetrap_bg1videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_BASE(&firetrap_bg2videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_BASE(&firetrap_fgvideoram)
+	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
@@ -305,23 +288,24 @@ static ADDRESS_MAP_START( writemem_bootleg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf00a, 0xf00b) AM_WRITE(firetrap_bg1_scrolly_w)
 	AM_RANGE(0xf00c, 0xf00d) AM_WRITE(firetrap_bg2_scrollx_w)
 	AM_RANGE(0xf00e, 0xf00f) AM_WRITE(firetrap_bg2_scrolly_w)
-	AM_RANGE(0xf800, 0xf8ff) AM_WRITE(SMH_ROM)	/* extra ROM in the bootleg with unprotection code */
+	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
+	AM_RANGE(0xf011, 0xf011) AM_READ_PORT("IN1")
+	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
+	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
+	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_bootleg_r)
+	AM_RANGE(0xf800, 0xf8ff) AM_ROM /* extra ROM in the bootleg with unprotection code */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3400, 0x3400) AM_READ(soundlatch_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(2))
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym", ym3526_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x3400, 0x3400) AM_READ(soundlatch_r)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -577,11 +561,11 @@ static MACHINE_DRIVER_START( firetrap )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(firetrap_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(firetrap,2)
 
 	MDRV_CPU_ADD("audiocpu", M6502,3072000/2)	/* 1.536 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 	MDRV_MACHINE_RESET(firetrap)
@@ -616,11 +600,11 @@ static MACHINE_DRIVER_START( firetpbl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem_bootleg,writemem_bootleg)
+	MDRV_CPU_PROGRAM_MAP(firetrap_bootleg_map,0)
 	MDRV_CPU_VBLANK_INT("screen", bootleg)
 
 	MDRV_CPU_ADD("audiocpu", M6502,3072000/2) /* 1.536 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 

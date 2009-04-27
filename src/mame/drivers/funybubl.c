@@ -90,21 +90,12 @@ static WRITE8_DEVICE_HANDLER( funybubl_oki_bank_sw )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(2))	// banked port 1?
-	AM_RANGE(0xc400, 0xc7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_BANK(1))	// banked port 0?
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc400, 0xcfff) AM_WRITE(funybubl_paldatawrite) AM_BASE(&funybubl_paletteram) // palette
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_BANK(1))	// banked port 0?
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( funybubl_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(2) // banked port 1?
+	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(funybubl_paldatawrite) AM_BASE(&funybubl_paletteram) // palette
+	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK(1) // banked port 0?
+	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -120,18 +111,12 @@ ADDRESS_MAP_END
 
 /* Sound CPU */
 
-static ADDRESS_MAP_START( soundreadmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("oki", okim6295_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( soundwritemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", funybubl_oki_bank_sw)
-	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -238,12 +223,12 @@ static DRIVER_INIT( funybubl )
 static MACHINE_DRIVER_START( funybubl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz?? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(funybubl_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		 /* 4 MHz?? */
-	MDRV_CPU_PROGRAM_MAP(soundreadmem,soundwritemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

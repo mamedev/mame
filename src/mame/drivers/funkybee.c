@@ -98,26 +98,19 @@ static WRITE8_HANDLER( funkybee_coin_counter_w )
 	coin_counter_w(offset,data);
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_READNOP	/* IRQ Ack */
-	AM_RANGE(0xf800, 0xf800) AM_READ(funkybee_input_port_0_r)
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(funkybee_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(funkybee_colorram_w) AM_BASE(&colorram)
+static ADDRESS_MAP_START( funkybee_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x4fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(funkybee_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(funkybee_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(funkybee_scroll_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(funkybee_flipscreen_w)
 	AM_RANGE(0xe802, 0xe803) AM_WRITE(funkybee_coin_counter_w)
 	AM_RANGE(0xe805, 0xe805) AM_WRITE(funkybee_gfx_bank_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf000, 0xf000) AM_READNOP	/* IRQ Ack */
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(funkybee_input_port_0_r, watchdog_reset_w)
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -299,7 +292,7 @@ static MACHINE_DRIVER_START( funkybee )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(funkybee_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 

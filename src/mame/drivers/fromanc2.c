@@ -259,111 +259,72 @@ static WRITE8_HANDLER( fromanc2_subcpu_rombank_w )
 //  MAIN Program (fromanc2, fromancr, fromanc4)
 // ----------------------------------------------------------------------------
 
-static ADDRESS_MAP_START( fromanc2_readmem_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)				// MAIN ROM
+static ADDRESS_MAP_START( fromanc2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// MAIN ROM
 
-	AM_RANGE(0x802000, 0x802fff) AM_READNOP				// ???
+	AM_RANGE(0x802000, 0x802fff) AM_READNOP								// ???
+	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromanc2_videoram_0_w)		// VRAM 0, 1 (1P)
+	AM_RANGE(0x880000, 0x883fff) AM_WRITE(fromanc2_videoram_1_w)		// VRAM 2, 3 (1P)
+	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromanc2_videoram_2_w)		// VRAM 0, 1 (2P)
+	AM_RANGE(0x980000, 0x983fff) AM_WRITE(fromanc2_videoram_3_w)		// VRAM 2, 3 (2P)
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_READ(fromanc2_paletteram_0_r)// PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_READ(fromanc2_paletteram_1_r)// PALETTE (2P)
+	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(fromanc2_paletteram_0_r, fromanc2_paletteram_0_w)	// PALETTE (1P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromanc2_paletteram_1_r, fromanc2_paletteram_1_w)	// PALETTE (2P)
 
+	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromanc2_gfxreg_0_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromanc2_gfxreg_2_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd00200, 0xd00223) AM_WRITE(fromanc2_gfxreg_1_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd00300, 0xd00323) AM_WRITE(fromanc2_gfxreg_3_w)			// SCROLL REG (1P/2P)
+
+	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP							// ???
+	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP							// ???
+
+	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)			// SOUND REQ (1P/2P)
 	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r 	)	// SUB CPU READ
-	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)	// INPUT KEY MATRIX
+	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)			// SUB CPU WRITE
+	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r 	)			// SUB CPU READ
+	AM_RANGE(0xd01400, 0xd01401) AM_WRITE(fromanc2_gfxbank_0_w)			// GFXBANK (1P)
+	AM_RANGE(0xd01500, 0xd01501) AM_WRITE(fromanc2_gfxbank_1_w)			// GFXBANK (2P)
+	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromanc2_eeprom_w)			// EEPROM DATA
+	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)			// INPUT KEY MATRIX
+	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)		// PORT SELECT (1P/2P)
 
-	AM_RANGE(0xd80000, 0xd8ffff) AM_READ(SMH_RAM)				// WORK RAM
+	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM									// WORK RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc2_writemem_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)				// MAIN ROM
+static ADDRESS_MAP_START( fromancr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// MAIN ROM
 
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromanc2_videoram_0_w)	// VRAM 0, 1 (1P)
-	AM_RANGE(0x880000, 0x883fff) AM_WRITE(fromanc2_videoram_1_w)	// VRAM 2, 3 (1P)
-	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromanc2_videoram_2_w)	// VRAM 0, 1 (2P)
-	AM_RANGE(0x980000, 0x983fff) AM_WRITE(fromanc2_videoram_3_w)	// VRAM 2, 3 (2P)
+	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromancr_videoram_0_w)		// VRAM BG (1P/2P)
+	AM_RANGE(0x880000, 0x883fff) AM_WRITE(fromancr_videoram_1_w)		// VRAM FG (1P/2P)
+	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromancr_videoram_2_w)		// VRAM TEXT (1P/2P)
+	AM_RANGE(0x980000, 0x983fff) AM_WRITENOP							// VRAM Unused ?
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_WRITE(fromanc2_paletteram_0_w)// PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_WRITE(fromanc2_paletteram_1_w)// PALETTE (2P)
+	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(fromancr_paletteram_0_r, fromancr_paletteram_0_w)	// PALETTE (1P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromancr_paletteram_1_r, fromancr_paletteram_0_w)	// PALETTE (2P)
 
-	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromanc2_gfxreg_0_w)	// SCROLL REG (1P/2P)
-	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromanc2_gfxreg_2_w)	// SCROLL REG (1P/2P)
-	AM_RANGE(0xd00200, 0xd00223) AM_WRITE(fromanc2_gfxreg_1_w)	// SCROLL REG (1P/2P)
-	AM_RANGE(0xd00300, 0xd00323) AM_WRITE(fromanc2_gfxreg_3_w)	// SCROLL REG (1P/2P)
-
-	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP				// ???
-	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP				// ???
-
-	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)		// SOUND REQ (1P/2P)
-	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)		// SUB CPU WRITE
-	AM_RANGE(0xd01400, 0xd01401) AM_WRITE(fromanc2_gfxbank_0_w)	// GFXBANK (1P)
-	AM_RANGE(0xd01500, 0xd01501) AM_WRITE(fromanc2_gfxbank_1_w)	// GFXBANK (2P)
-	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromanc2_eeprom_w)		// EEPROM DATA
-	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)	// PORT SELECT (1P/2P)
-
-	AM_RANGE(0xd80000, 0xd8ffff) AM_WRITE(SMH_RAM)				// WORK RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fromancr_readmem_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)				// MAIN ROM
-
-	AM_RANGE(0xa00000, 0xa00fff) AM_READ(fromancr_paletteram_0_r)// PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_READ(fromancr_paletteram_1_r)// PALETTE (2P)
-
+	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromancr_gfxreg_1_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd00200, 0xd002ff) AM_WRITENOP							// ?
+	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP							// ???
+	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP							// ???
+	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)			// SOUND REQ (1P/2P)
+	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromancr_gfxreg_0_w)			// SCROLL REG (1P/2P)
 	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r)		// SUB CPU READ
-	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)	// INPUT KEY MATRIX
+	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)			// SUB CPU WRITE
+	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r)				// SUB CPU READ
+	AM_RANGE(0xd01400, 0xd01401) AM_WRITENOP							// COIN COUNTER ?
+	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromancr_eeprom_w)			// EEPROM DATA, GFXBANK (1P/2P)
+	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)			// INPUT KEY MATRIX
+	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)		// PORT SELECT (1P/2P)
 
-	AM_RANGE(0xd80000, 0xd8ffff) AM_READ(SMH_RAM)				// WORK RAM
+	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM									// WORK RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromancr_writemem_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)				// MAIN ROM
+static ADDRESS_MAP_START( fromanc4_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// MAIN ROM
+	AM_RANGE(0x400000, 0x7fffff) AM_ROM								// DATA ROM
 
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromancr_videoram_0_w)	// VRAM BG (1P/2P)
-	AM_RANGE(0x880000, 0x883fff) AM_WRITE(fromancr_videoram_1_w)	// VRAM FG (1P/2P)
-	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromancr_videoram_2_w)	// VRAM TEXT (1P/2P)
-	AM_RANGE(0x980000, 0x983fff) AM_WRITENOP				// VRAM Unused ?
-
-	AM_RANGE(0xa00000, 0xa00fff) AM_WRITE(fromancr_paletteram_0_w)// PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_WRITE(fromancr_paletteram_1_w)// PALETTE (2P)
-
-	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromancr_gfxreg_1_w)	// SCROLL REG (1P/2P)
-	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromancr_gfxreg_0_w)	// SCROLL REG (1P/2P)
-
-	AM_RANGE(0xd00200, 0xd002ff) AM_WRITENOP				// ?
-
-	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP				// ???
-	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP				// ???
-
-	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)		// SOUND REQ (1P/2P)
-	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)		// SUB CPU WRITE
-	AM_RANGE(0xd01400, 0xd01401) AM_WRITENOP				// COIN COUNTER ?
-	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromancr_eeprom_w)		// EEPROM DATA, GFXBANK (1P/2P)
-	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)	// PORT SELECT (1P/2P)
-
-	AM_RANGE(0xd80000, 0xd8ffff) AM_WRITE(SMH_RAM)				// WORK RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fromanc4_readmem_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)				// MAIN ROM
-	AM_RANGE(0x400000, 0x7fffff) AM_READ(SMH_ROM)				// DATA ROM
-
-	AM_RANGE(0x800000, 0x81ffff) AM_READ(SMH_RAM)				// WORK RAM
-
-	AM_RANGE(0xdb0000, 0xdb0fff) AM_READ(fromanc4_paletteram_0_r)// PALETTE (1P)
-	AM_RANGE(0xdc0000, 0xdc0fff) AM_READ(fromanc4_paletteram_1_r)// PALETTE (2P)
-
-	AM_RANGE(0xd10000, 0xd10001) AM_READ(fromanc2_keymatrix_r)	// INPUT KEY MATRIX
-	AM_RANGE(0xd20000, 0xd20001) AM_READ_PORT("SYSTEM")
-
-	AM_RANGE(0xe5000c, 0xe5000d) AM_READNOP				// EXT-COMM PORT ?
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fromanc4_writemem_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)				// MAIN ROM
-	AM_RANGE(0x400000, 0x7fffff) AM_WRITE(SMH_ROM)				// DATA ROM
-
-	AM_RANGE(0x800000, 0x81ffff) AM_WRITE(SMH_RAM)				// WORK RAM
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM								// WORK RAM
 
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(fromanc2_portselect_w)	// PORT SELECT (1P/2P)
 
@@ -377,8 +338,11 @@ static ADDRESS_MAP_START( fromanc4_writemem_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd90000, 0xd9ffff) AM_WRITE(fromanc4_videoram_1_w)	// VRAM BG (1P/2P)
 	AM_RANGE(0xda0000, 0xdaffff) AM_WRITE(fromanc4_videoram_2_w)	// VRAM TEXT (1P/2P)
 
-	AM_RANGE(0xdb0000, 0xdb0fff) AM_WRITE(fromanc4_paletteram_0_w)// PALETTE (1P)
-	AM_RANGE(0xdc0000, 0xdc0fff) AM_WRITE(fromanc4_paletteram_1_w)// PALETTE (2P)
+	AM_RANGE(0xdb0000, 0xdb0fff) AM_READWRITE(fromanc4_paletteram_0_r, fromanc4_paletteram_0_w)	// PALETTE (1P)
+	AM_RANGE(0xdc0000, 0xdc0fff) AM_READWRITE(fromanc4_paletteram_1_r, fromanc4_paletteram_0_w)	// PALETTE (2P)
+
+	AM_RANGE(0xd10000, 0xd10001) AM_READ(fromanc2_keymatrix_r)	// INPUT KEY MATRIX
+	AM_RANGE(0xd20000, 0xd20001) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xe00000, 0xe0001d) AM_WRITE(fromanc4_gfxreg_0_w)	// SCROLL, GFXBANK (1P/2P)
 	AM_RANGE(0xe10000, 0xe1001d) AM_WRITE(fromanc4_gfxreg_1_w)	// SCROLL, GFXBANK (1P/2P)
@@ -388,6 +352,7 @@ static ADDRESS_MAP_START( fromanc4_writemem_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe40000, 0xe40013) AM_WRITENOP				// ???
 
 	AM_RANGE(0xe50000, 0xe50009) AM_WRITENOP				// EXT-COMM PORT ?
+	AM_RANGE(0xe5000c, 0xe5000d) AM_READNOP				// EXT-COMM PORT ?
 ADDRESS_MAP_END
 
 
@@ -395,18 +360,11 @@ ADDRESS_MAP_END
 //  Z80 SUB Program (fromanc2, fromancr)
 // ----------------------------------------------------------------------------
 
-static ADDRESS_MAP_START( fromanc2_readmem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)					// ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))					// ROM(BANK)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_RAM)					// RAM(WORK)
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK(2))					// RAM(BANK)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fromanc2_writemem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)					// ROM
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_BANK(1))					// ROM(BANK)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_RAM)					// RAM(WORK)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_BANK(2))					// RAM(BANK)
+static ADDRESS_MAP_START( fromanc2_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM								// ROM
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(1)						// ROM(BANK) (is this comment correct?  It was in the split address maps in a RAM configuration...
+	AM_RANGE(0x8000, 0xbfff) AM_RAM								// RAM(WORK)
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK(2)						// RAM(BANK)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sub_io_map, ADDRESS_SPACE_IO, 8 )
@@ -422,14 +380,9 @@ ADDRESS_MAP_END
 //  Z80 Sound Program (fromanc2, fromancr, fromanc4)
 // ----------------------------------------------------------------------------
 
-static ADDRESS_MAP_START( fromanc2_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fromanc2_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( fromanc2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -616,15 +569,15 @@ static MACHINE_DRIVER_START( fromanc2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_main,fromanc2_writemem_main)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_main_map,0)
 	MDRV_CPU_VBLANK_INT("lscreen", fromanc2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map,0)
 	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
 
 	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sub,fromanc2_writemem_sub)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map,0)
 	MDRV_CPU_IO_MAP(fromanc2_sub_io_map,0)
 
 
@@ -668,15 +621,15 @@ static MACHINE_DRIVER_START( fromancr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromancr_readmem_main,fromancr_writemem_main)
+	MDRV_CPU_PROGRAM_MAP(fromancr_main_map,0)
 	MDRV_CPU_VBLANK_INT("lscreen", fromanc2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map,0)
 	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
 
 	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sub,fromanc2_writemem_sub)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sub_map,0)
 	MDRV_CPU_IO_MAP(fromanc2_sub_io_map,0)
 
 	MDRV_MACHINE_RESET(fromancr)
@@ -719,11 +672,11 @@ static MACHINE_DRIVER_START( fromanc4 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,32000000/2)		/* 16.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc4_readmem_main,fromanc4_writemem_main)
+	MDRV_CPU_PROGRAM_MAP(fromanc4_main_map,0)
 	MDRV_CPU_VBLANK_INT("lscreen", fromanc2_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/4)		/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(fromanc2_sound_map,0)
 	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(fromanc4)

@@ -90,34 +90,22 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 	}
 }
 
-static ADDRESS_MAP_START( fuuki16_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM					)	// ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x500000, 0x507fff) AM_READ(SMH_RAM					)	// Layers
-	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_READ(SMH_RAM	)	// Sprites, mirrored?
-	AM_RANGE(0x700000, 0x703fff) AM_READ(SMH_RAM					)	// Palette
+static ADDRESS_MAP_START( fuuki16_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM																		// ROM
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// RAM
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki16_vram_0_w) AM_BASE(&fuuki16_vram_0)					// Layers
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki16_vram_1_w) AM_BASE(&fuuki16_vram_1)					//
+	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki16_vram_2_w) AM_BASE(&fuuki16_vram_2)					//
+	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki16_vram_3_w) AM_BASE(&fuuki16_vram_3)					//
+	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites, mirrored?
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("DSW")
-	AM_RANGE(0x8c0000, 0x8c001f) AM_READ(SMH_RAM					)	// Video Registers
-/**/AM_RANGE(0x8d0000, 0x8d0003) AM_READ(SMH_RAM 				)	//
-/**/AM_RANGE(0x8e0000, 0x8e0001) AM_READ(SMH_RAM 				)	//
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fuuki16_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM							)	// ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(SMH_RAM							)	// RAM
-	AM_RANGE(0x500000, 0x501fff) AM_WRITE(fuuki16_vram_0_w) AM_BASE(&fuuki16_vram_0	)	// Layers
-	AM_RANGE(0x502000, 0x503fff) AM_WRITE(fuuki16_vram_1_w) AM_BASE(&fuuki16_vram_1	)	//
-	AM_RANGE(0x504000, 0x505fff) AM_WRITE(fuuki16_vram_2_w) AM_BASE(&fuuki16_vram_2	)	//
-	AM_RANGE(0x506000, 0x507fff) AM_WRITE(fuuki16_vram_3_w) AM_BASE(&fuuki16_vram_3	)	//
-	AM_RANGE(0x506000, 0x507fff) AM_WRITE(SMH_RAM							)	//
-	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites, mirrored?
-	AM_RANGE(0x700000, 0x703fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x8c0000, 0x8c001f) AM_WRITE(fuuki16_vregs_w) AM_BASE(&fuuki16_vregs )	// Video Registers
-	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(fuuki16_sound_command_w			)	// To Sound CPU
-	AM_RANGE(0x8d0000, 0x8d0003) AM_WRITE(SMH_RAM) AM_BASE(&fuuki16_unknown		)	//
-	AM_RANGE(0x8e0000, 0x8e0001) AM_WRITE(SMH_RAM) AM_BASE(&fuuki16_priority		)	//
+	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(fuuki16_sound_command_w)											// To Sound CPU
+	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(fuuki16_vregs_w) AM_BASE(&fuuki16_vregs )						// Video Registers
+/**/AM_RANGE(0x8d0000, 0x8d0003) AM_RAM AM_BASE(&fuuki16_unknown)											//
+/**/AM_RANGE(0x8e0000, 0x8e0001) AM_RAM AM_BASE(&fuuki16_priority)											//
 ADDRESS_MAP_END
 
 
@@ -147,16 +135,10 @@ static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )
 	okim6295_set_bank_base(device, ((data & 6) >> 1) * 0x40000);
 }
 
-static ADDRESS_MAP_START( fuuki16_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM		)	// ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_RAM		)	// RAM
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(1)		)	// Banked ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fuuki16_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM		)	// ROM
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_RAM		)	// RAM
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM		)	// Banked ROM
+static ADDRESS_MAP_START( fuuki16_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM			// ROM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM			// RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)	// Banked ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki16_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -469,10 +451,10 @@ static MACHINE_DRIVER_START( fuuki16 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(fuuki16_readmem,fuuki16_writemem)
+	MDRV_CPU_PROGRAM_MAP(fuuki16_map,0)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(fuuki16_sound_readmem,fuuki16_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(fuuki16_sound_map,0)
 	MDRV_CPU_IO_MAP(fuuki16_sound_io_map,0)
 
 	MDRV_MACHINE_START(fuuki16)
