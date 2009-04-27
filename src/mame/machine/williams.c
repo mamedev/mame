@@ -587,7 +587,7 @@ WRITE8_DEVICE_HANDLER( williams_port_select_w )
 
 CUSTOM_INPUT( williams_mux_r )
 {
-	const char *tag = param;
+	const char *tag = (const char *)param;
 
 	if (port_select != 0)
 		tag += strlen(tag) + 1;

@@ -199,21 +199,21 @@ static void wiggle_i860_common(int n, UINT16 data, const device_config *device)
 	if (bus_hold)
 	{
 		fprintf(stderr, "M0 asserting bus HOLD to i860 %s\n", device->tag);
-		i860_set_pin(device->token, DEC_PIN_BUS_HOLD, 1);
+		i860_set_pin(device, DEC_PIN_BUS_HOLD, 1);
 	}
 	else
 	{
 		fprintf(stderr, "M0 clearing bus HOLD to i860 %s\n", device->tag);
-		i860_set_pin(device->token, DEC_PIN_BUS_HOLD, 0);
+		i860_set_pin(device, DEC_PIN_BUS_HOLD, 0);
 	}
 
 	if (reset)
 	{
 		fprintf(stderr, "M0 asserting RESET to i860 %s\n", device->tag);
-		i860_set_pin(device->token, DEC_PIN_RESET, 1);
+		i860_set_pin(device, DEC_PIN_RESET, 1);
 	}
 	else
-		i860_set_pin(device->token, DEC_PIN_RESET, 0);
+		i860_set_pin(device, DEC_PIN_RESET, 0);
 }
 
 static WRITE16_HANDLER( wiggle_i860p0_pins_w )
@@ -379,8 +379,8 @@ static MACHINE_RESET( vcombat )
 	/* Setup the Bt476 VGA RAMDAC palette chip */
 	tlc34076_reset(6);
 
-	i860_set_pin(cputag_get_cpu(machine, "vid_0")->token, DEC_PIN_BUS_HOLD, 1);
-	i860_set_pin(cputag_get_cpu(machine, "vid_1")->token, DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(cputag_get_cpu(machine, "vid_0"), DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(cputag_get_cpu(machine, "vid_1"), DEC_PIN_BUS_HOLD, 1);
 
 	crtc_select = 0;
 }
@@ -390,7 +390,7 @@ static MACHINE_RESET( shadfgtr )
 	/* Setup the Bt476 VGA RAMDAC palette chip */
 	tlc34076_reset(6);
 
-	i860_set_pin(cputag_get_cpu(machine, "vid_0")->token, DEC_PIN_BUS_HOLD, 1);
+	i860_set_pin(cputag_get_cpu(machine, "vid_0"), DEC_PIN_BUS_HOLD, 1);
 
 	crtc_select = 0;
 }

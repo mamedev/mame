@@ -479,7 +479,8 @@ static void jaguar_set_palette(UINT16 vmode)
 
 static UINT8 *get_jaguar_memory(running_machine *machine, UINT32 offset)
 {
-	return memory_get_read_ptr(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), offset);
+	const address_space *space = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
+	return (UINT8 *)memory_get_read_ptr(space, offset);
 }
 
 

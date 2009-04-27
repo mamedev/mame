@@ -34,7 +34,7 @@ static TILE_GET_INFO( victnine_get_tile_info )
 {
 	int code = videoram[tile_index*2];
 	int attr = videoram[tile_index*2+1];
-	int tile_number = tile_number = ((attr & 0x38) << 5) + code;
+	int tile_number = ((attr & 0x38) << 5) + code;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(

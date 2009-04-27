@@ -48,7 +48,7 @@ static struct mjkjidai_adpcm_state
 
 static STREAM_UPDATE( mjkjidai_adpcm_callback )
 {
-	struct mjkjidai_adpcm_state *state = param;
+	struct mjkjidai_adpcm_state *state = (struct mjkjidai_adpcm_state *)param;
 	stream_sample_t *dest = outputs[0];
 
 	while (state->playing && samples > 0)

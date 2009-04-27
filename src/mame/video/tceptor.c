@@ -282,7 +282,7 @@ static void decode_bg(running_machine *machine, const char * region)
 static void decode_sprite(running_machine *machine, int gfx_index, const gfx_layout *layout, const void *data)
 {
 	/* decode the graphics */
-	machine->gfx[gfx_index] = gfx_element_alloc(machine, layout, data, 64, 1024);
+	machine->gfx[gfx_index] = gfx_element_alloc(machine, layout, (const UINT8 *)data, 64, 1024);
 }
 
 // fix sprite order

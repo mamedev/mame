@@ -702,7 +702,7 @@ static READ8_HANDLER( mcu_r )
 				return 0;
 		}
 
-		case 3: upd7759_busy_r(0) ? 0 : 0x08;
+		case 3: return upd7759_busy_r(0) ? 0 : 0x08;
 	}
 	return 0;
 }

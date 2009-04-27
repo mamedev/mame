@@ -961,7 +961,7 @@ static const struct game_keys keys_table[] =
 	{ "progearj", { 0x9f7edc56,0x39fb47be }, 0x400000 },	// 0C81 63A1 B8D3  cmpi.l  #$63A1B8D3,D1
 	{ "progeara", { 0x658ab128,0xfddc9b5e }, 0x400000 },	// 0C81 63A1 B8D3  cmpi.l  #$63A1B8D3,D1
 
-	{ 0 }	// end of table
+	{ NULL, { 0,0 }, 0 }	// end of table
 };
 
 

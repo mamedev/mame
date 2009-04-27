@@ -457,7 +457,7 @@ static READ8_HANDLER( leta_r )
 				/* if the joystick is centered, leave the rest of this alone */
 				angle = last_angle;
 				if (analogx < -32 || analogx > 32 || analogy < -32 || analogy > 32)
-					angle = atan2(analogx, analogy) * 360 / (2 * M_PI);
+					angle = atan2((double)analogx, (double)analogy) * 360 / (2 * M_PI);
 
 				/* detect when we pass the 0 point in either direction */
 				if (last_angle < -90 && angle > 90)

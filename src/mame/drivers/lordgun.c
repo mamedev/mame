@@ -32,34 +32,11 @@ To do:
 #include "machine/eeprom.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
+#include "lordgun.h"
 
-// Variables defined in video:
 
-extern UINT16 *lordgun_vram_0, *lordgun_scroll_x_0, *lordgun_scroll_y_0;
-extern UINT16 *lordgun_vram_1, *lordgun_scroll_x_1, *lordgun_scroll_y_1;
-extern UINT16 *lordgun_vram_2, *lordgun_scroll_x_2, *lordgun_scroll_y_2;
-extern UINT16 *lordgun_vram_3, *lordgun_scroll_x_3, *lordgun_scroll_y_3;
-extern UINT16 *lordgun_scrollram;
 static UINT16 *lordgun_priority_ram, lordgun_priority;
-extern int lordgun_whitescreen;
 
-extern struct
-{
-	int		scr_x,	scr_y;
-	UINT16	hw_x,	hw_y;
-}	lordgun_gun[2];
-
-// Functions defined in video:
-
-WRITE16_HANDLER( lordgun_vram_0_w );
-WRITE16_HANDLER( lordgun_vram_1_w );
-WRITE16_HANDLER( lordgun_vram_2_w );
-WRITE16_HANDLER( lordgun_vram_3_w );
-
-void lordgun_update_gun(running_machine *machine, int i);
-
-VIDEO_START( lordgun );
-VIDEO_UPDATE( lordgun );
 
 /***************************************************************************
 

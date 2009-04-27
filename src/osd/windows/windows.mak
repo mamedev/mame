@@ -207,6 +207,10 @@ endif
 # add the windows libraries
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
+ifdef CPP_COMPILE
+LIBS += -lsupc++
+endif
+
 ifeq ($(DIRECTINPUT),8)
 LIBS += -ldinput8
 CCOMFLAGS += -DDIRECTINPUT_VERSION=0x0800

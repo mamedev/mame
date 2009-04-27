@@ -181,8 +181,8 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, int link_to_file, const astring *tempheader, const astring *tempfooter);
 
 /* HTML helpers */
-static core_file *create_file_and_output_header(const astring *filename, const astring *template, const astring *path);
-static void output_footer_and_close_file(core_file *file, const astring *template, const astring *path);
+static core_file *create_file_and_output_header(const astring *filename, const astring *templatefile, const astring *path);
+static void output_footer_and_close_file(core_file *file, const astring *templatefile, const astring *path);
 
 /* path helpers */
 static const astring *normalized_subpath(const astring *path, int start);
@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
 		/* include path? */
 		if (arg[0] == '-' && arg[1] == 'I')
 		{
-			*incpathhead = malloc(sizeof(**incpathhead));
+			*incpathhead = (include_path *)malloc(sizeof(**incpathhead));
 			if (*incpathhead != NULL)
 			{
 				(*incpathhead)->next = NULL;
@@ -252,7 +252,7 @@ int main(int argc, char *argv[])
 	/* read the template file into an astring */
 	if (core_fload(astring_c(tempfilename), &buffer, &bufsize) == FILERR_NONE)
 	{
-		tempheader = astring_dupch(buffer, bufsize);
+		tempheader = astring_dupch((const char *)buffer, bufsize);
 		free(buffer);
 	}
 
@@ -353,7 +353,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 		while ((entry = osd_readdir(dir)) != NULL)
 			if (entry->type == entry_type && entry->name[0] != '.')
 			{
-				list_entry *lentry = malloc(sizeof(*lentry));
+				list_entry *lentry = (list_entry *)malloc(sizeof(*lentry));
 				lentry->name = astring_dupc(entry->name);
 				lentry->next = list;
 				list = lentry;
@@ -368,7 +368,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 			continue;
 
 		/* allocate memory for sorting */
-		listarray = malloc(sizeof(list_entry *) * found);
+		listarray = (list_entry **)malloc(sizeof(list_entry *) * found);
 		found = 0;
 		for (curlist = list; curlist != NULL; curlist = curlist->next)
 			listarray[found++] = curlist;
@@ -734,7 +734,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
     HTML file with a standard header
 -------------------------------------------------*/
 
-static core_file *create_file_and_output_header(const astring *filename, const astring *template, const astring *path)
+static core_file *create_file_and_output_header(const astring *filename, const astring *templatefile, const astring *path)
 {
 	astring *modified;
 	core_file *file;
@@ -744,7 +744,7 @@ static core_file *create_file_and_output_header(const astring *filename, const a
 		return NULL;
 
 	/* print a header */
-	modified = astring_dup(template);
+	modified = astring_dup(templatefile);
 	astring_replacec(modified, 0, "<!--PATH-->", astring_c(path));
 	core_fwrite(file, astring_c(modified), astring_len(modified));
 
@@ -759,11 +759,11 @@ static core_file *create_file_and_output_header(const astring *filename, const a
     standard footer to an HTML file and close it
 -------------------------------------------------*/
 
-static void output_footer_and_close_file(core_file *file, const astring *template, const astring *path)
+static void output_footer_and_close_file(core_file *file, const astring *templatefile, const astring *path)
 {
 	astring *modified;
 
-	modified = astring_dup(template);
+	modified = astring_dup(templatefile);
 	astring_replacec(modified, 0, "<!--PATH-->", astring_c(path));
 	core_fwrite(file, astring_c(modified), astring_len(modified));
 	astring_free(modified);

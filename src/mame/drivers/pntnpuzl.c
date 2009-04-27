@@ -151,7 +151,7 @@ static NVRAM_HANDLER( pntnpuzl )
 			UINT32 length, size;
 			UINT8 *dat;
 
-			dat = eeprom_get_data_pointer(&length, &size);
+			dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
 			memset(dat, 0, length * size);
 		}
 	}

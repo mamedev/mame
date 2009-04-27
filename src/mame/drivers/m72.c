@@ -190,7 +190,7 @@ static TIMER_CALLBACK( delayed_ram16_w )
 {
 	UINT16 val = ((UINT32) param) & 0xffff;
 	UINT16 offset = (((UINT32) param) >> 16) & 0xffff;
-	UINT16 *ram = ptr;
+	UINT16 *ram = (UINT16 *)ptr;
 
 	ram[offset] = val;
 }

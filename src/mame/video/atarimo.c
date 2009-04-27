@@ -246,8 +246,6 @@ INLINE void init_gfxelement(atarimo_data *mo, int idx)
 	mo->gfxelement[idx].total_colors = 65536;
 }
 
-static atarimo_data atarimo[ATARIMO_MAX];
-static emu_timer *force_update_timer;
 
 /*---------------------------------------------------------------
     init_savestate: Initialize save states

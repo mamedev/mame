@@ -166,7 +166,7 @@ static PALETTE_INIT( looping )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	looping_state *state = machine->driver_data;
+	looping_state *state = (looping_state *)machine->driver_data;
 	int tile_number = state->videoram[tile_index];
 	int color = state->colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
 	SET_TILE_INFO(0, tile_number, color, 0);
@@ -175,7 +175,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( looping )
 {
-	looping_state *state = machine->driver_data;
+	looping_state *state = (looping_state *)machine->driver_data;
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8,8, 32,32);
 
@@ -192,7 +192,7 @@ static VIDEO_START( looping )
 
 static WRITE8_HANDLER( flip_screen_x_w )
 {
-	looping_state *state = space->machine->driver_data;
+	looping_state *state = (looping_state *)space->machine->driver_data;
 	flip_screen_x_set(space->machine, ~data & 0x01);
 	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(space->machine) ? 128 : 0);
 }
@@ -200,7 +200,7 @@ static WRITE8_HANDLER( flip_screen_x_w )
 
 static WRITE8_HANDLER( flip_screen_y_w )
 {
-	looping_state *state = space->machine->driver_data;
+	looping_state *state = (looping_state *)space->machine->driver_data;
 	flip_screen_y_set(space->machine, ~data & 0x01);
 	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get(space->machine) ? 128 : 0);
 }
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( flip_screen_y_w )
 
 static WRITE8_HANDLER( looping_videoram_w )
 {
-	looping_state *state = space->machine->driver_data;
+	looping_state *state = (looping_state *)space->machine->driver_data;
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -216,7 +216,7 @@ static WRITE8_HANDLER( looping_videoram_w )
 
 static WRITE8_HANDLER( looping_colorram_w )
 {
-	looping_state *state = space->machine->driver_data;
+	looping_state *state = (looping_state *)space->machine->driver_data;
 	int i;
 
 	state->colorram[offset] = data;
@@ -246,7 +246,7 @@ static WRITE8_HANDLER( looping_colorram_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *source;
-	looping_state *state = machine->driver_data;
+	looping_state *state = (looping_state *)machine->driver_data;
 
 	for (source = state->spriteram; source < state->spriteram + 0x40; source += 4)
 	{
@@ -276,7 +276,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static VIDEO_UPDATE( looping )
 {
-	looping_state *state = screen->machine->driver_data;
+	looping_state *state = (looping_state *)screen->machine->driver_data;
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	draw_sprites(screen->machine, bitmap, cliprect);
@@ -293,7 +293,7 @@ static VIDEO_UPDATE( looping )
 
 static MACHINE_START( looping )
 {
-	looping_state *state = machine->driver_data;
+	looping_state *state = (looping_state *)machine->driver_data;
 	state_save_register_global_array(machine, state->sound);
 }
 
@@ -365,7 +365,7 @@ static WRITE8_DEVICE_HANDLER( looping_sound_sw )
         0007 = AFA
     */
 
-	looping_state *state = device->machine->driver_data;
+	looping_state *state = (looping_state *)device->machine->driver_data;
 	state->sound[offset + 1] = data ^ 1;
 	dac_data_w(device, ((state->sound[2] << 7) + (state->sound[3] << 6)) * state->sound[7]);
 }

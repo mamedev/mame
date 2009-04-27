@@ -239,7 +239,7 @@ static void qsound_set_command(qsound_state *chip, int data, int value)
 			ch=(ch+1)&0x0f;	/* strange ... */
 			chip->channel[ch].bank=(value&0x7f)<<16;
 #ifdef MAME_DEBUG
-			if (!value & 0x8000)
+			if (!(value & 0x8000))
 				popmessage("Register3=%04x",value);
 #endif
 

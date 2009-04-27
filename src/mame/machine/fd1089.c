@@ -125,7 +125,7 @@ CPU #     Type  Status   Game              Seed   Unencrypted data range
 
 struct parameters
 {
-	int xor;
+	int xorval;
 	int s7,s6,s5,s4,s3,s2,s1,s0;
 };
 
@@ -257,7 +257,7 @@ static int decode_fd1089a(int val,int key,int opcode)
 	table = rearrange_key(key, opcode);
 
 	p = &addr_params[table >> 4];
-	val = BITSWAP8(val, p->s7,p->s6,p->s5,p->s4,p->s3,p->s2,p->s1,p->s0) ^ p->xor;
+	val = BITSWAP8(val, p->s7,p->s6,p->s5,p->s4,p->s3,p->s2,p->s1,p->s0) ^ p->xorval;
 
 	if (BIT(table,3)) val ^= 0x01;
 	if (BIT(table,0)) val ^= 0xb1;
@@ -296,7 +296,7 @@ static int decode_fd1089a(int val,int key,int opcode)
 
 	q = &data_params[family];
 
-	val ^= q->xor;
+	val ^= q->xorval;
 	val = BITSWAP8(val, q->s7,q->s6,q->s5,q->s4,q->s3,q->s2,q->s1,q->s0);
 
 	return val;
@@ -305,7 +305,7 @@ static int decode_fd1089a(int val,int key,int opcode)
 static int decode_fd1089b(int val,int key,int opcode)
 {
 	int table;
-	int xor;
+	int xorval;
 
 	const struct parameters *p;
 
@@ -316,7 +316,7 @@ static int decode_fd1089b(int val,int key,int opcode)
 	table = rearrange_key(key, opcode);
 
 	p = &addr_params[table >> 4];
-	val = BITSWAP8(val, p->s7,p->s6,p->s5,p->s4,p->s3,p->s2,p->s1,p->s0) ^ p->xor;
+	val = BITSWAP8(val, p->s7,p->s6,p->s5,p->s4,p->s3,p->s2,p->s1,p->s0) ^ p->xorval;
 
 	if (BIT(table,3)) val ^= 0x01;
 	if (BIT(table,0)) val ^= 0xb1;
@@ -327,19 +327,19 @@ static int decode_fd1089b(int val,int key,int opcode)
 
 	val = basetable_fd1089[val];
 
-	xor = 0;
+	xorval = 0;
 	if (opcode == 0)
 	{
-		if (BIT(~table,6) & BIT(table,2)) xor ^= 0x01;
-		if (BIT(table,4)) xor ^= 0x01;
+		if (BIT(~table,6) & BIT(table,2)) xorval ^= 0x01;
+		if (BIT(table,4)) xorval ^= 0x01;
 	}
 	else
 	{
-		if (BIT(table,6) & BIT(table,2)) xor ^= 0x01;
-		if (BIT(table,5)) xor ^= 0x01;
+		if (BIT(table,6) & BIT(table,2)) xorval ^= 0x01;
+		if (BIT(table,5)) xorval ^= 0x01;
 	}
 
-	val ^= xor;
+	val ^= xorval;
 
 	if (BIT(table,2))
 	{

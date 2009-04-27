@@ -375,7 +375,7 @@ static DEVICE_START( i2cmem )
 	assert( device->machine != NULL );
 	assert( device->machine->config != NULL );
 
-	config = device->inline_config;
+	config = (const i2cmem_config *)device->inline_config;
 
 	c->scl = 0;
 	c->sdaw = 0;
@@ -431,7 +431,7 @@ static DEVICE_RESET( i2cmem )
 
 static DEVICE_NVRAM( i2cmem )
 {
-	const i2cmem_config *config = device->inline_config;
+	const i2cmem_config *config = (const i2cmem_config *)device->inline_config;
 	i2cmem_state *c = get_safe_token( device );
 
 	if( read_or_write )

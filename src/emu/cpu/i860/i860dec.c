@@ -309,8 +309,9 @@ static int has_delay_slot(UINT32 insn)
 
 /* This is the external interface for asserting/deasserting pins on
    the i860.  */
-void i860_set_pin (i860s *cpustate, int pin, int val)
+void i860_set_pin (const device_config *device, int pin, int val)
 {
+	i860s *cpustate = get_safe_token(device);
 	if (pin == DEC_PIN_BUS_HOLD)
 		cpustate->pin_bus_hold = val;
 	else if (pin == DEC_PIN_RESET)

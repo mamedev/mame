@@ -71,7 +71,7 @@ CUSTOM_INPUT( darkplnt_custom_r )
 							  0x2b, 0x2a, 0x28, 0x29, 0x09, 0x08, 0x0a, 0x0b,
 							  0x0f, 0x0e, 0x0c, 0x0d, 0x2d, 0x2c, 0x2e, 0x2f,
 							  0x27, 0x26, 0x24, 0x25, 0x05, 0x04, 0x06, 0x07 };
-	UINT8 val = input_port_read(field->port->machine, param);
+	UINT8 val = input_port_read(field->port->machine, (const char *)param);
 
 	return remap[val >> 2];
 }
@@ -323,9 +323,9 @@ DRIVER_INIT( devilfsh )
 
 		for (j = 0; j < 16; j++)
 		{
-			offs_t new = BITSWAP8(j,7,6,5,4,2,0,3,1);
+			offs_t newval = BITSWAP8(j,7,6,5,4,2,0,3,1);
 
-			swapbuffer[j] = RAM[i + new];
+			swapbuffer[j] = RAM[i + newval];
 		}
 
 		memcpy(&RAM[i], swapbuffer, 16);

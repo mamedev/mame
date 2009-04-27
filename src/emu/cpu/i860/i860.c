@@ -31,8 +31,8 @@ static CPU_INIT( i860 )
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	reset_i860(cpustate);
-	i860_set_pin(cpustate, DEC_PIN_BUS_HOLD, 0);
-	i860_set_pin(cpustate, DEC_PIN_RESET, 0);
+	i860_set_pin(device, DEC_PIN_BUS_HOLD, 0);
+	i860_set_pin(device, DEC_PIN_RESET, 0);
 	cpustate->single_stepping = 0;
 
 	state_save_register_device_item_array(device, 0, cpustate->iregs);

@@ -99,7 +99,7 @@ static int read_source_file(const char *srcfile)
 	fseek(file, 0, SEEK_END);
 	srcbuflen = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	srcbuf = malloc(srcbuflen);
+	srcbuf = (UINT8 *)malloc(srcbuflen);
 	if (!srcbuf)
 	{
 		fprintf(stderr, "Unable to allocate %d bytes for the source!\n", (int)srcbuflen);
@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
 
 		/* generate the output */
 		dstbuflen = jedbin_output(&jed, NULL, 0);
-		dstbuf = malloc(dstbuflen);
+		dstbuf = (UINT8 *)malloc(dstbuflen);
 		if (!dstbuf)
 		{
 			fprintf(stderr, "Unable to allocate %d bytes for the target buffer!\n", (int)dstbuflen);
@@ -270,7 +270,7 @@ int main(int argc, char *argv[])
 
 		/* generate the output */
 		dstbuflen = jed_output(&jed, NULL, 0);
-		dstbuf = malloc(dstbuflen);
+		dstbuf = (UINT8 *)malloc(dstbuflen);
 		if (!dstbuf)
 		{
 			fprintf(stderr, "Unable to allocate %d bytes for the target buffer!\n", (int)dstbuflen);

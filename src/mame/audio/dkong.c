@@ -304,7 +304,7 @@ struct dkong_custom_mixer_context
 
 static DISCRETE_STEP( dkong_custom_mixer )
 {
-	struct dkong_custom_mixer_context *context = node->context;
+	struct dkong_custom_mixer_context *context = (struct dkong_custom_mixer_context *)node->context;
 
 	int		in_1    = (int)DKONG_CUSTOM_IN1;
 
@@ -323,7 +323,7 @@ static DISCRETE_STEP( dkong_custom_mixer )
 
 static DISCRETE_RESET( dkong_custom_mixer )
 {
-	struct dkong_custom_mixer_context *context = node->context;
+	struct dkong_custom_mixer_context *context = (struct dkong_custom_mixer_context *)node->context;
 
 	/* everything is based on the input to the O.C. inverter */
 	/* precalculate current from In1 */
@@ -975,7 +975,7 @@ DISCRETE_SOUND_END
 
 static SOUND_START( dkong)
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = (dkong_state *)machine->driver_data;
 
 	state->snd_rom = memory_region(machine, "soundcpu");
 	state->dev_vp2 = devtag_get_device(machine, "virtual_p2");
@@ -1106,7 +1106,7 @@ static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 
 static READ8_DEVICE_HANDLER( dkong_tune_r )
 {
-	dkong_state *state = device->machine->driver_data;
+	dkong_state *state = (dkong_state *)device->machine->driver_data;
 	UINT8 page = latch8_r(state->dev_vp2,0) & 0x47;
 
 	if ( page & 0x40 )

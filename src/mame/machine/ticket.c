@@ -161,7 +161,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 ***************************************************************************/
 static TIMER_CALLBACK( ticket_dispenser_toggle )
 {
-	struct ticket_state *dispenser = ptr;
+	struct ticket_state *dispenser = (struct ticket_state *)ptr;
 
 	/* If we still have power, keep toggling ticket states. */
 	if (dispenser->power)

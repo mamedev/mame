@@ -141,7 +141,7 @@ static DIRECT_UPDATE_HANDLER( sloop_direct_handler )
 {
 	if (address < 0x80000)
 	{
-		direct->raw = direct->decrypted = (void *)sloop_base;
+		direct->raw = direct->decrypted = (UINT8 *)sloop_base;
 		return (offs_t)-1;
 	}
 	return address;

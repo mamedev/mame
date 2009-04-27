@@ -808,7 +808,7 @@ WRITE64_HANDLER( dc_maple_w )
 
 INPUT_CHANGED( dc_coin_slots_callback )
 {
-	UINT32 *counter = param;
+	UINT32 *counter = (UINT32 *)param;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval)

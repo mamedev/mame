@@ -46,7 +46,7 @@ static INT32 gp2_irq_control;
 
 static CUSTOM_INPUT( inputs_r )
 {
-	const char *tag1 = param;
+	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
 	return input_port_read(field->port->machine, (control & 0x0080) ? tag1 : tag2);
 }

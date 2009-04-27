@@ -25,6 +25,8 @@ static const discrete_mixer_desc desc_cliffhgr_mixer =
 	8
 };
 
+DISCRETE_SOUND_EXTERN(cliffhgr);
+
 DISCRETE_SOUND_START(cliffhgr)
 	DISCRETE_INPUT_LOGIC(CLIFF_ENABLE_SND_1)
 	DISCRETE_INPUT_LOGIC(CLIFF_ENABLE_SND_2)

@@ -842,7 +842,7 @@ static INPUT_CHANGED( gmgalax_game_changed )
 
 static CUSTOM_INPUT( gmgalax_port_r )
 {
-	const char *portname = param;
+	const char *portname = (const char *)param;
 	if (gmgalax_selected_game != 0)
 		portname += strlen(portname) + 1;
 	return input_port_read(field->port->machine, portname);

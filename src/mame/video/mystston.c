@@ -47,7 +47,7 @@
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-	mystston_state *state = machine->driver_data;
+	mystston_state *state = (mystston_state *)machine->driver_data;
 	int scanline = param;
 
 	mystston_on_scanline_interrupt(machine);
@@ -125,7 +125,7 @@ static void set_palette(running_machine *machine, mystston_state *state)
 
 WRITE8_HANDLER( mystston_video_control_w )
 {
-	mystston_state *state = space->machine->driver_data;
+	mystston_state *state = (mystston_state *)space->machine->driver_data;
 
 	*state->video_control = data;
 
@@ -151,7 +151,7 @@ WRITE8_HANDLER( mystston_video_control_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mystston_state *state = machine->driver_data;
+	mystston_state *state = (mystston_state *)machine->driver_data;
 
 	int page = (*state->video_control & 0x04) << 8;
 	int code = ((state->bg_videoram[page | 0x200 | tile_index] & 0x01) << 8) | state->bg_videoram[page | tile_index];
@@ -163,7 +163,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	mystston_state *state = machine->driver_data;
+	mystston_state *state = (mystston_state *)machine->driver_data;
 
 	int code = ((state->fg_videoram[0x400 | tile_index] & 0x07) << 8) | state->fg_videoram[tile_index];
 	int color = ((*state->video_control & 0x01) << 1) | ((*state->video_control & 0x02) >> 1);
@@ -219,7 +219,7 @@ static void draw_sprites(mystston_state *state, gfx_element **gfx, bitmap_t *bit
 
 static VIDEO_START( mystston )
 {
-	mystston_state *state = machine->driver_data;
+	mystston_state *state = (mystston_state *)machine->driver_data;
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_x, 16, 16, 16, 32);
 
@@ -240,7 +240,7 @@ static VIDEO_START( mystston )
 
 static VIDEO_RESET( mystston )
 {
-	mystston_state *state = machine->driver_data;
+	mystston_state *state = (mystston_state *)machine->driver_data;
 
 	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
@@ -255,7 +255,7 @@ static VIDEO_RESET( mystston )
 
 static VIDEO_UPDATE( mystston )
 {
-	mystston_state *state = screen->machine->driver_data;
+	mystston_state *state = (mystston_state *)screen->machine->driver_data;
 
 	int flip = (*state->video_control & 0x80) ^ ((input_port_read(screen->machine, "DSW1") & 0x20) << 2);
 

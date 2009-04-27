@@ -1996,11 +1996,11 @@ static TIMER_CALLBACK( tape_clock_callback )
 		UINT32 dataclock = tape->clockpos - REGION_BOT_GAP_END_CLOCK;
 
 		/* compute the block number */
-		tape->region = REGION_DATA_BLOCK_0 + dataclock / (TAPE_CLOCKS_PER_BYTE * BYTE_BLOCK_TOTAL);
+		tape->region = (tape_region)(REGION_DATA_BLOCK_0 + dataclock / (TAPE_CLOCKS_PER_BYTE * BYTE_BLOCK_TOTAL));
 		dataclock -= (tape->region - REGION_DATA_BLOCK_0) * TAPE_CLOCKS_PER_BYTE * BYTE_BLOCK_TOTAL;
 
 		/* compute the byte within the block */
-		tape->bytenum = dataclock / TAPE_CLOCKS_PER_BYTE;
+		tape->bytenum = (tape_byte)(dataclock / TAPE_CLOCKS_PER_BYTE);
 		dataclock -= tape->bytenum * TAPE_CLOCKS_PER_BYTE;
 
 		/* compute the bit within the byte */

@@ -63,10 +63,10 @@ PALETTE_INIT( mrdo )
 	{
 		float par = 0;
 
-		if (i & 1) par += 1.0/R1;
-		if (i & 2) par += 1.0/R2;
-		if (i & 4) par += 1.0/R3;
-		if (i & 8) par += 1.0/R4;
+		if (i & 1) par += 1.0f/(float)R1;
+		if (i & 2) par += 1.0f/(float)R2;
+		if (i & 4) par += 1.0f/(float)R3;
+		if (i & 8) par += 1.0f/(float)R4;
 		if (par)
 		{
 			par = 1/par;

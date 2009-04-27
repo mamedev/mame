@@ -62,6 +62,7 @@ static void m37710_set_irq_line(m37710i_cpu_struct *cpustate, int line, int stat
 
 /* interrupt control mapping */
 
+extern const int m37710_irq_levels[M37710_LINE_MAX];
 const int m37710_irq_levels[M37710_LINE_MAX] =
 {
 	// maskable

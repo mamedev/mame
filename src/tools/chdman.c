@@ -519,7 +519,7 @@ static int do_createcd(int argc, char *argv[], int param)
 	outputfile = argv[3];
 
 	/* allocate a cache */
-	cache = malloc(hunksize);
+	cache = (UINT8 *)malloc(hunksize);
 	if (cache == NULL)
 	{
 		fprintf(stderr, "Out of memory allocating temporary buffer\n");
@@ -933,7 +933,7 @@ static int do_createav(int argc, char *argv[], int param)
 	/* allocate space for the frame data */
 	if (height == 524/2 || height == 624/2)
 	{
-		ldframedata = malloc(numframes * VBI_PACKED_BYTES);
+		ldframedata = (UINT8 *)malloc(numframes * VBI_PACKED_BYTES);
 		if (ldframedata == NULL)
 		{
 			fprintf(stderr, "Out of memory allocating frame metadata\n");
@@ -961,7 +961,7 @@ static int do_createav(int argc, char *argv[], int param)
 	avconfig.channels = channels;
 	for (chnum = 0; chnum < channels; chnum++)
 	{
-		avconfig.audio[chnum] = malloc(max_samples_per_frame * 2);
+		avconfig.audio[chnum] = (INT16 *)malloc(max_samples_per_frame * 2);
 		if (avconfig.audio[chnum] == NULL)
 		{
 			fprintf(stderr, "Out of memory allocating temporary audio buffer\n");
@@ -1143,7 +1143,7 @@ static int do_createblankhd(int argc, char *argv[], int param)
 	}
 
 	/* alloc and zero buffer*/
-	cache = malloc(hunksize);
+	cache = (UINT8 *)malloc(hunksize);
 	if (cache == NULL)
 	{
 		fprintf(stderr, "Error allocating memory buffer\n");
@@ -1608,7 +1608,7 @@ static int do_extractav(int argc, char *argv[], int param)
 	avconfig.actsamples = &numsamples;
 	for (chnum = 0; chnum < channels; chnum++)
 	{
-		avconfig.audio[chnum] = malloc(avconfig.maxsamples * 2);
+		avconfig.audio[chnum] = (INT16 *)malloc(avconfig.maxsamples * 2);
 		if (avconfig.audio[chnum] == NULL)
 		{
 			fprintf(stderr, "Out of memory allocating temporary audio buffer\n");
@@ -1954,7 +1954,7 @@ static int do_fixavdata(int argc, char *argv[], int param)
 	avconfig.video = &fakebitmap;
 
 	/* allocate memory for VBI data */
-	vbidata = malloc(header.totalhunks * VBI_PACKED_BYTES);
+	vbidata = (UINT8 *)malloc(header.totalhunks * VBI_PACKED_BYTES);
 	if (vbidata == NULL)
 	{
 		fprintf(stderr, "Out of memory allocating VBI data\n");
@@ -2762,7 +2762,7 @@ static int do_addmeta(int argc, char *argv[], int param)
 	/* if it's text, strip any trailing Ctrl-Z and CR/LF and add a trailing NULL */
 	if (param)
 	{
-		metadata = realloc(metadata, metalength + 1);
+		metadata = (UINT8 *)realloc(metadata, metalength + 1);
 		if (metadata == NULL)
 		{
 			fprintf(stderr, "Out of memory preparing metadata\n");
@@ -2838,7 +2838,7 @@ static chd_error chdman_compress_file(chd_file *chd, const char *rawfile, UINT32
 
 	/* get the header */
 	header = chd_get_header(chd);
-	cache = malloc(header->hunkbytes);
+	cache = (UINT8 *)malloc(header->hunkbytes);
 	if (cache == NULL)
 	{
 		err = CHDERR_OUT_OF_MEMORY;
@@ -2909,7 +2909,7 @@ static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 tot
 
 	/* get the header */
 	header = chd_get_header(chd);
-	cache = malloc(header->hunkbytes);
+	cache = (UINT8 *)malloc(header->hunkbytes);
 	if (cache == NULL)
 	{
 		err = CHDERR_OUT_OF_MEMORY;
@@ -2918,7 +2918,7 @@ static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 tot
 
 	/* get the source CHD header */
 	source_header = chd_get_header(source);
-	source_cache = malloc(source_header->hunkbytes);
+	source_cache = (UINT8 *)malloc(source_header->hunkbytes);
 	if (source_cache == NULL)
 	{
 		err = CHDERR_OUT_OF_MEMORY;
@@ -3166,7 +3166,7 @@ int CLIB_DECL main(int argc, char **argv)
 		{ "-addmetatext",   do_addmeta, TRUE },
 		{ "-addmetabin",    do_addmeta, FALSE },
 	};
-	extern char build_version[];
+	extern const char build_version[];
 	int i;
 
 	/* print the header */

@@ -69,24 +69,19 @@ static write8_space_func ssio_custom_output[2];
 /* Chip Squeak Deluxe-specific globals */
 static const device_config *csdeluxe_sound_cpu;
 static UINT8 csdeluxe_status;
-static const pia6821_interface csdeluxe_pia_intf;
 
 /* Turbo Chip Squeak-specific globals */
 static const device_config *turbocs_sound_cpu;
 static UINT8 turbocs_status;
-static const pia6821_interface turbocs_pia_intf;
 
 /* Sounds Good-specific globals */
 static const device_config *soundsgood_sound_cpu;
 static UINT8 soundsgood_status;
-static const pia6821_interface soundsgood_pia_intf;
 
 /* Squawk n' Talk-specific globals */
 static const device_config *squawkntalk_sound_cpu;
 static UINT8 squawkntalk_tms_command;
 static UINT8 squawkntalk_tms_strobes;
-static const pia6821_interface squawkntalk_pia0_intf;
-static const pia6821_interface squawkntalk_pia1_intf;
 
 
 

@@ -59,7 +59,7 @@ UINT8 m107_spritesystem;
 
 static TILE_GET_INFO( get_pf_tile_info )
 {
-	pf_layer_info *layer = param;
+	pf_layer_info *layer = (pf_layer_info *)param;
 	int tile, attrib;
 	tile_index = 2 * tile_index + layer->vram_base;
 

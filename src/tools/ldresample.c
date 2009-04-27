@@ -129,8 +129,8 @@ static int chd_allocate_buffers(movie_info *info)
 	}
 
 	/* allocate sound buffers */
-	info->lsound = malloc(info->samplerate * sizeof(*info->lsound));
-	info->rsound = malloc(info->samplerate * sizeof(*info->rsound));
+	info->lsound = (INT16 *)malloc(info->samplerate * sizeof(*info->lsound));
+	info->rsound = (INT16 *)malloc(info->samplerate * sizeof(*info->rsound));
 	if (info->lsound == NULL || info->rsound == NULL)
 	{
 		fprintf(stderr, "Out of memory allocating sound buffers of %d bytes\n", (INT32)(info->samplerate * sizeof(*info->rsound)));

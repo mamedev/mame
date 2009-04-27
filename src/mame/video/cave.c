@@ -789,7 +789,7 @@ static void sprite_init_cave(running_machine *machine)
 	}
 
 	sprite_zbuf = auto_bitmap_alloc(machine, screen_width, screen_height, BITMAP_FORMAT_INDEXED16 );
-	blit.baseaddr_zbuf = sprite_zbuf->base;
+	blit.baseaddr_zbuf = (UINT8 *)sprite_zbuf->base;
 	blit.line_offset_zbuf = sprite_zbuf->rowpixels * sprite_zbuf->bpp / 8;
 
 	num_sprites = spriteram_size / 0x10 / 2;
@@ -1463,7 +1463,7 @@ VIDEO_UPDATE( cave )
 
 	set_pens(screen->machine);
 
-	blit.baseaddr = bitmap->base;
+	blit.baseaddr = (UINT8 *)bitmap->base;
 	blit.line_offset = bitmap->rowpixels * bitmap->bpp / 8;
 
 	/* Choose the tilemap to display (8x8 tiles or 16x16 tiles) */

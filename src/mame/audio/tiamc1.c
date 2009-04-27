@@ -246,7 +246,7 @@ WRITE8_HANDLER( tiamc1_timer1_gate_w )
 
 static STREAM_UPDATE( tiamc1_sound_update )
 {
-	int count, o0, o1, o2, len, or = 0;
+	int count, o0, o1, o2, len, orval = 0;
 
 	len = samples * CLOCK_DIVIDER;
 
@@ -271,11 +271,11 @@ static STREAM_UPDATE( tiamc1_sound_update )
 		o1 = timer8253_get_output(&timer0, 1) ? 1 : 0;
 		o2 = timer8253_get_output(&timer0, 2) ? 1 : 0;
 
-		or = (or << 1) | (((o0 | o1) ^ 0xff) & o2);
+		orval = (orval << 1) | (((o0 | o1) ^ 0xff) & o2);
 
 		if ((count + 1) % CLOCK_DIVIDER == 0) {
-			outputs[0][count / CLOCK_DIVIDER] = or ? 0x2828 : 0;
-			or = 0;
+			outputs[0][count / CLOCK_DIVIDER] = orval ? 0x2828 : 0;
+			orval = 0;
 		}
 	}
 }

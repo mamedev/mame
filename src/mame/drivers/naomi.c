@@ -687,7 +687,7 @@ static NVRAM_HANDLER( naomi_eeproms )
 			UINT8 *dat;
 			UINT8* jvseeprom_default = NULL;
 
-			dat = eeprom_get_data_pointer(&length, &size);
+			dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
 			memset(dat, 0, length * size);
 
 			// mainboard eeprom?

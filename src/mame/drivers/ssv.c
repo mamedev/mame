@@ -397,7 +397,7 @@ static WRITE16_HANDLER( dsp_w )
 	if(offset == 0x21 && dsp_ram[0x21]) {
 		switch(dsp_ram[0x20]) {
 		case 0x0001:
-			dsp_ram[0x11] = (UINT8)(128*atan2(dsp_ram[0] - dsp_ram[1], dsp_ram[2] - dsp_ram[3])/M_PI) ^ 0x80;
+			dsp_ram[0x11] = (UINT8)(128*atan2((double)(dsp_ram[0] - dsp_ram[1]), (double)(dsp_ram[2] - dsp_ram[3]))/M_PI) ^ 0x80;
 			dsp_ram[0x21] = 0;
 			break;
 		default:

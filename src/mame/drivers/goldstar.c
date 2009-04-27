@@ -7002,7 +7002,7 @@ static void do_blockswaps(UINT8* ROM)
 		0xa000, 0xa800, 0xb000, 0xb800,
 	};
 
-	buffer = malloc(0x10000);
+	buffer = alloc_array_or_die(UINT8, 0x10000);
 	memcpy(buffer,ROM,0x10000);
 
 	// swap some 0x800 blocks around..

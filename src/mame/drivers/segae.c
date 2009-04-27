@@ -1273,7 +1273,7 @@ static TIMER_CALLBACK( sms_scanline_timer_callback )
        The position to get the H position also has to compensate for a few errors
     */
 //  printf("num %d\n",num );
-	struct sms_vdp *chip = ptr;
+	struct sms_vdp *chip = (struct sms_vdp *)ptr;
 
 	if (chip->sms_scanline_counter<(chip->sms_total_scanlines-1))
 	{
@@ -2206,7 +2206,7 @@ static void init_systeme_map(running_machine *machine)
 
 void init_for_megadrive(running_machine *machine)
 {
-	md_sms_vdp = start_vdp(machine, GEN_VDP);
+	md_sms_vdp = (struct sms_vdp *)start_vdp(machine, GEN_VDP);
 	md_sms_vdp->set_irq = sms_vdp_cpu1_irq_callback;
 	md_sms_vdp->is_pal = 0;
 	md_sms_vdp->sms_total_scanlines = 262;
@@ -2220,7 +2220,7 @@ DRIVER_INIT( megatech_bios )
 {
 //  init_systeme_map(machine);
 
-	vdp1 = start_vdp(machine, SMS2_VDP);
+	vdp1 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
 	vdp1->set_irq = sms_vdp_cpu2_irq_callback;
 	vdp1->is_pal = 0;
 	vdp1->sms_total_scanlines = 262;
@@ -2235,7 +2235,7 @@ static DRIVER_INIT( segasyse )
 {
 	init_systeme_map(machine);
 
-	vdp1 = start_vdp(machine, SMS2_VDP);
+	vdp1 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
 //  vdp1->set_irq = sms_vdp_cpu0_irq_callback;
 	vdp1->is_pal = 0;
 	vdp1->sms_total_scanlines = 262;
@@ -2246,7 +2246,7 @@ static DRIVER_INIT( segasyse )
 	vdp1_vram_bank1 = auto_alloc_array(machine, UINT8, 0x4000);
 
 
-	vdp2 = start_vdp(machine, SMS2_VDP);
+	vdp2 = (struct sms_vdp *)start_vdp(machine, SMS2_VDP);
 	vdp2->set_irq = sms_vdp_cpu0_irq_callback;
 	vdp2->is_pal = 0;
 	vdp2->sms_total_scanlines = 262;

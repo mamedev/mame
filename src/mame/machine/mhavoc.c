@@ -227,7 +227,7 @@ CUSTOM_INPUT( tms5220_r )
 
 CUSTOM_INPUT( mhavoc_bit67_r )
 {
-	const char *tag1 = param;
+	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
 	return input_port_read(field->port->machine, player_1 ? tag2 : tag1) & 0x03;
 }

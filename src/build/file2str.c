@@ -80,6 +80,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* write the initial header */
+	fprintf(dst, "extern const %s %s[];\n", type, varname);
 	fprintf(dst, "const %s %s[] =\n{\n\t", type, varname);
 
 	/* write out the data */

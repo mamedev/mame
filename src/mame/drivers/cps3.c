@@ -620,13 +620,13 @@ static UINT16 rotate_left(UINT16 value, int n)
    return ((value<<n)|aux)%0x10000;
 }
 
-static UINT16 rotxor(UINT16 val, UINT16 xor)
+static UINT16 rotxor(UINT16 val, UINT16 xorval)
 {
 	UINT16 res;
 
 	res = val + rotate_left(val,2);
 
-	res = rotate_left(res,4) ^ (res & (val ^ xor));
+	res = rotate_left(res,4) ^ (res & (val ^ xorval));
 
 	return res;
 }
@@ -1429,8 +1429,8 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 		UINT32* romdata = (UINT32*)cps3_user5region;
 		int real_offset = 0;
 		UINT32 newdata;
-		UINT8* ptr1 = intelflash_getmemptr(flash1);
-		UINT8* ptr2 = intelflash_getmemptr(flash2);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(flash1);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(flash2);
 
 		real_offset = ((cram_gfxflash_bank&0x3e) * 0x200000) + offset*4;
 
@@ -1532,10 +1532,10 @@ static void cps3_flashmain_w(running_machine *machine, int base, UINT32 offset, 
 		UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 		int real_offset = 0;
 		UINT32 newdata;
-		UINT8* ptr1 = intelflash_getmemptr(base+0);
-		UINT8* ptr2 = intelflash_getmemptr(base+1);
-		UINT8* ptr3 = intelflash_getmemptr(base+2);
-		UINT8* ptr4 = intelflash_getmemptr(base+3);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(base+0);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(base+1);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(base+2);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(base+3);
 
 		real_offset = offset * 4;
 
@@ -2297,10 +2297,10 @@ static void precopy_to_flash(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = intelflash_getmemptr(0);
-		UINT8* ptr2 = intelflash_getmemptr(1);
-		UINT8* ptr3 = intelflash_getmemptr(2);
-		UINT8* ptr4 = intelflash_getmemptr(3);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(0);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(1);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(2);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(3);
 
 		data = romdata[i/4];
 
@@ -2313,10 +2313,10 @@ static void precopy_to_flash(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = intelflash_getmemptr(4);
-		UINT8* ptr2 = intelflash_getmemptr(5);
-		UINT8* ptr3 = intelflash_getmemptr(6);
-		UINT8* ptr4 = intelflash_getmemptr(7);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(4);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(5);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(6);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(7);
 
 		data = romdata[(0x800000+i)/4];
 
@@ -2338,8 +2338,8 @@ static void precopy_to_flash(running_machine *machine)
 
 			for (i=0;i<0x200000;i+=2)
 			{
-				UINT8* ptr1 = intelflash_getmemptr(flashnum);
-				UINT8* ptr2 = intelflash_getmemptr(flashnum+1);
+				UINT8* ptr1 = (UINT8*)intelflash_getmemptr(flashnum);
+				UINT8* ptr2 = (UINT8*)intelflash_getmemptr(flashnum+1);
 				UINT32 dat = romdata[(thebase+i)/2];
 
 				ptr1[BYTE_XOR_LE(i+1)] =  (dat&0xff000000)>>24;
@@ -2364,10 +2364,10 @@ static void copy_from_nvram(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = intelflash_getmemptr(0);
-		UINT8* ptr2 = intelflash_getmemptr(1);
-		UINT8* ptr3 = intelflash_getmemptr(2);
-		UINT8* ptr4 = intelflash_getmemptr(3);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(0);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(1);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(2);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(3);
 
 		data = ((ptr1[i/4]<<24) | (ptr2[i/4]<<16) | (ptr3[i/4]<<8) | (ptr4[i/4]<<0));
 
@@ -2383,10 +2383,10 @@ static void copy_from_nvram(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = intelflash_getmemptr(4);
-		UINT8* ptr2 = intelflash_getmemptr(5);
-		UINT8* ptr3 = intelflash_getmemptr(6);
-		UINT8* ptr4 = intelflash_getmemptr(7);
+		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(4);
+		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(5);
+		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(6);
+		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(7);
 
 		data = ((ptr1[i/4]<<24) | (ptr2[i/4]<<16) | (ptr3[i/4]<<8) | (ptr4[i/4]<<0));
 
@@ -2408,8 +2408,8 @@ static void copy_from_nvram(running_machine *machine)
 
 			for (i=0;i<0x200000;i+=2)
 			{
-				UINT8* ptr1 = intelflash_getmemptr(flashnum);
-				UINT8* ptr2 = intelflash_getmemptr(flashnum+1);
+				UINT8* ptr1 = (UINT8*)intelflash_getmemptr(flashnum);
+				UINT8* ptr2 = (UINT8*)intelflash_getmemptr(flashnum+1);
 				UINT32 dat = (ptr1[i+0]<<8) |
 					         (ptr1[i+1]<<24) |
 							 (ptr2[i+0]<<0) |
@@ -2476,7 +2476,7 @@ static NVRAM_HANDLER( cps3 )
 
 
 
-static UINT32 cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
+static int cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
 {
 	/*
       on the actual CPS3 hardware the SH2 DMA bypasses the encryption.
@@ -2535,7 +2535,7 @@ static UINT32 cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
 
 static const sh2_cpu_core sh2_conf_cps3 = {
 	0, // master
-	(void*)cps3_dma_callback
+	cps3_dma_callback
 };
 
 static MACHINE_DRIVER_START( cps3 )

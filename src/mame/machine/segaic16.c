@@ -383,9 +383,9 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 
 				if (decrypt)
 				{
-					decrypted = fd1094_get_decrypted_base();
+					decrypted = (UINT8 *)fd1094_get_decrypted_base();
 					if (!decrypted)
-						decrypted = fd1089_get_decrypted_base();
+						decrypted = (UINT8 *)fd1089_get_decrypted_base();
 				}
 
 				memory_configure_bank(machine, banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);

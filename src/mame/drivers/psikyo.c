@@ -211,7 +211,7 @@ static const UINT8 s1945j_table[256] = {
 };
 
 static UINT8 s1945_mcu_direction, s1945_mcu_latch1, s1945_mcu_latch2, s1945_mcu_inlatch, s1945_mcu_index;
-static UINT8 s1945_mcu_latching, s1945_mcu_mode, s1945_mcu_direction, s1945_mcu_control, s1945_mcu_bctrl;
+static UINT8 s1945_mcu_latching, s1945_mcu_mode, s1945_mcu_control, s1945_mcu_bctrl;
 static const UINT8 *s1945_mcu_table;
 
 static void s1945_mcu_init(const UINT8 *mcu_table)

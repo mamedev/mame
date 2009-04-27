@@ -451,8 +451,6 @@ static READ16_HANDLER ( jchan_ctrl_r )
 ***************************************************************************/
 
 /* communications - hacky! */
-static UINT16 *mainsub_shared_ram;
-
 static WRITE16_HANDLER( main2sub_cmd_w )
 {
 	COMBINE_DATA(&mainsub_shared_ram[0x03ffe/2]);

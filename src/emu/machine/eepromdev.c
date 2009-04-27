@@ -361,7 +361,7 @@ void *eepromdev_get_data_pointer(const device_config *device, UINT32 *length, UI
 
 static DEVICE_NVRAM( eeprom )
 {
-	const eeprom_config *config = device->inline_config;
+	const eeprom_config *config = (const eeprom_config *)device->inline_config;
 
 	if (read_or_write)
 		eepromdev_save(device, file);
@@ -384,7 +384,7 @@ static DEVICE_START(eeprom)
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
 
-	config = device->inline_config;
+	config = (const eeprom_config *)device->inline_config;
 
 	c->intf = config->pinterface;
 

@@ -1571,7 +1571,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 		add_dynamic_address(base + 0x2000, base + 0x2003, sio_irq_cause_r, NULL);
 		add_dynamic_address(base + 0x3000, base + 0x3003, sio_irq_status_r, NULL);
 		add_dynamic_address(base + 0x4000, base + 0x4003, sio_led_r, sio_led_w);
-		add_dynamic_address(base + 0x5000, base + 0x5007, SMH_NOP, NULL);
+		add_dynamic_address(base + 0x5000, base + 0x5007, (read32_space_func)SMH_NOP, NULL);
 		add_dynamic_address(base + 0x6000, base + 0x6003, NULL, cmos_unlock_w);
 		add_dynamic_address(base + 0x7000, base + 0x7003, NULL, vegas_watchdog_w);
 	}

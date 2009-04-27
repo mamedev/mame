@@ -362,7 +362,7 @@ static READ8_HANDLER( safari_io_r )
 static WRITE8_HANDLER( safari_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x02)  /* safari_audio_w(0, data) */;
+	if (offset & 0x02) { /* safari_audio_w(0, data) */ }
 }
 
 
@@ -567,7 +567,7 @@ static WRITE8_HANDLER( headon_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
-	if (offset & 0x04)  /* vicdual_palette_bank_w(0, data)  */;	 /* not written to */
+	if (offset & 0x04) { /* vicdual_palette_bank_w(0, data)  */ }	 /* not written to */
 }
 
 
@@ -759,8 +759,8 @@ static WRITE8_HANDLER( headon2_io_w )
 	if (offset & 0x01)  assert_coin_status();
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
-    if (offset & 0x08)  ;/* schematics show this as going into a shifer circuit, but never written to */
-    if (offset & 0x10)  ;/* schematics show this as going to an edge connector, but never written to */
+    if (offset & 0x08) { /* schematics show this as going into a shifer circuit, but never written to */ }
+    if (offset & 0x10) { /* schematics show this as going to an edge connector, but never written to */ }
 	if (offset & 0x18)  logerror("********* Write to port %x\n", offset);
 }
 
@@ -768,15 +768,15 @@ static WRITE8_HANDLER( headon2_io_w )
 static WRITE8_HANDLER( digger_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x02)  /* digger_audio_1_w(0, data) */;
+	if (offset & 0x02) { /* digger_audio_1_w(0, data) */ }
 	if (offset & 0x04)
 	{
 		vicdual_palette_bank_w(space, 0, data & 0x03);
-		/* digger_audio_2_w(0, data & 0xfc) */;
+		/* digger_audio_2_w(0, data & 0xfc); */
 	}
 
-    if (offset & 0x08)  ;/* schematics show this as going into a shifer circuit, but never written to */
-    if (offset & 0x10)  ;/* schematics show this as going to an edge connector, but never written to */
+    if (offset & 0x08) { /* schematics show this as going into a shifer circuit, but never written to */ }
+    if (offset & 0x10) { /* schematics show this as going to an edge connector, but never written to */ }
 	if (offset & 0x18)  logerror("********* Write to port %x\n", offset);
 }
 
@@ -972,7 +972,7 @@ static WRITE8_HANDLER( invho2_io_w )
 static WRITE8_HANDLER( invds_io_w )
 {
 	if (offset & 0x01)  invinco_audio_w(space, 0, data);
-	if (offset & 0x02)  /* deepscan_audio_w(0, data) */;
+	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -981,7 +981,7 @@ static WRITE8_HANDLER( invds_io_w )
 static WRITE8_HANDLER( sspacaho_io_w )
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
-	if (offset & 0x02)  /* sspaceatt_audio_w(space, 0, data) */;
+	if (offset & 0x02) { /* sspaceatt_audio_w(space, 0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -989,7 +989,7 @@ static WRITE8_HANDLER( sspacaho_io_w )
 
 static WRITE8_HANDLER( tranqgun_io_w )
 {
-	if (offset & 0x01)  /* tranqgun_audio_w(space, 0, data) */;
+	if (offset & 0x01) { /* tranqgun_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
 	if (offset & 0x08)  assert_coin_status();
 }
@@ -997,8 +997,8 @@ static WRITE8_HANDLER( tranqgun_io_w )
 
 static WRITE8_HANDLER( spacetrk_io_w )
 {
-	if (offset & 0x01)  /* spacetrk_audio_w(space, 0, data) */;
-	if (offset & 0x02)  /* spacetrk_audio_w(space, 0, data) */;
+	if (offset & 0x01) { /* spacetrk_audio_w(space, 0, data) */ }
+	if (offset & 0x02) { /* spacetrk_audio_w(space, 0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -1015,7 +1015,7 @@ static WRITE8_HANDLER( carnival_io_w )
 
 static WRITE8_HANDLER( brdrline_io_w )
 {
-	if (offset & 0x01)  /* brdrline_audio_w(space, 0, data) */;
+	if (offset & 0x01) { /* brdrline_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
 	if (offset & 0x08)  assert_coin_status();
 }
@@ -1032,12 +1032,12 @@ static WRITE8_HANDLER( pulsar_io_w )
 
 static WRITE8_HANDLER( heiankyo_io_w )
 {
-	if (offset & 0x01)  /* heiankyo_audio_1_w(0, data) */;
+	if (offset & 0x01) { /* heiankyo_audio_1_w(0, data) */ }
 
 	if (offset & 0x02)
 	{
 		vicdual_palette_bank_w(space, 0, data & 0x03);
-		/* heiankyo_audio_2_w(0, data & 0xfc) */;
+		/* heiankyo_audio_2_w(0, data & 0xfc); */
 	}
 
 	if (offset & 0x08)  assert_coin_status();
@@ -1046,8 +1046,8 @@ static WRITE8_HANDLER( heiankyo_io_w )
 
 static WRITE8_HANDLER( alphaho_io_w )
 {
-	if (offset & 0x01)  /* headon_audio_w(0, data) */;
-	if (offset & 0x02)  /* alphaf_audio_w(0, data) */;
+	if (offset & 0x01) { /* headon_audio_w(0, data) */ }
+	if (offset & 0x02) { /* alphaf_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -1989,7 +1989,7 @@ static CUSTOM_INPUT( samurai_protection_r )
 
 static WRITE8_HANDLER( samurai_io_w )
 {
-	if (offset & 0x02)  /* samurai_audio_w(0, data) */;
+	if (offset & 0x02) { /* samurai_audio_w(0, data) */ }
 	if (offset & 0x08)  assert_coin_status();
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -2108,7 +2108,7 @@ static READ8_HANDLER( nsub_io_r )
 static WRITE8_HANDLER( nsub_io_w )
 {
 	if (offset & 0x01)  assert_coin_status();
-	if (offset & 0x02)  /* nsub_audio_w(0, data) */;
+	if (offset & 0x02) { /* nsub_audio_w(0, data) */ }
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
 }
 

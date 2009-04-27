@@ -71,7 +71,7 @@ static void leprechn_get_pens(pen_t *pens)
 
 static VIDEO_UPDATE( gameplan )
 {
-	gameplan_state *state = screen->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)screen->machine->driver_data;
 	pen_t pens[GAMEPLAN_NUM_PENS];
 	offs_t offs;
 
@@ -91,7 +91,7 @@ static VIDEO_UPDATE( gameplan )
 
 static VIDEO_UPDATE( leprechn )
 {
-	gameplan_state *state = screen->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)screen->machine->driver_data;
 	pen_t pens[LEPRECHN_NUM_PENS];
 	offs_t offs;
 
@@ -118,7 +118,7 @@ static VIDEO_UPDATE( leprechn )
 
 static WRITE8_DEVICE_HANDLER( video_data_w )
 {
-	gameplan_state *state = device->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
 
 	state->video_data = data;
 }
@@ -126,7 +126,7 @@ static WRITE8_DEVICE_HANDLER( video_data_w )
 
 static WRITE8_DEVICE_HANDLER( gameplan_video_command_w )
 {
-	gameplan_state *state = device->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
 
 	state->video_command = data & 0x07;
 }
@@ -134,7 +134,7 @@ static WRITE8_DEVICE_HANDLER( gameplan_video_command_w )
 
 static WRITE8_DEVICE_HANDLER( leprechn_video_command_w )
 {
-	gameplan_state *state = device->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
 
 	state->video_command = (data >> 3) & 0x07;
 }
@@ -151,7 +151,7 @@ static TIMER_CALLBACK( clear_screen_done_callback )
 
 static WRITE8_DEVICE_HANDLER( video_command_trigger_w )
 {
-	gameplan_state *state = device->machine->driver_data;
+	gameplan_state *state = (gameplan_state *)device->machine->driver_data;
 
 	if (data == 0)
 	{
@@ -266,7 +266,7 @@ const via6522_interface trvquest_via_0_interface =
 
 static TIMER_CALLBACK( via_0_ca1_timer_callback )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
 	const device_config *via = devtag_get_device(machine, "via6522_0");
 
 	/* !VBLANK is connected to CA1 */
@@ -300,7 +300,7 @@ static void start_via_0_timer(running_machine *machine, gameplan_state *state)
 
 static VIDEO_START( common )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = (gameplan_state *)machine->driver_data;
 
 	state->videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	state->videoram = auto_alloc_array(machine, UINT8, state->videoram_size);
@@ -343,7 +343,7 @@ static VIDEO_START( trvquest )
 
 static VIDEO_RESET( gameplan )
 {
-	start_via_0_timer(machine, machine->driver_data);
+	start_via_0_timer(machine, (gameplan_state *)machine->driver_data);
 }
 
 

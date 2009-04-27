@@ -497,7 +497,7 @@ static WRITE8_HANDLER( mux2latch_w )
 	if ( changed & 0x08 )
 	{ // clock changed
 
-		if ( (!data & 0x08) )
+		if ( !(data & 0x08) )
 		{ // clock changed to low
 			int strobe, offset, pattern, i;
 

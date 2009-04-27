@@ -615,7 +615,7 @@ static void zeus_register_update(running_machine *machine, offs_t offset)
 					// zeusbase[0x46] = ??? = 0x00000000
 					// zeusbase[0x4c] = ??? = 0x00808080 (brightness?)
 					// zeusbase[0x4e] = ??? = 0x00808080 (brightness?)
-					poly_extra_data *extra = poly_get_extra_data(poly);
+					poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 					poly_vertex vert[4];
 
 					vert[0].x = (INT16)zeusbase[0x08];
@@ -700,9 +700,9 @@ static void zeus_register_update(running_machine *machine, offs_t offset)
 				const UINT32 *src;
 
 				if (zeusbase[0xb6] & 0x80000000)
-					src = waveram1_ptr_from_expanded_addr(zeusbase[0xb4]);
+					src = (const UINT32 *)waveram1_ptr_from_expanded_addr(zeusbase[0xb4]);
 				else
-					src = waveram0_ptr_from_expanded_addr(zeusbase[0xb4]);
+					src = (const UINT32 *)waveram0_ptr_from_expanded_addr(zeusbase[0xb4]);
 
 				poly_wait(poly, "vram_read");
 				zeusbase[0xb0] = WAVERAM_READ32(src, 0);
@@ -1201,7 +1201,7 @@ if (
 			clipvert[i].y += 0.0005f;
 	}
 
-	extra = poly_get_extra_data(poly);
+	extra = (poly_extra_data *)poly_get_extra_data(poly);
 	extra->solidcolor = zeusbase[0x00] & 0x7fff;
 	extra->zoffset = zeusbase[0x7e] >> 16;
 	extra->alpha = zeusbase[0x4e];
@@ -1223,7 +1223,7 @@ if (
 
 static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;
@@ -1280,7 +1280,7 @@ static void render_poly_4bit(void *dest, INT32 scanline, const poly_extent *exte
 
 static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	INT32 curz = extent->param[0].start;
 	INT32 curu = extent->param[1].start;
 	INT32 curv = extent->param[2].start;
@@ -1337,7 +1337,7 @@ static void render_poly_8bit(void *dest, INT32 scanline, const poly_extent *exte
 
 static void render_poly_shade(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	int x;
 
 	for (x = extent->startx; x < extent->stopx; x++)
@@ -1364,7 +1364,7 @@ static void render_poly_shade(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	UINT16 color = extra->solidcolor;
 	INT32 curz = (INT32)(extent->param[0].start);
 	INT32 curv = extent->param[2].start;
@@ -1390,7 +1390,7 @@ static void render_poly_solid(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_poly_solid_fixedz(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	UINT16 color = extra->solidcolor;
 	UINT16 depth = extra->zoffset;
 	int x;
@@ -1427,7 +1427,7 @@ static void log_waveram(UINT32 length_and_base)
 	} recent_entries[100];
 
 	UINT32 numoctets = (length_and_base >> 24) + 1;
-	const UINT32 *ptr = waveram0_ptr_from_block_addr(length_and_base);
+	const UINT32 *ptr = (const UINT32 *)waveram0_ptr_from_block_addr(length_and_base);
 	UINT32 checksum = length_and_base;
 	int foundit = FALSE;
 	int i;

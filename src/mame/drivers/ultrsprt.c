@@ -70,7 +70,7 @@ static WRITE32_HANDLER( eeprom_w )
 
 static CUSTOM_INPUT( analog_ctrl_r )
 {
-	const char *tag = param;
+	const char *tag = (const char *)param;
 	return input_port_read(field->port->machine, tag) & 0xfff;
 }
 

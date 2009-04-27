@@ -151,8 +151,8 @@ static int CLIB_DECL compare_file(const void *file0ptr, const void *file1ptr);
 static summary_file *sort_file_list(void);
 
 /* HTML helpers */
-static core_file *create_file_and_output_header(const astring *filename, const astring *template, const astring *title);
-static void output_footer_and_close_file(core_file *file, const astring *template, const astring *title);
+static core_file *create_file_and_output_header(const astring *filename, const astring *templatefile, const astring *title);
+static void output_footer_and_close_file(core_file *file, const astring *templatefile, const astring *title);
 
 /* report generators */
 static void output_report(const astring *dirname, const astring *tempheader, const astring *tempfooter, summary_file *filelist);
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 	/* read the template file into an astring */
 	if (core_fload(astring_c(tempfilename), &buffer, &bufsize) == FILERR_NONE)
 	{
-		tempheader = astring_dupch(buffer, bufsize);
+		tempheader = astring_dupch((const char *)buffer, bufsize);
 		free(buffer);
 	}
 
@@ -299,7 +299,7 @@ static summary_file *get_file(const char *filename)
             return file;
 
     /* didn't find one -- allocate */
-    file = malloc(sizeof(*file));
+    file = (summary_file *)malloc(sizeof(*file));
     if (file == NULL)
         return NULL;
     memset(file, 0, sizeof(*file));
@@ -376,7 +376,7 @@ static int read_summary_log(const char *filename, int index)
 				char *dirname = trim_string(linestart + 4);
 
 				/* allocate a copy of the string */
-				lists[index].dir = malloc(strlen(dirname) + 1);
+				lists[index].dir = (char *)malloc(strlen(dirname) + 1);
 				if (lists[index].dir == NULL)
 					goto error;
 				strcpy(lists[index].dir, dirname);
@@ -413,7 +413,7 @@ static int read_summary_log(const char *filename, int index)
 				if (curfile->textsize[index] + (curptr - linestart) + 1 >= curfile->textalloc[index])
 				{
 					curfile->textalloc[index] = curfile->textsize[index] + (curptr - linestart) + 256;
-					curfile->text[index] = realloc(curfile->text[index], curfile->textalloc[index]);
+					curfile->text[index] = (char *)realloc(curfile->text[index], curfile->textalloc[index]);
 					if (curfile->text[index] == NULL)
 					{
 						fprintf(stderr, "Unable to allocate memory for text\n");
@@ -542,7 +542,7 @@ static summary_file *sort_file_list(void)
 	    		numfiles++;
 
 	/* allocate an array of files */
-	filearray = malloc(numfiles * sizeof(*filearray));
+	filearray = (summary_file **)malloc(numfiles * sizeof(*filearray));
 	if (filearray == NULL)
 	{
 		fprintf(stderr, "Out of memory!\n");
@@ -584,7 +584,7 @@ static summary_file *sort_file_list(void)
     HTML file with a standard header
 -------------------------------------------------*/
 
-static core_file *create_file_and_output_header(const astring *filename, const astring *template, const astring *title)
+static core_file *create_file_and_output_header(const astring *filename, const astring *templatefile, const astring *title)
 {
 	astring *modified;
 	core_file *file;
@@ -594,7 +594,7 @@ static core_file *create_file_and_output_header(const astring *filename, const a
 		return NULL;
 
 	/* print a header */
-	modified = astring_dup(template);
+	modified = astring_dup(templatefile);
 	astring_replacec(modified, 0, "<!--TITLE-->", astring_c(title));
 	core_fwrite(file, astring_c(modified), astring_len(modified));
 
@@ -609,11 +609,11 @@ static core_file *create_file_and_output_header(const astring *filename, const a
     standard footer to an HTML file and close it
 -------------------------------------------------*/
 
-static void output_footer_and_close_file(core_file *file, const astring *template, const astring *title)
+static void output_footer_and_close_file(core_file *file, const astring *templatefile, const astring *title)
 {
 	astring *modified;
 
-	modified = astring_dup(template);
+	modified = astring_dup(templatefile);
 	astring_replacec(modified, 0, "<!--TITLE-->", astring_c(title));
 	core_fwrite(file, astring_c(modified), astring_len(modified));
 	astring_free(modified);
@@ -904,7 +904,7 @@ static int generate_png_diff(const summary_file *curfile, const astring *destdir
 			/* load the source image */
 			pngerr = png_read_bitmap(file, &bitmaps[bitmapcount++]);
 			core_fclose(file);
-			if (pngerr != FILERR_NONE)
+			if (pngerr != PNGERR_NONE)
 				goto error;
 		}
 
@@ -976,7 +976,7 @@ static int generate_png_diff(const summary_file *curfile, const astring *destdir
 		goto error;
 	pngerr = png_write_bitmap(file, NULL, finalbitmap, 0, NULL);
 	core_fclose(file);
-	if (pngerr != FILERR_NONE)
+	if (pngerr != PNGERR_NONE)
 		goto error;
 
 	/* if we get here, we are error free */

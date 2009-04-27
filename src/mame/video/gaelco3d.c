@@ -144,7 +144,7 @@ static void render_poly(const device_config *screen, UINT32 *polydata)
 	float voz_base = convert_tms3203x_fp_to_float(polydata[7]) * 256.0f - midx * voz_dx - midy * voz_dy;
 	float ooz_base = convert_tms3203x_fp_to_float(polydata[8]) - midx * ooz_dx - midy * ooz_dy;
 	float uoz_base = convert_tms3203x_fp_to_float(polydata[9]) * 256.0f - midx * uoz_dx - midy * uoz_dy;
-	poly_extra_data *extra = poly_get_extra_data(poly);
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 	int color = (polydata[10] & 0x7f) << 8;
 	poly_vertex vert[MAX_VERTICES];
 	UINT32 data;
@@ -223,8 +223,8 @@ static void render_poly(const device_config *screen, UINT32 *polydata)
 
 static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
-	bitmap_t *bitmap = destbase;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *bitmap = (bitmap_t *)destbase;
 	float zbase = recip_approx(extra->ooz_base);
 	float uoz_step = extra->uoz_dx * zbase;
 	float voz_step = extra->voz_dx * zbase;
@@ -264,8 +264,8 @@ static void render_noz_noperspective(void *destbase, INT32 scanline, const poly_
 
 static void render_normal(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
-	bitmap_t *bitmap = destbase;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *bitmap = (bitmap_t *)destbase;
 	float ooz_dx = extra->ooz_dx;
 	float uoz_dx = extra->uoz_dx;
 	float voz_dx = extra->voz_dx;
@@ -316,8 +316,8 @@ static void render_normal(void *destbase, INT32 scanline, const poly_extent *ext
 
 static void render_alphablend(void *destbase, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
-	bitmap_t *bitmap = destbase;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *bitmap = (bitmap_t *)destbase;
 	float ooz_dx = extra->ooz_dx;
 	float uoz_dx = extra->uoz_dx;
 	float voz_dx = extra->voz_dx;

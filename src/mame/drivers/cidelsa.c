@@ -10,7 +10,7 @@
 
 static CDP1802_MODE_READ( cidelsa_mode_r )
 {
-	cidelsa_state *state = device->machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
 
 	return state->cdp1802_mode;
 }
@@ -29,7 +29,7 @@ static CDP1802_EF_READ( cidelsa_ef_r )
 
 static CDP1802_Q_WRITE( cidelsa_q_w )
 {
-	cidelsa_state *state = device->machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
 
 	state->cdp1802_q = level;
 }
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( draco_sound_bankswitch_w )
 
 static WRITE8_DEVICE_HANDLER( draco_sound_g_w )
 {
-	cidelsa_state *state = device->machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)device->machine->driver_data;
 
 	/*
 
@@ -97,21 +97,21 @@ static WRITE8_DEVICE_HANDLER( draco_sound_g_w )
 
 static READ8_HANDLER( draco_sound_in_r )
 {
-	cidelsa_state *state = space->machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)space->machine->driver_data;
 
 	return ~(state->draco_sound) & 0x07;
 }
 
 static READ8_HANDLER( draco_sound_ay8910_r )
 {
-	cidelsa_state *state = space->machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)space->machine->driver_data;
 
 	return state->draco_ay_latch;
 }
 
 static WRITE8_HANDLER( draco_sound_ay8910_w )
 {
-	cidelsa_state *state = space->machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)space->machine->driver_data;
 
 	state->draco_ay_latch = data;
 }
@@ -171,7 +171,7 @@ static WRITE8_HANDLER( draco_out1_w )
         7   SONIDO C -> COP402 IN2
     */
 
-	cidelsa_state *state = space->machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)space->machine->driver_data;
 
     state->draco_sound = (data & 0xe0) >> 5;
 }
@@ -308,14 +308,14 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( cdp1869_pcb_r )
 {
-	cidelsa_state *state = field->port->machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)field->port->machine->driver_data;
 
 	return state->cdp1869_pcb;
 }
 
 static CUSTOM_INPUT( cdp1869_predisplay_r )
 {
-	cidelsa_state *state = field->port->machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)field->port->machine->driver_data;
 
 	return state->cdp1869_prd;
 }
@@ -466,14 +466,14 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( set_cpu_mode )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)machine->driver_data;
 
 	state->cdp1802_mode = CDP1802_MODE_RUN;
 }
 
 static MACHINE_START( cidelsa )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)machine->driver_data;
 
 	/* reset the CPU */
 	state->cdp1802_mode = CDP1802_MODE_RESET;
@@ -485,7 +485,7 @@ static MACHINE_START( cidelsa )
 
 static MACHINE_START( draco )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = (cidelsa_state *)machine->driver_data;
 
 	MACHINE_START_CALL( cidelsa );
 

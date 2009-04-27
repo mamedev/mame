@@ -674,7 +674,7 @@ void cmc50_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 /* ms5pcb and svcpcb have an additional scramble on top of the standard CMC scrambling */
 void svcpcb_gfx_decrypt(running_machine *machine)
 {
-	static const UINT8 xor[ 4 ] = { 0x34, 0x21, 0xc4, 0xe9 };
+	static const UINT8 xorval[ 4 ] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int i;
 	int ofst;
 	int rom_size = memory_region_length( machine, "sprites" );
@@ -683,7 +683,7 @@ void svcpcb_gfx_decrypt(running_machine *machine)
 
 	for( i = 0; i < rom_size; i++ )
 	{
-		rom[ i ] ^= xor[ (i % 4) ];
+		rom[ i ] ^= xorval[ (i % 4) ];
 	}
 	for( i = 0; i < rom_size; i += 4 )
 	{
@@ -724,7 +724,7 @@ void svcpcb_s1data_decrypt(running_machine *machine)
 /* Thanks to Razoola & Halrin for the info */
 void kf2k3pcb_gfx_decrypt(running_machine *machine)
 {
-	static const UINT8 xor[ 4 ] = { 0x34, 0x21, 0xc4, 0xe9 };
+	static const UINT8 xorval[ 4 ] = { 0x34, 0x21, 0xc4, 0xe9 };
 	int i;
 	int ofst;
 	int rom_size = memory_region_length( machine, "sprites" );
@@ -733,7 +733,7 @@ void kf2k3pcb_gfx_decrypt(running_machine *machine)
 
 	for ( i = 0; i < rom_size; i++ )
 	{
-		rom[ i ] ^= xor[ (i % 4) ];
+		rom[ i ] ^= xorval[ (i % 4) ];
 	}
 	for ( i = 0; i < rom_size; i+=4 )
 	{

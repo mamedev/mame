@@ -1987,7 +1987,7 @@ static char *slider_get_laserdisc_desc(const device_config *laserdisc)
 #ifdef MAME_DEBUG
 static INT32 slider_crossscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	input_field_config *field = arg;
+	input_field_config *field = (input_field_config *)arg;
 
 	if (newval != SLIDER_NOCHANGE)
 		field->crossscale = (float)newval * 0.001f;
@@ -2006,7 +2006,7 @@ static INT32 slider_crossscale(running_machine *machine, void *arg, astring *str
 #ifdef MAME_DEBUG
 static INT32 slider_crossoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	input_field_config *field = arg;
+	input_field_config *field = (input_field_config *)arg;
 
 	if (newval != SLIDER_NOCHANGE)
 		field->crossoffset = (float)newval * 0.001f;

@@ -490,7 +490,7 @@ static INTERRUPT_GEN(skns_interrupt)
 
 static CUSTOM_INPUT( paddle_r )
 {
-	const char *tag = param;
+	const char *tag = (const char *)param;
 	return input_port_read(field->port->machine, tag);
 }
 

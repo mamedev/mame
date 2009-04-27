@@ -254,7 +254,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( namco_50xx_irq_clear )
 {
-	const device_config *cpu = ptr;
+	const device_config *cpu = (const device_config *)ptr;
 	cpu_set_input_line(cpu, 0, CLEAR_LINE);
 }
 

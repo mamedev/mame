@@ -2253,6 +2253,7 @@ OP(ff, OP_SBC  ( ALX         ) ) /* SBC alx (G) */
 
 
 
+extern TABLE_OPCODES;
 TABLE_OPCODES =
 {
 	O(00),O(01),O(02),O(03),O(04),O(05),O(06),O(07),

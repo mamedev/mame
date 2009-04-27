@@ -131,7 +131,7 @@ CUSTOM_INPUT( arkanoid_68705_input_r )
 
 CUSTOM_INPUT( arkanoid_input_mux )
 {
-	const char *tag1 = param;
+	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
 	return input_port_read(field->port->machine, (arkanoid_paddle_select == 0) ? tag1 : tag2);
 }

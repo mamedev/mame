@@ -105,7 +105,7 @@ static UINT8 tilemap_pages;
 
 static TILE_GET_INFO( tile_get_info )
 {
-	UINT8 *rambase = param;
+	const UINT8 *rambase = (const UINT8 *)param;
 	UINT32 tiledata = rambase[tile_index*2+0] | (rambase[tile_index*2+1] << 8);
 	UINT32 code = ((tiledata >> 4) & 0x800) | (tiledata & 0x7ff);
 	UINT32 color = (tiledata >> 5) & 0xff;

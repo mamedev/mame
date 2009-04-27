@@ -155,12 +155,12 @@ void *malloc_file_line(size_t size, const char *file, int line)
 		rounded_size = ((size + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
 
 		// reserve that much memory, plus two guard pages
-		page_base = VirtualAlloc(NULL, rounded_size + 2 * PAGE_SIZE, MEM_RESERVE, PAGE_NOACCESS);
+		page_base = (UINT8 *)VirtualAlloc(NULL, rounded_size + 2 * PAGE_SIZE, MEM_RESERVE, PAGE_NOACCESS);
 		if (page_base == NULL)
 			return NULL;
 
 		// now allow access to everything but the first and last pages
-		page_base = VirtualAlloc(page_base + PAGE_SIZE, rounded_size, MEM_COMMIT, PAGE_READWRITE);
+		page_base = (UINT8 *)VirtualAlloc(page_base + PAGE_SIZE, rounded_size, MEM_COMMIT, PAGE_READWRITE);
 		if (page_base == NULL)
 			return NULL;
 

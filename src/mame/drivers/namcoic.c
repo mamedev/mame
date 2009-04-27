@@ -57,7 +57,7 @@ namco_tilemap_init( running_machine *machine, int gfxbank, void *maskBaseAddr,
 {
 	int i;
 	mTilemapInfo.gfxbank = gfxbank;
-	mTilemapInfo.maskBaseAddr = maskBaseAddr;
+	mTilemapInfo.maskBaseAddr = (UINT8 *)maskBaseAddr;
 	mTilemapInfo.cb = cb;
 	mTilemapInfo.videoram = auto_alloc_array(machine, UINT16,  0x10000 );
 
@@ -1603,7 +1603,7 @@ namco_road_set_transparent_color(pen_t pen)
 void
 namco_road_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	const UINT8 *clut = (void *)memory_region(machine, "user3");
+	const UINT8 *clut = (const UINT8 *)memory_region(machine, "user3");
 	bitmap_t *pSourceBitmap;
 	unsigned yscroll;
 	int i;

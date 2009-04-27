@@ -178,13 +178,13 @@ static WRITE16_HANDLER ( wwfwfest_soundwrite )
 /* DIPs are spread accross the other input ports */
 static CUSTOM_INPUT( dsw_3f_r )
 {
-	const char *tag = param;
+	const char *tag = (const char *)param;
 	return input_port_read(field->port->machine, tag) & 0x3f;
 }
 
 static CUSTOM_INPUT( dsw_c0_r )
 {
-	const char *tag = param;
+	const char *tag = (const char *)param;
 	return (input_port_read(field->port->machine, tag) & 0xc0) >> 6;
 }
 

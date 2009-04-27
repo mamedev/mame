@@ -172,8 +172,8 @@ static void sys24_tile_draw_rect(running_machine *machine, bitmap_t *bm, bitmap_
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
-	UINT8        *prib = priority_bitmap->base;
-	UINT16       *dest = dm->base;
+	UINT8        *prib = (UINT8 *)priority_bitmap->base;
+	UINT16       *dest = (UINT16 *)dm->base;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
 
@@ -306,7 +306,7 @@ static void sys24_tile_draw_rect_rgb(running_machine *machine, bitmap_t *bm, bit
 	int y;
 	const UINT16 *source  = ((UINT16 *)bm->base) + sx + sy*bm->rowpixels;
 	const UINT8  *trans = ((UINT8 *) tm->base) + sx + sy*tm->rowpixels;
-	UINT16       *dest = dm->base;
+	UINT16       *dest = (UINT16 *)dm->base;
 	const pen_t  *pens   = machine->pens;
 
 	tpri |= TILEMAP_PIXEL_LAYER0;

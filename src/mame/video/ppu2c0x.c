@@ -372,7 +372,7 @@ static DEVICE_START( ppu2c0x )
 
 static TIMER_CALLBACK( hblank_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	ppu2c0x_chip *this_ppu = get_token(device);
 	int *ppu_regs = &this_ppu->regs[0];
 
@@ -389,7 +389,7 @@ static TIMER_CALLBACK( hblank_callback )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	ppu2c0x_chip *this_ppu = get_token(device);
 	const ppu2c0x_interface *intf = get_interface(device);
 	int *ppu_regs = &this_ppu->regs[0];
@@ -861,7 +861,7 @@ static void update_scanline(const device_config *device)
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	const device_config *device = ptr;
+	const device_config *device = (const device_config *)ptr;
 	ppu2c0x_chip *this_ppu = get_token(device);
 	int *ppu_regs = &this_ppu->regs[0];
 	int blanked = ( ppu_regs[PPU_CONTROL1] & ( PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES ) ) == 0;

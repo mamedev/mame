@@ -160,7 +160,7 @@ static WRITE8_HANDLER( _20pacgal_coin_counter_w )
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	_20pacgal_state *state = space->machine->driver_data;
+	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
 
 	state->game_selected = data & 1;
 
@@ -174,7 +174,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 static WRITE8_HANDLER( rom_48000_w )
 {
-	_20pacgal_state *state = space->machine->driver_data;
+	_20pacgal_state *state = (_20pacgal_state *)space->machine->driver_data;
 
 	if (state->game_selected)
 	{

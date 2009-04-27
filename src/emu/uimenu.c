@@ -1511,7 +1511,7 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 
 	/* add crosshair options menu */
 	if (crosshair_get_usage(machine))
-		ui_menu_item_append(menu, "Crosshair Options", NULL, 0, menu_crosshair);
+		ui_menu_item_append(menu, "Crosshair Options", NULL, 0, (void *)menu_crosshair);
 
 	/* add cheat menu */
 	if (options_get_bool(mame_options(), OPTION_CHEAT) && cheat_get_next_menu_entry(machine, NULL, NULL, NULL, NULL) != NULL)
@@ -3077,7 +3077,7 @@ static void menu_crosshair(running_machine *machine, ui_menu *menu, void *parame
 	if (event != NULL && event->itemref != NULL)
 	{
 		crosshair_user_settings settings;
-		crosshair_item_data *data = event->itemref;
+		crosshair_item_data *data = (crosshair_item_data *)event->itemref;
 		int changed = FALSE;
 		int set_def = FALSE;
 		int newval = data->cur;
@@ -3193,7 +3193,7 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 			if (settings.mode == CROSSHAIR_VISIBILITY_AUTO) use_auto = TRUE;
 
 			/* CROSSHAIR_ITEM_VIS - allocate a data item and fill it */
-			data = ui_menu_pool_alloc(menu, sizeof(*data));
+			data = (crosshair_item_data *)ui_menu_pool_alloc(menu, sizeof(*data));
 			data->type = CROSSHAIR_ITEM_VIS;
 			data->player = player;
 			data->min = CROSSHAIR_VISIBILITY_OFF;
@@ -3212,7 +3212,7 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 			ui_menu_item_append(menu, temp_text, vis_text[settings.mode], flags, data);
 
 			/* CROSSHAIR_ITEM_PIC - allocate a data item and fill it */
-			data = ui_menu_pool_alloc(menu, sizeof(*data));
+			data = (crosshair_item_data *)ui_menu_pool_alloc(menu, sizeof(*data));
 			data->type = CROSSHAIR_ITEM_PIC;
 			data->player = player;
 			data->last_name[0] = 0;
@@ -3299,7 +3299,7 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 		crosshair_get_user_settings(machine, 0, &settings);
 
 		/* CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it */
-		data = ui_menu_pool_alloc(menu, sizeof(*data));
+		data = (crosshair_item_data *)ui_menu_pool_alloc(menu, sizeof(*data));
 		data->type = CROSSHAIR_ITEM_AUTO_TIME;
 		data->min = CROSSHAIR_VISIBILITY_AUTOTIME_MIN;
 		data->max = CROSSHAIR_VISIBILITY_AUTOTIME_MAX;

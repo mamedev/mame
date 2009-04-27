@@ -349,7 +349,7 @@ static NVRAM_HANDLER(93C56)
 			UINT32 length, size;
 			UINT8 *dat;
 
-			dat = eeprom_get_data_pointer(&length, &size);
+			dat = (UINT8 *)eeprom_get_data_pointer(&length, &size);
 			memset(dat, 0, length * size);
 
  			if (use_factory_eeprom!=eeprom_0) /* Set the EEPROM to Factory Defaults for games needing them*/

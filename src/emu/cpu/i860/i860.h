@@ -198,7 +198,7 @@ extern void i860_gen_interrupt(i860_state_t*);
 
 /* This is the external interface for asserting/deasserting a pin on
    the i860.  */
-extern void i860_set_pin(i860_state_t*, int, int);
+extern void i860_set_pin(const device_config *, int, int);
 
 /* Hard or soft reset.  */
 extern void reset_i860(i860_state_t*);

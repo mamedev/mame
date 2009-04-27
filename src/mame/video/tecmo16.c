@@ -251,9 +251,9 @@ static void blendbitmaps(running_machine *machine,
 		const pen_t *paldata = machine->pens;
 		UINT32 *end;
 
-		UINT16 *sd1 = src1->base;												/* source data   */
-		UINT16 *sd2 = src2->base;
-		UINT16 *sd3 = src3->base;
+		UINT16 *sd1 = (UINT16 *)src1->base;												/* source data   */
+		UINT16 *sd2 = (UINT16 *)src2->base;
+		UINT16 *sd3 = (UINT16 *)src3->base;
 
 		int sw = ex-sx+1;														/* source width  */
 		int sh = ey-sy+1;														/* source height */

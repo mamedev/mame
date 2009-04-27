@@ -321,7 +321,7 @@ WRITE32_HANDLER( atarigen_video_int_ack32_w )
 
 static TIMER_CALLBACK( scanline_interrupt_callback )
 {
-	const device_config *screen = ptr;
+	const device_config *screen = (const device_config *)ptr;
 	emu_timer *timer = get_scanline_interrupt_timer_for_screen(screen);
 
 	/* generate the interrupt */
@@ -984,7 +984,7 @@ void atarigen_scanline_timer_reset(const device_config *screen, atarigen_scanlin
 
 static TIMER_CALLBACK( scanline_timer_callback )
 {
-	const device_config *screen = ptr;
+	const device_config *screen = (const device_config *)ptr;
 	int scanline = param;
 
 	/* callback */
@@ -1049,7 +1049,7 @@ static emu_timer *get_atarivc_eof_update_timer_for_screen(const device_config *s
 
 static TIMER_CALLBACK( atarivc_eof_update )
 {
-	const device_config *screen = ptr;
+	const device_config *screen = (const device_config *)ptr;
 	emu_timer *timer = get_atarivc_eof_update_timer_for_screen(screen);
 	int i;
 
@@ -1584,8 +1584,8 @@ static TIMER_CALLBACK( unhalt_cpu )
 
 void atarigen_swap_mem(void *ptr1, void *ptr2, int bytes)
 {
-	UINT8 *p1 = ptr1;
-	UINT8 *p2 = ptr2;
+	UINT8 *p1 = (UINT8 *)ptr1;
+	UINT8 *p2 = (UINT8 *)ptr2;
 	while (bytes--)
 	{
 		int temp = *p1;

@@ -276,8 +276,8 @@ static void renderscanline_uvi_full(void *dest, INT32 scanline, const poly_exten
 	float du = extent->param[1].dpdx;
 	float dv = extent->param[2].dpdx;
 	float di = extent->param[3].dpdx;
-	bitmap_t *bitmap = dest;
-	const poly_extra_data *extra = extradata;
+	bitmap_t *bitmap = (bitmap_t *)dest;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
 	int bn = extra->bn * 0x1000;
 	const pen_t *pens = extra->pens;
 	int fogFactor = 0xff - extra->fogFactor;
@@ -434,7 +434,7 @@ static void poly3d_DrawQuad(running_machine *machine, bitmap_t *bitmap, int text
 		}
 	}
 
-	extra = poly_get_extra_data(poly);
+	extra = (poly_extra_data *)poly_get_extra_data(poly);
 
 	extra->pens = &machine->pens[(color&0x7f)<<8];
 	extra->bn = textureBank;
@@ -488,8 +488,8 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 	int x_index = extent->param[0].start * 65536.0f;
 	int y_index = extent->param[1].start * 65536.0f;
 	int dx = extent->param[0].dpdx * 65536.0f;
-	const poly_extra_data *extra = extradata;
-	bitmap_t *destmap = destbase;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *destmap = (bitmap_t *)destbase;
 	const pen_t *pal = extra->pens;
 	int prioverchar = extra->prioverchar;
 	int z = extra->z;
@@ -591,7 +591,7 @@ mydrawgfxzoom(
 		vert[3].p[0] = flipx ? fwidth : 0;
 		vert[3].p[1] = flipy ? 0 : fheight;
 
-		extra = poly_get_extra_data(poly);
+		extra = (poly_extra_data *)poly_get_extra_data(poly);
 		extra->z = z;
 		extra->alpha = alpha;
 		extra->prioverchar = prioverchar;
@@ -1232,8 +1232,8 @@ Prepare3dTexture( running_machine *machine, void *pTilemapROM, void *pTextureROM
    	         *pUnpackedTileAttr++ = (*pPackedTileAttr)&0xf;
    	         pPackedTileAttr++;
    	   }
-   	   mpTextureTileMap16 = pTilemapROM;
-         mpTextureTileData = pTextureROM;
+   	   mpTextureTileMap16 = (UINT16 *)pTilemapROM;
+         mpTextureTileData = (UINT8 *)pTextureROM;
    	   PatchTexture();
       }
    }

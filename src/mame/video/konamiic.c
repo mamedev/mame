@@ -7452,19 +7452,21 @@ void K054338_export_config(int **shdRGB)
 /*                                                                         */
 /***************************************************************************/
 
+struct K053250_CHIPTAG
+{
+	UINT8 regs[8];
+	UINT8 *base;
+	UINT16 *ram, *rammax;
+	UINT16 *buffer[2];
+	UINT32 rommask;
+	int page[2];
+	int frame, offsx, offsy;
+};
+
 static struct
 {
 	int chips;
-	struct K053250_CHIPTAG
-	{
-		UINT8 regs[8];
-		UINT8 *base;
-		UINT16 *ram, *rammax;
-		UINT16 *buffer[2];
-		UINT32 rommask;
-		int page[2];
-		int frame, offsx, offsy;
-	} chip[2];
+	struct K053250_CHIPTAG chip[2];
 } K053250_info;
 
 void K053250_set_LayerOffset(int chip, int offsx, int offsy)

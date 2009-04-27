@@ -36,6 +36,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
+#include "lordgun.h"
 
 // Variables needed by driver:
 
@@ -46,11 +47,7 @@ UINT16 *lordgun_vram_3, *lordgun_scroll_x_3, *lordgun_scroll_y_3;
 UINT16 *lordgun_scrollram;
 int lordgun_whitescreen;
 
-struct
-{
-	int		scr_x,	scr_y;
-	UINT16	hw_x,	hw_y;
-}	lordgun_gun[2];
+lordgun_gun_data lordgun_gun[2];
 
 
 /***************************************************************************

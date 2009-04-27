@@ -381,11 +381,11 @@ static LRESULT handle_copydata(WPARAM wparam, LPARAM lparam)
 		return 1;
 
 	// allocate memory
-	entry = malloc(sizeof(*entry));
+	entry = (id_map_entry *)malloc(sizeof(*entry));
 	if (entry == NULL)
 		return 0;
 
-	string = malloc(strlen(data->string) + 1);
+	string = (char *)malloc(strlen(data->string) + 1);
 	if (string == NULL)
 	{
 		free(entry);

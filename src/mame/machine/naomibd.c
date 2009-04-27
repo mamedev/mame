@@ -112,7 +112,7 @@ INLINE naomibd_state *get_safe_token(const device_config *device)
 
 int naomibd_interrupt_callback(const device_config *device, naomibd_interrupt_func callback)
 {
-	naomibd_config *config = device->inline_config;
+	naomibd_config *config = (naomibd_config *)device->inline_config;
 	//naomibd_state *v = get_safe_token(device);
 
 	config->interrupt = callback;
@@ -522,7 +522,7 @@ static void load_rom_gdrom(running_machine* machine, naomibd_state *v)
 
 static DEVICE_START( naomibd )
 {
-	const naomibd_config *config = device->inline_config;
+	const naomibd_config *config = (const naomibd_config *)device->inline_config;
 	naomibd_state *v = get_safe_token(device);
 
 	/* validate some basic stuff */
@@ -623,7 +623,7 @@ static DEVICE_NVRAM( naomibd )
 
 DEVICE_GET_INFO( naomibd )
 {
-	const naomibd_config *config = (device != NULL) ? device->inline_config : NULL;
+	const naomibd_config *config = (device != NULL) ? (const naomibd_config *)device->inline_config : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

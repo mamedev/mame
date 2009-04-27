@@ -289,7 +289,7 @@ VIDEO_UPDATE( taitojc )
 
 static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	bitmap_t *destmap = dest;
+	bitmap_t *destmap = (bitmap_t *)dest;
 	float z = extent->param[0].start;
 	int color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
@@ -313,7 +313,7 @@ static void render_solid_scan(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	bitmap_t *destmap = dest;
+	bitmap_t *destmap = (bitmap_t *)dest;
 	float z = extent->param[0].start;
 	float color = extent->param[1].start;
 	float dz = extent->param[0].dpdx;
@@ -340,8 +340,8 @@ static void render_shade_scan(void *dest, INT32 scanline, const poly_extent *ext
 
 static void render_texture_scan(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
-	bitmap_t *destmap = dest;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *destmap = (bitmap_t *)dest;
 	float z = extent->param[0].start;
 	float u = extent->param[1].start;
 	float v = extent->param[2].start;
@@ -434,7 +434,7 @@ void taitojc_render_polygons(running_machine *machine, UINT16 *polygon_fifo, int
 				// 0x12: Vertex 3 X
 				// 0x13: Vertex 3 Z
 
-				poly_extra_data *extra = poly_get_extra_data(poly);
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 				UINT16 texbase;
 
 				/*
@@ -552,7 +552,7 @@ void taitojc_render_polygons(running_machine *machine, UINT16 *polygon_fifo, int
 				// 0x18: Vertex 4 X
 				// 0x19: Vertex 4 Z
 
-				poly_extra_data *extra = poly_get_extra_data(poly);
+				poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 				UINT16 texbase;
 
 				/*

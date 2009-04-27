@@ -1188,23 +1188,23 @@ static int kram3_permut1(int idx, int value)
 
 static int kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table)
 {
-	int xor = 0;
+	int xorval = 0;
 
 	if (idx == 0 || idx == 3)
 	{
-		xor = xor_table[tbl_index];
+		xorval = xor_table[tbl_index];
 
 		// handle missing values in table
-		if (xor == 99)
-			return xor;
+		if (xorval == 99)
+			return xorval;
 	}
 
-	xor ^= 0x02;
+	xorval ^= 0x02;
 
 	if (idx == 3)
-		xor = BITSWAP8(xor, 7,6,5,4, 0,2,3,1);
+		xorval = BITSWAP8(xorval, 7,6,5,4, 0,2,3,1);
 
-	return xor;
+	return xorval;
 }
 
 static int kram3_decrypt(int address, int value)

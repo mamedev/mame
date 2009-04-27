@@ -119,8 +119,9 @@ bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 ***************************************************************************/
 
+typedef enum { STATE_IDLE = 0, STATE_ADDR_R, STATE_ROM_R, STATE_EEPROM_R, STATE_EEPROM_W } prot_state;
 static struct {
-	enum { STATE_IDLE = 0, STATE_ADDR_R, STATE_ROM_R, STATE_EEPROM_R, STATE_EEPROM_W } state;
+	prot_state state;
 	int wait_param;
 	int param;
 	int cmd;

@@ -608,7 +608,7 @@ static NVRAM_HANDLER(93C46_gundamex)
 			UINT32 length, size;
 			UINT16 *dat;
 
-			dat = eeprom_get_data_pointer(&length, &size);
+			dat = (UINT16 *)eeprom_get_data_pointer(&length, &size);
 			dat[0] = 0x7008;
 		}
 	}

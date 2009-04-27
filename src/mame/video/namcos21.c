@@ -254,14 +254,14 @@ typedef struct
 	double z;
 } edge;
 
-#define SWAP(A,B) { const void *temp = A; A = B; B = temp; }
+#define SWAP(T,A,B) { const T *temp = A; A = B; B = temp; }
 
 static void
 renderscanline_flat( const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable )
 {
 	if( e1->x > e2->x )
 	{
-		SWAP(e1,e2);
+		SWAP(edge,e1,e2);
 	}
 
 	{
@@ -335,11 +335,11 @@ rendertri(
 	{
 		if( v0->y > v1->y )
 		{
-			SWAP(v0,v1);
+			SWAP(vertex,v0,v1);
 		}
 		else if( v1->y > v2->y )
 		{
-			SWAP(v1,v2);
+			SWAP(vertex,v1,v2);
 		}
 		else
 		{

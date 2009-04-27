@@ -64,7 +64,7 @@ WRITE8_HANDLER( m10_colorram_w )
 
 WRITE8_HANDLER( m10_chargen_w )
 {
-	m10_state *state = space->machine->driver_data;
+	m10_state *state = (m10_state *)space->machine->driver_data;
 
 	if (state->chargen[offset] != data)
 	{
@@ -76,7 +76,7 @@ WRITE8_HANDLER( m10_chargen_w )
 
 WRITE8_HANDLER( m15_chargen_w )
 {
-	m10_state *state = space->machine->driver_data;
+	m10_state *state = (m10_state *)space->machine->driver_data;
 
 	if (state->chargen[offset] != data)
 	{
@@ -88,7 +88,7 @@ WRITE8_HANDLER( m15_chargen_w )
 
 INLINE void plot_pixel_m10(running_machine *machine, bitmap_t *bm, int x, int y, int col)
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = (m10_state *)machine->driver_data;
 
 	if (!state->flip)
 		*BITMAP_ADDR16(bm, y, x) = col;
@@ -99,7 +99,7 @@ INLINE void plot_pixel_m10(running_machine *machine, bitmap_t *bm, int x, int y,
 
 VIDEO_START( m10 )
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = (m10_state *)machine->driver_data;
 	int i;
 
 	for (i=0;i<32*8;i++)
@@ -118,7 +118,7 @@ VIDEO_START( m10 )
 
 VIDEO_START( m15 )
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = (m10_state *)machine->driver_data;
 
 	machine->gfx[0] = gfx_element_alloc(machine, &charlayout, state->chargen, 8, 0);
 
@@ -136,7 +136,7 @@ VIDEO_START( m15 )
 ***************************************************************************/
 VIDEO_UPDATE( m10 )
 {
-	m10_state *state = screen->machine->driver_data;
+	m10_state *state = (m10_state *)screen->machine->driver_data;
 	int offs;
 	static const int color[4]= { 3, 3, 5, 5 };
 	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
@@ -175,7 +175,7 @@ VIDEO_UPDATE( m10 )
 ***************************************************************************/
 VIDEO_UPDATE( m15 )
 {
-	m10_state *state = screen->machine->driver_data;
+	m10_state *state = (m10_state *)screen->machine->driver_data;
 	int offs;
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)

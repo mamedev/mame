@@ -29,7 +29,7 @@ static CUSTOM_INPUT( get_collision )
 
 static CUSTOM_INPUT( get_joystick )
 {
-	UINT8 joy = input_port_read(field->port->machine, param) & 3;
+	UINT8 joy = input_port_read(field->port->machine, (const char *)param) & 3;
 
 	if (joy == 1)
 	{

@@ -2721,6 +2721,7 @@ OP(235, OP_DIV   ( DX          ) ) /* DIV dx      */
 OP(249, OP_RLA   ( IMM         ) ) /* RLA imm     */
 OP(2c2, OP_LDT   ( IMM         ) ) /* LDT imm     */
 
+extern TABLE_OPCODES;
 TABLE_OPCODES =
 {
 	O(00),O(01),O(02),O(03),O(04),O(05),O(06),O(07),
@@ -2757,6 +2758,7 @@ TABLE_OPCODES =
 	O(f8),O(f9),O(fa),O(fb),O(fc),O(fd),O(fe),O(ff)
 };
 
+extern TABLE_OPCODES2;
 TABLE_OPCODES2 =
 {
 	O(200),O(101),O(200),O(103),O(200),O(105),O(200),O(107),
@@ -2793,6 +2795,7 @@ TABLE_OPCODES2 =
 	O(200),O(200),O(200),O(200),O(200),O(200),O(200),O(200)
 };
 
+extern TABLE_OPCODES3;
 TABLE_OPCODES3 =
 {
 	O(200),O(200),O(200),O(203),O(200),O(205),O(200),O(200),

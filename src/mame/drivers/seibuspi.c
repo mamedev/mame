@@ -1268,7 +1268,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( ejanhs_encode )
 {
 	static const UINT8 encoding[] = { 0x02, 0x10, 0x03, 0x18, 0x04, 0x20, 0x05, 0x28, 0x06, 0x30, 0x07 };
-	input_port_value state = input_port_read(field->port->machine, param);
+	input_port_value state = input_port_read(field->port->machine, (const char *)param);
 	int bit;
 
 	for (bit = 0; bit < ARRAY_LENGTH(encoding); bit++)

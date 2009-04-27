@@ -222,6 +222,7 @@ static int ddivs(UINT64 *dstlo, UINT64 *dsthi, INT64 src1, INT64 src2);
 ***************************************************************************/
 
 /* globally-accessible interface to the backend */
+extern const drcbe_interface drcbe_x86_be_interface;
 const drcbe_interface drcbe_x86_be_interface =
 {
 	drcbex86_alloc,

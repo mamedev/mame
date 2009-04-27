@@ -106,7 +106,7 @@ INLINE void K053936GP_copyroz32clip( running_machine *machine,
 	cmask = colormask[tilebpp];
 
 	src_pitch = src_bitmap->rowpixels;
-	src_base = src_bitmap->base;
+	src_base = (UINT16 *)src_bitmap->base;
 
 	dst_ptr = dst_base;
 	cy = starty;
@@ -374,7 +374,7 @@ INLINE void zdrawgfxzoom32GP( running_machine *machine,
 	pal_base  = machine->pens + gfx->color_base + (color % gfx->total_colors) * granularity;
 	shd_base  = machine->shadow_table;
 
-	dst_ptr   = bitmap->base;
+	dst_ptr   = (UINT32 *)bitmap->base;
 	dst_pitch = bitmap->rowpixels;
 	dst_minx  = cliprect->min_x;
 	dst_maxx  = cliprect->max_x;

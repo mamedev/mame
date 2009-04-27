@@ -73,7 +73,7 @@ if (!((data >> 4) & 1)) mame_printf_debug("/TRIG4\n");
 WRITE8_DEVICE_HANDLER( turbo_sound_a_w )
 {
 	const device_config *samples = devtag_get_device(device->machine, "samples");
-	turbo_state *state = device->machine->driver_data;
+	turbo_state *state = (turbo_state *)device->machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[0];
 	state->sound_state[0] = data;
 
@@ -122,7 +122,7 @@ WRITE8_DEVICE_HANDLER( turbo_sound_a_w )
 WRITE8_DEVICE_HANDLER( turbo_sound_b_w )
 {
 	const device_config *samples = devtag_get_device(device->machine, "samples");
-	turbo_state *state = device->machine->driver_data;
+	turbo_state *state = (turbo_state *)device->machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[1];
 	state->sound_state[1] = data;
 
@@ -145,7 +145,7 @@ WRITE8_DEVICE_HANDLER( turbo_sound_b_w )
 WRITE8_DEVICE_HANDLER( turbo_sound_c_w )
 {
 	const device_config *samples = devtag_get_device(device->machine, "samples");
-	turbo_state *state = device->machine->driver_data;
+	turbo_state *state = (turbo_state *)device->machine->driver_data;
 
 	/* OSEL1-2 */
 	state->turbo_osel = (state->turbo_osel & 1) | ((data & 3) << 1);
@@ -295,7 +295,7 @@ MACHINE_DRIVER_END
 
 WRITE8_DEVICE_HANDLER( subroc3d_sound_a_w )
 {
-	turbo_state *state = device->machine->driver_data;
+	turbo_state *state = (turbo_state *)device->machine->driver_data;
 	state->sound_state[0] = data;
 
 	/* DIS0-3 contained in bits 0-3 */
@@ -326,7 +326,7 @@ INLINE void subroc3d_update_volume(const device_config *samples, int leftchan, U
 WRITE8_DEVICE_HANDLER( subroc3d_sound_b_w )
 {
 	const device_config *samples = devtag_get_device(device->machine, "samples");
-	turbo_state *state = device->machine->driver_data;
+	turbo_state *state = (turbo_state *)device->machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[1];
 	state->sound_state[1] = data;
 
@@ -382,7 +382,7 @@ WRITE8_DEVICE_HANDLER( subroc3d_sound_b_w )
 WRITE8_DEVICE_HANDLER( subroc3d_sound_c_w )
 {
 	const device_config *samples = devtag_get_device(device->machine, "samples");
-	turbo_state *state = device->machine->driver_data;
+	turbo_state *state = (turbo_state *)device->machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[2];
 	state->sound_state[2] = data;
 
@@ -507,7 +507,7 @@ static void buckrog_update_samples(turbo_state *state, const device_config *samp
 WRITE8_DEVICE_HANDLER( buckrog_sound_a_w )
 {
 	const device_config *samples = devtag_get_device(device->machine, "samples");
-	turbo_state *state = device->machine->driver_data;
+	turbo_state *state = (turbo_state *)device->machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[0];
 	state->sound_state[0] = data;
 
@@ -533,7 +533,7 @@ WRITE8_DEVICE_HANDLER( buckrog_sound_a_w )
 WRITE8_DEVICE_HANDLER( buckrog_sound_b_w )
 {
 	const device_config *samples = devtag_get_device(device->machine, "samples");
-	turbo_state *state = device->machine->driver_data;
+	turbo_state *state = (turbo_state *)device->machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[1];
 	state->sound_state[1] = data;
 

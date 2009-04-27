@@ -283,6 +283,7 @@ static const UINT32 condition_map[] =
 
 static UINT64 immediate_zero = 0;
 
+extern const drcbe_interface drcbe_c_be_interface;
 const drcbe_interface drcbe_c_be_interface =
 {
 	drcbec_alloc,

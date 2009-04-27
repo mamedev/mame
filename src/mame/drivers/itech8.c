@@ -1139,7 +1139,7 @@ INPUT_PORTS_END
 
 static CUSTOM_INPUT( gtg_mux )
 {
-	const char *tag1 = param;
+	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
 	return input_port_read(field->port->machine, tag1) & input_port_read(field->port->machine, tag2);
 }

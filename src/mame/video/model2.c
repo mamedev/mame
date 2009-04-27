@@ -511,7 +511,7 @@ static void model2_3d_process_quad( UINT32 attr )
 			if ( ztri != NULL )
 			{
 				while( ztri->next != NULL )
-					ztri = ztri->next;
+					ztri = (triangle *)ztri->next;
 			}
 
 			/* go through the clipped vertex list, adding triangles */
@@ -748,7 +748,7 @@ static void model2_3d_process_triangle( UINT32 attr )
 			if ( ztri != NULL )
 			{
 				while( ztri->next != NULL )
-					ztri = ztri->next;
+					ztri = (triangle *)ztri->next;
 			}
 
 			/* go through the clipped vertex list, adding triangles */
@@ -929,7 +929,7 @@ static const poly_draw_scanline_func render_funcs[8] =
 
 static void model2_3d_render( bitmap_t *bitmap, triangle *tri, const rectangle *cliprect )
 {
-	poly_extra_data *extra = poly_get_extra_data(poly);
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 	UINT8		renderer;
 	rectangle	vp;
 
@@ -1085,7 +1085,7 @@ static void model2_3d_frame_end( bitmap_t *bitmap, const rectangle *cliprect )
 				model2_3d_project( tri );
 				model2_3d_render( bitmap, tri, cliprect );
 
-				tri = tri->next;
+				tri = (triangle *)tri->next;
 			}
 		}
 	}

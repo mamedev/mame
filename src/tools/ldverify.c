@@ -123,19 +123,19 @@ static void *open_avi(const char *filename, movie_info *info)
 
 static int read_avi(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT16 *rsound, int *samples)
 {
-	const avi_movie_info *aviinfo = avi_get_movie_info(file);
+	const avi_movie_info *aviinfo = avi_get_movie_info((avi_file *)file);
 	UINT32 firstsample = ((UINT64)aviinfo->audio_samplerate * (UINT64)frame * (UINT64)aviinfo->video_sampletime + aviinfo->video_timescale - 1) / (UINT64)aviinfo->video_timescale;
 	UINT32 lastsample = ((UINT64)aviinfo->audio_samplerate * (UINT64)(frame + 1) * (UINT64)aviinfo->video_sampletime + aviinfo->video_timescale - 1) / (UINT64)aviinfo->video_timescale;
 	avi_error avierr;
 
 	/* read the frame */
-	avierr = avi_read_video_frame_yuy16(file, frame, bitmap);
+	avierr = avi_read_video_frame_yuy16((avi_file *)file, frame, bitmap);
 	if (avierr != AVIERR_NONE)
 		return FALSE;
 
 	/* read the samples */
-	avierr = avi_read_sound_samples(file, 0, firstsample, lastsample - firstsample, lsound);
-	avierr = avi_read_sound_samples(file, 1, firstsample, lastsample - firstsample, rsound);
+	avierr = avi_read_sound_samples((avi_file *)file, 0, firstsample, lastsample - firstsample, lsound);
+	avierr = avi_read_sound_samples((avi_file *)file, 1, firstsample, lastsample - firstsample, rsound);
 	if (avierr != AVIERR_NONE)
 		return FALSE;
 	*samples = lastsample - firstsample;
@@ -149,7 +149,7 @@ static int read_avi(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 
 static void close_avi(void *file)
 {
-	avi_close(file);
+	avi_close((avi_file *)file);
 }
 
 
@@ -247,10 +247,10 @@ static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 		avconfig.audio[1] = &rsound[*samples];
 
 		/* configure the decompressor for this frame */
-		chd_codec_config(file, AV_CODEC_DECOMPRESS_CONFIG, &avconfig);
+		chd_codec_config((chd_file *)file, AV_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 		/* read the frame */
-		chderr = chd_read(file, frame * interlace_factor + fieldnum, NULL);
+		chderr = chd_read((chd_file *)file, frame * interlace_factor + fieldnum, NULL);
 		if (chderr != CHDERR_NONE)
 			return FALSE;
 
@@ -267,7 +267,7 @@ static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 
 static void close_chd(void *file)
 {
-	chd_close(file);
+	chd_close((chd_file *)file);
 }
 
 
@@ -723,8 +723,8 @@ int main(int argc, char *argv[])
 	}
 
 	/* allocate sound buffers */
-	lsound = malloc(info.samplerate * sizeof(*lsound));
-	rsound = malloc(info.samplerate * sizeof(*rsound));
+	lsound = (INT16 *)malloc(info.samplerate * sizeof(*lsound));
+	rsound = (INT16 *)malloc(info.samplerate * sizeof(*rsound));
 	if (lsound == NULL || rsound == NULL)
 	{
 		isavi ? close_avi(file) : close_chd(file);

@@ -305,7 +305,7 @@ static MACHINE_RESET( gottlieb )
 
 static CUSTOM_INPUT( analog_delta_r )
 {
-	const char *string = param;
+	const char *string = (const char *)param;
 	int which = string[0] - '0';
 
 	return input_port_read(field->port->machine, &string[1]) - track[which];

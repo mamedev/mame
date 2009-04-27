@@ -64,22 +64,6 @@ static WRITE8_HANDLER( bank14_w ) { (*namcos1_active_bank[13].bank_handler_w)(sp
 static WRITE8_HANDLER( bank15_w ) { (*namcos1_active_bank[14].bank_handler_w)(space, offset + namcos1_active_bank[14].bank_offset, data); }
 static WRITE8_HANDLER( bank16_w ) { (*namcos1_active_bank[15].bank_handler_w)(space, offset + namcos1_active_bank[15].bank_offset, data); }
 
-static const read8_space_func ram_bank_handler_r[16] =
-{
-	SMH_BANK(1) ,SMH_BANK(2) ,SMH_BANK(3) ,SMH_BANK(4) ,
-	SMH_BANK(5) ,SMH_BANK(6) ,SMH_BANK(7) ,SMH_BANK(8) ,
-	SMH_BANK(9) ,SMH_BANK(10),SMH_BANK(11),SMH_BANK(12),
-	SMH_BANK(13),SMH_BANK(14),SMH_BANK(15),SMH_BANK(16)
-};
-
-static const write8_space_func ram_bank_handler_w[16] =
-{
-	SMH_BANK(1) ,SMH_BANK(2) ,SMH_BANK(3) ,SMH_BANK(4) ,
-	SMH_BANK(5) ,SMH_BANK(6) ,SMH_BANK(7) ,SMH_BANK(8) ,
-	SMH_BANK(9) ,SMH_BANK(10),SMH_BANK(11),SMH_BANK(12),
-	SMH_BANK(13),SMH_BANK(14),SMH_BANK(15),SMH_BANK(16)
-};
-
 static const read8_space_func io_bank_handler_r[16] =
 {
 	bank1_r, bank2_r, bank3_r, bank4_r,
@@ -692,7 +676,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 	if (!handler->bank_handler_r)
 	{
 		if (namcos1_active_bank[banknum].bank_handler_r)
-			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_r[banknum]);
+			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (read8_space_func)SMH_BANK(banknum + 1));
 	}
 	else
 	{
@@ -706,7 +690,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 		if (!handler->bank_handler_w)
 		{
 			if (namcos1_active_bank[banknum].bank_handler_w)
-				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_w[banknum]);
+				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, (write8_space_func)SMH_BANK(banknum + 1));
 		}
 		else
 		{

@@ -35,6 +35,8 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 #define SAMPLES_PER_BLOCK ( 28 )
 #define PITCH_SHIFT ( 12 )
 
+typedef enum { e_attack = 0, e_decay, e_sustain, e_sustainEnd, e_release, e_releaseend } sound_envstate;
+
 struct psxinfo
 {
 	const psx_spu_interface *intf;
@@ -66,7 +68,7 @@ struct psxinfo
 	UINT16 m_p_n_pitch[ MAX_CHANNEL ];
 	UINT16 m_p_n_address[ MAX_CHANNEL ];
 	UINT16 m_p_n_envelopestate[ MAX_CHANNEL ];
-	enum envstate { e_attack = 0, e_decay, e_sustain, e_sustainEnd, e_release, e_releaseend } m_envstate;
+	sound_envstate m_envstate;
 	UINT16 m_p_n_attackdecaysustain[ MAX_CHANNEL ];
 	UINT16 m_p_n_sustainrelease[ MAX_CHANNEL ];
 	UINT16 m_p_n_adsrvolume[ MAX_CHANNEL ];

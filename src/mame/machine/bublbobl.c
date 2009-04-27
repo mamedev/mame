@@ -347,10 +347,10 @@ WRITE8_HANDLER( boblbobl_ic43_a_w )
 
 WRITE8_HANDLER( boblbobl_ic43_b_w )
 {
-	static const int xor[4] = { 4, 1, 8, 2 };
+	static const int xorval[4] = { 4, 1, 8, 2 };
 
 //  logerror("%04x: ic43_b_w (offs %d) %02x\n",cpu_get_pc(space->cpu),offset,data);
-	ic43_b = (data >> 4) ^ xor[offset];
+	ic43_b = (data >> 4) ^ xorval[offset];
 }
 
 READ8_HANDLER( boblbobl_ic43_b_r )

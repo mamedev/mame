@@ -247,7 +247,7 @@ static void sega_decode(running_machine *machine, const char *cputag, const UINT
 
 	for (A = 0x0000;A < cryptlen;A++)
 	{
-		int xor = 0;
+		int xorval = 0;
 
 		UINT8 src = rom[A];
 
@@ -260,14 +260,14 @@ static void sega_decode(running_machine *machine, const char *cputag, const UINT
 		if (src & 0x80)
 		{
 			col = 3 - col;
-			xor = 0xa8;
+			xorval = 0xa8;
 		}
 
 		/* decode the opcodes */
-		decrypted[A] = (src & ~0xa8) | (convtable[2*row][col] ^ xor);
+		decrypted[A] = (src & ~0xa8) | (convtable[2*row][col] ^ xorval);
 
 		/* decode the data */
-		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
+		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xorval);
 
 		if (convtable[2*row][col] == 0xff)	/* table incomplete! (for development) */
 			decrypted[A] = 0xee;
@@ -468,7 +468,7 @@ void toprollr_decode(running_machine *machine, const char *cputag, const char *r
 	for(bankstart=0;bankstart<0x6000*3;bankstart+=0x6000)
 	for (A = 0x0000;A < 0x6000;A++)
 	{
-		int xor = 0;
+		int xorval = 0;
 
 		UINT8 src = rom[A+bankstart];
 
@@ -481,14 +481,14 @@ void toprollr_decode(running_machine *machine, const char *cputag, const char *r
 		if (src & 0x80)
 		{
 			col = 3 - col;
-			xor = 0xa8;
+			xorval = 0xa8;
 		}
 
 		/* decode the opcodes */
-		decrypted[A+bankstart] = (src & ~0xa8) | (convtable[2*row][col] ^ xor);
+		decrypted[A+bankstart] = (src & ~0xa8) | (convtable[2*row][col] ^ xorval);
 
 		/* decode the data */
-		rom[A+bankstart] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
+		rom[A+bankstart] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xorval);
 	}
 
 	memory_configure_bank(machine, 1,0,3, memory_region(machine, regiontag),0x6000);
@@ -823,7 +823,7 @@ void jongkyo_decode(running_machine *machine, const char *cputag)
 
 	for (A = 0x0000;A < 0x9000;A++)
 	{
-		int xor = 0;
+		int xorval = 0;
 
 		UINT8 src = rom[A];
 
@@ -836,7 +836,7 @@ void jongkyo_decode(running_machine *machine, const char *cputag)
 		if (src & 0x80)
 		{
 			col = 3 - col;
-			xor = 0xa8;
+			xorval = 0xa8;
 		}
 
 		/* special handling for banked area */
@@ -844,10 +844,10 @@ void jongkyo_decode(running_machine *machine, const char *cputag)
 			row = (A & 1) + (((A >> 4) & 1) << 1) + (((A >> 8) & 1) << 2);
 
 		/* decode the opcodes */
-		decrypted[A] = (src & ~0xa8) | (convtable[2*row][col] ^ xor);
+		decrypted[A] = (src & ~0xa8) | (convtable[2*row][col] ^ xorval);
 
 		/* decode the data */
-		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xor);
+		rom[A] = (src & ~0xa8) | (convtable[2*row+1][col] ^ xorval);
 	}
 
 	memory_configure_bank(machine, 1,0,8, memory_region(machine, cputag)+0x7000,0x0400);

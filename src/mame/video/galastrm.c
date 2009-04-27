@@ -239,8 +239,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void tc0610_draw_scanline(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
 {
-	const poly_extra_data *extra = extradata;
-	bitmap_t *destmap = dest;
+	const poly_extra_data *extra = (const poly_extra_data *)extradata;
+	bitmap_t *destmap = (bitmap_t *)dest;
 	UINT16 *framebuffer = BITMAP_ADDR16(destmap, scanline, 0);
 	bitmap_t *texbase = extra->texbase;
 	int startx = extent->startx;
@@ -261,7 +261,7 @@ static void tc0610_draw_scanline(void *dest, INT32 scanline, const poly_extent *
 
 static void tc0610_rotate_draw(running_machine *machine, bitmap_t *bitmap, bitmap_t *srcbitmap, const rectangle *clip)
 {
-	poly_extra_data *extra = poly_get_extra_data(poly);
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 	poly_draw_scanline_func callback;
 	poly_vertex vert[4];
 	int rsx = galastrm_tc0610_ctrl_reg[1][0];

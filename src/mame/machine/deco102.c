@@ -28,7 +28,7 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 		{ 12,15,8,13,9,11,14,10, 6,5,4,3,2,1,0,7 }, { 11,12,13,14,15,8,9,10, 4,5,7,1,6,3,2,0 },
 		{ 13,8,12,14,11,15,10,9, 7,6,5,4,3,2,1,0 }, { 15,14,13,12,11,10,9,8, 0,6,7,4,3,2,1,5 }
 	};
-	int j, xor;
+	int j, xorval;
 	const UINT8 *bs;
 
 	// calculate bitswap to use
@@ -39,10 +39,10 @@ static UINT16 decrypt(UINT16 data, int address, int select_xor)
 	// calculate xor to use
 	j = (address ^ select_xor) & 0x0f;
 	if (address & 0x40000) j ^= 2;	// boogwing
-	xor = xors[j];
+	xorval = xors[j];
 
 	// decrypt
-	return xor ^ BITSWAP16(data,
+	return xorval ^ BITSWAP16(data,
 				bs[0],bs[1],bs[2],bs[3],bs[4],bs[5],bs[6],bs[7],
 				bs[8],bs[9],bs[10],bs[11],bs[12],bs[13],bs[14],bs[15]);
 }

@@ -703,7 +703,7 @@ void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
 void timer_device_adjust_oneshot(const device_config *timer, attotime duration, INT32 param)
 {
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -756,7 +756,7 @@ void timer_device_adjust_periodic(const device_config *timer, attotime start_del
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -820,7 +820,7 @@ void timer_device_reset(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -890,7 +890,7 @@ int timer_device_get_param(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);
@@ -915,7 +915,7 @@ void timer_device_set_param(const device_config *timer, int param)
 {
 	timer_state *state = get_safe_token(timer);
 #ifdef MAME_DEBUG
-	timer_config *config = timer->inline_config;
+	timer_config *config = (timer_config *)timer->inline_config;
 
 	/* doesn't make sense for scanline timers */
 	assert(config->type != TIMER_TYPE_SCANLINE);

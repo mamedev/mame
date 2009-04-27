@@ -380,7 +380,7 @@ static STREAM_UPDATE( leland_80186_dac_update )
 
 static STREAM_UPDATE( leland_80186_dma_update )
 {
-	const address_space *dmaspace = param;
+	const address_space *dmaspace = (const address_space *)param;
 	stream_sample_t *buffer = outputs[0];
 	int i, j;
 

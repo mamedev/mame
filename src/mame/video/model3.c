@@ -1080,7 +1080,7 @@ static int clip_polygon(const poly_vertex *v, int num_vertices, PLANE cp, poly_v
 
 static void render_one(TRIANGLE *tri)
 {
-	poly_extra_data *extra = poly_get_extra_data(poly);
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(poly);
 	poly_draw_scanline_func callback = NULL;
 
 	tri->v[0].pz = 1.0f / tri->v[0].pz;

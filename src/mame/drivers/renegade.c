@@ -139,7 +139,7 @@ static struct renegade_adpcm_state
 
 static STREAM_UPDATE( renegade_adpcm_callback )
 {
-	struct renegade_adpcm_state *state = param;
+	struct renegade_adpcm_state *state = (struct renegade_adpcm_state *)param;
 	stream_sample_t *dest = outputs[0];
 
 	while (state->playing && samples > 0)

@@ -191,7 +191,7 @@ static PALETTE_INIT( m10 )
 
 static MACHINE_RESET( irem )
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = (m10_state *)machine->driver_data;
 
 	state_save_register_global(machine, state->bottomline);
 	state_save_register_global(machine, state->flip);
@@ -225,7 +225,7 @@ static MACHINE_RESET( irem )
 static WRITE8_HANDLER( m10_ctrl_w )
 {
 	const device_config *samples = devtag_get_device(space->machine, "samples");
-	m10_state *state = space->machine->driver_data;
+	m10_state *state = (m10_state *)space->machine->driver_data;
 
 #if DEBUG
 	if (data & 0x40)
@@ -302,7 +302,7 @@ static WRITE8_HANDLER( m10_ctrl_w )
 
 static WRITE8_HANDLER( m11_ctrl_w )
 {
-	m10_state *state = space->machine->driver_data;
+	m10_state *state = (m10_state *)space->machine->driver_data;
 
 #if DEBUG
 	if (data & 0x4C)
@@ -335,7 +335,7 @@ static WRITE8_HANDLER( m11_ctrl_w )
 
 static WRITE8_HANDLER( m15_ctrl_w )
 {
-	m10_state *state = space->machine->driver_data;
+	m10_state *state = (m10_state *)space->machine->driver_data;
 
 #if DEBUG
 	if (data & 0xF0)
@@ -916,7 +916,7 @@ MACHINE_DRIVER_END
 static DRIVER_INIT( andromed )
 {
 	int i;
-	m10_state *state = machine->driver_data;
+	m10_state *state = (m10_state *)machine->driver_data;
 
 	for (i=0x1c00;i<0x2000;i++)
 		state->rom[i]=0x60;
@@ -925,7 +925,7 @@ static DRIVER_INIT( andromed )
 static DRIVER_INIT( ipminva1 )
 {
 	int i;
-	m10_state *state = machine->driver_data;
+	m10_state *state = (m10_state *)machine->driver_data;
 
 	for (i=0x1400;i<0x17ff;i++)
 		state->rom[i]=0x60;

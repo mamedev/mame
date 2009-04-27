@@ -266,7 +266,7 @@ static void draw_phasor(bitmap_t* bitmap)
 
 static int get_radius(void)
 {
-	return 6 * sqrt(starshp1_circle_size);  /* size calibrated by hand */
+	return 6 * sqrt((double)starshp1_circle_size);  /* size calibrated by hand */
 }
 static int get_circle_hpos(void)
 {

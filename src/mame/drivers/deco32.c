@@ -480,7 +480,7 @@ static WRITE32_HANDLER( tattass_control_w )
 	static int pendingCommand=0; /* 1 = read, 2 = write */
 	static int readBitCount=0;
 	static int byteAddr=0;
-	UINT8 *eeprom=eeprom_get_data_pointer(NULL,NULL);
+	UINT8 *eeprom=(UINT8 *)eeprom_get_data_pointer(NULL,NULL);
 
 	/* Eprom in low byte */
 	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */

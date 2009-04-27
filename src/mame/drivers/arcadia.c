@@ -72,7 +72,7 @@ static UINT8 coin_counter[2];
 
 static WRITE16_HANDLER( arcadia_multibios_change_game )
 {
-	memory_install_read16_handler(space, 0x800000, 0x97ffff, 0, 0, (data == 0) ? SMH_BANK(2) : SMH_NOP);
+	memory_install_read16_handler(space, 0x800000, 0x97ffff, 0, 0, (read16_space_func)((data == 0) ? SMH_BANK(2) : SMH_NOP));
 }
 
 
@@ -156,7 +156,7 @@ static CUSTOM_INPUT( coin_counter_r )
 
 static INPUT_CHANGED( coin_changed_callback )
 {
-	UINT8 *counter = param;
+	UINT8 *counter = (UINT8 *)param;
 
 	/* check for a 0 -> 1 transition */
 	if (!oldval && newval && *counter < 3)

@@ -774,9 +774,9 @@ static void decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int fr
 	int chunk_start;
 
 	/* compute the charge, decay, and leak constants */
-	charge = pow(exp(-1), 1.0 / (FILTER_CHARGE_TC * (double)frequency));
-	decay = pow(exp(-1), 1.0 / (FILTER_DECAY_TC * (double)frequency));
-	leak = pow(exp(-1), 1.0 / (INTEGRATOR_LEAK_TC * (double)frequency));
+	charge = pow(exp(-1.0), 1.0 / (FILTER_CHARGE_TC * (double)frequency));
+	decay = pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * (double)frequency));
+	leak = pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * (double)frequency));
 
 	/* compute the gain */
 	gain = SAMPLE_GAIN;
