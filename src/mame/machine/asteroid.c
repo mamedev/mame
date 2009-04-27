@@ -128,12 +128,12 @@ WRITE8_HANDLER( astdelux_bank_switch_w )
 
 WRITE8_HANDLER( astdelux_led_w )
 {
-	set_led_status(offset,(data&0x80)?0:1);
+	set_led_status(offset, (data & 0x80) ? 0 : 1);
 }
 
 
 MACHINE_RESET( asteroid )
 {
-	asteroid_bank_switch_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
-	avgdvg_reset_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
+	asteroid_bank_switch_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
+	avgdvg_reset_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
 }

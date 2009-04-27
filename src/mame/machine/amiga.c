@@ -301,9 +301,9 @@ static void amiga_m68k_reset(const device_config *device)
 MACHINE_RESET( amiga )
 {
 	/* set m68k reset  function */
-	m68k_set_reset_callback(machine->cpu[0], amiga_m68k_reset);
+	m68k_set_reset_callback(cputag_get_cpu(machine, "maincpu"), amiga_m68k_reset);
 
-	amiga_m68k_reset(machine->cpu[0]);
+	amiga_m68k_reset(cputag_get_cpu(machine, "maincpu"));
 
 	/* call the system-specific callback */
 	if (amiga_intf->reset_callback)
@@ -331,7 +331,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == 0)
 	{
 		/* signal VBLANK IRQ */
-		amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
+		amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
 
 		/* clock the first CIA TOD */
 		cia_clock_tod(cia_0);
@@ -377,31 +377,31 @@ static void update_irqs(running_machine *machine)
 	if (CUSTOM_REG(REG_INTENA) & 0x4000)
 	{
 		/* Serial transmit buffer empty, disk block finished, software interrupts */
-		cpu_set_input_line(machine->cpu[0], 1, ints & 0x0007 ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, ints & 0x0007 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* I/O ports and timer interrupts */
-		cpu_set_input_line(machine->cpu[0], 2, ints & 0x0008 ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 2, ints & 0x0008 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Copper, VBLANK, blitter interrupts */
-		cpu_set_input_line(machine->cpu[0], 3, ints & 0x0070 ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, ints & 0x0070 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Audio interrupts */
-		cpu_set_input_line(machine->cpu[0], 4, ints & 0x0780 ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 4, ints & 0x0780 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Serial receive buffer full, disk sync match */
-		cpu_set_input_line(machine->cpu[0], 5, ints & 0x1800 ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 5, ints & 0x1800 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* External interrupts */
-		cpu_set_input_line(machine->cpu[0], 6, ints & 0x2000 ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 6, ints & 0x2000 ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 2, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 3, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 4, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 5, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], 6, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 2, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 4, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 5, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 6, CLEAR_LINE);
 	}
 }
 
@@ -942,7 +942,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	/* signal an interrupt */
-	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
+	amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
 
 	/* reset the blitter timer */
 	timer_reset( amiga_blitter_timer, attotime_never);
@@ -1096,13 +1096,13 @@ WRITE16_HANDLER( amiga_cia_w )
 
 void amiga_cia_0_irq(const device_config *device, int state)
 {
-	amiga_custom_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
+	amiga_custom_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
 void amiga_cia_1_irq(const device_config *device, int state)
 {
-	amiga_custom_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
+	amiga_custom_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
 
 
@@ -1115,7 +1115,7 @@ void amiga_cia_1_irq(const device_config *device, int state)
 
 static void custom_reset(running_machine *machine)
 {
-	int clock = cpu_get_clock(machine->cpu[0]);
+	int clock = cputag_get_clock(machine, "maincpu");
 	UINT16	vidmode = (clock == AMIGA_68000_NTSC_CLOCK || clock == AMIGA_68EC020_NTSC_CLOCK ) ? 0x1000 : 0x0000; /* NTSC or PAL? */
 
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1258,7 +1258,7 @@ static TIMER_CALLBACK( finish_serial_write )
 	CUSTOM_REG(REG_SERDATR) |= 0x3000;
 
 	/* signal an interrupt */
-	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
+	amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
 }
 
 
@@ -1434,7 +1434,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
-				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( space->machine->cpu[0], AMIGA_IRQ_DELAY_CYCLES ), 0);
+				timer_adjust_oneshot( amiga_irq_timer, cputag_clocks_to_attotime(space->machine, "maincpu", AMIGA_IRQ_DELAY_CYCLES ), 0);
 			else /* if we're clearing irq's, process right away */
 				update_irqs(space->machine);
 			break;
@@ -1509,7 +1509,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 void amiga_serial_in_w(running_machine *machine, UINT16 data)
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int mask = (CUSTOM_REG(REG_SERPER) & 0x8000) ? 0x1ff : 0xff;
 
 	/* copy the data to the low 8 bits of SERDATR and set RBF */
@@ -1531,7 +1531,7 @@ void amiga_serial_in_w(running_machine *machine, UINT16 data)
 attotime amiga_get_serial_char_period(running_machine *machine)
 {
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	UINT32 baud = cpu_get_clock(machine->cpu[0]) / 2 / divisor;
+	UINT32 baud = cputag_get_clock(machine, "maincpu") / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
 	return attotime_mul(ATTOTIME_IN_HZ(baud), numbits);
 }

@@ -136,7 +136,7 @@ INTERRUPT_GEN( attckufo_raster_interrupt )
 
 VIDEO_UPDATE( attckufo )
 {
-	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int x, y, yy;
 
 	for (y = cliprect->min_y & ~7; y <= cliprect->max_y; y += 8)

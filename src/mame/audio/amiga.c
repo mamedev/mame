@@ -82,7 +82,7 @@ static amiga_audio *audio_state;
 
 static TIMER_CALLBACK( signal_irq )
 {
-	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | (0x80 << param), 0xffff);
+	amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | (0x80 << param), 0xffff);
 }
 
 

@@ -51,8 +51,8 @@ static UINT8 bslapstic_primed;
 
 static void update_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 2, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -193,7 +193,7 @@ static READ16_HANDLER( pitfighb_cheap_slapstic_r )
 static void pitfighb_cheap_slapstic_init(running_machine *machine)
 {
 	/* install a read handler */
-	bslapstic_base = memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x038000, 0x03ffff, 0, 0, pitfighb_cheap_slapstic_r);
+	bslapstic_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x038000, 0x03ffff, 0, 0, pitfighb_cheap_slapstic_r);
 
 	/* allocate memory for a copy of bank 0 */
 	bslapstic_bank0 = auto_alloc_array(machine, UINT8, 0x2000);
@@ -1052,7 +1052,7 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 		state_save_register_postload(machine, pitfighb_state_postload, NULL);
 	}
 	else if (slapstic != 0)
-		atarigen_slapstic_init(machine->cpu[0], slapstic_base, 0, slapstic);
+		atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), slapstic_base, 0, slapstic);
 	atarijsa_init(machine, "IN0", 0x4000);
 
 	atarig1_pitfight = is_pitfight;

@@ -290,7 +290,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( clock_r )
 {
-	return (cpu_get_total_cycles(field->port->machine->cpu[0]) & 0x100) ? 1 : 0;
+	return (cputag_get_total_cycles(field->port->machine, "maincpu") & 0x100) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( asteroid )
@@ -880,14 +880,14 @@ ROM_END
 
 static DRIVER_INIT( asteroib )
 {
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, "IN0");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2003, 0x2003, 0, 0, "HS");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, "IN0");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2003, 0x2003, 0, 0, "HS");
 }
 
 
 static DRIVER_INIT( asterock )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2007, 0, 0, asterock_IN0_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2000, 0x2007, 0, 0, asterock_IN0_r);
 }
 
 

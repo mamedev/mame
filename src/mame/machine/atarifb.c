@@ -125,7 +125,7 @@ WRITE8_HANDLER( soccer_out2_w )
 
 WRITE8_HANDLER( atarifb_out3_w )
 {
-	int loop = cpu_getiloops(space->machine->cpu[0]);
+	int loop = cpu_getiloops(cputag_get_cpu(space->machine, "maincpu"));
 
 	switch (loop)
 	{

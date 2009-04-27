@@ -23,7 +23,7 @@ WRITE16_HANDLER( aztarac_sound_w )
 		soundlatch_w(space, offset, data);
 		sound_status ^= 0x21;
 		if (sound_status & 0x20)
-			cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+			cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 }
 
@@ -51,5 +51,3 @@ INTERRUPT_GEN( aztarac_snd_timed_irq )
     if (sound_status & 0x10)
         cpu_set_input_line(device,0,HOLD_LINE);
 }
-
-

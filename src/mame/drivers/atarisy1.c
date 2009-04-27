@@ -211,10 +211,10 @@ static TIMER_CALLBACK( delayed_joystick_int );
 
 static void update_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 2, joystick_int && joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 3, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[0], 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 2, joystick_int && joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 3, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -224,7 +224,7 @@ static MACHINE_RESET( atarisy1 )
 	atarigen_eeprom_reset();
 	atarigen_slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_sound_io_reset(machine->cpu[1]);
+	atarigen_sound_io_reset(cputag_get_cpu(machine, "audiocpu"));
 
 	/* reset the joystick parameters */
 	joystick_value = 0;
@@ -2328,7 +2328,7 @@ ROM_END
 static DRIVER_INIT( marble )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 103);
+	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 103);
 
 	joystick_type = 0;	/* none */
 	trackball_type = 1;	/* rotated */
@@ -2338,7 +2338,7 @@ static DRIVER_INIT( marble )
 static DRIVER_INIT( peterpak )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 107);
+	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 107);
 
 	joystick_type = 1;	/* digital */
 	trackball_type = 0;	/* none */
@@ -2348,7 +2348,7 @@ static DRIVER_INIT( peterpak )
 static DRIVER_INIT( indytemp )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 105);
+	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 105);
 
 	joystick_type = 1;	/* digital */
 	trackball_type = 0;	/* none */
@@ -2358,7 +2358,7 @@ static DRIVER_INIT( indytemp )
 static DRIVER_INIT( roadrunn )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 108);
+	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 108);
 
 	joystick_type = 2;	/* analog */
 	trackball_type = 0;	/* none */
@@ -2368,7 +2368,7 @@ static DRIVER_INIT( roadrunn )
 static DRIVER_INIT( roadb109 )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 109);
+	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 109);
 
 	joystick_type = 3;	/* pedal */
 	trackball_type = 2;	/* steering wheel */
@@ -2378,7 +2378,7 @@ static DRIVER_INIT( roadb109 )
 static DRIVER_INIT( roadb110 )
 {
 	atarigen_eeprom_default = NULL;
-	atarigen_slapstic_init(machine->cpu[0], 0x080000, 0, 110);
+	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x080000, 0, 110);
 
 	joystick_type = 3;	/* pedal */
 	trackball_type = 2;	/* steering wheel */

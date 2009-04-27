@@ -1066,7 +1066,7 @@ static TIMER_CALLBACK( antic_issue_dli )
 	{
 		LOG(("           @cycle #%3d issue DLI\n", cycle(machine)));
 		antic.r.nmist |= DLI_NMI;
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
@@ -1161,7 +1161,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
 	LOG(("           @cycle #%3d steal %d cycles\n", cycle(machine), antic.steal_cycles));
 	after(machine, antic.steal_cycles, antic_line_done, "antic_line_done");
     antic.steal_cycles = 0;
-	cpu_spinuntil_trigger( machine->cpu[0], TRIGGER_STEAL );
+	cpu_spinuntil_trigger( cputag_get_cpu(machine, "maincpu"), TRIGGER_STEAL );
 }
 
 
@@ -1175,7 +1175,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
  *****************************************************************************/
 static TIMER_CALLBACK( antic_scanline_render )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(machine), (antic.cmd & 0x0f), antic.modelines));
@@ -1245,7 +1245,7 @@ INLINE void LMS(running_machine *machine, int new_cmd)
      **************************************************************/
     if( new_cmd & ANTIC_LMS )
     {
-    	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+    	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		int addr = RDANTIC(space);
         antic.doffs = ++antic.doffs & DOFFS;
         addr += 256 * RDANTIC(space);
@@ -1270,7 +1270,7 @@ INLINE void LMS(running_machine *machine, int new_cmd)
  *****************************************************************************/
 static void antic_scanline_dma(running_machine *machine, int param)
 {
-   	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+   	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	LOG(("           @cycle #%3d DMA fetch\n", cycle(machine)));
 	if (antic.scanline == VBL_END)
 		antic.r.nmist &= ~VBL_NMI;
@@ -1528,7 +1528,7 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 			LOG(("           cause VBL NMI\n"));
 			/* set the VBL NMI status bit */
 			antic.r.nmist |= VBL_NMI;
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
     }
 

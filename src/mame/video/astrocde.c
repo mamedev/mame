@@ -427,7 +427,7 @@ VIDEO_UPDATE( profpac )
 
 static TIMER_CALLBACK( interrupt_off )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -440,15 +440,15 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x01) == 0)
 		{
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector & 0xf0);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector & 0xf0);
 			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector & 0xf0);
-			timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, interrupt_vector & 0xf0);
+			timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, interrupt_off);
 		}
 
 		/* latch the feedback registers */
@@ -480,15 +480,15 @@ static TIMER_CALLBACK( scanline_callback )
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x04) == 0)
 		{
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, interrupt_vector);
 			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector);
-			timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, ASSERT_LINE, interrupt_vector);
+			timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, interrupt_off);
 		}
 	}
 

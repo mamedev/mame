@@ -248,7 +248,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 	/* sound CPU reset */
 	if (diff & 0x0080)
 	{
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(newselect & 0x0080)) atarigen_sound_reset(space->machine);
 	}
 
@@ -405,7 +405,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 
 static TIMER_CALLBACK( int3off_callback )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* clear the state */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);
@@ -417,7 +417,7 @@ static TIMER_CALLBACK( int3_callback )
 	int scanline = param;
 
 	/* update the state */
-	atarigen_scanline_int_gen(machine->cpu[0]);
+	atarigen_scanline_int_gen(cputag_get_cpu(machine, "maincpu"));
 
 	/* set a timer to turn it off */
 	timer_adjust_oneshot(int3off_timer, video_screen_get_scan_period(machine->primary_screen), 0);

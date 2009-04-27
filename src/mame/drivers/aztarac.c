@@ -36,7 +36,7 @@ static IRQ_CALLBACK(aztarac_irq_callback)
 
 static MACHINE_RESET( aztarac )
 {
-	cpu_set_irq_callback(machine->cpu[0], aztarac_irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), aztarac_irq_callback);
 }
 
 

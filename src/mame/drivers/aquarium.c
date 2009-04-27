@@ -98,7 +98,7 @@ static WRITE16_HANDLER( aquarium_sound_w )
 //  popmessage("sound write %04x",data);
 
 	soundlatch_w(space,1,data&0xff);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( aquarium_z80_bank_w )
@@ -318,7 +318,7 @@ static DRIVER_INIT( aquarium )
 	}
 
 	/* reset the sound bank */
-	aquarium_z80_bank_w(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0, 0);
+	aquarium_z80_bank_w(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_IO), 0, 0);
 }
 
 
@@ -331,7 +331,7 @@ GFXDECODE_END
 
 static void irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

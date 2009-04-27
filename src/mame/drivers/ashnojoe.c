@@ -293,7 +293,7 @@ GFXDECODE_END
 
 static void ym2203_irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ym2203_write_a )
@@ -332,7 +332,7 @@ static void ashnojoe_vclk_cb(const device_config *device)
 	else
 	{
 		msm5205_data_w(device, adpcm_byte & 0xf);
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	msm5205_vclk_toggle ^= 1;

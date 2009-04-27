@@ -185,24 +185,24 @@ static STATE_POSTLOAD( bankselect_postload );
 static void update_interrupts(running_machine *machine)
 {
 	if (atarigen_video_int_state)
-		cpu_set_input_line(machine->cpu[0], 3, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 3, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, CLEAR_LINE);
 
 	if (atarigen_scanline_int_state)
-		cpu_set_input_line(machine->cpu[0], 2, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 2, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 2, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 2, CLEAR_LINE);
 
 	if (p2portwr_state)
-		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
 
 	if (p2portrd_state)
-		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -220,7 +220,7 @@ static void scanline_update(const device_config *screen, int scanline)
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (interrupt_enable & 4)
-				atarigen_scanline_int_gen(screen->machine->cpu[0]);
+				atarigen_scanline_int_gen(cputag_get_cpu(screen->machine, "maincpu"));
 	}
 }
 
@@ -262,9 +262,9 @@ static MACHINE_RESET( atarisy2 )
 	atarigen_eeprom_reset();
 	slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_sound_io_reset(machine->cpu[1]);
+	atarigen_sound_io_reset(cputag_get_cpu(machine, "soundcpu"));
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 64);
-	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), atarisy2_direct_handler);
+	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), atarisy2_direct_handler);
 
 	tms5220_data_strobe = 1;
 
@@ -302,7 +302,7 @@ static WRITE16_HANDLER( int1_ack_w )
 {
 	/* reset sound CPU */
 	if (ACCESSING_BITS_0_7)
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -361,7 +361,7 @@ static WRITE16_HANDLER( bankselect_w )
 
 static STATE_POSTLOAD( bankselect_postload )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	bankselect_w(space, 0, bankselect[0], 0xffff);
 	bankselect_w(space, 1, bankselect[1], 0xffff);
@@ -630,7 +630,7 @@ static WRITE8_HANDLER( sound_reset_w )
 		return;
 
 	/* a large number of signals are reset when this happens */
-	atarigen_sound_io_reset(space->machine->cpu[1]);
+	atarigen_sound_io_reset(cputag_get_cpu(space->machine, "soundcpu"));
 	devtag_reset(space->machine, "ym");
 	mixer_w(space, 0, 0);
 	tms5220_data = 0;

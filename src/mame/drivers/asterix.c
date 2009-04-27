@@ -110,23 +110,23 @@ static INTERRUPT_GEN( asterix_interrupt )
 
 static READ8_DEVICE_HANDLER( asterix_sound_r )
 {
-	return k053260_r(device,2 + offset);
+	return k053260_r(device, 2 + offset);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
-	timer_set(space->machine, ATTOTIME_IN_USEC(5), NULL,0,nmi_callback);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	timer_set(space->machine, ATTOTIME_IN_USEC(5), NULL, 0, nmi_callback);
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 // Check the routine at 7f30 in the ead version.
@@ -137,7 +137,7 @@ static UINT16 prot[2];
 
 static WRITE16_HANDLER( protection_w )
 {
-	COMBINE_DATA(prot+offset);
+	COMBINE_DATA(prot + offset);
 
 	if (offset == 1)
 	{
