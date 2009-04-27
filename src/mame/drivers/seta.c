@@ -2223,7 +2223,7 @@ static WRITE16_HANDLER( msgundam_vregs_w )
 static ADDRESS_MAP_START( msgundam_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM								// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_MIRROR(0x40000)			// RAM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_MIRROR(0x70000)			// RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
@@ -2662,55 +2662,42 @@ static WRITE8_HANDLER( sub_bankswitch_lockout_w )
 
 static READ8_HANDLER( ff_r )	{return 0xff;}
 
-static ADDRESS_MAP_START( tndrcade_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(ff_r					)	// ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
-//  AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r           )   //
-//  AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r          )   //
+static ADDRESS_MAP_START( tndrcade_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM 							// RAM
+	AM_RANGE(0x0800, 0x0800) AM_READ(ff_r)						// ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
+//  AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)  			//
+//  AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r) 			//
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")					// P1
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x2000, 0x2001) AM_DEVREAD("ym1", ym2203_r )
-	AM_RANGE(0x5000, 0x57ff) AM_READ(SMH_RAM				)	// Shared RAM
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)				)	// Banked ROM
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
+	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE("ym2", ym3812_w)
+	AM_RANGE(0x5000, 0x57ff) AM_RAM	 AM_BASE(&sharedram)		// Shared RAM
+	AM_RANGE(0x6000, 0x7fff) AM_ROM								// ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						// Banked ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM								// ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tndrcade_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM					)	// RAM
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w	)	// ROM Bank + Coin Lockout
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_w	)
-	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE("ym2", ym3812_w	)
-	AM_RANGE(0x5000, 0x57ff) AM_WRITE(SMH_RAM) AM_BASE(&sharedram		)	// Shared RAM
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM					)	// ROM
-ADDRESS_MAP_END
 
 /***************************************************************************
                                 Twin Eagle
 ***************************************************************************/
 
-static ADDRESS_MAP_START( twineagl_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM			)	// RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r		)	//
-	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r		)	//
+static ADDRESS_MAP_START( twineagl_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM							// RAM
+	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)			//
+	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)			//
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")				// P1
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")				// P2
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")			// Coins
-	AM_RANGE(0x5000, 0x57ff) AM_READ(SMH_RAM			)	// Shared RAM
-	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM			)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)			)	// Banked ROM
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM			)	// ROM
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&sharedram)		// Shared RAM
+	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)					// Banked ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM							// ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( twineagl_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM				)	// RAM
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w	)	// ROM Bank + Coin Lockout
-	AM_RANGE(0x5000, 0x57ff) AM_WRITE(SMH_RAM) AM_BASE(&sharedram	)	// Shared RAM
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(SMH_ROM				)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM				)	// ROM
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM				)	// ROM
-ADDRESS_MAP_END
 
 /***************************************************************************
                                 DownTown
@@ -2739,23 +2726,18 @@ static READ8_HANDLER( downtown_ip_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( downtown_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM			)	// RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r		)	//
-	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r		)	//
-	AM_RANGE(0x1000, 0x1007) AM_READ(downtown_ip_r		)	// Input Ports
-	AM_RANGE(0x5000, 0x57ff) AM_READ(SMH_RAM			)	// Shared RAM
-	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM			)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)			)	// Banked ROM
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM			)	// ROM
+static ADDRESS_MAP_START( downtown_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM							// RAM
+	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)			//
+	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)			//
+	AM_RANGE(0x1000, 0x1007) AM_READ(downtown_ip_r)			// Input Ports
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&sharedram)		// Shared RAM
+	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)					// Banked ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM							// ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( downtown_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM				)	// RAM
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w		)	// ROM Bank + Coin Lockout
-	AM_RANGE(0x5000, 0x57ff) AM_WRITE(SMH_RAM) AM_BASE(&sharedram	)	// Shared RAM
-	AM_RANGE(0x7000, 0xffff) AM_WRITE(SMH_ROM				)	// ROM
-ADDRESS_MAP_END
 
 /***************************************************************************
                         Caliber 50 / U.S. Classic
@@ -2773,46 +2755,33 @@ static WRITE8_HANDLER( calibr50_soundlatch2_w )
 	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
-static ADDRESS_MAP_START( calibr50_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("x1", seta_sound_r		)	// Sound
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r		)	// From Main CPU
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)			)	// Banked ROM
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM			)	// ROM
+static ADDRESS_MAP_START( calibr50_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("x1", seta_sound_r,seta_sound_w)	// Sound
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)				// From Main CPU
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_bankswitch_w)			// Bankswitching
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						// Banked ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM								// ROM
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(calibr50_soundlatch2_w)	// To Main CPU
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calibr50_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVWRITE("x1", seta_sound_w				)	// Sound
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_bankswitch_w			)	// Bankswitching
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM					)	// Banked ROM
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(calibr50_soundlatch2_w	)	// To Main CPU
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM					)	// ROM
-ADDRESS_MAP_END
 
 /***************************************************************************
                                 Meta Fox
 ***************************************************************************/
 
-static ADDRESS_MAP_START( metafox_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM			)	// RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r		)	//
-	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r		)	//
+static ADDRESS_MAP_START( metafox_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM							// RAM
+	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)			//
+	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)			//
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("COINS")			// Coins
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1")				// P1
-//  AM_RANGE(0x1004, 0x1004) AM_READ(SMH_NOP            )   // ?
+//  AM_RANGE(0x1004, 0x1004) AM_READNOP						// ?
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P2")				// P2
-	AM_RANGE(0x5000, 0x57ff) AM_READ(SMH_RAM			)	// Shared RAM
-	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM			)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1)			)	// Banked ROM
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM			)	// ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( metafox_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM				)	// RAM
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(sub_bankswitch_lockout_w		)	// ROM Bank + Coin Lockout
-	AM_RANGE(0x5000, 0x57ff) AM_WRITE(SMH_RAM) AM_BASE(&sharedram	)	// Shared RAM
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(SMH_ROM				)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM				)	// ROM
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM				)	// ROM
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&sharedram)		// Shared RAM
+	AM_RANGE(0x7000, 0x7fff) AM_ROM							// ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)					// Banked ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM							// ROM
 ADDRESS_MAP_END
 
 
@@ -2820,15 +2789,10 @@ ADDRESS_MAP_END
                             Ultra Toukon Densetsu
 ***************************************************************************/
 
-static ADDRESS_MAP_START( utoukond_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_DEVREAD("x1", seta_sound_r)
-ADDRESS_MAP_END
-static ADDRESS_MAP_START( utoukond_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_DEVWRITE("x1", seta_sound_w)
+static ADDRESS_MAP_START( utoukond_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_DEVREADWRITE("x1", seta_sound_r,seta_sound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( utoukond_sound_io_map, ADDRESS_SPACE_IO, 8 )
@@ -6390,7 +6354,7 @@ static MACHINE_DRIVER_START( tndrcade )
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(tndrcade_sub_readmem,tndrcade_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(tndrcade_sub_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(tndrcade_sub_interrupt,TNDRCADE_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
@@ -6439,7 +6403,7 @@ static MACHINE_DRIVER_START( twineagl )
 	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(twineagl_sub_readmem,twineagl_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(twineagl_sub_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
@@ -6480,7 +6444,7 @@ static MACHINE_DRIVER_START( downtown )
 	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(downtown_sub_readmem,downtown_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(downtown_sub_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
@@ -6539,7 +6503,7 @@ static MACHINE_DRIVER_START( usclssic )
 	MDRV_CPU_VBLANK_INT_HACK(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(calibr50_sub_readmem,calibr50_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(calibr50_sub_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* NMI caused by main cpu when writing to the sound latch */
 
 	MDRV_MACHINE_RESET(calibr50)
@@ -6586,7 +6550,7 @@ static MACHINE_DRIVER_START( calibr50 )
 	MDRV_CPU_VBLANK_INT_HACK(calibr50_interrupt,calibr50_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(calibr50_sub_readmem,calibr50_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(calibr50_sub_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* IRQ: 4/frame
                                NMI: when the 68k writes the sound latch */
 
@@ -6630,7 +6594,7 @@ static MACHINE_DRIVER_START( metafox )
 	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	MDRV_CPU_ADD("sub", M65C02, 16000000/8)	/* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(metafox_sub_readmem,metafox_sub_writemem)
+	MDRV_CPU_PROGRAM_MAP(metafox_sub_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(seta_sub_interrupt,SETA_SUB_INTERRUPTS_NUM)
 
 	/* video hardware */
@@ -7611,7 +7575,7 @@ static MACHINE_DRIVER_START( utoukond )
 	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(utoukond_sound_readmem,utoukond_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(utoukond_sound_map,0)
 	MDRV_CPU_IO_MAP(utoukond_sound_io_map,0)
 
 	/* video hardware */
