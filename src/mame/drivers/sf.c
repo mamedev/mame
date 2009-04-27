@@ -191,9 +191,10 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x04ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x800000, 0x800fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sf_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x04ffff) AM_ROM
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE(&sf_videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ(button1_r)
@@ -202,13 +203,20 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
-	AM_RANGE(0xff8000, 0xffdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xffe000, 0xffffff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
+	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
+	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
+	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
+	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
+	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
+	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE(&sf_objectram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmemus, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x04ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x800000, 0x800fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sfus_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x04ffff) AM_ROM
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE(&sf_videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ(dummy_r)
@@ -217,13 +225,20 @@ static ADDRESS_MAP_START( readmemus, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
-	AM_RANGE(0xff8000, 0xffdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xffe000, 0xffffff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
+	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
+	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
+	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
+	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
+	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
+	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE(&sf_objectram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmemjp, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x04ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x800000, 0x800fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sfjp_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x04ffff) AM_ROM
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(sf_videoram_w) AM_BASE(&sf_videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("P2")
@@ -232,47 +247,28 @@ static ADDRESS_MAP_START( readmemjp, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
-	AM_RANGE(0xff8000, 0xffdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xffe000, 0xffffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x04ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x800000, 0x800fff) AM_WRITE(sf_videoram_w) AM_BASE(&sf_videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xb00000, 0xb007ff) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
 	AM_RANGE(0xc00014, 0xc00015) AM_WRITE(sf_fg_scroll_w)
 	AM_RANGE(0xc00018, 0xc00019) AM_WRITE(sf_bg_scroll_w)
 	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE(sf_gfxctrl_w)
 	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
 	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
-	AM_RANGE(0xff8000, 0xffdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xffe000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&sf_objectram)
+	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
+	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE(&sf_objectram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREAD("ym", ym2151_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym", ym2151_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( sound2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK(1))
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
-static ADDRESS_MAP_START( sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-/*  AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM) avoid cluttering up error.log */
-	AM_RANGE(0x0000, 0xffff) AM_WRITENOP
+static ADDRESS_MAP_START( sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(1)
+	AM_RANGE(0x0000, 0xffff) AM_WRITENOP /* avoid cluttering up error.log */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound2_io_map, ADDRESS_SPACE_IO, 8 )
@@ -813,15 +809,15 @@ static MACHINE_DRIVER_START( sf )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(sf_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* ? xtal is 3.579545MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 								/* NMIs are caused by the main CPU */
 
 	MDRV_CPU_ADD("audio2", Z80, 3579545)	/* ? xtal is 3.579545MHz */
-	MDRV_CPU_PROGRAM_MAP(sound2_readmem,sound2_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound2_map,0)
 	MDRV_CPU_IO_MAP(sound2_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
@@ -864,7 +860,7 @@ static MACHINE_DRIVER_START( sfus )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sf)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(readmemus,writemem)
+	MDRV_CPU_PROGRAM_MAP(sfus_map,0)
 MACHINE_DRIVER_END
 
 
@@ -873,7 +869,7 @@ static MACHINE_DRIVER_START( sfjp )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sf)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(readmemjp,writemem)
+	MDRV_CPU_PROGRAM_MAP(sfjp_map,0)
 MACHINE_DRIVER_END
 
 
@@ -1029,6 +1025,9 @@ ROM_START( sfjp )
 	ROM_REGION( 0x40000, "audio2", 0 )	/* 256k for the samples CPU */
 	ROM_LOAD( "sf-00.bin", 0x00000, 0x20000, CRC(4b733845) SHA1(f7ff46e02f8ce6682d6e573588271bae2edfa90f) )
 	ROM_LOAD( "sf-01.bin", 0x20000, 0x20000, CRC(86e0f0d5) SHA1(7cef8056f83dac15f1b47d7be705d26170858337) )
+
+	ROM_REGION( 0x0800, "mcu", 0 ) /* 68705 MCU */
+	ROM_LOAD( "68705.bin",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "sf-39.bin", 0x000000, 0x020000, CRC(cee3d292) SHA1(a8c22f1dc81976e8dd5d6c70361c61fa3f9f89d6) ) /* Background b planes 0-1*/
