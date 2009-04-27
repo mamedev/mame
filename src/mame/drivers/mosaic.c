@@ -96,38 +96,23 @@ static READ8_HANDLER( gfire2_protection_r )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x0ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x20000, 0x21fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x22000, 0x23fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x24000, 0x241ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( mosaic_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x0ffff) AM_ROM
+	AM_RANGE(0x20000, 0x21fff) AM_RAM
+	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_BASE(&mosaic_bgvideoram)
+	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_BASE(&mosaic_fgvideoram)
+	AM_RANGE(0x24000, 0x241ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x0ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x20000, 0x21fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x22000, 0x22fff) AM_WRITE(mosaic_bgvideoram_w) AM_BASE(&mosaic_bgvideoram)
-	AM_RANGE(0x23000, 0x23fff) AM_WRITE(mosaic_fgvideoram_w) AM_BASE(&mosaic_fgvideoram)
-	AM_RANGE(0x24000, 0x241ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
+static ADDRESS_MAP_START( gfire2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x0ffff) AM_ROM
+	AM_RANGE(0x10000, 0x17fff) AM_RAM
+	AM_RANGE(0x22000, 0x22fff) AM_RAM_WRITE(mosaic_bgvideoram_w) AM_BASE(&mosaic_bgvideoram)
+	AM_RANGE(0x23000, 0x23fff) AM_RAM_WRITE(mosaic_fgvideoram_w) AM_BASE(&mosaic_fgvideoram)
+	AM_RANGE(0x24000, 0x241ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gfire2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x0ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x10000, 0x17fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x22000, 0x23fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x24000, 0x241ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gfire2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x0ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x10000, 0x17fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x22000, 0x22fff) AM_WRITE(mosaic_bgvideoram_w) AM_BASE(&mosaic_bgvideoram)
-	AM_RANGE(0x23000, 0x23fff) AM_WRITE(mosaic_fgvideoram_w) AM_BASE(&mosaic_fgvideoram)
-	AM_RANGE(0x24000, 0x241ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mosaic_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_WRITENOP	/* Z180 internal registers */
 	AM_RANGE(0x30, 0x30) AM_READNOP	/* Z180 internal registers */
@@ -275,8 +260,8 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_DRIVER_START( mosaic )
 	MDRV_CPU_ADD("maincpu", Z180, 7000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mosaic_map,0)
+	MDRV_CPU_IO_MAP(mosaic_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -304,7 +289,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gfire2 )
 	MDRV_IMPORT_FROM(mosaic)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gfire2_readmem,gfire2_writemem)
+	MDRV_CPU_PROGRAM_MAP(gfire2_map,0)
 	MDRV_CPU_IO_MAP(gfire2_io_map,0)
 MACHINE_DRIVER_END
 

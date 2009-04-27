@@ -70,45 +70,23 @@ static WRITE8_HANDLER( momoko_bg_read_bank_w )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0xd064, 0xd0ff) AM_READ(SMH_RAM) /* sprite ram */
-
-	AM_RANGE(0xd400, 0xd400) AM_READ_PORT("IN0")
-	AM_RANGE(0xd402, 0xd402) AM_READ_PORT("IN1")
-	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd407, 0xd407) AM_READ_PORT("DSW1")
-
-	AM_RANGE(0xd800, 0xdbff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe3ff) AM_READ(SMH_RAM) /* text */
-
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_BANK(1))
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
-
-	AM_RANGE(0xd064, 0xd0ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-
-	AM_RANGE(0xd400, 0xd400) AM_WRITENOP /* interrupt ack? */
-	AM_RANGE(0xd402, 0xd402) AM_WRITE(momoko_flipscreen_w)
+static ADDRESS_MAP_START( momoko_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xd064, 0xd0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd400, 0xd400) AM_READ_PORT("IN0") AM_WRITENOP /* interrupt ack? */
+	AM_RANGE(0xd402, 0xd402) AM_READ_PORT("IN1") AM_WRITE(momoko_flipscreen_w)
 	AM_RANGE(0xd404, 0xd404) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xd406, 0xd406) AM_WRITE(soundlatch_w)
-
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE(&paletteram)
-
+	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0") AM_WRITE(soundlatch_w)
+	AM_RANGE(0xd407, 0xd407) AM_READ_PORT("DSW1")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(momoko_fg_scrolly_w)
 	AM_RANGE(0xdc01, 0xdc01) AM_WRITE(momoko_fg_scrollx_w)
 	AM_RANGE(0xdc02, 0xdc02) AM_WRITE(momoko_fg_select_w)
-
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(momoko_text_scrolly_w)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(momoko_text_mode_w)
-
+	AM_RANGE(0xf000, 0xffff) AM_ROMBANK(1)
 	AM_RANGE(0xf000, 0xf001) AM_WRITE(momoko_bg_scrolly_w) AM_BASE(&momoko_bg_scrolly)
 	AM_RANGE(0xf002, 0xf003) AM_WRITE(momoko_bg_scrollx_w) AM_BASE(&momoko_bg_scrollx)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(momoko_bg_read_bank_w)
@@ -116,21 +94,15 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(momoko_bg_priority_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym1", ym2203_r)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym2", ym2203_r)
+static ADDRESS_MAP_START( momoko_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x9000, 0x9000) AM_WRITENOP /* unknown */
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP /* unknown */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITENOP /* unknown */
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITENOP /* unknown */
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym2", ym2203_w)
-ADDRESS_MAP_END
 
 /****************************************************************************/
 
@@ -273,11 +245,11 @@ static MACHINE_DRIVER_START( momoko )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.0MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(momoko_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 2500000)	/* 2.5MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(momoko_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

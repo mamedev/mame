@@ -12,11 +12,10 @@ Kikiippatsu Mayumi-chan (c) 1988 Victory L.L.C.
 
 #define MCLK 10000000
 
+extern UINT8 *mayumi_videoram;
+WRITE8_HANDLER( mayumi_videoram_w );
 VIDEO_START( mayumi );
 VIDEO_UPDATE( mayumi );
-
-WRITE8_HANDLER( mayumi_videoram_w );
-READ8_HANDLER( mayumi_videoram_r );
 
 static int int_enable;
 static int input_sel;
@@ -75,21 +74,15 @@ static READ8_HANDLER( key_matrix_r )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xf7ff) AM_READ(mayumi_videoram_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xe000, 0xf7ff) AM_WRITE(mayumi_videoram_w)
+static ADDRESS_MAP_START( mayumi_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE(&mayumi_videoram)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mayumi_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0") AM_WRITE(bank_sel_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)
@@ -279,8 +272,8 @@ static MACHINE_DRIVER_START( mayumi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 5.000 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mayumi_map,0)
+	MDRV_CPU_IO_MAP(mayumi_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", mayumi_interrupt)
 
 	MDRV_MACHINE_RESET( mayumi )

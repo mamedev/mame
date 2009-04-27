@@ -12,7 +12,7 @@ static tilemap *bg_tilemap;
 
 /***************************************************************************
 
-  Convert the color PROMs. (from video/penco.c)
+  Convert the color PROMs. (from video/pengo.c)
 
 ***************************************************************************/
 PALETTE_INIT( mrjong )
@@ -101,24 +101,27 @@ VIDEO_START( mrjong )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows_flip_xy, 8, 8, 32, 32);
 }
 
+/*
+Note: First 0x40 entries in the videoram are actually spriteram
+*/
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
-	for (offs = (spriteram_size - 4); offs >= 0; offs -= 4)
+	for (offs = (0x40 - 4); offs >= 0; offs -= 4)
 	{
 		int sprt;
 		int color;
 		int sx, sy;
 		int flipx, flipy;
 
-		sprt = (((spriteram[offs + 1] >> 2) & 0x3f) | ((spriteram[offs + 3] & 0x20) << 1));
-		flipx = (spriteram[offs + 1] & 0x01) >> 0;
-		flipy = (spriteram[offs + 1] & 0x02) >> 1;
-		color = (spriteram[offs + 3] & 0x1f);
+		sprt = (((videoram[offs + 1] >> 2) & 0x3f) | ((videoram[offs + 3] & 0x20) << 1));
+		flipx = (videoram[offs + 1] & 0x01) >> 0;
+		flipy = (videoram[offs + 1] & 0x02) >> 1;
+		color = (videoram[offs + 3] & 0x1f);
 
-		sx = 224 - spriteram[offs + 2];
-		sy = spriteram[offs + 0];
+		sx = 224 - videoram[offs + 2];
+		sy = videoram[offs + 0];
 		if (flip_screen_get(machine))
 		{
 			sx = 208 - sx;

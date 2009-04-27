@@ -14,17 +14,13 @@ driver by Yochizo and Takahiro Nogi
 
 Supported games :
 ==================
+ Super Real Mahjong Part1     (C) 1987 Seta
  Super Real Mahjong Part2     (C) 1987 Seta
  Super Real Mahjong Part3     (C) 1988 Seta
  Mahjong Yuugi (set 1)        (C) 1990 Visco
  Mahjong Yuugi (set 2)        (C) 1990 Visco
  Mahjong Pon Chin Kan (set 1) (C) 1991 Visco
  Mahjong Pon Chin Kan (set 2) (C) 1991 Visco
-
-
-Not supported game :
-=====================
- Super Real Mahjong Part1 (not dumped)
 
 
 System specs :
@@ -386,72 +382,52 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 **************************************************************************/
 
 
-static ADDRESS_MAP_START( srmp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x140000, 0x143fff) AM_READ(SMH_RAM)				/* Sprites Code + X + Attr */
-	AM_RANGE(0x180000, 0x180607) AM_READ(SMH_RAM)				/* Sprites Y */
-	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("SYSTEM")			/* Coinage */
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(srmp2_input_1_r)		/* I/O port 1 */
-	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */
+static ADDRESS_MAP_START( srmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE(&spriteram16_2)		/* Sprites Code + X + Attr */
+	AM_RANGE(0x180000, 0x180609) AM_RAM AM_BASE(&spriteram16)		/* Sprites Y */
+	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP						/* ??? */
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)			/* ADPCM bank, Color bank, etc. */
+	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("SYSTEM")				/* Coinage */
+	AM_RANGE(0x900000, 0x900001) AM_WRITENOP						/* ??? */
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(srmp2_input_1_r,srmp2_input_1_w)	/* I/O port 1 */
+	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE(srmp2_input_2_r,srmp2_input_2_w)	/* I/O port 2 */
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(srmp2_cchip_status_0_r)	/* Custom chip status ??? */
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)	/* ADPCM number */
 	AM_RANGE(0xb00002, 0xb00003) AM_READ(srmp2_cchip_status_1_r)	/* Custom chip status ??? */
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP						/* ??? */
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP						/* ??? */
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP						/* ??? */
 	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( srmp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x140000, 0x143fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2)	/* Sprites Code + X + Attr */
-	AM_RANGE(0x180000, 0x180609) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)	/* Sprites Y */
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP					/* ??? */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)				/* ADPCM bank, Color bank, etc. */
-	AM_RANGE(0x900000, 0x900001) AM_WRITENOP					/* ??? */
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(srmp2_input_1_w)			/* I/O ??? */
-	AM_RANGE(0xa00002, 0xa00003) AM_WRITE(srmp2_input_2_w)			/* I/O ??? */
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP					/* ??? */
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP					/* ??? */
 	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mjyuugi_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")			/* Coinage */
-	AM_RANGE(0x100010, 0x100011) AM_READNOP				/* ??? */
-	AM_RANGE(0x200000, 0x200001) AM_READNOP				/* ??? */
-	AM_RANGE(0x300000, 0x300001) AM_READNOP				/* ??? */
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")			/* DSW 3-1 */
-	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")			/* DSW 3-2 */
-	AM_RANGE(0x700000, 0x7003ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")				/* Coinage */
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(mjyuugi_flags_w)			/* Coin Counter */
+	AM_RANGE(0x100010, 0x100011) AM_READNOP							/* ??? */
+	AM_RANGE(0x100010, 0x100011) AM_WRITE(mjyuugi_adpcm_bank_w)		/* ADPCM bank, GFX bank */
+	AM_RANGE(0x200000, 0x200001) AM_READNOP							/* ??? */
+	AM_RANGE(0x300000, 0x300001) AM_READNOP							/* ??? */
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")				/* DSW 3-1 */
+	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")				/* DSW 3-2 */
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x800000, 0x800001) AM_READNOP				/* ??? */
-	AM_RANGE(0x900000, 0x900001) AM_READ(srmp2_input_1_r)		/* I/O port 1 */
-	AM_RANGE(0x900002, 0x900003) AM_READ(srmp2_input_2_r)		/* I/O port 2 */
+	AM_RANGE(0x900000, 0x900001) AM_READWRITE(srmp2_input_1_r,srmp2_input_1_w)		/* I/O port 1 */
+	AM_RANGE(0x900002, 0x900003) AM_READWRITE(srmp2_input_2_r,srmp2_input_2_w)		/* I/O port 2 */
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(srmp2_cchip_status_0_r)	/* custom chip status ??? */
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(srmp2_cchip_status_1_r)	/* custom chip status ??? */
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("ay", ay8910_r, 0x00ff)
-	AM_RANGE(0xd00000, 0xd00609) AM_READ(SMH_RAM)				/* Sprites Y */
-	AM_RANGE(0xd02000, 0xd023ff) AM_READ(SMH_RAM)				/* ??? */
-	AM_RANGE(0xe00000, 0xe03fff) AM_READ(SMH_RAM)				/* Sprites Code + X + Attr */
-	AM_RANGE(0xffc000, 0xffffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjyuugi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(mjyuugi_flags_w)			/* Coin Counter */
-	AM_RANGE(0x100010, 0x100011) AM_WRITE(mjyuugi_adpcm_bank_w)		/* ADPCM bank, GFX bank */
-	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(srmp2_input_1_w)			/* I/O ??? */
-	AM_RANGE(0x900002, 0x900003) AM_WRITE(srmp2_input_2_w)			/* I/O ??? */
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("msm", srmp2_adpcm_code_w)			/* ADPCM number */
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("ay", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
-	AM_RANGE(0xd00000, 0xd00609) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)	/* Sprites Y */
-	AM_RANGE(0xd02000, 0xd023ff) AM_WRITE(SMH_RAM)					/* ??? only writes $00fa */
-	AM_RANGE(0xe00000, 0xe03fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2)	/* Sprites Code + X + Attr */
-	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xd00000, 0xd00609) AM_RAM AM_BASE(&spriteram16)	/* Sprites Y */
+	AM_RANGE(0xd02000, 0xd023ff) AM_RAM							/* ??? only writes $00fa */
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM	AM_BASE(&spriteram16_2)	/* Sprites Code + X + Attr */
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
 
@@ -562,24 +538,15 @@ static WRITE8_HANDLER( srmp3_flags_w )
 }
 
 
-static ADDRESS_MAP_START( srmp3_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK(1))						/* rom bank */
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)						/* work ram */
-	AM_RANGE(0xb000, 0xb303) AM_READ(SMH_RAM)						/* Sprites Y */
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)						/* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( srmp3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_ROM)						/* rom bank */
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* work ram */
-	AM_RANGE(0xa800, 0xa800) AM_WRITENOP						/* flag ? */
-	AM_RANGE(0xb000, 0xb303) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)			/* Sprites Y */
-	AM_RANGE(0xb800, 0xb800) AM_WRITENOP						/* flag ? */
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)			/* Sprites Code + X + Attr */
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_3)
+static ADDRESS_MAP_START( srmp3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)							/* rom bank */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* work ram */
+	AM_RANGE(0xa800, 0xa800) AM_WRITENOP							/* flag ? */
+	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE(&spriteram)				/* Sprites Y */
+	AM_RANGE(0xb800, 0xb800) AM_WRITENOP							/* flag ? */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&spriteram_2)			/* Sprites Code + X + Attr */
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&spriteram_3)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1059,7 +1026,7 @@ static MACHINE_DRIVER_START( srmp2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(srmp2_readmem,srmp2_writemem)
+	MDRV_CPU_PROGRAM_MAP(srmp2_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
 	MDRV_MACHINE_RESET(srmp2)
@@ -1098,7 +1065,7 @@ static MACHINE_DRIVER_START( srmp3 )
 
 	MDRV_CPU_ADD("maincpu", Z80, 3500000)		/* 3.50 MHz ? */
 	//      4000000,                /* 4.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(srmp3_readmem,srmp3_writemem)
+	MDRV_CPU_PROGRAM_MAP(srmp3_map,0)
 	MDRV_CPU_IO_MAP(srmp3_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -1136,7 +1103,7 @@ static MACHINE_DRIVER_START( mjyuugi )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(mjyuugi_readmem,mjyuugi_writemem)
+	MDRV_CPU_PROGRAM_MAP(mjyuugi_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
 	MDRV_MACHINE_RESET(srmp2)

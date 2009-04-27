@@ -318,18 +318,6 @@ note:
 
 
 
-static UINT8 *cfb_zpu_sharedram;
-static WRITE8_HANDLER ( sharedram_CFB_ZPU_w )
-{
-	cfb_zpu_sharedram[offset] = data;
-}
-static READ8_HANDLER ( sharedram_CFB_ZPU_r )
-{
-	return cfb_zpu_sharedram[offset];
-}
-
-
-
 static UINT8 ls670_0[4];
 static UINT8 ls670_1[4];
 
@@ -471,7 +459,15 @@ static WRITE8_HANDLER(zpu_coin_counter_w)
 	coin_counter_w(offset, (data&0x40)>>6 );
 }
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mazerbla_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe800, 0xefff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mazerbla_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE(ls670_1_r, ls670_0_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
@@ -480,22 +476,6 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x6a, 0x6a) AM_WRITE(zpu_lamps_w)
 	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(sharedram_CFB_ZPU_r)
-	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe800, 0xefff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(sharedram_CFB_ZPU_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
 
 
 static UINT8 vsb_ls273;
@@ -508,38 +488,19 @@ static WRITE8_HANDLER( vsb_ls273_audio_control_w )
 }
 
 
-static ADDRESS_MAP_START( cpu2_io_map, ADDRESS_SPACE_IO, 8 )
+
+
+static ADDRESS_MAP_START( mazerbla_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM /* main RAM (stack) */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM /* waveform ???*/
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mazerbla_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(vsb_ls273_audio_control_w)
 	AM_RANGE(0x80, 0x83) AM_READWRITE(ls670_0_r, ls670_1_w)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM) /* main RAM (stack) */
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM) /* waveform ???*/
-ADDRESS_MAP_END
-
-
-
-
-
-/* Color Frame Buffer PCB */
-static WRITE8_HANDLER ( cfb_ram_w )
-{
-	cfb_ram[offset] = data;
-}
-static READ8_HANDLER ( cfb_ram_r )
-{
-	return cfb_ram[offset];
-}
-
 
 static WRITE8_HANDLER(cfb_led_w)
 {
@@ -613,28 +574,6 @@ static READ8_HANDLER( cfb_port_02_r )
 	port02_status ^= 0xff;
 	return (port02_status);
 }
-
-
-static ADDRESS_MAP_START( cpu3_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
-	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
-ADDRESS_MAP_END
-/* Great Guns has a little different banking layout */
-
-static ADDRESS_MAP_START( gg_cpu3_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP
-	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
-	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w_gg)
-	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
-ADDRESS_MAP_END
-
 
 static UINT8 VCU_video_reg[4];
 static WRITE8_HANDLER( VCU_video_reg_w )
@@ -1028,27 +967,25 @@ UINT8 * rom = memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 
 	return 0;
 }
 
-static ADDRESS_MAP_START( readmem_cpu3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(sharedram_CFB_ZPU_r)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK(1))				/* GFX roms */
-	AM_RANGE(0x6000, 0x67ff) AM_READ(cfb_ram_r)				/* RAM for VCU commands and parameters */
-
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(VCU_set_cmd_param_r)	/* VCU command and parameters LOAD */
-	AM_RANGE(0xc000, 0xdfff) AM_READ(VCU_set_gfx_addr_r)		/* gfx LOAD (blit) */
-	AM_RANGE(0xe000, 0xffff) AM_READ(VCU_set_clr_addr_r)		/* palette? LOAD */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_cpu3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(sharedram_CFB_ZPU_w) AM_BASE(&cfb_zpu_sharedram)
+static ADDRESS_MAP_START( mazerbla_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x37ff) AM_ROM
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK(1)					/* GFX roms */
 	AM_RANGE(0x4000, 0x4003) AM_WRITE(VCU_video_reg_w)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(cfb_ram_w) AM_BASE(&cfb_ram)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
+	AM_RANGE(0xa000, 0xa7ff) AM_READ(VCU_set_cmd_param_r)	/* VCU command and parameters LOAD */
+	AM_RANGE(0xc000, 0xdfff) AM_READ(VCU_set_gfx_addr_r)	/* gfx LOAD (blit) */
+	AM_RANGE(0xe000, 0xffff) AM_READ(VCU_set_clr_addr_r)	/* palette? LOAD */
 ADDRESS_MAP_END
 
-
-
-
+static ADDRESS_MAP_START( mazerbla_cpu3_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
+	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
+ADDRESS_MAP_END
 
 
 /* Great Guns */
@@ -1075,7 +1012,7 @@ static WRITE8_HANDLER( main_sound_w )
 }
 
 
-static ADDRESS_MAP_START( gg_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( greatgun_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4c) AM_WRITE(main_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
@@ -1085,6 +1022,16 @@ static ADDRESS_MAP_START( gg_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
 
+/* Great Guns has a little different banking layout */
+static ADDRESS_MAP_START( greatgun_cpu3_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITENOP
+	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
+	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w_gg)
+	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
+ADDRESS_MAP_END
 
 /* frequency is 14.318 MHz/16/16/16/16 */
 static INTERRUPT_GEN( sound_interrupt )
@@ -1107,25 +1054,15 @@ static WRITE8_DEVICE_HANDLER( gg_led_ctrl_w )
 	set_led_status(1,data&0x01);
 }
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( greatgun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("ay1", ay8910_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(SMH_RAM) /* main RAM (stack) */
-
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_address_data_w)
-
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_int_clear_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_clear_w)
 ADDRESS_MAP_END
-
-
-
 
 
 
@@ -1472,17 +1409,17 @@ static const ay8910_interface ay8912_interface_2 =
 static MACHINE_DRIVER_START( mazerbla )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mazerbla_map,0)
+	MDRV_CPU_IO_MAP(mazerbla_io_map,0)
 
 	MDRV_CPU_ADD("sub", Z80, 4000000)	/* 4 MHz, NMI, IM1 INT */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu2,writemem_cpu2)
-	MDRV_CPU_IO_MAP(cpu2_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mazerbla_cpu2_map,0)
+	MDRV_CPU_IO_MAP(mazerbla_cpu2_io_map,0)
 //MDRV_CPU_PERIODIC_INT(irq0_line_hold, 400 ) /* frequency in Hz */
 
 	MDRV_CPU_ADD("sub2", Z80, 4000000)	/* 4 MHz, no  NMI, IM1 INT */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu3,writemem_cpu3)
-	MDRV_CPU_IO_MAP(cpu3_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mazerbla_cpu3_map,0)
+	MDRV_CPU_IO_MAP(mazerbla_cpu3_io_map,0)
 /* (vblank related ??) int generated by a custom video processor
 and cleared on ANY port access.
 but handled differently for now
@@ -1515,16 +1452,16 @@ static MACHINE_DRIVER_START( greatgun )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(gg_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mazerbla_map,0)
+	MDRV_CPU_IO_MAP(greatgun_io_map,0)
 
 	MDRV_CPU_ADD("sub", Z80, 14318000 / 4)	/* 3.579500 MHz, NMI - caused by sound command write, periodic INT */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(greatgun_sound_map,0)
 	MDRV_CPU_PERIODIC_INT(sound_interrupt, (double)14318180/16/16/16/16 )
 
 	MDRV_CPU_ADD("sub2", Z80, 4000000)	/* 4 MHz, no  NMI, IM1 INT */
-	MDRV_CPU_PROGRAM_MAP(readmem_cpu3,writemem_cpu3)
-	MDRV_CPU_IO_MAP(gg_cpu3_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mazerbla_cpu3_map,0)
+	MDRV_CPU_IO_MAP(greatgun_cpu3_io_map,0)
 /* (vblank related ??) int generated by a custom video processor
 and cleared on ANY port access.
 but handled differently for now

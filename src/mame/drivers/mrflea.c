@@ -82,37 +82,8 @@ static const gfx_layout sprite_layout = {
 
 static GFXDECODE_START( mrflea )
 	GFXDECODE_ENTRY( "gfx1", 0, sprite_layout,	0x10, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,		0x00, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,	0x00, 1 )
 GFXDECODE_END
-
-/*******************************************************/
-
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(mrflea_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xec00, 0xecff) AM_WRITE(mrflea_spriteram_w) AM_BASE(&spriteram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_io, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x80ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x905a) AM_READ(SMH_RAM) /* ? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_io, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x80ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x905a) AM_WRITE(SMH_RAM) /* ? */
-ADDRESS_MAP_END
 
 /*******************************************************/
 
@@ -151,7 +122,7 @@ static READ8_HANDLER( mrflea_io_status_r ){
 	return mrflea_status^0x01;
 }
 
-static INTERRUPT_GEN( mrflea_io_interrupt ){
+static INTERRUPT_GEN( mrflea_slave_interrupt ){
 	if( cpu_getiloops(device)==0 || (mrflea_status&0x08) )
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
@@ -167,7 +138,15 @@ static READ8_HANDLER( mrflea_interrupt_type_r ){
 
 /*******************************************************/
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mrflea_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(mrflea_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xec00, 0xecff) AM_RAM_WRITE(mrflea_spriteram_w) AM_BASE(&spriteram)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mrflea_master_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog? */
 	AM_RANGE(0x40, 0x40) AM_WRITE(mrflea_io_w)
@@ -191,7 +170,14 @@ static READ8_HANDLER( mrflea_input1_r )
 static WRITE8_HANDLER( mrflea_data1_w ){
 }
 
-static ADDRESS_MAP_START( inout_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mrflea_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
+	AM_RANGE(0x8000, 0x80ff) AM_RAM
+	AM_RANGE(0x9000, 0x905a) AM_RAM /* ? */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mrflea_slave_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x10, 0x10) AM_READWRITE(mrflea_interrupt_type_r, SMH_NOP) /* ? / irq ACK */
@@ -232,14 +218,14 @@ static MACHINE_DRIVER_START( mrflea )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(mrflea_master_map,0)
+	MDRV_CPU_IO_MAP(mrflea_master_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* NMI resets the game */
 
 	MDRV_CPU_ADD("sub", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(readmem_io,writemem_io)
-	MDRV_CPU_IO_MAP(inout_io_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(mrflea_io_interrupt,2)
+	MDRV_CPU_PROGRAM_MAP(mrflea_slave_map,0)
+	MDRV_CPU_IO_MAP(mrflea_slave_io_map,0)
+	MDRV_CPU_VBLANK_INT_HACK(mrflea_slave_interrupt,2)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 

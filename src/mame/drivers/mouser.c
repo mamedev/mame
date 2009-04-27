@@ -55,45 +55,30 @@ static READ8_HANDLER( mouser_sound_byte_r )
 	return mouser_sound_byte;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x6000, 0x6bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x93ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("P2")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x6000, 0x6bff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( mouser_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_WRITENOP /* unknown */
-	AM_RANGE(0x9000, 0x93ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x9800, 0x9cff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9c00, 0x9fff) AM_WRITE(SMH_RAM) AM_BASE(&colorram)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(mouser_nmi_enable_w) /* bit 0 = NMI Enable */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x9800, 0x9cff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE(&colorram)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(mouser_nmi_enable_w) /* bit 0 = NMI Enable */
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(mouser_flip_screen_x_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(mouser_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(mouser_sound_interrupt_w) /* byte to sound cpu */
-
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("P2") AM_WRITE(mouser_sound_interrupt_w) /* byte to sound cpu */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( mouser_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(mouser_sound_byte_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP	/* watchdog? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map_2, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mouser_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_data_address_w)
@@ -196,12 +181,12 @@ static MACHINE_DRIVER_START( mouser )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(mouser_map,0)
 	MDRV_CPU_VBLANK_INT("screen", mouser_nmi_interrupt) /* NMI is masked externally */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
-	MDRV_CPU_IO_MAP(io_map_2,0)
+	MDRV_CPU_PROGRAM_MAP(mouser_sound_map,0)
+	MDRV_CPU_IO_MAP(mouser_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4) /* ??? This controls the sound tempo */
 
 	/* video hardware */
