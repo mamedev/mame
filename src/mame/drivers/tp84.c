@@ -130,7 +130,7 @@ static WRITE8_HANDLER( tp84_filter_w )
 
 static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[2],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu",0,HOLD_LINE,0xff);
 }
 
 

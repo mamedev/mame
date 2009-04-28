@@ -402,7 +402,7 @@ static void kick_sn74s516(running_machine *machine, UINT16 *data, const int ins)
 	}
 
 	math.dbgaddr = math.promaddr;
-	math.dbgpc = cpu_get_previouspc(machine->cpu[1]);
+	math.dbgpc = cpu_get_previouspc(cputag_get_cpu(machine, "math_cpu"));
 }
 
 

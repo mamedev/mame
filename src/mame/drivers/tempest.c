@@ -309,7 +309,7 @@ static MACHINE_START( tempest )
 
 static WRITE8_HANDLER( wdclr_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 	watchdog_reset(space->machine);
 }
 
@@ -335,7 +335,7 @@ static CUSTOM_INPUT( tempest_buttons_r )
 static CUSTOM_INPUT( clock_r )
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
-	return (cpu_get_total_cycles(field->port->machine->cpu[0]) & 0x100) ? 1 : 0;
+	return (cputag_get_total_cycles(field->port->machine, "maincpu") & 0x100) ? 1 : 0;
 }
 
 

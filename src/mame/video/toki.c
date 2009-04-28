@@ -38,20 +38,20 @@ WRITE16_HANDLER( toki_control_w )
 
 VIDEO_EOF( toki )
 {
-	buffer_spriteram16_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0,0xffff);
+	buffer_spriteram16_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
 }
 
 VIDEO_EOF( tokib )
 {
-	buffer_spriteram16_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0,0xffff);
+	buffer_spriteram16_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
 {
 	int tile = videoram16[tile_index];
-	int color=(tile>>12)&0xf;
+	int color = (tile >> 12) & 0xf;
 
-	tile&=0xfff;
+	tile &= 0xfff;
 
 	SET_TILE_INFO(
 			0,
@@ -63,9 +63,9 @@ static TILE_GET_INFO( get_text_tile_info )
 static TILE_GET_INFO( get_back_tile_info )
 {
 	int tile = toki_background1_videoram16[tile_index];
-	int color=(tile>>12)&0xf;
+	int color = (tile >> 12) & 0xf;
 
-	tile&=0xfff;
+	tile &= 0xfff;
 
 	SET_TILE_INFO(
 			2,
@@ -77,9 +77,9 @@ static TILE_GET_INFO( get_back_tile_info )
 static TILE_GET_INFO( get_fore_tile_info )
 {
 	int tile = toki_background2_videoram16[tile_index];
-	int color=(tile>>12)&0xf;
+	int color = (tile >> 12) & 0xf;
 
-	tile&=0xfff;
+	tile &= 0xfff;
 
 	SET_TILE_INFO(
 			3,

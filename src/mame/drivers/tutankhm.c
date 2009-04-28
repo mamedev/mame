@@ -49,7 +49,7 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	irq_enable = data & 1;
 	if (!irq_enable)
-		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 

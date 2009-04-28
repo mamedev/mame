@@ -68,11 +68,13 @@ extern VIDEO_UPDATE( vsgongf );
 static int nmi_enabled;
 static int sound_command1, sound_command2, sound_command3;
 
-static WRITE8_HANDLER( nmi_enable_w ){
+static WRITE8_HANDLER( nmi_enable_w )
+{
 	nmi_enabled = data;
 }
 
-static INTERRUPT_GEN( samurai_interrupt ){
+static INTERRUPT_GEN( samurai_interrupt )
+{
 	if (nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -104,19 +106,19 @@ static READ8_HANDLER( unknown_d938_r )
 static WRITE8_HANDLER( sound_command1_w )
 {
 	sound_command1 = data;
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command2_w )
 {
 	sound_command2 = data;
-	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE );
+	cputag_set_input_line(space->machine, "audio2", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command3_w )
 {
 	sound_command3 = data;
-	cpu_set_input_line(space->machine->cpu[3], 0, HOLD_LINE );
+	cputag_set_input_line(space->machine, "audio3", 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( flip_screen_w )
@@ -220,11 +222,13 @@ static READ8_HANDLER( sound_command1_r )
 	return sound_command1;
 }
 
-static READ8_HANDLER( sound_command2_r ){
+static READ8_HANDLER( sound_command2_r )
+{
 	return sound_command2;
 }
 
-static READ8_HANDLER( sound_command3_r ){
+static READ8_HANDLER( sound_command3_r )
+{
 	return sound_command3;
 }
 
@@ -285,17 +289,20 @@ ADDRESS_MAP_END
 /*******************************************************************************/
 
 static int vsgongf_sound_nmi_enabled;
-static WRITE8_HANDLER( vsgongf_sound_nmi_enable_w ){
+static WRITE8_HANDLER( vsgongf_sound_nmi_enable_w )
+{
 	vsgongf_sound_nmi_enabled = data;
 }
 
-static INTERRUPT_GEN( vsgongf_sound_interrupt ){
+static INTERRUPT_GEN( vsgongf_sound_interrupt )
+{
 	if (vsgongf_sound_nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* what are these, protection of some kind? */
 
-static READ8_HANDLER( vsgongf_a006_r ){
+static READ8_HANDLER( vsgongf_a006_r )
+{
 	/* sound CPU busy? */
 	if (!strcmp(space->machine->gamedrv->name,"vsgongf"))  return 0x80;
 	if (!strcmp(space->machine->gamedrv->name,"ringfgt"))  return 0x80;
@@ -305,7 +312,8 @@ static READ8_HANDLER( vsgongf_a006_r ){
 	return 0x00;
 }
 
-static READ8_HANDLER( vsgongf_a100_r ){
+static READ8_HANDLER( vsgongf_a100_r )
+{
 	/* protection? */
 	if (!strcmp(space->machine->gamedrv->name,"vsgongf"))  return 0xaa;
 	if (!strcmp(space->machine->gamedrv->name,"ringfgt"))  return 0x63;
@@ -315,9 +323,10 @@ static READ8_HANDLER( vsgongf_a100_r ){
 	return 0x00;
 }
 
-static WRITE8_HANDLER( vsgongf_sound_command_w ){
-	soundlatch_w( space, offset, data );
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+static WRITE8_HANDLER( vsgongf_sound_command_w )
+{
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( vsgongf_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -30,20 +30,20 @@ extern VIDEO_UPDATE( tryout );
 
 static WRITE8_HANDLER( tryout_nmi_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE );
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( tryout_sound_w )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 /*this is actually irq/nmi mask, polls only four values at start up (81->01->81->01) and then
   stays on this state.*/
 static WRITE8_HANDLER( tryout_sound_irq_ack_w )
 {
-//  cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+//  cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( tryout_bankswitch_w )
@@ -52,7 +52,7 @@ static WRITE8_HANDLER( tryout_bankswitch_w )
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x2000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )

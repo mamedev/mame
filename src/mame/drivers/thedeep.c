@@ -46,8 +46,8 @@ static WRITE8_HANDLER( thedeep_nmi_w )
 
 static WRITE8_HANDLER( thedeep_sound_w )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 protection_command, protection_data;
@@ -308,7 +308,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface thedeep_ym2203_intf =

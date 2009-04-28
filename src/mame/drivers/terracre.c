@@ -999,7 +999,7 @@ static DRIVER_INIT( amatelas )
 static DRIVER_INIT( horekid )
 {
 	mpProtData = mHoreKidProtData;
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x44004, 0x44005, 0, 0, horekid_IN2_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x44004, 0x44005, 0, 0, horekid_IN2_r);
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */
@@ -1011,4 +1011,3 @@ GAME( 1986, amatelas, amazon,   amazon,  amazon,   amatelas, ROT270,  "Nichibuts
 GAME( 1987, horekid,  0,        amazon,  horekid,  horekid,  ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", GAME_SUPPORTS_SAVE )
 GAME( 1987, horekidb, horekid,  amazon,  horekid,  horekid,  ROT270,  "bootleg", "Kid no Hore Hore Daisakusen (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1987, boobhack, horekid,  amazon,  horekid,  horekid,  ROT270,  "bootleg", "Booby Kids (Italian manufactured graphic hack / bootleg of Kid no Hore Hore Daisakusen (bootleg))", GAME_SUPPORTS_SAVE )
-

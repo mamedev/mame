@@ -314,7 +314,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	// fix Plotting test mode
 	if ((irq_enable & (1 << last_irq_level)) == 0)
-		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( irq_enable_r )
@@ -866,8 +866,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER (evilston_snd_w)
 {
-	shared_ram[0x7fe]=data&0x7f;
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	shared_ram[0x7fe] = data & 0x7f;
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( evilston_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1877,7 +1877,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( portA_w )
@@ -1889,8 +1889,8 @@ static WRITE8_DEVICE_HANDLER( portA_w )
 
 		cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (cur_bank-1) * 0x4000;
-		memory_set_bankptr(device->machine, 7,&RAM[bankaddress]);
-		//logerror ("YM2203 bank change val=%02x  pc=%04x\n",cur_bank, cpu_get_pc(space->cpu) );
+		memory_set_bankptr(device->machine, 7, &RAM[bankaddress]);
+		//logerror ("YM2203 bank change val=%02x  pc=%04x\n", cur_bank, cpu_get_pc(space->cpu) );
 	}
 }
 
@@ -2761,7 +2761,7 @@ static DRIVER_INIT( evilston )
 {
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 	ROM[0x72]=0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
 }
 
 

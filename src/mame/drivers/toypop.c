@@ -156,68 +156,68 @@ static WRITE16_HANDLER( toypop_m68000_sharedram_w )
 
 static READ8_HANDLER( toypop_main_interrupt_enable_r )
 {
-	cpu_interrupt_enable(space->machine->cpu[0],1);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), 1);
 	return 0;
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_enable_w )
 {
-	cpu_interrupt_enable(space->machine->cpu[0],1);
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), 1);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
 {
-	cpu_interrupt_enable(space->machine->cpu[0],0);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), 0);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
 {
-	cpu_interrupt_enable(space->machine->cpu[1],1);
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "audiocpu"), 1);
+	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
 {
-	cpu_interrupt_enable(space->machine->cpu[1],0);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "audiocpu"), 0);
 }
 
 static INTERRUPT_GEN( toypop_main_interrupt )
 {
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
-						// so don't replace with cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
-	namcoio_set_irq_line(device->machine,0,PULSE_LINE);
-	namcoio_set_irq_line(device->machine,1,PULSE_LINE);
-	namcoio_set_irq_line(device->machine,2,PULSE_LINE);
+	namcoio_set_irq_line(device->machine, 0, PULSE_LINE);
+	namcoio_set_irq_line(device->machine, 1, PULSE_LINE);
+	namcoio_set_irq_line(device->machine, 2, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_assert_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( toypop_m68000_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_m68000_assert_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( disable_interrupts )
 {
-	cpu_interrupt_enable(machine->cpu[0],0);
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-	cpu_interrupt_enable(machine->cpu[1],0);
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+	cpu_interrupt_enable(cputag_get_cpu(machine, "audiocpu"), 0);
+	cputag_set_input_line(machine, "audiocpu", 0, CLEAR_LINE);
 	interrupt_enable_68k = 0;
 }
 

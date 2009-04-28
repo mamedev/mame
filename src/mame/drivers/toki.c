@@ -61,8 +61,8 @@ WRITE16_HANDLER( toki_foreground_videoram16_w );
 
 static WRITE16_HANDLER( tokib_soundcommand16_w )
 {
-	soundlatch_w(space,0,data & 0xff);
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	soundlatch_w(space, 0, data & 0xff);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( pip16_r )
@@ -75,14 +75,14 @@ static int msm5205next;
 
 static void toki_adpcm_int (const device_config *device)
 {
-	static int toggle=0;
+	static int toggle = 0;
 
-	msm5205_data_w (device,msm5205next);
-	msm5205next>>=4;
+	msm5205_data_w (device, msm5205next);
+	msm5205next >>= 4;
 
 	toggle ^= 1;
 	if (toggle)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )

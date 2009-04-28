@@ -147,7 +147,7 @@ static WRITE16_DEVICE_HANDLER( tmaster_oki_bank_w )
 
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	cpu_set_input_line_and_vector(device->machine->cpu[0], 4, HOLD_LINE, vector);
+	cputag_set_input_line_and_vector(device->machine, "maincpu", 4, HOLD_LINE, vector);
 };
 
 static void duart_tx(const device_config *device, int channel, UINT8 data)
@@ -408,7 +408,7 @@ static WRITE16_HANDLER( tmaster_blitter_w )
 	{
 		case 0x0e:
 			tmaster_draw(space->machine);
-			cpu_set_input_line(space->machine->cpu[0], 2, HOLD_LINE);
+			cputag_set_input_line(space->machine, "maincpu", 2, HOLD_LINE);
 			break;
 	}
 }
@@ -832,7 +832,7 @@ static MACHINE_RESET( galgames )
 	memory_set_bank(machine, 2, 0);	// ram
 	memory_set_bank(machine, 4, 0);	// ram
 
-	device_reset(machine->cpu[0]);
+	device_reset(cputag_get_cpu(machine, "maincpu"));
 }
 
 static MACHINE_DRIVER_START( galgames )

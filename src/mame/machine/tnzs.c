@@ -44,7 +44,7 @@ static READ8_HANDLER( mcu_tnzs_r )
 {
 	UINT8 data;
 
-	data = upi41_master_r(space->machine->cpu[2], offset & 1);
+	data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), offset & 1);
 	cpu_yield(space->cpu);
 
 //  logerror("PC %04x: read %02x from mcu $c00%01x\n", cpu_get_previouspc(space->cpu), data, offset);
@@ -56,7 +56,7 @@ static WRITE8_HANDLER( mcu_tnzs_w )
 {
 //  logerror("PC %04x: write %02x to mcu $c00%01x\n", cpu_get_previouspc(space->cpu), data, offset);
 
-	upi41_master_w(space->machine->cpu[2], offset & 1, data);
+	upi41_master_w(cputag_get_cpu(space->machine, "mcu"), offset & 1, data);
 }
 
 
@@ -521,7 +521,7 @@ DRIVER_INIT( drtoppel )
 	mcu_type = MCU_DRTOPPEL;
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf800, 0xfbff, 0, 0, (write8_space_func)SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf800, 0xfbff, 0, 0, (write8_space_func)SMH_NOP);
 }
 
 DRIVER_INIT( chukatai )
@@ -533,7 +533,7 @@ DRIVER_INIT( tnzs )
 {
 	mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+//  memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
 }
 
 DRIVER_INIT( tnzsb )
@@ -541,7 +541,7 @@ DRIVER_INIT( tnzsb )
 	mcu_type = MCU_NONE_TNZSB;
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+//  memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
 }
 
 DRIVER_INIT( kabukiz )
@@ -554,9 +554,9 @@ DRIVER_INIT( insectx )
 	mcu_type = MCU_NONE_INSECTX;
 
 	/* this game has no mcu, replace the handler with plain input port handlers */
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, "IN0" );
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc001, 0xc001, 0, 0, "IN1" );
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc002, 0xc002, 0, 0, "IN2" );
+	memory_install_read_port_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, "IN0" );
+	memory_install_read_port_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xc001, 0xc001, 0, 0, "IN1" );
+	memory_install_read_port_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xc002, 0xc002, 0, 0, "IN2" );
 }
 
 DRIVER_INIT( kageki )
@@ -665,9 +665,9 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 
 	/* bit 4 resets the second CPU */
 	if (data & 0x10)
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bits 0-2 select RAM/ROM bank */
 	memory_set_bankptr (space->machine, 1, &RAM[0x10000 + 0x4000 * (data & 0x07)]);
@@ -686,8 +686,8 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 				/* bit 2 resets the mcu */
 				if (data & 0x04)
 				{
-					if (space->machine->cpu[2] != NULL && cpu_get_type(space->machine->cpu[2]) == CPU_I8742)
-						cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);
+					if (cputag_get_cpu(space->machine, "mcu") != NULL && cpu_get_type(cputag_get_cpu(space->machine, "mcu")) == CPU_I8742)
+						cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */
 				break;

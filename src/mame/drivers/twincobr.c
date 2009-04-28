@@ -690,7 +690,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate);
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

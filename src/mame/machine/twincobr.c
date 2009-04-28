@@ -72,7 +72,7 @@ READ16_HANDLER( twincobr_dsp_r )
 	switch (main_ram_seg) {
 		case 0x30000:
 		case 0x40000:
-		case 0x50000:	mainspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		case 0x50000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 						input_data = memory_read_word(mainspace, main_ram_seg + dsp_addr_w);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",cpu_get_previouspc(space->cpu),main_ram_seg + dsp_addr_w); break;
@@ -90,7 +90,7 @@ WRITE16_HANDLER( twincobr_dsp_w )
 	switch (main_ram_seg) {
 		case 0x30000:	if ((dsp_addr_w < 3) && (data == 0)) dsp_execute = 1;
 		case 0x40000:
-		case 0x50000:	mainspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		case 0x50000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 						memory_write_word(mainspace, main_ram_seg + dsp_addr_w, data);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",cpu_get_previouspc(space->cpu),main_ram_seg + dsp_addr_w); break;
@@ -122,7 +122,7 @@ READ16_HANDLER( wardner_dsp_r )
 	switch (main_ram_seg) {
 		case 0x7000:
 		case 0x8000:
-		case 0xa000:	mainspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		case 0xa000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 						input_data =  memory_read_byte(mainspace, main_ram_seg + (dsp_addr_w + 0))
 								   | (memory_read_byte(mainspace, main_ram_seg + (dsp_addr_w + 1)) << 8);
 						break;
@@ -141,7 +141,7 @@ WRITE16_HANDLER( wardner_dsp_w )
 	switch (main_ram_seg) {
 		case 0x7000:	if ((dsp_addr_w < 3) && (data == 0)) dsp_execute = 1;
 		case 0x8000:
-		case 0xa000:	mainspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		case 0xa000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 						memory_write_byte(mainspace, main_ram_seg + (dsp_addr_w + 0), (data & 0xff));
 						memory_write_byte(mainspace, main_ram_seg + (dsp_addr_w + 1), ((data >> 8) & 0xff));
 						break;
@@ -164,7 +164,7 @@ WRITE16_HANDLER( twincobr_dsp_bio_w )
 	if (data == 0) {
 		if (dsp_execute) {
 			LOG(("Turning the main CPU on\n"));
-			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 			dsp_execute = 0;
 		}
 		twincobr_dsp_BIO = ASSERT_LINE;
@@ -201,14 +201,14 @@ static void twincobr_dsp(running_machine *machine, int enable)
 	twincobr_dsp_on = enable;
 	if (enable) {
 		LOG(("Turning DSP on and main CPU off\n"));
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE); /* TMS32010 INT */
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, CLEAR_LINE);
+		cputag_set_input_line(machine, "dsp", 0, ASSERT_LINE); /* TMS32010 INT */
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else {
 		LOG(("Turning DSP off\n"));
-		cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE); /* TMS32010 INT */
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(machine, "dsp", 0, CLEAR_LINE); /* TMS32010 INT */
+		cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -287,14 +287,14 @@ static void toaplan0_coin_dsp_w(const address_space *space, int offset, int data
 		/****** The following apply to Flying Shark/Wardner only ******/
 		case 0x00:	/* This means assert the INT line to the DSP */
 					LOG(("Turning DSP on and main CPU off\n"));
-					cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
-					cpu_set_input_line(space->machine->cpu[2], 0, ASSERT_LINE); /* TMS32010 INT */
-					cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+					cputag_set_input_line(space->machine, "dsp", INPUT_LINE_HALT, CLEAR_LINE);
+					cputag_set_input_line(space->machine, "dsp", 0, ASSERT_LINE); /* TMS32010 INT */
+					cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 		case 0x01:	/* This means inhibit the INT line to the DSP */
 					LOG(("Turning DSP off\n"));
-					cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE); /* TMS32010 INT */
-					cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
+					cputag_set_input_line(space->machine, "dsp", 0, CLEAR_LINE); /* TMS32010 INT */
+					cputag_set_input_line(space->machine, "dsp", INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 	}
 }

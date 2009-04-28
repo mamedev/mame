@@ -335,17 +335,17 @@ WRITE16_HANDLER( tmnt_0a0000_w )
 		static int last;
 
 		/* bit 0/1 = coin counters */
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);	/* 2 players version */
+		coin_counter_w(0, data & 0x01);
+		coin_counter_w(1, data & 0x02);	/* 2 players version */
 
 		/* bit 3 high then low triggers irq on sound CPU */
 		if (last == 0x08 && (data & 0x08) == 0)
-			cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+			cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 
 		last = data & 0x08;
 
 		/* bit 5 = irq enable */
-		interrupt_enable_w(space,0,data & 0x20);
+		interrupt_enable_w(space, 0, data & 0x20);
 
 		/* bit 7 = enable char ROM reading through the video RAM */
 		K052109_set_RMRD_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -362,11 +362,11 @@ WRITE16_HANDLER( punkshot_0a0020_w )
 
 
 		/* bit 0 = coin counter */
-		coin_counter_w(0,data & 0x01);
+		coin_counter_w(0, data & 0x01);
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (last == 0x04 && (data & 0x04) == 0)
-			cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+			cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 
 		last = data & 0x04;
 
@@ -383,12 +383,12 @@ WRITE16_HANDLER( lgtnfght_0a0018_w )
 
 
 		/* bit 0,1 = coin counter */
-		coin_counter_w(0,data & 0x01);
-		coin_counter_w(1,data & 0x02);
+		coin_counter_w(0, data & 0x01);
+		coin_counter_w(1, data & 0x02);
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (last == 0x00 && (data & 0x04) == 0x04)
-			cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+			cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 
 		last = data & 0x04;
 

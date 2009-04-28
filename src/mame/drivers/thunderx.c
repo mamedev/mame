@@ -36,7 +36,7 @@ static INTERRUPT_GEN( scontra_interrupt )
 
 static TIMER_CALLBACK( thunderx_firq_callback )
 {
-	cpu_set_input_line(machine->cpu[0], KONAMI_FIRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( thunderx_videobank_w )
 
 static WRITE8_HANDLER( thunderx_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( scontra_snd_bankswitch_w )
@@ -909,8 +909,8 @@ static MACHINE_RESET( thunderx )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
 
-	konami_configure_set_lines(machine->cpu[0], thunderx_banking);
-	memory_set_bankptr(machine,  1, &RAM[0x10000] ); /* init the default bank */
+	konami_configure_set_lines(cputag_get_cpu(machine, "maincpu"), thunderx_banking);
+	memory_set_bankptr(machine, 1, &RAM[0x10000] ); /* init the default bank */
 
 	paletteram = &RAM[0x28000];
 	pmcram = &RAM[0x28800];

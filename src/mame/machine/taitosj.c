@@ -44,7 +44,7 @@ MACHINE_START( taitosj )
 
 MACHINE_RESET( taitosj )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* set the default ROM bank (many games only have one bank and */
 	/* never write to the bank selector register) */
 	taitosj_bankswitch_w(space, 0, 0);
@@ -53,8 +53,8 @@ MACHINE_RESET( taitosj )
 	zaccept = 1;
 	zready = 0;
 	busreq = 0;
- 	if (machine->cpu[2] != NULL)
-		cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
+ 	if (cputag_get_cpu(machine, "mcu") != NULL)
+		cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 
 	spacecr_prot_value = 0;
 }
@@ -113,7 +113,7 @@ READ8_HANDLER( taitosj_mcu_data_r )
 static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 {
 	zready = 1;
-	cpu_set_input_line(machine->cpu[2],0,ASSERT_LINE);
+	cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
 	fromz80 = param;
 }
 
@@ -189,19 +189,19 @@ static TIMER_CALLBACK( taitosj_mcu_status_real_w )
 
 WRITE8_HANDLER( taitosj_68705_portB_w )
 {
-	LOG(("%04x: 68705 port B write %02x\n",cpu_get_pc(space->cpu),data));
+	LOG(("%04x: 68705 port B write %02x\n", cpu_get_pc(space->cpu), data));
 
 	if (~data & 0x01)
 	{
-		LOG(("%04x: 68705  68INTRQ **NOT SUPPORTED**!\n",cpu_get_pc(space->cpu)));
+		LOG(("%04x: 68705  68INTRQ **NOT SUPPORTED**!\n", cpu_get_pc(space->cpu)));
 	}
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
-		timer_call_after_resynch(space->machine, NULL, 0,taitosj_mcu_data_real_r);
-		cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
+		timer_call_after_resynch(space->machine, NULL, 0, taitosj_mcu_data_real_r);
+		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 		portA_in = fromz80;
-		LOG(("%04x: 68705 <- Z80 %02x\n",cpu_get_pc(space->cpu),portA_in));
+		LOG(("%04x: 68705 <- Z80 %02x\n", cpu_get_pc(space->cpu), portA_in));
 	}
 	if (~data & 0x08)
 		busreq = 1;
@@ -209,15 +209,15 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 		busreq = 0;
 	if (~data & 0x04)
 	{
-		LOG(("%04x: 68705 -> Z80 %02x\n",cpu_get_pc(space->cpu),portA_out));
+		LOG(("%04x: 68705 -> Z80 %02x\n", cpu_get_pc(space->cpu), portA_out));
 
 		/* 68705 is writing data for the Z80 */
-		timer_call_after_resynch(space->machine, NULL, portA_out,taitosj_mcu_status_real_w);
+		timer_call_after_resynch(space->machine, NULL, portA_out, taitosj_mcu_status_real_w);
 	}
 	if (~data & 0x10)
 	{
-		const address_space *cpu0space = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu),portA_out,address));
+		const address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu), portA_out, address));
 
 		memory_write_byte(cpu0space, address, portA_out);
 
@@ -226,18 +226,18 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	}
 	if (~data & 0x20)
 	{
-		const address_space *cpu0space = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		portA_in = memory_read_byte(cpu0space, address);
-		LOG(("%04x: 68705 read %02x from address %04x\n",cpu_get_pc(space->cpu),portA_in,address));
+		LOG(("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(space->cpu), portA_in, address));
 	}
 	if (~data & 0x40)
 	{
-		LOG(("%04x: 68705 address low %02x\n",cpu_get_pc(space->cpu),portA_out));
+		LOG(("%04x: 68705 address low %02x\n", cpu_get_pc(space->cpu), portA_out));
 		address = (address & 0xff00) | portA_out;
 	}
 	if (~data & 0x80)
 	{
-		LOG(("%04x: 68705 address high %02x\n",cpu_get_pc(space->cpu),portA_out));
+		LOG(("%04x: 68705 address high %02x\n", cpu_get_pc(space->cpu), portA_out));
 		address = (address & 0x00ff) | (portA_out << 8);
 	}
 }

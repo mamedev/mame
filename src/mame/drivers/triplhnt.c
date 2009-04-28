@@ -32,7 +32,7 @@ void triplhnt_set_collision(running_machine *machine, int code)
 {
 	triplhnt_hit_code = code;
 
-	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 

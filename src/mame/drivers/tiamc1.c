@@ -120,7 +120,7 @@
 
 static MACHINE_RESET( tiamc1 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	tiamc1_bankswitch_w(space, 0, 0);
 }
 

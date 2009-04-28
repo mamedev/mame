@@ -68,7 +68,7 @@ static WRITE8_HANDLER( tbowlc_bankswitch_w )
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
 
 
-	memory_set_bankptr(space->machine, 2,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 2, &RAM[bankaddress]);
 }
 
 /*** Shared Ram Handlers
@@ -87,8 +87,8 @@ static WRITE8_HANDLER( shared_w )
 
 static WRITE8_HANDLER( tbowl_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -141,7 +141,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER ( tbowl_trigger_nmi )
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( 6206C_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -444,7 +444,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[2],0,linestate);
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

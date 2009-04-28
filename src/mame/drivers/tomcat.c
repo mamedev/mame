@@ -156,7 +156,7 @@ static WRITE16_HANDLER(tomcat_mresh_w)
 static WRITE16_HANDLER(tomcat_irqclr_w)
 {
 	// Clear IRQ Latch          (Address Strobe)
-	cpu_set_input_line(space->machine->cpu[0], 1, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 1, CLEAR_LINE);
 }
 
 static READ16_HANDLER(tomcat_inputs2_r)
@@ -177,7 +177,7 @@ static READ16_HANDLER(tomcat_inputs2_r)
 static READ16_HANDLER(tomcat_320bio_r)
 {
 	dsp_BIO = 1;
-	cpu_suspend(space->machine->cpu[0], SUSPEND_REASON_SPIN, 1);
+	cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_SPIN, 1);
 	return 0;
 }
 
@@ -198,7 +198,7 @@ static READ16_HANDLER(dsp_BIO_r)
 		{
 			dsp_idle = 0;
 			dsp_BIO = 0;
-			cpu_resume(space->machine->cpu[0], SUSPEND_REASON_SPIN );
+			cputag_resume(space->machine, "maincpu", SUSPEND_REASON_SPIN );
 			return 0;
 		}
 		else

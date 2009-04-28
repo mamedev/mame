@@ -73,23 +73,23 @@ static UINT32 ts;
 /* Main CPU and Z80 synchronisation */
 static WRITE16_HANDLER( z80_busreq_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audio_cpu", INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( resume_math_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_TEST, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "math_cpu", INPUT_LINE_TEST, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( halt_math_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_TEST, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "math_cpu", INPUT_LINE_TEST, CLEAR_LINE);
 }
 
 /* Z80 can trigger its own interrupts */
 static WRITE8_HANDLER( z80_intreq_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audio_cpu", 0, HOLD_LINE);
 }
 
 /* Periodic Z80 interrupt */
@@ -100,13 +100,13 @@ static INTERRUPT_GEN( z80_irq )
 
 static READ16_HANDLER( z80_shared_r )
 {
-	const address_space *cpu2space = cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
+	const address_space *cpu2space = cputag_get_address_space(space->machine, "audio_cpu", ADDRESS_SPACE_PROGRAM);
 	return memory_read_byte(cpu2space, offset);
 }
 
 static WRITE16_HANDLER( z80_shared_w )
 {
-	const address_space *cpu2space = cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
+	const address_space *cpu2space = cputag_get_address_space(space->machine, "audio_cpu", ADDRESS_SPACE_PROGRAM);
 	memory_write_byte(cpu2space, offset, data & 0xff);
 }
 

@@ -34,7 +34,7 @@ static emu_timer *interrupt_timer;
 */
 static TIMER_CALLBACK( interrupt_callback )
 {
-	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, 0xff);
+	cputag_set_input_line_and_vector(machine, "main_cpu", 0, HOLD_LINE, 0xff);
 	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
 }
 
@@ -2939,7 +2939,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 		}
 		case 0xe0:
 		{
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_TEST, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "math_cpu", INPUT_LINE_TEST, CLEAR_LINE);
 			vregs.flags = data;
 			break;
 		}

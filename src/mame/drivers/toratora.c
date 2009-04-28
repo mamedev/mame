@@ -122,7 +122,7 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
 	int combined_state = pia6821_get_irq_a(device) | pia6821_get_irq_b(device);
 
 logerror("GEN IRQ: %x\n", combined_state);
-	cpu_set_input_line(device->machine->cpu[0], 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

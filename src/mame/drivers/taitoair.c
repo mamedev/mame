@@ -248,9 +248,9 @@ static WRITE16_HANDLER( system_control_w )
 
 	dsp_HOLD_signal = (data & 4) ? CLEAR_LINE : ASSERT_LINE;
 
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
-	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n",cpu_get_previouspc(space->cpu),data,((data & 4) ? "Clear" : "Assert"),((data & 1) ? "Clear" : "Assert"));
+	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", cpu_get_previouspc(space->cpu), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
 static READ16_HANDLER( lineram_r )
@@ -582,7 +582,7 @@ GFXDECODE_END
 /* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface airsys_ym2610_interface =

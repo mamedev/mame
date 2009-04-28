@@ -66,7 +66,7 @@ READ16_HANDLER( demonwld_dsp_r )
 	const address_space *mainspace;
 	UINT16 input_data = 0;
 	switch (main_ram_seg) {
-		case 0xc00000:	mainspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		case 0xc00000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 						input_data = memory_read_word(mainspace, main_ram_seg + dsp_addr_w);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",cpu_get_previouspc(space->cpu),main_ram_seg + dsp_addr_w);
@@ -83,7 +83,7 @@ WRITE16_HANDLER( demonwld_dsp_w )
 	dsp_execute = 0;
 	switch (main_ram_seg) {
 		case 0xc00000:	if ((dsp_addr_w < 3) && (data == 0)) dsp_execute = 1;
-						mainspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+						mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 						memory_write_word(mainspace, main_ram_seg + dsp_addr_w, data);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",cpu_get_previouspc(space->cpu),main_ram_seg + dsp_addr_w);
@@ -105,7 +105,7 @@ WRITE16_HANDLER( demonwld_dsp_bio_w )
 	if (data == 0) {
 		if (dsp_execute) {
 			logerror("Turning 68000 on\n");
-			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 			dsp_execute = 0;
 		}
 		demonwld_dsp_BIO = ASSERT_LINE;
@@ -124,15 +124,15 @@ static void demonwld_dsp(running_machine *machine, int enable)
 	if (enable)
 	{
 		logerror("Turning DSP on and 68000 off\n");
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE); /* TMS32010 INT */
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, CLEAR_LINE);
+		cputag_set_input_line(machine, "dsp", 0, ASSERT_LINE); /* TMS32010 INT */
+		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{
 		logerror("Turning DSP off\n");
-		cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE); /* TMS32010 INT */
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
+		cputag_set_input_line(machine, "dsp", 0, CLEAR_LINE); /* TMS32010 INT */
+		cputag_set_input_line(machine, "dsp", INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 static STATE_POSTLOAD( demonwld_restore_dsp )
@@ -231,10 +231,10 @@ WRITE16_HANDLER( toaplan1_reset_sound )
 
 	if (ACCESSING_BITS_0_7 && (data == 0))
 	{
-		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n",cpu_get_previouspc(space->cpu),data);
+		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n", cpu_get_previouspc(space->cpu), data);
 		devtag_reset(space->machine, "ym");
-		if (space->machine->cpu[1] != NULL && cpu_get_type(space->machine->cpu[1]) == CPU_Z80)
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		if (cputag_get_cpu(space->machine, "audiocpu") != NULL && cpu_get_type(cputag_get_cpu(space->machine, "audiocpu")) == CPU_Z80)
+			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 

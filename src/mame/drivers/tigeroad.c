@@ -501,7 +501,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -770,12 +770,12 @@ ROM_END
 
 static DRIVER_INIT( tigeroad )
 {
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, tigeroad_soundcmd_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, tigeroad_soundcmd_w);
 }
 
 static DRIVER_INIT( f1dream )
 {
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, f1dream_control_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, f1dream_control_w);
 }
 
 

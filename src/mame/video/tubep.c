@@ -442,19 +442,19 @@ WRITE8_HANDLER( tubep_colorproms_A4_line_w )
 
 WRITE8_HANDLER( tubep_background_a000_w )
 {
-	ls175_b7 = ((data&0x0f)^0x0f) | 0xf0;
+	ls175_b7 = ((data & 0x0f) ^ 0x0f) | 0xf0;
 }
 
 
 WRITE8_HANDLER( tubep_background_c000_w )
 {
-	ls175_e8 = ((data&0x0f)^0x0f);
+	ls175_e8 = ((data & 0x0f) ^ 0x0f);
 }
 
 
 static TIMER_CALLBACK( sprite_timer_callback )
 {
-	cpu_set_input_line(machine->cpu[3],0,ASSERT_LINE);
+	cputag_set_input_line(machine, "nsc", 0, ASSERT_LINE);
 }
 
 
@@ -583,7 +583,7 @@ WRITE8_HANDLER( tubep_sprite_control_w )
             /SINT line will be reasserted in XSize * YSize cycles (RH0 signal cycles)
             */
 			/* 1.clear the /SINT interrupt line */
-			cpu_set_input_line(space->machine->cpu[3],0,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "nsc", 0, CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
 			timer_set( space->machine, attotime_mul(ATTOTIME_IN_HZ(19968000/8), (XSize+1)*(YSize+1)), NULL, 0, sprite_timer_callback);
@@ -875,4 +875,3 @@ VIDEO_UPDATE( rjammer )
 
 	return 0;
 }
-

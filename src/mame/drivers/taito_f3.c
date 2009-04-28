@@ -121,12 +121,12 @@ static WRITE32_HANDLER( f3_control_w )
 
 static WRITE32_HANDLER( f3_sound_reset_0_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_reset_1_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_bankswitch_w )
@@ -361,7 +361,7 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( f3_interrupt3 )
 {
-	cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE);	// some signal from video hardware?
+	cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);	// some signal from video hardware?
 }
 
 static INTERRUPT_GEN( f3_interrupt2 )
@@ -373,7 +373,7 @@ static INTERRUPT_GEN( f3_interrupt2 )
 static MACHINE_RESET( f3 )
 {
 	taito_f3_soundsystem_reset(machine);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	f3_68681_reset(machine);
 }
@@ -3669,8 +3669,8 @@ static DRIVER_INIT( bubsympb )
 		}
 	}
 
-	memory_install_read32_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), oki, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
-	memory_install_write32_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), oki, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
+	memory_install_read32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), oki, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
+	memory_install_write32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), oki, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
 }
 
 

@@ -54,7 +54,7 @@ static int cur_dac_address_index = 0;
 
 static TIMER_CALLBACK( dac_irq )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_DEVICE_HANDLER( audio_dac_w)

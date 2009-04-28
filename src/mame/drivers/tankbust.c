@@ -56,7 +56,7 @@ static READ8_DEVICE_HANDLER( tankbust_soundlatch_r )
 }
 
 //port B of ay8910#0
-static UINT32 timer1=0;
+static UINT32 timer1 = 0;
 static READ8_DEVICE_HANDLER( tankbust_soundtimer_r )
 {
 	int ret;
@@ -70,8 +70,8 @@ static TIMER_CALLBACK( soundirqline_callback )
 {
 //logerror("sound_irq_line write = %2x (after CPUs synced) \n",param);
 
-		if ((param&1) == 0)
-			cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+		if ((param & 1) == 0)
+			cputag_set_input_line(machine, "sub", 0, HOLD_LINE);
 }
 
 
@@ -83,16 +83,16 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 
 #if 0
 	popmessage("e0: %x %x (%x cnt) %x %x %x %x",
-		e0xx_data[0],e0xx_data[1],
-		e0xx_data[2],e0xx_data[3],
-		e0xx_data[4],e0xx_data[5],
+		e0xx_data[0], e0xx_data[1],
+		e0xx_data[2], e0xx_data[3],
+		e0xx_data[4], e0xx_data[5],
 		e0xx_data[6] );
 #endif
 
 	switch (offset)
 	{
 	case 0:	/* 0xe000 interrupt enable */
-		interrupt_enable_w(space,0,data);
+		interrupt_enable_w(space, 0, data);
 	break;
 
 	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */

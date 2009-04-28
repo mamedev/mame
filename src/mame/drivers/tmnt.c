@@ -195,14 +195,14 @@ static INTERRUPT_GEN( lgtnfght_interrupt )
 static WRITE16_HANDLER( tmnt_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space,0,data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 }
 
 static READ8_DEVICE_HANDLER( punkshot_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return k053260_r(device,2 + offset);
+	return k053260_r(device, 2 + offset);
 }
 
 static WRITE8_DEVICE_HANDLER( glfgreat_sound_w )
@@ -210,7 +210,7 @@ static WRITE8_DEVICE_HANDLER( glfgreat_sound_w )
 	k053260_w(device, offset, data);
 
 	if (offset)
-		cpu_set_input_line_and_vector(device->machine->cpu[1],0,HOLD_LINE,0xff);
+		cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static READ16_HANDLER( prmrsocr_sound_r )
@@ -223,14 +223,14 @@ static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		if (offset == 0) soundlatch_w(space,0,data);
-		else soundlatch2_w(space,0,data);
+		if (offset == 0) soundlatch_w(space, 0, data);
+		else soundlatch2_w(space, 0, data);
 	}
 }
 
 static WRITE16_HANDLER( prmrsocr_sound_irq_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
@@ -317,13 +317,13 @@ static void sound_nmi_callback( int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 //  sound_nmi_enabled = 1;
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -591,7 +591,7 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (last == 0 && (data & 0x20) != 0)
-			cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+			cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 		last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
@@ -755,7 +755,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( ssriders_soundkludge_w )
 {
 	/* I think this is more than just a trigger */
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2373,7 +2373,7 @@ MACHINE_DRIVER_END
 
 static void sound_nmi(const device_config *device)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const k054539_interface k054539_config =

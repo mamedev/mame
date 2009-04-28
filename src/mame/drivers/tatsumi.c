@@ -188,7 +188,7 @@ static READ16_HANDLER(cyclwarr_input2_r)
 static WRITE16_HANDLER(cyclwarr_sound_w)
 {
 	soundlatch_w(space, 0, data >> 8);
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -829,7 +829,7 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_IRQ0, state);
 }
 
 static const ym2151_interface ym2151_config =
@@ -844,15 +844,15 @@ static INTERRUPT_GEN( roundup5_interrupt )
 
 static void apache3_68000_reset(const device_config *device)
 {
-	cpu_set_input_line(device->machine->cpu[3], INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(device->machine, "sub2", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static MACHINE_RESET( apache3 )
 {
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE); // TODO
+	cputag_set_input_line(machine, "sub2", INPUT_LINE_RESET, ASSERT_LINE); // TODO
 
 	/* Hook the RESET line, which resets the Z80 */
-	m68k_set_reset_callback(machine->cpu[1], apache3_68000_reset);
+	m68k_set_reset_callback(cputag_get_cpu(machine, "sub"), apache3_68000_reset);
 }
 
 

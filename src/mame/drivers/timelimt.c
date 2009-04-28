@@ -49,8 +49,8 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static WRITE8_HANDLER( sound_reset_w )
 {
-	if ( data & 1 )
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE );
+	if (data & 1)
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -361,4 +361,3 @@ ROM_END
 
 GAME( 1983, timelimt, 0, timelimt, timelimt, 0, ROT90, "Chuo Co. Ltd", "Time Limit", GAME_IMPERFECT_COLORS )
 GAME( 1984, progress, 0, progress, progress, 0, ROT90, "Chuo Co. Ltd", "Progress", 0 )
-

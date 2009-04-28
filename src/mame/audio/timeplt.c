@@ -110,7 +110,7 @@ WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 	if (timeplt_last_irq_state == 0 && data)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
+		cputag_set_input_line_and_vector(space->machine, "tpsound", 0, HOLD_LINE, 0xff);
 	}
 
 	timeplt_last_irq_state = data;

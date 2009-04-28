@@ -45,24 +45,24 @@ static void check_interrupt(running_machine *machine)
 {
 	if (!timer_int || !data_rdy_int || !ssi_data_request)
 	{
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
 static TIMER_CALLBACK( intrq_tick )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( intrq_w )
 {
 	// T = 1.1 * R30 * C53 = 1.1 * 750K * 0.01uF = 8.25 ms
 
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 
 	timer_set(space->machine, ATTOTIME_IN_USEC(8250), NULL, 0, intrq_tick);
 }
@@ -302,7 +302,7 @@ static WRITE8_HANDLER( control2_w )
 
 	if (!BIT(data, 2) & cart_present)
 	{
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
 

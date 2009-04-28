@@ -75,19 +75,19 @@ static WRITE8_HANDLER( tecmo_bankswitch_w )
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 }
 
 static WRITE8_HANDLER( tecmo_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "soundcpu",INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( tecmo_adpcm_start_w )
 {
 	adpcm_pos = data << 8;
-	msm5205_reset_w(device,0);
+	msm5205_reset_w(device, 0);
 }
 static WRITE8_HANDLER( tecmo_adpcm_end_w )
 {
@@ -546,7 +546,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate);
+	cputag_set_input_line(device->machine, "soundcpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

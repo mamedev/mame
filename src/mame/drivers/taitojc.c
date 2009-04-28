@@ -775,13 +775,13 @@ static WRITE32_HANDLER(dsp_shared_w)
 		{
 			if (!first_dsp_reset)
 			{
-				cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			first_dsp_reset = 0;
 		}
 		else
 		{
-			cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 		}
 	}
 }
@@ -1280,7 +1280,7 @@ static MACHINE_RESET( taitojc )
 	f3_68681_reset(machine);
 
 	// hold the TMS in reset until we have code
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( taitojc_vblank )
