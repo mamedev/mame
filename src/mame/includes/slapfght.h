@@ -34,11 +34,6 @@ extern int getstar_id;
 
 MACHINE_RESET( slapfight );
 
-extern UINT8 *slapfight_dpram;
-extern size_t slapfight_dpram_size;
-WRITE8_HANDLER( slapfight_dpram_w );
-READ8_HANDLER( slapfight_dpram_r );
-
 READ8_HANDLER( slapfight_port_00_r );
 WRITE8_HANDLER( slapfight_port_00_w );
 WRITE8_HANDLER( slapfight_port_01_w );
