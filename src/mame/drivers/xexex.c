@@ -273,7 +273,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
@@ -309,7 +309,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
 		// if object data isn't ready for DMA within the frame.
-		cpu_set_input_line(machine->cpu[0], 5, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 	}
 }
 

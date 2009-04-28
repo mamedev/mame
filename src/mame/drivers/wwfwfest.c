@@ -103,10 +103,10 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( wwfwfest_irq_ack_w )
 {
 	if (offset == 0)
-		cpu_set_input_line(space->machine->cpu[0], 3, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 3, CLEAR_LINE);
 
 	else
-		cpu_set_input_line(space->machine->cpu[0], 2, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 2, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( wwfwfest_flipscreen_w )
@@ -166,7 +166,7 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 static WRITE16_HANDLER ( wwfwfest_soundwrite )
 {
 	soundlatch_w(space,1,data & 0xff);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /*******************************************************************************
@@ -352,14 +352,14 @@ static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
 	{
 		if (scanline > 0)
 			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cpu_set_input_line(timer->machine->cpu[0], 2, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", 2, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
 		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cpu_set_input_line(timer->machine->cpu[0], 3, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", 3, ASSERT_LINE);
 	}
 }
 
@@ -371,7 +371,7 @@ static TIMER_DEVICE_CALLBACK( wwfwfest_scanline )
 
 static void dd3_ymirq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -381,7 +381,7 @@ static const ym2151_interface ym2151_config =
 
 static VIDEO_EOF( wwfwfest )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram16_w(space,0,0,0xffff);
 }

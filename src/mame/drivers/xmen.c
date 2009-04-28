@@ -95,7 +95,7 @@ logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
-		coin_counter_w(0,data & 0x01);
+		coin_counter_w(0, data & 0x01);
 
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */
@@ -115,12 +115,13 @@ logerror("%06x: write %04x to 108000\n",cpu_get_pc(space->cpu),data);
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch2_r(space,0);
+	return soundlatch2_r(space, 0);
 }
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	if (ACCESSING_BITS_0_7) {
+	if (ACCESSING_BITS_0_7) 
+	{
 		data &= 0xff;
 		soundlatch_w(space, 0, data);
 	}
@@ -128,16 +129,17 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 //int xmen_irqenabled;
 
 static WRITE16_HANDLER( xmen_18fa00_w )
 {
-	if(ACCESSING_BITS_0_7) {
+	if(ACCESSING_BITS_0_7) 
+	{
 		/* bit 2 is interrupt enable */
-		interrupt_enable_w(space,0,data & 0x04);
+		interrupt_enable_w(space, 0, data & 0x04);
 	//  xmen_irqenabled = data;
 	}
 }

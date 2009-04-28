@@ -2723,7 +2723,7 @@ static DRIVER_INIT( mayday )
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* install a handler to catch protection checks */
-	mayday_protection = memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa190, 0xa191, 0, 0, mayday_protection_r);
+	mayday_protection = memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa190, 0xa191, 0, 0, mayday_protection_r);
 }
 
 
@@ -2757,7 +2757,7 @@ static DRIVER_INIT( bubbles )
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* bubbles has a full 8-bit-wide CMOS */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, bubbles_cmos_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, bubbles_cmos_w);
 }
 
 
@@ -2798,27 +2798,27 @@ static DRIVER_INIT( spdball )
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* add a third PIA */
-	memory_install_readwrite8_device_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), pia_3, 0xc808, 0xc80b, 0, 0, pia6821_r, pia6821_w);
+	memory_install_readwrite8_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pia_3, 0xc808, 0xc80b, 0, 0, pia6821_r, pia6821_w);
 
 	/* install extra input handlers */
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xc800, 0, 0, "AN0");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc801, 0xc801, 0, 0, "AN1");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc802, 0xc802, 0, 0, "AN2");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc803, 0xc803, 0, 0, "AN3");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xc800, 0, 0, "AN0");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc801, 0xc801, 0, 0, "AN1");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc802, 0xc802, 0, 0, "AN2");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc803, 0xc803, 0, 0, "AN3");
 }
 
 
 static DRIVER_INIT( alienar )
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0, (write8_space_func)SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0, (write8_space_func)SMH_NOP);
 }
 
 
 static DRIVER_INIT( alienaru )
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0, (write8_space_func)SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0, (write8_space_func)SMH_NOP);
 }
 
 

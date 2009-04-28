@@ -125,29 +125,29 @@ static TIMER_DEVICE_CALLBACK( vball_scanline )
 	/* IRQ fires every on every 8th scanline */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		cpu_set_input_line(timer->machine->cpu[0], M6502_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", M6502_IRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		cpu_set_input_line(timer->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* Save the scroll x register value */
 	if (scanline < 256)
 	{
-		vb_scrollx[255 - scanline] = (vb_scrollx_hi + vb_scrollx_lo+4);
+		vb_scrollx[255 - scanline] = (vb_scrollx_hi + vb_scrollx_lo + 4);
 	}
 }
 
 static WRITE8_HANDLER( vball_irq_ack_w )
 {
 	if (offset == 0)
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	else
-		cpu_set_input_line(space->machine->cpu[0], M6502_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -163,19 +163,21 @@ static WRITE8_HANDLER( vball_irq_ack_w )
 static WRITE8_HANDLER( vb_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
-	memory_set_bankptr(space->machine,  1,&RAM[ 0x10000 + ( 0x4000 * ( data & 1 ) ) ] );
+	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + (0x4000 * (data & 1))]);
 
-	if (vball_gfxset != ((data  & 0x20) ^ 0x20)) {
+	if (vball_gfxset != ((data  & 0x20) ^ 0x20)) 
+	{
 		vball_gfxset = (data  & 0x20) ^ 0x20;
 			vb_mark_all_dirty();
 	}
-	vb_scrolly_hi = (data & 0x40)<<2;
+	vb_scrolly_hi = (data & 0x40) << 2;
 }
 
 /* The sound system comes all but verbatim from Double Dragon */
-static WRITE8_HANDLER( cpu_sound_command_w ) {
-	soundlatch_w( space, offset, data );
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+static WRITE8_HANDLER( cpu_sound_command_w ) 
+{
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -192,15 +194,15 @@ static WRITE8_HANDLER( vb_scrollx_hi_w )
 {
 	flip_screen_set(space->machine, ~data&1);
 	vb_scrollx_hi = (data & 0x02) << 7;
-	vb_bgprombank_w(space->machine, (data >> 2)&0x07);
-	vb_spprombank_w(space->machine, (data >> 5)&0x07);
-	//logerror("%04x: vb_scrollx_hi = %d\n",cpu_get_previouspc(space->cpu), vb_scrollx_hi);
+	vb_bgprombank_w(space->machine, (data >> 2) & 0x07);
+	vb_spprombank_w(space->machine, (data >> 5) & 0x07);
+	//logerror("%04x: vb_scrollx_hi = %d\n", cpu_get_previouspc(space->cpu), vb_scrollx_hi);
 }
 
 static WRITE8_HANDLER(vb_scrollx_lo_w)
 {
 	vb_scrollx_lo = data;
-	//logerror("%04x: vb_scrollx_lo =%d\n",cpu_get_previouspc(space->cpu), vb_scrollx_lo);
+	//logerror("%04x: vb_scrollx_lo =%d\n", cpu_get_previouspc(space->cpu), vb_scrollx_lo);
 }
 
 
@@ -405,7 +407,7 @@ GFXDECODE_END
 
 static void vball_irq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

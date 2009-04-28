@@ -1086,13 +1086,13 @@ static DRIVER_INIT( stinger )
 
 static DRIVER_INIT( scion )
 {
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4000, 0x4001, 0, 0, (write8_space_func)SMH_NOP);
+	memory_install_write8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x4001, 0, 0, (write8_space_func)SMH_NOP);
 }
 
 
 static DRIVER_INIT( wiz )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xd400, 0xd400, 0, 0, wiz_protection_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd400, 0xd400, 0, 0, wiz_protection_r);
 }
 
 

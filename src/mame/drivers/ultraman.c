@@ -101,13 +101,13 @@ static WRITE16_HANDLER( ultraman_K051960_w )
 static WRITE16_HANDLER( sound_cmd_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space,0,data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 }
 
 static WRITE16_HANDLER( sound_irq_trigger_w )
 {
 	if (ACCESSING_BITS_0_7)
-		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

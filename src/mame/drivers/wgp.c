@@ -438,7 +438,7 @@ static void parse_control(running_machine *machine)
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 1 is "vibration" acc. to test mode */
 }
@@ -464,20 +464,20 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 #ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( wgp_interrupt4 )
 {
-    cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
+    cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
 }
 #endif
 
 static TIMER_CALLBACK( wgp_interrupt6 )
 {
-	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
 }
 
 /* 68000 B */
 
 static TIMER_CALLBACK( wgp_cpub_interrupt6 )
 {
-	cpu_set_input_line(machine->cpu[2],6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	cputag_set_input_line(machine, "sub", 6, HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -913,7 +913,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)	// assumes Z80 sandwiched between 68Ks
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -1236,4 +1236,3 @@ GAME( 1989, wgpj,     wgp,    wgp,    wgpj,   wgp,    ROT0, "Taito Corporation",
 GAME( 1989, wgpjoy,   wgp,    wgp,    wgpjoy, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1989, wgpjoya,  wgp,    wgp,    wgpjoy, wgp,    ROT0, "Taito Corporation", "World Grand Prix (joystick version) (Japan, set 2)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1990, wgp2,     wgp,    wgp2,   wgp2,   wgp2,   ROT0, "Taito Corporation", "World Grand Prix 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-

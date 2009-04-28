@@ -208,13 +208,13 @@ static TIMER_DEVICE_CALLBACK( xain_scanline )
 	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		cpu_set_input_line(timer->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		cpu_set_input_line(timer->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* VBLANK input bit is held high from scanlines 248-255 */
@@ -242,7 +242,7 @@ static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 static WRITE8_HANDLER( xain_sound_command_w )
 {
 	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[2],M6809_IRQ_LINE,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( xain_main_irq_w )
@@ -250,28 +250,28 @@ static WRITE8_HANDLER( xain_main_irq_w )
 	switch (offset)
 	{
 	case 0: /* 0x3a09 - NMI clear */
-		cpu_set_input_line(space->machine->cpu[0],INPUT_LINE_NMI,CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 		break;
 	case 1: /* 0x3a0a - FIRQ clear */
-		cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 		break;
 	case 2: /* 0x3a0b - IRQ clear */
-		cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 		break;
 	case 3: /* 0x3a0c - IRQB assert */
-		cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
+		cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
 
 static WRITE8_HANDLER( xain_irqA_assert_w )
 {
-	cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
+	cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( xain_irqB_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static READ8_HANDLER( xain_68705_r )
@@ -454,7 +454,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[2],M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

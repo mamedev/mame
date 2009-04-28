@@ -163,7 +163,7 @@ VIDEO_UPDATE( xmen6p )
 /* my lefts and rights are mixed up in several places.. */
 VIDEO_EOF( xmen6p )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int layer[3];
 	bitmap_t * renderbitmap;
 	rectangle cliprect;
@@ -178,27 +178,25 @@ VIDEO_EOF( xmen6p )
 //  cliprect.max_y = visarea->max_y;
 
 	cliprect.min_x = 0;
-	cliprect.max_x = 64*8-1;
-	cliprect.min_y = 2*8;
-	cliprect.max_y = 30*8-1;
-
-
+	cliprect.max_x = 64 * 8 - 1;
+	cliprect.min_y = 2 * 8;
+	cliprect.max_y = 30 * 8 - 1;
 
 
 	if (xmen_current_frame & 0x01)
 	{
 
 			/* copy the desired spritelist to the chip */
-		memcpy(K053247_ram,xmen6p_spriteramright,0x1000);
+		memcpy(K053247_ram, xmen6p_spriteramright, 0x1000);
 		/* we write the entire content of the tileram to the chip to ensure
            everything gets marked as dirty and the desired tilemap is rendered
 
            this is not very efficient!
            */
-		for (offset=0;offset<(0xc000/2);offset++)
+		for (offset = 0; offset < (0xc000 / 2); offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(space,offset,xmen6p_tilemapright[offset]&0x00ff);
+			K052109_w(space, offset, xmen6p_tilemapright[offset] & 0x00ff);
 		}
 
 
@@ -207,20 +205,18 @@ VIDEO_EOF( xmen6p )
 	else
 	{
 		/* copy the desired spritelist to the chip */
-		memcpy(K053247_ram,xmen6p_spriteramleft,0x1000);
+		memcpy(K053247_ram, xmen6p_spriteramleft, 0x1000);
 
 		/* we write the entire content of the tileram to the chip to ensure
            everything gets marked as dirty and the desired tilemap is rendered
 
            this is not very efficient!
            */
-		for (offset=0;offset<(0xc000/2);offset++)
+		for (offset = 0; offset < (0xc000 / 2); offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(space,offset,xmen6p_tilemapleft[offset]&0x00ff);
+			K052109_w(space, offset, xmen6p_tilemapleft[offset] & 0x00ff);
 		}
-
-
 
 
 		renderbitmap = screen_left;
@@ -244,16 +240,14 @@ VIDEO_EOF( xmen6p )
 
 	sortlayers(layer,layerpri);
 
-	bitmap_fill(priority_bitmap,&cliprect,0);
+	bitmap_fill(priority_bitmap, &cliprect, 0);
 	/* note the '+1' in the background color!!! */
-	bitmap_fill(renderbitmap,&cliprect,16 * bg_colorbase+1);
-	tilemap_draw(renderbitmap,&cliprect,K052109_tilemap[layer[0]],0,1);
-	tilemap_draw(renderbitmap,&cliprect,K052109_tilemap[layer[1]],0,2);
-	tilemap_draw(renderbitmap,&cliprect,K052109_tilemap[layer[2]],0,4);
+	bitmap_fill(renderbitmap, &cliprect, 16 * bg_colorbase + 1);
+	tilemap_draw(renderbitmap, &cliprect, K052109_tilemap[layer[0]], 0, 1);
+	tilemap_draw(renderbitmap, &cliprect, K052109_tilemap[layer[1]], 0, 2);
+	tilemap_draw(renderbitmap, &cliprect, K052109_tilemap[layer[2]], 0, 4);
 
 /* this isn't supported anymore and it is unsure if still needed; keeping here for reference
     pdrawgfx_shadow_lowpri = 1; fix shadows of boulders in front of feet */
-	K053247_sprites_draw(machine, renderbitmap,&cliprect);
-
+	K053247_sprites_draw(machine, renderbitmap, &cliprect);
 }
-

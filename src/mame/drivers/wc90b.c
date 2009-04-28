@@ -142,8 +142,8 @@ static WRITE8_HANDLER( wc90b_bankswitch1_w )
 
 static WRITE8_HANDLER( wc90b_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[2],0,HOLD_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
@@ -351,7 +351,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -368,13 +368,12 @@ static void adpcm_int(const device_config *device)
 {
 	static int toggle = 0;
 
-	msm5205_data_w (device,msm5205next);
-	msm5205next>>=4;
+	msm5205_data_w(device, msm5205next);
+	msm5205next >>= 4;
 
 	toggle ^= 1;
 	if(toggle)
-		cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
-
+		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =

@@ -35,7 +35,7 @@ static TIMER_CALLBACK( periodic_callback )
 {
 	int scanline = param;
 
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
 	scanline += 64;
 

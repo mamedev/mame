@@ -77,12 +77,12 @@ static const struct TTL74148_interface irq_encoder =
 static void update_irq(running_machine *machine)
 {
 	if (irq_state < 7)
-		cpu_set_input_line(machine->cpu[0], irq_state ^ 7, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", irq_state ^ 7, CLEAR_LINE);
 
 	irq_state = TTL74148_output_r(0);
 
 	if (irq_state < 7)
-		cpu_set_input_line(machine->cpu[0], irq_state ^ 7, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", irq_state ^ 7, ASSERT_LINE);
 }
 
 
@@ -96,7 +96,7 @@ static void update_irq_encoder(running_machine *machine, int line, int state)
 static PIT8253_OUTPUT_CHANGED( v_irq4_w )
 {
 	update_irq_encoder(device->machine, INPUT_LINE_IRQ4, state);
-	vertigo_vproc(cpu_attotime_to_clocks(device->machine->cpu[0], attotime_sub(timer_get_time(device->machine), irq4_time)), state);
+	vertigo_vproc(cputag_attotime_to_clocks(device->machine, "maincpu", attotime_sub(timer_get_time(device->machine), irq4_time)), state);
 	irq4_time = timer_get_time(device->machine);
 }
 
@@ -104,7 +104,7 @@ static PIT8253_OUTPUT_CHANGED( v_irq4_w )
 static PIT8253_OUTPUT_CHANGED( v_irq3_w )
 {
 	if (state)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_IRQ0, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 
 	update_irq_encoder(device->machine, INPUT_LINE_IRQ3, state);
 }
@@ -164,9 +164,9 @@ WRITE16_HANDLER( vertigo_wsot_w )
 {
 	/* Reset sound cpu */
 	if ((data & 2) == 0)
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -174,7 +174,7 @@ static TIMER_CALLBACK( sound_command_w )
 {
 	exidy440_sound_command = param;
 	exidy440_sound_command_ack = 0;
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ1, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 
 	/* It is important that the sound cpu ACKs the sound command
        quickly. Otherwise the main CPU gives up with sound. Boosting

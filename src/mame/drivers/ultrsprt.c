@@ -76,17 +76,17 @@ static CUSTOM_INPUT( analog_ctrl_r )
 
 static WRITE32_HANDLER( int_ack_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 static MACHINE_START( ultrsprt )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine->cpu[0], PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->cpu[0], 0x80000000, 0x8007ffff, FALSE, vram);
-	ppcdrc_add_fastram(machine->cpu[0], 0xff000000, 0xff01ffff, FALSE, workram);
+	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x80000000, 0x8007ffff, FALSE, vram);
+	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0xff000000, 0xff01ffff, FALSE, workram);
 }
 
 
@@ -232,9 +232,9 @@ MACHINE_DRIVER_END
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		/*generic_pulse_irq_line(machine->cpu[1], INPUT_LINE_IRQ5)*/;
+		/*generic_pulse_irq_line(cputag_get_cpu(machine, "audiocpu"), INPUT_LINE_IRQ5)*/;
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ6, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ6, HOLD_LINE);
 }
 
 static DRIVER_INIT( ultrsprt )

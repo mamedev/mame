@@ -220,7 +220,7 @@ static VIDEO_UPDATE( jetwave )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	sharc_set_flag_input(screen->machine->cpu[2], 1, ASSERT_LINE);
+	sharc_set_flag_input(cputag_get_cpu(screen->machine, "dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -274,7 +274,7 @@ static VIDEO_UPDATE( zr107 )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	sharc_set_flag_input(screen->machine->cpu[2], 1, ASSERT_LINE);
+	sharc_set_flag_input(cputag_get_cpu(screen->machine, "dsp"), 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -345,7 +345,7 @@ static WRITE8_HANDLER( sysreg_w )
 			eeprom_write_bit((data & 0x01) ? 1 : 0);
 			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -361,9 +361,9 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = ADDSCLK (ADC SCLK)
             */
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			adc083x_cs_write(space->machine, 0, (data >> 2) & 1);
 			adc083x_di_write(space->machine, 0, (data >> 1) & 1);
@@ -442,10 +442,10 @@ static UINT32 *workram;
 static MACHINE_START( zr107 )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine->cpu[0], PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->cpu[0], 0x00000000, 0x000fffff, FALSE, workram);
+	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x000fffff, FALSE, workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -710,7 +710,7 @@ static INTERRUPT_GEN( zr107_vblank )
 }
 static MACHINE_RESET( zr107 )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( zr107 )
@@ -807,13 +807,13 @@ MACHINE_DRIVER_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpu_set_input_line(machine->cpu[1], param, CLEAR_LINE);
+	cputag_set_input_line(machine, "audiocpu", param, CLEAR_LINE);
 }
 
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
 	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 

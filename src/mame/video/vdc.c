@@ -82,13 +82,15 @@ static void vpc_init( running_machine *machine );
 INTERRUPT_GEN( pce_interrupt )
 {
 	/* Draw the last scanline */
-	if ( vce.current_bitmap_line >= 14 && vce.current_bitmap_line < 14 + 242 ) {
+	if ( vce.current_bitmap_line >= 14 && vce.current_bitmap_line < 14 + 242 ) 
+	{
 		/* We are in the active display area */
 		/* First fill the line with the overscan color */
 		draw_overscan_line(vce.current_bitmap_line );
 
 		/* Check if we need to draw more just the overscan color */
-		if ( vdc[0].current_segment == STATE_VDW ) {
+		if ( vdc[0].current_segment == STATE_VDW ) 
+		{
 			/* 0 - no sprite and background pixels drawn
                1 - background pixel drawn
                otherwise is 2 + sprite# */
@@ -105,11 +107,14 @@ INTERRUPT_GEN( pce_interrupt )
 			pce_refresh_line( 0, vdc[0].current_segment_line, 0, drawn, line_buffer);
 
 			/* Draw VDC #0 sprite layer */
-			if(vdc[0].vdc_data[CR].w & CR_SB) {
+			if(vdc[0].vdc_data[CR].w & CR_SB) 
+			{
 				pce_refresh_sprites(device->machine, 0, vdc[0].current_segment_line, drawn, line_buffer);
 			}
 		}
-	} else {
+	} 
+	else 
+	{
 		/* We are in one of the blanking areas */
 		draw_black_line(device->machine, vce.current_bitmap_line );
 	}
@@ -122,13 +127,15 @@ INTERRUPT_GEN( pce_interrupt )
 INTERRUPT_GEN( sgx_interrupt )
 {
 	/* Draw the last scanline */
-	if ( vce.current_bitmap_line >= 14 && vce.current_bitmap_line < 14 + 242 ) {
+	if ( vce.current_bitmap_line >= 14 && vce.current_bitmap_line < 14 + 242 ) 
+	{
 		/* We are in the active display area */
 		/* First fill the line with the overscan color */
 		draw_sgx_overscan_line(vce.current_bitmap_line );
 
 		/* Check if we need to draw more just the overscan color */
-		if ( vdc[0].current_segment == STATE_VDW ) {
+		if ( vdc[0].current_segment == STATE_VDW ) 
+		{
 			/* 0 - no sprite and background pixels drawn
                1 - background pixel drawn
                otherwise is 2 + sprite# */
@@ -147,7 +154,8 @@ INTERRUPT_GEN( sgx_interrupt )
 			pce_refresh_line( 0, vdc[0].current_segment_line, 0, drawn[0], temp_buffer[0]);
 
 			/* Draw VDC #0 sprite layer */
-			if(vdc[0].vdc_data[CR].w & CR_SB) {
+			if(vdc[0].vdc_data[CR].w & CR_SB) 
+			{
 				pce_refresh_sprites(device->machine, 0, vdc[0].current_segment_line, drawn[0], temp_buffer[0]);
 			}
 
@@ -155,37 +163,54 @@ INTERRUPT_GEN( sgx_interrupt )
 			pce_refresh_line( 1, vdc[1].current_segment_line, 1, drawn[1], temp_buffer[1]);
 
 			/* Draw VDC #1 sprite layer */
-			if ( vdc[1].vdc_data[CR].w & CR_SB ) {
+			if ( vdc[1].vdc_data[CR].w & CR_SB ) 
+			{
 				pce_refresh_sprites(device->machine, 1, vdc[1].current_segment_line, drawn[1], temp_buffer[1]);
 			}
 
 			line_buffer = BITMAP_ADDR16( vce.bmp, vce.current_bitmap_line, 86 );
 			/* Combine the output of both VDCs */
-			for( i = 0; i < 512; i++ ) {
+			for( i = 0; i < 512; i++ ) 
+			{
 				int cur_prio = vpc.prio_map[i];
 
-				if ( vpc.vpc_prio[cur_prio].vdc0_enabled ) {
-					if ( vpc.vpc_prio[cur_prio].vdc1_enabled ) {
-						switch( vpc.vpc_prio[cur_prio].prio ) {
+				if ( vpc.vpc_prio[cur_prio].vdc0_enabled ) 
+				{
+					if ( vpc.vpc_prio[cur_prio].vdc1_enabled ) 
+					{
+						switch( vpc.vpc_prio[cur_prio].prio ) 
+						{
 						case 0:	/* BG1 SP1 BG0 SP0 */
-							if ( drawn[0][i] ) {
+							if ( drawn[0][i] ) 
+							{
 								line_buffer[i] = temp_buffer[0][i];
-							} else if ( drawn[1][i] ) {
+							} 
+							else if ( drawn[1][i] ) 
+							{
 								line_buffer[i] = temp_buffer[1][i];
 							}
 							break;
 						case 1:	/* BG1 BG0 SP1 SP0 */
-							if ( drawn[0][i] ) {
-								if ( drawn[0][i] > 1 ) {
+							if ( drawn[0][i] ) 
+							{
+								if ( drawn[0][i] > 1 ) 
+								{
 									line_buffer[i] = temp_buffer[0][i];
-								} else {
-									if ( drawn[1][i] > 1 ) {
+								} 
+								else 
+								{
+									if ( drawn[1][i] > 1 ) 
+									{
 										line_buffer[i] = temp_buffer[1][i];
-									} else {
+									} 
+									else 
+									{
 										line_buffer[i] = temp_buffer[0][i];
 									}
 								}
-							} else if ( drawn[1][i] ) {
+							} 
+							else if ( drawn[1][i] ) 
+							{
 								line_buffer[i] = temp_buffer[1][i];
 							}
 							break;
@@ -195,36 +220,54 @@ INTERRUPT_GEN( sgx_interrupt )
                                    BG0 + SP0 => SP0
                                    BG1 + SP0 => BG1
                                    SP0 + SP1 => SP0 */
-							if ( drawn[0][i] ) {
-								if ( drawn[0][i] > 1 ) {
-									if ( drawn[1][i] == 1 ) {
+							if ( drawn[0][i] ) 
+							{
+								if ( drawn[0][i] > 1 ) 
+								{
+									if ( drawn[1][i] == 1 ) 
+									{
 										line_buffer[i] = temp_buffer[1][i];
-									} else {
+									} 
+									else 
+									{
 										line_buffer[i] = temp_buffer[0][i];
 									}
-								} else {
+								} 
+								else 
+								{
 									line_buffer[i] = temp_buffer[0][i];
 								}
-							} else if ( drawn[1][i] ) {
+							} 
+							else if ( drawn[1][i] ) 
+							{
 								line_buffer[i] = temp_buffer[1][i];
 							}
 							break;
 						}
-					} else {
-						if ( drawn[0][i] ) {
+					} 
+					else 
+					{
+						if ( drawn[0][i] ) 
+						{
 							line_buffer[i] = temp_buffer[0][i];
 						}
 					}
-				} else {
-					if ( vpc.vpc_prio[cur_prio].vdc1_enabled ) {
-						if ( drawn[1][i] ) {
+				} 
+				else 
+				{
+					if ( vpc.vpc_prio[cur_prio].vdc1_enabled ) 
+					{
+						if ( drawn[1][i] ) 
+						{
 							line_buffer[i] = temp_buffer[1][i];
 						}
 					}
 				}
 			}
 		}
-	} else {
+	} 
+	else 
+	{
 		/* We are in one of the blanking areas */
 		draw_black_line(device->machine, vce.current_bitmap_line );
 	}
@@ -235,71 +278,85 @@ INTERRUPT_GEN( sgx_interrupt )
 	vdc_advance_line(device->machine, 1 );
 }
 
-static void vdc_advance_line(running_machine *machine, int which) {
+static void vdc_advance_line(running_machine *machine, int which) 
+{
 	int ret = 0;
 
 	vdc[which].curline += 1;
 	vdc[which].current_segment_line += 1;
 	vdc[which].raster_count += 1;
 
-	if ( vdc[which].satb_countdown ) {
+	if ( vdc[which].satb_countdown ) 
+	{
 		vdc[which].satb_countdown -= 1;
-		if ( vdc[which].satb_countdown == 0 ) {
-			if ( vdc[which].vdc_data[DCR].w & DCR_DSC ) {
+		if ( vdc[which].satb_countdown == 0 ) 
+		{
+			if ( vdc[which].vdc_data[DCR].w & DCR_DSC ) 
+			{
 				vdc[which].status |= VDC_DS;	/* set satb done flag */
 				ret = 1;
 			}
 		}
 	}
 
-	if ( vce.current_bitmap_line == 0 ) {
+	if ( vce.current_bitmap_line == 0 ) 
+	{
 		vdc[which].current_segment = STATE_VSW;
 		vdc[which].current_segment_line = 0;
 		vdc[which].vblank_triggered = 0;
 		vdc[which].curline = 0;
 	}
 
-	if ( STATE_VSW == vdc[which].current_segment && vdc[which].current_segment_line >= ( vdc[which].vdc_data[VPR].b.l & 0x1F ) ) {
+	if ( STATE_VSW == vdc[which].current_segment && vdc[which].current_segment_line >= ( vdc[which].vdc_data[VPR].b.l & 0x1F ) ) 
+	{
 		vdc[which].current_segment = STATE_VDS;
 		vdc[which].current_segment_line = 0;
 	}
 
-	if ( STATE_VDS == vdc[which].current_segment && vdc[which].current_segment_line >= vdc[which].vdc_data[VPR].b.h ) {
+	if ( STATE_VDS == vdc[which].current_segment && vdc[which].current_segment_line >= vdc[which].vdc_data[VPR].b.h ) 
+	{
 		vdc[which].current_segment = STATE_VDW;
 		vdc[which].current_segment_line = 0;
 		vdc[which].raster_count = 0x40;
 	}
 
-	if ( STATE_VDW == vdc[which].current_segment && vdc[which].current_segment_line > ( vdc[which].vdc_data[VDW].w & 0x01FF ) ) {
+	if ( STATE_VDW == vdc[which].current_segment && vdc[which].current_segment_line > ( vdc[which].vdc_data[VDW].w & 0x01FF ) ) 
+	{
 		vdc[which].current_segment = STATE_VCR;
 		vdc[which].current_segment_line = 0;
 
 		/* Generate VBlank interrupt, sprite DMA */
 		vdc[which].vblank_triggered = 1;
-		if ( vdc[which].vdc_data[CR].w & CR_VR ) {
+		if ( vdc[which].vdc_data[CR].w & CR_VR ) 
+		{
 			vdc[which].status |= VDC_VD;
 			ret = 1;
 		}
 
 		/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */
-		if( ( vdc[which].vdc_data[DCR].w & DCR_DSR ) || vdc[which].dvssr_write ) {
+		if( ( vdc[which].vdc_data[DCR].w & DCR_DSR ) || vdc[which].dvssr_write ) 
+		{
 			int i;
 
 			vdc[which].dvssr_write = 0;
 
-			for( i = 0; i < 256; i++ ) {
+			for( i = 0; i < 256; i++ ) 
+			{
 				vdc[which].sprite_ram[i] = ( vdc[which].vram[ ( vdc[which].vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc[which].vram[ ( vdc[which].vdc_data[DVSSR].w << 1 ) + i * 2 ];
 			}
 
 			/* generate interrupt if needed */
-			if ( vdc[which].vdc_data[DCR].w & DCR_DSC ) {
+			if ( vdc[which].vdc_data[DCR].w & DCR_DSC ) 
+			{
 				vdc[which].satb_countdown = 4;
 			}
 		}
 	}
 
-	if ( STATE_VCR == vdc[which].current_segment ) {
-		if ( vdc[which].current_segment_line >= 3 && vdc[which].current_segment_line >= vdc[which].vdc_data[VCR].b.l ) {
+	if ( STATE_VCR == vdc[which].current_segment ) 
+	{
+		if ( vdc[which].current_segment_line >= 3 && vdc[which].current_segment_line >= vdc[which].vdc_data[VCR].b.l ) 
+		{
 			vdc[which].current_segment = STATE_VSW;
 			vdc[which].current_segment_line = 0;
 			vdc[which].curline = 0;
@@ -307,41 +364,47 @@ static void vdc_advance_line(running_machine *machine, int which) {
 	}
 
 	/* generate interrupt on line compare if necessary */
-	if ( vdc[which].raster_count == vdc[which].vdc_data[RCR].w && vdc[which].vdc_data[CR].w & CR_RC ) {
+	if ( vdc[which].raster_count == vdc[which].vdc_data[RCR].w && vdc[which].vdc_data[CR].w & CR_RC ) 
+	{
 		vdc[which].status |= VDC_RR;
 		ret = 1;
 	}
 
 	/* handle frame events */
-	if(vdc[which].curline == 261 && ! vdc[which].vblank_triggered ) {
+	if(vdc[which].curline == 261 && ! vdc[which].vblank_triggered ) 
+	{
 
 		vdc[which].vblank_triggered = 1;
-		if(vdc[which].vdc_data[CR].w & CR_VR) {	/* generate IRQ1 if enabled */
+		if(vdc[which].vdc_data[CR].w & CR_VR) 
+		{	/* generate IRQ1 if enabled */
 			vdc[which].status |= VDC_VD;	/* set vblank flag */
 			ret = 1;
 		}
 
 		/* do VRAM > SATB DMA if the enable bit is set or the DVSSR reg. was written to */
-		if ( ( vdc[which].vdc_data[DCR].w & DCR_DSR ) || vdc[which].dvssr_write ) {
+		if ( ( vdc[which].vdc_data[DCR].w & DCR_DSR ) || vdc[which].dvssr_write ) 
+		{
 			int i;
 
 			vdc[which].dvssr_write = 0;
 #ifdef MAME_DEBUG
 			assert(((vdc[which].vdc_data[DVSSR].w<<1) + 512) <= 0x10000);
 #endif
-			for( i = 0; i < 256; i++ ) {
+			for( i = 0; i < 256; i++ ) 
+			{
 				vdc[which].sprite_ram[i] = ( vdc[which].vram[ ( vdc[which].vdc_data[DVSSR].w << 1 ) + i * 2 + 1 ] << 8 ) | vdc[which].vram[ ( vdc[which].vdc_data[DVSSR].w << 1 ) + i * 2 ];
 			}
 
 			/* generate interrupt if needed */
-			if(vdc[which].vdc_data[DCR].w & DCR_DSC) {
+			if(vdc[which].vdc_data[DCR].w & DCR_DSC) 
+			{
 				vdc[which].satb_countdown = 4;
 			}
 		}
 	}
 
 	if (ret)
-		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
 
 VIDEO_START( pce )
@@ -401,7 +464,8 @@ static void draw_overscan_line(int line)
 		line_buffer[i] = color_base + vce.vce_data[0x100].w;
 }
 
-static void draw_sgx_overscan_line(int line) {
+static void draw_sgx_overscan_line(int line) 
+{
 	int i;
 
 	/* Are we in greyscale mode or in color mode? */
@@ -535,21 +599,22 @@ static void vdc_w( running_machine *machine, int which, offs_t offset, UINT8 dat
 static UINT8 vdc_r( running_machine *machine, int which, offs_t offset )
 {
 	int temp = 0;
-	switch(offset&3)
+	switch(offset & 3)
 	{
 		case 0x00:
 			temp = vdc[which].status;
 			vdc[which].status &= ~(VDC_VD | VDC_RR | VDC_CR | VDC_OR | VDC_DS);
-			cpu_set_input_line(machine->cpu[0],0,CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:
-			temp = vram_read(which, vdc[which].vdc_data[MARR].w*2+0);
+			temp = vram_read(which, vdc[which].vdc_data[MARR].w * 2 + 0);
 			break;
 
 		case 0x03:
-			temp = vram_read(which, vdc[which].vdc_data[MARR].w*2+1);
-			if ( vdc[which].vdc_register ==VxR ) {
+			temp = vram_read(which, vdc[which].vdc_data[MARR].w * 2 + 1);
+			if ( vdc[which].vdc_register == VxR ) 
+			{
 				vdc[which].vdc_data[MARR].w += vdc[which].inc;
 			}
 			break;
@@ -562,10 +627,12 @@ WRITE8_HANDLER( vdc_1_w ) {	vdc_w( space->machine, 1, offset, data ); }
 READ8_HANDLER( vdc_0_r ) {	return vdc_r( space->machine, 0, offset ); }
 READ8_HANDLER( vdc_1_r ) {	return vdc_r( space->machine, 1, offset ); }
 
-PALETTE_INIT( vce ) {
+PALETTE_INIT( vce ) 
+{
 	int i;
 
-	for( i = 0; i < 512; i++ ) {
+	for( i = 0; i < 512; i++ ) 
+	{
 		int r = (( i >> 3) & 7) << 5;
 		int g = (( i >> 6) & 7) << 5;
 		int b = (( i     ) & 7) << 5;
@@ -701,13 +768,16 @@ static void pce_refresh_line(int which, int line, int external_input, UINT8 *dra
 				if ( ! ( c & 0x0F ) )
 					c &= 0x0F;
 
-				if ( phys_x >= 0 && phys_x < vdc[which].physical_width ) {
+				if ( phys_x >= 0 && phys_x < vdc[which].physical_width ) 
+				{
 					drawn[ pixel ] = c ? 1 : 0;
 					if ( c || ! external_input )
 						line_buffer[ pixel ] = color_base + vce.vce_data[c].w;
 					pixel++;
-					if ( vdc[which].physical_width != 512 ) {
-						while ( pixel < ( ( ( phys_x + 1 ) * 512 ) / vdc[which].physical_width ) ) {
+					if ( vdc[which].physical_width != 512 ) 
+					{
+						while ( pixel < ( ( ( phys_x + 1 ) * 512 ) / vdc[which].physical_width ) ) 
+						{
 							drawn[ pixel ] = c ? 1 : 0;
 							if ( c || ! external_input )
 								line_buffer[ pixel ] = color_base + vce.vce_data[c].w;
@@ -757,20 +827,20 @@ static void conv_obj(int which, int i, int l, int hf, int vf, char *buf)
 static void pce_refresh_sprites(running_machine *machine, int which, int line, UINT8 *drawn, UINT16 *line_buffer)
 {
     int i;
-	UINT8 sprites_drawn=0;
+	UINT8 sprites_drawn = 0;
 
 	/* Are we in greyscale mode or in color mode? */
 	int color_base = vce.vce_control & 0x80 ? 512 : 0;
 
 	/* count up: Highest priority is Sprite 0 */
-	for(i=0; i<64; i++)
+	for(i = 0; i < 64; i++)
 	{
 		static const int cgy_table[] = {16, 32, 64, 64};
 
-		int obj_y = (vdc[which].sprite_ram[(i<<2)+0] & 0x03FF) - 64;
-		int obj_x = (vdc[which].sprite_ram[(i<<2)+1] & 0x03FF) - 32;
-		int obj_i = (vdc[which].sprite_ram[(i<<2)+2] & 0x07FE);
-		int obj_a = (vdc[which].sprite_ram[(i<<2)+3]);
+		int obj_y = (vdc[which].sprite_ram[(i << 2) + 0] & 0x03FF) - 64;
+		int obj_x = (vdc[which].sprite_ram[(i << 2) + 1] & 0x03FF) - 32;
+		int obj_i = (vdc[which].sprite_ram[(i << 2) + 2] & 0x07FE);
+		int obj_a = (vdc[which].sprite_ram[(i << 2) + 3]);
 		int cgx   = (obj_a >> 8) & 1;   /* sprite width */
 		int cgy   = (obj_a >> 12) & 3;  /* sprite height */
 		int hf    = (obj_a >> 11) & 1;  /* horizontal flip */
@@ -786,7 +856,7 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 		if ((obj_x == -32) || (obj_x >= vdc[which].physical_width)) continue;
 
 		/* no need to draw an object that's ABOVE where we are. */
-		if((obj_y + obj_h)<line) continue;
+		if((obj_y + obj_h) < line) continue;
 
 		/* If CGX is set, bit 0 of sprite pattern index is forced to 0 */
 		if ( cgx )
@@ -800,13 +870,15 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 		if ( cgy & 2 )
 			obj_i &= ~12;
 
-		if (obj_l < obj_h) {
+		if (obj_l < obj_h) 
+		{
 
 			sprites_drawn++;
-			if(sprites_drawn > 16) {
+			if(sprites_drawn > 16) 
+			{
 				vdc[which].status |= VDC_OR;
-				if(vdc[which].vdc_data[CR].w&CR_OV)
-					cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+				if(vdc[which].vdc_data[CR].w & CR_OV)
+					cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 				continue;  /* Should cause an interrupt */
 			}
 
@@ -820,17 +892,22 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 
 				conv_obj(which, obj_i + (cgypos << 2), obj_l, hf, vf, buf);
 
-				for(x=0;x<16;x++)
+				for(x = 0; x < 16; x++)
 				{
-					if(((obj_x + x)<(vdc[which].physical_width))&&((obj_x + x)>=0))
+					if(((obj_x + x) < (vdc[which].physical_width)) && ((obj_x + x) >= 0))
 					{
-						if ( buf[x] ) {
-							if( drawn[pixel_x] < 2 ) {
-								if( priority || drawn[pixel_x] == 0 ) {
+						if ( buf[x] )
+						 {
+							if( drawn[pixel_x] < 2 ) 
+							{
+								if( priority || drawn[pixel_x] == 0 ) 
+								{
 									line_buffer[pixel_x] = color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w;
-									if ( vdc[which].physical_width != 512 ) {
+									if ( vdc[which].physical_width != 512 ) 
+									{
 										int dp = 1;
-										while ( pixel_x + dp < ( ( ( obj_x + x + 1 ) * 512 ) / vdc[which].physical_width ) ) {
+										while ( pixel_x + dp < ( ( ( obj_x + x + 1 ) * 512 ) / vdc[which].physical_width ) ) 
+										{
 											drawn[pixel_x + dp] = i + 2;
 											line_buffer[pixel_x + dp] = color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w;
 											dp++;
@@ -840,17 +917,20 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 								drawn[pixel_x] = i + 2;
 							}
 							/* Check for sprite #0 collision */
-							else if (drawn[pixel_x]==2)
+							else if (drawn[pixel_x] == 2)
 							{
-								if(vdc[which].vdc_data[CR].w&CR_CC)
-									cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
-								vdc[which].status|=VDC_CR;
+								if(vdc[which].vdc_data[CR].w & CR_CC)
+									cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+								vdc[which].status |= VDC_CR;
 							}
 						}
 					}
-					if ( vdc[which].physical_width != 512 ) {
+					if ( vdc[which].physical_width != 512 ) 
+					{
 						pixel_x = ( ( obj_x + x + 1 ) * 512 ) / vdc[which].physical_width;
-					} else {
+					} 
+					else 
+					{
 						pixel_x += 1;
 					}
 				}
@@ -862,17 +942,22 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 
 				conv_obj(which, obj_i + (cgypos << 2) + (hf ? 2 : 0), obj_l, hf, vf, buf);
 
-				for(x=0;x<16;x++)
+				for(x = 0; x < 16; x++)
 				{
-					if(((obj_x + x)<(vdc[which].physical_width))&&((obj_x + x)>=0))
+					if(((obj_x + x) < (vdc[which].physical_width)) && ((obj_x + x) >= 0))
 					{
-						if ( buf[x] ) {
-							if( drawn[pixel_x] < 2 ) {
-								if ( priority || drawn[pixel_x] == 0 ) {
+						if ( buf[x] ) 
+						{
+							if( drawn[pixel_x] < 2 ) 
+							{
+								if ( priority || drawn[pixel_x] == 0 ) 
+								{
 									line_buffer[pixel_x] = color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w;
-									if ( vdc[which].physical_width != 512 ) {
+									if ( vdc[which].physical_width != 512 ) 
+									{
 										int dp = 1;
-										while ( pixel_x + dp < ( ( ( obj_x + x + 1 ) * 512 ) / vdc[which].physical_width ) ) {
+										while ( pixel_x + dp < ( ( ( obj_x + x + 1 ) * 512 ) / vdc[which].physical_width ) ) 
+										{
 											drawn[pixel_x + dp] = i + 2;
 											line_buffer[pixel_x + dp] = color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w;
 											dp++;
@@ -882,16 +967,20 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 								drawn[pixel_x] = i + 2;
 							}
 							/* Check for sprite #0 collision */
-							else if ( drawn[pixel_x] == 2 ) {
-								if(vdc[which].vdc_data[CR].w&CR_CC)
-									cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
-								vdc[which].status|=VDC_CR;
+							else if ( drawn[pixel_x] == 2 ) 
+							{
+								if(vdc[which].vdc_data[CR].w & CR_CC)
+									cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+								vdc[which].status |= VDC_CR;
 							}
 						}
 					}
-					if ( vdc[which].physical_width != 512 ) {
+					if ( vdc[which].physical_width != 512 ) 
+					{
 						pixel_x = ( ( obj_x + x + 1 ) * 512 ) / vdc[which].physical_width;
-					} else {
+					}
+					else 
+					{
 						pixel_x += 1;
 					}
 				}
@@ -900,23 +989,31 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
                    is only drawn if there are 2 open slots.
                 */
 				sprites_drawn++;
-				if( sprites_drawn > 16 ) {
+				if( sprites_drawn > 16 ) 
+				{
 					vdc[which].status |= VDC_OR;
 					if(vdc[which].vdc_data[CR].w&CR_OV)
-						cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
-				} else {
+						cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+				} 
+				else 
+				{
 					conv_obj(which, obj_i + (cgypos << 2) + (hf ? 0 : 2), obj_l, hf, vf, buf);
-					for(x=0;x<16;x++)
+					for(x = 0; x < 16; x++)
 					{
-						if(((obj_x + 0x10 + x)<(vdc[which].physical_width))&&((obj_x + 0x10 + x)>=0))
+						if(((obj_x + 0x10 + x) < (vdc[which].physical_width)) && ((obj_x + 0x10 + x) >= 0))
 						{
-							if ( buf[x] ) {
-								if( drawn[pixel_x] < 2 ) {
-									if( priority || drawn[pixel_x] == 0 ) {
+							if ( buf[x] ) 
+							{
+								if( drawn[pixel_x] < 2 ) 
+								{
+									if( priority || drawn[pixel_x] == 0 ) 
+									{
 										line_buffer[pixel_x] = color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w;
-										if ( vdc[which].physical_width != 512 ) {
+										if ( vdc[which].physical_width != 512 ) 
+										{
 											int dp = 1;
-											while ( pixel_x + dp < ( ( ( obj_x + x + 17 ) * 512 ) / vdc[which].physical_width ) ) {
+											while ( pixel_x + dp < ( ( ( obj_x + x + 17 ) * 512 ) / vdc[which].physical_width ) ) 
+											{
 												drawn[pixel_x + dp] = i + 2;
 												line_buffer[pixel_x + dp] = color_base + vce.vce_data[0x100 + (palette << 4) + buf[x]].w;
 												dp++;
@@ -926,16 +1023,20 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 									drawn[pixel_x] = i + 2;
 								}
 								/* Check for sprite #0 collision */
-								else if ( drawn[pixel_x]==2 ) {
-									if(vdc[which].vdc_data[CR].w&CR_CC)
-										cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
-									vdc[which].status|=VDC_CR;
+								else if ( drawn[pixel_x] == 2 )
+								 {
+									if(vdc[which].vdc_data[CR].w & CR_CC)
+										cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+									vdc[which].status |= VDC_CR;
 								}
 							}
 						}
-						if ( vdc[which].physical_width != 512 ) {
+						if ( vdc[which].physical_width != 512 ) 
+						{
 							pixel_x = ( ( obj_x + x + 17 ) * 512 ) / vdc[which].physical_width;
-						} else {
+						} 
+						else 
+						{
 							pixel_x += 1;
 						}
 					}
@@ -980,29 +1081,35 @@ static void vdc_do_dma(running_machine *machine, int which)
 	vdc[which].vdc_data[LENR].w = len;
 	if(dvc)
 	{
-		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 	}
 
 }
 
-static void vpc_update_prio_map( void ) {
+static void vpc_update_prio_map( void ) 
+{
 	int i;
 
-	for( i = 0; i < 512; i++ ) {
+	for( i = 0; i < 512; i++ ) 
+	{
 		vpc.prio_map[i] = 0;
-		if ( vpc.window1.w < 0x40 || i > vpc.window1.w ) {
+		if ( vpc.window1.w < 0x40 || i > vpc.window1.w ) 
+		{
 			vpc.prio_map[i] |= 1;
 		}
-		if ( vpc.window2.w < 0x40 || i > vpc.window2.w ) {
+		if ( vpc.window2.w < 0x40 || i > vpc.window2.w ) 
+		{
 			vpc.prio_map[i] |= 2;
 		}
 	}
 }
 
-WRITE8_HANDLER( vpc_w ) {
+WRITE8_HANDLER( vpc_w ) 
+{
 //if ( offset < 2 )
 //printf("VPC write offset %02X, data %02X\n", offset, data );
-	switch( offset & 0x07 ) {
+	switch( offset & 0x07 ) 
+	{
 	case 0x00:	/* Priority register #0 */
 		vpc.priority.b.l = data;
 		vpc.vpc_prio[0].prio = ( data >> 2 ) & 3;
@@ -1043,9 +1150,11 @@ WRITE8_HANDLER( vpc_w ) {
 	}
 }
 
-READ8_HANDLER( vpc_r ) {
+READ8_HANDLER( vpc_r ) 
+{
 	UINT8 data = 0;
-	switch( offset & 0x07 ) {
+	switch( offset & 0x07 ) 
+	{
 	case 0x00:  /* Priority register #0 */
 		data = vpc.priority.b.l;
 		break;
@@ -1070,7 +1179,7 @@ READ8_HANDLER( vpc_r ) {
 
 static void vpc_init( running_machine *machine )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	vpc_w( space, 0, 0x11 );
 	vpc_w( space, 1, 0x11 );
 	vpc.window1.w = 0;
@@ -1078,15 +1187,20 @@ static void vpc_init( running_machine *machine )
 	vpc.vdc_select = 0;
 }
 
-WRITE8_HANDLER( sgx_vdc_w ) {
-	if ( vpc.vdc_select ) {
+WRITE8_HANDLER( sgx_vdc_w ) 
+{
+	if ( vpc.vdc_select ) 
+	{
 		vdc_1_w( space, offset, data );
-	} else {
+	} 
+	else 
+	{
 		vdc_0_w( space, offset, data );
 	}
 }
 
-READ8_HANDLER( sgx_vdc_r ) {
+READ8_HANDLER( sgx_vdc_r ) 
+{
 	return ( vpc.vdc_select ) ? vdc_1_r( space, offset ) : vdc_0_r( space, offset );
 }
 

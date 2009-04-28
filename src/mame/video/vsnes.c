@@ -16,12 +16,12 @@ PALETTE_INIT( vsdual )
 
 static void ppu_irq_1( const device_config *device, int *ppu_regs )
 {
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static void ppu_irq_2( const device_config *device, int *ppu_regs )
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */

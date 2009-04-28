@@ -45,16 +45,22 @@ static TIMER_CALLBACK( battles_nmi_generate )
 
 	battles_customio_prev_command = battles_customio_command;
 
-	if( battles_customio_command & 0x10 ){
-		if( battles_customio_command_count == 0 ){
-			cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
-		}else{
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
-			cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
+	if( battles_customio_command & 0x10 )
+	{
+		if( battles_customio_command_count == 0 )
+		{
+			cputag_set_input_line(machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
 		}
-	}else{
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
-		cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
+		else
+		{
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
+		}
+	}
+	else
+	{
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine, "sub3", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	battles_customio_command_count++;
 }

@@ -442,7 +442,7 @@ static UINT32 voodoo3_pci_r(const device_config *busdevice, const device_config 
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(device->machine->cpu[0]));
+			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 	}
 	return 0;
 }
@@ -510,7 +510,7 @@ static void voodoo3_pci_w(const device_config *busdevice, const device_config *d
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(device->machine->cpu[0]));
+			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(cputag_get_cpu(device->machine, "maincpu")));
 	}
 }
 
@@ -637,8 +637,8 @@ static DRIVER_INIT(vipercf)
 
 	DRIVER_INIT_CALL(viper);
 
-	memory_install_readwrite64_device_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), ide, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
-	memory_install_readwrite64_device_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
+	memory_install_readwrite64_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
+	memory_install_readwrite64_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
 }
 
 

@@ -864,7 +864,7 @@ static TIMER_CALLBACK(sound_t1_callback)
 
 		if (dc_40103 == 0)
 		{
-			cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
+			cputag_set_input_line(machine, "soundcpu", 0, ASSERT_LINE);
 		}
 	}
 }

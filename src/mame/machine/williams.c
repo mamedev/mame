@@ -311,14 +311,14 @@ static void williams_main_irq(const device_config *device, int state)
 	int combined_state = pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
 
 	/* IRQ to the main CPU */
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void williams_main_firq(const device_config *device, int state)
 {
 	/* FIRQ to the main CPU */
-	cpu_set_input_line(device->machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -328,7 +328,7 @@ static void williams_snd_irq(const device_config *device, int state)
 	int combined_state = pia6821_get_irq_a(pia_2) | pia6821_get_irq_b(pia_2);
 
 	/* IRQ to the sound CPU */
-	cpu_set_input_line(device->machine->cpu[1], M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "soundcpu", M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -346,7 +346,7 @@ static void mysticm_main_irq(const device_config *device, int state)
 	int combined_state = pia6821_get_irq_b(pia_0) | pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
 
 	/* IRQ to the main CPU */
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -357,7 +357,7 @@ static void tshoot_main_irq(const device_config *device, int state)
 	int combined_state = pia6821_get_irq_a(pia_0) | pia6821_get_irq_b(pia_0) | pia6821_get_irq_a(pia_1) | pia6821_get_irq_b(pia_1);
 
 	/* IRQ to the main CPU */
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -452,14 +452,14 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
 
 static STATE_POSTLOAD( williams2_postload )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	williams2_bank_select_w(space, 0, vram_bank);
 }
 
 
 MACHINE_RESET( williams2 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* configure memory banks */
 	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
@@ -730,14 +730,14 @@ WRITE8_HANDLER( williams2_7segment_w )
 
 static STATE_POSTLOAD( defender_postload )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	defender_bank_select_w(space, 0, vram_bank);
 }
 
 
 MACHINE_RESET( defender )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	MACHINE_RESET_CALL(williams_common);
 
@@ -883,10 +883,10 @@ WRITE8_HANDLER( blaster_bank_select_w )
 
 static READ8_DEVICE_HANDLER( lottofun_input_port_0_r )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* merge in the ticket dispenser status */
-	return input_port_read(device->machine, "IN0") | ticket_dispenser_r(space,offset);
+	return input_port_read(device->machine, "IN0") | ticket_dispenser_r(space, offset);
 }
 
 

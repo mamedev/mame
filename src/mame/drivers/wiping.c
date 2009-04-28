@@ -88,9 +88,9 @@ static READ8_HANDLER( ports_r )
 static WRITE8_HANDLER( subcpu_reset_w )
 {
 	if (data & 1)
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

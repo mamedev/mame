@@ -141,7 +141,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		const address_space *mainspace;
 		UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-		mainspace = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		wardner_membank = data;
 
 		if (data)
@@ -176,7 +176,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 
 STATE_POSTLOAD( wardner_restore_bank )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	wardner_ramrom_bank_sw(space,0,1);	/* Dummy value to ensure restoration */
 	wardner_ramrom_bank_sw(space,0,wardner_membank);
@@ -417,7 +417,7 @@ static const gfx_layout spritelayout =
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate);
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

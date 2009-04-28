@@ -376,11 +376,13 @@ static WRITE16_HANDLER( irqctrl_w )
 
 		// Bit 0 : SUBINT
 		if ( (wecleman_irqctrl & 1) && (!(data & 1)) )	// 1->0 transition
-			cpu_set_input_line(space->machine->cpu[1],4,HOLD_LINE);
+			cputag_set_input_line(space->machine, "sub", 4, HOLD_LINE);
 
 		// Bit 1 : NSUBRST
-		if (data & 2)   cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE  );
-		else                    cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE );
+		if (data & 2)
+			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
+		else
+			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 
 		// Bit 2 : SOUND-ON
 		// Bit 3 : SOUNDRST
@@ -655,8 +657,8 @@ WRITE16_HANDLER( wecleman_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,0,data & 0xFF);
-		cpu_set_input_line(space->machine->cpu[2],0, HOLD_LINE);
+		soundlatch_w(space, 0, data & 0xFF);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 }
 
@@ -715,8 +717,8 @@ static WRITE16_HANDLER( hotchase_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,0,data & 0xFF);
-		cpu_set_input_line(space->machine->cpu[2],M6809_IRQ_LINE, HOLD_LINE);
+		soundlatch_w(space, 0, data & 0xFF);
+		cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 

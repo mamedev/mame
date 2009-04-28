@@ -55,12 +55,12 @@ VIDEO_UPDATE( yunsung8 );
 
 static MACHINE_RESET( yunsung8 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8* yunsung8_videoram = auto_alloc_array(machine, UINT8, 0x4000);
 
 	yunsung8_videoram_0 = yunsung8_videoram + 0x0000;	// Ram is banked
 	yunsung8_videoram_1 = yunsung8_videoram + 0x2000;
-	yunsung8_videobank_w(space,0,0);
+	yunsung8_videobank_w(space, 0, 0);
 }
 
 
@@ -486,14 +486,14 @@ GFXDECODE_END
 
 static void yunsung8_adpcm_int(const device_config *device)
 {
-	static int toggle=0;
+	static int toggle = 0;
 
-	msm5205_data_w (device,adpcm>>4);
-	adpcm<<=4;
+	msm5205_data_w(device, adpcm >> 4);
+	adpcm <<= 4;
 
 	toggle ^= 1;
 	if (toggle)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface yunsung8_msm5205_interface =

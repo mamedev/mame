@@ -238,7 +238,7 @@ static WRITE32_HANDLER( color_ram_w )
 
 static TIMER_CALLBACK( interrupt5 )
 {
-	cpu_set_input_line(machine->cpu[0], 5, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 }
 
 
@@ -472,7 +472,7 @@ static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
     ........ .x......   Vibration
 */
 
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ32_HANDLER( cbombers_adc_r )

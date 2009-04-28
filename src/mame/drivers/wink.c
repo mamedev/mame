@@ -56,7 +56,7 @@ static READ8_HANDLER( player_inputs_r )
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
 	//timer_call_after_resynch(space->machine, NULL, 0, NULL);
 }

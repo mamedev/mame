@@ -97,7 +97,7 @@ static INPUT_CHANGED( coin_changed )
 		coin_counter_w(0, 1);
 		coin_counter_w(0, 0);
 
-		cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
 		timer_set(field->port->machine, double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(field->port->machine->primary_screen))), NULL, 0, clear_coin_status);

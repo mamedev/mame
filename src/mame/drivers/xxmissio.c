@@ -53,7 +53,7 @@ static WRITE8_HANDLER ( xxmissio_status_m_w )
 
 		case 0x40:
 			xxmissio_status &= ~0x08;
-			cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0x10);
+			cputag_set_input_line_and_vector(space->machine, "sub", 0, HOLD_LINE, 0x10);
 			break;
 
 		case 0x80:
@@ -76,7 +76,7 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 
 		case 0x80:
 			xxmissio_status &= ~0x04;
-			cpu_set_input_line_and_vector(space->machine->cpu[0],0,HOLD_LINE,0x10);
+			cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, 0x10);
 			break;
 	}
 }

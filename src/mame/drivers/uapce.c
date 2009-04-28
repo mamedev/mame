@@ -42,7 +42,7 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
 
 	if ( diff & 0x40 )
 	{
-		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// bit 3 - enable 752 Hz (D-3) square wave output
