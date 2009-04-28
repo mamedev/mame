@@ -641,7 +641,7 @@ static void hng64_do_dma (const address_space *space)
 {
 	logerror("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
-	while (hng_dma_len>0)
+	while (hng_dma_len>=0)
 	{
 		UINT32 dat;
 
@@ -676,23 +676,6 @@ static WRITE32_HANDLER( hng_dma_len_w )
 	hng64_do_dma(space);
 
 }
-
-#ifdef UNUSED_FUNCTION
-READ32_HANDLER( hng64_videoram_r )
-{
-	return hng64_videoram[offset];
-}
-
-WRITE32_HANDLER( hng64_mainram_w )
-{
-	COMBINE_DATA (&hng_mainram[offset]);
-}
-
-READ32_HANDLER( hng64_cart_r )
-{
-	return hng_cart[offset];
-}
-#endif
 
 static READ32_HANDLER( hng64_sram_r )
 {
@@ -855,7 +838,7 @@ static WRITE32_HANDLER( tcram_w )
     if (offset == 0x0000000b)
     {
         sprintf(writeString, "%s %.8x ", writeString, hng64_tcram[offset]) ;
-//      popmessage("%s", writeString) ;
+//      _("%s", writeString) ;
     }
 */
 }
