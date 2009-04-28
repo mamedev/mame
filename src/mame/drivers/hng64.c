@@ -636,10 +636,10 @@ static READ32_HANDLER( hng64_port_read )
 
 
 /* preliminary dma code, dma is used to copy program code -> ram */
-static int hng_dma_start,hng_dma_dst,hng_dma_len;
+static INT32 hng_dma_start,hng_dma_dst,hng_dma_len;
 static void hng64_do_dma (const address_space *space)
 {
-	logerror("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
+	printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
 	while (hng_dma_len>=0)
 	{
@@ -651,28 +651,26 @@ static void hng64_do_dma (const address_space *space)
 		hng_dma_dst+=4;
 		hng_dma_len--;
 	}
-
-	hng_dma_start+=4;
-	hng_dma_dst+=4;
 }
 
 
 static WRITE32_HANDLER( hng_dma_start_w )
 {
 	logerror ("DMA Start Write %08x\n",data);
-	hng_dma_start = data;
+	COMBINE_DATA(&hng_dma_start);
 }
 
 static WRITE32_HANDLER( hng_dma_dst_w )
 {
 	logerror ("DMA Dst Write %08x\n",data);
-	hng_dma_dst = data;
+	COMBINE_DATA(&hng_dma_dst);
 }
 
 static WRITE32_HANDLER( hng_dma_len_w )
 {
 	logerror ("DMA Len Write %08x\n",data);
-	hng_dma_len = data;
+	COMBINE_DATA(&hng_dma_len);
+
 	hng64_do_dma(space);
 
 }
