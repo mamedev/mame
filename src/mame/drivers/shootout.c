@@ -10,9 +10,6 @@
     Perhaps the USA arm of Deco designed this game rather than the Japanese
     arm?
 
-    Shoot Out (Japan) uses the YM2203 ports for CPU bankswitching so it does
-    not work with sound turned off.
-
     Shoot Out (Korean bootleg) is based on the earlier DE-0203 board but
     strangely features the same encryption as used on the DE-0219 board.  It
     also has some edited graphics.
@@ -76,72 +73,51 @@ static WRITE8_HANDLER( shootout_coin_counter_w )
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( shootout_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE(shootout_bankswitch_w)
+	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE(shootout_flipscreen_w)
+	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE(shootout_coin_counter_w)
+	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2") AM_WRITE(sound_cpu_command_w)
+	AM_RANGE(0x1004, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shootouj_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)	/* foreground */
-	AM_RANGE(0x2800, 0x2fff) AM_READ(SMH_RAM)	/* background */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(shootout_bankswitch_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(shootout_flipscreen_w)
-	AM_RANGE(0x1002, 0x1002) AM_WRITE(shootout_coin_counter_w)
-	AM_RANGE(0x1003, 0x1003) AM_WRITE(sound_cpu_command_w)
-	AM_RANGE(0x1004, 0x17ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1800, 0x19ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(shootout_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem_alt, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x21ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREAD("ym", ym2203_r)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)	/* foreground */
-	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM)	/* background */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_alt, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
-	AM_RANGE(0x2000, 0x21ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ym", ym2203_w)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(shootout_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ym", ym2203_r,ym2203_w)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE(&shootout_textram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ym", ym2203_r)
+static ADDRESS_MAP_START( shootout_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym", ym2203_r,ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym", ym2203_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /*******************************************************************************/
+
+static INPUT_CHANGED( coin_inserted )
+{
+	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
 
 static INPUT_PORTS_START( shootout )
 	PORT_START("P1")
@@ -161,8 +137,8 @@ static INPUT_PORTS_START( shootout )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -293,28 +269,14 @@ static const ym2203_interface ym2203_interface2 =
 	shootout_snd2_irq
 };
 
-static INTERRUPT_GEN( shootout_interrupt )
-{
-	static int coin = 0;
-
-	if ( input_port_read(device->machine, "P2") & 0xc0 ) {
-		if ( coin == 0 ) {
-			coin = 1;
-			nmi_line_pulse(device);
-		}
-	} else
-		coin = 0;
-}
-
 static MACHINE_DRIVER_START( shootout )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("screen", shootout_interrupt) /* nmi's are triggered at coin up */
+	MDRV_CPU_PROGRAM_MAP(shootout_map,0)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(shootout_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -344,8 +306,7 @@ static MACHINE_DRIVER_START( shootouj )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
-	MDRV_CPU_PROGRAM_MAP(readmem_alt,writemem_alt)
-	MDRV_CPU_VBLANK_INT("screen", shootout_interrupt) /* nmi's are triggered at coin up */
+	MDRV_CPU_PROGRAM_MAP(shootouj_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

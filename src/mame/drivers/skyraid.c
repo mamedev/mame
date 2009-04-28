@@ -44,13 +44,6 @@ static PALETTE_INIT( skyraid )
 	palette_set_color(machine, 19, MAKE_RGB(0xE0, 0xE0, 0xE0));
 }
 
-
-static READ8_HANDLER( skyraid_alpha_num_r)
-{
-	return skyraid_alpha_num_ram[offset & 0x7f];
-}
-
-
 static READ8_HANDLER( skyraid_port_0_r )
 {
 	UINT8 val = input_port_read(space->machine, "LANGUAGE");
@@ -62,13 +55,6 @@ static READ8_HANDLER( skyraid_port_0_r )
 
 	return val;
 }
-
-
-static WRITE8_HANDLER( skyraid_alpha_num_w )
-{
-	skyraid_alpha_num_ram[offset & 0x7f] = data;
-}
-
 
 static WRITE8_HANDLER( skyraid_sound_w )
 {
@@ -101,34 +87,23 @@ static WRITE8_HANDLER( skyraid_scroll_w )
 }
 
 
-static ADDRESS_MAP_START( skyraid_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READ(SMH_RAM) AM_MIRROR(0x300)
-	AM_RANGE(0x0800, 0x087f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0880, 0x0bff) AM_READ(skyraid_alpha_num_r)
+static ADDRESS_MAP_START( skyraid_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
+	AM_RANGE(0x0400, 0x040f) AM_WRITEONLY AM_BASE(&skyraid_pos_ram)
+	AM_RANGE(0x0800, 0x087f) AM_RAM AM_MIRROR(0x480) AM_BASE(&skyraid_alpha_num_ram)
 	AM_RANGE(0x1000, 0x1000) AM_READ(skyraid_port_0_r)
-	AM_RANGE(0x1000, 0x1001) AM_READ_PORT("DSW")
+	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW")
 	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("COIN")
 	AM_RANGE(0x1400, 0x1401) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( skyraid_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE(SMH_RAM) AM_MIRROR(0x300)
-	AM_RANGE(0x0400, 0x040f) AM_WRITE(SMH_RAM) AM_BASE(&skyraid_pos_ram)
-	AM_RANGE(0x0800, 0x087f) AM_WRITE(SMH_RAM) AM_BASE(&skyraid_alpha_num_ram)
-	AM_RANGE(0x0880, 0x0bff) AM_WRITE(skyraid_alpha_num_w)
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITE(SMH_RAM) AM_BASE(&skyraid_obj_ram)
+	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_BASE(&skyraid_obj_ram)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(skyraid_scroll_w)
 	AM_RANGE(0x4400, 0x4400) AM_WRITE(skyraid_sound_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(skyraid_range_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(skyraid_offset_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x7000, 0x7fff) AM_ROM
+	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( skyraid )
 	PORT_START("LANGUAGE")
@@ -263,7 +238,7 @@ static MACHINE_DRIVER_START( skyraid )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 12)
-	MDRV_CPU_PROGRAM_MAP(skyraid_readmem, skyraid_writemem)
+	MDRV_CPU_PROGRAM_MAP(skyraid_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

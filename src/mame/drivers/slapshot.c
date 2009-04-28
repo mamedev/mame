@@ -309,25 +309,18 @@ static ADDRESS_MAP_START( opwolf3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xe00007) AM_READWRITE(opwolf3_adc_r, opwolf3_adc_req_w)
 ADDRESS_MAP_END
 
+
 /***************************************************************************/
 
-static ADDRESS_MAP_START( z80_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(10))
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVREAD("ym", ym2610_r)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP
-	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READNOP
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe003) AM_DEVWRITE("ym", ym2610_w)
-	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
+static ADDRESS_MAP_START( opwolf3_z80_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(10)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ym", ym2610_r,ym2610_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_WRITE(taitosound_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r,taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
+	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
@@ -529,7 +522,7 @@ static MACHINE_DRIVER_START( slapshot )
 	MDRV_CPU_VBLANK_INT("screen", slapshot_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(opwolf3_z80_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -571,7 +564,7 @@ static MACHINE_DRIVER_START( opwolf3 )
 	MDRV_CPU_VBLANK_INT("screen", slapshot_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(opwolf3_z80_sound_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

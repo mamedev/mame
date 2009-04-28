@@ -125,53 +125,33 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1800, 0x1bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x20ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sidepckt_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM // ???
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sidepckt_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM // ???
+	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2100, 0x24ff) AM_RAM // ???
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3014, 0x3014) AM_READ(sidepckt_i8751_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(sidepckt_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE(sidepckt_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2000, 0x20ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(sound_cpu_command_w)
-	AM_RANGE(0x300c, 0x300c) AM_WRITE(sidepckt_flipscreen_w)
-	AM_RANGE(0x3018, 0x3018) AM_WRITE(sidepckt_i8751_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x300c, 0x300c) AM_READNOP AM_WRITE(sidepckt_flipscreen_w)
+//	AM_RANGE(0x3014, 0x3014) //i8751 read
+//  AM_RANGE(0x3018, 0x3018) //i8751 write
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( j_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(sidepckt_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE(sidepckt_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2000, 0x20ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3004, 0x3004) AM_WRITE(sound_cpu_command_w)
-	AM_RANGE(0x300c, 0x300c) AM_WRITE(sidepckt_flipscreen_w)
-	AM_RANGE(0x3018, 0x3018) AM_WRITE(sidepctj_i8751_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
-    AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-    AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-    AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_w)
-    AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_w)
-    AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
 
 /******************************************************************************/
 
@@ -291,11 +271,11 @@ static MACHINE_DRIVER_START( sidepckt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(sidepckt_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 								/* NMIs are triggered by the main cpu */
 
 	/* video hardware */
@@ -324,43 +304,6 @@ static MACHINE_DRIVER_START( sidepckt )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-
-static MACHINE_DRIVER_START( sidepctj )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,j_writemem)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-								/* NMIs are triggered by the main cpu */
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* VERIFY:  May be 55 or 56 */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-
-	MDRV_GFXDECODE(sidepckt)
-	MDRV_PALETTE_LENGTH(256)
-
-	MDRV_PALETTE_INIT(sidepckt)
-	MDRV_VIDEO_START(sidepckt)
-	MDRV_VIDEO_UPDATE(sidepckt)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
 
 /***************************************************************************
 
@@ -374,6 +317,9 @@ ROM_START( sidepckt )
 
     ROM_REGION( 0x10000, "audiocpu", 0 )
     ROM_LOAD( "dh04.bin",     0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
+
+    ROM_REGION( 0x10000, "mcu", 0 ) //i8751 MCU
+    ROM_LOAD( "i8751.mcu",     0x00000, 0x8000, NO_DUMP )
 
     ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
     ROM_LOAD( "sp_07.bin",    0x00000, 0x8000, CRC(9d6f7969) SHA1(583852be0861a89c63ce09eb39146ec379b9e12d) ) /* characters */
@@ -396,6 +342,9 @@ ROM_START( sidepctj )
 
     ROM_REGION( 0x10000, "audiocpu", 0 )
     ROM_LOAD( "dh04.bin",     0x08000, 0x8000, CRC(d076e62e) SHA1(720ff1a6a58697b4a9c7c4f31c24a2cf8a04900a) )
+
+    ROM_REGION( 0x10000, "mcu", 0 ) //i8751 MCU
+    ROM_LOAD( "i8751.mcu",     0x00000, 0x8000, NO_DUMP )
 
     ROM_REGION( 0x18000, "gfx1", ROMREGION_DISPOSE )
     ROM_LOAD( "dh07.bin",     0x00000, 0x8000, CRC(7d0ce858) SHA1(3a158f218a762e6841d2611f41ace67a1afefb35) ) /* characters */
@@ -436,7 +385,19 @@ ROM_START( sidepctb )
 ROM_END
 
 
+static DRIVER_INIT( sidepckt )
+{
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepckt_i8751_w  );
+}
 
-GAME( 1986, sidepckt, 0,        sidepckt, sidepckt, 0, ROT0, "Data East Corporation", "Side Pocket (World)", 0 )
-GAME( 1986, sidepctj, sidepckt, sidepctj, sidepckt, 0, ROT0, "Data East Corporation", "Side Pocket (Japan)", 0 )
-GAME( 1986, sidepctb, sidepckt, sidepckt, sidepckt, 0, ROT0, "bootleg", "Side Pocket (bootleg)", 0 )
+static DRIVER_INIT( sidepctj )
+{
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepctj_i8751_w  );
+}
+
+
+GAME( 1986, sidepckt, 0,        sidepckt, sidepckt, sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)", 0 )
+GAME( 1986, sidepctj, sidepckt, sidepckt, sidepckt, sidepctj, ROT0, "Data East Corporation", "Side Pocket (Japan)", 0 )
+GAME( 1986, sidepctb, sidepckt, sidepckt, sidepckt, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", 0 )

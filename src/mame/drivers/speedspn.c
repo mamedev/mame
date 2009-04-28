@@ -116,29 +116,18 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 
 /* main cpu */
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8800, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9fff) AM_READ(speedspn_vidram_r) /* banked? */
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa800, 0xafff) AM_READ(SMH_RAM)
-	AM_RANGE(0xb000, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK(1)) /* banked ROM */
+static ADDRESS_MAP_START( speedspn_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)	/* RAM COLOUR */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(speedspn_attram_w) AM_BASE(&speedspn_attram)
+	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(speedspn_vidram_r,speedspn_vidram_w)	/* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM
+	AM_RANGE(0xa800, 0xafff) AM_RAM
+	AM_RANGE(0xb000, 0xbfff) AM_RAM 											/* RAM PROGRAM */
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(1) 										/* banked ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)	/* RAM COLOUR */
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(speedspn_attram_w) AM_BASE(&speedspn_attram)
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(speedspn_vidram_w)	/* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa800, 0xafff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xbfff) AM_WRITE(SMH_RAM) /* RAM PROGRAM */
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)	/* banked ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( speedspn_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_WRITE(speedspn_global_display_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
@@ -152,19 +141,14 @@ ADDRESS_MAP_END
 
 /* sound cpu */
 
-static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("oki", okim6295_r)
+static ADDRESS_MAP_START( speedspn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", oki_banking_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("oki", okim6295_w)
-ADDRESS_MAP_END
 
 /*** INPUT PORT **************************************************************/
 
@@ -297,12 +281,12 @@ static MACHINE_DRIVER_START( speedspn )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,6000000)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(speedspn_map,0)
+	MDRV_CPU_IO_MAP(speedspn_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
+	MDRV_CPU_PROGRAM_MAP(speedspn_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

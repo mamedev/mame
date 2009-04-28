@@ -487,7 +487,7 @@ static MACHINE_DRIVER_START( funystrp )
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 //  MDRV_CPU_ADD("audiocpu", Z80,30000000/8)
-//  MDRV_CPU_PROGRAM_MAP(splash_readmem_sound,splash_writemem_sound)
+//  MDRV_CPU_PROGRAM_MAP(funystrp_sound_map,0)
 //  MDRV_CPU_PERIODIC_INT(nmi_line_pulse,60*64)  /* needed for the msm5205 to play the samples */
 
 	/* video hardware */
@@ -812,7 +812,7 @@ ROM_START( funystrp )
 	ROM_LOAD16_BYTE( "12.u87",  0x000000, 0x010000, CRC(4ac173f3) SHA1(c211bc8528d26d5a96fce4b0ebfddf2aa6a257ef) )
 	ROM_LOAD16_BYTE( "13.u111", 0x000001, 0x010000, CRC(1358c60c) SHA1(7142aa6f94cfdfb1b70b37742201b2c213f85137) )
 
-	ROM_REGION( 0x080000, "cpu1", 0 )	/* Z80 code + sound data */
+	ROM_REGION( 0x080000, "audiocpu", 0 )	/* Z80 code + sound data */
 	ROM_LOAD( "11.u130", 0x000000, 0x040000, CRC(e969ea2b) SHA1(54d5bb59e9909a6b7e66764f91e2f98f8f8832c5) )
 	ROM_LOAD( "10.u118", 0x040000, 0x040000, CRC(0894b936) SHA1(cd01eb86e403e20c56492185ecd9bb0f4f27867a) )
 

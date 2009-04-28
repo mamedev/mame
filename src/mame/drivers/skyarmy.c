@@ -58,18 +58,6 @@ static WRITE8_HANDLER( skyarmy_colorram_w )
         tilemap_mark_tile_dirty(skyarmy_tilemap,offset);
 }
 
-static WRITE8_HANDLER( skyarmy_scrollram_w )
-{
-        skyarmy_scrollram[offset] = data;
-}
-
-
-static READ8_HANDLER( skyarmy_scrollram_r )
-{
-        return skyarmy_scrollram[offset];
-}
-
-
 static PALETTE_INIT( skyarmy )
 {
 	int i;
@@ -154,29 +142,27 @@ static WRITE8_HANDLER( nmi_enable_w )
 }
 
 
-static ADDRESS_MAP_START( skyarmy_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7FFF) AM_READ(SMH_ROM)
-        AM_RANGE(0x8000, 0x87FF) AM_READ(SMH_RAM)
-        AM_RANGE(0x8800, 0x93FF) AM_READ(SMH_RAM) /* Video RAM */
-        AM_RANGE(0x9800, 0x983F) AM_READ(SMH_RAM) /* Sprites */
-        AM_RANGE(0x9840, 0x985F) AM_READ(skyarmy_scrollram_r) /* Sroll RAM */
-        AM_RANGE(0xA000, 0xA000) AM_READ_PORT("DSW")
-        AM_RANGE(0xA001, 0xA001) AM_READ_PORT("P1")
-        AM_RANGE(0xA002, 0xA002) AM_READ_PORT("P2")
-        AM_RANGE(0xA003, 0xA003) AM_READ_PORT("SYSTEM")
+static ADDRESS_MAP_START( skyarmy_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_BASE(&skyarmy_videoram) /* Video RAM */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(skyarmy_colorram_w) AM_BASE(&skyarmy_colorram) /* Color RAM */
+	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* Sprites */
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&skyarmy_scrollram)  /* Scroll RAM */
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
+	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")
+	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
+	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(nmi_enable_w) // ???
+	AM_RANGE(0xa005, 0xa005) AM_WRITENOP
+	AM_RANGE(0xa006, 0xa006) AM_WRITENOP
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( skyarmy_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7FFF) AM_WRITE(SMH_ROM)
-        AM_RANGE(0x8000, 0x87FF) AM_WRITE(SMH_RAM)
-        AM_RANGE(0x8800, 0x8BFF) AM_WRITE(skyarmy_videoram_w) AM_BASE(&skyarmy_videoram) /* Video RAM */
-        AM_RANGE(0x9000, 0x93FF) AM_WRITE(skyarmy_colorram_w) AM_BASE(&skyarmy_colorram) /* Color RAM */
-        AM_RANGE(0x9800, 0x983F) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* Sprites */
-        AM_RANGE(0x9840, 0x985F) AM_WRITE(skyarmy_scrollram_w) AM_BASE(&skyarmy_scrollram) /* Sprites */
-        AM_RANGE(0xa004, 0xa004) AM_WRITE(nmi_enable_w) // ???
-        AM_RANGE(0xa005, 0xa005) AM_WRITENOP
-        AM_RANGE(0xa006, 0xa006) AM_WRITENOP
-        AM_RANGE(0xa007, 0xa007) AM_WRITENOP
+static ADDRESS_MAP_START( skyarmy_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay", ay8910_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( skyarmy )
@@ -249,17 +235,10 @@ static GFXDECODE_START( skyarmy )
         GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 32 )
 GFXDECODE_END
 
-
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("ay", ay8910_r)
-ADDRESS_MAP_END
-
 static MACHINE_DRIVER_START( skyarmy )
 	MDRV_CPU_ADD("maincpu", Z80,4000000)
-	MDRV_CPU_PROGRAM_MAP(skyarmy_readmem,skyarmy_writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(skyarmy_map,0)
+	MDRV_CPU_IO_MAP(skyarmy_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_PERIODIC_INT(skyarmy_nmi_source,650)	/* Hz */
 

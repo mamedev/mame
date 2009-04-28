@@ -48,27 +48,18 @@ VIDEO_UPDATE( skyfox );
                                 Sky Fox
 ***************************************************************************/
 
-static ADDRESS_MAP_START( skyfox_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM			)	// ROM
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM			)	// RAM
+static ADDRESS_MAP_START( skyfox_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM							// ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM							// RAM
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	// Sprites
+	AM_RANGE(0xd400, 0xdfff) AM_RAM							// RAM?
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")			// Input Ports
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")			//
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW1")			//
+	AM_RANGE(0xe008, 0xe00f) AM_WRITE(skyfox_vregs_w)		// Video Regs
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSW2")			//
-//  AM_RANGE(0xff00, 0xff07) AM_READ(skyfox_vregs_r     )   // fake to read the vregs
+//  AM_RANGE(0xff00, 0xff07) AM_READ(skyfox_vregs_r)   		// fake to read the vregs
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( skyfox_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM								)	// ROM
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM								)	// RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0xd400, 0xdfff) AM_WRITE(SMH_RAM								)	// RAM?
-	AM_RANGE(0xe008, 0xe00f) AM_WRITE(skyfox_vregs_w						)	// Video Regs
-ADDRESS_MAP_END
-
-
-
-
 
 
 /***************************************************************************
@@ -85,24 +76,15 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( skyfox_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREAD("ym1", ym2203_r)	// YM2203 #1
-//  AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym2", ym2203_r )   // YM2203 #2
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r			)	// From Main CPU
+static ADDRESS_MAP_START( skyfox_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM								// RAM
+//  AM_RANGE(0x9000, 0x9001) AM_WRITENOP                    	// ??
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)	// YM2203 #1
+//  AM_RANGE(0xb000, 0xb001) AM_WRITENOP                     	// ??
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)	// YM2203 #2
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)				// From Main CPU
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( skyfox_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM					)	// RAM
-//  AM_RANGE(0x9000, 0x9001) AM_WRITE(SMH_NOP                  )   // ??
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym1", ym2203_w 	)	//
-//  AM_RANGE(0xb000, 0xb001) AM_WRITE(SMH_NOP                  )   // ??
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym2", ym2203_w 	)	//
-ADDRESS_MAP_END
-
-
 
 
 /***************************************************************************
@@ -112,6 +94,11 @@ ADDRESS_MAP_END
 
 
 ***************************************************************************/
+
+static INPUT_CHANGED( coin_inserted )
+{
+	cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
 
 static INPUT_PORTS_START( skyfox )
 	PORT_START("INPUTS")
@@ -182,9 +169,9 @@ static INPUT_PORTS_START( skyfox )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("COINS")	// Fake input port, polled every VBLANK to generate an NMI upon coin insertion
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_START("COINS")	// Fake input port, coins are directly connected on NMI line
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -222,10 +209,6 @@ static GFXDECODE_START( skyfox )
 GFXDECODE_END
 
 
-
-
-
-
 /***************************************************************************
 
 
@@ -239,27 +222,23 @@ GFXDECODE_END
                                 Sky Fox
 ***************************************************************************/
 
-/* Check for coin insertion once a frame (polling a fake input port).
-   Generate an NMI in case. Scroll the background too. */
+/* Scroll the background on every vblank (guess). */
 
 static INTERRUPT_GEN( skyfox_interrupt )
 {
 	/* Scroll the bg */
 	skyfox_bg_pos += (skyfox_bg_ctrl >> 1) & 0x7;	// maybe..
-
-	/* Check coin 1 & 2 */
-	if ((input_port_read(device->machine, "COINS") & 3) != 3) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( skyfox )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(skyfox_readmem,skyfox_writemem)
+	MDRV_CPU_PROGRAM_MAP(skyfox_map,0)
 	MDRV_CPU_VBLANK_INT("screen", skyfox_interrupt)		/* NMI caused by coin insertion */
 
 	MDRV_CPU_ADD("audiocpu", Z80, 1748000)
-	MDRV_CPU_PROGRAM_MAP(skyfox_sound_readmem,skyfox_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(skyfox_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

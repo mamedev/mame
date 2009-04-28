@@ -11,9 +11,6 @@
 #include "includes/slapfght.h"
 
 
-UINT8 *slapfight_dpram;
-size_t slapfight_dpram_size;
-
 static int slapfight_status;
 static int getstar_sequence_index;
 static int getstar_sh_intenabled;
@@ -49,20 +46,6 @@ MACHINE_RESET( slapfight )
 	/* MCU */
 	mcu_val = 0;
 }
-
-/* Interrupt handlers cpu & sound */
-
-WRITE8_HANDLER( slapfight_dpram_w )
-{
-    slapfight_dpram[offset]=data;
-}
-
-READ8_HANDLER( slapfight_dpram_r )
-{
-    return slapfight_dpram[offset];
-}
-
-
 
 /* Slapfight CPU input/output ports
 

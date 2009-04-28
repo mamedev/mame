@@ -145,27 +145,18 @@ static WRITE16_HANDLER( soundcommand_w )
 	}
 }
 
-static ADDRESS_MAP_START( spbactn_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x40000, 0x43fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x50000, 0x50fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x60000, 0x67fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x70000, 0x77fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x80000, 0x82fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( spbactn_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM
+	AM_RANGE(0x40000, 0x43fff) AM_RAM	// main ram
+	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_BASE(&spbactn_spvideoram)
+	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_BASE(&spbactn_fgvideoram)
+	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_BASE(&spbactn_bgvideoram)
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
 	AM_RANGE(0x90020, 0x90021) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x90030, 0x90031) AM_READ_PORT("DSW1")
 	AM_RANGE(0x90040, 0x90041) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spbactn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x40000, 0x43fff) AM_WRITE(SMH_RAM)	// main ram
-	AM_RANGE(0x50000, 0x50fff) AM_WRITE(SMH_RAM) AM_BASE(&spbactn_spvideoram)
-	AM_RANGE(0x60000, 0x67fff) AM_WRITE(SMH_RAM) AM_BASE(&spbactn_fgvideoram)
-	AM_RANGE(0x70000, 0x77fff) AM_WRITE(SMH_RAM) AM_BASE(&spbactn_bgvideoram)
-	AM_RANGE(0x80000, 0x827ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 
 	/* this is an awful lot of unknowns */
 	AM_RANGE(0x90000, 0x90001) AM_WRITENOP
@@ -200,21 +191,16 @@ static ADDRESS_MAP_START( spbactn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0206, 0xa0207) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("oki", okim6295_r)
-	AM_RANGE(0xfc00, 0xfc00) AM_READNOP	/* irq ack ?? */
+static ADDRESS_MAP_START( spbactn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_r,okim6295_w)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ym", ym3812_w)
+
+	AM_RANGE(0xfc00, 0xfc00) AM_READNOP	AM_WRITENOP /* irq ack ?? */
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("oki", okim6295_w)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ym", ym3812_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP	/* irq ack ?? */
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spbactn )
 	PORT_START("IN0")
@@ -355,11 +341,11 @@ static const ym3812_interface ym3812_config =
 static MACHINE_DRIVER_START( spbactn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(spbactn_readmem,spbactn_writemem)
+	MDRV_CPU_PROGRAM_MAP(spbactn_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(spbactn_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

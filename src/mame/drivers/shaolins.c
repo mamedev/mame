@@ -36,39 +36,31 @@ static INTERRUPT_GEN( shaolins_interrupt )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( shaolins_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(shaolins_nmi_w)	/* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
+														/* bit 3, bit 4 = coin counters */
+	AM_RANGE(0x0100, 0x0100) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0300, 0x0300) AM_DEVWRITE("sn1", sn76496_w) 	/* trigger chip to read from latch. The program always */
+	AM_RANGE(0x0400, 0x0400) AM_DEVWRITE("sn2", sn76496_w) 	/* writes the same number as the latch, so we don't */
+															/* bother emulating them. */
 	AM_RANGE(0x0500, 0x0500) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0600, 0x0600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0700, 0x0700) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0701, 0x0701) AM_READ_PORT("P1")
 	AM_RANGE(0x0702, 0x0702) AM_READ_PORT("P2")
 	AM_RANGE(0x0703, 0x0703) AM_READ_PORT("DSW3")
-	AM_RANGE(0x2800, 0x2bff) AM_READ(SMH_RAM)	/* RAM BANK 2 */
-	AM_RANGE(0x3000, 0x33ff) AM_READ(SMH_RAM)	/* RAM BANK 1 */
-	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM)	/* video RAM */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_ROM)    /* Machine checks for extra rom */
-	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(shaolins_nmi_w)	/* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
-										/* bit 3, bit 4 = coin counters */
-	AM_RANGE(0x0100, 0x0100) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x0300, 0x0300) AM_DEVWRITE("sn1", sn76496_w) 	/* trigger chip to read from latch. The program always */
-	AM_RANGE(0x0400, 0x0400) AM_DEVWRITE("sn2", sn76496_w) 	/* writes the same number as the latch, so we don't */
-										/* bother emulating them. */
-	AM_RANGE(0x0800, 0x0800) AM_WRITENOP	/* latch for 76496 #0 */
-	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* latch for 76496 #1 */
+	AM_RANGE(0x0800, 0x0800) AM_WRITENOP					/* latch for 76496 #0 */
+	AM_RANGE(0x1000, 0x1000) AM_WRITENOP					/* latch for 76496 #1 */
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(shaolins_palettebank_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(shaolins_scroll_w)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(SMH_RAM)	/* RAM BANK 2 */
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE(SMH_RAM)	/* RAM BANK 1 */
-	AM_RANGE(0x3100, 0x33ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3800, 0x3bff) AM_WRITE(shaolins_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x3c00, 0x3fff) AM_WRITE(shaolins_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM							/* RAM BANK 2 */
+	AM_RANGE(0x3000, 0x30ff) AM_RAM							/* RAM BANK 1 */
+	AM_RANGE(0x3100, 0x33ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(shaolins_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(shaolins_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x5fff) AM_ROM   						/* Machine checks for extra rom */
+	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( shaolins )
@@ -220,7 +212,7 @@ static MACHINE_DRIVER_START( shaolins )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)        /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(shaolins_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(shaolins_interrupt,16)	/* 1 IRQ + 8 NMI */
 
 	/* video hardware */
