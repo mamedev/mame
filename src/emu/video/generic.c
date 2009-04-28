@@ -706,6 +706,20 @@ WRITE8_HANDLER( paletteram_BBGGRRII_w )
 	                                   pal4bit(((data >> 4) & 0x0c) | i));
 }
 
+/*-------------------------------------------------
+    II-BB-GG-RR writes
+-------------------------------------------------*/
+
+WRITE8_HANDLER( paletteram_IIBBGGRR_w )
+{
+	int i = (data >> 6) & 3;
+
+	paletteram[offset] = data;
+	palette_set_color_rgb(space->machine, offset, pal4bit(((data << 2) & 0x0c) | i),
+	                                   pal4bit(((data >> 0) & 0x0c) | i),
+	                                   pal4bit(((data >> 2) & 0x0c) | i));
+}
+
 
 
 /***************************************************************************

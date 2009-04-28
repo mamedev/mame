@@ -145,6 +145,7 @@ PALETTE_INIT( RRRRR_GGGGGG_BBBBB );
 WRITE8_HANDLER( paletteram_BBGGGRRR_w );
 WRITE8_HANDLER( paletteram_RRRGGGBB_w );
 WRITE8_HANDLER( paletteram_BBGGRRII_w );
+WRITE8_HANDLER( paletteram_IIBBGGRR_w );
 
 /* 4-4-4 RGB palette write handlers */
 WRITE8_HANDLER( paletteram_xxxxBBBBGGGGRRRR_le_w );

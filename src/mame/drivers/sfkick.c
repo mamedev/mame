@@ -92,24 +92,24 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 0: /* bios */
 		{
 			UINT8 *mem = memory_region(machine, "bios");
-			memory_set_bankptr (machine, 1, mem);
-			memory_set_bankptr (machine,2, mem+0x2000);
+			memory_set_bankptr(machine,1, mem);
+			memory_set_bankptr(machine,2, mem+0x2000);
 		}
 		break;
 
 		case 1: /* ext rom */
 		{
 			UINT8 *mem = memory_region(machine, "extrom");
-			memory_set_bankptr (machine,1, mem+0x4000);
-			memory_set_bankptr (machine,2, mem+0x6000);
+			memory_set_bankptr(machine,1, mem+0x4000);
+			memory_set_bankptr(machine,2, mem+0x6000);
 		}
 		break;
 
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr (machine,1, mem+0x2000*sfkick_bank[0]);
-			memory_set_bankptr (machine,2, mem+0x2000*sfkick_bank[1]);
+			memory_set_bankptr(machine,1, mem+0x2000*sfkick_bank[0]);
+			memory_set_bankptr(machine,2, mem+0x2000*sfkick_bank[1]);
 		}
 		break;
 
@@ -128,8 +128,8 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 0: /* bios - upper part */
 		{
 			UINT8 *mem = memory_region(machine, "bios");
-			memory_set_bankptr (machine,3, mem+0x4000);
-			memory_set_bankptr (machine,4, mem+0x6000);
+			memory_set_bankptr(machine,3, mem+0x4000);
+			memory_set_bankptr(machine,4, mem+0x6000);
 		}
 		break;
 
@@ -145,8 +145,8 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr (machine,3, mem+0x2000*sfkick_bank[2]);
-			memory_set_bankptr (machine,4, mem+0x2000*sfkick_bank[3]);
+			memory_set_bankptr(machine,3, mem+0x2000*sfkick_bank[2]);
+			memory_set_bankptr(machine,4, mem+0x2000*sfkick_bank[3]);
 		}
 		break;
 	}
@@ -174,8 +174,8 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr (machine,5, mem+0x2000*sfkick_bank[4]);
-			memory_set_bankptr (machine,6, mem+0x2000*sfkick_bank[5]);
+			memory_set_bankptr(machine,5, mem+0x2000*sfkick_bank[4]);
+			memory_set_bankptr(machine,6, mem+0x2000*sfkick_bank[5]);
 		}
 		break;
 	}
@@ -195,8 +195,8 @@ static void sfkick_remap_banks(running_machine *machine)
 		case 2: /* banked */
 		{
 			UINT8 *mem = memory_region(machine, "banked");
-			memory_set_bankptr (machine,7, mem+0x2000*sfkick_bank[6]);
-			memory_set_bankptr (machine,8, mem+0x2000*sfkick_bank[7]);
+			memory_set_bankptr(machine,7, mem+0x2000*sfkick_bank[6]);
+			memory_set_bankptr(machine,8, mem+0x2000*sfkick_bank[7]);
 		}
 		break;
 
@@ -293,25 +293,22 @@ static WRITE8_HANDLER(page3_w)
 	}
 }
 
-static ADDRESS_MAP_START (readmem, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE( 0x0000, 0x1fff) AM_READ( SMH_BANK(1) )
-	AM_RANGE( 0x2000, 0x3fff) AM_READ( SMH_BANK(2) )
-	AM_RANGE( 0x4000, 0x5fff) AM_READ( SMH_BANK(3) )
-	AM_RANGE( 0x6000, 0x7fff) AM_READ( SMH_BANK(4) )
-	AM_RANGE( 0x8000, 0x9fff) AM_READ( SMH_BANK(5) )
-	AM_RANGE( 0xa000, 0xbfff) AM_READ( SMH_BANK(6) )
-	AM_RANGE( 0xc000, 0xdfff) AM_READ( SMH_BANK(7) )
-	AM_RANGE( 0xe000, 0xffff) AM_READ( SMH_BANK(8) )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( sfkick_map, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE( 0x0000, 0x1fff) AM_ROMBANK(1)
+	AM_RANGE( 0x2000, 0x3fff) AM_ROMBANK(2)
+	AM_RANGE( 0x4000, 0x5fff) AM_ROMBANK(3)
+	AM_RANGE( 0x6000, 0x7fff) AM_ROMBANK(4)
+	AM_RANGE( 0x8000, 0x9fff) AM_ROMBANK(5)
+	AM_RANGE( 0xa000, 0xbfff) AM_ROMBANK(6)
+	AM_RANGE( 0xc000, 0xdfff) AM_ROMBANK(7)
+	AM_RANGE( 0xe000, 0xffff) AM_ROMBANK(8)
 	AM_RANGE( 0x0000, 0x3fff) AM_WRITE( page0_w )
 	AM_RANGE( 0x4000, 0x7fff) AM_WRITE( page1_w )
 	AM_RANGE( 0x8000, 0xbfff) AM_WRITE( page2_w )
 	AM_RANGE( 0xc000, 0xffff) AM_WRITE( page3_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (main_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sfkick_io_map, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0xa0, 0xa7) AM_WRITE( soundlatch_w )
@@ -322,12 +319,12 @@ static ADDRESS_MAP_START (main_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sfkick_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (sound_io, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sfkick_sound_io_map, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
@@ -460,15 +457,15 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( sfkick )
 
 	MDRV_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(main_io,0)
+	MDRV_CPU_PROGRAM_MAP(sfkick_map,0)
+	MDRV_CPU_IO_MAP(sfkick_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sfkick_interrupt,262)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
 	MDRV_CPU_ADD("soundcpu",Z80,MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(sound_mem,0)
-	MDRV_CPU_IO_MAP(sound_io,0)
+	MDRV_CPU_PROGRAM_MAP(sfkick_sound_map,0)
+	MDRV_CPU_IO_MAP(sfkick_sound_io_map,0)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
