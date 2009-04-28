@@ -316,31 +316,19 @@ static struct sms_vdp *md_sms_vdp;
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
 
 #ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START( sms_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000 , 0xbfff) AM_READ(SMH_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_READ(SMH_RAM) AM_MIRROR(0x2000)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sms_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(SMH_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(SMH_RAM) AM_MIRROR(0x2000)
+static ADDRESS_MAP_START( sms_map, ADDRESS_SPACE_PROGRAM, 8 )
+//  AM_RANGE(0x0000 , 0xbfff) AM_ROM
+//  AM_RANGE(0xc000 , 0xdfff) AM_RAM AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 #endif
 
 /* we have to fill in the ROM addresses for systeme due to the encrypted games */
-static ADDRESS_MAP_START( systeme_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* Fixed ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK(1))				/* Banked ROM */
+static ADDRESS_MAP_START( systeme_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* Fixed ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)						/* Banked ROM */
 
-//  AM_RANGE(0x0000 , 0xbfff) AM_READ(SMH_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_READ(SMH_RAM) AM_MIRROR(0x2000)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( systeme_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)				/* Fixed ROM */
-
-//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(SMH_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(SMH_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_ROM
+//  AM_RANGE(0xc000 , 0xdfff) AM_RAM	 AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_io_map, ADDRESS_SPACE_IO, 8 )
@@ -2036,7 +2024,7 @@ static VIDEO_UPDATE(systeme)
 
 static MACHINE_DRIVER_START( systeme )
 	MDRV_CPU_ADD("z80", Z80, 10738600/2) /* correct for hangonjr, and astroflash/transformer at least  */
-	MDRV_CPU_PROGRAM_MAP(systeme_readmem,systeme_writemem)
+	MDRV_CPU_PROGRAM_MAP(systeme_map,0)
 	MDRV_CPU_IO_MAP(sms_io_map,0)
 
 	/* IRQ handled via the timers */

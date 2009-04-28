@@ -90,7 +90,6 @@ WRITE8_HANDLER( tecfri_videoram2_w );
 WRITE8_HANDLER( tecfri_colorram2_w );
 WRITE8_HANDLER( tecfri_scroll_bg_w );
 WRITE8_HANDLER( sauro_scroll_fg_w );
-WRITE8_HANDLER( trckydoc_spriteram_mirror_w );
 WRITE8_HANDLER( sauro_palette_bank_w );
 
 VIDEO_START( sauro );
@@ -135,22 +134,15 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 	sp0256_ALD_w(device, 0, data);
 }
 
-static ADDRESS_MAP_START( sauro_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xebff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sauro_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE(&tecfri_videoram)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE(&tecfri_colorram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(tecfri_videoram2_w) AM_BASE(&tecfri_videoram2)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(tecfri_colorram2_w) AM_BASE(&tecfri_colorram2)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sauro_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe800, 0xebff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(tecfri_videoram_w) AM_BASE(&tecfri_videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(tecfri_colorram_w) AM_BASE(&tecfri_colorram)
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(tecfri_videoram2_w) AM_BASE(&tecfri_videoram2)
-	AM_RANGE(0xfc00, 0xffff) AM_WRITE(tecfri_colorram2_w) AM_BASE(&tecfri_colorram2)
-ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( sauro_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -177,38 +169,29 @@ static ADDRESS_MAP_START( sauro_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sauro_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sauro_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sauro_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym3812_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", adpcm_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
 	AM_RANGE(0xe000, 0xe006) AM_WRITENOP	/* echo from write to e0000 */
 	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trckydoc_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
+
+static ADDRESS_MAP_START( trckydoc_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE(&tecfri_videoram)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE(&tecfri_colorram)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
 	AM_RANGE(0xf818, 0xf818) AM_READ_PORT("P2")
-	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( trckydoc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe800, 0xebff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xec00, 0xefff) AM_WRITE(trckydoc_spriteram_mirror_w) // it clears sprites from the screen by writing here to set some of the attributes
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(tecfri_videoram_w) AM_BASE(&tecfri_videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(tecfri_colorram_w) AM_BASE(&tecfri_colorram)
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ym", ym3812_w)
+	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE(tecfri_scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITENOP				/* only written at startup */
 	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
@@ -217,6 +200,7 @@ static ADDRESS_MAP_START( trckydoc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf83c, 0xf83c) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP				/* only written at startup */
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( tecfri )
 	PORT_START("P1")
@@ -376,7 +360,7 @@ static MACHINE_DRIVER_START( trckydoc )
 	MDRV_IMPORT_FROM(tecfri)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trckydoc_readmem, trckydoc_writemem )
+	MDRV_CPU_PROGRAM_MAP(trckydoc_map,0 )
 
 	MDRV_GFXDECODE(trckydoc)
 
@@ -389,12 +373,12 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_IMPORT_FROM(tecfri)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sauro_readmem, sauro_writemem)
+	MDRV_CPU_PROGRAM_MAP(sauro_map, 0)
 	MDRV_CPU_IO_MAP(sauro_io_map,0)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	// 4 MHz?
-	MDRV_CPU_PROGRAM_MAP(sauro_sound_readmem, sauro_sound_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(sauro_interrupt, 8) // ?
+	MDRV_CPU_PROGRAM_MAP(sauro_sound_map, 0)
+	MDRV_CPU_PERIODIC_INT(sauro_interrupt, 8*60) // ?
 
 	MDRV_GFXDECODE(sauro)
 
@@ -404,7 +388,6 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_SOUND_ADD("speech", SP0256, 3120000)
 	MDRV_SOUND_CONFIG(sauro_sp256)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_DRIVER_END
 
 /***************************************************************************

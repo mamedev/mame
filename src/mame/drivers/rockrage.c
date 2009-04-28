@@ -100,50 +100,34 @@ static WRITE8_DEVICE_HANDLER( rockrage_speech_w ) {
 	vlm5030_st( device, ( data >> 0 ) & 0x01 );
 }
 
-static ADDRESS_MAP_START( rockrage_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(K007342_r)			/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_READ(K007420_r)			/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_READ(K007342_scroll_r)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x247f) AM_READ(SMH_RAM)			/* Palette */
+static ADDRESS_MAP_START( rockrage_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(K007342_r,K007342_w)					/* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(K007420_r,K007420_w)					/* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_READWRITE(K007342_scroll_r,K007342_scroll_w)	/* Scroll RAM */
+	AM_RANGE(0x2400, 0x247f) AM_RAM AM_BASE(&paletteram)						/* Palette */
+	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)							/* Video Registers */
+	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")
 	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)			/* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(1))			/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
+	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(rockrage_sh_irqtrigger_w)					/* cause interrupt on audio CPU */
+	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)							/* watchdog reset */
+	AM_RANGE(0x2f00, 0x2f00) AM_WRITE(rockrage_vreg_w)							/* ??? */
+	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)					/* bankswitch control */
+	AM_RANGE(0x4000, 0x5fff) AM_RAM												/* RAM */
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)										/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rockrage_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(K007342_w)				/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_WRITE(K007420_w)				/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_WRITE(K007342_scroll_w)		/* Scroll RAM */
-	AM_RANGE(0x2400, 0x247f) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_WRITE(K007342_vreg_w)			/* Video Registers */
-	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(rockrage_sh_irqtrigger_w)/* cause interrupt on audio CPU */
-	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)		/* watchdog reset */
-	AM_RANGE(0x2f00, 0x2f00) AM_WRITE(rockrage_vreg_w)		/* ??? */
-	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)	/* bankswitch control */
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM)				/* RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_RAM)				/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rockrage_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("vlm", rockrage_VLM5030_busy_r)/* VLM5030 */
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0x6000, 0x6001) AM_DEVREAD("ym", ym2151_r)	/* YM 2151 */
-	AM_RANGE(0x7000, 0x77ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rockrage_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("vlm", vlm5030_data_w) 			/* VLM5030 */
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("vlm", rockrage_speech_w)			/* VLM5030 */
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ym", ym2151_w)		/* YM 2151 */
-	AM_RANGE(0x7000, 0x77ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
+static ADDRESS_MAP_START( rockrage_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("vlm", vlm5030_data_w) 				/* VLM5030 */
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("vlm", rockrage_VLM5030_busy_r)			/* VLM5030 */
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("vlm", rockrage_speech_w)				/* VLM5030 */
+	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)								/* soundlatch_r */
+	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ym", ym2151_r,ym2151_w)			/* YM 2151 */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM												/* RAM */
+	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -286,11 +270,11 @@ static MACHINE_DRIVER_START( rockrage )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8 */
-	MDRV_CPU_PROGRAM_MAP(rockrage_readmem,rockrage_writemem)
+	MDRV_CPU_PROGRAM_MAP(rockrage_map,0)
 	MDRV_CPU_VBLANK_INT("screen", rockrage_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 1500000)		/* 24MHz/16 */
-	MDRV_CPU_PROGRAM_MAP(rockrage_readmem_sound,rockrage_writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(rockrage_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

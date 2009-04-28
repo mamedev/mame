@@ -152,11 +152,6 @@ VIDEO_UPDATE( sauro )
 
 /* Tricky Doc */
 
-WRITE8_HANDLER ( trckydoc_spriteram_mirror_w )
-{
-	spriteram[offset] = data;
-}
-
 VIDEO_START( trckydoc )
 {
 	bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols,

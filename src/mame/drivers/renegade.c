@@ -535,51 +535,33 @@ static WRITE8_HANDLER( renegade_coin_counter_w )
 
 /********************************************************************************************/
 
-static ADDRESS_MAP_START( main_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x37ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")		/* Player#1 controls, P1,P2 start */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")		/* Player#2 controls, coin triggers */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2")	/* DIP2  various IO ports */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")	/* DIP1 */
-	AM_RANGE(0x3804, 0x3804) AM_READ(mcu_r)
-	AM_RANGE(0x3805, 0x3805) AM_READ(mcu_reset_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( main_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(renegade_videoram2_w) AM_BASE(&renegade_videoram2)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0x2800, 0x2fff) AM_WRITE(renegade_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0x3100, 0x31ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(renegade_scroll0_w)
-	AM_RANGE(0x3801, 0x3801) AM_WRITE(renegade_scroll1_w)
-	AM_RANGE(0x3802, 0x3802) AM_WRITE(sound_w)
-	AM_RANGE(0x3803, 0x3803) AM_WRITE(renegade_flipscreen_w)
-	AM_RANGE(0x3804, 0x3804) AM_WRITE(mcu_w)
-	AM_RANGE(0x3805, 0x3805) AM_WRITE(bankswitch_w)
+static ADDRESS_MAP_START( renegade_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(renegade_videoram2_w) AM_BASE(&renegade_videoram2)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(renegade_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3000, 0x30ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
+	AM_RANGE(0x3100, 0x31ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE(renegade_scroll0_w)		/* Player#1 controls, P1,P2 start */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(renegade_scroll1_w)		/* Player#2 controls, coin triggers */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE(sound_w)	/* DIP2  various IO ports */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE(renegade_flipscreen_w)	/* DIP1 */
+	AM_RANGE(0x3804, 0x3804) AM_READWRITE(mcu_r,mcu_w)
+	AM_RANGE(0x3805, 0x3805) AM_READWRITE(mcu_reset_r,bankswitch_w)
 	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
 	AM_RANGE(0x3807, 0x3807) AM_WRITE(renegade_coin_counter_w)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( renegade_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREAD("ym", ym3526_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // this gets written the same values as 0x2000
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_play_w)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ym", ym3526_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ym", ym3526_r,ym3526_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* adpcm related? stereo pan? */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -799,11 +781,11 @@ static MACHINE_DRIVER_START( renegade )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12000000/8)	/* 1.5 MHz (measured) */
-	MDRV_CPU_PROGRAM_MAP(main_readmem,main_writemem)
+	MDRV_CPU_PROGRAM_MAP(renegade_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(renegade_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 12000000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(renegade_sound_map,0)
 								/* IRQs are caused by the main CPU */
 	MDRV_MACHINE_START(renegade)
 	MDRV_MACHINE_RESET(renegade)

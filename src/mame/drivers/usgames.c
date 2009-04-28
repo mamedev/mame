@@ -25,7 +25,6 @@ Sound: AY-3-8912
 
 #include "driver.h"
 #include "cpu/m6809/m6809.h"
-#include "deprecat.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 
@@ -241,7 +240,7 @@ static MACHINE_DRIVER_START( usg32 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(usgames_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,5) /* ?? */
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,5*60) /* ?? */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 

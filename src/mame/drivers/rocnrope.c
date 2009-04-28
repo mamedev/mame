@@ -1,5 +1,7 @@
 /***************************************************************************
 
+Roc'n Rope (c) 1983 Konami
+
 Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 
 ***************************************************************************/
@@ -31,24 +33,19 @@ static WRITE8_HANDLER( rocnrope_interrupt_vector_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( rocnrope_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3080, 0x3080) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3081, 0x3081) AM_READ_PORT("P1")
 	AM_RANGE(0x3082, 0x3082) AM_READ_PORT("P2")
 	AM_RANGE(0x3083, 0x3083) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW3")
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x4000, 0x402f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x4400, 0x442f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4800, 0x4bff) AM_WRITE(rocnrope_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(rocnrope_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x4000, 0x402f) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0x4400, 0x442f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(rocnrope_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(rocnrope_flipscreen_w)
 	AM_RANGE(0x8081, 0x8081) AM_WRITE(timeplt_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
@@ -58,7 +55,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8087, 0x8087) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x8100, 0x8100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -168,7 +165,7 @@ static MACHINE_DRIVER_START( rocnrope )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(rocnrope_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

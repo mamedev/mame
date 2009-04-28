@@ -59,12 +59,12 @@ static WRITE8_HANDLER(sangho_ram_w)
 	sangho_ram[offset]=data;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pzlestar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(sangho_ram_w)
-	AM_RANGE(0x0000, 0x3fff) AM_READ( SMH_BANK(1) )
-	AM_RANGE(0x4000, 0x7fff) AM_READ( SMH_BANK(2) )
-	AM_RANGE(0x8000, 0xbfff) AM_READ( SMH_BANK(3) )
-	AM_RANGE(0xc000, 0xffff) AM_READ( SMH_BANK(4) )
+	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(3)
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
 /* Wrong ! */
@@ -223,7 +223,7 @@ static VIDEO_START( sangho )
 static MACHINE_DRIVER_START(pzlestar)
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(readmem, 0)
+	MDRV_CPU_PROGRAM_MAP(pzlestar_map, 0)
 	MDRV_CPU_IO_MAP(pzlestar_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
@@ -256,7 +256,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(sexyboom )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(readmem, 0)
+	MDRV_CPU_PROGRAM_MAP(pzlestar_map, 0)
 	MDRV_CPU_IO_MAP(sexyboom_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 

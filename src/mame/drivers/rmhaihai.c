@@ -171,35 +171,18 @@ static MACHINE_RESET( themj )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x9fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa800, 0xb7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)	/* rmhaisei only */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( themj_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa800, 0xb7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK(2))
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x9fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa800, 0xafff) AM_WRITE(rmhaihai_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(rmhaihai_videoram_w) AM_BASE(&videoram)
+static ADDRESS_MAP_START( rmhaihai_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP	// ??
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// ??
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)	/* rmhaisei only */
+	AM_RANGE(0xc000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROM			/* rmhaisei only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( rmhaihai_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(keyboard_r, SMH_NOP)	// ??
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, keyboard_w)	// ??
@@ -210,6 +193,16 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
 	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
 	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP	// ??
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( themj_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK(1)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(2)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( themj_io_map, ADDRESS_SPACE_IO, 8 )
@@ -225,6 +218,7 @@ static ADDRESS_MAP_START( themj_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
 	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP	// ??
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( mjctrl )
 	PORT_START("KEY0")		// fake, handled by keyboard_r()
@@ -415,11 +409,11 @@ static const gfx_layout charlayout =
 	16*8
 };
 
-static GFXDECODE_START( 1 )
+static GFXDECODE_START( rmhaihai )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-static GFXDECODE_START( 2 )
+static GFXDECODE_START( themj )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 64 )
 GFXDECODE_END
 
@@ -445,8 +439,8 @@ static MACHINE_DRIVER_START( rmhaihai )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,20000000/4)	/* 5 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(rmhaihai_map,0)
+	MDRV_CPU_IO_MAP(rmhaihai_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
@@ -457,7 +451,7 @@ static MACHINE_DRIVER_START( rmhaihai )
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 60*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(1)
+	MDRV_GFXDECODE(rmhaihai)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
@@ -482,7 +476,7 @@ static MACHINE_DRIVER_START( rmhaisei )
 	MDRV_IMPORT_FROM(rmhaihai)
 
 	/* video hardware */
-	MDRV_GFXDECODE(2)
+	MDRV_GFXDECODE(themj)
 	MDRV_PALETTE_LENGTH(0x200)
 MACHINE_DRIVER_END
 
@@ -492,13 +486,13 @@ static MACHINE_DRIVER_START( themj )
 	MDRV_IMPORT_FROM(rmhaihai)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(themj_readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(themj_map,0)
 	MDRV_CPU_IO_MAP(themj_io_map,0)
 
 	MDRV_MACHINE_RESET(themj)
 
 	/* video hardware */
-	MDRV_GFXDECODE(2)
+	MDRV_GFXDECODE(themj)
 	MDRV_PALETTE_LENGTH(0x200)
 MACHINE_DRIVER_END
 

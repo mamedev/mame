@@ -51,61 +51,41 @@ it as ASCII text.
 
 #include "driver.h"
 #include "cpu/m6502/m6502.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "includes/btime.h"
 
 
-static ADDRESS_MAP_START( dommy_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2bff) AM_READ(btime_mirrorvideoram_r)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")
+static ADDRESS_MAP_START( dommy_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE(&btime_colorram)
+	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITENOP
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
 /*  AM_RANGE(0x4004, 0x4004)  */ /* this is read */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("P1")
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("P2")
-	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dommy_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(SMH_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x2400, 0x27ff) AM_WRITE(SMH_RAM) AM_BASE(&btime_colorram)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(btime_mirrorvideoram_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITENOP
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(btime_video_control_w)
 	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eggs_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1000, 0x17ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1800, 0x1bff) AM_READ(btime_mirrorvideoram_r)
-	AM_RANGE(0x1c00, 0x1fff) AM_READ(btime_mirrorcolorram_r)
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2")
+
+static ADDRESS_MAP_START( eggs_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(&btime_colorram)
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
+	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE(btime_video_control_w)
+	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITENOP
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P1")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P2")
-	AM_RANGE(0x3000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)    /* reset/interrupt vectors */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( eggs_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(SMH_RAM) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(SMH_RAM) AM_BASE(&btime_colorram)
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE(btime_mirrorvideoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(btime_mirrorcolorram_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITENOP
 	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x3000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x3000, 0x7fff) AM_ROM
+	AM_RANGE(0xf000, 0xffff) AM_ROM    /* reset/interrupt vectors */
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( scregg )
@@ -224,8 +204,8 @@ static MACHINE_DRIVER_START( dommy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(dommy_readmem,dommy_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)
+	MDRV_CPU_PROGRAM_MAP(dommy_map,0)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,16*60) //???
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -257,8 +237,8 @@ static MACHINE_DRIVER_START( scregg )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)
-	MDRV_CPU_PROGRAM_MAP(eggs_readmem,eggs_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,16)
+	MDRV_CPU_PROGRAM_MAP(eggs_map,0)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,16*60) //???
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

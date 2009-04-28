@@ -73,51 +73,42 @@ static WRITE8_HANDLER( sbasketb_coin_counter_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x2000, 0x3bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3c10, 0x3c10) AM_READNOP    /* ???? */
-	AM_RANGE(0x3e00, 0x3e00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3e01, 0x3e01) AM_READ_PORT("P1")
-	AM_RANGE(0x3e02, 0x3e02) AM_READ_PORT("P2")
-	AM_RANGE(0x3e03, 0x3e03) AM_READNOP
-	AM_RANGE(0x3e80, 0x3e80) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(sbasketb_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x3400, 0x37ff) AM_WRITE(sbasketb_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x3800, 0x39ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3a00, 0x3bff) AM_WRITE(SMH_RAM)           /* Probably unused, but initialized */
+static ADDRESS_MAP_START( sbasketb_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x2000, 0x2fff) AM_RAM
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3a00, 0x3bff) AM_RAM           /* Probably unused, but initialized */
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3c20, 0x3c20) AM_WRITE(SMH_RAM) AM_BASE(&sbasketb_palettebank)
+	AM_RANGE(0x3c10, 0x3c10) AM_READNOP    /* ???? */
+	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_BASE(&sbasketb_palettebank)
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(sbasketb_flipscreen_w)
 	AM_RANGE(0x3c81, 0x3c81) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x3c83, 0x3c84) AM_WRITE(sbasketb_coin_counter_w)
 	AM_RANGE(0x3c85, 0x3c85) AM_WRITE(SMH_RAM) AM_BASE(&sbasketb_spriteram_select)
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(sbasketb_sh_irqtrigger_w)
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(SMH_RAM) AM_BASE(&sbasketb_scroll)
+	AM_RANGE(0x3e00, 0x3e00) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x3e01, 0x3e01) AM_READ_PORT("P1")
+	AM_RANGE(0x3e02, 0x3e02) AM_READ_PORT("P2")
+	AM_RANGE(0x3e03, 0x3e03) AM_READNOP
+	AM_RANGE(0x3e80, 0x3e80) AM_READ_PORT("DSW2")
+	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("DSW1")
+	AM_RANGE(0x3f80, 0x3f80) AM_WRITEONLY AM_BASE(&sbasketb_scroll)
+	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sbasketb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(hyperspt_sh_timer_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_data_w) /* speech data */
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("vlm", hyperspt_sound_w)     /* speech and output controll */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("sn", konami_SN76496_w)      /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( sbasketb )
@@ -197,11 +188,11 @@ static MACHINE_DRIVER_START( sbasketb )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(sbasketb_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)	/* 3.5795 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sbasketb_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

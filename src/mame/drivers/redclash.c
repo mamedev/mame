@@ -38,18 +38,7 @@ extern VIDEO_START( redclash );
 extern VIDEO_UPDATE( redclash );
 extern VIDEO_EOF( redclash );
 
-/*
-  This game doesn't have VBlank interrupts.
-  Interrupts are still used, but they are related to coin
-  slots. Left slot generates an IRQ, Right slot a NMI.
-*/
-static INTERRUPT_GEN( redclash_interrupt )
-{
-	if (input_port_read(device->machine, "FAKE") & 1)	/* Left Coin */
-		cpu_set_input_line(device,0,ASSERT_LINE);
-	else if (input_port_read(device->machine, "FAKE") & 2)	/* Right Coin */
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
+
 
 static WRITE8_HANDLER( irqack_w )
 {
@@ -57,22 +46,15 @@ static WRITE8_HANDLER( irqack_w )
 }
 
 
-
-static ADDRESS_MAP_START( zero_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( zerohour_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x37ff) AM_RAM
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
 	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")	/* DSW1 */
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)		/* video RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( zero_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x3800, 0x3bff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(redclash_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x5007) AM_WRITENOP	/* to sound board */
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star0_w)
 	AM_RANGE(0x5801, 0x5804) AM_WRITENOP	/* to sound board */
@@ -83,34 +65,43 @@ static ADDRESS_MAP_START( zero_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( redclash_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+//  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
+//  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
 	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")	/* DSW1 */
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)		/* video RAM */
-	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
-//  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
-//  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(redclash_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x5007) AM_WRITENOP	/* to sound board */
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star0_w)
 	AM_RANGE(0x5801, 0x5801) AM_WRITE(redclash_gfxbank_w)
 	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star1_w)
 	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star2_w)
 	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x6800, 0x6bff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(redclash_star_reset_w)
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
 ADDRESS_MAP_END
 
+/*
+  This game doesn't have VBlank interrupts.
+  Interrupts are still used, but they are related to coin
+  slots. Left slot generates an IRQ, Right slot a NMI.
+*/
+static INPUT_CHANGED( left_coin_inserted )
+{
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", 0, ASSERT_LINE);
+}
 
+static INPUT_CHANGED( right_coin_inserted )
+{
+	if(newval)
+		cputag_set_input_line(field->port->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static INPUT_PORTS_START( redclash )
 	PORT_START("IN0")	/* IN0 */
@@ -201,8 +192,8 @@ static INPUT_PORTS_START( redclash )
 	/* handler to be notified of coin insertions. We use IMPULSE to */
 	/* trigger exactly one interrupt, without having to check when the */
 	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zerohour )
@@ -276,8 +267,8 @@ static INPUT_PORTS_START( zerohour )
 	/* handler to be notified of coin insertions. We use IMPULSE to */
 	/* trigger exactly one interrupt, without having to check when the */
 	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -350,8 +341,7 @@ static MACHINE_DRIVER_START( zerohour )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(zero_readmem,zero_writemem)
-	MDRV_CPU_VBLANK_INT("screen", redclash_interrupt)
+	MDRV_CPU_PROGRAM_MAP(zerohour_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -377,8 +367,7 @@ static MACHINE_DRIVER_START( redclash )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_VBLANK_INT("screen", redclash_interrupt)
+	MDRV_CPU_PROGRAM_MAP(redclash_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

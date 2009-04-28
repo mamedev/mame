@@ -1,7 +1,10 @@
 /***************************************************************************
 
+Fighting Roller (c) 1983 Kaneko
+
 Issues:
 -sound effects missing
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -34,57 +37,39 @@ static WRITE8_HANDLER( ra_fake_d800_w )
 /*  logerror("d900: %02X\n",data);*/
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_ROM) /* only rollace2 */
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd900, 0xd900) AM_READ(ra_fake_d800_r) /* protection ??*/
-	AM_RANGE(0xe000, 0xe3ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe400, 0xe47f) AM_READ(SMH_RAM)
-	AM_RANGE(0xec00, 0xec0f) AM_READNOP /* Analog sound effects ??*/
-	AM_RANGE(0xf000, 0xf0ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2")
-	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
+static ADDRESS_MAP_START( rollrace_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_ROM			 /* only rollace2 */
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd806, 0xd806) AM_READNOP /* looks like a watchdog, bit4 checked*/
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xd900, 0xd900) AM_WRITE(ra_fake_d800_w) /* protection ?? */
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe400, 0xe47f) AM_WRITE(SMH_RAM) AM_BASE(&colorram)
+	AM_RANGE(0xd900, 0xd900) AM_READWRITE(ra_fake_d800_r,ra_fake_d800_w) /* protection ??*/
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_BASE(&colorram)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xec00, 0xec0f) AM_WRITENOP /* Analog sound effects ?? ec00 sound enable ?*/
-	AM_RANGE(0xf000, 0xf0ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xec00, 0xec0f) AM_NOP /* Analog sound effects ?? ec00 sound enable ?*/
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(rollrace_backgroundcolor_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(rollrace_bkgpen_w)
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM") AM_WRITE(rollrace_backgroundpage_w)
+	AM_RANGE(0xf803, 0xf803) AM_WRITE(rollrace_flipy_w)
+	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(rollrace_flipx_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xfc02, 0xfc03) AM_WRITENOP /* coin counters */
 	AM_RANGE(0xfc04, 0xfc05) AM_WRITE(rollrace_charbank_w)
 	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(rollrace_spritebank_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(rollrace_backgroundcolor_w)
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(rollrace_bkgpen_w)
-	AM_RANGE(0xf802, 0xf802) AM_WRITE(rollrace_backgroundpage_w)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(rollrace_flipy_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem_snd, ADDRESS_SPACE_PROGRAM, 8 )
-		AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
-		AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_RAM)
-		AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
-		AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-		AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_RAM)
-		AM_RANGE(0x3000, 0x3000) AM_WRITE(interrupt_enable_w)
-		AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-		AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay2", ay8910_address_data_w)
-		AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay3", ay8910_address_data_w)
+static ADDRESS_MAP_START( rollrace_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x2000, 0x2fff) AM_RAM
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay3", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -180,66 +165,60 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,	/* 8*8 characters */
-		256,	/* 256 characters */
-		3,	  /* 3 bits per pixel */
-		{ 0,1024*8*8, 2*1024*8*8 }, /* the two bitplanes are separated */
+	256,	/* 256 characters */
+	3,	  /* 3 bits per pixel */
+	{ 0,1024*8*8, 2*1024*8*8 }, /* the two bitplanes are separated */
 	{ 0,1,2,3,4,5,6,7 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-
-
 	8*8	/* every char takes 8 consecutive bytes */
 };
 static const gfx_layout charlayout2 =
 {
 	8,8,	/* 8*8 characters */
-		1024,	/* 1024 characters */
-		3,	  /* 3 bits per pixel */
-		{ 0,1024*8*8, 2*1024*8*8 }, /* the two bitplanes are separated */
+	1024,	/* 1024 characters */
+	3,	  /* 3 bits per pixel */
+	{ 0,1024*8*8, 2*1024*8*8 }, /* the two bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 7*8, 6*8, 5*8, 4*8, 3*8, 2*8, 1*8, 0*8 },
-
 //  { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-
 	8*8	/* every char takes 8 consecutive bytes */
 };
 
 static const gfx_layout spritelayout =
 {
-		32,32,  /* 32*32 sprites */
-		64,	/* 64 sprites */
+	32,32,  /* 32*32 sprites */
+	64,	/* 64 sprites */
 	3,	  /* 3 bits per pixel */
-		{ 0x4000*8, 0x2000*8, 0 }, /* the three bitplanes are separated */
+	{ 0x4000*8, 0x2000*8, 0 }, /* the three bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
 		 8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7,16*8,16*8+1,16*8+2,16*8+3,16*8+4,16*8+5,16*8+6,16*8+7,24*8,24*8+1,24*8+2,24*8+3,24*8+4,24*8+5,24*8+6,24*8+7},
 
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 		  32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8,
 		  64*8,65*8,66*8,67*8,68*8,69*8,70*8,71*8, 96*8,97*8,98*8,99*8,100*8,101*8,102*8,103*8 },
-
-		32*32	 /* every sprite takes 128 consecutive bytes */
+	32*32	 /* every sprite takes 128 consecutive bytes */
 };
 
 static GFXDECODE_START( rollrace )
-		GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,	0,	32 ) /* foreground */
-		GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,	0,	32 )
-		GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout,	0,	32 )
-		GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout,	0,	32 )
-		GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout2,	0, 	32 ) /* for the road */
-		GFXDECODE_ENTRY( "gfx3", 0x0000, spritelayout,	0, 	32 ) /* sprites */
-		GFXDECODE_ENTRY( "gfx4", 0x0000, spritelayout,	0,	32 )
-		GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,	0,	32 )
-
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,	0,	32 ) /* foreground */
+	GFXDECODE_ENTRY( "gfx1", 0x0800, charlayout,	0,	32 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout,	0,	32 )
+	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout,	0,	32 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout2,	0, 	32 ) /* for the road */
+	GFXDECODE_ENTRY( "gfx3", 0x0000, spritelayout,	0, 	32 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx4", 0x0000, spritelayout,	0,	32 )
+	GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,	0,	32 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( rollrace )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(rollrace_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_24MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem_snd,writemem_snd)
+	MDRV_CPU_PROGRAM_MAP(rollrace_sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
 	/* video hardware */
@@ -426,6 +405,7 @@ ROM_START( rollace2 )
 	ROM_REGION( 0x10000,"audiocpu",0 )
 	ROM_LOAD( "8.6f", 0x0000, 0x1000, CRC(6ec3c545) SHA1(1a2477b9e1563734195b0743f5dbbb005e06022e) )
 ROM_END
+
 
 GAME( 1983, fightrol, 0,        rollrace, rollrace, 0, ROT270, "[Kaneko] (Taito license)", "Fighting Roller", GAME_IMPERFECT_SOUND )
 GAME( 1983, rollace,  fightrol, rollrace, rollrace, 0, ROT270, "[Kaneko] (Williams license)", "Roller Aces (set 1)", GAME_IMPERFECT_SOUND )

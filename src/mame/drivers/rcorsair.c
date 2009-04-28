@@ -1,5 +1,6 @@
 /* Red Corsair */
 
+/* skeleton driver */
 /* This driver is not being worked on by the original author.
    Somebody will probably need to do extensive research on the
    PCB to establish what the custom block actually contains,
@@ -53,12 +54,8 @@ so even the Main CPU is unknown, assuming the 8085 is the sound CPU
 #include "driver.h"
 #include "cpu/i8085/i8085.h"
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( rcorsair_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( inports )
@@ -120,7 +117,7 @@ static MACHINE_DRIVER_START( rcorsair )
        program code, unknown type */
 
 	MDRV_CPU_ADD("maincpu", 8085A,8000000)		 /* Sound CPU? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(rcorsair_map,0)
 //  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
