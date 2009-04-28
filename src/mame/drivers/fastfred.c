@@ -125,7 +125,7 @@ static MACHINE_START( imago )
 
 static WRITE8_HANDLER( imago_dma_irq_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( imago_sprites_bank_w )
@@ -953,8 +953,8 @@ ROM_END
 
 static DRIVER_INIT( flyboy )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
 	fastfred_hardware_type = 1;
 }
 
@@ -965,19 +965,19 @@ static DRIVER_INIT( flyboyb )
 
 static DRIVER_INIT( fastfred )
 {
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r, (write8_space_func)SMH_NOP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r, (write8_space_func)SMH_NOP);
 	fastfred_hardware_type = 1;
 }
 
 static DRIVER_INIT( jumpcoas )
 {
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, (write8_space_func)SMH_NOP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, (write8_space_func)SMH_NOP);
 	fastfred_hardware_type = 0;
 }
 
 static DRIVER_INIT( boggy84 )
 {
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, (write8_space_func)SMH_NOP);
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, (write8_space_func)SMH_NOP);
 	fastfred_hardware_type = 2;
 }
 

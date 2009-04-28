@@ -48,7 +48,7 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+		cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 	}
 }
 
@@ -70,7 +70,7 @@ static void m5205_int1(const device_config *device)
 	sample_buffer1 >>= 4;
 	sample_select1 ^= 1;
 	if (sample_select1 == 0)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void m5205_int2(const device_config *device)

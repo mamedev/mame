@@ -78,7 +78,7 @@ static int _fbsel = 1;
 
 static void ptm_irq(running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[ESRIPSYS_SOUND_CPU], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "sound_cpu", M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =
@@ -130,7 +130,7 @@ static READ8_HANDLER( uart_r )
 
 static READ8_HANDLER( g_status_r )
 {
-	int bank4 = BIT(get_rip_status(space->machine->cpu[ESRIPSYS_VIDEO_CPU]), 2);
+	int bank4 = BIT(get_rip_status(cputag_get_cpu(space->machine, "video_cpu")), 2);
 	int vblank = video_screen_get_vblank(space->machine->primary_screen);
 
 	return (!vblank << 7) | (bank4 << 6) | (f_status & 0x2f);
@@ -146,14 +146,14 @@ static WRITE8_HANDLER( g_status_w )
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
 	memory_set_bankptr(space->machine, 1, &rom[bankaddress]);
 
-	cpu_set_input_line(space->machine->cpu[ESRIPSYS_FRAME_CPU], M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(space->machine->cpu[ESRIPSYS_FRAME_CPU], INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "frame_cpu", M6809_FIRQ_LINE, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "frame_cpu", INPUT_LINE_NMI,  data & 0x80 ? CLEAR_LINE : ASSERT_LINE);
 
-	cpu_set_input_line(space->machine->cpu[ESRIPSYS_VIDEO_CPU], INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "video_cpu", INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /VBLANK IRQ acknowledge */
 	if (!(data & 0x20))
-		cpu_set_input_line(space->machine->cpu[ESRIPSYS_GAME_CPU], M6809_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "game_cpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -179,7 +179,7 @@ static WRITE8_HANDLER( g_status_w )
 static READ8_HANDLER( f_status_r )
 {
 	int vblank = video_screen_get_vblank(space->machine->primary_screen);
-	UINT8 rip_status = get_rip_status(space->machine->cpu[ESRIPSYS_VIDEO_CPU]);
+	UINT8 rip_status = get_rip_status(cputag_get_cpu(space->machine, "video_cpu"));
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
 
@@ -378,7 +378,7 @@ static WRITE8_HANDLER( g_ioadd_w )
 			}
 			case 0x02:
 			{
-				cpu_set_input_line(space->machine->cpu[ESRIPSYS_SOUND_CPU], INPUT_LINE_NMI, g_iodata & 4 ? CLEAR_LINE : ASSERT_LINE);
+				cputag_set_input_line(space->machine, "sound_cpu", INPUT_LINE_NMI, g_iodata & 4 ? CLEAR_LINE : ASSERT_LINE);
 
 				if (!(g_to_s_latch2 & 1) && (g_iodata & 1))
 				{
@@ -386,7 +386,7 @@ static WRITE8_HANDLER( g_ioadd_w )
 					u56a = 1;
 
 					/*...causing a sound CPU /IRQ */
-					cpu_set_input_line(space->machine->cpu[ESRIPSYS_SOUND_CPU], M6809_IRQ_LINE, ASSERT_LINE);
+					cputag_set_input_line(space->machine, "sound_cpu", M6809_IRQ_LINE, ASSERT_LINE);
 				}
 
 				if (g_iodata & 2)
@@ -439,7 +439,7 @@ static INPUT_CHANGED( keypad_interrupt )
 	{
 		io_firq_status |= 2;
 		keypad_status |= 0x20;
-		cpu_set_input_line(field->port->machine->cpu[ESRIPSYS_GAME_CPU], M6809_FIRQ_LINE, HOLD_LINE);
+		cputag_set_input_line(field->port->machine, "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -449,7 +449,7 @@ static INPUT_CHANGED( coin_interrupt )
 	{
 		io_firq_status |= 2;
 		coin_latch = input_port_read(field->port->machine, "COINS") << 2;
-		cpu_set_input_line(field->port->machine->cpu[ESRIPSYS_GAME_CPU], M6809_FIRQ_LINE, HOLD_LINE);
+		cputag_set_input_line(field->port->machine, "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -530,7 +530,7 @@ static WRITE8_HANDLER( s_200f_w )
 	if (s_to_g_latch2 & 0x40)
 	{
 		u56a = 0;
-		cpu_set_input_line(space->machine->cpu[ESRIPSYS_SOUND_CPU], M6809_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "sound_cpu", M6809_IRQ_LINE, CLEAR_LINE);
 	}
 
 	if (!(s_to_g_latch2 & 0x80) && (data & 0x80))

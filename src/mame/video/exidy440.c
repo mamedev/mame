@@ -244,9 +244,9 @@ WRITE8_HANDLER( exidy440_interrupt_clear_w )
 static void exidy440_update_firq(running_machine *machine)
 {
 	if (exidy440_firq_vblank || (firq_enable && exidy440_firq_beam))
-		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
 }
 
 

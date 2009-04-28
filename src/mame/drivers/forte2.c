@@ -86,7 +86,7 @@ static const ay8910_interface forte2_ay8910_interface =
 
 static void vdp_interrupt(running_machine *machine, int i)
 {
-	cpu_set_input_line(machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cputag_set_input_line(machine, "maincpu", 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static const TMS9928a_interface tms9928a_interface =

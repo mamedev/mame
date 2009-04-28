@@ -339,7 +339,7 @@ static STREAM_UPDATE( channel_update )
 static READ8_HANDLER( sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	cpu_set_input_line(space->machine->cpu[1], 1, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 1, CLEAR_LINE);
 	exidy440_sound_command_ack = 1;
 
 	return exidy440_sound_command;
@@ -375,7 +375,7 @@ static WRITE8_HANDLER( sound_volume_w )
 
 static WRITE8_HANDLER( sound_interrupt_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 }
 
 

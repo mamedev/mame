@@ -147,7 +147,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	if (data==0x26) {
 		i8751_current_command=0;
 		i8751_return=0xff; /* This value is XOR'd and must equal 0 */
-		cpu_set_input_line_and_vector(space->machine->cpu[0],0,HOLD_LINE,0xff);
+		cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, 0xff);
 		return;
 	}
 
@@ -194,14 +194,14 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	}
 
 	/* Signal main cpu task is complete */
-	cpu_set_input_line_and_vector(space->machine->cpu[0],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, 0xff);
 	i8751_current_command=data;
 }
 
 static WRITE8_HANDLER( firetrap_sound_command_w )
 {
-	soundlatch_w(space,offset,data);
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
@@ -216,21 +216,21 @@ static WRITE8_HANDLER( firetrap_sound_bankselect_w )
 	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(space->machine, 2,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 2, &RAM[bankaddress]);
 }
 
 static int msm5205next;
 
 static void firetrap_adpcm_int (const device_config *device)
 {
-	static int toggle=0;
+	static int toggle = 0;
 
-	msm5205_data_w (device,msm5205next>>4);
-	msm5205next<<=4;
+	msm5205_data_w(device, msm5205next >> 4);
+	msm5205next <<= 4;
 
 	toggle ^= 1;
 	if (firetrap_irq_enable && toggle)
-		cpu_set_input_line (device->machine->cpu[1], M6502_IRQ_LINE, HOLD_LINE);
+		cputag_set_input_line (device->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_adpcm_data_w )

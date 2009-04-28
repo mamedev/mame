@@ -81,8 +81,8 @@ static WRITE16_HANDLER( fantland_nmi_enable_16_w )
 
 static WRITE8_HANDLER( fantland_soundlatch_w )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE16_HANDLER( fantland_soundlatch_16_w )
@@ -864,7 +864,7 @@ MACHINE_DRIVER_END
 
 static void galaxygn_sound_irq(const device_config *device, int line)
 {
-	cpu_set_input_line_and_vector(device->machine->cpu[1], 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	cputag_set_input_line_and_vector(device->machine, "audiocpu", 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
 static const ym2151_interface galaxygn_ym2151_interface =
@@ -977,7 +977,7 @@ MACHINE_DRIVER_END
 
 static void wheelrun_ym3526_irqhandler(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_IRQ0, state);
+	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_IRQ0, state);
 }
 
 static const ym3526_interface wheelrun_ym3526_interface =

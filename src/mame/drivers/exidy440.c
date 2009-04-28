@@ -266,7 +266,7 @@ static INPUT_CHANGED( coin_inserted )
 {
 	/* if we got a coin, set the IRQ on the main CPU */
 	if (newval == 0)
-		cpu_set_input_line(field->port->machine->cpu[0], 0, ASSERT_LINE);
+		cputag_set_input_line(field->port->machine, "maincpu", 0, ASSERT_LINE);
 }
 
 
@@ -310,9 +310,9 @@ void exidy440_bank_select(running_machine *machine, UINT8 bank)
 	if (showdown_bank_data[0] != NULL)
 	{
 		if (bank == 0 && exidy440_bank != 0)
-			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, showdown_bank0_r);
+			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, showdown_bank0_r);
 		else if (bank != 0 && exidy440_bank == 0)
-			memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1));
+			memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1));
 	}
 
 	/* select the bank and update the bank pointer */
@@ -344,7 +344,7 @@ static WRITE8_HANDLER( bankram_w )
 static READ8_HANDLER( exidy440_input_port_3_r )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 	return input_port_read(space->machine, "IN3");
 }
 
@@ -369,7 +369,7 @@ static TIMER_CALLBACK( delayed_sound_command_w )
 	exidy440_sound_command_ack = 0;
 
 	/* cause an FIRQ on the sound CPU */
-	cpu_set_input_line(machine->cpu[1], 1, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", 1, ASSERT_LINE);
 }
 
 
@@ -382,7 +382,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( exidy440_input_port_3_w )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -1937,7 +1937,7 @@ static DRIVER_INIT( claypign )
 {
 	DRIVER_INIT_CALL(exidy440);
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec0, 0x2ec3, 0, 0, claypign_protection_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2ec0, 0x2ec3, 0, 0, claypign_protection_r);
 }
 
 
@@ -1946,11 +1946,11 @@ static DRIVER_INIT( topsecex )
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec6, 0x2ec6, 0, 0, "AN0");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec7, 0x2ec7, 0, 0, "IN4");
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2ec6, 0x2ec6, 0, 0, "AN0");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2ec7, 0x2ec7, 0, 0, "IN4");
 
-	topsecex_yscroll = memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
+	topsecex_yscroll = memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
 }
 
 

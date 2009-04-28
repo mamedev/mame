@@ -130,9 +130,10 @@ static WRITE8_HANDLER( exzisus_sharedram_ac_w )
 	exzisus_sharedram_ac[offset] = data;
 }
 
+// is it ok that cpub_reset refers to cpuc?
 static WRITE8_HANDLER( exzisus_cpub_reset_w )
 {
-	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(space->machine, "cpuc", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 #if 0
@@ -277,7 +278,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

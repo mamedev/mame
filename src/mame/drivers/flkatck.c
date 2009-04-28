@@ -86,7 +86,7 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 			soundlatch_w(space, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+			cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
 			watchdog_reset_w(space, 0, data);

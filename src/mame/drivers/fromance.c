@@ -180,7 +180,7 @@ static void fromance_adpcm_int(const device_config *device)
 
 	/* generate an NMI if we're out of data */
 	if (!fromance_vclk_left)
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1307,4 +1307,3 @@ GAME( 1989, mfunclub,        0, fromance, mfunclub, 0, ROT0, "Video System Co.",
 GAME( 1990, daiyogen,        0, fromance, daiyogen, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", 0 )
 GAME( 1991, nmsengen,        0, fromance, nmsengen, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", 0 )
 GAME( 1991, fromance,        0, fromance, fromance, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", 0 )
-

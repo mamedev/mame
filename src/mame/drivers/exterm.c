@@ -117,13 +117,13 @@ static MACHINE_RESET( exterm )
 
 static WRITE16_HANDLER( exterm_host_data_w )
 {
-	tms34010_host_w(space->machine->cpu[1], offset / TOWORD(0x00100000), data);
+	tms34010_host_w(cputag_get_cpu(space->machine, "slave"), offset / TOWORD(0x00100000), data);
 }
 
 
 static READ16_HANDLER( exterm_host_data_r )
 {
-	return tms34010_host_r(space->machine->cpu[1], offset / TOWORD(0x00100000));
+	return tms34010_host_r(cputag_get_cpu(space->machine, "slave"), offset / TOWORD(0x00100000));
 }
 
 
@@ -198,7 +198,7 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 	{
 		/* Bit 13 = Resets the slave CPU */
 		if ((data & 0x2000) && !(last & 0x2000))
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+			cputag_set_input_line(space->machine, "slave", INPUT_LINE_RESET, PULSE_LINE);
 
 		/* Bits 14-15 = Coin counters */
 		coin_counter_w(0, data & 0x8000);
@@ -213,8 +213,8 @@ static TIMER_CALLBACK( sound_delayed_w )
 {
 	/* data is latched independently for both sound CPUs */
 	master_sound_latch = slave_sound_latch = param;
-	cpu_set_input_line(machine->cpu[2], M6502_IRQ_LINE, ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[3], M6502_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", M6502_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine, "audioslave", M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -236,7 +236,7 @@ static TIMER_CALLBACK( master_sound_nmi_callback )
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (sound_control & 0x01)
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 static READ8_HANDLER( sound_master_latch_r )
 {
 	/* read latch and clear interrupt */
-	cpu_set_input_line(space->machine->cpu[2], M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
 	return master_sound_latch;
 }
 
@@ -268,7 +268,7 @@ static READ8_HANDLER( sound_master_latch_r )
 static READ8_HANDLER( sound_slave_latch_r )
 {
 	/* read latch and clear interrupt */
-	cpu_set_input_line(space->machine->cpu[3], M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audioslave", M6502_IRQ_LINE, CLEAR_LINE);
 	return slave_sound_latch;
 }
 
@@ -284,7 +284,7 @@ static WRITE8_DEVICE_HANDLER( sound_slave_dac_w )
 static READ8_HANDLER( sound_nmi_to_slave_r )
 {
 	/* a read from here triggers an NMI pulse to the slave */
-	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audioslave", INPUT_LINE_NMI, PULSE_LINE);
 	return 0xff;
 }
 

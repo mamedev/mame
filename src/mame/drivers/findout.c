@@ -67,7 +67,7 @@ static READ8_DEVICE_HANDLER( portC_r )
 
 static READ8_DEVICE_HANDLER( port1_r )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	return input_port_read(device->machine, "IN0") | (ticket_dispenser_0_r(space, 0) >> 5);
 }
@@ -88,7 +88,7 @@ static WRITE8_DEVICE_HANDLER( lamps_w )
 
 static WRITE8_DEVICE_HANDLER( sound_w )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* bit 3 - coin lockout (lamp6 in test modes, set to lamp 10 as in getrivia.c) */
 	coin_lockout_global_w(~data & 0x08);

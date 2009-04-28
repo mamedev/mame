@@ -589,7 +589,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
 			if (ACCESSING_BITS_16_31 && (data & 0x0001) == 0)
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+				cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			break;
 
 		case 0x30:
@@ -857,12 +857,12 @@ static int atapi_drivesel;
 
 static void atapi_cause_irq(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ4, ASSERT_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ4, ASSERT_LINE);
 }
 
 static void atapi_clear_irq(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ4, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ4, CLEAR_LINE);
 }
 
 static void atapi_exit(running_machine* machine)
@@ -1277,7 +1277,7 @@ static WRITE32_HANDLER( comm_uart_w )
 static void comm_uart_irq_callback(running_machine *machine, int channel, int value)
 {
 	// TODO
-	//cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, ASSERT_LINE);
+	//cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -1401,20 +1401,20 @@ static void midi_uart_irq_callback(running_machine *machine, int channel, int va
 		if ((extend_board_irq_enable & 0x02) == 0 && value != CLEAR_LINE)
 		{
 			extend_board_irq_active |= 0x02;
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 	else
 	{
 		if ((extend_board_irq_enable & 0x01) == 0 && value != CLEAR_LINE)
 		{
 			extend_board_irq_active |= 0x01;
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 }
 
@@ -1733,10 +1733,10 @@ static UINT32 *work_ram;
 static MACHINE_START( firebeat )
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine->cpu[0], PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(cputag_get_cpu(machine, "maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine->cpu[0], 0x00000000, 0x01ffffff, FALSE, work_ram);
+	ppcdrc_add_fastram(cputag_get_cpu(machine, "maincpu"), 0x00000000, 0x01ffffff, FALSE, work_ram);
 }
 
 static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -2216,7 +2216,7 @@ static void security_w(const device_config *device, UINT8 data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)
-		ppc4xx_spu_receive_byte(device->machine->cpu[0], r);
+		ppc4xx_spu_receive_byte(cputag_get_cpu(device->machine, "maincpu"), r);
 }
 
 /*****************************************************************************/
@@ -2227,9 +2227,9 @@ static void init_lights(running_machine *machine, write32_space_func out1, write
 	if(!out2) out1 = lamp_output2_w;
 	if(!out3) out1 = lamp_output3_w;
 
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7d000804, 0x7d000807, 0, 0, out1);
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7d000320, 0x7d000323, 0, 0, out2);
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7d000324, 0x7d000327, 0, 0, out3);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7d000804, 0x7d000807, 0, 0, out1);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7d000320, 0x7d000323, 0, 0, out2);
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7d000324, 0x7d000327, 0, 0, out3);
 }
 
 static void init_firebeat(running_machine *machine)
@@ -2251,7 +2251,7 @@ static void init_firebeat(running_machine *machine)
 
 	cur_cab_data = cab_data;
 
-	ppc4xx_spu_set_tx_handler(machine->cpu[0], security_w);
+	ppc4xx_spu_set_tx_handler(cputag_get_cpu(machine, "maincpu"), security_w);
 
 	set_ibutton(rom);
 

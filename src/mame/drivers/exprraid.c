@@ -247,8 +247,8 @@ static READ8_HANDLER( exprraid_protection_r )
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
-    soundlatch_w(space,0,data);
-    cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+    soundlatch_w(space, 0, data);
+    cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( vblank_r )
@@ -435,7 +435,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line_and_vector(device->machine->cpu[1],0,linestate,0xff);
+	cputag_set_input_line_and_vector(device->machine, "slave", 0, linestate, 0xff);
 }
 
 static const ym3526_interface ym3526_config =
@@ -760,13 +760,13 @@ static DRIVER_INIT( exprraid )
 
 static DRIVER_INIT( wexpresb )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, vblank_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpresc )
 {
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xFFC0, 0xFFC0, 0, 0, vblank_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xFFC0, 0xFFC0, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 

@@ -19,7 +19,7 @@ static UINT8 sound_nmi_enabled;
 static TIMER_CALLBACK( interrupt_disable )
 {
 	//interrupt_enable = 0;
-	cpu_interrupt_enable(machine->cpu[0],0);
+	cpu_interrupt_enable(cputag_get_cpu(machine, "maincpu"), 0);
 }
 
 MACHINE_RESET( espial )
@@ -67,7 +67,7 @@ INTERRUPT_GEN( zodiac_master_interrupt )
 WRITE8_HANDLER( zodiac_master_soundlatch_w )
 {
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 

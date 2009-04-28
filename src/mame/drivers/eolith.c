@@ -1033,15 +1033,15 @@ static DRIVER_INIT( hidctch2 )
 
 static DRIVER_INIT( hidctch3 )
 {
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfc200000, 0xfc200003, 0, 0, (write32_space_func)SMH_NOP); // this generates pens vibration
+	memory_install_write32_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfc200000, 0xfc200003, 0, 0, (write32_space_func)SMH_NOP); // this generates pens vibration
 
 	// It is not clear why the first reads are needed too
 
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfce00000, 0xfce00003, 0, 0, hidctch3_pen1_r);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfce80000, 0xfce80003, 0, 0, hidctch3_pen1_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfce00000, 0xfce00003, 0, 0, hidctch3_pen1_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfce80000, 0xfce80003, 0, 0, hidctch3_pen1_r);
 
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfcf00000, 0xfcf00003, 0, 0, hidctch3_pen2_r);
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfcf80000, 0xfcf80003, 0, 0, hidctch3_pen2_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfcf00000, 0xfcf00003, 0, 0, hidctch3_pen2_r);
+	memory_install_read32_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0xfcf80000, 0xfcf80003, 0, 0, hidctch3_pen2_r);
 
 	init_eolith_speedup(machine);
 }

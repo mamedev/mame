@@ -97,7 +97,7 @@ static WRITE16_HANDLER( fromanc2_sndcmd_w )
 	soundlatch_w(space, offset, (data >> 8) & 0xff);	// 1P (LEFT)
 	soundlatch2_w(space, offset, data & 0xff);			// 2P (RIGHT)
 
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	fromanc2_sndcpu_nmi_flag = 0;
 }
 
@@ -194,13 +194,13 @@ static WRITE16_HANDLER( fromanc2_subcpu_w )
 {
 	fromanc2_datalatch1 = data;
 
-	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE);
 	fromanc2_subcpu_int_flag = 0;
 }
 
 static READ16_HANDLER( fromanc2_subcpu_r )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 	fromanc2_subcpu_nmi_flag = 0;
 
 	return (fromanc2_datalatch_2h << 8) | fromanc2_datalatch_2l;
@@ -552,7 +552,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -825,4 +825,3 @@ ROM_END
 GAME( 1995, fromanc2, 0, fromanc2, fromanc2, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan)", 0 )
 GAME( 1995, fromancr, 0, fromancr, fromanc2, fromancr, ROT0, "Video System Co.", "Taisen Mahjong FinalRomance R (Japan)", 0 )
 GAME( 1998, fromanc4, 0, fromanc4, fromanc4, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong FinalRomance 4 (Japan)", 0 )
-

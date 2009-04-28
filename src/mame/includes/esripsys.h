@@ -16,14 +16,6 @@
 #define CMOS_RAM_SIZE			(2048)
 #define FDT_RAM_SIZE			(2048 * sizeof(UINT16))
 
-enum
-{
-	ESRIPSYS_GAME_CPU  = 0,
-	ESRIPSYS_FRAME_CPU = 1,
-	ESRIPSYS_VIDEO_CPU = 2,
-	ESRIPSYS_SOUND_CPU = 3,
-};
-
 /*----------- defined in video/esripsys.c -----------*/
 
 extern int esripsys_hblank;

@@ -410,7 +410,7 @@ static emu_timer *nmi_timer, *adjuster_timer;
 
 static TIMER_CALLBACK( equites_nmi_callback )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -443,17 +443,17 @@ static WRITE8_HANDLER(equites_c0f8_w)
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			generic_pulse_irq_line(space->machine->cpu[1], I8085_RST75_LINE);
+			generic_pulse_irq_line(cputag_get_cpu(space->machine, "audiocpu"), I8085_RST75_LINE);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			cpu_set_input_line(space->machine->cpu[1], I8085_INTR_LINE, HOLD_LINE);
+			cputag_set_input_line(space->machine, "audiocpu", I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -700,12 +700,12 @@ static WRITE16_HANDLER(mcu_w)
 
 static WRITE16_HANDLER( mcu_halt_assert_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( mcu_halt_clear_w )
 {
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 
@@ -1848,8 +1848,8 @@ static DRIVER_INIT( gekisou )
 	unpack_region(machine, "gfx3");
 
 	// install special handlers for unknown device (protection?)
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1862,7 +1862,7 @@ static DRIVER_INIT( hvoltage )
 	unpack_region(machine, "gfx3");
 
 #if HVOLTAGE_DEBUG
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
 #endif
 }
 
@@ -1881,5 +1881,3 @@ GAME( 1985, gekisou,  0,        gekisou,  gekisou,  gekisou,  ROT90, "Eastern Co
 // Splendor Blast Hardware
 GAME( 1985, splndrbt, 0,        splndrbt, splndrbt, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1985, hvoltage, 0,        splndrbt, hvoltage, hvoltage, ROT0,  "Alpha Denshi Co.", "High Voltage", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-
-/******************************************************************************/
