@@ -77,20 +77,14 @@ static WRITE8_HANDLER( sspeedr_sound_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x21ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x2000, 0x21ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sspeedr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x2000, 0x21ff) AM_RAM
 	AM_RANGE(0x7f00, 0x7f17) AM_WRITE(sspeedr_score_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sspeedr_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -196,8 +190,8 @@ static MACHINE_DRIVER_START( sspeedr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 19968000 / 8)
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(sspeedr_map, 0)
+	MDRV_CPU_IO_MAP(sspeedr_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* video hardware */

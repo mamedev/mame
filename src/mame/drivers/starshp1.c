@@ -164,31 +164,25 @@ static WRITE8_HANDLER( starshp1_misc_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READ(SMH_RAM) AM_MIRROR(0x100)
-	AM_RANGE(0x2c00, 0x3fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( starshp1_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
+	AM_RANGE(0x2c00, 0x3fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("VBLANK")
-	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("COINAGE")
-	AM_RANGE(0xd800, 0xd800) AM_READ(starshp1_rng_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE(SMH_RAM) AM_MIRROR(0x100)
-	AM_RANGE(0x2c00, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc300, 0xc3ff) AM_WRITE(starshp1_sspic_w) /* spaceship picture */
+	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xc400, 0xc4ff) AM_WRITE(starshp1_ssadd_w) /* spaceship address */
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(starshp1_playfield_w) AM_BASE(&starshp1_playfield_ram)
-	AM_RANGE(0xcc00, 0xcc0f) AM_WRITE(SMH_RAM) AM_BASE(&starshp1_hpos_ram)
-	AM_RANGE(0xd000, 0xd00f) AM_WRITE(SMH_RAM) AM_BASE(&starshp1_vpos_ram)
-	AM_RANGE(0xd400, 0xd40f) AM_WRITE(SMH_RAM) AM_BASE(&starshp1_obj_ram)
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(starshp1_playfield_w) AM_BASE(&starshp1_playfield_ram)
+	AM_RANGE(0xcc00, 0xcc0f) AM_WRITEONLY AM_BASE(&starshp1_hpos_ram)
+	AM_RANGE(0xd000, 0xd00f) AM_WRITEONLY AM_BASE(&starshp1_vpos_ram)
+	AM_RANGE(0xd400, 0xd40f) AM_WRITEONLY AM_BASE(&starshp1_obj_ram)
+	AM_RANGE(0xd800, 0xd800) AM_READ(starshp1_rng_r)
 	AM_RANGE(0xd800, 0xd80f) AM_WRITE(starshp1_collision_reset_w)
 	AM_RANGE(0xdc00, 0xdc0f) AM_WRITE(starshp1_misc_w)
 	AM_RANGE(0xdd00, 0xdd0f) AM_WRITE(starshp1_analog_in_w)
 	AM_RANGE(0xde00, 0xde0f) AM_DEVWRITE("discrete", starshp1_audio_w)
 	AM_RANGE(0xdf00, 0xdf0f) AM_DEVWRITE("discrete", starshp1_analog_out_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -304,7 +298,7 @@ static MACHINE_DRIVER_START( starshp1 )
 	/* basic machine hardware */
 
 	MDRV_CPU_ADD("maincpu", M6502, STARSHP1_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
+	MDRV_CPU_PROGRAM_MAP(starshp1_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", starshp1_interrupt)
 
 	/* video hardware */

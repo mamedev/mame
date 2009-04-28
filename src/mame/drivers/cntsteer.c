@@ -386,7 +386,7 @@ static WRITE8_HANDLER( cntsteer_background_w )
 
 static WRITE8_HANDLER( gekitsui_sub_irq_ack )
 {
-	cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "subcpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sound_w )
@@ -399,23 +399,23 @@ static WRITE8_HANDLER( zerotrgt_ctrl_w )
 {
 	/*TODO: check this.*/
 	logerror("CTRL: %04x: %04x: %04x\n",cpu_get_pc(space->cpu),offset,data);
-//  if (offset==0) cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+//  if (offset==0) cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset==1) cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset==2) cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset==1) cputag_set_input_line(space->machine, "subcpu", M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset==2) cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_irq_w )
 {
-	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "subcpu", M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n",data);
 }
 
 static WRITE8_HANDLER( cntsteer_sub_nmi_w )
 {
 //  if(data)
-//  cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+//  cputag_set_input_line(space->machine, "subcpu", INPUT_LINE_NMI, PULSE_LINE);
 //  popmessage("%02x",data);
 }
 
@@ -588,7 +588,7 @@ INPUT_PORTS_END
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cputag_set_input_line(field->port->machine, "audiocpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : PULSE_LINE);
+	cputag_set_input_line(field->port->machine, "subcpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : PULSE_LINE);
 }
 
 static INPUT_PORTS_START( cntsteer )
@@ -738,7 +738,7 @@ static MACHINE_DRIVER_START( cntsteer )
 	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD("sub", M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu2_map,0)
 //  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
@@ -781,7 +781,7 @@ static MACHINE_DRIVER_START( zerotrgt )
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD("sub", M6809, 2000000)		 /* ? */
+	MDRV_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
 	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map,0)
 //  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
@@ -825,7 +825,7 @@ ROM_START( cntsteer )
 	ROM_LOAD( "by02", 0x8000, 0x4000, CRC(b6fdd7fd) SHA1(e54cc31628966f747f9ccbf9db1017ed1eee0d5d) )
 	ROM_LOAD( "by01", 0xc000, 0x4000, CRC(932423a5) SHA1(0d8164359a79ae554328dfb4d729a8d07de7ee75) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "by12", 0x4000, 0x4000, CRC(278e7fed) SHA1(5def4c8919a507c64045c57de2da65e1d39e1185) )
 	ROM_LOAD( "by11", 0x8000, 0x4000, CRC(00624e34) SHA1(27bd472e9f2feef4a2c4753d8b0da26ff30d930d) )
 	ROM_LOAD( "by10", 0xc000, 0x4000, CRC(9227a9ce) SHA1(8c86f22f90a3a8853562469037ffa06693045f4c) )
@@ -867,7 +867,7 @@ ROM_START( zerotrgt )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ct01-s.4c", 0x8000, 0x8000, CRC(b35a16cb) SHA1(49581324c3e3d5219f0512d08a40161185368b10) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "ct08.16a",  0x4000, 0x4000,  CRC(7e8db408) SHA1(2ae407d15645753a2a0d691c9f1cf1eb383d3e8a) )
 	ROM_LOAD( "cty07.14a", 0x8000, 0x4000,  CRC(119b6211) SHA1(2042f06387d34fad6b63bcb8ac6f9b06377f634d) )
 	ROM_LOAD( "ct06.13a",  0xc000, 0x4000,  CRC(bce5adad) SHA1(86c4eef0d68679a24bab6460b49640a498f32ecd) )
@@ -910,7 +910,7 @@ ROM_START( gekitsui )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ct01", 0x8000, 0x8000, CRC(d3d82d8d) SHA1(c175c626d4cb89a2d82740c04892092db6faf616) )
 
-	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_REGION( 0x10000, "subcpu", 0 )
 	ROM_LOAD( "ct08.16a",  0x4000, 0x4000,  CRC(7e8db408) SHA1(2ae407d15645753a2a0d691c9f1cf1eb383d3e8a) )
 	ROM_LOAD( "cty07.14a", 0x8000, 0x4000,  CRC(119b6211) SHA1(2042f06387d34fad6b63bcb8ac6f9b06377f634d) )
 	ROM_LOAD( "ct06.13a",  0xc000, 0x4000,  CRC(bce5adad) SHA1(86c4eef0d68679a24bab6460b49640a498f32ecd) )
@@ -974,7 +974,7 @@ static void zerotrgt_rearrange_gfx(running_machine *machine, int romsize, int ro
 #if 0
 static void init_cntsteer(void)
 {
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = memory_region(machine, "subcpu");
 
 	RAM[0xc2cf]=0x43; /* Patch out Cpu 1 ram test - it never ends..?! */
 	RAM[0xc2d0]=0x43;

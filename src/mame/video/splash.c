@@ -78,11 +78,6 @@ static TILE_GET_INFO( get_tile_info_splash_tilemap1 )
 
 ***************************************************************************/
 
-READ16_HANDLER( splash_vram_r )
-{
-	return splash_videoram[offset];
-}
-
 WRITE16_HANDLER( splash_vram_w )
 {
 	COMBINE_DATA(&splash_videoram[offset]);

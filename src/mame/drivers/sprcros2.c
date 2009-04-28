@@ -70,23 +70,14 @@ WRITE8_HANDLER( sprcros2_bgscrolly_w );
 PALETTE_INIT( sprcros2 );
 VIDEO_START( sprcros2 );
 VIDEO_UPDATE( sprcros2 );
-static UINT8 *sprcros2_sharedram;
 UINT8 sprcros2_m_port7 = 0;
 static UINT8 sprcros2_s_port3 = 0;
 
-static READ8_HANDLER( sprcros2_sharedram_r )
-{
-	return sprcros2_sharedram[offset];
-}
 
-static WRITE8_HANDLER( sprcros2_sharedram_w )
-{
-	sprcros2_sharedram[offset]=data;
-}
 
 static WRITE8_HANDLER( sprcros2_m_port7_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "maincpu");
+	UINT8 *RAM = memory_region(space->machine, "master");
 
 	//76543210
 	//x------- unused
@@ -107,7 +98,7 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 
 static WRITE8_HANDLER( sprcros2_s_port3_w )
 {
-	UINT8 *RAM = memory_region(space->machine, "audiocpu");
+	UINT8 *RAM = memory_region(space->machine, "slave");
 
 	//76543210
 	//xxxx---- unused
@@ -121,25 +112,18 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 	sprcros2_s_port3 = data;
 }
 
-static ADDRESS_MAP_START( sprcros2_m_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0xe000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)						//shared with slave cpu
+static ADDRESS_MAP_START( sprcros2_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(1)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_BASE(&sprcros2_fgvideoram)
+	AM_RANGE(0xe800, 0xe817) AM_RAM						//always zero
+	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE(&sprcros2_spriteram) AM_SIZE(&sprcros2_spriteram_size)
+	AM_RANGE(0xe840, 0xefff) AM_RAM						//always zero
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(1)			//shared with slave cpu
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprcros2_m_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_BANK(1))
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(sprcros2_fgvideoram_w) AM_BASE(&sprcros2_fgvideoram)
-	AM_RANGE(0xe800, 0xe817) AM_WRITE(SMH_RAM)						//always zero
-	AM_RANGE(0xe818, 0xe83f) AM_WRITE(SMH_RAM) AM_BASE(&sprcros2_spriteram) AM_SIZE(&sprcros2_spriteram_size)
-	AM_RANGE(0xe840, 0xefff) AM_WRITE(SMH_RAM)						//always zero
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&sprcros2_sharedram)	//shared with slave cpu
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sprcros2_master_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496_w)
@@ -149,25 +133,16 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITE(sprcros2_m_port7_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprcros2_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK(2))
-	AM_RANGE(0xe000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(sprcros2_sharedram_r)
+static ADDRESS_MAP_START( sprcros2_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(2)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE(&sprcros2_bgvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM						//always zero
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprcros2_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_BANK(2))
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(sprcros2_bgvideoram_w) AM_BASE(&sprcros2_bgvideoram)
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(SMH_RAM)						//always zero
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(sprcros2_sharedram_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sprcros2_slave_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sprcros2_bgscrollx_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(sprcros2_bgscrolly_w)
@@ -295,14 +270,14 @@ static MACHINE_START( sprcros2 )
 static MACHINE_DRIVER_START( sprcros2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,10000000/2)
-	MDRV_CPU_PROGRAM_MAP(sprcros2_m_readmem,sprcros2_m_writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_ADD("master", Z80,10000000/2)
+	MDRV_CPU_PROGRAM_MAP(sprcros2_master_map,0)
+	MDRV_CPU_IO_MAP(sprcros2_master_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_m_interrupt,2)	//1 nmi + 1 irq
 
-	MDRV_CPU_ADD("audiocpu", Z80,10000000/2)
-	MDRV_CPU_PROGRAM_MAP(sprcros2_s_readmem,sprcros2_s_writemem)
-	MDRV_CPU_IO_MAP(audio_io_map,0)
+	MDRV_CPU_ADD("slave", Z80,10000000/2)
+	MDRV_CPU_PROGRAM_MAP(sprcros2_slave_map,0)
+	MDRV_CPU_IO_MAP(sprcros2_slave_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_s_interrupt,2)	//2 nmis
 
 	MDRV_MACHINE_START(sprcros2)
@@ -336,14 +311,14 @@ static MACHINE_DRIVER_START( sprcros2 )
 MACHINE_DRIVER_END
 
 ROM_START( sprcros2 )
-	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_REGION( 0x14000, "master", 0 )
 	ROM_LOAD( "scm-03.10g", 0x00000, 0x4000, CRC(b9757908) SHA1(d59cb2aac1b6268fc766306850f5711d4a12d897) )
 	ROM_LOAD( "scm-02.10j", 0x04000, 0x4000, CRC(849c5c87) SHA1(0e02c4990e371d6a290efa53301818e769648945) )
 	ROM_LOAD( "scm-01.10k", 0x08000, 0x4000, CRC(385a62de) SHA1(847bf9d97ab3fa8949d9198e4e509948a940d6aa) )
 
 	ROM_LOAD( "scm-00.10l", 0x10000, 0x4000, CRC(13fa3684) SHA1(611b7a237e394f285dcc5beb027dacdbdd58a7a0) )	//banked into c000-dfff
 
-	ROM_REGION( 0x14000, "audiocpu", 0 )
+	ROM_REGION( 0x14000, "slave", 0 )
 	ROM_LOAD( "scs-30.5f",  0x00000, 0x4000, CRC(c0a40e41) SHA1(e74131b353855749258dffa45091c825ccdbf05a) )
 	ROM_LOAD( "scs-29.5h",  0x04000, 0x4000, CRC(83d49fa5) SHA1(7112110df2f382bbc0e651adcec975054a485b9b) )
 	ROM_LOAD( "scs-28.5j",  0x08000, 0x4000, CRC(480d351f) SHA1(d1b86f441ae0e58b30e0f089ab25de219d5f30e3) )
@@ -373,14 +348,14 @@ ROM_END
 
 /* this is probably an old revision */
 ROM_START( sprcrs2a )
-	ROM_REGION( 0x14000, "maincpu", 0 )
+	ROM_REGION( 0x14000, "master", 0 )
 	ROM_LOAD( "15.bin",     0x00000, 0x4000, CRC(b9d02558) SHA1(775404c6c7648d9dab02b496541739ea700cd481) )
 	ROM_LOAD( "scm-02.10j", 0x04000, 0x4000, CRC(849c5c87) SHA1(0e02c4990e371d6a290efa53301818e769648945) )
 	ROM_LOAD( "scm-01.10k", 0x08000, 0x4000, CRC(385a62de) SHA1(847bf9d97ab3fa8949d9198e4e509948a940d6aa) )
 
 	ROM_LOAD( "scm-00.10l", 0x10000, 0x4000, CRC(13fa3684) SHA1(611b7a237e394f285dcc5beb027dacdbdd58a7a0) )	//banked into c000-dfff
 
-	ROM_REGION( 0x14000, "audiocpu", 0 )
+	ROM_REGION( 0x14000, "slave", 0 )
 	ROM_LOAD( "scs-30.5f",  0x00000, 0x4000, CRC(c0a40e41) SHA1(e74131b353855749258dffa45091c825ccdbf05a) )
 	ROM_LOAD( "scs-29.5h",  0x04000, 0x4000, CRC(83d49fa5) SHA1(7112110df2f382bbc0e651adcec975054a485b9b) )
 	ROM_LOAD( "scs-28.5j",  0x08000, 0x4000, CRC(480d351f) SHA1(d1b86f441ae0e58b30e0f089ab25de219d5f30e3) )

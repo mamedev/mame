@@ -34,18 +34,12 @@ extern int p2_sprite;
 extern int s1_sprite;
 extern int s2_sprite;
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM) /* Program ROM */
-	AM_RANGE(0x1000, 0x10ff) AM_READ(SMH_RAM) /* RAM */
+static ADDRESS_MAP_START( starcrus_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0x10ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM) /* Program ROM */
-    AM_RANGE(0x1000, 0x10ff) AM_WRITE(SMH_RAM) /* RAM */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( starcrus_io_map, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(starcrus_s1_x_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(starcrus_s1_y_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(starcrus_coll_det_r, starcrus_s2_x_w)
@@ -164,8 +158,8 @@ static MACHINE_DRIVER_START( starcrus )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080,9750000/9)  /* 8224 chip is a divide by 9 */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(starcrus_map,0)
+	MDRV_CPU_IO_MAP(starcrus_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */

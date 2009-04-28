@@ -246,9 +246,9 @@ static WRITE8_HANDLER( sprint2_lamp2_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(sprint2_wram_r)
-	AM_RANGE(0x0400, 0x07ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( sprint2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(sprint2_wram_r,sprint2_wram_w)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_BASE(&sprint2_video_ram)
 	AM_RANGE(0x0818, 0x081f) AM_READ(sprint2_input_A_r)
 	AM_RANGE(0x0828, 0x082f) AM_READ(sprint2_input_B_r)
 	AM_RANGE(0x0830, 0x0837) AM_READ(sprint2_dip_r)
@@ -256,17 +256,6 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0880, 0x08bf) AM_READ(sprint2_steering1_r)
 	AM_RANGE(0x08c0, 0x08ff) AM_READ(sprint2_steering2_r)
 	AM_RANGE(0x0c00, 0x0fff) AM_READ(sprint2_sync_r)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(sprint2_collision1_r)
-	AM_RANGE(0x1400, 0x17ff) AM_READ(sprint2_collision2_r)
-	AM_RANGE(0x1800, 0x1800) AM_READNOP  /* debugger ROM location? */
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(sprint2_wram_w)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(sprint2_video_ram_w) AM_BASE(&sprint2_video_ram)
 	AM_RANGE(0x0c00, 0x0c0f) AM_DEVWRITE("discrete", sprint2_attract_w)
 	AM_RANGE(0x0c10, 0x0c1f) AM_DEVWRITE("discrete", sprint2_skid1_w)
 	AM_RANGE(0x0c20, 0x0c2f) AM_DEVWRITE("discrete", sprint2_skid2_w)
@@ -279,8 +268,11 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE(sprint2_steering_reset1_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_WRITE(sprint2_steering_reset2_w)
 	AM_RANGE(0x0f00, 0x0f7f) AM_DEVWRITE("discrete", sprint2_noise_reset_w)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(sprint2_collision1_r)
+	AM_RANGE(0x1400, 0x17ff) AM_READ(sprint2_collision2_r)
+	AM_RANGE(0x1800, 0x1800) AM_READNOP  /* debugger ROM location? */
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -504,7 +496,7 @@ static MACHINE_DRIVER_START( sprint2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 16)
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
+	MDRV_CPU_PROGRAM_MAP(sprint2_map, 0)
 	MDRV_CPU_VBLANK_INT("screen", sprint2)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 
