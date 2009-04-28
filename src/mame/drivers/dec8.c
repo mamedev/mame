@@ -412,7 +412,7 @@ static void csilver_adpcm_int(const device_config *device)
 
 	toggle ^= 1;
 	if (toggle)
-		cpu_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 
 	msm5205_data_w(device, msm5205next >> 4);
 	msm5205next <<= 4;
@@ -2101,7 +2101,7 @@ static MACHINE_DRIVER_START( oscar )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2145,7 +2145,7 @@ static MACHINE_DRIVER_START( lastmiss )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2189,7 +2189,7 @@ static MACHINE_DRIVER_START( shackled )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2234,7 +2234,7 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */

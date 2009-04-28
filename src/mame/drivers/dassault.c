@@ -189,9 +189,10 @@ static READ16_HANDLER( dassault_irq_r )
 
 static WRITE16_HANDLER( dassault_irq_w )
 {
-	switch (offset) {
-		case 0: cpu_set_input_line(space->machine, "maincpu", 5, ASSERT_LINE); break;
-		case 1: cpu_set_input_line(space->machine, "sub", 6, ASSERT_LINE); break;
+	switch (offset) 
+	{
+		case 0: cputag_set_input_line(space->machine, "maincpu", 5, ASSERT_LINE); break;
+		case 1: cputag_set_input_line(space->machine, "sub", 6, ASSERT_LINE); break;
 	}
 
 	COMBINE_DATA(&shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
