@@ -64,21 +64,21 @@ static int automat_msm5205_vclk_toggle;
 
 static WRITE16_HANDLER( dec0_control_w )
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
 		case 0: /* Playfield & Sprite priority */
-			dec0_priority_w(space,0,data,mem_mask);
+			dec0_priority_w(space, 0, data, mem_mask);
 			break;
 
 		case 2: /* DMA flag */
-			dec0_update_sprites_w(space,0,0,mem_mask);
+			dec0_update_sprites_w(space, 0, 0, mem_mask);
 			break;
 
 		case 4: /* 6502 sound cpu */
 			if (ACCESSING_BITS_0_7)
 			{
-				soundlatch_w(space,0,data & 0xff);
-				cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+				soundlatch_w(space, 0, data & 0xff);
+				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 
@@ -110,18 +110,18 @@ static WRITE16_HANDLER( dec0_control_w )
 
 static WRITE16_HANDLER( automat_control_w )
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
 		case 0xe: /* 6502 sound cpu */
 			if (ACCESSING_BITS_0_7)
 			{
-				soundlatch_w(space,0,data & 0xff);
-				cpu_set_input_line(space->machine->cpu[1], 0 ,HOLD_LINE);
+				soundlatch_w(space, 0, data & 0xff);
+				cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 			}
 			break;
 
 		case 12: /* DMA flag */
-			dec0_update_sprites_w(space,0,0,mem_mask);
+			dec0_update_sprites_w(space, 0, 0, mem_mask);
 			break;
 #if 0
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
@@ -143,16 +143,17 @@ static WRITE16_HANDLER( automat_control_w )
 
 static WRITE16_HANDLER( slyspy_control_w )
 {
-    switch (offset<<1) {
+    switch (offset << 1) 
+	{
     	case 0:
 			if (ACCESSING_BITS_0_7)
 			{
-				soundlatch_w(space,0,data & 0xff);
-				cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+				soundlatch_w(space, 0, data & 0xff);
+				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 		case 2:
-			dec0_priority_w(space,0,data,mem_mask);
+			dec0_priority_w(space, 0, data, mem_mask);
 			break;
     }
 }
@@ -161,8 +162,8 @@ static WRITE16_HANDLER( midres_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -944,12 +945,12 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate); /* IRQ */
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate); /* IRQ */
 }
 
 static void sound_irq2(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],1,linestate); /* IRQ2 */
+	cputag_set_input_line(device->machine, "audiocpu", 1, linestate); /* IRQ2 */
 }
 
 static const ym3812_interface ym3812_config =
@@ -974,7 +975,7 @@ static void automat_vclk_cb(const device_config *device)
 	else
 	{
 		msm5205_data_w(device, automat_adpcm_byte >> 4);
-		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	automat_msm5205_vclk_toggle ^= 1;

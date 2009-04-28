@@ -183,30 +183,30 @@ static WRITE16_HANDLER( ddragon3_io16_w )
 		break;
 
 		case 1: /* soundlatch_w */
-		soundlatch_w(space,1,reg[1]&0xff);
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(space, 1, reg[1] & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
 		/*  this gets written to on startup and at the end of IRQ6
         **  possibly trigger IRQ on sound CPU
         */
-		cpu_set_input_line(space->machine->cpu[0], 6, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
 		break;
 
 		case 3:
 		/*  this gets written to on startup,
         **  and at the end of IRQ5 (input port read) */
-		cpu_set_input_line(space->machine->cpu[0], 5, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 5, CLEAR_LINE);
 		break;
 
 		case 4:
 		/* this gets written to at the end of IRQ6 only */
-		cpu_set_input_line(space->machine->cpu[0], 6, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
 		break;
 
 		default:
-		logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset,(unsigned)data, cpu_get_pc(space->cpu) );
+		logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(space->cpu) );
 		break;
 	}
 }
@@ -526,7 +526,7 @@ GFXDECODE_END
 
 static void dd3_ymirq_handler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(device->machine, "audiocpu", 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -549,14 +549,14 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 	{
 		if (scanline > 0)
 			video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cpu_set_input_line(timer->machine->cpu[0], 5, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", 5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
 		video_screen_update_partial(timer->machine->primary_screen, scanline - 1);
-		cpu_set_input_line(timer->machine->cpu[0], 6, ASSERT_LINE);
+		cputag_set_input_line(timer->machine, "maincpu", 6, ASSERT_LINE);
 	}
 }
 

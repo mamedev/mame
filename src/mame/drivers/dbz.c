@@ -120,15 +120,15 @@ static WRITE16_HANDLER( dbz_sound_command_w )
 
 static WRITE16_HANDLER( dbz_sound_cause_nmi )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void dbz_sound_irq(const device_config *device, int irq)
 {
 	if (irq)
-		cpu_set_input_line(device->machine->cpu[1], 0, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", 0, ASSERT_LINE);
 	else
-		cpu_set_input_line(device->machine->cpu[1], 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dbz_map, ADDRESS_SPACE_PROGRAM, 16 )

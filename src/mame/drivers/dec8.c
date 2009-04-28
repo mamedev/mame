@@ -56,23 +56,23 @@ static int msm5205next;
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static VIDEO_EOF( dec8 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	buffer_spriteram_w(space,0,0);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram_w(space, 0, 0);
 }
 
 static READ8_HANDLER( i8751_h_r )
 {
-	return i8751_return>>8; /* MSB */
+	return i8751_return >> 8; /* MSB */
 }
 
 static READ8_HANDLER( i8751_l_r )
 {
-	return i8751_return&0xff; /* LSB */
+	return i8751_return & 0xff; /* LSB */
 }
 
 static WRITE8_HANDLER( i8751_reset_w )
 {
-	i8751_return=0;
+	i8751_return = 0;
 }
 
 /******************************************************************************/
@@ -81,7 +81,8 @@ static READ8_HANDLER( gondo_player_1_r )
 {
 	int val = 1 << input_port_read(space->machine, "AN0");
 
-	switch (offset) {
+	switch (offset) 
+	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
@@ -94,7 +95,8 @@ static READ8_HANDLER( gondo_player_2_r )
 {
 	int val = 1 << input_port_read(space->machine, "AN1");
 
-	switch (offset) {
+	switch (offset) 
+	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
@@ -107,45 +109,47 @@ static READ8_HANDLER( gondo_player_2_r )
 
 static WRITE8_HANDLER( ghostb_i8751_w )
 {
-	i8751_return=0;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset) 
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
+		i8751_value = (i8751_value & 0xff) | (data << 8);
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
-	if (i8751_value==0x00aa) i8751_return=0x655;
-	if (i8751_value==0x021a) i8751_return=0x6e5; /* Ghostbusters ID */
-	if (i8751_value==0x021b) i8751_return=0x6e4; /* Meikyuu Hunter G ID */
+	if (i8751_value == 0x00aa) i8751_return = 0x655;
+	if (i8751_value == 0x021a) i8751_return = 0x6e5; /* Ghostbusters ID */
+	if (i8751_value == 0x021b) i8751_return = 0x6e4; /* Meikyuu Hunter G ID */
 }
 
 static WRITE8_HANDLER( srdarwin_i8751_w )
 {
-	static int coins,latch;
-	i8751_return=0;
+	static int coins, latch;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset) 
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
+		i8751_value = (i8751_value & 0xff) | (data << 8);
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
-	if (i8751_value==0x0000) {i8751_return=0;coins=0;}
-	if (i8751_value==0x3063) i8751_return=0x9c; /* Protection - Japanese version */
-	if (i8751_value==0x306b) i8751_return=0x94; /* Protection - World version */
-	if ((i8751_value&0xff00)==0x4000) i8751_return=i8751_value; /* Coinage settings */
- 	if (i8751_value==0x5000) i8751_return=((coins / 10) << 4) | (coins % 10); /* Coin request */
- 	if (i8751_value==0x6000) {i8751_value=-1; coins--; } /* Coin clear */
+	if (i8751_value == 0x0000) {i8751_return = 0; coins = 0;}
+	if (i8751_value == 0x3063) i8751_return = 0x9c;				/* Protection - Japanese version */
+	if (i8751_value == 0x306b) i8751_return = 0x94;				/* Protection - World version */
+	if ((i8751_value & 0xff00) == 0x4000) i8751_return = i8751_value;	/* Coinage settings */
+ 	if (i8751_value == 0x5000) i8751_return =((coins / 10) << 4) | (coins % 10);	/* Coin request */
+ 	if (i8751_value == 0x6000) {i8751_value = -1; coins--; }	/* Coin clear */
 	/* Nb:  Command 0x4000 for setting coinage options is not supported */
- 	if ((input_port_read(space->machine, "FAKE") & 1) == 1) latch=1;
- 	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && latch) {coins++; latch=0;}
+ 	if ((input_port_read(space->machine, "FAKE") & 1) == 1) latch = 1;
+ 	if ((input_port_read(space->machine, "FAKE") & 1) != 1 && latch) {coins++; latch = 0;}
 
 	/* This next value is the index to a series of tables,
     each table controls the end of level bad guy, wrong values crash the
@@ -183,165 +187,171 @@ bb63           = Square things again
     but Boss #6 is uncomfirmed as correct.
 
 */
-	if (i8751_value==0x8000) i8751_return=0xf580 +  0; /* Boss #1: Snake + Bees */
-	if (i8751_value==0x8001) i8751_return=0xf580 + 30; /* Boss #2: 4 Corners */
-	if (i8751_value==0x8002) i8751_return=0xf580 + 26; /* Boss #3: Clock */
-	if (i8751_value==0x8003) i8751_return=0xf580 +  2; /* Boss #4: Pyramid */
-	if (i8751_value==0x8004) i8751_return=0xf580 +  6; /* Boss #5: Snake + Head Combo */
-	if (i8751_value==0x8005) i8751_return=0xf580 + 24; /* Boss #6: LED Panels */
-	if (i8751_value==0x8006) i8751_return=0xf580 + 28; /* Boss #7: Dragon */
-	if (i8751_value==0x8007) i8751_return=0xf580 + 32; /* Boss #8: Teleport */
-	if (i8751_value==0x8008) i8751_return=0xf580 + 38; /* Boss #9: Octopus (Pincer) */
-	if (i8751_value==0x8009) i8751_return=0xf580 + 40; /* Boss #10: Bird */
-	if (i8751_value==0x800a) i8751_return=0xf580 + 42; /* End Game(bad address?) */
+	if (i8751_value == 0x8000) i8751_return = 0xf580 +  0; /* Boss #1: Snake + Bees */
+	if (i8751_value == 0x8001) i8751_return = 0xf580 + 30; /* Boss #2: 4 Corners */
+	if (i8751_value == 0x8002) i8751_return = 0xf580 + 26; /* Boss #3: Clock */
+	if (i8751_value == 0x8003) i8751_return = 0xf580 +  2; /* Boss #4: Pyramid */
+	if (i8751_value == 0x8004) i8751_return = 0xf580 +  6; /* Boss #5: Snake + Head Combo */
+	if (i8751_value == 0x8005) i8751_return = 0xf580 + 24; /* Boss #6: LED Panels */
+	if (i8751_value == 0x8006) i8751_return = 0xf580 + 28; /* Boss #7: Dragon */
+	if (i8751_value == 0x8007) i8751_return = 0xf580 + 32; /* Boss #8: Teleport */
+	if (i8751_value == 0x8008) i8751_return = 0xf580 + 38; /* Boss #9: Octopus (Pincer) */
+	if (i8751_value == 0x8009) i8751_return = 0xf580 + 40; /* Boss #10: Bird */
+	if (i8751_value == 0x800a) i8751_return = 0xf580 + 42; /* End Game(bad address?) */
 }
 
 static WRITE8_HANDLER( gondo_i8751_w )
 {
-	static int coin1,coin2,latch,snd;
-	i8751_return=0;
+	static int coin1, coin2, latch,snd;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset) 
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
-		if (int_enable) cpu_set_input_line (space->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		if (int_enable) 
+			cputag_set_input_line (space->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
- 	if ((input_port_read(space->machine, "I8751") & 3) == 3) latch=1;
- 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && latch) {coin1++; snd=1; latch=0;}
- 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && latch) {coin2++; snd=1; latch=0;}
+ 	if ((input_port_read(space->machine, "I8751") & 3) == 3) latch = 1;
+ 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && latch) {coin1++; snd = 1; latch = 0;}
+ 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && latch) {coin2++; snd = 1; latch = 0;}
 
 	/* Work out return values */
-	if (i8751_value==0x0000) {i8751_return=0; coin1=coin2=snd=0;}
-	if (i8751_value==0x038a)  i8751_return=0x375; /* Makyou Senshi ID */
-	if (i8751_value==0x038b)  i8751_return=0x374; /* Gondomania ID */
-	if ((i8751_value>>8)==0x04)  i8751_return=0x40f; /* Coinage settings (Not supported) */
-	if ((i8751_value>>8)==0x05) {i8751_return=0x500 | ((coin1 / 10) << 4) | (coin1 % 10);  } /* Coin 1 */
-	if ((i8751_value>>8)==0x06 && coin1 && !offset) {i8751_return=0x600; coin1--; } /* Coin 1 clear */
-	if ((i8751_value>>8)==0x07) {i8751_return=0x700 | ((coin2 / 10) << 4) | (coin2 % 10);  } /* Coin 2 */
-	if ((i8751_value>>8)==0x08 && coin2 && !offset) {i8751_return=0x800; coin2--; } /* Coin 2 clear */
+	if (i8751_value == 0x0000) {i8751_return = 0; coin1 = coin2 = snd = 0;}
+	if (i8751_value == 0x038a)  i8751_return = 0x375; /* Makyou Senshi ID */
+	if (i8751_value == 0x038b)  i8751_return = 0x374; /* Gondomania ID */
+	if ((i8751_value >> 8) == 0x04)  i8751_return = 0x40f; /* Coinage settings (Not supported) */
+	if ((i8751_value >> 8) == 0x05) {i8751_return = 0x500 | ((coin1 / 10) << 4) | (coin1 % 10);  } /* Coin 1 */
+	if ((i8751_value >> 8) == 0x06 && coin1 && !offset) {i8751_return = 0x600; coin1--; } /* Coin 1 clear */
+	if ((i8751_value >> 8) == 0x07) {i8751_return = 0x700 | ((coin2 / 10) << 4) | (coin2 % 10);  } /* Coin 2 */
+	if ((i8751_value >> 8) == 0x08 && coin2 && !offset) {i8751_return = 0x800; coin2--; } /* Coin 2 clear */
 	/* Commands 0x9xx do nothing */
-	if ((i8751_value>>8)==0x0a) {i8751_return=0xa00 | snd; if (snd) snd=0; }
+	if ((i8751_value >> 8) == 0x0a) {i8751_return = 0xa00 | snd; if (snd) snd = 0; }
 }
 
 static WRITE8_HANDLER( shackled_i8751_w )
 {
-	static int coin1,coin2,latch=0;
-	i8751_return=0;
+	static int coin1, coin2, latch = 0;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset) 
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpu_set_input_line (space->machine->cpu[1], M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		cputag_set_input_line(space->machine, "sub", M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
- 	if (/*(input_port_read(space->machine, "IN2") & 3) == 3*/!latch) {latch=1;coin1=coin2=0;}
- 	if ((input_port_read(space->machine, "IN2") & 1) != 1 && latch) {coin1=1; latch=0;}
- 	if ((input_port_read(space->machine, "IN2") & 2) != 2 && latch) {coin2=1; latch=0;}
+ 	if (/*(input_port_read(space->machine, "IN2") & 3) == 3*/!latch) {latch = 1; coin1 = coin2 = 0;}
+ 	if ((input_port_read(space->machine, "IN2") & 1) != 1 && latch)  {coin1 = 1; latch = 0;}
+ 	if ((input_port_read(space->machine, "IN2") & 2) != 2 && latch)  {coin2 = 1; latch = 0;}
 
-	if (i8751_value==0x0050) i8751_return=0; /* Breywood ID */
-	if (i8751_value==0x0051) i8751_return=0; /* Shackled ID */
-	if (i8751_value==0x0102) i8751_return=0; /* ?? */
-	if (i8751_value==0x0101) i8751_return=0; /* ?? */
-	if (i8751_value==0x8101) i8751_return=((coin2 / 10) << 4) | (coin2 % 10) |
-			((((coin1 / 10) << 4) | (coin1 % 10))<<8); /* Coins */
+	if (i8751_value == 0x0050) i8751_return = 0; /* Breywood ID */
+	if (i8751_value == 0x0051) i8751_return = 0; /* Shackled ID */
+	if (i8751_value == 0x0102) i8751_return = 0; /* ?? */
+	if (i8751_value == 0x0101) i8751_return = 0; /* ?? */
+	if (i8751_value == 0x8101) i8751_return = ((coin2 / 10) << 4) | (coin2 % 10) |
+			((((coin1 / 10) << 4) | (coin1 % 10)) << 8); /* Coins */
 }
 
 static WRITE8_HANDLER( lastmiss_i8751_w )
 {
-	static int coin,latch=0,snd;
-	i8751_return=0;
+	static int coin, latch = 0, snd;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset) 
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpu_set_input_line (space->machine->cpu[0], M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
-	if(offset==0)
+	if(offset == 0)
 	{
 		/* Coins are controlled by the i8751 */
- 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch=1;
- 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch=0;snd=0x400;i8751_return=0x400;return;}
-		if (i8751_value==0x007a) i8751_return=0x0185; /* Japan ID code */
-		if (i8751_value==0x007b) i8751_return=0x0184; /* USA ID code */
-		if (i8751_value==0x0001) {coin=snd=0;}//???
-		if (i8751_value==0x0000) {i8751_return=0x0184;}//???
-		if (i8751_value==0x0401) i8751_return=0x0184; //???
-		if ((i8751_value>>8)==0x01) i8751_return=0x0184; /* Coinage setup */
-		if ((i8751_value>>8)==0x02) {i8751_return=snd | ((coin / 10) << 4) | (coin % 10); snd=0;} /* Coin return */
-		if ((i8751_value>>8)==0x03 && coin) {i8751_return=0; coin--; } /* Coin clear */
+ 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch = 1;
+ 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch = 0; snd = 0x400; i8751_return = 0x400; return;}
+		if (i8751_value == 0x007a) i8751_return = 0x0185; /* Japan ID code */
+		if (i8751_value == 0x007b) i8751_return = 0x0184; /* USA ID code */
+		if (i8751_value == 0x0001) {coin = snd = 0;}//???
+		if (i8751_value == 0x0000) {i8751_return = 0x0184;}//???
+		if (i8751_value == 0x0401) i8751_return = 0x0184; //???
+		if ((i8751_value >> 8) == 0x01) i8751_return = 0x0184; /* Coinage setup */
+		if ((i8751_value >> 8) == 0x02) {i8751_return = snd | ((coin / 10) << 4) | (coin % 10); snd = 0;} /* Coin return */
+		if ((i8751_value >> 8) == 0x03 && coin) {i8751_return = 0; coin--; } /* Coin clear */
 	}
 }
 
 static WRITE8_HANDLER( csilver_i8751_w )
 {
-	static int coin,latch=0,snd;
-	i8751_return=0;
+	static int coin, latch = 0, snd;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset) 
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpu_set_input_line (space->machine->cpu[0], M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		i8751_value = (i8751_value & 0xff) | (data << 8);
+		cputag_set_input_line (space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
-	if(offset==0)
+	if(offset == 0)
 	{
 		/* Coins are controlled by the i8751 */
- 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch=1;
- 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch=0; snd=0x1200; i8751_return=0x1200;return;}
+ 		if ((input_port_read(space->machine, "IN2") & 3) == 3 && !latch) latch = 1;
+ 		if ((input_port_read(space->machine, "IN2") & 3) != 3 && latch) {coin++; latch = 0; snd = 0x1200; i8751_return = 0x1200; return;}
 
-		if (i8751_value==0x054a) {i8751_return=~(0x4a); coin=0; snd=0;} /* Captain Silver (Japan) ID */
-		if (i8751_value==0x054c) {i8751_return=~(0x4c); coin=0; snd=0;} /* Captain Silver (World) ID */
-		if ((i8751_value>>8)==0x01) i8751_return=0; /* Coinage - Not Supported */
-		if ((i8751_value>>8)==0x02) {i8751_return=snd | coin; snd=0; } /* Coin Return */
-		if ((i8751_value>>8)==0x03 && coin) {i8751_return=0; coin--;} /* Coin Clear */
+		if (i8751_value == 0x054a) {i8751_return = ~(0x4a); coin = 0; snd = 0;} /* Captain Silver (Japan) ID */
+		if (i8751_value == 0x054c) {i8751_return = ~(0x4c); coin = 0; snd = 0;} /* Captain Silver (World) ID */
+		if ((i8751_value >> 8) == 0x01) i8751_return = 0; /* Coinage - Not Supported */
+		if ((i8751_value >> 8) == 0x02) {i8751_return = snd | coin; snd = 0; } /* Coin Return */
+		if ((i8751_value >> 8) == 0x03 && coin) {i8751_return = 0; coin--;} /* Coin Clear */
 	}
 }
 
 static WRITE8_HANDLER( garyoret_i8751_w )
 {
-	static int coin1,coin2,latch;
-	i8751_return=0;
+	static int coin1, coin2, latch;
+	i8751_return = 0;
 
-	switch (offset) {
+	switch (offset) 
+	{
 	case 0: /* High byte */
-		i8751_value=(i8751_value&0xff) | (data<<8);
+		i8751_value = (i8751_value & 0xff) | (data << 8);
 		break;
 	case 1: /* Low byte */
-		i8751_value=(i8751_value&0xff00) | data;
+		i8751_value = (i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
  	if ((input_port_read(space->machine, "I8751") & 3) == 3) latch=1;
- 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && latch) {coin1++; latch=0;}
- 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && latch) {coin2++; latch=0;}
+ 	if ((input_port_read(space->machine, "I8751") & 1) != 1 && latch) {coin1++; latch = 0;}
+ 	if ((input_port_read(space->machine, "I8751") & 2) != 2 && latch) {coin2++; latch = 0;}
 
 	/* Work out return values */
-	if ((i8751_value>>8)==0x00) {i8751_return=0; coin1=coin2=0;}
-	if ((i8751_value>>8)==0x01)  i8751_return=0x59a; /* ID */
-	if ((i8751_value>>8)==0x04)  i8751_return=i8751_value; /* Coinage settings (Not supported) */
-	if ((i8751_value>>8)==0x05) {i8751_return=0x00 | ((coin1 / 10) << 4) | (coin1 % 10);  } /* Coin 1 */
-	if ((i8751_value>>8)==0x06 && coin1 && !offset) {i8751_return=0x600; coin1--; } /* Coin 1 clear */
+	if ((i8751_value >> 8) == 0x00) {i8751_return = 0; coin1 = coin2 = 0;}
+	if ((i8751_value >> 8) == 0x01)  i8751_return = 0x59a; /* ID */
+	if ((i8751_value >> 8) == 0x04)  i8751_return = i8751_value; /* Coinage settings (Not supported) */
+	if ((i8751_value >> 8) == 0x05) {i8751_return = 0x00 | ((coin1 / 10) << 4) | (coin1 % 10);  } /* Coin 1 */
+	if ((i8751_value >> 8) == 0x06 && coin1 && !offset) {i8751_return = 0x600; coin1--; } /* Coin 1 clear */
 }
 
 /******************************************************************************/
@@ -369,10 +379,10 @@ static WRITE8_HANDLER( ghostb_bank_w )
     */
 
 	bankaddress = 0x10000 + (data >> 4) * 0x4000;
-	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 
-	if (data&1) int_enable=1; else int_enable=0;
-	if (data&2) nmi_enable=1; else nmi_enable=0;
+	if (data & 1) int_enable =1; else int_enable = 0;
+	if (data & 2) nmi_enable =1; else nmi_enable = 0;
 	flip_screen_set(space->machine, data & 0x08);
 }
 
@@ -387,36 +397,30 @@ static WRITE8_HANDLER( csilver_control_w )
         Bit 0x40 - Unused.
         Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
     */
-	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + (data & 0x0f) * 0x4000]);
+	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + (data & 0x0f) * 0x4000]);
 }
 
 static WRITE8_HANDLER( dec8_sound_w )
 {
- 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
-}
-
-static WRITE8_HANDLER( oscar_sound_w )
-{
- 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+ 	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void csilver_adpcm_int(const device_config *device)
 {
-	static int toggle =0;
+	static int toggle = 0;
 
 	toggle ^= 1;
 	if (toggle)
-		cpu_set_input_line(device->machine->cpu[2],M6502_IRQ_LINE,HOLD_LINE);
+		cpu_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 
-	msm5205_data_w (device,msm5205next>>4);
-	msm5205next<<=4;
+	msm5205_data_w(device, msm5205next >> 4);
+	msm5205next <<= 4;
 }
 
 static READ8_DEVICE_HANDLER( csilver_adpcm_reset_r )
 {
-	msm5205_reset_w(device,0);
+	msm5205_reset_w(device, 0);
 	return 0;
 }
 
@@ -429,8 +433,10 @@ static WRITE8_HANDLER( csilver_sound_bank_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "audiocpu");
 
-	if (data&8) { memory_set_bankptr(space->machine, 3,&RAM[0x14000]); }
-	else { memory_set_bankptr(space->machine, 3,&RAM[0x10000]); }
+	if (data & 8)
+		memory_set_bankptr(space->machine, 3, &RAM[0x14000]);
+	else
+		memory_set_bankptr(space->machine, 3, &RAM[0x10000]);
 }
 
 /******************************************************************************/
@@ -438,18 +444,19 @@ static WRITE8_HANDLER( csilver_sound_bank_w )
 static WRITE8_HANDLER( oscar_int_w )
 {
 	/* Deal with interrupts, coins also generate NMI to CPU 0 */
-	switch (offset) {
+	switch (offset) 
+	{
 		case 0: /* IRQ2 */
-			cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE);
 			return;
 		case 1: /* IRC 1 */
-			cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 			return;
 		case 2: /* IRQ 1 */
-			cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 			return;
 		case 3: /* IRC 2 */
-			cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
 			return;
 	}
 }
@@ -461,25 +468,27 @@ static WRITE8_HANDLER( shackled_int_w )
 /* This is correct, but the cpus in Shackled need an interleave of about 5000!
     With lower interleave CPU 0 misses an interrupt at the start of the game
     (The last interrupt has not finished and been ack'd when the new one occurs */
-	switch (offset) {
+	switch (offset) 
+	{
 		case 0: /* CPU 2 - IRQ acknowledge */
-			cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
             return;
         case 1: /* CPU 1 - IRQ acknowledge */
-			cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,CLEAR_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
         	return;
         case 2: /* i8751 - FIRQ acknowledge */
             return;
         case 3: /* IRQ 1 */
-			cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
+			cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 			return;
         case 4: /* IRQ 2 */
-            cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
+            cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, ASSERT_LINE);
             return;
 	}
 #endif
 
-	switch (offset) {
+	switch (offset) 
+	{
 		case 0: /* CPU 2 - IRQ acknowledge */
             return;
         case 1: /* CPU 1 - IRQ acknowledge */
@@ -487,10 +496,10 @@ static WRITE8_HANDLER( shackled_int_w )
         case 2: /* i8751 - FIRQ acknowledge */
             return;
         case 3: /* IRQ 1 */
-			cpu_set_input_line (space->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
+			cputag_set_input_line (space->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 			return;
         case 4: /* IRQ 2 */
-            cpu_set_input_line (space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
+            cputag_set_input_line (space->machine, "sub", M6809_IRQ_LINE, HOLD_LINE);
             return;
 	}
 }
@@ -498,8 +507,8 @@ static WRITE8_HANDLER( shackled_int_w )
 /******************************************************************************/
 
 static READ8_HANDLER( shackled_sprite_r ) { return spriteram[offset]; }
-static WRITE8_HANDLER( shackled_sprite_w ) { spriteram[offset]=data; }
-static WRITE8_HANDLER( flip_screen_w ) {	flip_screen_set(space->machine, data); }
+static WRITE8_HANDLER( shackled_sprite_w ) { spriteram[offset] = data; }
+static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine, data); }
 
 /******************************************************************************/
 
@@ -612,7 +621,7 @@ static ADDRESS_MAP_START( oscar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3c00, 0x3c1f) AM_WRITE(dec8_bac06_0_w)
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(buffer_spriteram_w)	/* DMA */
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)   		/* BNKS */
-	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(oscar_sound_w) 		/* SOUN */
+	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w) 		/* SOUN */
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP       		/* COINCL */
 	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
@@ -642,7 +651,7 @@ static ADDRESS_MAP_START( lastmiss_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
 	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmiss_scrollx_w) /* Scroll LSB */
 	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(lastmiss_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(lastmiss_i8751_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
@@ -665,7 +674,7 @@ static ADDRESS_MAP_START( lastmiss_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM) AM_WRITE(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(shackled_sprite_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
@@ -687,7 +696,7 @@ static ADDRESS_MAP_START( shackled_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmiss_scrollx_w) /* Scroll LSB */
 	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM) AM_WRITE(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(shackled_sprite_r, shackled_sprite_w)
@@ -712,7 +721,7 @@ static ADDRESS_MAP_START( shackled_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
 	AM_RANGE(0x1809, 0x1809) AM_WRITE(lastmiss_scrollx_w) /* Scroll LSB */
 	AM_RANGE(0x180b, 0x180b) AM_WRITE(lastmiss_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(shackled_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(shackled_i8751_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
@@ -734,7 +743,7 @@ static ADDRESS_MAP_START( csilver_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(buffer_spriteram_w) /* Dip 1, DMA */
 	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x1808, 0x180b) AM_WRITE(dec8_scroll2_w)
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE(csilver_control_w)
 	AM_RANGE(0x180e, 0x180f) AM_WRITE(csilver_i8751_w)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(i8751_h_r)
@@ -755,7 +764,7 @@ static ADDRESS_MAP_START( csilver_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
 	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE(oscar_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE(2)
@@ -1823,22 +1832,12 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate); /* M6502_IRQ_LINE */
-}
-
-static void oscar_irqhandler(const device_config *device, int linestate)
-{
-	cpu_set_input_line(device->machine->cpu[2],0,linestate); /* M6502_IRQ_LINE */
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate); /* M6502_IRQ_LINE */
 }
 
 static const ym3526_interface ym3526_config =
 {
 	irqhandler
-};
-
-static const ym3526_interface oscar_ym3526_interface =
-{
-	oscar_irqhandler
 };
 
 static const ym3812_interface ym3812_config =
@@ -1857,18 +1856,18 @@ static const msm5205_interface msm5205_config =
 static INTERRUPT_GEN( ghostb_interrupt )
 {
 	static int latch[4];
-	int i8751_out=input_port_read(device->machine, "I8751");
+	int i8751_out = input_port_read(device->machine, "I8751");
 
 	/* Ghostbusters coins are controlled by the i8751 */
-	if ((i8751_out & 0x8) == 0x8) latch[0]=1;
-	if ((i8751_out & 0x4) == 0x4) latch[1]=1;
-	if ((i8751_out & 0x2) == 0x2) latch[2]=1;
-	if ((i8751_out & 0x1) == 0x1) latch[3]=1;
+	if ((i8751_out & 0x8) == 0x8) latch[0] = 1;
+	if ((i8751_out & 0x4) == 0x4) latch[1] = 1;
+	if ((i8751_out & 0x2) == 0x2) latch[2] = 1;
+	if ((i8751_out & 0x1) == 0x1) latch[3] = 1;
 
-	if (((i8751_out & 0x8) != 0x8) && latch[0]) {latch[0]=0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x8001; } /* Player 1 coin */
-	if (((i8751_out & 0x4) != 0x4) && latch[1]) {latch[1]=0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x4001; } /* Player 2 coin */
-	if (((i8751_out & 0x2) != 0x2) && latch[2]) {latch[2]=0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x2001; } /* Player 3 coin */
-	if (((i8751_out & 0x1) != 0x1) && latch[3]) {latch[3]=0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return=0x1001; } /* Service */
+	if (((i8751_out & 0x8) != 0x8) && latch[0]) {latch[0] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x8001; } /* Player 1 coin */
+	if (((i8751_out & 0x4) != 0x4) && latch[1]) {latch[1] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x4001; } /* Player 2 coin */
+	if (((i8751_out & 0x2) != 0x2) && latch[2]) {latch[2] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x2001; } /* Player 3 coin */
+	if (((i8751_out & 0x1) != 0x1) && latch[3]) {latch[3] = 0; cpu_set_input_line(device,M6809_IRQ_LINE,HOLD_LINE); i8751_return = 0x1001; } /* Service */
 
 	if (nmi_enable) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
@@ -1882,11 +1881,12 @@ static INTERRUPT_GEN( gondo_interrupt )
 /* Coins generate NMI's */
 static INTERRUPT_GEN( oscar_interrupt )
 {
-	static int latch=1;
+	static int latch = 1;
 
-	if ((input_port_read(device->machine, "IN2") & 0x7) == 0x7) latch=1;
-	if (latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7) {
-		latch=0;
+	if ((input_port_read(device->machine, "IN2") & 0x7) == 0x7) latch = 1;
+	if (latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7) 
+	{
+		latch = 0;
     	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
     }
 }
@@ -2101,7 +2101,7 @@ static MACHINE_DRIVER_START( oscar )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2145,7 +2145,7 @@ static MACHINE_DRIVER_START( lastmiss )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2189,7 +2189,7 @@ static MACHINE_DRIVER_START( shackled )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2234,7 +2234,7 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(oscar_ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */

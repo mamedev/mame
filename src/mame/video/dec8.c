@@ -81,9 +81,9 @@ PALETTE_INIT( ghostb )
 {
 	int i;
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3, r, g, b;
 
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
@@ -101,30 +101,30 @@ PALETTE_INIT( ghostb )
 		bit3 = (color_prom[i + machine->config->total_colors] >> 3) & 0x01;
 		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
 WRITE8_HANDLER( dec8_bac06_0_w )
 {
-	dec8_pf0_control[offset]=data;
+	dec8_pf0_control[offset] = data;
 }
 
 WRITE8_HANDLER( dec8_bac06_1_w )
 {
-	dec8_pf1_control[offset]=data;
+	dec8_pf1_control[offset] = data;
 }
 
 WRITE8_HANDLER( dec8_pf0_data_w )
 {
-	dec8_pf0_data[offset]=data;
-	tilemap_mark_tile_dirty(dec8_pf0_tilemap,offset/2);
+	dec8_pf0_data[offset] = data;
+	tilemap_mark_tile_dirty(dec8_pf0_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( dec8_pf1_data_w )
 {
-	dec8_pf1_data[offset]=data;
-	tilemap_mark_tile_dirty(dec8_pf1_tilemap,offset/2);
+	dec8_pf1_data[offset] = data;
+	tilemap_mark_tile_dirty(dec8_pf1_tilemap, offset / 2);
 }
 
 READ8_HANDLER( dec8_pf0_data_r )
@@ -139,26 +139,26 @@ READ8_HANDLER( dec8_pf1_data_r )
 
 WRITE8_HANDLER( dec8_videoram_w )
 {
-	videoram[offset]=data;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty( dec8_fix_tilemap,offset/2 );
 }
 
 WRITE8_HANDLER( srdarwin_videoram_w )
 {
-	videoram[offset]=data;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty( dec8_fix_tilemap,offset );
 }
 
 #ifdef UNUSED_FUNCTION
 WRITE8_HANDLER( dec8_scroll1_w )
 {
-	scroll1[offset]=data;
+	scroll1[offset] = data;
 }
 #endif
 
 WRITE8_HANDLER( dec8_scroll2_w )
 {
-	scroll2[offset]=data;
+	scroll2[offset] = data;
 }
 
 WRITE8_HANDLER( srdarwin_control_w )
@@ -166,15 +166,16 @@ WRITE8_HANDLER( srdarwin_control_w )
 	int bankaddress;
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-	switch (offset) {
+	switch (offset) 
+	{
     	case 0: /* Top 3 bits - bank switch, bottom 4 - scroll MSB */
 			bankaddress = 0x10000 + (data >> 5) * 0x4000;
-			memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
-			scroll2[0]=data&0xf;
+			memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
+			scroll2[0] = data & 0xf;
 			return;
 
         case 1:
-        	scroll2[1]=data;
+        	scroll2[1] = data;
         	return;
     }
 }
@@ -190,15 +191,15 @@ WRITE8_HANDLER( lastmiss_control_w )
         Bit 0x40 - Y scroll MSB
         Bit 0x80 - Hold subcpu reset line high if clear, else low
     */
-	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + (data & 0x0f) * 0x4000]);
+	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + (data & 0x0f) * 0x4000]);
 
-	scroll2[0]=(data>>5)&1;
-	scroll2[2]=(data>>6)&1;
+	scroll2[0] = (data >> 5) & 1;
+	scroll2[2] = (data >> 6) & 1;
 
-	if (data&0x80)
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+	if (data & 0x80)
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE8_HANDLER( shackled_control_w )
@@ -210,32 +211,33 @@ WRITE8_HANDLER( shackled_control_w )
 	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
 	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
-	scroll2[0]=(data>>5)&1;
-	scroll2[2]=(data>>6)&1;
+	scroll2[0] = (data >> 5) & 1;
+	scroll2[2] = (data >> 6) & 1;
 }
 
 WRITE8_HANDLER( lastmiss_scrollx_w )
 {
-	scroll2[1]=data;
+	scroll2[1] = data;
 }
 
 WRITE8_HANDLER( lastmiss_scrolly_w )
 {
-	scroll2[3]=data;
+	scroll2[3] = data;
 }
 
 WRITE8_HANDLER( gondo_scroll_w )
 {
-	switch (offset) {
+	switch (offset) 
+	{
 		case 0x0:
-			scroll2[1]=data; /* X LSB */
+			scroll2[1] = data; /* X LSB */
 			break;
 		case 0x8:
-			scroll2[3]=data; /* Y LSB */
+			scroll2[3] = data; /* Y LSB */
 			break;
 		case 0x10:
-			scroll2[0]=(data>>0)&1; /* Bit 0: X MSB */
-			scroll2[2]=(data>>1)&1; /* Bit 1: Y MSB */
+			scroll2[0] = (data >> 0) & 1; /* Bit 0: X MSB */
+			scroll2[2] = (data >> 1) & 1; /* Bit 1: Y MSB */
 			/* Bit 2 is also used in Gondo & Garyoret */
 			break;
 	}
@@ -276,7 +278,8 @@ static void draw_sprites1(running_machine* machine, bitmap_t *bitmap, const rect
 		y=(y+16)%0x200;
 		x=256 - x;
 		y=256 - y;
-		if (flip_screen_get(machine)) {
+		if (flip_screen_get(machine)) 
+		{
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -285,7 +288,8 @@ static void draw_sprites1(running_machine* machine, bitmap_t *bitmap, const rect
 		}
 
 		/* Y Flip determines order of multi-sprite */
-		if (extra && fy) {
+		if (extra && fy) 
+		{
 			sprite2=sprite;
 			sprite++;
 		}
@@ -348,7 +352,8 @@ static void draw_sprites2(running_machine* machine, bitmap_t *bitmap, const rect
 			inc = 1;
 		}
 
-		if (flip_screen_get(machine)) {
+		if (flip_screen_get(machine)) 
+		{
 			y=240-y;
 			x=240-x;
 			if (fx) fx=0; else fx=1;
@@ -394,7 +399,8 @@ static void srdarwin_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 		fx = buffered_spriteram[offs+1] & 0x04;
 		multi = buffered_spriteram[offs+1] & 0x10;
 
-		if (flip_screen_get(machine)) {
+		if (flip_screen_get(machine)) 
+		{
 			sy=240-sy;
 			sx=240-sx;
 			if (fx) fx=0; else fx=1;
@@ -424,7 +430,8 @@ static void draw_characters(running_machine* machine, bitmap_t *bitmap, const re
 {
 	int mx,my,tile,color,offs;
 
-	for (offs = 0x800 - 2;offs >= 0;offs -= 2) {
+	for (offs = 0x800 - 2;offs >= 0;offs -= 2) 
+	{
 		tile=videoram[offs+1]+((videoram[offs]&0xf)<<8);
 
 		if (!tile) continue;
@@ -526,13 +533,16 @@ VIDEO_START( cobracom )
 
 VIDEO_UPDATE( ghostb )
 {
-   if (dec8_pf0_control[0]&0x4) { /* Rowscroll */
+   if (dec8_pf0_control[0]&0x4) 
+   { /* Rowscroll */
  		int offs;
 
 		tilemap_set_scroll_rows(dec8_pf0_tilemap,512);
 		for (offs = 0;offs < 512;offs+=2)
 			tilemap_set_scrollx( dec8_pf0_tilemap,offs/2, (dec8_pf0_control[0x10]<<8)+dec8_pf0_control[0x11] + (dec8_row[offs]<<8)+dec8_row[offs+1] );
-	} else {
+	} 
+	else 
+	{
 		tilemap_set_scroll_rows(dec8_pf0_tilemap,1);
 		tilemap_set_scrollx( dec8_pf0_tilemap,0, (dec8_pf0_control[0x10]<<8)+dec8_pf0_control[0x11] );
 	}

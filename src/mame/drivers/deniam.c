@@ -57,7 +57,7 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space,offset,(data >> 8) & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -223,8 +223,8 @@ GFXDECODE_END
 static void irqhandler(const device_config *device, int linestate)
 {
 	/* system 16c doesn't have the sound CPU */
-	if (device->machine->cpu[1] != NULL)
-		cpu_set_input_line(device->machine->cpu[1],0,linestate);
+	if (cputag_get_cpu(device->machine, "audiocpu") != NULL)
+		cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -406,4 +406,3 @@ GAME( 1996, logicpro, 0,        deniam16b, logicpr2, logicpro, ROT0, "Deniam", "
 GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, logicpro, ROT0, "Deniam", "Croquis (Germany)", 0 )
 GAME( 1996, karianx,  0,        deniam16b, karianx,  karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", 0 )
 GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)", GAME_IMPERFECT_SOUND )
-

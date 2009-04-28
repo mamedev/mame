@@ -41,11 +41,11 @@ static WRITE16_HANDLER( darkseal_control_w )
 {
 	switch (offset<<1) {
     case 6: /* DMA flag */
-		buffer_spriteram16_w(space,0,0,0xffff);
+		buffer_spriteram16_w(space, 0, 0, 0xffff);
 		return;
     case 8: /* Sound CPU write */
-		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space, 0, data & 0xff);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
     	return;
   	case 0xa: /* IRQ Ack (VBL) */
 		return;
@@ -231,7 +231,7 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1],1,state); /* IRQ 2 */
+	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

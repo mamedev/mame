@@ -173,7 +173,7 @@ static WRITE8_HANDLER(bg2_w)
 static WRITE8_HANDLER( sound_w )
 {
 	soundlatch_w(space,offset,data);
-	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( i8257_CH0_w )

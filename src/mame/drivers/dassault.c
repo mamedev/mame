@@ -173,16 +173,16 @@ static READ16_HANDLER( dassault_sub_control_r )
 
 static WRITE16_HANDLER( dassault_sound_w )
 {
-	soundlatch_w(space,0,data&0xff);
-	cpu_set_input_line(space->machine->cpu[2],0,HOLD_LINE); /* IRQ1 */
+	soundlatch_w(space, 0, data & 0xff);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
 static READ16_HANDLER( dassault_irq_r )
 {
 	switch (offset) {
-		case 0: cpu_set_input_line(space->machine->cpu[0], 5, CLEAR_LINE); break;
-		case 1: cpu_set_input_line(space->machine->cpu[1], 6, CLEAR_LINE); break;
+		case 0: cputag_set_input_line(space->machine, "maincpu", 5, CLEAR_LINE); break;
+		case 1: cputag_set_input_line(space->machine, "sub", 6, CLEAR_LINE); break;
 	}
 	return shared_ram[(0xffc/2)+offset]; /* The values probably don't matter */
 }
@@ -190,11 +190,11 @@ static READ16_HANDLER( dassault_irq_r )
 static WRITE16_HANDLER( dassault_irq_w )
 {
 	switch (offset) {
-		case 0: cpu_set_input_line(space->machine->cpu[0], 5, ASSERT_LINE); break;
-		case 1: cpu_set_input_line(space->machine->cpu[1], 6, ASSERT_LINE); break;
+		case 0: cpu_set_input_line(space->machine, "maincpu", 5, ASSERT_LINE); break;
+		case 1: cpu_set_input_line(space->machine, "sub", 6, ASSERT_LINE); break;
 	}
 
-	COMBINE_DATA(&shared_ram[(0xffc/2)+offset]); /* The values probably don't matter */
+	COMBINE_DATA(&shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
 }
 
 static WRITE16_HANDLER( shared_ram_w )
@@ -509,7 +509,7 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[2],1,state);
+	cputag_set_input_line(device->machine, "audiocpu", 1, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
@@ -820,7 +820,7 @@ static DRIVER_INIT( dassault )
 	free(tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
 }
 
 static DRIVER_INIT( thndzone )
@@ -840,7 +840,7 @@ static DRIVER_INIT( thndzone )
 	free(tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);
 }
 
 /**********************************************************************************/

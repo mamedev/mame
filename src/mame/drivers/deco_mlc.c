@@ -177,7 +177,7 @@ static READ32_HANDLER( mlc_scanline_r )
 static TIMER_CALLBACK( interrupt_gen )
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(machine->primary_screen), info.i);
-	cpu_set_input_line(machine->cpu[0], mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
@@ -189,7 +189,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cpu_set_input_line(space->machine->cpu[0], mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
 		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, irq_ram[0x14/4], 0),0);
@@ -733,14 +733,14 @@ static READ32_HANDLER( avengrgs_speedup_r )
 static DRIVER_INIT( avengrgs )
 {
 	// init options
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	sh2drc_add_pcflush(machine->cpu[0], 0x3234);
-	sh2drc_add_pcflush(machine->cpu[0], 0x32dc);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x3234);
+	sh2drc_add_pcflush(cputag_get_cpu(machine, "maincpu"), 0x32dc);
 
-	mainCpuIsArm=0;
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
+	mainCpuIsArm = 0;
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
 	descramble_sound(machine);
 }
 
@@ -749,8 +749,8 @@ static DRIVER_INIT( mlc )
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
         effective clock rate here to compensate otherwise we have slowdowns in
         Skull Fung where there probably shouldn't be. */
-	cpu_set_clockscale(machine->cpu[0], 2.0f);
-	mainCpuIsArm=1;
+	cpu_set_clockscale(cputag_get_cpu(machine, "maincpu"), 2.0f);
+	mainCpuIsArm = 1;
 	deco156_decrypt(machine);
 	descramble_sound(machine);
 }

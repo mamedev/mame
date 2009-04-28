@@ -657,7 +657,7 @@ static DRIVER_INIT( djboyj )
 
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
@@ -715,23 +715,23 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "cpu2", INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "cpu2");
 
-	if( data<3 )
+	if( data < 3 )
 	{
 		RAM = &RAM[0x04000 * data];
 	}
 	else
 	{
-		RAM = &RAM[0x10000 + 0x4000*(data-3)];
+		RAM = &RAM[0x10000 + 0x4000 * (data - 3)];
 	}
-	memory_set_bankptr(space->machine, 3,RAM);
+	memory_set_bankptr(space->machine, 3, RAM);
 }
 
 /******************************************************************************/
@@ -1052,4 +1052,3 @@ INPUT_PORTS_END
 GAME( 1989, djboy,  0,      djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 1)", 0) // Sammy & Williams logos in FG ROM
 GAME( 1989, djboya, djboy,  djboy,   djboy, djboy,    ROT0, "Kaneko (American Sammy license)", "DJ Boy (set 2)", 0) // Sammy & Williams logos in FG ROM
 GAME( 1989, djboyj, djboy,  djboy,   djboy, djboyj,   ROT0, "Kaneko (Sega license)", "DJ Boy (Japan)", 0 ) // Sega logo in FG ROM
-

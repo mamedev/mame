@@ -494,19 +494,19 @@ static MACHINE_RESET( drakton )
 
 static READ8_DEVICE_HANDLER( dk_dma_read_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	return memory_read_byte(space, offset);
 }
 
 static WRITE8_DEVICE_HANDLER( dk_dma_write_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_write_byte(space, offset, data);
 }
 
 static READ8_DEVICE_HANDLER( hb_dma_read_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	dkong_state *state = (dkong_state *)device->machine->driver_data;
 	int	  bucket = state->rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -521,7 +521,7 @@ static READ8_DEVICE_HANDLER( hb_dma_read_byte )
 
 static WRITE8_DEVICE_HANDLER( hb_dma_write_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	dkong_state *state = (dkong_state *)device->machine->driver_data;
 	int	  bucket = state->rev_map[(offset>>10) & 0x1ff];
 	int   addr;
@@ -699,13 +699,13 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
 	{
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
-		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "n2a03a", INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "n2a03b", INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "n2a03a", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "n2a03b", INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -2899,7 +2899,7 @@ static DRIVER_INIT( drakton )
 			{7,1,4,0,3,6,2,5},
 	};
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1) );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1) );
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -2921,7 +2921,7 @@ static DRIVER_INIT( strtheat )
 			{6,3,4,1,0,7,2,5},
 	};
 
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1) );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, (read8_space_func)SMH_BANK(1) );
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -2932,8 +2932,8 @@ static DRIVER_INIT( strtheat )
 	drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
 }
 
 /*************************************

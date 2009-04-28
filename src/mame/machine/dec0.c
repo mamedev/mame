@@ -463,8 +463,8 @@ static emu_timer *i8751_timer;
 static TIMER_CALLBACK( i8751_callback )
 {
 	/* Signal main cpu microcontroller task is complete */
-	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE);
-	i8751_timer=NULL;
+	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
+	i8751_timer = NULL;
 
 	logerror("i8751:  Timer called!!!\n");
 }
@@ -473,11 +473,11 @@ static TIMER_CALLBACK( i8751_callback )
 void dec0_i8751_write(running_machine *machine, int data)
 {
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
-	if (GAME==1) hbarrel_i8751_write(data);
-	if (GAME==2) baddudes_i8751_write(machine, data);
-	if (GAME==3) birdtry_i8751_write(machine, data);
+	if (GAME == 1) hbarrel_i8751_write(data);
+	if (GAME == 2) baddudes_i8751_write(machine, data);
+	if (GAME == 3) birdtry_i8751_write(machine, data);
 
-	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 5, HOLD_LINE);
 
 	/* Simulate the processing time of the i8751, time value is guessed
     if (i8751_timer)
@@ -525,8 +525,8 @@ static WRITE16_HANDLER( robocop_68000_share_w )
 
 	robocop_shared_ram[offset]=data&0xff;
 
-	if (offset==0x7ff) /* A control address - not standard ram */
-		cpu_set_input_line(space->machine->cpu[2],0,HOLD_LINE);
+	if (offset == 0x7ff) /* A control address - not standard ram */
+		cputag_set_input_line(space->machine, "sub", 0, HOLD_LINE);
 }
 
 /******************************************************************************/
@@ -537,24 +537,24 @@ static void h6280_decrypt(running_machine *machine, const char *cputag)
 	UINT8 *RAM = memory_region(machine, cputag);
 
 	/* Read each byte, decrypt it */
-	for (i=0x00000; i<0x10000; i++)
-		RAM[i]=(RAM[i] & 0x7e) | ((RAM[i] & 0x1) << 7) | ((RAM[i] & 0x80) >> 7);
+	for (i = 0x00000; i < 0x10000; i++)
+		RAM[i] = (RAM[i] & 0x7e) | ((RAM[i] & 0x1) << 7) | ((RAM[i] & 0x80) >> 7);
 }
 
 DRIVER_INIT( hippodrm )
 {
 	UINT8 *RAM = memory_region(machine, "sub");
 
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x180000, 0x180fff, 0, 0, hippodrm_68000_share_r, hippodrm_68000_share_w);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xffc800, 0xffcfff, 0, 0, sprite_mirror_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x180000, 0x180fff, 0, 0, hippodrm_68000_share_r, hippodrm_68000_share_w);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xffc800, 0xffcfff, 0, 0, sprite_mirror_w);
 
 	h6280_decrypt(machine, "sub");
 
 	/* The protection cpu has additional memory mapped protection! */
-	RAM[0x189]=0x60; /* RTS prot area */
-	RAM[0x1af]=0x60; /* RTS prot area */
-	RAM[0x1db]=0x60; /* RTS prot area */
-	RAM[0x21a]=0x60; /* RTS prot area */
+	RAM[0x189] = 0x60; /* RTS prot area */
+	RAM[0x1af] = 0x60; /* RTS prot area */
+	RAM[0x1db] = 0x60; /* RTS prot area */
+	RAM[0x21a] = 0x60; /* RTS prot area */
 }
 
 DRIVER_INIT( slyspy )
@@ -564,23 +564,23 @@ DRIVER_INIT( slyspy )
 	h6280_decrypt(machine, "audiocpu");
 
 	/* Slyspy sound cpu has some protection */
-	RAM[0xf2d]=0xea;
-	RAM[0xf2e]=0xea;
+	RAM[0xf2d] = 0xea;
+	RAM[0xf2e] = 0xea;
 }
 
 DRIVER_INIT( robocop )
 {
-	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x180000, 0x180fff, 0, 0, robocop_68000_share_r, robocop_68000_share_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x180000, 0x180fff, 0, 0, robocop_68000_share_r, robocop_68000_share_w);
 }
 
 DRIVER_INIT( baddudes )
 {
-	GAME=2;
+	GAME = 2;
 }
 
 DRIVER_INIT( hbarrel )
 {
-	GAME=1;
+	GAME = 1;
 { /* Remove this patch once processing time of i8751 is simulated */
 UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 rom[0xb68/2] = 0x8008;
@@ -589,7 +589,7 @@ rom[0xb68/2] = 0x8008;
 
 DRIVER_INIT( hbarrelw )
 {
-	GAME=1;
+	GAME = 1;
 { /* Remove this patch once processing time of i8751 is simulated */
 UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 rom[0xb3e/2] = 0x8008;

@@ -83,7 +83,7 @@ static IRQ_CALLBACK(irq_callback)
 void dcheese_signal_irq(running_machine *machine, int which)
 {
 	irq_state[which] = 1;
-	update_irq_state(machine->cpu[0]);
+	update_irq_state(cputag_get_cpu(machine, "maincpu"));
 }
 
 
@@ -103,7 +103,7 @@ static INTERRUPT_GEN( dcheese_vblank )
 
 static MACHINE_START( dcheese )
 {
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 
 	state_save_register_global_array(machine, irq_state);
 	state_save_register_global(machine, soundlatch_full);
@@ -145,7 +145,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		/* write the latch and set the IRQ */
 		soundlatch_full = 1;
-		cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", 0, ASSERT_LINE);
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
@@ -162,7 +162,7 @@ static READ8_HANDLER( sound_command_r )
 {
 	/* read the latch and clear the IRQ */
 	soundlatch_full = 0;
-	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
@@ -805,4 +805,3 @@ GAME( 1994, fredmeuk, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusem
 GAME( 1994, fredmemj, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmemc, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmesp, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)", GAME_SUPPORTS_SAVE )
-

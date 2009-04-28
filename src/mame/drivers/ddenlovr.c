@@ -908,7 +908,7 @@ profiler_mark(PROFILER_VIDEO);
 				#endif
 			}
 
-			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, irq_vector);
+			cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, irq_vector);
 			break;
 
 		default:
@@ -1974,7 +1974,7 @@ static WRITE8_HANDLER( mmpanic_rombank_w )
 static WRITE8_HANDLER( mmpanic_soundlatch_w )
 {
 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( mmpanic_blitter_w )
@@ -7896,7 +7896,7 @@ static DRIVER_INIT( rongrong )
        version of the game might be a bootleg with the protection
        patched. (both sets need this)
      */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60d4, 0x60d4, 0, 0, (read8_space_func)SMH_NOP);
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d4, 0x60d4, 0, 0, (read8_space_func)SMH_NOP);
 }
 
 /***************************************************************************

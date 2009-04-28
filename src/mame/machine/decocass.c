@@ -103,7 +103,7 @@ WRITE8_HANDLER( decocass_sound_command_w )
 	decocass_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
 	decocass_sound_ack &= ~0x40;
-	cpu_set_input_line(space->machine->cpu[1], M6502_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 READ8_HANDLER( decocass_sound_data_r )
@@ -131,7 +131,7 @@ READ8_HANDLER( decocass_sound_command_r )
 {
 	UINT8 data = soundlatch_r(space, 0);
 	LOG(4,("CPU %s sound command <- $%02x\n", space->cpu->tag, data));
-	cpu_set_input_line(space->machine->cpu[1], M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6502_IRQ_LINE, CLEAR_LINE);
 	decocass_sound_ack &= ~0x80;
 	return data;
 }
@@ -140,19 +140,19 @@ TIMER_DEVICE_CALLBACK( decocass_audio_nmi_gen )
 {
 	int scanline = param;
 	audio_nmi_state = scanline & 8;
-	cpu_set_input_line(timer->machine->cpu[1], INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(timer->machine, "audiocpu", INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( decocass_sound_nmi_enable_w )
 {
 	audio_nmi_enabled = 1;
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_HANDLER( decocass_sound_nmi_enable_r )
 {
 	audio_nmi_enabled = 1;
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	return 0xff;
 }
 
@@ -172,7 +172,7 @@ WRITE8_HANDLER( decocass_sound_data_ack_reset_w )
 
 WRITE8_HANDLER( decocass_nmi_reset_w )
 {
-	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE );
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 WRITE8_HANDLER( decocass_quadrature_decoder_reset_w )
@@ -246,17 +246,17 @@ WRITE8_HANDLER( decocass_reset_w )
 	decocass_reset = data;
 
 	/* CPU #1 active high reset */
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, data & 0x01);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, data & 0x01);
 
 	/* on reset also disable audio NMI */
 	if (data & 1)
 	{
 		audio_nmi_enabled = 0;
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, (audio_nmi_enabled && audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* 8041 active low reset */
-	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x08) ^ 0x08);
+	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, (data & 0x08) ^ 0x08);
 }
 
 
@@ -314,7 +314,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 1);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 1);
 		else
 			data = 0xff;
 
@@ -344,7 +344,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 0);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 0);
 		else
 			data = 0xff;
 
@@ -393,7 +393,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 1);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 1);
 		else
 			data = 0xff;
 
@@ -423,7 +423,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 0);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 0);
 		else
 			data = 0xff;
 
@@ -472,7 +472,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 1);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 1);
 		else
 			data = 0xff;
 
@@ -502,7 +502,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 0);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 0);
 		else
 			data = 0xff;
 
@@ -551,7 +551,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 1);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 1);
 		else
 			data = 0xff;
 
@@ -581,7 +581,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 0);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 0);
 		else
 			data = 0xff;
 
@@ -632,7 +632,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 1);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 1);
 		else
 			data = 0xff;
 
@@ -662,7 +662,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], 0);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 0);
 		else
 			data = 0xff;
 
@@ -725,7 +725,7 @@ static READ8_HANDLER( decocass_type2_r )
 	else
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(space->machine->cpu[2], offset);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), offset);
 		else
 			data = offset & 0xff;
 
@@ -762,7 +762,7 @@ static WRITE8_HANDLER( decocass_type2_w )
 			LOG(3,("PROM:%s D2:%d", type2_xx_latch ? "on" : "off", type2_d2_latch));
 		}
 	}
-	upi41_master_w(space->machine->cpu[2], offset & 1, data);
+	upi41_master_w(cputag_get_cpu(space->machine, "mcu"), offset & 1, data);
 
 #ifdef MAME_DEBUG
 	decocass_fno(offset, data);
@@ -803,7 +803,7 @@ static READ8_HANDLER( decocass_type3_r )
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				data = upi41_master_r(space->machine->cpu[2], 1);
+				data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 1);
 				LOG(4,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data));
 			}
 			else
@@ -824,7 +824,7 @@ static READ8_HANDLER( decocass_type3_r )
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				save = upi41_master_r(space->machine->cpu[2], 0);
+				save = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 0);
 				switch (type3_swap)
 				{
 				case TYPE3_SWAP_01:
@@ -996,7 +996,7 @@ static WRITE8_HANDLER( decocass_type3_w )
 		}
 	}
 	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-	upi41_master_w(space->machine->cpu[2], offset, data);
+	upi41_master_w(cputag_get_cpu(space->machine, "mcu"), offset, data);
 }
 
 /***************************************************************************
@@ -1019,7 +1019,7 @@ static READ8_HANDLER( decocass_type4_r )
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = upi41_master_r(space->machine->cpu[2], 1);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 1);
 			LOG(4,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data));
 		}
 		else
@@ -1042,7 +1042,7 @@ static READ8_HANDLER( decocass_type4_r )
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				data = upi41_master_r(space->machine->cpu[2], 0);
+				data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 0);
 				LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
@@ -1082,7 +1082,7 @@ static WRITE8_HANDLER( decocass_type4_w )
 		}
 	}
 	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-	upi41_master_w(space->machine->cpu[2], offset, data);
+	upi41_master_w(cputag_get_cpu(space->machine, "mcu"), offset, data);
 }
 
 /***************************************************************************
@@ -1102,7 +1102,7 @@ static READ8_HANDLER( decocass_type5_r )
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = upi41_master_r(space->machine->cpu[2], 1);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 1);
 			LOG(4,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data));
 		}
 		else
@@ -1122,7 +1122,7 @@ static READ8_HANDLER( decocass_type5_r )
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				data = upi41_master_r(space->machine->cpu[2], 0);
+				data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 0);
 				LOG(3,("%10s 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
@@ -1159,7 +1159,7 @@ static WRITE8_HANDLER( decocass_type5_w )
 		}
 	}
 	LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-	upi41_master_w(space->machine->cpu[2], offset, data);
+	upi41_master_w(cputag_get_cpu(space->machine, "mcu"), offset, data);
 }
 
 /***************************************************************************
@@ -1178,7 +1178,7 @@ static READ8_HANDLER( decocass_nodong_r )
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = upi41_master_r(space->machine->cpu[2], 1);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 1);
 			LOG(4,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data));
 		}
 		else
@@ -1191,7 +1191,7 @@ static READ8_HANDLER( decocass_nodong_r )
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = upi41_master_r(space->machine->cpu[2], 0);
+			data = upi41_master_r(cputag_get_cpu(space->machine, "mcu"), 0);
 			LOG(3,("%10s 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
@@ -1263,7 +1263,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 	if (0 == (offset & E5XX_MASK))
 	{
 		LOG(3,("%10s 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_string(timer_get_time(space->machine), 6), cpu_get_previouspc(space->cpu), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-		upi41_master_w(space->machine->cpu[2], offset & 1, data);
+		upi41_master_w(cputag_get_cpu(space->machine, "mcu"), offset & 1, data);
 #ifdef MAME_DEBUG
 		decocass_fno(offset, data);
 #endif

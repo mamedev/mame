@@ -32,12 +32,12 @@ static WRITE8_HANDLER( subirqtrigger_w )
 	/* bit 0 used but unknown */
 
 	if (data & 0x04)
-		cpu_set_input_line(space->machine->cpu[1],0,ASSERT_LINE);
+		cputag_set_input_line(space->machine, "sub", 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sub_irqack_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],0,CLEAR_LINE);
+	cputag_set_input_line(space->machine, "sub", 0, CLEAR_LINE);
 }
 
 

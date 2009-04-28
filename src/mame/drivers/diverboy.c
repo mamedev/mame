@@ -63,7 +63,7 @@ static WRITE16_HANDLER( soundcmd_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,0,data & 0xff);
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 }
 

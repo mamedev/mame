@@ -203,10 +203,10 @@ static WRITE8_HANDLER( discoboy_port_01_w )
 
 static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
 {
-//  printf("unk discoboy_port_03_w %02x\n",data);
-//  cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,HOLD_LINE);
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+//  printf("unk discoboy_port_03_w %02x\n", data);
+//  cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, HOLD_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( discoboy_port_06_w )
@@ -542,4 +542,3 @@ ROM_END
 
 
 GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy, ROT270, "Soft Art Co.", "Disco Boy", 0 )
-

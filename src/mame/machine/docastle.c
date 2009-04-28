@@ -81,5 +81,5 @@ WRITE8_HANDLER( docastle_shared1_w )
 
 WRITE8_HANDLER( docastle_nmitrigger_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	cputag_set_input_line(space->machine, "slave", INPUT_LINE_NMI, PULSE_LINE);
 }

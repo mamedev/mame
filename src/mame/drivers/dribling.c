@@ -99,7 +99,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 	/* bit 7 = di */
 	di = (data >> 7) & 1;
 	if (!di)
-		cpu_set_input_line(device->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 0, CLEAR_LINE);
 
 	/* bit 6 = parata */
 
@@ -369,4 +369,3 @@ ROM_END
 
 GAME( 1983, dribling, 0,        dribling, dribling, 0, ROT0, "Model Racing", "Dribbling", GAME_NO_SOUND )
 GAME( 1983, driblino, dribling, dribling, dribling, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", GAME_NO_SOUND )
-

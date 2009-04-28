@@ -156,7 +156,7 @@ static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched 
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "cpub", INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -498,7 +498,7 @@ ADDRESS_MAP_END
 static void darius_adpcm_int (const device_config *device)
 {
 	if (nmi_enable)
-		cpu_set_input_line(device->machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(device->machine, "adpcm", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -775,7 +775,7 @@ GFXDECODE_END
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int irq)	/* assumes Z80 sandwiched between 68Ks */
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_interface_1 =
@@ -1222,4 +1222,3 @@ GAME( 1986, darius,   0,        darius,   darius,   darius,   ROT0, "Taito Corpo
 GAME( 1986, dariusj,  darius,   darius,   dariusj,  darius,   ROT0, "Taito Corporation", "Darius (Japan)", 0 )
 GAME( 1986, dariuso,  darius,   darius,   dariusj,  darius,   ROT0, "Taito Corporation", "Darius (Japan old version)", 0 )
 GAME( 1986, dariuse,  darius,   darius,   dariuse,  darius,   ROT0, "Taito Corporation", "Darius (Extra) (Japan)", 0 )
-

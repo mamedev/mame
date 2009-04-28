@@ -146,7 +146,7 @@ INPUT_PORTS_END
 /*Is it there an IRQ mask?*/
 static INTERRUPT_GEN( deshoros_irq )
 {
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_RESET( deshoros )
