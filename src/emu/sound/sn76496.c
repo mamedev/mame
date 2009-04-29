@@ -32,10 +32,24 @@
   23/04/2007 : Lord Nightmare
   Major update, implement all three different noise generation algorithms and a
   set_variant call to discern among them.
+  
+  28/04/2009 : Lord Nightmare
+  Add READY line readback; cleaned up struct a bit. Cleaned up comments.
+  Add more TODOs. Fixed some unsaved savestate related stuff.
 
-  TODO: Implement a function for setting stereo regs for the game gear.
-        Requires either making the entire core stereo and forcing mono out for all
-        chips except gamegear, or somehow making the core support both output typesf.
+  TODO: * Implement a function for setting stereo regs for the game gear.
+		  Requires making the core support both mono and stereo, and have
+		  a select register which determines which channels go where.
+		* Implement the TMS9919 and SN94624, which are earlier versions,
+		  possibly lacking the /8 clock divider, of the SN76489, and hence
+		  would have a max clock of 500Khz and 4 clocks per sample, as
+		  opposed to max of 4Mhz and 32 clocks per sample on the SN76489A 
+		* Implement the T6W28; has registers in a weird order, needs writes
+		  to be 'sanitized' first. Also is stereo, similar to game gear.
+		* Implement the NCR 7496; Is probably 100% compatible with SN76496,
+		  but the whitenoise taps could be different. Needs someone with a
+		  Tandy 1200 or whatever it was which uses this to run some tests.
+		* Factor out common code so that the SAA1099 can share some code.
 ***************************************************************************/
 
 #include "sndintrf.h"
@@ -44,26 +58,26 @@
 
 
 #define MAX_OUTPUT 0x7fff
-
 #define STEP 0x10000
+#define NOISEMODE (R->Register[6]&4)?1:0
+
 
 typedef struct _sn76496_state sn76496_state;
 struct _sn76496_state
 {
 	sound_stream * Channel;
-	int SampleRate;
-	int VolTable[16];	/* volume table         */
+	INT32 VolTable[16];	/* volume table (for 4-bit to db conversion)*/
 	INT32 Register[8];	/* registers */
 	INT32 LastRegister;	/* last register written */
-	INT32 Volume[4];	/* volume of voice 0-2 and noise */
-	UINT32 RNG;		/* noise generator      */
-	INT32 NoiseMode;	/* active noise mode */
-	INT32 FeedbackMask;     /* mask for feedback */
-	INT32 WhitenoiseTaps;   /* mask for white noise taps */
-	INT32 WhitenoiseInvert; /* white noise invert flag */
-	INT32 Period[4];
-	INT32 Count[4];
-	INT32 Output[4];
+	INT32 Volume[4];	/* db volume of voice 0-2 and noise */
+	UINT32 RNG;			/* noise generator LFSR*/
+	INT32 FeedbackMask;	/* mask for feedback */
+	INT32 WhitenoiseTaps;	/* mask for white noise taps */
+	INT32 WhitenoiseInvert;	/* white noise invert flag */
+	INT32 Period[4];	/* Length of 1/2 of waveform */
+	INT32 Count[4];		/* Position within the waveform */
+	INT32 Output[4];	/* 1-bit output of each channel, pre-volume */
+	INT32 CyclestoREADY;/* number of cycles until the READY line goes active */
 };
 
 
@@ -81,6 +95,12 @@ INLINE sn76496_state *get_safe_token(const device_config *device)
 	return (sn76496_state *)device->token;
 }
 
+READ8_DEVICE_HANDLER( sn76496_ready_r )
+{
+	sn76496_state *R = get_safe_token(device);
+	stream_update(R->Channel);
+	return (R->CyclestoREADY? 0 : 1);
+}
 
 WRITE8_DEVICE_HANDLER( sn76496_w )
 {
@@ -90,6 +110,9 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 
 	/* update the output buffer before changing the registers */
 	stream_update(R->Channel);
+
+	/* set number of cycles until READY is active; this is always one 'sample', i.e. it equals the clock divider exactly; until the clock divider is fully supported, we delay until one sample has played */
+	R->CyclestoREADY = 1;
 
 	if (data & 0x80)
 	{
@@ -128,12 +151,10 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 			{
 			        if ((data & 0x80) == 0) R->Register[r] = (R->Register[r] & 0x3f0) | (data & 0x0f);
 				n = R->Register[6];
-				R->NoiseMode = (n & 4) ? 1 : 0;
 				/* N/512,N/1024,N/2048,Tone #3 output */
 				R->Period[3] = ((n&3) == 3) ? 2 * R->Period[2] : (STEP << (5+(n&3)));
 			        /* Reset noise shifter */
-				R->RNG = R->FeedbackMask; /* this is correct according to the smspower document */
-				//R->RNG = 0xF35; /* this is not, but sounds better in do run run */
+				R->RNG = R->FeedbackMask; 
 				R->Output[3] = R->RNG & 1;
 			}
 			break;
@@ -149,14 +170,16 @@ static STREAM_UPDATE( SN76496Update )
 	stream_sample_t *buffer = outputs[0];
 
 
-	/* If the volume is 0, increase the counter */
+	/* If the volume is 0, increase the counter; this is more or less
+	a speedup hack for when silence is to be output */
 	for (i = 0;i < 4;i++)
 	{
 		if (R->Volume[i] == 0)
 		{
-			/* note that I do count += samples, NOT count = samples + 1. You might think */
-			/* it's the same since the volume is 0, but doing the latter could cause */
-			/* interferencies when the program is rapidly modulating the volume. */
+			/* note that I do count += samples, NOT count = samples + 1. 
+			You might think it's the same since the volume is 0, but doing
+			the latter could cause interferencies when the program is 
+			rapidly modulating the volume. */
 			if (R->Count[i] <= samples*STEP) R->Count[i] += samples*STEP;
 		}
 	}
@@ -166,7 +189,9 @@ static STREAM_UPDATE( SN76496Update )
 		int vol[4];
 		unsigned int out;
 		int left;
-
+		
+		/* decrement Cycles to READY by one */
+		if (R->CyclestoREADY >0) R->CyclestoREADY--;
 
 		/* vol[] keeps track of how long each square wave stays */
 		/* in the 1 position during the sample period. */
@@ -176,14 +201,14 @@ static STREAM_UPDATE( SN76496Update )
 		{
 			if (R->Output[i]) vol[i] += R->Count[i];
 			R->Count[i] -= STEP;
-			/* Period[i] is the half period of the square wave. Here, in each */
-			/* loop I add Period[i] twice, so that at the end of the loop the */
-			/* square wave is in the same status (0 or 1) it was at the start. */
-			/* vol[i] is also incremented by Period[i], since the wave has been 1 */
-			/* exactly half of the time, regardless of the initial position. */
-			/* If we exit the loop in the middle, Output[i] has to be inverted */
-			/* and vol[i] incremented only if the exit status of the square */
-			/* wave is 1. */
+			/* Period[i] is the half period of the square wave. Here, in each 
+			loop I add Period[i] twice, so that at the end of the loop the 
+			square wave is in the same status (0 or 1) it was at the start.
+			vol[i] is also incremented by Period[i], since the wave has been 1
+			exactly half of the time, regardless of the initial position. 
+			If we exit the loop in the middle, Output[i] has to be inverted
+			and vol[i] incremented only if the exit status of the square
+			wave is 1. */
 			while (R->Count[i] <= 0)
 			{
 				R->Count[i] += R->Period[i];
@@ -212,7 +237,7 @@ static STREAM_UPDATE( SN76496Update )
 			R->Count[3] -= nextevent;
 			if (R->Count[3] <= 0)
 			{
-		        if (R->NoiseMode == 1) /* White Noise Mode */
+		        if (NOISEMODE == 1) /* White Noise Mode */
 		        {
 			        if (((R->RNG & R->WhitenoiseTaps) != R->WhitenoiseTaps) && ((R->RNG & R->WhitenoiseTaps) != 0)) /* crappy xor! */
 					{
@@ -293,8 +318,6 @@ static int SN76496_init(const device_config *device, sn76496_state *R)
 
 	R->Channel = stream_create(device,0,1,sample_rate,R,SN76496Update);
 
-	R->SampleRate = sample_rate;
-
 	for (i = 0;i < 4;i++) R->Volume[i] = 0;
 
 	R->LastRegister = 0;
@@ -314,6 +337,7 @@ static int SN76496_init(const device_config *device, sn76496_state *R)
 	R->FeedbackMask = 0x4000;     /* mask for feedback */
 	R->WhitenoiseTaps = 0x03;   /* mask for white noise taps */
 	R->WhitenoiseInvert = 1; /* white noise invert flag */
+	R->CyclestoREADY = 1; /* assume ready is not active immediately on init. is this correct?*/
 
 	R->RNG = R->FeedbackMask;
 	R->Output[3] = R->RNG & 1;
@@ -334,14 +358,18 @@ static void generic_start(const device_config *device, int feedbackmask, int noi
 	chip->WhitenoiseTaps = noisetaps;
 	chip->WhitenoiseInvert = noiseinvert;
 
+	state_save_register_device_item_array(device, 0, chip->VolTable);
 	state_save_register_device_item_array(device, 0, chip->Register);
 	state_save_register_device_item(device, 0, chip->LastRegister);
 	state_save_register_device_item_array(device, 0, chip->Volume);
 	state_save_register_device_item(device, 0, chip->RNG);
-	state_save_register_device_item(device, 0, chip->NoiseMode);
+	state_save_register_device_item(device, 0, chip->FeedbackMask);
+	state_save_register_device_item(device, 0, chip->WhitenoiseTaps);
+	state_save_register_device_item(device, 0, chip->WhitenoiseInvert);
 	state_save_register_device_item_array(device, 0, chip->Period);
 	state_save_register_device_item_array(device, 0, chip->Count);
 	state_save_register_device_item_array(device, 0, chip->Output);
+	state_save_register_device_item(device, 0, chip->CyclestoREADY);
 }
 
 

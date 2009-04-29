@@ -3,6 +3,7 @@
 #ifndef __SN76496_H__
 #define __SN76496_H__
 
+READ8_DEVICE_HANDLER( sn76496_ready_r );
 WRITE8_DEVICE_HANDLER( sn76496_w );
 
 DEVICE_GET_INFO( sn76496 );
