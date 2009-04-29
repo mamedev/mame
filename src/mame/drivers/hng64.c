@@ -624,12 +624,36 @@ static WRITE32_HANDLER( hng64_pal_w )
 
 static READ32_HANDLER( hng64_port_read )
 {
-	logerror("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
+	mame_system_time systime;
+	mame_get_base_datetime(space->machine, &systime);
 
-	if(offset==0x421) return 0x00000002;
- 	if(offset==0x441) return hng64_interrupt_level_request;
+	//if(((offset*4) & 0xff00) == 0x2100)
+	//	printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
 
-	if(offset==0x85b) return 0x00000010;
+	switch(offset*4)
+	{
+		case 0x1084: return 0x00000002; //???
+		case 0x1104: return hng64_interrupt_level_request;
+		/* 4-bit RTC */
+		case 0x2104: return (systime.local_time.second % 10);
+		case 0x210c: return (systime.local_time.second / 10);
+		case 0x2114: return (systime.local_time.minute % 10);
+		case 0x211c: return (systime.local_time.minute / 10);
+		case 0x2124: return (systime.local_time.hour % 10);
+		case 0x212c: return (systime.local_time.hour / 10);
+		case 0x2134: return (systime.local_time.mday % 10);
+		case 0x213c: return (systime.local_time.mday / 10);
+		case 0x2144: return ((systime.local_time.month+1) % 10);
+		case 0x214c: return ((systime.local_time.month+1) / 10);
+		case 0x2154: return (systime.local_time.year%10);
+		case 0x215c: return ((systime.local_time.year%100)/10);
+		case 0x2164: return (systime.local_time.weekday);
+
+		case 0x216c: return 0x00000010; //enables "system log reader"
+
+		case 0x217c: return 0; //RTC status?
+	}
+
 
 	return mame_rand(space->machine)&0xffffffff;
 }
@@ -699,14 +723,14 @@ static READ32_HANDLER( hng64_dualport_r )
 	static int toggle = 0;
 
 	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
-	
+
 	// These hacks create some red marks for the boot-up sequence
 	switch (offset*4)
 	{
 		//SamSho64
         case 0x00:
 		{
-		
+
 			if (hng64_boothack == 1) // ss64
 			{
 				toggle^=1; if (toggle==1) {return 0x00000400;} else {return 0x00000300;};
@@ -715,14 +739,14 @@ static READ32_HANDLER( hng64_dualport_r )
 			{
 				return 0x00000400;
 			}
-			
+
 			return mame_rand(space->machine);
 		}
-			
+
 		//RoadsEdge
 //      case 0x00:  return input_port_read(space->machine, "IPT_TEST");
 
-  
+
 		case 0x04:  return input_port_read(space->machine, "SYSTEM");
 		case 0x08:  return input_port_read(space->machine, "P1_P2");
 
@@ -1407,7 +1431,7 @@ static const gfx_layout hng64_texlayout =
 {
 	1024, 512,
 	RGN_FRAC(1,1),
-	8, 
+	8,
 	{ 0,1,2,3,4,5,6,7 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
@@ -1424,12 +1448,12 @@ static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( "scrtile", 0, hng64_8x8x8_tilelayout,  0x0, 0x10 )
 	GFXDECODE_ENTRY( "scrtile", 0, hng64_16x16x4_tilelayout,0x0, 0x100 )
 	GFXDECODE_ENTRY( "scrtile", 0, hng64_16x16x8_tilelayout,0x0, 0x10 )
-	
+
 	/* sprite tiles */
 	GFXDECODE_ENTRY( "sprtile", 0, hng64_16x16x4_spritelayout, 0x0, 0x100 )
-	GFXDECODE_ENTRY( "sprtile", 0, hng64_16x16x8_spritelayout, 0x0, 0x10 )  
-	
-	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */	
+	GFXDECODE_ENTRY( "sprtile", 0, hng64_16x16x8_spritelayout, 0x0, 0x10 )
+
+	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */
 GFXDECODE_END
 
 static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
@@ -1439,15 +1463,15 @@ static void hng64_reorder(UINT8* gfxregion, size_t gfxregionsize)
 	UINT8* buffer;
 	int i;
 	UINT8 tilesize = 4*8; // 4 bytes per line, 8 lines
-	
+
 	buffer = alloc_array_or_die(UINT8, gfxregionsize);
-	
+
 	for (i=0;i<gfxregionsize/2;i+=tilesize)
 	{
 		memcpy((buffer+i*2)+tilesize, gfxregion+i,                   tilesize);
 		memcpy((buffer+i*2),          gfxregion+i+(gfxregionsize/2), tilesize);
 	}
-	
+
 	memcpy(gfxregion, buffer, gfxregionsize);
 
 	free (buffer);
@@ -1624,7 +1648,7 @@ ROM_START( hng64 )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 
 	/* To placate MAME */
-	ROM_REGION32_LE( 0x2000000, "user3", ROMREGION_ERASEFF ) 
+	ROM_REGION32_LE( 0x2000000, "user3", ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "scrtile", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 	ROM_REGION( 0x4000, "sprtile", ROMREGION_DISPOSE | ROMREGION_ERASEFF )
 	ROM_REGION( 0x1000000, "textures", ROMREGION_ERASEFF )
@@ -1643,7 +1667,7 @@ ROM_START( roadedge )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "001pr01b.81", 0x0000000, 0x400000, CRC(effbac30) SHA1(c1bddf3e511a8950f65ac7e452f81dbc4b7fd977) )
 	ROM_LOAD32_WORD( "001pr02b.82", 0x0000002, 0x400000, CRC(b9aa4ad3) SHA1(9ab3c896dbdc45560b7127486e2db6ca3b15a057) )
 
@@ -1702,8 +1726,8 @@ ROM_START( sams64 )
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
-	
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
+
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "002-pro1a.81", 0x0000000, 0x400000, CRC(e5b907c5) SHA1(83637ffaa9031d41a5bed3397a519d1dfa8052cb) )
 	ROM_LOAD32_WORD( "002-pro2a.82", 0x0000002, 0x400000, CRC(803ed2eb) SHA1(666db47886a316e68b911311e5db3bc0f5b8a34d) )
 	ROM_LOAD32_WORD( "002-pro3a.83", 0x0800000, 0x400000, CRC(582156a7) SHA1(a7bbbd472a53072cbfaed5d41d4265123c9e3f3d) )
@@ -1738,7 +1762,7 @@ ROM_START( sams64 )
 	ROM_LOAD( "002-tx02a.14", 0x0400000, 0x400000, CRC(d5074be2) SHA1(c33e9b9f0d21ad5ad31d8f988b3c7378d374fc1b) )
 	ROM_LOAD( "002-tx03a.15", 0x0800000, 0x400000, CRC(68c313f7) SHA1(90ce8d0d19a994647c7167e3b256ff31647e575a) )
 	ROM_LOAD( "002-tx04a.16", 0x0c00000, 0x400000, CRC(f7dac24f) SHA1(1215354f28cbeb9fc38f6a7acae450ad5f34bb6a) )
-	
+
 
 	/* X,Y,Z Vertex ROMs */
 	ROM_REGION( 0x1800000, "verts", ROMREGION_NODISPOSE )
@@ -1764,8 +1788,8 @@ ROM_START( xrally )
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
-	
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
+
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "003-pr01a.81", 0x0000000, 0x400000, CRC(4e160388) SHA1(08fba66d0f0dab47f7db5bc7d411f4fc0e8219c8) )
 	ROM_LOAD32_WORD( "003-pr02a.82", 0x0000002, 0x400000, CRC(c4dd4f18) SHA1(4db0e6d5cabd9e4f82d5905556174b9eff8ad4d9) )
 
@@ -1790,7 +1814,7 @@ ROM_START( xrally )
 	ROM_LOAD( "003-tx02a.14", 0x0400000, 0x400000, CRC(7912f4be) SHA1(bca44c1415a25f2349857b2246e3ee7abe709a84) )
 	ROM_LOAD( "003-tx03a.15", 0x0800000, 0x400000, CRC(a319c94e) SHA1(14d720cdd8b9411fd82a7b4b33ee5dbfdd01c9f8) )
 	ROM_LOAD( "003-tx04a.16", 0x0c00000, 0x400000, CRC(16d7805b) SHA1(4cc7b2375832c2f9f20fe882e604a2a52bf07f6f) )
-	
+
 	/* X,Y,Z Vertex ROMs */
 	ROM_REGION( 0x1800000, "verts", ROMREGION_NODISPOSE )
 	ROMX_LOAD( "003-vt01a.17", 0x0000000, 0x400000, CRC(3e5e275d) SHA1(74f5ec88c258bc224e271f7abeb02d6485e27d8c), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -1812,8 +1836,8 @@ ROM_START( bbust2 )
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
-	
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
+
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "004-pr01a.81", 0x0000000, 0x400000, CRC(7b836ece) SHA1(7a4a08251f1dd66c368ac203f5a006266e77f73d) )
 	ROM_LOAD32_WORD( "004-pr02a.82", 0x0000002, 0x400000, CRC(8c55a988) SHA1(d9a61ac3d8550ce0ee6aab374c9f024912163180) )
 	ROM_LOAD32_WORD( "004-pr03a.83", 0x0800000, 0x400000, CRC(f25a82dd) SHA1(74c0a03021ef424e0b9c3c818be297d2967b3012) )
@@ -1844,7 +1868,7 @@ ROM_START( bbust2 )
 	ROM_LOAD( "004-tx02a.14", 0x0400000, 0x400000, CRC(a36c6c34) SHA1(3e4ad293b064a7c05aa23447ff5f17010cae2863) )
 	ROM_LOAD( "004-tx03a.15", 0x0800000, 0x400000, CRC(f46377c0) SHA1(bfa6fc3ab89599a4443577d18578569ad55774bd) )
 	ROM_LOAD( "004-tx04a.16", 0x0c00000, 0x400000, CRC(b5f0ef01) SHA1(646bfb17b9e81aecf8db33d3a021f7769b262eda) )
-	
+
 	/* X,Y,Z Vertex ROMs */
 	ROM_REGION( 0x1800000, "verts", ROMREGION_NODISPOSE )
 	ROMX_LOAD( "004-vt01a.17", 0x0000000, 0x400000, CRC(25ebbf9b) SHA1(b7c3fb9ee9cf75824d908e7a94970282f1845d5d), ROM_GROUPWORD | ROM_SKIP(4) )
@@ -1867,7 +1891,7 @@ ROM_START( sams64_2 )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "005pr01a.81", 0x0000000, 0x400000, CRC(a69d7700) SHA1(a580783a109bc3e24248d70bcd67f62dd7d8a5dd) )
 	ROM_LOAD32_WORD( "005pr02a.82", 0x0000002, 0x400000, CRC(38b9e6b3) SHA1(d1dad8247d920cc66854a0096e1c7845842d2e1c) )
 	ROM_LOAD32_WORD( "005pr03a.83", 0x0800000, 0x400000, CRC(0bc738a8) SHA1(79893b0e1c4a31e02ab385c4382684245975ae8f) )
@@ -1946,7 +1970,7 @@ ROM_START( fatfurwa )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "006pr01a.81", 0x0000000, 0x400000, CRC(3830efa1) SHA1(9d8c941ccb6cbe8d138499cf9d335db4ac7a9ec0) )
 	ROM_LOAD32_WORD( "006pr02a.82", 0x0000002, 0x400000, CRC(8d5de84e) SHA1(e3ae014263f370c2836f62ab323f1560cb3a9cf0) )
 	ROM_LOAD32_WORD( "006pr03a.83", 0x0800000, 0x400000, CRC(c811b458) SHA1(7d94e0df501fb086b2e5cf08905d7a3adc2c6472) )
@@ -2016,7 +2040,7 @@ ROM_START( buriki )
 	ROM_LOAD ( "rom1.bin",  0x080000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
 	/* END BIOS */
 
-	ROM_REGION32_LE( 0x2000000, "user3", 0 ) 
+	ROM_REGION32_LE( 0x2000000, "user3", 0 )
 	ROM_LOAD32_WORD( "007pr01b.81", 0x0000000, 0x400000, CRC(a31202f5) SHA1(c657729b292d394ced021a0201a1c5608a7118ba) )
 	ROM_LOAD32_WORD( "007pr02b.82", 0x0000002, 0x400000, CRC(a563fed6) SHA1(9af9a021beb814e35df968abe5a99225a124b5eb) )
 	ROM_LOAD32_WORD( "007pr03a.83", 0x0800000, 0x400000, CRC(da5f6105) SHA1(5424cf5289cef66e301e968b4394e551918fe99b) )
