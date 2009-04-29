@@ -228,12 +228,38 @@ because they just need a few lines of code */
 	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(player) \
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, button3            ) PORT_PLAYER(player)
 
+#define KONAMI16_LSB_40_UDLR( player, button3 )	\
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(player) \
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(player) \
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(player) \
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) \
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(player) \
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(player) \
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, button3            ) PORT_PLAYER(player)
+
+#define KONAMI16_MSB_40_UDLR( player, button3 )	\
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(player) \
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(player) \
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(player) \
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(player) \
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_PLAYER(player) \
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_PLAYER(player) \
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, button3            ) PORT_PLAYER(player)
+
 #define KONAMI16_LSB( player, button3, start )	\
 	KONAMI16_LSB_40( player, button3 )			\
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, start )
 
 #define KONAMI16_MSB( player, button3, start )	\
 	KONAMI16_MSB_40( player, button3 )			\
+	PORT_BIT(  0x8000, IP_ACTIVE_LOW, start )
+
+#define KONAMI16_LSB_UDLR( player, button3, start )	\
+	KONAMI16_LSB_40_UDLR( player, button3 )			\
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, start )
+
+#define KONAMI16_MSB_UDLR( player, button3, start )	\
+	KONAMI16_MSB_40_UDLR( player, button3 )			\
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, start )
 
 
