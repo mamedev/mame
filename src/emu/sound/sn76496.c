@@ -112,7 +112,7 @@ WRITE8_DEVICE_HANDLER( sn76496_w )
 	stream_update(R->Channel);
 
 	/* set number of cycles until READY is active; this is always one 'sample', i.e. it equals the clock divider exactly; until the clock divider is fully supported, we delay until one sample has played */
-	R->CyclestoREADY = 1;
+	R->CyclestoREADY = 4;
 
 	if (data & 0x80)
 	{
