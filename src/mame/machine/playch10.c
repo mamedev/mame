@@ -28,7 +28,7 @@ static int MMC2_bank[4], MMC2_bank_latch[2];
  *************************************/
 MACHINE_RESET( pc10 )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const device_config *ppu = devtag_get_device(machine, "ppu");
 
 	/* initialize latches and flip-flops */
@@ -103,12 +103,12 @@ WRITE8_HANDLER( pc10_DOGDI_w )
 
 WRITE8_HANDLER( pc10_GAMERES_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(space->machine, "cart", INPUT_LINE_RESET, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_GAMESTOP_w )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line(space->machine, "cart", INPUT_LINE_HALT, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_PPURES_w )
@@ -441,7 +441,7 @@ static WRITE8_HANDLER( aboard_vrom_switch_w )
 DRIVER_INIT( pcaboard )
 {
 	/* switches vrom with writes to the $803e-$8041 area */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0x8fff, 0, 0, aboard_vrom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0x8fff, 0, 0, aboard_vrom_switch_w );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -471,7 +471,7 @@ DRIVER_INIT( pcbboard )
 	memcpy( &prg[0x08000], &prg[0x28000], 0x8000 );
 
 	/* Roms are banked at $8000 to $bfff */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, bboard_rom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, bboard_rom_switch_w );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -493,7 +493,7 @@ static WRITE8_HANDLER( cboard_vrom_switch_w )
 DRIVER_INIT( pccboard )
 {
 	/* switches vrom with writes to $6000 */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, cboard_vrom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, cboard_vrom_switch_w );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -514,7 +514,7 @@ DRIVER_INIT( pcdboard )
 	mmc1_rom_mask = 0x07;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -525,7 +525,7 @@ DRIVER_INIT( pcdboard )
 DRIVER_INIT( pcdboard_2 )
 {
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
 	memory_set_bankptr(machine, 1, auto_alloc_array(machine, UINT8, 0x2000));
 
 	/* common init */
@@ -617,13 +617,13 @@ DRIVER_INIT( pceboard )
 	memcpy( &prg[0x08000], &prg[0x28000], 0x8000 );
 
 	/* basically a mapper 9 on a nes */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, eboard_rom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, eboard_rom_switch_w );
 
 	/* ppu_latch callback */
 	ppu_latch = mapper9_latch;
 
 	/* nvram at $6000-$6fff */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
 	memory_set_bankptr(machine, 1, auto_alloc_array(machine, UINT8, 0x1000));
 
 	/* common init */
@@ -645,7 +645,7 @@ DRIVER_INIT( pcfboard )
 	mmc1_rom_mask = 0x07;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -656,7 +656,7 @@ DRIVER_INIT( pcfboard )
 DRIVER_INIT( pcfboard_2 )
 {
 	/* extra ram at $6000-$6fff */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
 	memory_set_bankptr(machine, 1, auto_alloc_array(machine, UINT8, 0x1000));
 
 	/* common init */
@@ -681,7 +681,7 @@ static void gboard_scanline_cb( const device_config *device, int scanline, int v
 		if ( --gboard_scanline_counter == -1 )
 		{
 			gboard_scanline_counter = gboard_scanline_latch;
-			generic_pulse_irq_line(device->machine->cpu[1], 0);
+			generic_pulse_irq_line(cputag_get_cpu(device->machine, "cart"), 0);
 		}
 	}
 }
@@ -831,10 +831,10 @@ DRIVER_INIT( pcgboard )
 	memcpy( &prg[0x0c000], &prg[0x4c000], 0x4000 );
 
 	/* MMC3 mapper at writes to $8000-$ffff */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, gboard_rom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, gboard_rom_switch_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
 	memory_set_bankptr(machine, 1, auto_alloc_array(machine, UINT8, 0x2000));
 
 	gboard_banks[0] = 0x1e;
@@ -883,7 +883,7 @@ DRIVER_INIT( pciboard )
 	memcpy( &prg[0x08000], &prg[0x10000], 0x8000 );
 
 	/* Roms are banked at $8000 to $bfff */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, iboard_rom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, iboard_rom_switch_w );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -948,10 +948,10 @@ DRIVER_INIT( pchboard )
 	memcpy( &prg[0x0c000], &prg[0x4c000], 0x4000 );
 
 	/* Roms are banked at $8000 to $bfff */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, hboard_rom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, hboard_rom_switch_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
 	memory_set_bankptr(machine, 1, auto_alloc_array(machine, UINT8, 0x2000));
 
 	gboard_banks[0] = 0x1e;
@@ -980,11 +980,11 @@ DRIVER_INIT( pckboard )
 	mmc1_rom_mask = 0x0f;
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
+	memory_install_readwrite8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, (read8_space_func)SMH_BANK(1), (write8_space_func)SMH_BANK(1) );
 	memory_set_bankptr(machine, 1, auto_alloc_array(machine, UINT8, 0x2000));
 
 	/* Roms are banked at $8000 to $bfff */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);

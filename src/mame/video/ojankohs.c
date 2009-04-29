@@ -306,7 +306,7 @@ VIDEO_UPDATE( ojankoc )
 
 	if (ojankoc_screen_refresh)
 	{
-		const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++) {

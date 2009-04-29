@@ -283,9 +283,9 @@ static void ide_interrupt(const device_config *device, int state)
 	if (control & 0x0008)
 	{
 		if (state != CLEAR_LINE)
-			cpu_set_input_line(device->machine->cpu[0], 4, HOLD_LINE);
+			cputag_set_input_line(device->machine, "maincpu", 4, HOLD_LINE);
 		else
-			cpu_set_input_line(device->machine->cpu[0], 4, CLEAR_LINE);
+			cputag_set_input_line(device->machine, "maincpu", 4, CLEAR_LINE);
 	}
 }
 
@@ -294,7 +294,7 @@ static void ide_interrupt(const device_config *device, int state)
 static TIMER_CALLBACK( gp2_timer_callback )
 {
 	if (control & 0x0004)
-		cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN(qdrmfgp2_interrupt)
@@ -313,9 +313,11 @@ static void gp2_ide_interrupt(const device_config *device, int state)
 			if (gp2_irq_control)
 				gp2_irq_control = 0;
 			else
-				cpu_set_input_line(device->machine->cpu[0], 5, HOLD_LINE);
-		} else {
-			cpu_set_input_line(device->machine->cpu[0], 5, CLEAR_LINE);
+				cputag_set_input_line(device->machine, "maincpu", 5, HOLD_LINE);
+		} 
+		else 
+		{
+			cputag_set_input_line(device->machine, "maincpu", 5, CLEAR_LINE);
 		}
 	}
 }
@@ -562,7 +564,7 @@ INPUT_PORTS_END
 static void sound_irq(const device_config *device)
 {
 	if (control & 0x0001)
-		cpu_set_input_line(device->machine->cpu[0], 1, HOLD_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 1, HOLD_LINE);
 }
 
 static const k054539_interface k054539_config =

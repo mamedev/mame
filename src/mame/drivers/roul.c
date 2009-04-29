@@ -139,7 +139,7 @@ static WRITE8_HANDLER( blitter_cmd_w )
 static WRITE8_HANDLER( sound_latch_w )
 {
  	soundlatch_w(space, 0, data & 0xff);
- 	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+ 	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( ball_w )

@@ -29,7 +29,7 @@ extern UINT16 *prehisle_bg_videoram16;
 static WRITE16_HANDLER( prehisle_sound16_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*******************************************************************************/
@@ -202,7 +202,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
@@ -340,4 +340,3 @@ ROM_END
 GAME( 1989, prehisle, 0,        prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, prehislu, prehisle, prehisle, prehisle, 0, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, gensitou, prehisle, prehisle, prehisle, 0, ROT0, "SNK", "Genshi-Tou 1930's", GAME_SUPPORTS_SAVE )
-

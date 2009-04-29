@@ -572,7 +572,7 @@ if (VERBOSE_AUDIO_LOG)
 
 static TIMER_CALLBACK( rabbit_blit_done )
 {
-	cpu_set_input_line(machine->cpu[0], rabbit_bltirqlevel, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", rabbit_bltirqlevel, HOLD_LINE);
 }
 
 static void rabbit_do_blit(running_machine *machine)

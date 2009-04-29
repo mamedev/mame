@@ -263,7 +263,7 @@ static WRITE16_HANDLER( jumping_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
-		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 	}
 }
 
@@ -553,7 +553,7 @@ GFXDECODE_END
 
 static void irqhandler(const device_config *device, int irq)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "audiocpu", 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

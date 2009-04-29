@@ -146,7 +146,7 @@ static READ8_HANDLER( popper_input_ports_r )
 
 static READ8_HANDLER( popper_soundcpu_nmi_r )
 {
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 

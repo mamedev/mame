@@ -429,9 +429,9 @@ ADDRESS_MAP_END
 static void irqhandler(const device_config *device, int linestate)
 {
 	if (linestate)
-		cpu_set_input_line(device->machine->cpu[0], 12, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 12, ASSERT_LINE);
 	else
-		cpu_set_input_line(device->machine->cpu[0], 12, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 12, CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -1059,7 +1059,7 @@ static void install_hotgmck_pcm_bank(running_machine *machine)
 	set_hotgmck_pcm_bank(machine, 0);
 	set_hotgmck_pcm_bank(machine, 1);
 
-	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5800008, 0x580000b, 0, 0, hotgmck_pcm_bank_w );
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800008, 0x580000b, 0, 0, hotgmck_pcm_bank_w );
 	state_save_register_postload(machine, hotgmck_pcm_bank_postload, (void *)0);
 	state_save_register_postload(machine, hotgmck_pcm_bank_postload, (void *)1);
 }
@@ -1067,23 +1067,23 @@ static void install_hotgmck_pcm_bank(running_machine *machine)
 static DRIVER_INIT( hotgmck )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1,&RAM[0x100000]);
+	memory_set_bankptr(machine, 1, &RAM[0x100000]);
 	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM
 }
 
 static DRIVER_INIT( loderndf )
 {
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderndf_speedup_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderndf_speedup_r );
 }
 
 static DRIVER_INIT( loderdfa )
 {
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderdfa_speedup_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderdfa_speedup_r );
 }
 
 static DRIVER_INIT( hotdebut )
 {
-	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x600001c, 0x600001f, 0, 0, hotdebut_speedup_r );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600001c, 0x600001f, 0, 0, hotdebut_speedup_r );
 }
 
 

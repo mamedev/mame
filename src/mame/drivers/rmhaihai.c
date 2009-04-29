@@ -166,7 +166,7 @@ logerror("banksw %d\n",bank);
 
 static MACHINE_RESET( themj )
 {
-	themj_rombank_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO),0,0);
+	themj_rombank_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0, 0);
 }
 
 

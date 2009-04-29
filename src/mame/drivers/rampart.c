@@ -41,7 +41,7 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[0], 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -49,7 +49,7 @@ static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(screen->machine->cpu[0]);
+		atarigen_scanline_int_gen(cputag_get_cpu(screen->machine, "maincpu"));
 }
 
 
@@ -490,7 +490,7 @@ static DRIVER_INIT( rampart )
 
 	atarigen_eeprom_default = compressed_default_eeprom;
 	memcpy(&rom[0x140000], &rom[0x40000], 0x8000);
-	atarigen_slapstic_init(machine->cpu[0], 0x140000, 0x438000, 118);
+	atarigen_slapstic_init(cputag_get_cpu(machine, "maincpu"), 0x140000, 0x438000, 118);
 }
 
 

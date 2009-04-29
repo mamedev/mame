@@ -87,14 +87,16 @@ static WRITE8_HANDLER( rockrage_bankswitch_w )
 static WRITE8_HANDLER( rockrage_sh_irqtrigger_w )
 {
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static READ8_DEVICE_HANDLER( rockrage_VLM5030_busy_r ) {
+static READ8_DEVICE_HANDLER( rockrage_VLM5030_busy_r ) 
+{
 	return ( vlm5030_bsy(device) ? 1 : 0 );
 }
 
-static WRITE8_DEVICE_HANDLER( rockrage_speech_w ) {
+static WRITE8_DEVICE_HANDLER( rockrage_speech_w ) 
+{
 	/* bit2 = data bus enable */
 	vlm5030_rst( device, ( data >> 1 ) & 0x01 );
 	vlm5030_st( device, ( data >> 0 ) & 0x01 );

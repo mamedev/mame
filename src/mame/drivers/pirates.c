@@ -155,16 +155,16 @@ static CUSTOM_INPUT( prot_r )
        602e and 62a6 */
 	/* For Genix, see 6576 for setting values and 67c2,d3b4 and dbc2 for tests. */
 
-	if (cpu_get_pc(field->port->machine->cpu[0]) == 0x6134)
+	if (cpu_get_pc(cputag_get_cpu(field->port->machine, "main")) == 0x6134)
 	{
 		bit = prot & 1;
 		prot = (prot >> 1) | (bit << 7);
 	}
-	else if (cpu_get_pc(field->port->machine->cpu[0]) == 0x6020)
+	else if (cputag_get_cpu(field->port->machine, "main")) == 0x6020)
 		bit = 0;
-	else if (cpu_get_pc(field->port->machine->cpu[0]) == 0x6168)
+	else if (cputag_get_cpu(field->port->machine, "main")) == 0x6168)
 		bit = 0;
-	else if (cpu_get_pc(field->port->machine->cpu[0]) == 0x61cc)
+	else if (cputag_get_cpu(field->port->machine, "main")) == 0x61cc)
 		bit = 1;
 	else
 #endif
@@ -486,7 +486,7 @@ static DRIVER_INIT( genix )
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x109e98, 0x109e9b, 0, 0, genix_prot_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x109e98, 0x109e9b, 0, 0, genix_prot_r );
 }
 
 

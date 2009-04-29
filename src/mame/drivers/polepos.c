@@ -289,9 +289,9 @@ static WRITE8_HANDLER( polepos_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* IRQON */
-			cpu_interrupt_enable(space->machine->cpu[0],bit);
+			cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
 			if (!bit)
-				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
@@ -302,8 +302,8 @@ static WRITE8_HANDLER( polepos_latch_w )
 			polepos_sound_enable(devtag_get_device(space->machine, "namco"),bit);
 			if (!bit)
 			{
-				polepos_engine_sound_lsb_w(space,0,0);
-				polepos_engine_sound_msb_w(space,0,0);
+				polepos_engine_sound_lsb_w(space, 0, 0);
+				polepos_engine_sound_msb_w(space, 0, 0);
 			}
 			break;
 
@@ -312,11 +312,11 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x04:	/* RESB */
-			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:	/* RESA */
-			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:	/* SB0 */
@@ -375,12 +375,12 @@ static const struct namcoio_interface intf1 =
 #include "cpu/z8000/z8000.h"
 static MACHINE_RESET( polepos )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
-	for (i = 0;i < 8;i++)
-		polepos_latch_w(space,i,0);
+	for (i = 0; i < 8; i++)
+		polepos_latch_w(space, i, 0);
 
 	namco_06xx_init(machine, 0, 0,
 		NAMCOIO_51XX, &intf0,
@@ -389,8 +389,8 @@ static MACHINE_RESET( polepos )
 		NAMCOIO_54XX, NULL);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
-	cpu_set_input_line_vector(machine->cpu[1], 0, Z8000_NVI);
-	cpu_set_input_line_vector(machine->cpu[2], 0, Z8000_NVI);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub"), 0, Z8000_NVI);
+	cpu_set_input_line_vector(cputag_get_cpu(machine, "sub2"), 0, Z8000_NVI);
 }
 
 
@@ -1774,16 +1774,16 @@ static DRIVER_INIT( topracra )
 	polepos_gear_bit = 0x20;
 
 	/* extra direct mapped inputs read */
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, "STEER");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "IN0");
-	memory_install_read_port_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSWA");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, "STEER");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "IN0");
+	memory_install_read_port_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSWA");
 
 }
 
 static DRIVER_INIT( polepos2 )
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
+	memory_install_read16_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
 
 	DRIVER_INIT_CALL(polepos);
 }

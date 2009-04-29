@@ -40,13 +40,13 @@ static TIMER_DEVICE_CALLBACK( nmi_32v )
 {
 	int scanline = param;
 	int nmistate = (scanline & 32) && (orbit_misc_flags & 4);
-	cpu_set_input_line(timer->machine->cpu[0], INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(timer->machine, "maincpu", INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 }
 
 

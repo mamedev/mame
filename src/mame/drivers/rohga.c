@@ -791,7 +791,7 @@ GFXDECODE_END
 
 static void sound_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(device->machine->cpu[1],1,state); /* IRQ 2 */
+	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )

@@ -1024,13 +1024,13 @@ static DRIVER_INIT (paradise)
 static DRIVER_INIT (tgtball)
 {
 	paradise_sprite_inc = 4;
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
 }
 
 static DRIVER_INIT (torus)
 {
 	paradise_sprite_inc = 4;
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x2070, 0x2070, 0, 0, torus_coin_counter_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2070, 0x2070, 0, 0, torus_coin_counter_w);
 }
 
 
@@ -1048,4 +1048,3 @@ GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung",
 GAME( 1996,  torus,    0,       torus,    torus,    torus,    ROT90, "Yun Sung", "Torus", 0 )
 GAME( 1998,  madball,  0,       madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", 0 )
 GAME( 1997,  madballn, madball, madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", 0 )
-

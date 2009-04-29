@@ -716,7 +716,7 @@ static DRIVER_INIT(polygonet)
 	dsp56k_bank04_ram    = auto_alloc_array_clear(machine, UINT16, 2 * 8 * dsp56k_bank04_size);
 
 	/* The dsp56k occasionally executes out of mapped memory */
-	dsp56k_update_handler = memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
+	dsp56k_update_handler = memory_set_direct_update_handler(cputag_get_address_space(machine, "dsp", ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
 }
 
 ROM_START( plygonet )

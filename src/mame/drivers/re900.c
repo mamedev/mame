@@ -228,7 +228,7 @@ static INTERRUPT_GEN( re900_video_interrupt )
 
 static void vdp_interrupt (running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
+	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

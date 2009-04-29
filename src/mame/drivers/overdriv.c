@@ -155,7 +155,7 @@ static INTERRUPT_GEN( cpuB_interrupt )
 static MACHINE_RESET( overdriv )
 {
 	/* start with cpu B halted */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( cpuA_ctrl_w )
@@ -163,13 +163,13 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 probably enables the second 68000 */
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		set_led_status(0,data & 0x08);
-		coin_counter_w(0,data & 0x10);
-		coin_counter_w(1,data & 0x20);
+		set_led_status(0, data & 0x08);
+		coin_counter_w(0, data & 0x10);
+		coin_counter_w(1, data & 0x20);
 
 //logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(space->cpu),data);
 	}
@@ -206,17 +206,17 @@ static READ8_DEVICE_HANDLER( overdriv_sound_r )
 
 static WRITE16_HANDLER( overdriv_soundirq_w )
 {
-	cpu_set_input_line(space->machine->cpu[2],M6809_IRQ_LINE,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq5_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],5,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 5, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
 {
-	cpu_set_input_line(space->machine->cpu[1],6,HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", 6, HOLD_LINE);
 }
 
 
@@ -433,12 +433,10 @@ ROM_START( overdriv )
 ROM_END
 
 
-
 static DRIVER_INIT( overdriv )
 {
 	konami_rom_deinterleave_4(machine, "gfx1");
 }
-
 
 
 GAMEL( 1990, overdriv, 0, overdriv, overdriv, overdriv, ROT90, "Konami", "Over Drive", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING, layout_overdriv )

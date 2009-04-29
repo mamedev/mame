@@ -190,7 +190,7 @@ static UINT8 at_pages[0x10];
 
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
@@ -200,7 +200,7 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 
 static DMA8237_MEM_WRITE( pc_dma_write_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
@@ -211,7 +211,8 @@ static READ8_HANDLER(dma_page_select_r)
 {
 	UINT8 data = at_pages[offset % 0x10];
 
-	switch(offset % 8) {
+	switch(offset % 8) 
+	{
 	case 1:
 		data = dma_offset[(offset / 8) & 1][2];
 		break;
@@ -233,7 +234,8 @@ static WRITE8_HANDLER(dma_page_select_w)
 {
 	at_pages[offset % 0x10] = data;
 
-	switch(offset % 8) {
+	switch(offset % 8) 
+	{
 	case 1:
 		dma_offset[(offset / 8) & 1][2] = data;
 		break;
@@ -281,15 +283,17 @@ static const struct dma8237_interface dma8237_2_config =
 8259 IRQ controller
 ******************/
 
-static PIC8259_SET_INT_LINE( pic8259_1_set_int_line ) {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+static PIC8259_SET_INT_LINE( pic8259_1_set_int_line ) 
+{
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pic8259_1_config = {
 	pic8259_1_set_int_line
 };
 
-static PIC8259_SET_INT_LINE( pic8259_2_set_int_line ) {
+static PIC8259_SET_INT_LINE( pic8259_2_set_int_line ) 
+{
 	pic8259_set_irq_line( streetg2_devices.pic8259_1, 2, interrupt);
 }
 
@@ -310,7 +314,8 @@ static IRQ_CALLBACK(irq_callback)
 
 static PIT8253_OUTPUT_CHANGED( at_pit8254_out0_changed )
 {
-	if ( streetg2_devices.pic8259_1 ) {
+	if ( streetg2_devices.pic8259_1 ) 
+	{
 		pic8259_set_irq_line(streetg2_devices.pic8259_1, 0, state);
 	}
 }
@@ -514,7 +519,8 @@ static PALETTE_INIT(pcat_286)
 	//todo: 256 colors
 }
 
-static void streetg2_set_keyb_int(running_machine *machine, int state) {
+static void streetg2_set_keyb_int(running_machine *machine, int state) 
+{
 	pic8259_set_irq_line(streetg2_devices.pic8259_1, 1, state);
 }
 
@@ -524,7 +530,7 @@ static MACHINE_START( streetg2 )
 //  bank = -1;
 //  lastvalue = -1;
 //  hv_blank = 0;
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 	streetg2_devices.pit8253 = devtag_get_device( machine, "pit8254" );
 	streetg2_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
 	streetg2_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );

@@ -159,7 +159,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
 			}
 
 			if (!(data & 0x40))
-				cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_5, CLEAR_LINE);
+				cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_5, CLEAR_LINE);
 		break;
 
 		case 0x0c/2:
@@ -177,7 +177,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
 static WRITE16_HANDLER( sound_cmd1_w )
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(space, 0, data>>8);
+		soundlatch_w(space, 0, data >> 8);
 }
 
 static WRITE16_HANDLER( sound_cmd2_w )
@@ -189,13 +189,13 @@ static WRITE16_HANDLER( sound_cmd2_w )
 static WRITE16_HANDLER( sound_irq_w )
 {
 	if (ACCESSING_BITS_8_15)
-		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+		cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_msb_r )
 {
 	if (ACCESSING_BITS_8_15)
-		return(rng_sound_status<<8);
+		return(rng_sound_status << 8);
 
 	return(0);
 }
@@ -249,7 +249,7 @@ static WRITE8_HANDLER( z80ctrl_w )
 	memory_set_bankptr(space->machine, 2, memory_region(space->machine, "soundcpu") + 0x10000 + (data & 0x07) * 0x4000);
 
 	if (data & 0x10)
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN(audio_interrupt)

@@ -62,14 +62,14 @@ static TILE_GET_INFO( get_fg_tile_info )
 static WRITE8_HANDLER( onetwo_fgram_w )
 {
 	fgram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset/2);
+	tilemap_mark_tile_dirty(fg_tilemap, offset / 2);
 }
 
 static WRITE8_HANDLER( onetwo_cpubank_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu") + 0x10000;
 
-	memory_set_bankptr(space->machine, 1,&RAM[data * 0x4000]);
+	memory_set_bankptr(space->machine, 1, &RAM[data * 0x4000]);
 }
 
 static WRITE8_HANDLER( onetwo_coin_counters_w )
@@ -82,27 +82,27 @@ static WRITE8_HANDLER( onetwo_coin_counters_w )
 static WRITE8_HANDLER( onetwo_soundlatch_w )
 {
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void setColor(running_machine *machine, int offset)
 {
-		int r,g,b;
-		r=paletteram[offset]&0x1f;
-		g=paletteram_2[offset]&0x1f;
-		b=((paletteram[offset]&0x60)>>2)|((paletteram_2[offset]&0xe0)>>5);
-		palette_set_color_rgb(machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
+		int r, g, b;
+		r = paletteram[offset] & 0x1f;
+		g = paletteram_2[offset] & 0x1f;
+		b = ((paletteram[offset] & 0x60) >> 2) | ((paletteram_2[offset] & 0xe0) >> 5);
+		palette_set_color_rgb(machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 static WRITE8_HANDLER(palette1_w)
 {
-	paletteram[offset]=data;
+	paletteram[offset] = data;
 	setColor(space->machine, offset);
 }
 
 static WRITE8_HANDLER(palette2_w)
 {
-	paletteram_2[offset]=data;
+	paletteram_2[offset] = data;
 	setColor(space->machine, offset);
 }
 
@@ -257,18 +257,18 @@ GFXDECODE_END
 
 static VIDEO_START( onetwo )
 {
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
 static VIDEO_UPDATE( onetwo )
 {
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
 
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1],0,linestate);
+	cputag_set_input_line(device->machine, "audiocpu", 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

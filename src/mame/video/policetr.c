@@ -245,12 +245,12 @@ WRITE32_HANDLER( policetr_video_w )
 
 				/* latch 0x50 clears IRQ4 */
 				case 0x50:
-					cpu_set_input_line(space->machine->cpu[0], R3000_IRQ4, CLEAR_LINE);
+					cputag_set_input_line(space->machine, "audiocpu", R3000_IRQ4, CLEAR_LINE);
 					break;
 
 				/* latch 0x60 clears IRQ5 */
 				case 0x60:
-					cpu_set_input_line(space->machine->cpu[0], R3000_IRQ5, CLEAR_LINE);
+					cputag_set_input_line(space->machine, "audiocpu", R3000_IRQ5, CLEAR_LINE);
 					break;
 
 				/* log anything else */

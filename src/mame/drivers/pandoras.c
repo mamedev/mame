@@ -38,17 +38,20 @@ WRITE8_HANDLER( pandoras_scrolly_w );
 VIDEO_START( pandoras );
 VIDEO_UPDATE( pandoras );
 
-static INTERRUPT_GEN( pandoras_interrupt_a ){
+static INTERRUPT_GEN( pandoras_interrupt_a )
+{
 	if (irq_enable_a)
 		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( pandoras_interrupt_b ){
+static INTERRUPT_GEN( pandoras_interrupt_b )
+{
 	if (irq_enable_b)
 		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( pandoras_int_control_w ){
+static WRITE8_HANDLER( pandoras_int_control_w )
+{
 	/*  byte 0: irq enable (CPU A)
         byte 2: coin counter 1
         byte 3: coin counter 2
@@ -58,8 +61,9 @@ static WRITE8_HANDLER( pandoras_int_control_w ){
 
         other bytes unknown */
 
-	switch (offset){
-		case 0x00:	if (!data) cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
+	switch (offset)
+	{
+		case 0x00:	if (!data) cputag_set_input_line(space->machine, "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 					irq_enable_a = data;
 					break;
 		case 0x02:	coin_counter_w(0,data & 0x01);
@@ -68,10 +72,10 @@ static WRITE8_HANDLER( pandoras_int_control_w ){
 					break;
 		case 0x05:	pandoras_flipscreen_w(space, 0, data);
 					break;
-		case 0x06:	if (!data) cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
+		case 0x06:	if (!data) cputag_set_input_line(space->machine, "sub", M6809_IRQ_LINE, CLEAR_LINE);
 					irq_enable_b = data;
 					break;
-		case 0x07:	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		case 0x07:	cputag_set_input_line(space->machine, "sub",INPUT_LINE_NMI,PULSE_LINE);
 					break;
 
 		default:
@@ -79,17 +83,21 @@ static WRITE8_HANDLER( pandoras_int_control_w ){
 	}
 }
 
-static WRITE8_HANDLER( pandoras_cpua_irqtrigger_w ){
-	if (!firq_old_data_a && data){
-		cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
+static WRITE8_HANDLER( pandoras_cpua_irqtrigger_w )
+{
+	if (!firq_old_data_a && data)
+	{
+		cputag_set_input_line(space->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
 	firq_old_data_a = data;
 }
 
-static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w ){
-	if (!firq_old_data_b && data){
-		cpu_set_input_line(space->machine->cpu[1],M6809_FIRQ_LINE,HOLD_LINE);
+static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w )
+{
+	if (!firq_old_data_b && data)
+	{
+		cputag_set_input_line(space->machine, "sub", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
 	firq_old_data_b = data;
@@ -97,14 +105,14 @@ static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w ){
 
 static WRITE8_HANDLER( pandoras_i8039_irqtrigger_w )
 {
-	cpu_set_input_line(space->machine->cpu[3], 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
-		cpu_set_input_line(space->machine->cpu[3], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 
 	/* bit 5 goes to 8910 port A */
 	i8039_status = (data & 0x20) >> 5;
@@ -112,7 +120,7 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 
 static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(space->machine->cpu[2],0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 

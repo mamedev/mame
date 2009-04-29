@@ -31,11 +31,11 @@ static WRITE8_HANDLER( pcktgal_bank_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "maincpu");
 
-	if (data & 1) { memory_set_bankptr(space->machine, 1,&RAM[0x4000]); }
-	else { memory_set_bankptr(space->machine, 1,&RAM[0x10000]); }
+	if (data & 1) { memory_set_bankptr(space->machine, 1, &RAM[0x4000]); }
+	else { memory_set_bankptr(space->machine, 1, &RAM[0x10000]); }
 
-	if (data & 2) { memory_set_bankptr(space->machine, 2,&RAM[0x6000]); }
-	else { memory_set_bankptr(space->machine, 2,&RAM[0x12000]); }
+	if (data & 2) { memory_set_bankptr(space->machine, 2, &RAM[0x6000]); }
+	else { memory_set_bankptr(space->machine, 2, &RAM[0x12000]); }
 }
 
 static WRITE8_HANDLER( pcktgal_sound_bank_w )
@@ -45,8 +45,8 @@ static WRITE8_HANDLER( pcktgal_sound_bank_w )
 
 static WRITE8_HANDLER( pcktgal_sound_w )
 {
-	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static int msm5205next;
@@ -60,7 +60,7 @@ static void pcktgal_adpcm_int(const device_config *device)
 
 	toggle = 1 - toggle;
 	if (toggle)
-		cpu_set_input_line(device->machine->cpu[1],M6502_IRQ_LINE,HOLD_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( pcktgal_adpcm_data_w )

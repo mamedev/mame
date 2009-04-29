@@ -594,18 +594,18 @@ static DRIVER_INIT( cashquiz )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4000, 0x4000, 0, 0, cashquiz_question_bank_high_w);
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4001, 0x4001, 0, 0, cashquiz_question_bank_low_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x4000, 0, 0, cashquiz_question_bank_high_w);
+	memory_install_write8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x4001, 0x4001, 0, 0, cashquiz_question_bank_low_w);
 
 	// 8 independents banks for questions
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5000, 0x50ff, 0, 0, (read8_space_func)SMH_BANK(1));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5100, 0x51ff, 0, 0, (read8_space_func)SMH_BANK(2));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5200, 0x52ff, 0, 0, (read8_space_func)SMH_BANK(3));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5300, 0x53ff, 0, 0, (read8_space_func)SMH_BANK(4));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5400, 0x54ff, 0, 0, (read8_space_func)SMH_BANK(5));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5500, 0x55ff, 0, 0, (read8_space_func)SMH_BANK(6));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5600, 0x56ff, 0, 0, (read8_space_func)SMH_BANK(7));
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5700, 0x57ff, 0, 0, (read8_space_func)SMH_BANK(8));
+	memory_install_read8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x50ff, 0, 0, (read8_space_func)SMH_BANK(1));
+	memory_install_read8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5100, 0x51ff, 0, 0, (read8_space_func)SMH_BANK(2));
+	memory_install_read8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5200, 0x52ff, 0, 0, (read8_space_func)SMH_BANK(3));
+	memory_install_read8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5300, 0x53ff, 0, 0, (read8_space_func)SMH_BANK(4));
+	memory_install_read8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5400, 0x54ff, 0, 0, (read8_space_func)SMH_BANK(5));
+	memory_install_read8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5500, 0x55ff, 0, 0, (read8_space_func)SMH_BANK(6));
+	memory_install_read8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5600, 0x56ff, 0, 0, (read8_space_func)SMH_BANK(7));
+	memory_install_read8_handler(cputag_get_address_space(machine, "cpu", ADDRESS_SPACE_PROGRAM), 0x5700, 0x57ff, 0, 0, (read8_space_func)SMH_BANK(8));
 
 	// setup default banks
 	for(i = 0; i < 8; i++)

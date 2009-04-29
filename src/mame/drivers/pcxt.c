@@ -435,7 +435,7 @@ static READ8_DEVICE_HANDLER( port_a_r )
 	}
 	else//keyboard emulation
 	{
-		//cpu_set_input_line(device->machine->cpu[0],1,PULSE_LINE);
+		//cputag_set_input_line(device->machine, "maincpu", 1, PULSE_LINE);
 		return 0x00;//Keyboard is disconnected
 		//return 0xaa;//Keyboard code
 	}
@@ -478,7 +478,7 @@ static WRITE8_DEVICE_HANDLER( wss_2_w )
 
 static WRITE8_DEVICE_HANDLER( sys_reset_w )
 {
-	cpu_set_input_line(device->machine->cpu[0],INPUT_LINE_RESET,PULSE_LINE);
+	cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -553,7 +553,7 @@ static UINT8 at_pages[0x10];
 
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
@@ -563,7 +563,7 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 
 static DMA8237_MEM_WRITE( pc_dma_write_byte )
 {
-	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
@@ -631,7 +631,7 @@ static const struct dma8237_interface dma8237_1_config =
 ******************/
 
 static PIC8259_SET_INT_LINE( pic8259_1_set_int_line ) {
-	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pic8259_1_config = {
@@ -898,7 +898,7 @@ static MACHINE_RESET( filetto )
 	bank = -1;
 	lastvalue = -1;
 	hv_blank = 0;
-	cpu_set_irq_callback(machine->cpu[0], irq_callback);
+	cpu_set_irq_callback(cputag_get_cpu(machine, "maincpu"), irq_callback);
 	filetto_devices.pit8253 = devtag_get_device( machine, "pit8253" );
 	filetto_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
 	filetto_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );

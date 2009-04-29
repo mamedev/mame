@@ -435,7 +435,7 @@ static WRITE32_HANDLER( psikyosh_irqctrl_w )
 {
 	if (!(data & 0x00c00000))
 	{
-		cpu_set_input_line(space->machine->cpu[0], 4, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 4, CLEAR_LINE);
 	}
 }
 
@@ -551,9 +551,9 @@ ADDRESS_MAP_END
 static void irqhandler(const device_config *device, int linestate)
 {
 	if (linestate)
-		cpu_set_input_line(device->machine->cpu[0], 12, ASSERT_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 12, ASSERT_LINE);
 	else
-		cpu_set_input_line(device->machine->cpu[0], 12, CLEAR_LINE);
+		cputag_set_input_line(device->machine, "maincpu", 12, CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -1098,68 +1098,68 @@ ROM_END
 
 static DRIVER_INIT( soldivid )
 {
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_0;
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_0;
 }
 
 static DRIVER_INIT( s1945ii )
 {
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_DEFAULT;
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_DARAKU;
+	memory_set_bankptr(machine, 1, &RAM[0x100000]);
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_DARAKU;
 }
 
 static DRIVER_INIT( sbomberb )
 {
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_DEFAULT;
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_DEFAULT;
+	memory_set_bankptr(machine, 1, &RAM[0x100000]);
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, 1,&RAM[0x100000]);
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_S1945III;
+	memory_set_bankptr(machine, 1, &RAM[0x100000]);
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_S1945III;
 }
 
 static DRIVER_INIT( dragnblz )
 {
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_DRAGNBLZ;
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_DRAGNBLZ;
 }
 
 static DRIVER_INIT( gnbarich )
 {
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_GNBARICH;
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_GNBARICH;
 }
 
 static DRIVER_INIT( tgm2 )
 {
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_USER1;
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_USER1;
 }
 
 static DRIVER_INIT( mjgtaste )
 {
-	sh2drc_set_options(machine->cpu[0], SH2DRC_FASTEST_OPTIONS);
-	use_factory_eeprom=eeprom_MJGTASTE;
+	sh2drc_set_options(cputag_get_cpu(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	use_factory_eeprom = eeprom_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }
 

@@ -59,7 +59,7 @@ PALETTE_INIT( playch10 )
 
 static void ppu_irq( const device_config *device, int *ppu_regs )
 {
-	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(device->machine, "cart", INPUT_LINE_NMI, PULSE_LINE );
 	pc10_int_detect = 1;
 }
 

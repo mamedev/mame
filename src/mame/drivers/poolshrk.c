@@ -92,7 +92,7 @@ static READ8_HANDLER( poolshrk_input_r )
 
 static READ8_HANDLER( poolshrk_irq_reset_r )
 {
-	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 
 	return 0;
 }

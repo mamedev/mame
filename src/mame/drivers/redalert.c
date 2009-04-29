@@ -115,7 +115,7 @@ static INTERRUPT_GEN( redalert_vblank_interrupt )
 
 static READ8_HANDLER( redalert_interrupt_clear_r )
 {
-	cpu_set_input_line(space->machine->cpu[0], M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
 	return video_screen_get_vpos(space->machine->primary_screen);

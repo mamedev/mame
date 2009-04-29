@@ -216,7 +216,7 @@ static WRITE8_HANDLER( adpcm_play_w )
 static WRITE8_HANDLER( sound_w )
 {
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(space->machine, "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /********************************************************************************************/
@@ -761,7 +761,7 @@ GFXDECODE_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(const device_config *device, int linestate)
 {
-	cpu_set_input_line(device->machine->cpu[1], M6809_FIRQ_LINE, linestate);
+	cputag_set_input_line(device->machine, "audiocpu", M6809_FIRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =

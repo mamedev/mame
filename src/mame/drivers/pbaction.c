@@ -86,7 +86,7 @@ extern VIDEO_UPDATE( pbaction );
 static WRITE8_HANDLER( pbaction_sh_command_w )
 {
 	soundlatch_w(space,offset,data);
-	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0x00);
+	cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0x00);
 }
 
 
@@ -437,7 +437,7 @@ static DRIVER_INIT( pbactio3 )
 	pbaction_decode(machine, "maincpu");
 
 	/* install a protection (?) workaround */
-	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
+	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
 }
 
 

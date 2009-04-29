@@ -150,12 +150,12 @@ static CUSTOM_INPUT( punchout_vlm5030_busy_r )
 
 static WRITE8_DEVICE_HANDLER( punchout_speech_reset_w )
 {
-	vlm5030_rst( device, data&0x01 );
+	vlm5030_rst( device, data & 0x01 );
 }
 
 static WRITE8_DEVICE_HANDLER( punchout_speech_st_w )
 {
-	vlm5030_st( device, data&0x01 );
+	vlm5030_st( device, data & 0x01 );
 }
 
 static WRITE8_DEVICE_HANDLER( punchout_speech_vcu_w )
@@ -166,9 +166,9 @@ static WRITE8_DEVICE_HANDLER( punchout_speech_vcu_w )
 static WRITE8_HANDLER( punchout_2a03_reset_w )
 {
 	if (data & 1)
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static int rp5c01_mode_sel; /* Mode selector */
@@ -176,7 +176,7 @@ static int rp5c01_mem[16*4];
 
 static READ8_HANDLER( spunchout_rp5c01_r )
 {
-	logerror("%04x: prot_r %x\n",cpu_get_previouspc(space->cpu),offset);
+	logerror("%04x: prot_r %x\n", cpu_get_previouspc(space->cpu), offset);
 
 	if (offset <= 0x0c)
 	{
@@ -1042,4 +1042,3 @@ GAME( 1984, punchita, punchout, punchout, punchout, spnchout, ROT0, "bootleg",  
 GAME( 1984, spnchout, 0,        punchout, spnchout, spnchout, ROT0, "Nintendo", "Super Punch-Out!!", 0 )
 GAME( 1984, spnchotj, spnchout, punchout, spnchout, spnchotj, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
 GAME( 1985, armwrest, 0,        armwrest, armwrest, armwrest, ROT0, "Nintendo", "Arm Wrestling", 0 )
-

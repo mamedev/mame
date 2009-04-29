@@ -194,7 +194,7 @@ VIDEO_UPDATE( pacland );
 static WRITE8_HANDLER( pacland_subreset_w )
 {
 	int bit = !BIT(offset,11);
-	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( pacland_flipscreen_w )
@@ -212,7 +212,7 @@ static READ8_HANDLER( pacland_input_r )
 	int port = offset & 2;
 	static const char *const portnames[] = { "DSWA", "DSWB", "IN0", "IN1" };
 	int r = (input_port_read(space->machine, portnames[port]) << shift) & 0xf0;
-	r |= (input_port_read(space->machine, portnames[port+1]) >> (4-shift)) & 0x0f;
+	r |= (input_port_read(space->machine, portnames[port+1]) >> (4 - shift)) & 0x0f;
 
 	return r;
 }
@@ -220,30 +220,30 @@ static READ8_HANDLER( pacland_input_r )
 static WRITE8_HANDLER( pacland_coin_w )
 {
 	coin_lockout_global_w(data & 1);
-	coin_counter_w(0,~data & 2);
-	coin_counter_w(1,~data & 4);
+	coin_counter_w(0, ~data & 2);
+	coin_counter_w(1, ~data & 4);
 }
 
 static WRITE8_HANDLER( pacland_led_w )
 {
-	set_led_status(0,data & 0x08);
-	set_led_status(1,data & 0x10);
+	set_led_status(0, data & 0x08);
+	set_led_status(1, data & 0x10);
 }
 
 static WRITE8_HANDLER( pacland_irq_1_ctrl_w )
 {
-	int bit = !BIT(offset,11);
-	cpu_interrupt_enable(space->machine->cpu[0],bit);
+	int bit = !BIT(offset, 11);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "maincpu"), bit);
 	if (!bit)
-		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( pacland_irq_2_ctrl_w )
 {
-	int bit = !BIT(offset,13);
-	cpu_interrupt_enable(space->machine->cpu[1],bit);
+	int bit = !BIT(offset, 13);
+	cpu_interrupt_enable(cputag_get_cpu(space->machine, "mcu"), bit);
 	if (!bit)
-		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 }
 
 
