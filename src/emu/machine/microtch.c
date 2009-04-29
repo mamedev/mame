@@ -91,7 +91,7 @@ static TIMER_CALLBACK(microtouch_timer_callback)
 		{
 			ty = 0x4000 - ty;
 
-			microtouch_send_format_table_packet(0xc0, tx, ty);
+			microtouch_send_format_table_packet(0xc8, tx, ty);
 			microtouch.last_touch_state = 1;
 			microtouch.last_x = tx;
 			microtouch.last_y = ty;
@@ -102,7 +102,7 @@ static TIMER_CALLBACK(microtouch_timer_callback)
 		if ( microtouch.last_touch_state == 1 )
 		{
 			microtouch.last_touch_state = 0;
-			microtouch_send_format_table_packet(0x80, microtouch.last_x, microtouch.last_y);
+			microtouch_send_format_table_packet(0x88, microtouch.last_x, microtouch.last_y);
 		}
 	}
 };

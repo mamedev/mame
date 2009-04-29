@@ -10,6 +10,10 @@
       Other: 2 Z80APIO (I/O and interrupt controllers)
              1 8255 (I/O)
 
+  CRT 252: addon board for CRT 250, stores question roms
+
+  CRT 258: addon board for CRT 250, contains UART and Microtouch touch screen controller
+
   CRT 260 additional components:
   - Microtouch touch screen controller (SMT-3)
   - PC16550 UART (for communication with touch screen controller)
@@ -30,9 +34,9 @@
   Pit Boss Superstar (c)1990
   *Pit Boss Superstar 30 (c)1993
   Pit Boss Megastar (c)1994
+  *Pit Boss Supertouch 30 (c)1993/4
 
   CRT 260:
-  *Pit Boss Supertouch 30 (c)1994?
   *Megatouch Video (c)1994?
   *Megatouch II (c)1995
   Megatouch III (c)1995
@@ -71,6 +75,7 @@ PROGRAM#    Program Version      Program Differences
   - problem with registering touches on the bottom of the screen (currently hacked to work)
   - megat5: has jmp $0000 in the initialization code causing infinite loop, is rom bad?
   - megat4st doesn't boot, protection problem?
+  - for pbst30 only roms were found, it appears that two roms with graphics data were missing, using pitbossm roms for now
  */
 
 #include "driver.h"
@@ -569,6 +574,25 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x10, 0x10) AM_READWRITE(v9938_0_vram_r, v9938_0_vram_w)
+	AM_RANGE(0x11, 0x11) AM_READWRITE(v9938_0_status_r, v9938_0_command_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(v9938_0_palette_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(v9938_0_register_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(v9938_1_vram_r, v9938_1_vram_w)
+	AM_RANGE(0x21, 0x21) AM_READWRITE(v9938_1_status_r, v9938_1_command_w)
+	AM_RANGE(0x22, 0x22) AM_WRITE(v9938_1_palette_w)
+	AM_RANGE(0x23, 0x23) AM_WRITE(v9938_1_register_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_r, z80pio_w)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_r, z80pio_w)
+	AM_RANGE(0x60, 0x67) AM_READWRITE(pc16552d_0_r,pc16552d_0_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("ay", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay", ay8910_address_data_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( meritm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK(1)
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK(2)
@@ -668,6 +692,36 @@ static INPUT_PORTS_START(pitbossm)
 	PORT_DIPNAME( 0x20, 0x20, "Great Solitaire: Coins to start" )
 	PORT_DIPSETTING(    0x00, "4 Coins" )
 	PORT_DIPSETTING(    0x20, "2 Coins" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(pbst30)
+	PORT_INCLUDE(meritm_crt260)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) ) // when on, touch screen coordinates are mirrored?
+	PORT_DIPNAME( 0x02, 0x02, "Enable casino games" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // off 1 coin 0.5 credit, on 1 coin 1 credit
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -846,6 +900,13 @@ static MACHINE_START(meritm_crt250_questions)
 	state_save_register_global(machine, questions_loword_address);
 };
 
+static MACHINE_START(meritm_crt250_crt252_crt258)
+{
+	MACHINE_START_CALL(meritm_crt250_questions);
+	pc16552d_init(machine, 0, UART_CLK, NULL, pc16650d_tx_callback);
+	microtouch_init(machine, meritm_microtouch_tx_callback, meritm_touch_coord_transform);
+}
+
 static MACHINE_START(meritm_crt260)
 {
 	meritm_ram = auto_alloc_array(machine, UINT8,  0x8000 );
@@ -928,6 +989,13 @@ static MACHINE_DRIVER_START(meritm_crt250_questions)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(meritm_crt250_questions_map,0)
 	MDRV_MACHINE_START(meritm_crt250_questions)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START(meritm_crt250_crt252_crt258)
+	MDRV_IMPORT_FROM(meritm_crt250_questions)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(meritm_crt250_crt258_io_map,0)
+	MDRV_MACHINE_START(meritm_crt250_crt252_crt258)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START(meritm_crt260)
@@ -1056,6 +1124,40 @@ ROM_START( pitbossm )
 	ROM_LOAD( "2",  0x40000, 0x40000, CRC(606f1656) SHA1(7f1e3a698a34d3c3b8f9f2cd8d5224b6c096e941) )
 	ROM_LOAD( "1",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
 ROM_END
+
+
+ROM_START( pbst30 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9234-10-01_u9-r0",  0x00000, 0x10000, CRC(96f39c9a) SHA1(df698e94a5204cf050ceadc5c257ca5f68171114) )
+	ROM_LOAD( "5",  0x10000, 0x10000, BAD_DUMP CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) // taken from pitbossm
+	ROM_LOAD( "9234-10-01_u11-r0",  0x20000, 0x10000, CRC(835fa041) SHA1(2ae754c5fcf50548eb214902409217d1643c6eaa) )
+	ROM_LOAD( "7",  0x30000, 0x10000, BAD_DUMP CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) // taken from pitbossm
+	ROM_LOAD( "9234-10-01_u14-r0",  0x50000, 0x10000, CRC(9b0873a4) SHA1(7362c6220aa4bf1a9ab7c11cb8a51587a2a0a992) )
+	ROM_LOAD( "9234-10-01_u15-r0",  0x60000, 0x10000, CRC(9fbd8582) SHA1(c0f68c8a7cdca34c8736cefc71767c421bcaba8a) )
+
+
+	ROM_REGION( 0xc0000, "user1", 0 ) // extra data / extra banks?
+	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) )
+	ROM_LOAD( "qs9234-01_u6-r0",  0x40000, 0x40000, CRC(fe2cd934) SHA1(623011dc53ed6eefefa0725dba6fd1efee2077c1) )
+	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
+ROM_END
+
+ROM_START( pbst30b )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9234-00-01_u9-r0a",  0x00000, 0x10000, CRC(5f058f95) SHA1(98382935340a076bdb1b20c7f16c25b6084599fe) )
+	ROM_LOAD( "5",  0x10000, 0x10000, BAD_DUMP CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) ) // taken from pitbossm
+	ROM_LOAD( "9234-00-01_u11-r0a",  0x20000, 0x10000, CRC(79125fb5) SHA1(6ca4f33c363cfb6f5c0f23b8fcc8cfcc076f68b1) )
+	ROM_LOAD( "7",  0x30000, 0x10000, BAD_DUMP CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) ) // taken from pitbossm
+	ROM_LOAD( "9234-00-01_u14-r0a",  0x50000, 0x10000, CRC(e83f91d5) SHA1(1d64c943787b239763f44be412ee7f5ad13eb37d) )
+	ROM_LOAD( "9234-00-01_u15-r0a",  0x60000, 0x10000, CRC(f10f0d39) SHA1(2b5d5a93adb5251e09160b10c067b6e70289f608) )
+
+
+	ROM_REGION( 0xc0000, "user1", 0 ) // extra data / extra banks?
+	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) )
+	ROM_LOAD( "qs9234-01_u6-r0",  0x40000, 0x40000, CRC(fe2cd934) SHA1(623011dc53ed6eefefa0725dba6fd1efee2077c1) )
+	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
+ROM_END
+
 
 /*
     Mega Touch
@@ -1367,6 +1469,30 @@ ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
+static DRIVER_INIT(pbst30)
+{
+	static const UINT8 pbst30b_ds1204_key[8] =
+		{ 0xf0, 0xaa, 0x0f, 0x0f, 0x55, 0x55, 0xff, 0xab };
+
+	static const UINT8 pbst30b_ds1204_nvram[16] =
+		{ 0x3e, 0x9a, 0x3c, 0x3f, 0x1d, 0x51, 0x72, 0xc9, 0x28, 0x2c, 0x1d, 0x2d, 0x0e, 0x56, 0x41, 0x00 };
+
+	ds1204_init(machine, pbst30b_ds1204_key, pbst30b_ds1204_nvram);
+
+};
+
+static DRIVER_INIT(pbst30b)
+{
+	static const UINT8 megat3_ds1204_key[8] =
+		{ 0xf0, 0xaa, 0x0f, 0x0f, 0x55, 0x55, 0xff, 0xab };
+
+	static const UINT8 megat3_ds1204_nvram[16] =
+		{ 0xa9, 0xdb, 0x41, 0xf8, 0xe4, 0x42, 0x20, 0x6e, 0xde, 0xaf, 0x4f, 0x046, 0x3d, 0x55, 0x44, 0x00 };
+
+	ds1204_init(machine, megat3_ds1204_key, megat3_ds1204_nvram);
+
+};
+
 static DRIVER_INIT(megat3)
 {
 	static const UINT8 megat3_ds1204_key[8] =
@@ -1448,6 +1574,10 @@ GAME( 1990, pitbosss,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "
 
 /* CRT 250 + question roms */
 GAME( 1994, pitbossm,  0,      meritm_crt250_questions, pitbossm, 0, ROT0, "Merit", "Pit Boss Megastar", GAME_IMPERFECT_GRAPHICS )
+
+/* CRT 250 + CRT 252 + CRT 258 */
+GAME( 1994, pbst30,    0,      meritm_crt250_crt252_crt258, pbst30, pbst30,  ROT0, "Merit", "Pit Boss Supertouch 30", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, pbst30b,   0,      meritm_crt250_crt252_crt258, pbst30, pbst30b, ROT0, "Merit", "Pit Boss Supertouch 30 (set 2)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 */
 GAME( 1996, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 RON, Standard version)", GAME_IMPERFECT_GRAPHICS )
