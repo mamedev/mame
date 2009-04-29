@@ -351,50 +351,33 @@ static WRITE8_HANDLER( sound_bank_w )
 
 
 
-static ADDRESS_MAP_START( spy_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(spy_bankedram1_r)
-	AM_RANGE(0x0800, 0x1aff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3fd0, 0x3fd0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3fd1, 0x3fd1) AM_READ_PORT("P1")
-	AM_RANGE(0x3fd2, 0x3fd2) AM_READ_PORT("P2")
-	AM_RANGE(0x3fd3, 0x3fd3) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3fe0, 0x3fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x5fff) AM_READ(K052109_051960_r)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK(1))
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spy_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(spy_bankedram1_w) AM_BASE(&ram)
-	AM_RANGE(0x0800, 0x1aff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( spy_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(spy_bankedram1_r,spy_bankedram1_w) AM_BASE(&ram)
+	AM_RANGE(0x0800, 0x1aff) AM_RAM
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x3f90, 0x3f90) AM_WRITE(spy_3f90_w)
 	AM_RANGE(0x3fa0, 0x3fa0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3fb0, 0x3fb0) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE(spy_sh_irqtrigger_w)
-	AM_RANGE(0x2000, 0x5fff) AM_WRITE(K052109_051960_w)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x3fd0, 0x3fd0) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x3fd1, 0x3fd1) AM_READ_PORT("P1")
+	AM_RANGE(0x3fd2, 0x3fd2) AM_READ_PORT("P2")
+	AM_RANGE(0x3fd3, 0x3fd3) AM_READ_PORT("DSW1")
+	AM_RANGE(0x3fe0, 0x3fe0) AM_READ_PORT("DSW2")
+	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(K052109_051960_r,K052109_051960_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK(1)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spy_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREAD("konami1", k007232_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREAD("konami2", k007232_r)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREAD("ym", ym3812_r)
+static ADDRESS_MAP_START( spy_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("konami1", k007232_r,k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami2", k007232_r,k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym", ym3812_r,ym3812_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spy_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVWRITE("konami1", k007232_w)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVWRITE("konami2", k007232_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ym", ym3812_w)
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( spy )
@@ -489,11 +472,11 @@ static MACHINE_DRIVER_START( spy )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 3000000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(spy_readmem,spy_writemem)
+	MDRV_CPU_PROGRAM_MAP(spy_map,0)
 	MDRV_CPU_VBLANK_INT("screen", spy_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(spy_sound_readmem,spy_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(spy_sound_map,0)
 								/* nmi by the sound chip */
 
 	/* video hardware */

@@ -15,8 +15,12 @@ Set 3
     CPU:    MC68000, Z80 (for sound)
     Sound:  2x OKI6295 (Sound code supports an additional YM2203, but it's not fitted)
 
-- Note: To enter test mode press F2 (Test)
-        Use 9 (Service Coin) to change page.
+Note:
+- To enter test mode press F2 (Test)
+  Use 9 (Service Coin) to change page.
+- In powerina there is a hidden test mode screen because it's a bootleg
+  without a sound CPU. Set 18ff08 to 4 during test mode that calls the
+  data written to $10001e "sound code".
 
 TODO:
 - sprites flip y (not used by the game)
@@ -77,64 +81,64 @@ static WRITE16_HANDLER( powerins_okibank_w )
 static WRITE16_HANDLER( powerins_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
-	{
 		soundlatch_w(space, 0, data & 0xff);
-	}
 }
+
 static READ8_HANDLER( powerinb_fake_ym2203_r )
 {
 	return 0x01;
 }
 
 
-static ADDRESS_MAP_START( powerins_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM				)	// ROM
+static ADDRESS_MAP_START( powerins_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM															// ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x10003e, 0x10003f) AM_DEVREAD8("oki1", okim6295_r, 0x00ff)	// OKI Status (used by powerina)
-	AM_RANGE(0x120000, 0x120fff) AM_READ(SMH_RAM				)	// Palette
-	AM_RANGE(0x130000, 0x130007) AM_READ(SMH_RAM				)	// VRAM 0 Control
-	AM_RANGE(0x140000, 0x143fff) AM_READ(SMH_RAM				)	// VRAM 0
-	AM_RANGE(0x170000, 0x170fff) AM_READ(SMH_RAM				)	// VRAM 1
-	AM_RANGE(0x180000, 0x18ffff) AM_READ(SMH_RAM				)	// RAM + Sprites
+	AM_RANGE(0x100014, 0x100015) AM_WRITE(powerins_flipscreen_w)								// Flip Screen
+	AM_RANGE(0x100016, 0x100017) AM_WRITENOP													// ? always 1
+	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
+	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(powerins_soundlatch_w)								// Sound Latch
+	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(&powerins_vctrl_0)								// VRAM 0 Control
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0)		// VRAM 0
+	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE(&powerins_vram_1)		// VRAM 1
+	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)									// Mirror of VRAM 1?
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&spriteram16)									// RAM + Sprites
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerins_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM								)	// ROM
-	AM_RANGE(0x100014, 0x100015) AM_WRITE(powerins_flipscreen_w					)	// Flip Screen
-	AM_RANGE(0x100016, 0x100017) AM_WRITE(SMH_NOP								)	// ? always 1
-	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w					)	// Tiles Banking (VRAM 0)
-	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(powerins_soundlatch_w					)	// Sound Latch
-	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w					)	// Sound
-	AM_RANGE(0x10003e, 0x10003f) AM_DEVWRITE8("oki1", okim6295_w, 0x00ff	)	// used by powerina
-	AM_RANGE(0x120000, 0x120fff) AM_WRITE(powerins_paletteram16_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x130000, 0x130007) AM_WRITE(SMH_RAM) AM_BASE(&powerins_vctrl_0	)	// VRAM 0 Control
-	AM_RANGE(0x140000, 0x143fff) AM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0		)	// VRAM 0
-	AM_RANGE(0x170000, 0x170fff) AM_WRITE(powerins_vram_1_w) AM_BASE(&powerins_vram_1		)	// VRAM 1
-	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w						)	// Mirror of VRAM 1?
-	AM_RANGE(0x180000, 0x18ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16			)	// RAM + Sprites
+/* powerina: same as the original one but without the sound cpu (and inferior sound HW) */
+static ADDRESS_MAP_START( powerina_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM															// ROM
+	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
+	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
+	AM_RANGE(0x100014, 0x100015) AM_WRITE(powerins_flipscreen_w)								// Flip Screen
+	AM_RANGE(0x100016, 0x100017) AM_WRITENOP													// ? always 1
+	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
+	AM_RANGE(0x10001e, 0x10001f) AM_WRITENOP													// Sound Latch, NOPed since there is no sound cpu
+	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
+	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8("oki1", okim6295_r,okim6295_w, 0x00ff)		// (used by powerina)
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(powerins_paletteram16_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(&powerins_vctrl_0)								// VRAM 0 Control
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0)		// VRAM 0
+	AM_RANGE(0x170000, 0x170fff) AM_RAM_WRITE(powerins_vram_1_w) AM_BASE(&powerins_vram_1)		// VRAM 1
+	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w)									// Mirror of VRAM 1?
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(&spriteram16)									// RAM + Sprites
 ADDRESS_MAP_END
 
-/* In powerina there is a hidden test mode screen because it's a bootleg
-   without a sound CPU. Set 18ff08 to 4 during test mode that calls the
-   data written to $10001e "sound code". */
-
-static ADDRESS_MAP_START( readmem_snd, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( powerins_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 //  AM_RANGE(0xe000, 0xe000) AM_WRITENOP // ? written only once ?
 //  AM_RANGE(0xe001, 0xe001) AM_WRITENOP // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerins_io_snd, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( powerins_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
@@ -142,14 +146,15 @@ static ADDRESS_MAP_START( powerins_io_snd, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerinb_io_snd, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( powerinb_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(powerinb_fake_ym2203_r, SMH_NOP)
+	AM_RANGE(0x00, 0x00) AM_READ(powerinb_fake_ym2203_r) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_NOP
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)
 	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
 ADDRESS_MAP_END
+
 
 /***************************************************************************
 
@@ -352,12 +357,12 @@ static MACHINE_DRIVER_START( powerins )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12MHz */
-	MDRV_CPU_PROGRAM_MAP(powerins_readmem,powerins_writemem)
+	MDRV_CPU_PROGRAM_MAP(powerins_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MDRV_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem_snd,writemem_snd)
-	MDRV_CPU_IO_MAP(powerins_io_snd,0)
+	MDRV_CPU_PROGRAM_MAP(powerins_sound_map,0)
+	MDRV_CPU_IO_MAP(powerins_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(powerins)
 
@@ -396,6 +401,9 @@ static MACHINE_DRIVER_START( powerina )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(powerins)
 
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(powerina_map,0)
+
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 
@@ -418,7 +426,7 @@ static MACHINE_DRIVER_START( powerinb )
 	MDRV_SCREEN_REFRESH_RATE(60)
 
 	MDRV_CPU_MODIFY("soundcpu") /* 6 MHz */
-	MDRV_CPU_IO_MAP(powerinb_io_snd,0)
+	MDRV_CPU_IO_MAP(powerinb_sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
 
 	MDRV_SOUND_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board

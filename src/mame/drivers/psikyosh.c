@@ -479,74 +479,49 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 #endif
 
 
-static ADDRESS_MAP_START( ps3v1_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_READ(SMH_ROM)	// program ROM (1 meg)
-	AM_RANGE(0x02000000, 0x021fffff) AM_READ(SMH_BANK(1)) // data ROM
-	AM_RANGE(0x03000000, 0x03003fff) AM_READ(SMH_RAM)	// sprites
-	AM_RANGE(0x03004000, 0x0300ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x03040000, 0x03044fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x03050000, 0x030501ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP // also writes to this address - might be vblank reads?
-	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_READ(SMH_RAM) //  video registers
+static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM					// program ROM (1 meg)
+	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK(1) // data ROM
+	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)	// sprites (might be a bit longer)
+	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE(&psikyosh_bgram) // backgrounds
+	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32) // palette..
+	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE(&psikyosh_zoomram) // a gradient sometimes ...
+	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
+	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) //  video registers
 	AM_RANGE(0x05000000, 0x05000003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff) // read YMF status
+	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x05800004, 0x05800007) AM_READ(psh_eeprom_r)
-	AM_RANGE(0x06000000, 0x060fffff) AM_READ(SMH_RAM) // main RAM (1 meg)
+	AM_RANGE(0x05800004, 0x05800007) AM_READWRITE(psh_eeprom_r,psh_eeprom_w)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM	AM_BASE(&psh_ram) // main RAM (1 meg)
 
 #if ROMTEST
 	AM_RANGE(0x05000004, 0x05000007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x03060000, 0x0307ffff) AM_READ(SMH_BANK(2)) // data for rom tests (gfx), data is controlled by vidreg
-	AM_RANGE(0x04060000, 0x0407ffff) AM_READ(SMH_BANK(2)) // data for rom tests (gfx) (Mirrored?)
+	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK(2) // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK(2) // data for rom tests (gfx) (Mirrored?)
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ps3v1_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_WRITE(SMH_ROM)	// program ROM (1 meg)
-	AM_RANGE(0x02000000, 0x021fffff) AM_WRITE(SMH_ROM) // data ROM
-	AM_RANGE(0x03000000, 0x03003fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)	// sprites (might be a bit longer)
-	AM_RANGE(0x03004000, 0x0300ffff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_bgram) // backgrounds
-	AM_RANGE(0x03040000, 0x03044fff) AM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32) // palette..
-	AM_RANGE(0x03050000, 0x030501ff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_zoomram) // a gradient sometimes ...
-	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_WRITE(psikyosh_irqctrl_w)
-	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) //  video registers
-	AM_RANGE(0x05000000, 0x05000007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
-	AM_RANGE(0x05800004, 0x05800007) AM_WRITE(psh_eeprom_w)
-	AM_RANGE(0x06000000, 0x060fffff) AM_WRITE(SMH_RAM) AM_BASE(&psh_ram) // work RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( ps5_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_READ(SMH_ROM) // program ROM (1 meg)
+static ADDRESS_MAP_START( ps5_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 	AM_RANGE(0x03000000, 0x03000003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x03000004, 0x03000007) AM_READ_PORT("JP4")
+	AM_RANGE(0x03000004, 0x03000007) AM_READ_PORT("JP4") AM_WRITE(psh_eeprom_w)
 	AM_RANGE(0x03100000, 0x03100003) AM_DEVREAD8("ymf", ymf278b_r, 0xffffffff)
-	AM_RANGE(0x04000000, 0x04003fff) AM_READ(SMH_RAM)	// sprites
-	AM_RANGE(0x04004000, 0x0400ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x04040000, 0x04044fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x04050000, 0x040501ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP // also writes to this address - might be vblank reads?
-	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_READ(SMH_RAM) // video registers
-	AM_RANGE(0x05000000, 0x0507ffff) AM_READ(SMH_BANK(1)) // data ROM
-	AM_RANGE(0x06000000, 0x060fffff) AM_READ(SMH_RAM)
+	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
+	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE(&psikyosh_bgram) // backgrounds
+	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE(&psikyosh_zoomram)
+	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
+	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) // video registers
+	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK(1) // data ROM
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM  AM_BASE(&psh_ram)
 
 #if ROMTEST
 	AM_RANGE(0x03100004, 0x03100007) AM_READ(psh_sample_r) // data for rom tests (Used to verify Sample rom)
-	AM_RANGE(0x04060000, 0x0407ffff) AM_READ(SMH_BANK(2)) // data for rom tests (gfx), data is controlled by vidreg
+	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK(2) // data for rom tests (gfx), data is controlled by vidreg
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ps5_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_WRITE(SMH_ROM)	// program ROM (1 meg)
-	AM_RANGE(0x03000004, 0x03000007) AM_WRITE(psh_eeprom_w)
-	AM_RANGE(0x03100000, 0x03100007) AM_DEVWRITE8("ymf", ymf278b_w, 0xffffffff)
-	AM_RANGE(0x04000000, 0x04003fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x04004000, 0x0400ffff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_bgram) // backgrounds
-	AM_RANGE(0x04040000, 0x04044fff) AM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x04050000, 0x040501ff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_zoomram)
-	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_WRITE(psikyosh_irqctrl_w)
-	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) // video registers
-	AM_RANGE(0x05000000, 0x0507ffff) AM_WRITE(SMH_ROM) // data ROM
-	AM_RANGE(0x06000000, 0x060fffff) AM_WRITE(SMH_RAM) AM_BASE(&psh_ram)
-ADDRESS_MAP_END
 
 static void irqhandler(const device_config *device, int linestate)
 {
@@ -564,7 +539,7 @@ static const ymf278b_interface ymf278b_config =
 static MACHINE_DRIVER_START( psikyo3v1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(ps3v1_readmem,ps3v1_writemem)
+	MDRV_CPU_PROGRAM_MAP(ps3v1_map,0)
 	MDRV_CPU_VBLANK_INT("screen", psikyosh_interrupt)
 
 	MDRV_NVRAM_HANDLER(93C56)
@@ -600,7 +575,7 @@ static MACHINE_DRIVER_START( psikyo5 )
 	MDRV_IMPORT_FROM(psikyo3v1)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ps5_readmem,ps5_writemem)
+	MDRV_CPU_PROGRAM_MAP(ps5_map,0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psikyo5_240 )
@@ -608,7 +583,7 @@ static MACHINE_DRIVER_START( psikyo5_240 )
 	MDRV_IMPORT_FROM(psikyo3v1)
 
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ps5_readmem,ps5_writemem)
+	MDRV_CPU_PROGRAM_MAP(ps5_map,0)
 
 	/* It probably has a register to change visarea */
 	MDRV_SCREEN_MODIFY("screen")
