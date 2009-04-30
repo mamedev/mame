@@ -858,13 +858,10 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE(4)
-	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE(5)// extra ram on Naomi (mirror on DC)
-	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE(4)// mirror
-	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE(5)// mirror
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE(4)
+	AM_RANGE(0x0e000000, 0x0fffffff) AM_RAM AM_SHARE(4)// mirror
 
-	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE(4) // RAM access through cache
-	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE(5) // RAM access through cache
+	AM_RANGE(0x8c000000, 0x8dffffff) AM_RAM AM_SHARE(4) // RAM access through cache
 
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
@@ -890,6 +887,66 @@ static ADDRESS_MAP_START( naomi_port, ADDRESS_SPACE_IO, 64 )
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
+
+/*
+ * Atomiswave address map, identical to Dreamcast
+ */
+
+static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
+	/* Area 0 */
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE(3) AM_REGION("maincpu", 0) // BIOS
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_SHARE(3)  // non cachable access to  0x00000000 - 0x001fffff
+
+	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_DEVREADWRITE("rom_board", naomibd_r, naomibd_w)
+	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE( dc_g1_ctrl_r, dc_g1_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE( dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE( "aica", dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+
+
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+
+	/* Area 1 */
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
+
+	/* Area 2*/
+	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
+
+	/* Area 3 */
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE(4)
+	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE(4)// extra ram on Naomi (mirror on DC)
+	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE(4)// mirror
+	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE(4)// mirror
+
+	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE(4) // RAM access through cache
+	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE(4) // RAM access through cache
+
+	/* Area 4 */
+	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
+	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)
+	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
+	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE( ta_fifo_poly_w )
+	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
+	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)
+
+	/* Area 5 */
+	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
+
+	/* Area 6 */
+	//AM_RANGE(0x18000000, 0x1bffffff) AM_NOP // Unassigned
+
+	/* Area 7 */
+	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
+ADDRESS_MAP_END
 
 /*
  * Aica
@@ -1018,6 +1075,28 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( naomigd )
 	MDRV_IMPORT_FROM(naomi_base)
 	MDRV_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
+MACHINE_DRIVER_END
+
+/*
+ * Naomi 2
+ */
+
+// ...
+
+/*
+ * Naomi 2 GD-Rom
+ */
+
+// ...
+
+/*
+ * Atomiswave
+ */
+
+static MACHINE_DRIVER_START( aw )
+	MDRV_IMPORT_FROM(naomi)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(aw_map,0)
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -1250,147 +1329,11 @@ ROM_START( awbios )
 ROM_END
 
 
-ROM_START( fotns )
-	ROM_REGION( 0x200000, "maincpu", 0)
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
-	ROM_LOAD("ax1901p01.ic18", 0x0000000, 0x0800000,  CRC(a06998b0) SHA1(d617691db5170f6db176e40fc732966d523fd8cf) )
-	ROM_LOAD("ax1901m01.ic11", 0x1000000, 0x1000000,  CRC(ff5a1642) SHA1(49cefcce173f9a811fe9c0c07bee53aeba2bc3a8) )
-	ROM_LOAD("ax1902m01.ic12", 0x2000000, 0x1000000,  CRC(d9aae8a9) SHA1(bf87034088be0847b6e297b7665e0ea4d8cba631) )
-	ROM_LOAD("ax1903m01.ic13", 0x3000000, 0x1000000,  CRC(1711b23d) SHA1(ab628b2ec678839c75245e245297818ef1592d3b) )
-	ROM_LOAD("ax1904m01.ic14", 0x4000000, 0x1000000,  CRC(443bfb26) SHA1(6f7751afa0ca55dd0679758b27bed92b31c1b050) )
-	ROM_LOAD("ax1905m01.ic15", 0x5000000, 0x1000000,  CRC(eb1cada0) SHA1(459d21d622c72606f1d3095e8a25b6c4adccf8ab) )
-	ROM_LOAD("ax1906m01.ic16", 0x6000000, 0x1000000,  CRC(fe6da168) SHA1(d4ab6443383469bb5a4337005de917627a2e21cc) )
-	ROM_LOAD("ax1907m01.ic17", 0x7000000, 0x1000000,  CRC(9d3a0520) SHA1(78583fd171b34439f77a04a97ebe3c9d1bab61cc) )
-ROM_END
-
-ROM_START( demofist )
-	ROM_REGION( 0x200000, "maincpu", 0)
-	AW_BIOS
-
-	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
-	ROM_LOAD("ax0601p01.ic18", 0x0000000, 0x0800000,  CRC(0efb38ad) SHA1(9400e37efe3e936474d74400ebdf28ad0869b67b) )
-	/* incomplete, other rom names / sizes are.. ? */
-ROM_END
-
-
-
-struct AtomiswaveKey
-{
-    int P0[16];
-    int P1[16];
-    int S0[32];
-    int S1[16];
-    int S2[16];
-    int S3[8];
-};
-
-static const struct AtomiswaveKey fotns_key = {
-    {0,2,7,11,12,1,5,6,15,4,8,9,14,3,10,13},
-    {12,8,3,7,0,15,1,11,6,10,4,14,9,5,13,2},
-    {4,1,10,16,9,25,26,31,13,0,14,15,24,6,30,18,7,20,5,12,22,17,27,3,8,11,21,29,19,23,28,2},
-    {3,2,11,14,10,13,12,0,7,6,8,15,5,1,4,9},
-    {10,3,6,12,7,11,4,14,0,2,8,1,15,13,5,9},
-    {7,1,6,5,4,2,0,3}
-};
-
-static const struct AtomiswaveKey df_key = {
-    {1,4,5,6,9,7,10,11,13,0,8,12,14,2,3,15},
-    {12,0,3,8,7,6,15,11,1,4,14,10,9,5,13,2},
-    {9,27,15,6,28,30,7,12,21,0,1,25,22,3,16,29,13,4,24,20,2,5,23,19,18,10,8,14,17,11,31,26},
-    {5,13,4,0,8,12,14,7,2,11,3,10,6,1,15,9},
-    {11,6,2,9,12,1,7,4,10,0,13,3,8,14,15,5},
-    {1,6,4,3,5,2,7,0}
-};
-
-
-static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const struct AtomiswaveKey* key)
-{
-    int b0,b1,b2,b3;
-    int aux;
-
-    aux = BITSWAP16(cipherText,
-                    key->P0[15],key->P0[14],key->P0[13],key->P0[12],key->P0[11],key->P0[10],key->P0[9],key->P0[8],
-                    key->P0[7],key->P0[6],key->P0[5],key->P0[4],key->P0[3],key->P0[2],key->P0[1],key->P0[0]);
-    aux = aux ^ BITSWAP16(address/2,
-                          key->P1[15],key->P1[14],key->P1[13],key->P1[12],key->P1[11],key->P1[10],key->P1[9],key->P1[8],
-                          key->P1[7],key->P1[6],key->P1[5],key->P1[4],key->P1[3],key->P1[2],key->P1[1],key->P1[0]);
-
-    b0 = aux&0x1f;
-    b1 = (aux>>5)&0xf;
-    b2 = (aux>>9)&0xf;
-    b3 = aux>>13;
-
-    b0 = key->S0[b0];
-    b1 = key->S1[b1];
-    b2 = key->S2[b2];
-    b3 = key->S3[b3];
-
-    return (b3<<13)|(b2<<9)|(b1<<5)|b0;
-}
-
-
-static DRIVER_INIT(fotns)
-{
-  	int i;
-	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
-
-	long rom_size = memory_region_length(machine, "user1");
-
-	for(i=0; i<rom_size/2; i++)
-	{
-		src[i] = atomiswave_decrypt(src[i], i*2, &fotns_key);
-	}
-
-#if 0
-	{
-		FILE *fp;
-		const char *gamename = machine->gamedrv->name;
-		char filename[256];
-		sprintf(filename, "%s.dump", gamename);
-
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(src, rom_size, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
-}
-
-
-
-static DRIVER_INIT(demofist)
-{
-  	int i;
-	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
-
-	long rom_size = memory_region_length(machine, "user1");
-
-	for(i=0; i<rom_size/2; i++)
-	{
-		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);
-	}
-
-#if 0
-	{
-		FILE *fp;
-		const char *gamename = machine->gamedrv->name;
-		char filename[256];
-		sprintf(filename, "%s.dump", gamename);
-
-		fp=fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(src, rom_size, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
-}
-
+/**********************************************
+ *
+ * Naomi Cart ROM defines
+ *
+ *********************************************/
 
 
 /* Info above each set is automatically generated from the IC22 rom and may not be accurate */
@@ -3232,7 +3175,11 @@ GAME( 1998, hod2bios, 0,        naomi,    naomi,    0,     ROT0, "Sega",        
 GAME( 1999, f355bios, 0,        naomi,    naomi,    0,     ROT0, "Sega",            "Naomi Ferrari F355 Challenge Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 GAME( 1999, f355,     f355bios, naomi,    naomi,    0,     ROT0, "Sega",            "Ferrari F355 Challenge", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
-
+/**********************************************
+ *
+ * Naomi GD-ROM defines
+ *
+ *********************************************/
 
 ROM_START( gundmgd )
 	NAOMIGD_BIOS
@@ -4147,13 +4094,18 @@ GAME( 2003, puyofev,   naomigd,  naomigd,  naomi, naomi,  ROT0, "Sega",         
 //GDS-0037? Puyo Puyo Fever (Export)
 
 
-/* Naomi 2 & Naomi 2 GD-ROM */
+/**********************************************
+ *
+ * Naomi 2 Cart defines
+ *
+ *********************************************/
 
 ROM_START( vstrik3c )
 	NAOMI2_BIOS
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASEFF)
 	ROM_LOAD("epr-23663.ic22", 0x0000000, 0x0400000, CRC(7007fec7) SHA1(523168f0b218d0bd5c815d65bf0caba2c8468c9d) )
+	/* TODO: proper rom names */
 	ROM_LOAD("ic.1", 0x0800000, 0x0800000, CRC(db8bf632) SHA1(cd0c5c385dc33778eb6477f48a33d31f8461b810) )
 	ROM_LOAD("ic.2", 0x1000000, 0x0800000, CRC(f5889f8b) SHA1(540aa6a9adf10d5426ac4962afdc300cc9c5c6ba) )
 	ROM_LOAD("ic.3", 0x1800000, 0x0800000, CRC(74e7ef35) SHA1(6b63910fa05f98b31689882d3f7f32ea84fb11e5) )
@@ -4203,6 +4155,12 @@ ROM_START( wldrider )
 	ROM_LOAD("ic.19",0x9800000, 0x0800000, NO_DUMP )
 	ROM_LOAD("ic.20",0xa000000, 0x0800000, NO_DUMP )
 ROM_END
+
+/**********************************************
+ *
+ * Naomi 2 GD-ROM defines
+ *
+ *********************************************/
 
 ROM_START( vstrik3 )
 	NAOMI2_BIOS
@@ -4435,7 +4393,7 @@ GAME( 2001, vstrik3c, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "
 /* Incomplete Dumps (just the program rom IC22) */
 GAME( 2001, wldrider, naomi2,  naomi,    naomi,    0,  ROT0,  "Sega",          "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
-// GDS-xxxx (first party games?)
+/* GDS-xxxx (Sega first party games) */
 GAME( 2001, vstrik3, naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2001, vf4,     naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 (GDS-0012)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2001, vf4b,    vf4,     naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 (Rev B) (GDS-0012B)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -4451,8 +4409,159 @@ GAME( 2004, vf4tuned,naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "
 GAME( 2004, vf4tunedd,vf4tuned,naomigd,   naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev D) (GDS-0036D)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, vf4tuneda,vf4tuned,naomigd,   naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 Final Tuned (Rev A) (GDS-0036A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
+/**********************************************
+ *
+ * Atomiswave cart defines
+ *
+ *********************************************/
+
+struct AtomiswaveKey
+{
+    int P0[16];
+    int P1[16];
+    int S0[32];
+    int S1[16];
+    int S2[16];
+    int S3[8];
+};
+
+static const struct AtomiswaveKey fotns_key = {
+    {0,2,7,11,12,1,5,6,15,4,8,9,14,3,10,13},
+    {12,8,3,7,0,15,1,11,6,10,4,14,9,5,13,2},
+    {4,1,10,16,9,25,26,31,13,0,14,15,24,6,30,18,7,20,5,12,22,17,27,3,8,11,21,29,19,23,28,2},
+    {3,2,11,14,10,13,12,0,7,6,8,15,5,1,4,9},
+    {10,3,6,12,7,11,4,14,0,2,8,1,15,13,5,9},
+    {7,1,6,5,4,2,0,3}
+};
+
+static const struct AtomiswaveKey df_key = {
+    {1,4,5,6,9,7,10,11,13,0,8,12,14,2,3,15},
+    {12,0,3,8,7,6,15,11,1,4,14,10,9,5,13,2},
+    {9,27,15,6,28,30,7,12,21,0,1,25,22,3,16,29,13,4,24,20,2,5,23,19,18,10,8,14,17,11,31,26},
+    {5,13,4,0,8,12,14,7,2,11,3,10,6,1,15,9},
+    {11,6,2,9,12,1,7,4,10,0,13,3,8,14,15,5},
+    {1,6,4,3,5,2,7,0}
+};
+
+
+static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const struct AtomiswaveKey* key)
+{
+    int b0,b1,b2,b3;
+    int aux;
+
+    aux = BITSWAP16(cipherText,
+                    key->P0[15],key->P0[14],key->P0[13],key->P0[12],key->P0[11],key->P0[10],key->P0[9],key->P0[8],
+                    key->P0[7],key->P0[6],key->P0[5],key->P0[4],key->P0[3],key->P0[2],key->P0[1],key->P0[0]);
+    aux = aux ^ BITSWAP16(address/2,
+                          key->P1[15],key->P1[14],key->P1[13],key->P1[12],key->P1[11],key->P1[10],key->P1[9],key->P1[8],
+                          key->P1[7],key->P1[6],key->P1[5],key->P1[4],key->P1[3],key->P1[2],key->P1[1],key->P1[0]);
+
+    b0 = aux&0x1f;
+    b1 = (aux>>5)&0xf;
+    b2 = (aux>>9)&0xf;
+    b3 = aux>>13;
+
+    b0 = key->S0[b0];
+    b1 = key->S1[b1];
+    b2 = key->S2[b2];
+    b3 = key->S3[b3];
+
+    return (b3<<13)|(b2<<9)|(b1<<5)|b0;
+}
+
+
+static DRIVER_INIT(fotns)
+{
+  	int i;
+	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
+
+	long rom_size = memory_region_length(machine, "user1");
+
+	for(i=0; i<rom_size/2; i++)
+	{
+		src[i] = atomiswave_decrypt(src[i], i*2, &fotns_key);
+	}
+
+#if 0
+	{
+		FILE *fp;
+		const char *gamename = machine->gamedrv->name;
+		char filename[256];
+		sprintf(filename, "%s.dump", gamename);
+
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(src, rom_size, 1, fp);
+			fclose(fp);
+		}
+	}
+#endif
+}
+
+
+
+static DRIVER_INIT(demofist)
+{
+  	int i;
+	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
+
+	long rom_size = memory_region_length(machine, "user1");
+
+	for(i=0; i<rom_size/2; i++)
+	{
+		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);
+	}
+
+#if 0
+	{
+		FILE *fp;
+		const char *gamename = machine->gamedrv->name;
+		char filename[256];
+		sprintf(filename, "%s.dump", gamename);
+
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(src, rom_size, 1, fp);
+			fclose(fp);
+		}
+	}
+#endif
+}
+
+ROM_START( fotns )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD("ax1901p01.ic18", 0x0000000, 0x0800000,  CRC(a06998b0) SHA1(d617691db5170f6db176e40fc732966d523fd8cf) )
+	ROM_LOAD("ax1901m01.ic11", 0x1000000, 0x1000000,  CRC(ff5a1642) SHA1(49cefcce173f9a811fe9c0c07bee53aeba2bc3a8) )
+	ROM_LOAD("ax1902m01.ic12", 0x2000000, 0x1000000,  CRC(d9aae8a9) SHA1(bf87034088be0847b6e297b7665e0ea4d8cba631) )
+	ROM_LOAD("ax1903m01.ic13", 0x3000000, 0x1000000,  CRC(1711b23d) SHA1(ab628b2ec678839c75245e245297818ef1592d3b) )
+	ROM_LOAD("ax1904m01.ic14", 0x4000000, 0x1000000,  CRC(443bfb26) SHA1(6f7751afa0ca55dd0679758b27bed92b31c1b050) )
+	ROM_LOAD("ax1905m01.ic15", 0x5000000, 0x1000000,  CRC(eb1cada0) SHA1(459d21d622c72606f1d3095e8a25b6c4adccf8ab) )
+	ROM_LOAD("ax1906m01.ic16", 0x6000000, 0x1000000,  CRC(fe6da168) SHA1(d4ab6443383469bb5a4337005de917627a2e21cc) )
+	ROM_LOAD("ax1907m01.ic17", 0x7000000, 0x1000000,  CRC(9d3a0520) SHA1(78583fd171b34439f77a04a97ebe3c9d1bab61cc) )
+ROM_END
+
+ROM_START( demofist )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD("ax0601p01.ic18", 0x0000000, 0x0800000,  CRC(0efb38ad) SHA1(9400e37efe3e936474d74400ebdf28ad0869b67b) )
+	ROM_LOAD("ic11", 0x1000000, 0x1000000,  NO_DUMP )
+	ROM_LOAD("ic12", 0x2000000, 0x1000000,  NO_DUMP )
+	ROM_LOAD("ic13", 0x3000000, 0x1000000,  NO_DUMP )
+	ROM_LOAD("ic14", 0x4000000, 0x1000000,  NO_DUMP )
+	ROM_LOAD("ic15", 0x5000000, 0x1000000,  NO_DUMP )
+	ROM_LOAD("ic16", 0x6000000, 0x1000000,  NO_DUMP )
+	ROM_LOAD("ic17", 0x7000000, 0x1000000,  NO_DUMP )
+ROM_END
 
 /* Atomiswave */
-GAME( 2001, awbios,   0,        naomi,    naomi,    0, ROT0, "Sammy",           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns, ROT0, "Arc System Works",           "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2001, awbios,   0,        naomi,    naomi,    0,        ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+
+GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns,    ROT0, "Arc System Works",                "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, demofist, awbios,   naomi,    naomi,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
