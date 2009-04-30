@@ -5,7 +5,7 @@ UINT8* ninjakd2_bg_videoram;
 UINT8* ninjakd2_fg_videoram;
 
 static int next_sprite_overdraw_enabled;
-static int stencil_palette;
+static int (*stencil_compare_function) (UINT16 pal);
 static int sprites_updated;
 static bitmap_t *sp_bitmap;
 // in robokid and omegaf big sprites are laid out differently in ROM
@@ -25,6 +25,7 @@ static UINT8* robokid_bg0_videoram;
 static UINT8* robokid_bg1_videoram;
 static UINT8* robokid_bg2_videoram;
 
+#define TRANSPARENTCODE (15)
 
 /*************************************
  *
@@ -139,6 +140,12 @@ static void videoram_alloc(running_machine* const machine, int const size)
 	sp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
+static int stencil_ninjakd2( UINT16 pal );
+static int stencil_mnight(   UINT16 pal );
+static int stencil_arkarea(  UINT16 pal );
+static int stencil_robokid(  UINT16 pal );
+static int stencil_omegaf(   UINT16 pal );
+
 VIDEO_START( ninjakd2 )
 {
 	videoram_alloc(machine, 0);
@@ -146,10 +153,10 @@ VIDEO_START( ninjakd2 )
 	fg_tilemap = tilemap_create(         machine, get_fg_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
 	bg_tilemap = tilemap_create(machine, ninjakd2_get_bg_tile_info, tilemap_scan_rows,  16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap, 15);
+	tilemap_set_transparent_pen(fg_tilemap, TRANSPARENTCODE);
 
 	robokid_sprites = 0;
-	stencil_palette = 0xf0;  // stencil palette when overdraw mode = 0xf (watched bit 7-4)
+	stencil_compare_function = stencil_ninjakd2 ;
 }
 
 VIDEO_START( mnight )
@@ -159,10 +166,23 @@ VIDEO_START( mnight )
 	fg_tilemap = tilemap_create(       machine, get_fg_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
 	bg_tilemap = tilemap_create(machine, mnight_get_bg_tile_info, tilemap_scan_rows,  16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap, 15);
+	tilemap_set_transparent_pen(fg_tilemap, TRANSPARENTCODE);
 
 	robokid_sprites = 0;
-	stencil_palette = 0xf0;  // stencil palette when overdraw mode = 0xf (watched bit 7-4)
+	stencil_compare_function = stencil_mnight ;
+}
+
+VIDEO_START( arkarea )
+{
+	videoram_alloc(machine, 0);
+
+	fg_tilemap = tilemap_create(       machine, get_fg_tile_info, tilemap_scan_rows,   8,  8, 32, 32);
+	bg_tilemap = tilemap_create(machine, mnight_get_bg_tile_info, tilemap_scan_rows,  16, 16, 32, 32);
+
+	tilemap_set_transparent_pen(fg_tilemap, TRANSPARENTCODE);
+
+	robokid_sprites = 0;
+	stencil_compare_function = stencil_arkarea ;
 }
 
 VIDEO_START( robokid )
@@ -176,12 +196,12 @@ VIDEO_START( robokid )
 	bg1_tilemap = tilemap_create(machine, robokid_get_bg1_tile_info, robokid_bg_scan,    16, 16, 32, 32);
 	bg2_tilemap = tilemap_create(machine, robokid_get_bg2_tile_info, robokid_bg_scan,    16, 16, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap,  15);
-	tilemap_set_transparent_pen(bg1_tilemap, 15);
-	tilemap_set_transparent_pen(bg2_tilemap, 15);
+	tilemap_set_transparent_pen(fg_tilemap,  TRANSPARENTCODE);
+	tilemap_set_transparent_pen(bg1_tilemap, TRANSPARENTCODE);
+	tilemap_set_transparent_pen(bg2_tilemap, TRANSPARENTCODE);
 
 	robokid_sprites = 1;
-	stencil_palette = 0xf0;  // stencil palette when overdraw mode = 0xf (watched bit 7-4)
+	stencil_compare_function = stencil_robokid ;
 }
 
 VIDEO_START( omegaf )
@@ -195,13 +215,13 @@ VIDEO_START( omegaf )
 	bg1_tilemap = tilemap_create(machine, robokid_get_bg1_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
 	bg2_tilemap = tilemap_create(machine, robokid_get_bg2_tile_info, omegaf_bg_scan,     16, 16, 128, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap,  15);
-	tilemap_set_transparent_pen(bg0_tilemap, 15);
-	tilemap_set_transparent_pen(bg1_tilemap, 15);
-	tilemap_set_transparent_pen(bg2_tilemap, 15);
+	tilemap_set_transparent_pen(fg_tilemap,  TRANSPARENTCODE);
+	tilemap_set_transparent_pen(bg0_tilemap, TRANSPARENTCODE);
+	tilemap_set_transparent_pen(bg1_tilemap, TRANSPARENTCODE);
+	tilemap_set_transparent_pen(bg2_tilemap, TRANSPARENTCODE);
 
 	robokid_sprites = 1;
-	stencil_palette = 0xf0;  // stencil palette when overdraw mode = 0xf (watched bit 7-4)
+	stencil_compare_function = stencil_omegaf ;
 }
 
 
@@ -415,13 +435,26 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap)
 	}
 }
 
+static int stencil_ninjakd2( UINT16 pal ) { return( (pal & 0xf0) == 0xf0 ); }
+static int stencil_mnight(   UINT16 pal ) { return( (pal & 0xf0) == 0xf0 ); }
+static int stencil_arkarea(  UINT16 pal ) { return( (pal & 0xf0) == 0xf0 ); }
+static int stencil_robokid(  UINT16 pal ) { return( (pal & 0xf0) <  0xe0 ); }
+static int stencil_omegaf(   UINT16 pal ) { return( TRUE ); }
+//////            OVERDRAW     STENCIL     UNKNOWN
+//////  NINJAKD2  023459ABCDE  F           1678
+//////    MNIGHT  023459ABCDE  F           279
+//////   ARKAREA  012345679BDE             8ACF
+//////   ROBOKID  EF           01236       45789ABCD
+//////    OMEGAF                                     unused ?
+// I could not find a port to select overdraw or stencil.
+// Temporarily, I compare with constant number.
+// This is very hackish.
 
 static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap, const rectangle* const cliprect)
 {
 	// if sprite overdraw is disabled, clear the sprite framebuffer
-	// if sprite overdraw is enabled, leave palette "0-E" on screen, and stencil only "F".
 	if (!next_sprite_overdraw_enabled)
-		bitmap_fill(sp_bitmap, cliprect, 15);
+		bitmap_fill(sp_bitmap, cliprect, TRANSPARENTCODE);
 	else
 	{
 		int y;
@@ -432,12 +465,7 @@ static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap
 			{
 				UINT16* const ptr = BITMAP_ADDR16(sp_bitmap, y, x);
 
-				if ( (*ptr & 0xf0) == stencil_palette ) { *ptr = 15; }
-				////// Before modified, clears palettes 0-B and F, and leaves C-E on screen
-				////// But I'm sure "Ninja Kid II" clears F, and leaves 0-E
-				//////  (apply this to other games when verified)
-				//////  Now, I use variable "stencil_palette".
-				//////  But, I think that it may be "F", because I don't know why 0-B was cleared.
+				if ( (*stencil_compare_function)(*ptr) ) *ptr = TRANSPARENTCODE ;
 			}
 		}
 	}
@@ -467,7 +495,7 @@ VIDEO_UPDATE( ninjakd2 )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	copybitmap_trans(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, 15);
+	copybitmap_trans(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
@@ -485,7 +513,7 @@ VIDEO_UPDATE( robokid )
 
 	tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
 
-	copybitmap_trans(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, 15);
+	copybitmap_trans(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
 	tilemap_draw(bitmap, cliprect, bg2_tilemap, 0, 0);
 
@@ -507,7 +535,7 @@ VIDEO_UPDATE( omegaf )
 
 	tilemap_draw(bitmap, cliprect, bg2_tilemap, 0, 0);
 
-	copybitmap_trans(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, 15);
+	copybitmap_trans(bitmap, sp_bitmap, 0, 0, 0, 0, cliprect, TRANSPARENTCODE);
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 

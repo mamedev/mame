@@ -20,6 +20,7 @@ extern WRITE8_HANDLER( robokid_bg2_bank_w );
 
 extern VIDEO_START( ninjakd2 );
 extern VIDEO_START( mnight );
+extern VIDEO_START( arkarea );
 extern VIDEO_START( robokid );
 extern VIDEO_START( omegaf );
 extern VIDEO_UPDATE( ninjakd2 );

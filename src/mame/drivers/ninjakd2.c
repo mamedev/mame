@@ -997,6 +997,21 @@ static MACHINE_DRIVER_START( mnight )
 	MDRV_SOUND_REMOVE("pcm")
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( arkarea )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(ninjakd2)
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu,0)
+
+	/* video hardware */
+	MDRV_VIDEO_START(arkarea)
+
+	/* sound hardware */
+	MDRV_SOUND_REMOVE("pcm")
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( robokid )
 
 	/* basic machine hardware */
@@ -1405,7 +1420,7 @@ ROM_END
 /******************************************************************************
 
 Gfx ROMs in the older games have an unusual layout, where a high address bit
-(which is no the top bit) separates parts of the same tile. To make it possible
+(which is not the top bit) separates parts of the same tile. To make it possible
 to decode graphics without resorting to ROM_CONTINUE trickery, this function
 makes an address line rotation, bringing bit "bit" to bit 0 and shifting left
 by one place all the intervening bits.
@@ -1484,9 +1499,9 @@ GAME( 1987, ninjak2a, ninjakd2, ninjakd2, ninjakd2, bootleg,  ROT0,   "UPL", "Ni
 GAME( 1987, ninjak2b, ninjakd2, ninjakd2, rdaction, bootleg,  ROT0,   "UPL", "Ninja-Kid II / NinjaKun Ashura no Shou (set 3, bootleg?)", 0 )
 GAME( 1987, rdaction, ninjakd2, ninjakd2, rdaction, ninjakd2, ROT0,   "UPL (World Games license)", "Rad Action / NinjaKun Ashura no Shou", 0 )
 GAME( 1987, mnight,   0,        mnight,   mnight,   mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", GAME_IMPERFECT_GRAPHICS )
-GAME( 1987, arkarea,  0,        mnight,   arkarea,  mnight,   ROT0,   "UPL", "Ark Area", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, robokid,  0,        robokid,  robokid,  0,        ROT0,   "UPL", "Atomic Robo-kid", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, robokidj, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, robokdj2, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, omegaf,   0,        omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, omegafs,  omegaf,   omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter Special", GAME_IMPERFECT_GRAPHICS )
+GAME( 1987, arkarea,  0,        arkarea,  arkarea,  mnight,   ROT0,   "UPL", "Ark Area", 0 )
+GAME( 1988, robokid,  0,        robokid,  robokid,  0,        ROT0,   "UPL", "Atomic Robo-kid", 0 )
+GAME( 1988, robokidj, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 1)", 0 )
+GAME( 1988, robokdj2, robokid,  robokid,  robokidj, 0,        ROT0,   "UPL", "Atomic Robo-kid (Japan, set 2)", 0 )
+GAME( 1989, omegaf,   0,        omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter", 0 )
+GAME( 1989, omegafs,  omegaf,   omegaf,   omegaf,   0,        ROT270, "UPL", "Omega Fighter Special", 0 )
