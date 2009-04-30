@@ -167,7 +167,6 @@ static WRITE8_HANDLER( sound_command_w )
 	static int cmd;
 	int c;
 
-
 	if (offset == 0) cmd = (cmd & 0x00ff) | (data << 8);
 	else cmd = (cmd & 0xff00) | data;
 
@@ -178,41 +177,29 @@ static WRITE8_HANDLER( sound_command_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( olibochu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(olibochu_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(olibochu_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2")
 	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("DSW0")
 	AM_RANGE(0xa004, 0xa004) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa005, 0xa005) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(olibochu_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(olibochu_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xa800, 0xa801) AM_WRITE(sound_command_w)
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(olibochu_flipscreen_w)	/* bit 6 = enable sound? */
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf400, 0xf41f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf440, 0xf47f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0xf400, 0xf41f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf440, 0xf47f) AM_RAM AM_BASE(&spriteram_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x6000, 0x63ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( olibochu_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_r)	/* likely ay8910 input port, not direct */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("ay", ay8910_address_data_w)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( olibochu )
@@ -367,12 +354,14 @@ static MACHINE_DRIVER_START( olibochu )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ?? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(olibochu_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(olibochu_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* 4 MHz ?? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_PROGRAM_MAP(olibochu_sound_map,0)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,60) //???
+
+//	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

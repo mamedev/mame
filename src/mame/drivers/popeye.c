@@ -80,72 +80,47 @@ static WRITE8_HANDLER( protection_w )
 
 
 
-static ADDRESS_MAP_START( skyskipr_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8c00, 0x8e7f) AM_READ(SMH_RAM)
-	AM_RANGE(0x8e80, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe001) AM_READ(protection_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( skyskipr_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8c00, 0x8c02) AM_WRITE(SMH_RAM) AM_BASE(&popeye_background_pos)
-	AM_RANGE(0x8c03, 0x8c03) AM_WRITE(SMH_RAM) AM_BASE(&popeye_palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x8e80, 0x8fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( skyskipr_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE(&popeye_background_pos)
+	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE(&popeye_palettebank)
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(skyskipr_bitmap_w)
-	AM_RANGE(0xe000, 0xe001) AM_WRITE(protection_w)
+	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popeye_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8800, 0x8bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8c00, 0x8e7f) AM_READ(SMH_RAM)
-	AM_RANGE(0x8e80, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe001) AM_READ(protection_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( popeye_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8800, 0x8bff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8c00, 0x8c02) AM_WRITE(SMH_RAM) AM_BASE(&popeye_background_pos)
-	AM_RANGE(0x8c03, 0x8c03) AM_WRITE(SMH_RAM) AM_BASE(&popeye_palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x8e80, 0x8fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( popeye_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8bff) AM_RAM
+	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE(&popeye_background_pos)
+	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE(&popeye_palettebank)
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(popeye_bitmap_w)
-	AM_RANGE(0xe000, 0xe001) AM_WRITE(protection_w)
+	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popeyebl_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8c00, 0x8e7f) AM_READ(SMH_RAM)
-	AM_RANGE(0x8e80, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe01f) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( popeyebl_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8c00, 0x8c02) AM_WRITE(SMH_RAM) AM_BASE(&popeye_background_pos)
-	AM_RANGE(0x8c03, 0x8c03) AM_WRITE(SMH_RAM) AM_BASE(&popeye_palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x8e80, 0x8fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( popeyebl_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE(&popeye_background_pos)
+	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE(&popeye_palettebank)
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(skyskipr_bitmap_w)
-	AM_RANGE(0xe000, 0xe01f) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xe000, 0xe01f) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( popeye_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay", ay8910_address_data_w)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
@@ -470,8 +445,8 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( skyskipr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(skyskipr_readmem,skyskipr_writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(skyskipr_map,0)
+	MDRV_CPU_IO_MAP(popeye_io_map,0)
 	MDRV_CPU_VBLANK_INT("screen", popeye_interrupt)
 
 	/* video hardware */
@@ -501,7 +476,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( popeye )
 	MDRV_IMPORT_FROM(skyskipr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(popeye_readmem,popeye_writemem)
+	MDRV_CPU_PROGRAM_MAP(popeye_map,0)
 
 	MDRV_VIDEO_START(popeye)
 MACHINE_DRIVER_END
@@ -510,7 +485,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( popeyebl )
 	MDRV_IMPORT_FROM(skyskipr)
 	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(popeyebl_readmem,popeyebl_writemem)
+	MDRV_CPU_PROGRAM_MAP(popeyebl_map,0)
 
 	MDRV_PALETTE_INIT(popeyebl)
 	MDRV_VIDEO_START(popeye)

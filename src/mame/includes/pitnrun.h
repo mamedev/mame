@@ -26,8 +26,6 @@ WRITE8_HANDLER(pitnrun_v_heed_w);
 WRITE8_HANDLER(pitnrun_color_select_w);
 WRITE8_HANDLER( pitnrun_char_bank_select );
 WRITE8_HANDLER( pitnrun_scroll_w );
-READ8_HANDLER( pitnrun_videoram_r );
-READ8_HANDLER( pitnrun_videoram2_r );
 
 PALETTE_INIT(pitnrun);
 VIDEO_START(pitnrun);

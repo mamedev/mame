@@ -1,3 +1,9 @@
+/***************************************************************************
+
+Ping Pong (c) 1985 Konami
+
+***************************************************************************/
+
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
@@ -85,23 +91,17 @@ static INTERRUPT_GEN( pingpong_interrupt )
 	}
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x97ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( pingpong_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9000, 0x9002) AM_RAM
+	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9053, 0x97ff) AM_RAM
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa880, 0xa880) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa900, 0xa900) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa980, 0xa980) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(pingpong_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(pingpong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9000, 0x9002) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9003, 0x9052) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9053, 0x97ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* coin counters + irq enables */
 	AM_RANGE(0xa200, 0xa200) AM_WRITENOP		/* SN76496 data latch */
 	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("sn", sn76496_w)	/* trigger read */
@@ -457,7 +457,7 @@ static MACHINE_DRIVER_START( pingpong )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu",Z80,18432000/6)		/* 3.072 MHz (probably) */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(pingpong_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(pingpong_interrupt,16)	/* 1 IRQ + 8 NMI */
 
 	/* video hardware */

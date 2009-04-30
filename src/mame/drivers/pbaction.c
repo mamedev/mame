@@ -93,50 +93,34 @@ static WRITE8_HANDLER( pbaction_sh_command_w )
 static UINT8 *work_ram;
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe07f) AM_READ(SMH_RAM)
-	AM_RANGE(0xe400, 0xe5ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1")
+static ADDRESS_MAP_START( pbaction_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&work_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(pbaction_videoram2_w) AM_BASE(&pbaction_videoram2)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(pbaction_colorram2_w) AM_BASE(&pbaction_colorram2)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1")
+	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1") AM_WRITE(pbaction_flipscreen_w)
 	AM_RANGE(0xe605, 0xe605) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe606, 0xe606) AM_READNOP	/* ??? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM) AM_BASE(&work_ram)
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(pbaction_videoram2_w) AM_BASE(&pbaction_videoram2)
-	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(pbaction_colorram2_w) AM_BASE(&pbaction_colorram2)
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pbaction_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(pbaction_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xe000, 0xe07f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe400, 0xe5ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xe600, 0xe600) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xe604, 0xe604) AM_WRITE(pbaction_flipscreen_w)
-	AM_RANGE(0xe606, 0xe606) AM_WRITE(pbaction_scroll_w)
+	AM_RANGE(0xe606, 0xe606) AM_READNOP	/* ??? */ AM_WRITE(pbaction_scroll_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(pbaction_sh_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( pbaction_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	/* watchdog? */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pbaction_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay2", ay8910_address_data_w)
@@ -286,12 +270,12 @@ static MACHINE_DRIVER_START( pbaction )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(pbaction_map,0)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_CPU_ADD("audiocpu", Z80, 3072000)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pbaction_sound_map,0)
+	MDRV_CPU_IO_MAP(pbaction_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(pbaction_interrupt,2)	/* ??? */
 									/* IRQs are caused by the main CPU */
 

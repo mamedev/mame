@@ -38,13 +38,13 @@ WRITE8_HANDLER( pandoras_scrolly_w );
 VIDEO_START( pandoras );
 VIDEO_UPDATE( pandoras );
 
-static INTERRUPT_GEN( pandoras_interrupt_a )
+static INTERRUPT_GEN( pandoras_master_interrupt )
 {
 	if (irq_enable_a)
 		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static INTERRUPT_GEN( pandoras_interrupt_b )
+static INTERRUPT_GEN( pandoras_slave_interrupt )
 {
 	if (irq_enable_b)
 		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
@@ -125,81 +125,55 @@ static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 
 
 
-static ADDRESS_MAP_START( pandoras_readmem_a, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM) AM_SHARE(1)	/* Work RAM (Shared with CPU B) */
-	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM) AM_SHARE(2) 	/* Color RAM (shared with CPU B) */
-	AM_RANGE(0x1400, 0x17ff) AM_READ(SMH_RAM) AM_SHARE(3)	/* Video RAM (shared with CPU B) */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_ROM)				/* space for diagnostic ROM */
-	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM) AM_SHARE(4)	/* Shared RAM with CPU B */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
+static ADDRESS_MAP_START( pandoras_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram) 						/* Work RAM (Shared with CPU B) */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE(2) AM_BASE(&colorram)	/* Color RAM (shared with CPU B) */
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE(3) AM_BASE(&videoram)	/* Video RAM (shared with CPU B) */
+	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)								/* INT control */
+	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(pandoras_scrolly_w)									/* bg scroll */
+	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)							/* cause INT on the Z80 */
+	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(soundlatch_w)											/* sound command to the Z80 */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(pandoras_cpub_irqtrigger_w)							/* cause FIRQ on CPU B */
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(watchdog_reset_w)										/* watchdog reset */
+	AM_RANGE(0x4000, 0x5fff) AM_ROM															/* space for diagnostic ROM */
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE(4) 											/* Shared RAM with CPU B */
+	AM_RANGE(0x8000, 0xffff) AM_ROM															/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_writemem_a, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM) AM_SHARE(1) AM_BASE(&spriteram) /* Work RAM (Shared with CPU B) */
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(pandoras_cram_w) AM_SHARE(2) AM_BASE(&colorram)					/* Color RAM (shared with CPU B) */
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(pandoras_vram_w) AM_SHARE(3) AM_BASE(&videoram)					/* Video RAM (shared with CPU B) */
-	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)						/* INT control */
-	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(pandoras_scrolly_w)							/* bg scroll */
-	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)					/* cause INT on the Z80 */
-	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(soundlatch_w)								/* sound command to the Z80 */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(pandoras_cpub_irqtrigger_w)					/* cause FIRQ on CPU B */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(watchdog_reset_w)							/* watchdog reset */
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_ROM)									/* see notes */
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM) AM_SHARE(4) /* Shared RAM with CPU B */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)									/* ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pandoras_readmem_b, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM) AM_SHARE(1)/* Work RAM (Shared with CPU A) */
-	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM) AM_SHARE(2) 		/* Color RAM (shared with CPU A) */
-	AM_RANGE(0x1400, 0x17ff) AM_READ(SMH_RAM) AM_SHARE(3) 	/* Video RAM (shared with CPU A) */
+static ADDRESS_MAP_START( pandoras_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE(1)												/* Work RAM (Shared with CPU A) */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE(2) 						/* Color RAM (shared with CPU A) */
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE(3) 						/* Video RAM (shared with CPU A) */
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)								/* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1a01, 0x1a01) AM_READ_PORT("P1")
 	AM_RANGE(0x1a02, 0x1a02) AM_READ_PORT("P2")
 	AM_RANGE(0x1a03, 0x1a03) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2")
-//  AM_RANGE(0x1e00, 0x1e00) AM_READNOP              /* ??? seems to be important */
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM) AM_SHARE(4)	/* Shared RAM with the CPU A */
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
+//  AM_RANGE(0x1e00, 0x1e00) AM_READNOP              										/* ??? seems to be important */
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)										/* watchdog reset */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(pandoras_cpua_irqtrigger_w)							/* cause FIRQ on CPU A */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(4)												/* Shared RAM with the CPU A */
+	AM_RANGE(0xe000, 0xffff) AM_ROM															/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_writemem_b, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)	AM_SHARE(1) /* Work RAM (Shared with CPU A) */
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(pandoras_cram_w) AM_SHARE(2) 		/* Color RAM (shared with CPU A) */
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(pandoras_vram_w) AM_SHARE(3) 		/* Video RAM (shared with CPU A) */
-	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)	/* INT control */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)		/* watchdog reset */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(pandoras_cpua_irqtrigger_w)/* cause FIRQ on CPU A */
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM) AM_SHARE(4)	/* Shared RAM with the CPU A */
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
+static ADDRESS_MAP_START( pandoras_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM															/* ROM */
+	AM_RANGE(0x2000, 0x23ff) AM_RAM															/* RAM */
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)											/* soundlatch_r */
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay", ay8910_address_w)							/* AY-8910 */
+	AM_RANGE(0x6001, 0x6001) AM_DEVREAD("ay", ay8910_r)										/* AY-8910 */
+	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("ay", ay8910_data_w)								/* AY-8910 */
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(pandoras_i8039_irqtrigger_w)							/* cause INT on the 8039 */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch2_w)										/* sound command to the 8039 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_readmem_snd, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)				/* ROM */
-	AM_RANGE(0x2000, 0x23ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0x6001, 0x6001) AM_DEVREAD("ay", ay8910_r)	/* AY-8910 */
+static ADDRESS_MAP_START( pandoras_i8039_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)				/* ROM */
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(SMH_RAM)				/* RAM */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay", ay8910_address_w)/* AY-8910 */
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("ay", ay8910_data_w)	/* AY-8910 */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(pandoras_i8039_irqtrigger_w)/* cause INT on the 8039 */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch2_w)			/* sound command to the 8039 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pandoras_i8039_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
@@ -345,19 +319,19 @@ static MACHINE_DRIVER_START( pandoras )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,18432000/6)	/* CPU A */
-	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_a,pandoras_writemem_a)
-	MDRV_CPU_VBLANK_INT("screen", pandoras_interrupt_a)
+	MDRV_CPU_PROGRAM_MAP(pandoras_master_map,0)
+	MDRV_CPU_VBLANK_INT("screen", pandoras_master_interrupt)
 
-	MDRV_CPU_ADD("sub", M6809,18432000/6)	/* CPU B */
-	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_b,pandoras_writemem_b)
-	MDRV_CPU_VBLANK_INT("screen", pandoras_interrupt_b)
+	MDRV_CPU_ADD("sub", M6809,18432000/6)		/* CPU B */
+	MDRV_CPU_PROGRAM_MAP(pandoras_slave_map,0)
+	MDRV_CPU_VBLANK_INT("screen", pandoras_slave_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", Z80,14318000/8)
-	MDRV_CPU_PROGRAM_MAP(pandoras_readmem_snd,pandoras_writemem_snd)
+	MDRV_CPU_PROGRAM_MAP(pandoras_sound_map,0)
 
 	MDRV_CPU_ADD("mcu", I8039,14318000/2)
-	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
-	MDRV_CPU_IO_MAP(i8039_io_map,0)
+	MDRV_CPU_PROGRAM_MAP(pandoras_i8039_map,0)
+	MDRV_CPU_IO_MAP(pandoras_i8039_io_map,0)
 
 	MDRV_QUANTUM_TIME(HZ(3000))	/* slices per frame */
 

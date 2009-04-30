@@ -64,17 +64,6 @@ WRITE8_HANDLER( pitnrun_videoram2_w )
 	tilemap_mark_all_tiles_dirty( bg );
 }
 
-
-READ8_HANDLER( pitnrun_videoram_r )
-{
-	return videoram[offset];
-}
-
-READ8_HANDLER( pitnrun_videoram2_r )
-{
-	return pitnrun_videoram2[offset];
-}
-
 WRITE8_HANDLER( pitnrun_char_bank_select )
 {
 	if(pitnrun_char_bank!=data)

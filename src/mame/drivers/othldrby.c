@@ -94,36 +94,26 @@ static READ16_HANDLER( calendar_r )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x20000f) AM_READ(calendar_r)
-	AM_RANGE(0x300004, 0x300007) AM_READ(othldrby_videoram_r)
+static ADDRESS_MAP_START( othldrby_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(calendar_r,calendar_w)
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(othldrby_videoram_addr_w)
+	AM_RANGE(0x300004, 0x300007) AM_READWRITE(othldrby_videoram_r,othldrby_videoram_w)
+	AM_RANGE(0x300008, 0x300009) AM_WRITE(othldrby_vreg_addr_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READ(pip)	// vblank?
-	AM_RANGE(0x400000, 0x400fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x600000, 0x600001) AM_DEVREAD8("oki", okim6295_r, 0x00ff)
+	AM_RANGE(0x30000c, 0x30000f) AM_WRITE(othldrby_vreg_w)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_READ(pap)	// scanline???
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("P1")
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYSTEM")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x200000, 0x20000f) AM_WRITE(calendar_w)
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(othldrby_videoram_addr_w)
-	AM_RANGE(0x300004, 0x300007) AM_WRITE(othldrby_videoram_w)
-	AM_RANGE(0x300008, 0x300009) AM_WRITE(othldrby_vreg_addr_w)
-	AM_RANGE(0x30000c, 0x30000f) AM_WRITE(othldrby_vreg_w)
-	AM_RANGE(0x400000, 0x400fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x600000, 0x600001) AM_DEVWRITE8("oki", okim6295_w, 0x00ff)
 	AM_RANGE(0x700030, 0x700031) AM_DEVWRITE("oki", oki_bankswitch_w)
 	AM_RANGE(0x700034, 0x700035) AM_WRITE(coinctrl_w)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( othldrby )
@@ -242,7 +232,7 @@ static MACHINE_DRIVER_START( othldrby )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(othldrby_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	/* video hardware */

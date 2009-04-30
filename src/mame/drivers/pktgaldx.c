@@ -47,7 +47,6 @@ original todo:
 
 bootleg todo:
 
-    Sound.
     Fix GFX glitches in background of girls after each level.
     Tidy up code.
 
@@ -80,10 +79,10 @@ static WRITE16_DEVICE_HANDLER(pktgaldx_oki_bank_w)
 static ADDRESS_MAP_START( pktgaldx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100fff) AM_READ(SMH_RAM) AM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x102000, 0x102fff) AM_READ(SMH_RAM) AM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x110000, 0x1107ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x112000, 0x1127ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf2_rowscroll)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
+	AM_RANGE(0x110000, 0x1107ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
+	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
 
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x130000, 0x130fff) AM_RAM_WRITE(deco16_nonbuffered_palette_w) AM_BASE(&paletteram16)
@@ -93,9 +92,9 @@ static ADDRESS_MAP_START( pktgaldx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8("oki2", okim6295_w, 0x00ff)
 	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_r, 0x00ff)
 
-	AM_RANGE(0x161800, 0x16180f) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x161800, 0x16180f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
 	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE("oki2", pktgaldx_oki_bank_w)
-	AM_RANGE(0x167800, 0x167fff) AM_READ(deco16_104_pktgaldx_prot_r) AM_WRITE(deco16_104_pktgaldx_prot_w) AM_BASE(&deco16_prot_ram)
+	AM_RANGE(0x167800, 0x167fff) AM_READWRITE(deco16_104_pktgaldx_prot_r,deco16_104_pktgaldx_prot_w) AM_BASE(&deco16_prot_ram)
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -107,46 +106,11 @@ static READ16_HANDLER( pckgaldx_unknown_r )
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( paletteram16_xRGB_w )
-{
-	int pen;
-	int r,g,b;
-	UINT32 paldat;
-
-	COMBINE_DATA(&paletteram16[offset]);
-
-	pen = offset/2;
-
-	paldat = (paletteram16[pen*2] << 16) | (paletteram16[pen*2+1] << 0);
-
-	r = ((paldat & 0x000000ff) >>0);
-	g = ((paldat & 0x0000ff00) >>8);
-	b = ((paldat & 0x00ff0000) >>16);
-
-	palette_set_color(space->machine,pen,MAKE_RGB(r,g,b));
-}
-
 static READ16_HANDLER( pckgaldx_protection_r )
 {
 	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(space->cpu));
 	return -1;
 }
-
-
-
-static ADDRESS_MAP_START( pktgaldb_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x102000, 0x102fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x130000, 0x130fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x120000, 0x123fff) AM_READ(SMH_RAM)
-
-	AM_RANGE(0x140006, 0x140007) AM_READ(pckgaldx_unknown_r) // sound?
-	AM_RANGE(0x150006, 0x150007) AM_READ(pckgaldx_unknown_r) // sound?
-
-//  AM_RANGE(0x160000, 0x167fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x170000, 0x17ffff) AM_READ(SMH_RAM)
 
 /*
 cpu #0 (PC=0000A0DE): unmapped program memory word read from 00167DB2 & FFFF
@@ -158,9 +122,26 @@ cpu #0 (PC=00009B12): unmapped program memory word read from 00167842 & FF00
 cpu #0 (PC=0000923C): unmapped program memory word read from 00167DB2 & 00FF
 */
 
-	/* do the 300000 addresses somehow interact with the protection addresses on this bootleg? */
+/* do the 300000 addresses somehow interact with the protection addresses on this bootleg? */
+/* or maybe protection writes go to sound ... */
 
-	AM_RANGE(0x16500A, 0x16500b) AM_READ(pckgaldx_unknown_r)
+static ADDRESS_MAP_START( pktgaldb_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&pcktgaldb_fgram) // fgram on original?
+	AM_RANGE(0x102000, 0x102fff) AM_RAM // bgram on original?
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(&pcktgaldb_sprites)
+
+	AM_RANGE(0x130000, 0x130fff) AM_RAM // palette on original?
+
+	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_w, 0x00ff)
+	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_r, 0x00ff)
+	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8("oki2", okim6295_w, 0x00ff)
+	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_r, 0x00ff)
+
+//  AM_RANGE(0x160000, 0x167fff) AM_RAM
+	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE("oki2", pktgaldx_oki_bank_w)
+	AM_RANGE(0x160000, 0x167fff) AM_WRITENOP
+	AM_RANGE(0x16500a, 0x16500b) AM_READ(pckgaldx_unknown_r)
 
 	/* should we really be using these to read the i/o in the BOOTLEG?
       these look like i/o through protection ... */
@@ -171,37 +152,13 @@ cpu #0 (PC=0000923C): unmapped program memory word read from 00167DB2 & 00FF
 	AM_RANGE(0x167d10, 0x167d11) AM_READ(pckgaldx_protection_r) // check code at 6ea
 	AM_RANGE(0x167d1a, 0x167d1b) AM_READ(pckgaldx_protection_r) // check code at 7C4
 
-	AM_RANGE(0x300000, 0x30000f) AM_READ(SMH_RAM) // ??
+	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 
-	AM_RANGE(0x330000, 0x330bff) AM_READ(SMH_RAM)
+	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
+
+	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE(&paletteram16) // extra colours?
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( pktgaldb_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_WRITE(SMH_RAM) AM_BASE(&pcktgaldb_fgram) // fgram on original?
-	AM_RANGE(0x102000, 0x102fff) AM_WRITE(SMH_RAM) // bgram on original?
-	AM_RANGE(0x120000, 0x123fff) AM_WRITE(SMH_RAM)AM_BASE(&pcktgaldb_sprites)
-	AM_RANGE(0x130000, 0x130fff) AM_WRITE(SMH_RAM) // palette on original?
-	AM_RANGE(0x140000, 0x140003) AM_WRITE(SMH_RAM) // sound?
-	AM_RANGE(0x140008, 0x140009) AM_WRITE(SMH_RAM) // sound?
-	AM_RANGE(0x150000, 0x150003) AM_WRITE(SMH_RAM) // sound?
-
-	/* or maybe protection writes go to sound ... */
-	AM_RANGE(0x160000, 0x167fff) AM_WRITE(SMH_RAM)
-//cpu #0 (PC=00009246): unmapped program memory word write to 00167942 = 0000 & FFFF
-//cpu #0 (PC=0000924E): unmapped program memory word write to  = 0000 & FFFF
-	AM_RANGE(0x16500a, 0x16500b) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x166800, 0x166801) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x167942, 0x167943) AM_WRITE(SMH_RAM)
-
-	AM_RANGE(0x170000, 0x17ffff) AM_WRITE(SMH_RAM)
-
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(SMH_RAM)
-
-	AM_RANGE(0x330000, 0x330bff) AM_WRITE(paletteram16_xRGB_w) AM_BASE(&paletteram16) // extra colours?
-ADDRESS_MAP_END
 
 /**********************************************************************************/
 
@@ -379,7 +336,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pktgaldb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(pktgaldb_readmem,pktgaldb_writemem)
+	MDRV_CPU_PROGRAM_MAP(pktgaldb_map,0)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
 	/* video hardware */
@@ -397,6 +354,17 @@ static MACHINE_DRIVER_START( pktgaldb )
 	MDRV_VIDEO_UPDATE(pktgaldb)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("oki1", OKIM6295, 32220000/32)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+
+	MDRV_SOUND_ADD("oki2", OKIM6295, 32220000/16)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_DRIVER_END
 
 
@@ -441,9 +409,6 @@ ROM_START( pktgaldb )
 	ROM_LOAD16_BYTE ("4.bin", 0x00000, 0x80000, CRC(67ce30aa) SHA1(c5228ed19eebbfb6d5f7cbfcb99734d9fcd5aba3) )
 	ROM_LOAD16_BYTE( "5.bin", 0x00001, 0x80000, CRC(64cb4c33) SHA1(02f988f558113dd9a77079dee59e23583394fa98) )
 
-	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
-	ROM_LOAD( "kg01.14f",    0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) ) // 1.bin on the bootleg
-
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "11.bin",    0x000000, 0x80000, CRC(a8c8f1fd) SHA1(9fd5fa500967a1bd692abdbeef89ce195c8aecd4) )
 	ROM_LOAD16_BYTE( "6.bin",     0x000001, 0x80000, CRC(0e3335a1) SHA1(2d6899336302d222e8404dde159e64911a8f94e6) )
@@ -451,6 +416,9 @@ ROM_START( pktgaldb )
 	ROM_LOAD16_BYTE( "7.bin",     0x100001, 0x80000, CRC(0ebf12b5) SHA1(17b6c2ce21de3671d75d89a41317efddf5b49339) )
 	ROM_LOAD16_BYTE( "9.bin",     0x200001, 0x80000, CRC(078f371c) SHA1(5b510a0f7f50c55cce1ffcc8f2e9c3432b23e352) )
 	ROM_LOAD16_BYTE( "8.bin",     0x200000, 0x80000, CRC(40f5a032) SHA1(c2ad585ddbc3ef40c6214cb30b4d78a2cd0a9446) )
+
+	ROM_REGION( 0x20000, "oki1", 0 ) /* Oki samples */
+	ROM_LOAD( "kg01.14f",    0x00000, 0x20000, CRC(8a106263) SHA1(229ab17403c2b8f4e89a90a8cda2f3c3a4b55d9e) ) // 1.bin on the bootleg
 
 	ROM_REGION( 0x100000, "oki2", 0 ) /* Oki samples (banked?) */
 	ROM_LOAD( "3.bin",    0x00000, 0x80000, CRC(4638747b) SHA1(56d79cd8d4d7b41b71f1e942b5a5bf1bafc5c6e7) )
@@ -467,4 +435,4 @@ static DRIVER_INIT( pktgaldx )
 
 GAME( 1992, pktgaldx, 0,        pktgaldx, pktgaldx, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", 0 )
 GAME( 1993, pktgaldj, pktgaldx, pktgaldx, pktgaldx, pktgaldx,  ROT0, "Nihon System",          "Pocket Gal Deluxe (Japan v3.00)", 0 )
-GAME( 1992, pktgaldb, pktgaldx, pktgaldb, pktgaldx, 0,         ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1992, pktgaldb, pktgaldx, pktgaldb, pktgaldx, 0,         ROT0, "bootleg",               "Pocket Gal Deluxe (Euro v3.00, bootleg)", GAME_IMPERFECT_GRAPHICS )
